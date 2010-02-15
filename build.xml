@@ -314,6 +314,8 @@
         <copy file="build/org.mortbay.jetty.jar" todir="pkg-temp/lib/" />
         <copy file="build/router.jar" todir="pkg-temp/lib/" />
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
+        <!-- pulled out of routerconsole.jar in 0.7.12; name without version so we can overwrite if we upgrade  -->
+        <copy file="apps/jrobin/jrobin-1.4.0.jar" tofile="pkg-temp/lib/jrobin.jar" />
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
         <copy file="build/BOB.jar" todir="pkg-temp/lib/" />
         <copy file="build/systray.jar" todir="pkg-temp/lib" />
@@ -325,6 +327,8 @@
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
         <copy file="build/susimail.war" todir="pkg-temp/webapps/" />
         <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
+        <copy file="apps/susidns/src/WEB-INF/lib/jstl.jar" todir="pkg-temp/lib/" />
+        <copy file="apps/susidns/src/WEB-INF/lib/standard.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
         <copy file="apps/i2psnark/launch-i2psnark" todir="pkg-temp/" />
         <copy file="apps/i2psnark/jetty-i2psnark.xml" todir="pkg-temp/" />
@@ -470,6 +474,9 @@
         <copy file="build/systray.jar" todir="pkg-temp/lib/" />
         <copy file="build/susimail.war" todir="pkg-temp/webapps/" />
         <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
+        <!-- as of 0.7.12; someday, we can remove these from the updater -->
+        <copy file="apps/susidns/src/WEB-INF/lib/jstl.jar" todir="pkg-temp/lib/" />
+        <copy file="apps/susidns/src/WEB-INF/lib/standard.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
         <copy file="history.txt" todir="pkg-temp/" />
         <!-- the following overwrites history.txt on unix to shrink the update file -->
@@ -489,6 +496,9 @@
         <copy file="build/mstreaming.jar" todir="pkg-temp/lib/" />
         <copy file="build/streaming.jar" todir="pkg-temp/lib/" />
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
+        <!-- pulled out of routerconsole.jar in 0.7.12, someday we can take out of updater -->
+        <!-- name without version so we can overwrite if we upgrade  -->
+        <copy file="apps/jrobin/jrobin-1.4.0.jar" tofile="pkg-temp/lib/jrobin.jar" />
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />

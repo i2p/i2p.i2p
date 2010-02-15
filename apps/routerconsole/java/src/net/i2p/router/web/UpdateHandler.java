@@ -37,7 +37,7 @@ public class UpdateHandler {
     private String _nonce;
     
     protected static final String SIGNED_UPDATE_FILE = "i2pupdate.sud";
-    protected static final String PROP_UPDATE_IN_PROGRESS = "net.i2p.router.web.UpdateHandler.updateInProgress";
+    static final String PROP_UPDATE_IN_PROGRESS = "net.i2p.router.web.UpdateHandler.updateInProgress";
     protected static final String PROP_LAST_UPDATE_TIME = "router.updateLastDownloaded";
 
     public UpdateHandler() {
@@ -124,7 +124,7 @@ public class UpdateHandler {
         protected boolean _isRunning;
         protected boolean done;
         protected EepGet _get;
-        private final DecimalFormat _pct = new DecimalFormat("0.0%");
+        protected final DecimalFormat _pct = new DecimalFormat("0.0%");
 
         public UpdateRunner() { 
             _isRunning = false;

@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.IOException;
 import java.io.SequenceInputStream;
 import java.io.UnsupportedEncodingException;
@@ -104,7 +105,7 @@ D8usM7Dxp5yrDrCYZ5AIijc=
 */
 
     private static final int    VERSION_BYTES       = 16;
-    private static final int    HEADER_BYTES        = Signature.SIGNATURE_BYTES + VERSION_BYTES;
+    public static final int    HEADER_BYTES        = Signature.SIGNATURE_BYTES + VERSION_BYTES;
     private static final String PROP_TRUSTED_KEYS   = "router.trustedUpdateKeys";
 
     private static I2PAppContext _context;
@@ -176,6 +177,22 @@ D8usM7Dxp5yrDrCYZ5AIijc=
         }
         _trustedKeys.put(signingPublicKey, name);
         return true;
+    }
+
+    /**
+     *  Do we know about the following key?
+     *  @since 0.7.12
+     */
+    public boolean haveKey(String key) {
+        if (key.length() != KEYSIZE_B64_BYTES)
+            return false;
+        SigningPublicKey signingPublicKey = new SigningPublicKey();
+        try {
+            signingPublicKey.fromBase64(key);
+        } catch (DataFormatException dfe) {
+            return false;
+        }
+        return _trustedKeys.containsKey(signingPublicKey);
     }
 
     /**
@@ -258,7 +275,7 @@ D8usM7Dxp5yrDrCYZ5AIijc=
     }
 
     private static final void showVersionCLI(String signedFile) {
-        String versionString = new TrustedUpdate().getVersionString(new File(signedFile));
+        String versionString = getVersionString(new File(signedFile));
 
         if (versionString.equals(""))
             System.out.println("No version string found in file '" + signedFile + "'");
@@ -331,7 +348,7 @@ D8usM7Dxp5yrDrCYZ5AIijc=
      * @return The version string read, or an empty string if no version string
      *         is present.
      */
-    public String getVersionString(File signedFile) {
+    public static String getVersionString(File signedFile) {
         FileInputStream fileInputStream = null;
 
         try {
@@ -360,6 +377,45 @@ D8usM7Dxp5yrDrCYZ5AIijc=
             if (fileInputStream != null)
                 try {
                     fileInputStream.close();
+                } catch (IOException ioe) {
+                }
+        }
+    }
+    
+    /**
+     * Reads the version string from an input stream
+     * 
+     * @param inputStream containing at least 56 bytes
+     * 
+     * @return The version string read, or an empty string if no version string
+     *         is present.
+     */
+    public static String getVersionString(InputStream inputStream) {
+        try {
+            long skipped = inputStream.skip(Signature.SIGNATURE_BYTES);
+            if (skipped != Signature.SIGNATURE_BYTES)
+                return "";
+            byte[] data = new byte[VERSION_BYTES];
+            int bytesRead = DataHelper.read(inputStream, data);
+
+            if (bytesRead != VERSION_BYTES) {
+                return "";
+            }
+
+            for (int i = 0; i < VERSION_BYTES; i++) 
+                if (data[i] == 0x00) {
+                    return new String(data, 0, i, "UTF-8");
+                }
+
+            return new String(data, "UTF-8");
+        } catch (UnsupportedEncodingException uee) {
+            throw new RuntimeException("wtf, your JVM doesnt support utf-8? " + uee.getMessage());
+        } catch (IOException ioe) {
+            return "";
+        } finally {
+            if (inputStream != null)
+                try {
+                    inputStream.close();
                 } catch (IOException ioe) {
                 }
         }
@@ -409,6 +465,22 @@ D8usM7Dxp5yrDrCYZ5AIijc=
 
         if (!verify(signedFile))
             return "Unknown signing key or corrupt file";
+
+        return migrateFile(signedFile, outputFile);
+    }
+
+    /**
+     * Extract the file. Skips and ignores the signature and version. No verification.
+     * 
+     * @param signedFile     A signed update file.
+     * @param outputFile     The file to write the verified data to.
+     * 
+     * @return <code>null</code> if the
+     *         data was moved, and an error <code>String</code> otherwise.
+     */
+    public String migrateFile(File signedFile, File outputFile) {
+        if (!signedFile.exists())
+            return "File not found: " + signedFile.getAbsolutePath();
 
         FileInputStream fileInputStream = null;
         FileOutputStream fileOutputStream = null;
@@ -608,6 +680,23 @@ D8usM7Dxp5yrDrCYZ5AIijc=
             _log.warn("None of the keys match");
 
         return false;
+    }
+
+    /**
+     * Verifies the DSA signature of a signed update file.
+     * 
+     * @param signedFile The signed update file to check.
+     * 
+     * @return signer (could be empty string) or null if invalid
+     * @since 0.7.12
+     */
+    public String verifyAndGetSigner(File signedFile) {
+        for (SigningPublicKey signingPublicKey : _trustedKeys.keySet()) {
+            boolean isValidSignature = verify(signedFile, signingPublicKey);
+            if (isValidSignature)
+                return _trustedKeys.get(signingPublicKey);
+        }
+        return null;
     }
 
     /**

@@ -1,0 +1,378 @@
+package net.i2p.router.web;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Properties;
+
+import net.i2p.CoreVersion;
+import net.i2p.I2PAppContext;
+import net.i2p.crypto.TrustedUpdate;
+import net.i2p.data.DataHelper;
+import net.i2p.router.Router;
+import net.i2p.router.RouterContext;
+import net.i2p.util.EepGet;
+import net.i2p.util.FileUtil;
+import net.i2p.util.I2PAppThread;
+import net.i2p.util.Log;
+import net.i2p.util.OrderedProperties;
+import net.i2p.util.VersionComparator;
+
+/**
+ * Download and install a plugin.
+ * A plugin is a standard .sud file with a 40-byte signature,
+ * a 16-byte version, and a .zip file.
+ * Unlike for router updates, we need not have the public key
+ * for the signature in advance.
+ *
+ * The zip file must have a standard directory layout, with
+ * a plugin.config file at the top level.
+ * The config file contains properties for the package name, version,
+ * signing public key, and other settings.
+ * The zip file will typically contain a webapps/ or lib/ dir,
+ * and a webapps.config and/or clients.config file.
+ *
+ * @since 0.7.12
+ * @author zzz
+ */
+public class PluginUpdateHandler extends UpdateHandler {
+    private static PluginUpdateRunner _pluginUpdateRunner;
+    private String _xpi2pURL;
+    private String _appStatus;
+    private static final String XPI2P = "app.xpi2p";
+    private static final String ZIP = XPI2P + ".zip";
+    public static final String PLUGIN_DIR = "plugins";
+
+    private static PluginUpdateHandler _instance;
+    public static final synchronized PluginUpdateHandler getInstance(RouterContext ctx) { 
+        if (_instance != null)
+            return _instance;
+        _instance = new PluginUpdateHandler(ctx);
+        return _instance;
+    }
+
+    private PluginUpdateHandler(RouterContext ctx) {
+        super(ctx);
+        _appStatus = "";
+    }
+    
+    public void update(String xpi2pURL) {
+        // don't block waiting for the other one to finish
+        if ("true".equals(System.getProperty(PROP_UPDATE_IN_PROGRESS))) {
+            _log.error("Update already running");
+            return;
+        }
+        synchronized (UpdateHandler.class) {
+            if (_pluginUpdateRunner == null)
+                _pluginUpdateRunner = new PluginUpdateRunner(_xpi2pURL);
+            if (_pluginUpdateRunner.isRunning())
+                return;
+            _xpi2pURL = xpi2pURL;
+            _updateFile = (new File(_context.getTempDir(), "tmp" + _context.random().nextInt() + XPI2P)).getAbsolutePath();
+            System.setProperty(PROP_UPDATE_IN_PROGRESS, "true");
+            I2PAppThread update = new I2PAppThread(_pluginUpdateRunner, "AppDownload");
+            update.start();
+        }
+    }
+    
+    public String getAppStatus() {
+        return _appStatus;
+    }
+
+    public boolean isRunning() {
+        return _pluginUpdateRunner != null && _pluginUpdateRunner.isRunning();
+    }
+    
+    @Override
+    public boolean isDone() {
+        // FIXME
+        return false;
+    }
+    
+    public class PluginUpdateRunner extends UpdateRunner implements Runnable, EepGet.StatusListener {
+
+        public PluginUpdateRunner(String url) { 
+            super();
+        }
+
+        @Override
+        protected void update() {
+            updateStatus("<b>" + _("Downloading plugin from {0}", _xpi2pURL) + "</b>");
+            // use the same settings as for updater
+            boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
+            String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
+            int proxyPort = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_PORT, ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT);
+            try {
+                if (shouldProxy)
+                    // 10 retries!!
+                    _get = new EepGet(_context, proxyHost, proxyPort, 10, _updateFile, _xpi2pURL, false);
+                else
+                    _get = new EepGet(_context, 1, _updateFile, _xpi2pURL, false);
+                _get.addStatusListener(PluginUpdateRunner.this);
+                _get.fetch();
+            } catch (Throwable t) {
+                _log.error("Error downloading plugin", t);
+            }
+        }
+        
+        @Override
+        public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {
+            StringBuilder buf = new StringBuilder(64);
+            buf.append("<b>").append(_("Downloading plugin")).append(' ');
+            double pct = ((double)alreadyTransferred + (double)currentWrite) /
+                         ((double)alreadyTransferred + (double)currentWrite + (double)bytesRemaining);
+            synchronized (_pct) {
+                buf.append(_pct.format(pct));
+            }
+            buf.append(": ");
+            buf.append(_("{0}B transferred", DataHelper.formatSize(currentWrite + alreadyTransferred)));
+            updateStatus(buf.toString());
+        }
+
+        @Override
+        public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
+            updateStatus("<b>" + _("Plugin downloaded") + "</b>");
+            File f = new File(_updateFile);
+            File appDir = new File(_context.getAppDir(), PLUGIN_DIR);
+            if ((!appDir.exists()) && (!appDir.mkdir())) {
+                f.delete();
+                updateStatus("<b>" + _("Cannot create plugin directory {0}", appDir.getAbsolutePath()) + "</b>");
+                return;
+            }
+
+            TrustedUpdate up = new TrustedUpdate(_context);
+            File to = new File(_context.getTempDir(), "tmp" + _context.random().nextInt() + ZIP);
+            // extract to a zip file whether the sig is good or not, so we can get the properties file
+            String err = up.migrateFile(f, to);
+            if (err != null) {
+                updateStatus("<b>" + err + ' ' + _("from {0}", url) + " </b>");
+                f.delete();
+                to.delete();
+                return;
+            }
+            File tempDir = new File(_context.getTempDir(), "tmp" + _context.random().nextInt() + "-unzip");
+            if (!FileUtil.extractZip(to, tempDir)) {
+                f.delete();
+                to.delete();
+                FileUtil.rmdir(tempDir, false);
+                updateStatus("<b>" + _("Plugin from {0} is corrupt", url) + "</b>");
+                return;
+            }
+            File installProps = new File(tempDir, "plugin.config");
+            Properties props = new OrderedProperties();
+            try {
+                DataHelper.loadProps(props, installProps);
+            } catch (IOException ioe) {
+                f.delete();
+                to.delete();
+                FileUtil.rmdir(tempDir, false);
+                updateStatus("<b>" + _("Plugin from {0} does not contain the required configuration file", url) + "</b>");
+                return;
+            }
+            // we don't need this anymore, we will unzip again
+            FileUtil.rmdir(tempDir, false);
+
+            // ok, now we check sigs and deal with a bad sig
+            String pubkey = props.getProperty("key");
+            String keyName = props.getProperty("keyName");
+            if (pubkey == null || keyName == null || pubkey.length() != 172 || keyName.length() <= 0) {
+                f.delete();
+                to.delete();
+                //updateStatus("<b>" + "Plugin contains an invalid key" + ' ' + pubkey + ' ' + keyName + "</b>");
+                updateStatus("<b>" + _("Plugin from {0} contains an invalid key", url) + "</b>");
+                return;
+            }
+
+            // add all existing plugin keys, so any conflicts with existing keys
+            // will be discovered and rejected
+            Map<String, String> existingKeys = PluginStarter.getPluginKeys(_context);
+            for (Map.Entry<String, String> e : existingKeys.entrySet()) {
+                // ignore dups/bad keys
+                up.addKey(e.getKey(), e.getValue());
+            }
+
+            if (up.haveKey(pubkey)) {
+                // the key is already in the TrustedUpdate keyring
+                // verify the sig and verify that it is signed by the keyName in the plugin.config file
+                String signingKeyName = up.verifyAndGetSigner(f);
+                if (!keyName.equals(signingKeyName)) {
+                    f.delete();
+                    to.delete();
+                    updateStatus("<b>" + _("Plugin signature verification of {0} failed", url) + "</b>");
+                    return;
+                }
+            } else {
+                // add to keyring...
+                if(!up.addKey(pubkey, keyName)) {
+                    // bad or duplicate key
+                    f.delete();
+                    to.delete();
+                    updateStatus("<b>" + _("Plugin signature verification of {0} failed", url) + "</b>");
+                    return;
+                }
+                // ...and try the verify again
+                // verify the sig and verify that it is signed by the keyName in the plugin.config file
+                String signingKeyName = up.verifyAndGetSigner(f);
+                if (!keyName.equals(signingKeyName)) {
+                    f.delete();
+                    to.delete();
+                    updateStatus("<b>" + _("Plugin signature verification of {0} failed", url) + "</b>");
+                    return;
+                }
+            }
+
+            String sudVersion = TrustedUpdate.getVersionString(f);
+            f.delete();
+
+            String appName = props.getProperty("name");
+            String version = props.getProperty("version");
+            if (appName == null || version == null || appName.length() <= 0 || version.length() <= 0 ||
+                appName.indexOf("<") >= 0 || appName.indexOf(">") >= 0 ||
+                version.indexOf("<") >= 0 || version.indexOf(">") >= 0 ||
+                appName.startsWith(".") || appName.indexOf("/") >= 0 || appName.indexOf("\\") >= 0) {
+                to.delete();
+                updateStatus("<b>" + _("Plugin from {0} has invalid name or version", url) + "</b>");
+                return;
+            }
+            if (!version.equals(sudVersion)) {
+                to.delete();
+                updateStatus("<b>" + _("Plugin {0} has mismatched versions", appName) + "</b>");
+                return;
+            }
+
+            // todo compare sud version with property version
+
+            String minVersion = ConfigClientsHelper.stripHTML(props, "min-i2p-version");
+            if (minVersion != null &&
+                (new VersionComparator()).compare(CoreVersion.VERSION, minVersion) < 0) {
+                to.delete();
+                updateStatus("<b>" + _("This plugin requires I2P version {0} or higher", minVersion) + "</b>");
+                return;
+            }
+
+            minVersion = ConfigClientsHelper.stripHTML(props, "min-java-version");
+            if (minVersion != null &&
+                (new VersionComparator()).compare(System.getProperty("java.version"), minVersion) < 0) {
+                to.delete();
+                updateStatus("<b>" + _("This plugin requires Java version {0} or higher", minVersion) + "</b>");
+                return;
+            }
+
+            File destDir = new File(appDir, appName);
+            if (destDir.exists()) {
+                if (Boolean.valueOf(props.getProperty("install-only")).booleanValue()) {
+                    to.delete();
+                    updateStatus("<b>" + _("Downloaded plugin is for new installs only, but the plugin is already installed", url) + "</b>");
+                    return;
+                }
+
+                // compare previous version
+                File oldPropFile = new File(destDir, "plugin.config");
+                Properties oldProps = new OrderedProperties();
+                try {
+                    DataHelper.loadProps(oldProps, oldPropFile);
+                } catch (IOException ioe) {
+                    to.delete();
+                    FileUtil.rmdir(tempDir, false);
+                    updateStatus("<b>" + _("Installed plugin does not contain the required configuration file", url) + "</b>");
+                    return;
+                }
+                String oldPubkey = oldProps.getProperty("key");
+                String oldKeyName = oldProps.getProperty("keyName");
+                String oldAppName = props.getProperty("name");
+                if ((!pubkey.equals(oldPubkey)) || (!keyName.equals(oldKeyName)) || (!appName.equals(oldAppName))) {
+                    to.delete();
+                    updateStatus("<b>" + _("Signature of downloaded plugin does not match installed plugin") + "</b>");
+                    return;
+                }
+                String oldVersion = oldProps.getProperty("version");
+                if (oldVersion == null ||
+                    (new VersionComparator()).compare(oldVersion, version) >= 0) {
+                    to.delete();
+                    updateStatus("<b>" + _("Downloaded plugin version {0} is not newer than installed plugin", version) + "</b>");
+                    return;
+                }
+                minVersion = ConfigClientsHelper.stripHTML(props, "min-installed-version");
+                if (minVersion != null &&
+                    (new VersionComparator()).compare(minVersion, oldVersion) > 0) {
+                    to.delete();
+                    updateStatus("<b>" + _("Plugin update requires installed plugin version {0} or higher", minVersion) + "</b>");
+                    return;
+                }
+                String maxVersion = ConfigClientsHelper.stripHTML(props, "max-installed-version");
+                if (maxVersion != null &&
+                    (new VersionComparator()).compare(maxVersion, oldVersion) < 0) {
+                    to.delete();
+                    updateStatus("<b>" + _("Plugin update requires installed plugin version {0} or lower", maxVersion) + "</b>");
+                    return;
+                }
+
+                // check if it is running first?
+                try {
+                    if (!PluginStarter.stopPlugin(_context, appName)) {
+                        // failed, ignore
+                    }
+                } catch (Throwable e) {
+                    // no updateStatus() for this one
+                    _log.error("Error stopping plugin " + appName, e);
+                }
+
+            } else {
+                if (Boolean.valueOf(props.getProperty("update-only")).booleanValue()) {
+                    to.delete();
+                    updateStatus("<b>" + _("Plugin is for upgrades only, but the plugin is not installed") + "</b>");
+                    return;
+                }
+                if (!destDir.mkdir()) {
+                    to.delete();
+                    updateStatus("<b>" + _("Cannot create plugin directory {0}", destDir.getAbsolutePath()) + "</b>");
+                    return;
+                }
+            }
+
+            // Finally, extract the zip to the plugin directory
+            if (!FileUtil.extractZip(to, destDir)) {
+                to.delete();
+                updateStatus("<b>" + _("Failed to install plugin in {0}", destDir.getAbsolutePath()) + "</b>");
+                return;
+            }
+
+            to.delete();
+            if (Boolean.valueOf(props.getProperty("dont-start-at-install")).booleanValue()) {
+                if (Boolean.valueOf(props.getProperty("router-restart-required")).booleanValue())
+                    updateStatus("<b>" + _("Plugin {0} installed, router restart required", appName) + "</b>");
+                else {
+                    updateStatus("<b>" + _("Plugin {0} installed", appName) + "</b>");
+                    Properties pluginProps = PluginStarter.pluginProperties();
+                    pluginProps.setProperty(PluginStarter.PREFIX + appName + PluginStarter.ENABLED, "false");
+                    PluginStarter.storePluginProperties(pluginProps);
+                }
+            } else {
+                // start everything
+                try {
+                    if (PluginStarter.startPlugin(_context, appName))
+                        updateStatus("<b>" + _("Plugin {0} installed and started", appName) + "</b>");
+                    else
+                        updateStatus("<b>" + _("Plugin {0} installed but failed to start, check logs", appName) + "</b>");
+                } catch (Throwable e) {
+                    updateStatus("<b>" + _("Plugin {0} installed but failed to start", appName) + ": " + e + "</b>");
+                    _log.error("Error starting plugin " + appName, e);
+                }
+            }
+        }
+
+        @Override
+        public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {
+            File f = new File(_updateFile);
+            f.delete();
+            updateStatus("<b>" + _("Failed to download plugin from {0}", url) + "</b>");
+        }
+    }
+    
+    @Override
+    protected void updateStatus(String s) {
+        super.updateStatus(s);
+        _appStatus = s;
+    }
+}
+    

@@ -48,16 +48,20 @@ public class LoadClientAppsJob extends JobImpl {
             }
         }
     }
-    private class DelayedRunClient extends JobImpl {
+
+    public static class DelayedRunClient extends JobImpl {
         private String _className;
         private String _clientName;
         private String _args[];
+        private Log _log;
+
         public DelayedRunClient(RouterContext enclosingContext, String className, String clientName, String args[], long delay) {
             super(enclosingContext);
             _className = className;
             _clientName = clientName;
             _args = args;
-            getTiming().setStartAfter(LoadClientAppsJob.this.getContext().clock().now() + delay);
+            _log = enclosingContext.logManager().getLog(LoadClientAppsJob.class);
+            getTiming().setStartAfter(getContext().clock().now() + delay);
         }
         public String getName() { return "Delayed client job"; }
         public void runJob() {

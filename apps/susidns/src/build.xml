@@ -66,7 +66,9 @@
         <war destfile="${project}.war" webxml="WEB-INF/web-out.xml">
         	<fileset dir=".">
         		<include name="WEB-INF/**/*.class"/>
+                     <!-- pulled out of the jar in 0.7.12
         		<include name="WEB-INF/lib/*.jar"/>
+                      -->
         		<include name="images/*.png"/>
         		<include name="css.css"/>
         		<include name="index.html"/>

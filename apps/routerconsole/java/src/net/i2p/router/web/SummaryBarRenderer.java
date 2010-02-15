@@ -70,7 +70,11 @@ public class SummaryBarRenderer {
                .append(_("Anonymous resident webserver"))
                .append("\">")
                .append(_("Webserver"))
-               .append("</a></td></tr></table>\n" +
+               .append("</a>")
+
+               .append(NavHelper.getClientAppLinks(_context))
+
+               .append("</td></tr></table>\n" +
 
                        "<hr><h3><a href=\"/config.jsp\" target=\"_top\" title=\"")
                .append(_("Configure I2P Router"))
@@ -184,7 +188,7 @@ public class SummaryBarRenderer {
         if (_helper.updateAvailable() || _helper.unsignedUpdateAvailable()) {
             // display all the time so we display the final failure message
             buf.append(UpdateHandler.getStatus());
-            if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress"))) {
+            if ("true".equals(System.getProperty(UpdateHandler.PROP_UPDATE_IN_PROGRESS))) {
                 // nothing
             } else if(
                       // isDone() is always false for now, see UpdateHandler

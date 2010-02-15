@@ -62,7 +62,7 @@ public class RouterContext extends I2PAppContext {
     private Calculator _capacityCalc;
 
 
-    private static List _contexts = new ArrayList(1);
+    private static List<RouterContext> _contexts = new ArrayList(1);
     
     public RouterContext(Router router) { this(router, null); }
     public RouterContext(Router router, Properties envProps) { 
@@ -148,7 +148,7 @@ public class RouterContext extends I2PAppContext {
      * context is created or a router is shut down.
      *
      */
-    public static List listContexts() { return _contexts; }
+    public static List<RouterContext> listContexts() { return _contexts; }
     
     /** what router is this context working for? */
     public Router router() { return _router; }
