@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-02-10 13:36+0000\n"
-"PO-Revision-Date: 2010-02-10 20:19+0000\n"
+"POT-Creation-Date: 2010-02-15 17:54+0000\n"
+"PO-Revision-Date: 2010-02-15 20:41+0000\n"
 "Last-Translator: 4get <forget@mail.i2p>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -76,7 +76,7 @@ msgstr "Не принимаем туннели"
 msgid "No transports (hidden or starting up?)"
 msgstr "Нет транспортных протоколов (в скрытом режиме или запущен недавно?)"
 
-#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:450
+#: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:456
 msgid "Unreachable on any transport"
 msgstr "Недоступен по всем транспортным протоколам"
 
@@ -86,27 +86,27 @@ msgstr "Недоступен по всем транспортным проток
 msgid "Excessive clock skew: {0}"
 msgstr "Чрезмерное расхождение времени: {0}"
 
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:137
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:145
 msgid "Dropping tunnel requests: Too slow"
 msgstr "Игнорируем запросы туннелей: Время выполнения превысило ожидаемое"
 
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:354
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:352
 msgid "Dropping tunnel requests: Overloaded"
 msgstr "Игнорируем запросы туннелей: Слишком высокая нагрузка"
 
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:521
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:523
 msgid "Rejecting tunnels: Request overload"
 msgstr "Не принимаем туннели: Слишком много запросов"
 
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:546
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:548
 msgid "Rejecting tunnels: Connection limit"
 msgstr "Не принимаем туннели: Достигнут предел количества соединений"
 
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:748
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:742
 msgid "Dropping tunnel requests: High load"
 msgstr "Игнорируем запросы туннелей: Высокая нагрузка"
 
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:757
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:751
 msgid "Dropping tunnel requests: Queue time"
 msgstr "Игнорируем запросы туннелей: Слишком большое время пребывания в очереди"
 
@@ -1057,114 +1057,235 @@ msgstr "Настройки сохранены"
 msgid "Error saving the configuration (applied but not saved) - please see the error logs"
 msgstr "Не удалось сохранить настройки (применены, но не сохранены) — загляните в журнал ошибок"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:32
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:31
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:332
 msgid "Save Client Configuration"
 msgstr "Сохранить настройки клиентов"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:36
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:35
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:344
 msgid "Save WebApp Configuration"
 msgstr "Сохранить настройки веб-апплетов"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:66
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:97
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:39
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:354
+msgid "Save Plugin Configuration"
+msgstr "Сохранить настройки плагинов"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:43
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:360
+msgid "Install Plugin"
+msgstr "Установить плагин"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:74
+#, java-format
+msgid "Deleted plugin {0}"
+msgstr "Удален плагин {0}"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:76
+#, java-format
+msgid "Error deleting plugin {0}"
+msgstr "Ошибка при удалении плагина {0}"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:88
+#, java-format
+msgid "Stopped plugin {0}"
+msgstr "Остановлен плагин {0}"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:90
+#, java-format
+msgid "Error stopping plugin {0}"
+msgstr "Ошибка при остановке плагина {0}"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:111
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:179
 msgid "Start"
 msgstr "Запустить"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:80
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:125
 #: ../java/src/net/i2p/router/web/ConfigKeyringHandler.java:49
 msgid "Unsupported"
 msgstr "Не поддерживается"
 
 # This term intentionally left in English
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:94
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:110
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:140
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:156
 msgid "desc"
 msgstr "desc"
 
 # This term intentionally left in English
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:105
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:120
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:151
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:166
 msgid "name"
 msgstr "name"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:125
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:171
 msgid "New client added"
 msgstr "Добавлен новый клиент"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:129
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:175
 msgid "Client configuration saved successfully - restart required to take effect."
 msgstr "Настройки клиентов сохранены, требуется перезагрузка маршрутизатора для вступления в силу."
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:143
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:154
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:189
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:200
 msgid "Bad client index."
 msgstr "Индекс клиента не найден в списке."
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:148
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:159
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:36
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:370
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:384
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:194
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:205
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:38
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:374
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:389
 msgid "Client"
 msgstr "Клиент"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:148
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:194
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:253
 msgid "started"
 msgstr "запущен"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:159
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:205
 msgid "deleted"
 msgstr "удален"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:176
-msgid "WebApp configuration saved successfully - restart required to take effect."
-msgstr "Настройки веб-апплетов сохранены, требуется перезагрузка маршрутизатора для вступления в силу."
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:222
+msgid "WebApp configuration saved."
+msgstr "Настройки веб-апплета сохранены."
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:194
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:55
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:238
+msgid "Plugin configuration saved."
+msgstr "Настройки плагина сохранены."
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:253
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:57
 msgid "WebApp"
 msgstr "Веб-апплет"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:196
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:255
 msgid "Failed to start"
 msgstr "Не удалось запустить"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:202
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:260
 msgid "Failed to find server."
 msgstr "Не удалось найти сервер."
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:19
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:100
+# This term intentionally left in English
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:264
+msgid "pluginURL"
+msgstr "pluginURL"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:266
+msgid "No plugin URL specified."
+msgstr "Не указан URL загрузки плагина"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:276
+#, java-format
+msgid "No update URL specified for {0}"
+msgstr "Не указан URL загрузки плагина {0}"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:284
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:289
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:302
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:307
+msgid "Plugin or update download already in progress."
+msgstr "Загрузка плагина или обновления уже запущена."
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:293
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:100
+#, java-format
+msgid "Downloading plugin from {0}"
+msgstr "Производится загрузка плагина с {0}"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:311
+#, java-format
+msgid "Checking plugin {0} for updates"
+msgstr "Проверяется наличие обновления для плагина {0}"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:21
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:182
 msgid "Edit"
 msgstr "Редактировать"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:28
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:30
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:328
 msgid "Add Client"
 msgstr "Добавить клиент"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:36
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:38
 msgid "Class and arguments"
 msgstr "Название класса и параметры"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:36
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:55
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:38
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:57
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:80
+msgid "Control"
+msgstr "Управление"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:38
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:57
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:80
 msgid "Run at Startup?"
 msgstr "Запускать автоматически?"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:36
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:55
-msgid "Start Now"
-msgstr "Запустить вручную"
-
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:55
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:57
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:80
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:125
 msgid "Description"
 msgstr "Описание"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:101
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:80
+msgid "Plugin"
+msgstr "Плагин"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:91
+#: ../java/src/net/i2p/router/web/NetDbRenderer.java:191
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:165
+msgid "Version"
+msgstr "Версия"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:93
+msgid "Signed by"
+msgstr "Подписано"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:108
+msgid "Date"
+msgstr "Дата"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:114
+msgid "Author"
+msgstr "Автор"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:130
+msgid "License"
+msgstr "Лицензия"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:135
+msgid "Website"
+msgstr "Веб-сайт"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:140
+msgid "Update link"
+msgstr "Адрес обновления"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:184
+msgid "Stop"
+msgstr "Остановить"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:186
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:58
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:310
+msgid "Check for updates"
+msgstr "Проверить обновления"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:187
+#: ../java/src/net/i2p/router/web/ConfigNavHelper.java:18
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:213
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:220
+msgid "Update"
+msgstr "Обновление"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:190
 msgid "Delete"
 msgstr "Удалить"
 
@@ -1258,7 +1379,7 @@ msgid "Service"
 msgstr "Служба"
 
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:18
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:86
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:90
 #: ../java/strings/Strings.java:72
 msgid "Tunnels"
 msgstr "Туннели"
@@ -1266,12 +1387,6 @@ msgstr "Туннели"
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:18
 msgid "UI"
 msgstr "Интерфейс"
-
-#: ../java/src/net/i2p/router/web/ConfigNavHelper.java:18
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:209
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:216
-msgid "Update"
-msgstr "Обновление"
 
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:19
 msgid "Clients"
@@ -1287,15 +1402,15 @@ msgid "Logging"
 msgstr "Журнал"
 
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:19
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:92
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:234
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:96
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:238
 #: ../java/strings/Strings.java:67
 msgid "Peers"
 msgstr "Пиры"
 
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:19
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:294
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:128
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:132
 msgid "Stats"
 msgstr "Статистика"
 
@@ -1773,11 +1888,6 @@ msgstr "Русский"
 msgid "Swedish"
 msgstr "Svenska"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:58
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:310
-msgid "Check for updates"
-msgstr "Проверить обновления"
-
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:65
 msgid "Update available, attempting to download now"
 msgstr "Доступно обновление, пытаемся загрузить"
@@ -1786,39 +1896,39 @@ msgstr "Доступно обновление, пытаемся загрузит
 msgid "Update available, click button on left to download"
 msgstr "Доступно обновление, нажмите кнопку слева для загрузки"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:69
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:73
 msgid "No update available"
 msgstr "Нет доступных обновлений"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:77
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:81
 msgid "Updating news URL to"
 msgstr "Новый URL новостей"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:85
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:89
 msgid "Updating proxy host to"
 msgstr "Новый адрес I2P-прокси"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:93
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:97
 msgid "Updating proxy port to"
 msgstr "Новый порт I2P-прокси"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:106
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:110
 msgid "Updating refresh frequency to"
 msgstr "Новый интервал проверки обновлений"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:113
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:117
 msgid "Updating update policy to"
 msgstr "Новый режим обновлений"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:122
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:126
 msgid "Updating update URLs."
 msgstr "Новые URL обновлений"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:131
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:135
 msgid "Updating trusted keys."
 msgstr "Обновление списка доверенных ключей."
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:139
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:143
 msgid "Updating unsigned update URL to"
 msgstr "Новый URL неподписанной тестовой сборки"
 
@@ -2009,11 +2119,6 @@ msgstr "Статистика маршрутизаторов"
 msgid "Count"
 msgstr "Количество"
 
-#: ../java/src/net/i2p/router/web/NetDbRenderer.java:191
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:161
-msgid "Version"
-msgstr "Версия"
-
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:205
 msgid "Transports"
 msgstr "Транспортный протокол"
@@ -2035,7 +2140,7 @@ msgid "Full entry"
 msgstr "Показать полную запись"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:267
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:105
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:110
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:589
 msgid "Hidden"
 msgstr "Скрытый"
@@ -2092,6 +2197,165 @@ msgstr "Новости последний раз обновлялись {0} на
 #, java-format
 msgid "News last checked {0} ago."
 msgstr "Новости последний раз проверялись {0} назад."
+
+#: ../java/src/net/i2p/router/web/PluginUpdateChecker.java:65
+#, java-format
+msgid "Cannot check, plugin {0} is not installed"
+msgstr "Проверка невозможна — плагин {0} не установлен"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateChecker.java:102
+#, java-format
+msgid "Checking for update of plugin {0}"
+msgstr "Проверяется наличие обновления для плагина {0}"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateChecker.java:125
+#, java-format
+msgid "New plugin version {0} is available"
+msgstr "Доступна новая версия {0}"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateChecker.java:127
+#, java-format
+msgid "No new version is available for plugin {0}"
+msgstr "Для плагина {0} нет обновлений"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateChecker.java:134
+#, java-format
+msgid "Update check failed for plugin {0}"
+msgstr "Ошибка при проверке наличия обновлений для плагина {0}"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:121
+msgid "Downloading plugin"
+msgstr "Загружается плагин"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:128
+#: ../java/src/net/i2p/router/web/UpdateHandler.java:179
+#, java-format
+msgid "{0}B transferred"
+msgstr "{0} байт скачано"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:134
+msgid "Plugin downloaded"
+msgstr "Плагин загружен"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:139
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:328
+#, java-format
+msgid "Cannot create plugin directory {0}"
+msgstr "Не удалось создать директорию плагина {0}"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:148
+#: ../java/src/net/i2p/router/web/UpdateHandler.java:219
+#, java-format
+msgid "from {0}"
+msgstr "из {0}"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:158
+#, java-format
+msgid "Plugin from {0} is corrupt"
+msgstr "Загруженный из {0} плагин поврежден"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:169
+#, java-format
+msgid "Plugin from {0} does not contain the required configuration file"
+msgstr "Загруженный из {0} плагин не содержит необходимого файла настроек"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:182
+#, java-format
+msgid "Plugin from {0} contains an invalid key"
+msgstr "Загруженный из {0} плагин содержит некорректный ключ"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:201
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:210
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:219
+#, java-format
+msgid "Plugin signature verification of {0} failed"
+msgstr "Плагин {0} содержит недействительную подпись"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:234
+#, java-format
+msgid "Plugin from {0} has invalid name or version"
+msgstr "Загруженный из {0} плагин имеет некорректное название или версию"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:239
+#, java-format
+msgid "Plugin {0} has mismatched versions"
+msgstr "Плагин {0} содержит несовпадающие версии"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:249
+#, java-format
+msgid "This plugin requires I2P version {0} or higher"
+msgstr "Для этого плагина требуется версия I2P {0} и выше"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:257
+#, java-format
+msgid "This plugin requires Java version {0} or higher"
+msgstr "Для этого плагина требуется версия Java {0} и выше"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:265
+msgid "Downloaded plugin is for new installs only, but the plugin is already installed"
+msgstr "Загруженный инсталлятор плагина предназначен только для первоначальной установки, но такой плагин уже установлен"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:277
+msgid "Installed plugin does not contain the required configuration file"
+msgstr "Установленный плагин не содержит необходимого файла настроек"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:285
+msgid "Signature of downloaded plugin does not match installed plugin"
+msgstr "Подпись загруженного плагина не совпадает с установленным плагином"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:292
+#, java-format
+msgid "Downloaded plugin version {0} is not newer than installed plugin"
+msgstr "Версия скачанного плагина {0} не новее версии уже установленного плагина"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:299
+#, java-format
+msgid "Plugin update requires installed plugin version {0} or higher"
+msgstr "Для обновления плагина требуется установленная версия плагина {0} и выше"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:306
+#, java-format
+msgid "Plugin update requires installed plugin version {0} or lower"
+msgstr "Для обновления плагина требуется установленная версия плагина {0} и ниже"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:323
+msgid "Plugin is for upgrades only, but the plugin is not installed"
+msgstr "Загруженный инсталлятор плагина предназначен только для обновления, но такой плагин ещё не был установлен"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:336
+#, java-format
+msgid "Failed to install plugin in {0}"
+msgstr "Не удалось установить плагин в {0}"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:343
+#, java-format
+msgid "Plugin {0} installed, router restart required"
+msgstr "Плагин {0} установлен, требуется перезагрузка маршрутизатора"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:345
+#, java-format
+msgid "Plugin {0} installed"
+msgstr "Плагин {0} установлен"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:354
+#, java-format
+msgid "Plugin {0} installed and started"
+msgstr "Плагин {0} установлен и запущен"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:356
+#, java-format
+msgid "Plugin {0} installed but failed to start, check logs"
+msgstr "Плагин {0} установлен, но при его запуске произошел сбой, загляните в журнал ошибок"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:358
+#, java-format
+msgid "Plugin {0} installed but failed to start"
+msgstr "Плагин {0} установлен, но при его запуске произошел сбой"
+
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:368
+#, java-format
+msgid "Failed to download plugin from {0}"
+msgstr "Не удалось скачать плагин из {0}"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:72
 msgid "Peer Profiles"
@@ -2155,7 +2419,7 @@ msgid "Failing"
 msgstr "Сбоит"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:131
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:260
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:264
 msgid "Integrated"
 msgstr "Интегрированные"
 
@@ -2415,305 +2679,305 @@ msgstr "Встроенный анонимный веб-сервер"
 msgid "Webserver"
 msgstr "Веб-сервер"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:76
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:80
 msgid "Configure I2P Router"
 msgstr "Настройка Маршрутизатора I2P"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:78
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:82
 msgid "I2P Internals"
 msgstr "I2P свойства"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:84
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:355
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:88
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:359
 msgid "View existing tunnels and tunnel build status"
 msgstr "Обзор списка существующих туннелей и статуса строящихся"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:90
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:232
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:94
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:236
 msgid "Show all current peer connections"
 msgstr "Просмотр списка текущих соединения с пирами"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:96
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:100
 msgid "Show recent peer performance profiles"
 msgstr "Просмотр профилей пиров"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:98
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:102
 msgid "Profiles"
 msgstr "Профили"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:102
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:106
 msgid "Show list of all known I2P routers"
 msgstr "Показать список всех известных I2P маршрутизаторов"
 
 # This term intentionally left in English
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:104
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:108
 msgid "NetDB"
 msgstr "NetDB"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:108
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:112
 msgid "Health Report"
 msgstr "Журналы сообщений маршрутизатора"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:110
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:114
 msgid "Logs"
 msgstr "Журналы"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:114
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:118
 msgid "Show the router's workload, and how it's performing"
 msgstr "Просмотр загрузки маршрутизатора и эффективности его работы"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:116
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:120
 msgid "Jobs"
 msgstr "Задачи"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:120
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:124
 msgid "Graph router performance"
 msgstr "График производительности маршрутизатора"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:122
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:126
 msgid "Graphs"
 msgstr "Графики"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:126
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:130
 msgid "Textual router performance statistics"
 msgstr "Статистика производительности маршрутизатора в текстовом виде"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:132
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:370
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:136
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:375
 msgid "Local Destinations"
 msgstr "Локальные туннели"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:134
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:138
 #: ../java/strings/Strings.java:62
 msgid "I2PTunnel"
 msgstr "Менеджер Туннелей"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:145
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:149
 msgid "I2P Router Help"
 msgstr "Справка Маршрутизатора I2P"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:147
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:151
 msgid "General"
 msgstr "Общая информация"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:150
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:154
 msgid "Your unique I2P router identity is"
 msgstr "Уникальный идентификатор Вашего I2P маршрутизатора:"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:154
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:158
 msgid "never reveal it to anyone"
 msgstr "никому его не показывайте."
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:156
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:160
 msgid "Local Identity"
 msgstr "Локальный идентификатор"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:168
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:172
 msgid "How long we've been running for this session"
 msgstr "Время работы маршрутизатора с последнего запуска"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:171
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:175
 msgid "Uptime"
 msgstr "Аптайм"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:178
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:182
 msgid "Help with configuring your firewall and router for optimal I2P performance"
 msgstr "Помощь в настройке брандмауэра и маршрутизатора для обеспечения оптимальной производительности I2P"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:205
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:209
 msgid "Download"
 msgstr "Скачать"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:214
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:218
 msgid "Download Unsigned"
 msgstr "Скачать неподписанное"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:240
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:244
 msgid "Active"
 msgstr "Активные"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:248
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:252
 msgid "Fast"
 msgstr "Быстрые"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:254
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:258
 msgid "High capacity"
 msgstr "Высокоёмкие"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:266
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:270
 msgid "Known"
 msgstr "Известные"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:281
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:285
 msgid "Help with firewall configuration"
 msgstr "Помощь в настройке брандмауэра"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:283
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:287
 msgid "Check NAT/firewall"
 msgstr "Проверьте настройки NAT/брандмауэров."
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:303
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:307
 msgid "Reseed"
 msgstr "Повторить начальную загрузку"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:320
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:324
 msgid "Configure router bandwidth allocation"
 msgstr "Настройка ограничений скорости"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:322
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:326
 msgid "Bandwidth in/out"
 msgstr "Трафик (вх./исх.)"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:339
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:343
 msgid "Total"
 msgstr "Всего"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:347
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:351
 msgid "Used"
 msgstr "Объем"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:357
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:361
 msgid "Tunnels in/out"
 msgstr "Туннели (вх./исх.)"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:362
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:366
 msgid "Exploratory"
 msgstr "Зондирующие"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:378
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:382
 msgid "Participating"
 msgstr "Транзитные"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:384
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:388
 msgid "Share ratio"
 msgstr "Доля транзита"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:390
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:394
 msgid "What's in the router's job queue?"
 msgstr "Просмотр очереди заданий маршрутизатора."
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:392
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:396
 msgid "Congestion"
 msgstr "Занятость"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:397
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:401
 msgid "Job lag"
 msgstr "Задержка задач"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:403
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:407
 msgid "Message delay"
 msgstr "Задежка сообщений"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:409
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:413
 msgid "Tunnel lag"
 msgstr "Задержка туннелей"
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:415
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:419
 msgid "Backlog"
 msgstr "Очередь"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:96
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:101
 msgid "ERR-Client Manager I2CP Error - check logs"
 msgstr "ОШИБКА - ошибка менеджера I2CP - загляните в журнал ошибок"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:103
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:108
 #, java-format
 msgid "ERR-Clock Skew of {0}"
 msgstr "ОШИБКА - Часы сбиты (расхождение {0})"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:112
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:117
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:565
 msgid "OK"
 msgstr "OK"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:113
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:118
 msgid "ERR-Private TCP Address"
 msgstr "ОШИБКА - Частный TCP Адрес"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:115
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:120
 msgid "ERR-SymmetricNAT"
 msgstr "ОШИБКА - Симмметричный NAT"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:118
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:123
 msgid "WARN-Firewalled with Inbound TCP Enabled"
 msgstr "ПРЕДУПРЕЖДЕНИЕ - Заблокирован извне при включенном на вход TCP"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:120
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:125
 msgid "WARN-Firewalled and Floodfill"
 msgstr "ПРЕДУПРЕЖДЕНИЕ - Заблокирован извне и Floodfill"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:122
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:127
 msgid "WARN-Firewalled and Fast"
 msgstr "ПРЕДУПРЕЖДЕНИЕ - Заблокирован извне и Быстрый"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:123
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:128
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:569
 msgid "Firewalled"
 msgstr "Заблокирован извне"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:125
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:130
 msgid "ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart"
 msgstr "ОШИБКА - UDP-порт уже занят - перенастройте i2np.udp.internalPort=xxxx в дополнительных настройках и перезапустите маршрутизатор"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:131
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:136
 msgid "ERR-No Active Peers, Check Network Connection and Firewall"
 msgstr "ОШИБКА - Нет активных пиров, проверьте подключение к сети и брандмауэр"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:134
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:139
 msgid "ERR-UDP Disabled and Inbound TCP host/port not set"
 msgstr "ОШИБКА - UDP отключено и не заданы адрес/порт для входящих TCP-соединений"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:136
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:141
 msgid "WARN-Firewalled with UDP Disabled"
 msgstr "ПРЕДУПРЕЖДЕНИЕ - Заблокирован  извне при отключенном UDP"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:138
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:143
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:585
 msgid "Testing"
 msgstr "Проверка"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:370
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:375
 msgid "Add/remove/edit &amp; control your client and server tunnels"
 msgstr "Управление клиентскими и серверными туннелями"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:382
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:387
 msgid "Server"
 msgstr "Сервер"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:386
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:391
 msgid "Show tunnels"
 msgstr "Перейти к списку туннелей"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:397
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:402
 msgid "Leases expired"
 msgstr "Срок аренды истек"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:397
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:398
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:402
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:403
 msgid "Rebuilding"
 msgstr "Построение заново"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:398
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:403
 msgid "ago"
 msgstr "назад"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:401
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:406
 msgid "Ready"
 msgstr "Готов к работе"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:405
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:410
 msgid "Building"
 msgstr "Построение"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:405
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:410
 msgid "Building tunnels"
 msgstr "Построение туннелей"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:410
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:415
 msgid "none"
 msgstr "нет"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:421
+#: ../java/src/net/i2p/router/web/SummaryHelper.java:426
 #: ../java/strings/Strings.java:36
 msgid "shared clients"
 msgstr "коллективные клиенты"
@@ -2851,6 +3115,60 @@ msgstr "Транзитных туннелей"
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:253
 msgid "Totals"
 msgstr "Всего"
+
+#: ../java/src/net/i2p/router/web/UnsignedUpdateHandler.java:66
+#: ../java/src/net/i2p/router/web/UpdateHandler.java:132
+#: ../java/src/net/i2p/router/web/UpdateHandler.java:145
+#: ../java/src/net/i2p/router/web/UpdateHandler.java:172
+msgid "Updating"
+msgstr "Загружается обновление"
+
+#: ../java/src/net/i2p/router/web/UnsignedUpdateHandler.java:88
+#: ../java/src/net/i2p/router/web/UnsignedUpdateHandler.java:111
+#: ../java/src/net/i2p/router/web/UnsignedUpdateHandler.java:116
+#: ../java/src/net/i2p/router/web/UpdateHandler.java:183
+#: ../java/src/net/i2p/router/web/UpdateHandler.java:208
+msgid "Update downloaded"
+msgstr "Обновление загружено"
+
+#: ../java/src/net/i2p/router/web/UnsignedUpdateHandler.java:91
+#, java-format
+msgid "Unsigned update file from {0} is corrupt"
+msgstr "Обнаружено повреждение в неподписанном обновлении загруженном из {0}"
+
+#: ../java/src/net/i2p/router/web/UnsignedUpdateHandler.java:111
+#: ../java/src/net/i2p/router/web/UpdateHandler.java:203
+msgid "Restarting"
+msgstr "Производится перезагрузка"
+
+#: ../java/src/net/i2p/router/web/UnsignedUpdateHandler.java:118
+#: ../java/src/net/i2p/router/web/UpdateHandler.java:210
+msgid "Click Restart to install"
+msgstr "Перезагрузите I2P-маршрутизатор для установки"
+
+#: ../java/src/net/i2p/router/web/UnsignedUpdateHandler.java:120
+#: ../java/src/net/i2p/router/web/UpdateHandler.java:212
+msgid "Click Shutdown and restart to install"
+msgstr "Остановите и снова запустите I2P-маршрутизатор для установки"
+
+#: ../java/src/net/i2p/router/web/UnsignedUpdateHandler.java:121
+#: ../java/src/net/i2p/router/web/UpdateHandler.java:214
+#, java-format
+msgid "Version {0}"
+msgstr "Версия {0}"
+
+#: ../java/src/net/i2p/router/web/UnsignedUpdateHandler.java:126
+#, java-format
+msgid "Failed copy to {0}"
+msgstr "Не удалось скопировать в {0}"
+
+#: ../java/src/net/i2p/router/web/UpdateHandler.java:203
+msgid "Update verified"
+msgstr "Подлинность обновления проверена"
+
+#: ../java/src/net/i2p/router/web/UpdateHandler.java:227
+msgid "Transfer failed"
+msgstr "Не удалось загрузить"
 
 #: ../java/strings/Strings.java:12
 msgid "addressbook"
@@ -3630,6 +3948,22 @@ msgstr "Перечисленные ниже Java веб-апплеты запу�
 msgid "A web app may also be disabled by removing the .war file from the webapps directory; however the .war file and web app will reappear when you update your router to a newer version, so disabling the web app here is the preferred method."
 msgstr "Веб-апплет также можно отключить, просто удалив .war-файл из директории webapps. Однако при  обновлении маршрутизатора и .war-файл и соответствующее приложение будут возвращены на свои места, поэтому отключение веб-апплетов через эту страницу это более корректный способ."
 
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:348
+msgid "Plugin Configuration"
+msgstr "Настройки плагинов"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:350
+msgid "The plugins listed below are started by the webConsole client."
+msgstr "Перечисленные ниже плагины запускаются клиентом webConsole."
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:356
+msgid "Plugin Installation"
+msgstr "Установка плагина"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:358
+msgid "To install a plugin, enter the download URL:"
+msgstr "Для установки нового плагина введите URL:"
+
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:106
 msgid "config keyring"
 msgstr "настройки ключей"
@@ -4168,4 +4502,12 @@ msgstr "обзор туннелей"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:227
 msgid "I2P Tunnel Summary"
 msgstr "Обзор туннелей I2P"
+
+#~ msgid ""
+#~ "WebApp configuration saved successfully - restart required to take effect."
+#~ msgstr ""
+#~ "Настройки веб-апплетов сохранены, требуется перезагрузка маршрутизатора "
+#~ "для вступления в силу."
+#~ msgid "Start Now"
+#~ msgstr "Запустить вручную"
 
