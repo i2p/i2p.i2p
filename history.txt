@@ -1,3 +1,5 @@
+* 2010-02-15  0.7.11 released
+
 2010-02-13 sponge
     * Fix addWebApplications API goofup
     * Bump BOB version, which I forgot to do.

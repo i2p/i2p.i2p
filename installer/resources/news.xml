@@ -1,21 +1,25 @@
 <!--
-<i2p.news date="$Date: 2010-01-22 00:00:00 $">
-<i2p.release version="0.7.10" date="2010/01/22" minVersion="0.6" />
+<i2p.news date="$Date: 2010-02-15 00:00:00 $">
+<i2p.release version="0.7.11" date="2010/02/15" minVersion="0.6" />
 -->
-<h4><ul><li>2010-01-22: <b>0.7.10 <a href="http://www.i2p2.i2p/release-0.7.10.html">Released</a></b></li></ul></h4>
+<h4><ul><li>2010-02-15: <b>0.7.11 <a href="http://www.i2p2.i2p/release-0.7.11.html">Released</a></b></li></ul></h4>
 <p>
-0.7.10 closes some recently-discovered vulnerabilities related to the
-way routers communicate with floodfill peers.
-Network database stores and verifies are moved from exploratory to client tunnels, and are encrypted.
+The 0.7.11 release fixes several issues, some related to clocks, which prevented new routers from quickly integrating into the network.
+It also fixes the installer for 64-bit Windows.
+The release includes an
+update to <a href="http://old.nabble.com/jetty-5.1.15,-6.1.18-and-7.0.0.M2-td23652819.html">Jetty 5.1.15</a>
+to fix <a href="http://www.kb.cert.org/vuls/id/402580">this vulnerability</a>.
 </p><p>
-Also, to improve anonymity, router's fast peer set is now limited to a maximum of 30.
-The release also fixes a bug causing Windows installs to fail when the install or user path
-contained a "\r" or "\n".
+As usual, the release contains more anonymity and performance improvements,
+and an assortment of bug fixes.
 Upgrading is recommended.
+</p><p>
+We already have more big improvements in development for the next two releases.
 Please give the
 developers feedback on <a href="irc://127.0.0.1:6668/i2p">IRC #i2p</a> or <a href="http://forum.i2p">forum.i2p</a>
-and <a href="http://www.i2p2.i2p/getinvolved.html">get involved</a>
-or <a href="http://www.i2p2.i2p/donate.html">donate</a>!
-We are still looking for help on new and existing translations.
+and <a href="http://www.i2p2.i2p/getinvolved.html">get involved</a>,
+spread the word,
+and <a href="http://www.i2p2.i2p/donate.html">donate</a>!
+We are still looking for volunteers to work on new and existing translations.
 Please volunteer on <a href="irc://127.0.0.1:6668/i2p">IRC #i2p</a>.
 </p>

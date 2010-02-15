@@ -9,8 +9,9 @@
 # wrapper configuration file.
 #
 # Note that the wrapper only supports Windows, Mac, and
-# certain Linux architectures. If this script fails to
-# successfully invoke i2psvc on your platform,
+# certain Linux architectures.
+# It may also fail on some 64-bit platforms.
+# If this script fails to successfully invoke i2psvc on your platform,
 # try the runplain.sh script instead.
 #
 
