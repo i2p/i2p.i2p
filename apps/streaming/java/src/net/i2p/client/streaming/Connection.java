@@ -152,6 +152,7 @@ public class Connection {
      * Block until there is an open outbound packet slot or the write timeout 
      * expires.  
      *
+     * @param timeoutMs PacketLocal is the only caller, often with -1??????
      * @return true if the packet should be sent
      */
     boolean packetSendChoke(long timeoutMs) {
