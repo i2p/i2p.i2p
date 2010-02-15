@@ -247,7 +247,8 @@ class BuildRequestor {
         if (useVariable) {
             msg = new VariableTunnelBuildMessage(ctx, SHORT_RECORDS);
             order = new ArrayList(SHORT_ORDER);
-            log.log(Log.CRIT, "Using new VTBM");
+            if (log.shouldLog(Log.INFO))
+                log.info("Using new VTBM");
         } else {
             msg = new TunnelBuildMessage(ctx);
             order = new ArrayList(ORDER);
