@@ -685,6 +685,23 @@ D8usM7Dxp5yrDrCYZ5AIijc=
     /**
      * Verifies the DSA signature of a signed update file.
      * 
+     * @param signedFile The signed update file to check.
+     * 
+     * @return signer (could be empty string) or null if invalid
+     * @since 0.7.12
+     */
+    public String verifyAndGetSigner(File signedFile) {
+        for (SigningPublicKey signingPublicKey : _trustedKeys.keySet()) {
+            boolean isValidSignature = verify(signedFile, signingPublicKey);
+            if (isValidSignature)
+                return _trustedKeys.get(signingPublicKey);
+        }
+        return null;
+    }
+
+    /**
+     * Verifies the DSA signature of a signed update file.
+     * 
      * @param signedFile    The signed update file to check.
      * @param publicKeyFile A file containing the public key to use for
      *                      verification.

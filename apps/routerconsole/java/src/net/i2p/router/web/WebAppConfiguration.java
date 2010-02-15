@@ -81,9 +81,9 @@ public class WebAppConfiguration implements WebApplicationContext.Configuration 
             String elem = tok.nextToken().trim();
             String path;
             if (elem.startsWith("$I2P"))
-                path = i2pContext.getBaseDir().getAbsolutePath() + '/' + elem.substring(4);
+                path = i2pContext.getBaseDir().getAbsolutePath() + elem.substring(4);
             else if (elem.startsWith("$PLUGIN"))
-                path = dir.getAbsolutePath() + '/' + elem.substring(7);
+                path = dir.getAbsolutePath() + elem.substring(7);
             else
                 path = dir.getAbsolutePath() + '/' + elem;
             System.err.println("Adding " + path + " to classpath for " + appName);

@@ -193,7 +193,9 @@ public class PluginUpdateHandler extends UpdateHandler {
 
             if (up.haveKey(pubkey)) {
                 // the key is already in the TrustedUpdate keyring
-                if (!up.verify(f)) {
+                // verify the sig and verify that it is signed by the keyName in the plugin.config file
+                String signingKeyName = up.verifyAndGetSigner(f);
+                if (!keyName.equals(signingKeyName)) {
                     f.delete();
                     to.delete();
                     updateStatus("<b>" + _("Plugin signature verification of {0} failed", url) + "</b>");
@@ -209,7 +211,9 @@ public class PluginUpdateHandler extends UpdateHandler {
                     return;
                 }
                 // ...and try the verify again
-                if (!up.verify(f)) {
+                // verify the sig and verify that it is signed by the keyName in the plugin.config file
+                String signingKeyName = up.verifyAndGetSigner(f);
+                if (!keyName.equals(signingKeyName)) {
                     f.delete();
                     to.delete();
                     updateStatus("<b>" + _("Plugin signature verification of {0} failed", url) + "</b>");
