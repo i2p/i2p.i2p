@@ -194,7 +194,7 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
     }
     
     /**
-     * @param timeoutMs MessageOutputStream is the only caller, often with -1 ??????
+     * @param maxWaitMs MessageOutputStream is the only caller, often with -1 ??????
      */
     public void waitForAccept(int maxWaitMs) {
         if (_connection == null) 
