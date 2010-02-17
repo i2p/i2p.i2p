@@ -51,10 +51,15 @@ public class ConfigClientsHandler extends FormHandler {
             try {
                 appnum = Integer.parseInt(app);
             } catch (NumberFormatException nfe) {}
-            if (appnum >= 0)
+            if (appnum >= 0) {
                 startClient(appnum);
-            else
-                startWebApp(app);
+            } else {
+                List<String> plugins = PluginStarter.getPlugins();
+                if (plugins.contains(app))
+                    startPlugin(app);
+                else
+                    startWebApp(app);
+            }
             return;
         }
 
@@ -117,10 +122,15 @@ public class ConfigClientsHandler extends FormHandler {
             try {
                 appnum = Integer.parseInt(app);
             } catch (NumberFormatException nfe) {}
-            if (appnum >= 0)
+            if (appnum >= 0) {
                 startClient(appnum);
-            else
-                startWebApp(app);
+            } else {
+                List<String> plugins = PluginStarter.getPlugins();
+                if (plugins.contains(app))
+                    startPlugin(app);
+                else
+                    startWebApp(app);
+            }
         } else {
             addFormError(_("Unsupported") + ' ' + _action + '.');
         }
@@ -315,4 +325,13 @@ public class ConfigClientsHandler extends FormHandler {
         } catch (InterruptedException ie) {}
     }
 
+    private void startPlugin(String app) {
+        try {
+            PluginStarter.startPlugin(_context, app);
+            addFormNotice(_("Started plugin {0}", app));
+        } catch (Throwable e) {
+            addFormError(_("Error starting plugin {0}", app) + ": " + e);
+            _log.error("Error starting plugin " + app,  e);
+        }
+    }
 }

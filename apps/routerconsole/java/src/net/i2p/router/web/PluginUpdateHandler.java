@@ -174,11 +174,11 @@ public class PluginUpdateHandler extends UpdateHandler {
 
             // ok, now we check sigs and deal with a bad sig
             String pubkey = props.getProperty("key");
-            String keyName = props.getProperty("keyName");
-            if (pubkey == null || keyName == null || pubkey.length() != 172 || keyName.length() <= 0) {
+            String signer = props.getProperty("signer");
+            if (pubkey == null || signer == null || pubkey.length() != 172 || signer.length() <= 0) {
                 f.delete();
                 to.delete();
-                //updateStatus("<b>" + "Plugin contains an invalid key" + ' ' + pubkey + ' ' + keyName + "</b>");
+                //updateStatus("<b>" + "Plugin contains an invalid key" + ' ' + pubkey + ' ' + signer + "</b>");
                 updateStatus("<b>" + _("Plugin from {0} contains an invalid key", url) + "</b>");
                 return;
             }
@@ -193,9 +193,9 @@ public class PluginUpdateHandler extends UpdateHandler {
 
             if (up.haveKey(pubkey)) {
                 // the key is already in the TrustedUpdate keyring
-                // verify the sig and verify that it is signed by the keyName in the plugin.config file
+                // verify the sig and verify that it is signed by the signer in the plugin.config file
                 String signingKeyName = up.verifyAndGetSigner(f);
-                if (!keyName.equals(signingKeyName)) {
+                if (!signer.equals(signingKeyName)) {
                     f.delete();
                     to.delete();
                     updateStatus("<b>" + _("Plugin signature verification of {0} failed", url) + "</b>");
@@ -203,7 +203,7 @@ public class PluginUpdateHandler extends UpdateHandler {
                 }
             } else {
                 // add to keyring...
-                if(!up.addKey(pubkey, keyName)) {
+                if(!up.addKey(pubkey, signer)) {
                     // bad or duplicate key
                     f.delete();
                     to.delete();
@@ -211,9 +211,9 @@ public class PluginUpdateHandler extends UpdateHandler {
                     return;
                 }
                 // ...and try the verify again
-                // verify the sig and verify that it is signed by the keyName in the plugin.config file
+                // verify the sig and verify that it is signed by the signer in the plugin.config file
                 String signingKeyName = up.verifyAndGetSigner(f);
-                if (!keyName.equals(signingKeyName)) {
+                if (!signer.equals(signingKeyName)) {
                     f.delete();
                     to.delete();
                     updateStatus("<b>" + _("Plugin signature verification of {0} failed", url) + "</b>");
@@ -278,9 +278,9 @@ public class PluginUpdateHandler extends UpdateHandler {
                     return;
                 }
                 String oldPubkey = oldProps.getProperty("key");
-                String oldKeyName = oldProps.getProperty("keyName");
+                String oldKeyName = oldProps.getProperty("signer");
                 String oldAppName = props.getProperty("name");
-                if ((!pubkey.equals(oldPubkey)) || (!keyName.equals(oldKeyName)) || (!appName.equals(oldAppName))) {
+                if ((!pubkey.equals(oldPubkey)) || (!signer.equals(oldKeyName)) || (!appName.equals(oldAppName))) {
                     to.delete();
                     updateStatus("<b>" + _("Signature of downloaded plugin does not match installed plugin") + "</b>");
                     return;

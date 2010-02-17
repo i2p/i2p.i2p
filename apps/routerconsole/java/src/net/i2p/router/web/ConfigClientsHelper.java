@@ -86,16 +86,20 @@ public class ConfigClientsHelper extends HelperBase {
                 String app = name.substring(PluginStarter.PREFIX.length(), name.lastIndexOf(PluginStarter.ENABLED));
                 String val = props.getProperty(name);
                 Properties appProps = PluginStarter.pluginProperties(_context, app);
+                if (appProps.size() <= 0)
+                    continue;
                 StringBuilder desc = new StringBuilder(256);
                 desc.append("<table border=\"0\">")
                     .append("<tr><td><b>").append(_("Version")).append("<td>").append(stripHTML(appProps, "version"))
                     .append("<tr><td><b>")
                     .append(_("Signed by")).append("<td>");
-                String s = stripHTML(appProps, "keyName");
-                if (s.indexOf("@") > 0)
-                    desc.append("<a href=\"mailto:").append(s).append("\">").append(s).append("</a>");
-                else
-                    desc.append(s);
+                String s = stripHTML(appProps, "signer");
+                if (s != null) {
+                    if (s.indexOf("@") > 0)
+                        desc.append("<a href=\"mailto:").append(s).append("\">").append(s).append("</a>");
+                    else
+                        desc.append(s);
+                }
                 s = stripHTML(appProps, "date");
                 if (s != null) {
                     long ms = 0;

@@ -301,9 +301,9 @@ public class PluginStarter implements Runnable {
         for (String name : names) {
             Properties props = pluginProperties(ctx, name);
             String pubkey = props.getProperty("key");
-            String keyName = props.getProperty("keyName");
-            if (pubkey != null && keyName != null && pubkey.length() == 172 && keyName.length() > 0)
-                rv.put(pubkey, keyName);
+            String signer = props.getProperty("signer");
+            if (pubkey != null && signer != null && pubkey.length() == 172 && signer.length() > 0)
+                rv.put(pubkey, signer);
         }
         return rv;
     }
