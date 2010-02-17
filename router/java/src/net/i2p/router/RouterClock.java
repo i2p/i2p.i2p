@@ -176,7 +176,6 @@ public class RouterClock extends Clock {
             if (desiredOffset > offset) {
                 // slew forward
                 _offset = ++offset;
-                _lastSlewed = systemNow;
             } else if (desiredOffset < offset) {
                 // slew backward, but don't let the clock go backward
                 // this should be the first call since systemNow
@@ -184,8 +183,8 @@ public class RouterClock extends Clock {
                 // from the last systemNow, thus we won't let the clock go backward,
                 // no need to track when we were last called.
                 _offset = --offset;
-                _lastSlewed = systemNow;
             }
+            _lastSlewed = systemNow;
         }
         return offset + systemNow;
     }
