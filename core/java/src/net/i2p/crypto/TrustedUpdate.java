@@ -198,27 +198,31 @@ D8usM7Dxp5yrDrCYZ5AIijc=
     /**
      * Parses command line arguments when this class is used from the command
      * line.
+     * Exits 1 on failure so this can be used in scripts.
      * 
      * @param args Command line parameters.
      */
     public static void main(String[] args) {
+        boolean ok = false;
         try {
             if ("keygen".equals(args[0])) {
-                genKeysCLI(args[1], args[2]);
+                ok = genKeysCLI(args[1], args[2]);
             } else if ("showversion".equals(args[0])) {
-                showVersionCLI(args[1]);
+                ok = showVersionCLI(args[1]);
             } else if ("sign".equals(args[0])) {
-                signCLI(args[1], args[2], args[3], args[4]);
+                ok = signCLI(args[1], args[2], args[3], args[4]);
             } else if ("verifysig".equals(args[0])) {
-                verifySigCLI(args[1]);
+                ok = verifySigCLI(args[1]);
             } else if ("verifyupdate".equals(args[0])) {
-                verifyUpdateCLI(args[1]);
+                ok = verifyUpdateCLI(args[1]);
             } else {
                 showUsageCLI();
             }
         } catch (ArrayIndexOutOfBoundsException aioobe) {
             showUsageCLI();
         }
+        if (!ok)
+            System.exit(1);
     }
 
     /**
@@ -234,7 +238,8 @@ D8usM7Dxp5yrDrCYZ5AIijc=
         return (new VersionComparator()).compare(currentVersion, newVersion) < 0;
     }
 
-    private static final void genKeysCLI(String publicKeyFile, String privateKeyFile) {
+    /** @return success */
+    private static final boolean genKeysCLI(String publicKeyFile, String privateKeyFile) {
         FileOutputStream fileOutputStream = null;
 
         _context = I2PAppContext.getGlobalContext();
@@ -257,6 +262,7 @@ D8usM7Dxp5yrDrCYZ5AIijc=
         } catch (Exception e) {
             System.err.println("Error writing keys:");
             e.printStackTrace();
+            return false;
         } finally {
             if (fileOutputStream != null)
                 try {
@@ -264,6 +270,7 @@ D8usM7Dxp5yrDrCYZ5AIijc=
                 } catch (IOException ioe) {
                 }
         }
+        return true;
     }
 
     private static final void showUsageCLI() {
@@ -274,40 +281,48 @@ D8usM7Dxp5yrDrCYZ5AIijc=
         System.err.println("       TrustedUpdate verifyupdate signedFile");
     }
 
-    private static final void showVersionCLI(String signedFile) {
+    /** @return success */
+    private static final boolean showVersionCLI(String signedFile) {
         String versionString = getVersionString(new File(signedFile));
 
         if (versionString.equals(""))
             System.out.println("No version string found in file '" + signedFile + "'");
         else
             System.out.println("Version: " + versionString);
+        return !versionString.equals("");
     }
 
-    private static final void signCLI(String inputFile, String signedFile, String privateKeyFile, String version) {
+    /** @return success */
+    private static final boolean signCLI(String inputFile, String signedFile, String privateKeyFile, String version) {
         Signature signature = new TrustedUpdate().sign(inputFile, signedFile, privateKeyFile, version);
 
         if (signature != null)
             System.out.println("Input file '" + inputFile + "' signed and written to '" + signedFile + "'");
         else
             System.out.println("Error signing input file '" + inputFile + "'");
+        return signature != null;
     }
 
-    private static final void verifySigCLI(String signedFile) {
+    /** @return valid */
+    private static final boolean verifySigCLI(String signedFile) {
         boolean isValidSignature = new TrustedUpdate().verify(new File(signedFile));
 
         if (isValidSignature)
             System.out.println("Signature VALID");
         else
             System.out.println("Signature INVALID");
+        return isValidSignature;
     }
 
-    private static final void verifyUpdateCLI(String signedFile) {
+    /** @return if newer */
+    private static final boolean verifyUpdateCLI(String signedFile) {
         boolean isUpdate = new TrustedUpdate().isUpdatedVersion(CoreVersion.VERSION, new File(signedFile));
 
         if (isUpdate)
             System.out.println("File version is newer than current version.");
         else
             System.out.println("File version is older than or equal to current version.");
+        return isUpdate;
     }
 
     /**
