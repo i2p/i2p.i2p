@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-02-15 17:54+0000\n"
-"PO-Revision-Date: 2010-02-15 20:41+0000\n"
+"POT-Creation-Date: 2010-02-18 21:01+0000\n"
+"PO-Revision-Date: 2010-02-18 21:13+0000\n"
 "Last-Translator: 4get <forget@mail.i2p>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -1077,133 +1077,143 @@ msgstr "Сохранить настройки плагинов"
 msgid "Install Plugin"
 msgstr "Установить плагин"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:74
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:79
 #, java-format
 msgid "Deleted plugin {0}"
 msgstr "Удален плагин {0}"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:76
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:81
 #, java-format
 msgid "Error deleting plugin {0}"
 msgstr "Ошибка при удалении плагина {0}"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:88
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:93
 #, java-format
 msgid "Stopped plugin {0}"
 msgstr "Остановлен плагин {0}"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:90
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:95
 #, java-format
 msgid "Error stopping plugin {0}"
 msgstr "Ошибка при остановке плагина {0}"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:111
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:179
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:116
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:183
 msgid "Start"
 msgstr "Запустить"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:125
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:135
 #: ../java/src/net/i2p/router/web/ConfigKeyringHandler.java:49
 msgid "Unsupported"
 msgstr "Не поддерживается"
 
 # This term intentionally left in English
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:140
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:156
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:150
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:166
 msgid "desc"
 msgstr "desc"
 
 # This term intentionally left in English
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:151
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:166
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:161
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:176
 msgid "name"
 msgstr "name"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:171
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:181
 msgid "New client added"
 msgstr "Добавлен новый клиент"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:175
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:185
 msgid "Client configuration saved successfully - restart required to take effect."
 msgstr "Настройки клиентов сохранены, требуется перезагрузка маршрутизатора для вступления в силу."
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:189
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:200
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:199
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:210
 msgid "Bad client index."
 msgstr "Индекс клиента не найден в списке."
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:194
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:205
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:204
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:215
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:38
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:374
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:389
 msgid "Client"
 msgstr "Клиент"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:194
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:253
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:204
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:263
 msgid "started"
 msgstr "запущен"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:205
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:215
 msgid "deleted"
 msgstr "удален"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:222
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:232
 msgid "WebApp configuration saved."
 msgstr "Настройки веб-апплета сохранены."
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:238
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:248
 msgid "Plugin configuration saved."
 msgstr "Настройки плагина сохранены."
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:253
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:263
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:57
 msgid "WebApp"
 msgstr "Веб-апплет"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:255
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:265
 msgid "Failed to start"
 msgstr "Не удалось запустить"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:260
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:270
 msgid "Failed to find server."
 msgstr "Не удалось найти сервер."
 
 # This term intentionally left in English
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:264
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:274
 msgid "pluginURL"
 msgstr "pluginURL"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:266
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:276
 msgid "No plugin URL specified."
 msgstr "Не указан URL загрузки плагина"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:276
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:286
 #, java-format
 msgid "No update URL specified for {0}"
 msgstr "Не указан URL загрузки плагина {0}"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:284
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:289
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:302
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:307
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:294
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:299
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:312
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:317
 msgid "Plugin or update download already in progress."
 msgstr "Загрузка плагина или обновления уже запущена."
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:293
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:303
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:100
 #, java-format
 msgid "Downloading plugin from {0}"
 msgstr "Производится загрузка плагина с {0}"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:311
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:321
 #, java-format
 msgid "Checking plugin {0} for updates"
 msgstr "Проверяется наличие обновления для плагина {0}"
 
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:331
+#, java-format
+msgid "Started plugin {0}"
+msgstr "Запущен плагин {0}"
+
+#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:333
+#, java-format
+msgid "Error starting plugin {0}"
+msgstr "Ошибка при запуске плагина {0}"
+
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:21
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:182
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:186
 msgid "Edit"
 msgstr "Редактировать"
 
@@ -1230,7 +1240,7 @@ msgstr "Запускать автоматически?"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:57
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:80
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:125
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:129
 msgid "Description"
 msgstr "Описание"
 
@@ -1238,54 +1248,54 @@ msgstr "Описание"
 msgid "Plugin"
 msgstr "Плагин"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:91
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:93
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:191
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:165
 msgid "Version"
 msgstr "Версия"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:93
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:95
 msgid "Signed by"
 msgstr "Подписано"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:108
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:112
 msgid "Date"
 msgstr "Дата"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:114
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:118
 msgid "Author"
 msgstr "Автор"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:130
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:134
 msgid "License"
 msgstr "Лицензия"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:135
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:139
 msgid "Website"
 msgstr "Веб-сайт"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:140
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:144
 msgid "Update link"
 msgstr "Адрес обновления"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:184
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:188
 msgid "Stop"
 msgstr "Остановить"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:186
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:190
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:58
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:310
 msgid "Check for updates"
 msgstr "Проверить обновления"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:187
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:191
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:18
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:213
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:220
 msgid "Update"
 msgstr "Обновление"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:190
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:194
 msgid "Delete"
 msgstr "Удалить"
 
