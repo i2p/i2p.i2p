@@ -6,7 +6,6 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -23,7 +22,6 @@ import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 import net.i2p.util.Translate;
 
-import org.mortbay.http.HttpListener;
 import org.mortbay.jetty.Server;
 
 
@@ -93,7 +91,7 @@ public class PluginStarter implements Runnable {
         }
 
         // start console webapps in console/webapps
-        Server server = getConsoleServer();
+        Server server = WebAppStarter.getConsoleServer();
         if (server != null) {
             File consoleDir = new File(pluginDir, "console");
             Properties props = RouterConsoleRunner.webAppProperties(consoleDir.getAbsolutePath());
@@ -185,7 +183,7 @@ public class PluginStarter implements Runnable {
         }
 
         // stop console webapps in console/webapps
-        Server server = getConsoleServer();
+        Server server = WebAppStarter.getConsoleServer();
         if (server != null) {
             File consoleDir = new File(pluginDir, "console");
             Properties props = RouterConsoleRunner.webAppProperties(consoleDir.getAbsolutePath());
@@ -316,20 +314,6 @@ public class PluginStarter implements Runnable {
         try {
             DataHelper.storeProps(props, cfgFile);
         } catch (IOException ioe) {}
-    }
-
-    /** see comments in ConfigClientsHandler */
-    static Server getConsoleServer() {
-        Collection c = Server.getHttpServers();
-        for (int i = 0; i < c.size(); i++) {
-            Server s = (Server) c.toArray()[i];
-            HttpListener[] hl = s.getListeners();
-            for (int j = 0; j < hl.length; j++) {
-                if (hl[j].getPort() == 7657)
-                    return s;
-            }
-        }
-        return null;
     }
 
     /** @param action "start" or "stop" or "uninstall" */

@@ -2,12 +2,14 @@ package net.i2p.router.web;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
 
 import org.mortbay.http.HttpContext;
+import org.mortbay.http.HttpListener;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.WebApplicationContext;
 
@@ -73,4 +75,17 @@ public class WebAppStarter {
         } catch (InterruptedException ie) {}
     }
 
+    /** see comments in ConfigClientsHandler */
+    static Server getConsoleServer() {
+        Collection c = Server.getHttpServers();
+        for (int i = 0; i < c.size(); i++) {
+            Server s = (Server) c.toArray()[i];
+            HttpListener[] hl = s.getListeners();
+            for (int j = 0; j < hl.length; j++) {
+                if (hl[j].getPort() == 7657)
+                    return s;
+            }
+        }
+        return null;
+    }
 }
