@@ -80,6 +80,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     private int _expireTimeout;
 
+    /** last report from a peer of our IP */
+    private Hash _lastFrom;
+    private byte[] _lastOurIP;
+    private int _lastOurPort;
+
     private static final int DROPLIST_PERIOD = 10*60*1000;
     private static final int MAX_DROPLIST_SIZE = 256;
     
@@ -407,9 +412,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * Right now, we just blindly trust them, changing our IP and port on a
      * whim.  this is not good ;)
      *
+     * Slight enhancement - require two different peers in a row to agree
+     *
      * Todo:
      *   - Much better tracking of troublemakers
      *   - Disable if we have good local address or UPnP
+     *   - This gets harder if and when we publish multiple addresses, or IPv6
      * 
      * @param from Hash of inbound destination
      * @param ourIP publicly routable IPv4 only
@@ -441,9 +449,25 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             return;
         } else if (inboundRecent && _externalListenPort > 0 && _externalListenHost != null) {
             // use OS clock since its an ordering thing, not a time thing
+            // Note that this fails us if we switch from one IP to a second, then back to the first,
+            // as some routers still have the first IP and will successfully connect,
+            // leaving us thinking the second IP is still good.
             if (_log.shouldLog(Log.INFO))
                 _log.info("Ignoring IP address suggestion, since we have received an inbound con recently");
+        } else if (from.equals(_lastFrom) || !eq(_lastOurIP, _lastOurPort, ourIP, ourPort)) {
+            _lastFrom = from;
+            _lastOurIP = ourIP;
+            _lastOurPort = ourPort;
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("The router " + from.toBase64() + " told us we have a new IP - " 
+                           + RemoteHostId.toString(ourIP) + " port " +  ourPort + ".  Wait until somebody else tells us the same thing.");
         } else {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn(from.toBase64() + " and " + _lastFrom.toBase64() + " agree we have a new IP - " 
+                           + RemoteHostId.toString(ourIP) + " port " +  ourPort + ".  Changing address.");
+            _lastFrom = from;
+            _lastOurIP = ourIP;
+            _lastOurPort = ourPort;
             changeAddress(ourIP, ourPort);
         }
         
@@ -462,14 +486,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _log.warn("Change address? status = " + _reachabilityStatus +
                       " diff = " + (_context.clock().now() - _reachabilityStatusLastUpdated) +
                       " old = " + _externalListenHost + ':' + _externalListenPort +
-                      " new = " + DataHelper.toString(ourIP) + ':' + ourPort);
+                      " new = " + RemoteHostId.toString(ourIP) + ':' + ourPort);
 
             synchronized (this) {
                 if ( (_externalListenHost == null) ||
                      (!eq(_externalListenHost.getAddress(), _externalListenPort, ourIP, ourPort)) ) {
-                    if ( (_reachabilityStatus != CommSystemFacade.STATUS_OK) ||
-                         (_externalListenHost == null) || (_externalListenPort <= 0) ||
-                         (_context.clock().now() - _reachabilityStatusLastUpdated > 2*TEST_FREQUENCY) ) {
+                    // This prevents us from changing our IP when we are not firewalled
+                    //if ( (_reachabilityStatus != CommSystemFacade.STATUS_OK) ||
+                    //     (_externalListenHost == null) || (_externalListenPort <= 0) ||
+                    //     (_context.clock().now() - _reachabilityStatusLastUpdated > 2*TEST_FREQUENCY) ) {
                         // they told us something different and our tests are either old or failing
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("Trying to change our external address...");
@@ -488,13 +513,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                             if (_log.shouldLog(Log.WARN))
                                 _log.warn("Error trying to change our external address", uhe);
                         }
-                    } else {
-                        // they told us something different, but our tests are recent and positive,
-                        // so lets test again
-                        fireTest = true;
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn("Different address, but we're fine.. (" + _reachabilityStatus + ")");
-                    }
+                    //} else {
+                    //    // they told us something different, but our tests are recent and positive,
+                    //    // so lets test again
+                    //    fireTest = true;
+                    //    if (_log.shouldLog(Log.WARN))
+                    //        _log.warn("Different address, but we're fine.. (" + _reachabilityStatus + ")");
+                    //}
                 } else {
                     // matched what we expect
                     if (_log.shouldLog(Log.INFO))
