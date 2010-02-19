@@ -185,9 +185,9 @@ public class SummaryBarRenderer {
            .append("</a></h4><hr>\n");
 
 
+        // display all the time so we display the final failure message, and plugin update messages too
+        buf.append(UpdateHandler.getStatus());
         if (_helper.updateAvailable() || _helper.unsignedUpdateAvailable()) {
-            // display all the time so we display the final failure message
-            buf.append(UpdateHandler.getStatus());
             if ("true".equals(System.getProperty(UpdateHandler.PROP_UPDATE_IN_PROGRESS))) {
                 // nothing
             } else if(

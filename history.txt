@@ -1,3 +1,9 @@
+2010-02-19 zzz
+    * i2psnark: Make file box bigger
+    * Plugins:
+      - Fix display of download status
+      - Unhide
+
 2010-02-18 zzz
     * Clock: Slew tweak
     * i2psnark: Improve error message when finding HTML

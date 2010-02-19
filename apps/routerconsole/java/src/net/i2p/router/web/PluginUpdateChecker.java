@@ -74,7 +74,7 @@ public class PluginUpdateChecker extends UpdateHandler {
             _appName = appName;
             _oldVersion = oldVersion;
             System.setProperty(PROP_UPDATE_IN_PROGRESS, "true");
-            I2PAppThread update = new I2PAppThread(_pluginUpdateCheckerRunner, "AppChecker");
+            I2PAppThread update = new I2PAppThread(_pluginUpdateCheckerRunner, "AppChecker", true);
             update.start();
         }
     }

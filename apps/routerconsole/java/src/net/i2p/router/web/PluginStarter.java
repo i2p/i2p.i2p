@@ -41,7 +41,7 @@ public class PluginStarter implements Runnable {
     }
 
     static boolean pluginsEnabled(I2PAppContext ctx) {
-         return Boolean.valueOf(ctx.getProperty("router.enablePlugins")).booleanValue();
+         return Boolean.valueOf(ctx.getProperty("router.enablePlugins", "true")).booleanValue();
     }
 
     public void run() {
