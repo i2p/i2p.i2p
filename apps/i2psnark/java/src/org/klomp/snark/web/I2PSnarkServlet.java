@@ -774,7 +774,7 @@ public class I2PSnarkServlet extends HttpServlet {
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>\n");
         out.write(_("Data to seed"));
         out.write(":<td>" + _manager.getDataDir().getAbsolutePath() + File.separatorChar 
-                  + "<input type=\"text\" name=\"baseFile\" size=\"20\" value=\"" + baseFile 
+                  + "<input type=\"text\" name=\"baseFile\" size=\"40\" value=\"" + baseFile 
                   + "\" title=\"");
         out.write(_("File or directory to seed (must be within the specified path)"));
         out.write("\" ><tr><td>\n");
