@@ -455,8 +455,11 @@ public class I2PSnarkServlet extends HttpServlet {
         int i = filename.lastIndexOf(".torrent");
         if (i > 0)
             filename = filename.substring(0, i);
-        if (filename.length() > MAX_DISPLAYED_FILENAME_LENGTH)
+        String fullFilename = filename;
+        if (filename.length() > MAX_DISPLAYED_FILENAME_LENGTH) {
+            fullFilename = new String(filename);
             filename = filename.substring(0, MAX_DISPLAYED_FILENAME_LENGTH) + "&hellip;";
+        }
         long total = snark.meta.getTotalLength();
         // Early typecast, avoid possibly overflowing a temp integer
         long remaining = (long) snark.storage.needed() * (long) snark.meta.getPieceLength(0); 
@@ -627,13 +630,23 @@ public class I2PSnarkServlet extends HttpServlet {
             out.write("<a href=\"" + uri + "?action=Remove" + parameters
                       + "\" title=\"");
             out.write(_("Remove the torrent from the active list, deleting the .torrent file"));
-            out.write("\">");
+            out.write("\" onclick=\"if (!confirm('");
+            // Can't figure out how to escape double quotes inside the onclick string.
+            // Single quotes in translate strings with parameters must be doubled.
+            // Then the remaining single quite must be escaped
+            out.write(_("Are you sure you want to delete the file \\''{0}.torrent\\'' (downloaded data will not be deleted) ?", fullFilename));
+            out.write("')) { return false; }\">");
             out.write(_("Remove"));
             out.write("</a><br>");
             out.write("<a href=\"" + uri + "?action=Delete" + parameters
                       + "\" title=\"");
             out.write(_("Delete the .torrent file and the associated data file(s)"));
-            out.write("\">");
+            out.write("\" onclick=\"if (!confirm('");
+            // Can't figure out how to escape double quotes inside the onclick string.
+            // Single quotes in translate strings with parameters must be doubled.
+            // Then the remaining single quite must be escaped
+            out.write(_("Are you sure you want to delete the torrent \\''{0}\\'' and all downloaded data?", fullFilename));
+            out.write("')) { return false; }\">");
             out.write(_("Delete"));
             out.write("</a>");
         }

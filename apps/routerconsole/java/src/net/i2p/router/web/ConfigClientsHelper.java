@@ -42,11 +42,12 @@ public class ConfigClientsHelper extends HelperBase {
             ClientAppConfig ca = clients.get(cur);
             renderForm(buf, ""+cur, ca.clientName, false, !ca.disabled,
                        "webConsole".equals(ca.clientName) || "Web console".equals(ca.clientName),
-                       ca.className + ((ca.args != null) ? " " + ca.args : ""), (""+cur).equals(_edit), true, false, false);
+                       ca.className + ((ca.args != null) ? " " + ca.args : ""), (""+cur).equals(_edit),
+                       true, false, false, true);
         }
         
         if ("new".equals(_edit))
-            renderForm(buf, "" + clients.size(), "", false, false, false, "", true, false, false, false);
+            renderForm(buf, "" + clients.size(), "", false, false, false, "", true, false, false, false, false);
         buf.append("</table>\n");
         return buf.toString();
     }
@@ -63,7 +64,8 @@ public class ConfigClientsHelper extends HelperBase {
                 String app = name.substring(RouterConsoleRunner.PREFIX.length(), name.lastIndexOf(RouterConsoleRunner.ENABLED));
                 String val = props.getProperty(name);
                 renderForm(buf, app, app, !"addressbook".equals(app),
-                           "true".equals(val), RouterConsoleRunner.ROUTERCONSOLE.equals(app), app + ".war", false, false, false, false);
+                           "true".equals(val), RouterConsoleRunner.ROUTERCONSOLE.equals(app), app + ".war",
+                           false, false, false, false, false);
             }
         }
         buf.append("</table>\n");
@@ -146,7 +148,7 @@ public class ConfigClientsHelper extends HelperBase {
                 desc.append("</table>");
                 renderForm(buf, app, app, false,
                            "true".equals(val), false, desc.toString(), false, false,
-                           updateURL != null, true);
+                           updateURL != null, true, true);
             }
         }
         buf.append("</table>\n");
@@ -156,7 +158,8 @@ public class ConfigClientsHelper extends HelperBase {
     /** ro trumps edit and showEditButton */
     private void renderForm(StringBuilder buf, String index, String name, boolean urlify,
                             boolean enabled, boolean ro, String desc, boolean edit,
-                            boolean showEditButton, boolean showUpdateButton, boolean showStopButton) {
+                            boolean showEditButton, boolean showUpdateButton, boolean showStopButton,
+                            boolean showDeleteButton) {
         buf.append("<tr><td class=\"mediumtags\" align=\"right\" width=\"25%\">");
         if (urlify && enabled) {
             String link = "/";
@@ -190,8 +193,13 @@ public class ConfigClientsHelper extends HelperBase {
             buf.append("<button type=\"submit\" name=\"action\" value=\"Check ").append(index).append("\" >" + _("Check for updates") + "<span class=hide> ").append(index).append("</span></button>");
             buf.append("<button type=\"submit\" name=\"action\" value=\"Update ").append(index).append("\" >" + _("Update") + "<span class=hide> ").append(index).append("</span></button>");
         }
-        if ((!edit) && !ro)
-            buf.append("<button type=\"submit\" name=\"action\" value=\"Delete ").append(index).append("\" >" + _("Delete") + "<span class=hide> ").append(index).append("</span></button>");
+        if (showDeleteButton && (!edit) && !ro) {
+            buf.append("<button type=\"submit\" name=\"action\" value=\"Delete ").append(index)
+               .append("\" onclick=\"if (!confirm('")
+               .append(_("Are you sure you want to delete {0}?", _(name)))
+               .append("')) { return false; }\">")
+               .append(_("Delete")).append("<span class=hide> ").append(index).append("</span></button>");
+        }
         buf.append("</td><td align=\"left\" width=\"50%\">");
         if (edit && !ro) {
             buf.append("<input type=\"text\" size=\"80\" name=\"desc").append(index).append("\" value=\"");

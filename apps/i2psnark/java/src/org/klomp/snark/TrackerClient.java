@@ -24,6 +24,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -123,13 +125,19 @@ public class TrackerClient extends I2PAppThread
     // followed by the secondary open trackers
     // It's painful, but try to make sure if an open tracker is also
     // the primary tracker, that we don't add it twice.
+    // todo: check for b32 matches as well
     trackers = new ArrayList(2);
-    trackers.add(new Tracker(meta.getAnnounce(), true));
+    String primary = meta.getAnnounce();
+    if (isValidAnnounce(primary)) {
+        trackers.add(new Tracker(meta.getAnnounce(), true));
+    } else {
+        _log.warn("Skipping invalid or non-i2p announce: " + primary);
+    }
     List tlist = _util.getOpenTrackers();
     if (tlist != null) {
         for (int i = 0; i < tlist.size(); i++) {
              String url = (String)tlist.get(i);
-             if (!url.startsWith("http://")) {
+             if (!isValidAnnounce(url)) {
                 _log.error("Bad announce URL: [" + url + "]");
                 continue;
              }
@@ -138,20 +146,27 @@ public class TrackerClient extends I2PAppThread
                 _log.error("Bad announce URL: [" + url + "]");
                 continue;
              }
-             if (meta.getAnnounce().startsWith(url.substring(0, slash)))
+             if (primary.startsWith(url.substring(0, slash)))
                 continue;
              String dest = _util.lookup(url.substring(7, slash));
              if (dest == null) {
                 _log.error("Announce host unknown: [" + url + "]");
                 continue;
              }
-             if (meta.getAnnounce().startsWith("http://" + dest))
+             if (primary.startsWith("http://" + dest))
                 continue;
-             if (meta.getAnnounce().startsWith("http://i2p/" + dest))
+             if (primary.startsWith("http://i2p/" + dest))
                 continue;
              trackers.add(new Tracker(url, false));
              _log.debug("Additional announce: [" + url + "] for infoHash: " + infoHash);
         }
+    }
+
+    if (tlist.size() <= 0) {
+        // FIXME really need to get this message to the gui
+        stop = true;
+        _log.error("No valid trackers for infoHash: " + infoHash);
+        return;
     }
 
     long uploaded = coordinator.getUploaded();
@@ -397,6 +412,22 @@ public class TrackerClient extends I2PAppThread
       }
          
     return sb.toString();
+  }
+
+  /**
+   *  @return true for i2p hosts only
+   *  @since 0.7.12
+   */
+  static boolean isValidAnnounce(String ann) {
+    URL url;
+    try {
+       url = new URL(ann);
+    } catch (MalformedURLException mue) {
+       return false;
+    }
+    return url.getProtocol().equals("http") &&
+           (url.getHost().endsWith(".i2p") || url.getHost().equals("i2p")) &&
+           url.getPort() < 0;
   }
 
   private class Tracker

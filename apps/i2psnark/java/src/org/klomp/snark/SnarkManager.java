@@ -198,6 +198,7 @@ public class SnarkManager implements Snark.CompleteListener {
         String ot = _config.getProperty(I2PSnarkUtil.PROP_OPENTRACKERS);
         if (ot != null)
             _util.setOpenTrackerString(ot);
+        // FIXME set util use open trackers property somehow
         getDataDir().mkdirs();
     }
     
@@ -428,6 +429,14 @@ public class SnarkManager implements Snark.CompleteListener {
                     fis.close();
                     fis = null;
                     
+                    if (!TrackerClient.isValidAnnounce(info.getAnnounce())) {
+                        if (_util.shouldUseOpenTrackers() && _util.getOpenTrackers() != null) {
+                            addMessage(_("Warning - Ignoring non-i2p tracker in \"{0}\", will announce to i2p open trackers only", info.getName()));
+                        } else {
+                            addMessage(_("Warning - Ignoring non-i2p tracker in \"{0}\", and open trackers are disabled, you must enable open trackers before starting the torrent!", info.getName()));
+                            dontAutoStart = true;
+                        }
+                    }
                     String rejectMessage = locked_validateTorrent(info);
                     if (rejectMessage != null) {
                         sfile.delete();
@@ -551,12 +560,10 @@ public class SnarkManager implements Snark.CompleteListener {
         saveConfig();
     }
     
+    /**
+     *  Warning - does not validate announce URL - use TrackerClient.isValidAnnounce()
+     */
     private String locked_validateTorrent(MetaInfo info) throws IOException {
-        String announce = info.getAnnounce();
-        // basic validation of url
-        if ((!announce.startsWith("http://")) ||
-            (announce.indexOf(".i2p/") < 0)) // need to do better than this
-            return _("Non-i2p tracker in \"{0}\", deleting it from our list of trackers!", info.getName());
         List files = info.getFiles();
         if ( (files != null) && (files.size() > MAX_FILES_PER_TORRENT) ) {
             return _("Too many files in \"{0}\" ({1}), deleting it!", info.getName(), files.size());

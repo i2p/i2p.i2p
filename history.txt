@@ -1,3 +1,13 @@
+2010-02-22 zzz
+    * configclients.jsp:
+      - Add js delete confirm
+      - Remove delete button for webapps
+    * i2psnark:
+      - Ignore a non-i2p tracker in a torrent rather than deleting
+        the torrent, thus "converting" a torrent to in-netowrk use
+        via the open trackers
+      - Add js delete confirm
+
 2010-02-19 zzz
     * i2psnark: Make file box bigger
     * Plugins:
