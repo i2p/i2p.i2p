@@ -451,6 +451,8 @@
     <target name="consoleDocs" depends="deletepkg-temp, prepconsoleDocs">
         <zip destfile="docs.zip" basedir="pkg-temp" whenempty="fail" />
     </target>
+
+    <target name="updater200" depends="prepupdate, preplicenses, pack200, zipit" />
     <target name="updater" depends="prepupdate, preplicenses, zipit" />
     <target name="updaterWithGeoIP" depends="prepupdate, prepgeoupdate, preplicenses, zipit" />
     <target name="updaterWithJetty" depends="prepjupdate, preplicenses, zipit" />
@@ -460,7 +462,19 @@
     <target name="updaterRouter" depends="prepupdateRouter, zipit" />
     <target name="zipit">
         <zip destfile="i2pupdate.zip" basedir="pkg-temp" whenempty="fail" />
+       <!-- just a test, makes almost no difference
+        <tar destfile="i2pupdate.tgz" basedir="pkg-temp" compression="gzip" />
+        <tar destfile="i2pupdate.tbz" basedir="pkg-temp" compression="bzip2" />
+       -->
     </target>
+    <target name="pack200">
+        <exec executable="sh" failifexecutionfails="true">
+            <arg value="-c" />
+            <!-- pack200 will only pack to a .pack file, and only from a .jar file, so we put another .jar on the end -->
+            <arg value="for i in pkg-temp/lib/*.jar pkg-temp/webapps/*war; do echo pack200 $i; mv $i $i.jar; pack200 -g $i.pack $i.jar; rm -f $i.jar; done" />
+        </exec>
+    </target>
+
     <target name="updateTest" depends="prepupdate">
         <ant dir="core/java/" target="jarTest" />    
         <copy file="core/java/build/i2ptest.jar" todir="pkg-temp/lib" />
