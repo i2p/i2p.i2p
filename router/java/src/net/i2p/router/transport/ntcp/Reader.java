@@ -17,10 +17,10 @@ import net.i2p.util.Log;
 class Reader {
     private RouterContext _context;
     private Log _log;
-    private final List _pendingConnections;
-    private List _liveReads;
-    private List _readAfterLive;
-    private List _runners;
+    private final List<NTCPConnection> _pendingConnections;
+    private List<NTCPConnection> _liveReads;
+    private List<NTCPConnection> _readAfterLive;
+    private List<Runner> _runners;
     
     public Reader(RouterContext ctx) {
         _context = ctx;
@@ -41,7 +41,7 @@ class Reader {
     }
     public void stopReading() {
         while (_runners.size() > 0) {
-            Runner r = (Runner)_runners.remove(0);
+            Runner r = _runners.remove(0);
             r.stop();
         }
         synchronized (_pendingConnections) {
@@ -93,7 +93,7 @@ class Reader {
                             if (_pendingConnections.size() <= 0) {
                                 _pendingConnections.wait();
                             } else {
-                                con = (NTCPConnection)_pendingConnections.remove(0);
+                                con = _pendingConnections.remove(0);
                                 _liveReads.add(con);
                             }
                         }
@@ -155,7 +155,8 @@ class Reader {
                 con.close();
                 return;
             } else if (buf.remaining() <= 0) {
-                con.removeReadBuf(buf);
+                // not necessary, getNextReadBuf() removes
+                //con.removeReadBuf(buf);
             }
             if (est.isComplete() && est.getExtraBytes() != null)
                 con.recvEncryptedI2NP(ByteBuffer.wrap(est.getExtraBytes()));
@@ -165,7 +166,8 @@ class Reader {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Processing read buffer as part of an i2np message (" + buf.remaining() + " bytes)");
             con.recvEncryptedI2NP(buf);
-            con.removeReadBuf(buf);
+            // not necessary, getNextReadBuf() removes
+            //con.removeReadBuf(buf);
         }
     }
 }

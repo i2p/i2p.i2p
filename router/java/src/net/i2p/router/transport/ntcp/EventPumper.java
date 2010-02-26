@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.RouterInfo;
@@ -33,11 +34,11 @@ public class EventPumper implements Runnable {
     private Log _log;
     private volatile boolean _alive;
     private Selector _selector;
-    private final List _bufCache;
-    private final List _wantsRead = new ArrayList(16);
-    private final List _wantsWrite = new ArrayList(4);
-    private final List _wantsRegister = new ArrayList(1);
-    private final List _wantsConRegister = new ArrayList(4);
+    private final LinkedBlockingQueue<ByteBuffer> _bufCache;
+    private final LinkedBlockingQueue<NTCPConnection> _wantsRead = new LinkedBlockingQueue();
+    private final LinkedBlockingQueue<NTCPConnection> _wantsWrite = new LinkedBlockingQueue();
+    private final LinkedBlockingQueue<ServerSocketChannel> _wantsRegister = new LinkedBlockingQueue();
+    private final LinkedBlockingQueue<NTCPConnection> _wantsConRegister = new LinkedBlockingQueue();
     private NTCPTransport _transport;
     private long _expireIdleWriteTime;
     
@@ -54,23 +55,19 @@ public class EventPumper implements Runnable {
     /** tunnel test is every 30-60s, so this should be longer than, say, 3*45s to allow for drops */
     private static final long MIN_EXPIRE_IDLE_TIME = 3*60*1000l;
     private static final long MAX_EXPIRE_IDLE_TIME = 15*60*1000l;
-    
+
     public EventPumper(RouterContext ctx, NTCPTransport transport) {
         _context = ctx;
         _log = ctx.logManager().getLog(getClass());
         _transport = transport;
         _alive = false;
-        _bufCache = new ArrayList(MAX_CACHE_SIZE);
+        _bufCache = new LinkedBlockingQueue(MAX_CACHE_SIZE);
         _expireIdleWriteTime = MAX_EXPIRE_IDLE_TIME;
     }
     
     public synchronized void startPumping() {
         if (_log.shouldLog(Log.INFO))
             _log.info("Starting pumper");
-//        _wantsRead = new ArrayList(16);
-//        _wantsWrite = new ArrayList(4);
-//        _wantsRegister = new ArrayList(1);
-//        _wantsConRegister = new ArrayList(4);
         try {
             _selector = Selector.open();
             _alive = true;
@@ -98,13 +95,13 @@ public class EventPumper implements Runnable {
 
     public void register(ServerSocketChannel chan) {
         if (_log.shouldLog(Log.DEBUG)) _log.debug("Registering server socket channel");
-        synchronized (_wantsRegister) { _wantsRegister.add(chan); }
+        _wantsRegister.offer(chan);
         _selector.wakeup();
     }
     public void registerConnect(NTCPConnection con) {
         if (_log.shouldLog(Log.DEBUG)) _log.debug("Registering outbound connection");
         _context.statManager().addRateData("ntcp.registerConnect", 1, 0);
-        synchronized (_wantsConRegister) { _wantsConRegister.add(con); }
+        _wantsConRegister.offer(con);
         _selector.wakeup();
     }
     
@@ -254,10 +251,10 @@ public class EventPumper implements Runnable {
         } catch (Exception e) {
             _log.error("Error closing keys on pumper shutdown", e);
         }
-        synchronized (_wantsConRegister) { _wantsConRegister.clear(); }
-        synchronized (_wantsRead) { _wantsRead.clear(); }
-        synchronized (_wantsRegister) { _wantsRegister.clear(); }
-        synchronized (_wantsWrite) { _wantsWrite.clear(); }
+        _wantsConRegister.clear();
+        _wantsRead.clear();
+        _wantsRegister.clear();
+        _wantsWrite.clear();
     }
     
     private void processKeys(Set selected) {
@@ -322,10 +319,8 @@ public class EventPumper implements Runnable {
     public void wantsWrite(NTCPConnection con) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Before adding wants to write on " + con);
-        synchronized (_wantsWrite) {
-            if (!_wantsWrite.contains(con))
-                _wantsWrite.add(con);
-        }
+        if (!_wantsWrite.contains(con))
+            _wantsWrite.offer(con);
         if (_log.shouldLog(Log.INFO))
             _log.info("Wants to write on " + con);
         _selector.wakeup();
@@ -333,10 +328,8 @@ public class EventPumper implements Runnable {
             _log.debug("selector awoken for write");
     }
     public void wantsRead(NTCPConnection con) {
-        synchronized (_wantsRead) {
-            if (!_wantsRead.contains(con))
-                _wantsRead.add(con);
-        }
+        if (!_wantsRead.contains(con))
+            _wantsRead.offer(con);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("wants to read on " + con);
         _selector.wakeup();
@@ -345,16 +338,16 @@ public class EventPumper implements Runnable {
     }
     
     private static final int MIN_BUFS = 5;
+    /**
+     *  There's only one pumper, so static is fine, unless multi router
+     *  Is there a better way to do this?
+     */
     private static int NUM_BUFS = 5;
     private static int __liveBufs = 0;
     private static int __consecutiveExtra;
     ByteBuffer acquireBuf() {
-        if (false) return ByteBuffer.allocate(BUF_SIZE);
-        ByteBuffer rv = null;
-        synchronized (_bufCache) {
-            if (_bufCache.size() > 0)
-                rv = (ByteBuffer)_bufCache.remove(0);
-        }
+        //if (false) return ByteBuffer.allocate(BUF_SIZE);
+        ByteBuffer rv = (ByteBuffer)_bufCache.poll();
         if (rv == null) {
             rv = ByteBuffer.allocate(BUF_SIZE);
             NUM_BUFS = ++__liveBufs;
@@ -369,27 +362,24 @@ public class EventPumper implements Runnable {
     }
     
     void releaseBuf(ByteBuffer buf) {
-        if (false) return;
+        //if (false) return;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("releasing read buffer " + System.identityHashCode(buf) + " with " + __liveBufs + " live: " + buf);
         buf.clear();
-        int extra = 0;
-        boolean cached = false;
-        synchronized (_bufCache) {
-            if (_bufCache.size() < NUM_BUFS) {
-                extra = _bufCache.size();
-                _bufCache.add(buf);
-                cached = true;
-                if (extra > 5) {
-                    __consecutiveExtra++;
-                    if (__consecutiveExtra >= 20) {
-                        NUM_BUFS = Math.max(NUM_BUFS - 1, MIN_BUFS);
-                        __consecutiveExtra = 0;
-                    }
+        int extra = _bufCache.size();
+        boolean cached = extra < NUM_BUFS;
+
+        if (cached) {
+            _bufCache.offer(buf);
+            if (extra > 5) {
+                __consecutiveExtra++;
+                if (__consecutiveExtra >= 20) {
+                    NUM_BUFS = Math.max(NUM_BUFS - 1, MIN_BUFS);
+                    __consecutiveExtra = 0;
                 }
-            } else {
-                __liveBufs--;
             }
+        } else {
+            __liveBufs--;
         }
         if (cached && _log.shouldLog(Log.DEBUG))
             _log.debug("read buffer " + System.identityHashCode(buf) + " cached with " + __liveBufs + " live");
@@ -578,14 +568,8 @@ public class EventPumper implements Runnable {
     }
     
     private void runDelayedEvents(List buf) {
-        synchronized (_wantsRead) {
-            if (_wantsRead.size() > 0) {
-                buf.addAll(_wantsRead);
-                _wantsRead.clear();
-            }
-        }
-        while (buf.size() > 0) {
-            NTCPConnection con = (NTCPConnection)buf.remove(0);
+        NTCPConnection con;
+        while ((con = _wantsRead.poll()) != null) {
             SelectionKey key = con.getKey();
             try {
                 key.interestOps(key.interestOps() | SelectionKey.OP_READ);
@@ -594,14 +578,7 @@ public class EventPumper implements Runnable {
             }
         }
 
-        synchronized (_wantsWrite) {
-            if (_wantsWrite.size() > 0) {
-                buf.addAll(_wantsWrite);
-                _wantsWrite.clear();
-            }
-        }
-        while (buf.size() > 0) {
-            NTCPConnection con = (NTCPConnection)buf.remove(0);
+        while ((con = _wantsWrite.poll()) != null) {
             SelectionKey key = con.getKey();
             try {
                 key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
@@ -610,14 +587,8 @@ public class EventPumper implements Runnable {
             }
         }
         
-        synchronized (_wantsRegister) {
-            if (_wantsRegister.size() > 0) {
-                buf.addAll(_wantsRegister);
-                _wantsRegister.clear();
-            }
-        }
-        while (buf.size() > 0) {
-            ServerSocketChannel chan = (ServerSocketChannel)buf.remove(0);
+        ServerSocketChannel chan;
+        while ((chan = _wantsRegister.poll()) != null) {
             try {
                 SelectionKey key = chan.register(_selector, SelectionKey.OP_ACCEPT);
                 key.attach(chan);
@@ -626,14 +597,7 @@ public class EventPumper implements Runnable {
             }
         }
         
-        synchronized (_wantsConRegister) {
-            if (_wantsConRegister.size() > 0) {
-                buf.addAll(_wantsConRegister);
-                _wantsConRegister.clear();
-            }
-        }
-        while (buf.size() > 0) {
-            NTCPConnection con = (NTCPConnection)buf.remove(0);
+        while ((con = _wantsConRegister.poll()) != null) {
             try {
                 SelectionKey key = con.getChannel().register(_selector, SelectionKey.OP_CONNECT);
                 key.attach(con);
