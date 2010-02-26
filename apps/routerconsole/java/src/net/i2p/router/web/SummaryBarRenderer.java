@@ -114,11 +114,11 @@ public class SummaryBarRenderer {
                .append(_("Logs"))
                .append("</a>\n" +
 
-                       "<a href=\"/jobs.jsp\" target=\"_top\" title=\"")
-               .append(_("Show the router's workload, and how it's performing"))
-               .append("\">")
-               .append(_("Jobs"))
-               .append("</a>\n" +
+           //          "<a href=\"/jobs.jsp\" target=\"_top\" title=\"")
+           //  .append(_("Show the router's workload, and how it's performing"))
+           //  .append("\">")
+           //  .append(_("Jobs"))
+           //  .append("</a>\n" +
 
                        "<a href=\"/graphs.jsp\" target=\"_top\" title=\"")
                .append(_("Graph router performance"))
