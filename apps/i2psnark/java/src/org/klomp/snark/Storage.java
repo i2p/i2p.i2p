@@ -420,13 +420,29 @@ public class Storage
       }
   }
 
+  private static final char[] ILLEGAL = new char[] {
+        '<', '>', ':', '"', '/', '\\', '|', '?', '*',
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+        16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 };
+
   /**
-   * Removes 'suspicious' characters from the give file name.
+   * Removes 'suspicious' characters from the given file name.
+   * http://msdn.microsoft.com/en-us/library/aa365247%28VS.85%29.aspx
    */
   private static String filterName(String name)
   {
-    // XXX - Is this enough?
-    return name.replace(File.separatorChar, '_');
+    if (name.equals(".") || name.equals(" "))
+        return "_";
+    String rv = name;
+    if (rv.startsWith("."))
+        rv = '_' + rv.substring(1);
+    if (rv.endsWith(".") || rv.endsWith(" "))
+        rv = rv.substring(0, rv.length() - 1) + '_';
+    for (int i = 0; i < ILLEGAL.length; i++) {
+        if (rv.indexOf(ILLEGAL[i]) >= 0)
+            rv = rv.replace(ILLEGAL[i], '_');
+    }
+    return rv;
   }
 
   private File createFileFromNames(File base, List names) throws IOException
@@ -577,6 +593,9 @@ public class Storage
     if (rafs == null) return;
     for (int i = 0; i < rafs.length; i++)
       {
+        // if we had an IOE in check(), the RAFlock may be null
+        if (RAFlock[i] == null)
+            continue;
         try {
           synchronized(RAFlock[i]) {
             closeRAF(i);

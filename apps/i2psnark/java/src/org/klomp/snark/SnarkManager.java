@@ -425,9 +425,18 @@ public class SnarkManager implements Snark.CompleteListener {
                 FileInputStream fis = null;
                 try {
                     fis = new FileInputStream(sfile);
+                } catch (IOException ioe) {
+                    // catch this here so we don't try do delete it below
+                    addMessage(_("Cannot open \"{0}\"", sfile.getName()) + ": " + ioe.getMessage());
+                    return;
+                }
+
+                try {
                     MetaInfo info = new MetaInfo(fis);
-                    fis.close();
-                    fis = null;
+                    try {
+                        fis.close();
+                        fis = null;
+                    } catch (IOException e) {}
                     
                     if (!TrackerClient.isValidAnnounce(info.getAnnounce())) {
                         if (_util.shouldUseOpenTrackers() && _util.getOpenTrackers() != null) {
