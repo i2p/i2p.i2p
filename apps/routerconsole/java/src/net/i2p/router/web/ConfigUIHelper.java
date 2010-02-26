@@ -1,6 +1,7 @@
 package net.i2p.router.web;
 
 import java.io.File;
+import java.util.Iterator;
 import java.util.TreeSet;
 import java.util.Set;
 
@@ -19,6 +20,8 @@ public class ConfigUIHelper extends HelperBase {
         return buf.toString();
     }
 
+    static final String PROP_THEME_PFX = "routerconsole.theme.";
+
     /** @return standard and user-installed themes, sorted (untranslated) */
     private Set<String> themeSet() {
          Set<String> rv = new TreeSet();
@@ -32,6 +35,13 @@ public class ConfigUIHelper extends HelperBase {
              String name = files[i].getName();
              if (files[i].isDirectory() && ! name.equals("images"))
                  rv.add(name);
+         }
+         // user themes
+         Set props = _context.getPropertyNames();
+         for (Iterator iter = props.iterator(); iter.hasNext(); ) {
+              String prop = (String) iter.next();
+              if (prop.startsWith(PROP_THEME_PFX) && prop.length() > PROP_THEME_PFX.length())
+                  rv.add(prop.substring(PROP_THEME_PFX.length()));
          }
          return rv;
     }

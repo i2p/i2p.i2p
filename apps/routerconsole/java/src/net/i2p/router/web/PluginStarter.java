@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -26,7 +27,9 @@ import org.mortbay.jetty.Server;
 
 
 /**
- *  Start plugins that are already installed
+ *  Start/stop/delete plugins that are already installed
+ *  Get properties of installed plugins
+ *  Get or change settings in plugins.config
  *
  *  @since 0.7.12
  *  @author zzz
@@ -35,6 +38,10 @@ public class PluginStarter implements Runnable {
     private RouterContext _context;
     static final String PREFIX = "plugin.";
     static final String ENABLED = ".startOnLoad";
+    private static final String[] STANDARD_WEBAPPS = { "i2psnark", "i2ptunnel", "susidns",
+                                                       "susimail", "addressbook", "routerconsole" };
+    private static final String[] STANDARD_THEMES = { "images", "light", "dark", "classic",
+                                                      "midnight" };
 
     public PluginStarter(RouterContext ctx) {
         _context = ctx;
@@ -81,6 +88,18 @@ public class PluginStarter implements Runnable {
         }
         //log.error("Starting plugin: " + appName);
 
+        // register themes
+        File dir = new File(pluginDir, "console/themes");
+        File[] tfiles = dir.listFiles();
+        if (tfiles != null) {
+            for (int i = 0; i < tfiles.length; i++) {
+                String name = tfiles[i].getName();
+                if (tfiles[i].isDirectory() && (!Arrays.asList(STANDARD_THEMES).contains(tfiles[i])))
+                    ctx.router().setConfigSetting(ConfigUIHelper.PROP_THEME_PFX + name, tfiles[i].getAbsolutePath());
+                    // we don't need to save
+            }
+        }
+
         // load and start things in clients.config
         File clientConfig = new File(pluginDir, "clients.config");
         if (clientConfig.exists()) {
@@ -103,9 +122,7 @@ public class PluginStarter implements Runnable {
                         String warName = fileNames[i].substring(0, fileNames[i].lastIndexOf(".war"));
                         //log.error("Found webapp: " + warName);
                         // check for duplicates in $I2P
-                        // easy way for now...
-                        if (warName.equals("i2psnark") || warName.equals("susidns") || warName.equals("i2ptunnel") ||
-                            warName.equals("susimail") || warName.equals("addressbook")) {
+                        if (Arrays.asList(STANDARD_WEBAPPS).contains(warName)) {
                             log.error("Skipping duplicate webapp " + warName + " in plugin " + appName);
                             continue;
                         }
@@ -146,8 +163,6 @@ public class PluginStarter implements Runnable {
                     Translate.clearCache();
             }
         }
-
-        // add themes in console/themes
 
         // add summary bar link
         Properties props = pluginProperties(ctx, appName);
@@ -192,8 +207,7 @@ public class PluginStarter implements Runnable {
             if (fileNames != null) {
                 for (int i = 0; i < fileNames.length; i++) {
                     String warName = fileNames[i].substring(0, fileNames[i].lastIndexOf(".war"));
-                    if (warName.equals("i2psnark") || warName.equals("susidns") || warName.equals("i2ptunnel") ||
-                        warName.equals("susimail") || warName.equals("addressbook")) {
+                    if (Arrays.asList(STANDARD_WEBAPPS).contains(warName)) {
                         continue;
                     }
                     WebAppStarter.stopWebApp(server, warName);
@@ -213,12 +227,12 @@ public class PluginStarter implements Runnable {
         return true;
     }
 
-    /** @return true on success - call stopPlugin() first */
+    /** @return true on success - caller should call stopPlugin() first */
     static boolean deletePlugin(RouterContext ctx, String appName) throws IOException {
         Log log = ctx.logManager().getLog(PluginStarter.class);
         File pluginDir = new File(ctx.getAppDir(), PluginUpdateHandler.PLUGIN_DIR + '/' + appName);
         if ((!pluginDir.exists()) || (!pluginDir.isDirectory())) {
-            log.error("Cannot stop nonexistent plugin: " + appName);
+            log.error("Cannot delete nonexistent plugin: " + appName);
             return false;
         }
         // uninstall things in clients.config
@@ -229,6 +243,24 @@ public class PluginStarter implements Runnable {
             List<ClientAppConfig> clients = ClientAppConfig.getClientApps(clientConfig);
             runClientApps(ctx, pluginDir, clients, "uninstall");
         }
+
+        // unregister themes, and switch to default if we are unregistering the current theme
+        File dir = new File(pluginDir, "console/themes");
+        File[] tfiles = dir.listFiles();
+        if (tfiles != null) {
+            String current = ctx.getProperty(CSSHelper.PROP_THEME_NAME);
+            for (int i = 0; i < tfiles.length; i++) {
+                String name = tfiles[i].getName();
+                if (tfiles[i].isDirectory() && (!name.equals("images")) && (!name.equals("classic")) &&
+                    (!name.equals("dark")) && (!name.equals("light")) && (!name.equals("midnight"))) {
+                    ctx.router().removeConfigSetting(ConfigUIHelper.PROP_THEME_PFX + name);
+                    if (name.equals(current))
+                        ctx.router().setConfigSetting(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
+                }
+            }
+            ctx.router().saveConfig();
+        }
+
         FileUtil.rmdir(pluginDir, false);
         Properties props = pluginProperties();
         for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
