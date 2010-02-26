@@ -9,6 +9,8 @@ import net.i2p.util.Log;
  * Blocking thread to grab new messages off the outbound queue and
  * plopping them into our active pool.  
  *
+ * WARNING - UNUSED since 0.6.1.11
+ *
  */
 public class OutboundRefiller implements Runnable {
     private RouterContext _context;

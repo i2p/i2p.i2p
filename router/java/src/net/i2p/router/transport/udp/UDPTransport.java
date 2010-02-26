@@ -135,12 +135,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /** how many relays offered to us will we use at a time? */
     public static final int PUBLIC_RELAY_COUNT = 3;
     
+    private static final boolean USE_PRIORITY = false;
+
     /** configure the priority queue with the given split points */
     private static final int PRIORITY_LIMITS[] = new int[] { 100, 200, 300, 400, 500, 1000 };
     /** configure the priority queue with the given weighting per priority group */
     private static final int PRIORITY_WEIGHT[] = new int[] { 1, 1, 1, 1, 1, 2 };
 
-    /** should we flood all UDP peers with the configured rate? */
+    /** should we flood all UDP peers with the configured rate? This is for testing only! */
     private static final boolean SHOULD_FLOOD_PEERS = false;
     
     private static final int MAX_CONSECUTIVE_FAILED = 5;
@@ -170,9 +172,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _dropList = new ArrayList(256);
         _endpoint = null;
         
-        TimedWeightedPriorityMessageQueue mq = new TimedWeightedPriorityMessageQueue(ctx, PRIORITY_LIMITS, PRIORITY_WEIGHT, this);
-        _outboundMessages = mq;
-        _activeThrottle = mq;
+        // See comments in DQAT.java
+        if (USE_PRIORITY) {
+            TimedWeightedPriorityMessageQueue mq = new TimedWeightedPriorityMessageQueue(ctx, PRIORITY_LIMITS, PRIORITY_WEIGHT, this);
+            _outboundMessages = mq;
+            _activeThrottle = mq;
+        } else {
+            DummyThrottle mq = new DummyThrottle();
+            _outboundMessages = null;
+            _activeThrottle = mq;
+        }
 
         _cachedBid = new SharedBid[BID_VALUES.length];
         for (int i = 0; i < BID_VALUES.length; i++) {
@@ -181,7 +190,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
         _fragments = new OutboundMessageFragments(_context, this, _activeThrottle);
         _inboundFragments = new InboundMessageFragments(_context, _fragments, this);
-        _flooder = new UDPFlooder(_context, this);
+        if (SHOULD_FLOOD_PEERS)
+            _flooder = new UDPFlooder(_context, this);
         _expireTimeout = EXPIRE_TIMEOUT;
         _expireEvent = new ExpirePeerEvent();
         _testEvent = new PeerTestEvent();
@@ -276,10 +286,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (_handler == null)
             _handler = new PacketHandler(_context, this, _endpoint, _establisher, _inboundFragments, _testManager, _introManager);
         
-        if (_refiller == null)
+        // See comments in DQAT.java
+        if (USE_PRIORITY && _refiller == null)
             _refiller = new OutboundRefiller(_context, _fragments, _outboundMessages);
         
-        if (_flooder == null)
+        if (SHOULD_FLOOD_PEERS && _flooder == null)
             _flooder = new UDPFlooder(_context, this);
         
         // Startup the endpoint with the requested port, check the actual port, and
@@ -306,8 +317,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _inboundFragments.startup();
         _pusher = new PacketPusher(_context, _fragments, _endpoint.getSender());
         _pusher.startup();
-        _refiller.startup();
-        _flooder.startup();
+        if (USE_PRIORITY)
+            _refiller.startup();
+        if (SHOULD_FLOOD_PEERS)
+            _flooder.startup();
         _expireEvent.setIsAlive(true);
         _testEvent.setIsAlive(true); // this queues it for 3-6 minutes in the future...
         SimpleTimer.getInstance().addEvent(_testEvent, 10*1000); // lets requeue it for Real Soon
@@ -1150,10 +1163,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             msg.timestamp("enqueueing for an already established peer");
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Add to fragments for " + to.toBase64());
-            if (true) // skip the priority queue and go straight to the active pool
-                _fragments.add(msg);
-            else
+
+            // See comments in DQAT.java
+            if (USE_PRIORITY)
                 _outboundMessages.add(msg);
+            else  // skip the priority queue and go straight to the active pool
+                _fragments.add(msg);
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Establish new connection to " + to.toBase64());
