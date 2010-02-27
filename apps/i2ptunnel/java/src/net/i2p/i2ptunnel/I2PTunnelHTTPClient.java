@@ -26,6 +26,7 @@ import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketOptions;
+import net.i2p.data.Base32;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -46,7 +47,13 @@ import net.i2p.util.Translate;
  *   $method http://i2p/$b64key/$path $protocolVersion
  * or
  *   $method /$site/$path $protocolVersion
+ * or (deprecated)
+ *   $method /eepproxy/$site/$path $protocolVersion
  * </pre>
+ *
+ * Note that http://i2p/$b64key/... and /eepproxy/$site/... are not recommended
+ * in browsers or other user-visible applications, as relative links will not
+ * resolve correctly, cookies won't work, etc.
  *
  * If the $site resolves with the I2P naming service, then it is directed towards
  * that eepsite, otherwise it is directed towards this client's outproxy (typically
@@ -303,14 +310,16 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
 
                 if (method == null) { // first line (GET /base64/realaddr)
                     if (_log.shouldLog(Log.DEBUG))
-                        _log.debug(getPrefix(requestId) + "Method is null for [" + line + "]");
+                        _log.debug(getPrefix(requestId) + "First line [" + line + "]");
 
                     int pos = line.indexOf(" ");
                     if (pos == -1) break;
                     method = line.substring(0, pos);
                     // TODO use Java URL class to make all this simpler and more robust
+                    // That will also fix IPV6 [a:b:c]
                     String request = line.substring(pos + 1);
                     if (request.startsWith("/") && getTunnel().getClientOptions().getProperty("i2ptunnel.noproxy") != null) {
+                        // what is this for ???
                         request = "http://i2p" + request;
                     } else if (request.startsWith("/eepproxy/")) {
                         // /eepproxy/foo.i2p/bar/baz.html HTTP/1.0
@@ -321,6 +330,16 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                                 uri = uri + "/";
                         }
                         // "http://" + "foo.i2p/bar/baz.html" + " HTTP/1.0"
+                        request = "http://" + uri + subRequest.substring(protopos);
+                    } else if (request.toLowerCase().startsWith("http://i2p/")) {
+                        // http://i2p/b64key/bar/baz.html HTTP/1.0
+                        String subRequest = request.substring("http://i2p/".length());
+                        int protopos = subRequest.indexOf(" ");
+                        String uri = subRequest.substring(0, protopos);
+                        if (uri.indexOf("/") == -1) {
+                                uri = uri + "/";
+                        }
+                        // "http://" + "b64key/bar/baz.html" + " HTTP/1.0"
                         request = "http://" + uri + subRequest.substring(protopos);
                     }
 
@@ -334,6 +353,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
 
                     targetRequest = request;
 
+                    // pos is the start of the path
                     pos = request.indexOf("/");
                     if (pos == -1) {
                         method = null;
@@ -354,9 +374,22 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         }
                     }
 
-                    if (host.toLowerCase().equals("proxy.i2p")) {
+                    // Go through the various types of host names, set
+                    // the host and destination variables accordingly,
+                    // and transform the first line.
+                    // For all i2p network hosts, ensure that the host is a
+                    // Base 32 hostname so that we do not reveal our name for it
+                    // in our addressbook (all naming is local),
+                    // and it is removed from the request line.
+
+                    if (host.length() >= 516 && host.indexOf(".") < 0) {
+                        // http://b64key/bar/baz.html
+                        destination = host;
+                        host = getHostName(destination);
+                        line = method + ' ' + request.substring(pos);
+                    } else if (host.toLowerCase().equals("proxy.i2p")) {
                         // so we don't do any naming service lookups
-                        destination = "proxy.i2p";
+                        destination = host;
                         usingInternalServer = true;
                     } else if (host.toLowerCase().endsWith(".i2p")) {
                         // Destination gets the host name
@@ -482,6 +515,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug(getPrefix(requestId) + "Host doesnt end with .i2p and it contains a period [" + host + "]: wwwProxy!");
                     } else {
+                        // what is left for here? a hostname with no dots, and != "i2p"
+                        // and not a destination ???
+                        // Perhaps something in privatehosts.txt ...
                         request = request.substring(pos + 1);
                         pos = request.indexOf("/");
                         if (pos < 0) {
@@ -494,8 +530,18 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                             return;
                         }
                         destination = request.substring(0, pos);
+                        host = getHostName(destination);
                         line = method + " " + request.substring(pos);
                     }   // end host name processing
+
+                    if (port != 80 && !usingWWWProxy) {
+                        if (out != null) {
+                            out.write(getErrorPage("denied", ERR_REQUEST_DENIED));
+                            writeFooter(out);
+                        }
+                        s.close();
+                        return;
+                    }
 
                     boolean isValid = usingWWWProxy || usingInternalServer || isSupportedAddress(host, protocol);
                     if (!isValid) {
@@ -503,22 +549,30 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         method = null;
                         destination = null;
                         break;
-                    } else if ((!usingWWWProxy) && (!usingInternalServer)) {
-                        if (_log.shouldLog(Log.INFO)) _log.info(getPrefix(requestId) + "host=getHostName(" + destination + ")");
-                        host = getHostName(destination); // hide original host
                     }
 
+                    // don't do this, it forces yet another hostname lookup,
+                    // and in all cases host was already set above
+                    //if ((!usingWWWProxy) && (!usingInternalServer)) {
+                    //    String oldhost = host;
+                    //    host = getHostName(destination); // hide original host
+                    //    if (_log.shouldLog(Log.INFO))
+                    //        _log.info(getPrefix(requestId) + " oldhost " + oldhost + " newhost " + host + " dest " + destination);
+                    //}
+
                     if (_log.shouldLog(Log.DEBUG)) {
-                        _log.debug(getPrefix(requestId) + "METHOD:" + method + ":");
-                        _log.debug(getPrefix(requestId) + "PROTOC:" + protocol + ":");
-                        _log.debug(getPrefix(requestId) + "HOST  :" + host + ":");
-                        _log.debug(getPrefix(requestId) + "DEST  :" + destination + ":");
+                        _log.debug(getPrefix(requestId) + "METHOD: \"" + method + "\"");
+                        _log.debug(getPrefix(requestId) + "PROTOC: \"" + protocol + "\"");
+                        _log.debug(getPrefix(requestId) + "HOST  : \"" + host + "\"");
+                        _log.debug(getPrefix(requestId) + "DEST  : \"" + destination + "\"");
                     }
 
                     // end first line processing
 
                 } else {
                     if (lowercaseLine.startsWith("host: ") && !usingWWWProxy) {
+                        // Note that we only pass the original Host: line through to the outproxy
+                        // But we don't create a Host: line if it wasn't sent to us
                         line = "Host: " + host;
                         if (_log.shouldLog(Log.INFO))
                             _log.info(getPrefix(requestId) + "Setting host = " + host);
@@ -575,7 +629,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 _log.debug(getPrefix(requestId) + "NewRequest header: [" + newRequest.toString() + "]");
 
             if (method == null || destination == null) {
-                l.log("No HTTP method found in the request.");
+                //l.log("No HTTP method found in the request.");
                 if (out != null) {
                     if ("http://".equalsIgnoreCase(protocol))
                         out.write(getErrorPage("denied", ERR_REQUEST_DENIED));
@@ -598,7 +652,16 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 return;
             }
 
-            Destination clientDest = I2PTunnel.destFromName(destination);
+            // If the host is "i2p", the getHostName() lookup failed, don't try to
+            // look it up again as the naming service does not do negative caching
+            // so it will be slow.
+
+            Destination clientDest;
+            if ("i2p".equals(host))
+                clientDest = null;
+            else
+                clientDest = I2PTunnel.destFromName(destination);
+
             if (clientDest == null) {
                 //l.log("Could not resolve " + destination + ".");
                 if (_log.shouldLog(Log.WARN))
@@ -679,12 +742,18 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
         }
     }
 
+    /**
+     *  @return b32hash.b32.i2p, or "i2p" on lookup failure.
+     *  Prior to 0.7.12, returned b64 key
+     */
     private final static String getHostName(String host) {
         if (host == null) return null;
+        if (host.length() == 60 && host.toLowerCase().endsWith(".b32.i2p"))
+            return host;
         try {
             Destination dest = I2PTunnel.destFromName(host);
             if (dest == null) return "i2p";
-            return dest.toBase64();
+            return Base32.encode(dest.calculateHash().getData()) + ".b32.i2p";
         } catch (DataFormatException dfe) {
             return "i2p";
         }
@@ -858,8 +927,14 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
 
     private final static String SUPPORTED_HOSTS[] = { "i2p", "www.i2p.com", "i2p."};
 
+    /** @param host ignored */
     private static boolean isSupportedAddress(String host, String protocol) {
         if ((host == null) || (protocol == null)) return false;
+
+     /****
+       *  Let's not look up the name _again_
+       *  and now that host is a b32, this was failing
+       *
         boolean found = false;
         String lcHost = host.toLowerCase();
         for (int i = 0; i < SUPPORTED_HOSTS.length; i++) {
@@ -876,7 +951,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             } catch (DataFormatException dfe) {
             }
         }
-
+      ****/
         return protocol.equalsIgnoreCase("http://");
     }
 

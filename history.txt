@@ -1,3 +1,27 @@
+2010-02-27 zzz
+    * eepsite: Add some help to index.html
+    * HTTP Proxy:
+      - Put B32 instead of B64 in Host: header, saves 450 bytes
+      - Eliminate some redundant lookups
+      - Fix http://i2p/b64/ and /eepproxy/site/ requests
+      - Disallow a port specified for an i2p address
+      - Cleanup and comments
+    * i2psnark:
+      - Fix NPE after create file failure
+      - Sanitize more characters in file names
+    * netdb: Fix NPE after OOM http://trac.i2p2.i2p/ticket/38
+    * NTCP Transport:
+      - Replace lists with concurrent queues in EventPumper
+        and NTCPConnection to remove global locks
+      - Java 5 cleanup
+    * Plugins: Support console themes
+    * UDP Transport:
+      - Replace the unused-since-2006 TimedWeightedPriorityMessageQueue
+        with DummyThrottle
+      - Don't instantiate and start TWPMQ Cleaner and OutboundRefiller
+        threads, part of priority queues unused since 0.6.1.11
+      - Don't instantiate and start UDPFlooder, it is for testing only
+
 2010-02-23 zzz
     * Unzip: Any files in the zip with a .jar.pack or .war.pack extension
       will be transparently unpacked with unpack200. Savings is about 60%.
