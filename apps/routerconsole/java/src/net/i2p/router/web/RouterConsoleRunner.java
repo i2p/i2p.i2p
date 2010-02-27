@@ -30,6 +30,7 @@ public class RouterConsoleRunner {
     private String _webAppsDir = "./webapps/";
     private static final String PROP_WEBAPP_CONFIG_FILENAME = "router.webappsConfigFile";
     private static final String DEFAULT_WEBAPP_CONFIG_FILENAME = "webapps.config";
+    private static final DigestAuthenticator authenticator = new DigestAuthenticator();
     public static final String ROUTERCONSOLE = "routerconsole";
     public static final String PREFIX = "webapps.";
     public static final String ENABLED = ".startOnLoad";
@@ -203,7 +204,7 @@ public class RouterConsoleRunner {
             realm.put("admin", password);
             realm.addUserToRole("admin", "routerAdmin");
             context.setRealm(realm);
-            context.setAuthenticator(new DigestAuthenticator());
+            context.setAuthenticator(authenticator);
             context.addHandler(0, new SecurityHandler());
             SecurityConstraint constraint = new SecurityConstraint("admin", "routerAdmin");
             constraint.setAuthenticate(true);
