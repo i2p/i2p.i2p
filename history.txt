@@ -6,6 +6,7 @@
       - Fix http://i2p/b64/ and /eepproxy/site/ requests
       - Disallow a port specified for an i2p address
       - Cleanup and comments
+      - For more info see http://zzz.i2p/topics/566
     * i2psnark:
       - Fix NPE after create file failure
       - Sanitize more characters in file names
@@ -21,6 +22,7 @@
       - Don't instantiate and start TWPMQ Cleaner and OutboundRefiller
         threads, part of priority queues unused since 0.6.1.11
       - Don't instantiate and start UDPFlooder, it is for testing only
+      - Prevent NPE http://zzz.i2p/topics/571
 
 2010-02-23 zzz
     * Unzip: Any files in the zip with a .jar.pack or .war.pack extension

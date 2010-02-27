@@ -1264,7 +1264,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             options.setProperty(UDPAddress.PROP_CAPACITY, ""+UDPAddress.CAPACITY_TESTING + UDPAddress.CAPACITY_INTRODUCER);
 
         if (directIncluded || introducersIncluded) {
-            options.setProperty(UDPAddress.PROP_INTRO_KEY, _introKey.toBase64());
+            // This is called via TransportManager.configTransports() before startup(), prevent NPE
+            if (_introKey != null)
+                options.setProperty(UDPAddress.PROP_INTRO_KEY, _introKey.toBase64());
 
             RouterAddress addr = new RouterAddress();
             if (ADJUST_COST && !haveCapacity())
