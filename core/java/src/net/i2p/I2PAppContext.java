@@ -353,6 +353,32 @@ public class I2PAppContext {
     }
 
     /**
+     * Return a boolean with a boolean default
+     * @since 0.7.12
+     */
+    public boolean getProperty(String propName, boolean defaultVal) {
+        String val = getProperty(propName);
+        if (val == null)
+            return defaultVal;
+        return Boolean.valueOf(val).booleanValue();
+    }
+
+    /**
+     * Default false
+     * @since 0.7.12
+     */
+    public boolean getBooleanProperty(String propName) {
+        return Boolean.valueOf(getProperty(propName)).booleanValue();
+    }
+
+    /**
+     * @since 0.7.12
+     */
+    public boolean getBooleanPropertyDefaultTrue(String propName) {
+        return getProperty(propName, true);
+    }
+
+    /**
      * Access the configuration attributes of this context, listing the properties 
      * provided during the context construction, as well as the ones included in
      * System.getProperties.
