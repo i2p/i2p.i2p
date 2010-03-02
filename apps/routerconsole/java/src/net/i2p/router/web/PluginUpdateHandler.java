@@ -240,8 +240,6 @@ public class PluginUpdateHandler extends UpdateHandler {
                 return;
             }
 
-            // todo compare sud version with property version
-
             String minVersion = ConfigClientsHelper.stripHTML(props, "min-i2p-version");
             if (minVersion != null &&
                 (new VersionComparator()).compare(CoreVersion.VERSION, minVersion) < 0) {

@@ -1,3 +1,15 @@
+2010-03-02 zzz
+    * Console:
+      - Add link to jobs.jsp on configservice.jsp
+      - Add plugin disableStop support
+    * Context: Add boolean getProperty methods
+    * HTTP Proxy:
+      - Fix address helper conflicts caused by last checkin
+      - Use B32 instead of random hostname for conflict link
+    * LoadClientAppsJob:
+      - Fix unquoted arg after quoted arg
+      - Logging cleanup
+
 2010-02-27 zzz
     * eepsite: Add some help to index.html
     * HTTP Proxy:

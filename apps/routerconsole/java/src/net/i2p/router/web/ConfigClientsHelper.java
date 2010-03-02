@@ -146,9 +146,10 @@ public class ConfigClientsHelper extends HelperBase {
                         .append("<a href=\"").append(updateURL).append("\">").append(_("Update link")).append("</a><td>&nbsp;");
                 }
                 desc.append("</table>");
+                boolean enableStop = !Boolean.valueOf(appProps.getProperty("disableStop")).booleanValue();
                 renderForm(buf, app, app, false,
                            "true".equals(val), false, desc.toString(), false, false,
-                           updateURL != null, true, true);
+                           updateURL != null, enableStop, true);
             }
         }
         buf.append("</table>\n");

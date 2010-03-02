@@ -59,12 +59,14 @@
     <%=intl._("You may want to consider shutting down gracefully, as above, then running uninstall_i2p_service_winnt.bat.")%></p>
  <% } %>
 
- <% if (System.getProperty("wrapper.version") != null) { %>
  <h3><%=intl._("Debugging")%></h3>
+ <p><a href="/jobs.jsp"><%=intl._("View the job queue")%></a>
+ <% if (System.getProperty("wrapper.version") != null) { %>
  <p><%=intl._("At times, it may be helpful to debug I2P by getting a thread dump. To do so, please select the following option and review the thread dumped to <a href=\"logs.jsp#servicelogs\">wrapper.log</a>.")%></p>
   <hr><div class="formaction">
  <input type="submit" name="action" value="<%=intl._("Dump threads")%>" >
-<% } %></div>
+ </div>
+<% } %>
 
  <h3><%=intl._("Launch browser on router startup?")%></h3>
  <p><%=intl._("I2P's main configuration interface is this web console, so for your convenience I2P can launch a web browser on startup pointing at")%>
