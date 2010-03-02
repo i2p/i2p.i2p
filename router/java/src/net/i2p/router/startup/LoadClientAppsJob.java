@@ -1,6 +1,7 @@
 package net.i2p.router.startup;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -84,9 +85,8 @@ public class LoadClientAppsJob extends JobImpl {
                             if (str.length() > 0)
                                 argList.add(str);
                             buf = new StringBuilder(32);
-                        } else {
-                            isQuoted = true;
                         }
+                        isQuoted = !isQuoted;
                         break;
                     case ' ':
                     case '\t':
@@ -119,7 +119,8 @@ public class LoadClientAppsJob extends JobImpl {
     }
 
     public static void runClient(String className, String clientName, String args[], Log log) {
-        log.info("Loading up the client application " + clientName + ": " + className + " " + args);
+        if (log.shouldLog(Log.INFO))
+            log.info("Loading up the client application " + clientName + ": " + className + " " + Arrays.toString(args));
         I2PThread t = new I2PThread(new RunApp(className, clientName, args, log));
         if (clientName == null) 
             clientName = className + " client";
@@ -150,7 +151,8 @@ public class LoadClientAppsJob extends JobImpl {
             } catch (Throwable t) {
                 _log.log(Log.CRIT, "Error starting up the client class " + _className, t);
             }
-            _log.info("Done running client application " + _appName);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Done running client application " + _appName);
         }
     }
 
