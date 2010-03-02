@@ -425,6 +425,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
 
                                     // Key contains data, lets not ignore it
                                     if (ahelperKey != null) {
+                                        // ahelperKey will be validated later
 
                                         // Host resolvable only with addresshelper
                                         if ( (host == null) || ("i2p".equals(host)) )
@@ -434,12 +435,18 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                                         } else {
                                             // Host resolvable from database, verify addresshelper key
                                             // Silently bypass correct keys, otherwise alert
-                                            if (!host.equals(ahelperKey))
+                                            String destB64 = null;
+                                            try {
+                                                Destination dest = I2PTunnel.destFromName(host);
+                                                if (dest != null)
+                                                    destB64 = dest.toBase64();
+                                            } catch (DataFormatException dfe) {}
+                                            if (destB64 != null && !destB64.equals(ahelperKey))
                                             {
                                                 // Conflict: handle when URL reconstruction done
                                                 ahelperConflict = true;
                                                 if (_log.shouldLog(Log.WARN))
-                                                    _log.warn(getPrefix(requestId) + "Addresshelper key conflict for site [" + destination + "], trusted key [" + host + "], specified key [" + ahelperKey + "].");
+                                                    _log.warn(getPrefix(requestId) + "Addresshelper key conflict for site [" + destination + "], trusted key [" + destB64 + "], specified key [" + ahelperKey + "].");
                                             }
                                         }
                                     }
@@ -461,14 +468,22 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                             {
 
                                 if (out != null) {
-                                    long alias = I2PAppContext.getGlobalContext().random().nextLong();
-                                    String trustedURL = protocol + uriPath + urlEncoding;
-                                    String conflictURL = protocol + alias + ".i2p/?" + initialFragments;
-                                    byte[] header = getErrorPage("ahelper-conflict", ERR_AHELPER_CONFLICT);
-                                    out.write(header);
-                                    out.write(_("To visit the destination in your host database, click <a href=\"{0}\">here</a>. To visit the conflicting addresshelper link by temporarily giving it a random alias, click <a href=\"{1}\">here</a>.", trustedURL, conflictURL).getBytes("UTF-8"));
-                                    out.write(("<p></div>").getBytes());
-                                    writeFooter(out);
+                                    // convert ahelperKey to b32
+                                    String alias = getHostName(ahelperKey);
+                                    if (alias.equals("i2p")) {
+                                        // bad ahelperKey
+                                        byte[] header = getErrorPage("dnfb", ERR_DESTINATION_UNKNOWN);
+                                        writeErrorMessage(header, out, targetRequest, false, destination, null);
+                                    } else {
+                                        String trustedURL = protocol + uriPath + urlEncoding;
+                                        // Fixme - any path is lost
+                                        String conflictURL = protocol + alias + '/' + urlEncoding;
+                                        byte[] header = getErrorPage("ahelper-conflict", ERR_AHELPER_CONFLICT);
+                                        out.write(header);
+                                        out.write(_("To visit the destination in your host database, click <a href=\"{0}\">here</a>. To visit the conflicting addresshelper destination, click <a href=\"{1}\">here</a>.", trustedURL, conflictURL).getBytes("UTF-8"));
+                                        out.write(("<p></div>").getBytes());
+                                        writeFooter(out);
+                                    }
                                 }
                                 s.close();
                                 return;
