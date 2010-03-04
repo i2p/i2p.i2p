@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-02-23 08:00+0000\n"
-"PO-Revision-Date: 2010-02-23 08:12+0000\n"
+"POT-Creation-Date: 2010-03-04 09:52+0000\n"
+"PO-Revision-Date: 2010-03-04 12:24+0000\n"
 "Last-Translator: 4get <forget@mail.i2p>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -1098,7 +1098,7 @@ msgid "Error stopping plugin {0}"
 msgstr "Ошибка при остановке плагина {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:116
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:186
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:187
 msgid "Start"
 msgstr "Запустить"
 
@@ -1213,7 +1213,7 @@ msgid "Error starting plugin {0}"
 msgstr "Ошибка при запуске плагина {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:21
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:189
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:190
 msgid "Edit"
 msgstr "Редактировать"
 
@@ -1278,29 +1278,29 @@ msgstr "Веб-сайт"
 msgid "Update link"
 msgstr "Адрес обновления"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:191
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:192
 msgid "Stop"
 msgstr "Остановить"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:193
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:194
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:58
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:310
 msgid "Check for updates"
 msgstr "Проверить обновления"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:194
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:195
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:18
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:213
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:220
 msgid "Update"
 msgstr "Обновление"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:199
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:200
 #, java-format
 msgid "Are you sure you want to delete {0}?"
 msgstr "Вы действительно хотите удалить {0}?"
 
-#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:201
+#: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:202
 msgid "Delete"
 msgstr "Удалить"
 
@@ -1875,31 +1875,31 @@ msgstr "Изменение темы оформления сохранено."
 msgid "Refresh the page to view."
 msgstr "Обновите страницу для просмотра."
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:41
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:51
 msgid "English"
 msgstr "English"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:41
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:51
 msgid "French"
 msgstr "Français"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:41
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:51
 msgid "German"
 msgstr "Deutsch"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:42
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:52
 msgid "Chinese"
 msgstr "中文"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:42
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:52
 msgid "Dutch"
 msgstr "Nederlands"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:42
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:52
 msgid "Russian"
 msgstr "Русский"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:42
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:52
 msgid "Swedish"
 msgstr "Svenska"
 
@@ -2253,7 +2253,7 @@ msgid "Plugin downloaded"
 msgstr "Плагин загружен"
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:139
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:328
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:326
 #, java-format
 msgid "Cannot create plugin directory {0}"
 msgstr "Не удалось создать директорию плагина {0}"
@@ -2296,78 +2296,78 @@ msgstr "Загруженный из {0} плагин имеет некоррек
 msgid "Plugin {0} has mismatched versions"
 msgstr "Плагин {0} содержит несовпадающие версии"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:249
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:247
 #, java-format
 msgid "This plugin requires I2P version {0} or higher"
 msgstr "Для этого плагина требуется версия I2P {0} и выше"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:257
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:255
 #, java-format
 msgid "This plugin requires Java version {0} or higher"
 msgstr "Для этого плагина требуется версия Java {0} и выше"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:265
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:263
 msgid "Downloaded plugin is for new installs only, but the plugin is already installed"
 msgstr "Загруженный инсталлятор плагина предназначен только для первоначальной установки, но такой плагин уже установлен"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:277
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:275
 msgid "Installed plugin does not contain the required configuration file"
 msgstr "Установленный плагин не содержит необходимого файла настроек"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:285
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:283
 msgid "Signature of downloaded plugin does not match installed plugin"
 msgstr "Подпись загруженного плагина не совпадает с установленным плагином"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:292
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:290
 #, java-format
 msgid "Downloaded plugin version {0} is not newer than installed plugin"
 msgstr "Версия скачанного плагина {0} не новее версии уже установленного плагина"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:299
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:297
 #, java-format
 msgid "Plugin update requires installed plugin version {0} or higher"
 msgstr "Для обновления плагина требуется установленная версия плагина {0} и выше"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:306
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:304
 #, java-format
 msgid "Plugin update requires installed plugin version {0} or lower"
 msgstr "Для обновления плагина требуется установленная версия плагина {0} и ниже"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:323
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:321
 msgid "Plugin is for upgrades only, but the plugin is not installed"
 msgstr "Загруженный инсталлятор плагина предназначен только для обновления, но такой плагин ещё не был установлен"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:336
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:334
 #, java-format
 msgid "Failed to install plugin in {0}"
 msgstr "Не удалось установить плагин в {0}"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:343
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:341
 #, java-format
 msgid "Plugin {0} installed, router restart required"
 msgstr "Плагин {0} установлен, требуется перезагрузка маршрутизатора"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:345
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:343
 #, java-format
 msgid "Plugin {0} installed"
 msgstr "Плагин {0} установлен"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:354
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:352
 #, java-format
 msgid "Plugin {0} installed and started"
 msgstr "Плагин {0} установлен и запущен"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:356
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:354
 #, java-format
 msgid "Plugin {0} installed but failed to start, check logs"
 msgstr "Плагин {0} установлен, но при его запуске произошел сбой, загляните в журнал ошибок"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:358
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:356
 #, java-format
 msgid "Plugin {0} installed but failed to start"
 msgstr "Плагин {0} установлен, но при его запуске произошел сбой"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:368
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:366
 #, java-format
 msgid "Failed to download plugin from {0}"
 msgstr "Не удалось скачать плагин из {0}"
@@ -2736,14 +2736,6 @@ msgstr "Журналы сообщений маршрутизатора"
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:114
 msgid "Logs"
 msgstr "Журналы"
-
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:118
-msgid "Show the router's workload, and how it's performing"
-msgstr "Просмотр загрузки маршрутизатора и эффективности его работы"
-
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:120
-msgid "Jobs"
-msgstr "Задачи"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:124
 msgid "Graph router performance"
@@ -4191,9 +4183,13 @@ msgstr "Если служба I2P уже была запущена, при вы�
 msgid "You may want to consider shutting down gracefully, as above, then running uninstall_i2p_service_winnt.bat."
 msgstr "Возможно лучше плавно остановить маршрутизатор и после этого запустить файл C:\\Program Files\\I2P\\uninstall_i2p_service_winnt.bat."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:350
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:346
 msgid "Debugging"
 msgstr "Отладка"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:348
+msgid "View the job queue"
+msgstr "Просмотр очереди заданий"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:352
 msgid "At times, it may be helpful to debug I2P by getting a thread dump. To do so, please select the following option and review the thread dumped to <a href=\"logs.jsp#servicelogs\">wrapper.log</a>."
@@ -4517,4 +4513,9 @@ msgstr "обзор туннелей"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:227
 msgid "I2P Tunnel Summary"
 msgstr "Обзор туннелей I2P"
+
+#~ msgid "Show the router's workload, and how it's performing"
+#~ msgstr "Просмотр загрузки маршрутизатора и эффективности его работы"
+#~ msgid "Jobs"
+#~ msgstr "Задачи"
 
