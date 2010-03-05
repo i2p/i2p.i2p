@@ -61,6 +61,7 @@ import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
+import net.i2p.i2ptunnel.socks.I2PSOCKSIRCTunnel;
 import net.i2p.i2ptunnel.socks.I2PSOCKSTunnel;
 import net.i2p.i2ptunnel.streamr.StreamrConsumer;
 import net.i2p.i2ptunnel.streamr.StreamrProducer;
@@ -886,6 +887,39 @@ public class I2PTunnel implements Logging, EventDispatcher {
             ownDest = !isShared;
             I2PTunnelTask task;
             task = new I2PSOCKSTunnel(_port, l, ownDest, (EventDispatcher) this, this);
+            addtask(task);
+            notifyEvent("sockstunnelTaskId", Integer.valueOf(task.getId()));
+        } else {
+            l.log("sockstunnel <port>");
+            l.log("  creates a tunnel that distributes SOCKS requests.");
+            notifyEvent("sockstunnelTaskId", Integer.valueOf(-1));
+        }
+    }
+
+    
+    /**
+     * Run an SOCKS IRC tunnel on the given port number 
+     * @since 0.7.12
+     */
+    public void runSOCKSIRCTunnel(String args[], Logging l) {
+        if (args.length >= 1 && args.length <= 2) {
+            int _port = -1;
+            try {
+                _port = Integer.parseInt(args[0]);
+            } catch (NumberFormatException nfe) {
+                l.log("invalid port");
+                _log.error(getPrefix() + "Port specified is not valid: " + args[0], nfe);
+                notifyEvent("sockstunnelTaskId", Integer.valueOf(-1));
+                return;
+            }
+
+            boolean isShared = false;
+            if (args.length > 1)
+                isShared = "true".equalsIgnoreCase(args[1].trim());
+
+            ownDest = !isShared;
+            I2PTunnelTask task;
+            task = new I2PSOCKSIRCTunnel(_port, l, ownDest, (EventDispatcher) this, this);
             addtask(task);
             notifyEvent("sockstunnelTaskId", Integer.valueOf(task.getId()));
         } else {

@@ -1,3 +1,15 @@
+2010-03-05 zzz
+    * I2PSOCKSIRCTunnel:
+      - New, for filtering IRC client traffic when using SOCKS
+    * I2PTunnelIRCClient:
+      - Make filter classes static and public for use by SOCKS
+      - Eliminate redundant case conversion
+      - Pass ISON message through (jIRCii uses it for pings)
+      - Switch back to StringBuffer since it's used by 2 threads
+      - Set daemon on filter threads
+    * SOCKS5Server:
+      - Fix handling of multiple authentication methods
+
 2010-03-02 zzz
     * Console:
       - Add link to jobs.jsp on configservice.jsp

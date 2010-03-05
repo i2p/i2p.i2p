@@ -89,10 +89,10 @@ public class SOCKS5Server extends SOCKSServer {
         int method = Method.NO_ACCEPTABLE_METHODS;
 
         for (int i = 0; i < nMethods; ++i) {
-            method = in.readByte() & 0xff;
-            if (method == Method.NO_AUTH_REQUIRED) {
+            int meth = in.readByte() & 0xff;
+            if (meth == Method.NO_AUTH_REQUIRED) {
                 // That's fine, we do support this method
-                break;
+                method  = meth;
             }
         }
 
@@ -119,7 +119,7 @@ public class SOCKS5Server extends SOCKSServer {
         int socksVer = in.readByte() & 0xff;
         if (socksVer != SOCKS_VERSION_5) {
             _log.debug("error in SOCKS5 request (protocol != 5? wtf?)");
-            throw new SOCKSException("Invalid protocol version in request");
+            throw new SOCKSException("Invalid protocol version in request: " + socksVer);
         }
 
         int command = in.readByte() & 0xff;
