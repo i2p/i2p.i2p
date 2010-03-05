@@ -1,5 +1,7 @@
 2010-03-05 zzz
-    * Console: Tag reseed messages
+    * Console:
+      - Tag reseed messages
+      - Translate country names on flag popups
     * I2PSOCKSIRCTunnel:
       - New, for filtering IRC client traffic when using SOCKS
     * I2PTunnelIRCClient:
