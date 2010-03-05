@@ -113,6 +113,10 @@
         <delete file="${external-libs-folder}/crypto.jar" />
     </target>
 
+    <!-- fix for property name change sometime after SDK 1.5 -->
+    <property name="android-jar" value="${android.jar}" />
+    <property name="android-aidl" value="${android.aidl}" />
+
     <!--
          ================================================================================
          From here down copied from SDK platforms/android-1.1/templates/android_rules.xml
