@@ -31,7 +31,7 @@ import net.i2p.util.Log;
 public class I2PSOCKSIRCTunnel extends I2PSOCKSTunnel {
 
     private static final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(I2PSOCKSIRCTunnel.class);
-    private static final int __clientId = 0;
+    private static int __clientId = 0;
 
     public I2PSOCKSIRCTunnel(int localPort, Logging l, boolean ownDest, EventDispatcher notifyThis, I2PTunnel tunnel) {
         super(localPort, l, ownDest, notifyThis, tunnel);
