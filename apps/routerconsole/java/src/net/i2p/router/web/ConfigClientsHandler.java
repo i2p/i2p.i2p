@@ -147,7 +147,7 @@ public class ConfigClientsHandler extends FormHandler {
             if (! ("webConsole".equals(ca.clientName) || "Web console".equals(ca.clientName)))
                 ca.disabled = val == null;
             // edit of an existing entry
-            String desc = getString("desc" + cur);
+            String desc = getJettyString("desc" + cur);
             if (desc != null) {
                 int spc = desc.indexOf(" ");
                 String clss = desc;
@@ -158,12 +158,12 @@ public class ConfigClientsHandler extends FormHandler {
                 }
                 ca.className = clss;
                 ca.args = args;
-                ca.clientName = getString("name" + cur);
+                ca.clientName = getJettyString("name" + cur);
             }
         }
 
         int newClient = clients.size();
-        String newDesc = getString("desc" + newClient);
+        String newDesc = getJettyString("desc" + newClient);
         if (newDesc != null && newDesc.trim().length() > 0) {
             // new entry
             int spc = newDesc.indexOf(" ");
@@ -173,7 +173,7 @@ public class ConfigClientsHandler extends FormHandler {
                 clss = newDesc.substring(0, spc);
                 args = newDesc.substring(spc + 1);
             }
-            String name = getString("name" + newClient);
+            String name = getJettyString("name" + newClient);
             if (name == null || name.trim().length() <= 0) name = "new client";
             ClientAppConfig ca = new ClientAppConfig(clss, name, args, 2*60*1000,
                                                      _settings.get(newClient + ".enabled") != null);
@@ -186,7 +186,7 @@ public class ConfigClientsHandler extends FormHandler {
     }
 
     /** curses Jetty for returning arrays */
-    private String getString(String key) {
+    private String getJettyString(String key) {
         String[] arr = (String[]) _settings.get(key);
         if (arr == null)
             return null;
@@ -271,7 +271,7 @@ public class ConfigClientsHandler extends FormHandler {
     }
 
     private void installPlugin() {
-        String url = getString("pluginURL");
+        String url = getJettyString("pluginURL");
         if (url == null || url.length() <= 0) {
             addFormError(_("No plugin URL specified."));
             return;

@@ -39,7 +39,8 @@ ROUTERFILES="\
    ../../../router/java/src/net/i2p/router/transport/TransportManager.java \
    ../../../router/java/src/net/i2p/router/transport/GetBidsJob.java \
    ../../../router/java/src/net/i2p/router/Blocklist.java \
-   ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java"
+   ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java \
+   ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java"
 
 # add ../java/ so the refs will work in the po file
 JPATHS="../java/src ../jsp/WEB-INF ../java/strings $JFILE $ROUTERFILES"

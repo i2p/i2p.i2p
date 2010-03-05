@@ -160,7 +160,7 @@ public class FormHandler {
             if ( (expected != null) && (expected.trim().length() > 0) && (expected.equals(_passphrase)) ) {
                 // ok
             } else {
-                addFormError("Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.");
+                addFormError(_("Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit."));
                 _valid = false;
             }
         }
