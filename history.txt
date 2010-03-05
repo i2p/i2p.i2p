@@ -1,4 +1,5 @@
 2010-03-05 zzz
+    * Console: Tag reseed messages
     * I2PSOCKSIRCTunnel:
       - New, for filtering IRC client traffic when using SOCKS
     * I2PTunnelIRCClient:
