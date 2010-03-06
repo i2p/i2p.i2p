@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-11-01 02:59+0000\n"
-"PO-Revision-Date: 2010-02-13 11:50+0100\n"
+"PO-Revision-Date: 2010-03-06 14:19+0100\n"
 "Last-Translator: \n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -177,7 +177,7 @@ msgstr "Configuration UPnP"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:363
 msgid "Enable UPnP to open firewall ports"
-msgstr ""
+msgstr "Activer UPnP afin d'ouvrir les ports du pare-feu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:365
 msgid "UPnP status"
@@ -190,15 +190,15 @@ msgstr "Configuration IP"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:369
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:425
 msgid "Externally reachable hostname or IP address"
-msgstr ""
+msgstr "Adresse IP ou nom d'hôte qui est joignable depuis l'exterieur"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:373
 msgid "Use all auto-detect methods"
-msgstr ""
+msgstr "Utiliser toute méthode d'auto-détection"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:377
 msgid "Disable UPnP IP address detection"
-msgstr ""
+msgstr "Desactiver la détection de l'adresse IP par UPnP"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:381
 msgid "Ignore local interface IP address"
@@ -206,7 +206,7 @@ msgstr "Ignorer l'adresse IP de l'interface locale"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:385
 msgid "Use SSU IP address detection only"
-msgstr ""
+msgstr "Utiliser seulement SSU pour détecter l'adresse IP"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:389
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:443
@@ -245,7 +245,7 @@ msgstr "Configuration TCP"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:429
 msgid "Use auto-detected IP address"
-msgstr ""
+msgstr "Utiliser l'adresse IP qui a été auto-détectée"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:431
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:463
@@ -258,11 +258,11 @@ msgstr "s'il n'y a pas de pare-feu"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:439
 msgid "Always use auto-detected IP address (Not firewalled)"
-msgstr ""
+msgstr "Utiliser toujours l'adresse IP qui a été auto-détectée (pas de pare-feu)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:449
 msgid "Disable inbound (Firewalled)"
-msgstr ""
+msgstr "Desactiver les connexions entrantes (derrière un pare-feu)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:453
 msgid "Completely disable"
@@ -270,7 +270,7 @@ msgstr "Desactiver complètement"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:455
 msgid "(select only if behind a firewall that throttles or blocks outbound TCP)"
-msgstr ""
+msgstr "(selectionner seulement si derrière un pare-feu qui limite les connexions sortantes TCP)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:457
 msgid "Externally reachable TCP port"
@@ -278,7 +278,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:461
 msgid "Use the same port configured for UDP"
-msgstr ""
+msgstr "Utiliser le même port qui a été configuré pour UDP"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:469
 msgid "Specify Port"
@@ -301,67 +301,67 @@ msgstr "Aide avec la configuration"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:484
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:526
 msgid "While I2P will work fine behind most firewalls, your speeds and network integration will generally improve if the I2P port (generally 8887) is forwarded for both UDP and TCP."
-msgstr ""
+msgstr "I2P fonctionnera derrière le plupart des pares-feu, mais votre vitesse et votre intégration avec le réseau s'améliorera s'il y a la redirection du port I2P pour UDP et TCP."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:486
 msgid "If you can, please poke a hole in your firewall to allow unsolicited UDP and TCP packets to reach you."
-msgstr ""
+msgstr "Si vous pouvez, ouvrez un port dans votre pare-feu afin de permettre la réception des les paquets TCP et UDP non sollicités."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:488
 msgid "If you can't, I2P supports UPnP (Universal Plug and Play) and UDP hole punching with \"SSU introductions\" to relay traffic."
-msgstr ""
+msgstr "Si vous ne pouvez pas, I2P est compatible avec UPnp (Universal Plug and Play)  et \"UDP hole punching\" avec \"SSU introductions\" afin de relayer le trafic I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:490
 msgid "Most of the options above are for special situations, for example where UPnP does not work correctly, or a firewall not under your control is doing harm."
-msgstr ""
+msgstr "Le plupart des possibilités décrites ci-avant sont pour les situtations particulieres, par exemple le cas où UPnP ne fonctionne pas correctement, ou un pare-feu empeche la connexion au réseau I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:492
 msgid "Certain firewalls such as symmetric NATs may not work well with I2P."
-msgstr ""
+msgstr "Il y a des certains types de pare-feu (tel que les NAT symétriques) qui ne fonctionnent pas bien avec I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:494
 msgid "UPnP is used to communicate with Internet Gateway Devices (IGDs) to detect the external IP address and forward ports."
-msgstr ""
+msgstr "UPnP est utilisé pour communiquer avec des \"Internet Gateway Devices (IGDs)\" afin de détecter l'adresse IP extérieure et de contrôler la redirection des ports."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:496
 msgid "UPnP support is beta, and may not work for any number of reasons"
-msgstr ""
+msgstr "UPnP est toujours en développement, et il peut arrêter de fonctionner correctement à cause de "
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:498
 msgid "No UPnP-compatible device present"
-msgstr ""
+msgstr "Il n'y a pas d'appareil qui est compatible avec UPnP"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:500
 msgid "UPnP disabled on the device"
-msgstr ""
+msgstr "UPnP est desactivé sur l'appareil"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:502
 msgid "Software firewall interference with UPnP"
-msgstr ""
+msgstr "Il y a de l'intérference entre un pare-feu en software et UPnP"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:504
 msgid "Bugs in the device's UPnP implementation"
-msgstr ""
+msgstr "Il y a des bogues dans l'implementation d'UPnP dans l'appareil"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:506
 msgid "Multiple firewall/routers in the internet connection path"
-msgstr ""
+msgstr "Il y a plusieurs routeurs/pare-feux entre le routeur I2P et l'internet"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:508
 msgid "UPnP device change, reset, or address change"
-msgstr ""
+msgstr "Un changement de l'appareil UPnP, une redémarrage, ou une changement d'adresse IP"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:510
 msgid "Review the UPnP status here."
-msgstr ""
+msgstr "Consulter le statut de UPnP ici."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:512
 msgid "UPnP may be enabled or disabled above, but a change requires a router restart to take effect."
-msgstr ""
+msgstr "UPnP peut être activé ou desactivé au-dessus, mais afin de prendre en compte la changement il faut rédemarrer le routeur I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:514
 msgid "Hostnames entered above will be published in the network database."
-msgstr ""
+msgstr "Les noms d'hôtes qui ont été saisis au-dessus seront publié dans la base de données du réseau I2P."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:516
 msgid "They are <b>not private</b>."
@@ -369,15 +369,15 @@ msgstr "Ils ne sont pas <b>privés</b>."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:518
 msgid "Also, <b>do not enter a private IP address</b> like 127.0.0.1 or 192.168.1.1."
-msgstr ""
+msgstr "En plus, <b>ne saisissez pas une adresse IP privée</b> tel que 127.0.0.1 ou 192.168.1.1."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:520
 msgid "If you specify the wrong IP address or hostname, or do not properly configure your NAT or firewall, your network performance will degrade substantially."
-msgstr ""
+msgstr "Si vous saisissez une mauvaise adresse IP ou nom d'hôte, ou configurer votre NAT ou pare-feu incorrectement, votre intégration avec le réseau I2P dégradera substantiellement."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:522
 msgid "When in doubt, leave the settings at the defaults."
-msgstr ""
+msgstr "Si vous n'êtes pas sûr de vous, laisser la configuration par défaut."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:524
 msgid "Reachability Help"
@@ -853,11 +853,11 @@ msgstr "Fermer le routeur"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:286
 msgid "Graceful shutdown lets the router satisfy the agreements it has already made before shutting down, but may take a few minutes."
-msgstr ""
+msgstr "Une fermature gracieuse permit au routeur de satisfaire ses accords en place avec d'autres routeurs avant de fermer, mais cela prendra plusieurs minutes."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:288
 msgid "If you need to kill the router immediately, that option is available as well."
-msgstr ""
+msgstr "Si vous avez besoin d'arrêter le routeur I2P immédiatement, cette option est aussi disponible."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:290
 #: src/net/i2p/router/web/ConfigServiceHandler.java:53
@@ -889,11 +889,11 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:304
 msgid "A graceful restart will take a few minutes (but your peers will appreciate your patience), while a hard restart does so immediately."
-msgstr ""
+msgstr "Une redémarrage gracieux prendra quelques minutes (mais vos pairs apprécieront votre patience), une redémarrage immédiate est quasi instantané."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:306
 msgid "After tearing down the router, it will wait 1 minute before starting back up again."
-msgstr ""
+msgstr "Après la rédemmarage du routeur, il attendra 1 minute avant de se relancer."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:308
 #: src/net/i2p/router/web/ConfigServiceHandler.java:64
