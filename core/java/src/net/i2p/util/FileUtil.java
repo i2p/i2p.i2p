@@ -12,8 +12,11 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.jar.JarOutputStream;
+import java.util.jar.Pack200;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
 
 /**
  * General helper methods for messing with files
@@ -75,6 +78,10 @@ public class FileUtil {
         }
     }
     
+    /**
+     *  As of release 0.7.12, any files inside the zip that have a .jar.pack or .war.pack suffix
+     *  are transparently unpacked to a .jar or .war file using unpack200.
+     */
     public static boolean extractZip(File zipfile, File targetDir) {
         ZipFile zip = null;
         try {
@@ -109,15 +116,22 @@ public class FileUtil {
                 } else {
                     try {
                         InputStream in = zip.getInputStream(entry);
-                        FileOutputStream fos = new FileOutputStream(target);
-                        int read = 0;
-                        while ( (read = in.read(buf)) != -1) {
-                            fos.write(buf, 0, read);
+                        if (entry.getName().endsWith(".jar.pack") || entry.getName().endsWith(".war.pack")) {
+                            target = new File(targetDir, entry.getName().substring(0, entry.getName().length() - ".pack".length()));
+                            JarOutputStream fos = new JarOutputStream(new FileOutputStream(target));
+                            Pack200.newUnpacker().unpack(in, fos);
+                            fos.close();
+                            System.err.println("INFO: File [" + entry.getName() + "] extracted and unpacked");
+                        } else {
+                            FileOutputStream fos = new FileOutputStream(target);
+                            int read = 0;
+                            while ( (read = in.read(buf)) != -1) {
+                                fos.write(buf, 0, read);
+                            }
+                            fos.close();
+                            System.err.println("INFO: File [" + entry.getName() + "] extracted");
                         }
-                        fos.close();
                         in.close();
-                        
-                        System.err.println("INFO: File [" + entry.getName() + "] extracted");
                     } catch (IOException ioe) {
                         System.err.println("ERROR: Error extracting the zip entry (" + entry.getName() + "]");
                         ioe.printStackTrace();

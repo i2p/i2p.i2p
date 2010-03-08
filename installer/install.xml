@@ -4,7 +4,7 @@
 
     <info>
         <appname>i2p</appname>
-        <appversion>0.7.10</appversion>
+        <appversion>0.7.11</appversion>
         <authors>
             <author name="I2P" email="http://forum.i2p2.de/"/>
         </authors>
@@ -78,8 +78,21 @@
         <langpack iso3="ukr"/>
     </locale>
 
+    <!--
+        The <os> tag can be used to restrict the inclusion into the uninstaller
+        to a specific operating system family, architecture or version.
+        The inclusion into the installer will be always done.
+        Here's a sample :
+
+        <native type="izpack" name="ShellLink.dll">
+            <os family="windows"/>
+        </native>
+
+        This doesn't appear to be necessary, the dlls don't get put in Uninstaller/uninstaller.jar on linux
+     -->
     <native type="izpack" name="ShellLink.dll" />
-    
+    <native type="izpack" name="ShellLink_x64.dll" />
+
     <resources>
         <res id="Installer.image" src="installer/resources/i2plogo.png" />
         <res id="InfoPanel.info" src="installer/resources/readme.license.txt"/>

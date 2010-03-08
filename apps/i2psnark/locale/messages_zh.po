@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-01-29 07:17+0000\n"
-"PO-Revision-Date: 2010-01-29 15:30+0800\n"
-"Last-Translator: walking <zhazhenzhong@gmail.com>\n"
+"POT-Creation-Date: 2010-03-05 12:41+0000\n"
+"PO-Revision-Date: 2010-03-05 21:58+0800\n"
+"Last-Translator: walking <walking@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -22,179 +22,189 @@ msgstr ""
 msgid "Adding torrents in {0} minutes"
 msgstr "{0}分钟内完成添加"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:241
+#: ../java/src/org/klomp/snark/SnarkManager.java:242
 #, java-format
 msgid "Total uploaders limit changed to {0}"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:243
+#: ../java/src/org/klomp/snark/SnarkManager.java:244
 #, java-format
 msgid "Minimum total uploaders limit is {0}"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:255
+#: ../java/src/org/klomp/snark/SnarkManager.java:256
 #, java-format
 msgid "Up BW limit changed to {0}KBps"
 msgstr "上传带宽限制改为 {0} KBps"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:257
+#: ../java/src/org/klomp/snark/SnarkManager.java:258
 #, java-format
 msgid "Minimum up bandwidth limit is {0}KBps"
 msgstr "最小上传带宽限制为 {0} KBps"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:301
+#: ../java/src/org/klomp/snark/SnarkManager.java:302
 msgid "Cannot change the I2CP settings while torrents are active"
 msgstr "正在下载/上传，无法更改I2CP设置"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:307
+#: ../java/src/org/klomp/snark/SnarkManager.java:308
 msgid "Disconnecting old I2CP destination"
 msgstr "正在断开旧的I2CP目标"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:311
+#: ../java/src/org/klomp/snark/SnarkManager.java:312
 #, java-format
 msgid "I2CP settings changed to {0}"
 msgstr "I2CP设置改为{0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:315
+#: ../java/src/org/klomp/snark/SnarkManager.java:316
 msgid "Unable to connect with the new settings, reverting to the old I2CP settings"
 msgstr "无法通过新设置连接，恢复I2CP的旧设置"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:319
+#: ../java/src/org/klomp/snark/SnarkManager.java:320
 msgid "Unable to reconnect with the old settings!"
 msgstr "旧设置也无法连接！"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:321
+#: ../java/src/org/klomp/snark/SnarkManager.java:322
 msgid "Reconnected on the new I2CP destination"
 msgstr "重新连接新I2CP目标"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:332
+#: ../java/src/org/klomp/snark/SnarkManager.java:333
 #, java-format
 msgid "I2CP listener restarted for \"{0}\""
 msgstr "\"{0}\"的I2CP监听端口已启动"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:343
+#: ../java/src/org/klomp/snark/SnarkManager.java:344
 msgid "Enabled autostart"
 msgstr "启用自动启动"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:345
+#: ../java/src/org/klomp/snark/SnarkManager.java:346
 msgid "Disabled autostart"
 msgstr "禁用自动启动"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:351
+#: ../java/src/org/klomp/snark/SnarkManager.java:352
 msgid "Enabled open trackers - torrent restart required to take effect."
 msgstr "启用OpenTracker-重新启动种子后生效"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:353
+#: ../java/src/org/klomp/snark/SnarkManager.java:354
 msgid "Disabled open trackers - torrent restart required to take effect."
 msgstr "禁用OpenTracker - 重新启动种子后生效"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:360
+#: ../java/src/org/klomp/snark/SnarkManager.java:361
 msgid "Open Tracker list changed - torrent restart required to take effect."
 msgstr "OpenTracker列表已改变 - 重新启动种子后生效"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:367
+#: ../java/src/org/klomp/snark/SnarkManager.java:368
 msgid "Configuration unchanged."
 msgstr "设置未改变"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:377
+#: ../java/src/org/klomp/snark/SnarkManager.java:378
 #, java-format
 msgid "Unable to save the config to {0}"
 msgstr "无法保存设置到{0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:395
+#: ../java/src/org/klomp/snark/SnarkManager.java:396
 msgid "Connecting to I2P"
 msgstr "正在连接到I2P"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:398
+#: ../java/src/org/klomp/snark/SnarkManager.java:399
 msgid "Error connecting to I2P - check your I2CP settings!"
 msgstr "连接I2P时发生错误 - 请检查I2CP设置!"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:407
+#: ../java/src/org/klomp/snark/SnarkManager.java:408
 #, java-format
 msgid "Error: Could not add the torrent {0}"
 msgstr "错误：无法添加种子{0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:446
+#: ../java/src/org/klomp/snark/SnarkManager.java:430
+#, java-format
+msgid "Cannot open \"{0}\""
+msgstr "无法打开 \"{0}\""
+
+#: ../java/src/org/klomp/snark/SnarkManager.java:443
+#, java-format
+msgid "Warning - Ignoring non-i2p tracker in \"{0}\", will announce to i2p open trackers only"
+msgstr "警告 - 忽略\"{0}\"文件中I2P网络外的Tracker服务器，文件将仅发布至 I2P 内的 Open Tracker 服务器。"
+
+#: ../java/src/org/klomp/snark/SnarkManager.java:445
+#, java-format
+msgid "Warning - Ignoring non-i2p tracker in \"{0}\", and open trackers are disabled, you must enable open trackers before starting the torrent!"
+msgstr "警告 - 忽略\"{0}\"文件中I2P网络外的Tracker服务器，OpenTracker已禁用，启动此种子前您必须启用OpenTracker。"
+
+#: ../java/src/org/klomp/snark/SnarkManager.java:464
 #, java-format
 msgid "Torrent in \"{0}\" is invalid"
 msgstr "无效种子 \"{0}\" "
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:461
+#: ../java/src/org/klomp/snark/SnarkManager.java:479
 #, java-format
 msgid "Torrent added and started: \"{0}\""
 msgstr "已添加并启动种子:\"{0}\""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:463
+#: ../java/src/org/klomp/snark/SnarkManager.java:481
 #, java-format
 msgid "Torrent added: \"{0}\""
 msgstr "已添加种子:\"{0}\""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:559
-#, java-format
-msgid "Non-i2p tracker in \"{0}\", deleting it from our list of trackers!"
-msgstr "【匿名性警告】\"{0}\" 中含有非I2P Tracker，程序将从Tracker列表中将其删除。"
-
-#: ../java/src/org/klomp/snark/SnarkManager.java:562
+#: ../java/src/org/klomp/snark/SnarkManager.java:578
 #, java-format
 msgid "Too many files in \"{0}\" ({1}), deleting it!"
 msgstr "\"{0}\" ({1}) 含有太多文件，删除之!"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:564
+#: ../java/src/org/klomp/snark/SnarkManager.java:580
 #, java-format
 msgid "Torrent file \"{0}\" cannot end in \".torrent\", deleting it!"
 msgstr "种子文件 \"{0}\" 不以 \".torrent\"结尾，正在删除！"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:566
+#: ../java/src/org/klomp/snark/SnarkManager.java:582
 #, java-format
 msgid "No pieces in \"{0}\",  deleting it!"
 msgstr "\"{0}\" 中没有数据片，删除之!"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:568
+#: ../java/src/org/klomp/snark/SnarkManager.java:584
 #, java-format
 msgid "Too many pieces in \"{0}\", limit is {1}, deleting it!"
 msgstr "\"{0}\" 中文件分片太多，限额为{1}，删除之！"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:570
+#: ../java/src/org/klomp/snark/SnarkManager.java:586
 #, java-format
 msgid "Pieces are too large in \"{0}\" ({1}B), deleting it."
 msgstr "\"{0}\" ({1}B) 中文件分片过大，删除之。"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:571
+#: ../java/src/org/klomp/snark/SnarkManager.java:587
 #, java-format
 msgid "Limit is {0}B"
 msgstr "限额为 {0}B"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:579
+#: ../java/src/org/klomp/snark/SnarkManager.java:595
 #, java-format
 msgid "Torrents larger than {0}B are not supported yet, deleting \"{1}\""
 msgstr "目前不支持大于{0}B 的种子，正在删除\"{1}\""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:595
+#: ../java/src/org/klomp/snark/SnarkManager.java:611
 #, java-format
 msgid "Error: Could not remove the torrent {0}"
 msgstr "错误:无法删除种子{0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:616
+#: ../java/src/org/klomp/snark/SnarkManager.java:632
 #, java-format
 msgid "Torrent stopped: \"{0}\""
 msgstr "种子已停止:\"{0}\""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:631
+#: ../java/src/org/klomp/snark/SnarkManager.java:647
 #, java-format
 msgid "Torrent removed: \"{0}\""
 msgstr "种子已删除:\"{0}\""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:664
+#: ../java/src/org/klomp/snark/SnarkManager.java:680
 #, java-format
 msgid "Download finished: \"{0}\""
 msgstr "下载已完成:\"{0}\""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:664
+#: ../java/src/org/klomp/snark/SnarkManager.java:680
 #, java-format
 msgid "size: {0}B"
 msgstr "大小:{0}B"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:692
+#: ../java/src/org/klomp/snark/SnarkManager.java:708
 msgid "Unable to connect to I2P!"
 msgstr "无法连接至I2P!"
 
@@ -207,7 +217,7 @@ msgid "Refresh page"
 msgstr "刷新页面"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:97
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:656
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:669
 msgid "I2PSnark"
 msgstr ""
 
@@ -291,13 +301,13 @@ msgid "Torrent file {0} does not exist"
 msgstr "种子文件{0}不存在"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:237
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:990
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1003
 #, java-format
 msgid "Torrent already running: {0}"
 msgstr "种子已启动:{0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:239
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:992
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1005
 #, java-format
 msgid "Torrent already in the queue: {0}"
 msgstr "种子排队中:{0}"
@@ -394,257 +404,270 @@ msgstr "I2P隧道已关闭"
 msgid "Opening the I2P tunnel and starting all torrents."
 msgstr "正在打开I2P隧道并启动所有种子"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:502
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:670
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:505
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:683
 msgid "Unknown"
 msgstr "未知"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:505
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:509
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:513
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:508
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:512
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:516
 msgid "TrackerErr"
 msgstr "Tracker错误"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:507
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:509
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:519
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:521
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:528
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:530
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:534
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:536
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:862
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:510
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:512
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:522
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:524
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:531
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:533
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:537
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:539
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:875
 msgid "peers"
 msgstr "用户"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:517
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:521
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:520
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:524
 msgid "Seeding"
 msgstr "正做种"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:523
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:526
 msgid "Complete"
 msgstr "完成"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:526
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:530
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:529
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:533
 msgid "OK"
 msgstr "确定"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:532
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:536
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:535
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:539
 msgid "Stalled"
 msgstr "等待"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:538
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:541
 msgid "No Peers"
 msgstr "没有用户"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:540
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:543
 msgid "Stopped"
 msgstr "已停用"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:553
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:556
 msgid "View files"
 msgstr "浏览文件"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:555
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:558
 msgid "Open file"
 msgstr "打开文件"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:579
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:781
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:582
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:794
 msgid "Tracker"
 msgstr "Tracker服务器"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:580
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:583
 msgid "Details"
 msgstr "详情"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:614
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:617
 msgid "Stop the torrent"
 msgstr "停止种子"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:616
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:619
 msgid "Stop"
 msgstr "停止"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:622
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:625
 msgid "Start the torrent"
 msgstr "启动种子"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:624
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:627
 msgid "Start"
 msgstr "启动"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:629
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:632
 msgid "Remove the torrent from the active list, deleting the .torrent file"
 msgstr "取消下载任务并删除对应种子文件。"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:631
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:637
+#, java-format
+msgid "Are you sure you want to delete the file \\''{0}.torrent\\'' (downloaded data will not be deleted) ?"
+msgstr "您确定要删除文件“{0}.torrent”(下载的数据文件不会被删除)?"
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:639
 msgid "Remove"
 msgstr "移除"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:635
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:643
 msgid "Delete the .torrent file and the associated data file(s)"
 msgstr "删除种子及所下载的文件"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:637
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:648
+#, java-format
+msgid "Are you sure you want to delete the torrent \\''{0}\\'' and all downloaded data?"
+msgstr "您确定要删除种子“{0}”(下载的数据文件会一并被删除)?"
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:650
 msgid "Delete"
 msgstr "删除"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:680
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:693
 msgid "Seed"
 msgstr "种子"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:698
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:711
 msgid "Uninteresting (The peer has no pieces we need)"
 msgstr "无需要部分"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:700
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:713
 msgid "Choked (The peer is not allowing us to request pieces)"
 msgstr "拒绝请求"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:714
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:727
 msgid "Uninterested (We have no pieces the peer needs)"
 msgstr "无需要部分"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:716
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:729
 msgid "Choking (We are not allowing the peer to request pieces)"
 msgstr "拒绝请求"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:743
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:756
 msgid "Add Torrent"
 msgstr "添加种子"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:745
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:758
 msgid "From URL"
 msgstr "从URL"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:750
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:763
 msgid "Add torrent"
 msgstr "添加种子"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:753
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:766
 #, java-format
 msgid "Alternately, you can copy .torrent files to the directory {0}."
 msgstr "或者您可以将.torrent文件复制到以下目录{0}."
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:755
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:768
 msgid "Removing a .torrent file will cause the torrent to stop."
 msgstr "删除种子文件将导致中止该下载任务。"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:772
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:785
 msgid "Create Torrent"
 msgstr "创建种子"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:775
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:788
 msgid "Data to seed"
 msgstr "做种数据"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:779
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:792
 msgid "File or directory to seed (must be within the specified path)"
 msgstr "做种文件或文件夹(必须下面为Snark指定的文件夹中)"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:783
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:796
 msgid "Select a tracker"
 msgstr "选择一个Tracker"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:796
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:809
 msgid "or"
 msgstr "或"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:799
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:812
 msgid "Specify custom tracker announce URL"
 msgstr "指定Open Tracker发布链接"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:802
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:815
 msgid "Create torrent"
 msgstr "创建种子"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:820
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:833
 msgid "Configuration"
 msgstr "设置"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:823
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:836
 msgid "Data directory"
 msgstr "数据文件夹"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:826
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:839
 msgid "Directory to store torrents and data"
 msgstr "种子及被做种文件的保存位置。"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:828
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:841
 msgid "Edit i2psnark.config and restart to change"
 msgstr "编辑 i2psnark.config 并重启Snark后生效"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:832
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:845
 msgid "Auto start"
 msgstr "自动启动"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:836
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:849
 msgid "If checked, automatically start torrents that are added"
 msgstr "选中后Snark将自动启动已添加的所有种子。"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:859
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:872
 msgid "Total uploader limit"
 msgstr ""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:866
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:879
 msgid "Up bandwidth limit"
 msgstr "上传带宽限制"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:869
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:882
 msgid "Half available bandwidth recommended."
 msgstr "推荐设置为可用带宽的一半。"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:871
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:884
 msgid "View or change router bandwidth"
 msgstr "浏览或修改路由器带宽"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:875
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:888
 msgid "Use open trackers also"
 msgstr "同时使用OpenTracker"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:879
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:892
 msgid "If checked, announce torrents to open trackers as well as the tracker listed in the torrent file"
 msgstr "选择后在OpenTracker及种子文件中的Tracker上同时发布。"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:883
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:896
 msgid "Open tracker announce URLs"
 msgstr "Open Tracker发布链接"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:894
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:907
 msgid "I2CP host"
 msgstr "I2CP主机"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:899
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:912
 msgid "I2CP port"
 msgstr "I2CP端口"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:912
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:925
 msgid "I2CP options"
 msgstr "I2CP选项"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:917
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:930
 msgid "Save configuration"
 msgstr "保存设置"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:970
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:983
 #, java-format
 msgid "Torrent fetched from {0}"
 msgstr "从{0}获取种子成功"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:998
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1011
 #, java-format
 msgid "Torrent at {0} was not valid"
 msgstr "{0}的种子中有错误"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1003
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1016
 #, java-format
 msgid "Torrent was not retrieved from {0}"
 msgstr "从{0}获得种子失败"
 
+#~ msgid "Non-i2p tracker in \"{0}\", deleting it from our list of trackers!"
+#~ msgstr ""
+#~ "【匿名性警告】\"{0}\" 中含有非I2P Tracker，程序将从Tracker列表中将其删除。"
 #~ msgid "Custom tracker URL"
 #~ msgstr "自定义TrackerURL"
 #~ msgid "Configure"

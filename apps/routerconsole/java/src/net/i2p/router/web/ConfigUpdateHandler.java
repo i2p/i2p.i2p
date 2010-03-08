@@ -65,6 +65,10 @@ public class ConfigUpdateHandler extends FormHandler {
                     addFormNotice(_("Update available, attempting to download now"));
                 else
                     addFormNotice(_("Update available, click button on left to download"));
+                // So that update() will post a status to the summary bar before we reload
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ie) {}
             } else
                 addFormNotice(_("No update available"));
             return;
@@ -124,6 +128,7 @@ public class ConfigUpdateHandler extends FormHandler {
         }
 
         if ( (_trustedKeys != null) && (_trustedKeys.length() > 0) ) {
+            _trustedKeys = _trustedKeys.replaceAll("\r\n", ",").replaceAll("\n", ",");
             String oldKeys = new TrustedUpdate(_context).getTrustedKeysString();
             if ( (oldKeys == null) || (!_trustedKeys.equals(oldKeys)) ) {
                 _context.router().setConfigSetting(PROP_TRUSTED_KEYS, _trustedKeys);

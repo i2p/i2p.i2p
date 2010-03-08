@@ -245,7 +245,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             Set keys = ds.getKeys();
             if (keys != null) {
                 for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
-                    Object o = getDataStore().get((Hash)iter.next());
+                    Object o = ds.get((Hash)iter.next());
                     if (o instanceof RouterInfo)
                         rv.add((RouterInfo)o);
                 }

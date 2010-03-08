@@ -1,7 +1,7 @@
 package net.i2p.router.web;
 
 import java.io.File;
-import java.util.Collection;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -13,7 +13,6 @@ import net.i2p.router.startup.ClientAppConfig;
 import net.i2p.router.startup.LoadClientAppsJob;
 import net.i2p.util.Log;
 
-import org.mortbay.http.HttpListener;
 import org.mortbay.jetty.Server;
 
 /**
@@ -37,6 +36,14 @@ public class ConfigClientsHandler extends FormHandler {
             saveWebAppChanges();
             return;
         }
+        if (_action.equals(_("Save Plugin Configuration"))) {
+            savePluginChanges();
+            return;
+        }
+        if (_action.equals(_("Install Plugin"))) {
+            installPlugin();
+            return;
+        }
         // value
         if (_action.startsWith("Start ")) {
             String app = _action.substring(6);
@@ -44,10 +51,15 @@ public class ConfigClientsHandler extends FormHandler {
             try {
                 appnum = Integer.parseInt(app);
             } catch (NumberFormatException nfe) {}
-            if (appnum >= 0)
+            if (appnum >= 0) {
                 startClient(appnum);
-            else
-                startWebApp(app);
+            } else {
+                List<String> plugins = PluginStarter.getPlugins();
+                if (plugins.contains(app))
+                    startPlugin(app);
+                else
+                    startWebApp(app);
+            }
             return;
         }
 
@@ -58,10 +70,48 @@ public class ConfigClientsHandler extends FormHandler {
             try {
                 appnum = Integer.parseInt(app);
             } catch (NumberFormatException nfe) {}
-            if (appnum >= 0)
+            if (appnum >= 0) {
                 deleteClient(appnum);
+            } else {
+                try {
+                    PluginStarter.stopPlugin(_context, app);
+                    PluginStarter.deletePlugin(_context, app);
+                    addFormNotice(_("Deleted plugin {0}", app));
+                } catch (Throwable e) {
+                    addFormError(_("Error deleting plugin {0}", app) + ": " + e);
+                    _log.error("Error deleting plugin " + app,  e);
+                }
+            }
             return;
         }
+
+        // value
+        if (_action.startsWith("Stop ")) {
+            String app = _action.substring(5);
+            try {
+                PluginStarter.stopPlugin(_context, app);
+                addFormNotice(_("Stopped plugin {0}", app));
+            } catch (Throwable e) {
+                addFormError(_("Error stopping plugin {0}", app) + ": " + e);
+                    _log.error("Error stopping plugin " + app,  e);
+            }
+            return;
+        }
+
+        // value
+        if (_action.startsWith("Update ")) {
+            String app = _action.substring(7);
+            updatePlugin(app);
+            return;
+        }
+
+        // value
+        if (_action.startsWith("Check ")) {
+            String app = _action.substring(6);
+            checkPlugin(app);
+            return;
+        }
+
         // label (IE)
         String xStart = _("Start");
         if (_action.toLowerCase().startsWith(xStart + "<span class=hide> ") &&
@@ -72,13 +122,19 @@ public class ConfigClientsHandler extends FormHandler {
             try {
                 appnum = Integer.parseInt(app);
             } catch (NumberFormatException nfe) {}
-            if (appnum >= 0)
+            if (appnum >= 0) {
                 startClient(appnum);
-            else
-                startWebApp(app);
+            } else {
+                List<String> plugins = PluginStarter.getPlugins();
+                if (plugins.contains(app))
+                    startPlugin(app);
+                else
+                    startWebApp(app);
+            }
         } else {
             addFormError(_("Unsupported") + ' ' + _action + '.');
         }
+
     }
     
     public void setSettings(Map settings) { _settings = new HashMap(settings); }
@@ -91,7 +147,7 @@ public class ConfigClientsHandler extends FormHandler {
             if (! ("webConsole".equals(ca.clientName) || "Web console".equals(ca.clientName)))
                 ca.disabled = val == null;
             // edit of an existing entry
-            String desc = getString("desc" + cur);
+            String desc = getJettyString("desc" + cur);
             if (desc != null) {
                 int spc = desc.indexOf(" ");
                 String clss = desc;
@@ -102,12 +158,12 @@ public class ConfigClientsHandler extends FormHandler {
                 }
                 ca.className = clss;
                 ca.args = args;
-                ca.clientName = getString("name" + cur);
+                ca.clientName = getJettyString("name" + cur);
             }
         }
 
         int newClient = clients.size();
-        String newDesc = getString("desc" + newClient);
+        String newDesc = getJettyString("desc" + newClient);
         if (newDesc != null && newDesc.trim().length() > 0) {
             // new entry
             int spc = newDesc.indexOf(" ");
@@ -117,7 +173,7 @@ public class ConfigClientsHandler extends FormHandler {
                 clss = newDesc.substring(0, spc);
                 args = newDesc.substring(spc + 1);
             }
-            String name = getString("name" + newClient);
+            String name = getJettyString("name" + newClient);
             if (name == null || name.trim().length() <= 0) name = "new client";
             ClientAppConfig ca = new ClientAppConfig(clss, name, args, 2*60*1000,
                                                      _settings.get(newClient + ".enabled") != null);
@@ -130,7 +186,7 @@ public class ConfigClientsHandler extends FormHandler {
     }
 
     /** curses Jetty for returning arrays */
-    private String getString(String key) {
+    private String getJettyString(String key) {
         String[] arr = (String[]) _settings.get(key);
         if (arr == null)
             return null;
@@ -173,32 +229,109 @@ public class ConfigClientsHandler extends FormHandler {
                 props.setProperty(name, "" + (val != null));
         }
         RouterConsoleRunner.storeWebAppProperties(props);
-        addFormNotice(_("WebApp configuration saved successfully - restart required to take effect."));
+        addFormNotice(_("WebApp configuration saved."));
     }
 
-    // Big hack for the moment, not using properties for directory and port
-    // Go through all the Jetty servers, find the one serving port 7657,
-    // requested and add the .war to that one
+    private void savePluginChanges() {
+        Properties props = PluginStarter.pluginProperties();
+        Set keys = props.keySet();
+        int cur = 0;
+        for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
+            String name = (String)iter.next();
+            if (! (name.startsWith(PluginStarter.PREFIX) && name.endsWith(PluginStarter.ENABLED)))
+                continue;
+            String app = name.substring(PluginStarter.PREFIX.length(), name.lastIndexOf(PluginStarter.ENABLED));
+            Object val = _settings.get(app + ".enabled");
+            props.setProperty(name, "" + (val != null));
+        }
+        PluginStarter.storePluginProperties(props);
+        addFormNotice(_("Plugin configuration saved."));
+    }
+
+    /**
+     * Big hack for the moment, not using properties for directory and port
+     * Go through all the Jetty servers, find the one serving port 7657,
+     * requested and add the .war to that one
+     */
     private void startWebApp(String app) {
-        Collection c = Server.getHttpServers();
-        for (int i = 0; i < c.size(); i++) {
-            Server s = (Server) c.toArray()[i];
-            HttpListener[] hl = s.getListeners();
-            for (int j = 0; j < hl.length; j++) {
-                if (hl[j].getPort() == 7657) {
+        Server s = WebAppStarter.getConsoleServer();
+        if (s != null) {
                     try {
                         File path = new File(_context.getBaseDir(), "webapps");
                         path = new File(path, app + ".war");
-                        s.addWebApplication("/"+ app, path.getAbsolutePath()).start();
-                        // no passwords... initialize(wac);
+                        WebAppStarter.startWebApp(_context, s, app, path.getAbsolutePath());
                         addFormNotice(_("WebApp") + " <a href=\"/" + app + "/\">" + _(app) + "</a> " + _("started") + '.');
-                    } catch (Exception ioe) {
-                        addFormError(_("Failed to start") + ' ' + _(app) + " " + ioe + '.');
+                    } catch (Throwable e) {
+                        addFormError(_("Failed to start") + ' ' + _(app) + " " + e + '.');
+                        _log.error("Failed to start webapp " + app, e);
                     }
                     return;
-                }
-            }
         }
         addFormError(_("Failed to find server."));
+    }
+
+    private void installPlugin() {
+        String url = getJettyString("pluginURL");
+        if (url == null || url.length() <= 0) {
+            addFormError(_("No plugin URL specified."));
+            return;
+        }
+        installPlugin(url);
+    }
+
+    private void updatePlugin(String app) {
+        Properties props = PluginStarter.pluginProperties(_context, app);
+        String url = props.getProperty("updateURL");
+        if (url == null) {
+            addFormError(_("No update URL specified for {0}",app));
+            return;
+        }
+        installPlugin(url);
+    }
+
+    private void installPlugin(String url) {
+        if ("true".equals(System.getProperty(UpdateHandler.PROP_UPDATE_IN_PROGRESS))) {
+            addFormError(_("Plugin or update download already in progress."));
+            return;
+        }
+        PluginUpdateHandler puh = PluginUpdateHandler.getInstance(_context);
+        if (puh.isRunning()) {
+            addFormError(_("Plugin or update download already in progress."));
+            return;
+        }
+        puh.update(url);
+        addFormNotice(_("Downloading plugin from {0}", url));
+        // So that update() will post a status to the summary bar before we reload
+        try {
+           Thread.sleep(1000);
+        } catch (InterruptedException ie) {}
+    }
+
+    private void checkPlugin(String app) {
+        if ("true".equals(System.getProperty(UpdateHandler.PROP_UPDATE_IN_PROGRESS))) {
+            addFormError(_("Plugin or update download already in progress."));
+            return;
+        }
+        PluginUpdateChecker puc = PluginUpdateChecker.getInstance(_context);
+        if (puc.isRunning()) {
+            addFormError(_("Plugin or update download already in progress."));
+            return;
+        }
+        puc.update(app);
+        addFormNotice(_("Checking plugin {0} for updates", app));
+        // So that update() will post a status to the summary bar before we reload
+        try {
+           Thread.sleep(1000);
+        } catch (InterruptedException ie) {}
+    }
+
+    private void startPlugin(String app) {
+        try {
+            PluginStarter.startPlugin(_context, app);
+            addFormNotice(_("Started plugin {0}", app));
+        } catch (Throwable e) {
+            addFormError(_("Error starting plugin {0}", app) + ": " + e);
+            _log.error("Error starting plugin " + app,  e);
+        }
     }
 }

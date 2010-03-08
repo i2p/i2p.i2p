@@ -1,13 +1,9 @@
 <project name="launch4j" default="compile" basedir=".">
-	<property name="versionNumber" value="2.0.0.0" />
-	<property name="version" value="2.0.RC3" />
 	<property name="src" location="src" />
 	<property name="lib" location="lib" />
 	<property name="build" location="build" />
-	<property name="dist" location="${user.home}/dist/${ant.project.name}" />
 	<property name="jar" location="./${ant.project.name}.jar" />
 	<property name="launch4j.dir" location="." />
-	<property name="javac.compilerargs" value="" />
 
 	<path id="dist.classpath">
 		<pathelement path="${build}" />
@@ -19,16 +15,18 @@
 	<target name="init">
 		<tstamp />
 		<mkdir dir="${build}" />
-		<mkdir dir="${dist}" />
 	</target>
 
 	<target name="compile" depends="init" description="compile the source">
 		<javac srcdir="${src}" destdir="${build}" classpathref="dist.classpath" source="1.4" debug="on" />
-			<compilerarg line="${javac.compilerargs}" />
-		</javac>
 		<copy todir="${build}/images">
 			<fileset dir="${src}/images">
 				<include name="**/*" />
+			</fileset>
+		</copy>
+		<copy todir="${build}">
+			<fileset dir="${src}">
+				<include name="**/*.properties" />
 			</fileset>
 		</copy>
 	</target>
@@ -42,17 +40,10 @@
 		</pathconvert>
 		<!-- Put everything in ${build} into a jar file -->
 		<jar jarfile="${jar}">
-			<fileset dir="${build}" includes="**/*" />
+			<fileset dir="${build}" excludes="**/messages_es.properties" />
 			<manifest>
 				<attribute name="Main-Class" value="net.sf.launch4j.Main" />
 				<attribute name="Class-Path" value=". ${dist.classpath}" />
-			</manifest>
-		</jar>
-		<jar jarfile="./launcher.jar">
-			<fileset dir="${build}" includes="net/sf/launch4j/Launcher.class" />
-			<manifest>
-				<attribute name="Main-Class" value="net.sf.launch4j.Launcher" />
-				<attribute name="Class-Path" value=". ./${ant.project.name}.jar ${dist.classpath}" />
 			</manifest>
 		</jar>
 	</target>
@@ -62,41 +53,10 @@
 		<ant dir="./demo/SimpleApp" inheritAll="false" />
 	</target>
 
-	<target name="dist.linux" depends="jar" description="generate the Linux distribution">
-		<!-- changes executables to default mode!
-				<tar tarfile="${dist}/${ant.project.name}-${version}-linux.tgz" basedir="."
-				compression="gzip" excludes="**/build/** **/CVS/** **/*.exe"/> -->
-		<exec executable="tar" failonerror="true">
-			<arg line="-czC .. --exclude build --exclude CVS --exclude *.bat --exclude *.exe --exclude launch4j/l4j --exclude launch4j/launcher.jar -f ${dist}/${ant.project.name}-${version}-linux.tgz ./launch4j" />
-		</exec>
-	</target>
-
-	<target name="dist.win32" depends="jar" description="generate the Windows distribution">
-		<taskdef name="launch4j" classname="net.sf.launch4j.ant.Launch4jTask" classpath="${build}:./lib/xstream.jar" />
-		<launch4j configFile="./l4j/launch4j.xml"
-			fileVersion="${versionNumber}" txtFileVersion="${version}"
-			productVersion="${versionNumber}" txtProductVersion="${version}" />
-		<launch4j configFile="./l4j/launch4jc.xml"
-			fileVersion="${versionNumber}" txtFileVersion="${version}"
-			productVersion="${versionNumber}" txtProductVersion="${version}" />
-		<zip destfile="${dist}/${ant.project.name}-${version}-win32.zip">
-			<zipfileset dir="." prefix="launch4j" excludes="**/build/** **/CVS/** bin/ld bin/windres l4j/** launch4j launcher.jar" />
-		</zip>
-	</target>
-
-	<target name="dist" depends="demo, dist.linux, dist.win32, clean" description="generate all distributions" />
-
 	<target name="clean" description="clean up">
+		<delete dir="${build}" />
 		<delete file="${jar}" />
-		<delete file="./launcher.jar" />
-		<delete>
-			<fileset dir="." includes="*.exe"/>
-		</delete>
 		<ant dir="./demo/ConsoleApp" target="clean" inheritAll="false" />
 		<ant dir="./demo/SimpleApp" target="clean" inheritAll="false" />
-	</target>
-
-	<target name="clean.all" depends="clean" description="clean up">
-		<delete dir="${build}" />
 	</target>
 </project>

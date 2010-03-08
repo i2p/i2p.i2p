@@ -314,6 +314,8 @@
         <copy file="build/org.mortbay.jetty.jar" todir="pkg-temp/lib/" />
         <copy file="build/router.jar" todir="pkg-temp/lib/" />
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
+        <!-- pulled out of routerconsole.jar in 0.7.12; name without version so we can overwrite if we upgrade  -->
+        <copy file="apps/jrobin/jrobin-1.4.0.jar" tofile="pkg-temp/lib/jrobin.jar" />
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
         <copy file="build/BOB.jar" todir="pkg-temp/lib/" />
         <copy file="build/systray.jar" todir="pkg-temp/lib" />
@@ -325,6 +327,8 @@
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
         <copy file="build/susimail.war" todir="pkg-temp/webapps/" />
         <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
+        <copy file="apps/susidns/src/WEB-INF/lib/jstl.jar" todir="pkg-temp/lib/" />
+        <copy file="apps/susidns/src/WEB-INF/lib/standard.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
         <copy file="apps/i2psnark/launch-i2psnark" todir="pkg-temp/" />
         <copy file="apps/i2psnark/jetty-i2psnark.xml" todir="pkg-temp/" />
@@ -380,6 +384,13 @@
         <copy todir="pkg-temp/licenses/" >
           <fileset dir="licenses/" />
         </copy>
+        <!--
+              The license in launch4j/ is a BSD license for launch4j
+              The license in launch4j/head is a MIT license for the code that is actually wrapped around the jars
+              So we include the MIT one in our binary package
+         -->
+        <copy file="installer/lib/launch4j/head/LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-Launch4j.txt" />
+        <!--  Not sure if these are used or should be included -->
         <copy file="installer/lib/launch4j/lib/foxtrot.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-Foxtrot.txt" />
         <copy file="installer/lib/launch4j/lib/JGoodies.Forms.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-JGoodies-Forms.txt" />
         <copy file="installer/lib/launch4j/lib/JGoodies.Looks.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-JGoodies-Looks.txt" />
@@ -433,13 +444,15 @@
     </target>
     <target name="prepconsoleDocs" depends="prepgeoupdate">
         <copy todir="pkg-temp/docs/" >
-          <fileset dir="." includes="readme*.html" />
+          <fileset dir="installer/resources/readme/" includes="readme*.html" />
           <fileset dir="installer/resources/proxy" />
         </copy>
     </target>
     <target name="consoleDocs" depends="deletepkg-temp, prepconsoleDocs">
         <zip destfile="docs.zip" basedir="pkg-temp" whenempty="fail" />
     </target>
+
+    <target name="updater200" depends="prepupdate, preplicenses, pack200, zipit" />
     <target name="updater" depends="prepupdate, preplicenses, zipit" />
     <target name="updaterWithGeoIP" depends="prepupdate, prepgeoupdate, preplicenses, zipit" />
     <target name="updaterWithJetty" depends="prepjupdate, preplicenses, zipit" />
@@ -449,7 +462,19 @@
     <target name="updaterRouter" depends="prepupdateRouter, zipit" />
     <target name="zipit">
         <zip destfile="i2pupdate.zip" basedir="pkg-temp" whenempty="fail" />
+       <!-- just a test, makes almost no difference
+        <tar destfile="i2pupdate.tgz" basedir="pkg-temp" compression="gzip" />
+        <tar destfile="i2pupdate.tbz" basedir="pkg-temp" compression="bzip2" />
+       -->
     </target>
+    <target name="pack200">
+        <exec executable="sh" failifexecutionfails="true">
+            <arg value="-c" />
+            <!-- pack200 will only pack to a .pack file, and only from a .jar file, so we put another .jar on the end -->
+            <arg value="for i in pkg-temp/lib/*.jar pkg-temp/webapps/*war; do echo pack200 $i; mv $i $i.jar; pack200 -g $i.pack $i.jar; rm -f $i.jar; done" />
+        </exec>
+    </target>
+
     <target name="updateTest" depends="prepupdate">
         <ant dir="core/java/" target="jarTest" />    
         <copy file="core/java/build/i2ptest.jar" todir="pkg-temp/lib" />
@@ -463,6 +488,9 @@
         <copy file="build/systray.jar" todir="pkg-temp/lib/" />
         <copy file="build/susimail.war" todir="pkg-temp/webapps/" />
         <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
+        <!-- as of 0.7.12; someday, we can remove these from the updater -->
+        <copy file="apps/susidns/src/WEB-INF/lib/jstl.jar" todir="pkg-temp/lib/" />
+        <copy file="apps/susidns/src/WEB-INF/lib/standard.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
         <copy file="history.txt" todir="pkg-temp/" />
         <!-- the following overwrites history.txt on unix to shrink the update file -->
@@ -482,6 +510,9 @@
         <copy file="build/mstreaming.jar" todir="pkg-temp/lib/" />
         <copy file="build/streaming.jar" todir="pkg-temp/lib/" />
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
+        <!-- pulled out of routerconsole.jar in 0.7.12, someday we can take out of updater -->
+        <!-- name without version so we can overwrite if we upgrade  -->
+        <copy file="apps/jrobin/jrobin-1.4.0.jar" tofile="pkg-temp/lib/jrobin.jar" />
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />

@@ -349,6 +349,7 @@ public class IndexBean {
         return ( ("client".equals(type)) || 
         		("httpclient".equals(type)) ||
         		("sockstunnel".equals(type)) ||
+        		("socksirctunnel".equals(type)) ||
         		("connectclient".equals(type)) ||
         		("streamrclient".equals(type)) ||
         		("ircclient".equals(type)));
@@ -385,6 +386,7 @@ public class IndexBean {
         else if ("server".equals(internalType)) return _("Standard server");
         else if ("httpserver".equals(internalType)) return _("HTTP server");
         else if ("sockstunnel".equals(internalType)) return _("SOCKS 4/4a/5 proxy");
+        else if ("socksirctunnel".equals(internalType)) return _("SOCKS IRC proxy");
         else if ("connectclient".equals(internalType)) return _("CONNECT/SSL/HTTPS proxy");
         else if ("ircserver".equals(internalType)) return _("IRC server");
         else if ("streamrclient".equals(internalType)) return _("Streamr client");

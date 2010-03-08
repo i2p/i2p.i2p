@@ -33,6 +33,7 @@ import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
+import net.i2p.util.Translate;
 
 public class CommSystemFacadeImpl extends CommSystemFacade {
     private Log _log;
@@ -475,6 +476,8 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         return n;
     }
 
+    private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
+
     /** Provide a consistent "look" for displaying router IDs in the console */
     @Override
     public String renderPeerHTML(Hash peer) {
@@ -482,8 +485,11 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         StringBuilder buf = new StringBuilder(128);
         String c = getCountry(peer);
         if (c != null) {
+            String countryName = getCountryName(c);
+            if (countryName.length() > 2)
+                countryName = Translate.getString(countryName, _context, BUNDLE_NAME);
             buf.append("<img height=\"11\" width=\"16\" alt=\"").append(c.toUpperCase()).append("\" title=\"");
-            buf.append(getCountryName(c));
+            buf.append(countryName);
             buf.append("\" src=\"/flags.jsp?c=").append(c).append("\"> ");
         }
         buf.append("<tt>");

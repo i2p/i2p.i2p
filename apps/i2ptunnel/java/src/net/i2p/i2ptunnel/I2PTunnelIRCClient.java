@@ -82,10 +82,10 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         try {
             i2ps = createI2PSocket(clientDest);
             i2ps.setReadTimeout(readTimeout);
-            StringBuilder expectedPong = new StringBuilder();
-            Thread in = new I2PAppThread(new IrcInboundFilter(s,i2ps, expectedPong), "IRC Client " + __clientId + " in");
+            StringBuffer expectedPong = new StringBuffer();
+            Thread in = new I2PAppThread(new IrcInboundFilter(s,i2ps, expectedPong), "IRC Client " + __clientId + " in", true);
             in.start();
-            Thread out = new I2PAppThread(new IrcOutboundFilter(s,i2ps, expectedPong), "IRC Client " + __clientId + " out");
+            Thread out = new I2PAppThread(new IrcOutboundFilter(s,i2ps, expectedPong), "IRC Client " + __clientId + " out", true);
             out.start();
         } catch (Exception ex) {
             if (_log.shouldLog(Log.ERROR))
@@ -117,13 +117,13 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
     /*************************************************************************
      *
      */
-    private class IrcInboundFilter implements Runnable {
+    public static class IrcInboundFilter implements Runnable {
         
         private Socket local;
         private I2PSocket remote;
-        private StringBuilder expectedPong;
+        private StringBuffer expectedPong;
                 
-        IrcInboundFilter(Socket _local, I2PSocket _remote, StringBuilder pong) {
+        public IrcInboundFilter(Socket _local, I2PSocket _remote, StringBuffer pong) {
             local=_local;
             remote=_remote;
             expectedPong=pong;
@@ -191,13 +191,13 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         /*************************************************************************
          *
          */
-        private class IrcOutboundFilter implements Runnable {
+        public static class IrcOutboundFilter implements Runnable {
                     
             private Socket local;
             private I2PSocket remote;
-            private StringBuilder expectedPong;
+            private StringBuffer expectedPong;
                 
-            IrcOutboundFilter(Socket _local, I2PSocket _remote, StringBuilder pong) {
+            public IrcOutboundFilter(Socket _local, I2PSocket _remote, StringBuffer pong) {
                 local=_local;
                 remote=_remote;
                 expectedPong=pong;
@@ -266,7 +266,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
      *
      */
     
-    public String inboundFilter(String s, StringBuilder expectedPong) {
+    public static String inboundFilter(String s, StringBuffer expectedPong) {
         
         String field[]=s.split(" ",4);
         String command;
@@ -353,7 +353,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         return null;
     }
     
-    public String outboundFilter(String s, StringBuilder expectedPong) {
+    public static String outboundFilter(String s, StringBuffer expectedPong) {
         
         String field[]=s.split(" ",3);
         String command;
@@ -378,7 +378,8 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
                 "KICK",
                 "HELPME",
                 "RULES",
-                "TOPIC"
+                "TOPIC",
+                "ISON"    // jIRCii uses this for a ping (response is 303)
         };
 
         if(field[0].length()==0)
@@ -390,7 +391,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         
         command = field[0].toUpperCase();
 
-	if ("PING".equalsIgnoreCase(command)) {
+	if ("PING".equals(command)) {
             // Most clients just send a PING and are happy with any old PONG.  Others,
             // like BitchX, actually expect certain behavior.  It sends two different pings:
             // "PING :irc.freshcoffee.i2p" and "PING 1234567890 127.0.0.1" (where the IP is the proxy)
@@ -426,19 +427,19 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
             
             return rv;
         }
-	if ("PONG".equalsIgnoreCase(command))
+	if ("PONG".equals(command))
             return "PONG 127.0.0.1"; // no way to know what the ircd to i2ptunnel server con is, so localhost works
 
         // Allow all allowedCommands
         for(int i=0;i<allowedCommands.length;i++)
         {
-            if(allowedCommands[i].equalsIgnoreCase(command))
+            if(allowedCommands[i].equals(command))
                 return s;
         }
         
         // mIRC sends "NOTICE user :DCC Send file (IP)"
         // in addition to the CTCP version
-        if("NOTICE".equalsIgnoreCase(command))
+        if("NOTICE".equals(command))
         {
             String msg = field[2];
             if(msg.startsWith(":DCC "))
@@ -447,7 +448,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         }
         
         // Allow PRIVMSG, but block CTCP (except ACTION).
-        if("PRIVMSG".equalsIgnoreCase(command) || "NOTICE".equalsIgnoreCase(command))
+        if("PRIVMSG".equals(command) || "NOTICE".equals(command))
         {
             String msg;
             msg = field[2];
@@ -465,14 +466,16 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
             return s;
         }
         
-        if("USER".equalsIgnoreCase(command)) {
+        if("USER".equals(command)) {
             int idx = field[2].lastIndexOf(":");
             if(idx<0)
                 return "USER user hostname localhost :realname";
             String realname = field[2].substring(idx+1);
             String ret = "USER "+field[1]+" hostname localhost :"+realname;
             return ret;
-        } else if ("QUIT".equalsIgnoreCase(command)) {
+        }
+
+        if ("QUIT".equals(command)) {
             return "QUIT :leaving";
         }
         

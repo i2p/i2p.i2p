@@ -16,10 +16,10 @@ import net.i2p.util.Log;
 class Writer {
     private RouterContext _context;
     private Log _log;
-    private final List _pendingConnections;
-    private List _liveWrites;
-    private List _writeAfterLive;
-    private List _runners;
+    private final List<NTCPConnection> _pendingConnections;
+    private List<NTCPConnection> _liveWrites;
+    private List<NTCPConnection> _writeAfterLive;
+    private List<Runner> _runners;
     
     public Writer(RouterContext ctx) {
         _context = ctx;
@@ -40,7 +40,7 @@ class Writer {
     }
     public void stopWriting() {
         while (_runners.size() > 0) {
-            Runner r = (Runner)_runners.remove(0);
+            Runner r = _runners.remove(0);
             r.stop();
         }
         synchronized (_pendingConnections) {
@@ -100,7 +100,7 @@ class Writer {
                                     _log.debug("Done writing, but nothing pending, so wait");
                                 _pendingConnections.wait();
                             } else {
-                                con = (NTCPConnection)_pendingConnections.remove(0);
+                                con = _pendingConnections.remove(0);
                                 _liveWrites.add(con);
                                 if (_log.shouldLog(Log.DEBUG))
                                     _log.debug("Switch to writing on: " + con);

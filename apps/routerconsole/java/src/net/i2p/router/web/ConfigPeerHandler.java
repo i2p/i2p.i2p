@@ -58,7 +58,7 @@ public class ConfigPeerHandler extends FormHandler {
             }
             addFormError(_("Invalid peer"));
         } else if (_action.startsWith("Check")) {
-            addFormError("Unsupported");
+            addFormError(_("Unsupported"));
         }
     }
     

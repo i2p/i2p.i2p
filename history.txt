@@ -1,3 +1,205 @@
+2010-03-08 zzz
+    * Floodfills: Increase max to 60 (was 28) and min to 45 (was 20)
+    * i2psnark: Better track outgoing bandwidth by incrementing
+      counter before the blocking write
+    * Random: Remove and deprecate some old classses
+    * Reseeder: Reduce max response size to 1MB (was 8MB)
+
+2010-03-05 zzz
+    * Console:
+      - Tag reseed messages
+      - Translate country names on flag popups
+    * I2PSOCKSIRCTunnel:
+      - New, for filtering IRC client traffic when using SOCKS
+    * I2PTunnelIRCClient:
+      - Make filter classes static and public for use by SOCKS
+      - Eliminate redundant case conversion
+      - Pass ISON message through (jIRCii uses it for pings)
+      - Switch back to StringBuffer since it's used by 2 threads
+      - Set daemon on filter threads
+    * SOCKS5Server:
+      - Fix handling of multiple authentication methods
+
+2010-03-02 zzz
+    * Console:
+      - Add link to jobs.jsp on configservice.jsp
+      - Add plugin disableStop support
+    * Context: Add boolean getProperty methods
+    * HTTP Proxy:
+      - Fix address helper conflicts caused by last checkin
+      - Use B32 instead of random hostname for conflict link
+    * LoadClientAppsJob:
+      - Fix unquoted arg after quoted arg
+      - Logging cleanup
+
+2010-02-27 zzz
+    * eepsite: Add some help to index.html
+    * HTTP Proxy:
+      - Put B32 instead of B64 in Host: header, saves 450 bytes
+      - Eliminate some redundant lookups
+      - Fix http://i2p/b64/ and /eepproxy/site/ requests
+      - Disallow a port specified for an i2p address
+      - Cleanup and comments
+      - For more info see http://zzz.i2p/topics/566
+    * i2psnark:
+      - Fix NPE after create file failure
+      - Sanitize more characters in file names
+    * netdb: Fix NPE after OOM http://trac.i2p2.i2p/ticket/38
+    * NTCP Transport:
+      - Replace lists with concurrent queues in EventPumper
+        and NTCPConnection to remove global locks
+      - Java 5 cleanup
+    * Plugins: Support console themes
+    * UDP Transport:
+      - Replace the unused-since-2006 TimedWeightedPriorityMessageQueue
+        with DummyThrottle
+      - Don't instantiate and start TWPMQ Cleaner and OutboundRefiller
+        threads, part of priority queues unused since 0.6.1.11
+      - Don't instantiate and start UDPFlooder, it is for testing only
+      - Prevent NPE http://zzz.i2p/topics/571
+
+2010-02-23 zzz
+    * Unzip: Any files in the zip with a .jar.pack or .war.pack extension
+      will be transparently unpacked with unpack200. Savings is about 60%.
+      Someday we will do this for suds, but we can do it for xpi2ps now.
+    * build: Add updater200 target
+
+2010-02-22 zzz
+    * configclients.jsp:
+      - Add js delete confirm
+      - Remove delete button for webapps
+    * i2psnark:
+      - Ignore a non-i2p tracker in a torrent rather than deleting
+        the torrent, thus "converting" a torrent to in-netowrk use
+        via the open trackers
+      - Add js delete confirm
+
+2010-02-19 zzz
+    * i2psnark: Make file box bigger
+    * Plugins:
+      - Fix display of download status
+      - Unhide
+
+2010-02-18 zzz
+    * Clock: Slew tweak
+    * i2psnark: Improve error message when finding HTML
+    * HTTP Proxy: Fix blank page instead of error page for eepsite unreachable
+    * Plugins:
+      - Fix plugin start button
+      - Change signer prop to match docs
+      - Tweaks
+    * Transport:
+      - Fix recognition of IP change when not firewalled
+      - Require consecutive identical results from two peers before changing IP
+    * TrustedUpdate: CLI exits 1 on failure for ease of use in scripts
+
+2010-02-15 zzz
+    Propagate from 3 dev branches.
+
+    i2p.i2p.zzz.test:
+    * Clock:
+      - getFramedAveragePeerClockSkew() now returns a long (ms);
+        was a Long (s)
+      - Implement NTP-style clock slewing so the clock is adjusted
+        gradually
+      - Implement clock strata so we prefer better clocks
+      - Implement a timestamper in the transport so we will periodically
+        update the clock even if NTP is not working.
+        This allows the router to converge the clock instead of simply
+        hoping the first connected peer is correct.
+      - Slow down NTP attempts after several consecutive failures
+    * Console: refactor and tag update messages
+    * Streaming: MessageOutputStream logging tweaks
+    * Transport:
+      - Prepare for using address costs
+      - Adjust bids based on address cost
+      - Increase cost if near transport capacity, disabled until 0.7.12
+      - Clear the geoip negative cache periodically
+
+    i2p.i2p.zzz.plugin:
+    * Jrobin: Move from routerconsole.jar to its own jrobin.jar,
+      adjust classpath in routerconsole.jar manifest
+    * Plugins:
+      New plugin support, hidden for now, enable with router.enablePlugins=true
+      Configure and add plugins on configclients.jsp
+      Supports the following:
+      - Console webapps
+      - New translation bundles
+      - Link on console
+      - Anything that can be started in clients.config
+      - Additions to classpath for clients and webapps
+    * TrustedUpdate:
+      - Add method to check if we know about a key
+      - Add method to add a key
+      - Add method to extract without verifying
+      - Add method to get key signer name
+    * Webapps: Allow additions to a webapp classpath.
+      - Pull jstl.jar and standard.jar out of susidns.war
+      - Remove 100KB of duplicate classes from i2psnark.war
+
+    i2p.i2p.zzz.VTBM:
+    * I2NP: Add UnknownI2NPMessage so we can route unknown message types
+    * Tunnel Builds:
+      - Add getRecordCount() to TunnelBuildMessage and TunnelBuildReplyMessage so they can be extended.
+      - New I2NP Messages VariableTunnelBuildMessage and VariableTunnelBuildReplyMessage,
+        which contain the number of request slots in them.
+      - Convert all static assumptions of 8 slots to getRecordCount()
+      - Use the new VTBM if all hops in the tunnel and the OBEP or IBGW of the reply tunnel
+        support it, and the tunnel is 4 hops or shorter.
+      - Reply to a VTBM with a VTBRM of the same size
+      - Make BuildReplyHandler static
+      - Convert the currentlyBuilding List to a ConcurrentHashMap to speed reply lookups
+        and eliminate a global lock; don't put fallback tunnels in there
+      - Add new tunnel.corruptBuildReply stat
+      - Various cleanups and javadoc
+      - Fix first hop expiration for Build Messages, was way too long
+      - Randomize Build Message expiration to make it harder to guess hop position
+      - Save expired tunnel build configs for a while, so that we will still use the tunnel
+        and update peer stats if the reply comes in late
+      - Don't update our own profile for Tunnel Build Replies
+      - VTBM generation only through routers >= 0.7.12
+      - VTBM generation disabled for now
+
+* 2010-02-15  0.7.11 released
+
+2010-02-13 sponge
+    * Fix addWebApplications API goofup
+    * Bump BOB version, which I forgot to do.
+
+2010-02-13 zzz
+    * Floodfills: Increase max to 28 (was 15) and min to 20 (was 10)
+
+2010-02-12 sponge
+    * org.mortbay.jetty.Server modified method to accept attributes for
+      batch webapp launches via addWebApplications.
+
+2010-02-10 zzz
+    * I2PTunnelRunner: Flush initial data, for some reason it wasn't
+      getting flushed ever in some cases.
+
+2010-02-10 zzz
+    64-bit windows installer fixes. Still no 64-bit wrapper.
+    Thanks eche|on for testing!
+    * Izpack:
+      Add 64-bit windows dll so installer doesn't die trying to add shortcuts
+    * Launch4j:
+      Upgrade to launch4j 3.0.1 2008-07-20.
+      The license is BSD for launch4j and MIT for the wrapper code in head/
+      Changelog is in installer/lib/launch4j/web/changelog.html
+      Hopefully this will fix installs for 64-bit JRE on 64-bit windows.
+      The previous version was 2.0-RC3 2005-08-13.
+      The previous license was GPLv2 for launch4j and LGPLv2.1 for the wrapper code in head/
+      The bin/ld.exe and bin/windres.exe files were contributed by
+      i2p users in 2005 so the i2p installer could be built on windows.
+      They have not been updated for 3.0.1, so pkg builds on windows
+      will presumably still get 2.0-RC3.
+
+2010-02-06 zzz
+    * Console: Fix saving update keys, was broken in 0.7.10
+    * i2psnark: Add transmission ID
+    * news.xml: Wrap i2p version tags in XML comment
+    * Transport: Try yet again to prevent two NTCP pumpers
+
 2010-02-04 zzz
     * i2psnark: Fix sending stopped events to the tracker
 

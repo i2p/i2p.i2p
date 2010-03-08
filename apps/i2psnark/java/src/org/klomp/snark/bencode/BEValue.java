@@ -179,7 +179,7 @@ public class BEValue
     if (value instanceof byte[])
       {
         byte[] bs = (byte[])value;
-        // XXX - Stupid heuristic...
+        // XXX - Stupid heuristic... and not UTF-8
         if (bs.length <= 12)
           valueString = new String(bs);
         else

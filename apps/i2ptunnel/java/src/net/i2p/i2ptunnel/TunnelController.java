@@ -144,6 +144,8 @@ public class TunnelController implements Logging {
             startIrcClient();
         } else if("sockstunnel".equals(type)) {
             startSocksClient();
+        } else if("socksirctunnel".equals(type)) {
+            startSocksIRCClient();
         } else if("connectclient".equals(type)) {
             startConnectClient();
         } else if ("client".equals(type)) {
@@ -209,6 +211,14 @@ public class TunnelController implements Logging {
         String listenPort = getListenPort();
         String sharedClient = getSharedClient();
         _tunnel.runSOCKSTunnel(new String[] { listenPort, sharedClient }, this);
+    }
+    
+    /** @since 0.7.12 */
+    private void startSocksIRCClient() {
+        setListenOn();
+        String listenPort = getListenPort();
+        String sharedClient = getSharedClient();
+        _tunnel.runSOCKSIRCTunnel(new String[] { listenPort, sharedClient }, this);
     }
     
     /*

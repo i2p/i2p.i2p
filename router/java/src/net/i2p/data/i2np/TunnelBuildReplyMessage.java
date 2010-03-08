@@ -10,18 +10,30 @@ import net.i2p.data.ByteArray;
  * reply tunnel
  */
 public class TunnelBuildReplyMessage extends I2NPMessageImpl {
-    private ByteArray _records[];
+    protected ByteArray _records[];
+    protected int RECORD_COUNT;
+    public static final int MAX_RECORD_COUNT = TunnelBuildMessage.MAX_RECORD_COUNT;
     
     public static final int MESSAGE_TYPE = 22;
-    public static final int RECORD_COUNT = TunnelBuildMessage.RECORD_COUNT;
 
     public TunnelBuildReplyMessage(I2PAppContext context) {
+        this(context, MAX_RECORD_COUNT);
+    }
+
+    /** @since 0.7.10 */
+    protected TunnelBuildReplyMessage(I2PAppContext context, int records) {
         super(context);
-        _records = new ByteArray[RECORD_COUNT];
+        if (records > 0) {
+            RECORD_COUNT = records;
+            _records = new ByteArray[records];
+        }
+        // else will be initialized by readMessage() in VTBRM
     }
 
     public void setRecord(int index, ByteArray record) { _records[index] = record; }
     public ByteArray getRecord(int index) { return _records[index]; }
+    /** @since 0.7.10 */
+    public int getRecordCount() { return RECORD_COUNT; }
     
     public static final int RECORD_SIZE = TunnelBuildMessage.RECORD_SIZE;
     
@@ -52,5 +64,10 @@ public class TunnelBuildReplyMessage extends I2NPMessageImpl {
             curIndex += RECORD_SIZE;
         }
         return curIndex;
+    }
+
+    @Override
+    public String toString() {
+        return "[TunnelBuildReplyMessage]";
     }
 }

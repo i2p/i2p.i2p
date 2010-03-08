@@ -250,7 +250,8 @@
             }
       %></div>
 
-      <% if (!"sockstunnel".equals(indexBean.getInternalType(curClient))) { %>
+      <% if (!("sockstunnel".equals(indexBean.getInternalType(curClient)) ||
+               "socksirctunnel".equals(indexBean.getInternalType(curClient)))) { %>
         <div class="destinationField rowItem">
             <label>
             <% if ("httpclient".equals(indexBean.getInternalType(curClient)) || "connectclient".equals(indexBean.getInternalType(curClient))) { %>
@@ -288,6 +289,7 @@
                         <option value="httpclient">HTTP</option>
                         <option value="ircclient">IRC</option>
                         <option value="sockstunnel">SOCKS 4/4a/5</option>
+                        <option value="socksirctunnel">SOCKS IRC</option>
                         <option value="connectclient">CONNECT</option>
                         <option value="streamrclient">Streamr</option>
                     </select>

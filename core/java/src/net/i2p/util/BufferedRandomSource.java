@@ -17,6 +17,8 @@ import net.i2p.data.DataHelper;
  * (likely) small buffer to reduce the frequency of prng recalcs (though
  * the recalcs are now more time consuming).
  *
+ * @deprecated Unused! See FortunaRandomSource
+ *
  */
 public class BufferedRandomSource extends RandomSource {
     private byte _buffer[];

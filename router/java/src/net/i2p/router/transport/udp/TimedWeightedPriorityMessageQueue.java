@@ -16,6 +16,9 @@ import net.i2p.util.Log;
  * Weighted priority queue implementation for the outbound messages, coupled
  * with code to fail messages that expire.  
  *
+ * WARNING - UNUSED since 0.6.1.11
+ * See comments in DQAT.java and mtn history ca. 2006-02-19
+ *
  */
 public class TimedWeightedPriorityMessageQueue implements MessageQueue, OutboundMessageFragments.ActiveThrottle {
     private RouterContext _context;

@@ -1,20 +1,34 @@
 /*
- 	launch4j :: Cross-platform Java application wrapper for creating Windows native executables
- 	Copyright (C) 2005 Grzegorz Kowal
+	Launch4j (http://launch4j.sourceforge.net/)
+	Cross-platform Java application wrapper for creating Windows native executables.
 
-	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; either version 2 of the License, or
-	(at your option) any later version.
+	Copyright (c) 2004, 2007 Grzegorz Kowal
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+	All rights reserved.
 
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+	Redistribution and use in source and binary forms, with or without modification,
+	are permitted provided that the following conditions are met:
+
+	    * Redistributions of source code must retain the above copyright notice,
+	      this list of conditions and the following disclaimer.
+	    * Redistributions in binary form must reproduce the above copyright notice,
+	      this list of conditions and the following disclaimer in the documentation
+	      and/or other materials provided with the distribution.
+	    * Neither the name of the Launch4j nor the names of its contributors
+	      may be used to endorse or promote products derived from this software without
+	      specific prior written permission.
+
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+	"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+	LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+	A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+	CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+	EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+	PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+	PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+	LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+	NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /*
@@ -26,10 +40,12 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 
 import net.sf.launch4j.config.Config;
 import net.sf.launch4j.config.ConfigPersister;
 import net.sf.launch4j.config.Jre;
+import net.sf.launch4j.config.Msg;
 import net.sf.launch4j.config.Splash;
 import net.sf.launch4j.config.VersionInfo;
 
@@ -43,6 +59,9 @@ public class RcBuilder {
 	public static final int SUBLANG_NEUTRAL	= 0;
 	public static final int SUBLANG_DEFAULT	= 1;
 	public static final int SUBLANG_SYS_DEFAULT	= 2;
+
+	// MANIFEST
+	public static final int MANIFEST = 1;
 
 	// ICON
 	public static final int APP_ICON = 1;
@@ -62,13 +81,38 @@ public class RcBuilder {
 	public static final int SET_PROC_NAME = 9;
 	public static final int ERR_TITLE = 10;
 	public static final int GUI_HEADER_STAYS_ALIVE = 11;
-	public static final int JVM_ARGS = 12;
-	public static final int JAR_ARGS = 13;
-
+	public static final int JVM_OPTIONS = 12;
+	public static final int CMD_LINE = 13;
+	public static final int JAR = 14;
+	public static final int MAIN_CLASS = 15;
+	public static final int CLASSPATH = 16;
+	public static final int WRAPPER = 17;
+	public static final int JDK_PREFERENCE = 18;
+	public static final int ENV_VARIABLES = 19;
+	public static final int PRIORITY_CLASS = 20;
+	public static final int	DOWNLOAD_URL = 	21;
+	public static final int SUPPORT_URL = 22;
+	public static final int MUTEX_NAME = 23;
+	public static final int INSTANCE_WINDOW_TITLE = 24;
+	public static final int INITIAL_HEAP_SIZE = 25;
+	public static final int INITIAL_HEAP_PERCENT = 26;
+	public static final int MAX_HEAP_SIZE = 27;
+	public static final int MAX_HEAP_PERCENT = 28;
+	
+	public static final int STARTUP_ERR = 101;
+	public static final int BUNDLED_JRE_ERR = 102;
+	public static final int JRE_VERSION_ERR = 103;
+	public static final int LAUNCHER_ERR = 104;
+	public static final int INSTANCE_ALREADY_EXISTS_MSG = 105;
+	
 	private final StringBuffer _sb = new StringBuffer();
 
 	public String getContent() {
 		return _sb.toString();
+	}
+
+	public String getLine(int line) {
+		return _sb.toString().split("\n")[line - 1];
 	}
 
 	public File build(Config c) throws IOException {
@@ -79,14 +123,41 @@ public class RcBuilder {
 		_sb.append('\n');
 		addVersionInfo(c.getVersionInfo());
 		addJre(c.getJre());
+		addManifest(MANIFEST, c.getManifest());
 		addIcon(APP_ICON, c.getIcon());
 		addText(ERR_TITLE, c.getErrTitle());
-		addText(JAR_ARGS, c.getJarArgs());
+		addText(DOWNLOAD_URL, c.getDownloadUrl());
+		addText(SUPPORT_URL, c.getSupportUrl());
+		addText(CMD_LINE, c.getCmdLine());
 		addWindowsPath(CHDIR, c.getChdir());
+		addText(PRIORITY_CLASS, String.valueOf(c.getPriorityClass()));
 		addTrue(SET_PROC_NAME, c.isCustomProcName());
 		addTrue(GUI_HEADER_STAYS_ALIVE, c.isStayAlive());
 		addSplash(c.getSplash());
-		File f = File.createTempFile("launch4j", "rc");
+		addMessages(c);
+
+		if (c.getSingleInstance() != null) {
+			addText(MUTEX_NAME, c.getSingleInstance().getMutexName());
+			addText(INSTANCE_WINDOW_TITLE, c.getSingleInstance().getWindowTitle());
+		}
+
+		if (c.getVariables() != null && !c.getVariables().isEmpty()) {
+			StringBuffer vars = new StringBuffer();
+			append(vars, c.getVariables(), "\t");
+			addText(ENV_VARIABLES, vars.toString());
+		}
+
+		// MAIN_CLASS / JAR
+		addTrue(WRAPPER, !c.isDontWrapJar());
+		if (c.getClassPath() != null) {
+			addText(MAIN_CLASS, c.getClassPath().getMainClass());
+			addWindowsPath(CLASSPATH, c.getClassPath().getPathsString());
+		}
+		if (c.isDontWrapJar() && c.getJar() != null) {
+			addWindowsPath(JAR, c.getJar().getPath());
+		}
+
+		File f = Util.createTempFile("rc");
 		BufferedWriter w = new BufferedWriter(new FileWriter(f));
 		w.write(_sb.toString());
 		w.close();
@@ -118,30 +189,25 @@ public class RcBuilder {
 		addVerBlockValue("OriginalFilename", v.getOriginalFilename());
 		addVerBlockValue("ProductName", v.getProductName());
 		addVerBlockValue("ProductVersion", v.getTxtProductVersion());
-		_sb.append("  }\n }\n}\n");
+		_sb.append("  }\n }\nBLOCK \"VarFileInfo\"\n{\nVALUE \"Translation\", 0x0409, 0x04E4\n}\n}");     
 	}
-	
+
 	private void addJre(Jre jre) {
 		addWindowsPath(JRE_PATH, jre.getPath());
 		addText(JAVA_MIN_VER, jre.getMinVersion());
 		addText(JAVA_MAX_VER, jre.getMaxVersion());
-		StringBuffer jvmArgs = new StringBuffer();
-		if (jre.getInitialHeapSize() > 0) {
-			jvmArgs.append("-Xms");
-			jvmArgs.append(jre.getInitialHeapSize());
-			jvmArgs.append('m');
+		addText(JDK_PREFERENCE, String.valueOf(jre.getJdkPreferenceIndex()));
+		addInteger(INITIAL_HEAP_SIZE, jre.getInitialHeapSize());
+		addInteger(INITIAL_HEAP_PERCENT, jre.getInitialHeapPercent());
+		addInteger(MAX_HEAP_SIZE, jre.getMaxHeapSize());
+		addInteger(MAX_HEAP_PERCENT, jre.getMaxHeapPercent());
+
+		StringBuffer options = new StringBuffer();
+		if (jre.getOptions() != null && !jre.getOptions().isEmpty()) {
+			addSpace(options);
+			append(options, jre.getOptions(), " ");
 		}
-		if (jre.getMaxHeapSize() > 0) {
-			addSpace(jvmArgs);
-			jvmArgs.append("-Xmx");
-			jvmArgs.append(jre.getMaxHeapSize());
-			jvmArgs.append('m');
-		}
-		if (jre.getArgs() != null && jre.getArgs().length() > 0) {
-			addSpace(jvmArgs);
-			jvmArgs.append(jre.getArgs().replaceAll("\n", " "));
-		}
-		addText(JVM_ARGS, jvmArgs.toString());
+		addText(JVM_OPTIONS, options.toString());
 	}
 	
 	private void addSplash(Splash splash) {
@@ -154,15 +220,50 @@ public class RcBuilder {
 		addTrue(SPLASH_TIMEOUT_ERR, splash.isTimeoutErr());
 		addBitmap(SPLASH_BITMAP, splash.getFile());
 	}
+	
+	private void addMessages(Config c) {
+		Msg msg = c.getMessages();
+		if (msg == null) {
+			msg = new Msg();
+		}
+		addText(STARTUP_ERR, msg.getStartupErr());
+		addText(BUNDLED_JRE_ERR, msg.getBundledJreErr());
+		addText(JRE_VERSION_ERR, msg.getJreVersionErr());
+		addText(LAUNCHER_ERR, msg.getLauncherErr());
+		if (c.getSingleInstance() != null) {
+			addText(INSTANCE_ALREADY_EXISTS_MSG, msg.getInstanceAlreadyExistsMsg());
+		}
+	}
+
+	private void append(StringBuffer sb, List list, String separator) {
+		for (int i = 0; i < list.size(); i++) {
+			sb.append(list.get(i));
+			if (i < list.size() - 1) {
+				sb.append(separator);
+			}
+		}
+	}
 
 	private void addText(int id, String text) {
-		if (text == null || text.length() == 0) {
+		if (text == null || text.equals("")) {
 			return;
 		}
 		_sb.append(id);
 		_sb.append(" RCDATA BEGIN \"");
-		_sb.append(text);
+		_sb.append(escape(text));
 		_sb.append("\\0\" END\n");
+	}
+
+	private void addTrue(int id, boolean value) {
+		if (value) {
+			addText(id, "true");
+		}
+	}
+
+	private void addInteger(int id, Integer value) {
+		if (value != null) {
+			addText(id, value.toString());
+		}
 	}
 
 	/**
@@ -179,10 +280,15 @@ public class RcBuilder {
 		_sb.append("\\0\" END\n");
 	}
 
-	private void addTrue(int id, boolean value) {
-		if (value) {
-			addText(id, "true");
+	private void addManifest(int id, File manifest) {
+		if (manifest == null || manifest.getPath().equals("")) {
+			return;
 		}
+		_sb.append(id);
+		_sb.append(" 24 \"");
+		_sb.append(getPath(Util.getAbsoluteFile(
+				ConfigPersister.getInstance().getConfigPath(), manifest)));
+		_sb.append("\"\n");
 	}
 
 	private void addIcon(int id, File icon) {
@@ -223,8 +329,12 @@ public class RcBuilder {
 		_sb.append(key);
 		_sb.append("\", \"");
 		if (value != null) {
-			_sb.append(value);
+			_sb.append(escape(value));
 		}
 		_sb.append("\"\n");
+	}
+
+	private String escape(String text) {
+		return text.replaceAll("\"", "\"\"");
 	}
 }

@@ -110,10 +110,10 @@
     </target>    
     <target name="cleandep" depends="clean" />
     <target name="distclean" depends="clean">
+        <delete dir="./jettylib" />
         <echo message="Not actually deleting the jetty libs (since they're so large)" />
     </target>
     <target name="reallyclean" depends="distclean">
-        <delete dir="./jettylib" />
     </target>
     <target name="totallyclean" depends="clean">
         <delete dir="./jettylib" />

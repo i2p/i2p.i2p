@@ -30,6 +30,7 @@ public class RouterConsoleRunner {
     private String _webAppsDir = "./webapps/";
     private static final String PROP_WEBAPP_CONFIG_FILENAME = "router.webappsConfigFile";
     private static final String DEFAULT_WEBAPP_CONFIG_FILENAME = "webapps.config";
+    private static final DigestAuthenticator authenticator = new DigestAuthenticator();
     public static final String ROUTERCONSOLE = "routerconsole";
     public static final String PREFIX = "webapps.";
     public static final String ENABLED = ".startOnLoad";
@@ -69,6 +70,8 @@ public class RouterConsoleRunner {
         if (!workDirCreated)
             System.err.println("ERROR: Unable to create Jetty temporary work directory");
         
+        // so Jetty can find WebAppConfiguration
+        System.setProperty("jetty.class.path", I2PAppContext.getGlobalContext().getBaseDir() + "/lib/routerconsole.jar");
         _server = new Server();
         boolean rewrite = false;
         Properties props = webAppProperties();
@@ -127,11 +130,9 @@ public class RouterConsoleRunner {
                         String enabled = props.getProperty(PREFIX + appName + ENABLED);
                         if (! "false".equals(enabled)) {
                             String path = new File(dir, fileNames[i]).getCanonicalPath();
-                            wac = _server.addWebApplication("/"+ appName, path);
                             tmpdir = new File(workDir, appName + "-" + _listenPort);
-                            tmpdir.mkdir();
-                            wac.setTempDirectory(tmpdir);
-                            initialize(wac);
+                            WebAppStarter.addWebApp(I2PAppContext.getGlobalContext(), _server, appName, path, tmpdir);
+
                             if (enabled == null) {
                                 // do this so configclients.jsp knows about all apps from reading the config
                                 props.setProperty(PREFIX + appName + ENABLED, "true");
@@ -181,23 +182,29 @@ public class RouterConsoleRunner {
         }
 
         NewsFetcher fetcher = NewsFetcher.getInstance(I2PAppContext.getGlobalContext());
-        Thread t = new I2PAppThread(fetcher, "NewsFetcher");
-        t.setDaemon(true);
+        Thread t = new I2PAppThread(fetcher, "NewsFetcher", true);
         t.start();
         
-        Thread st = new I2PAppThread(new StatSummarizer(), "StatSummarizer");
-        st.setDaemon(true);
-        st.start();
+        t = new I2PAppThread(new StatSummarizer(), "StatSummarizer", true);
+        t.start();
+        
+        List<RouterContext> contexts = RouterContext.listContexts();
+        if (contexts != null) {
+            if (PluginStarter.pluginsEnabled(contexts.get(0))) {
+                t = new I2PAppThread(new PluginStarter(contexts.get(0)), "PluginStarter", true);
+                t.start();
+            }
+        }
     }
     
-    private void initialize(WebApplicationContext context) {
+    static void initialize(WebApplicationContext context) {
         String password = getPassword();
         if (password != null) {
             HashUserRealm realm = new HashUserRealm("i2prouter");
             realm.put("admin", password);
             realm.addUserToRole("admin", "routerAdmin");
             context.setRealm(realm);
-            context.setAuthenticator(new DigestAuthenticator());
+            context.setAuthenticator(authenticator);
             context.addHandler(0, new SecurityHandler());
             SecurityConstraint constraint = new SecurityConstraint("admin", "routerAdmin");
             constraint.setAuthenticate(true);
@@ -205,11 +212,11 @@ public class RouterConsoleRunner {
         }
     }
     
-    private String getPassword() {
-        List contexts = RouterContext.listContexts();
+    static String getPassword() {
+        List<RouterContext> contexts = RouterContext.listContexts();
         if (contexts != null) {
             for (int i = 0; i < contexts.size(); i++) {
-                RouterContext ctx = (RouterContext)contexts.get(i);
+                RouterContext ctx = contexts.get(i);
                 String password = ctx.getProperty("consolePassword");
                 if (password != null) {
                     password = password.trim();
@@ -237,10 +244,14 @@ public class RouterConsoleRunner {
 ********/
     
     public static Properties webAppProperties() {
+        return webAppProperties(I2PAppContext.getGlobalContext().getConfigDir().getAbsolutePath());
+    }
+
+    public static Properties webAppProperties(String dir) {
         Properties rv = new Properties();
         // String webappConfigFile = ctx.getProperty(PROP_WEBAPP_CONFIG_FILENAME, DEFAULT_WEBAPP_CONFIG_FILENAME);
         String webappConfigFile = DEFAULT_WEBAPP_CONFIG_FILENAME;
-        File cfgFile = new File(I2PAppContext.getGlobalContext().getConfigDir(), webappConfigFile);
+        File cfgFile = new File(dir, webappConfigFile);
         
         try {
             DataHelper.loadProps(rv, cfgFile);
@@ -263,11 +274,12 @@ public class RouterConsoleRunner {
         }
     }
 
-    private static class WarFilenameFilter implements FilenameFilter {
+    static class WarFilenameFilter implements FilenameFilter {
         private static final WarFilenameFilter _filter = new WarFilenameFilter();
         public static WarFilenameFilter instance() { return _filter; }
         public boolean accept(File dir, String name) {
             return (name != null) && (name.endsWith(".war") && !name.equals(ROUTERCONSOLE + ".war"));
         }
     }
+
 }

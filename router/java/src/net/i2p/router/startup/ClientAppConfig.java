@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -32,12 +33,27 @@ public class ClientAppConfig {
     public String args;
     public long delay;
     public boolean disabled;
+    /** @since 0.7.12 */
+    public String classpath;
+    /** @since 0.7.12 */
+    public String stopargs;
+    /** @since 0.7.12 */
+    public String uninstallargs;
+
     public ClientAppConfig(String cl, String client, String a, long d, boolean dis) {
         className = cl;
         clientName = client;
         args = a;
         delay = d;
         disabled = dis;
+    }
+
+    /** @since 0.7.12 */
+    public ClientAppConfig(String cl, String client, String a, long d, boolean dis, String cp, String sa, String ua) {
+        this(cl, client, a, d, dis);
+        classpath = cp;
+        stopargs = sa;
+        uninstallargs = ua;
     }
 
     public static File configFile(I2PAppContext ctx) {
@@ -72,6 +88,26 @@ public class ClientAppConfig {
      */
     public static List<ClientAppConfig> getClientApps(RouterContext ctx) {
         Properties clientApps = getClientAppProps(ctx);
+        return getClientApps(clientApps);
+    }
+
+    /*
+     * Go through the properties, and return a List of ClientAppConfig structures
+     */
+    public static List<ClientAppConfig> getClientApps(File cfgFile) {
+        Properties clientApps = new Properties();
+        try {
+            DataHelper.loadProps(clientApps, cfgFile);
+        } catch (IOException ioe) {
+            return Collections.EMPTY_LIST;
+        }
+        return getClientApps(clientApps);
+    }
+
+    /*
+     * Go through the properties, and return a List of ClientAppConfig structures
+     */
+    private static List<ClientAppConfig> getClientApps(Properties clientApps) {
         List<ClientAppConfig> rv = new ArrayList(8);
         int i = 0;
         while (true) {
@@ -83,6 +119,9 @@ public class ClientAppConfig {
             String delayStr = clientApps.getProperty(PREFIX + i + ".delay");
             String onBoot = clientApps.getProperty(PREFIX + i + ".onBoot");
             String disabled = clientApps.getProperty(PREFIX + i + ".startOnLoad");
+            String classpath = clientApps.getProperty(PREFIX + i + ".classpath");
+            String stopargs = clientApps.getProperty(PREFIX + i + ".stopargs");
+            String uninstallargs = clientApps.getProperty(PREFIX + i + ".uninstallargs");
             i++;
             boolean dis = disabled != null && "false".equals(disabled);
 
@@ -94,11 +133,13 @@ public class ClientAppConfig {
             if (delayStr != null && !onStartup)
                 try { delay = 1000*Integer.parseInt(delayStr); } catch (NumberFormatException nfe) {}
 
-            rv.add(new ClientAppConfig(className, clientName, args, delay, dis));
+            rv.add(new ClientAppConfig(className, clientName, args, delay, dis,
+                   classpath, stopargs, uninstallargs));
         }
         return rv;
     }
 
+    /** classpath and stopargs not supported */
     public static void writeClientAppConfig(RouterContext ctx, List apps) {
         File cfgFile = configFile(ctx);
         FileOutputStream fos = null;

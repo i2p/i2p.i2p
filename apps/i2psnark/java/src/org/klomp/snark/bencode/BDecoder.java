@@ -279,7 +279,9 @@ public class BDecoder
   public BEValue bdecodeMap() throws IOException
   {
     int c = getNextIndicator();
-    if (c != 'd')
+    if (c == '<')
+      throw new InvalidBEncodingException("Expected a .torrent metainfo file but found HTML? Check URL or file!");
+    else if (c != 'd')
       throw new InvalidBEncodingException("Expected 'd', not '"
                                           + (char)c + "'");
     indicator = 0;

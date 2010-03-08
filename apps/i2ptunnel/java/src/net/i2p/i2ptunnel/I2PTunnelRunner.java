@@ -124,11 +124,14 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
             OutputStream i2pout = i2ps.getOutputStream(); //new BufferedOutputStream(i2ps.getOutputStream(), MAX_PACKET_SIZE);
             if (initialI2PData != null) {
                 synchronized (slock) {
+                    // this does not increment totalSent
                     i2pout.write(initialI2PData);
+                    // do NOT flush here, it will block and then onTimeout.run() won't happen on fail.
                     //i2pout.flush();
                 }
             }
             if (initialSocketData != null) {
+                // this does not increment totalReceived
                 out.write(initialSocketData);
             }
             if (_log.shouldLog(Log.DEBUG))
@@ -150,6 +153,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("runner has a timeout job, totalReceived = " + totalReceived
                                + " totalSent = " + totalSent + " job = " + onTimeout);
+                // should we only look at totalReceived?
                 if ( (totalSent <= 0) && (totalReceived <= 0) )
                     onTimeout.run();
             }
@@ -271,7 +275,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
                         //if (_log.shouldLog(Log.DEBUG))
                         //    _log.debug("Flushing after sending " + len + " bytes through");
                         if (_log.shouldLog(Log.DEBUG))
-                            _log.debug(direction + ": " + len + " bytes flushed through to " 
+                            _log.debug(direction + ": " + len + " bytes flushed through " + (_toI2P ? "to " : "from ")
                                        + i2ps.getPeerDestination().calculateHash().toBase64().substring(0,6));
                         try {
                             Thread.sleep(I2PTunnel.PACKET_DELAY);

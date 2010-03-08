@@ -18,6 +18,7 @@ import net.i2p.util.EepGet;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.SSLEepGet;
+import net.i2p.util.Translate;
 
 /**
  * Moved from ReseedHandler in routerconsole. See ReseedChecker for additional comments.
@@ -33,14 +34,18 @@ public class Reseeder {
     private Log _log;
 
     // Reject unreasonably big files, because we download into a ByteArrayOutputStream.
-    private static final long MAX_RESEED_RESPONSE_SIZE = 8 * 1024 * 1024;
+    private static final long MAX_RESEED_RESPONSE_SIZE = 1024 * 1024;
 
-    private static final String DEFAULT_SEED_URL = "http://a.netdb.i2p2.de/,http://b.netdb.i2p2.de/,http://reseed.i2p-projekt.de/";
+    private static final String DEFAULT_SEED_URL = "http://a.netdb.i2p2.de/,http://b.netdb.i2p2.de/,http://reseed.i2p-projekt.de/,http://i2pbote.net/netDb/";
     private static final String PROP_INPROGRESS = "net.i2p.router.web.ReseedHandler.reseedInProgress";
     private static final String PROP_ERROR = "net.i2p.router.web.ReseedHandler.errorMessage";
     private static final String PROP_STATUS = "net.i2p.router.web.ReseedHandler.statusMessage";
     public static final String PROP_PROXY_HOST = "router.reseedProxyHost";
     public static final String PROP_PROXY_PORT = "router.reseedProxyPort";
+    private static final String RESEED_TIPS =
+            _x("Ensure that nothing blocks outbound HTTP, check <a href=logs.jsp>logs</a> " +
+               "and if nothing helps, read FAQ about reseeding manually.");
+        
 
     public Reseeder(RouterContext ctx) {
         _context = ctx;
@@ -63,7 +68,6 @@ public class Reseeder {
 
     }
 
-    /** Todo: translate the messages sent via PROP_STATUS */
     public class ReseedRunner implements Runnable, EepGet.StatusListener {
         private boolean _isRunning;
         private String _proxyHost;
@@ -71,7 +75,7 @@ public class Reseeder {
 
         public ReseedRunner() {
             _isRunning = false; 
-            System.setProperty(PROP_STATUS, "Reseeding.");
+            System.setProperty(PROP_STATUS, _("Reseeding"));
         }
         public boolean isRunning() { return _isRunning; }
         public void run() {
@@ -105,10 +109,6 @@ public class Reseeder {
         * save them into this router's netDb dir.
         *
         */
-        private static final String RESEED_TIPS =
-        "Ensure that nothing blocks outbound HTTP, check <a href=logs.jsp>logs</a> " +
-        "and if nothing helps, read FAQ about reseeding manually.";
-        
         private void reseed(boolean echoStatus) {
             List URLList = new ArrayList();
             String URLs = _context.getProperty("i2p.reseedURL", DEFAULT_SEED_URL);
@@ -139,14 +139,14 @@ public class Reseeder {
 
             try {
                 System.setProperty(PROP_ERROR, "");
-                System.setProperty(PROP_STATUS, "Reseeding: fetching seed URL.");
+                System.setProperty(PROP_STATUS, _("Reseeding: fetching seed URL."));
                 System.err.println("Reseed from " + seedURL);
                 URL dir = new URL(seedURL);
                 byte contentRaw[] = readURL(dir);
                 if (contentRaw == null) {
                     System.setProperty(PROP_ERROR,
-                        "Last reseed failed fully (failed reading seed URL). " +
-                        RESEED_TIPS);
+                        _("Last reseed failed fully (failed reading seed URL).") + ' '  +
+                        _(RESEED_TIPS));
                     // Logging deprecated here since attemptFailed() provides better info
                     _log.debug("Failed reading seed URL: " + seedURL);
                     return;
@@ -171,8 +171,8 @@ public class Reseeder {
                 if (total <= 0) {
                     _log.error("Read " + contentRaw.length + " bytes from seed " + seedURL + ", but found no routerInfo URLs.");
                     System.setProperty(PROP_ERROR,
-                        "Last reseed failed fully (no routerInfo URLs at seed URL). " +
-                        RESEED_TIPS);
+                        _("Last reseed failed fully (no routerInfo URLs at seed URL).") + ' ' +
+                        _(RESEED_TIPS));
                     return;
                 }
 
@@ -184,8 +184,7 @@ public class Reseeder {
                 for (Iterator iter = urlList.iterator(); iter.hasNext() && fetched < 200; ) {
                     try {
                         System.setProperty(PROP_STATUS,
-                            "Reseeding: fetching router info from seed URL (" +
-                            fetched + " successful, " + errors + " errors, " + total + " total).");
+                            _("Reseeding: fetching router info from seed URL ({0} successful, {1} errors).", fetched, errors));
 
                         fetchSeed(seedURL, (String)iter.next());
                         fetched++;
@@ -206,13 +205,13 @@ public class Reseeder {
                 // because some routerInfos will always fail.
                 if ((failPercent >= 10) && (failPercent < 90)) {
                     System.setProperty(PROP_ERROR,
-                        "Last reseed failed partly (" + failPercent + "% of " + total + "). " +
-                        RESEED_TIPS);
+                        _("Last reseed failed partly ({0}% of {1}).", failPercent, total) + ' ' +
+                        _(RESEED_TIPS));
                 }
                 if (failPercent >= 90) {
                     System.setProperty(PROP_ERROR,
-                        "Last reseed failed (" + failPercent + "% of " + total + "). " +
-                        RESEED_TIPS);
+                        _("Last reseed failed ({0}% of {1}).", failPercent, total) + ' ' +
+                        _(RESEED_TIPS));
                 }
                 if (fetched > 0)
                     _context.netDb().rescan();
@@ -221,8 +220,8 @@ public class Reseeder {
                     _isRunning = false;
             } catch (Throwable t) {
                 System.setProperty(PROP_ERROR,
-                    "Last reseed failed fully (exception caught). " +
-                    RESEED_TIPS);
+                    _("Last reseed failed fully (exception caught).") + ' ' +
+                    _(RESEED_TIPS));
                 _log.error("Error reseeding", t);
             }
         }
@@ -268,6 +267,28 @@ public class Reseeder {
             fos.close();
         }
 
+    }
+
+    /**
+     *  Mark a string for extraction by xgettext and translation.
+     *  Use this only in static initializers.
+     *  It does not translate!
+     *  @return s
+     */
+    private static final String _x(String s) {
+        return s;
+    }
+
+    private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
+
+    /** translate */
+    public String _(String key) {
+        return Translate.getString(key, _context, BUNDLE_NAME);
+    }
+
+    /** translate */
+    public String _(String s, Object o, Object o2) {
+        return Translate.getString(s, o, o2, _context, BUNDLE_NAME);
     }
 
 /******

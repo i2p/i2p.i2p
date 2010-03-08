@@ -126,4 +126,13 @@ public abstract class Translate {
         }
         return rv;
     }
+
+    /**
+     *  Clear the cache.
+     *  Call this after adding new bundles to the classpath.
+     *  @since 0.7.12
+     */
+    public static void clearCache() {
+        _missing.clear();
+    }
 }

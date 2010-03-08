@@ -43,7 +43,7 @@ public class BuildMessageProcessor {
         long totalEq = 0;
         long totalDup = 0;
         long beforeLoop = System.currentTimeMillis();
-        for (int i = 0; i < TunnelBuildMessage.RECORD_COUNT; i++) {
+        for (int i = 0; i < msg.getRecordCount(); i++) {
             ByteArray rec = msg.getRecord(i);
             int off = rec.getOffset();
             int len = BuildRequestRecord.PEER_SIZE;
@@ -87,7 +87,7 @@ public class BuildMessageProcessor {
         SessionKey replyKey = rv.readReplyKey();
         byte iv[] = rv.readReplyIV();
         int ivOff = 0;
-        for (int i = 0; i < TunnelBuildMessage.RECORD_COUNT; i++) {
+        for (int i = 0; i < msg.getRecordCount(); i++) {
             if (i != ourHop) {
                 ByteArray data = msg.getRecord(i);
                 if (log.shouldLog(Log.DEBUG))

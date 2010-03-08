@@ -430,7 +430,18 @@ public class NTCPTransport extends TransportImpl {
     private static final int NUM_CONCURRENT_READERS = 3;
     private static final int NUM_CONCURRENT_WRITERS = 3;
 
+    /**
+     *  Called by TransportManager.
+     *  Caller should stop the transport first, then
+     *  verify stopped with isAlive()
+     *  Unfortunately TransportManager doesn't do that, so we
+     *  check here to prevent two pumpers.
+     *  @return appears to be ignored by caller
+     */
     public synchronized RouterAddress startListening() {
+        // try once again to prevent two pumpers which is fatal
+        if (_pumper.isAlive())
+            return _myAddress != null ? _myAddress.toRouterAddress() : null;
         if (_log.shouldLog(Log.WARN)) _log.warn("Starting ntcp transport listening");
         _finisher.start();
         _pumper.startPumping();
@@ -442,7 +453,17 @@ public class NTCPTransport extends TransportImpl {
         return bindAddress();
     }
 
+    /**
+     *  Only called by CSFI.
+     *  Caller should stop the transport first, then
+     *  verify stopped with isAlive()
+     *  @return appears to be ignored by caller
+     */
     public synchronized RouterAddress restartListening(RouterAddress addr) {
+        // try once again to prevent two pumpers which is fatal
+        // we could just return null since the return value is ignored
+        if (_pumper.isAlive())
+            return _myAddress != null ? _myAddress.toRouterAddress() : null;
         if (_log.shouldLog(Log.WARN)) _log.warn("Restarting ntcp transport listening");
         _finisher.start();
         _pumper.startPumping();
@@ -461,6 +482,7 @@ public class NTCPTransport extends TransportImpl {
         return _pumper.isAlive();
     }
 
+    /** call from synchronized method */
     private RouterAddress bindAddress() {
         if (_myAddress != null) {
             try {
