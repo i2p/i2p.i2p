@@ -240,7 +240,7 @@ public class InNetMessagePool implements Service {
     }
     
     public int handleReplies(I2NPMessage messageBody) {
-        List origMessages = _context.messageRegistry().getOriginalMessages(messageBody);
+        List<OutNetMessage> origMessages = _context.messageRegistry().getOriginalMessages(messageBody);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Original messages for inbound message: " + origMessages.size());
         if (origMessages.size() > 1) {
@@ -250,7 +250,7 @@ public class InNetMessagePool implements Service {
         }
 
         for (int i = 0; i < origMessages.size(); i++) {
-            OutNetMessage omsg = (OutNetMessage)origMessages.get(i);
+            OutNetMessage omsg = origMessages.get(i);
             ReplyJob job = omsg.getOnReplyJob();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Original message [" + i + "] " + omsg.getReplySelector() 

@@ -46,18 +46,18 @@ public class OutNetMessage {
     private ReplyJob _onReply;
     private Job _onFailedReply;
     private MessageSelector _replySelector;
-    private Set _failedTransports;
+    private Set<String> _failedTransports;
     private long _sendBegin;
     private long _transmitBegin;
     private Exception _createdBy;
     private long _created;
     /** for debugging, contains a mapping of even name to Long (e.g. "begin sending", "handleOutbound", etc) */
-    private HashMap _timestamps;
+    private HashMap<String, Long> _timestamps;
     /**
      * contains a list of timestamp event names in the order they were fired
      * (some JVMs have less than 10ms resolution, so the Long above doesn't guarantee order)
      */
-    private List _timestampOrder;
+    private List<String> _timestampOrder;
     private int _queueSize;
     private long _prepareBegin;
     private long _prepareEnd;
@@ -108,11 +108,11 @@ public class OutNetMessage {
         }
         return now - _created;
     }
-    public Map getTimestamps() {
+    public Map<String, Long> getTimestamps() {
         if (_log.shouldLog(Log.INFO)) {
             synchronized (this) {
                 locked_initTimestamps();
-                return (Map)_timestamps.clone();
+                return (Map<String, Long>)_timestamps.clone();
             }
         }
         return Collections.EMPTY_MAP;
@@ -121,7 +121,7 @@ public class OutNetMessage {
         if (_log.shouldLog(Log.INFO)) {
             synchronized (this) {
                 locked_initTimestamps();
-                return (Long)_timestamps.get(eventName);
+                return _timestamps.get(eventName);
             }
         }
         return ZERO;
@@ -339,8 +339,8 @@ public class OutNetMessage {
             synchronized (this) {
                 long lastWhen = -1;
                 for (int i = 0; i < _timestampOrder.size(); i++) {
-                    String name = (String)_timestampOrder.get(i);
-                    Long when = (Long)_timestamps.get(name);
+                    String name = _timestampOrder.get(i);
+                    Long when = _timestamps.get(name);
                     buf.append("\t[");
                     long diff = when.longValue() - lastWhen;
                     if ( (lastWhen > 0) && (diff > 500) )
