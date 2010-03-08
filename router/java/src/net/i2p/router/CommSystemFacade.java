@@ -11,7 +11,6 @@ package net.i2p.router;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -30,7 +29,7 @@ public abstract class CommSystemFacade implements Service {
     public void renderStatusHTML(Writer out) throws IOException { renderStatusHTML(out, null, 0); }
     
     /** Create the set of RouterAddress structures based on the router's config */
-    public Set createAddresses() { return new HashSet(); }
+    public Set<RouterAddress> createAddresses() { return Collections.EMPTY_SET; }
     
     public int countActivePeers() { return 0; }
     public int countActiveSendPeers() { return 0; }

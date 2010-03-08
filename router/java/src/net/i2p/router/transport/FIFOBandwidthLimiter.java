@@ -12,8 +12,8 @@ import net.i2p.util.Log;
 public class FIFOBandwidthLimiter {
     private Log _log;
     private I2PAppContext _context;
-    private final List _pendingInboundRequests;
-    private final List _pendingOutboundRequests;
+    private final List<Request> _pendingInboundRequests;
+    private final List<Request> _pendingOutboundRequests;
     /** how many bytes we can consume for inbound transmission immediately */
     private volatile int _availableInbound;
     /** how many bytes we can consume for outbound transmission immediately */
@@ -176,7 +176,7 @@ public class FIFOBandwidthLimiter {
     }
     public void requestOutbound(Request req, int bytesOut, String purpose) {
         req.init(0, bytesOut, purpose);
-        if (false) { ((SimpleRequest)req).allocateAll(); return; }
+        //if (false) { ((SimpleRequest)req).allocateAll(); return; }
         int pending = 0;
         synchronized (_pendingOutboundRequests) {
             pending = _pendingOutboundRequests.size();
@@ -215,7 +215,7 @@ public class FIFOBandwidthLimiter {
      * @param maxBurstIn allow up to this many bytes in from the burst section for this time period (may be negative)
      * @param maxBurstOut allow up to this many bytes in from the burst section for this time period (may be negative)
      */
-    final void refillBandwidthQueues(List buf, long bytesInbound, long bytesOutbound, long maxBurstIn, long maxBurstOut) {
+    final void refillBandwidthQueues(List<Request> buf, long bytesInbound, long bytesOutbound, long maxBurstIn, long maxBurstOut) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Refilling the queues with " + bytesInbound + "/" + bytesOutbound + ": " + getStatus().toString());
         _availableInbound += bytesInbound;
@@ -338,14 +338,14 @@ public class FIFOBandwidthLimiter {
      * Go through the queue, satisfying as many requests as possible (notifying
      * each one satisfied that the request has been granted).  
      */
-    private final void satisfyRequests(List buffer) {
+    private final void satisfyRequests(List<Request> buffer) {
         buffer.clear();
         satisfyInboundRequests(buffer);
         buffer.clear();
         satisfyOutboundRequests(buffer);
     }
     
-    private final void satisfyInboundRequests(List satisfied) {
+    private final void satisfyInboundRequests(List<Request> satisfied) {
         synchronized (_pendingInboundRequests) {
             if (_inboundUnlimited) {
                 locked_satisfyInboundUnlimited(satisfied);
@@ -400,7 +400,7 @@ public class FIFOBandwidthLimiter {
      * There are no limits, so just give every inbound request whatever they want
      *
      */
-    private final void locked_satisfyInboundUnlimited(List satisfied) {
+    private final void locked_satisfyInboundUnlimited(List<Request> satisfied) {
         while (_pendingInboundRequests.size() > 0) {
             SimpleRequest req = (SimpleRequest)_pendingInboundRequests.remove(0);
             int allocated = req.getPendingInboundRequested();
@@ -425,7 +425,7 @@ public class FIFOBandwidthLimiter {
      * 
      * @return list of requests that were completely satisfied
      */
-    private final void locked_satisfyInboundAvailable(List satisfied) {
+    private final void locked_satisfyInboundAvailable(List<Request> satisfied) {
         for (int i = 0; i < _pendingInboundRequests.size(); i++) {
             if (_availableInbound <= 0) break;
             SimpleRequest req = (SimpleRequest)_pendingInboundRequests.get(i);
@@ -485,7 +485,7 @@ public class FIFOBandwidthLimiter {
         }
     }
     
-    private final void satisfyOutboundRequests(List satisfied) {
+    private final void satisfyOutboundRequests(List<Request> satisfied) {
         synchronized (_pendingOutboundRequests) {
             if (_outboundUnlimited) {
                 locked_satisfyOutboundUnlimited(satisfied);
@@ -514,7 +514,7 @@ public class FIFOBandwidthLimiter {
      * There are no limits, so just give every outbound request whatever they want
      *
      */
-    private final void locked_satisfyOutboundUnlimited(List satisfied) {
+    private final void locked_satisfyOutboundUnlimited(List<Request> satisfied) {
         while (_pendingOutboundRequests.size() > 0) {
             SimpleRequest req = (SimpleRequest)_pendingOutboundRequests.remove(0);
             int allocated = req.getPendingOutboundRequested();
@@ -540,7 +540,7 @@ public class FIFOBandwidthLimiter {
      * 
      * @return list of requests that were completely satisfied
      */
-    private final void locked_satisfyOutboundAvailable(List satisfied) {
+    private final void locked_satisfyOutboundAvailable(List<Request> satisfied) {
         for (int i = 0; i < _pendingOutboundRequests.size(); i++) {
             if (_availableOutbound <= 0) break;
             SimpleRequest req = (SimpleRequest)_pendingOutboundRequests.get(i);
@@ -665,7 +665,7 @@ public class FIFOBandwidthLimiter {
         private int _allocationsSinceWait;
         private boolean _aborted;
         private boolean _waited;
-        List satisfiedBuffer;
+        List<Request> satisfiedBuffer;
         private CompleteListener _lsnr;
         private Object _attachment;
         
