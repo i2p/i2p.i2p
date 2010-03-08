@@ -12,7 +12,7 @@ import net.i2p.crypto.CryptixAESEngine;
 import net.i2p.crypto.DSAEngine;
 import net.i2p.crypto.DummyDSAEngine;
 import net.i2p.crypto.DummyElGamalEngine;
-import net.i2p.crypto.DummyPooledRandomSource;
+//import net.i2p.crypto.DummyPooledRandomSource;
 import net.i2p.crypto.ElGamalAESEngine;
 import net.i2p.crypto.ElGamalEngine;
 import net.i2p.crypto.HMAC256Generator;
@@ -29,7 +29,7 @@ import net.i2p.util.FileUtil;
 import net.i2p.util.FortunaRandomSource;
 import net.i2p.util.KeyRing;
 import net.i2p.util.LogManager;
-import net.i2p.util.PooledRandomSource;
+//import net.i2p.util.PooledRandomSource;
 import net.i2p.util.RandomSource;
 
 /**
@@ -729,12 +729,12 @@ public class I2PAppContext {
     private void initializeRandom() {
         synchronized (this) {
             if (_random == null) {
-                if (true)
+                //if (true)
                     _random = new FortunaRandomSource(this);
-                else if ("true".equals(getProperty("i2p.weakPRNG", "false")))
-                    _random = new DummyPooledRandomSource(this);
-                else
-                    _random = new PooledRandomSource(this);
+                //else if ("true".equals(getProperty("i2p.weakPRNG", "false")))
+                //    _random = new DummyPooledRandomSource(this);
+                //else
+                //    _random = new PooledRandomSource(this);
             }
             _randomInitialized = true;
         }

@@ -15,6 +15,9 @@ import net.i2p.data.Base64;
 
 /**
  * Maintain a set of PRNGs to feed the apps
+ *
+ * @deprecated Unused! See FortunaRandomSource
+ *
  */
 public class PooledRandomSource extends RandomSource {
     private Log _log;

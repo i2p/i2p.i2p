@@ -1,3 +1,10 @@
+2010-03-08 zzz
+    * Floodfills: Increase max to 60 (was 28) and min to 45 (was 20)
+    * i2psnark: Better track outgoing bandwidth by incrementing
+      counter before the blocking write
+    * Random: Remove and deprecate some old classses
+    * Reseeder: Reduce max response size to 1MB (was 8MB)
+
 2010-03-05 zzz
     * Console:
       - Tag reseed messages
