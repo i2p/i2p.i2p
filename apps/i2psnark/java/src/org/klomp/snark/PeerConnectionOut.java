@@ -151,7 +151,11 @@ class PeerConnectionOut implements Runnable
               {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Send " + peer + ": " + m + " on " + peer.metainfo.getName());
-                m.sendMessage(dout);
+
+                // This can block for quite a while.
+                // To help get slow peers going, and track the bandwidth better,
+                // move this _after_ state.uploaded() and see how it works.
+                //m.sendMessage(dout);
                 lastSent = System.currentTimeMillis();
 
                 // Remove all piece messages after sending a choke message.
@@ -162,6 +166,7 @@ class PeerConnectionOut implements Runnable
                 if (m.type == Message.PIECE)
                   state.uploaded(m.len);
 
+                m.sendMessage(dout);
                 m = null;
               }
           }
