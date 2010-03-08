@@ -101,7 +101,7 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
      * @deprecated unused except by above
      */
     private byte[][] preprocess(TunnelGateway.Pending msg) {
-        List fragments = new ArrayList(1);
+        List<byte[]> fragments = new ArrayList(1);
 
         while (msg.getOffset() < msg.getData().length) {
             fragments.add(preprocessFragment(msg));
@@ -111,7 +111,7 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
 
         byte rv[][] = new byte[fragments.size()][];
         for (int i = 0; i < fragments.size(); i++)
-            rv[i] = (byte[])fragments.get(i);
+            rv[i] = fragments.get(i);
         return rv;
     }
     

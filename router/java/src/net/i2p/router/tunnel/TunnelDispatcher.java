@@ -726,6 +726,7 @@ public class TunnelDispatcher implements Service {
         startup(); 
     }
     
+    /** @deprecated moved to router console */
     public void renderStatusHTML(Writer out) throws IOException {}    
     
     private class LeaveTunnel extends JobImpl {
