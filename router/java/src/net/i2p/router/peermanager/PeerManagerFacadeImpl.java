@@ -57,7 +57,7 @@ public class PeerManagerFacadeImpl implements PeerManagerFacade {
         _manager.loadProfiles();
     }
     
-    public List selectPeers(PeerSelectionCriteria criteria) {
+    public List<Hash> selectPeers(PeerSelectionCriteria criteria) {
         return _manager.selectPeers(criteria);
     }
 
@@ -69,11 +69,15 @@ public class PeerManagerFacadeImpl implements PeerManagerFacade {
         if (_manager == null) return;
         _manager.removeCapabilities(peer); 
     }
+
+    /** @deprecated unused */
     public Hash selectRandomByCapability(char capability) { 
-        if (_manager == null) return null;
-        return _manager.selectRandomByCapability(capability); 
+        //if (_manager == null) return null;
+        //return _manager.selectRandomByCapability(capability); 
+        return null;
     }
-    public List getPeersByCapability(char capability) { 
+
+    public List<Hash> getPeersByCapability(char capability) { 
         if (_manager == null) return new ArrayList(0);
         return _manager.getPeersByCapability(capability); 
     }

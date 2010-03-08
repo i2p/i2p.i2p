@@ -11,12 +11,12 @@ package net.i2p.router.peermanager;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
@@ -26,6 +26,7 @@ import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
+import net.i2p.util.ConcurrentHashSet;
 
 /**
  * Manage the current state of the statistics
@@ -46,8 +47,8 @@ class PeerManager {
     private RouterContext _context;
     private ProfileOrganizer _organizer;
     private ProfilePersistenceHelper _persistenceHelper;
-    private List _peersByCapability[];
-    private final Map _capabilitiesByPeer;
+    private Set<Hash> _peersByCapability[];
+    private final Map<Hash, String> _capabilitiesByPeer;
     
     public PeerManager(RouterContext context) {
         _context = context;
@@ -55,10 +56,10 @@ class PeerManager {
         _persistenceHelper = new ProfilePersistenceHelper(context);
         _organizer = context.profileOrganizer();
         _organizer.setUs(context.routerHash());
-        _capabilitiesByPeer = new HashMap(128);
-        _peersByCapability = new List[26];
+        _capabilitiesByPeer = new ConcurrentHashMap(128);
+        _peersByCapability = new Set[26];
         for (int i = 0; i < _peersByCapability.length; i++)
-            _peersByCapability[i] = new ArrayList(64);
+            _peersByCapability[i] = new ConcurrentHashSet();
         loadProfiles();
         ////_context.jobQueue().addJob(new EvaluateProfilesJob(_context));
         SimpleScheduler.getInstance().addPeriodicEvent(new Reorg(), 0, 45*1000);
@@ -77,14 +78,16 @@ class PeerManager {
     
     void storeProfiles() {
         Set peers = selectPeers();
-        for (Iterator iter = peers.iterator(); iter.hasNext(); ) {
-            Hash peer = (Hash)iter.next();
+        for (Iterator<Hash> iter = peers.iterator(); iter.hasNext(); ) {
+            Hash peer = iter.next();
             storeProfile(peer);
         }
     }
+
     Set selectPeers() {
         return _organizer.selectAllPeers();
     }
+
     void storeProfile(Hash peer) {
         if (peer == null) return;
         PeerProfile prof = _organizer.getProfile(peer);
@@ -92,10 +95,11 @@ class PeerManager {
         if (true)
             _persistenceHelper.writeProfile(prof);
     }
+
     void loadProfiles() {
-        Set profiles = _persistenceHelper.readProfiles();
-        for (Iterator iter = profiles.iterator(); iter.hasNext();) {
-            PeerProfile prof = (PeerProfile)iter.next();
+        Set<PeerProfile> profiles = _persistenceHelper.readProfiles();
+        for (Iterator<PeerProfile> iter = profiles.iterator(); iter.hasNext();) {
+            PeerProfile prof = iter.next();
             if (prof != null) {
                 _organizer.addProfile(prof);
                 if (_log.shouldLog(Log.DEBUG))
@@ -107,10 +111,11 @@ class PeerManager {
     /**
      * Find some peers that meet the criteria and we have the netDb info for locally
      *
+     * Only used by PeerTestJob (PURPOSE_TEST)
      */
-    List selectPeers(PeerSelectionCriteria criteria) {
-        Set peers = new HashSet(criteria.getMinimumRequired());
-        Set exclude = new HashSet(1);
+    List<Hash> selectPeers(PeerSelectionCriteria criteria) {
+        Set<Hash> peers = new HashSet(criteria.getMinimumRequired());
+        Set<Hash> exclude = new HashSet(1);
         exclude.add(_context.routerHash());
         switch (criteria.getPurpose()) {
             case PeerSelectionCriteria.PURPOSE_TEST:
@@ -143,10 +148,10 @@ class PeerManager {
             default:
                 break;
         }
-        if (peers.size() <= 0) {
+        if (peers.isEmpty()) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("We ran out of peers when looking for reachable ones after finding " 
-                          + peers.size() + " with "
+                          + "0 with "
                           + _organizer.countWellIntegratedPeers() + "/" 
                           + _organizer.countHighCapacityPeers() + "/" 
                           + _organizer.countFastPeers() + " integrated/high capacity/fast peers");
@@ -160,18 +165,18 @@ class PeerManager {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Setting capabilities for " + peer.toBase64() + " to " + caps);
         if (caps != null) caps = caps.toLowerCase();
-        synchronized (_capabilitiesByPeer) {
+
             String oldCaps = null;
             if (caps != null)
-                oldCaps = (String)_capabilitiesByPeer.put(peer, caps);
+                oldCaps = _capabilitiesByPeer.put(peer, caps);
             else
-                oldCaps = (String)_capabilitiesByPeer.remove(peer);
+                oldCaps = _capabilitiesByPeer.remove(peer);
             
             if (oldCaps != null) {
                 for (int i = 0; i < oldCaps.length(); i++) {
                     char c = oldCaps.charAt(i);
                     if ( (caps == null) || (caps.indexOf(c) < 0) ) {
-                        List peers = locked_getPeers(c);
+                        Set<Hash> peers = locked_getPeers(c);
                         if (peers != null)
                             peers.remove(peer);
                     }
@@ -182,15 +187,15 @@ class PeerManager {
                     char c = caps.charAt(i);
                     if ( (oldCaps != null) && (oldCaps.indexOf(c) >= 0) )
                         continue;
-                    List peers = locked_getPeers(c);
-                    if ( (peers != null) && (!peers.contains(peer)) )
+                    Set<Hash> peers = locked_getPeers(c);
+                    if (peers != null)
                         peers.add(peer);
                 }
             }
-        }
     }
     
-    private List locked_getPeers(char c) {
+    /** locking no longer req'd */
+    private Set<Hash> locked_getPeers(char c) {
         c = Character.toLowerCase(c);
         int i = c - 'a';
         if ( (i < 0) || (i >= _peersByCapability.length) ) {
@@ -204,18 +209,19 @@ class PeerManager {
     public void removeCapabilities(Hash peer) { 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Removing capabilities from " + peer.toBase64());
-        synchronized (_capabilitiesByPeer) {
+
             String oldCaps = (String)_capabilitiesByPeer.remove(peer);
             if (oldCaps != null) {
                 for (int i = 0; i < oldCaps.length(); i++) {
                     char c = oldCaps.charAt(i);
-                    List peers = locked_getPeers(c);
+                    Set<Hash> peers = locked_getPeers(c);
                     if (peers != null)
                         peers.remove(peer);
                 }
             }
-        }
     }
+
+/*******
     public Hash selectRandomByCapability(char capability) { 
         int index = _context.random().nextInt(Integer.MAX_VALUE);
         synchronized (_capabilitiesByPeer) {
@@ -227,20 +233,29 @@ class PeerManager {
         }
         return null;
     }
-    public List getPeersByCapability(char capability) { 
-        if (false) {
-            synchronized (_capabilitiesByPeer) {
-                List peers = locked_getPeers(capability);
-                if (peers != null)
-                    return new ArrayList(peers);
-            }
+********/
+
+    /**
+     *  The only user of this is TunnelPeerSelector for unreachables?
+     */
+    public List<Hash> getPeersByCapability(char capability) { 
+        if (true) {
+            Set<Hash> peers = locked_getPeers(capability);
+            if (peers != null)
+                return new ArrayList(peers);
             return null;
         } else {
+            // Wow this looks really slow...
+            // What is the point of keeping all the data structures above
+            // if we are going to go through the whole netdb anyway?
+            // Not sure why jrandom switched to do it this way,
+            // the checkin comments aren't clear...
+            // Since the locking is gone, switch back to the above.
             FloodfillNetworkDatabaseFacade f = (FloodfillNetworkDatabaseFacade)_context.netDb();
-            List routerInfos = f.getKnownRouterData();
-            List rv = new ArrayList();
-            for (Iterator iter = routerInfos.iterator(); iter.hasNext(); ) {
-                RouterInfo ri = (RouterInfo)iter.next();
+            List<RouterInfo> routerInfos = f.getKnownRouterData();
+            List<Hash> rv = new ArrayList();
+            for (Iterator<RouterInfo> iter = routerInfos.iterator(); iter.hasNext(); ) {
+                RouterInfo ri = iter.next();
                 String caps = ri.getCapabilities();
                 if (caps.indexOf(capability) >= 0)
                     rv.add(ri.getIdentity().calculateHash());
