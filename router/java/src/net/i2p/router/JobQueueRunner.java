@@ -23,12 +23,12 @@ class JobQueueRunner implements Runnable {
         _currentJob = null;
         _lastJob = null;
         _log = _context.logManager().getLog(JobQueueRunner.class);
-        _context.statManager().createRateStat("jobQueue.jobRun", "How long jobs take", "JobQueue", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
-        _context.statManager().createRateStat("jobQueue.jobRunSlow", "How long jobs that take over a second take", "JobQueue", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("jobQueue.jobRun", "How long jobs take", "JobQueue", new long[] { 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("jobQueue.jobRunSlow", "How long jobs that take over a second take", "JobQueue", new long[] { 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("jobQueue.jobLag", "How long jobs have to wait before running", "JobQueue", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
-        _context.statManager().createRateStat("jobQueue.jobWait", "How long does a job sit on the job queue?", "JobQueue", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
-        _context.statManager().createRateStat("jobQueue.jobRunnerInactive", "How long are runners inactive?", "JobQueue", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
-        _state = 1;
+        _context.statManager().createRateStat("jobQueue.jobWait", "How long does a job sit on the job queue?", "JobQueue", new long[] { 60*60*1000l, 24*60*60*1000l });
+        //_context.statManager().createRateStat("jobQueue.jobRunnerInactive", "How long are runners inactive?", "JobQueue", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+        //_state = 1;
     }
     
     final int getState() { return _state; }
@@ -41,16 +41,16 @@ class JobQueueRunner implements Runnable {
     public long getLastBegin() { return _lastBegin; }
     public long getLastEnd() { return _lastEnd; }
     public void run() {
-        _state = 2;
+        //_state = 2;
         long lastActive = _context.clock().now();
         long jobNum = 0;
         while ( (_keepRunning) && (_context.jobQueue().isAlive()) ) { 
-            _state = 3;
+            //_state = 3;
             try {
                 Job job = _context.jobQueue().getNext();
-                _state = 4;
+                //_state = 4;
                 if (job == null) {
-                    _state = 5;
+                    //_state = 5;
                     if (_context.router().isAlive())
                         if (_log.shouldLog(Log.ERROR))
                             _log.error("getNext returned null - dead?");
@@ -60,14 +60,14 @@ class JobQueueRunner implements Runnable {
 
                 long enqueuedTime = 0;
                 if (job instanceof JobImpl) {
-                    _state = 6;
+                    //_state = 6;
                     long when = ((JobImpl)job).getMadeReadyOn();
                     if (when <= 0) {
-                        _state = 7;
+                        //_state = 7;
                         _log.error("Job was not made ready?! " + job, 
                                    new Exception("Not made ready?!"));
                     } else {
-                        _state = 8;
+                        //_state = 8;
                         enqueuedTime = now - when;
                     }
                 }
@@ -75,27 +75,27 @@ class JobQueueRunner implements Runnable {
                 long betweenJobs = now - lastActive;
                 _currentJob = job;
                 _lastJob = null;
-                _state = 9;
+                //_state = 9;
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Runner " + _id + " running job " + job.getJobId() + ": " + job.getName());
                 long origStartAfter = job.getTiming().getStartAfter();
                 long doStart = _context.clock().now();
-                _state = 10;
+                //_state = 10;
                 job.getTiming().start();
                 runCurrentJob();
                 job.getTiming().end();
-                _state = 11;
+                //_state = 11;
                 long duration = job.getTiming().getActualEnd() - job.getTiming().getActualStart();
                 long beforeUpdate = _context.clock().now();
-                _state = 12;
+                //_state = 12;
                 _context.jobQueue().updateStats(job, doStart, origStartAfter, duration);
-                _state = 13;
+                //_state = 13;
                 long diff = _context.clock().now() - beforeUpdate;
 
                 long lag = doStart - origStartAfter;
                 if (lag < 0) lag = 0;
                 
-                _context.statManager().addRateData("jobQueue.jobRunnerInactive", betweenJobs, betweenJobs);
+                //_context.statManager().addRateData("jobQueue.jobRunnerInactive", betweenJobs, betweenJobs);
                 _context.statManager().addRateData("jobQueue.jobRun", duration, duration);
                 _context.statManager().addRateData("jobQueue.jobLag", lag, 0);
                 _context.statManager().addRateData("jobQueue.jobWait", enqueuedTime, enqueuedTime);
@@ -107,7 +107,7 @@ class JobQueueRunner implements Runnable {
                                   + ") on job " + _currentJob);
                 }
                 
-                _state = 14;
+                //_state = 14;
                 
                 if (diff > 100) {
                     if (_log.shouldLog(Log.WARN))
@@ -121,7 +121,7 @@ class JobQueueRunner implements Runnable {
                 _currentJob = null;
                 _lastEnd = lastActive;
                 jobNum++;
-                _state = 15;
+                //_state = 15;
                 
                 //if ( (jobNum % 10) == 0)
                 //    System.gc();
@@ -130,22 +130,22 @@ class JobQueueRunner implements Runnable {
                     _log.log(Log.CRIT, "WTF, error running?", t);
             }
         }
-        _state = 16;
+        //_state = 16;
         if (_context.router().isAlive())
             if (_log.shouldLog(Log.CRIT))
                 _log.log(Log.CRIT, "Queue runner " + _id + " exiting");
         _context.jobQueue().removeRunner(_id);
-        _state = 17;
+        //_state = 17;
     }
     
     private void runCurrentJob() {
         try {
-            _state = 18;
+            //_state = 18;
             _lastBegin = _context.clock().now();
             _currentJob.runJob();
-            _state = 19;
+            //_state = 19;
         } catch (OutOfMemoryError oom) {
-            _state = 20;
+            //_state = 20;
             try {
                 if (_log.shouldLog(Log.CRIT))
                     _log.log(Log.CRIT, "Router ran out of memory, shutting down", oom);
@@ -157,7 +157,7 @@ class JobQueueRunner implements Runnable {
             try { Thread.sleep(1000); } catch (InterruptedException ie) {}
             System.exit(-1);
         } catch (Throwable t) {
-            _state = 21;
+            //_state = 21;
             if (_log.shouldLog(Log.CRIT))
                 _log.log(Log.CRIT, "Error processing job [" + _currentJob.getName() 
                                    + "] on thread " + _id + ": " + t.getMessage(), t);
