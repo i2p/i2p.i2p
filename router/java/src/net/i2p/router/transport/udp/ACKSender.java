@@ -1,7 +1,10 @@
 package net.i2p.router.transport.udp;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
@@ -18,8 +21,9 @@ public class ACKSender implements Runnable {
     private UDPTransport _transport;
     private PacketBuilder _builder;
     /** list of peers (PeerState) who we have received data from but not yet ACKed to */
-    private final List _peersToACK;
+    private final BlockingQueue<PeerState> _peersToACK;
     private boolean _alive;
+    private static final long POISON_PS = -9999999999l;
     
     /** how frequently do we want to send ACKs to a peer? */
     static final int ACK_FREQUENCY = 500;
@@ -28,7 +32,7 @@ public class ACKSender implements Runnable {
         _context = ctx;
         _log = ctx.logManager().getLog(ACKSender.class);
         _transport = transport;
-        _peersToACK = new ArrayList(4);
+        _peersToACK = new LinkedBlockingQueue();
         _builder = new PacketBuilder(_context, transport);
         _alive = true;
         _context.statManager().createRateStat("udp.sendACKCount", "how many ack messages were sent to a peer", "udp", UDPTransport.RATES);
@@ -37,27 +41,34 @@ public class ACKSender implements Runnable {
         _context.statManager().createRateStat("udp.abortACK", "How often do we schedule up an ACK send only to find it had already been sent (through piggyback)?", "udp", UDPTransport.RATES);
     }
     
+    /**
+     *  Add to the queue.
+     *  For speed, don't check for duplicates here.
+     *  The runner will remove them in its own thread.
+     */
     public void ackPeer(PeerState peer) {
-        synchronized (_peersToACK) {
-            if (!_peersToACK.contains(peer))
-                _peersToACK.add(peer);
-            _peersToACK.notifyAll();
-        }
+        if (_alive)
+            _peersToACK.offer(peer);
     }
     
     public void startup() {
         _alive = true;
-        I2PThread t = new I2PThread(this, "UDP ACK sender");
-        t.setDaemon(true);
+        _peersToACK.clear();
+        I2PThread t = new I2PThread(this, "UDP ACK sender", true);
         t.start();
     }
     
     public void shutdown() { 
         _alive = false;
-        synchronized (_peersToACK) {
-            _peersToACK.clear();
-            _peersToACK.notifyAll();
+        PeerState poison = new PeerState(_context, _transport);
+        poison.setTheyRelayToUsAs(POISON_PS);
+        _peersToACK.offer(poison);
+        for (int i = 1; i <= 5 && !_peersToACK.isEmpty(); i++) {
+            try {
+                Thread.sleep(i * 50);
+            } catch (InterruptedException ie) {}
         }
+        _peersToACK.clear();
     }
     
     private long ackFrequency(long timeSinceACK, long rtt) {
@@ -71,47 +82,89 @@ public class ACKSender implements Runnable {
     }
     
     public void run() {
+
+        // we use a Set to strip out dups that come in on the Queue
+        Set<PeerState> notYet = new HashSet();
         while (_alive) {
             PeerState peer = null;
-            long now = _context.clock().now();
+            long now = 0;
             long remaining = -1;
-            try {
-                synchronized (_peersToACK) {
-                    for (int i = 0; i < _peersToACK.size(); i++) {
-                        PeerState cur = (PeerState)_peersToACK.get(i);
-                        long wanted = cur.getWantedACKSendSince();
-                        long delta = wanted + ackFrequency(now-cur.getLastACKSend(), cur.getRTT()) - now;
-                        if ( ( (wanted > 0) && (delta < 0) ) || (cur.unsentACKThresholdReached()) ) {
-                            _peersToACK.remove(i);
-                            peer = cur;
-                            break;
-                        } 
-                    }
-                    
-                    if (peer == null) {
-                        if (_peersToACK.size() <= 0)
-                            _peersToACK.wait();
+            long wanted = 0;
+
+                while (_alive) {
+                    // Pull from the queue until we find one ready to ack
+                    // Any that are not ready we will put back on the queue
+                    PeerState cur = null;
+                    try {
+                        if (notYet.isEmpty())
+                            // wait forever
+                            cur = _peersToACK.take();
                         else
-                            _peersToACK.wait(50);
-                    } else {
-                        remaining = _peersToACK.size();
-                    }
-                }
-            } catch (InterruptedException ie) {}
-                
+                            // Don't wait if nothing there, just put everybody back and sleep below
+                            cur = _peersToACK.poll();
+                    } catch (InterruptedException ie) {}
+
+                    if (cur != null) {
+                        if (cur.getTheyRelayToUsAs() == POISON_PS)
+                            return;
+                        wanted = cur.getWantedACKSendSince();
+                        now = _context.clock().now();
+                        long delta = wanted + ackFrequency(now-cur.getLastACKSend(), cur.getRTT()) - now;
+                        if (wanted <= 0) {
+                            // it got acked by somebody - discard, remove any dups, and go around again
+                            notYet.remove(cur);
+                        } else if ( (delta <= 0) || (cur.unsentACKThresholdReached()) ) {
+                            // found one to ack
+                            peer = cur;
+                            notYet.remove(cur); // in case a dup
+                            try {
+                                // bulk operations may throw an exception
+                                _peersToACK.addAll(notYet);
+                            } catch (Exception e) {}
+                            notYet.clear();
+                            break;
+                        } else { 
+                            // not yet, go around again
+                            // moving from the Queue to the Set and then back removes duplicates
+                            boolean added = notYet.add(cur);
+                            if (added && _log.shouldLog(Log.DEBUG))
+                                _log.debug("Pending ACK (delta = " + delta + ") for " + cur);
+                        } 
+                    } else if (!notYet.isEmpty()) {
+                        // put them all back and wait a while
+                        try {
+                            // bulk operations may throw an exception
+                            _peersToACK.addAll(notYet);
+                        } catch (Exception e) {}
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("sleeping, pending size = " + notYet.size());
+                        notYet.clear();
+                        try {
+                            // sleep a little longer than the divided frequency,
+                            // so it will be ready after we circle around a few times
+                            Thread.sleep(5 + (ACK_FREQUENCY / 3));
+                        } catch (InterruptedException ie) {}
+                    } // else go around again where we will wait at take()
+                } // inner while()
+                    
             if (peer != null) {
                 long lastSend = peer.getLastACKSend();
-                long wanted = peer.getWantedACKSendSince();
-                List ackBitfields = peer.retrieveACKBitfields(false);
+                // set above before the break
+                //long wanted = peer.getWantedACKSendSince();
+                List<ACKBitfield> ackBitfields = peer.retrieveACKBitfields(false);
                 
-                if (wanted < 0)
-                    _log.error("wtf, why are we acking something they dont want?  remaining=" + remaining + ", peer=" + peer + ", bitfields=" + ackBitfields);
+                if (wanted < 0) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("wtf, why are we acking something they dont want?  remaining=" + remaining + ", peer=" + peer + ", bitfields=" + ackBitfields);
+                    continue;
+                }
                 
-                if ( (ackBitfields != null) && (ackBitfields.size() > 0) ) {
+                if ( (ackBitfields != null) && (!ackBitfields.isEmpty()) ) {
                     _context.statManager().addRateData("udp.sendACKCount", ackBitfields.size(), 0);
                     if (remaining > 0)
                         _context.statManager().addRateData("udp.sendACKRemaining", remaining, 0);
-                    now = _context.clock().now();
+                    // set above before the break
+                    //now = _context.clock().now();
                     if (lastSend < 0)
                         lastSend = now - 1;
                     _context.statManager().addRateData("udp.ackFrequency", now-lastSend, now-wanted);
@@ -119,7 +172,7 @@ public class ACKSender implements Runnable {
                     UDPPacket ack = _builder.buildACK(peer, ackBitfields);
                     ack.markType(1);
                     ack.setFragmentCount(-1);
-                    ack.setMessageType(42);
+                    ack.setMessageType(PacketBuilder.TYPE_ACK);
                     
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Sending ACK for " + ackBitfields);

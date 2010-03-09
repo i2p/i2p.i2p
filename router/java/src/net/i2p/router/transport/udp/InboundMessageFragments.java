@@ -96,8 +96,8 @@ public class InboundMessageFragments /*implements UDPTransport.PartialACKSource 
         if (fragments <= 0) return fragments;
         Hash fromPeer = from.getRemotePeer();
             
-        Map messages = from.getInboundMessages();
-            
+        Map<Long, InboundMessageState> messages = from.getInboundMessages();
+
         for (int i = 0; i < fragments; i++) {
             long mid = data.readMessageId(i);
             Long messageId = new Long(mid);
@@ -122,7 +122,7 @@ public class InboundMessageFragments /*implements UDPTransport.PartialACKSource 
             boolean partialACK = false;
          
             synchronized (messages) {
-                state = (InboundMessageState)messages.get(messageId);
+                state = messages.get(messageId);
                 if (state == null) {
                     state = new InboundMessageState(_context, mid, fromPeer);
                     messages.put(messageId, state);

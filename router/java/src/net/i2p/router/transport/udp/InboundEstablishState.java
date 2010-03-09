@@ -21,17 +21,17 @@ import net.i2p.util.Log;
  *
  */
 public class InboundEstablishState {
-    private RouterContext _context;
-    private Log _log;
+    private final RouterContext _context;
+    private final Log _log;
     // SessionRequest message
     private byte _receivedX[];
     private byte _bobIP[];
-    private int _bobPort;
+    private final int _bobPort;
     private DHSessionKeyBuilder _keyBuilder;
     // SessionCreated message
     private byte _sentY[];
-    private byte _aliceIP[];
-    private int _alicePort;
+    private final byte _aliceIP[];
+    private final int _alicePort;
     private long _sentRelayTag;
     private long _sentSignedOnTime;
     private SessionKey _sessionKey;
@@ -44,11 +44,11 @@ public class InboundEstablishState {
     private boolean _verificationAttempted;
     private RouterIdentity _receivedConfirmedIdentity;
     // general status 
-    private long _establishBegin;
-    private long _lastReceive;
+    private final long _establishBegin;
+    //private long _lastReceive;
     // private long _lastSend;
     private long _nextSend;
-    private RemoteHostId _remoteHostId;
+    private final RemoteHostId _remoteHostId;
     private int _currentState;
     private boolean _complete;
     
@@ -121,9 +121,10 @@ public class InboundEstablishState {
     public synchronized SessionKey getMACKey() { return _macKey; }
 
     /** what IP do they appear to be on? */
-    public synchronized byte[] getSentIP() { return _aliceIP; }
+    public byte[] getSentIP() { return _aliceIP; }
+
     /** what port number do they appear to be coming from? */
-    public synchronized int getSentPort() { return _alicePort; }
+    public int getSentPort() { return _alicePort; }
     
     public synchronized byte[] getBobIP() { return _bobIP; }
     
@@ -205,8 +206,8 @@ public class InboundEstablishState {
     }
     
     /** how long have we been trying to establish this session? */
-    public synchronized long getLifetime() { return _context.clock().now() - _establishBegin; }
-    public synchronized long getEstablishBeginTime() { return _establishBegin; }
+    public long getLifetime() { return _context.clock().now() - _establishBegin; }
+    public long getEstablishBeginTime() { return _establishBegin; }
     public synchronized long getNextSendTime() { return _nextSend; }
     public synchronized void setNextSendTime(long when) { _nextSend = when; }
 
@@ -328,8 +329,7 @@ public class InboundEstablishState {
     }
     
     private void packetReceived() {
-        _lastReceive = _context.clock().now();
-        _nextSend = _lastReceive;
+        _nextSend = _context.clock().now();
     }
     
     @Override

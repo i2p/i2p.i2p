@@ -402,7 +402,7 @@ public class UDPPacketReader {
         
         @Override
         public String toString() {
-            StringBuilder buf = new StringBuilder(256);
+            StringBuilder buf = new StringBuilder(512);
             long msAgo = _context.clock().now() - readTimestamp()*1000;
             buf.append("Data packet sent ").append(msAgo).append("ms ago ");
             buf.append("IV ");

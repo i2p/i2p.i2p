@@ -6,12 +6,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.Base64;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.SessionKey;
 import net.i2p.router.RouterContext;
+import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 
 /**
@@ -23,17 +26,17 @@ public class IntroductionManager {
     private UDPTransport _transport;
     private PacketBuilder _builder;
     /** map of relay tag to PeerState that should receive the introduction */
-    private Map<Long, PeerState> _outbound;
+    private final Map<Long, PeerState> _outbound;
     /** list of peers (PeerState) who have given us introduction tags */
-    private final List<PeerState> _inbound;
+    private final Set<PeerState> _inbound;
 
     public IntroductionManager(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
         _log = ctx.logManager().getLog(IntroductionManager.class);
         _transport = transport;
         _builder = new PacketBuilder(ctx, transport);
-        _outbound = Collections.synchronizedMap(new HashMap(128));
-        _inbound = new ArrayList(128);
+        _outbound = new ConcurrentHashMap(128);
+        _inbound = new ConcurrentHashSet(128);
         ctx.statManager().createRateStat("udp.receiveRelayIntro", "How often we get a relayed request for us to talk to someone?", "udp", UDPTransport.RATES);
         ctx.statManager().createRateStat("udp.receiveRelayRequest", "How often we receive a good request to relay to someone else?", "udp", UDPTransport.RATES);
         ctx.statManager().createRateStat("udp.receiveRelayRequestBadTag", "Received relay requests with bad/expired tag", "udp", UDPTransport.RATES);
@@ -52,10 +55,7 @@ public class IntroductionManager {
         if (peer.getWeRelayToThemAs() > 0) 
             _outbound.put(new Long(peer.getWeRelayToThemAs()), peer);
         if (peer.getTheyRelayToUsAs() > 0) {
-            synchronized (_inbound) {
-                if (!_inbound.contains(peer))
                     _inbound.add(peer);
-            }
         }
     }
     
@@ -67,9 +67,7 @@ public class IntroductionManager {
         if (peer.getWeRelayToThemAs() > 0) 
             _outbound.remove(new Long(peer.getWeRelayToThemAs()));
         if (peer.getTheyRelayToUsAs() > 0) {
-            synchronized (_inbound) {
-                _inbound.remove(peer);
-            }
+            _inbound.remove(peer);
         }
     }
     
@@ -90,14 +88,11 @@ public class IntroductionManager {
      * and we want to keep our introducers valid.
      */
     public int pickInbound(Properties ssuOptions, int howMany) {
-        List<PeerState> peers = null;
         int start = _context.random().nextInt(Integer.MAX_VALUE);
-        synchronized (_inbound) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Picking inbound out of " + _inbound.size());
-            if (_inbound.size() <= 0) return 0;
-            peers = new ArrayList(_inbound);
-        }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Picking inbound out of " + _inbound.size());
+        if (_inbound.isEmpty()) return 0;
+        List<PeerState> peers = new ArrayList(_inbound);
         int sz = peers.size();
         start = start % sz;
         int found = 0;
@@ -164,9 +159,7 @@ public class IntroductionManager {
      * @return number of peers that have volunteerd to introduce us
      */
     int introducerCount() {
-        synchronized(_inbound) {
             return _inbound.size();
-        }
     }
 
     void receiveRelayIntro(RemoteHostId bob, UDPPacketReader reader) {

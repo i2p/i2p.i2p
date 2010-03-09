@@ -25,8 +25,7 @@ public class PacketPusher implements Runnable {
     
     public void startup() {
         _alive = true;
-        I2PThread t = new I2PThread(this, "UDP packet pusher");
-        t.setDaemon(true);
+        I2PThread t = new I2PThread(this, "UDP packet pusher", true);
         t.start();
     }
     
@@ -39,7 +38,8 @@ public class PacketPusher implements Runnable {
                 if (packets != null) {
                     for (int i = 0; i < packets.length; i++) {
                         if (packets[i] != null) // null for ACKed fragments
-                            _sender.add(packets[i], 0); // 0 does not block //100); // blocks for up to 100ms
+                            //_sender.add(packets[i], 0); // 0 does not block //100); // blocks for up to 100ms
+                            _sender.add(packets[i]);
                     }
                 }
             } catch (Exception e) {

@@ -33,71 +33,71 @@ class PeerTestState {
     public static final short BOB = 2;
     public static final short CHARLIE = 3;
     
-    public synchronized long getNonce() { return _testNonce; }
-    public synchronized void setNonce(long nonce) { _testNonce = nonce; }
+    public long getNonce() { return _testNonce; }
+    public void setNonce(long nonce) { _testNonce = nonce; }
     /** Are we Alice, bob, or Charlie. */
-    public synchronized short getOurRole() { return _ourRole; }
-    public synchronized void setOurRole(short role) { _ourRole = role; }
+    public short getOurRole() { return _ourRole; }
+    public void setOurRole(short role) { _ourRole = role; }
     /**
      * If we are Alice, this will contain the IP that Bob says we
      * can be reached at - the IP Charlie says we can be reached 
      * at is _aliceIPFromCharlie
      *
      */
-    public synchronized InetAddress getAliceIP() { return _aliceIP; }
-    public synchronized void setAliceIP(InetAddress ip) { _aliceIP = ip; }
-    public synchronized InetAddress getBobIP() { return _bobIP; }
-    public synchronized void setBobIP(InetAddress ip) { _bobIP = ip; }
-    public synchronized InetAddress getCharlieIP() { return _charlieIP; }
-    public synchronized void setCharlieIP(InetAddress ip) { _charlieIP = ip; }
-    public synchronized InetAddress getAliceIPFromCharlie() { return _aliceIPFromCharlie; }
-    public synchronized void setAliceIPFromCharlie(InetAddress ip) { _aliceIPFromCharlie = ip; }
+    public InetAddress getAliceIP() { return _aliceIP; }
+    public void setAliceIP(InetAddress ip) { _aliceIP = ip; }
+    public InetAddress getBobIP() { return _bobIP; }
+    public void setBobIP(InetAddress ip) { _bobIP = ip; }
+    public InetAddress getCharlieIP() { return _charlieIP; }
+    public void setCharlieIP(InetAddress ip) { _charlieIP = ip; }
+    public InetAddress getAliceIPFromCharlie() { return _aliceIPFromCharlie; }
+    public void setAliceIPFromCharlie(InetAddress ip) { _aliceIPFromCharlie = ip; }
     /**
      * If we are Alice, this will contain the port that Bob says we
      * can be reached at - the port Charlie says we can be reached
      * at is _alicePortFromCharlie
      *
      */
-    public synchronized int getAlicePort() { return _alicePort; }
-    public synchronized void setAlicePort(int alicePort) { _alicePort = alicePort; }
-    public synchronized int getBobPort() { return _bobPort; }
-    public synchronized void setBobPort(int bobPort) { _bobPort = bobPort; }
-    public synchronized int getCharliePort() { return _charliePort; }
-    public synchronized void setCharliePort(int charliePort) { _charliePort = charliePort; }
+    public int getAlicePort() { return _alicePort; }
+    public void setAlicePort(int alicePort) { _alicePort = alicePort; }
+    public int getBobPort() { return _bobPort; }
+    public void setBobPort(int bobPort) { _bobPort = bobPort; }
+    public int getCharliePort() { return _charliePort; }
+    public void setCharliePort(int charliePort) { _charliePort = charliePort; }
     
-    public synchronized int getAlicePortFromCharlie() { return _alicePortFromCharlie; }
-    public synchronized void setAlicePortFromCharlie(int alicePortFromCharlie) { _alicePortFromCharlie = alicePortFromCharlie; }
+    public int getAlicePortFromCharlie() { return _alicePortFromCharlie; }
+    public void setAlicePortFromCharlie(int alicePortFromCharlie) { _alicePortFromCharlie = alicePortFromCharlie; }
     
-    public synchronized SessionKey getAliceIntroKey() { return _aliceIntroKey; }
-    public synchronized void setAliceIntroKey(SessionKey key) { _aliceIntroKey = key; }
-    public synchronized SessionKey getCharlieIntroKey() { return _charlieIntroKey; }
-    public synchronized void setCharlieIntroKey(SessionKey key) { _charlieIntroKey = key; }
-    public synchronized SessionKey getBobCipherKey() { return _bobCipherKey; }
-    public synchronized void setBobCipherKey(SessionKey key) { _bobCipherKey = key; }
-    public synchronized SessionKey getBobMACKey() { return _bobMACKey; }
-    public synchronized void setBobMACKey(SessionKey key) { _bobMACKey = key; }
+    public SessionKey getAliceIntroKey() { return _aliceIntroKey; }
+    public void setAliceIntroKey(SessionKey key) { _aliceIntroKey = key; }
+    public SessionKey getCharlieIntroKey() { return _charlieIntroKey; }
+    public void setCharlieIntroKey(SessionKey key) { _charlieIntroKey = key; }
+    public SessionKey getBobCipherKey() { return _bobCipherKey; }
+    public void setBobCipherKey(SessionKey key) { _bobCipherKey = key; }
+    public SessionKey getBobMACKey() { return _bobMACKey; }
+    public void setBobMACKey(SessionKey key) { _bobMACKey = key; }
     
     /** when did this test begin? */
-    public synchronized long getBeginTime() { return _beginTime; }
-    public synchronized void setBeginTime(long when) { _beginTime = when; }
+    public long getBeginTime() { return _beginTime; }
+    public void setBeginTime(long when) { _beginTime = when; }
     /** when did we last send out a packet? */
-    public synchronized long getLastSendTime() { return _lastSendTime; }
-    public synchronized void setLastSendTime(long when) { _lastSendTime = when; }
+    public long getLastSendTime() { return _lastSendTime; }
+    public void setLastSendTime(long when) { _lastSendTime = when; }
     /** when did we last hear from alice? */
-    public synchronized long getReceiveAliceTime() { return _receiveAliceTime; }
-    public synchronized void setReceiveAliceTime(long when) { _receiveAliceTime = when; }
+    public long getReceiveAliceTime() { return _receiveAliceTime; }
+    public void setReceiveAliceTime(long when) { _receiveAliceTime = when; }
     /** when did we last hear from bob? */
-    public synchronized long getReceiveBobTime() { return _receiveBobTime; }
-    public synchronized void setReceiveBobTime(long when) { _receiveBobTime = when; }
+    public long getReceiveBobTime() { return _receiveBobTime; }
+    public void setReceiveBobTime(long when) { _receiveBobTime = when; }
     /** when did we last hear from charlie? */
-    public synchronized long getReceiveCharlieTime() { return _receiveCharlieTime; }
-    public synchronized void setReceiveCharlieTime(long when) { _receiveCharlieTime = when; }
+    public long getReceiveCharlieTime() { return _receiveCharlieTime; }
+    public void setReceiveCharlieTime(long when) { _receiveCharlieTime = when; }
     
     public int getPacketsRelayed() { return _packetsRelayed; }
     public void incrementPacketsRelayed() { ++_packetsRelayed; }
     
     @Override
-    public synchronized String toString() {
+    public String toString() {
         StringBuilder buf = new StringBuilder(512);
         buf.append("Role: ");
         if (_ourRole == ALICE) buf.append("Alice");

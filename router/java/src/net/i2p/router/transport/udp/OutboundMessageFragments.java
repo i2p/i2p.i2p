@@ -28,7 +28,7 @@ public class OutboundMessageFragments {
     private UDPTransport _transport;
     // private ActiveThrottle _throttle; // LINT not used ??
     /** peers we are actively sending messages to */
-    private final List _activePeers;
+    private final List<PeerState> _activePeers;
     private boolean _alive;
     /** which peer should we build the next packet out of? */
     private int _nextPeer;
@@ -207,7 +207,7 @@ public class OutboundMessageFragments {
         synchronized (_activePeers) {
             peers = new ArrayList(_activePeers.size());
             for (int i = 0; i < _activePeers.size(); i++) {
-                PeerState state = (PeerState)_activePeers.get(i);
+                PeerState state = _activePeers.get(i);
                 if (state.getOutboundMessageCount() <= 0) {
                     _activePeers.remove(i);
                     i--;
@@ -255,7 +255,7 @@ public class OutboundMessageFragments {
                             if (cycleTime > 1000)
                                 _context.statManager().addRateData("udp.sendCycleTimeSlow", cycleTime, _activePeers.size());
                         }
-                        peer = (PeerState)_activePeers.get(i);
+                        peer = _activePeers.get(i);
                         state = peer.allocateSend();
                         if (state != null) {
                             _nextPeer = i + 1;
@@ -318,12 +318,12 @@ public class OutboundMessageFragments {
                 return null;
 
             // ok, simplest possible thing is to always tack on the bitfields if
-            List msgIds = peer.getCurrentFullACKs();
+            List<Long> msgIds = peer.getCurrentFullACKs();
             if (msgIds == null) msgIds = new ArrayList();
-            List partialACKBitfields = new ArrayList();
+            List<ACKBitfield> partialACKBitfields = new ArrayList();
             peer.fetchPartialACKs(partialACKBitfields);
             int piggybackedPartialACK = partialACKBitfields.size();
-            List remaining = new ArrayList(msgIds);
+            List<Long> remaining = new ArrayList(msgIds);
             int sparseCount = 0;
             UDPPacket rv[] = new UDPPacket[fragments]; //sparse
             for (int i = 0; i < fragments; i++) {
@@ -356,7 +356,7 @@ public class OutboundMessageFragments {
             int piggybackedAck = 0;
             if (msgIds.size() != remaining.size()) {
                 for (int i = 0; i < msgIds.size(); i++) {
-                    Long id = (Long)msgIds.get(i);
+                    Long id = msgIds.get(i);
                     if (!remaining.contains(id)) {
                         peer.removeACKMessage(id);
                         piggybackedAck++;

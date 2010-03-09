@@ -2,8 +2,8 @@ package net.i2p.router.transport.udp;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
@@ -24,19 +24,20 @@ public class UDPReceiver {
     private Log _log;
     private DatagramSocket _socket;
     private String _name;
-    private final List _inboundQueue;
+    private final BlockingQueue<UDPPacket> _inboundQueue;
     private boolean _keepRunning;
     private Runner _runner;
     private UDPTransport _transport;
-    // private static int __id;
+    private static int __id;
     private int _id;
+    private static final int TYPE_POISON = -99999;
     
     public UDPReceiver(RouterContext ctx, UDPTransport transport, DatagramSocket socket, String name) {
         _context = ctx;
         _log = ctx.logManager().getLog(UDPReceiver.class);
-        _id++;
+        _id = ++__id;
         _name = name;
-        _inboundQueue = new ArrayList(128);
+        _inboundQueue = new LinkedBlockingQueue();
         _socket = socket;
         _transport = transport;
         _runner = new Runner();
@@ -50,17 +51,22 @@ public class UDPReceiver {
     public void startup() {
         //adjustDropProbability();
         _keepRunning = true;
-        I2PThread t = new I2PThread(_runner, _name + "." + _id);
-        t.setDaemon(true);
+        I2PThread t = new I2PThread(_runner, _name + '.' + _id, true);
         t.start();
     }
     
     public void shutdown() {
         _keepRunning = false;
-        synchronized (_inboundQueue) {
-            _inboundQueue.clear();
-            _inboundQueue.notifyAll();
+        _inboundQueue.clear();
+        UDPPacket poison = UDPPacket.acquire(_context, false);
+        poison.setMessageType(TYPE_POISON);
+        _inboundQueue.offer(poison);
+        for (int i = 1; i <= 5 && !_inboundQueue.isEmpty(); i++) {
+            try {
+                Thread.sleep(i * 50);
+            } catch (InterruptedException ie) {}
         }
+        _inboundQueue.clear();
     }
     
 /*********
@@ -96,6 +102,7 @@ public class UDPReceiver {
     private static final int ARTIFICIAL_DELAY_BASE = 0; //600;
 **********/
     
+    /** @return zero (was queue size) */
     private int receive(UDPPacket packet) {
 /*********
         //adjustDropProbability();
@@ -126,7 +133,12 @@ public class UDPReceiver {
         
         return doReceive(packet);
     }
+
+    /** @return zero (was queue size) */
     private final int doReceive(UDPPacket packet) {
+        if (!_keepRunning)
+            return 0;
+
         if (_log.shouldLog(Log.INFO))
             _log.info("Received: " + packet);
         
@@ -143,26 +155,25 @@ public class UDPReceiver {
         boolean rejected = false;
         int queueSize = 0;
         long headPeriod = 0;
-        synchronized (_inboundQueue) {
-            queueSize = _inboundQueue.size();
-            if (queueSize > 0) {
-                headPeriod = ((UDPPacket)_inboundQueue.get(0)).getLifetime();
+
+            UDPPacket head = _inboundQueue.peek();
+            if (head != null) {
+                headPeriod = head.getLifetime();
                 if (headPeriod > MAX_QUEUE_PERIOD) {
                     rejected = true;
-                    _inboundQueue.notifyAll();
                 }
             }
             if (!rejected) {
-                _inboundQueue.add(packet);
-                _inboundQueue.notifyAll();
-                return queueSize + 1;
+                _inboundQueue.offer(packet);
+                //return queueSize + 1;
+                return 0;
             }
-        }
         
         // rejected
         packet.release();
         _context.statManager().addRateData("udp.droppedInbound", queueSize, headPeriod);
         if (_log.shouldLog(Log.WARN)) {
+            queueSize = _inboundQueue.size();
             StringBuilder msg = new StringBuilder();
             msg.append("Dropping inbound packet with ");
             msg.append(queueSize);
@@ -188,21 +199,15 @@ public class UDPReceiver {
      */
     public UDPPacket receiveNext() {
         UDPPacket rv = null;
-        int remaining = 0;
-        while (_keepRunning) {
-            synchronized (_inboundQueue) {
-                if (_inboundQueue.size() <= 0)
-                    try { _inboundQueue.wait(); } catch (InterruptedException ie) {}
-                if (_inboundQueue.size() > 0) {
-                    rv = (UDPPacket)_inboundQueue.remove(0);
-                    remaining = _inboundQueue.size();
-                    if (remaining > 0)
-                        _inboundQueue.notifyAll();
-                    break;
-                }
-            }
+        //int remaining = 0;
+        while (_keepRunning && rv == null) {
+            try {
+                rv = _inboundQueue.take();
+            } catch (InterruptedException ie) {}
+            if (rv != null && rv.getMessageType() == TYPE_POISON)
+                return null;
         }
-        _context.statManager().addRateData("udp.receiveRemaining", remaining, 0);
+        //_context.statManager().addRateData("udp.receiveRemaining", remaining, 0);
         return rv;
     }
     

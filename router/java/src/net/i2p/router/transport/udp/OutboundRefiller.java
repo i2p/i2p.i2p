@@ -31,8 +31,7 @@ public class OutboundRefiller implements Runnable {
     
     public void startup() {
         _alive = true;
-        I2PThread t = new I2PThread(this, "UDP outbound refiller");
-        t.setDaemon(true);
+        I2PThread t = new I2PThread(this, "UDP outbound refiller", true);
         t.start();
     }
     public void shutdown() { _alive = false; }

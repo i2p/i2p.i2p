@@ -1,7 +1,7 @@
 package net.i2p.router.transport.udp;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
@@ -24,15 +24,17 @@ public class MessageReceiver {
     private Log _log;
     private UDPTransport _transport;
     /** list of messages (InboundMessageState) fully received but not interpreted yet */
-    private final List _completeMessages;
+    private final BlockingQueue<InboundMessageState> _completeMessages;
     private boolean _alive;
     private ByteCache _cache;
+    private static final int THREADS = 5;
+    private static final long POISON_IMS = -99999999999l;
     
     public MessageReceiver(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
         _log = ctx.logManager().getLog(MessageReceiver.class);
         _transport = transport;
-        _completeMessages = new ArrayList(16);
+        _completeMessages = new LinkedBlockingQueue();
         _cache = ByteCache.getInstance(64, I2NPMessage.MAX_SIZE);
         _context.statManager().createRateStat("udp.inboundExpired", "How many messages were expired before reception?", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.inboundRemaining", "How many messages were remaining when a message is pulled off the complete queue?", "udp", UDPTransport.RATES);
@@ -46,9 +48,8 @@ public class MessageReceiver {
     
     public void startup() {
         _alive = true;
-        for (int i = 0; i < 5; i++) {
-            I2PThread t = new I2PThread(new Runner(), "UDP message receiver " + i);
-            t.setDaemon(true);
+        for (int i = 0; i < THREADS; i++) {
+            I2PThread t = new I2PThread(new Runner(), "UDP message receiver " + i + '/' + THREADS, true);
             t.start();
         }
     }
@@ -61,26 +62,31 @@ public class MessageReceiver {
     
     public void shutdown() {
         _alive = false;
-        synchronized (_completeMessages) {
-            _completeMessages.clear();
-            _completeMessages.notifyAll();
+        _completeMessages.clear();
+        for (int i = 0; i < THREADS; i++) {
+            InboundMessageState ims = new InboundMessageState(_context, POISON_IMS, null);
+            _completeMessages.offer(ims);
         }
+        for (int i = 1; i <= 5 && !_completeMessages.isEmpty(); i++) {
+            try {
+                Thread.sleep(i * 50);
+            } catch (InterruptedException ie) {}
+        }
+        _completeMessages.clear();
     }
     
     public void receiveMessage(InboundMessageState state) {
-        int total = 0;
-        long lag = -1;
-        synchronized (_completeMessages) {
-            _completeMessages.add(state);
-            total = _completeMessages.size();
-            if (total > 1)
-                lag = ((InboundMessageState)_completeMessages.get(0)).getLifetime();
-            _completeMessages.notifyAll();
-        }
-        if (total > 1)
-            _context.statManager().addRateData("udp.inboundReady", total, 0);
-        if (lag > 1000)
-            _context.statManager().addRateData("udp.inboundLag", lag, total);
+        //int total = 0;
+        //long lag = -1;
+        if (_alive)
+            _completeMessages.offer(state);
+        //total = _completeMessages.size();
+        //if (total > 1)
+        //    lag = ((InboundMessageState)_completeMessages.get(0)).getLifetime();
+        //if (total > 1)
+        //    _context.statManager().addRateData("udp.inboundReady", total, 0);
+        //if (lag > 1000)
+        //    _context.statManager().addRateData("udp.inboundLag", lag, total);
     }
     
     public void loop(I2NPMessageHandler handler) {
@@ -91,19 +97,18 @@ public class MessageReceiver {
             long expiredLifetime = 0;
             int remaining = 0;
             try {
-                synchronized (_completeMessages) {
                     while (message == null) {
-                        if (_completeMessages.size() > 0) // grab the tail for lowest latency
-                            message = (InboundMessageState)_completeMessages.remove(_completeMessages.size()-1);
-                        else
-                            _completeMessages.wait(5000);
+                        message = _completeMessages.take();
+                        if ( (message != null) && (message.getMessageId() == POISON_IMS) ) {
+                            message = null;
+                            break;
+                        }
                         if ( (message != null) && (message.isExpired()) ) {
                             expiredLifetime += message.getLifetime();
                             message = null;
                             expired++;
                         }
-                        remaining = _completeMessages.size();
-                    }
+                        //remaining = _completeMessages.size();
                 }
             } catch (InterruptedException ie) {}
             
