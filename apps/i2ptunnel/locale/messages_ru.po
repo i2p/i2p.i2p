@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P i2ptunnel\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-04 09:53+0000\n"
-"PO-Revision-Date: 2010-03-04 12:28+0000\n"
+"POT-Creation-Date: 2010-03-06 00:05+0000\n"
+"PO-Revision-Date: 2010-03-06 00:08+0000\n"
 "Last-Translator: 4get <forget@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -26,51 +26,55 @@ msgstr "Для перехода по ссылке из локальной адр
 msgid "Click a link below to look for an address helper by using a \"jump\" service:"
 msgstr "Jump-сервисы, которые, возможно, знают нужную Вам addresshelper-ссылку:"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:362
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:363
 msgid "New Tunnel"
 msgstr "Новый туннель"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:382
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:383
 msgid "Standard client"
 msgstr "Обычный клиент"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:383
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:384
 msgid "HTTP client"
 msgstr "HTTP-клиент"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:384
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:385
 msgid "IRC client"
 msgstr "IRC-клиент"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:385
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:386
 msgid "Standard server"
 msgstr "Обычный сервер"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:386
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:387
 msgid "HTTP server"
 msgstr "HTTP-сервер"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:387
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:388
 msgid "SOCKS 4/4a/5 proxy"
 msgstr "SOCKS 4/4a/5 прокси"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:388
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:389
+msgid "SOCKS IRC proxy"
+msgstr "SOCKS IRC прокси"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:390
 msgid "CONNECT/SSL/HTTPS proxy"
 msgstr "CONNECT/SSL/HTTPS прокси"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:389
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:391
 msgid "IRC server"
 msgstr "IRC-сервер"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:390
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:392
 msgid "Streamr client"
 msgstr "Streamr-клиент"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:391
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:393
 msgid "Streamr server"
 msgstr "Streamr-сервер"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:392
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:394
 msgid "HTTP bidir"
 msgstr "HTTP bidir (экспериментальный двунаправленный режим, инструкцию спрашивайте у sponge)"
 
@@ -105,7 +109,7 @@ msgstr "Тип"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:120
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:120
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:226
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:357
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:358
 msgid "Description"
 msgstr "Описание"
 
@@ -638,12 +642,12 @@ msgid "New server tunnel"
 msgstr "Новый серверный туннель"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:236
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:367
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:368
 msgid "Standard"
 msgstr "Стандартный"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:238
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:369
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:370
 msgid "Create"
 msgstr "Создать"
 
@@ -661,15 +665,15 @@ msgid "Standby"
 msgstr "Режим ожидания"
 
 # This term intentionally left in English
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:345
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:346
 msgid "Outproxy"
 msgstr "Outproxy"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:349
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:350
 msgid "Destination"
 msgstr "Адрес назначения"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:365
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:366
 msgid "New client tunnel"
 msgstr "Новый клиентский туннель"
 
