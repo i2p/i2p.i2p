@@ -222,8 +222,8 @@ public class MessageOutputStream extends OutputStream {
                 // We've seen the queue blow up before, maybe it was this before the rewrite...
                 // So perhaps it IS wise to be "overly worried" ...
                 forceReschedule(_passiveFlushDelay);
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Enqueueing the flusher for " + _passiveFlushDelay + "ms out");
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Enqueueing the flusher for " + _passiveFlushDelay + "ms out");
             } else {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("NOT enqueing the flusher");
