@@ -50,7 +50,7 @@ public class SOCKSUDPUnwrapper implements Source, Sink {
 
         int headerlen = h.getBytes().length;
         byte unwrapped[] = new byte[data.length - headerlen];
-        System.arraycopy(unwrapped, 0, data, headerlen, unwrapped.length);
+        System.arraycopy(data, headerlen, unwrapped, 0, unwrapped.length);
         this.sink.send(dest, unwrapped);
     }
     
