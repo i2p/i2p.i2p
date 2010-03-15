@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.i2p.I2PAppContext;
 
 public class NavHelper {
-    private static Map<String, String> _apps = new ConcurrentHashMap();
+    private static Map<String, String> _apps = new ConcurrentHashMap(4);
     
     /**
      * To register a new client application so that it shows up on the router
@@ -28,7 +28,9 @@ public class NavHelper {
      *  Translated string is loaded by PluginStarter
      */
     public static String getClientAppLinks(I2PAppContext ctx) {
-        StringBuilder buf = new StringBuilder(1024); 
+        if (_apps.isEmpty())
+            return "";
+        StringBuilder buf = new StringBuilder(256); 
         for (Iterator<String> iter = _apps.keySet().iterator(); iter.hasNext(); ) {
             String name = iter.next();
             String path = _apps.get(name);
