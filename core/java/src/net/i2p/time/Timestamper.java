@@ -252,6 +252,8 @@ public class Timestamper implements Runnable {
     
     /**
      * Notify the listeners
+     *
+     * @since stratum param added in 0.7.12
      */
     private void stampTime(long now, int stratum) {
         long before = _context.clock().now();

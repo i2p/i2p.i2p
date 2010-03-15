@@ -19,7 +19,7 @@ public class TunnelBuildMessage extends I2NPMessageImpl {
         this(context, MAX_RECORD_COUNT);
     }
 
-    /** @since 0.7.10 */
+    /** @since 0.7.12 */
     protected TunnelBuildMessage(I2PAppContext context, int records) {
         super(context);
         if (records > 0) {
@@ -31,7 +31,7 @@ public class TunnelBuildMessage extends I2NPMessageImpl {
 
     public void setRecord(int index, ByteArray record) { _records[index] = record; }
     public ByteArray getRecord(int index) { return _records[index]; }
-    /** @since 0.7.10 */
+    /** @since 0.7.12 */
     public int getRecordCount() { return RECORD_COUNT; }
     
     public static final int RECORD_SIZE = 512+16;

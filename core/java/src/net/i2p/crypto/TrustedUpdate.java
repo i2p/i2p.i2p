@@ -404,6 +404,8 @@ D8usM7Dxp5yrDrCYZ5AIijc=
      * 
      * @return The version string read, or an empty string if no version string
      *         is present.
+     *
+     * @since 0.7.12
      */
     public static String getVersionString(InputStream inputStream) {
         try {
@@ -492,6 +494,8 @@ D8usM7Dxp5yrDrCYZ5AIijc=
      * 
      * @return <code>null</code> if the
      *         data was moved, and an error <code>String</code> otherwise.
+     *
+     * @since 0.7.12
      */
     public String migrateFile(File signedFile, File outputFile) {
         if (!signedFile.exists())

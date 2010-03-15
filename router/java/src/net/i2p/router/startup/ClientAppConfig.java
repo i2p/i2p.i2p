@@ -93,6 +93,8 @@ public class ClientAppConfig {
 
     /*
      * Go through the properties, and return a List of ClientAppConfig structures
+     *
+     * @since 0.7.12
      */
     public static List<ClientAppConfig> getClientApps(File cfgFile) {
         Properties clientApps = new Properties();
@@ -106,6 +108,8 @@ public class ClientAppConfig {
 
     /*
      * Go through the properties, and return a List of ClientAppConfig structures
+     *
+     * @since 0.7.12
      */
     private static List<ClientAppConfig> getClientApps(Properties clientApps) {
         List<ClientAppConfig> rv = new ArrayList(8);
