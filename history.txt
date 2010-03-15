@@ -1,3 +1,5 @@
+* 2010-03-15  0.7.12 released
+
 2010-03-13 zzz
     * Partial fix for i2ptunnel nonce troubles
 

@@ -1,21 +1,29 @@
 <!--
-<i2p.news date="$Date: 2010-02-15 00:00:00 $">
-<i2p.release version="0.7.11" date="2010/02/15" minVersion="0.6" />
+<i2p.news date="$Date: 2010-03-15 00:00:00 $">
+<i2p.release version="0.7.12" date="2010/03/15" minVersion="0.6" />
 -->
-<h4><ul><li>2010-02-15: <b>0.7.11 <a href="http://www.i2p2.i2p/release-0.7.11.html">Released</a></b></li></ul></h4>
+<h4><ul><li>2010-03-15: <b>0.7.12 <a href="http://www.i2p2.i2p/release-0.7.12.html">Released</a></b></li></ul></h4>
 <p>
-The 0.7.11 release fixes several issues, some related to clocks, which prevented new routers from quickly integrating into the network.
-It also fixes the installer for 64-bit Windows.
-The release includes an
-update to <a href="http://old.nabble.com/jetty-5.1.15,-6.1.18-and-7.0.0.M2-td23652819.html">Jetty 5.1.15</a>
-to fix <a href="http://www.kb.cert.org/vuls/id/402580">this vulnerability</a>.
+The 0.7.12 release contains support for user-generated plugins. These plugins may contain console web applications,
+themes, translations, or standalone programs.
+Some plugins are available for testing at
+<a href="http://i2pbote.i2p/">i2pbote.i2p</a>
+and
+<a href="http://stats.i2p/i2p/plugins/">stats.i2p</a>.
+We are hopeful this support will enable rapid development of innovative i2p applications.
+</p><p>
+The release fixes the blank-page bug when an eepsite is not reachable,
+and also improves handling of clock skews and IP changes.
+It adds support for a new, smaller tunnel build message,
+that will be tested in this release and enabled in the next release.
 </p><p>
 As usual, the release contains more anonymity and performance improvements,
-and an assortment of bug fixes.
+translation updates, and an assortment of other bug fixes.
 Upgrading is recommended.
 </p><p>
-We already have more big improvements in development for the next two releases.
-Please give the
+The last 6 months of development have dramatically increased the performance and capacity of the network.
+Please help grow the network.
+Give the
 developers feedback on <a href="irc://127.0.0.1:6668/i2p">IRC #i2p</a> or <a href="http://forum.i2p">forum.i2p</a>
 and <a href="http://www.i2p2.i2p/getinvolved.html">get involved</a>,
 spread the word,
