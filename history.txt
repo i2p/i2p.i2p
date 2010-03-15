@@ -1,3 +1,6 @@
+2010-03-013 zzz
+    * Partial fix for i2ptunnel nonce troubles
+
 2010-03-08 zzz
     * Floodfills: Increase max to 60 (was 28) and min to 45 (was 20)
     * i2psnark: Better track outgoing bandwidth by incrementing

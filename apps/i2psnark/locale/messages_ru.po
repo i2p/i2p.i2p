@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-02-23 08:02+0000\n"
-"PO-Revision-Date: 2010-02-23 08:27+0000\n"
+"POT-Creation-Date: 2010-03-13 09:42+0000\n"
+"PO-Revision-Date: 2010-03-13 09:44+0000\n"
 "Last-Translator: 4get <forget@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -114,92 +114,97 @@ msgstr "Ошибка соединения с I2P, проверьте настр�
 msgid "Error: Could not add the torrent {0}"
 msgstr "Ошибка: Не удалось добавить торрент {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:434
+#: ../java/src/org/klomp/snark/SnarkManager.java:430
+#, java-format
+msgid "Cannot open \"{0}\""
+msgstr "Не удалось открыть \"{0}\""
+
+#: ../java/src/org/klomp/snark/SnarkManager.java:443
 #, java-format
 msgid "Warning - Ignoring non-i2p tracker in \"{0}\", will announce to i2p open trackers only"
 msgstr "Внимание: указанные в \"{0}\" не-i2p трекеры будут проигнорированы, будут использоваться только открытые i2p трекеры"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:436
+#: ../java/src/org/klomp/snark/SnarkManager.java:445
 #, java-format
 msgid "Warning - Ignoring non-i2p tracker in \"{0}\", and open trackers are disabled, you must enable open trackers before starting the torrent!"
 msgstr "Внимание: указанные в \"{0}\" не-i2p трекеры будут проигнорированы, однако использование открытых i2p трекеров отключено, Вы должны включить поддержку открытых i2p трекеров перед запуском этого торрента!"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:455
+#: ../java/src/org/klomp/snark/SnarkManager.java:464
 #, java-format
 msgid "Torrent in \"{0}\" is invalid"
 msgstr "Торрент в \"{0}\" некорректен"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:470
+#: ../java/src/org/klomp/snark/SnarkManager.java:479
 #, java-format
 msgid "Torrent added and started: \"{0}\""
 msgstr "Торрент добавлен и запущен: \"{0}\""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:472
+#: ../java/src/org/klomp/snark/SnarkManager.java:481
 #, java-format
 msgid "Torrent added: \"{0}\""
 msgstr "Торрент добавлен: \"{0}\""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:569
+#: ../java/src/org/klomp/snark/SnarkManager.java:578
 #, java-format
 msgid "Too many files in \"{0}\" ({1}), deleting it!"
 msgstr "Слишком много файлов в торренте \"{0}\" ({1}), удаляем его!"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:571
+#: ../java/src/org/klomp/snark/SnarkManager.java:580
 #, java-format
 msgid "Torrent file \"{0}\" cannot end in \".torrent\", deleting it!"
 msgstr "Торрент \"{0}\" содержит единственный файл заканчивающийся на \".torrent\", удаляем его!"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:573
+#: ../java/src/org/klomp/snark/SnarkManager.java:582
 #, java-format
 msgid "No pieces in \"{0}\",  deleting it!"
 msgstr "В торренте \"{0}\" не оказалось ни одной части, удаляем его!"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:575
+#: ../java/src/org/klomp/snark/SnarkManager.java:584
 #, java-format
 msgid "Too many pieces in \"{0}\", limit is {1}, deleting it!"
 msgstr "Слишком много частей в торренте \"{0}\" (наш предел {1}), удаляем его!"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:577
+#: ../java/src/org/klomp/snark/SnarkManager.java:586
 #, java-format
 msgid "Pieces are too large in \"{0}\" ({1}B), deleting it."
 msgstr "Слишком крупные части в торренте \"{0}\" ({1}B), удаляем его."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:578
+#: ../java/src/org/klomp/snark/SnarkManager.java:587
 #, java-format
 msgid "Limit is {0}B"
 msgstr "Наш предел {0}B"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:586
+#: ../java/src/org/klomp/snark/SnarkManager.java:595
 #, java-format
 msgid "Torrents larger than {0}B are not supported yet, deleting \"{1}\""
 msgstr "Торренты крупнее чем {0}B пока не поддерживается, удаляем \"{1}\""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:602
+#: ../java/src/org/klomp/snark/SnarkManager.java:611
 #, java-format
 msgid "Error: Could not remove the torrent {0}"
 msgstr "Ошибка: Невозможно удалить торрент {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:623
+#: ../java/src/org/klomp/snark/SnarkManager.java:632
 #, java-format
 msgid "Torrent stopped: \"{0}\""
 msgstr "Торрент остановлен: \"{0}\""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:638
+#: ../java/src/org/klomp/snark/SnarkManager.java:647
 #, java-format
 msgid "Torrent removed: \"{0}\""
 msgstr "Торрент удален: \"{0}\""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:671
+#: ../java/src/org/klomp/snark/SnarkManager.java:680
 #, java-format
 msgid "Download finished: \"{0}\""
 msgstr "Завершена загрузка: \"{0}\""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:671
+#: ../java/src/org/klomp/snark/SnarkManager.java:680
 #, java-format
 msgid "size: {0}B"
 msgstr "размер: {0}B"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:699
+#: ../java/src/org/klomp/snark/SnarkManager.java:708
 msgid "Unable to connect to I2P!"
 msgstr "Не удалось установить соединение с I2P!"
 

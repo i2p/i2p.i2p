@@ -39,8 +39,10 @@ public class IndexBean {
     private String _action;
     private int _tunnel;
     private long _prevNonce;
+    private long _prevNonce2;
     private long _curNonce;
     private long _nextNonce;
+    /** deprecated unimplemented, now using routerconsole realm */
     private String _passphrase;
 
     private String _type;
@@ -79,8 +81,10 @@ public class IndexBean {
     public static final int NOT_RUNNING = 3;
     public static final int STANDBY = 4;
     
+    /** deprecated unimplemented, now using routerconsole realm */
     public static final String PROP_TUNNEL_PASSPHRASE = "i2ptunnel.passphrase";
     static final String PROP_NONCE = IndexBean.class.getName() + ".nonce";
+    static final String PROP_NONCE_OLD = PROP_NONCE + '2';
     static final String CLIENT_NICKNAME = "shared clients";
     
     public static final String PROP_THEME_NAME = "routerconsole.theme";
@@ -96,10 +100,16 @@ public class IndexBean {
         _tunnel = -1;
         _curNonce = -1;
         _prevNonce = -1;
+        _prevNonce2 = -1;
         try { 
+            String nonce2 = System.getProperty(PROP_NONCE_OLD);
+            if (nonce2 != null)
+                _prevNonce2 = Long.parseLong(nonce2);
             String nonce = System.getProperty(PROP_NONCE);
-            if (nonce != null)
+            if (nonce != null) {
                 _prevNonce = Long.parseLong(nonce);
+                System.setProperty(PROP_NONCE_OLD, nonce);
+            }
         } catch (NumberFormatException nfe) {}
         _nextNonce = _context.random().nextLong();
         System.setProperty(PROP_NONCE, Long.toString(_nextNonce));
@@ -117,6 +127,7 @@ public class IndexBean {
         }
     }
 
+    /** deprecated unimplemented, now using routerconsole realm */
     public void setPassphrase(String phrase) {
         _passphrase = phrase;
     }
@@ -134,6 +145,7 @@ public class IndexBean {
         }
     }
     
+    /** deprecated unimplemented, now using routerconsole realm */
     private boolean validPassphrase(String proposed) {
         if (proposed == null) return false;
         String pass = _context.getProperty(PROP_TUNNEL_PASSPHRASE);
@@ -146,7 +158,7 @@ public class IndexBean {
     private String processAction() {
         if ( (_action == null) || (_action.trim().length() <= 0) || ("Cancel".equals(_action)))
             return "";
-        if ( (_prevNonce != _curNonce) && (!validPassphrase(_passphrase)) )
+        if ( (_prevNonce != _curNonce) && (_prevNonce2 != _curNonce) && (!validPassphrase(_passphrase)) )
             return "Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.";
         if ("Stop all".equals(_action)) 
             return stopAll();

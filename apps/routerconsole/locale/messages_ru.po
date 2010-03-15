@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-04 09:52+0000\n"
-"PO-Revision-Date: 2010-03-04 12:24+0000\n"
+"POT-Creation-Date: 2010-03-06 00:05+0000\n"
+"PO-Revision-Date: 2010-03-13 09:35+0000\n"
 "Last-Translator: 4get <forget@mail.i2p>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -71,6 +71,45 @@ msgstr "Принимаем туннели"
 #: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:487
 msgid "Rejecting tunnels"
 msgstr "Не принимаем туннели"
+
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:46
+msgid "Ensure that nothing blocks outbound HTTP, check <a href=logs.jsp>logs</a> and if nothing helps, read FAQ about reseeding manually."
+msgstr "Убедитесь, что исходящие HTTP-запросы ничем не блокируются, загляните в <a href=logs.jsp>журналы ошибок</a> и если ничто не помогло, прочтите в FAQ инструкцию по начальной загрузке вручную."
+
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:78
+msgid "Reseeding"
+msgstr "Производится начальная загрузка"
+
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:142
+msgid "Reseeding: fetching seed URL."
+msgstr "Производится начальная загрузка: загружается URL каталога маршрутизаторов."
+
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:148
+msgid "Last reseed failed fully (failed reading seed URL)."
+msgstr "Предыдущая попытка начальной загрузки полностью провалилась (не удалось загрузить URL каталога маршрутизаторов)"
+
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:174
+msgid "Last reseed failed fully (no routerInfo URLs at seed URL)."
+msgstr "Предыдущая попытка начальной загрузки полностью провалилась (не удалось найти список routerInfo-ссылок в загруженном каталоге)"
+
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:187
+#, java-format
+msgid "Reseeding: fetching router info from seed URL ({0} successful, {1} errors)."
+msgstr "Производится начальная загрузка: получение информации о маршрутизаторах ({0} удачно, {1} ошибок)."
+
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:208
+#, java-format
+msgid "Last reseed failed partly ({0}% of {1})."
+msgstr "Предыдущая попытка начальной загрузки частично не удалась ({0}% из {1})."
+
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:213
+#, java-format
+msgid "Last reseed failed ({0}% of {1})."
+msgstr "Предыдущая попытка начальной загрузки почти полностью провалилась ({0}% из {1})."
+
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:223
+msgid "Last reseed failed fully (exception caught)."
+msgstr "Предыдущая попытка начальной загрузки полностью провалилась (произошла необрабатываемая ошибка)."
 
 #: ../../../router/java/src/net/i2p/router/transport/GetBidsJob.java:70
 msgid "No transports (hidden or starting up?)"
@@ -1104,20 +1143,9 @@ msgstr "Запустить"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:135
 #: ../java/src/net/i2p/router/web/ConfigKeyringHandler.java:49
+#: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:61
 msgid "Unsupported"
 msgstr "Не поддерживается"
-
-# This term intentionally left in English
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:150
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:166
-msgid "desc"
-msgstr "desc"
-
-# This term intentionally left in English
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:161
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:176
-msgid "name"
-msgstr "name"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:181
 msgid "New client added"
@@ -1169,11 +1197,6 @@ msgstr "Не удалось запустить"
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:270
 msgid "Failed to find server."
 msgstr "Не удалось найти сервер."
-
-# This term intentionally left in English
-#: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:274
-msgid "pluginURL"
-msgstr "pluginURL"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:276
 msgid "No plugin URL specified."
@@ -1967,6 +1990,10 @@ msgstr "Только скачать и проверить целостность
 #: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:123
 msgid "Download, verify, and restart"
 msgstr "Скачать, проверить и обновить I2P"
+
+#: ../java/src/net/i2p/router/web/FormHandler.java:163
+msgid "Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit."
+msgstr "Форма не принята, скорее всего это произошло из-за того, что Вы нажимали кнопку \"Назад\" или \"Обновить\" в браузере. Пожалуйста, заполните форму заново."
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:128
 msgid "Configure Graph Display"
@@ -4513,9 +4540,4 @@ msgstr "обзор туннелей"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:227
 msgid "I2P Tunnel Summary"
 msgstr "Обзор туннелей I2P"
-
-#~ msgid "Show the router's workload, and how it's performing"
-#~ msgstr "Просмотр загрузки маршрутизатора и эффективности его работы"
-#~ msgid "Jobs"
-#~ msgstr "Задачи"
 
