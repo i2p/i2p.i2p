@@ -187,6 +187,7 @@ class BuildRequestor {
             SHORT_ORDER.add(Integer.valueOf(i));
     }
 
+    /** @since 0.7.12 */
     private static boolean supportsVariable(RouterContext ctx, Hash h) {
         RouterInfo ri = ctx.netDb().lookupRouterInfoLocally(h);
         if (ri == null)

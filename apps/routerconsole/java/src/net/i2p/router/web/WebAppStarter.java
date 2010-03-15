@@ -15,13 +15,14 @@ import org.mortbay.jetty.servlet.WebApplicationContext;
 
 
 /**
- *  Start a webappapp classpath as specified in webapps.config.
+ *  Add, start or stop a webapp.
+ *  Add to the webapp classpath if specified in webapps.config.
  *
  *  Sadly, setting Class-Path in MANIFEST.MF doesn't work for jetty wars.
- *  We could look there ourselves, or look for another properties file in the war,
+ *  See WebAppConfiguration for more information.
  *  but let's just do it in webapps.config.
  *
- *  No, wac.addClassPath() does not work.
+ *  No, wac.addClassPath() does not work. For more info see:
  *
  *  http://servlets.com/archive/servlet/ReadMsg?msgId=511113&listName=jetty-support
  *

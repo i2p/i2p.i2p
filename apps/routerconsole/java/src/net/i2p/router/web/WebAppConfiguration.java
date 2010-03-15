@@ -16,7 +16,7 @@ import org.mortbay.jetty.servlet.WebApplicationContext;
  *  individual jars and not lib/*.jar specified in wrapper.config.
  *
  *  A sample line in webapps.config is:
- *     webapps.appname.path=foo.jar,$I2P/lib/bar.jar
+ *     webapps.appname.classpath=foo.jar,$I2P/lib/bar.jar
  *  Unless $I2P is specified the path will be relative to $I2P/lib for
  *  webapps in the installation and appDir/plugins/appname/lib for plugins.
  *

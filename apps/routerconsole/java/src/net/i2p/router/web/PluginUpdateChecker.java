@@ -17,18 +17,13 @@ import net.i2p.util.PartialEepGet;
 import net.i2p.util.VersionComparator;
 
 /**
- * Download and install a plugin.
+ * Check for an updated version of a plugin.
  * A plugin is a standard .sud file with a 40-byte signature,
  * a 16-byte version, and a .zip file.
- * Unlike for router updates, we need not have the public key
- * for the signature in advance.
  *
- * The zip file must have a standard directory layout, with
- * a plugin.config file at the top level.
- * The config file contains properties for the package name, version,
- * signing public key, and other settings.
- * The zip file will typically contain a webapps/ or lib/ dir,
- * and a webapps.config and/or clients.config file.
+ * So we get the current version and update URL for the installed plugin,
+ * then fetch the first 56 bytes of the URL, extract the version,
+ * and compare.
  *
  * @since 0.7.12
  * @author zzz

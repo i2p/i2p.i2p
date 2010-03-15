@@ -506,6 +506,7 @@ class BuildExecutor implements Runnable {
     /**
      *  Only do this for non-fallback tunnels.
      *  @return true if refused because of a duplicate key
+     *  @since 0.7.12
      */
     private boolean addToBuilding(PooledTunnelCreatorConfig cfg) {
         //_log.error("Adding ID: " + cfg.getReplyMessageId() + "; size was: " + _currentlyBuildingMap.size());
@@ -521,6 +522,7 @@ class BuildExecutor implements Runnable {
      *  But that's ok. A peer that rejects slowly gets penalized twice, for example.
      *
      *  @return ptcc or null
+     *  @since 0.7.12
      */
     PooledTunnelCreatorConfig removeFromBuilding(long id) {
         //_log.error("Removing ID: " + id + "; size was: " + _currentlyBuildingMap.size());
