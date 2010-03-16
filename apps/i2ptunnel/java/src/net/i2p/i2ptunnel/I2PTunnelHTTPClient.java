@@ -203,7 +203,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             if (size <= 0) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Proxy list is empty - no outproxy available");
-                l.log("Proxy list is emtpy - no outproxy available");
+                l.log("Proxy list is empty - no outproxy available");
                 return null;
             }
             int index = I2PAppContext.getGlobalContext().random().nextInt(size);
