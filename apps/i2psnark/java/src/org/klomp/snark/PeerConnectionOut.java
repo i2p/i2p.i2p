@@ -163,10 +163,22 @@ class PeerConnectionOut implements Runnable
                   removeMessage(Message.PIECE);
 
                 // XXX - Should also register overhead...
-                if (m.type == Message.PIECE)
-                  state.uploaded(m.len);
+                // Don't let other clients requesting big chunks get an advantage
+                // when we are seeding;
+                // only count the rest of the upload after sendMessage().
+                int remainder = 0;
+                if (m.type == Message.PIECE) {
+                  if (m.len <= PeerState.PARTSIZE) {
+                     state.uploaded(m.len);
+                  } else {
+                     state.uploaded(PeerState.PARTSIZE);
+                     remainder = m.len - PeerState.PARTSIZE;
+                  }
+                }
 
                 m.sendMessage(dout);
+                if (remainder > 0)
+                  state.uploaded(remainder);
                 m = null;
               }
           }
