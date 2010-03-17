@@ -36,7 +36,7 @@ public class Reseeder {
     // Reject unreasonably big files, because we download into a ByteArrayOutputStream.
     private static final long MAX_RESEED_RESPONSE_SIZE = 1024 * 1024;
 
-    private static final String DEFAULT_SEED_URL = "http://a.netdb.i2p2.de/,http://b.netdb.i2p2.de/,http://c.netdb.i2p2.de/,http://reseed.i2p-projekt.de/,http://i2pbote.net/netDb/";
+    private static final String DEFAULT_SEED_URL = "http://a.netdb.i2p2.de/,http://b.netdb.i2p2.de/,http://c.netdb.i2p2.de/,http://reseed.i2p-projekt.de/,http://i2pbote.net/netDb/,http://r31453.ovh.net/static_media/netDb/";
     private static final String PROP_INPROGRESS = "net.i2p.router.web.ReseedHandler.reseedInProgress";
     private static final String PROP_ERROR = "net.i2p.router.web.ReseedHandler.errorMessage";
     private static final String PROP_STATUS = "net.i2p.router.web.ReseedHandler.statusMessage";
@@ -152,7 +152,7 @@ public class Reseeder {
                     return;
                 }
                 String content = new String(contentRaw);
-                Set urls = new HashSet();
+                Set<String> urls = new HashSet(1024);
                 int cur = 0;
                 int total = 0;
                 while (total++ < 1000) {
@@ -176,17 +176,17 @@ public class Reseeder {
                     return;
                 }
 
-                List urlList = new ArrayList(urls);
+                List<String> urlList = new ArrayList(urls);
                 Collections.shuffle(urlList);
                 int fetched = 0;
                 int errors = 0;
                 // 200 max from one URL
-                for (Iterator iter = urlList.iterator(); iter.hasNext() && fetched < 200; ) {
+                for (Iterator<String> iter = urlList.iterator(); iter.hasNext() && fetched < 200; ) {
                     try {
                         System.setProperty(PROP_STATUS,
                             _("Reseeding: fetching router info from seed URL ({0} successful, {1} errors).", fetched, errors));
 
-                        fetchSeed(seedURL, (String)iter.next());
+                        fetchSeed(seedURL, iter.next());
                         fetched++;
                         if (echoStatus) {
                             System.out.print(".");
