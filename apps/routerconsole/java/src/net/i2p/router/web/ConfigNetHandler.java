@@ -298,6 +298,9 @@ public class ConfigNetHandler extends FormHandler {
         _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
     }
     
+    private static final int DEF_BURST_PCT = 10;
+    private static final int DEF_BURST_TIME = 20;
+
     private void updateRates() {
         boolean updated = false;
 
@@ -310,14 +313,27 @@ public class ConfigNetHandler extends FormHandler {
             }
         }
 
+        // Since burst is now hidden in the gui, set burst to +10% for 20 seconds
         if ( (_inboundRate != null) && (_inboundRate.length() > 0) &&
             !_inboundRate.equals(_context.getProperty(FIFOBandwidthRefiller.PROP_INBOUND_BANDWIDTH, "" + FIFOBandwidthRefiller.DEFAULT_INBOUND_BANDWIDTH))) {
             _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_INBOUND_BANDWIDTH, _inboundRate);
+            try {
+                int rate = Integer.parseInt(_inboundRate) * (100 + DEF_BURST_PCT) / 100;
+                int kb = DEF_BURST_TIME * rate;
+                _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_INBOUND_BURST_BANDWIDTH, "" + rate);
+                _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_INBOUND_BANDWIDTH_PEAK, "" + kb);
+            } catch (NumberFormatException nfe) {}
             updated = true;
         }
         if ( (_outboundRate != null) && (_outboundRate.length() > 0) &&
             !_outboundRate.equals(_context.getProperty(FIFOBandwidthRefiller.PROP_OUTBOUND_BANDWIDTH, "" + FIFOBandwidthRefiller.DEFAULT_OUTBOUND_BANDWIDTH))) {
             _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_OUTBOUND_BANDWIDTH, _outboundRate);
+            try {
+                int rate = Integer.parseInt(_outboundRate) * (100 + DEF_BURST_PCT) / 100;
+                int kb = DEF_BURST_TIME * rate;
+                _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_OUTBOUND_BURST_BANDWIDTH, "" + rate);
+                _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_OUTBOUND_BANDWIDTH_PEAK, "" + kb);
+            } catch (NumberFormatException nfe) {}
             updated = true;
         }
 
