@@ -42,8 +42,6 @@ public class IndexBean {
     private long _prevNonce2;
     private long _curNonce;
     private long _nextNonce;
-    /** deprecated unimplemented, now using routerconsole realm */
-    private String _passphrase;
 
     private String _type;
     private String _name;
@@ -82,7 +80,8 @@ public class IndexBean {
     public static final int STANDBY = 4;
     
     /** deprecated unimplemented, now using routerconsole realm */
-    public static final String PROP_TUNNEL_PASSPHRASE = "i2ptunnel.passphrase";
+    //public static final String PROP_TUNNEL_PASSPHRASE = "i2ptunnel.passphrase";
+    public static final String PROP_TUNNEL_PASSPHRASE = "consolePassword";
     static final String PROP_NONCE = IndexBean.class.getName() + ".nonce";
     static final String PROP_NONCE_OLD = PROP_NONCE + '2';
     static final String CLIENT_NICKNAME = "shared clients";
@@ -129,7 +128,6 @@ public class IndexBean {
 
     /** deprecated unimplemented, now using routerconsole realm */
     public void setPassphrase(String phrase) {
-        _passphrase = phrase;
     }
     
     public void setAction(String action) {
@@ -145,20 +143,16 @@ public class IndexBean {
         }
     }
     
-    /** deprecated unimplemented, now using routerconsole realm */
-    private boolean validPassphrase(String proposed) {
-        if (proposed == null) return false;
+    /** just check if console password option is set, jetty will do auth */
+    private boolean validPassphrase() {
         String pass = _context.getProperty(PROP_TUNNEL_PASSPHRASE);
-        if ( (pass != null) && (pass.trim().length() > 0) ) 
-            return pass.trim().equals(proposed.trim());
-        else
-            return false;
+        return pass != null && pass.trim().length() > 0;
     }
     
     private String processAction() {
         if ( (_action == null) || (_action.trim().length() <= 0) || ("Cancel".equals(_action)))
             return "";
-        if ( (_prevNonce != _curNonce) && (_prevNonce2 != _curNonce) && (!validPassphrase(_passphrase)) )
+        if ( (_prevNonce != _curNonce) && (_prevNonce2 != _curNonce) && (!validPassphrase()) )
             return "Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.";
         if ("Stop all".equals(_action)) 
             return stopAll();
