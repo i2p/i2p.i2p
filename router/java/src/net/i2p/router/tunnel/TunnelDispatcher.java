@@ -386,7 +386,7 @@ public class TunnelDispatcher implements Service {
      *
      */
     public void dispatch(TunnelGatewayMessage msg) {
-        long before = System.currentTimeMillis();
+        long before = _context.clock().now();
         TunnelGateway gw = _inboundGateways.get(msg.getTunnelId());
         if (gw != null) {
             if (_log.shouldLog(Log.DEBUG))
@@ -423,7 +423,7 @@ public class TunnelDispatcher implements Service {
                            + " existing = " + _inboundGateways.size(), new Exception("source"));
         }
         
-        long dispatchTime = System.currentTimeMillis() - before;
+        long dispatchTime = _context.clock().now() - before;
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Dispatch in gw time: " + dispatchTime + " gateway? " + gw);
