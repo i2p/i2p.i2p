@@ -1,10 +1,10 @@
 package net.i2p.client.streaming;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
@@ -32,14 +32,13 @@ public class ConnectionManager {
     private ConnectionPacketHandler _conPacketHandler;
     private TCBShare _tcbShare;
     /** Inbound stream ID (Long) to Connection map */
-    private Map _connectionByInboundId;
+    private ConcurrentHashMap<Long, Connection> _connectionByInboundId;
     /** Ping ID (Long) to PingRequest */
-    private final Map _pendingPings;
+    private final Map<Long, PingRequest> _pendingPings;
     private boolean _allowIncoming;
     private int _maxConcurrentStreams;
     private ConnectionOptions _defaultOptions;
     private volatile int _numWaiting;
-    private final Object _connectionLock;
     private long SoTimeout;
     
     public ConnectionManager(I2PAppContext context, I2PSession session, int maxConcurrent, ConnectionOptions defaultOptions) {
@@ -48,9 +47,8 @@ public class ConnectionManager {
         _maxConcurrentStreams = maxConcurrent;
         _defaultOptions = defaultOptions;
         _log = _context.logManager().getLog(ConnectionManager.class);
-        _connectionByInboundId = new HashMap(32);
-        _pendingPings = new HashMap(4);
-        _connectionLock = new Object();
+        _connectionByInboundId = new ConcurrentHashMap(32);
+        _pendingPings = new ConcurrentHashMap(4);
         _messageHandler = new MessageHandler(_context, this);
         _packetHandler = new PacketHandler(_context, this);
         _connectionHandler = new ConnectionHandler(_context, this);
@@ -77,22 +75,17 @@ public class ConnectionManager {
     }
     
     Connection getConnectionByInboundId(long id) {
-        synchronized (_connectionLock) {
-            return (Connection)_connectionByInboundId.get(new Long(id));
-        }
+        return _connectionByInboundId.get(Long.valueOf(id));
     }
     /** 
      * not guaranteed to be unique, but in case we receive more than one packet
      * on an inbound connection that we havent ack'ed yet...
      */
     Connection getConnectionByOutboundId(long id) {
-        synchronized (_connectionLock) {
-            for (Iterator iter = _connectionByInboundId.values().iterator(); iter.hasNext(); ) {
-                Connection con = (Connection)iter.next();
+            for (Connection con : _connectionByInboundId.values()) {
                 if (DataHelper.eq(con.getSendStreamId(), id))
                     return con;
             }
-        }
         return null;
     }
     
@@ -135,27 +128,26 @@ public class ConnectionManager {
         boolean reject = false;
         int active = 0;
         int total = 0;
-        synchronized (_connectionLock) {
-            total = _connectionByInboundId.size();
-            for (Iterator iter = _connectionByInboundId.values().iterator(); iter.hasNext(); ) {
-                if ( ((Connection)iter.next()).getIsConnected() )
-                    active++;
-            }
+
+            // just for the stat
+            //total = _connectionByInboundId.size();
+            //for (Iterator iter = _connectionByInboundId.values().iterator(); iter.hasNext(); ) {
+            //    if ( ((Connection)iter.next()).getIsConnected() )
+            //        active++;
+            //}
             if (locked_tooManyStreams()) {
                 reject = true;
             } else { 
                 while (true) {
-                    Connection oldCon = (Connection)_connectionByInboundId.put(new Long(receiveId), con);
+                    Connection oldCon = _connectionByInboundId.putIfAbsent(Long.valueOf(receiveId), con);
                     if (oldCon == null) {
                         break;
                     } else { 
-                        _connectionByInboundId.put(new Long(receiveId), oldCon);
                         // receiveId already taken, try another
                         receiveId = _context.random().nextLong(Packet.MAX_STREAM_ID-1)+1;
                     }
                 }
             }
-        }
         
         _context.statManager().addRateData("stream.receiveActive", active, total);
         
@@ -179,9 +171,7 @@ public class ConnectionManager {
         try {
             con.getPacketHandler().receivePacket(synPacket, con);
         } catch (I2PException ie) {
-            synchronized (_connectionLock) {
-                _connectionByInboundId.remove(new Long(receiveId));
-            }
+            _connectionByInboundId.remove(Long.valueOf(receiveId));
             return null;
         }
         
@@ -215,8 +205,7 @@ public class ConnectionManager {
                 _numWaiting--;
                 return null;
             }
-            boolean reject = false;
-            synchronized (_connectionLock) {
+
                 if (locked_tooManyStreams()) {
                     // allow a full buffer of pending/waiting streams
                     if (_numWaiting > _maxConcurrentStreams) {
@@ -227,27 +216,30 @@ public class ConnectionManager {
                         _numWaiting--;
                         return null;
                     }
-                    
+
                     // no remaining streams, lets wait a bit
-                    try { _connectionLock.wait(remaining); } catch (InterruptedException ie) {}
+                    // got rid of the lock, so just sleep (fixme?)
+                    // try { _connectionLock.wait(remaining); } catch (InterruptedException ie) {}
+                    try { Thread.sleep(remaining/4); } catch (InterruptedException ie) {}
                 } else { 
                     con = new Connection(_context, this, _schedulerChooser, _outboundQueue, _conPacketHandler, opts);
                     con.setRemotePeer(peer);
             
-                    while (_connectionByInboundId.containsKey(new Long(receiveId))) {
+                    while (_connectionByInboundId.containsKey(Long.valueOf(receiveId))) {
                         receiveId = _context.random().nextLong(Packet.MAX_STREAM_ID-1)+1;
                     }
-                    _connectionByInboundId.put(new Long(receiveId), con);
+                    _connectionByInboundId.put(Long.valueOf(receiveId), con);
                     break; // stop looping as a psuedo-wait
                 }
-            }
+
         }
 
         // ok we're in...
         con.setReceiveStreamId(receiveId);        
         con.eventOccurred();
         
-        _log.debug("Connect() conDelay = " + opts.getConnectDelay());
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Connect() conDelay = " + opts.getConnectDelay());
         if (opts.getConnectDelay() <= 0) {
             con.waitForConnect();
         }
@@ -258,12 +250,15 @@ public class ConnectionManager {
         return con;
     }
 
+    /**
+     *  Doesn't need to be locked any more
+     *  @return too many
+     */
     private boolean locked_tooManyStreams() {
         if (_maxConcurrentStreams <= 0) return false;
         if (_connectionByInboundId.size() < _maxConcurrentStreams) return false;
         int active = 0;
-        for (Iterator iter = _connectionByInboundId.values().iterator(); iter.hasNext(); ) {
-            Connection con = (Connection)iter.next();
+        for (Connection con : _connectionByInboundId.values()) {
             if (con.getIsConnected())
                 active++;
         }
@@ -293,13 +288,10 @@ public class ConnectionManager {
      *
      */
     public void disconnectAllHard() {
-        synchronized (_connectionLock) {
-            for (Iterator iter = _connectionByInboundId.values().iterator(); iter.hasNext(); ) {
-                Connection con = (Connection)iter.next();
-                con.disconnect(false, false);
-            }
-            _connectionByInboundId.clear();
-            _connectionLock.notifyAll();
+        for (Iterator<Connection> iter = _connectionByInboundId.values().iterator(); iter.hasNext(); ) {
+            Connection con = iter.next();
+            con.disconnect(false, false);
+            iter.remove();
         }
         _tcbShare.stop();
     }
@@ -310,17 +302,15 @@ public class ConnectionManager {
      * @param con Connection to drop.
      */
     public void removeConnection(Connection con) {
-        boolean removed = false;
-        synchronized (_connectionLock) {
-            Object o = _connectionByInboundId.remove(new Long(con.getReceiveStreamId()));
-            removed = (o == con);
+
+            Object o = _connectionByInboundId.remove(Long.valueOf(con.getReceiveStreamId()));
+            boolean removed = (o == con);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Connection removed? " + removed + " remaining: " 
                            + _connectionByInboundId.size() + ": " + con);
             if (!removed && _log.shouldLog(Log.DEBUG))
                 _log.debug("Failed to remove " + con +"\n" + _connectionByInboundId.values());
-            _connectionLock.notifyAll();
-        }
+
         if (removed) {
             _context.statManager().addRateData("stream.con.lifetimeMessagesSent", 1+con.getLastSendId(), con.getLifetime());
             MessageInputStream stream = con.getInputStream();
@@ -344,10 +334,8 @@ public class ConnectionManager {
     /** return a set of Connection objects
      * @return set of Connection objects
      */
-    public Set listConnections() {
-        synchronized (_connectionLock) {
+    public Set<Connection> listConnections() {
             return new HashSet(_connectionByInboundId.values());
-        }
     }
 
     /** blocking */
@@ -368,7 +356,7 @@ public class ConnectionManager {
     }
 
     public boolean ping(Destination peer, long timeoutMs, boolean blocking, PingNotifier notifier) {
-        Long id = new Long(_context.random().nextLong(Packet.MAX_STREAM_ID-1)+1);
+        Long id = Long.valueOf(_context.random().nextLong(Packet.MAX_STREAM_ID-1)+1);
         PacketLocal packet = new PacketLocal(_context, peer);
         packet.setSendStreamId(id.longValue());
         packet.setFlag(Packet.FLAG_ECHO);
@@ -381,9 +369,7 @@ public class ConnectionManager {
         
         PingRequest req = new PingRequest(peer, packet, notifier);
         
-        synchronized (_pendingPings) {
-            _pendingPings.put(id, req);
-        }
+        _pendingPings.put(id, req);
         
         _outboundQueue.enqueue(packet);
         packet.releasePayload();
@@ -393,10 +379,7 @@ public class ConnectionManager {
                 if (!req.pongReceived())
                     try { req.wait(timeoutMs); } catch (InterruptedException ie) {}
             }
-            
-            synchronized (_pendingPings) {
-                _pendingPings.remove(id);
-            }
+            _pendingPings.remove(id);
         } else {
             SimpleTimer.getInstance().addEvent(new PingFailed(id, notifier), timeoutMs);
         }
@@ -418,13 +401,8 @@ public class ConnectionManager {
         }
         
         public void timeReached() {
-            boolean removed = false;
-            synchronized (_pendingPings) {
-                Object o = _pendingPings.remove(_id);
-                if (o != null)
-                    removed = true;
-            }
-            if (removed) {
+            PingRequest pr = _pendingPings.remove(_id);
+            if (pr != null) {
                 if (_notifier != null)
                     _notifier.pingComplete(false);
                 if (_log.shouldLog(Log.INFO))
@@ -433,7 +411,7 @@ public class ConnectionManager {
         }
     }
     
-    private class PingRequest {
+    private static class PingRequest {
         private boolean _ponged;
         private Destination _peer;
         private PacketLocal _packet;
@@ -445,7 +423,8 @@ public class ConnectionManager {
             _notifier = notifier;
         }
         public void pong() { 
-            _log.debug("Ping successful");
+            // static, no log
+            //_log.debug("Ping successful");
             //_context.sessionKeyManager().tagsDelivered(_peer.getPublicKey(), _packet.getKeyUsed(), _packet.getTagsSent());
             synchronized (ConnectionManager.PingRequest.this) {
                 _ponged = true; 
@@ -458,10 +437,7 @@ public class ConnectionManager {
     }
     
     void receivePong(long pingId) {
-        PingRequest req = null;
-        synchronized (_pendingPings) {
-            req = (PingRequest)_pendingPings.remove(new Long(pingId));
-        }
+        PingRequest req = _pendingPings.remove(Long.valueOf(pingId));
         if (req != null) 
             req.pong();
     }

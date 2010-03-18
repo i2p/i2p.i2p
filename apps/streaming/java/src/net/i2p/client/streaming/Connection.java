@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
@@ -29,7 +30,7 @@ public class Connection {
     private long _sendStreamId;
     private long _receiveStreamId;
     private long _lastSendTime;
-    private long _lastSendId;
+    private AtomicLong _lastSendId;
     private boolean _resetReceived;
     private boolean _resetSent;
     private long _resetSentOn;
@@ -49,7 +50,7 @@ public class Connection {
     private boolean _isInbound;
     private boolean _updatedShareOpts;
     /** Packet ID (Long) to PacketLocal for sent but unacked packets */
-    private final Map _outboundPackets;
+    private final Map<Long, PacketLocal> _outboundPackets;
     private PacketQueue _outboundQueue;
     private ConnectionPacketHandler _handler;
     private ConnectionOptions _options;
@@ -102,7 +103,7 @@ public class Connection {
         _options = (opts != null ? opts : new ConnectionOptions());
         _outputStream.setWriteTimeout((int)_options.getWriteTimeout());
         _inputStream.setReadTimeout((int)_options.getReadTimeout());
-        _lastSendId = -1;
+        _lastSendId = new AtomicLong(-1);
         _nextSendTime = -1;
         _ackedPackets = 0;
         _createdOn = _context.clock().now();
@@ -137,9 +138,7 @@ public class Connection {
     }
     
     public long getNextOutboundPacketNum() { 
-        synchronized (this) {
-            return ++_lastSendId;
-        }
+        return _lastSendId.incrementAndGet();
     }
     
     void closeReceived() {
@@ -175,7 +174,7 @@ public class Connection {
                        return false;
                 started = true;
                 if ( (_outboundPackets.size() >= _options.getWindowSize()) || (_activeResends > 0) ||
-                     (_lastSendId - _highestAckedThrough > _options.getWindowSize()) ) {
+                     (_lastSendId.get() - _highestAckedThrough > _options.getWindowSize()) ) {
                     if (timeoutMs > 0) {
                         if (timeLeft <= 0) {
                             if (_log.shouldLog(Log.INFO))
@@ -211,10 +210,10 @@ public class Connection {
     void ackImmediately() {
         PacketLocal packet = null;
         synchronized (_outboundPackets) {
-            if (_outboundPackets.size() > 0) {
+            if (!_outboundPackets.isEmpty()) {
                 // ordered, so pick the lowest to retransmit
-                Iterator iter = _outboundPackets.values().iterator();
-                packet = (PacketLocal)iter.next();
+                Iterator<PacketLocal> iter = _outboundPackets.values().iterator();
+                packet = iter.next();
                 //iter.remove();
             }
         }
@@ -403,10 +402,10 @@ public class Connection {
             }
         }
         
-        List acked = null;
+        List<PacketLocal> acked = null;
         synchronized (_outboundPackets) {
-            for (Iterator iter = _outboundPackets.keySet().iterator(); iter.hasNext(); ) {
-                Long id = (Long)iter.next();
+            for (Iterator<Long> iter = _outboundPackets.keySet().iterator(); iter.hasNext(); ) {
+                Long id = iter.next();
                 if (id.longValue() <= ackThrough) {
                     boolean nacked = false;
                     if (nacks != null) {
@@ -414,7 +413,7 @@ public class Connection {
                         for (int i = 0; i < nacks.length; i++) {
                             if (nacks[i] == id.longValue()) {
                                 nacked = true;
-                                PacketLocal nackedPacket = (PacketLocal)_outboundPackets.get(id);
+                                PacketLocal nackedPacket = _outboundPackets.get(id);
                                 nackedPacket.incrementNACKs();
                                 break; // NACKed
                             }
@@ -423,7 +422,7 @@ public class Connection {
                     if (!nacked) { // aka ACKed
                         if (acked == null) 
                             acked = new ArrayList(1);
-                        PacketLocal ackedPacket = (PacketLocal)_outboundPackets.get(id);
+                        PacketLocal ackedPacket = _outboundPackets.get(id);
                         ackedPacket.ackReceived();
                         acked.add(ackedPacket);
                     }
@@ -433,7 +432,7 @@ public class Connection {
             }
             if (acked != null) {
                 for (int i = 0; i < acked.size(); i++) {
-                    PacketLocal p = (PacketLocal)acked.get(i);
+                    PacketLocal p = acked.get(i);
                     _outboundPackets.remove(new Long(p.getSequenceNum()));
                     _ackedPackets++;
                     if (p.getNumSends() > 1) {
@@ -443,7 +442,7 @@ public class Connection {
                     }
                 }
             }
-            if ( (_outboundPackets.size() <= 0) && (_activeResends != 0) ) {
+            if ( (_outboundPackets.isEmpty()) && (_activeResends != 0) ) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("All outbound packets acked, clearing " + _activeResends);
                 _activeResends = 0;
@@ -570,8 +569,8 @@ public class Connection {
     private void killOutstandingPackets() {
         //boolean tagsCancelled = false;
         synchronized (_outboundPackets) {
-            for (Iterator iter = _outboundPackets.values().iterator(); iter.hasNext(); ) {
-                PacketLocal pl = (PacketLocal)iter.next();
+            for (Iterator<PacketLocal> iter = _outboundPackets.values().iterator(); iter.hasNext(); ) {
+                PacketLocal pl = iter.next();
                 //if ( (pl.getTagsSent() != null) && (pl.getTagsSent().size() > 0) )
                 //    tagsCancelled = true;
                 pl.cancelled();
@@ -652,11 +651,11 @@ public class Connection {
     /** What was the last packet Id sent to the peer?
      * @return The last sent packet ID
      */
-    public long getLastSendId() { return _lastSendId; }
+    public long getLastSendId() { return _lastSendId.get(); }
     /** Set the packet Id that was sent to a peer.
      * @param id The packet ID
      */
-    public void setLastSendId(long id) { _lastSendId = id; }
+    public void setLastSendId(long id) { _lastSendId.set(id); }
     
     /**
      * Retrieve the current ConnectionOptions.
@@ -783,7 +782,7 @@ public class Connection {
         if (_ackSinceCongestion) {
             _lastCongestionSeenAt = _options.getWindowSize();
             _lastCongestionTime = _context.clock().now();
-            _lastCongestionHighestUnacked = _lastSendId;
+            _lastCongestionHighestUnacked = _lastSendId.get();
             _ackSinceCongestion = false;
         }
     }
@@ -1022,7 +1021,7 @@ public class Connection {
         }
         if (getCloseReceivedOn() > 0)
             buf.append(" close received ").append(DataHelper.formatDuration(_context.clock().now() - getCloseReceivedOn())).append(" ago");
-        buf.append(" sent: ").append(1 + _lastSendId);
+        buf.append(" sent: ").append(1 + _lastSendId.get());
         if (_inputStream != null)
             buf.append(" rcvd: ").append(1 + _inputStream.getHighestBlockId() - missing);
         
