@@ -1,3 +1,53 @@
+2010-03-18 zzz
+    * Blocklist, CommSystem, FIFOBandwidth, TransportManager,
+      OutNetMessage, InNetMessagePool:
+      - Java 5 cleanup
+    * ByteCache:
+      - Replace some locks with concurrent
+    * Clients:
+      - Negative delay means run immediately and inline
+      - Add methods to test class and run inline,
+        to propagate errors to the console
+      - Use new methods for plugins
+      - Add javadoc for clients.config format
+    * config.jsp: Set burst to +10% for 20s by default,
+      to fix bug where the burst stays high when limits
+      are reduced.
+    * FIFOBandwidthRefiller:
+      - Replace global counters with atomics
+      - Use lockless shortcut methods to grant
+        requests if we can satisfy immediately
+    * i2psnark: Tweak upload bw tracking
+    * Installer: Enable pack200 (-3.3MB)
+    * Job Queue:
+      - Replace some locks with concurrent
+      - Change job ID to a long so it won't wrap
+      - Remove some unused stats
+      - Java 5 and debug cleanup
+    * KeyManager: Concurrent
+    * logs.jsp: Add link to trac
+    * netdb.jsp: Display transport cost if not default
+    * Peer Manager:
+      - Replace some locks with concurrent
+      - Switch back to fast version of getPeersByCapability()
+      - Java 5 cleanup
+    * Streaming: Concurrent
+    * Throttle:
+      - Remove some unused stats
+    * Tunnel Builds: Enable VTBM
+    * Tunnel Dispatcher: Discard at IBGW based on router clock,
+      not system clock.
+    * TunnelGatewayPumper:
+      - Refactor for concurrent
+    * UDP:
+      - Big refactor of several classes for concurrent,
+        elimination of several locks
+      - Reduce max number of resent acks in a packet to
+        lower overhead
+      - Take incoming messages from the head of the queue,
+        not sure why taking them from the tail "reduces latency"
+      - Java 5 cleanup
+
 * 2010-03-15  0.7.12 released
 
 2010-03-13 zzz
