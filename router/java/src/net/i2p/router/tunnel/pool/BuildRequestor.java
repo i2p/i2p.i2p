@@ -176,7 +176,7 @@ class BuildRequestor {
     
     private static final String MIN_VARIABLE_VERSION = "0.7.12";
     /** change this to true in 0.7.13 if testing goes well */
-    private static final boolean SEND_VARIABLE = false;
+    private static final boolean SEND_VARIABLE = true;
     /** 5 (~2600 bytes) fits nicely in 3 tunnel messages */
     private static final int SHORT_RECORDS = 5;
     private static final int LONG_RECORDS = TunnelBuildMessage.MAX_RECORD_COUNT;
