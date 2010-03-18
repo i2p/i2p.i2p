@@ -205,13 +205,14 @@ public class UpdateHandler {
                 } else {
                     _log.log(Log.CRIT, "Update was VERIFIED, will be installed at next restart");
                     StringBuilder buf = new StringBuilder(64);
-                    buf.append("<b>").append(_("Update downloaded")).append("</b><br>");
+                    buf.append("<b>").append(_("Update downloaded")).append("<br>");
                     if (System.getProperty("wrapper.version") != null)
                         buf.append(_("Click Restart to install"));
                     else
                         buf.append(_("Click Shutdown and restart to install"));
                     if (up.newVersion() != null)
                         buf.append(' ').append(_("Version {0}", up.newVersion()));
+                    buf.append("</b>");
                     updateStatus(buf.toString());
                 }
             } else {
