@@ -13,8 +13,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -31,6 +33,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.transport.Transport;
 import net.i2p.router.transport.TransportBid;
 import net.i2p.router.transport.TransportImpl;
+import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
@@ -75,8 +78,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /** introduction key */
     private SessionKey _introKey;
     
-    /** list of RemoteHostId for peers whose packets we want to drop outright */
-    private final List<RemoteHostId> _dropList;
+    /**
+     *  List of RemoteHostId for peers whose packets we want to drop outright
+     *  This is only for old network IDs (pre-0.6.1.10), so it isn't really used now.
+     */
+    private final Set<RemoteHostId> _dropList;
     
     private int _expireTimeout;
 
@@ -167,9 +173,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         super(ctx);
         _context = ctx;
         _log = ctx.logManager().getLog(UDPTransport.class);
-        _peersByIdent = new HashMap(128);
-        _peersByRemoteHost = new HashMap(128);
-        _dropList = new ArrayList(256);
+        _peersByIdent = new ConcurrentHashMap(128);
+        _peersByRemoteHost = new ConcurrentHashMap(128);
+        _dropList = new ConcurrentHashSet(2);
         _endpoint = null;
         
         // See comments in DQAT.java
@@ -608,9 +614,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * if no state exists
      */
     PeerState getPeerState(RemoteHostId hostInfo) {
-        synchronized (_peersByRemoteHost) {
             return _peersByRemoteHost.get(hostInfo);
-        }
     }
     
     /** 
@@ -618,9 +622,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      * if no state exists
      */
     public PeerState getPeerState(Hash remotePeer) { 
-        synchronized (_peersByIdent) {
             return _peersByIdent.get(remotePeer);
-        }
     }
     
     /**
@@ -697,14 +699,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         long oldEstablishedOn = -1;
         PeerState oldPeer = null;
         if (remotePeer != null) {
-            synchronized (_peersByIdent) {
                 oldPeer = _peersByIdent.put(remotePeer, peer);
                 if ( (oldPeer != null) && (oldPeer != peer) ) {
                     // transfer over the old state/inbound message fragments/etc
                     peer.loadFrom(oldPeer);
                     oldEstablishedOn = oldPeer.getKeyEstablishedTime();
                 }
-            }
         }
         
         if (oldPeer != null) {
@@ -717,13 +717,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         RemoteHostId remoteId = peer.getRemoteHostId();
         if (remoteId == null) return false;
         
-        synchronized (_peersByRemoteHost) {
             oldPeer = _peersByRemoteHost.put(remoteId, peer);
             if ( (oldPeer != null) && (oldPeer != peer) ) {
                 // transfer over the old state/inbound message fragments/etc
                 peer.loadFrom(oldPeer);
                 oldEstablishedOn = oldPeer.getKeyEstablishedTime();
-            }
         }
         
         if (oldPeer != null) {
@@ -773,6 +771,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             DatabaseStoreMessage dsm = (DatabaseStoreMessage)inMsg;
             if ( (dsm.getRouterInfo() != null) && 
                  (dsm.getRouterInfo().getNetworkId() != Router.NETWORK_ID) ) {
+                // this is pre-0.6.1.10, so it isn't going to happen any more
+
                 /*
                 if (remoteIdentHash != null) {
                     _context.shitlist().shitlistRouter(remoteIdentHash, "Sent us a peer from the wrong network");
@@ -792,21 +792,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 PeerState peer = getPeerState(peerHash);
                 if (peer != null) {
                     RemoteHostId remote = peer.getRemoteHostId();
-                    boolean added = false;
-                    int droplistSize = 0;
-                    synchronized (_dropList) {
-                        if (!_dropList.contains(remote)) {
-                            while (_dropList.size() > MAX_DROPLIST_SIZE)
-                                _dropList.remove(0);
-                            _dropList.add(remote);
-                            added = true;
-                        }
-                        droplistSize = _dropList.size();
-                    }
-                    if (added) {
-                        _context.statManager().addRateData("udp.dropPeerDroplist", droplistSize, 0);
-                        SimpleScheduler.getInstance().addEvent(new RemoveDropList(remote), DROPLIST_PERIOD);
-                    }
+                    _dropList.add(remote);
+                    _context.statManager().addRateData("udp.dropPeerDroplist", 1, 0);
+                    SimpleScheduler.getInstance().addEvent(new RemoveDropList(remote), DROPLIST_PERIOD);
                 }
                 markUnreachable(peerHash);
                 _context.shitlist().shitlistRouter(peerHash, "Part of the wrong network, version = " + dsm.getRouterInfo().getOption("router.version"));
@@ -838,13 +826,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         private RemoteHostId _peer;
         public RemoveDropList(RemoteHostId peer) { _peer = peer; }
         public void timeReached() { 
-            synchronized (_dropList) {
-                _dropList.remove(_peer);
-            }
+            _dropList.remove(_peer);
         }
     }
     
-    boolean isInDropList(RemoteHostId peer) { synchronized (_dropList) { return _dropList.contains(peer); } }
+    boolean isInDropList(RemoteHostId peer) { return _dropList.contains(peer); }
     
     void dropPeer(Hash peer, boolean shouldShitlist, String why) {
         PeerState state = getPeerState(peer);
@@ -916,16 +902,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
             long now = _context.clock().now();
             _context.statManager().addRateData("udp.droppedPeer", now - peer.getLastReceiveTime(), now - peer.getKeyEstablishedTime());
-            synchronized (_peersByIdent) {
-                altByIdent = _peersByIdent.remove(peer.getRemotePeer());
-            }
+            altByIdent = _peersByIdent.remove(peer.getRemotePeer());
         }
         
         RemoteHostId remoteId = peer.getRemoteHostId();
         if (remoteId != null) {
-            synchronized (_peersByRemoteHost) {
                 altByHost = _peersByRemoteHost.remove(remoteId);
-            }
         }
         
         // unchoke 'em, but just because we'll never talk again...
@@ -1087,10 +1069,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             // also introduce us, also bid aggressively so we are preferred over NTCP.
             // (Otherwise we only talk UDP to those that are firewalled, and we will
             // never get any introducers)
-            int count;
-            synchronized (_peersByIdent) {
-                count = _peersByIdent.size();
-            }
+            int count = _peersByIdent.size();
             if (alwaysPreferUDP() || count < MIN_PEERS ||
                 (introducersRequired() && _introManager.introducerCount() < MIN_INTRODUCER_POOL))
                 return _cachedBid[SLOW_PREFERRED_BID];
@@ -1474,9 +1453,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
     @Override
     public int countPeers() {
-        synchronized (_peersByIdent) {
             return _peersByIdent.size();
-        }
     }
 
     @Override
@@ -1484,7 +1461,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         long now = _context.clock().now();
         int active = 0;
         int inactive = 0;
-        synchronized (_peersByIdent) {
             for (Iterator<PeerState> iter = _peersByIdent.values().iterator(); iter.hasNext(); ) {
                 PeerState peer = iter.next();
                 if (now-peer.getLastReceiveTime() > 5*60*1000)
@@ -1492,7 +1468,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 else
                     active++;
             }
-        }
         return active;
     }
     
@@ -1501,7 +1476,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         long now = _context.clock().now();
         int active = 0;
         int inactive = 0;
-        synchronized (_peersByIdent) {
             for (Iterator<PeerState> iter = _peersByIdent.values().iterator(); iter.hasNext(); ) {
                 PeerState peer = iter.next();
                 if (now-peer.getLastSendFullyTime() > 1*60*1000)
@@ -1509,7 +1483,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 else
                     active++;
             }
-        }
         return active;
     }
     
@@ -1519,9 +1492,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
 
     public boolean allowConnection() {
-        synchronized (_peersByIdent) {
             return _peersByIdent.size() < getMaxConnections();
-        }
     }
 
     /**
@@ -1534,9 +1505,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         Vector<Long> skews = new Vector();
         Vector<PeerState> peers = new Vector();
 
-        synchronized (_peersByIdent) {
-            peers.addAll(_peersByIdent.values());
-        }
+        peers.addAll(_peersByIdent.values());
 
         // If our clock is way off, we may not have many (or any) successful connections,
         // so try hard in that case to return good data
@@ -1557,15 +1526,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /** **internal, do not use** */
     public static final UDPTransport _instance() { return __instance; }
     /** **internal, do not use** return the peers (Hash) of active peers. */
-    public List _getActivePeers() {
-        List peers = new ArrayList(128);
-        synchronized (_peersByIdent) {
-            peers.addAll(_peersByIdent.keySet());
-        }
+    public List<Hash> _getActivePeers() {
+        List<Hash> peers = new ArrayList(128);
+        peers.addAll(_peersByIdent.keySet());
         
         long now = _context.clock().now();
-        for (Iterator iter = peers.iterator(); iter.hasNext(); ) {
-            Hash peer = (Hash)iter.next();
+        for (Iterator<Hash> iter = peers.iterator(); iter.hasNext(); ) {
+            Hash peer = iter.next();
             PeerState state = getPeerState(peer);
             if (now-state.getLastReceiveTime() > 5*60*1000)
                 iter.remove(); // don't include old peers
@@ -1886,9 +1853,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     @Override
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException {
         TreeSet<PeerState> peers = new TreeSet(getComparator(sortFlags));
-        synchronized (_peersByIdent) {
-            peers.addAll(_peersByIdent.values());
-        }
+        peers.addAll(_peersByIdent.values());
         long offsetTotal = 0;
 
         int bpsIn = 0;
@@ -2205,12 +2170,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     private class ExpirePeerEvent implements SimpleTimer.TimedEvent {
-        private final List _expirePeers;
-        private List _expireBuffer;
+        private final Set<PeerState> _expirePeers;
+        private final List<PeerState> _expireBuffer;
         private boolean _alive;
         public ExpirePeerEvent() {
-            _expirePeers = new ArrayList(128);
-            _expireBuffer = new ArrayList(128);
+            _expirePeers = new ConcurrentHashSet(128);
+            _expireBuffer = new ArrayList();
         }
         public void timeReached() {
             // Increase allowed idle time if we are well under allowed connections, otherwise decrease
@@ -2222,10 +2187,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             long longInactivityCutoff = _context.clock().now() - EXPIRE_TIMEOUT;
             long pingCutoff = _context.clock().now() - (2 * 60*60*1000);
             _expireBuffer.clear();
-            synchronized (_expirePeers) {
-                int sz = _expirePeers.size();
-                for (int i = 0; i < sz; i++) {
-                    PeerState peer = (PeerState)_expirePeers.get(i);
+
+                for (Iterator<PeerState> iter = _expirePeers.iterator(); iter.hasNext(); ) {
+                    PeerState peer = iter.next();
                     long inactivityCutoff;
                     // if we offered to introduce them, or we used them as introducer in last 2 hours
                     if (peer.getWeRelayToThemAs() > 0 || peer.getIntroducerTime() > pingCutoff)
@@ -2234,28 +2198,22 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                         inactivityCutoff = shortInactivityCutoff;
                     if ( (peer.getLastReceiveTime() < inactivityCutoff) && (peer.getLastSendTime() < inactivityCutoff) ) {
                         _expireBuffer.add(peer);
-                        _expirePeers.remove(i);
-                        i--;
-                        sz--;
+                        iter.remove();
                     }
                 }
-            }
+
             for (int i = 0; i < _expireBuffer.size(); i++)
-                dropPeer((PeerState)_expireBuffer.get(i), false, "idle too long");
+                dropPeer(_expireBuffer.get(i), false, "idle too long");
             _expireBuffer.clear();
 
             if (_alive)
                 SimpleTimer.getInstance().addEvent(ExpirePeerEvent.this, 30*1000);
         }
         public void add(PeerState peer) {
-            synchronized (_expirePeers) {
                 _expirePeers.add(peer);
-            }
         }
         public void remove(PeerState peer) {
-            synchronized (_expirePeers) {
                 _expirePeers.remove(peer);
-            }
         }
         public void setIsAlive(boolean isAlive) {
             _alive = isAlive;
@@ -2263,9 +2221,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 SimpleTimer.getInstance().addEvent(ExpirePeerEvent.this, 30*1000);
             } else {
                 SimpleTimer.getInstance().removeEvent(ExpirePeerEvent.this);
-                synchronized (_expirePeers) {
-                    _expirePeers.clear();
-                }
+                _expirePeers.clear();
             }
         }
     }
@@ -2348,10 +2304,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     PeerState pickTestPeer(RemoteHostId dontInclude) {
-        List<PeerState> peers = null;
-        synchronized (_peersByIdent) {
-            peers = new ArrayList(_peersByIdent.values());
-        }
+        List<PeerState> peers = new ArrayList(_peersByIdent.values());
         Collections.shuffle(peers, _context.random());
         for (int i = 0; i < peers.size(); i++) {
             PeerState peer = peers.get(i);

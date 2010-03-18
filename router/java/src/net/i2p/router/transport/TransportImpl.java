@@ -421,8 +421,8 @@ public abstract class TransportImpl implements Transport {
         }
     }
 
-    /** To protect dev anonymity. Set to true after 0.7.12 is out */
-    public static final boolean ADJUST_COST = !RouterVersion.VERSION.equals("0.7.11");
+    /** Do we increase the advertised cost when approaching conn limits? */
+    public static final boolean ADJUST_COST = true;
 
     /** What addresses are we currently listening to? */
     public RouterAddress getCurrentAddress() {

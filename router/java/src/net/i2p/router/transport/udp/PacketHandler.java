@@ -1,8 +1,6 @@
 package net.i2p.router.transport.udp;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
@@ -31,7 +29,7 @@ public class PacketHandler {
     private PeerTestManager _testManager;
     private IntroductionManager _introManager;
     private boolean _keepReading;
-    private List _handlers;
+    private final Handler[] _handlers;
     
     private static final int NUM_HANDLERS = 5;
     /** let packets be up to 30s slow */
@@ -46,9 +44,9 @@ public class PacketHandler {
         _inbound = inbound;
         _testManager = testManager;
         _introManager = introManager;
-        _handlers = new ArrayList(NUM_HANDLERS);
+        _handlers = new Handler[NUM_HANDLERS];
         for (int i = 0; i < NUM_HANDLERS; i++) {
-            _handlers.add(new Handler());
+            _handlers[i] = new Handler();
         }
         _context.statManager().createRateStat("udp.handleTime", "How long it takes to handle a received packet after its been pulled off the queue", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.queueTime", "How long after a packet is received can we begin handling it", "udp", UDPTransport.RATES);
@@ -81,9 +79,8 @@ public class PacketHandler {
     
     public void startup() { 
         _keepReading = true;
-        for (int i = 0; i < _handlers.size(); i++) {
-            I2PThread t = new I2PThread((Handler)_handlers.get(i), "UDP Packet handler " + i + "/" + _handlers.size());
-            t.setDaemon(true);
+        for (int i = 0; i < NUM_HANDLERS; i++) {
+            I2PThread t = new I2PThread(_handlers[i], "UDP Packet handler " + i + '/' + NUM_HANDLERS, true);
             t.start();
         }
     }
@@ -94,10 +91,9 @@ public class PacketHandler {
 
     String getHandlerStatus() {
         StringBuilder rv = new StringBuilder();
-        int size = _handlers.size();
-        rv.append("Handlers: ").append(size);
-        for (int i = 0; i < size; i++) {
-            Handler handler = (Handler)_handlers.get(i);
+        rv.append("Handlers: ").append(NUM_HANDLERS);
+        for (int i = 0; i < NUM_HANDLERS; i++) {
+            Handler handler = _handlers[i];
             rv.append(" handler ").append(i).append(" state: ").append(handler._state);
         }
         return rv.toString();

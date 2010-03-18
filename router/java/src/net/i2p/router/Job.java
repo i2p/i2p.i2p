@@ -19,7 +19,7 @@ public interface Job {
      */
     public String getName();
     /** unique id */
-    public int getJobId();
+    public long getJobId();
     /**
      * Timing criteria for the task
      */

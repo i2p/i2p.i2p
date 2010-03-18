@@ -1,8 +1,8 @@
 package net.i2p.router.transport.udp;
 
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.crypto.DHSessionKeyBuilder;
 import net.i2p.data.Base64;
@@ -22,8 +22,8 @@ import net.i2p.util.Log;
  *
  */
 public class OutboundEstablishState {
-    private RouterContext _context;
-    private Log _log;
+    private final RouterContext _context;
+    private final Log _log;
     // SessionRequest message
     private byte _sentX[];
     private byte _bobIP[];
@@ -44,18 +44,18 @@ public class OutboundEstablishState {
     private long _sentSignedOnTime;
     private Signature _sentSignature;
     // general status 
-    private long _establishBegin;
-    private long _lastReceive;
+    private final long _establishBegin;
+    //private long _lastReceive;
     private long _lastSend;
     private long _nextSend;
     private RemoteHostId _remoteHostId;
-    private RouterIdentity _remotePeer;
+    private final RouterIdentity _remotePeer;
     private SessionKey _introKey;
-    private final List _queuedMessages;
+    private final Queue<OutNetMessage> _queuedMessages;
     private int _currentState;
     private long _introductionNonce;
     // intro
-    private UDPAddress _remoteAddress;
+    private final UDPAddress _remoteAddress;
     private boolean _complete;
     
     /** nothin sent yet */
@@ -87,7 +87,7 @@ public class OutboundEstablishState {
         _remotePeer = remotePeer;
         _introKey = introKey;
         _keyBuilder = null;
-        _queuedMessages = new ArrayList(4);
+        _queuedMessages = new LinkedBlockingQueue();
         _currentState = STATE_UNKNOWN;
         _establishBegin = ctx.clock().now();
         _remoteAddress = addr;
@@ -113,22 +113,21 @@ public class OutboundEstablishState {
     public long getIntroNonce() { return _introductionNonce; }
     
     public void addMessage(OutNetMessage msg) {
-        synchronized (_queuedMessages) {
-            if (!_queuedMessages.contains(msg))
-                _queuedMessages.add(msg);
-        }
+        // chance of a duplicate here in a race, that's ok
+        if (!_queuedMessages.contains(msg))
+            _queuedMessages.offer(msg);
+        else if (_log.shouldLog(Log.WARN))
+             _log.warn("attempt to add duplicate msg to queue: " + msg);
     }
+
     public OutNetMessage getNextQueuedMessage() { 
-        synchronized (_queuedMessages) {
-            if (_queuedMessages.size() > 0)
-                return (OutNetMessage)_queuedMessages.remove(0);
-        }
-        return null;
+        return _queuedMessages.poll();
     }
     
     public RouterIdentity getRemoteIdentity() { return _remotePeer; }
     public SessionKey getIntroKey() { return _introKey; }
     
+    /** called from constructor, no need to synch */
     private void prepareSessionRequest() {
         _keyBuilder = new DHSessionKeyBuilder();
         byte X[] = _keyBuilder.getMyPublicValue().toByteArray();
@@ -142,7 +141,7 @@ public class OutboundEstablishState {
             System.arraycopy(X, 0, _sentX, _sentX.length - X.length, X.length);
     }
 
-    public synchronized byte[] getSentX() { return _sentX; }
+    public byte[] getSentX() { return _sentX; }
     public synchronized byte[] getSentIP() { return _bobIP; }
     public synchronized int getSentPort() { return _bobPort; }
 
@@ -403,8 +402,8 @@ public class OutboundEstablishState {
     }
     
     /** how long have we been trying to establish this session? */
-    public synchronized long getLifetime() { return _context.clock().now() - _establishBegin; }
-    public synchronized long getEstablishBeginTime() { return _establishBegin; }
+    public long getLifetime() { return _context.clock().now() - _establishBegin; }
+    public long getEstablishBeginTime() { return _establishBegin; }
     public synchronized long getNextSendTime() { return _nextSend; }
     public synchronized void setNextSendTime(long when) { 
         _nextSend = when; 
@@ -422,8 +421,7 @@ public class OutboundEstablishState {
     }
     
     private void packetReceived() {
-        _lastReceive = _context.clock().now();
-        _nextSend = _lastReceive;
+        _nextSend = _context.clock().now();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Got a packet, nextSend == now");
     }

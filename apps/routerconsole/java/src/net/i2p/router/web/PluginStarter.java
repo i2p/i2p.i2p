@@ -180,7 +180,7 @@ public class PluginStarter implements Runnable {
      *  @return true on success
      *  @throws just about anything, caller would be wise to catch Throwable
      */
-    static boolean stopPlugin(RouterContext ctx, String appName) throws IOException {
+    static boolean stopPlugin(RouterContext ctx, String appName) throws Exception {
         Log log = ctx.logManager().getLog(PluginStarter.class);
         File pluginDir = new File(ctx.getAppDir(), PluginUpdateHandler.PLUGIN_DIR + '/' + appName);
         if ((!pluginDir.exists()) || (!pluginDir.isDirectory())) {
@@ -228,7 +228,7 @@ public class PluginStarter implements Runnable {
     }
 
     /** @return true on success - caller should call stopPlugin() first */
-    static boolean deletePlugin(RouterContext ctx, String appName) throws IOException {
+    static boolean deletePlugin(RouterContext ctx, String appName) throws Exception {
         Log log = ctx.logManager().getLog(PluginStarter.class);
         File pluginDir = new File(ctx.getAppDir(), PluginUpdateHandler.PLUGIN_DIR + '/' + appName);
         if ((!pluginDir.exists()) || (!pluginDir.isDirectory())) {
@@ -348,8 +348,12 @@ public class PluginStarter implements Runnable {
         } catch (IOException ioe) {}
     }
 
-    /** @param action "start" or "stop" or "uninstall" */
-    private static void runClientApps(RouterContext ctx, File pluginDir, List<ClientAppConfig> apps, String action) {
+    /**
+     *  @param action "start" or "stop" or "uninstall"
+     *  @throws just about anything if an app has a delay less than zero, caller would be wise to catch Throwable
+     *  If no apps have a delay less than zero, it shouldn't throw anything
+     */
+    private static void runClientApps(RouterContext ctx, File pluginDir, List<ClientAppConfig> apps, String action) throws Exception {
         Log log = ctx.logManager().getLog(PluginStarter.class);
         for(ClientAppConfig app : apps) {
             if (action.equals("start") && app.disabled)
@@ -388,10 +392,18 @@ public class PluginStarter implements Runnable {
                 }
                 addToClasspath(cp, app.clientName, log);
             }
-            if (app.delay == 0 || !action.equals("start")) {
+
+            if (app.delay < 0 && action.equals("start")) {
+                // this will throw exceptions
+                LoadClientAppsJob.runClientInline(app.className, app.clientName, argVal, log);
+            } else if (app.delay == 0 || !action.equals("start")) {
+                // quick check, will throw ClassNotFoundException on error
+                LoadClientAppsJob.testClient(app.className);
                 // run this guy now
                 LoadClientAppsJob.runClient(app.className, app.clientName, argVal, log);
             } else {
+                // quick check, will throw ClassNotFoundException on error
+                LoadClientAppsJob.testClient(app.className);
                 // wait before firing it up
                 ctx.jobQueue().addJob(new LoadClientAppsJob.DelayedRunClient(ctx, app.className, app.clientName, argVal, app.delay));
             }

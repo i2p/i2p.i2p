@@ -62,7 +62,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
      * and already cleared through the bandwidth limiter.
      */
     private final LinkedBlockingQueue<ByteBuffer> _writeBufs;
-    /** Todo: This is only so we can abort() them when we close() ??? */
+    /** Requests that were not granted immediately */
     private final Set<FIFOBandwidthLimiter.Request> _bwRequests;
     private boolean _established;
     private long _establishedOn;

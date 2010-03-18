@@ -12,10 +12,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataStructure;
@@ -41,7 +41,7 @@ public class KeyManager {
     private PublicKey _publicKey;
     private SigningPrivateKey _signingPrivateKey;
     private SigningPublicKey _signingPublicKey;
-    private final Map _leaseSetKeys; // Destination --> LeaseSetKeys
+    private final Map<Hash, LeaseSetKeys> _leaseSetKeys; // Destination --> LeaseSetKeys
     private SynchronizeKeysJob _synchronizeJob;
     
     public final static String PROP_KEYDIR = "router.keyBackupDir";
@@ -63,7 +63,7 @@ public class KeyManager {
         setPublicKey(null);
         setSigningPrivateKey(null);
         setSigningPublicKey(null);
-        _leaseSetKeys = new HashMap();
+        _leaseSetKeys = new ConcurrentHashMap();
     }
     
     public void startup() {
@@ -102,9 +102,7 @@ public class KeyManager {
     public void registerKeys(Destination dest, SigningPrivateKey leaseRevocationPrivateKey, PrivateKey endpointDecryptionKey) {
         _log.info("Registering keys for destination " + dest.calculateHash().toBase64());
         LeaseSetKeys keys = new LeaseSetKeys(dest, leaseRevocationPrivateKey, endpointDecryptionKey);
-        synchronized (_leaseSetKeys) {
-            _leaseSetKeys.put(dest.calculateHash(), keys);
-        }
+        _leaseSetKeys.put(dest.calculateHash(), keys);
     }
    
     private void queueWrite() {
@@ -118,27 +116,19 @@ public class KeyManager {
     public LeaseSetKeys unregisterKeys(Destination dest) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Unregistering keys for destination " + dest.calculateHash().toBase64());
-        LeaseSetKeys rv = null;
-        synchronized (_leaseSetKeys) {
-            rv = (LeaseSetKeys)_leaseSetKeys.remove(dest.calculateHash());
-        }
-        return rv;
+        return _leaseSetKeys.remove(dest.calculateHash());
     }
     
     public LeaseSetKeys getKeys(Destination dest) {
         return getKeys(dest.calculateHash());
     }
     public LeaseSetKeys getKeys(Hash dest) {
-        synchronized (_leaseSetKeys) {
-            return (LeaseSetKeys)_leaseSetKeys.get(dest);
-        }
+            return _leaseSetKeys.get(dest);
     }
     
-    public Set getAllKeys() {
+    public Set<LeaseSetKeys> getAllKeys() {
         HashSet keys = new HashSet();
-        synchronized (_leaseSetKeys) {
-            keys.addAll(_leaseSetKeys.values());
-        }
+        keys.addAll(_leaseSetKeys.values());
         return keys;
     }
     

@@ -39,8 +39,8 @@ public class SOCKSUDPWrapper implements Source, Sink {
 
         byte[] header = h.getBytes();
         byte wrapped[] = new byte[header.length + data.length];
-        System.arraycopy(wrapped, 0, header, 0, header.length);
-        System.arraycopy(wrapped, header.length, data, 0, data.length);
+        System.arraycopy(header, 0, wrapped, 0, header.length);
+        System.arraycopy(data, 0, wrapped, header.length, data.length);
         this.sink.send(from, wrapped);
     }
     

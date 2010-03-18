@@ -2,8 +2,8 @@ package net.i2p.router.transport.udp;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -32,6 +32,25 @@ public class PacketBuilder {
     private static final ByteCache _hmacCache = ByteCache.getInstance(64, Hash.HASH_LENGTH);
     private static final ByteCache _blockCache = ByteCache.getInstance(64, 16);
 
+    /**
+     *  For debugging and stats only - does not go out on the wire.
+     *  These are chosen to be higher than the highest I2NP message type,
+     *  as a data packet is set to the underlying I2NP message type.
+     */
+    static final int TYPE_FIRST = 42;
+    static final int TYPE_ACK = TYPE_FIRST;
+    static final int TYPE_PUNCH = 43;
+    static final int TYPE_RESP = 44;
+    static final int TYPE_INTRO = 45;
+    static final int TYPE_RREQ = 46;
+    static final int TYPE_TCB = 47;
+    static final int TYPE_TBC = 48;
+    static final int TYPE_TTA = 49;
+    static final int TYPE_TFA = 50;
+    static final int TYPE_CONF = 51;
+    static final int TYPE_SREQ = 52;
+    static final int TYPE_CREAT = 53;
+
     /** we only talk to people of the right version */
     static final int PROTOCOL_VERSION = 0;
     
@@ -58,7 +77,7 @@ public class PacketBuilder {
      *                        The list itself is passed by reference, and if a messageId is
      *                        included, it should be removed from the list.
      */
-    public UDPPacket buildPacket(OutboundMessageState state, int fragment, PeerState peer, List ackIdsRemaining, List partialACKsRemaining) {
+    public UDPPacket buildPacket(OutboundMessageState state, int fragment, PeerState peer, List<Long> ackIdsRemaining, List<ACKBitfield> partialACKsRemaining) {
         UDPPacket packet = UDPPacket.acquire(_context, false);
 
         StringBuilder msg = null;
@@ -92,18 +111,18 @@ public class PacketBuilder {
         // is under the MTU, but for now, since the # of packets acked is so few (usually
         // just one or two), and since the packets are so small anyway, an additional five
         // or ten bytes doesn't hurt.
-        if ( (ackIdsRemaining != null) && (ackIdsRemaining.size() > 0) )
+        if ( (ackIdsRemaining != null) && (!ackIdsRemaining.isEmpty()) )
             data[off] |= UDPPacket.DATA_FLAG_EXPLICIT_ACK;
-        if ( (partialACKsRemaining != null) && (partialACKsRemaining.size() > 0) )
+        if ( (partialACKsRemaining != null) && (!partialACKsRemaining.isEmpty()) )
             data[off] |= UDPPacket.DATA_FLAG_ACK_BITFIELDS;
         off++;
 
-        if ( (ackIdsRemaining != null) && (ackIdsRemaining.size() > 0) ) {
+        if ( (ackIdsRemaining != null) && (!ackIdsRemaining.isEmpty()) ) {
             DataHelper.toLong(data, off, 1, ackIdsRemaining.size());
             off++;
             for (int i = 0; i < ackIdsRemaining.size(); i++) {
             //while (ackIdsRemaining.size() > 0) {
-                Long ackId = (Long)ackIdsRemaining.get(i);//(Long)ackIdsRemaining.remove(0);
+                Long ackId = ackIdsRemaining.get(i);//(Long)ackIdsRemaining.remove(0);
                 DataHelper.toLong(data, off, 4, ackId.longValue());
                 off += 4;        
                 if (msg != null) // logging it
@@ -118,7 +137,7 @@ public class PacketBuilder {
             // leave it blank for now, since we could skip some
             off++;
             for (int i = 0; i < partialACKsRemaining.size(); i++) {
-                ACKBitfield bitfield = (ACKBitfield)partialACKsRemaining.get(i);
+                ACKBitfield bitfield = partialACKsRemaining.get(i);
                 if (bitfield.receivedComplete()) continue;
                 DataHelper.toLong(data, off, 4, bitfield.getMessageId());
                 off += 4;
@@ -214,15 +233,18 @@ public class PacketBuilder {
     // We use this for keepalive purposes.
     // It doesn't generate a reply, but that's ok.
     public UDPPacket buildPing(PeerState peer) {
-        return buildACK(peer, new ArrayList(0));
+        return buildACK(peer, Collections.EMPTY_LIST);
     }
 
     private static final int ACK_PRIORITY = 1;
     
     /**
+     *  Build the ack packet. The list need not be sorted into full and partial;
+     *  this method will put all fulls before the partials in the outgoing packet.
+     *
      * @param ackBitfields list of ACKBitfield instances to either fully or partially ACK
      */
-    public UDPPacket buildACK(PeerState peer, List ackBitfields) {
+    public UDPPacket buildACK(PeerState peer, List<ACKBitfield> ackBitfields) {
         UDPPacket packet = UDPPacket.acquire(_context, false);
         
         StringBuilder msg = null;
@@ -263,7 +285,7 @@ public class PacketBuilder {
             DataHelper.toLong(data, off, 1, fullACKCount);
             off++;
             for (int i = 0; i < ackBitfields.size(); i++) {
-                ACKBitfield bf = (ACKBitfield)ackBitfields.get(i);
+                ACKBitfield bf = ackBitfields.get(i);
                 if (bf.receivedComplete()) {
                     DataHelper.toLong(data, off, 4, bf.getMessageId());
                     off += 4;
@@ -415,7 +437,7 @@ public class PacketBuilder {
         authenticate(packet, ourIntroKey, ourIntroKey, iv);
         setTo(packet, to, state.getSentPort());
         _ivCache.release(iv);
-        packet.setMessageType(53);
+        packet.setMessageType(TYPE_CREAT);
         return packet;
     }
     
@@ -479,7 +501,7 @@ public class PacketBuilder {
         packet.getPacket().setLength(off);
         authenticate(packet, state.getIntroKey(), state.getIntroKey());
         setTo(packet, to, state.getSentPort());
-        packet.setMessageType(52);
+        packet.setMessageType(TYPE_SREQ);
         return packet;
     }
 
@@ -586,7 +608,7 @@ public class PacketBuilder {
         } 
         
         setTo(packet, to, state.getSentPort());
-        packet.setMessageType(51);
+        packet.setMessageType(TYPE_CONF);
         return packet;
     }
 
@@ -639,7 +661,7 @@ public class PacketBuilder {
         packet.getPacket().setLength(off);
         authenticate(packet, toCipherKey, toMACKey);
         setTo(packet, toIP, toPort);
-        packet.setMessageType(50);
+        packet.setMessageType(TYPE_TFA);
         return packet;
     }
 
@@ -684,7 +706,7 @@ public class PacketBuilder {
         packet.getPacket().setLength(off);
         authenticate(packet, aliceIntroKey, aliceIntroKey);
         setTo(packet, aliceIP, alicePort);
-        packet.setMessageType(49);
+        packet.setMessageType(TYPE_TTA);
         return packet;
     }
 
@@ -731,7 +753,7 @@ public class PacketBuilder {
         packet.getPacket().setLength(off);
         authenticate(packet, charlieCipherKey, charlieMACKey);
         setTo(packet, charlieIP, charliePort);
-        packet.setMessageType(48);
+        packet.setMessageType(TYPE_TBC);
         return packet;
     }
     
@@ -776,7 +798,7 @@ public class PacketBuilder {
         packet.getPacket().setLength(off);
         authenticate(packet, bobCipherKey, bobMACKey);
         setTo(packet, bobIP, bobPort);
-        packet.setMessageType(47);
+        packet.setMessageType(TYPE_TCB);
         return packet;
     }
     
@@ -875,7 +897,7 @@ public class PacketBuilder {
         if (encrypt)
             authenticate(packet, new SessionKey(introKey), new SessionKey(introKey));
         setTo(packet, introHost, introPort);
-        packet.setMessageType(46);
+        packet.setMessageType(TYPE_RREQ);
         return packet;
     }
 
@@ -925,7 +947,7 @@ public class PacketBuilder {
         packet.getPacket().setLength(off);
         authenticate(packet, charlie.getCurrentCipherKey(), charlie.getCurrentMACKey());
         setTo(packet, charlie.getRemoteIPAddress(), charlie.getRemotePort());
-        packet.setMessageType(45);
+        packet.setMessageType(TYPE_INTRO);
         return packet;
     }
 
@@ -986,7 +1008,7 @@ public class PacketBuilder {
         packet.getPacket().setLength(off);
         authenticate(packet, aliceIntroKey, aliceIntroKey);
         setTo(packet, aliceAddr, alice.getPort());
-        packet.setMessageType(44);
+        packet.setMessageType(TYPE_RESP);
         return packet;
     }
     
@@ -1019,7 +1041,7 @@ public class PacketBuilder {
         packet.getPacket().setLength(0);
         setTo(packet, to, port);
         
-        packet.setMessageType(43);
+        packet.setMessageType(TYPE_PUNCH);
         return packet;
     }
     

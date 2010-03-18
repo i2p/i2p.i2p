@@ -12,10 +12,14 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.data.DataHelper;
 import net.i2p.router.networkdb.HandleDatabaseLookupMessageJob;
@@ -33,15 +37,15 @@ public class JobQueue {
     private RouterContext _context;
     
     /** Integer (runnerId) to JobQueueRunner for created runners */
-    private final HashMap _queueRunners;
+    private final Map<Integer, JobQueueRunner> _queueRunners;
     /** a counter to identify a job runner */
     private volatile static int _runnerId = 0;
     /** list of jobs that are ready to run ASAP */
-    private ArrayList _readyJobs;
+    private BlockingQueue<Job> _readyJobs;
     /** list of jobs that are scheduled for running in the future */
-    private ArrayList _timedJobs;
+    private List<Job> _timedJobs;
     /** job name to JobStat for that job */
-    private final SortedMap _jobStats;
+    private final Map<String, JobStats> _jobStats;
     /** how many job queue runners can go concurrently */
     private int _maxRunners = 1; 
     private QueuePumper _pumper;
@@ -52,9 +56,12 @@ public class JobQueue {
     
     private final Object _jobLock;
     
+    /** how many when we go parallel */
+    private static final int RUNNERS = 4;
+
     /** default max # job queue runners operating */
     private final static int DEFAULT_MAX_RUNNERS = 1;
-    /** router.config parameter to override the max runners */
+    /** router.config parameter to override the max runners @deprecated unimplemented */
     private final static String PROP_MAX_RUNNERS = "router.maxJobRunners";
     
     /** how frequently should we check and update the max runners */
@@ -63,33 +70,39 @@ public class JobQueue {
     /** if a job is this lagged, spit out a warning, but keep going */
     private long _lagWarning = DEFAULT_LAG_WARNING;
     private final static long DEFAULT_LAG_WARNING = 5*1000;
+    /** @deprecated unimplemented */
     private final static String PROP_LAG_WARNING = "router.jobLagWarning";
     
-    /** if a job is this lagged, the router is hosed, so shut it down */
+    /** if a job is this lagged, the router is hosed, so spit out a warning (dont shut it down) */
     private long _lagFatal = DEFAULT_LAG_FATAL;
     private final static long DEFAULT_LAG_FATAL = 30*1000;
+    /** @deprecated unimplemented */
     private final static String PROP_LAG_FATAL = "router.jobLagFatal";
     
     /** if a job takes this long to run, spit out a warning, but keep going */
     private long _runWarning = DEFAULT_RUN_WARNING;
     private final static long DEFAULT_RUN_WARNING = 5*1000;
+    /** @deprecated unimplemented */
     private final static String PROP_RUN_WARNING = "router.jobRunWarning";
     
-    /** if a job takes this long to run, the router is hosed, so shut it down */
+    /** if a job takes this long to run, the router is hosed, so spit out a warning (dont shut it down) */
     private long _runFatal = DEFAULT_RUN_FATAL;
     private final static long DEFAULT_RUN_FATAL = 30*1000;
+    /** @deprecated unimplemented */
     private final static String PROP_RUN_FATAL = "router.jobRunFatal";
     
     /** don't enforce fatal limits until the router has been up for this long */
     private long _warmupTime = DEFAULT_WARMUP_TIME;
     private final static long DEFAULT_WARMUP_TIME = 10*60*1000;
-    private final static String PROP_WARMUM_TIME = "router.jobWarmupTime";
+    /** @deprecated unimplemented */
+    private final static String PROP_WARMUP_TIME = "router.jobWarmupTime";
     
     /** max ready and waiting jobs before we start dropping 'em */
     private int _maxWaitingJobs = DEFAULT_MAX_WAITING_JOBS;
     private final static int DEFAULT_MAX_WAITING_JOBS = 100;
+    /** @deprecated unimplemented */
     private final static String PROP_MAX_WAITING_JOBS = "router.maxWaitingJobs";
-    
+
     /** 
      * queue runners wait on this whenever they're not doing anything, and 
      * this gets notified *once* whenever there are ready jobs
@@ -109,16 +122,14 @@ public class JobQueue {
                                               new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
 
         _alive = true;
-        _readyJobs = new ArrayList(16);
+        _readyJobs = new LinkedBlockingQueue();
         _timedJobs = new ArrayList(64);
         _jobLock = new Object();
-        _queueRunners = new HashMap();
-        _jobStats = Collections.synchronizedSortedMap(new TreeMap());
+        _queueRunners = new ConcurrentHashMap(RUNNERS);
+        _jobStats = new ConcurrentHashMap();
         _allowParallelOperation = false;
         _pumper = new QueuePumper();
-        I2PThread pumperThread = new I2PThread(_pumper);
-        pumperThread.setDaemon(true);
-        pumperThread.setName("QueuePumper");
+        I2PThread pumperThread = new I2PThread(_pumper, "Job Queue Pumper", true);
         //pumperThread.setPriority(I2PThread.NORM_PRIORITY+1);
         pumperThread.start();
     }
@@ -128,7 +139,7 @@ public class JobQueue {
      *
      */
     public void addJob(Job job) {
-        if (job == null) return;
+        if (job == null || !_alive) return;
 
         if (job instanceof JobImpl)
             ((JobImpl)job).addedToQueue();
@@ -136,6 +147,7 @@ public class JobQueue {
         long numReady = 0;
         boolean alreadyExists = false;
         boolean dropped = false;
+        // getNext() is now outside the jobLock, is that ok?
         synchronized (_jobLock) {
             if (_readyJobs.contains(job))
                 alreadyExists = true;
@@ -155,7 +167,7 @@ public class JobQueue {
                         job.getTiming().setStartAfter(_context.clock().now());
                         if (job instanceof JobImpl)
                             ((JobImpl)job).madeReady();
-                        _readyJobs.add(job);
+                        _readyJobs.offer(job);
                     } else {
                         _timedJobs.add(job);
                     }
@@ -167,12 +179,10 @@ public class JobQueue {
         _context.statManager().addRateData("jobQueue.readyJobs", numReady, 0);
         if (dropped) {
             _context.statManager().addRateData("jobQueue.droppedJobs", 1, 1);
-           if (_log.shouldLog(Log.WARN))
-                _log.warn("Dropping job due to overload!  # ready jobs: " 
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Dropping job due to overload!  # ready jobs: " 
                           + numReady + ": job = " + job);
         }
-
-        return;
     }
     
     public void removeJob(Job job) {
@@ -189,17 +199,15 @@ public class JobQueue {
     }
     
     public int getReadyCount() { 
-        synchronized (_jobLock) {
             return _readyJobs.size();
-        }
     }
+
     public long getMaxLag() { 
-        synchronized (_jobLock) {
-            if (_readyJobs.size() <= 0) return 0;
+            Job j = _readyJobs.peek();
+            if (j == null) return 0;
             // first job is the one that has been waiting the longest
-            long startAfter = ((Job)_readyJobs.get(0)).getTiming().getStartAfter();
+            long startAfter = j.getTiming().getStartAfter();
             return _context.clock().now() - startAfter;
-        }
     }
     
     /** 
@@ -228,9 +236,10 @@ public class JobQueue {
     
     public void allowParallelOperation() { 
         _allowParallelOperation = true; 
-        runQueue(4);
+        runQueue(RUNNERS);
     }
     
+    /** @deprecated do you really want to do this? */
     public void restart() {
         synchronized (_jobLock) {
             _timedJobs.clear();
@@ -241,14 +250,21 @@ public class JobQueue {
     
     void shutdown() { 
         _alive = false; 
-        synchronized (_jobLock) {
-            _jobLock.notifyAll();
-        }
+        _timedJobs.clear();
+        _readyJobs.clear();
+        // The JobQueueRunners are NOT daemons,
+        // so they must be stopped.
+        Job poison = new PoisonJob();
+        for (int i = 0; i < _queueRunners.size(); i++)
+            _readyJobs.offer(poison);
+
+
+      /********
         if (_log.shouldLog(Log.WARN)) {
             StringBuilder buf = new StringBuilder(1024);
             buf.append("current jobs: \n");
             for (Iterator iter = _queueRunners.values().iterator(); iter.hasNext(); ) {
-                JobQueueRunner runner = (JobQueueRunner)iter.next();
+                JobQueueRunner runner = iter.next();
                 Job j = runner.getCurrentJob();
 
                 buf.append("Runner ").append(runner.getRunnerId()).append(": ");
@@ -279,7 +295,9 @@ public class JobQueue {
                 buf.append(_timedJobs.get(i).toString()).append("\n\t");
             _log.log(Log.WARN, buf.toString());
         }
+      ********/
     }
+
     boolean isAlive() { return _alive; }
     
     /**
@@ -287,9 +305,8 @@ public class JobQueue {
      */
     public long getLastJobBegin() { 
         long when = -1;
-        // not synchronized, so might b0rk if the runners are changed
-        for (Iterator iter = _queueRunners.values().iterator(); iter.hasNext(); ) {
-            long cur = ((JobQueueRunner)iter.next()).getLastBegin();
+        for (JobQueueRunner runner : _queueRunners.values()) {
+            long cur = runner.getLastBegin();
             if (cur > when)
                 cur = when;
         }
@@ -300,9 +317,8 @@ public class JobQueue {
      */
     public long getLastJobEnd() { 
         long when = -1;
-        // not synchronized, so might b0rk if the runners are changed
-        for (Iterator iter = _queueRunners.values().iterator(); iter.hasNext(); ) {
-            long cur = ((JobQueueRunner)iter.next()).getLastEnd();
+        for (JobQueueRunner runner : _queueRunners.values()) {
+            long cur = runner.getLastEnd();
             if (cur > when)
                 cur = when;
         }
@@ -315,9 +331,7 @@ public class JobQueue {
     public Job getLastJob() { 
         Job j = null;
         long when = -1;
-        // not synchronized, so might b0rk if the runners are changed
-        for (Iterator iter = _queueRunners.values().iterator(); iter.hasNext(); ) {
-            JobQueueRunner cur = (JobQueueRunner)iter.next();
+        for (JobQueueRunner cur : _queueRunners.values()) {
             if (cur.getLastBegin() > when) {
                 j = cur.getCurrentJob();
                 when = cur.getLastBegin();
@@ -333,13 +347,10 @@ public class JobQueue {
     Job getNext() {
         while (_alive) {
             try {
-                synchronized (_jobLock) {
-                    if (_readyJobs.size() > 0) {
-                        return (Job)_readyJobs.remove(0);
-                    } else {
-                        _jobLock.wait();
-                    }
-                }
+                Job j = _readyJobs.take();
+                if (j.getJobId() == POISON_ID)
+                    break;
+                return j;
             } catch (InterruptedException ie) {}
         }
         if (_log.shouldLog(Log.WARN))
@@ -355,8 +366,7 @@ public class JobQueue {
      * the current job.
      *
      */
-    public void runQueue(int numThreads) {
-        synchronized (_queueRunners) {
+    public synchronized void runQueue(int numThreads) {
             // we're still starting up [serially] and we've got at least one runner,
             // so dont do anything
             if ( (_queueRunners.size() > 0) && (!_allowParallelOperation) ) return;
@@ -377,8 +387,7 @@ public class JobQueue {
                     t.start();
                 }
             } else if (_queueRunners.size() == numThreads) {
-                for (Iterator iter = _queueRunners.values().iterator(); iter.hasNext(); ) {
-                    JobQueueRunner runner = (JobQueueRunner)iter.next();
+                for (JobQueueRunner runner : _queueRunners.values()) {
                     runner.startRunning();
                 }
             } else { // numThreads < # runners, so shrink
@@ -387,7 +396,6 @@ public class JobQueue {
                 //     runner.stopRunning();
                 //}
             }
-        }
     }
         
     void removeRunner(int id) { _queueRunners.remove(Integer.valueOf(id)); }
@@ -407,11 +415,11 @@ public class JobQueue {
                 while (_alive) {
                     long now = _context.clock().now();
                     long timeToWait = -1;
-                    ArrayList toAdd = null;
+                    List<Job> toAdd = null;
                     try {
                         synchronized (_jobLock) {
                             for (int i = 0; i < _timedJobs.size(); i++) {
-                                Job j = (Job)_timedJobs.get(i);
+                                Job j = _timedJobs.get(i);
                                 // find jobs due to start before now
                                 long timeLeft = j.getTiming().getStartAfter() - now;
                                 if (timeLeft <= 0) {
@@ -437,7 +445,7 @@ public class JobQueue {
                                 // extra alloc.  (no, i'm not just being insane - i'm updating this based
                                 // on some profiling data ;)
                                 for (int i = 0; i < toAdd.size(); i++)
-                                    _readyJobs.add(toAdd.get(i));
+                                    _readyJobs.offer(toAdd.get(i));
                                 _jobLock.notifyAll();
                             } else {
                                 if (timeToWait < 0)
@@ -476,17 +484,15 @@ public class JobQueue {
     private void updateJobTimings(long delta) {
         synchronized (_jobLock) {
             for (int i = 0; i < _timedJobs.size(); i++) {
-                Job j = (Job)_timedJobs.get(i);
+                Job j = _timedJobs.get(i);
                 j.getTiming().offsetChanged(delta);
             }
-            for (int i = 0; i < _readyJobs.size(); i++) {
-                Job j = (Job)_readyJobs.get(i);
+            for (Job j : _readyJobs) {
                 j.getTiming().offsetChanged(delta);
             }
         }
         synchronized (_runnerLock) {
-            for (Iterator iter = _queueRunners.values().iterator(); iter.hasNext(); ) {
-                JobQueueRunner runner = (JobQueueRunner)iter.next();
+            for (JobQueueRunner runner : _queueRunners.values()) {
                 Job job = runner.getCurrentJob();
                 if (job != null)
                     job.getTiming().offsetChanged(delta);
@@ -509,14 +515,14 @@ public class JobQueue {
         if (lag < 0) lag = 0;
         if (duration < 0) duration = 0;
         
-        JobStats stats = null;
-        if (!_jobStats.containsKey(key)) {
-            _jobStats.put(key, new JobStats(key));
+        JobStats stats = _jobStats.get(key);
+        if (stats == null) {
+            stats = new JobStats(key);
+            _jobStats.put(key, stats);
             // yes, if two runners finish the same job at the same time, this could
             // create an extra object.  but, who cares, its pushed out of the map
             // immediately anyway.
         }
-        stats = (JobStats)_jobStats.get(key);
         stats.jobRan(duration, lag);
 
         String dieMsg = null;
@@ -555,26 +561,39 @@ public class JobQueue {
     }
     
         
+    /** job ID counter changed from int to long so it won't wrap negative */
+    private static final int POISON_ID = -99999;
+
+    private static class PoisonJob implements Job {
+        public String getName() { return null; }
+        public long getJobId() { return POISON_ID; }
+        public JobTiming getTiming() { return null; }
+        public void runJob() {}
+        public Exception getAddedBy() { return null; }
+        public void dropped() {}
+    }
+
     //// 
     // the remainder are utility methods for dumping status info
     ////
     
     public void renderStatusHTML(Writer out) throws IOException {
-        ArrayList readyJobs = null;
-        ArrayList timedJobs = null;
-        ArrayList activeJobs = new ArrayList(1);
-        ArrayList justFinishedJobs = new ArrayList(4);
+        List<Job> readyJobs = null;
+        List<Job> timedJobs = null;
+        List<Job> activeJobs = new ArrayList(RUNNERS);
+        List<Job> justFinishedJobs = new ArrayList(RUNNERS);
         //out.write("<!-- jobQueue rendering -->\n");
         out.flush();
         
-        int states[] = null;
+        //int states[] = null;
         int numRunners = 0;
-        synchronized (_queueRunners) {
-            states = new int[_queueRunners.size()];
+
+        {
+            //states = new int[_queueRunners.size()];
             int i = 0;
-            for (Iterator iter = _queueRunners.values().iterator(); iter.hasNext(); i++) {
-                JobQueueRunner runner = (JobQueueRunner)iter.next();
-                states[i] = runner.getState();
+            for (Iterator<JobQueueRunner> iter = _queueRunners.values().iterator(); iter.hasNext(); i++) {
+                JobQueueRunner runner = iter.next();
+                //states[i] = runner.getState();
                 Job job = runner.getCurrentJob();
                 if (job != null) {
                     activeJobs.add(job);
@@ -621,21 +640,21 @@ public class JobQueue {
 
         buf.append("<hr><b>Active jobs: ").append(activeJobs.size()).append("</b><ol>\n");
         for (int i = 0; i < activeJobs.size(); i++) {
-            Job j = (Job)activeJobs.get(i);
+            Job j = activeJobs.get(i);
             buf.append("<li>[started ").append(DataHelper.formatDuration(now-j.getTiming().getStartAfter())).append(" ago]: ");
             buf.append(j.toString()).append("</li>\n");
         }
         buf.append("</ol>\n");
         buf.append("<hr><b>Just finished jobs: ").append(justFinishedJobs.size()).append("</b><ol>\n");
         for (int i = 0; i < justFinishedJobs.size(); i++) {
-            Job j = (Job)justFinishedJobs.get(i);
+            Job j = justFinishedJobs.get(i);
             buf.append("<li>[finished ").append(DataHelper.formatDuration(now-j.getTiming().getActualEnd())).append(" ago]: ");
             buf.append(j.toString()).append("</li>\n");
         }
         buf.append("</ol>\n");
         buf.append("<hr><b>Ready/waiting jobs: ").append(readyJobs.size()).append("</b><ol>\n");
         for (int i = 0; i < readyJobs.size(); i++) {
-            Job j = (Job)readyJobs.get(i);
+            Job j = readyJobs.get(i);
             buf.append("<li>[waiting ");
             buf.append(DataHelper.formatDuration(now-j.getTiming().getStartAfter()));
             buf.append("]: ");
@@ -645,13 +664,13 @@ public class JobQueue {
         out.flush();
 
         buf.append("<hr><b>Scheduled jobs: ").append(timedJobs.size()).append("</b><ol>\n");
-        TreeMap ordered = new TreeMap();
+        TreeMap<Long, Job> ordered = new TreeMap();
         for (int i = 0; i < timedJobs.size(); i++) {
-            Job j = (Job)timedJobs.get(i);
+            Job j = timedJobs.get(i);
             ordered.put(new Long(j.getTiming().getStartAfter()), j);
         }
-        for (Iterator iter = ordered.values().iterator(); iter.hasNext(); ) {
-            Job j = (Job)iter.next();
+        for (Iterator<Job> iter = ordered.values().iterator(); iter.hasNext(); ) {
+            Job j = iter.next();
             long time = j.getTiming().getStartAfter() - now;
             buf.append("<li>").append(j.getName()).append(" in ");
             buf.append(DataHelper.formatDuration(time)).append("</li>\n");
@@ -685,13 +704,10 @@ public class JobQueue {
         long maxPendingTime = -1;
         long minPendingTime = -1;
 
-        TreeMap tstats = null;
-        synchronized (_jobStats) {
-            tstats = new TreeMap(_jobStats);
-        }
+        TreeMap<String, JobStats> tstats = new TreeMap(_jobStats);
         
-        for (Iterator iter = tstats.values().iterator(); iter.hasNext(); ) {
-            JobStats stats = (JobStats)iter.next();
+        for (Iterator<JobStats> iter = tstats.values().iterator(); iter.hasNext(); ) {
+            JobStats stats = iter.next();
             buf.append("<tr>");
             buf.append("<td><b>").append(stats.getName()).append("</b></td>");
             buf.append("<td align=\"right\">").append(stats.getRuns()).append("</td>");

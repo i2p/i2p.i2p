@@ -12,10 +12,8 @@
 
         <!-- use pack200 compression, saves about 33%
              see http://java.sun.com/j2se/1.5.0/docs/guide/deployment/deployment-guide/pack200.html
-             However it makes the unpacked jars much larger...
-             For further testing...
-             <pack200 />
          -->
+             <pack200 />
 
         <!-- adding this element will make the installer attempt to launch itself with administrator permissions,
              but see http://www.nabble.com/Classpath-security-issues-on-Vista-td22456230.html

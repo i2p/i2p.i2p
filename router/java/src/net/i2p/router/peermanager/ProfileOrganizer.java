@@ -217,7 +217,7 @@ public class ProfileOrganizer {
         return activePeers;
     }
     
-    private boolean isX(Map m, Hash peer) {
+    private boolean isX(Map<Hash, PeerProfile> m, Hash peer) {
         getReadLock();
         try {
             return m.containsKey(peer);
@@ -272,10 +272,10 @@ public class ProfileOrganizer {
      * @param matches set to store the return value in
      *
      */
-    public void selectFastPeers(int howMany, Set exclude, Set matches) {
+    public void selectFastPeers(int howMany, Set<Hash> exclude, Set<Hash> matches) {
         selectFastPeers(howMany, exclude, matches, 0);
     }
-    public void selectFastPeers(int howMany, Set exclude, Set matches, int mask) {
+    public void selectFastPeers(int howMany, Set<Hash> exclude, Set<Hash> matches, int mask) {
         getReadLock();
         try {
             locked_selectPeers(_fastPeers, howMany, exclude, matches, mask);
@@ -295,10 +295,10 @@ public class ProfileOrganizer {
      * Return a set of Hashes for peers that have a high capacity
      *
      */
-    public void selectHighCapacityPeers(int howMany, Set exclude, Set matches) {
+    public void selectHighCapacityPeers(int howMany, Set<Hash> exclude, Set<Hash> matches) {
         selectHighCapacityPeers(howMany, exclude, matches, 0);
     }
-    public void selectHighCapacityPeers(int howMany, Set exclude, Set matches, int mask) {
+    public void selectHighCapacityPeers(int howMany, Set<Hash> exclude, Set<Hash> matches, int mask) {
         getReadLock();
         try {
             // we only use selectHighCapacityPeers when we are selecting for PURPOSE_TEST
@@ -326,10 +326,10 @@ public class ProfileOrganizer {
      * Return a set of Hashes for peers that are well integrated into the network.
      *
      */
-    public void selectWellIntegratedPeers(int howMany, Set exclude, Set matches) {
+    public void selectWellIntegratedPeers(int howMany, Set<Hash> exclude, Set<Hash> matches) {
         selectWellIntegratedPeers(howMany, exclude, matches, 0);
     }
-    public void selectWellIntegratedPeers(int howMany, Set exclude, Set matches, int mask) {
+    public void selectWellIntegratedPeers(int howMany, Set<Hash> exclude, Set<Hash> matches, int mask) {
         getReadLock();
         try {
             locked_selectPeers(_wellIntegratedPeers, howMany, exclude, matches, mask);
@@ -350,13 +350,13 @@ public class ProfileOrganizer {
      * we are already talking with
      *
      */
-    public void selectNotFailingPeers(int howMany, Set exclude, Set matches) {
+    public void selectNotFailingPeers(int howMany, Set<Hash> exclude, Set<Hash> matches) {
         selectNotFailingPeers(howMany, exclude, matches, false, 0);
     }
-    public void selectNotFailingPeers(int howMany, Set exclude, Set matches, int mask) {
+    public void selectNotFailingPeers(int howMany, Set<Hash> exclude, Set<Hash> matches, int mask) {
         selectNotFailingPeers(howMany, exclude, matches, false, mask);
     }
-    public void selectNotFailingPeers(int howMany, Set exclude, Set matches, boolean onlyNotFailing) {
+    public void selectNotFailingPeers(int howMany, Set<Hash> exclude, Set<Hash> matches, boolean onlyNotFailing) {
         selectNotFailingPeers(howMany, exclude, matches, onlyNotFailing, 0);
     }
     /**
@@ -368,7 +368,7 @@ public class ProfileOrganizer {
      * @param matches set to store the matches in
      * @param onlyNotFailing if true, don't include any high capacity peers
      */
-    public void selectNotFailingPeers(int howMany, Set exclude, Set matches, boolean onlyNotFailing, int mask) {
+    public void selectNotFailingPeers(int howMany, Set<Hash> exclude, Set<Hash> matches, boolean onlyNotFailing, int mask) {
         if (matches.size() < howMany)
             selectAllNotFailingPeers(howMany, exclude, matches, onlyNotFailing, mask);
         return;
@@ -388,7 +388,7 @@ public class ProfileOrganizer {
      * @param exclude non-null
      * No mask parameter, to be fixed
      */
-    public void selectActiveNotFailingPeers(int howMany, Set exclude, Set matches) {
+    public void selectActiveNotFailingPeers(int howMany, Set<Hash> exclude, Set<Hash> matches) {
         if (matches.size() < howMany) {
             getReadLock();
             try {
@@ -412,7 +412,7 @@ public class ProfileOrganizer {
      *
      * This DOES cascade further to non-connected peers.
      */
-    private void selectActiveNotFailingPeers2(int howMany, Set exclude, Set matches, int mask) {
+    private void selectActiveNotFailingPeers2(int howMany, Set<Hash> exclude, Set<Hash> matches, int mask) {
         if (matches.size() < howMany) {
             Map<Hash, PeerProfile> activePeers = new HashMap();
             getReadLock();
@@ -439,14 +439,14 @@ public class ProfileOrganizer {
      * Return a set of Hashes for peers that are not failing.
      *
      */
-    public void selectAllNotFailingPeers(int howMany, Set exclude, Set matches, boolean onlyNotFailing) {
+    public void selectAllNotFailingPeers(int howMany, Set<Hash> exclude, Set<Hash> matches, boolean onlyNotFailing) {
         selectAllNotFailingPeers(howMany, exclude, matches, onlyNotFailing, 0);
     }
     /**
      * @param mask ignored, should call locked_selectPeers, to be fixed
      *
      */
-    private void selectAllNotFailingPeers(int howMany, Set exclude, Set matches, boolean onlyNotFailing, int mask) {
+    private void selectAllNotFailingPeers(int howMany, Set<Hash> exclude, Set<Hash> matches, boolean onlyNotFailing, int mask) {
         if (matches.size() < howMany) {
             int orig = matches.size();
             int needed = howMany - orig;
@@ -495,7 +495,7 @@ public class ProfileOrganizer {
      * I'm not quite sure why you'd want this... (other than for failover from the better results)
      *
      */
-    public void selectFailingPeers(int howMany, Set exclude, Set matches) {
+    public void selectFailingPeers(int howMany, Set<Hash> exclude, Set<Hash> matches) {
         getReadLock();
         try {
             locked_selectPeers(_failingPeers, howMany, exclude, matches);
@@ -564,12 +564,12 @@ public class ProfileOrganizer {
      * recent == last 20s
      *
      */
-    public List selectPeersRecentlyRejecting() { 
+    public List<Hash> selectPeersRecentlyRejecting() { 
         getReadLock();
         try {
             long cutoff = _context.clock().now() - (20*1000);
             int count = _notFailingPeers.size();
-            List l = new ArrayList(count / 128);
+            List<Hash> l = new ArrayList(count / 128);
             for (Iterator<PeerProfile> iter = _notFailingPeers.values().iterator(); iter.hasNext(); ) {
                 PeerProfile prof = iter.next();
                 if (prof.getTunnelHistory().getLastRejectedBandwidth() > cutoff)
@@ -583,10 +583,10 @@ public class ProfileOrganizer {
      * Find the hashes for all peers we are actively profiling
      *
      */
-    public Set selectAllPeers() {
+    public Set<Hash> selectAllPeers() {
         getReadLock();
         try {
-            Set allPeers = new HashSet(_failingPeers.size() + _notFailingPeers.size() + _highCapacityPeers.size() + _fastPeers.size());
+            Set<Hash> allPeers = new HashSet(_failingPeers.size() + _notFailingPeers.size() + _highCapacityPeers.size() + _fastPeers.size());
             allPeers.addAll(_failingPeers.keySet());
             allPeers.addAll(_notFailingPeers.keySet());
             allPeers.addAll(_highCapacityPeers.keySet());
@@ -853,10 +853,10 @@ public class ProfileOrganizer {
      * high capacity group to define the integration threshold.
      *
      */
-    private void locked_calculateThresholds(Set allPeers) {
+    private void locked_calculateThresholds(Set<PeerProfile> allPeers) {
         double totalCapacity = 0;
         double totalIntegration = 0;
-        Set reordered = new TreeSet(_comp);
+        Set<PeerProfile> reordered = new TreeSet(_comp);
         for (Iterator<PeerProfile> iter = allPeers.iterator(); iter.hasNext(); ) {
             PeerProfile profile = iter.next();
             
@@ -895,7 +895,7 @@ public class ProfileOrganizer {
      *                  (highest first) for active nonfailing peers whose 
      *                  capacity is greater than the growth factor
      */
-    private void locked_calculateCapacityThreshold(double totalCapacity, Set reordered) {
+    private void locked_calculateCapacityThreshold(double totalCapacity, Set<PeerProfile> reordered) {
         int numNotFailing = reordered.size();
         
         double meanCapacity = avg(totalCapacity, numNotFailing);
@@ -964,7 +964,7 @@ public class ProfileOrganizer {
      * @param reordered ordered set of PeerProfile objects, ordered by capacity
      *                  (highest first) for active nonfailing peers
      */
-    private void locked_calculateSpeedThreshold(Set reordered) {
+    private void locked_calculateSpeedThreshold(Set<PeerProfile> reordered) {
         if (true) {
             locked_calculateSpeedThresholdMean(reordered);
             return;
@@ -996,7 +996,7 @@ public class ProfileOrganizer {
 *****/
     }
     
-    private void locked_calculateSpeedThresholdMean(Set reordered) {
+    private void locked_calculateSpeedThresholdMean(Set<PeerProfile> reordered) {
         double total = 0;
         int count = 0;
         for (Iterator<PeerProfile> iter = reordered.iterator(); iter.hasNext(); ) {
@@ -1040,10 +1040,10 @@ public class ProfileOrganizer {
      * matches set until it has howMany elements in it.
      *
      */
-    private void locked_selectPeers(Map peers, int howMany, Set toExclude, Set matches) {
+    private void locked_selectPeers(Map<Hash, PeerProfile> peers, int howMany, Set<Hash> toExclude, Set<Hash> matches) {
         locked_selectPeers(peers, howMany, toExclude, matches, 0);
     }
-    private void locked_selectPeers(Map peers, int howMany, Set toExclude, Set matches, int mask) {
+    private void locked_selectPeers(Map<Hash, PeerProfile> peers, int howMany, Set<Hash> toExclude, Set<Hash> matches, int mask) {
         List all = new ArrayList(peers.keySet());
         if (toExclude != null)
             all.removeAll(toExclude);
@@ -1051,7 +1051,7 @@ public class ProfileOrganizer {
         all.removeAll(matches);
         all.remove(_us);
         Collections.shuffle(all, _random);
-        Set IPSet = new HashSet(8);
+        Set<Integer> IPSet = new HashSet(8);
         for (int i = 0; (matches.size() < howMany) && (i < all.size()); i++) {
             Hash peer = (Hash)all.get(i);
             boolean ok = isSelectable(peer);
@@ -1073,8 +1073,8 @@ public class ProfileOrganizer {
      * @param mask is 1-4 (number of bytes to match)
      * @param IPMatches all IPs so far, modified by this routine
      */
-    private boolean notRestricted(Hash peer, Set IPSet, int mask) {
-        Set peerIPs = maskedIPSet(peer, mask);
+    private boolean notRestricted(Hash peer, Set<Integer> IPSet, int mask) {
+        Set<Integer> peerIPs = maskedIPSet(peer, mask);
         if (containsAny(IPSet, peerIPs))
             return false;
         IPSet.addAll(peerIPs);
@@ -1087,8 +1087,8 @@ public class ProfileOrganizer {
       *
       * @return an opaque set of masked IPs for this peer
       */
-    private Set maskedIPSet(Hash peer, int mask) {
-        Set rv = new HashSet(2);
+    private Set<Integer> maskedIPSet(Hash peer, int mask) {
+        Set<Integer> rv = new HashSet(2);
         byte[] commIP = _context.commSystem().getIP(peer);
         if (commIP != null)
             rv.add(maskedIP(commIP, mask));

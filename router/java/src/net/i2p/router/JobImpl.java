@@ -15,8 +15,8 @@ import net.i2p.util.Log;
 public abstract class JobImpl implements Job {
     private RouterContext _context;
     private JobTiming _timing;
-    private static int _idSrc = 0;
-    private int _id;
+    private static long _idSrc = 0;
+    private long _id;
     private Exception _addedBy;
     private long _madeReadyOn;
     
@@ -28,7 +28,7 @@ public abstract class JobImpl implements Job {
         _madeReadyOn = 0;
     }
     
-    public int getJobId() { return _id; }
+    public long getJobId() { return _id; }
     public JobTiming getTiming() { return _timing; }
     
     public final RouterContext getContext() { return _context; }

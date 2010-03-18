@@ -180,7 +180,8 @@ public abstract class TunnelPeerSelector {
         peers.addAll(ctx.tunnelManager().selectPeersInTooManyTunnels());
         // if (false && filterUnreachable(ctx, isInbound, isExploratory)) {
         if (filterUnreachable(ctx, isInbound, isExploratory)) {
-            List caps = ctx.peerManager().getPeersByCapability(Router.CAPABILITY_UNREACHABLE);
+            // This is the only use for getPeersByCapability? And the whole set of datastructures in PeerManager?
+            List<Hash> caps = ctx.peerManager().getPeersByCapability(Router.CAPABILITY_UNREACHABLE);
             if (caps != null)
                 peers.addAll(caps);
             caps = ctx.profileOrganizer().selectPeersLocallyUnreachable();

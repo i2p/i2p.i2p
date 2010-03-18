@@ -282,7 +282,11 @@ public class NetDbRenderer {
         }
         for (Iterator iter = info.getAddresses().iterator(); iter.hasNext(); ) {
             RouterAddress addr = (RouterAddress)iter.next();
-            buf.append("<b>").append(DataHelper.stripHTML(addr.getTransportStyle())).append(":</b> ");
+            String style = addr.getTransportStyle();
+            buf.append("<b>").append(DataHelper.stripHTML(style)).append(":</b> ");
+            int cost = addr.getCost();
+            if (!((style.equals("SSU") && cost == 5) || (style.equals("NTCP") && cost == 10)))
+                buf.append('[').append("cost").append('=').append("" + cost).append("] ");
             for (Iterator optIter = addr.getOptions().keySet().iterator(); optIter.hasNext(); ) {
                 String name = (String)optIter.next();
                 String val = addr.getOptions().getProperty(name);

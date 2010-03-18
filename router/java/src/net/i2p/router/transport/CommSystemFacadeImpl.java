@@ -116,7 +116,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         return sum * 1000 / frameSize;
     }
     
-    public List getBids(OutNetMessage msg) {
+    public List<TransportBid> getBids(OutNetMessage msg) {
         return _manager.getBids(msg);
     }
     public TransportBid getBid(OutNetMessage msg) {
@@ -174,8 +174,8 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     }
     
     @Override
-    public Set createAddresses() {
-        Map addresses = null;
+    public Set<RouterAddress> createAddresses() {
+        Map<String, RouterAddress> addresses = null;
         boolean newCreated = false;
         
         if (_manager != null) {

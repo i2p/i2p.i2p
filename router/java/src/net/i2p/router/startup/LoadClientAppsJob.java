@@ -11,7 +11,7 @@ import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
 /**
- * Run any client applications specified in the router.config.  If any clientApp
+ * Run any client applications specified in clients.config.  If any clientApp
  * contains the config property ".onBoot=true" it'll be launched immediately, otherwise
  * it'll get queued up for starting 2 minutes later.
  *
@@ -40,7 +40,7 @@ public class LoadClientAppsJob extends JobImpl {
             if (app.disabled)
                 continue;
             String argVal[] = parseArgs(app.args);
-            if (app.delay == 0) {
+            if (app.delay <= 0) {
                 // run this guy now
                 runClient(app.className, app.clientName, argVal, _log);
             } else {
@@ -118,6 +118,36 @@ public class LoadClientAppsJob extends JobImpl {
         return rv;
     }
 
+    /**
+     *  Use to test if the class is present,
+     *  to propagate an error back to the user,
+     *  since runClient() runs in a separate thread.
+     *
+     *  @since 0.7.13
+     */
+    public static void testClient(String className) throws ClassNotFoundException {
+        Class.forName(className);
+    }
+
+    /**
+     *  Run client in this thread.
+     *
+     *  @throws just about anything, caller would be wise to catch Throwable
+     *  @since 0.7.13
+     */
+    public static void runClientInline(String className, String clientName, String args[], Log log) throws Exception {
+        if (log.shouldLog(Log.INFO))
+            log.info("Loading up the client application " + clientName + ": " + className + " " + Arrays.toString(args));
+        if (args == null)
+            args = new String[0];
+        Class cls = Class.forName(className);
+        Method method = cls.getMethod("main", new Class[] { String[].class });
+        method.invoke(cls, new Object[] { args });
+    }
+
+    /**
+     *  Run client in a new thread.
+     */
     public static void runClient(String className, String clientName, String args[], Log log) {
         if (log.shouldLog(Log.INFO))
             log.info("Loading up the client application " + clientName + ": " + className + " " + Arrays.toString(args));

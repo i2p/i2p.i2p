@@ -2,11 +2,10 @@ package net.i2p.router.transport.udp;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
@@ -102,7 +101,7 @@ class PeerTestManager {
     private PeerTestState _currentTest;
     private boolean _currentTestComplete;
     /** as Alice */
-    private List<Long> _recentTests;
+    private Queue<Long> _recentTests;
     
     /** longest we will keep track of a Charlie nonce for */
     private static final int MAX_CHARLIE_LIFETIME = 10*1000;
@@ -116,8 +115,8 @@ class PeerTestManager {
         _context = context;
         _transport = transport;
         _log = context.logManager().getLog(PeerTestManager.class);
-        _activeTests = new HashMap(64);
-        _recentTests = Collections.synchronizedList(new ArrayList(16));
+        _activeTests = new ConcurrentHashMap();
+        _recentTests = new LinkedBlockingQueue();
         _packetBuilder = new PacketBuilder(context, transport);
         _currentTest = null;
         _currentTestComplete = false;
@@ -155,8 +154,8 @@ class PeerTestManager {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Running test with bob = " + bobIP + ":" + bobPort + " " + test.getNonce());
         while (_recentTests.size() > 16)
-            _recentTests.remove(0);
-        _recentTests.add(new Long(test.getNonce()));
+            _recentTests.poll();
+        _recentTests.offer(new Long(test.getNonce()));
         
         sendTestToBob();
         
@@ -435,10 +434,7 @@ class PeerTestManager {
             testInfo.readIP(testIP, 0);
         }
        
-        PeerTestState state = null;
-        synchronized (_activeTests) {
-            state = (PeerTestState)_activeTests.get(new Long(nonce));
-        }
+        PeerTestState state = _activeTests.get(new Long(nonce));
         
         if (state == null) {
             if ( (testIP == null) || (testPort <= 0) ) {
@@ -542,9 +538,7 @@ class PeerTestManager {
                 _log.debug("Receive from bob (" + from + ") as charlie, sending back to bob and sending to alice @ " + aliceIP + ":" + alicePort);
             
             if (isNew) {
-                synchronized (_activeTests) {
-                    _activeTests.put(new Long(nonce), state);
-                }
+                _activeTests.put(new Long(nonce), state);
                 SimpleScheduler.getInstance().addEvent(new RemoveTest(nonce), MAX_CHARLIE_LIFETIME);
             }
 
@@ -623,9 +617,7 @@ class PeerTestManager {
             }
             
             if (isNew) {
-                synchronized (_activeTests) {
-                    _activeTests.put(new Long(nonce), state);
-                }
+                _activeTests.put(new Long(nonce), state);
                 SimpleScheduler.getInstance().addEvent(new RemoveTest(nonce), MAX_CHARLIE_LIFETIME);
             }
             
@@ -701,9 +693,7 @@ class PeerTestManager {
             _nonce = nonce;
         }
         public void timeReached() {
-            synchronized (_activeTests) {
                 _activeTests.remove(new Long(_nonce));
-            }
         }
     }
 }

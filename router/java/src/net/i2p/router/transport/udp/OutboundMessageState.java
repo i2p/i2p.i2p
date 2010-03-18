@@ -342,8 +342,8 @@ public class OutboundMessageState {
     public String toString() {
         short sends[] = _fragmentSends;
         ByteArray messageBuf = _messageBuf;
-        StringBuilder buf = new StringBuilder(64);
-        buf.append("Message ").append(_messageId);
+        StringBuilder buf = new StringBuilder(256);
+        buf.append("OB Message ").append(_messageId);
         if (sends != null)
             buf.append(" with ").append(sends.length).append(" fragments");
         if (messageBuf != null)

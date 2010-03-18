@@ -25,8 +25,8 @@ public interface PeerManagerFacade extends Service {
      *
      * @return List of Hash objects of the RouterIdentity for matching peers
      */
-    public List selectPeers(PeerSelectionCriteria criteria);
-    public List getPeersByCapability(char capability);
+    public List<Hash> selectPeers(PeerSelectionCriteria criteria);
+    public List<Hash> getPeersByCapability(char capability);
     public void setCapabilities(Hash peer, String caps);
     public void removeCapabilities(Hash peer);
     public Hash selectRandomByCapability(char capability);

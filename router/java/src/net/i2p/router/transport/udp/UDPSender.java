@@ -3,8 +3,8 @@ package net.i2p.router.transport.udp;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
@@ -20,16 +20,17 @@ public class UDPSender {
     private Log _log;
     private DatagramSocket _socket;
     private String _name;
-    private final List _outboundQueue;
+    private final BlockingQueue<UDPPacket> _outboundQueue;
     private boolean _keepRunning;
     private Runner _runner;
+    private static final int TYPE_POISON = 99999;
     
-    private static final int MAX_QUEUED = 4;
+    //private static final int MAX_QUEUED = 4;
     
     public UDPSender(RouterContext ctx, DatagramSocket socket, String name) {
         _context = ctx;
         _log = ctx.logManager().getLog(UDPSender.class);
-        _outboundQueue = new ArrayList(128);
+        _outboundQueue = new LinkedBlockingQueue();
         _socket = socket;
         _runner = new Runner();
         _name = name;
@@ -44,49 +45,40 @@ public class UDPSender {
         // used in RouterWatchdog
         _context.statManager().createRateStat("udp.sendException", "How frequently we fail to send a packet (likely due to a windows exception)", "udp", new long[] { 60*1000, 10*60*1000 });
 
-        _context.statManager().createRateStat("udp.sendPacketSize.1", "db store message size", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.sendPacketSize.2", "db lookup message size", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.sendPacketSize.3", "db search reply message size", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.sendPacketSize.6", "tunnel create message size", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.sendPacketSize.7", "tunnel create status message size", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.sendPacketSize.10", "delivery status message size", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.sendPacketSize.11", "garlic message size", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.sendPacketSize.16", "date message size", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.sendPacketSize.18", "tunnel data message size", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.sendPacketSize.19", "tunnel gateway message size", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.sendPacketSize.20", "data message size", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.sendPacketSize.21", "tunnel build", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.sendPacketSize.22", "tunnel build reply", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.sendPacketSize.20", "data message size", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.sendPacketSize.42", "ack-only packet size", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.sendPacketSize.43", "hole punch packet size", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.sendPacketSize.44", "relay response packet size", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.sendPacketSize.45", "relay intro packet size", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.sendPacketSize.46", "relay request packet size", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.sendPacketSize.47", "peer test charlie to bob packet size", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.sendPacketSize.48", "peer test bob to charlie packet size", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.sendPacketSize.49", "peer test to alice packet size", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.sendPacketSize.50", "peer test from alice packet size", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.sendPacketSize.51", "session confirmed packet size", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.sendPacketSize.52", "session request packet size", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.sendPacketSize.53", "session created packet size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize." + PacketBuilder.TYPE_ACK, "ack-only packet size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize." + PacketBuilder.TYPE_PUNCH, "hole punch packet size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize." + PacketBuilder.TYPE_RESP, "relay response packet size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize." + PacketBuilder.TYPE_INTRO, "relay intro packet size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize." + PacketBuilder.TYPE_RREQ, "relay request packet size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize." + PacketBuilder.TYPE_TCB, "peer test charlie to bob packet size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize." + PacketBuilder.TYPE_TBC, "peer test bob to charlie packet size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize." + PacketBuilder.TYPE_TTA, "peer test to alice packet size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize." + PacketBuilder.TYPE_TFA, "peer test from alice packet size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize." + PacketBuilder.TYPE_CONF, "session confirmed packet size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize." + PacketBuilder.TYPE_SREQ, "session request packet size", "udp", UDPTransport.RATES);
+        _context.statManager().createRateStat("udp.sendPacketSize." + PacketBuilder.TYPE_CREAT, "session created packet size", "udp", UDPTransport.RATES);
     }
     
     public void startup() {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Starting the runner: " + _name);
         _keepRunning = true;
-        I2PThread t = new I2PThread(_runner, _name);
-        t.setDaemon(true);
+        I2PThread t = new I2PThread(_runner, _name, true);
         t.start();
     }
     
     public void shutdown() {
         _keepRunning = false;
-        synchronized (_outboundQueue) {
-            _outboundQueue.clear();
-            _outboundQueue.notifyAll();
+        _outboundQueue.clear();
+        UDPPacket poison = UDPPacket.acquire(_context, false);
+        poison.setMessageType(TYPE_POISON);
+        _outboundQueue.offer(poison);
+        for (int i = 1; i <= 5 && !_outboundQueue.isEmpty(); i++) {
+            try {
+                Thread.sleep(i * 50);
+            } catch (InterruptedException ie) {}
         }
+        _outboundQueue.clear();
     }
     
     public DatagramSocket updateListeningPort(DatagramSocket socket, int newPort) {
@@ -98,10 +90,12 @@ public class UDPSender {
      * Add the packet to the queue.  This may block until there is space
      * available, if requested, otherwise it returns immediately
      *
-     * @param blockTime how long to block
+     * @param blockTime how long to block IGNORED
      * @return number of packets queued
+     * @deprecated use add(packet)
      */
     public int add(UDPPacket packet, int blockTime) {
+     /********
         //long expiration = _context.clock().now() + blockTime;
         int remaining = -1;
         long lifetime = -1;
@@ -124,13 +118,12 @@ public class UDPSender {
                         }
                     }
                     
-                    //if (true || (_outboundQueue.size() < MAX_QUEUED)) {
+                    if (true || (_outboundQueue.size() < MAX_QUEUED)) {
                         lifetime = packet.getLifetime();
                         _outboundQueue.add(packet);
                         added = true;
                         remaining = _outboundQueue.size();
                         _outboundQueue.notifyAll();
-                    /*****
                     } else {
                         long remainingTime = expiration - _context.clock().now();
                         if (remainingTime > 0) {
@@ -141,7 +134,6 @@ public class UDPSender {
                         }
                         lifetime = packet.getLifetime();
                     }
-                    *****/
                 }
             //} catch (InterruptedException ie) {}
         }
@@ -153,42 +145,26 @@ public class UDPSender {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Added the packet onto the queue with " + remaining + " remaining and a lifetime of " + lifetime);
         return remaining;
+     ********/
+        return add(packet);
     }
     
     private static final int MAX_HEAD_LIFETIME = 1000;
     
     /**
-     *
-     * @return number of packets in the queue
+     * Put it on the queue
+     * @return ZERO (used to be number of packets in the queue)
      */
     public int add(UDPPacket packet) {
-        if (packet == null) return 0;
+        if (packet == null || !_keepRunning) return 0;
         int size = 0;
-        long lifetime = -1;
-        int removed = 0;
-        synchronized (_outboundQueue) {
-            lifetime = packet.getLifetime();
-            UDPPacket head = null;
-            if (_outboundQueue.size() > 0) {
-                head = (UDPPacket)_outboundQueue.get(0);
-                while (head.getLifetime() > MAX_HEAD_LIFETIME) {
-                    _outboundQueue.remove(0);
-                    removed++;
-                    if (_outboundQueue.size() > 0)
-                        head = (UDPPacket)_outboundQueue.get(0);
-                    else
-                        break;
-                }
-            }
-            _outboundQueue.add(packet);
+        _outboundQueue.offer(packet);
+        //size = _outboundQueue.size();
+        //_context.statManager().addRateData("udp.sendQueueSize", size, lifetime);
+        if (_log.shouldLog(Log.DEBUG)) {
             size = _outboundQueue.size();
-            _outboundQueue.notifyAll();
+            _log.debug("Added the packet onto the queue with " + size + " remaining and a lifetime of " + packet.getLifetime());
         }
-        _context.statManager().addRateData("udp.sendQueueSize", size, lifetime);
-        if (removed > 0)
-            _context.statManager().addRateData("udp.sendQueueTrimmed", removed, size);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Added the packet onto the queue with " + size + " remaining and a lifetime of " + lifetime);
         return size;
     }
     
@@ -227,7 +203,8 @@ public class UDPSender {
                         //_log.debug("Sending packet: (size="+size + "/"+size2 +")\nraw: " + Base64.encode(packet.getPacket().getData(), 0, size));
                     }
                     
-                    _context.statManager().addRateData("udp.sendPacketSize." + packet.getMessageType(), size, packet.getFragmentCount());
+                    if (packet.getMessageType() >= PacketBuilder.TYPE_FIRST)
+                        _context.statManager().addRateData("udp.sendPacketSize." + packet.getMessageType(), size, packet.getFragmentCount());
                     
                     //packet.getPacket().setLength(size);
                     try {
@@ -267,20 +244,17 @@ public class UDPSender {
                 _log.debug("Stop sending...");
         }
         
+        /** @return next packet in queue. Will discard any packet older than MAX_HEAD_LIFETIME */
         private UDPPacket getNextPacket() {
             UDPPacket packet = null;
-            while ( (_keepRunning) && (packet == null) ) {
+            while ( (_keepRunning) && (packet == null || packet.getLifetime() > MAX_HEAD_LIFETIME) ) {
+                if (packet != null)
+                    _context.statManager().addRateData("udp.sendQueueTrimmed", 1, 0);
                 try {
-                    synchronized (_outboundQueue) {
-                        if (_outboundQueue.size() <= 0) {
-                            _outboundQueue.notifyAll();
-                            _outboundQueue.wait();
-                        } else {
-                            packet = (UDPPacket)_outboundQueue.remove(0);
-                            _outboundQueue.notifyAll();
-                        }
-                    }
+                    packet = _outboundQueue.take();
                 } catch (InterruptedException ie) {}
+                if (packet != null && packet.getMessageType() == TYPE_POISON)
+                    return null;
             }
             return packet;
         }

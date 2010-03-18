@@ -18,6 +18,49 @@ import net.i2p.router.RouterContext;
  * so they can be used both by LoadClientAppsJob and by the configuration
  * page in the router console.
  *
+ * <pre>
+ *
+ * clients.config format:
+ *
+ * Lines are of the form clientApp.x.prop=val, where x is the app number.
+ * App numbers MUST start with 0 and be consecutive.
+ *
+ * Properties are as follows:
+ *	main: Full class name. Required. The main() method in this
+ *	      class will be run.
+ *	name: Name to be displayed on console.
+ *	args: Arguments to the main class, separated by spaces or tabs.
+ *	      Arguments containing spaces or tabs may be quoted with ' or "
+ *	delay: Seconds before starting, default 120
+ *	onBoot: {true|false}, default false, forces a delay of 0,
+ *	        overrides delay setting
+ *	startOnLoad: {true|false} Is the client to be run at all?
+ *                    Default true
+ *
+ * The following additional properties are used only by plugins:
+ *	stopargs: Arguments to stop the client.
+ *	uninstallargs: Arguments to stop the client.
+ *	classpath: Additional classpath elements for the client,
+ *	           separated by commas.
+ *
+ * The following substitutions are made in the args, stopargs,
+ * uninstallargs, and classpath lines, for plugins only:
+ *	$I2P: The base I2P install directory
+ *	$CONFIG: The user's configuration directory (e.g. ~/.i2p)
+ *	$PLUGIN: This plugin's directory (e.g. ~/.i2p/plugins/foo)
+ *
+ * All properties except "main" are optional.
+ * Lines starting with "#" are comments.
+ *
+ * If the delay is less than zero, the client is run immediately,
+ * in the same thread, so that exceptions may be propagated to the console.
+ * In this case, the client should either throw an exception, return quickly,
+ * or spawn its own thread.
+ * If the delay is greater than or equal to zero, it will be run
+ * in a new thread, and exceptions will be logged but not propagated
+ * to the console.
+ *
+ * </pre>
  */
 public class ClientAppConfig {
     /** wait 2 minutes before starting up client apps */

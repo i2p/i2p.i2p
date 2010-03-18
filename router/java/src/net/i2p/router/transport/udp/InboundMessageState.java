@@ -172,8 +172,8 @@ public class InboundMessageState {
     
     @Override
     public String toString() {
-        StringBuilder buf = new StringBuilder(32);
-        buf.append("Message: ").append(_messageId);
+        StringBuilder buf = new StringBuilder(256);
+        buf.append("IB Message: ").append(_messageId);
         if (isComplete()) {
             buf.append(" completely received with ");
             buf.append(getCompleteSize()).append(" bytes");

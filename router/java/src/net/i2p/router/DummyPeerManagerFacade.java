@@ -24,8 +24,8 @@ class DummyPeerManagerFacade implements PeerManagerFacade {
     public void startup() {}
     public void restart() {}
     public void renderStatusHTML(Writer out) { }    
-    public List selectPeers(PeerSelectionCriteria criteria) { return null; }
-    public List getPeersByCapability(char capability) { return null; }
+    public List<Hash> selectPeers(PeerSelectionCriteria criteria) { return null; }
+    public List<Hash> getPeersByCapability(char capability) { return null; }
     public void setCapabilities(Hash peer, String caps) {}
     public void removeCapabilities(Hash peer) {}
     public Hash selectRandomByCapability(char capability) { return null; }

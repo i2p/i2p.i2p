@@ -11,7 +11,16 @@ import java.io.FileInputStream;
 import java.io.Writer;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
 
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
@@ -56,9 +65,9 @@ public class Blocklist {
     private int _blocklistSize;
     private final Object _lock = new Object();
     private Entry _wrapSave;
-    private final Set<Hash> _inProcess = new HashSet(0);
-    private Map<Hash, String> _peerBlocklist = new HashMap(0);
-    private final Set<Integer> _singleIPBlocklist = new ConcurrentHashSet(0);
+    private final Set<Hash> _inProcess = new HashSet(4);
+    private Map<Hash, String> _peerBlocklist = new HashMap(4);
+    private final Set<Integer> _singleIPBlocklist = new ConcurrentHashSet(4);
     
     public Blocklist(RouterContext context) {
         _context = context;
@@ -109,8 +118,8 @@ public class Blocklist {
                     return;
                 }
             }
-            for (Iterator iter = _peerBlocklist.keySet().iterator(); iter.hasNext(); ) {
-                Hash peer = (Hash) iter.next();
+            for (Iterator<Hash> iter = _peerBlocklist.keySet().iterator(); iter.hasNext(); ) {
+                Hash peer = iter.next();
                 String reason;
                 String comment = (String) _peerBlocklist.get(peer);
                 if (comment != null)
@@ -125,8 +134,8 @@ public class Blocklist {
                 return;
             FloodfillNetworkDatabaseFacade fndf = (FloodfillNetworkDatabaseFacade) _context.netDb();
             int count = 0;
-            for (Iterator iter = fndf.getKnownRouterData().iterator(); iter.hasNext(); ) {
-                RouterInfo ri = (RouterInfo) iter.next();
+            for (Iterator<RouterInfo> iter = fndf.getKnownRouterData().iterator(); iter.hasNext(); ) {
+                RouterInfo ri = iter.next();
                 Hash peer = ri.getIdentity().getHash();
                 if (isBlocklisted(peer))
                     count++;
@@ -458,15 +467,15 @@ public class Blocklist {
      * this tries to not return duplicates
      * but I suppose it could.
      */
-    public List getAddresses(Hash peer) {
-        List rv = new ArrayList(1);
+    public List<byte[]> getAddresses(Hash peer) {
+        List<byte[]> rv = new ArrayList(1);
         RouterInfo pinfo = _context.netDb().lookupRouterInfoLocally(peer);
         if (pinfo == null) return rv;
-        Set paddr = pinfo.getAddresses();
+        Set<RouterAddress> paddr = pinfo.getAddresses();
         if (paddr == null || paddr.size() == 0)
             return rv;
         String oldphost = null;
-        List pladdr = new ArrayList(paddr);
+        List<RouterAddress> pladdr = new ArrayList(paddr);
         // for each peer address
         for (int j = 0; j < paddr.size(); j++) {
             RouterAddress pa = (RouterAddress) pladdr.get(j);
@@ -495,9 +504,9 @@ public class Blocklist {
      * If so, and it isn't shitlisted, shitlist it forever...
      */
     public boolean isBlocklisted(Hash peer) {
-        List ips = getAddresses(peer);
-        for (Iterator iter = ips.iterator(); iter.hasNext(); ) {
-            byte ip[] = (byte[]) iter.next();
+        List<byte[]> ips = getAddresses(peer);
+        for (Iterator<byte[]> iter = ips.iterator(); iter.hasNext(); ) {
+            byte ip[] = iter.next();
             if (isBlocklisted(ip)) {
                 if (! _context.shitlist().isShitlisted(peer))
                     // nice knowing you...
@@ -715,8 +724,8 @@ public class Blocklist {
 
         // look through the file for each address to find which one was the cause
         List ips = getAddresses(peer);
-        for (Iterator iter = ips.iterator(); iter.hasNext(); ) {
-            byte ip[] = (byte[]) iter.next();
+        for (Iterator<byte[]> iter = ips.iterator(); iter.hasNext(); ) {
+            byte ip[] = iter.next();
             int ipint = toInt(ip);
             FileInputStream in = null;
             try {
@@ -762,12 +771,12 @@ public class Blocklist {
     public void renderStatusHTML(Writer out) throws IOException {
         // move to the jsp
         //out.write("<h2>Banned IPs</h2>");
-        Set singles = new TreeSet();
+        Set<Integer> singles = new TreeSet();
         singles.addAll(_singleIPBlocklist);
         if (singles.size() > 0) {
             out.write("<table><tr><td><b>Transient IPs</b></td></tr>");
-            for (Iterator iter = singles.iterator(); iter.hasNext(); ) {
-                 int ip = ((Integer) iter.next()).intValue();
+            for (Iterator<Integer> iter = singles.iterator(); iter.hasNext(); ) {
+                 int ip = iter.next().intValue();
                  out.write("<tr><td align=right>"); out.write(toStr(ip)); out.write("</td></tr>\n");
             }
             out.write("</table>");

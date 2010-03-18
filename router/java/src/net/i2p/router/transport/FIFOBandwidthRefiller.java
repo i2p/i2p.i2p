@@ -71,7 +71,7 @@ public class FIFOBandwidthRefiller implements Runnable {
     public void run() {
         // bootstrap 'em with nothing
         _lastRefillTime = _limiter.now();
-        List buffer = new ArrayList(2);
+        List<FIFOBandwidthLimiter.Request> buffer = new ArrayList(2);
         while (true) {
             long now = _limiter.now();
             if (now >= _lastCheckConfigTime + _configCheckPeriodMs) {
@@ -95,7 +95,7 @@ public class FIFOBandwidthRefiller implements Runnable {
         _lastCheckConfigTime = _lastRefillTime;
     }
     
-    private boolean updateQueues(List buffer, long now) {
+    private boolean updateQueues(List<FIFOBandwidthLimiter.Request> buffer, long now) {
         long numMs = (now - _lastRefillTime);
         if (_log.shouldLog(Log.INFO))
             _log.info("Updating bandwidth after " + numMs + " (status: " + _limiter.getStatus().toString()

@@ -302,7 +302,7 @@ public class EventPumper implements Runnable {
     
     public void wantsWrite(NTCPConnection con, byte data[]) {
         ByteBuffer buf = ByteBuffer.wrap(data);
-        FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().requestOutbound(data.length, "NTCP write", null, null);//con, buf);
+        FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().requestOutbound(data.length, "NTCP write");//con, buf);
         if (req.getPendingOutboundRequested() > 0) {
             if (_log.shouldLog(Log.INFO))
                 _log.info("queued write on " + con + " for " + data.length);
@@ -471,7 +471,7 @@ public class EventPumper implements Runnable {
                 buf.get(data);
                 releaseBuf(buf);
                 ByteBuffer rbuf = ByteBuffer.wrap(data);
-                FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().requestInbound(read, "NTCP read", null, null); //con, buf);
+                FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().requestInbound(read, "NTCP read"); //con, buf);
                 if (req.getPendingInboundRequested() > 0) {
                     key.interestOps(key.interestOps() & ~SelectionKey.OP_READ);
                     if (_log.shouldLog(Log.DEBUG))

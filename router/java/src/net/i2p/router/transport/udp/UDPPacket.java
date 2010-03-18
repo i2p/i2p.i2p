@@ -2,9 +2,9 @@ package net.i2p.router.transport.udp;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
@@ -40,15 +40,17 @@ public class UDPPacket {
     private int _validateCount;
     // private boolean _isInbound;
   
-    private static final List _packetCache;
+    private static final Queue<UDPPacket> _packetCache;
+    private static final boolean CACHE = true;
+    private static final int CACHE_SIZE = 64;
     static {
-        _packetCache = new ArrayList(256);
+        if (CACHE)
+            _packetCache = new LinkedBlockingQueue(CACHE_SIZE);
+        else
+            _packetCache = null;
         _log = I2PAppContext.getGlobalContext().logManager().getLog(UDPPacket.class);
     }
     
-    private static final boolean CACHE = true; // TODO: support caching to cut churn down a /lot/
-    private static final int CACHE_SIZE = 64;
-      
     static final int MAX_PACKET_SIZE = 2048;
     public static final int IV_SIZE = 16;
     public static final int MAC_SIZE = 16;
@@ -121,7 +123,9 @@ public class UDPPacket {
     
     private int _messageType;
     private int _fragmentCount;
+    /** only for debugging and stats, does not go on the wire */
     int getMessageType() { return _messageType; }
+    /** only for debugging and stats, does not go on the wire */
     void setMessageType(int type) { _messageType = type; }
     int getFragmentCount() { return _fragmentCount; }
     void setFragmentCount(int count) { _fragmentCount = count; }
@@ -238,7 +242,7 @@ public class UDPPacket {
     @Override
     public String toString() {
         verifyNotReleased(); 
-        StringBuilder buf = new StringBuilder(64);
+        StringBuilder buf = new StringBuilder(256);
         buf.append(_packet.getLength());
         buf.append(" byte packet with ");
         buf.append(_packet.getAddress().getHostAddress()).append(":");
@@ -256,12 +260,7 @@ public class UDPPacket {
     public static UDPPacket acquire(I2PAppContext ctx, boolean inbound) {
         UDPPacket rv = null;
         if (CACHE) {
-            synchronized (_packetCache) {
-                if (_packetCache.size() > 0) {
-                    rv = (UDPPacket)_packetCache.remove(0);
-                }
-            }
-            
+            rv = _packetCache.poll();
             if (rv != null)
                 rv.init(ctx, inbound);
         }
@@ -284,11 +283,7 @@ public class UDPPacket {
         //_dataCache.release(_dataBuf);
         if (!CACHE)
             return;
-        synchronized (_packetCache) {
-            if (_packetCache.size() <= CACHE_SIZE) {
-                _packetCache.add(this);
-            }
-        }
+        _packetCache.offer(this);
     }
     
     private void verifyNotReleased() {

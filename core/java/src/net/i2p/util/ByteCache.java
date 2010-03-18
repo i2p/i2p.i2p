@@ -1,10 +1,10 @@
 package net.i2p.util;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
@@ -36,12 +36,12 @@ public final class ByteCache {
     }
     private Log _log;
     /** list of available and available entries */
-    private final List _available;
+    private Queue<ByteArray> _available;
     private int _maxCached;
     private int _entrySize;
     private long _lastOverflow;
     
-    /** do we actually want to cache? */
+    /** do we actually want to cache? Warning - setting to false may NPE, this should be fixed or removed */
     private static final boolean _cache = true;
     
     /** how often do we cleanup the cache */
@@ -51,7 +51,7 @@ public final class ByteCache {
     
     private ByteCache(int maxCachedEntries, int entrySize) {
         if (_cache)
-            _available = new ArrayList(maxCachedEntries);
+            _available = new LinkedBlockingQueue(maxCachedEntries);
         _maxCached = maxCachedEntries;
         _entrySize = entrySize;
         _lastOverflow = -1;
@@ -62,6 +62,12 @@ public final class ByteCache {
     private void resize(int maxCachedEntries) {
         if (_maxCached >= maxCachedEntries) return;
         _maxCached = maxCachedEntries;
+        // make a bigger one, move the cached items over
+        Queue newLBQ = new LinkedBlockingQueue(maxCachedEntries);
+        ByteArray ba;
+        while ((ba = _available.poll()) != null)
+            newLBQ.offer(ba);
+        _available = newLBQ;
     }
     
     /**
@@ -70,10 +76,9 @@ public final class ByteCache {
      */
     public final ByteArray acquire() {
         if (_cache) {
-            synchronized (_available) {
-                if (_available.size() > 0)
-                    return (ByteArray)_available.remove(0);
-            }
+            ByteArray rv = _available.poll();
+            if (rv != null)
+                return rv;
         }
         _lastOverflow = System.currentTimeMillis();
         byte data[] = new byte[_entrySize];
@@ -100,10 +105,7 @@ public final class ByteCache {
             
             if (shouldZero)
                 Arrays.fill(entry.getData(), (byte)0x0);
-            synchronized (_available) {
-                if (_available.size() < _maxCached)
-                    _available.add(entry);
-            }
+            _available.offer(entry);
         }
     }
     
@@ -112,13 +114,11 @@ public final class ByteCache {
             if (System.currentTimeMillis() - _lastOverflow > EXPIRE_PERIOD) {
                 // we haven't exceeded the cache size in a few minutes, so lets
                 // shrink the cache 
-                synchronized (_available) {
                     int toRemove = _available.size() / 2;
                     for (int i = 0; i < toRemove; i++)
-                        _available.remove(0);
+                        _available.poll();
                     if ( (toRemove > 0) && (_log.shouldLog(Log.DEBUG)) )
                         _log.debug("Removing " + toRemove + " cached entries of size " + _entrySize);
-                }
             }
         }
     }
