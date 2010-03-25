@@ -23,6 +23,7 @@ package org.klomp.snark;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,8 @@ public class TrackerInfo
   private final String failure_reason;
   private final int interval;
   private final Set peers;
+  private int complete;
+  private int incomplete;
 
   public TrackerInfo(InputStream in, byte[] my_id, MetaInfo metainfo)
     throws IOException
@@ -68,11 +71,26 @@ public class TrackerInfo
           throw new InvalidBEncodingException("No interval given");
         else
           interval = beInterval.getInt();
+
         BEValue bePeers = (BEValue)m.get("peers");
         if (bePeers == null)
-          throw new InvalidBEncodingException("No peer list");
+          peers = Collections.EMPTY_SET;
         else
           peers = getPeers(bePeers.getList(), my_id, metainfo);
+
+        BEValue bev = (BEValue)m.get("complete");
+        if (bev != null) try {
+          complete = bev.getInt();
+          if (complete < 0)
+              complete = 0;
+        } catch (InvalidBEncodingException ibe) {}
+
+        bev = (BEValue)m.get("incomplete");
+        if (bev != null) try {
+          incomplete = bev.getInt();
+          if (incomplete < 0)
+              incomplete = 0;
+        } catch (InvalidBEncodingException ibe) {}
       }
   }
 
@@ -115,6 +133,12 @@ public class TrackerInfo
     return peers;
   }
 
+  public int getPeerCount()
+  {
+    int pc = peers == null ? 0 : peers.size();
+    return Math.max(pc, complete + incomplete - 1);
+  }
+
   public String getFailureReason()
   {
     return failure_reason;
@@ -132,6 +156,8 @@ public class TrackerInfo
       return "TrackerInfo[FAILED: " + failure_reason + "]";
     else
       return "TrackerInfo[interval=" + interval
+        + (complete > 0 ? (", complete=" + complete) : "" )
+        + (incomplete > 0 ? (", incomplete=" + incomplete) : "" )
         + ", peers=" + peers + "]";
   }
 }

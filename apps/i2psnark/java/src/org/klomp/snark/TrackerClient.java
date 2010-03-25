@@ -150,7 +150,7 @@ public class TrackerClient extends I2PAppThread
                 continue;
              String dest = _util.lookup(url.substring(7, slash));
              if (dest == null) {
-                _log.error("Announce host unknown: [" + url + "]");
+                _log.error("Announce host unknown: [" + url.substring(7, slash) + "]");
                 continue;
              }
              if (primary.startsWith("http://" + dest))
@@ -258,7 +258,7 @@ public class TrackerClient extends I2PAppThread
                     tr.started = true;
 
                     Set peers = info.getPeers();
-                    tr.seenPeers = peers.size();
+                    tr.seenPeers = info.getPeerCount();
                     if (coordinator.trackerSeenPeers < tr.seenPeers) // update rising number quickly
                         coordinator.trackerSeenPeers = tr.seenPeers;
                     if ( (left > 0) && (!completed) ) {
@@ -269,6 +269,7 @@ public class TrackerClient extends I2PAppThread
                         Iterator it = ordered.iterator();
                         while (it.hasNext()) {
                           Peer cur = (Peer)it.next();
+                          // FIXME if id == us || dest == us continue;
                           // only delay if we actually make an attempt to add peer
                           if(coordinator.addPeer(cur)) {
                             int delay = DELAY_MUL;
@@ -356,6 +357,10 @@ public class TrackerClient extends I2PAppThread
       + "&downloaded=" + downloaded
       + "&left=" + left
       + ((! event.equals(NO_EVENT)) ? ("&event=" + event) : "");
+    if (left <= 0 || event.equals(STOPPED_EVENT) || !coordinator.needPeers())
+        s += "&numwant=0";
+    else
+        s += "&numwant=" + _util.getMaxConnections();
     _util.debug("Sending TrackerClient request: " + s, Snark.INFO);
       
     tr.lastRequestTime = System.currentTimeMillis();
@@ -430,7 +435,7 @@ public class TrackerClient extends I2PAppThread
            url.getPort() < 0;
   }
 
-  private class Tracker
+  private static class Tracker
   {
       String announce;
       boolean isPrimary;
