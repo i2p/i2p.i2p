@@ -56,7 +56,7 @@ button span.hide{
  <input type="submit" name="action" value="<%=intl._("Save WebApp Configuration")%>" />
 </div></div>
 <% if (clientshelper.showPlugins()) { %>
-<h3><a name="webapp"></a><%=intl._("Plugin Configuration")%></h3><p>
+<h3><a name="pconfig"></a><%=intl._("Plugin Configuration")%></h3><p>
  <%=intl._("The plugins listed below are started by the webConsole client.")%>
  </p><div class="wideload"><p>
  <jsp:getProperty name="clientshelper" property="form3" />
