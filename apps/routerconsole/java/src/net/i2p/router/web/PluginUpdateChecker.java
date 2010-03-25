@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
@@ -14,6 +15,8 @@ import net.i2p.util.EepGet;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.PartialEepGet;
+import net.i2p.util.SimpleScheduler;
+import net.i2p.util.SimpleTimer;
 import net.i2p.util.VersionComparator;
 
 /**
@@ -46,6 +49,20 @@ public class PluginUpdateChecker extends UpdateHandler {
         super(ctx);
     }
     
+    /** check all plugins */
+    public void update() {
+        Thread t = new I2PAppThread(new AllCheckerRunner(), "AllAppChecker", true);
+        t.start();
+    }
+
+    public class AllCheckerRunner implements Runnable {
+        public void run() {
+            List<String> plugins = PluginStarter.getPlugins();
+            // TODO
+        }
+    }
+
+    /** check a single plugin */
     public void update(String appName) {
         // don't block waiting for the other one to finish
         if ("true".equals(System.getProperty(PROP_UPDATE_IN_PROGRESS))) {
@@ -84,6 +101,21 @@ public class PluginUpdateChecker extends UpdateHandler {
         return false;
     }
     
+    private void scheduleStatusClean(String msg) {
+        SimpleScheduler.getInstance().addEvent(new Cleaner(msg), 60*60*1000);
+    }
+
+    private class Cleaner implements SimpleTimer.TimedEvent {
+        private String _msg;
+        public Cleaner(String msg) {
+            _msg = msg;
+        }
+        public void timeReached() {
+            if (_msg.equals(getStatus()))
+                updateStatus("");
+        }
+    }
+
     public class PluginUpdateCheckerRunner extends UpdateRunner implements Runnable, EepGet.StatusListener {
         ByteArrayOutputStream _baos;
 
@@ -116,17 +148,22 @@ public class PluginUpdateChecker extends UpdateHandler {
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
             String newVersion = TrustedUpdate.getVersionString(new ByteArrayInputStream(_baos.toByteArray()));
             boolean newer = (new VersionComparator()).compare(newVersion, _oldVersion) > 0;
+            String msg;
             if (newer)
-                updateStatus("<b>" + _("New plugin version {0} is available", newVersion) + "</b>");
+                msg = "<b>" + _("New plugin version {0} is available", newVersion) + "</b>";
             else
-                updateStatus("<b>" + _("No new version is available for plugin {0}", _appName) + "</b>");
+                msg = "<b>" + _("No new version is available for plugin {0}", _appName) + "</b>";
+            updateStatus(msg);
+            scheduleStatusClean(msg);
         }
 
         @Override
         public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {
             File f = new File(_updateFile);
             f.delete();
-            updateStatus("<b>" + _("Update check failed for plugin {0}", _appName) + "</b>");
+            String msg = "<b>" + _("Update check failed for plugin {0}", _appName) + "</b>";
+            updateStatus(msg);
+            scheduleStatusClean(msg);
         }
     }
 }
