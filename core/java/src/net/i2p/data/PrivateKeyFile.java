@@ -267,6 +267,8 @@ public class PrivateKeyFile {
         StringBuilder s = new StringBuilder(128);
         s.append("Dest: ");
         s.append(this.dest != null ? this.dest.toBase64() : "null");
+        s.append("\nB32: ");
+        s.append(this.dest != null ? Base32.encode(this.dest.calculateHash().getData()) + ".b32.i2p" : "null");
         s.append("\nContains: ");
         s.append(this.dest);
         s.append("\nPrivate Key: ");
