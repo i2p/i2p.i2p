@@ -39,6 +39,7 @@ import net.i2p.I2PAppContext;
 public class Daemon {
     public static final String VERSION = "2.0.3";
     private static final Daemon _instance = new Daemon();
+    private boolean _running;
     
     /**
      * Update the router and published address books using remote data from the
@@ -126,6 +127,7 @@ public class Daemon {
     }
     
     public void run(String[] args) {
+        _running = true;
         String settingsLocation = "config.txt";
         File homeFile;
         if (args.length > 0) {
@@ -166,7 +168,7 @@ public class Daemon {
 	    // Static method, and redundent Thread.currentThread().sleep(5*60*1000);
         } catch (InterruptedException ie) {}
         
-        while (true) {
+        while (_running) {
             long delay = Long.parseLong((String) settings.get("update_delay"));
             if (delay < 1) {
                 delay = 1;
@@ -179,6 +181,8 @@ public class Daemon {
                 }
             } catch (InterruptedException exp) {
             }
+            if (!_running)
+                break;
             settings = ConfigParser.parse(settingsFile, defaultSettings);
         }
     }
@@ -191,5 +195,10 @@ public class Daemon {
         synchronized (_instance) {
             _instance.notifyAll();
         }
+    }
+
+    public static void stop() {
+        _instance._running = false;
+        wakeup();
     }
 }

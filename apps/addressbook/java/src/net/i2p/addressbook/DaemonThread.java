@@ -51,4 +51,9 @@ public class DaemonThread extends Thread {
         //}
         Daemon.main(this.args);
     }
+
+    public void halt() {
+        Daemon.stop();
+        interrupt();
+    }
 }
