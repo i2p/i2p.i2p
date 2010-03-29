@@ -60,6 +60,12 @@ public class I2PSnarkServlet extends HttpServlet {
     }
     
     @Override
+    public void destroy() {
+        _manager.stop();
+        super.destroy();
+    }
+
+    @Override
     public void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
