@@ -124,13 +124,13 @@ class HTTPResponseOutputStream extends FilterOutputStream {
      * Tweak that first HTTP response line (HTTP 200 OK, etc)
      *
      */
-    protected String filterResponseLine(String line) {
+    protected static String filterResponseLine(String line) {
         return line;
     }
     
     /** we ignore any potential \r, since we trim it on write anyway */
     private static final byte NL = '\n';
-    private boolean isNL(byte b) { return (b == NL); }
+    private static boolean isNL(byte b) { return (b == NL); }
     
     /** ok, received, now munge & write it */
     private void writeHeader() throws IOException {
@@ -275,7 +275,8 @@ class HTTPResponseOutputStream extends FilterOutputStream {
             _context.statManager().addRateData("i2ptunnel.httpExpanded", (long)expanded, end-start);
         }
     }
-    private class InternalGZIPInputStream extends GZIPInputStream {
+
+    private static class InternalGZIPInputStream extends GZIPInputStream {
         public InternalGZIPInputStream(InputStream in) throws IOException {
             super(in);
         }
@@ -318,6 +319,7 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         return super.toString() + ": " + _in;
     }
     
+/*******
     public static void main(String args[]) {
         String simple   = "HTTP/1.1 200 OK\n" +
                           "foo: bar\n" +
@@ -367,7 +369,6 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                           "A:\n" +
                           "\n";
         
-        /* */
         test("Simple", simple, true);
         test("Filtered", filtered, true);
         test("Filtered windows", winfilter, true);
@@ -382,7 +383,6 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         test("Invalid (bad headers)", invalid5, true);
         test("Invalid (bad headers2)", invalid6, false);
         test("Invalid (bad headers3)", invalid7, false);
-        /* */
     }
     
     private static void test(String name, String orig, boolean shouldPass) {
@@ -401,4 +401,5 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                 System.out.println("Properly fails with " + e.getMessage());
         }
     }
+******/
 }
