@@ -264,8 +264,30 @@
         </delete>
     </target>
 
-    <target name="preppkg" depends="preppkg-linux, buildexe">
+    <target name="preppkg" depends="preppkg-linux, preppkg-windows">
         <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
+        <copy todir="pkg-temp/lib/wrapper/freebsd/">
+            <fileset dir="installer/lib/wrapper/freebsd/" />
+        </copy>
+        <copy todir="pkg-temp/lib/wrapper/macosx/">
+            <fileset dir="installer/lib/wrapper/macosx/" />
+        </copy>
+        <copy todir="pkg-temp/lib/wrapper/solaris/">
+            <fileset dir="installer/lib/wrapper/solaris/" />
+        </copy>
+    </target>
+
+    <target name="preppkg-windows-only" depends="preppkg-windows">
+        <!-- rip the non-windows stuff out of jbigi.jar -->
+        <mkdir dir="tmpextract" />
+        <unjar src="build/jbigi.jar" dest="tmpextract/" />
+        <jar destfile="pkg-temp/lib/jbigi.jar" >
+            <fileset dir="tmpextract/" includes="*windows*" />
+        </jar>
+        <delete dir="tmpextract/" />
+    </target>
+
+    <target name="preppkg-windows" depends="preppkg-base, buildexe">
         <copy file="i2p.exe" todir="pkg-temp/" failonerror="false" />
         <copy file="apps/systray/java/lib/systray4j.dll" todir="pkg-temp/lib" />
         <copy file="apps/systray/java/resources/iggy.ico" todir="pkg-temp/icons" />
@@ -276,15 +298,6 @@
         <copy file="installer/resources/install_i2p_service_winnt.bat" todir="pkg-temp/" />
         <copy file="installer/resources/postinstall.bat" todir="pkg-temp/" />
         <copy file="installer/resources/uninstall_i2p_service_winnt.bat" todir="pkg-temp/" />
-        <copy todir="pkg-temp/lib/wrapper/freebsd/">
-            <fileset dir="installer/lib/wrapper/freebsd/" />
-        </copy>
-        <copy todir="pkg-temp/lib/wrapper/macosx/">
-            <fileset dir="installer/lib/wrapper/macosx/" />
-        </copy>
-        <copy todir="pkg-temp/lib/wrapper/solaris/">
-            <fileset dir="installer/lib/wrapper/solaris/" />
-        </copy>
         <copy todir="pkg-temp/lib/wrapper/win32/">
             <fileset dir="installer/lib/wrapper/win32/" />
         </copy>
@@ -301,7 +314,22 @@
         <delete dir="tmpextract/" />
     </target>
 
-    <target name="preppkg-linux" depends="build, preplicenses, prepconsoleDocs">
+    <target name="preppkg-linux" depends="preppkg-base">
+        <copy file="installer/resources/runplain.sh" todir="pkg-temp/" />
+        <copy file="apps/i2psnark/launch-i2psnark" todir="pkg-temp/" />
+        <copy file="installer/resources/eepget" todir="pkg-temp/" />
+        <copy file="installer/resources/i2prouter" todir="pkg-temp/" />
+        <copy file="installer/resources/osid" todir="pkg-temp/" />
+        <copy file="installer/resources/postinstall.sh" todir="pkg-temp/" />
+        <copy todir="pkg-temp/lib/wrapper/linux/">
+            <fileset dir="installer/lib/wrapper/linux/" />
+        </copy>
+        <copy todir="pkg-temp/lib/wrapper/linux64/">
+            <fileset dir="installer/lib/wrapper/linux64/" />
+        </copy>
+    </target>
+
+    <target name="preppkg-base" depends="build, preplicenses, prepconsoleDocs">
         <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
         <copy file="build/jasper-compiler.jar" todir="pkg-temp/lib/" />
@@ -320,7 +348,6 @@
         <copy file="build/BOB.jar" todir="pkg-temp/lib/" />
         <copy file="build/systray.jar" todir="pkg-temp/lib" />
         <copy file="build/i2psnark.jar" todir="pkg-temp/lib/" />
-        <copy file="installer/resources/runplain.sh" todir="pkg-temp/" />
         <copy file="apps/systray/java/lib/systray4j.jar" todir="pkg-temp/lib" />
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
@@ -330,24 +357,13 @@
         <copy file="apps/susidns/src/WEB-INF/lib/jstl.jar" todir="pkg-temp/lib/" />
         <copy file="apps/susidns/src/WEB-INF/lib/standard.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
-        <copy file="apps/i2psnark/launch-i2psnark" todir="pkg-temp/" />
         <copy file="apps/i2psnark/jetty-i2psnark.xml" todir="pkg-temp/" />
         <copy file="apps/i2psnark/i2psnark.config" todir="pkg-temp/" />
         <copy file="installer/resources/blocklist.txt" todir="pkg-temp/" />
         <copy file="installer/resources/clients.config" todir="pkg-temp/" />
-        <copy file="installer/resources/eepget" todir="pkg-temp/" />
-        <copy file="installer/resources/i2prouter" todir="pkg-temp/" />
         <copy file="installer/resources/i2ptunnel.config" todir="pkg-temp/" />
-        <copy file="installer/resources/osid" todir="pkg-temp/" />
-        <copy file="installer/resources/postinstall.sh" todir="pkg-temp/" />
         <copy file="installer/resources/systray.config" todir="pkg-temp/" />
         <copy file="installer/resources/wrapper.config" todir="pkg-temp/" />
-        <copy todir="pkg-temp/lib/wrapper/linux/">
-            <fileset dir="installer/lib/wrapper/linux/" />
-        </copy>
-        <copy todir="pkg-temp/lib/wrapper/linux64/">
-            <fileset dir="installer/lib/wrapper/linux64/" />
-        </copy>
         <copy file="installer/resources/hosts.txt" todir="pkg-temp/" />
         <copy file="INSTALL-headless.txt" todir="pkg-temp/" />
         <!-- overwrite the truncated history put in by the updater -->
