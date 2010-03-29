@@ -43,8 +43,16 @@ public class WebAppStarter {
 
     /**
      *  add but don't start
+     *  This is used only by RouterConsoleRunner, which adds all the webapps first
+     *  and then starts all at once.
      */
     static WebApplicationContext addWebApp(I2PAppContext ctx, Server server, String appName, String warPath, File tmpdir) throws IOException {
+
+        // Jetty will happily load one context on top of another without stopping
+        // the first one, so we remove any previous one here
+        try {
+            stopWebApp(server, appName);
+        } catch (Throwable t) {}
 
         WebApplicationContext wac = server.addWebApplication("/"+ appName, warPath);
         tmpdir.mkdir();
@@ -64,7 +72,7 @@ public class WebAppStarter {
     }
 
     /**
-     *  stop it
+     *  stop it and remove the context
      *  @throws just about anything, caller would be wise to catch Throwable
      */
     static void stopWebApp(Server server, String appName) {
@@ -74,6 +82,9 @@ public class WebAppStarter {
             // false -> not graceful
             wac.stop(false);
         } catch (InterruptedException ie) {}
+        try {
+            server.removeContext(wac);
+        } catch (IllegalStateException ise) {}
     }
 
     /** see comments in ConfigClientsHandler */
