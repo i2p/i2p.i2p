@@ -7,7 +7,11 @@
  */
 package net.i2p.client.naming;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -87,13 +91,10 @@ public class HostsTxtNamingService extends NamingService {
         List filenames = getFilenames();
         for (int i = 0; i < filenames.size(); i++) { 
             String hostsfile = (String)filenames.get(i);
-            Properties hosts = new Properties();
             try {
                 File f = new File(_context.getRouterDir(), hostsfile);
                 if ( (f.exists()) && (f.canRead()) ) {
-                    DataHelper.loadProps(hosts, f, true);
-                    
-                    String key = hosts.getProperty(hostname.toLowerCase());
+                    String key = getKey(f, hostname.toLowerCase());
                     if ( (key != null) && (key.trim().length() > 0) ) {
                         d = lookupBase64(key);
                         putCache(hostname, d);
@@ -165,6 +166,32 @@ public class HostsTxtNamingService extends NamingService {
             } catch (Exception ioe) {
                 _log.error("Error loading hosts file " + hostsfile, ioe);
             }
+        }
+        return null;
+    }
+
+    /**
+     *  Better than DataHelper.loadProps(), doesn't load the whole file into memory,
+     *  and stops when it finds a match.
+     *
+     *  @param host lower case
+     *  @since 0.7.13
+     */
+    private static String getKey(File file, String host) throws IOException {
+        BufferedReader in = null;
+        try {
+            in = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"), 16*1024);
+            String line = null;
+            while ( (line = in.readLine()) != null) {
+                if (!line.toLowerCase().startsWith(host + '='))
+                    continue;
+                if (line.indexOf('#') > 0)  // trim off any end of line comment
+                    line = line.substring(0, line.indexOf('#')).trim();
+                int split = line.indexOf('=');
+                return line.substring(split+1);   //.trim() ??????????????
+            }
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
         }
         return null;
     }
