@@ -213,7 +213,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 sockMgr.getSession().destroySession();
             } catch (I2PException ex) {
                 _log.error("Error destroying the session", ex);
-                System.exit(1);
+                //System.exit(1);
             }
             l.log("Server shut down.");
             open = false;

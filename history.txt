@@ -1,4 +1,11 @@
+2010-03-31 zzz
+    * FloodfillPeerSelector: Adjust rankings to try to
+      improve LeaseSet lookups
+    * HostsTxtNamingService: Don't load the whole hosts.txt
+      into memory for every lookup
+
 2010-03-29 zzz
+    * build.xml: Prep for a windows-only pkg
     * configclients.jsp:
       - Always show start button for webapps and plugins
     * configclients.jsp, configupdate.jsp:
