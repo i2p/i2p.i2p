@@ -112,7 +112,7 @@ class FloodfillPeerSelector extends PeerSelector {
     private static final int NO_FAIL_STORE_OK = 10*60*1000;
     private static final int NO_FAIL_STORE_GOOD = NO_FAIL_STORE_OK * 2;
     /** this must be longer than the max streaming timeout (60s) */
-    private static final int NO_FAIL_LOOKUP_OK = 3*60*1000;
+    private static final int NO_FAIL_LOOKUP_OK = 75*1000;
     private static final int NO_FAIL_LOOKUP_GOOD = NO_FAIL_LOOKUP_OK * 3;
     private static final int MAX_GOOD_RESP_TIME = 5*1000;
 

@@ -1,3 +1,6 @@
+2010-04-02 zzz
+    * FloodfillPeerSelector: Adjust rankings again
+
 2010-03-31 zzz
     * FloodfillPeerSelector: Adjust rankings to try to
       improve LeaseSet lookups
