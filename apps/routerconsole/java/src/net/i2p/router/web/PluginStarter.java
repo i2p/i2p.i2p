@@ -170,8 +170,15 @@ public class PluginStarter implements Runnable {
         if (name == null)
             name = ConfigClientsHelper.stripHTML(props, "consoleLinkName");
         String url = ConfigClientsHelper.stripHTML(props, "consoleLinkURL");
-        if (name != null && url != null && name.length() > 0 && url.length() > 0)
-            NavHelper.registerApp(name, url);
+        if (name != null && url != null && name.length() > 0 && url.length() > 0) {
+            String tip = ConfigClientsHelper.stripHTML(props, "consoleLinkTooltip_" + Messages.getLanguage(ctx));
+            if (tip == null)
+                tip = ConfigClientsHelper.stripHTML(props, "consoleLinkTooltip");
+            if (tip != null)
+                NavHelper.registerApp(name, url, tip);
+            else
+                NavHelper.registerApp(name, url);
+        }
 
         return true;
     }
