@@ -33,11 +33,14 @@
  <% String prev = System.getProperty("net.i2p.router.web.ConfigTunnelsHandler.nonce");
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigTunnelsHandler.noncePrev", prev);
     System.setProperty("net.i2p.router.web.ConfigTunnelsHandler.nonce", new java.util.Random().nextLong()+""); %>
- <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigTunnelsHandler.nonce")%>" />
- <input type="hidden" name="action" value="blah" />
+ <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigTunnelsHandler.nonce")%>" >
+ <input type="hidden" name="action" value="blah" >
  <jsp:getProperty name="tunnelshelper" property="form" />
  <%=intl._("Note")%>: <%=intl._("Exploratory tunnel setting changes are stored in the router.config file.")%>
  <%=intl._("Client tunnel changes are temporary and are not saved.")%>
 <%=intl._("To make permanent client tunnel changes see the")%> <a href="i2ptunnel/index.jsp"><%=intl._("i2ptunnel page")%></a>.
- <hr><div class="formaction"><input type="submit" name="shouldsave" value="<%=intl._("Save changes")%>" /> <input type="reset" value="<%=intl._("Cancel")%>" /></div>
+ <hr><div class="formaction">
+<input type="reset" value="<%=intl._("Cancel")%>" >
+<input type="submit" name="shouldsave" value="<%=intl._("Save changes")%>" >
+</div>
  </form></p></div></div></div></body></html>

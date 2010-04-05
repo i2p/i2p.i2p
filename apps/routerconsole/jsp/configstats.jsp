@@ -69,14 +69,14 @@ function toggleAll(category)
  <% String prev = System.getProperty("net.i2p.router.web.ConfigStatsHandler.nonce");
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigStatsHandler.noncePrev", prev);
     System.setProperty("net.i2p.router.web.ConfigStatsHandler.nonce", new java.util.Random().nextLong()+""); %>
- <input type="hidden" name="action" value="foo" />
- <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigStatsHandler.nonce")%>" />
+ <input type="hidden" name="action" value="foo" >
+ <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigStatsHandler.nonce")%>" >
  <h3><%=intl._("Configure I2P Stat Collection")%></h3>
  <p><%=intl._("Enable full stats?")%>
  <input type="checkbox" class="optbox" name="isFull" value="true" <%
- if (statshelper.getIsFull()) { %>checked="true" <% } %>/>
+ if (statshelper.getIsFull()) { %>checked="true" <% } %> >
  (<%=intl._("change requires restart to take effect")%>)<br>
- <%=intl._("Stat file")%>: <input type="text" name="filename" value="<%=statshelper.getFilename()%>" /><br>
+ <%=intl._("Stat file")%>: <input type="text" name="filename" value="<%=statshelper.getFilename()%>" ><br>
 <%=intl._("Filter")%>: (<a href="javascript: void(null);" onclick="toggleAll('*')"><%=intl._("toggle all")%></a>)<br></p>
  <div class="wideload">
  <p><table>
@@ -96,17 +96,20 @@ function toggleAll(category)
  <tr><td align="center">
      <a name="<%=statshelper.getCurrentStatName()%>"></a>
      <input id="<%=statshelper.getCurrentGroupName()%>" type="checkbox" class="optbox" name="statList" value="<%=statshelper.getCurrentStatName()%>" <%
-     if (statshelper.getCurrentIsLogged()) { %>checked="true" <% } %>/></td>
+     if (statshelper.getCurrentIsLogged()) { %>checked="true" <% } %> ></td>
      <td align="center">
      <% if (statshelper.getCurrentCanBeGraphed()) { %>
        <input id="<%=statshelper.getCurrentGroupName()%>" type="checkbox" class="optbox" name="graphList" value="<%=statshelper.getCurrentGraphName()%>" <%
-       if (statshelper.getCurrentIsGraphed()) { %>checked="true" <% } %>/><% } %></td>
+       if (statshelper.getCurrentIsGraphed()) { %>checked="true" <% } %> ><% } %></td>
      <td align="left"><b><%=statshelper.getCurrentStatName()%>:</b><br>
      <%=statshelper.getCurrentStatDescription()%></td></tr><%
     } // end iterating over all stats %>
  <tr><td colspan="3"></td></tr>
- <tr><td align="center"><input type="checkbox" class="optbox" name="explicitFilter" /></td>
+ <tr><td align="center"><input type="checkbox" class="optbox" name="explicitFilter" ></td>
      <td colspan="2"><%=intl._("Advanced filter")%>:
-     <input type="text" name="explicitFilterValue" value="<%=statshelper.getExplicitFilter()%>" size="40" /></td></tr>
-     <tr class="tablefooter"><td colspan="3" align="right"><input type="submit" name="shouldsave" value="<%=intl._("Save changes")%>" /><input type="reset" value="<%=intl._("Cancel")%>" /></td></tr>
+     <input type="text" name="explicitFilterValue" value="<%=statshelper.getExplicitFilter()%>" size="40" ></td></tr>
+     <tr class="tablefooter"><td colspan="3" align="right">
+<input type="reset" value="<%=intl._("Cancel")%>" >
+<input type="submit" name="shouldsave" value="<%=intl._("Save changes")%>" >
+</td></tr>
  </table></p></div></form></div></div></body></html>

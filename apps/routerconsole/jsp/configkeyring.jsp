@@ -29,7 +29,7 @@
  <% String prev = System.getProperty("net.i2p.router.web.ConfigKeyringHandler.nonce");
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigKeyringHandler.noncePrev", prev);
     System.setProperty("net.i2p.router.web.ConfigKeyringHandler.nonce", new java.util.Random().nextLong()+""); %>
- <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigKeyringHandler.nonce")%>" />
+ <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigKeyringHandler.nonce")%>" >
  <h3><%=intl._("Manual Keyring Addition")%></h3><p>
  <%=intl._("Enter keys for encrypted remote destinations here.")%>
  <%=intl._("Keys for local destinations must be entered on the")%> <a href="i2ptunnel/index.jsp"><%=intl._("I2PTunnel page")%></a>.
@@ -40,8 +40,10 @@
           <td><textarea name="peer" cols="44" rows="1" style="height: 3em;" wrap="off"></textarea></td>
         </tr><tr>
           <td class="mediumtags" align="right"><%=intl._("Encryption Key")%>:</td>
-          <td><input type="text" size="55" name="key" /></td>
+          <td><input type="text" size="55" name="key" ></td>
         </tr><tr>
-          <td align="right" colspan="2"><input type="submit" name="action" value="<%=intl._("Add key")%>" />
-             <input type="submit" name="action" value="<%=intl._("Delete key")%>" /> <input type="reset" value="<%=intl._("Cancel")%>" /></td>
-</tr></table></p></div></form></div></div></body></html>
+          <td align="right" colspan="2">
+<input type="reset" value="<%=intl._("Cancel")%>" >
+<input type="submit" name="action" value="<%=intl._("Delete key")%>" >
+<input type="submit" name="action" value="<%=intl._("Add key")%>" >
+</td></tr></table></p></div></form></div></div></body></html>

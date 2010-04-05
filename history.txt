@@ -1,3 +1,10 @@
+2010-04-05 zzz
+    * Console:
+      - Add tooltip support for plugin links
+      - Make target=_blank for plugin links
+      - More HTML transitional fixes
+      - Standardize on 'save' to the right of 'cancel'
+
 2010-04-02 zzz
     * FloodfillPeerSelector: Adjust rankings again
 

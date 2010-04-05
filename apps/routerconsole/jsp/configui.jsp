@@ -42,6 +42,7 @@
 <jsp:getProperty name="uihelper" property="langSettings" />
 <%=uihelper._("Please contribute to the router console translation project! Contact the developers on IRC #i2p to help.")%>
 <hr><div class="formaction">
-<input type="submit" name="shouldsave" value="<%=intl._("Apply")%>" > <input type="reset" value="<%=intl._("Cancel")%>" >
+<input type="reset" value="<%=intl._("Cancel")%>" >
+<input type="submit" name="shouldsave" value="<%=intl._("Apply")%>" >
 </div></form></div>
 </div></body></html>
