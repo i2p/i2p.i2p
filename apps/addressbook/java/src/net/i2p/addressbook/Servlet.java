@@ -41,7 +41,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  */
 public class Servlet extends HttpServlet {
-    private Thread thread;
+    private DaemonThread thread;
     private String nonce;
     private static final String PROP_NONCE = "addressbook.nonce";
 
@@ -88,4 +88,9 @@ public class Servlet extends HttpServlet {
         //System.out.println("INFO: config root under " + args[0]);
     }
 
+    @Override
+    public void destroy() {
+        this.thread.halt();
+        super.destroy();
+    }
 }

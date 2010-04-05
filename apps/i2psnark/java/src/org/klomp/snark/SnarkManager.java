@@ -40,6 +40,8 @@ public class SnarkManager implements Snark.CompleteListener {
     private I2PSnarkUtil _util;
     private PeerCoordinatorSet _peerCoordinatorSet;
     private ConnectionAcceptor _connectionAcceptor;
+    private Thread _monitor;
+    private boolean _running;
     
     public static final String PROP_I2CP_HOST = "i2psnark.i2cpHost";
     public static final String PROP_I2CP_PORT = "i2psnark.i2cpPort";
@@ -78,14 +80,21 @@ public class SnarkManager implements Snark.CompleteListener {
      *  for i2cp host/port or i2psnark.dir
      */
     public void start() {
+        _running = true;
         _peerCoordinatorSet = new PeerCoordinatorSet();
         _connectionAcceptor = new ConnectionAcceptor(_util);
         int minutes = getStartupDelayMinutes();
         _messages.add(_("Adding torrents in {0} minutes", minutes));
-        I2PAppThread monitor = new I2PAppThread(new DirMonitor(), "Snark DirMonitor");
-        monitor.setDaemon(true);
-        monitor.start();
+        _monitor = new I2PAppThread(new DirMonitor(), "Snark DirMonitor", true);
+        _monitor.start();
         _context.addShutdownTask(new SnarkManagerShutdown());
+    }
+
+    public void stop() {
+        _running = false;
+        _monitor.interrupt();
+        _connectionAcceptor.halt();
+        (new SnarkManagerShutdown()).run();
     }
     
     /** hook to I2PSnarkUtil for the servlet */

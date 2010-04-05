@@ -30,7 +30,9 @@ button span.hide{
  <% String prev = System.getProperty("net.i2p.router.web.ConfigClientsHandler.nonce");
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigClientsHandler.noncePrev", prev);
     System.setProperty("net.i2p.router.web.ConfigClientsHandler.nonce", new java.util.Random().nextLong()+""); %>
- <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigClientsHandler.nonce")%>" />
+ <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigClientsHandler.nonce")%>" >
+ <% /* set hidden default */ %>
+ <button type="submit" name="action" value="" style="display:none" >Cancel</button>
  <h3><%=intl._("Client Configuration")%></h3><p>
  <%=intl._("The Java clients listed below are started by the router and run in the same JVM.")%>
  </p><div class="wideload">
@@ -56,7 +58,7 @@ button span.hide{
  <input type="submit" name="action" value="<%=intl._("Save WebApp Configuration")%>" />
 </div></div>
 <% if (clientshelper.showPlugins()) { %>
-<h3><a name="webapp"></a><%=intl._("Plugin Configuration")%></h3><p>
+<h3><a name="pconfig"></a><%=intl._("Plugin Configuration")%></h3><p>
  <%=intl._("The plugins listed below are started by the webConsole client.")%>
  </p><div class="wideload"><p>
  <jsp:getProperty name="clientshelper" property="form3" />

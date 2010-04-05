@@ -11,7 +11,6 @@ import java.util.Set;
 
 import net.i2p.router.startup.ClientAppConfig;
 import net.i2p.router.startup.LoadClientAppsJob;
-import net.i2p.util.Log;
 
 import org.mortbay.jetty.Server;
 
@@ -19,15 +18,19 @@ import org.mortbay.jetty.Server;
  *  Saves changes to clients.config or webapps.config
  */
 public class ConfigClientsHandler extends FormHandler {
-    private Log configClient_log;
     private Map _settings;
     
-    public ConfigClientsHandler() {
-        configClient_log = ContextHelper.getContext(null).logManager().getLog(ConfigClientsHandler.class);
-    }
-
     @Override
     protected void processForm() {
+        // set action for when CR is hit in a text input box
+        if (_action.length() <= 0) {
+            String url = getJettyString("pluginURL");
+            if (url != null && url.length() > 0)
+                _action = "Install Plugin";
+            else
+                _action = "Save Client Configuration";
+        }
+
         if (_action.equals(_("Save Client Configuration"))) {
             saveClientChanges();
             return;
@@ -200,7 +203,7 @@ public class ConfigClientsHandler extends FormHandler {
             return;
         }
         ClientAppConfig ca = clients.get(i);
-        LoadClientAppsJob.runClient(ca.className, ca.clientName, LoadClientAppsJob.parseArgs(ca.args), configClient_log);
+        LoadClientAppsJob.runClient(ca.className, ca.clientName, LoadClientAppsJob.parseArgs(ca.args), _log);
         addFormNotice(_("Client") + ' ' + _(ca.clientName) + ' ' + _("started") + '.');
     }
 

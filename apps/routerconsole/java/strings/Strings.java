@@ -71,5 +71,30 @@ class Dummy {
         _("Transport");
         _("Tunnels");
         _("udp");
+
+        // parameters in transport addresses (netdb.jsp)
+        // may or may not be worth translating
+        _("host");
+        _("key");
+        _("port");
+        // capabilities
+        _("caps");
+        // introducer host
+        _("ihost0");
+        _("ihost1");
+        _("ihost2");
+        // introducer port
+        _("iport0");
+        _("iport1");
+        _("iport2");
+        // introducer key
+        _("ikey0");
+        _("ikey1");
+        _("ikey2");
+        // introducer tag
+        _("itag0");
+        _("itag1");
+        _("itag2");
+
     }
 }

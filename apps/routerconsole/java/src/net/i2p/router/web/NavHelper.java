@@ -1,6 +1,8 @@
 package net.i2p.router.web;
 
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -31,9 +33,12 @@ public class NavHelper {
         if (_apps.isEmpty())
             return "";
         StringBuilder buf = new StringBuilder(256); 
-        for (Iterator<String> iter = _apps.keySet().iterator(); iter.hasNext(); ) {
-            String name = iter.next();
+        List<String> l = new ArrayList(_apps.keySet());
+        Collections.sort(l);
+        for (String name : l) {
             String path = _apps.get(name);
+            if (path == null)
+                continue;
             buf.append(" <a target=\"_top\" href=\"").append(path).append("\">");
             buf.append(name).append("</a>");
         }

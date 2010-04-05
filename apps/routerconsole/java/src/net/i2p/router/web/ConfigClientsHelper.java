@@ -43,11 +43,11 @@ public class ConfigClientsHelper extends HelperBase {
             renderForm(buf, ""+cur, ca.clientName, false, !ca.disabled,
                        "webConsole".equals(ca.clientName) || "Web console".equals(ca.clientName),
                        ca.className + ((ca.args != null) ? " " + ca.args : ""), (""+cur).equals(_edit),
-                       true, false, false, true);
+                       true, false, false, true, !ca.disabled);
         }
         
         if ("new".equals(_edit))
-            renderForm(buf, "" + clients.size(), "", false, false, false, "", true, false, false, false, false);
+            renderForm(buf, "" + clients.size(), "", false, false, false, "", true, false, false, false, false, false);
         buf.append("</table>\n");
         return buf.toString();
     }
@@ -65,7 +65,7 @@ public class ConfigClientsHelper extends HelperBase {
                 String val = props.getProperty(name);
                 renderForm(buf, app, app, !"addressbook".equals(app),
                            "true".equals(val), RouterConsoleRunner.ROUTERCONSOLE.equals(app), app + ".war",
-                           false, false, false, false, false);
+                           false, false, false, false, false, true);
             }
         }
         buf.append("</table>\n");
@@ -149,7 +149,7 @@ public class ConfigClientsHelper extends HelperBase {
                 boolean enableStop = !Boolean.valueOf(appProps.getProperty("disableStop")).booleanValue();
                 renderForm(buf, app, app, false,
                            "true".equals(val), false, desc.toString(), false, false,
-                           updateURL != null, enableStop, true);
+                           updateURL != null, enableStop, true, true);
             }
         }
         buf.append("</table>\n");
@@ -160,7 +160,7 @@ public class ConfigClientsHelper extends HelperBase {
     private void renderForm(StringBuilder buf, String index, String name, boolean urlify,
                             boolean enabled, boolean ro, String desc, boolean edit,
                             boolean showEditButton, boolean showUpdateButton, boolean showStopButton,
-                            boolean showDeleteButton) {
+                            boolean showDeleteButton, boolean showStartButton) {
         buf.append("<tr><td class=\"mediumtags\" align=\"right\" width=\"25%\">");
         if (urlify && enabled) {
             String link = "/";
@@ -183,7 +183,7 @@ public class ConfigClientsHelper extends HelperBase {
                 buf.append("disabled=\"true\" ");
         }
         buf.append("></td><td align=\"center\" width=\"15%\">");
-        if ((!enabled) && !edit) {
+        if (showStartButton && (!ro) && !edit) {
             buf.append("<button type=\"submit\" name=\"action\" value=\"Start ").append(index).append("\" >" + _("Start") + "<span class=hide> ").append(index).append("</span></button>");
         }
         if (showEditButton && (!edit) && !ro)

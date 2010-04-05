@@ -35,7 +35,7 @@ import org.mortbay.jetty.Server;
  *  @author zzz
  */
 public class PluginStarter implements Runnable {
-    private RouterContext _context;
+    protected RouterContext _context;
     static final String PREFIX = "plugin.";
     static final String ENABLED = ".startOnLoad";
     private static final String[] STANDARD_WEBAPPS = { "i2psnark", "i2ptunnel", "susidns",
@@ -223,7 +223,8 @@ public class PluginStarter implements Runnable {
         if (name != null && name.length() > 0)
             NavHelper.unregisterApp(name);
 
-        log.error("Stopping plugin: " + appName);
+        if (log.shouldLog(Log.WARN))
+            log.warn("Stopping plugin: " + appName);
         return true;
     }
 
@@ -426,7 +427,8 @@ public class PluginStarter implements Runnable {
             }
             try {
                 addPath(f.toURI().toURL());
-                log.error("INFO: Adding plugin to classpath: " + f);
+                if (log.shouldLog(Log.WARN))
+                    log.warn("INFO: Adding plugin to classpath: " + f);
             } catch (Exception e) {
                 log.error("Plugin client " + clientName + " bad classpath element: " + f, e);
             }

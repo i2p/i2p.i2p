@@ -112,7 +112,7 @@ class FloodfillPeerSelector extends PeerSelector {
     private static final int NO_FAIL_STORE_OK = 10*60*1000;
     private static final int NO_FAIL_STORE_GOOD = NO_FAIL_STORE_OK * 2;
     /** this must be longer than the max streaming timeout (60s) */
-    private static final int NO_FAIL_LOOKUP_OK = 2*60*1000;
+    private static final int NO_FAIL_LOOKUP_OK = 75*1000;
     private static final int NO_FAIL_LOOKUP_GOOD = NO_FAIL_LOOKUP_OK * 3;
     private static final int MAX_GOOD_RESP_TIME = 5*1000;
 
@@ -135,8 +135,11 @@ class FloodfillPeerSelector extends PeerSelector {
             maxFailRate = 100d; // disable
         }
 
+        // 8 == FNDF.MAX_TO_FLOOD + 1
+        int limit = Math.max(8, howMany);
+        limit = Math.min(limit, ffs.size());
         // split sorted list into 3 sorted lists
-        for (int i = 0; found < howMany && i < ffs.size(); i++) {
+        for (int i = 0; found < howMany && i < limit; i++) {
             Hash entry = sorted.first();
             sorted.remove(entry);
             if (entry == null)

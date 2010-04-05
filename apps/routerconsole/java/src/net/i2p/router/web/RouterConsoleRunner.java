@@ -190,9 +190,11 @@ public class RouterConsoleRunner {
         
         List<RouterContext> contexts = RouterContext.listContexts();
         if (contexts != null) {
-            if (PluginStarter.pluginsEnabled(contexts.get(0))) {
-                t = new I2PAppThread(new PluginStarter(contexts.get(0)), "PluginStarter", true);
+            RouterContext ctx = contexts.get(0);
+            if (PluginStarter.pluginsEnabled(ctx)) {
+                t = new I2PAppThread(new PluginStarter(ctx), "PluginStarter", true);
                 t.start();
+                ctx.addShutdownTask(new PluginStopper(ctx));
             }
         }
     }

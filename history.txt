@@ -1,3 +1,44 @@
+2010-04-02 zzz
+    * FloodfillPeerSelector: Adjust rankings again
+
+2010-03-31 zzz
+    * FloodfillPeerSelector: Adjust rankings to try to
+      improve LeaseSet lookups
+    * HostsTxtNamingService: Don't load the whole hosts.txt
+      into memory for every lookup
+
+2010-03-29 zzz
+    * build.xml: Prep for a windows-only pkg
+    * configclients.jsp:
+      - Always show start button for webapps and plugins
+    * configclients.jsp, configupdate.jsp:
+      - Fix submission when entering CR in a text box
+    * EepGet: Don't retry after a MalformedURLException
+    * HTTPResponseOutputStream: More static
+    * Plugins:
+      - Stop all plugins at shutdown
+      - Log tweaks
+    * WebApps:
+      - Remove the WAC after stopping it
+      - Stop a WAC before starting it to prevent dups
+      - Implement destroy() in addressbook to prevent dups
+      - Implement destroy() in i2psnark to prevent dups
+
+2010-03-25 zzz
+    * configclients.jsp: Fix dup anchor
+    * Console: Sort plugin links in summary bar
+    * i2psnark:
+      - Send numwant=0 if we don't need peers
+      - Report returned complete and incomplete counts
+        if higher than peer count
+      - Allow missing peer list
+      - Log tweaks
+    * netdb.jsp: Tag transport properties
+    * Plugins: Remove final check and install console
+      messages after a while
+    * PrivateKeyFile: Add b32 output
+    * Reseed: Add another host
+
 2010-03-18 zzz
     * Blocklist, CommSystem, FIFOBandwidth, TransportManager,
       OutNetMessage, InNetMessagePool:
@@ -47,6 +88,10 @@
       - Take incoming messages from the head of the queue,
         not sure why taking them from the tail "reduces latency"
       - Java 5 cleanup
+
+2010-03-17 zzz
+    * I2PTunnel: Disable nonce checking when console password set
+    * Reseed: Add another host
 
 * 2010-03-15  0.7.12 released
 
