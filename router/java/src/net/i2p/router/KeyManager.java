@@ -105,11 +105,15 @@ public class KeyManager {
         _leaseSetKeys.put(dest.calculateHash(), keys);
     }
    
+    /**
+     *  Wait one second, as this will get called 4 times in quick succession
+     *  There is still a race here though, if a key is set while the sync job is running
+     */
     private void queueWrite() {
         Clock cl = _context.clock();
         JobQueue q = _context.jobQueue();
         if ( (cl == null) || (q == null) ) return;
-        _synchronizeJob.getTiming().setStartAfter(cl.now());
+        _synchronizeJob.getTiming().setStartAfter(cl.now() + 1000);
         q.addJob(_synchronizeJob);
     }
 
@@ -159,33 +163,55 @@ public class KeyManager {
         }
 
         private synchronized void syncPrivateKey(File keyDir) {
-            File keyFile = new File(keyDir, KeyManager.KEYFILE_PRIVATE_ENC);
+            DataStructure ds;
+            File keyFile = new File(keyDir, KEYFILE_PRIVATE_ENC);
             boolean exists = (_privateKey != null);
-            if (!exists)
-                _privateKey = new PrivateKey();
-            _privateKey = (PrivateKey)syncKey(keyFile, _privateKey, exists);
+            if (exists)
+                ds = _privateKey;
+            else
+                ds = new PrivateKey();
+            DataStructure readin = syncKey(keyFile, ds, exists);
+            if (readin != null && !exists)
+                _privateKey = (PrivateKey) readin;
         }
+
         private synchronized void syncPublicKey(File keyDir) {
-            File keyFile = new File(keyDir, KeyManager.KEYFILE_PUBLIC_ENC);
+            DataStructure ds;
+            File keyFile = new File(keyDir, KEYFILE_PUBLIC_ENC);
             boolean exists = (_publicKey != null);
-            if (!exists)
-                _publicKey = new PublicKey();
-            _publicKey = (PublicKey)syncKey(keyFile, _publicKey, exists);
+            if (exists)
+                ds = _publicKey;
+            else
+                ds = new PublicKey();
+            DataStructure readin = syncKey(keyFile, ds, exists);
+            if (readin != null && !exists)
+                _publicKey = (PublicKey) readin;
         }
 
         private synchronized void syncSigningKey(File keyDir) {
-            File keyFile = new File(keyDir, KeyManager.KEYFILE_PRIVATE_SIGNING);
+            DataStructure ds;
+            File keyFile = new File(keyDir, KEYFILE_PRIVATE_SIGNING);
             boolean exists = (_signingPrivateKey != null);
-            if (!exists)
-                _signingPrivateKey = new SigningPrivateKey();
-            _signingPrivateKey = (SigningPrivateKey)syncKey(keyFile, _signingPrivateKey, exists);
+            if (exists)
+                ds = _signingPrivateKey;
+            else
+                ds = new SigningPrivateKey();
+            DataStructure readin = syncKey(keyFile, ds, exists);
+            if (readin != null && !exists)
+                _signingPrivateKey = (SigningPrivateKey) readin;
         }
+
         private synchronized void syncVerificationKey(File keyDir) {
-            File keyFile = new File(keyDir, KeyManager.KEYFILE_PUBLIC_SIGNING);
+            DataStructure ds;
+            File keyFile = new File(keyDir, KEYFILE_PUBLIC_SIGNING);
             boolean exists = (_signingPublicKey != null);
-            if (!exists)
-                _signingPublicKey  = new SigningPublicKey();
-            _signingPublicKey  = (SigningPublicKey)syncKey(keyFile, _signingPublicKey, exists);
+            if (exists)
+                ds = _signingPublicKey;
+            else
+                ds = new SigningPublicKey();
+            DataStructure readin = syncKey(keyFile, ds, exists);
+            if (readin != null && !exists)
+                _signingPublicKey  = (SigningPublicKey) readin;
         }
 
         private DataStructure syncKey(File keyFile, DataStructure structure, boolean exists) {
