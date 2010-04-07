@@ -1,3 +1,18 @@
+2010-04-08 zzz
+    * Key Manager: Hopefully avoid some races at startup
+      http://forum.i2p/viewtopic.php?t=4424
+    * OCMOSJ:
+      - Increase min timeout
+      - Logging tweaks
+    * Streaming:
+      - Detect and drop dup SYNs rather than create
+        a duplicate connection - will hopefully fix
+        "Received a syn with the wrong IDs"
+      - Send reset for a SYN ACK with the wrong IDs
+      - Don't send a reset to a null dest
+      - Logging tweaks
+      - Cleanups
+
 2010-04-05 zzz
     * Console:
       - Add tooltip support for plugin links
