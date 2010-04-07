@@ -7,7 +7,7 @@ import java.util.Set;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
-import net.i2p.data.DataHelper;
+import net.i2p.data.Destination;
 import net.i2p.util.Log;
 
 /**
@@ -19,15 +19,15 @@ public class PacketHandler {
     private ConnectionManager _manager;
     private I2PAppContext _context;
     private Log _log;
-    private int _lastDelay;
-    private int _dropped;
+    //private int _lastDelay;
+    //private int _dropped;
     
     public PacketHandler(I2PAppContext ctx, ConnectionManager mgr) {
         _manager = mgr;
         _context = ctx;
-        _dropped = 0;
+        //_dropped = 0;
         _log = ctx.logManager().getLog(PacketHandler.class);
-        _lastDelay = _context.random().nextInt(30*1000);
+        //_lastDelay = _context.random().nextInt(30*1000);
     }
     
 /** what is the point of this ? */
@@ -167,7 +167,7 @@ public class PacketHandler {
                 }
             } else {
                 if ( (con.getSendStreamId() <= 0) || 
-                     (DataHelper.eq(con.getSendStreamId(), packet.getReceiveStreamId())) ||
+                     (con.getSendStreamId() == packet.getReceiveStreamId()) ||
                      (packet.getSequenceNum() <= ConnectionOptions.MIN_WINDOW_SIZE) ) { // its in flight from the first batch
                     long oldId = con.getSendStreamId();
                     if (packet.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
@@ -179,6 +179,7 @@ public class PacketHandler {
                         } else {
                             if (_log.shouldLog(Log.ERROR))
                                 _log.error("Received a syn with the wrong IDs, con=" + con + " packet=" + packet);
+                            sendReset(packet);
                             packet.releasePayload();
                             return;
                         }
@@ -199,16 +200,18 @@ public class PacketHandler {
                 } else {
                     if (!con.getResetSent()) {
                         // someone is sending us a packet on the wrong stream 
+                        // It isn't a SYN so it isn't likely to have a FROM to send a reset back to
                         if (_log.shouldLog(Log.ERROR)) {
                             Set cons = _manager.listConnections();
                             StringBuilder buf = new StringBuilder(512);
                             buf.append("Received a packet on the wrong stream: ");
                             buf.append(packet);
-                            buf.append(" connection: ");
+                            buf.append("\nthis connection:\n");
                             buf.append(con);
+                            buf.append("\nall connections:");
                             for (Iterator iter = cons.iterator(); iter.hasNext();) {
                                 Connection cur = (Connection)iter.next();
-                                buf.append(" ").append(cur);
+                                buf.append('\n').append(cur);
                             }
                             _log.error(buf.toString(), new Exception("Wrong stream"));
                         }
@@ -219,8 +222,22 @@ public class PacketHandler {
         }
     }
     
+    /**
+     *  This sends a reset back to the place this packet came from.
+     *  If the packet has no 'optional from' or valid signature, this does nothing.
+     *  This is not associated with a connection, so no con stats are updated.
+     */
     private void sendReset(Packet packet) {
-        PacketLocal reply = new PacketLocal(_context, packet.getOptionalFrom());
+        Destination from = packet.getOptionalFrom();
+        if (from == null)
+            return;
+        boolean ok = packet.verifySignature(_context, from, null);
+        if (!ok) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Can't send reset after recv spoofed packet: " + packet);
+            return;
+        }
+        PacketLocal reply = new PacketLocal(_context, from);
         reply.setFlag(Packet.FLAG_RESET);
         reply.setFlag(Packet.FLAG_SIGNATURE_INCLUDED);
         reply.setSendStreamId(packet.getReceiveStreamId());

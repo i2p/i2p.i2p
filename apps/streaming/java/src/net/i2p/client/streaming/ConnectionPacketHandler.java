@@ -4,7 +4,6 @@ import java.util.List;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
-import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
@@ -239,17 +238,17 @@ public class ConnectionPacketHandler {
         boolean firstAck = isNew && con.getHighestAckedThrough() < 0;
 
         int numResends = 0;
-        List acked = null;
+        List<PacketLocal> acked = null;
         // if we don't know the streamIds for both sides of the connection, there's no way we
         // could actually be acking data (this fixes the buggered up ack of packet 0 problem).
         // this is called after packet verification, which places the stream IDs as necessary if
         // the SYN verifies (so if we're acking w/out stream IDs, no SYN has been received yet)
         if ( (packet != null) && (packet.getSendStreamId() > 0) && (packet.getReceiveStreamId() > 0) &&
              (con != null) && (con.getSendStreamId() > 0) && (con.getReceiveStreamId() > 0) &&
-             (!DataHelper.eq(packet.getSendStreamId(), Packet.STREAM_ID_UNKNOWN)) &&
-             (!DataHelper.eq(packet.getReceiveStreamId(), Packet.STREAM_ID_UNKNOWN)) &&
-             (!DataHelper.eq(con.getSendStreamId(), Packet.STREAM_ID_UNKNOWN)) &&
-             (!DataHelper.eq(con.getReceiveStreamId(), Packet.STREAM_ID_UNKNOWN)) )
+             (packet.getSendStreamId() != Packet.STREAM_ID_UNKNOWN) &&
+             (packet.getReceiveStreamId() != Packet.STREAM_ID_UNKNOWN) &&
+             (con.getSendStreamId() != Packet.STREAM_ID_UNKNOWN) &&
+             (con.getReceiveStreamId() != Packet.STREAM_ID_UNKNOWN) )
             acked = con.ackPackets(ackThrough, nacks);
         else
             return false;
@@ -261,7 +260,7 @@ public class ConnectionPacketHandler {
             // and the highest rtt lets us set our resend delay properly
             int highestRTT = -1;
             for (int i = 0; i < acked.size(); i++) {
-                PacketLocal p = (PacketLocal)acked.get(i);
+                PacketLocal p = acked.get(i);
                 if (p.getAckTime() > highestRTT) {
                     //if (p.getNumSends() <= 1)
                     highestRTT = p.getAckTime();
@@ -282,7 +281,15 @@ public class ConnectionPacketHandler {
                     _log.debug("Packet acked after " + p.getAckTime() + "ms: " + p);
             }
             if (highestRTT > 0) {
+                int oldrtt = con.getOptions().getRTT();
+                int oldrto = con.getOptions().getRTO();
+                int olddev = con.getOptions().getRTTDev();
                 con.getOptions().updateRTT(highestRTT);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("acked: " + acked.size() + " highestRTT: " + highestRTT +
+                              " RTT: " + oldrtt + " -> " + con.getOptions().getRTT() +
+                              " RTO: " + oldrto + " -> " + con.getOptions().getRTO() +
+                              " Dev: " + olddev + " -> " + con.getOptions().getRTTDev());
                 if (firstAck) {
                     if (con.isInbound())
                         _context.statManager().addRateData("stream.con.initialRTT.in", highestRTT, 0);
@@ -357,7 +364,7 @@ public class ConnectionPacketHandler {
                     // integers, so lets use a random distribution instead
                     int shouldIncrement = _context.random().nextInt(con.getOptions().getCongestionAvoidanceGrowthRateFactor()*newWindowSize);
                     if (shouldIncrement < acked)
-                        newWindowSize += 1;
+                        newWindowSize++;
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("cong. avoid acks = " + acked + " for " + con);
                 }
@@ -387,6 +394,11 @@ public class ConnectionPacketHandler {
     
     /**
      * Make sure this packet is ok and that we can continue processing its data.
+     *
+     * SIDE EFFECT:
+     * Sets the SendStreamId and RemotePeer for the con,
+     * using the packet's ReceiveStreamId and OptionalFrom,
+     * If this is a SYN packet and the con's SendStreamId is not set.
      * 
      * @return true if the packet is ok for this connection, false if we shouldn't
      *         continue processing.
@@ -415,7 +427,7 @@ public class ConnectionPacketHandler {
                     }
                 }
             } else {
-                if (!DataHelper.eq(con.getSendStreamId(), packet.getReceiveStreamId())) {
+                if (con.getSendStreamId() != packet.getReceiveStreamId()) {
                     if (_log.shouldLog(Log.ERROR))
                         _log.error("Packet received with the wrong reply stream id: " 
                                   + con + " / " + packet);
@@ -431,7 +443,7 @@ public class ConnectionPacketHandler {
      * Make sure this RST packet is valid, and if it is, act on it.
      */
     private void verifyReset(Packet packet, Connection con) {
-        if (DataHelper.eq(con.getReceiveStreamId(), packet.getSendStreamId())) {
+        if (con.getReceiveStreamId() == packet.getSendStreamId()) {
             boolean ok = packet.verifySignature(_context, packet.getOptionalFrom(), null);
             if (!ok) {
                 if (_log.shouldLog(Log.ERROR))

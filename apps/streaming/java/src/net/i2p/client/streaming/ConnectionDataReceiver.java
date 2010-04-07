@@ -2,7 +2,6 @@ package net.i2p.client.streaming;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
-import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
 /**
@@ -187,7 +186,7 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
             packet.setOptionalFrom(con.getSession().getMyDestination());
             packet.setOptionalMaxSize(con.getOptions().getMaxMessageSize());
         }
-        if (DataHelper.eq(con.getSendStreamId(), Packet.STREAM_ID_UNKNOWN)) {
+        if (con.getSendStreamId() == Packet.STREAM_ID_UNKNOWN) {
             packet.setFlag(Packet.FLAG_NO_ACK);
         }
         

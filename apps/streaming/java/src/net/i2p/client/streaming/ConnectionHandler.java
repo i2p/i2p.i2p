@@ -4,6 +4,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.Destination;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
@@ -73,8 +74,8 @@ public class ConnectionHandler {
                 sendReset(packet);
             return;
         }
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Receive new SYN: " + packet + ": timeout in " + _acceptTimeout);
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Receive new SYN: " + packet + ": timeout in " + _acceptTimeout);
         // also check if expiration of the head is long past for overload detection with peek() ?
         boolean success = _synQueue.offer(packet); // fail immediately if full
         if (success) {
@@ -145,10 +146,29 @@ public class ConnectionHandler {
                 if (syn.getOptionalDelay() == PoisonPacket.POISON_MAX_DELAY_REQUEST)
                     return null;
 
-                // deal with forged / invalid syn packets
+                // deal with forged / invalid syn packets in _manager.receiveConnection()
 
                 // Handle both SYN and non-SYN packets in the queue
                 if (syn.isFlagSet(Packet.FLAG_SYNCHRONIZE)) {
+                    // We are single-threaded here, so this is
+                    // a good place to check for dup SYNs and drop them
+                    Destination from = syn.getOptionalFrom();
+                    if (from == null) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Dropping SYN packet with no FROM: " + syn);
+                        // drop it
+                        continue;
+                    }
+                    Connection oldcon = _manager.getConnectionByOutboundId(syn.getReceiveStreamId());
+                    if (oldcon != null) {
+                        // His ID not guaranteed to be unique to us, but probably is...
+                        // only drop it on a destination match too
+                        if (from.equals(oldcon.getRemotePeer())) {
+                            if (_log.shouldLog(Log.WARN))
+                                _log.warn("Dropping dup SYN: " + syn);
+                            continue;
+                        }
+                    }
                     Connection con = _manager.receiveConnection(syn);
                     if (con != null)
                         return con;

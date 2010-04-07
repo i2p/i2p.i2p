@@ -385,7 +385,7 @@ public class Connection {
      *  Process the acks and nacks received in a packet
      *  @return List of packets acked or null
      */
-    List ackPackets(long ackThrough, long nacks[]) {
+    List<PacketLocal> ackPackets(long ackThrough, long nacks[]) {
         if (ackThrough < _highestAckedThrough) {
             // dupack which won't tell us anything
         } else {

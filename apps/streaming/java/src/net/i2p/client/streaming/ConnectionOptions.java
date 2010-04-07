@@ -359,7 +359,11 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         if (_rtt > 60*1000)
             _rtt = 60*1000;
     }
+
     public int getRTO() { return _rto; }
+
+    /** for debugging @since 0.7.13 */
+    int getRTTDev() { return _rttDev; }
     
     /**
      * If we have 3 consecutive rtt increases, we are trending upwards (1), or if we have

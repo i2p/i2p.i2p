@@ -9,7 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PSession;
-import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.SessionKey;
 import net.i2p.util.Log;
@@ -83,7 +82,7 @@ public class ConnectionManager {
      */
     Connection getConnectionByOutboundId(long id) {
             for (Connection con : _connectionByInboundId.values()) {
-                if (DataHelper.eq(con.getSendStreamId(), id))
+                if (con.getSendStreamId() == id)
                     return con;
             }
         return null;
@@ -169,6 +168,7 @@ public class ConnectionManager {
         
         con.setReceiveStreamId(receiveId);
         try {
+            // This validates the packet, and sets the con's SendStreamID and RemotePeer
             con.getPacketHandler().receivePacket(synPacket, con);
         } catch (I2PException ie) {
             _connectionByInboundId.remove(Long.valueOf(receiveId));
