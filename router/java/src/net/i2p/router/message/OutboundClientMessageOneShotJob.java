@@ -75,7 +75,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      */
     public final static String OVERALL_TIMEOUT_MS_PARAM = "clientMessageTimeout";
     private final static long OVERALL_TIMEOUT_MS_DEFAULT = 60*1000;
-    private final static long OVERALL_TIMEOUT_MS_MIN = 5*1000;
+    private final static long OVERALL_TIMEOUT_MS_MIN = 8*1000;
     
     /** priority of messages, that might get honored some day... */
     private final static int SEND_PRIORITY = 500;
@@ -151,8 +151,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         if (_overallExpiration > 0) {
            _overallExpiration = Math.max(_overallExpiration, _start + OVERALL_TIMEOUT_MS_MIN);
            _overallExpiration = Math.min(_overallExpiration, _start + OVERALL_TIMEOUT_MS_DEFAULT);
-           if (_log.shouldLog(Log.WARN))
-               _log.warn("Message Expiration (ms): " + (_overallExpiration - _start));
+           if (_log.shouldLog(Log.INFO))
+               _log.info(getJobId() + ": Message Expiration (ms): " + (_overallExpiration - _start));
         } else {
             String param = msg.getSenderConfig().getOptions().getProperty(OVERALL_TIMEOUT_MS_PARAM);
             if (param == null)
@@ -168,8 +168,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                 }
             }
             _overallExpiration = timeoutMs + _start;
-           if (_log.shouldLog(Log.WARN))
-               _log.warn("Default Expiration (ms): " + timeoutMs);
+           if (_log.shouldLog(Log.INFO))
+               _log.info(getJobId() + " Default Expiration (ms): " + timeoutMs);
         }
         _finished = false;
     }
@@ -262,12 +262,12 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                         //    return ls;
                         //} else {
                             if (_log.shouldLog(Log.INFO))
-                                _log.info("Found in cache - NOT including reply leaseset for " + _toString); 
+                                _log.info(getJobId() + ": Found in cache - NOT including reply leaseset for " + _toString); 
                             return null;
                         //}
                     } else {
                         if (_log.shouldLog(Log.INFO))
-                            _log.info("Expired from cache - reply leaseset for " + _toString); 
+                            _log.info(getJobId() + ": Expired from cache - reply leaseset for " + _toString); 
                         // will get overwritten below
                         // _leaseSetCache.remove(hashPair());
                     }
@@ -276,7 +276,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             _leaseSetCache.put(hashPair(), newLS);
         }
         if (_log.shouldLog(Log.INFO))
-            _log.info("Added to cache - reply leaseset for " + _toString); 
+            _log.info(getJobId() + ": Added to cache - reply leaseset for " + _toString); 
         return newLS;
     }
     
@@ -339,13 +339,13 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                         Lease lease = _leaseSet.getLease(i);
                         if (_lease.equals(lease)) {
                             if (_log.shouldLog(Log.INFO))
-                                _log.info("Found in cache - lease for " + _toString); 
+                                _log.info(getJobId() + ": Found in cache - lease for " + _toString); 
                             return true;
                         }
                     }
                 }
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Expired from cache - lease for " + _toString); 
+                    _log.info(getJobId() + ": Expired from cache - lease for " + _toString); 
                 _leaseCache.remove(_to);
             }
         }
@@ -419,7 +419,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             _leaseCache.put(hashPair(), _lease);
         }
         if (_log.shouldLog(Log.INFO))
-            _log.info("Added to cache - lease for " + _toString); 
+            _log.info(getJobId() + ": Added to cache - lease for " + _toString); 
         _wantACK = true;
         return true;
     }
@@ -598,12 +598,14 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             if (_selector != null)
                 getContext().messageRegistry().registerPending(_selector, _replyFound, _replyTimeout, _timeoutMs);
             if (_log.shouldLog(Log.INFO))
-                _log.info("Dispatching message to " + _toString + ": " + _msg);
+                _log.info(OutboundClientMessageOneShotJob.this.getJobId() +
+                          ": Dispatching message to " + _toString + ": " + _msg);
             long before = getContext().clock().now();
             getContext().tunnelDispatcher().dispatchOutbound(_msg, _outTunnel.getSendTunnelId(0), _lease.getTunnelId(), _lease.getGateway());
             long dispatchSendTime = getContext().clock().now() - before; 
             if (_log.shouldLog(Log.INFO))
-                _log.info("Dispatching message to " + _toString + " complete");
+                _log.info(OutboundClientMessageOneShotJob.this.getJobId() +
+                          ": Dispatching message to " + _toString + " complete");
             getContext().statManager().addRateData("client.dispatchTime", getContext().clock().now() - _start, 0);
             getContext().statManager().addRateData("client.dispatchSendTime", dispatchSendTime, 0);
         }
@@ -828,7 +830,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     }
     
     /**
-     * give up the ghost, this message just aint going through.  tell the client to fuck off.
+     * give up the ghost, this message just aint going through.  tell the client.
      *
      * this is safe to call multiple times (only tells the client once)
      */
@@ -912,18 +914,18 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         }
         
         public boolean continueMatching() { 
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug(OutboundClientMessageOneShotJob.this.getJobId() 
-                           + ": dont continue matching for token=" + _pendingToken);
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug(OutboundClientMessageOneShotJob.this.getJobId() 
+            //               + ": dont continue matching for token=" + _pendingToken);
             return false; 
         }
         public long getExpiration() { return _overallExpiration; }
         
         public boolean isMatch(I2NPMessage inMsg) {
             if (inMsg.getType() == DeliveryStatusMessage.MESSAGE_TYPE) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug(OutboundClientMessageOneShotJob.this.getJobId() 
-                               + ": delivery status message received: " + inMsg + " our token: " + _pendingToken);
+                //if (_log.shouldLog(Log.DEBUG))
+                //    _log.debug(OutboundClientMessageOneShotJob.this.getJobId() 
+                //               + ": delivery status message received: " + inMsg + " our token: " + _pendingToken);
                 return _pendingToken == ((DeliveryStatusMessage)inMsg).getMessageId();
             } else {
                 return false;
@@ -966,7 +968,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             if (_log.shouldLog(Log.INFO))
                 _log.info(OutboundClientMessageOneShotJob.this.getJobId() 
                            + ": SUCCESS!  msg " + _clientMessageId
-                           + " sent after " + sendTime + "ms");
+                           + " acked by DSM after " + sendTime + "ms");
             
             if (_key != null && _tags != null && _leaseSet != null) {
                 SessionKeyManager skm = getContext().clientManager().getClientSessionKeyManager(_from.calculateHash());
@@ -1019,8 +1021,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         
         public String getName() { return "Send client message timed out"; }
         public void runJob() {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug(OutboundClientMessageOneShotJob.this.getJobId()
+            if (_log.shouldLog(Log.INFO))
+                _log.info(OutboundClientMessageOneShotJob.this.getJobId()
                            + ": Soft timeout through the lease " + _lease);
             
             // unused

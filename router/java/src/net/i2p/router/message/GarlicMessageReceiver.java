@@ -105,12 +105,12 @@ public class GarlicMessageReceiver {
                                                                           clove.getExpiration().getTime());
         if (invalidReason != null) {
             String howLongAgo = DataHelper.formatDuration(_context.clock().now()-clove.getExpiration().getTime());
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Clove is NOT valid: id=" + clove.getCloveId() 
-                           + " expiration " + howLongAgo + " ago: " + invalidReason + ": " + clove);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Clove is NOT valid: id=" + clove.getCloveId() 
                            + " expiration " + howLongAgo + " ago", new Exception("Invalid within..."));
+            else if (_log.shouldLog(Log.WARN))
+                _log.warn("Clove is NOT valid: id=" + clove.getCloveId() 
+                           + " expiration " + howLongAgo + " ago: " + invalidReason + ": " + clove);
             _context.messageHistory().messageProcessingError(clove.getCloveId(), 
                                                              clove.getData().getClass().getName(), 
                                                              "Clove is not valid (expiration " + howLongAgo + " ago)");

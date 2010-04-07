@@ -75,7 +75,7 @@ public class GarlicMessageParser {
                 GarlicClove clove = new GarlicClove(_context);
                 offset += clove.readBytes(data, offset);
                 set.addClove(clove);
-            if (_log.shouldLog(Log.WARN))
+            if (_log.shouldLog(Log.DEBUG))
                 _log.debug("After reading clove " + i);
         }
         Certificate cert = new Certificate();
