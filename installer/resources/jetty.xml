@@ -201,6 +201,8 @@
   <!-- Configure the Other Server Options                              -->
   <!-- =============================================================== -->
   <Set name="requestsPerGC">2000</Set>
+<!--  defaults to false, requires access through jconsole?
   <Set name="statsOn">false</Set>
+-->
 
 </Configure>
