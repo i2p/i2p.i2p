@@ -240,15 +240,19 @@ public class PeerCoordinator implements PeerListener
       }
   }
   
-  /** reduce max if huge pieces to keep from ooming */
+  /**
+   *  Reduce max if huge pieces to keep from ooming
+   *  Todo: should we only reduce when leeching?
+   *  @return 512K: 16; 1M: 11; 2M: 8
+   */
   private int getMaxConnections() {
     int size = metainfo.getPieceLength(0);
     int max = _util.getMaxConnections();
-    if (size <= 1024*1024)
+    if (size <= 512*1024)
       return max;
-    if (size <= 2*1024*1024)
-      return (max + 1) / 2;
-    return (max + 3) / 4;
+    if (size <= 1024*1024)
+      return (max + max + 2) / 3;
+    return (max + 1) / 2;
   }
 
   public boolean halted() { return halted; }
