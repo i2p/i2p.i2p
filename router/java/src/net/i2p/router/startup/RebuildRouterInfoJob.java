@@ -107,7 +107,7 @@ public class RebuildRouterInfoJob extends JobImpl {
                     ident.setSigningPublicKey(signingPubKey);
                     info.setIdentity(ident);
                 } catch (Exception e) {
-                    _log.error("Error reading in the key data from " + keyFile.getAbsolutePath(), e);
+                    _log.log(Log.CRIT, "Error reading in the key data from " + keyFile.getAbsolutePath(), e);
                     if (fis != null) try { fis.close(); } catch (IOException ioe) {}
                     fis = null;
                     keyFile.delete();
@@ -129,7 +129,7 @@ public class RebuildRouterInfoJob extends JobImpl {
                 
                 info.sign(getContext().keyManager().getSigningPrivateKey());
             } catch (DataFormatException dfe) {
-                _log.error("Error rebuilding the new router info", dfe);
+                _log.log(Log.CRIT, "Error rebuilding the new router info", dfe);
                 return;
             }
             
@@ -138,9 +138,9 @@ public class RebuildRouterInfoJob extends JobImpl {
                 fos = new FileOutputStream(infoFile);
                 info.writeBytes(fos);
             } catch (DataFormatException dfe) {
-                _log.error("Error rebuilding the router information", dfe);
+                _log.log(Log.CRIT, "Error rebuilding the router information", dfe);
             } catch (IOException ioe) {
-                _log.error("Error writing out the rebuilt router information", ioe);
+                _log.log(Log.CRIT, "Error writing out the rebuilt router information", ioe);
             } finally {
                 if (fos != null) try { fos.close(); } catch (IOException ioe) {}
             }
