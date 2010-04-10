@@ -699,6 +699,7 @@ public class EstablishmentManager {
         // signs if we havent signed yet
         state.prepareSessionConfirmed();
         
+        // BUG - handle null return
         UDPPacket packets[] = _builder.buildSessionConfirmedPackets(state, _context.router().getRouterInfo().getIdentity());
         
         if (_log.shouldLog(Log.DEBUG))

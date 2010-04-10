@@ -348,6 +348,8 @@ public class OutboundEstablishState {
         DataHelper.toLong(signed, off, 4, _receivedRelayTag);
         off += 4;
         DataHelper.toLong(signed, off, 4, _sentSignedOnTime);
+        // BUG - if SigningPrivateKey is null, _sentSignature will be null, leading to NPE later
+        // should we throw something from here?
         _sentSignature = _context.dsa().sign(signed, _context.keyManager().getSigningPrivateKey());
     }
     

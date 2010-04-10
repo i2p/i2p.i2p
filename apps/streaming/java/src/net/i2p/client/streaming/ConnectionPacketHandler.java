@@ -328,7 +328,19 @@ public class ConnectionPacketHandler {
         } 
         
         long lowest = con.getHighestAckedThrough();
-        if (lowest >= con.getCongestionWindowEnd()) {
+        // RFC 2581
+        // Why wait until we get a whole cwin to start updating the window?
+        // That means we don't start increasing the window until after 1 RTT.
+        // And whether we increase the window or not (probably not since 1/N),
+        // we reset the CongestionWindowEnd and have to wait another RTT.
+        // So we add the acked > 1 and UnackedPacketsSent > 0 cases,
+        // so we almost always go through the window adjustment code,
+        // unless we're just sending a single packet now and then.
+        // This keeps the window size from going sky-high from  ping traffic alone.
+        // Since we don't adjust the window down after idle? (RFC 2581 sec. 4.1)
+        if (lowest >= con.getCongestionWindowEnd() ||
+            acked > 1 ||
+            con.getUnackedPacketsSent() > 0) {
             // new packet that ack'ed uncongested data, or an empty ack
             int oldWindow = con.getOptions().getWindowSize();
             int newWindowSize = oldWindow;
@@ -352,11 +364,12 @@ public class ConnectionPacketHandler {
                         newWindowSize += acked / factor;
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("slow start acks = " + acked + " for " + con);
-                } else if (trend < 0) {
-                    // rtt is shrinking, so lets increment the cwin
-                    newWindowSize++;
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("trend < 0 for " + con);
+                // this is too fast since we mostly disabled the CongestionWindowEnd test above
+                //} else if (trend < 0) {
+                //    // rtt is shrinking, so lets increment the cwin
+                //    newWindowSize++;
+                //    if (_log.shouldLog(Log.DEBUG))
+                //        _log.debug("trend < 0 for " + con);
                 } else {
                     // congestion avoidance
                     // linear growth - increase window 1/N per RTT
@@ -368,6 +381,10 @@ public class ConnectionPacketHandler {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("cong. avoid acks = " + acked + " for " + con);
                 }
+            } else {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("No change to window: " + con.getOptions().getWindowSize() +
+                               " congested? " + congested + " acked: " + acked + " resends: " + numResends);
             }
             
             if (newWindowSize <= 0)
@@ -380,6 +397,11 @@ public class ConnectionPacketHandler {
                 _log.debug("New window size " + newWindowSize + "/" + oldWindow + "/" + con.getOptions().getWindowSize() + " congestionSeenAt: "
                            + con.getLastCongestionSeenAt() + " (#resends: " + numResends 
                            + ") for " + con);
+        } else {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("No change to window: " + con.getOptions().getWindowSize() +
+                           " highestAckedThrough: " + lowest + " congestionWindowEnd: " + con.getCongestionWindowEnd() +
+                           " acked: " + acked + " unacked: " + con.getUnackedPacketsSent());
         }
         
         con.windowAdjusted();

@@ -259,8 +259,7 @@ public class PluginStarter implements Runnable {
             String current = ctx.getProperty(CSSHelper.PROP_THEME_NAME);
             for (int i = 0; i < tfiles.length; i++) {
                 String name = tfiles[i].getName();
-                if (tfiles[i].isDirectory() && (!name.equals("images")) && (!name.equals("classic")) &&
-                    (!name.equals("dark")) && (!name.equals("light")) && (!name.equals("midnight"))) {
+                if (tfiles[i].isDirectory() && (!Arrays.asList(STANDARD_THEMES).contains(tfiles[i]))) {
                     ctx.router().removeConfigSetting(ConfigUIHelper.PROP_THEME_PFX + name);
                     if (name.equals(current))
                         ctx.router().setConfigSetting(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);

@@ -1,3 +1,16 @@
+2010-04-10 zzz
+    * i2psnark:
+      - Disconnect seeds that connect to a seed
+      - Lower per-torrent conn limits for large pieces
+    * Startup:
+      - Don't die horribly if there is a router.info file
+        but no router.keys file
+        http://forum.i2p/viewtopic.php?t=4424
+      - Log tweaks
+    * Streaming:
+      - Fix the window size increment logic so it
+        does it much more often
+
 2010-04-08 zzz
     * Key Manager: Hopefully avoid some races at startup
       http://forum.i2p/viewtopic.php?t=4424

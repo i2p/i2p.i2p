@@ -152,7 +152,16 @@ class PeerState
         // XXX - Check for weird bitfield and disconnect?
         bitfield = new BitField(bitmap, metainfo.getPieces());
       }
-    setInteresting(listener.gotBitField(peer, bitfield));
+    boolean interest = listener.gotBitField(peer, bitfield);
+    setInteresting(interest);
+    if (bitfield.complete() && !interest) {
+        // They are seeding and we are seeding,
+        // why did they contact us? (robert)
+        // Dump them quick before we send our whole bitmap
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Disconnecting seed that connects to seeds" + peer);
+        peer.disconnect(true);
+    }
   }
 
   void requestMessage(int piece, int begin, int length)

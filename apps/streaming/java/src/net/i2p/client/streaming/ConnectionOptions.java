@@ -386,8 +386,10 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     private static final double RTT_DAMPENING = 0.875;
     
     public void updateRTT(int measuredValue) {
+        // the rttDev calculation matches that recommended in RFC 2988 (beta = 1/4)
         _rttDev = _rttDev + (int)(0.25d*(Math.abs(measuredValue-_rtt)-_rttDev));
         int smoothed = (int)(RTT_DAMPENING*_rtt + (1-RTT_DAMPENING)*measuredValue);        
+        // K = 4
         _rto = smoothed + (_rttDev<<2);
         if (_rto < Connection.MIN_RESEND_DELAY) 
             _rto = (int)Connection.MIN_RESEND_DELAY;

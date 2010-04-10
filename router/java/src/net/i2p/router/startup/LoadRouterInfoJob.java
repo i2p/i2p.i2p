@@ -68,11 +68,18 @@ public class LoadRouterInfoJob extends JobImpl {
         FileInputStream fis1 = null;
         FileInputStream fis2 = null;
         try {
-            if (_infoExists) {
+            // if we have a routerinfo but no keys, things go bad in a hurry:
+            // CRIT   ...rkdb.PublishLocalRouterInfoJob: Internal error - signing private key not known?  rescheduling publish for 30s
+            // CRIT      net.i2p.router.Router         : Internal error - signing private key not known?  wtf
+            // CRIT   ...sport.udp.EstablishmentManager: Error in the establisher java.lang.NullPointerException
+            // at net.i2p.router.transport.udp.PacketBuilder.buildSessionConfirmedPacket(PacketBuilder.java:574)
+            // so pretend the RI isn't there if there is no keyfile
+            if (_infoExists && _keysExist) {
                 fis1 = new FileInputStream(rif);
                 info = new RouterInfo();
                 info.readBytes(fis1);
                 _log.debug("Reading in routerInfo from " + rif.getAbsolutePath() + " and it has " + info.getAddresses().size() + " addresses");
+                _us = info;
             }
             
             if (_keysExist) {
@@ -91,17 +98,15 @@ public class LoadRouterInfoJob extends JobImpl {
                 getContext().keyManager().setPublicKey(pubkey); //info.getIdentity().getPublicKey());
                 getContext().keyManager().setSigningPublicKey(signingPubKey); // info.getIdentity().getSigningPublicKey());
             }
-            
-            _us = info;
         } catch (IOException ioe) {
-            _log.error("Error reading the router info from " + rif.getAbsolutePath() + " and the keys from " + rkf.getAbsolutePath(), ioe);
+            _log.log(Log.CRIT, "Error reading the router info from " + rif.getAbsolutePath() + " and the keys from " + rkf.getAbsolutePath(), ioe);
             _us = null;
             rif.delete();
             rkf.delete();
             _infoExists = false;
             _keysExist = false;
         } catch (DataFormatException dfe) {
-            _log.error("Corrupt router info or keys at " + rif.getAbsolutePath() + " / " + rkf.getAbsolutePath(), dfe);
+            _log.log(Log.CRIT, "Corrupt router info or keys at " + rif.getAbsolutePath() + " / " + rkf.getAbsolutePath(), dfe);
             _us = null;
             rif.delete();
             rkf.delete();

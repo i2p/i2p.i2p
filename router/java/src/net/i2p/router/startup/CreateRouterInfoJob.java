@@ -98,9 +98,9 @@ public class CreateRouterInfoJob extends JobImpl {
             
             _log.info("Router info created and stored at " + ifile.getAbsolutePath() + " with private keys stored at " + kfile.getAbsolutePath() + " [" + info + "]");
         } catch (DataFormatException dfe) {
-            _log.error("Error building the new router information", dfe);
+            _log.log(Log.CRIT, "Error building the new router information", dfe);
         } catch (IOException ioe) {
-            _log.error("Error writing out the new router information", ioe);
+            _log.log(Log.CRIT, "Error writing out the new router information", ioe);
         } finally {
             if (fos1 != null) try { fos1.close(); } catch (IOException ioe) {}
             if (fos2 != null) try { fos2.close(); } catch (IOException ioe) {}
