@@ -512,6 +512,10 @@ public class PacketBuilder {
      * encrypting it as necessary.
      * 
      * @return ready to send packets, or null if there was a problem
+     * 
+     * TODO: doesn't really return null, and caller doesn't handle null return
+     * (null SigningPrivateKey should cause this?)
+     * Should probably return null if buildSessionConfirmedPacket() turns null for any fragment
      */
     public UDPPacket[] buildSessionConfirmedPackets(OutboundEstablishState state, RouterIdentity ourIdentity) {
         byte identity[] = ourIdentity.toByteArray();
@@ -593,6 +597,7 @@ public class PacketBuilder {
                 off++;
             }
             
+            // BUG: NPE here if null signature
             System.arraycopy(state.getSentSignature().getData(), 0, data, off, Signature.SIGNATURE_BYTES);
             packet.getPacket().setLength(off + Signature.SIGNATURE_BYTES);
             authenticate(packet, state.getCipherKey(), state.getMACKey());
