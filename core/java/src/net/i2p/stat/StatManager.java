@@ -39,8 +39,8 @@ public class StatManager {
     public static final String PROP_STAT_FILTER = "stat.logFilters";
     public static final String PROP_STAT_FILE = "stat.logFile";
     public static final String DEFAULT_STAT_FILE = "stats.log";
+    /** default true */
     public static final String PROP_STAT_FULL = "stat.full";
-    public static final String DEFAULT_STAT_FULL = "true";
     public static final String PROP_STAT_REQUIRED = "stat.required";
     /**
      * These are all the stats published in netDb, plus those required for the operation of
@@ -211,7 +211,7 @@ public class StatManager {
      * @return true if the stat should be ignored.
      */
     public boolean ignoreStat(String statName) {
-        if (_context.getProperty(PROP_STAT_FULL, DEFAULT_STAT_FULL).equalsIgnoreCase("true"))
+        if (_context.getBooleanPropertyDefaultTrue(PROP_STAT_FULL))
             return false;
         String required = _context.getProperty(PROP_STAT_REQUIRED, DEFAULT_STAT_REQUIRED);
         String req[] = required.split(",");

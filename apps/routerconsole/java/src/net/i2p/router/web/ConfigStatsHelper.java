@@ -139,9 +139,6 @@ public class ConfigStatsHelper extends HelperBase {
     public boolean getCurrentCanBeGraphed() { return _currentCanBeGraphed; }
     public String getExplicitFilter() { return _filter; }
     public boolean getIsFull() {
-        String f = _context.getProperty(StatManager.PROP_STAT_FULL);
-        if (f != null && f.equals("true"))
-            return true;
-        return false;
+        return _context.getBooleanPropertyDefaultTrue(StatManager.PROP_STAT_FULL);
     }
 }
