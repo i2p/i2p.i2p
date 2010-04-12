@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import net.i2p.I2PAppContext;
 import net.i2p.crypto.SHA1;
 import net.i2p.data.Base64;
 import net.i2p.util.Log;
@@ -47,7 +48,7 @@ import org.klomp.snark.bencode.InvalidBEncodingException;
  */
 public class MetaInfo
 {  
-  private static final Log _log = new Log(MetaInfo.class);
+  private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(MetaInfo.class);
   private final String announce;
   private final byte[] info_hash;
   private final String name;

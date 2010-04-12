@@ -23,11 +23,12 @@ package org.klomp.snark;
 import java.io.DataInputStream;
 import java.io.IOException;
 
+import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
 
 class PeerConnectionIn implements Runnable
 {
-  private Log _log = new Log(PeerConnectionIn.class);
+  private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(PeerConnectionIn.class);
   private final Peer peer;
   private final DataInputStream din;
 
@@ -129,7 +130,7 @@ class PeerConnectionIn implements Runnable
                 din.readFully(bitmap);
                 ps.bitfieldMessage(bitmap);
                 if (_log.shouldLog(Log.DEBUG)) 
-                    _log.debug("Received bitmap from " + peer + " on " + peer.metainfo.getName() + ": size=" + (i-1) + ": " + ps.bitfield);
+                    _log.debug("Received bitmap from " + peer + " on " + peer.metainfo.getName() + ": size=" + (i-1) /* + ": " + ps.bitfield */ );
                 break;
               case 6:
                 piece = din.readInt();

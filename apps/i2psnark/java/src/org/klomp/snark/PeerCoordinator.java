@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Timer;
 
+import net.i2p.I2PAppContext;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
@@ -37,7 +38,7 @@ import net.i2p.util.Log;
  */
 public class PeerCoordinator implements PeerListener
 {
-  private final Log _log = new Log(PeerCoordinator.class);
+  private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(PeerCoordinator.class);
   final MetaInfo metainfo;
   final Storage storage;
   final Snark snark;
@@ -241,18 +242,17 @@ public class PeerCoordinator implements PeerListener
   }
   
   /**
-   *  Reduce max if huge pieces to keep from ooming
-   *  Todo: should we only reduce when leeching?
-   *  @return 512K: 16; 1M: 11; 2M: 8
+   *  Reduce max if huge pieces to keep from ooming when leeching
+   *  @return 512K: 16; 1M: 11; 2M: 6
    */
   private int getMaxConnections() {
     int size = metainfo.getPieceLength(0);
     int max = _util.getMaxConnections();
-    if (size <= 512*1024)
+    if (size <= 512*1024 || completed())
       return max;
     if (size <= 1024*1024)
       return (max + max + 2) / 3;
-    return (max + 1) / 2;
+    return (max + 2) / 3;
   }
 
   public boolean halted() { return halted; }

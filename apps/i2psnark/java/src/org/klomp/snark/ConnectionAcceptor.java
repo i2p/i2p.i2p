@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
@@ -36,7 +37,7 @@ import net.i2p.util.Log;
  */
 public class ConnectionAcceptor implements Runnable
 {
-  private Log _log = new Log(ConnectionAcceptor.class);
+  private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(ConnectionAcceptor.class);
   private I2PServerSocket serverSocket;
   private PeerAcceptor peeracceptor;
   private Thread thread;

@@ -24,11 +24,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
 
 class PeerState
 {
-  private Log _log = new Log(PeerState.class);
+  private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(PeerState.class);
   final Peer peer;
   final PeerListener listener;
   final MetaInfo metainfo;
@@ -159,7 +160,7 @@ class PeerState
         // why did they contact us? (robert)
         // Dump them quick before we send our whole bitmap
         if (_log.shouldLog(Log.WARN))
-            _log.warn("Disconnecting seed that connects to seeds" + peer);
+            _log.warn("Disconnecting seed that connects to seeds: " + peer);
         peer.disconnect(true);
     }
   }
@@ -195,6 +196,7 @@ class PeerState
 
     // Limit total pipelined requests to MAX_PIPELINE bytes
     // to conserve memory and prevent DOS
+    // Todo: limit number of requests also? (robert 64 x 4KB)
     if (out.queuedBytes() + length > MAX_PIPELINE_BYTES)
       {
         if (_log.shouldLog(Log.WARN))

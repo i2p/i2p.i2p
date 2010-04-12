@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +22,7 @@ import net.i2p.client.streaming.I2PSocketManagerFactory;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
+import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.EepGet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
@@ -48,7 +48,7 @@ public class I2PSnarkUtil {
     private Map _opts;
     private I2PSocketManager _manager;
     private boolean _configured;
-    private final Set _shitlist;
+    private final Set<Hash> _shitlist;
     private int _maxUploaders;
     private int _maxUpBW;
     private int _maxConnections;
@@ -67,7 +67,7 @@ public class I2PSnarkUtil {
         _opts = new HashMap();
         setProxy("127.0.0.1", 4444);
         setI2CPConfig("127.0.0.1", 7654, null);
-        _shitlist = new HashSet(64);
+        _shitlist = new ConcurrentHashSet();
         _configured = false;
         _maxUploaders = Snark.MAX_TOTAL_UPLOADERS;
         _maxUpBW = DEFAULT_MAX_UP_BW;
@@ -187,18 +187,15 @@ public class I2PSnarkUtil {
     /** connect to the given destination */
     I2PSocket connect(PeerID peer) throws IOException {
         Hash dest = peer.getAddress().calculateHash();
-        synchronized (_shitlist) {
-            if (_shitlist.contains(dest))
-                throw new IOException("Not trying to contact " + dest.toBase64() + ", as they are shitlisted");
-        }
+        if (_shitlist.contains(dest))
+            throw new IOException("Not trying to contact " + dest.toBase64() + ", as they are shitlisted");
         try {
             I2PSocket rv = _manager.connect(peer.getAddress());
-            if (rv != null) synchronized (_shitlist) { _shitlist.remove(dest); }
+            if (rv != null)
+                _shitlist.remove(dest);
             return rv;
         } catch (I2PException ie) {
-            synchronized (_shitlist) {
-                _shitlist.add(dest);
-            }
+            _shitlist.add(dest);
             SimpleScheduler.getInstance().addEvent(new Unshitlist(dest), 10*60*1000);
             throw new IOException("Unable to reach the peer " + peer + ": " + ie.getMessage());
         }
@@ -207,7 +204,7 @@ public class I2PSnarkUtil {
     private class Unshitlist implements SimpleTimer.TimedEvent {
         private Hash _dest;
         public Unshitlist(Hash dest) { _dest = dest; }
-        public void timeReached() { synchronized (_shitlist) { _shitlist.remove(_dest); } }
+        public void timeReached() { _shitlist.remove(_dest); }
     }
     
     /**

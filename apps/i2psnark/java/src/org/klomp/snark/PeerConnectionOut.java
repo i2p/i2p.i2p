@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import net.i2p.I2PAppContext;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
@@ -33,7 +34,7 @@ import net.i2p.util.SimpleTimer;
 
 class PeerConnectionOut implements Runnable
 {
-  private Log _log = new Log(PeerConnectionOut.class);
+  private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(PeerConnectionOut.class);
   private final Peer peer;
   private final DataOutputStream dout;
 

@@ -505,7 +505,7 @@ public class I2PSnarkServlet extends HttpServlet {
             err = snark.coordinator.trackerProblems;
             curPeers = snark.coordinator.getPeerCount();
             stats[4] += curPeers;
-            knownPeers = snark.coordinator.trackerSeenPeers;
+            knownPeers = Math.max(curPeers, snark.coordinator.trackerSeenPeers);
         }
         
         String statusString = _("Unknown");

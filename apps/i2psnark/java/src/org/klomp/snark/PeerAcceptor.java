@@ -28,6 +28,7 @@ import java.io.OutputStream;
 import java.io.SequenceInputStream;
 import java.util.Iterator;
 
+import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
@@ -41,7 +42,7 @@ import net.i2p.util.Log;
  */
 public class PeerAcceptor
 {
-  private static final Log _log = new Log(PeerAcceptor.class);
+  private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(PeerAcceptor.class);
   private final PeerCoordinator coordinator;
   final PeerCoordinatorSet coordinators;
 
