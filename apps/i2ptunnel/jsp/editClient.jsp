@@ -424,9 +424,9 @@
                     <span class="comment"><%=intl._("NOTE: If tunnel is currently running, most changes will not take effect until tunnel is stopped and restarted.")%></span>
                      <div class="separator"><hr /></div>
                     <input type="hidden" value="true" name="removeConfirm" />
-                    <button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="Save changes" title="Save Changes"><%=intl._("Save")%>(<span class="accessKey">S</span>)</button>
-                    <button id="controlDelete" <%=(editBean.allowJS() ? "onclick=\"if (!confirm('Are you sure you want to delete?')) { return false; }\" " : "")%>accesskey="D" class="control" type="submit" name="action" value="Delete this proxy" title="Delete this Proxy"><%=intl._("Delete")%>(<span class="accessKey">D</span>)</button>
                     <button id="controlCancel" class="control" type="submit" name="action" value="" title="Cancel"><%=intl._("Cancel")%></button>
+                    <button id="controlDelete" <%=(editBean.allowJS() ? "onclick=\"if (!confirm('Are you sure you want to delete?')) { return false; }\" " : "")%>accesskey="D" class="control" type="submit" name="action" value="Delete this proxy" title="Delete this Proxy"><%=intl._("Delete")%>(<span class="accessKey">D</span>)</button>
+                    <button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="Save changes" title="Save Changes"><%=intl._("Save")%>(<span class="accessKey">S</span>)</button>
                 </div>
             </div> 
         </div>

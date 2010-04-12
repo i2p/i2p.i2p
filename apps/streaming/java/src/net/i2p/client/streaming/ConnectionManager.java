@@ -135,6 +135,14 @@ public class ConnectionManager {
             //        active++;
             //}
             if (locked_tooManyStreams()) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Refusing connection since we have exceeded our max of " 
+                              + _maxConcurrentStreams + " connections");
+                reject = true;
+            } else if (shouldRejectConnection(synPacket)) {
+                _log.error("Refusing connection since peer is " +
+                           (_defaultOptions.isAccessListEnabled() ? "not whitelisted: " : "blacklisted: ") +
+                           (synPacket.getOptionalFrom() == null ? "null from" : synPacket.getOptionalFrom().calculateHash().toBase64()));
                 reject = true;
             } else { 
                 while (true) {
@@ -151,9 +159,6 @@ public class ConnectionManager {
         _context.statManager().addRateData("stream.receiveActive", active, total);
         
         if (reject) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Refusing connection since we have exceeded our max of " 
-                          + _maxConcurrentStreams + " connections");
             PacketLocal reply = new PacketLocal(_context, synPacket.getOptionalFrom());
             reply.setFlag(Packet.FLAG_RESET);
             reply.setFlag(Packet.FLAG_SIGNATURE_INCLUDED);
@@ -270,6 +275,21 @@ public class ConnectionManager {
         return (active >= _maxConcurrentStreams);
     }
     
+    private boolean shouldRejectConnection(Packet syn) {
+        // unfortunately we don't have access to the router client manager here,
+        // so we can't whitelist local access
+        Destination from = syn.getOptionalFrom();
+        if (from == null)
+            return true;
+        // if the sig is absent or bad it will be caught later (in CPH)
+        if (_defaultOptions.isAccessListEnabled())
+            return !_defaultOptions.getAccessList().contains(from.calculateHash());
+        if (_defaultOptions.isBlacklistEnabled())
+            return _defaultOptions.getBlacklist().contains(from.calculateHash());
+        return false;
+    }
+
+
     public MessageHandler getMessageHandler() { return _messageHandler; }
     public PacketHandler getPacketHandler() { return _packetHandler; }
     public I2PSession getSession() { return _session; }

@@ -1,6 +1,15 @@
 package net.i2p.client.streaming;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
+import java.util.StringTokenizer;
+
+import net.i2p.I2PAppContext;
+import net.i2p.data.Hash;
+import net.i2p.util.ConvertToHash;
+import net.i2p.util.Log;
 
 /**
  * Define the current options for the con (and allow custom tweaking midstream)
@@ -27,6 +36,10 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     private int _maxWindowSize;
     private int _congestionAvoidanceGrowthRateFactor;
     private int _slowStartGrowthRateFactor;
+    private boolean _accessListEnabled;
+    private boolean _blackListEnabled;
+    private Set<Hash> _accessList;
+    private Set<Hash> _blackList;
 
     public static final int PROFILE_BULK = 1;
     public static final int PROFILE_INTERACTIVE = 2;
@@ -54,6 +67,9 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     public static final String PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR = "i2p.streaming.congestionAvoidanceGrowthRateFactor";
     public static final String PROP_SLOW_START_GROWTH_RATE_FACTOR = "i2p.streaming.slowStartGrowthRateFactor";
     public static final String PROP_ANSWER_PINGS = "i2p.streaming.answerPings";
+    public static final String PROP_ENABLE_ACCESS_LIST = "i2cp.enableAccessList";
+    public static final String PROP_ENABLE_BLACKLIST = "i2cp.enableBlackList";
+    public static final String PROP_ACCESS_LIST = "i2cp.accessList";
     
     private static final int TREND_COUNT = 3;
     static final int INITIAL_WINDOW_SIZE = 6;
@@ -205,6 +221,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
             setWriteTimeout(opts.getWriteTimeout());
             setReadTimeout(opts.getReadTimeout());
             setAnswerPings(opts.getAnswerPings());
+            initLists(opts);
         }
     }
     
@@ -230,6 +247,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         setSlowStartGrowthRateFactor(getInt(opts, PROP_SLOW_START_GROWTH_RATE_FACTOR, 1));
         setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DISCONNECT_TIMEOUT));
         setAnswerPings(getBool(opts, PROP_ANSWER_PINGS, DEFAULT_ANSWER_PINGS));
+        initLists(opts);
     }
     
 	@Override
@@ -272,6 +290,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
             setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DISCONNECT_TIMEOUT));
         if (opts.containsKey(PROP_ANSWER_PINGS))
             setAnswerPings(getBool(opts, PROP_ANSWER_PINGS, DEFAULT_ANSWER_PINGS));
+        initLists(opts);
     }
     
     /** 
@@ -504,6 +523,57 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     public int getSlowStartGrowthRateFactor() { return _slowStartGrowthRateFactor; }
     public void setSlowStartGrowthRateFactor(int factor) { _slowStartGrowthRateFactor = factor; }
     
+    public boolean isAccessListEnabled() { return _accessListEnabled; }
+    public boolean isBlacklistEnabled() { return _blackListEnabled; }
+    public Set<Hash> getAccessList() { return _accessList; }
+    public Set<Hash> getBlacklist() { return _blackList; }
+
+    private void initLists(ConnectionOptions opts) {
+        _accessListEnabled = opts.isAccessListEnabled();
+        _blackListEnabled = opts.isBlacklistEnabled();
+        _accessList = opts.getAccessList();
+        _blackList = opts.getBlacklist();
+    }
+
+    private void initLists(Properties opts) {
+        _accessListEnabled = getBool(opts, PROP_ENABLE_ACCESS_LIST, false);
+        _blackListEnabled = getBool(opts, PROP_ENABLE_BLACKLIST, false);
+        if (_accessListEnabled)
+            _accessList = new HashSet();
+        else
+            _accessList = Collections.EMPTY_SET;
+        if (_blackListEnabled)
+            _blackList = new HashSet();
+        else
+            _blackList = Collections.EMPTY_SET;
+        if (!(_accessListEnabled || _blackListEnabled))
+            return;
+        String hashes = opts.getProperty(PROP_ACCESS_LIST);
+        if (hashes == null)
+            return;
+        StringTokenizer tok = new StringTokenizer(hashes, ", ");
+        while (tok.hasMoreTokens()) {
+            String hashstr = tok.nextToken();
+            Hash h = ConvertToHash.getHash(hashstr);
+            if (h == null)
+                error("bad list hash: " + hashstr);
+            else if (_blackListEnabled)
+                _blackList.add(h);
+            else
+                _accessList.add(h);
+        }
+        if (_accessListEnabled && _accessList.isEmpty())
+            error("Connection access list enabled but no valid entries; no peers can connect");
+        else if (_blackListEnabled && _blackList.isEmpty())
+            error("Connection blacklist enabled but no valid entries; all peers can connect");
+    }
+
+    private static void error(String s) {
+        I2PAppContext ctx = I2PAppContext.getGlobalContext();
+        Log log = ctx.logManager().getLog(ConnectionOptions.class);
+        log.error(s);
+    }
+
 	@Override
     public String toString() {
         StringBuilder buf = new StringBuilder(128);
