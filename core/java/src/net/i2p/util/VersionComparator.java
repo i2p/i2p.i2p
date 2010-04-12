@@ -64,5 +64,9 @@ public class VersionComparator implements Comparator<String> {
 
         return versionStringBuilder.toString();
     }
+
+    public static void main(String[] args) {
+        System.out.println("" + (new VersionComparator()).compare(args[0], args[1]));
+    }
 }
 
