@@ -126,7 +126,7 @@ public class PluginStarter implements Runnable {
                             log.error("Skipping duplicate webapp " + warName + " in plugin " + appName);
                             continue;
                         }
-                        String enabled = props.getProperty(PREFIX + warName + ENABLED);
+                        String enabled = props.getProperty(RouterConsoleRunner.PREFIX + warName + ENABLED);
                         if (! "false".equals(enabled)) {
                             //log.error("Starting webapp: " + warName);
                             String path = new File(webappDir, fileNames[i]).getCanonicalPath();
