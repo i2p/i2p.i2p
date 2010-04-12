@@ -167,7 +167,9 @@ public class Log {
         return _name;
     }
     
+    /** @return the LogScope (private class) */
     public Object getScope() { return _scope; }
+
     static String getScope(String name, Class cls) { 
         if ( (name == null) && (cls == null) ) return "f00";
         if (cls == null) return name;

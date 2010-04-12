@@ -70,13 +70,12 @@ class LogWriter implements Runnable {
     public void flushRecords() { flushRecords(true); }
     public void flushRecords(boolean shouldWait) {
         try {
-            List records = _manager._removeAll();
+            List<LogRecord> records = _manager._removeAll();
             if (records == null) return;
-            for (int i = 0; i < records.size(); i++) {
-                LogRecord rec = (LogRecord) records.get(i);
+            for (LogRecord rec : records) {
                 writeRecord(rec);
             }
-            if (records.size() > 0) {
+            if (!records.isEmpty()) {
                 try {
                     _currentOut.flush();
                 } catch (IOException ioe) {

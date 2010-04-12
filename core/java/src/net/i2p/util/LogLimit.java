@@ -39,4 +39,16 @@ class LogLimit {
         if (name == null) return false;
         return name.startsWith(_rootName);
     }
+
+    @Override
+    public int hashCode() {
+        return _rootName.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || !(o instanceof LogLimit))
+            return false;
+        return _rootName.equals(((LogLimit) o).getRootName());
+    }
 }

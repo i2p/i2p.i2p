@@ -17,10 +17,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
 
@@ -70,11 +74,11 @@ public class LogManager {
     /** the config file */
     private File _locationFile;
     /** Ordered list of LogRecord elements that have not been written out yet */
-    private /* FIXME final FIXME */ List _records;
+    private LinkedBlockingQueue<LogRecord> _records;
     /** List of explicit overrides of log levels (LogLimit objects) */
-    private /* FIXME final FIXME */ List _limits;
-    /** String (scope) to Log object */
-    private /* FIXME final FIXME */ Map _logs;
+    private Set<LogLimit> _limits;
+    /** String (scope) or Log.LogScope to Log object */
+    private ConcurrentHashMap<Object, Log> _logs;
     /** who clears and writes our records */
     private LogWriter _writer;
 
@@ -110,9 +114,9 @@ public class LogManager {
     public LogManager(I2PAppContext context) {
         _displayOnScreen = true;
         _alreadyNoticedMissingConfig = false;
-        _records = new ArrayList();
-        _limits = new ArrayList(128);
-        _logs = new HashMap(128);
+        _records = new LinkedBlockingQueue();
+        _limits = new ConcurrentHashSet();
+        _logs = new ConcurrentHashMap(128);
         _defaultLimit = Log.ERROR;
         _configLastRead = 0;
         _context = context;
@@ -139,33 +143,26 @@ public class LogManager {
     public Log getLog(Class cls) { return getLog(cls, null); }
     public Log getLog(String name) { return getLog(null, name); }
     public Log getLog(Class cls, String name) {
-        Log rv = null;
         String scope = Log.getScope(name, cls);
         boolean isNew = false;
-        synchronized (_logs) {
-            rv = (Log)_logs.get(scope);
-            if (rv == null) {
-                rv = new Log(this, cls, name);
-                _logs.put(scope, rv);
-                isNew = true;
-            }
+        Log rv = _logs.get(scope);
+        if (rv == null) {
+            rv = new Log(this, cls, name);
+            _logs.putIfAbsent(scope, rv);
+            isNew = true;
         }
         if (isNew)
             updateLimit(rv);
         return rv;
     }
-    public List getLogs() {
-        List rv = null;
-        synchronized (_logs) {
-            rv = new ArrayList(_logs.values());
-        }
-        return rv;
+
+    /** @deprecated unused */
+    public List<Log> getLogs() {
+        return new ArrayList(_logs.values());
     }
+
     void addLog(Log log) {
-        synchronized (_logs) {
-            if (!_logs.containsKey(log.getScope()))
-                _logs.put(log.getScope(), log);
-        }
+        _logs.putIfAbsent(log.getScope(), log);
         updateLimit(log);
     }
     
@@ -211,11 +208,8 @@ public class LogManager {
      *
      */
     void addRecord(LogRecord record) {
-        int numRecords = 0;
-        synchronized (_records) {
-            _records.add(record);
-            numRecords = _records.size();
-        }
+        _records.offer(record);
+        int numRecords = _records.size();
         
         if (numRecords > 100) {
             // the writer waits 10 seconds *or* until we tell them to wake up
@@ -339,9 +333,7 @@ public class LogManager {
         parseLimits(config, PROP_RECORD_PREFIX);
     }
     private void parseLimits(Properties config, String recordPrefix) {
-        synchronized (_limits) {
-            _limits.clear();
-        }
+        _limits.clear();
         if (config != null) {
             for (Iterator iter = config.keySet().iterator(); iter.hasNext();) {
                 String key = (String) iter.next();
@@ -359,10 +351,8 @@ public class LogManager {
 
                 LogLimit lim = new LogLimit(key, Log.getLevel(val));
                 //_log.debug("Limit found for " + name + " as " + val);
-                synchronized (_limits) {
-                    if (!_limits.contains(lim))
-                        _limits.add(lim);
-                }
+                if (!_limits.contains(lim))
+                    _limits.add(lim);
             }
         }
         updateLimits();
@@ -417,11 +407,8 @@ public class LogManager {
      */
     public Properties getLimits() {
         Properties rv = new Properties();
-        synchronized (_limits) {
-            for (int i = 0; i < _limits.size(); i++) {
-                LogLimit lim = (LogLimit)_limits.get(i);
-                rv.setProperty(lim.getRootName(), Log.toLevelString(lim.getLimit()));
-            }
+        for (LogLimit lim : _limits) {
+            rv.setProperty(lim.getRootName(), Log.toLevelString(lim.getLimit()));
         }
         return rv;
     }
@@ -460,23 +447,17 @@ public class LogManager {
     }
 
     private void updateLimits() {
-        Map logs = null;
-        synchronized (_logs) {
-            logs = new HashMap(_logs);
-        }
-        for (Iterator iter = logs.values().iterator(); iter.hasNext();) {
-            Log log = (Log) iter.next();
+        for (Log log : _logs.values()) {
             updateLimit(log);
         }
     }
 
     private void updateLimit(Log log) {
-        List limits = getLimits(log);
+        List<LogLimit> limits = getLimits(log);
         LogLimit max = null;
         LogLimit notMax = null;
         if (limits != null) {
-            for (int i = 0; i < limits.size(); i++) {
-                LogLimit cur = (LogLimit) limits.get(i);
+            for (LogLimit cur : limits) {
                 if (max == null)
                     max = cur;
                 else {
@@ -496,16 +477,14 @@ public class LogManager {
         }
     }
 
-    private List getLimits(Log log) {
-        ArrayList limits = null; // new ArrayList(4);
-        synchronized (_limits) {
-            for (int i = 0; i < _limits.size(); i++) {
-                LogLimit limit = (LogLimit)_limits.get(i);
-                if (limit.matches(log)) { 
-                    if (limits == null)
-                        limits = new ArrayList(4);
-                    limits.add(limit);
-                }
+    /** @return null if no matches */
+    private List<LogLimit> getLimits(Log log) {
+        ArrayList<LogLimit> limits = null; // new ArrayList(4);
+        for (LogLimit limit : _limits) {
+            if (limit.matches(log)) { 
+                if (limits == null)
+                    limits = new ArrayList(4);
+                limits.add(limit);
             }
         }
         return limits;
@@ -572,11 +551,8 @@ public class LogManager {
         buf.append("# log limit overrides:\n");
         
         TreeMap limits = new TreeMap();
-        synchronized (_limits) {
-            for (int i = 0; i < _limits.size(); i++) {
-                LogLimit lim = (LogLimit)_limits.get(i);
-                limits.put(lim.getRootName(), Log.toLevelString(lim.getLimit()));
-            }
+        for (LogLimit lim : _limits) {
+            limits.put(lim.getRootName(), Log.toLevelString(lim.getLimit()));
         }
         for (Iterator iter = limits.entrySet().iterator(); iter.hasNext(); ) {
             Map.Entry entry = (Map.Entry)iter.next();
@@ -589,16 +565,9 @@ public class LogManager {
         return buf.toString();
     }
 
-    
-    //List _getRecords() { return _records; }
-    List _removeAll() {
-        List vals = null;
-        synchronized (_records) {
-            if (_records.size() <= 0) 
-                return null;
-            vals = new ArrayList(_records);
-            _records.clear();
-        }
+    List<LogRecord> _removeAll() {
+        List<LogRecord> vals = new LinkedList();
+        _records.drainTo(vals);
         return vals;
     }
 
