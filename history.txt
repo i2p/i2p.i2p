@@ -1,3 +1,8 @@
+2010-04-15 sponge
+    * I2PTunnelHTTPClient: Test for "http://:/" and output error page.
+      This avoids an ArrayIndexOutOfBoundsException, which can eventually
+      cause the eepproxy to stop functioning.
+
 2010-04-12 zzz
     * configstats.jsp: Fix full stats checkbox default
     * i2psnark:

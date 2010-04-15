@@ -366,7 +366,17 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                     int port = 80;
                     if(posPort != -1) {
                         String[] parts = host.split(":");
+                        try {
                         host = parts[0];
+                        } catch (ArrayIndexOutOfBoundsException ex) {
+                        if (out != null) {
+                            out.write(getErrorPage("denied", ERR_REQUEST_DENIED));
+                            writeFooter(out);
+                        }
+                        s.close();
+                        return;
+
+                        }
                         try {
                             port = Integer.parseInt(parts[1]);
                         } catch(Exception exc) {
@@ -437,9 +447,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                                             // Silently bypass correct keys, otherwise alert
                                             String destB64 = null;
                                             try {
-                                                Destination dest = I2PTunnel.destFromName(host);
-                                                if (dest != null)
-                                                    destB64 = dest.toBase64();
+                                                Destination _dest = I2PTunnel.destFromName(host);
+                                                if (_dest != null)
+                                                    destB64 = _dest.toBase64();
                                             } catch (DataFormatException dfe) {}
                                             if (destB64 != null && !destB64.equals(ahelperKey))
                                             {
