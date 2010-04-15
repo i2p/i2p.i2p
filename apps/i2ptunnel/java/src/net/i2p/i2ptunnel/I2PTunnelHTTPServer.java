@@ -321,6 +321,9 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         return buf.toString();
     }
     
+    /** ridiculously long, just to prevent OOM DOS @since 0.7.13 */
+    private static final int MAX_HEADERS = 60;
+
     private Properties readHeaders(InputStream in, StringBuilder command) throws IOException {
         Properties headers = new Properties();
         StringBuilder buf = new StringBuilder(128);
@@ -344,7 +347,10 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         if (trimmed > 0)
             getTunnel().getContext().statManager().addRateData("i2ptunnel.httpNullWorkaround", trimmed, 0);
         
+        int i = 0;
         while (true) {
+            if (++i > MAX_HEADERS)
+                throw new IOException("Too many header lines - max " + MAX_HEADERS);
             buf.setLength(0);
             ok = DataHelper.readLine(in, buf);
             if (!ok) throw new IOException("EOF reached before the end of the headers [" + buf.toString() + "]");
