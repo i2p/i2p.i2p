@@ -721,24 +721,27 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             Runnable onTimeout = new OnTimeout(s, s.getOutputStream(), targetRequest, usingWWWProxy, currentProxy, requestId);
             I2PTunnelRunner runner = new I2PTunnelHTTPClientRunner(s, i2ps, sockLock, data, mySockets, onTimeout);
         } catch (SocketException ex) {
-            _log.info(getPrefix(requestId) + "Error trying to connect", ex);
-            l.log(ex.getMessage());
+            if (_log.shouldLog(Log.INFO))
+                _log.info(getPrefix(requestId) + "Error trying to connect", ex);
+            //l.log("Error connecting: " + ex.getMessage());
             handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
             closeSocket(s);
         } catch (IOException ex) {
-            _log.info(getPrefix(requestId) + "Error trying to connect", ex);
-            l.log(ex.getMessage());
+            if (_log.shouldLog(Log.INFO))
+                _log.info(getPrefix(requestId) + "Error trying to connect", ex);
+            //l.log("Error connecting: " + ex.getMessage());
             handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
             closeSocket(s);
         } catch (I2PException ex) {
-            _log.info("getPrefix(requestId) + Error trying to connect", ex);
-            l.log(ex.getMessage());
+            if (_log.shouldLog(Log.INFO))
+                _log.info("getPrefix(requestId) + Error trying to connect", ex);
+            //l.log("Error connecting: " + ex.getMessage());
             handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
             closeSocket(s);
         } catch (OutOfMemoryError oom) {
             IOException ex = new IOException("OOM");
-            _log.info("getPrefix(requestId) + Error trying to connect", ex);
-            l.log(ex.getMessage());
+            _log.error("getPrefix(requestId) + Error trying to connect", oom);
+            //l.log("Error connecting: " + ex.getMessage());
             handleHTTPClientException(ex, out, targetRequest, usingWWWProxy, currentProxy, requestId);
             closeSocket(s);
         }

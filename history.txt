@@ -1,3 +1,9 @@
+2010-04-15 zzz
+    * DataHelper: Limit max length in readline()
+    * Floodfills: Increase max to 100 (was 60) and min to 60 (was 45)
+    * i2ptunnel: Log tweaks
+    * I2PTunnelHTTPServer: Limit max header lines
+
 2010-04-15 sponge
     * I2PTunnelHTTPClient: Test for "http://:/" and output error page.
       This avoids an ArrayIndexOutOfBoundsException, which can eventually

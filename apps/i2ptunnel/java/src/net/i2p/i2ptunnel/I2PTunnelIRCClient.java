@@ -90,7 +90,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         } catch (Exception ex) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error connecting", ex);
-            l.log(ex.getMessage());
+            //l.log("Error connecting: " + ex.getMessage());
             closeSocket(s);
             if (i2ps != null) {
                 synchronized (sockLock) {

@@ -78,8 +78,9 @@ public class I2PTunnelClient extends I2PTunnelClientBase {
             i2ps.setReadTimeout(readTimeout);
             new I2PTunnelRunner(s, i2ps, sockLock, null, mySockets);
         } catch (Exception ex) {
-            _log.info("Error connecting", ex);
-            l.log(ex.getMessage());
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Error connecting", ex);
+            //l.log("Error connecting: " + ex.getMessage());
             closeSocket(s);
             if (i2ps != null) {
                 synchronized (sockLock) {
