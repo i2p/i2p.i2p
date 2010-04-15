@@ -872,12 +872,14 @@ public class DataHelper {
      * Read a newline delimited line from the stream, returning the line (without
      * the newline), or null if EOF reached before the newline was found
      * Warning - strips \n but not \r
+     * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
      */
     public static String readLine(InputStream in) throws IOException { return readLine(in, (Sha256Standalone)null); }
 
     /**
      * update the hash along the way
      * Warning - strips \n but not \r
+     * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
      */
     public static String readLine(InputStream in, Sha256Standalone hash) throws IOException {
         StringBuilder buf = new StringBuilder(128);
@@ -891,6 +893,7 @@ public class DataHelper {
     /**
      * Read in a line, placing it into the buffer (excluding the newline).
      * Warning - strips \n but not \r
+     * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
      * @deprecated use StringBuilder version
      *
      * @return true if the line was read, false if eof was reached before a 
@@ -900,14 +903,21 @@ public class DataHelper {
         return readLine(in, buf, null);
     }
 
+    /** ridiculously long, just to prevent OOM DOS @since 0.7.13 */
+    private static final int MAX_LINE_LENGTH = 8*1024;
+
     /**
      * update the hash along the way
      * Warning - strips \n but not \r
+     * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
      * @deprecated use StringBuilder version
      */
     public static boolean readLine(InputStream in, StringBuffer buf, Sha256Standalone hash) throws IOException {
         int c = -1;
+        int i = 0;
         while ( (c = in.read()) != -1) {
+            if (++i > MAX_LINE_LENGTH)
+                throw new IOException("Line too long - max " + MAX_LINE_LENGTH);
             if (hash != null) hash.update((byte)c);
             if (c == '\n')
                 break;
@@ -922,6 +932,7 @@ public class DataHelper {
     /**
      * Read in a line, placing it into the buffer (excluding the newline).
      * Warning - strips \n but not \r
+     * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
      *
      * @return true if the line was read, false if eof was reached before a 
      *              newline was found
@@ -933,10 +944,14 @@ public class DataHelper {
     /**
      * update the hash along the way
      * Warning - strips \n but not \r
+     * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
      */
     public static boolean readLine(InputStream in, StringBuilder buf, Sha256Standalone hash) throws IOException {
         int c = -1;
+        int i = 0;
         while ( (c = in.read()) != -1) {
+            if (++i > MAX_LINE_LENGTH)
+                throw new IOException("Line too long - max " + MAX_LINE_LENGTH);
             if (hash != null) hash.update((byte)c);
             if (c == '\n')
                 break;
