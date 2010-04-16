@@ -147,9 +147,11 @@ public class ConfigClientsHelper extends HelperBase {
                 }
                 desc.append("</table>");
                 boolean enableStop = !Boolean.valueOf(appProps.getProperty("disableStop")).booleanValue();
+                enableStop &= PluginStarter.isPluginRunning(app, _context);
+                boolean enableStart = !PluginStarter.isPluginRunning(app, _context);
                 renderForm(buf, app, app, false,
                            "true".equals(val), false, desc.toString(), false, false,
-                           updateURL != null, enableStop, true, true);
+                           updateURL != null, enableStop, true, enableStart);
             }
         }
         buf.append("</table>\n");

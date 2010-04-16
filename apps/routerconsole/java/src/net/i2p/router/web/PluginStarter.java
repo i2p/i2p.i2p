@@ -7,18 +7,22 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
+import net.i2p.router.Job;
 import net.i2p.router.RouterContext;
 import net.i2p.router.startup.ClientAppConfig;
 import net.i2p.router.startup.LoadClientAppsJob;
+import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 import net.i2p.util.Translate;
@@ -42,6 +46,8 @@ public class PluginStarter implements Runnable {
                                                        "susimail", "addressbook", "routerconsole" };
     private static final String[] STANDARD_THEMES = { "images", "light", "dark", "classic",
                                                       "midnight" };
+    private static Map<String, ThreadGroup> pluginThreadGroups = new ConcurrentHashMap<String, ThreadGroup>();   // one thread group per plugin (map key=plugin name)
+    private static Map<String, Collection<Job>> pluginJobs = new ConcurrentHashMap<String, Collection<Job>>();
 
     public PluginStarter(RouterContext ctx) {
         _context = ctx;
@@ -362,6 +368,15 @@ public class PluginStarter implements Runnable {
      */
     private static void runClientApps(RouterContext ctx, File pluginDir, List<ClientAppConfig> apps, String action) throws Exception {
         Log log = ctx.logManager().getLog(PluginStarter.class);
+        
+        // initialize pluginThreadGroup and pluginJobs
+        String pluginName = pluginDir.getName();
+        if (!pluginThreadGroups.containsKey(pluginName))
+            pluginThreadGroups.put(pluginName, new ThreadGroup(pluginName));
+        ThreadGroup pluginThreadGroup = pluginThreadGroups.get(pluginName);
+        if (action.equals("start"))
+            pluginJobs.put(pluginName, new ConcurrentHashSet<Job>());
+        
         for(ClientAppConfig app : apps) {
             if (action.equals("start") && app.disabled)
                 continue;
@@ -407,16 +422,48 @@ public class PluginStarter implements Runnable {
                 // quick check, will throw ClassNotFoundException on error
                 LoadClientAppsJob.testClient(app.className);
                 // run this guy now
-                LoadClientAppsJob.runClient(app.className, app.clientName, argVal, log);
+                LoadClientAppsJob.runClient(app.className, app.clientName, argVal, log, pluginThreadGroup);
             } else {
                 // quick check, will throw ClassNotFoundException on error
                 LoadClientAppsJob.testClient(app.className);
                 // wait before firing it up
-                ctx.jobQueue().addJob(new LoadClientAppsJob.DelayedRunClient(ctx, app.className, app.clientName, argVal, app.delay));
+                Job job = new LoadClientAppsJob.DelayedRunClient(ctx, app.className, app.clientName, argVal, app.delay, pluginThreadGroup);
+                ctx.jobQueue().addJob(job);
+                pluginJobs.get(pluginName).add(job);
             }
         }
     }
 
+    public static boolean isPluginRunning(String pluginName, RouterContext ctx) {
+        Log log = ctx.logManager().getLog(PluginStarter.class);
+        
+        boolean isJobRunning = false;
+        if (pluginJobs.containsKey(pluginName))
+            for (Job job: pluginJobs.get(pluginName))
+                if (ctx.jobQueue().isJobActive(job)) {
+                    isJobRunning = true;
+                    break;
+                }
+
+        log.debug("plugin name = <" + pluginName + ">; threads running? " + isClientThreadRunning(pluginName) + "; webapp runing? " + WebAppStarter.isWebAppRunning(pluginName) + "; jobs running? " + isJobRunning);
+        return isClientThreadRunning(pluginName) || WebAppStarter.isWebAppRunning(pluginName) || isJobRunning;
+    }
+    
+    /**
+     * Returns <code>true</code> if one or more client threads are running in a given plugin.
+     * @param pluginName
+     * @return
+     */
+    private static boolean isClientThreadRunning(String pluginName) {
+        ThreadGroup group = pluginThreadGroups.get(pluginName);
+        if (group == null)
+            return false;
+        
+        Thread[] activeThreads = new Thread[1];
+        group.enumerate(activeThreads);
+        return activeThreads[0] != null;
+    }
+    
     /**
      *  Perhaps there's an easy way to use Thread.setContextClassLoader()
      *  but I don't see how to make it magically get used for everything.

@@ -87,6 +87,13 @@ public class WebAppStarter {
         } catch (IllegalStateException ise) {}
     }
 
+    static boolean isWebAppRunning(String appName) {
+        Server server = WebAppStarter.getConsoleServer();
+        // this will return a new context if one does not exist
+        HttpContext wac = server.getContext('/' + appName);
+        return wac.isStarted();
+    }
+    
     /** see comments in ConfigClientsHandler */
     static Server getConsoleServer() {
         Collection c = Server.getHttpServers();

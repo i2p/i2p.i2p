@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
@@ -55,18 +56,24 @@ public class LoadClientAppsJob extends JobImpl {
         private String _clientName;
         private String _args[];
         private Log _log;
+        private ThreadGroup _threadGroup;
 
         public DelayedRunClient(RouterContext enclosingContext, String className, String clientName, String args[], long delay) {
+            this(enclosingContext, className, clientName, args, delay, null);
+        }
+        
+        public DelayedRunClient(RouterContext enclosingContext, String className, String clientName, String args[], long delay, ThreadGroup threadGroup) {
             super(enclosingContext);
             _className = className;
             _clientName = clientName;
             _args = args;
             _log = enclosingContext.logManager().getLog(LoadClientAppsJob.class);
+            _threadGroup = threadGroup;
             getTiming().setStartAfter(getContext().clock().now() + delay);
         }
         public String getName() { return "Delayed client job"; }
         public void runJob() {
-            runClient(_className, _clientName, _args, _log);
+            runClient(_className, _clientName, _args, _log, _threadGroup);
         }
     }
     
@@ -149,9 +156,20 @@ public class LoadClientAppsJob extends JobImpl {
      *  Run client in a new thread.
      */
     public static void runClient(String className, String clientName, String args[], Log log) {
+        runClient(className, clientName, args, log, null);
+    }
+    
+    /**
+     *  Run client in a new thread.
+     */
+    public static void runClient(String className, String clientName, String args[], Log log, ThreadGroup threadGroup) {
         if (log.shouldLog(Log.INFO))
             log.info("Loading up the client application " + clientName + ": " + className + " " + Arrays.toString(args));
-        I2PThread t = new I2PThread(new RunApp(className, clientName, args, log));
+        I2PThread t;
+        if (threadGroup != null)
+            t = new I2PThread(threadGroup, new RunApp(className, clientName, args, log));
+        else
+            t = new I2PThread(new RunApp(className, clientName, args, log));
         if (clientName == null) 
             clientName = className + " client";
         t.setName(clientName);

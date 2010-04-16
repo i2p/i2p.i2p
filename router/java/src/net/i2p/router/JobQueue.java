@@ -11,6 +11,7 @@ package net.i2p.router;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -190,6 +191,19 @@ public class JobQueue {
             _readyJobs.remove(job);
             _timedJobs.remove(job);
         }
+    }
+    
+    /**
+     * Returns <code>true</code> if a given job is waiting or running;
+     * <code>false</code> if the job is finished or doesn't exist in the queue.
+     */
+    public boolean isJobActive(Job job) {
+        if (_readyJobs.contains(job) | _timedJobs.contains(job))
+            return true;
+        for (JobQueueRunner runner: _queueRunners.values())
+            if (runner.getCurrentJob() == job)
+                return true;
+        return false;
     }
     
     public void timingUpdated() {

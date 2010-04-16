@@ -55,6 +55,12 @@ public class I2PThread extends Thread {
             _createdBy = new Exception("Created by");
     }
     
+    public I2PThread(ThreadGroup g, Runnable r) {
+        super(g, r);
+        if ( (_log == null) || (_log.shouldLog(Log.DEBUG)) )
+            _createdBy = new Exception("Created by");
+    }
+
     private void log(int level, String msg) { log(level, msg, null); }
     private void log(int level, String msg, Throwable t) {
         // we cant assume log is created
