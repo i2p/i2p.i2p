@@ -311,6 +311,19 @@ public class MUXlisten implements Runnable {
 			} catch (InterruptedException ex) {
 			}
 
+			// Hopefully nuke stuff here...
+			{
+				String boner = tg.getName();
+				try {
+					_log.warn("destroySocketManager " + boner);
+					socketManager.destroySocketManager();
+					_log.warn("destroySocketManager Successful" + boner);
+				} catch (Exception e) {
+					// nop
+					_log.warn("destroySocketManager Failed" + boner);
+					_log.warn(e.toString());
+				}
+			}
 			// zero out everything.
 			try {
 				wlock();

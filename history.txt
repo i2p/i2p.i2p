@@ -1,3 +1,6 @@
+2010-04-16 sponge
+    * BOB early session destroy to speed up tunnel tare-down.
+
 2010-04-15 zzz
     * DataHelper: Limit max length in readline()
     * Floodfills: Increase max to 100 (was 60) and min to 60 (was 45)
