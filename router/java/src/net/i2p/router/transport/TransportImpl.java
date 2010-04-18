@@ -93,7 +93,7 @@ public abstract class TransportImpl implements Transport {
     public int countActiveSendPeers() { return 0; }
 
     /** Default is 500 for floodfills... */
-    private static final int DEFAULT_MAX_CONNECTIONS = 500;
+    private static final int DEFAULT_MAX_CONNECTIONS = 425;
     /** ...and 50/100/150/200/250 for BW Tiers K/L/M/N/O */
     private static final int MAX_CONNECTION_FACTOR = 50;
     /** Per-transport connection limit */

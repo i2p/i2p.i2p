@@ -43,7 +43,7 @@ public class ConfigClientsHelper extends HelperBase {
             renderForm(buf, ""+cur, ca.clientName, false, !ca.disabled,
                        "webConsole".equals(ca.clientName) || "Web console".equals(ca.clientName),
                        ca.className + ((ca.args != null) ? " " + ca.args : ""), (""+cur).equals(_edit),
-                       true, false, false, true, !ca.disabled);
+                       true, false, false, true, ca.disabled);
         }
         
         if ("new".equals(_edit))

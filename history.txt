@@ -1,3 +1,9 @@
+2010-04-18 zzz
+    * configclients.jsp: Start button logic for clients was inverted
+    * Console: IRC links in readmes and initialNews
+    * I2PTunnelServer: Debug log incoming conns
+    * Transport: Reduce floodfill max NTCP conns to 425 (was 500)
+
 2010-04-16 sponge
     * BOB early session destroy to speed up tunnel tare-down.
 
