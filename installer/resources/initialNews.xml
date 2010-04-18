@@ -17,7 +17,8 @@ please <b>check out</b> our
 <a href="http://www.i2p2.i2p/faq.html">FAQ</a>.
 </p>
 <p>
-Point your IRC client to <b>localhost:6668</b> and say hi to us on #i2p.
+Point your IRC client to <b>localhost:6668</b> and say hi to us on 
+<a href="irc://127.0.0.1:6668/i2p-help">#i2p-help</a> or <a href="irc://127.0.0.1:6668/i2p">#i2p</a>.
 </p>
 
 <h4><ul><li>Gratulation zur erfolgreichen Installation von I2P!</li></ul></h4>
@@ -33,7 +34,8 @@ Passe bitte In der Wartezeit <b>deine Einstellungen zur Bandbreite</b> auf der
 Sobald auf der linken Seite eine "shared clients" Verbindung aufgelistet ist <b>besuche bitte</b> unsere <a href="http://www.i2p2.i2p/faq_de.html">FAQ</a>.
 </p>
 <p>
-Verbinde deinen IRC Klienten mit dem Server auf <b>localhost:6668</b> und sage Hallo zu uns im Kanal #i2p.
+Verbinde deinen IRC Klienten mit dem Server auf <b>localhost:6668</b> und sage Hallo zu uns im Kanal 
+<a href="irc://127.0.0.1:6668/i2p-help">#i2p-help</a>, <a href="irc://127.0.0.1:6668/i2p-de">#i2p-de</a> oder <a href="irc://127.0.0.1:6668/i2p">#i2p</a>.
 </p>
 
 <h4><ul><li>Поздравляем с успешным завершением установки I2P!</li></ul></h4>
@@ -44,7 +46,8 @@ Verbinde deinen IRC Klienten mit dem Server auf <b>localhost:6668</b> und sage H
 Пока Вы ждете, самое время зайти в <a href="config.jsp">сетевые настройки</a> и <b>выставить ограничение скорости</b> в соответствии со скоростью Вашего подключения к интернету. 
 </p>
 <p>
-Как только в панели слева в разделе «Локальные туннели» появится запись «коллективные клиенты» — I2P готов к работе. Подключайте Ваш IRC-клиент к серверу <b>localhost:6668</b> и заходите сказать нам привет на канал <b>#i2p</b>.
+Как только в панели слева в разделе «Локальные туннели» появится запись «коллективные клиенты» — I2P готов к работе. Подключайте Ваш IRC-клиент к серверу <b>localhost:6668</b> и заходите сказать нам привет на канал 
+<a href="irc://127.0.0.1:6668/i2p-help">#i2p-help</a> и <a href="irc://127.0.0.1:6668/i2p">#i2p</a>.
 </p>
 <p>
 <b>Не забудьте заглянуть</b> в наш <a href="http://www.i2p2.i2p/faq_ru.html">FAQ</a>.
