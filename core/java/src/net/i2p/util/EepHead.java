@@ -117,7 +117,7 @@ public class EepHead extends EepGet {
             timeout.setInactivityTimeout(60*1000);
         
         if (_redirectLocation != null) {
-            try {
+            //try {
                 URL oldURL = new URL(_actualURL);
                 String query = oldURL.getQuery();
                 if (query == null) query = "";
@@ -135,9 +135,10 @@ public class EepHead extends EepGet {
                     if ( (_actualURL.indexOf('?') < 0) && (query.length() > 0) )
                         _actualURL = _actualURL + "?" + query;
                 }
-            } catch (MalformedURLException mue) {
-                throw new IOException("Redirected from an invalid URL");
-            }
+            // an MUE is an IOE
+            //} catch (MalformedURLException mue) {
+            //    throw new IOException("Redirected from an invalid URL");
+            //}
             _redirects++;
             if (_redirects > 5)
                 throw new IOException("Too many redirects: to " + _redirectLocation);

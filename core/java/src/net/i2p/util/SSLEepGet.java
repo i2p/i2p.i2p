@@ -286,7 +286,7 @@ public class SSLEepGet extends EepGet {
 
         String req = getRequest();
 
-        try {
+        //try {
             URL url = new URL(_actualURL);
             if ("https".equals(url.getProtocol())) {
                 String host = url.getHost();
@@ -301,9 +301,10 @@ public class SSLEepGet extends EepGet {
             } else {
                 throw new IOException("Only https supported: " + _actualURL);
             }
-        } catch (MalformedURLException mue) {
-            throw new IOException("Request URL is invalid");
-        }
+        // an MUE is an IOE
+        //} catch (MalformedURLException mue) {
+        //    throw new IOException("Request URL is invalid");
+        //}
 
         _proxyIn = _proxy.getInputStream();
         _proxyOut = _proxy.getOutputStream();

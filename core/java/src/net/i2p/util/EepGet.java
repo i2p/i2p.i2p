@@ -507,7 +507,7 @@ public class EepGet {
             timeout.setInactivityTimeout(INACTIVITY_TIMEOUT);
         
         if (_redirectLocation != null) {
-            try {
+            //try {
                 URL oldURL = new URL(_actualURL);
                 String query = oldURL.getQuery();
                 if (query == null) query = "";
@@ -525,9 +525,10 @@ public class EepGet {
                     if ( (_actualURL.indexOf('?') < 0) && (query.length() > 0) )
                         _actualURL = _actualURL + "?" + query;
                 }
-            } catch (MalformedURLException mue) {
-                throw new IOException("Redirected from an invalid URL");
-            }
+            // an MUE is an IOE
+            //} catch (MalformedURLException mue) {
+            //    throw new IOException("Redirected from an invalid URL");
+            //}
             _redirects++;
             if (_redirects > 5)
                 throw new IOException("Too many redirects: to " + _redirectLocation);
@@ -874,7 +875,7 @@ public class EepGet {
         if (_shouldProxy) {
             _proxy = InternalSocket.getSocket(_proxyHost, _proxyPort);
         } else {
-            try {
+            //try {
                 URL url = new URL(_actualURL);
                 if ("http".equals(url.getProtocol())) {
                     String host = url.getHost();
@@ -885,9 +886,10 @@ public class EepGet {
                 } else {
                     throw new IOException("URL is not supported:" + _actualURL);
                 }
-            } catch (MalformedURLException mue) {
-                throw new IOException("Request URL is invalid");
-            }
+            // an MUE is an IOE
+            //} catch (MalformedURLException mue) {
+            //    throw new IOException("Request URL is invalid");
+            //}
         }
         _proxyIn = _proxy.getInputStream();
         _proxyOut = _proxy.getOutputStream();
