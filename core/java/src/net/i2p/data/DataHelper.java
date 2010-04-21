@@ -1054,7 +1054,13 @@ public class DataHelper {
             //               * (((double) orig.length) / ((double) rv.length)) + "% savings)");
             return rv;
         } catch (IOException ioe) {
-            //_log.error("Error compressing?!", ioe);
+            // Apache Harmony 5.0M13
+            //java.io.IOException: attempt to write after finish
+            //at java.util.zip.DeflaterOutputStream.write(DeflaterOutputStream.java:181)
+            //at net.i2p.util.ResettableGZIPOutputStream.write(ResettableGZIPOutputStream.java:122)
+            //at net.i2p.data.DataHelper.compress(DataHelper.java:1048)
+            //   ...
+            ioe.printStackTrace();
             return null;
         } finally {
             ReusableGZIPOutputStream.release(out);

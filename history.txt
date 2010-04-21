@@ -1,3 +1,11 @@
+2010-04-21 zzz
+    * EepGet: Don't convert a MalformedURLException into
+      an IOE so we recognize it when it's throuwn
+    * ReusableGZIPStreams:
+      - Concurrent
+      - Workaround for Apache Harmony 5.0M13 Deflater bug
+    * TrustedUpdate: Increase buf size for extraction
+
 2010-04-18 zzz
     * configclients.jsp: Start button logic for clients was inverted
     * Console: IRC links in readmes and initialNews
