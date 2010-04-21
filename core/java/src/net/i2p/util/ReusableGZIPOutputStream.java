@@ -2,9 +2,9 @@ package net.i2p.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.data.DataHelper;
 
@@ -14,16 +14,23 @@ import net.i2p.data.DataHelper;
  *
  */
 public class ReusableGZIPOutputStream extends ResettableGZIPOutputStream {
-    private static final ArrayList _available = new ArrayList(16);
+    // Apache Harmony 5.0M13 Deflater doesn't work after reset()
+    private static final boolean ENABLE_CACHING = !System.getProperty("java.vendor").startsWith("Apache");
+    private static final LinkedBlockingQueue<ReusableGZIPOutputStream> _available;
+    static {
+        if (ENABLE_CACHING)
+            _available = new LinkedBlockingQueue(16);
+        else
+            _available = null;
+    }
+
     /**
      * Pull a cached instance
      */
     public static ReusableGZIPOutputStream acquire() {
         ReusableGZIPOutputStream rv = null;
-        synchronized (_available) {
-            if (_available.size() > 0)
-                rv = (ReusableGZIPOutputStream)_available.remove(0);
-        }
+        if (ENABLE_CACHING)
+            rv = _available.poll();
         if (rv == null) {
             rv = new ReusableGZIPOutputStream();
         } 
@@ -36,10 +43,8 @@ public class ReusableGZIPOutputStream extends ResettableGZIPOutputStream {
      */
     public static void release(ReusableGZIPOutputStream out) {
         out.reset();
-        synchronized (_available) {
-            if (_available.size() < 16)
-                _available.add(out);
-        }
+        if (ENABLE_CACHING)
+            _available.offer(out);
     }
     
     private ByteArrayOutputStream _buffer = null;
