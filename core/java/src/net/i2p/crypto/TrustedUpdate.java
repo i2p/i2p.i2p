@@ -512,7 +512,7 @@ D8usM7Dxp5yrDrCYZ5AIijc=
             while (skipped < HEADER_BYTES)
                 skipped += fileInputStream.skip(HEADER_BYTES - skipped);
 
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[16*1024];
             int bytesRead = 0;
 
             while ( (bytesRead = fileInputStream.read(buffer)) != -1) 
