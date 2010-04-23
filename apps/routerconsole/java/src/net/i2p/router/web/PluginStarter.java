@@ -445,7 +445,8 @@ public class PluginStarter implements Runnable {
                     break;
                 }
 
-        log.debug("plugin name = <" + pluginName + ">; threads running? " + isClientThreadRunning(pluginName) + "; webapp runing? " + WebAppStarter.isWebAppRunning(pluginName) + "; jobs running? " + isJobRunning);
+        if (log.shouldLog(Log.DEBUG))
+            log.debug("plugin name = <" + pluginName + ">; threads running? " + isClientThreadRunning(pluginName) + "; webapp runing? " + WebAppStarter.isWebAppRunning(pluginName) + "; jobs running? " + isJobRunning);
         return isClientThreadRunning(pluginName) || WebAppStarter.isWebAppRunning(pluginName) || isJobRunning;
     }
     

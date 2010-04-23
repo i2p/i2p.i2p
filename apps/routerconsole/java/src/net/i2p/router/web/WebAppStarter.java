@@ -89,6 +89,8 @@ public class WebAppStarter {
 
     static boolean isWebAppRunning(String appName) {
         Server server = WebAppStarter.getConsoleServer();
+        if (server == null)
+            return false;
         // this will return a new context if one does not exist
         HttpContext wac = server.getContext('/' + appName);
         return wac.isStarted();
