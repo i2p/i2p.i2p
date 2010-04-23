@@ -753,6 +753,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
      *  We can't use BufferedReader for POST because we can't have readahead,
      *  since we are passing the stream on to I2PTunnelRunner for the POST data.
      *
+     *  Warning - BufferedReader removes \r, DataHelper does not
+     *  Warning - DataHelper limits line length, BufferedReader does not
+     *  Todo: Limit line length for buffered reads, or go back to unbuffered for all
      */
     private static class InputReader {
         BufferedReader _br;
