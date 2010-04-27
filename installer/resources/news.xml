@@ -1,28 +1,19 @@
 <!--
-<i2p.news date="$Date: 2010-03-15 00:00:00 $">
-<i2p.release version="0.7.12" date="2010/03/15" minVersion="0.6" />
+<i2p.news date="$Date: 2010-04-27 00:00:00 $">
+<i2p.release version="0.7.13" date="2010/04/27" minVersion="0.6" />
 -->
-<h4><ul><li>2010-03-15: <b>0.7.12 <a href="http://www.i2p2.i2p/release-0.7.12.html">Released</a></b></li></ul></h4>
+<h4><ul><li>2010-04-27: <b>0.7.13 <a href="http://www.i2p2.i2p/release-0.7.13.html">Released</a></b></li></ul></h4>
 <p>
-The 0.7.12 release contains support for user-generated plugins. These plugins may contain console web applications,
-themes, translations, or standalone programs.
-Some plugins are available for testing at
-<a href="http://i2pbote.i2p/">i2pbote.i2p</a>
-and
-<a href="http://stats.i2p/i2p/plugins/">stats.i2p</a>.
-We are hopeful this support will enable rapid development of innovative i2p applications.
+The 0.7.13 release contains several changes and bug fixes to improve performance.
+It also includes improvements for the plugin support that was
+introduced in the last release.
+The new, smaller tunnel build message is enabled,
+to reduce overhead and increase build success.
 </p><p>
-The release fixes the blank-page bug when an eepsite is not reachable,
-and also improves handling of clock skews and IP changes.
-It adds support for a new, smaller tunnel build message,
-that will be tested in this release and enabled in the next release.
-</p><p>
-As usual, the release contains more anonymity and performance improvements,
-translation updates, and an assortment of other bug fixes.
+Of course, there is the usual assortment of bug fixes as well.
 Upgrading is recommended.
-</p><p>
-The last 6 months of development have dramatically increased the performance and capacity of the network.
-Please help grow the network.
+Please help grow the network!
+Say hello to the volunteers on the new <a href="irc://127.0.0.1:6668/i2p-help">#i2p-help IRC channel</a>.
 Give the
 developers feedback on <a href="irc://127.0.0.1:6668/i2p">IRC #i2p</a> or <a href="http://forum.i2p">forum.i2p</a>
 and <a href="http://www.i2p2.i2p/getinvolved.html">get involved</a>,
