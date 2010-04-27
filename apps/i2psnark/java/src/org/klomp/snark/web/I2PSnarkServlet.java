@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -34,10 +36,14 @@ import org.klomp.snark.SnarkManager;
 import org.klomp.snark.Storage;
 import org.klomp.snark.TrackerClient;
 
+import org.mortbay.jetty.servlet.Default;
+
 /**
- *
+ *  We extend Default instead of HTTPServlet so we can handle
+ *  i2psnark/ file requests with http:// instead of the flaky and
+ *  often-blocked-by-the-browser file://
  */
-public class I2PSnarkServlet extends HttpServlet {
+public class I2PSnarkServlet extends Default {
     private I2PAppContext _context;
     private Log _log;
     private SnarkManager _manager;
@@ -47,7 +53,6 @@ public class I2PSnarkServlet extends HttpServlet {
     
     @Override
     public void init(ServletConfig cfg) throws ServletException {
-        super.init(cfg);
         _context = I2PAppContext.getGlobalContext();
         _log = _context.logManager().getLog(I2PSnarkServlet.class);
         _nonce = _context.random().nextLong();
@@ -57,8 +62,42 @@ public class I2PSnarkServlet extends HttpServlet {
             configFile = "i2psnark.config";
         _manager.loadConfig(configFile);
         _manager.start();
+        super.init(new DefaultServletConfig(cfg, _manager.getDataDir().getAbsolutePath()));
     }
     
+    /**
+     *  A ServletConfig we will pass to super
+     */
+    private static class DefaultServletConfig implements ServletConfig {
+        private final ServletConfig _sc;
+        private final String _path;
+
+        DefaultServletConfig(ServletConfig sc, String path) {
+            _sc = sc;
+            _path = path;
+        }
+
+        public String getInitParameter(String name) {
+            if ("acceptRanges".equals(name) || "dirAllowed".equals(name))
+                return "true";
+            if ("resourceBase".equals(name))
+                return _path;
+            return _sc.getInitParameter(name);
+        }
+
+        public Enumeration getInitParameterNames() {
+            return _sc.getInitParameterNames();
+        }
+
+        public ServletContext getServletContext() {
+            return _sc.getServletContext();
+        }
+
+        public String getServletName() {
+            return _sc.getServletName();
+        }
+    }
+
     @Override
     public void destroy() {
         _manager.stop();
@@ -67,6 +106,14 @@ public class I2PSnarkServlet extends HttpServlet {
 
     @Override
     public void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // this is the part after /i2psnark
+        String path = req.getServletPath();
+        // index.jsp doesn't work, it is grabbed by the war handler before here
+        if (!(path == null || path.equals("/") || path.equals("/index.jsp") || path.equals("/index.html"))) {
+            super.service(req, resp);
+            return;
+        }
+
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html; charset=UTF-8");
@@ -556,8 +603,10 @@ public class I2PSnarkServlet extends HttpServlet {
         out.write("<td align=\"left\" class=\"snarkTorrentName " + rowClass + "\">");
         
         if (remaining == 0) {
-            out.write("<a href=\"" + _manager.linkPrefix() + snark.meta.getName() 
-                      + "\" title=\"");
+            out.write("<a href=\"" + snark.meta.getName());
+            if (snark.meta.getFiles() != null)
+                out.write("/");
+            out.write("\" title=\"");
             if (snark.meta.getFiles() != null)
                 out.write(_("View files"));
             else
