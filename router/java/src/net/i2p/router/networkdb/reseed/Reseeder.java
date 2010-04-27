@@ -46,8 +46,8 @@ public class Reseeder {
     public static final String PROP_PROXY_HOST = "router.reseedProxyHost";
     public static final String PROP_PROXY_PORT = "router.reseedProxyPort";
     private static final String RESEED_TIPS =
-            _x("Ensure that nothing blocks outbound HTTP, check <a href=logs.jsp>logs</a> " +
-               "and if nothing helps, read FAQ about reseeding manually.");
+            _x("Ensure that nothing blocks outbound HTTP, check <a target=\"_top\" href=\"logs.jsp\">logs</a> " +
+               "and if nothing helps, read the <a target=\"_top\" href=\"http://www.i2p2.de/faq.html\">FAQ</a> about reseeding manually.");
         
 
     public Reseeder(RouterContext ctx) {
