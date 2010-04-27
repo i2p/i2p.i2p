@@ -277,16 +277,6 @@
         </copy>
     </target>
 
-    <target name="preppkg-windows-only" depends="preppkg-windows">
-        <!-- rip the non-windows stuff out of jbigi.jar -->
-        <mkdir dir="tmpextract" />
-        <unjar src="build/jbigi.jar" dest="tmpextract/" />
-        <jar destfile="pkg-temp/lib/jbigi.jar" >
-            <fileset dir="tmpextract/" includes="*windows*" />
-        </jar>
-        <delete dir="tmpextract/" />
-    </target>
-
     <target name="preppkg-windows" depends="preppkg-base, buildexe">
         <copy file="i2p.exe" todir="pkg-temp/" failonerror="false" />
         <copy file="apps/systray/java/lib/systray4j.dll" todir="pkg-temp/lib" />
@@ -301,17 +291,6 @@
         <copy todir="pkg-temp/lib/wrapper/win32/">
             <fileset dir="installer/lib/wrapper/win32/" />
         </copy>
-    </target>
-
-    <!-- only what is needed for debian, etc. -->
-    <target name="preppkg-linux-only" depends="preppkg-linux">
-        <!-- rip the non-linux stuff out of jbigi.jar -->
-        <mkdir dir="tmpextract" />
-        <unjar src="build/jbigi.jar" dest="tmpextract/" />
-        <jar destfile="pkg-temp/lib/jbigi.jar" >
-            <fileset dir="tmpextract/" includes="*linux*" />
-        </jar>
-        <delete dir="tmpextract/" />
     </target>
 
     <target name="preppkg-linux" depends="preppkg-base">
@@ -849,4 +828,151 @@
             <arg value="-I_MTN" />
         </exec>
     </target>
+<!-- the following are appened to help build barebone portable version, 
+     none of the above is modified for this purpose -->
+	<target name = "pkg-portable-clean">
+		<delete dir="build/" />
+		<delete dir="portable/" />
+		<delete>
+			<fileset dir="." includes="portable-**.zip**" />
+		</delete>
+	</target>
+<!-- build a portable archive -->
+<!-- command for windows only packing -->
+	<target name = "pkg-portable-win32"  depends="check-built-jars, preppkg-windows-only, preppkg-portable-basic, preppkg-portable-win" >
+		<!-- i need the portable\ folder in .zip so basedir is set to . -->
+		<zip destfile="portable-win32.zip" basedir="." includes="portable\**" />
+		<checksum file="portable-win32.zip" forceOverwrite="yes"/>
+	</target>
+<!-- *0* check libs -->
+	<target name = "check-built-jars">
+		<fail message="Please run 'ant buildSmall' first">
+			<condition>
+				<or>
+					<not>
+						<available file="build/" type="dir" />
+					</not>
+					<!-- we cant accept more files or they will be bundled into the package during 'for x in y do'-->
+					<not>
+						<resourcecount count="14">
+							<fileset id="fs" dir="build/" includes="**.jar"/>
+						</resourcecount>
+					</not>
+					<not>
+						<resourcecount count="3">
+							<fileset id="fs" dir="build/" includes="**.war"/>
+						</resourcecount>
+					</not>
+				</or>
+			</condition>
+		</fail>
+	</target>
+<!-- *1* preparing the jars by OS dependent de-bloating -->
+	<target name="preppkg-windows-only" depends="chk-bigi-size" if="bloated-jbigi">
+		<!-- rip the non-windows stuff out of jbigi.jar -->
+		<mkdir dir="tmpextract" />
+		<unjar src="build/jbigi.jar" dest="tmpextract/" />
+		<jar destfile="build/jbigi.jar" >
+			<fileset dir="tmpextract/" includes="*windows*" />
+		</jar>
+		<delete dir="tmpextract/" />
+	</target>
+	<target name="preppkg-linux-only"  depends="chk-bigi-size" if="bloated-jbigi">
+		<!-- rip the non-linux stuff out of jbigi.jar -->
+		<mkdir dir="tmpextract" />
+		<unjar src="build/jbigi.jar" dest="tmpextract/" />
+		<jar destfile="pkg-temp/lib/jbigi.jar" >
+			<fileset dir="tmpextract/" includes="*linux*" />
+		</jar>
+		<delete dir="tmpextract/" />
+	</target>
+	<target name="chk-bigi-size">
+		<condition property="bloated-jbigi">
+			<length file="build/jbigi.jar" length="900000" when="gt" />
+		</condition>
+	</target>
+<!-- *2* os independent procedure -->
+	<target name="preppkg-portable-basic" >
+		<mkdir dir="portable" />
+			<!-- non OS dependent configurations only, dont add *nux/win stuff here -->
+			<copy todir="portable">
+				<fileset dir="installer/resources/portable/configs/" />
+			</copy>
+			<copy file="installer/resources/blocklist.txt" todir="portable/" />
+			<copy file="installer/resources/hosts.txt" todir="portable/" />
+			<copy file="installer/resources/readme.license.txt" todir="portable/" />
+		<mkdir dir="portable/addressbook" />
+			<copy file="apps/addressbook/subscriptions.txt" todir="portable/addressbook/" />
+			<copy file="apps/addressbook/myhosts.txt"  todir="portable/addressbook/" />
+			<!-- config.txt is in installer/resources/portable -->
+		<mkdir dir="portable/docs" />
+			<copy file="installer/resources/initialNews.xml" tofile="portable/docs/news.xml" overwrite="true" />
+			<copy file="installer/resources/readme/readme.html" tofile="portable/docs/readme.html" />
+			<copy file="installer/resources/startconsole.html" todir="portable/docs/" />
+			<copy file="installer/resources/start.ico" todir="portable/docs/" />
+			<copy file="installer/resources/console.ico" todir="portable/docs/" />
+			<!-- http error respond, english only,
+				if you need a different lang do it in a sepreate target -->
+			<copy todir="portable/docs/" >
+				<fileset dir="installer/resources/proxy/"  includes="**-header.ht" />
+			</copy>
+			<!-- here we choose light theme only -->
+			<copy todir="portable/docs/themes/console/light/" overwrite="true" >
+				<fileset dir="installer/resources/themes/console/light/" includes="**.css" />
+			</copy>
+<!-- @dr.zed where is your CJK fix for the default theme ??	put it here		<copy file="installer/resources/themes/console/classic/console_big.css" todir="portable/docs/themes/console/light/" / -->
+			<copy todir="portable/docs/themes/console/images/" >
+				<fileset dir="installer/resources/themes/console/images/" />
+			</copy>
+			<!-- flags for language icon (not for ip)-->
+			<copy todir="portable/docs/icons/flags" >
+				<fileset dir="installer/resources/icons/flags/" includes="cn.png,de.png,fr.png,nl.png,ru.png,se.png,us.png" />
+			</copy>
+		<mkdir dir="portable/lib" />
+		<mkdir dir="portable/webapps" />
+			<copy todir="portable/webapps/">
+				<fileset dir="build/" includes="**.war" />
+			</copy>
+	</target>
+<!-- *3* os dependent procedure/commands -->
+	<target name = "preppkg-portable-win">
+		<!-- *a* all jar in build/ -->
+			<!-- the following will not be pack200ed 
+			since they got bloated rather than slimer after compression 00d -->
+		<move file="build\jasper-runtime.jar" todir ="portable\lib\" />
+		<move file="build\javax.servlet.jar" todir ="portable\lib\" />
+		<move file="build\jbigi.jar" todir ="portable\lib\" />
+		<exec executable="cmd" failifexecutionfails="true">
+			<arg value="/c" />
+			<arg value="for %i in (build\*.jar) do pack200 -g -G portable\lib\%~ni.pack %i" />
+        </exec>
+		<copy todir ="build\" >
+			<fileset dir = "portable\lib\" includes = "**.jar" />
+		</copy>
+		<!-- *b* 3rd party jars from apps/  -->
+			<!-- jrobin - without jobin , you lost graph and get a lot error entry in logs -->
+		<exec executable="cmd" failifexecutionfails="true">
+			<arg value="/c"/>
+			<arg value="pack200 -g -G portable\lib\jrobin.pack apps\jrobin\jrobin-1.4.0.jar" />
+		</exec>
+<!---->
+			<!-- systray4.j  - why do we need trayicons for portable version ? dependency hardcoded in console -->
+		<copy file="apps/systray/java/lib/systray4j.dll" todir="portable/lib" />
+		<exec executable="cmd" failifexecutionfails="true">
+			<arg value="/c"/>
+			<arg value="pack200 -g -G portable\lib\systray4j.pack apps\systray\java\lib\systray4j.jar" />
+		</exec>
+<!---->
+			<!--wrapper - dont even think about it. i2p cosumes appreantly more mem without it on win32-->
+		<copy file="installer/lib/wrapper/win32/wrapper.dll" todir="portable/lib" />
+		<copy file="installer/lib/wrapper/win32/I2Psvc.exe" tofile="portable/i2psvc.ex_" />
+		<exec executable="cmd" failifexecutionfails="true">
+			<arg value="/c"/>
+			<arg value="pack200 -g -G portable\lib\wrapper.pack installer\lib\wrapper\win32\wrapper.jar" />
+		</exec>
+		<!-- *c* copy the unpack/start batchfiles -->
+		<copy todir="portable">
+			<fileset dir="installer/resources/portable/win32/" />
+		</copy>
+	</target>
 </project>

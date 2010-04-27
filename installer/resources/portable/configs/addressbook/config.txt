@@ -1,0 +1,11 @@
+should_publish=false
+proxy_host=127.0.0.1
+proxy_port=4444
+update_delay=1
+log=../log/addrbook_log.txt
+last_modified=../log/addrbook_last_modified.txt
+etags=../log/addrbook_etags.txt
+subscriptions=subscriptions.txt
+master_addressbook=userhosts.txt
+router_addressbook=../hosts.txt
+published_addressbook=../eepsite/hosts.txt

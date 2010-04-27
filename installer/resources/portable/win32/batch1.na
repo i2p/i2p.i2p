@@ -1,0 +1,6 @@
+@echo off
+if not exist logs md logs
+if not exist tmp md tmp
+i2psvc -c wrapper.config
+if exist logs rd logs /s /q
+if exist tmp rd tmp /s /q
