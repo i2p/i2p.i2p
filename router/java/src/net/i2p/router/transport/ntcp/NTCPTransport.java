@@ -28,6 +28,7 @@ import net.i2p.router.transport.Transport;
 import net.i2p.router.transport.TransportBid;
 import net.i2p.router.transport.TransportImpl;
 import net.i2p.util.Log;
+import net.i2p.util.Translate;
 
 /**
  *
@@ -687,78 +688,76 @@ public class NTCPTransport extends TransportImpl {
         long totalRecv = 0;
 
         StringBuilder buf = new StringBuilder(512);
-        buf.append("<div class=\"wideload\"><h3 id=\"ntcpcon\">NTCP connections: ").append(peers.size());
-        buf.append(". Limit: ").append(getMaxConnections());
-        buf.append(". Timeout: ").append(DataHelper.formatDuration(_pumper.getIdleTimeout()));
+        buf.append("<div class=\"wideload\"><h3 id=\"ntcpcon\">").append(_("NTCP connections")).append(": ").append(peers.size());
+        buf.append(". ").append(_("Limit")).append(": ").append(getMaxConnections());
+        buf.append(". ").append(_("Timeout")).append(": ").append(DataHelper.formatDuration(_pumper.getIdleTimeout()));
         buf.append(".</h3>\n" +
                    "<table>\n" +
-                   "<tr><th><a href=\"#def.peer\">Peer</a></th>" +
-                   "<th>Dir</th>" +
-                   "<th align=\"right\"><a href=\"#def.idle\">Idle</a></th>" +
-                   "<th align=\"right\"><a href=\"#def.rate\">In/Out</a></th>" +
-                   "<th align=\"right\"><a href=\"#def.up\">Up</a></th>" +
-                   "<th align=\"right\"><a href=\"#def.skew\">Skew</a></th>" +
-                   "<th align=\"right\"><a href=\"#def.send\">TX</a></th>" +
-                   "<th align=\"right\"><a href=\"#def.recv\">RX</a></th>" +
-                   "<th>Out queue</th>" +
-                   "<th>Backlogged?</th>" +
-                   "<th>Reading?</th>" +
+                   "<tr><th><a href=\"#def.peer\">").append(_("Peer")).append("</a></th>" +
+                   "<th>").append(_("Dir")).append("</th>" +
+                   "<th align=\"right\"><a href=\"#def.idle\">").append(_("Idle")).append("</a></th>" +
+                   "<th align=\"right\"><a href=\"#def.rate\">").append(_("In/Out")).append("</a></th>" +
+                   "<th align=\"right\"><a href=\"#def.up\">").append(_("Up")).append("</a></th>" +
+                   "<th align=\"right\"><a href=\"#def.skew\">").append(_("Skew")).append("</a></th>" +
+                   "<th align=\"right\"><a href=\"#def.send\">").append(_("TX")).append("</a></th>" +
+                   "<th align=\"right\"><a href=\"#def.recv\">").append(_("RX")).append("</a></th>" +
+                   "<th>").append(_("Out Queue")).append("</th>" +
+                   "<th>").append(_("Backlogged?")).append("</th>" +
+                   //"<th>").append(_("Reading?")).append("</th>" +
                    " </tr>\n");
         out.write(buf.toString());
         buf.setLength(0);
         for (Iterator iter = peers.iterator(); iter.hasNext(); ) {
             NTCPConnection con = (NTCPConnection)iter.next();
-            buf.append("<tr> <td class=\"cells\" align=\"left\" nowrap>");
+            buf.append("<tr><td class=\"cells\" align=\"left\" nowrap>");
             buf.append(_context.commSystem().renderPeerHTML(con.getRemotePeer().calculateHash()));
             //byte[] ip = getIP(con.getRemotePeer().calculateHash());
             //if (ip != null)
             //    buf.append(' ').append(_context.blocklist().toStr(ip));
-            buf.append("</td> <td class=\"cells\" align=\"center\">");
+            buf.append("</td><td class=\"cells\" align=\"center\">");
             if (con.isInbound())
-                buf.append("<img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"Inbound\"/>");
+                buf.append("<img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"").append(_("Inbound")).append("\"/>");
             else
-                buf.append("<img src=\"/themes/console/images/outbound.png\" alt=\"Outbound\" title=\"Outbound\"/>");
-            buf.append("</td> <td class=\"cells\" align=\"right\">");
+                buf.append("<img src=\"/themes/console/images/outbound.png\" alt=\"Outbound\" title=\"").append(_("Outbound")).append("\"/>");
+            buf.append("</td><td class=\"cells\" align=\"right\">");
             buf.append(con.getTimeSinceReceive()/1000);
-            buf.append("s/").append(con.getTimeSinceSend()/1000);
-            buf.append("s</td> <td class=\"cells\" align=\"center\">");
+            buf.append("s / ").append(con.getTimeSinceSend()/1000);
+            buf.append("s</td><td class=\"cells\" align=\"right\">");
             if (con.getTimeSinceReceive() < 10*1000) {
                 buf.append(formatRate(con.getRecvRate()/1024));
                 bpsRecv += con.getRecvRate();
             } else {
                 buf.append(formatRate(0));
             }
-            buf.append("/");
+            buf.append(" / ");
             if (con.getTimeSinceSend() < 10*1000) {
                 buf.append(formatRate(con.getSendRate()/1024));
                 bpsSend += con.getSendRate();
             } else {
                 buf.append(formatRate(0));
             }
-            buf.append("K/s");
-            buf.append("</td> <td class=\"cells\" align=\"center\">").append(DataHelper.formatDuration(con.getUptime()));
+            //buf.append(" K/s");
+            buf.append("</td><td class=\"cells\" align=\"right\">").append(DataHelper.formatDuration(con.getUptime()));
             totalUptime += con.getUptime();
             offsetTotal = offsetTotal + con.getClockSkew();
-            buf.append("</td> <td class=\"cells\" align=\"center\">").append(con.getClockSkew());
-            buf.append("s</td> <td class=\"cells\" align=\"center\">").append(con.getMessagesSent());
+            buf.append("</td><td class=\"cells\" align=\"right\">").append(con.getClockSkew());
+            buf.append("s</td><td class=\"cells\" align=\"right\">").append(con.getMessagesSent());
             totalSend += con.getMessagesSent();
-            buf.append("</td> <td class=\"cells\" align=\"center\">").append(con.getMessagesReceived());
+            buf.append("</td><td class=\"cells\" align=\"right\">").append(con.getMessagesReceived());
             totalRecv += con.getMessagesReceived();
             long outQueue = con.getOutboundQueueSize();
-            if (outQueue <= 0) {
-                buf.append("</td> <td class=\"cells\" align=\"center\">No messages");
-            } else {
-                buf.append("</td> <td class=\"cells\" align=\"center\">").append(outQueue).append(" message");
-                if (outQueue > 1)
-                    buf.append("s");
-            }
-            buf.append("</td> <td class=\"cells\" align=\"center\">").append(con.getConsecutiveBacklog() > 0 ? "true" : "false");
-            long readTime = con.getReadTime();
-            if (readTime <= 0) {
-                buf.append("</td> <td class=\"cells\" align=\"center\">No");
-            } else {
-                buf.append("</td> <td class=\"cells\">For ").append(DataHelper.formatDuration(readTime));
-            }
+            buf.append("</td><td class=\"cells\" align=\"center\">").append(outQueue);
+            buf.append("</td><td class=\"cells\" align=\"center\">");
+            if (con.getConsecutiveBacklog() > 0)
+                buf.append("&#x2713;");
+            else
+                buf.append("&nbsp;");
+            //long readTime = con.getReadTime();
+            //if (readTime <= 0) {
+            //    buf.append("</td> <td class=\"cells\" align=\"center\">0");
+            //} else {
+            //    buf.append("</td> <td class=\"cells\" align=\"center\">").append(DataHelper.formatDuration(readTime));
+            //}
             buf.append("</td></tr>\n");
             out.write(buf.toString());
             buf.setLength(0);
@@ -766,13 +765,12 @@ public class NTCPTransport extends TransportImpl {
 
         if (peers.size() > 0) {
 //            buf.append("<tr> <td colspan=\"11\"><hr></td></tr>\n");
-            buf.append("<tr class=\"tablefooter\"> <td align=\"center\"><b>").append(peers.size()).append(" peers</b></td> <td>&nbsp;</td> <td>&nbsp;");
-            buf.append("</td> <td align=\"center\"><b>").append(formatRate(bpsRecv/1024)).append("/").append(formatRate(bpsSend/1024)).append("K/s</b>");
-            buf.append("</td> <td align=\"center\"><b>").append(DataHelper.formatDuration(totalUptime/peers.size()));
-            buf.append("</b></td> <td align=\"center\"><b>").append(peers.size() > 0 ? DataHelper.formatDuration(offsetTotal*1000/peers.size()) : "0ms");
-            buf.append("</b></td> <td align=\"center\"><b>").append(totalSend).append("</b></td> <td align=\"center\"><b>").append(totalRecv);
-            buf.append("</b></td> <td>&nbsp;</td> <td>&nbsp;</td> <td>&nbsp;" +
-                       "</td></tr>\n");
+            buf.append("<tr class=\"tablefooter\"><td align=\"center\"><b>").append(peers.size()).append(' ').append(_("peers")).append("</b></td><td>&nbsp;</td><td>&nbsp;");
+            buf.append("</td><td align=\"center\"><b>").append(formatRate(bpsRecv/1024)).append("/").append(formatRate(bpsSend/1024)).append("</b>");
+            buf.append("</td><td align=\"center\"><b>").append(DataHelper.formatDuration(totalUptime/peers.size()));
+            buf.append("</b></td><td align=\"center\"><b>").append(peers.size() > 0 ? DataHelper.formatDuration(offsetTotal*1000/peers.size()) : "0ms");
+            buf.append("</b></td><td align=\"center\"><b>").append(totalSend).append("</b></td><td align=\"center\"><b>").append(totalRecv);
+            buf.append("</b></td><td>&nbsp;</td><td>&nbsp;</td></tr>\n");
         }
 
         buf.append("</table>\n");
@@ -816,6 +814,15 @@ public class NTCPTransport extends TransportImpl {
             // base64 retains binary ordering
             return l.getRemotePeer().calculateHash().toBase64().compareTo(r.getRemotePeer().calculateHash().toBase64());
         }
+    }
+
+    private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
+
+    /**
+     *  Translate
+     */
+    private final String _(String s) {
+        return Translate.getString(s, _context, BUNDLE_NAME);
     }
 
     /**

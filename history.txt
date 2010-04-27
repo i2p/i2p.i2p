@@ -1,3 +1,9 @@
+2010-04-27 zzz
+    * i2psnark: Serve downloaded files from the servlet rather
+      than with a file: link
+    * Jetty: Backport directory listing bugfix from jetty 6
+    * peers.jsp: Cleanup and tag
+
 * 2010-04-27  0.7.13 released
 
 2010-04-23 zzz

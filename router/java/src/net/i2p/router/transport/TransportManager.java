@@ -32,6 +32,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.transport.ntcp.NTCPTransport;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.util.Log;
+import net.i2p.util.Translate;
 
 public class TransportManager implements TransportEventListener {
     private Log _log;
@@ -499,13 +500,14 @@ public class TransportManager implements TransportEventListener {
             t.renderStatusHTML(out, urlBase, sortFlags);
         }
         StringBuilder buf = new StringBuilder(4*1024);
-        buf.append("<h3>Router Transport Addresses</h3><pre>\n");
+        buf.append("<h3>").append(_("Router Transport Addresses")).append("</h3><pre>\n");
         for (int i = 0; i < _transports.size(); i++) {
             Transport t = _transports.get(i);
             if (t.getCurrentAddress() != null)
-                buf.append(t.getCurrentAddress()).append("\n\n");
+                buf.append(t.getCurrentAddress());
             else
-                buf.append(t.getStyle()).append(" is used for outbound connections only\n\n");
+                buf.append(_("{0} is used for outbound connections only", t.getStyle()));
+            buf.append("\n\n");
         }
         buf.append("</pre>\n");
         out.write(buf.toString());
@@ -525,4 +527,20 @@ public class TransportManager implements TransportEventListener {
         return s;
     }
 
+
+    private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
+
+    /**
+     *  Translate
+     */
+    private final String _(String s) {
+        return Translate.getString(s, _context, BUNDLE_NAME);
+    }
+
+    /**
+     *  Translate
+     */
+    private final String _(String s, Object o) {
+        return Translate.getString(s, o, _context, BUNDLE_NAME);
+    }
 }
