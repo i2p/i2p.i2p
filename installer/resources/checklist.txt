@@ -78,4 +78,9 @@ Website files to change:
         release-x.y.z.html (new)
 	Sync with mtn.i2p2.i2p
 
-Announce on #i2p, forum.i2p, freshmeat.net, launchpad.net
+Announce on:
+         #i2p
+         forum.i2p
+         freshmeat.net
+         launchpad.net
+         alt.privacy.anon-server
