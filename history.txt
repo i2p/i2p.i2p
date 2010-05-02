@@ -1,3 +1,12 @@
+2010-05-02 zzz
+    * ByteCache:
+      - Add a per-cache stat
+      - Limit each cache based on max memory
+      - Disable in UDP MessageReceiver
+      - Add clearAll() method to be called when under
+        severe memory pressure; call from Router
+    * Plugins: Fix version checker bug
+
 2010-04-27 zzz
     * i2psnark: Serve downloaded files from the servlet rather
       than with a file: link
