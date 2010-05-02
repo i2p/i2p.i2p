@@ -65,6 +65,7 @@ public class ReusableGZIPOutputStream extends ResettableGZIPOutputStream {
     /** pull the contents of the stream written */
     public byte[] getData() { return _buffer.toByteArray(); }
     
+/******
     public static void main(String args[]) {
         try {
             for (int i = 0; i < 2; i++)
@@ -129,5 +130,6 @@ public class ReusableGZIPOutputStream extends ResettableGZIPOutputStream {
             return false;
         }
     }
+*****/
 }
 

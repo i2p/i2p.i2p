@@ -122,6 +122,7 @@ public class ResettableGZIPOutputStream extends DeflaterOutputStream {
         super.write(buf, off, len);
     }
     
+/******
     public static void main(String args[]) {
         for (int i = 0; i < 2; i++)
             test();
@@ -165,12 +166,13 @@ public class ResettableGZIPOutputStream extends DeflaterOutputStream {
         } catch (Exception e) { e.printStackTrace(); }
     }
     
-    /** just for testing/verification, expose the CRC32 values */
+    // just for testing/verification, expose the CRC32 values
     private static final class SnoopGZIPOutputStream extends GZIPOutputStream {
         public SnoopGZIPOutputStream(OutputStream o) throws IOException {
             super(o);
         }
         public CRC32 getCRC() { return crc; }
     }
+******/
 }
 

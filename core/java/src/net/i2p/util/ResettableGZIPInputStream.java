@@ -211,6 +211,7 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
         }
     }
     
+/******
     public static void main(String args[]) {
         for (int i = 129; i < 64*1024; i++) {
             if (!test(i)) return;
@@ -279,4 +280,5 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
             return false;
         }
     }
+******/
 }
