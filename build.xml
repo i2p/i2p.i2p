@@ -850,7 +850,7 @@
 	</target>
 <!-- build a portable archive -->
 <!-- command for windows only packing -->
-	<target name = "pkg-portable-win32"  depends="check-built-jars, preppkg-windows-only, preppkg-portable-basic, preppkg-portable-win" >
+	<target name = "pkg-portable-win32"  depends="check-built-jars, preppkg-portable-windows-only, preppkg-portable-basic, preppkg-portable-win" >
 		<!-- i need the portable\ folder in .zip so basedir is set to . -->
 		<zip destfile="portable-win32.zip" basedir="." includes="portable\**" />
 		<checksum file="portable-win32.zip" forceOverwrite="yes"/>
@@ -879,7 +879,7 @@
 		</fail>
 	</target>
 <!-- *1* preparing the jars by OS dependent de-bloating -->
-	<target name="preppkg-windows-only" depends="chk-bigi-size" if="bloated-jbigi">
+	<target name="preppkg-portable-windows-only" depends="chk-bigi-size" if="bloated-jbigi">
 		<!-- rip the non-windows stuff out of jbigi.jar -->
 		<mkdir dir="tmpextract" />
 		<unjar src="build/jbigi.jar" dest="tmpextract/" />
@@ -888,7 +888,7 @@
 		</jar>
 		<delete dir="tmpextract/" />
 	</target>
-	<target name="preppkg-linux-only"  depends="chk-bigi-size" if="bloated-jbigi">
+	<target name="preppkg-portable-linux-only"  depends="chk-bigi-size" if="bloated-jbigi">
 		<!-- rip the non-linux stuff out of jbigi.jar -->
 		<mkdir dir="tmpextract" />
 		<unjar src="build/jbigi.jar" dest="tmpextract/" />
