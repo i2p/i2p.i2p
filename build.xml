@@ -293,6 +293,17 @@
         </copy>
     </target>
 
+    <!-- only what is needed for debian, etc. -->
+    <target name="preppkg-linux-only" depends="preppkg-linux">
+        <!-- rip the non-linux stuff out of jbigi.jar -->
+        <mkdir dir="tmpextract" />
+        <unjar src="build/jbigi.jar" dest="tmpextract/" />
+        <jar destfile="pkg-temp/lib/jbigi.jar" >
+            <fileset dir="tmpextract/" includes="*linux*" />
+        </jar>
+        <delete dir="tmpextract/" />
+    </target>
+
     <target name="preppkg-linux" depends="preppkg-base">
         <copy file="installer/resources/runplain.sh" todir="pkg-temp/" />
         <copy file="apps/i2psnark/launch-i2psnark" todir="pkg-temp/" />
