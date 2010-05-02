@@ -10,7 +10,7 @@ import net.i2p.data.i2np.I2NPMessageException;
 import net.i2p.data.i2np.I2NPMessageHandler;
 import net.i2p.data.i2np.I2NPMessageImpl;
 import net.i2p.router.RouterContext;
-import net.i2p.util.ByteCache;
+//import net.i2p.util.ByteCache;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
@@ -26,7 +26,7 @@ public class MessageReceiver {
     /** list of messages (InboundMessageState) fully received but not interpreted yet */
     private final BlockingQueue<InboundMessageState> _completeMessages;
     private boolean _alive;
-    private ByteCache _cache;
+    //private ByteCache _cache;
     private static final int THREADS = 5;
     private static final long POISON_IMS = -99999999999l;
     
@@ -35,7 +35,8 @@ public class MessageReceiver {
         _log = ctx.logManager().getLog(MessageReceiver.class);
         _transport = transport;
         _completeMessages = new LinkedBlockingQueue();
-        _cache = ByteCache.getInstance(64, I2NPMessage.MAX_SIZE);
+        // the runners run forever, no need to have a cache
+        //_cache = ByteCache.getInstance(64, I2NPMessage.MAX_SIZE);
         _context.statManager().createRateStat("udp.inboundExpired", "How many messages were expired before reception?", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.inboundRemaining", "How many messages were remaining when a message is pulled off the complete queue?", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.inboundReady", "How many messages were ready when a message is added to the complete queue?", "udp", UDPTransport.RATES);
@@ -91,7 +92,8 @@ public class MessageReceiver {
     
     public void loop(I2NPMessageHandler handler) {
         InboundMessageState message = null;
-        ByteArray buf = _cache.acquire();
+        //ByteArray buf = _cache.acquire();
+        ByteArray buf = new ByteArray(new byte[I2NPMessage.MAX_SIZE]);
         while (_alive) {
             int expired = 0;
             long expiredLifetime = 0;
@@ -142,7 +144,7 @@ public class MessageReceiver {
         }
         
         // no need to zero it out, as these buffers are only used with an explicit getCompleteSize
-        _cache.release(buf, false); 
+        //_cache.release(buf, false); 
     }
     
     private I2NPMessage readMessage(ByteArray buf, InboundMessageState state, I2NPMessageHandler handler) {
