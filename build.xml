@@ -473,11 +473,26 @@
         <tar destfile="i2pupdate.tbz" basedir="pkg-temp" compression="bzip2" />
        -->
     </target>
+
     <target name="pack200">
-        <exec executable="sh" failifexecutionfails="true">
+<!-- *nix here -->
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true">
+            <arg value="-c" />
+            <arg value="for i in pkg-temp/lib/*.jar pkg-temp/webapps/*war; do echo pack200 $i; mv $i $i.jar; pack200 -g $i.pack $i.jar; rm -f $i.jar; done" />
+        </exec>
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true">
             <arg value="-c" />
             <!-- pack200 will only pack to a .pack file, and only from a .jar file, so we put another .jar on the end -->
             <arg value="for i in pkg-temp/lib/*.jar pkg-temp/webapps/*war; do echo pack200 $i; mv $i $i.jar; pack200 -g $i.pack $i.jar; rm -f $i.jar; done" />
+        </exec>
+<!-- windoz here : i admit, i hate escaped symbols in xml, indeed = =! -->
+		<exec executable="cmd" osfamily="windows" failifexecutionfails="true">
+			<arg value="/c" />
+			<arg value="for %i in (pkg-temp\webapps\*.war) do move %i %i.jar &amp;&amp; pack200 -g pkg-temp\webapps\%~ni.war.pack %i.jar &amp;&amp; del %i.jar" />
+        </exec>
+		<exec executable="cmd" osfamily="windows" failifexecutionfails="true">
+			<arg value="/c" />
+			<arg value="for %i in (pkg-temp\lib\*.jar) do move %i %i.jar &amp;&amp; pack200 -g pkg-temp\lib\%~ni.jar.pack %i.jar &amp;&amp; del %i.jar" />
         </exec>
     </target>
 
@@ -523,7 +538,7 @@
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
         <!-- decapitalized the file in 0.7.8 -->
-        <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
+       <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
     </target>
     <target name="prepupdateRouter" depends="buildrouter, deletepkg-temp">
         <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
@@ -843,43 +858,19 @@
      none of the above is modified for this purpose -->
 	<target name = "pkg-portable-clean">
 		<delete dir="build/" />
-		<delete dir="portable/" />
+		<delete dir="pkg-temp/" />
 		<delete>
 			<fileset dir="." includes="portable-**.zip**" />
 		</delete>
 	</target>
 <!-- build a portable archive -->
-<!-- command for windows only packing -->
-	<target name = "pkg-portable-win32"  depends="check-built-jars, preppkg-portable-windows-only, preppkg-portable-basic, preppkg-portable-win" >
-		<!-- i need the portable\ folder in .zip so basedir is set to . -->
-		<zip destfile="portable-win32.zip" basedir="." includes="portable\**" />
-		<checksum file="portable-win32.zip" forceOverwrite="yes"/>
-	</target>
-<!-- *0* check libs -->
-	<target name = "check-built-jars">
-		<fail message="Please run 'ant buildSmall' first">
-			<condition>
-				<or>
-					<not>
-						<available file="build/" type="dir" />
-					</not>
-					<!-- we cant accept more files or they will be bundled into the package during 'for x in y do'-->
-					<not>
-						<resourcecount count="14">
-							<fileset id="fs" dir="build/" includes="**.jar"/>
-						</resourcecount>
-					</not>
-					<not>
-						<resourcecount count="3">
-							<fileset id="fs" dir="build/" includes="**.war"/>
-						</resourcecount>
-					</not>
-				</or>
-			</condition>
-		</fail>
-	</target>
+
+<!-- *0* Since we simply pack all files in folder "build/" into our archieve, 
+		we need to make sure its small, with NO redundent jars or wars.
+		thus cleaning is required before each build-->
+	<target name="buildSmallOnly" depends="pkg-portable-clean,buildSmall"/>
 <!-- *1* preparing the jars by OS dependent de-bloating -->
-	<target name="preppkg-portable-windows-only" depends="chk-bigi-size" if="bloated-jbigi">
+	<target name="preppkg-portable-win32-jbigi" depends="buildSmallOnly">
 		<!-- rip the non-windows stuff out of jbigi.jar -->
 		<mkdir dir="tmpextract" />
 		<unjar src="build/jbigi.jar" dest="tmpextract/" />
@@ -888,102 +879,85 @@
 		</jar>
 		<delete dir="tmpextract/" />
 	</target>
-	<target name="preppkg-portable-linux-only"  depends="chk-bigi-size" if="bloated-jbigi">
+	<target name="preppkg-portable-linux-jbigi"  depends="buildSmallOnly">
 		<!-- rip the non-linux stuff out of jbigi.jar -->
 		<mkdir dir="tmpextract" />
 		<unjar src="build/jbigi.jar" dest="tmpextract/" />
-		<jar destfile="pkg-temp/lib/jbigi.jar" >
+		<jar destfile="build/jbigi.jar" >
 			<fileset dir="tmpextract/" includes="*linux*" />
 		</jar>
 		<delete dir="tmpextract/" />
 	</target>
-	<target name="chk-bigi-size">
-		<condition property="bloated-jbigi">
-			<length file="build/jbigi.jar" length="900000" when="gt" />
-		</condition>
-	</target>
-<!-- *2* os independent procedure -->
+
+<!-- *2* os independent procedure  -->
 	<target name="preppkg-portable-basic" >
-		<mkdir dir="portable" />
+		<mkdir dir="pkg-temp" />
 			<!-- non OS dependent configurations only, dont add *nux/win stuff here -->
-			<copy todir="portable">
+			<copy todir="pkg-temp">
 				<fileset dir="installer/resources/portable/configs/" />
 			</copy>
-			<copy file="installer/resources/blocklist.txt" todir="portable/" />
-			<copy file="installer/resources/hosts.txt" todir="portable/" />
-			<copy file="installer/resources/readme.license.txt" todir="portable/" />
-		<mkdir dir="portable/addressbook" />
-			<copy file="apps/addressbook/subscriptions.txt" todir="portable/addressbook/" />
-			<copy file="apps/addressbook/myhosts.txt"  todir="portable/addressbook/" />
+			<copy file="installer/resources/blocklist.txt" todir="pkg-temp/" />
+			<copy file="installer/resources/hosts.txt" todir="pkg-temp/" />
+			<copy file="installer/resources/readme.license.txt" todir="pkg-temp/" />
+		<mkdir dir="pkg-temp/addressbook" />
+			<copy file="apps/addressbook/subscriptions.txt" todir="pkg-temp/addressbook/" />
+			<copy file="apps/addressbook/myhosts.txt"  todir="pkg-temp/addressbook/" />
 			<!-- config.txt is in installer/resources/portable -->
-		<mkdir dir="portable/docs" />
-			<copy file="installer/resources/initialNews.xml" tofile="portable/docs/news.xml" overwrite="true" />
-			<copy file="installer/resources/readme/readme.html" tofile="portable/docs/readme.html" />
-			<copy file="installer/resources/startconsole.html" todir="portable/docs/" />
-			<copy file="installer/resources/start.ico" todir="portable/docs/" />
-			<copy file="installer/resources/console.ico" todir="portable/docs/" />
-			<!-- http error respond, english only,
+		<mkdir dir="pkg-temp/docs" />
+			<copy file="installer/resources/initialNews.xml" tofile="pkg-temp/docs/news.xml" overwrite="true" />
+			<copy file="installer/resources/readme/readme.html" tofile="pkg-temp/docs/readme.html" />
+			<copy file="installer/resources/startconsole.html" todir="pkg-temp/docs/" />
+			<copy file="installer/resources/start.ico" todir="pkg-temp/docs/" />
+			<copy file="installer/resources/console.ico" todir="pkg-temp/docs/" />
+			<!-- HTTP Header files, english only,
 				if you need a different lang do it in a sepreate target -->
-			<copy todir="portable/docs/" >
+			<copy todir="pkg-temp/docs/" >
 				<fileset dir="installer/resources/proxy/"  includes="**-header.ht" />
 			</copy>
-			<!-- here we choose light theme only -->
-			<copy todir="portable/docs/themes/console/light/" overwrite="true" >
+			<!-- Theme light only -->
+			<copy todir="pkg-temp/docs/themes/console/light/" overwrite="true" >
 				<fileset dir="installer/resources/themes/console/light/" includes="**.css" />
 			</copy>
 <!-- @dr.zed where is your CJK fix for the default theme ??	put it here		<copy file="installer/resources/themes/console/classic/console_big.css" todir="portable/docs/themes/console/light/" / -->
-			<copy todir="portable/docs/themes/console/images/" >
+			<copy todir="pkg-temp/docs/themes/console/images/" >
 				<fileset dir="installer/resources/themes/console/images/" />
 			</copy>
-			<!-- flags for language icon (not for ip)-->
-			<copy todir="portable/docs/icons/flags" >
+			<!-- FLAGs for language icon (not for ip)-->
+			<copy todir="pkg-temp/docs/icons/flags" >
 				<fileset dir="installer/resources/icons/flags/" includes="cn.png,de.png,fr.png,nl.png,ru.png,se.png,us.png" />
 			</copy>
-		<mkdir dir="portable/lib" />
-		<mkdir dir="portable/webapps" />
-			<copy todir="portable/webapps/">
+		<mkdir dir="pkg-temp/webapps" />
+			<copy todir="pkg-temp/webapps/">
 				<fileset dir="build/" includes="**.war" />
 			</copy>
+		<mkdir dir="pkg-temp/lib" />
+			<copy todir ="pkg-temp/lib/" >
+				<fileset dir="build/" includes="**.jar" />
+			</copy>
+			<!-- 3rd party jars from apps/  -->
+				<!-- jrobin - without jobin , you lost graph and get a lot error entry in logs -->
+			<copy file="apps/jrobin/jrobin-1.4.0.jar" tofile="pkg-temp/lib/jrobin.jar" />
 	</target>
 <!-- *3* os dependent procedure/commands -->
-	<target name = "preppkg-portable-win">
-		<!-- *a* all jar in build/ -->
-			<!-- the following will not be pack200ed 
-			since they got bloated rather than slimer after compression 00d -->
-		<move file="build\jasper-runtime.jar" todir ="portable\lib\" />
-		<move file="build\javax.servlet.jar" todir ="portable\lib\" />
-		<move file="build\jbigi.jar" todir ="portable\lib\" />
-		<exec executable="cmd" failifexecutionfails="true">
-			<arg value="/c" />
-			<arg value="for %i in (build\*.jar) do pack200 -g -G portable\lib\%~ni.pack %i" />
-        </exec>
-		<copy todir ="build\" >
-			<fileset dir = "portable\lib\" includes = "**.jar" />
-		</copy>
-		<!-- *b* 3rd party jars from apps/  -->
-			<!-- jrobin - without jobin , you lost graph and get a lot error entry in logs -->
-		<exec executable="cmd" failifexecutionfails="true">
-			<arg value="/c"/>
-			<arg value="pack200 -g -G portable\lib\jrobin.pack apps\jrobin\jrobin-1.4.0.jar" />
-		</exec>
-<!---->
+	<target name = "preppkg-portable-win32" depends="preppkg-portable-win32-jbigi,preppkg-portable-basic">
 			<!-- systray4.j  - why do we need trayicons for portable version ? dependency hardcoded in console -->
-		<copy file="apps/systray/java/lib/systray4j.dll" todir="portable/lib" />
-		<exec executable="cmd" failifexecutionfails="true">
-			<arg value="/c"/>
-			<arg value="pack200 -g -G portable\lib\systray4j.pack apps\systray\java\lib\systray4j.jar" />
-		</exec>
-<!---->
+		<copy file="apps/systray/java/lib/systray4j.dll" todir="pkg-temp/lib" />
+		<copy file="apps/systray/java/lib/systray4j.jar" todir="pkg-temp/lib" />
 			<!--wrapper - dont even think about it. i2p cosumes appreantly more mem without it on win32-->
-		<copy file="installer/lib/wrapper/win32/wrapper.dll" todir="portable/lib" />
-		<copy file="installer/lib/wrapper/win32/I2Psvc.exe" tofile="portable/i2psvc.ex_" />
-		<exec executable="cmd" failifexecutionfails="true">
-			<arg value="/c"/>
-			<arg value="pack200 -g -G portable\lib\wrapper.pack installer\lib\wrapper\win32\wrapper.jar" />
-		</exec>
-		<!-- *c* copy the unpack/start batchfiles -->
-		<copy todir="portable">
+		<copy file="installer/lib/wrapper/win32/wrapper.dll" todir="pkg-temp/lib" />
+		<copy file="installer/lib/wrapper/win32/wrapper.jar" todir="pkg-temp/lib" />
+		<copy file="installer/lib/wrapper/win32/I2Psvc.exe" tofile="pkg-temp/i2psvc.ex_" />
+			<!--  copy the unpack/start batchfiles -->
+		<copy todir="pkg-temp">
 			<fileset dir="installer/resources/portable/win32/" />
 		</copy>
+	</target>
+<!-- *4* command for windows package -->
+	<target name = "pkg-portable-win32"	depends="preppkg-portable-win32, pack200" >
+		<!-- i need the portable\ folder in .zip so basedir is set to . -->
+		<move file="pkg-temp" tofile="portable"/>
+		<zip destfile="portable-win32.zip" basedir="." level="9" includes="portable\**" />
+		<checksum file="portable-win32.zip" forceOverwrite="yes"/>
+		<move file="portable" tofile="pkg-temp"/>
 	</target>
 </project>
