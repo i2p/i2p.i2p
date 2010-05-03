@@ -13,27 +13,98 @@ import net.i2p.data.ByteArray;
  * Cache the objects frequently used to reduce memory churn.  The ByteArray 
  * should be held onto as long as the  data referenced in it is needed.
  *
+ * Heap size control - survey of usage (April 2010) :
+ *
+ *  </pre>
+	Size	Max	MaxMem	From
+
+	16	16	256	CryptixAESEngine
+	16	32	512	BloomFilterIVValidator
+	16	64	1K	UDP PacketBuilder
+	16	128	2K	tunnel HopProcessor
+	16	128	2K	tunnel TrivialPreprocessor
+	16	128	2K	tunnel InboundEndpointProcessor
+	16	128	2K	tunnel OutboundGatewayProcessor
+
+	32	64	2K	UDP PacketBuilder
+	32	128	4K	tunnel TrivialPreprocessor
+
+	1K	32	32K	tunnel TrivialPreprocessor
+	1K	512	512K	tunnel FragmentHandler
+	1K	512	512K	I2NP TunnelDataMessage
+	1K	512	512K	tunnel FragmentedMessage
+
+	1730	128	216K	streaming MessageOutputStream
+
+	2K	64	128K	UDP IMS
+
+	4K	32	128K	I2PTunnelRunner
+
+	8K	8	64K	I2PTunnel HTTPResponseOutputStream
+
+	32K	4	128K	SAM StreamSession
+	32K	10	320K	SAM v2StreamSession
+	32K	64	2M	UDP OMS
+	32K	128	4M	streaming MessageInputStream
+
+	36K	64	2.25M	streaming PacketQueue
+
+	40K	8	320K	DataHelper decompress
+
+	64K	64	4M	UDP MessageReceiver - disabled in 0.7.14
+ *  </pre>
+ *
  */
 public final class ByteCache {
-    private final static Map _caches = new HashMap(16);
+
+    private static final Map<Integer, ByteCache> _caches = new HashMap(16);
+
+    /**
+     *  max size in bytes of each cache
+     *  Set to max memory / 128, with a min of 128KB and a max of 4MB
+     *
+     *  @since 0.7.14
+     */
+    private static final int MAX_CACHE;
+    static {
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        MAX_CACHE = (int) Math.min(4*1024*1024l, Math.max(128*1024l, maxMemory / 128));
+    }
+
     /**
      * Get a cache responsible for objects of the given size
      *
      * @param cacheSize how large we want the cache to grow before using on 
      *                  demand allocation
+     *                  Since 0.7.14, a limit of 1MB / size is enforced
+     *                  for the typical 128MB max memory JVM
      * @param size how large should the objects cached be?
      */
     public static ByteCache getInstance(int cacheSize, int size) {
+        if (cacheSize * size > MAX_CACHE)
+            cacheSize = MAX_CACHE / size;
         Integer sz = Integer.valueOf(size);
         ByteCache cache = null;
         synchronized (_caches) {
             if (!_caches.containsKey(sz))
                 _caches.put(sz, new ByteCache(cacheSize, size));
-            cache = (ByteCache)_caches.get(sz);
+            cache = _caches.get(sz);
         }
         cache.resize(cacheSize);
+        //I2PAppContext.getGlobalContext().logManager().getLog(ByteCache.class).error("ByteCache size: " + size + " max: " + cacheSize, new Exception("from"));
         return cache;
     }
+
+    /**
+     *  Clear everything (memory pressure)
+     *  @since 0.7.14
+     */
+    public static void clearAll() {
+        for (ByteCache bc : _caches.values())
+            bc.clear();
+        I2PAppContext.getGlobalContext().logManager().getLog(ByteCache.class).error("WARNING: Low memory, clearing byte caches");
+    }
+
     private Log _log;
     /** list of available and available entries */
     private Queue<ByteArray> _available;
@@ -57,13 +128,14 @@ public final class ByteCache {
         _lastOverflow = -1;
         SimpleScheduler.getInstance().addPeriodicEvent(new Cleanup(), CLEANUP_FREQUENCY);
         _log = I2PAppContext.getGlobalContext().logManager().getLog(ByteCache.class);
+        I2PAppContext.getGlobalContext().statManager().createRateStat("byteCache.memory." + entrySize, "Memory usage (B)", "Router", new long[] { 60*1000 });
     }
     
     private void resize(int maxCachedEntries) {
         if (_maxCached >= maxCachedEntries) return;
         _maxCached = maxCachedEntries;
         // make a bigger one, move the cached items over
-        Queue newLBQ = new LinkedBlockingQueue(maxCachedEntries);
+        Queue<ByteArray> newLBQ = new LinkedBlockingQueue(maxCachedEntries);
         ByteArray ba;
         while ((ba = _available.poll()) != null)
             newLBQ.offer(ba);
@@ -109,8 +181,17 @@ public final class ByteCache {
         }
     }
     
+    /**
+     *  Clear everything (memory pressure)
+     *  @since 0.7.14
+     */
+    private void clear() {
+        _available.clear();
+    }
+
     private class Cleanup implements SimpleTimer.TimedEvent {
         public void timeReached() {
+            I2PAppContext.getGlobalContext().statManager().addRateData("byteCache.memory." + _entrySize, _entrySize * _available.size(), 0);
             if (System.currentTimeMillis() - _lastOverflow > EXPIRE_PERIOD) {
                 // we haven't exceeded the cache size in a few minutes, so lets
                 // shrink the cache 

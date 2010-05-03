@@ -41,6 +41,7 @@ import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.stat.StatManager;
+import net.i2p.util.ByteCache;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.I2PThread;
@@ -224,6 +225,7 @@ public class Router {
         _killVMOnEnd = true;
         _oomListener = new I2PThread.OOMEventListener() { 
             public void outOfMemory(OutOfMemoryError oom) { 
+                ByteCache.clearAll();
                 _log.log(Log.CRIT, "Thread ran out of memory", oom);
                 for (int i = 0; i < 5; i++) { // try this 5 times, in case it OOMs
                     try { 
@@ -252,6 +254,8 @@ public class Router {
      *
      */
     public void setKillVMOnEnd(boolean shouldDie) { _killVMOnEnd = shouldDie; }
+
+    /** @deprecated unused */
     public boolean getKillVMOnEnd() { return _killVMOnEnd; }
     
     public String getConfigFilename() { return _configFilename; }
@@ -923,7 +927,7 @@ public class Router {
     private static final boolean ALLOW_DYNAMIC_KEYS = false;
 
     private void finalShutdown(int exitCode) {
-        _log.log(Log.CRIT, "Shutdown(" + exitCode + ") complete", new Exception("Shutdown"));
+        _log.log(Log.CRIT, "Shutdown(" + exitCode + ") complete"  /* , new Exception("Shutdown") */ );
         try { _context.logManager().shutdown(); } catch (Throwable t) { }
         if (ALLOW_DYNAMIC_KEYS) {
             if (Boolean.valueOf(_context.getProperty(PROP_DYNAMIC_KEYS)).booleanValue())
@@ -1357,12 +1361,16 @@ public class Router {
     
 /* following classes are now private static inner classes, didn't bother to reindent */
 
+private static final long LOW_MEMORY_THRESHOLD = 5 * 1024 * 1024;
+
 /**
  * coalesce the stats framework every minute
  *
  */
 private static class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
     private RouterContext _ctx;
+    private long _maxMemory;
+
     public CoalesceStatsEvent(RouterContext ctx) { 
         _ctx = ctx; 
         ctx.statManager().createRateStat("bw.receiveBps", "How fast we receive data (in KBps)", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
@@ -1373,8 +1381,8 @@ private static class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
         ctx.statManager().createRateStat("router.activeSendPeers", "How many peers we've sent to this minute", "Throttle", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         ctx.statManager().createRateStat("router.highCapacityPeers", "How many high capacity peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
         ctx.statManager().createRateStat("router.fastPeers", "How many fast peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
-        long max = Runtime.getRuntime().maxMemory() / (1024*1024);
-        ctx.statManager().createRateStat("router.memoryUsed", "(Bytes) Max is " + max + "MB", "Router", new long[] { 60*1000 });
+        _maxMemory = Runtime.getRuntime().maxMemory();
+        ctx.statManager().createRateStat("router.memoryUsed", "(Bytes) Max is " + (_maxMemory / (1024*1024)) + "MB", "Router", new long[] { 60*1000 });
     }
     private RouterContext getContext() { return _ctx; }
     public void timeReached() {
@@ -1395,6 +1403,8 @@ private static class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
         
         long used = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
         getContext().statManager().addRateData("router.memoryUsed", used, 0);
+        if (_maxMemory - used < LOW_MEMORY_THRESHOLD)
+            ByteCache.clearAll();
 
         getContext().tunnelDispatcher().updateParticipatingStats(COALESCE_TIME);
 

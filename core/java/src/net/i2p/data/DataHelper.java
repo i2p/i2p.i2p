@@ -1078,6 +1078,7 @@ public class DataHelper {
         ReusableGZIPInputStream in = ReusableGZIPInputStream.acquire();
         in.initialize(new ByteArrayInputStream(orig, offset, length));
         
+        // don't make this a static field, or else I2PAppContext gets initialized too early
         ByteCache cache = ByteCache.getInstance(8, MAX_UNCOMPRESSED);
         ByteArray outBuf = cache.acquire();
         int written = 0;
