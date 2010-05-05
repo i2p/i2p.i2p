@@ -13,6 +13,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -264,14 +265,16 @@ public class RouterInfo extends DataStructureImpl {
         try {
             _identity.writeBytes(out);
             DataHelper.writeDate(out, new Date(_published));
-            if (isHidden()) {
+            int sz = _addresses.size();
+            if (sz <= 0 || isHidden()) {
                 // Do not send IP address to peers in hidden mode
                 DataHelper.writeLong(out, 1, 0);
             } else {
-                DataHelper.writeLong(out, 1, _addresses.size());
-                List addresses = DataHelper.sortStructures(_addresses);
-                for (Iterator iter = addresses.iterator(); iter.hasNext();) {
-                    RouterAddress addr = (RouterAddress) iter.next();
+                DataHelper.writeLong(out, 1, sz);
+                Collection<RouterAddress> addresses = _addresses;
+                if (sz > 1)
+                    addresses = (Collection<RouterAddress>) DataHelper.sortStructures(addresses);
+                for (RouterAddress addr : addresses) {
                     addr.writeBytes(out);
                 }
             }
@@ -279,12 +282,16 @@ public class RouterInfo extends DataStructureImpl {
             // answer: they're always empty... they're a placeholder for one particular
             //         method of trusted links, which isn't implemented in the router
             //         at the moment, and may not be later.
-            // fixme to reduce objects - if (_peers == null) write 0
-            DataHelper.writeLong(out, 1, _peers.size());
-            List peers = DataHelper.sortStructures(_peers);
-            for (Iterator iter = peers.iterator(); iter.hasNext();) {
-                Hash peerHash = (Hash) iter.next();
-                peerHash.writeBytes(out);
+            // fixme to reduce objects - allow _peers == null
+            int psz = _peers.size();
+            DataHelper.writeLong(out, 1, psz);
+            if (psz > 0) {
+                Collection<Hash> peers = _peers;
+                if (psz > 1)
+                    peers = (Collection<Hash>) DataHelper.sortStructures(peers);
+                for (Hash peerHash : peers) {
+                    peerHash.writeBytes(out);
+                }
             }
             DataHelper.writeProperties(out, _options);
         } catch (IOException ioe) {
