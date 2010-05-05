@@ -22,7 +22,7 @@ public class HMAC256Generator extends HMACGenerator {
     @Override
     protected I2PHMac acquire() {
         synchronized (_available) {
-            if (_available.size() > 0)
+            if (!_available.isEmpty())
                 return (I2PHMac)_available.remove(0);
         }
         // the HMAC is hardcoded to use SHA256 digest size

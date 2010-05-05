@@ -559,7 +559,7 @@ public class NTCPTransport extends TransportImpl {
         }
         for (int i = 0; expired != null && i < expired.size(); i++)
             ((NTCPConnection)expired.get(i)).close();
-        if ( (expired != null) && (expired.size() > 0) )
+        if ( (expired != null) && (!expired.isEmpty()) )
             _context.statManager().addRateData("ntcp.outboundEstablishFailed", expired.size(), 0);
     }
 
@@ -763,12 +763,12 @@ public class NTCPTransport extends TransportImpl {
             buf.setLength(0);
         }
 
-        if (peers.size() > 0) {
+        if (!peers.isEmpty()) {
 //            buf.append("<tr> <td colspan=\"11\"><hr></td></tr>\n");
             buf.append("<tr class=\"tablefooter\"><td align=\"center\"><b>").append(peers.size()).append(' ').append(_("peers")).append("</b></td><td>&nbsp;</td><td>&nbsp;");
             buf.append("</td><td align=\"center\"><b>").append(formatRate(bpsRecv/1024)).append("/").append(formatRate(bpsSend/1024)).append("</b>");
             buf.append("</td><td align=\"center\"><b>").append(DataHelper.formatDuration(totalUptime/peers.size()));
-            buf.append("</b></td><td align=\"center\"><b>").append(peers.size() > 0 ? DataHelper.formatDuration(offsetTotal*1000/peers.size()) : "0ms");
+            buf.append("</b></td><td align=\"center\"><b>").append((!peers.isEmpty()) ? DataHelper.formatDuration(offsetTotal*1000/peers.size()) : "0ms");
             buf.append("</b></td><td align=\"center\"><b>").append(totalSend).append("</b></td><td align=\"center\"><b>").append(totalRecv);
             buf.append("</b></td><td>&nbsp;</td><td>&nbsp;</td></tr>\n");
         }

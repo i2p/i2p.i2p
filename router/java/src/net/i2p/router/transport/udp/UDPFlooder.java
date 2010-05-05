@@ -66,7 +66,7 @@ class UDPFlooder implements Runnable {
         while (_alive) {
             try {
                 synchronized (_peers) {
-                    if (_peers.size() <= 0)
+                    if (_peers.isEmpty())
                         _peers.wait();
                 }
             } catch (InterruptedException ie) {}

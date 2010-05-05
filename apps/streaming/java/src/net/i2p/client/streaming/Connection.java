@@ -449,7 +449,7 @@ public class Connection {
             }
             _outboundPackets.notifyAll();
         }
-        if ((acked != null) && (acked.size() > 0) )
+        if ((acked != null) && (!acked.isEmpty()) )
             _ackSinceCongestion = true;
         return acked;
     }

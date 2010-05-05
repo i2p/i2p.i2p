@@ -298,7 +298,7 @@ class BuildExecutor implements Runnable {
                         }
                     }
                 } else {
-                    if ( (allowed > 0) && (wanted.size() > 0) ) {
+                    if ( (allowed > 0) && (!wanted.isEmpty()) ) {
                         Collections.shuffle(wanted, _context.random());
                         Collections.sort(wanted, new TunnelPoolComparator());
 
@@ -307,7 +307,7 @@ class BuildExecutor implements Runnable {
                         if (allowed > 2)
                             allowed = 2;
                         
-                        for (int i = 0; (i < allowed) && (wanted.size() > 0); i++) {
+                        for (int i = 0; (i < allowed) && (!wanted.isEmpty()); i++) {
                             TunnelPool pool = wanted.remove(0);
                             //if (pool.countWantedTunnels() <= 0)
                             //    continue;

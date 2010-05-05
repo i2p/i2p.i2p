@@ -313,7 +313,7 @@ class FloodfillPeerSelector extends PeerSelector {
             }
             // are we corrupting _sorted here?
             for (int i = rv.size(); i < howMany; i++) {
-                if (_sorted.size() <= 0)
+                if (_sorted.isEmpty())
                     break;
                 Hash entry = _sorted.first();
                 rv.add(entry);

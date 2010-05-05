@@ -40,7 +40,7 @@ class Reader {
         }
     }
     public void stopReading() {
-        while (_runners.size() > 0) {
+        while (!_runners.isEmpty()) {
             Runner r = _runners.remove(0);
             r.stop();
         }
@@ -90,7 +90,7 @@ class Reader {
                         } else {
                             _liveReads.remove(con);
                             con = null;
-                            if (_pendingConnections.size() <= 0) {
+                            if (_pendingConnections.isEmpty()) {
                                 _pendingConnections.wait();
                             } else {
                                 con = _pendingConnections.remove(0);

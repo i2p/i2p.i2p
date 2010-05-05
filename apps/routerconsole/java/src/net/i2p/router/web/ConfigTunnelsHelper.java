@@ -163,7 +163,7 @@ public class ConfigTunnelsHelper extends HelperBase {
         // TunnelPoolOptions, so make the boxes readonly.
         // And let's not display them at all unless they have contents, which should be rare.
         Properties props = in.getUnknownOptions();
-        if (props.size() > 0) {
+        if (!props.isEmpty()) {
             buf.append("<tr><td align=\"right\" class=\"mediumtags\">" + _("Inbound options") + ":</td>\n" +
                        "<td colspan=\"2\" align=\"center\"><input name=\"").append(index);
             buf.append(".inboundOptions\" type=\"text\" size=\"32\" disabled=\"true\" " +
@@ -176,7 +176,7 @@ public class ConfigTunnelsHelper extends HelperBase {
             buf.append("\"></td></tr>\n");
         }
         props = out.getUnknownOptions();
-        if (props.size() > 0) {
+        if (!props.isEmpty()) {
             buf.append("<tr><td align=\"right\" class=\"mediumtags\">" + _("Outbound options") + ":</td>\n" +
                        "<td colspan=\"2\" align=\"center\"><input name=\"").append(index);
             buf.append(".outboundOptions\" type=\"text\" size=\"32\" disabled=\"true\" " +

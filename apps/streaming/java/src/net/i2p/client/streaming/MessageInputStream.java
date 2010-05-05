@@ -283,15 +283,15 @@ public class MessageInputStream extends InputStream {
             expiration = _readTimeout + System.currentTimeMillis();
         synchronized (_dataLock) {
             for (int i = 0; i < length; i++) {
-                if ( (_readyDataBlocks.size() <= 0) && (i == 0) ) {
+                if ( (_readyDataBlocks.isEmpty()) && (i == 0) ) {
                     // ok, we havent found anything, so lets block until we get 
                     // at least one byte
                     
-                    while (_readyDataBlocks.size() <= 0) {
+                    while (_readyDataBlocks.isEmpty()) {
                         if (_locallyClosed)
                             throw new IOException("Already closed, you wanker");
                         
-                        if ( (_notYetReadyBlocks.size() <= 0) && (_closeReceived) ) {
+                        if ( (_notYetReadyBlocks.isEmpty()) && (_closeReceived) ) {
                             if (_log.shouldLog(Log.INFO))
                                 _log.info("read(...," + offset + ", " + length + ")[" + i 
                                            + "] got EOF after " + _readTotal + " " + toString());
@@ -322,7 +322,7 @@ public class MessageInputStream extends InputStream {
                                                + ") with nonblocking setup: " + toString());
                                 return i;
                             }
-                            if (_readyDataBlocks.size() <= 0) {
+                            if (_readyDataBlocks.isEmpty()) {
                                 if ( (_readTimeout > 0) && (expiration < System.currentTimeMillis()) ) {
                                     if (_log.shouldLog(Log.INFO))
                                         _log.info("read(...," + offset+", " + length+ ")[" + i 
@@ -334,7 +334,7 @@ public class MessageInputStream extends InputStream {
                     }
                     // we looped a few times then got data, so this pass doesnt count
                     i--;
-                } else if (_readyDataBlocks.size() <= 0) {
+                } else if (_readyDataBlocks.isEmpty()) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("read(...," + offset+", " + length+ ")[" + i 
                                    + "] no more ready blocks, returning");

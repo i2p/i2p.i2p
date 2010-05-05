@@ -152,7 +152,7 @@ public class TunnelPool {
             _lastSelectionPeriod = period;
             _lastSelected = null;
 
-            if (_tunnels.size() <= 0) {
+            if (_tunnels.isEmpty()) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn(toString() + ": No tunnels to select from");
             } else {
@@ -483,7 +483,7 @@ public class TunnelPool {
             if (_log.shouldLog(Log.WARN))
                 _log.warn(toString() + ": Not enough tunnels (" + _tunnels.size() + ", wanted " + wanted + ")");
             // see comment below
-            if (_tunnels.size() <= 0)
+            if (_tunnels.isEmpty())
                 return null;
         }
 
@@ -538,7 +538,7 @@ public class TunnelPool {
         if (leases.size() < wanted) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn(toString() + ": Not enough leases (" + leases.size() + ", wanted " + wanted + ")");
-            if (leases.size() <= 0)
+            if (leases.isEmpty())
                 return null;
         }
 
@@ -858,7 +858,7 @@ public class TunnelPool {
 
         if (!forceZeroHop) {
             peers = _peerSelector.selectPeers(_context, settings);
-            if ( (peers == null) || (peers.size() <= 0) ) {
+            if ( (peers == null) || (peers.isEmpty()) ) {
                 // no inbound or outbound tunnels to send the request through, and 
                 // the pool is refusing 0 hop tunnels
                 if (peers == null) {

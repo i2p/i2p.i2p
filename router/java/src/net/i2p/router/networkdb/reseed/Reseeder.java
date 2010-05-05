@@ -285,12 +285,12 @@ public class Reseeder {
     private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
 
     /** translate */
-    public String _(String key) {
+    private String _(String key) {
         return Translate.getString(key, _context, BUNDLE_NAME);
     }
 
     /** translate */
-    public String _(String s, Object o, Object o2) {
+    private String _(String s, Object o, Object o2) {
         return Translate.getString(s, o, o2, _context, BUNDLE_NAME);
     }
 

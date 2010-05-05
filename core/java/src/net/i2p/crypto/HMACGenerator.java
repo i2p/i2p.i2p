@@ -89,7 +89,7 @@ public class HMACGenerator {
     
     protected I2PHMac acquire() {
         synchronized (_available) {
-            if (_available.size() > 0)
+            if (!_available.isEmpty())
                 return (I2PHMac)_available.remove(0);
         }
         // the HMAC is hardcoded to use SHA256 digest size
@@ -108,7 +108,7 @@ public class HMACGenerator {
     private byte[] acquireTmp() {
         byte rv[] = null;
         synchronized (_availableTmp) {
-            if (_availableTmp.size() > 0)
+            if (!_availableTmp.isEmpty())
                 rv = (byte[])_availableTmp.remove(0);
         }
         if (rv != null)

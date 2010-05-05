@@ -451,13 +451,13 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                 Long msgId = null;
                 Integer size = null;
                 synchronized (AvailabilityNotifier.this) {
-                    if (_pendingIds.size() <= 0) {
+                    if (_pendingIds.isEmpty()) {
                         try {
                             AvailabilityNotifier.this.wait();
                         } catch (InterruptedException ie) { // nop
                         }
                     }
-                    if (_pendingIds.size() > 0) {
+                    if (!_pendingIds.isEmpty()) {
                         msgId = (Long)_pendingIds.remove(0);
                         size = (Integer)_pendingSizes.remove(0);
                     }

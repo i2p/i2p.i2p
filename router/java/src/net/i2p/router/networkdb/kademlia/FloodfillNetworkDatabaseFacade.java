@@ -305,13 +305,13 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         Job fail = null;
         if (onFind != null) {
             synchronized (onFind) {
-                if (onFind.size() > 0)
+                if (!onFind.isEmpty())
                     find = onFind.remove(0);
             } 
         }
         if (onFailed != null) {
             synchronized (onFailed) {
-                if (onFailed.size() > 0)
+                if (!onFailed.isEmpty())
                     fail = onFailed.remove(0);
             }
         }

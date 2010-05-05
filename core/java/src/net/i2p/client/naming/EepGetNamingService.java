@@ -72,7 +72,7 @@ public class EepGetNamingService extends NamingService {
             return d;
 
         List URLs = getURLs();
-        if (URLs.size() == 0)
+        if (URLs.isEmpty())
             return null;
 
         // prevent lookup loops - this cannot be the only lookup service

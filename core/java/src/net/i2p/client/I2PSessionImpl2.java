@@ -236,7 +236,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
             oldTags = _context.sessionKeyManager().getAvailableTags(dest.getPublicKey(), key);
             long availTimeLeft = _context.sessionKeyManager().getAvailableTimeLeft(dest.getPublicKey(), key);
         
-            if ( (tagsSent == null) || (tagsSent.size() <= 0) ) {
+            if ( (tagsSent == null) || (tagsSent.isEmpty()) ) {
                 if (oldTags < NUM_TAGS) {
                     sentTags = createNewTags(NUM_TAGS);
                     if (_log.shouldLog(Log.DEBUG))
@@ -261,7 +261,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
             if (false) // rekey
                 newKey = _context.keyGenerator().generateSessionKey();
         
-            if ( (tagsSent != null) && (tagsSent.size() > 0) ) {
+            if ( (tagsSent != null) && (!tagsSent.isEmpty()) ) {
                 if (sentTags == null)
                     sentTags = new HashSet();
                 sentTags.addAll(tagsSent);

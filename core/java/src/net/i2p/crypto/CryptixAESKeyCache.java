@@ -31,7 +31,7 @@ public final class CryptixAESKeyCache {
      */
     public final KeyCacheEntry acquireKey() {
         synchronized (_availableKeys) {
-            if (_availableKeys.size() > 0)
+            if (!_availableKeys.isEmpty())
                 return (KeyCacheEntry)_availableKeys.remove(0);
         }
         return createNew();

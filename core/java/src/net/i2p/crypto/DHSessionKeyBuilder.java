@@ -114,7 +114,7 @@ public class DHSessionKeyBuilder {
         this(false);
         DHSessionKeyBuilder builder = null;
         synchronized (_builders) {
-            if (_builders.size() > 0) {
+            if (!_builders.isEmpty()) {
                 builder = (DHSessionKeyBuilder) _builders.remove(0);
                 if (_log.shouldLog(Log.DEBUG)) _log.debug("Removing a builder.  # left = " + _builders.size());
             } else {

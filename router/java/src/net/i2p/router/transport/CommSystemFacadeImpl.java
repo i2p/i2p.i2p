@@ -91,7 +91,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         }
         Vector skews = _manager.getClockSkews();
         if (skews == null ||
-            skews.size() <= 0 ||
+            skews.isEmpty() ||
             (skews.size() < 5 && _context.clock().getUpdatedSuccessfully())) {
             return _context.clock().getOffset();
         }

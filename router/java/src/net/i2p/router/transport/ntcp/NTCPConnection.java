@@ -487,7 +487,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
                 return;
             }
                 //throw new RuntimeException("We should not be preparing a write while we still have one pending");
-            if (_outbound.size() > 0) {
+            if (!_outbound.isEmpty()) {
                 msg = (OutNetMessage)_outbound.remove(0);
                 _currentOutbound = msg;
             } else {
@@ -711,7 +711,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     private final static List _bufs = new ArrayList(NUM_PREP_BUFS);
     private PrepBuffer acquireBuf() {
         synchronized (_bufs) {
-            if (_bufs.size() > 0) {
+            if (!_bufs.isEmpty()) {
                 PrepBuffer b = (PrepBuffer)_bufs.remove(0);
                 b.acquired();
                 return b;

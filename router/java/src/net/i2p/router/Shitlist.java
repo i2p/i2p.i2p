@@ -210,7 +210,7 @@ public class Shitlist {
             fully = true;
         } else {
             e.transports.remove(transport);
-            if (e.transports.size() <= 0)
+            if (e.transports.isEmpty())
                 fully = true;
             else
                 _entries.put(peer, e);

@@ -69,7 +69,7 @@ class MessageWrapper {
             return null;
         TagSetHandle tsh = null;
         PublicKey sentTo = to.getIdentity().getPublicKey();
-        if (sentTags.size() > 0)
+        if (!sentTags.isEmpty())
             tsh = skm.tagsDelivered(sentTo, sentKey, sentTags);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sent to: " + to.getIdentity().getHash() + " with key: " + sentKey + " and tags: " + sentTags.size());

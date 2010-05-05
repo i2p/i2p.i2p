@@ -205,7 +205,7 @@ public class DatabaseLookupMessage extends I2NPMessageImpl {
         } else {
             out[curIndex++] = DataHelper.BOOLEAN_FALSE;
         }
-        if ( (_dontIncludePeers == null) || (_dontIncludePeers.size() <= 0) ) {
+        if ( (_dontIncludePeers == null) || (_dontIncludePeers.isEmpty()) ) {
             out[curIndex++] = 0x0;
             out[curIndex++] = 0x0;
         } else {

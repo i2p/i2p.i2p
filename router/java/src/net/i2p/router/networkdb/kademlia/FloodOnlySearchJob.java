@@ -93,13 +93,13 @@ class FloodOnlySearchJob extends FloodSearchJob {
         _shouldProcessDSRM = floodfillPeers.size() < MIN_FOR_NO_DSRM ||
                              getContext().routingKeyGenerator().getLastChanged() > getContext().clock().now() - 30*60*1000;
 
-        if (floodfillPeers.size() <= 0) {
+        if (floodfillPeers.isEmpty()) {
             // ask anybody, they may not return the answer but they will return a few ff peers we can go look up,
             // so this situation should be temporary
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Running netDb searches against the floodfill peers, but we don't know any");
             floodfillPeers = new ArrayList(_facade.getAllRouters());
-            if (floodfillPeers.size() <= 0) {
+            if (floodfillPeers.isEmpty()) {
                 if (_log.shouldLog(Log.ERROR))
                     _log.error("We don't know any peers at all");
                 failed();
@@ -256,7 +256,7 @@ class FloodOnlySearchJob extends FloodSearchJob {
         _facade.complete(_key);
         getContext().statManager().addRateData("netDb.successTime", System.currentTimeMillis()-_created, System.currentTimeMillis()-_created);
         synchronized (_onFind) {
-            while (_onFind.size() > 0)
+            while (!_onFind.isEmpty())
                 getContext().jobQueue().addJob((Job)_onFind.remove(0));
         }
     }

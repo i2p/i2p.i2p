@@ -332,7 +332,7 @@ public class SOCKS5Server extends SOCKSServer {
                 throw new SOCKSException(err);
             } else {
                 List<String> proxies = t.getProxies(connPort);
-                if (proxies == null || proxies.size() <= 0) {
+                if (proxies == null || proxies.isEmpty()) {
                     String err = "No outproxy configured for port " + connPort + " and no default configured either";
                     _log.error(err);
                     try {

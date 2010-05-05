@@ -85,7 +85,7 @@ public class PumpedTunnelGateway extends TunnelGateway {
      */
     void pump(List<Pending> queueBuf) {
         synchronized (_prequeue) {
-            if (_prequeue.size() > 0) {
+            if (!_prequeue.isEmpty()) {
                 queueBuf.addAll(_prequeue);
                 _prequeue.clear();
             } else {

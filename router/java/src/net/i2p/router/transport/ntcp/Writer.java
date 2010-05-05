@@ -39,7 +39,7 @@ class Writer {
         }
     }
     public void stopWriting() {
-        while (_runners.size() > 0) {
+        while (!_runners.isEmpty()) {
             Runner r = _runners.remove(0);
             r.stop();
         }
@@ -95,7 +95,7 @@ class Writer {
                         } else {
                             _liveWrites.remove(con);
                             con = null;
-                            if (_pendingConnections.size() <= 0) {
+                            if (_pendingConnections.isEmpty()) {
                                 if (_log.shouldLog(Log.DEBUG))
                                     _log.debug("Done writing, but nothing pending, so wait");
                                 _pendingConnections.wait();

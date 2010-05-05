@@ -391,7 +391,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 	// TODO: extend it! RTFM
 	private void listSubServices(Device dev, StringBuilder sb) {
 		ServiceList sl = dev.getServiceList();
-		if (sl.size() <= 0)
+		if (sl.isEmpty())
 			return;
 		sb.append("<ul>\n");
 		for(int i=0; i<sl.size(); i++) {
@@ -440,7 +440,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		listSubServices(dev, sb);
 		
 		DeviceList dl = dev.getDeviceList();
-		if (dl.size() <= 0)
+		if (dl.isEmpty())
 			return;
 		sb.append("<ul>\n");
 		for(int j=0; j<dl.size(); j++) {

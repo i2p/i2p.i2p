@@ -151,8 +151,8 @@ class StoreJob extends JobImpl {
         //else
         //    closestHashes = getClosestRouters(_state.getTarget(), toCheck, _state.getAttempted());
         closestHashes = getClosestFloodfillRouters(_state.getTarget(), toCheck, _state.getAttempted());
-        if ( (closestHashes == null) || (closestHashes.size() <= 0) ) {
-            if (_state.getPending().size() <= 0) {
+        if ( (closestHashes == null) || (closestHashes.isEmpty()) ) {
+            if (_state.getPending().isEmpty()) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info(getJobId() + ": No more peers left and none pending");
                 fail();

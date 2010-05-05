@@ -69,7 +69,7 @@ class I2PServerSocketImpl implements I2PServerSocket {
         I2PSocket ret = null;
         
         while ( (ret == null) && (!closing) ){
-            while (pendingSockets.size() <= 0) {
+            while (pendingSockets.isEmpty()) {
                 if (closing) throw new ConnectException("I2PServerSocket closed");
                 try {
                     synchronized(socketAddedLock) {
@@ -78,7 +78,7 @@ class I2PServerSocketImpl implements I2PServerSocket {
                 } catch (InterruptedException ie) {}
             }
             synchronized (pendingSockets) {
-                if (pendingSockets.size() > 0) {
+                if (!pendingSockets.isEmpty()) {
                     ret = (I2PSocket)pendingSockets.remove(0);
                 }
             } 

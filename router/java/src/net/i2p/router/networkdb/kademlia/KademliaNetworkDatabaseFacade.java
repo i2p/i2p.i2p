@@ -725,7 +725,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             long age = _context.clock().now() - routerInfo.getPublished();
             return "Peer " + key.toBase64() + " published " + DataHelper.formatDuration(age) + " ago";
         } else if (upLongEnough && !routerInfo.isCurrent(ROUTER_INFO_EXPIRATION_SHORT)) {
-            if (routerInfo.getAddresses().size() <= 0)
+            if (routerInfo.getAddresses().isEmpty())
                 return "Peer " + key.toBase64() + " published > 90m ago with no addresses";
             RouterAddress ra = routerInfo.getTargetAddress("SSU");
             if (ra != null) {

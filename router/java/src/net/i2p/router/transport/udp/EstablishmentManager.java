@@ -359,14 +359,14 @@ public class EstablishmentManager {
 /********
     private int locked_admitQueued() {
         int admitted = 0;
-        while ( (_queuedOutbound.size() > 0) && (_outboundStates.size() < getMaxConcurrentEstablish()) ) {
+        while ( (!_queuedOutbound.isEmpty()) && (_outboundStates.size() < getMaxConcurrentEstablish()) ) {
             // ok, active shrunk, lets let some queued in.  duplicate the synchronized 
             // section from the add(
 
             RemoteHostId to = (RemoteHostId)_queuedOutbound.keySet().iterator().next();
             List queued = (List)_queuedOutbound.remove(to);
 
-            if (queued.size() <= 0)
+            if (queued.isEmpty())
                 continue;
             
             OutNetMessage msg = (OutNetMessage)queued.get(0);

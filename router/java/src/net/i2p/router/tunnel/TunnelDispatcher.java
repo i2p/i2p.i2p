@@ -649,7 +649,7 @@ public class TunnelDispatcher implements Service {
     public void dropBiggestParticipating() {
 
        List<HopConfig> partTunnels = listParticipatingTunnels();
-       if ((partTunnels == null) || (partTunnels.size() == 0)) {
+       if ((partTunnels == null) || (partTunnels.isEmpty())) {
            if (_log.shouldLog(Log.ERROR))
                _log.error("Not dropping tunnel, since partTunnels was null or had 0 items!");
            return;
@@ -745,7 +745,7 @@ public class TunnelDispatcher implements Service {
             Long dropTime = new Long(cfg.getExpiration() + 2*Router.CLOCK_FUDGE_FACTOR + LEAVE_BATCH_TIME);
             boolean noTunnels;
             synchronized (LeaveTunnel.this) {
-                noTunnels = _configs.size() <= 0;
+                noTunnels = _configs.isEmpty();
                 _configs.add(cfg);
                 _times.add(dropTime);
             
@@ -777,13 +777,13 @@ public class TunnelDispatcher implements Service {
             long now = getContext().clock().now() + LEAVE_BATCH_TIME; // leave all expiring in next 10 sec
             while (true) {
                 synchronized (LeaveTunnel.this) {
-                    if (_configs.size() <= 0)
+                    if (_configs.isEmpty())
                         return;
                     nextTime = _times.get(0);
                     if (nextTime.longValue() <= now) {
                         cur = _configs.remove(0);
                         _times.remove(0);
-                        if (_times.size() > 0)
+                        if (!_times.isEmpty())
                             nextTime = _times.get(0);
                         else
                             nextTime = null;

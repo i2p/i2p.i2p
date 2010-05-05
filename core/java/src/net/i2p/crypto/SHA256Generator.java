@@ -52,7 +52,7 @@ public final class SHA256Generator {
     private Sha256Standalone acquireGnu() {
         Sha256Standalone rv = null;
         synchronized (_digestsGnu) {
-            if (_digestsGnu.size() > 0)
+            if (!_digestsGnu.isEmpty())
                 rv = (Sha256Standalone)_digestsGnu.remove(0);
         }
         if (rv != null)

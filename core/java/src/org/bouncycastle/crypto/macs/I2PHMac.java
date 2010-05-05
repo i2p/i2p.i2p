@@ -172,7 +172,7 @@ implements Mac
     private static byte[] acquireTmp(int sz) {
         byte rv[] = null;
         synchronized (_tmpBuf[sz == 32 ? 0 : 1]) {
-            if (_tmpBuf[sz == 32 ? 0 : 1].size() > 0)
+            if (!_tmpBuf[sz == 32 ? 0 : 1].isEmpty())
                 rv = (byte[])_tmpBuf[sz == 32 ? 0 : 1].remove(0);
         }
         if (rv != null)

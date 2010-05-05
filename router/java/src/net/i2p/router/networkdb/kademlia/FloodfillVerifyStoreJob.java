@@ -138,7 +138,7 @@ public class FloodfillVerifyStoreJob extends JobImpl {
         Hash rkey = getContext().routingKeyGenerator().getRoutingKey(_key);
         FloodfillPeerSelector sel = (FloodfillPeerSelector)_facade.getPeerSelector();
         List<Hash> peers = sel.selectFloodfillParticipants(rkey, 1, _ignore, _facade.getKBuckets());
-        if (peers.size() > 0)
+        if (!peers.isEmpty())
             return peers.get(0);
         
         if (_log.shouldLog(Log.WARN))

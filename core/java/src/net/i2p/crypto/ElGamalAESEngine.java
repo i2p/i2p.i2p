@@ -104,7 +104,7 @@ public class ElGamalAESEngine {
             decrypted = decryptExistingSession(data, key, targetPrivateKey, foundTags, usedKey, foundKey);
             if (decrypted != null) {
                 _context.statManager().updateFrequency("crypto.elGamalAES.decryptExistingSession");
-                if ( (foundTags.size() > 0) && (_log.shouldLog(Log.DEBUG)) )
+                if ( (!foundTags.isEmpty()) && (_log.shouldLog(Log.DEBUG)) )
                     _log.debug(id + ": ElG/AES decrypt success with " + st + ": found tags: " + foundTags);
                 wasExisting = true;
             } else {
@@ -118,7 +118,7 @@ public class ElGamalAESEngine {
             decrypted = decryptNewSession(data, targetPrivateKey, foundTags, usedKey, foundKey);
             if (decrypted != null) {
                 _context.statManager().updateFrequency("crypto.elGamalAES.decryptNewSession");
-                if ( (foundTags.size() > 0) && (_log.shouldLog(Log.DEBUG)) )
+                if ( (!foundTags.isEmpty()) && (_log.shouldLog(Log.DEBUG)) )
                     _log.debug("ElG decrypt success: found tags: " + foundTags);
             } else {
                 _context.statManager().updateFrequency("crypto.elGamalAES.decryptFailed");
@@ -131,7 +131,7 @@ public class ElGamalAESEngine {
             //_log.debug("Unable to decrypt the data starting with tag [" + st + "] - did the tag expire recently?", new Exception("Decrypt failure"));
         }
 
-        if (foundTags.size() > 0) {
+        if (!foundTags.isEmpty()) {
             if (foundKey.getData() != null) {
                 if (_log.shouldLog(Log.DEBUG)) 
                     _log.debug("Found key: " + foundKey.toBase64() + " tags: " + foundTags + " wasExisting? " + wasExisting);

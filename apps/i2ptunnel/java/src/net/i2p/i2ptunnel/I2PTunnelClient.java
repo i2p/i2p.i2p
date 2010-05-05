@@ -54,7 +54,7 @@ public class I2PTunnelClient extends I2PTunnelClientBase {
             }
         }
 
-        if (dests.size() <= 0) {
+        if (dests.isEmpty()) {
             l.log("No target destinations found");
             notifyEvent("openClientResult", "error");
             return;

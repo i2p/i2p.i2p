@@ -1301,7 +1301,7 @@ public class HttpContext extends Container
 
         List scss= _constraintMap.getMatches(pathInContext);
         String pattern=null;
-        if (scss != null && scss.size() > 0)
+        if (scss != null && !scss.isEmpty())
         {
             Object constraints= null;
 

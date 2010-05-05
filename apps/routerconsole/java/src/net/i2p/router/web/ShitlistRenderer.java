@@ -58,7 +58,7 @@ public class ShitlistRenderer {
             else
                 buf.append(_("Banned until restart or in {0}", expireString));
             Set transports = entry.transports;
-            if ( (transports != null) && (transports.size() > 0) )
+            if ( (transports != null) && (!transports.isEmpty()) )
                 buf.append(" on the following transport: ").append(transports);
             if (entry.cause != null) {
                 buf.append("<br>\n");

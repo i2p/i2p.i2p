@@ -6,9 +6,11 @@ import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
 
 class ContextHelper {
+
+    /** @throws IllegalStateException if no context available */
     public static RouterContext getContext(String contextId) {
         List contexts = RouterContext.listContexts();
-        if ( (contexts == null) || (contexts.size() <= 0) ) 
+        if ( (contexts == null) || (contexts.isEmpty()) ) 
             throw new IllegalStateException("No contexts. This is usually because the router is either starting up or shutting down.");
         if ( (contextId == null) || (contextId.trim().length() <= 0) )
             return (RouterContext)contexts.get(0);

@@ -96,7 +96,7 @@ public class FloodSearchJob extends JobImpl {
                     removed = new ArrayList(_onFailed);
                     _onFailed.clear();
                 }
-                while (removed.size() > 0)
+                while (!removed.isEmpty())
                     getContext().jobQueue().addJob(removed.remove(0));
                 getContext().messageRegistry().unregisterPending(out);
                 return;
@@ -140,7 +140,7 @@ public class FloodSearchJob extends JobImpl {
                 removed = new ArrayList(_onFailed);
                 _onFailed.clear();
             }
-            while (removed.size() > 0)
+            while (!removed.isEmpty())
                 getContext().jobQueue().addJob(removed.remove(0));
         }
     }
@@ -155,7 +155,7 @@ public class FloodSearchJob extends JobImpl {
             removed = new ArrayList(_onFind);
             _onFind.clear();
         }
-        while (removed.size() > 0)
+        while (!removed.isEmpty())
             getContext().jobQueue().addJob(removed.remove(0));
     }
 

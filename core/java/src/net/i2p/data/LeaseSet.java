@@ -201,7 +201,7 @@ public class LeaseSet extends DataStructureImpl {
      * @return earliest end date of any lease in the set, or -1 if there are no leases
      */
     public long getEarliestLeaseDate() {
-        if (_leases.size() <= 0)
+        if (_leases.isEmpty())
             return -1;
         return _firstExpiration;
     }

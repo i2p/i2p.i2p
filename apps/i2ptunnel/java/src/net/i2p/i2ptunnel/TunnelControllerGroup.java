@@ -329,7 +329,7 @@ public class TunnelControllerGroup {
             Set owners = (Set)_sessions.get(session);
             if (owners != null) {
                 owners.remove(controller);
-                if (owners.size() <= 0) {
+                if (owners.isEmpty()) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("After releasing session " + session + " by " + controller + ", no more owners remain");
                     shouldClose = true;

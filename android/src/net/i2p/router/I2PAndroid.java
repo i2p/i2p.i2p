@@ -69,7 +69,7 @@ public class I2PAndroid extends Activity
 
         // from routerconsole ContextHelper
         List contexts = RouterContext.listContexts();
-        if ( (contexts == null) || (contexts.size() <= 0) ) 
+        if ( (contexts == null) || (contexts.isEmpty()) ) 
             throw new IllegalStateException("No contexts. This is usually because the router is either starting up or shutting down.");
         RouterContext ctx = (RouterContext)contexts.get(0);
 

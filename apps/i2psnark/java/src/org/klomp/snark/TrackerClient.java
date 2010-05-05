@@ -163,7 +163,7 @@ public class TrackerClient extends I2PAppThread
         }
     }
 
-    if (tlist.size() <= 0) {
+    if (tlist.isEmpty()) {
         // FIXME really need to get this message to the gui
         stop = true;
         _log.error("No valid trackers for infoHash: " + infoHash);

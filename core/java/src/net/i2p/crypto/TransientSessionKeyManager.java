@@ -307,7 +307,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
     public TagSetHandle tagsDelivered(PublicKey target, SessionKey key, Set<SessionTag> sessionTags) {
         if (_log.shouldLog(Log.DEBUG)) {
             //_log.debug("Tags delivered to set " + set + " on session " + sess);
-            if (sessionTags.size() > 0)
+            if (!sessionTags.isEmpty())
                 _log.debug("Tags delivered: " + sessionTags.size() + " for key: " + key + ": " + sessionTags);
         }
         OutboundSession sess = getSession(target);
@@ -415,7 +415,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
         if (overage > 0)
             clearExcess(overage);
 
-        if ( (sessionTags.size() <= 0) && (_log.shouldLog(Log.DEBUG)) )
+        if ( (sessionTags.isEmpty()) && (_log.shouldLog(Log.DEBUG)) )
             _log.debug("Received 0 tags for key " + key);
         //if (false) aggressiveExpire();
     }
@@ -785,7 +785,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
             long now = _context.clock().now();
             _lastUsed = now;
             synchronized (_tagSets) {
-                while (_tagSets.size() > 0) {
+                while (!_tagSets.isEmpty()) {
                     TagSet set = _tagSets.get(0);
                     if (set.getDate() + SESSION_TAG_DURATION_MS > now) {
                         SessionTag tag = set.consumeNext();
@@ -830,7 +830,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
             synchronized (_tagSets) {
                 for (Iterator<TagSet> iter = _tagSets.iterator(); iter.hasNext();) {
                     TagSet set = iter.next();
-                    if ( (set.getDate() > last) && (set.getTags().size() > 0) ) 
+                    if ( (set.getDate() > last) && (!set.getTags().isEmpty()) ) 
                         last = set.getDate();
                 }
             }

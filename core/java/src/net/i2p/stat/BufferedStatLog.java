@@ -94,7 +94,7 @@ public class BufferedStatLog implements StatLog {
                     _statFilters.clear();
                     while (tok.hasMoreTokens())
                         _statFilters.add(tok.nextToken().trim());
-                    _filtersSpecified = _statFilters.size() > 0;
+                    _filtersSpecified = !_statFilters.isEmpty();
                 }
             }
             _lastFilters = val;

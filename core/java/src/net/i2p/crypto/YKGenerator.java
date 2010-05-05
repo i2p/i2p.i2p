@@ -110,7 +110,7 @@ class YKGenerator {
     public static BigInteger[] getNextYK() {
         if (true) {
             synchronized (_values) {
-                if (_values.size() > 0) {
+                if (!_values.isEmpty()) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Sufficient precalculated YK values - fetch the existing");
                     return (BigInteger[]) _values.remove(0);

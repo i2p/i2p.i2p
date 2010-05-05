@@ -70,7 +70,7 @@ public class ConfigStatsHelper extends HelperBase {
      * @return true if a valid stat is available, otherwise false
      */
     public boolean hasMoreStats() {
-        if (_stats.size() <= 0)
+        if (_stats.isEmpty())
             return false;
         _currentIsGraphed = false;
         _currentStatName = (String)_stats.remove(0);

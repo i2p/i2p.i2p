@@ -226,7 +226,7 @@ class PeerManager {
         int index = _context.random().nextInt(Integer.MAX_VALUE);
         synchronized (_capabilitiesByPeer) {
             List peers = locked_getPeers(capability);
-            if ( (peers != null) && (peers.size() > 0) ) {
+            if ( (peers != null) && (!peers.isEmpty()) ) {
                 index = index % peers.size();
                 return (Hash)peers.get(index);
             }

@@ -140,7 +140,7 @@ public class PeerSelector {
         public List<Hash> get(int howMany) {
             List<Hash> rv = new ArrayList(howMany);
             for (int i = 0; i < howMany; i++) {
-                if (_sorted.size() <= 0)
+                if (_sorted.isEmpty())
                     break;
                 rv.add(_sorted.remove(_sorted.firstKey()));
             }

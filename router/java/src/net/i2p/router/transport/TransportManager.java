@@ -84,7 +84,7 @@ public class TransportManager implements TransportEventListener {
         }
         if (enableNTCP(_context))
             addTransport(new NTCPTransport(_context));
-        if (_transports.size() <= 0)
+        if (_transports.isEmpty())
             _log.log(Log.CRIT, "No transports are enabled");
     }
     
@@ -223,7 +223,7 @@ public class TransportManager implements TransportEventListener {
       * Use for throttling in the router.
       */
     public boolean haveHighOutboundCapacity() { 
-        if (_transports.size() <= 0)
+        if (_transports.isEmpty())
             return false;
         for (int i = 0; i < _transports.size(); i++) {
             if (!_transports.get(i).haveCapacity(HIGH_CAPACITY_PCT))
@@ -255,7 +255,7 @@ public class TransportManager implements TransportEventListener {
         Vector skews = new Vector();
         for (int i = 0; i < _transports.size(); i++) {
             Vector tempSkews = _transports.get(i).getClockSkews();
-            if ((tempSkews == null) || (tempSkews.size() <= 0)) continue;
+            if ((tempSkews == null) || (tempSkews.isEmpty())) continue;
             skews.addAll(tempSkews);
         }
         if (_log.shouldLog(Log.DEBUG))
@@ -373,7 +373,7 @@ public class TransportManager implements TransportEventListener {
     
     public TransportBid getBid(OutNetMessage msg) {
         List<TransportBid> bids = getBids(msg);
-        if ( (bids == null) || (bids.size() <= 0) )
+        if ( (bids == null) || (bids.isEmpty()) )
             return null;
         else
             return bids.get(0);

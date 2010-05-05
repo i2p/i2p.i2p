@@ -322,7 +322,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
                 handler = new UpdateHandler((RouterContext)_context);
             } else {
                 List contexts = RouterContext.listContexts();
-                if (contexts.size() > 0)
+                if (!contexts.isEmpty())
                     handler = new UpdateHandler((RouterContext)contexts.get(0));
                 else
                     _log.log(Log.CRIT, "No router context to update with?");

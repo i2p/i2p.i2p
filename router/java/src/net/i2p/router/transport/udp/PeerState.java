@@ -749,7 +749,7 @@ public class PeerState {
             }
             if (_currentACKs.isEmpty())
                 _wantACKSendSince = -1;
-            if (alwaysIncludeRetransmissions || rv.size() > 0) {
+            if (alwaysIncludeRetransmissions || !rv.isEmpty()) {
                 // now repeat by putting in some old ACKs
                 // randomly selected from the Resend queue.
                 // Maybe we should only resend each one a certain number of times...

@@ -180,7 +180,7 @@ public class SimpleTimer {
                         long nextEventDelay = -1;
                         Object nextEvent = null;
                         while(runn.getAnswer()) {
-                            if(_events.size() <= 0) {
+                            if(_events.isEmpty()) {
                                 break;
                             }
                             Long when = (Long)_events.firstKey();
@@ -196,7 +196,7 @@ public class SimpleTimer {
                                 break;
                             }
                         }
-                        if (eventsToFire.size() <= 0) { 
+                        if (eventsToFire.isEmpty()) { 
                             if (nextEventDelay != -1) {
                                 if (_log.shouldLog(Log.DEBUG))
                                     _log.debug("Next event in " + nextEventDelay + ": " + nextEvent);
