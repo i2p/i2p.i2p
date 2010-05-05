@@ -85,16 +85,16 @@ public class FormHandler {
     public String getAllMessages() { 
         validate();
         process();
-        if (_errors.size() <= 0 && _notices.size() <= 0)
+        if (_errors.isEmpty() && _notices.isEmpty())
             return "";
         StringBuilder buf = new StringBuilder(512);
         buf.append("<div class=\"messages\" id=\"messages\"><p>");
-        if (_errors.size() > 0) {
+        if (!_errors.isEmpty()) {
             buf.append("<span class=\"error\">");
             buf.append(render(_errors));
             buf.append("</span>");
         }
-        if (_notices.size() > 0) {
+        if (!_notices.isEmpty()) {
             buf.append("<span class=\"notice\">");
             buf.append(render(_notices));
             buf.append("</span>");
@@ -174,8 +174,8 @@ public class FormHandler {
         }
     }
     
-    private String render(List<String> source) {
-        if (source.size() <= 0) {
+    private static String render(List<String> source) {
+        if (source.isEmpty()) {
             return "";
         } else {
             StringBuilder buf = new StringBuilder(512);
