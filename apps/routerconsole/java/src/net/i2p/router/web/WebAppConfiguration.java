@@ -54,7 +54,7 @@ public class WebAppConfiguration implements WebApplicationContext.Configuration 
         I2PAppContext i2pContext = I2PAppContext.getGlobalContext();
         File libDir = new File(i2pContext.getBaseDir(), "lib");
         // FIXME this only works if war is the same name as the plugin
-        File pluginDir = new File(i2pContext.getAppDir(),
+        File pluginDir = new File(i2pContext.getConfigDir(),
                                         PluginUpdateHandler.PLUGIN_DIR + ctxPath);
 
         File dir = libDir;
