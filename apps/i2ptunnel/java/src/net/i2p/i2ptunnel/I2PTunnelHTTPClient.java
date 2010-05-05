@@ -508,7 +508,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         }
 
                         line = method + " " + request.substring(pos);
-                    } else if (host.toLowerCase().equals("localhost") || host.equals("127.0.0.1")) {
+                    } else if (host.toLowerCase().equals("localhost") || host.equals("127.0.0.1") ||
+                               host.startsWith("192.168.")) {
+                        // if somebody is trying to get to 192.168.example.com, oh well
                         if (out != null) {
                             out.write(getErrorPage("localhost", ERR_LOCALHOST));
                             writeFooter(out);
