@@ -75,7 +75,7 @@ public class RouterConsoleRunner {
         _server = new Server();
         boolean rewrite = false;
         Properties props = webAppProperties();
-        if (props.size() <= 0) {
+        if (props.isEmpty()) {
             props.setProperty(PREFIX + ROUTERCONSOLE + ENABLED, "true");
             rewrite = true;
         }
@@ -161,6 +161,7 @@ public class RouterConsoleRunner {
                                "If so, you may ignore this error, or remove the\n" +
                                "\"::1,\" in the \"clientApp.0.args\" line of the clients.config file.\n" +
                                "Exception: " + me);
+            me.printStackTrace();
         }
 
         if (baseHandler != null) {
