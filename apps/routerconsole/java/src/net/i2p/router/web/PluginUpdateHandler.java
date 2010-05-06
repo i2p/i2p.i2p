@@ -150,7 +150,7 @@ public class PluginUpdateHandler extends UpdateHandler {
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
             updateStatus("<b>" + _("Plugin downloaded") + "</b>");
             File f = new File(_updateFile);
-            File appDir = new File(_context.getAppDir(), PLUGIN_DIR);
+            File appDir = new File(_context.getConfigDir(), PLUGIN_DIR);
             if ((!appDir.exists()) && (!appDir.mkdir())) {
                 f.delete();
                 statusDone("<b>" + _("Cannot create plugin directory {0}", appDir.getAbsolutePath()) + "</b>");

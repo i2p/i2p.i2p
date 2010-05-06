@@ -147,7 +147,7 @@ public abstract class TransportImpl implements Transport {
     public OutNetMessage getNextMessage() {
         OutNetMessage msg = null;
         synchronized (_sendPool) {
-            if (_sendPool.size() <= 0) return null;
+            if (_sendPool.isEmpty()) return null;
             msg = (OutNetMessage)_sendPool.remove(0); // use priority queues later
         }
         msg.beginSend();

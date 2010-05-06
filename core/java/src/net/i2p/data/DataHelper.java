@@ -30,6 +30,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -965,16 +966,22 @@ public class DataHelper {
         out.write(data);
     }
 
-    public static List sortStructures(Collection dataStructures) {
-        if (dataStructures == null) return new ArrayList();
-        ArrayList rv = new ArrayList(dataStructures.size());
-        TreeMap tm = new TreeMap();
-        for (Iterator iter = dataStructures.iterator(); iter.hasNext();) {
-            DataStructure struct = (DataStructure) iter.next();
+    /**
+     *  Sort based on the Hash of the DataStructure
+     *  Warning - relatively slow.
+     *  Only used by RouterInfo
+     *  Why? Just because it has to be consistent so signing will work?
+     *  How to spec as returning the same type as the param?
+     */
+    public static List<? extends DataStructure> sortStructures(Collection<? extends DataStructure> dataStructures) {
+        if (dataStructures == null) return Collections.EMPTY_LIST;
+        ArrayList<DataStructure> rv = new ArrayList(dataStructures.size());
+        TreeMap<String, DataStructure> tm = new TreeMap();
+        for (DataStructure struct : dataStructures) {
             tm.put(struct.calculateHash().toString(), struct);
         }
-        for (Iterator iter = tm.values().iterator(); iter.hasNext();) {
-            rv.add(iter.next());
+        for (DataStructure struct : tm.values()) {
+            rv.add(struct);
         }
         return rv;
     }

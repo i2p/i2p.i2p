@@ -88,7 +88,7 @@ public class ConfigClientsHelper extends HelperBase {
                 String app = name.substring(PluginStarter.PREFIX.length(), name.lastIndexOf(PluginStarter.ENABLED));
                 String val = props.getProperty(name);
                 Properties appProps = PluginStarter.pluginProperties(_context, app);
-                if (appProps.size() <= 0)
+                if (appProps.isEmpty())
                     continue;
                 StringBuilder desc = new StringBuilder(256);
                 desc.append("<table border=\"0\">")

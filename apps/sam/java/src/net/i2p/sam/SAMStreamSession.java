@@ -739,7 +739,7 @@ public class SAMStreamSession {
                 data = null;
                 try {
                     synchronized (_data) {
-                        if (_data.size() > 0) {
+                        if (!_data.isEmpty()) {
                             data = (ByteArray)_data.remove(0);
                         } else if (_shuttingDownGracefully) {
                             /* No data left and shutting down gracefully?

@@ -2,6 +2,7 @@ package net.i2p.router.web;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.ClassLoader;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -48,6 +49,7 @@ public class PluginStarter implements Runnable {
                                                       "midnight" };
     private static Map<String, ThreadGroup> pluginThreadGroups = new ConcurrentHashMap<String, ThreadGroup>();   // one thread group per plugin (map key=plugin name)
     private static Map<String, Collection<Job>> pluginJobs = new ConcurrentHashMap<String, Collection<Job>>();
+    private static Map<String, ClassLoader> _clCache = new ConcurrentHashMap();
 
     public PluginStarter(RouterContext ctx) {
         _context = ctx;
@@ -87,7 +89,7 @@ public class PluginStarter implements Runnable {
      */
     static boolean startPlugin(RouterContext ctx, String appName) throws Exception {
         Log log = ctx.logManager().getLog(PluginStarter.class);
-        File pluginDir = new File(ctx.getAppDir(), PluginUpdateHandler.PLUGIN_DIR + '/' + appName);
+        File pluginDir = new File(ctx.getConfigDir(), PluginUpdateHandler.PLUGIN_DIR + '/' + appName);
         if ((!pluginDir.exists()) || (!pluginDir.isDirectory())) {
             log.error("Cannot start nonexistent plugin: " + appName);
             return false;
@@ -195,7 +197,7 @@ public class PluginStarter implements Runnable {
      */
     static boolean stopPlugin(RouterContext ctx, String appName) throws Exception {
         Log log = ctx.logManager().getLog(PluginStarter.class);
-        File pluginDir = new File(ctx.getAppDir(), PluginUpdateHandler.PLUGIN_DIR + '/' + appName);
+        File pluginDir = new File(ctx.getConfigDir(), PluginUpdateHandler.PLUGIN_DIR + '/' + appName);
         if ((!pluginDir.exists()) || (!pluginDir.isDirectory())) {
             log.error("Cannot stop nonexistent plugin: " + appName);
             return false;
@@ -244,7 +246,7 @@ public class PluginStarter implements Runnable {
     /** @return true on success - caller should call stopPlugin() first */
     static boolean deletePlugin(RouterContext ctx, String appName) throws Exception {
         Log log = ctx.logManager().getLog(PluginStarter.class);
-        File pluginDir = new File(ctx.getAppDir(), PluginUpdateHandler.PLUGIN_DIR + '/' + appName);
+        File pluginDir = new File(ctx.getConfigDir(), PluginUpdateHandler.PLUGIN_DIR + '/' + appName);
         if ((!pluginDir.exists()) || (!pluginDir.isDirectory())) {
             log.error("Cannot delete nonexistent plugin: " + appName);
             return false;
@@ -287,7 +289,7 @@ public class PluginStarter implements Runnable {
 
     /** plugin.config */
     public static Properties pluginProperties(I2PAppContext ctx, String appName) {
-        File cfgFile = new File(ctx.getAppDir(), PluginUpdateHandler.PLUGIN_DIR + '/' + appName + '/' + "plugin.config");
+        File cfgFile = new File(ctx.getConfigDir(), PluginUpdateHandler.PLUGIN_DIR + '/' + appName + '/' + "plugin.config");
         Properties rv = new Properties();
         try {
             DataHelper.loadProps(rv, cfgFile);
@@ -322,7 +324,7 @@ public class PluginStarter implements Runnable {
      */
     public static List<String> getPlugins() {
         List<String> rv = new ArrayList();
-        File pluginDir = new File(I2PAppContext.getGlobalContext().getAppDir(), PluginUpdateHandler.PLUGIN_DIR);
+        File pluginDir = new File(I2PAppContext.getGlobalContext().getConfigDir(), PluginUpdateHandler.PLUGIN_DIR);
         File[] files = pluginDir.listFiles();
         if (files == null)
             return rv;
@@ -405,6 +407,8 @@ public class PluginStarter implements Runnable {
                     argVal[i] = argVal[i].replace("$PLUGIN", pluginDir.getAbsolutePath());
                 }
             }
+
+            ClassLoader cl = null;
             if (app.classpath != null) {
                 String cp = new String(app.classpath);
                 if (cp.indexOf("$") >= 0) {
@@ -412,22 +416,41 @@ public class PluginStarter implements Runnable {
                     cp = cp.replace("$CONFIG", ctx.getConfigDir().getAbsolutePath());
                     cp = cp.replace("$PLUGIN", pluginDir.getAbsolutePath());
                 }
-                addToClasspath(cp, app.clientName, log);
+
+                // Old way - add for the whole JVM
+                //addToClasspath(cp, app.clientName, log);
+
+                // New way - add only for this client
+                // We cache the ClassLoader we start the client with, so
+                // we can reuse it for stopping and uninstalling.
+                // If we don't, the client won't be able to find its
+                // static members.
+                String clCacheKey = pluginName + app.className + app.args;
+                if (!action.equals("start"))
+                    cl = _clCache.get(clCacheKey);
+                if (cl == null) {
+                    URL[] urls = classpathToURLArray(cp, app.clientName, log);
+                    if (urls != null) {
+                        cl = new URLClassLoader(urls, ClassLoader.getSystemClassLoader());
+                        if (action.equals("start"))
+                            _clCache.put(clCacheKey, cl);
+                    }
+                }
             }
 
             if (app.delay < 0 && action.equals("start")) {
                 // this will throw exceptions
-                LoadClientAppsJob.runClientInline(app.className, app.clientName, argVal, log);
+                LoadClientAppsJob.runClientInline(app.className, app.clientName, argVal, log, cl);
             } else if (app.delay == 0 || !action.equals("start")) {
                 // quick check, will throw ClassNotFoundException on error
-                LoadClientAppsJob.testClient(app.className);
+                LoadClientAppsJob.testClient(app.className, cl);
                 // run this guy now
-                LoadClientAppsJob.runClient(app.className, app.clientName, argVal, log, pluginThreadGroup);
+                LoadClientAppsJob.runClient(app.className, app.clientName, argVal, log, pluginThreadGroup, cl);
             } else {
                 // quick check, will throw ClassNotFoundException on error
-                LoadClientAppsJob.testClient(app.className);
+                LoadClientAppsJob.testClient(app.className, cl);
                 // wait before firing it up
-                Job job = new LoadClientAppsJob.DelayedRunClient(ctx, app.className, app.clientName, argVal, app.delay, pluginThreadGroup);
+                Job job = new LoadClientAppsJob.DelayedRunClient(ctx, app.className, app.clientName, argVal, app.delay, pluginThreadGroup, cl);
                 ctx.jobQueue().addJob(job);
                 pluginJobs.get(pluginName).add(job);
             }
@@ -470,6 +493,7 @@ public class PluginStarter implements Runnable {
      *  but I don't see how to make it magically get used for everything.
      *  So add this to the whole JVM's classpath.
      */
+/******
     private static void addToClasspath(String classpath, String clientName, Log log) {
         StringTokenizer tok = new StringTokenizer(classpath, ",");
         while (tok.hasMoreTokens()) {
@@ -487,6 +511,33 @@ public class PluginStarter implements Runnable {
                 log.error("Plugin client " + clientName + " bad classpath element: " + f, e);
             }
         }
+    }
+*****/
+
+    /**
+     *  @return null if no valid elements
+     */
+    private static URL[] classpathToURLArray(String classpath, String clientName, Log log) {
+        StringTokenizer tok = new StringTokenizer(classpath, ",");
+        List<URL> urls = new ArrayList();
+        while (tok.hasMoreTokens()) {
+            String elem = tok.nextToken().trim();
+            File f = new File(elem);
+            if (!f.isAbsolute()) {
+                log.error("Plugin client " + clientName + " classpath element is not absolute: " + f);
+                continue;
+            }
+            try {
+                urls.add(f.toURI().toURL());
+                if (log.shouldLog(Log.WARN))
+                    log.warn("INFO: Adding plugin to classpath: " + f);
+            } catch (Exception e) {
+                log.error("Plugin client " + clientName + " bad classpath element: " + f, e);
+            }
+        }
+        if (urls.isEmpty())
+            return null;
+        return urls.toArray(new URL[urls.size()]);
     }
 
     /**

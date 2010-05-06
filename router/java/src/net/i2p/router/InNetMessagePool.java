@@ -356,7 +356,7 @@ public class InNetMessagePool implements Service {
             I2NPMessage msg = null;
             Hash from = null;
             synchronized (_pendingDataMessages) {
-                if (_pendingDataMessages.size() > 0) {
+                if (!_pendingDataMessages.isEmpty()) {
                     msg = (I2NPMessage)_pendingDataMessages.remove(0);
                     from = (Hash)_pendingDataMessagesFrom.remove(0);
                 }
@@ -379,7 +379,7 @@ public class InNetMessagePool implements Service {
             I2NPMessage msg = null;
             int remaining = 0;
             synchronized (_pendingGatewayMessages) {
-                if (_pendingGatewayMessages.size() > 0)
+                if (!_pendingGatewayMessages.isEmpty())
                     msg = (I2NPMessage)_pendingGatewayMessages.remove(0);
                 remaining = _pendingGatewayMessages.size();
             }
@@ -397,7 +397,7 @@ public class InNetMessagePool implements Service {
                 I2NPMessage msg = null;
                 try {
                     synchronized (_pendingGatewayMessages) {
-                        if (_pendingGatewayMessages.size() <= 0)
+                        if (_pendingGatewayMessages.isEmpty())
                             _pendingGatewayMessages.wait();
                         else
                             msg = (I2NPMessage)_pendingGatewayMessages.remove(0);
@@ -428,7 +428,7 @@ public class InNetMessagePool implements Service {
                 Hash from = null;
                 try {
                     synchronized (_pendingDataMessages) {
-                        if (_pendingDataMessages.size() <= 0) {
+                        if (_pendingDataMessages.isEmpty()) {
                             _pendingDataMessages.wait();
                         } else {
                             msg = (I2NPMessage)_pendingDataMessages.remove(0);

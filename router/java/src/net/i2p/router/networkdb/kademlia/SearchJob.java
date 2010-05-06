@@ -265,7 +265,7 @@ class SearchJob extends JobImpl {
         while (sent <= 0) {
             //boolean onlyFloodfill = onlyQueryFloodfillPeers(getContext());
             boolean onlyFloodfill = true;
-            if (_floodfillPeersExhausted && onlyFloodfill && _state.getPending().size() <= 0) {
+            if (_floodfillPeersExhausted && onlyFloodfill && _state.getPending().isEmpty()) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn(getJobId() + ": no non-floodfill peers left, and no more pending.  Searched: "
                               + _state.getAttempted().size() + " failed: " + _state.getFailed().size());
@@ -273,8 +273,8 @@ class SearchJob extends JobImpl {
                 return;
             }
             List closestHashes = getClosestRouters(_state.getTarget(), toCheck, attempted);
-            if ( (closestHashes == null) || (closestHashes.size() <= 0) ) {
-                if (_state.getPending().size() <= 0) {
+            if ( (closestHashes == null) || (closestHashes.isEmpty()) ) {
+                if (_state.getPending().isEmpty()) {
                     // we tried to find some peers, but there weren't any and no one else is going to answer
                     if (_log.shouldLog(Log.INFO))
                         _log.info(getJobId() + ": No peers left, and none pending!  Already searched: " 
@@ -746,7 +746,7 @@ class SearchJob extends JobImpl {
     private void handleDeferred(boolean success) {
         List deferred = null;
         synchronized (_deferredSearches) {
-            if (_deferredSearches.size() > 0) {
+            if (!_deferredSearches.isEmpty()) {
                 deferred = new ArrayList(_deferredSearches);
                 _deferredSearches.clear();
             }

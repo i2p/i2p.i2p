@@ -61,7 +61,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
             }
         }
 
-        if (dests.size() <= 0) {
+        if (dests.isEmpty()) {
             l.log("No target destinations found");
             notifyEvent("openClientResult", "error");
             return;

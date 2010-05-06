@@ -363,7 +363,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             }
         }
         
-        if (leases.size() <= 0) {
+        if (leases.isEmpty()) {
             if (_log.shouldLog(Log.INFO))
                 _log.info(getJobId() + ": No leases found from: " + _leaseSet);
             return false;
@@ -536,7 +536,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         ReplySelector selector = null;
         if (wantACK) {
             TagSetHandle tsh = null;
-            if ( (sessKey != null) && (tags != null) && (tags.size() > 0) ) {
+            if ( (sessKey != null) && (tags != null) && (!tags.isEmpty()) ) {
                 if (_leaseSet != null) {
                     SessionKeyManager skm = getContext().clientManager().getClientSessionKeyManager(_from.calculateHash());
                     if (skm != null)

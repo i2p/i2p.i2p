@@ -255,12 +255,12 @@
 	<defaultexcludes default="true"/>
     </target>
 
-    <!-- A few reeleases only, then back to updater. First release was 0.7.11 -->
+    <!-- A few reeleases only, then back to updater. Jetty fix for snark in 0.7.14 -->
     <target name="pkg" depends="distclean, updaterWithJettyFixes, preppkg, installer" />
 
     <target name="pkgclean" depends="deletepkg-temp">
         <delete>
-            <fileset dir="." includes="i2p.tar.bz2 install.jar i2pupdate.zip" />
+            <fileset dir="." includes="i2p.tar.bz2 install.jar i2pupdate.zip i2pupdate200.zip" />
         </delete>
     </target>
 
@@ -320,6 +320,10 @@
     </target>
 
     <target name="preppkg-base" depends="build, preplicenses, prepconsoleDocs">
+        <!-- if updater200 was run previously, it left *.pack files in pkg-temp -->
+        <delete>
+            <fileset dir="pkg-temp" includes="**/*.jar.pack **/*.war.pack" />
+        </delete>
         <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
         <copy file="build/jasper-compiler.jar" todir="pkg-temp/lib/" />
@@ -458,7 +462,8 @@
         <zip destfile="docs.zip" basedir="pkg-temp" whenempty="fail" />
     </target>
 
-    <target name="updater200" depends="prepupdate, preplicenses, pack200, zipit" />
+    <target name="updater200" depends="prepupdate, preplicenses, pack200, zipit200" />
+    <target name="updater200WithJettyFixes" depends="prepjupdatefixes, preplicenses, pack200, zipit200" />
     <target name="updater" depends="prepupdate, preplicenses, zipit" />
     <target name="updaterWithGeoIP" depends="prepupdate, prepgeoupdate, preplicenses, zipit" />
     <target name="updaterWithJetty" depends="prepjupdate, preplicenses, zipit" />
@@ -473,24 +478,27 @@
         <tar destfile="i2pupdate.tbz" basedir="pkg-temp" compression="bzip2" />
        -->
     </target>
+    <target name="zipit200">
+        <zip destfile="i2pupdate200.zip" basedir="pkg-temp" whenempty="fail" />
+    </target>
 
     <target name="pack200">
 <!-- *nix here -->
-        <exec executable="sh" osfamily="unix" failifexecutionfails="true">
+        <exec executable="sh" osfamily="unix" failonerror="true">
             <arg value="-c" />
             <arg value="for i in pkg-temp/lib/*.jar pkg-temp/webapps/*war; do echo pack200 $i; mv $i $i.jar; pack200 -g $i.pack $i.jar; rm -f $i.jar; done" />
         </exec>
-        <exec executable="sh" osfamily="mac" failifexecutionfails="true">
+        <exec executable="sh" osfamily="mac" failonerror="true">
             <arg value="-c" />
             <!-- pack200 will only pack to a .pack file, and only from a .jar file, so we put another .jar on the end -->
             <arg value="for i in pkg-temp/lib/*.jar pkg-temp/webapps/*war; do echo pack200 $i; mv $i $i.jar; pack200 -g $i.pack $i.jar; rm -f $i.jar; done" />
         </exec>
 <!-- windoz here : i admit, i hate escaped symbols in xml, indeed = =! -->
-		<exec executable="cmd" osfamily="windows" failifexecutionfails="true">
+		<exec executable="cmd" osfamily="windows" failonerror="true">
 			<arg value="/c" />
 			<arg value="for %i in (pkg-temp\webapps\*.war) do move %i %i.jar &amp;&amp; pack200 -g pkg-temp\webapps\%~ni.war.pack %i.jar &amp;&amp; del %i.jar" />
         </exec>
-		<exec executable="cmd" osfamily="windows" failifexecutionfails="true">
+		<exec executable="cmd" osfamily="windows" failonerror="true">
 			<arg value="/c" />
 			<arg value="for %i in (pkg-temp\lib\*.jar) do move %i %i.jar &amp;&amp; pack200 -g pkg-temp\lib\%~ni.jar.pack %i.jar &amp;&amp; del %i.jar" />
         </exec>
@@ -703,7 +711,10 @@
     <target name="distcleanWithDesktopgui" depends="distclean">
         <ant dir="apps/desktopgui" target="build_clean" />
     </target>
-    <target name="release" depends="pkg">
+
+    <!-- this is the same dependency as pkg, but with updater200 in the middle,
+         since preppkg puts too much stuff in pkg-temp -->
+    <target name="release" depends="distclean, updaterWithJettyFixes, updater200WithJettyFixes, preppkg, installer" >
         <echo message="================================================================" />
         <echo message="Did you update these files?" />
         <exec executable="ls" failonerror="true">
@@ -733,6 +744,7 @@
         <copy file="i2pupdate.zip" tofile="i2pupdate_${release.number}.zip" />
         <copy file="i2pinstall.exe" tofile="i2pinstall_${release.number}.exe" />
         <delete file="i2pupdate.sud" failonerror="false" />
+        <delete file="i2pupdate.su2" failonerror="false" />
         <input message="Enter private signing key file:" addproperty="release.privkey" />
         <fail message="You must enter a path." >
             <condition>
@@ -750,11 +762,6 @@
             <arg value="${release.privkey}" />
             <arg value="${release.number}" />
         </java>
-        <fail message="i2pupdate.sud generation failed!" >
-            <condition>
-                <length file="i2pupdate.sud" when="lt" length="1000000" />
-            </condition>
-        </fail>
         <echo message="Verify version and VALID signature:" />
         <java classname="net.i2p.crypto.TrustedUpdate" fork="true" failonerror="true">
             <classpath>
@@ -769,6 +776,32 @@
             </classpath>
             <arg value="showversion" />
             <arg value="i2pupdate.sud" />
+        </java>
+        <!-- now build and verify the packed sud from the packed zip -->
+        <java classname="net.i2p.crypto.TrustedUpdate" fork="true" failonerror="true">
+            <classpath>
+                <pathelement location="build/i2p.jar" />
+            </classpath>
+            <arg value="sign" />
+            <arg value="i2pupdate200.zip" />
+            <arg value="i2pupdate.su2" />
+            <arg value="${release.privkey}" />
+            <arg value="${release.number}" />
+        </java>
+        <echo message="Verify version and VALID signature:" />
+        <java classname="net.i2p.crypto.TrustedUpdate" fork="true" failonerror="true">
+            <classpath>
+                <pathelement location="build/i2p.jar" />
+            </classpath>
+            <arg value="verifysig" />
+            <arg value="i2pupdate.su2" />
+        </java>
+        <java classname="net.i2p.crypto.TrustedUpdate" fork="true" failonerror="true">
+            <classpath>
+                <pathelement location="build/i2p.jar" />
+            </classpath>
+            <arg value="showversion" />
+            <arg value="i2pupdate.su2" />
         </java>
         <!-- will this use the monotonerc file in the current workspace? -->
         <echo message="Checking out fresh copy into ../i2p-${release.number} for tarballing:" />
@@ -813,6 +846,7 @@
             <arg value="i2pinstall_${release.number}.exe" />
             <arg value="i2psource_${release.number}.tar.bz2" />
             <arg value="i2pupdate_${release.number}.zip" />
+            <arg value="i2pupdate.su2" />
             <arg value="i2pupdate.sud" />
             <arg value="i2pinstall_${release.number}.exe.sig" />
             <arg value="i2psource_${release.number}.tar.bz2.sig" />
@@ -823,11 +857,13 @@
             <arg value="i2pinstall_${release.number}.exe" />
             <arg value="i2psource_${release.number}.tar.bz2" />
             <arg value="i2pupdate_${release.number}.zip" />
+            <arg value="i2pupdate.su2" />
             <arg value="i2pupdate.sud" />
         </exec>
         <echo message="Don't forget to mtn tag w: i2p-${release.number}" />
         <echo message="... and mtn cert t:i2p-${release.number} branch i2p.i2p.release" />
     </target>
+
     <target name="debian">
         <!-- binary only -->
         <echo message="Did you update the version in these files?" />
@@ -854,6 +890,7 @@
             <arg value="-I_MTN" />
         </exec>
     </target>
+
 <!-- the following are appened to help build barebone portable version, 
      none of the above is modified for this purpose -->
 	<target name = "pkg-portable-clean">

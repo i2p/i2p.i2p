@@ -131,7 +131,7 @@ public class PacketBuilder {
             }
         }
 
-        if ( (partialACKsRemaining != null) && (partialACKsRemaining.size() > 0) ) {
+        if ( (partialACKsRemaining != null) && (!partialACKsRemaining.isEmpty()) ) {
             int origNumRemaining = partialACKsRemaining.size();
             int numPartialOffset = off;
             // leave it blank for now, since we could skip some

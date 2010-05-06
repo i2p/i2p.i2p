@@ -641,7 +641,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
             while (open) {
                 try {
                     synchronized (_waitingSockets) {
-                        if (_waitingSockets.size() <= 0)
+                        if (_waitingSockets.isEmpty())
                             _waitingSockets.wait();
                         else
                             s = (Socket)_waitingSockets.remove(0);

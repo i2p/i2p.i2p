@@ -73,7 +73,7 @@ public class AddressbookBean
 	}
 	public boolean isNotEmpty()
 	{
-		return addressbook != null && addressbook.size() > 0;
+		return addressbook != null && !addressbook.isEmpty();
 	}
 	public AddressbookBean()
 	{
@@ -89,7 +89,7 @@ public class AddressbookBean
 	{
 		long currentTime = System.currentTimeMillis();
 		
-		if( properties.size() > 0 &&  currentTime - configLastLoaded < 10000 )
+		if( !properties.isEmpty() &&  currentTime - configLastLoaded < 10000 )
 			return;
 		
 		FileInputStream fis = null;

@@ -294,7 +294,7 @@ public class TunnelGateway {
                 //if (_queue.size() > 10000) // stay in the synchronized block
                 //    System.out.println("foo!");
                 afterChecked = _context.clock().now();
-                if (_queue.size() > 0) {
+                if (!_queue.isEmpty()) {
                     if ( (remaining > 0) && (_log.shouldLog(Log.DEBUG)) )
                         _log.debug("Remaining before delayed flush preprocessing: " + _queue);
                     wantRequeue = _preprocessor.preprocessQueue(_queue, _sender, _receiver);

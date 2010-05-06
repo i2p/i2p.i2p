@@ -83,7 +83,7 @@ class FloodfillMonitorJob extends JobImpl {
         List floodfillPeers = _facade.getFloodfillPeers();
         long now = getContext().clock().now();
         // We know none at all! Must be our turn...
-        if (floodfillPeers == null || floodfillPeers.size() <= 0) {
+        if (floodfillPeers == null || floodfillPeers.isEmpty()) {
             _lastChanged = now;
             return true;
         }

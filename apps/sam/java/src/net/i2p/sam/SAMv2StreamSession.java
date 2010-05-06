@@ -371,7 +371,7 @@ public class SAMv2StreamSession extends SAMStreamSession
 						{
 							synchronized ( _data )
 							{
-								if ( _data.size() > 0 )
+								if ( !_data.isEmpty() )
 								{
 									int formerSize = _dataSize ;
 									data = ( ByteArray ) _data.remove ( 0 );

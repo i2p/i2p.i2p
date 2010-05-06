@@ -355,7 +355,7 @@ public class I2PSnarkUtil {
         while (tok.hasMoreTokens())
             rv.add(tok.nextToken());
         
-        if (rv.size() <= 0)
+        if (rv.isEmpty())
             return null;
         return rv;
     }

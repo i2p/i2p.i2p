@@ -19,6 +19,9 @@ public class CSSHelper extends HelperBase {
         if (userAgent != null && userAgent.contains("MSIE")) {
             url += FORCE + "/";
         } else {
+            // This is the first thing to use _context on most pages
+            if (_context == null)
+                throw new IllegalStateException("No contexts. This is usually because the router is either starting up or shutting down.");
             String theme = _context.getProperty(PROP_THEME_NAME, DEFAULT_THEME);
             url += theme + "/";
         }

@@ -443,7 +443,7 @@ public class FIFOBandwidthLimiter {
      *
      */
     private final void locked_satisfyInboundUnlimited(List<Request> satisfied) {
-        while (_pendingInboundRequests.size() > 0) {
+        while (!_pendingInboundRequests.isEmpty()) {
             SimpleRequest req = (SimpleRequest)_pendingInboundRequests.remove(0);
             int allocated = req.getPendingInboundRequested();
             _totalAllocatedInboundBytes.addAndGet(allocated);
@@ -558,7 +558,7 @@ public class FIFOBandwidthLimiter {
      *
      */
     private final void locked_satisfyOutboundUnlimited(List<Request> satisfied) {
-        while (_pendingOutboundRequests.size() > 0) {
+        while (!_pendingOutboundRequests.isEmpty()) {
             SimpleRequest req = (SimpleRequest)_pendingOutboundRequests.remove(0);
             int allocated = req.getPendingOutboundRequested();
             _totalAllocatedOutboundBytes.addAndGet(allocated);

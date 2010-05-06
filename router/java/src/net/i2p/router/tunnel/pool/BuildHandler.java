@@ -139,14 +139,14 @@ class BuildHandler {
                         } else {
                             break;
                         }
-                    } while (_inboundBuildMessages.size() > 0);
+                    } while (!_inboundBuildMessages.isEmpty());
                     
                     if (dropExpired > 0)
                         _context.throttle().setTunnelStatus(_x("Dropping tunnel requests: Too slow"));
 
                     // now pull off the oldest requests first (we're doing a tail-drop
                     // when adding)
-                    for (int i = 0; i < toHandle && _inboundBuildMessages.size() > 0; i++)
+                    for (int i = 0; i < toHandle && !_inboundBuildMessages.isEmpty(); i++)
                         handled.add(_inboundBuildMessages.remove(0));
                 //}
             }

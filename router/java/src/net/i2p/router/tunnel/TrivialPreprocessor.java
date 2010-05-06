@@ -59,7 +59,7 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
             buf = new StringBuilder(256);
             buf.append("Trivial preprocessing of ").append(pending.size()).append(" ");
         }
-        while (pending.size() > 0) {
+        while (!pending.isEmpty()) {
             TunnelGateway.Pending msg = pending.remove(0);
             long beforePreproc = System.currentTimeMillis();
             byte preprocessed[][] = preprocess(msg);

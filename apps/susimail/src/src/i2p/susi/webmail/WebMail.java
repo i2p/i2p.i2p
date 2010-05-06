@@ -1411,7 +1411,7 @@ public class WebMail extends HttpServlet
 		if( bccToSelf != null && bccToSelf.compareTo( "1" ) == 0 )
 			recipients.add( sender );
 		
-		if( recipients.size() == 0 ) {
+		if( recipients.isEmpty() ) {
 			ok = false;
 			sessionObject.error += "No recipients found.<br>";
 		}
@@ -1442,7 +1442,7 @@ public class WebMail extends HttpServlet
 			}
 			String boundary = "_="+(int)(Math.random()*Integer.MAX_VALUE)+""+(int)(Math.random()*Integer.MAX_VALUE);
 			boolean multipart = false;
-			if( sessionObject.attachments != null && sessionObject.attachments.size() > 0 ) {
+			if( sessionObject.attachments != null && !sessionObject.attachments.isEmpty() ) {
 				multipart = true;
 				body.append( "\r\nMIME-Version: 1.0\r\nContent-type: multipart/mixed; boundary=\"" + boundary + "\"\r\n\r\n" );
 			}
@@ -1515,7 +1515,7 @@ public class WebMail extends HttpServlet
 	{
 		out.println( button( SEND, "Send" ) +
 				button( CANCEL, "Cancel" ) + spacer +
-				(sessionObject.attachments != null && sessionObject.attachments.size() > 0 ? button( DELETE_ATTACHMENT, "Delete Attachment" ) : button2( DELETE_ATTACHMENT, "Delete Attachment" ) ) + spacer +
+				(sessionObject.attachments != null && (!sessionObject.attachments.isEmpty()) ? button( DELETE_ATTACHMENT, "Delete Attachment" ) : button2( DELETE_ATTACHMENT, "Delete Attachment" ) ) + spacer +
 				button( RELOAD, "Reload Config" ) + spacer +
 				button( LOGOUT, "Logout" ) );
 
@@ -1550,7 +1550,7 @@ public class WebMail extends HttpServlet
 				"<tr><td colspan=\"2\" align=\"center\"><hr></td></tr>\n" +
 				"<tr><td align=\"right\">New Attachment:</td><td align=\"left\"><input type=\"file\" size=\"50%\" name=\"" + NEW_FILENAME + "\" value=\"\"><input type=\"submit\" name=\"" + NEW_UPLOAD + "\" value=\"Upload File\"></td></tr>" );
 		
-		if( sessionObject.attachments != null && sessionObject.attachments.size() > 0 ) {
+		if( sessionObject.attachments != null && !sessionObject.attachments.isEmpty() ) {
 			boolean wroteHeader = false;
 			for( Iterator it = sessionObject.attachments.iterator(); it.hasNext(); ) {
 				if( !wroteHeader ) {

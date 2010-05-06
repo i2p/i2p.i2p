@@ -472,7 +472,7 @@ public class Blocklist {
         RouterInfo pinfo = _context.netDb().lookupRouterInfoLocally(peer);
         if (pinfo == null) return rv;
         Set<RouterAddress> paddr = pinfo.getAddresses();
-        if (paddr == null || paddr.size() == 0)
+        if (paddr == null || paddr.isEmpty())
             return rv;
         String oldphost = null;
         List<RouterAddress> pladdr = new ArrayList(paddr);
@@ -773,7 +773,7 @@ public class Blocklist {
         //out.write("<h2>Banned IPs</h2>");
         Set<Integer> singles = new TreeSet();
         singles.addAll(_singleIPBlocklist);
-        if (singles.size() > 0) {
+        if (!singles.isEmpty()) {
             out.write("<table><tr><td><b>Transient IPs</b></td></tr>");
             for (Iterator<Integer> iter = singles.iterator(); iter.hasNext(); ) {
                  int ip = iter.next().intValue();

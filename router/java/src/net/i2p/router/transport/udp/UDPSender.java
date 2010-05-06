@@ -106,12 +106,12 @@ public class UDPSender {
                 synchronized (_outboundQueue) {
                     // clear out any too-old packets
                     UDPPacket head = null;
-                    if (_outboundQueue.size() > 0) {
+                    if (!_outboundQueue.isEmpty()) {
                         head = (UDPPacket)_outboundQueue.get(0);
                         while (head.getLifetime() > MAX_HEAD_LIFETIME) {
                             _outboundQueue.remove(0);
                             removed++;
-                            if (_outboundQueue.size() > 0)
+                            if (!_outboundQueue.isEmpty())
                                 head = (UDPPacket)_outboundQueue.get(0);
                             else
                                 break;

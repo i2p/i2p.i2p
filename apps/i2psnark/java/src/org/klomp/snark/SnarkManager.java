@@ -30,7 +30,7 @@ public class SnarkManager implements Snark.CompleteListener {
     public static SnarkManager instance() { return _instance; }
     
     /** map of (canonical) filename to Snark instance (unsynchronized) */
-    private final Map _snarks;
+    private final Map<String, Snark> _snarks;
     private final Object _addSnarkLock;
     private /* FIXME final FIXME */ File _configFile;
     private Properties _config;
@@ -394,7 +394,7 @@ public class SnarkManager implements Snark.CompleteListener {
     private static final int MAX_FILES_PER_TORRENT = 512;
     
     /** set of filenames that we are dealing with */
-    public Set listTorrentFiles() { synchronized (_snarks) { return new HashSet(_snarks.keySet()); } }
+    public Set<String> listTorrentFiles() { synchronized (_snarks) { return new HashSet(_snarks.keySet()); } }
     /**
      * Grab the torrent given the (canonical) filename
      */

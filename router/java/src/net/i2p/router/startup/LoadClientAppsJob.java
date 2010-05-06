@@ -30,7 +30,7 @@ public class LoadClientAppsJob extends JobImpl {
             _loaded = true;
         }
         List apps = ClientAppConfig.getClientApps(getContext());
-        if (apps.size() <= 0) {
+        if (apps.isEmpty()) {
             _log.error("Warning - No client apps or router console configured - we are just a router");
             System.err.println("Warning - No client apps or router console configured - we are just a router");
             return;
@@ -56,23 +56,26 @@ public class LoadClientAppsJob extends JobImpl {
         private String _args[];
         private Log _log;
         private ThreadGroup _threadGroup;
+        private ClassLoader _cl;
 
         public DelayedRunClient(RouterContext enclosingContext, String className, String clientName, String args[], long delay) {
-            this(enclosingContext, className, clientName, args, delay, null);
+            this(enclosingContext, className, clientName, args, delay, null, null);
         }
         
-        public DelayedRunClient(RouterContext enclosingContext, String className, String clientName, String args[], long delay, ThreadGroup threadGroup) {
+        public DelayedRunClient(RouterContext enclosingContext, String className, String clientName, String args[],
+                                long delay, ThreadGroup threadGroup, ClassLoader cl) {
             super(enclosingContext);
             _className = className;
             _clientName = clientName;
             _args = args;
             _log = enclosingContext.logManager().getLog(LoadClientAppsJob.class);
             _threadGroup = threadGroup;
+            _cl = cl;
             getTiming().setStartAfter(getContext().clock().now() + delay);
         }
         public String getName() { return "Delayed client job"; }
         public void runJob() {
-            runClient(_className, _clientName, _args, _log, _threadGroup);
+            runClient(_className, _clientName, _args, _log, _threadGroup, _cl);
         }
     }
     
@@ -129,50 +132,81 @@ public class LoadClientAppsJob extends JobImpl {
      *  to propagate an error back to the user,
      *  since runClient() runs in a separate thread.
      *
+     *  @param cl can be null
      *  @since 0.7.13
      */
-    public static void testClient(String className) throws ClassNotFoundException {
-        Class.forName(className);
+    public static void testClient(String className, ClassLoader cl) throws ClassNotFoundException {
+        if (cl == null)
+            cl = ClassLoader.getSystemClassLoader();
+        Class.forName(className, false, cl);
     }
 
     /**
      *  Run client in this thread.
      *
+     *  @param clientName can be null
+     *  @param args can be null
      *  @throws just about anything, caller would be wise to catch Throwable
      *  @since 0.7.13
      */
     public static void runClientInline(String className, String clientName, String args[], Log log) throws Exception {
+        runClientInline(className, clientName, args, log, null);
+    }
+
+    /**
+     *  Run client in this thread.
+     *
+     *  @param clientName can be null
+     *  @param args can be null
+     *  @param cl can be null
+     *  @throws just about anything, caller would be wise to catch Throwable
+     *  @since 0.7.14
+     */
+    public static void runClientInline(String className, String clientName, String args[],
+                                       Log log, ClassLoader cl) throws Exception {
         if (log.shouldLog(Log.INFO))
             log.info("Loading up the client application " + clientName + ": " + className + " " + Arrays.toString(args));
         if (args == null)
             args = new String[0];
-        Class cls = Class.forName(className);
+        Class cls = Class.forName(className, true, cl);
         Method method = cls.getMethod("main", new Class[] { String[].class });
         method.invoke(cls, new Object[] { args });
     }
 
     /**
      *  Run client in a new thread.
+     *
+     *  @param clientName can be null
+     *  @param args can be null
      */
     public static void runClient(String className, String clientName, String args[], Log log) {
-        runClient(className, clientName, args, log, null);
+        runClient(className, clientName, args, log, null, null);
     }
     
     /**
      *  Run client in a new thread.
+     *
+     *  @param clientName can be null
+     *  @param args can be null
+     *  @param threadGroup can be null
+     *  @param cl can be null
+     *  @since 0.7.13
      */
-    public static void runClient(String className, String clientName, String args[], Log log, ThreadGroup threadGroup) {
+    public static void runClient(String className, String clientName, String args[], Log log,
+                                 ThreadGroup threadGroup, ClassLoader cl) {
         if (log.shouldLog(Log.INFO))
             log.info("Loading up the client application " + clientName + ": " + className + " " + Arrays.toString(args));
         I2PThread t;
         if (threadGroup != null)
-            t = new I2PThread(threadGroup, new RunApp(className, clientName, args, log));
+            t = new I2PThread(threadGroup, new RunApp(className, clientName, args, log, cl));
         else
-            t = new I2PThread(new RunApp(className, clientName, args, log));
+            t = new I2PThread(new RunApp(className, clientName, args, log, cl));
         if (clientName == null) 
             clientName = className + " client";
         t.setName(clientName);
         t.setDaemon(true);
+        if (cl != null)
+            t.setContextClassLoader(cl);
         t.start();
     }
 
@@ -181,7 +215,9 @@ public class LoadClientAppsJob extends JobImpl {
         private String _appName;
         private String _args[];
         private Log _log;
-        public RunApp(String className, String appName, String args[], Log log) { 
+        private ClassLoader _cl;
+
+        public RunApp(String className, String appName, String args[], Log log, ClassLoader cl) { 
             _className = className; 
             _appName = appName;
             if (args == null)
@@ -189,10 +225,15 @@ public class LoadClientAppsJob extends JobImpl {
             else
                 _args = args;
             _log = log;
+            if (cl == null)
+                _cl = ClassLoader.getSystemClassLoader();
+            else
+                _cl = cl;
         }
+
         public void run() {
             try {
-                Class cls = Class.forName(_className);
+                Class cls = Class.forName(_className, true, _cl);
                 Method method = cls.getMethod("main", new Class[] { String[].class });
                 method.invoke(cls, new Object[] { _args });
             } catch (Throwable t) {

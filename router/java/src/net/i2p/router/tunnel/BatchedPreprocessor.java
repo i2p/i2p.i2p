@@ -137,7 +137,7 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
         int beforeLooping = pending.size();
         
         // loop until the queue is empty
-        while (pending.size() > 0) {
+        while (!pending.isEmpty()) {
             int allocated = 0;
             long beforePendingLoop = System.currentTimeMillis();
 
@@ -252,7 +252,7 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
                         _context.statManager().addRateData("tunnel.writeDelay", cur.getLifetime(), cur.getData().length);
                     }
 
-                    if (pending.size() > 0) {
+                    if (!pending.isEmpty()) {
                         // rare
                         _pendingSince = _context.clock().now();
                         _context.statManager().addRateData("tunnel.batchFlushRemaining", pending.size(), beforeSize);

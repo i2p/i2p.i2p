@@ -49,7 +49,7 @@ public class SubscriptionsBean
 	{
 		long currentTime = System.currentTimeMillis();
 		
-		if( properties.size() > 0 &&  currentTime - configLastLoaded < 10000 )
+		if( !properties.isEmpty() &&  currentTime - configLastLoaded < 10000 )
 			return;
 		
 		FileInputStream fis = null;

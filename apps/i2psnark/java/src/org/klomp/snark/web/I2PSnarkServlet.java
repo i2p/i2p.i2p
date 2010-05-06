@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -176,7 +177,7 @@ public class I2PSnarkServlet extends Default {
         String uri = req.getRequestURI();
         out.write(TABLE_HEADER);
         out.write(_("Status"));
-        if (_manager.util().connected() && snarks.size() > 0) {
+        if (_manager.util().connected() && !snarks.isEmpty()) {
             out.write(" (<a href=\"");
             out.write(req.getRequestURI());
             if (peerParam != null) {
@@ -210,7 +211,7 @@ public class I2PSnarkServlet extends Default {
             out.write("\">");
             out.write(_("Stop All"));
             out.write("</a>");
-        } else if (snarks.size() > 0) {
+        } else if (!snarks.isEmpty()) {
             out.write("<a href=\"" + uri + "?action=StartAll&nonce=" + _nonce +
                       "\" title=\"");
             out.write(_("Start all torrents and the I2P tunnel"));
@@ -228,7 +229,7 @@ public class I2PSnarkServlet extends Default {
             displaySnark(out, snark, uri, i, stats, showPeers, showDebug);
         }
 
-        if (snarks.size() <= 0) {
+        if (snarks.isEmpty()) {
             out.write("<tr class=\"snarkTorrentEven\">" +
                       "<td class=\"snarkTorrentEven\" align=\"center\"" +
                       " colspan=\"8\"><i>");
@@ -485,11 +486,34 @@ public class I2PSnarkServlet extends Default {
         }
     }
     
-    private List getSortedSnarks(HttpServletRequest req) {
-        Set files = _manager.listTorrentFiles();
-        TreeSet fileNames = new TreeSet(Collator.getInstance()); // sorts it alphabetically
+    /**
+     *  Sort alphabetically in current locale, ignore case, ignore leading "the "
+     *  (I guess this is worth it, a lot of torrents start with "The "
+     *  These are full path names which makes it harder
+     *  @since 0.7.14
+     */
+    private class TorrentNameComparator implements Comparator<String> {
+        private final Comparator collator = Collator.getInstance();
+        private final String skip = _manager.getDataDir().getAbsolutePath() + File.separator;
+
+        public int compare(String l, String r) {
+            if (l.startsWith(skip))
+                l = l.substring(skip.length());
+            if (r.startsWith(skip))
+                r = r.substring(skip.length());
+            if (l.toLowerCase().startsWith("the "))
+                l = l.substring(4);
+            if (r.toLowerCase().startsWith("the "))
+                r = r.substring(4);
+            return collator.compare(l, r);
+        }
+    }
+
+    private List<Snark> getSortedSnarks(HttpServletRequest req) {
+        Set<String> files = _manager.listTorrentFiles();
+        TreeSet<String> fileNames = new TreeSet(new TorrentNameComparator());
         fileNames.addAll(files);
-        ArrayList rv = new ArrayList(fileNames.size());
+        ArrayList<Snark> rv = new ArrayList(fileNames.size());
         for (Iterator iter = fileNames.iterator(); iter.hasNext(); ) {
             String name = (String)iter.next();
             Snark snark = _manager.getTorrent(name);

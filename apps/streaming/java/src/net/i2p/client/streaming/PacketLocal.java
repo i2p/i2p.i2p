@@ -70,9 +70,9 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
      * @deprecated I2PSession throws out the tags
      */
     public void setTagsSent(Set tags) { 
-        if (tags != null && tags.size() > 0)
+        if (tags != null && !tags.isEmpty())
             _log.error("Who is sending tags thru the streaming lib? " + tags.size());
-        if ( (_tagsSent != null) && (_tagsSent.size() > 0) && (tags.size() > 0) ) {
+        if ( (_tagsSent != null) && (!_tagsSent.isEmpty()) && (!tags.isEmpty()) ) {
             //int old = _tagsSent.size();
             //_tagsSent.addAll(tags);
             if (!_tagsSent.equals(tags))
@@ -160,7 +160,7 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
         if (con != null)
             buf.append(" rtt ").append(con.getOptions().getRTT());
         
-        if ( (_tagsSent != null) && (_tagsSent.size() > 0) ) 
+        if ( (_tagsSent != null) && (!_tagsSent.isEmpty()) ) 
             buf.append(" with tags");
 
         if (_ackOn > 0)

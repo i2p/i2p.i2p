@@ -201,15 +201,17 @@ public class TunnelRenderer {
         out.write("</table>\n");
         if (in != null) {
             List pending = in.listPending();
-            if (pending.size() > 0)
+            if (!pending.isEmpty()) {
                 out.write("<div class=\"statusnotes\"><center><b>" + _("Build in progress") + ": " + pending.size() + " " + _("inbound") + "</b></center></div>\n");
-            live += pending.size();
+                live += pending.size();
+            }
         }
         if (outPool != null) {
             List pending = outPool.listPending();
-            if (pending.size() > 0)
+            if (!pending.isEmpty()) {
                 out.write("<div class=\"statusnotes\"><center><b>" + _("Build in progress") + ": " + pending.size() + " " + _("outbound") + "</b></center></div>\n");
-            live += pending.size();
+                live += pending.size();
+            }
         }
         if (live <= 0)
             out.write("<div class=\"statusnotes\"><center><b>" + _("No tunnels; waiting for the grace period to end.") + "</center></b></div>\n");

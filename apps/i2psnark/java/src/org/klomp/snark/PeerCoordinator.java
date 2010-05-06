@@ -272,7 +272,7 @@ public class PeerCoordinator implements PeerListener
         peerCount = 0;
       }
 
-    while (removed.size() > 0) {
+    while (!removed.isEmpty()) {
         Peer peer = (Peer)removed.remove(0);
         peer.disconnect();
         removePeerFromPieces(peer);
@@ -428,7 +428,7 @@ public class PeerCoordinator implements PeerListener
               }
           }
 
-        while (uploaders < maxUploaders && interested.size() > 0)
+        while (uploaders < maxUploaders && !interested.isEmpty())
           {
             Peer peer = (Peer)interested.remove(0);
             if (_log.shouldLog(Log.DEBUG))

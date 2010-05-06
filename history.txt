@@ -1,3 +1,17 @@
+2010-05-05 zzz
+    * build.xml: Create packed sud in release
+    * Console:
+      - Print stack trace if exception on startup
+      - IllegalStateException rather than NPE if no context
+    * EepGet: Limit max times to fail completely even if numRetries is higher
+    * i2psnark: Skip 'the' when sorting snarks
+    * I2PTunnelHTTPClient: Reject 192.168.*
+    * Plugins:
+      - Set classpath for specific client only, not for the whole JVM
+      - Use ConfigDir() not AppDir()
+    * Replace size() <= 0 with isEmpty() everywhere, ditto > 0 -> !isEmpty()
+    * RouterInfo: Clean up use of sortStructures()
+
 2010-05-02 zzz
     * ByteCache:
       - Add a per-cache stat

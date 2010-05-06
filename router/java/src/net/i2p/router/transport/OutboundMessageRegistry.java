@@ -185,7 +185,7 @@ public class OutboundMessageRegistry {
                 if (old instanceof List) {
                     List l = (List)old;
                     l.remove(msg);
-                    if (l.size() > 0) {
+                    if (!l.isEmpty()) {
                         _selectorToMessage.put(sel, l);
                         stillActive = true;
                     }
@@ -221,7 +221,7 @@ public class OutboundMessageRegistry {
                     }
                 }
             }
-            if (removing.size() > 0) {
+            if (!removing.isEmpty()) {
                 for (int i = 0; i < removing.size(); i++) {
                     MessageSelector sel = (MessageSelector)removing.get(i);
                     OutNetMessage msg = null;

@@ -185,7 +185,7 @@ public class NetDbRenderer {
         buf.append("<table border=\"0\" cellspacing=\"30\"><tr><th colspan=\"3\">").append(_("Network Database Router Statistics")).append("</th><tr><td>");
         // versions table
         List<String> versionList = new ArrayList(versions.objects());
-        if (versionList.size() > 0) {
+        if (!versionList.isEmpty()) {
             Collections.sort(versionList, Collections.reverseOrder(new VersionComparator()));
             buf.append("<table>\n");
             buf.append("<tr><th>" + _("Version") + "</th><th>" + _("Count") + "</th></tr>\n");
@@ -217,7 +217,7 @@ public class NetDbRenderer {
 
         // country table
         List<String> countryList = new ArrayList(countries.objects());
-        if (countryList.size() > 0) {
+        if (!countryList.isEmpty()) {
             Collections.sort(countryList, new CountryComparator());
             buf.append("<table>\n");
             buf.append("<tr><th align=\"left\">" + _("Country") + "</th><th>" + _("Count") + "</th></tr>\n");

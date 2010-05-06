@@ -253,7 +253,7 @@ public class ConnectionPacketHandler {
         else
             return false;
         
-        if ( (acked != null) && (acked.size() > 0) ) {
+        if ( (acked != null) && (!acked.isEmpty()) ) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(acked.size() + " of our packets acked with " + packet);
             // use the highest RTT, since these would likely be bunched together,

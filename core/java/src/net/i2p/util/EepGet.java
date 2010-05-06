@@ -72,6 +72,8 @@ public class EepGet {
     protected static final String USER_AGENT = "Wget/1.11.4";
     protected static final long CONNECT_TIMEOUT = 45*1000;
     protected static final long INACTIVITY_TIMEOUT = 60*1000;
+    /** maximum times to try without getting any data at all, even if numRetries is higher @since 0.7.14 */
+    protected static final int MAX_COMPLETE_FAILS = 5;
     
     public EepGet(I2PAppContext ctx, String proxyHost, int proxyPort, int numRetries, String outputFile, String url) {
         this(ctx, true, proxyHost, proxyPort, numRetries, outputFile, url);
@@ -473,7 +475,9 @@ public class EepGet {
             }
 
             _currentAttempt++;
-            if (_currentAttempt > _numRetries || !_keepFetching) 
+            if (_currentAttempt > _numRetries ||
+                (_alreadyTransferred == 0 && _currentAttempt > MAX_COMPLETE_FAILS) ||
+                !_keepFetching) 
                 break;
             try { 
                 long delay = _context.random().nextInt(60*1000);
