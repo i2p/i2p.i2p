@@ -244,7 +244,7 @@ public class SummaryBarRenderer {
            .append(_("Active"))
            .append(":</b></td><td align=\"right\">")
            .append(_helper.getActivePeers())
-           .append('/')
+           .append(" / ")
            .append(_helper.getActiveProfiles())
            .append("</td></tr>\n" +
 
@@ -328,54 +328,48 @@ public class SummaryBarRenderer {
                    "<table>\n" +
 
                    "<tr><td align=\"left\"><b>1s:</b></td><td align=\"right\">")
-           .append(_helper.getInboundSecondKBps())
-           .append('/')
-           .append(_helper.getOutboundSecondKBps())
-           .append("K/s</td></tr>\n" +
+           .append(_helper.getSecondKBps())
+           .append("Bps</td></tr>\n");
 
-                   "<tr><td align=\"left\"><b>5m:</b></td><td align=\"right\">")
-           .append(_helper.getInboundFiveMinuteKBps())
-           .append('/')
-           .append(_helper.getOutboundFiveMinuteKBps())
-           .append("K/s</td></tr>\n" +
+        if (_context.router().getUptime() > 6*60*1000) {
+            buf.append("<tr><td align=\"left\"><b>5m:</b></td><td align=\"right\">")
+           .append(_helper.getFiveMinuteKBps())
+           .append("Bps</td></tr>\n");
+        }
 
-                   "<tr><td align=\"left\"><b>")
+        if (_context.router().getUptime() > 2*60*1000) {
+            buf.append("<tr><td align=\"left\"><b>")
            .append(_("Total"))
            .append(":</b></td><td align=\"right\">")
-           .append(_helper.getInboundLifetimeKBps())
-           .append('/')
-           .append(_helper.getOutboundLifetimeKBps())
-           .append("K/s</td></tr>\n" +
+           .append(_helper.getLifetimeKBps())
+           .append("Bps</td></tr>\n");
+        }
 
-                   "<tr><td align=\"left\"><b>")
+        buf.append("<tr><td align=\"left\"><b>")
            .append(_("Used"))
            .append(":</b></td><td align=\"right\">")
            .append(_helper.getInboundTransferred())
-           .append('/')
+           .append(" / ")
            .append(_helper.getOutboundTransferred())
            .append("</td></tr></table>\n" +
 
                    "<hr><h3><a href=\"/tunnels.jsp\" target=\"_top\" title=\"")
            .append(_("View existing tunnels and tunnel build status"))
            .append("\">")
-           .append(_("Tunnels in/out"))
+           .append(_("Tunnels"))
            .append("</a></h3><hr>" +
                    "<table>\n" +
 
                    "<tr><td align=\"left\"><b>")
            .append(_("Exploratory"))
            .append(":</b></td><td align=\"right\">")
-           .append(_helper.getInboundTunnels())
-           .append('/')
-           .append(_helper.getOutboundTunnels())
+           .append(_helper.getInboundTunnels() + _helper.getOutboundTunnels())
            .append("</td></tr>\n" +
 
                   "<tr><td align=\"left\"><b>")
            .append(_("Client"))
            .append(":</b></td><td align=\"right\">")
-           .append(_helper.getInboundClientTunnels())
-           .append('/')
-           .append(_helper.getOutboundClientTunnels())
+           .append(_helper.getInboundClientTunnels() + _helper.getOutboundClientTunnels())
            .append("</td></tr>\n" +
 
                    "<tr><td align=\"left\"><b>")

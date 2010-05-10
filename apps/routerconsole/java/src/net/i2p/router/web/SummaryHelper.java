@@ -245,96 +245,86 @@ public class SummaryHelper extends HelperBase {
 ********/
  
     /**
-     * How fast we have been receiving data over the last second (pretty printed
-     * string with 2 decimal places representing the KBps)
-     *
+     *    @return "x.xx / y.yy {K|M}"
      */
-    public String getInboundSecondKBps() { 
+    public String getSecondKBps() { 
         if (_context == null) 
-            return "0";
-        double kbps = _context.bandwidthLimiter().getReceiveBps()/1024d;
-        DecimalFormat fmt = new DecimalFormat("##0.00");
-        return fmt.format(kbps);
-    }
-    /**
-     * How fast we have been sending data over the last second (pretty printed
-     * string with 2 decimal places representing the KBps)
-     *
-     */
-    public String getOutboundSecondKBps() { 
-        if (_context == null) 
-            return "0";
-        double kbps = _context.bandwidthLimiter().getSendBps()/1024d;
-        DecimalFormat fmt = new DecimalFormat("##0.00");
-        return fmt.format(kbps);
+            return "0 / 0";
+        return formatPair(_context.bandwidthLimiter().getReceiveBps(), 
+                          _context.bandwidthLimiter().getSendBps());
     }
     
     /**
-     * How fast we have been receiving data over the last 5 minutes (pretty printed
-     * string with 2 decimal places representing the KBps)
-     *
+     *    @return "x.xx / y.yy {K|M}"
      */
-    public String getInboundFiveMinuteKBps() {
+    public String getFiveMinuteKBps() {
         if (_context == null) 
-            return "0";
+            return "0 / 0";
         
         RateStat receiveRate = _context.statManager().getRate("bw.recvRate");
-        if (receiveRate == null) return "0";
-        Rate rate = receiveRate.getRate(5*60*1000);
-        double kbps = rate.getAverageValue()/1024;
-        DecimalFormat fmt = new DecimalFormat("##0.00");
-        return fmt.format(kbps);
-    }
-    
-    /**
-     * How fast we have been sending data over the last 5 minutes (pretty printed
-     * string with 2 decimal places representing the KBps)
-     *
-     */
-    public String getOutboundFiveMinuteKBps() { 
-        if (_context == null) 
-            return "0";
-        
-        RateStat receiveRate = _context.statManager().getRate("bw.sendRate");
-        if (receiveRate == null) return "0";
-        Rate rate = receiveRate.getRate(5*60*1000);
-        double kbps = rate.getAverageValue()/1024;
-        DecimalFormat fmt = new DecimalFormat("##0.00");
-        return fmt.format(kbps);
-    }
-    
-    /**
-     * How fast we have been receiving data since the router started (pretty printed
-     * string with 2 decimal places representing the KBps)
-     *
-     */
-    public String getInboundLifetimeKBps() { 
-        if (_context == null) 
-            return "0";
-        
-        RateStat receiveRate = _context.statManager().getRate("bw.recvRate");
-        if (receiveRate == null) return "0";
-        double kbps = receiveRate.getLifetimeAverageValue()/1024;
-        DecimalFormat fmt = new DecimalFormat("##0.00");
-        return fmt.format(kbps);
-    }
-    
-    /**
-     * How fast we have been sending data since the router started (pretty printed
-     * string with 2 decimal places representing the KBps)
-     *
-     */
-    public String getOutboundLifetimeKBps() { 
-        if (_context == null) 
-            return "0";
-        
+        double in = 0;
+        if (receiveRate != null) {
+            Rate r = receiveRate.getRate(5*60*1000);
+            if (r != null)
+                in = r.getAverageValue();
+        }
         RateStat sendRate = _context.statManager().getRate("bw.sendRate");
-        if (sendRate == null) return "0";
-        double kbps = sendRate.getLifetimeAverageValue()/1024;
-        DecimalFormat fmt = new DecimalFormat("##0.00");
-        return fmt.format(kbps);
+        double out = 0;
+        if (sendRate != null) {
+            Rate r = sendRate.getRate(5*60*1000);
+            if (r != null)
+                out = r.getAverageValue();
+        }
+        return formatPair(in, out);
     }
     
+    /**
+     *    @return "x.xx / y.yy {K|M}"
+     */
+    public String getLifetimeKBps() { 
+        if (_context == null) 
+            return "0 / 0";
+        
+        RateStat receiveRate = _context.statManager().getRate("bw.recvRate");
+        double in;
+        if (receiveRate == null)
+            in = 0;
+        else
+            in = receiveRate.getLifetimeAverageValue();
+        RateStat sendRate = _context.statManager().getRate("bw.sendRate");
+        double out;
+        if (sendRate == null)
+            out = 0;
+        else
+            out = sendRate.getLifetimeAverageValue();
+        return formatPair(in, out);
+    }
+    
+    /**
+     *    @return "x.xx / y.yy {K|M}"
+     */
+    private static String formatPair(double in, double out) {
+        boolean mega = in >= 1024*1024 || out >= 1024*1024;
+        // scale both the same
+        if (mega) {
+            in /= 1024*1024;
+            out /= 1024*1024;
+        } else {
+            in /= 1024;
+            out /= 1024;
+        }
+        // control total width
+        DecimalFormat fmt;
+        if (in >= 1000 || out >= 1000)
+            fmt = new DecimalFormat("#0");
+        else if (in >= 100 || out >= 100)
+            fmt = new DecimalFormat("#0.0");
+        else
+            fmt = new DecimalFormat("#0.00");
+        return fmt.format(in) + " / " + fmt.format(out) +
+               (mega ? 'M' : 'K');
+    }
+
     /**
      * How much data have we received since the router started (pretty printed
      * string with 2 decimal places and the appropriate units - GB/MB/KB/bytes)
