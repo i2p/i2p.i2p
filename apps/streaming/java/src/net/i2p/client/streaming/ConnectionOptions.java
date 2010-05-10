@@ -565,7 +565,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     public int getMaxConnsPerMinute() { return _maxConnsPerMinute; }
     public int getMaxConnsPerHour() { return _maxConnsPerHour; }
     public int getMaxConnsPerDay() { return _maxConnsPerDay; }
-    public int getMaxTotalConnsPerMinute() { return _maxConnsPerMinute; }
+    public int getMaxTotalConnsPerMinute() { return _maxTotalConnsPerMinute; }
     public int getMaxTotalConnsPerHour() { return _maxTotalConnsPerHour; }
     public int getMaxTotalConnsPerDay() { return _maxTotalConnsPerDay; }
 

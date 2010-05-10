@@ -1,3 +1,21 @@
+2010-05-10 zzz
+    * Console:
+      - Summary bar tweaks
+      - Add monthly bw estimate
+    * DataHelper: Deprecate inefficient eq() methods
+    * i2psnark:
+      - Add tunnel config dropdowns
+      - Comment out old proxy stuff
+    * NetDB:
+      - Handle old and duplicate stores more efficiently
+      - Have DataStore put() return success
+      - Move getDistance() to its own class
+    * Router: Add router.forceBandwidthClass advanced config for testing
+    * Streaming: Add support for connection throttling
+    * TunnelPoolManager: Concurrent
+    * UDP: To help limit connections, don't offer to introduce
+      when floodfill
+
 2010-05-10 sponge
      * PluginStarter: If there is some delay, there may be a really good reason for it.
        Loading a class would be one of them!
