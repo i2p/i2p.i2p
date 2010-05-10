@@ -10,6 +10,8 @@ package net.i2p.router.web;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.math.BigInteger;         // debug
+import java.text.DecimalFormat;      // debug
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -27,6 +29,8 @@ import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
+import net.i2p.router.networkdb.kademlia.HashDistance;   // debug
+import net.i2p.util.HexDump;                             // debug
 import net.i2p.util.ObjectCounter;
 import net.i2p.util.VersionComparator;
 
@@ -37,10 +41,10 @@ public class NetDbRenderer {
         _context = ctx;
     }
 
-    private class LeaseSetComparator implements Comparator {
-         public int compare(Object l, Object r) {
-             Destination dl = ((LeaseSet)l).getDestination();
-             Destination dr = ((LeaseSet)r).getDestination();
+    private class LeaseSetComparator implements Comparator<LeaseSet> {
+         public int compare(LeaseSet l, LeaseSet r) {
+             Destination dl = l.getDestination();
+             Destination dr = r.getDestination();
              boolean locall = _context.clientManager().isLocal(dl);
              boolean localr = _context.clientManager().isLocal(dr);
              if (locall && !localr) return -1;
@@ -49,9 +53,20 @@ public class NetDbRenderer {
         }
     }
 
-    private static class RouterInfoComparator implements Comparator {
-         public int compare(Object l, Object r) {
-             return ((RouterInfo)l).getIdentity().getHash().toBase64().compareTo(((RouterInfo)r).getIdentity().getHash().toBase64());
+    /** for debugging @since 0.7.14 */
+    private static class LeaseSetRoutingKeyComparator implements Comparator<LeaseSet> {
+         private final Hash _us;
+         public LeaseSetRoutingKeyComparator(Hash us) {
+             _us = us;
+         }
+         public int compare(LeaseSet l, LeaseSet r) {
+             return HashDistance.getDistance(_us, l.getRoutingKey()).subtract(HashDistance.getDistance(_us, r.getRoutingKey())).signum();
+        }
+    }
+
+    private static class RouterInfoComparator implements Comparator<RouterInfo> {
+         public int compare(RouterInfo l, RouterInfo r) {
+             return l.getIdentity().getHash().toBase64().compareTo(r.getIdentity().getHash().toBase64());
         }
     }
 
@@ -78,13 +93,31 @@ public class NetDbRenderer {
         out.flush();
     }
 
-    public void renderLeaseSetHTML(Writer out) throws IOException {
+    /**
+     *  @param debug @since 0.7.14 sort by routing key, display distance from our routing key
+     *               median distance, and other stuff, useful when floodfill
+     */
+    public void renderLeaseSetHTML(Writer out, boolean debug) throws IOException {
         StringBuilder buf = new StringBuilder(4*1024);
         buf.append("<h2>" + _("Network Database Contents") + "</h2>\n");
         buf.append("<a href=\"netdb.jsp\">" + _("View RouterInfo") + "</a>");
         buf.append("<h3>").append(_("LeaseSets")).append("</h3>\n");
-        Set leases = new TreeSet(new LeaseSetComparator());
+        Hash ourRKey;
+        Set<LeaseSet> leases;
+        DecimalFormat fmt;
+        if (debug) {
+            ourRKey = _context.routingKeyGenerator().getRoutingKey(_context.routerHash());
+            leases = new TreeSet(new LeaseSetRoutingKeyComparator(ourRKey));
+            fmt = new DecimalFormat("#0.00");
+        } else {
+            ourRKey = null;
+            leases = new TreeSet(new LeaseSetComparator());
+            fmt = null;
+        }
         leases.addAll(_context.netDb().getLeases());
+        int medianCount = leases.size() / 2;
+        BigInteger median = null;
+        int c = 0;
         long now = _context.clock().now();
         for (Iterator iter = leases.iterator(); iter.hasNext(); ) {
             LeaseSet ls = (LeaseSet)iter.next();
@@ -115,6 +148,16 @@ public class NetDbRenderer {
                 buf.append(_("Expires in {0}", DataHelper.formatDuration(exp))).append("<br>\n");
             else
                 buf.append(_("Expired {0} ago", DataHelper.formatDuration(0-exp))).append("<br>\n");
+            if (debug) {
+                buf.append("RAP? " + ls.getReceivedAsPublished() + ' ');
+                buf.append("RAR? " + ls.getReceivedAsReply() + ' ');
+                BigInteger dist = HashDistance.getDistance(ourRKey, ls.getRoutingKey());
+                if (c++ == medianCount)
+                    median = dist;
+                buf.append("Dist: <b>" + fmt.format(biLog2(dist)) + "</b> ");
+                buf.append("RKey: " + ls.getRoutingKey().toBase64() + ' ');
+                buf.append("<br>");
+            }
             for (int i = 0; i < ls.getLeaseCount(); i++) {
                 buf.append(_("Lease")).append(' ').append(i + 1).append(": " + _("Gateway") + ' ');
                 buf.append(_context.commSystem().renderPeerHTML(ls.getLease(i).getGateway()));
@@ -124,8 +167,36 @@ public class NetDbRenderer {
             out.write(buf.toString());
             buf.setLength(0);
         }
+        if (debug) {
+            buf.append("<p><b>Total Leasesets: " + leases.size());
+            buf.append("<p>Our RKey: " + ourRKey.toBase64() + "<p>");
+            buf.append("<p>Mod Data: " + HexDump.dump(_context.routingKeyGenerator().getModData()) + "<p>");
+            if (median != null) {
+                double log2 = biLog2(median);
+                buf.append("<p>Median distance (bits): " + fmt.format(log2));
+                // 1 for median, 3 for 8 floodfills... is this right?
+                buf.append("<p>Estimated total floodfills: " + Math.round(Math.pow(2, 1 + 3 + 255 - log2)));
+            }
+        }
         out.write(buf.toString());
         out.flush();
+    }
+
+    /**
+     * For debugging
+     * http://forums.sun.com/thread.jspa?threadID=597652
+     * @since 0.7.14
+     */
+    private static double biLog2(BigInteger a) {
+        int b = a.bitLength() - 1;
+        double c = 0;
+        double d = 0.5;
+        for (int i = b; i >= 0; --i) {
+             if (a.testBit(i))
+                 c += d;
+             d /= 2;
+        }
+        return b + c;
     }
 
     /**
@@ -160,7 +231,7 @@ public class NetDbRenderer {
         ObjectCounter<String> countries = new ObjectCounter();
         int[] transportCount = new int[8];
         
-        Set routers = new TreeSet(new RouterInfoComparator());
+        Set<RouterInfo> routers = new TreeSet(new RouterInfoComparator());
         routers.addAll(_context.netDb().getRouters());
         for (Iterator iter = routers.iterator(); iter.hasNext(); ) {
             RouterInfo ri = (RouterInfo)iter.next();

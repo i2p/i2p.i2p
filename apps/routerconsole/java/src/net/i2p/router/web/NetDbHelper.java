@@ -9,7 +9,8 @@ import net.i2p.data.DataHelper;
 public class NetDbHelper extends HelperBase {
     private String _routerPrefix;
     private int _full;
-    private boolean _lease = false;
+    private boolean _lease;
+    private boolean _debug;
     
     public NetDbHelper() {}
     
@@ -23,7 +24,11 @@ public class NetDbHelper extends HelperBase {
             _full = Integer.parseInt(f);
         } catch (NumberFormatException nfe) {}
     }
-    public void setLease(String l) { _lease = "1".equals(l); }
+
+    public void setLease(String l) {
+        _debug = "2".equals(l);
+        _lease = _debug || "1".equals(l);
+    }
     
     public String getNetDbSummary() {
         NetDbRenderer renderer = new NetDbRenderer(_context);
@@ -32,7 +37,7 @@ public class NetDbHelper extends HelperBase {
                 if (_routerPrefix != null)
                     renderer.renderRouterInfoHTML(_out, _routerPrefix);
                 else if (_lease)
-                    renderer.renderLeaseSetHTML(_out);
+                    renderer.renderLeaseSetHTML(_out, _debug);
                 else
                     renderer.renderStatusHTML(_out, _full);
                 return "";
@@ -41,7 +46,7 @@ public class NetDbHelper extends HelperBase {
                 if (_routerPrefix != null)
                     renderer.renderRouterInfoHTML(new OutputStreamWriter(baos), _routerPrefix);
                 else if (_lease)
-                    renderer.renderLeaseSetHTML(new OutputStreamWriter(baos));
+                    renderer.renderLeaseSetHTML(new OutputStreamWriter(baos), _debug);
                 else
                     renderer.renderStatusHTML(new OutputStreamWriter(baos), _full);
                 return new String(baos.toByteArray());
