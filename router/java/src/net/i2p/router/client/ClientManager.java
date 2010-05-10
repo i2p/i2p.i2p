@@ -283,18 +283,14 @@ public class ClientManager {
         return false;
     }
     
+    /**
+     *  @return true if we don't know about this destination at all
+     */
     public boolean shouldPublishLeaseSet(Hash destHash) { 
-        if (false) return true;
         if (destHash == null) return true;
         ClientConnectionRunner runner = getRunner(destHash);
         if (runner == null) return true;
-        String dontPublish = runner.getConfig().getOptions().getProperty(ClientManagerFacade.PROP_CLIENT_ONLY);
-        if ( (dontPublish != null) && ("true".equals(dontPublish)) ) {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Not publishing the leaseSet for " + destHash.toBase64());
-            return false;
-        } 
-        return true;
+        return !Boolean.valueOf(runner.getConfig().getOptions().getProperty(ClientManagerFacade.PROP_CLIENT_ONLY)).booleanValue();
     }
 
     public Set<Destination> listClients() {
