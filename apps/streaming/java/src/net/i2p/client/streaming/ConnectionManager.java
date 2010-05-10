@@ -10,6 +10,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PSession;
 import net.i2p.data.Destination;
+import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
@@ -35,10 +36,14 @@ public class ConnectionManager {
     /** Ping ID (Long) to PingRequest */
     private final Map<Long, PingRequest> _pendingPings;
     private boolean _allowIncoming;
+    private boolean _throttlersInitialized;
     private int _maxConcurrentStreams;
     private ConnectionOptions _defaultOptions;
     private volatile int _numWaiting;
     private long SoTimeout;
+    private ConnThrottler _minuteThrottler;
+    private ConnThrottler _hourThrottler;
+    private ConnThrottler _dayThrottler;
     
     public ConnectionManager(I2PAppContext context, I2PSession session, int maxConcurrent, ConnectionOptions defaultOptions) {
         _context = context;
@@ -106,7 +111,23 @@ public class ConnectionManager {
 
     public void setAllowIncomingConnections(boolean allow) { 
         _connectionHandler.setActive(allow);
+        if (allow && !_throttlersInitialized) {
+            _throttlersInitialized = true;
+            if (_defaultOptions.getMaxConnsPerMinute() > 0 || _defaultOptions.getMaxTotalConnsPerMinute() > 0) {
+               _context.statManager().createRateStat("stream.con.throttledMinute", "Dropped for conn limit", "Stream", new long[] { 5*60*1000 });
+               _minuteThrottler = new ConnThrottler(_defaultOptions.getMaxConnsPerMinute(), _defaultOptions.getMaxTotalConnsPerMinute(), 60*1000);
+            }
+            if (_defaultOptions.getMaxConnsPerHour() > 0 || _defaultOptions.getMaxTotalConnsPerHour() > 0) {
+               _context.statManager().createRateStat("stream.con.throttledHour", "Dropped for conn limit", "Stream", new long[] { 5*60*1000 });
+               _hourThrottler = new ConnThrottler(_defaultOptions.getMaxConnsPerHour(), _defaultOptions.getMaxTotalConnsPerHour(), 60*60*1000);
+            }
+            if (_defaultOptions.getMaxConnsPerDay() > 0 || _defaultOptions.getMaxTotalConnsPerDay() > 0) {
+               _context.statManager().createRateStat("stream.con.throttledDay", "Dropped for conn limit", "Stream", new long[] { 5*60*1000 });
+               _dayThrottler = new ConnThrottler(_defaultOptions.getMaxConnsPerDay(), _defaultOptions.getMaxTotalConnsPerDay(), 24*60*60*1000);
+            }
+        }
     }
+
     /** @return if we should accept connections */
     public boolean getAllowIncomingConnections() {
         return _connectionHandler.getActive();
@@ -140,8 +161,15 @@ public class ConnectionManager {
                               + _maxConcurrentStreams + " connections");
                 reject = true;
             } else if (shouldRejectConnection(synPacket)) {
-                _log.error("Refusing connection since peer is " +
-                           (_defaultOptions.isAccessListEnabled() ? "not whitelisted: " : "blacklisted: ") +
+                // this may not be right if more than one is enabled
+                String why;
+                if (_defaultOptions.isAccessListEnabled())
+                    why = "not whitelisted: ";
+                else if (_defaultOptions.isBlacklistEnabled())
+                    why = "blacklisted: ";
+                else
+                    why = "throttled: ";
+                _log.error("Refusing connection since peer is " + why +
                            (synPacket.getOptionalFrom() == null ? "null from" : synPacket.getOptionalFrom().calculateHash().toBase64()));
                 reject = true;
             } else { 
@@ -281,11 +309,28 @@ public class ConnectionManager {
         Destination from = syn.getOptionalFrom();
         if (from == null)
             return true;
+        Hash h = from.calculateHash();
+        boolean throttled = false;
+        // always call all 3 to increment all counters
+        if (_minuteThrottler != null && _minuteThrottler.shouldThrottle(h)) {
+            _context.statManager().addRateData("stream.con.throttledMinute", 1, 0);
+            throttled = true;
+        }
+        if (_hourThrottler != null && _hourThrottler.shouldThrottle(h)) {
+            _context.statManager().addRateData("stream.con.throttledHour", 1, 0);
+            throttled = true;
+        }
+        if (_dayThrottler != null && _dayThrottler.shouldThrottle(h)) {
+            _context.statManager().addRateData("stream.con.throttledDay", 1, 0);
+            throttled = true;
+        }
+        if (throttled)
+            return true;
         // if the sig is absent or bad it will be caught later (in CPH)
         if (_defaultOptions.isAccessListEnabled())
-            return !_defaultOptions.getAccessList().contains(from.calculateHash());
+            return !_defaultOptions.getAccessList().contains(h);
         if (_defaultOptions.isBlacklistEnabled())
-            return _defaultOptions.getBlacklist().contains(from.calculateHash());
+            return _defaultOptions.getBlacklist().contains(h);
         return false;
     }
 

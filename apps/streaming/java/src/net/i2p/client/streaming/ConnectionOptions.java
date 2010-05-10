@@ -40,6 +40,12 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     private boolean _blackListEnabled;
     private Set<Hash> _accessList;
     private Set<Hash> _blackList;
+    private int _maxConnsPerMinute;
+    private int _maxConnsPerHour;
+    private int _maxConnsPerDay;
+    private int _maxTotalConnsPerMinute;
+    private int _maxTotalConnsPerHour;
+    private int _maxTotalConnsPerDay;
 
     public static final int PROFILE_BULK = 1;
     public static final int PROFILE_INTERACTIVE = 2;
@@ -67,9 +73,17 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     public static final String PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR = "i2p.streaming.congestionAvoidanceGrowthRateFactor";
     public static final String PROP_SLOW_START_GROWTH_RATE_FACTOR = "i2p.streaming.slowStartGrowthRateFactor";
     public static final String PROP_ANSWER_PINGS = "i2p.streaming.answerPings";
+    /** all of these are @since 0.7.13 */
     public static final String PROP_ENABLE_ACCESS_LIST = "i2cp.enableAccessList";
     public static final String PROP_ENABLE_BLACKLIST = "i2cp.enableBlackList";
     public static final String PROP_ACCESS_LIST = "i2cp.accessList";
+    /** all of these are @since 0.7.14 */
+    public static final String PROP_MAX_CONNS_MIN = "i2p.streaming.maxConnsPerMinute";
+    public static final String PROP_MAX_CONNS_HOUR = "i2p.streaming.maxConnsPerHour";
+    public static final String PROP_MAX_CONNS_DAY = "i2p.streaming.maxConnsPerDay";
+    public static final String PROP_MAX_TOTAL_CONNS_MIN = "i2p.streaming.maxTotalConnsPerMinute";
+    public static final String PROP_MAX_TOTAL_CONNS_HOUR = "i2p.streaming.maxTotalConnsPerHour";
+    public static final String PROP_MAX_TOTAL_CONNS_DAY = "i2p.streaming.maxTotalConnsPerDay";
     
     private static final int TREND_COUNT = 3;
     static final int INITIAL_WINDOW_SIZE = 6;
@@ -222,6 +236,12 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
             setReadTimeout(opts.getReadTimeout());
             setAnswerPings(opts.getAnswerPings());
             initLists(opts);
+            _maxConnsPerMinute = opts.getMaxConnsPerMinute();
+            _maxConnsPerHour = opts.getMaxConnsPerHour();
+            _maxConnsPerDay = opts.getMaxConnsPerDay();
+            _maxTotalConnsPerMinute = opts.getMaxTotalConnsPerMinute();
+            _maxTotalConnsPerHour = opts.getMaxTotalConnsPerHour();
+            _maxTotalConnsPerDay = opts.getMaxTotalConnsPerDay();
         }
     }
     
@@ -248,6 +268,12 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DISCONNECT_TIMEOUT));
         setAnswerPings(getBool(opts, PROP_ANSWER_PINGS, DEFAULT_ANSWER_PINGS));
         initLists(opts);
+        _maxConnsPerMinute = getInt(opts, PROP_MAX_CONNS_MIN, 0);
+        _maxConnsPerHour = getInt(opts, PROP_MAX_CONNS_HOUR, 0);
+        _maxConnsPerDay = getInt(opts, PROP_MAX_CONNS_DAY, 0);
+        _maxTotalConnsPerMinute = getInt(opts, PROP_MAX_TOTAL_CONNS_MIN, 0);
+        _maxTotalConnsPerHour = getInt(opts, PROP_MAX_TOTAL_CONNS_HOUR, 0);
+        _maxTotalConnsPerDay = getInt(opts, PROP_MAX_TOTAL_CONNS_DAY, 0);
     }
     
 	@Override
@@ -291,6 +317,18 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         if (opts.containsKey(PROP_ANSWER_PINGS))
             setAnswerPings(getBool(opts, PROP_ANSWER_PINGS, DEFAULT_ANSWER_PINGS));
         initLists(opts);
+        if (opts.containsKey(PROP_MAX_CONNS_MIN))
+            _maxConnsPerMinute = getInt(opts, PROP_MAX_CONNS_MIN, 0);
+        if (opts.containsKey(PROP_MAX_CONNS_HOUR))
+            _maxConnsPerHour = getInt(opts, PROP_MAX_CONNS_HOUR, 0);
+        if (opts.containsKey(PROP_MAX_CONNS_DAY))
+            _maxConnsPerDay = getInt(opts, PROP_MAX_CONNS_DAY, 0);
+        if (opts.containsKey(PROP_MAX_TOTAL_CONNS_MIN))
+            _maxTotalConnsPerMinute = getInt(opts, PROP_MAX_TOTAL_CONNS_MIN, 0);
+        if (opts.containsKey(PROP_MAX_TOTAL_CONNS_HOUR))
+            _maxTotalConnsPerHour = getInt(opts, PROP_MAX_TOTAL_CONNS_HOUR, 0);
+        if (opts.containsKey(PROP_MAX_TOTAL_CONNS_DAY))
+            _maxTotalConnsPerDay = getInt(opts, PROP_MAX_TOTAL_CONNS_DAY, 0);
     }
     
     /** 
@@ -523,6 +561,14 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     public int getSlowStartGrowthRateFactor() { return _slowStartGrowthRateFactor; }
     public void setSlowStartGrowthRateFactor(int factor) { _slowStartGrowthRateFactor = factor; }
     
+    /** all of these are @since 0.7.14; no public setters */
+    public int getMaxConnsPerMinute() { return _maxConnsPerMinute; }
+    public int getMaxConnsPerHour() { return _maxConnsPerHour; }
+    public int getMaxConnsPerDay() { return _maxConnsPerDay; }
+    public int getMaxTotalConnsPerMinute() { return _maxConnsPerMinute; }
+    public int getMaxTotalConnsPerHour() { return _maxTotalConnsPerHour; }
+    public int getMaxTotalConnsPerDay() { return _maxTotalConnsPerDay; }
+
     public boolean isAccessListEnabled() { return _accessListEnabled; }
     public boolean isBlacklistEnabled() { return _blackListEnabled; }
     public Set<Hash> getAccessList() { return _accessList; }
