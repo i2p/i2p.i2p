@@ -87,7 +87,7 @@ public class SessionStatusMessage extends I2CPMessageImpl {
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof SessionStatusMessage)) {
             SessionStatusMessage msg = (SessionStatusMessage) object;
-            return DataHelper.eq(getSessionId(), msg.getSessionId()) && DataHelper.eq(getStatus(), msg.getStatus());
+            return DataHelper.eq(getSessionId(), msg.getSessionId()) && _status == msg.getStatus();
         }
          
         return false;

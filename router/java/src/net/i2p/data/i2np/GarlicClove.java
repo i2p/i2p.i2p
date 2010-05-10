@@ -193,7 +193,7 @@ public class GarlicClove extends DataStructureImpl {
             return false;
         GarlicClove clove = (GarlicClove)obj;
         return DataHelper.eq(getCertificate(), clove.getCertificate()) &&
-               DataHelper.eq(getCloveId(), clove.getCloveId()) &&
+               _cloveId == clove.getCloveId() &&
                DataHelper.eq(getData(), clove.getData()) &&
                DataHelper.eq(getExpiration(), clove.getExpiration()) &&
                DataHelper.eq(getInstructions(),  clove.getInstructions());

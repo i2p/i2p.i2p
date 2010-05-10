@@ -53,7 +53,7 @@ public class MessageId extends DataStructureImpl {
     @Override
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof MessageId)) return false;
-        return DataHelper.eq(getMessageId(), ((MessageId) object).getMessageId());
+        return _messageId == ((MessageId) object).getMessageId();
     }
 
     @Override

@@ -247,7 +247,7 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
             return DataHelper.eq(getKey(),msg.getKey()) &&
                    DataHelper.eq(getLeaseSet(),msg.getLeaseSet()) &&
                    DataHelper.eq(getRouterInfo(),msg.getRouterInfo()) &&
-                   DataHelper.eq(getValueType(),msg.getValueType()) &&
+                   _type == msg.getValueType() &&
                    getReplyToken() == msg.getReplyToken() &&
                    DataHelper.eq(getReplyTunnel(), msg.getReplyTunnel()) &&
                    DataHelper.eq(getReplyGateway(), msg.getReplyGateway());

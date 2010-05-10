@@ -157,9 +157,9 @@ public class MessageStatusMessage extends I2CPMessageImpl {
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof MessageStatusMessage)) {
             MessageStatusMessage msg = (MessageStatusMessage) object;
-            return DataHelper.eq(getSessionId(), msg.getSessionId())
-                   && DataHelper.eq(getMessageId(), msg.getMessageId()) && (getNonce() == msg.getNonce())
-                   && DataHelper.eq(getSize(), msg.getSize()) && DataHelper.eq(getStatus(), msg.getStatus());
+            return _sessionId == msg.getSessionId()
+                   && _messageId == msg.getMessageId() && _nonce == msg.getNonce()
+                   && _size == msg.getSize() && _status == msg.getStatus();
         }
             
         return false;

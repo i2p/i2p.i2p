@@ -197,7 +197,7 @@ public class TunnelDataMessage extends I2NPMessageImpl {
     public boolean equals(Object object) {
         if ( (object != null) && (object instanceof TunnelDataMessage) ) {
             TunnelDataMessage msg = (TunnelDataMessage)object;
-            return DataHelper.eq(getTunnelId(),msg.getTunnelId()) &&
+            return _tunnelId == msg.getTunnelId() &&
                    DataHelper.eq(getData(),msg.getData());
         } else {
             return false;

@@ -76,8 +76,8 @@ public class ReceiveMessageEndMessage extends I2CPMessageImpl {
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof ReceiveMessageEndMessage)) {
             ReceiveMessageEndMessage msg = (ReceiveMessageEndMessage) object;
-            return DataHelper.eq(getSessionId(), msg.getSessionId())
-                   && DataHelper.eq(getMessageId(), msg.getMessageId());
+            return _sessionId == msg.getSessionId()
+                   && _messageId == msg.getMessageId();
         }
          
         return false;

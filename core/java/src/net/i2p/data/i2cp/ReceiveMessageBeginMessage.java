@@ -92,8 +92,8 @@ public class ReceiveMessageBeginMessage extends I2CPMessageImpl {
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof ReceiveMessageBeginMessage)) {
             ReceiveMessageBeginMessage msg = (ReceiveMessageBeginMessage) object;
-            return DataHelper.eq(getSessionId(), msg.getSessionId())
-                   && DataHelper.eq(getMessageId(), msg.getMessageId());
+            return _sessionId == msg.getSessionId()
+                   && _messageId == msg.getMessageId();
         }
             
         return false;

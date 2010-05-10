@@ -71,8 +71,8 @@ public class DeliveryStatusMessage extends I2NPMessageImpl {
     public boolean equals(Object object) {
         if ( (object != null) && (object instanceof DeliveryStatusMessage) ) {
             DeliveryStatusMessage msg = (DeliveryStatusMessage)object;
-            return DataHelper.eq(getMessageId(),msg.getMessageId()) &&
-                   DataHelper.eq(getArrival(),msg.getArrival());
+            return _id == msg.getMessageId() &&
+                   _arrival == msg.getArrival();
         } else {
             return false;
         }

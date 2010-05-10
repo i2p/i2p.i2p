@@ -560,7 +560,7 @@ public class RouterInfo extends DataStructureImpl {
         RouterInfo info = (RouterInfo) object;
         return DataHelper.eq(_identity, info.getIdentity())
                && DataHelper.eq(_signature, info.getSignature())
-               && DataHelper.eq(_published, info.getPublished())
+               && _published == info.getPublished()
                && DataHelper.eq(_addresses, info.getAddresses())
                && DataHelper.eq(_options, info.getOptions()) 
                && DataHelper.eq(_peers, info.getPeers());

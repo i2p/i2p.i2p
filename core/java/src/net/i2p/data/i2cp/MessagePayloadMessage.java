@@ -112,8 +112,8 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof MessagePayloadMessage)) {
             MessagePayloadMessage msg = (MessagePayloadMessage) object;
-            return DataHelper.eq(getSessionId(), msg.getSessionId())
-                   && DataHelper.eq(getMessageId(), msg.getMessageId())
+            return _sessionId == msg.getSessionId()
+                   && _messageId == msg.getMessageId()
                    && DataHelper.eq(getPayload(), msg.getPayload());
         }
             

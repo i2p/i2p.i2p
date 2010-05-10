@@ -51,7 +51,7 @@ public class AbuseSeverity extends DataStructureImpl {
     @Override
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof AbuseSeverity)) return false;
-        return DataHelper.eq(getSeverity(), ((AbuseSeverity) object).getSeverity());
+        return _severityId == ((AbuseSeverity) object).getSeverity();
     }
 
     @Override
