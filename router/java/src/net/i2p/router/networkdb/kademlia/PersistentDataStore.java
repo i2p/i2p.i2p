@@ -128,20 +128,22 @@ class PersistentDataStore extends TransientDataStore {
     }
     
     @Override
-    public void put(Hash key, DataStructure data) {
-        put(key, data, true);
+    public boolean put(Hash key, DataStructure data) {
+        return put(key, data, true);
     }
 
     /*
      *  @param persist if false, call super only, don't access disk
+     *  @return success
      */
     @Override
-    public void put(Hash key, DataStructure data, boolean persist) {
-        if ( (data == null) || (key == null) ) return;
-        super.put(key, data);
+    public boolean put(Hash key, DataStructure data, boolean persist) {
+        if ( (data == null) || (key == null) ) return false;
+        boolean rv = super.put(key, data);
         // Don't bother writing LeaseSets to disk
-        if (persist && data instanceof RouterInfo)
+        if (rv && persist && data instanceof RouterInfo)
             _writer.queue(key, data);
+        return rv;
     }
     
     private class RemoveJob extends JobImpl {

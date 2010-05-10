@@ -24,7 +24,7 @@ import net.i2p.util.Log;
 
 class TransientDataStore implements DataStore {
     private Log _log;
-    private Map<Hash, DataStructure> _data;
+    private ConcurrentHashMap<Hash, DataStructure> _data;
     protected RouterContext _context;
     
     public TransientDataStore(RouterContext ctx) {
@@ -47,11 +47,11 @@ class TransientDataStore implements DataStore {
     
     public void rescan() {}
 
-    public Set getKeys() {
+    public Set<Hash> getKeys() {
         return new HashSet(_data.keySet());
     }
     
-    /** for PersistentDataStore only - don't use here */
+    /** for PersistentDataStore only - don't use here @throws IAE always */
     public DataStructure get(Hash key, boolean persist) {
         throw new IllegalArgumentException("no");
     }
@@ -73,22 +73,22 @@ class TransientDataStore implements DataStore {
         return count;
     }
     
-    /** nothing published more than 5 minutes in the future */
-    private final static long MAX_FUTURE_PUBLISH_DATE = 5*60*1000;
-    /** don't accept tunnels set to expire more than 3 hours in the future, which is insane */
-    private final static long MAX_FUTURE_EXPIRATION_DATE = KademliaNetworkDatabaseFacade.MAX_LEASE_FUTURE;
-    
-    /** for PersistentDataStore only - don't use here */
-    public void put(Hash key, DataStructure data, boolean persist) {
+    /** for PersistentDataStore only - don't use here @throws IAE always */
+    public boolean put(Hash key, DataStructure data, boolean persist) {
         throw new IllegalArgumentException("no");
     }
 
-    public void put(Hash key, DataStructure data) {
-        if (data == null) return;
+    /**
+     *  @param data must be validated before here
+     *  @return success
+     */
+    public boolean put(Hash key, DataStructure data) {
+        if (data == null) return false;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Storing key " + key);
         DataStructure old = null;
-        old = _data.put(key, data);
+        old = _data.putIfAbsent(key, data);
+        boolean rv = false;
         if (data instanceof RouterInfo) {
             // Don't do this here so we don't reset it at router startup;
             // the StoreMessageJob calls this
@@ -99,26 +99,19 @@ class TransientDataStore implements DataStore {
                 if (ri.getPublished() < ori.getPublished()) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Almost clobbered an old router! " + key + ": [old published on " + new Date(ori.getPublished()) + " new on " + new Date(ri.getPublished()) + "]");
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Number of router options for " + key + ": " + ri.getOptions().size() + " (old one had: " + ori.getOptions().size() + ")", new Exception("Updated routerInfo"));
-                    _data.put(key, old);
-                } else if (ri.getPublished() > _context.clock().now() + MAX_FUTURE_PUBLISH_DATE) {
+                } else if (ri.getPublished() == ori.getPublished()) {
                     if (_log.shouldLog(Log.INFO))
-                        _log.info("Hmm, someone tried to give us something with the publication date really far in the future (" + new Date(ri.getPublished()) + "), dropping it");
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Number of router options for " + key + ": " + ri.getOptions().size() + " (old one had: " + ori.getOptions().size() + ")", new Exception("Updated routerInfo"));
-                    _data.put(key, old);
+                        _log.info("Duplicate " + key);
                 } else {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Updated the old router for " + key + ": [old published on " + new Date(ori.getPublished()) + " new on " + new Date(ri.getPublished()) + "]");
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Number of router options for " + key + ": " + ri.getOptions().size() + " (old one had: " + ori.getOptions().size() + ")", new Exception("Updated routerInfo"));
+                    _data.put(key, data);
+                    rv = true;
                 }
             } else {
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Brand new router for " + key + ": published on " + new Date(ri.getPublished()));
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Number of router options for " + key + ": " + ri.getOptions().size(), new Exception("Updated routerInfo"));
+                    _log.info("New router for " + key + ": published on " + new Date(ri.getPublished()));
+                rv = true;
             }
         } else if (data instanceof LeaseSet) {
             LeaseSet ls = (LeaseSet)data;
@@ -127,14 +120,28 @@ class TransientDataStore implements DataStore {
                 if (ls.getEarliestLeaseDate() < ols.getEarliestLeaseDate()) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Almost clobbered an old leaseSet! " + key + ": [old published on " + new Date(ols.getEarliestLeaseDate()) + " new on " + new Date(ls.getEarliestLeaseDate()) + "]");
-                    _data.put(key, old);
-                } else if (ls.getEarliestLeaseDate() > _context.clock().now() + MAX_FUTURE_EXPIRATION_DATE) {
+                } else if (ls.getEarliestLeaseDate() == ols.getEarliestLeaseDate()) {
                     if (_log.shouldLog(Log.INFO))
-                        _log.info("Hmm, someone tried to give us something with the expiration date really far in the future (" + new Date(ls.getEarliestLeaseDate()) + "), dropping it");
-                    _data.put(key, old);
+                        _log.info("Duplicate " + key);
+                } else {
+                    if (_log.shouldLog(Log.INFO)) {
+                        _log.info("Updated old leaseSet " + key + ": [old published on " + new Date(ols.getEarliestLeaseDate()) + " new on " + new Date(ls.getEarliestLeaseDate()) + "]");
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("RAP? " + ls.getReceivedAsPublished() + " RAR? " + ls.getReceivedAsReply());
+                    }
+                    _data.put(key, data);
+                    rv = true;
                 }
+            } else {
+                if (_log.shouldLog(Log.INFO)) {
+                    _log.info("New leaseset for " + key + ": published on " + new Date(ls.getEarliestLeaseDate()));
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("RAP? " + ls.getReceivedAsPublished() + " RAR? " + ls.getReceivedAsReply());
+                }
+                rv = true;
             }
         }
+        return rv;
     }
     
     @Override
