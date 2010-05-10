@@ -21,6 +21,7 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
@@ -561,7 +562,10 @@ public class EstablishmentManager {
     private void sendCreated(InboundEstablishState state) {
         long now = _context.clock().now();
         // don't offer if we are approaching max connections (see comments above)
-        if ((!_transport.introducersRequired()) && _transport.haveCapacity()) {
+        // Also don't offer if we are floodfill, as this extends the max idle time
+        // and we will have lots of incoming conns
+        if ((!_transport.introducersRequired()) && _transport.haveCapacity() &&
+            !((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled()) {
             // offer to relay
             // (perhaps we should check our bw usage and/or how many peers we are 
             //  already offering introducing?)
