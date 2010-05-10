@@ -447,12 +447,32 @@ public class PluginStarter implements Runnable {
                 // run this guy now
                 LoadClientAppsJob.runClient(app.className, app.clientName, argVal, log, pluginThreadGroup, cl);
             } else {
-                // quick check, will throw ClassNotFoundException on error
-                LoadClientAppsJob.testClient(app.className, cl);
-                // wait before firing it up
-                Job job = new LoadClientAppsJob.DelayedRunClient(ctx, app.className, app.clientName, argVal, app.delay, pluginThreadGroup, cl);
-                ctx.jobQueue().addJob(job);
-                pluginJobs.get(pluginName).add(job);
+                // If there is some delay, there may be a really good reason for it.
+                // Loading a class would be one of them!
+                // So we do a quick check first, If it bombs out, we delay and try again.
+                // If it bombs after that, then we throw the ClassNotFoundException.
+                try {
+                    // quick check
+                    LoadClientAppsJob.testClient(app.className, cl);
+               } catch(ClassNotFoundException ex) {
+                   // Try again 1 or 2 seconds later. 
+                   // This should be enough time. Although it is a lousy hack
+                   // it should work for most cases.
+                   // Perhaps it may be even better to delay a percentage
+                   // if > 1, and reduce the delay time.
+                   // Under normal circumstances there will be no delay at all.
+                   if(app.delay > 1) {
+                       Thread.sleep(2000);
+                   } else {
+                       Thread.sleep(1000);
+                   }
+               }
+               // quick check, will throw ClassNotFoundException on error
+               LoadClientAppsJob.testClient(app.className, cl);
+               // wait before firing it up
+               Job job = new LoadClientAppsJob.DelayedRunClient(ctx, app.className, app.clientName, argVal, app.delay, pluginThreadGroup, cl);
+               ctx.jobQueue().addJob(job);
+               pluginJobs.get(pluginName).add(job);
             }
         }
     }

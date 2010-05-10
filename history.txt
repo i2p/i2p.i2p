@@ -1,3 +1,9 @@
+2010-05-10 sponge
+     * PluginStarter: If there is some delay, there may be a really good reason for it.
+       Loading a class would be one of them!
+       So we do a quick check first, If it bombs out, we delay and try again.
+       If it bombs after that, then we throw the ClassNotFoundException.
+
 2010-05-05 zzz
     * build.xml: Create packed sud in release
     * Console:
