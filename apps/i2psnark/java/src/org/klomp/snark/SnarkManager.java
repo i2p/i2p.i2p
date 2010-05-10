@@ -46,8 +46,8 @@ public class SnarkManager implements Snark.CompleteListener {
     public static final String PROP_I2CP_HOST = "i2psnark.i2cpHost";
     public static final String PROP_I2CP_PORT = "i2psnark.i2cpPort";
     public static final String PROP_I2CP_OPTS = "i2psnark.i2cpOptions";
-    public static final String PROP_EEP_HOST = "i2psnark.eepHost";
-    public static final String PROP_EEP_PORT = "i2psnark.eepPort";
+    //public static final String PROP_EEP_HOST = "i2psnark.eepHost";
+    //public static final String PROP_EEP_PORT = "i2psnark.eepPort";
     public static final String PROP_UPLOADERS_TOTAL = "i2psnark.uploaders.total";
     public static final String PROP_UPBW_MAX = "i2psnark.upbw.max";
     public static final String PROP_DIR = "i2psnark.dir";
@@ -157,10 +157,10 @@ public class SnarkManager implements Snark.CompleteListener {
             _config.setProperty(PROP_I2CP_PORT, "7654");
         if (!_config.containsKey(PROP_I2CP_OPTS))
             _config.setProperty(PROP_I2CP_OPTS, "inbound.length=2 inbound.lengthVariance=0 outbound.length=2 outbound.lengthVariance=0 inbound.quantity=3 outbound.quantity=3");
-        if (!_config.containsKey(PROP_EEP_HOST))
-            _config.setProperty(PROP_EEP_HOST, "127.0.0.1");
-        if (!_config.containsKey(PROP_EEP_PORT))
-            _config.setProperty(PROP_EEP_PORT, "4444");
+        //if (!_config.containsKey(PROP_EEP_HOST))
+        //    _config.setProperty(PROP_EEP_HOST, "127.0.0.1");
+        //if (!_config.containsKey(PROP_EEP_PORT))
+        //    _config.setProperty(PROP_EEP_PORT, "4444");
         if (!_config.containsKey(PROP_UPLOADERS_TOTAL))
             _config.setProperty(PROP_UPLOADERS_TOTAL, "" + Snark.MAX_TOTAL_UPLOADERS);
         if (!_config.containsKey(PROP_DIR))
@@ -198,10 +198,10 @@ public class SnarkManager implements Snark.CompleteListener {
             _log.debug("Configuring with I2CP options " + i2cpOpts);
         }
         //I2PSnarkUtil.instance().setI2CPConfig("66.111.51.110", 7654, new Properties());
-        String eepHost = _config.getProperty(PROP_EEP_HOST);
-        int eepPort = getInt(PROP_EEP_PORT, 4444);
-        if (eepHost != null)
-            _util.setProxy(eepHost, eepPort);
+        //String eepHost = _config.getProperty(PROP_EEP_HOST);
+        //int eepPort = getInt(PROP_EEP_PORT, 4444);
+        //if (eepHost != null)
+        //    _util.setProxy(eepHost, eepPort);
         _util.setMaxUploaders(getInt(PROP_UPLOADERS_TOTAL, Snark.MAX_TOTAL_UPLOADERS));
         _util.setMaxUpBW(getInt(PROP_UPBW_MAX, DEFAULT_MAX_UP_BW));
         String ot = _config.getProperty(I2PSnarkUtil.PROP_OPENTRACKERS);
@@ -226,20 +226,20 @@ public class SnarkManager implements Snark.CompleteListener {
                              String eepPort, String i2cpHost, String i2cpPort, String i2cpOpts,
                              String upLimit, String upBW, boolean useOpenTrackers, String openTrackers) {
         boolean changed = false;
-        if (eepHost != null) {
-            // unused, we use socket eepget
-            int port = _util.getEepProxyPort();
-            try { port = Integer.parseInt(eepPort); } catch (NumberFormatException nfe) {}
-            String host = _util.getEepProxyHost();
-            if ( (eepHost.trim().length() > 0) && (port > 0) &&
-                 ((!host.equals(eepHost) || (port != _util.getEepProxyPort()) )) ) {
-                _util.setProxy(eepHost, port);
-                changed = true;
-                _config.setProperty(PROP_EEP_HOST, eepHost);
-                _config.setProperty(PROP_EEP_PORT, eepPort+"");
-                addMessage("EepProxy location changed to " + eepHost + ":" + port);
-            }
-        }
+        //if (eepHost != null) {
+        //    // unused, we use socket eepget
+        //    int port = _util.getEepProxyPort();
+        //    try { port = Integer.parseInt(eepPort); } catch (NumberFormatException nfe) {}
+        //    String host = _util.getEepProxyHost();
+        //    if ( (eepHost.trim().length() > 0) && (port > 0) &&
+        //         ((!host.equals(eepHost) || (port != _util.getEepProxyPort()) )) ) {
+        //        _util.setProxy(eepHost, port);
+        //        changed = true;
+        //        _config.setProperty(PROP_EEP_HOST, eepHost);
+        //        _config.setProperty(PROP_EEP_PORT, eepPort+"");
+        //        addMessage("EepProxy location changed to " + eepHost + ":" + port);
+        //    }
+        //}
         if (upLimit != null) {
             int limit = _util.getMaxUploaders();
             try { limit = Integer.parseInt(upLimit); } catch (NumberFormatException nfe) {}
@@ -308,7 +308,10 @@ public class SnarkManager implements Snark.CompleteListener {
                     }
                 }
                 if (snarksActive) {
-                    addMessage(_("Cannot change the I2CP settings while torrents are active"));
+                    Properties p = new Properties();
+                    p.putAll(opts);
+                    _util.setI2CPConfig(i2cpHost, port, p);
+                    addMessage(_("I2CP and tunnel changes will take effect after stopping all torrents"));
                     _log.debug("i2cp host [" + i2cpHost + "] i2cp port " + port + " opts [" + opts 
                                + "] oldOpts [" + oldOpts + "]");
                 } else {

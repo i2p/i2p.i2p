@@ -618,14 +618,14 @@ public class Snark
             command_interpreter = false;
             i++;
           }
-        else if (args[i].equals("--eepproxy"))
-          {
-            String proxyHost = args[i+1];
-            String proxyPort = args[i+2];
-            if (!configured)
-                util.setProxy(proxyHost, Integer.parseInt(proxyPort));
-            i += 3;
-          }
+        //else if (args[i].equals("--eepproxy"))
+        //  {
+        //    String proxyHost = args[i+1];
+        //    String proxyPort = args[i+2];
+        //    if (!configured)
+        //        util.setProxy(proxyHost, Integer.parseInt(proxyPort));
+        //    i += 3;
+        //  }
         else if (args[i].equals("--i2cp"))
           {
             String i2cpHost = args[i+1];

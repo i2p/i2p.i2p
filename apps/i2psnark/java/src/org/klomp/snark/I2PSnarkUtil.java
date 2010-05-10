@@ -45,7 +45,7 @@ public class I2PSnarkUtil {
     private int _proxyPort;
     private String _i2cpHost;
     private int _i2cpPort;
-    private Map _opts;
+    private Map<String, String> _opts;
     private I2PSocketManager _manager;
     private boolean _configured;
     private final Set<Hash> _shitlist;
@@ -65,7 +65,7 @@ public class I2PSnarkUtil {
         _context = ctx;
         _log = _context.logManager().getLog(Snark.class);
         _opts = new HashMap();
-        setProxy("127.0.0.1", 4444);
+        //setProxy("127.0.0.1", 4444);
         setI2CPConfig("127.0.0.1", 7654, null);
         _shitlist = new ConcurrentHashSet();
         _configured = false;
@@ -85,6 +85,7 @@ public class I2PSnarkUtil {
      * host for no proxying)
      *
      */
+/*****
     public void setProxy(String host, int port) {
         if ( (host != null) && (port > 0) ) {
             _shouldProxy = true;
@@ -97,6 +98,7 @@ public class I2PSnarkUtil {
         }
         _configured = true;
     }
+******/
     
     public boolean configured() { return _configured; }
     
@@ -128,7 +130,7 @@ public class I2PSnarkUtil {
     
     public String getI2CPHost() { return _i2cpHost; }
     public int getI2CPPort() { return _i2cpPort; }
-    public Map getI2CPOptions() { return _opts; }
+    public Map<String, String> getI2CPOptions() { return _opts; }
     public String getEepProxyHost() { return _proxyHost; }
     public int getEepProxyPort() { return _proxyPort; }
     public boolean getEepProxySet() { return _shouldProxy; }

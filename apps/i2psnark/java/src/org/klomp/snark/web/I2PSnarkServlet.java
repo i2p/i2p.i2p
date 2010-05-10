@@ -419,7 +419,7 @@ public class I2PSnarkServlet extends Default {
             String eepPort = req.getParameter("eepPort");
             String i2cpHost = req.getParameter("i2cpHost");
             String i2cpPort = req.getParameter("i2cpPort");
-            String i2cpOpts = req.getParameter("i2cpOpts");
+            String i2cpOpts = buildI2CPOpts(req);
             String upLimit = req.getParameter("upLimit");
             String upBW = req.getParameter("upBW");
             boolean useOpenTrackers = req.getParameter("useOpenTrackers") != null;
@@ -486,6 +486,23 @@ public class I2PSnarkServlet extends Default {
         }
     }
     
+    private static final String iopts[] = {"inbound.length", "inbound.quantity",
+                                           "outbound.length", "outbound.quantity" };
+
+    /** put the individual i2cp selections into the option string */
+    private static String buildI2CPOpts(HttpServletRequest req) {
+        StringBuilder buf = new StringBuilder(128);
+        String p = req.getParameter("i2cpOpts");
+        if (p != null)
+            buf.append(p);
+        for (int i = 0; i < iopts.length; i++) {
+            p = req.getParameter(iopts[i]);
+            if (p != null)
+                buf.append(' ').append(iopts[i]).append('=').append(p);
+        }
+        return buf.toString();
+    }
+
     /**
      *  Sort alphabetically in current locale, ignore case, ignore leading "the "
      *  (I guess this is worth it, a lot of torrents start with "The "
@@ -982,6 +999,20 @@ public class I2PSnarkServlet extends Default {
         //out.write("port: <input type=\"text\" name=\"eepPort\" value=\""
         //          + _manager.util().getEepProxyPort() + "\" size=\"5\" maxlength=\"5\" /><br>\n");
 
+        Map<String, String> options = new TreeMap(_manager.util().getI2CPOptions());
+        out.write("<tr><td>");
+        out.write(_("Inbound Settings"));
+        out.write(":<td>");
+        out.write(renderOptions(1, 6, options.remove("inbound.quantity"), "inbound.quantity", TUNNEL));
+        out.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+        out.write(renderOptions(0, 4, options.remove("inbound.length"), "inbound.length", HOP));
+        out.write("<tr><td>");
+        out.write(_("Outbound Settings"));
+        out.write(":<td>");
+        out.write(renderOptions(1, 6, options.remove("outbound.quantity"), "outbound.quantity", TUNNEL));
+        out.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+        out.write(renderOptions(0, 4, options.remove("outbound.length"), "outbound.length", HOP));
+
         out.write("<tr><td>");
         out.write(_("I2CP host"));
         out.write(": <td><input type=\"text\" name=\"i2cpHost\" value=\"" 
@@ -993,7 +1024,6 @@ public class I2PSnarkServlet extends Default {
                   + _manager.util().getI2CPPort() + "\" size=\"5\" maxlength=\"5\" > <br>\n");
 
         StringBuilder opts = new StringBuilder(64);
-        Map options = new TreeMap(_manager.util().getI2CPOptions());
         for (Iterator iter = options.entrySet().iterator(); iter.hasNext(); ) {
             Map.Entry entry = (Map.Entry)iter.next();
             String key = (String)entry.getKey();
@@ -1012,6 +1042,38 @@ public class I2PSnarkServlet extends Default {
         out.write("</form></div>");
     }
     
+    /** copied from ConfigTunnelsHelper */
+    private static final String HOP = _x("hop");
+    private static final String TUNNEL = _x("tunnel");
+    /** dummies for translation */
+    private static final String HOPS = _x("hops");
+    private static final String TUNNELS = _x("tunnels");
+
+    /** modded from ConfigTunnelsHelper */
+    private String renderOptions(int min, int max, String strNow, String selName, String name) {
+        int now = 2;
+        try {
+            now = Integer.parseInt(strNow);
+        } catch (Throwable t) {}
+        StringBuilder buf = new StringBuilder(128);
+        buf.append("<select name=\"").append(selName).append("\">\n");
+        for (int i = min; i <= max; i++) {
+            buf.append("<option value=\"").append(i).append("\" ");
+            if (i == now)
+                buf.append("selected=\"true\" ");
+            String pname;
+            // pluralize and then translate
+            if (i != 1 && i != -1)
+                pname = name + 's';
+            else
+                pname = name;
+            buf.append(">").append(i).append(' ').append(_(pname));
+            buf.append("</option>\n");
+        }
+        buf.append("</select>\n");
+        return buf.toString();
+    }
+
     /** translate */
     private String _(String s) {
         return _manager.util().getString(s);
@@ -1020,6 +1082,11 @@ public class I2PSnarkServlet extends Default {
     /** translate */
     private String _(String s, Object o) {
         return _manager.util().getString(s, o);
+    }
+
+    /** dummy for tagging */
+    private static String _x(String s) {
+        return s;
     }
 
     // rounding makes us look faster :)
