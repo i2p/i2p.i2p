@@ -66,6 +66,7 @@ public class LeaseSet extends DataStructureImpl {
     private volatile Hash _currentRoutingKey;
     private volatile byte[] _routingKeyGenMod;
     private boolean _receivedAsPublished;
+    private boolean _receivedAsReply;
     // Store these since isCurrent() and getEarliestLeaseDate() are called frequently
     private long _firstExpiration;
     private long _lastExpiration;
@@ -119,10 +120,19 @@ public class LeaseSet extends DataStructureImpl {
     /**
      * If true, we received this LeaseSet by a remote peer publishing it to
      * us, rather than by searching for it ourselves or locally creating it.
-     *
+     * Default false.
      */
     public boolean getReceivedAsPublished() { return _receivedAsPublished; }
+    /** Default false */
     public void setReceivedAsPublished(boolean received) { _receivedAsPublished = received; }
+
+    /**
+     * If true, we received this LeaseSet by searching for it
+     * Default false.
+     */
+    public boolean getReceivedAsReply() { return _receivedAsReply; }
+    /** set to true */
+    public void setReceivedAsReply() { _receivedAsReply = true; }
 
     public void addLease(Lease lease) {
         if (lease == null) throw new IllegalArgumentException("erm, null lease");
