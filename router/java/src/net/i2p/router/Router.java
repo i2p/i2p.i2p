@@ -443,18 +443,19 @@ public class Router {
         }
     }
     
-    // publicize our ballpark capacity - this does not affect anything at
-    // the moment
+    // publicize our ballpark capacity
     public static final char CAPABILITY_BW12 = 'K';
     public static final char CAPABILITY_BW32 = 'L';
     public static final char CAPABILITY_BW64 = 'M';
     public static final char CAPABILITY_BW128 = 'N';
     public static final char CAPABILITY_BW256 = 'O';
+    public static final String PROP_FORCE_BWCLASS = "router.forceBandwidthClass";
     
     public static final char CAPABILITY_REACHABLE = 'R';
     public static final char CAPABILITY_UNREACHABLE = 'U';
     public static final String PROP_FORCE_UNREACHABLE = "router.forceUnreachable";
 
+    /** @deprecated unused */
     public static final char CAPABILITY_NEW_TUNNEL = 'T';
     
     public void addCapabilities(RouterInfo ri) {
@@ -464,7 +465,10 @@ public class Router {
         if (_log.shouldLog(Log.INFO))
             _log.info("Adding capabilities w/ bw limit @ " + bwLim, new Exception("caps"));
         
-        if (bwLim < 12) {
+        String force = _context.getProperty(PROP_FORCE_BWCLASS);
+        if (force != null && force.length() > 0) {
+            ri.addCapability(force.charAt(0));
+        } else if (bwLim < 12) {
             ri.addCapability(CAPABILITY_BW12);
         } else if (bwLim <= 32) {
             ri.addCapability(CAPABILITY_BW32);
