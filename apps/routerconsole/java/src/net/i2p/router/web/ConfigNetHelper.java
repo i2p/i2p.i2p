@@ -166,7 +166,8 @@ public class ConfigNetHelper extends HelperBase {
         return kbytesToBits(getShareBandwidth());
     }
     private String kbytesToBits(int kbytes) {
-        return DataHelper.formatSize(kbytes * 8 * 1024) + ' ' + _("bits per second");
+        return DataHelper.formatSize(kbytes * 8 * 1024) + ' ' + _("bits per second") +
+               ' ' + _("or {0} bytes per month maximum", DataHelper.formatSize(kbytes * 1024l * 60 * 60 * 24 * 31));
     }
     public String getInboundBurstRate() {
         return "" + _context.bandwidthLimiter().getInboundBurstKBytesPerSecond();
