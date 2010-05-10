@@ -19,7 +19,7 @@ import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
-import net.i2p.router.networkdb.kademlia.PeerSelector;
+import net.i2p.router.networkdb.kademlia.HashDistance;
 import net.i2p.util.Log;
 
 /**
@@ -505,8 +505,8 @@ public abstract class TunnelPeerSelector {
             Hash lh = SHA256Generator.getInstance().calculateHash(data);
             System.arraycopy(((Hash) r).getData(), 0, data, 0, Hash.HASH_LENGTH);
             Hash rh = SHA256Generator.getInstance().calculateHash(data);
-            BigInteger ll = PeerSelector.getDistance(_hash, lh);
-            BigInteger rr = PeerSelector.getDistance(_hash, rh);
+            BigInteger ll = HashDistance.getDistance(_hash, lh);
+            BigInteger rr = HashDistance.getDistance(_hash, rh);
             return ll.compareTo(rr);
         }
     }
