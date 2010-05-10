@@ -712,12 +712,14 @@ public class DataHelper {
      *
      */
     public final static boolean eq(byte lhs[], byte rhs[]) {
+        // this appears to be the way Arrays.equals is defined, so all the extra tests are unnecessary?
         boolean eq = (((lhs == null) && (rhs == null)) || ((lhs != null) && (rhs != null) && (Arrays.equals(lhs, rhs))));
         return eq;
     }
 
     /**
      * Compare two integers, really just for consistency.
+     * @deprecated inefficient
      */
     public final static boolean eq(int lhs, int rhs) {
         return lhs == rhs;
@@ -725,6 +727,7 @@ public class DataHelper {
 
     /**
      * Compare two longs, really just for consistency.
+     * @deprecated inefficient
      */
     public final static boolean eq(long lhs, long rhs) {
         return lhs == rhs;
@@ -732,6 +735,7 @@ public class DataHelper {
 
     /**
      * Compare two bytes, really just for consistency.
+     * @deprecated inefficient
      */
     public final static boolean eq(byte lhs, byte rhs) {
         return lhs == rhs;
