@@ -1952,9 +1952,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 buf.append("<br><i>").append(_("Choked")).append("</i>");
                 appended = true;
             }
-            if (peer.getConsecutiveFailedSends() > 0) {
+            int cfs = peer.getConsecutiveFailedSends();
+            if (cfs > 0) {
                 if (!appended) buf.append("<br>");
-                buf.append(" <i>").append(peer.getConsecutiveFailedSends()).append(' ').append(_("fail(s)")).append("</i>");
+                buf.append(" <i>");
+                if (cfs == 1)
+                    buf.append(_("1 fail"));
+                else
+                    buf.append(_("{0} fails", cfs));
+                buf.append("</i>");
                 appended = true;
             }
             if (_context.shitlist().isShitlisted(peer.getRemotePeer(), STYLE)) {
@@ -2180,6 +2186,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
      */
     private final String _(String s) {
         return Translate.getString(s, _context, BUNDLE_NAME);
+    }
+
+    /**
+     *  Translate
+     */
+    private final String _(String s, Object o) {
+        return Translate.getString(s, o, _context, BUNDLE_NAME);
     }
 
     /*
