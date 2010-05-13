@@ -777,7 +777,7 @@ public class I2PSnarkServlet extends Default {
                     client = "Transmission";
                 else
                     client = _("Unknown") + " (" + ch + ')';
-                out.write(client + "&nbsp;&nbsp;" + peer.toString().substring(5, 9));
+                out.write(client + "&nbsp;&nbsp;<tt>" + peer.toString().substring(5, 9)+ "</tt>");
                 if (showDebug)
                     out.write(" inactive " + (peer.getInactiveTime() / 1000) + "s");
                 out.write("</td>\n\t");
