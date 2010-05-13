@@ -94,7 +94,7 @@ public class NetDbRenderer {
     }
 
     /**
-     *  @param debug @since 0.7.14 sort by routing key, display distance from our routing key
+     *  @param debug @since 0.7.14 sort by distance from us, display
      *               median distance, and other stuff, useful when floodfill
      */
     public void renderLeaseSetHTML(Writer out, boolean debug) throws IOException {
@@ -106,7 +106,7 @@ public class NetDbRenderer {
         Set<LeaseSet> leases;
         DecimalFormat fmt;
         if (debug) {
-            ourRKey = _context.routingKeyGenerator().getRoutingKey(_context.routerHash());
+            ourRKey = _context.routerHash();
             leases = new TreeSet(new LeaseSetRoutingKeyComparator(ourRKey));
             fmt = new DecimalFormat("#0.00");
         } else {
@@ -169,13 +169,17 @@ public class NetDbRenderer {
         }
         if (debug) {
             buf.append("<p><b>Total Leasesets: " + leases.size());
-            buf.append("<p>Our RKey: " + ourRKey.toBase64() + "<p>");
+            buf.append("<p><b>Published (RAP) Leasesets: " + _context.netDb().getKnownLeaseSets());
             buf.append("<p>Mod Data: " + HexDump.dump(_context.routingKeyGenerator().getModData()) + "<p>");
+            buf.append("<p>Network data (only valid if floodfill):");
+            buf.append("<p>Center of Key Space (router hash): " + ourRKey.toBase64() + "<p>");
             if (median != null) {
                 double log2 = biLog2(median);
                 buf.append("<p>Median distance (bits): " + fmt.format(log2));
-                // 1 for median, 3 for 8 floodfills... is this right?
-                buf.append("<p>Estimated total floodfills: " + Math.round(Math.pow(2, 1 + 3 + 255 - log2)));
+                // 3 for 8 floodfills... -1 for median
+                int total = (int) Math.round(Math.pow(2, 3 + 256 - 1 - log2));
+                buf.append("<p>Estimated total floodfills: " + total);
+                buf.append("<p>Estimated network total leasesets: " + (total * leases.size() / 8));
             }
         }
         out.write(buf.toString());
