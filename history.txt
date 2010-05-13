@@ -1,3 +1,7 @@
+2010-05-13 zzz
+    * netdb.jsp debug tweaks
+    * Plugins: Try to prevent ZipErrors after upgrade
+
 2010-05-10 zzz
     * Console:
       - Summary bar tweaks

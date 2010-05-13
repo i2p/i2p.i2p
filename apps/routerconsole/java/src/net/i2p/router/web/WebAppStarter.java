@@ -3,10 +3,13 @@ package net.i2p.router.web;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
+import net.i2p.util.FileUtil;
 
 import org.mortbay.http.HttpContext;
 import org.mortbay.http.HttpListener;
@@ -31,6 +34,8 @@ import org.mortbay.jetty.servlet.WebApplicationContext;
  */
 public class WebAppStarter {
 
+    static final Map<String, Long> warModTimes = new ConcurrentHashMap();
+
     /**
      *  adds and starts
      *  @throws just about anything, caller would be wise to catch Throwable
@@ -53,6 +58,28 @@ public class WebAppStarter {
         try {
             stopWebApp(server, appName);
         } catch (Throwable t) {}
+
+        // To avoid ZipErrors from JarURLConnetion caching,
+        // (used by Jetty JarResource and JarFileResource)
+        // copy the war to a new directory if it is newer than the one we loaded originally.
+        // Yes, URLConnection has a setDefaultUseCaches() method, but it's hard to get to
+        // because it's non-static and the class is abstract, and we don't really want to
+        // set the default to false for everything.
+        long newmod = (new File(warPath)).lastModified();
+        if (newmod <= 0)
+            throw new IOException("Web app " + warPath + " does not exist");
+        Long oldmod = warModTimes.get(warPath);
+        if (oldmod == null) {
+            warModTimes.put(warPath, new Long(newmod));
+        } else if (oldmod.longValue() < newmod) {
+            // copy war to temporary directory
+            File warTmpDir = new File(ctx.getTempDir(), "war-copy-" + appName + ctx.random().nextInt());
+            warTmpDir.mkdir();
+            String tmpPath = (new File(warTmpDir, appName + ".war")).getAbsolutePath();
+            if (!FileUtil.copy(warPath, tmpPath, true))
+                throw new IOException("Web app failed copy from " + warPath + " to " + tmpPath);
+            warPath = tmpPath;
+        }
 
         WebApplicationContext wac = server.addWebApplication("/"+ appName, warPath);
         tmpdir.mkdir();
