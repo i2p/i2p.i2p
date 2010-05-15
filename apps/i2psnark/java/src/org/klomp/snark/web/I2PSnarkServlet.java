@@ -966,14 +966,14 @@ public class I2PSnarkServlet extends Default {
 */
         out.write("<tr><td>");
         out.write(_("Total uploader limit"));
-        out.write(": <td><input type=\"text\" name=\"upLimit\" value=\""
+        out.write(": <td><input type=\"text\" name=\"upLimit\" class=\"r\" value=\""
                   + _manager.util().getMaxUploaders() + "\" size=\"3\" maxlength=\"3\" > ");
         out.write(_("peers"));
         out.write("<br>\n");
 
         out.write("<tr><td>");
         out.write(_("Up bandwidth limit"));
-        out.write(": <td><input type=\"text\" name=\"upBW\" value=\""
+        out.write(": <td><input type=\"text\" name=\"upBW\" class=\"r\" value=\""
                   + _manager.util().getMaxUpBW() + "\" size=\"3\" maxlength=\"3\" > KBps <i>(");
         out.write(_("Half available bandwidth recommended."));
         out.write(" <a href=\"/config.jsp\" target=\"blank\">");
@@ -1020,7 +1020,7 @@ public class I2PSnarkServlet extends Default {
 
         out.write("<tr><td>");
         out.write(_("I2CP port"));
-        out.write(": <td><input type=\"text\" name=\"i2cpPort\" value=\"" +
+        out.write(": <td><input type=\"text\" name=\"i2cpPort\" class=\"r\" value=\"" +
                   + _manager.util().getI2CPPort() + "\" size=\"5\" maxlength=\"5\" > <br>\n");
 
         StringBuilder opts = new StringBuilder(64);
