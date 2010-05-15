@@ -149,6 +149,10 @@ public class StatSummarizer implements Runnable {
         return false;
     }
     
+    /**
+     *  This does the two-data bandwidth graph only.
+     *  For all other graphs see SummaryRenderer
+     */
     public boolean renderRatePng(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount, boolean showCredit) throws IOException {
         long end = _context.clock().now() - 60*1000;
         if (width > GraphHelper.MAX_X)
@@ -166,22 +170,22 @@ public class StatSummarizer implements Runnable {
             def.setTimePeriod(start/1000, 0);
             def.setLowerLimit(0d);
             def.setBaseValue(1024);
-            String title = "Bandwidth usage";
+            String title = _("Bandwidth usage");
             if (!hideTitle)
                 def.setTitle(title);
             String sendName = SummaryListener.createName(_context, "bw.sendRate.60000");
             String recvName = SummaryListener.createName(_context, "bw.recvRate.60000");
             def.datasource(sendName, sendName, sendName, "AVERAGE", "MEMORY");
             def.datasource(recvName, recvName, recvName, "AVERAGE", "MEMORY");
-            def.area(sendName, Color.BLUE, "Outbound bytes/sec");
+            def.area(sendName, Color.BLUE, _("Outbound bytes/sec"));
             //def.line(sendName, Color.BLUE, "Outbound bytes/sec", 3);
-            def.line(recvName, Color.RED, "Inbound bytes/sec@r", 3);
+            def.line(recvName, Color.RED, _("Inbound bytes/sec") + "@r", 3);
             //def.area(recvName, Color.RED, "Inbound bytes/sec@r");
             if (!hideLegend) {
-                def.gprint(sendName, "AVERAGE", "out average: @2@sbytes/sec");
-                def.gprint(sendName, "MAX", " max: @2@sbytes/sec@r");
-                def.gprint(recvName, "AVERAGE", "in average:  @2@sbytes/sec");
-                def.gprint(recvName, "MAX", " max: @2@sbytes/sec@r");
+                def.gprint(sendName, "AVERAGE", _("out average") + ": @2@s" + _("bytes/sec"));
+                def.gprint(sendName, "MAX", ' ' + _("max") + ": @2@s" + _("bytes/sec") + "@r");
+                def.gprint(recvName, "AVERAGE", _("in average") + ":  @2@s" + _("bytes/sec"));
+                def.gprint(recvName, "MAX", ' ' + _("max") + ": @2@s" + _("bytes/sec") + "@r");
             }
             if (!showCredit)
                 def.setShowSignature(false);
@@ -247,5 +251,13 @@ public class StatSummarizer implements Runnable {
             } catch (NumberFormatException nfe) {}
         }
         return rv;
+    }
+
+    /** translate a string */
+    private String _(String s) {
+        // the RRD font doesn't have zh chars, at least on my system
+        if ("zh".equals(Messages.getLanguage(_context)))
+            return s;
+        return Messages.getString(s, _context);
     }
 }
