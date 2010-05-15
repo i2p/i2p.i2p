@@ -625,4 +625,12 @@ public class LogManager {
             shutdown();
         }
     }
+
+    /**
+     *  Convenience method for LogRecordFormatter
+     *  @since 0.7.14
+     */
+    I2PAppContext getContext() {
+        return _context;
+    }
 }

@@ -1,3 +1,13 @@
+2010-05-15 zzz
+    * Console:
+      - Tag text in graphs
+      - Move SummaryRenderer to its own file
+    * Eepsite: Set no-cache in redirecting page
+    * Hash: Move caching XOR methods only used by KBucket
+      into netdb
+    * i2psnark: CSS tweaks
+    * Log: Translate priority
+
 2010-05-13 zzz
     * netdb.jsp debug tweaks
     * Plugins: Try to prevent ZipErrors after upgrade
