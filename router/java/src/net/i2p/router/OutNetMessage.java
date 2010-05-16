@@ -66,18 +66,8 @@ public class OutNetMessage {
     public OutNetMessage(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(OutNetMessage.class);
-        setTarget(null);
-        _message = null;
-        _messageSize = 0;
         setPriority(-1);
         setExpiration(-1);
-        setOnSendJob(null);
-        setOnFailedSendJob(null);
-        setOnReplyJob(null);
-        setOnFailedReplyJob(null);
-        setReplySelector(null);
-        _failedTransports = null;
-        _sendBegin = 0;
         //_createdBy = new Exception("Created by");
         _created = context.clock().now();
         timestamp("Created");

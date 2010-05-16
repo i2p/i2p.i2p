@@ -26,8 +26,8 @@ public class PublicKey extends DataStructureImpl {
     public final static int KEYSIZE_BYTES = 256;
 
     public PublicKey() {
-        setData(null);
     }
+
     public PublicKey(byte data[]) {
         if ( (data == null) || (data.length != KEYSIZE_BYTES) )
             throw new IllegalArgumentException("Data must be specified, and the correct size");
@@ -39,7 +39,6 @@ public class PublicKey extends DataStructureImpl {
      * on a prior instance of PublicKey
      */
     public PublicKey(String base64Data)  throws DataFormatException {
-        this();
         fromBase64(base64Data);
     }
 

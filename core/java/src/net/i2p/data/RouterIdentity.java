@@ -31,10 +31,6 @@ public class RouterIdentity extends DataStructureImpl {
     private Hash __calculatedHash;
 
     public RouterIdentity() {
-        setCertificate(null);
-        setSigningPublicKey(null);
-        setPublicKey(null);
-        __calculatedHash = null;
     }
 
     public Certificate getCertificate() {

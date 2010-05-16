@@ -28,8 +28,8 @@ public class PrivateKey extends DataStructureImpl {
     public final static int KEYSIZE_BYTES = 256;
 
     public PrivateKey() {
-        setData(null);
     }
+
     public PrivateKey(byte data[]) { setData(data); }
 
     /** constructs from base64
@@ -37,7 +37,6 @@ public class PrivateKey extends DataStructureImpl {
      * on a prior instance of PrivateKey
      */
     public PrivateKey(String base64Data) throws DataFormatException {
-        this();
         fromBase64(base64Data);
     }
 

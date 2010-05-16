@@ -33,7 +33,6 @@ public class I2NPMessageHandler {
     public I2NPMessageHandler(I2PAppContext context) {
         _context = context;
         _log = context.logManager().getLog(I2NPMessageHandler.class);
-        _messageBuffer = null;
         _lastSize = -1;
     }
     

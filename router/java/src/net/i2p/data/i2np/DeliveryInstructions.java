@@ -51,14 +51,7 @@ public class DeliveryInstructions extends DataStructureImpl {
     private final static long FLAG_DELAY = 16;
     
     public DeliveryInstructions() {
-        setEncrypted(false);
-        setEncryptionKey(null);
         setDeliveryMode(-1);
-        setDestination(null);
-        setRouter(null);
-        setTunnelId(null);
-        setDelayRequested(false);
-        setDelaySeconds(0);
     }
     
     public boolean getEncrypted() { return _encrypted; }

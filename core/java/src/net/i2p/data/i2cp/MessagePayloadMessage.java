@@ -31,7 +31,6 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
     public MessagePayloadMessage() {
         setSessionId(-1);
         setMessageId(-1);
-        setPayload(null);
     }
 
     public long getSessionId() {

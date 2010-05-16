@@ -28,7 +28,8 @@ public class SigningPrivateKey extends DataStructureImpl {
 
     public final static int KEYSIZE_BYTES = 20;
 
-    public SigningPrivateKey() { this((byte[])null); }
+    public SigningPrivateKey() {}
+
     public SigningPrivateKey(byte data[]) { setData(data); }
 
     /** constructs from base64
@@ -36,7 +37,6 @@ public class SigningPrivateKey extends DataStructureImpl {
      * on a prior instance of SigningPrivateKey
      */
     public SigningPrivateKey(String base64Data)  throws DataFormatException {
-        this();
         fromBase64(base64Data);
     }
 

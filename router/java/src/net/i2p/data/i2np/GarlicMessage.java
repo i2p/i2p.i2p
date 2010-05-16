@@ -26,7 +26,6 @@ public class GarlicMessage extends I2NPMessageImpl {
     
     public GarlicMessage(I2PAppContext context) {
         super(context);
-        setData(null);
     }
     
     public byte[] getData() { 

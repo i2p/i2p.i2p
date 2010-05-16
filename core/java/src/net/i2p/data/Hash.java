@@ -29,7 +29,6 @@ public class Hash extends DataStructureImpl {
     public final static Hash FAKE_HASH = new Hash(new byte[HASH_LENGTH]);
     
     public Hash() {
-        setData(null);
     }
 
     public Hash(byte data[]) {

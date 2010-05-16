@@ -27,8 +27,8 @@ public class SessionKey extends DataStructureImpl {
     public static final SessionKey INVALID_KEY = new SessionKey(new byte[KEYSIZE_BYTES]);
 
     public SessionKey() {
-        this(null);
     } 
+
     public SessionKey(byte data[]) {
         setData(data);
     }

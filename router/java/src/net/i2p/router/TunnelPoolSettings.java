@@ -60,12 +60,7 @@ public class TunnelPoolSettings {
         _duration = DEFAULT_DURATION;
         _length = DEFAULT_LENGTH;
         _lengthVariance = DEFAULT_LENGTH_VARIANCE;
-        _lengthOverride = 0;
         _allowZeroHop = DEFAULT_ALLOW_ZERO_HOP;
-        _isInbound = false;
-        _isExploratory = false;
-        _destination = null;
-        _destinationNickname = null;
         _IPRestriction = DEFAULT_IP_RESTRICTION;
         _unknownOptions = new Properties();
         _randomKey = generateRandomKey();

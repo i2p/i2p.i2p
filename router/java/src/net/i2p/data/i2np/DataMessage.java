@@ -24,7 +24,6 @@ public class DataMessage extends I2NPMessageImpl {
     
     public DataMessage(I2PAppContext context) {
         super(context);
-        _data = null;
     }
     
     public byte[] getData() { 

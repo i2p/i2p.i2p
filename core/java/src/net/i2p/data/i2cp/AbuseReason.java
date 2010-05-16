@@ -27,7 +27,6 @@ public class AbuseReason extends DataStructureImpl {
     private String _reason;
 
     public AbuseReason() {
-        setReason(null);
     }
 
     public String getReason() {

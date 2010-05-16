@@ -42,8 +42,6 @@ public class Certificate extends DataStructureImpl {
     public final static int CERTIFICATE_TYPE_MULTIPLE = 4;
 
     public Certificate() {
-        _type = 0;
-        _payload = null;
     }
 
     public Certificate(int type, byte[] payload) {

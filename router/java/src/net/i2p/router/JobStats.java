@@ -15,11 +15,8 @@ class JobStats {
     
     public JobStats(String name) {
         _job = name;
-        _numRuns = 0;
-        _totalTime = 0;
         _maxTime = -1;
         _minTime = -1;
-        _totalPendingTime = 0;
         _maxPendingTime = -1;
         _minPendingTime = -1;
     }

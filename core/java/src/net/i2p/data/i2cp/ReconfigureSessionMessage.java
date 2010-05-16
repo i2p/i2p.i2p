@@ -28,8 +28,6 @@ public class ReconfigureSessionMessage extends I2CPMessageImpl {
     private SessionConfig _sessionConfig;
 
     public ReconfigureSessionMessage() {
-        _sessionId = null;
-        _sessionConfig = null;
     }
 
     public SessionId getSessionId() {

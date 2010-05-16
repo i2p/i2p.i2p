@@ -32,10 +32,6 @@ public class SendMessageMessage extends I2CPMessageImpl {
     private long _nonce;
 
     public SendMessageMessage() {
-        setSessionId(null);
-        setDestination(null);
-        setPayload(null);
-        setNonce(0);
     }
 
     public SessionId getSessionId() {
