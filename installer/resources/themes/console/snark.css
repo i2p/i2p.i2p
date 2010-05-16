@@ -187,6 +187,7 @@ input {
      text-align: left;
      padding: 2px 4px;
      -moz-border-radius: 4px;
+     border-radius: 4px;
      border: 1px;
 }
 
@@ -201,6 +202,7 @@ select {
      font-weight: bold;
      padding: 2px 2px 2px 3px;
      -moz-border-radius: 4px;
+     border-radius: 4px;
 }
 
 textarea {
@@ -209,6 +211,7 @@ textarea {
      font-weight: bold;
      padding: 1px 4px 0px;
      -moz-border-radius: 4px;
+     border-radius: 4px;
 }
 
 img {
