@@ -35,7 +35,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Properties;
 
+import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Destination;
 
 public class AddressbookBean
 {
@@ -254,15 +256,40 @@ public class AddressbookBean
 				boolean changed = false;
 				int deleted = 0;
 				String name = null;
-				if (action.equals(_("Add"))) {
+				if (action.equals(_("Add")) || action.equals(_("Replace"))) {
 					if( addressbook != null && hostname != null && destination != null ) {
-						addressbook.put( hostname, destination );
-						changed = true;
-						message = _("Destination added.");
-						// clear search when adding
-						search = null;
+						String oldDest = (String) addressbook.get(hostname);
+						if (destination.equals(oldDest)) {
+							message = _("Host name {0} is already in addressbook, unchanged.", hostname);
+						} else if (oldDest != null && !action.equals(_("Replace"))) {
+							message = _("Host name {0} is already in addressbook with a different destination. Click \"Replace\" to overwrite.", hostname);
+						} else {
+							boolean valid = true;
+							try {
+								Destination dest = new Destination(destination);
+							} catch (DataFormatException dfe) {
+								valid = false;
+							}
+							if (valid) {
+								addressbook.put( hostname, destination );
+								changed = true;
+								if (oldDest == null)
+									message = _("Destination added for {0}.", hostname);
+								else
+									message = _("Destination changed for {0}.", hostname);
+								// clear form
+								hostname = null;
+								destination = null;
+							} else {
+								message = _("Invalid Base 64 destination.");
+							}
+						}
+					} else {
+						message = _("Please enter a host name and destination");
 					}
-				} else if (action.equals(_("Delete"))) {
+					// clear search when adding
+					search = null;
+				} else if (action.equals(_("Delete Selected"))) {
 					Iterator it = deletionMarks.iterator();
 					while( it.hasNext() ) {
 						name = (String)it.next();
@@ -340,7 +367,7 @@ public class AddressbookBean
 		return destination;
 	}
 	public void setDestination(String destination) {
-		this.destination = DataHelper.stripHTML(destination);  // XSS
+		this.destination = DataHelper.stripHTML(destination).trim();  // XSS
 	}
 	public String getHostname() {
 		return hostname;
@@ -352,7 +379,7 @@ public class AddressbookBean
 		deletionMarks.addLast( name );
 	}
 	public void setHostname(String hostname) {
-		this.hostname = DataHelper.stripHTML(hostname);  // XSS
+		this.hostname = DataHelper.stripHTML(hostname).trim();  // XSS
 	}
 	private int getBeginInt() {
 		return Math.max(0, Math.min(entries.length - 1, beginIndex));

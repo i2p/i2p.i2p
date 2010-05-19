@@ -69,8 +69,8 @@
 <textarea name="config" rows="10" cols="80">${cfg.config}</textarea>
 </div>
 <div id="buttons">
-<input type="submit" name="action" value="<%=intl._("Save")%>" >
 <input type="submit" name="action" value="<%=intl._("Reload")%>" >
+<input type="submit" name="action" value="<%=intl._("Save")%>" >
 </div>
 </form>
 <div id="help">
