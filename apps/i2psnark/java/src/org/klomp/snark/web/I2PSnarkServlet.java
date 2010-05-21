@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -37,7 +38,10 @@ import org.klomp.snark.SnarkManager;
 import org.klomp.snark.Storage;
 import org.klomp.snark.TrackerClient;
 
+import org.mortbay.http.HttpResponse;
 import org.mortbay.jetty.servlet.Default;
+import org.mortbay.util.Resource;
+import org.mortbay.util.URI;
 
 /**
  *  We extend Default instead of HTTPServlet so we can handle
@@ -105,13 +109,52 @@ public class I2PSnarkServlet extends Default {
         super.destroy();
     }
 
+    /**
+     * Some parts modified from:
+     * <pre>
+      // ========================================================================
+      // $Id: Default.java,v 1.51 2006/10/08 14:13:18 gregwilkins Exp $
+      // Copyright 199-2004 Mort Bay Consulting Pty. Ltd.
+      // ------------------------------------------------------------------------
+      // Licensed under the Apache License, Version 2.0 (the "License");
+      // you may not use this file except in compliance with the License.
+      // You may obtain a copy of the License at 
+      // http://www.apache.org/licenses/LICENSE-2.0
+      // Unless required by applicable law or agreed to in writing, software
+      // distributed under the License is distributed on an "AS IS" BASIS,
+      // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      // See the License for the specific language governing permissions and
+      // limitations under the License.
+      // ========================================================================
+     * </pre>
+     *
+     */
     @Override
     public void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // this is the part after /i2psnark
         String path = req.getServletPath();
         // index.jsp doesn't work, it is grabbed by the war handler before here
         if (!(path == null || path.equals("/") || path.equals("/index.jsp") || path.equals("/index.html"))) {
-            super.service(req, resp);
+            if (path.endsWith("/")) {
+                // bypass the horrid Resource.getListHTML()
+                String pathInfo = req.getPathInfo();
+                String pathInContext = URI.addPaths(path, pathInfo);
+                resp.setCharacterEncoding("UTF-8");
+                resp.setContentType("text/html; charset=UTF-8");
+                Resource resource = getResource(pathInContext);
+                if (resource == null || (!resource.exists()) || !resource.isDirectory()) {
+                    resp.sendError(HttpResponse.__404_Not_Found);
+                } else {
+                    String base = URI.addPaths(req.getRequestURI(), "/");
+                    String listing = getListHTML(resource, base, true);
+                    if (listing != null)
+                        resp.getWriter().write(listing);
+                    else // shouldn't happen
+                        resp.sendError(HttpResponse.__404_Not_Found);
+                }
+            } else {
+                super.service(req, resp);
+            }
             return;
         }
 
@@ -305,7 +348,7 @@ public class I2PSnarkServlet extends Default {
                 }
             } else if (newURL != null) {
                 if (newURL.startsWith("http://")) {
-                    _manager.addMessage(_("Fetching {0}", newURL));
+                    _manager.addMessage(_("Fetching {0}", urlify(newURL)));
                     I2PAppThread fetch = new I2PAppThread(new FetchAndAdd(_manager, newURL), "Fetch and add");
                     fetch.start();
                 } else {
@@ -689,7 +732,7 @@ public class I2PSnarkServlet extends Default {
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentDownloaded " + rowClass + "\">");
         if (remaining > 0)
-            out.write(formatSize(total-remaining) + "/" + formatSize(total)); // 18MB/3GB
+            out.write(formatSize(total-remaining) + " / " + formatSize(total)); // 18MB/3GB
         else
             out.write(formatSize(total)); // 3GB
         out.write("</td>\n\t");
@@ -1090,18 +1133,24 @@ public class I2PSnarkServlet extends Default {
     }
 
     // rounding makes us look faster :)
-    private String formatSize(long bytes) {
+    private static String formatSize(long bytes) {
         if (bytes < 5*1024)
-            return bytes + "B";
+            return bytes + " B";
         else if (bytes < 5*1024*1024)
-            return ((bytes + 512)/1024) + "KB";
+            return ((bytes + 512)/1024) + " KB";
         else if (bytes < 10*1024*1024*1024l)
-            return ((bytes + 512*1024)/(1024*1024)) + "MB";
+            return ((bytes + 512*1024)/(1024*1024)) + " MB";
         else
-            return ((bytes + 512*1024*1024)/(1024*1024*1024)) + "GB";
+            return ((bytes + 512*1024*1024)/(1024*1024*1024)) + " GB";
     }
     
-    private static final String HEADER = "<link href=\"../themes/console/snark.css\" rel=\"stylesheet\" type=\"text/css\" >";
+    private static String urlify(String s) {
+        StringBuilder buf = new StringBuilder(256);
+        buf.append("<a href=\"").append(s).append("\">").append(s).append("</a>");
+        return buf.toString();
+    }
+
+    private static final String HEADER = "<link href=\"/themes/console/snark.css\" rel=\"stylesheet\" type=\"text/css\" >";
                                        
 
     private static final String TABLE_HEADER = "<table border=\"0\" class=\"snarkTorrents\" width=\"100%\" cellpadding=\"0 10px\">\n" +
@@ -1111,6 +1160,114 @@ public class I2PSnarkServlet extends Default {
     private static final String TABLE_FOOTER = "</table></div>\n";
     
     private static final String FOOTER = "</div></div></div></center></body></html>";
+
+    /**
+     * Modded heavily from the Jetty version in Resource.java,
+     * pass Resource as 1st param
+     * All the xxxResource constructors are package local so we can't extend them.
+     *
+     * <pre>
+      // ========================================================================
+      // $Id: Resource.java,v 1.32 2009/05/16 01:53:36 gregwilkins Exp $
+      // Copyright 1996-2004 Mort Bay Consulting Pty. Ltd.
+      // ------------------------------------------------------------------------
+      // Licensed under the Apache License, Version 2.0 (the "License");
+      // you may not use this file except in compliance with the License.
+      // You may obtain a copy of the License at 
+      // http://www.apache.org/licenses/LICENSE-2.0
+      // Unless required by applicable law or agreed to in writing, software
+      // distributed under the License is distributed on an "AS IS" BASIS,
+      // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      // See the License for the specific language governing permissions and
+      // limitations under the License.
+      // ========================================================================
+     * </pre>
+     *
+     * Get the resource list as a HTML directory listing.
+     * @param r The Resource
+     * @param base The base URL
+     * @param parent True if the parent directory should be included
+     * @return String of HTML
+     */
+    private String getListHTML(Resource r, String base, boolean parent)
+        throws IOException
+    {
+        if (!r.isDirectory())
+            return null;
+        
+        String[] ls = r.list();
+        if (ls==null)
+            return null;
+        Arrays.sort(ls, Collator.getInstance());
+        
+        StringBuilder buf=new StringBuilder(4096);
+        buf.append("<HTML><HEAD><TITLE>");
+        String title = URI.decodePath(base);
+        if (title.startsWith("/i2psnark/"))
+            title = title.substring("/i2psnark/".length());
+        if (title.endsWith("/"))
+            title = title.substring(0, title.length() - 1);
+        title = _("Completed Torrent") + ": " + title;
+        buf.append(title);
+        buf.append("</TITLE>").append(HEADER).append("</HEAD><BODY>\n<div class=\"snarknavbar\">");
+        buf.append(title);
+        
+        if (parent)
+        {
+            buf.append("\n<br><A HREF=\"");
+            // corrupts utf-8
+            //buf.append(URI.encodePath(URI.addPaths(base,"../")));
+            buf.append(URI.addPaths(base,"../"));
+            buf.append("\"><img border=\"0\" src=\"/themes/console/images/outbound.png\"> ")
+               .append(_("Up to higher level directory")).append("</A>\n");
+        }
+        
+        buf.append("</div><div class=\"page\"><div class=\"mainsection\">" +
+                   "<TABLE BORDER=0 class=\"snarkTorrents\" cellpadding=\"5px 10px\">" +
+                   "<thead><tr><th>").append(_("File")).append("</th><th>").append(_("Size"))
+           .append("</th><th>").append(_("Status")).append("</th></tr></thead>");
+        //DateFormat dfmt=DateFormat.getDateTimeInstance(DateFormat.MEDIUM,
+        //                                               DateFormat.MEDIUM);
+        for (int i=0 ; i< ls.length ; i++)
+        {   
+            String encoded=URI.encodePath(ls[i]);
+            // bugfix for I2P - Backport from Jetty 6 (zero file lengths and last-modified times)
+            // http://jira.codehaus.org/browse/JETTY-361?page=com.atlassian.jira.plugin.system.issuetabpanels%3Achangehistory-tabpanel#issue-tabs
+            // See resource.diff attachment
+            //Resource item = addPath(encoded);
+            Resource item = r.addPath(ls[i]);
+            
+            String rowClass = (i % 2 == 0 ? "snarkTorrentEven" : "snarkTorrentOdd");
+            buf.append("<TR class=\"").append(rowClass).append("\"><TD class=\"snarkFileName ")
+               .append(rowClass).append("\">");
+            
+            String path=URI.addPaths(base,encoded);
+            if (item.isDirectory() && !path.endsWith("/"))
+                path=URI.addPaths(path,"/");
+            // thumbnail ?
+            String plc = path.toLowerCase();
+            if (plc.endsWith(".jpg") || plc.endsWith(".png") || plc.endsWith(".gif"))
+                buf.append("<a href=\"").append(path).append("\"><img alt=\"\" border=\"0\" class=\"thumb\" src=\"").append(path).append("\"></a> ");
+            buf.append("<A HREF=\"");
+            buf.append(path);
+            buf.append("\">");
+            buf.append(ls[i]);
+            buf.append("</TD><TD ALIGN=right class=\"").append(rowClass).append("\">");
+            if (!item.isDirectory())
+                buf.append(DataHelper.formatSize(item.length())).append(' ').append(_("Bytes"));
+            buf.append("</TD><TD>");
+            //buf.append(dfmt.format(new Date(item.lastModified())));
+            // TODO add real status
+            if (!item.isDirectory())
+                buf.append(_("Complete"));
+            buf.append("</TD></TR>\n");
+        }
+        buf.append("</TABLE>\n");
+	buf.append("</div></div></BODY></HTML>\n");
+        
+        return buf.toString();
+    }
+
 
 /** inner class, don't bother reindenting */
 private static class FetchAndAdd implements Runnable {
@@ -1126,7 +1283,7 @@ private static class FetchAndAdd implements Runnable {
         File file = _manager.util().get(_url, false, 3);
         try {
             if ( (file != null) && (file.exists()) && (file.length() > 0) ) {
-                _manager.addMessage(_("Torrent fetched from {0}", _url));
+                _manager.addMessage(_("Torrent fetched from {0}", urlify(_url)));
                 FileInputStream in = null;
                 try {
                     in = new FileInputStream(file);
@@ -1154,12 +1311,12 @@ private static class FetchAndAdd implements Runnable {
                         _manager.addTorrent(canonical);
                     }
                 } catch (IOException ioe) {
-                    _manager.addMessage(_("Torrent at {0} was not valid", _url) + ": " + ioe.getMessage());
+                    _manager.addMessage(_("Torrent at {0} was not valid", urlify(_url)) + ": " + ioe.getMessage());
                 } finally {
                     try { in.close(); } catch (IOException ioe) {}
                 }
             } else {
-                _manager.addMessage(_("Torrent was not retrieved from {0}", _url));
+                _manager.addMessage(_("Torrent was not retrieved from {0}", urlify(_url)));
             }
         } finally {
             if (file != null) file.delete();
