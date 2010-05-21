@@ -686,7 +686,7 @@ public class I2PSnarkServlet extends Default {
         out.write(statusString + "</td>\n\t");
         out.write("<td align=\"left\" class=\"snarkTorrentName " + rowClass + "\">");
         
-        if (remaining == 0) {
+        if (remaining == 0 || snark.meta.getFiles() != null) {
             out.write("<a href=\"" + snark.meta.getName());
             if (snark.meta.getFiles() != null)
                 out.write("/");
@@ -698,7 +698,7 @@ public class I2PSnarkServlet extends Default {
             out.write("\">");
         }
         out.write(filename);
-        if (remaining == 0)
+        if (remaining == 0 || snark.meta.getFiles() != null)
             out.write("</a>");
         // temporarily hardcoded for postman* and anonymity, requires bytemonsoon patch for lookup by info_hash
         String announce = snark.meta.getAnnounce();
@@ -1205,9 +1205,23 @@ public class I2PSnarkServlet extends Default {
         String title = URI.decodePath(base);
         if (title.startsWith("/i2psnark/"))
             title = title.substring("/i2psnark/".length());
+
+        // Get the snark associated with this directory
+        Snark snark = null;
+        try {
+            String torrentName;
+            int slash = title.indexOf('/');
+            if (slash > 0)
+                torrentName = title.substring(0, slash) + ".torrent";
+            else
+                torrentName = title + ".torrent";
+            File dataDir = _manager.getDataDir();
+            String torrentAbsPath = (new File(dataDir, torrentName)).getCanonicalPath();
+            snark = _manager.getTorrent(torrentAbsPath);
+        } catch (IOException ioe) {}
         if (title.endsWith("/"))
             title = title.substring(0, title.length() - 1);
-        title = _("Completed Torrent") + ": " + title;
+        title = _("Torrent") + ": " + title;
         buf.append(title);
         buf.append("</TITLE>").append(HEADER).append("</HEAD><BODY>\n<div class=\"snarknavbar\">");
         buf.append(title);
@@ -1241,25 +1255,66 @@ public class I2PSnarkServlet extends Default {
             buf.append("<TR class=\"").append(rowClass).append("\"><TD class=\"snarkFileName ")
                .append(rowClass).append("\">");
             
+            // Get completeness and status string
+            boolean complete = false;
+            String status = "";
+            long length = item.length();
+            if (item.isDirectory()) {
+                complete = true;
+                status = _("Directory");
+            } else {
+                if (snark == null) {
+                    status = "Snark not found?";
+                } else {
+                    try {
+                        File f = item.getFile();
+                        if (f != null) {
+                            long remaining = snark.storage.remaining(f.getCanonicalPath());
+                            if (remaining == 0) {
+                                complete = true;
+                                status = _("Complete");
+                            } else if (remaining < 0) {
+                                complete = true;
+                                status = _("File not found in torrent?");
+                            } else if (length <= 0) {
+                                complete = true;
+                                status = _("Complete");
+                            } else {
+                                status = (100 - (100 * remaining / length)) + "% " + _("complete") +
+                                         " (" + DataHelper.formatSize(remaining) + " bytes remaining)";
+                            }
+                        } else {
+                            status = "Not a file?";
+                        }
+                    } catch (IOException ioe) {
+                        status = "Not a file? " + ioe;
+                    }
+                }
+            }
+
             String path=URI.addPaths(base,encoded);
             if (item.isDirectory() && !path.endsWith("/"))
                 path=URI.addPaths(path,"/");
-            // thumbnail ?
-            String plc = path.toLowerCase();
-            if (plc.endsWith(".jpg") || plc.endsWith(".png") || plc.endsWith(".gif"))
-                buf.append("<a href=\"").append(path).append("\"><img alt=\"\" border=\"0\" class=\"thumb\" src=\"").append(path).append("\"></a> ");
-            buf.append("<A HREF=\"");
-            buf.append(path);
-            buf.append("\">");
+            if (complete) {
+                // thumbnail ?
+                String plc = path.toLowerCase();
+                if (plc.endsWith(".jpg") || plc.endsWith(".png") || plc.endsWith(".gif")) {
+                    buf.append("<a href=\"").append(path).append("\"><img alt=\"\" border=\"0\" class=\"thumb\" src=\"")
+                       .append(path).append("\"></a> ");
+                }
+                buf.append("<A HREF=\"");
+                buf.append(path);
+                buf.append("\">");
+            }
             buf.append(ls[i]);
+            if (complete)
+                buf.append("</a>");
             buf.append("</TD><TD ALIGN=right class=\"").append(rowClass).append("\">");
             if (!item.isDirectory())
-                buf.append(DataHelper.formatSize(item.length())).append(' ').append(_("Bytes"));
+                buf.append(DataHelper.formatSize(length)).append(' ').append(_("Bytes"));
             buf.append("</TD><TD>");
             //buf.append(dfmt.format(new Date(item.lastModified())));
-            // TODO add real status
-            if (!item.isDirectory())
-                buf.append(_("Complete"));
+            buf.append(status);
             buf.append("</TD></TR>\n");
         }
         buf.append("</TABLE>\n");

@@ -108,6 +108,15 @@ td {
      font-size: 8pt;
 }
 
+.snarkFileName {
+     min-width: 25em;
+}
+
+.thumb {
+     max-height: 64px;
+     max-width: 96px;
+}
+
 .snarkNewTorrent {
      font-size: 9pt;
 }

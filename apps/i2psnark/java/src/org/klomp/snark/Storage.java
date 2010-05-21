@@ -287,6 +287,40 @@ public class Storage
   }
 
   /**
+   *  @param file absolute path (non-directory)
+   *  @return number of bytes remaining; -1 if unknown file
+   *  @since 0.7.14
+   */
+  public long remaining(String file) {
+      long bytes = 0;
+      for (int i = 0; i < rafs.length; i++) {
+          File f = RAFfile[i];
+          if (f != null && f.getAbsolutePath().equals(file)) {
+              if (complete())
+                  return 0;
+              int psz = metainfo.getPieceLength(0);
+              long start = bytes;
+              long end = start + lengths[i];
+              int pc = (int) (bytes / psz);
+              long rv = 0;
+              if (!bitfield.get(pc))
+                  rv = psz - (bytes % psz);
+              for (int j = pc + 1; j * psz < end; j++) {
+                  if (!bitfield.get(j)) {
+                      if ((j+1)*psz < end)
+                          rv += psz;
+                      else
+                          rv += end - (j * psz);
+                  }
+              }
+              return rv;
+          }
+          bytes += lengths[i];
+      }
+      return -1;
+  }
+
+  /**
    * The BitField that tells which pieces this storage contains.
    * Do not change this since this is the current state of the storage.
    */
