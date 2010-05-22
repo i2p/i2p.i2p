@@ -2,6 +2,8 @@ package net.i2p.router.transport.ntcp;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.text.DecimalFormat;
@@ -53,6 +55,9 @@ public class NTCPTransport extends TransportImpl {
      * want to remove on establishment or close on timeout
      */
     private final List<NTCPConnection> _establishing;
+
+    /** this is rarely if ever used, default is to bind to wildcard address */
+    public static final String PROP_BIND_INTERFACE = "i2np.ntcp.bindInterface";
 
     private final NTCPSendFinisher _finisher;
     private long _lastBadSkew;
@@ -486,15 +491,29 @@ public class NTCPTransport extends TransportImpl {
     /** call from synchronized method */
     private RouterAddress bindAddress() {
         if (_myAddress != null) {
+            InetAddress bindToAddr = null;
+            String bindTo = _context.getProperty(PROP_BIND_INTERFACE);
+            if (bindTo != null) {
+                try {
+                    bindToAddr = InetAddress.getByName(bindTo);
+                } catch (UnknownHostException uhe) {
+                    _log.log(Log.CRIT, "Invalid SSU bind interface specified [" + bindTo + "]", uhe);
+                    // this can be implemented later, just updates some stats
+                    // see udp/UDPTransport.java
+                    //setReachabilityStatus(CommSystemFacade.STATUS_HOSED);
+                    return null;
+                }
+            }
+
             try {
                 ServerSocketChannel chan = ServerSocketChannel.open();
                 chan.configureBlocking(false);
 
                 InetSocketAddress addr = null;
-                //if (bindAllInterfaces())
+                if(bindToAddr==null)
                     addr = new InetSocketAddress(_myAddress.getPort());
-                //else
-                //    addr = new InetSocketAddress(_myAddress.getAddress(), _myAddress.getPort());
+                else
+                    addr = new InetSocketAddress(bindToAddr, _myAddress.getPort());
                 chan.socket().bind(addr);
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Listening on " + addr);
