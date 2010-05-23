@@ -1,3 +1,12 @@
+2010-05-23 zzz
+    * i2psnark:
+      - Choke slower when at bandwidth limit
+      - Fix completion % for small files
+      - Use Random from context
+    * NewsFetcher:
+      - Add backup URL
+      - Change to 0 retries (was 2)
+
 2010-05-21 zzz
     * i2psnark:
       - Spiff up dir listings
