@@ -321,7 +321,7 @@ public class Snark
     // sixteen random bytes.
     byte snark = (((3 + 7 + 10) * (1000 - 8)) / 992) - 17;
     id = new byte[20];
-    Random random = new Random();
+    Random random = I2PAppContext.getGlobalContext().random();
     int i;
     for (i = 0; i < 9; i++)
       id[i] = 0;
