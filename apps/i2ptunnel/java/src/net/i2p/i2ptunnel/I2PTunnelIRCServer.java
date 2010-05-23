@@ -31,6 +31,9 @@ import net.i2p.util.Log;
  *
  * There are three options for mangling the desthash. Put the option in the
  * "custom options" section of i2ptunnel.
+ *   - ircserver.method unset:            Defaults to user.
+ *   - ircserver.method=user:             Use method described above.
+ *   - ircserver.method=webirc:           Use the WEBIRC protocol.
  *   - ircserver.cloakKey unset:          Cloak with a random value that is persistent for
  *                                        the life of this tunnel. This is the default.
  *   - ircserver.cloakKey=somepassphrase: Cloak with the hash of the passphrase. Use this to
@@ -39,6 +42,8 @@ import net.i2p.util.Log;
  *                                        be able to track users even when they switch servers.
  *                                        Note: don't quote or put spaces in the passphrase,
  *                                        the i2ptunnel gui can't handle it.
+ *   - ircserver.webircPassword=password  The password to use for the WEBIRC protocol.
+ *   - ircserver.webircSpoofIP=IP         The IP
  *   - ircserver.fakeHostname=%f.b32.i2p: Set the fake hostname sent by I2PTunnel,
  *                                        %f is the full B32 destination hash
  *                                        %c is the cloaked hash.
@@ -48,7 +53,12 @@ import net.i2p.util.Log;
  * @author zzz
  */
 public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
+    public static final String PROP_METHOD="ircserver.method";
+    public static final String PROP_METHOD_DEFAULT="user";
     public static final String PROP_CLOAK="ircserver.cloakKey";
+    public static final String PROP_WEBIRC_PASSWORD="ircserver.webircPassword";
+	public static final String PROP_WEBIRC_SPOOF_IP="ircserver.webircSpoofIP";
+	public static final String PROP_WEBIRC_SPOOF_IP_DEFAULT="127.0.0.1";
     public static final String PROP_HOSTNAME="ircserver.fakeHostname";
     public static final String PROP_HOSTNAME_DEFAULT="%f.b32.i2p";
     
@@ -67,7 +77,20 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
 
     /** generate a random 32 bytes, or the hash of the passphrase */
     private void initCloak(I2PTunnel tunnel) {
+        // get the properties of this server-tunnel
         Properties opts = tunnel.getClientOptions();
+        
+        // get method of host faking
+        this.method = opts.getProperty(PROP_METHOD, PROP_METHOD_DEFAULT);
+        assert this.method != null;
+        
+        // get the password for the webirc method
+        this.webircPassword = opts.getProperty(PROP_WEBIRC_PASSWORD);
+
+		// get the spoof IP for the webirc method
+		this.webircSpoofIP = opts.getProperty(PROP_WEBIRC_SPOOF_IP, PROP_WEBIRC_SPOOF_IP_DEFAULT);
+        
+        // get the cloaking passphrase
         String passphrase = opts.getProperty(PROP_CLOAK);
         if (passphrase == null) {
             this.cloakKey = new byte[Hash.HASH_LENGTH];
@@ -76,17 +99,30 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
             this.cloakKey = SHA256Generator.getInstance().calculateHash(passphrase.trim().getBytes()).getData();
         }
         
+        // get the fake hostmask to use
         this.hostname = opts.getProperty(PROP_HOSTNAME, PROP_HOSTNAME_DEFAULT);
     }
     
     @Override
     protected void blockingHandle(I2PSocket socket) {
         try {
-            // give them 15 seconds to send in the request
-            socket.setReadTimeout(15*1000);
-            InputStream in = socket.getInputStream();
-            String modifiedRegistration = filterRegistration(in, cloakDest(socket.getPeerDestination()));
-            socket.setReadTimeout(readTimeout);
+			String modifiedRegistration;
+			if(!this.method.equals("webirc")) {
+				// give them 15 seconds to send in the request
+				socket.setReadTimeout(15*1000);
+				InputStream in = socket.getInputStream();
+				modifiedRegistration = filterRegistration(in, cloakDest(socket.getPeerDestination()));
+				socket.setReadTimeout(readTimeout);
+			} else {
+				StringBuffer buf = new StringBuffer("WEBIRC ");
+				buf.append(this.webircPassword);
+				buf.append(" cgiirc ");
+				buf.append(cloakDest(socket.getPeerDestination()));
+				buf.append(' ');
+				buf.append(this.webircSpoofIP);
+				buf.append("\r\n");
+				modifiedRegistration = buf.toString();
+			}
             Socket s = new Socket(remoteHost, remotePort);
             new I2PTunnelRunner(s, socket, slock, null, modifiedRegistration.getBytes(), null);
         } catch (SocketException ex) {
@@ -185,4 +221,7 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
     
     private byte[] cloakKey; // 32 bytes of stuff to scramble the dest with
     private String hostname;
+    private String method;
+    private String webircPassword;
+	private String webircSpoofIP;
 }
