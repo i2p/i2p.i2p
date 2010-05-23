@@ -14,7 +14,9 @@ import java.io.IOException;
 import net.i2p.crypto.DSAEngine;
 import net.i2p.crypto.SHA256Generator;
 import net.i2p.data.DataFormatException;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
+import net.i2p.data.Hash;
 import net.i2p.data.Signature;
 import net.i2p.util.Log;
 
@@ -33,7 +35,7 @@ public final class I2PDatagramDissector {
     private DSAEngine dsaEng = DSAEngine.getInstance();
     private SHA256Generator hashGen = SHA256Generator.getInstance();
 
-    private byte[] rxHashBytes = null;
+    private Hash rxHash = null;
 
     private Signature rxSign = new Signature();
 
@@ -62,21 +64,27 @@ public final class I2PDatagramDissector {
         ByteArrayInputStream dgStream = new ByteArrayInputStream(dgram);
         byte[] rxTrimmedPayload;
 
+		// set invalid(very important!)
+		this.valid = false;
+
         try {
+			// read destination
             rxDest.readBytes(dgStream);
 
+			// read signature
             rxSign.readBytes(dgStream);
 
+			// read payload
             rxPayloadLen = dgStream.read(rxPayload);
-
-            // FIXME: hashGen.calculateHash(source, offset, len) would rock...
-            rxTrimmedPayload = new byte[rxPayloadLen];
-            System.arraycopy(rxPayload, 0, rxTrimmedPayload, 0, rxPayloadLen);
-            
-            rxHashBytes =hashGen.calculateHash(rxTrimmedPayload).toByteArray();
+			
+			// calculate the hash of the payload
+            this.rxHash = hashGen.calculateHash(rxPayload, 0, rxPayloadLen);
+			assert this.hashGen.calculateHash(this.extractPayload()).equals(this.rxHash);
         } catch (IOException e) {
             _log.error("Caught IOException - INCONSISTENT STATE!", e);
-        }
+        } catch(AssertionError e) {
+			_log.error("Assertion failed!", e);
+		}
 
         //_log.debug("Datagram payload size: " + rxPayloadLen + "; content:\n"
         //           + HexDump.dump(rxPayload, 0, rxPayloadLen));
@@ -93,10 +101,7 @@ public final class I2PDatagramDissector {
     public byte[] getPayload() throws I2PInvalidDatagramException {
         this.verifySignature();
         
-        byte[] retPayload = new byte[rxPayloadLen];
-        System.arraycopy(rxPayload, 0, retPayload, 0, rxPayloadLen);
-
-        return retPayload;
+        return this.extractPayload();
     }
 
     /**
@@ -110,16 +115,22 @@ public final class I2PDatagramDissector {
     public Destination getSender() throws I2PInvalidDatagramException {
         this.verifySignature();
         
-        Destination retDest = new Destination();
-        try {
-            retDest.fromByteArray(rxDest.toByteArray());
-        } catch (DataFormatException e) {
-            _log.error("Caught DataFormatException", e);
-            return null;
-        }
-
-        return retDest;
+		return this.extractSender();
     }
+
+	/**
+	 * Extract the hash of the payload of an I2P repliable datagram (previously
+	 * loaded with the loadI2PDatagram() method), verifying the datagram
+	 * signature.
+	 * @return The hash of the payload of the I2P repliable datagram
+	 * @throws I2PInvalidDatagramException if the signature verification fails
+	 */
+	public Hash getHash() throws I2PInvalidDatagramException {
+		// make sure it has a valid signature
+		this.verifySignature();
+
+		return this.extractHash();
+	}
 
     /**
      * Extract the payload carried by an I2P repliable datagram (previously
@@ -129,8 +140,8 @@ public final class I2PDatagramDissector {
      * @return A byte array containing the datagram payload
      */
     public byte[] extractPayload() {
-        byte[] retPayload = new byte[rxPayloadLen];
-        System.arraycopy(rxPayload, 0, retPayload, 0, rxPayloadLen);
+        byte[] retPayload = new byte[this.rxPayloadLen];
+        System.arraycopy(this.rxPayload, 0, retPayload, 0, this.rxPayloadLen);
 
         return retPayload;
     }
@@ -144,7 +155,7 @@ public final class I2PDatagramDissector {
     public Destination extractSender() {
         Destination retDest = new Destination();
         try {
-            retDest.fromByteArray(rxDest.toByteArray());
+            retDest.fromByteArray(this.rxDest.toByteArray());
         } catch (DataFormatException e) {
             _log.error("Caught DataFormatException", e);
             return null;
@@ -152,10 +163,21 @@ public final class I2PDatagramDissector {
         
         return retDest;
     }
+
+	/**
+	 * Extract the hash of the payload of an I2P repliable datagram (previously
+	 * loaded with the loadI2PDatagram() method), without verifying the datagram
+	 * signature.
+	 * @return The hash of the payload of the I2P repliable datagram
+	 */
+	public Hash extractHash() {
+		return this.rxHash;
+	}
     
     /**
      * Verify the signature of this datagram (previously loaded with the
      * loadI2PDatagram() method)
+	 * @throws I2PInvalidDatagramException if the signature is invalid
      */
     public void verifySignature() throws I2PInvalidDatagramException {
         // first check if it already got validated
@@ -163,7 +185,7 @@ public final class I2PDatagramDissector {
             return;
         
         // now validate
-        if (!dsaEng.verifySignature(rxSign, rxHashBytes, rxDest.getSigningPublicKey()))
+        if (!this.dsaEng.verifySignature(rxSign, rxHash.getData(), rxDest.getSigningPublicKey()))
             throw new I2PInvalidDatagramException("Incorrect I2P repliable datagram signature");
         
         // set validated
