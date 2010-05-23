@@ -47,6 +47,8 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
 
     private static final String NEWS_FILE = "docs/news.xml";
     private static final String TEMP_NEWS_FILE = "news.xml.temp";
+    /** @since 0.7.14 not configurable */
+    private static final String BACKUP_NEWS_URL = "http://www.i2p2.i2p/_static/news/news.xml";
     
     private NewsFetcher(I2PAppContext ctx) {
         _context = ctx;
@@ -151,12 +153,20 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         try {
             EepGet get = null;
             if (shouldProxy)
-                get = new EepGet(_context, true, proxyHost, proxyPort, 2, _tempFile.getAbsolutePath(), newsURL, true, null, _lastModified);
+                get = new EepGet(_context, true, proxyHost, proxyPort, 0, _tempFile.getAbsolutePath(), newsURL, true, null, _lastModified);
             else
                 get = new EepGet(_context, false, null, 0, 0, _tempFile.getAbsolutePath(), newsURL, true, null, _lastModified);
             get.addStatusListener(this);
-            if (get.fetch())
+            if (get.fetch()) {
                 _lastModified = get.getLastModified();
+            } else {
+                // backup news location - always proxied
+                _tempFile.delete();
+                get = new EepGet(_context, true, proxyHost, proxyPort, 0, _tempFile.getAbsolutePath(), BACKUP_NEWS_URL, true, null, _lastModified);
+                get.addStatusListener(this);
+                if (get.fetch())
+                    _lastModified = get.getLastModified();
+            }
         } catch (Throwable t) {
             _log.error("Error fetching the news", t);
         }

@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.TimerTask;
 
+import net.i2p.I2PAppContext;
+
 /**
  * TimerTask that checks for good/bad up/downloader. Works together
  * with the PeerCoordinator to select which Peers get (un)choked.
@@ -43,7 +45,7 @@ class PeerCheckerTask extends TimerTask
     this.coordinator = coordinator;
   }
 
-  private Random random = new Random();
+  private static final Random random = I2PAppContext.getGlobalContext().random();
 
   public void run()
   {
@@ -113,10 +115,10 @@ class PeerCheckerTask extends TimerTask
                         + " C: " + peer.isChoked(),
                         Snark.DEBUG);
 
-            // Choke half of them rather than all so it isn't so drastic...
+            // Choke a third of them rather than all so it isn't so drastic...
             // unless this torrent is over the limit all by itself.
             boolean overBWLimitChoke = upload > 0 &&
-                                       ((overBWLimit && random.nextBoolean()) ||
+                                       ((overBWLimit && random.nextInt(3) == 0) ||
                                         (coordinator.overUpBWLimit(uploaded)));
 
             // If we are at our max uploaders and we have lots of other

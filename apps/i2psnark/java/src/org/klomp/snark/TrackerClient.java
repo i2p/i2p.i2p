@@ -183,7 +183,7 @@ public class TrackerClient extends I2PAppThread
         boolean runStarted = false;
         boolean firstTime = true;
         int consecutiveFails = 0;
-        Random r = new Random();
+        Random r = I2PAppContext.getGlobalContext().random();
         while(!stop)
           {
             try

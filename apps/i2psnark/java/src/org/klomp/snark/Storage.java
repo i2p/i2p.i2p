@@ -304,7 +304,7 @@ public class Storage
               int pc = (int) (bytes / psz);
               long rv = 0;
               if (!bitfield.get(pc))
-                  rv = psz - (bytes % psz);
+                  rv = Math.min(psz - (start % psz), lengths[i]);
               for (int j = pc + 1; j * psz < end; j++) {
                   if (!bitfield.get(j)) {
                       if ((j+1)*psz < end)
