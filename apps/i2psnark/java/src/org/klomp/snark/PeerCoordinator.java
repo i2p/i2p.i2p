@@ -522,6 +522,11 @@ public class PeerCoordinator implements PeerListener
         
         //Only request a piece we've requested before if there's no other choice.
         if (piece == null) {
+            // AND if there are almost no wanted pieces left (real end game).
+            // If we do end game all the time, we generate lots of extra traffic
+            // when the seeder is super-slow and all the peers are "caught up"
+            if (wantedPieces.size() > 4)
+                return -1;  // nothing to request and not in end game
             // let's not all get on the same piece
             Collections.shuffle(requested);
             Iterator it2 = requested.iterator();

@@ -34,7 +34,6 @@ public class SendMessageExpiresMessage extends SendMessageMessage {
 
     public SendMessageExpiresMessage() {
         super();
-        setExpiration(null);
     }
 
     public Date getExpiration() {

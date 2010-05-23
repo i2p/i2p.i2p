@@ -29,9 +29,6 @@ public class RouterAddress extends DataStructureImpl {
 
     public RouterAddress() {
         setCost(-1);
-        setExpiration(null);
-        setTransportStyle(null);
-        setOptions(null);
     }
 
     /**

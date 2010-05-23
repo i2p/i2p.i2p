@@ -27,7 +27,6 @@ public class DestroySessionMessage extends I2CPMessageImpl {
     private SessionId _sessionId;
 
     public DestroySessionMessage() {
-        setSessionId(null);
     }
 
     public SessionId getSessionId() {

@@ -27,10 +27,6 @@ public class Destination extends DataStructureImpl {
     protected Hash __calculatedHash;
 
     public Destination() {
-        setCertificate(null);
-        setSigningPublicKey(null);
-        setPublicKey(null);
-        __calculatedHash = null;
     }
 
     /**
@@ -38,7 +34,6 @@ public class Destination extends DataStructureImpl {
      * @param s a Base64 representation of the destination, as (eg) is used in hosts.txt
      */
     public Destination(String s) throws DataFormatException {
-        this();
         fromBase64(s);
     }
 

@@ -78,18 +78,8 @@ public class LeaseSet extends DataStructureImpl {
     public final static int MAX_LEASES = 6;
 
     public LeaseSet() {
-        setDestination(null);
-        setEncryptionKey(null);
-        setSigningKey(null);
-        setSignature(null);
-        setRoutingKey(null);
         _leases = new ArrayList(MAX_LEASES);
-        _routingKeyGenMod = null;
-        _receivedAsPublished = false;
         _firstExpiration = Long.MAX_VALUE;
-        _lastExpiration = 0;
-        _decrypted = false;
-        _checked = false;
     }
 
     public Destination getDestination() {

@@ -27,8 +27,6 @@ public class Payload extends DataStructureImpl {
     private byte[] _unencryptedData;
 
     public Payload() {
-        setUnencryptedData(null);
-        setEncryptedData(null);
     }
 
     /**

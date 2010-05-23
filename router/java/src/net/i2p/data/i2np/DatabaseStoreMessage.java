@@ -43,12 +43,6 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
     public DatabaseStoreMessage(I2PAppContext context) {
         super(context);
         setValueType(-1);
-        setKey(null);
-        setLeaseSet(null);
-        setRouterInfo(null);
-        setReplyToken(0);
-        setReplyTunnel(null);
-        setReplyGateway(null);
     }
     
     /**

@@ -120,18 +120,6 @@ public class Rate {
      */
     public Rate(long period) throws IllegalArgumentException {
         if (period <= 0) throw new IllegalArgumentException("The period must be strictly positive");
-        _currentTotalValue = 0.0d;
-        _currentEventCount = 0;
-        _currentTotalEventTime = 0;
-        _lastTotalValue = 0.0d;
-        _lastEventCount = 0;
-        _lastTotalEventTime = 0;
-        _extremeTotalValue = 0.0d;
-        _extremeEventCount = 0;
-        _extremeTotalEventTime = 0;
-        _lifetimeTotalValue = 0.0d;
-        _lifetimeEventCount = 0;
-        _lifetimeTotalEventTime = 0;
 
         _creationDate = now();
         _lastCoalesceDate = _creationDate;

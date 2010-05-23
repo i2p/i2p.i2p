@@ -160,7 +160,9 @@
 
 <c:if test="${book.master || book.router || book.published || book.private}">
 <div id="buttons">
-<p class="buttons"><input type="submit" name="action" value="<%=intl._("Delete")%>" >
+<p class="buttons">
+<input type="reset" value="<%=intl._("Cancel")%>" >
+<input type="submit" name="action" value="<%=intl._("Delete Selected")%>" >
 </p>
 </div>
 </c:if>
@@ -179,6 +181,7 @@
 <b><%=intl._("Hostname")%>:</b> <input type="text" name="hostname" value="${book.hostname}" size="20">
 <b><%=intl._("Destination")%>:</b> <textarea name="destination" rows="1" style="height: 3em;" cols="40" wrap="off" >${book.destination}</textarea><br/>
 </p><p>
+<input type="submit" name="action" value="<%=intl._("Replace")%>" >
 <input type="submit" name="action" value="<%=intl._("Add")%>" >
 </p>
 </div>

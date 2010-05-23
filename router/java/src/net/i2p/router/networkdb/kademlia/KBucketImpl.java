@@ -39,7 +39,7 @@ class KBucketImpl implements KBucket {
      */
     private final Set<Hash> _entries;
     /** we center the kbucket set on the given hash, and derive distances from this */
-    private Hash _local;
+    private LocalHash _local;
     /** include if any bits equal or higher to this bit (in big endian order) */
     private int _begin;
     /** include if no bits higher than this bit (inclusive) are set */
@@ -49,12 +49,17 @@ class KBucketImpl implements KBucket {
     private static final int SHUFFLE_DELAY = 10*60*1000;
     private I2PAppContext _context;
     
-    public KBucketImpl(I2PAppContext context, Hash local) {
+    public KBucketImpl(I2PAppContext context, LocalHash local) {
         _context = context;
         _log = context.logManager().getLog(KBucketImpl.class);
         _entries = new ConcurrentHashSet(2); //all but the last 1 or 2 buckets will be empty
         _lastShuffle = context.clock().now();
         setLocal(local);
+    }
+    
+    /** for testing - use above constructor for production to get common caching */
+    public KBucketImpl(I2PAppContext context, Hash local) {
+        this(context, new LocalHash(local));
     }
     
     public int getRangeBegin() { return _begin; }
@@ -67,8 +72,8 @@ class KBucketImpl implements KBucket {
         return _entries.size();
     }
     
-    public Hash getLocal() { return _local; }
-    private void setLocal(Hash local) {
+    public LocalHash getLocal() { return _local; }
+    private void setLocal(LocalHash local) {
         _local = local; 
         // we want to make sure we've got the cache in place before calling cachedXor
         _local.prepareCache();
@@ -378,7 +383,7 @@ class KBucketImpl implements KBucket {
         int low = 1;
         int high = 3;
         Log log = I2PAppContext.getGlobalContext().logManager().getLog(KBucketImpl.class);
-        Hash local = Hash.FAKE_HASH;
+        LocalHash local = new LocalHash(Hash.FAKE_HASH);
         local.prepareCache();
         KBucketImpl bucket = new KBucketImpl(I2PAppContext.getGlobalContext(), local);
         bucket.setRange(low, high);
@@ -415,7 +420,7 @@ class KBucketImpl implements KBucket {
         int high = 200;
         byte hash[] = new byte[Hash.HASH_LENGTH];
         RandomSource.getInstance().nextBytes(hash);
-        Hash local = new Hash(hash);
+        LocalHash local = new LocalHash(hash);
         local.prepareCache();
         KBucketImpl bucket = new KBucketImpl(I2PAppContext.getGlobalContext(), local);
         bucket.setRange(low, high);

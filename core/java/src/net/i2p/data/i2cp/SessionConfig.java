@@ -51,9 +51,7 @@ public class SessionConfig extends DataStructureImpl {
     }
     public SessionConfig(Destination dest) {
         _destination = dest;
-        _signature = null;
         _creationDate = new Date(Clock.getInstance().now());
-        _options = null;
     }
 
     /**

@@ -30,10 +30,6 @@ public class ReportAbuseMessage extends I2CPMessageImpl {
     private MessageId _messageId;
 
     public ReportAbuseMessage() {
-        setSessionId(null);
-        setSeverity(null);
-        setReason(null);
-        setMessageId(null);
     }
 
     public SessionId getSessionId() {

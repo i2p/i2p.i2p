@@ -33,7 +33,6 @@ public class SessionStatusMessage extends I2CPMessageImpl {
     public final static int STATUS_INVALID = 3;
 
     public SessionStatusMessage() {
-        setSessionId(null);
         setStatus(STATUS_INVALID);
     }
 

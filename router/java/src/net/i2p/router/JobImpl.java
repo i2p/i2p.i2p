@@ -24,8 +24,6 @@ public abstract class JobImpl implements Job {
         _context = context;
         _timing = new JobTiming(context);
         _id = ++_idSrc;
-        _addedBy = null;
-        _madeReadyOn = 0;
     }
     
     public long getJobId() { return _id; }

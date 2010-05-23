@@ -27,7 +27,6 @@ public class DisconnectMessage extends I2CPMessageImpl {
     private String _reason;
 
     public DisconnectMessage() {
-        setReason(null);
     }
 
     public String getReason() {

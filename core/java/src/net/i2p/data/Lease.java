@@ -30,11 +30,6 @@ public class Lease extends DataStructureImpl {
     private int _numFailure;
 
     public Lease() {
-        setGateway(null);
-        setTunnelId(null);
-        setEndDate(null);
-        setNumSuccess(0);
-        setNumFailure(0);
     }
 
     /** Retrieve the router at which the destination can be contacted

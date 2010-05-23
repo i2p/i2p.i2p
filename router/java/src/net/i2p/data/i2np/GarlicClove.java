@@ -40,11 +40,7 @@ public class GarlicClove extends DataStructureImpl {
         _context = context;
         _log = context.logManager().getLog(GarlicClove.class);
         _handler = new I2NPMessageHandler(context);
-        setInstructions(null);
-        setData(null);
         setCloveId(-1);
-        setExpiration(null);
-        setCertificate(null);
     }
     
     public DeliveryInstructions getInstructions() { return _instructions; }

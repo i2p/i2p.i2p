@@ -15,7 +15,7 @@ import net.i2p.data.ByteArray;
  *
  * Heap size control - survey of usage (April 2010) :
  *
- *  </pre>
+ *  <pre>
 	Size	Max	MaxMem	From
 
 	16	16	256	CryptixAESEngine

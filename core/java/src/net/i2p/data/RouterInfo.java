@@ -60,18 +60,9 @@ public class RouterInfo extends DataStructureImpl {
     public static final String BW_CAPABILITY_CHARS = "KLMNO";
     
     public RouterInfo() {
-        setIdentity(null);
-        setPublished(0);
         _addresses = new HashSet(2);
         _peers = new HashSet(0);
         _options = new OrderedProperties();
-        setSignature(null);
-        _validated = false;
-        _isValid = false;
-        _currentRoutingKey = null;
-        _stringified = null;
-        _byteified = null;
-        _hashCodeInitialized = false;
     }
 
     public RouterInfo(RouterInfo old) {

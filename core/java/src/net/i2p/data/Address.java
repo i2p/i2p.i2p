@@ -9,8 +9,6 @@ public class Address extends DataStructureImpl {
     private Destination _destination;
     
     public Address() {
-        _hostname = null;
-        _destination = null;
     }
 
     public String getHostname() {

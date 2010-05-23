@@ -27,7 +27,7 @@ import net.i2p.util.Log;
 class KBucketSet {
     private Log _log;
     private I2PAppContext _context;
-    private Hash _us;
+    private LocalHash _us;
     private KBucket _buckets[];
     private volatile int _size;
     
@@ -38,7 +38,7 @@ class KBucketSet {
     public final static int BUCKET_SIZE = 500; // # values at which we start periodic trimming (500 ~= 250Kb)
     
     public KBucketSet(I2PAppContext context, Hash us) {
-        _us = us;
+        _us = new LocalHash(us);
         _context = context;
         _log = context.logManager().getLog(KBucketSet.class);
         createBuckets();

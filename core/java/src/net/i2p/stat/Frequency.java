@@ -15,9 +15,6 @@ public class Frequency {
 
     public Frequency(long period) {
         setPeriod(period);
-        setLastEvent(0);
-        setAverageInterval(0);
-        setMinAverageInterval(0);
     }
 
     /** how long is this frequency averaged over? */

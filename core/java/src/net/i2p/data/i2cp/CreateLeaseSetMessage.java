@@ -33,10 +33,6 @@ public class CreateLeaseSetMessage extends I2CPMessageImpl {
     private PrivateKey _privateKey;
 
     public CreateLeaseSetMessage() {
-        setSessionId(null);
-        setLeaseSet(null);
-        setSigningPrivateKey(null);
-        setPrivateKey(null);
     }
 
     public SessionId getSessionId() {
