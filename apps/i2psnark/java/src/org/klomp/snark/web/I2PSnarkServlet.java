@@ -53,6 +53,7 @@ public class I2PSnarkServlet extends Default {
     private Log _log;
     private SnarkManager _manager;
     private static long _nonce;
+    private Resource _resourceBase;
     
     public static final String PROP_CONFIG_FILE = "i2psnark.configFile";
     
@@ -67,46 +68,31 @@ public class I2PSnarkServlet extends Default {
             configFile = "i2psnark.config";
         _manager.loadConfig(configFile);
         _manager.start();
-        super.init(new DefaultServletConfig(cfg, _manager.getDataDir().getAbsolutePath()));
+        try {
+            _resourceBase = Resource.newResource(_manager.getDataDir().getAbsolutePath());
+        } catch (IOException ioe) {}
+        super.init(cfg);
     }
     
-    /**
-     *  A ServletConfig we will pass to super
-     */
-    private static class DefaultServletConfig implements ServletConfig {
-        private final ServletConfig _sc;
-        private final String _path;
-
-        DefaultServletConfig(ServletConfig sc, String path) {
-            _sc = sc;
-            _path = path;
-        }
-
-        public String getInitParameter(String name) {
-            if ("acceptRanges".equals(name) || "dirAllowed".equals(name))
-                return "true";
-            if ("resourceBase".equals(name))
-                return _path;
-            return _sc.getInitParameter(name);
-        }
-
-        public Enumeration getInitParameterNames() {
-            return _sc.getInitParameterNames();
-        }
-
-        public ServletContext getServletContext() {
-            return _sc.getServletContext();
-        }
-
-        public String getServletName() {
-            return _sc.getServletName();
-        }
-    }
-
     @Override
     public void destroy() {
         _manager.stop();
         super.destroy();
+    }
+
+    /**
+     *  We override this instead of passing a resource base to super(), because
+     *  if a resource base is set, super.getResource() always uses that base,
+     *  and we can't get any resources (like icons) out of the .war
+     */
+    @Override
+    protected Resource getResource(String pathInContext) throws IOException
+    {
+        if (pathInContext == null || pathInContext.equals("/") || pathInContext.equals("/index.jsp") ||
+            pathInContext.equals("/index.html") || pathInContext.startsWith("/_icons/"))
+            return super.getResource(pathInContext);
+        // files in the i2psnark/ directory
+        return _resourceBase.addPath(pathInContext);
     }
 
     /**
@@ -1261,26 +1247,30 @@ public class I2PSnarkServlet extends Default {
             long length = item.length();
             if (item.isDirectory()) {
                 complete = true;
-                status = _("Directory");
+                status = "<img height=\"16\" width=\"16\" src=\"/i2psnark/_icons/tick.png\"> " +
+                         _("Directory");
             } else {
                 if (snark == null) {
-                    status = "Snark not found?";
+                    // Assume complete, perhaps he removed a completed torrent but kept a bookmark
+                    complete = true;
+                    status = "<img height=\"16\" width=\"16\" src=\"/i2psnark/_icons/cancel.png\"> " +
+                                         _("Torrent not found?");
                 } else {
                     try {
                         File f = item.getFile();
                         if (f != null) {
                             long remaining = snark.storage.remaining(f.getCanonicalPath());
-                            if (remaining == 0) {
+                            if (remaining < 0) {
                                 complete = true;
-                                status = _("Complete");
-                            } else if (remaining < 0) {
+                                status = "<img height=\"16\" width=\"16\" src=\"/i2psnark/_icons/cancel.png\"> " +
+                                         _("File not found in torrent?");
+                            } else if (remaining == 0 || length <= 0) {
                                 complete = true;
-                                status = _("File not found in torrent?");
-                            } else if (length <= 0) {
-                                complete = true;
-                                status = _("Complete");
+                                status = "<img height=\"16\" width=\"16\" src=\"/i2psnark/_icons/tick.png\"> " +
+                                         _("Complete");
                             } else {
-                                status = (100 - (100 * remaining / length)) + "% " + _("complete") +
+                                status = "<img height=\"16\" width=\"16\" src=\"/i2psnark/_icons/clock.png\"> " +
+                                         (100 - (100 * remaining / length)) + "% " + _("complete") +
                                          " (" + DataHelper.formatSize(remaining) + " bytes remaining)";
                             }
                         } else {
@@ -1295,24 +1285,72 @@ public class I2PSnarkServlet extends Default {
             String path=URI.addPaths(base,encoded);
             if (item.isDirectory() && !path.endsWith("/"))
                 path=URI.addPaths(path,"/");
+            String plc = path.toLowerCase();
+
+            // pick an icon; try to catch the common types in an i2p environment
+            String icon;
+            if (item.isDirectory()) {
+                icon = "folder";
+            } else {
+                // Should really just add to the mime.properties file in org.mortbay.jetty.jar
+                // instead of this mishmash. We can't get to HttpContext.setMimeMapping()
+                // from here? We could do it from a web.xml perhaps.
+                // Or could we put our own org/mortbay/http/mime.properties file in the war?
+                String mime = getServletContext().getMimeType(path);
+                if (mime == null)
+                    mime = "";
+                if (mime.equals("text/html"))
+                    icon = "html";
+                else if (mime.equals("text/plain") || plc.endsWith(".nfo"))
+                    icon = "page";
+                else if (mime.equals("application/java-archive") || plc.endsWith(".war"))
+                    icon = "package";
+                else if (plc.endsWith(".xpi2p"))
+                    icon = "plugin";
+                else if (mime.equals("application/pdf"))
+                    icon = "page_white_acrobat";
+                else if (mime.startsWith("image/") || plc.endsWith(".ico"))
+                    icon = "photo";
+                else if (mime.startsWith("audio/") || mime.equals("application/ogg") ||
+                         plc.endsWith(".flac") || plc.endsWith(".m4a") || plc.endsWith(".wma") ||
+                         plc.endsWith(".ape"))
+                    icon = "music";
+                else if (mime.startsWith("video/") || plc.endsWith(".mkv") || plc.endsWith(".m4v") ||
+                         plc.endsWith(".mp4"))
+                    icon = "film";
+                else if (mime.equals("application/zip") || mime.equals("application/x-gtar") ||
+                         mime.equals("application/compress") || mime.equals("application/gzip") ||
+                         mime.equals("application/x-tar") ||
+                         plc.endsWith(".rar") || plc.endsWith(".bz2") || plc.endsWith(".7z"))
+                    icon = "compress";
+                else if (plc.endsWith(".exe"))
+                    icon = "application";
+                else
+                    icon = "bug";
+            }
             if (complete) {
+                buf.append("<a href=\"").append(path).append("\"><img alt=\"\" border=\"0\" ");
                 // thumbnail ?
-                String plc = path.toLowerCase();
-                if (plc.endsWith(".jpg") || plc.endsWith(".png") || plc.endsWith(".gif")) {
-                    buf.append("<a href=\"").append(path).append("\"><img alt=\"\" border=\"0\" class=\"thumb\" src=\"")
+                if (plc.endsWith(".jpg") || plc.endsWith(".jpeg") || plc.endsWith(".png") ||
+                    plc.endsWith(".gif") || plc.endsWith(".ico")) {
+                    buf.append("class=\"thumb\" src=\"")
                        .append(path).append("\"></a> ");
+                } else {
+                    buf.append("height=\"16\" width=\"16\" src=\"/i2psnark/_icons/").append(icon).append(".png\"></a> ");
                 }
                 buf.append("<A HREF=\"");
                 buf.append(path);
                 buf.append("\">");
+            } else {
+                buf.append("<img height=\"16\" width=\"16\" src=\"/i2psnark/_icons/").append(icon).append(".png\"> ");
             }
             buf.append(ls[i]);
             if (complete)
                 buf.append("</a>");
-            buf.append("</TD><TD ALIGN=right class=\"").append(rowClass).append("\">");
+            buf.append("</TD><TD ALIGN=right class=\"").append(rowClass).append(" snarkFileSize\">");
             if (!item.isDirectory())
                 buf.append(DataHelper.formatSize(length)).append(' ').append(_("Bytes"));
-            buf.append("</TD><TD>");
+            buf.append("</TD><TD class=\"").append(rowClass).append(" snarkFileStatus\">");
             //buf.append(dfmt.format(new Date(item.lastModified())));
             buf.append(status);
             buf.append("</TD></TR>\n");

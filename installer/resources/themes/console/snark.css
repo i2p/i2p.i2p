@@ -110,6 +110,15 @@ td {
 
 .snarkFileName {
      min-width: 25em;
+     padding: 4px 10px;
+}
+
+.snarkFileSize {
+     padding: 4px 10px;
+}
+
+.snarkFileStatus {
+     padding: 4px 10px;
 }
 
 .thumb {
@@ -225,7 +234,8 @@ textarea {
 
 img {
      border: none;
-     margin: 5px 5px 0px 5px;
+     margin: 4px 8px 4px 4px;
+     vertical-align: middle;
      opacity: 1.0;
      line-height: 100%;
 }
