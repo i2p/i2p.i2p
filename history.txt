@@ -1,3 +1,6 @@
+2010-05-23 welterde
+    * I2PTunnelServer: Implemented WEBIRC support in IRC server tunnel
+
 2010-04-27 zzz
     * i2psnark: Serve downloaded files from the servlet rather
       than with a file: link
