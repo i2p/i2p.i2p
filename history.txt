@@ -1,3 +1,6 @@
+2010-05-24 zzz
+    * i2psnark: Listing icons and cleanups
+
 2010-05-23 welterde
     * core:
       - fixed major security hole in DatagramDissector
