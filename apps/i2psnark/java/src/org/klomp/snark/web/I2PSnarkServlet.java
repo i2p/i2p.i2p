@@ -1271,7 +1271,7 @@ public class I2PSnarkServlet extends Default {
                             } else {
                                 status = "<img height=\"16\" width=\"16\" src=\"/i2psnark/_icons/clock.png\"> " +
                                          (100 - (100 * remaining / length)) + "% " + _("complete") +
-                                         " (" + DataHelper.formatSize(remaining) + " bytes remaining)";
+                                         " (" + DataHelper.formatSize(remaining) + " " + _("bytes remaining") + ")";
                             }
                         } else {
                             status = "Not a file?";
