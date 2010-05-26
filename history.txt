@@ -1,3 +1,7 @@
+2010-05-26 zzz
+    * i2psnark: Listing fixes and cleanups;
+      icons on front page; tweak bw choker again
+
 2010-05-24 zzz
     * i2psnark: Listing icons and cleanups
 
@@ -5,7 +9,6 @@
     * core:
       - fixed major security hole in DatagramDissector
     * I2PTunnelServer: Implemented WEBIRC support in IRC server tunnel
-
 
 2010-05-23 zzz
     * i2psnark:

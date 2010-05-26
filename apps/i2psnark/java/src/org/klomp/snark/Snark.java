@@ -734,7 +734,7 @@ public class Snark
     //if (debug >= INFO && t != null)
     //  t.printStackTrace();
     stopTorrent();
-    throw new RuntimeException(s + (t == null ? "" : ": " + t.getMessage()));
+    throw new RuntimeException(s + (t == null ? "" : ": " + t));
   }
 
   /**

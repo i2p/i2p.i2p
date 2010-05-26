@@ -1030,6 +1030,30 @@ public class DataHelper {
     }
     
     /**
+     * Like formatSize but with a space after the number
+     * @since 0.7.14
+     */
+    public static String formatSize2(long bytes) {
+        double val = bytes;
+        int scale = 0;
+        while (val >= 1024) {
+            scale++; 
+            val /= 1024;
+        }
+        
+        DecimalFormat fmt = new DecimalFormat("##0.00");
+
+        String str = fmt.format(val);
+        switch (scale) {
+            case 1: return str + " K";
+            case 2: return str + " M";
+            case 3: return str + " G";
+            case 4: return str + " T";
+            default: return bytes + " ";
+        }
+    }
+    
+    /**
      * Strip out any HTML (simply removing any less than / greater than symbols)
      */
     public static String stripHTML(String orig) {

@@ -115,10 +115,10 @@ class PeerCheckerTask extends TimerTask
                         + " C: " + peer.isChoked(),
                         Snark.DEBUG);
 
-            // Choke a third of them rather than all so it isn't so drastic...
+            // Choke a percentage of them rather than all so it isn't so drastic...
             // unless this torrent is over the limit all by itself.
             boolean overBWLimitChoke = upload > 0 &&
-                                       ((overBWLimit && random.nextInt(3) == 0) ||
+                                       ((overBWLimit && random.nextInt(5) < 2) ||
                                         (coordinator.overUpBWLimit(uploaded)));
 
             // If we are at our max uploaders and we have lots of other

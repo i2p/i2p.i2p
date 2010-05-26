@@ -287,7 +287,7 @@ public class Storage
   }
 
   /**
-   *  @param file absolute path (non-directory)
+   *  @param file canonical path (non-directory)
    *  @return number of bytes remaining; -1 if unknown file
    *  @since 0.7.14
    */
@@ -295,7 +295,16 @@ public class Storage
       long bytes = 0;
       for (int i = 0; i < rafs.length; i++) {
           File f = RAFfile[i];
-          if (f != null && f.getAbsolutePath().equals(file)) {
+          // use canonical in case snark dir or sub dirs are symlinked
+          String canonical = null;
+          if (f != null) {
+              try {
+                  canonical = f.getCanonicalPath();
+              } catch (IOException ioe) {
+                  f = null;
+              }
+          }
+          if (f != null && canonical.equals(file)) {
               if (complete())
                   return 0;
               int psz = metainfo.getPieceLength(0);
@@ -305,7 +314,8 @@ public class Storage
               long rv = 0;
               if (!bitfield.get(pc))
                   rv = Math.min(psz - (start % psz), lengths[i]);
-              for (int j = pc + 1; j * psz < end; j++) {
+              int pieces = metainfo.getPieces();
+              for (int j = pc + 1; j * psz < end && j < pieces; j++) {
                   if (!bitfield.get(j)) {
                       if ((j+1)*psz < end)
                           rv += psz;

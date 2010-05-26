@@ -271,7 +271,7 @@ public class I2PSnarkServlet extends Default {
             out.write(" (");
             out.write(_("{0} torrents", snarks.size()));
             out.write(", ");
-            out.write(DataHelper.formatSize(stats[5]) + "B, ");
+            out.write(DataHelper.formatSize2(stats[5]) + "B, ");
             out.write(_("{0} connected peers", stats[4]));
             out.write(")</th>\n" +
                       "    <th>&nbsp;</th>\n" +
@@ -683,6 +683,12 @@ public class I2PSnarkServlet extends Default {
                 out.write(_("Open file"));
             out.write("\">");
         }
+        String icon;
+        if (snark.meta.getFiles() != null)
+            icon = "folder";
+        else
+            icon = toIcon(fullFilename);
+        out.write(toImg(icon));
         out.write(filename);
         if (remaining == 0 || snark.meta.getFiles() != null)
             out.write("</a>");
@@ -1078,7 +1084,7 @@ public class I2PSnarkServlet extends Default {
     private static final String HOPS = _x("hops");
     private static final String TUNNELS = _x("tunnels");
 
-    /** modded from ConfigTunnelsHelper */
+    /** modded from ConfigTunnelsHelper @since 0.7.14 */
     private String renderOptions(int min, int max, String strNow, String selName, String name) {
         int now = 2;
         try {
@@ -1130,6 +1136,7 @@ public class I2PSnarkServlet extends Default {
             return ((bytes + 512*1024*1024)/(1024*1024*1024)) + " GB";
     }
     
+    /** @since 0.7.14 */
     private static String urlify(String s) {
         StringBuilder buf = new StringBuilder(256);
         buf.append("<a href=\"").append(s).append("\">").append(s).append("</a>");
@@ -1174,6 +1181,7 @@ public class I2PSnarkServlet extends Default {
      * @param base The base URL
      * @param parent True if the parent directory should be included
      * @return String of HTML
+     * @since 0.7.14
      */
     private String getListHTML(Resource r, String base, boolean parent)
         throws IOException
@@ -1247,14 +1255,12 @@ public class I2PSnarkServlet extends Default {
             long length = item.length();
             if (item.isDirectory()) {
                 complete = true;
-                status = "<img height=\"16\" width=\"16\" src=\"/i2psnark/_icons/tick.png\"> " +
-                         _("Directory");
+                status = toImg("tick") + _("Directory");
             } else {
                 if (snark == null) {
                     // Assume complete, perhaps he removed a completed torrent but kept a bookmark
                     complete = true;
-                    status = "<img height=\"16\" width=\"16\" src=\"/i2psnark/_icons/cancel.png\"> " +
-                                         _("Torrent not found?");
+                    status = toImg("cancel") + _("Torrent not found?");
                 } else {
                     try {
                         File f = item.getFile();
@@ -1262,16 +1268,14 @@ public class I2PSnarkServlet extends Default {
                             long remaining = snark.storage.remaining(f.getCanonicalPath());
                             if (remaining < 0) {
                                 complete = true;
-                                status = "<img height=\"16\" width=\"16\" src=\"/i2psnark/_icons/cancel.png\"> " +
-                                         _("File not found in torrent?");
+                                status = toImg("cancel") + _("File not found in torrent?");
                             } else if (remaining == 0 || length <= 0) {
                                 complete = true;
-                                status = "<img height=\"16\" width=\"16\" src=\"/i2psnark/_icons/tick.png\"> " +
-                                         _("Complete");
+                                status = toImg("tick") + _("Complete");
                             } else {
-                                status = "<img height=\"16\" width=\"16\" src=\"/i2psnark/_icons/clock.png\"> " +
-                                         (100 - (100 * remaining / length)) + "% " + _("complete") +
-                                         " (" + DataHelper.formatSize(remaining) + " " + _("bytes remaining") + ")";
+                                status = toImg("clock") +
+                                         (100 * (length - remaining) / length) + "% " + _("complete") +
+                                         " (" + DataHelper.formatSize2(remaining) + _("bytes remaining") + ")";
                             }
                         } else {
                             status = "Not a file?";
@@ -1285,71 +1289,31 @@ public class I2PSnarkServlet extends Default {
             String path=URI.addPaths(base,encoded);
             if (item.isDirectory() && !path.endsWith("/"))
                 path=URI.addPaths(path,"/");
-            String plc = path.toLowerCase();
+            String icon = toIcon(item);
 
-            // pick an icon; try to catch the common types in an i2p environment
-            String icon;
-            if (item.isDirectory()) {
-                icon = "folder";
-            } else {
-                // Should really just add to the mime.properties file in org.mortbay.jetty.jar
-                // instead of this mishmash. We can't get to HttpContext.setMimeMapping()
-                // from here? We could do it from a web.xml perhaps.
-                // Or could we put our own org/mortbay/http/mime.properties file in the war?
-                String mime = getServletContext().getMimeType(path);
-                if (mime == null)
-                    mime = "";
-                if (mime.equals("text/html"))
-                    icon = "html";
-                else if (mime.equals("text/plain") || plc.endsWith(".nfo"))
-                    icon = "page";
-                else if (mime.equals("application/java-archive") || plc.endsWith(".war"))
-                    icon = "package";
-                else if (plc.endsWith(".xpi2p"))
-                    icon = "plugin";
-                else if (mime.equals("application/pdf"))
-                    icon = "page_white_acrobat";
-                else if (mime.startsWith("image/") || plc.endsWith(".ico"))
-                    icon = "photo";
-                else if (mime.startsWith("audio/") || mime.equals("application/ogg") ||
-                         plc.endsWith(".flac") || plc.endsWith(".m4a") || plc.endsWith(".wma") ||
-                         plc.endsWith(".ape"))
-                    icon = "music";
-                else if (mime.startsWith("video/") || plc.endsWith(".mkv") || plc.endsWith(".m4v") ||
-                         plc.endsWith(".mp4"))
-                    icon = "film";
-                else if (mime.equals("application/zip") || mime.equals("application/x-gtar") ||
-                         mime.equals("application/compress") || mime.equals("application/gzip") ||
-                         mime.equals("application/x-tar") ||
-                         plc.endsWith(".rar") || plc.endsWith(".bz2") || plc.endsWith(".7z"))
-                    icon = "compress";
-                else if (plc.endsWith(".exe"))
-                    icon = "application";
-                else
-                    icon = "bug";
-            }
             if (complete) {
-                buf.append("<a href=\"").append(path).append("\"><img alt=\"\" border=\"0\" ");
+                buf.append("<a href=\"").append(path).append("\">");
                 // thumbnail ?
+                String plc = item.toString().toLowerCase();
                 if (plc.endsWith(".jpg") || plc.endsWith(".jpeg") || plc.endsWith(".png") ||
                     plc.endsWith(".gif") || plc.endsWith(".ico")) {
-                    buf.append("class=\"thumb\" src=\"")
+                    buf.append("<img alt=\"\" border=\"0\" class=\"thumb\" src=\"")
                        .append(path).append("\"></a> ");
                 } else {
-                    buf.append("height=\"16\" width=\"16\" src=\"/i2psnark/_icons/").append(icon).append(".png\"></a> ");
+                    buf.append(toImg(icon));
                 }
                 buf.append("<A HREF=\"");
                 buf.append(path);
                 buf.append("\">");
             } else {
-                buf.append("<img height=\"16\" width=\"16\" src=\"/i2psnark/_icons/").append(icon).append(".png\"> ");
+                buf.append(toImg(icon));
             }
             buf.append(ls[i]);
             if (complete)
                 buf.append("</a>");
             buf.append("</TD><TD ALIGN=right class=\"").append(rowClass).append(" snarkFileSize\">");
             if (!item.isDirectory())
-                buf.append(DataHelper.formatSize(length)).append(' ').append(_("Bytes"));
+                buf.append(DataHelper.formatSize2(length)).append('B');
             buf.append("</TD><TD class=\"").append(rowClass).append(" snarkFileStatus\">");
             //buf.append(dfmt.format(new Date(item.lastModified())));
             buf.append(status);
@@ -1359,6 +1323,64 @@ public class I2PSnarkServlet extends Default {
 	buf.append("</div></div></BODY></HTML>\n");
         
         return buf.toString();
+    }
+
+    /** @since 0.7.14 */
+    private String toIcon(Resource item) {
+        if (item.isDirectory())
+            return "folder";
+        return toIcon(item.toString());
+    }
+
+    /**
+     *  Pick an icon; try to catch the common types in an i2p environment
+     *  @return file name not including ".png"
+     *  @since 0.7.14
+     */
+    private String toIcon(String path) {
+        String icon;
+        // Should really just add to the mime.properties file in org.mortbay.jetty.jar
+        // instead of this mishmash. We can't get to HttpContext.setMimeMapping()
+        // from here? We could do it from a web.xml perhaps.
+        // Or could we put our own org/mortbay/http/mime.properties file in the war?
+        String plc = path.toLowerCase();
+        String mime = getServletContext().getMimeType(path);
+        if (mime == null)
+            mime = "";
+        if (mime.equals("text/html"))
+            icon = "html";
+        else if (mime.equals("text/plain") || plc.endsWith(".nfo"))
+            icon = "page";
+        else if (mime.equals("application/java-archive") || plc.endsWith(".war"))
+            icon = "package";
+        else if (plc.endsWith(".xpi2p"))
+            icon = "plugin";
+        else if (mime.equals("application/pdf"))
+            icon = "page_white_acrobat";
+        else if (mime.startsWith("image/") || plc.endsWith(".ico"))
+            icon = "photo";
+        else if (mime.startsWith("audio/") || mime.equals("application/ogg") ||
+                 plc.endsWith(".flac") || plc.endsWith(".m4a") || plc.endsWith(".wma") ||
+                 plc.endsWith(".ape"))
+            icon = "music";
+        else if (mime.startsWith("video/") || plc.endsWith(".mkv") || plc.endsWith(".m4v") ||
+                 plc.endsWith(".mp4"))
+            icon = "film";
+        else if (mime.equals("application/zip") || mime.equals("application/x-gtar") ||
+                 mime.equals("application/compress") || mime.equals("application/gzip") ||
+                 mime.equals("application/x-tar") ||
+                 plc.endsWith(".rar") || plc.endsWith(".bz2") || plc.endsWith(".7z"))
+            icon = "compress";
+        else if (plc.endsWith(".exe"))
+            icon = "application";
+        else
+            icon = "bug";
+        return icon;
+    }
+    
+    /** @since 0.7.14 */
+    private static String toImg(String icon) {
+        return "<img alt=\"\" height=\"16\" width=\"16\" src=\"/i2psnark/_icons/" + icon + ".png\"> ";
     }
 
 
