@@ -29,4 +29,9 @@ public class Messages extends Translate {
     public static String getString(String s, Object o, I2PAppContext ctx) {
         return Translate.getString(s, o, ctx, BUNDLE_NAME);
     }
+
+    /** translate (ngettext) @since 0.7.14 */
+    public static String getString(int n, String s, String p, I2PAppContext ctx) {
+        return Translate.getString(n, s, p, ctx, BUNDLE_NAME);
+    }
 }

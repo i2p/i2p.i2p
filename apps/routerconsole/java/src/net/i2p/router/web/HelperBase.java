@@ -51,6 +51,11 @@ public abstract class HelperBase {
         return Messages.getString(s, o, _context);
     }
 
+    /** translate (ngettext) @since 0.7.14 */
+    public String _(int n, String s, String p) {
+        return Messages.getString(n, s, p, _context);
+    }
+
     /**
      *  Mark a string for extraction by xgettext and translation.
      *  Use this only in static initializers.

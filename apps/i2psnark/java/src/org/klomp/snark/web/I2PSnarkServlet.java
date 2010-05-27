@@ -269,10 +269,10 @@ public class I2PSnarkServlet extends Default {
                       "    <th align=\"left\" colspan=\"2\">");
             out.write(_("Totals"));
             out.write(" (");
-            out.write(_("{0} torrents", snarks.size()));
+            out.write(ngettext("1 torrent", "{0} torrents", snarks.size()));
             out.write(", ");
             out.write(DataHelper.formatSize2(stats[5]) + "B, ");
-            out.write(_("{0} connected peers", stats[4]));
+            out.write(ngettext("1 connected peer", "{0} connected peers", (int) stats[4]));
             out.write(")</th>\n" +
                       "    <th>&nbsp;</th>\n" +
                       "    <th align=\"right\">" + formatSize(stats[0]) + "</th>\n" +
@@ -629,10 +629,12 @@ public class I2PSnarkServlet extends Default {
         if (err != null) {
             if (isRunning && curPeers > 0 && !showPeers)
                 statusString = "<a title=\"" + err + "\">" + _("TrackerErr") + "</a> (" +
-                               curPeers + "/" + knownPeers +
-                               " <a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">" + _("peers") + "</a>)";
+                               "<a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">" +
+                               curPeers + '/' +
+                               ngettext("1 peer", "{0} peers", knownPeers) + "</a>)";
             else if (isRunning)
-                statusString = "<a title=\"" + err + "\">" + _("TrackerErr") + " (" + curPeers + '/' + knownPeers + ' ' + _("peers") + ')';
+                statusString = "<a title=\"" + err + "\">" + _("TrackerErr") + " (" + curPeers + '/' +
+                               ngettext("1 peer", "{0} peers", knownPeers) + ')';
             else {
                 if (err.length() > MAX_DISPLAYED_ERROR_LENGTH)
                     err = err.substring(0, MAX_DISPLAYED_ERROR_LENGTH) + "&hellip;";
@@ -641,25 +643,31 @@ public class I2PSnarkServlet extends Default {
         } else if (remaining <= 0) {
             if (isRunning && curPeers > 0 && !showPeers)
                 statusString = _("Seeding") + " (" +
-                               curPeers + '/' + knownPeers +
-                               " <a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">" + _("peers") + "</a>)";
+                               "<a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">" +
+                               curPeers + '/' +
+                               ngettext("1 peer", "{0} peers", knownPeers) + "</a>)";
             else if (isRunning)
-                statusString = _("Seeding") + " (" + curPeers + "/" + knownPeers + ' ' + _("peers") + ')';
+                statusString = _("Seeding") + " (" + curPeers + "/" +
+                               ngettext("1 peer", "{0} peers", knownPeers) + ')';
             else
                 statusString = _("Complete");
         } else {
             if (isRunning && curPeers > 0 && downBps > 0 && !showPeers)
                 statusString = _("OK") + " (" +
-                               curPeers + "/" + knownPeers +
-                               " <a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">" + _("peers") + "</a>)";
+                               "<a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">" +
+                               curPeers + "/" +
+                               ngettext("1 peer", "{0} peers", knownPeers) + "</a>)";
             else if (isRunning && curPeers > 0 && downBps > 0)
-                statusString = _("OK") + " (" + curPeers + "/" + knownPeers + ' ' + _("peers") + ')';
+                statusString = _("OK") + " (" + curPeers + "/" +
+                               ngettext("1 peer", "{0} peers", knownPeers) + ')';
             else if (isRunning && curPeers > 0 && !showPeers)
                 statusString = _("Stalled") + " (" +
-                               curPeers + '/' + knownPeers +
-                               " <a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">" + _("peers") + "</a>)";
+                               "<a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">" +
+                               curPeers + '/' +
+                               ngettext("1 peer", "{0} peers", knownPeers) + "</a>)";
             else if (isRunning && curPeers > 0)
-                statusString = _("Stalled") + " (" + curPeers + '/' + knownPeers + ' ' + _("peers") + ')';
+                statusString = _("Stalled") + " (" + curPeers + '/' +
+                               ngettext("1 peer", "{0} peers", knownPeers) + ')';
             else if (isRunning)
                 statusString = _("No Peers") + " (0/" + knownPeers + ')';
             else
@@ -1078,11 +1086,11 @@ public class I2PSnarkServlet extends Default {
     }
     
     /** copied from ConfigTunnelsHelper */
-    private static final String HOP = _x("hop");
-    private static final String TUNNEL = _x("tunnel");
+    private static final String HOP = "hop";
+    private static final String TUNNEL = "tunnel";
     /** dummies for translation */
-    private static final String HOPS = _x("hops");
-    private static final String TUNNELS = _x("tunnels");
+    private static final String HOPS = ngettext("1 hop", "{0} hops");
+    private static final String TUNNELS = ngettext("1 tunnel", "{0} tunnels");
 
     /** modded from ConfigTunnelsHelper @since 0.7.14 */
     private String renderOptions(int min, int max, String strNow, String selName, String name) {
@@ -1096,13 +1104,7 @@ public class I2PSnarkServlet extends Default {
             buf.append("<option value=\"").append(i).append("\" ");
             if (i == now)
                 buf.append("selected=\"true\" ");
-            String pname;
-            // pluralize and then translate
-            if (i != 1 && i != -1)
-                pname = name + 's';
-            else
-                pname = name;
-            buf.append(">").append(i).append(' ').append(_(pname));
+            buf.append(">").append(ngettext("1 " + name, "{0} " + name + 's', i));
             buf.append("</option>\n");
         }
         buf.append("</select>\n");
@@ -1119,9 +1121,14 @@ public class I2PSnarkServlet extends Default {
         return _manager.util().getString(s, o);
     }
 
+    /** translate (ngettext) @since 0.7.14 */
+    private String ngettext(String s, String p, int n) {
+        return _manager.util().getString(n, s, p);
+    }
+
     /** dummy for tagging */
-    private static String _x(String s) {
-        return s;
+    private static String ngettext(String s, String p) {
+        return null;
     }
 
     // rounding makes us look faster :)

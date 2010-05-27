@@ -8,11 +8,11 @@ import net.i2p.data.Destination;
 import net.i2p.router.TunnelPoolSettings;
 
 public class ConfigTunnelsHelper extends HelperBase {
-    static final String HOP = _x("hop");
-    static final String TUNNEL = _x("tunnel");
+    private static final String HOP = "hop";
+    private static final String TUNNEL = "tunnel";
     /** dummies for translation */
-    static final String HOPS = _x("hops");
-    static final String TUNNELS = _x("tunnels");
+    private static final String HOPS = ngettext("1 hop", "{0} hops");
+    private static final String TUNNELS = ngettext("1 tunnel", "{0} tunnels");
 
     public ConfigTunnelsHelper() {}
     
@@ -196,14 +196,13 @@ public class ConfigTunnelsHelper extends HelperBase {
             buf.append("<option value=\"").append(i).append("\" ");
             if (i == now)
                 buf.append("selected=\"true\" ");
-            String pname;
-            // pluralize and then translate
-            if (i != 1 && i != -1)
-                pname = name + 's';
-            else
-                pname = name;
-            buf.append(">").append(prefix).append(i).append(' ').append(_(pname));
+            buf.append(">").append(_(i, "1 " + name, "{0} " + name + 's'));
             buf.append("</option>\n");
         }
+    }
+
+    /** dummy for tagging */
+    private static String ngettext(String s, String p) {
+        return null;
     }
 }

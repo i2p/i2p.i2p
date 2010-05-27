@@ -17,6 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: Chinese\n"
 "X-Poedit-Country: CHINA\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 
 #: ../../../router/java/src/net/i2p/router/Blocklist.java:117
 #, java-format

@@ -430,4 +430,9 @@ public class I2PSnarkUtil {
     public String getString(String s, Object o, Object o2) {
         return Translate.getString(s, o, o2, _context, BUNDLE_NAME);
     }
+
+    /** ngettext @since 0.7.14 */
+    public String getString(int n, String s, String p) {
+        return Translate.getString(n, s, p, _context, BUNDLE_NAME);
+    }
 }

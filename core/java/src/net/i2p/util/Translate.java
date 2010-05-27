@@ -8,6 +8,8 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import gnu.gettext.GettextResource;
+
 import net.i2p.I2PAppContext;
 import net.i2p.util.ConcurrentHashSet;
 
@@ -99,6 +101,40 @@ public abstract class Translate {
                                "\" param2: \"" + o2 +
                                "\" lang: " + lang);
             return "FIXME: " + x + ' ' + o + ',' + o2;
+        }
+    }
+
+    /**
+     *  Use GNU ngettext
+     *  For .po file format see http://www.gnu.org/software/gettext/manual/gettext.html.gz#Translating-plural-forms
+     *
+     *  @param n how many
+     *  @param s singluar string, optionally with {0} e.g. "one tunnel"
+     *  @param s plural string optionally with {0} e.g. "{0} tunnels"
+     *  @since 0.7.14
+     */
+    public static String getString(int n, String s, String p, I2PAppContext ctx, String bun) {
+        String lang = getLanguage(ctx);
+        if (lang.equals(TEST_LANG))
+            return TEST_STRING + '(' + n + ')' + TEST_STRING;
+        ResourceBundle bundle = null;
+        if (!lang.equals("en"))
+            bundle = findBundle(bun, lang);
+        String x;
+        if (bundle == null)
+            x = n == 1 ? s : p;
+        else
+            x = GettextResource.ngettext(bundle, s, p, n);
+        Object[] oArray = new Object[1];
+        oArray[0] = Integer.valueOf(n);
+        try {
+            MessageFormat fmt = new MessageFormat(x, new Locale(lang));
+            return fmt.format(oArray, new StringBuffer(), null).toString();
+        } catch (IllegalArgumentException iae) {
+            System.err.println("Bad format: sing: \"" + s +
+                           "\" plural: \"" + p +
+                           "\" lang: " + lang);
+            return "FIXME: " + s + ' ' + p + ',' + n;
         }
     }
 

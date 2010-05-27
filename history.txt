@@ -1,3 +1,6 @@
+2010-05-27 zzz
+    * Translate: Add GNU ngettext (plurals) support
+
 2010-05-26 zzz
     * i2psnark: Listing fixes and cleanups;
       icons on front page; tweak bw choker again
