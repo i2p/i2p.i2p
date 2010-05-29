@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P susidns\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-05 12:44+0000\n"
-"PO-Revision-Date: 2010-03-05 21:37+0800\n"
+"POT-Creation-Date: 2010-05-29 02:35+0000\n"
+"PO-Revision-Date: 2010-05-29 12:51+0800\n"
 "Last-Translator: walking <walking@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -17,79 +17,109 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: Chinese\n"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:197
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:199
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:193
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:197
 msgid "Search"
 msgstr "搜索"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:201
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:203
 msgid "Search within filtered list"
 msgstr "在过滤结果中搜索"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:203
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:205
 msgid "Filtered list"
 msgstr "过滤结果列表"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:207
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:209
 msgid "no matches"
 msgstr "无匹配项目"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:210
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:212
 msgid "Addressbook"
 msgstr "地址簿"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:212
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:214
 msgid "contains no entries"
 msgstr "包含 0 个项目"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:214
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:216
 msgid "contains 1 entry"
 msgstr "包含 1 个项目"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:216
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:218
 #, java-format
 msgid "contains {0} entries"
 msgstr "包含 {0} 个项目"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:226
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:228
 #, java-format
 msgid "Showing {0} of {1}"
 msgstr "显示 {0} 个项目共 {1}"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:257
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:364
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:259
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:368
 msgid "Add"
 msgstr "添加"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:261
-msgid "Destination added."
-msgstr "目标已添加"
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:259
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:264
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:366
+msgid "Replace"
+msgstr "替换"
+
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:263
+#, java-format
+msgid "Host name {0} is already in addressbook, unchanged."
+msgstr "主机名称{0}已存在于地址簿中，本次操作未更新。"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:265
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:312
-msgid "Delete"
-msgstr "删除"
+#, java-format
+msgid "Host name {0} is already in addressbook with a different destination. Click \"Replace\" to overwrite."
+msgstr "域名{0}已以不同目标密钥的存在于地址簿中，点击“替换”进行覆盖"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:275
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:277
+#, java-format
+msgid "Destination added for {0}."
+msgstr "目标密钥已添加为{0}。"
+
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:279
+#, java-format
+msgid "Destination changed for {0}."
+msgstr "目标已更新为{0}。"
+
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:284
+msgid "Invalid Base 64 destination."
+msgstr "无效的Base64目标密钥"
+
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:288
+msgid "Please enter a host name and destination"
+msgstr "请输入主机名称与目标"
+
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:292
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:314
+msgid "Delete Selected"
+msgstr "删除选中项"
+
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:302
 #, java-format
 msgid "Destination {0} deleted."
 msgstr "目标 {0} 已删除"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:277
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:304
 #, java-format
 msgid "{0} destinations deleted."
 msgstr "{0} 个目标已删除"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:283
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:310
 msgid "Addressbook saved."
 msgstr "地址簿已保存"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:286
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:313
 msgid "ERROR: Could not write addressbook file."
 msgstr "错误:无法写入地址簿文件"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:291
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:318
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:148
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:150
 msgid "Invalid form submission, probably because you used the \"back\" or \"reload\" button on your browser. Please resubmit."
@@ -97,8 +127,8 @@ msgstr "提交数据无效，可能的原因是您使用了浏览器中的“前
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:139
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:129
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:128
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:128
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:130
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:130
 msgid "Save"
 msgstr "保存"
 
@@ -108,8 +138,8 @@ msgstr "配置已保存"
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:142
 #: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:144
-#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:130
-#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:130
+#: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:128
+#: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:128
 msgid "Reload"
 msgstr "刷新"
 
@@ -213,7 +243,7 @@ msgid "Name"
 msgstr "名称"
 
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:226
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:360
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:362
 msgid "Destination"
 msgstr "目标"
 
@@ -225,15 +255,19 @@ msgstr "标记为删除"
 msgid "address helper link"
 msgstr "地址簿助手链接"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:343
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:312
+msgid "Cancel"
+msgstr "取消"
+
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:345
 msgid "This addressbook is empty."
 msgstr "此地址簿为空"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:354
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:356
 msgid "Add new destination"
 msgstr "添加新目标"
 
-#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:356
+#: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:358
 msgid "Hostname"
 msgstr "主机名称"
 
@@ -392,4 +426,7 @@ msgstr "所以订阅一些网站的最新地址簿是个不错的主意。"
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:142
 msgid "See the FAQ for a list of subscription URLs."
 msgstr "其他来源的订阅链接参见I2P站点的 <a href=\"http://www.i2p2.i2p/faq_zh.html\">FAQ</a>"
+
+#~ msgid "Delete"
+#~ msgstr "删除"
 
