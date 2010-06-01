@@ -547,9 +547,11 @@ public class I2PSnarkServlet extends Default {
                 l = l.substring(skip.length());
             if (r.startsWith(skip))
                 r = r.substring(skip.length());
-            if (l.toLowerCase().startsWith("the "))
+            String llc = l.toLowerCase();
+            if (llc.startsWith("the ") || llc.startsWith("the."))
                 l = l.substring(4);
-            if (r.toLowerCase().startsWith("the "))
+            String rlc = r.toLowerCase();
+            if (rlc.startsWith("the ") || rlc.startsWith("the."))
                 r = r.substring(4);
             return collator.compare(l, r);
         }
@@ -681,7 +683,7 @@ public class I2PSnarkServlet extends Default {
         out.write("<td align=\"left\" class=\"snarkTorrentName " + rowClass + "\">");
         
         if (remaining == 0 || snark.meta.getFiles() != null) {
-            out.write("<a href=\"" + snark.meta.getName());
+            out.write("<a href=\"" + snark.storage.getBaseName());
             if (snark.meta.getFiles() != null)
                 out.write("/");
             out.write("\" title=\"");
@@ -1091,6 +1093,9 @@ public class I2PSnarkServlet extends Default {
     /** dummies for translation */
     private static final String HOPS = ngettext("1 hop", "{0} hops");
     private static final String TUNNELS = ngettext("1 tunnel", "{0} tunnels");
+    /** prevents the ngettext line below from getting tagged */
+    private static final String DUMMY0 = "{0} ";
+    private static final String DUMMY1 = "1 ";
 
     /** modded from ConfigTunnelsHelper @since 0.7.14 */
     private String renderOptions(int min, int max, String strNow, String selName, String name) {
@@ -1104,7 +1109,8 @@ public class I2PSnarkServlet extends Default {
             buf.append("<option value=\"").append(i).append("\" ");
             if (i == now)
                 buf.append("selected=\"true\" ");
-            buf.append(">").append(ngettext("1 " + name, "{0} " + name + 's', i));
+            // constants to prevent tagging
+            buf.append(">").append(ngettext(DUMMY1 + name, DUMMY0 + name + 's', i));
             buf.append("</option>\n");
         }
         buf.append("</select>\n");
@@ -1208,18 +1214,13 @@ public class I2PSnarkServlet extends Default {
             title = title.substring("/i2psnark/".length());
 
         // Get the snark associated with this directory
-        Snark snark = null;
-        try {
-            String torrentName;
-            int slash = title.indexOf('/');
-            if (slash > 0)
-                torrentName = title.substring(0, slash) + ".torrent";
-            else
-                torrentName = title + ".torrent";
-            File dataDir = _manager.getDataDir();
-            String torrentAbsPath = (new File(dataDir, torrentName)).getCanonicalPath();
-            snark = _manager.getTorrent(torrentAbsPath);
-        } catch (IOException ioe) {}
+        String torrentName;
+        int slash = title.indexOf('/');
+        if (slash > 0)
+            torrentName = title.substring(0, slash);
+        else
+            torrentName = title;
+        Snark snark = _manager.getTorrentByBaseName(torrentName);
         if (title.endsWith("/"))
             title = title.substring(0, title.length() - 1);
         title = _("Torrent") + ": " + title;
@@ -1371,7 +1372,7 @@ public class I2PSnarkServlet extends Default {
                  plc.endsWith(".ape"))
             icon = "music";
         else if (mime.startsWith("video/") || plc.endsWith(".mkv") || plc.endsWith(".m4v") ||
-                 plc.endsWith(".mp4"))
+                 plc.endsWith(".mp4") || plc.endsWith(".wmv"))
             icon = "film";
         else if (mime.equals("application/zip") || mime.equals("application/x-gtar") ||
                  mime.equals("application/compress") || mime.equals("application/gzip") ||

@@ -29,7 +29,7 @@ public class SnarkManager implements Snark.CompleteListener {
     private static SnarkManager _instance = new SnarkManager();
     public static SnarkManager instance() { return _instance; }
     
-    /** map of (canonical) filename to Snark instance (unsynchronized) */
+    /** map of (canonical) filename of the .torrent file to Snark instance (unsynchronized) */
     private final Map<String, Snark> _snarks;
     private final Object _addSnarkLock;
     private /* FIXME final FIXME */ File _configFile;
@@ -396,12 +396,30 @@ public class SnarkManager implements Snark.CompleteListener {
     /** hardcoded for sanity.  perhaps this should be customizable, for people who increase their ulimit, etc. */
     private static final int MAX_FILES_PER_TORRENT = 512;
     
-    /** set of filenames that we are dealing with */
+    /** set of canonical .torrent filenames that we are dealing with */
     public Set<String> listTorrentFiles() { synchronized (_snarks) { return new HashSet(_snarks.keySet()); } }
+
     /**
-     * Grab the torrent given the (canonical) filename
+     * Grab the torrent given the (canonical) filename of the .torrent file
+     * @return Snark or null
      */
     public Snark getTorrent(String filename) { synchronized (_snarks) { return (Snark)_snarks.get(filename); } }
+
+    /**
+     * Grab the torrent given the base name of the storage
+     * @return Snark or null
+     * @since 0.7.14
+     */
+    public Snark getTorrentByBaseName(String filename) {
+        synchronized (_snarks) {
+            for (Snark s : _snarks.values()) {
+                if (s.storage.getBaseName().equals(filename))
+                    return s;
+            }
+        }
+        return null;
+    }
+
     public void addTorrent(String filename) { addTorrent(filename, false); }
     public void addTorrent(String filename, boolean dontAutoStart) {
         if ((!dontAutoStart) && !_util.connected()) {
@@ -595,8 +613,8 @@ public class SnarkManager implements Snark.CompleteListener {
         } else if (info.getPieces() > Storage.MAX_PIECES) {
             return _("Too many pieces in \"{0}\", limit is {1}, deleting it!", info.getName(), Storage.MAX_PIECES);
         } else if (info.getPieceLength(0) > Storage.MAX_PIECE_SIZE) {
-            return _("Pieces are too large in \"{0}\" ({1}B), deleting it.", info.getName(), DataHelper.formatSize(info.getPieceLength(0))) + ' ' +
-                   _("Limit is {0}B", DataHelper.formatSize(Storage.MAX_PIECE_SIZE));
+            return _("Pieces are too large in \"{0}\" ({1}B), deleting it.", info.getName(), DataHelper.formatSize2(info.getPieceLength(0))) + ' ' +
+                   _("Limit is {0}B", DataHelper.formatSize2(Storage.MAX_PIECE_SIZE));
         } else if (info.getTotalLength() > Storage.MAX_TOTAL_SIZE) {
             System.out.println("torrent info: " + info.toString());
             List lengths = info.getLengths();
@@ -689,7 +707,7 @@ public class SnarkManager implements Snark.CompleteListener {
     public void torrentComplete(Snark snark) {
         File f = new File(snark.torrent);
         long len = snark.meta.getTotalLength();
-        addMessage(_("Download finished: \"{0}\"", f.getName()) + " (" + _("size: {0}B", DataHelper.formatSize(len)) + ')');
+        addMessage(_("Download finished: \"{0}\"", f.getName()) + " (" + _("size: {0}B", DataHelper.formatSize2(len)) + ')');
         updateStatus(snark);
     }
     
