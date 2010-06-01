@@ -2,6 +2,7 @@
     * i2psnark:
       - More listing fixes
       - Revert choker change
+      - Start end game a little sooner
     * Installer: Disable pack200 in updater again, doesn't work
       on Java 1.5
     * Remove jetty from updater - it's been in for a few

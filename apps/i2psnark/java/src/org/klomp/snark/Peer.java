@@ -388,6 +388,7 @@ public class Peer implements Comparable
    * Sets whether or not we are interested in pieces from this peer.
    * Defaults to false. When interest is true and this peer unchokes
    * us then we start downloading from it. Has no effect when not connected.
+   * @deprecated unused
    */
   public void setInteresting(boolean interest)
   {

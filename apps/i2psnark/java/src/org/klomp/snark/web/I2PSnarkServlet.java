@@ -697,7 +697,7 @@ public class I2PSnarkServlet extends Default {
         if (snark.meta.getFiles() != null)
             icon = "folder";
         else
-            icon = toIcon(fullFilename);
+            icon = toIcon(snark.meta.getName());
         out.write(toImg(icon));
         out.write(filename);
         if (remaining == 0 || snark.meta.getFiles() != null)
