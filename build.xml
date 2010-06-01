@@ -255,8 +255,7 @@
 	<defaultexcludes default="true"/>
     </target>
 
-    <!-- A few reeleases only, then back to updater. Jetty fix for snark in 0.7.14 -->
-    <target name="pkg" depends="distclean, updaterWithJettyFixes, preppkg, installer" />
+    <target name="pkg" depends="distclean, updater, preppkg, installer" />
 
     <target name="pkgclean" depends="deletepkg-temp">
         <delete>
@@ -582,6 +581,15 @@
         <jar destfile="./pkg-temp/installer/exec.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Exec.class">
             <manifest><attribute name="Main-Class" value="net.i2p.util.Exec" /></manifest>
         </jar>
+        <!--
+          Force 1.5 pack200 output
+          Doesnt work!
+          http://jira.codehaus.org/browse/IZPACK-404
+          http://forums.sun.com/thread.jspa?threadID=773439
+          http://bfo.co.uk/blog/2010/05/13/combining_ant_jar_signatures_and_pack200.html
+        <property name="com.sun.java.util.jar.pack.package.majver" value="150" />
+        <property name="com.sun.java.util.jar.pack.package.minver" value="7" />
+        -->
         <izpack input="${basedir}/installer/install.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
 
         <ant target="installerexe" />

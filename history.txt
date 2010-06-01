@@ -1,3 +1,12 @@
+2010-06-01 zzz
+    * i2psnark:
+      - More listing fixes
+      - Revert choker change
+    * Installer: Disable pack200 in updater again, doesn't work
+      on Java 1.5
+    * Remove jetty from updater - it's been in for a few
+      releases, and i2psnark now has its own listHTML method
+
 2010-05-27 zzz
     * Translate: Add GNU ngettext (plurals) support
 
