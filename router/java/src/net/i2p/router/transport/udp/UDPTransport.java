@@ -2146,6 +2146,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
     
+    /**
+     *  Todo: Move since some of these apply to NTCP also, and the whole thing
+     *  is hidden if i2np.udp.enable=false
+     */
     private final String getKey() {
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<h3>").append(_("Definitions")).append("</h3><div class=\"configure\">" +
