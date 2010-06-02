@@ -1,3 +1,11 @@
+2010-06-02 zzz
+    * graphs.jsp: Tag some more
+    * Translation: Set xgettext add-comments option
+    * UDP: Fix a bug from a blank i2np.udp.host config
+      causing frequent RouterInfo updates and incorrect
+      addition of introducers, caused by config.jsp handling
+    * Update: Change default update URLs to .su2 for pack200
+
 2010-06-01 zzz
     * i2psnark:
       - More listing fixes
@@ -40,7 +48,7 @@
 
 2010-05-19 zzz
     * Data: Remove lots of unnecessary initializers
-    * susidns: More validataion when adding entry
+    * susidns: More validatation when adding entry
 
 2010-05-15 zzz
     * Console:
