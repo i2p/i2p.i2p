@@ -30,6 +30,11 @@ public class Messages extends Translate {
         return Translate.getString(s, o, ctx, BUNDLE_NAME);
     }
 
+    /** two params @since 0.7.14 */
+    public static String getString(String s, Object o, Object o2, I2PAppContext ctx) {
+        return Translate.getString(s, o, o2, ctx, BUNDLE_NAME);
+    }
+
     /** translate (ngettext) @since 0.7.14 */
     public static String getString(int n, String s, String p, I2PAppContext ctx) {
         return Translate.getString(n, s, p, ctx, BUNDLE_NAME);

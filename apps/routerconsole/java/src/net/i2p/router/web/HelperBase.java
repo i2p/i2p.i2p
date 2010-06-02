@@ -51,6 +51,11 @@ public abstract class HelperBase {
         return Messages.getString(s, o, _context);
     }
 
+    /** two params @since 0.7.14 */
+    public String _(String s, Object o, Object o2) {
+        return Messages.getString(s, o, o2, _context);
+    }
+
     /** translate (ngettext) @since 0.7.14 */
     public String _(int n, String s, String p) {
         return Messages.getString(n, s, p, _context);

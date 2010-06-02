@@ -80,6 +80,7 @@ class SummaryRenderer {
                 String title;
                 String p = DataHelper.formatDuration(_listener.getRate().getPeriod());
                 if (showEvents)
+                    // Note to translators: all runtime zh translation disabled in this file, no font available in RRD
                     title = name + ' ' + _("events in {0}", p);
                 else
                     title = name + ' ' + _("averaged for {0}", p);
@@ -96,7 +97,11 @@ class SummaryRenderer {
             } else {
                 // include the average value
                 plotName = dsNames[0];
-                descr = _listener.getRate().getRateStat().getDescription();
+                // The descriptions are not tagged in the createRateStat calls
+                // (there are over 500 of them)
+                // but the descriptions for the default graphs are tagged in
+                // Strings.java
+                descr = _(_listener.getRate().getRateStat().getDescription());
             }
             def.datasource(plotName, path, plotName, "AVERAGE", "MEMORY");
             def.area(plotName, Color.BLUE, descr + "@r");
