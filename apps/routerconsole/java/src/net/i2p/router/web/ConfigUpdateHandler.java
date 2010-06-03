@@ -42,11 +42,15 @@ public class ConfigUpdateHandler extends FormHandler {
     public static final String PROP_ZIP_URL = "router.updateUnsignedURL";
     
     public static final String PROP_UPDATE_URL = "router.updateURL";
+    /**
+     *  Changed as of release 0.7.14 from .sud to .su2
+     *  Update hosts must maintain both for several releases
+     */
     public static final String DEFAULT_UPDATE_URL =
-    "http://echelon.i2p/i2p/i2pupdate.sud\r\n" +
-    "http://stats.i2p/i2p/i2pupdate.sud\r\n" +
-    "http://www.i2p2.i2p/_static/i2pupdate.sud\r\n" +
-    "http://update.postman.i2p/i2pupdate.sud" ;
+    "http://echelon.i2p/i2p/i2pupdate.su2\r\n" +
+    "http://stats.i2p/i2p/i2pupdate.su2\r\n" +
+    "http://www.i2p2.i2p/_static/i2pupdate.su2\r\n" +
+    "http://update.postman.i2p/i2pupdate.su2" ;
     
     public static final String PROP_TRUSTED_KEYS = "router.trustedUpdateKeys";
     

@@ -79,19 +79,21 @@ public class GraphHelper extends HelperBase {
                            + "&amp;width=" + (3 * _width)
                            + "&amp;height=" + (3 * _height)
                            + "\" / target=\"_blank\">");
+                String title = _("Combined bandwidth graph");
                 _out.write("<img class=\"statimage\" width=\""
                            + (_width + 83) + "\" height=\"" + (_height + 92)
                            + "\" src=\"viewstat.jsp?stat=bw.combined"
                            + "&amp;periodCount=" + _periodCount 
                            + "&amp;width=" + _width
                            + "&amp;height=" + (_height - 14)
-                           + "\" alt=\"Combined bandwidth graph\" title=\"Combined bandwidth graph\"></a>\n");
+                           + "\" alt=\"" + title + "\" title=\"" + title + "\"></a>\n");
             }
             
             for (Iterator iter = ordered.iterator(); iter.hasNext(); ) {
                 SummaryListener lsnr = (SummaryListener)iter.next();
                 Rate r = lsnr.getRate();
-                String title = r.getRateStat().getName() + " for " + DataHelper.formatDuration(_periodCount * r.getPeriod());
+                // e.g. "statname for 60m"
+                String title = _("{0} for {1}", r.getRateStat().getName(), DataHelper.formatDuration(_periodCount * r.getPeriod()));
                 _out.write("<a href=\"viewstat.jsp?stat="
                            + r.getRateStat().getName() 
                            + "&amp;showEvents=" + _showEvents

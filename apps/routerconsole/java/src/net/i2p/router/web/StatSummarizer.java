@@ -170,6 +170,7 @@ public class StatSummarizer implements Runnable {
             def.setTimePeriod(start/1000, 0);
             def.setLowerLimit(0d);
             def.setBaseValue(1024);
+            // Note to translators: all runtime zh translation disabled in this file, no font available in RRD
             String title = _("Bandwidth usage");
             if (!hideTitle)
                 def.setTitle(title);

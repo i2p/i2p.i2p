@@ -315,12 +315,12 @@ public class Storage
               if (!bitfield.get(pc))
                   rv = Math.min(psz - (start % psz), lengths[i]);
               int pieces = metainfo.getPieces();
-              for (int j = pc + 1; j * psz < end && j < pieces; j++) {
+              for (int j = pc + 1; (((long)j) * psz) < end && j < pieces; j++) {
                   if (!bitfield.get(j)) {
-                      if ((j+1)*psz < end)
+                      if (((long)(j+1))*psz < end)
                           rv += psz;
                       else
-                          rv += end - (j * psz);
+                          rv += end - (((long)j) * psz);
                   }
               }
               return rv;
@@ -337,6 +337,18 @@ public class Storage
   public BitField getBitField()
   {
     return bitfield;
+  }
+
+  /**
+   *  The base file or directory name of the data,
+   *  as specified in the .torrent file, but filtered to remove
+   *  illegal characters. This is where the data actually is,
+   *  relative to the snark base dir.
+   *
+   *  @since 0.7.14
+   */
+  public String getBaseName() {
+      return filterName(metainfo.getName());
   }
 
   /**

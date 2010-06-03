@@ -1181,7 +1181,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     private boolean explicitAddressSpecified() {
-        return (_context.getProperty(PROP_EXTERNAL_HOST) != null);
+        String h = _context.getProperty(PROP_EXTERNAL_HOST);
+        // Bug in config.jsp prior to 0.7.14, sets an empty host config
+        return h != null && h.length() > 0;
     }
     
     /**
@@ -2146,6 +2148,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
     
+    /**
+     *  Todo: Move since some of these apply to NTCP also, and the whole thing
+     *  is hidden if i2np.udp.enable=false
+     */
     private final String getKey() {
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<h3>").append(_("Definitions")).append("</h3><div class=\"configure\">" +

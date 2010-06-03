@@ -490,6 +490,13 @@ public class PeerCoordinator implements PeerListener
   }
 
   /**
+   *  This should be somewhat less than the max conns per torrent,
+   *  but not too much less, so a torrent doesn't get stuck near the end.
+   *  @since 0.7.14
+   */
+  private static final int END_GAME_THRESHOLD = 8;
+
+  /**
    * Returns one of pieces in the given BitField that is still wanted or
    * -1 if none of the given pieces are wanted.
    */
@@ -525,7 +532,7 @@ public class PeerCoordinator implements PeerListener
             // AND if there are almost no wanted pieces left (real end game).
             // If we do end game all the time, we generate lots of extra traffic
             // when the seeder is super-slow and all the peers are "caught up"
-            if (wantedPieces.size() > 4)
+            if (wantedPieces.size() > END_GAME_THRESHOLD)
                 return -1;  // nothing to request and not in end game
             // let's not all get on the same piece
             Collections.shuffle(requested);

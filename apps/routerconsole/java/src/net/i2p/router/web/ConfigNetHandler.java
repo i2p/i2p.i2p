@@ -145,7 +145,10 @@ public class ConfigNetHandler extends FormHandler {
                 }
                 _context.router().setConfigSetting(UDPTransport.PROP_SOURCES, _udpAutoIP);
                 // Todo: Catch local IPs right here rather than complaining later
-                _context.router().setConfigSetting(UDPTransport.PROP_EXTERNAL_HOST, uhost);
+                if (uhost.length() > 0)
+                    _context.router().setConfigSetting(UDPTransport.PROP_EXTERNAL_HOST, uhost);
+                else
+                    _context.router().removeConfigSetting(UDPTransport.PROP_EXTERNAL_HOST);
                 if ((!oldUdp.equals(_udpAutoIP)) || (!oldUHost.equals(uhost))) {
                    addFormNotice(_("Updating IP address"));
                    restartRequired = true;
