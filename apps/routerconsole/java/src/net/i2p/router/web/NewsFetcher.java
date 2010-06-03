@@ -92,8 +92,11 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
          return buf.toString();
     }
     
+    private static final long INITIAL_DELAY = 5*60*1000;
+    private static final long RUN_DELAY = 10*60*1000;
+
     public void run() {
-        try { Thread.sleep(_context.random().nextLong(5*60*1000)); } catch (InterruptedException ie) {}
+        try { Thread.sleep(INITIAL_DELAY + _context.random().nextLong(INITIAL_DELAY)); } catch (InterruptedException ie) {}
         while (true) {
             if (!_updateAvailable) checkForUpdates();
             if (shouldFetchNews()) {
@@ -101,7 +104,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
                 if (shouldFetchUnsigned())
                     fetchUnsignedHead();
             }
-            try { Thread.sleep(10*60*1000); } catch (InterruptedException ie) {}
+            try { Thread.sleep(RUN_DELAY); } catch (InterruptedException ie) {}
         }
     }
     
