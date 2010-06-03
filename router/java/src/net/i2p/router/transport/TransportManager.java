@@ -499,6 +499,11 @@ public class TransportManager implements TransportEventListener {
             Transport t= (Transport)iter.next();
             t.renderStatusHTML(out, urlBase, sortFlags);
         }
+        
+        if (_transports.size() > 0) {
+            out.write(getTransportsLegend());
+        }
+
         StringBuilder buf = new StringBuilder(4*1024);
         buf.append("<h3>").append(_("Router Transport Addresses")).append("</h3><pre>\n");
         for (int i = 0; i < _transports.size(); i++) {
@@ -517,6 +522,41 @@ public class TransportManager implements TransportEventListener {
         out.flush();
     }
 
+
+    private final String getTransportsLegend() {
+        StringBuilder buf = new StringBuilder(1024);
+        buf.append("<h3>").append(_("Definitions")).append("</h3><div class=\"configure\">" +
+                   "<p><b id=\"def.peer\">").append(_("Peer")).append("</b>: ").append(_("The remote peer, identified by router hash")).append("<br>\n" +
+                   "<b id=\"def.dir\">").append(_("Dir")).append("</b>: " +
+                   "<img src=\"/themes/console/images/inbound.png\"> ").append(_("Inbound connection")).append("<br>\n" +
+                   "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                   "<img src=\"/themes/console/images/outbound.png\"> ").append(_("Outbound connection")).append("<br>\n" +
+                   "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                   "<img src=\"/themes/console/images/inbound.png\" alt=\"V\" height=\"8\" width=\"12\"> ").append(_("They offered to introduce us (help other peers traverse our firewall)")).append("<br>\n" +
+                   "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" +
+                   "<img src=\"/themes/console/images/outbound.png\" alt=\"^\" height=\"8\" width=\"12\"> ").append(_("We offered to introduce them (help other peers traverse their firewall)")).append("<br>\n" +
+                   "<b id=\"def.idle\">").append(_("Idle")).append("</b>: ").append(_("How long since a packet has been received / sent")).append("<br>\n" +
+                   "<b id=\"def.rate\">").append(_("In/Out")).append("</b>: ").append(_("The smoothed inbound / outbound transfer rate (KBytes per second)")).append("<br>\n" +
+                   "<b id=\"def.up\">").append(_("Up")).append("</b>: ").append(_("How long ago this connection was established")).append("<br>\n" +
+                   "<b id=\"def.skew\">").append(_("Skew")).append("</b>: ").append(_("The difference between the peer's clock and your own")).append("<br>\n" +
+                   "<b id=\"def.cwnd\">CWND</b>: ").append(_("The congestion window, which is how many bytes can be sent without an acknowledgement")).append(" / <br>\n" +
+                   "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ").append(_("The number of sent messages awaiting acknowledgement")).append(" /<br>\n" +
+                   "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ").append(_("The maximum number of concurrent messages to send")).append(" /<br>\n"+ 
+                   "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ").append(_("The number of pending sends which exceed congestion window")).append("<br>\n" +
+                   "<b id=\"def.ssthresh\">SST</b>: ").append(_("The slow start threshold")).append("<br>\n" +
+                   "<b id=\"def.rtt\">RTT</b>: ").append(_("The round trip time in milliseconds")).append("<br>\n" +
+                   "<b id=\"def.dev\">").append(_("Dev")).append("</b>: ").append(_("The standard deviation of the round trip time in milliseconds")).append("<br>\n" +
+                   "<b id=\"def.rto\">RTO</b>: ").append(_("The retransmit timeout in milliseconds")).append("<br>\n" +
+                   "<b id=\"def.mtu\">MTU</b>: ").append(_("Current maximum send packet size / estimated maximum receive packet size (bytes)")).append("<br>\n" +
+                   "<b id=\"def.send\">").append(_("TX")).append("</b>: ").append(_("The total number of packets sent to the peer")).append("<br>\n" +
+                   "<b id=\"def.recv\">").append(_("RX")).append("</b>: ").append(_("The total number of packets received from the peer")).append("<br>\n" +
+                   "<b id=\"def.resent\">").append(_("Dup TX")).append("</b>: ").append(_("The total number of packets retransmitted to the peer")).append("<br>\n" +
+                   "<b id=\"def.dupRecv\">").append(_("Dup RX")).append("</b>: ").append(_("The total number of duplicate packets received from the peer")).append("</p>" +
+                   "</div>\n");
+        return buf.toString();
+    }
+
+    
     /**
      *  Mark a string for extraction by xgettext and translation.
      *  Use this only in static initializers.

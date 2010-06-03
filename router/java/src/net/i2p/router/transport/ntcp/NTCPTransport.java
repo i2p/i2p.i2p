@@ -707,7 +707,7 @@ public class NTCPTransport extends TransportImpl {
         long totalRecv = 0;
 
         StringBuilder buf = new StringBuilder(512);
-        buf.append("<div class=\"wideload\"><h3 id=\"ntcpcon\">").append(_("NTCP connections")).append(": ").append(peers.size());
+        buf.append("<h3 id=\"ntcpcon\">").append(_("NTCP connections")).append(": ").append(peers.size());
         buf.append(". ").append(_("Limit")).append(": ").append(getMaxConnections());
         buf.append(". ").append(_("Timeout")).append(": ").append(DataHelper.formatDuration(_pumper.getIdleTimeout()));
         buf.append(".</h3>\n" +
