@@ -31,6 +31,12 @@ Darwin*)
 	LIBFILE="libjbigi.so";;
 esac
 
+if [ ! -f "$JAVA_HOME/include/jni.h" ]; then
+    echo "Cannot find jni.h! Looked in '$JAVA_HOME/include/jni.h'"
+    echo "Please set JAVA_HOME to a java home that has the JNI"
+    exit 1
+fi
+
 #To link dynamically to GMP (use libgmp.so or gmp.lib), uncomment the first line below
 #To link statically to GMP, uncomment the second line below
 # Bug!!! Quote *BOTH* or neither! --Sponge
