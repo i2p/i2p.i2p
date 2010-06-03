@@ -41,7 +41,7 @@
             long delay = 60;
             try { delay = Long.parseLong(d); } catch (NumberFormatException nfe) {}
             if (delay*1000 < timeleft + 5000)
-                out.print("<meta http-equiv=\"refresh\" content=\"" + d + "\" >\n");
+                out.print("<meta http-equiv=\"refresh\" content=\"" + d + ";url=/summaryframe.jsp\" >\n");
             else
                 shutdownSoon = true;
         }

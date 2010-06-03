@@ -1,3 +1,9 @@
+2010-06-03 zzz
+    * NewsFetcher: Delay a minimum amount at startup
+    * Update: Fix multiple updates after manually
+      starting update - caused by refreshing summary bar
+      (thx 'backup'!)
+
 2010-06-02 zzz
     * graphs.jsp: Tag some more
     * Translation: Set xgettext add-comments option
