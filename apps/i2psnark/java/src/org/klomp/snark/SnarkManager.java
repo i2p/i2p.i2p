@@ -59,10 +59,11 @@ public class SnarkManager implements Snark.CompleteListener {
     public static final String DEFAULT_AUTO_START = "false";
     public static final String PROP_LINK_PREFIX = "i2psnark.linkPrefix";
     public static final String DEFAULT_LINK_PREFIX = "file:///";
-    
+    public static final String PROP_STARTUP_DELAY = "i2psnark.startupDelay";
+   
     public static final int MIN_UP_BW = 2;
     public static final int DEFAULT_MAX_UP_BW = 10;
-
+    public static final int DEFAULT_STARTUP_DELAY = 3; 
     private SnarkManager() {
         _snarks = new HashMap();
         _addSnarkLock = new Object();
@@ -124,7 +125,9 @@ public class SnarkManager implements Snark.CompleteListener {
     public String linkPrefix() {
         return _config.getProperty(PROP_LINK_PREFIX, DEFAULT_LINK_PREFIX + getDataDir().getAbsolutePath() + File.separatorChar);
     }
-    private int getStartupDelayMinutes() { return 3; }
+    private int getStartupDelayMinutes() { 
+	return Integer.valueOf(_config.getProperty(PROP_STARTUP_DELAY)).intValue(); 
+    }
     public File getDataDir() { 
         String dir = _config.getProperty(PROP_DIR, "i2psnark");
         File f = new File(dir);
@@ -167,6 +170,9 @@ public class SnarkManager implements Snark.CompleteListener {
             _config.setProperty(PROP_DIR, "i2psnark");
         if (!_config.containsKey(PROP_AUTO_START))
             _config.setProperty(PROP_AUTO_START, DEFAULT_AUTO_START);
+	if (!_config.containsKey(PROP_STARTUP_DELAY))
+            _config.setProperty(PROP_STARTUP_DELAY, "" + DEFAULT_STARTUP_DELAY);
+
         updateConfig();
     }
 
@@ -204,6 +210,7 @@ public class SnarkManager implements Snark.CompleteListener {
         //    _util.setProxy(eepHost, eepPort);
         _util.setMaxUploaders(getInt(PROP_UPLOADERS_TOTAL, Snark.MAX_TOTAL_UPLOADERS));
         _util.setMaxUpBW(getInt(PROP_UPBW_MAX, DEFAULT_MAX_UP_BW));
+        _util.setStartupDelay(getInt(PROP_STARTUP_DELAY, DEFAULT_STARTUP_DELAY));
         String ot = _config.getProperty(I2PSnarkUtil.PROP_OPENTRACKERS);
         if (ot != null)
             _util.setOpenTrackerString(ot);
@@ -222,7 +229,7 @@ public class SnarkManager implements Snark.CompleteListener {
         return defaultVal;
     }
     
-    public void updateConfig(String dataDir, boolean autoStart, String seedPct, String eepHost, 
+    public void updateConfig(String dataDir, boolean autoStart, String startDelay, String seedPct, String eepHost, 
                              String eepPort, String i2cpHost, String i2cpPort, String i2cpOpts,
                              String upLimit, String upBW, boolean useOpenTrackers, String openTrackers) {
         boolean changed = false;
@@ -268,7 +275,19 @@ public class SnarkManager implements Snark.CompleteListener {
                 }
             }
         }
-        if (i2cpHost != null) {
+        
+	if (startDelay != null){
+		int minutes = _util.getStartupDelay();
+                try { minutes = Integer.parseInt(startDelay); } catch (NumberFormatException nfe) {}
+	        if ( minutes != _util.getStartupDelay()) {
+                	    _util.setStartupDelay(minutes);
+	                    changed = true;
+        	            _config.setProperty(PROP_STARTUP_DELAY, "" + minutes);
+                	    addMessage(_("Startup delay limit changed to {0} minutes", minutes));
+                	}
+
+	}
+	if (i2cpHost != null) {
             int oldI2CPPort = _util.getI2CPPort();
             String oldI2CPHost = _util.getI2CPHost();
             int port = oldI2CPPort;

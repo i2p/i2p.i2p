@@ -451,9 +451,10 @@ public class I2PSnarkServlet extends Default {
             String i2cpOpts = buildI2CPOpts(req);
             String upLimit = req.getParameter("upLimit");
             String upBW = req.getParameter("upBW");
+	    String startupDel = req.getParameter("startupDelay");
             boolean useOpenTrackers = req.getParameter("useOpenTrackers") != null;
             String openTrackers = req.getParameter("openTrackers");
-            _manager.updateConfig(dataDir, autoStart, seedPct, eepHost, eepPort, i2cpHost, i2cpPort, i2cpOpts, upLimit, upBW, useOpenTrackers, openTrackers);
+            _manager.updateConfig(dataDir, autoStart, startupDel, seedPct, eepHost, eepPort, i2cpHost, i2cpPort, i2cpOpts, upLimit, upBW, useOpenTrackers, openTrackers);
         } else if ("Create".equals(action)) {
             String baseData = req.getParameter("baseFile");
             if (baseData != null && baseData.trim().length() > 0) {
@@ -990,6 +991,11 @@ public class I2PSnarkServlet extends Default {
         out.write(_("If checked, automatically start torrents that are added"));
         out.write("\" >");
 
+	out.write("<tr><td>");
+        out.write(_("Startup delay"));
+        out.write(": <td><input name=\"startupDelay\" size=\"3\" value=\"" + _manager.util().getStartupDelay() + "\"> minutes <br>\n");
+
+
         //Auto add: <input type="checkbox" name="autoAdd" value="true" title="If true, automatically add torrents that are found in the data directory" />
         //Auto stop: <input type="checkbox" name="autoStop" value="true" title="If true, automatically stop torrents that are removed from the data directory" />
         //out.write("<br>\n");
@@ -1079,6 +1085,7 @@ public class I2PSnarkServlet extends Default {
         out.write(_("I2CP options"));
         out.write(": <td><textarea name=\"i2cpOpts\" cols=\"60\" rows=\"1\" wrap=\"off\" >"
                   + opts.toString() + "</textarea><br>\n");
+	
 
         out.write("<tr><td>&nbsp;<td><input type=\"submit\" value=\"");
         out.write(_("Save configuration"));

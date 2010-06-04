@@ -53,14 +53,15 @@ public class I2PSnarkUtil {
     private int _maxUpBW;
     private int _maxConnections;
     private File _tmpDir;
-    
+    private int _startupDelay;
+
+    public static final int DEFAULT_STARTUP_DELAY = 3;
     public static final String PROP_USE_OPENTRACKERS = "i2psnark.useOpentrackers";
     public static final boolean DEFAULT_USE_OPENTRACKERS = true;
     public static final String PROP_OPENTRACKERS = "i2psnark.opentrackers";
     public static final String DEFAULT_OPENTRACKERS = "http://tracker.welterde.i2p/a";
     public static final int DEFAULT_MAX_UP_BW = 8;  //KBps
     public static final int MAX_CONNECTIONS = 16; // per torrent
-
     public I2PSnarkUtil(I2PAppContext ctx) {
         _context = ctx;
         _log = _context.logManager().getLog(Snark.class);
@@ -72,6 +73,7 @@ public class I2PSnarkUtil {
         _maxUploaders = Snark.MAX_TOTAL_UPLOADERS;
         _maxUpBW = DEFAULT_MAX_UP_BW;
         _maxConnections = MAX_CONNECTIONS;
+        _startupDelay = DEFAULT_STARTUP_DELAY;
         // This is used for both announce replies and .torrent file downloads,
         // so it must be available even if not connected to I2CP.
         // so much for multiple instances
@@ -127,6 +129,11 @@ public class I2PSnarkUtil {
         _maxConnections = limit;
         _configured = true;
     }
+
+    public void setStartupDelay(int minutes) {
+	_startupDelay = minutes;
+	_configured = true;
+    }
     
     public String getI2CPHost() { return _i2cpHost; }
     public int getI2CPPort() { return _i2cpPort; }
@@ -137,7 +144,8 @@ public class I2PSnarkUtil {
     public int getMaxUploaders() { return _maxUploaders; }
     public int getMaxUpBW() { return _maxUpBW; }
     public int getMaxConnections() { return _maxConnections; }
-    
+    public int getStartupDelay() { return _startupDelay; }  
+  
     /**
      * Connect to the router, if we aren't already
      */
