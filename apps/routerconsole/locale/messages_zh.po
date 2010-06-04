@@ -87,11 +87,11 @@ msgstr "正在补种:获取补种连接..."
 
 #: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:151
 msgid "Last reseed failed fully (failed reading seed URL)."
-msgstr "上一次补种尝试失败(读取补种URL失败)。"
+msgstr "上次补种尝试失败(读取补种URL失败)。"
 
 #: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:177
 msgid "Last reseed failed fully (no routerInfo URLs at seed URL)."
-msgstr "上一次补种尝试失败(补种服务器未返回任何路由信息URL)。"
+msgstr "上次补种尝试失败(补种服务器未返回任何路由信息URL)。"
 
 #: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:190
 #, java-format
@@ -101,16 +101,16 @@ msgstr "正在补种:从补种服务器获取路由信息({0}成功，{1}失败)
 #: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:211
 #, java-format
 msgid "Last reseed failed partly ({0}% of {1})."
-msgstr "上一次补种部分失败({0}%失败，共{1})"
+msgstr "上次补种部分失败({0}%失败，共{1})"
 
 #: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:216
 #, java-format
 msgid "Last reseed failed ({0}% of {1})."
-msgstr "上一次补种失败({0}%失败，共{1})"
+msgstr "上次补种失败({0}%失败，共{1})"
 
 #: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:226
 msgid "Last reseed failed fully (exception caught)."
-msgstr "上一次补种失败(exception caught)."
+msgstr "上次补种失败(exception caught)."
 
 #: ../../../router/java/src/net/i2p/router/transport/CommSystemFacadeImpl.java:498
 msgid "NetDb entry"
@@ -2717,7 +2717,7 @@ msgstr "隐藏 {0} 个标准描述。"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:82
 msgid "Groups (Caps)"
-msgstr "组(容量)"
+msgstr "分组(容量)"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:83
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:251
@@ -2796,11 +2796,11 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:192
 msgid "Last Good Send"
-msgstr "上一次发送成功"
+msgstr "上次发送成功"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:193
 msgid "Last Bad Send"
-msgstr "上一次发送失败"
+msgstr "上次发送失败"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:194
 msgid "10m Resp. Time"
@@ -2816,19 +2816,19 @@ msgstr "1d响应时间"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:197
 msgid "Last Good Lookup"
-msgstr "上一次查询成功"
+msgstr "上次查询成功"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:198
 msgid "Last Bad Lookup"
-msgstr "上一次查询失败"
+msgstr "上次查询失败"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:199
 msgid "Last Good Store"
-msgstr "上一次保存成功"
+msgstr "上次保存成功"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:200
 msgid "Last Bad Store"
-msgstr "上一次保存失败"
+msgstr "上次保存失败"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:201
 msgid "1h Fail Rate"
@@ -3066,7 +3066,7 @@ msgstr "路由性能文字统计"
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:136
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:375
 msgid "Local Destinations"
-msgstr "本地目标"
+msgstr "本地服务"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:138
 #: ../java/strings/Strings.java:62
