@@ -54,10 +54,22 @@ class FloodOnlyLookupMatchJob extends JobImpl implements ReplyJob {
         }
         try {
             DatabaseStoreMessage dsm = (DatabaseStoreMessage)message;
-            if (dsm.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET)
+            if (_log.shouldLog(Log.INFO))
+                _log.info(_search.getJobId() + ": got a DSM for " 
+                          + dsm.getKey().toBase64());
+            // This store will be duplicated by HFDSMJ
+            // We do it here first to make sure it is in the DB before
+            // runJob() and search.success() is called???
+            // Should we just pass the DataStructure directly back to somebody?
+            if (dsm.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET) {
+                // Since HFDSMJ wants to setReceivedAsPublished(), we have to
+                // set a flag saying this was really the result of a query,
+                // so don't do that.
+                dsm.getLeaseSet().setReceivedAsReply();
                 getContext().netDb().store(dsm.getKey(), dsm.getLeaseSet());
-            else
+            } else {
                 getContext().netDb().store(dsm.getKey(), dsm.getRouterInfo());
+            }
         } catch (IllegalArgumentException iae) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn(_search.getJobId() + ": Received an invalid store reply", iae);

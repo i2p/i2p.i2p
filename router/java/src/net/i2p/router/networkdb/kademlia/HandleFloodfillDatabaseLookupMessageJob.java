@@ -30,6 +30,12 @@ public class HandleFloodfillDatabaseLookupMessageJob extends HandleDatabaseLooku
         super(ctx, receivedMessage, from, fromHash);    
     }
     
+    /**
+     * @return are we floodfill
+     * We don't really answer all queries if this is true,
+     * since floodfills don't have the whole keyspace any more,
+     * see ../HTLMJ for discussion
+     */
     @Override
     protected boolean answerAllQueries() {
         if (!FloodfillNetworkDatabaseFacade.floodfillEnabled(getContext())) return false;
@@ -42,7 +48,7 @@ public class HandleFloodfillDatabaseLookupMessageJob extends HandleDatabaseLooku
      * will stop bugging us.
      */
     @Override
-    protected void sendClosest(Hash key, Set routerInfoSet, Hash toPeer, TunnelId replyTunnel) {
+    protected void sendClosest(Hash key, Set<Hash> routerInfoSet, Hash toPeer, TunnelId replyTunnel) {
         super.sendClosest(key, routerInfoSet, toPeer, replyTunnel);
 
         // go away, you got the wrong guy, send our RI back unsolicited

@@ -38,11 +38,13 @@ class FloodfillPeerSelector extends PeerSelector {
      * Pick out peers with the floodfill capacity set, returning them first, but then
      * after they're complete, sort via kademlia.
      * Puts the floodfill peers that are directly connected first in the list.
+     * List will not include our own hash.
      *
+     * @param peersToIgnore can be null
      * @return List of Hash for the peers selected
      */
     @Override
-    public List<Hash> selectMostReliablePeers(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet kbuckets) { 
+    List<Hash> selectMostReliablePeers(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet kbuckets) { 
         return selectNearestExplicitThin(key, maxNumRouters, peersToIgnore, kbuckets, true);
     }
 
@@ -50,22 +52,32 @@ class FloodfillPeerSelector extends PeerSelector {
      * Pick out peers with the floodfill capacity set, returning them first, but then
      * after they're complete, sort via kademlia.
      * Does not prefer the floodfill peers that are directly connected.
+     * List will not include our own hash.
      *
+     * @param peersToIgnore can be null
      * @return List of Hash for the peers selected
      */
     @Override
-    public List<Hash> selectNearestExplicitThin(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet kbuckets) { 
+    List<Hash> selectNearestExplicitThin(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet kbuckets) { 
         return selectNearestExplicitThin(key, maxNumRouters, peersToIgnore, kbuckets, false);
     }
 
-    public List<Hash> selectNearestExplicitThin(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet kbuckets, boolean preferConnected) { 
+    /**
+     * Pick out peers with the floodfill capacity set, returning them first, but then
+     * after they're complete, sort via kademlia.
+     * List will not include our own hash.
+     *
+     * @param peersToIgnore can be null
+     * @return List of Hash for the peers selected
+     */
+    List<Hash> selectNearestExplicitThin(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet kbuckets, boolean preferConnected) { 
         if (peersToIgnore == null)
             peersToIgnore = new HashSet(1);
         peersToIgnore.add(_context.routerHash());
         FloodfillSelectionCollector matches = new FloodfillSelectionCollector(key, peersToIgnore, maxNumRouters);
         if (kbuckets == null) return new ArrayList();
         kbuckets.getAll(matches);
-        List rv = matches.get(maxNumRouters, preferConnected);
+        List<Hash> rv = matches.get(maxNumRouters, preferConnected);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Searching for " + maxNumRouters + " peers close to " + key + ": " 
                        + rv + " (not including " + peersToIgnore + ") [allHashes.size = " 
@@ -74,15 +86,24 @@ class FloodfillPeerSelector extends PeerSelector {
     }
     
     /**
-     *  @return all floodfills not shitlisted forever. list will not include our own hash
+     *  @return all floodfills not shitlisted forever.
+     *  List will not include our own hash.
      *  List is not sorted and not shuffled.
      */
-    public List<Hash> selectFloodfillParticipants(KBucketSet kbuckets) {
-         return selectFloodfillParticipants(null, kbuckets);
+    List<Hash> selectFloodfillParticipants(KBucketSet kbuckets) {
+        Set<Hash> ignore = new HashSet(1);
+        ignore.add(_context.routerHash());
+        return selectFloodfillParticipants(ignore, kbuckets);
     }
 
-    public List<Hash> selectFloodfillParticipants(Set<Hash> toIgnore, KBucketSet kbuckets) {
-        if (kbuckets == null) return new ArrayList();
+    /**
+     *  @param toIgnore can be null
+     *  @return all floodfills not shitlisted forever.
+     *  List MAY INCLUDE our own hash.
+     *  List is not sorted and not shuffled.
+     */
+    private List<Hash> selectFloodfillParticipants(Set<Hash> toIgnore, KBucketSet kbuckets) {
+        if (kbuckets == null) return Collections.EMPTY_LIST;
         FloodfillSelectionCollector matches = new FloodfillSelectionCollector(null, toIgnore, 0);
         kbuckets.getAll(matches);
         return matches.getFloodfillParticipants();
@@ -92,8 +113,9 @@ class FloodfillPeerSelector extends PeerSelector {
      *  Sort the floodfills. The challenge here is to keep the good ones
      *  at the front and the bad ones at the back. If they are all good or bad,
      *  searches and stores won't work well.
+     *  List will not include our own hash.
      *
-     *  @return all floodfills not shitlisted foreverx
+     *  @return floodfills closest to the key that are not shitlisted forever
      *  @param key the routing key
      *  @param maxNumRouters max to return
      *  Sorted by closest to the key if > maxNumRouters, otherwise not
@@ -104,8 +126,10 @@ class FloodfillPeerSelector extends PeerSelector {
      *           success newer than failure
      *  Group 3: All others
      */
-    public List<Hash> selectFloodfillParticipants(Hash key, int maxNumRouters, KBucketSet kbuckets) {
-         return selectFloodfillParticipants(key, maxNumRouters, null, kbuckets);
+    List<Hash> selectFloodfillParticipants(Hash key, int maxNumRouters, KBucketSet kbuckets) {
+        Set<Hash> ignore = new HashSet(1);
+        ignore.add(_context.routerHash());
+        return selectFloodfillParticipants(key, maxNumRouters, ignore, kbuckets);
     }
 
     /** .5 * PublishLocalRouterInfoJob.PUBLISH_DELAY */
@@ -116,7 +140,29 @@ class FloodfillPeerSelector extends PeerSelector {
     private static final int NO_FAIL_LOOKUP_GOOD = NO_FAIL_LOOKUP_OK * 3;
     private static final int MAX_GOOD_RESP_TIME = 5*1000;
 
-    public List<Hash> selectFloodfillParticipants(Hash key, int howMany, Set<Hash> toIgnore, KBucketSet kbuckets) {
+    /**
+     *  See above for description
+     *  List will not include our own hash
+     *  @param toIgnore can be null
+     */
+    List<Hash> selectFloodfillParticipants(Hash key, int howMany, Set<Hash> toIgnore, KBucketSet kbuckets) {
+        if (toIgnore == null) {
+            toIgnore = new HashSet(1);
+            toIgnore.add(_context.routerHash());
+        } else if (!toIgnore.contains(_context.routerHash())) {
+            // copy the Set so we don't confuse StoreJob
+            toIgnore = new HashSet(toIgnore);
+            toIgnore.add(_context.routerHash());
+        }
+        return selectFloodfillParticipantsIncludingUs(key, howMany, toIgnore, kbuckets);
+    }
+
+    /**
+     *  See above for description
+     *  List MAY CONTAIN our own hash unless included in toIgnore
+     *  @param toIgnore can be null
+     */
+    private List<Hash> selectFloodfillParticipantsIncludingUs(Hash key, int howMany, Set<Hash> toIgnore, KBucketSet kbuckets) {
         List<Hash> ffs = selectFloodfillParticipants(toIgnore, kbuckets);
         TreeSet<Hash> sorted = new TreeSet(new XORComparator(key));
         sorted.addAll(ffs);
@@ -204,6 +250,11 @@ class FloodfillPeerSelector extends PeerSelector {
         private Set<Hash>  _toIgnore;
         private int _matches;
         private int _wanted;
+
+        /**
+         *  Warning - may return our router hash - add to toIgnore if necessary
+         *  @param toIgnore can be null
+         */
         public FloodfillSelectionCollector(Hash key, Set<Hash> toIgnore, int wanted) {
             _key = key;
             _sorted = new TreeSet(new XORComparator(key));
@@ -225,8 +276,8 @@ class FloodfillPeerSelector extends PeerSelector {
             //    return;
             if ( (_toIgnore != null) && (_toIgnore.contains(entry)) )
                 return;
-            if (entry.equals(_context.routerHash()))
-                return;
+            //if (entry.equals(_context.routerHash()))
+            //    return;
             // it isn't direct, so who cares if they're shitlisted
             //if (_context.shitlist().isShitlisted(entry))
             //    return;
@@ -328,12 +379,14 @@ class FloodfillPeerSelector extends PeerSelector {
      * Floodfill peers only. Used only by HandleDatabaseLookupMessageJob to populate the DSRM.
      * UNLESS peersToIgnore contains Hash.FAKE_HASH (all zeros), in which case this is an exploratory
      * lookup, and the response should not include floodfills.
+     * List MAY INCLUDE our own router - add to peersToIgnore if you don't want
      *
      * @param key the original key (NOT the routing key)
+     * @param peersToIgnore can be null
      * @return List of Hash for the peers selected, ordered
      */
     @Override
-    public List<Hash> selectNearest(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet kbuckets) {
+    List<Hash> selectNearest(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet kbuckets) {
         Hash rkey = _context.routingKeyGenerator().getRoutingKey(key);
         if (peersToIgnore != null && peersToIgnore.contains(Hash.FAKE_HASH)) {
             // return non-ff
@@ -343,7 +396,7 @@ class FloodfillPeerSelector extends PeerSelector {
             return matches.get(maxNumRouters);
         } else {
             // return ff
-            return selectFloodfillParticipants(rkey, maxNumRouters, peersToIgnore, kbuckets);
+            return selectFloodfillParticipantsIncludingUs(rkey, maxNumRouters, peersToIgnore, kbuckets);
         }
     }
 }

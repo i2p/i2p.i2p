@@ -76,16 +76,43 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                                                        key.toBase64().substring(0, 4));
                 }
                 LeaseSet ls = _message.getLeaseSet();
-                // mark it as something we received, so we'll answer queries 
-                // for it.  this flag does NOT get set on entries that we 
+                //boolean oldrar = ls.getReceivedAsReply();
+                //boolean oldrap = ls.getReceivedAsPublished();
+                // If this was received as a response to a query,
+                // FloodOnlyLookupMatchJob called setReceivedAsReply(),
+                // and we are seeing this only as a duplicate,
+                // so we don't set the receivedAsPublished() flag.
+                // Otherwise, mark it as something we received unsolicited, so we'll answer queries 
+                // for it.  This flag must NOT get set on entries that we 
                 // receive in response to our own lookups.
-                ls.setReceivedAsPublished(true);
+                // See ../HDLMJ for more info
+                if (!ls.getReceivedAsReply())
+                    ls.setReceivedAsPublished(true);
+                //boolean rap = ls.getReceivedAsPublished();
+                //if (_log.shouldLog(Log.INFO))
+                //    _log.info("oldrap? " + oldrap + " oldrar? " + oldrar + " newrap? " + rap);
                 LeaseSet match = getContext().netDb().store(key, _message.getLeaseSet());
-                if ( (match == null) || (match.getEarliestLeaseDate() < _message.getLeaseSet().getEarliestLeaseDate()) ) {
+                if (match == null) {
                     wasNew = true;
+                } else if (match.getEarliestLeaseDate() < _message.getLeaseSet().getEarliestLeaseDate()) {
+                    wasNew = true;
+                    // If it is in our keyspace and we are talking to it
+
+
+                    if (match.getReceivedAsPublished())
+                        ls.setReceivedAsPublished(true);
                 } else {
                     wasNew = false;
-                    match.setReceivedAsPublished(true);
+                    // The FloodOnlyLookupSelector goes away after the first good reply
+                    // So on the second reply, FloodOnlyMatchJob is not called to set ReceivedAsReply.
+                    // So then we think it's an unsolicited store.
+                    // So we should skip this.
+                    // If the 2nd reply is newer than the first, ReceivedAsPublished will be set incorrectly,
+                    // that will hopefully be rare.
+                    // A more elaborate solution would be a List of recent ReceivedAsReply LeaseSets, with receive time ?
+                    // A real unsolicited store is likely to be new - hopefully...
+                    //if (!ls.getReceivedAsReply())
+                    //    match.setReceivedAsPublished(true);
                 }
             } catch (IllegalArgumentException iae) {
                 invalidMessage = iae.getMessage();

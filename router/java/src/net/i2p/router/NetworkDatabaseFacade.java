@@ -30,7 +30,7 @@ public abstract class NetworkDatabaseFacade implements Service {
      * @param maxNumRouters The maximum number of routers to return
      * @param peersToIgnore Hash of routers not to include
      */
-    public abstract Set findNearestRouters(Hash key, int maxNumRouters, Set peersToIgnore);
+    public abstract Set<Hash> findNearestRouters(Hash key, int maxNumRouters, Set<Hash> peersToIgnore);
     
     public abstract void lookupLeaseSet(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs);
     public abstract LeaseSet lookupLeaseSetLocally(Hash key);

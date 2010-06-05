@@ -41,14 +41,13 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
     private RouterIdentity _from;
     private Hash _fromHash;
     private final static int MAX_ROUTERS_RETURNED = 3;
-    private final static int CLOSENESS_THRESHOLD = 10; // StoreJob.REDUNDANCY * 2
+    private final static int CLOSENESS_THRESHOLD = 8; // FNDF.MAX_TO_FLOOD + 1
     private final static int REPLY_TIMEOUT = 60*1000;
     private final static int MESSAGE_PRIORITY = 300;
     
     /**
-     * If a routerInfo structure isn't updated within an hour, drop it
-     * and search for a later version.  This value should be large enough
-     * to deal with the Router.CLOCK_FUDGE_FACTOR.
+     * If a routerInfo structure isn't this recent, don't send it out.
+     * Equal to KNDF.ROUTER_INFO_EXPIRATION_FLOODFILL.
      */
     public final static long EXPIRE_DELAY = 60*60*1000;
     
@@ -85,29 +84,66 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
 
         LeaseSet ls = getContext().netDb().lookupLeaseSetLocally(_message.getSearchKey());
         if (ls != null) {
-            boolean publish = getContext().clientManager().shouldPublishLeaseSet(_message.getSearchKey());
+            // We have to be very careful here to decide whether or not to send out the leaseSet,
+            // to avoid anonymity vulnerabilities.
+            // As this is complex, lots of comments follow...
+
+            boolean isLocal = getContext().clientManager().isLocal(ls.getDestination());
+            boolean shouldPublishLocal = isLocal && getContext().clientManager().shouldPublishLeaseSet(_message.getSearchKey());
         
-            // only answer a request for a LeaseSet if it has been published
+            // Only answer a request for a LeaseSet if it has been published
             // to us, or, if its local, if we would have published to ourselves
-            if (publish && (answerAllQueries() || ls.getReceivedAsPublished())) {
+
+            // answerAllQueries: We are floodfill
+            // getReceivedAsPublished:
+            //    false for local
+            //    false for received over a tunnel
+            //    false for received in response to our lookups
+            //    true for received in a DatabaseStoreMessage unsolicited
+            if (ls.getReceivedAsPublished()) {
+                // Answer anything that was stored to us directly
+                // (i.e. "received as published" - not the result of a query, or received
+                // over a client tunnel).
+                // This is probably because we are floodfill, but also perhaps we used to be floodfill,
+                // so we don't check the answerAllQueries() flag.
+                // Local leasesets are not handled here
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("We have the published LS " + _message.getSearchKey().toBase64() + ", answering query");
                 getContext().statManager().addRateData("netDb.lookupsMatchedReceivedPublished", 1, 0);
                 sendData(_message.getSearchKey(), ls, fromKey, _message.getReplyTunnel());
-            } else {
-                Set<RouterInfo> routerInfoSet = getContext().netDb().findNearestRouters(_message.getSearchKey(), 
-                                                                            CLOSENESS_THRESHOLD,
-                                                                            _message.getDontIncludePeers());
-                if (getContext().clientManager().isLocal(ls.getDestination())) {
-                    if (publish && weAreClosest(routerInfoSet)) {
-                        getContext().statManager().addRateData("netDb.lookupsMatchedLocalClosest", 1, 0);
-                        sendData(_message.getSearchKey(), ls, fromKey, _message.getReplyTunnel());
-                    } else {
-                        getContext().statManager().addRateData("netDb.lookupsMatchedLocalNotClosest", 1, 0);
-                        sendClosest(_message.getSearchKey(), routerInfoSet, fromKey, _message.getReplyTunnel());
-                    }
+            } else if (shouldPublishLocal && answerAllQueries()) {
+                // We are floodfill, and this is our local leaseset, and we publish it.
+                // Only send it out if it is in our estimated keyspace.
+                // For this, we do NOT use their dontInclude list as it can't be trusted
+                // (i.e. it could mess up the closeness calculation)
+                Set<Hash> closestHashes = getContext().netDb().findNearestRouters(_message.getSearchKey(), 
+                                                                            CLOSENESS_THRESHOLD, null);
+                if (weAreClosest(closestHashes)) {
+                    // It's in our keyspace, so give it to them
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("We have local LS " + _message.getSearchKey().toBase64() + ", answering query, in our keyspace");
+                    getContext().statManager().addRateData("netDb.lookupsMatchedLocalClosest", 1, 0);
+                    sendData(_message.getSearchKey(), ls, fromKey, _message.getReplyTunnel());
                 } else {
-                    getContext().statManager().addRateData("netDb.lookupsMatchedRemoteNotClosest", 1, 0);
-                    sendClosest(_message.getSearchKey(), routerInfoSet, fromKey, _message.getReplyTunnel());
+                    // Lie, pretend we don't have it
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("We have local LS " + _message.getSearchKey().toBase64() + ", NOT answering query, out of our keyspace");
+                    getContext().statManager().addRateData("netDb.lookupsMatchedLocalNotClosest", 1, 0);
+                    Set<Hash> routerHashSet = getNearestRouters();
+                    sendClosest(_message.getSearchKey(), routerHashSet, fromKey, _message.getReplyTunnel());
                 }
+            } else {
+                // It was not published to us (we looked it up, for example)
+                // or it's local and we aren't floodfill,
+                // or it's local and we don't publish it.
+                // Lie, pretend we don't have it
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("We have LS " + _message.getSearchKey().toBase64() +
+                               ", NOT answering query - local? " + isLocal + " shouldPublish? " + shouldPublishLocal +
+                               " RAP? " + ls.getReceivedAsPublished() + " RAR? " + ls.getReceivedAsReply());
+                getContext().statManager().addRateData("netDb.lookupsMatchedRemoteNotClosest", 1, 0);
+                Set<Hash> routerHashSet = getNearestRouters();
+                sendClosest(_message.getSearchKey(), routerHashSet, fromKey, _message.getReplyTunnel());
             }
         } else {
             RouterInfo info = getContext().netDb().lookupRouterInfoLocally(_message.getSearchKey());
@@ -134,14 +170,8 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                     sendData(_message.getSearchKey(), info, fromKey, _message.getReplyTunnel());
                 }
             } else {
-                // not found locally - return closest peer routerInfo structs
-                Set<Hash> dontInclude = _message.getDontIncludePeers();
-                // Honor flag to exclude all floodfills
-                //if (dontInclude.contains(Hash.FAKE_HASH)) {
-                // This is handled in FloodfillPeerSelector
-                Set<RouterInfo> routerInfoSet = getContext().netDb().findNearestRouters(_message.getSearchKey(), 
-                                                                        MAX_ROUTERS_RETURNED, 
-                                                                        dontInclude);
+                // not found locally - return closest peer hashes
+                Set<Hash> routerHashSet = getNearestRouters();
 
                 // ERR: see above
                 // // Remove hidden nodes from set..
@@ -154,13 +184,32 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
 
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("We do not have key " + _message.getSearchKey().toBase64() + 
-                               " locally.  sending back " + routerInfoSet.size() + " peers to " + fromKey.toBase64());
-                sendClosest(_message.getSearchKey(), routerInfoSet, fromKey, _message.getReplyTunnel());
+                               " locally.  sending back " + routerHashSet.size() + " peers to " + fromKey.toBase64());
+                sendClosest(_message.getSearchKey(), routerHashSet, fromKey, _message.getReplyTunnel());
             }
         }
     }
     
-    private boolean isUnreachable(RouterInfo info) {
+    /**
+     *  Closest to the message's search key,
+     *  honoring the message's dontInclude set.
+     *  Will not include us.
+     *  Side effect - adds us to the message's dontInclude set.
+     */
+    private Set<Hash> getNearestRouters() {
+        Set<Hash> dontInclude = _message.getDontIncludePeers();
+        if (dontInclude == null)
+            dontInclude = new HashSet(1);
+        dontInclude.add(getContext().routerHash());
+        // Honor flag to exclude all floodfills
+        //if (dontInclude.contains(Hash.FAKE_HASH)) {
+        // This is handled in FloodfillPeerSelector
+        return getContext().netDb().findNearestRouters(_message.getSearchKey(), 
+                                                       MAX_ROUTERS_RETURNED, 
+                                                       dontInclude);
+    }
+
+    private static boolean isUnreachable(RouterInfo info) {
         if (info == null) return true;
         String cap = info.getCapabilities();
         if (cap == null) return false;
@@ -171,21 +220,11 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
     public static final boolean DEFAULT_PUBLISH_UNREACHABLE = true;
     
     private boolean publishUnreachable() {
-        String publish = getContext().getProperty(PROP_PUBLISH_UNREACHABLE);
-        if (publish != null)
-            return Boolean.valueOf(publish).booleanValue();
-        else
-            return DEFAULT_PUBLISH_UNREACHABLE;
+        return getContext().getProperty(PROP_PUBLISH_UNREACHABLE, DEFAULT_PUBLISH_UNREACHABLE);
     }
     
-    private boolean weAreClosest(Set routerInfoSet) {
-        for (Iterator iter = routerInfoSet.iterator(); iter.hasNext(); ) {
-            RouterInfo cur = (RouterInfo)iter.next();
-            if (cur.getIdentity().calculateHash().equals(getContext().routerHash())) {
-                return true;
-            }
-        }
-        return false;
+    private boolean weAreClosest(Set<Hash> routerHashSet) {
+        return routerHashSet.contains(getContext().routerHash());
     }
     
     private void sendData(Hash key, DataStructure data, Hash toPeer, TunnelId replyTunnel) {
@@ -207,17 +246,17 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         sendMessage(msg, toPeer, replyTunnel);
     }
     
-    protected void sendClosest(Hash key, Set<RouterInfo> routerInfoSet, Hash toPeer, TunnelId replyTunnel) {
+    protected void sendClosest(Hash key, Set<Hash> routerHashes, Hash toPeer, TunnelId replyTunnel) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending closest routers to key " + key.toBase64() + ": # peers = " 
-                       + routerInfoSet.size() + " tunnel " + replyTunnel);
+                       + routerHashes.size() + " tunnel " + replyTunnel);
         DatabaseSearchReplyMessage msg = new DatabaseSearchReplyMessage(getContext());
         msg.setFromHash(getContext().routerHash());
         msg.setSearchKey(key);
-        for (Iterator iter = routerInfoSet.iterator(); iter.hasNext(); ) {
-            RouterInfo peer = (RouterInfo)iter.next();
-            msg.addReply(peer.getIdentity().getHash());
-            if (msg.getNumReplies() >= MAX_ROUTERS_RETURNED)
+        int i = 0;
+        for (Hash h : routerHashes) {
+            msg.addReply(h);
+            if (++i >= MAX_ROUTERS_RETURNED)
                 break;
         }
         getContext().statManager().addRateData("netDb.lookupsHandled", 1, 0);

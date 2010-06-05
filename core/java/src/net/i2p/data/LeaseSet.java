@@ -119,9 +119,10 @@ public class LeaseSet extends DataStructureImpl {
     /**
      * If true, we received this LeaseSet by searching for it
      * Default false.
+     * @since 0.7.14
      */
     public boolean getReceivedAsReply() { return _receivedAsReply; }
-    /** set to true */
+    /** set to true @since 0.7.14 */
     public void setReceivedAsReply() { _receivedAsReply = true; }
 
     public void addLease(Lease lease) {

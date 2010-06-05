@@ -1,3 +1,17 @@
+2010-06-05 zzz
+    * Netdb:
+      - Use new receivedAsReply flag in LeaseSet to mark
+        those received as response to a query
+      - Mark which methods in FloodfillPeerSelector may return
+        our own hash
+      - Redefine selectNearest() so it may return our own hash,
+        so it can be used for closeness measurement
+      - Redefine findNearestRouters() to return Hashes
+        instead of RouterInfos
+      - Fix LeaseSet response decisions for floodfills, based
+        on partial keyspace and closeness measurements
+      - List only count of published leasesets in netdb
+
 2010-06-03 zzz
     * NewsFetcher: Delay a minimum amount at startup
     * Update: Fix multiple updates after manually
