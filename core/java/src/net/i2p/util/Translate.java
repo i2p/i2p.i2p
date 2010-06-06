@@ -110,7 +110,7 @@ public abstract class Translate {
      *
      *  @param n how many
      *  @param s singluar string, optionally with {0} e.g. "one tunnel"
-     *  @param s plural string optionally with {0} e.g. "{0} tunnels"
+     *  @param p plural string optionally with {0} e.g. "{0} tunnels"
      *  @since 0.7.14
      */
     public static String getString(int n, String s, String p, I2PAppContext ctx, String bun) {

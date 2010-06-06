@@ -386,7 +386,7 @@ public class EventPumper implements Runnable {
             // don't throw an NPE if the connect is gone again
             if(chan == null)
                 return;
-            chan.configureBlocking(false);;
+            chan.configureBlocking(false);
 
             if (!_transport.allowConnection()) {
                 if (_log.shouldLog(Log.WARN))

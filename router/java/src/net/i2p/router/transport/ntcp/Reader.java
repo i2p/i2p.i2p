@@ -17,6 +17,7 @@ import net.i2p.util.Log;
 class Reader {
     private RouterContext _context;
     private Log _log;
+    // TODO change to LBQ ??
     private final List<NTCPConnection> _pendingConnections;
     private List<NTCPConnection> _liveReads;
     private List<NTCPConnection> _readAfterLive;
