@@ -27,7 +27,6 @@ class ConnThrottler {
     ConnThrottler(int max, int totalMax, long period) {
         _max = max;
         _totalMax = totalMax;
-        SimpleScheduler.getInstance().addPeriodicEvent(new Cleaner(), period);
         if (max > 0)
             this.counter = new ObjectCounter();
         else
@@ -36,6 +35,7 @@ class ConnThrottler {
             _currentTotal = new AtomicInteger();
         else
             _currentTotal = null;
+        SimpleScheduler.getInstance().addPeriodicEvent(new Cleaner(), period);
     }
 
     /** increments before checking */
