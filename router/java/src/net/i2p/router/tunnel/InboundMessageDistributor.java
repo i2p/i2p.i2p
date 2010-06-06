@@ -1,6 +1,7 @@
 package net.i2p.router.tunnel;
 
 import net.i2p.data.Hash;
+import net.i2p.data.LeaseSet;
 import net.i2p.data.Payload;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DataMessage;
@@ -16,6 +17,7 @@ import net.i2p.router.ClientMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.message.GarlicMessageReceiver;
+//import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.Log;
 
 /**
@@ -35,8 +37,8 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
         _client = client;
         _log = ctx.logManager().getLog(InboundMessageDistributor.class);
         _receiver = new GarlicMessageReceiver(ctx, this, client);
-        _context.statManager().createRateStat("tunnel.dropDangerousClientTunnelMessage", "How many tunnel messages come down a client tunnel that we shouldn't expect (lifetime is the 'I2NP type')", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
-        _context.statManager().createRateStat("tunnel.handleLoadClove", "When do we receive load test cloves", "Tunnels", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _context.statManager().createRateStat("tunnel.dropDangerousClientTunnelMessage", "How many tunnel messages come down a client tunnel that we shouldn't expect (lifetime is the 'I2NP type')", "Tunnels", new long[] { 60*60*1000 });
+        _context.statManager().createRateStat("tunnel.handleLoadClove", "When do we receive load test cloves", "Tunnels", new long[] { 60*60*1000 });
     }
     
     public void distribute(I2NPMessage msg, Hash target) {
@@ -164,11 +166,19 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
                         DatabaseStoreMessage dsm = (DatabaseStoreMessage)data;
                         try {
                             if (dsm.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET) {
-                                // dont tell anyone else about it if we got it through a client tunnel
-                                // (though this is the default, but it doesn't hurt to make it explicit)
-                                if (_client != null)
-                                    dsm.getLeaseSet().setReceivedAsPublished(false);
-                                _context.netDb().store(dsm.getKey(), dsm.getLeaseSet());
+                                // If it was stored to us before, don't undo the
+                                // receivedAsPublished flag so we will continue to respond to requests
+                                // for the leaseset. That is, we don't want this to change the
+                                // RAP flag of the leaseset.
+                                // When the keyspace rotates at midnight, and this leaseset moves out
+                                // of our keyspace, maybe we shouldn't do this?
+                                // Should we do this whether ff or not?
+                                LeaseSet old = _context.netDb().store(dsm.getKey(), dsm.getLeaseSet());
+                                if (old != null && old.getReceivedAsPublished()
+                                    /** && ((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled() **/ )
+                                    dsm.getLeaseSet().setReceivedAsPublished(true);
+                                if (_log.shouldLog(Log.INFO))
+                                    _log.info("Storing LS for: " + dsm.getKey() + " sent to: " + _client);
                             } else {                                        
                                 if (_client != null) {
                                     // drop it, since the data we receive shouldn't include router 

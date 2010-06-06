@@ -383,7 +383,10 @@ public class EventPumper implements Runnable {
         ServerSocketChannel servChan = (ServerSocketChannel)key.attachment();
         try {
             SocketChannel chan = servChan.accept();
-            chan.configureBlocking(false);
+            // don't throw an NPE if the connect is gone again
+            if(chan == null)
+                return;
+            chan.configureBlocking(false);;
 
             if (!_transport.allowConnection()) {
                 if (_log.shouldLog(Log.WARN))

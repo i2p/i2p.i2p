@@ -314,12 +314,18 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     
     /**
      * Get the routers closest to that key in response to a remote lookup
+     * Only used by ../HDLMJ
+     * Set MAY INCLUDE our own router - add to peersToIgnore if you don't want
+     *
+     * @param key the real key, NOT the routing key
+     * @param peersToIgnore can be null
      */
-    public Set<RouterInfo> findNearestRouters(Hash key, int maxNumRouters, Set peersToIgnore) {
-        if (!_initialized) return null;
-        return getRouters(_peerSelector.selectNearest(key, maxNumRouters, peersToIgnore, _kb));
+    public Set<Hash> findNearestRouters(Hash key, int maxNumRouters, Set<Hash> peersToIgnore) {
+        if (!_initialized) return Collections.EMPTY_SET;
+        return new HashSet(_peerSelector.selectNearest(key, maxNumRouters, peersToIgnore, _kb));
     }
     
+/*****
     private Set<RouterInfo> getRouters(Collection hashes) {
         if (!_initialized) return null;
         Set rv = new HashSet(hashes.size());
@@ -337,17 +343,16 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
         return rv;
     }
+*****/
     
     /** get the hashes for all known routers */
     public Set<Hash> getAllRouters() {
-        if (!_initialized) return new HashSet(0);
-        Set keys = _ds.getKeys();
-        Set rv = new HashSet(keys.size());
+        if (!_initialized) return Collections.EMPTY_SET;
+        Set<Hash> keys = _ds.getKeys();
+        Set<Hash> rv = new HashSet(keys.size());
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("getAllRouters(): # keys in the datastore: " + keys.size());
-        for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
-            Hash key = (Hash)iter.next();
-            
+        for (Hash key : keys) {
             DataStructure ds = _ds.get(key);
             if (ds == null) {
                 if (_log.shouldLog(Log.INFO))
@@ -382,10 +387,27 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         }
     }
     
+    /**
+     *  This is only used by StatisticsManager to publish
+     *  the count if we are floodfill.
+     *  So to hide a clue that a popular eepsite is hosted
+     *  on a floodfill router, only count leasesets that
+     *  are "received as published", as of 0.7.14
+     */
     @Override
     public int getKnownLeaseSets() {  
         if (_ds == null) return 0;
-        return _ds.countLeaseSets();
+        //return _ds.countLeaseSets();
+        Set<Hash> keys = _ds.getKeys();
+        int rv = 0;
+        for (Hash key : keys) {
+            DataStructure ds = _ds.get(key);
+            if (ds != null &&
+                ds instanceof LeaseSet &&
+                ((LeaseSet)ds).getReceivedAsPublished())
+                rv++;
+        }
+        return rv;
     }
 
     /* aparently, not used?? should be public if used elsewhere. */
@@ -622,6 +644,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * Store the leaseSet
      *
      * @throws IllegalArgumentException if the leaseSet is not valid
+     * @return previous entry or null
      */
     public LeaseSet store(Hash key, LeaseSet leaseSet) throws IllegalArgumentException {
         if (!_initialized) return null;
@@ -742,6 +765,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * store the routerInfo
      *
      * @throws IllegalArgumentException if the routerInfo is not valid
+     * @return previous entry or null
      */
     public RouterInfo store(Hash key, RouterInfo routerInfo) throws IllegalArgumentException {
         return store(key, routerInfo, true);
