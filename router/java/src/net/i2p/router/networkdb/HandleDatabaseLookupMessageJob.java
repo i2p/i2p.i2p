@@ -151,8 +151,8 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
                 if ( (info.getIdentity().isHidden()) || (isUnreachable(info) && !publishUnreachable()) ) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Not answering a query for a netDb peer who isn't reachable");
-                    Set us = new HashSet(1);
-                    us.add(getContext().router().getRouterInfo());
+                    Set<Hash> us = new HashSet<Hash>(1);
+                    us.add(getContext().router().getRouterInfo().calculateHash());
                     sendClosest(_message.getSearchKey(), us, fromKey, _message.getReplyTunnel());
                 //} else if (info.isHidden()) {
                 //    // Don't return hidden nodes
