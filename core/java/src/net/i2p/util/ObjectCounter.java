@@ -2,33 +2,28 @@ package net.i2p.util;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  *  Count things.
  *
- *  @author zzz
+ *  @author zzz, welterde
  */
 public class ObjectCounter<K> {
-    private ConcurrentHashMap<K, Integer> _map;
-    private static final Integer ONE = Integer.valueOf(1);
+    private ConcurrentHashMap<K, AtomicInteger> map;
 
     public ObjectCounter() {
-        _map = new ConcurrentHashMap();
+        this.map = new ConcurrentHashMap<K, AtomicInteger>();
     }
 
     /**
      *  Add one.
-     *  Not perfectly concurrent, new AtomicInteger(1) would be better,
-     *  at the cost of some object churn.
      *  @return count after increment
      */
     public int increment(K h) {
-        Integer i = _map.putIfAbsent(h, ONE);
-        if (i != null) {
-            int rv = i.intValue() + 1;
-            _map.put(h, Integer.valueOf(rv));
-            return rv;
-        }
+        AtomicInteger i = this.map.putIfAbsent(h, new AtomicInteger(1));
+        if (i != null)
+            return i.incrementAndGet();
         return 1;
     }
 
@@ -36,9 +31,9 @@ public class ObjectCounter<K> {
      *  @return current count
      */
     public int count(K h) {
-        Integer i = _map.get(h);
+        AtomicInteger i = this.map.get(h);
         if (i != null)
-            return i.intValue();
+            return i.get();
         return 0;
     }
 
@@ -46,7 +41,7 @@ public class ObjectCounter<K> {
      *  @return set of objects with counts > 0
      */
     public Set<K> objects() {
-        return _map.keySet();
+        return this.map.keySet();
     }
 
     /**
@@ -54,7 +49,7 @@ public class ObjectCounter<K> {
      *  @since 0.7.11
      */
     public void clear() {
-        _map.clear();
+        this.map.clear();
     }
 }
 
