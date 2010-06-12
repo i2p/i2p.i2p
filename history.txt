@@ -1,3 +1,6 @@
+2010-06-12 welterde
+    * fixed possible race-condition and improved code style in ObjectCounter utility class
+
 * 2010-06-07  0.7.14 released
 
 2010-06-07 zzz
