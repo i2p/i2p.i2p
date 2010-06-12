@@ -28,7 +28,7 @@ class ConnThrottler {
         _max = max;
         _totalMax = totalMax;
         if (max > 0)
-            this.counter = new ObjectCounter();
+            this.counter = new ObjectCounter<Hash>();
         else
             this.counter = null;
         if (totalMax > 0)
