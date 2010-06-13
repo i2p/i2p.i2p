@@ -643,8 +643,13 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         newRequest.append("Accept-Encoding: \r\n");
                         newRequest.append("X-Accept-Encoding: x-i2p-gzip;q=1.0, identity;q=0.5, deflate;q=0, gzip;q=0, *;q=0\r\n");
                     }
-                    if (!Boolean.valueOf(getTunnel().getClientOptions().getProperty(PROP_USER_AGENT)).booleanValue())
-                        newRequest.append("User-Agent: MYOB/6.66 (AN/ON)\r\n");
+                    if (!Boolean.valueOf(getTunnel().getClientOptions().getProperty(PROP_USER_AGENT)).booleanValue()) {
+                        // let's not advertise to external sites that we are from I2P
+                        if (usingWWWProxy)
+                            newRequest.append("User-Agent: Wget/1.11.4\r\n");
+                        else
+                            newRequest.append("User-Agent: MYOB/6.66 (AN/ON)\r\n");
+                    }
                     newRequest.append("Connection: close\r\n\r\n");
                     break;
                 } else {
