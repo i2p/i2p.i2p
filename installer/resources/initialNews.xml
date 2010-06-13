@@ -2,6 +2,7 @@
 <i2p.news date="$Date: 2010-06-07 00:00:00 $">
 <i2p.release version="0.7.14" date="2010/06/07" minVersion="0.6"/>
 -->
+<div lang="en">
 <h4><ul><li>Congratulations on getting I2P installed!</li></ul></h4>
 <p>
 <b>Welcome to I2P!</b>
@@ -20,7 +21,9 @@ please <b>check out</b> our
 Point your IRC client to <b>localhost:6668</b> and say hi to us on 
 <a href="irc://127.0.0.1:6668/i2p-help">#i2p-help</a> or <a href="irc://127.0.0.1:6668/i2p">#i2p</a>.
 </p>
+</div>
 
+<div lang="de">
 <h4><ul><li>Gratulation zur erfolgreichen Installation von I2P!</li></ul></h4>
 <p>
 <b>Willkommen bei I2P!</b>
@@ -37,7 +40,9 @@ Sobald auf der linken Seite eine "shared clients" Verbindung aufgelistet ist <b>
 Verbinde deinen IRC Klienten mit dem Server auf <b>localhost:6668</b> und sage Hallo zu uns im Kanal 
 <a href="irc://127.0.0.1:6668/i2p-help">#i2p-help</a>, <a href="irc://127.0.0.1:6668/i2p-de">#i2p-de</a> oder <a href="irc://127.0.0.1:6668/i2p">#i2p</a>.
 </p>
+</div>
 
+<div lang="ru">
 <h4><ul><li>Поздравляем с успешным завершением установки I2P!</li></ul></h4>
 <p>
 <b>Добро пожаловать в I2P!</b> Немного терпения! I2P-маршрутизатору потребуется пара минут для запуска модулей и первого подключения к сети I2P. 
@@ -52,4 +57,4 @@ Verbinde deinen IRC Klienten mit dem Server auf <b>localhost:6668</b> und sage H
 <p>
 <b>Не забудьте заглянуть</b> в наш <a href="http://www.i2p2.i2p/faq_ru.html">FAQ</a>.
 </p>
-
+</div>

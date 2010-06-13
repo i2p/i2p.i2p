@@ -2,6 +2,7 @@
 <i2p.news date="$Date: 2010-06-07 00:00:00 $">
 <i2p.release version="0.7.14" date="2010/06/07" minVersion="0.6" />
 -->
+<div lang="en">
 <h4><ul><li>2010-06-07: <b>0.7.14 <a href="http://www.i2p2.i2p/release-0.7.14.html">Released</a></b></li></ul></h4>
 <p>
 The 0.7.14 release contains the usual collection of bug fixes and performance tweaks.
@@ -25,3 +26,4 @@ and <a href="http://www.i2p2.i2p/donate.html">donate</a>!
 We are still looking for volunteers to work on new and existing translations.
 Please volunteer on <a href="irc://127.0.0.1:6668/i2p">IRC #i2p</a>.
 </p>
+</div>
