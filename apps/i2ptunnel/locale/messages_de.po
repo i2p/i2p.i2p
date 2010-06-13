@@ -3,14 +3,14 @@
 # This file is distributed under the same license as the i2ptunnel package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # foo <foo@bar>, 2009.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P i2ptunnel\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-12-10 00:50+0000\n"
-"PO-Revision-Date: 2009-10-19 12:50+0000\n"
-"Last-Translator: foo <foo@bar>\n"
+"PO-Revision-Date: 2010-06-13 14:41+0100\n"
+"Last-Translator: echelon <echelon@i2pmail.org>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -19,12 +19,13 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:73
 msgid "I2P Tunnel Manager - Edit Client Tunnel"
-msgstr ""
+msgstr "I2P Tunnel Manager - Edit Klienten Tunnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:73
 msgid "I2P Tunnel Manager - Edit Server Tunnel"
-msgstr ""
+msgstr "I2P Tunnel Manager - Edit Server Tunnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:71
 msgid "I2P Tunnel Manager - List"
-msgstr ""
+msgstr "I2P Tunnel Manager - List"
+
