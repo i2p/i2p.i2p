@@ -119,8 +119,9 @@ public class I2PSnarkServlet extends Default {
     public void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // this is the part after /i2psnark
         String path = req.getServletPath();
+        boolean isConfigure = "/configure".equals(path);
         // index.jsp doesn't work, it is grabbed by the war handler before here
-        if (!(path == null || path.equals("/") || path.equals("/index.jsp") || path.equals("/index.html"))) {
+        if (!(path == null || path.equals("/") || path.equals("/index.jsp") || path.equals("/index.html") || isConfigure)) {
             if (path.endsWith("/")) {
                 // bypass the horrid Resource.getListHTML()
                 String pathInfo = req.getPathInfo();
@@ -147,8 +148,6 @@ public class I2PSnarkServlet extends Default {
         req.setCharacterEncoding("UTF-8");
         resp.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html; charset=UTF-8");
-        /** dl, ul, down rate, up rate, peers, size */
-        final long stats[] = {0,0,0,0,0,0};
         
         String nonce = req.getParameter("nonce");
         if ( (nonce != null) && (nonce.equals(String.valueOf(_nonce))) )
@@ -170,28 +169,37 @@ public class I2PSnarkServlet extends Default {
         out.write("</title>\n");
                                          
         // we want it to go to the base URI so we don't refresh with some funky action= value
-        out.write("<meta http-equiv=\"refresh\" content=\"60;" + req.getRequestURI() + peerString + "\">\n");
+        if (!isConfigure)
+            out.write("<meta http-equiv=\"refresh\" content=\"60;" + req.getRequestURI() + peerString + "\">\n");
         out.write(HEADER);
         out.write("</head><body>");
         out.write("<center>");
-        out.write("<div class=\"snarknavbar\"><a href=\"" + req.getRequestURI() + peerString + "\" title=\"");
-        out.write(_("Refresh page"));
-        out.write("\" class=\"snarkRefresh\">");
-        out.write(_("I2PSnark"));
-        out.write("</a> <a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\" target=\"_blank\">");
-        out.write(_("Forum"));
-        out.write("</a>\n");
+        if (isConfigure) {
+            out.write("<div class=\"snarknavbar\"><a href=\"/i2psnark/\" title=\"");
+            out.write(_("Torrents"));
+            out.write("\" class=\"snarkRefresh\">");
+            out.write(_("I2PSnark"));
+            out.write("</a>");
+        } else {
+            out.write("<div class=\"snarknavbar\"><a href=\"" + req.getRequestURI() + peerString + "\" title=\"");
+            out.write(_("Refresh page"));
+            out.write("\" class=\"snarkRefresh\">");
+            out.write(_("I2PSnark"));
+            out.write("</a> <a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\" target=\"_blank\">");
+            out.write(_("Forum"));
+            out.write("</a>\n");
 
-        Map trackers = _manager.getTrackers();
-        for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
-            Map.Entry entry = (Map.Entry)iter.next();
-            String name = (String)entry.getKey();
-            String baseURL = (String)entry.getValue();
-            int e = baseURL.indexOf('=');
-            if (e < 0)
-                continue;
-            baseURL = baseURL.substring(e + 1);
-            out.write(" <a href=\"" + baseURL + "\" class=\"snarkRefresh\" target=\"_blank\">" + name + "</a>");
+            Map trackers = _manager.getTrackers();
+            for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
+                Map.Entry entry = (Map.Entry)iter.next();
+                String name = (String)entry.getKey();
+                String baseURL = (String)entry.getValue();
+                int e = baseURL.indexOf('=');
+                if (e < 0)
+                    continue;
+                baseURL = baseURL.substring(e + 1);
+                out.write(" <a href=\"" + baseURL + "\" class=\"snarkRefresh\" target=\"_blank\">" + name + "</a>");
+            }
         }
         out.write("</div>\n");
         out.write("<div class=\"page\"><div class=\"mainsection\"><div class=\"snarkMessages\"><table><tr><td align=\"left\"><pre>");
@@ -201,6 +209,24 @@ public class I2PSnarkServlet extends Default {
             out.write(msg + "\n");
         }
         out.write("</pre></td></tr></table></div>");
+
+        if (isConfigure) {
+            out.write("</div>\n");
+            writeConfigForm(out, req);
+        } else {
+            writeTorrents(out, req);
+            out.write("</div>\n");
+            writeAddForm(out, req);
+            writeSeedForm(out, req);
+            writeConfigLink(out);
+        }
+        out.write(FOOTER);
+    }
+
+    private void writeTorrents(PrintWriter out, HttpServletRequest req) throws IOException {
+        /** dl, ul, down rate, up rate, peers, size */
+        final long stats[] = {0,0,0,0,0,0};
+        String peerParam = req.getParameter("p");
 
         List snarks = getSortedSnarks(req);
         String uri = req.getRequestURI();
@@ -283,13 +309,7 @@ public class I2PSnarkServlet extends Default {
                       "</tfoot>\n");
         }
         
-        out.write(TABLE_FOOTER);
-
-        writeAddForm(out, req);
-        if (true) // seeding needs to register the torrent first, so we can't start it automatically (boo, hiss)
-            writeSeedForm(out, req);
-        writeConfigForm(out, req);
-        out.write(FOOTER);
+        out.write("</table>");
     }
     
     /**
@@ -993,7 +1013,9 @@ public class I2PSnarkServlet extends Default {
 
 	out.write("<tr><td>");
         out.write(_("Startup delay"));
-        out.write(": <td><input name=\"startupDelay\" size=\"3\" value=\"" + _manager.util().getStartupDelay() + "\"> minutes <br>\n");
+        out.write(": <td><input name=\"startupDelay\" size=\"3\" class=\"r\" value=\"" + _manager.util().getStartupDelay() + "\"> ");
+        out.write(_("minutes"));
+        out.write("<br>\n"); 
 
 
         //Auto add: <input type="checkbox" name="autoAdd" value="true" title="If true, automatically add torrents that are found in the data directory" />
@@ -1094,6 +1116,13 @@ public class I2PSnarkServlet extends Default {
         out.write("</form></div>");
     }
     
+    private void writeConfigLink(PrintWriter out) throws IOException {
+        out.write("<div class=\"configsection\"><span class=\"snarkConfig\">\n");
+        out.write("<span class=\"snarkConfigTitle\"><a href=\"configure\">");
+        out.write(_("Configuration"));
+        out.write("</a></span></span></div>\n");
+    }
+
     /** copied from ConfigTunnelsHelper */
     private static final String HOP = "hop";
     private static final String TUNNEL = "tunnel";
@@ -1170,8 +1199,6 @@ public class I2PSnarkServlet extends Default {
                                                "<thead>\n" +
                                                "<tr><th align=\"center\">";
 
-    private static final String TABLE_FOOTER = "</table></div>\n";
-    
     private static final String FOOTER = "</div></div></div></center></body></html>";
 
     /**
@@ -1379,7 +1406,7 @@ public class I2PSnarkServlet extends Default {
                  plc.endsWith(".ape"))
             icon = "music";
         else if (mime.startsWith("video/") || plc.endsWith(".mkv") || plc.endsWith(".m4v") ||
-                 plc.endsWith(".mp4") || plc.endsWith(".wmv"))
+                 plc.endsWith(".mp4") || plc.endsWith(".wmv") || plc.endsWith(".flv"))
             icon = "film";
         else if (mime.equals("application/zip") || mime.equals("application/x-gtar") ||
                  mime.equals("application/compress") || mime.equals("application/gzip") ||
@@ -1388,8 +1415,10 @@ public class I2PSnarkServlet extends Default {
             icon = "compress";
         else if (plc.endsWith(".exe"))
             icon = "application";
+        else if (plc.endsWith(".iso"))
+            icon = "cd";
         else
-            icon = "bug";
+            icon = "page_white";
         return icon;
     }
     
