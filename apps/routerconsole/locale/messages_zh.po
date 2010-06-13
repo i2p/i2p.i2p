@@ -3917,7 +3917,7 @@ msgstr "试验性"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:442
 msgid "UDP Configuration:"
-msgstr "UPnP 设置:"
+msgstr "UDP 设置:"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:444
 msgid "UDP port:"
