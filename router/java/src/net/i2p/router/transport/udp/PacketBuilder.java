@@ -123,6 +123,7 @@ public class PacketBuilder {
             for (int i = 0; i < ackIdsRemaining.size(); i++) {
             //while (ackIdsRemaining.size() > 0) {
                 Long ackId = ackIdsRemaining.get(i);//(Long)ackIdsRemaining.remove(0);
+                // NPE here, how did a null get in the List?
                 DataHelper.toLong(data, off, 4, ackId.longValue());
                 off += 4;        
                 if (msg != null) // logging it

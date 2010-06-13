@@ -1,3 +1,11 @@
+2010-06-13 zzz
+    * Console: Add some divs for languages to news and readmes
+    * HTTP Proxy: Pass different User Agent to outproxy
+    * i2psnark:
+      - Move config to separate page
+      - Icon tweaks
+    * Translation: zh fix
+
 2010-06-12 welterde
     * fixed possible race-condition and improved code style in ObjectCounter utility class
 

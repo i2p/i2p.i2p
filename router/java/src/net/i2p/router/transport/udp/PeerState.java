@@ -1546,7 +1546,11 @@ public class PeerState {
         oldPeer._dead = true;
         
         List<Long> tmp = new ArrayList();
-        tmp.addAll(oldPeer._currentACKs);
+        // AIOOBE from concurrent access
+        //tmp.addAll(oldPeer._currentACKs);
+        for (Long l : oldPeer._currentACKs) {
+            tmp.add(l);
+        }
         oldPeer._currentACKs.clear();
 
         if (!_dead) {

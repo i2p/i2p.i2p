@@ -323,6 +323,7 @@ public class OutboundMessageFragments {
             List<ACKBitfield> partialACKBitfields = new ArrayList();
             peer.fetchPartialACKs(partialACKBitfields);
             int piggybackedPartialACK = partialACKBitfields.size();
+            // getCurrentFullACKs() already makes a copy, do we need to copy again?
             List<Long> remaining = new ArrayList(msgIds);
             int sparseCount = 0;
             UDPPacket rv[] = new UDPPacket[fragments]; //sparse
