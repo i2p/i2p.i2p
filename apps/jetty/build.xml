@@ -29,8 +29,8 @@
         <echo message="but strongly recommended, since they are used by some applications" />
         <echo message="on top of I2P, like the router console." />
         <echo message="" />
-        <echo message="Even if you deploy the Jetty archive manually, the build script will" />
-        <echo message="still attempt to verify its checksums, which must be:" />
+        <echo message="Even if you deploy the Jetty archive manually into directory apps/jetty/," />
+        <echo message="the build script will still attempt to verify its checksums, which must be:" />
         <echo message="SHA1 ${jetty.sha1}" />
         <echo message="" />
         <input message="Download Jetty archive automatically?" validargs="y,n" addproperty="jetty.download" />
