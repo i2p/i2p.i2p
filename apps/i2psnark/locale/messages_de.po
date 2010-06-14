@@ -302,11 +302,15 @@ msgstr "Total"
 #, java-format
 msgid "1 torrent"
 msgid_plural "{0} torrents"
+msgstr[0] "1 Torrent"
+msgstr[1] "{0} Torrents"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:301
 #, java-format
 msgid "1 connected peer"
 msgid_plural "{0} connected peers"
+msgstr[0] "1 verbundener Teilnehmer"
+msgstr[1] "{0} verbundene Teilnehmer"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:330
 #, java-format
@@ -439,6 +443,8 @@ msgstr "TrackerFehler"
 #, java-format
 msgid "1 peer"
 msgid_plural "{0} peers"
+msgstr[0] "1 Teilnehmer"
+msgstr[1] "{0} Teilnehmer"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:668
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:673
@@ -697,13 +703,15 @@ msgstr "Speichere Einstellungen"
 #, java-format
 msgid "1 hop"
 msgid_plural "{0} hops"
-msgstr "1 Zwischenstation "
+msgstr[0] "1 Zwischenstation"
+msgstr[1] "{0} Zwischenstationen"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1131
 #, java-format
 msgid "1 tunnel"
 msgid_plural "{0} tunnels"
-msgstr "1 Tunnel "
+msgstr[0] "1 Tunnel"
+msgstr[1] "{0} Tunnel"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1272
 msgid "Up to higher level directory"

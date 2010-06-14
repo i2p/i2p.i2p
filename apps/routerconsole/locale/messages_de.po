@@ -2165,11 +2165,15 @@ msgstr ""
 #, java-format
 msgid "1 hop"
 msgid_plural "{0} hops"
+msgstr[0] "1 Zwischenstation"
+msgstr[1] "{0} Zwischenstationen"
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:15
 #, java-format
 msgid "1 tunnel"
 msgid_plural "{0} tunnels"
+msgstr[0] "1 Tunnel"
+msgstr[1] "{0} Tunnel"
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:26
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:41
