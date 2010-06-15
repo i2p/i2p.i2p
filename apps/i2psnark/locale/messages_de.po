@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-06-13 19:23+0000\n"
-"PO-Revision-Date: 2010-06-14 09:34+0100\n"
+"PO-Revision-Date: 2010-06-15 09:07+0100\n"
 "Last-Translator: echelon <echelon@i2pmail.org>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -35,12 +35,12 @@ msgstr "Minimale Anzahl and Uploadslots ist {0}"
 #: ../java/src/org/klomp/snark/SnarkManager.java:272
 #, java-format
 msgid "Up BW limit changed to {0}KBps"
-msgstr "Upload Bandbreite wurde geändert auf {0}kbit/s"
+msgstr "Upload Bandbreite wurde geändert auf {0}kbyte/s"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:274
 #, java-format
 msgid "Minimum up bandwidth limit is {0}KBps"
-msgstr "Minimales upload Bandbreiten Limit ist {0} kbit/s"
+msgstr "Minimales upload Bandbreiten Limit ist {0} kbyte/s"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:286
 #, java-format
