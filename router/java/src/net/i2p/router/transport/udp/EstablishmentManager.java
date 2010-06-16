@@ -34,10 +34,10 @@ import net.i2p.util.SimpleTimer;
  *
  */
 public class EstablishmentManager {
-    private RouterContext _context;
-    private Log _log;
-    private UDPTransport _transport;
-    private PacketBuilder _builder;
+    private final RouterContext _context;
+    private final Log _log;
+    private final UDPTransport _transport;
+    private final PacketBuilder _builder;
     /** map of RemoteHostId to InboundEstablishState */
     private final ConcurrentHashMap<RemoteHostId, InboundEstablishState> _inboundStates;
     /** map of RemoteHostId to OutboundEstablishState */
@@ -102,15 +102,7 @@ public class EstablishmentManager {
     }
     
     private int getMaxConcurrentEstablish() {
-        String val = _context.getProperty(PROP_MAX_CONCURRENT_ESTABLISH);
-        if (val != null) {
-            try {
-                return Integer.parseInt(val);
-            } catch (NumberFormatException nfe) {
-                return DEFAULT_MAX_CONCURRENT_ESTABLISH;
-            }
-        }
-        return DEFAULT_MAX_CONCURRENT_ESTABLISH;
+        return _context.getProperty(PROP_MAX_CONCURRENT_ESTABLISH, DEFAULT_MAX_CONCURRENT_ESTABLISH);
     }
     
     private static final int MAX_QUEUED_OUTBOUND = 10*1000;
@@ -654,8 +646,7 @@ public class EstablishmentManager {
         }
     }
     
-    /* FIXME Exporting non-public type through public API FIXME */
-    public void receiveRelayResponse(RemoteHostId bob, UDPPacketReader reader) {
+    void receiveRelayResponse(RemoteHostId bob, UDPPacketReader reader) {
         long nonce = reader.getRelayResponseReader().readNonce();
         OutboundEstablishState state = _liveIntroductions.remove(new Long(nonce));
         if (state == null) 
@@ -719,6 +710,7 @@ public class EstablishmentManager {
     /**
      * Drive through the inbound establishment states, adjusting one of them
      * as necessary
+     * @return next requested time or -1
      */
     private long handleInbound() {
         long now = _context.clock().now();
@@ -820,6 +812,7 @@ public class EstablishmentManager {
     /**
      * Drive through the outbound establishment states, adjusting one of them
      * as necessary
+     * @return next requested time or -1
      */
     private long handleOutbound() {
         long now = _context.clock().now();
