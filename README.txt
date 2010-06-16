@@ -1,5 +1,6 @@
 Prerequisites to build from source:
 	Java SDK (preferably Sun) 1.5.0 or higher (1.6 recommended)
+	The SDK must have Pack200 support (java.util.jar.Pack200)
 	Apache Ant 1.7.0 or higher
 	Optional, For multilanguage support: The xgettext, msgfmt, and msgmerge tools installed
 	from the GNU gettext package http://www.gnu.org/software/gettext/

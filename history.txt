@@ -1,3 +1,8 @@
+2010-06-16 zzz
+    * Console: Sort countries with selected locale
+    * FileUtil: Try to handle lack of unpack200 support more gracefully
+    * Update: Select old update URL if no unpack200 available
+
 2010-06-13 zzz
     * Console: Add some divs for languages to news and readmes
     * HTTP Proxy: Pass different User Agent to outproxy

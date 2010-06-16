@@ -27,6 +27,7 @@ run I2P for the first time.
 To run I2P explicitly:
    (*nix): sh i2prouter start
    (win*): I2P.exe
+   (Platforms unsupported by the wrapper - PPC, ARM, etc): sh runplain.sh
 
 To stop the router (gracefully):
    lynx http://localhost:7657/configservice.jsp ("Shutdown gracefully")

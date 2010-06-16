@@ -43,15 +43,34 @@ public class ConfigUpdateHandler extends FormHandler {
     
     public static final String PROP_UPDATE_URL = "router.updateURL";
     /**
-     *  Changed as of release 0.7.14 from .sud to .su2
-     *  Update hosts must maintain both for several releases
+     *  Changed as of release 0.8 to support both .sud and .su2
+     *  Some JVMs (IcedTea) don't have pack200
+     *  Update hosts must maintain both
      */
-    public static final String DEFAULT_UPDATE_URL =
+    private static final String PACK200_URLS =
     "http://echelon.i2p/i2p/i2pupdate.su2\r\n" +
     "http://stats.i2p/i2p/i2pupdate.su2\r\n" +
     "http://www.i2p2.i2p/_static/i2pupdate.su2\r\n" +
     "http://update.postman.i2p/i2pupdate.su2" ;
-    
+
+    private static final String NO_PACK200_URLS =
+    "http://echelon.i2p/i2p/i2pupdate.sud\r\n" +
+    "http://stats.i2p/i2p/i2pupdate.sud\r\n" +
+    "http://www.i2p2.i2p/_static/i2pupdate.sud\r\n" +
+    "http://update.postman.i2p/i2pupdate.sud" ;
+
+    public static final String DEFAULT_UPDATE_URL;
+    static {
+        String foo;
+        try {
+            Class.forName("java.util.jar.Pack200", false, ClassLoader.getSystemClassLoader());
+            foo = PACK200_URLS;
+        } catch (ClassNotFoundException cnfe) {
+            foo = NO_PACK200_URLS;
+        }
+        DEFAULT_UPDATE_URL = foo;
+    }
+
     public static final String PROP_TRUSTED_KEYS = "router.trustedUpdateKeys";
     
     

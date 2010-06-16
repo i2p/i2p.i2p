@@ -133,8 +133,15 @@ public class FileUtil {
                         }
                         in.close();
                     } catch (IOException ioe) {
-                        System.err.println("ERROR: Error extracting the zip entry (" + entry.getName() + "]");
+                        System.err.println("ERROR: Error extracting the zip entry (" + entry.getName() + ')');
+                        if (ioe.getMessage() != null && ioe.getMessage().indexOf("CAFED00D") >= 0)
+                            System.err.println("This may be caused by a packed library that requires Java 1.6, your Java version is: " +
+                                               System.getProperty("java.version"));
                         ioe.printStackTrace();
+                        return false;
+                    } catch (Exception e) {  // ClassNotFoundException but compiler not happy with that
+                        System.err.println("ERROR: Error unpacking the zip entry (" + entry.getName() +
+                                           "), your JVM does not support unpack200");
                         return false;
                     }
                 }
@@ -170,6 +177,7 @@ public class FileUtil {
             byte buf[] = new byte[16*1024];
             zip = new ZipFile(zipfile);
             Enumeration entries = zip.entries();
+            boolean p200TestRequired = true;
             while (entries.hasMoreElements()) {
                 ZipEntry entry = (ZipEntry)entries.nextElement();
                 if (entry.getName().indexOf("..") != -1) {
@@ -179,6 +187,16 @@ public class FileUtil {
                 if (entry.isDirectory()) {
                     // noop
                 } else {
+                    if (p200TestRequired &&
+                        (entry.getName().endsWith(".jar.pack") || entry.getName().endsWith(".war.pack"))) {
+                        try {
+                            Class.forName("java.util.jar.Pack200", false, ClassLoader.getSystemClassLoader());
+                        } catch (Exception e) {  // ClassNotFoundException but compiler not happy with that
+                            System.err.println("ERROR: Zip verify failed, your JVM does not support unpack200");
+                            return false;
+                        }
+                        p200TestRequired = false;
+                    }
                     try {
                         InputStream in = zip.getInputStream(entry);
                         int read = 0;
