@@ -11,12 +11,14 @@ package net.i2p.router.web;
 import java.io.IOException;
 import java.io.Writer;
 import java.math.BigInteger;         // debug
+import java.text.Collator;
 import java.text.DecimalFormat;      // debug
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -311,11 +313,18 @@ public class NetDbRenderer {
         out.flush();
     }
     
-    /** sort by translated country name */
-    private class CountryComparator implements Comparator {
-         public int compare(Object l, Object r) {
-             return _(_context.commSystem().getCountryName((String)l))
-                    .compareTo(_(_context.commSystem().getCountryName((String)r)));
+    /** sort by translated country name using rules for the current language setting */
+    private class CountryComparator implements Comparator<String> {
+         Collator coll;
+
+         public CountryComparator() {
+             super();
+             coll = Collator.getInstance(new Locale(Messages.getLanguage(_context)));
+         }
+
+         public int compare(String l, String r) {
+             return coll.compare(_(_context.commSystem().getCountryName(l)),
+                                 _(_context.commSystem().getCountryName(r)));
         }
     }
 
