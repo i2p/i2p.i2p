@@ -104,7 +104,7 @@ public class I2PSessionDemultiplexer implements I2PSessionMuxedListener {
         return _listeners.get(key(proto, port));
     }
 
-    private Integer key(int proto, int port) {
+    private static Integer key(int proto, int port) {
         return Integer.valueOf(((port << 8) & 0xffff00) | proto);
     }
 
