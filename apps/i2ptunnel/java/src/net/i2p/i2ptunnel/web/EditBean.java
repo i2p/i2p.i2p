@@ -85,7 +85,7 @@ public class EditBean extends IndexBean {
     }
     
     public boolean isInteractive(int tunnel) {
-        return getProperty(tunnel, "i2p.streaming.maxWindowSize", 128) == 12;
+        return getProperty(tunnel, "i2p.streaming.maxWindowSize", 128) == 16;
     }
     
     public int getTunnelDepth(int tunnel, int defaultLength) {
