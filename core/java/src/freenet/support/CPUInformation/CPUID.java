@@ -34,8 +34,15 @@ public class CPUID {
      * do we want to dump some basic success/failure info to stderr during 
      * initialization?  this would otherwise use the Log component, but this makes
      * it easier for other systems to reuse this class
+     *
+     * Well, we really want to use Log so if you are one of those "other systems"
+     * then comment out the I2PAppContext usage below.
+     *
+     * Set to false if not in router context, so scripts using TrustedUpdate
+     * don't spew log messages. main() below overrides to true.
      */
-    private static final boolean _doLog = System.getProperty("jcpuid.dontLog") == null;
+    private static boolean _doLog = System.getProperty("jcpuid.dontLog") == null &&
+                                    I2PAppContext.getGlobalContext().isRouterContext();
 
     //.matches() is a java 1.4+ addition, using a simplified version for 1.3+
     //private static final boolean isX86 = System.getProperty("os.arch").toLowerCase().matches("i?[x0-9]86(_64)?");
@@ -391,6 +398,7 @@ public class CPUID {
 
     public static void main(String args[])
     {
+        _doLog = true;
         if(!_nativeOk){
             System.out.println("**Failed to retrieve CPUInfo. Please verify the existence of jcpuid dll/so**");
         }
@@ -446,7 +454,7 @@ public class CPUID {
                 } else {
                     _nativeOk = false;
                     if (_doLog)
-                        System.err.println("WARN: Native CPUID library jcpuid not loaded - will not be able to read CPU information using CPUID");
+                        System.err.println("WARNING: Native CPUID library jcpuid not loaded - will not be able to read CPU information using CPUID");
                 }
             }
         } else {
@@ -502,7 +510,7 @@ public class CPUID {
         
         if (resource == null) {
             if (_doLog)
-                System.err.println("ERROR: Resource name [" + resourceName + "] was not found");
+                System.err.println("WARNING: Resource name [" + resourceName + "] was not found");
             return false;
         }
 

@@ -96,8 +96,12 @@ public class NativeBigInteger extends BigInteger {
      *
      * Well, we really want to use Log so if you are one of those "other systems"
      * then comment out the I2PAppContext usage below.
+     *
+     * Set to false if not in router context, so scripts using TrustedUpdate
+     * don't spew log messages. main() below overrides to true.
      */
-    private static final boolean _doLog = System.getProperty("jbigi.dontLog") == null;
+    private static boolean _doLog = System.getProperty("jbigi.dontLog") == null &&
+                                    I2PAppContext.getGlobalContext().isRouterContext();
     
     private final static String JBIGI_OPTIMIZATION_K6         = "k6";
     private final static String JBIGI_OPTIMIZATION_K6_2       = "k62";
@@ -194,6 +198,7 @@ public class NativeBigInteger extends BigInteger {
      * Converts a BigInteger byte-array to a 'double'
      * @param ba Big endian twos complement representation of the BigInteger to convert to a double
      * @return The plain double-value represented by 'ba'
+     * @deprecated unused
      */
     public native static double nativeDoubleValue(byte ba[]);
 
@@ -245,6 +250,7 @@ public class NativeBigInteger extends BigInteger {
         return cachedBa;
     }
     
+    /** @deprecated unused */
     @Override
     public double doubleValue() {
         if (_nativeOk)
@@ -281,6 +287,7 @@ public class NativeBigInteger extends BigInteger {
      *
      */
     public static void main(String args[]) {
+        _doLog = true;
         runModPowTest(100);
         // i2p doesn't care about the double values
         //runDoubleValueTest(100);
@@ -354,6 +361,7 @@ public class NativeBigInteger extends BigInteger {
         }
     }
     
+/********
     private static void runDoubleValueTest(int numRuns) {
         System.out.println("DEBUG: Warming up the random number generator...");
         SecureRandom rand = new SecureRandom();
@@ -408,6 +416,7 @@ public class NativeBigInteger extends BigInteger {
             System.out.println("However, we couldn't load the native library, so this doesn't test much");
         }
     }
+*********/
     
  
     /**
