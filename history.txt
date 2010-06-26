@@ -1,3 +1,12 @@
+2010-06-26 zzz
+    * I2PTunnel:
+     - Move connection profile and delay connect to advanced config section
+     - Add persistent client key support to SOCKS IRC
+     - Fix display of interactive setting
+    * jbigi, jcpuid: Suppress log messages when not in router context
+    * jetty.xml: Add info on how to configure for following symlinks
+    * logs.jsp: Add more JVM version info so we can distinguish OpenJDK from Sun
+
 2010-06-16 zzz
     * Console: Sort countries with selected locale
     * FileUtil: Try to handle lack of unpack200 support more gracefully

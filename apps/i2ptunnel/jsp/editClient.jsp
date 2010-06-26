@@ -163,23 +163,6 @@
             </div>
          <% } %>
          <% if (!"streamrclient".equals(tunnelType)) { %>
-            <div id="profileField" class="rowItem">
-                <label for="profile" accesskey="f">
-                    <%=intl._("Profile")%>(<span class="accessKey">f</span>):
-                </label>
-                <select id="profile" name="profile" title="Connection Profile" class="selectbox">
-                    <% boolean interactiveProfile = editBean.isInteractive(curTunnel);
-                  %><option <%=(interactiveProfile == true  ? "selected=\"selected\" " : "")%>value="interactive"><%=intl._("interactive connection")%> </option>
-                    <option <%=(interactiveProfile == false ? "selected=\"selected\" " : "")%>value="bulk"><%=intl._("bulk connection (downloads/websites/BT)")%> </option>
-                </select>                
-            </div>
-            <div id="delayConnectField" class="rowItem">
-                <label for="connectDelay" accesskey="y">
-                    <%=intl._("Delay Connect")%>(<span class="accessKey">y</span>):
-                </label>
-                <input value="1000" type="checkbox" id="connectDelay" name="connectDelay" title="Delay Connection"<%=(editBean.shouldDelay(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
-                <span class="comment">(<%=intl._("for request/response connections")%>)</span>
-            </div>
             <div id="sharedtField" class="rowItem">
                 <label for="shared" accesskey="h">
                     <%=intl._("Shared Client")%>(<span class="accessKey">h</span>):
@@ -277,7 +260,31 @@
             <div class="subdivider">
                 <hr />
             </div>
-            
+
+         <% if (!"streamrclient".equals(tunnelType)) { %>
+            <div id="profileField" class="rowItem">
+                <label for="profile" accesskey="f">
+                    <%=intl._("Profile")%>(<span class="accessKey">f</span>):
+                </label>
+                <select id="profile" name="profile" title="Connection Profile" class="selectbox">
+                    <% boolean interactiveProfile = editBean.isInteractive(curTunnel);
+                  %><option <%=(interactiveProfile == true  ? "selected=\"selected\" " : "")%>value="interactive"><%=intl._("interactive connection")%> </option>
+                    <option <%=(interactiveProfile == false ? "selected=\"selected\" " : "")%>value="bulk"><%=intl._("bulk connection (downloads/websites/BT)")%> </option>
+                </select>                
+            </div>
+            <div id="delayConnectField" class="rowItem">
+                <label for="connectDelay" accesskey="y">
+                    <%=intl._("Delay Connect")%>(<span class="accessKey">y</span>):
+                </label>
+                <input value="1000" type="checkbox" id="connectDelay" name="connectDelay" title="Delay Connection"<%=(editBean.shouldDelay(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <span class="comment">(<%=intl._("for request/response connections")%>)</span>
+            </div>
+
+            <div class="subdivider">
+                <hr />
+            </div>
+         <% } // !streamrclient %>
+
             <div id="optionsField" class="rowItem">
                 <label><%=intl._("I2CP Options")%>:</label>
             </div>
@@ -379,7 +386,7 @@
                 <hr />
             </div>
 
-         <% if ("client".equals(tunnelType) || "ircclient".equals(tunnelType)) { %>
+         <% if ("client".equals(tunnelType) || "ircclient".equals(tunnelType) || "socksirctunnel".equals(tunnelType)) { %>
             <div id="optionsField" class="rowItem">
                 <label for="privKeyFile" accesskey="k">
                     <%=intl._("Persistent private key")%>(<span class="accessKey">k</span>):

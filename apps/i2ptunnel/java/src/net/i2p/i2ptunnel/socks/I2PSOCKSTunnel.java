@@ -33,8 +33,9 @@ public class I2PSOCKSTunnel extends I2PTunnelClientBase {
     //	  I2PSOCKSTunnel(localPort, l, ownDest, (EventDispatcher)null);
     //}
 
-    public I2PSOCKSTunnel(int localPort, Logging l, boolean ownDest, EventDispatcher notifyThis, I2PTunnel tunnel) {
-        super(localPort, ownDest, l, notifyThis, "SOCKSHandler", tunnel);
+    /** @param pkf private key file name or null for transient key */
+    public I2PSOCKSTunnel(int localPort, Logging l, boolean ownDest, EventDispatcher notifyThis, I2PTunnel tunnel, String pkf) {
+        super(localPort, ownDest, l, notifyThis, "SOCKSHandler", tunnel, pkf);
 
         if (waitEventValue("openBaseClientResult").equals("error")) {
             notifyEvent("openSOCKSTunnelResult", "error");

@@ -218,7 +218,12 @@ public class TunnelController implements Logging {
         setListenOn();
         String listenPort = getListenPort();
         String sharedClient = getSharedClient();
-        _tunnel.runSOCKSIRCTunnel(new String[] { listenPort, sharedClient }, this);
+        if (getPersistentClientKey()) {
+            String privKeyFile = getPrivKeyFile(); 
+            _tunnel.runSOCKSIRCTunnel(new String[] { listenPort, "false", privKeyFile }, this);
+        } else {
+            _tunnel.runSOCKSIRCTunnel(new String[] { listenPort, sharedClient }, this);
+        }
     }
     
     /*
@@ -427,7 +432,9 @@ public class TunnelController implements Logging {
     public String getListenPort() { return _config.getProperty("listenPort"); }
     public String getTargetDestination() { return _config.getProperty("targetDestination"); }
     public String getProxyList() { return _config.getProperty("proxyList"); }
+    /** default true */
     public String getSharedClient() { return _config.getProperty("sharedClient", "true"); }
+    /** default true */
     public boolean getStartOnLoad() { return "true".equalsIgnoreCase(_config.getProperty("startOnLoad", "true")); }
     public boolean getPersistentClientKey() { return Boolean.valueOf(_config.getProperty("option.persistentClientKey")).booleanValue(); }
     public String getMyDestination() {

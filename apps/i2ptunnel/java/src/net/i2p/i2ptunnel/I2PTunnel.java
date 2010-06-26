@@ -886,7 +886,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
 
             ownDest = !isShared;
             I2PTunnelTask task;
-            task = new I2PSOCKSTunnel(_port, l, ownDest, (EventDispatcher) this, this);
+            task = new I2PSOCKSTunnel(_port, l, ownDest, (EventDispatcher) this, this, null);
             addtask(task);
             notifyEvent("sockstunnelTaskId", Integer.valueOf(task.getId()));
         } else {
@@ -899,10 +899,11 @@ public class I2PTunnel implements Logging, EventDispatcher {
     
     /**
      * Run an SOCKS IRC tunnel on the given port number 
+     * @param args {portNumber [, sharedClient]} or (portNumber, ignored (false), privKeyFile)
      * @since 0.7.12
      */
     public void runSOCKSIRCTunnel(String args[], Logging l) {
-        if (args.length >= 1 && args.length <= 2) {
+        if (args.length >= 1 && args.length <= 3) {
             int _port = -1;
             try {
                 _port = Integer.parseInt(args[0]);
@@ -914,17 +915,20 @@ public class I2PTunnel implements Logging, EventDispatcher {
             }
 
             boolean isShared = false;
-            if (args.length > 1)
+            if (args.length == 2)
                 isShared = "true".equalsIgnoreCase(args[1].trim());
 
             ownDest = !isShared;
+            String privateKeyFile = null;
+            if (args.length == 3)
+                privateKeyFile = args[2];
             I2PTunnelTask task;
-            task = new I2PSOCKSIRCTunnel(_port, l, ownDest, (EventDispatcher) this, this);
+            task = new I2PSOCKSIRCTunnel(_port, l, ownDest, (EventDispatcher) this, this, privateKeyFile);
             addtask(task);
             notifyEvent("sockstunnelTaskId", Integer.valueOf(task.getId()));
         } else {
-            l.log("sockstunnel <port>");
-            l.log("  creates a tunnel that distributes SOCKS requests.");
+            l.log("socksirctunnel <port> [<sharedClient> [<privKeyFile>]]");
+            l.log("  creates a tunnel for SOCKS IRC.");
             notifyEvent("sockstunnelTaskId", Integer.valueOf(-1));
         }
     }

@@ -187,18 +187,6 @@
                 <input type="text" size="30" id="privKeyFile" name="privKeyFile" title="Path to Private Key File" value="<%=editBean.getPrivateKeyFile(curTunnel)%>" class="freetext" />               
             </div>
 
-         <% if (!"streamrserver".equals(tunnelType)) { %>
-            <div id="profileField" class="rowItem">
-                <label for="profile" accesskey="f">
-                    <%=intl._("Profile")%>(<span class="accessKey">f</span>):
-                </label>
-                <select id="profile" name="profile" title="Connection Profile" class="selectbox">
-                    <% boolean interactiveProfile = editBean.isInteractive(curTunnel);
-                  %><option <%=(interactiveProfile == true  ? "selected=\"selected\" " : "")%>value="interactive"><%=intl._("interactive connection")%> </option>
-                    <option <%=(interactiveProfile == false ? "selected=\"selected\" " : "")%>value="bulk"><%=intl._("bulk connection (downloads/websites/BT)")%> </option>
-                </select>                
-            </div> 
-         <% } // !streamrserver %>
             <div id="destinationField" class="rowItem">
                 <label for="localDestination" accesskey="L">
                     <%=intl._("Local destination")%>(<span class="accessKey">L</span>):
@@ -290,6 +278,23 @@
                 <hr />
             </div>
             
+         <% if (!"streamrserver".equals(tunnelType)) { %>
+            <div id="profileField" class="rowItem">
+                <label for="profile" accesskey="f">
+                    <%=intl._("Profile")%>(<span class="accessKey">f</span>):
+                </label>
+                <select id="profile" name="profile" title="Connection Profile" class="selectbox">
+                    <% boolean interactiveProfile = editBean.isInteractive(curTunnel);
+                  %><option <%=(interactiveProfile == true  ? "selected=\"selected\" " : "")%>value="interactive"><%=intl._("interactive connection")%> </option>
+                    <option <%=(interactiveProfile == false ? "selected=\"selected\" " : "")%>value="bulk"><%=intl._("bulk connection (downloads/websites/BT)")%> </option>
+                </select>                
+            </div> 
+
+            <div class="subdivider">
+                <hr />
+            </div>
+         <% } // !streamrserver %>
+
             <div id="optionsField" class="rowItem">
                 <label><%=intl._("I2CP Options")%>:</label>
             </div>

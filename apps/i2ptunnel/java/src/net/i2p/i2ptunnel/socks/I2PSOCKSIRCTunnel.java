@@ -33,8 +33,9 @@ public class I2PSOCKSIRCTunnel extends I2PSOCKSTunnel {
     private static final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(I2PSOCKSIRCTunnel.class);
     private static int __clientId = 0;
 
-    public I2PSOCKSIRCTunnel(int localPort, Logging l, boolean ownDest, EventDispatcher notifyThis, I2PTunnel tunnel) {
-        super(localPort, l, ownDest, notifyThis, tunnel);
+    /** @param pkf private key file name or null for transient key */
+    public I2PSOCKSIRCTunnel(int localPort, Logging l, boolean ownDest, EventDispatcher notifyThis, I2PTunnel tunnel, String pkf) {
+        super(localPort, l, ownDest, notifyThis, tunnel, pkf);
         setName(getLocalPort() + " -> SOCKSIRCTunnel");
     }
 
@@ -45,7 +46,7 @@ public class I2PSOCKSIRCTunnel extends I2PSOCKSTunnel {
     @Override
     protected void clientConnectionRun(Socket s) {
         try {
-            _log.error("SOCKS IRC Tunnel Start");
+            //_log.error("SOCKS IRC Tunnel Start");
             SOCKSServer serv = SOCKSServerFactory.createSOCKSServer(s);
             Socket clientSock = serv.getClientSocket();
             I2PSocket destSock = serv.getDestinationI2PSocket(this);
