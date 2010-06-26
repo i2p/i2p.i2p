@@ -16,6 +16,7 @@
 <!--           if you have a high-traffic site and get a lot of warnings.      -->
 <!--   * Uncomment the addWebApplications section to use to enable             -->
 <!--           war files placed in the webapps/ dir.                           -->
+<!--   * Uncomment the line to allow Jetty to follow symlinks                  -->
 <!--                                                                           -->
 <!-- I2P uses Jetty 5.1.15. We have no plans to upgrade to Jetty 6, due to     -->
 <!-- the significant changes in the API. If you need web server features not   -->
@@ -104,6 +105,16 @@
       </New>
     </Arg>
   </Call>
+  -->
+
+
+  <!-- =============================================================== -->
+  <!-- Uncomment this to allow Jetty to follow symlinks                -->
+  <!-- Jetty declares this to be a security risk, use with care        -->
+  <!-- See also http://docs.codehaus.org/display/JETTY/How+to+enable+serving+aliased+files -->
+  <!-- =============================================================== -->
+  <!-- UNCOMMENT TO ACTIVATE
+  <Set name="checkAliases" class="org.mortbay.util.FileResource" type="boolean">false</Set>
   -->
 
 
