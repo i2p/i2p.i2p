@@ -14,7 +14,7 @@
 <p><i><%=intl._("Please include this information in bug reports")%>:</i>
  <p>
 <b>I2P version:</b> <jsp:getProperty name="helper" property="version" /><br>
-<b>Java version:</b> <%=System.getProperty("java.vendor")%> <%=System.getProperty("java.version")%><br>
+<b>Java version:</b> <%=System.getProperty("java.vendor")%> <%=System.getProperty("java.version")%> (<%=System.getProperty("java.runtime.name")%> <%=System.getProperty("java.runtime.version")%>)<br>
 <b>Platform:</b> <%=System.getProperty("os.name")%> <%=System.getProperty("os.arch")%> <%=System.getProperty("os.version")%><br>
 <b>Processor:</b> <%=net.i2p.util.NativeBigInteger.cpuModel()%> (<%=net.i2p.util.NativeBigInteger.cpuType()%>)<br>
 <b>Jbigi:</b> <%=net.i2p.util.NativeBigInteger.loadStatus()%><br>
