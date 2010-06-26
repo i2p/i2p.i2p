@@ -905,9 +905,12 @@ public class I2PSnarkServlet extends Default {
     private void writeAddForm(PrintWriter out, HttpServletRequest req) throws IOException {
         String uri = req.getRequestURI();
         String newURL = req.getParameter("newURL");
-        if ( (newURL == null) || (newURL.trim().length() <= 0) ) newURL = "";
-        String newFile = req.getParameter("newFile");
-        if ( (newFile == null) || (newFile.trim().length() <= 0) ) newFile = "";
+        if ( (newURL == null) || (newURL.trim().length() <= 0) )
+            newURL = "";
+        else
+            newURL = DataHelper.stripHTML(newURL);    // XSS
+        //String newFile = req.getParameter("newFile");
+        //if ( (newFile == null) || (newFile.trim().length() <= 0) ) newFile = "";
         
         out.write("<span class=\"snarkNewTorrent\">\n");
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
@@ -935,8 +938,10 @@ public class I2PSnarkServlet extends Default {
     private void writeSeedForm(PrintWriter out, HttpServletRequest req) throws IOException {
         String uri = req.getRequestURI();
         String baseFile = req.getParameter("baseFile");
-        if (baseFile == null)
+        if (baseFile == null || baseFile.trim().length() <= 0)
             baseFile = "";
+        else
+            baseFile = DataHelper.stripHTML(baseFile);    // XSS
         
         out.write("<div class=\"newtorrentsection\"><span class=\"snarkNewTorrent\">\n");
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
