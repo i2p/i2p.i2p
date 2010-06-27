@@ -25,8 +25,12 @@ public class SummaryBarRenderer {
      */
     public void renderSummaryHTML(Writer out) throws IOException {
         StringBuilder buf = new StringBuilder(8*1024);
-
-        buf.append("<a href=\"/index.jsp\" target=\"_top\"><img src=\"/themes/console/images/i2plogo.png\" alt=\"")
+        String theme = _context.getProperty(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
+        
+        buf.append("<a href=\"/index.jsp\" target=\"_top\"><img src=\"")
+           .append(CSSHelper.BASE_THEME_PATH)
+           .append(theme)
+           .append("/images/i2plogo.png\" alt=\"")
            .append(_("I2P Router Console"))
            .append("\" title=\"")
            .append(_("I2P Router Console"))

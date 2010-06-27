@@ -9,13 +9,13 @@ public class CSSHelper extends HelperBase {
     
     public static final String PROP_THEME_NAME = "routerconsole.theme";
     public static final String DEFAULT_THEME = "light";
-    private static final String BASE = "/themes/console/";
+    public static final String BASE_THEME_PATH = "/themes/console/";
     private static final String FORCE = "classic";
     public static final String PROP_REFRESH = "routerconsole.summaryRefresh";
     public static final String DEFAULT_REFRESH = "60";
 
     public String getTheme(String userAgent) {
-        String url = BASE;
+        String url = BASE_THEME_PATH;
         if (userAgent != null && userAgent.contains("MSIE")) {
             url += FORCE + "/";
         } else {
