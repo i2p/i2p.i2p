@@ -597,4 +597,33 @@ public class RouterInfo extends DataStructureImpl {
         _stringified = buf.toString();
         return _stringified;
     }
+
+    /**
+     *  Print out routerinfos from files specified on the command line
+     *  @since 0.8
+     */
+    public static void main(String[] args) {
+        if (args.length <= 0) {
+            System.err.println("Usage: RouterInfo file ...");
+            System.exit(1);
+        }
+        for (int i = 0; i < args.length; i++) {
+             RouterInfo ri = new RouterInfo();
+             InputStream is = null;
+             try {
+                 is = new java.io.FileInputStream(args[i]);
+                 ri.readBytes(is);
+                 if (ri.isValid())
+                     System.out.println(ri.toString());
+                 else
+                     System.err.println("Router info " + args[i] + "is invalid");
+             } catch (Exception e) {
+                 System.err.println("Error reading " + args[i] + ": " + e);
+             } finally {
+                 if (is != null) {
+                     try { is.close(); } catch (IOException ioe) {}
+                 }
+             }
+        }
+    }
 }
