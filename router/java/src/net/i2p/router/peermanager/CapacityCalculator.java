@@ -7,27 +7,6 @@ import net.i2p.util.Log;
 
 /**
  * Estimate how many of our tunnels the peer can join per hour.
- * Pseudocode:
- * <pre>
- *   int growthFactor = 5;
- *   int capacity = 0;
- *   foreach i (10, 30, 60) {
- *     if (# tunnels rejected in last $i minutes > 0) continue;
- *     int val = (# tunnels joined in last $i minutes) * (60 / $i);
- *     val -= (# tunnels failed in last $i minutes) * (60 / $i);
- *     if (val &gt;= 0)   // if we're failing lots of tunnels, dont grow
- *       capacity += ((val + growthFactor) * periodWeight($i));
- *   }
- *   
- *   periodWeight(int curWeight) {
- *     switch (curWeight) {
- *       case 10: return .6;
- *       case 30: return .3;
- *       case 60: return .1;
- *     }
- *   }
- * </pre>
- *
  */
 public class CapacityCalculator extends Calculator {
     private Log _log;
@@ -46,26 +25,30 @@ public class CapacityCalculator extends Calculator {
     
     @Override
     public double calc(PeerProfile profile) {
-        RateStat acceptStat = profile.getTunnelCreateResponseTime();
-        RateStat rejectStat = profile.getTunnelHistory().getRejectionRate();
-        RateStat failedStat = profile.getTunnelHistory().getFailedRate();
-        
-        double capacity10m = estimateCapacity(acceptStat, rejectStat, failedStat, 10*60*1000);
-        double capacity30m = estimateCapacity(acceptStat, rejectStat, failedStat, 30*60*1000);
-        double capacity60m = estimateCapacity(acceptStat, rejectStat, failedStat, 60*60*1000);
-        double capacity1d  = estimateCapacity(acceptStat, rejectStat, failedStat, 24*60*60*1000);
-        
-        double capacity = capacity10m * periodWeight(10*60*1000) + 
-                          capacity30m * periodWeight(30*60*1000) + 
-                          capacity60m * periodWeight(60*60*1000) + 
-                          capacity1d  * periodWeight(24*60*60*1000);
-        
-        // if we actively know they're bad, who cares if they used to be good?
-        if (capacity10m <= 0)
-            capacity = 0;
-        
-        if (tooOld(profile)) 
+        double capacity;
+
+        if (tooOld(profile)) { 
             capacity = 1;
+        } else {
+            RateStat acceptStat = profile.getTunnelCreateResponseTime();
+            RateStat rejectStat = profile.getTunnelHistory().getRejectionRate();
+            RateStat failedStat = profile.getTunnelHistory().getFailedRate();
+        
+            double capacity10m = estimateCapacity(acceptStat, rejectStat, failedStat, 10*60*1000);
+            // if we actively know they're bad, who cares if they used to be good?
+            if (capacity10m <= 0) {
+                capacity = 0;
+            } else {
+                double capacity30m = estimateCapacity(acceptStat, rejectStat, failedStat, 30*60*1000);
+                double capacity60m = estimateCapacity(acceptStat, rejectStat, failedStat, 60*60*1000);
+                double capacity1d  = estimateCapacity(acceptStat, rejectStat, failedStat, 24*60*60*1000);
+        
+                capacity = capacity10m * periodWeight(10*60*1000) + 
+                           capacity30m * periodWeight(30*60*1000) + 
+                           capacity60m * periodWeight(60*60*1000) + 
+                           capacity1d  * periodWeight(24*60*60*1000);
+            }
+        }        
         
         // now take into account non-rejection tunnel rejections (which haven't 
         // incremented the rejection counter, since they were only temporary)
@@ -86,14 +69,31 @@ public class CapacityCalculator extends Calculator {
      * If we haven't heard from them in an hour, they aren't too useful.
      *
      */
-    private boolean tooOld(PeerProfile profile) {
+    private static boolean tooOld(PeerProfile profile) {
         if (profile.getIsActive(60*60*1000)) 
             return false;
         else 
             return true;
     }
     
-    private double estimateCapacity(RateStat acceptStat, RateStat rejectStat, RateStat failedStat, int period) {
+    /**
+     * Compute a tunnel accept capacity-per-hour for the given period
+     * This is perhaps the most critical part of the peer ranking and selection
+     * system, so adjust with great care and testing to ensure good network
+     * performance and prevent congestion collapse.
+     *
+     * The baseline or "growth factor" is 5.
+     * Rejects will not reduce the baseline. Failures will.
+     *
+     * @param acceptStat Accept counter (1 = 1 accept)
+     * @param rejectStat Reject counter (1 = 1 reject)
+     * @param failedStat Failed counter (100 = 1 fail)
+     *
+     * Let A = accects, R = rejects, F = fails
+     * @return estimated and adjusted accepts per hour, for the given period
+     *         which is, more or less, max(0, 5 + (A * (A / (A + R))) - (4 * F))
+     */
+    private static double estimateCapacity(RateStat acceptStat, RateStat rejectStat, RateStat failedStat, int period) {
         Rate curAccepted = acceptStat.getRate(period);
         Rate curRejected = rejectStat.getRate(period);
         Rate curFailed = failedStat.getRate(period);
@@ -133,7 +133,7 @@ public class CapacityCalculator extends Calculator {
         }
     }
     
-    private double periodWeight(int period) {
+    private static double periodWeight(int period) {
         switch (period) {
             case 10*60*1000: return .4;
             case 30*60*1000: return .3;

@@ -1,3 +1,11 @@
+2010-06-29 zzz
+    * CapacityCalculator: Cleanup
+    * I2PTunnel: Add default HTTPS outproxy
+    * Jetty: Disable TRACE and OPTIONS in console and eepsite
+    * RouterInfo: Add main() to dump RI files
+    * Scale prng.buffers based on max memory, reduce default from 16 to 9
+    * SOCKS: Better HTTP error message
+
 2010-06-26 zzz
     * I2PTunnel:
      - Move connection profile and delay connect to advanced config section
