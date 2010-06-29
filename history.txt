@@ -1,3 +1,8 @@
+2010-06-29 sponge
+    * 25%-50% cpu savings in BOB. The remainder of the fix is in streaming
+      lib, which aparently keeps running and does not sleep according to
+      profiling.
+
 2010-06-29 zzz
     * CapacityCalculator: Cleanup
     * I2PTunnel: Add default HTTPS outproxy

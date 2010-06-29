@@ -95,10 +95,14 @@ public class TCPio implements Runnable {
 					if (b > 0) {
 						Aout.write(a, 0, b);
 					} else if (b == 0) {
-						Thread.yield(); // this should act like a mini sleep.
-						if (Ain.available() == 0) {
-							Thread.sleep(10);
+// Will this die? We'll see.
+						while(Ain.available() == 0) {
+							Thread.sleep(20);
 						}
+//						Thread.yield(); // this should act like a mini sleep.
+//						if (Ain.available() == 0) {
+//							Thread.sleep(10);
+//						}
 					} else {
 						/* according to the specs:
 						 *
