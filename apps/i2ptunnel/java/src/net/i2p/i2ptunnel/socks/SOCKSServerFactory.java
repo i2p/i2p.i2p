@@ -20,7 +20,7 @@ public class SOCKSServerFactory {
     private final static Log _log = new Log(SOCKSServerFactory.class);
 
     private final static String ERR_REQUEST_DENIED =
-        "HTTP/1.1 403 Access Denied\r\n" +
+        "HTTP/1.1 403 Access Denied - This is a SOCKS proxy, not a HTTP proxy\r\n" +
         "Content-Type: text/html; charset=iso-8859-1\r\n" +
         "Cache-control: no-cache\r\n" +
         "\r\n" +
