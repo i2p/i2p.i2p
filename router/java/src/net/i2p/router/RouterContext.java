@@ -92,8 +92,16 @@ public class RouterContext extends I2PAppContext {
             envProps = new Properties();
         if (envProps.getProperty("time.disabled") == null)
             envProps.setProperty("time.disabled", "false");
-        if (envProps.getProperty("prng.buffers") == null)
-            envProps.setProperty("prng.buffers", "16");
+        if (envProps.getProperty("prng.buffers") == null) {
+            // How many of these 256 KB buffers do we need?
+            // One clue: prng.bufferFillTime is ~10ms on my system,
+            // and prng.bufferFillTime event count is ~30 per minute,
+            // or about 2 seconds per buffer - so about 200x faster
+            // to fill than to drain - so we don't need too many
+            long maxMemory = Runtime.getRuntime().maxMemory();
+            long buffs = Math.min(16, Math.max(2, maxMemory / (14 * 1024 * 1024)));
+            envProps.setProperty("prng.buffers", "" + buffs);
+        }
         return envProps;
     }
 
