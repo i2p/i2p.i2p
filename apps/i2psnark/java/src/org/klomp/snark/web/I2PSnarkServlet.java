@@ -117,6 +117,12 @@ public class I2PSnarkServlet extends Default {
      */
     @Override
     public void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // since we are not overriding handle*(), do this here
+        String method = req.getMethod();
+        if (!(method.equals("GET") || method.equals("HEAD") || method.equals("POST"))) {
+            resp.sendError(HttpResponse.__405_Method_Not_Allowed);
+            return;
+        }
         // this is the part after /i2psnark
         String path = req.getServletPath();
         boolean isConfigure = "/configure".equals(path);

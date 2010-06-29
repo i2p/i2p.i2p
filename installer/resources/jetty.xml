@@ -176,6 +176,14 @@
           <Arg>
             <New class="org.mortbay.http.handler.ResourceHandler">
               <Set name="redirectWelcome">FALSE</Set>
+              <!-- disable TRACE and OPTIONS ref: http://osdir.com/ml/java.jetty.support/2003-11/msg00014.html -->
+              <Set name="AllowedMethods">
+                <Array type="String">
+                  <Item>GET</Item>
+                  <Item>HEAD</Item>
+                  <Item>POST</Item>
+                </Array>
+              </Set>
 	    </New>
           </Arg>
         </Call>

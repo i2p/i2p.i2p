@@ -32,12 +32,20 @@ public class LocaleWebAppHandler extends WebApplicationHandler
      *  or as specified in the routerconsole.lang property.
      *  Unless language==="en".
      */
+    @Override
     public void handle(String pathInContext,
                        String pathParams,
                        HttpRequest httpRequest,
                        HttpResponse httpResponse)
          throws IOException
     {
+        // Handle OPTIONS (nothing to override)
+        if (HttpRequest.__OPTIONS.equals(httpRequest.getMethod()))
+        {
+            handleOptions(httpRequest, httpResponse);
+            return;
+        }
+
         //System.err.println("Path: " + pathInContext);
         String newPath = pathInContext;
         if (pathInContext.endsWith(".jsp")) {
@@ -65,5 +73,28 @@ public class LocaleWebAppHandler extends WebApplicationHandler
         //System.err.println("New path: " + newPath);
         super.handle(newPath, pathParams, httpRequest, httpResponse);
         //System.err.println("Was handled? " + httpRequest.isHandled());
+    }
+
+    /**
+     *  Overrides method in ServletHandler
+     *  @since 0.8
+     */
+    @Override
+    public void handleTrace(HttpRequest request,
+                            HttpResponse response)
+        throws IOException
+    {
+        response.sendError(HttpResponse.__405_Method_Not_Allowed);
+    }
+
+    /**
+     *  Not an override
+     *  @since 0.8
+     */
+    public void handleOptions(HttpRequest request,
+                              HttpResponse response)
+        throws IOException
+    {
+        response.sendError(HttpResponse.__405_Method_Not_Allowed);
     }
 }

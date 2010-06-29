@@ -213,6 +213,22 @@ public class RouterConsoleRunner {
             constraint.setAuthenticate(true);
             context.addSecurityConstraint("/", constraint);
         }
+
+        // This forces a '403 Forbidden' response for TRACE and OPTIONS unless the
+        // WAC handler handles it.
+        // (LocaleWebAppHandler returns a '405 Method Not Allowed')
+        // TRACE and OPTIONS aren't really security issues...
+        // TRACE doesn't echo stuff unless you call setTrace(true)
+        // But it might bug some people
+        // The other strange methods - PUT, DELETE, MOVE - are disabled by default
+        // See also:
+        // http://old.nabble.com/Disable-HTTP-TRACE-in-Jetty-5.x-td12412607.html
+        SecurityConstraint sc = new SecurityConstraint();
+        sc.setName("No trace or options");
+        sc.addMethod("TRACE");
+        sc.addMethod("OPTIONS");
+        sc.setAuthenticate(true);
+        context.addSecurityConstraint("/*", sc) ;
     }
     
     static String getPassword() {
