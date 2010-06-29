@@ -142,7 +142,7 @@ public class PluginUpdateHandler extends UpdateHandler {
                 buf.append(_pct.format(pct));
             }
             buf.append(": ");
-            buf.append(_("{0}B transferred", DataHelper.formatSize(currentWrite + alreadyTransferred)));
+            buf.append(_("{0}B transferred", DataHelper.formatSize2(currentWrite + alreadyTransferred)));
             updateStatus(buf.toString());
         }
 

@@ -176,7 +176,7 @@ public class UpdateHandler {
                 buf.append(_pct.format(pct));
             }
             buf.append(":<br>\n");
-            buf.append(_("{0}B transferred", DataHelper.formatSize(currentWrite + alreadyTransferred)));
+            buf.append(_("{0}B transferred", DataHelper.formatSize2(currentWrite + alreadyTransferred)));
             updateStatus(buf.toString());
         }
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
