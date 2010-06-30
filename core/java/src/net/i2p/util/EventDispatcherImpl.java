@@ -24,6 +24,8 @@ import java.util.Set;
  * each object it is used by, ala:
  * <code>private final EventDispatcher _event = new EventDispatcher();</code>
  *
+ * Deprecated - Used only by I2PTunnel
+ *
  * If there is anything in here that doesn't make sense, turn off
  * your computer and go fly a kite - (c) 2004 by jrandom
 
@@ -32,10 +34,10 @@ import java.util.Set;
  */
 public class EventDispatcherImpl implements EventDispatcher {
 
-    private final static Log _log = new Log(EventDispatcherImpl.class);
+    //private final static Log _log = new Log(EventDispatcherImpl.class);
 
     private boolean _ignore = false;
-    private /* FIXME final FIXME */ HashMap _events = new HashMap(4);
+    private final HashMap _events = new HashMap(4);
     private final ArrayList _attached = new ArrayList();
     
     public EventDispatcher getEventDispatcher() {
@@ -45,7 +47,7 @@ public class EventDispatcherImpl implements EventDispatcher {
     public void attachEventDispatcher(EventDispatcher ev) {
         if (ev == null) return;
         synchronized (_attached) {
-            _log.debug(this.hashCode() + ": attaching EventDispatcher " + ev.hashCode());
+            //_log.debug(this.hashCode() + ": attaching EventDispatcher " + ev.hashCode());
             _attached.add(ev);
         }
     }
@@ -68,7 +70,7 @@ public class EventDispatcherImpl implements EventDispatcher {
         if (args == null) {
             args = "[null value]";
         }
-        _log.debug(this.hashCode() + ": got notification [" + eventName + "] = [" + args + "]");
+        //_log.debug(this.hashCode() + ": got notification [" + eventName + "] = [" + args + "]");
         synchronized (_events) {
             _events.put(eventName, args);
             _events.notifyAll();
@@ -77,8 +79,8 @@ public class EventDispatcherImpl implements EventDispatcher {
                 EventDispatcher e;
                 while (it.hasNext()) {
                     e = (EventDispatcher) it.next();
-                    _log.debug(this.hashCode() + ": notifying attached EventDispatcher " + e.hashCode() + ": ["
-                               + eventName + "] = [" + args + "]");
+                    //_log.debug(this.hashCode() + ": notifying attached EventDispatcher " + e.hashCode() + ": ["
+                    //           + eventName + "] = [" + args + "]");
                     e.notifyEvent(eventName, args);
                 }
             }
@@ -112,7 +114,6 @@ public class EventDispatcherImpl implements EventDispatcher {
         synchronized (_events) {
             _events.clear();
         }
-        _events = null;
     }
     
     public void unIgnoreEvents() {
@@ -123,7 +124,7 @@ public class EventDispatcherImpl implements EventDispatcher {
         if (_ignore) return null;
         Object val;
 
-        _log.debug(this.hashCode() + ": waiting for [" + name + "]");
+        //_log.debug(this.hashCode() + ": waiting for [" + name + "]");
         do {
             synchronized (_events) {
                 if (_events.containsKey(name)) {
