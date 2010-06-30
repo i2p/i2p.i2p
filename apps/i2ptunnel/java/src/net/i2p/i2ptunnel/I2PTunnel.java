@@ -69,6 +69,9 @@ import net.i2p.util.EventDispatcher;
 import net.i2p.util.EventDispatcherImpl;
 import net.i2p.util.Log;
 
+/**
+ *  Todo: Most events are not listened to elsewhere, so error propagation is poor
+ */
 public class I2PTunnel implements Logging, EventDispatcher {
     private Log _log;
     private EventDispatcherImpl _event;
@@ -180,6 +183,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
         }
     }
 
+    /** @return non-null */
     List<I2PSession> getSessions() { 
         synchronized (_sessions) {
             return new ArrayList(_sessions); 
@@ -585,6 +589,9 @@ public class I2PTunnel implements Logging, EventDispatcher {
      * Run the server pointing at the host and port specified using the private i2p
      * destination loaded from the given base64 stream. <p />
      *
+     * Deprecated? Why run a server with a private destination?
+     * Not available from the war GUI
+     *
      * Sets the event "serverTaskId" = Integer(taskId) after the tunnel has been started (or -1 on error)
      * Also sets the event "openServerResult" = "ok" or "error" (displaying "Ready!" on the logger after
      * 'ok').  So, success = serverTaskId != -1 and openServerResult = ok.
@@ -666,6 +673,11 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 _log.error(getPrefix() + "Invalid I2PTunnel config to create a client [" + host + ":"+ port + "]", iae);
                 l.log("Invalid I2PTunnel configuration [" + host + ":" + port + "]");
                 notifyEvent("clientTaskId", Integer.valueOf(-1));
+                // Since nothing listens to TaskID events, use this to propagate the error to TunnelController
+                // Otherwise, the tunnel stays up even though the port is down
+                // This doesn't work for CLI though... and the tunnel doesn't close itself after error,
+                // so this probably leaves the tunnel open if called from the CLI
+                throw iae;
             }
         } else {
             l.log("client <port> <pubkey>[,<pubkey>]|file:<pubkeyfile>[ <sharedClient>] [<privKeyFile>]");
@@ -733,6 +745,11 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 _log.error(getPrefix() + "Invalid I2PTunnel config to create an httpclient [" + host + ":"+ clientPort + "]", iae);
                 l.log("Invalid I2PTunnel configuration [" + host + ":" + clientPort + "]");
                 notifyEvent("httpclientTaskId", Integer.valueOf(-1));
+                // Since nothing listens to TaskID events, use this to propagate the error to TunnelController
+                // Otherwise, the tunnel stays up even though the port is down
+                // This doesn't work for CLI though... and the tunnel doesn't close itself after error,
+                // so this probably leaves the tunnel open if called from the CLI
+                throw iae;
             }
         } else {
             l.log("httpclient <port> [<sharedClient>] [<proxy>]");
@@ -789,7 +806,12 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 task = new I2PTunnelConnectClient(_port, l, ownDest, proxy, (EventDispatcher) this, this);
                 addtask(task);
             } catch (IllegalArgumentException iae) {
-                _log.error(getPrefix() + "Invalid I2PTunnel config to create an httpclient [" + host + ":"+ _port + "]", iae);
+                _log.error(getPrefix() + "Invalid I2PTunnel config to create a connect client [" + host + ":"+ _port + "]", iae);
+                // Since nothing listens to TaskID events, use this to propagate the error to TunnelController
+                // Otherwise, the tunnel stays up even though the port is down
+                // This doesn't work for CLI though... and the tunnel doesn't close itself after error,
+                // so this probably leaves the tunnel open if called from the CLI
+                throw iae;
             }
         } else {
             l.log("connectclient <port> [<sharedClient>] [<proxy>]");
@@ -848,6 +870,11 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 _log.error(getPrefix() + "Invalid I2PTunnel config to create an ircclient [" + host + ":"+ _port + "]", iae);
                 l.log("Invalid I2PTunnel configuration [" + host + ":" + _port + "]");
                 notifyEvent("ircclientTaskId", Integer.valueOf(-1));
+                // Since nothing listens to TaskID events, use this to propagate the error to TunnelController
+                // Otherwise, the tunnel stays up even though the port is down
+                // This doesn't work for CLI though... and the tunnel doesn't close itself after error,
+                // so this probably leaves the tunnel open if called from the CLI
+                throw iae;
             }
         } else {
             l.log("ircclient <port> [<sharedClient> [<privKeyFile>]]");

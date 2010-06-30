@@ -29,8 +29,8 @@ public class TunnelController implements Logging {
     private Log _log;
     private Properties _config;
     private I2PTunnel _tunnel;
-    private List _messages;
-    private List _sessions;
+    private List<String> _messages;
+    private List<I2PSession> _sessions;
     private boolean _running;
     private boolean _starting;
     
@@ -120,6 +120,9 @@ public class TunnelController implements Logging {
         } catch (Exception e) {
             _log.error("Error starting up the tunnel", e);
             log("Error starting up the tunnel - " + e.getMessage());
+            // if we don't acquire() then the release() in stopTunnel() won't work
+            acquire();
+            stopTunnel();
         }
         _starting = false;
     }
@@ -256,15 +259,18 @@ public class TunnelController implements Logging {
      * closed by some other tunnels
      */
     private void acquire() {
-        List sessions = _tunnel.getSessions();
-        if (sessions != null) {
+        List<I2PSession> sessions = _tunnel.getSessions();
+        if (!sessions.isEmpty()) {
             for (int i = 0; i < sessions.size(); i++) {
-                I2PSession session = (I2PSession)sessions.get(i);
+                I2PSession session = sessions.get(i);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Acquiring session " + session);
                 TunnelControllerGroup.getInstance().acquire(this, session);
             }
             _sessions = sessions;
         } else {
-            _log.error("No sessions to acquire?");
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("No sessions to acquire? for " + getName());
         }
     }
     
@@ -273,13 +279,16 @@ public class TunnelController implements Logging {
      * no other tunnels are using them, close them.
      */
     private void release() {
-        if (_sessions != null) {
+        if (_sessions != null && !_sessions.isEmpty()) {
             for (int i = 0; i < _sessions.size(); i++) {
-                I2PSession s = (I2PSession)_sessions.get(i);
+                I2PSession s = _sessions.get(i);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Releasing session " + s);
                 TunnelControllerGroup.getInstance().release(this, s);
             }
         } else {
-            _log.error("No sessions to release?");
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("No sessions to release? for " + getName());
         }
     }
     
@@ -370,7 +379,7 @@ public class TunnelController implements Logging {
             _tunnel.port = "7654";
         }
     }
-    
+
     public void stopTunnel() {
         _tunnel.runClose(new String[] { "forced", "all" }, this);
         release();
@@ -597,7 +606,7 @@ public class TunnelController implements Logging {
      *
      * @return list of messages pulled off (each is a String, earliest first)
      */
-    public List clearMessages() { 
+    public List<String> clearMessages() { 
         List rv = null;
         synchronized (this) {
             rv = new ArrayList(_messages);

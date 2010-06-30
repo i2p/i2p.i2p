@@ -1,3 +1,9 @@
+2010-07-01 zzz
+    * EventDispatcher: Minor cleanups and comments
+    * I2PTunnel: Don't start a tunnel if no valid destinations;
+      cleanups, logging, and error propagation fixes
+    * Transport: Fix NTCP address generation when host is specified but port is auto
+
 2010-06-29 sponge
     * 25%-50% cpu savings in BOB. The remainder of the fix is in streaming
       lib, which aparently keeps running and does not sleep according to

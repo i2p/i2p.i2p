@@ -17,6 +17,9 @@ import net.i2p.util.EventDispatcher;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
+/**
+ * Todo: Can we extend I2PTunnelClient instead and remove some duplicated code?
+ */
 public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable {
 
     private static final Log _log = new Log(I2PTunnelIRCClient.class);
@@ -25,7 +28,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
     private static volatile long __clientId = 0;
     
     /** list of Destination objects that we point at */
-    protected List dests;
+    protected List<Destination> dests;
     private static final long DEFAULT_READ_TIMEOUT = 5*60*1000; // -1
     protected long readTimeout = DEFAULT_READ_TIMEOUT;
 
@@ -47,7 +50,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
               "IRCHandler " + (++__clientId), tunnel, pkf);
         
         StringTokenizer tok = new StringTokenizer(destinations, ", ");
-        dests = new ArrayList(1);
+        dests = new ArrayList(2);
         while (tok.hasMoreTokens()) {
             String destination = tok.nextToken();
             try {
@@ -64,7 +67,18 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         if (dests.isEmpty()) {
             l.log("No target destinations found");
             notifyEvent("openClientResult", "error");
-            return;
+            // Nothing is listening for the above event, so it's useless
+            // Maybe figure out where to put a waitEventValue("openClientResult") ??
+            // In the meantime, let's do this the easy way
+            // Note that b32 dests will often not be resolvable at instantiation time;
+            // a delayed resolution system would be even better.
+
+            // Don't close() here, because it does a removeSession() and then
+            // TunnelController can't acquire() it to release() it.
+            //close(true);
+            // Unfortunately, super() built the whole tunnel before we get here.
+            throw new IllegalArgumentException("No valid target destinations found");
+            //return;
         }
         
         setName(getLocalPort() + " -> IRCClient");
@@ -109,9 +123,9 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
             return null;
         }
         if (size == 1) // skip the rand in the most common case
-            return (Destination)dests.get(0);
+            return dests.get(0);
         int index = I2PAppContext.getGlobalContext().random().nextInt(size);
-        return (Destination)dests.get(index);
+        return dests.get(index);
     }
 
     /*************************************************************************
