@@ -73,7 +73,7 @@
         </exec>
     </target>
 
-    <target name="poupdate" depends="compile">
+    <target name="poupdate" depends="builddep, compile">
         <!-- Update the messages_*.po files.  -->
         <exec executable="sh" osfamily="unix" failifexecutionfails="true" >
             <arg value="./bundle-messages.sh" />
