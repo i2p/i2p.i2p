@@ -448,9 +448,9 @@ public class TunnelController implements Logging {
     public boolean getPersistentClientKey() { return Boolean.valueOf(_config.getProperty("option.persistentClientKey")).booleanValue(); }
     public String getMyDestination() {
         if (_tunnel != null) {
-            List sessions = _tunnel.getSessions();
+            List<I2PSession> sessions = _tunnel.getSessions();
             for (int i = 0; i < sessions.size(); i++) {
-                I2PSession session = (I2PSession)sessions.get(i);
+                I2PSession session = sessions.get(i);
                 Destination dest = session.getMyDestination();
                 if (dest != null)
                     return dest.toBase64();
@@ -461,9 +461,9 @@ public class TunnelController implements Logging {
     
     public String getMyDestHashBase32() {
         if (_tunnel != null) {
-            List sessions = _tunnel.getSessions();
+            List<I2PSession> sessions = _tunnel.getSessions();
             for (int i = 0; i < sessions.size(); i++) {
-                I2PSession session = (I2PSession)sessions.get(i);
+                I2PSession session = sessions.get(i);
                 Destination dest = session.getMyDestination();
                 if (dest != null)
                     return Base32.encode(dest.calculateHash().getData());
@@ -565,9 +565,9 @@ public class TunnelController implements Logging {
         if ( (opts != null) && (opts.length() > 0) )
             buf.append("Network options: ").append(opts).append("<br />\n");
         if (_running) {
-            List sessions = _tunnel.getSessions();
+            List<I2PSession> sessions = _tunnel.getSessions();
             for (int i = 0; i < sessions.size(); i++) {
-                I2PSession session = (I2PSession)sessions.get(i);
+                I2PSession session = sessions.get(i);
                 Destination dest = session.getMyDestination();
                 if (dest != null) {
                     buf.append("Destination hash: ").append(dest.calculateHash().toBase64()).append("<br />\n");
