@@ -31,6 +31,9 @@ import net.i2p.util.Log;
 /**
  * Simple accessor for exposing tunnel info, but also an ugly form handler
  *
+ * Warning - This class is not part of the i2ptunnel API, and at some point
+ * it will be moved from the jar to the war.
+ * Usage by classes outside of i2ptunnel.war is deprecated.
  */
 public class IndexBean {
     protected I2PAppContext _context;
