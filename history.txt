@@ -1,3 +1,8 @@
+2010-07-03 zzz
+    * Build: Fix poupdate dependencies
+    * I2PTunnel: More error propagation fixes
+    * I2PTunnelHTTPClient: Don't use BufferedReader
+
 2010-07-01 zzz
     * EventDispatcher: Minor cleanups and comments
     * I2PTunnel: Don't start a tunnel if no valid destinations;

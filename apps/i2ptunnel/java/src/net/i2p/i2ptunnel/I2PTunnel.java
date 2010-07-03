@@ -166,7 +166,12 @@ public class I2PTunnel implements Logging, EventDispatcher {
                     System.out.print("I2PTunnel>");
                     String cmd = r.readLine();
                     if (cmd == null) break;
-                    runCommand(cmd, this);
+                    if (cmd.length() <= 0) continue;
+                    try {
+                        runCommand(cmd, this);
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    }
                 }
             } catch (IOException ex) {
                 ex.printStackTrace();
@@ -355,6 +360,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
      *
      * @param args {hostname, portNumber, privKeyFilename}
      * @param l logger to receive events and output
+     * @throws IllegalArgumentException on config problem
      */
     public void runServer(String args[], Logging l) {
         if (args.length == 3) {
@@ -367,7 +373,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 l.log("unknown host");
                 _log.error(getPrefix() + "Error resolving " + args[0], uhe);
                 notifyEvent("serverTaskId", Integer.valueOf(-1));
-                return;
+                throw new IllegalArgumentException(getPrefix() + "Error resolving " + args[0] + uhe.getMessage());
             }
 
             try {
@@ -376,8 +382,9 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 l.log("invalid port");
                 _log.error(getPrefix() + "Port specified is not valid: " + args[1], nfe);
                 notifyEvent("serverTaskId", Integer.valueOf(-1));
-                return;
             }
+            if (portNum <= 0)
+                throw new IllegalArgumentException(getPrefix() + "Bad port " + args[1]);
 
             privKeyFile = new File(args[2]);
             if (!privKeyFile.isAbsolute())
@@ -404,6 +411,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
     /**
      * Same args as runServer
      * (we should stop duplicating all this code...)
+     * @throws IllegalArgumentException on config problem
      */
     public void runIrcServer(String args[], Logging l) {
         if (args.length == 3) {
@@ -416,7 +424,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 l.log("unknown host");
                 _log.error(getPrefix() + "Error resolving " + args[0], uhe);
                 notifyEvent("serverTaskId", Integer.valueOf(-1));
-                return;
+                throw new IllegalArgumentException(getPrefix() + "Error resolving " + args[0] + uhe.getMessage());
             }
 
             try {
@@ -425,8 +433,9 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 l.log("invalid port");
                 _log.error(getPrefix() + "Port specified is not valid: " + args[1], nfe);
                 notifyEvent("serverTaskId", Integer.valueOf(-1));
-                return;
             }
+            if (portNum <= 0)
+                throw new IllegalArgumentException(getPrefix() + "Bad port " + args[1]);
 
             privKeyFile = new File(args[2]);
             if (!privKeyFile.isAbsolute())
@@ -461,6 +470,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
      *
      * @param args {hostname, portNumber, spoofedHost, privKeyFilename}
      * @param l logger to receive events and output
+     * @throws IllegalArgumentException on config problem
      */
     public void runHttpServer(String args[], Logging l) {
         if (args.length == 4) {
@@ -473,7 +483,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 l.log("unknown host");
                 _log.error(getPrefix() + "Error resolving " + args[0], uhe);
                 notifyEvent("serverTaskId", Integer.valueOf(-1));
-                return;
+                throw new IllegalArgumentException(getPrefix() + "Error resolving " + args[0] + uhe.getMessage());
             }
 
             try {
@@ -482,8 +492,9 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 l.log("invalid port");
                 _log.error(getPrefix() + "Port specified is not valid: " + args[1], nfe);
                 notifyEvent("serverTaskId", Integer.valueOf(-1));
-                return;
             }
+            if (portNum <= 0)
+                throw new IllegalArgumentException(getPrefix() + "Bad port " + args[1]);
 
             String spoofedHost = args[2];
             
@@ -523,6 +534,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
      *
      * @param args {hostname, portNumber, proxyPortNumber, spoofedHost, privKeyFilename}
      * @param l logger to receive events and output
+     * @throws IllegalArgumentException on config problem
      */
     public void runHttpBidirServer(String args[], Logging l) {
         if (args.length == 5) {
@@ -536,7 +548,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 l.log("unknown host");
                 _log.error(getPrefix() + "Error resolving " + args[0], uhe);
                 notifyEvent("serverTaskId", Integer.valueOf(-1));
-                return;
+                throw new IllegalArgumentException(getPrefix() + "Error resolving " + args[0] + uhe.getMessage());
             }
 
             try {
@@ -545,7 +557,6 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 l.log("invalid port");
                 _log.error(getPrefix() + "Port specified is not valid: " + args[1], nfe);
                 notifyEvent("serverTaskId", Integer.valueOf(-1));
-                return;
             }
 
             try {
@@ -554,8 +565,11 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 l.log("invalid port");
                 _log.error(getPrefix() + "Port specified is not valid: " + args[2], nfe);
                 notifyEvent("serverTaskId", Integer.valueOf(-1));
-                return;
             }
+            if (portNum <= 0)
+                throw new IllegalArgumentException(getPrefix() + "Bad port " + args[1]);
+            if (port2Num <= 0)
+                throw new IllegalArgumentException(getPrefix() + "Bad port " + args[2]);
 
             String spoofedHost = args[3];
 
@@ -598,6 +612,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
      *
      * @param args {hostname, portNumber, privKeyBase64}
      * @param l logger to receive events and output
+     * @throws IllegalArgumentException on config problem
      */
     public void runTextServer(String args[], Logging l) {
         if (args.length == 3) {
@@ -609,7 +624,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 l.log("unknown host");
                 _log.error(getPrefix() + "Error resolving " + args[0], uhe);
                 notifyEvent("serverTaskId", Integer.valueOf(-1));
-                return;
+                throw new IllegalArgumentException(getPrefix() + "Error resolving " + args[0] + uhe.getMessage());
             }
 
             try {
@@ -618,8 +633,9 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 l.log("invalid port");
                 _log.error(getPrefix() + "Port specified is not valid: " + args[1], nfe);
                 notifyEvent("serverTaskId", Integer.valueOf(-1));
-                return;
             }
+            if (portNum <= 0)
+                throw new IllegalArgumentException(getPrefix() + "Bad port " + args[1]);
 
             I2PTunnelServer serv = new I2PTunnelServer(serverHost, portNum, args[2], l, (EventDispatcher) this, this);
             serv.setReadTimeout(readTimeout);
@@ -645,6 +661,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
      *
      * @param args {portNumber, destinationBase64 or "file:filename"[, sharedClient [, privKeyFile]]}
      * @param l logger to receive events and output
+     * @throws IllegalArgumentException on config problem
      */
     public void runClient(String args[], Logging l) {
         boolean isShared = true;
@@ -658,8 +675,10 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 l.log("invalid port");
                 _log.error(getPrefix() + "Port specified is not valid: " + args[0], nfe);
                 notifyEvent("clientTaskId", Integer.valueOf(-1));
-                return;
             }
+            if (portNum <= 0)
+                throw new IllegalArgumentException(getPrefix() + "Bad port " + args[0]);
+
             I2PTunnelTask task;
             ownDest = !isShared;
             try {
@@ -699,6 +718,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
      *
      * @param args {portNumber[, sharedClient][, proxy to be used for the WWW]}
      * @param l logger to receive events and output
+     * @throws IllegalArgumentException on config problem
      */
     public void runHttpClient(String args[], Logging l) {
         if (args.length >= 1 && args.length <= 3) {
@@ -709,8 +729,9 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 l.log("invalid port");
                 _log.error(getPrefix() + "Port specified is not valid: " + args[0], nfe);
                 notifyEvent("httpclientTaskId", Integer.valueOf(-1));
-                return;
             }
+            if (clientPort <= 0)
+                throw new IllegalArgumentException(getPrefix() + "Bad port " + args[0]);
             
             String proxy = "";
             boolean isShared = true;
@@ -766,6 +787,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
      *
      * @param args {portNumber[, sharedClient][, proxy to be used for the WWW]}
      * @param l logger to receive events and output
+     * @throws IllegalArgumentException on config problem
      */
     public void runConnectClient(String args[], Logging l) {
         if (args.length >= 1 && args.length <= 3) {
@@ -774,8 +796,9 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 _port = Integer.parseInt(args[0]);
             } catch (NumberFormatException nfe) {
                 _log.error(getPrefix() + "Port specified is not valid: " + args[0], nfe);
-                return;
             }
+            if (_port <= 0)
+                throw new IllegalArgumentException(getPrefix() + "Bad port " + args[0]);
             
             String proxy = "";
             boolean isShared = true;
@@ -831,6 +854,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
      *
      * @param args {portNumber,destinationBase64 or "file:filename" [, sharedClient [, privKeyFile]]}
      * @param l logger to receive events and output
+     * @throws IllegalArgumentException on config problem
      */
     public void runIrcClient(String args[], Logging l) {
         if (args.length >= 2) {
@@ -841,8 +865,9 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 l.log("invalid port");
                 _log.error(getPrefix() + "Port specified is not valid: " + args[0], nfe);
                 notifyEvent("ircclientTaskId", Integer.valueOf(-1));
-                return;
             }
+            if (_port <= 0)
+                throw new IllegalArgumentException(getPrefix() + "Bad port " + args[0]);
             
             boolean isShared = true;
             if (args.length > 2) {
@@ -894,6 +919,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
      *
      * @param args {portNumber [, sharedClient]}
      * @param l logger to receive events and output
+     * @throws IllegalArgumentException on config problem
      */
     public void runSOCKSTunnel(String args[], Logging l) {
         if (args.length >= 1 && args.length <= 2) {
@@ -904,8 +930,9 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 l.log("invalid port");
                 _log.error(getPrefix() + "Port specified is not valid: " + args[0], nfe);
                 notifyEvent("sockstunnelTaskId", Integer.valueOf(-1));
-                return;
             }
+            if (_port <= 0)
+                throw new IllegalArgumentException(getPrefix() + "Bad port " + args[0]);
 
             boolean isShared = false;
             if (args.length > 1)
@@ -927,6 +954,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
     /**
      * Run an SOCKS IRC tunnel on the given port number 
      * @param args {portNumber [, sharedClient]} or (portNumber, ignored (false), privKeyFile)
+     * @throws IllegalArgumentException on config problem
      * @since 0.7.12
      */
     public void runSOCKSIRCTunnel(String args[], Logging l) {
@@ -938,8 +966,9 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 l.log("invalid port");
                 _log.error(getPrefix() + "Port specified is not valid: " + args[0], nfe);
                 notifyEvent("sockstunnelTaskId", Integer.valueOf(-1));
-                return;
             }
+            if (_port <= 0)
+                throw new IllegalArgumentException(getPrefix() + "Bad port " + args[0]);
 
             boolean isShared = false;
             if (args.length == 2)
@@ -965,6 +994,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
      *
      * @param args {targethost, targetport, destinationString}
      * @param l logger to receive events and output
+     * @throws IllegalArgumentException on config problem
      */
     public void runStreamrClient(String args[], Logging l) {
         if (args.length == 3) {
@@ -985,8 +1015,9 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 l.log("invalid port");
                 _log.error(getPrefix() + "Port specified is not valid: " + args[0], nfe);
                 notifyEvent("streamrtunnelTaskId", Integer.valueOf(-1));
-                return;
             }
+            if (_port <= 0)
+                throw new IllegalArgumentException(getPrefix() + "Bad port " + args[0]);
 
             StreamrConsumer task = new StreamrConsumer(_host, _port, args[2], l, (EventDispatcher) this, this);
             task.startRunning();
@@ -1004,6 +1035,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
      *
      * @param args {port, privkeyfile}
      * @param l logger to receive events and output
+     * @throws IllegalArgumentException on config problem
      */
     public void runStreamrServer(String args[], Logging l) {
         if (args.length == 2) {
@@ -1014,8 +1046,9 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 l.log("invalid port");
                 _log.error(getPrefix() + "Port specified is not valid: " + args[0], nfe);
                 notifyEvent("streamrtunnelTaskId", Integer.valueOf(-1));
-                return;
             }
+            if (_port <= 0)
+                throw new IllegalArgumentException(getPrefix() + "Bad port " + args[0]);
 
             File privKeyFile = new File(args[1]);
             if (!privKeyFile.isAbsolute())
@@ -1556,7 +1589,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
         }
     }
     
-    private String getPrefix() { return '[' + _tunnelId + "]: "; }
+    private String getPrefix() { return "[" + _tunnelId + "]: "; }
     
     public I2PAppContext getContext() { return _context; }
 
