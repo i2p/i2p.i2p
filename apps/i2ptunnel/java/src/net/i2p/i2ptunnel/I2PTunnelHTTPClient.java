@@ -33,7 +33,6 @@ import net.i2p.data.Destination;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
-
 import net.i2p.util.Translate;
 
 /**
@@ -772,11 +771,12 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             _s = s;
         }
         String readLine(String method) throws IOException {
-             if (method == null || "POST".equals(method))
+             //  Use unbuffered until we can find a BufferedReader that limits line length
+             //if (method == null || "POST".equals(method))
                  return DataHelper.readLine(_s);
-             if (_br == null)
-                 _br = new BufferedReader(new InputStreamReader(_s, "ISO-8859-1"));
-             return _br.readLine();
+             //if (_br == null)
+             //    _br = new BufferedReader(new InputStreamReader(_s, "ISO-8859-1"));
+             //return _br.readLine();
         }
     }
 

@@ -144,6 +144,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         }
 
         public void run() {
+            // Todo: Don't use BufferedReader - IRC spec limits line length to 512 but...
             BufferedReader in;
             OutputStream output;
             try {
@@ -218,6 +219,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
             }
                 
             public void run() {
+                // Todo: Don't use BufferedReader - IRC spec limits line length to 512 but...
                 BufferedReader in;
                 OutputStream output;
                 try {
