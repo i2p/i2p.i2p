@@ -3196,7 +3196,7 @@ msgstr "Uptime"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:186
 msgid "Help with configuring your firewall and router for optimal I2P performance"
-msgstr "Hulp bye het configureren van je firewall en router voor optimale I2P prestatie"
+msgstr "Hulp bij het configureren van je firewall en router voor optimale I2P prestatie"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:213
 msgid "Download"
@@ -4967,7 +4967,7 @@ msgstr "samenvatting netwerk database"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/netdb_jsp.java:227
 msgid "I2P Network Database Summary"
-msgstr "Samenvatting I2P Netwoek Database "
+msgstr "Samenvatting I2P Netwerk Database "
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/nowebapp_jsp.java:109
 msgid "WebApp Not Found"
