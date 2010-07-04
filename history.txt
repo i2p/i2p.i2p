@@ -1,3 +1,6 @@
+2010-07-04 duck
+    * RouterConsole: Dutch translation (thanks to monkeybrains)
+
 2010-07-03 zzz
     * Build: Fix poupdate dependencies
     * I2PTunnel: More error propagation fixes
