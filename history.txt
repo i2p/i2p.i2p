@@ -1,3 +1,6 @@
+2010-07-06 duck
+    * susidns: Dutch translation (thanks to monkeybrains)
+
 2010-07-05 zzz
     * i2psnark: Fix transition to end game
     * I2PTunnelIRCClient: Filter PART messages like we do for QUIT
