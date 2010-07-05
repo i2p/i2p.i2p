@@ -1,3 +1,6 @@
+2010-07-05 duck
+    * I2PTunnel & I2PSnark: Dutch translation (thanks to monkeybrains)
+
 2010-07-04 duck
     * RouterConsole: Dutch translation (thanks to monkeybrains)
 
