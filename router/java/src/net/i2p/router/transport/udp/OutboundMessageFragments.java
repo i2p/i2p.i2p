@@ -22,7 +22,7 @@ import net.i2p.util.Log;
  * message.
  *
  */
-public class OutboundMessageFragments {
+class OutboundMessageFragments {
     private RouterContext _context;
     private Log _log;
     private UDPTransport _transport;

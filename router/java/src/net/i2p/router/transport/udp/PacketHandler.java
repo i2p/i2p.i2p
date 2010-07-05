@@ -19,7 +19,7 @@ import net.i2p.util.Log;
  * receiver's queue and pushing them as necessary.
  *
  */
-public class PacketHandler {
+class PacketHandler {
     private RouterContext _context;
     private Log _log;
     private UDPTransport _transport;
@@ -524,6 +524,10 @@ public class PacketHandler {
                         _log.info("Received relay response packet: " + reader + " from " + from);
                     _establisher.receiveRelayResponse(from, reader);
                     _context.statManager().addRateData("udp.receivePacketSize.relayResponse", packet.getPacket().getLength(), packet.getLifetime());
+                    break;
+                case UDPPacket.PAYLOAD_TYPE_SESSION_DESTROY:
+                    _state = 53;
+                    //_TODO
                     break;
                 default:
                     _state = 52;

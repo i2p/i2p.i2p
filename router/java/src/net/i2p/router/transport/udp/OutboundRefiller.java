@@ -12,7 +12,7 @@ import net.i2p.util.Log;
  * WARNING - UNUSED since 0.6.1.11
  *
  */
-public class OutboundRefiller implements Runnable {
+class OutboundRefiller implements Runnable {
     private RouterContext _context;
     private Log _log;
     private OutboundMessageFragments _fragments;

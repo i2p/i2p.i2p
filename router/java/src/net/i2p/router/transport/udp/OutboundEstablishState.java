@@ -21,7 +21,7 @@ import net.i2p.util.Log;
  * they are Bob.
  *
  */
-public class OutboundEstablishState {
+class OutboundEstablishState {
     private final RouterContext _context;
     private final Log _log;
     // SessionRequest message

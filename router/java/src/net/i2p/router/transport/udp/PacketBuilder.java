@@ -22,8 +22,80 @@ import net.i2p.util.Log;
  * Big ol' class to do all our packet formatting.  The UDPPackets generated are
  * fully authenticated, encrypted, and configured for delivery to the peer. 
  *
+ * The following is from udp.html on the website:
+
+<p>
+All UDP datagrams begin with a 16 byte MAC (Message Authentication Code)
+and a 16 byte IV (Initialization Vector
+followed by a variable
+size payload encrypted with the appropriate key.  The MAC used is 
+HMAC-MD5, truncated to 16 bytes, while the key is a full 32 byte AES256 
+key.  The specific construct of the MAC is the first 16 bytes from:</p>
+<pre>
+  HMAC-MD5(payload || IV || (payloadLength ^ protocolVersion), macKey)
+</pre>
+
+<p>The protocol version is currently 0.</p>
+
+<p>The payload itself is AES256/CBC encrypted with the IV and the 
+sessionKey, with replay prevention addressed within its body, 
+explained below.  The payloadLength in the MAC is a 2 byte unsigned 
+integer in 2s complement.</p>
+  
+<p>The protocolVersion is a 2 byte unsigned integer in 2s complement,
+and currently set to 0.  Peers using a different protocol version will
+not be able to communicate with this peer, though earlier versions not
+using this flag are.</p>
+
+<h2><a name="payload">Payload</a></h2>
+
+<p>Within the AES encrypted payload, there is a minimal common structure
+to the various messages - a one byte flag and a four byte sending 
+timestamp (*seconds* since the unix epoch).  The flag byte contains 
+the following bitfields:</p>
+<pre>
+  bits 0-3: payload type
+     bit 4: rekey?
+     bit 5: extended options included
+  bits 6-7: reserved
+</pre>
+
+<p>If the rekey flag is set, 64 bytes of keying material follow the 
+timestamp.  If the extended options flag is set, a one byte option 
+size value is appended to, followed by that many extended option 
+bytes, which are currently uninterpreted.</p>
+
+<p>When rekeying, the first 32 bytes of the keying material is fed 
+into a SHA256 to produce the new MAC key, and the next 32 bytes are
+fed into a SHA256 to produce the new session key, though the keys are
+not immediately used.  The other side should also reply with the 
+rekey flag set and that same keying material.  Once both sides have 
+sent and received those values, the new keys should be used and the 
+previous keys discarded.  It may be useful to keep the old keys 
+around briefly, to address packet loss and reordering.</p>
+
+<p>NOTE: Rekeying is currently unimplemented.</p>
+
+<pre>
+ Header: 37+ bytes
+ +----+----+----+----+----+----+----+----+
+ |                  MAC                  |
+ |                                       |
+ +----+----+----+----+----+----+----+----+
+ |                   IV                  |
+ |                                       |
+ +----+----+----+----+----+----+----+----+
+ |flag|        time       | (optionally  |
+ +----+----+----+----+----+              |
+ | this may have 64 byte keying material |
+ | and/or a one+N byte extended options) |
+ +---------------------------------------|
+</pre>
+
+ *
+ *
  */
-public class PacketBuilder {
+class PacketBuilder {
     private I2PAppContext _context;
     private Log _log;
     private UDPTransport _transport;
@@ -62,10 +134,16 @@ public class PacketBuilder {
         _context.statManager().createRateStat("udp.packetAuthTimeSlow", "How long it takes to encrypt and MAC a packet for sending (when its slow)", "udp", UDPTransport.RATES);
     }
     
+/****
     public UDPPacket buildPacket(OutboundMessageState state, int fragment, PeerState peer) {
         return buildPacket(state, fragment, peer, null, null);
     }
+****/
+
     /**
+     * This builds a data packet (PAYLOAD_TYPE_DATA).
+     * See the methods below for the other message types.
+     *
      * @param ackIdsRemaining list of messageIds (Long) that should be acked by this packet.  
      *                        The list itself is passed by reference, and if a messageId is
      *                        transmitted and the sender does not want the ID to be included
@@ -231,8 +309,10 @@ public class PacketBuilder {
         return packet;
     }
     
-    // We use this for keepalive purposes.
-    // It doesn't generate a reply, but that's ok.
+    /**
+     * We use this for keepalive purposes.
+     * It doesn't generate a reply, but that's ok.
+     */
     public UDPPacket buildPing(PeerState peer) {
         return buildACK(peer, Collections.EMPTY_LIST);
     }
@@ -1018,6 +1098,9 @@ public class PacketBuilder {
         return packet;
     }
     
+    /**
+     *  Sends an empty unauthenticated packet for hole punching
+     */
     public UDPPacket buildHolePunch(UDPPacketReader reader) {
         UDPPacket packet = UDPPacket.acquire(_context, false);
         byte data[] = packet.getPacket().getData();
@@ -1051,7 +1134,7 @@ public class PacketBuilder {
         return packet;
     }
     
-    private void setTo(UDPPacket packet, InetAddress ip, int port) {
+    private static void setTo(UDPPacket packet, InetAddress ip, int port) {
         packet.getPacket().setAddress(ip);
         packet.getPacket().setPort(port);
     }

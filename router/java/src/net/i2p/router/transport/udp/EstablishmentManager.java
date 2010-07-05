@@ -33,7 +33,7 @@ import net.i2p.util.SimpleTimer;
  * as well as to drop any failed establishment attempts.
  *
  */
-public class EstablishmentManager {
+class EstablishmentManager {
     private final RouterContext _context;
     private final Log _log;
     private final UDPTransport _transport;

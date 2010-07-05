@@ -23,7 +23,7 @@ import net.i2p.util.ConcurrentHashSet;
  * Contain all of the state about a UDP connection to a peer.
  *
  */
-public class PeerState {
+class PeerState {
     private RouterContext _context;
     private Log _log;
     /**

@@ -20,7 +20,7 @@ import net.i2p.util.Log;
 /**
  *
  */
-public class IntroductionManager {
+class IntroductionManager {
     private RouterContext _context;
     private Log _log;
     private UDPTransport _transport;

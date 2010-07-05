@@ -16,7 +16,7 @@ import net.i2p.util.Log;
  * of object instances to allow rapid reuse.
  *
  */
-public class UDPPacket {
+class UDPPacket {
     private I2PAppContext _context;
     private static Log _log;
     private volatile DatagramPacket _packet;
@@ -63,6 +63,8 @@ public class UDPPacket {
     public static final int PAYLOAD_TYPE_RELAY_INTRO = 5;
     public static final int PAYLOAD_TYPE_DATA = 6;
     public static final int PAYLOAD_TYPE_TEST = 7;
+    /** @since 0.8.1 */
+    public static final int PAYLOAD_TYPE_SESSION_DESTROY = 8;
     
     // various flag fields for use in the data packets
     public static final byte DATA_FLAG_EXPLICIT_ACK = (byte)(1 << 7);

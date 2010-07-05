@@ -15,7 +15,7 @@ import net.i2p.util.Log;
  * any outstanding ACKs.  
  *
  */
-public class ACKSender implements Runnable {
+class ACKSender implements Runnable {
     private RouterContext _context;
     private Log _log;
     private UDPTransport _transport;
