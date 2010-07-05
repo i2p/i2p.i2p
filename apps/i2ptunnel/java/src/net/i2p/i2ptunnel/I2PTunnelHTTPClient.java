@@ -644,7 +644,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                     }
                     if (!Boolean.valueOf(getTunnel().getClientOptions().getProperty(PROP_USER_AGENT)).booleanValue()) {
                         // let's not advertise to external sites that we are from I2P
-			UASwitcher ua_switcher = new UASwitcher();
                         if (usingWWWProxy)
                             newRequest.append("User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.2.6) Gecko/20100625 Firefox/3.6.6\r\n");
                         else
