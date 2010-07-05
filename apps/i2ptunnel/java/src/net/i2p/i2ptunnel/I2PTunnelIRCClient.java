@@ -387,7 +387,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
                 // "QUIT", // replace with a filtered QUIT to hide client quit messages
                 "SILENCE",
                 "MAP", // seems safe enough, the ircd should protect themselves though
-                "PART",
+                // "PART", // replace with filtered PART to hide client part messages
                 "OPER",
                 // "PONG", // replaced with a filtered PING/PONG since some clients send the server IP (thanks aardvax!) 
                 // "PING", 
@@ -491,6 +491,11 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
             return ret;
         }
 
+        if ("PART".equals(command)) {
+            // hide client message
+            return "PART " + field[1] + " :leaving";
+        }
+        
         if ("QUIT".equals(command)) {
             return "QUIT :leaving";
         }
