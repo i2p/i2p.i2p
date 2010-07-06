@@ -20,6 +20,7 @@ import net.i2p.client.I2PSessionException;
 import net.i2p.data.DataHelper;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
+import net.i2p.util.SecureFileOutputStream;
 
 /**
  * Coordinate a set of tunnels within the JVM, loading and storing their config
@@ -254,7 +255,7 @@ public class TunnelControllerGroup {
         
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(cfgFile);
+            fos = new SecureFileOutputStream(cfgFile);
             fos.write(buf.toString().getBytes("UTF-8"));
             if (_log.shouldLog(Log.INFO))
                 _log.info("Config written to " + cfgFile.getPath());

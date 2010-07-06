@@ -27,6 +27,7 @@ import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
+import net.i2p.util.SecureFileOutputStream;
 
 public class CreateRouterInfoJob extends JobImpl {
     private static Log _log = new Log(CreateRouterInfoJob.class);
@@ -80,12 +81,12 @@ public class CreateRouterInfoJob extends JobImpl {
             
             String infoFilename = getContext().getProperty(Router.PROP_INFO_FILENAME, Router.PROP_INFO_FILENAME_DEFAULT);
             File ifile = new File(getContext().getRouterDir(), infoFilename);
-            fos1 = new FileOutputStream(ifile);
+            fos1 = new SecureFileOutputStream(ifile);
             info.writeBytes(fos1);
             
             String keyFilename = getContext().getProperty(Router.PROP_KEYS_FILENAME, Router.PROP_KEYS_FILENAME_DEFAULT);
             File kfile = new File(getContext().getRouterDir(), keyFilename);
-            fos2 = new FileOutputStream(kfile);
+            fos2 = new SecureFileOutputStream(kfile);
             privkey.writeBytes(fos2);
             signingPrivKey.writeBytes(fos2);
             pubkey.writeBytes(fos2);

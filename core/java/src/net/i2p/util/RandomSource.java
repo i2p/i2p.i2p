@@ -145,7 +145,7 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
         File f = new File(I2PAppContext.getGlobalContext().getConfigDir(), SEEDFILE);
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(f);
+            fos = new SecureFileOutputStream(f);
             fos.write(buf);
         } catch (IOException ioe) {
             // ignore

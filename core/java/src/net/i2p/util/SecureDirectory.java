@@ -39,6 +39,18 @@ public class SecureDirectory extends File {
     }
 
     /**
+     *  Sets directory to mode 700 if the directory is created
+     *  Does NOT change the mode of other created directories
+     */
+    @Override
+    public boolean mkdirs() {
+        boolean rv = super.mkdirs();
+        if (rv)
+            setPerms();
+        return rv;
+    }
+
+    /**
      *  Tries to set the permissions to 700,
      *  ignores errors
      */

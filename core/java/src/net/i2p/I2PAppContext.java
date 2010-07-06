@@ -31,6 +31,7 @@ import net.i2p.util.KeyRing;
 import net.i2p.util.LogManager;
 //import net.i2p.util.PooledRandomSource;
 import net.i2p.util.RandomSource;
+import net.i2p.util.SecureDirectory;
 
 /**
  * <p>Provide a base scope for accessing singletons that I2P exposes.  Rather than
@@ -217,7 +218,7 @@ public class I2PAppContext {
         // config defaults to base
         s = getProperty("i2p.dir.config");
         if (s != null) {
-            _configDir = new File(s);
+            _configDir = new SecureDirectory(s);
             if (!_configDir.exists())
                 _configDir.mkdir();
         } else {
@@ -226,7 +227,7 @@ public class I2PAppContext {
         // router defaults to config
         s = getProperty("i2p.dir.router");
         if (s != null) {
-            _routerDir = new File(s);
+            _routerDir = new SecureDirectory(s);
             if (!_routerDir.exists())
                 _routerDir.mkdir();
         } else {
@@ -240,7 +241,7 @@ public class I2PAppContext {
         // these all default to router
         s = getProperty("i2p.dir.log");
         if (s != null) {
-            _logDir = new File(s);
+            _logDir = new SecureDirectory(s);
             if (!_logDir.exists())
                 _logDir.mkdir();
         } else {
@@ -248,7 +249,7 @@ public class I2PAppContext {
         }
         s = getProperty("i2p.dir.app");
         if (s != null) {
-            _appDir = new File(s);
+            _appDir = new SecureDirectory(s);
             if (!_appDir.exists())
                 _appDir.mkdir();
         } else {
@@ -278,14 +279,14 @@ public class I2PAppContext {
                 String d = getProperty("i2p.dir.temp", System.getProperty("java.io.tmpdir"));
                 // our random() probably isn't warmed up yet
                 String f = "i2p-" + Math.abs((new java.util.Random()).nextInt()) + ".tmp";
-                _tmpDir = new File(d, f);
+                _tmpDir = new SecureDirectory(d, f);
                 if (_tmpDir.exists()) {
                     // good or bad ?
                 } else if (_tmpDir.mkdir()) {
                     _tmpDir.deleteOnExit();
                 } else {
                     System.err.println("Could not create temp dir " + _tmpDir.getAbsolutePath());
-                    _tmpDir = new File(_routerDir, "tmp");
+                    _tmpDir = new SecureDirectory(_routerDir, "tmp");
                     _tmpDir.mkdir();
                 }
             }

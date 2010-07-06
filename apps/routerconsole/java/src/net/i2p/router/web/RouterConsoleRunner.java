@@ -14,6 +14,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
+import net.i2p.util.SecureDirectory;
 
 import org.mortbay.http.DigestAuthenticator;
 import org.mortbay.http.HashUserRealm;
@@ -62,7 +63,7 @@ public class RouterConsoleRunner {
     }
     
     public void startConsole() {
-        File workDir = new File(I2PAppContext.getGlobalContext().getTempDir(), "jetty-work");
+        File workDir = new SecureDirectory(I2PAppContext.getGlobalContext().getTempDir(), "jetty-work");
         boolean workDirRemoved = FileUtil.rmdir(workDir, false);
         if (!workDirRemoved)
             System.err.println("ERROR: Unable to remove Jetty temporary work directory");
@@ -115,7 +116,7 @@ public class RouterConsoleRunner {
             }
             _server.setRootWebApp(ROUTERCONSOLE);
             WebApplicationContext wac = _server.addWebApplication("/", _webAppsDir + ROUTERCONSOLE + ".war");
-            File tmpdir = new File(workDir, ROUTERCONSOLE + "-" + _listenPort);
+            File tmpdir = new SecureDirectory(workDir, ROUTERCONSOLE + "-" + _listenPort);
             tmpdir.mkdir();
             wac.setTempDirectory(tmpdir);
             baseHandler = new LocaleWebAppHandler(I2PAppContext.getGlobalContext());
@@ -130,7 +131,7 @@ public class RouterConsoleRunner {
                         String enabled = props.getProperty(PREFIX + appName + ENABLED);
                         if (! "false".equals(enabled)) {
                             String path = new File(dir, fileNames[i]).getCanonicalPath();
-                            tmpdir = new File(workDir, appName + "-" + _listenPort);
+                            tmpdir = new SecureDirectory(workDir, appName + "-" + _listenPort);
                             WebAppStarter.addWebApp(I2PAppContext.getGlobalContext(), _server, appName, path, tmpdir);
 
                             if (enabled == null) {

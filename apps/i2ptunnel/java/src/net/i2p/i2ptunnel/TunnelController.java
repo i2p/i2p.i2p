@@ -18,6 +18,7 @@ import net.i2p.data.Base32;
 import net.i2p.data.Destination;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
+import net.i2p.util.SecureFileOutputStream;
 
 /**
  * Coordinate the runtime operation and configuration of a tunnel.  
@@ -84,7 +85,7 @@ public class TunnelController implements Logging {
         }
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(keyFile);
+            fos = new SecureFileOutputStream(keyFile);
             Destination dest = client.createDestination(fos);
             String destStr = dest.toBase64();
             log("Private key created and saved in " + keyFile.getAbsolutePath());

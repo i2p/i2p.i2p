@@ -26,6 +26,7 @@ import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.EepGet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
+import net.i2p.util.SecureDirectory;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.Translate;
@@ -77,7 +78,7 @@ public class I2PSnarkUtil {
         // This is used for both announce replies and .torrent file downloads,
         // so it must be available even if not connected to I2CP.
         // so much for multiple instances
-        _tmpDir = new File(ctx.getTempDir(), "i2psnark");
+        _tmpDir = new SecureDirectory(ctx.getTempDir(), "i2psnark");
         FileUtil.rmdir(_tmpDir, false);
         _tmpDir.mkdirs();
     }

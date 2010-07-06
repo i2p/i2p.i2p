@@ -11,7 +11,6 @@ package net.i2p.util;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -158,7 +157,8 @@ class LogWriter implements Runnable {
         File parent = f.getParentFile();
         if (parent != null) {
             if (!parent.exists()) {
-                boolean ok = parent.mkdirs();
+                File sd = new SecureDirectory(parent.getAbsolutePath());
+                boolean ok = sd.mkdirs();
                 if (!ok) {
                     System.err.println("Unable to create the parent directory: " + parent.getAbsolutePath());
                     //System.exit(0);
@@ -171,7 +171,7 @@ class LogWriter implements Runnable {
         }
         closeFile();
         try {
-            _currentOut = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), "UTF-8"));
+            _currentOut = new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(f), "UTF-8"));
         } catch (IOException ioe) {
             System.err.println("Error rotating into [" + f.getAbsolutePath() + "]" + ioe);
         }

@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.i2p.I2PAppContext;
+import net.i2p.util.SecureDirectory;
 
 /**
  * Main class of addressbook.  Performs updates, and runs the main loop.
@@ -131,11 +132,11 @@ public class Daemon {
         String settingsLocation = "config.txt";
         File homeFile;
         if (args.length > 0) {
-            homeFile = new File(args[0]);
+            homeFile = new SecureDirectory(args[0]);
             if (!homeFile.isAbsolute())
-                homeFile = new File(I2PAppContext.getGlobalContext().getRouterDir(), args[0]);
+                homeFile = new SecureDirectory(I2PAppContext.getGlobalContext().getRouterDir(), args[0]);
         } else {
-            homeFile = new File(System.getProperty("user.dir"));
+            homeFile = new SecureDirectory(System.getProperty("user.dir"));
         }
         
         Map defaultSettings = new HashMap();

@@ -25,15 +25,17 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import net.i2p.util.SecureFileOutputStream;
 
 /**
  * Utility class providing methods to parse and write files in config file
@@ -277,7 +279,7 @@ public class ConfigParser {
      */
     public static void write(Map map, File file) throws IOException {
         ConfigParser
-                .write(map, new BufferedWriter(new FileWriter(file, false)));
+                .write(map, new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(file), "UTF-8")));
     }
 
     /**
@@ -316,7 +318,7 @@ public class ConfigParser {
     public static void writeSubscriptions(List list, File file)
             throws IOException {
         ConfigParser.writeSubscriptions(list, new BufferedWriter(
-                new FileWriter(file, false)));
+                new OutputStreamWriter(new SecureFileOutputStream(file), "UTF-8")));
     }
 
 }

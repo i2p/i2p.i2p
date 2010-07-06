@@ -27,13 +27,13 @@ package i2p.susi.dns;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 
 import net.i2p.I2PAppContext;
+import net.i2p.util.SecureFileOutputStream;
 
 public class ConfigBean implements Serializable {
 	
@@ -111,7 +111,7 @@ public class ConfigBean implements Serializable {
 	{
 		File file = new File( configFileName );
 		try {
-			PrintWriter out = new PrintWriter( new FileOutputStream( file ) );
+			PrintWriter out = new PrintWriter( new SecureFileOutputStream( file ) );
 			out.print( config );
 			out.flush();
 			out.close();

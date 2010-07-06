@@ -21,6 +21,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
+import net.i2p.util.SecureDirectory;
 
 /**
  * Manage multiple snarks
@@ -130,9 +131,9 @@ public class SnarkManager implements Snark.CompleteListener {
     }
     public File getDataDir() { 
         String dir = _config.getProperty(PROP_DIR, "i2psnark");
-        File f = new File(dir);
+        File f = new SecureDirectory(dir);
         if (!f.isAbsolute())
-            f = new File(_context.getAppDir(), dir);
+            f = new SecureDirectory(_context.getAppDir(), dir);
         return f; 
     }
     

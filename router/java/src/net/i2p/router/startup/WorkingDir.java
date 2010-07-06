@@ -11,6 +11,8 @@ import java.io.PrintWriter;
 import java.util.Properties;
 
 import net.i2p.data.DataHelper;
+import net.i2p.util.SecureDirectory;
+import net.i2p.util.SecureFileOutputStream;
 
 /**
  * Get a working directory for i2p.
@@ -64,19 +66,19 @@ public class WorkingDir {
         boolean isWindows = System.getProperty("os.name").startsWith("Win");
         File dirf = null;
         if (dir != null) {
-            dirf = new File(dir);
+            dirf = new SecureDirectory(dir);
         } else {
             String home = System.getProperty("user.home");
             if (isWindows) {
                 String appdata = System.getenv("APPDATA");
                 if (appdata != null)
                     home = appdata;
-                dirf = new File(home, WORKING_DIR_DEFAULT_WINDOWS);
+                dirf = new SecureDirectory(home, WORKING_DIR_DEFAULT_WINDOWS);
             } else {
                 if (DAEMON_USER.equals(System.getProperty("user.name")))
-                    dirf = new File(home, WORKING_DIR_DEFAULT_DAEMON);
+                    dirf = new SecureDirectory(home, WORKING_DIR_DEFAULT_DAEMON);
                 else
-                    dirf = new File(home, WORKING_DIR_DEFAULT);
+                    dirf = new SecureDirectory(home, WORKING_DIR_DEFAULT);
             }
         }
 
@@ -143,7 +145,7 @@ public class WorkingDir {
         // this one must be after MIGRATE_BASE
         success &= migrateJettyXml(oldDirf, dirf);
         success &= migrateClientsConfig(oldDirf, dirf);
-        success &= copy(new File(oldDirf, "docs/news.xml"), new File(dirf, "docs"));
+        success &= copy(new File(oldDirf, "docs/news.xml"), new SecureDirectory(dirf, "docs"));
 
         // Report success or failure
         if (success) {
@@ -197,7 +199,7 @@ public class WorkingDir {
         PrintWriter out = null;
         try {
             in = new FileInputStream(oldFile);
-            out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(newFile), "UTF-8")));
+            out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(newFile), "UTF-8")));
             out.println("# Modified by I2P User dir migration script");
             String s = null;
             boolean isDaemon = DAEMON_USER.equals(System.getProperty("user.name"));
@@ -240,7 +242,7 @@ public class WorkingDir {
         PrintWriter out = null;
         try {
             in = new FileInputStream(oldFile);
-            out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(newFile), "UTF-8")));
+            out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(newFile), "UTF-8")));
             String s = null;
             while ((s = DataHelper.readLine(in)) != null) {
                 if (s.indexOf("./eepsite/") >= 0) {
@@ -270,7 +272,7 @@ public class WorkingDir {
      * @param targetDir the directory to copy to, will be created if it doesn't exist
      * @return true for success OR if src does not exist
      */
-    public static final boolean copy(File src, File targetDir) {
+    private static boolean copy(File src, File targetDir) {
         if (!src.exists())
             return true;
         if (!targetDir.exists()) {
@@ -280,7 +282,8 @@ public class WorkingDir {
             }
             System.err.println("Created " + targetDir.getPath());
         }
-        File targetFile = new File(targetDir, src.getName());
+        // SecureDirectory is a File so this works for non-directories too
+        File targetFile = new SecureDirectory(targetDir, src.getName());
         if (!src.isDirectory())
             return copyFile(src, targetFile);
         File children[] = src.listFiles();
@@ -305,10 +308,10 @@ public class WorkingDir {
     
     /**
      * @param src not a directory, must exist
-     * @param dst not a directory, will be overwritten if existing
+     * @param dst not a directory, will be overwritten if existing, will be mode 600
      * @return true if it was copied successfully
      */
-    public static boolean copyFile(File src, File dst) {
+    private static boolean copyFile(File src, File dst) {
         if (!src.exists()) return false;
         boolean rv = true;
 
@@ -317,7 +320,7 @@ public class WorkingDir {
         FileOutputStream out = null;
         try {
             in = new FileInputStream(src);
-            out = new FileOutputStream(dst);
+            out = new SecureFileOutputStream(dst);
             
             int read = 0;
             while ( (read = in.read(buf)) != -1)
