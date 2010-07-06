@@ -38,8 +38,7 @@ public class Reseeder {
 
     private static final String DEFAULT_SEED_URL =
               "http://a.netdb.i2p2.de/,http://b.netdb.i2p2.de/,http://c.netdb.i2p2.de/," +
-              "http://reseed.i2p-projekt.de/,http://i2pbote.net/netDb/,http://r31453.ovh.net/static_media/netDb/," +
-              "http://p2i.mine.nu/netDb/";
+              "http://reseed.i2p-projekt.de/,http://i2pbote.net/netDb/,http://r31453.ovh.net/static_media/netDb/";
     private static final String PROP_INPROGRESS = "net.i2p.router.web.ReseedHandler.reseedInProgress";
     private static final String PROP_ERROR = "net.i2p.router.web.ReseedHandler.errorMessage";
     private static final String PROP_STATUS = "net.i2p.router.web.ReseedHandler.statusMessage";
