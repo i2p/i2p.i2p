@@ -2,8 +2,7 @@ package net.i2p.crypto;
 
 import gnu.crypto.hash.Sha256Standalone;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
@@ -15,11 +14,9 @@ import net.i2p.data.Hash;
  * 
  */
 public final class SHA256Generator {
-    private List _digests;
-    private final List _digestsGnu;
+    private final LinkedBlockingQueue<Sha256Standalone> _digestsGnu;
     public SHA256Generator(I2PAppContext context) {
-        _digests = new ArrayList(32);
-        _digestsGnu = new ArrayList(32);
+        _digestsGnu = new LinkedBlockingQueue(32);
     }
     
     public static final SHA256Generator getInstance() {
@@ -50,11 +47,7 @@ public final class SHA256Generator {
     }
     
     private Sha256Standalone acquireGnu() {
-        Sha256Standalone rv = null;
-        synchronized (_digestsGnu) {
-            if (!_digestsGnu.isEmpty())
-                rv = (Sha256Standalone)_digestsGnu.remove(0);
-        }
+        Sha256Standalone rv = _digestsGnu.poll();
         if (rv != null)
             rv.reset();
         else
@@ -63,11 +56,7 @@ public final class SHA256Generator {
     }
     
     private void releaseGnu(Sha256Standalone digest) {
-        synchronized (_digestsGnu) {
-            if (_digestsGnu.size() < 32) {
-                _digestsGnu.add(digest);
-            }
-        }
+        _digestsGnu.offer(digest);
     }
     
     public static void main(String args[]) {
