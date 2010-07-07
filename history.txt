@@ -1,12 +1,9 @@
-2010-07-06 duck
-    * susidns: Dutch translation (thanks to monkeybrains)
+2010-07-07 duck
+    * RouterConsole: Add Help & FAQ link, minor label improvements.
 
 2010-07-05 zzz
     * i2psnark: Fix transition to end game
     * I2PTunnelIRCClient: Filter PART messages like we do for QUIT
-
-2010-07-05 duck
-    * I2PTunnel & I2PSnark: Dutch translation (thanks to monkeybrains)
 
 2010-07-04 duck
     * RouterConsole: Dutch translation (thanks to monkeybrains)
