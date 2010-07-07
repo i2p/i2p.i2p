@@ -419,19 +419,19 @@
         </copy>
         <!-- make a "classic" theme -->
         <copy todir="pkg-temp/docs/themes/console/classic/" >
-            <fileset  dir="installer/resources/themes/console/classic/" excludes="**/i2plogo.png" />
+            <fileset  dir="installer/resources/themes/console/classic/" />
         </copy>
         <!-- Add dark theme -->
         <copy todir="pkg-temp/docs/themes/console/dark/" >
-            <fileset  dir="installer/resources/themes/console/dark/" excludes="**/i2plogo.png" />
+            <fileset  dir="installer/resources/themes/console/dark/" />
         </copy>
         <!-- Add light theme -->
         <copy todir="pkg-temp/docs/themes/console/light/" >
-            <fileset  dir="installer/resources/themes/console/light/" excludes="**/i2plogo.png" />
+            <fileset  dir="installer/resources/themes/console/light/" />
         </copy>
          <!-- Add midnight theme -->
         <copy todir="pkg-temp/docs/themes/console/midnight/" >
-            <fileset  dir="installer/resources/themes/console/midnight/" excludes="**/i2plogo.png" />
+            <fileset  dir="installer/resources/themes/console/midnight/" />
         </copy>        
         <!-- Add shared images.. these are subject to flux and change! -->
         <copy todir="pkg-temp/docs/themes/console/images/" >
