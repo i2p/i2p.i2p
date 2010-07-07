@@ -838,7 +838,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (state != null)
             dropPeer(state, shouldShitlist, why);
     }
-    private void dropPeer(PeerState peer, boolean shouldShitlist, String why) {
+
+    void dropPeer(PeerState peer, boolean shouldShitlist, String why) {
         if (_log.shouldLog(Log.WARN)) {
             long now = _context.clock().now();
             StringBuilder buf = new StringBuilder(4096);

@@ -186,6 +186,10 @@ class PacketHandler {
         }
     //}
 
+        /**
+         * Initial handling, called for every packet
+         * Find the state and call the correct receivePacket() variant
+         */
         private void handlePacket(UDPPacketReader reader, UDPPacket packet) {
             if (packet == null) return;
 
@@ -229,6 +233,10 @@ class PacketHandler {
             }
         }
 
+        /**
+         * Established conn
+         * Decrypt and validate the packet then call handlePacket()
+         */
         private void receivePacket(UDPPacketReader reader, UDPPacket packet, PeerState state) {
             _state = 17;
             boolean isValid = packet.validate(state.getCurrentMACKey());
@@ -280,6 +288,12 @@ class PacketHandler {
             _state = 26;
         }
 
+        /**
+         * New conn or failed validation
+         * Decrypt and validate the packet then call handlePacket()
+         *
+         * @param peerType OUTBOUND_FALLBACK, INBOUND_FALLBACK, or NEW_PEER
+         */
         private void receivePacket(UDPPacketReader reader, UDPPacket packet, short peerType) {
             _state = 27;
             boolean isValid = packet.validate(_transport.getIntroKey());
@@ -314,7 +328,11 @@ class PacketHandler {
         private void receivePacket(UDPPacketReader reader, UDPPacket packet, InboundEstablishState state) {
             receivePacket(reader, packet, state, true);
         }
+
         /**
+         * Inbound establishing conn
+         * Decrypt and validate the packet then call handlePacket()
+         *
          * @param allowFallback if it isn't valid for this establishment state, try as a non-establishment packet
          */
         private void receivePacket(UDPPacketReader reader, UDPPacket packet, InboundEstablishState state, boolean allowFallback) {
@@ -355,6 +373,10 @@ class PacketHandler {
             }
         }
 
+        /**
+         * Outbound establishing conn
+         * Decrypt and validate the packet then call handlePacket()
+         */
         private void receivePacket(UDPPacketReader reader, UDPPacket packet, OutboundEstablishState state) {
             _state = 35;
             if ( (state != null) && (_log.shouldLog(Log.DEBUG)) ) {
@@ -406,6 +428,10 @@ class PacketHandler {
 
         /**
          * Parse out the interesting bits and honor what it says
+         *
+         * @param state non-null if fully established
+         * @param outState non-null if outbound establishing in process
+         * @param inState unused always null
          */
         private void handlePacket(UDPPacketReader reader, UDPPacket packet, PeerState state, OutboundEstablishState outState, InboundEstablishState inState) {
             _state = 43;
@@ -527,7 +553,12 @@ class PacketHandler {
                     break;
                 case UDPPacket.PAYLOAD_TYPE_SESSION_DESTROY:
                     _state = 53;
-                    //_TODO
+                    if (outState != null)
+                        _establisher.receiveSessionDestroy(from, outState);
+                    else if (state != null)
+                        _establisher.receiveSessionDestroy(from, state);
+                    else
+                        _establisher.receiveSessionDestroy(from);
                     break;
                 default:
                     _state = 52;

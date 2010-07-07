@@ -317,6 +317,40 @@ class EstablishmentManager {
     }
 
     /**
+     * Got a SessionDestroy on an established conn
+     */
+    void receiveSessionDestroy(RemoteHostId from, PeerState state) {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Receive session destroy (EST) from: " + from);
+        _transport.dropPeer(state, false, "received destroy message");
+    }
+
+    /**
+     * Got a SessionDestroy during outbound establish
+     */
+    void receiveSessionDestroy(RemoteHostId from, OutboundEstablishState state) {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Receive session destroy (OB) from: " + from);
+        _outboundStates.remove(from);
+        Hash peer = state.getRemoteIdentity().calculateHash();
+        _transport.dropPeer(peer, false, "received destroy message");
+    }
+
+    /**
+     * Got a SessionDestroy - maybe after an inbound establish
+     */
+    void receiveSessionDestroy(RemoteHostId from) {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Receive session destroy (IB) from: " + from);
+        InboundEstablishState state = _inboundStates.remove(from);
+        if (state != null) {
+            Hash peer = state.getConfirmedIdentity().calculateHash();
+            if (peer != null)
+                _transport.dropPeer(peer, false, "received destroy message");
+        }
+    }
+
+    /**
      * A data packet arrived on an outbound connection being established, which
      * means its complete (yay!).  This is a blocking call, more than I'd like...
      *
