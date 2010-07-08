@@ -46,6 +46,7 @@ public class TunnelController implements Logging {
     public TunnelController(Properties config, String prefix) {
         this(config, prefix, true);
     }
+
     /**
      * 
      * @param createKey for servers, whether we want to create a brand new destination
@@ -58,17 +59,21 @@ public class TunnelController implements Logging {
         setConfig(config, prefix);
         _messages = new ArrayList(4);
         _running = false;
+        boolean keyOK = true;
         if (createKey && (getType().endsWith("server") || getPersistentClientKey()))
-            createPrivateKey();
-        _starting = getStartOnLoad();
+            keyOK = createPrivateKey();
+        _starting = keyOK && getStartOnLoad();
     }
     
-    private void createPrivateKey() {
+    /**
+     * @return success
+     */
+    private boolean createPrivateKey() {
         I2PClient client = I2PClientFactory.createClient();
         String filename = getPrivKeyFile();
         if ( (filename == null) || (filename.trim().length() <= 0) ) {
             log("No filename specified for the private key");
-            return;
+            return false;
         }
         
         File keyFile = new File(getPrivKeyFile());
@@ -76,7 +81,7 @@ public class TunnelController implements Logging {
             keyFile = new File(I2PAppContext.getGlobalContext().getConfigDir(), getPrivKeyFile());
         if (keyFile.exists()) {
             //log("Not overwriting existing private keys in " + keyFile.getAbsolutePath());
-            return;
+            return true;
         } else {
             File parent = keyFile.getParentFile();
             if ( (parent != null) && (!parent.exists()) )
@@ -94,13 +99,16 @@ public class TunnelController implements Logging {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error creating new destination", ie);
             log("Error creating new destination: " + ie.getMessage());
+            return false;
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error creating writing the destination to " + keyFile.getAbsolutePath(), ioe);
             log("Error writing the keys to " + keyFile.getAbsolutePath());
+            return false;
         } finally {
             if (fos != null) try { fos.close(); } catch (IOException ioe) {}
         }
+        return true;
     }
     
     public void startTunnelBackground() {
@@ -126,6 +134,10 @@ public class TunnelController implements Logging {
         }
         _starting = false;
     }
+
+    /**
+     *  @throws IllegalArgumentException via methods in I2PTunnel
+     */
     private void doStartTunnel() {
         if (_running) {
             if (_log.shouldLog(Log.INFO))

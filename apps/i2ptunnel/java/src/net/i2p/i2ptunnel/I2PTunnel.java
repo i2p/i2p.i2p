@@ -390,10 +390,10 @@ public class I2PTunnel implements Logging, EventDispatcher {
             if (!privKeyFile.isAbsolute())
                 privKeyFile = new File(_context.getConfigDir(), args[2]);
             if (!privKeyFile.canRead()) {
-                l.log("private key file does not exist");
+                l.log(getPrefix() + "Private key file does not exist or is not readable: " + args[2]);
                 _log.error(getPrefix() + "Private key file does not exist or is not readable: " + args[2]);
                 notifyEvent("serverTaskId", Integer.valueOf(-1));
-                return;
+                throw new IllegalArgumentException(getPrefix() + "Cannot open private key file " + args[2]);
             }
             I2PTunnelServer serv = new I2PTunnelServer(serverHost, portNum, privKeyFile, args[2], l, (EventDispatcher) this, this);
             serv.setReadTimeout(readTimeout);
@@ -441,10 +441,10 @@ public class I2PTunnel implements Logging, EventDispatcher {
             if (!privKeyFile.isAbsolute())
                 privKeyFile = new File(_context.getConfigDir(), args[2]);
             if (!privKeyFile.canRead()) {
-                l.log("private key file does not exist");
+                l.log(getPrefix() + "Private key file does not exist or is not readable: " + args[2]);
                 _log.error(getPrefix() + "Private key file does not exist or is not readable: " + args[2]);
                 notifyEvent("serverTaskId", Integer.valueOf(-1));
-                return;
+                throw new IllegalArgumentException(getPrefix() + "Cannot open private key file " + args[2]);
             }
             I2PTunnelServer serv = new I2PTunnelIRCServer(serverHost, portNum, privKeyFile, args[2], l, (EventDispatcher) this, this);
             serv.setReadTimeout(readTimeout);
@@ -502,10 +502,10 @@ public class I2PTunnel implements Logging, EventDispatcher {
             if (!privKeyFile.isAbsolute())
                 privKeyFile = new File(_context.getConfigDir(), args[3]);
             if (!privKeyFile.canRead()) {
-                l.log("private key file does not exist");
+                l.log(getPrefix() + "Private key file does not exist or is not readable: " + args[3]);
                 _log.error(getPrefix() + "Private key file does not exist or is not readable: " + args[3]);
                 notifyEvent("serverTaskId", Integer.valueOf(-1));
-                return;
+                throw new IllegalArgumentException(getPrefix() + "Cannot open private key file " + args[3]);
             }
             I2PTunnelHTTPServer serv = new I2PTunnelHTTPServer(serverHost, portNum, privKeyFile, args[3], spoofedHost, l, (EventDispatcher) this, this);
             serv.setReadTimeout(readTimeout);
@@ -577,10 +577,10 @@ public class I2PTunnel implements Logging, EventDispatcher {
             if (!privKeyFile.isAbsolute())
                 privKeyFile = new File(_context.getConfigDir(), args[4]);
             if (!privKeyFile.canRead()) {
-                l.log("private key file does not exist");
+                l.log(getPrefix() + "Private key file does not exist or is not readable: " + args[4]);
                 _log.error(getPrefix() + "Private key file does not exist or is not readable: " + args[4]);
                 notifyEvent("serverTaskId", Integer.valueOf(-1));
-                return;
+                throw new IllegalArgumentException(getPrefix() + "Cannot open private key file " + args[4]);
             }
 
             I2PTunnelHTTPBidirServer serv = new I2PTunnelHTTPBidirServer(serverHost, portNum, port2Num, privKeyFile, args[3], spoofedHost, l, (EventDispatcher) this, this);

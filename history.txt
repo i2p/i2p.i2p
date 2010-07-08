@@ -1,3 +1,6 @@
+2010-07-08 zzz
+    * I2PTunnel: More error propagation fixes
+
 2010-07-07 duck
     * RouterConsole: Add Help & FAQ link, minor label improvements.
 
