@@ -202,7 +202,8 @@ public class SnarkManager implements Snark.CompleteListener {
         }
         if (i2cpHost != null) {
             _util.setI2CPConfig(i2cpHost, i2cpPort, i2cpOpts);
-            _log.debug("Configuring with I2CP options " + i2cpOpts);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Configuring with I2CP options " + i2cpOpts);
         }
         //I2PSnarkUtil.instance().setI2CPConfig("66.111.51.110", 7654, new Properties());
         //String eepHost = _config.getProperty(PROP_EEP_HOST);
@@ -332,8 +333,9 @@ public class SnarkManager implements Snark.CompleteListener {
                     p.putAll(opts);
                     _util.setI2CPConfig(i2cpHost, port, p);
                     addMessage(_("I2CP and tunnel changes will take effect after stopping all torrents"));
-                    _log.debug("i2cp host [" + i2cpHost + "] i2cp port " + port + " opts [" + opts 
-                               + "] oldOpts [" + oldOpts + "]");
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("i2cp host [" + i2cpHost + "] i2cp port " + port + " opts [" + opts 
+                                   + "] oldOpts [" + oldOpts + "]");
                 } else {
                     if (_util.connected()) {
                         _util.disconnect();
@@ -712,7 +714,8 @@ public class SnarkManager implements Snark.CompleteListener {
             getBWLimit();
             while (true) {
                 File dir = getDataDir();
-                _log.debug("Directory Monitor loop over " + dir.getAbsolutePath());
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Directory Monitor loop over " + dir.getAbsolutePath());
                 try {
                     monitorTorrents(dir);
                 } catch (Exception e) {

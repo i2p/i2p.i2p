@@ -92,7 +92,8 @@ public class Peer implements Comparable
     byte[] id  = handshake(in, out);
     this.peerID = new PeerID(id, sock.getPeerDestination());
     _id = ++__id;
-    _log.debug("Creating a new peer with " + peerID.getAddress().calculateHash().toBase64(), new Exception("creating " + _id));
+    if (_log.shouldLog(Log.DEBUG))
+        _log.debug("Creating a new peer with " + peerID.getAddress().calculateHash().toBase64(), new Exception("creating " + _id));
   }
 
   /**
@@ -182,14 +183,16 @@ public class Peer implements Comparable
     if (state != null)
       throw new IllegalStateException("Peer already started");
 
-    _log.debug("Running connection to " + peerID.getAddress().calculateHash().toBase64(), new Exception("connecting"));    
+    if (_log.shouldLog(Log.DEBUG))
+        _log.debug("Running connection to " + peerID.getAddress().calculateHash().toBase64(), new Exception("connecting"));    
     try
       {
         // Do we need to handshake?
         if (din == null)
           {
             sock = util.connect(peerID);
-            _log.debug("Connected to " + peerID + ": " + sock);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Connected to " + peerID + ": " + sock);
             if ((sock == null) || (sock.isClosed())) {
                 throw new IOException("Unable to reach " + peerID);
             }
@@ -208,17 +211,20 @@ public class Peer implements Comparable
             //  = new BufferedOutputStream(sock.getOutputStream());
             byte [] id = handshake(in, out); //handshake(bis, bos);
             byte [] expected_id = peerID.getID();
-            if (expected_id == null)
+            if (expected_id == null) {
                 peerID.setID(id);
-            else if (Arrays.equals(expected_id, id))
-                _log.debug("Handshake got matching IDs with " + toString());
-            else
+            } else if (Arrays.equals(expected_id, id)) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Handshake got matching IDs with " + toString());
+            } else {
                 throw new IOException("Unexpected peerID '"
                                     + PeerID.idencode(id)
                                     + "' expected '"
                                     + PeerID.idencode(expected_id) + "'");
+            }
           } else {
-            _log.debug("Already have din [" + sock + "] with " + toString());
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Already have din [" + sock + "] with " + toString());
           }
         
         PeerConnectionIn in = new PeerConnectionIn(this, din);
@@ -233,7 +239,8 @@ public class Peer implements Comparable
         state = s;
         listener.connected(this);
   
-        _log.debug("Start running the reader with " + toString());
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Start running the reader with " + toString());
         // Use this thread for running the incomming connection.
         // The outgoing connection creates its own Thread.
         out.startup();
@@ -283,7 +290,8 @@ public class Peer implements Comparable
     dout.write(my_id);
     dout.flush();
     
-    _log.debug("Wrote my shared hash and ID to " + toString());
+    if (_log.shouldLog(Log.DEBUG))
+        _log.debug("Wrote my shared hash and ID to " + toString());
     
     // Handshake read - header
     byte b = din.readByte();
@@ -310,7 +318,8 @@ public class Peer implements Comparable
 
     // Handshake read - peer id
     din.readFully(bs);
-    _log.debug("Read the remote side's hash and peerID fully from " + toString());
+    if (_log.shouldLog(Log.DEBUG))
+        _log.debug("Read the remote side's hash and peerID fully from " + toString());
     return bs;
   }
 

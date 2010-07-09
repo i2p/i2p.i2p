@@ -228,7 +228,8 @@ public class I2PSnarkUtil {
     public File get(String url, boolean rewrite) { return get(url, rewrite, 0); }
     public File get(String url, int retries) { return get(url, true, retries); }
     public File get(String url, boolean rewrite, int retries) {
-        _log.debug("Fetching [" + url + "] proxy=" + _proxyHost + ":" + _proxyPort + ": " + _shouldProxy);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Fetching [" + url + "] proxy=" + _proxyHost + ":" + _proxyPort + ": " + _shouldProxy);
         File out = null;
         try {
             // we could use the system tmp dir but deleteOnExit() doesn't seem to work on all platforms...
@@ -252,10 +253,12 @@ public class I2PSnarkUtil {
         }
         EepGet get = new I2PSocketEepGet(_context, _manager, retries, out.getAbsolutePath(), fetchURL);
         if (get.fetch()) {
-            _log.debug("Fetch successful [" + url + "]: size=" + out.length());
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Fetch successful [" + url + "]: size=" + out.length());
             return out;
         } else {
-            _log.warn("Fetch failed [" + url + "]");
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Fetch failed [" + url + "]");
             out.delete();
             return null;
         }
