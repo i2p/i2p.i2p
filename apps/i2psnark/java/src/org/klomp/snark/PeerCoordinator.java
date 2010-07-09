@@ -373,7 +373,8 @@ public class PeerCoordinator implements PeerListener
 
     if (need_more)
       {
-        _log.debug("Adding a peer " + peer.getPeerID().getAddress().calculateHash().toBase64() + " for " + metainfo.getName(), new Exception("add/run"));
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Adding a peer " + peer.getPeerID().toString() + " for " + metainfo.getName(), new Exception("add/run"));
 
         // Run the peer with us as listener and the current bitfield.
         final PeerListener listener = this;

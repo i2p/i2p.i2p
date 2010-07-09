@@ -129,7 +129,7 @@ public class Peer implements Comparable
     @Override
   public int hashCode()
   {
-    return peerID.hashCode() ^ (2 << _id);
+    return peerID.hashCode() ^ (7777 * (int)_id);
   }
 
   /**
@@ -150,6 +150,7 @@ public class Peer implements Comparable
 
   /**
    * Compares the PeerIDs.
+   * @deprecated unused?
    */
   public int compareTo(Object o)
   {
@@ -207,12 +208,15 @@ public class Peer implements Comparable
             //  = new BufferedOutputStream(sock.getOutputStream());
             byte [] id = handshake(in, out); //handshake(bis, bos);
             byte [] expected_id = peerID.getID();
-            if (!Arrays.equals(expected_id, id))
-              throw new IOException("Unexpected peerID '"
+            if (expected_id == null)
+                peerID.setID(id);
+            else if (Arrays.equals(expected_id, id))
+                _log.debug("Handshake got matching IDs with " + toString());
+            else
+                throw new IOException("Unexpected peerID '"
                                     + PeerID.idencode(id)
                                     + "' expected '"
                                     + PeerID.idencode(expected_id) + "'");
-            _log.debug("Handshake got matching IDs with " + toString());
           } else {
             _log.debug("Already have din [" + sock + "] with " + toString());
           }

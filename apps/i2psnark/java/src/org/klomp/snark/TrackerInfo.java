@@ -33,11 +33,17 @@ import org.klomp.snark.bencode.BDecoder;
 import org.klomp.snark.bencode.BEValue;
 import org.klomp.snark.bencode.InvalidBEncodingException;
 
+/**
+ *  The data structure for the tracker response.
+ *  Handles both traditional and compact formats.
+ *  Compact format 1 - a list of hashes - implemented
+ *  Compact format 2 - One big string of concatenated hashes - unimplemented
+ */
 public class TrackerInfo
 {
   private final String failure_reason;
   private final int interval;
-  private final Set peers;
+  private final Set<Peer> peers;
   private int complete;
   private int incomplete;
 
@@ -76,6 +82,7 @@ public class TrackerInfo
         if (bePeers == null)
           peers = Collections.EMPTY_SET;
         else
+          // if compact is going to be one big string instead, try/catch here
           peers = getPeers(bePeers.getList(), my_id, metainfo);
 
         BEValue bev = (BEValue)m.get("complete");
@@ -94,33 +101,39 @@ public class TrackerInfo
       }
   }
 
-  public static Set getPeers(InputStream in, byte[] my_id, MetaInfo metainfo)
+/******
+  public static Set<Peer> getPeers(InputStream in, byte[] my_id, MetaInfo metainfo)
     throws IOException
   {
     return getPeers(new BDecoder(in), my_id, metainfo);
   }
 
-  public static Set getPeers(BDecoder be, byte[] my_id, MetaInfo metainfo)
+  public static Set<Peer> getPeers(BDecoder be, byte[] my_id, MetaInfo metainfo)
     throws IOException
   {
     return getPeers(be.bdecodeList().getList(), my_id, metainfo);
   }
+******/
 
-  public static Set getPeers(List l, byte[] my_id, MetaInfo metainfo)
+  private static Set<Peer> getPeers(List<BEValue> l, byte[] my_id, MetaInfo metainfo)
     throws IOException
   {
-    Set peers = new HashSet(l.size());
+    Set<Peer> peers = new HashSet(l.size());
 
-    Iterator it = l.iterator();
-    while (it.hasNext())
-      {
+    for (BEValue bev : l) {
         PeerID peerID;
         try {
-            peerID = new PeerID(((BEValue)it.next()).getMap());
+            // Case 1 - non-compact - A list of dictionaries (maps)
+            peerID = new PeerID(bev.getMap());
         } catch (InvalidBEncodingException ibe) {
-            // don't let one bad entry spoil the whole list
-            //Snark.debug("Discarding peer from list: " + ibe, Snark.ERROR);
-            continue;
+            try {
+                // Case 2 - compact - A list of 32-byte binary strings (hashes)
+                peerID = new PeerID(bev.getBytes());
+            } catch (InvalidBEncodingException ibe2) {
+                // don't let one bad entry spoil the whole list
+                //Snark.debug("Discarding peer from list: " + ibe, Snark.ERROR);
+                continue;
+            }
         }
         peers.add(new Peer(peerID, my_id, metainfo));
       }
@@ -128,7 +141,7 @@ public class TrackerInfo
     return peers;
   }
 
-  public Set getPeers()
+  public Set<Peer> getPeers()
   {
     return peers;
   }

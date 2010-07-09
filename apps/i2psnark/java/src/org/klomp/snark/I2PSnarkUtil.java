@@ -197,11 +197,14 @@ public class I2PSnarkUtil {
     
     /** connect to the given destination */
     I2PSocket connect(PeerID peer) throws IOException {
-        Hash dest = peer.getAddress().calculateHash();
+        Destination addr = peer.getAddress();
+        if (addr == null)
+            throw new IOException("Null address");
+        Hash dest = addr.calculateHash();
         if (_shitlist.contains(dest))
             throw new IOException("Not trying to contact " + dest.toBase64() + ", as they are shitlisted");
         try {
-            I2PSocket rv = _manager.connect(peer.getAddress());
+            I2PSocket rv = _manager.connect(addr);
             if (rv != null)
                 _shitlist.remove(dest);
             return rv;
