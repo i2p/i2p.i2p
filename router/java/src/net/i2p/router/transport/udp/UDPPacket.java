@@ -55,6 +55,7 @@ class UDPPacket {
     public static final int IV_SIZE = 16;
     public static final int MAC_SIZE = 16;
     
+    /** Message types, 4 bits max */
     public static final int PAYLOAD_TYPE_SESSION_REQUEST = 0;
     public static final int PAYLOAD_TYPE_SESSION_CREATED = 1;
     public static final int PAYLOAD_TYPE_SESSION_CONFIRMED = 2;

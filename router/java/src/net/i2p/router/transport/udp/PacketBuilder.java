@@ -4,7 +4,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import net.i2p.I2PAppContext;
@@ -156,7 +155,9 @@ class PacketBuilder {
      *                        included, it should be removed from the list.
      */
     public UDPPacket buildPacket(OutboundMessageState state, int fragment, PeerState peer, List<Long> ackIdsRemaining, List<ACKBitfield> partialACKsRemaining) {
-        UDPPacket packet = UDPPacket.acquire(_context, false);
+        UDPPacket packet = buildPacketHeader((byte)(UDPPacket.PAYLOAD_TYPE_DATA << 4));
+        byte data[] = packet.getPacket().getData();
+        int off = HEADER_SIZE;
 
         StringBuilder msg = null;
         boolean acksIncluded = false;
@@ -167,19 +168,6 @@ class PacketBuilder {
             if (fragment == state.getFragmentCount() - 1)
                 msg.append("*");
         }
-        
-        byte data[] = packet.getPacket().getData();
-        Arrays.fill(data, 0, data.length, (byte)0x0);
-        int start = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
-        int off = start;
-        
-        // header
-        data[off] |= (UDPPacket.PAYLOAD_TYPE_DATA << 4);
-        // todo: add support for rekeying and extended options
-        off++;
-        long now = _context.clock().now() / 1000;
-        DataHelper.toLong(data, off, 4, now);
-        off += 4;
         
         // ok, now for the body...
         
@@ -322,11 +310,14 @@ class PacketBuilder {
     /**
      *  Build the ack packet. The list need not be sorted into full and partial;
      *  this method will put all fulls before the partials in the outgoing packet.
+     *  An ack packet is just a data packet with no data.
      *
      * @param ackBitfields list of ACKBitfield instances to either fully or partially ACK
      */
     public UDPPacket buildACK(PeerState peer, List<ACKBitfield> ackBitfields) {
-        UDPPacket packet = UDPPacket.acquire(_context, false);
+        UDPPacket packet = buildPacketHeader((byte)(UDPPacket.PAYLOAD_TYPE_DATA << 4));
+        byte data[] = packet.getPacket().getData();
+        int off = HEADER_SIZE;
         
         StringBuilder msg = null;
         if (_log.shouldLog(Log.DEBUG)) {
@@ -334,18 +325,6 @@ class PacketBuilder {
             msg.append("building ACK packet to ").append(peer.getRemotePeer().toBase64().substring(0,6));
         }
 
-        byte data[] = packet.getPacket().getData();
-        Arrays.fill(data, 0, data.length, (byte)0x0);
-        int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
-        
-        // header
-        data[off] |= (UDPPacket.PAYLOAD_TYPE_DATA << 4);
-        // todo: add support for rekeying and extended options
-        off++;
-        long now = _context.clock().now() / 1000;
-        DataHelper.toLong(data, off, 4, now);
-        off += 4;
-        
         int fullACKCount = 0;
         int partialACKCount = 0;
         for (int i = 0; i < ackBitfields.size(); i++) {
@@ -432,7 +411,9 @@ class PacketBuilder {
      * @return ready to send packet, or null if there was a problem
      */
     public UDPPacket buildSessionCreatedPacket(InboundEstablishState state, int externalPort, SessionKey ourIntroKey) {
-        UDPPacket packet = UDPPacket.acquire(_context, false);
+        UDPPacket packet = buildPacketHeader(SESSION_CREATED_FLAG_BYTE);
+        byte data[] = packet.getPacket().getData();
+        int off = HEADER_SIZE;
         
         InetAddress to = null;
         try {
@@ -445,17 +426,6 @@ class PacketBuilder {
         }
 
         state.prepareSessionCreated();
-        
-        byte data[] = packet.getPacket().getData();
-        Arrays.fill(data, 0, data.length, (byte)0x0);
-        int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
-        
-        // header
-        data[off] = SESSION_CREATED_FLAG_BYTE;
-        off++;
-        long now = _context.clock().now() / 1000;
-        DataHelper.toLong(data, off, 4, now);
-        off += 4;
         
         byte sentIP[] = state.getSentIP();
         if ( (sentIP == null) || (sentIP.length <= 0) || ( (_transport != null) && (!_transport.isValid(sentIP)) ) ) {
@@ -535,7 +505,10 @@ class PacketBuilder {
      * @return ready to send packet, or null if there was a problem
      */
     public UDPPacket buildSessionRequestPacket(OutboundEstablishState state) {
-        UDPPacket packet = UDPPacket.acquire(_context, false);
+        UDPPacket packet = buildPacketHeader(SESSION_REQUEST_FLAG_BYTE);
+        byte data[] = packet.getPacket().getData();
+        int off = HEADER_SIZE;
+
         byte toIP[] = state.getSentIP();
         if ( (_transport !=null) && (!_transport.isValid(toIP)) ) {
             packet.release();
@@ -550,19 +523,8 @@ class PacketBuilder {
             packet.release();
             return null;
         }
-        
-        byte data[] = packet.getPacket().getData();
-        Arrays.fill(data, 0, data.length, (byte)0x0);
-        int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
-        
-        // header
-        data[off] = SESSION_REQUEST_FLAG_BYTE;
-        off++;
-        long now = _context.clock().now() / 1000;
-        DataHelper.toLong(data, off, 4, now);
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Sending request with time = " + new Date(now*1000));
-        off += 4;
+            _log.debug("Sending request");
         
         // now for the body
         System.arraycopy(state.getSentX(), 0, data, off, state.getSentX().length);
@@ -622,7 +584,10 @@ class PacketBuilder {
      * @return ready to send packets, or null if there was a problem
      */
     public UDPPacket buildSessionConfirmedPacket(OutboundEstablishState state, int fragmentNum, int numFragments, byte identity[]) {
-        UDPPacket packet = UDPPacket.acquire(_context, false);
+        UDPPacket packet = buildPacketHeader(SESSION_CONFIRMED_FLAG_BYTE);
+        byte data[] = packet.getPacket().getData();
+        int off = HEADER_SIZE;
+
         InetAddress to = null;
         try {
             to = InetAddress.getByAddress(state.getSentIP());
@@ -632,17 +597,6 @@ class PacketBuilder {
             packet.release();
             return null;
         }
-        
-        byte data[] = packet.getPacket().getData();
-        Arrays.fill(data, 0, data.length, (byte)0x0);
-        int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
-        
-        // header
-        data[off] = SESSION_CONFIRMED_FLAG_BYTE;
-        off++;
-        long now = _context.clock().now() / 1000;
-        DataHelper.toLong(data, off, 4, now);
-        off += 4;
         
         // now for the body
         data[off] |= fragmentNum << 4;
@@ -699,6 +653,36 @@ class PacketBuilder {
     }
 
     
+    /**
+     *  Build a destroy packet, which contains a header but no body.
+     *
+     *  @since 0.8.1
+     */
+    public UDPPacket buildSessionDestroyPacket(PeerState peer) {
+        UDPPacket packet = buildPacketHeader((byte)(UDPPacket.PAYLOAD_TYPE_SESSION_DESTROY << 4));
+        byte data[] = packet.getPacket().getData();
+        int off = HEADER_SIZE;
+        
+        StringBuilder msg = null;
+        if (_log.shouldLog(Log.DEBUG)) {
+            msg = new StringBuilder(128);
+            msg.append("building session destroy packet to ").append(peer.getRemotePeer().toBase64().substring(0,6));
+        }
+
+        // no body in this message
+
+        if (msg != null)
+            _log.debug(msg.toString());
+        
+        // pad up so we're on the encryption boundary
+        if ( (off % 16) != 0)
+            off += 16 - (off % 16);
+        packet.getPacket().setLength(off);
+        authenticate(packet, peer.getCurrentCipherKey(), peer.getCurrentMACKey());
+        setTo(packet, peer.getRemoteIPAddress(), peer.getRemotePort());
+        return packet;
+    }
+    
     /** 
      * full flag info for a peerTest message.  this can be fixed, 
      * since we never rekey on test, and don't need any extended options
@@ -715,19 +699,11 @@ class PacketBuilder {
         return buildPeerTestFromAlice(toIP, toPort, toIntroKey, toIntroKey, nonce, aliceIntroKey);
     }
     public UDPPacket buildPeerTestFromAlice(InetAddress toIP, int toPort, SessionKey toCipherKey, SessionKey toMACKey, long nonce, SessionKey aliceIntroKey) {
-        UDPPacket packet = UDPPacket.acquire(_context, false);
+        UDPPacket packet = buildPacketHeader(PEER_TEST_FLAG_BYTE);
         byte data[] = packet.getPacket().getData();
-        Arrays.fill(data, 0, data.length, (byte)0x0);
-        int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
-        
-        // header
-        data[off] = PEER_TEST_FLAG_BYTE;
-        off++;
-        long now = _context.clock().now() / 1000;
-        DataHelper.toLong(data, off, 4, now);
+        int off = HEADER_SIZE;
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Sending peer test " + nonce + " to Bob with time = " + new Date(now*1000));
-        off += 4;
+            _log.debug("Sending peer test " + nonce + " to Bob");
         
         // now for the body
         DataHelper.toLong(data, off, 4, nonce);
@@ -757,19 +733,11 @@ class PacketBuilder {
      * @return ready to send packet, or null if there was a problem
      */
     public UDPPacket buildPeerTestToAlice(InetAddress aliceIP, int alicePort, SessionKey aliceIntroKey, SessionKey charlieIntroKey, long nonce) {
-        UDPPacket packet = UDPPacket.acquire(_context, false);
+        UDPPacket packet = buildPacketHeader(PEER_TEST_FLAG_BYTE);
         byte data[] = packet.getPacket().getData();
-        Arrays.fill(data, 0, data.length, (byte)0x0);
-        int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
-        
-        // header
-        data[off] = PEER_TEST_FLAG_BYTE;
-        off++;
-        long now = _context.clock().now() / 1000;
-        DataHelper.toLong(data, off, 4, now);
+        int off = HEADER_SIZE;
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Sending peer test " + nonce + " to Alice with time = " + new Date(now*1000));
-        off += 4;
+            _log.debug("Sending peer test " + nonce + " to Alice");
         
         // now for the body
         DataHelper.toLong(data, off, 4, nonce);
@@ -804,19 +772,11 @@ class PacketBuilder {
     public UDPPacket buildPeerTestToCharlie(InetAddress aliceIP, int alicePort, SessionKey aliceIntroKey, long nonce, 
                                             InetAddress charlieIP, int charliePort, 
                                             SessionKey charlieCipherKey, SessionKey charlieMACKey) {
-        UDPPacket packet = UDPPacket.acquire(_context, false);
+        UDPPacket packet = buildPacketHeader(PEER_TEST_FLAG_BYTE);
         byte data[] = packet.getPacket().getData();
-        Arrays.fill(data, 0, data.length, (byte)0x0);
-        int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
-        
-        // header
-        data[off] = PEER_TEST_FLAG_BYTE;
-        off++;
-        long now = _context.clock().now() / 1000;
-        DataHelper.toLong(data, off, 4, now);
+        int off = HEADER_SIZE;
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Sending peer test " + nonce + " to Charlie with time = " + new Date(now*1000));
-        off += 4;
+            _log.debug("Sending peer test " + nonce + " to Charlie");
         
         // now for the body
         DataHelper.toLong(data, off, 4, nonce);
@@ -849,19 +809,11 @@ class PacketBuilder {
      * @return ready to send packet, or null if there was a problem
      */
     public UDPPacket buildPeerTestToBob(InetAddress bobIP, int bobPort, InetAddress aliceIP, int alicePort, SessionKey aliceIntroKey, long nonce, SessionKey bobCipherKey, SessionKey bobMACKey) {
-        UDPPacket packet = UDPPacket.acquire(_context, false);
+        UDPPacket packet = buildPacketHeader(PEER_TEST_FLAG_BYTE);
         byte data[] = packet.getPacket().getData();
-        Arrays.fill(data, 0, data.length, (byte)0x0);
-        int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
-        
-        // header
-        data[off] = PEER_TEST_FLAG_BYTE;
-        off++;
-        long now = _context.clock().now() / 1000;
-        DataHelper.toLong(data, off, 4, now);
+        int off = HEADER_SIZE;
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Sending peer test " + nonce + " to Bob with time = " + new Date(now*1000));
-        off += 4;
+            _log.debug("Sending peer test " + nonce + " to Bob");
         
         // now for the body
         DataHelper.toLong(data, off, 4, nonce);
@@ -925,22 +877,15 @@ class PacketBuilder {
     }
     
     public UDPPacket buildRelayRequest(InetAddress introHost, int introPort, byte introKey[], long introTag, SessionKey ourIntroKey, long introNonce, boolean encrypt) {
-        UDPPacket packet = UDPPacket.acquire(_context, false);
+        UDPPacket packet = buildPacketHeader(PEER_RELAY_REQUEST_FLAG_BYTE);
         byte data[] = packet.getPacket().getData();
-        Arrays.fill(data, 0, data.length, (byte)0x0);
-        int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
+        int off = HEADER_SIZE;
         
         byte ourIP[] = getOurExplicitIP();
         int ourPort = getOurExplicitPort();
         
-        // header
-        data[off] = PEER_RELAY_REQUEST_FLAG_BYTE;
-        off++;
-        long now = _context.clock().now() / 1000;
-        DataHelper.toLong(data, off, 4, now);
         if (_log.shouldLog(Log.INFO))
             _log.info("Sending intro relay request to " + introHost + ":" + introPort); // + " regarding " + state.getRemoteIdentity().calculateHash().toBase64());
-        off += 4;
         
         // now for the body
         DataHelper.toLong(data, off, 4, introTag);
@@ -994,19 +939,11 @@ class PacketBuilder {
     private static final byte PEER_RELAY_INTRO_FLAG_BYTE = (UDPPacket.PAYLOAD_TYPE_RELAY_INTRO << 4);
     
     UDPPacket buildRelayIntro(RemoteHostId alice, PeerState charlie, UDPPacketReader.RelayRequestReader request) {
-        UDPPacket packet = UDPPacket.acquire(_context, false);
+        UDPPacket packet = buildPacketHeader(PEER_RELAY_INTRO_FLAG_BYTE);
         byte data[] = packet.getPacket().getData();
-        Arrays.fill(data, 0, data.length, (byte)0x0);
-        int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
-        
-        // header
-        data[off] = PEER_RELAY_INTRO_FLAG_BYTE;
-        off++;
-        long now = _context.clock().now() / 1000;
-        DataHelper.toLong(data, off, 4, now);
+        int off = HEADER_SIZE;
         if (_log.shouldLog(Log.INFO))
             _log.info("Sending intro to " + charlie + " for " + alice);
-        off += 4;
         
         // now for the body
         byte ip[] = alice.getIP();
@@ -1051,17 +988,9 @@ class PacketBuilder {
             return null;
         }
         
-        UDPPacket packet = UDPPacket.acquire(_context, false);
+        UDPPacket packet = buildPacketHeader(PEER_RELAY_RESPONSE_FLAG_BYTE);
         byte data[] = packet.getPacket().getData();
-        Arrays.fill(data, 0, data.length, (byte)0x0);
-        int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
-        
-        // header
-        data[off] = PEER_RELAY_RESPONSE_FLAG_BYTE;
-        off++;
-        long now = _context.clock().now() / 1000;
-        DataHelper.toLong(data, off, 4, now);
-        off += 4;
+        int off = HEADER_SIZE;
         
         if (_log.shouldLog(Log.INFO))
             _log.info("Sending relay response to " + alice + " for " + charlie + " with alice's intro key " + aliceIntroKey.toBase64());
@@ -1105,7 +1034,6 @@ class PacketBuilder {
         UDPPacket packet = UDPPacket.acquire(_context, false);
         byte data[] = packet.getPacket().getData();
         Arrays.fill(data, 0, data.length, (byte)0x0);
-        int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
         
         int ipSize = reader.getRelayIntroReader().readIPSize();
         byte ip[] = new byte[ipSize];
@@ -1134,6 +1062,33 @@ class PacketBuilder {
         return packet;
     }
     
+    /** if no extended options or rekey data, which we don't support */
+    private static final int HEADER_SIZE = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE + 1 + 4;
+
+    /**
+     *  Create a new packet and add the flag byte and the time stamp.
+     *  Caller should add data starting at HEADER_SIZE.
+     *  At this point, adding support for extended options and rekeying is unlikely,
+     *  but if we do, we'll have to change this.
+     *
+     *  @param flagByte contains type and flags
+     *  @since 0.8.1
+     */
+    private UDPPacket buildPacketHeader(byte flagByte) {
+        UDPPacket packet = UDPPacket.acquire(_context, false);
+        byte data[] = packet.getPacket().getData();
+        Arrays.fill(data, 0, data.length, (byte)0x0);
+        int off = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE;
+        
+        // header
+        data[off] = flagByte;
+        off++;
+        long now = _context.clock().now() / 1000;
+        DataHelper.toLong(data, off, 4, now);
+        // todo: add support for rekeying and extended options
+        return packet;
+    }
+
     private static void setTo(UDPPacket packet, InetAddress ip, int port) {
         packet.getPacket().setAddress(ip);
         packet.getPacket().setPort(port);
