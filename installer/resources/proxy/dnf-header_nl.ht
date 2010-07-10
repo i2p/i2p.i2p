@@ -5,7 +5,7 @@ Connection: close
 Proxy-Connection: close
 
 <html><head>
-<title>I2P Warning: Eepsite niet bereikbaar</title>
+<title>I2P Waarschuwing: Eepsite niet bereikbaar</title>
 <link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico" >
 <link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css" >
 </head>
@@ -15,7 +15,7 @@ Proxy-Connection: close
  <a href="http://127.0.0.1:7657/config.jsp">Configuratie</a> <a href="http://127.0.0.1:7657/help.jsp">Help</a> <a href="http://127.0.0.1:7657/susidns/index.jsp">Adresboek</a>
 </div>
 <div class=warning id=warning>
-<h3>Warning: Eepsite Onbereikbaar</h3>
+<h3>Waarschuwing: Eepsite Onbereikbaar</h3>
 De eepsite was niet bereikbaar.
 De eepsite is offline, er is een netwerk verstopping,
 of je router is niet goed geïntegreerd met peers.

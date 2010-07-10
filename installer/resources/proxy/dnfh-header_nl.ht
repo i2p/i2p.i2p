@@ -5,7 +5,7 @@ Connection: close
 Proxy-Connection: close
 
 <html><head>
-<title>I2P Warning: Eepsite onbekend</title>
+<title>I2P Waarschuwing: Eepsite onbekend</title>
 <link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico" >
 <link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css" >
 </head>
