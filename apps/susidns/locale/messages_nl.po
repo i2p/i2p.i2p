@@ -500,7 +500,6 @@ msgid "The subscription file contains a list of i2p URLs."
 msgstr "Het subscription bestand bevat een lijst met i2p URLs."
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:134
-#, fuzzy
 msgid ""
 "The addressbook application regularly checks this list for new eepsites."
 msgstr ""
