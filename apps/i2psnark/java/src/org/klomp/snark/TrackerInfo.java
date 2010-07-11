@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,8 +35,8 @@ import org.klomp.snark.bencode.InvalidBEncodingException;
 /**
  *  The data structure for the tracker response.
  *  Handles both traditional and compact formats.
- *  Compact format 1 - a list of hashes - implemented
- *  Compact format 2 - One big string of concatenated hashes - unimplemented
+ *  Compact format 1 - a list of hashes - early format for testing
+ *  Compact format 2 - One big string of concatenated hashes - official format
  */
 public class TrackerInfo
 {
@@ -79,11 +78,19 @@ public class TrackerInfo
           interval = beInterval.getInt();
 
         BEValue bePeers = (BEValue)m.get("peers");
-        if (bePeers == null)
+        if (bePeers == null) {
           peers = Collections.EMPTY_SET;
-        else
-          // if compact is going to be one big string instead, try/catch here
-          peers = getPeers(bePeers.getList(), my_id, metainfo);
+        } else {
+            Set<Peer> p;
+            try {
+              // One big string (the official compact format)
+              p = getPeers(bePeers.getBytes(), my_id, metainfo);
+            } catch (InvalidBEncodingException ibe) {
+              // List of Dictionaries or List of Strings
+              p = getPeers(bePeers.getList(), my_id, metainfo);
+            }
+            peers = p;
+        }
 
         BEValue bev = (BEValue)m.get("complete");
         if (bev != null) try {
@@ -115,6 +122,7 @@ public class TrackerInfo
   }
 ******/
 
+  /** List of Dictionaries or List of Strings */
   private static Set<Peer> getPeers(List<BEValue> l, byte[] my_id, MetaInfo metainfo)
     throws IOException
   {
@@ -128,12 +136,41 @@ public class TrackerInfo
         } catch (InvalidBEncodingException ibe) {
             try {
                 // Case 2 - compact - A list of 32-byte binary strings (hashes)
+                // This was just for testing and is not the official format
                 peerID = new PeerID(bev.getBytes());
             } catch (InvalidBEncodingException ibe2) {
                 // don't let one bad entry spoil the whole list
                 //Snark.debug("Discarding peer from list: " + ibe, Snark.ERROR);
                 continue;
             }
+        }
+        peers.add(new Peer(peerID, my_id, metainfo));
+      }
+
+    return peers;
+  }
+
+  private static final int HASH_LENGTH = 32;
+
+  /**
+   *  One big string of concatenated 32-byte hashes
+   *  @since 0.8.1
+   */
+  private static Set<Peer> getPeers(byte[] l, byte[] my_id, MetaInfo metainfo)
+    throws IOException
+  {
+    int count = l.length / HASH_LENGTH;
+    Set<Peer> peers = new HashSet(count);
+
+    for (int i = 0; i < count; i++) {
+        PeerID peerID;
+        byte[] hash = new byte[HASH_LENGTH];
+        System.arraycopy(l, i * HASH_LENGTH, hash, 0, HASH_LENGTH);
+        try {
+            peerID = new PeerID(hash);
+        } catch (InvalidBEncodingException ibe) {
+            // won't happen
+            continue;
         }
         peers.add(new Peer(peerID, my_id, metainfo));
       }
