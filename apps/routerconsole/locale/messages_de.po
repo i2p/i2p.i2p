@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-07-08 08:03+0000\n"
-"PO-Revision-Date: 2010-07-08 10:18+0100\n"
+"PO-Revision-Date: 2010-07-26 14:04+0100\n"
 "Last-Translator: echelon <echelon@i2pmail.org>\n"
 "Language-Team: echelon <echelon@mail.i2p>, Sperreingang <sperrbezirk@mail.i2p>\n"
 "MIME-Version: 1.0\n"
@@ -3441,7 +3441,7 @@ msgstr "Jetzt"
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:63
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:280
 msgid "configure"
-msgstr "ändere"
+msgstr "ändern"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:65
 msgid "dead"
@@ -3482,7 +3482,7 @@ msgstr "Aufgabe"
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:74
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:156
 msgid "Usage"
-msgstr "Benutzt"
+msgstr "Datenmenge"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:107
 msgid "grace period"
@@ -3512,7 +3512,7 @@ msgstr "Verbrauchte Bandbreite über die aktive Zeit"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:156
 msgid "Expiry"
-msgstr "Verfallzeit"
+msgstr "Restzeit"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:159
 msgid "Participants"
@@ -3950,11 +3950,11 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:303
 msgid "KBps In"
-msgstr "kbit/s Eingehend"
+msgstr "kbyte/s Eingehend"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:317
 msgid "KBps Out"
-msgstr "kbit/s Ausgehend"
+msgstr "kbyte/s Ausgehend"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:333
 msgid "Share"
