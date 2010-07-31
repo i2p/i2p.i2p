@@ -34,8 +34,8 @@ import java.math.BigInteger;
 import net.i2p.util.NativeBigInteger;
 
 /**
- * Primes for ElGamal and DSA from
- * http://www.ietf.org/proceedings/03mar/I-D/draft-ietf-ipsec-ike-modp-groups-05.txt
+ * Prime for ElGamal from http://tools.ietf.org/html/rfc3526
+ * Primes for DSA: unknown.
  */
 public class CryptoConstants {
     public static final BigInteger dsap = new NativeBigInteger(
