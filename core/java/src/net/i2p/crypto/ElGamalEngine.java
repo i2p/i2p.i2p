@@ -45,7 +45,7 @@ import net.i2p.util.RandomSource;
 /** 
  * Wrapper for ElGamal encryption/signature schemes.
  *
- * Does all of Elgamal now for data sizes of 223 bytes and less.  The data to be
+ * Does all of Elgamal now for data sizes of 222 bytes and less.  The data to be
  * encrypted is first prepended with a random nonzero byte, then the 32 bytes
  * making up the SHA256 of the data, then the data itself.  The random byte and 
  * the SHA256 hash is stripped on decrypt so the original data is returned.
