@@ -1463,6 +1463,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
     /**
      * Create a new destination, storing the destination and its private keys where 
      * instructed
+     * Deprecated - only used by CLI
      *
      * @param writeTo location to store the private keys
      * @param pubDest location to store the destination
@@ -1487,6 +1488,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
 
     /**
      * Read in the given destination, display it, and write it to the given location
+     * Deprecated - only used by CLI
      *
      * @param readFrom stream to read the destination from
      * @param pubDest stream to write the destination to
@@ -1508,6 +1510,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
 
     /**
      * Write out the destination to the stream
+     * Deprecated - only used by CLI
      *
      * @param d Destination to write
      * @param o stream to write the destination to
@@ -1525,6 +1528,9 @@ public class I2PTunnel implements Logging, EventDispatcher {
      * also supported, where filename is a file that either contains a 
      * binary Destination structure or the Base64 encoding of that 
      * structure.
+     *
+     * Since file:<filename> isn't really used, this method is deprecated,
+     * just call context.namingService.lookup() directly.
      */
     public static Destination destFromName(String name) throws DataFormatException {
 

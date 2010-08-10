@@ -703,6 +703,9 @@ public class EstablishState {
      * - 4 byte i2p network time as known by the remote side (seconds since the epoch)
      * - uninterpreted padding data, up to byte 223
      * - xor of the local router's identity hash and the SHA256 of bytes 32 through bytes 223
+     *
+     * @return should always be false since nobody ever sends a check info message
+     *
      */
     private static boolean isCheckInfo(I2PAppContext ctx, Hash us, byte first256[]) {
         Log log = ctx.logManager().getLog(EstablishState.class);
@@ -742,6 +745,8 @@ public class EstablishState {
         }
     }
 
+    /** @deprecated unused */
+/*********
     public static void checkHost(String args[]) {
         if (args.length != 3) {
             System.err.println("Usage: EstablishState ipOrHostname portNum peerHashBase64");
@@ -779,7 +784,9 @@ public class EstablishState {
             e.printStackTrace();
         }
     }
+*******/
 
+/*******
     public static void main(String args[]) {
         if (args.length == 3) {
             checkHost(args);
@@ -943,6 +950,7 @@ public class EstablishState {
             e.printStackTrace();
         }
     }
+*******/
 
     /**
      *  Mark a string for extraction by xgettext and translation.

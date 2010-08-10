@@ -98,6 +98,10 @@ public class DataHelper {
     /**
      * Write a mapping to the stream, as defined by the I2P data structure spec,
      * and store it into a Properties object.  See readProperties for the format.
+     * Property keys and values must not contain '=' or ';', this is not checked and they are not escaped
+     * Keys and values must be 255 bytes or less,
+     * Formatted length must not exceed 65535 bytes
+     * @throws DataFormatException if either is too long.
      *
      * @param rawStream stream to write to
      * @param props properties to write out
@@ -111,6 +115,11 @@ public class DataHelper {
 
     /**
      * Writes the props to the stream, sorted by property name.
+     * See readProperties() for the format.
+     * Property keys and values must not contain '=' or ';', this is not checked and they are not escaped
+     * Keys and values must be 255 bytes or less,
+     * Formatted length must not exceed 65535 bytes
+     * @throws DataFormatException if either is too long.
      *
      * jrandom disabled UTF-8 in mid-2004, for performance reasons,
      * i.e. slow foo.getBytes("UTF-8")
@@ -151,8 +160,19 @@ public class DataHelper {
     }
     
     /*
-     * Reads the props from the byte array
-     * @param props returned OrderedProperties (sorted by property name)
+     * Writes the props to the byte array, sorted
+     * See readProperties() for the format.
+     * Property keys and values must not contain '=' or ';', this is not checked and they are not escaped
+     * Keys and values must be 255 bytes or less,
+     * @throws DataFormatException if too long.
+     * Formatted length must not exceed 65535 bytes
+     * Should throw DataFormatException if too long but it doesn't.
+     * Warning - confusing method name, Properties is the source.
+     *
+     * @deprecated unused
+     *
+     * @param target returned array as specified in data structure spec
+     * @param props source
      * @return new offset
      */
     public static int toProperties(byte target[], int offset, Properties props) throws DataFormatException, IOException {
@@ -185,8 +205,14 @@ public class DataHelper {
     }
     
     /**
-     * Writes the props to the byte array, not sorted
-     * (unless the target param is an OrderedProperties)
+     * Reads the props from the byte array and puts them in the Properties target
+     * See readProperties() for the format.
+     * Warning - confusing method name, Properties is the target.
+     *
+     * @deprecated unused
+     *
+     * @param source source
+     * @param target returned Properties
      * @return new offset
      */
     public static int fromProperties(byte source[], int offset, Properties target) throws DataFormatException, IOException {
@@ -214,6 +240,15 @@ public class DataHelper {
     /**
      * Writes the props to returned byte array, not sorted
      * (unless the opts param is an OrderedProperties)
+     * See readProperties() for the format.
+     * Property keys and values must not contain '=' or ';', this is not checked and they are not escaped
+     * Keys and values must be 255 bytes or less,
+     * Formatted length must not exceed 65535 bytes
+     * Warning - confusing method name, Properties is the source.
+     *
+     * @deprecated unused
+     *
+     * @throws RuntimeException if either is too long.
      */
     public static byte[] toProperties(Properties opts) {
         try {
@@ -604,6 +639,7 @@ public class DataHelper {
      * @throws DataFormatException if the boolean is not valid
      * @throws IOException if there is an IO error reading the boolean
      * @return boolean value, or null
+     * @deprecated unused
      */
     public static Boolean readBoolean(InputStream in) throws DataFormatException, IOException {
         int val = (int) readLong(in, 1);
@@ -626,6 +662,7 @@ public class DataHelper {
      * @param bool boolean value, or null
      * @throws DataFormatException if the boolean is not valid
      * @throws IOException if there is an IO error writing the boolean
+     * @deprecated unused
      */
     public static void writeBoolean(OutputStream out, Boolean bool) 
         throws DataFormatException, IOException {
@@ -637,6 +674,7 @@ public class DataHelper {
             writeLong(out, 1, BOOLEAN_FALSE);
     }
     
+    /** @deprecated unused */
     public static Boolean fromBoolean(byte data[], int offset) {
         if (data[offset] == BOOLEAN_TRUE)
             return Boolean.TRUE;
@@ -646,9 +684,12 @@ public class DataHelper {
             return null;
     }
     
+    /** @deprecated unused */
     public static void toBoolean(byte data[], int offset, boolean value) {
         data[offset] = (value ? BOOLEAN_TRUE : BOOLEAN_FALSE);
     }
+
+    /** @deprecated unused */
     public static void toBoolean(byte data[], int offset, Boolean value) {
         if (value == null)
             data[offset] = BOOLEAN_UNKNOWN;
@@ -656,9 +697,13 @@ public class DataHelper {
             data[offset] = (value.booleanValue() ? BOOLEAN_TRUE : BOOLEAN_FALSE);
     }
     
+    /** deprecated - used only in DatabaseLookupMessage */
     public static final byte BOOLEAN_TRUE = 0x1;
+    /** deprecated - used only in DatabaseLookupMessage */
     public static final byte BOOLEAN_FALSE = 0x0;
+    /** @deprecated unused */
     public static final byte BOOLEAN_UNKNOWN = 0x2;
+    /** @deprecated unused */
     public static final int BOOLEAN_LENGTH = 1;
 
     //

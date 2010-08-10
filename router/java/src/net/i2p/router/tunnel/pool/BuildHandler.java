@@ -498,6 +498,8 @@ class BuildHandler {
         long nextId = req.readNextTunnelId();
         boolean isInGW = req.readIsInboundGateway();
         boolean isOutEnd = req.readIsOutboundEndpoint();
+        // time is in hours, and only for log below - what's the point?
+        // tunnel-alt-creation.html specifies that this is enforced +/- 1 hour but it is not.
         long time = req.readRequestTime();
         long now = (_context.clock().now() / (60l*60l*1000l)) * (60*60*1000);
         int ourSlot = -1;
