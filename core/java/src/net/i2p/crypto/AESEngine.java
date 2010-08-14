@@ -18,7 +18,8 @@ import net.i2p.util.RandomSource;
 
 /** 
  * Dummy wrapper for AES cipher operation.
- *
+ * UNUSED unless i2p.encryption = off
+ * See CryptixAESEngine for the real thing.
  */
 public class AESEngine {
     private Log _log;
@@ -145,7 +146,10 @@ public class AESEngine {
         _log.warn("Warning: AES is disabled");
     }
 
-    
+    /**
+     *   Just copies payload to out
+     *   @param sessionKey unused
+     */
     public void encryptBlock(byte payload[], int inIndex, SessionKey sessionKey, byte out[], int outIndex) {
         System.arraycopy(payload, inIndex, out, outIndex, out.length - outIndex);
     }
@@ -158,6 +162,7 @@ public class AESEngine {
         System.arraycopy(payload, inIndex, rv, outIndex, rv.length - outIndex);
     }
     
+/******
     public static void main(String args[]) {
         I2PAppContext ctx = new I2PAppContext();
         SessionKey key = ctx.keyGenerator().generateSessionKey();
@@ -178,4 +183,5 @@ public class AESEngine {
         byte ld[] = ctx.aes().safeDecrypt(le, key, iv);
         ctx.logManager().getLog(AESEngine.class).debug("Long test: " + DataHelper.eq(ld, lbuf));
     }
+******/
 }

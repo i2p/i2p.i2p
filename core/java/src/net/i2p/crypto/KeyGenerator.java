@@ -25,7 +25,7 @@ import net.i2p.util.Log;
 import net.i2p.util.NativeBigInteger;
 import net.i2p.util.RandomSource;
 
-/** Define a way of generating asymetrical key pairs as well as symetrical keys
+/** Define a way of generating asymmetrical key pairs as well as symmetrical keys
  * @author jrandom
  */
 public class KeyGenerator {
@@ -157,7 +157,7 @@ public class KeyGenerator {
      * Pad the buffer w/ leading 0s or trim off leading bits so the result is the
      * given length.  
      */
-    final static byte[] padBuffer(byte src[], int length) {
+    private final static byte[] padBuffer(byte src[], int length) {
         byte buf[] = new byte[length];
 
         if (src.length > buf.length) // extra bits, chop leading bits
@@ -171,6 +171,7 @@ public class KeyGenerator {
         return buf;
     }
 
+/******
     public static void main(String args[]) {
         Log log = new Log("keygenTest");
         RandomSource.getInstance().nextBoolean();
@@ -222,4 +223,5 @@ public class KeyGenerator {
         } catch (InterruptedException ie) { // nop
         }
     }
+******/
 }

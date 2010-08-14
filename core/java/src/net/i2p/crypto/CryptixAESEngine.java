@@ -126,6 +126,7 @@ public class CryptixAESEngine extends AESEngine {
         _prevCache.release(curA);
     }
     
+    /** encrypt exactly 16 bytes using the session key */
     @Override
     public final void encryptBlock(byte payload[], int inIndex, SessionKey sessionKey, byte out[], int outIndex) {
         if (sessionKey.getPreparedKey() == null) {
@@ -166,6 +167,7 @@ public class CryptixAESEngine extends AESEngine {
         CryptixRijndael_Algorithm.blockDecrypt(payload, rv, inIndex, outIndex, sessionKey.getPreparedKey(), 16);
     }
     
+/********
     public static void main(String args[]) {
         I2PAppContext ctx = new I2PAppContext();
         try {
@@ -278,4 +280,5 @@ public class CryptixAESEngine extends AESEngine {
         else
             System.out.println("block D(E(orig)) == orig");
     }
+*******/
 }

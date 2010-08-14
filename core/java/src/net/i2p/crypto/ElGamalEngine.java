@@ -66,10 +66,10 @@ public class ElGamalEngine {
     public ElGamalEngine(I2PAppContext context) {
         context.statManager().createRateStat("crypto.elGamal.encrypt",
                                              "how long does it take to do a full ElGamal encryption", "Encryption",
-                                             new long[] { 60 * 1000, 60 * 60 * 1000, 24 * 60 * 60 * 1000});
+                                             new long[] { 60 * 60 * 1000});
         context.statManager().createRateStat("crypto.elGamal.decrypt",
                                              "how long does it take to do a full ElGamal decryption", "Encryption",
-                                             new long[] { 60 * 1000, 60 * 60 * 1000, 24 * 60 * 60 * 1000});
+                                             new long[] { 60 * 60 * 1000});
         _context = context;
         _log = context.logManager().getLog(ElGamalEngine.class);
     }
@@ -85,9 +85,9 @@ public class ElGamalEngine {
     }
 
     /** encrypt the data to the public key
-     * @return encrypted data
+     * @return encrypted data, will be about twice as big as the cleartext
      * @param publicKey public key encrypt to
-     * @param data data to encrypt
+     * @param data data to encrypt, must be 222 bytes or less
      */
     public byte[] encrypt(byte data[], PublicKey publicKey) {
         if ((data == null) || (data.length >= 223))
@@ -156,7 +156,7 @@ public class ElGamalEngine {
     }
 
     /** Decrypt the data
-     * @param encrypted encrypted data
+     * @param encrypted encrypted data, must be 514 bytes or less
      * @param privateKey private key to decrypt with
      * @return unencrypted data
      */

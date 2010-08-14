@@ -598,6 +598,8 @@ public class UDPPacketReader {
                 _log.debug("read alice port: " + rv);
             return rv;
         }
+
+        /** unused */
         public int readChallengeSize() {
             int offset = readBodyOffset() + 4;
             offset += DataHelper.fromLong(_message, offset, 1);
@@ -608,6 +610,8 @@ public class UDPPacketReader {
                 _log.debug("read challenge size: " + rv);
             return rv;
         }
+
+        /** unused */
         public void readChallengeSize(byte target[], int targetOffset) {
             int offset = readBodyOffset() + 4;
             offset += DataHelper.fromLong(_message, offset, 1);
@@ -668,6 +672,8 @@ public class UDPPacketReader {
             offset++;
             return (int)DataHelper.fromLong(_message, offset, 2);
         }
+
+        /** unused */
         public int readChallengeSize() {
             int offset = readBodyOffset();
             offset += DataHelper.fromLong(_message, offset, 1);
@@ -675,6 +681,8 @@ public class UDPPacketReader {
             offset += 2;
             return (int)DataHelper.fromLong(_message, offset, 1);
         }
+
+        /** unused */
         public void readChallengeSize(byte target[], int targetOffset) {
             int offset = readBodyOffset();
             offset += DataHelper.fromLong(_message, offset, 1);

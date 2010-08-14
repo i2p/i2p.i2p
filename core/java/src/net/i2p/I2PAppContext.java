@@ -210,6 +210,7 @@ public class I2PAppContext {
     *  need to look there as well.
     *
     *  All dirs except the base are created if they don't exist, but the creation will fail silently.
+    *  @since 0.7.6
     */
     private void initializeDirs() {
         String s = getProperty("i2p.dir.base", System.getProperty("user.dir"));
@@ -265,12 +266,78 @@ public class I2PAppContext {
         ******/
     }
 
+    /**
+     *  This is the installation dir, often referred to as $I2P.
+     *  Applilcations should consider this directory read-only and never
+     *  attempt to write to it.
+     *  It may actually be read-only on a multi-user installation.
+     *  The config files in this directory are templates for user
+     *  installations and should not be accessed by applications.
+     *  The only thing that may be useful in here is the lib/ dir
+     *  containing the .jars.
+     *  @since 0.7.6
+     *  @return dir constant for the life of the context
+     */
     public File getBaseDir() { return _baseDir; }
+
+    /**
+     *  The base dir for config files.
+     *  Applications may use this to access router configuration files if necessary.
+     *  Usually ~/.i2p on Linux and %APPDIR%\I2P on Windows.
+     *  In installations originally installed with 0.7.5 or earlier, and in
+     *  "portable" installations, this will be the same as the base dir.
+     *  @since 0.7.6
+     *  @return dir constant for the life of the context
+     */
     public File getConfigDir() { return _configDir; }
+
+    /**
+     *  Where the router keeps its files.
+     *  Applications should not use this.
+     *  The same as the config dir for now.
+     *  @since 0.7.6
+     *  @return dir constant for the life of the context
+     */
     public File getRouterDir() { return _routerDir; }
+
+    /**
+     *  Where router.ping goes.
+     *  Applications should not use this.
+     *  The same as the system temp dir for now.
+     *  Which is a problem for multi-user installations.
+     *  @since 0.7.6
+     *  @return dir constant for the life of the context
+     */
     public File getPIDDir() { return _pidDir; }
+
+    /**
+     *  Where the router keeps its log directory.
+     *  Applications should not use this.
+     *  The same as the config dir for now.
+     *  (i.e. ~/.i2p, NOT ~/.i2p/logs)
+     *  @since 0.7.6
+     *  @return dir constant for the life of the context
+     */
     public File getLogDir() { return _logDir; }
+
+    /**
+     *  Where applications may store data.
+     *  The same as the config dir for now, but may change in the future.
+     *  Apps should be careful not to overwrite router files.
+     *  @since 0.7.6
+     *  @return dir constant for the life of the context
+     */
     public File getAppDir() { return _appDir; }
+
+    /**
+     *  Where anybody may store temporary data.
+     *  This is a directory created in the system temp dir on the
+     *  first call in this context, and is deleted on JVM exit.
+     *  Applications should create their own directory inside this directory
+     *  to avoid collisions with other apps.
+     *  @since 0.7.6
+     *  @return dir constant for the life of the context
+     */
     public File getTempDir() {
         // fixme don't synchronize every time
         synchronized (this) {
