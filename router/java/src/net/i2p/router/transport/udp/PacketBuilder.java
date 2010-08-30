@@ -607,6 +607,7 @@ public class PacketBuilder {
             // pad here if we want.  maybe randomized?
 
             // pad up so we're on the encryption boundary
+            // TODO: why not random data?
             if ( (off % 16) != 0)
                 off += 16 - (off % 16);
             packet.getPacket().setLength(off);

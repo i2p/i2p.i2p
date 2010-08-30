@@ -85,9 +85,17 @@ public class ElGamalEngine {
     }
 
     /** encrypt the data to the public key
-     * @return encrypted data, will be about twice as big as the cleartext
+     * @return encrypted data, will be exactly 514 bytes long
+     *         Contains the two-part encrypted data starting at bytes 0 and 257.
+     *         If the encrypted parts are smaller than 257 bytes, they will be
+     *         padded with leading zeros.
+     *         The parts appear to always be 256 bytes or less, in other words,
+     *         bytes 0 and 257 are always zero.
      * @param publicKey public key encrypt to
      * @param data data to encrypt, must be 222 bytes or less
+     *         As the encrypted data may contain a substantial number of zeros if the
+     *         cleartext is smaller than 222 bytes, it is recommended that the caller pad
+     *         the cleartext to 222 bytes with random data.
      */
     public byte[] encrypt(byte data[], PublicKey publicKey) {
         if ((data == null) || (data.length >= 223))
@@ -97,6 +105,7 @@ public class ElGamalEngine {
         long start = _context.clock().now();
 
         byte d2[] = new byte[1+Hash.HASH_LENGTH+data.length];
+        // FIXME this isn't a random nonzero byte!
         d2[0] = (byte)0xFF;
         Hash hash = _context.sha().calculateHash(data);
         System.arraycopy(hash.getData(), 0, d2, 1, Hash.HASH_LENGTH);
@@ -156,11 +165,15 @@ public class ElGamalEngine {
     }
 
     /** Decrypt the data
-     * @param encrypted encrypted data, must be 514 bytes or less
+     * @param encrypted encrypted data, must be exactly 514 bytes
+     *         Contains the two-part encrypted data starting at bytes 0 and 257.
+     *         If the encrypted parts are smaller than 257 bytes, they must be
+     *         padded with leading zeros.
      * @param privateKey private key to decrypt with
-     * @return unencrypted data
+     * @return unencrypted data or null on failure
      */
     public byte[] decrypt(byte encrypted[], PrivateKey privateKey) {
+        // actually it must be exactly 514 bytes or the arraycopy below will AIOOBE
         if ((encrypted == null) || (encrypted.length > 514))
             throw new IllegalArgumentException("Data to decrypt must be <= 514 bytes at the moment");
         long start = _context.clock().now();

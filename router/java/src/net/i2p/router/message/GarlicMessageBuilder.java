@@ -35,6 +35,7 @@ public class GarlicMessageBuilder {
 
     /**
      *  This was 100 since 0.6.1.10 (50 before that). It's important because:
+     * <pre>
      *  - Tags are 32 bytes. So it previously added 3200 bytes to an initial message.
      *  - Too many tags adds a huge overhead to short-duration connections
      *    (like http, datagrams, etc.)
@@ -43,14 +44,17 @@ public class GarlicMessageBuilder {
      *  - This reduces the effective maximum datagram size because the client
      *    doesn't know when tags will be bundled, so the tag size must be
      *    subtracted from the maximum I2NP size or transport limit.
+     * </pre>
      *
      *  Issues with too small a value:
+     * <pre>
      *  - When tags are sent, a reply leaseset (~1KB) is always bundled.
      *    Maybe don't need to bundle more than every minute or so
      *    rather than every time?
      *  - Does the number of tags (and the threshold of 20) limit the effective
      *    streaming lib window size? Should the threshold and the number of
      *    sent tags be variable based on the message rate?
+     * </pre>
      *
      *  We have to be very careful if we implement an adaptive scheme,
      *  since the key manager is per-router, not per-local-dest.
@@ -218,6 +222,7 @@ public class GarlicMessageBuilder {
         
         byte cloveSet[] = buildCloveSet(ctx, config);
         
+        // TODO - 128 is the minimum padded size - should it be more? less? random?
         byte encData[] = ctx.elGamalAESEngine().encrypt(cloveSet, target, encryptKey, wrappedTags, encryptTag, 128);
         msg.setData(encData);
         msg.setMessageExpiration(config.getExpiration());
