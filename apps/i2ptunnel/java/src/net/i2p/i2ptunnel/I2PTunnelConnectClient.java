@@ -26,6 +26,7 @@ import net.i2p.util.Log;
 
 /**
  * Supports the following:
+ *<pre>
  *   (where protocol is generally HTTP/1.1 but is ignored)
  *   (where host is one of:
  *      example.i2p
@@ -39,16 +40,19 @@ import net.i2p.util.Log;
  *   CONNECT host protocol
  *   CONNECT host:port
  *   CONNECT host:port protocol (this is the standard)
+ *</pre>
  *
  * Additional lines after the CONNECT line but before the blank line are ignored and stripped.
  * The CONNECT line is removed for .i2p accesses
  * but passed along for outproxy accesses.
  *
  * Ref:
+ *<pre>
  *  INTERNET-DRAFT                                              Ari Luotonen
  *  Expires: September 26, 1997          Netscape Communications Corporation
  *  <draft-luotonen-ssl-tunneling-03.txt>                     March 26, 1997
  *                     Tunneling SSL Through a WWW Proxy
+ *</pre>
  *
  * @author zzz a stripped-down I2PTunnelHTTPClient
  */

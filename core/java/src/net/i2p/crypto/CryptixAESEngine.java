@@ -41,11 +41,13 @@ public class CryptixAESEngine extends AESEngine {
         _cache = new CryptixAESKeyCache();
     }
     
+    /** @param length must be a multiple of 16 */
     @Override
     public void encrypt(byte payload[], int payloadIndex, byte out[], int outIndex, SessionKey sessionKey, byte iv[], int length) {
         encrypt(payload, payloadIndex, out, outIndex, sessionKey, iv, 0, length);
     }
     
+    /** @param length must be a multiple of 16 */
     @Override
     public void encrypt(byte payload[], int payloadIndex, byte out[], int outIndex, SessionKey sessionKey, byte iv[], int ivOffset, int length) {
         if ( (payload == null) || (out == null) || (sessionKey == null) || (iv == null) ) 
@@ -142,7 +144,7 @@ public class CryptixAESEngine extends AESEngine {
         CryptixRijndael_Algorithm.blockEncrypt(payload, out, inIndex, outIndex, sessionKey.getPreparedKey(), 16);
     }
 
-    /** decrypt the data with the session key provided
+    /** decrypt exactly 16 bytes of data with the session key provided
      * @param payload encrypted data
      * @param sessionKey private session key
      */

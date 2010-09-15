@@ -176,7 +176,11 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     }
     
     /**
-     * Create a new connected socket (block until the socket is created)
+     * Create a new connected socket. Blocks until the socket is created,
+     * unless the connectDelay option (i2p.streaming.connectDelay) is
+     * set and greater than zero. If so this will return immediately,
+     * and the client may quickly write initial data to the socket and
+     * this data will be bundled in the SYN packet.
      *
      * @param peer Destination to connect to
      * @param options I2P socket options to be used for connecting
@@ -199,6 +203,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         if (_log.shouldLog(Log.INFO))
             _log.info("Connecting to " + peer.calculateHash().toBase64().substring(0,6) 
                       + " with options: " + opts);
+        // the following blocks unless connect delay > 0
         Connection con = _connectionManager.connect(peer, opts);
         if (con == null)
             throw new TooManyStreamsException("Too many streams (max " + _maxStreams + ")");
@@ -212,7 +217,11 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     }
 
     /**
-     * Create a new connected socket (block until the socket is created)
+     * Create a new connected socket. Blocks until the socket is created,
+     * unless the connectDelay option (i2p.streaming.connectDelay) is
+     * set and greater than zero in the default options. If so this will return immediately,
+     * and the client may quickly write initial data to the socket and
+     * this data will be bundled in the SYN packet.
      *
      * @param peer Destination to connect to
      *

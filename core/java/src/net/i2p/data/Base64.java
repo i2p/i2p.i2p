@@ -42,23 +42,46 @@ public class Base64 {
 
     private final static Log _log = new Log(Base64.class);
 
-    /** added by aum */
+    /**
+     *  @param source if null will return ""
+     */
     public static String encode(String source) {
         return (source != null ? encode(source.getBytes()) : "");
     }
+
+    /**
+     *  @param source if null will return ""
+     */
     public static String encode(byte[] source) {
         return (source != null ? encode(source, 0, source.length) : "");
     }
+
+    /**
+     *  @param source if null will return ""
+     */
     public static String encode(byte[] source, int off, int len) {
         return (source != null ? encode(source, off, len, false) : "");
     }
+
+    /**
+     *  @param source if null will return ""
+     *  @param useStandardAlphabet Warning, must be false for I2P compatibility
+     */
     public static String encode(byte[] source, boolean useStandardAlphabet) {
         return (source != null ? encode(source, 0, source.length, useStandardAlphabet) : "");
     }
+
+    /**
+     *  @param source if null will return ""
+     *  @param useStandardAlphabet Warning, must be false for I2P compatibility
+     */
     public static String encode(byte[] source, int off, int len, boolean useStandardAlphabet) {
         return (source != null ? safeEncode(source, off, len, useStandardAlphabet) : "");
     }
 
+    /**
+     *  @param s Base 64 encoded string using the I2P alphabet A-Z, a-z, 0-9, -, ~
+     */
     public static byte[] decode(String s) {
         return safeDecode(s, false);
     }
@@ -84,6 +107,8 @@ public class Base64 {
                                             (byte) 'w', (byte) 'x', (byte) 'y', (byte) 'z', (byte) '0', (byte) '1',
                                             (byte) '2', (byte) '3', (byte) '4', (byte) '5', (byte) '6', (byte) '7',
                                             (byte) '8', (byte) '9', (byte) '+', (byte) '/'};
+
+    /** The 64 valid Base64 values for I2P. */
     private final static byte[] ALPHABET_ALT = { (byte) 'A', (byte) 'B', (byte) 'C', (byte) 'D', (byte) 'E', (byte) 'F',
                                             (byte) 'G', (byte) 'H', (byte) 'I', (byte) 'J', (byte) 'K', (byte) 'L',
                                             (byte) 'M', (byte) 'N', (byte) 'O', (byte) 'P', (byte) 'Q', (byte) 'R',
@@ -241,7 +266,7 @@ public class Base64 {
      * @return four byte array in Base64 notation.
      * @since 1.3
      */
-/***** unused
+/***** unused (standard alphabet)
     private static byte[] encode3to4(byte[] threeBytes) {
         return encode3to4(threeBytes, 3);
     } // end encodeToBytes
@@ -260,11 +285,13 @@ public class Base64 {
      * @return four byte array in Base64 notation.
      * @since 1.3
      */
+/***** unused (standard alphabet)
     private static byte[] encode3to4(byte[] threeBytes, int numSigBytes) {
         byte[] dest = new byte[4];
         encode3to4(threeBytes, 0, numSigBytes, dest, 0);
         return dest;
     }
+******/
 
     /**
      * Encodes up to three bytes of the array <var>source</var>
@@ -287,6 +314,7 @@ public class Base64 {
      * @return the <var>destination</var> array
      * @since 1.3
      */
+/***** unused (standard alphabet)
     private static byte[] encode3to4(byte[] source, int srcOffset, int numSigBytes, byte[] destination, int destOffset) {
         //           1         2         3  
         // 01234567890123456789012345678901 Bit position
@@ -329,7 +357,11 @@ public class Base64 {
             return destination;
         } // end switch
     } // end encode3to4
+******/
 
+    /**
+     *  @param alpha alphabet
+     */
     private static void encode3to4(byte[] source, int srcOffset, int numSigBytes, StringBuilder buf, byte alpha[]) {
         //           1         2         3  
         // 01234567890123456789012345678901 Bit position
@@ -628,7 +660,7 @@ public class Base64 {
      * Decodes data from Base64 notation.
      *
      * @param s the string to decode
-     * @return the decoded data
+     * @return the decoded data, null on error
      * @since 1.4
      */
     private static byte[] standardDecode(String s) {
@@ -647,6 +679,7 @@ public class Base64 {
      * @param s the strind to decode
      * @return The data as a string
      * @since 1.4
+     * @throws NPE on error?
      */
     public static String decodeToString(String s) {
         return new String(decode(s));
@@ -659,7 +692,7 @@ public class Base64 {
      * @param source The Base64 encoded data
      * @param off    The offset of where to begin decoding
      * @param len    The length of characters to decode
-     * @return decoded data
+     * @return decoded data, null on error
      * @since 1.3
      */
     private static byte[] decode(byte[] source, int off, int len) {

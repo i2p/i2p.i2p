@@ -23,7 +23,7 @@ import net.i2p.data.SessionKey;
  *   byte      184: flags
  *   bytes 185-188: request time (in hours since the epoch)
  *   bytes 189-192: next message ID
- *   bytes 193-222: uninterpreted / random padding
+ *   bytes 193-221: uninterpreted / random padding
  * </pre>
  *
  */
@@ -226,7 +226,7 @@ public class BuildRequestRecord {
         *   byte      184: flags
         *   bytes 185-188: request time (in hours since the epoch)
         *   bytes 189-192: next message ID
-        *   bytes 193-222: uninterpreted / random padding
+        *   bytes 193-221: uninterpreted / random padding
         */
         DataHelper.toLong(buf, OFF_RECV_TUNNEL, 4, receiveTunnelId);
         System.arraycopy(peer.getData(), 0, buf, OFF_OUR_IDENT, Hash.HASH_LENGTH);

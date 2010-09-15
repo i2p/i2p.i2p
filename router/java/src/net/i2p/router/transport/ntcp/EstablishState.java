@@ -29,18 +29,45 @@ import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
-/*
+/**
+ * Handle the 4-phase establishment, which is as follows:
+ *
+ * <pre>
+ *
  * Alice                   contacts                      Bob
  * =========================================================
+ *
+ * Message 1 (Session Request):
  *  X+(H(X) xor Bob.identHash)----------------------------->
+ *
+ * Message 2 (Session Created):
  *  <----------------------------------------Y+E(H(X+Y)+tsB, sk, Y[239:255])
- *  E(#+Alice.identity+tsA+padding+S(X+Y+Bob.identHash+tsA+tsB+padding), sk, hX_xor_Bob.identHash[16:31])--->
+ *
+ * Message 3 (Session Confirm A):
+ *  E(sz+Alice.identity+tsA+padding+S(X+Y+Bob.identHash+tsA+tsB), sk, hX_xor_Bob.identHash[16:31])--->
+ *
+ * Message 4 (Session Confirm B):
  *  <----------------------E(S(X+Y+Alice.identHash+tsA+tsB)+padding, sk, prev)
+ *
+ *  Key:
+ *
+ *    X, Y: 256 byte DH keys
+ *    H(): 32 byte SHA256 Hash
+ *    E(data, session key, IV): AES256 Encrypt
+ *    S(): 40 byte DSA Signature
+ *    tsA, tsB: timestamps (4 bytes, seconds since epoch)
+ *    sk: 32 byte Session key
+ *    sz: 2 byte size of Alice identity to follow
+ *
+ * </pre>
+ *
  *
  * Alternately, when Bob receives a connection, it could be a
  * check connection (perhaps prompted by Bob asking for someone
  * to verify his listener).  check connections are formatted per
- * {@link #isCheckInfo()}
+ * isCheckInfo()
+ * NOTE: Check info is unused.
+ *
  */
 public class EstablishState {
     private RouterContext _context;
@@ -57,7 +84,9 @@ public class EstablishState {
     // alice receives (and bob sends)
     private byte _Y[];
     private transient byte _e_hXY_tsB[];
+    /** Bob's Timestamp in seconds */
     private transient long _tsB;
+    /** Alice's Timestamp in seconds */
     private transient long _tsA;
     private transient byte _e_bobSig[];
 
@@ -98,9 +127,6 @@ public class EstablishState {
         _log = ctx.logManager().getLog(getClass());
         _transport = transport;
         _con = con;
-        _verified = false;
-        _corrupt = false;
-        _confirmWritten = false;
         _dh = new DHSessionKeyBuilder();
         if (_con.isInbound()) {
             _X = new byte[256];
@@ -116,10 +142,7 @@ public class EstablishState {
 
         _prevEncrypted = new byte[16];
         _curEncrypted = new byte[16];
-        _curEncryptedOffset = 0;
         _curDecrypted = new byte[16];
-
-        _received = 0;
     }
 
     /**
@@ -150,7 +173,10 @@ public class EstablishState {
 
     public boolean getFailedBySkew() { return _failedBySkew; }
 
-    /** we are Bob, so receive these bytes as part of an inbound connection */
+    /**
+     *  we are Bob, so receive these bytes as part of an inbound connection
+     *  This method receives messages 1 and 3, and sends messages 2 and 4.
+     */
     private void receiveInbound(ByteBuffer src) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(prefix()+"Receiving inbound: prev received=" + _received + " src.remaining=" + src.remaining());
@@ -311,7 +337,10 @@ public class EstablishState {
         }
     }
 
-    /** we are Alice, so receive these bytes as part of an outbound connection */
+    /**
+     *  We are Alice, so receive these bytes as part of an outbound connection.
+     *  This method receives messages 2 and 4, and sends message 3.
+     */
     private void receiveOutbound(ByteBuffer src) {
         if (_log.shouldLog(Log.DEBUG)) _log.debug(prefix()+"Receive outbound " + src + " received=" + _received);
 
@@ -498,8 +527,10 @@ public class EstablishState {
     public boolean isComplete() { return _verified; }
 
     /**
-     * we are establishing an outbound connection, so prepare ourselves by
+     * We are Alice.
+     * We are establishing an outbound connection, so prepare ourselves by
      * queueing up the write of the first part of the handshake
+     * This method sends message #1 to Bob.
      */
     public void prepareOutbound() {
         if (_received <= 0) {
@@ -516,7 +547,9 @@ public class EstablishState {
     }
 
     /**
-     * make sure the signatures are correct, and if they are, update the
+     * We are Bob. Verify message #3 from Alice, then send message #4 to Alice.
+     *
+     * Make sure the signatures are correct, and if they are, update the
      * NIOConnection with the session key / peer ident / clock skew / iv.
      * The NIOConnection itself is responsible for registering with the
      * transport
@@ -623,6 +656,9 @@ public class EstablishState {
         }
     }
 
+    /**
+     *  We are Bob. Send message #4 to Alice.
+     */
     private void sendInboundConfirm(RouterIdentity alice, long tsA) {
         // send Alice E(S(X+Y+Alice.identHash+tsA+tsB), sk, prev)
         byte toSign[] = new byte[256+256+32+4+4];

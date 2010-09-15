@@ -127,6 +127,8 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
                     // this does not increment totalSent
                     i2pout.write(initialI2PData);
                     // do NOT flush here, it will block and then onTimeout.run() won't happen on fail.
+                    // But if we don't flush, then we have to wait for the connectDelay timer to fire
+                    // in i2p socket? To be researched and/or fixed.
                     //i2pout.flush();
                 }
             }

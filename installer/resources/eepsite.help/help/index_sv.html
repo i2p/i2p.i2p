@@ -1,6 +1,6 @@
 <html>
  <head>
-  <title>I2P Anonym Webbserver | Välkommen till din eepsite</title>
+  <title>I2P Anonym Webbserver | VÃ¤lkommen till din eepsite</title>
   <link rel="shortcut icon" href="favicon.ico" />
     <link rel="stylesheet" type="text/css" href="lib/eepsite.css" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -11,121 +11,121 @@
  <h1>I2P Anonym Webbserver</h1>
 <div class="langbar">
 <!-- Most of these languages listed here are yet to be translated -->
-<a href="index.html"><img src="lib/us.png" title="English" alt="English"></a>
-<a href="index_na.html"><img src="lib/cn.png" title="??" alt="??"></a>
-<a href="index_de.html"><img src="lib/de.png" title="Deutsch" alt="Deutsch"></a>
-<a href="index_fr.html"><img src="lib/fr.png" title="Français" alt="Français"></a>
-<a href="index_nl.html"><img src="lib/nl.png" title="Nederlands" alt="Nederlands"></a>
-<a href="index_ru.html"><img src="lib/ru.png" title="???????" alt="???????"></a>
-<a href="index_sv.html"><img src="lib/se.png" title="Svenska" alt="Svenska"></a>
+<a href="index.html"><img src="lib/us.png" title="English" alt="English"></a> 
+<a href="index_na.html"><img src="lib/cn.png" title="ä¸­æ–‡" alt="ä¸­æ–‡"></a> 
+<a href="index_de.html"><img src="lib/de.png" title="Deutsch" alt="Deutsch"></a> 
+<a href="index_fr.html"><img src="lib/fr.png" title="FranÃ§ais" alt="FranÃ§ais"></a> 
+<a href="index_nl.html"><img src="lib/nl.png" title="Nederlands" alt="Nederlands"></a> 
+<a href="index_ru.html"><img src="lib/ru.png" title="Ğ ÑƒÑÑĞºĞ¸Ğ¹" alt="Ğ ÑƒÑÑĞºĞ¸Ğ¹"></a> 
+<a href="index_sv.html"><img src="lib/se.png" title="Svenska" alt="Svenska"></a> 
 
 </div>
-<h2>Snabb vägledning till anonym webbservning på I2P</h2>
+<h2>Snabb vÃ¤gledning till anonym webbservning pÃ¥ I2P</h2>
 
- <p>Det här är din eepsite, din egen anonyma I2P-webbserver - redigera bara filerna
+ <p>Det hÃ¤r Ã¤r din eepsite, din egen anonyma I2P-webbserver - redigera bara filerna
      under <code>~/.i2p/eepsite/docroot/</code> (Linux, OS X)
      eller <code>%APPDATA%\I2P\eepsite\docroot\</code> (Windows)
- så kommer andra kunna nå dem efter att du följt instruktionerna nedan.
- I I2P så adresseras eepsajter med en 'nyckel', som representeras som en väldigt lång Base64-sträng.
- ('Nyckeln' är något så när analog med en IP-adress och visas
- på eepsajtens I2PTunnel-<a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">konfigurationssida</a>).
- Nedan ges instruktioner om hur du kan ange ett namn som "minsajt.i2p" till din nyckel och börja köra din eepsajt.</p>
- <p>Du kan nå din eepsajt lokalt via
+ sÃ¥ kommer andra kunna nÃ¥ dem efter att du fÃ¶ljt instruktionerna nedan.
+ I I2P sÃ¥ adresseras eepsajter med en 'nyckel', som representeras som en vÃ¤ldigt lÃ¥ng Base64-strÃ¤ng.
+ ('Nyckeln' Ã¤r nÃ¥got sÃ¥ nÃ¤r analog med en IP-adress och visas
+ pÃ¥ eepsajtens I2PTunnel-<a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">konfigurationssida</a>).
+ Nedan ges instruktioner om hur du kan ange ett namn som "minsajt.i2p" till din nyckel och bÃ¶rja kÃ¶ra din eepsajt.</p>
+ <p>Du kan nÃ¥ din eepsajt lokalt via
  <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a>.
 </p>
 
- <h2>Att sätta upp och annonsera din eepsajt</h2>
- Din eepsajt är stoppad som standard.
- Efter att du startat den kommer det att vara svårt för att andra att hitta den,
- eftersom den inte har ett namn och de inte känner till din mycket långa Base64-nyckel.
- Du skulle bara kunna berätta för andra om den långa nyckeln, men tacksamt nog har i2p en
- adressbok och många enkla sätt att berätta för folk om din eepsajt. Här är alla stegen.
+ <h2>Att sÃ¤tta upp och annonsera din eepsajt</h2>
+ Din eepsajt Ã¤r stoppad som standard.
+ Efter att du startat den kommer det att vara svÃ¥rt fÃ¶r att andra att hitta den,
+ eftersom den inte har ett namn och de inte kÃ¤nner till din mycket lÃ¥nga Base64-nyckel.
+ Du skulle bara kunna berÃ¤tta fÃ¶r andra om den lÃ¥nga nyckeln, men tacksamt nog har i2p en
+ adressbok och mÃ¥nga enkla sÃ¤tt att berÃ¤tta fÃ¶r folk om din eepsajt. HÃ¤r Ã¤r alla stegen.
  <ul>
- <li>Välj ett namn åt din eepsajt (<i>ettbranamn</i>.i2p). Små bokstäver.
-     Kanske vill du först kolla i
+ <li>VÃ¤lj ett namn Ã¥t din eepsajt (<i>ettbranamn</i>.i2p). SmÃ¥ bokstÃ¤ver.
+     Kanske vill du fÃ¶rst kolla i
      <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=router&amp;filter=none">din routers adressbok</a>,
-     eller i filen <code>i2p/hosts.txt</code> för att se om ditt tilltänkta namn redan är taget.
-     Skriv in namnet för din eepsajt på
-     <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">eepsitekonfigurationssidan för i2ptunnel</a>
-     där det står "Website name". Detta kommer att ersätta det förinställda "mysite.i2p".
-     När du är där, kryssa i "Auto Start"-rutan. Din eepsajt kommer nu att starta varje gång som du startar
+     eller i filen <code>i2p/hosts.txt</code> fÃ¶r att se om ditt tilltÃ¤nkta namn redan Ã¤r taget.
+     Skriv in namnet fÃ¶r din eepsajt pÃ¥
+     <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">eepsitekonfigurationssidan fÃ¶r i2ptunnel</a>
+     dÃ¤r det stÃ¥r "Website name". Detta kommer att ersÃ¤tta det fÃ¶rinstÃ¤llda "mysite.i2p".
+     NÃ¤r du Ã¤r dÃ¤r, kryssa i "Auto Start"-rutan. Din eepsajt kommer nu att starta varje gÃ¥ng som du startar
      din router.
-     Tryck sedan på "Save".
- <li>Klicka på startknappen för din eepsajt på
-     <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">huvudkonfigurationssidan för i2ptunnel</a>.
-     Du borde nu kunna se "eepsite" listad under "Local Destinations" på vänster sida om
+     Tryck sedan pÃ¥ "Save".
+ <li>Klicka pÃ¥ startknappen fÃ¶r din eepsajt pÃ¥
+     <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">huvudkonfigurationssidan fÃ¶r i2ptunnel</a>.
+     Du borde nu kunna se "eepsite" listad under "Local Destinations" pÃ¥ vÃ¤nster sida om
      <a href="http://127.0.0.1:7657/index.jsp">I2P Router Console</a>.
-     Din eepsajt kör nu.
- <li>Markera hela "Local destination"-nyckeln på
-     <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">eepsitekonfigurationssidan för i2ptunnel</a>
-     och kopiera den för att senare klistra in den.
-     Säkerställ att du får med hela texten - det är mer än 500 bokstäver och den måste sluta på "AAAA".
+     Din eepsajt kÃ¶r nu.
+ <li>Markera hela "Local destination"-nyckeln pÃ¥
+     <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">eepsitekonfigurationssidan fÃ¶r i2ptunnel</a>
+     och kopiera den fÃ¶r att senare klistra in den.
+     SÃ¤kerstÃ¤ll att du fÃ¥r med hela texten - det Ã¤r mer Ã¤n 500 bokstÃ¤ver och den mÃ¥ste sluta pÃ¥ "AAAA".
  <li>Skriv in namnet och klistra in destinationsnyckeln i din
      <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=master">huvudadressbok</a>.
-     Klicka på "Add" för att lägga till destinationen i din adressbok.
- <li>I din webbläsare, skriv in ditt eepsajtnamn (<i>ettbranamn</i>.i2p) så borde du landa på den här sidan igen.
-     Förhoppningsvis fungerade det.
- <li>Innan du berättar för världen om den nya eepsajt borde du lägga till lite innehåll.
-     Gå till <code>~/.i2p/eepsite/docroot/</code> (på Linux eller OS X) eller <code>%APPDATA%\I2P\eepsite\docroot\</code> (på Windows)
-     och ersätt omdirigeringssidan index.html med ditt eget innehåll. Virtuella mappar fungerar, så du kan serva filer från en
-     underkatalog utan att behöva ge en sida med länkar till filer. Om du behöver en mall för en enkel sajt så
-     varsågod och låna och anpassa
-     <a href="pagetemplate.html">denna sida</a> och <a href="lib/">det här innehållet</a>!
+     Klicka pÃ¥ "Add" fÃ¶r att lÃ¤gga till destinationen i din adressbok.
+ <li>I din webblÃ¤sare, skriv in ditt eepsajtnamn (<i>ettbranamn</i>.i2p) sÃ¥ borde du landa pÃ¥ den hÃ¤r sidan igen.
+     FÃ¶rhoppningsvis fungerade det.
+ <li>Innan du berÃ¤ttar fÃ¶r vÃ¤rlden om den nya eepsajt borde du lÃ¤gga till lite innehÃ¥ll.
+     GÃ¥ till <code>~/.i2p/eepsite/docroot/</code> (pÃ¥ Linux eller OS X) eller <code>%APPDATA%\I2P\eepsite\docroot\</code> (pÃ¥ Windows)
+     och ersÃ¤tt omdirigeringssidan index.html med ditt eget innehÃ¥ll. Virtuella mappar fungerar, sÃ¥ du kan serva filer frÃ¥n en
+     underkatalog utan att behÃ¶va ge en sida med lÃ¤nkar till filer. Om du behÃ¶ver en mall fÃ¶r en enkel sajt sÃ¥
+     varsÃ¥god och lÃ¥na och anpassa
+     <a href="pagetemplate.html">denna sida</a> och <a href="lib/">det hÃ¤r innehÃ¥llet</a>!
 </ul>
-<h2>Registrera din egen .I2P-domän</h2><ul>
- <li>Nu är det dags att lägga till din eepsajt till en I2P-adressbok som hostas på en sajt
+<h2>Registrera din egen .I2P-domÃ¤n</h2><ul>
+ <li>Nu Ã¤r det dags att lÃ¤gga till din eepsajt till en I2P-adressbok som hostas pÃ¥ en sajt
      som <a href="http://stats.i2p/">stats.i2p</a>.
-     Alltså, du måste skriva in namn och nyckeln på din eepsajt i ett webbgränssnitt på
+     AlltsÃ¥, du mÃ¥ste skriva in namn och nyckeln pÃ¥ din eepsajt i ett webbgrÃ¤nssnitt pÃ¥
      en eller flera av dessa sajter.
-     Här är <a href="http://stats.i2p/i2p/addkey.html">nyckelinmatningsformuläret hos stats.i2p</a>.
-     Återigen, din nyckel är hela "Local destination"-nyckeln på
-     <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite-konfigurationssidan för i2ptunnel</a>.
-     Säkerställ att du får med hela texten, som slutar med "AAAA".
-     Glöm inte att klicka på "add a key".
+     HÃ¤r Ã¤r <a href="http://stats.i2p/i2p/addkey.html">nyckelinmatningsformulÃ¤ret hos stats.i2p</a>.
+     Ã…terigen, din nyckel Ã¤r hela "Local destination"-nyckeln pÃ¥
+     <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite-konfigurationssidan fÃ¶r i2ptunnel</a>.
+     SÃ¤kerstÃ¤ll att du fÃ¥r med hela texten, som slutar med "AAAA".
+     GlÃ¶m inte att klicka pÃ¥ "add a key".
      Kolla att den rapporterar att nyckeln lagts till.
-     Eftersom många routrar periodiskt skaffar adressboksuppdateringar från dessa sajter
-     så kommer andra att kunna finna din eepsajt inom ett antal timmar, bara genom att
-     skriva <i>ettbranamn</i>.i2p i sin webbläsare.
-</ul><h2>Att prenumerera på adressböcker</h2><ul>
- <li>På tal adressboksuppdateringar, nu vore en bra tidpunkt att lägga till några fler adressböcker
+     Eftersom mÃ¥nga routrar periodiskt skaffar adressboksuppdateringar frÃ¥n dessa sajter
+     sÃ¥ kommer andra att kunna finna din eepsajt inom ett antal timmar, bara genom att
+     skriva <i>ettbranamn</i>.i2p i sin webblÃ¤sare.
+</ul><h2>Att prenumerera pÃ¥ adressbÃ¶cker</h2><ul>
+ <li>PÃ¥ tal adressboksuppdateringar, nu vore en bra tidpunkt att lÃ¤gga till nÃ¥gra fler adressbÃ¶cker
      till din egen
      <a href="http://127.0.0.1:7657/susidns/subscriptions.jsp">prenumerationslista</a>.
-     Gå till din prenumerationsinställningssida och lägg till ett par av de här för en automatiskt uppdaterad
-     lista över nya hosts:<ul>
+     GÃ¥ till din prenumerationsinstÃ¤llningssida och lÃ¤gg till ett par av de hÃ¤r fÃ¶r en automatiskt uppdaterad
+     lista Ã¶ver nya hosts:<ul>
      <li><a href="http://tino.i2p/hosts.txt">http://tino.i2p/hosts.txt</a>
      <li><a href="http://stats.i2p/cgi-bin/newhosts.txt">http://stats.i2p/cgi-bin/newhosts.txt</a>
      <li><a href="http://i2host.i2p/cgi-bin/i2hostetag">http://i2host.i2p/cgi-bin/i2hostetag</a></ul>
- <li>Om du har bråttom och inte kan vänta ett par timmar så kan du säga åt folk att använda en "jump"-adresshjälpar-
-     omdirigeringstjänst.
-     Detta kommer att funka inom ett par minuter efter att du skrivit in nyckeln i en adressbok på samma sajt.
-     Prova först själv genom att skriva:
+ <li>Om du har brÃ¥ttom och inte kan vÃ¤nta ett par timmar sÃ¥ kan du sÃ¤ga Ã¥t folk att anvÃ¤nda en "jump"-adresshjÃ¤lpar-
+     omdirigeringstjÃ¤nst.
+     Detta kommer att funka inom ett par minuter efter att du skrivit in nyckeln i en adressbok pÃ¥ samma sajt.
+     Prova fÃ¶rst sjÃ¤lv genom att skriva:
      <code>http://stats.i2p/cgi-bin/jump.cgi?a=<i>ettbranamn</i>.i2p</code> eller
      <code>http://i2host.i2p/cgi-bin/i2hostjump?<i>ettbranamn</i>.i2p</code>
-     i din webbläsare.
-     Så snart som det funkar kan du berätta för andra att de ska använda det.
- <li>Vissa människor kolla på eepsajtlistor som
+     i din webblÃ¤sare.
+     SÃ¥ snart som det funkar kan du berÃ¤tta fÃ¶r andra att de ska anvÃ¤nda det.
+ <li>Vissa mÃ¤nniskor kolla pÃ¥ eepsajtlistor som
      <a href="http://inproxy.tino.i2p/status.php">inproxy.tino.i2p/status.php</a> efter nya eepsajter,
-     så att du kan börja få ett par besökare. Men det finns massor av sätt att berätta för folk.
-     Här är en rad idëer:
+     sÃ¥ att du kan bÃ¶rja fÃ¥ ett par besÃ¶kare. Men det finns massor av sÃ¤tt att berÃ¤tta fÃ¶r folk.
+     HÃ¤r Ã¤r en rad idÃ«er:
      <ul>
-     <li>Posta en meddelanden på <a href="http://forum.i2p/viewforum.php?f=16">Eepsajt-annonseringsforum</a>
-         eller på <a href="http://forum.i2p/">forum.i2p</a>.
-     <li>Berätta det för folk på chattkanalen #i2p eller #i2p-chat på IRC.
-     <li>Säg det i en ny post och lägg den på <a href="http://syndie.i2p2.de/">den nya Syndie</a>.
-     <li>Lägg det i <a href="http://ugha.i2p/EepsiteIndex">Ugha's Eepsite Index Wiki</a>
+     <li>Posta en meddelanden pÃ¥ <a href="http://forum.i2p/viewforum.php?f=16">Eepsajt-annonseringsforum</a>
+         eller pÃ¥ <a href="http://forum.i2p/">forum.i2p</a>.
+     <li>BerÃ¤tta det fÃ¶r folk pÃ¥ chattkanalen #i2p eller #i2p-chat pÃ¥ IRC.
+     <li>SÃ¤g det i en ny post och lÃ¤gg den pÃ¥ <a href="http://syndie.i2p2.de/">den nya Syndie</a>.
+     <li>LÃ¤gg det i <a href="http://ugha.i2p/EepsiteIndex">Ugha's Eepsite Index Wiki</a>
      </ul>
      Notera att vissa sajter rekommenderar att du klistrar in den verkligt
-     långa destinationsnyckeln. Det kan du om vill - men om du har framgångsrikt har skickat din
-     nyckel, testat den med en "hopptjänst", och väntat 24 timmar på att adressboken ska börja
-     propagera sina ändringar till andra, så det borde inte vara nödvändigt.</ul>
+     lÃ¥nga destinationsnyckeln. Det kan du om vill - men om du har framgÃ¥ngsrikt har skickat din
+     nyckel, testat den med en "hopptjÃ¤nst", och vÃ¤ntat 24 timmar pÃ¥ att adressboken ska bÃ¶rja
+     propagera sina Ã¤ndringar till andra, sÃ¥ det borde inte vara nÃ¶dvÃ¤ndigt.</ul>
 <h2>Vidare assistans</h2>
 <p>
-    Ifall du har några frågor, så finns följande ställen för support:
+    Ifall du har nÃ¥gra frÃ¥gor, sÃ¥ finns fÃ¶ljande stÃ¤llen fÃ¶r support:
 </p>
 <ul>
-     <li>Vår IRC-supportkanal: <ul><li><a href="irc://irc.freenode.net/i2p">#i2p on Freenode</a></li>
+     <li>VÃ¥r IRC-supportkanal: <ul><li><a href="irc://irc.freenode.net/i2p">#i2p on Freenode</a></li>
      <li><a href="irc://127.0.0.1:6668/i2p">eller anonymt via I2P-IRC-tunnel</a>.</li></ul>
-     <li><a href="http://forum.i2p/viewforum.php?f=10">Sektionen om tekniska problem</a> på
+     <li><a href="http://forum.i2p/viewforum.php?f=10">Sektionen om tekniska problem</a> pÃ¥
      <a href="http://forum.i2p/">forum.i2p</a>.</li>
 </ul>
  <div class="notify">
