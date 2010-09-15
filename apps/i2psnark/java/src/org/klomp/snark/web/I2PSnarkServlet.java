@@ -871,10 +871,10 @@ public class I2PSnarkServlet extends Default {
                 out.write("<td align=\"right\" class=\"snarkTorrentStatus " + rowClass + "\">");
                 if (remaining > 0) {
                     if (peer.isInteresting() && !peer.isChoked()) {
-                        out.write("<font color=#008000>");
+                        out.write("<font color=#003300>");
                         out.write(formatSize(peer.getDownloadRate()) + "ps</font>");
                     } else {
-                        out.write("<font color=#a00000><a title=\"");
+                        out.write("<font color=#550000><a title=\"");
                         if (!peer.isInteresting())
                             out.write(_("Uninteresting (The peer has no pieces we need)"));
                         else
@@ -887,10 +887,10 @@ public class I2PSnarkServlet extends Default {
                 out.write("<td align=\"right\" class=\"snarkTorrentStatus " + rowClass + "\">");
                 if (pct != 100.0) {
                     if (peer.isInterested() && !peer.isChoking()) {
-                        out.write("<font color=#008000>");
+                        out.write("<font color=#003300>");
                         out.write(formatSize(peer.getUploadRate()) + "ps</font>");
                     } else {
-                        out.write("<font color=#a00000><a title=\"");
+                        out.write("<font color=#550000><a title=\"");
                         if (!peer.isInterested())
                             out.write(_("Uninterested (We have no pieces the peer needs)"));
                         else
@@ -925,7 +925,7 @@ public class I2PSnarkServlet extends Default {
         out.write("<input type=\"hidden\" name=\"action\" value=\"Add\" >\n");
         out.write("<div class=\"addtorrentsection\"><span class=\"snarkConfigTitle\">");
         out.write(_("Add Torrent"));
-        out.write("</span><br>\n<table border=\"0\"><tr><td>");
+        out.write("</span><hr>\n<table border=\"0\"><tr><td>");
         out.write(_("From URL"));
         out.write(":<td><input type=\"text\" name=\"newURL\" size=\"80\" value=\"" + newURL + "\" > \n");
         // not supporting from file at the moment, since the file name passed isn't always absolute (so it may not resolve)
@@ -956,7 +956,7 @@ public class I2PSnarkServlet extends Default {
         out.write("<input type=\"hidden\" name=\"action\" value=\"Create\" >\n");
         out.write("<span class=\"snarkConfigTitle\">");
         out.write(_("Create Torrent"));
-        out.write("</span><br>\n<table border=\"0\"><tr><td>");
+        out.write("</span><hr>\n<table border=\"0\"><tr><td>");
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>\n");
         out.write(_("Data to seed"));
         out.write(":<td>" + _manager.getDataDir().getAbsolutePath() + File.separatorChar 
@@ -1004,7 +1004,7 @@ public class I2PSnarkServlet extends Default {
         out.write("<input type=\"hidden\" name=\"action\" value=\"Save\" >\n");
         out.write("<span class=\"snarkConfigTitle\">");
         out.write(_("Configuration"));
-        out.write("</span><br>\n");
+        out.write("</span><hr>\n");
         out.write("<table border=\"0\"><tr><td>");
         out.write(_("Data directory"));
         out.write(": <td><input type=\"text\" size=\"50\" name=\"dataDir\" value=\"" + dataDir + "\" ");

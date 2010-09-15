@@ -1,7 +1,7 @@
 /* Not yet complete. Subject to flux and change. dr|z3d - 07.25.09 */
 
 body {
-     background: #eef;
+     background: #333;
      color: #001;
      font: 8pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
 }
@@ -15,11 +15,13 @@ body {
 .snarkRefresh:link,.snarkRefresh:visited {
      text-decoration: none !important;
      text-transform: uppercase !important;
-     padding: 0 16px;
+     padding: 2px 16px;
+	 margin: -5px -7px -5px 0 !important;
      letter-spacing: 0.05em;
      font-weight: bold;
      font-size: 11pt;
-     color: #005;
+     color: #f70;
+	 text-shadow: 1px 1px #420;
 }
 
 .snarkRefresh:hover {
@@ -29,9 +31,12 @@ body {
      letter-spacing: 0.05em;
      font-weight: bold;
      font-size: 11pt;
-     color: #f60;
-     border-bottom: 3px solid #f60;
-     border-top: 3px solid #f60;
+     color: #f90;
+     /*border-bottom: 3px solid #111;
+     border-top: 3px solid #111;*/
+	 background: #f90;
+     background: #111 url('../console/images/snarknav_on.png') repeat-x scroll center center;
+	 -moz-border-radius: 3px;
 }
 
 .snarkRefresh:active {
@@ -41,26 +46,29 @@ body {
      letter-spacing: 0.05em;
      font-weight: bold;
      font-size: 11pt;
-     color: #f30;
-     border-bottom: 3px solid #f30;
-     border-top: 3px solid #f30;
+     color: #fb0;
+     /*border-bottom: 3px solid #6d6;
+     border-top: 3px solid #6d6; */
+     background: #111 url('../console/images/snarknav_on.png') repeat-x scroll center center;
 }
 
 .snarkMessages {
      font: bold 9pt "Lucida Console","DejaVu Sans Mono",Courier,mono !important;
      text-align: left;
-     margin: 0 0px 10px 0px;
-     padding: 0;
+     margin: 0 0 10px 0;
+     padding: 3px 0;
      border-spacing: 0px;
      -moz-border-radius: 4px 0 0 0;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     border: 2px solid #930;
+     border: 1px solid #000;
      overflow: auto;
-     color: #531;
-     height: 79px;
+     color: #22f;
+     height: 70px;
      width: auto;
-     background: #f0dea0;
+     background: #000;
+     background: #111 url('../console/images/hat.png') no-repeat scroll right center;
+
 }
 
 pre {
@@ -69,6 +77,7 @@ pre {
      padding: 0;
      text-align: left !important;
      height: 8px;
+	 color: #050;
 }
 
 table {
@@ -77,6 +86,8 @@ table {
      padding: 0px;
      border-spacing: 0px;
      border-collapse: collapse;
+	 color: #ddd;
+	 width: 100%;
 }
 
 th {
@@ -84,27 +95,38 @@ th {
      font-size: 9pt;
      border-top: 1px outset #001;
      border-bottom: 1px inset #001;
-     background: #fda;
+     background: #222;
+	 color: #ddd;
      whitespace: nowrap;
 }
 
 .SnarkTorrents {
      margin: 0;
      border: 1px solid #001;
-     background: #f9f;
+     background: #333;
 }
 
 td {
-     padding: 4px;
+     padding: 2px;
+	 color: #ddd !important;
+}
+
+.mainsection td {
+     color: #111;
+}
+
+td:first-child {
+     text-align: center;
+	 padding-left: 10px;
 }
 
 .snarkTorrentEven {
-     background: #fea;
+     background: #555;
      font-size: 8pt;
 }
 
 .snarkTorrentOdd {
-     background: #f0dea0;
+     background: #444;
      font-size: 8pt;
 }
 
@@ -139,6 +161,14 @@ td {
      font-size: 11pt;
      font-weight: bold;
      text-transform: uppercase;
+	 padding: 0 25px 5px 25px;
+	 margin: 5px 0 10px 0 !important;
+	 letter-spacing: 0.25em;
+	 border: 2px solid #444;
+	 -moz-border-radius: 0 0 5px 5px;
+	 border-top: 0;
+	 text-shadow: 1px 1px #333;
+	 background: #333;/* url('../console/images/snarknav.png') repeat-x scroll center center;*/
 }
 
 .snarkConfig {
@@ -147,7 +177,7 @@ td {
 }
 
 .page {
-     background: #fff;
+     background: #222;
      color: #310;
      min-width: 800px !important;
      margin: 5px 0 0 0;
@@ -164,7 +194,8 @@ td {
 }
 
 form {
-     line-height: 250%;
+/*     line-height: 250%; */
+	 margin-bottom: 0;
 }
 
 p {
@@ -181,21 +212,31 @@ hr {
      text-align: center;
 }
 
+hr {
+     color: #444;
+     background: #444;
+     height: 1px;
+     border: 0px solid #444;
+     width: 100%;
+     margin: 5px 0 7px 0;
+     text-align: center;
+}
+
 a:link {
-     color: #930;
+     color: #f70;
      text-decoration: none;
      font-weight: bold;
      word-wrap: break-word;
 }
 
 a:visited {
-     color: #606;
+     color: #f50;
      text-decoration: none;
      font-weight: bold;
 }
 
 a:hover {
-     color: #900;
+     color: #f90;
      font-weight: bold;
 }
 
@@ -206,31 +247,66 @@ input {
      padding: 2px 4px;
      -moz-border-radius: 4px;
      border-radius: 4px;
-     border: 1px;
-     background: #ffe;
+     border: 1px solid #000;
+     background: #111;
+	 color: #f60;
 }
 
 input.r {
      text-align: right;
 }
 
+input[type=submit] {
+     text-shadow: 1px 1px #555;
+	 color: #000;
+	 background: #777;
+	 border: 1px outset #bbb;
+}
+
+input[type=submit]:hover {
+	 border: 1px inset #bbb;
+     text-shadow: 0 0;	 
+}
+
+input[type=submit]:active {
+     background: #000 !important;
+	 color: #777;
+}
+
+input[type=text]:active, input[type=text]:hover, input.r:hover {
+     background: #f60;
+	 color: #000;
+}
+
+input[type=submit]:hover {
+     background: #f60;
+	 color: #000;
+}
+
 select {
-     background: #ffe;
-     color: #310;
+     background: #111;
+     color: #f60;
      font: 9pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
      font-weight: bold;
      padding: 2px 2px 2px 3px;
-     -moz-border-radius: 4px;
+     -moz-border-radius: 4px 0 0 4px;
      border-radius: 4px;
+	 border: 1px solid #000;
 }
 
+select:hover, textarea:hover {
+     background: #f60;
+     color: #000;
+}	 
+
 textarea {
-     background: #ffe;
-     color: #310;
+     background: #111;
+     color: #f60;
      font-weight: bold;
      padding: 1px 4px 0px;
      -moz-border-radius: 4px;
      border-radius: 4px;
+	 border: 1px solid #000;
 }
 
 img {
@@ -259,53 +335,58 @@ div.section,div.mainsection {
      -moz-box-shadow: inset 0px 0px 1px 0px #002;
      word-wrap: break-word;
      text-align: center;
-     background: #ffe url('../console/light/images/tabletile.png');
-     opacity: 1.0;
+     /*background: #ffe url('../console/light/images/tabletile.png');*/
+     background: #444;
+	 opacity: 1.0;
 }
 
 div.newtorrentsection {
      margin: 0 0 10px 0;
-     padding: 0 10px 10px 10px;
+     padding: 0 10px 0px 10px;
      border: 1px solid #001;
      text-align: center;
-     color: #001;
+     color: #ddd;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     -moz-box-shadow: inset 0px 0px 1px 0px #ff0;
      word-wrap: break-word;
-     background: #bb4 url('../console/images/yellowtile.png');
+     background: #444 url('../console/images/snark_create.png') no-repeat scroll right center;
      opacity: 1.0;
 }
 
 div.addtorrentsection {
      margin: 0 0 10px 0;
-     padding: 0 10px 10px 10px;
+     padding: 0 10px 0px 10px;
      border: 1px solid #001;
      text-align: center;
-     color: #001;
+     color: #ddd;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     -moz-box-shadow: inset 0px 0px 1px 0px #0f0;
      word-wrap: break-word;
-     background: #7f7 url('../console/images/greentile.png');
+     background: #444 url('../console/images/snark_add.png') no-repeat scroll right center;
      opacity: 1.0;
 }
 
 div.configsection {
-     margin: 0;
-     padding: 0 10px 10px 10px;
+     margin: 0 0 10px 0;
+     padding: 0 10px 15px 10px;
      border: 1px solid #001;
-     color: #ffb;
+     color: #ddd;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     -moz-box-shadow: inset 0px 0px 0px 1px #900;
+     -moz-box-shadow: inset 0px 0px 1px 0px #f00;
      word-wrap: break-word;
      text-align: center;
-     background: #700 url('../console/light/images/darkbluetile.png');
-     font-weight: bold;/* red tile needs bold text! */
+     background: #444;
+     font-weight: bold;
+}
+
+.newtorrentsection form, .configsection form, .addtorrentsection form {
+     color: #ddd !important;
 }
 
 div.configsection table{
@@ -313,26 +394,27 @@ div.configsection table{
 }
 
 div.configsection a {
-     color: #f90;
+     color: #f60;
 }
 
-div.configsection a: hover {
-     color: #f60;
-     text-decoration: underline;
+div.configsection a:hover {
+     color: #f90;
+     text-decoration: none;
 }
 
 .snarknavbar {
      margin: 0 0 10px 0 !important;
-     padding: 10px;
+     padding: 2px 10px;
      border: 1px solid #001;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
      -moz-box-shadow: inset 0px 0px 1px 0px #002;
-     background: #ddf url('../console/light/images/tabletile.png');
+     background: #111 url('../console/images/snarknav.png') repeat-x scroll center center;
      text-transform: uppercase !important;
      letter-spacing: 0.05em;
      font-weight: bold;
      font-size: 11pt;
      color: #001;
+	 min-width: 800px;
  }
