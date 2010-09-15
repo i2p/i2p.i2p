@@ -37,6 +37,8 @@ body {
 	 background: #f90;
      background: #111 url('../console/images/snarknav_on.png') repeat-x scroll center center;
 	 -moz-border-radius: 3px;
+	 -khtml-border-radius: 3px;
+	 border-radius: 3px;
 }
 
 .snarkRefresh:active {
@@ -59,8 +61,8 @@ body {
      padding: 3px 0;
      border-spacing: 0px;
      -moz-border-radius: 4px 0 0 0;
-     -khtml-border-radius: 4px;
-     border-radius: 4px;
+     -khtml-border-radius: 4px 0 0 0;
+     border-radius: 4px 0 0 0;
      border: 1px solid #000;
      overflow: auto;
      color: #22f;
@@ -166,6 +168,8 @@ td:first-child {
 	 letter-spacing: 0.25em;
 	 border: 2px solid #444;
 	 -moz-border-radius: 0 0 5px 5px;
+	 -khtml-border-radius: 0 0 5px 5px;
+	 border-radius: 0 0 5px 5px;
 	 border-top: 0;
 	 text-shadow: 1px 1px #333;
 	 background: #333;/* url('../console/images/snarknav.png') repeat-x scroll center center;*/
@@ -189,6 +193,8 @@ td:first-child {
      font-size: 9pt !important;
      line-height: 160% !important;
      -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     -khtml-box-shadow: inset 0px 0px 1px 0px #002;
+     box-shadow: inset 0px 0px 1px 0px #002;
      text-align: center;
      opacity: 1.0;
 }
@@ -246,6 +252,7 @@ input {
      text-align: left;
      padding: 2px 4px;
      -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
      border-radius: 4px;
      border: 1px solid #000;
      background: #111;
@@ -290,7 +297,8 @@ select {
      font-weight: bold;
      padding: 2px 2px 2px 3px;
      -moz-border-radius: 4px 0 0 4px;
-     border-radius: 4px;
+     -khtml-border-radius: 4px 0 0 4px;
+     border-radius: 4px 0 0 4px;
 	 border: 1px solid #000;
 }
 
@@ -305,6 +313,7 @@ textarea {
      font-weight: bold;
      padding: 1px 4px 0px;
      -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
      border-radius: 4px;
 	 border: 1px solid #000;
 }
@@ -350,6 +359,8 @@ div.newtorrentsection {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      -moz-box-shadow: inset 0px 0px 1px 0px #ff0;
+     -khtml-box-shadow: inset 0px 0px 1px 0px #ff0;
+     box-shadow: inset 0px 0px 1px 0px #ff0;
      word-wrap: break-word;
      background: #444 url('../console/images/snark_create.png') no-repeat scroll right center;
      opacity: 1.0;
@@ -365,6 +376,8 @@ div.addtorrentsection {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      -moz-box-shadow: inset 0px 0px 1px 0px #0f0;
+     -khtml-box-shadow: inset 0px 0px 1px 0px #0f0;
+     box-shadow: inset 0px 0px 1px 0px #0f0;
      word-wrap: break-word;
      background: #444 url('../console/images/snark_add.png') no-repeat scroll right center;
      opacity: 1.0;
@@ -379,6 +392,8 @@ div.configsection {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      -moz-box-shadow: inset 0px 0px 1px 0px #f00;
+     -khtml-box-shadow: inset 0px 0px 1px 0px #f00;
+     box-shadow: inset 0px 0px 1px 0px #f00;
      word-wrap: break-word;
      text-align: center;
      background: #444;
@@ -410,6 +425,8 @@ div.configsection a:hover {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     -khtml-box-shadow: inset 0px 0px 1px 0px #002;
+     box-shadow: inset 0px 0px 1px 0px #002;
      background: #111 url('../console/images/snarknav.png') repeat-x scroll center center;
      text-transform: uppercase !important;
      letter-spacing: 0.05em;
