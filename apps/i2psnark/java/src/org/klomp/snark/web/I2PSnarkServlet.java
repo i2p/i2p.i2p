@@ -169,7 +169,7 @@ public class I2PSnarkServlet extends Default {
 
         PrintWriter out = resp.getWriter();
         out.write("<html>\n" +
-                  "<head>\n" +
+                  "<head><link rel=\"shortcut icon\" href=\"/themes/console/snark_favicon.ico\">\n" +
                   "<title>");
         out.write(_("I2PSnark - Anonymous BitTorrent Client"));
         out.write("</title>\n");
