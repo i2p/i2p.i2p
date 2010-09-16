@@ -1,7 +1,7 @@
 /* Not yet complete. Subject to flux and change. dr|z3d - 07.25.09 */
 
 body {
-     background: #333;
+     background: #333 url('../console/images/graytile.png');
      color: #001;
      font: 8pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
 }
@@ -209,21 +209,11 @@ p {
 }
 
 hr {
-     color: #003;
-     background: #003;
-     height: 1px;
-     border: 0px solid #003;
-     width: 100%;
-     margin: 10px 0 7px 0;
-     text-align: center;
-}
-
-hr {
      color: #444;
      background: #444;
      height: 1px;
      border: 0px solid #444;
-     width: 100%;
+     width: 0%;
      margin: 5px 0 7px 0;
      text-align: center;
 }
@@ -277,7 +267,8 @@ input[type=submit]:hover {
 
 input[type=submit]:active {
      background: #000 !important;
-	 color: #777;
+	 color: #f60 !important;
+	 text-shadow: 0 !important;
 }
 
 input[type=text]:active, input[type=text]:hover, input.r:hover {
