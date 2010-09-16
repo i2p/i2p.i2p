@@ -1,4 +1,4 @@
-/* Not yet complete. Subject to flux and change. dr|z3d - 07.25.09 */
+/* I2PSnark theme "faze to gray" by dr|z3d */
 
 body {
      background: #333 url('../console/images/graytile.png');
@@ -79,7 +79,8 @@ pre {
      padding: 0;
      text-align: left !important;
      height: 8px;
-	 color: #050;
+	 color: #070;
+     font-weight: bold !important; 
 }
 
 table {
