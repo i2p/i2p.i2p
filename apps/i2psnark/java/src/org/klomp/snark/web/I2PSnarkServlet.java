@@ -934,8 +934,8 @@ public class I2PSnarkServlet extends Default {
         out.write(_("Add torrent"));
         out.write("\" name=\"foo\" ><br>\n");
         out.write("<tr><td>&nbsp;<td><span class=\"snarkAddInfo\">");
-        out.write(_("Alternately, you can copy .torrent files to the directory {0}.", _manager.getDataDir().getAbsolutePath()));
-        out.write("\n");
+        out.write(_("Alternately, you can copy .torrent files to the directory <code>{0}", _manager.getDataDir().getAbsolutePath()));
+        out.write("</code>.\n");
         out.write(_("Removing a .torrent file will cause the torrent to stop."));
         out.write("<br></span></table>\n");
         out.write("</form>\n</span></div>");  
@@ -959,8 +959,8 @@ public class I2PSnarkServlet extends Default {
         out.write("</span><hr>\n<table border=\"0\"><tr><td>");
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>\n");
         out.write(_("Data to seed"));
-        out.write(":<td>" + _manager.getDataDir().getAbsolutePath() + File.separatorChar 
-                  + "<input type=\"text\" name=\"baseFile\" size=\"40\" value=\"" + baseFile 
+        out.write(":<td><code>" + _manager.getDataDir().getAbsolutePath() + File.separatorChar 
+                  + "</code><input type=\"text\" name=\"baseFile\" size=\"40\" value=\"" + baseFile 
                   + "\" title=\"");
         out.write(_("File or directory to seed (must be within the specified path)"));
         out.write("\" ><tr><td>\n");
