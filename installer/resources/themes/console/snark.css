@@ -92,14 +92,26 @@ table {
      border-collapse: collapse;
 	 color: #ddd;
 	 width: 100%;
+	 
 }
+
+thead, tfoot {
+     background: #333;
+	 background: url("../console/images/snark_thead.png") repeat scroll 0 0 #333333;
+	 text-shadow:0 2px 5px #333333;
+}
+
+thead a, tfoot a {
+text-shadow: 1px 1px #210;
+text-shadow:1px 1px #550000;
+} 
 
 th {
      padding: 4px;
      font-size: 9pt;
      border-top: 1px outset #001;
      border-bottom: 1px inset #001;
-     background: #222;
+/*     background: #222;*/
 	 color: #ddd;
      whitespace: nowrap;
 }
@@ -125,15 +137,25 @@ td:first-child {
 	 padding-left: 10px;
 }
 
+.snarkTorrentName {
+     text-shadow:1px 1px #550000;
+}
+
+.snarkTorrentAction {
+     text-shadow:1px 1px #550000;
+}
+
 .snarkTorrentEven {
      background: #555;
      font-size: 8pt;
 }
 
-.snarkTorrentStatus {
-     text-align: center !important;
+.snarkTorrentStatus:first-child {
+     text-align: left !important;
 	 font-style: italic;
+	 padding-left: 2%;
 }
+
 
 .snarkTorrentOdd {
      background: #444;
@@ -173,8 +195,7 @@ td:first-child {
 .snarkConfigTitle {
      font-size: 11pt;
      font-weight: bold;
-     text-transform: uppercase;
-	 padding: 0 25px 5px 25px;
+	 padding: 0 25px 3px 25px;
 	 margin: 5px 0 10px 0 !important;
 	 letter-spacing: 0.25em;
 	 border: 1px solid #111;
@@ -182,11 +203,10 @@ td:first-child {
 	 -khtml-border-radius: 0 0 5px 5px;
 	 border-radius: 0 0 5px 5px;
 	 border-top: 0;
-	 text-shadow: 1px 1px #333;
+	 text-shadow: 0px 3px 5px #333;
 	 background: #333 url('../console/images/snarknav.png') repeat-x scroll center center !important;
+	 font-variant: small-caps !important;
 }
-
-
 
 .snarkConfig {
      font-size: 10pt;
@@ -347,7 +367,7 @@ div.section,div.mainsection {
      -moz-box-shadow: inset 0px 0px 1px 0px #002;
      word-wrap: break-word;
      text-align: center;
-     background: #444;
+     background: #333;
 	 opacity: 1.0;
 }
 
