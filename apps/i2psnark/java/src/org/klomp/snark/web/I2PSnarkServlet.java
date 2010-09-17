@@ -239,7 +239,7 @@ public class I2PSnarkServlet extends Default {
         out.write(TABLE_HEADER);
         out.write(_("Status"));
         if (_manager.util().connected() && !snarks.isEmpty()) {
-            out.write(" (<a href=\"");
+            out.write(" &raquo; <a href=\"");
             out.write(req.getRequestURI());
             if (peerParam != null) {
                 out.write("\">");
@@ -248,20 +248,20 @@ public class I2PSnarkServlet extends Default {
                 out.write("?p=1\">");
                 out.write(_("Show Peers"));
             }
-            out.write("</a>)<br>\n");
+            out.write("</a><br>\n");
         }
         out.write("</th>\n<th align=\"left\">");
         out.write(_("Torrent"));
         out.write("</th>\n<th align=\"center\">");
         out.write(_("ETA"));
         out.write("</th>\n<th align=\"right\">");
-        out.write(_("Downloaded"));
+        out.write(_("RX"));
         out.write("</th>\n<th align=\"right\">");
-        out.write(_("Uploaded"));
+        out.write(_("TX"));
         out.write("</th>\n<th align=\"right\">");
-        out.write(_("Down Rate"));
+        out.write(_("RX Rate"));
         out.write("</th>\n<th align=\"right\">");
-        out.write(_("Up Rate"));
+        out.write(_("TX Rate"));
         out.write("</th>\n");
     
         out.write("<th align=\"center\">");
@@ -598,7 +598,7 @@ public class I2PSnarkServlet extends Default {
         return rv;
     }
 
-    private static final int MAX_DISPLAYED_FILENAME_LENGTH = 44;
+    private static final int MAX_DISPLAYED_FILENAME_LENGTH = 38;
     private static final int MAX_DISPLAYED_ERROR_LENGTH = 40;
     private void displaySnark(PrintWriter out, Snark snark, String uri, int row, long stats[], boolean showPeers, boolean showDebug) throws IOException {
         String filename = snark.torrent;
@@ -671,34 +671,34 @@ public class I2PSnarkServlet extends Default {
             }
         } else if (remaining <= 0) {
             if (isRunning && curPeers > 0 && !showPeers)
-                statusString = _("Seeding") + " (" +
+                statusString = _("Seeding") + " &raquo; " +
                                "<a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">" +
                                curPeers + '/' +
-                               ngettext("1 peer", "{0} peers", knownPeers) + "</a>)";
+                               ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning)
-                statusString = _("Seeding") + " (" + curPeers + "/" +
-                               ngettext("1 peer", "{0} peers", knownPeers) + ')';
+                statusString = _("Seeding") + " &raquo; " + curPeers + "/" +
+                               ngettext("1 peer", "{0} peers", knownPeers);
             else
                 statusString = _("Complete");
         } else {
             if (isRunning && curPeers > 0 && downBps > 0 && !showPeers)
-                statusString = _("OK") + " (" +
+                statusString = _("OK") + " &raquo; " +
                                "<a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">" +
                                curPeers + "/" +
-                               ngettext("1 peer", "{0} peers", knownPeers) + "</a>)";
+                               ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning && curPeers > 0 && downBps > 0)
                 statusString = _("OK") + " (" + curPeers + "/" +
                                ngettext("1 peer", "{0} peers", knownPeers) + ')';
             else if (isRunning && curPeers > 0 && !showPeers)
-                statusString = _("Stalled") + " (" +
+                statusString = _("Stalled") + " &raquo; " +
                                "<a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">" +
                                curPeers + '/' +
-                               ngettext("1 peer", "{0} peers", knownPeers) + "</a>)";
+                               ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning && curPeers > 0)
-                statusString = _("Stalled") + " (" + curPeers + '/' +
-                               ngettext("1 peer", "{0} peers", knownPeers) + ')';
+                statusString = _("Stalled") + " &raquo; " + curPeers + '/' +
+                               ngettext("1 peer", "{0} peers", knownPeers);
             else if (isRunning)
-                statusString = _("No Peers") + " (0/" + knownPeers + ')';
+                statusString = _("No Peers") + " &raquo; 0/" + knownPeers;
             else
                 statusString = _("Stopped");
         }
@@ -745,11 +745,11 @@ public class I2PSnarkServlet extends Default {
                 if (e < 0)
                     continue;
                 baseURL = baseURL.substring(e + 1);
-                out.write("&nbsp;&nbsp;&nbsp;[<a href=\"" + baseURL + "details.php?dllist=1&filelist=1&info_hash=");
+                out.write("&nbsp;&raquo;&nbsp;<a href=\"" + baseURL + "details.php?dllist=1&filelist=1&info_hash=");
                 out.write(TrackerClient.urlencode(snark.meta.getInfoHash()));
                 out.write("\" title=\"" + name + ' ' + _("Tracker") + "\">");
                 out.write(_("Details"));
-                out.write("</a>]");
+                out.write("</a>");
                 break;
             }
         }

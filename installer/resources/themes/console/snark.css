@@ -96,8 +96,8 @@ table {
 }
 
 thead, tfoot {
-     background: #333;
-	 background: url("../console/images/snark_thead.png") repeat scroll 0 0 #333333;
+     background: #000;
+	 background: url("../console/images/snark_thead.png") repeat-x scroll 0 0 #101;
 	 text-shadow:0 2px 5px #333333;
 }
 
@@ -105,6 +105,10 @@ thead a, tfoot a {
 text-shadow: 1px 1px #210;
 text-shadow:1px 1px #550000;
 } 
+
+thead {
+     border-bottom: 2px solid #101;
+}
 
 th {
      padding: 4px;
@@ -116,6 +120,11 @@ th {
      whitespace: nowrap;
 }
 
+th:first-child {
+     text-align: left;
+	 padding-left: 10px;
+}
+
 .SnarkTorrents {
      margin: 0;
      border: 1px solid #001;
@@ -123,7 +132,7 @@ th {
 }
 
 td {
-     padding: 2px;
+     padding: 1px;
 	 color: #ddd !important;
 	 font-size: 9.5pt;
 }
@@ -146,20 +155,31 @@ td:first-child {
 }
 
 .snarkTorrentEven {
-     background: #555;
+     background: #545;
      font-size: 8pt;
+}
+
+.snarkTorrentStatus {
+     line-height: 200%;
 }
 
 .snarkTorrentStatus:first-child {
      text-align: left !important;
 	 font-style: italic;
-	 padding-left: 2%;
+	 padding-left: 10px;
 }
 
+.snarkTorrentRate, .snarkTorrentDownloaded, .snarkTorrentUploaded {
+     font-size: 8pt;
+     font-weight: bold;
+}
 
 .snarkTorrentOdd {
-     background: #444;
+     background: #434;
      font-size: 8pt;
+	 border: 1px inset #323;
+	 border-left: 0;
+	 border-right: 0;
 }
 
 .snarkFileName {
@@ -314,7 +334,8 @@ input[type=text]:active, input[type=text]:hover, input.r:hover {
 }
 
 select {
-     background: url('../console/images/graytile.png');
+     background: #333;
+	 background: url('../console/images/graytile.png') !important;
      color: #f60;
      font: 9pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
      font-weight: bold;
