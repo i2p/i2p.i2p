@@ -120,7 +120,7 @@ td {
 }
 
 td:first-child {
-     text-align: center;
+     text-align: right;
 	 padding-left: 10px;
 }
 
@@ -247,24 +247,28 @@ input {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      border: 1px solid #000;
-     background: #111;
+     background: url('../console/images/graytile.png');	 
 	 color: #f60;
 }
 
 input.r {
      text-align: right;
+     background: url('../console/images/graytile.png');
 }
 
 input[type=submit] {
-     text-shadow: 1px 1px #555;
+     text-shadow: 0px 0px #410;
 	 color: #000;
-	 background: #777;
-	 border: 1px outset #bbb;
+	 background: #999;
+	 border: 1px inset #bbb;
 }
 
 input[type=submit]:hover {
-	 border: 1px inset #bbb;
+	 border: 1px outset #bbb;
      text-shadow: 0 0;	 
+     background: #f60;
+	 color: #fff;
+	 text-shadow: 0px 1px 5px #f00;
 }
 
 input[type=submit]:active {
@@ -278,13 +282,8 @@ input[type=text]:active, input[type=text]:hover, input.r:hover {
 	 color: #000;
 }
 
-input[type=submit]:hover {
-     background: #f60;
-	 color: #000;
-}
-
 select {
-     background: #111;
+     background: url('../console/images/graytile.png');
      color: #f60;
      font: 9pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
      font-weight: bold;
@@ -301,7 +300,7 @@ select:hover, textarea:hover {
 }	 
 
 textarea {
-     background: #111;
+     background: #111 url('../console/images/graytile.png');
      color: #f60;
      font-weight: bold;
      padding: 1px 4px 0px;
