@@ -177,14 +177,16 @@ td:first-child {
 	 padding: 0 25px 5px 25px;
 	 margin: 5px 0 10px 0 !important;
 	 letter-spacing: 0.25em;
-	 border: 2px solid #444;
+	 border: 1px solid #111;
 	 -moz-border-radius: 0 0 5px 5px;
 	 -khtml-border-radius: 0 0 5px 5px;
 	 border-radius: 0 0 5px 5px;
 	 border-top: 0;
 	 text-shadow: 1px 1px #333;
-	 background: #333;/* url('../console/images/snarknav.png') repeat-x scroll center center;*/
+	 background: #333 url('../console/images/snarknav.png') repeat-x scroll center center !important;
 }
+
+
 
 .snarkConfig {
      font-size: 10pt;
@@ -255,7 +257,7 @@ input {
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     border: 1px solid #000;
+     border: 1px inset #000;
      background: url('../console/images/graytile.png');	 
 	 color: #f60;
 }
@@ -316,7 +318,7 @@ textarea {
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-	 border: 1px solid #000;
+	 border: 1px inset #000;
 }
 
 img {
@@ -345,7 +347,6 @@ div.section,div.mainsection {
      -moz-box-shadow: inset 0px 0px 1px 0px #002;
      word-wrap: break-word;
      text-align: center;
-     /*background: #ffe url('../console/light/images/tabletile.png');*/
      background: #444;
 	 opacity: 1.0;
 }
@@ -411,6 +412,7 @@ div.configsection table{
 
 div.configsection a {
      color: #f60;
+	 text-shadow: 1px 1px #500;
 }
 
 div.configsection a:hover {
