@@ -129,6 +129,11 @@ td:first-child {
      font-size: 8pt;
 }
 
+.snarkTorrentStatus {
+     text-align: center !important;
+	 font-style: italic;
+}
+
 .snarkTorrentOdd {
      background: #444;
      font-size: 8pt;
@@ -137,6 +142,7 @@ td:first-child {
 .snarkFileName {
      min-width: 25em;
      padding: 4px 10px;
+	 text-align: left !important;
 }
 
 .snarkFileSize {
@@ -145,6 +151,8 @@ td:first-child {
 
 .snarkFileStatus {
      padding: 4px 10px;
+	 text-align: center;
+	 font-style: italic;
 }
 
 .thumb {
