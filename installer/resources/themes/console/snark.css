@@ -148,10 +148,12 @@ td:first-child {
 
 .snarkTorrentName {
      text-shadow:1px 1px #550000;
+	 padding: 2px 0 0;
 }
 
 .snarkTorrentAction {
      text-shadow:1px 1px #550000;
+	 padding: 0 0 1px;
 }
 
 .snarkTorrentEven {
@@ -160,7 +162,8 @@ td:first-child {
 }
 
 .snarkTorrentStatus {
-     line-height: 200%;
+/*     line-height: 100%; */
+     padding: 1px 0 2px;
 }
 
 .snarkTorrentStatus:first-child {
@@ -364,7 +367,7 @@ textarea {
 
 img {
      border: none;
-     margin: 3px 8px 5px 4px;
+     margin: 1px 3px 3px 4px;
      vertical-align: middle;
      opacity: 1.0;
      line-height: 100%;
