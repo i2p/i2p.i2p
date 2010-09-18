@@ -871,10 +871,10 @@ public class I2PSnarkServlet extends Default {
                 out.write("<td align=\"right\" class=\"snarkTorrentStatus " + rowClass + "\">");
                 if (remaining > 0) {
                     if (peer.isInteresting() && !peer.isChoked()) {
-                        out.write("<font color=#003300>");
+                        out.write("<font color=#00ee00>");
                         out.write(formatSize(peer.getDownloadRate()) + "ps</font>");
                     } else {
-                        out.write("<font color=#550000><a title=\"");
+                        out.write("<font color=#ee0000><a title=\"");
                         if (!peer.isInteresting())
                             out.write(_("Uninteresting (The peer has no pieces we need)"));
                         else
@@ -887,10 +887,10 @@ public class I2PSnarkServlet extends Default {
                 out.write("<td align=\"right\" class=\"snarkTorrentStatus " + rowClass + "\">");
                 if (pct != 100.0) {
                     if (peer.isInterested() && !peer.isChoking()) {
-                        out.write("<font color=#003300>");
+                        out.write("<font color=#00ee00>");
                         out.write(formatSize(peer.getUploadRate()) + "ps</font>");
                     } else {
-                        out.write("<font color=#550000><a title=\"");
+                        out.write("<font color=#ee0000><a title=\"");
                         if (!peer.isInterested())
                             out.write(_("Uninterested (We have no pieces the peer needs)"));
                         else

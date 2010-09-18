@@ -175,9 +175,9 @@ td:first-child {
 }
 
 .snarkTorrentOdd {
-     background: #434;
+     background: #656;
      font-size: 8pt;
-	 border: 1px inset #323;
+	 border: 1px inset #434;
 	 border-left: 0;
 	 border-right: 0;
 }
@@ -234,7 +234,7 @@ td:first-child {
 }
 
 .page {
-     background: #222;
+     background: #323;
      color: #310;
      min-width: 800px !important;
      margin: 5px 0 0 0;
@@ -242,7 +242,7 @@ td:first-child {
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     border: 1px solid #001;
+     border: 1px solid #101;
      font-size: 9pt !important;
      line-height: 160% !important;
      -moz-box-shadow: inset 0px 0px 1px 0px #002;
@@ -310,7 +310,7 @@ input.r {
 input[type=submit] {
      text-shadow: 0px 0px #410;
 	 color: #000;
-	 background: #999;
+	 background: #989;
 	 border: 1px inset #bbb;
 }
 
@@ -330,7 +330,7 @@ input[type=submit]:active {
 
 input[type=text]:active, input[type=text]:hover, input.r:hover {
      background: #f60;
-	 color: #000;
+	 color: #fff;
 }
 
 select {
@@ -347,8 +347,8 @@ select {
 }
 
 select:hover, textarea:hover {
-     background: #f60;
-     color: #000;
+     background: #f60 !important;
+     color: #fff;
 }	 
 
 textarea {
@@ -385,10 +385,10 @@ div.section,div.mainsection {
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     -moz-box-shadow: inset 0px 0px 1px 0px #212;
      word-wrap: break-word;
      text-align: center;
-     background: #333;
+     background: #545;
 	 opacity: 1.0;
 }
 
@@ -401,11 +401,11 @@ div.newtorrentsection {
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     -moz-box-shadow: inset 0px 0px 1px 0px #ff0;
-     -khtml-box-shadow: inset 0px 0px 1px 0px #ff0;
-     box-shadow: inset 0px 0px 1px 0px #ff0;
+     -moz-box-shadow: inset 0px 0px 1px 0px #101;
+     -khtml-box-shadow: inset 0px 0px 1px 0px #101;
+     box-shadow: inset 0px 0px 1px 0px #101;
      word-wrap: break-word;
-     background: #444 url('../console/images/snark_create.png') no-repeat scroll right center;
+     background: #545 url('../console/images/snark_create.png') no-repeat scroll right center;
      opacity: 1.0;
 }
 
@@ -418,28 +418,28 @@ div.addtorrentsection {
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     -moz-box-shadow: inset 0px 0px 1px 0px #0f0;
-     -khtml-box-shadow: inset 0px 0px 1px 0px #0f0;
-     box-shadow: inset 0px 0px 1px 0px #0f0;
+     -moz-box-shadow: inset 0px 0px 1px 0px #101;
+     -khtml-box-shadow: inset 0px 0px 1px 0px #101;
+     box-shadow: inset 0px 0px 1px 0px #101;
      word-wrap: break-word;
-     background: #444 url('../console/images/snark_add.png') no-repeat scroll right center;
+     background: #545 url('../console/images/snark_add.png') no-repeat scroll right center;
      opacity: 1.0;
 }
 
 div.configsection {
      margin: 0 0 10px 0;
      padding: 0 10px 15px 10px;
-     border: 1px solid #001;
+     border: 1px solid #000;
      color: #ddd;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     -moz-box-shadow: inset 0px 0px 1px 0px #f00;
-     -khtml-box-shadow: inset 0px 0px 1px 0px #f00;
-     box-shadow: inset 0px 0px 1px 0px #f00;
+     -moz-box-shadow: inset 0px 0px 1px 0px #101;
+     -khtml-box-shadow: inset 0px 0px 1px 0px #101;
+     box-shadow: inset 0px 0px 1px 0px #101;
      word-wrap: break-word;
      text-align: center;
-     background: #444;
+     background: #545;
      font-weight: bold;
 }
 
@@ -461,6 +461,12 @@ div.configsection a:hover {
      text-decoration: none;
 }
 
+code {
+     font-size: 9.5pt;
+     color: #0f0;
+	 padding: 0 2px;
+	 font-weight: bold;
+}
 .snarknavbar {
      margin: 0 0 10px 0 !important;
      padding: 2px 10px;
