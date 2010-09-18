@@ -236,7 +236,7 @@ td:first-child {
 .page {
      background: #323;
      color: #310;
-     min-width: 800px !important;
+     min-width: 820px !important;
      margin: 5px 0 0 0;
      padding: 10px 10px 0px 10px;
      -moz-border-radius: 4px;
@@ -484,5 +484,5 @@ code {
      font-weight: bold;
      font-size: 11pt;
      color: #001;
-	 min-width: 800px;
+	 min-width: 820px;
  }
