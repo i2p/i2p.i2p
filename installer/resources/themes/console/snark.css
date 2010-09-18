@@ -462,10 +462,11 @@ div.configsection a:hover {
 }
 
 code {
-     font-size: 9.5pt;
-     color: #0f0;
+     font-size: 9pt;
+     color: #b8b;
 	 padding: 0 2px;
 	 font-weight: bold;
+	 font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono;
 }
 .snarknavbar {
      margin: 0 0 10px 0 !important;
