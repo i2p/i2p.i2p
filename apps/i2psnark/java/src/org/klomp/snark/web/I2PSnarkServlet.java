@@ -237,7 +237,7 @@ public class I2PSnarkServlet extends Default {
         List snarks = getSortedSnarks(req);
         String uri = req.getRequestURI();
         out.write(TABLE_HEADER);
-        out.write(_("Status"));
+        out.write(_("<img border=\"0\" src=\"/themes/console/snark/images/status.png\" title=\"Torrent Status\">Status"));
         if (_manager.util().connected() && !snarks.isEmpty()) {
             out.write(" &raquo; <a href=\"");
             out.write(req.getRequestURI());
@@ -251,7 +251,7 @@ public class I2PSnarkServlet extends Default {
             out.write("</a><br>\n");
         }
         out.write("</th>\n<th align=\"left\">");
-        out.write(_("Torrent"));
+        out.write(_("<img border=\"0\" src=\"/themes/console/snark/images/torrent.png\" title=\"Loaded Torrents\">Torrent"));
         out.write("</th>\n<th align=\"center\">");
         out.write(_("<img border=\"0\" src=\"/themes/console/snark/images/eta.png\" title=\"Estimated Download Time\">ETA"));
         out.write("</th>\n<th align=\"center\">");
