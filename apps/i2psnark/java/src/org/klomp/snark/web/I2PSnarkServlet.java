@@ -657,13 +657,13 @@ public class I2PSnarkServlet extends Default {
         String statusString = _("Unknown");
         if (err != null) {
             if (isRunning && curPeers > 0 && !showPeers)
-                statusString = "<a title=\"" + err + "\">" + _("TrackerErr") + "</a> (" +
+                statusString = "<a title=\"" + err + "\">" + _("TrackerErr") + "</a> &raquo; " +
                                "<a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">" +
                                curPeers + '/' +
-                               ngettext("1 peer", "{0} peers", knownPeers) + "</a>)";
+                               ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning)
-                statusString = "<a title=\"" + err + "\">" + _("TrackerErr") + " (" + curPeers + '/' +
-                               ngettext("1 peer", "{0} peers", knownPeers) + ')';
+                statusString = "<a title=\"" + err + "\">" + _("TrackerErr") + " &raquo; " + curPeers + '/' +
+                               ngettext("1 peer", "{0} peers", knownPeers);
             else {
                 if (err.length() > MAX_DISPLAYED_ERROR_LENGTH)
                     err = err.substring(0, MAX_DISPLAYED_ERROR_LENGTH) + "&hellip;";
