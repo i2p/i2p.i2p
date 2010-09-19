@@ -243,10 +243,10 @@ public class I2PSnarkServlet extends Default {
             out.write(req.getRequestURI());
             if (peerParam != null) {
                 out.write("\">");
-                out.write(_("Hide Peers"));
+                out.write(_("<img border=\"0\" src=\"/themes/console/snark/images/hidepeers.png\" title=\"Hide Peers\">"));
             } else {
                 out.write("?p=1\">");
-                out.write(_("Show Peers"));
+                out.write(_("<img border=\"0\" src=\"/themes/console/snark/images/showpeers.png\" title=\"Show Peers\">"));
             }
             out.write("</a><br>\n");
         }
