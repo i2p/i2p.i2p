@@ -243,12 +243,12 @@ public class I2PSnarkServlet extends Default {
             out.write(req.getRequestURI());
             if (peerParam != null) {
                 out.write("\">");
-                out.write(_("<img border=\"0\" src=\"/themes/console/snark/images/hidepeers.png\" title=\"Hide Peers\">"));
+                out.write(_("<img border=\"0\" src=\"/themes/console/snark/images/hidepeers.png\" title=\"Hide Peers\" alt=\"Hide Peers\">"));
             } else {
                 out.write("?p=1\">");
-                out.write(_("<img border=\"0\" src=\"/themes/console/snark/images/showpeers.png\" title=\"Show Peers\">"));
+                out.write(_("<img border=\"0\" src=\"/themes/console/snark/images/showpeers.png\" title=\"Show Peers\" alt=\"Show Peers\">"));
             }
-            out.write("</a><br>\n");
+            out.write("</a><br>\n"); 
         }
         out.write("</th>\n<th align=\"left\">");
         out.write(_("<img border=\"0\" src=\"/themes/console/snark/images/torrent.png\" title=\"Loaded Torrents\">Torrent"));
@@ -598,7 +598,7 @@ public class I2PSnarkServlet extends Default {
         return rv;
     }
 
-    private static final int MAX_DISPLAYED_FILENAME_LENGTH = 38;
+    private static final int MAX_DISPLAYED_FILENAME_LENGTH = 42;
     private static final int MAX_DISPLAYED_ERROR_LENGTH = 40;
     private void displaySnark(PrintWriter out, Snark snark, String uri, int row, long stats[], boolean showPeers, boolean showDebug) throws IOException {
         String filename = snark.torrent;
