@@ -2,7 +2,7 @@
 /* Guantanamo Commemorative Edition. */
 
 body {
-     background: #333 url('/themes/console/snark/images/graytile.png');
+     background: #101 url('/themes/console/snark/images/graytile.png');
      color: #001;
      font: 8pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
 }
@@ -165,6 +165,14 @@ td:first-child {
 .snarkTorrentEven {
      background: #545;
      font-size: 8pt;
+}
+
+.snarkTorrentNoneLoaded {
+     background: #323;
+     font-size: 8.5pt;
+	 font-weight: bold;
+	 text-align: center !important;
+	 color: #bbb !important;
 }
 
 .snarkTorrentStatus {

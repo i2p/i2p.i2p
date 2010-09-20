@@ -243,10 +243,10 @@ public class I2PSnarkServlet extends Default {
             out.write(req.getRequestURI());
             if (peerParam != null) {
                 out.write("\">");
-                out.write(_("<img border=\"0\" src=\"/themes/console/snark/images/hidepeers.png\" title=\"Hide Peers\" alt=\"Hide Peers\">"));
+                out.write(_("<img border=\"0\" src=\"/themes/console/snark/images/showpeers.png\" title=\"Toggle Peer Visibility\" alt=\"Hide Peers\">"));
             } else {
                 out.write("?p=1\">");
-                out.write(_("<img border=\"0\" src=\"/themes/console/snark/images/showpeers.png\" title=\"Show Peers\" alt=\"Show Peers\">"));
+                out.write(_("<img border=\"0\" src=\"/themes/console/snark/images/hidepeers.png\" title=\"Toggle Peer Visibility\" alt=\"Show Peers\">"));
             }
             out.write("</a><br>\n"); 
         }
@@ -291,8 +291,8 @@ public class I2PSnarkServlet extends Default {
         }
 
         if (snarks.isEmpty()) {
-            out.write("<tr class=\"snarkTorrentEven\">" +
-                      "<td class=\"snarkTorrentEven\" align=\"center\"" +
+            out.write("<tr class=\"snarkTorrentNoneLoaded\">" +
+                      "<td class=\"snarkTorrentNoneLoaded\"" +
                       " colspan=\"8\"><i>");
             out.write(_("No torrents loaded."));
             out.write("</i></td></tr>\n");
@@ -300,12 +300,12 @@ public class I2PSnarkServlet extends Default {
             out.write("<tfoot><tr>\n" +
                       "    <th align=\"left\" colspan=\"2\">");
             out.write(_("Totals"));
-            out.write(" (");
+            out.write(" &raquo;&nbsp;");
             out.write(ngettext("1 torrent", "{0} torrents", snarks.size()));
             out.write(", ");
             out.write(DataHelper.formatSize2(stats[5]) + "B, ");
             out.write(ngettext("1 connected peer", "{0} connected peers", (int) stats[4]));
-            out.write(")</th>\n" +
+            out.write("</th>\n" +
                       "    <th>&nbsp;</th>\n" +
                       "    <th align=\"right\">" + formatSize(stats[0]) + "</th>\n" +
                       "    <th align=\"right\">" + formatSize(stats[1]) + "</th>\n" +
