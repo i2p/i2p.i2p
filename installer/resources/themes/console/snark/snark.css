@@ -33,10 +33,7 @@ body {
      font-weight: bold;
      font-size: 11pt;
      color: #f90;
-     /*border-bottom: 3px solid #111;
-     border-top: 3px solid #111;*/
-	 background: #f90;
-     background: #111 url('/themes/console/snark/images/snarknav_on.png') repeat-x scroll center center;
+     background: #310 url('/themes/console/snark/images/snarknav_on.png') repeat-x scroll center center;
 	 -moz-border-radius: 3px;
 	 -khtml-border-radius: 3px;
 	 border-radius: 3px;
@@ -50,9 +47,7 @@ body {
      font-weight: bold;
      font-size: 11pt;
      color: #fb0;
-     /*border-bottom: 3px solid #6d6;
-     border-top: 3px solid #6d6; */
-     background: #111 url('/themes/console/snark/images/snarknav_on.png') repeat-x scroll center center;
+     background: #310 url('/themes/console/snark/images/snarknav_on.png') repeat-x scroll center center;
 }
 
 .snarkMessages {
@@ -69,9 +64,7 @@ body {
      color: #22f;
      height: 70px;
      width: auto;
-     background: #000;
      background: #111 url('/themes/console/snark/images/hat.png') no-repeat scroll right center;
-
 }
 
 pre {
@@ -92,7 +85,11 @@ table {
      border-collapse: collapse;
 	 color: #ddd;
 	 width: 100%;
-	 
+	 opacity: 1 !important;
+}
+
+tr { 
+	 opacity: 1;
 }
 
 thead, tfoot {
@@ -115,7 +112,6 @@ th {
      font-size: 9pt;
      border-top: 1px outset #001;
      border-bottom: 1px inset #001;
-/*     background: #222;*/
 	 color: #ddd;
      whitespace: nowrap;
 }
@@ -144,6 +140,7 @@ td {
      padding: 1px;
 	 color: #ddd !important;
 	 font-size: 9.5pt;
+	 opacity: 1;
 }
 
 .mainsection td {
@@ -171,7 +168,6 @@ td:first-child {
 }
 
 .snarkTorrentStatus {
-/*     line-height: 100%; */
      padding: 1px 0 2px;
 }
 
@@ -261,11 +257,10 @@ td:first-child {
      -khtml-box-shadow: inset 0px 0px 1px 0px #002;
      box-shadow: inset 0px 0px 1px 0px #002;
      text-align: center;
-     opacity: 1.0;
+     opacity: 1
 }
 
 form {
-/*     line-height: 250%; */
 	 margin-bottom: 0;
 }
 
@@ -401,7 +396,7 @@ div.section,div.mainsection {
      word-wrap: break-word;
      text-align: center;
      background: #545;
-	 opacity: 1.0;
+	 opacity: 1 !important;
 }
 
 div.newtorrentsection {
@@ -461,6 +456,7 @@ div.configsection {
 
 div.configsection table{
      color: #ffb;
+	 opacity: 1;
 }
 
 div.configsection a {
