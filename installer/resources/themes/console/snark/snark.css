@@ -67,6 +67,10 @@ body {
      background: #111 url('/themes/console/snark/images/hat.png') no-repeat scroll right center;
 }
 
+.logshim {
+     margin-top: -10px !important;
+}
+
 pre {
      width: 100%;
      font: 8pt "Lucida Console","DejaVu Sans Mono",Courier,mono !important;

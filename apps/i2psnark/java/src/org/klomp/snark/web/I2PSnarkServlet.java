@@ -217,7 +217,7 @@ public class I2PSnarkServlet extends Default {
         out.write("</pre></td></tr></table></div>");
 
         if (isConfigure) {
-            out.write("</div>\n");
+            out.write("<div class=\"logshim\"></div></div>\n");
             writeConfigForm(out, req);
         } else {
             writeTorrents(out, req);
