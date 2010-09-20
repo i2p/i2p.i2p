@@ -458,6 +458,23 @@ div.configsection {
      font-weight: bold;
 }
 
+div.configsectionpanel {
+     margin: 0 0 10px 0;
+     padding: 0 10px;
+     border: 1px solid #000;
+     color: #ddd;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     -moz-box-shadow: inset 0px 0px 1px 0px #101;
+     -khtml-box-shadow: inset 0px 0px 1px 0px #101;
+     box-shadow: inset 0px 0px 1px 0px #101;
+     word-wrap: break-word;
+     text-align: center;
+     background: #545 url('/themes/console/snark/images/configuration.png') no-repeat scroll right center;
+     font-weight: bold;
+}
+
 .newtorrentsection form, .configsection form, .addtorrentsection form {
      color: #ddd !important;
 }

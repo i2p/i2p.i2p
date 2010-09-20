@@ -999,7 +999,7 @@ public class I2PSnarkServlet extends Default {
         //int seedPct = 0;
        
         out.write("<form action=\"" + uri + "\" method=\"POST\">\n");
-        out.write("<div class=\"configsection\"><span class=\"snarkConfig\">\n");
+        out.write("<div class=\"configsectionpanel\"><span class=\"snarkConfig\">\n");
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n");
         out.write("<input type=\"hidden\" name=\"action\" value=\"Save\" >\n");
         out.write("<span class=\"snarkConfigTitle\">");
