@@ -1285,8 +1285,8 @@ public class I2PSnarkServlet extends Default {
         
         buf.append("</div><div class=\"page\"><div class=\"mainsection\">" +
                    "<TABLE BORDER=0 class=\"snarkTorrents\" cellpadding=\"5px 10px\">" +
-                   "<thead><tr><th>").append(_("File")).append("</th><th>").append(_("Size"))
-           .append("</th><th>").append(_("Status")).append("</th></tr></thead>");
+                   "<thead><tr><th>").append(_("<img border=\"0\" src=\"/themes/console/snark/images/file.png\" title=\"File\" alt=\"File\">&nbsp;File")).append("</th><th>").append(_("<img border=\"0\" src=\"/themes/console/snark/images/size.png\" title=\"FileSize\" alt=\"FileSize\">Size"))
+           .append("</th><th>").append(_("<img border=\"0\" src=\"/themes/console/snark/images/status.png\" title=\"Download Status\">Status")).append("</th></tr></thead>");
         //DateFormat dfmt=DateFormat.getDateTimeInstance(DateFormat.MEDIUM,
         //                                               DateFormat.MEDIUM);
         for (int i=0 ; i< ls.length ; i++)
