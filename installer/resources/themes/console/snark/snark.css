@@ -121,9 +121,14 @@ th {
 }
 
 th:first-child {
-     text-align: left;
+     text-align: left !important;
 	 padding-left: 3px;
 	 max-width: 120px;
+}
+
+tfoot td:first-child {
+     text-align: left !important;
+	 padding-left: 0px;
 }
 
 th:first-child img {
@@ -243,8 +248,8 @@ td:first-child {
 	 -khtml-border-radius: 0 0 5px 5px;
 	 border-radius: 0 0 5px 5px;
 	 border-top: 0;
-	 text-shadow: 0px 3px 5px #333;
-	 background: #333 url('/themes/console/snark/images/snarknav.png') repeat-x scroll center center !important;
+	 text-shadow: 0px 3px 5px #323;
+	 background: #101 url('/themes/console/snark/images/snarknav.png') repeat-x scroll center center !important;
 	 font-variant: small-caps !important;
 }
 
@@ -522,6 +527,7 @@ code {
      font-size: 11.5pt;
      color: #001;
 	 min-width: 820px;
+	 text-align: center;
  }
 
  .snarknavbar img {
