@@ -412,7 +412,6 @@
         <copy file="installer/lib/launch4j/lib/XStream.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-XStream.txt" />
     </target>
     <target name="prepthemeupdates">
-        <!-- Add extricated I2PSnark css here, for now -->
         <!-- Migrated all Snark content to its own dir. Need to ensure snark dir excluded from console theme choices!! -->
         <!-- Snark's visible Assets -->
         <copy todir="pkg-temp/docs/themes/console/snark/" >

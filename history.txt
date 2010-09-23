@@ -1,5 +1,5 @@
 2010-09-15 dr|z3d
-    * I2PSnark: Overhaul UI, implement gray theme.
+    * I2PSnark: Overhaul UI, implement new theme.
 
 * 2010-07-12  0.8 released
 

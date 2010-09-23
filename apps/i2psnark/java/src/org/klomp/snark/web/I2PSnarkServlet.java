@@ -1270,7 +1270,7 @@ public class I2PSnarkServlet extends Default {
             title = title.substring(0, title.length() - 1);
         title = _("Torrent") + ": " + title;
         buf.append(title);
-        buf.append("</TITLE>").append(HEADER).append("</HEAD><BODY>\n<div class=\"snarknavbar\"> <a href=\"/i2psnark/\" title=\"Torrents\"");
+        buf.append("</TITLE>").append(HEADER).append("<link rel=\"shortcut icon\" href=\"/themes/console/snark/favicon.ico\"></HEAD><BODY>\n<div class=\"snarknavbar\"> <a href=\"/i2psnark/\" title=\"Torrents\"");
         buf.append(" class=\"snarkRefresh\">I2PSnark</a>").append("</div>");
        
         buf.append("<div class=\"page\"><div class=\"mainsection\">" +
