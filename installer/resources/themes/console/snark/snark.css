@@ -87,7 +87,7 @@ table {
      padding: 0px;
      border-spacing: 0px;
      border-collapse: collapse;
-	 color: #ddd;
+	 color: #323 url("/themes/console/snark/images/hat.png");
 	 width: 100%;
 	 opacity: 1 !important;
 }
@@ -97,13 +97,11 @@ tr {
 }
 
 thead, tfoot {
-     background: #000;
 	 background: url("/themes/console/snark/images/snark_thead.png") repeat-x scroll 0 0 #101;
 	 text-shadow:0 2px 5px #333333;
 }
 
 thead a, tfoot a {
-text-shadow: 1px 1px #210;
 text-shadow:1px 1px #550000;
 } 
 
@@ -112,7 +110,7 @@ thead {
 }
 
 th {
-     padding: 4px;
+     padding: 4px 2px 1px 4px;
      font-size: 9pt;
      border-top: 1px outset #001;
      border-bottom: 1px inset #001;
@@ -139,10 +137,14 @@ th:nth-child(2) img {
      margin: 1px 7px 3px 2px;
 }
 
+tfoot th {
+     padding-bottom: 4px !important;
+}
+
 .SnarkTorrents {
      margin: 0;
      border: 1px solid #001;
-     background: #333;
+     background: #212;
 }
 
 td {
