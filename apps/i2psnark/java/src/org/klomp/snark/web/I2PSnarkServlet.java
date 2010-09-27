@@ -270,14 +270,14 @@ public class I2PSnarkServlet extends Default {
                       "\" title=\"");
             out.write(_("Stop all torrents and the I2P tunnel"));
             out.write("\">");
-            out.write(_("Stop All"));
+            out.write(_("<img src=\"/themes/console/snark/images/stop_all.png\" title=\"Stop All Torrents\" alt=\"Stop All\">"));
             out.write("</a>");
         } else if (!snarks.isEmpty()) {
             out.write("<a href=\"" + uri + "?action=StartAll&nonce=" + _nonce +
                       "\" title=\"");
             out.write(_("Start all torrents and the I2P tunnel"));
             out.write("\">");
-            out.write(_("Start All"));
+            out.write(_("<img src=\"/themes/console/snark/images/start_all.png\" title=\"Start All Torrents\" alt=\"Start All\">"));
             out.write("</a>");
         } else {
             out.write("&nbsp;");
@@ -784,7 +784,7 @@ public class I2PSnarkServlet extends Default {
                       + "\" title=\"");
             out.write(_("Stop the torrent"));
             out.write("\">");
-            out.write(_("Stop"));
+            out.write(_("<img src=\"/themes/console/snark/images/stop.png\" title=\"Stop Torrent\" alt=\"Stop\">"));
             out.write("</a>");
         } else {
             if (isValid) {
@@ -792,8 +792,8 @@ public class I2PSnarkServlet extends Default {
                           + "\" title=\"");
                 out.write(_("Start the torrent"));
                 out.write("\">");
-                out.write(_("Start"));
-                out.write("</a>\n");
+                out.write(_("<img src=\"/themes/console/snark/images/start.png\" title=\"Start Torrent\" alt=\"Start\">"));
+                out.write("</a>");
             }
             out.write("<a href=\"" + uri + "?action=Remove" + parameters
                       + "\" title=\"");
@@ -804,8 +804,8 @@ public class I2PSnarkServlet extends Default {
             // Then the remaining single quite must be escaped
             out.write(_("Are you sure you want to delete the file \\''{0}.torrent\\'' (downloaded data will not be deleted) ?", fullFilename));
             out.write("')) { return false; }\">");
-            out.write(_("Remove"));
-            out.write("</a><br>");
+            out.write(_("<img src=\"/themes/console/snark/images/remove.png\" title=\"Remove Torrent\" alt=\"Remove\">"));
+            out.write("</a>");
             out.write("<a href=\"" + uri + "?action=Delete" + parameters
                       + "\" title=\"");
             out.write(_("Delete the .torrent file and the associated data file(s)"));
@@ -815,7 +815,7 @@ public class I2PSnarkServlet extends Default {
             // Then the remaining single quite must be escaped
             out.write(_("Are you sure you want to delete the torrent \\''{0}\\'' and all downloaded data?", fullFilename));
             out.write("')) { return false; }\">");
-            out.write(_("Delete"));
+            out.write(_("<img src=\"/themes/console/snark/images/delete.png\" title=\"Delete Torrent + Data\" alt=\"Delete\">"));
             out.write("</a>");
         }
         out.write("</td>\n</tr>\n");
