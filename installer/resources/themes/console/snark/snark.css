@@ -170,9 +170,10 @@ td:first-child {
 
 .snarkTorrentAction {
      text-shadow:1px 1px #550000;
-	 padding: 1px 0 !important;
+	 padding: 1px 1px 1px 1px !important;
 	 margin: 0 !important;
 	 text-align: center;
+	 width: 68px;
 }
 
 .snarkTorrentAction img {
