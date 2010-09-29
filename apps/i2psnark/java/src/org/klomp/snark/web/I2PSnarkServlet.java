@@ -761,7 +761,7 @@ public class I2PSnarkServlet extends Default {
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentDownloaded " + rowClass + "\">");
         if (remaining > 0)
-            out.write(formatSize(total-remaining) + " / " + formatSize(total)); // 18MB/3GB
+            out.write("<i>" + formatSize(total-remaining) + "</i> /" + formatSize(total)); // 18MB/3GB
         else
             out.write(formatSize(total)); // 3GB
         out.write("</td>\n\t");
@@ -927,7 +927,7 @@ public class I2PSnarkServlet extends Default {
         out.write(_("<img border=\"0\" src=\"/themes/console/snark/images/add.png\">Add Torrent"));
         out.write("</span><hr>\n<table border=\"0\"><tr><td>");
         out.write(_("From URL"));
-        out.write(":<td><input type=\"text\" name=\"newURL\" size=\"80\" value=\"" + newURL + "\" > \n");
+        out.write(":<td><input type=\"text\" name=\"newURL\" size=\"85\" value=\"" + newURL + "\" > \n");
         // not supporting from file at the moment, since the file name passed isn't always absolute (so it may not resolve)
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>");
         out.write("<input type=\"submit\" value=\"");
@@ -960,7 +960,7 @@ public class I2PSnarkServlet extends Default {
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>\n");
         out.write(_("Data to seed"));
         out.write(":<td><code>" + _manager.getDataDir().getAbsolutePath() + File.separatorChar 
-                  + "</code><input type=\"text\" name=\"baseFile\" size=\"40\" value=\"" + baseFile 
+                  + "</code><input type=\"text\" name=\"baseFile\" size=\"58\" value=\"" + baseFile 
                   + "\" title=\"");
         out.write(_("File or directory to seed (must be within the specified path)"));
         out.write("\" ><tr><td>\n");
@@ -980,7 +980,7 @@ public class I2PSnarkServlet extends Default {
         }
         out.write("</select>\n");
         out.write(_("or&nbsp;"));
-        out.write("<input type=\"text\" name=\"announceURLOther\" size=\"50\" value=\"http://\" " +
+        out.write("<input type=\"text\" name=\"announceURLOther\" size=\"57\" value=\"http://\" " +
                   "title=\"");
         out.write(_("Specify custom tracker announce URL"));
         out.write("\" > ");
