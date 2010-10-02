@@ -60,7 +60,6 @@ public class TunnelGateway {
         _preprocessor = preprocessor;
         _sender = sender;
         _receiver = receiver;
-        _messagesSent = 0;
         _flushFrequency = 500;
         _delayedFlush = new DelayedFlush();
         _lastFlush = _context.clock().now();
@@ -128,8 +127,8 @@ public class TunnelGateway {
             FlushTimer.getInstance().addEvent(_delayedFlush, delayAmount);
         }
         _context.statManager().addRateData("tunnel.lockedGatewayAdd", afterAdded-beforeLock, remaining);
-        long complete = System.currentTimeMillis();
-        if (_log.shouldLog(Log.DEBUG))
+        if (_log.shouldLog(Log.DEBUG)) {
+            long complete = System.currentTimeMillis();
             _log.debug("Time to add the message " + msg.getUniqueId() + ": " + (complete-startAdd)
                        + " delayed? " + delayedFlush + " remaining: " + remaining
                        + " prepare: " + (beforeLock-startAdd)
@@ -137,6 +136,7 @@ public class TunnelGateway {
                        + " preprocess: " + (afterPreprocess-afterAdded)
                        + " expire: " + (afterExpire-afterPreprocess)
                        + " queue flush: " + (complete-afterExpire));
+        }
     }
     
     public int getMessagesSent() { return _messagesSent; }
@@ -202,10 +202,7 @@ public class TunnelGateway {
             _messageId = message.getUniqueId();
             _expiration = message.getMessageExpiration();
             _remaining = message.toByteArray();
-            _offset = 0;
-            _fragmentNumber = 0;
             _created = now;
-            _messageIds = null;
         }
         /** may be null */
         public Hash getToRouter() { return _toRouter; }

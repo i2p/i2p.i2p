@@ -14,9 +14,9 @@ import net.i2p.util.Log;
  *
  */
 public class OutboundGatewayProcessor {
-    private I2PAppContext _context;
-    private Log _log;
-    private TunnelCreatorConfig _config;
+    private final I2PAppContext _context;
+    private final Log _log;
+    private final TunnelCreatorConfig _config;
         
     static final boolean USE_ENCRYPTION = HopProcessor.USE_ENCRYPTION;
     private static final ByteCache _cache = ByteCache.getInstance(128, HopProcessor.IV_LENGTH);
@@ -54,10 +54,8 @@ public class OutboundGatewayProcessor {
     }
     
     /**
-     * Undo the crypto that the various layers in the tunnel added.  This is used
-     * by both the outbound gateway (preemptively undoing the crypto peers will add)
-     * and by the inbound endpoint.
-     *
+     * Iteratively undo the crypto that the various layers in the tunnel added.  This is used
+     * by the outbound gateway (preemptively undoing the crypto peers will add).
      */
     private void decrypt(I2PAppContext ctx, TunnelCreatorConfig cfg, byte iv[], byte orig[], int offset, int length) {
         Log log = ctx.logManager().getLog(OutboundGatewayProcessor.class);
@@ -73,6 +71,11 @@ public class OutboundGatewayProcessor {
         _cache.release(ba);
     }
     
+    /**
+     * Undo the crypto for a single hop.  This is used
+     * by both the outbound gateway (preemptively undoing the crypto peers will add)
+     * and by the inbound endpoint.
+     */
     static void decrypt(I2PAppContext ctx, byte iv[], byte orig[], int offset, int length, byte cur[], HopConfig config) {
         // update the IV for the previous (next?) hop
         ctx.aes().decryptBlock(orig, offset, config.getIVKey(), orig, offset);
