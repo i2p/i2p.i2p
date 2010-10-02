@@ -37,17 +37,9 @@ public class GarlicConfig {
     private long _replyBlockExpiration;
     
     public GarlicConfig() {
-	_recipient = null;
-	_recipientPublicKey = null;
-	_cert = null;
 	_id = -1;
 	_expiration = -1;
 	_cloveConfigs = new ArrayList();
-	_instructions = null;
-	_requestAck = false;
-	_replyThroughRouter = null;
-	_replyInstructions = null;
-	_replyBlockCertificate = null;
 	_replyBlockMessageId = -1;
 	_replyBlockExpiration = -1;
     }
