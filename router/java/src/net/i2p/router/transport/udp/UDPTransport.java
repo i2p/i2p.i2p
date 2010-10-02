@@ -945,7 +945,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 // try to shift 'em around every 10 minutes or so
                 if (_introducersSelectedOn < _context.clock().now() - 10*60*1000) {
                     if (_log.shouldLog(Log.WARN))
-                        _log.warn("Our introducers are valid, but thy havent changed in a while, so lets rechoose");
+                        _log.warn("Our introducers are valid, but havent changed in a while, so lets rechoose");
                     return true;
                 } else {
                     if (_log.shouldLog(Log.INFO))
@@ -954,7 +954,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 }
             } else {
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Our introducers are not valid (" +valid + ")");
+                    _log.info("Need more introducers (have " +valid + " need " + PUBLIC_RELAY_COUNT + ')');
                 return true;
             }
         } else {
@@ -1233,7 +1233,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 _introducersSelectedOn = _context.clock().now();
                 introducersIncluded = true;
             } else {
+                // FIXME
                 // maybe we should fail to publish an address at all in this case?
+                // YES that would be better
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Need introducers but we don't know any");
             }
@@ -1331,13 +1333,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         switch (status) {
             case CommSystemFacade.STATUS_REJECT_UNSOLICITED:
             case CommSystemFacade.STATUS_DIFFERENT:
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Require introducers, because our status is " + status);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Require introducers, because our status is " + status);
                 return true;
             default:
                 if (!allowDirectUDP()) {
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Require introducers, because we do not allow direct UDP connections");
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("Require introducers, because we do not allow direct UDP connections");
                     return true;
                 }
                 return false;

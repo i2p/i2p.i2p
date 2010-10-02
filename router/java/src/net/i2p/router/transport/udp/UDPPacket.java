@@ -67,9 +67,11 @@ public class UDPPacket {
     // various flag fields for use in the data packets
     public static final byte DATA_FLAG_EXPLICIT_ACK = (byte)(1 << 7);
     public static final byte DATA_FLAG_ACK_BITFIELDS = (1 << 6);
+    // unused
     public static final byte DATA_FLAG_ECN = (1 << 4);
     public static final byte DATA_FLAG_WANT_ACKS = (1 << 3);
     public static final byte DATA_FLAG_WANT_REPLY = (1 << 2);
+    // unused
     public static final byte DATA_FLAG_EXTENDED = (1 << 1);
     
     public static final byte BITFIELD_CONTINUATION = (byte)(1 << 7);

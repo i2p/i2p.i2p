@@ -756,6 +756,7 @@ public class UDPPacketReader {
     }
     
     
+/******
     public static void main(String args[]) {
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
         try {
@@ -781,4 +782,5 @@ public class UDPPacketReader {
         }
         
     }
+*******/
 }
