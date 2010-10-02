@@ -41,6 +41,10 @@ import net.i2p.data.SigningPublicKey;
 import net.i2p.util.Log;
 import net.i2p.util.NativeBigInteger;
 
+/**
+ *  Params and rv's changed from Hash to SHA1Hash for version 0.8.1
+ *  There shouldn't be any external users of those variants.
+ */
 public class DSAEngine {
     private Log _log;
     private I2PAppContext _context;
@@ -61,7 +65,9 @@ public class DSAEngine {
     public boolean verifySignature(Signature signature, InputStream in, SigningPublicKey verifyingKey) {
         return verifySignature(signature, calculateHash(in), verifyingKey);
     }
-    public boolean verifySignature(Signature signature, Hash hash, SigningPublicKey verifyingKey) {
+
+    /** @param hash SHA-1 hash, NOT a SHA-256 hash */
+    public boolean verifySignature(Signature signature, SHA1Hash hash, SigningPublicKey verifyingKey) {
         long start = _context.clock().now();
 
         try {
@@ -111,17 +117,18 @@ public class DSAEngine {
     }
     public Signature sign(byte data[], int offset, int length, SigningPrivateKey signingKey) {
         if ((signingKey == null) || (data == null) || (data.length <= 0)) return null;
-        Hash h = calculateHash(data, offset, length);
+        SHA1Hash h = calculateHash(data, offset, length);
         return sign(h, signingKey);
     }
     
     public Signature sign(InputStream in, SigningPrivateKey signingKey) {
         if ((signingKey == null) || (in == null) ) return null;
-        Hash h = calculateHash(in);
+        SHA1Hash h = calculateHash(in);
         return sign(h, signingKey);
     }
 
-    public Signature sign(Hash hash, SigningPrivateKey signingKey) {
+    /** @param hash SHA-1 hash, NOT a SHA-256 hash */
+    public Signature sign(SHA1Hash hash, SigningPrivateKey signingKey) {
         if ((signingKey == null) || (hash == null)) return null;
         long start = _context.clock().now();
 
@@ -186,7 +193,8 @@ public class DSAEngine {
         return sig;
     }
     
-    public Hash calculateHash(InputStream in) {
+    /** @return hash SHA-1 hash, NOT a SHA-256 hash */
+    public SHA1Hash calculateHash(InputStream in) {
         SHA1 digest = new SHA1();
         byte buf[] = new byte[64];
         int read = 0;
@@ -199,14 +207,15 @@ public class DSAEngine {
                 _log.warn("Unable to hash the stream", ioe);
             return null;
         }
-        return new Hash(digest.engineDigest());
+        return new SHA1Hash(digest.engineDigest());
     }
 
-    public static Hash calculateHash(byte[] source, int offset, int len) {
+    /** @return hash SHA-1 hash, NOT a SHA-256 hash */
+    public static SHA1Hash calculateHash(byte[] source, int offset, int len) {
         SHA1 h = new SHA1();
         h.engineUpdate(source, offset, len);
         byte digested[] = h.digest();
-        return new Hash(digested);
+        return new SHA1Hash(digested);
     }
 
     public static void main(String args[]) {

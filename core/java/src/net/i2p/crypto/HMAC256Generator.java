@@ -15,16 +15,16 @@ import org.bouncycastle.crypto.macs.I2PHMac;
  * in {@link org.bouncycastle.crypto.macs.I2PHMac} and 
  * {@link org.bouncycastle.crypto.digests.MD5Digest}.
  *
+ * deprecated unused
  */
 public class HMAC256Generator extends HMACGenerator {
     public HMAC256Generator(I2PAppContext context) { super(context); }
     
     @Override
     protected I2PHMac acquire() {
-        synchronized (_available) {
-            if (!_available.isEmpty())
-                return (I2PHMac)_available.remove(0);
-        }
+        I2PHMac rv = _available.poll();
+        if (rv != null)
+            return rv;
         // the HMAC is hardcoded to use SHA256 digest size
         // for backwards compatability.  next time we have a backwards
         // incompatible change, we should update this by removing ", 32"
@@ -43,6 +43,7 @@ public class HMAC256Generator extends HMACGenerator {
         
     }
     
+/******
     public static void main(String args[]) {
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
         byte data[] = new byte[64];
@@ -51,4 +52,5 @@ public class HMAC256Generator extends HMACGenerator {
         Hash mac = ctx.hmac256().calculate(key, data);
         System.out.println(Base64.encode(mac.getData()));
     }
+******/
 }

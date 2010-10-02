@@ -63,7 +63,7 @@ public final class SHA1 extends MessageDigest implements Cloneable {
     /**
      * This implementation returns a fixed-size digest.
      */
-    private static final int HASH_LENGTH = 20; // bytes == 160 bits
+    static final int HASH_LENGTH = 20; // bytes == 160 bits
  
     /**
      * Private context for incomplete blocks and padding bytes.
