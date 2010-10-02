@@ -33,12 +33,14 @@ import net.i2p.util.Log;
 class I2PSessionImpl2 extends I2PSessionImpl {
 
     /** set of MessageState objects, representing all of the messages in the process of being sent */
-    private /* FIXME final FIXME */ Set _sendingStates;
+    private /* FIXME final FIXME */ Set<MessageState> _sendingStates;
     /** max # seconds to wait for confirmation of the message send */
     private final static long SEND_TIMEOUT = 60 * 1000; // 60 seconds to send 
     /** should we gzip each payload prior to sending it? */
     private final static boolean SHOULD_COMPRESS = true;
     private final static boolean SHOULD_DECOMPRESS = true;
+    /** Don't expect any MSMs from the router for outbound traffic @since 0.8.1 */
+    private boolean _noEffort;
 
     /** for extension */
     public I2PSessionImpl2() {}
@@ -53,6 +55,8 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         super(ctx, destKeyStream, options);
         _log = ctx.logManager().getLog(I2PSessionImpl2.class);
         _sendingStates = new HashSet(32);
+        // default is BestEffort
+        _noEffort = "none".equalsIgnoreCase(options.getProperty(I2PClient.PROP_RELIABILITY));
 
         ctx.statManager().createRateStat("i2cp.sendBestEffortTotalTime", "how long to do the full sendBestEffort call?", "i2cp", new long[] { 10*60*1000 } );
         //ctx.statManager().createRateStat("i2cp.sendBestEffortStage0", "first part of sendBestEffort?", "i2cp", new long[] { 10*60*1000 } );
@@ -60,15 +64,16 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         //ctx.statManager().createRateStat("i2cp.sendBestEffortStage2", "third part of sendBestEffort?", "i2cp", new long[] { 10*60*1000 } );
         //ctx.statManager().createRateStat("i2cp.sendBestEffortStage3", "fourth part of sendBestEffort?", "i2cp", new long[] { 10*60*1000 } );
         //ctx.statManager().createRateStat("i2cp.sendBestEffortStage4", "fifth part of sendBestEffort?", "i2cp", new long[] { 10*60*1000 } );
-        _context.statManager().createRateStat("i2cp.receiveStatusTime.0", "How long it took to get status=0 back", "i2cp", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("i2cp.receiveStatusTime.1", "How long it took to get status=1 back", "i2cp", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("i2cp.receiveStatusTime.2", "How long it took to get status=2 back", "i2cp", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("i2cp.receiveStatusTime.3", "How long it took to get status=3 back", "i2cp", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("i2cp.receiveStatusTime.4", "How long it took to get status=4 back", "i2cp", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("i2cp.receiveStatusTime.5", "How long it took to get status=5 back", "i2cp", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("i2cp.receiveStatusTime", "How long it took to get any status", "i2cp", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("i2cp.tx.msgCompressed", "compressed size transferred", "i2cp", new long[] { 60*1000, 30*60*1000 });
-        _context.statManager().createRateStat("i2cp.tx.msgExpanded", "size before compression", "i2cp", new long[] { 60*1000, 30*60*1000 });
+        //_context.statManager().createRateStat("i2cp.receiveStatusTime.0", "How long it took to get status=0 back", "i2cp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("i2cp.receiveStatusTime.1", "How long it took to get status=1 back", "i2cp", new long[] { 10*60*1000 });
+        // best effort codes unused
+        //_context.statManager().createRateStat("i2cp.receiveStatusTime.2", "How long it took to get status=2 back", "i2cp", new long[] { 60*1000, 10*60*1000 });
+        //_context.statManager().createRateStat("i2cp.receiveStatusTime.3", "How long it took to get status=3 back", "i2cp", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("i2cp.receiveStatusTime.4", "How long it took to get status=4 back", "i2cp", new long[] { 10*60*1000 });
+        _context.statManager().createRateStat("i2cp.receiveStatusTime.5", "How long it took to get status=5 back", "i2cp", new long[] { 10*60*1000 });
+        _context.statManager().createRateStat("i2cp.receiveStatusTime", "How long it took to get any status", "i2cp", new long[] { 10*60*1000 });
+        _context.statManager().createRateStat("i2cp.tx.msgCompressed", "compressed size transferred", "i2cp", new long[] { 30*60*1000 });
+        _context.statManager().createRateStat("i2cp.tx.msgExpanded", "size before compression", "i2cp", new long[] { 30*60*1000 });
     }
 
     protected long getTimeout() {
@@ -186,7 +191,10 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         }
         _context.statManager().addRateData("i2cp.tx.msgCompressed", compressed, 0);
         _context.statManager().addRateData("i2cp.tx.msgExpanded", size, 0);
-        return sendBestEffort(dest, payload, keyUsed, tagsSent, expires);
+        if (_noEffort)
+            return sendNoEffort(dest, payload, expires);
+        else
+            return sendBestEffort(dest, payload, keyUsed, tagsSent, expires);
     }
 
     /**
@@ -213,6 +221,9 @@ class I2PSessionImpl2 extends I2PSessionImpl {
     private static final int NUM_TAGS = 50;
 
     /**
+     * TODO - Don't need to save MessageState since actuallyWait is false...
+     * But for now just use sendNoEffort() instead.
+     *
      * @param keyUsed unused - no end-to-end crypto
      * @param tagsSent unused - no end-to-end crypto
      */
@@ -257,7 +268,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
                                + "ms left, " + oldTags + " tags known and " 
                                + (tag == null ? "no tag" : " a valid tag"));
             }
-        
+
             if (false) // rekey
                 newKey = _context.keyGenerator().generateSessionKey();
         
@@ -371,6 +382,37 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         return found;
     }
     
+    /**
+     * Same as sendBestEffort(), except we do not expect any MessageStatusMessage responses -
+     * not for accepted, or success, or failure.
+     * So we don't create a MessageState and save it on the _sendingStates HashSet
+     *
+     * @return true always
+     * @since 0.8.1
+     */
+    protected boolean sendNoEffort(Destination dest, byte payload[], long expires)
+                    throws I2PSessionException {
+        // nonce always 0
+        _producer.sendMessage(this, dest, 0, payload, null, null, null, null, expires);
+        return true;
+    }
+    
+    /**
+     *  Only call this with nonzero status, i.e. for outbound messages
+     *  whose MessageState may be queued on _sendingStates.
+     *
+     *  Even when using sendBestEffort(), this is a waste, because the
+     *  MessageState is removed from _sendingStates immediately and
+     *  so the lookup here fails.
+     *  And iterating through the HashSet instead of having a map
+     *  is bad too.
+     *
+     *  This is now pretty much avoided since streaming now sets
+     *  i2cp.messageReliability = none, which forces sendNoEffort() instead of sendBestEffort(),
+     *  so the router won't send us any MSM's for outbound traffic.
+     *
+     *  @param status != 0
+     */
     @Override
     public void receiveStatus(int msgId, long nonce, int status) {
         if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Received status " + status + " for msgId " + msgId + " / " + nonce);
@@ -413,12 +455,13 @@ class I2PSessionImpl2 extends I2PSessionImpl {
                 case 1:
                     _context.statManager().addRateData("i2cp.receiveStatusTime.1", lifetime, 0);
                     break;
-                case 2:
-                    _context.statManager().addRateData("i2cp.receiveStatusTime.2", lifetime, 0);
-                    break;
-                case 3:
-                    _context.statManager().addRateData("i2cp.receiveStatusTime.3", lifetime, 0);
-                    break;
+                // best effort codes unused
+                //case 2:
+                //    _context.statManager().addRateData("i2cp.receiveStatusTime.2", lifetime, 0);
+                //    break;
+                //case 3:
+                //    _context.statManager().addRateData("i2cp.receiveStatusTime.3", lifetime, 0);
+                //    break;
                 case 4:
                     _context.statManager().addRateData("i2cp.receiveStatusTime.4", lifetime, 0);
                     break;
