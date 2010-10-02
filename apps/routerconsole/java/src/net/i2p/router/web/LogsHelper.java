@@ -44,13 +44,16 @@ public class LogsHelper extends HelperBase {
     }
     ******/
 
-    private String formatMessages(List msgs) {
+    /** formats in reverse order */
+    private String formatMessages(List<String> msgs) {
+        if (msgs.isEmpty())
+            return "<p><i>" + _("No log messages") + "</i></p>";
         boolean colorize = Boolean.valueOf(_context.getProperty("routerconsole.logs.color")).booleanValue();
         StringBuilder buf = new StringBuilder(16*1024); 
         buf.append("<ul>");
         buf.append("<code>\n");
         for (int i = msgs.size(); i > 0; i--) { 
-            String msg = (String)msgs.get(i - 1);
+            String msg = msgs.get(i - 1);
             buf.append("<li>");
             if (colorize) {
                 String color;
