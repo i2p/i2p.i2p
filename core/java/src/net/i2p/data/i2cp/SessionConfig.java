@@ -168,8 +168,8 @@ public class SessionConfig extends DataStructureImpl {
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
-            _log.debug("PubKey size for destination: " + _destination.getPublicKey().getData().length);
-            _log.debug("SigningKey size for destination: " + _destination.getSigningPublicKey().getData().length);
+            //_log.debug("PubKey size for destination: " + _destination.getPublicKey().getData().length);
+            //_log.debug("SigningKey size for destination: " + _destination.getSigningPublicKey().getData().length);
             _destination.writeBytes(out);
             DataHelper.writeProperties(out, _options, true);  // UTF-8
             DataHelper.writeDate(out, _creationDate);

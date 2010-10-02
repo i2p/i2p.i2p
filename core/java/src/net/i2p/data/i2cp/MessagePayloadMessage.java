@@ -29,8 +29,8 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
     private Payload _payload;
 
     public MessagePayloadMessage() {
-        setSessionId(-1);
-        setMessageId(-1);
+        _sessionId = -1;
+        _messageId = -1;
     }
 
     public long getSessionId() {
@@ -113,7 +113,7 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
             MessagePayloadMessage msg = (MessagePayloadMessage) object;
             return _sessionId == msg.getSessionId()
                    && _messageId == msg.getMessageId()
-                   && DataHelper.eq(getPayload(), msg.getPayload());
+                   && DataHelper.eq(_payload, msg.getPayload());
         }
             
         return false;
@@ -123,9 +123,9 @@ public class MessagePayloadMessage extends I2CPMessageImpl {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("[MessagePayloadMessage: ");
-        buf.append("\n\tSessionId: ").append(getSessionId());
-        buf.append("\n\tMessageId: ").append(getMessageId());
-        buf.append("\n\tPayload: ").append(getPayload());
+        buf.append("\n\tSessionId: ").append(_sessionId);
+        buf.append("\n\tMessageId: ").append(_messageId);
+        buf.append("\n\tPayload: ").append(_payload);
         buf.append("]");
         return buf.toString();
     }

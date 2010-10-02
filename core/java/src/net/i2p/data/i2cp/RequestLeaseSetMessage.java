@@ -30,7 +30,7 @@ import net.i2p.data.TunnelId;
 public class RequestLeaseSetMessage extends I2CPMessageImpl {
     public final static int MESSAGE_TYPE = 21;
     private SessionId _sessionId;
-    private List _endpoints;
+    private List<TunnelEndpoint> _endpoints;
     private Date _end;
 
     public RequestLeaseSetMessage() {
@@ -51,12 +51,12 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
 
     public Hash getRouter(int endpoint) {
         if ((endpoint < 0) || (_endpoints.size() < endpoint)) return null;
-        return ((TunnelEndpoint) _endpoints.get(endpoint)).getRouter();
+        return _endpoints.get(endpoint).getRouter();
     }
 
     public TunnelId getTunnelId(int endpoint) {
         if ((endpoint < 0) || (_endpoints.size() < endpoint)) return null;
-        return ((TunnelEndpoint) _endpoints.get(endpoint)).getTunnelId();
+        return _endpoints.get(endpoint).getTunnelId();
     }
 
     /** @deprecated unused - presumably he meant remove? */
@@ -159,8 +159,6 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
         private TunnelId _tunnelId;
 
         public TunnelEndpoint() {
-            _router = null;
-            _tunnelId = null;
         }
 
         public TunnelEndpoint(Hash router, TunnelId id) {

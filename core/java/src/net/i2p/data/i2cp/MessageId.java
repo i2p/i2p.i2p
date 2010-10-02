@@ -27,10 +27,10 @@ public class MessageId extends DataStructureImpl {
     private long _messageId;
 
     public MessageId() {
-        setMessageId(-1);
+        _messageId = -1;
     }
     public MessageId(long id) {
-        setMessageId(id);
+        _messageId = id;
     }
 
     public long getMessageId() {
@@ -58,11 +58,11 @@ public class MessageId extends DataStructureImpl {
 
     @Override
     public int hashCode() {
-        return (int)getMessageId();
+        return (int)_messageId;
     }
 
     @Override
     public String toString() {
-        return "[MessageId: " + getMessageId() + "]";
+        return "[MessageId: " + _messageId + "]";
     }
 }
