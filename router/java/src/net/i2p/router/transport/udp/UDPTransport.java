@@ -1017,7 +1017,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     /** minimum active peers to maintain IP detection, etc. */
     private static final int MIN_PEERS = 3;
     /** minimum peers volunteering to be introducers if we need that */
-    private static final int MIN_INTRODUCER_POOL = 4;
+    private static final int MIN_INTRODUCER_POOL = 5;
 
     public TransportBid bid(RouterInfo toAddress, long dataSize) {
         if (dataSize > OutboundMessageState.MAX_MSG_SIZE) {

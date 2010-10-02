@@ -96,7 +96,10 @@ public class IntroductionManager {
         int sz = peers.size();
         start = start % sz;
         int found = 0;
-        long inactivityCutoff = _context.clock().now() - (UDPTransport.EXPIRE_TIMEOUT / 2);
+        long inactivityCutoff = _context.clock().now() - (UDPTransport.EXPIRE_TIMEOUT / 2);    // 15 min
+        // if not too many to choose from, be less picky
+        if (sz <= howMany + 2)
+            inactivityCutoff -= UDPTransport.EXPIRE_TIMEOUT / 4;
         for (int i = 0; i < sz && found < howMany; i++) {
             PeerState cur = peers.get((start + i) % sz);
             RouterInfo ri = _context.netDb().lookupRouterInfoLocally(cur.getRemotePeer());
@@ -119,7 +122,11 @@ public class IntroductionManager {
                 continue;
             }
             // Try to pick active peers...
-            if (cur.getLastReceiveTime() < inactivityCutoff || cur.getLastSendTime() < inactivityCutoff) {
+            // FIXME this is really strict and causes us to run out of introducers
+            // We have much less introducers than we used to have because routers don't offer
+            // if they are approaching max connections (see EstablishmentManager)
+            // FIXED, was ||, is this OK now?
+            if (cur.getLastReceiveTime() < inactivityCutoff && cur.getLastSendTime() < inactivityCutoff) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Peer is idle too long: " + cur);
                 continue;
@@ -134,6 +141,8 @@ public class IntroductionManager {
             ssuOptions.setProperty(UDPAddress.PROP_INTRO_TAG_PREFIX + found, String.valueOf(cur.getTheyRelayToUsAs()));
             found++;
         }
+
+        // FIXME failsafe if found == 0, relax inactivityCutoff and try again?
 
         // Try to keep the connection up for two hours after we made anybody an introducer
         long pingCutoff = _context.clock().now() - (2 * 60 * 60 * 1000);
@@ -156,7 +165,7 @@ public class IntroductionManager {
      * Not as elaborate as pickInbound() above.
      * Just a quick check to see how many volunteers we know,
      * which the Transport uses to see if we need more.
-     * @return number of peers that have volunteerd to introduce us
+     * @return number of peers that have volunteered to introduce us
      */
     int introducerCount() {
             return _inbound.size();
