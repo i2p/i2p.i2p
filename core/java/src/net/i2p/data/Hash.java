@@ -31,6 +31,7 @@ public class Hash extends DataStructureImpl {
     public Hash() {
     }
 
+    /** @throws IllegalArgumentException if data is not 32 bytes (null is ok) */
     public Hash(byte data[]) {
         setData(data);
     }
@@ -39,7 +40,10 @@ public class Hash extends DataStructureImpl {
         return _data;
     }
 
+    /** @throws IllegalArgumentException if data is not 32 bytes (null is ok) */
     public void setData(byte[] data) {
+        if (data != null && data.length != HASH_LENGTH)
+            throw new IllegalArgumentException("Hash must be 32 bytes");
         _data = data;
         _stringified = null;
         _base64ed = null;
