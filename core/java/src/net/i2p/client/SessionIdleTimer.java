@@ -18,13 +18,13 @@ import net.i2p.util.SimpleTimer;
  *
  * @author zzz
  */
-public class SessionIdleTimer implements SimpleTimer.TimedEvent {
+class SessionIdleTimer implements SimpleTimer.TimedEvent {
     public static final long MINIMUM_TIME = 5*60*1000;
     private static final long DEFAULT_REDUCE_TIME = 20*60*1000;
     private static final long DEFAULT_CLOSE_TIME = 30*60*1000;
     private final static Log _log = new Log(SessionIdleTimer.class);
-    private I2PAppContext _context;
-    private I2PSessionImpl _session;
+    private final I2PAppContext _context;
+    private final I2PSessionImpl _session;
     private boolean _reduceEnabled;
     private int _reduceQuantity;
     private long _reduceTime;
@@ -36,7 +36,6 @@ public class SessionIdleTimer implements SimpleTimer.TimedEvent {
     /**
      *  reduce, shutdown, or both must be true
      */
-    /* FIXME Exporting non-public type through public API FIXME */
     public SessionIdleTimer(I2PAppContext context, I2PSessionImpl session, boolean reduce, boolean shutdown) {
         _context = context;
         _session = session;
