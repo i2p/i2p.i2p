@@ -98,23 +98,26 @@ public class GeoIP {
         public void run() {
             if (_lock.getAndSet(true))
                 return;
-            // clear the negative cache every few runs, to prevent it from getting too big
-            if (((++_lookupRunCount) % CLEAR) == 0)
-                _notFound.clear();
-            Long[] search = _pendingSearch.toArray(new Long[_pendingSearch.size()]);
-            if (search.length <= 0)
-                return;
-            _pendingSearch.clear();
-            Arrays.sort(search);
-            String[] countries = readGeoIPFile(search);
-
-            for (int i = 0; i < countries.length; i++) {
-                if (countries[i] != null)
-                    _IPToCountry.put(search[i], countries[i]);
-                else
-                    _notFound.add(search[i]);
+            try {
+                // clear the negative cache every few runs, to prevent it from getting too big
+                if (((++_lookupRunCount) % CLEAR) == 0)
+                    _notFound.clear();
+                Long[] search = _pendingSearch.toArray(new Long[_pendingSearch.size()]);
+                if (search.length <= 0)
+                    return;
+                _pendingSearch.clear();
+                Arrays.sort(search);
+                String[] countries = readGeoIPFile(search);
+    
+                for (int i = 0; i < countries.length; i++) {
+                    if (countries[i] != null)
+                        _IPToCountry.put(search[i], countries[i]);
+                    else
+                        _notFound.add(search[i]);
+                }
+            } finally {
+                _lock.set(false);
             }
-            _lock.set(false);
         }
     }
 
