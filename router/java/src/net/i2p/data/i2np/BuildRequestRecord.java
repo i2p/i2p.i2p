@@ -9,7 +9,9 @@ import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
 
 /**
- * Hold the tunnel request record, managing its encryption and decryption.
+ * Hold the tunnel request record, managing its ElGamal encryption and decryption.
+ * Iterative AES encryption/decryption is done elsewhere.
+ *
  * Cleartext:
  * <pre>
  *   bytes     0-3: tunnel ID to receive messages as
@@ -24,6 +26,12 @@ import net.i2p.data.SessionKey;
  *   bytes 185-188: request time (in hours since the epoch)
  *   bytes 189-192: next message ID
  *   bytes 193-221: uninterpreted / random padding
+ * </pre>
+ *
+ * Encrypted:
+ * <pre>
+ *   bytes    0-15: First 16 bytes of router hash
+ *   bytes  16-527: ElGamal encrypted block (discarding zero bytes at elg[0] and elg[257])
  * </pre>
  *
  */
@@ -152,7 +160,7 @@ public class BuildRequestRecord {
     
     /**
      * Encrypt the record to the specified peer.  The result is formatted as: <pre>
-     *   bytes 0-15: SHA-256-128 of the current hop's identity (the toPeer parameter)
+     *   bytes 0-15: truncated SHA-256 of the current hop's identity (the toPeer parameter)
      * bytes 15-527: ElGamal-2048 encrypted block
      * </pre>
      */
