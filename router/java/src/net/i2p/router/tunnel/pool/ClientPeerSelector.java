@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
 
@@ -14,7 +15,7 @@ import net.i2p.router.TunnelPoolSettings;
  *
  */
 class ClientPeerSelector extends TunnelPeerSelector {
-    public List selectPeers(RouterContext ctx, TunnelPoolSettings settings) {
+    public List<Hash> selectPeers(RouterContext ctx, TunnelPoolSettings settings) {
         int length = getLength(ctx, settings);
         if (length < 0)
             return null;
@@ -31,7 +32,7 @@ class ClientPeerSelector extends TunnelPeerSelector {
         ctx.profileOrganizer().selectFastPeers(length, exclude, matches, settings.getIPRestriction());
         
         matches.remove(ctx.routerHash());
-        ArrayList rv = new ArrayList(matches);
+        ArrayList<Hash> rv = new ArrayList(matches);
         if (rv.size() > 1)
             orderPeers(rv, settings.getRandomKey());
         if (settings.isInbound())

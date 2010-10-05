@@ -13,11 +13,20 @@ import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import net.i2p.data.Base64;
+import net.i2p.data.Destination;
+import net.i2p.data.PrivateKeyFile;
+import net.i2p.data.Signature;
+import net.i2p.data.SigningPrivateKey;
 import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.i2ptunnel.TunnelControllerGroup;
 
 /**
  * Ugly little accessor for the edit page
+ *
+ * Warning - This class is not part of the i2ptunnel API, and at some point
+ * it will be moved from the jar to the war.
+ * Usage by classes outside of i2ptunnel.war is deprecated.
  */
 public class EditBean extends IndexBean {
     public EditBean() { super(); }
@@ -62,6 +71,31 @@ public class EditBean extends IndexBean {
         if (tunnel < 0)
             tunnel = _group.getControllers().size();
         return "i2ptunnel" + tunnel + "-privKeys.dat";
+    }
+    
+    public String getNameSignature(int tunnel) {
+        String spoof = getSpoofedHost(tunnel);
+        if (spoof.length() <= 0)
+            return "";
+        TunnelController tun = getController(tunnel);
+        if (tun == null)
+            return "";
+        String keyFile = tun.getPrivKeyFile();
+        if (keyFile != null && keyFile.trim().length() > 0) {
+            PrivateKeyFile pkf = new PrivateKeyFile(keyFile);
+            try {
+                Destination d = pkf.getDestination();
+                if (d == null)
+                    return "";
+                SigningPrivateKey privKey = pkf.getSigningPrivKey();
+                if (privKey == null)
+                    return "";
+                //System.err.println("Signing " + spoof + " with " + Base64.encode(privKey.getData()));
+                Signature sig = _context.dsa().sign(spoof.getBytes("UTF-8"), privKey);
+                return Base64.encode(sig.getData());
+            } catch (Exception e) {}
+        }
+        return "";
     }
     
     public boolean startAutomatically(int tunnel) {

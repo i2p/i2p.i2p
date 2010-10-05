@@ -43,19 +43,19 @@ public class ElGamalAESEngine {
         
         _context.statManager().createFrequencyStat("crypto.elGamalAES.encryptNewSession",
                                                    "how frequently we encrypt to a new ElGamal/AES+SessionTag session?",
-                                                   "Encryption", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l});
+                                                   "Encryption", new long[] { 60*60*1000l});
         _context.statManager().createFrequencyStat("crypto.elGamalAES.encryptExistingSession",
                                                    "how frequently we encrypt to an existing ElGamal/AES+SessionTag session?",
-                                                   "Encryption", new long[] { 60 * 1000l, 60 * 60 * 1000l, 24 * 60 * 60 * 1000l});
+                                                   "Encryption", new long[] { 60*60*1000l});
         _context.statManager().createFrequencyStat("crypto.elGamalAES.decryptNewSession",
                                                    "how frequently we decrypt with a new ElGamal/AES+SessionTag session?",
-                                                   "Encryption", new long[] { 60 * 1000l, 60 * 60 * 1000l, 24 * 60 * 60 * 1000l});
+                                                   "Encryption", new long[] { 60*60*1000l});
         _context.statManager().createFrequencyStat("crypto.elGamalAES.decryptExistingSession",
                                                    "how frequently we decrypt with an existing ElGamal/AES+SessionTag session?",
-                                                   "Encryption", new long[] { 60 * 1000l, 60 * 60 * 1000l, 24 * 60 * 60 * 1000l});
+                                                   "Encryption", new long[] { 60*60*1000l});
         _context.statManager().createFrequencyStat("crypto.elGamalAES.decryptFailed",
-                                                   "how frequently we fail to decrypt with ElGamal/AES+SessionTag?", "Encryption",
-                                                   new long[] { 60 * 60 * 1000l, 24 * 60 * 60 * 1000l});
+                                                   "how frequently we fail to decrypt with ElGamal/AES+SessionTag?",
+                                                   "Encryption", new long[] { 60*60*1000l});
     }
 
     /**
@@ -73,6 +73,7 @@ public class ElGamalAESEngine {
      * This works according to the
      * ElGamal+AES algorithm in the data structure spec.
      *
+     * @return decrypted data or null on failure
      */
     public byte[] decrypt(byte data[], PrivateKey targetPrivateKey, SessionKeyManager keyManager) throws DataFormatException {
         if (data == null) {
@@ -148,9 +149,12 @@ public class ElGamalAESEngine {
     /**
      * scenario 1: 
      * Begin with 222 bytes, ElG encrypted, containing:
+     * <pre>
      *  - 32 byte SessionKey
      *  - 32 byte pre-IV for the AES
      *  - 158 bytes of random padding
+     * </pre>
+     * After encryption, the ElG section is 514 bytes long.
      * Then encrypt with AES using that session key and the first 16 bytes of the SHA256 of the pre-IV, using
      * the decryptAESBlock method & structure.
      *
@@ -213,6 +217,7 @@ public class ElGamalAESEngine {
      * scenario 2: 
      * The data begins with 32 byte session tag, which also serves as the preIV.
      * Then decrypt with AES using that session key and the first 16 bytes of the SHA256 of the pre-IV:
+     * <pre>
      *  - 2 byte integer specifying the # of session tags
      *  - that many 32 byte session tags
      *  - 4 byte integer specifying data.length
@@ -220,11 +225,13 @@ public class ElGamalAESEngine {
      *  - 1 byte flag that, if == 1, is followed by a new SessionKey
      *  - data
      *  - random bytes, padding the total size to greater than paddedSize with a mod 16 = 0
+     * </pre>
      *
      * If anything doesn't match up in decryption, it falls back to decryptNewSession
      *
      * @param foundTags set which is filled with any sessionTags found during decryption
      * @param foundKey  session key which may be filled with a new sessionKey found during decryption
+     * @return decrypted data or null on failure
      *
      */
     byte[] decryptExistingSession(byte data[], SessionKey key, PrivateKey targetPrivateKey, Set foundTags,
@@ -264,6 +271,7 @@ public class ElGamalAESEngine {
 
     /**
      * Decrypt the AES data with the session key and IV.  The result should be:
+     * <pre>
      *  - 2 byte integer specifying the # of session tags
      *  - that many 32 byte session tags
      *  - 4 byte integer specifying data.length
@@ -271,6 +279,7 @@ public class ElGamalAESEngine {
      *  - 1 byte flag that, if == 1, is followed by a new SessionKey
      *  - data
      *  - random bytes, padding the total size to greater than paddedSize with a mod 16 = 0
+     * </pre>
      *
      * If anything doesn't match up in decryption, return null.  Otherwise, return
      * the decrypted data and update the session as necessary.  If the sentTag is not null,
@@ -278,6 +287,7 @@ public class ElGamalAESEngine {
      *
      * @param foundTags set which is filled with any sessionTags found during decryption
      * @param foundKey  session key which may be filled with a new sessionKey found during decryption
+     * @return decrypted data or null on failure
      */
     byte[] decryptAESBlock(byte encrypted[], SessionKey key, byte iv[], 
                            byte sentTag[], Set foundTags, SessionKey foundKey) throws DataFormatException {
@@ -299,10 +309,10 @@ public class ElGamalAESEngine {
             //ByteArrayInputStream bais = new ByteArrayInputStream(decrypted);
             int cur = 0;
             long numTags = DataHelper.fromLong(decrypted, cur, 2);
+            if ((numTags < 0) || (numTags > 200)) throw new Exception("Invalid number of session tags");
             if (numTags > 0) tags = new ArrayList((int)numTags);
             cur += 2;
             //_log.debug("# tags: " + numTags);
-            if ((numTags < 0) || (numTags > 200)) throw new Exception("Invalid number of session tags");
             if (numTags * SessionTag.BYTE_LENGTH > decrypted.length - 2) {
                 throw new Exception("# tags: " + numTags + " is too many for " + (decrypted.length - 2));
             }
@@ -363,6 +373,8 @@ public class ElGamalAESEngine {
      * @param newKey key to be delivered to the target, with which the tagsForDelivery should be associated, or null
      * @param paddedSize minimum size in bytes of the body after padding it (if less than the
      *          body's real size, no bytes are appended but the body is not truncated)
+     *
+     * Unused externally, only called by below (i.e. newKey is always null)
      */
     public byte[] encrypt(byte data[], PublicKey target, SessionKey key, Set tagsForDelivery,
                                  SessionTag currentTag, SessionKey newKey, long paddedSize) {
@@ -384,6 +396,7 @@ public class ElGamalAESEngine {
     /**
      * Encrypt the data to the target using the given key and deliver the specified tags
      * No new session key
+     * This is the one called from GarlicMessageBuilder and is the primary entry point.
      */
     public byte[] encrypt(byte data[], PublicKey target, SessionKey key, Set tagsForDelivery,
                                  SessionTag currentTag, long paddedSize) {
@@ -394,6 +407,8 @@ public class ElGamalAESEngine {
      * Encrypt the data to the target using the given key and deliver the specified tags
      * No new session key
      * No current tag (encrypt as new session)
+     *
+     * @deprecated unused
      */
     public byte[] encrypt(byte data[], PublicKey target, SessionKey key, Set tagsForDelivery, long paddedSize) {
         return encrypt(data, target, key, tagsForDelivery, null, null, paddedSize);
@@ -403,6 +418,8 @@ public class ElGamalAESEngine {
      * Encrypt the data to the target using the given key delivering no tags
      * No new session key
      * No current tag (encrypt as new session)
+     *
+     * @deprecated unused
      */
     public byte[] encrypt(byte data[], PublicKey target, SessionKey key, long paddedSize) {
         return encrypt(data, target, key, null, null, null, paddedSize);
@@ -411,10 +428,14 @@ public class ElGamalAESEngine {
     /**
      * scenario 1: 
      * Begin with 222 bytes, ElG encrypted, containing:
+     * <pre>
      *  - 32 byte SessionKey
      *  - 32 byte pre-IV for the AES
      *  - 158 bytes of random padding
-     * Then encrypt with AES using that session key and the first 16 bytes of the SHA256 of the pre-IV:
+     * </pre>
+     * After encryption, the ElG section is 514 bytes long.
+     * Then encrypt the following with AES using that session key and the first 16 bytes of the SHA256 of the pre-IV:
+     * <pre>
      *  - 2 byte integer specifying the # of session tags
      *  - that many 32 byte session tags
      *  - 4 byte integer specifying data.length
@@ -422,6 +443,7 @@ public class ElGamalAESEngine {
      *  - 1 byte flag that, if == 1, is followed by a new SessionKey
      *  - data
      *  - random bytes, padding the total size to greater than paddedSize with a mod 16 = 0
+     * </pre>
      *
      */
     byte[] encryptNewSession(byte data[], PublicKey target, SessionKey key, Set tagsForDelivery,
@@ -440,10 +462,12 @@ public class ElGamalAESEngine {
         //_log.debug("SessionKey for encryptNewSession: " + DataHelper.toString(key.getData(), 32));
         long before = _context.clock().now();
         byte elgEncr[] = _context.elGamalEngine().encrypt(elgSrcData, target);
-        long after = _context.clock().now();
-        if (_log.shouldLog(Log.INFO))
+        if (_log.shouldLog(Log.INFO)) {
+            long after = _context.clock().now();
             _log.info("elgEngine.encrypt of the session key took " + (after - before) + "ms");
+        }
         if (elgEncr.length < 514) {
+            // ??? ElGamalEngine.encrypt() always returns 514 bytes
             byte elg[] = new byte[514];
             int diff = elg.length - elgEncr.length;
             //if (_log.shouldLog(Log.DEBUG)) _log.debug("Difference in size: " + diff);
@@ -474,6 +498,7 @@ public class ElGamalAESEngine {
      * scenario 2: 
      * Begin with 32 byte session tag, which also serves as the preIV.
      * Then encrypt with AES using that session key and the first 16 bytes of the SHA256 of the pre-IV:
+     * <pre>
      *  - 2 byte integer specifying the # of session tags
      *  - that many 32 byte session tags
      *  - 4 byte integer specifying data.length
@@ -481,6 +506,7 @@ public class ElGamalAESEngine {
      *  - 1 byte flag that, if == 1, is followed by a new SessionKey
      *  - data
      *  - random bytes, padding the total size to greater than paddedSize with a mod 16 = 0
+     * </pre>
      *
      */
     byte[] encryptExistingSession(byte data[], PublicKey target, SessionKey key, Set tagsForDelivery,
@@ -506,6 +532,7 @@ public class ElGamalAESEngine {
      * For both scenarios, this method encrypts the AES area using the given key, iv
      * and making sure the resulting data is at least as long as the paddedSize and 
      * also mod 16 bytes.  The contents of the encrypted data is:
+     * <pre>
      *  - 2 byte integer specifying the # of session tags
      *  - that many 32 byte session tags
      *  - 4 byte integer specifying data.length
@@ -513,6 +540,7 @@ public class ElGamalAESEngine {
      *  - 1 byte flag that, if == 1, is followed by a new SessionKey
      *  - data
      *  - random bytes, padding the total size to greater than paddedSize with a mod 16 = 0
+     * </pre>
      *
      */
     final byte[] encryptAESBlock(byte data[], SessionKey key, byte[] iv, Set tagsForDelivery, SessionKey newKey,

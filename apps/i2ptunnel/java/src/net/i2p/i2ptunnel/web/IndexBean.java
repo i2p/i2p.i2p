@@ -9,6 +9,7 @@ package net.i2p.i2ptunnel.web;
  */
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -31,6 +32,9 @@ import net.i2p.util.Log;
 /**
  * Simple accessor for exposing tunnel info, but also an ugly form handler
  *
+ * Warning - This class is not part of the i2ptunnel API, and at some point
+ * it will be moved from the jar to the war.
+ * Usage by classes outside of i2ptunnel.war is deprecated.
  */
 public class IndexBean {
     protected I2PAppContext _context;
@@ -38,10 +42,10 @@ public class IndexBean {
     protected TunnelControllerGroup _group;
     private String _action;
     private int _tunnel;
-    private long _prevNonce;
-    private long _prevNonce2;
-    private long _curNonce;
-    private long _nextNonce;
+    //private long _prevNonce;
+    //private long _prevNonce2;
+    private String _curNonce;
+    //private long _nextNonce;
 
     private String _type;
     private String _name;
@@ -82,10 +86,14 @@ public class IndexBean {
     /** deprecated unimplemented, now using routerconsole realm */
     //public static final String PROP_TUNNEL_PASSPHRASE = "i2ptunnel.passphrase";
     public static final String PROP_TUNNEL_PASSPHRASE = "consolePassword";
-    static final String PROP_NONCE = IndexBean.class.getName() + ".nonce";
-    static final String PROP_NONCE_OLD = PROP_NONCE + '2';
+    //static final String PROP_NONCE = IndexBean.class.getName() + ".nonce";
+    //static final String PROP_NONCE_OLD = PROP_NONCE + '2';
+    /** 3 wasn't enough for some browsers. They are reloading the page for some reason - maybe HEAD? @since 0.8.1 */
+    private static final int MAX_NONCES = 5;
+    /** store nonces in a static FIFO instead of in System Properties @since 0.8.1 */
+    private static final List<String> _nonces = new ArrayList(MAX_NONCES + 1);
+
     static final String CLIENT_NICKNAME = "shared clients";
-    
     public static final String PROP_THEME_NAME = "routerconsole.theme";
     public static final String DEFAULT_THEME = "light";
     public static final String PROP_CSS_DISABLED = "routerconsole.css.disabled";
@@ -95,34 +103,39 @@ public class IndexBean {
         _context = I2PAppContext.getGlobalContext();
         _log = _context.logManager().getLog(IndexBean.class);
         _group = TunnelControllerGroup.getInstance();
-        _action = null;
         _tunnel = -1;
-        _curNonce = -1;
-        _prevNonce = -1;
-        _prevNonce2 = -1;
-        try { 
-            String nonce2 = System.getProperty(PROP_NONCE_OLD);
-            if (nonce2 != null)
-                _prevNonce2 = Long.parseLong(nonce2);
-            String nonce = System.getProperty(PROP_NONCE);
-            if (nonce != null) {
-                _prevNonce = Long.parseLong(nonce);
-                System.setProperty(PROP_NONCE_OLD, nonce);
-            }
-        } catch (NumberFormatException nfe) {}
-        _nextNonce = _context.random().nextLong();
-        System.setProperty(PROP_NONCE, Long.toString(_nextNonce));
+        _curNonce = "-1";
+        addNonce();
         _booleanOptions = new ConcurrentHashSet(4);
         _otherOptions = new ConcurrentHashMap(4);
     }
     
-    public long getNextNonce() { return _nextNonce; }
+    public static String getNextNonce() {
+        synchronized (_nonces) {
+            return _nonces.get(0);
+        }
+    }
+
     public void setNonce(String nonce) {
         if ( (nonce == null) || (nonce.trim().length() <= 0) ) return;
-        try {
-            _curNonce = Long.parseLong(nonce);
-        } catch (NumberFormatException nfe) {
-            _curNonce = -1;
+        _curNonce = nonce;
+    }
+
+    /** add a random nonce to the head of the queue @since 0.8.1 */
+    private void addNonce() {
+        String nextNonce = Long.toString(_context.random().nextLong());
+        synchronized (_nonces) {
+            _nonces.add(0, nextNonce);
+            int sz = _nonces.size();
+            if (sz > MAX_NONCES)
+                _nonces.remove(sz - 1);
+        }
+    }
+
+    /** do we know this nonce? @since 0.8.1 */
+    private static boolean haveNonce(String nonce) {
+        synchronized (_nonces) {
+            return _nonces.contains(nonce);
         }
     }
 
@@ -152,7 +165,7 @@ public class IndexBean {
     private String processAction() {
         if ( (_action == null) || (_action.trim().length() <= 0) || ("Cancel".equals(_action)))
             return "";
-        if ( (_prevNonce != _curNonce) && (_prevNonce2 != _curNonce) && (!validPassphrase()) )
+        if ( (!haveNonce(_curNonce)) && (!validPassphrase()) )
             return "Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.";
         if ("Stop all".equals(_action)) 
             return stopAll();

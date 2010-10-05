@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="all" name="i2ptunnel">
     <target name="all" depends="clean, build" />
-    <target name="build" depends="builddep, jar" />
+    <target name="build" depends="builddep, jar, war" />
     <target name="builddep">
         <ant dir="../../ministreaming/java/" target="build" />
         <ant dir="../../jetty/" target="build" />
@@ -34,6 +34,10 @@
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
+
+    <!-- TODO: Move the web classes from the jar to the war - they are not part of the API
+      -  This will require sponge to rewrite some seedless stuff that uses it.
+     -->
     <target name="jar" depends="builddep, compile">
         <jar destfile="./build/i2ptunnel.jar" basedir="./build/obj" includes="**/*.class">
             <manifest>
@@ -41,8 +45,6 @@
                 <attribute name="Class-Path" value="i2p.jar mstreaming.jar" />
             </manifest>
         </jar>
-        <ant target="bundle" />
-        <ant target="war" />
     </target>
 
     <target name="bundle" depends="compile, precompilejsp">
@@ -77,13 +79,13 @@
         </exec>
     </target>
 
-    <target name="war" depends="precompilejsp"> 
+    <target name="war" depends="precompilejsp, bundle"> 
         <war destfile="build/i2ptunnel.war" webxml="../jsp/web-out.xml"
              basedir="../jsp/" excludes="web.xml, **/*.java, *.jsp">
         </war>
     </target>
 
-    <target name="precompilejsp" unless="precompilejsp.uptodate">
+    <target name="precompilejsp" depends="jar" unless="precompilejsp.uptodate">
         <delete dir="../jsp/WEB-INF/" />
         <delete file="../jsp/web-fragment.xml" />
         <delete file="../jsp/web-out.xml" />

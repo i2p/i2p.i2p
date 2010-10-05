@@ -30,8 +30,8 @@ public class TunnelController implements Logging {
     private Log _log;
     private Properties _config;
     private I2PTunnel _tunnel;
-    private List _messages;
-    private List _sessions;
+    private List<String> _messages;
+    private List<I2PSession> _sessions;
     private boolean _running;
     private boolean _starting;
     
@@ -47,6 +47,7 @@ public class TunnelController implements Logging {
     public TunnelController(Properties config, String prefix) {
         this(config, prefix, true);
     }
+
     /**
      * 
      * @param createKey for servers, whether we want to create a brand new destination
@@ -59,17 +60,21 @@ public class TunnelController implements Logging {
         setConfig(config, prefix);
         _messages = new ArrayList(4);
         _running = false;
+        boolean keyOK = true;
         if (createKey && (getType().endsWith("server") || getPersistentClientKey()))
-            createPrivateKey();
-        _starting = getStartOnLoad();
+            keyOK = createPrivateKey();
+        _starting = keyOK && getStartOnLoad();
     }
     
-    private void createPrivateKey() {
+    /**
+     * @return success
+     */
+    private boolean createPrivateKey() {
         I2PClient client = I2PClientFactory.createClient();
         String filename = getPrivKeyFile();
         if ( (filename == null) || (filename.trim().length() <= 0) ) {
             log("No filename specified for the private key");
-            return;
+            return false;
         }
         
         File keyFile = new File(getPrivKeyFile());
@@ -77,7 +82,7 @@ public class TunnelController implements Logging {
             keyFile = new File(I2PAppContext.getGlobalContext().getConfigDir(), getPrivKeyFile());
         if (keyFile.exists()) {
             //log("Not overwriting existing private keys in " + keyFile.getAbsolutePath());
-            return;
+            return true;
         } else {
             File parent = keyFile.getParentFile();
             if ( (parent != null) && (!parent.exists()) )
@@ -95,13 +100,16 @@ public class TunnelController implements Logging {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error creating new destination", ie);
             log("Error creating new destination: " + ie.getMessage());
+            return false;
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error creating writing the destination to " + keyFile.getAbsolutePath(), ioe);
             log("Error writing the keys to " + keyFile.getAbsolutePath());
+            return false;
         } finally {
             if (fos != null) try { fos.close(); } catch (IOException ioe) {}
         }
+        return true;
     }
     
     public void startTunnelBackground() {
@@ -121,9 +129,16 @@ public class TunnelController implements Logging {
         } catch (Exception e) {
             _log.error("Error starting up the tunnel", e);
             log("Error starting up the tunnel - " + e.getMessage());
+            // if we don't acquire() then the release() in stopTunnel() won't work
+            acquire();
+            stopTunnel();
         }
         _starting = false;
     }
+
+    /**
+     *  @throws IllegalArgumentException via methods in I2PTunnel
+     */
     private void doStartTunnel() {
         if (_running) {
             if (_log.shouldLog(Log.INFO))
@@ -257,15 +272,18 @@ public class TunnelController implements Logging {
      * closed by some other tunnels
      */
     private void acquire() {
-        List sessions = _tunnel.getSessions();
-        if (sessions != null) {
+        List<I2PSession> sessions = _tunnel.getSessions();
+        if (!sessions.isEmpty()) {
             for (int i = 0; i < sessions.size(); i++) {
-                I2PSession session = (I2PSession)sessions.get(i);
+                I2PSession session = sessions.get(i);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Acquiring session " + session);
                 TunnelControllerGroup.getInstance().acquire(this, session);
             }
             _sessions = sessions;
         } else {
-            _log.error("No sessions to acquire?");
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("No sessions to acquire? for " + getName());
         }
     }
     
@@ -274,13 +292,16 @@ public class TunnelController implements Logging {
      * no other tunnels are using them, close them.
      */
     private void release() {
-        if (_sessions != null) {
+        if (_sessions != null && !_sessions.isEmpty()) {
             for (int i = 0; i < _sessions.size(); i++) {
-                I2PSession s = (I2PSession)_sessions.get(i);
+                I2PSession s = _sessions.get(i);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Releasing session " + s);
                 TunnelControllerGroup.getInstance().release(this, s);
             }
         } else {
-            _log.error("No sessions to release?");
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("No sessions to release? for " + getName());
         }
     }
     
@@ -371,7 +392,7 @@ public class TunnelController implements Logging {
             _tunnel.port = "7654";
         }
     }
-    
+
     public void stopTunnel() {
         _tunnel.runClose(new String[] { "forced", "all" }, this);
         release();
@@ -440,9 +461,9 @@ public class TunnelController implements Logging {
     public boolean getPersistentClientKey() { return Boolean.valueOf(_config.getProperty("option.persistentClientKey")).booleanValue(); }
     public String getMyDestination() {
         if (_tunnel != null) {
-            List sessions = _tunnel.getSessions();
+            List<I2PSession> sessions = _tunnel.getSessions();
             for (int i = 0; i < sessions.size(); i++) {
-                I2PSession session = (I2PSession)sessions.get(i);
+                I2PSession session = sessions.get(i);
                 Destination dest = session.getMyDestination();
                 if (dest != null)
                     return dest.toBase64();
@@ -453,9 +474,9 @@ public class TunnelController implements Logging {
     
     public String getMyDestHashBase32() {
         if (_tunnel != null) {
-            List sessions = _tunnel.getSessions();
+            List<I2PSession> sessions = _tunnel.getSessions();
             for (int i = 0; i < sessions.size(); i++) {
-                I2PSession session = (I2PSession)sessions.get(i);
+                I2PSession session = sessions.get(i);
                 Destination dest = session.getMyDestination();
                 if (dest != null)
                     return Base32.encode(dest.calculateHash().getData());
@@ -557,9 +578,9 @@ public class TunnelController implements Logging {
         if ( (opts != null) && (opts.length() > 0) )
             buf.append("Network options: ").append(opts).append("<br />\n");
         if (_running) {
-            List sessions = _tunnel.getSessions();
+            List<I2PSession> sessions = _tunnel.getSessions();
             for (int i = 0; i < sessions.size(); i++) {
-                I2PSession session = (I2PSession)sessions.get(i);
+                I2PSession session = sessions.get(i);
                 Destination dest = session.getMyDestination();
                 if (dest != null) {
                     buf.append("Destination hash: ").append(dest.calculateHash().toBase64()).append("<br />\n");
@@ -598,7 +619,7 @@ public class TunnelController implements Logging {
      *
      * @return list of messages pulled off (each is a String, earliest first)
      */
-    public List clearMessages() { 
+    public List<String> clearMessages() { 
         List rv = null;
         synchronized (this) {
             rv = new ArrayList(_messages);

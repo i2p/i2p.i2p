@@ -218,6 +218,13 @@ class InboundEstablishState {
         if (_receivedIdentity == null)
             _receivedIdentity = new byte[conf.readTotalFragmentNum()][];
         int cur = conf.readCurrentFragmentNum();
+        if (cur >= _receivedIdentity.length) {
+            // avoid AIOOBE
+            // should do more than this, but what? disconnect?
+            fail();
+            packetReceived();
+            return;
+        }
         if (_receivedIdentity[cur] == null) {
             byte fragment[] = new byte[conf.readCurrentFragmentSize()];
             conf.readFragmentData(fragment, 0);

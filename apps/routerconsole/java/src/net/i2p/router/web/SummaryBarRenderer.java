@@ -34,7 +34,13 @@ public class SummaryBarRenderer {
            .append(_("I2P Router Console"))
            .append("\" title=\"")
            .append(_("I2P Router Console"))
-           .append("\"></a><hr>");
+           .append("\"></a><hr>")
+           
+           .append("<h3><a href=\"/help.jsp\" target=\"_top\" title=\"")
+           .append(_("I2P Router Help &amp; FAQ"))
+           .append("\">")
+           .append(_("Help &amp; FAQ"))
+           .append("</a></h3><hr>");
 
         File lpath = new File(_context.getBaseDir(), "docs/toolbar.html");
         // you better have target="_top" for the links in there...
@@ -153,19 +159,24 @@ public class SummaryBarRenderer {
            .append(_("I2P Router Help"))
            .append("\">")
            .append(_("General"))
-           .append("</a></h3><hr>" +
-                   "<h4><a title=\"")
+           .append("</a></h3><hr>\n" +
+
+                   "<table><tr>" +
+                   "<td align=\"left\"><b>")
+           .append(_("Local Identity"))
+           .append(":</b></td>" +
+                   "<td align=\"right\">" +
+                   "<a title=\"")
            .append(_("Your unique I2P router identity is"))
            .append(' ')
            .append(_helper.getIdent())
            .append(", ")
            .append(_("never reveal it to anyone"))
            .append("\" href=\"/netdb.jsp?r=.\" target=\"_top\">")
-           .append(_("Local Identity"))
-           .append("</a></h4><hr>\n" +
+           .append(_("show"))
+           .append("</a></td></tr>\n" +
 
-                   "<table><tr><td align=\"left\">" +
-                   "<b>")
+                   "<tr><td align=\"left\"><b>")
            .append(_("Version"))
            .append(":</b></td>" +
                    "<td align=\"right\">")
@@ -185,6 +196,8 @@ public class SummaryBarRenderer {
                    "<hr><h4><a href=\"/config.jsp#help\" target=\"_top\" title=\"")
            .append(_("Help with configuring your firewall and router for optimal I2P performance"))
            .append("\">")
+           .append(_("Network"))
+           .append(": ")
            .append(_helper.getReachability())
            .append("</a></h4><hr>\n");
 

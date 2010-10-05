@@ -1,6 +1,6 @@
 <!--
-<i2p.news date="$Date: 2010-06-07 00:00:00 $">
-<i2p.release version="0.7.14" date="2010/06/07" minVersion="0.6"/>
+<i2p.news date="$Date: 2010-07-12 00:00:00 $">
+<i2p.release version="0.8" date="2010/07/12" minVersion="0.6"/>
 -->
 <div lang="en">
 <h4><ul><li>Congratulations on getting I2P installed!</li></ul></h4>
@@ -39,6 +39,26 @@ Sobald auf der linken Seite eine "shared clients" Verbindung aufgelistet ist <b>
 <p>
 Verbinde deinen IRC Klienten mit dem Server auf <b>localhost:6668</b> und sage Hallo zu uns im Kanal 
 <a href="irc://127.0.0.1:6668/i2p-help">#i2p-help</a>, <a href="irc://127.0.0.1:6668/i2p-de">#i2p-de</a> oder <a href="irc://127.0.0.1:6668/i2p">#i2p</a>.
+</p>
+</div>
+
+<div lang="nl">
+<h4><ul><li>Gefeliciteerd met de installatie van I2P!</li></ul></h4>
+<p>
+<b>Welkom bij I2P!</b>
+Heb <b>wat geduld</b> terwijl I2P opstart en peers zoekt.
+</p>
+<p>
+Terwijl je wacht, <b>pas je bandbreedte instellingen aan</b> op de
+<a href="config.jsp">configuratie pagina</a>.
+</p>
+<p>
+Wanneer je een "gedeelde clients" destination in de linker lijst hebt,
+<b>lees dan aub</b> onze <a href="http://www.i2p2.i2p/faq.html">FAQ</a>.
+</p>
+<p>
+Verbind je IRC client met <b>localhost:6668</b> en zeg Hallo in
+<a href="irc://127.0.0.1:6668/i2p-help">#i2p-help</a> of <a href="irc://127.0.0.1:6668/i2p">#i2p</a>.
 </p>
 </div>
 

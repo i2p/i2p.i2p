@@ -224,6 +224,7 @@ public class PeerProfile {
     public double getIntegrationValue() { return _integrationValue; }
     /**
      * is this peer actively failing (aka not worth touching)?
+     * deprecated - unused - always false
      */
     public boolean getIsFailing() { return _isFailing; }
 
@@ -476,7 +477,9 @@ public class PeerProfile {
     private double calculateSpeed() { return _context.speedCalculator().calc(this); }
     private double calculateCapacity() { return _context.capacityCalculator().calc(this); }
     private double calculateIntegration() { return _context.integrationCalculator().calc(this); }
+    /** deprecated - unused - always false */
     private boolean calculateIsFailing() { return false; }
+    /** deprecated - unused - always false */
     void setIsFailing(boolean val) { _isFailing = val; }
     
     @Override

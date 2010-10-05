@@ -3147,7 +3147,7 @@ msgstr "设置路由的带宽分配"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:326
 msgid "Bandwidth in/out"
-msgstr "带宽(上/下行)"
+msgstr "带宽(进/出站)"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:343
 msgid "Total"

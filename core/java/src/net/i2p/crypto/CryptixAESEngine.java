@@ -41,11 +41,13 @@ public class CryptixAESEngine extends AESEngine {
         _cache = new CryptixAESKeyCache();
     }
     
+    /** @param length must be a multiple of 16 */
     @Override
     public void encrypt(byte payload[], int payloadIndex, byte out[], int outIndex, SessionKey sessionKey, byte iv[], int length) {
         encrypt(payload, payloadIndex, out, outIndex, sessionKey, iv, 0, length);
     }
     
+    /** @param length must be a multiple of 16 */
     @Override
     public void encrypt(byte payload[], int payloadIndex, byte out[], int outIndex, SessionKey sessionKey, byte iv[], int ivOffset, int length) {
         if ( (payload == null) || (out == null) || (sessionKey == null) || (iv == null) ) 
@@ -126,6 +128,7 @@ public class CryptixAESEngine extends AESEngine {
         _prevCache.release(curA);
     }
     
+    /** encrypt exactly 16 bytes using the session key */
     @Override
     public final void encryptBlock(byte payload[], int inIndex, SessionKey sessionKey, byte out[], int outIndex) {
         if (sessionKey.getPreparedKey() == null) {
@@ -141,7 +144,7 @@ public class CryptixAESEngine extends AESEngine {
         CryptixRijndael_Algorithm.blockEncrypt(payload, out, inIndex, outIndex, sessionKey.getPreparedKey(), 16);
     }
 
-    /** decrypt the data with the session key provided
+    /** decrypt exactly 16 bytes of data with the session key provided
      * @param payload encrypted data
      * @param sessionKey private session key
      */
@@ -166,6 +169,7 @@ public class CryptixAESEngine extends AESEngine {
         CryptixRijndael_Algorithm.blockDecrypt(payload, rv, inIndex, outIndex, sessionKey.getPreparedKey(), 16);
     }
     
+/********
     public static void main(String args[]) {
         I2PAppContext ctx = new I2PAppContext();
         try {
@@ -278,4 +282,5 @@ public class CryptixAESEngine extends AESEngine {
         else
             System.out.println("block D(E(orig)) == orig");
     }
+*******/
 }

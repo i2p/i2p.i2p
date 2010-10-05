@@ -62,7 +62,7 @@ public class PeerCoordinator implements PeerListener
   private long downloaded_old[] = {-1,-1,-1,-1,-1,-1};
 
   // synchronize on this when changing peers or downloaders
-  final List peers = new ArrayList();
+  final List<Peer> peers = new ArrayList();
   /** estimate of the peers, without requiring any synchronization */
   volatile int peerCount;
 
@@ -72,7 +72,7 @@ public class PeerCoordinator implements PeerListener
   private final byte[] id;
 
   // Some random wanted pieces
-  private List wantedPieces;
+  private List<Piece> wantedPieces;
 
   private boolean halted = false;
 
@@ -117,7 +117,7 @@ public class PeerCoordinator implements PeerListener
   public CoordinatorListener getListener() { return listener; }
 
   // for web page detailed stats
-  public List peerList()
+  public List<Peer> peerList()
   {
     synchronized(peers)
       {
@@ -135,8 +135,10 @@ public class PeerCoordinator implements PeerListener
     return storage.complete();
   }
 
+  /** might be wrong */
   public int getPeerCount() { return peerCount; }
 
+  /** should be right */
   public int getPeers()
   {
     synchronized(peers)
@@ -260,7 +262,7 @@ public class PeerCoordinator implements PeerListener
   public void halt()
   {
     halted = true;
-    List removed = new ArrayList();
+    List<Peer> removed = new ArrayList();
     synchronized(peers)
       {
         // Stop peer checker task.
@@ -273,7 +275,7 @@ public class PeerCoordinator implements PeerListener
       }
 
     while (!removed.isEmpty()) {
-        Peer peer = (Peer)removed.remove(0);
+        Peer peer = removed.remove(0);
         peer.disconnect();
         removePeerFromPieces(peer);
     }
@@ -340,9 +342,9 @@ public class PeerCoordinator implements PeerListener
   // caller must synchronize on peers
   private static Peer peerIDInList(PeerID pid, List peers)
   {
-    Iterator it = peers.iterator();
+    Iterator<Peer> it = peers.iterator();
     while (it.hasNext()) {
-      Peer cur = (Peer)it.next();
+      Peer cur = it.next();
       if (pid.sameID(cur.getPeerID()))
         return cur;
     }
@@ -407,15 +409,15 @@ public class PeerCoordinator implements PeerListener
     // linked list will contain all interested peers that we choke.
     // At the start are the peers that have us unchoked at the end the
     // other peer that are interested, but are choking us.
-    List interested = new LinkedList();
+    List<Peer> interested = new LinkedList();
     synchronized (peers) {
         int count = 0;
         int unchokedCount = 0;
         int maxUploaders = allowedUploaders();
-        Iterator it = peers.iterator();
+        Iterator<Peer> it = peers.iterator();
         while (it.hasNext())
           {
-            Peer peer = (Peer)it.next();
+            Peer peer = it.next();
             if (peer.isChoking() && peer.isInterested())
               {
                 count++;
@@ -431,7 +433,7 @@ public class PeerCoordinator implements PeerListener
 
         while (uploaders < maxUploaders && !interested.isEmpty())
           {
-            Peer peer = (Peer)interested.remove(0);
+            Peer peer = interested.remove(0);
             if (_log.shouldLog(Log.DEBUG))
               _log.debug("Unchoke: " + peer);
             peer.setChoking(false);
@@ -476,10 +478,10 @@ public class PeerCoordinator implements PeerListener
 
     synchronized(wantedPieces)
       {
-        Iterator it = wantedPieces.iterator();
+        Iterator<Piece> it = wantedPieces.iterator();
         while (it.hasNext())
           {
-            Piece p = (Piece)it.next();
+            Piece p = it.next();
             int i = p.getId();
             if (bitfield.get(i)) {
               p.addPeer(peer);
@@ -513,11 +515,11 @@ public class PeerCoordinator implements PeerListener
       {
         Piece piece = null;
         Collections.sort(wantedPieces); // Sort in order of rarest first.
-        List requested = new ArrayList(); 
-        Iterator it = wantedPieces.iterator();
+        List<Piece> requested = new ArrayList(); 
+        Iterator<Piece> it = wantedPieces.iterator();
         while (piece == null && it.hasNext())
           {
-            Piece p = (Piece)it.next();
+            Piece p = it.next();
             if (havePieces.get(p.getId()) && !p.isRequested())
               {
                 piece = p;
@@ -537,10 +539,10 @@ public class PeerCoordinator implements PeerListener
                 return -1;  // nothing to request and not in end game
             // let's not all get on the same piece
             Collections.shuffle(requested);
-            Iterator it2 = requested.iterator();
+            Iterator<Piece> it2 = requested.iterator();
             while (piece == null && it2.hasNext())
               {
-                Piece p = (Piece)it2.next();
+                Piece p = it2.next();
                 if (havePieces.get(p.getId()))
                   {
                     piece = p;
@@ -660,11 +662,11 @@ public class PeerCoordinator implements PeerListener
     // Disconnect from other seeders when we get the last piece
     synchronized(peers)
       {
-        List toDisconnect = new ArrayList(); 
-        Iterator it = peers.iterator();
+        List<Peer> toDisconnect = new ArrayList(); 
+        Iterator<Peer> it = peers.iterator();
         while (it.hasNext())
           {
-            Peer p = (Peer)it.next();
+            Peer p = it.next();
             if (p.isConnected())
               {
                   if (completed() && p.isCompleted())
@@ -676,7 +678,7 @@ public class PeerCoordinator implements PeerListener
         it = toDisconnect.iterator();
         while (it.hasNext())
           {
-            Peer p = (Peer)it.next();
+            Peer p = it.next();
             p.disconnect(true);
           }
       }
@@ -742,8 +744,8 @@ public class PeerCoordinator implements PeerListener
    */
   public void removePeerFromPieces(Peer peer) {
       synchronized(wantedPieces) {
-          for(Iterator iter = wantedPieces.iterator(); iter.hasNext(); ) {
-              Piece piece = (Piece)iter.next();
+          for(Iterator<Piece> iter = wantedPieces.iterator(); iter.hasNext(); ) {
+              Piece piece = iter.next();
               piece.removePeer(peer);
           }
       } 
@@ -797,8 +799,8 @@ public class PeerCoordinator implements PeerListener
     }
     synchronized(wantedPieces)
       {
-        for(Iterator iter = wantedPieces.iterator(); iter.hasNext(); ) {
-          Piece piece = (Piece)iter.next();
+        for(Iterator<Piece> iter = wantedPieces.iterator(); iter.hasNext(); ) {
+          Piece piece = iter.next();
           if (piece.getId() == savedRequest.piece) {
             Request req = savedRequest;
             piece.setRequested(true);
@@ -823,9 +825,9 @@ public class PeerCoordinator implements PeerListener
     // see if anybody else is requesting
     synchronized (peers)
       {
-        Iterator it = peers.iterator();
+        Iterator<Peer> it = peers.iterator();
         while (it.hasNext()) {
-          Peer p = (Peer)it.next();
+          Peer p = it.next();
           if (p.equals(peer))
             continue;
           if (p.state == null)
@@ -843,9 +845,9 @@ public class PeerCoordinator implements PeerListener
     // nobody is, so mark unrequested
     synchronized(wantedPieces)
       {
-        Iterator it = wantedPieces.iterator();
+        Iterator<Piece> it = wantedPieces.iterator();
         while (it.hasNext()) {
-          Piece p = (Piece)it.next();
+          Piece p = it.next();
           if (p.getId() == piece) {
             p.setRequested(false);
             if (_log.shouldLog(Log.DEBUG))

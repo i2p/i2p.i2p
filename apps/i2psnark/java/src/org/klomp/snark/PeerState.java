@@ -523,8 +523,10 @@ class PeerState
       _log.debug(peer + " requests " + outstandingRequests);
   }
 
-  // Starts requesting first chunk of next piece. Returns true if
-  // something has been added to the requests, false otherwise.
+  /**
+   * Starts requesting first chunk of next piece. Returns true if
+   * something has been added to the requests, false otherwise.
+   */
   private boolean requestNextPiece()
   {
     // Check that we already know what the other side has.
@@ -556,6 +558,15 @@ class PeerState
             if (nextPiece != -1
                 && (lastRequest == null || lastRequest.piece != nextPiece))
               {
+                // Fail safe to make sure we are interested
+                // When we transition into the end game we may not be interested...
+                if (!interesting) {
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug(peer + " transition to end game, setting interesting");
+                    interesting = true;
+                    out.sendInterest(true);
+                }
+
                 int piece_length = metainfo.getPieceLength(nextPiece);
                 //Catch a common place for OOMs esp. on 1MB pieces
                 byte[] bs;

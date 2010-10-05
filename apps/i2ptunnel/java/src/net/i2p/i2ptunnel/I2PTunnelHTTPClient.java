@@ -33,7 +33,6 @@ import net.i2p.data.Destination;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
-
 import net.i2p.util.Translate;
 
 /**
@@ -646,11 +645,11 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                     if (!Boolean.valueOf(getTunnel().getClientOptions().getProperty(PROP_USER_AGENT)).booleanValue()) {
                         // let's not advertise to external sites that we are from I2P
                         if (usingWWWProxy)
-                            newRequest.append("User-Agent: Wget/1.11.4\r\n");
+                            newRequest.append("User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.2.6) Gecko/20100625 Firefox/3.6.6\r\n");
                         else
                             newRequest.append("User-Agent: MYOB/6.66 (AN/ON)\r\n");
                     }
-                    newRequest.append("Connection: close\r\n\r\n");
+	            newRequest.append("Connection: close\r\n\r\n");
                     break;
                 } else {
                     newRequest.append(line).append("\r\n"); // HTTP spec
@@ -772,11 +771,12 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             _s = s;
         }
         String readLine(String method) throws IOException {
-             if (method == null || "POST".equals(method))
+             //  Use unbuffered until we can find a BufferedReader that limits line length
+             //if (method == null || "POST".equals(method))
                  return DataHelper.readLine(_s);
-             if (_br == null)
-                 _br = new BufferedReader(new InputStreamReader(_s, "ISO-8859-1"));
-             return _br.readLine();
+             //if (_br == null)
+             //    _br = new BufferedReader(new InputStreamReader(_s, "ISO-8859-1"));
+             //return _br.readLine();
         }
     }
 

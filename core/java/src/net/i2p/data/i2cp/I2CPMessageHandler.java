@@ -41,7 +41,7 @@ public class I2CPMessageHandler {
         try {
             if (length < 0) throw new I2CPMessageException("Invalid message length specified");
             int type = (int) DataHelper.readLong(in, 1);
-            I2CPMessage msg = createMessage(in, length, type);
+            I2CPMessage msg = createMessage(type);
             msg.readMessage(in, length, type);
             return msg;
         } catch (DataFormatException dfe) {
@@ -53,8 +53,8 @@ public class I2CPMessageHandler {
      * Yes, this is fairly ugly, but its the only place it ever happens.  
      *
      */
-    private static I2CPMessage createMessage(InputStream in, int length, int type) throws IOException,
-                                                                                  I2CPMessageException {
+    private static I2CPMessage createMessage(int type) throws IOException,
+                                                       I2CPMessageException {
         switch (type) {
         case CreateLeaseSetMessage.MESSAGE_TYPE:
             return new CreateLeaseSetMessage();
@@ -101,6 +101,7 @@ public class I2CPMessageHandler {
         }
     }
 
+/***
     public static void main(String args[]) {
         try {
             I2CPMessage msg = readMessage(new FileInputStream(args[0]));
@@ -109,4 +110,5 @@ public class I2CPMessageHandler {
             e.printStackTrace();
         }
     }
+***/
 }

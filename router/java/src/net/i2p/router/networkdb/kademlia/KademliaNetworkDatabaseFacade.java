@@ -194,10 +194,12 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     
     public void shutdown() {
         _initialized = false;
-        _kb = null;
+        // don't null out _kb, it can cause NPEs in concurrent operations
+        //_kb = null;
         if (_ds != null)
             _ds.stop();
-        _ds = null;
+        // don't null out _ds, it can cause NPEs in concurrent operations
+        //_ds = null;
         _exploreKeys.clear(); // hope this doesn't cause an explosion, it shouldn't.
         // _exploreKeys = null;
     }
@@ -750,6 +752,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         } else if (upLongEnough && !routerInfo.isCurrent(ROUTER_INFO_EXPIRATION_SHORT)) {
             if (routerInfo.getAddresses().isEmpty())
                 return "Peer " + key.toBase64() + " published > 90m ago with no addresses";
+            // This should cover the introducers case below too
+            // And even better, catches the case where the router is unreachable but knows no introducers
+            if (routerInfo.getCapabilities().indexOf(Router.CAPABILITY_UNREACHABLE) >= 0)
+                return "Peer " + key.toBase64() + " published > 90m ago and thinks it is unreachable";
             RouterAddress ra = routerInfo.getTargetAddress("SSU");
             if (ra != null) {
                 // Introducers change often, introducee will ping introducer for 2 hours

@@ -23,12 +23,14 @@ import net.i2p.util.Log;
  * No whitespace allowed.
  *
  * Decode accepts upper or lower case.
+ * @author zzz
+ * @since 0.7
  */
 public class Base32 {
 
     private final static Log _log = new Log(Base32.class);
 
-    /** The 64 valid Base32 values. */
+    /** The 32 valid Base32 values. */
     private final static char[] ALPHABET = {'a', 'b', 'c', 'd',
                                             'e', 'f', 'g', 'h', 'i', 'j',
                                             'k', 'l', 'm', 'n', 'o', 'p',
@@ -132,10 +134,16 @@ public class Base32 {
         System.out.println("or    : Base32 decode");
     }
 
+    /**
+     *  @param source if null will return ""
+     */
     public static String encode(String source) {
         return (source != null ? encode(source.getBytes()) : "");
     }
 
+    /**
+     * @param source The data to convert non-null
+     */
     public static String encode(byte[] source) {
         StringBuilder buf = new StringBuilder((source.length + 7) * 8 / 5);
         encodeBytes(source, buf);
@@ -147,7 +155,7 @@ public class Base32 {
     /**
      * Encodes a byte array into Base32 notation.
      *
-     * @param source The data to convert
+     * @param source The data to convert non-null
      */
     private static void encodeBytes(byte[] source, StringBuilder out) {
         int usedbits = 0;
@@ -174,7 +182,7 @@ public class Base32 {
      * Decodes data from Base32 notation and
      * returns it as a string.
      *
-     * @param s the string to decode
+     * @param s the string to decode, if null returns null
      * @return The data as a string or null on failure
      */
     public static String decodeToString(String s) {
@@ -184,6 +192,10 @@ public class Base32 {
         return new String(b);
     }
 
+    /**
+     * @param s non-null
+     * @return decoded data, null on error
+     */
     public static byte[] decode(String s) {
         return decode(s.getBytes());
     }
@@ -194,8 +206,8 @@ public class Base32 {
      * Decodes Base32 content in byte array format and returns
      * the decoded byte array.
      *
-     * @param source The Base32 encoded data
-     * @return decoded data
+     * @param source The Base32 encoded data non-null
+     * @return decoded data, null on error
      */
     private static byte[] decode(byte[] source) {
         int len58;

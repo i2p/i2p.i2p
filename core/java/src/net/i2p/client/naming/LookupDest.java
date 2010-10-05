@@ -27,6 +27,7 @@ class LookupDest {
 
     protected LookupDest(I2PAppContext context) {}
 
+    /** @param key 52 chars (do not include the .b32.i2p suffix) */
     static Destination lookupBase32Hash(I2PAppContext ctx, String key) {
         byte[] h = Base32.decode(key);
         if (h == null)
@@ -44,6 +45,7 @@ class LookupDest {
     }
     ****/
 
+    /** @param h 32 byte hash */
     static Destination lookupHash(I2PAppContext ctx, byte[] h) {
         Hash key = new Hash(h);
         Destination rv = null;

@@ -12,7 +12,7 @@ import net.i2p.util.Log;
 /**
  *
  */
-public class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
+class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
     private TunnelPool _pool;
     private TestJob _testJob;
     // private Job _expireJob;

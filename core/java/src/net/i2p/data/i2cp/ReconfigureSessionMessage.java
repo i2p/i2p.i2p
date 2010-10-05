@@ -81,8 +81,8 @@ public class ReconfigureSessionMessage extends I2CPMessageImpl {
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof ReconfigureSessionMessage)) {
             ReconfigureSessionMessage msg = (ReconfigureSessionMessage) object;
-            return DataHelper.eq(getSessionId(), msg.getSessionId())
-                   && DataHelper.eq(getSessionConfig(), msg.getSessionConfig());
+            return DataHelper.eq(_sessionId, msg.getSessionId())
+                   && DataHelper.eq(_sessionConfig, msg.getSessionConfig());
         }
             
         return false;
@@ -92,8 +92,8 @@ public class ReconfigureSessionMessage extends I2CPMessageImpl {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("[ReconfigureSessionMessage: ");
-        buf.append("\n\tSessionId: ").append(getSessionId());
-        buf.append("\n\tSessionConfig: ").append(getSessionConfig());
+        buf.append("\n\tSessionId: ").append(_sessionId);
+        buf.append("\n\tSessionConfig: ").append(_sessionConfig);
         buf.append("]");
         return buf.toString();
     }

@@ -32,7 +32,7 @@ public abstract class NamingService {
     public static final String PROP_IMPL = "i2p.naming.impl";
     private static final String DEFAULT_IMPL = "net.i2p.client.naming.HostsTxtNamingService";
 
-    protected static final int CACHE_MAX_SIZE = 8;
+    protected static final int CACHE_MAX_SIZE = 16;
 
     
     /** 
@@ -107,7 +107,7 @@ public abstract class NamingService {
      *  The service may override the age and/or size limit
      */
     /** Don't know why a dest would ever change but keep this short anyway */
-    protected static final long CACHE_MAX_AGE = 60*1000;
+    protected static final long CACHE_MAX_AGE = 7*60*1000;
 
     private class CacheEntry {
         public Destination dest;
@@ -172,6 +172,13 @@ public abstract class NamingService {
                 return null;
             }
             return ce.dest;
+        }
+    }
+
+    /** @since 0.8.1 */
+    public void clearCache() {
+        synchronized (_cache) {
+            _cache.clear();
         }
     }
 }

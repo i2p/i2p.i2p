@@ -41,8 +41,6 @@ public class ClientListenerRunner implements Runnable {
         _log = _context.logManager().getLog(ClientListenerRunner.class);
         _manager = manager;
         _port = port;
-        _running = false;
-        _listening = false;
         
         String val = context.getProperty(BIND_ALL_INTERFACES);
         _bindAllInterfaces = Boolean.valueOf(val).booleanValue();

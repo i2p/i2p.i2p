@@ -316,6 +316,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         String ohost = newProps.getProperty(NTCPAddress.PROP_HOST);
         String enabled = _context.getProperty(PROP_I2NP_NTCP_AUTO_IP, "true");
         String name = _context.getProperty(PROP_I2NP_NTCP_HOSTNAME);
+        // hostname config trumps auto config
         if (name != null && name.length() > 0)
             enabled = "false";
         Transport udp = _manager.getTransport(UDPTransport.STYLE);
@@ -335,6 +336,17 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
                 newProps.setProperty(NTCPAddress.PROP_HOST, nhost);
                 changed = true;
             }
+        } else if (enabled.equalsIgnoreCase("false") &&
+                   name != null && name.length() > 0 &&
+                   !name.equals(ohost) &&
+                   nport != null) {
+            // Host name is configured, and we have a port (either auto or configured)
+            // but we probably only get here if the port is auto,
+            // otherwise createNTCPAddress() would have done it already
+            if (_log.shouldLog(Log.INFO))
+                _log.info("old: " + ohost + " config: " + name + " new: " + name);
+            newProps.setProperty(NTCPAddress.PROP_HOST, name);
+            changed = true;
         } else if (ohost == null || ohost.length() <= 0) {
             return;
         } else if (enabled.equalsIgnoreCase("true") && status != STATUS_OK) {
@@ -359,10 +371,10 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Changing NTCP cost from " + oldCost + " to " + newCost);
                 } else {
-                    _log.warn("No change to NTCP Address");
+                    _log.info("No change to NTCP Address");
                 }
             } else {
-                _log.warn("No change to NTCP Address");
+                _log.info("No change to NTCP Address");
             }
             return;
         }

@@ -583,6 +583,8 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     }
 
     public boolean close(boolean forced) {
+        if (_log.shouldLog(Log.INFO))
+            _log.info("close() called: forced = " + forced + " open = " + open + " sockMgr = " + sockMgr);
         if (!open) return true;
         // FIXME: here we might have to wait quite a long time if
         // there is a connection attempt atm. But without waiting we

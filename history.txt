@@ -1,3 +1,29 @@
+* 2010-07-12  0.8 released
+
+2010-07-08 zzz
+    * I2PTunnel: More error propagation fixes
+
+2010-07-07 duck
+    * RouterConsole: Add Help & FAQ link, minor label improvements.
+
+2010-07-05 zzz
+    * i2psnark: Fix transition to end game
+    * I2PTunnelIRCClient: Filter PART messages like we do for QUIT
+
+2010-07-04 duck
+    * RouterConsole: Dutch translation (thanks to monkeybrains)
+
+2010-07-03 zzz
+    * Build: Fix poupdate dependencies
+    * I2PTunnel: More error propagation fixes
+    * I2PTunnelHTTPClient: Don't use BufferedReader
+
+2010-07-01 zzz
+    * EventDispatcher: Minor cleanups and comments
+    * I2PTunnel: Don't start a tunnel if no valid destinations;
+      cleanups, logging, and error propagation fixes
+    * Transport: Fix NTCP address generation when host is specified but port is auto
+
 2010-06-29 sponge
     * 25%-50% cpu savings in BOB. The remainder of the fix is in streaming
       lib, which aparently keeps running and does not sleep according to

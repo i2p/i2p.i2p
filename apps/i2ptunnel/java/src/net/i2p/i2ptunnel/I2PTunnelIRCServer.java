@@ -170,7 +170,7 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
     }
 
     /** keep reading until we see USER or SERVER */
-    private String filterRegistration(InputStream in, String newHostname) throws IOException {
+    private static String filterRegistration(InputStream in, String newHostname) throws IOException {
         StringBuilder buf = new StringBuilder(128);
         int lineCount = 0;
         

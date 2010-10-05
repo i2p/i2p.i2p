@@ -58,6 +58,10 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         //_context.statManager().createRateStat("i2np.readTime", "How long it takes to read an I2NP message", "I2NP", new long[] { 10*60*1000, 60*60*1000 });
     }
     
+    /**
+     *  Read the whole message (including the type) and throw it away.
+     *  @deprecated Unused, why would you do this
+     */
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         try {
             readBytes(in, -1, new byte[1024]);

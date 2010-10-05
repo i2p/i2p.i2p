@@ -20,7 +20,7 @@ import net.i2p.router.message.PayloadGarlicConfig;
 import net.i2p.util.Log;
 
 /**
- *  Method an class for garlic encrypting outbound netdb traffic,
+ *  Method and class for garlic encrypting outbound netdb traffic,
  *  including management of the ElGamal/AES tags
  *
  *  @since 0.7.10

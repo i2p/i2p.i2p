@@ -1,7 +1,6 @@
 package net.i2p.crypto;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Cache the objects used in CryptixRijndael_Algorithm.makeKey to reduce
@@ -11,7 +10,7 @@ import java.util.List;
  *
  */
 public final class CryptixAESKeyCache {
-    private final List _availableKeys;
+    private final LinkedBlockingQueue<KeyCacheEntry> _availableKeys;
     
     private static final int KEYSIZE = 32; // 256bit AES
     private static final int BLOCKSIZE = 16;
@@ -22,7 +21,7 @@ public final class CryptixAESKeyCache {
     private static final int MAX_KEYS = 64;
     
     public CryptixAESKeyCache() {
-        _availableKeys = new ArrayList(MAX_KEYS);
+        _availableKeys = new LinkedBlockingQueue(MAX_KEYS);
     }
     
     /**
@@ -30,10 +29,9 @@ public final class CryptixAESKeyCache {
      *
      */
     public final KeyCacheEntry acquireKey() {
-        synchronized (_availableKeys) {
-            if (!_availableKeys.isEmpty())
-                return (KeyCacheEntry)_availableKeys.remove(0);
-        }
+        KeyCacheEntry rv = _availableKeys.poll();
+        if (rv != null)
+            return rv;
         return createNew();
     }
     
@@ -42,10 +40,7 @@ public final class CryptixAESKeyCache {
      *
      */
     public final void releaseKey(KeyCacheEntry key) {
-        synchronized (_availableKeys) {
-            if (_availableKeys.size() < MAX_KEYS)
-                _availableKeys.add(key);
-        }
+        _availableKeys.offer(key);
     }
     
     public static final KeyCacheEntry createNew() {

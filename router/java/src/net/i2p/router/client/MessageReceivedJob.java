@@ -47,9 +47,6 @@ class MessageReceivedJob extends JobImpl {
     
     /**
      * Deliver notification to the client that the given message is available.
-     * This is synchronous and returns true if the notification was sent safely,
-     * otherwise it returns false
-     *
      */
     public void messageAvailable(MessageId id, long size) {
         if (_log.shouldLog(Log.DEBUG))
@@ -59,6 +56,7 @@ class MessageReceivedJob extends JobImpl {
         msg.setMessageId(id.getMessageId());
         msg.setSessionId(_runner.getSessionId().getSessionId());
         msg.setSize(size);
+        // has to be >= 0, it is initialized to -1
         msg.setNonce(1);
         msg.setStatus(MessageStatusMessage.STATUS_AVAILABLE);
         try {

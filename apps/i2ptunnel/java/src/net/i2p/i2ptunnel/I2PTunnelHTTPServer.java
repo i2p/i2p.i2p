@@ -151,7 +151,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             _log.warn("Took a while to handle the request [" + timeToHandle + ", socket create: " + (afterSocket-afterAccept) + "]");
     }
     
-    private class CompressedRequestor implements Runnable {
+    private static class CompressedRequestor implements Runnable {
         private Socket _webserver;
         private I2PSocket _browser;
         private String _headers;
@@ -214,7 +214,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             }
         }
     }
-    private class Sender implements Runnable {
+
+    private static class Sender implements Runnable {
         private OutputStream _out;
         private InputStream _in;
         private String _name;
@@ -248,7 +249,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             }
         }
     }
-    private class CompressedResponseOutputStream extends HTTPResponseOutputStream {
+
+    private static class CompressedResponseOutputStream extends HTTPResponseOutputStream {
         private InternalGZIPOutputStream _gzipOut;
         public CompressedResponseOutputStream(OutputStream o) {
             super(o);
@@ -287,7 +289,9 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 return 0;
         }
     }
-    private class InternalGZIPOutputStream extends GZIPOutputStream {
+
+    /** just a wrapper to provide stats for debugging */
+    private static class InternalGZIPOutputStream extends GZIPOutputStream {
         public InternalGZIPOutputStream(OutputStream target) throws IOException {
             super(target);
         }
@@ -309,7 +313,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         }
     }
 
-    private String formatHeaders(Properties headers, StringBuilder command) {
+    private static String formatHeaders(Properties headers, StringBuilder command) {
         StringBuilder buf = new StringBuilder(command.length() + headers.size() * 64);
         buf.append(command.toString().trim()).append("\r\n");
         for (Iterator iter = headers.keySet().iterator(); iter.hasNext(); ) {

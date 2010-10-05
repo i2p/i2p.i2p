@@ -21,6 +21,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
@@ -36,7 +37,11 @@ import net.i2p.util.Translate;
 
 public class TransportManager implements TransportEventListener {
     private Log _log;
-    private List<Transport> _transports;
+    /**
+     * Converted from List to prevent concurrent modification exceptions.
+     * If we want more than one transport with the same style we will have to change this.
+     */
+    private Map<String, Transport> _transports;
     private RouterContext _context;
     private UPnPManager _upnpManager;
 
@@ -56,20 +61,20 @@ public class TransportManager implements TransportEventListener {
         _context.statManager().createRateStat("transport.bidFailSelf", "Could not attempt to bid on message, as it targeted ourselves", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("transport.bidFailNoTransports", "Could not attempt to bid on message, as none of the transports could attempt it", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("transport.bidFailAllTransports", "Could not attempt to bid on message, as all of the transports had failed", "Transport", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
-        _transports = new ArrayList();
+        _transports = new ConcurrentHashMap(2);
         if (Boolean.valueOf(_context.getProperty(PROP_ENABLE_UPNP, "true")).booleanValue())
             _upnpManager = new UPnPManager(context, this);
     }
     
     public void addTransport(Transport transport) {
         if (transport == null) return;
-        _transports.add(transport);
+        _transports.put(transport.getStyle(), transport);
         transport.setListener(this);
     }
     
     public void removeTransport(Transport transport) {
         if (transport == null) return;
-        _transports.remove(transport);
+        _transports.remove(transport.getStyle());
         transport.setListener(null);
     }
 
@@ -140,11 +145,10 @@ public class TransportManager implements TransportEventListener {
             _upnpManager.start();
         configTransports();
         _log.debug("Starting up the transport manager");
-        for (int i = 0; i < _transports.size(); i++) {
-            Transport t = _transports.get(i);
+        for (Transport t : _transports.values()) {
             RouterAddress addr = t.startListening();
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Transport " + i + " (" + t.getStyle() + ") started");
+                _log.debug("Transport " + t.getStyle() + " started");
         }
         // kick UPnP - Do this to get the ports opened even before UDP registers an address
         transportAddressChanged();
@@ -161,19 +165,14 @@ public class TransportManager implements TransportEventListener {
     public void stopListening() {
         if (_upnpManager != null)
             _upnpManager.stop();
-        for (int i = 0; i < _transports.size(); i++) {
-            _transports.get(i).stopListening();
+        for (Transport t : _transports.values()) {
+            t.stopListening();
         }
         _transports.clear();
     }
     
     public Transport getTransport(String style) {
-        for (int i = 0; i < _transports.size(); i++) {
-            Transport t = _transports.get(i);
-            if(style.equals(t.getStyle()))
-                return t;
-        }
-        return null;
+        return _transports.get(style);
     }
     
     int getTransportCount() { return _transports.size(); }
@@ -189,16 +188,16 @@ public class TransportManager implements TransportEventListener {
     
     public int countActivePeers() { 
         int peers = 0;
-        for (int i = 0; i < _transports.size(); i++) {
-            peers += _transports.get(i).countActivePeers();
+        for (Transport t : _transports.values()) {
+            peers += t.countActivePeers();
         }
         return peers;
     }
     
     public int countActiveSendPeers() { 
         int peers = 0;
-        for (int i = 0; i < _transports.size(); i++) {
-            peers += _transports.get(i).countActiveSendPeers();
+        for (Transport t : _transports.values()) {
+            peers += t.countActiveSendPeers();
         }
         return peers;
     }
@@ -210,8 +209,8 @@ public class TransportManager implements TransportEventListener {
       * @param pct percent of limit 0-100
       */
     public boolean haveOutboundCapacity(int pct) { 
-        for (int i = 0; i < _transports.size(); i++) {
-            if (_transports.get(i).haveCapacity(pct))
+        for (Transport t : _transports.values()) {
+            if (t.haveCapacity(pct))
                 return true;
         }
         return false;
@@ -225,8 +224,8 @@ public class TransportManager implements TransportEventListener {
     public boolean haveHighOutboundCapacity() { 
         if (_transports.isEmpty())
             return false;
-        for (int i = 0; i < _transports.size(); i++) {
-            if (!_transports.get(i).haveCapacity(HIGH_CAPACITY_PCT))
+        for (Transport t : _transports.values()) {
+            if (!t.haveCapacity(HIGH_CAPACITY_PCT))
                 return false;
         }
         return true;
@@ -239,8 +238,8 @@ public class TransportManager implements TransportEventListener {
       * @param pct percent of limit 0-100
       */
     public boolean haveInboundCapacity(int pct) { 
-        for (int i = 0; i < _transports.size(); i++) {
-            if (_transports.get(i).getCurrentAddress() != null && _transports.get(i).haveCapacity(pct))
+        for (Transport t : _transports.values()) {
+            if (t.getCurrentAddress() != null && t.haveCapacity(pct))
                 return true;
         }
         return false;
@@ -253,8 +252,8 @@ public class TransportManager implements TransportEventListener {
      */
     public Vector getClockSkews() {
         Vector skews = new Vector();
-        for (int i = 0; i < _transports.size(); i++) {
-            Vector tempSkews = _transports.get(i).getClockSkews();
+        for (Transport t : _transports.values()) {
+            Vector tempSkews = t.getClockSkews();
             if ((tempSkews == null) || (tempSkews.isEmpty())) continue;
             skews.addAll(tempSkews);
         }
@@ -266,7 +265,7 @@ public class TransportManager implements TransportEventListener {
     /** @return the best status of any transport */
     public short getReachabilityStatus() { 
         short rv = CommSystemFacade.STATUS_UNKNOWN;
-        for (Transport t : _transports) {
+        for (Transport t : _transports.values()) {
             short s = t.getReachabilityStatus();
             if (s < rv)
                 rv = s;
@@ -275,13 +274,12 @@ public class TransportManager implements TransportEventListener {
     }
 
     public void recheckReachability() { 
-        for (int i = 0; i < _transports.size(); i++)
-            _transports.get(i).recheckReachability();
+        for (Transport t : _transports.values())
+            t.recheckReachability();
     }
 
     public boolean isBacklogged(Hash dest) {
-        for (int i = 0; i < _transports.size(); i++) {
-            Transport t = _transports.get(i);
+        for (Transport t : _transports.values()) {
             if (t.isBacklogged(dest))
                 return true;
         }
@@ -289,8 +287,7 @@ public class TransportManager implements TransportEventListener {
     }    
     
     public boolean isEstablished(Hash dest) {
-        for (int i = 0; i < _transports.size(); i++) {
-            Transport t = _transports.get(i);
+        for (Transport t : _transports.values()) {
             if (t.isEstablished(dest))
                 return true;
         }
@@ -303,8 +300,7 @@ public class TransportManager implements TransportEventListener {
      * This is NOT reset if the peer contacts us.
      */
     public boolean wasUnreachable(Hash dest) {
-        for (int i = 0; i < _transports.size(); i++) {
-            Transport t = _transports.get(i);
+        for (Transport t : _transports.values()) {
             if (!t.wasUnreachable(dest))
                 return false;
         }
@@ -330,9 +326,9 @@ public class TransportManager implements TransportEventListener {
     public Map<String, RouterAddress> getAddresses() {
         Map<String, RouterAddress> rv = new HashMap(_transports.size());
         // do this first since SSU may force a NTCP change
-        for (Transport t : _transports)
+        for (Transport t : _transports.values())
             t.updateAddress();
-        for (Transport t : _transports) {
+        for (Transport t : _transports.values()) {
             if (t.getCurrentAddress() != null)
                 rv.put(t.getStyle(), t.getCurrentAddress());
         }
@@ -345,7 +341,7 @@ public class TransportManager implements TransportEventListener {
      */
     private Map<String, Integer> getPorts() {
         Map<String, Integer> rv = new HashMap(_transports.size());
-        for (Transport t : _transports) {
+        for (Transport t : _transports.values()) {
             int port = t.getRequestedPort();
             if (t.getCurrentAddress() != null) {
                 Properties opts = t.getCurrentAddress().getOptions();
@@ -386,8 +382,7 @@ public class TransportManager implements TransportEventListener {
 
         List<TransportBid> rv = new ArrayList(_transports.size());
         Set failedTransports = msg.getFailedTransports();
-        for (int i = 0; i < _transports.size(); i++) {
-            Transport t = _transports.get(i);
+        for (Transport t : _transports.values()) {
             if (failedTransports.contains(t.getStyle())) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Skipping transport " + t.getStyle() + " as it already failed");
@@ -415,8 +410,7 @@ public class TransportManager implements TransportEventListener {
         Hash peer = msg.getTarget().getIdentity().calculateHash();
         Set failedTransports = msg.getFailedTransports();
         TransportBid rv = null;
-        for (int i = 0; i < _transports.size(); i++) {
-            Transport t = _transports.get(i);
+        for (Transport t : _transports.values()) {
             if (t.isUnreachable(peer)) {
                 unreachableTransports++;
                 // this keeps GetBids() from shitlisting for "no common transports"
@@ -482,8 +476,7 @@ public class TransportManager implements TransportEventListener {
 
     public List getMostRecentErrorMessages() { 
         List rv = new ArrayList(16);
-        for (int i = 0; i < _transports.size(); i++) {
-            Transport t = _transports.get(i);
+        for (Transport t : _transports.values()) {
             rv.addAll(t.getMostRecentErrorMessages());
         }
         return rv;
@@ -491,8 +484,7 @@ public class TransportManager implements TransportEventListener {
     
     public void renderStatusHTML(Writer out, String urlBase, int sortFlags) throws IOException {
         TreeMap transports = new TreeMap();
-        for (int i = 0; i < _transports.size(); i++) {
-            Transport t = _transports.get(i);
+        for (Transport t : _transports.values()) {
             transports.put(t.getStyle(), t);
         }
         for (Iterator iter = transports.values().iterator(); iter.hasNext(); ) {
@@ -506,8 +498,7 @@ public class TransportManager implements TransportEventListener {
 
         StringBuilder buf = new StringBuilder(4*1024);
         buf.append("<h3>").append(_("Router Transport Addresses")).append("</h3><pre>\n");
-        for (int i = 0; i < _transports.size(); i++) {
-            Transport t = _transports.get(i);
+        for (Transport t : _transports.values()) {
             if (t.getCurrentAddress() != null)
                 buf.append(t.getCurrentAddress());
             else

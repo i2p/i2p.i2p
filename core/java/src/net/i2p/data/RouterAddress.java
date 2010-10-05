@@ -14,7 +14,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
+
+import net.i2p.util.OrderedProperties;
 
 /**
  * Defines a method of communicating with a router
@@ -28,7 +31,7 @@ public class RouterAddress extends DataStructureImpl {
     private Properties _options;
 
     public RouterAddress() {
-        setCost(-1);
+        _cost = -1;
     }
 
     /**
@@ -134,18 +137,27 @@ public class RouterAddress extends DataStructureImpl {
         return DataHelper.hashCode(_transportStyle);
     }
     
+    /**
+     *  This is used on peers.jsp so sort options so it looks better.
+     *  We don't just use OrderedProperties for _options because DataHelper.writeProperties()
+     *  sorts also.
+     */
     @Override
     public String toString() {
-        StringBuilder buf = new StringBuilder(64);
+        StringBuilder buf = new StringBuilder(128);
         buf.append("[RouterAddress: ");
-        buf.append("\n\tTransportStyle: ").append(getTransportStyle());
-        buf.append("\n\tCost: ").append(getCost());
-        buf.append("\n\tExpiration: ").append(getExpiration());
-        buf.append("\n\tOptions: #: ").append(getOptions().size());
-        for (Iterator iter = getOptions().keySet().iterator(); iter.hasNext();) {
-            String key = (String) iter.next();
-            String val = getOptions().getProperty(key);
-            buf.append("\n\t\t[").append(key).append("] = [").append(val).append("]");
+        buf.append("\n\tTransportStyle: ").append(_transportStyle);
+        buf.append("\n\tCost: ").append(_cost);
+        buf.append("\n\tExpiration: ").append(_expiration);
+        if (_options != null) {
+            buf.append("\n\tOptions: #: ").append(_options.size());
+            Properties p = new OrderedProperties();
+            p.putAll(_options);
+            for (Map.Entry e : p.entrySet()) {
+                String key = (String) e.getKey();
+                String val = (String) e.getValue();
+                buf.append("\n\t\t[").append(key).append("] = [").append(val).append("]");
+            }
         }
         buf.append("]");
         return buf.toString();

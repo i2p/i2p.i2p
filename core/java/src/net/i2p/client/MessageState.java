@@ -37,13 +37,7 @@ class MessageState {
         _context = ctx;
         _nonce = nonce;
         _prefix = prefix + "[" + _stateId + "]: ";
-        _id = null;
         _receivedStatus = new HashSet();
-        _cancelled = false;
-        _key = null;
-        _newKey = null;
-        _tags = null;
-        _to = null;
         _created = ctx.clock().now();
         //ctx.statManager().createRateStat("i2cp.checkStatusTime", "how long it takes to go through the states", "i2cp", new long[] { 60*1000 });
     }

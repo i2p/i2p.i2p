@@ -28,7 +28,7 @@ public class SetDateMessage extends I2CPMessageImpl {
 
     public SetDateMessage() {
         super();
-        setDate(new Date(Clock.getInstance().now()));
+        _date = new Date(Clock.getInstance().now());
     }
 
     public Date getDate() {
@@ -70,7 +70,7 @@ public class SetDateMessage extends I2CPMessageImpl {
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof SetDateMessage)) {
             SetDateMessage msg = (SetDateMessage) object;
-            return DataHelper.eq(getDate(), msg.getDate());
+            return DataHelper.eq(_date, msg.getDate());
         }
             
         return false;
@@ -80,7 +80,7 @@ public class SetDateMessage extends I2CPMessageImpl {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("[SetDateMessage");
-        buf.append("\n\tDate: ").append(getDate());
+        buf.append("\n\tDate: ").append(_date);
         buf.append("]");
         return buf.toString();
     }
