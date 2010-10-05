@@ -153,16 +153,20 @@
             destdir="./build/javadoc" 
             packagenames="*" 
             use="true" 
-            group="SDK net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:freenet.support.CPUInformation,
-                   Streaming net.i2p.client.streaming,
-                   BOB net.i2p.BOB,
-                   SAM net.i2p.sam:net.i2p.sam.client,
-                   RouterConsole net.i2p.router.web,
-                   Router net.i2p.router:net.i2p.router.*:net.i2p.data.i2np,
-                   Systray net.i2p.apps.systray,
-                   I2PTunnel net.i2p.i2ptunnel:net.i2p.i2ptunnel.*"
             splitindex="true" 
-            windowtitle="I2P">
+            windowtitle="I2P Anonymous Network - Java Documentation">
+            <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:freenet.support.CPUInformation:org.bouncycastle.crypto:org.bouncycastle.crypto.*:gnu.crypto.*:gnu.gettext:org.xlattice.crypto.filters:com.nettgryppa.security" />
+            <group title="Streaming Library" packages="net.i2p.client.streaming" />
+            <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:org.cybergarage.*:org.freenetproject" />
+            <group title="Router Console" packages="net.i2p.router.web" />
+            <group title="Addressbook Application" packages="net.i2p.addressbook" />
+            <group title="BOB Bridge" packages="net.i2p.BOB" />
+            <group title="I2PSnark Application" packages="org.klomp.snark:org.klomp.snark.*" />
+            <group title="I2PTunnel Application" packages="net.i2p.i2ptunnel:net.i2p.i2ptunnel.*" />
+            <group title="SAM Bridge" packages="net.i2p.sam:net.i2p.sam.client" />
+            <group title="SusiDNS Application" packages="i2p.susi.dns" />
+            <group title="SusiMail Application" packages="i2p.susi.webmail:i2p.susi.webmail.*:i2p.susi.debug:i2p.susi.util" />
+            <group title="Systray Application" packages="net.i2p.apps.systray" />
             <sourcepath>
                 <pathelement location="core/java/src" />
                 <!--<pathelement location="core/java/test" />-->
@@ -177,6 +181,8 @@
                 <pathelement location="apps/i2psnark/java/src" />
                 <pathelement location="apps/sam/java/src" />
                 <pathelement location="apps/BOB/src" />
+                <pathelement location="apps/susidns/src/java/src" />
+                <pathelement location="apps/susimail/src/src" />
             </sourcepath>
             <classpath>
                 <pathelement location="apps/jetty/jettylib/org.mortbay.jetty.jar" />
