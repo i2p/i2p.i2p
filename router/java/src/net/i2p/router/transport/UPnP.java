@@ -581,6 +581,8 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 					// If not in portsForwarded, it wasn't successful, try again
 					if(portsForwarded.contains(port)) {
 						// We have forwarded it, and it should be forwarded, cool.
+						// Big problem here, if firewall resets, we don't know it.
+						// Do we need to re-forward anyway? or poll the router?
 					} else {
 						// Needs forwarding
 						if(portsToForwardNow == null) portsToForwardNow = new HashSet<ForwardPort>();
