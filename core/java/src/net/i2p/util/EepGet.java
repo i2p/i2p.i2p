@@ -537,6 +537,15 @@ public class EepGet {
             if (_redirects > 5)
                 throw new IOException("Too many redirects: to " + _redirectLocation);
             if (_log.shouldLog(Log.INFO)) _log.info("Redirecting to " + _redirectLocation);
+
+            // reset some important variables, we don't want to save the values from the redirect
+            _bytesRemaining = -1;
+            _redirectLocation = null;
+            _etag = null;
+            _lastModified = null;
+            _contentType = null;
+            _encodingChunked = false;
+
             sendRequest(timeout);
             doFetch(timeout);
             return;
