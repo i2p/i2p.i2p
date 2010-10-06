@@ -55,11 +55,11 @@ public class EepGet {
     protected long _bytesTransferred;
     protected long _bytesRemaining;
     protected int _currentAttempt;
-    private String _etag;
-    private String _lastModified;
+    protected String _etag;
+    protected String _lastModified;
     protected boolean _encodingChunked;
     protected boolean _notModified;
-    private String _contentType;
+    protected String _contentType;
     protected boolean _transferFailed;
     protected boolean _headersRead;
     protected boolean _aborted;
