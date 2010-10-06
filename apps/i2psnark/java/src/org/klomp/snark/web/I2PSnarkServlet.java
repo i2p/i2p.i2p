@@ -823,7 +823,8 @@ public class I2PSnarkServlet extends Default {
 
         if(showPeers && isRunning && curPeers > 0) {
             List<Peer> peers = snark.coordinator.peerList();
-            Collections.sort(peers, new PeerComparator());
+            if (!showDebug)
+                Collections.sort(peers, new PeerComparator());
             for (Peer peer : peers) {
                 if (!peer.isConnected())
                     continue;
