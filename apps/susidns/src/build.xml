@@ -72,7 +72,6 @@
         		<include name="images/*.png"/>
         		<include name="css.css"/>
         		<include name="index.html"/>
-        		<include name="WEB-INF/web-out.xml"/>
         		<include name="WEB-INF/classes/${project}.properties"/>
         	</fileset>
         </war>

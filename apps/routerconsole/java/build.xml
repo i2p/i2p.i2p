@@ -113,7 +113,7 @@
     <target name="war" depends="precompilejsp">
         <!-- Don't include the css in the war, the main build.xml will copy it to docs/themes/console/ -->
         <war destfile="build/routerconsole.war" webxml="../jsp/web-out.xml"
-             basedir="../jsp/" excludes="web.xml, *.css, **/*.java, *.jsp, *.jsi, web-fragment.xml">
+             basedir="../jsp/" excludes="web.xml, *.css, **/*.java, *.jsp, *.jsi, web-fragment.xml, web-out.xml">
         </war>
     </target>
     <target name="precompilejsp" unless="precompilejsp.uptodate">
