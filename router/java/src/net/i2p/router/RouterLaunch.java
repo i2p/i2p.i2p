@@ -1,9 +1,10 @@
 package net.i2p.router;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+
+import net.i2p.util.SecureFileOutputStream;
 
 /**
  *  This is the class called by the runplain.sh script on linux
@@ -33,7 +34,7 @@ public class RouterLaunch {
         }
         System.setProperty(PROP_WRAPPER_LOG, logfile.getAbsolutePath());
         try {
-            System.setOut(new PrintStream(new FileOutputStream(logfile, true)));
+            System.setOut(new PrintStream(new SecureFileOutputStream(logfile, true)));
         } catch (IOException ioe) {
             ioe.printStackTrace();
 	}
