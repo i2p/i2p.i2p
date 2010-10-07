@@ -146,7 +146,7 @@ public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runna
             int size = _proxyList.size();
             if (size <= 0)
                 return null;
-            int index = I2PAppContext.getGlobalContext().random().nextInt(size);
+            int index = _context.random().nextInt(size);
             return _proxyList.get(index);
         }
     }
