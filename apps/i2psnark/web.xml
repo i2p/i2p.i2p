@@ -42,6 +42,11 @@
     </mime-mapping>
 
     <mime-mapping>
+        <extension>mp4</extension>
+        <mime-type>video/mp4</mime-type>
+    </mime-mapping>
+
+    <mime-mapping>
         <extension>rar</extension>
         <mime-type>application/rar</mime-type>
     </mime-mapping>
