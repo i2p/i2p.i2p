@@ -156,7 +156,7 @@ public class LogManager {
         return rv;
     }
 
-    /** @deprecated unused */
+    /** now used by ConfigLogingHelper */
     public List<Log> getLogs() {
         return new ArrayList(_logs.values());
     }
@@ -415,15 +415,21 @@ public class LogManager {
 
     /** 
      * Determine how many bytes are in the given formatted string (5m, 60g, 100k, etc)
-     *
+     * Size may be k, m, or g; a trailing b is ignored. Upper-case is allowed.
+     * Spaces between the number and letter is are allowed.
+     * The number may be in floating point.
+     * 4096 min, 2 GB max (returns int)
      */
-    public int getFileSize(String size) {
-        int sz = -1;
+    public static int getFileSize(String size) {
         try {
-            String v = size;
-            char mod = size.toUpperCase().charAt(size.length() - 1);
-            if (!Character.isDigit(mod)) v = size.substring(0, size.length() - 1);
-            int val = Integer.parseInt(v);
+            String v = size.trim().toUpperCase();
+            if (v.length() < 2)
+                return -1;
+            if (v.endsWith("B"))
+                v = v.substring(0, v.length() - 1);
+            char mod = v.charAt(v.length() - 1);
+            if (!Character.isDigit(mod)) v = v.substring(0, v.length() - 1);
+            double val = Double.parseDouble(v);
             switch (mod) {
                 case 'K':
                     val *= 1024;
@@ -438,10 +444,11 @@ public class LogManager {
                     // blah, noop
                     break;
             }
-            return val;
+            if (val < 4096 || val > Integer.MAX_VALUE)
+                return -1;
+            return (int) val;
         } catch (Throwable t) {
             System.err.println("Error parsing config for filesize: [" + size + "]");
-            t.printStackTrace();
             return -1;
         }
     }

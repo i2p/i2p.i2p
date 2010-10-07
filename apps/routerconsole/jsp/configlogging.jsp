@@ -46,6 +46,8 @@
           </i></td>
         </tr><tr><td class="mediumtags" align="right"><b><%=intl._("Log level overrides")%>:</b></td>
           <td><jsp:getProperty name="logginghelper" property="logLevelTable" /></td>
+        </tr><tr><td class="mediumtags" align="right"><b><%=intl._("New override")%>:</b></td>
+          <td><jsp:getProperty name="logginghelper" property="newClassBox" /></td>
         </tr><tr><td colspan="2"><hr></td>
         </tr><tr class="tablefooter"><td colspan="2"> <div class="formaction">
           <input type="reset" value="<%=intl._("Cancel")%>" >
