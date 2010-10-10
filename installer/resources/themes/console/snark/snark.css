@@ -1,0 +1,553 @@
+/* I2PSnark theme "Ubergine" by dr|z3d */
+/* Guantanamo Commemorative Edition. */
+
+body {
+     background: #101 url('/themes/console/snark/images/graytile.png');
+     color: #001;
+     font: 8pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
+}
+
+.snarkTitle {
+     font-size: 12pt;
+     font-weight: bold;
+     text-align: center;
+}
+
+.snarkRefresh:link,.snarkRefresh:visited {
+     text-decoration: none !important;
+     text-transform: uppercase !important;
+     padding: 2px 16px;
+	 margin: -5px -7px -5px 0 !important;
+     letter-spacing: 0.05em;
+     font-weight: bold;
+     font-size: 11pt;
+     color: #f70;
+	 text-shadow: 1px 1px #420;
+}
+
+.snarkRefresh:hover {
+     text-decoration: none !important;
+     text-transform: uppercase !important;
+     padding: 1px 16px;
+     letter-spacing: 0.05em;
+     font-weight: bold;
+     font-size: 11pt;
+     color: #f90;
+     background: #310 url('/themes/console/snark/images/snarknav_on.png') repeat-x scroll center center;
+	 -moz-border-radius: 3px;
+	 -khtml-border-radius: 3px;
+	 border-radius: 3px;
+}
+
+.snarkRefresh:active {
+     text-decoration: none !important;
+     text-transform: uppercase !important;
+     padding: 0 16px;
+     letter-spacing: 0.05em;
+     font-weight: bold;
+     font-size: 11pt;
+     color: #fb0;
+     background: #310 url('/themes/console/snark/images/snarknav_on.png') repeat-x scroll center center;
+}
+
+.snarkMessages {
+     font: bold 9pt "Lucida Console","DejaVu Sans Mono",Courier,mono !important;
+     text-align: left;
+     margin: 0 0 10px 0;
+     padding: 3px 0;
+     border-spacing: 0px;
+     -moz-border-radius: 4px 0 0 0;
+     -khtml-border-radius: 4px 0 0 0;
+     border-radius: 4px 0 0 0;
+     border: 1px solid #000;
+     overflow: auto;
+     color: #22f;
+     height: 70px;
+     width: auto;
+     background: #111 url('/themes/console/snark/images/hat.png') no-repeat scroll right center;
+}
+
+.logshim {
+     margin-top: -10px !important;
+}
+
+pre {
+     width: 100%;
+     font: 8pt "Lucida Console","DejaVu Sans Mono",Courier,mono !important;
+     padding: 0;
+     text-align: left !important;
+     height: 8px;
+	 color: #070;
+     font-weight: bold !important; 
+}
+
+table {
+     margin: 0px 0px 10px 0px;
+     border: 0px;
+     padding: 0px;
+     border-spacing: 0px;
+     border-collapse: collapse;
+	 color: #323 url("/themes/console/snark/images/hat.png");
+	 width: 100%;
+	 opacity: 1 !important;
+}
+
+tr { 
+	 opacity: 1;
+}
+
+thead, tfoot {
+	 background: url("/themes/console/snark/images/snark_thead.png") repeat-x scroll 0 0 #101;
+	 text-shadow:0 2px 5px #333333;
+}
+
+thead a, tfoot a {
+text-shadow:1px 1px #550000;
+} 
+
+thead {
+     border-bottom: 2px solid #101;
+}
+
+th {
+     padding: 4px 2px 1px 4px;
+     font-size: 9pt;
+     border-top: 1px outset #001;
+     border-bottom: 1px inset #001;
+	 color: #ddd;
+     whitespace: nowrap;
+}
+
+th:first-child {
+     text-align: left !important;
+	 padding-left: 3px;
+	 max-width: 120px;
+}
+
+tfoot td:first-child {
+     text-align: left !important;
+	 padding-left: 0px;
+}
+
+th:first-child img {
+     margin: 1px 2px 3px 1px;
+}
+
+th:nth-child(2) img {
+     margin: 1px 7px 3px 2px;
+}
+
+tfoot th {
+     padding-bottom: 4px !important;
+}
+
+.SnarkTorrents {
+     margin: 0;
+     border: 1px solid #001;
+     background: #212;
+}
+
+td {
+     padding: 1px;
+	 color: #ddd !important;
+	 font-size: 9.5pt;
+	 opacity: 1;
+}
+
+.mainsection td {
+     color: #111;
+}
+
+td:first-child {
+     text-align: right;
+	 padding-left: 10px;
+}
+
+.snarkTorrentName {
+     text-shadow:1px 1px #550000;
+	 padding: 2px 0 0;
+}
+
+.snarkTorrentAction {
+     text-shadow:1px 1px #550000;
+	 padding: 1px 1px 1px 1px !important;
+	 margin: 0 !important;
+	 text-align: center;
+	 width: 68px;
+}
+
+.snarkTorrentAction img {
+     margin: 0 2px !important;
+	 opacity: 0.6;
+}
+
+.snarkTorrentAction img:hover {
+     -moz-box-shadow: 0 0 1px 1px #f90;
+     opacity: 1;
+}
+
+.snarkTorrentEven {
+     background: #545;
+     font-size: 8pt;
+}
+
+.snarkTorrentNoneLoaded {
+     background: #323;
+     font-size: 8.5pt;
+	 font-weight: bold;
+	 text-align: center !important;
+	 color: #bbb !important;
+}
+
+.snarkTorrentStatus {
+     padding: 1px 0 2px;
+}
+
+.snarkTorrentStatus:first-child {
+     text-align: left !important;
+	 font-style: italic;
+	 padding-left: 8px;
+}
+
+.snarkTorrentRate, .snarkTorrentDownloaded, .snarkTorrentUploaded {
+     font-size: 8pt;
+     font-weight: bold;
+}
+
+.snarkTorrentOdd {
+     background: #656;
+     font-size: 8pt;
+	 border: 1px inset #434 !important;
+	 border-left: 0 !important;
+	 border-right: 0 !important;
+}
+
+.snarkFileName {
+/*     min-width: 25em;*/
+     padding: 4px 0px !important; 
+	 text-align: left !important;
+}
+
+.snarkFileSize {
+     padding: 4px 10px;
+}
+
+.snarkFileStatus {
+     padding: 4px 10px;
+	 text-align: center;
+	 font-style: italic;
+}
+
+.thumb {
+     max-height: 64px;
+     max-width: 96px;
+}
+
+.snarkNewTorrent {
+     font-size: 9pt;
+}
+
+.snarkAddInfo {
+     font-size: 9pt;
+     line-height: 130% !important;
+}
+
+.snarkConfigTitle {
+     font-size: 11pt;
+     font-weight: bold;
+	 padding: 0 25px 3px 25px;
+	 margin: 5px 0 10px 0 !important;
+	 letter-spacing: 0.25em;
+	 border: 1px solid #111;
+	 -moz-border-radius: 0 0 5px 5px;
+	 -khtml-border-radius: 0 0 5px 5px;
+	 border-radius: 0 0 5px 5px;
+	 border-top: 0;
+	 text-shadow: 0px 3px 5px #323;
+	 background: #101 url('/themes/console/snark/images/snarknav.png') repeat-x scroll center center !important;
+	 font-variant: small-caps !important;
+}
+
+.snarkConfig {
+     font-size: 10pt;
+     width: 100%;
+}
+
+.page {
+     background: #323 url('/themes/console/snark/images/tile2.png');
+     color: #310;
+     min-width: 820px !important;
+     margin: 5px 0 0 0;
+     padding: 10px 10px 0px 10px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 1px solid #101;
+     font-size: 9pt !important;
+     line-height: 160% !important;
+     -moz-box-shadow: inset 0px 0px 1px 0px #212;
+     -khtml-box-shadow: inset 0px 0px 1px 0px #002;
+     box-shadow: inset 0px 0px 1px 0px #002;
+     text-align: center;
+     opacity: 1;
+}
+
+form {
+	 margin-bottom: 0;
+}
+
+p {
+     line-height: 150%;
+}
+
+hr {
+     color: #444;
+     background: #444;
+     height: 1px;
+     border: 0px solid #444;
+     width: 0%;
+     margin: 5px 0 7px 0;
+     text-align: center;
+}
+
+a:link {
+     color: #f70;
+     text-decoration: none;
+     font-weight: bold;
+     word-wrap: break-word;
+}
+
+a:visited {
+     color: #f50;
+     text-decoration: none;
+     font-weight: bold;
+}
+
+a:hover {
+     color: #f90;
+     font-weight: bold;
+}
+
+input {
+     font-size: 9pt;
+     font-weight: bold;
+     text-align: left;
+     padding: 2px 4px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 1px inset #000;
+     background: url('/themes/console/snark/images/graytile.png');	 
+	 color: #f60;
+}
+
+input.r {
+     text-align: right;
+     background: url('/themes/console/snark/images/graytile.png');
+}
+
+input[type=submit] {
+     text-shadow: 0px 0px #410;
+	 color: #000;
+	 background: #989;
+	 border: 1px inset #bbb;
+}
+
+input[type=submit]:hover {
+	 border: 1px outset #bbb;
+     text-shadow: 0 0;	 
+     background: #f60;
+	 color: #fff;
+	 text-shadow: 0px 1px 5px #f00;
+}
+
+input[type=submit]:active {
+     background: #000 !important;
+	 color: #f60 !important;
+	 text-shadow: 0 !important;
+}
+
+input[type=text]:active, input[type=text]:hover, input.r:hover {
+     background: #f60;
+	 color: #fff;
+}
+
+select {
+     background: #333;
+	 background: url('/themes/console/snark/images/graytile.png') !important;
+     color: #f60;
+     font: 9pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
+     font-weight: bold;
+     padding: 2px 2px 2px 3px;
+     -moz-border-radius: 4px 0 0 4px;
+     -khtml-border-radius: 4px 0 0 4px;
+     border-radius: 4px 0 0 4px;
+	 border: 1px solid #000;
+}
+
+select:hover, textarea:hover {
+     background: #f60 !important;
+     color: #fff;
+}	 
+
+textarea {
+     background: #111 url('/themes/console/snark/images/graytile.png');
+     color: #f60;
+     font-weight: bold;
+     padding: 1px 4px 0px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+	 border: 1px inset #000;
+}
+
+img {
+     border: none;
+     margin: 1px 3px 3px 4px;
+     vertical-align: middle;
+     opacity: 1.0;
+     line-height: 100%;
+}
+
+img: hover {
+     border: none;
+     margin: 5px 5px 0px 5px;
+     opacity: 0.5;
+     line-height: 100%;
+}
+
+div.section,div.mainsection {
+     margin: 0 0 10px 0;
+     padding: 10px;
+     border: 1px solid #001;
+     color: #001;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     -moz-box-shadow: inset 0px 0px 1px 0px #212;
+     word-wrap: break-word;
+     text-align: center;
+     background: #545;
+	 opacity: 1 !important;
+}
+
+div.newtorrentsection {
+     margin: 0 0 10px 0;
+     padding: 0 10px 0px 10px;
+     border: 1px solid #001;
+     text-align: center;
+     color: #ddd;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     -moz-box-shadow: inset 0px 0px 1px 0px #101;
+     -khtml-box-shadow: inset 0px 0px 1px 0px #101;
+     box-shadow: inset 0px 0px 1px 0px #101;
+     word-wrap: break-word;
+     background: #545 url('/themes/console/snark/images/snark_create.png') no-repeat scroll right center;
+     opacity: 1.0;
+}
+
+div.addtorrentsection {
+     margin: 0 0 10px 0;
+     padding: 0 10px 0px 10px;
+     border: 1px solid #001;
+     text-align: center;
+     color: #ddd;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     -moz-box-shadow: inset 0px 0px 1px 0px #101;
+     -khtml-box-shadow: inset 0px 0px 1px 0px #101;
+     box-shadow: inset 0px 0px 1px 0px #101;
+     word-wrap: break-word;
+     background: #545 url('/themes/console/snark/images/snark_add.png') no-repeat scroll right center;
+     opacity: 1.0;
+}
+
+div.configsection {
+     margin: 0 0 10px 0;
+     padding: 0 10px 15px 10px;
+     border: 1px solid #000;
+     color: #ddd;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     -moz-box-shadow: inset 0px 0px 1px 0px #101;
+     -khtml-box-shadow: inset 0px 0px 1px 0px #101;
+     box-shadow: inset 0px 0px 1px 0px #101;
+     word-wrap: break-word;
+     text-align: center;
+     background: #545;
+     font-weight: bold;
+}
+
+div.configsectionpanel {
+     margin: 0 0 10px 0;
+     padding: 0 10px;
+     border: 1px solid #000;
+     color: #ddd;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     -moz-box-shadow: inset 0px 0px 1px 0px #101;
+     -khtml-box-shadow: inset 0px 0px 1px 0px #101;
+     box-shadow: inset 0px 0px 1px 0px #101;
+     word-wrap: break-word;
+     text-align: center;
+     background: #545 url('/themes/console/snark/images/configuration.png') no-repeat scroll right center;
+     font-weight: bold;
+}
+
+.newtorrentsection form, .configsection form, .addtorrentsection form {
+     color: #ddd !important;
+}
+
+div.configsection table{
+     color: #ffb;
+	 opacity: 1;
+}
+
+div.configsection a {
+     color: #f60;
+	 text-shadow: 1px 1px #500;
+}
+
+div.configsection a:hover {
+     color: #f90;
+     text-decoration: none;
+}
+
+code {
+     font-size: 9pt;
+     color: #b8b;
+	 padding: 0 2px;
+	 font-weight: bold;
+	 font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+}
+.snarknavbar {
+     margin: 0 0 10px 0 !important;
+     padding: 4px 10px 4px;
+     border: 1px solid #001;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     -khtml-box-shadow: inset 0px 0px 1px 0px #002;
+     box-shadow: inset 0px 0px 1px 0px #002;
+     background: #111 url('/themes/console/snark/images/snarknav.png') repeat-x scroll center center;
+     text-transform: uppercase !important;
+     letter-spacing: 0.05em;
+     font-weight: bold;
+     font-size: 11.5pt;
+     color: #001;
+	 min-width: 820px;
+	 text-align: center;
+ }
+
+ .snarknavbar img {
+     border: 0;
+	 margin: 0 -2px 0 -3px;
+     padding: 1px 0 0px !important;
+	 vertical-align: top;
+}
