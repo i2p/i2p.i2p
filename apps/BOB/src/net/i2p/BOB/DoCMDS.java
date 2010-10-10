@@ -34,7 +34,9 @@ import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClientFactory;
+import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
+import net.i2p.i2ptunnel.I2PTunnel;
 import net.i2p.util.Log;
 // needed only for debugging.
 // import java.util.logging.Level;
@@ -50,7 +52,7 @@ public class DoCMDS implements Runnable {
 
 	// FIX ME
 	// I need a better way to do versioning, but this will do for now.
-	public static final String BMAJ = "00",  BMIN = "00",  BREV = "0D",  BEXT = "";
+	public static final String BMAJ = "00",  BMIN = "00",  BREV = "0E",  BEXT = "";
 	public static final String BOBversion = BMAJ + "." + BMIN + "." + BREV + BEXT;
 	private Socket server;
 	private Properties props;
@@ -86,6 +88,7 @@ public class DoCMDS implements Runnable {
 	private static final String C_inhost = "inhost";
 	private static final String C_inport = "inport";
 	private static final String C_list = "list";
+	private static final String C_lookup = "lookup";
 	private static final String C_newkeys = "newkeys";
 	private static final String C_option = "option";
 	private static final String C_outhost = "outhost";
@@ -113,6 +116,7 @@ public class DoCMDS implements Runnable {
 		{C_inhost, C_inhost + " hostname | IP * Set the inbound hostname or IP."},
 		{C_inport, C_inport + " port_number * Set the inbound port number nickname listens on."},
 		{C_list, C_list + " * List all tunnels."},
+		{C_lookup, C_lookup + " * Lookup an i2p address."},
 		{C_newkeys, C_newkeys + " * Generate a new keypair for the current nickname."},
 		{C_option, C_option + " I2CPoption=something * Set an I2CP option. NOTE: Don't use any spaces."},
 		{C_outhost, C_outhost + " hostname | IP * Set the outbound hostname or IP."},
@@ -138,6 +142,7 @@ public class DoCMDS implements Runnable {
 			C_inhost + " " +
 			C_inport + " " +
 			C_list + " " +
+			C_lookup + " " +
 			C_newkeys + " " +
 			C_option + " " +
 			C_outhost + " " +
@@ -446,6 +451,25 @@ public class DoCMDS implements Runnable {
 								} else if (Command.equals(C_visit)) {
 									visitAllThreads();
 									out.println("OK ");
+								} else if (Command.equals(C_lookup)) {
+									Destination dest = null;
+									String reply = null;
+									if (Arg.endsWith(".i2p")) {
+										try {
+											try {
+												dest = I2PTunnel.destFromName(Arg);
+											} catch (DataFormatException ex) {
+											}
+											reply = dest.toBase64();
+										} catch (NullPointerException npe) {
+											// Could not find the destination!?
+										}
+									}
+									if (reply == null) {
+										out.println("ERROR Address Not found.");
+									} else {
+										out.println("OK " + reply);
+									}
 								} else if (Command.equals(C_getdest)) {
 									if (ns) {
 										if (dk) {
