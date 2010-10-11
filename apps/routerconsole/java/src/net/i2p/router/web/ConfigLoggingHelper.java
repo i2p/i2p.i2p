@@ -23,7 +23,7 @@ public class ConfigLoggingHelper extends HelperBase {
     }
     public String getMaxFileSize() {
         int bytes = _context.logManager().getFileSize();
-        if (bytes <= 0) return "1 MB";
+        if (bytes <= 0) return "1.00 MB";
         return DataHelper.formatSize2(bytes) + 'B';
     }
     public String getLogLevelTable() {
