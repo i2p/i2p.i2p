@@ -43,6 +43,10 @@ public class MessageOutputStream extends OutputStream {
     private long _sendPeriodBytes;
     private int _sendBps;
     
+    /**
+     *  Since this is less than i2ptunnel's i2p.streaming.connectDelay default of 1000,
+     *  we only wait 250 at the start. Guess that's ok, 1000 is too long anyway.
+     */
     private static final int DEFAULT_PASSIVE_FLUSH_DELAY = 250;
 
     public MessageOutputStream(I2PAppContext ctx, DataReceiver receiver) {
@@ -273,8 +277,18 @@ public class MessageOutputStream extends OutputStream {
     }
     
     /** 
-     * Flush the data already queued up, blocking until it has been
-     * delivered.
+     * Flush the data already queued up, blocking only if the outbound
+     * window is full.
+     *
+     * Prior to 0.8.1, this blocked until "delivered".
+     * "Delivered" meant "received an ACK from the far end",
+     * which is not the commom implementation of flush(), and really hurt the
+     * performance of i2psnark, which flush()ed frequently.
+     * Calling flush() would cause a complete window stall.
+     *
+     * As of 0.8.1, only wait for accept into the streaming output queue.
+     * This will speed up snark significantly, and allow us to flush()
+     * the initial data in I2PTunnelRunner, saving 250 ms.
      *
      * @throws IOException if the write fails
      */
@@ -283,6 +297,14 @@ public class MessageOutputStream extends OutputStream {
      /* @throws InterruptedIOException if the write times out
       * Documented here, but doesn't belong in the javadoc. 
       */
+        flush(true);
+    }
+
+    /**
+     *  @param wait_for_accept_only see discussion in close() code
+     *  @@since 0.8.1
+     */
+    private void flush(boolean wait_for_accept_only) throws IOException {
         long begin = _context.clock().now();
         WriteStatus ws = null;
         if (_log.shouldLog(Log.INFO) && _valid > 0)
@@ -297,14 +319,28 @@ public class MessageOutputStream extends OutputStream {
                 throwAnyError();
                 return;
             }
-            ws = _dataReceiver.writeData(_buf, 0, _valid);
-            _written += _valid;
-            _valid = 0;
-            locked_updateBufferSize();
-            _lastFlushed = _context.clock().now();
-            _dataLock.notifyAll();
+            // if valid == 0 return ??? - no, this could flush a CLOSE packet too.
+
+            // Yes, flush here, inside the data lock, and do all the waitForCompletion() stuff below
+            // (disabled)
+            if (!wait_for_accept_only) {
+                ws = _dataReceiver.writeData(_buf, 0, _valid);
+                _written += _valid;
+                _valid = 0;
+                locked_updateBufferSize();
+                _lastFlushed = _context.clock().now();
+                _dataLock.notifyAll();
+            }
         }
         
+        // Skip all the waitForCompletion() stuff below, which is insanity, as of 0.8.1
+        // must do this outside the data lock
+        if (wait_for_accept_only) {
+            flushAvailable(_dataReceiver, true);
+            return;
+        }
+
+        // Wait a loooooong time, until we have the ACK
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("before waiting " + _writeTimeout + "ms for completion of " + ws);
         if (_closed && 
@@ -328,14 +364,28 @@ public class MessageOutputStream extends OutputStream {
         throwAnyError();
     }
     
+    /**
+     *  This does a flush, and BLOCKS until
+     *  the CLOSE packet is acked.
+     */
     @Override
     public void close() throws IOException {
         if (_closed) {
             synchronized (_dataLock) { _dataLock.notifyAll(); }
             return;
         }
+        // setting _closed before flush() will force flush() to send a CLOSE packet
         _closed = true;
-        flush();
+
+        // In 0.8.1 we rewrote flush() to only wait for accept into the window,
+        // not "completion" (i.e. ack from the far end).
+        // Unfortunately, that broke close(), at least in i2ptunnel HTTPClient.
+        // Symptom was premature close, i.e. incomplete pages and images.
+        // Possible cause - I2PTunnelRunner code? or the code here that follows flush()?
+        // It seems like we shouldn't have to wait for the far-end ACK for a close packet,
+        // should we? To be researched further.
+        // false -> wait for completion, not just accept.
+        flush(false);
         _log.debug("Output stream closed after writing " + _written);
         ByteArray ba = null;
         synchronized (_dataLock) {
@@ -351,7 +401,11 @@ public class MessageOutputStream extends OutputStream {
             _dataCache.release(ba);
         }
     }
-    /** nonblocking close */
+
+    /**
+     *  nonblocking close -
+     *  Use outside of this package is deprecated, should be made package local
+     */
     public void closeInternal() {
         _closed = true;
         if (_streamError == null)
@@ -412,6 +466,8 @@ public class MessageOutputStream extends OutputStream {
         if (_log.shouldLog(Log.INFO) && _valid > 0)
             _log.info("flushAvailable() valid = " + _valid);
         synchronized (_dataLock) {
+            // if valid == 0 return ??? - no, this could flush a CLOSE packet too.
+
             // _buf may be null, but the data receiver can handle that just fine,
             // deciding whether or not to send a packet
             ws = target.writeData(_buf, 0, _valid);
@@ -457,14 +513,21 @@ public class MessageOutputStream extends OutputStream {
     
     /** Define a way to detect the status of a write */
     public interface WriteStatus {
-        /** wait until the data written either fails or succeeds */
+        /**
+         * Wait until the data written either fails or succeeds.
+         * Success means an ACK FROM THE FAR END.
+         * @param maxWaitMs -1 = forever
+         */
         public void waitForCompletion(int maxWaitMs);
+
         /** 
-         * wait until the data written is accepted into the outbound pool,
+         * Wait until the data written is accepted into the outbound pool,
+         * (i.e. the outbound window is not full)
          * which we throttle rather than accept arbitrary data and queue 
-         * @param maxWaitMs -1 = forever ?
+         * @param maxWaitMs -1 = forever
          */
         public void waitForAccept(int maxWaitMs);
+
         /** the write was accepted.  aka did the socket not close? */
         public boolean writeAccepted();
         /** did the write fail?  */

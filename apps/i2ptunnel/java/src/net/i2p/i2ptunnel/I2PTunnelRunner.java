@@ -129,7 +129,14 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
                     // do NOT flush here, it will block and then onTimeout.run() won't happen on fail.
                     // But if we don't flush, then we have to wait for the connectDelay timer to fire
                     // in i2p socket? To be researched and/or fixed.
-                    //i2pout.flush();
+                    //
+                    // AS OF 0.8.1, MessageOutputStream.flush() is fixed to only wait for accept,
+                    // not for "completion" (i.e. an ACK from the far end).
+                    // So we now get a fast return from flush(), and can do it here to save 250 ms.
+                    // To make sure we are under the initial window size and don't hang waiting for accept,
+                    // only flush if it fits in one message.
+                    if (initialI2PData.length <= 1730)   // ConnectionOptions.DEFAULT_MAX_MESSAGE_SIZE
+                        i2pout.flush();
                 }
             }
             if (initialSocketData != null) {

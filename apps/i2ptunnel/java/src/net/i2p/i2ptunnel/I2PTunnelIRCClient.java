@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
@@ -124,7 +123,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         }
         if (size == 1) // skip the rand in the most common case
             return dests.get(0);
-        int index = I2PAppContext.getGlobalContext().random().nextInt(size);
+        int index = _context.random().nextInt(size);
         return dests.get(index);
     }
 
@@ -182,6 +181,8 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
                             }
                             outmsg=outmsg+"\r\n";   // rfc1459 sec. 2.3
                             output.write(outmsg.getBytes("ISO-8859-1"));
+                            // probably doesn't do much but can't hurt
+                            output.flush();
                         } else {
                             if (_log.shouldLog(Log.WARN))
                                 _log.warn("inbound BLOCKED: "+inmsg);
@@ -257,6 +258,8 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
                                 }
                                 outmsg=outmsg+"\r\n";   // rfc1459 sec. 2.3
                                 output.write(outmsg.getBytes("ISO-8859-1"));
+                                // save 250 ms in streaming
+                                output.flush();
                             } else {
                                 if (_log.shouldLog(Log.WARN))
                                     _log.warn("outbound BLOCKED: "+"\""+inmsg+"\"");
