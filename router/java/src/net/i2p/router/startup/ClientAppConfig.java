@@ -11,6 +11,7 @@ import java.util.Properties;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
+import net.i2p.util.SecureFileOutputStream;
 
 
 /**
@@ -191,7 +192,7 @@ public class ClientAppConfig {
         File cfgFile = configFile(ctx);
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(cfgFile);
+            fos = new SecureFileOutputStream(cfgFile);
             StringBuilder buf = new StringBuilder(2048);
             for(int i = 0; i < apps.size(); i++) {
                 ClientAppConfig app = (ClientAppConfig) apps.get(i);

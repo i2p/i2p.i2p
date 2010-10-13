@@ -69,7 +69,7 @@ public class DestroySessionMessage extends I2CPMessageImpl {
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof DestroySessionMessage)) {
             DestroySessionMessage msg = (DestroySessionMessage) object;
-            return DataHelper.eq(getSessionId(), msg.getSessionId());
+            return DataHelper.eq(_sessionId, msg.getSessionId());
         }
             
         return false;
@@ -86,7 +86,7 @@ public class DestroySessionMessage extends I2CPMessageImpl {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("[DestroySessionMessage: ");
-        buf.append("\n\tSessionId: ").append(getSessionId());
+        buf.append("\n\tSessionId: ").append(_sessionId);
         buf.append("]");
         return buf.toString();
     }

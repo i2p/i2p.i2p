@@ -9,7 +9,7 @@ import net.i2p.util.Log;
  * pool and toss 'em onto the outbound packet queue
  *
  */
-public class PacketPusher implements Runnable {
+class PacketPusher implements Runnable {
     // private RouterContext _context;
     private Log _log;
     private OutboundMessageFragments _fragments;

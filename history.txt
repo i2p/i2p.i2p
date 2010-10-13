@@ -1,3 +1,6 @@
+2010-10-10 sponge
+    * Fulfill Request for name resolving in BOB
+
 2010-09-15 dr|z3d
     * I2PSnark: Overhaul UI, implement new theme.
 

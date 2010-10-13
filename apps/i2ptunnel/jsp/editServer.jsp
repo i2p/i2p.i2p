@@ -196,7 +196,16 @@
             <a href="/susidns/addressbook.jsp?book=private&hostname=<%=editBean.getTunnelName(curTunnel)%>&destination=<%=editBean.getDestinationBase64(curTunnel)%>#add"><%=intl._("Add to local addressbook")%></a>    
          <% } %>
             </div>
-            
+
+            <% if (("httpserver".equals(tunnelType)) || ("httpbidirserver".equals(tunnelType))) {
+          %><div id="sigField" class="rowItem">
+                <label for="signature">
+                    <%=intl._("Hostname Signature")%>
+                </label>
+                <input type="text" size="30" readonly="readonly" title="Use to prove that the website name is for this destination" value="<%=editBean.getNameSignature(curTunnel)%>" wrap="off" class="freetext" />                
+            </div>
+            <% } %>
+
             <div class="footer">
             </div>
         </div>

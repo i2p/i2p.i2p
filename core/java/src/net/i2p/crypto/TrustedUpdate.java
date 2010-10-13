@@ -103,6 +103,25 @@ D8usM7Dxp5yrDrCYZ5AIijc=
 =SrXI
 -----END PGP SIGNATURE-----
 */
+/*
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+*/
+    /* HungryHobo's key */
+    private static final String DEFAULT_TRUSTED_KEY4 =
+        "l3G6um9nB9EDLkT9cUusz5fX-GxXSWE5zaj2~V8lUL~XsGuFf8gKqzJLK" +
+        "NkAw0CgDIDsLRHHuUaF7ZHo5Z7HG~9JJU9Il4G2jyNYtg5S8AzG0UxkEt" +
+        "-JeBEqIxv5GDn6OFKr~wTI0UafJbegEWokl-8m-GPWf0vW-yPMjL7y5MI=";
+/*
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAkysnNIACgkQHix7YXbc3BJVfwCeNGUHaWSqZUbWN9L8VyQLpwxI
+JXQAnA28vDmMMMH/WPbC5ixmJeGGNUiR
+=3oMC
+-----END PGP SIGNATURE-----
+*/
 
     private static final int    VERSION_BYTES       = 16;
     public static final int    HEADER_BYTES        = Signature.SIGNATURE_BYTES + VERSION_BYTES;
@@ -148,6 +167,7 @@ D8usM7Dxp5yrDrCYZ5AIijc=
             addKey(DEFAULT_TRUSTED_KEY, "jrandom@mail.i2p");
             addKey(DEFAULT_TRUSTED_KEY2, "zzz@mail.i2p");
             //addKey(DEFAULT_TRUSTED_KEY3, "complication@mail.i2p");
+            addKey(DEFAULT_TRUSTED_KEY4, "HungryHobo@mail.i2p");
         }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("TrustedUpdate created, trusting " + _trustedKeys.size() + " keys.");

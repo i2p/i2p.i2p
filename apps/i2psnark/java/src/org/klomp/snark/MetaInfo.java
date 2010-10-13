@@ -109,7 +109,8 @@ public class MetaInfo
    */
   public MetaInfo(Map m) throws InvalidBEncodingException
   {
-    _log.debug("Creating a metaInfo: " + m, new Exception("source"));
+    if (_log.shouldLog(Log.DEBUG))
+        _log.debug("Creating a metaInfo: " + m, new Exception("source"));
     BEValue val = (BEValue)m.get("announce");
     if (val == null)
         throw new InvalidBEncodingException("Missing announce string");
@@ -446,14 +447,16 @@ public class MetaInfo
         else
             buf.append(val.toString());
     }
-    _log.debug(buf.toString());
+    if (_log.shouldLog(Log.DEBUG))
+        _log.debug(buf.toString());
     byte[] infoBytes = BEncoder.bencode(info);
     //_log.debug("info bencoded: [" + Base64.encode(infoBytes, true) + "]");
     try
       {
         MessageDigest digest = MessageDigest.getInstance("SHA");
         byte hash[] = digest.digest(infoBytes);
-        _log.debug("info hash: [" + net.i2p.data.Base64.encode(hash) + "]");
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("info hash: [" + net.i2p.data.Base64.encode(hash) + "]");
         return hash;
       }
     catch(NoSuchAlgorithmException nsa)

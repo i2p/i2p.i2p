@@ -26,7 +26,7 @@ public class SessionId extends DataStructureImpl {
     private int _sessionId;
 
     public SessionId() {
-        setSessionId(-1);
+        _sessionId = -1;
     }
 
     public int getSessionId() {
@@ -49,16 +49,16 @@ public class SessionId extends DataStructureImpl {
     @Override
     public boolean equals(Object obj) {
         if ((obj == null) || !(obj instanceof SessionId)) return false;
-        return getSessionId() == ((SessionId) obj).getSessionId();
+        return _sessionId == ((SessionId) obj).getSessionId();
     }
 
     @Override
     public int hashCode() {
-        return getSessionId();
+        return _sessionId;
     }
 
     @Override
     public String toString() {
-        return "[SessionId: " + getSessionId() + "]";
+        return "[SessionId: " + _sessionId + "]";
     }
 }

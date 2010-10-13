@@ -194,7 +194,8 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
     }
     
     /**
-     * @param maxWaitMs MessageOutputStream is the only caller, often with -1 ??????
+     * Blocks until outbound window is not full. See Connection.packetSendChoke().
+     * @param maxWaitMs MessageOutputStream is the only caller, generally with -1
      */
     public void waitForAccept(int maxWaitMs) {
         if (_connection == null) 
@@ -220,6 +221,7 @@ public class PacketLocal extends Packet implements MessageOutputStream.WriteStat
                        + toString());
     }
     
+    /** block until the packet is acked from the far end */
     public void waitForCompletion(int maxWaitMs) {
         long expiration = _context.clock().now()+maxWaitMs;
         while (true) {

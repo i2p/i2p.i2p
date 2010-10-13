@@ -15,7 +15,7 @@ import net.i2p.util.Log;
  * Lowest level packet sender, pushes anything on its queue ASAP.
  *
  */
-public class UDPSender {
+class UDPSender {
     private RouterContext _context;
     private Log _log;
     private DatagramSocket _socket;

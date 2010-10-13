@@ -21,10 +21,13 @@ import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.networkdb.kademlia.HashDistance;
 import net.i2p.util.Log;
+import net.i2p.util.VersionComparator;
 
 /**
  * Coordinate the selection of peers to go into a tunnel for one particular 
  * pool.
+ *
+ * Todo: there's nothing non-static in here
  */
 public abstract class TunnelPeerSelector {
     /**
@@ -36,7 +39,7 @@ public abstract class TunnelPeerSelector {
      *         to build through, and the settings reject 0 hop tunnels, this will
      *         return null.
      */
-    public abstract List selectPeers(RouterContext ctx, TunnelPoolSettings settings);
+    public abstract List<Hash> selectPeers(RouterContext ctx, TunnelPoolSettings settings);
     
     protected int getLength(RouterContext ctx, TunnelPoolSettings settings) {
         int length = settings.getLength();
@@ -79,6 +82,11 @@ public abstract class TunnelPeerSelector {
         return length;
     }
     
+    /**
+     *  For debugging, also possibly for restricted routes?
+     *  Needs analysis and testing
+     *  @return should always be false
+     */
     protected boolean shouldSelectExplicit(TunnelPoolSettings settings) {
         if (settings.isExploratory()) return false;
         Properties opts = settings.getUnknownOptions();
@@ -92,7 +100,12 @@ public abstract class TunnelPeerSelector {
         return false;
     }
     
-    protected List selectExplicit(RouterContext ctx, TunnelPoolSettings settings, int length) {
+    /**
+     *  For debugging, also possibly for restricted routes?
+     *  Needs analysis and testing
+     *  @return should always be false
+     */
+    protected List<Hash> selectExplicit(RouterContext ctx, TunnelPoolSettings settings, int length) {
         String peers = null;
         Properties opts = settings.getUnknownOptions();
         if (opts != null)
@@ -102,7 +115,7 @@ public abstract class TunnelPeerSelector {
             peers = I2PAppContext.getGlobalContext().getProperty("explicitPeers");
         
         Log log = ctx.logManager().getLog(ClientPeerSelector.class);
-        List rv = new ArrayList();
+        List<Hash> rv = new ArrayList();
         StringTokenizer tok = new StringTokenizer(peers, ",");
         while (tok.hasMoreTokens()) {
             String peerStr = tok.nextToken();
@@ -156,7 +169,7 @@ public abstract class TunnelPeerSelector {
     /** 
      * Pick peers that we want to avoid
      */
-    public Set getExclude(RouterContext ctx, boolean isInbound, boolean isExploratory) {
+    public Set<Hash> getExclude(RouterContext ctx, boolean isInbound, boolean isExploratory) {
         // we may want to update this to skip 'hidden' or 'unreachable' peers, but that
         // isn't safe, since they may publish one set of routerInfo to us and another to
         // other peers.  the defaults for filterUnreachable has always been to return false,
@@ -175,11 +188,12 @@ public abstract class TunnelPeerSelector {
         //
         // Defaults changed to true for inbound only in filterUnreachable below.
 
-        Set peers = new HashSet(1);
+        Set<Hash> peers = new HashSet(1);
         peers.addAll(ctx.profileOrganizer().selectPeersRecentlyRejecting());
         peers.addAll(ctx.tunnelManager().selectPeersInTooManyTunnels());
         // if (false && filterUnreachable(ctx, isInbound, isExploratory)) {
         if (filterUnreachable(ctx, isInbound, isExploratory)) {
+            // NOTE: filterUnreachable returns true for inbound, false for outbound
             // This is the only use for getPeersByCapability? And the whole set of datastructures in PeerManager?
             List<Hash> caps = ctx.peerManager().getPeersByCapability(Router.CAPABILITY_UNREACHABLE);
             if (caps != null)
@@ -189,6 +203,7 @@ public abstract class TunnelPeerSelector {
                 peers.addAll(caps);
         }
         if (filterSlow(ctx, isInbound, isExploratory)) {
+            // NOTE: filterSlow always returns true
             Log log = ctx.logManager().getLog(TunnelPeerSelector.class);
             char excl[] = getExcludeCaps(ctx);
             if (excl != null) {
@@ -301,6 +316,7 @@ public abstract class TunnelPeerSelector {
         return peers;
     }
     
+    /** warning, this is also called by ProfileOrganizer.isSelectable() */
     public static boolean shouldExclude(RouterContext ctx, RouterInfo peer) {
         Log log = ctx.logManager().getLog(TunnelPeerSelector.class);
         return shouldExclude(ctx, log, peer, getExcludeCaps(ctx));
@@ -318,6 +334,10 @@ public abstract class TunnelPeerSelector {
     }
     
     private static final long DONT_EXCLUDE_PERIOD = 15*60*1000;
+    /** 0.7.8 and earlier had major message corruption bugs */
+    private static final String MIN_VERSION = "0.7.9";
+    private static final VersionComparator _versionComparator = new VersionComparator();
+
     private static boolean shouldExclude(RouterContext ctx, Log log, RouterInfo peer, char excl[]) {
         String cap = peer.getCapabilities();
         if (cap == null) {
@@ -340,6 +360,13 @@ public abstract class TunnelPeerSelector {
         // otherwise, it contains flags we aren't trying to focus on,
         // so don't exclude it based on published capacity
 
+        // minimum version check
+        String v = peer.getOption("router.version");
+        if (v == null || _versionComparator.compare(v, MIN_VERSION) < 0)
+            return true;
+
+        // uptime is always spoofed to 90m, so just remove all this
+      /******
         String val = peer.getOption("stat_uptime");
         if (val != null) {
             long uptimeMs = 0;
@@ -390,6 +417,8 @@ public abstract class TunnelPeerSelector {
             // not publishing an uptime, so exclude it
             return true;
         }
+      ******/
+        return false;
     }
     
     private static final String PROP_OUTBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE = "router.outboundExploratoryExcludeUnreachable";
@@ -403,6 +432,10 @@ public abstract class TunnelPeerSelector {
     private static final String DEFAULT_INBOUND_EXPLORATORY_EXCLUDE_UNREACHABLE = "true";
     private static final String DEFAULT_INBOUND_CLIENT_EXCLUDE_UNREACHABLE = "true";
     
+    /**
+     * do we want to skip peers who haven't been up for long?
+     * @return true for inbound, false for outbound, unless configured otherwise
+     */
     protected boolean filterUnreachable(RouterContext ctx, boolean isInbound, boolean isExploratory) {
         boolean def = false;
         String val = null;
@@ -429,6 +462,10 @@ public abstract class TunnelPeerSelector {
     private static final String PROP_INBOUND_EXPLORATORY_EXCLUDE_SLOW = "router.inboundExploratoryExcludeSlow";
     private static final String PROP_INBOUND_CLIENT_EXCLUDE_SLOW = "router.inboundClientExcludeSlow";
     
+    /**
+     * do we want to skip peers that are slow?
+     * @return true unless configured otherwise
+     */
     protected boolean filterSlow(RouterContext ctx, boolean isInbound, boolean isExploratory) {
         boolean def = true;
         String val = null;
@@ -454,7 +491,10 @@ public abstract class TunnelPeerSelector {
     private static final String PROP_INBOUND_EXPLORATORY_EXCLUDE_UPTIME = "router.inboundExploratoryExcludeUptime";
     private static final String PROP_INBOUND_CLIENT_EXCLUDE_UPTIME = "router.inboundClientExcludeUptime";
     
-    /** do we want to skip peers who haven't been up for long? */
+    /**
+     * do we want to skip peers who haven't been up for long?
+     * @return true unless configured otherwise
+     */
     protected boolean filterUptime(RouterContext ctx, boolean isInbound, boolean isExploratory) {
         boolean def = true;
         String val = null;

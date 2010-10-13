@@ -33,7 +33,7 @@ import net.i2p.util.SimpleTimer;
  * as well as to drop any failed establishment attempts.
  *
  */
-public class EstablishmentManager {
+class EstablishmentManager {
     private final RouterContext _context;
     private final Log _log;
     private final UDPTransport _transport;
@@ -313,6 +313,40 @@ public class EstablishmentManager {
             notifyActivity();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Receive session created from: " + state.getRemoteHostId().toString());
+        }
+    }
+
+    /**
+     * Got a SessionDestroy on an established conn
+     */
+    void receiveSessionDestroy(RemoteHostId from, PeerState state) {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Receive session destroy (EST) from: " + from);
+        _transport.dropPeer(state, false, "received destroy message");
+    }
+
+    /**
+     * Got a SessionDestroy during outbound establish
+     */
+    void receiveSessionDestroy(RemoteHostId from, OutboundEstablishState state) {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Receive session destroy (OB) from: " + from);
+        _outboundStates.remove(from);
+        Hash peer = state.getRemoteIdentity().calculateHash();
+        _transport.dropPeer(peer, false, "received destroy message");
+    }
+
+    /**
+     * Got a SessionDestroy - maybe after an inbound establish
+     */
+    void receiveSessionDestroy(RemoteHostId from) {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Receive session destroy (IB) from: " + from);
+        InboundEstablishState state = _inboundStates.remove(from);
+        if (state != null) {
+            Hash peer = state.getConfirmedIdentity().calculateHash();
+            if (peer != null)
+                _transport.dropPeer(peer, false, "received destroy message");
         }
     }
 

@@ -17,6 +17,8 @@ import net.i2p.router.RouterContext;
 import net.i2p.util.EepGet;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
+import net.i2p.util.SecureDirectory;
+import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SSLEepGet;
 import net.i2p.util.Translate;
 
@@ -260,11 +262,11 @@ public class Reseeder {
     
         private void writeSeed(String name, byte data[]) throws Exception {
             String dirName = "netDb"; // _context.getProperty("router.networkDatabase.dbDir", "netDb");
-            File netDbDir = new File(_context.getRouterDir(), dirName);
+            File netDbDir = new SecureDirectory(_context.getRouterDir(), dirName);
             if (!netDbDir.exists()) {
                 boolean ok = netDbDir.mkdirs();
             }
-            FileOutputStream fos = new FileOutputStream(new File(netDbDir, "routerInfo-" + name + ".dat"));
+            FileOutputStream fos = new SecureFileOutputStream(new File(netDbDir, "routerInfo-" + name + ".dat"));
             fos.write(data);
             fos.close();
         }

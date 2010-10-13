@@ -140,7 +140,7 @@ public class BEValue
    * succeeds when the BEValue is actually a List, otherwise it will
    * throw a InvalidBEncodingException.
    */
-  public List getList() throws InvalidBEncodingException
+  public List<BEValue> getList() throws InvalidBEncodingException
   {
     try
       {
@@ -157,7 +157,7 @@ public class BEValue
    * values. This operation only succeeds when the BEValue is actually
    * a Map, otherwise it will throw a InvalidBEncodingException.
    */
-  public Map getMap() throws InvalidBEncodingException
+  public Map<BEValue, BEValue> getMap() throws InvalidBEncodingException
   {
     try
       {

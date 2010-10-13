@@ -1,8 +1,7 @@
 package net.i2p.crypto;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
@@ -22,14 +21,14 @@ import org.bouncycastle.crypto.macs.I2PHMac;
 public class HMACGenerator {
     private I2PAppContext _context;
     /** set of available HMAC instances for calculate */
-    protected final List _available;
+    protected final LinkedBlockingQueue<I2PHMac> _available;
     /** set of available byte[] buffers for verify */
-    private final  List _availableTmp;
+    private final LinkedBlockingQueue<byte[]> _availableTmp;
     
     public HMACGenerator(I2PAppContext context) {
         _context = context;
-        _available = new ArrayList(32);
-        _availableTmp = new ArrayList(32);
+        _available = new LinkedBlockingQueue(32);
+        _availableTmp = new LinkedBlockingQueue(32);
     }
     
     /**
@@ -88,39 +87,30 @@ public class HMACGenerator {
     }
     
     protected I2PHMac acquire() {
-        synchronized (_available) {
-            if (!_available.isEmpty())
-                return (I2PHMac)_available.remove(0);
-        }
+        I2PHMac rv = _available.poll();
+        if (rv != null)
+            return rv;
         // the HMAC is hardcoded to use SHA256 digest size
         // for backwards compatability.  next time we have a backwards
         // incompatible change, we should update this by removing ", 32"
         return new I2PHMac(new MD5Digest(), 32);
     }
-    private void release(Mac mac) {
-        synchronized (_available) {
-            if (_available.size() < 64)
-                _available.add(mac);
-        }
+
+    private void release(I2PHMac mac) {
+        _available.offer(mac);
     }
 
     // temp buffers for verify(..)
     private byte[] acquireTmp() {
-        byte rv[] = null;
-        synchronized (_availableTmp) {
-            if (!_availableTmp.isEmpty())
-                rv = (byte[])_availableTmp.remove(0);
-        }
+        byte rv[] = _availableTmp.poll();
         if (rv != null)
             Arrays.fill(rv, (byte)0x0);
         else
             rv = new byte[Hash.HASH_LENGTH];
         return rv;
     }
+
     private void releaseTmp(byte tmp[]) {
-        synchronized (_availableTmp) {
-            if (_availableTmp.size() < 64)
-                _availableTmp.add((Object)tmp);
-        }
+        _availableTmp.offer(tmp);
     }
 }

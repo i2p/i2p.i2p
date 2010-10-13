@@ -16,6 +16,7 @@ import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
+import net.i2p.util.SecureDirectory;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.VersionComparator;
@@ -150,7 +151,7 @@ public class PluginUpdateHandler extends UpdateHandler {
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
             updateStatus("<b>" + _("Plugin downloaded") + "</b>");
             File f = new File(_updateFile);
-            File appDir = new File(_context.getConfigDir(), PLUGIN_DIR);
+            File appDir = new SecureDirectory(_context.getConfigDir(), PLUGIN_DIR);
             if ((!appDir.exists()) && (!appDir.mkdir())) {
                 f.delete();
                 statusDone("<b>" + _("Cannot create plugin directory {0}", appDir.getAbsolutePath()) + "</b>");
@@ -273,7 +274,7 @@ public class PluginUpdateHandler extends UpdateHandler {
                 return;
             }
 
-            File destDir = new File(appDir, appName);
+            File destDir = new SecureDirectory(appDir, appName);
             if (destDir.exists()) {
                 if (Boolean.valueOf(props.getProperty("install-only")).booleanValue()) {
                     to.delete();

@@ -43,7 +43,6 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
     
     public ClientManagerFacadeImpl(RouterContext context) {
         _context = context;
-        _manager = null;
         _log.debug("Client manager facade created");
     }
     

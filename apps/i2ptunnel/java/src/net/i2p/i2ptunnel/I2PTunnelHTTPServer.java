@@ -290,6 +290,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         }
     }
 
+    /** just a wrapper to provide stats for debugging */
     private static class InternalGZIPOutputStream extends GZIPOutputStream {
         public InternalGZIPOutputStream(OutputStream target) throws IOException {
             super(target);

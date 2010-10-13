@@ -563,7 +563,7 @@ public class PluginStarter implements Runnable {
     /**
      *  http://jimlife.wordpress.com/2007/12/19/java-adding-new-classpath-at-runtime/
      */
-    public static void addPath(URL u) throws Exception {
+    private static void addPath(URL u) throws Exception {
         URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
         Class urlClass = URLClassLoader.class;
         Method method = urlClass.getDeclaredMethod("addURL", new Class[]{URL.class});

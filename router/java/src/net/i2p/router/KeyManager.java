@@ -27,6 +27,8 @@ import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
+import net.i2p.util.SecureDirectory;
+import net.i2p.util.SecureFileOutputStream;
 
 /**
  * Maintain all of the key pairs for the router.
@@ -142,7 +144,7 @@ public class KeyManager {
         }
         public void runJob() {
             String keyDir = getContext().getProperty(PROP_KEYDIR, DEFAULT_KEYDIR);
-            File dir = new File(getContext().getRouterDir(), keyDir);
+            File dir = new SecureDirectory(getContext().getRouterDir(), keyDir);
             if (!dir.exists())
                 dir.mkdirs();
             if (dir.exists() && dir.isDirectory() && dir.canRead() && dir.canWrite()) {
@@ -219,7 +221,7 @@ public class KeyManager {
             FileInputStream in = null;
             try {
                 if (exists) {
-                    out = new FileOutputStream(keyFile);
+                    out = new SecureFileOutputStream(keyFile);
                     structure.writeBytes(out);
                     return structure;
                 } else {

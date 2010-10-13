@@ -11,7 +11,7 @@ import net.i2p.util.Log;
  * Hold the raw data fragments of an inbound message
  *
  */
-public class InboundMessageState {
+class InboundMessageState {
     private RouterContext _context;
     private Log _log;
     private long _messageId;

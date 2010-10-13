@@ -76,10 +76,12 @@ public class PeerAcceptor
         // is this working right?
         try {
           peerInfoHash = readHash(in);
-          _log.info("infohash read from " + socket.getPeerDestination().calculateHash().toBase64() 
-                    + ": " + Base64.encode(peerInfoHash));
+          if (_log.shouldLog(Log.INFO))
+              _log.info("infohash read from " + socket.getPeerDestination().calculateHash().toBase64() 
+                        + ": " + Base64.encode(peerInfoHash));
         } catch (IOException ioe) {
-            _log.info("Unable to read the infohash from " + socket.getPeerDestination().calculateHash().toBase64());
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Unable to read the infohash from " + socket.getPeerDestination().calculateHash().toBase64());
             throw ioe;
         }
         in = new SequenceInputStream(new ByteArrayInputStream(peerInfoHash), in);

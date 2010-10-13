@@ -11,7 +11,7 @@ import net.i2p.util.Log;
  * Coordinate the low level datagram socket, managing the UDPSender and
  * UDPReceiver
  */
-public class UDPEndpoint {
+class UDPEndpoint {
     private RouterContext _context;
     private Log _log;
     private int _listenPort;

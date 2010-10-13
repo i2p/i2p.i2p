@@ -17,7 +17,7 @@ import net.i2p.util.Log;
  * basic line of defense here).
  *
  */
-public class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
+class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
     private RouterContext _context;
     private Log _log;
     /** list of message IDs recently received, so we can ignore in flight dups */

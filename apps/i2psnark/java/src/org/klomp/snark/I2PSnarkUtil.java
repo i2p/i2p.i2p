@@ -26,6 +26,7 @@ import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.EepGet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
+import net.i2p.util.SecureDirectory;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.Translate;
@@ -77,7 +78,7 @@ public class I2PSnarkUtil {
         // This is used for both announce replies and .torrent file downloads,
         // so it must be available even if not connected to I2CP.
         // so much for multiple instances
-        _tmpDir = new File(ctx.getTempDir(), "i2psnark");
+        _tmpDir = new SecureDirectory(ctx.getTempDir(), "i2psnark");
         FileUtil.rmdir(_tmpDir, false);
         _tmpDir.mkdirs();
     }
@@ -196,11 +197,14 @@ public class I2PSnarkUtil {
     
     /** connect to the given destination */
     I2PSocket connect(PeerID peer) throws IOException {
-        Hash dest = peer.getAddress().calculateHash();
+        Destination addr = peer.getAddress();
+        if (addr == null)
+            throw new IOException("Null address");
+        Hash dest = addr.calculateHash();
         if (_shitlist.contains(dest))
             throw new IOException("Not trying to contact " + dest.toBase64() + ", as they are shitlisted");
         try {
-            I2PSocket rv = _manager.connect(peer.getAddress());
+            I2PSocket rv = _manager.connect(addr);
             if (rv != null)
                 _shitlist.remove(dest);
             return rv;
@@ -224,7 +228,8 @@ public class I2PSnarkUtil {
     public File get(String url, boolean rewrite) { return get(url, rewrite, 0); }
     public File get(String url, int retries) { return get(url, true, retries); }
     public File get(String url, boolean rewrite, int retries) {
-        _log.debug("Fetching [" + url + "] proxy=" + _proxyHost + ":" + _proxyPort + ": " + _shouldProxy);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Fetching [" + url + "] proxy=" + _proxyHost + ":" + _proxyPort + ": " + _shouldProxy);
         File out = null;
         try {
             // we could use the system tmp dir but deleteOnExit() doesn't seem to work on all platforms...
@@ -248,10 +253,12 @@ public class I2PSnarkUtil {
         }
         EepGet get = new I2PSocketEepGet(_context, _manager, retries, out.getAbsolutePath(), fetchURL);
         if (get.fetch()) {
-            _log.debug("Fetch successful [" + url + "]: size=" + out.length());
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Fetch successful [" + url + "]: size=" + out.length());
             return out;
         } else {
-            _log.warn("Fetch failed [" + url + "]");
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Fetch failed [" + url + "]");
             out.delete();
             return null;
         }

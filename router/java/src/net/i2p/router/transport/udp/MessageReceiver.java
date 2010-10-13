@@ -19,7 +19,7 @@ import net.i2p.util.Log;
  * parse 'em into I2NPMessages, and stick them on the 
  * {@link net.i2p.router.InNetMessagePool} by way of the {@link UDPTransport}.
  */
-public class MessageReceiver {
+class MessageReceiver {
     private RouterContext _context;
     private Log _log;
     private UDPTransport _transport;

@@ -34,6 +34,8 @@ public interface I2PClient {
     public final static String PROP_RELIABILITY_BEST_EFFORT = "BestEffort";
     /** Reliability value: guaranteed */
     public final static String PROP_RELIABILITY_GUARANTEED = "Guaranteed";
+    /** @since 0.8.1 */
+    public final static String PROP_RELIABILITY_NONE = "none";
 
     /** protocol flag that must be sent when opening the i2cp connection to the router */
     public final static int PROTOCOL_BYTE = 0x2A;

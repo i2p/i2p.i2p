@@ -205,7 +205,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                 l.log("Proxy list is empty - no outproxy available");
                 return null;
             }
-            int index = I2PAppContext.getGlobalContext().random().nextInt(size);
+            int index = _context.random().nextInt(size);
             String proxy = (String)proxyList.get(index);
             return proxy;
         }
@@ -626,6 +626,14 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         //line = "From: i2p";
                         line = null;
                         continue; // completely strip the line
+                    } else if (lowercaseLine.startsWith("authorization: ntlm ")) {
+                        // Block Windows NTLM after 401
+                        line = null;
+                        continue;
+                    } else if (lowercaseLine.startsWith("proxy-authorization: ntlm ")) {
+                        // Block Windows NTLM after 407
+                        line = null;
+                        continue;
                     }
                 }
 
@@ -808,7 +816,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
      *  @return non-null
      */
     private byte[] getErrorPage(String base, byte[] backup) {
-        return getErrorPage(getTunnel().getContext(), base, backup);
+        return getErrorPage(_context, base, backup);
     }
 
     private static byte[] getErrorPage(I2PAppContext ctx, String base, byte[] backup) {

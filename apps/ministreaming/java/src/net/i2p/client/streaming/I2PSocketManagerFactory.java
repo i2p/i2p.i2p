@@ -130,16 +130,19 @@ public class I2PSocketManagerFactory {
             if (!opts.containsKey(name))
                 opts.setProperty(name, System.getProperty(name));
         }
-        boolean oldLib = DEFAULT_MANAGER.equals(opts.getProperty(PROP_MANAGER, DEFAULT_MANAGER));
-        if (oldLib && false) {
+        //boolean oldLib = DEFAULT_MANAGER.equals(opts.getProperty(PROP_MANAGER, DEFAULT_MANAGER));
+        //if (oldLib && false) {
             // for the old streaming lib
-            opts.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_GUARANTEED);
+        //    opts.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_GUARANTEED);
             //opts.setProperty("tunnels.depthInbound", "0");
-        } else {
+        //} else {
             // for new streaming lib:
-            opts.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_BEST_EFFORT);
+            //opts.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_BEST_EFFORT);
+            // as of 0.8.1 (I2CP default is BestEffort)
+            if (!opts.containsKey(I2PClient.PROP_RELIABILITY))
+                opts.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_NONE);
             //p.setProperty("tunnels.depthInbound", "0");
-        }
+        //}
 
         if (i2cpHost != null)
             opts.setProperty(I2PClient.PROP_TCP_HOST, i2cpHost);

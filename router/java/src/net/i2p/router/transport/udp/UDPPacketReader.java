@@ -15,7 +15,7 @@ import net.i2p.util.Log;
  * elements, grab the appropriate subreader.
  *
  */
-public class UDPPacketReader {
+class UDPPacketReader {
     private I2PAppContext _context;
     private Log _log;
     private byte _message[];
@@ -125,6 +125,8 @@ public class UDPPacketReader {
                 return "Relay request packet";
             case UDPPacket.PAYLOAD_TYPE_RELAY_RESPONSE:
                 return "Relay response packet";
+            case UDPPacket.PAYLOAD_TYPE_SESSION_DESTROY:
+                return "Session destroyed packet";
             default:
                 return "Other packet type...";
         }
@@ -135,6 +137,8 @@ public class UDPPacketReader {
             buf.append(Base64.encode(_message, _payloadBeginOffset, _payloadLength));
     }
     
+    /* ------- Begin Reader Classes ------- */
+
     /** Help read the SessionRequest payload */
     public class SessionRequestReader {
         public static final int X_LENGTH = 256;
@@ -755,7 +759,9 @@ public class UDPPacketReader {
         }
     }
     
+    /* ------- End Reader Classes ------- */
     
+/******
     public static void main(String args[]) {
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
         try {
@@ -781,4 +787,5 @@ public class UDPPacketReader {
         }
         
     }
+*******/
 }

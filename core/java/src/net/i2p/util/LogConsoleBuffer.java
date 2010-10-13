@@ -11,8 +11,8 @@ import net.i2p.I2PAppContext;
  */
 public class LogConsoleBuffer {
     private I2PAppContext _context;
-    private final List _buffer;
-    private final List _critBuffer;
+    private final List<String> _buffer;
+    private final List<String> _critBuffer;
 
     public LogConsoleBuffer(I2PAppContext context) {
         _context = context;
@@ -43,7 +43,7 @@ public class LogConsoleBuffer {
      * in the logs)
      *
      */
-    public List getMostRecentMessages() {
+    public List<String> getMostRecentMessages() {
         synchronized (_buffer) {
             return new ArrayList(_buffer);
         }
@@ -54,7 +54,7 @@ public class LogConsoleBuffer {
      * in the logs)
      *
      */
-    public List getMostRecentCriticalMessages() {
+    public List<String> getMostRecentCriticalMessages() {
         synchronized (_critBuffer) {
             return new ArrayList(_critBuffer);
         }
