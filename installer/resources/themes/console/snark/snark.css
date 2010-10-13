@@ -16,13 +16,22 @@ body {
 .snarkRefresh:link,.snarkRefresh:visited {
      text-decoration: none !important;
      text-transform: uppercase !important;
-     padding: 2px 16px;
+     padding: 2px 16px 3px !important;
 	 margin: -5px -7px -5px 0 !important;
      letter-spacing: 0.05em;
      font-weight: bold;
      font-size: 11pt;
      color: #f70;
 	 text-shadow: 1px 1px #420;
+     background: url('/themes/console/snark/images/snarknav_lowlight.png') no-repeat scroll center bottom;
+     background: #310 url('/themes/console/snark/images/snarknav_lowlight.png') repeat-x scroll center center;
+	 -moz-border-radius: 0px;
+	 -khtml-border-radius: 3px;
+	 border-radius: 0px;
+	 -moz-box-shadow: inset 0 0 1px 0 #f90;
+	 -khtml-box-shadow: inset 0 0 1px 0 #f90;
+	 box-shadow: 0 0 1px 0 #f90;
+
 }
 
 .snarkRefresh:hover {
@@ -32,11 +41,15 @@ body {
      letter-spacing: 0.05em;
      font-weight: bold;
      font-size: 11pt;
-     color: #f90;
+     color: #f50;
      background: #310 url('/themes/console/snark/images/snarknav_on.png') repeat-x scroll center center;
-	 -moz-border-radius: 3px;
-	 -khtml-border-radius: 3px;
-	 border-radius: 3px;
+     background: url('/themes/console/snark/images/snarknav_on.png') repeat-x scroll center center;
+	 -moz-border-radius: 0;
+	 -khtml-border-radius: 0;
+	 border-radius: 0;
+	 -moz-box-shadow: inset 0 0 1px 0 #f90;
+	 -khtml-box-shadow: inset 0 0 1px 0 #f90;
+	 box-shadow: 0 0 1px  #f90;
 }
 
 .snarkRefresh:active {
@@ -48,6 +61,24 @@ body {
      font-size: 11pt;
      color: #fb0;
      background: #310 url('/themes/console/snark/images/snarknav_on.png') repeat-x scroll center center;
+}
+
+.snarkRefresh:first-child {
+	 -moz-border-radius: 0px 0 0 3px;
+	 -khtml-border-radius: 3px;
+	 border-radius: 0;
+	 -moz-box-shadow: inset 0 0 1px 0 #f90;
+	 -khtml-box-shadow: inset 0 0 1px 0 #f90;
+	 box-shadow: 0 0 1px 0  #f90;
+}
+
+.snarkRefresh:last-child {
+	 -moz-border-radius: 0 3px 0px 0px;
+	 -khtml-border-radius: 0 3px 0 0;
+	 border-radius: 0;
+	 -moz-box-shadow: inset 0 0 1px 0 #f90;
+	 -khtml-box-shadow: inset 0 0 1px 0 #f90;
+	 box-shadow: 0 0 1px 0 #f90;
 }
 
 .snarkMessages {
@@ -106,14 +137,14 @@ text-shadow:1px 1px #550000;
 } 
 
 thead {
-     border-bottom: 2px solid #101;
+     border-bottom: 1px solid #101;
 }
 
 th {
      padding: 4px 2px 1px 4px;
      font-size: 9pt;
      border-top: 1px outset #001;
-     border-bottom: 1px inset #001;
+     border-bottom: 1px inset #101;
 	 color: #ddd;
      whitespace: nowrap;
 }
@@ -143,7 +174,7 @@ tfoot th {
 
 .SnarkTorrents {
      margin: 0;
-     border: 1px solid #001;
+     border: 1px solid #101;
      background: #212;
 }
 
@@ -189,7 +220,15 @@ td:first-child {
 .snarkTorrentEven {
      background: #545;
      font-size: 8pt;
+     background: #202;
 }
+
+/*
+.snarkTorrentEven tr:first-child {
+	 border: 1px dotted #fff !important;
+}
+
+*/
 
 .snarkTorrentNoneLoaded {
      background: #323;
@@ -216,10 +255,14 @@ td:first-child {
 
 .snarkTorrentOdd {
      background: #656;
+     background: #351933;
      font-size: 8pt;
-	 border: 1px inset #434 !important;
+	 border: 0px inset #101 !important;
 	 border-left: 0 !important;
 	 border-right: 0 !important;
+}
+.snarkTorrentOdd td, .snarkTorrentEven td {
+	 border-top: 1px dotted #313 !important;
 }
 
 .snarkFileName {
@@ -236,6 +279,12 @@ td:first-child {
      padding: 4px 10px;
 	 text-align: center;
 	 font-style: italic;
+}
+
+.snarkTorrentETA {
+     font-weight: bold;
+	 font-style: italic;
+     color: #dd7 !important;
 }
 
 .thumb {
@@ -337,7 +386,7 @@ input {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      border: 1px inset #000;
-     background: url('/themes/console/snark/images/graytile.png');	 
+     background: #212 url('/themes/console/snark/images/graytile.png');	 
 	 color: #f60;
 }
 
@@ -527,7 +576,7 @@ code {
 }
 .snarknavbar {
      margin: 0 0 10px 0 !important;
-     padding: 4px 10px 4px;
+     padding: 7px 10px;
      border: 1px solid #001;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
@@ -537,7 +586,7 @@ code {
      box-shadow: inset 0px 0px 1px 0px #002;
      background: #111 url('/themes/console/snark/images/snarknav.png') repeat-x scroll center center;
      text-transform: uppercase !important;
-     letter-spacing: 0.05em;
+     letter-spacing: 0.065em !important;
      font-weight: bold;
      font-size: 11.5pt;
      color: #001;
