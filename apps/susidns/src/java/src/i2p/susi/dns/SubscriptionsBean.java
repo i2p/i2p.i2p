@@ -28,11 +28,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Properties;
+
+import net.i2p.util.SecureFileOutputStream;
 
 public class SubscriptionsBean
 {
@@ -113,7 +114,7 @@ public class SubscriptionsBean
 	{
 		File file = new File( getFileName() );
 		try {
-			PrintWriter out = new PrintWriter( new FileOutputStream( file ) );
+			PrintWriter out = new PrintWriter( new SecureFileOutputStream( file ) );
 			out.print( content );
 			out.flush();
 			out.close();

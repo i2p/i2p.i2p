@@ -29,6 +29,8 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.networkdb.reseed.ReseedChecker;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.SecureDirectory;
+import net.i2p.util.SecureFileOutputStream;
 
 /**
  * Write out keys to disk when we get them and periodically read ones we don't know
@@ -288,7 +290,7 @@ class PersistentDataStore extends TransientDataStore {
             long dataPublishDate = getPublishDate(data);
             if (dbFile.lastModified() < dataPublishDate) {
                 // our filesystem is out of date, lets replace it
-                fos = new FileOutputStream(dbFile);
+                fos = new SecureFileOutputStream(dbFile);
                 try {
                     data.writeBytes(fos);
                     fos.close();
@@ -440,7 +442,7 @@ class PersistentDataStore extends TransientDataStore {
     
     
     private File getDbDir() throws IOException {
-        File f = new File(_context.getRouterDir(), _dbDir);
+        File f = new SecureDirectory(_context.getRouterDir(), _dbDir);
         if (!f.exists()) {
             boolean created = f.mkdirs();
             if (!created)

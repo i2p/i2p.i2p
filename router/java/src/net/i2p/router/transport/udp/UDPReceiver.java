@@ -19,7 +19,7 @@ import net.i2p.util.SimpleTimer;
  * from the queue ASAP by a {@link PacketHandler}
  *
  */
-public class UDPReceiver {
+class UDPReceiver {
     private RouterContext _context;
     private Log _log;
     private DatagramSocket _socket;

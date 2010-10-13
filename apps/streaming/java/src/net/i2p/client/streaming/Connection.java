@@ -148,16 +148,21 @@ public class Connection {
     }
     
     /**
+     * This doesn't "send a choke". Rather, it blocks if the outbound window is full,
+     * thus choking the sender that calls this.
+     *
      * Block until there is an open outbound packet slot or the write timeout 
      * expires.  
+     * PacketLocal is the only caller, generally with -1.
      *
-     * @param timeoutMs PacketLocal is the only caller, often with -1??????
-     * @return true if the packet should be sent
+     * @param timeoutMs 0 or negative means wait forever, 5 minutes max
+     * @return true if the packet should be sent, false for a fatal error
+     *         will return false after 5 minutes even if timeoutMs is <= 0.
      */
     boolean packetSendChoke(long timeoutMs) {
         // if (false) return true; // <--- what the fuck??
         long start = _context.clock().now();
-        long writeExpire = start + timeoutMs;
+        long writeExpire = start + timeoutMs;  // only used if timeoutMs > 0
         boolean started = false;
         while (true) {
             long timeLeft = writeExpire - _context.clock().now();

@@ -3,7 +3,6 @@ package net.i2p.router.peermanager;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -19,6 +18,8 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
+import net.i2p.util.SecureDirectory;
+import net.i2p.util.SecureFileOutputStream;
 
 class ProfilePersistenceHelper {
     private Log _log;
@@ -61,7 +62,7 @@ class ProfilePersistenceHelper {
         long before = _context.clock().now();
         OutputStream fos = null;
         try {
-            fos = new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(f)));
+            fos = new BufferedOutputStream(new GZIPOutputStream(new SecureFileOutputStream(f)));
             writeProfile(profile, fos);
         } catch (IOException ioe) {
             _log.error("Error writing profile to " + f);
@@ -310,7 +311,7 @@ class ProfilePersistenceHelper {
     private File getProfileDir() {
         if (_profileDir == null) {
             String dir = _context.getProperty(PROP_PEER_PROFILE_DIR, DEFAULT_PEER_PROFILE_DIR);
-            _profileDir = new File(_context.getRouterDir(), dir);
+            _profileDir = new SecureDirectory(_context.getRouterDir(), dir);
         }
         return _profileDir;
     }

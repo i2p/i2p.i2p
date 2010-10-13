@@ -33,7 +33,6 @@ class LeaseRequestState {
         _onFailed = onFailed;
         _expiration = expiration;
         _requestedLeaseSet = requested;
-        _successful = false;
     }
     
     /** created lease set from client */

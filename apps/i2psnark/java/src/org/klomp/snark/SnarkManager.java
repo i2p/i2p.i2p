@@ -21,6 +21,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
+import net.i2p.util.SecureDirectory;
 
 /**
  * Manage multiple snarks
@@ -130,9 +131,9 @@ public class SnarkManager implements Snark.CompleteListener {
     }
     public File getDataDir() { 
         String dir = _config.getProperty(PROP_DIR, "i2psnark");
-        File f = new File(dir);
+        File f = new SecureDirectory(dir);
         if (!f.isAbsolute())
-            f = new File(_context.getAppDir(), dir);
+            f = new SecureDirectory(_context.getAppDir(), dir);
         return f; 
     }
     
@@ -201,7 +202,8 @@ public class SnarkManager implements Snark.CompleteListener {
         }
         if (i2cpHost != null) {
             _util.setI2CPConfig(i2cpHost, i2cpPort, i2cpOpts);
-            _log.debug("Configuring with I2CP options " + i2cpOpts);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Configuring with I2CP options " + i2cpOpts);
         }
         //I2PSnarkUtil.instance().setI2CPConfig("66.111.51.110", 7654, new Properties());
         //String eepHost = _config.getProperty(PROP_EEP_HOST);
@@ -331,8 +333,9 @@ public class SnarkManager implements Snark.CompleteListener {
                     p.putAll(opts);
                     _util.setI2CPConfig(i2cpHost, port, p);
                     addMessage(_("I2CP and tunnel changes will take effect after stopping all torrents"));
-                    _log.debug("i2cp host [" + i2cpHost + "] i2cp port " + port + " opts [" + opts 
-                               + "] oldOpts [" + oldOpts + "]");
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("i2cp host [" + i2cpHost + "] i2cp port " + port + " opts [" + opts 
+                                   + "] oldOpts [" + oldOpts + "]");
                 } else {
                     if (_util.connected()) {
                         _util.disconnect();
@@ -439,7 +442,10 @@ public class SnarkManager implements Snark.CompleteListener {
         return null;
     }
 
+    /** @throws RuntimeException via Snark.fatal() */
     public void addTorrent(String filename) { addTorrent(filename, false); }
+
+    /** @throws RuntimeException via Snark.fatal() */
     public void addTorrent(String filename, boolean dontAutoStart) {
         if ((!dontAutoStart) && !_util.connected()) {
             addMessage(_("Connecting to I2P"));
@@ -711,7 +717,8 @@ public class SnarkManager implements Snark.CompleteListener {
             getBWLimit();
             while (true) {
                 File dir = getDataDir();
-                _log.debug("Directory Monitor loop over " + dir.getAbsolutePath());
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Directory Monitor loop over " + dir.getAbsolutePath());
                 try {
                     monitorTorrents(dir);
                 } catch (Exception e) {
@@ -724,9 +731,13 @@ public class SnarkManager implements Snark.CompleteListener {
     
     /** two listeners */
     public void torrentComplete(Snark snark) {
-        File f = new File(snark.torrent);
+        StringBuilder buf = new StringBuilder(256);
+        buf.append("<a href=\"/i2psnark/").append(snark.storage.getBaseName());
+        if (snark.meta.getFiles() != null)
+            buf.append('/');
+        buf.append("\">").append(snark.storage.getBaseName()).append("</a>");
         long len = snark.meta.getTotalLength();
-        addMessage(_("Download finished: \"{0}\"", f.getName()) + " (" + _("size: {0}B", DataHelper.formatSize2(len)) + ')');
+        addMessage(_("Download finished: {0}", buf.toString()) + " (" + _("size: {0}B", DataHelper.formatSize2(len)) + ')');
         updateStatus(snark);
     }
     
@@ -736,7 +747,7 @@ public class SnarkManager implements Snark.CompleteListener {
     
     private void monitorTorrents(File dir) {
         String fileNames[] = dir.list(TorrentFilenameFilter.instance());
-        List foundNames = new ArrayList(0);
+        List<String> foundNames = new ArrayList(0);
         if (fileNames != null) {
             for (int i = 0; i < fileNames.length; i++) {
                 try {
@@ -747,7 +758,7 @@ public class SnarkManager implements Snark.CompleteListener {
             }
         }
         
-        Set existingNames = listTorrentFiles();
+        Set<String> existingNames = listTorrentFiles();
         // lets find new ones first...
         for (int i = 0; i < foundNames.size(); i++) {
             if (existingNames.contains(foundNames.get(i))) {
@@ -755,7 +766,13 @@ public class SnarkManager implements Snark.CompleteListener {
             } else {
                 if (shouldAutoStart() && !_util.connect())
                     addMessage(_("Unable to connect to I2P!"));
-                addTorrent((String)foundNames.get(i), !shouldAutoStart());
+                try {
+                    // Snark.fatal() throws a RuntimeException
+                    // don't let one bad torrent kill the whole loop
+                    addTorrent(foundNames.get(i), !shouldAutoStart());
+                } catch (Exception e) {
+                    addMessage(_("Unable to add {0}", foundNames.get(i)) + ": " + e);
+                }
             }
         }
         // now lets see which ones have been removed...
@@ -765,7 +782,13 @@ public class SnarkManager implements Snark.CompleteListener {
                 // known and still there.  noop
             } else {
                 // known, but removed.  drop it
-                stopTorrent(name, true);
+                try {
+                    // Snark.fatal() throws a RuntimeException
+                    // don't let one bad torrent kill the whole loop
+                    stopTorrent(name, true);
+                } catch (Exception e) {
+                    // don't bother with message
+                }
             }
         }
     }

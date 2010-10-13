@@ -17,7 +17,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -42,6 +41,7 @@ import net.i2p.util.ByteCache;
 import net.i2p.util.OrderedProperties;
 import net.i2p.util.ReusableGZIPInputStream;
 import net.i2p.util.ReusableGZIPOutputStream;
+import net.i2p.util.SecureFileOutputStream;
 
 /**
  * Defines some simple IO routines for dealing with marshalling data structures
@@ -339,11 +339,12 @@ public class DataHelper {
     /**
      * Writes the props to the file, unsorted (unless props is an OrderedProperties)
      * Note that this does not escape the \r or \n that are unescaped in loadProps() above.
+     * As of 0.8.1, file will be mode 600.
      */
     public static void storeProps(Properties props, File file) throws IOException {
         PrintWriter out = null;
         try {
-            out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8")));
+            out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(file), "UTF-8")));
             out.println("# NOTE: This I2P config file must use UTF-8 encoding");
             for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
                 String name = (String)iter.next();

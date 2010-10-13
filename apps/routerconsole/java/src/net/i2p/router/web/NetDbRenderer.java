@@ -19,6 +19,8 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -34,6 +36,7 @@ import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.networkdb.kademlia.HashDistance;   // debug
 import net.i2p.util.HexDump;                             // debug
 import net.i2p.util.ObjectCounter;
+import net.i2p.util.OrderedProperties;
 import net.i2p.util.VersionComparator;
 
 public class NetDbRenderer {
@@ -371,9 +374,11 @@ public class NetDbRenderer {
             int cost = addr.getCost();
             if (!((style.equals("SSU") && cost == 5) || (style.equals("NTCP") && cost == 10)))
                 buf.append('[').append(_("cost")).append('=').append("" + cost).append("] ");
-            for (Iterator optIter = addr.getOptions().keySet().iterator(); optIter.hasNext(); ) {
-                String name = (String)optIter.next();
-                String val = addr.getOptions().getProperty(name);
+            Properties p = new OrderedProperties();
+            p.putAll(addr.getOptions());
+            for (Map.Entry e : p.entrySet()) {
+                String name = (String) e.getKey();
+                String val = (String) e.getValue();
                 buf.append('[').append(_(DataHelper.stripHTML(name))).append('=').append(DataHelper.stripHTML(val)).append("] ");
             }
         }

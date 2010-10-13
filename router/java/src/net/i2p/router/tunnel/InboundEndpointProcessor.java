@@ -15,17 +15,19 @@ import net.i2p.util.Log;
  *
  */
 public class InboundEndpointProcessor {
-    private RouterContext _context;
-    private Log _log;
-    private TunnelCreatorConfig _config;
-    private IVValidator _validator;    
+    private final RouterContext _context;
+    private final Log _log;
+    private final TunnelCreatorConfig _config;
+    private final IVValidator _validator;    
     
     static final boolean USE_ENCRYPTION = HopProcessor.USE_ENCRYPTION;
     private static final ByteCache _cache = ByteCache.getInstance(128, HopProcessor.IV_LENGTH);
     
+    /** @deprecated unused */
     public InboundEndpointProcessor(RouterContext ctx, TunnelCreatorConfig cfg) {
         this(ctx, cfg, DummyValidator.getInstance());
     }
+
     public InboundEndpointProcessor(RouterContext ctx, TunnelCreatorConfig cfg, IVValidator validator) {
         _context = ctx;
         _log = ctx.logManager().getLog(InboundEndpointProcessor.class);
@@ -84,6 +86,9 @@ public class InboundEndpointProcessor {
         return true;
     }
     
+    /**
+     * Iteratively undo the crypto that the various layers in the tunnel added.
+     */
     private void decrypt(RouterContext ctx, TunnelCreatorConfig cfg, byte iv[], byte orig[], int offset, int length) {
         Log log = ctx.logManager().getLog(OutboundGatewayProcessor.class);
         ByteArray ba = _cache.acquire();

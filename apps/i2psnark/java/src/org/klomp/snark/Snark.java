@@ -437,7 +437,7 @@ public class Snark
             try { storage.close(); } catch (IOException ioee) {
                 ioee.printStackTrace();
             }
-            fatal("Could not create storage", ioe);
+            fatal("Could not check or create storage", ioe);
           }
       }
 

@@ -16,7 +16,7 @@ import net.i2p.util.Log;
  * of object instances to allow rapid reuse.
  *
  */
-public class UDPPacket {
+class UDPPacket {
     private I2PAppContext _context;
     private static Log _log;
     private volatile DatagramPacket _packet;
@@ -55,6 +55,7 @@ public class UDPPacket {
     public static final int IV_SIZE = 16;
     public static final int MAC_SIZE = 16;
     
+    /** Message types, 4 bits max */
     public static final int PAYLOAD_TYPE_SESSION_REQUEST = 0;
     public static final int PAYLOAD_TYPE_SESSION_CREATED = 1;
     public static final int PAYLOAD_TYPE_SESSION_CONFIRMED = 2;
@@ -63,13 +64,17 @@ public class UDPPacket {
     public static final int PAYLOAD_TYPE_RELAY_INTRO = 5;
     public static final int PAYLOAD_TYPE_DATA = 6;
     public static final int PAYLOAD_TYPE_TEST = 7;
+    /** @since 0.8.1 */
+    public static final int PAYLOAD_TYPE_SESSION_DESTROY = 8;
     
     // various flag fields for use in the data packets
     public static final byte DATA_FLAG_EXPLICIT_ACK = (byte)(1 << 7);
     public static final byte DATA_FLAG_ACK_BITFIELDS = (1 << 6);
+    // unused
     public static final byte DATA_FLAG_ECN = (1 << 4);
     public static final byte DATA_FLAG_WANT_ACKS = (1 << 3);
     public static final byte DATA_FLAG_WANT_REPLY = (1 << 2);
+    // unused
     public static final byte DATA_FLAG_EXTENDED = (1 << 1);
     
     public static final byte BITFIELD_CONTINUATION = (byte)(1 << 7);

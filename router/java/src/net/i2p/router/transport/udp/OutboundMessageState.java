@@ -15,7 +15,7 @@ import net.i2p.util.Log;
  * Maintain the outbound fragmentation for resending
  *
  */
-public class OutboundMessageState {
+class OutboundMessageState {
     private I2PAppContext _context;
     private Log _log;
     /** may be null if we are part of the establishment */

@@ -38,6 +38,7 @@ import java.util.Properties;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
+import net.i2p.util.SecureFileOutputStream;
 
 public class AddressbookBean
 {
@@ -330,7 +331,7 @@ public class AddressbookBean
 	{
 		String filename = properties.getProperty( getBook() + "_addressbook" );
 		
-		FileOutputStream fos = new FileOutputStream( ConfigBean.addressbookPrefix + filename  );
+		FileOutputStream fos = new SecureFileOutputStream( ConfigBean.addressbookPrefix + filename  );
 		addressbook.store( fos, null );
 		try {
 			fos.close();

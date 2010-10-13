@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -821,10 +822,10 @@ public class I2PSnarkServlet extends Default {
         out.write("</td>\n</tr>\n");
 
         if(showPeers && isRunning && curPeers > 0) {
-            List peers = snark.coordinator.peerList();
-            Iterator it = peers.iterator();
-            while (it.hasNext()) {
-                Peer peer = (Peer)it.next();
+            List<Peer> peers = snark.coordinator.peerList();
+            if (!showDebug)
+                Collections.sort(peers, new PeerComparator());
+            for (Peer peer : peers) {
                 if (!peer.isConnected())
                     continue;
                 out.write("<tr class=\"" + rowClass + "\">");
@@ -908,6 +909,19 @@ public class I2PSnarkServlet extends Default {
         }
     }
     
+    /**
+     *  Sort by completeness (seeds first), then by ID
+     *  @since 0.8.1
+     */
+    private static class PeerComparator implements Comparator<Peer> {
+        public int compare(Peer l, Peer r) {
+            int diff = r.completed() - l.completed();      // reverse
+            if (diff != 0)
+                return diff;
+            return l.toString().substring(5, 9).compareTo(r.toString().substring(5, 9));
+        }
+    }
+
     private void writeAddForm(PrintWriter out, HttpServletRequest req) throws IOException {
         String uri = req.getRequestURI();
         String newURL = req.getParameter("newURL");

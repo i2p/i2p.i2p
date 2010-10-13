@@ -28,7 +28,7 @@ public class AbuseSeverity extends DataStructureImpl {
     private int _severityId;
 
     public AbuseSeverity() {
-        setSeverity(-1);
+        _severityId = -1;
     }
 
     public int getSeverity() {
@@ -56,11 +56,11 @@ public class AbuseSeverity extends DataStructureImpl {
 
     @Override
     public int hashCode() {
-        return getSeverity();
+        return _severityId;
     }
 
     @Override
     public String toString() {
-        return "[AbuseSeverity: " + getSeverity() + "]";
+        return "[AbuseSeverity: " + _severityId + "]";
     }
 }

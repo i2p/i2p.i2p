@@ -65,35 +65,17 @@ public class DHSessionKeyBuilder {
     public final static String PROP_DH_PRECALC_MIN = "crypto.dh.precalc.min";
     public final static String PROP_DH_PRECALC_MAX = "crypto.dh.precalc.max";
     public final static String PROP_DH_PRECALC_DELAY = "crypto.dh.precalc.delay";
-    public final static String DEFAULT_DH_PRECALC_MIN = "5";
-    public final static String DEFAULT_DH_PRECALC_MAX = "50";
-    public final static String DEFAULT_DH_PRECALC_DELAY = "10000";
+    public final static int DEFAULT_DH_PRECALC_MIN = 5;
+    public final static int DEFAULT_DH_PRECALC_MAX = 50;
+    public final static int DEFAULT_DH_PRECALC_DELAY = 10000;
 
     static {
         I2PAppContext ctx = _context;
         ctx.statManager().createRateStat("crypto.dhGeneratePublicTime", "How long it takes to create x and X", "Encryption", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         ctx.statManager().createRateStat("crypto.dhCalculateSessionTime", "How long it takes to create the session key", "Encryption", new long[] { 60*1000, 5*60*1000, 60*60*1000 });        
-        try {
-            int val = Integer.parseInt(ctx.getProperty(PROP_DH_PRECALC_MIN, DEFAULT_DH_PRECALC_MIN));
-            MIN_NUM_BUILDERS = val;
-        } catch (Throwable t) {
-            int val = Integer.parseInt(DEFAULT_DH_PRECALC_MIN);
-            MIN_NUM_BUILDERS = val;
-        }
-        try {
-            int val = Integer.parseInt(ctx.getProperty(PROP_DH_PRECALC_MAX, DEFAULT_DH_PRECALC_MAX));
-            MAX_NUM_BUILDERS = val;
-        } catch (Throwable t) {
-            int val = Integer.parseInt(DEFAULT_DH_PRECALC_MAX);
-            MAX_NUM_BUILDERS = val;
-        }
-        try {
-            int val = Integer.parseInt(ctx.getProperty(PROP_DH_PRECALC_DELAY, DEFAULT_DH_PRECALC_DELAY));
-            CALC_DELAY = val;
-        } catch (Throwable t) {
-            int val = Integer.parseInt(DEFAULT_DH_PRECALC_DELAY);
-            CALC_DELAY = val;
-        }
+        MIN_NUM_BUILDERS = ctx.getProperty(PROP_DH_PRECALC_MIN, DEFAULT_DH_PRECALC_MIN);
+        MAX_NUM_BUILDERS = ctx.getProperty(PROP_DH_PRECALC_MAX, DEFAULT_DH_PRECALC_MAX);
+        CALC_DELAY = ctx.getProperty(PROP_DH_PRECALC_DELAY, DEFAULT_DH_PRECALC_DELAY);
 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("DH Precalc (minimum: " + MIN_NUM_BUILDERS + " max: " + MAX_NUM_BUILDERS + ", delay: "

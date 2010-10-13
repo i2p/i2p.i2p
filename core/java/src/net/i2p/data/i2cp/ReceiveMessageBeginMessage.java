@@ -28,8 +28,8 @@ public class ReceiveMessageBeginMessage extends I2CPMessageImpl {
     private long _messageId;
 
     public ReceiveMessageBeginMessage() {
-        setSessionId(-1);
-        setMessageId(-1);
+        _sessionId = -1;
+        _messageId = -1;
     }
 
     public long getSessionId() {
@@ -103,8 +103,8 @@ public class ReceiveMessageBeginMessage extends I2CPMessageImpl {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("[ReceiveMessageBeginMessage: ");
-        buf.append("\n\tSessionId: ").append(getSessionId());
-        buf.append("\n\tMessageId: ").append(getMessageId());
+        buf.append("\n\tSessionId: ").append(_sessionId);
+        buf.append("\n\tMessageId: ").append(_messageId);
         buf.append("]");
         return buf.toString();
     }

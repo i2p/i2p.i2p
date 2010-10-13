@@ -66,6 +66,10 @@ public class EepGetNamingService extends NamingService {
 
         hostname = hostname.toLowerCase();
 
+        // If you want b32, chain with HostsTxtNamingService
+        if (hostname.length() == 60 && hostname.endsWith(".b32.i2p"))
+            return null;
+
         // check the cache
         Destination d = getCache(hostname);
         if (d != null)

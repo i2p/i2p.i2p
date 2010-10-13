@@ -646,6 +646,7 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         return Boolean.valueOf(val).booleanValue();
     }
 
+/****
     public static void main(String args[]) {
         Properties p = new Properties();
         
@@ -656,4 +657,5 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
         c = new ConnectionOptions(new I2PSocketOptionsImpl(p));
         System.out.println("opts: " + c);
     }
+****/
 }

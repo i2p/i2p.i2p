@@ -27,11 +27,11 @@ public class CreateSessionMessage extends I2CPMessageImpl {
     private SessionConfig _sessionConfig;
 
     public CreateSessionMessage(SessionConfig config) {
-        setSessionConfig(config);
+        _sessionConfig = config;
     }
 
     public CreateSessionMessage() {
-        setSessionConfig(new SessionConfig());
+        _sessionConfig = new SessionConfig();
     }
 
     public SessionConfig getSessionConfig() {
@@ -75,7 +75,7 @@ public class CreateSessionMessage extends I2CPMessageImpl {
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof CreateSessionMessage)) {
             CreateSessionMessage msg = (CreateSessionMessage) object;
-            return DataHelper.eq(getSessionConfig(), msg.getSessionConfig());
+            return DataHelper.eq(_sessionConfig, msg.getSessionConfig());
         }
             
         return false;
@@ -85,7 +85,7 @@ public class CreateSessionMessage extends I2CPMessageImpl {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("[CreateSessionMessage: ");
-        buf.append("\n\tConfig: ").append(getSessionConfig());
+        buf.append("\n\tConfig: ").append(_sessionConfig);
         buf.append("]");
         return buf.toString();
     }

@@ -24,19 +24,33 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.Map;
 
+import net.i2p.I2PAppContext;
+import net.i2p.data.Base32;
 import net.i2p.data.Base64;
+import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 
 import org.klomp.snark.bencode.BDecoder;
 import org.klomp.snark.bencode.BEValue;
 import org.klomp.snark.bencode.InvalidBEncodingException;
 
+/**
+ *  Store the address information about a peer.
+ *  Prior to 0.8.1, an instantiation required a peer ID, and full Destination address.
+ *  Starting with 0.8.1, to support compact tracker responses,
+ *  a PeerID can be instantiated with a Destination Hash alone.
+ *  The full destination lookup is deferred until getAddress() is called,
+ *  and the PeerID is not required.
+ *  Equality is now determined solely by the dest hash.
+ */
 public class PeerID implements Comparable
 {
-  private final byte[] id;
-  private final Destination address;
+  private byte[] id;
+  private Destination address;
   private final int port;
-
+  private byte[] destHash;
+  /** whether we have tried to get the dest from the hash - only do once */
+  private boolean triedDestLookup;
   private final int hash;
 
   public PeerID(byte[] id, Destination address)
@@ -44,7 +58,7 @@ public class PeerID implements Comparable
     this.id = id;
     this.address = address;
     this.port = 6881;
-
+    this.destHash = address.calculateHash().getData();
     hash = calculateHash();
   }
 
@@ -77,8 +91,22 @@ public class PeerID implements Comparable
         throw new InvalidBEncodingException("Invalid destination [" + bevalue.getString() + "]");
 
     port = 6881;
-
+    this.destHash = address.calculateHash().getData();
     hash = calculateHash();
+  }
+
+  /**
+   * Creates a PeerID from a destHash
+   * @since 0.8.1
+   */
+  public PeerID(byte[] dest_hash) throws InvalidBEncodingException
+  {
+    // id and address remain null
+    port = 6881;
+    if (dest_hash.length != 32)
+        throw new InvalidBEncodingException("bad hash length");
+    destHash = dest_hash;
+    hash = DataHelper.hashCode(dest_hash);
   }
 
   public byte[] getID()
@@ -86,8 +114,26 @@ public class PeerID implements Comparable
     return id;
   }
 
-  public Destination getAddress()
+  /** for connecting out to peer based on desthash @since 0.8.1 */
+  public void setID(byte[] xid)
   {
+    id = xid;
+  }
+
+  /**
+   *  Get the destination.
+   *  If this PeerId was instantiated with a destHash,
+   *  and we have not yet done so, lookup the full destination, which may take
+   *  up to 10 seconds.
+   *  @return Dest or null if unknown
+   */
+  public synchronized Destination getAddress()
+  {
+    if (address == null && destHash != null && !triedDestLookup) {
+        String b32 = Base32.encode(destHash) + ".b32.i2p";
+        address = I2PAppContext.getGlobalContext().namingService().lookup(b32);
+        triedDestLookup = true;
+    }
     return address;
   }
 
@@ -96,16 +142,19 @@ public class PeerID implements Comparable
     return port;
   }
 
+  /** @since 0.8.1 */
+  public byte[] getDestHash()
+  {
+    return destHash;
+  }
+
   private int calculateHash()
   {
-    int b = 0;
-    for (int i = 0; i < id.length; i++)
-      b ^= id[i];
-    return (b ^ address.hashCode()) ^ port;
+    return DataHelper.hashCode(destHash);
   }
 
   /**
-   * The hash code of a PeerID is the exclusive or of all id bytes.
+   * The hash code of a PeerID is the hashcode of the desthash
    */
     @Override
   public int hashCode()
@@ -115,18 +164,15 @@ public class PeerID implements Comparable
 
   /**
    * Returns true if and only if this peerID and the given peerID have
-   * the same 20 bytes as ID.
+   * the same destination hash
    */
   public boolean sameID(PeerID pid)
   {
-    boolean equal = true;
-    for (int i = 0; equal && i < id.length; i++)
-      equal = id[i] == pid.id[i];
-    return equal;
+    return DataHelper.eq(destHash, pid.getDestHash());
   }
 
   /**
-   * Two PeerIDs are equal when they have the same id, address and port.
+   * Two PeerIDs are equal when they have the same dest hash
    */
     @Override
   public boolean equals(Object o)
@@ -135,9 +181,7 @@ public class PeerID implements Comparable
       {
         PeerID pid = (PeerID)o;
 
-        return port == pid.port
-          && address.equals(pid.address)
-          && sameID(pid);
+        return sameID(pid);
       }
     else
       return false;
@@ -145,6 +189,7 @@ public class PeerID implements Comparable
 
   /**
    * Compares port, address and id.
+   * @deprecated unused? and will NPE now that address can be null?
    */
   public int compareTo(Object o)
   {
@@ -176,6 +221,8 @@ public class PeerID implements Comparable
     @Override
   public String toString()
   {
+    if (id == null || address == null)
+        return "unkn@" + Base64.encode(destHash).substring(0, 6);
     int nonZero = 0;
     for (int i = 0; i < id.length; i++) {
         if (id[i] != 0) {

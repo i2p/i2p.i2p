@@ -14,7 +14,7 @@ import net.i2p.router.OutNetMessage;
  *
  * @since 0.7.12
  */
-public class DummyThrottle implements OutboundMessageFragments.ActiveThrottle {
+class DummyThrottle implements OutboundMessageFragments.ActiveThrottle {
 
     public DummyThrottle() {
     }

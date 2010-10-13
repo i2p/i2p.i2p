@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
@@ -110,7 +109,7 @@ public class I2PTunnelClient extends I2PTunnelClientBase {
         }
         if (size == 1) // skip the rand in the most common case
             return dests.get(0);
-        int index = I2PAppContext.getGlobalContext().random().nextInt(size);
+        int index = _context.random().nextInt(size);
         return dests.get(index);
     }
 }

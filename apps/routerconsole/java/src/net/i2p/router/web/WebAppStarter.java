@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.FileUtil;
+import net.i2p.util.SecureDirectory;
 
 import org.mortbay.http.HttpContext;
 import org.mortbay.http.HttpListener;
@@ -41,7 +42,7 @@ public class WebAppStarter {
      *  @throws just about anything, caller would be wise to catch Throwable
      */
     static void startWebApp(I2PAppContext ctx, Server server, String appName, String warPath) throws Exception {
-         File tmpdir = new File(ctx.getTempDir(), "jetty-work-" + appName + ctx.random().nextInt());
+         File tmpdir = new SecureDirectory(ctx.getTempDir(), "jetty-work-" + appName + ctx.random().nextInt());
          WebApplicationContext wac = addWebApp(ctx, server, appName, warPath, tmpdir);
          wac.start();
     }
@@ -73,7 +74,7 @@ public class WebAppStarter {
             warModTimes.put(warPath, new Long(newmod));
         } else if (oldmod.longValue() < newmod) {
             // copy war to temporary directory
-            File warTmpDir = new File(ctx.getTempDir(), "war-copy-" + appName + ctx.random().nextInt());
+            File warTmpDir = new SecureDirectory(ctx.getTempDir(), "war-copy-" + appName + ctx.random().nextInt());
             warTmpDir.mkdir();
             String tmpPath = (new File(warTmpDir, appName + ".war")).getAbsolutePath();
             if (!FileUtil.copy(warPath, tmpPath, true))

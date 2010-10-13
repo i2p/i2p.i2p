@@ -20,7 +20,7 @@ import net.i2p.util.Log;
  * See comments in DQAT.java and mtn history ca. 2006-02-19
  *
  */
-public class TimedWeightedPriorityMessageQueue implements MessageQueue, OutboundMessageFragments.ActiveThrottle {
+class TimedWeightedPriorityMessageQueue implements MessageQueue, OutboundMessageFragments.ActiveThrottle {
     private RouterContext _context;
     private Log _log;
     /** FIFO queue of messages in a particular priority */

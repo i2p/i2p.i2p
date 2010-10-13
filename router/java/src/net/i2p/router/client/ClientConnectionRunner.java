@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.i2p.client.I2PClient;
 import net.i2p.crypto.SessionKeyManager;
 import net.i2p.crypto.TransientSessionKeyManager;
 import net.i2p.data.Destination;
@@ -76,11 +77,13 @@ public class ClientConnectionRunner {
      * This contains the last 10 MessageIds that have had their (non-ack) status 
      * delivered to the client (so that we can be sure only to update when necessary)
      */
-    private final List _alreadyProcessed;
+    private final List<MessageId> _alreadyProcessed;
     private ClientWriterRunner _writer;
     private Hash _destHashCache;
     /** are we, uh, dead */
     private boolean _dead;
+    /** For outbound traffic. true if i2cp.messageReliability = "none"; @since 0.8.1 */
+    private boolean _dontSendMSM;
     
     /**
      * Create a new runner against the given socket
@@ -91,11 +94,9 @@ public class ClientConnectionRunner {
         _log = _context.logManager().getLog(ClientConnectionRunner.class);
         _manager = manager;
         _socket = socket;
-        _config = null;
         _messages = new ConcurrentHashMap();
         _alreadyProcessed = new ArrayList();
         _acceptedPending = new ConcurrentHashSet();
-        _dead = false;
     }
     
     private static volatile int __id = 0;
@@ -189,6 +190,9 @@ public class ClientConnectionRunner {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("SessionEstablished called for destination " + _destHashCache.toBase64());
         _config = config;
+        // This is the only option that is interpreted here, not at the tunnel manager
+        if (config.getOptions() != null)
+            _dontSendMSM = "none".equalsIgnoreCase(config.getOptions().getProperty(I2PClient.PROP_RELIABILITY));
         // per-destination session key manager to prevent rather easy correlation
         if (_sessionKeyManager == null)
             _sessionKeyManager = new TransientSessionKeyManager(_context);
@@ -197,10 +201,18 @@ public class ClientConnectionRunner {
         _manager.destinationEstablished(this);
     }
     
+    /** 
+     * Send a notification to the client that their message (id specified) was
+     * delivered (or failed delivery)
+     * Note that this sends the Guaranteed status codes, even though we only support best effort.
+     * Doesn't do anything if i2cp.messageReliability = "none"
+     */
     void updateMessageDeliveryStatus(MessageId id, boolean delivered) {
-        if (_dead) return;
+        if (_dead || _dontSendMSM)
+            return;
         _context.jobQueue().addJob(new MessageDeliveryStatusUpdate(id, delivered));
     }
+
     /** 
      * called after a new leaseSet is granted by the client, the NetworkDb has been
      * updated.  This takes care of all the LeaseRequestState stuff (including firing any jobs)
@@ -254,7 +266,8 @@ public class ClientConnectionRunner {
         long expiration = 0;
         if (message instanceof SendMessageExpiresMessage)
             expiration = ((SendMessageExpiresMessage) message).getExpiration().getTime();
-        _acceptedPending.add(id);
+        if (!_dontSendMSM)
+            _acceptedPending.add(id);
 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("** Receiving message [" + id.getMessageId() + "] with payload of size [" 
@@ -276,9 +289,11 @@ public class ClientConnectionRunner {
     /** 
      * Send a notification to the client that their message (id specified) was accepted 
      * for delivery (but not necessarily delivered)
-     *
+     * Doesn't do anything if i2cp.messageReliability = "none"
      */
     void ackSendMessage(MessageId id, long nonce) {
+        if (_dontSendMSM)
+            return;
         SessionId sid = _sessionId;
         if (sid == null) return;
         if (_log.shouldLog(Log.DEBUG))
@@ -517,12 +532,17 @@ public class ClientConnectionRunner {
         }
 
         public String getName() { return "Update Delivery Status"; }
+
+        /**
+         * Note that this sends the Guaranteed status codes, even though we only support best effort.
+         */
         public void runJob() {
             if (_dead) return;
 
             MessageStatusMessage msg = new MessageStatusMessage();
             msg.setMessageId(_messageId.getMessageId());
             msg.setSessionId(_sessionId.getSessionId());
+            // has to be >= 0, it is initialized to -1
             msg.setNonce(2);
             msg.setSize(0);
             if (_success) 

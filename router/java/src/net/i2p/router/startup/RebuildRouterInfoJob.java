@@ -26,6 +26,7 @@ import net.i2p.router.JobImpl;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
+import net.i2p.util.SecureFileOutputStream;
 
 /**
  * This used be called from StartAcceptingClientsJob but is now disabled.
@@ -135,7 +136,7 @@ public class RebuildRouterInfoJob extends JobImpl {
             
             FileOutputStream fos = null;
             try {
-                fos = new FileOutputStream(infoFile);
+                fos = new SecureFileOutputStream(infoFile);
                 info.writeBytes(fos);
             } catch (DataFormatException dfe) {
                 _log.log(Log.CRIT, "Error rebuilding the router information", dfe);

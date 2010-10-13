@@ -46,6 +46,7 @@ import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
+import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
@@ -305,6 +306,7 @@ public class Router {
     public void setHigherVersionSeen(boolean seen) { _higherVersionSeen = seen; }
     
     public long getWhenStarted() { return _started; }
+
     /** wall clock uptime */
     public long getUptime() { 
         if ( (_context == null) || (_context.clock() == null) ) return 1; // racing on startup
@@ -1053,11 +1055,12 @@ public class Router {
      * this does escape the \r or \n that are unescaped in DataHelper.loadProps().
      * Note that the escaping of \r or \n was probably a mistake and should be taken out.
      *
+     * FIXME Synchronize!!
      */
     public boolean saveConfig() {
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(_configFilename);
+            fos = new SecureFileOutputStream(_configFilename);
             StringBuilder buf = new StringBuilder(8*1024);
             buf.append("# NOTE: This I2P config file must use UTF-8 encoding\n");
             synchronized (_config) {
@@ -1541,7 +1544,7 @@ private static class PersistRouterInfoJob extends JobImpl {
 
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(infoFile);
+            fos = new SecureFileOutputStream(infoFile);
             info.writeBytes(fos);
         } catch (DataFormatException dfe) {
             _log.error("Error rebuilding the router information", dfe);
