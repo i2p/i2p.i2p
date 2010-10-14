@@ -62,7 +62,7 @@ public class EncodingFactory {
 	 * 
 	 * @param name name of encoding (e.g. quoted-printable)
 	 * 
-	 * @return
+	 * @return Encoder instance
 	 */
 	public static Encoding getEncoding( String name )
 	{
@@ -71,7 +71,7 @@ public class EncodingFactory {
 	/**
 	 * Returns list of available encodings;
 	 * 
-	 * @return
+	 * @return List of encodings
 	 */
 	public static Set availableEncodings()
 	{

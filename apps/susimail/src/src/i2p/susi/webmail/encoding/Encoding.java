@@ -35,21 +35,21 @@ public interface Encoding {
 	/**
 	 * 
 	 * @param in
-	 * @return
+	 * @return Encoded string.
 	 * @throws EncodingException 
 	 */
 	public String encode( byte in[] ) throws EncodingException;
 	/**
 	 * 
 	 * @param str
-	 * @return
+	 * @see Encoding#encode(byte[])
 	 * @throws EncodingException 
 	 */
 	public String encode( String str ) throws EncodingException;
 	/**
 	 * 
 	 * @param in
-	 * @return
+	 * @see Encoding#decode(byte[], int, int)
 	 * @throws DecodingException 
 	 */
 	public ReadBuffer decode( byte in[] ) throws DecodingException;
@@ -58,21 +58,21 @@ public interface Encoding {
 	 * @param in
 	 * @param offset 
 	 * @param length 
-	 * @return
+	 * @return Output buffer containing decoded String.
 	 * @throws DecodingException 
 	 */
 	public ReadBuffer decode( byte in[], int offset, int length ) throws DecodingException;
 	/**
 	 * 
 	 * @param str
-	 * @return
+	 * @see Encoding#decode(byte[], int, int)
 	 * @throws DecodingException 
 	 */
 	public ReadBuffer decode( String str ) throws DecodingException;
 	/**
 	 * 
 	 * @param in
-	 * @return
+	 * @see Encoding#decode(byte[], int, int)
 	 * @throws DecodingException 
 	 */
 	public ReadBuffer decode( ReadBuffer in ) throws DecodingException;

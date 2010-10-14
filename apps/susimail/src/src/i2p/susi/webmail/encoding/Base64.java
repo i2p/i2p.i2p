@@ -42,7 +42,7 @@ public class Base64 implements Encoding {
 		return "base64";
 	}
 	/**
-	 * @return
+	 * @return Base64-encoded String.
 	 * @throws EncodingException 
 	 */
 	public String encode( byte in[] ) throws EncodingException
@@ -53,8 +53,8 @@ public class Base64 implements Encoding {
 			throw new EncodingException( e.getMessage() );
 		}
 	}
-	/* (non-Javadoc)
-	 * @see i2p.susi23.util.Encoding#encode(java.lang.String)
+	/**
+	 * @see Base64#encode(byte[])
 	 */
 	public String encode(String str) throws EncodingException {
 		try {
@@ -66,7 +66,7 @@ public class Base64 implements Encoding {
 	/**
 	 * 
 	 * @param in
-	 * @return
+	 * @see Base64#encode(String)
 	 */
 	private String encode( InputStream in ) throws IOException, EncodingException
 	{
@@ -116,7 +116,7 @@ public class Base64 implements Encoding {
 
 	/**
 	 * @param b
-	 * @return
+	 * @return Encoded single byte.
 	 */
 	private static int encodeByte(int b) {
 		/*
@@ -173,21 +173,21 @@ public class Base64 implements Encoding {
 
 	/**
 	 * @param text 
-	 * @return
+	 * @return Buffer containing a decoded String.
 	 */
 	public ReadBuffer decode(String text) throws DecodingException {
 		return text != null ? decode( text.getBytes() ) : null;
 	}
 
-	/* (non-Javadoc)
-	 * @see i2p.susi23.util.Encoding#decode(byte[])
+	/**
+	 * @see Base64#decode(String)
 	 */
 	public ReadBuffer decode(byte[] in) throws DecodingException {
 		return decode( in, 0, in.length );
 	}
 
-	/* (non-Javadoc)
-	 * @see i2p.susi23.util.Encoding#decode(byte[], int, int)
+	/**
+	 * @see Base64#decode(String)
 	 */
 	public ReadBuffer decode(byte[] in, int offset, int length) throws DecodingException {
 		byte out[] = new byte[length * 3 / 4 + 1 ];
@@ -228,8 +228,8 @@ public class Base64 implements Encoding {
 		return readBuffer;
 	}
 
-	/* (non-Javadoc)
-	 * @see i2p.susi23.util.Encoding#decode(i2p.susi23.util.ReadBuffer)
+	/*
+	 * @see Base64#decode(String)
 	 */
 	public ReadBuffer decode(ReadBuffer in) throws DecodingException {
 		return decode( in.content, in.offset, in.length );
