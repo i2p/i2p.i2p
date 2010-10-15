@@ -266,7 +266,7 @@ public class TrackerClient extends I2PAppThread
                         // we only want to talk to new people if we need things
                         // from them (duh)
                         List ordered = new ArrayList(peers);
-                        Collections.shuffle(ordered);
+                        Collections.shuffle(ordered, r);
                         Iterator it = ordered.iterator();
                         while (it.hasNext()) {
                           Peer cur = (Peer)it.next();

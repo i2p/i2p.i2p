@@ -42,6 +42,8 @@ public class Storage
   private Object[] RAFlock;  // lock on RAF access
   private long[] RAFtime;    // when was RAF last accessed, or 0 if closed
   private File[] RAFfile;    // File to make it easier to reopen
+  /** priorities by file; default 0; may be null. @since 0.8.1 */
+  private int[] priorities;
 
   private final StorageListener listener;
   private I2PSnarkUtil _util;
@@ -228,6 +230,8 @@ public class Storage
     RAFlock = new Object[size];
     RAFtime = new long[size];
     RAFfile = new File[size];
+    priorities = new int[size];
+
 
     int i = 0;
     Iterator it = files.iterator();
@@ -328,6 +332,83 @@ public class Storage
           bytes += lengths[i];
       }
       return -1;
+  }
+
+  /**
+   *  @param file canonical path (non-directory)
+   *  @since 0.8.1
+   */
+  public int getPriority(String file) {
+      if (complete() || metainfo.getFiles() == null || priorities == null)
+          return 0;
+      for (int i = 0; i < rafs.length; i++) {
+          File f = RAFfile[i];
+          // use canonical in case snark dir or sub dirs are symlinked
+          if (f != null) {
+              try {
+                  String canonical = f.getCanonicalPath();
+                  if (canonical.equals(file))
+                      return priorities[i];
+              } catch (IOException ioe) {}
+          }
+      }
+      return 0;
+  }
+
+  /**
+   *  Must call setPiecePriorities() after calling this
+   *  @param file canonical path (non-directory)
+   *  @param priority default 0; <0 to disable
+   *  @since 0.8.1
+   */
+  public void setPriority(String file, int pri) {
+      if (complete() || metainfo.getFiles() == null || priorities == null)
+          return;
+      for (int i = 0; i < rafs.length; i++) {
+          File f = RAFfile[i];
+          // use canonical in case snark dir or sub dirs are symlinked
+          if (f != null) {
+              try {
+                  String canonical = f.getCanonicalPath();
+                  if (canonical.equals(file)) {
+                      priorities[i] = pri;
+                      return;
+                  }
+              } catch (IOException ioe) {}
+          }
+      }
+  }
+
+  /**
+   *  Call setPriority() for all changed files first,
+   *  then call this.
+   *  Set the piece priority to the highest priority
+   *  of all files spanning the piece.
+   *  Caller must pass array to the PeerCoordinator.
+   *  @return null on error, if complete, or if only one file
+   *  @since 0.8.1
+   */
+  public int[] getPiecePriorities() {
+      if (complete() || metainfo.getFiles() == null)
+          return null;
+      int[] rv = new int[metainfo.getPieces()];
+      int file = 0;
+      long pcEnd = -1;
+      long fileEnd = lengths[0] - 1;
+      int psz = metainfo.getPieceLength(0);
+      for (int i = 0; i < rv.length; i++) {
+          pcEnd += psz;
+          int pri = priorities[file];
+          while (fileEnd <= pcEnd && file < lengths.length - 1) {
+              file++;
+              long oldFileEnd = fileEnd;
+              fileEnd += lengths[file];
+              if (priorities[file] > pri && pcEnd < oldFileEnd)
+                  pri = priorities[file];
+          }
+          rv[i] = pri;
+      }
+      return rv;
   }
 
   /**
@@ -436,10 +517,14 @@ public class Storage
       changed = true;
       checkCreateFiles();
     }
-    if (complete())
+    if (complete()) {
         _util.debug("Torrent is complete", Snark.NOTICE);
-    else
+    } else {
+        // fixme saved priorities
+        if (files != null)
+            priorities = new int[files.size()];
         _util.debug("Still need " + needed + " out of " + metainfo.getPieces() + " pieces", Snark.NOTICE);
+    }
   }
 
   /**
@@ -624,7 +709,12 @@ public class Storage
     // the whole file?
     listener.storageCreateFile(this, names[nr], lengths[nr]);
     final int ZEROBLOCKSIZE = metainfo.getPieceLength(0);
-    byte[] zeros = new byte[ZEROBLOCKSIZE];
+    byte[] zeros;
+    try {
+        zeros = new byte[ZEROBLOCKSIZE];
+    } catch (OutOfMemoryError oom) {
+        throw new IOException(oom.toString());
+    }
     int i;
     for (i = 0; i < lengths[nr]/ZEROBLOCKSIZE; i++)
       {

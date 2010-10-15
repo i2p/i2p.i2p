@@ -133,6 +133,7 @@ public class I2PSnarkServlet extends Default {
                 // bypass the horrid Resource.getListHTML()
                 String pathInfo = req.getPathInfo();
                 String pathInContext = URI.addPaths(path, pathInfo);
+                req.setCharacterEncoding("UTF-8");
                 resp.setCharacterEncoding("UTF-8");
                 resp.setContentType("text/html; charset=UTF-8");
                 Resource resource = getResource(pathInContext);
@@ -140,7 +141,7 @@ public class I2PSnarkServlet extends Default {
                     resp.sendError(HttpResponse.__404_Not_Found);
                 } else {
                     String base = URI.addPaths(req.getRequestURI(), "/");
-                    String listing = getListHTML(resource, base, true);
+                    String listing = getListHTML(resource, base, true, method.equals("POST") ? req.getParameterMap() : null);
                     if (listing != null)
                         resp.getWriter().write(listing);
                     else // shouldn't happen
@@ -1252,10 +1253,11 @@ public class I2PSnarkServlet extends Default {
      * @param r The Resource
      * @param base The base URL
      * @param parent True if the parent directory should be included
+     * @param postParams map of POST parameters or null if not a POST
      * @return String of HTML
      * @since 0.7.14
      */
-    private String getListHTML(Resource r, String base, boolean parent)
+    private String getListHTML(Resource r, String base, boolean parent, Map postParams)
         throws IOException
     {
         if (!r.isDirectory())
@@ -1280,6 +1282,10 @@ public class I2PSnarkServlet extends Default {
         else
             torrentName = title;
         Snark snark = _manager.getTorrentByBaseName(torrentName);
+
+        if (snark != null && postParams != null)
+            savePriorities(snark, postParams);
+
         if (title.endsWith("/"))
             title = title.substring(0, title.length() - 1);
         title = _("Torrent") + ": " + title;
@@ -1297,12 +1303,19 @@ public class I2PSnarkServlet extends Default {
                .append(_("Up to higher level directory")).append("</A>\n");
         }
         
-        buf.append("</div><div class=\"page\"><div class=\"mainsection\">" +
-                   "<TABLE BORDER=0 class=\"snarkTorrents\" cellpadding=\"5px 10px\">" +
+        buf.append("</div><div class=\"page\"><div class=\"mainsection\">");
+        boolean showPriority = snark != null && !snark.storage.complete();
+        if (showPriority)
+            buf.append("<form action=\"").append(base).append("\" method=\"POST\">\n");
+        buf.append("<TABLE BORDER=0 class=\"snarkTorrents\" cellpadding=\"5px 10px\">" +
                    "<thead><tr><th>").append(_("File")).append("</th><th>").append(_("Size"))
-           .append("</th><th>").append(_("Status")).append("</th></tr></thead>");
+           .append("</th><th>").append(_("Status")).append("</th>");
+        if (showPriority)
+            buf.append("<th>").append(_("Priority")).append("</th>");
+        buf.append("</tr></thead>\n");
         //DateFormat dfmt=DateFormat.getDateTimeInstance(DateFormat.MEDIUM,
         //                                               DateFormat.MEDIUM);
+        boolean showSaveButton = false;
         for (int i=0 ; i< ls.length ; i++)
         {   
             String encoded=URI.encodePath(ls[i]);
@@ -1340,7 +1353,8 @@ public class I2PSnarkServlet extends Default {
                                 complete = true;
                                 status = toImg("tick") + _("Complete");
                             } else {
-                                status = toImg("clock") +
+                                status =
+                                         (snark.storage.getPriority(f.getCanonicalPath()) < 0 ? toImg("cancel") : toImg("clock")) +
                                          (100 * (length - remaining) / length) + "% " + _("complete") +
                                          " (" + DataHelper.formatSize2(remaining) + _("bytes remaining") + ")";
                             }
@@ -1384,9 +1398,40 @@ public class I2PSnarkServlet extends Default {
             buf.append("</TD><TD class=\"").append(rowClass).append(" snarkFileStatus\">");
             //buf.append(dfmt.format(new Date(item.lastModified())));
             buf.append(status);
-            buf.append("</TD></TR>\n");
+            buf.append("</TD>");
+            if (showPriority) {
+                buf.append("<td>");
+                File f = item.getFile();
+                if ((!complete) && (!item.isDirectory()) && f != null) {
+                    int pri = snark.storage.getPriority(f.getCanonicalPath());
+                    buf.append("<input type=\"radio\" value=\"5\" name=\"pri.").append(f.getCanonicalPath()).append("\" ");
+                    if (pri > 0)
+                        buf.append("checked=\"true\"");
+                    buf.append('>').append(_("High"));
+
+                    buf.append("<input type=\"radio\" value=\"0\" name=\"pri.").append(f.getCanonicalPath()).append("\" ");
+                    if (pri == 0)
+                        buf.append("checked=\"true\"");
+                    buf.append('>').append(_("Normal"));
+
+                    buf.append("<input type=\"radio\" value=\"-9\" name=\"pri.").append(f.getCanonicalPath()).append("\" ");
+                    if (pri < 0)
+                        buf.append("checked=\"true\"");
+                    buf.append('>').append(_("Do not download"));
+                    showSaveButton = true;
+                }
+                buf.append("</td>");
+            }
+            buf.append("</TR>\n");
+        }
+        if (showSaveButton) {
+            buf.append("<thead><tr><th colspan=\"3\">&nbsp;</th><th align=\"center\"><input type=\"submit\" value=\"");
+            buf.append(_("Save priorities"));
+            buf.append("\" name=\"foo\" ></th></tr></thead>\n");
         }
         buf.append("</TABLE>\n");
+        if (showPriority)
+	    buf.append("</form>");
 	buf.append("</div></div></BODY></HTML>\n");
         
         return buf.toString();
@@ -1450,6 +1495,25 @@ public class I2PSnarkServlet extends Default {
     /** @since 0.7.14 */
     private static String toImg(String icon) {
         return "<img alt=\"\" height=\"16\" width=\"16\" src=\"/i2psnark/_icons/" + icon + ".png\"> ";
+    }
+
+    /** @since 0.8.1 */
+    private static void savePriorities(Snark snark, Map postParams) {
+        Set<Map.Entry> entries = postParams.entrySet();
+        for (Map.Entry entry : entries) {
+            String key = (String)entry.getKey();
+            if (key.startsWith("pri.")) {
+                try {
+                    String file = key.substring(4);
+                    String val = ((String[])entry.getValue())[0];   // jetty arrays
+                    int pri = Integer.parseInt(val);
+                    snark.storage.setPriority(file, pri);
+                    //System.err.println("Priority now " + pri + " for " + file);
+                } catch (Throwable t) { t.printStackTrace(); }
+            }
+        }
+        if (snark.coordinator != null)
+            snark.coordinator.updatePiecePriorities();
     }
 
 

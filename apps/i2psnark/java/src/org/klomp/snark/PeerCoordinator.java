@@ -78,6 +78,7 @@ public class PeerCoordinator implements PeerListener
 
   private final CoordinatorListener listener;
   public I2PSnarkUtil _util;
+  private static final Random _random = I2PAppContext.getGlobalContext().random();
   
   public String trackerProblems = null;
   public int trackerSeenPeers = 0;
@@ -97,8 +98,7 @@ public class PeerCoordinator implements PeerListener
     // Install a timer to check the uploaders.
     // Randomize the first start time so multiple tasks are spread out,
     // this will help the behavior with global limits
-    Random r = I2PAppContext.getGlobalContext().random();
-    timer.schedule(new PeerCheckerTask(_util, this), (CHECK_PERIOD / 2) + r.nextInt((int) CHECK_PERIOD), CHECK_PERIOD);
+    timer.schedule(new PeerCheckerTask(_util, this), (CHECK_PERIOD / 2) + _random.nextInt((int) CHECK_PERIOD), CHECK_PERIOD);
   }
   
   // only called externally from Storage after the double-check fails
@@ -107,10 +107,16 @@ public class PeerCoordinator implements PeerListener
     // Make a list of pieces
     wantedPieces = new ArrayList();
     BitField bitfield = storage.getBitField();
-    for(int i = 0; i < metainfo.getPieces(); i++)
-      if (!bitfield.get(i))
-        wantedPieces.add(new Piece(i));
-    Collections.shuffle(wantedPieces);
+    int[] pri = storage.getPiecePriorities();
+    for(int i = 0; i < metainfo.getPieces(); i++) {
+      if (!bitfield.get(i)) {
+        Piece p = new Piece(i);
+        if (pri != null)
+            p.setPriority(pri[i]);
+        wantedPieces.add(p);
+      }
+    }
+    Collections.shuffle(wantedPieces, _random);
   }
 
   public Storage getStorage() { return storage; }
@@ -520,6 +526,9 @@ public class PeerCoordinator implements PeerListener
         while (piece == null && it.hasNext())
           {
             Piece p = it.next();
+            // sorted by priority, so when we hit a disabled piece we are done
+            if (p.isDisabled())
+                break;
             if (havePieces.get(p.getId()) && !p.isRequested())
               {
                 piece = p;
@@ -538,7 +547,7 @@ public class PeerCoordinator implements PeerListener
             if (wantedPieces.size() > END_GAME_THRESHOLD)
                 return -1;  // nothing to request and not in end game
             // let's not all get on the same piece
-            Collections.shuffle(requested);
+            Collections.shuffle(requested, _random);
             Iterator<Piece> it2 = requested.iterator();
             while (piece == null && it2.hasNext())
               {
@@ -563,8 +572,61 @@ public class PeerCoordinator implements PeerListener
                     _log.debug("parallel request (end game?) for " + peer + ": piece = " + piece);
             }
         }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Now requesting: piece " + piece + " priority " + piece.getPriority());
         piece.setRequested(true);
         return piece.getId();
+      }
+  }
+
+  /**
+   *  Maps file priorities to piece priorities.
+   *  Call after updating file priorities Storage.setPriority()
+   *  @since 0.8.1
+   */
+  public void updatePiecePriorities() {
+      int[] pri = storage.getPiecePriorities();
+      if (pri == null)
+          return;
+      synchronized(wantedPieces) {
+          // Add incomplete and previously unwanted pieces to the list
+          // Temp to avoid O(n**2)
+          BitField want = new BitField(pri.length);
+          for (Piece p : wantedPieces) {
+              want.set(p.getId());
+          }
+          BitField bitfield = storage.getBitField();
+          for (int i = 0; i < pri.length; i++) {
+              if (pri[i] >= 0 && !bitfield.get(i)) {
+                  if (!want.get(i)) {
+                      Piece piece = new Piece(i);
+                      wantedPieces.add(piece);
+                      // As connections are already up, new Pieces will
+                      // not have their PeerID list populated, so do that.
+                      synchronized(peers) {
+                          for (Peer p : peers) {
+                              PeerState s = p.state;
+                              if (s != null) {
+                                  BitField bf = s.bitfield;
+                                  if (bf != null && bf.get(i))
+                                      piece.addPeer(p);
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+          // now set the new priorities and remove newly unwanted pieces
+          for (Iterator<Piece> iter = wantedPieces.iterator(); iter.hasNext(); ) {
+               Piece p = iter.next();
+               int id = pri[p.getId()];
+               if (id >= 0)
+                   p.setPriority(pri[p.getId()]);
+               else
+                   iter.remove();
+          }
+          // if we added pieces, they will be in-order unless we shuffle
+          Collections.shuffle(wantedPieces, _random);
       }
   }
 
@@ -632,14 +694,18 @@ public class PeerCoordinator implements PeerListener
             
             // No need to announce have piece to peers.
             // Assume we got a good piece, we don't really care anymore.
-            return true;
+            // Well, this could be caused by a change in priorities, so
+            // only return true if we already have it, otherwise might as well keep it.
+            if (storage.getBitField().get(piece))
+                return true;
           }
         
         try
           {
             if (storage.putPiece(piece, bs))
               {
-                _log.info("Got valid piece " + piece + "/" + metainfo.getPieces() +" from " + peer + " for " + metainfo.getName());
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Got valid piece " + piece + "/" + metainfo.getPieces() +" from " + peer + " for " + metainfo.getName());
               }
             else
               {
