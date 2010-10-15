@@ -380,6 +380,25 @@ public class Storage
   }
 
   /**
+   *  Get the file priorities array.
+   *  @return null on error, if complete, or if only one file
+   *  @since 0.8.1
+   */
+  public int[] getFilePriorities() {
+      return priorities;
+  }
+
+  /**
+   *  Set the file priorities array.
+   *  Only call this when stopped, but after check()
+   *  @param p may be null
+   *  @since 0.8.1
+   */
+  void setFilePriorities(int[] p) {
+      priorities = p;
+  }
+
+  /**
    *  Call setPriority() for all changed files first,
    *  then call this.
    *  Set the piece priority to the highest priority
@@ -389,7 +408,7 @@ public class Storage
    *  @since 0.8.1
    */
   public int[] getPiecePriorities() {
-      if (complete() || metainfo.getFiles() == null)
+      if (complete() || metainfo.getFiles() == null || priorities == null)
           return null;
       int[] rv = new int[metainfo.getPieces()];
       int file = 0;

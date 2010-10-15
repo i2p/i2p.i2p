@@ -503,7 +503,7 @@ public class I2PSnarkServlet extends Default {
                         File torrentFile = new File(baseFile.getParent(), baseFile.getName() + ".torrent");
                         if (torrentFile.exists())
                             throw new IOException("Cannot overwrite an existing .torrent file: " + torrentFile.getPath());
-                        _manager.saveTorrentStatus(info, s.getBitField()); // so addTorrent won't recheck
+                        _manager.saveTorrentStatus(info, s.getBitField(), null); // so addTorrent won't recheck
                         // DirMonitor could grab this first, maybe hold _snarks lock?
                         FileOutputStream out = new FileOutputStream(torrentFile);
                         out.write(info.getTorrentData());
@@ -1498,7 +1498,7 @@ public class I2PSnarkServlet extends Default {
     }
 
     /** @since 0.8.1 */
-    private static void savePriorities(Snark snark, Map postParams) {
+    private void savePriorities(Snark snark, Map postParams) {
         Set<Map.Entry> entries = postParams.entrySet();
         for (Map.Entry entry : entries) {
             String key = (String)entry.getKey();
@@ -1514,6 +1514,7 @@ public class I2PSnarkServlet extends Default {
         }
         if (snark.coordinator != null)
             snark.coordinator.updatePiecePriorities();
+        _manager.saveTorrentStatus(snark.storage.getMetaInfo(), snark.storage.getBitField(), snark.storage.getFilePriorities());
     }
 
 
