@@ -590,7 +590,7 @@ public class ClientConnectionRunner {
                               + " for session [" + _sessionId.getSessionId() 
                               + "] (with nonce=2), retrying after [" 
                               + (_context.clock().now() - _lastTried) 
-                              + "]", getAddedBy());
+                              + "]");
             } else {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Updating message status for message " + _messageId + " to " 
