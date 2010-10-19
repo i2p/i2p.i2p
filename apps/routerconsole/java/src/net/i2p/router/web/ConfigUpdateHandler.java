@@ -142,7 +142,7 @@ public class ConfigUpdateHandler extends FormHandler {
         }
 
         if ( (_updateURL != null) && (_updateURL.length() > 0) ) {
-            _updateURL = _updateURL.replaceAll("\r\n", ",").replaceAll("\n", ",");
+            _updateURL = _updateURL.replace("\r\n", ",").replace("\n", ",");
             String oldURL = _context.router().getConfigSetting(PROP_UPDATE_URL);
             if ( (oldURL == null) || (!_updateURL.equals(oldURL)) ) {
                 _context.router().setConfigSetting(PROP_UPDATE_URL, _updateURL);
@@ -151,7 +151,7 @@ public class ConfigUpdateHandler extends FormHandler {
         }
 
         if ( (_trustedKeys != null) && (_trustedKeys.length() > 0) ) {
-            _trustedKeys = _trustedKeys.replaceAll("\r\n", ",").replaceAll("\n", ",");
+            _trustedKeys = _trustedKeys.replace("\r\n", ",").replace("\n", ",");
             String oldKeys = new TrustedUpdate(_context).getTrustedKeysString();
             if ( (oldKeys == null) || (!_trustedKeys.equals(oldKeys)) ) {
                 _context.router().setConfigSetting(PROP_TRUSTED_KEYS, _trustedKeys);

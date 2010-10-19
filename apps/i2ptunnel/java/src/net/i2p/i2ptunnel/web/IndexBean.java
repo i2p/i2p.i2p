@@ -666,7 +666,7 @@ public class IndexBean {
     }
     public void setAccessList(String val) {
         if (val != null)
-            _otherOptions.put("i2cp.accessList", val.trim().replaceAll("\r\n", ",").replaceAll("\n", ",").replaceAll(" ", ","));
+            _otherOptions.put("i2cp.accessList", val.trim().replace("\r\n", ",").replace("\n", ",").replace(" ", ","));
     }
     public void setCloseTime(String val) {
         if (val != null) {

@@ -1214,7 +1214,9 @@ public class I2PSnarkServlet extends Default {
     /** @since 0.7.14 */
     private static String urlify(String s) {
         StringBuilder buf = new StringBuilder(256);
-        buf.append("<a href=\"").append(s).append("\">").append(s).append("</a>");
+        // browsers seem to work without doing this but let's be strict
+        String link = s.replace("&", "&amp;");
+        buf.append("<a href=\"").append(link).append("\">").append(link).append("</a>");
         return buf.toString();
     }
 

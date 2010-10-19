@@ -33,7 +33,7 @@ public class LogsHelper extends HelperBase {
         if (str == null) 
             return "";
         else {
-            str = str.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+            str = str.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
             return _("File location") + ": <b><code>" + f.getAbsolutePath() + "</code></b> <pre>" + str + "</pre>";
         }
     }
@@ -54,12 +54,14 @@ public class LogsHelper extends HelperBase {
         buf.append("<code>\n");
         for (int i = msgs.size(); i > 0; i--) { 
             String msg = msgs.get(i - 1);
+            msg = msg.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
             buf.append("<li>");
             if (colorize) {
                 String color;
                 // Homeland Security Advisory System
                 // http://www.dhs.gov/xinfoshare/programs/Copy_of_press_release_0046.shtm
                 // but pink instead of yellow for WARN
+                // FIXME doesnt work for translated levels
                 if (msg.contains("CRIT"))
                     color = "#cc0000";
                 else if (msg.contains("ERROR"))
@@ -71,7 +73,7 @@ public class LogsHelper extends HelperBase {
                 else
                     color = "#006600";
                 buf.append("<font color=\"").append(color).append("\">");
-                buf.append(msg.replaceAll("<", "&lt;").replaceAll(">", "&gt;"));
+                buf.append(msg);
                 buf.append("</font>");
             } else {
                 buf.append(msg);
