@@ -78,8 +78,8 @@ public class Mail {
 	}
 	/**
 	 * 
-	 * @param address
-	 * @return
+	 * @param address E-mail address to be validated
+	 * @return Is the e-mail address valid?
 	 */
 	public static boolean validateAddress( String address )
 	{
@@ -105,7 +105,6 @@ public class Mail {
 	}
 	/**
 	 * @param address
-	 * @return
 	 */
 	public static String getAddress(String address )
 	{

@@ -42,7 +42,6 @@ public class Config {
 	/**
 	 * 
 	 * @param name
-	 * @return
 	 */
 	public static String getProperty( String name )
 	{
@@ -98,7 +97,6 @@ public class Config {
 	 * 
 	 * @param name
 	 * @param defaultValue
-	 * @return
 	 */
 	public static String getProperty( String name, String defaultValue )
 	{
@@ -109,7 +107,6 @@ public class Config {
 	 * 
 	 * @param name
 	 * @param defaultValue
-	 * @return
 	 */
 	public static int getProperty( String name, int defaultValue )
 	{
