@@ -249,14 +249,14 @@ public class I2PSnarkServlet extends Default {
             if (peerParam != null) {
                 out.write("\">");
         out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/showpeers.png\" title=\"");
-                out.write(_("Toggle Peer Visibility"));
+        out.write(_("Toggle Peer Visibility"));
         out.write("\" alt=\"");
         out.write(_("Hide Peers"));
         out.write("\">");
             } else {
                 out.write("?p=1\">");
         out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/hidepeers.png\" title=\"");
-                out.write(_("Toggle Peer Visibility"));
+        out.write(_("Toggle Peer Visibility"));
         out.write("\" alt=\"");
         out.write(_("Show Peers"));
         out.write("\">");
