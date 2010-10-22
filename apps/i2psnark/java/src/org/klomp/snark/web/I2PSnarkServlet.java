@@ -239,8 +239,8 @@ public class I2PSnarkServlet extends Default {
         List snarks = getSortedSnarks(req);
         String uri = req.getRequestURI();
         out.write(TABLE_HEADER);
-        out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/status.png\" >");
-        out.write("title=\"");
+        out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/status.png\"");
+        out.write(" title=\"");
 		out.write(_("Torrent Status"));
 		out.write("\">");
         if (_manager.util().connected() && !snarks.isEmpty()) {
@@ -250,14 +250,16 @@ public class I2PSnarkServlet extends Default {
                 out.write("\">");
 				out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/showpeers.png\" title=\"");
                 out.write(_("Toggle Peer Visibility"));
-				out.write(" alt=\"Hide Peers\">");
+				out.write("\" alt=\"");
 				out.write(_("Hide Peers"));
 				out.write("\">");
             } else {
                 out.write("?p=1\">");
 				out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/hidepeers.png\" title=\"");
                 out.write(_("Toggle Peer Visibility"));
-				out.write("\" alt=\"Show Peers\">");
+				out.write("\" alt=\"");
+				out.write(_("Show Peers"));
+				out.write("\">");
             }
             out.write("</a><br>\n"); 
         }
