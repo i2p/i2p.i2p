@@ -170,7 +170,7 @@ public class I2PSnarkServlet extends Default {
 
         PrintWriter out = resp.getWriter();
         out.write("<html>\n" +
-                  "<head><link rel=\"shortcut icon\" href=\"/themes/console/snark/favicon.ico\">\n" +
+                  "<head><link rel=\"shortcut icon\" href=\"/themes/snark/ubergine/favicon.ico\">\n" +
                   "<title>");
         out.write(_("I2PSnark - Anonymous BitTorrent Client"));
         out.write("</title>\n");
@@ -191,7 +191,8 @@ public class I2PSnarkServlet extends Default {
             out.write("<div class=\"snarknavbar\"><a href=\"" + req.getRequestURI() + peerString + "\" title=\"");
             out.write(_("Refresh page"));
             out.write("\" class=\"snarkRefresh\">");
-            out.write(_("<img border=\"0\" src=\"/themes/console/snark/images/arrow_refresh.png\"> I2PSnark"));
+            out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/arrow_refresh.png\"> ");
+            out.write(_("I2PSnark"));
             out.write("</a> <a href=\"http://forum.i2p/viewforum.php?f=21\" class=\"snarkRefresh\" target=\"_blank\">");
             out.write(_("Forum"));
             out.write("</a>\n");
@@ -238,47 +239,78 @@ public class I2PSnarkServlet extends Default {
         List snarks = getSortedSnarks(req);
         String uri = req.getRequestURI();
         out.write(TABLE_HEADER);
-        out.write(_("<img border=\"0\" src=\"/themes/console/snark/images/status.png\" title=\"Torrent Status\">Status"));
+        out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/status.png\" >");
+        out.write("title=\"");
+		out.write(_("Torrent Status"));
+		out.write("\">");
         if (_manager.util().connected() && !snarks.isEmpty()) {
             out.write(" &raquo; <a href=\"");
             out.write(req.getRequestURI());
             if (peerParam != null) {
                 out.write("\">");
-                out.write(_("<img border=\"0\" src=\"/themes/console/snark/images/showpeers.png\" title=\"Toggle Peer Visibility\" alt=\"Hide Peers\">"));
+				out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/showpeers.png\" title=\"");
+                out.write(_("Toggle Peer Visibility"));
+				out.write(" alt=\"Hide Peers\">");
+				out.write(_("Hide Peers"));
+				out.write("\">");
             } else {
                 out.write("?p=1\">");
-                out.write(_("<img border=\"0\" src=\"/themes/console/snark/images/hidepeers.png\" title=\"Toggle Peer Visibility\" alt=\"Show Peers\">"));
+				out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/hidepeers.png\" title=\"");
+                out.write(_("Toggle Peer Visibility"));
+				out.write("\" alt=\"Show Peers\">");
             }
             out.write("</a><br>\n"); 
         }
         out.write("</th>\n<th align=\"left\">");
-        out.write(_("<img border=\"0\" src=\"/themes/console/snark/images/torrent.png\" title=\"Loaded Torrents\">Torrent"));
+        out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/torrent.png\" title=\"");
+		out.write(_("Loaded Torrents"));
+		out.write("\">");
+        out.write(_("Torrent"));
         out.write("</th>\n<th align=\"center\">");
-        out.write(_("<img border=\"0\" src=\"/themes/console/snark/images/eta.png\" title=\"Estimated Download Time\">ETA"));
+        out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/eta.png\" title=\"");
+        out.write(_("Estimated Download Time"));
+		out.write("\">");
+		out.write(_("ETA"));
         out.write("</th>\n<th align=\"center\">");
-        out.write(_("<img border=\"0\" src=\"/themes/console/images/inbound.png\" title=\"Data Downloaded\">RX"));
+		out.write("<img border=\"0\" src=\"/themes/console/images/inbound.png\" title=\"");
+        out.write(_("Data Downloaded"));
+		out.write("\">");
+		out.write(_("RX"));
         out.write("</th>\n<th align=\"center\">");
-        out.write(_("<img border=\"0\" src=\"/themes/console/images/outbound.png\" title=\"Data Uploaded\">TX"));
+        out.write("<img border=\"0\" src=\"/themes/console/images/outbound.png\" title=\"");
+        out.write(_("Data Uploaded"));
+		out.write("\">");
+		out.write(_("TX"));		
         out.write("</th>\n<th align=\"center\">");
-        out.write(_("<img border=\"0\" src=\"/themes/console/images/inbound.png\" title=\"Download Speed\">Rate"));
+        out.write("<img border=\"0\" src=\"/themes/console/images/inbound.png\" title=\"");
+        out.write(_("Download Speed"));
+		out.write("\">Rate");
         out.write("</th>\n<th align=\"center\">");
-        out.write(_("<img border=\"0\" src=\"/themes/console/images/outbound.png\" title=\"Upload Speed\">Rate"));
+		out.write("<img border=\"0\" src=\"/themes/console/images/outbound.png\" title=\"");
+        out.write(_("Upload Speed"));
+		out.write("\">");
+		out.write(_("Rate"));
         out.write("</th>\n");
-    
         out.write("<th align=\"center\">");
         if (_manager.util().connected()) {
             out.write("<a href=\"" + uri + "?action=StopAll&nonce=" + _nonce +
                       "\" title=\"");
             out.write(_("Stop all torrents and the I2P tunnel"));
             out.write("\">");
-            out.write(_("<img src=\"/themes/console/snark/images/stop_all.png\" title=\"Stop All Torrents\" alt=\"Stop All\">"));
+            out.write("<img src=\"/themes/snark/ubergine/images/stop_all.png\" title=\"");
+            out.write(_("Stop All Torrents"));
+			out.write("\" alt=\"");
+			out.write(_("Stop All"));
+			out.write("\">");
             out.write("</a>");
         } else if (!snarks.isEmpty()) {
             out.write("<a href=\"" + uri + "?action=StartAll&nonce=" + _nonce +
                       "\" title=\"");
             out.write(_("Start all torrents and the I2P tunnel"));
             out.write("\">");
-            out.write(_("<img src=\"/themes/console/snark/images/start_all.png\" title=\"Start All Torrents\" alt=\"Start All\">"));
+            out.write("<img src=\"/themes/snark/ubergine/images/start_all.png\" title=\"");
+            out.write(_("Start All Torrents"));
+			out.write("\" alt=\"Start All\">");
             out.write("</a>");
         } else {
             out.write("&nbsp;");
@@ -749,7 +781,7 @@ public class I2PSnarkServlet extends Default {
                 out.write("&nbsp;<a href=\"" + baseURL + "details.php?dllist=1&filelist=1&info_hash=");
                 out.write(TrackerClient.urlencode(snark.meta.getInfoHash()));
                 out.write("\" title=\"" + name + ' ' + _("Tracker") + "\" target=\"_blank\">");
-                out.write(_("<img border=\"0\" src=\"/themes/console/snark/images/details.png\">"));
+                out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/details.png\">");
                 out.write("</a>");
                 break;
             }
@@ -785,7 +817,11 @@ public class I2PSnarkServlet extends Default {
                       + "\" title=\"");
             out.write(_("Stop the torrent"));
             out.write("\">");
-            out.write(_("<img src=\"/themes/console/snark/images/stop.png\" title=\"Stop Torrent\" alt=\"Stop\">"));
+			out.write("<img src=\"/themes/snark/ubergine/images/stop.png\" title=\"");
+            out.write(_("Stop Torrent"));
+			out.write("\" alt=\"");
+			out.write(_("Stop"));
+			out.write("\">");
             out.write("</a>");
         } else {
             if (isValid) {
@@ -793,7 +829,11 @@ public class I2PSnarkServlet extends Default {
                           + "\" title=\"");
                 out.write(_("Start the torrent"));
                 out.write("\">");
-                out.write(_("<img src=\"/themes/console/snark/images/start.png\" title=\"Start Torrent\" alt=\"Start\">"));
+				out.write("<img src=\"/themes/snark/ubergine/images/start.png\" title=\"");
+                out.write(_("Start Torrent"));
+				out.write("\" alt=\"");
+				out.write(_("Start"));
+				out.write("\">");
                 out.write("</a>");
             }
             out.write("<a href=\"" + uri + "?action=Remove" + parameters
@@ -805,7 +845,11 @@ public class I2PSnarkServlet extends Default {
             // Then the remaining single quite must be escaped
             out.write(_("Are you sure you want to delete the file \\''{0}.torrent\\'' (downloaded data will not be deleted) ?", fullFilename));
             out.write("')) { return false; }\">");
-            out.write(_("<img src=\"/themes/console/snark/images/remove.png\" title=\"Remove Torrent\" alt=\"Remove\">"));
+			out.write("<img src=\"/themes/snark/ubergine/images/remove.png\" title=\"");
+            out.write(_("Remove Torrent"));
+			out.write("\" alt=\"");
+			out.write(_("Remove"));
+			out.write("\">");
             out.write("</a>");
             out.write("<a href=\"" + uri + "?action=Delete" + parameters
                       + "\" title=\"");
@@ -816,7 +860,11 @@ public class I2PSnarkServlet extends Default {
             // Then the remaining single quite must be escaped
             out.write(_("Are you sure you want to delete the torrent \\''{0}\\'' and all downloaded data?", fullFilename));
             out.write("')) { return false; }\">");
-            out.write(_("<img src=\"/themes/console/snark/images/delete.png\" title=\"Delete Torrent + Data\" alt=\"Delete\">"));
+            out.write("<img src=\"/themes/snark/ubergine/images/delete.png\" title=\"");
+			out.write(_("Delete Torrent + Data"));
+			out.write("\" alt=\"");
+			out.write(_("Delete"));
+			out.write("\">");
             out.write("</a>");
         }
         out.write("</td>\n</tr>\n");
@@ -938,7 +986,8 @@ public class I2PSnarkServlet extends Default {
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n");
         out.write("<input type=\"hidden\" name=\"action\" value=\"Add\" >\n");
         out.write("<div class=\"addtorrentsection\"><span class=\"snarkConfigTitle\">");
-        out.write(_("<img border=\"0\" src=\"/themes/console/snark/images/add.png\">Add Torrent"));
+		out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/add.png\">");
+        out.write(_("Add Torrent"));
         out.write("</span><hr>\n<table border=\"0\"><tr><td>");
         out.write(_("From URL"));
         out.write(":<td><input type=\"text\" name=\"newURL\" size=\"85\" value=\"" + newURL + "\" > \n");
@@ -969,7 +1018,8 @@ public class I2PSnarkServlet extends Default {
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n");
         out.write("<input type=\"hidden\" name=\"action\" value=\"Create\" >\n");
         out.write("<span class=\"snarkConfigTitle\">");
-        out.write(_("<img border=\"0\" src=\"/themes/console/snark/images/create.png\">Create Torrent"));
+        out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/create.png\">");
+		out.write(_("Create Torrent"));
         out.write("</span><hr>\n<table border=\"0\"><tr><td>");
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>\n");
         out.write(_("Data to seed"));
@@ -1017,7 +1067,8 @@ public class I2PSnarkServlet extends Default {
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n");
         out.write("<input type=\"hidden\" name=\"action\" value=\"Save\" >\n");
         out.write("<span class=\"snarkConfigTitle\">");
-        out.write(_("<img border=\"0\" src=\"/themes/console/snark/images/config.png\">Configuration"));
+		out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/config.png\">");
+        out.write(_("Configuration"));
         out.write("</span><hr>\n");
         out.write("<table border=\"0\"><tr><td>");
         out.write(_("Data directory"));
@@ -1144,7 +1195,7 @@ public class I2PSnarkServlet extends Default {
     private void writeConfigLink(PrintWriter out) throws IOException {
         out.write("<div class=\"configsection\"><span class=\"snarkConfig\">\n");
         out.write("<span class=\"snarkConfigTitle\"><a href=\"configure\">");
-        out.write(_("<img border=\"0\" src=\"/themes/console/snark/images/config.png\">Configuration"));
+        out.write(_("<img border=\"0\" src=\"/themes/snark/ubergine/images/config.png\">Configuration"));
         out.write("</a></span></span></div>\n");
     }
 
@@ -1217,7 +1268,7 @@ public class I2PSnarkServlet extends Default {
         return buf.toString();
     }
 
-    private static final String HEADER = "<link href=\"/themes/console/snark/snark.css\" rel=\"stylesheet\" type=\"text/css\" >";
+    private static final String HEADER = "<link href=\"/themes/snark/ubergine/snark.css\" rel=\"stylesheet\" type=\"text/css\" >";
                                        
 
     private static final String TABLE_HEADER = "<table border=\"0\" class=\"snarkTorrents\" width=\"100%\" cellpadding=\"0 10px\">\n" +
@@ -1284,13 +1335,13 @@ public class I2PSnarkServlet extends Default {
             title = title.substring(0, title.length() - 1);
         title = _("Torrent") + ": " + title;
         buf.append(title);
-        buf.append("</TITLE>").append(HEADER).append("<link rel=\"shortcut icon\" href=\"/themes/console/snark/favicon.ico\"></HEAD><BODY>\n<div class=\"snarknavbar\"> <a href=\"/i2psnark/\" title=\"Torrents\"");
+        buf.append("</TITLE>").append(HEADER).append("<link rel=\"shortcut icon\" href=\"/themes/snark/ubergine/favicon.ico\"></HEAD><BODY>\n<center><div class=\"snarknavbar\"> <a href=\"/i2psnark/\" title=\"Torrents\"");
         buf.append(" class=\"snarkRefresh\">I2PSnark</a>").append("</div>");
        
         buf.append("<div class=\"page\"><div class=\"mainsection\">" +
                    "<TABLE BORDER=0 class=\"snarkTorrents\" cellpadding=\"5px 10px\">" +
-                   "<thead><tr><th>").append(_("<img border=\"0\" src=\"/themes/console/snark/images/file.png\" title=\"File\" alt=\"File\">&nbsp;")).append(title).append("</th><th>").append(_("<img border=\"0\" src=\"/themes/console/snark/images/size.png\" title=\"FileSize\" alt=\"FileSize\">Size"))
-           .append("</th><th>").append(_("<img border=\"0\" src=\"/themes/console/snark/images/status.png\" title=\"Download Status\">Status")).append("</th></tr></thead>");
+                   "<thead><tr><th>").append("<img border=\"0\" src=\"/themes/snark/ubergine/images/file.png\" title=\"").append(_("File")).append("\" alt=\"").append(_("File")).append("\">&nbsp;").append(title).append("</th><th>").append(_("<img border=\"0\" src=\"/themes/snark/ubergine/images/size.png\" title=\"")).append(_("FileSize")).append("\" alt=\"").append(_("FileSize")).append("\">").append(_("Size"));
+          buf.append("</th><th>").append("<img border=\"0\" src=\"/themes/snark/ubergine/images/status.png\" title=\"").append(_("Download Status")).append("\">").append(_("Status")).append("</th></tr></thead>");
         //DateFormat dfmt=DateFormat.getDateTimeInstance(DateFormat.MEDIUM,
         //                                               DateFormat.MEDIUM);
         for (int i=0 ; i< ls.length ; i++)
@@ -1383,7 +1434,7 @@ public class I2PSnarkServlet extends Default {
             // corrupts utf-8
             //buf.append(URI.encodePath(URI.addPaths(base,"../")));
             buf.append(URI.addPaths(base,"../"));
-            buf.append("\"><img border=\"0\" src=\"/themes/console/snark/images/up.png\"> ")
+            buf.append("\"><img border=\"0\" src=\"/themes/snark/ubergine/images/up.png\"> ")
                .append(_("Up to higher level directory")).append("</A></td></tr></thead>\n");
         }			
 			
@@ -1392,7 +1443,7 @@ public class I2PSnarkServlet extends Default {
 			
 
         buf.append("</TABLE>\n");
-	buf.append("</div></div></BODY></HTML>\n");
+	buf.append("</div></div></center></BODY></HTML>\n");
         
         return buf.toString();
     }
