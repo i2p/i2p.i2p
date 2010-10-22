@@ -85,23 +85,26 @@ cp -a ../i2p $PKG/$INSTALL_DIR/
 mkdir -p $PKG/install
 
 #############################################################################
-# Preconfigureation to make package smaller
+# Preconfigureation to make package smaller, and...
+# we keep as much as reasonable in the installation directory.
+# This makes the install map fairly well to the standard installation.
+# It also makes it easier to find the log and pid files!
 #############################################################################
 cd $PKG/$INSTALL_DIR/i2p
 
 # wrapper.config $INSTALL_PATH and $SYSTEM_java_io_tmpdir
-sed "s|\$INSTALL_PATH|$INSTALL_DIR/i2p|g" wrapper.config > a
-sed "s|\$SYSTEM_java_io_tmpdir|/var/tmp|g" a > wrapper.config
+sed "s|\$INSTALL_PATH|/$INSTALL_DIR/i2p|g" wrapper.config > a
+sed "s|\$SYSTEM_java_io_tmpdir|/$INSTALL_DIR/i2p|g" a > wrapper.config
 # eepget %INSTALL_PATH
-sed "s|\$INSTALL_PATH|$INSTALL_DIR/i2p|g" eepget > a
+sed "s|\$INSTALL_PATH|/$INSTALL_DIR/i2p|g" eepget > a
 rm eepget
 mv a eepget
 # runplain.sh %INSTALL_PATH and %SYSTEM_java_io_tmpdir
-sed "s|%INSTALL_PATH|$INSTALL_DIR/i2p|g" runplain.sh > a
-sed "s|%SYSTEM_java_io_tmpdir|/var/tmp|g" a > runplain.sh
+sed "s|%INSTALL_PATH|/$INSTALL_DIR/i2p|g" runplain.sh > a
+sed "s|%SYSTEM_java_io_tmpdir|/$INSTALL_DIR/i2p|g" a > runplain.sh
 # i2prouter %INSTALL_PATH and %SYSTEM_java_io_tmpdir
-sed "s|%INSTALL_PATH|$INSTALL_DIR/i2p|g" i2prouter > a
-sed "s|%SYSTEM_java_io_tmpdir|/var/tmp|g" a > i2prouter
+sed "s|%INSTALL_PATH|/$INSTALL_DIR/i2p|g" i2prouter > a
+sed "s|%SYSTEM_java_io_tmpdir|/$INSTALL_DIR/i2p|g" a > i2prouter
 
 chmod 744 ./i2prouter
 chmod 744 ./osid

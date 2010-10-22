@@ -67,29 +67,25 @@ public class RequestWrapper {
 
 	/**
 	 * @param b
-	 * @return
 	 */
 	public HttpSession getSession(boolean b) {
 		return httpRequest.getSession( b );
 	}
 
 	/**
-	 * @param key
-	 * @return
+	 * @param name Specific parameter key
+	 * @return parameter value
 	 */
 	public String getParameter(String name ) {
 		return getParameter( name, null );
 	}
 
-	/**
-	 * @return
-	 */
 	public HttpSession getSession() {
 		return httpRequest.getSession();
 	}
 
 	/**
-	 * @return
+	 * @return List of request parameter names
 	 */
 	public Enumeration getParameterNames() {
 		if( multiPartRequest != null ) {
@@ -106,24 +102,19 @@ public class RequestWrapper {
 	}
 
 	/**
-	 * @return
+	 * @return The total length of the content.
 	 */
 	public int getContentLength() {
 		return httpRequest.getContentLength();
 	}
 
 	/**
-	 * @return
+	 * @return The content type of the request.
 	 */
 	public String getContentType() {
 		return httpRequest.getContentType();
 	}
 
-	/**
-	 * 
-	 * @param partName
-	 * @return
-	 */
 	public String getContentType( String partName )
 	{
 		String result = null;
@@ -143,19 +134,11 @@ public class RequestWrapper {
 		}
 		return result;
 	}
-	/**
-	 * @param string
-	 * @return
-	 */
+
 	public Object getAttribute(String string) {
 		return httpRequest.getAttribute( string );
 	}
 
-	/**
-	 * @param new_subject
-	 * @param string
-	 * @return
-	 */
 	public String getParameter( String name, String defaultValue )
 	{
 		String result = defaultValue;
@@ -184,10 +167,7 @@ public class RequestWrapper {
 		}
 		return result;
 	}
-	/**
-	 * @param new_filename
-	 * @return
-	 */
+
 	public String getFilename(String partName )
 	{
 		String result = null;
@@ -198,10 +178,7 @@ public class RequestWrapper {
 		}
 		return result;
 	}
-	/**
-	 * @param new_filename
-	 * @return
-	 */
+
 	public InputStream getInputStream(String partName )
 	{
 		InputStream result = null;
