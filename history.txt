@@ -1,4 +1,7 @@
 2010-10-22 sponge
+    * Sanity and some fixs for slackware package
+
+2010-10-22 sponge
     * Fix rc.i2p for slackware package
 
 2010-10-10 sponge
