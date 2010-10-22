@@ -1045,8 +1045,8 @@ public class I2PSnarkServlet extends Default {
             out.write("\t<option value=\"" + announceURL + "\">" + name + "</option>\n");
         }
         out.write("</select>\n");
-        out.write(_("or&nbsp;"));
-        out.write("<input type=\"text\" name=\"announceURLOther\" size=\"57\" value=\"http://\" " +
+        out.write(_("or"));
+        out.write("&nbsp;<input type=\"text\" name=\"announceURLOther\" size=\"57\" value=\"http://\" " +
                   "title=\"");
         out.write(_("Specify custom tracker announce URL"));
         out.write("\" > ");
@@ -1197,7 +1197,8 @@ public class I2PSnarkServlet extends Default {
     private void writeConfigLink(PrintWriter out) throws IOException {
         out.write("<div class=\"configsection\"><span class=\"snarkConfig\">\n");
         out.write("<span class=\"snarkConfigTitle\"><a href=\"configure\">");
-        out.write(_("<img border=\"0\" src=\"/themes/snark/ubergine/images/config.png\">Configuration"));
+		out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/config.png\">");
+        out.write(_("Configuration"));
         out.write("</a></span></span></div>\n");
     }
 
@@ -1342,7 +1343,7 @@ public class I2PSnarkServlet extends Default {
        
         buf.append("<div class=\"page\"><div class=\"mainsection\">" +
                    "<TABLE BORDER=0 class=\"snarkTorrents\" cellpadding=\"5px 10px\">" +
-                   "<thead><tr><th>").append("<img border=\"0\" src=\"/themes/snark/ubergine/images/file.png\" title=\"").append(_("File")).append("\" alt=\"").append(_("File")).append("\">&nbsp;").append(title).append("</th><th>").append(_("<img border=\"0\" src=\"/themes/snark/ubergine/images/size.png\" title=\"")).append(_("FileSize")).append("\" alt=\"").append(_("FileSize")).append("\">").append(_("Size"));
+                   "<thead><tr><th>").append("<img border=\"0\" src=\"/themes/snark/ubergine/images/file.png\" title=\"").append(_("File")).append("\" alt=\"").append(_("File")).append("\">&nbsp;").append(title).append("</th><th>").append("<img border=\"0\" src=\"/themes/snark/ubergine/images/size.png\" title=\"").append(_("FileSize")).append("\" alt=\"").append(_("FileSize")).append("\">").append(_("Size"));
           buf.append("</th><th>").append("<img border=\"0\" src=\"/themes/snark/ubergine/images/status.png\" title=\"").append(_("Download Status")).append("\">").append(_("Status")).append("</th></tr></thead>");
         //DateFormat dfmt=DateFormat.getDateTimeInstance(DateFormat.MEDIUM,
         //                                               DateFormat.MEDIUM);
