@@ -414,8 +414,8 @@
     <target name="prepthemeupdates">
         <!-- Migrated all Snark content to its own dir. Need to ensure snark dir excluded from console theme choices!! -->
         <!-- Snark's visible Assets -->
-        <copy todir="pkg-temp/docs/themes/console/snark/" >
-            <fileset  dir="installer/resources/themes/console/snark/" />
+        <copy todir="pkg-temp/docs/themes/snark/ubergine/" >
+            <fileset dir="installer/resources/themes/snark/ubergine/" />
         </copy>
         <!-- No need to copy these individually, we're copying the whole dir below.. 
         <copy file="installer/resources/themes/console/images/favicon.ico" todir="pkg-temp/docs/themes/console/images/" />
