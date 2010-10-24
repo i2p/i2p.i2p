@@ -184,4 +184,20 @@ public class SysTray implements SysTrayMenuListener {
         _sysTrayMenu.addItem(_itemOpenConsole);
         refreshDisplay();
     }
+
+    /**
+     *  Starts SysTray, even on linux (but requires kde3 libsystray4j.so to do anything)
+     *  @since 0.8.1
+     */
+    public static void main(String args[]) {
+        System.err.println("SysTray4j version " + SysTrayMenu.VERSION);
+        System.err.println("Hit ^C to exit");
+        new SysTray();
+        Thread t = Thread.currentThread();
+        synchronized(t) {
+            try {
+                t.wait();
+            } catch (InterruptedException ie) {}
+        }
+    }
 }
