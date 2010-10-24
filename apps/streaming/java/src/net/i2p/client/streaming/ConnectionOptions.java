@@ -47,6 +47,9 @@ public class ConnectionOptions extends I2PSocketOptionsImpl {
     private int _maxTotalConnsPerHour;
     private int _maxTotalConnsPerDay;
 
+    // NOTE - almost all the options are below, but see
+    // I2PSocketOptions in ministreaming for a few more
+
     public static final int PROFILE_BULK = 1;
     public static final int PROFILE_INTERACTIVE = 2;
     
