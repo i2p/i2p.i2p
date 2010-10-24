@@ -2,6 +2,7 @@ package net.i2p.router.transport.ntcp;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ThreadFactory;
@@ -24,9 +25,9 @@ import net.i2p.util.Log;
  */
 public class NTCPSendFinisher {
     private static final int THREADS = 4;
-    private I2PAppContext _context;
-    private NTCPTransport _transport;
-    private Log _log;
+    private final I2PAppContext _context;
+    private final NTCPTransport _transport;
+    private final Log _log;
     private int _count;
     private ThreadPoolExecutor _executor;
 
@@ -47,7 +48,12 @@ public class NTCPSendFinisher {
     }
 
     public void add(OutNetMessage msg) {
-        _executor.execute(new RunnableEvent(msg));
+        try {
+            _executor.execute(new RunnableEvent(msg));
+        } catch (RejectedExecutionException ree) {
+            // race with stop()
+            _log.warn("NTCP send finisher stopped, discarding msg.afterSend()");
+        }
     }
     
     // not really needed for now but in case we want to add some hooks like afterExecute()
