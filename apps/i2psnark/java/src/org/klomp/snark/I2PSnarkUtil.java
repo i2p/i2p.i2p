@@ -190,6 +190,7 @@ public class I2PSnarkUtil {
      */
     public void disconnect() {
         I2PSocketManager mgr = _manager;
+        // FIXME this can cause race NPEs elsewhere
         _manager = null;
         _shitlist.clear();
         mgr.destroySocketManager();
@@ -201,6 +202,9 @@ public class I2PSnarkUtil {
     
     /** connect to the given destination */
     I2PSocket connect(PeerID peer) throws IOException {
+        I2PSocketManager mgr = _manager;
+        if (mgr == null)
+            throw new IOException("No socket manager");
         Destination addr = peer.getAddress();
         if (addr == null)
             throw new IOException("Null address");
