@@ -272,7 +272,7 @@ td:first-child {
 }
 
 .snarkFileSize {
-     padding: 4px 10px;
+     padding: 4px 2px;
 }
 
 .snarkFileStatus {
@@ -584,7 +584,7 @@ code {
      -moz-box-shadow: inset 0px 0px 1px 0px #002;
      -khtml-box-shadow: inset 0px 0px 1px 0px #002;
      box-shadow: inset 0px 0px 1px 0px #002;
-     background: #111 url('/themes/snark/ubergine/images/snarktopnav.png') repeat-x scroll center center;
+     background: #101 url('/themes/snark/ubergine/images/snarktopnav.png') repeat-x scroll center center;
      text-transform: uppercase !important;
      letter-spacing: 0.065em !important;
      font-weight: bold;

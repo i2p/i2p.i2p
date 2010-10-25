@@ -1342,7 +1342,7 @@ public class I2PSnarkServlet extends Default {
        
         buf.append("<div class=\"page\"><div class=\"mainsection\">" +
                    "<TABLE BORDER=0 class=\"snarkTorrents\" cellpadding=\"5px 10px\">" +
-                   "<thead><tr><th>").append("<img border=\"0\" src=\"/themes/snark/ubergine/images/file.png\" title=\"").append(_("File")).append("\" alt=\"").append(_("File")).append("\">&nbsp;").append(title).append("</th><th>").append("<img border=\"0\" src=\"/themes/snark/ubergine/images/size.png\" title=\"").append(_("FileSize")).append("\" alt=\"").append(_("FileSize")).append("\">").append(_("Size"));
+                   "<thead><tr><th>").append("<img border=\"0\" src=\"/themes/snark/ubergine/images/file.png\" title=\"").append(_("File")).append("\" alt=\"").append(_("File")).append("\">&nbsp;").append(title).append("</th><th align=\"right\">").append("<img border=\"0\" src=\"/themes/snark/ubergine/images/size.png\" title=\"").append(_("FileSize")).append("\" alt=\"").append(_("FileSize")).append("\">").append(_("Size"));
           buf.append("</th><th>").append("<img border=\"0\" src=\"/themes/snark/ubergine/images/status.png\" title=\"").append(_("Download Status")).append("\">").append(_("Status")).append("</th></tr></thead>");
         //DateFormat dfmt=DateFormat.getDateTimeInstance(DateFormat.MEDIUM,
         //                                               DateFormat.MEDIUM);
