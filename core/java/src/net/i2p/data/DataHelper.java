@@ -1076,7 +1076,8 @@ public class DataHelper {
     }
     
     /**
-     * Like formatSize but with a space after the number
+     * Like formatSize but with a non-breaking space after the number
+     * Use only in HTML
      * @since 0.7.14
      */
     public static String formatSize2(long bytes) {
@@ -1091,11 +1092,11 @@ public class DataHelper {
 
         String str = fmt.format(val);
         switch (scale) {
-            case 1: return str + " K";
-            case 2: return str + " M";
-            case 3: return str + " G";
-            case 4: return str + " T";
-            default: return bytes + " ";
+            case 1: return str + "&nbsp;K";
+            case 2: return str + "&nbsp;M";
+            case 3: return str + "&nbsp;G";
+            case 4: return str + "&nbsp;T";
+            default: return bytes + "&nbsp;";
         }
     }
     
