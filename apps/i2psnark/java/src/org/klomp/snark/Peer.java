@@ -117,10 +117,15 @@ public class Peer implements Comparable
   }
 
   /**
-   * Returns socket (for debug printing)
+   * @return socket debug string (for debug printing)
    */
   public String getSocket()
   {
+    if (state != null) {
+        String r = state.getRequests();
+        if (r != null)
+            return sock.toString() + "<br>Requests: " + r;
+    }
     return sock.toString();
   }
 
