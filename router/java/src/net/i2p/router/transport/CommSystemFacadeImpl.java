@@ -136,17 +136,17 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     
     @Override
     public boolean isBacklogged(Hash dest) { 
-        return _manager.isBacklogged(dest); 
+        return _manager != null && _manager.isBacklogged(dest); 
     }
     
     @Override
     public boolean isEstablished(Hash dest) { 
-        return _manager.isEstablished(dest); 
+        return _manager != null && _manager.isEstablished(dest); 
     }
     
     @Override
     public boolean wasUnreachable(Hash dest) { 
-        return _manager.wasUnreachable(dest); 
+        return _manager != null && _manager.wasUnreachable(dest); 
     }
     
     @Override
