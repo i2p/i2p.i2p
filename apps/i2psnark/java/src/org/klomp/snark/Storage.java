@@ -422,7 +422,7 @@ public class Storage
               file++;
               long oldFileEnd = fileEnd;
               fileEnd += lengths[file];
-              if (priorities[file] > pri && pcEnd < oldFileEnd)
+              if (priorities[file] > pri && oldFileEnd < pcEnd)
                   pri = priorities[file];
           }
           rv[i] = pri;
@@ -669,6 +669,10 @@ public class Storage
           changed = true;
           synchronized(RAFlock[i]) {
               allocateFile(i);
+              // close as we go so we don't run out of file descriptors
+              try {
+                  closeRAF(i);
+              } catch (IOException ioe) {}
           }
         } else {
           _util.debug("File '" + names[i] + "' exists, but has wrong length - repairing corruption", Snark.ERROR);
@@ -677,8 +681,10 @@ public class Storage
           synchronized(RAFlock[i]) {
               checkRAF(i);
               rafs[i].setLength(lengths[i]);
+              try {
+                  closeRAF(i);
+              } catch (IOException ioe) {}
           }
-          // will be closed below
         }
       }
 
@@ -687,10 +693,25 @@ public class Storage
       {
         pieces = metainfo.getPieces();
         byte[] piece = new byte[metainfo.getPieceLength(0)];
+        int file = 0;
+        long fileEnd = lengths[0];
+        long pieceEnd = 0;
         for (int i = 0; i < pieces; i++)
           {
             int length = getUncheckedPiece(i, piece);
             boolean correctHash = metainfo.checkPiece(i, piece, 0, length);
+            // close as we go so we don't run out of file descriptors
+            pieceEnd += length;
+            while (fileEnd <= pieceEnd) {
+                synchronized(RAFlock[file]) {
+                    try {
+                        closeRAF(file);
+                    } catch (IOException ioe) {}
+                }
+                if (++file >= rafs.length)
+                    break;
+                fileEnd += lengths[file];
+            }
             if (correctHash)
               {
                 bitfield.set(i);
@@ -705,13 +726,14 @@ public class Storage
     _probablyComplete = complete();
     // close all the files so we don't end up with a zillion open ones;
     // we will reopen as needed
-    for (int i = 0; i < rafs.length; i++) {
-      synchronized(RAFlock[i]) {
-        try {
-          closeRAF(i);
-        } catch (IOException ioe) {}
-      }
-    }
+    // Now closed above to avoid running out of file descriptors
+    //for (int i = 0; i < rafs.length; i++) {
+    //  synchronized(RAFlock[i]) {
+    //    try {
+    //      closeRAF(i);
+    //    } catch (IOException ioe) {}
+    //  }
+    //}
 
     if (listener != null) {
       listener.storageAllChecked(this);
@@ -720,6 +742,7 @@ public class Storage
     }
   }
 
+  /** this calls openRAF(); caller must synnchronize and call closeRAF() */
   private void allocateFile(int nr) throws IOException
   {
     // caller synchronized
