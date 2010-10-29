@@ -460,7 +460,7 @@ public class PeerCoordinator implements PeerListener
   }
 
   /**
-   * Returns true if we don't have the given piece yet.
+   * @return true if we still want the given piece
    */
   public boolean gotHave(Peer peer, int piece)
   {
@@ -586,8 +586,10 @@ public class PeerCoordinator implements PeerListener
    */
   public void updatePiecePriorities() {
       int[] pri = storage.getPiecePriorities();
-      if (pri == null)
+      if (pri == null) {
+          _log.debug("Updated piece priorities called but no priorities to set?");
           return;
+      }
       synchronized(wantedPieces) {
           // Add incomplete and previously unwanted pieces to the list
           // Temp to avoid O(n**2)
@@ -619,14 +621,31 @@ public class PeerCoordinator implements PeerListener
           // now set the new priorities and remove newly unwanted pieces
           for (Iterator<Piece> iter = wantedPieces.iterator(); iter.hasNext(); ) {
                Piece p = iter.next();
-               int id = pri[p.getId()];
-               if (id >= 0)
-                   p.setPriority(pri[p.getId()]);
-               else
+               int priority = pri[p.getId()];
+               if (priority >= 0) {
+                   p.setPriority(priority);
+               } else {
                    iter.remove();
+                   // cancel all peers
+                   synchronized(peers) {
+                       for (Peer peer : peers) {
+                           peer.cancel(p.getId());
+                       }
+                   }
+               }
           }
+          if (_log.shouldLog(Log.DEBUG))
+              _log.debug("Updated piece priorities, now wanted: " + wantedPieces);
           // if we added pieces, they will be in-order unless we shuffle
           Collections.shuffle(wantedPieces, _random);
+
+          // update request queues, in case we added wanted pieces
+          // and we were previously uninterested
+          synchronized(peers) {
+              for (Peer peer : peers) {
+                  peer.request();
+              }
+          }
       }
   }
 

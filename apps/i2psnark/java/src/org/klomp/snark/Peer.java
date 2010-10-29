@@ -393,6 +393,28 @@ public class Peer implements Comparable
   }
 
   /**
+   * Tell the other side that we are no longer interested in any of
+   * the outstanding requests (if any) for this piece.
+   * @since 0.8.1
+   */
+  void cancel(int piece) {
+    PeerState s = state;
+    if (s != null)
+      s.cancelPiece(piece);
+  }
+
+  /**
+   * Update the request queue.
+   * Call after adding wanted pieces.
+   * @since 0.8.1
+   */
+  void request() {
+    PeerState s = state;
+    if (s != null)
+      s.addRequest();
+  }
+
+  /**
    * Whether or not the peer is interested in pieces we have. Returns
    * false if not connected.
    */
