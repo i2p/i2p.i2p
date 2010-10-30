@@ -152,6 +152,9 @@ public class I2PSnarkUtil {
      */
     synchronized public boolean connect() {
         if (_manager == null) {
+            // try to find why reconnecting after stop
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Connecting to I2P", new Exception("I did it"));
             Properties opts = new Properties();
             if (_opts != null) {
                 for (Iterator iter = _opts.keySet().iterator(); iter.hasNext(); ) {

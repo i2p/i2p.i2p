@@ -530,6 +530,8 @@ public class I2PSnarkServlet extends Default {
                     _manager.stopTorrent(snark.torrent, false);
             }
             if (_manager.util().connected()) {
+                // Give the stopped announces time to get out
+                try { Thread.sleep(2000); } catch (InterruptedException ie) {}
                 _manager.util().disconnect();
                 _manager.addMessage(_("I2P tunnel closed."));
             }

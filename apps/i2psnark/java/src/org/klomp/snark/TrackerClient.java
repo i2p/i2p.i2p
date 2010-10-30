@@ -268,7 +268,7 @@ public class TrackerClient extends I2PAppThread
                         List ordered = new ArrayList(peers);
                         Collections.shuffle(ordered, r);
                         Iterator it = ordered.iterator();
-                        while (it.hasNext()) {
+                        while ((!stop) && it.hasNext()) {
                           Peer cur = (Peer)it.next();
                           // FIXME if id == us || dest == us continue;
                           // only delay if we actually make an attempt to add peer
