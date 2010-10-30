@@ -105,11 +105,15 @@ public class PeerCoordinator implements PeerListener
   public void setWantedPieces()
   {
     // Make a list of pieces
+    // FIXME synchronize, clear and re-add instead?
+    // Don't replace something we are synchronizing on.
     wantedPieces = new ArrayList();
     BitField bitfield = storage.getBitField();
     int[] pri = storage.getPiecePriorities();
     for(int i = 0; i < metainfo.getPieces(); i++) {
-      if (!bitfield.get(i)) {
+      // only add if we don't have and the priority is >= 0
+      if ((!bitfield.get(i)) &&
+          (pri == null || pri[i] >= 0)) {
         Piece p = new Piece(i);
         if (pri != null)
             p.setPriority(pri[i]);

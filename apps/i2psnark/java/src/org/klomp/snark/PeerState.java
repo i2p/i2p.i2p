@@ -56,6 +56,7 @@ class PeerState
 
   // Outstanding request
   private final List<Request> outstandingRequests = new ArrayList();
+  /** the tail (NOT the head) of the request queue */
   private Request lastRequest = null;
 
   private final static int MAX_PIPELINE = 5;               // this is for outbound requests
@@ -565,11 +566,10 @@ class PeerState
               }
         }
         int nextPiece = listener.wantPiece(peer, bitfield);
-        if (_log.shouldLog(Log.DEBUG))
-          _log.debug(peer + " want piece " + nextPiece);
-            if (nextPiece != -1
-                && (lastRequest == null || lastRequest.piece != nextPiece))
-              {
+        if (nextPiece != -1
+            && (lastRequest == null || lastRequest.piece != nextPiece)) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug(peer + " want piece " + nextPiece);
                 // Fail safe to make sure we are interested
                 // When we transition into the end game we may not be interested...
                 if (!interesting) {
@@ -596,8 +596,15 @@ class PeerState
                   out.sendRequest(req);
                 lastRequest = req;
                 return true;
-              }
+          } else {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug(peer + " no more pieces to request");
+          }
       }
+
+    // failsafe
+    if (outstandingRequests.isEmpty())
+        lastRequest = null;
 
     // If we are not in the end game, we may run out of things to request
     // because we are asking other peers. Set not-interesting now rather than
