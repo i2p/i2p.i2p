@@ -804,7 +804,7 @@ public class I2PSnarkServlet extends Default {
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentDownloaded " + rowClass + "\">");
         if (remaining > 0)
-            out.write("<i>" + formatSize(total-remaining) + "</i>/" + formatSize(total)); // 18MB/3GB
+            out.write(formatSize(total-remaining) + "/" + formatSize(total)); // 18MB/3GB
         else
             out.write(formatSize(total)); // 3GB
         out.write("</td>\n\t");
