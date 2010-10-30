@@ -1,3 +1,142 @@
+2010-10-30 zzz
+    * i2psnark:
+      - Priority mapping bugfix
+      - Close files as we go when creating/checking
+        so we don't run out of file descriptors
+      - Update request queues after priority change
+      - Only add wanted pieces to wanted list at startup
+      - Make sure lastRequest is null when it should be
+      - Delay during StopAll so we don't close the tunnel before the
+        stopped announces go out and reopen it
+      - Logging tweaks
+
+2010-10-27 zzz
+    * i2psnark:
+      - Don't stay interested if we run out of pieces
+        to request (thanks sponge)
+      - Enhance debug mode to show requests
+      - Priority mapping bugfix
+    * Transport: Avoid rare NPE at startup
+
+2010-10-24 zzz
+    * FileUtil: Make it easier to compile without Pack200, or with
+                Apache Harmony's Pack200, add unzip to main()
+    * i2psnark: Catch a race after disconnect()
+    * NTCP: Catch a race after stop()
+    * Router: Set permissions on wrapper.log when not called by RouterLaunch
+    * Systray: New doc and main()
+
+2010-10-19 zzz
+    * Escape & in logs and i2psnark (much more to do)
+    * JobImpl: Deprecate two debugging methods
+    * replaceAll() -> replace() when we don't need regex
+
+2010-10-15 zzz
+    * i2psnark: Add file priority feature
+    * I2PSocketEepGet: Set connect delay to save a RTT, will
+      speed announces in i2psnark
+
+2010-10-12 zzz
+    *** 1.6 or higher JDK now required to build
+    * configlogging.jsp:
+      - Add easy way to add an override
+      - Make file size specifier more flexible
+    * Console:
+      - Sort RouterAddress options on netdb.jsp and peers.jsp
+      - Remove unused web-*.xml file from war
+    * Crypto:
+      - Convert all ArrayList caching to LBQs in YKGenerator,
+        HMACGenerator, and AESKeyCache.
+      - Change DSAEngine params from Hash to new SHA1Hash, since
+        these were really 20 byte hashes, not 32 byte Hashes.
+      - Add stats to track YKGenerator caching success
+      - Fix YKGenerator precalculation to be much more useful by
+        increasing the cache size and dramatically shortening the delay
+      - Option cleanups
+      - YKGenerator cleanups
+      - Mark HMAC256Generator unused
+    * EepGet: Reset length variable on redirect
+    * Files: Change permissions to 600/700 for all written files/directories.
+      Now requires Java 1.6 to build, but only 1.5+ to run.
+      (requires 1.6 to set permissiomns)
+    * GeoIP: Fix locking bug causing lookups to stop
+    * Hash: Throw IAE if data length is not 32 bytes,
+      now that DSAEngine abuse is gone
+    * HTTPResponseOutputStream:
+      - More caching
+      - Stats cleanup
+      - Max header length check
+      - Catch OOM
+      - Initializer cleanup
+      - Javadoc
+    * I2CP:
+      - Add new option i2cp.messageReliability=none, which prevents the
+        router from sending MessageStatusMessages back in reply to an
+        outbound SendMessageMessage. Since the streaming lib always ignored
+        the MSMs anyway, make it the default for streaming.
+        This will reduce the I2CP traffic significantly.
+        MSM handling now avoided, but it is still fairly broken, see
+        comments in I2PSessionImpl2.
+      - Cleanups to replace method calls with fields
+      - More cleanups, javadoc, rate reduction
+    * i2psnark:
+      - Compact response format
+      - Add link to finished torrent in message box
+      - Don't let one bad torrent prevent others from
+        starting or stopping
+      - Sort peers by completion %
+      - Add some missing mime types to web.xml
+      - shouldLog() cleanup
+    * i2ptunnel:
+      - Now that streaming flush() is fixed, use it in IRCClient, and
+        for initial data in I2PTunnel runner, to avoid the 250 ms
+        passive flush delay
+      - Add hostname DSA signature field, to be used for addkey forms.
+        Experimental, may be commented out later.
+      - More header blocking (thanks telecomix!)
+      - Remove unused web-*.xml file from war
+    * Installer: Add startup hint for non-x86
+    * Javadoc updates all over the place
+    * LogConsoleBuffer: Java 5
+    * Naming:
+      - Increase cache size and expiration time
+      - Add clearCache() method
+      - Don't use EepGet or Exec for b32
+      - Javadoc updates
+    * NetDB:
+      - Expire unreachable routers quickly, even if they don't have introducers,
+        so we don't have old data on routers that ran out of introducers.
+      - Fix rare NPEs at shutdown
+    * NTCP:
+      - Cleanups
+    * Streaming:
+      - Make flush() block less, by waiting only for "accept" into the
+        streaming queue rather than "completion" (i.e. ACK from the far end).
+        This prevents complete stalls when flushing, and should help performance
+        of apps that use flush(), like i2psnark (and SAM?).
+        close() still does a flush that waits for completion, as i2ptunnel
+        doesn't like a fast return from close().
+      - cleanups
+    * SusiDNS:
+      - Remove unused web-*.xml file from war
+    * TransportManager: Convert _transports from a List to a CHM
+      to prevent a rare concurrent exception
+    * Tunnels:
+      - Don't use peers < 0.7.9 for tunnels due to the old
+        message corruption bugs
+      - Javadoc
+      - Cleanups
+    * UDP:
+      - Beginnings of destroy message support
+      - Try to avoid running out of introducers by relaxing selection criteria
+        and increasing minimum number of potential introducers
+      - Avoid rare AIOOBE
+      - PacketBuilder refactor
+      - Make most classes package private
+      - Comments
+      - Logging cleanup
+      - Comment out a main()
+
 * 2010-07-12  0.8 released
 
 2010-07-08 zzz
