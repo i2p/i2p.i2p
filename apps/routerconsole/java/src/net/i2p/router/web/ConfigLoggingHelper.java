@@ -24,7 +24,9 @@ public class ConfigLoggingHelper extends HelperBase {
     public String getMaxFileSize() {
         int bytes = _context.logManager().getFileSize();
         if (bytes <= 0) return "1.00 MB";
-        return DataHelper.formatSize2(bytes) + 'B';
+        // "&nbsp;" comes back in the POST as 0xc2 0xa0
+        // which is not recognized as whitespace and who knows why
+        return DataHelper.formatSize2(bytes).replace("&nbsp;", " ") + 'B';
     }
     public String getLogLevelTable() {
         StringBuilder buf = new StringBuilder(32*1024);
