@@ -357,7 +357,7 @@ public class TrackerClient extends I2PAppThread
       + "&uploaded=" + uploaded
       + "&downloaded=" + downloaded
       + "&left=" + left
-      + "&compact"
+      + "&compact=1"   // NOTE: opentracker will return 400 for &compact alone
       + ((! event.equals(NO_EVENT)) ? ("&event=" + event) : "");
     if (left <= 0 || event.equals(STOPPED_EVENT) || !coordinator.needPeers())
         s += "&numwant=0";
