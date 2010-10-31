@@ -31,7 +31,7 @@ public class LogsHelper extends HelperBase {
         }
         String str = FileUtil.readTextFile(f.getAbsolutePath(), 250, false);
         if (str == null) 
-            return "";
+            return _("File not found") + ": <b><code>" + f.getAbsolutePath() + "</code></b>";
         else {
             str = str.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
             return _("File location") + ": <b><code>" + f.getAbsolutePath() + "</code></b> <pre>" + str + "</pre>";
