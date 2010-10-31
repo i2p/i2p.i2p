@@ -12,14 +12,12 @@ build:
 	mkdir -p debian/tmp/usr/bin
 	sed 's|%INSTALL_PATH|/usr/lib/i2p|g' debian/tmp/usr/lib/i2p/eepget > debian/tmp/usr/lib/i2p/a
 	mv debian/tmp/usr/lib/i2p/a debian/tmp/usr/lib/i2p/eepget
-	cp debian/tmp/usr/lib/i2p/eepget  debian/tmp/usr/bin/eepget
-	chmod +x debian/tmp/usr/bin/eepget
+	ln -s /usr/lib/i2p/eepget debian/tmp/usr/bin/eepget
 	sed 's|%INSTALL_PATH|/usr/lib/i2p|g' debian/tmp/usr/lib/i2p/runplain.sh > debian/tmp/usr/lib/i2p/a
 	sed 's|%SYSTEM_java_io_tmpdir|/tmp|g' debian/tmp/usr/lib/i2p/a > debian/tmp/usr/lib/i2p/runplain.sh
 	sed 's|%INSTALL_PATH|/usr/lib/i2p|g' debian/tmp/usr/lib/i2p/i2prouter > debian/tmp/usr/lib/i2p/a
 	sed 's|%SYSTEM_java_io_tmpdir|/tmp|g' debian/tmp/usr/lib/i2p/a > debian/tmp/usr/lib/i2p/i2prouter
-	cp debian/tmp/usr/lib/i2p/i2prouter debian/tmp/usr/bin/i2prouter
-	chmod +x debian/tmp/usr/bin/i2prouter
+	ln -s /usr/lib/i2p/i2prouter debian/tmp/usr/bin/i2prouter
 	rm debian/tmp/usr/lib/i2p/a
 	touch debian/build
 
