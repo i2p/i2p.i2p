@@ -25,7 +25,8 @@ public class ConfigLoggingHelper extends HelperBase {
         int bytes = _context.logManager().getFileSize();
         if (bytes <= 0) return "1.00 MB";
         // "&nbsp;" comes back in the POST as 0xc2 0xa0
-        // which is not recognized as whitespace and who knows why
+        // non-breaking space is U+00A0 which is 0xc2 0xa0 in UTF-8.
+        // we could figure out where the UTF-8 problem is but why bother.
         return DataHelper.formatSize2(bytes).replace("&nbsp;", " ") + 'B';
     }
     public String getLogLevelTable() {
