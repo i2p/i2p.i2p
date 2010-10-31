@@ -1,5 +1,8 @@
 #!/usr/bin/make -f
 
+VERSION=`grep String\ VERSION core/java/src/net/i2p/CoreVersion.java | cut -d\" -f2`
+SOURCEURL=http://mirror.i2p2.de/i2psource_${VERSION}.tar.bz2
+
 build:
 	ant preppkg-linux-only
 	mkdir -p debian/tmp/usr/lib
@@ -32,3 +35,6 @@ clean:
 	rm -rf debian/tmp/
 	ant distclean
 	@exit 0
+
+get-orig-source:
+	wget ${SOURCEURL}
