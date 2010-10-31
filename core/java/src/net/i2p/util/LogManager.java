@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -429,7 +430,8 @@ public class LogManager {
                 v = v.substring(0, v.length() - 1);
             char mod = v.charAt(v.length() - 1);
             if (!Character.isDigit(mod)) v = v.substring(0, v.length() - 1);
-            double val = Double.parseDouble(v);
+            // output to form was in current locale, so have to parse it back that way
+            double val = (new DecimalFormat()).parse(v.trim()).doubleValue();
             switch (mod) {
                 case 'K':
                     val *= 1024;
