@@ -57,9 +57,9 @@ public class PeerCoordinator implements PeerListener
 
   private long uploaded;
   private long downloaded;
-  final static int RATE_DEPTH = 6; // make following arrays RATE_DEPTH long
-  private long uploaded_old[] = {-1,-1,-1,-1,-1,-1};
-  private long downloaded_old[] = {-1,-1,-1,-1,-1,-1};
+  final static int RATE_DEPTH = 3; // make following arrays RATE_DEPTH long
+  private long uploaded_old[] = {-1,-1,-1};
+  private long downloaded_old[] = {-1,-1,-1};
 
   // synchronize on this when changing peers or downloaders
   final List<Peer> peers = new ArrayList();
@@ -193,7 +193,7 @@ public class PeerCoordinator implements PeerListener
     setRate(down, downloaded_old);
   }
 
-  private static void setRate(long val, long array[])
+  static void setRate(long val, long array[])
   {
     synchronized(array) {
       for (int i = RATE_DEPTH-1; i > 0; i--)
@@ -224,20 +224,23 @@ public class PeerCoordinator implements PeerListener
     return (r * 1000) / CHECK_PERIOD;
   }
 
-  private long getRate(long array[])
+  static long getRate(long array[])
   {
     long rate = 0;
     int i = 0;
+    int factor = 0;
     synchronized(array) {
       for ( ; i < RATE_DEPTH; i++) {
         if (array[i] < 0)
             break;
-        rate += array[i];
+        int f = RATE_DEPTH - i;
+        rate += array[i] * f;
+        factor += f;
       }
     }
     if (i == 0)
         return 0;
-    return rate / (i * CHECK_PERIOD / 1000);
+    return rate / (factor * i * CHECK_PERIOD / 1000);
   }
 
   public MetaInfo getMetaInfo()
@@ -510,6 +513,12 @@ public class PeerCoordinator implements PeerListener
   private static final int END_GAME_THRESHOLD = 8;
 
   /**
+   *  Max number of peers to get a piece from when in end game
+   *  @since 0.8.1
+   */
+  private static final int MAX_PARALLEL_REQUESTS = 4;
+
+  /**
    * Returns one of pieces in the given BitField that is still wanted or
    * -1 if none of the given pieces are wanted.
    */
@@ -551,15 +560,32 @@ public class PeerCoordinator implements PeerListener
             if (wantedPieces.size() > END_GAME_THRESHOLD)
                 return -1;  // nothing to request and not in end game
             // let's not all get on the same piece
+            // Even better would be to sort by number of requests
             Collections.shuffle(requested, _random);
             Iterator<Piece> it2 = requested.iterator();
             while (piece == null && it2.hasNext())
               {
                 Piece p = it2.next();
-                if (havePieces.get(p.getId()))
-                  {
+                if (havePieces.get(p.getId())) {
+                    // limit number of parallel requests
+                    int requestedCount = 0;
+                    synchronized(peers) {
+                        for (Peer pr : peers) {
+                            if (pr.isRequesting(p.getId())) {
+                                if (pr.equals(peer)) {
+                                    // don't give it to him again
+                                    requestedCount = MAX_PARALLEL_REQUESTS;
+                                    break;
+                                }
+                                if (++requestedCount >= MAX_PARALLEL_REQUESTS)
+                                    break;
+                            }
+                        }
+                    }
+                    if (requestedCount >= MAX_PARALLEL_REQUESTS)
+                        continue;
                     piece = p;
-                  }
+                }
               }
             if (piece == null) {
                 if (_log.shouldLog(Log.WARN))
@@ -568,7 +594,7 @@ public class PeerCoordinator implements PeerListener
                 //            + " wanted = " + wantedPieces + " peerHas = " + havePieces);
                 return -1; //If we still can't find a piece we want, so be it.
             } else {
-                // Should be a lot smarter here - limit # of parallel attempts and
+                // Should be a lot smarter here -
                 // share blocks rather than starting from 0 with each peer.
                 // This is where the flaws of the snark data model are really exposed.
                 // Could also randomize within the duplicate set rather than strict rarest-first

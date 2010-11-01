@@ -56,8 +56,8 @@ public class Peer implements Comparable
   private long _id;
   final static long CHECK_PERIOD = PeerCoordinator.CHECK_PERIOD; // 40 seconds
   final static int RATE_DEPTH = PeerCoordinator.RATE_DEPTH; // make following arrays RATE_DEPTH long
-  private long uploaded_old[] = {-1,-1,-1,-1,-1,-1};
-  private long downloaded_old[] = {-1,-1,-1,-1,-1,-1};
+  private long uploaded_old[] = {-1,-1,-1};
+  private long downloaded_old[] = {-1,-1,-1};
 
   /**
    * Creates a disconnected peer given a PeerID, your own id and the
@@ -404,6 +404,15 @@ public class Peer implements Comparable
   }
 
   /**
+   * Are we currently requesting the piece?
+   * @since 0.8.1
+   */
+  boolean isRequesting(int p) {
+    PeerState s = state;
+    return s != null && s.isRequesting(p);
+  }
+
+  /**
    * Update the request queue.
    * Call after adding wanted pieces.
    * @since 0.8.1
@@ -572,17 +581,8 @@ public class Peer implements Comparable
    */
   public void setRateHistory(long up, long down)
   {
-    setRate(up, uploaded_old);
-    setRate(down, downloaded_old);
-  }
-
-  private void setRate(long val, long array[])
-  {
-    synchronized(array) {
-      for (int i = RATE_DEPTH-1; i > 0; i--)
-        array[i] = array[i-1];
-      array[0] = val;
-    }
+    PeerCoordinator.setRate(up, uploaded_old);
+    PeerCoordinator.setRate(down, downloaded_old);
   }
 
   /**
@@ -590,28 +590,11 @@ public class Peer implements Comparable
    */
   public long getUploadRate()
   {
-    return getRate(uploaded_old);
+    return PeerCoordinator.getRate(uploaded_old);
   }
 
   public long getDownloadRate()
   {
-    return getRate(downloaded_old);
+    return PeerCoordinator.getRate(downloaded_old);
   }
-
-  private long getRate(long array[])
-  {
-    long rate = 0;
-    int i = 0;
-    synchronized(array) {
-      for ( ; i < RATE_DEPTH; i++){
-        if (array[i] < 0)
-            break;
-        rate += array[i];
-      }
-    }
-    if (i == 0)
-        return 0;
-    return rate / (i * CHECK_PERIOD / 1000);
-  }
-
 }

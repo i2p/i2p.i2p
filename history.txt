@@ -1,3 +1,15 @@
+2010-11-01 zzz
+    * ClientConnectionRunner: Add synch to fix race causing AIOOBE
+                              (http://forum.i2p/viewtopic.php?t=5061)
+    * configlogging.jsp: Parse log limit with current locale
+                (ticket #118)
+    * i2psnark:
+      - Limit number of parallel requests of a single piece when in the end game
+      - Shorten and weight the speed tracker so the display is more
+        reflective of current speed
+    * logs.jsp: Add message if wrapper log not found
+                (ticket #103)
+
 2010-10-30 zzz
     * i2psnark:
       - Priority mapping bugfix

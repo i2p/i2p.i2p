@@ -471,6 +471,18 @@ class PeerState
   }
 
   /**
+   * Are we currently requesting the piece?
+   * @since 0.8.1
+   */
+  synchronized boolean isRequesting(int piece) {
+      for (Request req : outstandingRequests) {
+          if (req.piece == piece)
+              return true;
+      }
+      return false;
+  }
+
+  /**
    * Starts or resumes requesting pieces.
    * @param resend should we resend outstanding requests?
    */
