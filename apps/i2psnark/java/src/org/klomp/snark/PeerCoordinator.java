@@ -240,7 +240,7 @@ public class PeerCoordinator implements PeerListener
     }
     if (i == 0)
         return 0;
-    return rate / (factor * i * CHECK_PERIOD / 1000);
+    return rate / (factor * CHECK_PERIOD / 1000);
   }
 
   public MetaInfo getMetaInfo()
