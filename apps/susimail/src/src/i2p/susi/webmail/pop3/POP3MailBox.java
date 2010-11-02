@@ -85,7 +85,7 @@ public class POP3MailBox {
 	/**
 	 * 
 	 * @param uidl
-	 * @return
+	 * @return Byte buffer containing header data.
 	 */
 	public ReadBuffer getHeader( String uidl ) {
 		synchronized( synchronizer ) {
@@ -97,7 +97,7 @@ public class POP3MailBox {
 	 * retrieves header from pop3 server (with TOP command and RETR as fallback)
 	 * 
 	 * @param id message id
-	 * @return byte buffer containing data
+	 * @return Byte buffer containing header data.
 	 */
 	private ReadBuffer getHeader( int id ) {
 		synchronized( synchronizer ) {
@@ -138,7 +138,7 @@ public class POP3MailBox {
 	/**
 	 * 
 	 * @param uidl
-	 * @return
+	 * @return Byte buffer containing body data.
 	 */
 	public ReadBuffer getBody( String uidl ) {
 		synchronized( synchronizer ) {
@@ -150,7 +150,7 @@ public class POP3MailBox {
 	 * retrieve message body from pop3 server (via RETR command)
 	 * 
 	 * @param id message id
-	 * @return byte buffer containing data
+	 * @return Byte buffer containing body data.
 	 */
 	private ReadBuffer getBody(int id) {
 		synchronized( synchronizer ) {
@@ -179,7 +179,7 @@ public class POP3MailBox {
 	/**
 	 * 
 	 * @param uidl
-	 * @return
+	 * @return Success of delete operation: true if successful.
 	 */
 	public boolean delete( String uidl )
 	{
@@ -193,7 +193,7 @@ public class POP3MailBox {
 	 * delete message on pop3 server
 	 * 
 	 * @param id message id
-	 * @return true if successful
+	 * @return Success of delete operation: true if successful.
 	 */
 	private boolean delete(int id)
 	{
@@ -215,7 +215,7 @@ public class POP3MailBox {
 	/**
 	 * 
 	 * @param uidl
-	 * @return
+	 * @return Message size in bytes.
 	 */
 	public int getSize( String uidl ) {
 		synchronized( synchronizer ) {
@@ -227,7 +227,7 @@ public class POP3MailBox {
 	 * get size of a message (via LIST command)
 	 * 
 	 * @param id message id
-	 * @return message size in bytes
+	 * @return Message size in bytes.
 	 */
 	private int getSize(int id) {
 		synchronized( synchronizer ) {
@@ -627,7 +627,7 @@ public class POP3MailBox {
 	}
 
 	/**
-	 * @return
+	 * @return The amount of e-mails available.
 	 */
 	public int getNumMails() {
 		synchronized( synchronizer ) {
@@ -641,7 +641,7 @@ public class POP3MailBox {
 	}
 
 	/**
-	 * @return
+	 * @return The most recent error message.
 	 */
 	public String lastError() {
 		Debug.debug(Debug.DEBUG, "lastError()");
@@ -673,7 +673,7 @@ public class POP3MailBox {
 	 * returns number of message with given UIDL
 	 * 
 	 * @param uidl
-	 * @return
+	 * @return Message number.
 	 */
 	private int getIDfromUIDL( String uidl )
 	{
@@ -687,7 +687,7 @@ public class POP3MailBox {
 	/**
 	 * 
 	 * @param id
-	 * @return
+	 * @return UIDL.
 	 */
 	public String getUIDLfromID( int id )
 	{
@@ -695,7 +695,7 @@ public class POP3MailBox {
 	}
 	/**
 	 * 
-	 * @return
+	 * @return A list of the available UIDLs.
 	 */
 	public Object[] getUIDLs()
 	{

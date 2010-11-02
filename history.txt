@@ -38,6 +38,12 @@
     * Router: Set permissions on wrapper.log when not called by RouterLaunch
     * Systray: New doc and main()
 
+2010-10-22 sponge
+    * Sanity and some fixs for slackware package
+
+2010-10-22 sponge
+    * Fix rc.i2p for slackware package
+
 2010-10-19 zzz
     * Escape & in logs and i2psnark (much more to do)
     * JobImpl: Deprecate two debugging methods
@@ -148,6 +154,12 @@
       - Comments
       - Logging cleanup
       - Comment out a main()
+
+2010-10-10 sponge
+    * Fulfill Request for name resolving in BOB
+
+2010-09-15 dr|z3d
+    * I2PSnark: Overhaul UI, implement new theme.
 
 * 2010-07-12  0.8 released
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P i2ptunnel\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-07-01 04:52+0000\n"
+"POT-Creation-Date: 2010-10-04 02:45+0000\n"
 "PO-Revision-Date: 2010-05-29 10:57+0800\n"
 "Last-Translator: walking <walking@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: Chinese\n"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:493
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:492
 #, java-format
 msgid ""
 "To visit the destination in your host database, click <a href=\"{0}\">here</"
@@ -35,55 +35,55 @@ msgstr ""
 "请点击下面的链接通过【跳转(Jump)】服务提供的【地址助手】链接跳转至域名对应的"
 "主机："
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:369
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:372
 msgid "New Tunnel"
 msgstr "新建隧道"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:389
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:392
 msgid "Standard client"
 msgstr "标准客户端"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:390
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:393
 msgid "HTTP client"
 msgstr "HTTP 客户端"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:391
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:394
 msgid "IRC client"
 msgstr "IRC 客户端"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:392
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:395
 msgid "Standard server"
 msgstr "标准服务器"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:393
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:396
 msgid "HTTP server"
 msgstr "HTTP 服务器"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:394
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:397
 msgid "SOCKS 4/4a/5 proxy"
 msgstr "SOCKS4/4A/5 代理"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:395
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:398
 msgid "SOCKS IRC proxy"
 msgstr "SOCKS IRC 代理"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:396
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:399
 msgid "CONNECT/SSL/HTTPS proxy"
 msgstr "CONNECT/SSL/HTTPS 代理"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:397
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:400
 msgid "IRC server"
 msgstr "IRC 服务器"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:398
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:401
 msgid "Streamr client"
 msgstr "Streamr 客户端"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:399
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:402
 msgid "Streamr server"
 msgstr "Streamr 服务器"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:400
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:403
 msgid "HTTP bidir"
 msgstr "双向http"
 
