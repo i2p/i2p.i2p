@@ -1007,7 +1007,7 @@ public class I2PSnarkServlet extends Default {
         out.write(_("Add torrent"));
         out.write("\" name=\"foo\" ><br>\n");
         out.write("<tr><td>&nbsp;<td><span class=\"snarkAddInfo\">");
-        out.write(_("You can also copy .torrent files to: {0}", "<code>" + _manager.getDataDir().getAbsolutePath ())) + "</code>.";
+        out.write(_("You can also copy .torrent files to: {0}.", "<code>" + _manager.getDataDir().getAbsolutePath ())) + "</code>";
         out.write("\n");
         out.write(_("Removing a .torrent will cause it to stop."));
         out.write("<br></span></table>\n");
