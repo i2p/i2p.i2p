@@ -9,8 +9,8 @@ Package: i2p
 Architecture: all
 Section: net
 Priority: optional
-Depends: java-runtime
-Description: load-balanced unspoofable packet switching network
+Depends: sun-java6-jre | default-jre | java-runtime
+Description: Load-balanced unspoofable packet switching network
  I2P is an anonymizing network, offering a simple layer that identity-sensitive
  applications can use to securely communicate. All data is wrapped with several
  layers of encryption, and the network is both distributed and dynamic, with no

@@ -1,4 +1,12 @@
 #!/bin/sh
+
+# $1 is either "remove" or "purge". Since there are no config
+# files left after a remove, exit here if called with "purge".
+# This avoids calling userdel again which would cause an error.
+if [ "$1" = "purge" ]; then
+	exit 0;
+fi
+
 I2PUSER=i2psvc
 exec userdel $I2PUSER
 

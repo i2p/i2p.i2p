@@ -17,6 +17,11 @@ I2P () {
 	su i2psvc -c "/usr/lib/i2p/i2prouter $1"
 }
 
+if [ `id -un` != "root" ]; then
+	echo "This script ($0) must be run as root"
+	exit 1
+fi
+
 case "$1" in
   start)
 	log_daemon_msg "Starting I2P" "i2p"
