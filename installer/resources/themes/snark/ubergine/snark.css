@@ -92,10 +92,18 @@ body {
      border-radius: 4px 0 0 0;
      border: 1px solid #000;
      overflow: auto;
-     color: #22f;
+     color: #26f;
      height: 70px;
      width: auto;
      background: #101 url('/themes/snark/ubergine/images/hat.png') no-repeat scroll right center;
+}
+
+.snarkMessages a:link {
+     color: #37f !important;
+}
+
+.snarkMessages a:hover {
+     color: #59f !important;
 }
 
 .logshim {
@@ -108,7 +116,7 @@ pre {
      padding: 0;
      text-align: left !important;
      height: 8px;
-	 color: #51a;
+	 color: #13f;
      font-weight: bold !important; 
 }
 
