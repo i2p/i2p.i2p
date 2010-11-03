@@ -243,10 +243,10 @@ public class I2PSnarkServlet extends Default {
         out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/status.png\"");
         out.write(" title=\"");
         out.write(_("Status"));
-        out.write("\">");
+        out.write("\"> ");
         out.write(_("Status"));
         if (_manager.util().connected() && !snarks.isEmpty()) {
-            out.write("<a href=\"");
+            out.write(" <a href=\"");
             out.write(req.getRequestURI());
             if (peerParam != null) {
                 out.write("\">");
@@ -698,55 +698,55 @@ public class I2PSnarkServlet extends Default {
             if (isRunning && curPeers > 0 && !showPeers)
                 statusString = "<img border=\"0\" src=\"/themes/snark/ubergine/images/trackererror.png\" title=\"" + _("Tracker Error") +
                                "\"><a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">" +
-                               curPeers + '/' +
+                               ' ' + curPeers + "&thinsp;/&thinsp;" +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning)
                 statusString = "<img border=\"0\" src=\"/themes/snark/ubergine/images/trackererror.png\" title=\"" + _("Tracker Error") +
-                               "\">" + curPeers + '/' +
+                               "\">" + ' ' + curPeers + "&thinsp;/&thinsp;" +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else {
                 if (err.length() > MAX_DISPLAYED_ERROR_LENGTH)
                     err = err.substring(0, MAX_DISPLAYED_ERROR_LENGTH) + "&hellip;";
                 statusString = "<img border=\"0\" src=\"/themes/snark/ubergine/images/trackererror.png\" title=\"" + _("Tracker Error") +
-                "\">" + err + "</a>";
+                "\"> " + err + "</a>";
             }
         } else if (remaining <= 0) {
             if (isRunning && curPeers > 0 && !showPeers)
                 statusString = "<img border=\"0\" src=\"/themes/snark/ubergine/images/seeding.png\" title=\"" + _("Seeding") + "\">" +
                                "<a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">" +
-                               curPeers + '/' +
+                               ' ' + curPeers + "&thinsp;/&thinsp;" +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning)
                 statusString = "<img border=\"0\" src=\"/themes/snark/ubergine/images/seeding.png\" title=\"" + _("Seeding") + "\">" + 
-                               curPeers + "/" +
+                               ' ' + curPeers + "&thinsp;/&thinsp;" +
                                ngettext("1 peer", "{0} peers", knownPeers)  + "</a>";
             else
-                statusString = "<img border=\"0\" src=\"/themes/snark/ubergine/images/complete.png\" title=\"" + _("Complete") + "\">" + _("Complete");
+                statusString = "<img border=\"0\" src=\"/themes/snark/ubergine/images/complete.png\" title=\"" + _("Complete") + "\"> " + _("Complete");
         } else {
             if (isRunning && curPeers > 0 && downBps > 0 && !showPeers)
                 statusString = "<img border=\"0\" src=\"/themes/snark/ubergine/images/downloading.png\" title=\"" + _("Downloading") + "\">" +
                                "<a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">" +
-                               curPeers + "/" +
+                               ' ' + curPeers + "&thinsp;/&thinsp;" +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning && curPeers > 0 && downBps > 0)
                 statusString = "<img border=\"0\" src=\"/themes/snark/ubergine/images/downloading.png\" title=\"" + _("Downloading") + "\">" +
-                               curPeers + "/" +
+                               ' ' + curPeers + "&thinsp;/&thinsp;" +
                                ngettext("1 peer", "{0} peers", knownPeers);
             else if (isRunning && curPeers > 0 && !showPeers)
                 statusString = "<img border=\"0\" src=\"/themes/snark/ubergine/images/stalled.png\" title=\"" + _("Stalled") + "\">" +
                                "<a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">" +
-                               curPeers + '/' +
+                               ' ' + curPeers + "&thinsp;/&thinsp;" +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning && curPeers > 0)
                 statusString = "<img border=\"0\" src=\"/themes/snark/ubergine/images/stalled.png\" title=\"" + _("Stalled") + "\">" + 
-                               curPeers + '/' +
+                               ' ' + curPeers + "&thinsp;/&thinsp;" +
                                ngettext("1 peer", "{0} peers", knownPeers);
             else if (isRunning)
                 statusString = "<img border=\"0\" src=\"/themes/snark/ubergine/images/nopeers.png\" title=\"" + _("No Peers") + "\">" + 
-                               curPeers + "/" +
+                               ' ' + curPeers + "&thinsp;/&thinsp;" +
                                ngettext("1 peer", "{0} peers", knownPeers);
             else
-                statusString = "<img border=\"0\" src=\"/themes/snark/ubergine/images/stopped.png\" title=\"" + _("Stopped") + "\">" + _("Stopped");
+                statusString = "<img border=\"0\" src=\"/themes/snark/ubergine/images/stopped.png\" title=\"" + _("Stopped") + "\"> " + _("Stopped");
         }
         
         String rowClass = (row % 2 == 0 ? "snarkTorrentEven" : "snarkTorrentOdd");
@@ -831,7 +831,7 @@ public class I2PSnarkServlet extends Default {
             out.write(_("Stop the torrent"));
             out.write("\">");
             out.write("<img src=\"/themes/snark/ubergine/images/stop.png\" title=\"");
-            out.write(_("Stop"));
+            out.write(_("Stop the torrent"));
             out.write("\" alt=\"");
             out.write(_("Stop"));
             out.write("\">");
@@ -859,7 +859,7 @@ public class I2PSnarkServlet extends Default {
             out.write(_("Are you sure you want to delete the file \\''{0}.torrent\\'' (downloaded data will not be deleted) ?", fullFilename));
             out.write("')) { return false; }\">");
             out.write("<img src=\"/themes/snark/ubergine/images/remove.png\" title=\"");
-            out.write(_("Remove"));
+            out.write(_("Remove the torrent from the active list, deleting the .torrent file"));
             out.write("\" alt=\"");
             out.write(_("Remove"));
             out.write("\">");
@@ -874,7 +874,7 @@ public class I2PSnarkServlet extends Default {
             out.write(_("Are you sure you want to delete the torrent \\''{0}\\'' and all downloaded data?", fullFilename));
             out.write("')) { return false; }\">");
             out.write("<img src=\"/themes/snark/ubergine/images/delete.png\" title=\"");
-            out.write(_("Delete"));
+            out.write(_("Delete the .torrent file and the associated data file(s)"));
             out.write("\" alt=\"");
             out.write(_("Delete"));
             out.write("\">");
@@ -1541,7 +1541,8 @@ public class I2PSnarkServlet extends Default {
                  plc.endsWith(".ape"))
             icon = "music";
         else if (mime.startsWith("video/") || plc.endsWith(".mkv") || plc.endsWith(".m4v") ||
-                 plc.endsWith(".mp4") || plc.endsWith(".wmv") || plc.endsWith(".flv"))
+                 plc.endsWith(".mp4") || plc.endsWith(".wmv") || plc.endsWith(".flv") ||
+                 plc.endsWith(".ogm"))
             icon = "film";
         else if (mime.equals("application/zip") || mime.equals("application/x-gtar") ||
                  mime.equals("application/compress") || mime.equals("application/gzip") ||
