@@ -54,6 +54,7 @@ public class SnarkManager implements Snark.CompleteListener {
     public static final String PROP_DIR = "i2psnark.dir";
     public static final String PROP_META_PREFIX = "i2psnark.zmeta.";
     public static final String PROP_META_BITFIELD_SUFFIX = ".bitfield";
+    public static final String PROP_META_PRIORITY_SUFFIX = ".priority";
 
     private static final String CONFIG_FILE = "i2psnark.config";
     public static final String PROP_AUTO_START = "i2snark.autoStart";   // oops
@@ -510,6 +511,7 @@ public class SnarkManager implements Snark.CompleteListener {
                         torrent = new Snark(_util, filename, null, -1, null, null, this,
                                             _peerCoordinatorSet, _connectionAcceptor,
                                             false, dataDir.getPath());
+                        loadSavedFilePriorities(torrent);
                         torrent.completeListener = this;
                         synchronized (_snarks) {
                             _snarks.put(filename, torrent);
@@ -588,6 +590,33 @@ public class SnarkManager implements Snark.CompleteListener {
     }
     
     /**
+     * Get the saved priorities for a torrent from the config file.
+     * @since 0.8.1
+     */
+    public void loadSavedFilePriorities(Snark snark) {
+        MetaInfo metainfo = snark.meta;
+        if (metainfo.getFiles() == null)
+            return;
+        byte[] ih = metainfo.getInfoHash();
+        String infohash = Base64.encode(ih);
+        infohash = infohash.replace('=', '$');
+        String pri = _config.getProperty(PROP_META_PREFIX + infohash + PROP_META_PRIORITY_SUFFIX);
+        if (pri == null)
+            return;
+        int filecount = metainfo.getFiles().size();
+        int[] rv = new int[filecount];
+        String[] arr = pri.split(",");
+        for (int i = 0; i < filecount && i < arr.length; i++) {
+            if (arr[i].length() > 0) {
+                try {
+                    rv[i] = Integer.parseInt(arr[i]);
+                } catch (Throwable t) {}
+            }
+        }
+        snark.storage.setFilePriorities(rv);
+    }
+    
+    /**
      * Save the completion status of a torrent and the current time in the config file
      * in the form "i2psnark.zmeta.$base64infohash=$time,$base64bitfield".
      * The config file property key is appended with the Base64 of the infohash,
@@ -595,8 +624,9 @@ public class SnarkManager implements Snark.CompleteListener {
      * The time is a standard long converted to string.
      * The status is either a bitfield converted to Base64 or "." for a completed
      * torrent to save space in the config file and in memory.
+     * @param priorities may be null
      */
-    public void saveTorrentStatus(MetaInfo metainfo, BitField bitfield) {
+    public void saveTorrentStatus(MetaInfo metainfo, BitField bitfield, int[] priorities) {
         byte[] ih = metainfo.getInfoHash();
         String infohash = Base64.encode(ih);
         infohash = infohash.replace('=', '$');
@@ -609,6 +639,34 @@ public class SnarkManager implements Snark.CompleteListener {
           bfs = Base64.encode(bf);
         }
         _config.setProperty(PROP_META_PREFIX + infohash + PROP_META_BITFIELD_SUFFIX, now + "," + bfs);
+
+        // now the file priorities
+        String prop = PROP_META_PREFIX + infohash + PROP_META_PRIORITY_SUFFIX;
+        if (priorities != null) {
+            boolean nonzero = false;
+            for (int i = 0; i < priorities.length; i++) {
+                if (priorities[i] != 0) {
+                    nonzero = true;
+                    break;
+                }
+            }
+            if (nonzero) {
+                // generate string like -5,,4,3,,,,,,-2 where no number is zero.
+                StringBuilder buf = new StringBuilder(2 * priorities.length);
+                for (int i = 0; i < priorities.length; i++) {
+                    if (priorities[i] != 0)
+                        buf.append(Integer.toString(priorities[i]));
+                    if (i != priorities.length - 1)
+                        buf.append(',');
+                }
+                _config.setProperty(prop, buf.toString());
+            } else {
+                _config.remove(prop);
+            }
+        } else {
+            _config.remove(prop);
+        }
+
         saveConfig();
     }
     
@@ -621,6 +679,7 @@ public class SnarkManager implements Snark.CompleteListener {
         String infohash = Base64.encode(ih);
         infohash = infohash.replace('=', '$');
         _config.remove(PROP_META_PREFIX + infohash + PROP_META_BITFIELD_SUFFIX);
+        _config.remove(PROP_META_PREFIX + infohash + PROP_META_PRIORITY_SUFFIX);
         saveConfig();
     }
     
@@ -742,7 +801,7 @@ public class SnarkManager implements Snark.CompleteListener {
     }
     
     public void updateStatus(Snark snark) {
-        saveTorrentStatus(snark.meta, snark.storage.getBitField());
+        saveTorrentStatus(snark.meta, snark.storage.getBitField(), snark.storage.getFilePriorities());
     }
     
     private void monitorTorrents(File dir) {

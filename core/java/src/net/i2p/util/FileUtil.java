@@ -13,10 +13,18 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarOutputStream;
-import java.util.jar.Pack200;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+// Pack200 import
+// you must also uncomment the correct line in unpack() below
+// For gcj, gij, etc., comment both out
+//
+// For Sun, OpenJDK, IcedTea, etc, use this
+import java.util.jar.Pack200;
+
+// For Apache Harmony or if you put its pack200.jar in your library directory use this
+//import org.apache.harmony.unpack200.Archive;
 
 /**
  * General helper methods for messing with files
@@ -119,7 +127,7 @@ public class FileUtil {
                         if (entry.getName().endsWith(".jar.pack") || entry.getName().endsWith(".war.pack")) {
                             target = new File(targetDir, entry.getName().substring(0, entry.getName().length() - ".pack".length()));
                             JarOutputStream fos = new JarOutputStream(new FileOutputStream(target));
-                            Pack200.newUnpacker().unpack(in, fos);
+                            unpack(in, fos);
                             fos.close();
                             System.err.println("INFO: File [" + entry.getName() + "] extracted and unpacked");
                         } else {
@@ -189,9 +197,7 @@ public class FileUtil {
                 } else {
                     if (p200TestRequired &&
                         (entry.getName().endsWith(".jar.pack") || entry.getName().endsWith(".war.pack"))) {
-                        try {
-                            Class.forName("java.util.jar.Pack200", false, ClassLoader.getSystemClassLoader());
-                        } catch (Exception e) {  // ClassNotFoundException but compiler not happy with that
+                        if (!isPack200Supported()) {
                             System.err.println("ERROR: Zip verify failed, your JVM does not support unpack200");
                             return false;
                         }
@@ -224,6 +230,40 @@ public class FileUtil {
         }
     }
     
+    /**
+     * This won't work right if one of the two options in unpack() is commented out.
+     * @since 0.8.1
+     */
+    private static boolean isPack200Supported() {
+        try {
+            Class.forName("java.util.jar.Pack200", false, ClassLoader.getSystemClassLoader());
+            return true;
+        } catch (Exception e) {}
+        try {
+            Class.forName("org.apache.harmony.pack200.Archive", false, ClassLoader.getSystemClassLoader());
+            return true;
+        } catch (Exception e) {}
+        return false;
+    }
+
+    /**
+     * Caller must close streams
+     * @since 0.8.1
+     */
+    private static void unpack(InputStream in, JarOutputStream out) throws Exception {
+        // For Sun, OpenJDK, IcedTea, etc, use this
+        Pack200.newUnpacker().unpack(in, out);
+
+        // ------------------
+        // For Apache Harmony or if you put its pack200.jar in your library directory use this
+        //(new Archive(in, out)).unpack();
+
+
+        // ------------------
+        // For gcj, gij, etc., use this
+        //throw new IOException("Pack200 not supported");
+    }
+
     /**
      * Read in the last few lines of a (newline delimited) textfile, or null if
      * the file doesn't exist.  
@@ -352,6 +392,18 @@ public class FileUtil {
             boolean copied = FileUtil.copy(args[1], args[2], false);
             if (!copied) 
                 System.err.println("Error copying [" + args[1] + "] to [" + args[2] + "]");
+        } else if ("unzip".equals(args[0])) {
+            File f = new File(args[1]);
+            File to = new File("tmp");
+            to.mkdir();
+            boolean copied = verifyZip(f);
+            if (!copied) 
+                System.err.println("Error verifying " + args[1]);
+            copied = extractZip(f,  to);
+            if (copied) 
+                System.err.println("Unzipped [" + args[1] + "] to [" + to + "]");
+            else
+                System.err.println("Error unzipping [" + args[1] + "] to [" + to + "]");
         }
     }
     

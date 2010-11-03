@@ -6,6 +6,14 @@
     <!--
         <property name="javac.compilerargs" value="-warn:-unchecked,raw,unused,serial" />
     -->
+    <!-- Add Apache Harmony's Pack200 library if you don't have java.util.jar.Pack200
+         See core/java/src/net/i2p/util/FileUtil.java for code changes required
+         to use this library instead of Sun's version.
+         Or to comment it all out if you don't have either.
+    -->
+    <!--
+        <property name="javac.classpath" value="/PATH/TO/pack200.jar" />
+    -->
 
     <!-- You probably don't want to change anything from here down -->
     <target name="help" depends="all" />

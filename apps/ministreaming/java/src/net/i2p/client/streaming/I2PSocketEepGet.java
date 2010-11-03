@@ -45,6 +45,10 @@ public class I2PSocketEepGet extends EepGet {
     /** this replaces _proxy in the superclass. Sadly, I2PSocket does not extend Socket. */
     private I2PSocket _socket;
     
+    /** from ConnectionOptions */
+    private static final String PROP_CONNECT_DELAY = "i2p.streaming.connectDelay";
+    private static final String CONNECT_DELAY = "500";
+
     public I2PSocketEepGet(I2PAppContext ctx, I2PSocketManager mgr, int numRetries, String outputFile, String url) {
         this(ctx, mgr, numRetries, -1, -1, outputFile, null, url);
     }
@@ -123,6 +127,10 @@ public class I2PSocketEepGet extends EepGet {
                 Properties props = new Properties();
                 props.setProperty(I2PSocketOptions.PROP_CONNECT_TIMEOUT, "" + CONNECT_TIMEOUT);
                 props.setProperty(I2PSocketOptions.PROP_READ_TIMEOUT, "" + INACTIVITY_TIMEOUT);
+                // This is important - even if the underlying socket doesn't have a connect delay,
+                // we want to set it for this connection, so the request headers will go out
+                // in the SYN packet, saving one RTT.
+                props.setProperty(PROP_CONNECT_DELAY, CONNECT_DELAY);
                 I2PSocketOptions opts = _socketManager.buildOptions(props);
                 _socket = _socketManager.connect(dest, opts);
             } else {

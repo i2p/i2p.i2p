@@ -175,7 +175,7 @@ public class EditBean extends IndexBean {
     }
     
     public String getAccessList(int tunnel) {
-        return getProperty(tunnel, "i2cp.accessList", "").replaceAll(",", "\n");
+        return getProperty(tunnel, "i2cp.accessList", "").replace(",", "\n");
     }
     
     public boolean getClose(int tunnel) {

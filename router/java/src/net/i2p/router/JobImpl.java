@@ -39,11 +39,21 @@ public abstract class JobImpl implements Job {
         return buf.toString();
     }
     
+    /**
+     *  @deprecated
+     *  As of 0.8.1, this is a noop, as it just adds classes to the log manager
+     *  class list for no good reason. Logging in jobs is almost always
+     *  set explicitly rather than by class name.
+     */
     void addedToQueue() {
-        if (_context.logManager().getLog(getClass()).shouldLog(Log.DEBUG))
-            _addedBy = new Exception();
+        //if (_context.logManager().getLog(getClass()).shouldLog(Log.DEBUG))
+        //    _addedBy = new Exception();
     }
     
+    /**
+     *  @deprecated
+     *  @return null always
+     */
     public Exception getAddedBy() { return _addedBy; }
     public long getMadeReadyOn() { return _madeReadyOn; }
     public void madeReady() { _madeReadyOn = _context.clock().now(); }

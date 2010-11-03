@@ -112,7 +112,7 @@ public class TunnelRenderer {
             if (lifetime > 10*60)
                 lifetime = 10*60;
             int bps = 1024 * (int) cfg.getProcessedMessagesCount() / lifetime;
-            out.write("<td class=\"cells\" align=\"center\">" + bps + "Bps</td>");
+            out.write("<td class=\"cells\" align=\"center\">" + bps + " Bps</td>");
             if (cfg.getSendTo() == null)
                 out.write("<td class=\"cells\" align=\"center\">" + _("Outbound Endpoint") + "</td>");
             else if (cfg.getReceiveFrom() == null)

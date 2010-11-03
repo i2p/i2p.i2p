@@ -142,8 +142,9 @@ public class JobQueue {
     public void addJob(Job job) {
         if (job == null || !_alive) return;
 
-        if (job instanceof JobImpl)
-            ((JobImpl)job).addedToQueue();
+        // This does nothing
+        //if (job instanceof JobImpl)
+        //    ((JobImpl)job).addedToQueue();
 
         long numReady = 0;
         boolean alreadyExists = false;

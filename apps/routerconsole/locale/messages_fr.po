@@ -15,8 +15,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Language: German\n"
-"X-Poedit-Basepath: /home/lee/work/i2p/monotone/i2p.i2p/apps/routerconsole/java\n"
+"X-Poedit-Language: French\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:106
 msgid "config networking"

@@ -17,10 +17,11 @@
     </target>
     <!-- only used if not set by a higher build.xml -->
     <property name="javac.compilerargs" value="" />
+    <property name="javac.classpath" value="" />
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
-        <javac srcdir="./src" debug="true" source="1.5" target="1.5" deprecation="on" destdir="./build/obj" >
+        <javac srcdir="./src" debug="true" source="1.5" target="1.5" deprecation="on" destdir="./build/obj" classpath="${javac.classpath}" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
