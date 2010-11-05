@@ -535,6 +535,8 @@ public class DataHelper {
         else
             writeLong(out, DATE_LENGTH, date.getTime());
     }
+
+    /** @deprecated unused */
     public static byte[] toDate(Date date) throws IllegalArgumentException {
         if (date == null)
             return toLong(DATE_LENGTH, 0L);
