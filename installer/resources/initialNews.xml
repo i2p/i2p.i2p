@@ -26,18 +26,18 @@ Point your IRC client to <b>localhost:6668</b> and say hi to us on
 <div lang="de">
 <h4><ul><li>Gratulation zur erfolgreichen Installation von I2P!</li></ul></h4>
 <p>
-<b>Willkommen bei I2P!</b>
-Bitte noch <b>etwas Geduld</b> w&auml;hrend I2P startet und weitere I2P Router  findet.
+<b>Willkommen im I2P!</b>
+Hab noch <b>etwas Geduld</b> w&auml;hrend I2P startet und weitere I2P Router findet.
 </p>
 <p>
-Passe bitte In der Wartezeit <b>deine Einstellungen zur Bandbreite</b> auf der
-<a href="config.jsp">Einstellungsseite</a> an.
+Passe bitte in der Zwischenzeit <b>deine Einstellungen zur Bandbreite</b> auf der
+<a href="config.jsp">Einstellungsseite</a> an!
 </p>
 <p>
-Sobald auf der linken Seite eine "shared clients" Verbindung aufgelistet ist <b>besuche bitte</b> unsere <a href="http://www.i2p2.i2p/faq_de.html">FAQ</a>.
+<b>Besuche bitte</b> sobald auf der linken Seite eine "gemeinsam benutzte" Verbindung aufgelistet ist unsere <a href="http://www.i2p2.i2p/faq_de.html">FAQ</a>!
 </p>
 <p>
-Verbinde deinen IRC Klienten mit dem Server auf <b>localhost:6668</b> und sage Hallo zu uns im Kanal 
+Verbinde deinen IRC-Klienten mit dem Server auf <b>localhost:6668</b> und sage Hallo zu uns im Kanal 
 <a href="irc://127.0.0.1:6668/i2p-help">#i2p-help</a>, <a href="irc://127.0.0.1:6668/i2p-de">#i2p-de</a> oder <a href="irc://127.0.0.1:6668/i2p">#i2p</a>.
 </p>
 </div>
