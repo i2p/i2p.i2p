@@ -1,6 +1,8 @@
 #!/bin/bash
 # This script creates a Debian repository in ${DIR} using the reprepro tool.
 # The packages are signed with the key referenced in the newest changelog entry.
+#
+# TODO: error handling
 
 cd $(dirname $0)
 DIR=./repo
@@ -36,3 +38,5 @@ gpg --armor --export ${SIGNER} > ${DIR}/0x${KEYID}.asc
 echo Cleaning up...
 rm -f ${CONFFILE}
 rmdir ${CONFDIR}
+
+echo Debian repository created in `pwd`/${DIR}.
