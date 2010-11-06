@@ -44,6 +44,8 @@ public class LogsHelper extends HelperBase {
     }
     ******/
 
+    private final static String NL = System.getProperty("line.separator");
+
     /** formats in reverse order */
     private String formatMessages(List<String> msgs) {
         if (msgs.isEmpty())
@@ -55,6 +57,11 @@ public class LogsHelper extends HelperBase {
         for (int i = msgs.size(); i > 0; i--) { 
             String msg = msgs.get(i - 1);
             msg = msg.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+            // remove  last \n that LogRecordFormatter added
+            if (msg.endsWith(NL))
+                msg = msg.substring(0, msg.length() - NL.length());
+            // replace \n so that exception stack traces will format correctly and will paste nicely into pastebin
+            msg = msg.replace("\n", "<br>&nbsp;&nbsp;&nbsp;&nbsp;\n");
             buf.append("<li>");
             if (colorize) {
                 String color;
