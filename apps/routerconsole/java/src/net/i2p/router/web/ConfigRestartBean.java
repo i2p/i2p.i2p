@@ -62,12 +62,12 @@ public class ConfigRestartBean {
             buf.append("</b></center>");
         } else if (shuttingDown) {
             buf.append("<center><b>");
-            buf.append(_("Shutdown in {0}", DataHelper.formatDuration(timeRemaining), ctx));
+            buf.append(_("Shutdown in {0}", DataHelper.formatDuration2(timeRemaining), ctx));
             buf.append("</b></center><br>");
             buttons(ctx, buf, urlBase, systemNonce, SET1);
         } else if (restarting) {
             buf.append("<center><b>");
-            buf.append(_("Restart in {0}", DataHelper.formatDuration(timeRemaining), ctx));
+            buf.append(_("Restart in {0}", DataHelper.formatDuration2(timeRemaining), ctx));
             buf.append("</b></center><br>");
             buttons(ctx, buf, urlBase, systemNonce, SET2);
         } else {

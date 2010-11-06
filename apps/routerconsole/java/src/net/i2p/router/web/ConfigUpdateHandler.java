@@ -130,7 +130,7 @@ public class ConfigUpdateHandler extends FormHandler {
             try { oldFreq = Long.parseLong(oldFreqStr); } catch (NumberFormatException nfe) {}
         if (_refreshFrequency != oldFreq) {
             _context.router().setConfigSetting(PROP_REFRESH_FREQUENCY, ""+_refreshFrequency);
-            addFormNotice(_("Updating refresh frequency to") + " " + DataHelper.formatDuration(_refreshFrequency));
+            addFormNotice(_("Updating refresh frequency to") + " " + DataHelper.formatDuration2(_refreshFrequency));
         }
 
         if ( (_updatePolicy != null) && (_updatePolicy.length() > 0) ) {

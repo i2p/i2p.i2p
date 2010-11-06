@@ -1882,7 +1882,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         StringBuilder buf = new StringBuilder(512);
         buf.append("<h3 id=\"udpcon\">").append(_("UDP connections")).append(": ").append(peers.size());
         buf.append(". ").append(_("Limit")).append(": ").append(getMaxConnections());
-        buf.append(". ").append(_("Timeout")).append(": ").append(DataHelper.formatDuration(_expireTimeout));
+        buf.append(". ").append(_("Timeout")).append(": ").append(DataHelper.formatDuration2(_expireTimeout));
         buf.append(".</h3>\n");
         buf.append("<table>\n");
         buf.append("<tr><th class=\"smallhead\" nowrap><a href=\"#def.peer\">").append(_("Peer")).append("</a><br>");
@@ -1984,17 +1984,17 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (idleOut < 0) idleOut = 0;
             
             buf.append("<td class=\"cells\" align=\"right\">");
-            buf.append(idleIn);
-            buf.append("s / ");
-            buf.append(idleOut);
-            buf.append("s</td>");
+            buf.append(DataHelper.formatDuration2(1000 * idleIn));
+            buf.append("&thinsp/&thinsp;");
+            buf.append(DataHelper.formatDuration2(1000 * idleOut));
+            buf.append("</td>");
  
             int recvBps = (idleIn > 2 ? 0 : peer.getReceiveBps());
             int sendBps = (idleOut > 2 ? 0 : peer.getSendBps());
             
             buf.append("<td class=\"cells\" align=\"right\" nowrap>");
             buf.append(formatKBps(recvBps));
-            buf.append(" / ");
+            buf.append("&thinsp;/&thinsp;");
             buf.append(formatKBps(sendBps));
             //buf.append(" K/s");
             //buf.append(formatKBps(peer.getReceiveACKBps()));
@@ -2006,12 +2006,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             long uptime = now - peer.getKeyEstablishedTime();
             
             buf.append("<td class=\"cells\" align=\"right\">");
-            buf.append(DataHelper.formatDuration(uptime));
+            buf.append(DataHelper.formatDuration2(uptime));
             buf.append("</td>");
             
             buf.append("<td class=\"cells\" align=\"right\">");
-            buf.append(peer.getClockSkew() / 1000);
-            buf.append("s</td>");
+            buf.append(DataHelper.formatDuration2(peer.getClockSkew()));
+            buf.append("</td>");
             offsetTotal = offsetTotal + peer.getClockSkew();
 
             long sendWindow = peer.getSendWindowBytes();
@@ -2019,9 +2019,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append("<td class=\"cells\" align=\"right\">");
             buf.append(sendWindow/1024);
             buf.append("K");
-            buf.append(" / ").append(peer.getConcurrentSends());
-            buf.append(" / ").append(peer.getConcurrentSendWindow());
-            buf.append(" / ").append(peer.getConsecutiveSendRejections());
+            buf.append("&thinsp;/&thinsp;").append(peer.getConcurrentSends());
+            buf.append("&thinsp;/&thinsp;").append(peer.getConcurrentSendWindow());
+            buf.append("&thinsp;/&thinsp;").append(peer.getConsecutiveSendRejections());
             buf.append("</td>");
 
             buf.append("<td class=\"cells\" align=\"right\">");
@@ -2044,7 +2044,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append("</td>");
             
             buf.append("<td class=\"cells\" align=\"right\">");
-            buf.append(peer.getMTU()).append(" / ").append(peer.getReceiveMTU());
+            buf.append(peer.getMTU()).append("&thinsp;/&thinsp;").append(peer.getReceiveMTU());
             
             //.append('/');
             //buf.append(peer.getMTUIncreases()).append('/');
@@ -2104,10 +2104,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 //        buf.append("<tr><td colspan=\"16\"><hr></td></tr>\n");
         buf.append("<tr class=\"tablefooter\"> <td colspan=\"3\" align=\"left\"><b>").append(_("SUMMARY")).append("</b></td>" +
                    "<td align=\"center\" nowrap><b>");
-        buf.append(formatKBps(bpsIn)).append(" / ").append(formatKBps(bpsOut));
+        buf.append(formatKBps(bpsIn)).append("thinsp;/&thinsp;").append(formatKBps(bpsOut));
+        long x = numPeers > 0 ? uptimeMsTotal/numPeers : 0;
         buf.append("</b></td>" +
-                   "<td align=\"center\"><b>").append(numPeers > 0 ? DataHelper.formatDuration(uptimeMsTotal/numPeers) : "0s");
-        buf.append("</b></td><td align=\"center\"><b>").append(numPeers > 0 ? DataHelper.formatDuration(offsetTotal/numPeers) : "0ms").append("</b></td>\n" +
+                   "<td align=\"center\"><b>").append(DataHelper.formatDuration2(x));
+        x = numPeers > 0 ? offsetTotal/numPeers : 0;
+        buf.append("</b></td><td align=\"center\"><b>").append(DataHelper.formatDuration2(x)).append("</b></td>\n" +
                    "<td align=\"center\"><b>");
         buf.append(numPeers > 0 ? cwinTotal/(numPeers*1024) + "K" : "0K");
         buf.append("</b></td><td>&nbsp;</td>\n" +

@@ -803,7 +803,7 @@ public class I2PSnarkServlet extends Default {
         
         out.write("<td align=\"center\" class=\"snarkTorrentETA " + rowClass + "\">");
         if(isRunning && remainingSeconds > 0)
-            out.write(DataHelper.formatDuration(remainingSeconds*1000)); // (eta 6h)
+            out.write(DataHelper.formatDuration2(remainingSeconds*1000)); // (eta 6h)
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentDownloaded " + rowClass + "\">");
         if (remaining > 0)

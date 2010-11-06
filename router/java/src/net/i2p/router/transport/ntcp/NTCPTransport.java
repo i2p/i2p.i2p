@@ -709,7 +709,7 @@ public class NTCPTransport extends TransportImpl {
         StringBuilder buf = new StringBuilder(512);
         buf.append("<h3 id=\"ntcpcon\">").append(_("NTCP connections")).append(": ").append(peers.size());
         buf.append(". ").append(_("Limit")).append(": ").append(getMaxConnections());
-        buf.append(". ").append(_("Timeout")).append(": ").append(DataHelper.formatDuration(_pumper.getIdleTimeout()));
+        buf.append(". ").append(_("Timeout")).append(": ").append(DataHelper.formatDuration2(_pumper.getIdleTimeout()));
         buf.append(".</h3>\n" +
                    "<table>\n" +
                    "<tr><th><a href=\"#def.peer\">").append(_("Peer")).append("</a></th>" +
@@ -739,16 +739,16 @@ public class NTCPTransport extends TransportImpl {
             else
                 buf.append("<img src=\"/themes/console/images/outbound.png\" alt=\"Outbound\" title=\"").append(_("Outbound")).append("\"/>");
             buf.append("</td><td class=\"cells\" align=\"right\">");
-            buf.append(con.getTimeSinceReceive()/1000);
-            buf.append("s / ").append(con.getTimeSinceSend()/1000);
-            buf.append("s</td><td class=\"cells\" align=\"right\">");
+            buf.append(DataHelper.formatDuration2(con.getTimeSinceReceive()));
+            buf.append("&thinsp;/&thinsp;").append(DataHelper.formatDuration2(con.getTimeSinceSend()));
+            buf.append("</td><td class=\"cells\" align=\"right\">");
             if (con.getTimeSinceReceive() < 10*1000) {
                 buf.append(formatRate(con.getRecvRate()/1024));
                 bpsRecv += con.getRecvRate();
             } else {
                 buf.append(formatRate(0));
             }
-            buf.append(" / ");
+            buf.append("&thinsp;/&thinsp;");
             if (con.getTimeSinceSend() < 10*1000) {
                 buf.append(formatRate(con.getSendRate()/1024));
                 bpsSend += con.getSendRate();
@@ -756,11 +756,11 @@ public class NTCPTransport extends TransportImpl {
                 buf.append(formatRate(0));
             }
             //buf.append(" K/s");
-            buf.append("</td><td class=\"cells\" align=\"right\">").append(DataHelper.formatDuration(con.getUptime()));
+            buf.append("</td><td class=\"cells\" align=\"right\">").append(DataHelper.formatDuration2(con.getUptime()));
             totalUptime += con.getUptime();
             offsetTotal = offsetTotal + con.getClockSkew();
-            buf.append("</td><td class=\"cells\" align=\"right\">").append(con.getClockSkew());
-            buf.append("s</td><td class=\"cells\" align=\"right\">").append(con.getMessagesSent());
+            buf.append("</td><td class=\"cells\" align=\"right\">").append(DataHelper.formatDuration2(1000 * con.getClockSkew()));
+            buf.append("</td><td class=\"cells\" align=\"right\">").append(con.getMessagesSent());
             totalSend += con.getMessagesSent();
             buf.append("</td><td class=\"cells\" align=\"right\">").append(con.getMessagesReceived());
             totalRecv += con.getMessagesReceived();
@@ -785,9 +785,9 @@ public class NTCPTransport extends TransportImpl {
         if (!peers.isEmpty()) {
 //            buf.append("<tr> <td colspan=\"11\"><hr></td></tr>\n");
             buf.append("<tr class=\"tablefooter\"><td align=\"center\"><b>").append(peers.size()).append(' ').append(_("peers")).append("</b></td><td>&nbsp;</td><td>&nbsp;");
-            buf.append("</td><td align=\"center\"><b>").append(formatRate(bpsRecv/1024)).append("/").append(formatRate(bpsSend/1024)).append("</b>");
-            buf.append("</td><td align=\"center\"><b>").append(DataHelper.formatDuration(totalUptime/peers.size()));
-            buf.append("</b></td><td align=\"center\"><b>").append((!peers.isEmpty()) ? DataHelper.formatDuration(offsetTotal*1000/peers.size()) : "0ms");
+            buf.append("</td><td align=\"center\"><b>").append(formatRate(bpsRecv/1024)).append("&thinsp;/&thinsp;").append(formatRate(bpsSend/1024)).append("</b>");
+            buf.append("</td><td align=\"center\"><b>").append(DataHelper.formatDuration2(totalUptime/peers.size()));
+            buf.append("</b></td><td align=\"center\"><b>").append(DataHelper.formatDuration2(offsetTotal*1000/peers.size()));
             buf.append("</b></td><td align=\"center\"><b>").append(totalSend).append("</b></td><td align=\"center\"><b>").append(totalRecv);
             buf.append("</b></td><td>&nbsp;</td><td>&nbsp;</td></tr>\n");
         }

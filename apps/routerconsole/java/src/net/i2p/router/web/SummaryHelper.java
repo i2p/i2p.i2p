@@ -60,7 +60,7 @@ public class SummaryHelper extends HelperBase {
         if (router == null) 
             return "[not up]";
         else
-            return DataHelper.formatDuration(router.getUptime());
+            return DataHelper.formatDuration2(router.getUptime());
     }
     
 /**
@@ -74,7 +74,7 @@ public class SummaryHelper extends HelperBase {
         long diff = Math.abs(ms);
         if (diff < 3000)
             return "";
-        return " (" + DataHelper.formatDuration(diff) + " " + _("skew") + ")";
+        return " (" + DataHelper.formatDuration2(diff) + " " + _("skew") + ")";
     }
 **/
     
@@ -105,7 +105,7 @@ public class SummaryHelper extends HelperBase {
         long skew = _context.commSystem().getFramedAveragePeerClockSkew(33);
         // Display the actual skew, not the offset
         if (Math.abs(skew) > 30*1000)
-            return _("ERR-Clock Skew of {0}", DataHelper.formatDuration(Math.abs(skew)));
+            return _("ERR-Clock Skew of {0}", DataHelper.formatDuration2(Math.abs(skew)));
         if (_context.router().isHidden())
             return _("Hidden");
 
@@ -321,7 +321,7 @@ public class SummaryHelper extends HelperBase {
             fmt = new DecimalFormat("#0.0");
         else
             fmt = new DecimalFormat("#0.00");
-        return fmt.format(in) + " / " + fmt.format(out) +
+        return fmt.format(in) + "&thinsp;/&thinsp;" + fmt.format(out) + "&nbsp;" +
                (mega ? 'M' : 'K');
     }
 
@@ -336,7 +336,7 @@ public class SummaryHelper extends HelperBase {
         
         long received = _context.bandwidthLimiter().getTotalAllocatedInboundBytes();
 
-        return DataHelper.formatSize(received) + 'B';
+        return DataHelper.formatSize2(received) + 'B';
     }
     
     /**
@@ -349,7 +349,7 @@ public class SummaryHelper extends HelperBase {
             return "0";
         
         long sent = _context.bandwidthLimiter().getTotalAllocatedOutboundBytes();
-        return DataHelper.formatSize(sent) + 'B';
+        return DataHelper.formatSize2(sent) + 'B';
     }
     
     /**
@@ -389,7 +389,7 @@ public class SummaryHelper extends HelperBase {
                     long timeToExpire = ls.getEarliestLeaseDate() - _context.clock().now();
                     if (timeToExpire < 0) {
                         // red or yellow light                 
-                        buf.append("<td><img src=\"/themes/console/images/local_inprogress.png\" alt=\"").append(_("Rebuilding")).append("&hellip;\" title=\"").append(_("Leases expired")).append(" ").append(DataHelper.formatDuration(0-timeToExpire));
+                        buf.append("<td><img src=\"/themes/console/images/local_inprogress.png\" alt=\"").append(_("Rebuilding")).append("&hellip;\" title=\"").append(_("Leases expired")).append(" ").append(DataHelper.formatDuration2(0-timeToExpire));
                         buf.append(" ").append(_("ago")).append(". ").append(_("Rebuilding")).append("&hellip;\"></td></tr>\n");                    
                     } else {
                         // green light 
@@ -510,10 +510,10 @@ public class SummaryHelper extends HelperBase {
      */
     public String getJobLag() { 
         if (_context == null) 
-            return "0ms";
+            return "0 ms";
         
         Rate lagRate = _context.statManager().getRate("jobQueue.jobLag").getRate(60*1000);
-        return ((int)lagRate.getAverageValue()) + "ms";
+        return DataHelper.formatDuration2((long)lagRate.getAverageValue());
     }
  
     /**
@@ -523,9 +523,9 @@ public class SummaryHelper extends HelperBase {
      */   
     public String getMessageDelay() { 
         if (_context == null) 
-            return "0ms";
+            return "0 ms";
         
-        return _context.throttle().getMessageDelay() + "ms";
+        return DataHelper.formatDuration2(_context.throttle().getMessageDelay());
     }
     
     /**
@@ -535,9 +535,9 @@ public class SummaryHelper extends HelperBase {
      */
     public String getTunnelLag() { 
         if (_context == null) 
-            return "0ms";
+            return "0 ms";
         
-        return _context.throttle().getTunnelLag() + "ms";
+        return DataHelper.formatDuration2(_context.throttle().getTunnelLag());
     }
     
     public String getTunnelStatus() { 

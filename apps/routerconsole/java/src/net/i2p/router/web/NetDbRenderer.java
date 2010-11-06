@@ -150,9 +150,9 @@ public class NetDbRenderer {
             buf.append(")</b><br>\n");
             long exp = ls.getEarliestLeaseDate()-now;
             if (exp > 0)
-                buf.append(_("Expires in {0}", DataHelper.formatDuration(exp))).append("<br>\n");
+                buf.append(_("Expires in {0}", DataHelper.formatDuration2(exp))).append("<br>\n");
             else
-                buf.append(_("Expired {0} ago", DataHelper.formatDuration(0-exp))).append("<br>\n");
+                buf.append(_("Expired {0} ago", DataHelper.formatDuration2(0-exp))).append("<br>\n");
             if (debug) {
                 buf.append("RAP? " + ls.getReceivedAsPublished() + ' ');
                 buf.append("RAR? " + ls.getReceivedAsReply() + ' ');
@@ -352,13 +352,13 @@ public class NetDbRenderer {
         long age = _context.clock().now() - info.getPublished();
         if (isUs && _context.router().isHidden()) {
             buf.append("<b>").append(_("Hidden")).append(", ").append(_("Updated")).append(":</b> ")
-               .append(_("{0} ago", DataHelper.formatDuration(age))).append("<br>\n");
+               .append(_("{0} ago", DataHelper.formatDuration2(age))).append("<br>\n");
         } else if (age > 0) {
             buf.append("<b>").append(_("Published")).append(":</b> ")
-               .append(_("{0} ago", DataHelper.formatDuration(age))).append("<br>\n");
+               .append(_("{0} ago", DataHelper.formatDuration2(age))).append("<br>\n");
         } else {
             // shouldnt happen
-            buf.append("<b>" + _("Published") + ":</b> in ").append(DataHelper.formatDuration(0-age)).append("???<br>\n");
+            buf.append("<b>" + _("Published") + ":</b> in ").append(DataHelper.formatDuration2(0-age)).append("???<br>\n");
         }
         buf.append("<b>" + _("Address(es)") + ":</b> ");
         String country = _context.commSystem().getCountry(info.getIdentity().getHash());

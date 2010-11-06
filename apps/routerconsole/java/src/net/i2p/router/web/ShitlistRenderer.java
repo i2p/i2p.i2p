@@ -52,7 +52,7 @@ public class ShitlistRenderer {
             buf.append("<li>").append(_context.commSystem().renderPeerHTML(key));
             buf.append(' ');
             long expires = entry.expireOn-_context.clock().now();
-            String expireString = DataHelper.formatDuration(expires);
+            String expireString = DataHelper.formatDuration2(expires);
             if (expires < 5l*24*60*60*1000)
                 buf.append(_("Temporary ban expiring in {0}", expireString));
             else

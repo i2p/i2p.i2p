@@ -93,7 +93,7 @@ public class GraphHelper extends HelperBase {
                 SummaryListener lsnr = (SummaryListener)iter.next();
                 Rate r = lsnr.getRate();
                 // e.g. "statname for 60m"
-                String title = _("{0} for {1}", r.getRateStat().getName(), DataHelper.formatDuration(_periodCount * r.getPeriod()));
+                String title = _("{0} for {1}", r.getRateStat().getName(), DataHelper.formatDuration2(_periodCount * r.getPeriod()));
                 _out.write("<a href=\"viewstat.jsp?stat="
                            + r.getRateStat().getName() 
                            + "&amp;showEvents=" + _showEvents

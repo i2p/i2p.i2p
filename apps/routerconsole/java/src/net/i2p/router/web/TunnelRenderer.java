@@ -102,7 +102,7 @@ public class TunnelRenderer {
                 out.write("<td class=\"cells\">&nbsp;</td>");
             long timeLeft = cfg.getExpiration()-_context.clock().now();
             if (timeLeft > 0)
-                out.write("<td class=\"cells\" align=\"center\">" + DataHelper.formatDuration(timeLeft) + "</td>");
+                out.write("<td class=\"cells\" align=\"center\">" + DataHelper.formatDuration2(timeLeft) + "</td>");
             else
                 out.write("<td class=\"cells\" align=\"center\">(" + _("grace period") + ")</td>");
             out.write("<td class=\"cells\" align=\"center\">" + cfg.getProcessedMessagesCount() + " KB</td>");
@@ -175,7 +175,7 @@ public class TunnelRenderer {
                 out.write("<tr> <td class=\"cells\" align=\"center\"><img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"Inbound\"></td>");
             else
                 out.write("<tr> <td class=\"cells\" align=\"center\"><img src=\"/themes/console/images/outbound.png\" alt=\"Outbound\" title=\"Outbound\"></td>");
-            out.write(" <td class=\"cells\" align=\"center\">" + DataHelper.formatDuration(timeLeft) + "</td>\n");
+            out.write(" <td class=\"cells\" align=\"center\">" + DataHelper.formatDuration2(timeLeft) + "</td>\n");
             out.write(" <td class=\"cells\" align=\"center\">" + info.getProcessedMessagesCount() + " KB</td>\n");
             for (int j = 0; j < info.getLength(); j++) {
                 Hash peer = info.getPeer(j);

@@ -217,26 +217,26 @@ class ProfileOrganizerRenderer {
             buf.append("<td align=\"right\">").append(num(prof.getIntegrationValue())).append("</td>");
             long time;
             time = now - prof.getLastHeardAbout();
-            buf.append("<td align=\"right\">").append(DataHelper.formatDuration(time)).append("</td>");
+            buf.append("<td align=\"right\">").append(DataHelper.formatDuration2(time)).append("</td>");
             time = now - prof.getLastHeardFrom();
-            buf.append("<td align=\"right\">").append(DataHelper.formatDuration(time)).append("</td>");
+            buf.append("<td align=\"right\">").append(DataHelper.formatDuration2(time)).append("</td>");
             time = now - prof.getLastSendSuccessful();
-            buf.append("<td align=\"right\">").append(DataHelper.formatDuration(time)).append("</td>");
+            buf.append("<td align=\"right\">").append(DataHelper.formatDuration2(time)).append("</td>");
             time = now - prof.getLastSendFailed();
-            buf.append("<td align=\"right\">").append(DataHelper.formatDuration(time)).append("</td>");
+            buf.append("<td align=\"right\">").append(DataHelper.formatDuration2(time)).append("</td>");
             buf.append("<td align=\"right\">").append(avg(prof, 10*60*1000l)).append("</td>");
             buf.append("<td align=\"right\">").append(avg(prof, 60*60*1000l)).append("</td>");
             buf.append("<td align=\"right\">").append(avg(prof, 24*60*60*1000l)).append("</td>");
             DBHistory dbh = prof.getDBHistory();
             if (dbh != null) {
                 time = now - dbh.getLastLookupSuccessful();
-                buf.append("<td align=\"right\">").append(DataHelper.formatDuration(time)).append("</td>");
+                buf.append("<td align=\"right\">").append(DataHelper.formatDuration2(time)).append("</td>");
                 time = now - dbh.getLastLookupFailed();
-                buf.append("<td align=\"right\">").append(DataHelper.formatDuration(time)).append("</td>");
+                buf.append("<td align=\"right\">").append(DataHelper.formatDuration2(time)).append("</td>");
                 time = now - dbh.getLastStoreSuccessful();
-                buf.append("<td align=\"right\">").append(DataHelper.formatDuration(time)).append("</td>");
+                buf.append("<td align=\"right\">").append(DataHelper.formatDuration2(time)).append("</td>");
                 time = now - dbh.getLastStoreFailed();
-                buf.append("<td align=\"right\">").append(DataHelper.formatDuration(time)).append("</td>");
+                buf.append("<td align=\"right\">").append(DataHelper.formatDuration2(time)).append("</td>");
                 buf.append("<td align=\"right\">").append(davg(dbh, 60*60*1000l)).append("</td>");
                 buf.append("<td align=\"right\">").append(davg(dbh, 24*60*60*1000l)).append("</td>");
             } else {
@@ -323,7 +323,7 @@ class ProfileOrganizerRenderer {
             if (c == 0)
                 return _(NA);
             double d = r.getCurrentTotalValue() + r.getLastTotalValue();
-            return Math.round(d/c) + "ms";
+            return DataHelper.formatDuration2(Math.round(d/c));
     }
 
     private String davg (DBHistory dbh, long rate) {

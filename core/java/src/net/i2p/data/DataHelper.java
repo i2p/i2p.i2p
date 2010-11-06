@@ -37,11 +37,13 @@ import java.util.Properties;
 import java.util.TreeMap;
 import java.util.zip.Deflater;
 
+import net.i2p.I2PAppContext;
 import net.i2p.util.ByteCache;
 import net.i2p.util.OrderedProperties;
 import net.i2p.util.ReusableGZIPInputStream;
 import net.i2p.util.ReusableGZIPOutputStream;
 import net.i2p.util.SecureFileOutputStream;
+import net.i2p.util.Translate;
 
 /**
  * Defines some simple IO routines for dealing with marshalling data structures
@@ -543,9 +545,11 @@ public class DataHelper {
         else
             return toLong(DATE_LENGTH, date.getTime());
     }
+
     public static void toDate(byte target[], int offset, long when) throws IllegalArgumentException {
         toLong(target, offset, DATE_LENGTH, when);
     }
+
     public static Date fromDate(byte src[], int offset) throws DataFormatException {
         if ( (src == null) || (offset + DATE_LENGTH > src.length) )
             throw new DataFormatException("Not enough data to read a date");
@@ -1038,6 +1042,9 @@ public class DataHelper {
         return rv;
     }
 
+    /**
+     *  NOTE: formatDuration2() recommended in most cases for readability
+     */
     public static String formatDuration(long ms) {
         if (ms < 5 * 1000) {
             return ms + "ms";
@@ -1055,7 +1062,67 @@ public class DataHelper {
     }
     
     /**
+     * Like formatDuration but with a non-breaking space after the number,
+     * 0 is unitless, and the unit is translated.
+     * This seems consistent with most style guides out there.
+     * Use only in HTML.
+     * Thresholds are a little lower than in formatDuration() also,
+     * as precision is less important in the GUI than in logging.
+     * @since 0.8.2
+     */
+    public static String formatDuration2(long ms) {
+        String t;
+        if (ms == 0) {
+            return "0";
+        } else if (ms < 3 * 1000) {
+            // NOTE TO TRANSLATORS: Feel free to translate all these as you see fit, there are several options...
+            // spaces or not, '.' or not, plural or not. Try not to make it too long, it is used in
+            // a lot of tables.
+            // milliseconds
+            // Note to translators, may be negative or zero, 2999 maximum.
+            // {0,number,####} prevents 1234 from being output as 1,234 in the English locale.
+            // If you want the digit separator in your locale, translate as {0}.
+            // alternates: msec, msecs
+            t = ngettext("1 ms", "{0,number,####} ms", (int) ms);
+        } else if (ms < 2 * 60 * 1000) {
+            // seconds
+            // Note to translators: quantity will always be greater than one.
+            // alternates: secs, sec. 'seconds' is probably too long.
+            t = ngettext("1 sec", "{0} sec", (int) (ms / 1000));
+        } else if (ms < 120 * 60 * 1000) {
+            // minutes
+            // Note to translators: quantity will always be greater than one.
+            // alternates: mins, min. 'minutes' is probably too long.
+            t = ngettext("1 min", "{0} min", (int) (ms / (60 * 1000)));
+        } else if (ms < 2 * 24 * 60 * 60 * 1000) {
+            // hours
+            // Note to translators: quantity will always be greater than one.
+            // alternates: hrs, hr., hrs.
+            t = ngettext("1 hour", "{0} hours", (int) (ms / (60 * 60 * 1000)));
+        } else if (ms > 1000l * 24l * 60l * 60l * 1000l) {
+            return _("n/a");
+        } else {
+            // days
+            // Note to translators: quantity will always be greater than one.
+            t = ngettext("1 day", "{0} days", (int) (ms / (24 * 60 * 60 * 1000)));
+        }
+        // do it here to keep &nbsp; out of the tags for translator sanity
+        return t.replace(" ", "&nbsp;");
+    }
+    
+    private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
+
+    private static String _(String key) {
+        return Translate.getString(key, I2PAppContext.getGlobalContext(), BUNDLE_NAME);
+    }
+
+    private static String ngettext(String s, String p, int n) {
+        return Translate.getString(n, s, p, I2PAppContext.getGlobalContext(), BUNDLE_NAME);
+    }
+
+    /**
      * Caller should append 'B' or 'b' as appropriate
+     * NOTE: formatDuration2() recommended in most cases for readability
      */
     public static String formatSize(long bytes) {
         double val = bytes;
@@ -1079,6 +1146,7 @@ public class DataHelper {
     
     /**
      * Like formatSize but with a non-breaking space after the number
+     * This seems consistent with most style guides out there.
      * Use only in HTML
      * @since 0.7.14
      */

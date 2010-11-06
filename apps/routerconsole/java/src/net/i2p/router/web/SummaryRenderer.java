@@ -78,7 +78,12 @@ class SummaryRenderer {
                 def.setBaseValue(1024);
             if (!hideTitle) {
                 String title;
-                String p = DataHelper.formatDuration(_listener.getRate().getPeriod());
+                String p;
+                // we want the formatting and translation of formatDuration2(), except not zh, and not the &nbsp;
+                if ("zh".equals(Messages.getLanguage(_context)))
+                    p = DataHelper.formatDuration(_listener.getRate().getPeriod());
+                else
+                    p = DataHelper.formatDuration2(_listener.getRate().getPeriod()).replace("&nbsp;", " ");
                 if (showEvents)
                     // Note to translators: all runtime zh translation disabled in this file, no font available in RRD
                     title = name + ' ' + _("events in {0}", p);

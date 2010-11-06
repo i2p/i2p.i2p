@@ -366,7 +366,7 @@ public class SummaryBarRenderer {
            .append(_("Used"))
            .append(":</b></td><td align=\"right\">")
            .append(_helper.getInboundTransferred())
-           .append(" / ")
+           .append("&thinsp;/&thinsp;")
            .append(_helper.getOutboundTransferred())
            .append("</td></tr></table>\n" +
 

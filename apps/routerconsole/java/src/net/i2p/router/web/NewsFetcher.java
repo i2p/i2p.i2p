@@ -80,13 +80,13 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
          long now = _context.clock().now();
          if (_lastUpdated > 0) {
              buf.append(Messages.getString("News last updated {0} ago.",
-                                           DataHelper.formatDuration(now - _lastUpdated),
+                                           DataHelper.formatDuration2(now - _lastUpdated),
                                            _context))
                 .append('\n');
          }
          if (_lastFetch > _lastUpdated) {
              buf.append(Messages.getString("News last checked {0} ago.",
-                                           DataHelper.formatDuration(now - _lastFetch),
+                                           DataHelper.formatDuration2(now - _lastFetch),
                                            _context));
          }
          return buf.toString();
@@ -136,7 +136,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
                 return true;
             } else {
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Last fetched " + DataHelper.formatDuration(_context.clock().now() - _lastFetch) + " ago");
+                    _log.debug("Last fetched " + DataHelper.formatDuration2(_context.clock().now() - _lastFetch) + " ago");
                 return false;
             }
         } catch (NumberFormatException nfe) {

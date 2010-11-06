@@ -32,8 +32,9 @@ then
 	sed 's/..,\(..*\)/_("\1");/' $CFILE >> $JFILE
 fi
 
-# list specific files in router/ here, so we don't scan the whole tree
+# list specific files in core/ and router/ here, so we don't scan the whole tree
 ROUTERFILES="\
+   ../../../core/java/src/net/i2p/data/DataHelper.java \
    ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java \
    ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java \
    ../../../router/java/src/net/i2p/router/transport/TransportManager.java \
