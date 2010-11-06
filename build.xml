@@ -37,6 +37,8 @@
         <echo message="  javadoc:   generate javadoc for the entire project into ./build/javadoc" />
         <echo message="  slackpkg:  generate Slackware packages in ./Slackware/i2p and ./Slackware/i2p-base" />
         <echo message="  debianhowto: instructions on building Debian packages" />
+        <echo message="  debian: generate Debian packages (source + binary)" />
+        <echo message="  debianrepo: build a Debian repository (reprepro required)" />
         <echo message="  updaterWithDesktopgui: tar the built files and desktopgui in an i2pupdate.zip" />
         <echo message="  pkgWithDesktopgui: distclean then package everything up with the desktopgui" />
         <echo message="  distWithDesktopgui: pkgWithDesktopgui and javadoc" />
@@ -212,7 +214,13 @@
     </target>
     <target name="distclean" depends="clean">
         <delete dir="debian/tmp" />
+        <delete dir="debian/repo" />
+        <delete dir="debian/db" />
         <delete file="debian/files" />
+        <delete file="debian/build" />
+        <delete>
+            <fileset dir=".." includes="i2p_*.tar.gz,i2p_*.deb,i2p_*.dsc,i2p_*.changes" />
+        </delete>
         <ant dir="core/java/" target="distclean" />
         <ant dir="router/java/" target="distclean" />
         <ant dir="apps/ministreaming/java/" target="distclean" />
@@ -889,6 +897,20 @@
     </target>
 
     <target name="debian">
+        <!-- same as debian-binary + debian-source, but only one build needed -->
+        <echo message="Did you update the version in these files?" />
+        <exec executable="ls" failonerror="true">
+            <arg value="-l" />
+            <arg value="debian/changelog" />
+        </exec>
+        <echo message="====================" />
+        <!-- bundle the 20MB jetty 5 lib since there probably isn't a deb for it -->
+        <ant dir="apps/jetty" target="verifyJettylib" />
+        <exec executable="dpkg-buildpackage" failifexecutionfails="true">
+            <arg value="-I_MTN" />
+        </exec>
+    </target>
+    <target name="debian-binary">
         <!-- binary only -->
         <echo message="Did you update the version in these files?" />
         <exec executable="ls" failonerror="true">
@@ -913,6 +935,9 @@
             <arg value="-S" />
             <arg value="-I_MTN" />
         </exec>
+    </target>
+    <target name="debianrepo" depends="debian">
+        <exec dir="debian" executable="./makerepo.sh" />
     </target>
 
 <!-- the following are appened to help build barebone portable version, 
