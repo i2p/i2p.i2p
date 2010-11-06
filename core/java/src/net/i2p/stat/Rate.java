@@ -10,6 +10,7 @@ import net.i2p.util.Log;
  * average value over a period, the number of events in that period, the maximum number
  * of events (using the interval between events), and lifetime data.
  *
+ * If value is always a constant, you should be using Frequency instead.
  */
 public class Rate {
     private final static Log _log = new Log(Rate.class);
@@ -70,7 +71,10 @@ public class Rate {
         return _extremeTotalValue;
     }
 
-    /** when the max(totalValue) was achieved, how many events occurred in that period? */
+    /**
+     * when the max(totalValue) was achieved, how many events occurred in that period?
+     * Note that this is not necesarily the highest event count; that isn't tracked.
+     */
     public long getExtremeEventCount() {
         return _extremeEventCount;
     }
@@ -144,13 +148,50 @@ public class Rate {
         load(props, prefix, treatAsCurrent);
     }
 
-    /** accrue the data in the current period as an instantaneous event */
+    /**
+     * Accrue the data in the current period as an instantaneous event.
+     * If value is always a constant, you should be using Frequency instead.
+     * If you always use this call, eventDuration is always zero,
+     * and the various get*Saturation*() and get*EventTime() methods will return zero.
+     */
     public void addData(long value) {
-        addData(value, 0);
+        synchronized (_lock) {
+            _currentTotalValue += value;
+            _currentEventCount++;
+            _lifetimeTotalValue += value;
+            _lifetimeEventCount++;
+        }
     }
 
     /**
      * Accrue the data in the current period as if the event took the specified amount of time
+     * If value is always a constant, you should be using Frequency instead.
+     * If eventDuration is nonzero, then the various get*Saturation*() and get*EventTime()
+     * methods will also return nonzero.
+     *
+     * <pre>
+     * There are at least 4 possible strategies for eventDuration:
+     *
+     *   1) eventDuration is always zero.
+     *      The various get*Saturation*() and get*EventTime() methods will return zero.
+     *
+     *   2) Each eventDuration is relatively small, and reflects processing time.
+     *      This is probably the original meaning of "saturation", as it allows you
+     *      to track how much time is spent gathering the stats.
+     *      get*EventTime() will be close to 0.
+     *      get*EventSaturation() will return values close to 0,
+     *      get*SaturationLimit() will return adjusted values for the totals.
+     *
+     *   3) The total of the eventDurations are approximately equal to total elapsed time.
+     *      get*EventTime() will be close to the period.
+     *      get*EventSaturation() will return values close to 1,
+     *      get*SaturationLimit() will return adjusted values for the totals.
+     *
+     *   4) Each eventDuration is not a duration at all, but someother independent data.
+     *      get*EventTime() may be used to retrieve the data.
+     *      get*EventSaturation() are probably useless.
+     *      get*SaturationLimit() are probably useless.
+     * </pre>
      *
      * @param value value to accrue in the current period
      * @param eventDuration how long it took to accrue this data (set to 0 if it was instantaneous)
@@ -195,7 +236,7 @@ public class Rate {
                 correctedTotalValue = _currentTotalValue *
                                       (_lastEventCount / (double) _currentEventCount);
 
-            if (_lastTotalValue > _extremeTotalValue) {
+            if (_lastTotalValue >= _extremeTotalValue) {  // get the most recent if identical
                 _extremeTotalValue = _lastTotalValue;
                 _extremeEventCount = _lastEventCount;
                 _extremeTotalEventTime = _lastTotalEventTime;
@@ -220,7 +261,10 @@ public class Rate {
         return 0.0D;
     }
 
-    /** what was the average value across the events in the most active period? */
+    /**
+     * During the extreme period (i.e. the period with the highest total value),
+     * what was the average value?
+     */
     public double getExtremeAverageValue() {
         if ((_extremeTotalValue != 0) && (_extremeEventCount > 0))
             return _extremeTotalValue / _extremeEventCount;
@@ -240,7 +284,7 @@ public class Rate {
      * During the last period, how much of the time was spent actually processing events in proportion 
      * to how many events could have occurred if there were no intervals?
      *
-     * @return percentage, or 0 if event times aren't used
+     * @return ratio, or 0 if event times aren't used
      */
     public double getLastEventSaturation() {
         if ((_lastEventCount > 0) && (_lastTotalEventTime > 0)) {
@@ -256,10 +300,11 @@ public class Rate {
     }
 
     /** 
-     * During the extreme period, how much of the time was spent actually processing events
+     * During the extreme period (i.e. the period with the highest total value),
+     * how much of the time was spent actually processing events
      * in proportion to how many events could have occurred if there were no intervals? 
      *
-     * @return percentage, or 0 if the statistic doesn't use event times
+     * @return ratio, or 0 if the statistic doesn't use event times
      */
     public double getExtremeEventSaturation() {
         if ((_extremeEventCount > 0) && (_extremeTotalEventTime > 0)) {
@@ -274,7 +319,7 @@ public class Rate {
      * During the lifetime of this stat, how much of the time was spent actually processing events in proportion 
      * to how many events could have occurred if there were no intervals? 
      *
-     * @return percentage, or 0 if event times aren't used
+     * @return ratio, or 0 if event times aren't used
      */
     public double getLifetimeEventSaturation() {
         if ((_lastEventCount > 0) && (_lifetimeTotalEventTime > 0)) {
@@ -311,7 +356,8 @@ public class Rate {
     }
 
     /** 
-     * using the extreme period's rate, what is the total value that could have been 
+     * During the extreme period (i.e. the period with the highest total value),
+     * what is the total value that could have been 
      * sent if events were constant?
      *
      * @return event total at saturation, or 0 if no event times are measured
@@ -328,8 +374,9 @@ public class Rate {
     }
 
     /**
-     * How large was the last period's value as compared to the largest period ever?
-     *
+     * What was the total value, compared to the total value in
+     * the extreme period (i.e. the period with the highest total value),
+     * Warning- returns ratio, not percentage (i.e. it is not multiplied by 100 here)
      */
     public double getPercentageOfExtremeValue() {
         if ((_lastTotalValue != 0) && (_extremeTotalValue != 0))
@@ -340,7 +387,7 @@ public class Rate {
 
     /**
      * How large was the last period's value as compared to the lifetime average value?
-     *
+     * Warning- returns ratio, not percentage (i.e. it is not multiplied by 100 here)
      */
     public double getPercentageOfLifetimeValue() {
         if ((_lastTotalValue != 0) && (_lifetimeTotalValue != 0)) {
@@ -500,6 +547,7 @@ public class Rate {
         return System.currentTimeMillis(); //Clock.getInstance().now();
     }
 
+/******
     public static void main(String args[]) {
         Rate rate = new Rate(1000);
         for (int i = 0; i < 50; i++) {
@@ -532,4 +580,5 @@ public class Rate {
         } catch (InterruptedException ie) { // nop
         }
     }
+******/
 }

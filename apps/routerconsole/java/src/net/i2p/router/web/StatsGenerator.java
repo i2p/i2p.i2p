@@ -22,12 +22,13 @@ import net.i2p.util.Log;
 public class StatsGenerator {
     private Log _log;
     private RouterContext _context;
+
     public StatsGenerator(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(StatsGenerator.class);
     }
     
-    public void generateStatsPage(Writer out) throws IOException {
+    public void generateStatsPage(Writer out, boolean showAll) throws IOException {
         StringBuilder buf = new StringBuilder(16*1024);
         buf.append("<div class=\"joblog\"><form action=\"/stats.jsp\">");
         buf.append("<select name=\"go\" onChange='location.href=this.value'>");
@@ -58,8 +59,9 @@ public class StatsGenerator {
         
         buf.append(_("Statistics gathered during this router's uptime")).append(" (");
         long uptime = _context.router().getUptime();
-        buf.append(DataHelper.formatDuration(uptime));
+        buf.append(DataHelper.formatDuration2(uptime));
         buf.append(").  ").append( _("The data gathered is quantized over a 1 minute period, so should just be used as an estimate."));
+        buf.append(' ').append( _("These statistics are primarily used for development and debugging."));
 
         out.write(buf.toString());
         buf.setLength(0);
@@ -85,7 +87,7 @@ public class StatsGenerator {
                 if (_context.statManager().isFrequency(stat))
                     renderFrequency(stat, buf);
                 else
-                    renderRate(stat, buf);
+                    renderRate(stat, buf, showAll);
                 out.write(buf.toString());
                 buf.setLength(0);
             }
@@ -99,38 +101,50 @@ public class StatsGenerator {
         buf.append("<i>");
         buf.append(freq.getDescription());
         buf.append("</i><br>");
+        if (freq.getEventCount() <= 0) {
+            buf.append(_("No lifetime events")).append("<br>\n");
+            return;
+        }
         long uptime = _context.router().getUptime();
         long periods[] = freq.getPeriods();
         Arrays.sort(periods);
+        buf.append("<ul>");
         for (int i = 0; i < periods.length; i++) {
             if (periods[i] > uptime)
                 break;
+            buf.append("<li>");
             renderPeriod(buf, periods[i], _("frequency"));
             Frequency curFreq = freq.getFrequency(periods[i]);
-            buf.append(" <i>avg per period:</i> (");
+            buf.append(DataHelper.formatDuration2(Math.round(curFreq.getAverageInterval())));
+            buf.append("; ");
+            buf.append(_("Rolling average events per period"));
+            buf.append(": ");
             buf.append(num(curFreq.getAverageEventsPerPeriod()));
-            buf.append(", max ");
+            buf.append("; ");
+            buf.append(_("Highest events per period"));
+            buf.append(": ");
             buf.append(num(curFreq.getMaxAverageEventsPerPeriod()));
-            if ( (curFreq.getMaxAverageEventsPerPeriod() > 0) && (curFreq.getAverageEventsPerPeriod() > 0) ) {
-                buf.append(", current is ");
-                buf.append(pct(curFreq.getAverageEventsPerPeriod()/curFreq.getMaxAverageEventsPerPeriod()));
-                buf.append(" of max");
-            }
-            buf.append(")");
+            buf.append("; ");
+            //if (showAll && (curFreq.getMaxAverageEventsPerPeriod() > 0) && (curFreq.getAverageEventsPerPeriod() > 0) ) {
+            //    buf.append("(current is ");
+            //    buf.append(pct(curFreq.getAverageEventsPerPeriod()/curFreq.getMaxAverageEventsPerPeriod()));
+            //    buf.append(" of max)");
+            //}
             //buf.append(" <i>avg interval between updates:</i> (").append(num(curFreq.getAverageInterval())).append("ms, min ");
             //buf.append(num(curFreq.getMinAverageInterval())).append("ms)");
-            buf.append(" <i>strict average per period:</i> ");
+            buf.append(_("Lifetime average events per period")).append(": ");
             buf.append(num(curFreq.getStrictAverageEventsPerPeriod()));
-            buf.append(" events (averaged ");
-            buf.append(" using the lifetime of ");
-            buf.append(curFreq.getEventCount());
-            buf.append(" events)");
-            buf.append("<br>\n");
+            buf.append("</li>\n");
         }
-        buf.append("<br>\n");
+        // Display the strict average
+        buf.append("<li><b>").append(_("Lifetime average frequency")).append(":</b> ");
+        buf.append(DataHelper.formatDuration2(freq.getFrequency()));
+        buf.append(" (");
+        buf.append(ngettext((int) freq.getEventCount(), "1 event", "{0} events"));
+        buf.append(")</li></ul><br>\n");
     }
     
-    private void renderRate(String name, StringBuilder buf) {
+    private void renderRate(String name, StringBuilder buf, boolean showAll) {
         RateStat rate = _context.statManager().getRate(name);
         String d = rate.getDescription();
         if (! "".equals(d)) {
@@ -153,40 +167,39 @@ public class StatsGenerator {
             buf.append("<li>");
             renderPeriod(buf, periods[i], _("rate"));
             if (curRate.getLastEventCount() > 0) {
-                buf.append( "<i>").append(_("avg value")).append(":</i> (");
+                buf.append(_("Average")).append(":</i> ");
                 buf.append(num(curRate.getAverageValue()));
-                buf.append(" peak ");
+                buf.append("; ");
+                buf.append(_("Highest average"));
+                buf.append(": ");
                 buf.append(num(curRate.getExtremeAverageValue()));
-                buf.append(", [");
-                buf.append(pct(curRate.getPercentageOfExtremeValue()));
-                buf.append(" of max");
-                buf.append(", and ");
-                buf.append(pct(curRate.getPercentageOfLifetimeValue()));
-                buf.append(" of lifetime average]");
-                
-                buf.append(")");
-                buf.append(" <i>highest total period value:</i> (");
-                buf.append(num(curRate.getExtremeTotalValue()));
-                buf.append(")");
-                if (curRate.getLifetimeTotalEventTime() > 0) {
-                    buf.append(" <i>saturation:</i> (");
-                    buf.append(pct(curRate.getLastEventSaturation()));
-                    buf.append(")");
-                    buf.append(" <i>saturated limit:</i> (");
-                    buf.append(num(curRate.getLastSaturationLimit()));
-                    buf.append(")");
-                    buf.append(" <i>peak saturation:</i> (");
-                    buf.append(pct(curRate.getExtremeEventSaturation()));
-                    buf.append(")");
-                    buf.append(" <i>peak saturated limit:</i> (");
-                    buf.append(num(curRate.getExtremeSaturationLimit()));
-                    buf.append(")");
+                buf.append("; ");
+
+                // This is rarely interesting
+                // Don't bother to translate
+                if (showAll) {
+                    buf.append("Highest total in a period: ");
+                    buf.append(num(curRate.getExtremeTotalValue()));
+                    buf.append("; ");
                 }
-                buf.append(" <i>").append(_("events")).append(":</i> ");
-                buf.append(curRate.getLastEventCount());
-                buf.append(" <i>in this period which ended:</i> ");
-                buf.append(DataHelper.formatDuration(now - curRate.getLastCoalesceDate()));
-                buf.append(" ago ");
+
+                // Saturation stats, which nobody understands, even when it isn't meaningless
+                // Don't bother to translate
+                if (showAll && curRate.getLifetimeTotalEventTime() > 0) {
+                    buf.append("Saturation: ");
+                    buf.append(pct(curRate.getLastEventSaturation()));
+                    buf.append("; Saturated limit: ");
+                    buf.append(num(curRate.getLastSaturationLimit()));
+                    buf.append("; Peak saturation: ");
+                    buf.append(pct(curRate.getExtremeEventSaturation()));
+                    buf.append("; Peak saturated limit: ");
+                    buf.append(num(curRate.getExtremeSaturationLimit()));
+                    buf.append("; ");
+                }
+
+                buf.append(ngettext((int) curRate.getLastEventCount(), "There was 1 event", "There were {0} events"));
+                buf.append(' ');
+                buf.append(_("in this period which ended {0} ago.", DataHelper.formatDuration2(now - curRate.getLastCoalesceDate())));
             } else {
                 buf.append(" <i>").append(_("No events")).append("</i> ");
             }
@@ -194,38 +207,38 @@ public class StatsGenerator {
             if (numPeriods > 0) {
                 double avgFrequency = curRate.getLifetimeEventCount() / (double)numPeriods;
                 double peakFrequency = curRate.getExtremeEventCount();
-                buf.append(" (").append(_("lifetime average")).append(": ");
+                buf.append(" (").append(_("Average event count")).append(": ");
                 buf.append(num(avgFrequency));
-                buf.append(", ").append(_("peak average")).append(": ");
+                buf.append("; ").append(_("Events in peak period")).append(": ");
+                // This isn't really the highest event count, but the event count during the period with the highest total value.
                 buf.append(curRate.getExtremeEventCount());
                 buf.append(")");
             }
             if (curRate.getSummaryListener() != null) {
                 buf.append(" <a href=\"viewstat.jsp?stat=").append(name);
                 buf.append("&amp;period=").append(periods[i]);
-                buf.append("\" title=\"Render summarized data\">render</a>");
+                buf.append("\">").append(_("Graph Data")).append("</a> - ");
                 buf.append(" <a href=\"viewstat.jsp?stat=").append(name);
-                buf.append("&amp;period=").append(periods[i]).append("&amp;showEvents=true\" title=\"Render summarized event counts\">events</a>");
-                buf.append(" (as <a href=\"viewstat.jsp?stat=").append(name);
+                buf.append("&amp;period=").append(periods[i]).append("&amp;showEvents=true\">").append(_("Graph Event Count")).append("</a> - ");
+                buf.append("<a href=\"viewstat.jsp?stat=").append(name);
                 buf.append("&amp;period=").append(periods[i]);
-                buf.append("&amp;format=xml\" title=\"Dump stat history as XML\">XML</a>");
-                buf.append(" in a format <a href=\"http://people.ee.ethz.ch/~oetiker/webtools/rrdtool\">RRDTool</a> understands)");
+                buf.append("&amp;format=xml\">").append(_("Export Data as XML")).append("</a>");
             }
             buf.append("</li>\n");
         }
         // Display the strict average
-        buf.append("<li><b>").append(_("lifetime average value")).append(":</b> ");
+        buf.append("<li><b>").append(_("Lifetime average value")).append(":</b> ");
         buf.append(num(rate.getLifetimeAverageValue()));
-        buf.append(" over ");
-        buf.append(rate.getLifetimeEventCount());
-        buf.append(" events<br></li>");
-        buf.append("</ul>");
-        buf.append("<br>\n");
+        buf.append(" (");
+        buf.append(ngettext((int) rate.getLifetimeEventCount(), "1 event", "{0} events"));
+        buf.append(")<br></li>" +
+                   "</ul>" +
+                   "<br>\n");
     }
     
     private static void renderPeriod(StringBuilder buf, long period, String name) {
         buf.append("<b>");
-        buf.append(DataHelper.formatDuration(period));
+        buf.append(DataHelper.formatDuration2(period));
         buf.append(" ");
         buf.append(name);
         buf.append(":</b> ");
@@ -245,5 +258,10 @@ public class StatsGenerator {
     /** translate a string */
     private String _(String s, Object o) {
         return Messages.getString(s, o, _context);
+    }
+
+    /** translate a string */
+    private String ngettext(int n, String s, String p) {
+        return Messages.getString(n, s, p, _context);
     }
 }

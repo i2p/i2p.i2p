@@ -280,7 +280,7 @@ public class StatisticsManager implements Service {
         stats.setProperty("stat_bandwidthReceiveBps.60m", str);
     }
 
-    private String getPeriod(Rate rate) { return DataHelper.formatDuration(rate.getPeriod()); }
+    private static String getPeriod(Rate rate) { return DataHelper.formatDuration(rate.getPeriod()); }
 
     private final String num(double num) { 
         if (num < 0) num = 0;

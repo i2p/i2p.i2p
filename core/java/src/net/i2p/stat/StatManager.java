@@ -140,12 +140,17 @@ public class StatManager {
         if (stat != null) stat.addData(data, eventDuration);
     }
 
+    private int coalesceCounter;
+    /** every this many minutes for frequencies */
+    private static final int FREQ_COALESCE_RATE = 9;
+
     public void coalesceStats() {
-        synchronized (_frequencyStats) {
-            for (Iterator<FrequencyStat> iter = _frequencyStats.values().iterator(); iter.hasNext();) {
-                FrequencyStat stat = iter.next();
-                if (stat != null) {
-                    stat.coalesceStats();
+        if (++coalesceCounter % FREQ_COALESCE_RATE == 0) {
+            synchronized (_frequencyStats) {
+                for (FrequencyStat stat : _frequencyStats.values()) {
+                    if (stat != null) {
+                        stat.coalesceStats();
+                    }
                 }
             }
         }

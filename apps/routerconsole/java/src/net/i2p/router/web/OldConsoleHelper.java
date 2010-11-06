@@ -6,8 +6,14 @@ import java.io.OutputStreamWriter;
 
 
 public class OldConsoleHelper extends HelperBase {
+    private boolean _full;
+
     public OldConsoleHelper() {}
     
+    public void setFull(String f) {
+        _full = f != null && f.length() > 0;
+    }
+
     public String getConsole() {
         try {
             if (_out != null) {
@@ -27,11 +33,11 @@ public class OldConsoleHelper extends HelperBase {
         StatsGenerator gen = new StatsGenerator(_context);
         try {
             if (_out != null) {
-                gen.generateStatsPage(_out);
+                gen.generateStatsPage(_out, _full);
                 return "";
             } else {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream(32*1024);
-                gen.generateStatsPage(new OutputStreamWriter(baos));
+                gen.generateStatsPage(new OutputStreamWriter(baos), _full);
                 return baos.toString();
             }
         } catch (IOException ioe) {
