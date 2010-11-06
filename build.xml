@@ -905,7 +905,7 @@
         </exec>
         <echo message="====================" />
         <!-- bundle the 20MB jetty 5 lib since there probably isn't a deb for it -->
-        <ant dir="apps/jetty" target="verifyJettylib" />
+        <ant dir="apps/jetty" target="ensureJettylib" />
         <exec executable="dpkg-buildpackage" failifexecutionfails="true">
             <arg value="-I_MTN" />
         </exec>
@@ -924,7 +924,7 @@
     </target>
     <target name="debian-source">
         <!-- bundle the 20MB jetty 5 lib since there probably isn't a deb for it -->
-        <ant dir="apps/jetty" target="verifyJettylib" />
+        <ant dir="apps/jetty" target="ensureJettylib" />
         <echo message="Did you update the version in these files?" />
         <exec executable="ls" failonerror="true">
             <arg value="-l" />
