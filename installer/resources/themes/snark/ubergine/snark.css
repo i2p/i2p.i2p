@@ -17,7 +17,7 @@ body {
      text-decoration: none !important;
      text-transform: uppercase !important;
      padding: 4px 16px 5px !important;
-	 margin: -5px -7px -5px 0 !important;
+	 margin: -5px -8px -5px 0 !important;
      letter-spacing: 0.05em;
      font-weight: bold;
      font-size: 11pt;
@@ -43,13 +43,13 @@ body {
      font-size: 11pt;
      color: #f50;
      background: #310 url('/themes/snark/ubergine/images/snarknav_on.png') repeat-x scroll center center;
-     background: url('/themes/snark/ubergine/images/snarknav_lowlight.png') repeat-x scroll center center;
-	 -moz-border-radius: 0;
-	 -khtml-border-radius: 0;
-	 border-radius: 0;
-	 -moz-box-shadow: inset 0 0 1px 0 #f90;
-	 -khtml-box-shadow: inset 0 0 1px 0 #f90;
-	 box-shadow: 0 0 1px  #f90;
+     background: #310 url('/themes/snark/ubergine/images/snarknav_lowlight.png') repeat-x scroll center center;
+     -moz-border-radius: 0;
+     -khtml-border-radius: 0;
+     border-radius: 0;
+     -moz-box-shadow: inset 0 0 1px 0 #f90;
+     -khtml-box-shadow: inset 0 0 1px 0 #f90;
+     box-shadow: 0 0 1px  #f90;
 }
 
 .snarkRefresh:active {
@@ -64,21 +64,21 @@ body {
 }
 
 .snarkRefresh:last-child {
-	 -moz-border-radius: 0 3px 3px 0px;
-	 -khtml-border-radius: 0 3px 0 0;
-	 border-radius: 0;
-	 -moz-box-shadow: inset 0 0 1px 0 #f90;
-	 -khtml-box-shadow: inset 0 0 1px 0 #f90;
-	 box-shadow: 0 0 1px 0 #f90;
+     -moz-border-radius: 0 3px 3px 0px;
+     -khtml-border-radius: 0 3px 3px 0;
+     border-radius: 0 3px 3px 0;
+     -moz-box-shadow: inset 0 0 1px 0 #f90;
+     -khtml-box-shadow: inset 0 0 1px 0 #f90;
+     box-shadow: 0 0 1px 0 #f90;
 }
 
 .snarkRefresh:first-child {
-	 -moz-border-radius: 3px 0 0 3px;
-	 -khtml-border-radius: 3px;
-	 border-radius: 0;
-	 -moz-box-shadow: inset 0 0 1px 0 #f90;
-	 -khtml-box-shadow: inset 0 0 1px 0 #f90;
-	 box-shadow: 0 0 1px 0  #f90;
+     -moz-border-radius: 3px 0 0 3px;
+     -khtml-border-radius: 3px 0 0 3px;
+     border-radius: 3px 0 0 3px;
+     -moz-box-shadow: inset 0 0 1px 0 #f90;
+     -khtml-box-shadow: inset 0 0 1px 0 #f90;
+     box-shadow: 0 0 1px 0  #f90;
 }
 
 .snarkMessages {
@@ -116,7 +116,7 @@ pre {
      padding: 0;
      text-align: left !important;
      height: 8px;
-	 color: #13f;
+     color: #13f;
      font-weight: bold !important; 
 }
 
@@ -126,18 +126,18 @@ table {
      padding: 0px;
      border-spacing: 0px;
      border-collapse: collapse;
-	 color: #323;
-	 width: 100%;
-	 opacity: 1 !important;
+     color: #323;
+     width: 100%;
+     opacity: 1 !important;
 }
 
 tr { 
-	 opacity: 1;
+     opacity: 1;
 }
 
 thead, tfoot {
-	 background: url("/themes/snark/ubergine/images/snark_thead.png") repeat-x scroll 0 0 #101;
-	 text-shadow:0 2px 5px #333333;
+     background: url("/themes/snark/ubergine/images/snark_thead.png") repeat-x scroll 0 0 #101;
+     text-shadow:0 2px 5px #333333;
 }
 
 thead a, tfoot a {
@@ -153,7 +153,7 @@ th {
      font-size: 9pt;
      border-top: 1px outset #001;
      border-bottom: 1px inset #101;
-	 color: #ddd;
+     color: #ddd;
      whitespace: nowrap;
      font-variant: small-caps !important;
      letter-spacing: 0.05em;
@@ -161,8 +161,7 @@ th {
 
 th:first-child {
      text-align: left !important;
-	 padding-left: 2px;
-	 max-width: 120px;
+     padding-left: 2px;
 }
 
 tfoot td:first-child {
@@ -266,7 +265,7 @@ td:first-child {
      margin-right: 0px !important;
 }
 
-.snarkTorrentRate, .snarkTorrentDownloaded, .snarkTorrentUploaded {
+.snarkTorrentRateUp, .snarkTorrentRateDown, .snarkTorrentDownloaded, .snarkTorrentUploaded {
      font-size: 8pt;
      font-weight: bold;
      padding: 0 3px;
@@ -280,10 +279,13 @@ td:first-child {
      color: #b9b !important;
 }
 
-.snarkTorrentRate {
-     color: #d9d !important;
+.snarkTorrentRateUp {
+     color: #b9b !important;
 }
 
+.snarkTorrentRateDown {
+     color: #76a !important;
+}
 
 .snarkTorrentOdd {
      background: #656;
@@ -413,13 +415,14 @@ input {
      font-size: 9pt;
      font-weight: bold;
      text-align: left;
-     padding: 2px 4px;
+     padding: 3px 4px !important;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
      border: 1px inset #000;
      background: #212 url('/themes/snark/ubergine/images/graytile.png');	 
 	 color: #f60;
+     margin: 2px 0;
 }
 
 input.r {
@@ -432,6 +435,7 @@ input[type=submit] {
 	 color: #000;
 	 background: #989;
 	 border: 1px inset #bbb;
+     padding: 2px;
 }
 
 input[type=submit]:hover {
@@ -468,7 +472,7 @@ select {
 
 select:hover, textarea:hover {
      background: #f60 !important;
-     color: #fff;
+     color: #fff !important;
 }	 
 
 textarea {
@@ -610,8 +614,8 @@ code {
      padding: 11px 10px 12px;
      border: 1px solid #101;
      -moz-border-radius: 0 0 8px 8px;
-     -khtml-border-radius: 0 0 4px 4px;
-     border-radius: 0 0 4px 4px;
+     -khtml-border-radius: 0 0 8px 8px;
+     border-radius: 0 0 8px 8px;
      -moz-box-shadow: inset 0px 0px 1px 0px #002;
      -khtml-box-shadow: inset 0px 0px 1px 0px #002;
      box-shadow: inset 0px 0px 1px 0px #002;
