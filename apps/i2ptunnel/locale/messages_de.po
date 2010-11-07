@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P i2ptunnel\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-06-13 19:23+0000\n"
-"PO-Revision-Date: 2010-11-05 00:08+0100\n"
+"PO-Revision-Date: 2010-11-06 23:49+0100\n"
 "Last-Translator: echelon <echelon@i2pmail.org>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -147,7 +147,7 @@ msgstr "Lokal (127.0.0.1)"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:166
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:199
 msgid "Everyone (0.0.0.0)"
-msgstr "Jeder (0.0.0.0)"
+msgstr "Überall (0.0.0.0)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:170
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:203
@@ -157,7 +157,7 @@ msgstr "LAN-Hosts (Bitte geben Sie ihre LAN-Adressen an!)"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:186
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:205
 msgid "Other"
-msgstr "Andere"
+msgstr "Anderen"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:195
 msgid "Outproxies"
@@ -196,7 +196,7 @@ msgstr "für Verbindungen mit Anfragen/Antworten"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:239
 msgid "Shared Client"
-msgstr "Geteilter Klient"
+msgstr "versch. Klienten"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:243
 msgid "(Share tunnels with other clients and irc/httpclients? Change requires restart of client proxy)"
@@ -210,7 +210,7 @@ msgstr "Automatischer Start"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:251
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:128
 msgid "(Check the Box for 'YES')"
-msgstr "(Aktiviere die Box für 'JA')"
+msgstr "(Aktiviere das Kästchen für 'ja')"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:253
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:266
@@ -219,7 +219,7 @@ msgstr "Erweiterte Netzwerkoptionen"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:255
 msgid "(NOTE: when this client proxy is configured to share tunnels, then these options are for all the shared proxy clients!)"
-msgstr "(HINWEIS: Ist dieser Klienten-Proxy konfiguriert, Tunnel zu teilen, dann gelten diese Optionen für alle Klienten des Proxys!)"
+msgstr "(HINWEIS: Ist dieser Proxy konfiguriert, Tunnel mit anderen Klienten zu teilen, so gelten diese Optionen für alle Klienten des Proxys!)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:257
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:268
@@ -294,7 +294,7 @@ msgstr "Hop-Varianz"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:332
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:343
 msgid "Count"
-msgstr "Zähler"
+msgstr "Anzahl"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:339
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:350
@@ -379,7 +379,7 @@ msgstr "Reduziert die Anzahl an Tunneln im Leerlauf"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:433
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:445
 msgid "Enable"
-msgstr "Aktiviert"
+msgstr "aktiviert"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:412
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:449
@@ -394,7 +394,7 @@ msgstr "Minuten Inaktivität"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:420
 msgid "Close tunnels when idle"
-msgstr "Schliesse nicht genutzte Tunnel"
+msgstr "Schließe nicht genutzte Tunnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:426
 msgid "New Keys on Reopen"
@@ -402,7 +402,7 @@ msgstr "Neue Schlüssel beim Wiederöffnen"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:434
 msgid "Disable"
-msgstr "Deaktiviert"
+msgstr "deaktiviert"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:440
 msgid "Delay tunnel open until required"
@@ -480,7 +480,7 @@ msgstr "Zum lokalen Adressbuch hinzufügen"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:415
 msgid "Encrypt Leaseset"
-msgstr "verschlüsseltes Leaseset"
+msgstr "Verschlüsseltes Leaseset"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:421
 msgid "Encryption Key"
@@ -492,7 +492,7 @@ msgstr "Erzeuge neuen Schlüssel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:427
 msgid "Generate"
-msgstr "Erzeuge"
+msgstr "Erzeugen"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:429
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:487
@@ -509,7 +509,7 @@ msgstr "Zugangsliste"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:441
 msgid "(Restrict to these clients only)"
-msgstr "(Beschränkt auf nur diese Klienten)"
+msgstr "(Beschränkt auf diese Klienten)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:457
 msgid "New Certificate type"
@@ -561,11 +561,11 @@ msgstr "Auffrischen"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:91
 msgid "Stop All"
-msgstr "Alle Stoppen"
+msgstr "Alle stoppen"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:95
 msgid "Start All"
-msgstr "Alle Starten"
+msgstr "Alle starten"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:99
 msgid "Restart All"
@@ -645,7 +645,7 @@ msgstr "Standard"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:238
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:370
 msgid "Create"
-msgstr "Erstelle"
+msgstr "Erstellen"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:240
 msgid "I2P Client Tunnels"
@@ -670,5 +670,5 @@ msgstr "Ziel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:366
 msgid "New client tunnel"
-msgstr "Neuer Klienten Tunnel"
+msgstr "Neuer Kliententunnel"
 

@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P susidns\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-06-13 19:24+0000\n"
-"PO-Revision-Date: 2010-11-05 11:27+0100\n"
+"PO-Revision-Date: 2010-11-06 23:00+0100\n"
 "Last-Translator: echelon <echelon@i2pmail.org>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -282,7 +282,7 @@ msgstr "Hinweise"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:134
 msgid "File and directory paths here are relative to the addressbook's working directory, which is normally ~/.i2p/addressbook/ (Linux) or %APPDATA%\\I2P\\addressbook\\ (Windows)."
-msgstr "Dateien und Verzeichnispfade sind relativ zum Arbeitsverzeichnis des Adressbuches, normalerweise ~/.i2p/addressbook/ (Linux) oder %APPDATA%\\I2P\\addressbook\\ (Windows)."
+msgstr "Dateien und Verzeichnispfade sind relativ zum Arbeitsverzeichnis des Adressbuchs - normalerweise ~/.i2p/addressbook/ (Linux) oder %APPDATA%\\I2P\\addressbook\\ (Windows)."
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:136
 msgid "If you want to manually add lines to an addressbook, add them to the private or master addressbooks."
@@ -338,7 +338,7 @@ msgstr "Hostname zu Ihrem EepProxy (braucht nicht geändert zu werden)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:162
 msgid "Whether to update the published addressbook"
-msgstr "Ob Ihr veröffentlichtes Adressbuch aktualisiert werden soll"
+msgstr "Soll Ihr veröffentlichtes Adressbuch aktualisiert werden?"
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:164
 msgid "File containing the etags header from the fetched subscription URLs (no need to change)"
@@ -350,7 +350,7 @@ msgstr "Datei, welche die Zeitstempel der letzten Modifikation für jede bereits
 
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:168
 msgid "File to log activity to (change to /dev/null if you like)"
-msgstr "Berichte zu Aktivitäten werden in dieser Datei gespeichert (ändern Sie es zu /dev/null, wenn Sie möchten)"
+msgstr "Berichte zu Aktivitäten werden in dieser Datei gespeichert. (Ändern Sie es zu /dev/null, wenn Sie möchten!)"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:91
 msgid "Introduction"
@@ -374,11 +374,11 @@ msgstr "In der Standardeinstellung bezieht das Adressbuch sein Abonnement nur vo
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:117
 msgid "Subscribing to additional sites is easy, just add them to your <a href=\"subscriptions.jsp\">subscriptions</a> file."
-msgstr "Zusätzliche Abonnementquellen hinzuzufügen ist einfach: Fügen Sie dazu deren URL zu Ihrer <a href=\"subscriptions.jsp\">Abonnement</a>-Datei hinzu."
+msgstr "Zusätzliche Abonnementquellen hinzuzufügen ist einfach: Geben Sie dazu deren URL in Ihrer <a href=\"subscriptions.jsp\">Abonnement</a>-Datei an."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:119
 msgid "For more information on naming in i2p, see <a href=\"http://www.i2p2.i2p/naming.html\">the overview on www.i2p2.i2p</a>."
-msgstr "Für mehr Informationen über das Namenssystem in I2P schauen Sie bitte auf der <a href=\"http://www.i2p2.i2p/naming.html\">&Uuml;bersichtsseite auf www.i2p2.i2p</a> nach."
+msgstr "Für mehr Informationen über das Namenssystem in I2P konsultieren Sie bitte die <a href=\"http://www.i2p2.i2p/naming.html\">&Uuml;bersichtsseite auf www.i2p2.i2p</a>."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:121
 msgid "How does the addressbook work?"
@@ -386,15 +386,15 @@ msgstr "Wie funktioniert das Adressbuch?"
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:123
 msgid "The addressbook application regularly polls your subscriptions and merges their content into your \"router\" addressbook, stored in the hosts.txt file."
-msgstr "Die Adressbuch-Anwendung bezieht regelmäßig ihre Abonnements und fügt deren Inhalt mit Ihrem \"Router\"-Adressbuch zusammen, welches in der hosts.txt-Datei gespeichert ist."
+msgstr "Die Adressbuch-Anwendung bezieht regelmäßig ihre Abonnements und führt deren Inhalt mit dem Ihres \"Router\"-Adressbuchs zusammen, welches in der hosts.txt-Datei gespeichert ist."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:125
 msgid "Then it merges your \"master\" addressbook (userhosts.txt) into the router addressbook as well."
-msgstr "Dann fügt diese auch Ihr \"Master\"-Adressbuch (userhosts.txt) dem Router-Adressbuch hinzu."
+msgstr "Dann fügt sie auch Ihr \"Master\"-Adressbuch (userhosts.txt) dem Router-Adressbuch hinzu."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:127
 msgid "If configured, the router addressbook is now written to the \"published\" addressbook, which will be publicly available if you are running an eepsite."
-msgstr "Falls eingestellt, wird das Router-Adressbuch jetzt in das \"veröffentlichte\" Adressbuch kopiert, dieses ist öffentlich erreichbar sobald Sie eine Eepseite aktiv haben."
+msgstr "Falls eingestellt, wird das Router-Adressbuch jetzt in das \"veröffentlichte\" Adressbuch kopiert. Dieses ist öffentlich erreichbar, solange Sie eine Eepseite betreiben."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:129
 msgid "The router also uses a private addressbook (privatehosts.txt, not shown in the picture), which is not merged or published."
@@ -430,5 +430,5 @@ msgstr "Somit ist es eine gute Idee, weitere Abonnements von Seiten mit den neue
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:142
 msgid "See the FAQ for a list of subscription URLs."
-msgstr "Schauen Sie in den FAQ nach einer Liste von Abonnement-URLs."
+msgstr "Schauen Sie in den FAQ nach einer Liste von Abonnement-URLs!"
 
