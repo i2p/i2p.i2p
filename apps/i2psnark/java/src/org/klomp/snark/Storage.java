@@ -358,7 +358,7 @@ public class Storage
   /**
    *  Must call setPiecePriorities() after calling this
    *  @param file canonical path (non-directory)
-   *  @param priority default 0; <0 to disable
+   *  @param pri default 0; <0 to disable
    *  @since 0.8.1
    */
   public void setPriority(String file, int pri) {
