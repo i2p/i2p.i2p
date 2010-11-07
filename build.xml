@@ -159,12 +159,34 @@
     <target name="javadoc">
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc" />
+        <!-- get release and build version numbers -->
+        <exec executable="grep" outputproperty="versionLine" >
+            <arg value="public final static String VERSION" />
+	    <arg value="core/java/src/net/i2p/CoreVersion.java" />
+        </exec>
+        <exec executable="cut" inputstring="${versionLine}" outputproperty="release.number" >
+            <arg value="-f2" />
+	    <arg value="-d&quot;" />
+        </exec>
+        <exec executable="grep" outputproperty="buildLine" >
+            <arg value="public final static long BUILD" />
+	    <arg value="router/java/src/net/i2p/router/RouterVersion.java" />
+        </exec>
+        <exec executable="cut" inputstring="${buildLine}" outputproperty="build.temp" >
+            <arg value="-f2" />
+	    <arg value="-d=" />
+        </exec>
+        <exec executable="cut" inputstring="${build.temp}" outputproperty="build.number" >
+            <arg value="-f1" />
+	    <arg value="-d;" />
+        </exec>
         <javadoc access="package" 
             destdir="./build/javadoc" 
             packagenames="*" 
             use="true" 
             splitindex="true" 
-            windowtitle="I2P Anonymous Network - Java Documentation">
+            doctitle="I2P Javadocs for Release ${release.number} Build ${build.number}"
+            windowtitle="I2P Anonymous Network - Java Documentation - Version ${release.number}">
             <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:freenet.support.CPUInformation:org.bouncycastle.crypto:org.bouncycastle.crypto.*:gnu.crypto.*:gnu.gettext:org.xlattice.crypto.filters:com.nettgryppa.security" />
             <group title="Streaming Library" packages="net.i2p.client.streaming" />
             <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:org.cybergarage.*:org.freenetproject" />
@@ -202,6 +224,9 @@
                 <pathelement location="installer/lib/wrapper/win32/wrapper.jar" />
                 <pathelement location="core/lib/junit.jar" />                
             </classpath>
+            <link offline="true" href="http://download.oracle.com/javase/6/docs/api/" packagelistLoc="installer/resources/package-lists/java/" />
+            <link offline="true" href="http://docs.i2p2.de/jetty/javadoc/" packagelistLoc="installer/resources/package-lists/jetty/" />
+            <link offline="true" href="http://docs.i2p2.de/jrobin/javadoc/" packagelistLoc="installer/resources/package-lists/jrobin/" />
         </javadoc>
     </target>
     <target name="clean" depends="pkgclean" >
