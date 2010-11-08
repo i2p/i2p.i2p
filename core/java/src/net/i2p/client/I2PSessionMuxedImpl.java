@@ -67,6 +67,9 @@ import net.i2p.util.SimpleScheduler;
 class I2PSessionMuxedImpl extends I2PSessionImpl2 implements I2PSession {
     private I2PSessionDemultiplexer _demultiplexer;
 
+    /*
+     * @param options set of options to configure the router with, if null will use System properties
+     */
     public I2PSessionMuxedImpl(I2PAppContext ctx, InputStream destKeyStream, Properties options) throws I2PSessionException {
         super(ctx, destKeyStream, options);
         // also stored in _sessionListener but we keep it in _demultipexer

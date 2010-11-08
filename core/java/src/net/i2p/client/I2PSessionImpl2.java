@@ -49,6 +49,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
      * Create a new session, reading the Destination, PrivateKey, and SigningPrivateKey
      * from the destKeyStream, and using the specified options to connect to the router
      *
+     * @param options set of options to configure the router with, if null will use System properties
      * @throws I2PSessionException if there is a problem loading the private keys or 
      */
     public I2PSessionImpl2(I2PAppContext ctx, InputStream destKeyStream, Properties options) throws I2PSessionException {
@@ -56,7 +57,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         _log = ctx.logManager().getLog(I2PSessionImpl2.class);
         _sendingStates = new HashSet(32);
         // default is BestEffort
-        _noEffort = "none".equalsIgnoreCase(options.getProperty(I2PClient.PROP_RELIABILITY));
+        _noEffort = "none".equalsIgnoreCase(getOptions().getProperty(I2PClient.PROP_RELIABILITY));
 
         ctx.statManager().createRateStat("i2cp.sendBestEffortTotalTime", "how long to do the full sendBestEffort call?", "i2cp", new long[] { 10*60*1000 } );
         //ctx.statManager().createRateStat("i2cp.sendBestEffortStage0", "first part of sendBestEffort?", "i2cp", new long[] { 10*60*1000 } );

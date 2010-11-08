@@ -45,7 +45,7 @@ public interface I2PClient {
      * the router how to handle the new session, and to configure the end to end
      * encryption.
      * @param destKeyStream location from which to read the Destination, PrivateKey, and SigningPrivateKey from
-     * @param options set of options to configure the router with
+     * @param options set of options to configure the router with, if null will use System properties
      * @return new session allowing a Destination to recieve all of its messages and send messages to any other Destination.
      */
     public I2PSession createSession(InputStream destKeyStream, Properties options) throws I2PSessionException;
