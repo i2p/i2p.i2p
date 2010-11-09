@@ -1,8 +1,8 @@
 #!/bin/bash
 # This script creates a Debian repository in ${DIR} using the reprepro tool.
 # The packages are signed with the key referenced in the newest changelog entry.
-#
-# TODO: error handling
+
+set -e
 
 cd $(dirname $0)
 DIR=./repo
