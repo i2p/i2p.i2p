@@ -24,6 +24,7 @@ build:
 	rm debian/tmp/usr/lib/i2p/a
 	touch debian/build
 	mkdir -p debian/tmp/usr/share/doc/i2p
+
 	# Create the Debian copyright file, move the licenses dir,
 	# and delete all license files that are already in /usr/share/common-licenses/
 	cat debian/copyright.part1 LICENSE.txt > debian/tmp/usr/share/doc/i2p/copyright
@@ -32,6 +33,10 @@ build:
 	rm debian/tmp/usr/share/doc/i2p/licenses/LICENSE-Apache2.0.txt
 	rm debian/tmp/usr/share/doc/i2p/licenses/LICENSE-GPLv2.txt
 	rm debian/tmp/usr/share/doc/i2p/licenses/LICENSE-LGPLv2.1.txt
+
+	# changelog
+	gzip -9c history.txt > debian/tmp/usr/share/doc/i2p/changelog.gz
+	gzip -9c debian/changelog > debian/tmp/usr/share/doc/i2p/changelog.Debian.gz
 
 binary: build
 	mkdir -p debian/tmp/DEBIAN
