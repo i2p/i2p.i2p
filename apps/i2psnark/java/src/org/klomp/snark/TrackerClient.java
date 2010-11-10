@@ -266,9 +266,9 @@ public class TrackerClient extends I2PAppThread
                         // we only want to talk to new people if we need things
                         // from them (duh)
                         List ordered = new ArrayList(peers);
-                        Collections.shuffle(ordered);
+                        Collections.shuffle(ordered, r);
                         Iterator it = ordered.iterator();
-                        while (it.hasNext()) {
+                        while ((!stop) && it.hasNext()) {
                           Peer cur = (Peer)it.next();
                           // FIXME if id == us || dest == us continue;
                           // only delay if we actually make an attempt to add peer
@@ -357,7 +357,7 @@ public class TrackerClient extends I2PAppThread
       + "&uploaded=" + uploaded
       + "&downloaded=" + downloaded
       + "&left=" + left
-      + "&compact"
+      + "&compact=1"   // NOTE: opentracker will return 400 for &compact alone
       + ((! event.equals(NO_EVENT)) ? ("&event=" + event) : "");
     if (left <= 0 || event.equals(STOPPED_EVENT) || !coordinator.needPeers())
         s += "&numwant=0";

@@ -152,6 +152,9 @@ public class I2PSnarkUtil {
      */
     synchronized public boolean connect() {
         if (_manager == null) {
+            // try to find why reconnecting after stop
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Connecting to I2P", new Exception("I did it"));
             Properties opts = new Properties();
             if (_opts != null) {
                 for (Iterator iter = _opts.keySet().iterator(); iter.hasNext(); ) {
@@ -163,6 +166,10 @@ public class I2PSnarkUtil {
                 opts.setProperty("inbound.nickname", "I2PSnark");
             if (opts.getProperty("outbound.nickname") == null)
                 opts.setProperty("outbound.nickname", "I2PSnark");
+            // Dont do this for now, it is set in I2PSocketEepGet for announces,
+            // we don't need fast handshake for peer connections.
+            //if (opts.getProperty("i2p.streaming.connectDelay") == null)
+            //    opts.setProperty("i2p.streaming.connectDelay", "500");
             if (opts.getProperty("i2p.streaming.inactivityTimeout") == null)
                 opts.setProperty("i2p.streaming.inactivityTimeout", "240000");
             if (opts.getProperty("i2p.streaming.inactivityAction") == null)
@@ -186,6 +193,7 @@ public class I2PSnarkUtil {
      */
     public void disconnect() {
         I2PSocketManager mgr = _manager;
+        // FIXME this can cause race NPEs elsewhere
         _manager = null;
         _shitlist.clear();
         mgr.destroySocketManager();
@@ -197,6 +205,9 @@ public class I2PSnarkUtil {
     
     /** connect to the given destination */
     I2PSocket connect(PeerID peer) throws IOException {
+        I2PSocketManager mgr = _manager;
+        if (mgr == null)
+            throw new IOException("No socket manager");
         Destination addr = peer.getAddress();
         if (addr == null)
             throw new IOException("Null address");

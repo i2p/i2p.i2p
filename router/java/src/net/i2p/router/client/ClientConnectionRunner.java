@@ -361,18 +361,21 @@ public class ClientConnectionRunner {
         // TunnelPool.locked_buildNewLeaseSet() ensures that leases are sorted,
         //  so the comparison will always work.
         int leases = set.getLeaseCount();
-        if (_currentLeaseSet != null && _currentLeaseSet.getLeaseCount() == leases) {
-            for (int i = 0; i < leases; i++) {
-                if (! _currentLeaseSet.getLease(i).getTunnelId().equals(set.getLease(i).getTunnelId()))
-                    break;
-                if (! _currentLeaseSet.getLease(i).getGateway().equals(set.getLease(i).getGateway()))
-                    break;
-                if (i == leases - 1) {
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Requested leaseSet hasn't changed");
-                    if (onCreateJob != null)
-                        _context.jobQueue().addJob(onCreateJob);
-                    return; // no change
+        // synch so _currentLeaseSet isn't changed out from under us
+        synchronized (this) {
+            if (_currentLeaseSet != null && _currentLeaseSet.getLeaseCount() == leases) {
+                for (int i = 0; i < leases; i++) {
+                    if (! _currentLeaseSet.getLease(i).getTunnelId().equals(set.getLease(i).getTunnelId()))
+                        break;
+                    if (! _currentLeaseSet.getLease(i).getGateway().equals(set.getLease(i).getGateway()))
+                        break;
+                    if (i == leases - 1) {
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Requested leaseSet hasn't changed");
+                        if (onCreateJob != null)
+                            _context.jobQueue().addJob(onCreateJob);
+                        return; // no change
+                    }
                 }
             }
         }
@@ -590,7 +593,7 @@ public class ClientConnectionRunner {
                               + " for session [" + _sessionId.getSessionId() 
                               + "] (with nonce=2), retrying after [" 
                               + (_context.clock().now() - _lastTried) 
-                              + "]", getAddedBy());
+                              + "]");
             } else {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Updating message status for message " + _messageId + " to " 

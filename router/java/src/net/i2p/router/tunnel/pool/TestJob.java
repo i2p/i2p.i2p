@@ -317,7 +317,7 @@ class TestJob extends JobImpl {
         public String getName() { return "Tunnel test timeout"; }
         public void runJob() {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Timeout: found? " + _found, getAddedBy());
+                _log.warn("Timeout: found? " + _found);
             if (!_found) {
                 // don't clog up the SKM with old one-tag tagsets
                 if (_cfg.isInbound() && !_pool.getSettings().isExploratory()) {

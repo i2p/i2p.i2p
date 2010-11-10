@@ -40,7 +40,7 @@ public class ConfigUpdateHelper extends HelperBase {
     public String getUpdateURL() {
         String url = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_URL);
         if (url != null)
-            return url.replaceAll(",", "\n");
+            return url.replace(",", "\n");
         else
             return ConfigUpdateHandler.DEFAULT_UPDATE_URL;
     }

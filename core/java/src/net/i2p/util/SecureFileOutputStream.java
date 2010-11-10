@@ -56,7 +56,7 @@ public class SecureFileOutputStream extends FileOutputStream {
      *  Tries to set the permissions to 600,
      *  ignores errors
      */
-    private static void setPerms(File f) {
+    public static void setPerms(File f) {
         if (!canSetPerms)
             return;
         try {

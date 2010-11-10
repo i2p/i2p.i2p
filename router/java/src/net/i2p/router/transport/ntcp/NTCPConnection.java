@@ -615,8 +615,8 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Type " + msg.getMessage().getType() + " pri " + msg.getPriority() + " slot " + slot);
                 boolean removed = _outbound.remove(msg);
-                if ((!removed) && _log.shouldLog(Log.ERROR))
-                    _log.info("Already removed??? " + msg.getMessage().getType());
+                if ((!removed) && _log.shouldLog(Log.WARN))
+                    _log.warn("Already removed??? " + msg.getMessage().getType());
             }
             _currentOutbound = msg;
         }

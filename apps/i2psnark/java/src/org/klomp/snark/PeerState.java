@@ -55,11 +55,9 @@ class PeerState
   final PeerConnectionOut out;
 
   // Outstanding request
-  private final List outstandingRequests = new ArrayList();
+  private final List<Request> outstandingRequests = new ArrayList();
+  /** the tail (NOT the head) of the request queue */
   private Request lastRequest = null;
-
-  // If we have te resend outstanding requests (true after we got choked).
-  private boolean resend = false;
 
   private final static int MAX_PIPELINE = 5;               // this is for outbound requests
   private final static int MAX_PIPELINE_BYTES = 128*1024;  // this is for inbound requests
@@ -91,14 +89,13 @@ class PeerState
     if (_log.shouldLog(Log.DEBUG))
         _log.debug(peer + " rcv " + (choke ? "" : "un") + "choked");
 
+    boolean resend = choked && !choke;
     choked = choke;
-    if (choked)
-      resend = true;
 
     listener.gotChoke(peer, choke);
 
-    if (!choked && interesting)
-      request();
+    if (interesting && !choked)
+      request(resend);
   }
 
   void interestedMessage(boolean interest)
@@ -278,7 +275,7 @@ class PeerState
   synchronized private int getFirstOutstandingRequest(int piece)
   {
     for (int i = 0; i < outstandingRequests.size(); i++)
-      if (((Request)outstandingRequests.get(i)).piece == piece)
+      if (outstandingRequests.get(i).piece == piece)
         return i;
     return -1;
   }
@@ -313,12 +310,12 @@ class PeerState
     Request req;
     synchronized(this)
       {
-        req = (Request)outstandingRequests.get(r);
+        req = outstandingRequests.get(r);
         while (req.piece == piece && req.off != begin
                && r < outstandingRequests.size() - 1)
           {
             r++;
-            req = (Request)outstandingRequests.get(r);
+            req = outstandingRequests.get(r);
           }
         
         // Something wrong?
@@ -342,7 +339,7 @@ class PeerState
                                + ", wanted for peer: " + peer);
             for (int i = 0; i < r; i++)
               {
-                Request dropReq = (Request)outstandingRequests.remove(0);
+                Request dropReq = outstandingRequests.remove(0);
                 outstandingRequests.add(dropReq);
                 if (!choked)
                   out.sendRequest(dropReq);
@@ -366,11 +363,11 @@ class PeerState
   {
     Request req = null;
     for (int i = 0; i < outstandingRequests.size(); i++) {
-      Request r1 = (Request)outstandingRequests.get(i);
+      Request r1 = outstandingRequests.get(i);
       int j = getFirstOutstandingRequest(r1.piece);
       if (j == -1)
         continue;
-      Request r2 = (Request)outstandingRequests.get(j);
+      Request r2 = outstandingRequests.get(j);
       if (r2.off > 0 && ((req == null) || (r2.off > req.off)))
         req = r2;
     }
@@ -398,7 +395,7 @@ class PeerState
     }
     Request req = null;
     for (int i = 0; i < size; i++) {
-      Request r1 = (Request)outstandingRequests.get(i);
+      Request r1 = outstandingRequests.get(i);
       if (pc != r1.piece) {
         pc = r1.piece;
         arr[pos++] = pc;
@@ -423,32 +420,19 @@ class PeerState
                   + " length: " + bs.length);
   }
 
+  /**
+   *  We now have this piece.
+   *  Tell the peer and cancel any requests for the piece.
+   */
   void havePiece(int piece)
   {
     if (_log.shouldLog(Log.DEBUG))
       _log.debug("Tell " + peer + " havePiece(" + piece + ")");
 
-    synchronized(this)
-      {
         // Tell the other side that we are no longer interested in any of
         // the outstanding requests for this piece.
-        if (lastRequest != null && lastRequest.piece == piece)
-          lastRequest = null;
-        
-        Iterator it = outstandingRequests.iterator();
-        while (it.hasNext())
-          {
-            Request req = (Request)it.next();
-            if (req.piece == piece)
-              {
-                it.remove();
-                // Send cancel even when we are choked to make sure that it is
-                // really never ever send.
-                out.sendCancel(req);
-              }
-          }
-      }
-    
+    cancelPiece(piece);
+
     // Tell the other side that we really have this piece.
     out.sendHave(piece);
     
@@ -463,8 +447,46 @@ class PeerState
       }
   }
 
-  // Starts or resumes requesting pieces.
-  private void request()
+  /**
+   * Tell the other side that we are no longer interested in any of
+   * the outstanding requests (if any) for this piece.
+   * @since 0.8.1
+   */
+  synchronized void cancelPiece(int piece) {
+        if (lastRequest != null && lastRequest.piece == piece)
+          lastRequest = null;
+        
+        Iterator<Request> it = outstandingRequests.iterator();
+        while (it.hasNext())
+          {
+            Request req = it.next();
+            if (req.piece == piece)
+              {
+                it.remove();
+                // Send cancel even when we are choked to make sure that it is
+                // really never ever send.
+                out.sendCancel(req);
+              }
+          }
+  }
+
+  /**
+   * Are we currently requesting the piece?
+   * @since 0.8.1
+   */
+  synchronized boolean isRequesting(int piece) {
+      for (Request req : outstandingRequests) {
+          if (req.piece == piece)
+              return true;
+      }
+      return false;
+  }
+
+  /**
+   * Starts or resumes requesting pieces.
+   * @param resend should we resend outstanding requests?
+   */
+  private void request(boolean resend)
   {
     // Are there outstanding requests that have to be resend?
     if (resend)
@@ -472,7 +494,6 @@ class PeerState
         synchronized (this) {
             out.sendRequests(outstandingRequests);
         }
-        resend = false;
       }
 
     // Add/Send some more requests if necessary.
@@ -481,8 +502,11 @@ class PeerState
 
   /**
    * Adds a new request to the outstanding requests list.
+   * Then send interested if we weren't.
+   * Then send new requests if not choked.
+   * If nothing to request, send not interested if we were.
    */
-  synchronized private void addRequest()
+  synchronized void addRequest()
   {
     boolean more_pieces = true;
     while (more_pieces)
@@ -526,6 +550,7 @@ class PeerState
   /**
    * Starts requesting first chunk of next piece. Returns true if
    * something has been added to the requests, false otherwise.
+   * Caller should synchronize.
    */
   private boolean requestNextPiece()
   {
@@ -553,11 +578,10 @@ class PeerState
               }
         }
         int nextPiece = listener.wantPiece(peer, bitfield);
-        if (_log.shouldLog(Log.DEBUG))
-          _log.debug(peer + " want piece " + nextPiece);
-            if (nextPiece != -1
-                && (lastRequest == null || lastRequest.piece != nextPiece))
-              {
+        if (nextPiece != -1
+            && (lastRequest == null || lastRequest.piece != nextPiece)) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug(peer + " want piece " + nextPiece);
                 // Fail safe to make sure we are interested
                 // When we transition into the end game we may not be interested...
                 if (!interesting) {
@@ -584,9 +608,25 @@ class PeerState
                   out.sendRequest(req);
                 lastRequest = req;
                 return true;
-              }
+          } else {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug(peer + " no more pieces to request");
+          }
       }
 
+    // failsafe
+    if (outstandingRequests.isEmpty())
+        lastRequest = null;
+
+    // If we are not in the end game, we may run out of things to request
+    // because we are asking other peers. Set not-interesting now rather than
+    // wait for those other requests to be satisfied via havePiece()
+    if (interesting && lastRequest == null) {
+        interesting = false;
+        out.sendInterest(false);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug(peer + " nothing more to request, now uninteresting");
+    }
     return false;
   }
 
@@ -601,7 +641,7 @@ class PeerState
         out.sendInterest(interest);
 
         if (interesting && !choked)
-          request();
+          request(true);  // we shouldnt have any pending requests, but if we do, resend them
       }
   }
 
@@ -626,5 +666,17 @@ class PeerState
   {
       if (interesting && !choked)
         out.retransmitRequests(outstandingRequests);
+  }
+
+  /**
+   *  debug
+   *  @return string or null
+   *  @since 0.8.1
+   */
+  synchronized String getRequests() {
+      if (outstandingRequests.isEmpty())
+          return null;
+      else
+          return outstandingRequests.toString();
   }
 }

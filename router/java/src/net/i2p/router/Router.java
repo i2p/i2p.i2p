@@ -218,6 +218,19 @@ public class Router {
         // NOW we start all the activity
         _context.initAll();
 
+        // Set wrapper.log permissions.
+        // Just hope this is the right location, we don't know for sure,
+        // but this is the same method used in LogsHelper and we have no complaints.
+        // (we could look for the wrapper.config file and parse it I guess...)
+        // If we don't have a wrapper, RouterLaunch does this for us.
+        if (System.getProperty("wrapper.version") != null) {
+            File f = new File(System.getProperty("java.io.tmpdir"), "wrapper.log");
+            if (!f.exists())
+                f = new File(_context.getBaseDir(), "wrapper.log");
+            if (f.exists())
+                SecureFileOutputStream.setPerms(f);
+        }
+
         _routerInfo = null;
         _higherVersionSeen = false;
         _log = _context.logManager().getLog(Router.class);

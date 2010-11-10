@@ -112,10 +112,14 @@ public class WorkingDir {
         // where we want to go
         String rv = dirf.getAbsolutePath();
         if (dirf.exists()) {
-            if (dirf.isDirectory())
-                return rv; // all is good, we found the user directory
-            System.err.println("Wanted to use " + rv + " for a working directory but it is not a directory");
-            return cwd;
+            if (dirf.isDirectory()) {
+                if (isSetup(dirf))
+                    return rv; // all is good, we found the user directory
+            }
+            else {
+                System.err.println("Wanted to use " + rv + " for a working directory but it is not a directory");
+                return cwd;
+            }
         }
         // Check for a router.keys file or logs dir, if either exists it's an old install,
         // and only migrate the data files if told to do so
@@ -131,7 +135,7 @@ public class WorkingDir {
             return cwd;
         boolean migrateOldData = false; // this is a terrible idea
 
-        if (!dirf.mkdir()) {
+        if (!dirf.exists() && !dirf.mkdir()) {
             System.err.println("Wanted to use " + rv + " for a working directory but could not create it");
             return cwd;
         }
@@ -157,6 +161,18 @@ public class WorkingDir {
             System.err.println("Continung to use data files in old directory " + cwd);
             return cwd;
         }
+    }
+
+    /** Returns <code>false</code> if a directory is empty, or contains nothing besides a subdirectory named plugins */
+    private static boolean isSetup(File dir) {
+        if (dir.isDirectory()) {
+            String[] files = dir.list();
+            if (files.length == 0)
+                return false;
+            if (files.length>1 || !"plugins".equals(files[0]))
+                return true;
+        }
+        return false;
     }
 
     /**
