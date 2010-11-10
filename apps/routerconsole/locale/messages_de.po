@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-11-10 08:24+0000\n"
-"PO-Revision-Date: 2010-11-10 14:02+0100\n"
+"PO-Revision-Date: 2010-11-10 15:08+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: echelon <echelon@mail.i2p>, Sperreingang <sperrbezirk@mail.i2p>\n"
 "MIME-Version: 1.0\n"
@@ -3314,7 +3314,7 @@ msgstr "Rückstau"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:412
 msgid "Job lag"
-msgstr "Aufgabenverzug"
+msgstr "Aufgabenverzögerung"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:418
 msgid "Message delay"
