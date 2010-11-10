@@ -288,7 +288,7 @@ public class I2PSnarkServlet extends Default {
         out.write("</th>\n<th align=\"center\">");
         out.write("<img border=\"0\" src=\"/themes/console/images/inbound.png\" title=\"");
         out.write(_("Down Rate"));
-        out.write("\">Rate");
+        out.write(_("Rate"));
         out.write("</th>\n<th align=\"center\">");
         out.write("<img border=\"0\" src=\"/themes/console/images/outbound.png\" title=\"");
         out.write(_("Up Rate"));
