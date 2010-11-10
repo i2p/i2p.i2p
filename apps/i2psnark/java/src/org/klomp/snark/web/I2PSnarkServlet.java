@@ -1371,9 +1371,9 @@ public class I2PSnarkServlet extends Default {
             buf.append("<form action=\"").append(base).append("\" method=\"POST\">\n");
             buf.append("<TABLE BORDER=0 class=\"snarkTorrents\" cellpadding=\"5px 10px\">" +
                    "<thead><tr><th>").append("<img border=\"0\" src=\"/themes/snark/ubergine/images/file.png\" title=\"").append(_("File")).append("\" alt=\"").append(_("File")).append("\">&nbsp;").append(title).append("</th><th align=\"right\">").append("<img border=\"0\" src=\"/themes/snark/ubergine/images/size.png\" title=\"").append(_("FileSize")).append("\" alt=\"").append(_("FileSize")).append("\">").append(_("Size"));
-        buf.append("</th><th>").append("<img border=\"0\" src=\"/themes/snark/ubergine/images/status.png\" title=\"").append(_("Download Status")).append("\">").append(_("Status")).append("</th>");
+        buf.append("</th><th class=\"headerstatus\">").append("<img border=\"0\" src=\"/themes/snark/ubergine/images/status.png\" title=\"").append(_("Download Status")).append("\">").append(_("Status")).append("</th>");
         if (showPriority)
-            buf.append("<th>").append("<img border=\"0\" src=\"/themes/snark/ubergine/images/priority.png\" title=\"\">").append(_("Priority")).append("</th>");
+            buf.append("<th class=\"headerpriority\">").append("<img border=\"0\" src=\"/themes/snark/ubergine/images/priority.png\" title=\"\">").append(_("Priority")).append("</th>");
         buf.append("</tr></thead>\n");
             buf.append("<tr><td colspan=\"4\" class=\"ParentDir\"><A HREF=\"");
             buf.append(URI.addPaths(base,"../"));

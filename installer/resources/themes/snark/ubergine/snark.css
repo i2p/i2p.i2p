@@ -181,6 +181,16 @@ tfoot th {
      padding-bottom: 4px !important;
 }
 
+.headerstatus {
+     text-align: left;
+     padding-left: 15px;
+}
+
+.headerpriority {
+     text-align: left;
+     padding-left: 10px;
+}
+
 .ParentDir {
      background: #656;
      background: #351933;
@@ -324,17 +334,21 @@ td:first-child {
 
 .snarkFileSize {
      padding: 4px 2px;
+     font-weight: bold;
+     color: #b6b !important;
 }
 
 .snarkFileStatus {
-     padding: 4px 10px;
-	 text-align: center;
-	 font-style: italic;
+     padding: 4px 5px 4px 15px;
+     text-align: center;
+     font-style: italic;
+     font-size: 7.5pt;
+     text-align: left;
 }
 
 .snarkTorrentETA {
      font-weight: bold;
-	 font-style: italic;
+     font-style: italic;
      color: #dd7 !important;
 }
 
