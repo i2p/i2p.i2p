@@ -962,7 +962,7 @@
         </exec>
     </target>
     <target name="debianrepo" depends="debian">
-        <exec dir="debian" executable="./makerepo.sh" />
+        <exec dir="debian" executable="./makerepo.sh" failonerror="true"/>
     </target>
 
 <!-- the following are appened to help build barebone portable version, 
