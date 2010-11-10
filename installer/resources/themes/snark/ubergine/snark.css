@@ -192,6 +192,10 @@ tfoot th {
      padding: 4px 0;
 }
 
+.priority {
+     font-size: 7pt;
+     vertical-align: center;
+}
 
 .SnarkTorrents {
      margin: 0;
@@ -314,7 +318,8 @@ td:first-child {
 .snarkFileName {
 /*     min-width: 25em;*/
      padding: 4px 0px !important; 
-	 text-align: left !important;
+     text-align: left !important;
+     font-size: 8pt !important;
 }
 
 .snarkFileSize {
@@ -471,8 +476,8 @@ input[type=text]:active, input[type=text]:hover, input.r:hover {
 
 input[type=radio] {
      padding: 2px;
-     color: #f00 !important;
-     margin: 0 5px 0 15px;
+     margin: 0 3px 0 8px;
+     vertical-align: bottom;
 }
 
 select {

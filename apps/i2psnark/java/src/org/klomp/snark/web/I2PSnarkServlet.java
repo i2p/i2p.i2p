@@ -1005,7 +1005,10 @@ public class I2PSnarkServlet extends Default {
         out.write(_("Add Torrent"));
         out.write("</span><hr>\n<table border=\"0\"><tr><td>");
         out.write(_("From URL"));
-        out.write(":<td><input type=\"text\" name=\"newURL\" size=\"85\" value=\"" + newURL + "\" > \n");
+        out.write(":<td><input type=\"text\" name=\"newURL\" size=\"85\" value=\"" + newURL + "\"");
+        out.write("title=\"");
+        out.write(_("Torrent file must originate from an I2P-based tracker"));
+        out.write("\"> \n");
         // not supporting from file at the moment, since the file name passed isn't always absolute (so it may not resolve)
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>");
         out.write("<input type=\"submit\" value=\"");
@@ -1370,7 +1373,7 @@ public class I2PSnarkServlet extends Default {
                    "<thead><tr><th>").append("<img border=\"0\" src=\"/themes/snark/ubergine/images/file.png\" title=\"").append(_("File")).append("\" alt=\"").append(_("File")).append("\">&nbsp;").append(title).append("</th><th align=\"right\">").append("<img border=\"0\" src=\"/themes/snark/ubergine/images/size.png\" title=\"").append(_("FileSize")).append("\" alt=\"").append(_("FileSize")).append("\">").append(_("Size"));
         buf.append("</th><th>").append("<img border=\"0\" src=\"/themes/snark/ubergine/images/status.png\" title=\"").append(_("Download Status")).append("\">").append(_("Status")).append("</th>");
         if (showPriority)
-            buf.append("<th>").append(_("Priority")).append("</th>");
+            buf.append("<th>").append("<img border=\"0\" src=\"/themes/snark/ubergine/images/priority.png\" title=\"\">").append(_("Priority")).append("</th>");
         buf.append("</tr></thead>\n");
             buf.append("<tr><td colspan=\"4\" class=\"ParentDir\"><A HREF=\"");
             buf.append(URI.addPaths(base,"../"));
@@ -1465,7 +1468,7 @@ public class I2PSnarkServlet extends Default {
             buf.append(status);
             buf.append("</TD>");
             if (showPriority) {
-                buf.append("<td>");
+                buf.append("<td class=\"priority\">");
                 File f = item.getFile();
                 if ((!complete) && (!item.isDirectory()) && f != null) {
                     int pri = snark.storage.getPriority(f.getCanonicalPath());
@@ -1482,7 +1485,7 @@ public class I2PSnarkServlet extends Default {
                     buf.append("<input type=\"radio\" value=\"-9\" name=\"pri.").append(f.getCanonicalPath()).append("\" ");
                     if (pri < 0)
                         buf.append("checked=\"true\"");
-                    buf.append('>').append(_("Do not download"));
+                    buf.append('>').append(_("Ignore"));
                     showSaveButton = true;
                 }
                 buf.append("</td>");
