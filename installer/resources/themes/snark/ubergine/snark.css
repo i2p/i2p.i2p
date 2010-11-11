@@ -281,7 +281,7 @@ td:first-child {
 .snarkTorrentStatus:first-child {
      text-align: left !important;
      padding-left: 0px;
-     min-width: 92px;
+     min-width: 120px;
      font-weight: bold;
      color: #dd9 !important;
      font-size: 8pt;
