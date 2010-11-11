@@ -531,11 +531,28 @@ img {
      line-height: 100%;
 }
 
-img: hover {
+img:hover {
      border: none;
-     opacity: 0.5;
+     opacity: 1;
      line-height: 100%;
 }
+
+.infoz {
+     margin: 0 -1px 0 0 !important;
+     padding: 0 !important;
+     lineheight: 100%;
+     float: left;
+}
+
+.infoz img {
+     border: none;
+     opacity: 0.5 !important;
+}
+
+.infoz img:hover {
+     opacity: 1 !important;
+}
+
 
 div.section,div.mainsection {
      margin: 0 0 10px 0;

@@ -796,7 +796,7 @@ public class I2PSnarkServlet extends Default {
                 out.write("&nbsp;<a href=\"" + baseURL + "details.php?dllist=1&filelist=1&info_hash=");
                 out.write(TrackerClient.urlencode(snark.meta.getInfoHash()));
                 out.write("\" title=\"" + name + ' ' + _("Tracker") + "\" target=\"_blank\">");
-                out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/details.png\">");
+                out.write("<div class=\"infoz\"><img border=\"0\" src=\"/themes/snark/ubergine/images/details.png\"></div>");
                 out.write("</a>");
                 break;
             }
