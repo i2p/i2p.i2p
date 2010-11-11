@@ -5,19 +5,19 @@
 <div class="welcome"><h2>Willkommen im I2P!</h2></div>
 <p>Wenn Du I2P gerade gestartet hast, sollten die "Aktiv:"-Zahlen links in den n&auml;chsten paar Minuten anwachsen, und Du siehst dann dort ein als "versch. Klienten" bezeichnetes lokales Ziel gelistet (falls nicht, <a href="#trouble">siehe unten</a>). Sobald das erscheint, kannst Du:</p>
 <ul>
- <li><b>"Eepsites" besuchen</b> - In I2P gibt es anonym gehostete Websites: 
-     Konfiguriere Deinen Browser, &uuml;ber den <b>HTTP-Proxy: 127.0.0.1 Port 4444</b> zu surfen, dann besuche eine Eepsite:<br>
+ <li><b>"Eepseiten" besuchen</b> - In I2P gibt es anonym gehostete Websites: 
+     Konfiguriere Deinen Browser, &uuml;ber den <b>HTTP-Proxy: 127.0.0.1 Port 4444</b> zu surfen, dann besuche eine Eepseite:<br>
      <ul class="links">
          <li><a href="http://forum.i2p/">forum.i2p</a>: Eine sichere und anonyme Verbindung zu <a href="http://forum.i2p2.de/">forum.i2p2.de</a></li>
          <li><a href="http://www.i2p2.i2p/index_de.html">www.i2p2.i2p</a> und der Spiegel <a href="http://i2p-projekt.i2p/index_de.html">i2p-projekt.i2p</a>:
               Sichere und anonyme Verbindungen zu <a href="http://www.i2p2.de/index_de.html">www.i2p2.de</a></li>
-         <li><a href="http://eepsites.i2p/">eepsites.i2p</a>: Eine anonym gehostete Suchseite f&uuml;r Eepsites</li>
-         <li><a href="http://ugha.i2p/">ugha.i2p</a>: Ugha's Eepsite, ein &ouml;ffentliches Wiki mit vielen Links</li>
+         <li><a href="http://eepsites.i2p/">eepsites.i2p</a>: Eine anonym gehostete Suchseite f&uuml;r Eepseiten</li>
+         <li><a href="http://ugha.i2p/">ugha.i2p</a>: Ugha's Eepseite, ein &ouml;ffentliches Wiki mit vielen Links</li>
          <li><a href="http://fproxy.tino.i2p">fproxy.tino.i2p</a>: ein Freenet-Proxy</li>
 	 <li><a href="http://echelon.i2p">echelon.i2p</a>: Software-Archiv und Informationen zu I2P (mit BitTorrent-Klienten, I2P-Messenger, I2P-Bote, ...)</li>
          <li><a href="http://paste.i2p2.i2p">paste.i2p2.i2p</a>: Anonymer Pastebin</li>
 	</ul><br />
-     Es gibt viele andere Eepsites - folge einfach den Links, die du findest,
+     Es gibt viele andere Eepseiten - folge einfach den Links, die du findest,
      setze Lesezeichen für Deine Favoriten, und besuche sie oft!</li><br />
  <li class="tidylist"><b>Im Internet surfen</b> - Es gibt in I2P einen HTTP-"Outproxy". Um ihn zu nutzen, kannst du ebenfalls den
      HTTP-Proxy auf Port 4444 verwenden - Konfiguriere Deines Browsers Proxy-Einstellungen 
@@ -40,9 +40,9 @@
  <li class="tidylist">und vieles mehr</li>
 </ul>
 
-<h2>Willst Du Deine eigene Eepsite?</h2>
+<h2>Willst Du Deine eigene Eepseite?</h2>
 
-<p>I2P kommt mit Software, die es Dir  erm&ouml;glicht, Deine eigene Eepsite laufen zu lassen 
+<p>Das I2P-Paket beinhaltet Software, die es Dir  erm&ouml;glicht, Deine eigene Eepseite zu betreiben 
    : Eine 
 <a href="http://jetty.mortbay.org/">Jetty</a>-Instanz horcht auf 
 <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a>. Platziere einfach 
@@ -50,8 +50,8 @@
    Standard-JSP/Servlet <code>.war</code> unter <code>eepsite/webapps</code>, 
    CGI Scripte unter <code>eepsite/cgi-bin</code>) und schon sind sie 
    verf&uuml;gbar.  Nach dem Starten des <a href="/i2ptunnel/">Eepseiten-Tunnels</a>,
-   der darauf zeigt, ist Deine Eepsite f&uuml;r andere verf&uuml;gbar. 
-   Detailierte Instruktionen zum Start Deiner eigenen Eepsite sind auf
+   der darauf zeigt, ist Deine Eepseite f&uuml;r andere verf&uuml;gbar. 
+   Detailierte Instruktionen zum Start Deiner eigenen Eepseite findest Du auf
    <a href="http://127.0.0.1:7658/">Deiner tempor&auml;ren Eepseite</a>.
 </p>
 
@@ -60,12 +60,12 @@
 <p>Hab Geduld, denn nach dem ersten Start kann I2P noch etwas langsam sein. 
   Dein Router braucht etwas Zeit, um Verbindungen zu suchen und das Netzwerk kennenzulernen. 
   Falls nach 30 Minuten die Zahl Deiner aktiven Verbindungen (im Seitenpanel unter 
-  "Teilnehmer" die Zahl hinter "Aktiv:") noch immer geringer als 10 ist,  
+  "Teilnehmer", die Zahl hinter "Aktiv:") noch immer geringer als 10 ist,  
   solltest Du den I2P-Port auf Deiner Firewall &ouml;ffnen, um 
   f&uuml;r eine bessere Verbindung zu sorgen. Den von I2P bei Dir benutzten Port 
   (bei jeder Installation setzt I2P einen anderen) siehst Du auf der 
   <a href="config.jsp">Konfigurationsseite</a>.
-  Wenn Du gar keine Eepsites erreichen kannst (auch nicht 
+  Wenn Du gar keine Eepseiten erreichen kannst (auch nicht 
   <a href="http://www.i2p2.i2p/index_de.html">www.i2p2.i2p</a>), dann stell sicher, dass Dein 
   Internet-Browser auf den Proxy 127.0.0.1 Port 4444 eingestellt ist!
   Vielleicht m&ouml;chtest Du auch die Informationen lesen, die auf der 
