@@ -809,7 +809,7 @@ public class I2PSnarkServlet extends Default {
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentDownloaded " + rowClass + "\">");
         if (remaining > 0)
-            out.write(formatSize(total-remaining) + "&thinsp;/&thinsp;" + formatSize(total)); // 18MB/3GB; thin space so it will line break well
+            out.write(formatSize(total-remaining) + "/" + formatSize(total)); // 18MB/3GB; remove thin space so line does _not_ break. We don't want a break here.
         else
             out.write(formatSize(total)); // 3GB
         out.write("</td>\n\t");
