@@ -3,13 +3,13 @@ Maintainer: i2p
 Section: net
 Priority: optional
 Homepage: http://www.i2p2.de/
-Build-Depends: java-sdk, ant, gettext
+Build-Depends: sun-java6-jdk | openjdk-6-jdk | default-jdk | java-sdk, ant, fakeroot, gettext
 
 Package: i2p
 Architecture: all
 Section: net
 Priority: optional
-Depends: sun-java6-jre | default-jre | java-runtime
+Depends: libc6, sun-java6-jre | default-jre | java-runtime
 Description: Load-balanced unspoofable packet switching network
  I2P is an anonymizing network, offering a simple layer that identity-sensitive
  applications can use to securely communicate. All data is wrapped with several
