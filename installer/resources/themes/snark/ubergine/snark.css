@@ -17,20 +17,20 @@ body {
      text-decoration: none !important;
      text-transform: uppercase !important;
      padding: 4px 16px 5px !important;
-	 margin: -5px -8px -5px 0 !important;
+     margin: -5px -8px -5px 0 !important;
      letter-spacing: 0.05em;
      font-weight: bold;
      font-size: 11pt;
      color: #f70;
-	 text-shadow: 1px 1px #420;
+     text-shadow: 1px 1px #420;
      background: url('/themes/snark/ubergine/images/snarknav_lowlight.png') no-repeat scroll center bottom;
      background: #310 url('/themes/snark/ubergine/images/snarknav_on.png') repeat-x scroll center center;
-	 -moz-border-radius: 0px;
-	 -khtml-border-radius: 3px;
-	 border-radius: 0px;
-	 -moz-box-shadow: inset 0 0 1px 0 #f90;
-	 -khtml-box-shadow: inset 0 0 1px 0 #f90;
-	 box-shadow: 0 0 1px 0 #f90;
+     -moz-border-radius: 0px;
+     -khtml-border-radius: 3px;
+     border-radius: 0px;
+     -moz-box-shadow: inset 0 0 1px 0 #f90;
+     -khtml-box-shadow: inset 0 0 1px 0 #f90;
+     box-shadow: 0 0 1px 0 #f90;
 
 }
 
@@ -226,7 +226,6 @@ td {
 
 td:first-child {
      text-align: right;
-/*     padding-left: 10px;*/
      font-size: 9.5pt;
 }
 
@@ -245,7 +244,7 @@ td:first-child {
 
 .snarkTorrentAction img {
      margin: 0 2px !important;
-	 opacity: 0.6;
+     opacity: 0.6;
 }
 
 .snarkTorrentAction img:hover {
@@ -259,19 +258,12 @@ td:first-child {
      background: #202;
 }
 
-/*
-.snarkTorrentEven tr:first-child {
-	 border: 1px dotted #fff !important;
-}
-
-*/
-
 .snarkTorrentNoneLoaded {
      background: #323;
      font-size: 8.5pt;
-	 font-weight: bold;
-	 text-align: center !important;
-	 color: #bbb !important;
+     font-weight: bold;
+     text-align: center !important;
+     color: #bbb !important;
 }
 
 .snarkTorrentStatus {
@@ -317,16 +309,15 @@ td:first-child {
      background: #656;
      background: #351933;
      font-size: 8pt;
-	 border: 0px inset #101 !important;
-	 border-left: 0 !important;
-	 border-right: 0 !important;
+     border: 0px inset #101 !important;
+     border-left: 0 !important;
+     border-right: 0 !important;
 }
 .snarkTorrentOdd td, .snarkTorrentEven td {
-	 border-top: 1px dotted #313 !important;
+     border-top: 1px dotted #313 !important;
 }
 
 .snarkFileName {
-/*     min-width: 25em;*/
      padding: 4px 0px !important; 
      text-align: left !important;
      font-size: 8pt !important;
@@ -369,17 +360,17 @@ td:first-child {
 .snarkConfigTitle {
      font-size: 11pt;
      font-weight: bold;
-	 padding: 0 25px 3px 25px;
-	 margin: 5px 0 10px 0 !important;
-	 letter-spacing: 0.25em;
-	 border: 1px solid #111;
-	 -moz-border-radius: 0 0 5px 5px;
-	 -khtml-border-radius: 0 0 5px 5px;
-	 border-radius: 0 0 5px 5px;
-	 border-top: 0;
-	 text-shadow: 0px 3px 5px #323;
-	 background: #101 url('/themes/snark/ubergine/images/snarknav.png') repeat-x scroll center center !important;
-	 font-variant: small-caps !important;
+     padding: 0 25px 3px 25px;
+     margin: 5px 0 10px 0 !important;
+     letter-spacing: 0.25em;
+     border: 1px solid #111;
+     -moz-border-radius: 0 0 5px 5px;
+     -khtml-border-radius: 0 0 5px 5px;
+     border-radius: 0 0 5px 5px;
+     border-top: 0;
+     text-shadow: 0px 3px 5px #323;
+     background: #101 url('/themes/snark/ubergine/images/snarknav.png') repeat-x scroll center center !important;
+     font-variant: small-caps !important;
 }
 
 .snarkConfig {
@@ -452,7 +443,7 @@ input {
      border-radius: 4px;
      border: 1px inset #000;
      background: #212 url('/themes/snark/ubergine/images/graytile.png');	 
-	 color: #f60;
+     color: #f60;
      margin: 2px 0;
 }
 
@@ -463,29 +454,29 @@ input.r {
 
 input[type=submit] {
      text-shadow: 0px 0px #410;
-	 color: #000;
-	 background: #989;
-	 border: 1px inset #bbb;
+     color: #000;
+     background: #989;
+     border: 1px inset #bbb;
      padding: 2px;
 }
 
 input[type=submit]:hover {
-	 border: 1px outset #bbb;
+     border: 1px outset #bbb;
      text-shadow: 0 0;	 
      background: #f60;
-	 color: #fff;
-	 text-shadow: 0px 1px 5px #f00;
+     color: #fff;
+     text-shadow: 0px 1px 5px #f00;
 }
 
 input[type=submit]:active {
      background: #000 !important;
-	 color: #f60 !important;
-	 text-shadow: 0 !important;
+     color: #f60 !important;
+     text-shadow: 0 !important;
 }
 
 input[type=text]:active, input[type=text]:hover, input.r:hover {
      background: #f60;
-	 color: #fff;
+     color: #fff;
 }
 
 input[type=radio] {
@@ -496,7 +487,7 @@ input[type=radio] {
 
 select {
      background: #333;
-	 background: url('/themes/snark/ubergine/images/graytile.png') !important;
+     background: url('/themes/snark/ubergine/images/graytile.png') !important;
      color: #f60;
      font: 9pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
      font-weight: bold;
@@ -504,13 +495,13 @@ select {
      -moz-border-radius: 4px 0 0 4px;
      -khtml-border-radius: 4px 0 0 4px;
      border-radius: 4px 0 0 4px;
-	 border: 1px solid #000;
+     border: 1px solid #000;
 }
 
 select:hover, textarea:hover {
      background: #f60 !important;
      color: #fff !important;
-}	 
+}
 
 textarea {
      background: #111 url('/themes/snark/ubergine/images/graytile.png');
@@ -566,7 +557,7 @@ div.section,div.mainsection {
      word-wrap: break-word;
      text-align: center;
      background: #545;
-	 opacity: 1 !important;
+     opacity: 1 !important;
 }
 
 div.newtorrentsection {
@@ -643,12 +634,12 @@ div.configsectionpanel {
 
 div.configsection table{
      color: #ffb;
-	 opacity: 1;
+     opacity: 1;
 }
 
 div.configsection a {
      color: #f60;
-	 text-shadow: 1px 1px #500;
+     text-shadow: 1px 1px #500;
 }
 
 div.configsection a:hover {
@@ -659,9 +650,9 @@ div.configsection a:hover {
 code {
      font-size: 9.5pt;
      color: #b8b;
-	 padding: 0 2px;
-	 font-weight: bold;
-	 font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     padding: 0 2px;
+     font-weight: bold;
+     font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono;
 }
 .snarknavbar {
      margin: -10px 0 5px 0 !important;
@@ -679,9 +670,9 @@ code {
      font-weight: bold;
      font-size: 11.5pt;
      color: #001;
-	 min-width: 700px;
-	 width: 700px;
-	 text-align: center;
+     min-width: 700px;
+     width: 700px;
+     text-align: center;
  }
 
  .snarknavbar img {
