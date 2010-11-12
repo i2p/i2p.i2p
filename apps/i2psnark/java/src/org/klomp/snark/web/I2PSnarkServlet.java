@@ -639,7 +639,7 @@ public class I2PSnarkServlet extends Default {
         return rv;
     }
 
-    private static final int MAX_DISPLAYED_FILENAME_LENGTH = 44;
+    private static final int MAX_DISPLAYED_FILENAME_LENGTH = 50;
     private static final int MAX_DISPLAYED_ERROR_LENGTH = 6;
     private void displaySnark(PrintWriter out, Snark snark, String uri, int row, long stats[], boolean showPeers, boolean showDebug) throws IOException {
         String filename = snark.torrent;
