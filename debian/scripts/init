@@ -14,7 +14,7 @@ set -e
 . /lib/lsb/init-functions
 
 I2P () {
-	su i2psvc -c "/usr/lib/i2p/i2prouter $1"
+	su i2psvc -c "/usr/bin/i2prouter $1"
 }
 
 if [ `id -un` != "root" ]; then
