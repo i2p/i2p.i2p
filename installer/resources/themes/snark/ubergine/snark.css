@@ -381,7 +381,7 @@ td:first-child {
 .page {
      background: #323 url('/themes/snark/ubergine/images/tile2.png');
      color: #310;
-     min-width: 950px !important;
+     min-width: 964px !important;
      margin: 5px 0 0 0;
      padding: 10px 10px 0px 10px;
      -moz-border-radius: 4px;
