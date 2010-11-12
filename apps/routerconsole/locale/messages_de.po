@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-11-10 08:24+0000\n"
-"PO-Revision-Date: 2010-11-10 15:08+0100\n"
+"PO-Revision-Date: 2010-11-12 02:26+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: echelon <echelon@mail.i2p>, Sperreingang <sperrbezirk@mail.i2p>\n"
 "MIME-Version: 1.0\n"
@@ -2825,11 +2825,11 @@ msgstr "Status"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:126
 msgid "Fast, High Capacity"
-msgstr "Schnell, hohe Kapazität"
+msgstr "schnell, hohe Kapazität"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:127
 msgid "High Capacity"
-msgstr "Hohe Kapazität"
+msgstr "hohe Kapazität"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:128
 msgid "Standard"
@@ -2843,7 +2843,7 @@ msgstr "fehlgeschlagen"
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:131
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:281
 msgid "Integrated"
-msgstr "Integriert"
+msgstr "integriert"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:164
 msgid "Unreachable"
@@ -3252,15 +3252,15 @@ msgstr "aktiv"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:269
 msgid "Fast"
-msgstr "Schnell"
+msgstr "schnell"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:275
 msgid "High capacity"
-msgstr "Hohe Kapazität"
+msgstr "hohe Kapazität"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:287
 msgid "Known"
-msgstr "Bekannt"
+msgstr "bekannt"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:302
 msgid "Help with firewall configuration"
