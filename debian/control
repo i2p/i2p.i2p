@@ -6,7 +6,7 @@ Homepage: http://www.i2p2.de/
 Build-Depends: sun-java6-jdk | openjdk-6-jdk | default-jdk | java-sdk, ant, fakeroot, gettext
 
 Package: i2p
-Architecture: all
+Architecture: i386 amd64
 Section: net
 Priority: optional
 Depends: libc6, sun-java6-jre | default-jre | java-runtime

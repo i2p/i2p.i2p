@@ -933,6 +933,21 @@
         <ant dir="apps/jetty" target="ensureJettylib" />
         <exec executable="dpkg-buildpackage" failifexecutionfails="true">
             <arg value="-I_MTN" />
+            <arg value="-ai386" />
+        </exec>
+        <!-- rather than doing a complete new build, recreate debian/tmp by calling the "build" target in debian/rules -->
+        <delete dir="debian/tmp" />
+        <exec executable="dpkg-buildpackage" failifexecutionfails="true">
+            <arg value="-I_MTN" />
+            <arg value="-Tbuild" />
+            <arg value="-aamd64" />
+            <env key="MAKEFLAGS" value="-B" />
+        </exec>
+        <exec executable="dpkg-buildpackage" failifexecutionfails="true">
+            <arg value="-I_MTN" />
+            <!-- don't clean so the previous package isn't deleted -->
+            <arg value="-nc" />
+            <arg value="-aamd64" />
         </exec>
     </target>
     <target name="debian-binary">

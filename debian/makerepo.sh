@@ -28,8 +28,8 @@ echo "SignWith: ${SIGNER}" >> ${CONFFILE}
 
 # create the repository
 echo Building the repository...
-reprepro --ask-passphrase --outdir ${DIR} includedeb all ../../i2p_*.deb
-reprepro --ask-passphrase --outdir ${DIR} include all ../../i2p_*.changes
+find ../.. -name i2p_*.deb -maxdepth 1 -exec reprepro --ask-passphrase --outdir ${DIR} includedeb all {} \;
+find ../.. -name i2p_*.changes -maxdepth 1 -exec reprepro --ask-passphrase --outdir ${DIR} include all {} \;
 
 # export the public key
 gpg --armor --export ${SIGNER} > ${DIR}/0x${KEYID}.asc
