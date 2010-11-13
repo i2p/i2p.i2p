@@ -1,4 +1,6 @@
 #!/bin/sh
+set -e
+
 invoke-rc.d i2p stop
 
 # stuff in /tmp
