@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# /etc/rc*.d/*i2p files	
+update-rc.d -f i2p remove
+
 I2PUSER=i2psvc
 # delete $I2PUSER if it exists (it will not if this is a purge after a remove)
 id $I2PUSER 2>/dev/null
