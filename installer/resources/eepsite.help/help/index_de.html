@@ -2,14 +2,14 @@
 <html><head>
 
   
-    <title>Willkommen zu Ihrer Eepsite!</title>
+    <title>Willkommen auf Ihrer Eepseite!</title>
     <meta name="generator" content="muse.el">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <link rel="stylesheet" type="text/css" href="lib/eepsite.css">
   </head><body>
 <div class="fairylights">
 <div class="main">
-    <h1>Willkommen zu Ihrer Eepsite!</h1>
+    <h1>Willkommen auf Ihrer Eepseite!</h1>
 <div class="langbar">
 <!-- Most of these languages listed here are yet to be translated -->
 <a href="index.html"><img src="lib/us.png" title="English" alt="English"></a> 
@@ -20,63 +20,62 @@
 <a href="index_ru.html"><img src="lib/ru.png" title="Русский" alt="Русский"></a> 
 <a href="index_sv.html"><img src="lib/se.png" title="Svenska" alt="Svenska"></a> 
 </div>
-<p>Diese ist Ihre <strong>Eepsite</strong>, Ihre Web-Präsens über I2P. Editieren Sie einfach die Dateien unter 
+<p>Dies ist Ihre <strong>Eepseite</strong>, Ihre Web-Präsens über I2P. Editieren Sie einfach die Dateien unter 
 <em>~/.i2p/eepsite/docroot/</em> (Linux) oder <em>%APPDATA%\I2P\eepsite\docroot\</em> (Windows)
 und nachdem Sie den Anweisungen weiter unten gefolgt sind, werden Sie –
-vertreten durch Ihre Eepsite – von anderen im I2P-Netz und, soweit
-verfügbar, über private „Out-Proxys“ weltweit erreichbar sein.</p>
+vertreten durch Ihre Eepseite – von anderen im I2P-Netz und, soweit
+verfügbar, über private „Out-Proxys“ weltweit auch im offenen Internet erreichbar sein.</p>
 
-<p>In I2P werden Eepsites unter Verwendung eines Schlüssels (key) adressiert, dieser wird durch eine sehr lange Base64-Zeichenkette<sup><a class="footref" name="fnr.1" href="#fn.1">1</a></sup> dargestellt.
-(Dieser Schlüssel ist analog zur Standard IP-Adresse zu verstehen; man kann ihn sich in der Konfiguration für Eepsites unter <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">I2PTunnel</a> anzeigen lassen.)</p>
+<p>In I2P werden Eepseiten unter Verwendung eines Schlüssels (key) adressiert. Dieser wird durch eine sehr lange Base64-Zeichenkette<sup><a class="footref" name="fnr.1" href="#fn.1">1</a></sup> dargestellt.
+(Dieser Schlüssel ist analog zur Standard IP-Adresse zu verstehen; man kann ihn sich in der Konfiguration der Eepseite unter <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">I2PTunnel</a> anzeigen lassen.)</p>
 
 <p>Folgende Anweisungen sollen zeigen, wie man einer Eepsite einen
-Namen wie beispielsweise „meineseite.i2p“ zuweist und an dem Schlüssel
+Namen wie beispielsweise „meineseite.i2p“ zuweist und an den Schlüssel
 bindet.
-Sie können Ihre Eepsite, nachdem sie gestartet wurde, lokal unter <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a> erreichen.</p>
+Sie können Ihre Eepseite, nachdem sie gestartet wurde, lokal unter <a href="http://127.0.0.1:7658/">http://127.0.0.1:7658/</a> erreichen.</p>
 
-<p>Es folgt eine schrittweise Anleitung für das Starten Ihrer neuen Eepsite und dessen Ankündigung in der I2P-Gemeinde.</p>
+<p>Es folgt eine schrittweise Anleitung für das Starten Ihrer neuen Eepseite und dessen Ankündigung in der I2P-Gemeinde.</p>
 
-<p>In der Grundeinstellung ist Ihre Eepsite nicht eingeschaltet.
-Auch nach dem sie gestartet wurde, ist es für andere Teilnehmer immer
-noch schwierig Ihre Seite zu finden, solange bis Sie Ihren
+<p>In der Grundeinstellung ist Ihre Eepseite nicht eingeschaltet.
+Auch nachdem sie gestartet wurde, ist es für andere Teilnehmer immer
+noch schwierig, Ihre Seite zu finden; solange bis Sie Ihren
 Base64-Schlüssel und den Namen Ihrer Eepsite veröffentlicht haben.
 Natürlich können Sie den Leuten diesen sehr langen Schlüssel auch so
 mitteilen, aber glücklicherweise bringt I2P bereits ein Adressbuch mit
-und hat verschiedene Wege um Ihre Eepsite bekannt zu machen.</p>
+und hat verschiedene Wege, Ihre Eepsite bekannt zu machen.</p>
 
 
-<h3>Eine detailierte Einführung</h3>
+<h3>Eine detaillierte Einführung</h3>
 
-<h4>Meine Eepsite</h4>
+<h4>Meine Eepseite</h4>
 
 <ol>
-<li>Wählen Sie einen eigenen Namen für Ihre Eepsite – nur in diesem
-Beispiel heißt sie „meineseite.i2p“ – benutzen Sie nur Kleinschrift.
-Sie können in Ihrem <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=router">Adressbuch</a> überprüfen, ob der gewünschte Name bereits vergeben ist (Anmerkung: die Daten aus den Adressbuch werden im Klartext in der <em>i2p/hosts.txt</em> gespeichert).
+<li>Wählen Sie einen eigenen Namen für Ihre Eepseite – nur in diesem
+Beispiel heißt sie „meineseite.i2p“ – und benutzen Sie nur Kleinschrift.
+Sie können in Ihrem <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=router">Adressbuch</a> überprüfen, ob der gewünschte Name bereits vergeben ist. (Anmerkung: die Daten aus den Adressbuch werden im Klartext in der Datei <em>i2p/hosts.txt</em> gespeichert).
 <br>
 <br></li>
-<li>Rufen Sie nun, möglichst in einem neuen Browser-Fenster, die Konfiguration für Eepsites <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">I2PTunnel</a> auf. Unter „Local Server Tunnels“ wählen Sie den Eintrag „<a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite</a>“.
-Sie befinden sich nun auf der Seite mit Überschrift „Edit server
-settings“. In das Feld für „Website name:“ überschreiben Sie die
+<li>Rufen Sie nun, möglichst in einem neuen Browser-Fenster, die Konfiguration der Eepseite unter <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">I2PTunnel</a> auf. Unter „Lokale Servertunnel“ wählen Sie dazu den Eintrag „<a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">Eepseite</a>“ aus.
+Sie befinden sich nun auf der Seite mit Überschrift „Servertunnel bearbeiten“. Im Feld für „Name der Webseite:“ überschreiben Sie die
 Vorgabe „mysite.i2p“ mit Ihrem Wunschnamen. Optional geben Sie im Feld
-„Description:“ eine Beschreibung an.
+„Beschreibung:“ eine Beschreibung an.
 <br>
 <br></li>
-<li>Wenn Sie möchten das Ihre Eepsite automatisch gestartet wird, kreuzen Sie das Feld „Auto Start:“ an.
+<li>Wenn Sie möchten, dass Ihre Eepsite automatisch gestartet wird, kreuzen Sie das Feld „Automatischer Start:“ an.
 <br>
 <br></li>
-<li>Durch drücken des Links „Add to local addressbook“ gleich rechts
-neben Ihrem Schlüssel (Feld „Local destination“) wird Ihr Schlüssel in
+<li>Durch Drücken des Links „zum lokalen Adressbuch hinzufügen“ gleich unterhalb
+Ihres Schlüssels (Feld „lokales Ziel“) wird dieser in
 Ihr <em>privates</em> Adressbuch geschrieben (<em>i2p/privatehosts.txt</em>).
 <br>
 <br></li>
-<li>Jetzt sichern Sie Ihre Einstellungen indem Sie auf „Save“ klicken.
+<li>Jetzt sichern Sie Ihre Einstellungen, indem Sie auf „Speichern“ klicken.
 <br>
 <br></li>
 <li>Wir gehen wieder zurück auf die Konfigurationsseite <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">I2PTunnel</a>
-und drücken den „Start“-Knopf für die „eepsite“. Nach dem erfolgreichen
-Start wird Ihre Eepsite auf der linken Seite in der I2P <a href="http://127.0.0.1:7657/index.jsp">Router Console</a> unter „Local
-Destinations“ angezeigt.</li>
+und drücken den „Start“-Knopf für die „Eepseite“. Nach dem erfolgreichen
+Start wird Ihre Eepseite links in der I2P-<a href="http://127.0.0.1:7657/index.jsp">Routerkonsole</a> unter „Lokale
+Ziele“ angezeigt.</li>
 </ol>
 
 
@@ -85,50 +84,50 @@ Destinations“ angezeigt.</li>
 
 <ol>
 <li>Heben Sie in der „<a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">Konfiguration</a>“
-den gesamten Schlüssel für Ihre Eepsite hervor und kopieren ihn in die
-Zwischenablage. Stellen Sie sicher auch tatsächlich die gesamte, über
-500 Zeichen lange Zeichenkette die auf „AAAA“ endet, „erwischt“ zu
+den gesamten Schlüssel für Ihre Eepsite hervor und kopieren Sie ihn in die
+Zwischenablage. Stellen Sie sicher, auch tatsächlich die gesamte, über
+500 Zeichen lange Zeichenkette, die auf „AAAA“ endet, „erwischt“ zu
 haben.
 <br>
 <br></li>
 <li>Öffnen Sie Ihr <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=master">Master-Adressbuch</a>,
-tragen Ihren zuvor gewählten Wunschnamen ihrer Eepsite unter „Hostname“
-ein und kopieren den Schlüssel in das Feld „Destination“. Ein Klick auf
-„Add“ und diese „Destination“ ist in Ihrem Adressbuch.<sup><a class="footref" name="fnr.2" href="#fn.2">2</a></sup>
+tragen Ihren zuvor gewählten Wunschnamen ihrer Eepseite unter „Hostname“
+ein und kopieren den Schlüssel in das Feld „Ziel“. Ein Klick auf
+„Hinzufügen“ und dieses „Ziel“ ist in Ihrem Adressbuch.<sup><a class="footref" name="fnr.2" href="#fn.2">2</a></sup>
 <br>
 <br></li>
-<li>Ihre Eepsite sollte jetzt über den Browser erreichbar sein. Dazu
-tragen Sie, wie gewohnt, den Namen Ihrer Eepsite (hier im Beispiel
+<li>Ihre Eepseite sollte jetzt über den Browser erreichbar sein. Dazu
+tragen Sie, wie gewohnt, den Namen Ihrer Eepseite (hier im Beispiel
 „meineseite.i2p“) in die Adressleiste Ihres Browsers ein und rufen sie
 auf. Wenn alles gutgegangen ist, sind Sie nun wieder hier – nur die
 Adresse hat sich geändert.
 <br>
 <br></li>
-<li>Bevor Sie der Welt von Ihrer neuen Eepsite berichten sollte sie
+<li>Bevor Sie der Welt von Ihrer neuen Eepseite berichten, sollte sie
 auch über ein wenig Inhalt verfügen. Begeben Sie sich in das
 Verzeichnis <em>„~/.i2p/eepsite/docroot/“</em> (Linux) oder <em>„%APPDATA%\I2P\eepsite\docroot\“</em> (Windows)
-und benennen Sie dieses Dokument von <em>„index.html“</em> nach <em>„hilfe.html“</em> um, so können Sie später darauf zurück greifen. Erstellen Sie Ihre eigene <em>„index.html“</em> und füllen diese mit Inhalten, Bildern oder was auch immer Sie anderen hierüber mitteilen wollen.</li>
+und benennen Sie dieses Dokument von <em>„index.html“</em> in <em>„hilfe.html“</em> um, so können Sie später darauf zurückgreifen. Erstellen Sie Ihre eigene <em>„index.html“</em> und füllen diese mit Inhalten, Bildern oder was auch immer Sie anderen mitteilen wollen.</li>
 </ol>
 
-<h4><a name="AnkerDEOeA" id="AnkerDEOeA"></a>Die Eepsite öffentlich ankündigen</h4>
+<h4><a name="AnkerDEOeA" id="AnkerDEOeA"></a>Die Eepseite öffentlich ankündigen</h4>
 
 <ul>
 <li>Nun ist es an der Zeit, Ihre Eepsite in einem globalen I2P-Adressbuch, wie beispielsweise bei <a href="http://stats.i2p/i2p/addkey.html">stats.i2p</a>,
 einzutragen. Das heißt, Sie müssen Namen und Schlüssel Ihrer Eepsite
-und eine optionale Beschreibung in ein Formular auf einen oder mehreren
-dieser Seiten eingeben. Wie schon oben gesagt, Ihr Schlüssel ist der <em>vollständige</em> Schlüssel wie er in der <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">I2PTunnel</a> Konfiguration für die „<a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">Eepsite</a>“
-im Feld „Local destination“ angegeben ist (... über 500 Zeichen, endet
+und eine optionale Beschreibung in ein Formular auf einer oder mehreren
+dieser Seiten eingeben. Wie schon oben gesagt: Ihr Schlüssel ist der <em>vollständige</em> Schlüssel, wie er in der <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">I2PTunnel</a>-Konfiguration für die „<a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">Eepseite</a>“
+im Feld „Lokales Ziel“ angegeben ist (... über 500 Zeichen, endet
 auf „AAAA“). Bestätigen Sie Ihre Angaben mit einem klick auf „Submit“.
 Überprüfen Sie ob Ihr Schlüssel tatsächlich hinzugefügt wurde.
 <br>
 <br></li>
 <li>Da viele Router regelmäßig Adressbuchupdates von diesen Seiten
 erhalten, sollten andere innerhalb einiger Stunden in der Lage sein,
-Ihre Eesite durch
+Ihre Eeseite durch
 den Eintrag des Namens im Browser aufzurufen.
 <br>
 <br></li>
-<li>Weil wir gerade von Adressbuchupdates sprechen – es ist eine gute Zeit um weitere Adressbücher dem bestehenden <a href="http://127.0.0.1:7657/susidns/subscriptions.jsp">Abonnement</a>
+<li>Wo wir gerade von Adressbuchupdates sprechen – es ist ein guter Moment, weitere Adressbücher zum bestehenden <a href="http://127.0.0.1:7657/susidns/subscriptions.jsp">Abonnement</a>
 hinzuzufügen. Öffnen Sie Ihre Konfiguration und fügen Sie einige der
 folgenden Dienste Ihrem Abonnement hinzu (nur die jeweilige URL) und
 speichern Sie die Angaben.<sup><a class="footref" name="fnr.3" href="#fn.3">3</a></sup> Ab jetzt erhalten Sie ebenso alle Updates automatisch!
@@ -140,40 +139,40 @@ speichern Sie die Angaben.<sup><a class="footref" name="fnr.3" href="#fn.3">3</a
 <br></p>
 </blockquote></li>
 <li>Haben Sie es eilig und können nicht 12 bis 24 Stunden warten, ist
-es möglich das andere für Ihre Eepseite den „jump“
-Adresshelfer-Umlenkungs-Dienst benutzen. Dieses funktioniert innerhalb
-einiger Minuten nach Eingabe des Schlüssels zu einem Adressbuch auf der
-gleichen Seite.<br><br>
-Zuerst testen Sie das mittels Aufruf folgender Dienste. Sobald das
-klappt, können anderen diese Möglichkeit nutzen. (Ersetzen Sie
-„meineseite.i2p“ durch Ihre Seite.)
+es möglich, dass andere für Ihre Eepseite den Adresshelfer-Umlenkungs-Dienst („jump service“) nutzen. Dieser funktioniert innerhalb
+einiger Minuten nach Eingabe des Schlüssels in ein Adressbuch auf der
+selben Seite.<br><br>
+Testen Sie Ihre Hinzufügung also zuerst mittels Aufruf folgender Dienste. Sobald das
+klappt, können anderen diese Möglichkeit auch nutzen. (Ersetzen Sie
+„meineseite.i2p“ durch Ihre Seite.):
 <ul>
 <li><a href="http://stats.i2p/cgi-bin/jump.cgi?a=meineseite.i2p">http://stats.i2p/cgi-bin/jump.cgi?a=meineseite.i2p</a> oder</li>
 <li><a href="http://i2host.i2p/cgi-bin/i2hostjump?meineseite.i2p">http://i2host.i2p/cgi-bin/i2hostjump?meineseite.i2p</a>
 <br>
 <br></li>
 </ul></li>
-<li>Manche Leute erkundigen sich auf Eepsites-Listen wie  <a href="http://inproxy.tino.i2p/status.php">inproxy.tino.i2p/status.php</a> über neue Eepsites, so könnten Sie an einige Besucher kommen. Aber es gibt weitere Wege sich anzukündigen:
+<li>Manche erkundigen sich auf Eepseitenlisten wie  <a href="http://inproxy.tino.i2p/status.php">inproxy.tino.i2p/status.php</a> über neue Eepseiten; so könnten Sie an einige Besucher kommen. Aber es gibt weitere Wege, sich anzukündigen:
 
 <ul>
-<li>Veröffentlichen Sie eine Nachricht im <a href="http://forum.i2p">I2P Forum</a> unter  <a href="http://forum.i2p/viewforum.php?f=16">Eepsite Announce</a></li>
-<li>Besuchen sie die IRC-Kanäle #i2p oder #i2p-chat (beide englischsprachig) und Werben Sie sanft für sich.</li>
+<li>Veröffentlichen Sie eine Nachricht im <a href="http://forum.i2p">I2P-Forum</a> unter <a href="http://forum.i2p/viewforum.php?f=16">Eepsite Announce</a></li>
+<li>Besuchen Sie die IRC-Kanäle #i2p oder #i2p-chat (beide englischsprachig) oder #i2p-de und werben Sie sanft für sich.</li>
 <li>Verbreiten Sie eine Nachricht über Syndie.</li>
 <li>Tragen Sie sich ein in Ughas <a href="http://ugha.i2p/EepsiteIndex">Eepsite Index</a> Wiki.
 <br>
 <br></li>
 </ul></li>
-<li>Bitte beachten Sie, einige Seiten empfehlen das Einfügen des langen
-„Destination“-Schlüssels; das können Sie wenn Sie möchten – aber wenn
+<li>Bitte beachten Sie: Einige Seiten empfehlen das Einfügen des langen
+„Ziel“- bzw. „Destination“-Schlüssels; das können Sie, wenn Sie möchten – aber wenn
 Sie Ihren Schlüssel erfolgreich beim „Schlüssel-Dienst“ eingetragen und
 ihn mittels „jump“-Dienst getestet haben, sollte nach 24 Stunden
 Wartezeit dieses Vorgehen nicht nötig sein.
 <br>
 <br></li>
-<li>Sollten Sie Fragen haben, benutzen Sie den IRC-Kanal #i2p oder die technische Abteilung im <a href="http://forum.i2p">I2P Forum</a></li>
+<li>Sollten Sie Fragen haben, benutzen Sie den IRC-Kanal #i2p oder die technische Abteilung im <a href="http://forum.i2p">I2P-Forum</a>!</li>
 </ul>
 
 
+<br>
 <hr><p class="footnote"><a class="footnum" name="fn.1" href="#fnr.1">1.</a> <strong>Base64</strong>
 beschreibt ein Verfahren zur Kodierung von 8-Bit-Binärdaten in eine
 Zeichenfolge, die nur aus wenigen, Codepage-unabhängigen ASCII-Zeichen

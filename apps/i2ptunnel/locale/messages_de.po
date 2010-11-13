@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P i2ptunnel\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-11-08 18:21+0000\n"
-"PO-Revision-Date: 2010-11-09 00:57+0100\n"
+"PO-Revision-Date: 2010-11-13 03:16+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -423,7 +423,7 @@ msgstr "Datei"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:467
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:235
 msgid "Local destination"
-msgstr "Lokales Ziel"
+msgstr "lokales Ziel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:471
 msgid "(if known)"
@@ -456,7 +456,7 @@ msgstr "Speichern"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:73
 msgid "I2P Tunnel Manager - Edit Server Tunnel"
-msgstr "I2P-Tunnel-Manager - Server-Tunnel bearbeiten"
+msgstr "I2P-Tunnel-Manager - Servertunnel bearbeiten"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:93
 msgid "Edit server settings"
@@ -476,11 +476,11 @@ msgstr "(für ausgehende Proxies leer lassen)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:223
 msgid "Private key file"
-msgstr "Private Schlüsseldatei"
+msgstr "private Schlüsseldatei"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:245
 msgid "Add to local addressbook"
-msgstr "Zum lokalen Adressbuch hinzufügen"
+msgstr "zum lokalen Adressbuch hinzufügen"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:252
 msgid "Hostname Signature"
@@ -585,7 +585,7 @@ msgstr "Konfiguration neu einlesen"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:105
 msgid "I2P Server Tunnels"
-msgstr "I2P-Server-Tunnel"
+msgstr "I2P-Servertunnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:109
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:130
