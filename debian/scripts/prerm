@@ -2,7 +2,8 @@
 /etc/init.d/i2p stop
 
 # stuff in /tmp
-rm -f /tmp/wrapper.log /tmp/wrapper.log.1 /tmp/wrapper.log.2 /tmp/i2p.pid /tmp/routerjvm.pid /tmp/router.ping
+TMPDIR=/tmp
+rm -f ${TMPDIR}/wrapper.log ${TMPDIR}/wrapper.log.1 ${TMPDIR}/wrapper.log.2 ${TMPDIR}/i2p.pid ${TMPDIR}/routerjvm.pid ${TMPDIR}/router.ping
 
 # dpkg doesn't know about these files, they were copied out of jbigi.jar by the router
 LIB=/usr/lib/i2p
