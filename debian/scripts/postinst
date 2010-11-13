@@ -1,4 +1,6 @@
 #!/bin/sh
+set -e
+
 SVCHOME=/var/lib/i2p
 I2P=/usr/share/i2p
 I2PUSER=i2psvc
