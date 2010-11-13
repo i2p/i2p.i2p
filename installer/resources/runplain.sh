@@ -1,4 +1,5 @@
-#
+#!/bin/sh
+
 # This runs the router by itself, WITHOUT the wrapper.
 # This means the router will not restart if it crashes.
 # Also, you will be using the default memory size, which is
