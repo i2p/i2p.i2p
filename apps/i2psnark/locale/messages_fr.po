@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-11-13 08:01+0000\n"
-"PO-Revision-Date: 2010-11-13 11:51+0100\n"
+"PO-Revision-Date: 2010-11-13 20:35+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -245,7 +245,7 @@ msgstr "Forum"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:248
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1377
 msgid "Status"
-msgstr "Statut"
+msgstr "État"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:255
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:257
@@ -294,11 +294,11 @@ msgstr "Taux de téléchargement"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:293
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:298
 msgid "Rate"
-msgstr "Vitesse d'envoi"
+msgstr "Vitesse"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:296
 msgid "Up Rate"
-msgstr "Vitesse d'envoi"
+msgstr "Taux d'envoi"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:304
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:307
@@ -484,12 +484,12 @@ msgstr "Complet"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:729
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:734
 msgid "Downloading"
-msgstr "Téléchargement"
+msgstr "Téléchargement en cours"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:738
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:743
 msgid "Stalled"
-msgstr "Bloqué"
+msgstr "Figé"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:747
 msgid "No Peers"
@@ -570,23 +570,23 @@ msgstr "Seed"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:943
 msgid "Uninteresting (The peer has no pieces we need)"
-msgstr "Aucun intérêt (le pair n'a aucun morceau utile)"
+msgstr "aucun intérêt (le pair n'a aucun morceau utile)"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:945
 msgid "Choked (The peer is not allowing us to request pieces)"
-msgstr "Bridé (le pair ne nous permet pas de demander un morceau)"
+msgstr "bridé (le pair ne nous permet pas de demander un morceau)"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:959
 msgid "Uninterested (We have no pieces the peer needs)"
-msgstr "Aucun intérêt (nous n'avons aucun morceau utile au pair)"
+msgstr "aucun intérêt (nous n'avons aucun morceau utile au pair)"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:961
 msgid "Choking (We are not allowing the peer to request pieces)"
-msgstr "Bridage (nous ne permettons pas au pair de demander un morceau)"
+msgstr "bridage (nous ne permettons pas au pair de demander un morceau)"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1005
 msgid "Add Torrent"
-msgstr "Ajout torrent"
+msgstr "Ajouter torrent"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1007
 msgid "From URL"
@@ -598,7 +598,7 @@ msgstr "Le fichier torrent doit provenir d'un tracker I2P"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1015
 msgid "Add torrent"
-msgstr "Ajout torrent"
+msgstr "Ajouter torrent"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1018
 #, java-format
@@ -649,7 +649,7 @@ msgstr "Répertoire de données"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1094
 msgid "Edit i2psnark.config and restart to change"
-msgstr "Editer i2psnark.config et rédémarrez pour prendre en compte les modificationsEditer i2psnark.config et redémarrer pour prendre en compte les modifications"
+msgstr "Editez i2psnark.config et redémarrez pour prendre en compte les modifications"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1098
 msgid "Auto start"
