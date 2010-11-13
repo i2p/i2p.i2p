@@ -1,5 +1,5 @@
 #!/bin/sh
-/etc/init.d/i2p stop
+invoke-rc.d i2p stop
 
 # stuff in /tmp
 TMPDIR=/tmp
