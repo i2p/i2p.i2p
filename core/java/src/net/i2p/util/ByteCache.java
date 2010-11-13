@@ -102,7 +102,7 @@ public final class ByteCache {
     public static void clearAll() {
         for (ByteCache bc : _caches.values())
             bc.clear();
-        I2PAppContext.getGlobalContext().logManager().getLog(ByteCache.class).error("WARNING: Low memory, clearing byte caches");
+        I2PAppContext.getGlobalContext().logManager().getLog(ByteCache.class).warn("WARNING: Low memory, clearing byte caches");
     }
 
     private Log _log;
