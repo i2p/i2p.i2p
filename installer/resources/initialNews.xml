@@ -46,17 +46,17 @@ Wir wünschen Dir viel Freude an unserem Netz und hoffen, Deine Erwartungen zu e
 </div>
 
 <div lang="es">
-<h4><ul><li>&iexcl;Felicitaciones por instalar I2P exitosamente!</li></ul></h4>
+<h4><ul><li>&iexcl;Felicidades por instalar I2P exitosamente!</li></ul></h4>
 <p>
-<b>&iexcl;Bienvenido a I2P!</b>
-&iexcl;Ten todav&iacute;a <b>paciencia</b>, mientras I2P est&eacute; arrancando y encontrando otros enrutadores I2P!
+<b>&iexcl;Bienvenido a I2P!</b><br>
+&iexcl;Ten todav&iacute;a <b>paciencia</b> mientras I2P est&eacute; arrancando y encontrando otros enrutadores I2P!
 </p>
 <p>
 Esto es el momento ideal para adaptar tu <b>configuraci&oacute;n de ancha de banda</b> en la 
 <a href="config.jsp">p&aacute;gina de configuraci&oacute;n</a>.
 </p>
 <p>
-En cuanto veas a la izquierda una conexi&oacute;n llamada "shared clients", puedes visitar nuestros <a href="http://www.i2p2.i2p/faq_de.html">FAQ</a>.
+En cuanto veas a la izquierda una conexi&oacute;n llamada "shared clients", puedes visitar nuestros <a href="http://www.i2p2.i2p/faq.html">FAQ</a>.
 </p>
 <p>
 &iexcl;Con&eacute;cta tu cliente IRC con el servidor <b>localhost:6668</b> y ven a saludarnos en los canales 
@@ -66,8 +66,7 @@ En cuanto veas a la izquierda una conexi&oacute;n llamada "shared clients", pued
 Esperemos que tengas una buena experiencia con y en I2P.
 </p>
 </div>
-
-@@@@<div lang="nl">
+<div lang="nl">
 <h4><ul><li>Gefeliciteerd met de installatie van I2P!</li></ul></h4>
 <p>
 <b>Welkom bij I2P!</b>
