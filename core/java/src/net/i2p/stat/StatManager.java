@@ -2,13 +2,13 @@ package net.i2p.stat;
 
 import java.text.Collator;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
@@ -25,9 +25,9 @@ public class StatManager {
     private I2PAppContext _context;
 
     /** stat name to FrequencyStat */
-    private final Map<String, FrequencyStat> _frequencyStats;
+    private final ConcurrentHashMap<String, FrequencyStat> _frequencyStats;
     /** stat name to RateStat */
-    private final Map<String, RateStat> _rateStats;
+    private final ConcurrentHashMap<String, RateStat> _rateStats;
     /** may be null */
     private StatLog _statLog;
 
@@ -71,8 +71,8 @@ public class StatManager {
     public StatManager(I2PAppContext context) {
         _log = context.logManager().getLog(StatManager.class);
         _context = context;
-        _frequencyStats = Collections.synchronizedMap(new HashMap(8));
-        _rateStats = new HashMap(128); // synchronized only on add //Collections.synchronizedMap(new HashMap(128));
+        _frequencyStats = new ConcurrentHashMap(8);
+        _rateStats = new ConcurrentHashMap(128);
         if (getStatFilter() != null)
             _statLog = new BufferedStatLog(context);
     }
@@ -81,12 +81,10 @@ public class StatManager {
     public StatLog getStatLog() { return _statLog; }
     public void setStatLog(StatLog log) { 
         _statLog = log; 
-        synchronized (_rateStats) {
             for (Iterator<RateStat> iter = _rateStats.values().iterator(); iter.hasNext(); ) {
                 RateStat rs = iter.next();
                 rs.setStatLog(log);
             }
-        }
     }
 
     /**
@@ -100,7 +98,7 @@ public class StatManager {
     public void createFrequencyStat(String name, String description, String group, long periods[]) {
         if (ignoreStat(name)) return;
         if (_frequencyStats.containsKey(name)) return;
-        _frequencyStats.put(name, new FrequencyStat(name, description, group, periods));
+        _frequencyStats.putIfAbsent(name, new FrequencyStat(name, description, group, periods));
     }
 
     /**
@@ -113,19 +111,15 @@ public class StatManager {
      */
     public void createRateStat(String name, String description, String group, long periods[]) {
         if (ignoreStat(name)) return;
-        synchronized (_rateStats) {
             if (_rateStats.containsKey(name)) return;
             RateStat rs = new RateStat(name, description, group, periods);
             if (_statLog != null) rs.setStatLog(_statLog);
-            _rateStats.put(name, rs);
-        }
+            _rateStats.putIfAbsent(name, rs);
     }
 
     // Hope this doesn't cause any problems with unsynchronized accesses like addRateData() ...
     public void removeRateStat(String name) {
-        synchronized (_rateStats) {
             _rateStats.remove(name);
-        }
     }
 
     /** update the given frequency statistic, taking note that an event occurred (and recalculating all frequencies) */
@@ -146,22 +140,18 @@ public class StatManager {
 
     public void coalesceStats() {
         if (++coalesceCounter % FREQ_COALESCE_RATE == 0) {
-            synchronized (_frequencyStats) {
                 for (FrequencyStat stat : _frequencyStats.values()) {
                     if (stat != null) {
                         stat.coalesceStats();
                     }
                 }
-            }
         }
-        synchronized (_rateStats) {
             for (Iterator<RateStat> iter = _rateStats.values().iterator(); iter.hasNext();) {
                 RateStat stat = iter.next();
                 if (stat != null) {
                     stat.coalesceStats();
                 }
             }
-        }
     }
 
     public FrequencyStat getFrequency(String name) {
