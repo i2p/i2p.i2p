@@ -55,16 +55,13 @@ import net.i2p.util.RandomSource;
  *
  * @author jrandom
  */
-public class LeaseSet extends DataStructureImpl {
+public class LeaseSet extends DatabaseEntry {
     private final static Log _log = new Log(LeaseSet.class);
     private Destination _destination;
     private PublicKey _encryptionKey;
     private SigningPublicKey _signingKey;
     // Keep leases in the order received, or else signature verification will fail!
     private List<Lease> _leases;
-    private Signature _signature;
-    private volatile Hash _currentRoutingKey;
-    private volatile byte[] _routingKeyGenMod;
     private boolean _receivedAsPublished;
     private boolean _receivedAsReply;
     // Store these since isCurrent() and getEarliestLeaseDate() are called frequently
@@ -80,6 +77,18 @@ public class LeaseSet extends DataStructureImpl {
     public LeaseSet() {
         _leases = new ArrayList(MAX_LEASES);
         _firstExpiration = Long.MAX_VALUE;
+    }
+
+    public long getDate() {
+        return getEarliestLeaseDate();
+    }
+
+    protected KeysAndCert getKeysAndCert() {
+        return _destination;
+    }
+
+    public int getType() {
+        return KEY_TYPE_LEASESET;
     }
 
     public Destination getDestination() {
@@ -157,42 +166,6 @@ public class LeaseSet extends DataStructureImpl {
             return (Lease) _leases.get(index);
     }
 
-    public Signature getSignature() {
-        return _signature;
-    }
-
-    public void setSignature(Signature sig) {
-        _signature = sig;
-    }
-
-    /**
-     * Get the routing key for the structure using the current modifier in the RoutingKeyGenerator.
-     * This only calculates a new one when necessary though (if the generator's key modifier changes)
-     *
-     */
-    public Hash getRoutingKey() {
-        RoutingKeyGenerator gen = RoutingKeyGenerator.getInstance();
-        if ((gen.getModData() == null) || (_routingKeyGenMod == null)
-            || (!DataHelper.eq(gen.getModData(), _routingKeyGenMod))) {
-            setRoutingKey(gen.getRoutingKey(getDestination().calculateHash()));
-            _routingKeyGenMod = gen.getModData();
-        }
-        return _currentRoutingKey;
-    }
-
-    public void setRoutingKey(Hash key) {
-        _currentRoutingKey = key;
-    }
-
-    public boolean validateRoutingKey() {
-        Hash destKey = getDestination().calculateHash();
-        Hash rk = RoutingKeyGenerator.getInstance().getRoutingKey(destKey);
-        if (rk.equals(getRoutingKey()))
-            return true;
-
-        return false;
-    }
-
     /**
      * Retrieve the end date of the earliest lease include in this leaseSet.
      * This is the date that should be used in comparisons for leaseSet age - to
@@ -208,26 +181,15 @@ public class LeaseSet extends DataStructureImpl {
     }
 
     /**
-     * Sign the structure using the supplied signing key
-     *
-     */
-    public void sign(SigningPrivateKey key) throws DataFormatException {
-        byte[] bytes = getBytes();
-        if (bytes == null) throw new DataFormatException("Not enough data to sign");
-        // now sign with the key 
-        Signature sig = DSAEngine.getInstance().sign(bytes, key);
-        setSignature(sig);
-    }
-
-    /**
      * Verify that the signature matches the lease set's destination's signing public key.
      * OR the included revocation key.
      *
      * @return true only if the signature matches
      */
+    @Override
     public boolean verifySignature() {
-        if (getSignature() == null) return false;
-        if (getDestination() == null) return false;
+        if (_signature == null) return false;
+        if (_destination == null) return false;
         byte data[] = getBytes();
         if (data == null) return false;
         boolean signedByDest = DSAEngine.getInstance().verifySignature(_signature, data,
@@ -271,7 +233,7 @@ public class LeaseSet extends DataStructureImpl {
         return _lastExpiration > now - fudge;
     }
 
-    private byte[] getBytes() {
+    protected byte[] getBytes() {
         if ((_destination == null) || (_encryptionKey == null) || (_signingKey == null) || (_leases == null))
             return null;
         int len = PublicKey.KEYSIZE_BYTES  // dest

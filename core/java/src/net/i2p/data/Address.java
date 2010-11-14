@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+/**
+ *  ????????
+ *  deprecated unused except by naming/FilesystemAddressDB, which is unused.
+ */
 public class Address extends DataStructureImpl {
     private String _hostname;
     private Destination _destination;

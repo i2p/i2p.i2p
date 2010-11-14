@@ -9,57 +9,35 @@ package net.i2p.data;
  *
  */
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import net.i2p.util.RandomSource;
 
-public class SessionTag extends ByteArray {
+/**
+ *  32 bytes, usually of random data.
+ *  Changed from ByteArray to SimpleDataStructure in 0.8.2.
+ */
+public class SessionTag extends SimpleDataStructure {
     public final static int BYTE_LENGTH = 32;
 
     public SessionTag() {
         super();
     }
 
+    /**
+     *  @param create if true, instantiate the data array and fill it with random data.
+     */
     public SessionTag(boolean create) {
         super();
         if (create) {
-            byte buf[] = new byte[BYTE_LENGTH];
-            RandomSource.getInstance().nextBytes(buf);
-            setData(buf);
+            _data = new byte[BYTE_LENGTH];
+            RandomSource.getInstance().nextBytes(_data);
         }
     }
 
     public SessionTag(byte val[]) {
-        super();
-        setData(val);
+        super(val);
     }
     
-    @Override
-    public void setData(byte val[]) throws IllegalArgumentException {
-        if (val == null) 
-            throw new NullPointerException("SessionTags cannot be null");
-        if (val.length != BYTE_LENGTH)
-            throw new IllegalArgumentException("SessionTags must be " + BYTE_LENGTH + " bytes");
-        super.setData(val);
-        setValid(BYTE_LENGTH);
-    }
-
-    public void readBytes(InputStream in) throws DataFormatException, IOException {
-        byte data[] = new byte[BYTE_LENGTH];
-        int read = DataHelper.read(in, data);
-        if (read != BYTE_LENGTH)
-            throw new DataFormatException("Not enough data (read " + read + " wanted " + BYTE_LENGTH + ")");
-        setData(data);
-    }
-    
-    public void writeBytes(OutputStream out) throws DataFormatException, IOException {
-        out.write(getData());
-    }
-
-    @Override
-    public String toString() {
-        return "SessionTag " + toBase64();
+    public int length() {
+        return BYTE_LENGTH;
     }
 }

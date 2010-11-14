@@ -34,16 +34,13 @@ import net.i2p.util.OrderedProperties;
  *
  * @author jrandom
  */
-public class RouterInfo extends DataStructureImpl {
+public class RouterInfo extends DatabaseEntry {
     private final static Log _log = new Log(RouterInfo.class);
     private RouterIdentity _identity;
     private volatile long _published;
     private final Set<RouterAddress> _addresses;
     private final Set<Hash> _peers;
     private /* FIXME final FIXME */ Properties _options;
-    private volatile Signature _signature;
-    private volatile Hash _currentRoutingKey;
-    private volatile byte _routingKeyGenMod[];
     private volatile boolean _validated;
     private volatile boolean _isValid;
     private volatile String _stringified;
@@ -73,6 +70,18 @@ public class RouterInfo extends DataStructureImpl {
         setPeers(old.getPeers());
         setOptions(old.getOptions());
         setSignature(old.getSignature());
+    }
+
+    public long getDate() {
+        return _published;
+    }
+
+    protected KeysAndCert getKeysAndCert() {
+        return _identity;
+    }
+
+    public int getType() {
+        return KEY_TYPE_ROUTERINFO;
     }
 
     private void resetCache() {
@@ -204,47 +213,13 @@ public class RouterInfo extends DataStructureImpl {
         resetCache();
     }
 
-    /**
-     * Retrieve the proof that the identity stands behind the info here
-     *
-     */
-    public Signature getSignature() {
-        return _signature;
-    }
-
-    /**
-     * Configure the proof that the entity stands behind the info here
-     *
-     */
-    public void setSignature(Signature signature) {
-        _signature = signature;
-        resetCache();
-    }
-
-    /**
-     * Sign the structure using the supplied signing key
-     *
-     */
-    public synchronized void sign(SigningPrivateKey key) throws DataFormatException {
-        byte[] bytes = getBytes();
-        if (bytes == null) throw new DataFormatException("Not enough data to sign");
-        // now sign with the key 
-        Signature sig = DSAEngine.getInstance().sign(bytes, key);
-        if (sig == null) throw new DataFormatException("Not enough data to sign, or other signature failure");
-        setSignature(sig);
-        //_log.debug("Signed " + SHA256Generator.getInstance().calculateHash(bytes).toBase64() + " with " + key);
-        //_log.debug("verify ok? " + DSAEngine.getInstance().verifySignature(sig, bytes, getIdentity().getSigningPublicKey()));
-        //_log.debug("Signed data: \n" + Base64.encode(bytes));
-        //_log.debug("Signature: " + getSignature());
-    }
-
     /** 
      * Write out the raw payload of the routerInfo, excluding the signature.  This
      * caches the data in memory if possible.
      *
      * @throws DataFormatException if the data is somehow b0rked (missing props, etc)
      */
-    private byte[] getBytes() throws DataFormatException {
+    protected byte[] getBytes() throws DataFormatException {
         if (_byteified != null) return _byteified;
         if (_identity == null) throw new DataFormatException("Router identity isn't set? wtf!");
         if (_addresses == null) throw new DataFormatException("Router addressess isn't set? wtf!");
@@ -392,35 +367,6 @@ public class RouterInfo extends DataStructureImpl {
         }
     }
 
-        
-    /**
-     * Get the routing key for the structure using the current modifier in the RoutingKeyGenerator.
-     * This only calculates a new one when necessary though (if the generator's key modifier changes)
-     *
-     */
-    public synchronized Hash getRoutingKey() {
-        RoutingKeyGenerator gen = RoutingKeyGenerator.getInstance();
-        if ((gen.getModData() == null) || (_routingKeyGenMod == null)
-            || (!DataHelper.eq(gen.getModData(), _routingKeyGenMod))) {
-            setRoutingKey(gen.getRoutingKey(_identity.getHash()));
-            _routingKeyGenMod = gen.getModData();
-        }
-        return _currentRoutingKey;
-    }
-
-    public void setRoutingKey(Hash key) {
-        _currentRoutingKey = key;
-    }
-
-    public boolean validateRoutingKey() {
-        Hash identKey = _identity.getHash();
-        Hash rk = RoutingKeyGenerator.getInstance().getRoutingKey(identKey);
-        if (rk.equals(getRoutingKey()))
-            return true;
-
-        return false;
-    }
-
     /**
      * Determine whether the router was published recently (within the given age milliseconds).
      * The age should be large enough to take into consideration any clock fudge factor, so
@@ -453,6 +399,10 @@ public class RouterInfo extends DataStructureImpl {
         return null;
     }
     
+    /**
+     *  For future multiple addresses per-transport (IPV6), currently unused
+     *  @since 0.7.11
+     */
     public List<RouterAddress> getTargetAddresses(String transportStyle) {
         List<RouterAddress> ret = new Vector<RouterAddress>();
         synchronized(this._addresses) {
