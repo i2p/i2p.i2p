@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 
+import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
 
 /**
@@ -261,7 +262,7 @@ public class SummaryBarRenderer {
            .append(_("Active"))
            .append(":</b></td><td align=\"right\">")
            .append(_helper.getActivePeers())
-           .append(" / ")
+           .append("&thinsp;/&thinsp;")
            .append(_helper.getActiveProfiles())
            .append("</td></tr>\n" +
 
@@ -344,12 +345,16 @@ public class SummaryBarRenderer {
            .append("</a></h3><hr>" +
                    "<table>\n" +
 
-                   "<tr><td align=\"left\"><b>1s:</b></td><td align=\"right\">")
+                   "<tr><td align=\"left\"><b>")
+           .append(_("1 sec"))   // formatDuration2() would say 1000 ms
+           .append(":</b></td><td align=\"right\">")
            .append(_helper.getSecondKBps())
            .append("Bps</td></tr>\n");
 
         if (_context.router().getUptime() > 6*60*1000) {
-            buf.append("<tr><td align=\"left\"><b>5m:</b></td><td align=\"right\">")
+            buf.append("<tr><td align=\"left\"><b>")
+           .append(DataHelper.formatDuration2(5 * 60 * 1000))   // 5 min
+           .append(":</b></td><td align=\"right\">")
            .append(_helper.getFiveMinuteKBps())
            .append("Bps</td></tr>\n");
         }
