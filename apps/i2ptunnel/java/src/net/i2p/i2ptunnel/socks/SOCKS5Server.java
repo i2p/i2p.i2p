@@ -16,12 +16,14 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
+import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
 import net.i2p.i2ptunnel.I2PTunnel;
 import net.i2p.util.HexDump;
 import net.i2p.util.Log;
@@ -37,8 +39,10 @@ public class SOCKS5Server extends SOCKSServer {
 
     private static final int SOCKS_VERSION_5 = 0x05;
 
-    private Socket clientSock = null;
+    private final Socket clientSock;
+    private final Properties props;
     private boolean setupCompleted = false;
+    private final boolean authRequired;
 
     /**
      * Create a SOCKS5 server that communicates with the client using
@@ -49,9 +53,15 @@ public class SOCKS5Server extends SOCKSServer {
      * client socket.
      *
      * @param clientSock client socket
+     * @param props non-null
      */
-    public SOCKS5Server(Socket clientSock) {
+    public SOCKS5Server(Socket clientSock, Properties props) {
         this.clientSock = clientSock;
+        this.props = props;
+        this.authRequired =
+                    Boolean.valueOf(props.getProperty(I2PTunnelHTTPClientBase.PROP_AUTH)).booleanValue() &&
+                    props.containsKey(I2PTunnelHTTPClientBase.PROP_USER) &&
+                    props.containsKey(I2PTunnelHTTPClientBase.PROP_PW);
     }
 
     public Socket getClientSocket() throws SOCKSException {
@@ -90,23 +100,62 @@ public class SOCKS5Server extends SOCKSServer {
 
         for (int i = 0; i < nMethods; ++i) {
             int meth = in.readByte() & 0xff;
-            if (meth == Method.NO_AUTH_REQUIRED) {
+            if (((!authRequired) && meth == Method.NO_AUTH_REQUIRED) ||
+                (authRequired && meth == Method.USERNAME_PASSWORD)) {
                 // That's fine, we do support this method
                 method  = meth;
             }
         }
 
-        boolean canContinue = false;
         switch (method) {
-        case Method.NO_AUTH_REQUIRED:
+          case Method.USERNAME_PASSWORD:
+            _log.debug("username/password authentication required");
+            sendInitReply(Method.USERNAME_PASSWORD, out);
+            verifyPassword(in, out);
+            return;
+          case Method.NO_AUTH_REQUIRED:
             _log.debug("no authentication required");
             sendInitReply(Method.NO_AUTH_REQUIRED, out);
             return;
-        default:
+          default:
             _log.debug("no suitable authentication methods found (" + Integer.toHexString(method) + ")");
             sendInitReply(Method.NO_ACCEPTABLE_METHODS, out);
             throw new SOCKSException("Unsupported authentication method");
         }
+    }
+
+    /**
+     * Wait for the username/password message and verify or throw SOCKSException on failure
+     * @since 0.8.2
+     */
+    private void verifyPassword(DataInputStream in, DataOutputStream out) throws IOException, SOCKSException {
+        int c = in.readByte() & 0xff;
+        if (c != AUTH_VERSION)
+            throw new SOCKSException("Unsupported authentication version");
+        c = in.readByte() & 0xff;
+        if (c <= 0)
+            throw new SOCKSException("Bad authentication");
+        byte[] user = new byte[c];
+        in.readFully(user);
+        c = in.readByte() & 0xff;
+        if (c <= 0)
+            throw new SOCKSException("Bad authentication");
+        byte[] pw = new byte[c];
+        in.readFully(pw);
+        // Hopefully these are in UTF-8, since that's what our config file is in
+        // these throw UnsupportedEncodingException which is an IOE
+        String u = new String(user, "UTF-8");
+        String p = new String(pw, "UTF-8");
+        String configUser =  props.getProperty(I2PTunnelHTTPClientBase.PROP_USER);
+        String configPW = props.getProperty(I2PTunnelHTTPClientBase.PROP_PW);
+        if ((!u.equals(configUser)) || (!p.equals(configPW))) {
+            _log.error("SOCKS authorization failure");
+            sendAuthReply(AUTH_FAILURE, out);
+            throw new SOCKSException("SOCKS authorization failure");
+        }
+        if (_log.shouldLog(Log.INFO))
+            _log.info("SOCKS authorization success, user: " + u);
+        sendAuthReply(AUTH_SUCCESS, out);
     }
 
     /**
@@ -213,17 +262,24 @@ public class SOCKS5Server extends SOCKSServer {
      * Send the specified reply during SOCKS5 initialization
      */
     private void sendInitReply(int replyCode, DataOutputStream out) throws IOException {
-        ByteArrayOutputStream reps = new ByteArrayOutputStream();
-
-        reps.write(SOCKS_VERSION_5);
-        reps.write(replyCode);
-
-        byte[] reply = reps.toByteArray();
-
-        if (_log.shouldLog(Log.DEBUG)) {
+        byte[] reply = new byte[2];
+        reply[0] = SOCKS_VERSION_5;
+        reply[1] = (byte) replyCode;
+        if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending init reply:\n" + HexDump.dump(reply));
-        }
+        out.write(reply);
+    }
 
+    /**
+     * Send the specified reply during SOCKS5 authorization
+     * @since 0.8.2
+     */
+    private void sendAuthReply(int replyCode, DataOutputStream out) throws IOException {
+        byte[] reply = new byte[2];
+        reply[0] = AUTH_VERSION;
+        reply[1] = (byte) replyCode;
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Sending auth reply:\n" + HexDump.dump(reply));
         out.write(reply);
     }
 
@@ -435,6 +491,7 @@ public class SOCKS5Server extends SOCKSServer {
      */
     private static class Method {
         private static final int NO_AUTH_REQUIRED = 0x00;
+        private static final int USERNAME_PASSWORD = 0x02;
         private static final int NO_ACCEPTABLE_METHODS = 0xff;
     }
 
@@ -461,4 +518,8 @@ public class SOCKS5Server extends SOCKSServer {
         private static final int COMMAND_NOT_SUPPORTED = 0x07;
         private static final int ADDRESS_TYPE_NOT_SUPPORTED = 0x08;
     }
+
+    private static final int AUTH_VERSION = 1;
+    private static final int AUTH_SUCCESS = 0;
+    private static final int AUTH_FAILURE = 1;
 }

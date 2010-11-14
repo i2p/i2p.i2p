@@ -10,7 +10,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Properties;
 
+import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
 import net.i2p.util.Log;
 
 /**
@@ -35,8 +37,9 @@ public class SOCKSServerFactory {
      * provided sockets's input stream.
      *
      * @param s a Socket used to choose the SOCKS server type
+     * @param props non-null
      */
-    public static SOCKSServer createSOCKSServer(Socket s) throws SOCKSException {
+    public static SOCKSServer createSOCKSServer(Socket s, Properties props) throws SOCKSException {
         SOCKSServer serv;
 
         try {
@@ -46,11 +49,16 @@ public class SOCKSServerFactory {
             switch (socksVer) {
             case 0x04:
                 // SOCKS version 4/4a
+                if (Boolean.valueOf(props.getProperty(I2PTunnelHTTPClientBase.PROP_AUTH)).booleanValue() &&
+                    props.containsKey(I2PTunnelHTTPClientBase.PROP_USER) &&
+                    props.containsKey(I2PTunnelHTTPClientBase.PROP_PW)) {
+                    throw new SOCKSException("SOCKS 4/4a not supported when authorization is required");
+                }
                 serv = new SOCKS4aServer(s);
                 break;
             case 0x05:
                 // SOCKS version 5
-                serv = new SOCKS5Server(s);
+                serv = new SOCKS5Server(s, props);
                 break;
             case 'C':
             case 'G':
