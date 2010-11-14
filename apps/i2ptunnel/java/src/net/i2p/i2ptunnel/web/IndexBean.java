@@ -24,6 +24,7 @@ import net.i2p.data.Certificate;
 import net.i2p.data.Destination;
 import net.i2p.data.PrivateKeyFile;
 import net.i2p.data.SessionKey;
+import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
 import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.i2ptunnel.TunnelControllerGroup;
 import net.i2p.util.ConcurrentHashSet;
@@ -676,6 +677,35 @@ public class IndexBean {
         }
     }
 
+    /** all proxy auth @since 0.8.2 */
+    public void setProxyAuth(String s) {
+        _booleanOptions.add(I2PTunnelHTTPClientBase.PROP_AUTH);
+    }
+    
+    public void setProxyUsername(String s) {
+        if (s != null)
+            _otherOptions.put(I2PTunnelHTTPClientBase.PROP_USER, s.trim());
+    }
+    
+    public void setProxyPassword(String s) {
+        if (s != null)
+            _otherOptions.put(I2PTunnelHTTPClientBase.PROP_PW, s.trim());
+    }
+    
+    public void setOutproxyAuth(String s) {
+        _booleanOptions.add(I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH);
+    }
+    
+    public void setOutproxyUsername(String s) {
+        if (s != null)
+            _otherOptions.put(I2PTunnelHTTPClientBase.PROP_OUTPROXY_USER, s.trim());
+    }
+    
+    public void setOutproxyPassword(String s) {
+        if (s != null)
+            _otherOptions.put(I2PTunnelHTTPClientBase.PROP_OUTPROXY_PW, s.trim());
+    }
+    
     /** params needed for hashcash and dest modification */
     public void setEffort(String val) {
         if (val != null) {
@@ -825,6 +855,13 @@ public class IndexBean {
                     config.setProperty("option." + p, _otherOptions.get(p));
         }
 
+        // generic proxy stuff
+        if ("httpclient".equals(_type) || "connectclient".equals(_type) || "httpbidirserver".equals(_type) || 
+            "sockstunnel".equals(_type) ||"socksirctunnel".equals(_type)) {
+            for (String p : _booleanProxyOpts)
+                config.setProperty("option." + p, "" + _booleanOptions.contains(p));
+        }
+
         if ("httpclient".equals(_type) || "connectclient".equals(_type)) {
             if (_proxyList != null)
                 config.setProperty("proxyList", _proxyList);
@@ -858,11 +895,15 @@ public class IndexBean {
     private static final String _booleanClientOpts[] = {
         "i2cp.reduceOnIdle", "i2cp.closeOnIdle", "i2cp.newDestOnResume", "persistentClientKey", "i2cp.delayOpen"
         };
+    private static final String _booleanProxyOpts[] = {
+        I2PTunnelHTTPClientBase.PROP_AUTH, I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH
+        };
     private static final String _booleanServerOpts[] = {
         "i2cp.reduceOnIdle", "i2cp.encryptLeaseSet", "i2cp.enableAccessList"
         };
     private static final String _otherClientOpts[] = {
-        "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.closeIdleTime"
+        "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.closeIdleTime",
+        "proxyUsername", "proxyPassword", "outproxyUsername", "outproxyPassword"
         };
     private static final String _otherServerOpts[] = {
         "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.leaseSetKey", "i2cp.accessList"
@@ -871,6 +912,7 @@ public class IndexBean {
     static {
         _noShowSet.addAll(Arrays.asList(_noShowOpts));
         _noShowSet.addAll(Arrays.asList(_booleanClientOpts));
+        _noShowSet.addAll(Arrays.asList(_booleanProxyOpts));
         _noShowSet.addAll(Arrays.asList(_booleanServerOpts));
         _noShowSet.addAll(Arrays.asList(_otherClientOpts));
         _noShowSet.addAll(Arrays.asList(_otherServerOpts));
@@ -960,12 +1002,13 @@ public class IndexBean {
             return null;
     }
     
-    private String getMessages(List msgs) {
+    private static String getMessages(List msgs) {
         StringBuilder buf = new StringBuilder(128);
         getMessages(msgs, buf);
         return buf.toString();
     }
-    private void getMessages(List msgs, StringBuilder buf) {
+
+    private static void getMessages(List msgs, StringBuilder buf) {
         if (msgs == null) return;
         for (int i = 0; i < msgs.size(); i++) {
             buf.append((String)msgs.get(i)).append("\n");

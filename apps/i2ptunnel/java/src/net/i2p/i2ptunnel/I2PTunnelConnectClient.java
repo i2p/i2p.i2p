@@ -18,6 +18,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketOptions;
+import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.EventDispatcher;
@@ -56,10 +57,8 @@ import net.i2p.util.Log;
  *
  * @author zzz a stripped-down I2PTunnelHTTPClient
  */
-public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runnable {
+public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements Runnable {
     private static final Log _log = new Log(I2PTunnelConnectClient.class);
-
-    private final List<String> _proxyList;
 
     private final static byte[] ERR_DESTINATION_UNKNOWN =
         ("HTTP/1.1 503 Service Unavailable\r\n"+
@@ -72,16 +71,6 @@ public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runna
 	 "be temporarily offline.  You may want to <b>retry</b>.  "+
          "Could not find the following Destination:<BR><BR><div>")
         .getBytes();
-    
-    private final static byte[] ERR_NO_OUTPROXY =
-        ("HTTP/1.1 503 Service Unavailable\r\n"+
-         "Content-Type: text/html; charset=iso-8859-1\r\n"+
-         "Cache-control: no-cache\r\n"+
-         "\r\n"+
-         "<html><body><H1>I2P ERROR: No outproxy found</H1>"+
-         "Your request was for a site outside of I2P, but you have no "+
-         "HTTP outproxy configured.  Please configure an outproxy in I2PTunnel")
-         .getBytes();
     
     private final static byte[] ERR_BAD_PROTOCOL =
         ("HTTP/1.1 405 Bad Method\r\n"+
@@ -102,17 +91,23 @@ public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runna
          "Your browser is misconfigured. Do not use the proxy to access the router console or other localhost destinations.<BR>")
         .getBytes();
     
+    private final static byte[] ERR_AUTH =
+        ("HTTP/1.1 407 Proxy Authentication Required\r\n"+
+         "Content-Type: text/html; charset=UTF-8\r\n"+
+         "Cache-control: no-cache\r\n"+
+         "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.5\r\n" +         // try to get a UTF-8-encoded response back for the password
+         "Proxy-Authenticate: Basic realm=\"I2P SSL Proxy\"\r\n" +
+         "\r\n"+
+         "<html><body><H1>I2P ERROR: PROXY AUTHENTICATION REQUIRED</H1>"+
+         "This proxy is configured to require authentication.<BR>")
+        .getBytes();
+
     private final static byte[] SUCCESS_RESPONSE =
         ("HTTP/1.1 200 Connection Established\r\n"+
          "Proxy-agent: I2P\r\n"+
          "\r\n")
         .getBytes();
     
-    /** used to assign unique IDs to the threads / clients.  no logic or functionality */
-    private static volatile long __clientId = 0;
-
-    private static final File _errorDir = new File(I2PAppContext.getGlobalContext().getBaseDir(), "docs");
-
     /**
      * @throws IllegalArgumentException if the I2PTunnel does not contain
      *                                  valid config to contact the router
@@ -122,7 +117,6 @@ public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runna
                                I2PTunnel tunnel) throws IllegalArgumentException {
         super(localPort, ownDest, l, notifyThis, "HTTPHandler " + (++__clientId), tunnel);
 
-        _proxyList = new ArrayList();
         if (waitEventValue("openBaseClientResult").equals("error")) {
             notifyEvent("openConnectClientResult", "error");
             return;
@@ -139,20 +133,6 @@ public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runna
         startRunning();
     }
 
-    private String getPrefix(long requestId) { return "Client[" + _clientId + "/" + requestId + "]: "; }
-    
-    private String selectProxy() {
-        synchronized (_proxyList) {
-            int size = _proxyList.size();
-            if (size <= 0)
-                return null;
-            int index = _context.random().nextInt(size);
-            return _proxyList.get(index);
-        }
-    }
-
-    private static final int DEFAULT_READ_TIMEOUT = 60*1000;
-    
     /** 
      * create the default options (using the default timeout, etc)
      *
@@ -172,7 +152,6 @@ public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runna
         return opts;
     }
     
-    private static long __requestId = 0;
     protected void clientConnectionRun(Socket s) {
         InputStream in = null;
         OutputStream out = null;
@@ -186,6 +165,7 @@ public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runna
             String line, method = null, host = null, destination = null, restofline = null;
             StringBuilder newRequest = new StringBuilder();
             int ahelper = 0;
+            String authorization = null;
             while (true) {
                 // Use this rather than BufferedReader because we can't have readahead,
                 // since we are passing the stream on to I2PTunnelRunner
@@ -226,7 +206,7 @@ public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runna
                         }
                         destination = currentProxy;
                         usingWWWProxy = true;
-                        newRequest.append("CONNECT ").append(host).append(restofline).append("\r\n\r\n"); // HTTP spec
+                        newRequest.append("CONNECT ").append(host).append(restofline).append("\r\n"); // HTTP spec
                     } else if (host.toLowerCase().equals("localhost")) {
                         writeErrorMessage(ERR_LOCALHOST, out);
                         s.close();
@@ -242,7 +222,11 @@ public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runna
                         _log.debug(getPrefix(requestId) + "REST  :" + restofline + ":");
                         _log.debug(getPrefix(requestId) + "DEST  :" + destination + ":");
                     }
-                    
+                } else if (line.toLowerCase().startsWith("proxy-authorization: basic ")) {
+                    // strip Proxy-Authenticate from the response in HTTPResponseOutputStream
+                    // save for auth check below
+                    authorization = line.substring(27);  // "proxy-authorization: basic ".length()
+                    line = null;
                 } else if (line.length() > 0) {
                     // Additional lines - shouldn't be too many. Firefox sends:
                     // User-Agent: blabla
@@ -253,6 +237,23 @@ public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runna
                     // but for now just chomp them all.
                     line = null;
                 } else {
+                    // Add Proxy-Authentication header for next hop (outproxy)
+                    if (usingWWWProxy && Boolean.valueOf(getTunnel().getClientOptions().getProperty(PROP_OUTPROXY_AUTH)).booleanValue()) {
+                        // specific for this proxy
+                        String user = getTunnel().getClientOptions().getProperty(PROP_OUTPROXY_USER_PREFIX + currentProxy);
+                        String pw = getTunnel().getClientOptions().getProperty(PROP_OUTPROXY_PW_PREFIX + currentProxy);
+                        if (user == null || pw == null) {
+                            // if not, look at default user and pw
+                            user = getTunnel().getClientOptions().getProperty(PROP_OUTPROXY_USER);
+                            pw = getTunnel().getClientOptions().getProperty(PROP_OUTPROXY_PW);
+                        }
+                        if (user != null && pw != null) {
+                            newRequest.append("Proxy-Authorization: Basic ")
+                                      .append(Base64.encode((user + ':' + pw).getBytes(), true))    // true = use standard alphabet
+                                      .append("\r\n");
+                        }
+                    }
+                    newRequest.append("\r\n"); // HTTP spec
                     // do it
                     break;
                 }
@@ -264,6 +265,19 @@ public class I2PTunnelConnectClient extends I2PTunnelClientBase implements Runna
                 return;
             }
             
+            // Authorization
+            if (!authorize(s, requestId, authorization)) {
+                if (_log.shouldLog(Log.WARN)) {
+                    if (authorization != null)
+                        _log.warn(getPrefix(requestId) + "Auth failed, sending 407 again");
+                    else
+                        _log.warn(getPrefix(requestId) + "Auth required, sending 407");
+                }
+                writeErrorMessage(ERR_AUTH, out);
+                s.close();
+                return;
+            }
+
             Destination clientDest = I2PTunnel.destFromName(destination);
             if (clientDest == null) {
                 String str;

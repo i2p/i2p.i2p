@@ -27,6 +27,7 @@ import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.data.Base32;
+import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -60,10 +61,8 @@ import net.i2p.util.Translate;
  * and POST have been tested, though other $methods should work.
  *
  */
-public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable {
+public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runnable {
     private static final Log _log = new Log(I2PTunnelHTTPClient.class);
-
-    protected final List proxyList = new ArrayList();
 
     private HashMap addressHelpers = new HashMap();
 
@@ -152,10 +151,16 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
          "Your browser is misconfigured. Do not use the proxy to access the router console or other localhost destinations.<BR>")
         .getBytes();
 
-    /** used to assign unique IDs to the threads / clients.  no logic or functionality */
-    private static volatile long __clientId = 0;
-
-    private static final File _errorDir = new File(I2PAppContext.getGlobalContext().getBaseDir(), "docs");
+    private final static byte[] ERR_AUTH =
+        ("HTTP/1.1 407 Proxy Authentication Required\r\n"+
+         "Content-Type: text/html; charset=UTF-8\r\n"+
+         "Cache-control: no-cache\r\n"+
+         "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.5\r\n" +         // try to get a UTF-8-encoded response back for the password
+         "Proxy-Authenticate: Basic realm=\"I2P HTTP Proxy\"\r\n" +
+         "\r\n"+
+         "<html><body><H1>I2P ERROR: PROXY AUTHENTICATION REQUIRED</H1>"+
+         "This proxy is configured to require authentication.<BR>")
+        .getBytes();
 
     public I2PTunnelHTTPClient(int localPort, Logging l, I2PSocketManager sockMgr, I2PTunnel tunnel, EventDispatcher notifyThis, long clientId) {
         super(localPort, l, sockMgr, tunnel, notifyThis, clientId);
@@ -184,7 +189,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
         if (wwwProxy != null) {
             StringTokenizer tok = new StringTokenizer(wwwProxy, ", ");
             while (tok.hasMoreTokens())
-                proxyList.add(tok.nextToken().trim());
+                _proxyList.add(tok.nextToken().trim());
         }
 
         setName(getLocalPort() + " -> HTTPClient [WWW outproxy list: " + wwwProxy + "]");
@@ -193,25 +198,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
 
         notifyEvent("openHTTPClientResult", "ok");
     }
-
-    private String getPrefix(long requestId) { return "Client[" + _clientId + "/" + requestId + "]: "; }
-
-    private String selectProxy() {
-        synchronized (proxyList) {
-            int size = proxyList.size();
-            if (size <= 0) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Proxy list is empty - no outproxy available");
-                l.log("Proxy list is empty - no outproxy available");
-                return null;
-            }
-            int index = _context.random().nextInt(size);
-            String proxy = (String)proxyList.get(index);
-            return proxy;
-        }
-    }
-
-    private static final int DEFAULT_READ_TIMEOUT = 60*1000;
 
     /**
      * create the default options (using the default timeout, etc)
@@ -281,7 +267,6 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
     public static final String PROP_VIA = "i2ptunnel.httpclient.sendVia";
     public static final String PROP_JUMP_SERVERS = "i2ptunnel.httpclient.jumpServers";
 
-    private static long __requestId = 0;
     protected void clientConnectionRun(Socket s) {
         InputStream in = null;
         OutputStream out = null;
@@ -296,6 +281,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
             String line, method = null, protocol = null, host = null, destination = null;
             StringBuilder newRequest = new StringBuilder();
             int ahelper = 0;
+            String authorization = null;
             while ((line = reader.readLine(method)) != null) {
                 line = line.trim();
                 if (_log.shouldLog(Log.DEBUG))
@@ -630,15 +616,21 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                         // Block Windows NTLM after 401
                         line = null;
                         continue;
-                    } else if (lowercaseLine.startsWith("proxy-authorization: ntlm ")) {
-                        // Block Windows NTLM after 407
+                    } else if (lowercaseLine.startsWith("proxy-authorization: ")) {
+                        // This should be for us. It is a
+                        // hop-by-hop header, and we definitely want to block Windows NTLM after a far-end 407.
+                        // Response to far-end shouldn't happen, as we
+                        // strip Proxy-Authenticate from the response in HTTPResponseOutputStream
+                        if (lowercaseLine.startsWith("proxy-authorization: basic "))
+                            // save for auth check below
+                            authorization = line.substring(27);  // "proxy-authorization: basic ".length()
                         line = null;
                         continue;
                     }
                 }
 
                 if (line.length() == 0) {
-
+                    // No more headers, add our own and break out of the loop
                     String ok = getTunnel().getClientOptions().getProperty("i2ptunnel.gzip");
                     boolean gzip = DEFAULT_GZIP;
                     if (ok != null)
@@ -656,6 +648,22 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
                             newRequest.append("User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.2.6) Gecko/20100625 Firefox/3.6.6\r\n");
                         else
                             newRequest.append("User-Agent: MYOB/6.66 (AN/ON)\r\n");
+                    }
+                    // Add Proxy-Authentication header for next hop (outproxy)
+                    if (usingWWWProxy && Boolean.valueOf(getTunnel().getClientOptions().getProperty(PROP_OUTPROXY_AUTH)).booleanValue()) {
+                        // specific for this proxy
+                        String user = getTunnel().getClientOptions().getProperty(PROP_OUTPROXY_USER_PREFIX + currentProxy);
+                        String pw = getTunnel().getClientOptions().getProperty(PROP_OUTPROXY_PW_PREFIX + currentProxy);
+                        if (user == null || pw == null) {
+                            // if not, look at default user and pw
+                            user = getTunnel().getClientOptions().getProperty(PROP_OUTPROXY_USER);
+                            pw = getTunnel().getClientOptions().getProperty(PROP_OUTPROXY_PW);
+                        }
+                        if (user != null && pw != null) {
+                            newRequest.append("Proxy-Authorization: Basic ")
+                                      .append(Base64.encode((user + ':' + pw).getBytes(), true))    // true = use standard alphabet
+                                      .append("\r\n");
+                        }
                     }
 	            newRequest.append("Connection: close\r\n\r\n");
                     break;
@@ -685,8 +693,22 @@ public class I2PTunnelHTTPClient extends I2PTunnelClientBase implements Runnable
 
             // Serve local proxy files (images, css linked from error pages)
             // Ignore all the headers
+            // Allow without authorization
             if (usingInternalServer) {
                 serveLocalFile(out, method, targetRequest);
+                s.close();
+                return;
+            }
+
+            // Authorization
+            if (!authorize(s, requestId, authorization)) {
+                if (_log.shouldLog(Log.WARN)) {
+                    if (authorization != null)
+                        _log.warn(getPrefix(requestId) + "Auth failed, sending 407 again");
+                    else
+                        _log.warn(getPrefix(requestId) + "Auth required, sending 407");
+                }
+                out.write(getErrorPage("auth", ERR_AUTH));
                 s.close();
                 return;
             }

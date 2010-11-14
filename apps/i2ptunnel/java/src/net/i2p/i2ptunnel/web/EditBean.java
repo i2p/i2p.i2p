@@ -18,6 +18,7 @@ import net.i2p.data.Destination;
 import net.i2p.data.PrivateKeyFile;
 import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
+import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
 import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.i2ptunnel.TunnelControllerGroup;
 
@@ -198,6 +199,39 @@ public class EditBean extends IndexBean {
     
     public boolean getDelayOpen(int tunnel) {
         return getBooleanProperty(tunnel, "i2cp.delayOpen");
+    }
+    
+    /** all proxy auth @since 0.8.2 */
+    public boolean getProxyAuth(int tunnel) {
+        return getBooleanProperty(tunnel, I2PTunnelHTTPClientBase.PROP_AUTH) &&
+               getProxyUsername(tunnel).length() > 0 &&
+               getProxyPassword(tunnel).length() > 0;
+    }
+    
+    public String getProxyUsername(int tunnel) {
+        return getProperty(tunnel, I2PTunnelHTTPClientBase.PROP_USER, "");
+    }
+    
+    public String getProxyPassword(int tunnel) {
+        if (getProxyUsername(tunnel).length() <= 0)
+            return "";
+        return getProperty(tunnel, I2PTunnelHTTPClientBase.PROP_PW, "");
+    }
+    
+    public boolean getOutproxyAuth(int tunnel) {
+        return getBooleanProperty(tunnel, I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH) &&
+               getOutproxyUsername(tunnel).length() > 0 &&
+               getOutproxyPassword(tunnel).length() > 0;
+    }
+    
+    public String getOutproxyUsername(int tunnel) {
+        return getProperty(tunnel, I2PTunnelHTTPClientBase.PROP_OUTPROXY_USER, "");
+    }
+    
+    public String getOutproxyPassword(int tunnel) {
+        if (getOutproxyUsername(tunnel).length() <= 0)
+            return "";
+        return getProperty(tunnel, I2PTunnelHTTPClientBase.PROP_OUTPROXY_PW, "");
     }
     
     private int getProperty(int tunnel, String prop, int def) {

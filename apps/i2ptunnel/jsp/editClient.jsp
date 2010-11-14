@@ -298,7 +298,7 @@
                 <label for="clientPort" accesskey="r">
                     <%=intl._("Port")%>(<span class="accessKey">r</span>):
                 </label>
-                <input type="text" id="clientPort" name="clientport" size="20" title="I2CP Port Number" value="<%=editBean.getI2CPPort(curTunnel)%>" class="freetext" />                
+                <input type="text" id="port" name="clientport" size="20" title="I2CP Port Number" value="<%=editBean.getI2CPPort(curTunnel)%>" class="freetext" />                
             </div>
                  
          <% if (!"streamrclient".equals(tunnelType)) { // streamr client sends pings so it will never be idle %>
@@ -414,6 +414,57 @@
             </div>
          <% } %>
            
+         <% if ("httpclient".equals(tunnelType) || "connectclient".equals(tunnelType) || "sockstunnel".equals(tunnelType) || "socksirctunnel".equals(tunnelType)) { %>
+            <div id="accessField" class="rowItem">
+                <label><%=intl._("Local Authorization")%>:</label>
+            </div>
+            <div id="portField" class="rowItem">
+                <label>
+                    <%=intl._("Enable")%>:
+                </label>
+                <input value="1" type="checkbox" id="proxyAuth" name="proxyAuth" title="Check to require authorization for this service"<%=(editBean.getProxyAuth(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+            </div>
+            <div id="portField" class="rowItem">
+                <label>
+                    <%=intl._("Username")%>:
+                </label>
+                <input type="text" id="clientPort" name="proxyUsername" title="Set username for this service" value="<%=editBean.getProxyUsername(curTunnel)%>" class="freetext" />                
+            </div>
+            <div id="portField" class="rowItem">
+                <label>
+                    <%=intl._("Password")%>:
+                </label>
+                <input type="password" id="clientPort" name="proxyPassword" title="Set password for this service" value="<%=editBean.getProxyPassword(curTunnel)%>" class="freetext" />                
+            </div>
+            <div class="subdivider">
+                <hr />
+            </div>
+            <div id="accessField" class="rowItem">
+                <label><%=intl._("Outproxy Authorization")%>:</label>
+            </div>
+            <div id="portField" class="rowItem">
+                <label>
+                    <%=intl._("Enable")%>:
+                </label>
+                <input value="1" type="checkbox" id="outproxyAuth" name="outproxyAuth" title="Check if the outproxy requires authorization"<%=(editBean.getOutproxyAuth(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+            </div>
+            <div id="portField" class="rowItem">
+                <label>
+                    <%=intl._("Username")%>:
+                </label>
+                <input type="text" id="clientPort" name="outproxyUsername" title="Enter username required by outproxy" value="<%=editBean.getOutproxyUsername(curTunnel)%>" class="freetext" />                
+            </div>
+            <div id="portField" class="rowItem">
+                <label>
+                    <%=intl._("Password")%>:
+                </label>
+                <input type="password" id="clientPort" name="outproxyPassword" title="Enter password required by outproxy" value="<%=editBean.getOutproxyPassword(curTunnel)%>" class="freetext" />                
+            </div>
+            <div class="subdivider">
+                <hr />
+            </div>
+         <% } // httpclient || connect || socks || socksirc %>
+
             <div id="customOptionsField" class="rowItem">
                 <label for="customOptions" accesskey="u">
                     <%=intl._("Custom options")%>(<span class="accessKey">u</span>):

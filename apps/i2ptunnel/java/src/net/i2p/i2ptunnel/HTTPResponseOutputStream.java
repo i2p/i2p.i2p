@@ -179,6 +179,8 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                                 proxyConnectionSent = true;
                             } else if ( ("Content-encoding".equalsIgnoreCase(key)) && ("x-i2p-gzip".equalsIgnoreCase(val)) ) {
                                 _gzip = true;
+                            } else if ("Proxy-Authenticate".equalsIgnoreCase(key)) {
+                                // filter this hop-by-hop header; outproxy authentication must be configured in I2PTunnelHTTPClient
                             } else {
                                 out.write((key.trim() + ": " + val.trim() + "\r\n").getBytes());
                             }
