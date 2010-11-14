@@ -22,48 +22,24 @@ import java.io.OutputStream;
  */
 public class TunnelId extends DataStructureImpl {
     private long _tunnelId;
-    private int _type;
     
     public static final long MAX_ID_VALUE = (1l<<32l)-2l;
     
-    public final static int TYPE_UNSPECIFIED = 0;
-    public final static int TYPE_INBOUND = 1;
-    public final static int TYPE_OUTBOUND = 2;
-    public final static int TYPE_PARTICIPANT = 3;
-    
-    public static final TunnelId INVALID = new TunnelId(0, true);
-    
     public TunnelId() { 
         _tunnelId = -1;
-        _type = TYPE_UNSPECIFIED;
     }
+
     public TunnelId(long id) { 
         if (id <= 0) throw new IllegalArgumentException("wtf, tunnelId " + id);
         _tunnelId = id;
-        _type = TYPE_UNSPECIFIED;
     }
-    public TunnelId(long id, int type) { 
-        if (id <= 0) throw new IllegalArgumentException("wtf, tunnelId " + id);
-        _tunnelId = id;
-        _type = type;
-    }
-    private TunnelId(long id, boolean forceInvalid) {
-        _tunnelId = id;
-    }
-    
+
     public long getTunnelId() { return _tunnelId; }
+
     public void setTunnelId(long id) { 
         _tunnelId = id; 
         if (id <= 0) throw new IllegalArgumentException("wtf, tunnelId " + id);
     }
-    
-    /** 
-     * is this tunnel inbound, outbound, or a participant (kept in memory only and used only for the router).s
-     *
-     * @return type of tunnel (per constants TYPE_UNSPECIFIED, TYPE_INBOUND, TYPE_OUTBOUND, TYPE_PARTICIPANT)
-     */
-    public int getType() { return _type; }
-    public void setType(int type) { _type = type; }
     
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _tunnelId = DataHelper.readLong(in, 4);
@@ -73,12 +49,7 @@ public class TunnelId extends DataStructureImpl {
         if (_tunnelId < 0) throw new DataFormatException("Invalid tunnel ID: " + _tunnelId);
         DataHelper.writeLong(out, 4, _tunnelId);
     }
-    public int writeBytes(byte target[], int offset) throws DataFormatException {
-        if (_tunnelId < 0) throw new DataFormatException("Invalid tunnel ID: " + _tunnelId);
-        DataHelper.toLong(target, offset, 4, _tunnelId);
-        return 4;
-    }
-    
+
     @Override
     public boolean equals(Object obj) {
         if ( (obj == null) || !(obj instanceof TunnelId))
