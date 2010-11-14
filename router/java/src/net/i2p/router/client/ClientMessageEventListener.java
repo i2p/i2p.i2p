@@ -135,8 +135,11 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
 	
     
     /** 
-     * Handle a CreateSessionMessage
-     *
+     * Handle a CreateSessionMessage.
+     * On errors, we could perhaps send a SessionStatusMessage with STATUS_INVALID before
+     * sending the DisconnectMessage... but right now the client will send _us_ a
+     * DisconnectMessage in return, and not wait around for our DisconnectMessage.
+     * So keep it simple.
      */
     private void handleCreateSession(I2CPMessageReader reader, CreateSessionMessage message) {
         if (message.getSessionConfig().verifySignature()) {
@@ -148,7 +151,33 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             _runner.disconnectClient("Invalid signature on CreateSessionMessage");
             return;
         }
-	
+
+        // Auth, since 0.8.2
+        // In-JVM accesses have access to the same context properties, so
+        // they will be set on the client side... therefore we don't need to pass in
+        // some indication of (socket instanceof InternalSocket)
+        if (Boolean.valueOf(_context.getProperty("i2cp.auth")).booleanValue()) {
+            String configUser = _context.getProperty("i2cp.username");
+            String configPW = _context.getProperty("i2cp.password");
+            if (configUser != null && configPW != null) {
+                Properties props = message.getSessionConfig().getOptions();
+                String user = props.getProperty("i2cp.username");
+                String pw = props.getProperty("i2cp.password");
+                if (user == null || pw == null) {
+                    _log.error("I2CP auth failed for client: " + props.getProperty("inbound.nickname"));
+                    _runner.disconnectClient("Authorization required to create session, specify i2cp.username and i2cp.password in session options");
+                    return;
+                }
+                if ((!user.equals(configUser)) || (!pw.equals(configPW))) {
+                    _log.error("I2CP auth failed for client: " + props.getProperty("inbound.nickname") + " user: " + user);
+                    _runner.disconnectClient("Authorization failed for Create Session, user = " + user);
+                    return;
+                }
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("I2CP auth success for client: " + props.getProperty("inbound.nickname") + " user: " + user);
+            }
+        }
+
         SessionId sessionId = new SessionId();
         sessionId.setSessionId(getNextSessionId()); 
         _runner.setSessionId(sessionId);
