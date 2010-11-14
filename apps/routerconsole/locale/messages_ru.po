@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-11-13 18:50+0000\n"
-"PO-Revision-Date: 2010-11-14 03:09+0500\n"
+"PO-Revision-Date: 2010-11-14 22:32+0500\n"
 "Last-Translator: Hidden Z <hiddenz@mail.i2p>\n"
 "Language-Team: \n"
 "Language: \n"
@@ -1496,7 +1496,7 @@ msgstr "Добавлен новый клиент"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:188
 msgid "Client configuration saved successfully - restart required to take effect."
-msgstr "Настройки клиентов сохранены, требуется перезагрузка маршрутизатора для вступления в силу."
+msgstr "Настройки клиентов сохранены, требуется перезапуск маршрутизатора для вступления в силу."
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:202
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:213
@@ -1871,19 +1871,19 @@ msgstr "на"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:221
 msgid "Gracefully restarting into Hidden Router Mode"
-msgstr "Плавная перезагрузка для перехода в скрытый режим"
+msgstr "Плавный перезапуск для перехода в скрытый режим"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:223
 msgid "Gracefully restarting to exit Hidden Router Mode"
-msgstr "Плавная перезагрузка для выхода из скрытого режима"
+msgstr "Плавный перезапуск для выхода из скрытого режима"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:232
 msgid "Enabling UPnP, restart required to take effect"
-msgstr "UPnP включен, необходима перезагрузка маршрутизатора"
+msgstr "UPnP включен, необходим перезапуск маршрутизатора"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:234
 msgid "Disabling UPnP, restart required to take effect"
-msgstr "UPnP выключен, необходима перезагрузка маршрутизатора"
+msgstr "UPnP выключен, необходим перезапуск маршрутизатора"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:242
 msgid "Enabling laptop mode"
@@ -1901,7 +1901,7 @@ msgstr "Запрашиваем SSU-посредников"
 #. But it would be hard to get right, so just do a restart.
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:291
 msgid "Gracefully restarting I2P to change published router address"
-msgstr "Плавная перезагрузка для изменения публикуемого адреса"
+msgstr "Плавный перезапуск для изменения публикуемого адреса"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:314
 msgid "Updating bandwidth share percentage"
@@ -1931,7 +1931,7 @@ msgstr "или {0} байт/месяц максимум"
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:20
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:314
 msgid "Ban peer until restart"
-msgstr "Забанить пира до перезагрузки маршрутизатора"
+msgstr "Забанить пира до перезапуска маршрутизатора"
 
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:23
 #, java-format
@@ -1940,7 +1940,7 @@ msgstr "Забанен вручную через {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:24
 msgid "banned until restart"
-msgstr "забанен до перезагрузки"
+msgstr "забанен до перезапуска"
 
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:27
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:38
@@ -1989,17 +1989,17 @@ msgstr "Отменить выключение"
 
 #: ../java/src/net/i2p/router/web/ConfigRestartBean.java:37
 msgid "Cancel restart"
-msgstr "Отменить перезагрузку"
+msgstr "Отменить перезапуск"
 
 #: ../java/src/net/i2p/router/web/ConfigRestartBean.java:39
 msgid "Restart immediately"
-msgstr "Перезагрузить немедленно"
+msgstr "Перезапустить немедленно"
 
 #. ctx.router().shutdown(Router.EXIT_HARD_RESTART); // never returns
 #. give the UI time to respond
 #: ../java/src/net/i2p/router/web/ConfigRestartBean.java:43
 msgid "Restart"
-msgstr "Перезагрузить"
+msgstr "Перезапустить"
 
 #: ../java/src/net/i2p/router/web/ConfigRestartBean.java:46
 msgid "Shutdown"
@@ -2007,7 +2007,7 @@ msgstr "Выключить"
 
 #: ../java/src/net/i2p/router/web/ConfigRestartBean.java:59
 msgid "Restart imminent"
-msgstr "Неотменяемая перезагрузка"
+msgstr "Неотменяемый перезапуск"
 
 #: ../java/src/net/i2p/router/web/ConfigRestartBean.java:61
 msgid "Shutdown imminent"
@@ -2021,7 +2021,7 @@ msgstr "Выключение через {0}"
 #: ../java/src/net/i2p/router/web/ConfigRestartBean.java:70
 #, java-format
 msgid "Restart in {0}"
-msgstr "Перезагрузка через {0}"
+msgstr "Перезапуск через {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:53
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:290
@@ -2048,28 +2048,28 @@ msgstr "Плавное отключение отменено"
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:64
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:306
 msgid "Graceful restart"
-msgstr "Перезагрузить плавно"
+msgstr "Перезапустить плавно"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:67
 msgid "Graceful restart requested"
-msgstr "Запущена плавная перезагрузка"
+msgstr "Запущен плавный перезапуск"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:68
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:308
 msgid "Hard restart"
-msgstr "Перезагрузить немедленно"
+msgstr "Перезапустить немедленно"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:71
 msgid "Hard restart requested"
-msgstr "Запрошена быстрая перезагрузка"
+msgstr "Запрошен быстрый перезапуск"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:72
 msgid "Rekey and Restart"
-msgstr "Сменить ключ и перезагрузить"
+msgstr "Сменить ключ и перезапустить"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:73
 msgid "Rekeying after graceful restart"
-msgstr "Смена ключа после плавной перезагрузки"
+msgstr "Смена ключа после плавного перезапуска"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:76
 msgid "Rekey and Shutdown"
@@ -2439,13 +2439,12 @@ msgid "File location"
 msgstr "Путь к файлу журнала"
 
 #: ../java/src/net/i2p/router/web/LogsHelper.java:34
-#, fuzzy
 msgid "File not found"
 msgstr "Файл не найден"
 
 #: ../java/src/net/i2p/router/web/LogsHelper.java:50
 msgid "No log messages"
-msgstr "Нет логов"
+msgstr "Нет сообщений"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:80
 msgid "Network Database RouterInfo Lookup"
@@ -2763,7 +2762,7 @@ msgstr "Не удалось установить плагин в {0}"
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:359
 #, java-format
 msgid "Plugin {0} installed, router restart required"
-msgstr "Плагин {0} установлен, требуется перезагрузка маршрутизатора"
+msgstr "Плагин {0} установлен, требуется перезапуск маршрутизатора"
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:361
 #, java-format
@@ -3013,7 +3012,7 @@ msgstr "Временный бан истекает через {0}"
 #: ../java/src/net/i2p/router/web/ShitlistRenderer.java:59
 #, java-format
 msgid "Banned until restart or in {0}"
-msgstr "Забанен до перезагрузки или истечения {0}"
+msgstr "Забанен до перезапуска или истечения {0}"
 
 #: ../java/src/net/i2p/router/web/ShitlistRenderer.java:71
 msgid "unban now"
@@ -3125,7 +3124,7 @@ msgstr "Здесь можно управлять hosts-файлами (един�
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:64
 msgid "Addressbook"
-msgstr "Адресная Книга"
+msgstr "Адресная книга"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:68
 msgid "Built-in anonymous BitTorrent Client"
@@ -3192,7 +3191,7 @@ msgstr "Журналы сообщений маршрутизатора"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:124
 msgid "Logs"
-msgstr "Журналы"
+msgstr "Логи"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:134
 msgid "Graph router performance"
@@ -3629,12 +3628,12 @@ msgstr "Обнаружено повреждение в неподписанно�
 #: ../java/src/net/i2p/router/web/UnsignedUpdateHandler.java:111
 #: ../java/src/net/i2p/router/web/UpdateHandler.java:203
 msgid "Restarting"
-msgstr "Производится перезагрузка"
+msgstr "Производится перезапуск"
 
 #: ../java/src/net/i2p/router/web/UnsignedUpdateHandler.java:118
 #: ../java/src/net/i2p/router/web/UpdateHandler.java:210
 msgid "Click Restart to install"
-msgstr "Перезагрузите I2P-маршрутизатор для установки"
+msgstr "Перезапустите I2P-маршрутизатор для установки"
 
 #: ../java/src/net/i2p/router/web/UnsignedUpdateHandler.java:120
 #: ../java/src/net/i2p/router/web/UpdateHandler.java:212
@@ -4208,7 +4207,7 @@ msgstr "ВНИМАНИЕ"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:511
 msgid "Changing these settings will restart your router."
-msgstr "Изменение этих настрок повлечет перезагрузку I2P маршрутизатора."
+msgstr "Изменение этих настроек повлечет перезапуск I2P маршрутизатора."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:517
 msgid "Configuration Help"
@@ -4273,7 +4272,7 @@ msgstr "Посмотреть статус UPnP можно тут."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:554
 msgid "UPnP may be enabled or disabled above, but a change requires a router restart to take effect."
-msgstr "UPnP можно включить/выключить в настройках выше. Настройка вступит в силу только после перезагрузки I2P-маршрутизатора."
+msgstr "UPnP можно включить/выключить в настройках выше. Настройка вступит в силу только после перезапуска I2P-маршрутизатора."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:556
 msgid "Hostnames entered above will be published in the network database."
@@ -4504,7 +4503,7 @@ msgstr "Дополнительные настройки I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:309
 msgid "Some changes may require a restart to take effect."
-msgstr "Для вступления некоторых изменений в силу может потребоваться перезагрузка I2P-маршрутизатора."
+msgstr "Для вступления некоторых изменений в силу может потребоваться перезапуск I2P-маршрутизатора."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:106
 msgid "config clients"
@@ -4529,7 +4528,7 @@ msgstr "Для изменения других клиентских настро
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:324
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:344
 msgid "All changes require restart to take effect."
-msgstr "Для вступления изменённых настроек в силу потребуется перезагрузка маршрутизатора."
+msgstr "Для вступления изменённых настроек в силу потребуется перезапуск маршрутизатора."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:336
 msgid "WebApp Configuration"
@@ -4722,7 +4721,7 @@ msgstr "Если маршрутизатор должен быть выключе
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:298
 msgid "If you want the router to restart itself after shutting down, you can choose one of the following."
-msgstr "Иногда, Вам нужно перегрузить маршрутизатор (например, после изменения базовых настроек, которые считываются приложением только во время запуска). В этом случае, Вам доступны два варианта. Плавная перезагрузка займет несколько минут (но зато пиры, использующие Ваш маршрутизатор, будут Вам благодарны за терпение). Если Вы не можете ждать, выбирайте немедленную перезагрузку. В случае немедленной перезагрузки маршрутизатор запустится через одну минуту."
+msgstr "Иногда, Вам нужно перегрузить маршрутизатор (например, после изменения базовых настроек, которые считываются приложением только во время запуска). В этом случае, Вам доступны два варианта. Плавный перезапуск займет несколько минут (но зато пиры, использующие Ваш маршрутизатор, будут Вам благодарны за терпение). Если Вы не можете ждать, выбирайте немедленный перезапуск. В случае немедленного перезапуска маршрутизатор запустится через одну минуту."
 
 # This string intentionally left blank
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:300
@@ -4813,7 +4812,7 @@ msgstr "Включить полную статистику?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:309
 msgid "change requires restart to take effect"
-msgstr "изменения вступят в силу только после перезагрузки маршрутизатора"
+msgstr "изменения вступят в силу только после перезапуска маршрутизатора"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:311
 msgid "Stat file"
@@ -4875,7 +4874,7 @@ msgstr "Настройки зондирующих туннелей сохран�
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:335
 msgid "Client tunnel changes are temporary and are not saved."
-msgstr "Настройки клиентских туннелей нигде не сохраняются и действуют только до перезагрузки."
+msgstr "Настройки клиентских туннелей нигде не сохраняются и действуют только до перезапуска."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:337
 msgid "To make permanent client tunnel changes see the"
