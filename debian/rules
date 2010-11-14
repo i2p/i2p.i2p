@@ -113,6 +113,10 @@ binary: build
 	cp -a debian/scripts/postinst debian/scripts/postrm debian/scripts/prerm debian/conffiles debian/tmp/DEBIAN
 	dpkg-deb -b debian/tmp ..
 
+binary-arch:
+
+binary-indep:
+
 clean:
 	rm -f debian/build
 	rm -rf debian/tmp/
