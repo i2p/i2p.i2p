@@ -143,6 +143,12 @@ public class UpdateHandler {
         }
         protected void update() {
             updateStatus("<b>" + _("Updating") + "</b>");
+            // TODO:
+            // Do a PartialEepGet on the selected URL, check for version we expect,
+            // and loop if it isn't what we want.
+            // This will allow us to do a release without waiting for the last host to install the update.
+            // Alternative: In bytesTransferred(), Check the data in the output file after
+            // we've received at least 56 bytes. Need a cancel() method in EepGet ?
             String updateURL = selectUpdateURL();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Selected update URL: " + updateURL);
