@@ -113,7 +113,7 @@ public class ClientManager {
         }
         for (Iterator<ClientConnectionRunner> iter = runners.iterator(); iter.hasNext(); ) {
             ClientConnectionRunner runner = iter.next();
-            runner.stopRunning();
+            runner.disconnectClient("Router shutdown", Log.WARN);
         }
     }
     

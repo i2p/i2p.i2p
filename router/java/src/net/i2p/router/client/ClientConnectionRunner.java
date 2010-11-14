@@ -237,17 +237,32 @@ public class ClientConnectionRunner {
             _context.jobQueue().addJob(state.getOnGranted());
     }
     
+    /**
+     *  Send a DisconnectMessage and log with level Log.CRIT.
+     *  This is always bad.
+     *  See ClientMessageEventListener.handleCreateSession()
+     *  for why we don't send a SessionStatusMessage when we do this.
+     */
     void disconnectClient(String reason) {
-        if (_log.shouldLog(Log.CRIT))
-            _log.log(Log.CRIT, "Disconnecting the client (" 
+        disconnectClient(reason, Log.CRIT);
+    }
+
+    /**
+     * @param logLevel e.g. Log.WARN
+     * @since 0.8.2
+     */
+    void disconnectClient(String reason, int logLevel) {
+        if (_log.shouldLog(logLevel))
+            _log.log(logLevel, "Disconnecting the client (" 
                      + _config
-                     + ": " + reason);
+                     + ") : " + reason);
         DisconnectMessage msg = new DisconnectMessage();
         msg.setReason(reason);
         try {
             doSend(msg);
         } catch (I2CPMessageException ime) {
-            _log.error("Error writing out the disconnect message: " + ime);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Error writing out the disconnect message: " + ime);
         }
         stopRunning();
     }
