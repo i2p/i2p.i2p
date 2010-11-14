@@ -12,6 +12,7 @@ package net.i2p.client;
 import net.i2p.I2PAppContext;
 import net.i2p.data.i2cp.DisconnectMessage;
 import net.i2p.data.i2cp.I2CPMessage;
+import net.i2p.util.Log;
 
 /**
  * Handle I2CP disconnect messages from the router
@@ -24,7 +25,9 @@ class DisconnectMessageHandler extends HandlerImpl {
     }
     
     public void handleMessage(I2CPMessage message, I2PSessionImpl session) {
-        _log.debug("Handle message " + message);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Handle message " + message);
+        session.propogateError(((DisconnectMessage)message).getReason(), new I2PSessionException("Disconnect Message received"));
         session.destroySession(false);
     }
 }
