@@ -1,0 +1,38 @@
+.\"Created with GNOME Manpages Editor Wizard
+.\"http://sourceforge.net/projects/gmanedit2
+.TH i2prouter 1 "November 13, 2010" "" "I2PRouter"
+
+.SH NAME
+i2prouter \- start and stop the I2P router
+
+.SH SYNOPSIS
+.B i2prouter
+.RI { console | start | stop | restart | status | dump }
+.br
+
+.SH DESCRIPTION
+\fBi2prouter\fP controls the I2P service. It takes options similar to init scripts.
+
+.B
+.IP console
+Runs I2P as a console application under the current user.
+
+.B
+.IP start
+Starts the I2P service.
+
+.B
+.IP stop
+Stops the I2P service.
+
+.B
+.IP restart
+Stops the I2P service and then starts it.
+
+.B
+.IP status
+Prints whether the I2P service is running.
+
+.B
+.IP dump
+Dumps the current threads into\fB wrapper.log\fP.

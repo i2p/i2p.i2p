@@ -1,12 +1,14 @@
 #!/bin/sh
+set -e
 
 # /etc/rc*.d/*i2p files	
 update-rc.d -f i2p remove
 
 I2PUSER=i2psvc
 # delete $I2PUSER if it exists (it will not if this is a purge after a remove)
-id $I2PUSER 2>/dev/null
-if [ $? -eq 0 ]; then
+# the "| cat" sets the exit code to zero so the script doesn't abort
+entry=`getent passwd | cut -d: -f1 | grep i2psvc | cat`
+if [ -n "$entry" ]; then
     exec userdel $I2PUSER
 fi
 

@@ -1,0 +1,53 @@
+.\"Created with GNOME Manpages Editor Wizard
+.\"http://sourceforge.net/projects/gmanedit2
+.TH Eepget 1 "November 13, 2010" "" "Eepget - I2P Downloader"
+
+.SH NAME
+Eepget \- I2P downloader
+
+.SH SYNOPSIS
+.B eepget
+.RI [ options ] URL
+.br
+
+.SH DESCRIPTION
+\fBEepget\fP downloads a file via HTTP through the I2P network. It handles .i2p URLs as well as URLs on the regular web such as .com.
+
+.SH OPTIONS
+.B
+\fB\-p\fR proxy_host:port
+.TP
+Sets the I2P proxy server (eeproxy) to use. The default is 127.0.0.1:4444.
+.TP
+
+.B
+\fB\-n\fR retries
+.TP
+Sets the number of retries if the download fails. The default is 3.
+.TP
+
+.B
+\fB\-o\fR file
+.TP
+Sets the output file to write to. If this option is not given, the URL determines the output filename.
+.TP
+
+.B
+\fB\-m\fR markSize lineLen
+.TP
+Controls the progress display. \fB\ markSize \fP is the number of bytes one '#' character represents. \fB\ lineLen \fP is the length of one progress line in characters. The defaults are 1024 and 40.
+.TP
+
+.B
+\fB\-t\fR seconds
+.TP
+Sets the inactivity timeout. The default is 60 seconds.
+.TP
+
+.SH "EXIT STATUS"
+
+\fB Eepget\fP always exits with the status 0.
+
+.SH "SEE ALSO"
+
+wget(1)

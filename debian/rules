@@ -23,6 +23,7 @@ endif
 	mkdir -p debian/tmp/etc/i2p
 	mkdir -p debian/tmp/usr/share/i2p/lib
 	mkdir -p debian/tmp/usr/share/doc/i2p
+	mkdir -p debian/tmp/usr/share/man/man1
 	mkdir -p debian/tmp/usr/lib/i2p
 	mkdir -p debian/tmp/usr/bin
 	
@@ -59,6 +60,10 @@ endif
 	rm debian/tmp/usr/share/doc/i2p/licenses/LICENSE-Apache2.0.txt
 	rm debian/tmp/usr/share/doc/i2p/licenses/LICENSE-GPLv2.txt
 	rm debian/tmp/usr/share/doc/i2p/licenses/LICENSE-LGPLv2.1.txt
+
+	@# man pages
+	gzip -9c installer/resources/man/eepget.1 > debian/tmp/usr/share/man/man1/eepget.1.gz
+	gzip -9c installer/resources/man/i2prouter.1 > debian/tmp/usr/share/man/man1/i2prouter.1.gz
 
 	@# copy wrapper files to /usr/lib/i2p (including wrapper.jar because it is architecture dependent)
 	cp ${wrapperpath}/libwrapper.so debian/tmp/usr/lib/i2p/
