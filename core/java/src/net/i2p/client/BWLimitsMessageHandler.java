@@ -8,6 +8,7 @@ package net.i2p.client;
 import net.i2p.I2PAppContext;
 import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.BandwidthLimitsMessage;
+import net.i2p.util.Log;
 
 /**
  * Handle I2CP BW replies from the router
@@ -18,7 +19,8 @@ class BWLimitsMessageHandler extends HandlerImpl {
     }
     
     public void handleMessage(I2CPMessage message, I2PSessionImpl session) {
-        _log.debug("Handle message " + message);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Handle message " + message);
         BandwidthLimitsMessage msg = (BandwidthLimitsMessage) message;
        ((I2PSimpleSession)session).bwReceived(msg.getLimits());
     }

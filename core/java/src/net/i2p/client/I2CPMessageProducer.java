@@ -42,14 +42,13 @@ import net.i2p.util.Log;
  */
 class I2CPMessageProducer {
     private final static Log _log = new Log(I2CPMessageProducer.class);
-    private I2PAppContext _context;
+    private final I2PAppContext _context;
     private int _sendBps;
     private long _sendPeriodBytes;
     private long _sendPeriodBeginTime;
 
     public I2CPMessageProducer(I2PAppContext context) {
         _context = context;
-        _sendBps = 0;
         context.statManager().createRateStat("client.sendBpsRaw", "How fast we pump out I2CP data messages", "ClientMessages", new long[] { 60*1000, 5*60*1000, 10*60*1000, 60*60*1000 });
     }
     
