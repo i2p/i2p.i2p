@@ -10,7 +10,7 @@ import net.i2p.I2PAppContext;
 
 /**
  * This is a quick hack to get a working EepHead, primarily for the following usage:
- *
+ * <pre>
  * EepHead foo = new EepHead(...);
  * if (foo.fetch()) {
  *     String lastmod = foo.getLastModified();
@@ -19,12 +19,14 @@ import net.i2p.I2PAppContext;
  *         ...
  *     }
  * }
- *
+ * </pre>
  * Other use cases (command line, listeners, etc...) lightly- or un-tested.
+ * Note that this follows redirects! This may not be what you want or expect.
  *
  * Writing from scratch rather than extending EepGet would maybe have been less bloated memory-wise.
  * This way gets us redirect handling, among other benefits.
  *
+ * @since 0.7.7
  * @author zzz
  */
 public class EepHead extends EepGet {
