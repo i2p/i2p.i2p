@@ -13,10 +13,10 @@ import net.i2p.util.Log;
  * Base implementation of a Job
  */
 public abstract class JobImpl implements Job {
-    private RouterContext _context;
-    private JobTiming _timing;
+    private final RouterContext _context;
+    private final JobTiming _timing;
     private static long _idSrc = 0;
-    private long _id;
+    private final long _id;
     private Exception _addedBy;
     private long _madeReadyOn;
     
