@@ -54,12 +54,12 @@ vari&euml;ren.
 <a href="configstats.jsp#router.activePeers">[Grafieken inschakelen]</a>.
 <li class="tidylist"><b>Snel:</b>
 Dit is het aantal peers dat je gebruikt om client tunnels mee te bouwen. Het ligt over
-het algemeen tussen 8 en 15.
+het algemeen tussen 8 en 30.
 Je snelle peers worden getoond op de <a href="profiles.jsp">profielen pagina</a>.
 <a href="configstats.jsp#router.fastPeers">[Grafieken inschakelen]</a>.
 <li class="tidylist"><b>Grote capaciteit:</b>
 Dit is het aantal peers dat je gebruikt om sommige van de onderzoekende tunnels mee te maken.
-Het ligt over het algemeen tussen de 8 en 25. De snelle peers zijn inbegrepen in de categorie grote capaciteit.
+Het ligt over het algemeen tussen de 8 en 75. De snelle peers zijn inbegrepen in de categorie grote capaciteit.
 De grote capaciteits peers worden getoond op de <a href="profiles.jsp">profielen pagina</a>.
 <a href="configstats.jsp#router.highCapacityPeers">[Grafieken inschakelen]</a>.
 <li class="tidylist"><b>Ge&iuml;ntegreerd:</b>

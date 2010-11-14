@@ -243,9 +243,12 @@
         <delete dir="debian/db" />
         <delete file="debian/files" />
         <delete file="debian/build" />
+      <!-- HH to rework
+           Don't think we should be deleting stuff in .., esp. with wildcards
         <delete>
             <fileset dir=".." includes="i2p_*.tar.gz,i2p_*.deb,i2p_*.dsc,i2p_*.changes" />
         </delete>
+       -->
         <ant dir="core/java/" target="distclean" />
         <ant dir="router/java/" target="distclean" />
         <ant dir="apps/ministreaming/java/" target="distclean" />
