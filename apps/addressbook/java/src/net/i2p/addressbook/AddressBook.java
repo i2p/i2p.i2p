@@ -196,6 +196,8 @@ public class AddressBook {
                 // null cert ends with AAAA but other zero-length certs would be AA
 		((dest.length() == MIN_DEST_LENGTH && dest.endsWith("AA")) ||
 		 (dest.length() > MIN_DEST_LENGTH && dest.length() <= MAX_DEST_LENGTH)) &&
+		// B64 comes in groups of 2, 3, or 4 chars, but never 1
+		((dest.length() % 4) != 1) &&
                 dest.replaceAll("[a-zA-Z0-9~-]", "").length() == 0
                 ;	
     }
@@ -253,6 +255,7 @@ public class AddressBook {
             try {
                 ConfigParser.write(this.addresses, file);
             } catch (IOException exp) {
+                System.err.println("Error writing addressbook " + file.getAbsolutePath() + " : " + exp.toString());
             }
         }
     }

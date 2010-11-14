@@ -269,7 +269,9 @@ public class ConfigParser {
     /**
      * Write contents of Map map to the File file. Output is written
      * with one key, value pair on each line, in the format: key=value.
-     * 
+     * Write to a temp file in the same directory and then rename, to not corrupt
+     * simultaneous accesses by the router.
+     *
      * @param map
      *            A Map to write to file.
      * @param file
@@ -278,8 +280,17 @@ public class ConfigParser {
      *             if file cannot be written to.
      */
     public static void write(Map map, File file) throws IOException {
+        File tmp = File.createTempFile("hoststxt-", ".tmp", file.getAbsoluteFile().getParentFile());
         ConfigParser
+                .write(map, new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(tmp), "UTF-8")));
+        boolean success = tmp.renameTo(file);
+        if (!success) {
+            // hmm, that didn't work, try it the old way
+            System.out.println("Warning: addressbook rename fail from " + tmp + " to " + file);
+            tmp.delete();
+            ConfigParser
                 .write(map, new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(file), "UTF-8")));
+        }
     }
 
     /**
