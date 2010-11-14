@@ -164,8 +164,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     }
 
     /**
-     * Parse the config for anything we know about
-     *
+     * Parse the config for anything we know about.
+     * Also fill in the authorization properties if missing.
      */
     protected void loadConfig(Properties options) {
         _options = new Properties();
@@ -179,6 +179,18 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                 _log.warn(getPrefix() + "Invalid port number specified, defaulting to "
                           + LISTEN_PORT, nfe);
             _portNum = LISTEN_PORT;
+        }
+
+        // auto-add auth if required, not set in the options, and we are in the same JVM
+        if (_context.isRouterContext() &&
+            Boolean.valueOf(_context.getProperty("i2cp.auth")).booleanValue() &&
+            ((!options.containsKey("i2cp.username")) || (!options.containsKey("i2cp.password")))) {
+            String configUser = _context.getProperty("i2cp.username");
+            String configPW = _context.getProperty("i2cp.password");
+            if (configUser != null && configPW != null) {
+                _options.setProperty("i2cp.username", configUser);
+                _options.setProperty("i2cp.password", configPW);
+            }
         }
     }
 
