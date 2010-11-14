@@ -98,6 +98,9 @@ endif
 	    sed 's|%SYSTEM_java_io_tmpdir|/tmp|g' > debian/tmp/usr/share/i2p/runplain.sh
 	chmod +x debian/tmp/usr/share/i2p/runplain.sh
 	
+	dpkg-shlibdeps debian/tmp/usr/lib/i2p/libwrapper.so
+	dpkg-shlibdeps debian/tmp/usr/lib/i2p/i2psvc
+	
 	touch debian/build
 	
 	@# changelog

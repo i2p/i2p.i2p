@@ -243,6 +243,7 @@
         <delete dir="debian/db" />
         <delete file="debian/files" />
         <delete file="debian/build" />
+        <delete file="debian/substvars"/>
         <delete>
             <fileset dir=".." includes="i2p_*.tar.gz,i2p_*.deb,i2p_*.dsc,i2p_*.changes" />
         </delete>
