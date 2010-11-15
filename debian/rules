@@ -70,6 +70,8 @@ endif
 	cp ${wrapperpath}/wrapper.jar debian/tmp/usr/lib/i2p/
 	cp ${wrapperpath}/i2psvc debian/tmp/usr/lib/i2p/
 	chmod +x debian/tmp/usr/lib/i2p/i2psvc
+	strip debian/tmp/usr/lib/i2p/libwrapper.so
+	strip debian/tmp/usr/lib/i2p/i2psvc
 
 	@# copy remaining executables to /usr/bin, replace INSTALL_PATH and SYSTEM_java_io_tmpdir
 	sed 's|%INSTALL_PATH|/usr/share/i2p|g' pkg-temp/eepget > debian/tmp/usr/bin/eepget
