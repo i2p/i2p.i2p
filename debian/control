@@ -1,6 +1,7 @@
 Source: i2p
 Maintainer: Hungry Hobo <HungryHobo@i2pmail.org>
 Section: net
+Standards-Version: 3.8.4
 Priority: optional
 Homepage: http://www.i2p2.de/
 Build-Depends: libc6-dev (>= 2.10), sun-java6-jdk | openjdk-6-jdk | default-jdk | java-sdk, ant, fakeroot, gettext
