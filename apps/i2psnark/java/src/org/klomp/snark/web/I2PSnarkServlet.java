@@ -274,7 +274,7 @@ public class I2PSnarkServlet extends Default {
         out.write("</th>\n<th align=\"center\">");
         out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/eta.png\" title=\"");
         out.write(_("Estimated Download Time"));
-        out.write("\">&thinsp;");
+        out.write("\">");  // space here would look better but nbsp is too big and thinsp breaks
         out.write(_("ETA"));
         out.write("</th>\n<th align=\"center\">");
         out.write("<img border=\"0\" src=\"/themes/console/images/inbound.png\" title=\"");

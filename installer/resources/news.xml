@@ -1,17 +1,20 @@
 <!--
-<i2p.news date="$Date: 2010-07-12 00:00:00 $">
-<i2p.release version="0.8" date="2010/07/12" minVersion="0.6" />
+<i2p.news date="$Date: 2010-11-15 00:00:00 $">
+<i2p.release version="0.8.1" date="2010/11/15" minVersion="0.6" />
 -->
 <div lang="en">
 <h4><ul><li>2010-07-12: <b>0.8 <a href="http://www.i2p2.i2p/release-0.8.html">Released</a></b></li></ul></h4>
 <p>
-The 0.8 release contains the usual collection of bug fixes,
-as well as completion of the German translation by eche|on and a complete Dutch translation by monkeybrains and duck.
-This release is fully compatible with the 0.7.x releases.
+The 0.8.1 release contains the usual collection of bug fixes,
+and a newly colorful i2psnark theme by dr|zed.
+For increased security, files created by the router will now be readable only by the owner (mode 600).
 As usual, upgrading is recommended.
 </p><p>
+We have updated all our <a href="http://www.i2p2.i2p/how">technical specifications</a>
+and <a href="http://docs.i2p2.de/javadoc/">Javadocs</a>, check them out.
+
 Please help grow the network!
-Say hello to the volunteers on the new <a href="irc://127.0.0.1:6668/i2p-help">#i2p-help IRC channel</a>.
+Say hello to the volunteers on the <a href="irc://127.0.0.1:6668/i2p-help">#i2p-help IRC channel</a>.
 Give the
 developers feedback on <a href="irc://127.0.0.1:6668/i2p">IRC #i2p</a> or <a href="http://forum.i2p">forum.i2p</a>
 and <a href="http://www.i2p2.i2p/getinvolved.html">get involved</a>,
