@@ -1,0 +1,23 @@
+HTTP/1.1 400 Destination Not Found
+Content-Type: text/html; charset=UTF-8
+Cache-control: no-cache
+Connection: close
+Proxy-Connection: close
+
+<html><head>
+<title>I2P-Warnung: ungültiges Eepseiten-Ziel</title>
+<link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico" >
+<link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css" >
+</head>
+<body>
+<div class=logo>
+ <a href="http://127.0.0.1:7657/index.jsp" title="Routerkonsole"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="I2P-Routerkonsole" border="0"></a><hr>
+ <a href="http://127.0.0.1:7657/config.jsp">Einstellungen</a> <a href="http://127.0.0.1:7657/help.jsp">Help</a> <a href="http://127.0.0.1:7657/susidns/">Adressbuch</a>
+</div>
+<div class=warning id=warning>
+<h3>Warnung: ungültiges Eepseiten-Ziel</h3>
+Das angegebene Eepseiten-Ziel ist nicht gültig,
+oder andernarts nicht erreichbar. Vielleicht habe Sie eine falsche BASIS64-Zeichenkette kopiert
+oder Sie folgten einem ungültigen Verweis. Möglicherweise ist auch der I2P-Host offline. 
+Versuchen Sie ein <a href="javascript: window.location.reload()">Neuladen</a>.
+<hr><b>Konnte das folgende Ziel nicht finden:</b><BR><BR>
