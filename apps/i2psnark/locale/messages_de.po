@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-11-13 00:19+0000\n"
-"PO-Revision-Date: 2010-11-13 01:35+0100\n"
+"PO-Revision-Date: 2010-11-16 18:44+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -203,7 +203,7 @@ msgstr "Torrent entfernt:\"{0}\""
 #: ../java/src/org/klomp/snark/SnarkManager.java:799
 #, java-format
 msgid "Download finished: {0}"
-msgstr "Download beendet:\"{0}\""
+msgstr "vollständig heruntergeladen:\"{0}\""
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:799
 #, java-format
@@ -265,7 +265,7 @@ msgstr "Torrent"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:276
 msgid "Estimated Download Time"
-msgstr "Geschätzte verbleibende Zeit bis Fertigstellung"
+msgstr "geschätzte verbleibende Zeit bis zur Fertigstellung"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:278
 msgid "ETA"
@@ -281,15 +281,15 @@ msgstr "Heruntergeladen"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:286
 msgid "Uploaded"
-msgstr "Hochgeladen"
+msgstr "hochgeladen"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:288
 msgid "TX"
-msgstr "Hochgeladen"
+msgstr "hochgeladen"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:291
 msgid "Down Rate"
-msgstr "Eingehend"
+msgstr "eingehend"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:293
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:298
@@ -298,7 +298,7 @@ msgstr "Übertragung"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:296
 msgid "Up Rate"
-msgstr "Ausgehend"
+msgstr "ausgehend"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:304
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:307
@@ -316,7 +316,7 @@ msgstr "Starte alle Torrents und den I2P-Tunnel"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:336
 msgid "No torrents loaded."
-msgstr "Keine Torrents geladen"
+msgstr "keine Torrents geladen"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:341
 msgid "Totals"
@@ -469,7 +469,7 @@ msgstr "Trackerfehler"
 msgid "1 peer"
 msgid_plural "{0} peers"
 msgstr[0] "1 Teilnehmer"
-msgstr[1] "{0} Teilnehmer"
+msgstr[1] "{0} Teilnehmern"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:717
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:722
@@ -479,12 +479,12 @@ msgstr "Verteile"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:726
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1427
 msgid "Complete"
-msgstr "Vollständig"
+msgstr "vollständig"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:729
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:734
 msgid "Downloading"
-msgstr "Herunterladend"
+msgstr "lade herunter"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:738
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:743
@@ -493,7 +493,7 @@ msgstr "Stillstand"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:747
 msgid "No Peers"
-msgstr "Keine Teilnehmer"
+msgstr "keine Teilnehmer"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:751
 msgid "Stopped"
@@ -677,7 +677,7 @@ msgstr "Teilnehmer"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1139
 msgid "Up bandwidth limit"
-msgstr "Bandbreitenlimit beim Hochladen."
+msgstr "Bandbreitenbegrenzung beim Hochladen."
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1142
 msgid "Half available bandwidth recommended."
@@ -701,11 +701,11 @@ msgstr "OpenTracker-Announce-URL"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1168
 msgid "Inbound Settings"
-msgstr "Einstellungen Eingehend"
+msgstr "Einstellungen eingehend"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1174
 msgid "Outbound Settings"
-msgstr "Einstellungen Ausgehend"
+msgstr "Einstellungen ausgehend"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1181
 msgid "I2CP host"

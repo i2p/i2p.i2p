@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-11-10 08:24+0000\n"
-"PO-Revision-Date: 2010-11-13 00:45+0100\n"
+"PO-Revision-Date: 2010-11-16 18:34+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: echelon <echelon@mail.i2p>, Sperreingang <sperrbezirk@mail.i2p>\n"
 "MIME-Version: 1.0\n"
@@ -1420,7 +1420,7 @@ msgstr "Simbabwe"
 #: ../java/strings/Strings.java:29
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/index_jsp.java:234
 msgid "I2P Router Console"
-msgstr "I2P-Router-Konsole"
+msgstr "I2P-Routerkonsole"
 
 #: ../java/src/net/i2p/router/web/ConfigAdvancedHandler.java:57
 msgid "Error updating the configuration - please see the error logs"
@@ -3195,7 +3195,7 @@ msgstr "Statistiken über die Leistung des Routers in Textform"
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:146
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:365
 msgid "Local Destinations"
-msgstr "Lokale Ziele"
+msgstr "lokale Ziele"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:148
 #: ../java/strings/Strings.java:62
@@ -3212,7 +3212,7 @@ msgstr "Grundsätzliches"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:166
 msgid "Local Identity"
-msgstr "Lokale Identität"
+msgstr "lokale Identität"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:170
 msgid "Your unique I2P router identity is"
@@ -3296,13 +3296,13 @@ msgstr "Erkundung"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:393
 msgid "Participating"
-msgstr "Teilnehmend an"
+msgstr "teilnehmend an"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:399
 msgid "Share ratio"
 msgstr ""
 "Verhältnis \n"
-" fremde/eigene Hops"
+" fremder/eigenen Hops"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:405
 msgid "What's in the router's job queue?"
@@ -4540,7 +4540,7 @@ msgstr "WebApp-Einstellungen"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:338
 msgid "The Java web applications listed below are started by the webConsole client and run in the same JVM as the router. They are usually web applications accessible through the router console. They may be complete applications (e.g. i2psnark),front-ends to another client or application which must be separately enabled (e.g. susidns, i2ptunnel), or have no web interface at all (e.g. addressbook)."
-msgstr "Untengenannte Java-Anwendungen werden vom WebKonsolen-Klienten gestartet und laufen in der selben JVM wie der Router. Es handelt sich dabei normalerweise Web-Anwendungen, die über die Router-Konsole erreichbar sind. Es können komplette Anwendungen (z.B. i2psnark), reine Oberflächen für andere Klienten, Anwendungen, die separat aktiviert werden müssen (z.B. susidns, i2ptunnel), oder Anwendungen ohne Oberfläche (Adressbuch) sein."
+msgstr "Untengenannte Java-Anwendungen werden vom WebKonsolen-Klienten gestartet und laufen in der selben JVM wie der Router. Es handelt sich dabei normalerweise Web-Anwendungen, die über die Routerkonsole erreichbar sind. Es können komplette Anwendungen (z.B. i2psnark), reine Oberflächen für andere Klienten, Anwendungen, die separat aktiviert werden müssen (z.B. susidns, i2ptunnel), oder Anwendungen ohne Oberfläche (Adressbuch) sein."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:340
 msgid "A web app may also be disabled by removing the .war file from the webapps directory; however the .war file and web app will reappear when you update your router to a newer version, so disabling the web app here is the preferred method."
@@ -4729,7 +4729,7 @@ msgstr "Falls Sie den Router nach dem Herunterfahren automatisch wieder starten 
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:300
 msgid "This is useful in some situations - for example, if you changed some settings that client applications only read at startup, such as the routerconsole password or the interface it listens on."
-msgstr "Dies ist in manchen Situationen hilfreich - zum Beispiel wenn Sie einige Optionen geändert haben, die die Klient-Anwendung nur beim Starten einliest (Router-Konsolen-Passwort oder das Interface auf dem es arbeitet)."
+msgstr "Dies ist in manchen Situationen hilfreich - zum Beispiel wenn Sie einige Optionen geändert haben, die die Klient-Anwendung nur beim Starten einliest (Routerkonsolen-Passwort oder das Interface auf dem es arbeitet)."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:302
 msgid "A graceful restart will take a few minutes (but your peers will appreciate your patience), while a hard restart does so immediately."
@@ -4894,7 +4894,7 @@ msgstr "I2P UI-Konfiguration"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:291
 msgid "Router Console Theme"
-msgstr "Thema der Router-Konsole"
+msgstr "Thema der Routerkonsole"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:309
 msgid "Theme selection disabled for Internet Explorer, sorry."
@@ -4906,12 +4906,12 @@ msgstr "Falls Sie nicht den Internet Explorer (IE) benutzen, gibt Ihr Browser wa
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:315
 msgid "Router Console Language"
-msgstr "Sprache der Router-Konsole"
+msgstr "Sprache der Routerkonsole"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:319
 msgid "Please contribute to the router console translation project! Contact the developers on IRC #i2p to help."
 msgstr ""
-"Bitte tragen Sie zum Router-Konsolen-Übersetzungsprojekt bei! Kontaktieren \n"
+"Bitte tragen Sie zum Routerkonsolen-Übersetzungsprojekt bei! Kontaktieren \n"
 "Sie hierzu die Entwickler über den IRC-Kanal #i2p!"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:323
@@ -4993,7 +4993,7 @@ msgstr "Seite nicht gefunden"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error_jsp.java:243
 msgid "Sorry! You appear to be requesting a non-existent Router Console page or resource."
 msgstr ""
-"Bedaure. Anscheinend haben Sie eine nicht vorhandene Router-Konsolenseite\n"
+"Bedaure. Anscheinend haben Sie eine nicht vorhandene Routerkonsolenseite\n"
 "oder -Ressource angefordert."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error_jsp.java:245
