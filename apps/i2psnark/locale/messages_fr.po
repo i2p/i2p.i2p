@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-11-13 08:01+0000\n"
-"PO-Revision-Date: 2010-11-13 20:35+0100\n"
+"PO-Revision-Date: 2010-11-16 19:20+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -277,7 +277,7 @@ msgstr "Téléchargé"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:283
 msgid "RX"
-msgstr "Réception"
+msgstr "Reçu"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:286
 msgid "Uploaded"
@@ -285,7 +285,7 @@ msgstr "Envoyé"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:288
 msgid "TX"
-msgstr "Transmission"
+msgstr "Envoyé"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:291
 msgid "Down Rate"
@@ -468,8 +468,8 @@ msgstr "Erreur du tracker"
 #, java-format
 msgid "1 peer"
 msgid_plural "{0} peers"
-msgstr[0] "1 pair"
-msgstr[1] "{0} pairs"
+msgstr[0] "1 Pair"
+msgstr[1] "{0} Pairs"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:717
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:722
@@ -721,7 +721,7 @@ msgstr "Options I2CP"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1203
 msgid "Save configuration"
-msgstr "Sauver la configuration"
+msgstr "Sauvegarder la configuration"
 
 #. * dummies for translation
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1221
@@ -796,7 +796,7 @@ msgstr "Ignore"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1502
 msgid "Save priorities"
-msgstr "Sauver les priorités"
+msgstr "Sauvegarder les priorités"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1609
 #, java-format
