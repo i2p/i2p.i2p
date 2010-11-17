@@ -174,6 +174,8 @@ public class I2PSnarkServlet extends Default {
                   "<head><link rel=\"shortcut icon\" href=\"/themes/snark/ubergine/favicon.ico\">\n" +
                   "<title>");
         out.write(_("I2PSnark - Anonymous BitTorrent Client"));
+        if ("2".equals(peerParam))
+            out.write(" | Debug Mode");
         out.write("</title>\n");
                                          
         // we want it to go to the base URI so we don't refresh with some funky action= value
@@ -780,7 +782,7 @@ public class I2PSnarkServlet extends Default {
         // temporarily hardcoded for postman* and anonymity, requires bytemonsoon patch for lookup by info_hash
         String announce = snark.meta.getAnnounce();
         if (announce.startsWith("http://YRgrgTLG") || announce.startsWith("http://8EoJZIKr") ||
-            announce.startsWith("http://lnQ6yoBT") || announce.startsWith("http://tracker2.postman.i2p/")) {
+            announce.startsWith("http://lnQ6yoBT") || announce.startsWith("http://tracker2.postman.i2p/") || announce.startsWith("http://ahsplxkbhemefwvvml7qovzl5a2b5xo5i7lyai7ntdunvcyfdtna.b32.i2p/")) {
             Map trackers = _manager.getTrackers();
             for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
                 Map.Entry entry = (Map.Entry)iter.next();
