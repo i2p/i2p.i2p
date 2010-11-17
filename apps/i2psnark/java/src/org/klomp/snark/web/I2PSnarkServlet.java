@@ -1426,8 +1426,14 @@ public class I2PSnarkServlet extends Default {
                                 complete = true;
                                 status = toImg("tick") + _("Complete");
                             } else {
-                                status =
-                                         (snark.storage.getPriority(f.getCanonicalPath()) < 0 ? toImg("cancel") : toImg("clock")) +
+                                int priority = snark.storage.getPriority(f.getCanonicalPath());
+                                if (priority < 0)
+                                    status = toImg("cancel");
+                                else if (priority == 0)
+                                    status = toImg("clock");
+                                else
+                                    status = toImg("clock_red");
+                                status +=
                                          (100 * (length - remaining) / length) + "% " + _("complete") +
                                          " (" + DataHelper.formatSize2(remaining) + _("bytes remaining") + ")";
                             }

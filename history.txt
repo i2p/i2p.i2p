@@ -1,3 +1,28 @@
+2010-11-17 zzz
+    * Addressbook: Try to save files safely
+    * Console: Display durations with new tagged formatDuration2()
+    * DataStructures:
+      - Shim in 3 new abstract classes
+        SimpleDataStructure, KeysAndCert, and DatabaseEntry
+    * I2CP:
+      - Send DisconnectMessage at router shutdown
+      - Add username/password authorization
+    * I2PTunnel:
+      - Improve messages when starting and stopping tunnels
+      - Index page outproxy display cleanup
+    * I2PTunnel HTTP and Connect clients:
+      - Shim in a new abstract superclass I2PTunnelHTTPClientBase for common code
+      - Add local proxy username/password authorization
+      - Add outproxy username/password authorization
+      - Filter hop-by-hop Proxy headers appropriately
+    * I2PTunnel SOCKS and SOCKS IRC clients:
+      - Add local proxy username/password authorization
+      - Add SOCKS 5 outproxy support, with username/password authorization
+    * logs.jsp: Format multiline messages better
+    * Stats: Improve Frequency, enable coalescing; cleanup and javadocs
+    * stats.jsp: Cleanup, more tagging, hide obscure stuff unless ?f=1
+    * Streaming: Fix bug causing read() to incorrectly return EOF
+
 * 2010-11-15  0.8.1 released
 
 2010-11-08 zzz
