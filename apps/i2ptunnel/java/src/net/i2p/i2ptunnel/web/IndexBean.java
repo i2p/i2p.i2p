@@ -167,7 +167,7 @@ public class IndexBean {
         if ( (_action == null) || (_action.trim().length() <= 0) || ("Cancel".equals(_action)))
             return "";
         if ( (!haveNonce(_curNonce)) && (!validPassphrase()) )
-            return "Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.";
+            return _("Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit.");
         if ("Stop all".equals(_action)) 
             return stopAll();
         else if ("Start all".equals(_action))
@@ -214,7 +214,7 @@ public class IndexBean {
         if (_group == null) return "";
         
         _group.reloadControllers();
-        return "Config reloaded";
+        return _("Configuration reloaded for all tunnels");
     }
     private String start() {
         if (_tunnel < 0) return "Invalid tunnel";
@@ -223,7 +223,10 @@ public class IndexBean {
         if (_tunnel >= controllers.size()) return "Invalid tunnel";
         TunnelController controller = (TunnelController)controllers.get(_tunnel);
         controller.startTunnelBackground();
-        return "";
+        // give the messages a chance to make it to the window
+        try { Thread.sleep(1000); } catch (InterruptedException ie) {}
+        // and give them something to look at in any case
+        return _("Starting tunnel...");
     }
     
     private String stop() {
@@ -233,7 +236,10 @@ public class IndexBean {
         if (_tunnel >= controllers.size()) return "Invalid tunnel";
         TunnelController controller = (TunnelController)controllers.get(_tunnel);
         controller.stopTunnel();
-        return "";
+        // give the messages a chance to make it to the window
+        try { Thread.sleep(1000); } catch (InterruptedException ie) {}
+        // and give them something to look at in any case
+        return _("Stopping tunnel...");
     }
     
     private String saveChanges() {
