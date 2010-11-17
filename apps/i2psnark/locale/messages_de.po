@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-11-13 00:19+0000\n"
-"PO-Revision-Date: 2010-11-16 18:44+0100\n"
+"PO-Revision-Date: 2010-11-17 01:02+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -570,7 +570,7 @@ msgstr "Quelle"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:943
 msgid "Uninteresting (The peer has no pieces we need)"
-msgstr "Uninteressant (Der Teilnehmer hat keine Teile die wir benötigen)"
+msgstr "Uninteressant (Der Teilnehmer hat keine Teile, die wir benötigen)"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:945
 msgid "Choked (The peer is not allowing us to request pieces)"
