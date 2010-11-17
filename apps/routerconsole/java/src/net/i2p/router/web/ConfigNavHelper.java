@@ -22,7 +22,7 @@ public class ConfigNavHelper extends HelperBase {
     public void renderNavBar(String requestURI) throws IOException {
         StringBuilder buf = new StringBuilder(1024);
         for (int i = 0; i < pages.length; i++) {
-            String page = "config" + pages[i] + ".jsp";
+            String page = "config" + pages[i];
             if (requestURI.indexOf(page) != -1) {
                 // we are there
                 buf.append(_(titles[i]));

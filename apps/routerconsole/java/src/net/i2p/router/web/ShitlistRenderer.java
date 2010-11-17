@@ -67,7 +67,7 @@ public class ShitlistRenderer {
                 else
                     buf.append(_(entry.cause));
             }
-            buf.append(" (<a href=\"configpeer.jsp?peer=").append(key.toBase64())
+            buf.append(" (<a href=\"configpeer?peer=").append(key.toBase64())
                .append("#unsh\">").append(_("unban now")).append("</a>)");
             buf.append("</li>\n");
         }

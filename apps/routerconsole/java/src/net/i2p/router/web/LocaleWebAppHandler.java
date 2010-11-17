@@ -13,7 +13,9 @@ import org.mortbay.jetty.servlet.WebApplicationHandler;
 /**
  * Convert foo.jsp to foo_xx.jsp for language xx.
  * This is appropriate for jsps with large amounts of text.
- * This does not work for included jsps (e.g. summary*)
+ *
+ * Also, as of 0.8.2, rewrite "/" and "/index.html" to "/index.jsp",x
+ * and "/foo" to "/foo.jsp".
  *
  * @author zzz
  */
@@ -46,9 +48,22 @@ public class LocaleWebAppHandler extends WebApplicationHandler
             return;
         }
 
+        // transparent rewriting
+        if (pathInContext.equals("/") || pathInContext.equals("/index.html")) {
+            // home page
+            pathInContext = "/index.jsp";
+        } else if (pathInContext.indexOf("/", 1) < 0 &&
+                   !pathInContext.endsWith(".jsp")) {
+            // add .jsp to pages at top level
+            pathInContext += ".jsp";
+        }
+
         //System.err.println("Path: " + pathInContext);
         String newPath = pathInContext;
-        if (pathInContext.endsWith(".jsp")) {
+        //if (pathInContext.endsWith(".jsp")) {
+        // We only ended up doing this for help.jsp, so save some effort
+        // unless we translate more pages like this
+        if (pathInContext.equals("/help.jsp")) {
             int len = pathInContext.length();
             // ...but leave foo_xx.jsp alone
             if (len < 8 || pathInContext.charAt(len - 7) != '_') {

@@ -29,7 +29,7 @@ public class ConfigUIHandler extends FormHandler {
         if (_context.router().saveConfig()) {
             if (!oldTheme.equals(_config))
                 addFormNotice(_("Theme change saved.") +
-                              " <a href=\"configui.jsp\">" +
+                              " <a href=\"configui\">" +
                               _("Refresh the page to view.") +
                               "</a>");
         } else {

@@ -30,7 +30,7 @@ public class StatsGenerator {
     
     public void generateStatsPage(Writer out, boolean showAll) throws IOException {
         StringBuilder buf = new StringBuilder(16*1024);
-        buf.append("<div class=\"joblog\"><form action=\"/stats.jsp\">");
+        buf.append("<div class=\"joblog\"><form action=\"/stats\">");
         buf.append("<select name=\"go\" onChange='location.href=this.value'>");
         out.write(buf.toString());
         buf.setLength(0);
@@ -39,7 +39,7 @@ public class StatsGenerator {
         for (Iterator iter = groups.entrySet().iterator(); iter.hasNext(); ) {
             Map.Entry entry = (Map.Entry)iter.next();
             String group = (String)entry.getKey();
-            buf.append("<option value=\"/stats.jsp#").append(group).append("\">");
+            buf.append("<option value=\"#").append(group).append("\">");
             buf.append(_(group)).append("</option>\n");
             // let's just do the groups
             //Set stats = (Set)entry.getValue();
