@@ -244,9 +244,11 @@
         <delete file="debian/files" />
         <delete file="debian/build" />
         <delete file="debian/substvars"/>
+      <!-- HH to move
         <delete>
             <fileset dir=".." includes="i2p_*.tar.gz,i2p_*.deb,i2p_*.dsc,i2p_*.changes" />
         </delete>
+      -->
         <ant dir="core/java/" target="distclean" />
         <ant dir="router/java/" target="distclean" />
         <ant dir="apps/ministreaming/java/" target="distclean" />
