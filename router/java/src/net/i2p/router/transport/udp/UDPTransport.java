@@ -1978,15 +1978,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             //    buf.append(' ').append(_context.blocklist().toStr(ip));
             buf.append("</td>");
             
-            long idleIn = (now-peer.getLastReceiveTime())/1000;
-            long idleOut = (now-peer.getLastSendTime())/1000;
-            if (idleIn < 0) idleIn = 0;
-            if (idleOut < 0) idleOut = 0;
+            long idleIn = Math.max(now-peer.getLastReceiveTime(), 0);
+            long idleOut = Math.max(now-peer.getLastSendTime(), 0);
             
             buf.append("<td class=\"cells\" align=\"right\">");
-            buf.append(DataHelper.formatDuration2(1000 * idleIn));
+            buf.append(DataHelper.formatDuration2(idleIn));
             buf.append("&thinsp/&thinsp;");
-            buf.append(DataHelper.formatDuration2(1000 * idleOut));
+            buf.append(DataHelper.formatDuration2(idleOut));
             buf.append("</td>");
  
             int recvBps = (idleIn > 2 ? 0 : peer.getReceiveBps());
@@ -2010,7 +2008,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append("</td>");
             
             buf.append("<td class=\"cells\" align=\"right\">");
-            buf.append(DataHelper.formatDuration2(peer.getClockSkew()));
+            long skew = peer.getClockSkew();
+            buf.append(formatDuration3(peer.getClockSkew()));
             buf.append("</td>");
             offsetTotal = offsetTotal + peer.getClockSkew();
 
@@ -2032,15 +2031,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             int rto = peer.getRTO();
             
             buf.append("<td class=\"cells\" align=\"right\">");
-            buf.append(rtt);
+            buf.append(DataHelper.formatDuration2(rtt));
             buf.append("</td>");
             
             buf.append("<td class=\"cells\" align=\"right\">");
-            buf.append(peer.getRTTDeviation());
+            buf.append(DataHelper.formatDuration2(peer.getRTTDeviation()));
             buf.append("</td>");
 
             buf.append("<td class=\"cells\" align=\"right\">");
-            buf.append(rto);
+            buf.append(DataHelper.formatDuration2(rto));
             buf.append("</td>");
             
             buf.append("<td class=\"cells\" align=\"right\">");
@@ -2104,19 +2103,19 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 //        buf.append("<tr><td colspan=\"16\"><hr></td></tr>\n");
         buf.append("<tr class=\"tablefooter\"> <td colspan=\"3\" align=\"left\"><b>").append(_("SUMMARY")).append("</b></td>" +
                    "<td align=\"center\" nowrap><b>");
-        buf.append(formatKBps(bpsIn)).append("thinsp;/&thinsp;").append(formatKBps(bpsOut));
+        buf.append(formatKBps(bpsIn)).append("&thinsp;/&thinsp;").append(formatKBps(bpsOut));
         long x = numPeers > 0 ? uptimeMsTotal/numPeers : 0;
         buf.append("</b></td>" +
                    "<td align=\"center\"><b>").append(DataHelper.formatDuration2(x));
         x = numPeers > 0 ? offsetTotal/numPeers : 0;
-        buf.append("</b></td><td align=\"center\"><b>").append(DataHelper.formatDuration2(x)).append("</b></td>\n" +
+        buf.append("</b></td><td align=\"center\"><b>").append(formatDuration3(x)).append("</b></td>\n" +
                    "<td align=\"center\"><b>");
         buf.append(numPeers > 0 ? cwinTotal/(numPeers*1024) + "K" : "0K");
         buf.append("</b></td><td>&nbsp;</td>\n" +
                    "<td align=\"center\"><b>");
-        buf.append(numPeers > 0 ? rttTotal/numPeers : 0);
+        buf.append(numPeers > 0 ? DataHelper.formatDuration2(rttTotal/numPeers) : '0');
         buf.append("</b></td><td>&nbsp;</td> <td align=\"center\"><b>");
-        buf.append(numPeers > 0 ? rtoTotal/numPeers : 0);
+        buf.append(numPeers > 0 ? DataHelper.formatDuration2(rtoTotal/numPeers) : '0');
         buf.append("</b></td><td>&nbsp;</td> <td align=\"center\"><b>");
         buf.append(sendTotal).append("</b></td> <td align=\"center\"><b>").append(recvTotal).append("</b></td>\n" +
                    "<td align=\"center\"><b>").append(resentTotal);
@@ -2139,6 +2138,17 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.setLength(0);
     }
     
+    /**
+     *  @return e.g. 3 sec or -3 sec
+     *  formatDuration2() always prints negative numbers in ms
+     *  @since 0.8.2
+     */
+    private static String formatDuration3(long x) {
+        if (x >= 0)
+            return DataHelper.formatDuration2(x);
+        return "-" + DataHelper.formatDuration2(0 - x);
+    }
+
     private static final DecimalFormat _fmt = new DecimalFormat("#,##0.00");
     private static final String formatKBps(int bps) {
         synchronized (_fmt) {
