@@ -16,6 +16,7 @@ import net.i2p.client.I2PClientFactory;
 import net.i2p.client.I2PSession;
 import net.i2p.data.Base32;
 import net.i2p.data.Destination;
+import net.i2p.i2ptunnel.socks.I2PSOCKSTunnel;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFileOutputStream;
@@ -226,6 +227,13 @@ public class TunnelController implements Logging {
         setListenOn();
         String listenPort = getListenPort();
         String sharedClient = getSharedClient();
+        String proxyList = getProxyList();
+        if (proxyList != null) {
+            // set the outproxy property the socks tunnel wants
+            Properties props = _tunnel.getClientOptions();
+            if (!props.containsKey(I2PSOCKSTunnel.PROP_PROXY_DEFAULT))
+                props.setProperty(I2PSOCKSTunnel.PROP_PROXY_DEFAULT, proxyList);
+        }
         _tunnel.runSOCKSTunnel(new String[] { listenPort, sharedClient }, this);
     }
     
@@ -234,6 +242,13 @@ public class TunnelController implements Logging {
         setListenOn();
         String listenPort = getListenPort();
         String sharedClient = getSharedClient();
+        String proxyList = getProxyList();
+        if (proxyList != null) {
+            // set the outproxy property the socks tunnel wants
+            Properties props = _tunnel.getClientOptions();
+            if (!props.containsKey(I2PSOCKSTunnel.PROP_PROXY_DEFAULT))
+                props.setProperty(I2PSOCKSTunnel.PROP_PROXY_DEFAULT, proxyList);
+        }
         if (getPersistentClientKey()) {
             String privKeyFile = getPrivKeyFile(); 
             _tunnel.runSOCKSIRCTunnel(new String[] { listenPort, "false", privKeyFile }, this);

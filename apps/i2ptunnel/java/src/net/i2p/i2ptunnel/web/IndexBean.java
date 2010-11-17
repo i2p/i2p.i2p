@@ -862,16 +862,15 @@ public class IndexBean {
         }
 
         // generic proxy stuff
-        if ("httpclient".equals(_type) || "connectclient".equals(_type) || "httpbidirserver".equals(_type) || 
+        if ("httpclient".equals(_type) || "connectclient".equals(_type) || 
             "sockstunnel".equals(_type) ||"socksirctunnel".equals(_type)) {
             for (String p : _booleanProxyOpts)
                 config.setProperty("option." + p, "" + _booleanOptions.contains(p));
-        }
-
-        if ("httpclient".equals(_type) || "connectclient".equals(_type)) {
             if (_proxyList != null)
                 config.setProperty("proxyList", _proxyList);
-        } else if ("ircclient".equals(_type) || "client".equals(_type) || "streamrclient".equals(_type)) {
+        }
+
+        if ("ircclient".equals(_type) || "client".equals(_type) || "streamrclient".equals(_type)) {
             if (_targetDestination != null)
                 config.setProperty("targetDestination", _targetDestination);
         } else if ("httpserver".equals(_type) || "httpbidirserver".equals(_type)) {

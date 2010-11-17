@@ -20,8 +20,9 @@ public abstract class SOCKSServer {
     private static final Log _log = new Log(SOCKSServer.class);
 
     /* Details about the connection requested by client */
-    protected String connHostName = null;
-    protected int connPort = 0;
+    protected String connHostName;
+    protected int connPort;
+    protected int addressType;
 
     /**
      * Perform server initialization (expecially regarding protected

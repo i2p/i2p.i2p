@@ -250,19 +250,24 @@
             }
       %></div>
 
-      <% if (!("sockstunnel".equals(indexBean.getInternalType(curClient)) ||
-               "socksirctunnel".equals(indexBean.getInternalType(curClient)))) { %>
         <div class="destinationField rowItem">
             <label>
-            <% if ("httpclient".equals(indexBean.getInternalType(curClient)) || "connectclient".equals(indexBean.getInternalType(curClient))) { %>
+            <% if ("httpclient".equals(indexBean.getInternalType(curClient)) || "connectclient".equals(indexBean.getInternalType(curClient)) ||
+                   "sockstunnel".equals(indexBean.getInternalType(curClient)) || "socksirctunnel".equals(indexBean.getInternalType(curClient))) { %>
                 <%=intl._("Outproxy")%>:
             <% } else { %>
                 <%=intl._("Destination")%>:
             <% } %>
             </label>
-            <input class="freetext" size="40" readonly="readonly" value="<%=indexBean.getClientDestination(curClient)%>" />
+            <div class="text">
+            <% String cdest = indexBean.getClientDestination(curClient);
+               if (cdest.length() > 0) {
+                   %><%=cdest%><%
+               } else {
+                   %><i><%=intl._("none")%></i><%
+               } %>
+            </div>
         </div>
-      <% } %>
 
         <div class="descriptionField rowItem">
             <label><%=intl._("Description")%>:</label>

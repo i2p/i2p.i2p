@@ -15,6 +15,7 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 
 import net.i2p.client.streaming.I2PSocket;
+import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.I2PTunnel;
 import net.i2p.i2ptunnel.I2PTunnelClientBase;
@@ -61,15 +62,19 @@ public class I2PSOCKSTunnel extends I2PTunnelClientBase {
         }
     }
 
-    private static final String PROP_PROXY = "i2ptunnel.socks.proxy.";
+    /** add "default" or port number */
+    public static final String PROP_PROXY_PREFIX = "i2ptunnel.socks.proxy.";
+    public static final String DEFAULT = "default";
+    public static final String PROP_PROXY_DEFAULT = PROP_PROXY_PREFIX + DEFAULT;
+
     private void parseOptions() {
         Properties opts = getTunnel().getClientOptions();
-        proxies = new HashMap(0);
+        proxies = new HashMap(1);
         for (Map.Entry e : opts.entrySet()) {
            String prop = (String)e.getKey();
-           if ((!prop.startsWith(PROP_PROXY)) || prop.length() <= PROP_PROXY.length())
+           if ((!prop.startsWith(PROP_PROXY_PREFIX)) || prop.length() <= PROP_PROXY_PREFIX.length())
               continue;
-           String port = prop.substring(PROP_PROXY.length());
+           String port = prop.substring(PROP_PROXY_PREFIX.length());
            List proxyList = new ArrayList(1);
            StringTokenizer tok = new StringTokenizer((String)e.getValue(), ", \t");
            while (tok.hasMoreTokens()) {
@@ -95,7 +100,22 @@ public class I2PSOCKSTunnel extends I2PTunnelClientBase {
     }
 
     public List<String> getDefaultProxies() {
-        return proxies.get("default");
+        return proxies.get(DEFAULT);
+    }
+
+    /** 
+     * Because getDefaultOptions() in super() is protected
+     * @since 0.8.2
+     */
+    public I2PSocketOptions buildOptions(Properties overrides) {
+        Properties defaultOpts = getTunnel().getClientOptions();
+        defaultOpts.putAll(overrides);
+        // delayed start
+        verifySocketManager();
+        I2PSocketOptions opts = sockMgr.buildOptions(defaultOpts);
+        if (!defaultOpts.containsKey(I2PSocketOptions.PROP_CONNECT_TIMEOUT))
+            opts.setConnectTimeout(60 * 1000);
+        return opts;
     }
 
 }

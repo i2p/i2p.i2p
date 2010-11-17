@@ -139,7 +139,7 @@
                 <hr />
             </div>
            
-            <% if ("httpclient".equals(tunnelType) || "connectclient".equals(tunnelType)) {
+            <% if ("httpclient".equals(tunnelType) || "connectclient".equals(tunnelType) || "sockstunnel".equals(tunnelType) || "socksirctunnel".equals(tunnelType)) {
           %><div id="destinationField" class="rowItem">
                 <label for="proxyList" accesskey="x">
                     <%=intl._("Outproxies")%>(<span class="accessKey">x</span>):
