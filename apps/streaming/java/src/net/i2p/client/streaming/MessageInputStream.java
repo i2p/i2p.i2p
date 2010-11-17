@@ -258,8 +258,7 @@ public class MessageInputStream extends InputStream {
         int read = read(_oneByte, 0, 1);
         if (read < 0)
             return -1;
-        else
-            return _oneByte[0];
+        return _oneByte[0] & 0xff;
     }
     
 	@Override
@@ -359,7 +358,7 @@ public class MessageInputStream extends InputStream {
         }  // synchronized (_dataLock)
         
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("read(...," + offset+", " + length+ ") read fully total read: " +_readTotal);
+            _log.debug("read(byte[]," + offset + ',' + length + ") read fully; total read: " +_readTotal);
 
         return length;
     }
