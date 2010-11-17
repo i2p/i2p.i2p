@@ -37,6 +37,8 @@
         <echo message="  javadoc:   generate javadoc for the entire project into ./build/javadoc" />
         <echo message="  slackpkg:  generate Slackware packages in ./Slackware/i2p and ./Slackware/i2p-base" />
         <echo message="  debianhowto: instructions on building Debian packages" />
+        <echo message="  debian: generate Debian packages (source + binary)" />
+        <echo message="  debianrepo: build a Debian repository (reprepro required)" />
         <echo message="  updaterWithDesktopgui: tar the built files and desktopgui in an i2pupdate.zip" />
         <echo message="  pkgWithDesktopgui: distclean then package everything up with the desktopgui" />
         <echo message="  distWithDesktopgui: pkgWithDesktopgui and javadoc" />
@@ -157,12 +159,34 @@
     <target name="javadoc">
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc" />
+        <!-- get release and build version numbers -->
+        <exec executable="grep" outputproperty="versionLine" >
+            <arg value="public final static String VERSION" />
+	    <arg value="core/java/src/net/i2p/CoreVersion.java" />
+        </exec>
+        <exec executable="cut" inputstring="${versionLine}" outputproperty="release.number" >
+            <arg value="-f2" />
+	    <arg value="-d&quot;" />
+        </exec>
+        <exec executable="grep" outputproperty="buildLine" >
+            <arg value="public final static long BUILD" />
+	    <arg value="router/java/src/net/i2p/router/RouterVersion.java" />
+        </exec>
+        <exec executable="cut" inputstring="${buildLine}" outputproperty="build.temp" >
+            <arg value="-f2" />
+	    <arg value="-d=" />
+        </exec>
+        <exec executable="cut" inputstring="${build.temp}" outputproperty="build.number" >
+            <arg value="-f1" />
+	    <arg value="-d;" />
+        </exec>
         <javadoc access="package" 
             destdir="./build/javadoc" 
             packagenames="*" 
             use="true" 
             splitindex="true" 
-            windowtitle="I2P Anonymous Network - Java Documentation">
+            doctitle="I2P Javadocs for Release ${release.number} Build ${build.number}"
+            windowtitle="I2P Anonymous Network - Java Documentation - Version ${release.number}">
             <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:freenet.support.CPUInformation:org.bouncycastle.crypto:org.bouncycastle.crypto.*:gnu.crypto.*:gnu.gettext:org.xlattice.crypto.filters:com.nettgryppa.security" />
             <group title="Streaming Library" packages="net.i2p.client.streaming" />
             <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:org.cybergarage.*:org.freenetproject" />
@@ -200,6 +224,9 @@
                 <pathelement location="installer/lib/wrapper/win32/wrapper.jar" />
                 <pathelement location="core/lib/junit.jar" />                
             </classpath>
+            <link offline="true" href="http://download.oracle.com/javase/6/docs/api/" packagelistLoc="installer/resources/package-lists/java/" />
+            <link offline="true" href="http://docs.i2p2.de/jetty/javadoc/" packagelistLoc="installer/resources/package-lists/jetty/" />
+            <link offline="true" href="http://docs.i2p2.de/jrobin/javadoc/" packagelistLoc="installer/resources/package-lists/jrobin/" />
         </javadoc>
     </target>
     <target name="clean" depends="pkgclean" >
@@ -212,7 +239,14 @@
     </target>
     <target name="distclean" depends="clean">
         <delete dir="debian/tmp" />
+        <delete dir="debian/repo" />
+        <delete dir="debian/db" />
         <delete file="debian/files" />
+        <delete file="debian/build" />
+        <delete file="debian/substvars"/>
+        <delete>
+            <fileset dir=".." includes="i2p_*.tar.gz,i2p_*.deb,i2p_*.dsc,i2p_*.changes" />
+        </delete>
         <ant dir="core/java/" target="distclean" />
         <ant dir="router/java/" target="distclean" />
         <ant dir="apps/ministreaming/java/" target="distclean" />
@@ -889,6 +923,35 @@
     </target>
 
     <target name="debian">
+        <!-- same as debian-binary + debian-source, but only one build needed -->
+        <echo message="Did you update the version in these files?" />
+        <exec executable="ls" failonerror="true">
+            <arg value="-l" />
+            <arg value="debian/changelog" />
+        </exec>
+        <echo message="====================" />
+        <!-- bundle the 20MB jetty 5 lib since there probably isn't a deb for it -->
+        <ant dir="apps/jetty" target="ensureJettylib" />
+        <exec executable="dpkg-buildpackage" failifexecutionfails="true">
+            <arg value="-I_MTN" />
+            <arg value="-ai386" />
+        </exec>
+        <!-- rather than doing a complete new build, recreate debian/tmp by calling the "build" target in debian/rules -->
+        <delete dir="debian/tmp" />
+        <exec executable="dpkg-buildpackage" failifexecutionfails="true">
+            <arg value="-I_MTN" />
+            <arg value="-Tbuild" />
+            <arg value="-aamd64" />
+            <env key="MAKEFLAGS" value="-B" />
+        </exec>
+        <exec executable="dpkg-buildpackage" failifexecutionfails="true">
+            <arg value="-I_MTN" />
+            <!-- don't clean so the previous package isn't deleted -->
+            <arg value="-nc" />
+            <arg value="-aamd64" />
+        </exec>
+    </target>
+    <target name="debian-binary">
         <!-- binary only -->
         <echo message="Did you update the version in these files?" />
         <exec executable="ls" failonerror="true">
@@ -902,7 +965,7 @@
     </target>
     <target name="debian-source">
         <!-- bundle the 20MB jetty 5 lib since there probably isn't a deb for it -->
-        <ant dir="apps/jetty" target="verifyJettylib" />
+        <ant dir="apps/jetty" target="ensureJettylib" />
         <echo message="Did you update the version in these files?" />
         <exec executable="ls" failonerror="true">
             <arg value="-l" />
@@ -913,6 +976,9 @@
             <arg value="-S" />
             <arg value="-I_MTN" />
         </exec>
+    </target>
+    <target name="debianrepo" depends="debian">
+        <exec dir="debian" executable="./makerepo.sh" failonerror="true"/>
     </target>
 
 <!-- the following are appened to help build barebone portable version, 

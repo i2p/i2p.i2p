@@ -469,7 +469,8 @@ class RouterThrottleImpl implements RouterThrottle {
         if (fiveMinBps > 0) return nowBps - fiveMinBps;
         return 0;
     }
-    private double getBps(Rate rate) {
+
+    private static double getBps(Rate rate) {
         if (rate == null) return -1;
         double bytes = rate.getLastTotalValue();
         return (bytes*1000.0d)/rate.getPeriod(); 

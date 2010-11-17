@@ -1,15 +1,16 @@
 Source: i2p
-Maintainer: i2p
+Maintainer: Hungry Hobo <HungryHobo@i2pmail.org>
 Section: net
+Standards-Version: 3.8.4
 Priority: optional
 Homepage: http://www.i2p2.de/
-Build-Depends: java-sdk, ant, gettext
+Build-Depends: libc6-dev (>= 2.10), sun-java6-jdk | openjdk-6-jdk | default-jdk | java-sdk, ant, fakeroot, gettext
 
 Package: i2p
-Architecture: all
+Architecture: i386 amd64
 Section: net
 Priority: optional
-Depends: sun-java6-jre | default-jre | java-runtime
+Depends: ${shlibs:Depends}, sun-java6-jre | default-jre | java-runtime
 Description: Load-balanced unspoofable packet switching network
  I2P is an anonymizing network, offering a simple layer that identity-sensitive
  applications can use to securely communicate. All data is wrapped with several

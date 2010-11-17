@@ -1,6 +1,8 @@
 #!/bin/sh
+set -e
+
 SVCHOME=/var/lib/i2p
-I2P=/usr/lib/i2p
+I2P=/usr/share/i2p
 I2PUSER=i2psvc
 
 useradd -d $SVCHOME -r $I2PUSER
@@ -9,12 +11,5 @@ mkdir -p $SVCHOME
 chown $I2PUSER:$I2PUSER $SVCHOME
 
 update-rc.d i2p defaults
-
-cd $I2P
-su $I2PUSER ./postinstall.sh
-
-chmod 755 /usr/lib/i2p/eepget
-chmod 755 /usr/lib/i2p/i2prouter
-chmod 755 /usr/lib/i2p/i2psvc
 
 invoke-rc.d i2p start

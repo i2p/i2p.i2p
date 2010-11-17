@@ -2,7 +2,7 @@ This sets up a binary package with the following:
 
 - A new user i2psvc (a lot of people already have an i2p user)
 - i2psvc home is /var/lib/i2p
-- $I2P is /usr/lib/i2p, owned by i2psvc
+- $I2P is /usr/share/i2p, owned by i2psvc
 - i2psvc router directory is /var/lib/i2p/i2p-config (hack in WorkingDir.java)
 - i2p daemon script in /etc/init.d/i2p
 - i2prouter and eepget scripts in /usr/bin for other users to run it

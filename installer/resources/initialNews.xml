@@ -1,6 +1,6 @@
 <!--
-<i2p.news date="$Date: 2010-07-12 00:00:00 $">
-<i2p.release version="0.8" date="2010/07/12" minVersion="0.6"/>
+<i2p.news date="$Date: 2010-11-15 00:00:00 $">
+<i2p.release version="0.8.1" date="2010/11/15" minVersion="0.6"/>
 -->
 <div lang="en">
 <h4><ul><li>Congratulations on getting I2P installed!</li></ul></h4>
@@ -24,24 +24,48 @@ Point your IRC client to <b>localhost:6668</b> and say hi to us on
 </div>
 
 <div lang="de">
-<h4><ul><li>Gratulation zur erfolgreichen Installation von I2P!</li></ul></h4>
+<h4><ul><li>Wir gratulieren zur erfolgreichen Installation von I2P!</li></ul></h4>
 <p>
-<b>Willkommen bei I2P!</b>
-Bitte noch <b>etwas Geduld</b> w&auml;hrend I2P startet und weitere I2P Router  findet.
+<b>Willkommen im I2P!</b>
+Hab noch <b>etwas Geduld</b>, w&auml;hrend I2P startet und weitere I2P-Router findet.
 </p>
 <p>
-Passe bitte In der Wartezeit <b>deine Einstellungen zur Bandbreite</b> auf der
-<a href="config.jsp">Einstellungsseite</a> an.
+Passe bitte in der Zwischenzeit <b>deine Einstellungen zur Bandbreite</b> auf der
+<a href="config.jsp">Einstellungsseite</a> an!
 </p>
 <p>
-Sobald auf der linken Seite eine "shared clients" Verbindung aufgelistet ist <b>besuche bitte</b> unsere <a href="http://www.i2p2.i2p/faq_de.html">FAQ</a>.
+Sobald auf der linken Seite eine Verbindung namens "versch. Klienten" aufgelistet ist, kannst Du unsere <a href="http://www.i2p2.i2p/faq_de.html">FAQ</a> besuchen.
 </p>
 <p>
-Verbinde deinen IRC Klienten mit dem Server auf <b>localhost:6668</b> und sage Hallo zu uns im Kanal 
-<a href="irc://127.0.0.1:6668/i2p-help">#i2p-help</a>, <a href="irc://127.0.0.1:6668/i2p-de">#i2p-de</a> oder <a href="irc://127.0.0.1:6668/i2p">#i2p</a>.
+Verbinde deinen IRC-Klienten mit dem Server auf <b>localhost:6668</b> und schau bei uns im Kanal 
+<a href="irc://127.0.0.1:6668/i2p-de">#i2p-de</a>, <a href="irc://127.0.0.1:6668/i2p-help">#i2p-help</a> oder <a href="irc://127.0.0.1:6668/i2p">#i2p</a> vorbei!
+</p>
+<p>
+Wir wünschen Dir viel Freude an unserem Netz und hoffen, Deine Erwartungen zu erfüllen.
 </p>
 </div>
 
+<div lang="es">
+<h4><ul><li>&iexcl;Felicidades!, has instalado el enrutador I2P con &eacute;xito.</li></ul></h4>
+<p>
+<b>&iexcl;Bienvenido a I2P!</b><br>
+&iexcl;Ten todav&iacute;a <b>paciencia</b> mientras I2P est&eacute; arrancando y encontrando otros enrutadores I2P!
+</p>
+<p>
+Este es el momento ideal para adaptar tu <b>configuraci&oacute;n de ancho de banda</b> en la 
+<a href="config.jsp">p&aacute;gina de configuraci&oacute;n</a>.
+</p>
+<p>
+En cuanto veas a la izquierda una conexi&oacute;n llamada "shared clients", puedes visitar nuestros <a href="http://www.i2p2.i2p/faq.html">FAQ</a>.
+</p>
+<p>
+&iexcl;Con&eacute;cta tu cliente IRC con el servidor <b>localhost:6668</b> y ven a saludarnos en los canales 
+<a href="irc://127.0.0.1:6668/i2p-es">#i2p-es</a>, <a href="irc://127.0.0.1:6668/i2p-help">#i2p-help</a> o <a href="irc://127.0.0.1:6668/i2p">#i2p</a>!
+</p>
+<p>
+Esperemos que tengas una buena experiencia con y en I2P.
+</p>
+</div>
 <div lang="nl">
 <h4><ul><li>Gefeliciteerd met de installatie van I2P!</li></ul></h4>
 <p>

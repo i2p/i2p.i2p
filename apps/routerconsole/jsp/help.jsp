@@ -50,11 +50,11 @@ Do not be concerned if these numbers vary widely.
 <a href="configstats.jsp#router.activePeers">[Enable graphing]</a>.
 <li class="tidylist"><b>Fast:</b>
 This is the number of peers you use for building client tunnels. It is generally in the
-range 8-15. Your fast peers are shown on the <a href="profiles.jsp">profiles page</a>.
+range 8-30. Your fast peers are shown on the <a href="profiles.jsp">profiles page</a>.
 <a href="configstats.jsp#router.fastPeers">[Enable graphing]</a>.
 <li class="tidylist"><b>High Capacity:</b>
 This is the number of peers you use for building some of your exploratory tunnels. It is generally in the
-range 8-25. The fast peers are included in the high capacity tier.
+range 8-75. The fast peers are included in the high capacity tier.
 Your high capacity peers are shown on the <a href="profiles.jsp">profiles page</a>.
 <a href="configstats.jsp#router.highCapacityPeers">[Enable graphing]</a>.
 <li class="tidylist"><b>Well Integrated:</b>

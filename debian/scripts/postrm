@@ -1,17 +1,19 @@
 #!/bin/sh
+set -e
 
-# $1 is either "remove" or "purge". Since there are no config
-# files left after a remove, exit here if called with "purge".
-# This avoids calling userdel again which would cause an error.
-if [ "$1" = "purge" ]; then
-	exit 0;
-fi
+# /etc/rc*.d/*i2p files	
+update-rc.d -f i2p remove
 
 I2PUSER=i2psvc
-exec userdel $I2PUSER
+# delete $I2PUSER if it exists (it will not if this is a purge after a remove)
+# the "| cat" sets the exit code to zero so the script doesn't abort
+entry=`getent passwd | cut -d: -f1 | grep i2psvc | cat`
+if [ -n "$entry" ]; then
+    exec userdel $I2PUSER
+fi
 
 # if somebody did updates in-network, there may be new files that dpkg
 # doesn't know about, so just to be sure
-I2P=/usr/lib/i2p
+I2P=/usr/share/i2p
 rm -rf $I2P
 

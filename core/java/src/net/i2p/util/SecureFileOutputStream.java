@@ -25,8 +25,7 @@ public class SecureFileOutputStream extends FileOutputStream {
     }
 
     /**
-     *  Sets output file to mode 600 only if append = false
-     *  (otherwise it is presumed to be 600 already)
+     *  Sets output file to mode 600 whether append = true or false
      */
     public SecureFileOutputStream(String file, boolean append) throws FileNotFoundException {
         super(file, append);

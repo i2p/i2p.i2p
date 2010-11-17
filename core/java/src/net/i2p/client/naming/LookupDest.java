@@ -67,6 +67,10 @@ class LookupDest {
     }
 
     public static void main(String args[]) {
-        System.out.println(lookupBase32Hash(I2PAppContext.getGlobalContext(), args[0]));
+        Destination dest = lookupBase32Hash(I2PAppContext.getGlobalContext(), args[0]);
+        if (dest == null)
+            System.out.println("Destination not found!");
+        else
+            System.out.println(dest.toBase64());
     }
 }

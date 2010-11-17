@@ -3,32 +3,121 @@
 VERSION=`grep String\ VERSION core/java/src/net/i2p/CoreVersion.java | cut -d\" -f2`
 SOURCEURL=http://mirror.i2p2.de/i2psource_${VERSION}.tar.bz2
 
+DEB_HOST_ARCH := $(shell dpkg-architecture -qDEB_HOST_ARCH)
+ifeq ($(DEB_HOST_ARCH),i386)
+wrapperpath = installer/lib/wrapper/linux
+else ifeq ($(DEB_HOST_ARCH),amd64)
+wrapperpath = installer/lib/wrapper/linux64
+# other architectures could be supported by using runplain.sh
+endif
+
 build:
+	echo Target Architecture is $(DEB_HOST_ARCH)
+ifndef wrapperpath
+	@echo "Architecture not supported: $(DEB_HOST_ARCH)"
+	exit 1
+endif
 	ant preppkg-linux-only
-	mkdir -p debian/tmp/usr/lib
+	
 	mkdir -p debian/tmp/etc/init.d
-	cp -a debian/scripts/init debian/tmp/etc/init.d/i2p
-	cp -a pkg-temp debian/tmp/usr/lib/i2p
-	chmod +x debian/tmp/usr/lib/i2p/postinstall.sh
-	sed 's|$$INSTALL_PATH|/usr/lib/i2p|g' debian/tmp/usr/lib/i2p/wrapper.config > debian/tmp/usr/lib/i2p/a
-	sed 's|$$SYSTEM_java_io_tmpdir|/tmp|g' debian/tmp/usr/lib/i2p/a > debian/tmp/usr/lib/i2p/wrapper.config
+	mkdir -p debian/tmp/etc/i2p
+	mkdir -p debian/tmp/usr/share/i2p/lib
+	mkdir -p debian/tmp/usr/share/doc/i2p
+	mkdir -p debian/tmp/usr/share/man/man1
+	mkdir -p debian/tmp/usr/lib/i2p
 	mkdir -p debian/tmp/usr/bin
-	sed 's|%INSTALL_PATH|/usr/lib/i2p|g' debian/tmp/usr/lib/i2p/eepget > debian/tmp/usr/lib/i2p/a
-	mv debian/tmp/usr/lib/i2p/a debian/tmp/usr/lib/i2p/eepget
-	ln -s /usr/lib/i2p/eepget debian/tmp/usr/bin/eepget
-	sed 's|%INSTALL_PATH|/usr/lib/i2p|g' debian/tmp/usr/lib/i2p/runplain.sh > debian/tmp/usr/lib/i2p/a
-	sed 's|%SYSTEM_java_io_tmpdir|/tmp|g' debian/tmp/usr/lib/i2p/a > debian/tmp/usr/lib/i2p/runplain.sh
-	sed 's|%INSTALL_PATH|/usr/lib/i2p|g' debian/tmp/usr/lib/i2p/i2prouter > debian/tmp/usr/lib/i2p/a
-	sed 's|%SYSTEM_java_io_tmpdir|/tmp|g' debian/tmp/usr/lib/i2p/a > debian/tmp/usr/lib/i2p/i2prouter
-	ln -s /usr/lib/i2p/i2prouter debian/tmp/usr/bin/i2prouter
-	rm debian/tmp/usr/lib/i2p/a
+	
+	cp -a debian/scripts/init debian/tmp/etc/init.d/i2p
+	
+	@# copy config templates to /etc/i2p
+	cp -a pkg-temp/blocklist.txt debian/tmp/etc/i2p/
+	cp -a pkg-temp/clients.config debian/tmp/etc/i2p/
+	cp -a pkg-temp/hosts.txt debian/tmp/etc/i2p/
+	cp -a pkg-temp/i2psnark.config debian/tmp/etc/i2p/
+	cp -a pkg-temp/i2ptunnel.config debian/tmp/etc/i2p/
+	cp -a pkg-temp/jetty-i2psnark.xml debian/tmp/etc/i2p/
+	cp -a pkg-temp/systray.config debian/tmp/etc/i2p/
+	
+	@# copy architecture independent files to /usr/share/i2p and create symlinks to /etc/i2p/
+	ln -s /etc/i2p/blocklist.txt debian/tmp/usr/share/i2p/blocklist.txt
+	ln -s /etc/i2p/clients.config debian/tmp/usr/share/i2p/clients.config
+	ln -s /etc/i2p/hosts.txt debian/tmp/usr/share/i2p/hosts.txt
+	ln -s /etc/i2p/i2psnark.config debian/tmp/usr/share/i2p/i2psnark.config
+	ln -s /etc/i2p/i2ptunnel.config debian/tmp/usr/share/i2p/i2ptunnel.config
+	ln -s /etc/i2p/jetty-i2psnark.xml debian/tmp/usr/share/i2p/jetty-i2psnark.xml
+	ln -s /etc/i2p/systray.config debian/tmp/usr/share/i2p/systray.config
+	ln -s /etc/i2p/wrapper.config debian/tmp/usr/share/i2p/wrapper.config
+	cp -a pkg-temp/docs debian/tmp/usr/share/i2p/
+	cp -a pkg-temp/eepsite debian/tmp/usr/share/i2p/
+	cp -a pkg-temp/geoip debian/tmp/usr/share/i2p/
+	cp -a pkg-temp/lib/*.jar debian/tmp/usr/share/i2p/lib/
+	cp -a pkg-temp/scripts debian/tmp/usr/share/i2p/
+	cp -a pkg-temp/webapps debian/tmp/usr/share/i2p/
+	cp -a pkg-temp/licenses debian/tmp/usr/share/doc/i2p/
+	@# Create the Debian copyright file
+	cat debian/copyright.part1 LICENSE.txt > debian/tmp/usr/share/doc/i2p/copyright
+	@# delete all license files that are already in /usr/share/common-licenses/
+	rm debian/tmp/usr/share/doc/i2p/licenses/LICENSE-Apache2.0.txt
+	rm debian/tmp/usr/share/doc/i2p/licenses/LICENSE-GPLv2.txt
+	rm debian/tmp/usr/share/doc/i2p/licenses/LICENSE-LGPLv2.1.txt
+
+	@# man pages
+	gzip -9c installer/resources/man/eepget.1 > debian/tmp/usr/share/man/man1/eepget.1.gz
+	gzip -9c installer/resources/man/i2prouter.1 > debian/tmp/usr/share/man/man1/i2prouter.1.gz
+
+	@# copy wrapper files to /usr/lib/i2p (including wrapper.jar because it is architecture dependent)
+	cp ${wrapperpath}/libwrapper.so debian/tmp/usr/lib/i2p/
+	cp ${wrapperpath}/wrapper.jar debian/tmp/usr/lib/i2p/
+	cp ${wrapperpath}/i2psvc debian/tmp/usr/lib/i2p/
+	chmod +x debian/tmp/usr/lib/i2p/i2psvc
+	strip debian/tmp/usr/lib/i2p/libwrapper.so
+	strip debian/tmp/usr/lib/i2p/i2psvc
+
+	@# copy remaining executables to /usr/bin, replace INSTALL_PATH and SYSTEM_java_io_tmpdir
+	sed 's|%INSTALL_PATH|/usr/share/i2p|g' pkg-temp/eepget > debian/tmp/usr/bin/eepget
+	chmod +x debian/tmp/usr/bin/eepget
+	cat pkg-temp/i2prouter | \
+	    sed 's|$$I2P/i2psvc|/usr/lib/i2p/i2psvc|g' | \
+	    sed 's|$$I2P/wrapper.config|/etc/i2p/wrapper.config|g' | \
+	    sed 's|%INSTALL_PATH|/usr/share/i2p|g' | \
+	    sed 's|%SYSTEM_java_io_tmpdir|/tmp|g' > debian/tmp/usr/bin/i2prouter
+	chmod +x debian/tmp/usr/bin/i2prouter
+	@# The first 4 sed commands each replace the first \$INSTALL_PATH that hasn't been replaced
+	@# wrapper.java.classpath.1 --> /usr/share/i2p/lib/*.jar:/usr/lib/i2p/wrapper.jar
+	@# wrapper.java.library.path.1 --> /usr/lib/i2p
+	@# wrapper.java.library.path.2 --> /usr/lib/i2p
+	@# i2p.dir.base --> /usr/share/i2p
+	cat pkg-temp/wrapper.config | \
+	    sed '0,/$$INSTALL_PATH\/lib\/\*\.jar/s//\/usr\/share\/i2p\/lib\/*.jar\nwrapper.java.classpath.2=\/usr\/lib\/i2p\/wrapper.jar/' | \
+	    sed '0,/$$INSTALL_PATH/s//\/usr\/lib\/i2p/' | \
+	    sed '0,/$$INSTALL_PATH/s//\/usr\/lib\/i2p/' | \
+	    sed '0,/$$INSTALL_PATH/s//\/usr\/share\/i2p/' | \
+	    sed 's|$$SYSTEM_java_io_tmpdir|/tmp|g' > debian/tmp/etc/i2p/wrapper.config
+	@# now do runplain.sh
+	cat pkg-temp/runplain.sh | \
+	    sed 's|-Djava.library.path=$$I2P:$$I2P/lib|-Djava.library.path=/usr/lib/i2p|g' | \
+	    sed 's|%INSTALL_PATH|/usr/share/i2p|g' | \
+	    sed 's|%SYSTEM_java_io_tmpdir|/tmp|g' > debian/tmp/usr/share/i2p/runplain.sh
+	chmod +x debian/tmp/usr/share/i2p/runplain.sh
+	
+	dpkg-shlibdeps debian/tmp/usr/lib/i2p/libwrapper.so
+	dpkg-shlibdeps debian/tmp/usr/lib/i2p/i2psvc
+	
 	touch debian/build
+	
+	@# changelog
+	gzip -9c history.txt > debian/tmp/usr/share/doc/i2p/changelog.gz
+	gzip -9c debian/changelog > debian/tmp/usr/share/doc/i2p/changelog.Debian.gz
 
 binary: build
 	mkdir -p debian/tmp/DEBIAN
 	dpkg-gencontrol
-	cp -a debian/scripts/postinst debian/scripts/postrm debian/scripts/prerm debian/tmp/DEBIAN
+	cp -a debian/scripts/postinst debian/scripts/postrm debian/scripts/prerm debian/conffiles debian/tmp/DEBIAN
 	dpkg-deb -b debian/tmp ..
+
+binary-arch:
+
+binary-indep:
 
 clean:
 	rm -f debian/build

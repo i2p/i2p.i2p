@@ -186,6 +186,7 @@ public class I2PSnarkServlet extends Default {
             out.write("<div class=\"snarknavbar\"><a href=\"/i2psnark/\" title=\"");
             out.write(_("Torrents"));
             out.write("\" class=\"snarkRefresh\">");
+            out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/arrow_refresh.png\"> ");
             out.write(_("I2PSnark"));
             out.write("</a>");
         } else {
@@ -273,7 +274,7 @@ public class I2PSnarkServlet extends Default {
         out.write("</th>\n<th align=\"center\">");
         out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/eta.png\" title=\"");
         out.write(_("Estimated Download Time"));
-        out.write("\">");
+        out.write("\">");  // space here would look better but nbsp is too big and thinsp breaks
         out.write(_("ETA"));
         out.write("</th>\n<th align=\"center\">");
         out.write("<img border=\"0\" src=\"/themes/console/images/inbound.png\" title=\"");
@@ -288,7 +289,8 @@ public class I2PSnarkServlet extends Default {
         out.write("</th>\n<th align=\"center\">");
         out.write("<img border=\"0\" src=\"/themes/console/images/inbound.png\" title=\"");
         out.write(_("Down Rate"));
-        out.write("\">Rate");
+        out.write("\">");
+        out.write(_("Rate"));
         out.write("</th>\n<th align=\"center\">");
         out.write("<img border=\"0\" src=\"/themes/console/images/outbound.png\" title=\"");
         out.write(_("Up Rate"));
@@ -637,7 +639,7 @@ public class I2PSnarkServlet extends Default {
         return rv;
     }
 
-    private static final int MAX_DISPLAYED_FILENAME_LENGTH = 44;
+    private static final int MAX_DISPLAYED_FILENAME_LENGTH = 50;
     private static final int MAX_DISPLAYED_ERROR_LENGTH = 6;
     private void displaySnark(PrintWriter out, Snark snark, String uri, int row, long stats[], boolean showPeers, boolean showDebug) throws IOException {
         String filename = snark.torrent;
@@ -794,7 +796,7 @@ public class I2PSnarkServlet extends Default {
                 out.write("&nbsp;<a href=\"" + baseURL + "details.php?dllist=1&filelist=1&info_hash=");
                 out.write(TrackerClient.urlencode(snark.meta.getInfoHash()));
                 out.write("\" title=\"" + name + ' ' + _("Tracker") + "\" target=\"_blank\">");
-                out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/details.png\">");
+                out.write("<div class=\"infoz\"><img border=\"0\" src=\"/themes/snark/ubergine/images/details.png\"></div>");
                 out.write("</a>");
                 break;
             }
@@ -807,17 +809,17 @@ public class I2PSnarkServlet extends Default {
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentDownloaded " + rowClass + "\">");
         if (remaining > 0)
-            out.write(formatSize(total-remaining) + "&thinsp;/&thinsp;" + formatSize(total)); // 18MB/3GB; thin space so it will line break well
+            out.write(formatSize(total-remaining) + "/" + formatSize(total)); // 18MB/3GB; remove thin space so line does _not_ break. We don't want a break here.
         else
             out.write(formatSize(total)); // 3GB
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentUploaded " + rowClass 
                   + "\">" + formatSize(uploaded) + "</td>\n\t");
-        out.write("<td align=\"right\" class=\"snarkTorrentRate\">");
+        out.write("<td align=\"right\" class=\"snarkTorrentRateDown\">");
         if(isRunning && remaining > 0)
             out.write(formatSize(downBps) + "ps");
         out.write("</td>\n\t");
-        out.write("<td align=\"right\" class=\"snarkTorrentRate\">");
+        out.write("<td align=\"right\" class=\"snarkTorrentRateUp\">");
         if(isRunning)
             out.write(formatSize(upBps) + "ps");
         out.write("</td>\n\t");
@@ -1003,7 +1005,10 @@ public class I2PSnarkServlet extends Default {
         out.write(_("Add Torrent"));
         out.write("</span><hr>\n<table border=\"0\"><tr><td>");
         out.write(_("From URL"));
-        out.write(":<td><input type=\"text\" name=\"newURL\" size=\"85\" value=\"" + newURL + "\" > \n");
+        out.write(":<td><input type=\"text\" name=\"newURL\" size=\"85\" value=\"" + newURL + "\"");
+        out.write("title=\"");
+        out.write(_("Torrent file must originate from an I2P-based tracker"));
+        out.write("\"> \n");
         // not supporting from file at the moment, since the file name passed isn't always absolute (so it may not resolve)
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>");
         out.write("<input type=\"submit\" value=\"");
@@ -1085,10 +1090,7 @@ public class I2PSnarkServlet extends Default {
         out.write("</span><hr>\n");
         out.write("<table border=\"0\"><tr><td>");
         out.write(_("Data directory"));
-        out.write(": <td><input type=\"text\" size=\"50\" name=\"dataDir\" value=\"" + dataDir + "\" ");
-        out.write("title=\"");
-        out.write(_("Directory to store torrents and data"));
-        out.write("\" disabled=\"true\" ><br><i>(");
+        out.write(": <td><code>" + dataDir + "</code> (");
         out.write(_("Edit i2psnark.config and restart to change"));
         out.write(")</i><br>\n");
 
@@ -1356,28 +1358,34 @@ public class I2PSnarkServlet extends Default {
         title = _("Torrent") + ": " + title;
         buf.append(title);
         buf.append("</TITLE>").append(HEADER).append("<link rel=\"shortcut icon\" href=\"/themes/snark/ubergine/favicon.ico\"></HEAD><BODY>\n<center><div class=\"snarknavbar\"> <a href=\"/i2psnark/\" title=\"Torrents\"");
-        buf.append(" class=\"snarkRefresh\">I2PSnark</a>").append("</div>");
+        buf.append(" class=\"snarkRefresh\"><img border=\"0\" src=\"/themes/snark/ubergine/images/arrow_refresh.png\"> I2PSnark</a>").append("</div>");
         
         if (parent)
-        {
-            buf.append("\n<br><A HREF=\"");
-            // corrupts utf-8
-            //buf.append(URI.encodePath(URI.addPaths(base,"../")));
-            buf.append(URI.addPaths(base,"../"));
-            buf.append("\"><img border=\"0\" src=\"/themes/console/images/outbound.png\"> ")
-               .append(_("Up to higher level directory")).append("</A>\n");
-        }
-        
-        buf.append("</div><div class=\"page\"><div class=\"mainsection\">");
-        boolean showPriority = snark != null && !snark.storage.complete();
+            buf.append("</div><div class=\"page\"><div class=\"mainsection\">");
+            boolean showPriority = snark != null && !snark.storage.complete();
         if (showPriority)
             buf.append("<form action=\"").append(base).append("\" method=\"POST\">\n");
-        buf.append("<TABLE BORDER=0 class=\"snarkTorrents\" cellpadding=\"5px 10px\">" +
-                   "<thead><tr><th>").append("<img border=\"0\" src=\"/themes/snark/ubergine/images/file.png\" title=\"").append(_("File")).append("\" alt=\"").append(_("File")).append("\">&nbsp;").append(title).append("</th><th align=\"right\">").append("<img border=\"0\" src=\"/themes/snark/ubergine/images/size.png\" title=\"").append(_("FileSize")).append("\" alt=\"").append(_("FileSize")).append("\">").append(_("Size"));
-        buf.append("</th><th>").append("<img border=\"0\" src=\"/themes/snark/ubergine/images/status.png\" title=\"").append(_("Download Status")).append("\">").append(_("Status")).append("</th>");
+            buf.append("<TABLE BORDER=0 class=\"snarkTorrents\" cellpadding=\"5px 10px\">" +
+            "<thead><tr><th>")
+            .append("<img border=\"0\" src=\"/themes/snark/ubergine/images/file.png\" title=\"")
+            .append(_("File")).append("\" alt=\"").append(_("File")).append("\">&nbsp;")
+            .append(title).append("</th><th align=\"right\">")
+            .append("<img border=\"0\" src=\"/themes/snark/ubergine/images/size.png\" title=\"")
+            .append(_("FileSize")).append("\" alt=\"").append(_("FileSize")).append("\">").append(_("Size"));
+            buf.append("</th><th class=\"headerstatus\">")
+            .append("<img border=\"0\" src=\"/themes/snark/ubergine/images/status.png\" title=\"")
+            .append(_("Download Status")).append("\">").append(_("Status")).append("</th>");
         if (showPriority)
-            buf.append("<th>").append(_("Priority")).append("</th>");
-        buf.append("</tr></thead>\n");
+            buf.append("<th class=\"headerpriority\">")
+            .append("<img border=\"0\" src=\"/themes/snark/ubergine/images/priority.png\" title=\"\">")
+            .append(_("Priority")).append("</th>");
+            buf.append("</tr></thead>\n");
+            buf.append("<tr><td colspan=\"4\" class=\"ParentDir\"><A HREF=\"");
+            buf.append(URI.addPaths(base,"../"));
+            buf.append("\"><img border=\"0\" src=\"/themes/snark/ubergine/images/up.png\"> ")
+            .append(_("Up to higher level directory")).append("</A></td></tr>\n");
+
+
         //DateFormat dfmt=DateFormat.getDateTimeInstance(DateFormat.MEDIUM,
         //                                               DateFormat.MEDIUM);
         boolean showSaveButton = false;
@@ -1465,7 +1473,7 @@ public class I2PSnarkServlet extends Default {
             buf.append(status);
             buf.append("</TD>");
             if (showPriority) {
-                buf.append("<td>");
+                buf.append("<td class=\"priority\">");
                 File f = item.getFile();
                 if ((!complete) && (!item.isDirectory()) && f != null) {
                     int pri = snark.storage.getPriority(f.getCanonicalPath());
@@ -1482,7 +1490,7 @@ public class I2PSnarkServlet extends Default {
                     buf.append("<input type=\"radio\" value=\"-9\" name=\"pri.").append(f.getCanonicalPath()).append("\" ");
                     if (pri < 0)
                         buf.append("checked=\"true\"");
-                    buf.append('>').append(_("Do not download"));
+                    buf.append('>').append(_("Ignore"));
                     showSaveButton = true;
                 }
                 buf.append("</td>");
