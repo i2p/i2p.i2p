@@ -120,9 +120,7 @@ binary-arch:
 binary-indep:
 
 clean:
-	rm -f debian/build
-	rm -rf debian/tmp/
-	ant distclean
+	ant clean
 	@exit 0
 
 get-orig-source:

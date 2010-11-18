@@ -37,7 +37,8 @@
         <echo message="  javadoc:   generate javadoc for the entire project into ./build/javadoc" />
         <echo message="  slackpkg:  generate Slackware packages in ./Slackware/i2p and ./Slackware/i2p-base" />
         <echo message="  debianhowto: instructions on building Debian packages" />
-        <echo message="  debian: generate Debian packages (source + binary)" />
+        <echo message="  debian: generate Debian packages in ./debian/packages" />
+        <echo message="          (libc6-i686 and libc6-amd64 required, ant>=1.8 required)" />
         <echo message="  debianrepo: build a Debian repository (reprepro required)" />
         <echo message="  updaterWithDesktopgui: tar the built files and desktopgui in an i2pupdate.zip" />
         <echo message="  pkgWithDesktopgui: distclean then package everything up with the desktopgui" />
@@ -236,19 +237,17 @@
         <delete file="syndie-standalone.zip" failonerror="false" quiet="true" />
         <delete file="i2psnark-standalone.zip" failonerror="false" quiet="true" />
         <delete file="BOB-one.jar" failonerror="false" quiet="true" />	
-    </target>
-    <target name="distclean" depends="clean">
         <delete dir="debian/tmp" />
-        <delete dir="debian/repo" />
         <delete dir="debian/db" />
         <delete file="debian/files" />
         <delete file="debian/build" />
         <delete file="debian/substvars"/>
-      <!-- HH to move
-        <delete>
-            <fileset dir=".." includes="i2p_*.tar.gz,i2p_*.deb,i2p_*.dsc,i2p_*.changes" />
+    </target>
+    <target name="distclean" depends="clean">
+        <delete includeemptydirs="true" removeNotFollowedSymlinks="true" failonerror="false" >
+            <fileset dir="debian/packages" followSymlinks="false" />
         </delete>
-      -->
+        <delete dir="debian/repo" />
         <ant dir="core/java/" target="distclean" />
         <ant dir="router/java/" target="distclean" />
         <ant dir="apps/ministreaming/java/" target="distclean" />
@@ -924,8 +923,9 @@
         <echo message="... and mtn cert t:i2p-${release.number} branch i2p.i2p.release" />
     </target>
 
-    <target name="debian">
-        <!-- same as debian-binary + debian-source, but only one build needed -->
+    <target name="debian" depends="distclean, debian-source, debian-binary" />
+
+    <target name="debian-binary">
         <echo message="Did you update the version in these files?" />
         <exec executable="ls" failonerror="true">
             <arg value="-l" />
@@ -934,35 +934,12 @@
         <echo message="====================" />
         <!-- bundle the 20MB jetty 5 lib since there probably isn't a deb for it -->
         <ant dir="apps/jetty" target="ensureJettylib" />
-        <exec executable="dpkg-buildpackage" failifexecutionfails="true">
-            <arg value="-I_MTN" />
-            <arg value="-ai386" />
+	
+        <exec dir="debian" executable="./buildpackage.sh" failonerror="true">
+            <arg value="i386" />
         </exec>
-        <!-- rather than doing a complete new build, recreate debian/tmp by calling the "build" target in debian/rules -->
-        <delete dir="debian/tmp" />
-        <exec executable="dpkg-buildpackage" failifexecutionfails="true">
-            <arg value="-I_MTN" />
-            <arg value="-Tbuild" />
-            <arg value="-aamd64" />
-            <env key="MAKEFLAGS" value="-B" />
-        </exec>
-        <exec executable="dpkg-buildpackage" failifexecutionfails="true">
-            <arg value="-I_MTN" />
-            <!-- don't clean so the previous package isn't deleted -->
-            <arg value="-nc" />
-            <arg value="-aamd64" />
-        </exec>
-    </target>
-    <target name="debian-binary">
-        <!-- binary only -->
-        <echo message="Did you update the version in these files?" />
-        <exec executable="ls" failonerror="true">
-            <arg value="-l" />
-            <arg value="debian/changelog" />
-        </exec>
-        <echo message="====================" />
-        <exec executable="dpkg-buildpackage" failifexecutionfails="true" >
-            <arg value="-b" />
+        <exec dir="debian" executable="./buildpackage.sh" failonerror="true">
+            <arg value="amd64" />
         </exec>
     </target>
     <target name="debian-source">
@@ -974,9 +951,8 @@
             <arg value="debian/changelog" />
         </exec>
         <echo message="====================" />
-        <exec executable="dpkg-buildpackage" failifexecutionfails="true" >
-            <arg value="-S" />
-            <arg value="-I_MTN" />
+        <exec dir="debian" executable="./buildpackage.sh" failonerror="true">
+            <arg value="source" />
         </exec>
     </target>
     <target name="debianrepo" depends="debian">
