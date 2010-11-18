@@ -8,13 +8,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-11-13 00:19+0000\n"
-"PO-Revision-Date: 2010-11-17 01:02+0100\n"
+"POT-Creation-Date: 2010-11-18 18:05+0000\n"
+"PO-Revision-Date: 2010-11-18 23:42+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "X-Poedit-Language: German\n"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:90
@@ -267,17 +268,18 @@ msgstr "Torrent"
 msgid "Estimated Download Time"
 msgstr "geschätzte verbleibende Zeit bis zur Fertigstellung"
 
+#. space here would look better but nbsp is too big and thinsp breaks
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:278
 msgid "ETA"
-msgstr "Fertig in"
+msgstr "Fertig&nbsp;in"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:281
 msgid "Downloaded"
-msgstr "Heruntergeladen"
+msgstr "heruntergeladen"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:283
 msgid "RX"
-msgstr "Heruntergeladen"
+msgstr "heruntergeladen"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:286
 msgid "Uploaded"
@@ -342,13 +344,13 @@ msgid "Torrent file {0} does not exist"
 msgstr "Torrentdatei {0} existiert nicht"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:385
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1629
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1635
 #, java-format
 msgid "Torrent already running: {0}"
 msgstr "Torrent läuft schon: {0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:387
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1631
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1637
 #, java-format
 msgid "Torrent already in the queue: {0}"
 msgstr "Torrent ist schon in der Warteschlange: {0}"
@@ -774,41 +776,41 @@ msgstr "Torrentdatei nicht gefunden?"
 msgid "File not found in torrent?"
 msgstr "Datei nicht gefunden im Torrent?"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1431
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1437
 msgid "complete"
 msgstr "vollständig"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1432
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1438
 msgid "bytes remaining"
 msgstr "Bytes ausstehend"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1483
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1489
 msgid "High"
 msgstr "hoch"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1488
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1494
 msgid "Normal"
 msgstr "normal"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1493
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1499
 msgid "Ignore"
 msgstr "ignoriere"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1502
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1508
 msgid "Save priorities"
 msgstr "Prioritäten speichern"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1609
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1615
 #, java-format
 msgid "Torrent fetched from {0}"
 msgstr "Torrent geholt von {0}"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1637
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1643
 #, java-format
 msgid "Torrent at {0} was not valid"
 msgstr "Torrent in {0} war nicht gültig"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1642
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1648
 #, java-format
 msgid "Torrent was not retrieved from {0}"
 msgstr "Torrent wurde nicht geladen von {0}"
