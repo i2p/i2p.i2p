@@ -17,7 +17,7 @@ Proxy-Connection: close
 <div class=warning id=warning>
 <h3>Warnung: ungültiges Eepseiten-Ziel</h3>
 Das angegebene Eepseiten-Ziel ist nicht gültig,
-oder andernarts nicht erreichbar. Vielleicht habe Sie eine falsche BASIS64-Zeichenkette kopiert
+oder auf andere Art nicht erreichbar. Vielleicht habe Sie eine falsche BASIS64-Zeichenkette kopiert
 oder Sie folgten einem ungültigen Verweis. Möglicherweise ist auch der I2P-Host offline. 
 Versuchen Sie ein <a href="javascript: window.location.reload()">Neuladen</a>.
 <hr><b>Konnte das folgende Ziel nicht finden:</b><BR><BR>

@@ -1,0 +1,23 @@
+HTTP/1.1 407 Proxy Authorization Required
+Content-Type: text/html; charset=UTF-8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.5
+Proxy-Authenticate: Basic realm="I2P HTTP Proxy"
+Cache-control: no-cache
+Connection: close
+Proxy-Connection: close
+
+<html><head>
+<title>Proxyautorisierung erforderlich</title>
+<!-- we cannot have links to CSS or images here, but we could put in some simple inline style -->
+</head>
+<body>
+<div class=warning id=warning>
+<h3>Autorisierung für den I2P-HTTP-Proxy erforderlich</h3>
+Dieser Proxy ist eingestellt, Zugang nur für gültige Kombinationen aus einem Benutzernamen und einem Passwort zuzulasseen.
+Bitte geben Sie Ihren Benutzernamen und Passwort an, überprüfen Sie Ihre 
+<a href="http://127.0.0.1:7657/advancedconfig.jsp">Routereinstellungen</a>
+oder Ihre
+<a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">I2PTunnel-Einstellungen</a>!
+Um das Autrorsierungserfordernis zu aufzuheben, entfernen Sie 
+<code>i2ptunnel.proxy.auth=basic</code> aus der betreffenden Tunneleinstellung, stoppen Sie den HTTP-Proxy-Tunnel dann und starten Sie ihn neu!
+</div>

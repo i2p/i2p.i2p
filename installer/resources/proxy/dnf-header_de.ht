@@ -17,7 +17,7 @@ Proxy-Connection: close
 <div class=warning id=warning>
 <h3>Warnung: Eepseite unerreichbar</h3>
 Die Eepseite war nicht erreichbar.
-Die Eepseite ist offline, es gibt eine Überlast oder Verstopfung im Netz,
-or Ihr Router ist noch nicht gut ins Netzwerk integriert.
-Versuchen Sie einr <a href="javascript: window.location.reload()">Neuladen</a>. 
+Sie ist vielleicht offline, es gibt eine Überlast oder Verstopfung im Netz,
+oder Ihr Router ist noch nicht gut ins Netzwerk integriert.
+Versuchen Sie ein <a href="javascript: window.location.reload()">Neuladen</a>! 
 <hr><b>Konnte das folgende Ziel nicht finden:</b><BR><BR>
