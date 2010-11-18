@@ -7,9 +7,13 @@ VERSION=`grep String\ VERSION ../core/java/src/net/i2p/CoreVersion.java | cut -d
 echo "I2P Version: ${VERSION}"
 builddir="packages/$1/i2p-${VERSION}"
 
+# dpkg-buildpackage doesn't have an option to change the output directory,
+# so copy or symlink i2p.i2p in ${builddir} and call dpkg-buildpackage
+# in that directory. The output files are generated one directory above.
 if [ "$1" = "source" ]; then
     cd ..
     ant clean
+    # dpkg-source (called by dpkg-buildpackage) can't handle symlinks, so copy the i2p.i2p tree
     tempdir=../_i2p_copy_temp___
     cp -a . ${tempdir}
     mkdir -p debian/packages/$1
@@ -19,6 +23,7 @@ if [ "$1" = "source" ]; then
 else
     mkdir -p ${builddir}
     cd ${builddir}
+    # make symlinks for all files and dirs in i2p.i2p
     find ../../../.. -not -name . -and -not -name .. -maxdepth 1 -exec ln -fs {} \;
     dpkg-buildpackage -I_MTN -b -a$1
 fi
