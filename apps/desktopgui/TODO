@@ -1,0 +1,8 @@
+- API to allow applications to add themselves to the menu?
+    * registerApplication(); -- should return a positive number on success, -1 on failure
+    * unregisterApplication(int); -- should return nothing (or bool for success?), and the parameter should be the number given when registering the application
+- Internationalisation
+- Fetch I2P localhost from the core I2P application? 
+- Correct logging system
+- Use I2PAppContext::appDir (something like that) for desktopgui data.
+- Check core/java/src/net/i2p/util/FileUtil.java for dynamic jar loading
