@@ -1,3 +1,10 @@
+i2p (0.8.1) all; urgency=low
+  * Speedups
+  * Bugfixes
+  * I2PSnark UI redesign
+  * Debian packaging improvements
+ -- Hungry Hobo <HungryHobo@i2pmail.org>  Mon, 18 Nov 2010 17:14:57 +0000
+
 i2p (0.8.0-1) all; urgency=low
   * I2P 0.8
   * Debian packaging improvements
