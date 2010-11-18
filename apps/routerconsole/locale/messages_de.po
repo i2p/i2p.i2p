@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-11-18 18:05+0000\n"
-"PO-Revision-Date: 2010-11-18 19:54+0100\n"
+"PO-Revision-Date: 2010-11-18 23:45+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: echelon <echelon@mail.i2p>, Sperreingang <sperrbezirk@mail.i2p>\n"
 "MIME-Version: 1.0\n"
@@ -30,8 +30,8 @@ msgstr ""
 #, java-format
 msgid "1 ms"
 msgid_plural "{0,number,####} ms"
-msgstr[0] "1 Millisek."
-msgstr[1] "{0,number,####} Millisek."
+msgstr[0] "1 ms"
+msgstr[1] "{0,number,####} ms"
 
 #. seconds
 #. Note to translators: quantity will always be greater than one.
@@ -41,8 +41,8 @@ msgstr[1] "{0,number,####} Millisek."
 #, java-format
 msgid "1 sec"
 msgid_plural "{0} sec"
-msgstr[0] "1 Sek."
-msgstr[1] "{0} Sek."
+msgstr[0] "1 s"
+msgstr[1] "{0} s"
 
 #. minutes
 #. Note to translators: quantity will always be greater than one.
@@ -3127,9 +3127,8 @@ msgid "frequency"
 msgstr "Häufigkeit"
 
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:120
-#, fuzzy
 msgid "Rolling average events per period"
-msgstr "Ereignisse je Zeitintervall"
+msgstr "Fortschreitender Durchschnittshäufigkeit von Ereignissen je Zeitintervall"
 
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:124
 msgid "Highest events per period"
