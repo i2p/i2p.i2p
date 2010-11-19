@@ -582,8 +582,10 @@
         <exec executable="echo" osfamily="unix" failifexecutionfails="true" output="pkg-temp/history.txt" append="true">
             <arg value="EARLIER HISTORY IS AVAILABLE IN THE SOURCE PACKAGE" />
         </exec>
-        <!-- may be pointless now, people with split directories will never see this -->
+      <!-- May be pointless now, people with split directories will never see this,
+           and for flat installs we don't want to overwrite news more recent than the update package.
         <copy file="installer/resources/news.xml" todir="pkg-temp/docs/" />
+       -->
     </target>
     <target name="prepupdateSmall" depends="buildSmall, prepupdateRouter, prepthemeupdates">
         <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
