@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-11-18 18:05+0000\n"
-"PO-Revision-Date: 2010-11-18 23:42+0100\n"
+"PO-Revision-Date: 2010-11-19 19:31+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -499,7 +499,7 @@ msgstr "keine Teilnehmer"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:751
 msgid "Stopped"
-msgstr "Angehalten"
+msgstr "angehalten"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:766
 msgid "View files"
@@ -517,7 +517,7 @@ msgstr "Tracker"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:833
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:836
 msgid "Stop the torrent"
-msgstr "Stoppe den Torrent"
+msgstr "Torrent stoppen"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:838
 msgid "Stop"
@@ -526,7 +526,7 @@ msgstr "Stopp"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:845
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:848
 msgid "Start the torrent"
-msgstr "Starte den Torrent"
+msgstr "Torrent starten"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:850
 msgid "Start"
@@ -535,7 +535,7 @@ msgstr "Start"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:856
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:864
 msgid "Remove the torrent from the active list, deleting the .torrent file"
-msgstr "Entfernt den Torrent von der aktiven Liste und löscht die .torrent-Datei"
+msgstr "entfernt den Torrent von der aktiven Liste und löscht die .torrent-Datei"
 
 #. Can't figure out how to escape double quotes inside the onclick string.
 #. Single quotes in translate strings with parameters must be doubled.
@@ -552,7 +552,7 @@ msgstr "Entfernen"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:871
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:879
 msgid "Delete the .torrent file and the associated data file(s)"
-msgstr "Löscht die .torrent-Datei und dazugehörige Daten Datei(en)"
+msgstr "löscht die .torrent-Datei und dazugehörige Daten Datei(en)"
 
 #. Can't figure out how to escape double quotes inside the onclick string.
 #. Single quotes in translate strings with parameters must be doubled.
@@ -572,19 +572,19 @@ msgstr "Quelle"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:943
 msgid "Uninteresting (The peer has no pieces we need)"
-msgstr "Uninteressant (Der Teilnehmer hat keine Teile, die wir benötigen)"
+msgstr "uninteressant (Der Teilnehmer hat keine Teile, die wir benötigen)"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:945
 msgid "Choked (The peer is not allowing us to request pieces)"
-msgstr "Gedrosselt (Der Teilnehmer hat uns nicht erlaubt, Teile anzufordern)"
+msgstr "gedrosselt (Der Teilnehmer hat uns nicht erlaubt, Teile anzufordern)"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:959
 msgid "Uninterested (We have no pieces the peer needs)"
-msgstr "Uninteressiert (Wir haben keine Teile, die der Teilnehmer benötigt)"
+msgstr "uninteressiert (Wir haben keine Teile, die der Teilnehmer benötigt)"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:961
 msgid "Choking (We are not allowing the peer to request pieces)"
-msgstr "Gedrosselt (Wir erlauben dem Teilnehmer nicht, Teile anzufordern)"
+msgstr "gedrosselt (Wir erlauben dem Teilnehmer nicht, Teile anzufordern)"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1005
 msgid "Add Torrent"
