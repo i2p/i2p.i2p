@@ -27,6 +27,7 @@ import net.i2p.util.EepGet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 import net.i2p.util.SecureDirectory;
+import net.i2p.util.SecureFile;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.Translate;
@@ -244,7 +245,7 @@ public class I2PSnarkUtil {
         File out = null;
         try {
             // we could use the system tmp dir but deleteOnExit() doesn't seem to work on all platforms...
-            out = File.createTempFile("i2psnark", null, _tmpDir);
+            out = SecureFile.createTempFile("i2psnark", null, _tmpDir);
         } catch (IOException ioe) {
             ioe.printStackTrace();
             if (out != null)

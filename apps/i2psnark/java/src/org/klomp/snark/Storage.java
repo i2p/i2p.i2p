@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import net.i2p.crypto.SHA1;
+import net.i2p.util.SecureFile;
 
 /**
  * Maintains pieces on disk. Can be used to store and retrieve pieces.
@@ -462,7 +463,7 @@ public class Storage
   /** use a saved bitfield and timestamp from a config file */
   public void check(String rootDir, long savedTime, BitField savedBitField) throws IOException
   {
-    File base = new File(rootDir, filterName(metainfo.getName()));
+    File base = new SecureFile(rootDir, filterName(metainfo.getName()));
     boolean useSavedBitField = savedTime > 0 && savedBitField != null;
 
     List files = metainfo.getFiles();
@@ -623,7 +624,7 @@ public class Storage
         else
           {
             // The final element (file) in the hierarchy.
-            f = new File(base, name);
+            f = new SecureFile(base, name);
             if (!f.createNewFile() && !f.exists())
               throw new IOException("Could not create file " + f);
           }

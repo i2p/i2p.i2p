@@ -114,11 +114,28 @@ public class I2PAppContext {
      *
      */
     public static I2PAppContext getGlobalContext() { 
+        // skip the global lock
+        I2PAppContext rv = _globalAppContext;
+        if (rv != null)
+            return rv;
+
         synchronized (I2PAppContext.class) {
             if (_globalAppContext == null) {
                 _globalAppContext = new I2PAppContext(false, null);
             }
         }
+        return _globalAppContext; 
+    }
+    
+    /**
+     * Pull the default context, WITHOUT creating a new one.
+     * Use this in static methods used early in router initialization,
+     * where creating a context messes things up.
+     *
+     * @return context or null
+     * @since 0.8.2
+     */
+    public static I2PAppContext getCurrentContext() { 
         return _globalAppContext; 
     }
     
@@ -257,6 +274,7 @@ public class I2PAppContext {
             _appDir = _routerDir;
         }
         /******
+        (new Exception("Initialized by")).printStackTrace();
         System.err.println("Base directory:   " + _baseDir.getAbsolutePath());
         System.err.println("Config directory: " + _configDir.getAbsolutePath());
         System.err.println("Router directory: " + _routerDir.getAbsolutePath());

@@ -35,6 +35,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import net.i2p.util.SecureFile;
 import net.i2p.util.SecureFileOutputStream;
 
 /**
@@ -280,7 +281,7 @@ public class ConfigParser {
      *             if file cannot be written to.
      */
     public static void write(Map map, File file) throws IOException {
-        File tmp = File.createTempFile("hoststxt-", ".tmp", file.getAbsoluteFile().getParentFile());
+        File tmp = SecureFile.createTempFile("hoststxt-", ".tmp", file.getAbsoluteFile().getParentFile());
         ConfigParser
                 .write(map, new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(tmp), "UTF-8")));
         boolean success = tmp.renameTo(file);
