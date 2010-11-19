@@ -14,15 +14,18 @@
 <a href="index.html"><img src="lib/us.png" title="English" alt="English"></a> 
 <a href="index_na.html"><img src="lib/cn.png" title="中文" alt="中文"></a> 
 <a href="index_de.html"><img src="lib/de.png" title="Deutsch" alt="Deutsch"></a> 
-<a href="index_fr.html"><img src="lib/fr.png" title="Français" alt="Français"></a> 
+<a href="index_fr.html"><img src="lib/fr.png" title="Français" alt="Français"></a>
+<a href="index_na.html"><img src="lib/es.png" title="Español" alt="Español"></a>
+<a href="index_na.html"><img src="lib/it.png" title="Italiano" alt="Italiano"></a>
 <a href="index_nl.html"><img src="lib/nl.png" title="Nederlands" alt="Nederlands"></a> 
 <a href="index_ru.html"><img src="lib/ru.png" title="Русский" alt="Русский"></a> 
 <a href="index_sv.html"><img src="lib/se.png" title="Svenska" alt="Svenska"></a> 
-
+<a href="index_na.html"><img src="lib/ir.png" title="Farsi" alt="Farsi"></a>
+<a href="index_na.html"><img src="lib/jp.png" title="Japanese" alt="Japanese"></a>
 </div>
 <h2>Quick Guide to Anonymous Webserving on I2P</h2>
 
- <p>This is your eepsite, your own anonymous I2P webserver - simply edit the files under ~/.i2p/eepsite/docroot/ (Linux) or %APPDATA%\I2P\eepsite\docroot\ (Windows)  
+ <p>This is your eepsite, your own anonymous I2P webserver - simply edit the files under <code>~/.i2p/eepsite/docroot/</code> (Linux) or <code>%APPDATA%\I2P\eepsite\docroot\</code> (Windows)  
  and they'll be reachable by others once you follow the instructions below.
  In I2P, eepsites are addressed using a 'key', which is represented as a really long Base64 string.
  (The 'key' is somewhat analogous to an IP address, and
@@ -37,13 +40,13 @@
  Your eepsite is stopped by default.
  After you start it, it will be difficult for other people to find because it
  doesn't have a name and they don't have your really long Base64 key.
- You could just tell people that really long key, but thankfully i2p has an address book
+ You could just tell people that really long key, but thankfully I2P has an address book
  and several easy ways to tell people about your eepsite. Here's detailed instructions.
  <ul>
  <li>Pick a name for your eepsite (<i>something</i>.i2p). Use all lower-case.
      You may wish to check first in your own router's address book
      <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=router&filter=none">here</a>,
-     or the file i2p/hosts.txt to see if your name is already taken.
+     or the file <code>i2p/hosts.txt</code> to see if your name is already taken.
      Enter the new name for your eepsite on the
      <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite i2ptunnel configuration page</a>
      where it says "Website name". This will replace the default "mysite.i2p".
@@ -64,7 +67,7 @@
  <li>In your browser, enter in your eepsite name (<i>something</i>.i2p) and you should
      be right back here. Hopefully it worked.
  <li>Before you tell the world about your new eepsite, you should add some content.
-     Go to ~/.i2p/eepsite/docroot/ (Linux) or %APPDATA%\I2P\eepsite\docroot\ (Windows) and replace the index.html redirect page with your own content. Virtual folders work, so you can host files from a sub directory without explicitly needing to provide a page with links to files. If you need a template for a basic site, feel free to borrow and adapt <a href="pagetemplate.html">this page</a> and <a href="lib/">content</a>!
+     Go to <code>~/.i2p/eepsite/docroot/</code> (Linux) or <code>%APPDATA%\I2P\eepsite\docroot\</code> (Windows) and replace the index.html redirect page with your own content. Virtual folders work, so you can host files from a sub directory without explicitly needing to provide a page with links to files. If you need a template for a basic site, feel free to borrow and adapt <a href="pagetemplate.html">this page</a> and <a href="lib/">content</a>!
 </ul>
 <h2>Register your own .I2P Domain</h2><ul>
  <li>Now it's time to add your eepsite to an I2P address book hosted by a site
@@ -86,14 +89,13 @@
      <li><a href="http://i2host.i2p/cgi-bin/i2hostetag">http://i2host.i2p/cgi-bin/i2hostetag</a></ul>
  <li>If you are in a hurry and can't wait a few hours, you can tell people to use a "jump" address helper redirection service.
      This will work within a few minutes of your entering the key to an address book on the same site.
-     Test it yourself first by entering
-     http://stats.i2p/cgi-bin/jump.cgi?a=<i>something</i>.i2p or
-     or http://i2host.i2p/cgi-bin/i2hostjump?<i>something</i>.i2p
+     Test it yourself first by entering<code>
+     http://stats.i2p/cgi-bin/jump.cgi?a=<i>something</i>.i2p</code>
+     or <code>http://i2host.i2p/cgi-bin/i2hostjump?<i>something</i>.i2p</code>
      into your browser.
      Once it's working, then you can tell others to use it.
  <li>Some people check eepsite lists such as
-     <a href="http://inproxy.tino.i2p/status.php">inproxy.tino.i2p/status.php</a> for new eepsites, so you may start getting
-     a few visitors. But there are plenty of other ways to tell people. Here are a few ideas:
+     <a href="http://inproxy.tino.i2p/status.php">inproxy.tino.i2p/status.php</a> or <a href="http://perv.i2p">perv.i2p</a> for new eepsites, so you may start getting a few visitors. But there are plenty of other ways to tell people. Here are a few ideas:
      <ul>
      <li>Post a message on the <a href="http://forum.i2p/viewforum.php?f=16">Eepsite announce forum</a>
          on <a href="http://forum.i2p/">forum.i2p</a>.
@@ -116,7 +118,7 @@
  </ul><div class="notify">
 <b>Note:</b> This page, the website and the console all need translating into YOUR language if it's not already been done or in progress. Please consider helping the project grow by <a href="http://www.i2p2.i2p/getinvolved.html">volunteering your time</a> to translate. Contact the project via the IRC channel listed above. Thanks in advance!</div>
 <hr><div class="footnote">	
-Document last edited: November 2009.</div>
+Document last edited: November 2010.</div>
 </div></div>
  </body>
 </html>

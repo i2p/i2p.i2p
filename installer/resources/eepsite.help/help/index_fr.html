@@ -15,13 +15,17 @@
 <a href="index_na.html"><img src="lib/cn.png" title="中文" alt="中文"></a>  
 <a href="index_de.html"><img src="lib/de.png" title="Deutsch" alt="Deutsch"></a> 
 <a href="index_fr.html"><img src="lib/fr.png" title="Français" alt="Français"></a>
+<a href="index_na.html"><img src="lib/es.png" title="Español" alt="Español"></a>
+<a href="index_na.html"><img src="lib/it.png" title="Italiano" alt="Italiano"></a>
 <a href="index_nl.html"><img src="lib/nl.png" title="Nederlands" alt="Nederlands"></a> 
 <a href="index_ru.html"><img src="lib/ru.png" title="Русский" alt="Русский"></a> 
-<a href="index_sv.html"><img src="lib/se.png" title="Svenska" alt="Svenska"></a> 
+<a href="index_sv.html"><img src="lib/se.png" title="Svenska" alt="Svenska"></a>
+<a href="index_na.html"><img src="lib/ir.png" title="Farsi" alt="Farsi"></a>
+<a href="index_na.html"><img src="lib/jp.png" title="Japanese" alt="Japanese"></a>
 </div>
 <h2>Un mini guide pour faire un serveur web anonyme utilisant I2P</h2>
 
- <p>C'est votre eepsite qui fonctionne sur votre propre serveur web anonyme I2P. Afin de le mettre en route, simplement éditer les fichiers sous ./eepsite/docroot/ 
+ <p>C'est votre eepsite qui fonctionne sur votre propre serveur web anonyme I2P. Afin de le mettre en route, simplement éditer les fichiers sous <code>~/.i2p/eepsite/docroot/</code> (Linux) ou <code>%APPDATA%\I2P\eepsite\docroot\</code> (Windows)
  et ils seront accessibles aux autres internautes dès que vous avez suivi les instructions suivantes.
  Avec I2P, on accède aux eepsites en utilisant une 'clé', qui est réprésentée par une chaîne de caractères de base64. 
  (Cette 'clé' est un analogue d'une adresse IP et elle est montrée sur l'eepsite's I2PTunnel
@@ -41,7 +45,7 @@
  <li>Choissisez un nom pour votre eepsite (<i>quelquechose</i>.i2p). Tout en minuscule.
      D'abord, vérifiez dans le carnet d'adresse de votre router
      <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=router&filter=none">ici</a>,
-     ou dans le fichier i2p/hosts.txt pour voir si le nom a déjà été pris.
+     ou dans le fichier <code>i2p/hosts.txt</code> pour voir si le nom a déjà été pris.
      Entrez le nouveau nom de votre eepsite sur le 
      <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite i2ptunnel page de configuration</a>
      où c'est marqué "Website name". Cela remplacera le nom défaut "mysite.i2p".
@@ -62,7 +66,7 @@
  <li>Dans votre explorateur internet, entrez le nom de votre eepsite (<i>quelquechose</i>.i2p) et vous devriez vous retrouver sur cette page.
      Avec un peu de chance - si vous êtes arrivé ici, c'est que ça a marché !
  <li>Avant de parler à tout le monde de votre nouvel eepsite, vous devriez ajouter du contenu.
-     Allez à i2p/eepsite/docroot et remplacez la page index.html avec votre propre page. Les dossiers virtuels fonctionnent, donc vous pouvez héberger un sous-dossier sans explicitement ajouter des liens vers des fichiers. Si vous avez besoin d'un gabarit pour un site de base, n'hésitez pas à utiliser et à changer <a href="pagetemplate.html">cette page</a> et <a href="lib/">contenu</a>!
+     Allez à <code>~/.i2p/eepsite/docroot/</code> (Linux) ou <code>%APPDATA%\I2P\eepsite\docroot\</code> (Windows) et remplacez la page index.html avec votre propre page. Les dossiers virtuels fonctionnent, donc vous pouvez héberger un sous-dossier sans explicitement ajouter des liens vers des fichiers. Si vous avez besoin d'un gabarit pour un site de base, n'hésitez pas à utiliser et à changer <a href="pagetemplate.html">cette page</a> et <a href="lib/">contenu</a>!
 </ul>
 <h2>Enregistrer votre propre .I2P domaine</h2><ul>
  <li>Maintenant il faut ajouter votre eepsite au carnet d'adresse hébergé par un site 
@@ -84,13 +88,13 @@
      <li><a href="http://i2host.i2p/cgi-bin/i2hostetag">http://i2host.i2p/cgi-bin/i2hostetag</a></ul>
  <li>Si vous êtes pressé et que vous ne pouvez pas attendre quelques heures, vous pouvez demander aux autres d'utiliser un "jump" (service d'aide de ré-direction d'adresse).
      Cela marchera en quelques minutes après que vous ayez entré votre clé dans le carnet d'adresse sur le même site.
-     Testez-le vous-même en entrant :
+     Testez-le vous-même en entrant:
      http://stats.i2p/cgi-bin/jump.cgi?a=<i>quelquechose</i>.i2p 
      ou http://i2host.i2p/cgi-bin/i2hostjump?<i>quelquechose</i>.i2p
      dans votre explorateur internet.
      Dès que cela fonctionne, vous pouvez en parler aux autres.
  <li>Certains personnes vérifient les nouveaux eepsites sur les listes tels que
-     <a href="http://inproxy.tino.i2p/status.php">inproxy.tino.i2p/status.php</a>. Vous pouvez commencer à avoir
+     <a href="http://inproxy.tino.i2p/status.php">inproxy.tino.i2p/status.php</a> ou <a href="http://perv.i2p">perv.i2p</a>. Vous pouvez commencer à avoir
      quelques visiteurs. Il y a beaucoup des manières d'informers les autres. Voici quelques idées : 
      <ul>
      <li>Poster un message sur le <a href="http://forum.i2p/viewforum.php?f=16">Eepsite announce forum</a>
@@ -112,7 +116,7 @@
  </ul><div class="notify">
 <b>Note:</b> This page, the website and the console all need translating into YOUR language if it's not already been done or in progress. Please consider helping the project grow by <a href="http://www.i2p2.i2p/getinvolved.html">volunteering your time</a> to translate. Contact the project via the IRC channel listed above. Thanks in advance!</div>
 <hr><div class="footnote">	
-Document last edited: November 2009.</div>
+Document last edited: November 2010.</div>
 </div></div>
  </body>
 </html>
