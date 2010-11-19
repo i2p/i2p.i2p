@@ -23,7 +23,7 @@ public class ConfigNavHelper extends HelperBase {
         StringBuilder buf = new StringBuilder(1024);
         for (int i = 0; i < pages.length; i++) {
             String page = "config" + pages[i];
-            if (requestURI.indexOf(page) != -1) {
+            if (requestURI.endsWith(page) || requestURI.endsWith(page + ".jsp")) {
                 // we are there
                 buf.append(_(titles[i]));
             } else {
