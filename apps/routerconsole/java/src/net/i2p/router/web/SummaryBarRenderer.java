@@ -220,7 +220,7 @@ public class SummaryBarRenderer {
                     System.setProperty("net.i2p.router.web.UpdateHandler.noncePrev", prev);
                 System.setProperty("net.i2p.router.web.UpdateHandler.nonce", nonce+"");
                 String uri = _helper.getRequestURI();
-                buf.append("<p><form action=\"").append(uri).append("\" method=\"GET\">\n");
+                buf.append("<p><form action=\"").append(uri).append("\" method=\"POST\">\n");
                 buf.append("<input type=\"hidden\" name=\"updateNonce\" value=\"").append(nonce).append("\" >\n");
                 if (_helper.updateAvailable()) {
                     buf.append("<button type=\"submit\" name=\"updateAction\" value=\"signed\" >")
@@ -320,7 +320,7 @@ public class SummaryBarRenderer {
                 if (prev != null) System.setProperty("net.i2p.router.web.ReseedHandler.noncePrev", prev);
                 System.setProperty("net.i2p.router.web.ReseedHandler.nonce", nonce+"");
                 String uri = _helper.getRequestURI();
-                buf.append("<p><form action=\"").append(uri).append("\" method=\"GET\">\n");
+                buf.append("<p><form action=\"").append(uri).append("\" method=\"POST\">\n");
                 buf.append("<input type=\"hidden\" name=\"reseedNonce\" value=\"").append(nonce).append("\" >\n");
                 buf.append("<button type=\"submit\" value=\"Reseed\" >").append(_("Reseed")).append("</button></form></p>\n");
             }

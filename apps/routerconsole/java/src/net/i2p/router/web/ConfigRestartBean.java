@@ -81,7 +81,7 @@ public class ConfigRestartBean {
     
     /** @param s value,label,... pairs */
     private static void buttons(RouterContext ctx, StringBuilder buf, String url, String nonce, String[] s) {
-        buf.append("<form action=\"").append(url).append("\" method=\"GET\">\n");
+        buf.append("<form action=\"").append(url).append("\" method=\"POST\">\n");
         buf.append("<input type=\"hidden\" name=\"consoleNonce\" value=\"").append(nonce).append("\" >\n");
         for (int i = 0; i < s.length; i+= 2)
             buf.append("<button type=\"submit\" name=\"action\" value=\"").append(s[i]).append("\" >").append(_(s[i+1], ctx)).append("</button>\n");

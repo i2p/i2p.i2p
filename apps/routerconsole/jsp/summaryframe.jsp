@@ -52,7 +52,7 @@
 <%
     // d and shutdownSoon defined above
     if (!shutdownSoon) {
-        out.print("<div class=\"refresh\"><form action=\"summaryframe.jsp\" method=\"GET\">\n");
+        out.print("<div class=\"refresh\"><form action=\"summaryframe.jsp\" method=\"POST\">\n");
         if ("0".equals(d)) {
             out.print("<b>");
             out.print(intl._("Refresh (s)"));
