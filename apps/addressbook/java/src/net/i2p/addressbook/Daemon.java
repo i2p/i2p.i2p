@@ -38,7 +38,7 @@ import net.i2p.util.SecureDirectory;
  *
  */
 public class Daemon {
-    public static final String VERSION = "2.0.3";
+    public static final String VERSION = "2.0.4";
     private static final Daemon _instance = new Daemon();
     private boolean _running;
     
@@ -66,6 +66,7 @@ public class Daemon {
         router.merge(master, true, null);
         Iterator iter = subscriptions.iterator();
         while (iter.hasNext()) {
+            // yes, the EepGet fetch() is done in next()
             router.merge((AddressBook) iter.next(), false, log);
         }
         router.write();
@@ -97,6 +98,15 @@ public class Daemon {
         File etagsFile = new File(home, (String) settings.get("etags"));
         File lastModifiedFile = new File(home, (String) settings
                 .get("last_modified"));
+        File lastFetchedFile = new File(home, (String) settings
+                .get("last_fetched"));
+        long delay;
+        try {
+            delay = Long.parseLong((String) settings.get("update_delay"));
+        } catch (NumberFormatException nfe) {
+            delay = 12;
+        }
+        delay *= 60 * 60 * 1000;
 
         AddressBook master = new AddressBook(masterFile);
         AddressBook router = new AddressBook(routerFile);
@@ -106,7 +116,7 @@ public class Daemon {
         defaultSubs.add("http://www.i2p2.i2p/hosts.txt");
         
         SubscriptionList subscriptions = new SubscriptionList(subscriptionFile,
-                etagsFile, lastModifiedFile, defaultSubs, (String) settings
+                etagsFile, lastModifiedFile, lastFetchedFile, delay, defaultSubs, (String) settings
                 .get("proxy_host"), Integer.parseInt((String) settings.get("proxy_port")));
         Log log = new Log(logFile);
 
@@ -150,6 +160,7 @@ public class Daemon {
         defaultSettings.put("subscriptions", "subscriptions.txt");
         defaultSettings.put("etags", "etags");
         defaultSettings.put("last_modified", "last_modified");
+        defaultSettings.put("last_fetched", "last_fetched");
         defaultSettings.put("update_delay", "12");
         
         if (!homeFile.exists()) {
@@ -165,7 +176,7 @@ public class Daemon {
         Map settings = ConfigParser.parse(settingsFile, defaultSettings);
         // wait
         try {
-            Thread.sleep(5*60*1000);
+            Thread.sleep(5*60*1000 + I2PAppContext.getGlobalContext().random().nextLong(5*60*1000));
 	    // Static method, and redundent Thread.currentThread().sleep(5*60*1000);
         } catch (InterruptedException ie) {}
         

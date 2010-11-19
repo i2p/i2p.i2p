@@ -21,31 +21,39 @@
 
 package net.i2p.addressbook;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
+import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;  // debug
 
 /**
  * An iterator over the subscriptions in a SubscriptionList.  Note that this iterator
  * returns AddressBook objects, and not Subscription objects.
+ * Yes, the EepGet fetch() is done in here in next().
  * 
  * @author Ragnarok
  */
-public class SubscriptionIterator implements Iterator {
+class SubscriptionIterator implements Iterator {
 
     private Iterator subIterator;
     private String proxyHost;
     private int proxyPort;
+    private final long delay;
 
     /**
      * Construct a SubscriptionIterator using the Subscriprions in List subscriptions.
      * 
      * @param subscriptions
      *            List of Subscription objects that represent address books.
+     * @param delay the minimum delay since last fetched for the iterator to actually fetch
      * @param proxyHost proxy hostname
      * @param proxyPort proxt port number
      */
-    public SubscriptionIterator(List subscriptions, String proxyHost, int proxyPort) {
+    public SubscriptionIterator(List subscriptions, long delay, String proxyHost, int proxyPort) {
         this.subIterator = subscriptions.iterator();
+        this.delay = delay;
         this.proxyHost = proxyHost;
         this.proxyPort = proxyPort;
     }
@@ -58,12 +66,24 @@ public class SubscriptionIterator implements Iterator {
         return this.subIterator.hasNext();
     }
 
-    /* (non-Javadoc)
-     * @see java.util.Iterator#next()
+    /**
+     * Yes, the EepGet fetch() is done in here in next().
+     *
+     * see java.util.Iterator#next()
+     * @return an AddressBook (empty if the minimum delay has not been met)
      */
     public Object next() {
         Subscription sub = (Subscription) this.subIterator.next();
-        return new AddressBook(sub, this.proxyHost, this.proxyPort);
+        if (sub.getLastFetched() + this.delay < I2PAppContext.getGlobalContext().clock().now()) {
+            //System.err.println("Fetching addressbook from " + sub.getLocation());
+            return new AddressBook(sub, this.proxyHost, this.proxyPort);
+        } else {
+            //System.err.println("Addressbook " + sub.getLocation() + " was last fetched " + 
+            //                   DataHelper.formatDuration(I2PAppContext.getGlobalContext().clock().now() - sub.getLastFetched()) +
+            //                   " ago but the minimum delay is " +
+            //                   DataHelper.formatDuration(this.delay));
+            return new AddressBook(Collections.EMPTY_MAP);
+        }
     }
 
     /* (non-Javadoc)

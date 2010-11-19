@@ -47,7 +47,7 @@ import net.i2p.util.SecureFileOutputStream;
  * 
  * @author Ragnarok
  */
-public class ConfigParser {
+class ConfigParser {
 
     /**
      * Strip the comments from a String. Lines that begin with '#' and ';' are
@@ -143,7 +143,7 @@ public class ConfigParser {
      * @param file
      *            A File to attempt to parse.
      * @param map
-     *            A Map to use as the default, if file fails.
+     *            A Map containing values to use as defaults.
      * @return A Map containing the key, value pairs from file, or if file
      *         cannot be read, map.
      */
@@ -151,6 +151,11 @@ public class ConfigParser {
         Map result;
         try {
             result = ConfigParser.parse(file);
+            for (Iterator iter = map.keySet().iterator(); iter.hasNext(); ) {
+                String key = (String) iter.next();
+                if (!result.containsKey(key))
+                    result.put(key, map.get(key));
+            }
         } catch (IOException exp) {
             result = map;
             try {

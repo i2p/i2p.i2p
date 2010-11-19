@@ -27,7 +27,7 @@ package net.i2p.addressbook;
  * @author Ragnarok
  *
  */
-public class DaemonThread extends Thread {
+class DaemonThread extends Thread {
 
     private String[] args;
 

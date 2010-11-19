@@ -27,13 +27,14 @@ package net.i2p.addressbook;
  * @author Ragnarok
  *  
  */
-public class Subscription {
+class Subscription {
 
     private String location;
 
     private String etag;
 
     private String lastModified;
+    private long lastFetched;
 
     /**
      * Construct a Subscription pointing to the address book at location, that
@@ -47,11 +48,17 @@ public class Subscription {
      * @param lastModified
      *            the last-modified header we recieved the last time we read
      *            this subscription.
+     * @param lastFetched when the subscription was last fetched (Java time, as a String)
      */
-    public Subscription(String location, String etag, String lastModified) {
+    public Subscription(String location, String etag, String lastModified, String lastFetched) {
         this.location = location;
         this.etag = etag;
         this.lastModified = lastModified;
+        if (lastFetched != null) {
+            try {
+                this.lastFetched = Long.parseLong(lastFetched);
+            } catch (NumberFormatException nfe) {}
+        }
     }
 
     /**
@@ -101,5 +108,15 @@ public class Subscription {
      */
     public void setLastModified(String lastModified) {
         this.lastModified = lastModified;
+    }
+
+    /** @since 0.8.2 */
+    public long getLastFetched() {
+        return this.lastFetched;
+    }
+
+    /** @since 0.8.2 */
+    public void setLastFetched(long t) {
+        this.lastFetched = t;
     }
 }

@@ -38,7 +38,7 @@ import net.i2p.util.EepGet;
  * @author Ragnarok
  *  
  */
-public class AddressBook {
+class AddressBook {
 
     private String location;
 
@@ -88,6 +88,8 @@ public class AddressBook {
      * read or cannot be read, return an empty AddressBook.
      * Set a maximum size of the remote book to make it a little harder for a malicious book-sender.
      * 
+     * Yes, the EepGet fetch() is done in this constructor.
+     * 
      * @param subscription
      *            A Subscription instance pointing at a remote address book.
      * @param proxyHost hostname of proxy
@@ -102,6 +104,7 @@ public class AddressBook {
         if (get.fetch()) {
             subscription.setEtag(get.getETag());
             subscription.setLastModified(get.getLastModified());
+            subscription.setLastFetched(I2PAppContext.getGlobalContext().clock().now());
         }
         try {            
             this.addresses = ConfigParser.parse(tmp);
