@@ -260,10 +260,11 @@ public class SummaryBarRenderer {
 
                    "<tr><td align=\"left\"><b>")
            .append(_("Active"))
-           .append(":</b></td><td align=\"right\">")
-           .append(_helper.getActivePeers())
+           .append(":</b></td><td align=\"right\">");
+        int active = _helper.getActivePeers();
+        buf.append(active)
            .append("&thinsp;/&thinsp;")
-           .append(_helper.getActiveProfiles())
+           .append(Math.max(active, _helper.getActiveProfiles()))
            .append("</td></tr>\n" +
 
                    "<tr><td align=\"left\"><b>")
