@@ -1,3 +1,21 @@
+2010-11-19 zzz
+    * Addressbook
+      - Store last-fetched time so we don't always fetch subscriptions after restart
+      - Randomize first fetch time
+      - Make most classes package private
+    * Console: Rewrite URLs so we don't need .jsp
+    * i2psnark: Recognize postman b32, recognize ogv and oga.
+    * i2ptunnel:
+      - More work on error propagation and improving log messages
+      - Increase nonce queue size again
+    * News:
+      - Store news last-fetched time so we don't always fetch news after restart
+      - Don't include news in the updater
+    * peers.jsp fixups
+    * PrivateKeyFile: Speedups and better messages
+    * SecureFile: New class, catch places that were missed,
+                  add i2p.insecureFiles option to disable (default false)
+
 2010-11-17 zzz
     * Addressbook: Try to save files safely
     * Console: Display durations with new tagged formatDuration2()
