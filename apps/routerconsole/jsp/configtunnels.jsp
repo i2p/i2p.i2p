@@ -29,7 +29,7 @@
  <%=intl._("High CPU and/or high outbound bandwidth usage may result.")%>
  <%=intl._("Change these settings with care, and adjust them if you have problems.")%>
 <div class="wideload">
-<form action="configtunnels.jsp" method="POST">
+<form action="" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigTunnelsHandler.nonce");
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigTunnelsHandler.noncePrev", prev);
     System.setProperty("net.i2p.router.web.ConfigTunnelsHandler.nonce", new java.util.Random().nextLong()+""); %>

@@ -17,7 +17,7 @@
  <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:getProperty name="formhandler" property="allMessages" />
  <div class="configure">
- <form action="configservice.jsp" method="POST">
+ <form action="" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigServiceHandler.nonce");
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigServiceHandler.noncePrev", prev);
     System.setProperty("net.i2p.router.web.ConfigServiceHandler.nonce", new java.util.Random().nextLong()+""); %>
@@ -60,7 +60,7 @@
  <% } %>
 
  <h3><%=intl._("Debugging")%></h3>
- <p><a href="/jobs.jsp"><%=intl._("View the job queue")%></a>
+ <p><a href="/jobs"><%=intl._("View the job queue")%></a>
  <% if (System.getProperty("wrapper.version") != null) { %>
  <p><%=intl._("At times, it may be helpful to debug I2P by getting a thread dump. To do so, please select the following option and review the thread dumped to <a href=\"logs.jsp#servicelogs\">wrapper.log</a>.")%></p>
   <hr><div class="formaction">
@@ -70,7 +70,7 @@
 
  <h3><%=intl._("Launch browser on router startup?")%></h3>
  <p><%=intl._("I2P's main configuration interface is this web console, so for your convenience I2P can launch a web browser on startup pointing at")%>
- <a href="http://127.0.0.1:7657/index.jsp">http://127.0.0.1:7657/index.jsp</a> .</p>
+ <a href="http://127.0.0.1:7657/">http://127.0.0.1:7657/</a> .</p>
  <hr><div class="formaction">
  <input type="submit" name="action" value="<%=intl._("View console on startup")%>" >
  <input type="submit" name="action" value="<%=intl._("Do not view console on startup")%>" >

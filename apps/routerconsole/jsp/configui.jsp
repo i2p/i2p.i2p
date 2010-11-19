@@ -22,7 +22,7 @@
  <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:getProperty name="formhandler" property="allMessages" />
 <div class="configure"><div class="topshimten"><h3><%=uihelper._("Router Console Theme")%></h3></div>
- <form action="configui.jsp" method="POST">
+ <form action="" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigUIHandler.nonce");
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigUIHandler.noncePrev", prev);
     System.setProperty("net.i2p.router.web.ConfigUIHandler.nonce", new java.util.Random().nextLong()+""); %>

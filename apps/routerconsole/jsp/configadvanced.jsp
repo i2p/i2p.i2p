@@ -23,7 +23,7 @@
  <jsp:getProperty name="formhandler" property="allMessages" />
  <div class="configure">
  <div class="wideload">
- <form action="configadvanced.jsp" method="POST">
+ <form action="" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigAdvancedHandler.nonce");
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigAdvancedHandler.noncePrev", prev);
     System.setProperty("net.i2p.router.web.ConfigAdvancedHandler.nonce", new java.util.Random().nextLong()+""); %>

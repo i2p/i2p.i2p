@@ -30,7 +30,7 @@ public class StatsGenerator {
     
     public void generateStatsPage(Writer out, boolean showAll) throws IOException {
         StringBuilder buf = new StringBuilder(16*1024);
-        buf.append("<div class=\"joblog\"><form action=\"/stats\">");
+        buf.append("<div class=\"joblog\"><form action=\"\">");
         buf.append("<select name=\"go\" onChange='location.href=this.value'>");
         out.write(buf.toString());
         buf.setLength(0);

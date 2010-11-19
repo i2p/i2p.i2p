@@ -20,7 +20,7 @@
  <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:getProperty name="formhandler" property="allMessages" />
 <div class="configure">
- <form action="config.jsp" method="POST">
+ <form action="" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigNetHandler.nonce");
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigNetHandler.noncePrev", prev);
     System.setProperty("net.i2p.router.web.ConfigNetHandler.nonce", new java.util.Random().nextLong()+""); %>
@@ -96,7 +96,7 @@
  <a href="#chelp"><%=intl._("There is help below.")%></a></b>
  </p><p><b><%=intl._("UPnP Configuration")%>:</b><br>
     <input type="checkbox" class="optbox" name="upnp" value="true" <jsp:getProperty name="nethelper" property="upnpChecked" /> >
-    <%=intl._("Enable UPnP to open firewall ports")%> - <a href="peers.jsp#upnp"><%=intl._("UPnP status")%></a>
+    <%=intl._("Enable UPnP to open firewall ports")%> - <a href="peers#upnp"><%=intl._("UPnP status")%></a>
  </p><p><b><%=intl._("IP Configuration")%>:</b><br>
  <%=intl._("Externally reachable hostname or IP address")%>:<br>
     <input type="radio" class="optbox" name="udpAutoIP" value="local,upnp,ssu" <%=nethelper.getUdpAutoIPChecked(3) %> >
@@ -196,7 +196,7 @@
 <li class="tidylist"><%=intl._("Multiple firewall/routers in the internet connection path")%>
 <li class="tidylist"><%=intl._("UPnP device change, reset, or address change")%>
 </ul></p><p>
-<a href="peers.jsp#upnp"><%=intl._("Review the UPnP status here.")%></a>
+<a href="peers#upnp"><%=intl._("Review the UPnP status here.")%></a>
 <%=intl._("UPnP may be enabled or disabled above, but a change requires a router restart to take effect.")%></p>
 <p><%=intl._("Hostnames entered above will be published in the network database.")%>
     <%=intl._("They are <b>not private</b>.")%>

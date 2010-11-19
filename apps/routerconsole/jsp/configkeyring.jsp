@@ -25,7 +25,7 @@
  <jsp:getProperty name="keyringhelper" property="summary" />
 </p></div>
 
- <form action="configkeyring.jsp" method="POST">
+ <form action="" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigKeyringHandler.nonce");
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigKeyringHandler.noncePrev", prev);
     System.setProperty("net.i2p.router.web.ConfigKeyringHandler.nonce", new java.util.Random().nextLong()+""); %>
