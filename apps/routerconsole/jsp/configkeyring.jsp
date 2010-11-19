@@ -32,7 +32,7 @@
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigKeyringHandler.nonce")%>" >
  <h3><%=intl._("Manual Keyring Addition")%></h3><p>
  <%=intl._("Enter keys for encrypted remote destinations here.")%>
- <%=intl._("Keys for local destinations must be entered on the")%> <a href="i2ptunnel/index.jsp"><%=intl._("I2PTunnel page")%></a>.
+ <%=intl._("Keys for local destinations must be entered on the")%> <a href="i2ptunnel/"><%=intl._("I2PTunnel page")%></a>.
 </p>
   <div class="wideload">
       <p><table><tr>

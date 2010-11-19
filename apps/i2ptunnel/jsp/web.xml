@@ -5,6 +5,19 @@
 
 <web-app>
     <!-- precompiled servlets -->
+
+    <!-- yeah we could do this in a handler but this is easier -->
+    <servlet-mapping>
+        <servlet-name>net.i2p.i2ptunnel.jsp.index_jsp</servlet-name>
+        <!-- this becomes the default so it also covers /index and /index.html -->
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>net.i2p.i2ptunnel.jsp.edit_jsp</servlet-name>
+        <url-pattern>/edit</url-pattern>
+    </servlet-mapping>
+
     <session-config>
         <session-timeout>
             30
