@@ -304,7 +304,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             while (!_dateReceived) {
                 if (waitcount++ > 30) {
                     closeSocket();
-                    throw new IOException("no date handshake");
+                    throw new IOException("No handshake received from the router");
                 }
                 try {
                     synchronized (_dateReceivedLock) {
@@ -327,7 +327,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                         _producer.disconnect(this);
                     } catch (I2PSessionException ipe) {}
                     closeSocket();
-                    throw new IOException("no leaseset");
+                    throw new IOException("No tunnels built after waiting 5 minutes... are there network problems?");
                 }
                 synchronized (_leaseSetWait) {
                     try {
@@ -346,11 +346,11 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         } catch (UnknownHostException uhe) {
             _closed = true;
             setOpening(false);
-            throw new I2PSessionException(getPrefix() + "Invalid session configuration", uhe);
+            throw new I2PSessionException(getPrefix() + "Cannot connect to the router on " + _hostname + ':' + _portNum, uhe);
         } catch (IOException ioe) {
             _closed = true;
             setOpening(false);
-            throw new I2PSessionException(getPrefix() + "Problem connecting to " + _hostname + " on port " + _portNum, ioe);
+            throw new I2PSessionException(getPrefix() + "Cannot connect to the router on " + _hostname + ':' + _portNum, ioe);
         }
     }
 

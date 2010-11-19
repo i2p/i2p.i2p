@@ -39,7 +39,7 @@ class InternalSocketRunner implements Runnable {
             }
         } catch (IOException ex) {
             if (this.open) {
-                _log.error("Error listening for internal connections on " + this.port, ex);
+                _log.error("Error listening for internal connections on port " + this.port, ex);
             }
             this.open = false;
         }

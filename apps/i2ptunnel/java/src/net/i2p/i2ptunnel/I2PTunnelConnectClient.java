@@ -115,7 +115,7 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
     public I2PTunnelConnectClient(int localPort, Logging l, boolean ownDest, 
                                String wwwProxy, EventDispatcher notifyThis, 
                                I2PTunnel tunnel) throws IllegalArgumentException {
-        super(localPort, ownDest, l, notifyThis, "HTTPHandler " + (++__clientId), tunnel);
+        super(localPort, ownDest, l, notifyThis, "HTTPS Proxy on " + tunnel.listenHost + ':' + localPort + " #" + (++__clientId), tunnel);
 
         if (waitEventValue("openBaseClientResult").equals("error")) {
             notifyEvent("openConnectClientResult", "error");
@@ -128,7 +128,7 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                 _proxyList.add(tok.nextToken().trim());
         }
 
-        setName(getLocalPort() + " -> ConnectClient [Outproxy list: " + wwwProxy + "]");
+        setName("HTTPS Proxy on " + tunnel.listenHost + ':' + localPort);
 
         startRunning();
     }

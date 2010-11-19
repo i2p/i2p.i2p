@@ -85,8 +85,11 @@ public class I2PTunnel implements Logging, EventDispatcher {
 
     public boolean ownDest = false;
 
+    /** the I2CP port */
     public String port = System.getProperty(I2PClient.PROP_TCP_PORT, "7654");
+    /** the I2CP host */
     public String host = System.getProperty(I2PClient.PROP_TCP_HOST, "127.0.0.1");
+    /** the listen-on host. Sadly the listen-on port does not have a field. */
     public String listenHost = host;
 
     public long readTimeout = -1;
@@ -689,8 +692,10 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 addtask(task);
                 notifyEvent("clientTaskId", Integer.valueOf(task.getId()));
             } catch (IllegalArgumentException iae) {
-                _log.error(getPrefix() + "Invalid I2PTunnel config to create a client [" + host + ":"+ port + "]", iae);
-                l.log("Invalid I2PTunnel configuration [" + host + ":" + port + "]");
+                String msg = "Invalid I2PTunnel configuration to create an HTTP Proxy connecting to the router at " + host + ':'+ port +
+                             " and listening on " + listenHost + ':' + port;
+                _log.error(getPrefix() + msg, iae);
+                l.log(msg);
                 notifyEvent("clientTaskId", Integer.valueOf(-1));
                 // Since nothing listens to TaskID events, use this to propagate the error to TunnelController
                 // Otherwise, the tunnel stays up even though the port is down
@@ -763,8 +768,10 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 addtask(task);
                 notifyEvent("httpclientTaskId", Integer.valueOf(task.getId()));
             } catch (IllegalArgumentException iae) {
-                _log.error(getPrefix() + "Invalid I2PTunnel config to create an httpclient [" + host + ":"+ clientPort + "]", iae);
-                l.log("Invalid I2PTunnel configuration [" + host + ":" + clientPort + "]");
+                String msg = "Invalid I2PTunnel configuration to create an HTTP Proxy connecting to the router at " + host + ':'+ port +
+                             " and listening on " + listenHost + ':' + port;
+                _log.error(getPrefix() + msg, iae);
+                l.log(msg);
                 notifyEvent("httpclientTaskId", Integer.valueOf(-1));
                 // Since nothing listens to TaskID events, use this to propagate the error to TunnelController
                 // Otherwise, the tunnel stays up even though the port is down
@@ -829,7 +836,10 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 task = new I2PTunnelConnectClient(_port, l, ownDest, proxy, (EventDispatcher) this, this);
                 addtask(task);
             } catch (IllegalArgumentException iae) {
-                _log.error(getPrefix() + "Invalid I2PTunnel config to create a connect client [" + host + ":"+ _port + "]", iae);
+                String msg = "Invalid I2PTunnel configuration to create a CONNECT client connecting to the router at " + host + ':'+ port +
+                             " and listening on " + listenHost + ':' + port;
+                _log.error(getPrefix() + msg, iae);
+                l.log(msg);
                 // Since nothing listens to TaskID events, use this to propagate the error to TunnelController
                 // Otherwise, the tunnel stays up even though the port is down
                 // This doesn't work for CLI though... and the tunnel doesn't close itself after error,
@@ -892,8 +902,10 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 addtask(task);
                 notifyEvent("ircclientTaskId", Integer.valueOf(task.getId()));
             } catch (IllegalArgumentException iae) {
-                _log.error(getPrefix() + "Invalid I2PTunnel config to create an ircclient [" + host + ":"+ _port + "]", iae);
-                l.log("Invalid I2PTunnel configuration [" + host + ":" + _port + "]");
+                String msg = "Invalid I2PTunnel configuration to create an IRC client connecting to the router at " + host + ':'+ port +
+                             " and listening on " + listenHost + ':' + port;
+                _log.error(getPrefix() + msg, iae);
+                l.log(msg);
                 notifyEvent("ircclientTaskId", Integer.valueOf(-1));
                 // Since nothing listens to TaskID events, use this to propagate the error to TunnelController
                 // Otherwise, the tunnel stays up even though the port is down
@@ -939,10 +951,18 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 isShared = "true".equalsIgnoreCase(args[1].trim());
 
             ownDest = !isShared;
-            I2PTunnelTask task;
-            task = new I2PSOCKSTunnel(_port, l, ownDest, (EventDispatcher) this, this, null);
-            addtask(task);
-            notifyEvent("sockstunnelTaskId", Integer.valueOf(task.getId()));
+            try {
+                I2PTunnelTask task = new I2PSOCKSTunnel(_port, l, ownDest, (EventDispatcher) this, this, null);
+                addtask(task);
+                notifyEvent("sockstunnelTaskId", Integer.valueOf(task.getId()));
+            } catch (IllegalArgumentException iae) {
+                String msg = "Invalid I2PTunnel configuration to create a SOCKS Proxy connecting to the router at " + host + ':'+ port +
+                             " and listening on " + listenHost + ':' + port;
+                _log.error(getPrefix() + msg, iae);
+                l.log(msg);
+                notifyEvent("sockstunnelTaskId", Integer.valueOf(-1));
+                throw iae;
+            }
         } else {
             l.log("sockstunnel <port>");
             l.log("  creates a tunnel that distributes SOCKS requests.");
@@ -978,10 +998,18 @@ public class I2PTunnel implements Logging, EventDispatcher {
             String privateKeyFile = null;
             if (args.length == 3)
                 privateKeyFile = args[2];
-            I2PTunnelTask task;
-            task = new I2PSOCKSIRCTunnel(_port, l, ownDest, (EventDispatcher) this, this, privateKeyFile);
-            addtask(task);
-            notifyEvent("sockstunnelTaskId", Integer.valueOf(task.getId()));
+            try {
+                I2PTunnelTask task = new I2PSOCKSIRCTunnel(_port, l, ownDest, (EventDispatcher) this, this, privateKeyFile);
+                addtask(task);
+                notifyEvent("sockstunnelTaskId", Integer.valueOf(task.getId()));
+            } catch (IllegalArgumentException iae) {
+                String msg = "Invalid I2PTunnel configuration to create a SOCKS IRC Proxy connecting to the router at " + host + ':'+ port +
+                             " and listening on " + listenHost + ':' + port;
+                _log.error(getPrefix() + msg, iae);
+                l.log(msg);
+                notifyEvent("sockstunnelTaskId", Integer.valueOf(-1));
+                throw iae;
+            }
         } else {
             l.log("socksirctunnel <port> [<sharedClient> [<privKeyFile>]]");
             l.log("  creates a tunnel for SOCKS IRC.");
@@ -1019,10 +1047,19 @@ public class I2PTunnel implements Logging, EventDispatcher {
             if (_port <= 0)
                 throw new IllegalArgumentException(getPrefix() + "Bad port " + args[0]);
 
-            StreamrConsumer task = new StreamrConsumer(_host, _port, args[2], l, (EventDispatcher) this, this);
-            task.startRunning();
-            addtask(task);
-            notifyEvent("streamrtunnelTaskId", Integer.valueOf(task.getId()));
+            try {
+                StreamrConsumer task = new StreamrConsumer(_host, _port, args[2], l, (EventDispatcher) this, this);
+                task.startRunning();
+                addtask(task);
+                notifyEvent("streamrtunnelTaskId", Integer.valueOf(task.getId()));
+            } catch (IllegalArgumentException iae) {
+                String msg = "Invalid I2PTunnel configuration to create a Streamr Client connecting to the router at " + host + ':'+ port +
+                             " and sending to " + _host + ':' + port;
+                _log.error(getPrefix() + msg, iae);
+                l.log(msg);
+                notifyEvent("streamrtunnnelTaskId", Integer.valueOf(-1));
+                throw iae;
+            }
         } else {
             l.log("streamrclient <host> <port> <destination>");
             l.log("  creates a tunnel that receives streaming data.");
@@ -1409,7 +1446,8 @@ public class I2PTunnel implements Logging, EventDispatcher {
             for (Iterator it = tasks.iterator(); it.hasNext();) {
                 I2PTunnelTask t = (I2PTunnelTask) it.next();
                 int id = t.getId();
-                _log.debug(getPrefix() + "closetask(): parsing task " + id + " (" + t.toString() + ")");
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug(getPrefix() + "closetask(): parsing task " + id + " (" + t.toString() + ")");
                 if (id == num) {
                     closed = closetask(t, forced, l);
                     break;
@@ -1427,9 +1465,13 @@ public class I2PTunnel implements Logging, EventDispatcher {
      *
      */
     private boolean closetask(I2PTunnelTask t, boolean forced, Logging l) {
-        l.log("Closing task " + t.getId() + (forced ? " forced..." : "..."));
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Closing task " + t.getId() + (forced ? " forced..." : "..."));
+        //l.log("Closing task " + t.getId() + (forced ? " forced..." : "..."));
         if (t.close(forced)) {
-            l.log("Task " + t.getId() + " closed.");
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Task " + t.getId() + " closed.");
+            //l.log("Task " + t.getId() + " closed.");
             return true;
         }
         return false;

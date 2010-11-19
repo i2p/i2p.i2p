@@ -15,39 +15,28 @@ import java.io.PrintWriter;
 /**
  * Base class of I2P exceptions
  *
+ * This was originally used to provide chained exceptions, but
+ * those were added to Exception in Java 1.4, so this class provides nothing
+ * extra at the moment.
+ *
  * @author jrandom
  */
 public class I2PException extends Exception {
-    private Throwable _source;
 
     public I2PException() {
-        this(null, null);
+        super();
     }
 
     public I2PException(String msg) {
-        this(msg, null);
-    }
-
-    public I2PException(String msg, Throwable source) {
         super(msg);
-        _source = source;
-    }
-    
-    @Override
-    public void printStackTrace() {
-        if (_source != null) _source.printStackTrace();
-        super.printStackTrace();
-    }
-    
-    @Override
-    public void printStackTrace(PrintStream ps) {
-        if (_source != null) _source.printStackTrace(ps);
-        super.printStackTrace(ps);
     }
 
-    @Override
-    public void printStackTrace(PrintWriter pw) {
-        if (_source != null) _source.printStackTrace(pw);
-        super.printStackTrace(pw);
+    public I2PException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
+    
+    /** @since 0.8.2 */
+    public I2PException(Throwable cause) {
+        super(cause);
     }
 }

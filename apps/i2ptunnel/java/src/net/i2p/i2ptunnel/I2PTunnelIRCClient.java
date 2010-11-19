@@ -46,7 +46,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
               ownDest, 
               l, 
               notifyThis, 
-              "IRCHandler " + (++__clientId), tunnel, pkf);
+              "IRC Client on " + tunnel.listenHost + ':' + localPort + " #" + (++__clientId), tunnel, pkf);
         
         StringTokenizer tok = new StringTokenizer(destinations, ", ");
         dests = new ArrayList(2);
@@ -80,7 +80,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
             //return;
         }
         
-        setName(getLocalPort() + " -> IRCClient");
+        setName("IRC Client on " + tunnel.listenHost + ':' + localPort);
 
         startRunning();
 
