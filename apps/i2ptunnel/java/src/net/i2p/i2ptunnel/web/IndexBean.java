@@ -90,7 +90,7 @@ public class IndexBean {
     //static final String PROP_NONCE = IndexBean.class.getName() + ".nonce";
     //static final String PROP_NONCE_OLD = PROP_NONCE + '2';
     /** 3 wasn't enough for some browsers. They are reloading the page for some reason - maybe HEAD? @since 0.8.1 */
-    private static final int MAX_NONCES = 5;
+    private static final int MAX_NONCES = 8;
     /** store nonces in a static FIFO instead of in System Properties @since 0.8.1 */
     private static final List<String> _nonces = new ArrayList(MAX_NONCES + 1);
 
