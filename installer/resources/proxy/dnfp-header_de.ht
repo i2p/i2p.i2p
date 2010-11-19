@@ -21,7 +21,7 @@ Er ist offline, das Netz ist überlastet oder verstopft,
 oder Ihr Router ist noch nicht gut ins Netzwerk integriert.
 Versuchen Sie ein <a href="javascript: parent.window.location.reload()">Neuladen</a> 
 da dies eine erneute zufällige Auswahl des Outproxys aus der von Ihnen <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">hier</a> vorgegebenen Liste trifft 
-(falls mehr als einer angegeben ist).
+(falls mehr als einer angegeben ist)!
 Wenn das Problem weiterhin bestehen sollte, passen Sie die Liste Ihrer Outproxys 
 <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=0">hier</a> an!
 <hr><b>Konnte das folgende Ziel nicht finden:</b><BR><BR>
