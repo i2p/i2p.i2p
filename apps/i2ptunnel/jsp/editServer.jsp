@@ -29,7 +29,7 @@
     <div id="pageHeader">
     </div>
 
-    <form method="post" action="index.jsp">
+    <form method="post" action="list">
 
         <div id="tunnelEditPanel" class="panel">
             <div class="header">

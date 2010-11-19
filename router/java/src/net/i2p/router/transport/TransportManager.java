@@ -492,7 +492,7 @@ public class TransportManager implements TransportEventListener {
             t.renderStatusHTML(out, urlBase, sortFlags);
         }
         
-        if (_transports.size() > 0) {
+        if (!_transports.isEmpty()) {
             out.write(getTransportsLegend());
         }
 
@@ -516,6 +516,11 @@ public class TransportManager implements TransportEventListener {
 
     private final String getTransportsLegend() {
         StringBuilder buf = new StringBuilder(1024);
+        buf.append("<h3 id=\"help\">").append(_("Help")).append("</h3><div class=\"configure\"><p>")
+           .append(_("Your transport connection limits are automatically set based on your configured bandwidth."))
+           .append('\n')
+           .append(_("To override these limits, add the settings i2np.ntcp.maxConnections=nnn and i2np.udp.maxConnections=nnn on the advanced configuration page."))
+           .append("</p></div>\n");
         buf.append("<h3>").append(_("Definitions")).append("</h3><div class=\"configure\">" +
                    "<p><b id=\"def.peer\">").append(_("Peer")).append("</b>: ").append(_("The remote peer, identified by router hash")).append("<br>\n" +
                    "<b id=\"def.dir\">").append(_("Dir")).append("</b>: " +

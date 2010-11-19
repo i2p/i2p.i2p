@@ -362,7 +362,7 @@ public class SummaryHelper extends HelperBase {
         List<Destination> clients = new ArrayList(_context.clientManager().listClients());
         
         StringBuilder buf = new StringBuilder(512);
-        buf.append("<h3><a href=\"/i2ptunnel/index.jsp\" target=\"_blank\" title=\"").append(_("Add/remove/edit &amp; control your client and server tunnels")).append("\">").append(_("Local Destinations")).append("</a></h3><hr><div class=\"tunnels\">");
+        buf.append("<h3><a href=\"/i2ptunnel/\" target=\"_blank\" title=\"").append(_("Add/remove/edit &amp; control your client and server tunnels")).append("\">").append(_("Local Destinations")).append("</a></h3><hr><div class=\"tunnels\">");
         if (!clients.isEmpty()) {
             Collections.sort(clients, new AlphaComparator());
             buf.append("<table>");
@@ -377,7 +377,7 @@ public class SummaryHelper extends HelperBase {
                     buf.append("server.png\" alt=\"Server\" title=\"" + _("Server") + "\">");
                 else
                     buf.append("client.png\" alt=\"Client\" title=\"" + _("Client") + "\">");
-                buf.append("</td><td align=\"left\"><b><a href=\"tunnels.jsp#").append(h.toBase64().substring(0,4));
+                buf.append("</td><td align=\"left\"><b><a href=\"tunnels#").append(h.toBase64().substring(0,4));
                 buf.append("\" target=\"_top\" title=\"" + _("Show tunnels") + "\">");
                 if (name.length() < 16)
                     buf.append(name);

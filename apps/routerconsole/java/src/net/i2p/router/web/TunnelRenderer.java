@@ -38,7 +38,7 @@ public class TunnelRenderer {
     }
     
     public void renderStatusHTML(Writer out) throws IOException {
-        out.write("<div class=\"wideload\"><h2><a name=\"exploratory\" ></a>" + _("Exploratory tunnels") + " (<a href=\"/configtunnels.jsp#exploratory\">" + _("configure") + "</a>)</h2>\n");
+        out.write("<div class=\"wideload\"><h2><a name=\"exploratory\" ></a>" + _("Exploratory tunnels") + " (<a href=\"/configtunnels#exploratory\">" + _("configure") + "</a>)</h2>\n");
         renderPool(out, _context.tunnelManager().getInboundExploratoryPool(), _context.tunnelManager().getOutboundExploratoryPool());
         
         List<Hash> destinations = null;
@@ -60,7 +60,7 @@ public class TunnelRenderer {
             out.write("<h2><a name=\"" + client.toBase64().substring(0,4)
                       + "\" ></a>" + _("Client tunnels for") + ' ' + _(name));
             if (_context.clientManager().isLocal(client))
-                out.write(" (<a href=\"/configtunnels.jsp#" + client.toBase64().substring(0,4) +"\">" + _("configure") + "</a>)</h2>\n");
+                out.write(" (<a href=\"/configtunnels#" + client.toBase64().substring(0,4) +"\">" + _("configure") + "</a>)</h2>\n");
             else
                 out.write(" (" + _("dead") + ")</h2>\n");
             renderPool(out, in, outPool);

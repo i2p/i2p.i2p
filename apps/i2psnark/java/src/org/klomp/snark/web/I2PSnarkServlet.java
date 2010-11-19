@@ -174,6 +174,8 @@ public class I2PSnarkServlet extends Default {
                   "<head><link rel=\"shortcut icon\" href=\"/themes/snark/ubergine/favicon.ico\">\n" +
                   "<title>");
         out.write(_("I2PSnark - Anonymous BitTorrent Client"));
+        if ("2".equals(peerParam))
+            out.write(" | Debug Mode");
         out.write("</title>\n");
                                          
         // we want it to go to the base URI so we don't refresh with some funky action= value
@@ -780,14 +782,15 @@ public class I2PSnarkServlet extends Default {
         // temporarily hardcoded for postman* and anonymity, requires bytemonsoon patch for lookup by info_hash
         String announce = snark.meta.getAnnounce();
         if (announce.startsWith("http://YRgrgTLG") || announce.startsWith("http://8EoJZIKr") ||
-            announce.startsWith("http://lnQ6yoBT") || announce.startsWith("http://tracker2.postman.i2p/")) {
+            announce.startsWith("http://lnQ6yoBT") || announce.startsWith("http://tracker2.postman.i2p/") || announce.startsWith("http://ahsplxkbhemefwvvml7qovzl5a2b5xo5i7lyai7ntdunvcyfdtna.b32.i2p/")) {
             Map trackers = _manager.getTrackers();
             for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
                 Map.Entry entry = (Map.Entry)iter.next();
                 String name = (String)entry.getKey();
                 String baseURL = (String)entry.getValue();
                 if (!(baseURL.startsWith(announce) || // vvv hack for non-b64 announce in list vvv
-                      (announce.startsWith("http://lnQ6yoBT") && baseURL.startsWith("http://tracker2.postman.i2p/"))))
+                      (announce.startsWith("http://lnQ6yoBT") && baseURL.startsWith("http://tracker2.postman.i2p/")) ||
+                      (announce.startsWith("http://ahsplxkbhemefwvvml7qovzl5a2b5xo5i7lyai7ntdunvcyfdtna.b32.i2p/") && baseURL.startsWith("http://tracker2.postman.i2p/"))))
                     continue;
                 int e = baseURL.indexOf('=');
                 if (e < 0)
@@ -1552,11 +1555,11 @@ public class I2PSnarkServlet extends Default {
             icon = "photo";
         else if (mime.startsWith("audio/") || mime.equals("application/ogg") ||
                  plc.endsWith(".flac") || plc.endsWith(".m4a") || plc.endsWith(".wma") ||
-                 plc.endsWith(".ape"))
+                 plc.endsWith(".ape") || plc.endsWith(".oga"))
             icon = "music";
         else if (mime.startsWith("video/") || plc.endsWith(".mkv") || plc.endsWith(".m4v") ||
                  plc.endsWith(".mp4") || plc.endsWith(".wmv") || plc.endsWith(".flv") ||
-                 plc.endsWith(".ogm"))
+                 plc.endsWith(".ogm") || plc.endsWith(".ogv"))
             icon = "film";
         else if (mime.equals("application/zip") || mime.equals("application/x-gtar") ||
                  mime.equals("application/compress") || mime.equals("application/gzip") ||

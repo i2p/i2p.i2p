@@ -28,7 +28,7 @@ public class SummaryBarRenderer {
         StringBuilder buf = new StringBuilder(8*1024);
         String theme = _context.getProperty(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
         
-        buf.append("<a href=\"/index.jsp\" target=\"_top\"><img src=\"")
+        buf.append("<a href=\"/\" target=\"_top\"><img src=\"")
            .append(CSSHelper.BASE_THEME_PATH)
            .append(theme)
            .append("/images/i2plogo.png\" alt=\"")
@@ -37,7 +37,7 @@ public class SummaryBarRenderer {
            .append(_("I2P Router Console"))
            .append("\"></a><hr>")
            
-           .append("<h3><a href=\"/help.jsp\" target=\"_top\" title=\"")
+           .append("<h3><a href=\"/help\" target=\"_top\" title=\"")
            .append(_("I2P Router Help &amp; FAQ"))
            .append("\">")
            .append(_("Help &amp; FAQ"))
@@ -51,7 +51,7 @@ public class SummaryBarRenderer {
             linkhelper.setMaxLines("100");
             buf.append(linkhelper.getContent());
         } else {
-            buf.append("<h3><a href=\"/configclients.jsp\" target=\"_top\" title=\"")
+            buf.append("<h3><a href=\"/configclients\" target=\"_top\" title=\"")
                .append(_("Configure startup of clients and webapps (services); manually start dormant services"))
                .append("\">")
                .append(_("I2P Services"))
@@ -87,7 +87,7 @@ public class SummaryBarRenderer {
 
                .append("</td></tr></table>\n" +
 
-                       "<hr><h3><a href=\"/config.jsp\" target=\"_top\" title=\"")
+                       "<hr><h3><a href=\"/config\" target=\"_top\" title=\"")
                .append(_("Configure I2P Router"))
                .append("\">")
                .append(_("I2P Internals"))
@@ -95,31 +95,31 @@ public class SummaryBarRenderer {
 
                        "<table><tr><td>\n" +
 
-                       "<a href=\"/tunnels.jsp\" target=\"_top\" title=\"")
+                       "<a href=\"/tunnels\" target=\"_top\" title=\"")
                .append(_("View existing tunnels and tunnel build status"))
                .append("\">")
                .append(_("Tunnels"))
                .append("</a>\n" +
 
-                       "<a href=\"/peers.jsp\" target=\"_top\" title=\"")
+                       "<a href=\"/peers\" target=\"_top\" title=\"")
                .append(_("Show all current peer connections"))
                .append("\">")
                .append(_("Peers"))
                .append("</a>\n" +
 
-                       "<a href=\"/profiles.jsp\" target=\"_top\" title=\"")
+                       "<a href=\"/profiles\" target=\"_top\" title=\"")
                .append(_("Show recent peer performance profiles"))
                .append("\">")
                .append(_("Profiles"))
                .append("</a>\n" +
 
-                       "<a href=\"/netdb.jsp\" target=\"_top\" title=\"")
+                       "<a href=\"/netdb\" target=\"_top\" title=\"")
                .append(_("Show list of all known I2P routers"))
                .append("\">")
                .append(_("NetDB"))
                .append("</a>\n" +
 
-                       "<a href=\"/logs.jsp\" target=\"_top\" title=\"")
+                       "<a href=\"/logs\" target=\"_top\" title=\"")
                .append(_("Health Report"))
                .append("\">")
                .append(_("Logs"))
@@ -131,19 +131,19 @@ public class SummaryBarRenderer {
            //  .append(_("Jobs"))
            //  .append("</a>\n" +
 
-                       "<a href=\"/graphs.jsp\" target=\"_top\" title=\"")
+                       "<a href=\"/graphs\" target=\"_top\" title=\"")
                .append(_("Graph router performance"))
                .append("\">")
                .append(_("Graphs"))
                .append("</a>\n" +
 
-                       "<a href=\"/stats.jsp\" target=\"_top\" title=\"")
+                       "<a href=\"/stats\" target=\"_top\" title=\"")
                .append(_("Textual router performance statistics"))
                .append("\">")
                .append(_("Stats"))
                .append("</a>\n" +
 
-                        "<a href=\"/i2ptunnel/index.jsp\" target=\"_blank\" title=\"")
+                        "<a href=\"/i2ptunnel/\" target=\"_blank\" title=\"")
                .append(_("Local Destinations"))
                .append("\">")
                .append(_("I2PTunnel"))
@@ -156,7 +156,7 @@ public class SummaryBarRenderer {
 
 
 
-        buf.append("<hr><h3><a href=\"/help.jsp\" target=\"_top\" title=\"")
+        buf.append("<hr><h3><a href=\"/help\" target=\"_top\" title=\"")
            .append(_("I2P Router Help"))
            .append("\">")
            .append(_("General"))
@@ -173,7 +173,7 @@ public class SummaryBarRenderer {
            .append(_helper.getIdent())
            .append(", ")
            .append(_("never reveal it to anyone"))
-           .append("\" href=\"/netdb.jsp?r=.\" target=\"_top\">")
+           .append("\" href=\"/netdb?r=.\" target=\"_top\">")
            .append(_("show"))
            .append("</a></td></tr>\n" +
 
@@ -194,7 +194,7 @@ public class SummaryBarRenderer {
            .append(_helper.getUptime())
            .append("</td></tr></table>\n" +
 
-                   "<hr><h4><a href=\"/config.jsp#help\" target=\"_top\" title=\"")
+                   "<hr><h4><a href=\"/config#help\" target=\"_top\" title=\"")
            .append(_("Help with configuring your firewall and router for optimal I2P performance"))
            .append("\">")
            .append(_("Network"))
@@ -220,7 +220,7 @@ public class SummaryBarRenderer {
                     System.setProperty("net.i2p.router.web.UpdateHandler.noncePrev", prev);
                 System.setProperty("net.i2p.router.web.UpdateHandler.nonce", nonce+"");
                 String uri = _helper.getRequestURI();
-                buf.append("<p><form action=\"").append(uri).append("\" method=\"GET\">\n");
+                buf.append("<p><form action=\"").append(uri).append("\" method=\"POST\">\n");
                 buf.append("<input type=\"hidden\" name=\"updateNonce\" value=\"").append(nonce).append("\" >\n");
                 if (_helper.updateAvailable()) {
                     buf.append("<button type=\"submit\" name=\"updateAction\" value=\"signed\" >")
@@ -250,7 +250,7 @@ public class SummaryBarRenderer {
         buf.append("<p>")
            .append(ConfigRestartBean.renderStatus(_helper.getRequestURI(), _helper.getAction(), _helper.getConsoleNonce()))
 
-           .append("</p><hr><h3><a href=\"/peers.jsp\" target=\"_top\" title=\"")
+           .append("</p><hr><h3><a href=\"/peers\" target=\"_top\" title=\"")
            .append(_("Show all current peer connections"))
            .append("\">")
            .append(_("Peers"))
@@ -260,10 +260,11 @@ public class SummaryBarRenderer {
 
                    "<tr><td align=\"left\"><b>")
            .append(_("Active"))
-           .append(":</b></td><td align=\"right\">")
-           .append(_helper.getActivePeers())
+           .append(":</b></td><td align=\"right\">");
+        int active = _helper.getActivePeers();
+        buf.append(active)
            .append("&thinsp;/&thinsp;")
-           .append(_helper.getActiveProfiles())
+           .append(Math.max(active, _helper.getActiveProfiles()))
            .append("</td></tr>\n" +
 
                    "<tr><td align=\"left\"><b>")
@@ -299,7 +300,7 @@ public class SummaryBarRenderer {
 
         boolean anotherLine = false;
         if (_helper.showFirewallWarning()) {
-            buf.append("<h4><a href=\"/config.jsp\" target=\"_top\" title=\"")
+            buf.append("<h4><a href=\"/config\" target=\"_top\" title=\"")
                .append(_("Help with firewall configuration"))
                .append("\">")
                .append(_("Check NAT/firewall"))
@@ -320,7 +321,7 @@ public class SummaryBarRenderer {
                 if (prev != null) System.setProperty("net.i2p.router.web.ReseedHandler.noncePrev", prev);
                 System.setProperty("net.i2p.router.web.ReseedHandler.nonce", nonce+"");
                 String uri = _helper.getRequestURI();
-                buf.append("<p><form action=\"").append(uri).append("\" method=\"GET\">\n");
+                buf.append("<p><form action=\"").append(uri).append("\" method=\"POST\">\n");
                 buf.append("<input type=\"hidden\" name=\"reseedNonce\" value=\"").append(nonce).append("\" >\n");
                 buf.append("<button type=\"submit\" value=\"Reseed\" >").append(_("Reseed")).append("</button></form></p>\n");
             }
@@ -338,7 +339,7 @@ public class SummaryBarRenderer {
             buf.append("<hr>");
 
 
-        buf.append("<h3><a href=\"/config.jsp\" title=\"")
+        buf.append("<h3><a href=\"/config\" title=\"")
            .append(_("Configure router bandwidth allocation"))
            .append("\" target=\"_top\">")
            .append(_("Bandwidth in/out"))
@@ -375,7 +376,7 @@ public class SummaryBarRenderer {
            .append(_helper.getOutboundTransferred())
            .append("</td></tr></table>\n" +
 
-                   "<hr><h3><a href=\"/tunnels.jsp\" target=\"_top\" title=\"")
+                   "<hr><h3><a href=\"/tunnels\" target=\"_top\" title=\"")
            .append(_("View existing tunnels and tunnel build status"))
            .append("\">")
            .append(_("Tunnels"))
@@ -406,7 +407,7 @@ public class SummaryBarRenderer {
            .append(_helper.getShareRatio())
            .append("</td></tr>\n" +
 
-                   "</table><hr><h3><a href=\"/jobs.jsp\" target=\"_top\" title=\"")
+                   "</table><hr><h3><a href=\"/jobs\" target=\"_top\" title=\"")
            .append(_("What's in the router's job queue?"))
            .append("\">")
            .append(_("Congestion"))

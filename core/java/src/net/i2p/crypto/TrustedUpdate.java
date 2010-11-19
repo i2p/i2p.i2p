@@ -164,7 +164,7 @@ JXQAnA28vDmMMMH/WPbC5ixmJeGGNUiR
                 addKey(propertyTrustedKeysTokens.nextToken().trim(), "");
 
         } else {
-            addKey(DEFAULT_TRUSTED_KEY, "jrandom@mail.i2p");
+            //addKey(DEFAULT_TRUSTED_KEY, "jrandom@mail.i2p");
             addKey(DEFAULT_TRUSTED_KEY2, "zzz@mail.i2p");
             //addKey(DEFAULT_TRUSTED_KEY3, "complication@mail.i2p");
             addKey(DEFAULT_TRUSTED_KEY4, "HungryHobo@mail.i2p");

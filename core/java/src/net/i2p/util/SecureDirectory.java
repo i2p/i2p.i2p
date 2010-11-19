@@ -5,15 +5,14 @@ import java.io.File;
 /**
  * Same as File but sets the file mode after mkdir() so it can
  * be read and written by the owner only (i.e. 700 on linux)
+ * As of 0.8.2, just use SecureFile instead of this.
  *
  * @since 0.8.1
  * @author zzz
  */
 public class SecureDirectory extends File {
 
-    private static final boolean canSetPerms =
-        (new VersionComparator()).compare(System.getProperty("java.version"), "1.6") >= 0;
-    private static final boolean isNotWindows = !System.getProperty("os.name").startsWith("Win");
+    protected static final boolean isNotWindows = !System.getProperty("os.name").startsWith("Win");
 
     public SecureDirectory(String pathname) {
         super(pathname);
@@ -54,8 +53,8 @@ public class SecureDirectory extends File {
      *  Tries to set the permissions to 700,
      *  ignores errors
      */
-    private void setPerms() {
-        if (!canSetPerms)
+    protected void setPerms() {
+        if (!SecureFileOutputStream.canSetPerms())
             return;
         try {
             setReadable(false, false);

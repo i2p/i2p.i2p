@@ -39,7 +39,7 @@ public interface I2PSessionListener {
 
     /**
      * Notify the client that some error occurred
-     * @param null can be null? or not?
+     * @param error can be null? or not?
      */
     void errorOccurred(I2PSession session, String message, Throwable error);
 }

@@ -20,7 +20,7 @@ public class ConfigPeerHandler extends FormHandler {
         } else if (_action.equals(_("Ban peer until restart"))) {
             Hash h = getHash();
             if (h != null) {
-                _context.shitlist().shitlistRouterForever(h, _("Manually banned via {0}"), "<a href=\"configpeer.jsp\">configpeer.jsp</a>");
+                _context.shitlist().shitlistRouterForever(h, _("Manually banned via {0}"), "<a href=\"configpeer\">configpeer</a>");
                 addFormNotice(_("Peer") + " " + _peer + " " + _("banned until restart") );
                 return;
             }

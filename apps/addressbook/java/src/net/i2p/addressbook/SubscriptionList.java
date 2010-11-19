@@ -35,13 +35,15 @@ import java.util.Map;
  * @author Ragnarok
  *  
  */
-public class SubscriptionList {
+class SubscriptionList {
 
     private List subscriptions;
 
     private File etagsFile;
 
     private File lastModifiedFile;
+    private File lastFetchedFile;
+    private final long delay;
     
     private String proxyHost;
     
@@ -60,20 +62,24 @@ public class SubscriptionList {
      * @param lastModifiedFile
      *            A file containg the last-modified headers used for conditional
      *            GET. The file is in the format "url=leastmodified".
+     * @param delay the minimum delay since last fetched for the iterator to actually fetch
      * @param defaultSubs default subscription file
      * @param proxyHost proxy hostname
      * @param proxyPort proxy port number
      */
     public SubscriptionList(File locationsFile, File etagsFile,
-            File lastModifiedFile, List defaultSubs, String proxyHost, 
+            File lastModifiedFile, File lastFetchedFile, long delay, List defaultSubs, String proxyHost, 
             int proxyPort) {
         this.subscriptions = new LinkedList();
         this.etagsFile = etagsFile;
         this.lastModifiedFile = lastModifiedFile;
+        this.lastFetchedFile = lastFetchedFile;
+        this.delay = delay;
         this.proxyHost = proxyHost;
         this.proxyPort = proxyPort;
         Map etags;
         Map lastModified;
+        Map lastFetched;
         String location;
         List locations = ConfigParser.parseSubscriptions(locationsFile, 
                 defaultSubs);
@@ -87,11 +93,17 @@ public class SubscriptionList {
         } catch (IOException exp) {
             lastModified = new HashMap();
         }
+        try {
+            lastFetched = ConfigParser.parse(lastFetchedFile);
+        } catch (IOException exp) {
+            lastFetched = new HashMap();
+        }
         Iterator iter = locations.iterator();
         while (iter.hasNext()) {
             location = (String) iter.next();
-            this.subscriptions.add(new Subscription(location, (String) etags
-                    .get(location), (String) lastModified.get(location)));
+            this.subscriptions.add(new Subscription(location, (String) etags.get(location),
+                                   (String) lastModified.get(location),
+                                   (String) lastFetched.get(location)));
         }
     }
     
@@ -102,18 +114,22 @@ public class SubscriptionList {
      * @return A SubscriptionIterator.
      */
     public SubscriptionIterator iterator() {
-        return new SubscriptionIterator(this.subscriptions, this.proxyHost, 
+        return new SubscriptionIterator(this.subscriptions, this.delay, this.proxyHost, 
                 this.proxyPort);
     }
 
     /**
-     * Write the etag and last-modified headers for each Subscription to files.
+     * Write the etag and last-modified headers,
+     * and the last-fetched time, for each Subscription to files.
+     * BUG - If the subscription URL is a cgi containing an '=' the files
+     * won't be read back correctly; the '=' should be escaped.
      */
     public void write() {
         Iterator iter = this.subscriptions.iterator();
         Subscription sub;
         Map etags = new HashMap();
         Map lastModified = new HashMap();
+        Map lastFetched = new HashMap();
         while (iter.hasNext()) {
             sub = (Subscription) iter.next();
             if (sub.getEtag() != null) {
@@ -122,10 +138,12 @@ public class SubscriptionList {
             if (sub.getLastModified() != null) {
                 lastModified.put(sub.getLocation(), sub.getLastModified());
             }
+            lastFetched.put(sub.getLocation(), "" + sub.getLastFetched());
         }
         try {
             ConfigParser.write(etags, this.etagsFile);
             ConfigParser.write(lastModified, this.lastModifiedFile);
+            ConfigParser.write(lastFetched, this.lastFetchedFile);
         } catch (IOException exp) {
         }
     }

@@ -24,7 +24,7 @@
     } else {
         // since we don't have an iframe this will reload the base page, and
         // the new delay will be passed to the iframe above
-        out.print("<div class=\"refresh\"><form action=\"" + request.getRequestURI() + "\" method=\"GET\">\n");
+        out.print("<div class=\"refresh\"><form action=\"" + request.getRequestURI() + "\" method=\"POST\">\n");
         out.print("<b>");
         // We have intl defined when this is included, but not when compiled standalone.
         out.print(intl._("Refresh (s)"));

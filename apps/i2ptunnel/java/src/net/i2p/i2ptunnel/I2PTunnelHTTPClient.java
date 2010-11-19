@@ -166,7 +166,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         super(localPort, l, sockMgr, tunnel, notifyThis, clientId);
        // proxyList = new ArrayList();
 
-        setName(getLocalPort() + " -> HTTPClient [NO PROXIES]");
+        setName("HTTP Proxy on " + getTunnel().listenHost + ':' + localPort);
         startRunning();
 
         notifyEvent("openHTTPClientResult", "ok");
@@ -178,7 +178,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     public I2PTunnelHTTPClient(int localPort, Logging l, boolean ownDest,
                                String wwwProxy, EventDispatcher notifyThis,
                                I2PTunnel tunnel) throws IllegalArgumentException {
-        super(localPort, ownDest, l, notifyThis, "HTTPHandler " + (++__clientId), tunnel);
+        super(localPort, ownDest, l, notifyThis, "HTTP Proxy on " + tunnel.listenHost + ':' + localPort + " #" + (++__clientId), tunnel);
 
         //proxyList = new ArrayList(); // We won't use outside of i2p
         if (waitEventValue("openBaseClientResult").equals("error")) {
@@ -192,7 +192,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 _proxyList.add(tok.nextToken().trim());
         }
 
-        setName(getLocalPort() + " -> HTTPClient [WWW outproxy list: " + wwwProxy + "]");
+        setName("HTTP Proxy on " + tunnel.listenHost + ':' + localPort);
 
         startRunning();
 

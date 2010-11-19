@@ -80,10 +80,13 @@ public class PrivateKeyFile {
             if (args[0].equals("-n")) {
                 // Cert constructor generates a null cert
                 pkf.setCertType(Certificate.CERTIFICATE_TYPE_NULL);
+                System.out.println("New destination with null cert is:");
             } else if (args[0].equals("-u")) {
                 pkf.setCertType(99);
+                System.out.println("New destination with unknown cert is:");
             } else if (args[0].equals("-x")) {
                 pkf.setCertType(Certificate.CERTIFICATE_TYPE_HIDDEN);
+                System.out.println("New destination with hidden cert is:");
             } else if (args[0].equals("-h")) {
                 int hashEffort = HASH_EFFORT;
                 if (args.length == 3)
@@ -91,12 +94,13 @@ public class PrivateKeyFile {
                 System.out.println("Estimating hashcash generation time, stand by...");
                 System.out.println(estimateHashCashTime(hashEffort));
                 pkf.setHashCashCert(hashEffort);
+                System.out.println("New destination with hashcash cert is:");
             } else if (args.length == 3 && args[0].equals("-s")) {
                 // Sign dest1 with dest2's Signing Private Key
                 PrivateKeyFile pkf2 = new PrivateKeyFile(args[2]);
                 pkf.setSignedCert(pkf2);
+                System.out.println("New destination with signed cert is:");
             }
-            System.out.println("New signed destination is:");
             System.out.println(pkf);
             pkf.write();
             verifySignature(d);
@@ -318,23 +322,56 @@ public class PrivateKeyFile {
         byte[] data = new byte[len];
         System.arraycopy(d.getPublicKey().getData(), 0, data, 0, PublicKey.KEYSIZE_BYTES);
         System.arraycopy(d.getSigningPublicKey().getData(), 0, data, PublicKey.KEYSIZE_BYTES, SigningPublicKey.KEYSIZE_BYTES);
-        Signature sig = new Signature(d.getCertificate().getPayload());
+        Signature sig = new Signature();
+        byte[] payload = d.getCertificate().getPayload();
+        Hash signerHash = null;
+        if (payload == null) {
+            System.out.println("Bad signed cert - no payload");
+            return false;
+        } else if (payload.length == Signature.SIGNATURE_BYTES) {
+            sig.setData(payload);
+        } else if (payload.length == Certificate.CERTIFICATE_LENGTH_SIGNED_WITH_HASH) {
+            byte[] pl = new byte[Signature.SIGNATURE_BYTES];
+            System.arraycopy(payload, 0, pl, 0, Signature.SIGNATURE_BYTES);
+            sig.setData(pl);
+            byte[] hash = new byte[Hash.HASH_LENGTH];
+            System.arraycopy(payload, Signature.SIGNATURE_BYTES, hash, 0, Hash.HASH_LENGTH);
+            signerHash = new Hash(hash);
+            System.out.println("Destination is signed by " + Base32.encode(hash) + ".b32.i2p");
+        } else {
+            System.out.println("Bad signed cert - length = " + payload.length);
+            return false;
+        }
      
         String[] filenames = new String[] {"privatehosts.txt", "userhosts.txt", "hosts.txt"};
+        int tried = 0;
         for (int i = 0; i < filenames.length; i++) { 
             Properties hosts = new Properties();
             try {
                 File f = new File(filenames[i]);
                 if ( (f.exists()) && (f.canRead()) ) {
                     DataHelper.loadProps(hosts, f, true);
+                    int sz = hosts.size();
+                    if (sz > 0) {
+                        tried += sz;
+                        if (signerHash == null)
+                            System.out.println("Attempting to verify using " + sz + " hosts, this may take a while");
+                    }
                     
                     for (Iterator iter = hosts.entrySet().iterator(); iter.hasNext(); )  {
                         Map.Entry entry = (Map.Entry)iter.next();
                         String s = (String) entry.getValue();
                         Destination signer = new Destination(s);
-                        if (checkSignature(sig, data, signer.getSigningPublicKey())) {
-                            System.out.println("Good signature from: " + entry.getKey());
-                            return true;
+                        // make it go faster if we have the signerHash hint
+                        if (signerHash == null || signer.calculateHash().equals(signerHash)) {
+                            if (checkSignature(sig, data, signer.getSigningPublicKey())) {
+                                System.out.println("Good signature from: " + entry.getKey());
+                                return true;
+                            }
+                            if (signerHash != null) {
+                                System.out.println("Bad signature from: " + entry.getKey());
+                                // could probably return false here but keep going anyway
+                            }
                         }
                     }
                 }
@@ -342,7 +379,10 @@ public class PrivateKeyFile {
             }
             // not found, continue to the next file
         }
-        System.out.println("No valid signer found");
+        if (tried > 0)
+            System.out.println("No valid signer found");
+        else
+            System.out.println("No addressbooks found to valididate signer");
         return false;
     }
 

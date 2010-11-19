@@ -21,7 +21,7 @@
 <div class="messages">
 <i><jsp:getProperty name="updatehelper" property="newsStatus" /></i></div>
 <div class="configure">
- <form action="configupdate.jsp" method="POST">
+ <form action="" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigUpdateHandler.nonce");
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigUpdateHandler.noncePrev", prev);
     System.setProperty("net.i2p.router.web.ConfigUpdateHandler.nonce", new java.util.Random().nextLong()+""); %>

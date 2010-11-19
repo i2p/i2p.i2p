@@ -74,7 +74,7 @@ class ProfileOrganizerRenderer {
         if (older > 0)
             buf.append(_("Hiding {0} older profiles.", older)).append('\n');
         if (standard > 0)
-            buf.append("<a href=\"/profiles.jsp?f=1\">").append(_("Hiding {0} standard profiles.", standard)).append("</a>\n");
+            buf.append("<a href=\"/profiles?f=1\">").append(_("Hiding {0} standard profiles.", standard)).append("</a>\n");
         buf.append("</p>");
                    buf.append("<table>");
                    buf.append("<tr>");
@@ -173,7 +173,7 @@ class ProfileOrganizerRenderer {
             buf.append("&nbsp;</td>");
             buf.append("<td nowrap align=\"center\"><a target=\"_blank\" href=\"dumpprofile.jsp?peer=")
                .append(peer.toBase64().substring(0,6)).append("\">").append(_("profile")).append("</a>");
-            buf.append("&nbsp;<a href=\"configpeer.jsp?peer=").append(peer.toBase64()).append("\">+-</a></td>\n");
+            buf.append("&nbsp;<a href=\"configpeer?peer=").append(peer.toBase64()).append("\">+-</a></td>\n");
             buf.append("</tr>");
             // let's not build the whole page in memory (~500 bytes per peer)
             out.write(buf.toString());

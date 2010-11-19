@@ -49,25 +49,36 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
     private static final String TEMP_NEWS_FILE = "news.xml.temp";
     /** @since 0.7.14 not configurable */
     private static final String BACKUP_NEWS_URL = "http://www.i2p2.i2p/_static/news/news.xml";
+    private static final String PROP_LAST_CHECKED = "router.newsLastChecked";
     
     private NewsFetcher(I2PAppContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(NewsFetcher.class);
         _instance = this;
-        _lastFetch = 0;
+        try {
+            String last = ctx.getProperty(PROP_LAST_CHECKED);
+            if (last != null)
+                _lastFetch = Long.parseLong(last);
+        } catch (NumberFormatException nfe) {}
         _newsFile = new File(_context.getRouterDir(), NEWS_FILE);
         _tempFile = new File(_context.getTempDir(), TEMP_NEWS_FILE);
         updateLastFetched();
-        _lastUpdated = _lastFetch;
         _updateVersion = "";
     }
     
     private void updateLastFetched() {
         if (_newsFile.exists()) {
+            if (_lastUpdated == 0)
+                _lastUpdated = _newsFile.lastModified();
             if (_lastFetch == 0)
-                _lastFetch = _newsFile.lastModified();
-        } else
+                _lastFetch = _lastUpdated;
+            if (_lastModified == null)
+                _lastModified = to822Date(_lastFetch);
+        } else {
+            _lastUpdated = 0;
             _lastFetch = 0;
+            _lastModified = null;
+        }
     }
     
     public boolean updateAvailable() { return _updateAvailable; }
@@ -136,7 +147,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
                 return true;
             } else {
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Last fetched " + DataHelper.formatDuration2(_context.clock().now() - _lastFetch) + " ago");
+                    _log.debug("Last fetched " + DataHelper.formatDuration(_context.clock().now() - _lastFetch) + " ago");
                 return false;
             }
         } catch (NumberFormatException nfe) {
@@ -273,6 +284,11 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         return -1;
     }
 
+    /** @since 0.8.2 */
+    private static String to822Date(long t) {
+        return (new SimpleDateFormat("d MMM yyyy HH:mm:ss z", Locale.US)).format(new Date(t));
+    }
+
     private static final String VERSION_STRING = "version=\"" + RouterVersion.VERSION + "\"";
     private static final String VERSION_PREFIX = "version=\"";
     private void checkForUpdates() {
@@ -374,6 +390,10 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
                 _log.warn("Transfer complete, but no file? - probably 304 Not Modified");
         }
         _lastFetch = now;
+        if (_context.isRouterContext()) {
+            ((RouterContext)_context).router().setConfigSetting(PROP_LAST_CHECKED, "" + now);
+            ((RouterContext)_context).router().saveConfig();
+        }
     }
     
     public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {

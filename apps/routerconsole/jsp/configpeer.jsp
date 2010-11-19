@@ -27,7 +27,7 @@
         peer = net.i2p.data.DataHelper.stripHTML(request.getParameter("peer"));  // XSS
  %>
  <div class="configure">
- <form action="configpeer.jsp" method="POST">
+ <form action="" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigPeerHandler.nonce");
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigPeerHandler.noncePrev", prev);
     System.setProperty("net.i2p.router.web.ConfigPeerHandler.nonce", new java.util.Random().nextLong()+""); %>
@@ -49,7 +49,7 @@
       </div>
 
  <h3><%=intl._("Adjust Profile Bonuses")%></h3>
- <p><%=intl._("Bonuses may be positive or negative, and affect the peer's inclusion in Fast and High Capacity tiers. Fast peers are used for client tunnels, and High Capacity peers are used for some exploratory tunnels. Current bonuses are displayed on the")%> <a href="profiles.jsp"><%=intl._("profiles page")%></a>.</p>
+ <p><%=intl._("Bonuses may be positive or negative, and affect the peer's inclusion in Fast and High Capacity tiers. Fast peers are used for client tunnels, and High Capacity peers are used for some exploratory tunnels. Current bonuses are displayed on the")%> <a href="profiles"><%=intl._("profiles page")%></a>.</p>
  <% long speed = 0; long capacity = 0;
     if (! "".equals(peer)) {
         // get existing bonus values?

@@ -127,8 +127,8 @@ public class GraphHelper extends HelperBase {
     public String getForm() { 
         saveSettings();
         try {
-            _out.write("<br><h3>" + _("Configure Graph Display") + " [<a href=\"configstats.jsp\">" + _("Select Stats") + "</a>]</h3>");
-            _out.write("<form action=\"graphs.jsp\" method=\"GET\">");
+            _out.write("<br><h3>" + _("Configure Graph Display") + " [<a href=\"configstats\">" + _("Select Stats") + "</a>]</h3>");
+            _out.write("<form action=\"graphs\" method=\"POST\">");
             _out.write(_("Periods") + ": <input size=\"3\" type=\"text\" name=\"periodCount\" value=\"" + _periodCount + "\"><br>\n");
             _out.write(_("Plot averages") + ": <input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"false\" " + (_showEvents ? "" : "checked=\"true\" ") + "> ");
             _out.write(_("or")+ " " +_("plot events") + ": <input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"true\" "+ (_showEvents ? "checked=\"true\" " : "") + "><br>\n");

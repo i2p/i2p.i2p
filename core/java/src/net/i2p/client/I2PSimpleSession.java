@@ -86,10 +86,10 @@ class I2PSimpleSession extends I2PSessionImpl2 {
 
         } catch (UnknownHostException uhe) {
             _closed = true;
-            throw new I2PSessionException(getPrefix() + "Bad host ", uhe);
+            throw new I2PSessionException(getPrefix() + "Cannot connect to the router on " + _hostname + ':' + _portNum, uhe);
         } catch (IOException ioe) {
             _closed = true;
-            throw new I2PSessionException(getPrefix() + "Problem connecting to " + _hostname + " on port " + _portNum, ioe);
+            throw new I2PSessionException(getPrefix() + "Cannot connect to the router on " + _hostname + ':' + _portNum, ioe);
         }
     }
 

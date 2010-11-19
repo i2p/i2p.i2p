@@ -33,7 +33,7 @@ import java.util.Date;
  * @author Ragnarok
  *  
  */
-public class Log {
+class Log {
 
     private File file;
 

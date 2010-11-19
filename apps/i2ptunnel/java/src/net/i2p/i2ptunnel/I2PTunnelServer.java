@@ -61,16 +61,24 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     private int DEFAULT_LOCALPORT = 4488;
     protected int localPort = DEFAULT_LOCALPORT;
 
+    /**
+     * @throws IllegalArgumentException if the I2CP configuration is b0rked so
+     *                                  badly that we cant create a socketManager
+     */
     public I2PTunnelServer(InetAddress host, int port, String privData, Logging l, EventDispatcher notifyThis, I2PTunnel tunnel) {
-        super(host + ":" + port + " <- " + privData, notifyThis, tunnel);
+        super("Server at " + host + ':' + port, notifyThis, tunnel);
         ByteArrayInputStream bais = new ByteArrayInputStream(Base64.decode(privData));
         SetUsePool(tunnel);
         init(host, port, bais, privData, l);
     }
 
+    /**
+     * @throws IllegalArgumentException if the I2CP configuration is b0rked so
+     *                                  badly that we cant create a socketManager
+     */
     public I2PTunnelServer(InetAddress host, int port, File privkey, String privkeyname, Logging l,
                            EventDispatcher notifyThis, I2PTunnel tunnel) {
-        super(host + ":" + port + " <- " + privkeyname, notifyThis, tunnel);
+        super("Server at " + host + ':' + port, notifyThis, tunnel);
         SetUsePool(tunnel);
         FileInputStream fis = null;
         try {
@@ -85,8 +93,12 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         }
     }
 
+    /**
+     * @throws IllegalArgumentException if the I2CP configuration is b0rked so
+     *                                  badly that we cant create a socketManager
+     */
     public I2PTunnelServer(InetAddress host, int port, InputStream privData, String privkeyname, Logging l,  EventDispatcher notifyThis, I2PTunnel tunnel) {
-        super(host + ":" + port + " <- " + privkeyname, notifyThis, tunnel);
+        super("Server at " + host + ':' + port, notifyThis, tunnel);
         SetUsePool(tunnel);
         init(host, port, privData, privkeyname, l);
     }
@@ -100,6 +112,13 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
             _usePool = DEFAULT_USE_POOL;
     }
 
+    private static final int RETRY_DELAY = 20*1000;
+    private static final int MAX_RETRIES = 4;
+
+    /**
+     * @throws IllegalArgumentException if the I2CP configuration is b0rked so
+     *                                  badly that we cant create a socketManager
+     */
     private void init(InetAddress host, int port, InputStream privData, String privkeyname, Logging l) {
         this.l = l;
         this.remoteHost = host;
@@ -111,7 +130,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
             try {
                 portNum = Integer.parseInt(getTunnel().port);
             } catch (NumberFormatException nfe) {
-                _log.log(Log.CRIT, "Invalid port specified [" + getTunnel().port + "], reverting to " + portNum);
+                _log.error("Invalid port specified [" + getTunnel().port + "], reverting to " + portNum);
             }
         }
 
@@ -125,6 +144,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         }
 
         // Todo: Can't stop a tunnel from the UI while it's in this loop (no session yet)
+        int retries = 0;
         while (sockMgr == null) {
             synchronized (slock) {
                 sockMgr = I2PSocketManagerFactory.createManager(privDataCopy, getTunnel().host, portNum,
@@ -132,15 +152,25 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
 
             }
             if (sockMgr == null) {
-                _log.log(Log.CRIT, "Unable to create socket manager");
-                try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
+                // try to make this error sensible as it will happen...
+                String msg = "Unable to connect to the router at " + getTunnel().host + ':' + portNum +
+                             " and build tunnels for the server at " + getTunnel().listenHost + ':' + port;
+                if (++retries < MAX_RETRIES) {
+                    this.l.log(msg + ", retrying in " + (RETRY_DELAY / 1000) + " seconds");
+                    _log.error(msg + ", retrying in " + (RETRY_DELAY / 1000) + " seconds");
+                } else {
+                    this.l.log(msg + ", giving up");
+                    _log.log(Log.CRIT, msg + ", giving up");
+                    throw new IllegalArgumentException(msg);
+                }
+                try { Thread.sleep(RETRY_DELAY); } catch (InterruptedException ie) {}
                 privDataCopy.reset();
             }
         }
 
         sockMgr.setName("Server");
         getTunnel().addSession(sockMgr.getSession());
-        l.log("Ready!");
+        l.log("Tunnels ready for server at " + getTunnel().listenHost + ':' + port);
         notifyEvent("openServerResult", "ok");
         open = true;
     }
@@ -206,7 +236,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 }
                 return false;
             }
-            l.log("Shutting down server " + toString());
+            l.log("Stopping tunnels for server at " + getTunnel().listenHost + ':' + this.remotePort);
             try {
                 if (i2pss != null) i2pss.close();
                 getTunnel().removeSession(sockMgr.getSession());
@@ -215,7 +245,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 _log.error("Error destroying the session", ex);
                 //System.exit(1);
             }
-            l.log("Server shut down.");
+            //l.log("Server shut down.");
             open = false;
             return true;
         }

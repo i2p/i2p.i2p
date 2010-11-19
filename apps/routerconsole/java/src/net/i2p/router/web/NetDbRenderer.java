@@ -105,7 +105,7 @@ public class NetDbRenderer {
     public void renderLeaseSetHTML(Writer out, boolean debug) throws IOException {
         StringBuilder buf = new StringBuilder(4*1024);
         buf.append("<h2>" + _("Network Database Contents") + "</h2>\n");
-        buf.append("<a href=\"netdb.jsp\">" + _("View RouterInfo") + "</a>");
+        buf.append("<a href=\"netdb\">" + _("View RouterInfo") + "</a>");
         buf.append("<h3>").append(_("LeaseSets")).append("</h3>\n");
         Hash ourRKey;
         Set<LeaseSet> leases;
@@ -130,7 +130,7 @@ public class NetDbRenderer {
             Hash key = dest.calculateHash();
             buf.append("<b>").append(_("LeaseSet")).append(": ").append(key.toBase64());
             if (_context.clientManager().isLocal(dest)) {
-                buf.append(" (<a href=\"tunnels.jsp#" + key.toBase64().substring(0,4) + "\">" + _("Local") + "</a> ");
+                buf.append(" (<a href=\"tunnels#" + key.toBase64().substring(0,4) + "\">" + _("Local") + "</a> ");
                 if (! _context.clientManager().shouldPublishLeaseSet(key))
                     buf.append(_("Unpublished") + ' ');
                 buf.append(_("Destination") + ' ');
@@ -212,7 +212,7 @@ public class NetDbRenderer {
      *  @param mode 0: our info and charts only; 1: full routerinfos and charts; 2: abbreviated routerinfos and charts
      */
     public void renderStatusHTML(Writer out, int mode) throws IOException {
-        out.write("<h2>" + _("Network Database Contents") + " (<a href=\"netdb.jsp?l=1\">" + _("View LeaseSets") + "</a>)</h2>\n");
+        out.write("<h2>" + _("Network Database Contents") + " (<a href=\"netdb?l=1\">" + _("View LeaseSets") + "</a>)</h2>\n");
         if (!_context.netDb().isInitialized()) {
             out.write(_("Not initialized"));
             out.flush();
@@ -223,7 +223,7 @@ public class NetDbRenderer {
         boolean shortStats = mode == 2;
         boolean showStats = full || shortStats;
         Hash us = _context.routerHash();
-        out.write("<a name=\"routers\" ></a><h3>" + _("Routers") + " (<a href=\"netdb.jsp");
+        out.write("<a name=\"routers\" ></a><h3>" + _("Routers") + " (<a href=\"netdb");
         if (full || !showStats)
             out.write("?f=2#routers\" >" + _("Show all routers"));
         else
@@ -343,9 +343,9 @@ public class NetDbRenderer {
         } else {
             buf.append("<b>" + _("Peer info for") + ":</b> ").append(hash).append("\n");
             if (full) {
-                buf.append("[<a href=\"netdb.jsp\" >Back</a>]</th></tr><td>\n");
+                buf.append("[<a href=\"netdb\" >Back</a>]</th></tr><td>\n");
             } else {
-                buf.append("[<a href=\"netdb.jsp?r=").append(hash.substring(0, 6)).append("\" >").append(_("Full entry")).append("</a>]</th></tr><td>\n");
+                buf.append("[<a href=\"netdb?r=").append(hash.substring(0, 6)).append("\" >").append(_("Full entry")).append("</a>]</th></tr><td>\n");
             }
         }
         

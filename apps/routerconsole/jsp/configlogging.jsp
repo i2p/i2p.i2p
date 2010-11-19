@@ -19,7 +19,7 @@
  <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:getProperty name="formhandler" property="allMessages" />
 <div class="configure">
- <form action="configlogging.jsp" method="POST">
+ <form action="" method="POST">
  <% String prev = System.getProperty("net.i2p.router.web.ConfigLoggingHandler.nonce");
     if (prev != null) System.setProperty("net.i2p.router.web.ConfigLoggingHandler.noncePrev", prev);
     System.setProperty("net.i2p.router.web.ConfigLoggingHandler.nonce", new java.util.Random().nextLong()+""); %>
