@@ -157,6 +157,7 @@
         <ant dir="apps/susidns/src/" target="poupdate" />
     </target>
     <target name="javadoc">
+        <ant dir="apps/jetty" target="ensureJettylib" />
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc" />
         <!-- get release and build version numbers -->
