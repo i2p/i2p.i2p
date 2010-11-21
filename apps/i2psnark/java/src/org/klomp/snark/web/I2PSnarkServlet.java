@@ -618,10 +618,10 @@ public class I2PSnarkServlet extends Default {
             if (r.startsWith(skip))
                 r = r.substring(skip.length());
             String llc = l.toLowerCase();
-            if (llc.startsWith("the ") || llc.startsWith("the."))
+            if (llc.startsWith("the ") || llc.startsWith("the.") || llc.startsWith("the_"))
                 l = l.substring(4);
             String rlc = r.toLowerCase();
-            if (rlc.startsWith("the ") || rlc.startsWith("the."))
+            if (rlc.startsWith("the ") || rlc.startsWith("the.") || rlc.startsWith("the_"))
                 r = r.substring(4);
             return collator.compare(l, r);
         }
