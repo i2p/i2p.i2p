@@ -98,6 +98,7 @@ public class Connection {
         _log = _context.logManager().getLog(Connection.class);
         _receiver = new ConnectionDataReceiver(_context, this);
         _inputStream = new MessageInputStream(_context);
+        // FIXME pass through a passive flush delay setting as the 4th arg
         _outputStream = new MessageOutputStream(_context, _receiver, (opts == null ? Packet.MAX_PAYLOAD_SIZE : opts.getMaxMessageSize()));
         _outboundPackets = new TreeMap();
         _options = (opts != null ? opts : new ConnectionOptions());
