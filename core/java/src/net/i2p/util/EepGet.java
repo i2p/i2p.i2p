@@ -456,7 +456,7 @@ public class EepGet {
                 for (int i = 0; i < _listeners.size(); i++) 
                     _listeners.get(i).attemptFailed(_url, _bytesTransferred, _bytesRemaining, _currentAttempt, _numRetries, ioe);
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("ERR: doFetch failed " +  ioe);
+                    _log.warn("ERR: doFetch failed ", ioe);
                 if (ioe instanceof MalformedURLException)
                     _keepFetching = false;
             } finally {

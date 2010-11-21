@@ -245,7 +245,7 @@
         <delete file="debian/substvars"/>
     </target>
     <target name="distclean" depends="clean">
-        <delete includeemptydirs="true" removeNotFollowedSymlinks="true" failonerror="false" >
+        <delete includeemptydirs="true" failonerror="false" >
             <fileset dir="debian/packages" followSymlinks="false" />
         </delete>
         <delete dir="debian/repo" />
@@ -368,7 +368,7 @@
         </copy>
     </target>
 
-    <target name="preppkg-base" depends="build, preplicenses, prepconsoleDocs">
+    <target name="preppkg-base" depends="build, preplicenses, prepConsoleDocs, prepthemeupdates, prepCertificates">
         <!-- if updater200 was run previously, it left *.pack files in pkg-temp -->
         <delete>
             <fileset dir="pkg-temp" includes="**/*.jar.pack **/*.war.pack" />
@@ -419,10 +419,6 @@
         <copy file="installer/resources/start.ico" todir="pkg-temp/docs/" />
         <copy file="installer/resources/console.ico" todir="pkg-temp/docs/" />
         <copy file="installer/resources/uninstall.ico" todir="pkg-temp/docs/" />
-        <mkdir dir="pkg-temp/docs/themes/" />
-        <copy todir="pkg-temp/docs/themes/" >
-          <fileset dir="installer/resources/themes/" />
-        </copy>
         <!-- Eepsite stuff here -->
         <mkdir dir="pkg-temp/eepsite" />
         <mkdir dir="pkg-temp/eepsite/webapps" />
@@ -455,42 +451,17 @@
         <copy file="installer/lib/launch4j/lib/JGoodies.Looks.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-JGoodies-Looks.txt" />
         <copy file="installer/lib/launch4j/lib/XStream.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-XStream.txt" />
     </target>
+
     <target name="prepthemeupdates">
-        <!-- Migrated all Snark content to its own dir. Need to ensure snark dir excluded from console theme choices!! -->
-        <!-- Snark's visible Assets -->
-        <copy todir="pkg-temp/docs/themes/snark/ubergine/" >
-            <fileset dir="installer/resources/themes/snark/ubergine/" />
+        <copy todir="pkg-temp/docs/themes/" >
+            <fileset dir="installer/resources/themes/" />
         </copy>
-        <!-- No need to copy these individually, we're copying the whole dir below.. 
-        <copy file="installer/resources/themes/console/images/favicon.ico" todir="pkg-temp/docs/themes/console/images/" />
-        <copy file="installer/resources/themes/console/images/i2plogo.png" todir="pkg-temp/docs/themes/console/images/" />
-        -->
-        <!-- Since the logo moved, we have to update the error pages -->
-        <copy todir="pkg-temp/docs/" >
-          <fileset dir="installer/resources/proxy" />
-        </copy>
-        <!-- make a "classic" theme -->
-        <copy todir="pkg-temp/docs/themes/console/classic/" >
-            <fileset  dir="installer/resources/themes/console/classic/" />
-        </copy>
-        <!-- Add dark theme -->
-        <copy todir="pkg-temp/docs/themes/console/dark/" >
-            <fileset  dir="installer/resources/themes/console/dark/" />
-        </copy>
-        <!-- Add light theme -->
-        <copy todir="pkg-temp/docs/themes/console/light/" >
-            <fileset  dir="installer/resources/themes/console/light/" />
-        </copy>
-         <!-- Add midnight theme -->
-        <copy todir="pkg-temp/docs/themes/console/midnight/" >
-            <fileset  dir="installer/resources/themes/console/midnight/" />
-        </copy>        
-        <!-- Add shared images.. these are subject to flux and change! -->
-        <copy todir="pkg-temp/docs/themes/console/images/" >
-            <fileset  dir="installer/resources/themes/console/images/" />
-        </copy>          
-        <copy todir="pkg-temp/docs/" >
-          <fileset dir="installer/resources/readme/" includes="readme*.html" />
+    </target>
+
+    <!-- SSL Certs -->
+    <target name="prepCertificates">
+        <copy todir="pkg-temp/certificates/" >
+          <fileset dir="installer/resources/certificates/" />
         </copy>
     </target>
 
@@ -500,16 +471,23 @@
             <tarfileset dir="pkg-temp" includes="**/*" prefix="i2p" />
         </tar>
     </target>
+
     <target name="deletepkg-temp">
         <delete dir="pkg-temp" />
     </target>
-    <target name="prepconsoleDocs" depends="prepgeoupdate">
+
+    <!-- readme and proxy error page files, GeoIP files, and flag icons -->
+    <target name="prepConsoleDocs" depends="prepConsoleDocUpdates, prepgeoupdate" />
+
+    <!-- readme and proxy error page files -->
+    <target name="prepConsoleDocUpdates">
         <copy todir="pkg-temp/docs/" >
           <fileset dir="installer/resources/readme/" includes="readme*.html" />
-          <fileset dir="installer/resources/proxy" />
+          <fileset dir="installer/resources/proxy/" includes="*.ht" />
         </copy>
     </target>
-    <target name="consoleDocs" depends="deletepkg-temp, prepconsoleDocs">
+
+    <target name="consoleDocs" depends="deletepkg-temp, prepConsoleDocs">
         <zip destfile="docs.zip" basedir="pkg-temp" whenempty="fail" />
     </target>
 
@@ -560,7 +538,8 @@
         <copy file="core/java/build/i2ptest.jar" todir="pkg-temp/lib" />
         <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
     </target>
-    <target name="prepupdate" depends="build2, prepupdateSmall">
+
+    <target name="prepupdate" depends="build2, prepupdateSmall, prepConsoleDocUpdates, prepCertificates">
         <copy file="build/BOB.jar" todir="pkg-temp/lib/" />
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2psnark.jar" todir="pkg-temp/lib" />
@@ -587,6 +566,7 @@
         <copy file="installer/resources/news.xml" todir="pkg-temp/docs/" />
        -->
     </target>
+
     <target name="prepupdateSmall" depends="buildSmall, prepupdateRouter, prepthemeupdates">
         <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
         <copy file="build/mstreaming.jar" todir="pkg-temp/lib/" />
@@ -601,10 +581,13 @@
         <!-- decapitalized the file in 0.7.8 -->
        <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
     </target>
+
     <target name="prepupdateRouter" depends="buildrouter, deletepkg-temp">
         <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
         <copy file="build/router.jar" todir="pkg-temp/lib/" />
     </target>
+
+    <!-- GeoIP files and flag icons -->
     <target name="prepgeoupdate">
         <copy file="installer/resources/geoip.txt" todir="pkg-temp/geoip/" />
         <copy file="installer/resources/countries.txt" todir="pkg-temp/geoip/" />
@@ -612,6 +595,7 @@
           <fileset dir="installer/resources/icons/flags" />
         </copy>
     </target>
+
     <target name="prepjupdate" depends="prepupdate, buildWEB">
         <copy file="build/jasper-compiler.jar" todir="pkg-temp/lib/" />
         <copy file="build/jasper-runtime.jar" todir="pkg-temp/lib/" />
