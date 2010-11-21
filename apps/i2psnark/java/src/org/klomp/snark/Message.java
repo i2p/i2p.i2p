@@ -39,22 +39,27 @@ class Message
   final static byte REQUEST      = 6;
   final static byte PIECE        = 7;
   final static byte CANCEL       = 8;
+  final static byte EXTENSION    = 20;
   
   // Not all fields are used for every message.
   // KEEP_ALIVE doesn't have a real wire representation
   byte type;
 
   // Used for HAVE, REQUEST, PIECE and CANCEL messages.
+  // low byte used for EXTENSION message
   int piece;
 
   // Used for REQUEST, PIECE and CANCEL messages.
   int begin;
   int length;
 
-  // Used for PIECE and BITFIELD messages
+  // Used for PIECE and BITFIELD and EXTENSION messages
   byte[] data;
   int off;
   int len;
+
+  // Used to do deferred fetch of data
+  DataLoader dataLoader;
 
   SimpleTimer.TimedEvent expireEvent;
   
@@ -67,6 +72,13 @@ class Message
         dos.writeInt(0);
         return;
       }
+
+    // Get deferred data
+    if (data == null && dataLoader != null) {
+        data = dataLoader.loadData(piece, begin, length);
+        if (data == null)
+            return;  // hmm will get retried, but shouldn't happen
+    }
 
     // Calculate the total length in bytes
 
@@ -85,8 +97,12 @@ class Message
     if (type == REQUEST || type == CANCEL)
       datalen += 4;
 
+    // length is 1 byte
+    if (type == EXTENSION)
+      datalen += 1;
+
     // add length of data for piece or bitfield array.
-    if (type == BITFIELD || type == PIECE)
+    if (type == BITFIELD || type == PIECE || type == EXTENSION)
       datalen += len;
 
     // Send length
@@ -105,8 +121,11 @@ class Message
     if (type == REQUEST || type == CANCEL)
         dos.writeInt(length);
 
+    if (type == EXTENSION)
+        dos.writeByte((byte) piece & 0xff);
+
     // Send actual data
-    if (type == BITFIELD || type == PIECE)
+    if (type == BITFIELD || type == PIECE || type == EXTENSION)
       dos.write(data, off, len);
   }
 
@@ -135,6 +154,8 @@ class Message
         return "PIECE(" + piece + "," + begin + "," + length + ")";
       case CANCEL:
         return "CANCEL(" + piece + "," + begin + "," + length + ")";
+      case EXTENSION:
+        return "EXTENSION(" + piece + ',' + data.length + ')';
       default:
         return "<UNKNOWN>";
       }

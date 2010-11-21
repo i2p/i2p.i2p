@@ -430,6 +430,33 @@ class PeerConnectionOut implements Runnable
     return total;
   }
 
+  /** @since 0.8.2 */
+  void sendPiece(int piece, int begin, int length, DataLoader loader)
+  {
+      boolean sendNow = false;
+      // are there any cases where we should?
+
+      if (sendNow) {
+        // queue the real thing
+        byte[] bytes = loader.loadData(piece, begin, length);
+        if (bytes != null)
+            sendPiece(piece, begin, length, bytes);
+        return;
+      }
+
+      // queue a fake message... set everything up,
+      // except save the PeerState instead of the bytes.
+      Message m = new Message();
+      m.type = Message.PIECE;
+      m.piece = piece;
+      m.begin = begin;
+      m.length = length;
+      m.dataLoader = loader;
+      m.off = 0;
+      m.len = length;
+      addMessage(m);
+  }
+
   void sendPiece(int piece, int begin, int length, byte[] bytes)
   {
     Message m = new Message();
@@ -487,5 +514,17 @@ class PeerConnectionOut implements Runnable
               it.remove();
           }
       }
+  }
+
+  /** @since 0.8.2 */
+  void sendExtension(int id, byte[] bytes) {
+    Message m = new Message();
+    m.type = Message.EXTENSION;
+    m.piece = id;
+    m.data = bytes;
+    m.begin = 0;
+    m.length = bytes.length;
+    addMessage(m);
+
   }
 }
