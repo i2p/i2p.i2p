@@ -366,7 +366,13 @@ public class I2PSnarkServlet extends Default {
         String action = req.getParameter("action");
         if (action == null) {
             // noop
-        } else if ("Add".equals(action)) {
+            return;
+        }
+        String method = req.getMethod();
+        // check in each clause until all disallow GET
+        if ("Add".equals(action)) {
+            if (!method.equals("POST"))
+                return;
             String newFile = req.getParameter("newFile");
             String newURL = req.getParameter("newURL");
             // NOTE - newFile currently disabled in HTML form - see below
@@ -508,6 +514,8 @@ public class I2PSnarkServlet extends Default {
                 }
             }
         } else if ("Save".equals(action)) {
+            if (!method.equals("POST"))
+                return;
             String dataDir = req.getParameter("dataDir");
             boolean autoStart = req.getParameter("autoStart") != null;
             String seedPct = req.getParameter("seedPct");
@@ -523,6 +531,8 @@ public class I2PSnarkServlet extends Default {
             String openTrackers = req.getParameter("openTrackers");
             _manager.updateConfig(dataDir, autoStart, startupDel, seedPct, eepHost, eepPort, i2cpHost, i2cpPort, i2cpOpts, upLimit, upBW, useOpenTrackers, openTrackers);
         } else if ("Create".equals(action)) {
+            if (!method.equals("POST"))
+                return;
             String baseData = req.getParameter("baseFile");
             if (baseData != null && baseData.trim().length() > 0) {
                 File baseFile = new File(_manager.getDataDir(), baseData);
