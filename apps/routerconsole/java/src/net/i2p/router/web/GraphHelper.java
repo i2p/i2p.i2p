@@ -1,6 +1,7 @@
 package net.i2p.router.web;
 
 import java.io.IOException;
+import java.io.Writer;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -9,7 +10,8 @@ import java.util.TreeSet;
 import net.i2p.data.DataHelper;
 import net.i2p.stat.Rate;
 
-public class GraphHelper extends HelperBase {
+public class GraphHelper extends FormHandler {
+    protected Writer _out;
     private int _periodCount;
     private boolean _showEvents;
     private int _width;
@@ -29,9 +31,6 @@ public class GraphHelper extends HelperBase {
     static final int MAX_Y = 1024;
     private static final int MIN_REFRESH = 15;
     
-    public GraphHelper() {
-    }
-
     /** set the defaults after we have a context */
     @Override
     public void setContextId(String contextId) {
@@ -43,6 +42,12 @@ public class GraphHelper extends HelperBase {
         _showEvents = Boolean.valueOf(_context.getProperty(PROP_EVENTS)).booleanValue();
     }
     
+    /**
+     *  This was a HelperBase but now it's a FormHandler
+     *  @since 0.8.2
+     */
+    public void storeWriter(Writer out) { _out = out; }
+
     public void setPeriodCount(String str) { 
         try { _periodCount = Integer.parseInt(str); } catch (NumberFormatException nfe) {}
     }
@@ -125,10 +130,15 @@ public class GraphHelper extends HelperBase {
     }
 
     public String getForm() { 
-        saveSettings();
+        String prev = System.getProperty("net.i2p.router.web.GraphHelper.nonce");
+        if (prev != null) System.setProperty("net.i2p.router.web.GraphHelper.noncePrev", prev);
+        String nonce = "" + _context.random().nextLong();
+        System.setProperty("net.i2p.router.web.GraphHelper.nonce", nonce);
         try {
             _out.write("<br><h3>" + _("Configure Graph Display") + " [<a href=\"configstats\">" + _("Select Stats") + "</a>]</h3>");
-            _out.write("<form action=\"graphs\" method=\"POST\">");
+            _out.write("<form action=\"graphs\" method=\"POST\">\n" +
+                       "<input type=\"hidden\" name=\"action\" value=\"foo\">\n" +
+                       "<input type=\"hidden\" name=\"nonce\" value=\"" + nonce + "\" >\n");
             _out.write(_("Periods") + ": <input size=\"3\" type=\"text\" name=\"periodCount\" value=\"" + _periodCount + "\"><br>\n");
             _out.write(_("Plot averages") + ": <input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"false\" " + (_showEvents ? "" : "checked=\"true\" ") + "> ");
             _out.write(_("or")+ " " +_("plot events") + ": <input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"true\" "+ (_showEvents ? "checked=\"true\" " : "") + "><br>\n");
@@ -141,6 +151,15 @@ public class GraphHelper extends HelperBase {
             ioe.printStackTrace();
         }
         return ""; 
+    }
+
+    /**
+     *  This was a HelperBase but now it's a FormHandler
+     *  @since 0.8.2
+     */
+    @Override
+    protected void processForm() {
+        saveSettings();
     }
 
     /**
@@ -159,6 +178,7 @@ public class GraphHelper extends HelperBase {
             _context.router().setConfigSetting(PROP_REFRESH, "" + _refreshDelaySeconds);
             _context.router().setConfigSetting(PROP_EVENTS, "" + _showEvents);
             _context.router().saveConfig();
+            addFormNotice(_("Graph settings saved"));
         }
     }
 

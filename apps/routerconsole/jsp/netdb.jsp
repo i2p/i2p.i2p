@@ -12,7 +12,7 @@
  <div class="wideload">
  <jsp:useBean class="net.i2p.router.web.NetDbHelper" id="netdbHelper" scope="request" />
  <jsp:setProperty name="netdbHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
- <jsp:setProperty name="netdbHelper" property="writer" value="<%=out%>" />
+ <% netdbHelper.storeWriter(out); %>
  <jsp:setProperty name="netdbHelper" property="full" value="<%=request.getParameter("f")%>" />
  <jsp:setProperty name="netdbHelper" property="router" value="<%=request.getParameter("r")%>" />
  <jsp:setProperty name="netdbHelper" property="lease" value="<%=request.getParameter("l")%>" />

@@ -10,7 +10,7 @@
 <div class="main" id="main"><div class="wideload">
  <jsp:useBean class="net.i2p.router.web.ProfilesHelper" id="profilesHelper" scope="request" />
  <jsp:setProperty name="profilesHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
- <jsp:setProperty name="profilesHelper" property="writer" value="<%=out%>" />
+ <% profilesHelper.storeWriter(out); %>
  <jsp:setProperty name="profilesHelper" property="full" value="<%=request.getParameter("f")%>" />
  <jsp:getProperty name="profilesHelper" property="profileSummary" />
  <a name="shitlist"> </a><h2><%=intl._("Banned Peers")%></h2>

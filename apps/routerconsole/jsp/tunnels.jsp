@@ -10,6 +10,6 @@
 <div class="main" id="main">
  <jsp:useBean class="net.i2p.router.web.TunnelHelper" id="tunnelHelper" scope="request" />
  <jsp:setProperty name="tunnelHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
- <jsp:setProperty name="tunnelHelper" property="writer" value="<%=out%>" />
+ <% tunnelHelper.storeWriter(out); %>
  <jsp:getProperty name="tunnelHelper" property="tunnelSummary" />
 </div></body></html>
