@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-11-18 18:05+0000\n"
-"PO-Revision-Date: 2010-11-19 19:31+0100\n"
+"PO-Revision-Date: 2010-11-21 19:07+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -113,7 +113,7 @@ msgstr "Verbinde mit I2P"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:455
 msgid "Error connecting to I2P - check your I2CP settings!"
-msgstr "Fehler beim Verbinden mit I2P - Kontrollieren Sie die I2CP EInstellungen!"
+msgstr "Fehler beim Verbinden mit I2P - Kontrollieren Sie die I2CP Einstellungen!"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:464
 #, java-format
@@ -124,7 +124,7 @@ msgstr "Fehler: Konnte den Torrent nicht hinzufügen {0}"
 #: ../java/src/org/klomp/snark/SnarkManager.java:486
 #, java-format
 msgid "Cannot open \"{0}\""
-msgstr "Kann dies nicht öffnen:  \"{0}\""
+msgstr "Kann dies nicht öffnen: \"{0}\""
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:499
 #, java-format
@@ -169,17 +169,17 @@ msgstr "Keine Teile in \"{0}\", wird entfernt!"
 #: ../java/src/org/klomp/snark/SnarkManager.java:698
 #, java-format
 msgid "Too many pieces in \"{0}\", limit is {1}, deleting it!"
-msgstr "Zu viele Teile in  \"{0}\" , das Limit sind {1}, werden gelöscht!"
+msgstr "Zu viele Teile in  \"{0}\", das Limit sind {1}, werden gelöscht!"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:700
 #, java-format
 msgid "Pieces are too large in \"{0}\" ({1}B), deleting it."
-msgstr "Teile sind zu groß in \"{0}\" ({1}B), lösche es."
+msgstr "Teile in \"{0}\" sind zu groß ({1}B), lösche es."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:701
 #, java-format
 msgid "Limit is {0}B"
-msgstr "Limit ist \"{0}\"Byte"
+msgstr "Limit ist \"{0}\"Bytes"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:709
 #, java-format
@@ -671,7 +671,7 @@ msgstr "Minuten"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1132
 msgid "Total uploader limit"
-msgstr "Gesamtlimit an Hochladern."
+msgstr "Gesamtlimit an Hochladern"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1135
 msgid "peers"
@@ -679,7 +679,7 @@ msgstr "Teilnehmer"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1139
 msgid "Up bandwidth limit"
-msgstr "Bandbreitenbegrenzung beim Hochladen."
+msgstr "Bandbreitenbegrenzung beim Hochladen"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1142
 msgid "Half available bandwidth recommended."
@@ -699,7 +699,7 @@ msgstr "Wenn markiert, wird der Torrent neben dem angegebenen Tracker auch bei d
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1156
 msgid "Open tracker announce URLs"
-msgstr "OpenTracker-Announce-URL"
+msgstr "OpenTracker-Announce-URLs"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1168
 msgid "Inbound Settings"
