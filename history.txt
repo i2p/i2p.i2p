@@ -1,3 +1,26 @@
+2010-11-22 zzz
+    * Addressbook: Fix rename error on Windows (tkt 323 - thanks RN!)
+    * build.xml: Cleanup, fix distclean error in older ants.
+    * Console:
+      - Convert GraphHelper to a FormHandler
+      - Require POST for all forms
+      - Change the way we store the Writer to prevent problems
+      - Fix bonus setting on configpeer.jsp
+      - More ".jsp" removal
+    * i2psnark:
+      - Defer piece loading until required
+      - Stub out Extension message support
+      - Convert GET to POST, require POST
+    * NTCP: Log tweak
+    * SSLEepGet, Reseeder:
+      - Implement additional CA loading
+      - Provide facility to reuse SSL state for speed
+      - Provide facility to store previously untrusted certificates
+      - Add www.cacert.org cert to the installer and updater so
+        SSL on a.netdb.i2p2.de and c.netdb.i2p2.de will work
+      - Add SSL reseed hosts, prefer them by default
+      - Reseed message cleanup
+
 2010-11-19 zzz
     * Addressbook
       - Store last-fetched time so we don't always fetch subscriptions after restart
