@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-11-13 08:01+0000\n"
-"PO-Revision-Date: 2010-11-16 19:20+0100\n"
+"PO-Revision-Date: 2010-11-22 17:49+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -269,7 +269,7 @@ msgstr "Temps estimé de téléchargement"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:278
 msgid "ETA"
-msgstr "Temps restant"
+msgstr "Temps&nbsp;restant"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:281
 msgid "Downloaded"
