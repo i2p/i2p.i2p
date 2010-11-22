@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-11-13 00:19+0000\n"
-"PO-Revision-Date: 2010-11-21 23:32+0100\n"
+"PO-Revision-Date: 2010-11-22 17:49+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -270,7 +270,7 @@ msgstr "tiempo restante de descarga"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:278
 msgid "ETA"
-msgstr "Completado en"
+msgstr "Completado&nbsp;en"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:281
 msgid "Downloaded"
@@ -290,12 +290,12 @@ msgstr "Subido"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:291
 msgid "Down Rate"
-msgstr "Tasa de descarga"
+msgstr "Tasa&nbsp;de descarga"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:293
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:298
 msgid "Rate"
-msgstr "Tasa de transferencia"
+msgstr "Tasa&nbsp;de transferencia"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:296
 msgid "Up Rate"
@@ -694,7 +694,7 @@ msgstr "usar también rastreadores abiertos"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1152
 msgid "If checked, announce torrents to open trackers as well as the tracker listed in the torrent file"
-msgstr "Si está marcado, el torrent se anunciará a los rastreadores abiertos, además de a los rastreadores espicificados."
+msgstr "Si está marcado, el torrent se anunciará a los rastreadores abiertos, además de a los rastreadores especificados."
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1156
 msgid "Open tracker announce URLs"
