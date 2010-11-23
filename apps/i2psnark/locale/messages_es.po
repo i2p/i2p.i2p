@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-11-13 00:19+0000\n"
-"PO-Revision-Date: 2010-11-22 17:49+0100\n"
+"PO-Revision-Date: 2010-11-23 01:50+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -26,12 +26,12 @@ msgstr "Se añaden los torrents en {0} minutos ..."
 #: ../java/src/org/klomp/snark/SnarkManager.java:261
 #, java-format
 msgid "Total uploaders limit changed to {0}"
-msgstr "Número total de subida cambiado a {0}"
+msgstr "Límite del número total de subidores cambiado a {0}"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:263
 #, java-format
 msgid "Minimum total uploaders limit is {0}"
-msgstr "El mínimo de subidas es {0}"
+msgstr "El límite mínimo de subidores es {0}"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:275
 #, java-format
