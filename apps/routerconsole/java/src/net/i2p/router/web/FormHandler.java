@@ -20,26 +20,23 @@ public class FormHandler {
     protected Log _log;
     private String _nonce;
     protected String _action;
+    protected String _method;
     protected String _passphrase;
-    private List<String> _errors;
-    private List<String> _notices;
+    private final List<String> _errors;
+    private final List<String> _notices;
     private boolean _processed;
     private boolean _valid;
     
     public FormHandler() {
         _errors = new ArrayList();
         _notices = new ArrayList();
-        _action = null;
-        _processed = false;
         _valid = true;
-        _nonce = null;
-        _passphrase = null;
     }
     
     /**
      * Configure this bean to query a particular router context
      *
-     * @param contextId begging few characters of the routerHash, or null to pick
+     * @param contextId beginning few characters of the routerHash, or null to pick
      *                  the first one we come across.
      */
     public void setContextId(String contextId) {
@@ -54,6 +51,14 @@ public class FormHandler {
     public void setNonce(String val) { _nonce = val; }
     public void setAction(String val) { _action = val; }
     public void setPassphrase(String val) { _passphrase = val; }
+
+    /**
+     * Call this to prevent changes using GET
+     *
+     * @param the request method
+     * @since 0.8.2
+     */
+    public void storeMethod(String val) { _method = val; }
     
     /**
      * Override this to perform the final processing (in turn, adding formNotice
@@ -145,6 +150,12 @@ public class FormHandler {
             _valid = false;
             return;
         }
+        // To prevent actions with GET, jsps must call storeMethod()
+        if (_method != null && !"POST".equals(_method)) {
+            addFormError("Invalid form submission, requires POST not " + _method);
+            _valid = false;
+            return;
+        }
         
         String sharedNonce = System.getProperty("router.consoleNonce");
         if ( (sharedNonce != null) && (sharedNonce.equals(_nonce) ) ) {
@@ -211,4 +222,8 @@ public class FormHandler {
         return Messages.getString(s, o, _context);
     }
 
+    /** two params @since 0.8.2 */
+    public String _(String s, Object o, Object o2) {
+        return Messages.getString(s, o, o2, _context);
+    }
 }

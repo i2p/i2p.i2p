@@ -10,7 +10,8 @@
 <h1><%=intl._("I2P Router Logs")%></h1>
 <div class="main" id="main">
  <div class="joblog"><h3><%=intl._("I2P Version & Running Environment")%></h3><a name="version"> </a>
-<p><%=intl._("Please report bugs on <a href=\"http://trac.i2p2.i2p/newticket\">trac.i2p2.i2p</a>.")%>
+<p><%=intl._("Please report bugs on <a href=\"http://trac.i2p2.i2p/newticket\">trac.i2p2.i2p</a> or <a href=\"http://trac.i2p2.de/newticket\">trac.i2p2.de</a>.")%>
+<%=intl._("You may use the username \"guest\" and password \"guest\" if you do not wish to register.")%>
 <p><i><%=intl._("Please include this information in bug reports")%>:</i>
  <p>
 <b>I2P version:</b> <jsp:getProperty name="helper" property="version" /><br>

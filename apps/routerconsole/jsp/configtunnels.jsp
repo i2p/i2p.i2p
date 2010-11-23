@@ -15,6 +15,7 @@
 <div class="main" id="main">
  <%@include file="confignav.jsi" %>
  <jsp:useBean class="net.i2p.router.web.ConfigTunnelsHandler" id="formhandler" scope="request" />
+ <% formhandler.storeMethod(request.getMethod()); %>
  <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <jsp:setProperty name="formhandler" property="shouldsave" value="<%=request.getParameter("shouldsave")%>" />
  <jsp:setProperty name="formhandler" property="action" value="<%=request.getParameter("action")%>" />

@@ -1274,10 +1274,10 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
                     return;
                 }
             } else {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("CRC incorrect for message " + _messagesRead + " (calc=" + val + " expected=" + _expectedCrc + ") size=" + _size + " blocks " + _blocks);
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("CRC incorrect for message " + _messagesRead + " (calc=" + val + " expected=" + _expectedCrc + ") size=" + _size + " blocks " + _blocks);
                     _context.statManager().addRateData("ntcp.corruptI2NPCRC", 1, getUptime());
-                // should we try to read in the message and keep going?
+                // FIXME should we try to read in the message and keep going?
                 close();
                 // databuf is lost
                 return;

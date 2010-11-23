@@ -20,14 +20,20 @@
 
 package org.klomp.snark;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
 
-class PeerState
+import org.klomp.snark.bencode.BDecoder;
+import org.klomp.snark.bencode.BEValue;
+
+class PeerState implements DataLoader
 {
   private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(PeerState.class);
   final Peer peer;
@@ -201,13 +207,28 @@ class PeerState
         return;
       }
 
+    if (_log.shouldLog(Log.INFO))
+      _log.info("Queueing (" + piece + ", " + begin + ", "
+                + length + ")" + " to " + peer);
+
+    // don't load the data into mem now, let PeerConnectionOut do it
+    out.sendPiece(piece, begin, length, this);
+  }
+
+  /**
+   *  This is the callback that PeerConnectionOut calls
+   *
+   *  @return bytes or null for errors
+   *  @since 0.8.2
+   */
+  public byte[] loadData(int piece, int begin, int length) {
     byte[] pieceBytes = listener.gotRequest(peer, piece, begin, length);
     if (pieceBytes == null)
       {
         // XXX - Protocol error-> diconnect?
         if (_log.shouldLog(Log.WARN))
           _log.warn("Got request for unknown piece: " + piece);
-        return;
+        return null;
       }
 
     // More sanity checks
@@ -219,13 +240,13 @@ class PeerState
                       + ", " + begin
                       + ", " + length
                       + "' message from " + peer);
-        return;
+        return null;
       }
 
     if (_log.shouldLog(Log.INFO))
       _log.info("Sending (" + piece + ", " + begin + ", "
                 + length + ")" + " to " + peer);
-    out.sendPiece(piece, begin, length, pieceBytes);
+    return pieceBytes;
   }
 
   /**
@@ -411,6 +432,24 @@ class PeerState
       _log.debug("Got cancel message ("
                   + piece + ", " + begin + ", " + length + ")");
     out.cancelRequest(piece, begin, length);
+  }
+
+  /** @since 0.8.2 */
+  void extensionMessage(int id, byte[] bs)
+  {
+      if (id == 0) {
+          InputStream is = new ByteArrayInputStream(bs);
+          try {
+              BDecoder dec = new BDecoder(is);
+              BEValue bev = dec.bdecodeMap();
+              Map map = bev.getMap();
+              if (_log.shouldLog(Log.DEBUG))
+                  _log.debug("Got extension handshake message " + bev.toString());
+          } catch (Exception e) {}
+      } else {
+          if (_log.shouldLog(Log.DEBUG))
+              _log.debug("Got extended message type: " + id + " length: " + bs.length);
+      }
   }
 
   void unknownMessage(int type, byte[] bs)

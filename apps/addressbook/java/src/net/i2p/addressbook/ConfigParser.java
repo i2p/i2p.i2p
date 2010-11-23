@@ -49,6 +49,8 @@ import net.i2p.util.SecureFileOutputStream;
  */
 class ConfigParser {
 
+    private static final boolean isWindows = System.getProperty("os.name").startsWith("Win");
+
     /**
      * Strip the comments from a String. Lines that begin with '#' and ';' are
      * considered comments, as well as any part of a line after a '#'.
@@ -276,7 +278,8 @@ class ConfigParser {
      * Write contents of Map map to the File file. Output is written
      * with one key, value pair on each line, in the format: key=value.
      * Write to a temp file in the same directory and then rename, to not corrupt
-     * simultaneous accesses by the router.
+     * simultaneous accesses by the router. Except on Windows where renameTo()
+     * will fail if the target exists.
      *
      * @param map
      *            A Map to write to file.
@@ -286,14 +289,19 @@ class ConfigParser {
      *             if file cannot be written to.
      */
     public static void write(Map map, File file) throws IOException {
-        File tmp = SecureFile.createTempFile("hoststxt-", ".tmp", file.getAbsoluteFile().getParentFile());
-        ConfigParser
+        boolean success = false;
+        if (!isWindows) {
+            File tmp = SecureFile.createTempFile("temp-", ".tmp", file.getAbsoluteFile().getParentFile());
+            ConfigParser
                 .write(map, new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(tmp), "UTF-8")));
-        boolean success = tmp.renameTo(file);
+            success = tmp.renameTo(file);
+            if (!success) {
+                tmp.delete();
+                //System.out.println("Warning: addressbook rename fail from " + tmp + " to " + file);
+            }
+        }
         if (!success) {
             // hmm, that didn't work, try it the old way
-            System.out.println("Warning: addressbook rename fail from " + tmp + " to " + file);
-            tmp.delete();
             ConfigParser
                 .write(map, new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(file), "UTF-8")));
         }

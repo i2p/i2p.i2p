@@ -13,9 +13,12 @@
  <div class="graphspanel">
  <div class="widepanel">
  <jsp:useBean class="net.i2p.router.web.GraphHelper" id="graphHelper" scope="request" />
+ <% graphHelper.storeMethod(request.getMethod()); %>
  <jsp:setProperty name="graphHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
+<% /* GraphHelper sets the defaults in setContextId, so setting the properties must be after the context */ %>
  <jsp:setProperty name="graphHelper" property="*" />
- <jsp:setProperty name="graphHelper" property="writer" value="<%=out%>" />
+ <% graphHelper.storeWriter(out); %>
+ <jsp:getProperty name="graphHelper" property="allMessages" />
  <jsp:getProperty name="graphHelper" property="images" />
  <jsp:getProperty name="graphHelper" property="form" />
 </div></div></div></body></html>

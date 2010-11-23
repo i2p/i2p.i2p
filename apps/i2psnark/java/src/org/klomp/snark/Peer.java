@@ -59,6 +59,11 @@ public class Peer implements Comparable
   private long uploaded_old[] = {-1,-1,-1};
   private long downloaded_old[] = {-1,-1,-1};
 
+  //  bytes per bt spec:                 0011223344556677
+  static final long OPTION_EXTENSION = 0x0000000000100000l;
+  static final long OPTION_FAST      = 0x0000000000000004l;
+  private long options;
+
   /**
    * Creates a disconnected peer given a PeerID, your own id and the
    * relevant MetaInfo.
@@ -285,9 +290,8 @@ public class Peer implements Comparable
     // Handshake write - header
     dout.write(19);
     dout.write("BitTorrent protocol".getBytes("UTF-8"));
-    // Handshake write - zeros
-    byte[] zeros = new byte[8];
-    dout.write(zeros);
+    // Handshake write - options
+    dout.writeLong(OPTION_EXTENSION);
     // Handshake write - metainfo hash
     byte[] shared_hash = metainfo.getInfoHash();
     dout.write(shared_hash);
@@ -312,8 +316,8 @@ public class Peer implements Comparable
                             + "'Bittorrent protocol', got '"
                             + bittorrentProtocol + "'");
     
-    // Handshake read - zeros
-    din.readFully(zeros);
+    // Handshake read - options
+    options = din.readLong();
     
     // Handshake read - metainfo hash
     bs = new byte[20];
@@ -325,6 +329,15 @@ public class Peer implements Comparable
     din.readFully(bs);
     if (_log.shouldLog(Log.DEBUG))
         _log.debug("Read the remote side's hash and peerID fully from " + toString());
+
+//  if ((options & OPTION_EXTENSION) != 0) {
+    if (options != 0) {
+        // send them something
+        if (_log.shouldLog(Log.DEBUG))
+            //_log.debug("Peer supports extension message, what should we say? " + toString());
+            _log.debug("Peer supports options 0x" + Long.toString(options, 16) + ", what should we say? " + toString());
+    }
+
     return bs;
   }
 

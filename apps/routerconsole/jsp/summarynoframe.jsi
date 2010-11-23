@@ -11,7 +11,7 @@
 <jsp:setProperty name="helper" property="updateNonce" value="<%=request.getParameter("updateNonce")%>" />
 <jsp:setProperty name="helper" property="consoleNonce" value="<%=request.getParameter("consoleNonce")%>" />
 <jsp:setProperty name="helper" property="requestURI" value="<%=request.getRequestURI()%>" />
-<jsp:setProperty name="helper" property="writer" value="<%=out%>" />
+<% helper.storeWriter(out); %>
 <%
 /*
  * The following is required for the reseed button to work, although we probably

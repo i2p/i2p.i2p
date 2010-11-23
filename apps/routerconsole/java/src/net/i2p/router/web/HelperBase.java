@@ -28,7 +28,13 @@ public abstract class HelperBase {
     /** might be useful in the jsp's */
     //public RouterContext getContext() { return _context; }
 
-    public void setWriter(Writer out) { _out = out; }
+
+    /**
+     *  Renamed from setWriter, we realy don't want setFoo(non-String)
+     *  Prevent jsp.error.beans.property.conversion 500 error for ?writer=foo
+     *  @since 0.8.2
+     */
+    public void storeWriter(Writer out) { _out = out; }
 
     /** translate a string */
     public String _(String s) {

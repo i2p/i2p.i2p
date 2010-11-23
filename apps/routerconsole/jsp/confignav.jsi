@@ -5,7 +5,7 @@
 %>
 <jsp:useBean class="net.i2p.router.web.ConfigNavHelper" id="navHelper" scope="request" />
 <jsp:setProperty name="navHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
-<jsp:setProperty name="navHelper" property="writer" value="<%=out%>" />
+<% navHelper.storeWriter(out); %>
 <div class="confignav" id="confignav">
 <center>
 <%

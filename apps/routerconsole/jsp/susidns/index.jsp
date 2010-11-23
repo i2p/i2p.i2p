@@ -3,6 +3,6 @@
 <meta http-equiv="pragma" content="no-cache" />
 </head>
 <body>
-SusiDNS is not running. Go to <a href="/configclients.jsp">the config clients page</a>
+SusiDNS is not running. Go to <a href="/configclients#webapp">the config clients page</a>
 to start it.
 </body></html>

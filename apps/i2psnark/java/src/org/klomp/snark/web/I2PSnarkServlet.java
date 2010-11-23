@@ -242,6 +242,13 @@ public class I2PSnarkServlet extends Default {
 
         List snarks = getSortedSnarks(req);
         String uri = req.getRequestURI();
+        boolean isForm = _manager.util().connected() || !snarks.isEmpty();
+        if (isForm) {
+            out.write("<form action=\"");
+            out.write(uri);
+            out.write("\" method=\"POST\">\n");
+            out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n");
+        }
         out.write(TABLE_HEADER);
         out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/status.png\"");
         out.write(" title=\"");
@@ -301,25 +308,17 @@ public class I2PSnarkServlet extends Default {
         out.write("</th>\n");
         out.write("<th align=\"center\">");
         if (_manager.util().connected()) {
-            out.write("<a href=\"" + uri + "?action=StopAll&nonce=" + _nonce +
-                      "\" title=\"");
+            out.write("<input type=\"image\" name=\"action\" value=\"StopAll\" title=\"");
             out.write(_("Stop all torrents and the I2P tunnel"));
-            out.write("\">");
-            out.write("<img src=\"/themes/snark/ubergine/images/stop_all.png\" title=\"");
-            out.write(_("Stop all torrents and the I2P tunnel"));
-            out.write("\" alt=\"");
+            out.write("\" src=\"/themes/snark/ubergine/images/stop_all.png\" alt=\"");
             out.write(_("Stop All"));
             out.write("\">");
-            out.write("</a>");
         } else if (!snarks.isEmpty()) {
-            out.write("<a href=\"" + uri + "?action=StartAll&nonce=" + _nonce +
-                      "\" title=\"");
+            out.write("<input type=\"image\" name=\"action\" value=\"StartAll\" title=\"");
             out.write(_("Start all torrents and the I2P tunnel"));
+            out.write("\" src=\"/themes/snark/ubergine/images/start_all.png\" alt=\"");
+            out.write(_("Start All"));
             out.write("\">");
-            out.write("<img src=\"/themes/snark/ubergine/images/start_all.png\" title=\"");
-            out.write(_("Start all torrents and the I2P tunnel"));
-            out.write("\" alt=\"Start All\">");
-            out.write("</a>");
         } else {
             out.write("&nbsp;");
         }
@@ -357,6 +356,8 @@ public class I2PSnarkServlet extends Default {
         }
         
         out.write("</table>");
+        if (isForm)
+            out.write("</form>\n");
     }
     
     /**
@@ -366,7 +367,11 @@ public class I2PSnarkServlet extends Default {
         String action = req.getParameter("action");
         if (action == null) {
             // noop
-        } else if ("Add".equals(action)) {
+            return;
+        }
+        if (!"POST".equals(req.getMethod()))
+            return;
+        if ("Add".equals(action)) {
             String newFile = req.getParameter("newFile");
             String newURL = req.getParameter("newURL");
             // NOTE - newFile currently disabled in HTML form - see below
@@ -410,8 +415,8 @@ public class I2PSnarkServlet extends Default {
             } else {
                 // no file or URL specified
             }
-        } else if ("Stop".equals(action)) {
-            String torrent = req.getParameter("torrent");
+        } else if (action.startsWith("Stop_")) {
+            String torrent = action.substring(5);
             if (torrent != null) {
                 byte infoHash[] = Base64.decode(torrent);
                 if ( (infoHash != null) && (infoHash.length == 20) ) { // valid sha1
@@ -425,8 +430,8 @@ public class I2PSnarkServlet extends Default {
                     }
                 }
             }
-        } else if ("Start".equals(action)) {
-            String torrent = req.getParameter("torrent");
+        } else if (action.startsWith("Start_")) {
+            String torrent = action.substring(6);
             if (torrent != null) {
                 byte infoHash[] = Base64.decode(torrent);
                 if ( (infoHash != null) && (infoHash.length == 20) ) { // valid sha1
@@ -441,8 +446,8 @@ public class I2PSnarkServlet extends Default {
                     }
                 }
             }
-        } else if ("Remove".equals(action)) {
-            String torrent = req.getParameter("torrent");
+        } else if (action.startsWith("Remove_")) {
+            String torrent = action.substring(7);
             if (torrent != null) {
                 byte infoHash[] = Base64.decode(torrent);
                 if ( (infoHash != null) && (infoHash.length == 20) ) { // valid sha1
@@ -461,8 +466,8 @@ public class I2PSnarkServlet extends Default {
                     }
                 }
             }
-        } else if ("Delete".equals(action)) {
-            String torrent = req.getParameter("torrent");
+        } else if (action.startsWith("Delete_")) {
+            String torrent = action.substring(7);
             if (torrent != null) {
                 byte infoHash[] = Base64.decode(torrent);
                 if ( (infoHash != null) && (infoHash.length == 20) ) { // valid sha1
@@ -618,10 +623,10 @@ public class I2PSnarkServlet extends Default {
             if (r.startsWith(skip))
                 r = r.substring(skip.length());
             String llc = l.toLowerCase();
-            if (llc.startsWith("the ") || llc.startsWith("the."))
+            if (llc.startsWith("the ") || llc.startsWith("the.") || llc.startsWith("the_"))
                 l = l.substring(4);
             String rlc = r.toLowerCase();
-            if (rlc.startsWith("the ") || rlc.startsWith("the."))
+            if (rlc.startsWith("the ") || rlc.startsWith("the.") || rlc.startsWith("the_"))
                 r = r.substring(4);
             return collator.compare(l, r);
         }
@@ -828,62 +833,55 @@ public class I2PSnarkServlet extends Default {
         out.write("</td>\n\t");
         out.write("<td align=\"center\" class=\"snarkTorrentAction " + rowClass + "\">");
         String parameters = "&nonce=" + _nonce + "&torrent=" + Base64.encode(snark.meta.getInfoHash());
+        String b64 = Base64.encode(snark.meta.getInfoHash());
         if (showPeers)
             parameters = parameters + "&p=1";
         if (isRunning) {
-            out.write("<a href=\"" + uri + "?action=Stop" + parameters
-                      + "\" title=\"");
+            out.write("<input type=\"image\" name=\"action\" value=\"Stop_");
+            out.write(b64);
+            out.write("\" title=\"");
             out.write(_("Stop the torrent"));
-            out.write("\">");
-            out.write("<img src=\"/themes/snark/ubergine/images/stop.png\" title=\"");
-            out.write(_("Stop the torrent"));
-            out.write("\" alt=\"");
+            out.write("\" src=\"/themes/snark/ubergine/images/stop.png\" alt=\"");
             out.write(_("Stop"));
             out.write("\">");
-            out.write("</a>");
         } else {
             if (isValid) {
-                out.write("<a href=\"" + uri + "?action=Start" + parameters
-                          + "\" title=\"");
+                out.write("<input type=\"image\" name=\"action\" value=\"Start_");
+                out.write(b64);
+                out.write("\" title=\"");
                 out.write(_("Start the torrent"));
-                out.write("\">");
-                out.write("<img src=\"/themes/snark/ubergine/images/start.png\" title=\"");
-                out.write(_("Start the torrent"));
-                out.write("\" alt=\"");
+                out.write("\" src=\"/themes/snark/ubergine/images/start.png\" alt=\"");
                 out.write(_("Start"));
                 out.write("\">");
-                out.write("</a>");
             }
-            out.write("<a href=\"" + uri + "?action=Remove" + parameters
-                      + "\" title=\"");
+
+            out.write("<input type=\"image\" name=\"action\" value=\"Remove_");
+            out.write(b64);
+            out.write("\" title=\"");
             out.write(_("Remove the torrent from the active list, deleting the .torrent file"));
             out.write("\" onclick=\"if (!confirm('");
             // Can't figure out how to escape double quotes inside the onclick string.
             // Single quotes in translate strings with parameters must be doubled.
             // Then the remaining single quite must be escaped
             out.write(_("Are you sure you want to delete the file \\''{0}.torrent\\'' (downloaded data will not be deleted) ?", fullFilename));
-            out.write("')) { return false; }\">");
-            out.write("<img src=\"/themes/snark/ubergine/images/remove.png\" title=\"");
-            out.write(_("Remove the torrent from the active list, deleting the .torrent file"));
-            out.write("\" alt=\"");
+            out.write("')) { return false; }\"");
+            out.write(" src=\"/themes/snark/ubergine/images/remove.png\" alt=\"");
             out.write(_("Remove"));
             out.write("\">");
-            out.write("</a>");
-            out.write("<a href=\"" + uri + "?action=Delete" + parameters
-                      + "\" title=\"");
+
+            out.write("<input type=\"image\" name=\"action\" value=\"Delete_");
+            out.write(b64);
+            out.write("\" title=\"");
             out.write(_("Delete the .torrent file and the associated data file(s)"));
             out.write("\" onclick=\"if (!confirm('");
             // Can't figure out how to escape double quotes inside the onclick string.
             // Single quotes in translate strings with parameters must be doubled.
             // Then the remaining single quite must be escaped
             out.write(_("Are you sure you want to delete the torrent \\''{0}\\'' and all downloaded data?", fullFilename));
-            out.write("')) { return false; }\">");
-            out.write("<img src=\"/themes/snark/ubergine/images/delete.png\" title=\"");
-            out.write(_("Delete the .torrent file and the associated data file(s)"));
-            out.write("\" alt=\"");
+            out.write("')) { return false; }\"");
+            out.write(" src=\"/themes/snark/ubergine/images/delete.png\" alt=\"");
             out.write(_("Delete"));
             out.write("\">");
-            out.write("</a>");
         }
         out.write("</td>\n</tr>\n");
 

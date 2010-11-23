@@ -68,6 +68,10 @@ Public domain except as listed below:
    Copyright (C) 2001, 2007 Free Software Foundation, Inc.
    See licenses/LICENSE-LGPLv2.1.txt
 
+   SSLEepGet:
+   Contains some code Copyright 2006 Sun Microsystems, Inc.
+   See licenses/LICENSE-InstallCert.txt
+
 
 Router:
 Public domain except as listed below:

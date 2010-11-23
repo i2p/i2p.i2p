@@ -36,7 +36,7 @@ public class ConfigPeerHandler extends FormHandler {
                 return;
             }
             addFormError(_("Invalid peer"));
-        } else if (_action.equals(_("Adjust Profile Bonuses"))) {
+        } else if (_action.equals(_("Adjust peer bonuses"))) {
             Hash h = getHash();
             if (h != null) {
                 PeerProfile prof = _context.profileOrganizer().getProfile(h);
@@ -59,6 +59,8 @@ public class ConfigPeerHandler extends FormHandler {
             addFormError(_("Invalid peer"));
         } else if (_action.startsWith("Check")) {
             addFormError(_("Unsupported"));
+        } else {
+            addFormError("Unknown action \"" + _action + '"');
         }
     }
     
