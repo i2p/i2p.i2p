@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.concurrent.Semaphore;
 
 import net.i2p.router.RouterContext;
 import net.i2p.stat.Rate;
@@ -20,17 +21,20 @@ import org.jrobin.graph.RrdGraphDef;
  *
  */
 public class StatSummarizer implements Runnable {
-    private RouterContext _context;
-    private Log _log;
+    private final RouterContext _context;
+    private final Log _log;
     /** list of SummaryListener instances */
-    private List _listeners;
+    private final List<SummaryListener> _listeners;
     private static StatSummarizer _instance;
+    private static final int MAX_CONCURRENT_PNG = 3;
+    private final Semaphore _sem;
     
     public StatSummarizer() {
         _context = (RouterContext)RouterContext.listContexts().get(0); // fuck it, only summarize one per jvm
         _log = _context.logManager().getLog(getClass());
         _listeners = new ArrayList(16);
         _instance = this;
+        _sem = new Semaphore(MAX_CONCURRENT_PNG, true);
     }
     
     public static StatSummarizer instance() { return _instance; }
@@ -44,7 +48,7 @@ public class StatSummarizer implements Runnable {
     }
     
     /** list of SummaryListener instances */
-    List getListeners() { return _listeners; }
+    List<SummaryListener> getListeners() { return _listeners; }
     
     private static final String DEFAULT_DATABASES = "bw.sendRate.60000" +
                                                     ",bw.recvRate.60000" +
@@ -77,31 +81,32 @@ public class StatSummarizer implements Runnable {
              ( (spec != null) && (oldSpecs != null) && (oldSpecs.equals(spec))) )
             return oldSpecs;
         
-        List old = parseSpecs(oldSpecs);
-        List newSpecs = parseSpecs(spec);
+        List<Rate> old = parseSpecs(oldSpecs);
+        List<Rate> newSpecs = parseSpecs(spec);
         
         // remove old ones
-        for (int i = 0; i < old.size(); i++) {
-            Rate r = (Rate)old.get(i);
+        for (Rate r : old) {
             if (!newSpecs.contains(r))
                 removeDb(r);
         }
         // add new ones
         StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < newSpecs.size(); i++) {
-            Rate r = (Rate)newSpecs.get(i);
+        boolean comma = false;
+        for (Rate r : newSpecs) {
             if (!old.contains(r))
                 addDb(r);
-            buf.append(r.getRateStat().getName()).append(".").append(r.getPeriod());
-            if (i + 1 < newSpecs.size())
+            if (comma)
                 buf.append(',');
+            else
+                comma = true;
+            buf.append(r.getRateStat().getName()).append(".").append(r.getPeriod());
         }
         return buf.toString();
     }
     
     private void removeDb(Rate r) {
         for (int i = 0; i < _listeners.size(); i++) {
-            SummaryListener lsnr = (SummaryListener)_listeners.get(i);
+            SummaryListener lsnr = _listeners.get(i);
             if (lsnr.getRate().equals(r)) {
                 _listeners.remove(i);
                 lsnr.stopListening();
@@ -115,16 +120,40 @@ public class StatSummarizer implements Runnable {
         lsnr.startListening();
         //System.out.println("Start listening for " + r.getRateStat().getName() + ": " + r.getPeriod());
     }
+
     public boolean renderPng(Rate rate, OutputStream out) throws IOException { 
         return renderPng(rate, out, -1, -1, false, false, false, false, -1, true); 
     }
-    public boolean renderPng(Rate rate, OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount, boolean showCredit) throws IOException {
+
+    /**
+     *  This does the single data graphs.
+     *  For the two-data bandwidth graph see renderRatePng().
+     *  Synchronized to conserve memory.
+     *  @return success
+     */
+    public boolean renderPng(Rate rate, OutputStream out, int width, int height, boolean hideLegend,
+                                          boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount,
+                                          boolean showCredit) throws IOException {
+        try {
+            try {
+                _sem.acquire();
+            } catch (InterruptedException ie) {}
+            return locked_renderPng(rate, out, width, height, hideLegend, hideGrid, hideTitle, showEvents,
+                                    periodCount, showCredit);
+        } finally {
+                _sem.release();
+        }
+    }
+
+    private boolean locked_renderPng(Rate rate, OutputStream out, int width, int height, boolean hideLegend,
+                                          boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount,
+                                          boolean showCredit) throws IOException {
         if (width > GraphHelper.MAX_X)
             width = GraphHelper.MAX_X;
         if (height > GraphHelper.MAX_Y)
             height = GraphHelper.MAX_Y;
         for (int i = 0; i < _listeners.size(); i++) {
-            SummaryListener lsnr = (SummaryListener)_listeners.get(i);
+            SummaryListener lsnr = _listeners.get(i);
             if (lsnr.getRate().equals(rate)) {
                 lsnr.renderPng(out, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount, showCredit);
                 return true;
@@ -132,13 +161,15 @@ public class StatSummarizer implements Runnable {
         }
         return false;
     }
+
     public boolean renderPng(OutputStream out, String templateFilename) throws IOException {
         SummaryRenderer.render(_context, out, templateFilename);
         return true;
     }
+
     public boolean getXML(Rate rate, OutputStream out) throws IOException {
         for (int i = 0; i < _listeners.size(); i++) {
-            SummaryListener lsnr = (SummaryListener)_listeners.get(i);
+            SummaryListener lsnr = _listeners.get(i);
             if (lsnr.getRate().equals(rate)) {
                 lsnr.getData().exportXml(out);
                 out.write(("<!-- Rate: " + lsnr.getRate().getRateStat().getName() + " for period " + lsnr.getRate().getPeriod() + " -->\n").getBytes());
@@ -152,8 +183,26 @@ public class StatSummarizer implements Runnable {
     /**
      *  This does the two-data bandwidth graph only.
      *  For all other graphs see SummaryRenderer
+     *  Synchronized to conserve memory.
+     *  @return success
      */
-    public boolean renderRatePng(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount, boolean showCredit) throws IOException {
+    public boolean renderRatePng(OutputStream out, int width, int height, boolean hideLegend,
+                                              boolean hideGrid, boolean hideTitle, boolean showEvents,
+                                              int periodCount, boolean showCredit) throws IOException {
+        try {
+            try {
+                _sem.acquire();
+            } catch (InterruptedException ie) {}
+            return locked_renderRatePng(out, width, height, hideLegend, hideGrid, hideTitle, showEvents,
+                                        periodCount, showCredit);
+        } finally {
+                _sem.release();
+        }
+    }
+
+    private boolean locked_renderRatePng(OutputStream out, int width, int height, boolean hideLegend,
+                                              boolean hideGrid, boolean hideTitle, boolean showEvents,
+                                              int periodCount, boolean showCredit) throws IOException {
         long end = _context.clock().now() - 60*1000;
         if (width > GraphHelper.MAX_X)
             width = GraphHelper.MAX_X;
@@ -230,9 +279,9 @@ public class StatSummarizer implements Runnable {
      * @param specs statName.period,statName.period,statName.period
      * @return list of Rate objects
      */
-    private List parseSpecs(String specs) {
+    private List<Rate> parseSpecs(String specs) {
         StringTokenizer tok = new StringTokenizer(specs, ",");
-        List rv = new ArrayList();
+        List<Rate> rv = new ArrayList();
         while (tok.hasMoreTokens()) {
             String spec = tok.nextToken();
             int split = spec.lastIndexOf('.');
