@@ -80,7 +80,9 @@ public class Base64 {
     }
 
     /**
+     *  Decodes data from Base64 notation.
      *  @param s Base 64 encoded string using the I2P alphabet A-Z, a-z, 0-9, -, ~
+     *  @return the decoded data, null on error
      */
     public static byte[] decode(String s) {
         return safeDecode(s, false);
@@ -234,6 +236,7 @@ public class Base64 {
         System.out.println("or    : Base64 test");
     }
 
+/*******
     private static void test() {
         String orig = "you smell";
         String encoded = Base64.encode(orig.getBytes());
@@ -255,6 +258,7 @@ public class Base64 {
         else
             throw new RuntimeException("D(E([all bytes])) != [all bytes]!!!");
     }
+*******/
 
     /* ********  E N C O D I N G   M E T H O D S  ******** */
 
