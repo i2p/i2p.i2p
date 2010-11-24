@@ -261,11 +261,16 @@ class PeerState implements DataLoader
 
   // This is used to flag that we have to back up from the firstOutstandingRequest
   // when calculating how far we've gotten
-  Request pendingRequest = null;
+  private Request pendingRequest;
 
   /**
-   * Called when a partial piece request has been handled by
+   * Called when a full chunk (i.e. a piece message) has been received by
    * PeerConnectionIn.
+   *
+   * This may block quite a while if it is the last chunk for a piece,
+   * as it calls the listener, who stores the piece and then calls
+   * havePiece for every peer on the torrent (including us).
+   *
    */
   void pieceMessage(Request req)
   {
@@ -273,11 +278,15 @@ class PeerState implements DataLoader
     downloaded += size;
     listener.downloaded(peer, size);
 
-    pendingRequest = null;
+    if (_log.shouldLog(Log.DEBUG))
+      _log.debug("got end of Chunk("
+                  + req.piece + "," + req.off + "," + req.len + ") from "
+                  + peer);
 
     // Last chunk needed for this piece?
     if (getFirstOutstandingRequest(req.piece) == -1)
       {
+        // warning - may block here for a while
         if (listener.gotPiece(peer, req.piece, req.bs))
           {
             if (_log.shouldLog(Log.DEBUG))
@@ -288,8 +297,14 @@ class PeerState implements DataLoader
             if (_log.shouldLog(Log.WARN))
               _log.warn("Got BAD " + req.piece + " from " + peer);
             // XXX ARGH What now !?!
+            // FIXME Why would we set downloaded to 0?
             downloaded = 0;
           }
+      }
+
+      // ok done with this one
+      synchronized(this) {
+          pendingRequest = null;
       }
   }
 
@@ -303,15 +318,16 @@ class PeerState implements DataLoader
 
   /**
    * Called when a piece message is being processed by the incoming
-   * connection. Returns null when there was no such request. It also
+   * connection. That is, when the header of the piece message was received.
+   * Returns null when there was no such request. It also
    * requeues/sends requests when it thinks that they must have been
    * lost.
    */
   Request getOutstandingRequest(int piece, int begin, int length)
   {
     if (_log.shouldLog(Log.DEBUG))
-      _log.debug("getChunk("
-                  + piece + "," + begin + "," + length + ") "
+      _log.debug("got start of Chunk("
+                  + piece + "," + begin + "," + length + ") from "
                   + peer);
 
     int r = getFirstOutstandingRequest(piece);
@@ -351,6 +367,9 @@ class PeerState implements DataLoader
             downloaded = 0; // XXX - punishment?
             return null;
           }
+
+        // note that this request is being read
+        pendingRequest = req;
         
         // Report missing requests.
         if (r != 0)
@@ -374,13 +393,12 @@ class PeerState implements DataLoader
     // Request more if necessary to keep the pipeline filled.
     addRequest();
 
-    pendingRequest = req;
     return req;
 
   }
 
   // get longest partial piece
-  Request getPartialRequest()
+  synchronized Request getPartialRequest()
   {
     Request req = null;
     for (int i = 0; i < outstandingRequests.size(); i++) {
@@ -401,10 +419,13 @@ class PeerState implements DataLoader
     return req;
   }
 
-  // return array of pieces terminated by -1
-  // remove most duplicates
-  // but still could be some duplicates, not guaranteed
-  int[] getRequestedPieces()
+  /**
+   * return array of pieces terminated by -1
+   * remove most duplicates
+   * but still could be some duplicates, not guaranteed
+   * TODO rework this Java-style to return a Set or a List
+   */
+  synchronized int[] getRequestedPieces()
   {
     int size = outstandingRequests.size();
     int[] arr = new int[size+2];
@@ -514,6 +535,8 @@ class PeerState implements DataLoader
    * @since 0.8.1
    */
   synchronized boolean isRequesting(int piece) {
+      if (pendingRequest != null && pendingRequest.piece == piece)
+          return true;
       for (Request req : outstandingRequests) {
           if (req.piece == piece)
               return true;
@@ -616,6 +639,10 @@ class PeerState implements DataLoader
                 return true;
               }
         }
+
+        // Note that in addition to the bitfield, PeerCoordinator uses
+        // its request tracking and isRequesting() to determine
+        // what piece to give us next.
         int nextPiece = listener.wantPiece(peer, bitfield);
         if (nextPiece != -1
             && (lastRequest == null || lastRequest.piece != nextPiece)) {
