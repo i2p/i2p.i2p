@@ -203,6 +203,15 @@ public class Router {
             System.exit(-1);
         }
 
+        if (_config.getProperty("router.firstVersion") == null) {
+            // These may be useful someday. First added in 0.8.2
+            _config.setProperty("router.firstVersion", RouterVersion.VERSION);
+            String now = Long.toString(System.currentTimeMillis());
+            _config.setProperty("router.firstInstalled", now);
+            _config.setProperty("router.updateLastInstalled", now);
+            saveConfig();
+        }
+
         // This is here so that we can get the directory location from the context
         // for the zip file and the base location to unzip to.
         // If it does an update, it never returns.
@@ -1183,6 +1192,9 @@ public class Router {
                 }
             }
             if (ok) {
+                // This may be useful someday. First added in 0.8.2
+                _config.setProperty("router.updateLastInstalled", "" + System.currentTimeMillis());
+                saveConfig();
                 boolean deleted = updateFile.delete();
                 if (!deleted) {
                     System.out.println("ERROR: Unable to delete the update file!");
