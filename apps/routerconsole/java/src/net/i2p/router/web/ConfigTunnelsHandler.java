@@ -14,7 +14,6 @@ import net.i2p.util.Log;
  *
  */
 public class ConfigTunnelsHandler extends FormHandler {
-    private Log configTunnel_log;
     private Map _settings;
     private boolean _shouldSave;
     
@@ -44,11 +43,10 @@ public class ConfigTunnelsHandler extends FormHandler {
      *
      */
     private void saveChanges() {
-        configTunnel_log = _context.logManager().getLog(ConfigTunnelsHandler.class);
         boolean saveRequired = false;
         
-        if (configTunnel_log.shouldLog(Log.DEBUG))
-            configTunnel_log.debug("Saving changes, with props = " + _settings + ".");
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Saving changes, with props = " + _settings + ".");
         
         int updated = 0;
         int index = 0;
@@ -111,16 +109,16 @@ public class ConfigTunnelsHandler extends FormHandler {
             }
             
             if ("exploratory".equals(poolName)) {
-                if (configTunnel_log.shouldLog(Log.DEBUG)) {
-                    configTunnel_log.debug("Inbound exploratory settings: " + in);
-                    configTunnel_log.debug("Outbound exploratory settings: " + out);
+                if (_log.shouldLog(Log.DEBUG)) {
+                    _log.debug("Inbound exploratory settings: " + in);
+                    _log.debug("Outbound exploratory settings: " + out);
                 }
                 _context.tunnelManager().setInboundSettings(in);
                 _context.tunnelManager().setOutboundSettings(out);
             } else {
-                if (configTunnel_log.shouldLog(Log.DEBUG)) {
-                    configTunnel_log.debug("Inbound settings for " + client.toBase64() + ": " + in);
-                    configTunnel_log.debug("Outbound settings for " + client.toBase64() + ": " + out);
+                if (_log.shouldLog(Log.DEBUG)) {
+                    _log.debug("Inbound settings for " + client.toBase64() + ": " + in);
+                    _log.debug("Outbound settings for " + client.toBase64() + ": " + out);
                 }
                 _context.tunnelManager().setInboundSettings(client, in);
                 _context.tunnelManager().setOutboundSettings(client, out);
