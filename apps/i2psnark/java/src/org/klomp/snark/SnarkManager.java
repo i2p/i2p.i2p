@@ -533,9 +533,9 @@ public class SnarkManager implements Snark.CompleteListener {
         File f = new File(filename);
         if (!dontAutoStart && shouldAutoStart()) {
             torrent.startTorrent();
-            addMessage(_("Torrent added and started: \"{0}\"", f.getName()));
+            addMessage(_("Torrent added and started: \"{0}\"", torrent.storage.getBaseName()));
         } else {
-            addMessage(_("Torrent added: \"{0}\"", f.getName()));
+            addMessage(_("Torrent added: \"{0}\"", torrent.storage.getBaseName()));
         }
     }
     
@@ -742,8 +742,14 @@ public class SnarkManager implements Snark.CompleteListener {
                 // I2PServerSocket.accept() call properly?)
                 ////_util.
             }
+            String name;
+            if (torrent.storage != null) {
+                name = torrent.storage.getBaseName();
+            } else {
+                name = sfile.getName();
+            }
             if (!wasStopped)
-                addMessage(_("Torrent stopped: \"{0}\"", sfile.getName()));
+                addMessage(_("Torrent stopped: \"{0}\"", name));
         }
         return torrent;
     }
@@ -756,9 +762,14 @@ public class SnarkManager implements Snark.CompleteListener {
         if (torrent != null) {
             File torrentFile = new File(filename);
             torrentFile.delete();
-            if (torrent.storage != null)
+            String name;
+            if (torrent.storage != null) {
                 removeTorrentStatus(torrent.storage.getMetaInfo());
-            addMessage(_("Torrent removed: \"{0}\"", torrentFile.getName()));
+                name = torrent.storage.getBaseName();
+            } else {
+                name = torrentFile.getName();
+            }
+            addMessage(_("Torrent removed: \"{0}\"", name));
         }
     }
     

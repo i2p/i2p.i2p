@@ -438,11 +438,12 @@ public class I2PSnarkServlet extends Default {
             if (torrent != null) {
                 byte infoHash[] = Base64.decode(torrent);
                 if ( (infoHash != null) && (infoHash.length == 20) ) { // valid sha1
-                    for (Iterator iter = _manager.listTorrentFiles().iterator(); iter.hasNext(); ) {
-                        String name = (String)iter.next();
+                    for (String name : _manager.listTorrentFiles()) {
                         Snark snark = _manager.getTorrent(name);
                         if ( (snark != null) && (DataHelper.eq(infoHash, snark.meta.getInfoHash())) ) {
                             snark.startTorrent();
+                            if (snark.storage != null)
+                                name = snark.storage.getBaseName();
                             _manager.addMessage(_("Starting up torrent {0}", name));
                             break;
                         }
