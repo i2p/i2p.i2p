@@ -163,7 +163,7 @@ public class I2PSnarkServlet extends Default {
         
         String peerParam = req.getParameter("p");
         String peerString;
-        if (peerParam == null) {
+        if (peerParam == null || !_manager.util().connected()) {
             peerString = "";
         } else {
             peerString = "?p=" + peerParam;
@@ -248,6 +248,9 @@ public class I2PSnarkServlet extends Default {
             out.write(uri);
             out.write("\" method=\"POST\">\n");
             out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n");
+            // don't lose peer setting
+            if (peerParam != null)
+                out.write("<input type=\"hidden\" name=\"p\" value=\"" + peerParam + "\" >\n");
         }
         out.write(TABLE_HEADER);
         out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/status.png\"");
@@ -1001,6 +1004,10 @@ public class I2PSnarkServlet extends Default {
         out.write("<form action=\"" + uri + "\" method=\"POST\">\n");
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n");
         out.write("<input type=\"hidden\" name=\"action\" value=\"Add\" >\n");
+        // don't lose peer setting
+        String peerParam = req.getParameter("p");
+        if (peerParam != null)
+            out.write("<input type=\"hidden\" name=\"p\" value=\"" + peerParam + "\" >\n");
         out.write("<div class=\"addtorrentsection\"><span class=\"snarkConfigTitle\">");
         out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/add.png\">");
         out.write(_("Add Torrent"));
@@ -1036,6 +1043,10 @@ public class I2PSnarkServlet extends Default {
         out.write("<form action=\"" + uri + "\" method=\"POST\">\n");
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n");
         out.write("<input type=\"hidden\" name=\"action\" value=\"Create\" >\n");
+        // don't lose peer setting
+        String peerParam = req.getParameter("p");
+        if (peerParam != null)
+            out.write("<input type=\"hidden\" name=\"p\" value=\"" + peerParam + "\" >\n");
         out.write("<span class=\"snarkConfigTitle\">");
         out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/create.png\">");
         out.write(_("Create Torrent"));
