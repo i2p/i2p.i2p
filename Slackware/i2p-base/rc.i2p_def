@@ -4,7 +4,7 @@
 i2p_start() {
  # Check if router is up first!
  /bin/su - -c "( export PATH=\"$PATH:/usr/lib/java/bin:/usr/lib/java/jre/bin\"; directory status )" > /dev/null
- if [ ! $? -eq 0 ] ; then {
+ if [ $? -eq 0 ] ; then {
   # I2p is already running, so tell the user.
   echo "I2P is already running..."
   i2p_status

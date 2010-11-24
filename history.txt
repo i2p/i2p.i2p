@@ -1,3 +1,12 @@
+2010-11-24 sponge
+    * Slackware, fix rc.i2p, bad logic.
+
+2010-11-24 sponge
+    * Plugin: ticket 104 Fix webapp isRunning to check ALL webapps.
+      The only defecency is that if one is running, that it considers the
+      entire pliugin to be running. I'm not sure if that is a good thing
+      or a bad thing, but the other code checks threads that way.
+
 2010-11-22 zzz
     * Addressbook: Fix rename error on Windows (tkt 323 - thanks RN!)
     * build.xml: Cleanup, fix distclean error in older ants.
