@@ -1,3 +1,20 @@
+2010-11-24 zzz
+    * configui: Add .pt
+    * configtunnels: Log cleanup
+    * graphs: Synch to conserve memory; cleanup
+    * i2psnark:
+      - Prevent dup requests during end game
+        (ticket 331 - thanks sponge and Oct!)
+      - POST parameter tweaks
+      - Message cleanup
+    * logs: Add trac login hint
+    * Router:
+      - Save some info to config file when installing or updating
+      - Remove global lock on accessing config
+      - Add global lock on reading/writing config file
+    * SimpleDataStructure: Fix problem in fromBase64() that
+      manifested itself as a configtunnels.jsp bug
+
 2010-11-24 sponge
     * Slackware, fix rc.i2p, bad logic.
 
