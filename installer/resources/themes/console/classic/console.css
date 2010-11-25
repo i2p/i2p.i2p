@@ -157,7 +157,7 @@ div.routersummary {
      width: 193px;
      color: inherit;
      margin: 0;
-     padding: 10px 1px 7px 1px;
+     padding: 9px 1px 7px 1px;
      text-align: center !important;
      border: 1px solid #89f;
      border-bottom: 1px solid #89f;
@@ -509,7 +509,7 @@ h1 {
      border: 1px solid #89f;
      border-bottom: 1px solid #89f;
      border-right: 1px solid #89f;
-     padding: 16px 10px 16px 10px;
+     padding: 19px 10px;
      margin: 0 1px 0 200px;
      line-height: 93%;
      text-transform: uppercase;
