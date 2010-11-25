@@ -19,10 +19,12 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.CoreVersion;
 import net.i2p.crypto.DHSessionKeyBuilder;
@@ -57,7 +59,7 @@ import net.i2p.util.SimpleTimer;
 public class Router {
     private Log _log;
     private RouterContext _context;
-    private final Properties _config;
+    private final Map<String, String> _config;
     /** full path */
     private String _configFilename;
     private RouterInfo _routerInfo;
@@ -120,7 +122,7 @@ public class Router {
     public Router(String configFilename) { this(configFilename, null); }
     public Router(String configFilename, Properties envProps) {
         _gracefulExitCode = -1;
-        _config = new Properties();
+        _config = new ConcurrentHashMap();
 
         if (configFilename == null) {
             if (envProps != null) {
@@ -168,15 +170,9 @@ public class Router {
 
         readConfig();
 
-        if (envProps == null) {
-            envProps = _config;
-        } else {
-            for (Iterator iter = _config.keySet().iterator(); iter.hasNext(); ) {
-                String k = (String)iter.next();
-                String v = _config.getProperty(k);
-                envProps.setProperty(k, v);
-            }
-        }
+        if (envProps == null)
+            envProps = new Properties();
+        envProps.putAll(_config);
 
         // This doesn't work, guess it has to be in the static block above?
         // if (Boolean.valueOf(envProps.getProperty("router.disableIPv6")).booleanValue())
@@ -201,6 +197,15 @@ public class Router {
             System.err.println("       a new one.  If you are positive that no other instance is running,");
             System.err.println("       please delete the file " + getPingFile().getAbsolutePath());
             System.exit(-1);
+        }
+
+        if (_config.get("router.firstVersion") == null) {
+            // These may be useful someday. First added in 0.8.2
+            _config.put("router.firstVersion", RouterVersion.VERSION);
+            String now = Long.toString(System.currentTimeMillis());
+            _config.put("router.firstInstalled", now);
+            _config.put("router.updateLastInstalled", now);
+            saveConfig();
         }
 
         // This is here so that we can get the directory location from the context
@@ -276,30 +281,20 @@ public class Router {
     public void setConfigFilename(String filename) { _configFilename = filename; }
     
     public String getConfigSetting(String name) { 
-        synchronized (_config) {
-            return _config.getProperty(name); 
-        }
+            return _config.get(name); 
     }
     public void setConfigSetting(String name, String value) { 
-        synchronized (_config) {
-            _config.setProperty(name, value); 
-        }
+            _config.put(name, value); 
     }
     public void removeConfigSetting(String name) { 
-        synchronized (_config) {
             _config.remove(name); 
-        }
     }
     public Set getConfigSettings() { 
-        synchronized (_config) {
             return new HashSet(_config.keySet()); 
-        }
     }
     public Properties getConfigMap() { 
         Properties rv = new Properties();
-        synchronized (_config) {
-            rv.putAll(_config); 
-        }
+        rv.putAll(_config); 
         return rv;
     }
     
@@ -368,14 +363,19 @@ public class Router {
         _context.jobQueue().addJob(new StartupJob(_context));
     }
     
-    public void readConfig() {
+    /**
+     * This updates the config with all settings found in the file.
+     * It does not clear the config first, so settings not found in
+     * the file will remain in the config.
+     *
+     * This is synchronized with saveConfig()
+     */
+    public synchronized void readConfig() {
         String f = getConfigFilename();
         Properties config = getConfig(_context, f);
-        for (Iterator iter = config.keySet().iterator(); iter.hasNext(); ) {
-            String name = (String)iter.next();
-            String val = config.getProperty(name);
-            setConfigSetting(name, val);
-        }
+        // to avoid compiler errror
+        Map foo = _config;
+        foo.putAll(config);
     }
     
     /** this does not use ctx.getConfigDir(), must provide a full path in filename */
@@ -979,7 +979,7 @@ public class Router {
      */
     public void shutdownGracefully(int exitCode) {
         _gracefulExitCode = exitCode;
-        _config.setProperty(PROP_SHUTDOWN_IN_PROGRESS, "true");
+        _config.put(PROP_SHUTDOWN_IN_PROGRESS, "true");
         synchronized (_gracefulShutdownDetector) {
             _gracefulShutdownDetector.notifyAll();
         }
@@ -1001,7 +1001,7 @@ public class Router {
      */
     public int scheduledGracefulExitCode() { return _gracefulExitCode; }
     public boolean gracefulShutdownInProgress() {
-        return (null != _config.getProperty(PROP_SHUTDOWN_IN_PROGRESS));
+        return (null != _config.get(PROP_SHUTDOWN_IN_PROGRESS));
     }
     /** How long until the graceful shutdown will kill us?  */
     public long getShutdownTimeRemaining() {
@@ -1024,7 +1024,7 @@ public class Router {
     private class GracefulShutdown implements Runnable {
         public void run() {
             while (true) {
-                boolean shutdown = (null != _config.getProperty(PROP_SHUTDOWN_IN_PROGRESS));
+                boolean shutdown = (null != _config.get(PROP_SHUTDOWN_IN_PROGRESS));
                 if (shutdown) {
                     if (_gracefulExitCode == EXIT_HARD || _gracefulExitCode == EXIT_HARD_RESTART ||
                         _context.tunnelManager().getParticipatingCount() <= 0) {
@@ -1068,26 +1068,24 @@ public class Router {
      * this does escape the \r or \n that are unescaped in DataHelper.loadProps().
      * Note that the escaping of \r or \n was probably a mistake and should be taken out.
      *
-     * FIXME Synchronize!!
+     * Synchronized with file read in getConfig()
      */
-    public boolean saveConfig() {
+    public synchronized boolean saveConfig() {
         FileOutputStream fos = null;
         try {
             fos = new SecureFileOutputStream(_configFilename);
             StringBuilder buf = new StringBuilder(8*1024);
             buf.append("# NOTE: This I2P config file must use UTF-8 encoding\n");
-            synchronized (_config) {
-                TreeSet ordered = new TreeSet(_config.keySet());
-                for (Iterator iter = ordered.iterator() ; iter.hasNext(); ) {
-                    String key = (String)iter.next();
-                    String val = _config.getProperty(key);
+            TreeSet ordered = new TreeSet(_config.keySet());
+            for (Iterator iter = ordered.iterator() ; iter.hasNext(); ) {
+                String key = (String)iter.next();
+                String val = _config.get(key);
                     // Escape line breaks before saving.
                     // Remember: "\" needs escaping both for regex and string.
                     // NOOO - see comments in DataHelper
                     //val = val.replaceAll("\\r","\\\\r");
                     //val = val.replaceAll("\\n","\\\\n");
-                    buf.append(key).append('=').append(val).append('\n');
-                }
+                buf.append(key).append('=').append(val).append('\n');
             }
             fos.write(buf.toString().getBytes("UTF-8"));
         } catch (IOException ioe) {
@@ -1183,6 +1181,9 @@ public class Router {
                 }
             }
             if (ok) {
+                // This may be useful someday. First added in 0.8.2
+                _config.put("router.updateLastInstalled", "" + System.currentTimeMillis());
+                saveConfig();
                 boolean deleted = updateFile.delete();
                 if (!deleted) {
                     System.out.println("ERROR: Unable to delete the update file!");

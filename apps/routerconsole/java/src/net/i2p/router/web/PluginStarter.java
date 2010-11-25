@@ -50,6 +50,7 @@ public class PluginStarter implements Runnable {
     private static Map<String, ThreadGroup> pluginThreadGroups = new ConcurrentHashMap<String, ThreadGroup>();   // one thread group per plugin (map key=plugin name)
     private static Map<String, Collection<Job>> pluginJobs = new ConcurrentHashMap<String, Collection<Job>>();
     private static Map<String, ClassLoader> _clCache = new ConcurrentHashMap();
+    private static Map<String, Collection<String>> pluginWars = new ConcurrentHashMap<String, Collection<String>>();
 
     public PluginStarter(RouterContext ctx) {
         _context = ctx;
@@ -125,6 +126,8 @@ public class PluginStarter implements Runnable {
             File webappDir = new File(consoleDir, "webapps");
             String fileNames[] = webappDir.list(RouterConsoleRunner.WarFilenameFilter.instance());
             if (fileNames != null) {
+                if(!pluginWars.containsKey(appName))
+                    pluginWars.put(appName, new ConcurrentHashSet<String>());
                 for (int i = 0; i < fileNames.length; i++) {
                     try {
                         String warName = fileNames[i].substring(0, fileNames[i].lastIndexOf(".war"));
@@ -139,6 +142,7 @@ public class PluginStarter implements Runnable {
                             //log.error("Starting webapp: " + warName);
                             String path = new File(webappDir, fileNames[i]).getCanonicalPath();
                             WebAppStarter.startWebApp(ctx, server, warName, path);
+                            pluginWars.get(appName).add(warName);
                         }
                     } catch (IOException ioe) {
                         log.error("Error resolving '" + fileNames[i] + "' in '" + webappDir, ioe);
@@ -215,6 +219,7 @@ public class PluginStarter implements Runnable {
         // stop console webapps in console/webapps
         Server server = WebAppStarter.getConsoleServer();
         if (server != null) {
+        /*
             File consoleDir = new File(pluginDir, "console");
             Properties props = RouterConsoleRunner.webAppProperties(consoleDir.getAbsolutePath());
             File webappDir = new File(consoleDir, "webapps");
@@ -228,6 +233,13 @@ public class PluginStarter implements Runnable {
                     WebAppStarter.stopWebApp(server, warName);
                 }
             }
+        */
+            Iterator <String> wars = pluginWars.get(appName).iterator();
+            while (wars.hasNext()) {
+                String warName = wars.next();
+                WebAppStarter.stopWebApp(server, warName);
+            }
+            pluginWars.get(appName).clear();
         }
 
         // remove summary bar link
@@ -487,10 +499,25 @@ public class PluginStarter implements Runnable {
                     isJobRunning = true;
                     break;
                 }
+        boolean isWarRunning = false;
+        if(pluginWars.containsKey(pluginName)) {
+            Iterator <String> it = pluginWars.get(pluginName).iterator();
+            while(it.hasNext() && !isWarRunning) {
+                String warName = it.next();
+                if(WebAppStarter.isWebAppRunning(warName)) {
+                    isWarRunning = true;
+                }
+            }
+        }
 
         if (log.shouldLog(Log.DEBUG))
-            log.debug("plugin name = <" + pluginName + ">; threads running? " + isClientThreadRunning(pluginName) + "; webapp runing? " + WebAppStarter.isWebAppRunning(pluginName) + "; jobs running? " + isJobRunning);
-        return isClientThreadRunning(pluginName) || WebAppStarter.isWebAppRunning(pluginName) || isJobRunning;
+            log.debug("plugin name = <" + pluginName + ">; threads running? " + isClientThreadRunning(pluginName) + "; webapp runing? " + isWarRunning + "; jobs running? " + isJobRunning);
+        return isClientThreadRunning(pluginName) || isWarRunning || isJobRunning;
+        //
+        //if (log.shouldLog(Log.DEBUG))
+        //    log.debug("plugin name = <" + pluginName + ">; threads running? " + isClientThreadRunning(pluginName) + "; webapp runing? " + WebAppStarter.isWebAppRunning(pluginName) + "; jobs running? " + isJobRunning);
+        //return isClientThreadRunning(pluginName) || WebAppStarter.isWebAppRunning(pluginName) || isJobRunning;
+        //
     }
     
     /**

@@ -1,4 +1,4 @@
-/* Not yet complete. Subject to flux and change. dr|z3d - 07.25.09 */
+/* I2P Console Theme "Corporat" by dr|z3d. Aka "light". As in beer.*/
 
 body {
      margin: 15px 0 0 10px;
@@ -714,11 +714,11 @@ button:active{
 }
 
 .langbox {
-     margin: 4px 2px 4px 5px;
+     margin: 4px 10px 4px 5px;
      padding: 5px 5px;
      color: #001;
      font-size: 7pt;
-     width: 220px;
+     width: 260px;
      text-align: right;
      float: right;
      valign: middle;

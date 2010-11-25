@@ -33,21 +33,24 @@ import net.i2p.util.Log;
  *
  * The NTCP transport sends individual I2NP messages AES/256/CBC encrypted with
  * a simple checksum.  The unencrypted message is encoded as follows:
+ *<pre>
  *  +-------+-------+--//--+---//----+-------+-------+-------+-------+
  *  | sizeof(data)  | data | padding | adler checksum of sz+data+pad |
  *  +-------+-------+--//--+---//----+-------+-------+-------+-------+
+ *</pre>
  * That message is then encrypted with the DH/2048 negotiated session key
  * (station to station authenticated per the EstablishState class) using the
  * last 16 bytes of the previous encrypted message as the IV.
  *
  * One special case is a metadata message where the sizeof(data) is 0.  In
  * that case, the unencrypted message is encoded as:
+ *<pre>
  *  +-------+-------+-------+-------+-------+-------+-------+-------+
  *  |       0       |      timestamp in seconds     | uninterpreted             
  *  +-------+-------+-------+-------+-------+-------+-------+-------+
  *          uninterpreted           | adler checksum of sz+data+pad |
  *  +-------+-------+-------+-------+-------+-------+-------+-------+
- * 
+ *</pre>
  *
  */
 public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {

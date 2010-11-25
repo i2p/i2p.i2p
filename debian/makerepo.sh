@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # This script creates a Debian repository in ${DIR} using the reprepro tool.
 # The packages are signed with the key referenced in the newest changelog entry.
 
@@ -9,9 +9,7 @@ DIR=./repo
 CONFDIR=conf
 CONFFILE=${CONFDIR}/distributions
 
-SIGNER=`parsechangelog --file changelog | grep Maintainer | cut -d: -f2`
-SIGNER=${SIGNER//^ /}
-SIGNER=`echo ${SIGNER} | cut -d\  -f1`
+SIGNER=`parsechangelog --file changelog | grep Maintainer | cut -d\< -f2 | cut -d\> -f1`
 KEYID=`gpg --list-keys "${SIGNER}" | cut -d: -f2 | grep -w pub | cut -d/ -f2 | cut -d\  -f1`
 echo Using signing key: ${SIGNER}
 echo Key ID: ${KEYID}

@@ -163,7 +163,7 @@ public class I2PSnarkServlet extends Default {
         
         String peerParam = req.getParameter("p");
         String peerString;
-        if (peerParam == null) {
+        if (peerParam == null || !_manager.util().connected()) {
             peerString = "";
         } else {
             peerString = "?p=" + peerParam;
@@ -248,6 +248,9 @@ public class I2PSnarkServlet extends Default {
             out.write(uri);
             out.write("\" method=\"POST\">\n");
             out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n");
+            // don't lose peer setting
+            if (peerParam != null)
+                out.write("<input type=\"hidden\" name=\"p\" value=\"" + peerParam + "\" >\n");
         }
         out.write(TABLE_HEADER);
         out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/status.png\"");
@@ -435,11 +438,12 @@ public class I2PSnarkServlet extends Default {
             if (torrent != null) {
                 byte infoHash[] = Base64.decode(torrent);
                 if ( (infoHash != null) && (infoHash.length == 20) ) { // valid sha1
-                    for (Iterator iter = _manager.listTorrentFiles().iterator(); iter.hasNext(); ) {
-                        String name = (String)iter.next();
+                    for (String name : _manager.listTorrentFiles()) {
                         Snark snark = _manager.getTorrent(name);
                         if ( (snark != null) && (DataHelper.eq(infoHash, snark.meta.getInfoHash())) ) {
                             snark.startTorrent();
+                            if (snark.storage != null)
+                                name = snark.storage.getBaseName();
                             _manager.addMessage(_("Starting up torrent {0}", name));
                             break;
                         }
@@ -1001,6 +1005,10 @@ public class I2PSnarkServlet extends Default {
         out.write("<form action=\"" + uri + "\" method=\"POST\">\n");
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n");
         out.write("<input type=\"hidden\" name=\"action\" value=\"Add\" >\n");
+        // don't lose peer setting
+        String peerParam = req.getParameter("p");
+        if (peerParam != null)
+            out.write("<input type=\"hidden\" name=\"p\" value=\"" + peerParam + "\" >\n");
         out.write("<div class=\"addtorrentsection\"><span class=\"snarkConfigTitle\">");
         out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/add.png\">");
         out.write(_("Add Torrent"));
@@ -1036,6 +1044,10 @@ public class I2PSnarkServlet extends Default {
         out.write("<form action=\"" + uri + "\" method=\"POST\">\n");
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n");
         out.write("<input type=\"hidden\" name=\"action\" value=\"Create\" >\n");
+        // don't lose peer setting
+        String peerParam = req.getParameter("p");
+        if (peerParam != null)
+            out.write("<input type=\"hidden\" name=\"p\" value=\"" + peerParam + "\" >\n");
         out.write("<span class=\"snarkConfigTitle\">");
         out.write("<img border=\"0\" src=\"/themes/snark/ubergine/images/create.png\">");
         out.write(_("Create Torrent"));

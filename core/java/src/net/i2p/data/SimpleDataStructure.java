@@ -82,10 +82,20 @@ public abstract class SimpleDataStructure extends DataStructureImpl {
         return Base64.encode(_data);
     }
 
+    /**
+     * Sets the data.
+     * @throws DataFormatException if decoded data is not the legal number of bytes or on decoding error
+     */
     @Override
     public void fromBase64(String data) throws DataFormatException {
         if (data == null) throw new DataFormatException("Null data passed in");
-        _data = Base64.decode(data);
+        byte[] d = Base64.decode(data);
+        if (d == null)
+            throw new DataFormatException("Bad Base64 encoded data");
+        if (d.length != _length)
+            throw new DataFormatException("Bad decoded data length, expected " + _length + " got " + d.length);
+        // call setData() instead of _data = data in case overridden
+        setData(d);
     }
 
     /** @return the SHA256 hash of the byte array, or null if the data is null */
@@ -106,7 +116,7 @@ public abstract class SimpleDataStructure extends DataStructureImpl {
 
     /**
      * Overridden for efficiency.
-     * Does the same thing as getData() but null not allowed.
+     * Does the same thing as setData() but null not allowed.
      * @param data non-null
      * @throws DataFormatException if null or wrong length
      */
@@ -114,7 +124,8 @@ public abstract class SimpleDataStructure extends DataStructureImpl {
     public void fromByteArray(byte data[]) throws DataFormatException {
         if (data == null) throw new DataFormatException("Null data passed in");
         if (data.length != _length) throw new DataFormatException("Bad data length");
-        _data = data;
+        // call setData() instead of _data = data in case overridden
+        setData(data);
     }
 
     @Override
