@@ -728,7 +728,7 @@ p {
 }
 
 .links li {
-     list-style-image: url("../images/link.png") !important;
+     list-style-image: url("images/link.png") !important;
 }
 
 a:link{

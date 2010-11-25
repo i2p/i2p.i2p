@@ -589,7 +589,7 @@ a:active{
 }
 
 .links li {
-     list-style: url(../images/link.png) !important;
+     list-style: url(images/link.png) !important;
      padding-bottom: -2px;
      text-align: justify;
      line-height: 120% !important;
