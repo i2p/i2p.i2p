@@ -156,7 +156,7 @@ div.routersummary {
      background: #ddf;
      width: 193px;
      color: inherit;
-     margin: 0;
+     margin: 0 0 5px;
      padding: 9px 1px 7px 1px;
      text-align: center !important;
      border: 1px solid #89f;
@@ -428,7 +428,7 @@ div.news hr {
 }
 
 div.confignav {
-     padding: 10px 0 11px 0;
+     padding: 11px 0;
      background: #ddf;
      margin: -16px -16px 0 -16px;
      border: 1px solid #89f;
