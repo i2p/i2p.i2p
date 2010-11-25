@@ -1,3 +1,7 @@
+2010-11-25 dr|z3d
+    * Console themes: Classic and Dark theme refresh.
+    * Fix langbox overflow issue in all themes.
+
 2010-11-24 zzz
     * configui: Add .pt
     * configtunnels: Log cleanup
