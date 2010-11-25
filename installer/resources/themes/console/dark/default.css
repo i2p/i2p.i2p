@@ -1,9 +1,11 @@
+/* I2P Console theme: "Camo" by dr|z3d. Aka "dark". As in ops. */
+
 body {
      margin: 0px;
      padding: 0px;
      text-align: center;
      font-family: "Lucida Sans Unicode", Verdana, Helvetica, sans-serif;
-     background-color: #001;
+     background: #010 url('images/camotile.png') center bottom;
      color: #000000;
      font-size: 9pt;
 /* we've avoided Tantek Hacks so far,
@@ -39,14 +41,14 @@ h4 {
      font-size: 14px;
      font-weight: bold !important;
      text-align: center;
-     border: 1px solid #99f;
+     border: 1px solid #494;
      margin: 5px 0 15px 0;
      padding: 5px 10px;
-     background: #004 url(images/tabletitledark.png) repeat-x;
+     background: #000 url('images/header.png') center center repeat-x ;
      text-transform: uppercase;
-     text-shadow: 0px 0px 2px rgba(255, 255, 255, 0.9);
+     text-shadow: 0px 0px 2px rgba(0, 0, 0, 0.9);
      letter-spacing: 0.08em;
-     -moz-box-shadow: inset 0px 0px 4px 0px #009;
+     -moz-box-shadow: inset 0px 0px 4px 0px #090;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
@@ -73,7 +75,7 @@ button {
 }
 
 textarea {
-     border: 1px solid #9999ff;
+     border: 1px solid #494;
 }
 
 br {
@@ -121,21 +123,21 @@ hr {
      clear: both;
      height: 1px;
      margin: 3px 0px 3px 0px;
-     border-bottom: 1px solid #99f;
+     border-bottom: 1px solid #494;
 }
 
 .subdivider {
-     border-bottom: 1px solid #99f;
+     border-bottom: 1px solid #494;
      padding: 5px 0px 0px 0px;
 }
 
 .freetext {
      width: 150px;
      height : 22px; 
-     border: 1px solid #9999ff;
+     border: 1px solid #494;
      padding: 2px;
      margin: 4px 0 2px 4px;
-     background-color: #002;
+     background-color: #020;
      font: bold 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
 }
 
@@ -147,8 +149,8 @@ hr {
      max-height: 24px;
      font-size: 9pt;
      font-weight: bold;
-     background-color: #b4c8ff;
-     color: black;
+     background-color: #000;
+     color: #9f9 !important;
      border: 1px outset #ddddc0;
      text-align: center;
      white-space: nowrap;
@@ -159,18 +161,25 @@ hr {
      background: url(images/tabletitlelight.png) repeat: x;
      vertical-align: middle;
      text-decoration: none;
+     border: 1px outset #5f5;
+     -moz-box-shadow: inset 0px 1px 1px 0px #373;
+     -khtml-box-shadow: inset 0px 1px 1px 0px #373;
+     box-shadow: inset 0px 1px 1px 0px #373;
 }
 
 .control:link {
-     color: #001;
+     color: #9f9;
      text-decoration: none;
 }
 
 .control:hover {
-     border: 1px solid #eeeeff;
-     background-color: #003;
-     color: #ff6600 !important;
+     border: 1px solid #f60;
+     background-color: #000;
+     color: #f60 !important;
      text-decoration: none;
+     -moz-box-shadow: inset 0px 1px 1px 0px #fff;
+     -khtml-box-shadow: inset 0px 1px 1px 0px #fff;
+     box-shadow: inset 0px 1px 1px 0px #fff;
 }
 
 .control:active {
@@ -181,7 +190,7 @@ hr {
 }
 
 .control:visited {
-     color: #001;
+     color: #010;
      text-decoration: none;
 }
 
@@ -192,12 +201,12 @@ hr {
      text-align: left;
      font-size: 9pt;
      color: white;
-     background-color: #002;
-     background: url(images/darkbluebg.png);
+     background-color: #020;
+     background: #000; /*url(images/camotile2.png);*/
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     border: 1px solid #99f;
+     border: 1px solid #494;
      padding: 10px 20px;
 }
 
@@ -235,15 +244,15 @@ hr {
 }
 
 #globalOperationsPanel {
-     background-color: #003;
-     border: 1px solid #99f;
-     background: url(images/darkbluebg.png);
-     -moz-box-shadow: inset 0px 0px 0px 1px #f00;
+     background-color: #030;
+     border: 1px solid #494;
+     -moz-box-shadow: inset 0px 0px 0px 1px #932;
      padding: 5px 20px 11px 10px !important;
+     background: #000; /*url(images/camotile2.png);*/
 }
 
 #globalOperationsPanel .control {
-     width: 100px;
+     width: 120px;
 }
 
 .header {
@@ -254,12 +263,12 @@ hr {
 }
 
 a:link{
-     color: #99f;
+     color: #494;
      text-decoration: none;
 }
 
 a:visited{
-     color: #7bb;
+     color: #7b7;
      text-decoration: none;
 }
 
@@ -274,12 +283,12 @@ a:active{
 }
 
 input {
-     background-color: #002;
+     background-color: #020;
      color: #eef;
      margin: 0 2px 0 2px;
      font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
      font-weight: bold;
-     border: 1px solid #99f;
+     border: 1px solid #494;
 /*
      padding: 0px 2px 1px 2px;
 */
@@ -292,17 +301,17 @@ input hover {
      margin: 0 2px 0 2px;
      font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
      font-weight: bold;
-     border: 1px solid #99f;
+     border: 1px solid #494;
      padding: 2px;
      text-decoration: none;
 }
 
 select {
-     background-color: #001;
+     background-color: #020;
      color: #eef;
      margin: 6px 2px 0 2px;
      font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
-     border: 1px solid #99f;
+     border: 1px solid #494;
      padding: 2px 2px 2px 4px;
      max-height: 24px;
 }

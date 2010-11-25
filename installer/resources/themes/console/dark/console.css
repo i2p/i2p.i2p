@@ -1,12 +1,13 @@
-/* Not yet complete. Subject to flux and change. dr|z3d - 07.25.09 */
+/* I2P Console theme: "Camo" by dr|z3d. Aka "dark". As in ops. */
 
 body {
      margin: 20px 5px 0 15px;
      padding: 0;
      text-align: center;
-     background: #002;
-     color: #FFF;
+     background: #010 url('images/camotile.png') center bottom;
+     color: #EE9;
      font: 9pt/130% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     
 }
 
 .hide {
@@ -22,20 +23,20 @@ pre {
      overflow-x: scroll;
      text-align: left;
      font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
-     color: #fff;
+     color: #EE9;
 }
 
 div.logo {
      float: left;
      padding: 10px;
      text-align: center;
-     font-color: #fff;
+     font-color: #EE9;
      margin: 0 20px 0 20px;
-     border: 1px solid #99f;
+     border: 1px solid #494;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     background: #003 url('images/darkbluebg.png');
+     background: #030 url('images/darkbluebg.png');
      width: 175px;
      -moz-box-shadow: inset 0px 0px 1px 0px #009;
      -khtml-box-shadow: inset 0px 0px 1px 0px #009;
@@ -46,8 +47,8 @@ div.toolbar {
      margin: 0;
      padding: 10px;
      font-weight: bold;
-     background: #eef;
-     border: 1px solid #002;
+     background: #000;
+     border: 1px solid #000;
      display: none;
 }
 
@@ -59,7 +60,7 @@ div.toolbar a:link {
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
-     color: #002;
+     color: #000;
 }
 
 div.toolbar a:visited {
@@ -68,7 +69,7 @@ div.toolbar a:visited {
 
 div.toolbar a:hover, button:hover{
      border: 1px solid #f60;
-     background: #003;
+     background: #030;
      color: #f60;
 }
 
@@ -91,19 +92,20 @@ div.routersummary {
      width: 175px;
      padding: 10px;
      text-align: center;
-     border: 1px solid #99f;
-     background: #003;
-     background: url(images/darkbluebg.png);
-     color: #eef;
+     border: 1px solid #494;
+     background: #000;
+     background: #000 url(images/camotile2.png);
+     color: #EE9;
      font-size: 8pt;
      clear: left;/* fixes a bug in Opera */
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
      float: left;
-     -moz-box-shadow: inset 0px 0px 1px 0px #eef;
-     -khtml-box-shadow: inset 0px 0px 1px 0px #eef;     
-     box-shadow: inset 0px 0px 1px 0px #eef;
+/*     -moz-box-shadow: inset 0px 0px 0px 0px #EE9;
+     -khtml-box-shadow: inset 0px 0px 1px 0px #EE9;     
+     box-shadow: inset 0px 0px 1px 0px #EE9;*/
+     -moz-box-shadow: 0 1px 5px #000;
 }
 
 div.routersummary input[type=text] {
@@ -114,27 +116,26 @@ div.routersummary input[type=text] {
 }
 
 div.routersummary hr {
-     color: #99f;
-     background: #99f;
+     color: #494;
+     background: #494;
      height: 2px;
-     border-bottom: 1px solid #99f;
+     border-bottom: 1px solid #494;
      margin: 8px -10px 7px -10px;
-     -moz-box-shadow: inset 0px 1px 1px 1px #001;
+     -moz-box-shadow: inset 0px 1px 1px 1px #000;
 }
 
 div.routersummary h3 {
      border: 0;
      font-size: 9.5pt;
      letter-spacing: 0.04em;
-     margin: -7px -9px -8px -9px;
+     margin: -7px -10px -8px -10px;
      padding: 2px 0 3px 0 !important;
-     background: #007;
      text-transform: uppercase;
      -moz-border-radius: 0;
      -khtml-border-radius: 0;
      border-radius: 0;
-     background: #007;
-     background-image: -moz-linear-gradient(top, bottom, from(#007), to(#005), color-stop(7%, #007), color-stop(100%, #005));
+     background: #000 url('images/header.png') center center ;
+     background-image: -moz-linear-gradient(top, bottom, from(#005), to(#030), color-stop(7%, #000), color-stop(100%, #005));
 }
 
 div.routersummary h4 {
@@ -144,19 +145,19 @@ div.routersummary h4 {
      letter-spacing: 0.02em;
      margin: -7px -9px -10px -9px !important;
      padding: 2px 3px 5px 3px;
-     background: #005;
+     background: #000;
      text-transform: capitalize;
      text-decoration: none !important;
      color: #2b2;
-     background-image: -moz-linear-gradient(top, bottom, from(#001), to(#005), color-stop(10%, #005), color-stop(100%, #004));
+     background-image: -moz-linear-gradient(top, bottom, from(#000), to(#005), color-stop(10%, #005), color-stop(100%, #004));
      line-height: 100%;
 }
 
 div.routersummary table {
      border: 0;
      text-align: center !important;
-     margin: -5px -4px -5px -5px !important;
-     width: 185px !important;
+     margin: -5px -7px -5px -7px !important;
+     width: 188px !important;
      overflow: hidden;
      font-size: 8pt;
      padding: 0 -10px;
@@ -189,7 +190,8 @@ div.refresh {
 }
 
 div.routersummary a:link, div.routersummary a:visited {
-     text-shadow: 0px 0px 1px rgba(192, 192, 255, 0.5);
+     text-shadow: 1px 1px 1px rgba(0, 16, 0, 0.8);
+     text-shadow: 0px 0px 2px #010 !important;
 }
 
 div.routersummary a:hover {
@@ -210,28 +212,39 @@ div routersummary hr:last-child {
 
 div.tunnels {
      padding-top: 3px !important;
-     margin-left: -2px;
+     margin-left: -4px;
      text-align: center;
 }
 
 div.tunnels table {
-     margin: -3px 0 !important;
+     margin: -5px 0 -5px -2px !important;
 }
 
 div.tunnels td {
-     padding: 1px 2px 1px 2px;
+     padding: 1px 0px 1px 0px;
 }
+
 div.tunnels td:first-child {
      width: 16px;
+     text-align: left;
+     padding-right: 2px;
+}
+
+div.tunnels td:last-child {
+     text-align: right;
+}
+
+div.tunnels tr {
+/*     border: 1px solid #494 !important;*/
 }
 
 div.warning {
      margin: 5px 20px 10px 240px;
      padding: 5px 25px 20px 75px;
      background: #005;
-     border: 1px solid #99f;
+     border: 1px solid #494;
      text-align: left;
-     color: #fff;
+     color: #EE9;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
@@ -250,8 +263,8 @@ div.warning {
 div.sorry {
      margin: 15px 15px 10px 220px;
      padding: 20px 20px 20px 75px;
-     background: #005;
-     border: 1px solid #99f;
+     background: #020;
+     border: 1px solid #494;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
@@ -262,65 +275,74 @@ div.sorry {
      -moz-box-shadow: inset 0px 0px 0px 1px #d00;
      word-wrap: break-word;
      font-weight: bold;
-     color: #eef;
+     color: #EE9;
 }
 
 div.sorry hr {
-     color: #eef;
-     background: #eef;
+     color: #EE9;
+     background: #EE9;
      height: 1px;
-     border: 1px solid #eef;
+     border: 1px solid #EE9;
      margin: 10px 0;
 }     
 
 div.main {
-     margin: 0px 0px 20px 195px;
-     padding: 0 15px 15px 25px;
-     background: #002;
+     margin: 15px 15px 20px 220px;
+     padding: 0 15px 15px 15px;
      text-align: left;
-     color: #eef;
+     color: #EE9;
      width: auto;
 /*  overflow-x: scroll; */
+     border: 1px solid #494;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     background: #000;/* url(images/camotile2.png);*/
+     min-width: 620px;
+     -moz-box-shadow: 0 1px 5px #000;
 }
 
 div.main textarea {
-     background: #002;
-     color: #fff;
+     background: #000;
+     color: #EE9;
      font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
 }
 
 div.news {
      margin: 15px 15px 15px 220px;
      padding: 5px 30px 10px 30px;
-     border: 1px solid #99f;
-     background: #004;
-     background-image: -moz-linear-gradient(top, bottom, from(#003), to(#005), color-stop(30%, #003), color-stop(100%, #001));
-/*     background: #003 url("images/darkbluetile.png");*/
-     color: #aaf;
+     border: 1px solid #494;
+     background: #000;
+/*     background-image: -moz-linear-gradient(top, bottom, from(#030), to(#005), color-stop(30%, #030), color-stop(100%, #000));///*/
+     background: #000 url("images/bg2.png")no-repeat scroll bottom right;
+     color: #7b7;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      font-size: 7.5pt;
      text-align: right;
-     -moz-box-shadow: inset 0px 0px 1px 0px #eef;
-     -khtml-box-shadow: inset 0px 0px 1px 0px #eef;
-     box-shadow: inset 0px 0px 1px 0px #eef;
+/*     -moz-box-shadow: inset 0px 0px 0px 0px #EE9;
+     -khtml-box-shadow: inset 0px 0px 1px 0px #EE9;
+     box-shadow: inset 0px 0px 1px 0px #EE9;*/
+     -moz-box-shadow: 0 1px 5px #000;
+     min-width: 590px;
 }
 
 div.news li {
      text-align: justify;
      list-style: url('images/info_dark.png');
-     margin: 0 10px 0 20px;
+     list-style: none;
+     margin: 0 10px 0 0px;
      padding: 5px 5px 5px 0;
      vertical-align: middle;
      word-wrap: break-word;
-     color: #99f;
+     color: #494;
 }
 
 div.news h4 {
      border-bottom: 1px;
      border-bottom-style: dotted;
-     border-bottom-color: #99f;
+     border-bottom-color: #494;
      padding: 0 0 0px 0;
      margin: 5px 0 10px 0;
      font-size: 10pt;
@@ -337,7 +359,7 @@ div.news h4:first-child {
 div.news p {
      margin-top: -5px;
      font-size: 8.5pt;
-     color: #eef;
+     color: #EE9;
 }
 
 div.news hr {
@@ -347,31 +369,25 @@ div.news hr {
 div.confignav {
      padding: 15px 10px !important;
      margin: 15px 0;
-     background: #004 url('images/darkbluebg.png');
+     background: #000 url('images/header.png') center center repeat-x ;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     border: 1px solid #99f;
+     border: 1px solid #494;
      font-size: 9.5pt !important;
      font-weight: bold !important;
      line-height: 160% !important;
-     -moz-box-shadow: inset 0px 0px 1px 0px #eef;
-     -khtml-box-shadow: inset 0px 0px 1px 0px #eef;
-     box-shadow: inset 0px 0px 1px 0px #eef;
+
 }
 
 div.configure {
-     padding: 5px 15px 0 15px;
+/*     padding: 5px 15px 0 15px;
      margin: 10px 0px;
-     background: #005;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     border: 1px solid #99f;
-     background: #003 url(images/darkbluebg.png);
-     -moz-box-shadow: inset 0px 0px 1px 0px #eef;
-     -khtml-box-shadow: inset 0px 0px 1px 0px #eef;
-     box-shadow: inset 0px 0px 1px 0px #eef;     
+     border: 1px solid #494; */
+     background: #000;/* url(images/camotile2.png);*/
 }
 
 div.messages {
@@ -380,11 +396,8 @@ div.messages {
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     border: 1px solid #99f;
-     background: #008 url('images/lightbluetile.png');
-     -moz-box-shadow: inset 0px 0px 1px 0px #eef;
-     -khtml-box-shadow: inset 0px 0px 1px 0px #eef;
-     box-shadow: inset 0px 0px 1px 0px #eef;
+     border: 1px solid #494;
+     background: #000;/* url('images/lightbluetile.png');*/
      font-weight: bold;
      font-size: 9pt;
      color: #ddf;
@@ -408,18 +421,18 @@ div.messages li {
 }
 
 div.graphspanel {
-     padding: 10px 15px 0 15px;
-     margin: 15px 0px;
-     background: #005;
+     padding: 0;
+     margin: 15px 0px -15px 0;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     border: 1px solid #99f;
-     background: #003 url(images/darkbluebg.png);
-     -moz-box-shadow: inset 0px 0px 1px 0px #eef;
-     -khtml-box-shadow: inset 0px 0px 1px 0px #eef;
-     box-shadow: inset 0px 0px 1px 0px #eef;
+/*     border: 1px solid #494;*/
+     background: #000;/* url(images/camotile.png);*/
      text-align: center;
+}
+
+div.widepanel h3 {
+     text-align: left !important;
 }
 
 div.graphspanel form {
@@ -432,23 +445,21 @@ div.graphspanel hr {
 }
 
 div.graphspanel img {
-     border: 1px solid #001;
+     border: 1px solid #494;
      padding: 3px;
      margin: 5px;
      text-align: center !important;
-     background: #002;
-     -moz-box-shadow: inset 0px 0px 1px 0px #eef;
-     -khtml-box-shadow: inset 0px 0px 1px 0px #eef;
-     box-shadow: inset 0px 0px 1px 0px #eef;
+     background: #000;
+
      opacity: 0.8;
 }
 
 div.graphspanel img:hover {
-     border: 1px solid #001;
+     border: 1px solid #000;
      padding: 3px;
      margin: 5px;
      text-align: center !important;
-     background: #002;
+     background: #000;
      -moz-box-shadow: inset 0px 0px 1px 1px #f60;
      -khtml-box-shadow: inset 0px 0px 1px 1px #f60;
      box-shadow: inset 0px 0px 1px 1px #f60;
@@ -458,18 +469,18 @@ div.graphspanel img:hover {
 table {
      border-collapse: collapse;
      width: 100%;
-     border: 1px solid #99f;
+     border: 1px solid #494;
      cell-padding: 1px;
      font-size: 7pt;
-     background: #003;
+     background: #030;
      margin: 1px 0;
 }
 
 table hr {
      padding: 0px 0;
-     color: #99f;
-     background: #99f;
-     border: 0px solid #99f;
+     color: #494;
+     background: #494;
+     border: 0px solid #494;
      margin: 0px 0px;
      height: 1px;
      display: none;
@@ -477,12 +488,13 @@ table hr {
 
 th {
      padding: 6px 2px;
-     color: #eef;
+     color: #EE9;
      text-align: center;
      font-size: 9pt;
-     background: #004 url('images/tabletitledark.png') repeat-x;
-     border-top: 1px solid #99f;
-     border-bottom: 1px solid #99f !important;     
+     background: #000; /*url('images/tabletitledark.png') repeat-x;*/
+     background: #000 url('images/header.png') center center repeat-x ;
+     border-top: 1px solid #494;
+     border-bottom: 1px solid #494 !important;     
      line-height: 110%;
 }
 
@@ -491,27 +503,27 @@ tr {
 }
 
 tr:nth-child(even) {
-     background: #002 url('images/darkerbluetile.png') !important;
+     background: #010;/* url('images/darkerbluetile.png') !important;*/
      vertical-align: middle;
 }
 
 tr:nth-child(odd) {
-     background: #003 url('images/darkbluetile.png') !important;
+     background: #000800;/* url('images/darkbluetile.png') !important;*/
      vertical-align: middle;
 }
 /*
 tr:last-child {
      background: #004 url('images/lightbluetile.png') !important;
      font-weight: bold;
-     border: 1px solid #99f !important;
+     border: 1px solid #494 !important;
 }
 */
 td {
-     padding: 6px 3px;
-     color: #eef;
+     padding: 4px 6px;
+     color: #EE9;
      vertical-align: middle;
-     border-top: 1px inset #006;
-     border-bottom: 1px outset #006;   
+     border-top: 1px inset #494;
+     border-bottom: 1px outset #494;   
 }
 
 td img {
@@ -529,7 +541,7 @@ div.main li {
      list-style: square;
      margin: 2px 0px 2px 30px;
      padding: 1px 20px 1px 0px;
-     line-height: 150%;
+/*     line-height: 150%;*/
      word-wrap: break-word;
 }
 
@@ -559,18 +571,19 @@ ul {
 
 code {
      text-align: left;
-     font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: 8.5pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     color: #dd0;
 }
 
 a:link, h2 a:link{
-     color: #99f;
+     color: #494;
      text-decoration: none;
      font-weight: bold;     
      word-wrap: break-word;
 }
 
 a:visited{
-     color: #77f;
+     color: #7b7;
      text-decoration: none;
      font-weight: bold;     
      word-wrap: break-word;
@@ -601,7 +614,7 @@ p {
 
 h1 {
      text-align: left;
-     color: #fff;
+     color: #EE9;
      padding: 10px 15px;
      margin: 0 15px 10px 220px;
      font-size: 16pt;
@@ -609,65 +622,68 @@ h1 {
      font-style: normal;
      text-transform: uppercase;
      letter-spacing: 0.15em;
-     text-shadow: 0px 0px 3px rgba(255, 255, 255, 0.8);
+     text-shadow: 0px 0px 2px #010;
      white-space: normal;
-     background: #002 //url('images/darkbluebg.png');
-     background-image: -moz-linear-gradient(top, bottom, from(#001), to(#003), color-stop(30%, #001), color-stop(100%, #001));
-     -moz-box-shadow: inset 0px 0px 1px 0px #eef;
-     -khtml-box-shadow: inset 0px 0px 1px 0px #eef;
-     box-shadow: inset 0px 0px 1px 0px #eef;
-     border: 1px solid #99f;
+     background: #000 url("images/scope.png")no-repeat scroll right top;
+     background: #000 url("images/bg2.png")no-repeat scroll top right;
+     background: #000 url('images/header.png') center center ;
+     background-image: -moz-linear-gradient(top, bottom, from(#000), to(#030), color-stop(30%, #000), color-stop(100%, #000));
+     border: 1px solid #494;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      line-height: 120%;
+     min-width: 620px;
+     -moz-box-shadow: 0 1px 5px #000;
 }
 
 h2 {
      font-size: 12pt;
-     color: #fff;
-     text-shadow: 0px 0px 1px rgba(255, 255, 255, 0.5);
+     color: #EE9;
+     text-shadow: 0px 0px 2px #010;
      letter-spacing: 0.05em;
-     background: #002; // url('images/darkbluebg.png');
-     background-image: -moz-linear-gradient(top, bottom, from(#001), to(#003), color-stop(30%, #001), color-stop(100%, #001));
+     background: #000 url(images/camotile2.png);
+     background-image: -moz-linear-gradient(top, bottom, from(#000), to(#030), color-stop(30%, #000), color-stop(100%, #000));
+     background: #000 url('images/header.png') center center ;
      padding: 5px 10px 8px 10px;
      wordwrap: none;
-     border: 1px solid #99f;
+     border: 1px solid #494;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      vertical-align: middle;
      margin: 15px 0 12px 0 !important;
-     -moz-box-shadow: inset 0px 0px 1px 0px #eef;
-     -khtml-box-shadow: inset 0px 0px 1px 0px #eef;
-     box-shadow: inset 0px 0px 1px 0px #eef;
+    text-transform: uppercase;
      word-wrap: break-word;
 }
 
 h2 a:visited {
-     color: #44f;
+     color: #191;
 }
 
 h2 a:hover {
      color: #f60;
-     text-shadow: 0px 0px 1px rgba(255, 255, 72, 0.9);
+     text-shadow: 0px 0px 1px rgba(255, 64, 0, 0.7);
 }
 
 h3 {
-     border: 1px solid #99f;
-     border-left: 5px solid #99f;
-     padding: 3px 5px 3px 5px;
+     border: 1px solid #494;
+     border-left: 5px solid #494;
+     padding: 5px 6px;
      margin: 12px 0 10px 0;
      border-radius: 0 4px 4px 0;
      -moz-border-radius: 0 4px 4px 0;
      -khtml-border-radius: 0 4px 4px 0;
-     background: #002;
+     background: #000 url(images/camotile.png);
+     background: #000 url('images/header.png') center center ;
+     text-transform: uppercase;
+     text-shadow: 0px 0px 2px #010;
 }
 
 h4 {
      border-bottom: 1px;
      border-bottom-style: solid;
-     border-bottom-color: #99f;
+     border-bottom-color: #494;
      padding: 0 0 10px 0;
      margin: 5px 0 10px 0;
      font-size: 11pt;
@@ -675,9 +691,8 @@ h4 {
 
 button, button:visited {
      font: bold 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
-     border: 1px outset #77f;
+     border: 1px outset #191;
      padding: 1px 3px;
-     background: #bbf;
      text-decoration: none;
      border-radius: 4px;
      -moz-border-radius: 4px;
@@ -688,26 +703,26 @@ button, button:visited {
      text-align: center;
      vertical-align: middle;
      min-width: 76px;
-     -moz-box-shadow: inset 0px 1px 1px 0px #55f;
-     -khtml-box-shadow: inset 0px 1px 1px 0px #55f;
-     box-shadow: inset 0px 1px 1px 0px #55f;
-     background: #003;
-     color: #99f;
+     -moz-box-shadow: inset 0px 1px 1px 0px #494;
+     -khtml-box-shadow: inset 0px 1px 1px 0px #191;
+     box-shadow: inset 0px 1px 1px 0px #191;
+     background: #000;
+     color: #494;
 }
 
 button:hover {
      border: 1px solid #f60;
-     -moz-box-shadow: inset 0px 1px 1px 0px #eef;
-     -khtml-box-shadow: inset 0px 1px 1px 0px #eef;
-     box-shadow: inset 0px 1px 1px 0px #eef;
-     background: #001;
+     -moz-box-shadow: inset 0px 1px 1px 0px #EE9;
+     -khtml-box-shadow: inset 0px 1px 1px 0px #EE9;
+     box-shadow: inset 0px 1px 1px 0px #EE9;
+     background: #000;
      color: #f60;
 }     
           
 button:active {
      border: 1px inset #f60;
      background: #f60;
-     color: #fff;
+     color: #EE9;
      -moz-box-shadow: inset 0px 0px 0px 0px #f60;
      -khtml-box-shadow: inset 0px 0px 0px 0px #f60;
      box-shadow: inset 0px 0px 0px 0px #f60;
@@ -720,9 +735,9 @@ button:active {
 }
 
 .langbox {
-     margin: 2px 2px 2px 5px;
+     margin: 17px 2px 2px 5px;
      padding: 7px 10px 5px 10px;
-     color: #eef;
+     color: #EE9;
      font-size: 7pt;
      width: 220px;
      text-align: right;
@@ -730,11 +745,21 @@ button:active {
      vertical-align: middle;
 }
 
+.langbox img {
+     opacity: 0.7;
+     -moz-box-shadow: 0 0 1px #000;
+}
+
+.langbox img:hover {
+     opacity: 1;
+     -moz-box-shadow: 0 0 1px #f60;
+}
+
 hr {
-     color: #99f;
-     background: #99f;
+     color: #494;
+     background: #494;
      height: 1px;
-     border: 0px solid #99f;
+     border: 0px solid #494;
      margin: 10px 0;
 }
 
@@ -748,12 +773,12 @@ sidebarlogo {
 }
 
 input {
-     border: 1px outset #55f;
-     -moz-box-shadow: inset 0px 1px 1px 0px #55f;
-     -khtml-box-shadow: inset 0px 1px 1px 0px #55f;
-     box-shadow: inset 0px 1px 1px 0px #55f;
-     background: #003;
-     color: #99f;
+     border: 1px outset #5f5;
+     -moz-box-shadow: inset 0px 1px 1px 0px #373;
+     -khtml-box-shadow: inset 0px 1px 1px 0px #373;
+     box-shadow: inset 0px 1px 1px 0px #373;
+     background: #000;
+     color: #494;
      margin: 5px;
      font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      padding: 1px 2px;
@@ -765,16 +790,16 @@ input {
 }
 
 input:hover {
-     background: #001;
+     background: #000;
      color: #f60;
      border: 1px solid #f60;
-     -moz-box-shadow: inset 0px 1px 1px 0px #eef;
-     -khtml-box-shadow: inset 0px 1px 1px 0px #eef;
-     box-shadow: inset 0px 1px 1px 0px #eef;
+     -moz-box-shadow: inset 0px 1px 1px 0px #9e9;
+     -khtml-box-shadow: inset 0px 1px 1px 0px #9e9;
+     box-shadow: inset 0px 1px 1px 0px #9e9;
 }
 
 input:active {
-     background: #002;
+     background: #000;
      color: #f30;
      border: 1px solid #f30;
 }
@@ -782,16 +807,16 @@ input:active {
 input:active {
      border: 1px inset #f60;
      background: #f60;
-     color: #fff;
+     color: #EE9;
 }
 
 input[type=text] {
-     background: #002;
-     color: #eef;
+     background: #000;
+     color: #EE9;
      margin: 5px 10px;
      padding: 4px 2px;
      font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
-     border: 1px solid #bbf;
+     border: 1px solid #494 !important;
      text-decoration: none;
      border-radius: 4px;
      -moz-border-radius: 4px;
@@ -802,7 +827,7 @@ input[type=text] {
 }
 
 input[type=text]:active, input[type=text]:hover {
-     background: #001;
+     background: #000;
 }
 
 fieldset {
@@ -811,10 +836,10 @@ position: relative;
 }
 
 select {
-     background: #002;
-     color: #eef;
+     background: #000;
+     color: #EE9;
      margin: 5px 10px;
-     border: 1px solid #bbf;
+     border: 1px solid #494;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
@@ -824,8 +849,8 @@ select {
 }
 
 textarea {
-     background: #001;
-     color: #eef;
+     background: #000;
+     color: #EE9;
      padding: 5px;
      margin: 10px;
      border-radius: 4px;
@@ -835,7 +860,7 @@ textarea {
      min-height: 100px;
      min-width: 97%;
      text-align: left;
-     border: 1px solid #99f;
+     border: 1px solid #494;
 }
 
 form {}
@@ -849,39 +874,37 @@ form {}
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
-     border: 1px solid #001;
+     border: 1px solid #000;
      display: none;
 }        
 
 .statusnotes {
      font-style: italic;
      font-size: 8pt;
-     color: #eef;
+     color: #EE9;
      text-align: center;
-     border: 1px solid #99f !important;
+     border: 1px solid #494 !important;
 /*     border-top: 0px !important;*/
      margin: -3px 0 5px 0; 
      padding: 7px;
-     background: #004;
-     -moz-box-shadow: inset 0px 0px 0px 1px #009;
-     -khtml-box-shadow: inset 0px 0px 0px 1px #009;
-     box-shadow: inset 0px 0px 0px 1px #009;
+     background: #010;
+     -moz-box-shadow: inset 0px 0px 0px 1px #090;
+     -khtml-box-shadow: inset 0px 0px 0px 1px #090;
+     box-shadow: inset 0px 0px 0px 1px #090;
+/*     background: #000 url('images/header.png') repeat-x center center !important;*/
 }
 
 div.joblog {
-     margin: 	15px 0 15px 0;
+/*     margin: 	15px 0 15px 0;
      padding: 5px 20px 10px 20px !important;
-     border: 1px solid #99f;
-     background-color: #004;
-     background: url("images/darkbluebg.png");
-     color: #dfd;
-     border-radius: 4px;
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
+     border: 1px solid #494;
+     background-color: #000;
+     background: #000; url("images/camotile.png");*/
+/*     color: #dfd;*/
+     border-radius: 4px 4px 0 0;
+     -moz-border-radius: 4px 4px 0 0;
+     -khtml-border-radius: 4px 4px 0 0;
      text-align: justify !important;
-     -moz-box-shadow: inset 0px 0px 1px 0px #eef;
-     -khtml-box-shadow: inset 0px 0px 1px 0px #eef;
-     box-shadow: inset 0px 0px 1px 0px #eef;
      overflow-x: scroll; /* Opera fix */
  }
  
@@ -953,14 +976,14 @@ position: relative;
 }
 
 .cells {
-     border: 1px inset #005;
-     border-left: 1px outset #002;     
+     border: 1px inset #494;
+     border-left: 1px outset #494;     
 }
 
 .tablefooter tr, .tablefooter td {
-     background: #004 url('images/tabletitledark.png') repeat-x !important;
-     border-top: 1px solid #99f;
-     border-bottom: 1px solid #99f !important;     
+     background: #000 url('images/header.png') repeat-x center center !important;
+     border-top: 1px solid #494;
+     border-bottom: 1px solid #494 !important;     
      font-size: 7pt;
      line-height: 110%;
 }

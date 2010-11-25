@@ -1,5 +1,5 @@
 /* I2P Theme: I2P Classic Theme Override */
-/* Description: Larger fontsize override for console to accomodate foreign charactersets */
+/* I2P Description: Larger fontsize override for console to accomodate foreign charactersets */
 /* Author: Dr|Z3d */
 
 
@@ -20,8 +20,6 @@ div.routersummary h4 {
 
 div.routersummary table {
      font-size: 9pt;
-     margin: -5px 0px -5px -1px;
-     width: 188px !important;
 }
 
 div.routersummary table a:link, div.routersummary table a:visited {
@@ -33,9 +31,6 @@ div.tunnels a {
 }
 
 div.tunnels table {
-     width: 186px !important;
-     text-align: center;
-     margin: -4px 1px !important;
 }
 
 div.tunnels td:first-child, div.tunnels td:last-child  {

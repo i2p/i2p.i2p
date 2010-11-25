@@ -1,11 +1,10 @@
-/* I2P Theme: Classic */
-/* Description: Classic theme, loosely based on duck's original */
-/* Optimized for less capable browsers and system specifications */
+/* I2P Theme: Classic (aka corporat) */
+/* I2P Description: Light blue "classic" I2P theme; optimized for less capable browsers and system specifications. */
 /* Author: dr|z3d */
 
 
 body {
-     margin: 2px 0 0 2px;
+     margin: 5px 3px 5px 6px;
      padding: 0;
      text-align: left;
      background: #bbf;
@@ -28,6 +27,8 @@ pre {
      padding-top: 10px;
 }
 
+/* Sidepanel for proxy errors */
+
 div.logo {
      float: left;
      position-relative: top 20px ;
@@ -37,9 +38,7 @@ div.logo {
      text-align: center;
      border: 5px solid #ddf;
      background-color: #eef;
-     -moz-border-radius: 15px;
      -moz-box-shadow: inset 0px 0px 0px 2px #99f;
-     -khtml-border-radius: 15px;
      -khtml-box-shadow: inset 0px 0px 0px 2px #99f;
 }
 
@@ -65,6 +64,8 @@ div.logo a:hover {
      color: #900;
 }
 
+/* HTTP Proxy warning Main box */
+
 div.warning {
      margin: 20px 20px 10px 260px;
      padding: 0px 20px 20px 75px;
@@ -75,9 +76,7 @@ div.warning {
      background-image:url("../images/itoopie_sm.png");     
      background-position: 12px center;
      background-repeat:no-repeat;
-     -moz-border-radius: 15px;
      -moz-box-shadow: inset 0px 0px 0px 2px #f60;
-     -kthml-border-radius: 15px;
      -khtml-box-shadow: inset 0px 0px 0px 2px #f60;
 }
 
@@ -92,7 +91,7 @@ div.warning a:visited{
 
 div.warning a:hover{
      color: #d30;
-  text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.7);
+     text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.7);
 }
 
 div.warning a:active{
@@ -107,25 +106,32 @@ div.warning hr {
      margin: 5px 0;
 }
 
+div.warning h3 {
+     border: 0;
+     border-bottom: 5px solid #fb7;
+     padding-bottom: 10px;
+     background: #ffd;
+     padding-left: 0;
+}
+
 /* console error messages */
 
 div.sorry {
      padding: 20px;
      background: #ddf;
-     margin: -2px 1px 0 195px;
-     border: 5px solid #bbf;
+     margin: -1px 1px 0 200px;
+     border: 1px solid #89f;
      text-align: justify;
-     -moz-box-shadow: inset 0px 0px 0px 1px #d00;
      word-wrap: break-word;
      font-weight: bold;
      color: #001;
 }
 
 div.sorry hr {
-     color: #001;
-     background: #001;
+     color: #89f;
+     background: #89f;
      height: 1px;
-     border: 1px solid #001;
+     border: 0px solid #89f;
      margin: 10px 0;
 }
 
@@ -135,9 +141,11 @@ div.toolbar {
      display: none !important;
 }
 
+/* Side panel */
+
 div.routersummaryouter {
      float: left; 
-     width: 200px;
+     width: 193px;
      margin: 0;
      padding: 0;
      border: 0;
@@ -146,16 +154,16 @@ div.routersummaryouter {
 
 div.routersummary {
      background: #ddf;
-     width: 185px;
+     width: 193px;
      color: inherit;
      margin: 0;
      padding: 10px 1px 7px 1px;
      text-align: center !important;
-     border: 5px solid #bbf;
-     font-size: 9pt;
+     border: 1px solid #89f;
+     border-bottom: 1px solid #89f;
+     border-right: 1px solid #89f;
      word-wrap: break-word;
-     font: 9pt/125%;
-     -moz-box-shadow: inset 0px 0px 0px 1px #99f;
+     font: 9pt/125% !important;
 }
 
 div.routersummary input[type=text] {
@@ -163,45 +171,49 @@ div.routersummary input[type=text] {
 }
 
 div.routersummary hr {
-     color: #eef;
-     background: #eef;
-     height: 2px;
-     border-bottom: 1px solid #eef;
-     margin: 8px 1px 7px 1px;
-     -moz-box-shadow: inset 0px 1px 1px 1px #99f;
+     color: #89f;
+     background: #89f;
+     height: 0px;
+     border-bottom: 1px solid #89f;
+     margin: 8px -1px 7px -1px;
 }
 
 div.routersummary h3 {
      border: 0px solid #f00;
      font-size: 9.5pt;
      letter-spacing: 0.05em;
-     margin: -7px 1px -7px 1px;
+     margin: -7px 0px -8px 0px;
      padding: 1px 0;
      background: #c5d5fb;
      text-transform: uppercase;
 }
 
 div.routersummary h4 {
-     border: 0px solid #f00;
+     border: 0;
      border-bottom: 0 !important;
      font-size: 8.5pt;
      letter-spacing: 0.05em;
-     margin: -7px 1px -7px 1px !important;
-     padding: 1px 3px;
+     margin: -7px 0px -8px 0px !important;
+     padding: 3px 0;
      background: #c1d1f7;
      text-transform: capitalize;
      text-decoration: none !important;
      color: #2b2;
+     line-height: 90%;
+}
+
+div.routersummary h3 a, div.routersummary h4 a {
+     text-decoration: none;
 }
 
 div.routersummary table {
      border: 0;
      text-align: center !important;
-     margin: -5px 4px -5px 3px;
-     width: 180px !important;
+     margin: -5px 0px -5px 0px;
+     width: 193px !important;
      overflow: hidden;
      font-size: 8pt;
-     padding: 0 -10px;
+     padding: 0 -12px;
      background-image: none !important;
      background-color: transparent !important;
 }
@@ -212,18 +224,45 @@ div.routersummary tr {
      border: 0 !important;
 }
 
+div.tunnels table {
+     margin: 0 -7px !important;
+     width: 193px;
+}
+
 div.tunnels table{
-     margin: 0 !important;
+     margin: -2px 0px -4px 0px !important;
+     text-align: center !important;
+     width: 190px;
 }
 
 .tunnels tr {
      padding: 2px 0 !important;
-     margin-left: -7px !important;
 }
+
+.tunnels a {
+     text-transform: capitalize;
+}
+
+.tunnels td:first-child {
+     width: 16px !important;
+     padding-right: 0px;
+     text-align: left;
+}
+
+.tunnels td:last-child {
+     width: 12px;
+     text-align: right;
+     margin-right: -2px;
+}    
      
 div.routersummary form {
      margin-top: -6px !important;
      margin-bottom: -4px !important;     
+}
+
+div.routersummary form:last-child {
+     padding-top: 3px !important;
+     margin-bottom: -10px !important;     
 }
 
 div.refresh {
@@ -251,21 +290,17 @@ div.routersummary td {
      border: 0 !important;
 }
 
-div.warning h3 {
-     border-bottom: 5px solid #fb7;
-     padding-bottom: 10px;
-}
-
 div.main {
-     margin: 0px 0px 0px 195px;
+     margin: 0px 1px 0px 200px;
      padding: 15px 15px 10px 15px;
      background: #eef;
-     border: 5px solid #bbf;
+     border: 1px solid #89f;
+     border-bottom: 1px solid #89f;
+     border-right: 1px solid #89f;
      border-top: 0;
      text-align: left;
      color: #001;
-     min-width: 570px;
-     -moz-box-shadow: inset 0px 0px 0px 1px #99f;
+     min-width: 500px;
 }
 
 div.main ul {
@@ -295,7 +330,7 @@ div.main textarea {
 
 div.main h2 {
      margin-top: 20px;
-     margin-bottom: -5px;
+     margin-bottom: 0px;
 }
 
 div.welcome {
@@ -325,17 +360,18 @@ div.wideload p !important {
 }
 
 div.news {
-     margin: -5px 0px 0 195px;
+     margin: -1px 1px 0 200px;
      padding: -10px 0px 8px 0px;
      background: #ffffc0;
-     border: 5px solid #bbf;
+     border: 1px solid #89f;
+     border-bottom: 1px solid #89f;
+     border-right: 1px solid #89f;
      text-align: right;
      color: #770;
-     min-width: 600px;
+     min-width: 500px;
      padding-bottom: 8px;
      padding-left: 10px;
      padding-right: 10px;
-     -moz-box-shadow: inset 0px 0px 0px 1px #99f;
      font-size: 7pt;
 }
 
@@ -387,16 +423,19 @@ div.news hr {
      color: #cc7;
      background: #cc7;
      height: 1px;
-     border: 0px solid #cccc77;
-     margin: 20px 0 2px 0;
+     border: 0px solid #cc7;
+     margin: 20px 0 0 0;
 }
 
 div.confignav {
-     padding: 12px 0 15px 0;
-     background: #cfc;
-     margin: -20px -20px 0 -20px;
-     border: 5px solid #bbf;
-     -moz-box-shadow: inset 0px 0px 0px 1px #99f;
+     padding: 10px 0 11px 0;
+     background: #ddf;
+     margin: -16px -16px 0 -16px;
+     border: 1px solid #89f;
+     font-size: 9.5pt;
+}
+
+div.confignav a {
 }
 
 div.configure {
@@ -411,7 +450,7 @@ div.configure hr {
 div.configure table {
      font-size: 9pt;
      font-weight: bold;
-     border: 1px solid #bbf;
+     border: 1px solid #89f;
 }
 
 div.configure tr, div.configure td {
@@ -419,7 +458,6 @@ div.configure tr, div.configure td {
 }
 
 div.configure tr {
-     -moz-box-shadow: inset 0px 0px 1px 0px #bbf;
 }
 
 div.configure li:first-child, div.main li:first-child {
@@ -442,14 +480,13 @@ div.configure h2:first-child {
 div.messages {
      padding: 0px 10px;
      background: #fff;
-     border: 5px solid #bbf;
+     border: 1px solid #89f;
      border-right: 0;
-     margin: -5px -15px 10px -20px;
+     margin: -1px -15px 10px -16px;
      text-align: center;
      font-size: 9pt;
      font-weight: bold;
      color: #474;
-     -moz-box-shadow: inset 0px 0px 0px 1px #99f;
 }
 
 div.messages li, div.messages ul {
@@ -469,32 +506,42 @@ h1 {
      font-size: 18pt;
      text-shadow: 0px 0px 1px rgba(0, 0, 32, 0.7);
      text-align: center;
-     border: 5px solid #bbf;
-     padding: 13px 10px 12px 10px;
-     margin: 0 0px 0 195px;
+     border: 1px solid #89f;
+     border-bottom: 1px solid #89f;
+     border-right: 1px solid #89f;
+     padding: 16px 10px 16px 10px;
+     margin: 0 1px 0 200px;
      line-height: 93%;
      text-transform: uppercase;
      letter-spacing: 0.3em;
      background: #fff;
-     min-width: 600px;
-     -moz-box-shadow: inset 0px 0px 0px 1px #99f;
+     min-width: 500px;
 }
 
 h2 {
      font-size: 14pt;
-     padding: 0px 10px 10px 10px;
-     border-bottom: 3px solid #aaf;
-     border-top: 0px solid #aaf;
+     padding: 10px;
+     border: 1px solid #89f;
      letter-spacing: 0.04em;
+     font-variant: small-caps; 
+     text-transform: capitalize; 
+     background: #fff;
+     text-shadow: 0px 0px 1px rgba(0, 0, 32, 0.7);
 }
 
 h3 {
      font-size: 12pt;
-     padding: 0 10px 10px 10px;
-     border-bottom: 3px solid #aaf;
-     border-top: 0px solid #aaf;
+     padding: 5px 10px;
+     border: 1px solid #89f;
      letter-spacing: 0.04em;
      margin-bottom: 10px;
+     background: #fff;
+}
+
+h2, h3 {
+     background-image: url("images/titlebg.png"); 
+     background-repeat: no-repeat; 
+     background-position: right center;
 }
 
 .proxyfooter{
@@ -504,7 +551,7 @@ h3 {
 
 table {
      border-collapse: collapse; 
-     border: 1px solid #bbf;
+     border: 1px solid #89f;
      margin: 0 0 5px 0;
      cell-padding: 1px;
      font-size: 7.5pt;
@@ -513,11 +560,11 @@ table {
 }
 
 table hr {
-     padding: 0px 0;
-     color: #bbf;
-     background: #bbf;
-     border: 0px solid #bbf;
-     margin: 0px -5px;
+     padding: 0;
+     color: #89f;
+     background: #89f;
+     border: 0px solid #89f;
+     margin: -5px -5px -10px -5px !important;
      height: 1px;
 }
 
@@ -525,11 +572,15 @@ table tt {
      font-size: 7.5pt;
 }
 
+table code {
+     font-size: 120%;
+}
+
 th {
      background-color: #fff;
      padding: 8px 2px;
      text-align: center;
-     border-bottom: 1px solid #bbf;
+     border-bottom: 1px solid #89f;
 }
 
 tt {
@@ -553,10 +604,10 @@ tr:nth-child(odd) {
 }
 
 hr {
-     color: #aaf;
-     background: #aaf;
-     height: 3px;
-     border: 0px solid #aaf;
+     color: #89f;
+     background: #89f;
+     height: 2px;
+     border: 0px solid #89f;
      margin: 3px 0;
 }
 
@@ -655,10 +706,10 @@ p {
 }
 
 .langbox {
-     margin: 10px -20px 0px 5px;
+     margin: 18px -20px 0px 5px;
      color: #001;
      font-size: 7pt;
-     width: 220px;
+     width: 280px;
      text-align: center;
      float: right;
      valign: middle;
@@ -695,6 +746,7 @@ a:hover{
      color: #f60;
      text-decoration: underline;
      font-weight: bold;
+     text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.7);
 }
 
 a:active{
@@ -713,9 +765,9 @@ tt {
      font-weight: bold;
      color: darkgreen;
 }
-
+ 
 .tablefooter {
-     border: 1px solid #bbf;
+     border: 1px solid #a8f;
 }
 
 .tablefooter tr, .tablefooter td {
@@ -725,7 +777,7 @@ tt {
      line-height: 150%;
      word-wrap: nowrap;
      padding: 8px 1px;
-     border-top: 2px solid #bbf;
+     border-top: 2px solid #89f;
 }
 
 .tidylist {
@@ -735,14 +787,9 @@ tt {
 }
 
 div.graphspanel {
-     padding: 15px 5px 20px 5px;
-     margin: -20px;
-     background: #ddf url('images/lightbluetile.png');
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
-     border-radius: 4px;
-     border: 5px solid #bbf;
-     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     padding: 10px 5px 20px 5px;
+     margin: -16px -16px -11px -16px;
+     border: 1px solid #89f;
      text-align: center !important;   
 }
 
@@ -756,7 +803,7 @@ div.graphspanel img {
 }
 
 div.graphspanel img:hover {
-     border: 1px solid #003;
+     border: 1px solid #89f;
      padding: 2px;
      margin: 6px;
      text-align: center !important;

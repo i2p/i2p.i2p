@@ -738,10 +738,10 @@ p {
 }
 
 .langbox {
-     margin: 17px -20px 0px 5px;
+     margin: 17px -30px 0px 5px;
      color: #eef;
      font-size: 7pt;
-     width: 220px;
+     width: 280px;
      text-align: center;
      float: right;
      valign: middle;

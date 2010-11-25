@@ -1,5 +1,6 @@
-/* I2P Tunnel Edit Page
-*/
+/* I2P Console theme: "Camo" by dr|z3d. Aka "dark". As in ops. */
+/* I2P Tunnel Edit Page */
+
 #tunnelEditPage input {
      width: 458px;
 }
@@ -82,8 +83,9 @@
      height: 100px;
      padding: 4px;
      margin: 0 0 3px 0;
-     background-color: #000088;
-     color: #fff;
+     background-color: #040;
+/*     background: #000 url("images/helitile.png")no-repeat scroll right top;*/
+     color: #ee9;
      font-family: "Lucida Console", "Andale Mono", "Courier New", Courier, mono;
      border: 1px inset #002;
 }
