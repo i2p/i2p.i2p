@@ -26,7 +26,6 @@ import net.i2p.router.Router;
 
 /**
  * Manages the tray icon life.
- * 
  */
 public class TrayManager {
 
@@ -115,6 +114,9 @@ public class TrayManager {
 					@Override
 					protected void done() {
 						trayIcon.displayMessage("Starting", "I2P is starting!", TrayIcon.MessageType.INFO);
+						//Hide the tray icon.
+						//We cannot stop the desktopgui program entirely,
+						//since that risks killing the I2P process as well.
 						tray.remove(trayIcon);
 					}
 					

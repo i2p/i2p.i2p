@@ -12,6 +12,14 @@ public class RouterManager {
 		return RouterContext.listContexts().get(0).router();
 	}
 	
+	/**
+	 * Start an I2P router instance.
+	 * This method has limited knowledge
+	 * (there is no I2P instance running to collect information from).
+	 * 
+	 * It needs to determine itself where the I2P instance is located,
+	 * except if the location has been given through command-line arguments.
+	 */
 	public static void start() {
 		try {
 			String location = ConfigurationManager.getInstance().getStringConfiguration("I2PLocation", "/home/i2p");
@@ -24,10 +32,16 @@ public class RouterManager {
 		}
 	}
 	
+	/**
+	 * Restart the running I2P instance.
+	 */
 	public static void restart() {
 		getRouter().restart();
 	}
 
+	/**
+	 * Stop the running I2P instance.
+	 */
 	public static void shutDown() {
 		getRouter().shutdownGracefully();
     }

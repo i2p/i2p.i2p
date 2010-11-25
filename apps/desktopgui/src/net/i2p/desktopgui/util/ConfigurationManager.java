@@ -12,7 +12,9 @@ import java.util.regex.Pattern;
 public class ConfigurationManager {
 	
 	private static ConfigurationManager instance;
+	///Configurations with a String as value
 	private Map<String, String> stringConfigurations = new HashMap<String, String>();
+	///Configurations with a Boolean as value
 	private Map<String, Boolean> booleanConfigurations = new HashMap<String, Boolean>();
 
 	private ConfigurationManager() {}
@@ -24,13 +26,12 @@ public class ConfigurationManager {
 		return instance;
 	}
 	
+	/**
+	 * Collects arguments of the form --word, --word=otherword and -blah
+	 * to determine user parameters.
+	 * @param args Command line arguments to the application
+	 */
 	public void loadArguments(String[] args) {
-		//Match pattern of the form --word=true or --word=false
-		Pattern booleanConfiguration = Pattern.compile("--(\\w)");
-		//Match pattern of the form --word=word
-		Pattern stringConfiguration = Pattern.compile("--(\\w)=(\\w)");
-		//Match pattern of the form --word
-		Pattern existsConfiguration = Pattern.compile("--(\\w)");
 		for(int i=0; i<args.length; i++) {
 			String arg = args[i];
 			if(arg.startsWith("--")) {
