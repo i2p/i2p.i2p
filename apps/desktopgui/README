@@ -1,0 +1,13 @@
+Current setup:
+* Build desktopgui:
+    * 'ant jar' in the desktopgui directory
+    OR
+    * 'ant desktopgui' in the i2p.i2p directory
+* Place desktopgui.jar in the $I2P/lib/ directory.
+* Add to .i2p/clients.config:
+    #Desktopgui
+    clientApp.6.args=--startWithI2P --I2PLocation=/SOME_LOCATION
+    clientApp.6.delay=5
+    clientApp.6.main=net.i2p.desktopgui.Main
+    clientApp.6.name=desktopgui
+    clientApp.6.startOnLoad=true

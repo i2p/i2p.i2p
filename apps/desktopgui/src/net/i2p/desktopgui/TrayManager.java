@@ -9,6 +9,7 @@ import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
 import java.awt.Desktop.Action;
+import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -20,6 +21,7 @@ import java.util.Properties;
 import javax.swing.SwingWorker;
 
 import net.i2p.desktopgui.router.RouterManager;
+import net.i2p.desktopgui.util.*;
 import net.i2p.router.Router;
 
 /**
@@ -54,6 +56,8 @@ public class TrayManager {
      * @return popup menu
      */
     public PopupMenu getMainMenu() {
+    	boolean inI2P = ConfigurationManager.getInstance().getBooleanConfiguration("startWithI2P", false);
+    	
         PopupMenu popup = new PopupMenu();
         MenuItem browserLauncher = new MenuItem("Launch I2P Browser");
         browserLauncher.addActionListener(new ActionListener() {
@@ -95,6 +99,32 @@ public class TrayManager {
         });
         popup.add(browserLauncher);
         popup.addSeparator();
+        MenuItem startItem = new MenuItem("Start I2P");
+        startItem.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				new SwingWorker<Object, Object>() {
+
+					@Override
+					protected Object doInBackground() throws Exception {
+						RouterManager.start();
+						return null;
+					}
+					
+					@Override
+					protected void done() {
+						trayIcon.displayMessage("Starting", "I2P is starting!", TrayIcon.MessageType.INFO);
+						tray.remove(trayIcon);
+					}
+					
+				}.execute();
+			}
+        	
+        });
+        if(!inI2P) {
+        	popup.add(startItem);
+        }
         MenuItem restartItem = new MenuItem("Restart I2P");
         restartItem.addActionListener(new ActionListener() {
 
@@ -104,7 +134,7 @@ public class TrayManager {
 
                     @Override
                     protected Object doInBackground() throws Exception {
-                        RouterManager.shutDown(Router.EXIT_GRACEFUL_RESTART);
+                        RouterManager.restart();
                         return null;
                     }
                     
@@ -113,7 +143,9 @@ public class TrayManager {
             }
             
         });
-        popup.add(restartItem);
+        if(inI2P) {
+        	popup.add(restartItem);
+        }
         MenuItem stopItem = new MenuItem("Stop I2P");
         stopItem.addActionListener(new ActionListener() {
 
@@ -123,7 +155,7 @@ public class TrayManager {
                     
                     @Override
                     protected Object doInBackground() throws Exception {
-                        RouterManager.shutDown(Router.EXIT_GRACEFUL);
+                        RouterManager.shutDown();
                         return null;
                     }
                     
@@ -132,7 +164,9 @@ public class TrayManager {
             }
             
         });
-        popup.add(stopItem);
+        if(inI2P) {
+        	popup.add(stopItem);
+        }
         return popup;
     }
     

@@ -687,7 +687,7 @@
 		<ant dir="core/java/" target="fullclovertest" />
 		<ant dir="router/java/" target="fullclovertest" />
     </target>
-    <target name="desktopgui">
+    <target name="desktopgui" depends="builddepSmall">
         <ant dir="apps/desktopgui" target="jar" />
         <copy file="apps/desktopgui/dist/desktopgui.jar" todir="." />
     </target>

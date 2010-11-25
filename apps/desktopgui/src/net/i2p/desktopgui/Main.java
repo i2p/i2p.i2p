@@ -9,6 +9,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.i2p.desktopgui.util.*;
 
 /**
  * The main class of the application.
@@ -39,7 +40,10 @@ public class Main {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
         
+        ConfigurationManager.getInstance().loadArguments(args);
+        
         final Main main = new Main();
+        
         main.launchForeverLoop();
         //We'll be doing GUI work, so let's stay in the event dispatcher thread.
         SwingUtilities.invokeLater(new Runnable() {

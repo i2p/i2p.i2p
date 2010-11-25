@@ -43,7 +43,8 @@
 			</manifest>
 		</jar>
 	</target>
-	
+
+	<target name="dist" depends="jar" />	
 	<target name="all" depends="jar" />
 </project>
 
