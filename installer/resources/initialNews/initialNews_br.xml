@@ -1,0 +1,21 @@
+<div lang="br">
+<h4><ul><li>Parabéns, você instalou o roteador I2P com êxito!</li></ul></h4>
+<p>
+<b>Bem-vindo ao I2P!</b><br>
+Seja <b>paciente</b> enquanto I2P ainda está iniciando-se e enquanto continuam sendo encontrados outros roteadores I2P!
+</p>
+<p>
+Este é o momento ideal para personalizar a <b>configuração de largura de banda</b> na 
+<a href="config.jsp">página de configuração</a>.
+</p>
+<p>
+Quando você vê uma conexão no lado esquerdo chamada "shared clients", você pode visitar os nossos <a href="http://www.i2p2.i2p/faq.html">FAQ</a>.
+</p>
+<p>
+Conecte seu cliente de IRC para o servidor <b>localhost:6668</b> e vem para nos cumprimentar aos canais
+<a href="irc://127.0.0.1:6668/i2p-br">#i2p-br</a>, <a href="irc://127.0.0.1:6668/i2p-help">#i2p-help</a> ou <a href="irc://127.0.0.1:6668/i2p">#i2p</a>!
+</p>
+<p>
+Esperamos que você tenha uma boa experiência e I2P.
+</p>
+</div>

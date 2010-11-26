@@ -6,12 +6,10 @@ import java.util.Locale;
 import net.i2p.util.FileUtil;
 
 public class ContentHelper extends HelperBase {
-    private String _page;
+    protected String _page;
     private int _maxLines;
     private boolean _startAtBeginning;
     private String _lang;
-    
-    public ContentHelper() {}
     
     /**
      * Caution, use absolute paths only, do not assume files are in CWD

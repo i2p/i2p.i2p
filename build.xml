@@ -413,8 +413,6 @@
         <copy file="history.txt" todir="pkg-temp/" overwrite="true" />
         <mkdir dir="pkg-temp/scripts" />
         <copy file="apps/proxyscript/i2pProxy.pac" todir="pkg-temp/scripts/" />
-        <!-- overwrite the news put in by the updater -->
-        <copy file="installer/resources/initialNews.xml" tofile="pkg-temp/docs/news.xml" overwrite="true" />
         <copy file="installer/resources/startconsole.html" todir="pkg-temp/docs/" />
         <copy file="installer/resources/start.ico" todir="pkg-temp/docs/" />
         <copy file="installer/resources/console.ico" todir="pkg-temp/docs/" />
@@ -476,8 +474,12 @@
         <delete dir="pkg-temp" />
     </target>
 
-    <!-- readme and proxy error page files, GeoIP files, and flag icons -->
-    <target name="prepConsoleDocs" depends="prepConsoleDocUpdates, prepgeoupdate" />
+    <!-- readme and proxy error page files, initialNews.xml files, GeoIP files, and flag icons -->
+    <target name="prepConsoleDocs" depends="prepConsoleDocUpdates, prepgeoupdate" >
+        <copy todir="pkg-temp/docs/" >
+          <fileset dir="installer/resources/initialNews/" />
+        </copy>
+    </target>
 
     <!-- readme and proxy error page files -->
     <target name="prepConsoleDocUpdates">
@@ -766,7 +768,6 @@
         <exec executable="ls" failonerror="true">
             <arg value="-l" />
             <arg value="history.txt" />
-            <arg value="installer/resources/initialNews.xml" />
             <arg value="installer/install.xml" />
             <arg value="installer/resources/news.xml" />
 	    <arg value="core/java/src/net/i2p/CoreVersion.java" />
