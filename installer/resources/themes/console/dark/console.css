@@ -583,7 +583,8 @@ code {
      text-align: left;
      font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      color: #dd0;
-     padding: 0 5px;
+     padding: 1px 2px;
+     background: #030;
 }
 
 a:link, h2 a:link{
