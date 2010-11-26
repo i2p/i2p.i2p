@@ -1,4 +1,4 @@
-2010-11-27 zzz
+2010-11-26 zzz
     * Console: Split initialNews.xml into a file for each language
                don't copy to config dir at install.
     * i2psnark: Clean up and enhance the PeerCoordinator's partial piece handling,
@@ -6,6 +6,7 @@
     * LogManager: When not in router context, delay creating log file until required
     * NetDb: Lower RouterInfo expiration time again
     * Router: Prevent NCDFE after unzipping update file
+    * Transports: Round time to prevent clock bias, also adjust for RTT in UDP
 
 2010-11-26 dr|z3d
     * Readme: Overhaul (English) layout and text.
