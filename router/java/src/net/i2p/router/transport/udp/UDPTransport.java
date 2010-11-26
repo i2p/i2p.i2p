@@ -177,7 +177,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _peersByIdent = new ConcurrentHashMap(128);
         _peersByRemoteHost = new ConcurrentHashMap(128);
         _dropList = new ConcurrentHashSet(2);
-        _endpoint = null;
         
         // See comments in DQAT.java
         if (USE_PRIORITY) {

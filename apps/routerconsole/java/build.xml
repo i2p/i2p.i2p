@@ -92,6 +92,11 @@
         <!-- jar again to get the latest messages_*.class files -->
         <jar destfile="./build/routerconsole.jar" basedir="./build/obj" includes="**/*.class" update="true" />
     </target>
+
+    <target name="jarWithJavadoc" depends="jar">
+        <jar destfile="build/routerconsole.war" basedir="../../../build/" includes="javadoc/**/*" update="true" />
+    </target>
+
     <target name="poupdate" depends="build">
         <ant target="war" />
         <!-- Update the messages_*.po files.

@@ -66,8 +66,8 @@ public class LogManager {
     public final static String DEFAULT_DEFAULTLEVEL = Log.STR_ERROR;
     public final static String DEFAULT_ONSCREENLEVEL = Log.STR_CRIT;
 
-    private I2PAppContext _context;
-    private Log _log;
+    private final I2PAppContext _context;
+    private final Log _log;
     
     /** when was the config file last read (or -1 if never) */
     private long _configLastRead;
@@ -75,11 +75,11 @@ public class LogManager {
     /** the config file */
     private File _locationFile;
     /** Ordered list of LogRecord elements that have not been written out yet */
-    private LinkedBlockingQueue<LogRecord> _records;
+    private final LinkedBlockingQueue<LogRecord> _records;
     /** List of explicit overrides of log levels (LogLimit objects) */
-    private Set<LogLimit> _limits;
+    private final Set<LogLimit> _limits;
     /** String (scope) or Log.LogScope to Log object */
-    private ConcurrentHashMap<Object, Log> _logs;
+    private final ConcurrentHashMap<Object, Log> _logs;
     /** who clears and writes our records */
     private LogWriter _writer;
 
@@ -108,7 +108,7 @@ public class LogManager {
     /** how many records we want to buffer in the "recent logs" list */
     private int _consoleBufferSize;
     /** the actual "recent logs" list */
-    private LogConsoleBuffer _consoleBuffer;
+    private final LogConsoleBuffer _consoleBuffer;
     
     private boolean _alreadyNoticedMissingConfig;
 
@@ -119,17 +119,17 @@ public class LogManager {
         _limits = new ConcurrentHashSet();
         _logs = new ConcurrentHashMap(128);
         _defaultLimit = Log.ERROR;
-        _configLastRead = 0;
         _context = context;
         _log = getLog(LogManager.class);
         String location = context.getProperty(CONFIG_LOCATION_PROP, CONFIG_LOCATION_DEFAULT);
         setConfig(location);
         _consoleBuffer = new LogConsoleBuffer(context);
-        _writer = new LogWriter(this);
-        Thread t = new I2PThread(_writer);
-        t.setName("LogWriter");
-        t.setDaemon(true);
-        t.start();
+        // If we aren't in the router context, delay creating the LogWriter until required,
+        // so it doesn't create a log directory and log files unless there is output.
+        // In the router context, we have to rotate to a new log file at startup or the logs.jsp
+        // page will display the old log.
+        if (context.isRouterContext())
+            startLogWriter();
         try {
             Runtime.getRuntime().addShutdownHook(new ShutdownHook());
         } catch (IllegalStateException ise) {
@@ -138,9 +138,16 @@ public class LogManager {
         //System.out.println("Created logManager " + this + " with context: " + context);
     }
 
-    private LogManager() { // nop
+    /** @since 0.8.2 */
+    private synchronized void startLogWriter() {
+        // yeah, this doesn't always work, _writer should be volatile
+        if (_writer != null)
+            return;
+        _writer = new LogWriter(this);
+        Thread t = new I2PThread(_writer, "LogWriter", true);
+        t.start();
     }
-    
+
     public Log getLog(Class cls) { return getLog(cls, null); }
     public Log getLog(String name) { return getLog(null, name); }
     public Log getLog(Class cls, String name) {
@@ -169,6 +176,7 @@ public class LogManager {
     
     public LogConsoleBuffer getBuffer() { return _consoleBuffer; }
         
+    /** @deprecated unused */
     public void setDisplayOnScreen(boolean yes) {
         _displayOnScreen = yes;
     }
@@ -181,6 +189,7 @@ public class LogManager {
         return _onScreenLimit;
     }
 
+    /** @deprecated unused */
     public void setDisplayOnScreenLevel(int level) {
         _onScreenLimit = level;
     }
@@ -189,6 +198,7 @@ public class LogManager {
         return _consoleBufferSize;
     }
 
+    /** @deprecated unused */
     public void setConsoleBufferSize(int numRecords) {
         _consoleBufferSize = numRecords;
     }
@@ -201,6 +211,8 @@ public class LogManager {
     }
 
     public String currentFile() {
+        if (_writer == null)
+            return ("No log file created yet");
         return _writer.currentFile();
     }
 
@@ -209,6 +221,9 @@ public class LogManager {
      *
      */
     void addRecord(LogRecord record) {
+        if ((!_context.isRouterContext()) && _writer == null)
+            startLogWriter();
+
         _records.offer(record);
         int numRecords = _records.size();
         
@@ -617,9 +632,11 @@ public class LogManager {
     }
 
     public void shutdown() {
-        _log.log(Log.WARN, "Shutting down logger");
-        _writer.flushRecords(false);
-        _writer.stopWriting();
+        if (_writer != null) {
+            _log.log(Log.WARN, "Shutting down logger");
+            _writer.flushRecords(false);
+            _writer.stopWriting();
+        }
     }
 
     private static int __id = 0;

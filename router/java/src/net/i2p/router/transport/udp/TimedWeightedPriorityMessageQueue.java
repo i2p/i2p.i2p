@@ -76,7 +76,6 @@ class TimedWeightedPriorityMessageQueue implements MessageQueue, OutboundMessage
         }
         _alive = true;
         _nextLock = this;
-        _nextQueue = 0;
         _chokedPeers = Collections.synchronizedSet(new HashSet(16));
         _listener = lsnr;
         _context.statManager().createRateStat("udp.timeToEntrance", "Message lifetime until it reaches the UDP system", "udp", UDPTransport.RATES);

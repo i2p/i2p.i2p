@@ -22,6 +22,7 @@ package org.klomp.snark;
 
 /**
  * Holds all information needed for a partial piece request.
+ * This class should be used only by PeerState, PeerConnectionIn, and PeerConnectionOut.
  */
 class Request
 {

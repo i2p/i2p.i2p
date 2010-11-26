@@ -1,0 +1,19 @@
+<div lang="nl">
+<h4><ul><li>Gefeliciteerd met de installatie van I2P!</li></ul></h4>
+<p>
+<b>Welkom bij I2P!</b>
+Heb <b>wat geduld</b> terwijl I2P opstart en peers zoekt.
+</p>
+<p>
+Terwijl je wacht, <b>pas je bandbreedte instellingen aan</b> op de
+<a href="config.jsp">configuratie pagina</a>.
+</p>
+<p>
+Wanneer je een "gedeelde clients" destination in de linker lijst hebt,
+<b>lees dan aub</b> onze <a href="http://www.i2p2.i2p/faq.html">FAQ</a>.
+</p>
+<p>
+Verbind je IRC client met <b>localhost:6668</b> en zeg Hallo in
+<a href="irc://127.0.0.1:6668/i2p-help">#i2p-help</a> of <a href="irc://127.0.0.1:6668/i2p">#i2p</a>.
+</p>
+</div>

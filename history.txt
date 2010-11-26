@@ -1,3 +1,12 @@
+2010-11-27 zzz
+    * Console: Split initialNews.xml into a file for each language
+               don't copy to config dir at install.
+    * i2psnark: Clean up and enhance the PeerCoordinator's partial piece handling,
+                in preparation for more improvements
+    * LogManager: When not in router context, delay creating log file until required
+    * NetDb: Lower RouterInfo expiration time again
+    * Router: Prevent NCDFE after unzipping update file
+
 2010-11-26 dr|z3d
     * Readme: Overhaul (English) layout and text.
 

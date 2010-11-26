@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.List;
 
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.util.Log;
@@ -368,8 +369,11 @@ public class Peer implements Comparable
         if (this.deregister) {
           PeerListener p = s.listener;
           if (p != null) {
-            p.savePeerPartial(s);
-            p.markUnrequested(this);
+            List<PartialPiece> pcs = s.returnPartialPieces();
+            if (!pcs.isEmpty())
+                p.savePartialPieces(this, pcs);
+            // now covered by savePartialPieces
+            //p.markUnrequested(this);
           }
         }
         state = null;

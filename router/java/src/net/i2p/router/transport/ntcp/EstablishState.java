@@ -234,7 +234,7 @@ public class EstablishState {
                     System.arraycopy(_X, 0, xy, 0, _X.length);
                     System.arraycopy(_Y, 0, xy, _X.length, _Y.length);
                     Hash hxy = _context.sha().calculateHash(xy);
-                    _tsB = _context.clock().now()/1000l; // our (Bob's) timestamp in seconds
+                    _tsB = (_context.clock().now() + 500) / 1000l; // our (Bob's) timestamp in seconds
                     byte padding[] = new byte[12]; // the encrypted data needs an extra 12 bytes
                     _context.random().nextBytes(padding);
                     byte toEncrypt[] = new byte[hxy.getData().length+4+padding.length];
@@ -387,7 +387,7 @@ public class EstablishState {
                     return;
                 }
                 _tsB = DataHelper.fromLong(hXY_tsB, Hash.HASH_LENGTH, 4); // their (Bob's) timestamp in seconds
-                _tsA = _context.clock().now()/1000; // our (Alice's) timestamp in seconds
+                _tsA = (_context.clock().now() + 500) / 1000; // our (Alice's) timestamp in seconds
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug(prefix()+"h(X+Y) is correct, tsA-tsB=" + (_tsA-_tsB));
 

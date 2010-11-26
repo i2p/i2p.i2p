@@ -20,10 +20,12 @@
 
 package org.klomp.snark;
 
+import java.util.List;
+
 /**
  * Listener for Peer events.
  */
-public interface PeerListener
+interface PeerListener
 {
   /**
    * Called when the connection to the peer has started and the
@@ -151,7 +153,7 @@ public interface PeerListener
    *
    * @param state the PeerState for the peer
    */
-  void savePeerPartial(PeerState state); /* FIXME Exporting non-public type through public API FIXME */
+  void savePartialPieces(Peer peer, List<PartialPiece> pcs);
 
   /**
    * Called when a peer has connected and there may be a partially
@@ -161,12 +163,5 @@ public interface PeerListener
    *
    * @return request (contains the partial data and valid length)
    */
-  Request getPeerPartial(BitField havePieces); /* FIXME Exporting non-public type through public API FIXME */
-
-  /** Mark a peer's requested pieces unrequested when it is disconnected
-   *  This prevents premature end game
-   *
-   * @param peer the peer that is disconnecting
-   */
-  void markUnrequested(Peer peer);
+  PartialPiece getPartialPiece(Peer peer, BitField havePieces);
 }

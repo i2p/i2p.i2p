@@ -63,8 +63,13 @@ class PeerState {
     private boolean _rekeyBeganLocally;
     /** when were the current cipher and MAC keys established/rekeyed? */
     private long _keyEstablishedTime;
-    /** how far off is the remote peer from our clock, in milliseconds? */
+
+    /**
+     *  How far off is the remote peer from our clock, in milliseconds?
+     *  A positive number means our clock is ahead of theirs.
+     */
     private long _clockSkew;
+
     /** what is the current receive second, for congestion control? */
     private long _currentReceiveSecond;
     /** when did we last send them a packet? */
@@ -241,36 +246,19 @@ class PeerState {
         _context = ctx;
         _log = ctx.logManager().getLog(PeerState.class);
         _transport = transport;
-        _remotePeer = null;
-        _currentMACKey = null;
-        _currentCipherKey = null;
-        _nextMACKey = null;
-        _nextCipherKey = null;
-        _nextKeyingMaterial = null;
-        _rekeyBeganLocally = false;
         _keyEstablishedTime = -1;
-        _clockSkew = 0;
         _currentReceiveSecond = -1;
         _lastSendTime = -1;
         _lastReceiveTime = -1;
         _currentACKs = new ConcurrentHashSet();
         _currentACKsResend = new LinkedBlockingQueue();
-        _currentSecondECNReceived = false;
-        _remoteWantsPreviousACKs = false;
         _sendWindowBytes = DEFAULT_SEND_WINDOW_BYTES;
         _sendWindowBytesRemaining = DEFAULT_SEND_WINDOW_BYTES;
         _slowStartThreshold = MAX_SEND_WINDOW_BYTES/2;
         _lastSendRefill = _context.clock().now();
         _receivePeriodBegin = _lastSendRefill;
-        _sendBps = 0;
-        _sendBytes = 0;
-        _receiveBps = 0;
         _lastCongestionOccurred = -1;
-        _remoteIP = null;
         _remotePort = -1;
-        _remoteRequiresIntroduction = false;
-        _weRelayToThemAs = 0;
-        _theyRelayToUsAs = 0;
         _mtu = getDefaultMTU();
         _mtuReceive = _mtu;
         _mtuLastChecked = -1;
@@ -278,19 +266,8 @@ class PeerState {
         _rto = MIN_RTO;
         _rtt = _rto/2;
         _rttDeviation = _rtt;
-        _messagesReceived = 0;
-        _messagesSent = 0;
-        _packetsTransmitted = 0;
-        _packetsRetransmitted = 0;
-        _packetRetransmissionRate = 0;
-        _retransmissionPeriodStart = 0;
-        _packetsReceived = 0;
-        _packetsReceivedDuplicate = 0;
         _inboundMessages = new HashMap(8);
         _outboundMessages = new ArrayList(32);
-        _dead = false;
-        _isInbound = false;
-        _lastIntroducerTime = 0;
         _context.statManager().createRateStat("udp.congestionOccurred", "How large the cwin was when congestion occurred (duration == sendBps)", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.congestedRTO", "retransmission timeout after congestion (duration == rtt dev)", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.sendACKPartial", "Number of partial ACKs sent (duration == number of full ACKs in that ack packet)", "udp", UDPTransport.RATES);
@@ -346,8 +323,13 @@ class PeerState {
     public boolean getRekeyBeganLocally() { return _rekeyBeganLocally; }
     /** when were the current cipher and MAC keys established/rekeyed? */
     public long getKeyEstablishedTime() { return _keyEstablishedTime; }
-    /** how far off is the remote peer from our clock, in milliseconds? */
+
+    /**
+     *  How far off is the remote peer from our clock, in milliseconds?
+     *  A positive number means our clock is ahead of theirs.
+     */
     public long getClockSkew() { return _clockSkew ; }
+
     /** what is the current receive second, for congestion control? */
     public long getCurrentReceiveSecond() { return _currentReceiveSecond; }
     /** when did we last send them a packet? */
@@ -444,10 +426,17 @@ class PeerState {
     public void setRekeyBeganLocally(boolean local) { _rekeyBeganLocally = local; }
     /** when were the current cipher and MAC keys established/rekeyed? */
     public void setKeyEstablishedTime(long when) { _keyEstablishedTime = when; }
-    /** how far off is the remote peer from our clock, in milliseconds? */
+
+    /**
+     *  Update the moving-average clock skew based on the current difference.
+     *  The raw skew will be adjusted for RTT/2 here.
+     *  @param skew milliseconds, NOT adjusted for RTT.
+     *              A positive number means our clock is ahead of theirs.
+     */
     public void adjustClockSkew(long skew) { 
-        _clockSkew = (long) (0.9*(float)_clockSkew + 0.1*(float)skew); 
+        _clockSkew = (long) (0.9*(float)_clockSkew + 0.1*(float)(skew - (_rtt / 2))); 
     }
+
     /** what is the current receive second, for congestion control? */
     public void setCurrentReceiveSecond(long sec) { _currentReceiveSecond = sec; }
     /** when did we last send them a packet? */
@@ -679,6 +668,7 @@ class PeerState {
      *
      */
     public List<Long> getCurrentFullACKs() {
+            // no such element exception seen here
             ArrayList<Long> rv = new ArrayList(_currentACKs);
             // include some for retransmission
             rv.addAll(_currentACKsResend);

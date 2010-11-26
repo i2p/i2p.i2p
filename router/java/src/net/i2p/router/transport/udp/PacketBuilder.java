@@ -1084,7 +1084,7 @@ class PacketBuilder {
         // header
         data[off] = flagByte;
         off++;
-        long now = _context.clock().now() / 1000;
+        long now = (_context.clock().now() + 500) / 1000;
         DataHelper.toLong(data, off, 4, now);
         // todo: add support for rekeying and extended options
         return packet;

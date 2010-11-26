@@ -1035,7 +1035,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     * 
     */
     private void readMeta(byte unencrypted[]) {
-        long ourTs = _context.clock().now()/1000;
+        long ourTs = (_context.clock().now() + 500) / 1000;
         long ts = DataHelper.fromLong(unencrypted, 2, 4);
         Adler32 crc = new Adler32();
         crc.update(unencrypted, 0, unencrypted.length-4);
@@ -1068,7 +1068,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         synchronized (_meta) {
             _context.random().nextBytes(_meta); // randomize the uninterpreted, then overwrite w/ data
             DataHelper.toLong(_meta, 0, 2, 0);
-            DataHelper.toLong(_meta, 2, 4, _context.clock().now()/1000);
+            DataHelper.toLong(_meta, 2, 4, (_context.clock().now() + 500) / 1000);
             Adler32 crc = new Adler32();
             crc.update(_meta, 0, _meta.length-4);
             DataHelper.toLong(_meta, _meta.length-4, 4, crc.getValue());
