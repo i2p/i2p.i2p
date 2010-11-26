@@ -74,6 +74,9 @@ public class PeerCoordinator implements PeerListener
   // Some random wanted pieces
   private List<Piece> wantedPieces;
 
+  /** partial pieces */
+  private final List<PartialPiece> partialPieces;
+
   private boolean halted = false;
 
   private final CoordinatorListener listener;
@@ -94,6 +97,7 @@ public class PeerCoordinator implements PeerListener
     this.snark = torrent;
 
     setWantedPieces();
+    partialPieces = new ArrayList(getMaxConnections() + 1);
 
     // Install a timer to check the uploaders.
     // Randomize the first start time so multiple tasks are spread out,
@@ -293,7 +297,9 @@ public class PeerCoordinator implements PeerListener
         removePeerFromPieces(peer);
     }
     // delete any saved orphan partial piece
-    savedRequest = null;
+    synchronized (partialPieces) {
+        partialPieces.clear();
+    }
   }
 
   public void connected(Peer peer)
@@ -773,6 +779,9 @@ public class PeerCoordinator implements PeerListener
         wantedPieces.remove(p);
       }
 
+    // just in case
+    removePartialPiece(piece);
+
     // Announce to the world we have it!
     // Disconnect from other seeders when we get the last piece
     synchronized(peers)
@@ -866,70 +875,123 @@ public class PeerCoordinator implements PeerListener
       } 
   }
 
-
-  /** Simple method to save a partial piece on peer disconnection
+  /**
+   *  Save partial pieces on peer disconnection
    *  and hopefully restart it later.
-   *  Only one partial piece is saved at a time.
-   *  Replace it if a new one is bigger or the old one is too old.
+   *  Replace a partial piece in the List if the new one is bigger.
    *  Storage method is private so we can expand to save multiple partials
    *  if we wish.
+   *
+   *  Also mark the piece unrequested if this peer was the only one.
+   *
+   *  @param peer partials, must include the zero-offset (empty) ones too
+   *  @since 0.8.2
    */
-  private Request savedRequest = null;
-  private long savedRequestTime = 0;
-  public void savePeerPartial(PeerState state)
+  public void savePartialPieces(Peer peer, List<PartialPiece> partials)
   {
-    if (halted)
-      return;
-    Request req = state.getPartialRequest();
-    if (req == null)
-      return;
-    if (savedRequest == null ||
-        req.off > savedRequest.off ||
-        System.currentTimeMillis() > savedRequestTime + (15 * 60 * 1000)) {
-      if (savedRequest == null || (req.piece != savedRequest.piece && req.off != savedRequest.off)) {
-        if (_log.shouldLog(Log.DEBUG)) {
-          _log.debug(" Saving orphaned partial piece " + req);
-          if (savedRequest != null)
-            _log.debug(" (Discarding previously saved orphan) " + savedRequest);
-        }
+      if (halted)
+          return;
+      if (_log.shouldLog(Log.INFO))
+          _log.info("Partials received from " + peer + ": " + partials);
+      synchronized(partialPieces) {
+          for (PartialPiece pp : partials) {
+              if (pp.getDownloaded() > 0) {
+                  // PartialPiece.equals() only compares piece number, which is what we want
+                  int idx = partialPieces.indexOf(pp);
+                  if (idx < 0) {
+                      partialPieces.add(pp);
+                      if (_log.shouldLog(Log.INFO))
+                          _log.info("Saving orphaned partial piece (new) " + pp);
+                  } else if (idx >= 0 && pp.getDownloaded() > partialPieces.get(idx).getDownloaded()) {
+                      // replace what's there now
+                      partialPieces.set(idx, pp);
+                      if (_log.shouldLog(Log.INFO))
+                          _log.info("Saving orphaned partial piece (bigger) " + pp);
+                  } else {
+                      if (_log.shouldLog(Log.INFO))
+                          _log.info("Discarding partial piece (not bigger)" + pp);
+                  }
+                  int max = getMaxConnections();
+                  if (partialPieces.size() > max) {
+                      // sorts by remaining bytes, least first
+                      Collections.sort(partialPieces);
+                      PartialPiece gone = partialPieces.remove(max);
+                      if (_log.shouldLog(Log.INFO))
+                          _log.info("Discarding orphaned partial piece (list full)" + gone);
+                  }
+              }  // else drop the empty partial piece
+              // synchs on wantedPieces...
+              markUnrequestedIfOnlyOne(peer, pp.getPiece());
+          }
+          if (_log.shouldLog(Log.INFO))
+              _log.info("Partial list size now: " + partialPieces.size());
       }
-      savedRequest = req;
-      savedRequestTime = System.currentTimeMillis();
-    } else {
-      if (req.piece != savedRequest.piece)
-        if (_log.shouldLog(Log.DEBUG))
-          _log.debug(" Discarding orphaned partial piece " + req);
-    }
   }
 
-  /** Return partial piece if it's still wanted and peer has it.
+  /**
+   *  Return partial piece to the PeerState if it's still wanted and peer has it.
+   *  @param havePieces pieces the peer has, the rv will be one of these
+   *
+   *  @return PartialPiece or null
+   *  @since 0.8.2
    */
-  public Request getPeerPartial(BitField havePieces) {
-    if (savedRequest == null)
-      return null;
-    if (! havePieces.get(savedRequest.piece)) {
-      if (_log.shouldLog(Log.DEBUG))
-        _log.debug("Peer doesn't have orphaned piece " + savedRequest);
-      return null;
-    }
-    synchronized(wantedPieces)
-      {
-        for(Iterator<Piece> iter = wantedPieces.iterator(); iter.hasNext(); ) {
-          Piece piece = iter.next();
-          if (piece.getId() == savedRequest.piece) {
-            Request req = savedRequest;
-            piece.setRequested(true);
-            if (_log.shouldLog(Log.DEBUG))
-              _log.debug("Restoring orphaned partial piece " + req);
-            savedRequest = null;
-            return req;
+  public PartialPiece getPartialPiece(Peer peer, BitField havePieces) {
+      // do it in this order to avoid deadlock (same order as in savePartialPieces())
+      synchronized(partialPieces) {
+          synchronized(wantedPieces) {
+              // sorts by remaining bytes, least first
+              Collections.sort(partialPieces);
+              for (Iterator<PartialPiece> iter = partialPieces.iterator(); iter.hasNext(); ) {
+                  PartialPiece pp = iter.next();
+                  int savedPiece = pp.getPiece();
+                  if (havePieces.get(savedPiece)) {
+                     // this is just a double-check, it should be in there
+                     for(Piece piece : wantedPieces) {
+                         if (piece.getId() == savedPiece) {
+                             piece.setRequested(true);
+                             iter.remove();
+                             if (_log.shouldLog(Log.INFO)) {
+                                 _log.info("Restoring orphaned partial piece " + pp +
+                                           " Partial list size now: " + partialPieces.size());
+                             }
+                             return pp;
+                          }
+                      }
+                  }
+              }
           }
-        }
       }
-    if (_log.shouldLog(Log.DEBUG))
-      _log.debug("We no longer want orphaned piece " + savedRequest);
-    savedRequest = null;
-    return null;
+      // ...and this section turns this into the general move-requests-around code!
+      // Temporary? So PeerState never calls wantPiece() directly for now...
+      int piece = wantPiece(peer, havePieces);
+      if (piece >= 0) {
+          try {
+              return new PartialPiece(piece, metainfo.getPieceLength(piece));
+          } catch (OutOfMemoryError oom) {
+              if (_log.shouldLog(Log.WARN))
+                  _log.warn("OOM creating new partial piece");
+          }
+      }
+      if (_log.shouldLog(Log.DEBUG))
+          _log.debug("We have no partial piece to return");
+      return null;
+  }
+
+  /**
+   *  Remove saved state for this piece.
+   *  Unless we are in the end game there shouldnt be anything in there.
+   *  Do not call with wantedPieces lock held (deadlock)
+   */
+  private void removePartialPiece(int piece) {
+      synchronized(partialPieces) {
+          for (Iterator<PartialPiece> iter = partialPieces.iterator(); iter.hasNext(); ) {
+              PartialPiece pp = iter.next();
+              if (pp.getPiece() == piece) {
+                  iter.remove();
+                  // there should be only one but keep going to be sure
+              }
+          }
+      }
   }
 
   /** Clear the requested flag for a piece if the peer
@@ -947,13 +1009,12 @@ public class PeerCoordinator implements PeerListener
             continue;
           if (p.state == null)
             continue;
-          int[] arr = p.state.getRequestedPieces();
-          for (int i = 0; arr[i] >= 0; i++)
-            if(arr[i] == piece) {
+          // FIXME don't go into the state
+          if (p.state.getRequestedPieces().contains(Integer.valueOf(piece))) {
               if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Another peer is requesting piece " + piece);
               return;
-            }
+          }
         }
       }
 
@@ -971,20 +1032,6 @@ public class PeerCoordinator implements PeerListener
           }
         }
       }
-  }
-
-  /** Mark a peer's requested pieces unrequested when it is disconnected
-   ** Once for each piece
-   ** This is enough trouble, maybe would be easier just to regenerate
-   ** the requested list from scratch instead.
-   */
-  public void markUnrequested(Peer peer)
-  {
-    if (halted || peer.state == null)
-      return;
-    int[] arr = peer.state.getRequestedPieces();
-    for (int i = 0; arr[i] >= 0; i++)
-      markUnrequestedIfOnlyOne(peer, arr[i]);
   }
 
   /** Return number of allowed uploaders for this torrent.

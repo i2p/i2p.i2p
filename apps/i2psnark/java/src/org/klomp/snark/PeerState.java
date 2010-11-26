@@ -23,9 +23,11 @@ package org.klomp.snark;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
@@ -36,9 +38,9 @@ import org.klomp.snark.bencode.BEValue;
 class PeerState implements DataLoader
 {
   private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(PeerState.class);
-  final Peer peer;
+  private final Peer peer;
   final PeerListener listener;
-  final MetaInfo metainfo;
+  private final MetaInfo metainfo;
 
   // Interesting and choking describes whether we are interested in or
   // are choking the other side.
@@ -54,6 +56,7 @@ class PeerState implements DataLoader
   long downloaded;
   long uploaded;
 
+  /** the pieces the peer has */
   BitField bitfield;
 
   // Package local for use by Peer.
@@ -102,6 +105,12 @@ class PeerState implements DataLoader
 
     if (interesting && !choked)
       request(resend);
+
+    if (choked) {
+        // TODO
+        // savePartialPieces
+        // clear request list
+    }
   }
 
   void interestedMessage(boolean interest)
@@ -308,8 +317,11 @@ class PeerState implements DataLoader
       }
   }
 
+  /**
+   *  @return index in outstandingRequests or -1
+   */
   synchronized private int getFirstOutstandingRequest(int piece)
-  {
+   {
     for (int i = 0; i < outstandingRequests.size(); i++)
       if (outstandingRequests.get(i).piece == piece)
         return i;
@@ -397,54 +409,56 @@ class PeerState implements DataLoader
 
   }
 
-  // get longest partial piece
-  synchronized Request getPartialRequest()
-  {
-    Request req = null;
-    for (int i = 0; i < outstandingRequests.size(); i++) {
-      Request r1 = outstandingRequests.get(i);
-      int j = getFirstOutstandingRequest(r1.piece);
-      if (j == -1)
-        continue;
-      Request r2 = outstandingRequests.get(j);
-      if (r2.off > 0 && ((req == null) || (r2.off > req.off)))
-        req = r2;
-    }
-    if (pendingRequest != null && req != null && pendingRequest.off < req.off) {
-      if (pendingRequest.off != 0)
-        req = pendingRequest;
-      else
-        req = null;
-    }
-    return req;
+  /**
+   *  @return lowest offset of any request for the piece
+   *  @since 0.8.2
+   */
+  synchronized private Request getLowestOutstandingRequest(int piece) {
+      Request rv = null;
+      int lowest = Integer.MAX_VALUE;
+      for (Request r :  outstandingRequests) {
+          if (r.piece == piece && r.off < lowest) {
+              lowest = r.off;
+              rv = r;
+          }
+      }
+      if (pendingRequest != null &&
+          pendingRequest.piece == piece && pendingRequest.off < lowest)
+          rv = pendingRequest;
+
+      if (_log.shouldLog(Log.DEBUG))
+          _log.debug(peer + " lowest for " + piece + " is " + rv + " out of " + pendingRequest + " and " + outstandingRequests);
+      return rv;
   }
 
   /**
-   * return array of pieces terminated by -1
-   * remove most duplicates
-   * but still could be some duplicates, not guaranteed
-   * TODO rework this Java-style to return a Set or a List
+   *  get partial pieces, give them back to PeerCoordinator
+   *  @return List of PartialPieces, even those with an offset == 0, or empty list
+   *  @since 0.8.2
    */
-  synchronized int[] getRequestedPieces()
+  synchronized List<PartialPiece> returnPartialPieces()
   {
-    int size = outstandingRequests.size();
-    int[] arr = new int[size+2];
-    int pc = -1;
-    int pos = 0;
-    if (pendingRequest != null) {
-      pc = pendingRequest.piece;
-      arr[pos++] = pc;
-    }
-    Request req = null;
-    for (int i = 0; i < size; i++) {
-      Request r1 = outstandingRequests.get(i);
-      if (pc != r1.piece) {
-        pc = r1.piece;
-        arr[pos++] = pc;
+      Set<Integer> pcs = getRequestedPieces();
+      List<PartialPiece> rv = new ArrayList(pcs.size());
+      for (Integer p : pcs) {
+          Request req = getLowestOutstandingRequest(p.intValue());
+          if (req != null)
+              rv.add(new PartialPiece(req));
       }
-    }
-    arr[pos] = -1;
-    return(arr);
+      return rv;
+  }
+
+  /**
+   * @return all pieces we are currently requesting, or empty Set
+   */
+  synchronized Set<Integer> getRequestedPieces() {
+      Set<Integer> rv = new HashSet(outstandingRequests.size() + 1);
+      for (Request req : outstandingRequests) {
+          rv.add(Integer.valueOf(req.piece));
+      if (pendingRequest != null)
+          rv.add(Integer.valueOf(pendingRequest.piece));
+      }
+      return rv;
   }
 
   void cancelMessage(int piece, int begin, int length)
@@ -555,6 +569,8 @@ class PeerState implements DataLoader
       {
         synchronized (this) {
             out.sendRequests(outstandingRequests);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Resending requests to " + peer + outstandingRequests);
         }
       }
 
@@ -620,24 +636,17 @@ class PeerState implements DataLoader
     if (bitfield != null)
       {
         // Check for adopting an orphaned partial piece
-        Request r = listener.getPeerPartial(bitfield);
-        if (r != null) {
-              // Check that r not already in outstandingRequests
-              int[] arr = getRequestedPieces();
-              boolean found = false;
-              for (int i = 0; arr[i] >= 0; i++) {
-                if (arr[i] == r.piece) {
-                  found = true;
-                  break;
-                }
-              }
-              if (!found) {
+        PartialPiece pp = listener.getPartialPiece(peer, bitfield);
+        if (pp != null) {
+            // Double-check that r not already in outstandingRequests
+            if (!getRequestedPieces().contains(Integer.valueOf(pp.getPiece()))) {
+                Request r = pp.getRequest();
                 outstandingRequests.add(r);
                 if (!choked)
                   out.sendRequest(r);
                 lastRequest = r;
                 return true;
-              }
+            }
         }
 
         // Note that in addition to the bitfield, PeerCoordinator uses

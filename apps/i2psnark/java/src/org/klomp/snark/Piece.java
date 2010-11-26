@@ -5,7 +5,10 @@ import java.util.Set;
 
 import net.i2p.util.ConcurrentHashSet;
 
-public class Piece implements Comparable {
+/**
+ * This class is used solely by PeerCoordinator.
+ */
+class Piece implements Comparable {
 
     private int id;
     private Set<PeerID> peers;
