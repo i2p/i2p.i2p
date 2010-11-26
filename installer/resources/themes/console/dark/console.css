@@ -657,7 +657,7 @@ h2 {
      background: #000 url(images/camotile2.png);
      background-image: -moz-linear-gradient(top, bottom, from(#000), to(#030), color-stop(30%, #000), color-stop(100%, #000));
      background: #000 url('images/header.png') center center ;
-     padding: 5px 10px 8px 10px;
+     padding: 10px;
      wordwrap: none;
      border: 1px solid #494;
      border-radius: 4px;
@@ -747,7 +747,7 @@ button:active {
 }
 
 .langbox {
-     margin: 17px 2px 2px 5px;
+     margin: 21px 2px 2px 5px;
      padding: 7px 10px 5px 10px;
      color: #EE9;
      font-size: 7pt;
