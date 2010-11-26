@@ -72,9 +72,6 @@ class InboundEstablishState {
         _alicePort = remotePort;
         _remoteHostId = new RemoteHostId(_aliceIP, _alicePort);
         _bobPort = localPort;
-        _keyBuilder = null;
-        _verificationAttempted = false;
-        _complete = false;
         _currentState = STATE_UNKNOWN;
         _establishBegin = ctx.clock().now();
     }

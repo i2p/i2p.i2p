@@ -47,9 +47,6 @@ class OutboundMessageState {
     public OutboundMessageState(I2PAppContext context) {
         _context = context;
         _log = _context.logManager().getLog(OutboundMessageState.class);
-        _pushCount = 0;
-        _maxSends = 0;
-        // _nextSendFragment = 0;
     }
     
     public boolean initialize(OutNetMessage msg) {

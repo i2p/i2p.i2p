@@ -86,13 +86,11 @@ class OutboundEstablishState {
         }
         _remotePeer = remotePeer;
         _introKey = introKey;
-        _keyBuilder = null;
         _queuedMessages = new LinkedBlockingQueue();
         _currentState = STATE_UNKNOWN;
         _establishBegin = ctx.clock().now();
         _remoteAddress = addr;
         _introductionNonce = -1;
-        _complete = false;
         prepareSessionRequest();
         if ( (addr != null) && (addr.getIntroducerCount() > 0) ) {
             if (_log.shouldLog(Log.DEBUG))

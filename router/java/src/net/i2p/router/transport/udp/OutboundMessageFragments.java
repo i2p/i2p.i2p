@@ -47,7 +47,6 @@ class OutboundMessageFragments {
         _transport = transport;
         // _throttle = throttle;
         _activePeers = new ArrayList(256);
-        _nextPeer = 0;
         _builder = new PacketBuilder(ctx, transport);
         _alive = true;
         // _allowExcess = false;
