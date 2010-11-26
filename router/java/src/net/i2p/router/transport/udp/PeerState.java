@@ -63,8 +63,13 @@ class PeerState {
     private boolean _rekeyBeganLocally;
     /** when were the current cipher and MAC keys established/rekeyed? */
     private long _keyEstablishedTime;
-    /** how far off is the remote peer from our clock, in milliseconds? */
+
+    /**
+     *  How far off is the remote peer from our clock, in milliseconds?
+     *  A positive number means our clock is ahead of theirs.
+     */
     private long _clockSkew;
+
     /** what is the current receive second, for congestion control? */
     private long _currentReceiveSecond;
     /** when did we last send them a packet? */
@@ -346,8 +351,13 @@ class PeerState {
     public boolean getRekeyBeganLocally() { return _rekeyBeganLocally; }
     /** when were the current cipher and MAC keys established/rekeyed? */
     public long getKeyEstablishedTime() { return _keyEstablishedTime; }
-    /** how far off is the remote peer from our clock, in milliseconds? */
+
+    /**
+     *  How far off is the remote peer from our clock, in milliseconds?
+     *  A positive number means our clock is ahead of theirs.
+     */
     public long getClockSkew() { return _clockSkew ; }
+
     /** what is the current receive second, for congestion control? */
     public long getCurrentReceiveSecond() { return _currentReceiveSecond; }
     /** when did we last send them a packet? */
@@ -444,10 +454,17 @@ class PeerState {
     public void setRekeyBeganLocally(boolean local) { _rekeyBeganLocally = local; }
     /** when were the current cipher and MAC keys established/rekeyed? */
     public void setKeyEstablishedTime(long when) { _keyEstablishedTime = when; }
-    /** how far off is the remote peer from our clock, in milliseconds? */
+
+    /**
+     *  Update the moving-average clock skew based on the current difference.
+     *  The raw skew will be adjusted for RTT/2 here.
+     *  @param skew milliseconds, NOT adjusted for RTT.
+     *              A positive number means our clock is ahead of theirs.
+     */
     public void adjustClockSkew(long skew) { 
-        _clockSkew = (long) (0.9*(float)_clockSkew + 0.1*(float)skew); 
+        _clockSkew = (long) (0.9*(float)_clockSkew + 0.1*(float)(skew - (_rtt / 2))); 
     }
+
     /** what is the current receive second, for congestion control? */
     public void setCurrentReceiveSecond(long sec) { _currentReceiveSecond = sec; }
     /** when did we last send them a packet? */
@@ -679,6 +696,7 @@ class PeerState {
      *
      */
     public List<Long> getCurrentFullACKs() {
+            // no such element exception seen here
             ArrayList<Long> rv = new ArrayList(_currentACKs);
             // include some for retransmission
             rv.addAll(_currentACKsResend);
