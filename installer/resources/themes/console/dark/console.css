@@ -399,7 +399,7 @@ div.messages {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      border: 1px solid #494;
-     background: #000;/* url('images/lightbluetile.png');*/
+     background: #000  /*url('images/infotile.png') center left no-repeat;*/
      font-weight: bold;
      font-size: 9pt;
      color: #ddf;
@@ -417,8 +417,8 @@ div.messages li {
      text-align: justify !important;
      font-weight: bold;
      list-style: url(images/warning_dark.png) !important;
-     margin: 0 10px 0 35px !important;
-     padding: 5px 10px !important;
+     margin: 0 5px 0 50px !important;
+     padding: 0 10px 0 0 !important;
      border: 0px !important;
 }
 
@@ -542,13 +542,21 @@ div.main li {
      text-align: left;
      list-style: square;
      margin: 2px 0px 2px 30px;
-     padding: 1px 20px 1px 0px;
+     padding: 1px 20px 10px 0px;
 /*     line-height: 150%;*/
      word-wrap: break-word;
 }
 
+div.main li b {
+     color: #d60 !important;
+     letter-spacing: 0.07em;
+     font-size: 9.5pt;
+     line-height: 200%;
+}
+
 .tidylist {
      text-align: justify !important;
+     line-height: 150%;
 }
 
 .tidylist:first-child {
@@ -556,7 +564,7 @@ div.main li {
 }
 
 .tidylist:last-child {
-     padding-bottom: 5px;
+     padding-bottom: 10px;
 }
 
 ol {
@@ -573,8 +581,9 @@ ul {
 
 code {
      text-align: left;
-     font: 8.5pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      color: #dd0;
+     padding: 0 5px;
 }
 
 a:link, h2 a:link{
@@ -762,7 +771,7 @@ hr {
      background: #494;
      height: 1px;
      border: 0px solid #494;
-     margin: 10px 0;
+     margin: 20px 0 10px;
 }
 
 hr:last-child {

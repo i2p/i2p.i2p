@@ -506,6 +506,12 @@ div.messages li, div.messages ul {
      margin: -10px 0 0 0;
 }
 
+div.main li b{
+     color: #bb7 !important;
+     letter-spacing: 0.07em;
+     font-size: 9.5pt;
+}
+
 div.messages span.error {
      color: #d00000;
 }
@@ -537,8 +543,8 @@ h2 {
      border-top: 1px solid #99f;
      border-left: 1px solid #99f;
      background: #000008;
-     font-variant: small-caps; 
-     text-transform: capitalize; 
+/*     font-variant: small-caps; */
+     text-transform: uppercase; 
      letter-spacing: 0.07em;
 }
 
@@ -551,7 +557,7 @@ h3 {
      letter-spacing: 0.04em;
      margin-bottom: 10px;
      font-weight: bold !important;
-     text-transform: capitalize;
+     text-transform: uppercase; 
 }
 
 h3 a {
@@ -738,10 +744,10 @@ p {
 }
 
 .langbox {
-     margin: 17px -30px 0px 5px;
+     margin: 17px 0px 0px 5px;
      color: #eef;
      font-size: 7pt;
-     width: 280px;
+     width: 240px;
      text-align: center;
      float: right;
      valign: middle;
@@ -760,6 +766,11 @@ p {
 
 .links li {
      list-style-image: url("images/link.png") !important;
+     padding-right: 20px !important;
+}
+
+.links li:last-child {
+     padding-bottom: 10px !important;
 }
 
 a:link{
@@ -870,4 +881,12 @@ table li:last-child{
 
 table ul {
      font-size: 8.5pt;
+}
+
+
+code {
+     text-align: left;
+     font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     color: #0d0;
+     padding: 0 5px;
 }

@@ -15,54 +15,38 @@
 <div class="welcome"><h2>Welcome to I2P!</h2></div>
 <p>If you've just started I2P, the Active: numbers on the left should start to 
   grow over the next few minutes and you'll see a "shared clients" local destination 
-  listed on the left (if not, <a href="#trouble">see below</a>). Once those show 
-up, you can:</p> 
-<ul>
-  <li><b>browse "eepsites"</b> - on I2P there are anonymously hosted websites 
-    - tell your browser to use the <b>HTTP proxy at 127.0.0.1 port 4444</b>, then 
-    browse to an eepsite:<br>
+  listed at the bottom of the sidepanel on the left (if not, <a href="#trouble">see below</a>). Once green stars are indicated next to your local destinations, there are a range of services you can access including:</p> 
+
+<ul class="links">
+      <li class="tidylist"><b>Anonymous Chat</b><br>Start your IRC client (eg. chatzilla)
+        and connect to the <a href="irc://127.0.0.1:6668/i2p">server</a> at <code>127.0.0.1 port 6668</code>. This points at 
+        one of two IRC servers hosted by I2P stalwarts Postman and Badger on I2P, but neither you nor they know 
+        where the other is.</li>
+      <li class="tidylist"><b>Anonymous E-mail</b><br>Postman's I2P-based mail system can be accessed either via <a href="/susimail/">I2P's built-in webmail</a> (aka susimail) or using any mail client that supports smtp and pop3. Accounts can send and receive mail from the normal internet. For an account, visit <a href="http://hq.postman.i2p/" target="_blank">hq.postman.i2p</a>. Alternately, <a href="http://i2pbote.i2p/" target="_blank">I2P-Bote</a> is a new serverless, end-to-end encrypted e-mail system (with web interface), installable as a plugin.</li>
+      <li class="tidylist"><b>Anonymous File Transfer</b><br><a href="/i2psnark" target="_blank">I2PSnark</a> is integrated into I2P, providing anonymous, encrypted bittorrent. There is also a port of e-mule to I2P called <a href="http://echelon.i2p/imule">i-mule</a>. [Urgently needs developers!]</li>
+      <li class="tidylist"><b>Forums & Blogging</b><br><a href="http://syndie.i2p2.de/" target="_blank">Syndie</a> is a distributed forum and blogging plaform for I2P. [Urgently needs developers!]</li>
+      <li class="tidylist"><b>Plugins for I2P</b><br>Extend the usefulness of I2P by installing plugins&hellip; you can browse the plugins and related info on <a href="http://i2plugins.i2p" target="_blank">i2plugins.i2p</a>.
+      <li class="tidylist"<b>Darknet & Public Web browsing</b><br>I2P makes anonymously hosted websites (aka eepsites) possible, and you can also access the normal web anonymously via I2P. Configure your browser to use the HTTP proxy at <code>127.0.0.1 port 4444</code>, then 
+    browse to an eepsite (anonymous, encrypted webserver run over I2P) or a normal <code>http://</code> address. Some useful resources are listed below:<br>
     <ul class="links">
-      <li><a href="http://forum.i2p/" target="_blank">forum.i2p</a>: a secure 
+      <li class="tidylist"><a href="http://forum.i2p/" target="_blank">forum.i2p</a>: a secure 
         and anonymous connection to <a href="http://forum.i2p2.de/" target="_blank">forum.i2p2.de</a></li>
-      <li><a href="http://www.i2p2.i2p/" target="_blank">www.i2p2.i2p</a> and 
+      <li class="tidylist"><a href="http://www.i2p2.i2p/" target="_blank">www.i2p2.i2p</a> and 
         mirror <a href="http://i2p-projekt.i2p" target="_blank">i2p-projekt.i2p</a>: secure and 
         anonymous connections to <a href="http://www.i2p2.de/" target="_blank">www.i2p2.de</a></li>
-      <li><a href="http://eepsites.i2p/" target="_blank">eepsites.i2p</a>: an 
+      <li class="tidylist"><a href="http://eepsites.i2p/" target="_blank">eepsites.i2p</a>: an 
         anonymously hosted search engine of eepsites</li>
-      <li><a href="http://ugha.i2p/" target="_blank">ugha.i2p</a>: ugha's eepsite, 
+      <li class="tidylist"><a href="http://ugha.i2p/" target="_blank">ugha.i2p</a>: ugha's eepsite, 
         a wiki that anyone can edit, and lots of links</li>
-      <li><a href="http://fproxy.tino.i2p" target="_blank">fproxy.tino.i2p</a>: 
+      <li class="tidylist"><a href="http://fproxy.tino.i2p" target="_blank">fproxy.tino.i2p</a>: 
         Freenet proxy</li>
-      <li><a href="http://echelon.i2p" target="_blank">echelon.i2p</a>: software 
+      <li class="tidylist"><a href="http://echelon.i2p" target="_blank">echelon.i2p</a>: software 
         archive (I2PFox, iMule, I2P-Messenger etc) and information about I2P including a beginner's guide.</li>
-      <li><a href="http://paste.i2p2.i2p" target="_blank">paste.i2p2.i2p</a>: secure and 
+      <li class="tidylist"><a href="http://paste.i2p2.i2p" target="_blank">paste.i2p2.i2p</a>: secure and 
         anonymous paste service.</li>
-    </ul><br>
-      There are many more eepsites - just follow the links from the ones you see, 
-      bookmark your favorites, and visit them often! 
-    </li>
-    <ul>
-      <li class="tidylist"><b>browse the web</b> - there is currently an HTTP 
-        "outproxy" in I2P hooked up to your own HTTP proxy on port 4444 - simply 
-        set your browser's proxy to use it (as above) and go to any normal URL 
-        - your requests will be bounced through the I2P network.</li>
-      <li class="tidylist"><b>transfer files</b> - there is an integrated <a href="/i2psnark" target="_blank">port</a> 
-        of the <a href="http://www.klomp.org/snark/" target="_blank">Snark</a> <a href="http://www.bittorrent.com/" target="_blank">BitTorrent</a> 
-        client.</li>
-      <li class="tidylist"><b>use anonymous email</b> - postman has created a 
-        mail system compatible with normal mail clients (POP3 / SMTP) that allows 
-        email within I2P as well as mail from and to the normal internet! get 
-        your account at <a href="http://hq.postman.i2p/" target="_blank">hq.postman.i2p</a>. We 
-        bundle <a href="/susimail/susimail" target="_blank">susimail</a>, a web based anonymity-oriented 
-        pop3/smtp client configured to access postman's mail services.</li> 
-	 <li class="tidylist"><b>serverless e-mail</b> - there's also <a href="http://i2pbote.i2p/" target="_blank">I2P-Bote</a>, a new serverless, end-to-end encrypted e-mail system (with web interface), installable as a plugin.<br></li>
-      <li class="tidylist"><b>chat anonymously</b> - fire up your own IRC client 
-        and connect to the server at <b>127.0.0.1 port 6668</b>. This points at 
-        one of two anonymously hosted IRC servers, but neither you nor they know 
-        where the other is.</li>
-      <li class="tidylist"><b>blog anonymously</b> - check out <a href="http://syndie.i2p2.de/" target="_blank">Syndie</a></li>
-      <li class="tidylist"><b>install plugins</b> - browse the plugins and related info on <a href="http://i2plugins.i2p" target="_blank">i2plugins.i2p</a>.</li>
-      <li class="tidylist">and lots more&hellip;</li>
+      <li class="tidylist">There are many more eepsites - just follow the links from the ones you see, 
+      bookmark your favorites, and visit them often! </li>
+    </ul>
     </ul>
 </ul>
 <h2>Want your own eepsite?</h2>
