@@ -1,6 +1,7 @@
 package org.klomp.snark;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
+import java.util.Collection;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
@@ -62,7 +64,9 @@ public class SnarkManager implements Snark.CompleteListener {
     public static final String PROP_LINK_PREFIX = "i2psnark.linkPrefix";
     public static final String DEFAULT_LINK_PREFIX = "file:///";
     public static final String PROP_STARTUP_DELAY = "i2psnark.startupDelay";
-   
+    public static final String PROP_THEME = "i2psnark.theme";
+    public static final String DEFAULT_THEME = "ubergine";
+
     public static final int MIN_UP_BW = 2;
     public static final int DEFAULT_MAX_UP_BW = 10;
     public static final int DEFAULT_STARTUP_DELAY = 3; 
@@ -137,7 +141,7 @@ public class SnarkManager implements Snark.CompleteListener {
             f = new SecureDirectory(_context.getAppDir(), dir);
         return f; 
     }
-    
+
     /** null to set initial defaults */
     public void loadConfig(String filename) {
         if (_config == null)
@@ -172,11 +176,44 @@ public class SnarkManager implements Snark.CompleteListener {
             _config.setProperty(PROP_DIR, "i2psnark");
         if (!_config.containsKey(PROP_AUTO_START))
             _config.setProperty(PROP_AUTO_START, DEFAULT_AUTO_START);
-	if (!_config.containsKey(PROP_STARTUP_DELAY))
+        if (!_config.containsKey(PROP_STARTUP_DELAY))
             _config.setProperty(PROP_STARTUP_DELAY, "" + DEFAULT_STARTUP_DELAY);
-
+        if (!_config.containsKey(PROP_THEME))
+            _config.setProperty(PROP_THEME, "" + DEFAULT_THEME);
         updateConfig();
     }
+    /**
+     * Get current theme.
+     * @return String -- the current theme
+     */
+    public String getTheme() {
+        String theme = _config.getProperty(PROP_THEME);
+        return theme;
+    }
+
+    /**
+     * Get all themes
+     * @return String[] -- Array of all the themes found.
+     */
+    public String[] getThemes() {
+            String[] themes = null;
+            // "docs/themes/snark/"
+            String fsc = new String(""+File.separatorChar);
+            String look = _context.getConfigDir() + fsc + "docs" + fsc +"themes" + fsc + "snark" + fsc;
+            FileFilter fileFilter = new FileFilter() { public boolean accept(File file) { return file.isDirectory(); } };
+            // Walk the themes dir, collecting the theme names, and append them to the map
+            File dir = new File(look);
+            File[] dirnames = dir.listFiles(fileFilter);
+            if (dirnames != null) {
+                themes = new String[dirnames.length];
+                for(int i = 0; i < dirnames.length; i++) {
+                    themes[i] = dirnames[i].getName();
+                }
+            }
+            // return the map.
+            return themes;
+    }
+
 
     /** call from DirMonitor since loadConfig() is called before router I2CP is up */
     private void getBWLimit() {
@@ -234,7 +271,7 @@ public class SnarkManager implements Snark.CompleteListener {
     
     public void updateConfig(String dataDir, boolean autoStart, String startDelay, String seedPct, String eepHost, 
                              String eepPort, String i2cpHost, String i2cpPort, String i2cpOpts,
-                             String upLimit, String upBW, boolean useOpenTrackers, String openTrackers) {
+                             String upLimit, String upBW, boolean useOpenTrackers, String openTrackers, String Theme) {
         boolean changed = false;
         //if (eepHost != null) {
         //    // unused, we use socket eepget
@@ -396,6 +433,11 @@ public class SnarkManager implements Snark.CompleteListener {
                 addMessage(_("Open Tracker list changed - torrent restart required to take effect."));
                 changed = true;
             }
+        }
+        if (Theme != null) {
+            _config.setProperty(PROP_THEME, Theme +"");
+            addMessage(_("Theme changed."));
+            changed = true;
         }
         if (changed) {
             saveConfig();

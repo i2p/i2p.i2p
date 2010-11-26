@@ -1,3 +1,6 @@
+2010-11-26 sponge
+   * i2psnark: Add theme change and theme selection storage abilities.
+
 2010-11-26 zzz
     * Console: Split initialNews.xml into a file for each language
                don't copy to config dir at install.
