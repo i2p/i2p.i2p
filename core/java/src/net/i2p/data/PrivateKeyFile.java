@@ -23,6 +23,7 @@ import net.i2p.crypto.DSAEngine;
  * This helper class reads and writes files in the
  * same "eepPriv.dat" format used by the client code.
  * The format is:
+ *<pre>
  *  - Destination (387 bytes if no certificate, otherwise longer)
  *     - Public key (256 bytes)
  *     - Signing Public key (128 bytes)
@@ -32,6 +33,7 @@ import net.i2p.crypto.DSAEngine;
  *  - Private key (256 bytes)
  *  - Signing Private key (20 bytes)
  * Total 663 bytes
+ *</pre>
  *
  * @author welterde, zzz
  */
