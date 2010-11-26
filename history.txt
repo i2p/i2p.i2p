@@ -1,5 +1,5 @@
 2010-11-26 dr|z3d
-    * Readme: Overhaul layout and text.
+    * Readme: Overhaul (English) layout and text.
 
 2010-11-25 dr|z3d
     * Console themes: Classic and Dark theme refresh.
