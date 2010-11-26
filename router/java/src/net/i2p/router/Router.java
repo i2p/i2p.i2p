@@ -191,7 +191,9 @@ public class Router {
 
         // This is here so that we can get the directory location from the context
         // for the ping file
-        if (!beginMarkingLiveliness()) {
+        // Check for other router but do not start a thread yet so the update doesn't cause
+        // a NCDFE
+        if (!isOnlyRouterRunning()) {
             System.err.println("ERROR: There appears to be another router already running!");
             System.err.println("       Please make sure to shut down old instances before starting up");
             System.err.println("       a new one.  If you are positive that no other instance is running,");
@@ -214,6 +216,11 @@ public class Router {
         // I guess it's better to have the other-router check above this, we don't want to
         // overwrite an existing running router's jar files. Other than ours.
         installUpdates();
+
+        // *********  Start no threads before here ********* //
+        //
+        // NOW we can start the ping file thread.
+        beginMarkingLiveliness();
 
         // Apps may use this as an easy way to determine if they are in the router JVM
         // But context.isRouterContext() is even easier...
@@ -1163,38 +1170,50 @@ public class Router {
             // verify the whole thing first
             // we could remember this fails, and not bother restarting, but who cares...
             boolean ok = FileUtil.verifyZip(updateFile);
-            if (ok)
-                ok = FileUtil.extractZip(updateFile, _context.getBaseDir());
-            if (ok)
-                System.out.println("INFO: Update installed");
-            else
-                System.out.println("ERROR: Update failed!");
-            if (!ok) {
-                // we can't leave the file in place or we'll continually restart, so rename it
-                File bad = new File(_context.getRouterDir(), "BAD-" + UPDATE_FILE);
-                boolean renamed = updateFile.renameTo(bad);
-                if (renamed) {
-                    System.out.println("Moved update file to " + bad.getAbsolutePath());
-                } else {
-                    System.out.println("Deleting file " + updateFile.getAbsolutePath());
-                    ok = true;  // so it will be deleted
-                }
-            }
             if (ok) {
                 // This may be useful someday. First added in 0.8.2
+                // Moved above the extract so we don't NCDFE
                 _config.put("router.updateLastInstalled", "" + System.currentTimeMillis());
                 saveConfig();
-                boolean deleted = updateFile.delete();
-                if (!deleted) {
-                    System.out.println("ERROR: Unable to delete the update file!");
-                    updateFile.deleteOnExit();
-                }
+                ok = FileUtil.extractZip(updateFile, _context.getBaseDir());
             }
-            // exit whether ok or not
-            if (System.getProperty("wrapper.version") != null)
-                System.out.println("INFO: Restarting after update");
-            else
-                System.out.println("WARNING: Exiting after update, restart I2P");
+
+            // Very important - we have now trashed our jars.
+            // After this point, do not use any new I2P classes, or they will fail to load
+            // and we will die with NCDFE.
+            // Ideally, do not use I2P classes at all, new or not.
+            try {
+                if (ok)
+                    System.out.println("INFO: Update installed");
+                else
+                    System.out.println("ERROR: Update failed!");
+                if (!ok) {
+                    // we can't leave the file in place or we'll continually restart, so rename it
+                    File bad = new File(_context.getRouterDir(), "BAD-" + UPDATE_FILE);
+                    boolean renamed = updateFile.renameTo(bad);
+                    if (renamed) {
+                        System.out.println("Moved update file to " + bad.getAbsolutePath());
+                    } else {
+                        System.out.println("Deleting file " + updateFile.getAbsolutePath());
+                        ok = true;  // so it will be deleted
+                    }
+                }
+                if (ok) {
+                    boolean deleted = updateFile.delete();
+                    if (!deleted) {
+                        System.out.println("ERROR: Unable to delete the update file!");
+                        updateFile.deleteOnExit();
+                    }
+                }
+                // exit whether ok or not
+                if (System.getProperty("wrapper.version") != null)
+                    System.out.println("INFO: Restarting after update");
+                else
+                    System.out.println("WARNING: Exiting after update, restart I2P");
+            } catch (Throwable t) {
+                // hide the NCDFE
+                // hopefully the update file got deleted or we will loop
+            }
             System.exit(EXIT_HARD_RESTART);
         }
     }
@@ -1230,13 +1249,14 @@ public class Router {
     static final long LIVELINESS_DELAY = 60*1000;
     
     /** 
-     * Start a thread that will periodically update the file "router.ping", but if 
+     * Check the file "router.ping", but if 
      * that file already exists and was recently written to, return false as there is
-     * another instance running
+     * another instance running.
      * 
      * @return true if the router is the only one running 
+     * @since 0.8.2
      */
-    private boolean beginMarkingLiveliness() {
+    private boolean isOnlyRouterRunning() {
         File f = getPingFile();
         if (f.exists()) {
             long lastWritten = f.lastModified();
@@ -1247,12 +1267,20 @@ public class Router {
                 return false;
             }
         }
+        return true;
+    }
+
+    /** 
+     * Start a thread that will periodically update the file "router.ping".
+     * isOnlyRouterRunning() MUST have been called previously.
+     */
+    private void beginMarkingLiveliness() {
+        File f = getPingFile();
         // not an I2PThread for context creation issues
         Thread t = new Thread(new MarkLiveliness(_context, this, f));
         t.setName("Mark router liveliness");
         t.setDaemon(true);
         t.start();
-        return true;
     }
     
     public static final String PROP_BANDWIDTH_SHARE_PERCENTAGE = "router.sharePercentage";
