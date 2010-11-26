@@ -199,7 +199,7 @@ public class SnarkManager implements Snark.CompleteListener {
             String[] themes = null;
             // "docs/themes/snark/"
             String fsc = new String(""+File.separatorChar);
-            String look = _context.getConfigDir() + fsc + "docs" + fsc +"themes" + fsc + "snark" + fsc;
+            String look = _context.getBaseDir() + fsc + "docs" + fsc +"themes" + fsc + "snark" + fsc;
             FileFilter fileFilter = new FileFilter() { public boolean accept(File file) { return file.isDirectory(); } };
             // Walk the themes dir, collecting the theme names, and append them to the map
             File dir = new File(look);
