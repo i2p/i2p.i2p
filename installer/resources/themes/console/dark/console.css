@@ -137,7 +137,7 @@ div.routersummary h3 {
      -khtml-border-radius: 0;
      border-radius: 0;
      background: #000 url('images/header.png') center center ;
-     background-image: -moz-linear-gradient(top, bottom, from(#005), to(#030), color-stop(7%, #000), color-stop(100%, #005));
+     background-image: -moz-linear-gradient(top, bottom, from(#050), to(#030), color-stop(7%, #000), color-stop(100%, #050));
 }
 
 div.routersummary h4 {
@@ -151,7 +151,7 @@ div.routersummary h4 {
      text-transform: capitalize;
      text-decoration: none !important;
      color: #2b2;
-     background-image: -moz-linear-gradient(top, bottom, from(#000), to(#005), color-stop(10%, #005), color-stop(100%, #004));
+     background-image: -moz-linear-gradient(top, bottom, from(#000), to(#050), color-stop(10%, #050), color-stop(100%, #004));
      line-height: 100%;
 }
 
@@ -243,7 +243,7 @@ div.tunnels tr {
 div.warning {
      margin: 5px 20px 10px 240px;
      padding: 5px 25px 20px 75px;
-     background: #005;
+     background: #050;
      border: 1px solid #494;
      text-align: left;
      color: #EE9;
@@ -315,7 +315,7 @@ div.news {
      padding: 5px 30px 10px 30px;
      border: 1px solid #494;
      background: #000;
-/*     background-image: -moz-linear-gradient(top, bottom, from(#030), to(#005), color-stop(30%, #030), color-stop(100%, #000));///*/
+/*     background-image: -moz-linear-gradient(top, bottom, from(#030), to(#050), color-stop(30%, #030), color-stop(100%, #000));///*/
      background: #000 url("images/bg2.png")no-repeat scroll bottom right;
      color: #7b7;
      border-radius: 4px;
@@ -542,13 +542,13 @@ div.main li {
      text-align: left;
      list-style: square;
      margin: 2px 0px 2px 30px;
-     padding: 1px 20px 10px 0px;
+     padding: 2px 20px 2px 0px;
 /*     line-height: 150%;*/
      word-wrap: break-word;
 }
 
 div.main li b {
-     color: #d60 !important;
+     color: #b70 !important;
      letter-spacing: 0.07em;
      font-size: 9.5pt;
      line-height: 200%;
@@ -564,7 +564,7 @@ div.main li b {
 }
 
 .tidylist:last-child {
-     padding-bottom: 10px;
+     padding-bottom: 15px;
 }
 
 ol {
