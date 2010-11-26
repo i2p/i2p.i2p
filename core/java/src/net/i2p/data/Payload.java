@@ -19,6 +19,10 @@ import net.i2p.util.Log;
  * Defines the actual payload of a message being delivered, including the 
  * standard encryption wrapping, as defined by the I2P data structure spec.
  *
+ * This is used mostly in I2CP, where we used to do end-to-end encryption.
+ * Since we don't any more, you probably just want to use the
+ * get/set EncryptedData methods.
+ *
  * @author jrandom
  */
 public class Payload extends DataStructureImpl {
@@ -32,6 +36,9 @@ public class Payload extends DataStructureImpl {
     /**
      * Retrieve the unencrypted body of the message.  
      *
+     * Deprecated.
+     * Unless you are doing encryption, use getEncryptedData() instead.
+     *
      * @return body of the message, or null if the message has either not been
      *          decrypted yet or if the hash is not correct
      */
@@ -43,15 +50,19 @@ public class Payload extends DataStructureImpl {
      * Populate the message body with data.  This does not automatically encrypt
      * yet.
      * 
+     * Deprecated.
+     * Unless you are doing encryption, use setEncryptedData() instead.
      */
     public void setUnencryptedData(byte[] data) {
         _unencryptedData = data;
     }
 
+    /** the real data */
     public byte[] getEncryptedData() {
         return _encryptedData;
     }
 
+    /** the real data */
     public void setEncryptedData(byte[] data) {
         _encryptedData = data;
     }
@@ -100,7 +111,7 @@ public class Payload extends DataStructureImpl {
     
     @Override
     public int hashCode() {
-        return DataHelper.hashCode(_unencryptedData);
+        return DataHelper.hashCode(_encryptedData != null ? _encryptedData : _unencryptedData);
     }
     
     @Override
