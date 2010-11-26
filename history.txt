@@ -1,4 +1,7 @@
 2010-11-26 sponge
+   * i2psnark: Don't save theme parameter if it has not changed.
+
+2010-11-26 sponge
    * i2psnark: Add theme change and theme selection storage abilities.
 
 2010-11-26 zzz

@@ -435,9 +435,11 @@ public class SnarkManager implements Snark.CompleteListener {
             }
         }
         if (Theme != null) {
-            _config.setProperty(PROP_THEME, Theme +"");
-            addMessage(_("Theme changed."));
-            changed = true;
+            if(!Theme.equals(_config.getProperty(PROP_THEME))) {
+                _config.setProperty(PROP_THEME, Theme +"");
+                addMessage(_("Theme changed."));
+                changed = true;
+            }
         }
         if (changed) {
             saveConfig();
