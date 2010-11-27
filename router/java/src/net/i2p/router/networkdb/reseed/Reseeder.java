@@ -60,6 +60,8 @@ public class Reseeder {
     public static final String PROP_PROXY_ENABLE = "router.reseedProxyEnable";
     /** @since 0.8.2 */
     public static final String PROP_SSL_DISABLE = "router.reseedSSLDisable";
+    /** @since 0.8.2 */
+    public static final String PROP_SSL_REQUIRED = "router.reseedSSLRequired";
 
     private static final String RESEED_TIPS =
             _x("Ensure that nothing blocks outbound HTTP, check <a target=\"_top\" href=\"logs.jsp\">logs</a> " +
