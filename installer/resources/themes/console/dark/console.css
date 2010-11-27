@@ -552,6 +552,7 @@ div.main li b {
      letter-spacing: 0.07em;
      font-size: 9.5pt;
      line-height: 200%;
+     text-shadow: 0 1px 1px #700;
 }
 
 .tidylist {
