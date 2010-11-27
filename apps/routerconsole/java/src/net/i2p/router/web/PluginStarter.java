@@ -234,12 +234,14 @@ public class PluginStarter implements Runnable {
                 }
             }
         */
-            Iterator <String> wars = pluginWars.get(appName).iterator();
-            while (wars.hasNext()) {
-                String warName = wars.next();
-                WebAppStarter.stopWebApp(server, warName);
+            if(pluginWars.containsKey(appName)) {
+                Iterator <String> wars = pluginWars.get(appName).iterator();
+                while (wars.hasNext()) {
+                    String warName = wars.next();
+                    WebAppStarter.stopWebApp(server, warName);
+                }
+                pluginWars.get(appName).clear();
             }
-            pluginWars.get(appName).clear();
         }
 
         // remove summary bar link

@@ -1,4 +1,7 @@
 2010-11-27 sponge
+   * Plugin: ticket 336 fix NPE
+
+2010-11-27 sponge
    * Slackware: bump i2p-base version, so that it can be upgraded with the new
 	base code fixes.
 
