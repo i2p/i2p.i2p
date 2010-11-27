@@ -525,10 +525,17 @@ tt {
 div.main li {
      text-align: left;
      list-style: square;
-     margin: 2px 5px 0px 20px;
+     margin: 2px 20px 0px 40px;
      padding: 1px 10px 1px 10px;
      line-height: 150%;
      word-wrap: break-word;
+}
+
+div.main li b {
+     color: #404 !important;
+     letter-spacing: 0.04em;
+     font-size: 9.5pt;
+     line-height: 200%;
 }
 
 div.main li:first-child {
