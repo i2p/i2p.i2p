@@ -234,7 +234,6 @@ td:first-child {
 }
 
 .snarkTorrentAction {
-     text-shadow:1px 1px #540;
      padding: 1px 1px 1px 1px !important;
      margin: 0 !important;
      text-align: center;
@@ -242,12 +241,9 @@ td:first-child {
 }
 
 .snarkTorrentAction img {
-     margin: 0 2px !important;
-     opacity: 0.6;
 }
 
 .snarkTorrentAction img:hover {
-     -moz-box-shadow: 0 0 1px 1px #f90;
      opacity: 1;
 }
 
@@ -381,7 +377,7 @@ td:first-child {
 }
 
 .page {
-     background: #fff; /*url('/themes/snark/ubergine/images/tile2.png');*/
+     background: #fff url('images/tile2.png');
      color: #310;
      min-width: 970px !important;
      margin: 5px 0 0 0;
@@ -456,18 +452,20 @@ input.r {
 
 input[type=submit] {
      text-shadow: 0px 0px #410;
-     color: #000;
+     color: #f30;
      background: #fff;
      border: 1px outset #bbb;
      padding: 2px;
+     background: #fef url('images/bling.png') repeat-x scroll center center;
 }
 
 input[type=submit]:hover {
      border: 1px inset #bbb;
      text-shadow: 0 0;	 
      background: #fef;
-     color: #fff;
-     text-shadow: 0px 1px 1px #513;
+     color: #f60;
+     background: #fef url('images/bling2.png') repeat-x scroll center center;
+
 }
 
 input[type=submit]:active {
@@ -487,7 +485,6 @@ input[type=image] {
 }
 
 input[type=image]:hover {
-     border: 1px outset #bbb;
 }
 
 input[type=text]:active, input[type=text]:hover, input.r:hover {
