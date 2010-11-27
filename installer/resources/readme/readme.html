@@ -15,7 +15,9 @@
 <div class="welcome"><h2>Welcome to the I2P Darknet</h2></div>
 <ul class="links"><li class="tidylist"><b>Starting Up&hellip;</b><br>If you've just started I2P, the Active: numbers on the left should start to 
   grow over the next few minutes and you'll see a "shared clients" local destination 
-  listed at the bottom of the sidepanel on the left (if not, <a href="#trouble">see below</a>). The first time you start I2P it may take a few minutes to bootstrap you into the network and find additional peers to optimize your integration, so please be patient. Once green stars are indicated next to your local destinations, there are a range of services you can access including:</li>
+  listed at the bottom of the sidepanel on the left (if not, <a href="#trouble">see below</a>). The first time you start I2P it may take a few minutes to bootstrap you into the network and find additional peers to optimize your integration, so please be patient. Once green stars are indicated next to your local destinations, there are a range of things to do with I2P including:</li>
+  
+<h3>Services on I2P</h3>
 <li class="tidylist"><b>Anonymous File Transfer</b><br><a href="/i2psnark" target="_blank">I2PSnark</a> is integrated into I2P, providing anonymous, encrypted bittorrent. Also, Sponge develops a bittorrent client called <a href="http://bob.i2p/Robert.html">Robert</a> written in <a href="https://secure.wikimedia.org/wikipedia/en/wiki/Python_%28programming_language%29" target="_blank">Python</a>. There is also a port of <a href="http://www.emule-project.net/" target="_blank">eMule</a> to I2P called <a href="http://echelon.i2p/imule">iMule</a> [Urgently needs developers!], a hookup into the <a href="https://secure.wikimedia.org/wikipedia/en/wiki/Gnutella" target="_blank">gnutella network</a> in the shape of <a href="http://echelon.i2p/i2phex/" target="_blank">IPhex</a>, filedumps, webuploads et al.</li>
       <li class="tidylist"><b>Anonymous E-mail</b><br>Postman's I2P-based mail system can be accessed either via <a href="/susimail/">I2P's built-in webmail</a> (aka susimail) or using any mail client that supports smtp and pop3. Accounts can send and receive mail from the normal internet. For an account, visit <a href="http://hq.postman.i2p/" target="_blank">hq.postman.i2p</a>. Additionally, <a href="http://i2pbote.i2p/" target="_blank">I2P-Bote</a> is a new serverless, end-to-end encrypted e-mail system (with web interface), installable as a plugin.</li>
       <li class="tidylist"><b>Anonymous Chat</b><br>Start your IRC client (eg. chatzilla)
@@ -23,7 +25,7 @@
       <li class="tidylist"><b>Forums & Blogging</b><br><a href="http://syndie.i2p2.de/" target="_blank">Syndie</a> is a distributed forum and blogging plaform for I2P [Urgently needs developers!]. There's also an I2P plugin port of the Java-based <a href="http://pebble.sourceforge.net/" target="_blank">pebble</a> blogging platform ported to I2P by zzz, available on <a href="http://i2plugins.i2p" target="_blank">i2plugins.i2p</a>. And of course all normal blogging, forum and cms software will run over I2P, though you're advised to take extra precautions with security when setting up and keep all associated software (eg. Php, MySql, Python, Apache etc) up to date and locked down!</li>
       <li class="tidylist"><b>Plugins for I2P</b><br>Extend the usefulness of I2P by installing plugins&hellip; you can browse the plugins and related info on <a href="http://i2plugins.i2p" target="_blank">i2plugins.i2p</a>. If you're a <a href="http://i2plugins.i2p/developers/" target="_blank">developer</a>, a complete language agnostic framework for writing your own plugins is provided with <a href="http://i2plugins.i2p/specs/" target="_blank">documentation</a>; I2P plugins can be coded in any language. Blogging, chatting, filesharing and other plugins have already been written or ported and await your <a href="http://i2plugins.i2p/plugins/" target="_blank">installation</a>!
       <li class="tidylist"<b>I2P Darknet & Public Web browsing</b><br>On I2P you can host anonymous websites (aka eepsites) and other services (eg. ssh over I2p, your own irc server etc), and you can also access the normal web anonymously via I2P. Configure your browser to use the HTTP  <a href="https://secure.wikimedia.org/wikipedia/en/wiki/Proxy_server " target="_blank">proxy</a> I2P provides at <code>127.0.0.1 port 4444</code>, then 
-    browse to an eepsite or a normal <code>http://</code> address. Some useful resources are listed below:<br>
+    browse to an eepsite or a normal <code>http://</code> address. Some useful resources are listed below:<br></ul><h3>Sites of interest</h3>
     <ul class="links">
       <li class="tidylist"><b>Invisible Internet Project (I2P) Official Website</b><br><a href="http://www.i2p2.i2p/" target="_blank">www.i2p2.i2p</a> and 
         mirror <a href="http://i2p-projekt.i2p" target="_blank">i2p-projekt.i2p</a>: Secure and 
@@ -42,9 +44,8 @@
       <li class="tidylist"><b>Explore the darknet!</b><br>There are many more eepsites - just follow the links from the ones you see, 
       bookmark your favorites, and visit them often! There's a custom build of Firefox built for especially for I2P called <a href="http://echelon.i2p/i2pfox/">I2PFox</a> you might like to investigate for locked down darknet exploration!</li>
     </ul>
-    </ul>
 </ul>
-<h2>Anonymous Encrypted Webserving on I2P</h2>
+<h3>Anonymous Encrypted Webserving on I2P</h3>
 <ul class="links">
 
 <li class="tidylist"><b>Ready to roll!</b><br>I2P comes built-in with a ready-to-go webserver for hosting your own anonymous website (eepsite) on the I2P <a href="https://secure.wikimedia.org/wikipedia/en/wiki/Darknet_%28file_sharing%29" target="_blank">darknet</a>: a <a href="http://jetty.mortbay.org/" target="_blank">Jetty</a> instance listening on <a href="http://127.0.0.1:7658/" target="_blank">http://127.0.0.1:7658/</a>. To host your own content
@@ -56,7 +57,7 @@
 
       <li class="tidylist"><b>Start your tunnel</b><br>  
   After starting up your pre-configured <a href="/i2ptunnel/" target="_blank">I2P Webserver tunnel</a>,  
-your eepsite will be visible to others. Detailed instructions for starting 
+your eepsite will be visible (but not discoverable) to others. Detailed instructions for starting 
   your eepsite, registering an .i2p domain and promoting your site to others are accessible via your own I2P websever on <a href="http://127.0.0.1:7658/help/" target="_blank">http://127.0.0.1:7658/help/</a>.</li></ul>
 
 <h2><a name="trouble">Troubleshooting &amp; Further Assistance</a></h2>
