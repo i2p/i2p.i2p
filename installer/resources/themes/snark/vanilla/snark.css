@@ -1,0 +1,699 @@
+/* I2PSnark theme "Vanilla" by dr|z3d */
+
+
+body {
+     background: #eeb url('images/graytile.png');
+     color: #001;
+     font: 8pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
+}
+
+.snarkTitle {
+     font-size: 12pt;
+     font-weight: bold;
+     text-align: center;
+}
+
+.snarkRefresh:link,.snarkRefresh:visited {
+     text-decoration: none !important;
+     text-transform: uppercase !important;
+     padding: 4px 16px 5px !important;
+     margin: -5px -8px -5px 0 !important;
+     letter-spacing: 0.05em;
+     font-weight: bold;
+     font-size: 11pt;
+     color: #f60;
+     text-shadow: 0px 1px #303;
+     background: #fff url('images/bling.png') repeat-x scroll center center;
+     -moz-border-radius: 0px;
+     -khtml-border-radius: 3px;
+     border-radius: 0px;
+     -moz-box-shadow: inset 0 0 1px 0 #330;
+     -khtml-box-shadow: inset 0 0 1px 0 #330;
+     box-shadow: 0 0 1px 0 #330;
+     text-shadow: 0 0 0;
+
+}
+
+.snarkRefresh:hover {
+     text-decoration: none !important;
+     text-transform: uppercase !important;
+     padding: 1px 16px;
+     letter-spacing: 0.05em;
+     font-weight: bold;
+     font-size: 11pt;
+     color: #f50;
+     background: #fff url('images/bling2.png') repeat-x scroll center center;*/     -moz-border-radius: 0;
+     -khtml-border-radius: 0;
+     border-radius: 0;
+     -moz-box-shadow: inset 0 0 1px 0 #330;
+     -khtml-box-shadow: inset 0 0 1px 0 #330;
+     box-shadow: 0 0 1px  #330;
+     text-shadow: 0 0 0;
+}
+
+.snarkRefresh:active {
+     text-decoration: none !important;
+     text-transform: uppercase !important;
+     padding: 0 16px;
+     letter-spacing: 0.05em;
+     font-weight: bold;
+     font-size: 11pt;
+     color: #fb0;
+     background: #eeb url('images/snarknav_lowlight.png') repeat-x scroll center center;
+}
+
+.snarkRefresh:last-child {
+     -moz-border-radius: 0 3px 3px 0px;
+     -khtml-border-radius: 0 3px 3px 0;
+     border-radius: 0 3px 3px 0;
+     -moz-box-shadow: inset 0 0 1px 0 #330;
+     -khtml-box-shadow: inset 0 0 1px 0 #330;
+     box-shadow: 0 0 1px 0 #330;
+}
+
+.snarkRefresh:first-child {
+     -moz-border-radius: 3px 0 0 3px;
+     -khtml-border-radius: 3px 0 0 3px;
+     border-radius: 3px 0 0 3px;
+     -moz-box-shadow: inset 0 0 1px 0 #330;
+     -khtml-box-shadow: inset 0 0 1px 0 #330;
+     box-shadow: 0 0 1px 0  #330;
+}
+
+.snarkMessages {
+     font: bold 9pt "Lucida Console","DejaVu Sans Mono",Courier,mono !important;
+     text-align: left;
+     margin: 0 0 10px 0;
+     padding: 3px 5px;
+     border-spacing: 0px;
+     -moz-border-radius: 4px 0 0 0;
+     -khtml-border-radius: 4px 0 0 0;
+     border-radius: 4px 0 0 0;
+     border: 1px solid #000;
+     overflow: auto;
+     color: #26f;
+     height: 70px;
+     width: auto;
+     background: #eda url('/themes/snark/ubergine/images/hat.png') no-repeat scroll right center;
+}
+
+.snarkMessages a:link {
+     color: #37f !important;
+}
+
+.snarkMessages a:hover {
+     color: #59f !important;
+}
+
+.logshim {
+     margin-top: -10px !important;
+}
+
+pre {
+     width: 100%;
+     font: 8pt "Lucida Console","DejaVu Sans Mono",Courier,mono !important;
+     padding: 0;
+     text-align: left !important;
+     height: 8px;
+     color: #731;
+     font-weight: bold !important; 
+}
+
+table {
+     margin: 0px 0px 10px 0px;
+     border: 0px;
+     padding: 0px;
+     border-spacing: 0px;
+     border-collapse: collapse;
+     color: #323;
+     width: 100%;
+     opacity: 1 !important;
+}
+
+tr { 
+     opacity: 1;
+}
+
+thead, tfoot {
+     text-shadow:0 1px 1px #b48;
+     background: url("images/bling.png") repeat-x scroll center center #867;
+}
+
+thead a, tfoot a {
+text-shadow:1px 1px #101;
+} 
+
+thead {
+     border-bottom: 1px solid #604;
+}
+
+th {
+     padding: 4px 2px 4px 4px;
+     font-size: 9pt;
+     border-top: 1px outset #001;
+     border-bottom: 1px inset #604;
+     color: #b30;
+     whitespace: nowrap;
+     font-variant: small-caps !important;
+     letter-spacing: 0.05em;
+}
+
+th:first-child {
+     text-align: left !important;
+     padding-left: 2px;
+}
+
+tfoot td:first-child {
+     text-align: left !important;
+     padding-left: 0px;
+}
+
+th:first-child img {
+     margin: 1px 1px 3px 1px !important;
+}
+
+th:nth-child(2) img {
+     margin: 1px 7px 3px 2px !important;
+}
+
+tfoot th {
+     padding-bottom: 4px !important;
+}
+
+.headerstatus {
+     text-align: left;
+     padding-left: 15px;
+}
+
+.headerpriority {
+     text-align: left;
+     padding-left: 10px;
+}
+
+.ParentDir {
+     background: #656;
+     background: #fed;
+     font-size: 8pt;
+     border: 0px inset #604 !important;
+     border-left: 0 !important;
+     border-right: 0 !important;
+     text-align: left !important;
+     padding: 4px 0;
+}
+
+.priority {
+     font-size: 7pt;
+     vertical-align: center;
+}
+
+.SnarkTorrents {
+     margin: 0;
+     border: 1px solid #604;
+     background: #212;
+}
+
+td {
+     padding: 1px;
+     color: #001 !important;
+     opacity: 1;
+     font-size: 9.5pt;
+}
+
+.mainsection td {
+     color: #111;
+}
+
+td:first-child {
+     text-align: right;
+     font-size: 9.5pt;
+}
+
+.snarkTorrentName {
+/*     text-shadow:1px 1px #540;*/
+     padding: 2px 0 0;
+}
+
+.snarkTorrentAction {
+     text-shadow:1px 1px #540;
+     padding: 1px 1px 1px 1px !important;
+     margin: 0 !important;
+     text-align: center;
+     width: 68px;
+}
+
+.snarkTorrentAction img {
+     margin: 0 2px !important;
+     opacity: 0.6;
+}
+
+.snarkTorrentAction img:hover {
+     -moz-box-shadow: 0 0 1px 1px #f90;
+     opacity: 1;
+}
+
+.snarkTorrentEven {
+     background: #fef;
+     font-size: 8pt;
+     background: #feb;
+}
+
+.snarkTorrentNoneLoaded {
+     background: #323;
+     font-size: 8.5pt;
+     font-weight: bold;
+     text-align: center !important;
+     color: #bbb !important;
+}
+
+.snarkTorrentStatus {
+     padding: 1px 0 2px;
+}
+
+.snarkTorrentStatus:first-child {
+     text-align: left !important;
+     padding-left: 0px;
+     min-width: 120px;
+     font-weight: bold;
+     color: #404 !important;
+     font-size: 8pt;
+}
+
+.snarkTorrentStatus:first-child img {
+     margin-right: 0px !important;
+}
+
+.snarkTorrentRateUp, .snarkTorrentRateDown, .snarkTorrentDownloaded, .snarkTorrentUploaded {
+     font-size: 8pt;
+     font-weight: bold;
+     padding: 0 3px;
+}
+
+.snarkTorrentDownloaded {
+     color: #439 !important;
+}
+
+.snarkTorrentUploaded {
+     color: #626 !important;
+}
+
+.snarkTorrentRateUp {
+     color: #626 !important;
+
+}
+
+.snarkTorrentRateDown {
+     color: #439 !important;
+
+}
+
+.snarkTorrentOdd {
+     background: #656;
+     background: #fed;
+     font-size: 8pt;
+     border: 0px inset #fff !important;
+     border-left: 0 !important;
+     border-right: 0 !important;
+}
+.snarkTorrentOdd td, .snarkTorrentEven td {
+     border-top: 1px dotted #313 !important;
+}
+
+.snarkFileName {
+     padding: 4px 0px !important; 
+     text-align: left !important;
+     font-size: 8pt !important;
+}
+
+.snarkFileSize {
+     padding: 4px 2px;
+     font-weight: bold;
+     color: #b6b !important;
+}
+
+.snarkFileStatus {
+     padding: 4px 5px 4px 15px;
+     text-align: center;
+     font-style: italic;
+     font-size: 8pt;
+     text-align: left;
+}
+
+.snarkTorrentETA {
+     font-weight: bold;
+     font-style: italic;
+     color: #dd7 !important;
+}
+
+.thumb {
+     max-height: 64px;
+     max-width: 96px;
+}
+
+.snarkNewTorrent {
+     font-size: 9pt;
+}
+
+.snarkAddInfo {
+     font-size: 9pt;
+     line-height: 130% !important;
+}
+
+.snarkConfigTitle {
+     font-size: 11pt;
+     font-weight: bold;
+     padding: 0 25px 3px 25px;
+     margin: 5px 0 10px 0 !important;
+     letter-spacing: 0.25em;
+     border: 1px solid #111;
+     -moz-border-radius: 0 0 5px 5px;
+     -khtml-border-radius: 0 0 5px 5px;
+     border-radius: 0 0 5px 5px;
+     border-top: 0;
+     text-shadow: 0px 1px 1px #300;
+     background: #ffb url('images/bling.png') repeat-x scroll center center !important;
+     font-variant: small-caps !important;
+     color: #503;
+}
+
+.snarkConfig {
+     font-size: 10pt;
+     width: 100%;
+}
+
+.page {
+     background: #fff; /*url('/themes/snark/ubergine/images/tile2.png');*/
+     color: #310;
+     min-width: 970px !important;
+     margin: 5px 0 0 0;
+     padding: 10px 10px 0px 10px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 1px solid #101;
+     font-size: 9pt !important;
+     line-height: 160% !important;
+     -moz-box-shadow: inset 0px 0px 1px 0px #212;
+     -khtml-box-shadow: inset 0px 0px 1px 0px #002;
+     box-shadow: inset 0px 0px 1px 0px #002;
+     text-align: center;
+     opacity: 1;
+}
+
+form {
+     margin-bottom: 0;
+}
+
+p {
+     line-height: 150%;
+}
+
+hr {
+     color: #444;
+     background: #444;
+     height: 1px;
+     border: 0px solid #444;
+     width: 0%;
+     margin: 5px 0 7px 0;
+     text-align: center;
+}
+
+a:link {
+     color: #903;
+     text-decoration: none;
+     font-weight: bold;
+     word-wrap: break-word;
+}
+
+a:visited {
+     color: #703;
+     text-decoration: none;
+     font-weight: bold;
+}
+
+a:hover {
+     color: #b06
+     font-weight: bold;
+}
+
+input {
+     font-size: 9pt;
+     font-weight: bold;
+     text-align: left;
+     padding: 3px 4px !important;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 1px inset #000;
+     background: #fff /*url('/themes/snark/ubergine/images/graytile.png')*/;	 
+     color: #000;
+     margin: 2px 0;
+}
+
+input.r {
+     text-align: right;
+     background: /*url('/themes/snark/ubergine/images/graytile.png')*/;
+}
+
+input[type=submit] {
+     text-shadow: 0px 0px #410;
+     color: #000;
+     background: #fff;
+     border: 1px outset #bbb;
+     padding: 2px;
+}
+
+input[type=submit]:hover {
+     border: 1px inset #bbb;
+     text-shadow: 0 0;	 
+     background: #fef;
+     color: #fff;
+     text-shadow: 0px 1px 1px #513;
+}
+
+input[type=submit]:active {
+     background: #000 !important;
+     color: #f60 !important;
+     text-shadow: 0 !important;
+}
+
+input[type=image] {
+     padding: 0 !important;
+     background: none;
+     -moz-border-radius: 0px;
+     -khtml-border-radius: 0px;
+     border-radius: 0px;
+     border: medium none;
+     margin: 0 2px;
+}
+
+input[type=image]:hover {
+     border: 1px outset #bbb;
+}
+
+input[type=text]:active, input[type=text]:hover, input.r:hover {
+     background: #fef;
+     color: #500;
+}
+
+input[type=radio] {
+     padding: 2px;
+     margin: 0 3px 0 8px;
+     vertical-align: bottom;
+}
+
+select {
+     background: #fff;
+/*     background: url('/themes/snark/ubergine/images/graytile.png') !important;*/
+     color: #101;
+     font: 9pt "Lucida Sans Unicode","Bitstream Vera Sans",Verdana,Tahoma,Helvetica,sans-serif;
+     font-weight: bold;
+     padding: 2px 2px 2px 3px;
+     -moz-border-radius: 4px 0 0 4px;
+     -khtml-border-radius: 4px 0 0 4px;
+     border-radius: 4px 0 0 4px;
+     border: 1px solid #000;
+}
+
+select:hover, textarea:hover {
+     background: #fff !important;
+     color: #101 !important;
+}
+
+textarea {
+     background: #fff; /*/*url('/themes/snark/ubergine/images/graytile.png')*/;*/
+     color: #f60;
+     font-weight: bold;
+     padding: 1px 4px 0px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     border: 1px inset #000;
+}
+
+img {
+     border: none;
+     margin: 0 3px 1px 3px;
+     vertical-align: middle;
+     opacity: 1.0;
+     line-height: 100%;
+}
+
+img:hover {
+     border: none;
+     opacity: 1;
+     line-height: 100%;
+}
+
+.infoz {
+     margin: 0 -1px 0 0 !important;
+     padding: 0 !important;
+     lineheight: 100%;
+     float: left;
+}
+
+.infoz img {
+     border: none;
+     opacity: 0.8 !important;
+}
+
+.infoz img:hover {
+     opacity: 1 !important;
+}
+
+
+div.section,div.mainsection {
+     margin: 0 0 10px 0;
+     padding: 10px;
+     border: 1px solid #001;
+     color: #001;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     -moz-box-shadow: inset 0px 0px 1px 0px #212;
+     word-wrap: break-word;
+     text-align: center;
+     background: #fef;
+     opacity: 1 !important;
+}
+
+div.newtorrentsection {
+     margin: 0 0 10px 0;
+     padding: 0 10px 0px 10px;
+     border: 1px solid #001;
+     text-align: center;
+     color: #ddd;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     -moz-box-shadow: inset 0px 0px 1px 0px #fff;
+     -khtml-box-shadow: inset 0px 0px 1px 0px #fff;
+     box-shadow: inset 0px 0px 1px 0px #fff;
+     word-wrap: break-word;
+     background: #fef url('/themes/snark/ubergine/images/snark_create.png') no-repeat scroll right center;
+     opacity: 1.0;
+}
+
+div.addtorrentsection {
+     margin: 0 0 10px 0;
+     padding: 0 10px 0px 10px;
+     border: 1px solid #001;
+     text-align: center;
+     color: #ddd;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     -moz-box-shadow: inset 0px 0px 1px 0px #fff;
+     -khtml-box-shadow: inset 0px 0px 1px 0px #fff;
+     box-shadow: inset 0px 0px 1px 0px #fff;
+     word-wrap: break-word;
+     background: #fef url('/themes/snark/ubergine/images/snark_add.png') no-repeat scroll right center;
+     opacity: 1.0;
+}
+
+div.configsection {
+     margin: 0 0 10px 0;
+     padding: 0 10px 15px 10px;
+     border: 1px solid #000;
+     color: #ddd;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     -moz-box-shadow: inset 0px 0px 1px 0px #fff;
+     -khtml-box-shadow: inset 0px 0px 1px 0px #fff;
+     box-shadow: inset 0px 0px 1px 0px #fff;
+     word-wrap: break-word;
+     text-align: center;
+     background: #fef;
+     font-weight: bold;
+}
+
+div.configsectionpanel {
+     margin: 0 0 10px 0;
+     padding: 0 10px;
+     border: 1px solid #000;
+     color: #ddd;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     -moz-box-shadow: inset 0px 0px 1px 0px #fff;
+     -khtml-box-shadow: inset 0px 0px 1px 0px #fff;
+     box-shadow: inset 0px 0px 1px 0px #fff;
+     word-wrap: break-word;
+     text-align: center;
+     background: #fef url('/themes/snark/ubergine/images/configuration.png') no-repeat scroll right center;
+     font-weight: bold;
+}
+
+.newtorrentsection form, .configsection form, .addtorrentsection form {
+     color: #ddd !important;
+}
+
+div.configsection table{
+     color: #ffb;
+     opacity: 1;
+}
+
+div.configsection a {
+     color: #f60;
+     text-shadow: 1px 1px #500;
+}
+
+div.configsection a:hover {
+     color: #f90;
+     text-decoration: none;
+}
+
+code {
+     font-size: 9.5pt;
+     color: #227;
+     padding: 0 2px;
+     font-weight: bold;
+     font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+}
+.snarknavbar {
+     margin: -10px 0 5px 0 !important;
+     padding: 11px 10px 12px;
+     border: 1px solid #101;
+     -moz-border-radius: 0 0 8px 8px;
+     -khtml-border-radius: 0 0 8px 8px;
+     border-radius: 0 0 8px 8px;
+     -moz-box-shadow: inset 0px 0px 1px 0px #212;
+     -khtml-box-shadow: inset 0px 0px 1px 0px #212;
+     box-shadow: inset 0px 0px 1px 0px #212;
+     background: #fef url('images/bling2.png') repeat-x scroll center center;
+     text-transform: uppercase !important;
+     letter-spacing: 0.065em !important;
+     font-weight: bold;
+     font-size: 11.5pt;
+     color: #001;
+     min-width: 700px;
+     width: 70%;
+     text-align: center;
+ }
+
+ .snarknavbar img {
+     border: 0;
+     margin: 0 -6px 0 -2px;
+     padding: 1px 0 0px !important;
+     vertical-align: top;
+}
