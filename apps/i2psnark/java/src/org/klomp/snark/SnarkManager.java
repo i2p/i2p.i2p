@@ -437,7 +437,7 @@ public class SnarkManager implements Snark.CompleteListener {
         if (Theme != null) {
             if(!Theme.equals(_config.getProperty(PROP_THEME))) {
                 _config.setProperty(PROP_THEME, Theme +"");
-                addMessage(_("Theme changed."));
+                addMessage (Theme+(_(" theme locked and loaded.")));
                 changed = true;
             }
         }
