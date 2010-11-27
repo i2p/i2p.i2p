@@ -1,3 +1,17 @@
+2010-11-27 zzz
+    * Build:
+      - Add man pages to package
+      - New updaterWithJavadoc target
+    * configstats.jsp: Fix NPE
+    * Console:
+      - Linkify "plugin installed and started" message
+      - Add link to javadocs if installed
+    * i2psnark:
+      - Drop queued outbound requests when choked
+      - Redo some data structures and locking to hopefully prevent deadlock
+      - Memory reduction part 3: Return partial pieces to PeerCoordinator when choked
+    * Streaming: Fix race NPE at stream close
+
 2010-11-27 sponge
    * Plugin: ticket 336 fix NPE
 
