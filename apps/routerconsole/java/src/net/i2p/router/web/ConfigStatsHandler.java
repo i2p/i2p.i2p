@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import net.i2p.stat.StatManager;
-import net.i2p.util.Log;
 
 /**
  * Handler to deal with form submissions from the stats config form and act
@@ -41,14 +40,10 @@ public class ConfigStatsHandler extends FormHandler {
         if (stats != null) {
             for (int i = 0; i < stats.length; i++) {
                 String cur = stats[i].trim();
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Stat: [" + cur + "]");
                 if ( (cur.length() > 0) && (!_stats.contains(cur)) )
                     _stats.add(cur);
             }
         }
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Updated stats: " + _stats);
     }
 
     public void setGraphList(String stats[]) {
@@ -66,8 +61,6 @@ public class ConfigStatsHandler extends FormHandler {
         } else {
             _graphs = "";
         }
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Updated graphs: " + _graphs);
     }
 
     public void setExplicitFilter(String foo) { _explicitFilter = true; }

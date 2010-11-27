@@ -49,10 +49,8 @@ class PeerCheckerTask extends TimerTask
 
   public void run()
   {
-    synchronized(coordinator.peers)
-      {
-        Iterator it = coordinator.peers.iterator();
-        if ((!it.hasNext()) || coordinator.halted()) {
+        List<Peer> peerList = coordinator.peerList();
+        if (peerList.isEmpty() || coordinator.halted()) {
           coordinator.peerCount = 0;
           coordinator.interestedAndChoking = 0;
           coordinator.setRateHistory(0, 0);
@@ -76,19 +74,18 @@ class PeerCheckerTask extends TimerTask
 
         // Keep track of peers we remove now,
         // we will add them back to the end of the list.
-        List removed = new ArrayList();
+        List<Peer> removed = new ArrayList();
         int uploadLimit = coordinator.allowedUploaders();
         boolean overBWLimit = coordinator.overUpBWLimit();
-        while (it.hasNext())
-          {
-            Peer peer = (Peer)it.next();
+        for (Peer peer : peerList) {
 
             // Remove dying peers
             if (!peer.isConnected())
               {
-                it.remove();
-                coordinator.removePeerFromPieces(peer);
-                coordinator.peerCount = coordinator.peers.size();
+                // This was just a failsafe, right?
+                //it.remove();
+                //coordinator.removePeerFromPieces(peer);
+                //coordinator.peerCount = coordinator.peers.size();
                 continue;
               }
 
@@ -140,7 +137,6 @@ class PeerCheckerTask extends TimerTask
                     coordinator.uploaders--;
                     
                     // Put it at the back of the list
-                    it.remove();
                     removed.add(peer);
                   }
                 else if (overBWLimitChoke)
@@ -153,7 +149,6 @@ class PeerCheckerTask extends TimerTask
                     removedCount++;
 
                     // Put it at the back of the list for fairness, even though we won't be unchoking this time
-                    it.remove();
                     removed.add(peer);
                   }
                 else if (peer.isInteresting() && peer.isChoked())
@@ -166,7 +161,6 @@ class PeerCheckerTask extends TimerTask
                     removedCount++;
                     
                     // Put it at the back of the list
-                    it.remove();
                     removed.add(peer);
                   }
                 else if (!peer.isInteresting() && !coordinator.completed())
@@ -179,7 +173,6 @@ class PeerCheckerTask extends TimerTask
                     removedCount++;
                     
                     // Put it at the back of the list
-                    it.remove();
                     removed.add(peer);
                   }
                 else if (peer.isInteresting()
@@ -195,7 +188,6 @@ class PeerCheckerTask extends TimerTask
                     removedCount++;
                     
                     // Put it at the back of the list
-                    it.remove();
                     removed.add(peer);
                   }
                 else if (peer.isInteresting() && !peer.isChoked() &&
@@ -234,8 +226,6 @@ class PeerCheckerTask extends TimerTask
             removedCount++;
 
             // Put it at the back of the list
-            coordinator.peers.remove(worstDownloader);
-            coordinator.peerCount = coordinator.peers.size();
             removed.add(worstDownloader);
           }
         
@@ -244,8 +234,12 @@ class PeerCheckerTask extends TimerTask
             coordinator.unchokePeer();
 
         // Put peers back at the end of the list that we removed earlier.
-        coordinator.peers.addAll(removed);
-        coordinator.peerCount = coordinator.peers.size();
+        synchronized (coordinator.peers) {
+            for(Peer peer : removed) { 
+                if (coordinator.peers.remove(peer))
+                    coordinator.peers.add(peer);
+            }
+        }
         coordinator.interestedAndChoking += removedCount;
 
 	// store the rates
@@ -255,6 +249,5 @@ class PeerCheckerTask extends TimerTask
         if (random.nextInt(4) == 0)
             coordinator.getStorage().cleanRAFs();
 
-      }
   }
 }

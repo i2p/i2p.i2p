@@ -24,6 +24,7 @@
         <echo message="  installer: build the GUI installer" />
         <echo message="  tarball:   tar the full install into i2p.tar.bz2 (extracts to build a new clean install)" />
         <echo message="  updater:   tar the built i2p specific files into an i2pupdate.zip (extracts safely over existing installs)" />
+        <echo message="  updaterWithJavadoc: updater including the javadocs, for display in the console" />
         <echo message="  updaterWithJetty:   tar the built i2p specific files and jetty into an i2pupdate.zip (extracts safely over existing installs)" />
         <echo message="  updaterWithJettyFixes: updater including local jetty patches" />
         <echo message="  updaterWithGeoIP: updater including GeoIP Files" />
@@ -360,6 +361,9 @@
         <copy file="installer/resources/i2prouter" todir="pkg-temp/" />
         <copy file="installer/resources/osid" todir="pkg-temp/" />
         <copy file="installer/resources/postinstall.sh" todir="pkg-temp/" />
+        <copy todir="pkg-temp/man/">
+            <fileset dir="installer/resources/man/" />
+        </copy>
         <copy todir="pkg-temp/lib/wrapper/linux/">
             <fileset dir="installer/lib/wrapper/linux/" />
         </copy>
@@ -493,9 +497,16 @@
         <zip destfile="docs.zip" basedir="pkg-temp" whenempty="fail" />
     </target>
 
+    <target name="copyJavadoc" depends="javadoc">
+        <copy todir="pkg-temp/docs/javadoc" >
+          <fileset dir="build/javadoc/" />
+        </copy>
+    </target>
+
     <target name="updater200" depends="prepupdate, preplicenses, pack200, zipit200" />
     <target name="updater200WithJettyFixes" depends="prepjupdatefixes, preplicenses, pack200, zipit200" />
     <target name="updater" depends="prepupdate, preplicenses, zipit" />
+    <target name="updaterWithJavadoc" depends="prepupdate, preplicenses, copyJavadoc, zipit" />
     <target name="updaterWithGeoIP" depends="prepupdate, prepgeoupdate, preplicenses, zipit" />
     <target name="updaterWithJetty" depends="prepjupdate, preplicenses, zipit" />
     <target name="updaterWithJettyFixes" depends="prepjupdatefixes, preplicenses, zipit" />

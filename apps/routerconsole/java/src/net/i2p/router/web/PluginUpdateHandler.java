@@ -366,8 +366,18 @@ public class PluginUpdateHandler extends UpdateHandler {
             } else {
                 // start everything
                 try {
-                    if (PluginStarter.startPlugin(_context, appName))
-                        statusDone("<b>" + _("Plugin {0} installed and started", appName) + "</b>");
+                    if (PluginStarter.startPlugin(_context, appName)) {
+                        String linkName = ConfigClientsHelper.stripHTML(props, "consoleLinkName_" + Messages.getLanguage(_context));
+                        if (linkName == null)
+                           linkName = ConfigClientsHelper.stripHTML(props, "consoleLinkName");
+                        String linkURL = ConfigClientsHelper.stripHTML(props, "consoleLinkURL");
+                        String link;
+                        if (linkName != null && linkURL != null)
+                            link = "<a target=\"_blank\" href=\"" + linkURL + "\"/>" + linkName + "</a>";
+                        else
+                            link = appName;
+                        statusDone("<b>" + _("Plugin {0} installed and started", link) + "</b>");
+                    }
                     else
                         statusDone("<b>" + _("Plugin {0} installed but failed to start, check logs", appName) + "</b>");
                 } catch (Throwable e) {

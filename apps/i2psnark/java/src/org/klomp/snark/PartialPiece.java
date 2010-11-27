@@ -21,7 +21,7 @@ class PartialPiece implements Comparable {
      * Allocates the data.
      *
      * @param piece Piece number requested.
-     * @param bs length must be equal to the piece length
+     * @param len must be equal to the piece length
      */
     public PartialPiece (int piece, int len) throws OutOfMemoryError {
         this.piece = piece;

@@ -55,7 +55,7 @@ public class FormHandler {
     /**
      * Call this to prevent changes using GET
      *
-     * @param the request method
+     * @param val the request method
      * @since 0.8.2
      */
     public void storeMethod(String val) { _method = val; }

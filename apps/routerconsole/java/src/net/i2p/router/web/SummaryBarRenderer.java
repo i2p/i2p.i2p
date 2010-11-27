@@ -147,8 +147,12 @@ public class SummaryBarRenderer {
                .append(_("Local Destinations"))
                .append("\">")
                .append(_("I2PTunnel"))
+               .append("</a>\n");
 
-               .append("</a></td></tr></table>\n");
+            File javadoc = new File(_context.getBaseDir(), "docs/javadoc/index.html");
+            if (javadoc.exists())
+                buf.append("<a href=\"/javadoc/index.html\" target=\"_blank\">Javadoc</a>\n");
+            buf.append("</td></tr></table>\n");
 
             out.write(buf.toString());
             buf.setLength(0);

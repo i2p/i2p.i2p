@@ -745,7 +745,7 @@ public class Snark
     _util.debug(s, level, null);
   }
 
-  /** coordinatorListener */
+  /** CoordinatorListener - this does nothing */
   public void peerChange(PeerCoordinator coordinator, Peer peer)
   {
     // System.out.println(peer.toString());
