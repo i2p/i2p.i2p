@@ -1,3 +1,6 @@
+2010-11-27 dr|z3d
+   * I2PSnark: New alterntive theme: "Vanilla". Big thanks to sponge for implementing the theme changer!
+
 2010-11-27 sponge
    * Plugin: ticket 336 fix NPE
 
