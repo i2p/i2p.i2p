@@ -148,10 +148,24 @@ interface PeerListener
   int wantPiece(Peer peer, BitField bitfield);
 
   /**
+   * Called when we are downloading from the peer and may need to ask for
+   * a new piece. Returns true if wantPiece() or getPartialPiece() would return a piece.
+   *
+   * @param peer the Peer that will be asked to provide the piece.
+   * @param bitfield a BitField containing the pieces that the other
+   * side has.
+   *
+   * @return if we want any of what the peer has
+   * @since 0.8.2
+   */
+  boolean needPiece(Peer peer, BitField bitfield);
+
+  /**
    * Called when the peer has disconnected and the peer task may have a partially
    * downloaded piece that the PeerCoordinator can save
    *
-   * @param state the PeerState for the peer
+   * @param peer the peer
+   * @since 0.8.2
    */
   void savePartialPieces(Peer peer, List<PartialPiece> pcs);
 
@@ -162,6 +176,7 @@ interface PeerListener
    * @param havePieces the have-pieces bitmask for the peer
    *
    * @return request (contains the partial data and valid length)
+   * @since 0.8.2
    */
   PartialPiece getPartialPiece(Peer peer, BitField havePieces);
 }

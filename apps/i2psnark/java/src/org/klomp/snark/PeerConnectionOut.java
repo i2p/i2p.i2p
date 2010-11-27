@@ -42,7 +42,7 @@ class PeerConnectionOut implements Runnable
   private boolean quit;
 
   // Contains Messages.
-  private final List sendQueue = new ArrayList();
+  private final List<Message> sendQueue = new ArrayList();
   
   private static long __id = 0;
   private long _id;
@@ -494,6 +494,19 @@ class PeerConnectionOut implements Runnable
     m.begin = req.off;
     m.length = req.len;
     addMessage(m);
+  }
+
+  /**
+   *  Remove all Request messages from the queue
+   *  @since 0.8.2
+   */
+  void cancelRequestMessages() {
+      synchronized(sendQueue) {
+          for (Iterator<Message> it = sendQueue.iterator(); it.hasNext(); ) {
+              if (it.next().type == Message.REQUEST)
+                it.remove();
+          }
+      }
   }
 
   // Called by the PeerState when the other side doesn't want this

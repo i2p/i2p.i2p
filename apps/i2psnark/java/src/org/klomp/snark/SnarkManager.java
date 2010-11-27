@@ -851,7 +851,7 @@ public class SnarkManager implements Snark.CompleteListener {
             buf.append('/');
         buf.append("\">").append(snark.storage.getBaseName()).append("</a>");
         long len = snark.meta.getTotalLength();
-        addMessage(_("Download finished: {0}", buf.toString()) + " (" + _("size: {0}B", DataHelper.formatSize2(len)) + ')');
+        addMessage(_("Download finished: {0}", buf.toString())); //  + " (" + _("size: {0}B", DataHelper.formatSize2(len)) + ')');
         updateStatus(snark);
     }
     
