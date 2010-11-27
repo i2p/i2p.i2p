@@ -851,14 +851,16 @@ public class WebMail extends HttpServlet
 		/*
 		 * folder view
 		 */
-		if( sessionObject.state == STATE_LIST ) {
+		if( sessionObject.state == STATE_LIST || sessionObject.state == STATE_SHOW) {
 			/*
 			 * check if user wants to view a message
 			 */
 			String show = request.getParameter( SHOW );
 			if( show != null && show.length() > 0 ) {
 				try {
+
 					int id = Integer.parseInt( show );
+					
 					if( id >= 0 && id < sessionObject.folder.getPageSize() ) {
 						String uidl = (String)sessionObject.folder.getElementAtPosXonCurrentPage( id );
 						if( uidl != null ) {
