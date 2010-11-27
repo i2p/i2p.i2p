@@ -1,3 +1,7 @@
+2010-11-27 sponge
+   * Slackware: bump i2p-base version, so that it can be upgraded with the new
+	base code fixes.
+
 2010-11-26 sponge
    * i2psnark: Don't save theme parameter if it has not changed.
 
