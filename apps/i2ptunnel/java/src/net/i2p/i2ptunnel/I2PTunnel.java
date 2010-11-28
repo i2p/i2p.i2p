@@ -1573,6 +1573,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
      *
      * Since file:<filename> isn't really used, this method is deprecated,
      * just call context.namingService.lookup() directly.
+     * @deprecated Don't use i2ptunnel for lookup! Use I2PAppContext.getGlobalContext().namingService().lookup(name) from i2p.jar
      */
     public static Destination destFromName(String name) throws DataFormatException {
 

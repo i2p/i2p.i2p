@@ -117,9 +117,7 @@ import net.i2p.util.Log;
 
         // Setup the sink. Always send repliable datagrams.
         if (destination != null && destination.length() > 0) {
-            try {
-                _otherDest = I2PTunnel.destFromName(destination);
-            } catch (DataFormatException dfe) {}
+            _otherDest = _context.namingService().lookup(destination);
             if (_otherDest == null) {
                 l.log("Could not resolve " + destination);
                 throw new RuntimeException("failed to create session - could not resolve " + destination);

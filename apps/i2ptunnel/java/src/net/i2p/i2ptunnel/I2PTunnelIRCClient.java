@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import net.i2p.client.streaming.I2PSocket;
-import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.I2PAppThread;
@@ -52,15 +51,11 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         dests = new ArrayList(2);
         while (tok.hasMoreTokens()) {
             String destination = tok.nextToken();
-            try {
-                Destination destN = I2PTunnel.destFromName(destination);
-                if (destN == null)
-                    l.log("Could not resolve " + destination);
-                else
-                    dests.add(destN);
-            } catch (DataFormatException dfe) {
-                l.log("Bad format parsing \"" + destination + "\"");
-            }
+            Destination destN = _context.namingService().lookup(destination);
+            if (destN == null)
+                l.log("Could not resolve " + destination);
+            else
+                dests.add(destN);
         }
 
         if (dests.isEmpty()) {
