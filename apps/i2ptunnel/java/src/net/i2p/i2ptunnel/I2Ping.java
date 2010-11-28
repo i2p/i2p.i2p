@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.data.Destination;
@@ -200,7 +201,7 @@ public class I2Ping extends I2PTunnelTask implements Runnable {
         @Override
         public void run() {
             try {
-                Destination dest = I2PTunnel.destFromName(destination);
+                Destination dest = I2PAppContext.getGlobalContext().namingService().lookup(destination);
                 if (dest == null) {
                     synchronized (lock) { // Logger is not thread safe
                         l.log("Unresolvable: " + destination + "");

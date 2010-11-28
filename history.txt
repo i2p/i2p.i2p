@@ -1,3 +1,12 @@
+2010-11-28 zzz
+    * Build: Move all dependencies to top-level build.xml,
+             so each sub-build.xml is only executed once
+    * i2psnark:
+      - Fix NPE and other partials bugs
+      - More extension message stubbing
+      - Log tweaks
+    * I2PTunnel: Deprecate destFromName()
+
 2010-11-27 zzz
     * Build:
       - Add man pages to package

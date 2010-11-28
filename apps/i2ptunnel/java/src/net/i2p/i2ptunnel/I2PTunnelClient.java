@@ -42,15 +42,11 @@ public class I2PTunnelClient extends I2PTunnelClientBase {
         dests = new ArrayList(1);
         while (tok.hasMoreTokens()) {
             String destination = tok.nextToken();
-            try {
-                Destination destN = I2PTunnel.destFromName(destination);
-                if (destN == null)
-                    l.log("Could not resolve " + destination);
-                else
-                    dests.add(destN);
-            } catch (DataFormatException dfe) {
-                l.log("Bad format parsing \"" + destination + "\"");
-            }
+            Destination destN = _context.namingService().lookup(destination);
+            if (destN == null)
+                l.log("Could not resolve " + destination);
+            else
+                dests.add(destN);
         }
 
         if (dests.isEmpty()) {

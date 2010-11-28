@@ -204,7 +204,7 @@ public class SOCKS4aServer extends SOCKSServer {
                 // Let's not due a new Dest for every request, huh?
                 //I2PSocketManager sm = I2PSocketManagerFactory.createManager();
                 //destSock = sm.connect(I2PTunnel.destFromName(connHostName), null);
-                destSock = t.createI2PSocket(I2PTunnel.destFromName(connHostName));
+                destSock = t.createI2PSocket(I2PAppContext.getGlobalContext().namingService().lookup(connHostName));
             } else if ("localhost".equals(connHostName) || "127.0.0.1".equals(connHostName)) {
                 String err = "No localhost accesses allowed through the Socks Proxy";
                 _log.error(err);
@@ -237,7 +237,7 @@ public class SOCKS4aServer extends SOCKSServer {
                 _log.debug("connecting to port " + connPort + " proxy " + proxy + " for " + connHostName + "...");
                 // this isn't going to work, these need to be socks outproxies so we need
                 // to do a socks session to them?
-                destSock = t.createI2PSocket(I2PTunnel.destFromName(proxy));
+                destSock = t.createI2PSocket(I2PAppContext.getGlobalContext().namingService().lookup(proxy));
             }
             confirmConnection();
             _log.debug("connection confirmed - exchanging data...");

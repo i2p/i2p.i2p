@@ -66,6 +66,7 @@ public class Peer implements Comparable
   private long options;
 
   /**
+   * Outgoing connection.
    * Creates a disconnected peer given a PeerID, your own id and the
    * relevant MetaInfo.
    */
@@ -80,6 +81,7 @@ public class Peer implements Comparable
   }
 
   /**
+   * Incoming connection.
    * Creates a unconnected peer from the input and output stream got
    * from the socket. Note that the complete handshake (which can take
    * some time or block indefinitely) is done in the calling Thread to
@@ -201,6 +203,7 @@ public class Peer implements Comparable
         // Do we need to handshake?
         if (din == null)
           {
+            // Outgoing connection
             sock = util.connect(peerID);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Connected to " + peerID + ": " + sock);
@@ -234,6 +237,7 @@ public class Peer implements Comparable
                                     + PeerID.idencode(expected_id) + "'");
             }
           } else {
+            // Incoming connection
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Already have din [" + sock + "] with " + toString());
           }
@@ -242,6 +246,12 @@ public class Peer implements Comparable
         PeerConnectionOut out = new PeerConnectionOut(this, dout);
         PeerState s = new PeerState(this, listener, metainfo, in, out);
         
+        if ((options & OPTION_EXTENSION) != 0) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Peer supports extensions, sending test message");
+            out.sendExtension(0, ExtensionHandshake.getPayload());
+        }
+
         // Send our bitmap
         if (bitfield != null)
           s.out.sendBitfield(bitfield);
@@ -331,12 +341,10 @@ public class Peer implements Comparable
     if (_log.shouldLog(Log.DEBUG))
         _log.debug("Read the remote side's hash and peerID fully from " + toString());
 
-//  if ((options & OPTION_EXTENSION) != 0) {
     if (options != 0) {
         // send them something
         if (_log.shouldLog(Log.DEBUG))
-            //_log.debug("Peer supports extension message, what should we say? " + toString());
-            _log.debug("Peer supports options 0x" + Long.toString(options, 16) + ", what should we say? " + toString());
+            _log.debug("Peer supports options 0x" + Long.toString(options, 16) + ": " + toString());
     }
 
     return bs;

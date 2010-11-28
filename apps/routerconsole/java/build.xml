@@ -3,12 +3,10 @@
     <target name="all" depends="clean, build" />
     <target name="build" depends="builddep, jar" />
     <target name="builddep">
-        <ant dir="../../../router/java/" target="build" />
-        <ant dir="../../systray/java/" target="build" />
-	<!-- router will build core -->
+        <!-- run from top level build.xml to get dependencies built -->
     </target>
     <target name="prepare">
-        <ant dir="../../jetty/" target="build" />
+        <!-- run from top level build.xml to get dependencies built -->
     </target>
     <condition property="depend.available">
         <typefound name="depend" />
@@ -235,13 +233,7 @@
         <delete file="../jsp/web-out.xml" />
     </target>
     <target name="cleandep" depends="clean">
-	<!-- router will clean core -->
-        <ant dir="../../../router/java/" target="cleandep" />
-        <ant dir="../../systray/java/" target="cleandep" />
     </target>
     <target name="distclean" depends="clean">
-	<!-- router will clean core -->
-        <ant dir="../../../router/java/" target="distclean" />
-        <ant dir="../../systray/java/" target="distclean" />
     </target>
 </project>

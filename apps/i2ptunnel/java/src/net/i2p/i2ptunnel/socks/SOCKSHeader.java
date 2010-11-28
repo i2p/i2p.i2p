@@ -1,7 +1,7 @@
 package net.i2p.i2ptunnel.socks;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.Base32;
-import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.i2ptunnel.I2PTunnel;
 
@@ -74,11 +74,8 @@ public class SOCKSHeader {
         String name = getHost();
         if (name == null)
             return null;
-        try {
-            // the naming service does caching (thankfully)
-            return I2PTunnel.destFromName(name);
-        } catch (DataFormatException dfe) {}
-        return null;
+        // the naming service does caching (thankfully)
+        return I2PAppContext.getGlobalContext().namingService().lookup(name);
     }
 
     public byte[] getBytes() {
