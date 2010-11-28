@@ -609,6 +609,9 @@ class PeerState implements DataLoader
    */
   synchronized void addRequest()
   {
+    // no bitfield yet? nothing to request then.
+    if (bitfield == null)
+        return;
     boolean more_pieces = true;
     while (more_pieces)
       {
