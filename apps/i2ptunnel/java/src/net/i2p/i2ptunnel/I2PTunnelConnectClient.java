@@ -278,7 +278,7 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                 return;
             }
 
-            Destination clientDest = I2PTunnel.destFromName(destination);
+            Destination clientDest = _context.namingService().lookup(destination);
             if (clientDest == null) {
                 String str;
                 byte[] header;

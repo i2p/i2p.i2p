@@ -615,13 +615,13 @@ public class PeerCoordinator implements PeerListener
                 // share blocks rather than starting from 0 with each peer.
                 // This is where the flaws of the snark data model are really exposed.
                 // Could also randomize within the duplicate set rather than strict rarest-first
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("parallel request (end game?) for " + peer + ": piece = " + piece);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("parallel request (end game?) for " + peer + ": piece = " + piece);
             }
         }
         if (record) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Now requesting: piece " + piece + " priority " + piece.getPriority());
+            if (_log.shouldLog(Log.INFO))
+                _log.info(peer + " is now requesting: piece " + piece + " priority " + piece.getPriority());
             piece.setRequested(true);
         }
         return piece.getId();
@@ -945,11 +945,11 @@ public class PeerCoordinator implements PeerListener
               PartialPiece pp = iter.next();
               int savedPiece = pp.getPiece();
               if (havePieces.get(savedPiece)) {
+                 iter.remove();
                  // this is just a double-check, it should be in there
                  for(Piece piece : wantedPieces) {
                      if (piece.getId() == savedPiece) {
                          piece.setRequested(true);
-                         iter.remove();
                          if (_log.shouldLog(Log.INFO)) {
                              _log.info("Restoring orphaned partial piece " + pp +
                                        " Partial list size now: " + partialPieces.size());
@@ -957,8 +957,12 @@ public class PeerCoordinator implements PeerListener
                          return pp;
                       }
                   }
+                  if (_log.shouldLog(Log.WARN))
+                      _log.warn("Partial piece " + pp + " NOT in wantedPieces??");
               }
           }
+          if (_log.shouldLog(Log.WARN) && !partialPieces.isEmpty())
+              _log.warn("Peer " + peer + " has none of our partials " + partialPieces);
       }
       // ...and this section turns this into the general move-requests-around code!
       // Temporary? So PeerState never calls wantPiece() directly for now...
@@ -1004,7 +1008,7 @@ public class PeerCoordinator implements PeerListener
               }
           }
       }
-      return wantPiece(peer, havePieces, false) > 0;
+      return wantPiece(peer, havePieces, false) >= 0;
   }
 
   /**

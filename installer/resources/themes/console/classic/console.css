@@ -304,7 +304,7 @@ div.main {
 }
 
 div.main ul {
-     margin: -10px 0 -10px -10px;
+     margin: -10px 0 10px -10px;
 }
 
 div.main li {

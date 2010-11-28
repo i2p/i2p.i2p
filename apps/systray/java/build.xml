@@ -3,7 +3,7 @@
     <target name="all" depends="clean, build" />
     <target name="build" depends="builddep, jar" />
     <target name="builddep">
-        <ant dir="../../../core/java/" target="build" />
+        <!-- run from top level build.xml to get dependencies built -->
     </target>
     <property name="javac.compilerargs" value="" />
     <target name="compile">
@@ -55,10 +55,7 @@
         <delete dir="./build" />
     </target>
     <target name="cleandep" depends="clean">
-	<!-- router will clean core -->
-        <ant dir="../../../core/java/" target="cleandep" />
     </target>
     <target name="distclean" depends="clean">
-        <ant dir="../../../core/java/" target="distclean" />
     </target>
 </project>

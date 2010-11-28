@@ -28,7 +28,6 @@ import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketOptions;
 import net.i2p.data.Base32;
 import net.i2p.data.Base64;
-import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.util.EventDispatcher;
@@ -431,11 +430,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                             // Host resolvable from database, verify addresshelper key
                                             // Silently bypass correct keys, otherwise alert
                                             String destB64 = null;
-                                            try {
-                                                Destination _dest = I2PTunnel.destFromName(host);
-                                                if (_dest != null)
-                                                    destB64 = _dest.toBase64();
-                                            } catch (DataFormatException dfe) {}
+                                            Destination _dest = _context.namingService().lookup(host);
+                                            if (_dest != null)
+                                                destB64 = _dest.toBase64();
                                             if (destB64 != null && !destB64.equals(ahelperKey))
                                             {
                                                 // Conflict: handle when URL reconstruction done
@@ -721,7 +718,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             if ("i2p".equals(host))
                 clientDest = null;
             else
-                clientDest = I2PTunnel.destFromName(destination);
+                clientDest = _context.namingService().lookup(destination);
 
             if (clientDest == null) {
                 //l.log("Could not resolve " + destination + ".");
@@ -814,17 +811,13 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
      *  @return b32hash.b32.i2p, or "i2p" on lookup failure.
      *  Prior to 0.7.12, returned b64 key
      */
-    private final static String getHostName(String host) {
+    private final String getHostName(String host) {
         if (host == null) return null;
         if (host.length() == 60 && host.toLowerCase().endsWith(".b32.i2p"))
             return host;
-        try {
-            Destination dest = I2PTunnel.destFromName(host);
-            if (dest == null) return "i2p";
-            return Base32.encode(dest.calculateHash().getData()) + ".b32.i2p";
-        } catch (DataFormatException dfe) {
-            return "i2p";
-        }
+        Destination dest = _context.namingService().lookup(host);
+        if (dest == null) return "i2p";
+        return Base32.encode(dest.calculateHash().getData()) + ".b32.i2p";
     }
 
     /**
@@ -947,12 +940,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         // Skip jump servers we don't know
                         String jumphost = jurl.substring(7);  // "http://"
                         jumphost = jumphost.substring(0, jumphost.indexOf('/'));
-                        try {
-                            Destination dest = I2PTunnel.destFromName(jumphost);
-                            if (dest == null) continue;
-                        } catch (DataFormatException dfe) {
-                            continue;
-                        }
+                        Destination dest = I2PAppContext.getGlobalContext().namingService().lookup(jumphost);
+                        if (dest == null) continue;
 
                         out.write("<br><a href=\"".getBytes());
                         out.write(jurl.getBytes());
@@ -1014,7 +1003,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
 
         if (!found) {
             try {
-                Destination d = I2PTunnel.destFromName(host);
+                Destination d = _context.namingService().lookup(host);
                 if (d == null) return false;
             } catch (DataFormatException dfe) {
             }

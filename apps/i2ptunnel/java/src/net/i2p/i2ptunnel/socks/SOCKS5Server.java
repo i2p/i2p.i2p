@@ -360,14 +360,14 @@ public class SOCKS5Server extends SOCKSServer {
                 // Let's not due a new Dest for every request, huh?
                 //I2PSocketManager sm = I2PSocketManagerFactory.createManager();
                 //destSock = sm.connect(I2PTunnel.destFromName(connHostName), null);
-                Destination dest = I2PTunnel.destFromName(connHostName);
+                Destination dest = I2PAppContext.getGlobalContext().namingService().lookup(connHostName);
                 if (dest == null) {
                     try {
                         sendRequestReply(Reply.HOST_UNREACHABLE, AddressType.DOMAINNAME, null, "0.0.0.0", 0, out);
                     } catch (IOException ioe) {}
                     throw new SOCKSException("Host not found");
                 }
-                destSock = t.createI2PSocket(I2PTunnel.destFromName(connHostName));
+                destSock = t.createI2PSocket(I2PAppContext.getGlobalContext().namingService().lookup(connHostName));
             } else if ("localhost".equals(connHostName) || "127.0.0.1".equals(connHostName)) {
                 String err = "No localhost accesses allowed through the Socks Proxy";
                 _log.error(err);
@@ -455,10 +455,10 @@ public class SOCKS5Server extends SOCKSServer {
         Properties overrides = new Properties();
         overrides.setProperty("option.i2p.streaming.connectDelay", "1000");
         I2PSocketOptions proxyOpts = tun.buildOptions(overrides);
-        Destination dest = I2PTunnel.destFromName(proxy);
+        Destination dest = I2PAppContext.getGlobalContext().namingService().lookup(proxy);
         if (dest == null)
             throw new SOCKSException("Outproxy not found");
-        I2PSocket destSock = tun.createI2PSocket(I2PTunnel.destFromName(proxy), proxyOpts);
+        I2PSocket destSock = tun.createI2PSocket(I2PAppContext.getGlobalContext().namingService().lookup(proxy), proxyOpts);
         try {
             DataOutputStream out = new DataOutputStream(destSock.getOutputStream());
             boolean authAvail = Boolean.valueOf(props.getProperty(I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH)).booleanValue();
