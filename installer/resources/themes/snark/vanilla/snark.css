@@ -98,13 +98,16 @@ body {
 }
 
 .snarkMessages a:link {
-     color: #37f !important;
+     color: #f60 !important;
 }
 
 .snarkMessages a:hover {
-     color: #59f !important;
+     color: #f90 !important;
 }
 
+.snarkMessages a:visited {
+     color: #d30 !important;
+}
 .logshim {
      margin-top: -10px !important;
 }
@@ -128,6 +131,7 @@ table {
      color: #323;
      width: 100%;
      opacity: 1 !important;
+     font-weight: bold;
 }
 
 tr { 
@@ -135,7 +139,7 @@ tr {
 }
 
 thead, tfoot {
-     text-shadow:0 1px 1px #b48;
+     text-shadow:0 1px 0px #930;
      background: url("images/bling.png") repeat-x scroll center center #867;
 }
 
@@ -323,7 +327,7 @@ td:first-child {
 .snarkFileSize {
      padding: 4px 2px;
      font-weight: bold;
-     color: #b6b !important;
+     color: #727 !important;
 }
 
 .snarkFileStatus {
@@ -337,7 +341,7 @@ td:first-child {
 .snarkTorrentETA {
      font-weight: bold;
      font-style: italic;
-     color: #dd7 !important;
+     color: #505 !important;
 }
 
 .thumb {
@@ -414,20 +418,20 @@ hr {
 }
 
 a:link {
-     color: #903;
+     color: #742;
      text-decoration: none;
      font-weight: bold;
      word-wrap: break-word;
 }
 
 a:visited {
-     color: #703;
+     color: #962;
      text-decoration: none;
      font-weight: bold;
 }
 
 a:hover {
-     color: #b06
+     color: #f30;
      font-weight: bold;
 }
 
@@ -586,7 +590,7 @@ div.newtorrentsection {
      -khtml-box-shadow: inset 0px 0px 1px 0px #fff;
      box-shadow: inset 0px 0px 1px 0px #fff;
      word-wrap: break-word;
-     background: #fef url('/themes/snark/ubergine/images/snark_create.png') no-repeat scroll right center;
+     background: #ffd url('/themes/snark/ubergine/images/snark_create.png') no-repeat scroll right center;
      opacity: 1.0;
 }
 
@@ -603,7 +607,7 @@ div.addtorrentsection {
      -khtml-box-shadow: inset 0px 0px 1px 0px #fff;
      box-shadow: inset 0px 0px 1px 0px #fff;
      word-wrap: break-word;
-     background: #fef url('/themes/snark/ubergine/images/snark_add.png') no-repeat scroll right center;
+     background: #ffd url('/themes/snark/ubergine/images/snark_add.png') no-repeat scroll right center;
      opacity: 1.0;
 }
 
@@ -620,7 +624,7 @@ div.configsection {
      box-shadow: inset 0px 0px 1px 0px #fff;
      word-wrap: break-word;
      text-align: center;
-     background: #fef;
+     background: #ffd;
      font-weight: bold;
 }
 
@@ -637,7 +641,7 @@ div.configsectionpanel {
      box-shadow: inset 0px 0px 1px 0px #fff;
      word-wrap: break-word;
      text-align: center;
-     background: #fef url('/themes/snark/ubergine/images/configuration.png') no-repeat scroll right center;
+     background: #ffd url('/themes/snark/ubergine/images/configuration.png') no-repeat scroll right center;
      font-weight: bold;
 }
 
