@@ -1,0 +1,28 @@
+/* I2P Theme Override: Dark */
+/* Comment: Larger text (and other tweaks) for Chinese */
+/* Author: dr|z3d */
+
+div.routersummary table {
+    font-size: 8.5pt;
+}
+
+div.routersummary h3, div.routersummary h4, div.routersummary p, div.routersummary h3 a, div.routersummary a {
+     text-shadow: 0 0 0 #fff !important;
+}
+
+div.routersummary b {
+     font-size: 9pt;
+     font-weight: normal;
+}
+
+div.routersummary a {
+     font-size: 10pt;
+}
+
+.smallhead {
+     font-size: 8.5pt
+}
+
+table {
+     font: 8.5pt/130% "Lucida Sans Unicode", Verdana, "Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
+}
