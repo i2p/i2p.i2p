@@ -3,8 +3,7 @@
     <target name="all" depends="clean, build" />
     <target name="build" depends="builddep, jar" />
     <target name="builddep">
-        <ant dir="../../ministreaming/java/" target="build" />
-	<!-- ministreaming will build core -->
+        <!-- run from top level build.xml to get dependencies built -->
     </target>
     <condition property="depend.available">
         <typefound name="depend" />
@@ -62,11 +61,7 @@
         <delete dir="./build" />
     </target>
     <target name="cleandep" depends="clean">
-	<!-- ministreaming will clean core -->
-        <ant dir="../../ministreaming/java/" target="distclean" />
     </target>
     <target name="distclean" depends="clean">
-	<!-- ministreaming will clean core -->
-        <ant dir="../../ministreaming/java/" target="distclean" />
     </target>
 </project>

@@ -3,9 +3,7 @@
     <target name="all" depends="clean, build" />
     <target name="build" depends="builddep, jar, war" />
     <target name="builddep">
-        <ant dir="../../jetty/" target="build" />
-        <ant dir="../../streaming/java/" target="build" />
-	<!-- streaming will build ministreaming and core -->
+        <!-- run from top level build.xml to get dependencies built -->
     </target>
     <condition property="depend.available">
         <typefound name="depend" />

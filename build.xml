@@ -62,33 +62,79 @@
     <target name="build2" depends="builddep, jar, buildWEB" />
     <target name="buildSmall" depends="builddepSmall, jarSmall, buildWEB" />
     <target name="buildclean" depends="distclean, build" />
-    <target name="builddep" depends="builddepSmall">
-	<!-- build *everything* here, but only once -->
+
+    <target name="builddep" depends="builddepSmall, buildBOB, buildSAM, buildSusiMail, buildSusiDNS, buildI2PSnark" />
+
+    <target name="builddepSmall" depends="buildrouter, buildSystray, buildRouterConsole, buildStreaming, buildI2PTunnel, buildAddressbook" />
+
+    <!-- start of buildX, one for each sub-build.xml.
+         Do not put ant tasks in the sub-build.xmls anymore,
+         so the build will go faster.
+      -->
+
+    <!-- TODO remove I2PTunnel dependency in BOB -->
+    <target name="buildBOB" depends="buildStreaming, buildI2PTunnel" >
         <ant dir="apps/BOB/" target="jar" />
+    </target>
+
+    <target name="buildSAM" depends="buildStreaming" >
         <ant dir="apps/sam/java/" target="jar" />
+    </target>
+
+    <target name="buildSusiMail" depends="buildCore, buildJetty" >
         <ant dir="apps/susimail/" target="war" />
+    </target>
+
+    <target name="buildSusiDNS" depends="buildCore, buildJetty" >
         <ant dir="apps/susidns/src" target="all" />
+    </target>
+
+    <target name="buildI2PSnark" depends="buildStreaming, buildJetty" >
         <ant dir="apps/i2psnark/java/" target="war" />
     </target>
-    <target name="builddepSmall">
-        <ant dir="core/java/" target="jar" />
-        <ant dir="router/java/" target="jar" />
-        <ant dir="apps/systray/java/" target="jar" />
-        <ant dir="apps/routerconsole/java/" target="jar" />
-        <ant dir="apps/ministreaming/java/" target="jar" />
-        <ant dir="apps/streaming/java/" target="jar" />
-        <ant dir="apps/i2ptunnel/java/" target="build" />
+
+    <target name="buildAddressbook" depends="buildCore, buildJetty" >
         <ant dir="apps/addressbook/" target="war" />
     </target>
-    <target name="buildrouter">
-        <ant dir="core/java/" target="jar" />
+
+    <target name="buildI2PTunnel" depends="buildStreaming, buildJetty" >
+        <ant dir="apps/i2ptunnel/java/" target="build" />
+    </target>
+
+    <target name="buildRouterConsole" depends="buildrouter, buildSystray, buildJetty" >
+        <ant dir="apps/routerconsole/java/" target="jar" />
+    </target>
+
+    <target name="buildJetty" >
+        <ant dir="apps/jetty" target="build" />
+    </target>
+
+    <target name="buildSystray" depends="buildCore" >
+        <ant dir="apps/systray/java/" target="jar" />
+    </target>
+
+    <target name="buildStreaming" depends="buildMinistreaming" >
+        <ant dir="apps/streaming/java/" target="jar" />
+    </target>
+
+    <target name="buildMinistreaming" depends="buildCore" >
+        <ant dir="apps/ministreaming/java/" target="jar" />
+    </target>
+
+    <target name="buildRouter" depends="buildrouter" />
+    <target name="buildrouter" depends="buildCore" >
         <ant dir="router/java/" target="jar" />
-        <copy file="core/java/build/i2p.jar" todir="build/" />
         <copy file="router/java/build/router.jar" todir="build/" />
     </target>
-    <target name="buildWEB">
-        <ant dir="apps/jetty" target="ensureJettylib" />
-        <ant dir="apps/routerconsole/java" target="build" />
+
+    <target name="buildCore" >
+        <ant dir="core/java/" target="jar" />
+        <copy file="core/java/build/i2p.jar" todir="build/" />
+    </target>
+
+    <!-- end of sub-build.xml targets -->
+
+    <target name="buildWEB" depends="buildRouterConsole" >
         <copy file="apps/routerconsole/java/build/routerconsole.jar" todir="build/" />
         <copy file="apps/routerconsole/java/build/routerconsole.war" todir="build/" />
         <copy file="apps/jetty/jettylib/org.mortbay.jetty.jar" todir="build/" />
@@ -98,6 +144,7 @@
         <copy file="apps/jetty/jettylib/commons-el.jar" todir="build/" />
         <copy file="apps/jetty/jettylib/javax.servlet.jar" todir="build/" />
     </target>
+
     <target name="buildexe">
         <condition property="noExe">
 	    <os arch="x86_64" />
