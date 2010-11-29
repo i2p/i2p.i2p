@@ -90,7 +90,7 @@
      font-size: 9pt !important;
      font-weight: bold;
      text-align: justify !important;
-     background: #ddf url(images/tabletile.png);
+     background: #ddf; /*url(images/tabletile.png);*/
 }
 
 #tunnelListPage .footer .control {
