@@ -954,15 +954,15 @@ div.joblog li {
 div.joblog ul {
      word-wrap: break-word !important;
      text-align: justify;
-     margin-bottom: 0px;
+     margin: 0px 0 10px;
 }
 
 div.joblog li:first-child {
-     margin-top: 10px;
+     margin-top: 0px;
 }
 
 div.joblog li:last-child {
-     margin-bottom: -15px;
+     margin-bottom: -25px;
 }
 
 div.joblog form:first-child {
