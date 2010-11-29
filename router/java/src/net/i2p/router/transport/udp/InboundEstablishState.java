@@ -19,6 +19,7 @@ import net.i2p.util.Log;
  * initiated the connection with us.  In other words, they are Alice and
  * we are Bob.
  *
+ * TODO do all these methods need to be synchronized?
  */
 class InboundEstablishState {
     private final RouterContext _context;
@@ -27,7 +28,8 @@ class InboundEstablishState {
     private byte _receivedX[];
     private byte _bobIP[];
     private final int _bobPort;
-    private DHSessionKeyBuilder _keyBuilder;
+    // try to fix NPE in getSentY() ?????
+    private volatile DHSessionKeyBuilder _keyBuilder;
     // SessionCreated message
     private byte _sentY[];
     private final byte _aliceIP[];

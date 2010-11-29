@@ -1986,8 +1986,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append(DataHelper.formatDuration2(idleOut));
             buf.append("</td>");
  
-            int recvBps = (idleIn > 2 ? 0 : peer.getReceiveBps());
-            int sendBps = (idleOut > 2 ? 0 : peer.getSendBps());
+            int recvBps = (idleIn > 15*1000 ? 0 : peer.getReceiveBps());
+            int sendBps = (idleOut > 15*1000 ? 0 : peer.getSendBps());
             
             buf.append("<td class=\"cells\" align=\"right\" nowrap>");
             buf.append(formatKBps(recvBps));
