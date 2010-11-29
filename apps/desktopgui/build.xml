@@ -6,12 +6,14 @@
 	<property name="dist"  location="dist"/>
 	<property name="jar" value="desktopgui.jar"/>
 	<property name="resources" value="resources"/>
+    <property name="javadoc" value="javadoc"/>
 
 	<property name="javac.compilerargs" value=""/>
 
 	<target name="init">
 		<mkdir dir="${build}"/>
         <mkdir dir="${build}/${resources}"/>
+        <mkdir dir="${build}/${javadoc}"/>
 		<mkdir dir="${dist}"/>
 	</target>
 
@@ -43,6 +45,22 @@
 			</manifest>
 		</jar>
 	</target>
+
+    <target name="javadoc">
+        <mkdir dir="${build}" />
+        <mkdir dir="${build}/${javadoc}" />
+        <javadoc 
+            sourcepath="${src}" destdir="${build}/${javadoc}" 
+            packagenames="*" 
+            use="true" 
+            splitindex="true" 
+            windowtitle="Desktopgui">
+            <classpath>
+                <pathelement location="../../router/java/build/router.jar" />
+                <pathelement location="../../core/java/build/i2p.jar" />
+            </classpath>
+        </javadoc>
+    </target>
 
 	<target name="dist" depends="jar" />	
 	<target name="all" depends="jar" />

@@ -5,8 +5,16 @@ import java.io.IOException;
 import net.i2p.desktopgui.util.ConfigurationManager;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
+/**
+ * Handle communications with the router instance.
+ * @author mathias
+ *
+ */
 public class RouterManager {
+	
+	private final static Log log = new Log(RouterManager.class);
 	
 	private static Router getRouter() {
 		return RouterContext.listContexts().get(0).router();
@@ -27,8 +35,7 @@ public class RouterManager {
 			//TODO: crossplatform
 			Runtime.getRuntime().exec(location + "/i2psvc " + location + "/wrapper.config");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.log(Log.WARN, "Failed to start I2P", e);
 		}
 	}
 	

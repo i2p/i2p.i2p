@@ -7,37 +7,40 @@ package net.i2p.desktopgui;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.i2p.desktopgui.util.*;
+import net.i2p.util.Log;
 
 /**
  * The main class of the application.
  */
 public class Main {
+	
+    ///Manages the lifetime of the tray icon.
+    private TrayManager trayManager = null;
+    private final static Log log = new Log(Main.class);
 
 	/**
 	 * Start the tray icon code (loads tray icon in the tray area).
 	 */
     private void startUp() {
-        trayManager = new TrayManager();
+        trayManager = TrayManager.getInstance();
+        trayManager.startManager();
     }
 
     /**
      * Main method launching the application.
      */
     public static void main(String[] args) {
-        System.setProperty("java.awt.headless", "false");  //Make sure I2P is running in GUI mode for our application
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            log.log(Log.ERROR, null, ex);
         } catch (InstantiationException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            log.log(Log.ERROR, null, ex);
         } catch (IllegalAccessException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        	log.log(Log.ERROR, null, ex);
         } catch (UnsupportedLookAndFeelException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        	log.log(Log.ERROR, null, ex);
         }
         
         ConfigurationManager.getInstance().loadArguments(args);
@@ -78,6 +81,4 @@ public class Main {
         t.start();
     }
     
-    ///Manages the lifetime of the tray icon.
-    private TrayManager trayManager = null;
 }

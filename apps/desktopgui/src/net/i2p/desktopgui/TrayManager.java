@@ -9,43 +9,54 @@ import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
 import java.awt.Desktop.Action;
-import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Properties;
 
 import javax.swing.SwingWorker;
 
 import net.i2p.desktopgui.router.RouterManager;
-import net.i2p.desktopgui.util.*;
-import net.i2p.router.Router;
+import net.i2p.desktopgui.util.ConfigurationManager;
+import net.i2p.util.Log;
 
 /**
  * Manages the tray icon life.
  */
 public class TrayManager {
 
+	private static TrayManager instance = null;
 	///The tray area, or null if unsupported
     private SystemTray tray = null;
     ///Our tray icon, or null if unsupported
     private TrayIcon trayIcon = null;
+    private final static Log log = new Log(TrayManager.class);
+    
+    /**
+     * Instantiate tray manager.
+     */
+    private TrayManager() {}
+    
+    public static TrayManager getInstance() {
+    	if(instance == null) {
+    		instance = new TrayManager();
+    	}
+    	return instance;
+    }
 
     /**
-     * Instantiate tray icon and add it to the system tray.
+     * Add the tray icon to the system tray and start everything up.
      */
-    public TrayManager() {
+    public void startManager() {
         if(SystemTray.isSupported()) {
             tray = SystemTray.getSystemTray();
             trayIcon = new TrayIcon(getTrayImage(), "I2P", getMainMenu());
             try {
                 tray.add(trayIcon);
             } catch (AWTException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+            	log.log(Log.WARN, "Problem creating system tray icon!", e);
             }
         }
     }
@@ -78,11 +89,9 @@ public class TrayManager {
                                 try {
                                     desktop.browse(new URI("http://localhost:7657"));
                                 } catch (IOException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
+                                    log.log(Log.WARN, "Failed to open browser!", e);
                                 } catch (URISyntaxException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
+                                    log.log(Log.WARN, "Failed to open browser!", e);
                                 }
                             }
                             else {
