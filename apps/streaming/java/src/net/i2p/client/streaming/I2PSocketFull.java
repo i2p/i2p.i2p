@@ -10,7 +10,7 @@ import net.i2p.data.Destination;
  * Bridge between the full streaming lib and the I2PSocket API
  *
  */
-public class I2PSocketFull implements I2PSocket {
+class I2PSocketFull implements I2PSocket {
     private Connection _connection;
     private I2PSocket.SocketErrorListener _listener;
     private Destination _remotePeer;

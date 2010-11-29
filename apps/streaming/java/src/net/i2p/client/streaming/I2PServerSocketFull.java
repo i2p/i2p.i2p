@@ -7,7 +7,7 @@ import net.i2p.I2PException;
  * Bridge to allow accepting new connections
  *
  */
-public class I2PServerSocketFull implements I2PServerSocket {
+class I2PServerSocketFull implements I2PServerSocket {
     private I2PSocketManagerFull _socketManager;
     
     public I2PServerSocketFull(I2PSocketManagerFull mgr) {

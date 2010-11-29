@@ -8,6 +8,7 @@
          in logger.config to get system default format)
       - Force RuntimeExceptions to CRIT level
       - Don't have log() count buffer size
+    * Streaming: Make all classes outside the API package private
     * UDP:
       - Fix bug causing PacketPusher to loop quickly instead of sleeping
       - Fix udp.sendCycleTime stat

@@ -12,7 +12,7 @@ import net.i2p.util.SimpleTimer2;
  * coordinate local attributes about a packet - send time, ack time, number of
  * retries, etc.
  */
-public class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
+class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
     private I2PAppContext _context;
     private Log _log;
     private Connection _connection;

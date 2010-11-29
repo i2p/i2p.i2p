@@ -15,7 +15,7 @@ import net.i2p.util.ConcurrentHashSet;
  * Packets, if we can.
  *
  */
-public class MessageHandler implements I2PSessionListener {
+class MessageHandler implements I2PSessionListener {
     private ConnectionManager _manager;
     private I2PAppContext _context;
     private Log _log;

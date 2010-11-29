@@ -15,7 +15,7 @@ import net.i2p.util.Log;
  * Define the current options for the con (and allow custom tweaking midstream)
  *
  */
-public class ConnectionOptions extends I2PSocketOptionsImpl {
+class ConnectionOptions extends I2PSocketOptionsImpl {
     private int _connectDelay;
     private boolean _fullySigned;
     private boolean _answerPings;

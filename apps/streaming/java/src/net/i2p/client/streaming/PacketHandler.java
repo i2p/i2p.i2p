@@ -15,7 +15,7 @@ import net.i2p.util.Log;
  * the server socket, or queue a reply RST packet.
  *
  */
-public class PacketHandler {
+class PacketHandler {
     private ConnectionManager _manager;
     private I2PAppContext _context;
     private Log _log;
