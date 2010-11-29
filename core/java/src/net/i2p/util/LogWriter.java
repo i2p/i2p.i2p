@@ -27,7 +27,8 @@ import net.i2p.I2PAppContext;
  */
 class LogWriter implements Runnable {
     /** every 10 seconds? why? Just have the gui force a reread after a change?? */
-    private final static long CONFIG_READ_ITERVAL = 10 * 1000;
+    private final static long CONFIG_READ_INTERVAL = 50 * 1000;
+    private final static long FLUSH_INTERVAL = 11 * 1000;
     private long _lastReadConfig = 0;
     private long _numBytesInCurrentFile = 0;
     private Writer _currentOut;
@@ -71,14 +72,14 @@ class LogWriter implements Runnable {
         try {
             List<LogRecord> records = _manager._removeAll();
             if (records == null) return;
-            for (LogRecord rec : records) {
-                writeRecord(rec);
-            }
             if (!records.isEmpty()) {
+                for (LogRecord rec : records) {
+                    writeRecord(rec);
+                }
                 try {
                     _currentOut.flush();
                 } catch (IOException ioe) {
-                    System.err.println("Error flushing the records");
+                    System.err.println("Error writing the router log");
                 }
             }
         } catch (Throwable t) {
@@ -87,7 +88,7 @@ class LogWriter implements Runnable {
             if (shouldWait) {
                 try { 
                     synchronized (this) {
-                        this.wait(10*1000); 
+                        this.wait(FLUSH_INTERVAL); 
                     }
                 } catch (InterruptedException ie) { // nop
                 }
@@ -101,7 +102,7 @@ class LogWriter implements Runnable {
 
     private void rereadConfig() {
         long now = Clock.getInstance().now();
-        if (now - _lastReadConfig > CONFIG_READ_ITERVAL) {
+        if (now - _lastReadConfig > CONFIG_READ_INTERVAL) {
             _manager.rereadConfig();
             _lastReadConfig = now;
         }

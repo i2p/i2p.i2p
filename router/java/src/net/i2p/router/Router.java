@@ -96,6 +96,7 @@ public class Router {
     public final static String PROP_SHUTDOWN_IN_PROGRESS = "__shutdownInProgress";
     public final static String DNS_CACHE_TIME = "" + (5*60);
         
+    private static final String originalTimeZoneID;
     static {
         // grumble about sun's java caching DNS entries *forever* by default
         // so lets just keep 'em for a short time
@@ -106,6 +107,8 @@ public class Router {
         System.setProperty("http.agent", "I2P");
         // (no need for keepalive)
         System.setProperty("http.keepAlive", "false");
+        // Save it for LogManager
+        originalTimeZoneID = TimeZone.getDefault().getID();
         System.setProperty("user.timezone", "GMT");
         // just in case, lets make it explicit...
         TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
@@ -180,6 +183,8 @@ public class Router {
 
         if (envProps.getProperty("i2p.dir.config") == null)
             envProps.setProperty("i2p.dir.config", userDir);
+        // Save this in the context for the logger and apps that need it
+        envProps.setProperty("i2p.systemTimeZone", originalTimeZoneID);
 
         // The important thing that happens here is the directory paths are set and created
         // i2p.dir.router defaults to i2p.dir.config

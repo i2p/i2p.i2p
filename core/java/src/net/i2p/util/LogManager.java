@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -57,7 +59,9 @@ public class LogManager {
     public final static String PROP_RECORD_PREFIX = "logger.record.";
 
     public final static String DEFAULT_FORMAT = DATE + " " + PRIORITY + " [" + THREAD + "] " + CLASS + ": " + MESSAGE;
-    public final static String DEFAULT_DATEFORMAT = "HH:mm:ss.SSS";
+    //public final static String DEFAULT_DATEFORMAT = "HH:mm:ss.SSS";
+    /** blank means default short date and medium time for the locale - see DateFormat */
+    public final static String DEFAULT_DATEFORMAT = "";
     public final static String DEFAULT_FILENAME = "logs/log-#.txt";
     public final static String DEFAULT_FILESIZE = "10m";
     public final static boolean DEFAULT_DISPLAYONSCREEN = true;
@@ -225,6 +229,7 @@ public class LogManager {
             startLogWriter();
 
         _records.offer(record);
+      /**** don't burden the logging thread with counting
         int numRecords = _records.size();
         
         if (numRecords > 100) {
@@ -234,6 +239,7 @@ public class LogManager {
                 _writer.notifyAll();
             }
         }
+       ****/
     }
     
     /**
@@ -292,8 +298,7 @@ public class LogManager {
         _format = fmt.toCharArray();
         
         String df = config.getProperty(PROP_DATEFORMAT, DEFAULT_DATEFORMAT);
-        _dateFormatPattern = df;
-        _dateFormat = new SimpleDateFormat(df);
+        setDateFormat(df);
 
         String disp = config.getProperty(PROP_DISPLAYONSCREEN);
         if (disp == null)
@@ -386,13 +391,24 @@ public class LogManager {
     /**
      * Update the date format
      *
+     * @param format null or empty string means use default format for the locale
+     *               (with a SHORT date and a MEDIUM time - see DateFormat)
      * @return true if the format was updated, false if it was invalid
      */
     public boolean setDateFormat(String format) {
-        if (format == null) return false;
+        if (format == null)
+            format = "";
+        if (format.equals(_dateFormatPattern) && _dateFormat != null)
+            return true;
         
         try {
-            SimpleDateFormat fmt = new SimpleDateFormat(format);
+            SimpleDateFormat fmt = (SimpleDateFormat) DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
+            if (!format.equals(""))
+                fmt.applyPattern(format);
+            // the router sets the JVM time zone to UTC but saves the original here so we can get it
+            String systemTimeZone = _context.getProperty("i2p.systemTimeZone");
+            if (systemTimeZone != null)
+                fmt.setTimeZone(TimeZone.getTimeZone(systemTimeZone));
             _dateFormatPattern = format;
             _dateFormat = fmt;
             return true;
