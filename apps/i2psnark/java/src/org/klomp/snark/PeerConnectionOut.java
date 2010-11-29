@@ -229,12 +229,9 @@ class PeerConnectionOut implements Runnable
   /**
    * Adds a message to the sendQueue and notifies the method waiting
    * on the sendQueue to change.
-   * If a PIECE message only, add a timeout.
    */
   private void addMessage(Message m)
   {
-    if (m.type == Message.PIECE)
-      SimpleScheduler.getInstance().addEvent(new RemoveTooSlow(m), SEND_TIMEOUT);
     synchronized(sendQueue)
       {
         sendQueue.add(m);
@@ -430,7 +427,11 @@ class PeerConnectionOut implements Runnable
     return total;
   }
 
-  /** @since 0.8.2 */
+  /**
+   *  Queue a piece message with a callback to load the data
+   *  from disk when required.
+   *  @since 0.8.2
+   */
   void sendPiece(int piece, int begin, int length, DataLoader loader)
   {
       boolean sendNow = false;
@@ -457,6 +458,11 @@ class PeerConnectionOut implements Runnable
       addMessage(m);
   }
 
+  /**
+   *  Queue a piece message with the data already loaded from disk
+   *  Also add a timeout.
+   *  We don't use this anymore.
+   */
   void sendPiece(int piece, int begin, int length, byte[] bytes)
   {
     Message m = new Message();
@@ -467,6 +473,8 @@ class PeerConnectionOut implements Runnable
     m.data = bytes;
     m.off = 0;
     m.len = length;
+    // since we have the data already loaded, queue a timeout to remove it
+    SimpleScheduler.getInstance().addEvent(new RemoveTooSlow(m), SEND_TIMEOUT);
     addMessage(m);
   }
 

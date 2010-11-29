@@ -75,7 +75,9 @@ public class PeerCoordinator implements PeerListener
 
   private final byte[] id;
 
-  // Some random wanted pieces
+  /** The wanted pieces. We could use a TreeSet but we'd have to clear and re-add everything
+   *  when priorities change.
+   */
   private final List<Piece> wantedPieces;
 
   /** partial pieces - lock by synching on wantedPieces */
