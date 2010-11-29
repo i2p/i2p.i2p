@@ -3292,7 +3292,7 @@ msgstr "I2P Routeur Configuration"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:93
 msgid "I2P Internals"
-msgstr "I2P Configuration Interne"
+msgstr "Configuration"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:99
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:379
