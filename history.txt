@@ -1,3 +1,19 @@
+2010-11-29 zzz
+    * i2psnark:
+      - Don't timeout queued piece messages
+    * Logging:
+      - Use System locale and time zone for default date/time format,
+        so it matches the wrapper log time (we can't set the wrapper log time zone).
+        (existing installs must remove logger.dateFormat line
+         in logger.config to get system default format)
+      - Force RuntimeExceptions to CRIT level
+      - Don't have log() count buffer size
+    * UDP:
+      - Fix bug causing PacketPusher to loop quickly instead of sleeping
+      - Fix udp.sendCycleTime stat
+      - Fix speed values on peers.jsp
+      - Try to fix rare NPE (ticket 298)
+
 2010-11-28 zzz
     * Build: Move all dependencies to top-level build.xml,
              so each sub-build.xml is only executed once
