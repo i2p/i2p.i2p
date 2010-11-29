@@ -139,8 +139,8 @@ tr {
 }
 
 thead, tfoot {
-     text-shadow: 0px 1px 1px #330;
-     background: url("images/bling.png") repeat-x scroll center center #867;
+     text-shadow: 0px 1px 1px #707;
+     background: url("images/bling2.png") repeat-x scroll center center #867;
      font-weight: bold;
      color: #503;
 }
@@ -611,7 +611,7 @@ div.newtorrentsection {
      -khtml-box-shadow: inset 0px 0px 1px 0px #fff;
      box-shadow: inset 0px 0px 1px 0px #fff;
      word-wrap: break-word;
-     background: #ffd url('/themes/snark/ubergine/images/snark_create.png') no-repeat scroll right center;
+     background: #ffd url('images/snark_create.png') no-repeat scroll right center;
      opacity: 1.0;
 }
 
@@ -628,7 +628,7 @@ div.addtorrentsection {
      -khtml-box-shadow: inset 0px 0px 1px 0px #fff;
      box-shadow: inset 0px 0px 1px 0px #fff;
      word-wrap: break-word;
-     background: #ffd url('/themes/snark/ubergine/images/snark_add.png') no-repeat scroll right center;
+     background: #ffd url('images/snark_add.png') no-repeat scroll right center;
      opacity: 1.0;
 }
 
