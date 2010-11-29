@@ -1,3 +1,6 @@
+20-11-29 dr|z3d
+    * Updated console theme "light".
+
 2010-11-29 zzz
     * i2psnark:
       - Don't timeout queued piece messages
