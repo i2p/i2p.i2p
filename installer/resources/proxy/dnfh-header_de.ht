@@ -12,7 +12,7 @@ Proxy-Connection: close
 <body>
 <div class=logo>
  <a href="http://127.0.0.1:7657/index.jsp" title="Routerkonsole"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="I2P-Routerkonsole" border="0"></a><hr>
- <a href="http://127.0.0.1:7657/config.jsp">Configuratie</a> <a href="http://127.0.0.1:7657/help.jsp">Hilfe</a> <a href="http://127.0.0.1:7657/susidns/index.jsp">Adressbuch</a>
+ <a href="http://127.0.0.1:7657/config.jsp">Einstellungen</a> <a href="http://127.0.0.1:7657/help.jsp">Hilfe</a> <a href="http://127.0.0.1:7657/susidns/index.jsp">Adressbuch</a>
 </div>
 <div class=warning id=warning>
 <h3>Warnung: Eepseite nicht im Adressbuch gefunden</h3>
@@ -21,7 +21,7 @@ Die Eepseite konnte in nicht im Adressbuch des Routers gefunden werden.
 Wenn Sie eine BASIS64-Adresse haben, fügen Sie diese unter folgendem Link zu Ihrer userhosts.txt hinzu:
 <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=master">SusiDNS</a>,
 benutzen Sie einen BASIS64-Adresshelfer oder einen der folgenden Sprungdienste:<br><br>
-(Sehen Sie diese Seite &ozml;fters? Dann lesen Sie die <a href="http://www.i2p2.i2p/faq.html#subscriptions">FAQ</a>
+(Sehen Sie diese Seite öfters? Dann lesen Sie die <a href="http://www.i2p2.i2p/faq.html#subscriptions">FAQ</a>
 für Hilfe beim <a href="http://127.0.0.1:7657/susidns/config.jsp">Hinzufügen von Abonnements</a>
 zu Ihrem Adressbuch.)<hr>
 <b>Konnte das folgende Ziel nicht finden:</b><BR><BR>
