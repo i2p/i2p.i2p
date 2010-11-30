@@ -3416,19 +3416,19 @@ msgstr "Was ist in der Aufgabenliste des Routers?"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:412
 msgid "Congestion"
-msgstr "Rückstau"
+msgstr "Latenz"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:417
 msgid "Job lag"
-msgstr "Aufgabenverzögerung"
+msgstr "Aufgabenverzug"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:423
 msgid "Message delay"
-msgstr "Nachrichtenverzögerung"
+msgstr "Nachrichtenverzug"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:429
 msgid "Tunnel lag"
-msgstr "Tunnelverzögerung"
+msgstr "Tunnelverzug"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:435
 msgid "Backlog"
