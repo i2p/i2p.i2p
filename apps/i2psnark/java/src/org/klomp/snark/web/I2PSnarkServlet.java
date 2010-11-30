@@ -1294,7 +1294,7 @@ public class I2PSnarkServlet extends Default {
 
     // rounding makes us look faster :)
     private static String formatSize(long bytes) {
-        if (bytes < 5*1024)
+        if (bytes < 5000)
             return bytes + "&nbsp;B";
         else if (bytes < 5*1024*1024)
             return ((bytes + 512)/1024) + "&nbsp;KB";

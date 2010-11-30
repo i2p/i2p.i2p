@@ -1,3 +1,14 @@
+2010-11-30 zzz
+    * I2CP: Try to hide Pipe closed messages (several tickets)
+    * i2psnark: Move PeerCheckerTask from Timer to SimpleTimer2
+                to save some threads
+    * Logging:
+      - Limit buffer size; block and wakeup writer when full
+      - Limit errors written to system log
+      - Add method to force a log below the current level
+    * Streaming: Change some logged errors to warnings
+                 (tickets 76, 341 and others)
+
 20-11-29 dr|z3d
     * Updated console theme "light".
 
