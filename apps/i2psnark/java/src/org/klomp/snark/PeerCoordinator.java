@@ -29,12 +29,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Random;
-import java.util.Timer;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer2;
 
 /**
  * Coordinates what peer does what.
@@ -71,7 +71,7 @@ public class PeerCoordinator implements PeerListener
   volatile int peerCount;
 
   /** Timer to handle all periodical tasks. */
-  private final Timer timer = new Timer(true);
+  private final CheckEvent timer;
 
   private final byte[] id;
 
@@ -110,9 +110,26 @@ public class PeerCoordinator implements PeerListener
     // Install a timer to check the uploaders.
     // Randomize the first start time so multiple tasks are spread out,
     // this will help the behavior with global limits
-    timer.schedule(new PeerCheckerTask(_util, this), (CHECK_PERIOD / 2) + _random.nextInt((int) CHECK_PERIOD), CHECK_PERIOD);
+    timer = new CheckEvent(new PeerCheckerTask(_util, this));
+    timer.schedule((CHECK_PERIOD / 2) + _random.nextInt((int) CHECK_PERIOD));
   }
   
+  /**
+   *  Run the PeerCheckerTask via the SimpleTimer2 executors
+   *  @since 0.8.2
+   */
+  private static class CheckEvent extends SimpleTimer2.TimedEvent {
+      private final PeerCheckerTask _task;
+      public CheckEvent(PeerCheckerTask task) {
+          super(SimpleTimer2.getInstance());
+          _task = task;
+      }
+      public void timeReached() {
+          _task.run();
+          schedule(CHECK_PERIOD);
+      }
+  }
+
   // only called externally from Storage after the double-check fails
   public void setWantedPieces()
   {
