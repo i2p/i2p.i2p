@@ -1,0 +1,18 @@
+HIGH PRIORITY:
+- Allow desktopgui to start, stop and restart I2P. - DONE
+- Correct logging system - DONE
+- Internationalisation
+- Modify installer to set I2P directory parameter; or use $I2P?
+UNKNOWN:
+- API to allow applications to add themselves to the menu?
+    * registerApplication(); -- should return a positive number on success, -1 on failure
+    * unregisterApplication(int); -- should return nothing (or bool for success?), and the parameter should be the number given when registering the application
+- Fetch I2P localhost from the core I2P application? 
+- Use I2PAppContext::appDir (something like that) for desktopgui data.
+- Consider SWT as option
+    * Check core/java/src/net/i2p/util/FileUtil.java for dynamic jar loading
+    * Possible logic:
+        - First try to load SWT (has the most options and is not ugly)
+        - Then load AWT
+- Access router.jar from other JVM? Is this possible? -- no: use I2CP with auth (not ready yet)
+- Start desktopgui with another user than the user starting I2P (required for daemon usage).
