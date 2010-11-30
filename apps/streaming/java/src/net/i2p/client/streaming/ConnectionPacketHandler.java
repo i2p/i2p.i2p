@@ -36,8 +36,8 @@ class ConnectionPacketHandler {
         boolean ok = verifyPacket(packet, con);
         if (!ok) {
             boolean isTooFast = con.getSendStreamId() <= 0;
-            if ( (!packet.isFlagSet(Packet.FLAG_RESET)) && (!isTooFast) && (_log.shouldLog(Log.ERROR)) )
-                _log.error("Packet does NOT verify: " + packet + " on " + con);
+            if ( (!packet.isFlagSet(Packet.FLAG_RESET)) && (!isTooFast) && (_log.shouldLog(Log.WARN)) )
+                _log.warn("Packet does NOT verify: " + packet + " on " + con);
             packet.releasePayload();
             return;
         }
@@ -450,8 +450,8 @@ class ConnectionPacketHandler {
                 }
             } else {
                 if (con.getSendStreamId() != packet.getReceiveStreamId()) {
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error("Packet received with the wrong reply stream id: " 
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Packet received with the wrong reply stream id: " 
                                   + con + " / " + packet);
                     return false;
                 } else {

@@ -177,8 +177,8 @@ class PacketHandler {
                         } else if (oldId == packet.getReceiveStreamId()) {
                             // ok, as expected...
                         } else {
-                            if (_log.shouldLog(Log.ERROR))
-                                _log.error("Received a syn with the wrong IDs, con=" + con + " packet=" + packet);
+                            if (_log.shouldLog(Log.WARN))
+                                _log.warn("Received a syn with the wrong IDs, con=" + con + " packet=" + packet);
                             sendReset(packet);
                             packet.releasePayload();
                             return;
