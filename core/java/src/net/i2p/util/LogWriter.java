@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.List;
+import java.util.Queue;
 
 import net.i2p.I2PAppContext;
 
@@ -38,6 +38,8 @@ class LogWriter implements Runnable {
     private LogManager _manager;
 
     private boolean _write;
+    private static final int MAX_DISKFULL_MESSAGES = 8;
+    private int _diskFullMessageCount;
     
     private LogWriter() { // nop
     }
@@ -61,7 +63,7 @@ class LogWriter implements Runnable {
             }
             //System.err.println("Done writing");
         } catch (Exception e) {
-            System.err.println("Error writing the logs: " + e.getMessage());
+            System.err.println("Error writing the log: " + e);
             e.printStackTrace();
         }
         closeFile();
@@ -70,16 +72,19 @@ class LogWriter implements Runnable {
     public void flushRecords() { flushRecords(true); }
     public void flushRecords(boolean shouldWait) {
         try {
-            List<LogRecord> records = _manager._removeAll();
+            // zero copy, drain the manager queue directly
+            Queue<LogRecord> records = _manager.getQueue();
             if (records == null) return;
             if (!records.isEmpty()) {
-                for (LogRecord rec : records) {
+                LogRecord rec;
+                while ((rec = records.poll()) != null) {
                     writeRecord(rec);
                 }
                 try {
                     _currentOut.flush();
                 } catch (IOException ioe) {
-                    System.err.println("Error writing the router log");
+                    if (++_diskFullMessageCount < MAX_DISKFULL_MESSAGES)
+                        System.err.println("Error writing the router log - disk full? " + ioe);
                 }
             }
         } catch (Throwable t) {
@@ -138,7 +143,8 @@ class LogWriter implements Runnable {
         } catch (Throwable t) {
             if (!_write)
                 return;
-            System.err.println("Error writing log, disk full? " + t);
+            if (++_diskFullMessageCount < MAX_DISKFULL_MESSAGES)
+                System.err.println("Error writing log, disk full? " + t);
             //t.printStackTrace();
         }
         if (_numBytesInCurrentFile >= _manager.getFileSize()) {

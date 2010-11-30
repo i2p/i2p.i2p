@@ -117,6 +117,17 @@ public class Log {
         }
     }
 
+    /**
+     *  Always log this messge with the given priority, ignoring current minimum priority level.
+     *  This allows an INFO message about changing port numbers, for example, to always be logged.
+     *  @since 0.8.2
+     */
+    public void logAlways(int priority, String msg) {
+            _manager.addRecord(new LogRecord(_class, _name, 
+                                             Thread.currentThread().getName(), priority,
+                                             msg, null));
+    }
+
     public void debug(String msg) {
         log(DEBUG, msg);
     }

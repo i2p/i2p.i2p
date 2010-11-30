@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Queue;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
@@ -78,6 +79,9 @@ public class LogManager {
 
     /** the config file */
     private File _locationFile;
+
+    /** max to LogRecords to buffer in memory before we start blocking */
+    private static final int MAX_BUFFER = 1024;
     /** Ordered list of LogRecord elements that have not been written out yet */
     private final LinkedBlockingQueue<LogRecord> _records;
     /** List of explicit overrides of log levels (LogLimit objects) */
@@ -119,7 +123,7 @@ public class LogManager {
     public LogManager(I2PAppContext context) {
         _displayOnScreen = true;
         _alreadyNoticedMissingConfig = false;
-        _records = new LinkedBlockingQueue();
+        _records = new LinkedBlockingQueue(MAX_BUFFER);
         _limits = new ConcurrentHashSet();
         _logs = new ConcurrentHashMap(128);
         _defaultLimit = Log.ERROR;
@@ -221,25 +225,26 @@ public class LogManager {
     }
 
     /**
-     * Used by Log to add records to the queue
-     *
+     * Used by Log to add records to the queue.
+     * This is generally nonblocking and unsyncrhonized but may block when under
+     * massive logging load as a way of throttling logging threads.
      */
     void addRecord(LogRecord record) {
         if ((!_context.isRouterContext()) && _writer == null)
             startLogWriter();
 
-        _records.offer(record);
-      /**** don't burden the logging thread with counting
-        int numRecords = _records.size();
-        
-        if (numRecords > 100) {
+        boolean success = _records.offer(record);
+        if (!success) {
             // the writer waits 10 seconds *or* until we tell them to wake up
             // before rereading the config and writing out any log messages
             synchronized (_writer) {
                 _writer.notifyAll();
             }
+            // block as a way of slowing down out-of-control loggers (a little)
+            try {
+                _records.put(record);
+            } catch (InterruptedException ie) {}
         }
-       ****/
     }
     
     /**
@@ -605,10 +610,13 @@ public class LogManager {
         return buf.toString();
     }
 
-    List<LogRecord> _removeAll() {
-        List<LogRecord> vals = new LinkedList();
-        _records.drainTo(vals);
-        return vals;
+    /**
+     *  Zero-copy.
+     *  For the LogWriter
+     *  @since 0.8.2
+     */
+    Queue<LogRecord> getQueue() {
+        return _records;
     }
 
     public char[] getFormat() {
