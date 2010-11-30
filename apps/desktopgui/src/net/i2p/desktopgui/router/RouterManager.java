@@ -30,10 +30,14 @@ public class RouterManager {
 	 */
 	public static void start() {
 		try {
-			String location = ConfigurationManager.getInstance().getStringConfiguration("I2PLocation", "/home/i2p");
 			//TODO: detect I2P directory
-			//TODO: crossplatform
-			Runtime.getRuntime().exec(location + "/i2psvc " + location + "/wrapper.config");
+			//TODO: set/get PID
+			String separator = System.getProperty("file.separator");
+			String homeDirectory = System.getProperty("user.home");
+			String location = ConfigurationManager.getInstance()
+				.getStringConfiguration("I2PLocation", homeDirectory + separator + "i2p");
+			
+			Runtime.getRuntime().exec(location + separator + "i2psvc" + location + separator + "wrapper.config");
 		} catch (IOException e) {
 			log.log(Log.WARN, "Failed to start I2P", e);
 		}
