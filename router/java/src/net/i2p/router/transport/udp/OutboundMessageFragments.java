@@ -33,6 +33,8 @@ class OutboundMessageFragments {
     /** which peer should we build the next packet out of? */
     private int _nextPeer;
     private PacketBuilder _builder;
+    private long _lastCycleTime = System.currentTimeMillis();
+
     /** if we can handle more messages explicitly, set this to true */
     // private boolean _allowExcess; // LINT not used??
     // private volatile long _packetsRetransmitted; // LINT not used??
@@ -176,13 +178,13 @@ class OutboundMessageFragments {
             if (!_activePeers.contains(peer)) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Add a new message to a new peer " + peer.getRemotePeer().toBase64());
+                if (_activePeers.isEmpty())
+                    _lastCycleTime = System.currentTimeMillis();
                 _activePeers.add(peer);
             } else {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Add a new message to an existing peer " + peer.getRemotePeer().toBase64());
             }
-            if (_activePeers.size() == 1)
-                _lastCycleTime = System.currentTimeMillis();
             _activePeers.notifyAll();
         }
         _context.statManager().addRateData("udp.outboundActiveCount", active, 0);
@@ -227,8 +229,6 @@ class OutboundMessageFragments {
         }
     }
 
-    private long _lastCycleTime = System.currentTimeMillis();
-
     /**
      * Fetch all the packets for a message volley, blocking until there is a
      * message which can be fully transmitted (or the transport is shut down).
@@ -248,18 +248,24 @@ class OutboundMessageFragments {
                     for (int i = 0; i < _activePeers.size(); i++) {
                         int cur = (i + _nextPeer) % _activePeers.size();
                         if (cur == 0) {
+                            // FIXME or delete, these stats aren't much help since they include the sleep time
                             long ts = System.currentTimeMillis();
                             long cycleTime = ts - _lastCycleTime;
+                            _lastCycleTime = ts;
                             _context.statManager().addRateData("udp.sendCycleTime", cycleTime, _activePeers.size());
-                            if (cycleTime > 1000)
+                            // make longer than the default sleep time below
+                            if (cycleTime > 1100)
                                 _context.statManager().addRateData("udp.sendCycleTimeSlow", cycleTime, _activePeers.size());
                         }
                         peer = _activePeers.get(i);
                         state = peer.allocateSend();
                         if (state != null) {
+                            // we have something to send and we will be returning it
                             _nextPeer = i + 1;
                             break;
                         } else {
+                            // Update the minimum delay for all peers (getNextDelay() returns 1 for "now")
+                            // which will be used if we found nothing to send across all peers
                             int delay = peer.getNextDelay();
                             if ( (nextSendDelay <= 0) || (delay < nextSendDelay) )
                                 nextSendDelay = delay;
@@ -274,8 +280,9 @@ class OutboundMessageFragments {
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("wait for " + nextSendDelay);
                         // wait.. or somethin'
+                        // wait a min of 10 and a max of 3000 ms no matter what peer.getNextDelay() says
                         if (nextSendDelay > 0)
-                            _activePeers.wait(nextSendDelay);
+                            _activePeers.wait(Math.min(Math.max(nextSendDelay, 10), 3000));
                         else
                             _activePeers.wait(1000);
                     } else {

@@ -20,7 +20,7 @@ import net.i2p.util.SimpleTimer;
  *
  *
  */
-public class ConnectionManager {
+class ConnectionManager {
     private I2PAppContext _context;
     private Log _log;
     private I2PSession _session;

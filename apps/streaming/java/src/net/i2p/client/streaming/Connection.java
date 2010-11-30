@@ -22,7 +22,7 @@ import net.i2p.util.SimpleTimer2;
  * destinations.
  *
  */
-public class Connection {
+class Connection {
     private I2PAppContext _context;
     private Log _log;
     private ConnectionManager _connectionManager;
@@ -1067,7 +1067,7 @@ public class Connection {
     /**
      * Coordinate the resends of a given packet
      */
-    public class ResendPacketEvent extends SimpleTimer2.TimedEvent {
+    class ResendPacketEvent extends SimpleTimer2.TimedEvent {
         private PacketLocal _packet;
         private long _nextSendTime;
         public ResendPacketEvent(PacketLocal packet, long delay) {

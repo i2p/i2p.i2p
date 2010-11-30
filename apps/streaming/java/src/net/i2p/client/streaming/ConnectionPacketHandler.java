@@ -14,7 +14,7 @@ import net.i2p.util.SimpleTimer;
  * queue, marking packets as acked, updating various fields, etc.
  *
  */
-public class ConnectionPacketHandler {
+class ConnectionPacketHandler {
     private I2PAppContext _context;
     private Log _log;
     

@@ -53,7 +53,7 @@ import net.i2p.util.Log;
  * packet that should not be ACKed</p>
  *
  */
-public class Packet {
+class Packet {
     private long _sendStreamId;
     private long _receiveStreamId;
     private long _sequenceNum;

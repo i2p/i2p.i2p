@@ -17,7 +17,7 @@ import net.i2p.util.SimpleTimer;
  *
  * @author zzz modded to use concurrent and bound queue size
  */
-public class ConnectionHandler {
+class ConnectionHandler {
     private I2PAppContext _context;
     private Log _log;
     private ConnectionManager _manager;

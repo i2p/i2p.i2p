@@ -20,7 +20,7 @@ import net.i2p.util.SimpleTimer2;
  *  same router.
  *
  */
-public class TCBShare {
+class TCBShare {
     private I2PAppContext _context;
     private Log _log;
     private Map<Destination, Entry> _cache;

@@ -1,0 +1,57 @@
+/* I2P Theme Override: Dark */
+/* Comment: Larger text (and other tweaks) for Chinese & other doublebyte charactersets */
+/* Author: dr|z3d */
+
+body {
+     font: 9pt/130% Verdana, "Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
+}
+
+div.news {
+     font-size: 9.5pt;
+     font-style: normal !important;
+}
+
+div.routersummary table {
+    font-size: 8.5pt;
+}
+
+div.routersummary h3, div.routersummary h4, div.routersummary p, div.routersummary h3 a, div.routersummary a {
+     text-shadow: 0 0 0 #fff !important;
+}
+
+div.routersummary h4 {
+     font-size: 10pt;
+     font-weight: normal;
+}
+
+div.routersummary b {
+     font-size: 9pt;
+     font-weight: normal;
+}
+
+div.routersummary a {
+     font-size: 10pt;
+     font-weight: normal;
+}
+
+b, a, a:link, a:hover, a:visited {
+     font-weight: normal;
+}
+
+button, button:visited {
+    font: normal 10pt Verdana,"Bitstream Vera Sans",Tahoma,Helvetica,sans-serif !important;
+}
+
+code, pre, tt {
+     font-size: 10pt;
+     font-weight: normal;
+}
+
+.smallhead, th {
+     font-size: 8.5pt;
+     font-weight: normal;
+}
+
+table {
+     font: 8.5pt/130% Verdana, "Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
+}

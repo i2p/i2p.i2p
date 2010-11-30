@@ -110,6 +110,9 @@ class PeerState implements DataLoader
     if (choked) {
         out.cancelRequestMessages();
         // old Roberts thrash us here, choke+unchoke right together
+        // The only problem with returning the partials to the coordinator
+        // is that chunks above a missing request are lost.
+        // Future enhancements to PartialPiece could keep track of the holes.
         List<PartialPiece> pcs = returnPartialPieces();
         if (!pcs.isEmpty()) {
             if (_log.shouldLog(Log.DEBUG))

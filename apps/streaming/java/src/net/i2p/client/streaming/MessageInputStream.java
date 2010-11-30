@@ -19,7 +19,7 @@ import net.i2p.util.Log;
  * yet present them in order.
  *
  */
-public class MessageInputStream extends InputStream {
+class MessageInputStream extends InputStream {
     private final I2PAppContext _context;
     private final Log _log;
     /** 

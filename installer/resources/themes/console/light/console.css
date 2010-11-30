@@ -1,12 +1,12 @@
 /* I2P Theme: Light */
-/* I2P Description: Light theme with soft blue highlights. */
+/* Description: Light blue highlights. */
 /* Author: dr|z3d */
 
 body {
-     margin: 15px 0 0 10px;
+     margin: 15px 0 0 15px;
      padding: 0em;
      text-align: center;
-     background: #eef;
+     background: #eef url('images/snowcamo.png');
      color: #000;
      font: 9pt/130% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
 }
@@ -34,13 +34,13 @@ div.logo {
      text-align: center;
      font-color: #fff;
      margin: 0 20px 0 20px;
-     border: 1px solid #002;
+     border: 1px solid #447;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     background: #ddddff url('images/lightbluetile.png');
+     background: #eef; /*url('images/lightbluetile.png')*/
      width: 175px;
-     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
 }
 
 div.toolbar {
@@ -48,7 +48,7 @@ div.toolbar {
      padding: 10px;
      font-weight: bold;
      background: #eef;
-     border: 1px solid #002;
+     border: 1px solid #447;
      display: none !important;
 }
 
@@ -80,7 +80,7 @@ a:active{
 
 div.routersummaryouter {
      float: left;
-     width: 215px;
+     width: 210px;
      margin: 0 0 10px 0px;
      padding: 0;
      border: 0;
@@ -94,18 +94,19 @@ div.routersummary {
      width: 175px;
      padding: 10px;
      text-align: center !important;
-     border: 1px solid #000033;
-     background: #ddf url('images/lightbluetile.png');
+     border: 1px solid #447;
+     background: #ccddf6);
      color: #000;
      font-size: 8pt;
      clear: left;/* fixes a bug in Opera */
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
+     background: #eef;
 /* 
      float: left;
 */     
-     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
 }
 
 div.routersummary input[type=text] {
@@ -118,7 +119,7 @@ div.routersummary hr {
      height: 2px;
      border-bottom: 1px solid #eef;
      margin: 8px -10px 7px -10px;
-     -moz-box-shadow: inset 0px 1px 1px 1px #001;
+     -moz-box-shadow: inset 0px 1px 1px 1px #ddf;
 }
 
 div routersummary hr:last-child {
@@ -130,11 +131,22 @@ div.routersummary h3 {
      border: 0;
      font-size: 9.5pt;
      letter-spacing: 0.04em;
-     margin: -7px -9px -7px -9px;
-     padding: 1px 0;
+     margin: -4px -6px;
+     padding: 2px 0;
      background: #c5d5fb;
      text-transform: uppercase;
-     background-image: -moz-linear-gradient(top, bottom, from(#ddf), to(#c5d5fb), color-stop(25%, #c5d5fb), color-stop(100%, #ddf));
+     background: #ddf url('images/header_on.png') center center repeat-x;
+     border: 1px solid #99f !important;
+     -moz-border-radius: 3px;
+}
+
+div.routersummary h3 a {
+     text-decoration: none;
+}
+
+div.routersummary h3:hover {
+     background: #ddf url('images/header.png') center center repeat-x;
+     text-shadow: 0 0 0;
 }
 
 div.routersummary h4 {
@@ -144,10 +156,11 @@ div.routersummary h4 {
      letter-spacing: 0.02em;
      margin: -7px -9px -7px -9px !important;
      padding: 0px 3px 1px 3px;
-     background: #c1d1f7;
+     background: #eef;
      text-transform: capitalize;
      text-decoration: none !important;
      color: #2b2;
+     line-height: 105%;
 }
 
 div.routersummary table {
@@ -175,8 +188,23 @@ div.tunnels {
      padding-top: 3px !important;
 }
 
+div.tunnels table {
+     margin: -7px 0 -5px -4px !important;
+}
+
 .tunnels tr {
      padding: 4px 0 !important;
+}
+
+div.tunnels td:first-child {
+     width: 16px;
+     text-align: left;
+     padding-right: 1px;
+}
+
+div.tunnels td:last-child {
+     text-align: right;
+     padding-right: 1px;
 }
 
 div.routersummary form {
@@ -184,7 +212,7 @@ div.routersummary form {
 }
 
 div.routersummary form:last-child {
-     margin: 0 !important;
+     margin: 6px 0 0 0 !important;
      padding: 0;
 }
 
@@ -203,7 +231,7 @@ div.routersummary a:hover {
 }
 
 div.routersummary td {
-     padding: 1px 3px;
+     padding: 0 3px;
      background-image: none !important;
      border: 0 !important;
 }
@@ -214,7 +242,7 @@ div.warning {
      margin: 5px 20px 10px 240px;
      padding: 5px 25px 20px 75px;
      background: #fff;
-     border: 1px solid #002;
+     border: 1px solid #447;
      text-align: left;
      color: inherit;
      -moz-border-radius: 4px;
@@ -234,8 +262,8 @@ div.warning {
 div.sorry {
      margin: 5px 15px 10px 220px;
      padding: 20px 20px 20px 75px;
-     background: #ffb;
-     border: 1px solid #002;
+     background: #eef;
+     border: 1px solid #447;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
@@ -246,32 +274,37 @@ div.sorry {
      -moz-box-shadow: inset 0px 0px 0px 1px #d00;
      word-wrap: break-word;
      font-weight: bold;
-     color: #331;
+     color: #531;
 }
 
 div.sorry hr {
-     color: #552;
-     background: #552;
+     color: #531;
+     background: #531;
      height: 1px;
-     border: 1px solid #552;
-     margin: 10px 0;
+     border: 1px solid #531;
+     margin: 10px 0 15px 0;
 }     
 
 div.main {
-     margin: 0px 0px 20px 195px;
-     padding: 0 15px 15px 25px;
+     margin: 15px 15px 20px 220px;
+     padding: 0 15px 15px 15px;
      background: #eef;
      text-align: left;
      color: #001;
      width: auto;
      min-width: 500px;
+     border: 1px solid #447;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
 }
 
 div.main hr, hr {
-     color: #003;
-     background: #003;
+     color: #447;
+     background: #447;
      height: 1px;
-     border: 0px solid #003;
+     border: 0px solid #447;
      margin: 10px 0;
 }
 
@@ -288,46 +321,48 @@ div.main textarea {
 div.news {
      margin: 0px 15px 10px 220px;
      padding: 10px 25px 7px 25px;
-     border: 1px solid #003;
-     color: #410;
+     border: 1px solid #447;
+     color: #000;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      text-align: right !important;
-     font-size: 7pt;
+     font-size: 7.5pt;
      line-height: 140%;
-     background: #fea url('images/sandtile.png');
+     background: #eef; /*url('images/sandtile.png');*/
      -moz-box-shadow: inset 0px 0px 1px 0px #410;
+     background: #eef; /*url("images/bg2.png")no-repeat scroll bottom right;*/
 }
 
 div.news p {
      font-size: 8.5pt;
      text-align: justify !important;
 }
-
+/*
 div.news a:link{
-     color: #630;
+     color: #a30;
      text-decoration: none;
 }
 
 div.news a:visited{
-     color: #830;
+     color: #930;
 }
 
 div.news a:hover{
-     color: #a30;
+     color: #d20;
      text-decoration: underline;
 }
 
 div.news a:active{
      color: #c30;
 }
+*/
 
 div.news hr{
-     color: #410;
-     background: #410;
+     color: #447;
+     background: #447;
      height: 1px;
-     border: 0px solid #410;
+     border: 0px solid #447;
      margin: 10px 0 5px;
 }
 
@@ -335,18 +370,24 @@ div.news li {
      text-align: justify;
      list-style: none;
      margin: 10px 0 20px 0 !important;
-     padding: 5px 0;
      vertical-align: bottom;
-     border: 1px solid #410;
-     border-left: 5px solid #410;
-     padding: 3px 5px 3px 5px;
+     border: 1px solid #447;
+     border-left: 5px solid #447;
+     padding: 4px 5px;
      border-radius: 0 4px 4px 0;
      -moz-border-radius: 0 4px 4px 0;
      -khtml-border-radius: 0 4px 4px 0;
-     background: #fb1;
      font-size: 10pt;
-     opacity: 0.7;
+     opacity: 1;
+     background: #fff url('images/header.png') center center repeat-x;
 }
+
+/*
+div.news  h4 a{
+     color: #910 !important;
+     opacity: 1 !important;
+}
+*/
 
 div.news h4 {
      border-bottom: 0px;
@@ -357,34 +398,35 @@ div.news h4 {
 
 div.confignav {
      padding: 15px 10px !important;
-     margin: 0 0px 15px 0;
-     background: #ddf url('images/lightbluetile.png');
+     margin: 15px 0 15px 0;
+     background: #ddf url('images/header.png') center center repeat-x;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     border: 1px solid #000022;
+     border: 1px solid #447;
      font-size: 9.5pt !important;
      font-weight: bold !important;
      line-height: 160% !important;
-     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
      min-width: 400px;
 }
 
 div.configure {
-     padding: 5px 15px 0px 15px !important;
+/*     padding: 5px 15px 0px 15px !important;
      margin: 0px 0px 15px 0;
-     background: #ddf url('images/lightbluetile.png');
+     background: #eef; url('images/lightbluetile.png')
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     border: 1px solid #000022;
-     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     border: 1px solid #447;
+     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;*/
      min-width: 400px;
+     margin-bottom: 0px;
 }
 
 div.configure h3, div.graphspanel h3 {
-     border: 1px solid #002;
-     border-left: 5px solid #002;
+     border: 1px solid #447;
+     border-left: 5px solid #447;
      padding: 3px 5px 3px 5px;
      margin: 15px 0 15px 0;
      border-radius: 0 4px 4px 0;
@@ -394,19 +436,20 @@ div.configure h3, div.graphspanel h3 {
 }
 
 div.graphspanel {
-     padding: 12px;
+/*     padding: 12px;
      margin: 10px 0px 25px 0;
      background: #ddf url('images/lightbluetile.png');
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     border: 1px solid #000022;
-     -moz-box-shadow: inset 0px 0px 1px 0px #002;
-     text-align: center !important; 
+     border: 1px solid #447;
+     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;*/
+     text-align: center !important;
+     margin: 15px 0px -15px;
 }
 
 div.graphspanel img {
-     border: 1px solid #003;
+     border: 1px solid #447;
      padding: 2px;
      margin: 6px;
      text-align: center !important;
@@ -416,7 +459,7 @@ div.graphspanel img {
 }
 
 div.graphspanel img:hover {
-     border: 1px solid #003;
+     border: 1px solid #447;
      padding: 2px;
      margin: 6px;
      text-align: center !important;
@@ -436,10 +479,10 @@ div.messages {
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     border: 1px solid #000033;
-     background: #008 url('images/lightbluetile.png');
+     border: 1px solid #447;
+     background: #eef; /*url('images/lightbluetile.png');*/
      font-weight: bold;
-     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
 }
 
 div.messages span.error {
@@ -462,7 +505,7 @@ div.messages li {
 table {
      border-collapse: collapse;
      width: 100%;
-     border: 1px solid #000022;
+     border: 1px solid #447;
      margin: 1px -15px 5px 0px;
      cell-padding: 1px;
      font-size: 7pt;
@@ -483,12 +526,12 @@ table hr {
 th {
      padding: 6px 2px;
      color: #000;
-     background: #b4c8ff url('images/tabletitlelight.png') repeat-x;
+     background: #ddf url('images/header.png') center center repeat-x;
      text-align: center;
      font-size: 9pt;
      line-height: 110%;
-     border-bottom: 1px solid #001 !important;
-     border-top: 1px solid #001 !important;
+     border-bottom: 1px solid #447 !important;
+     border-top: 1px solid #447 !important;
 }
 
 tr {
@@ -497,11 +540,11 @@ tr {
 }
 
 tr:nth-child(even) {
-     background: #99f url('images/tabletile.png') !important;
+     background: #eef; /*url('images/tabletile.png') !important;*/
 }
 
 tr:nth-child(odd) {
-     background: #bbf url('images/tabletile_alt.png') !important;
+     background: #ddf; /*url('images/tabletile_alt.png') !important;*/
 }
 /*
 tr:last-child {
@@ -514,7 +557,7 @@ td {
      padding: 5px 3px;
      color: #000;
      vertical-align: middle;
-     border-top: 1px inset #001;
+     border-top: 1px inset #447;
      border-bottom: 1px outset #99f;     
 }
 
@@ -527,6 +570,15 @@ tt {
 div.main li {
      text-align: left;
      list-style: square;
+     margin: 2px 5px 0px 20px;
+     padding: 1px 10px 1px 10px;
+     line-height: 150%;
+     word-wrap: break-word;
+}
+
+div.main li {
+     text-align: left;
+     list-style: square;
      margin: 2px 20px 0px 40px;
      padding: 1px 10px 1px 10px;
      line-height: 150%;
@@ -534,14 +586,14 @@ div.main li {
 }
 
 div.main li b {
-     color: #404 !important;
-     letter-spacing: 0.04em;
+     color: #700 !important;
+     letter-spacing: 0.02em;
      font-size: 9.5pt;
-     line-height: 200%;
+     line-height: 170%;
 }
 
 div.main li:first-child {
-     margin-top: 10px;
+     margin-top: 10px !important;
 }
 .tidylist {
      text-align: justify !important;
@@ -553,6 +605,15 @@ div.main li:first-child {
 
 .tidylist:last-child {
      padding-bottom: 5px;
+}
+
+.tidylist code {
+     text-align: left;
+     font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     color: #390;
+     padding: 2px 3px;
+     background: #eeb;
+     font-weight: bold;
 }
 
 ol {
@@ -572,15 +633,24 @@ code {
      font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
 }
 
+
+code {
+     text-align: left;
+     font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     color: #390;
+     padding: 2px 3px;
+     font-weight: bold;
+}
+
 a:link{
-     color: #008;
+     color: #005;
      text-decoration: none;
      font-weight: bold;
      word-wrap: break-word;
 }
 
 a:visited{
-     color: #004;
+     color: #309;
      text-decoration: none;
      font-weight: bold;
 }
@@ -602,6 +672,7 @@ a:active{
      padding-bottom: -2px;
      text-align: justify;
      line-height: 120% !important;
+     padding-right: -100px !important;
 }
 
 .links li:first-child {
@@ -629,11 +700,11 @@ h1 {
      font: normal bold 16pt/120% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      letter-spacing: 0.15em;
      text-transform: uppercase;
-     text-shadow: 0px 0px 1px rgba(0, 0, 148, 0.9);
-     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     text-shadow: 0px 0px 1px #77f;;
+     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
      white-space: normal;
-     background: #ddddff url('images/lightbluetile.png');
-     border: 1px solid #002;
+     background: #ddf url('images/header.png') center center repeat-x;
+     border: 1px solid #447;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
@@ -643,42 +714,43 @@ h2 {
      font-size: 12pt;
      color: #001;
      letter-spacing: 0.05em;
-     background: #ddf url('images/titletile.png');
+     background: #ddf url('images/header.png') center center repeat-x;
      text-shadow: 0px 0px 1px rgba(0, 0, 64, 0.5);
-     padding: 7px 10px;
+     padding: 10px 10px;
      wordwrap: none;
-     border: 1px solid #002;
+     border: 1px solid #447;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      margin: 15px 0px 12px 0 !important;
-     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
      word-wrap: break-word;
+     text-transform: uppercase;
 }
 
 h2 a:hover {
      text-shadow: 0px 0px 1px rgba(255, 255, 72, 0.9);
      border-bottom: 1px #ff6600;
-     border-bottom-style: solid;
-     border-bottom-color: #002;
      padding-bottom: 5px;
 }
 
 h3 {
-     border: 1px solid #002;
-     border-left: 5px solid #002;
-     padding: 3px 5px 3px 5px;
+     border: 1px solid #447;
+     border-left: 5px solid #447;
+     padding: 5px 5px 5px 5px;
      margin: 12px 0 12px 0;
      border-radius: 0 4px 4px 0;
      -moz-border-radius: 0 4px 4px 0;
      -khtml-border-radius: 0 4px 4px 0;
-     background: #eef;
+     background: #ddf url('images/header.png') center center repeat-x !important;
+     text-transform: uppercase;
+     text-shadow: 0px 0px 1px #77f;
 }
 
 h4 {
      border-bottom: 1px;
      border-bottom-style: solid;
-     border-bottom-color: #001;
+     border-bottom-color: #447;
      padding: 0 0 10px 0;
      margin: 5px 0 10px 0;
      font-size: 11pt;
@@ -723,8 +795,8 @@ button:active{
 }
 
 .langbox {
-     margin: 4px 10px 4px 5px;
-     padding: 5px 5px;
+     margin: 20px 10px 4px 5px;
+     padding: 8px 5px;
      color: #001;
      font-size: 7pt;
      width: 260px;
@@ -733,13 +805,23 @@ button:active{
      valign: middle;
 }
 
+.langbox img {
+     opacity: 0.8;
+     -moz-box-shadow: 0 0 1px #447;
+}
+
+.langbox img:hover {
+     opacity: 1;
+     -moz-box-shadow: 0 0 1px #f60;
+}
+
 input {
      background: #eef;
      color: #001;
      margin: 5px 10px 5px 10px;
      padding: 4px 2px;
      font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
-     border: 1px solid #001;
+     border: 1px solid #447;
      text-decoration: none;
      min-width: 110px;
 }
@@ -785,7 +867,7 @@ input[type=text] {
      margin: 5px 10px 5px 10px;
      padding: 4px 2px;
      font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
-     border: 1px solid #001;
+     border: 1px solid #447;
      text-decoration: none;
 }
 
@@ -796,7 +878,7 @@ submit {
      padding: 2px;
      font-family: "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      font-weight: bold;
-     border: 1px solid #001;
+     border: 1px solid #447;
      text-decoration: none;
 }
 
@@ -809,7 +891,7 @@ select {
      color: #003;
      margin: 5px 10px 5px 10px;
      padding: 4px;
-     border: 1px solid #001;
+     border: 1px solid #447;
      min-width: 110px;
      font: 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      border-radius: 4px;
@@ -829,7 +911,7 @@ textarea {
      font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      min-height: 100px;
      min-width: 97%;
-     border: 1px solid #001;
+     border: 1px solid #447;
 }
 
 form {}
@@ -843,7 +925,7 @@ form {}
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
-     border: 1px solid #001;
+     border: 1px solid #447;
      display: none;
 }    
 
@@ -852,18 +934,19 @@ form {}
      font-size: 8pt;
      font-color: #001 !important;
      text-align: center;
-     border: 1px solid #001 !important;
+     border: 1px solid #447 !important;
      border-top: 0 !important;
      margin: -5px 0 5px 0; 
      padding: 7px;
      background: #bcf;
      -moz-box-shadow: inset 0px 0px 2px 1px #eef;
 }
+
 /*
 .joblog {
      margin: 15px 0;
      padding: 10px 20px !important;
-     border: 1px solid #003;
+     border: 1px solid #447;
      background-color: #004;
      background: #ddf url('images/lightbluetile.png');
      color: #001;
@@ -871,7 +954,7 @@ form {}
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      text-align: justify;
-     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
      overflow: auto;
  }
  
@@ -889,18 +972,20 @@ form {}
 */
 
 div.joblog {
-     margin: 15px 0;
+/*     margin: 15px 0;
      padding: 10px 20px !important;
-     border: 1px solid #003;
+     border: 1px solid #447;
      background-color: #004;
-     background: #ddf url('images/lightbluetile.png');
+     background: #eef; /*url('images/lightbluetile.png')
      color: #001;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      text-align: justify;
-     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;*/
      overflow: auto;
+     border: 0;
+     margin-top: 5px;
  }
  
  div.joblog:ul {
@@ -987,9 +1072,9 @@ div.joblog hr {
 }
 
 .tablefooter tr, .tablefooter td {
-     background: #b4c8ff url('images/tabletitlelight.png') repeat-x;
-     border-top: 1px solid #001;
-     border-bottom: 1px solid #001 !important;     
+     background: #ddf url('images/header.png') center center repeat-x;
+     border-top: 1px solid #447;
+     border-bottom: 1px solid #447 !important;     
      padding: 8px 2px !important;
      font-size: 7pt;
      line-height: 110%;

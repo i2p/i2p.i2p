@@ -1270,7 +1270,7 @@ class PeerState {
         if (_dead) return -1;
         synchronized (msgs) {
             if (_retransmitter != null) {
-                rv = (int)(now - _retransmitter.getNextSendTime());
+                rv = (int)(_retransmitter.getNextSendTime() - now);
                 if (rv <= 0)
                     return 1;
                 else

@@ -1525,7 +1525,7 @@ public class I2PSnarkServlet extends Default {
                     buf.append("<input type=\"radio\" value=\"-9\" name=\"pri.").append(f.getCanonicalPath()).append("\" ");
                     if (pri < 0)
                         buf.append("checked=\"true\"");
-                    buf.append('>').append(_("Ignore"));
+                    buf.append('>').append(_("Skip"));
                     showSaveButton = true;
                 }
                 buf.append("</td>");

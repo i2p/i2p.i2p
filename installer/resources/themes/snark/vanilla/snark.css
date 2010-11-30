@@ -139,13 +139,17 @@ tr {
 }
 
 thead, tfoot {
-     text-shadow:0 1px 0px #930;
-     background: url("images/bling.png") repeat-x scroll center center #867;
+     text-shadow: 0px 1px 1px #707;
+     background: url("images/bling2.png") repeat-x scroll center center #867;
+     font-weight: bold;
+     color: #503;
 }
 
+/*
 thead a, tfoot a {
-text-shadow:1px 1px #101;
+text-shadow: 1px 1px 1px #f00;
 } 
+*/
 
 thead {
      border-bottom: 1px solid #604;
@@ -156,7 +160,6 @@ th {
      font-size: 9pt;
      border-top: 1px outset #001;
      border-bottom: 1px inset #604;
-     color: #b30;
      whitespace: nowrap;
      font-variant: small-caps !important;
      letter-spacing: 0.05em;
@@ -218,7 +221,7 @@ tfoot th {
 
 td {
      padding: 1px;
-     color: #001 !important;
+     color: #501 !important;
      opacity: 1;
      font-size: 9.5pt;
 }
@@ -274,7 +277,7 @@ td:first-child {
      padding-left: 0px;
      min-width: 120px;
      font-weight: bold;
-     color: #404 !important;
+     color: #402 !important;
      font-size: 8pt;
 }
 
@@ -435,6 +438,24 @@ a:hover {
      font-weight: bold;
 }
 
+a:link {
+     color: #d30;
+     text-decoration: none;
+     font-weight: bold;
+     word-wrap: break-word;
+}
+
+a:visited {
+     color: #a60;
+     text-decoration: none;
+     font-weight: bold;
+}
+
+a:hover {
+     color: #fa0;
+     font-weight: bold;
+}
+
 input {
      font-size: 9pt;
      font-weight: bold;
@@ -590,7 +611,7 @@ div.newtorrentsection {
      -khtml-box-shadow: inset 0px 0px 1px 0px #fff;
      box-shadow: inset 0px 0px 1px 0px #fff;
      word-wrap: break-word;
-     background: #ffd url('/themes/snark/ubergine/images/snark_create.png') no-repeat scroll right center;
+     background: #ffd url('images/snark_create.png') no-repeat scroll right center;
      opacity: 1.0;
 }
 
@@ -607,7 +628,7 @@ div.addtorrentsection {
      -khtml-box-shadow: inset 0px 0px 1px 0px #fff;
      box-shadow: inset 0px 0px 1px 0px #fff;
      word-wrap: break-word;
-     background: #ffd url('/themes/snark/ubergine/images/snark_add.png') no-repeat scroll right center;
+     background: #ffd url('images/snark_add.png') no-repeat scroll right center;
      opacity: 1.0;
 }
 
@@ -655,7 +676,7 @@ div.configsection table{
 }
 
 div.configsection a {
-     color: #f60;
+     color: #f30;
      text-shadow: 1px 1px #500;
 }
 
@@ -665,8 +686,8 @@ div.configsection a:hover {
 }
 
 code {
-     font-size: 9.5pt;
-     color: #227;
+     font-size: 9pt;
+     color: #930;
      padding: 0 2px;
      font-weight: bold;
      font-family: "Lucida Console", "DejaVu Sans Mono", Courier, mono;

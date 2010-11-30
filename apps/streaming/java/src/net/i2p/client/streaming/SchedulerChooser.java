@@ -10,7 +10,7 @@ import net.i2p.util.Log;
  * Examine a connection's state and pick the right scheduler for it.
  *
  */
-public class SchedulerChooser {
+class SchedulerChooser {
     private I2PAppContext _context;
     private Log _log;
     private TaskScheduler _nullScheduler;

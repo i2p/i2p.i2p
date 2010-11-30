@@ -45,6 +45,14 @@ div.logo {
      box-shadow: inset 0px 0px 1px 0px #009;
 }
 
+div.logo hr {
+     color: #494;
+     background: #494;
+     height: 1px;
+     border: 0px solid #494;
+     margin: 10px 0 5px;
+}
+
 div.toolbar {
      margin: 0;
      padding: 10px;
@@ -559,11 +567,19 @@ div.main li b {
 }
 
 .tidylist:first-child {
-     padding-top: 5px;
+/*     padding-top: 5px;*/
 }
 
 .tidylist:last-child {
      padding-bottom: 15px;
+}
+
+.tidylist code {
+     text-align: left;
+     font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     color: #dd0;
+     padding: 1px 2px;
+     background: #030;
 }
 
 ol {
@@ -583,7 +599,6 @@ code {
      font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      color: #dd0;
      padding: 1px 2px;
-     background: #030;
 }
 
 a:link, h2 a:link{
@@ -918,24 +933,36 @@ div.joblog {
      text-align: justify !important;
      overflow-x: scroll; /* Opera fix */
  }
+
+div.main li {
+     text-align: left;
+     list-style: square;
+     margin: 2px 0px 2px 30px;
+     padding: 2px 20px 2px 0px;
+/*     line-height: 150%;*/
+     word-wrap: break-word;
+}
  
- div.joblog:li {
+div.joblog li {
      word-wrap: break-word !important;
      text-align: justify !important;
-     line-height: 80% !important;
+     line-height: 120% !important;
+     margin: 2px 0px 2px 30px;
+     padding: 2px 20px 2px 0px;
 }
 
-div.joblog:ul {
+div.joblog ul {
      word-wrap: break-word !important;
      text-align: justify;
+     margin: 0px 0 10px;
 }
 
 div.joblog li:first-child {
-     margin-top: 10px;
+     margin-top: 0px;
 }
 
 div.joblog li:last-child {
-     margin-bottom: 0;
+     margin-bottom: -25px;
 }
 
 div.joblog form:first-child {
