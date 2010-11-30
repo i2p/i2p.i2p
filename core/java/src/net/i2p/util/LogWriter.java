@@ -28,22 +28,20 @@ import net.i2p.I2PAppContext;
 class LogWriter implements Runnable {
     /** every 10 seconds? why? Just have the gui force a reread after a change?? */
     private final static long CONFIG_READ_INTERVAL = 50 * 1000;
-    private final static long FLUSH_INTERVAL = 11 * 1000;
+    private final static long FLUSH_INTERVAL = 9 * 1000;
     private long _lastReadConfig = 0;
     private long _numBytesInCurrentFile = 0;
-    private Writer _currentOut;
+    // volatile as it changes on log file rotation
+    private volatile Writer _currentOut;
     private int _rotationNum = -1;
     private String _logFilenamePattern;
     private File _currentFile;
-    private LogManager _manager;
+    private final LogManager _manager;
 
     private boolean _write;
     private static final int MAX_DISKFULL_MESSAGES = 8;
     private int _diskFullMessageCount;
     
-    private LogWriter() { // nop
-    }
-
     public LogWriter(LogManager manager) {
         _manager = manager;
         _lastReadConfig = Clock.getInstance().now();
