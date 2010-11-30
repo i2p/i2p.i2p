@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-11-13 00:19+0000\n"
-"PO-Revision-Date: 2010-11-23 01:50+0100\n"
+"PO-Revision-Date: 2010-11-30 19:25+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -54,7 +54,7 @@ msgstr "Cambios de I2CP y del túnel tomarán efecto despues de detener todos lo
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:343
 msgid "Disconnecting old I2CP destination"
-msgstr "Desconectando anterior Destinación I2CP"
+msgstr "Desconectando anterior Destino I2CP"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:347
 #, java-format
@@ -67,11 +67,11 @@ msgstr "Conectarse no fue posíble con las nuevas preferencias I2CP, utilizaré 
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:355
 msgid "Unable to reconnect with the old settings!"
-msgstr "Conectárse usando las preferencias anteriores no fue posíble!"
+msgstr "Conectarse usando las preferencias anteriores no fue posible!"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:357
 msgid "Reconnected on the new I2CP destination"
-msgstr "Conectado con la nueva Destinación I2CP"
+msgstr "Conectado con la nueva Destino I2CP"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:368
 #, java-format
@@ -109,7 +109,7 @@ msgstr "No se pudo guardar la configuración en {0}."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:452
 msgid "Connecting to I2P"
-msgstr "Conectándo a I2P"
+msgstr "Conectando a I2P"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:455
 msgid "Error connecting to I2P - check your I2CP settings!"
@@ -164,17 +164,17 @@ msgstr "Archivo de datos del torrent \"{0}\" no puede terminar en \".torrent' y 
 #: ../java/src/org/klomp/snark/SnarkManager.java:696
 #, java-format
 msgid "No pieces in \"{0}\",  deleting it!"
-msgstr "No hay piezas en \"{0}\", se borrará."
+msgstr "No hay partes en \"{0}\", se borrará."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:698
 #, java-format
 msgid "Too many pieces in \"{0}\", limit is {1}, deleting it!"
-msgstr "Hay demasiadas piezas en  \"{0}\" y el límite es {1}. Se borrarán."
+msgstr "Hay demasiadas partes en  \"{0}\" y el límite es {1}. Se borrarán."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:700
 #, java-format
 msgid "Pieces are too large in \"{0}\" ({1}B), deleting it."
-msgstr "Piezas en \"{0}\" son demasiado grandes ({1}B). Se borrarán."
+msgstr "Partes en \"{0}\" son demasiado grandes ({1}B). Se borrarán."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:701
 #, java-format
@@ -571,19 +571,19 @@ msgstr "Sembrador"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:943
 msgid "Uninteresting (The peer has no pieces we need)"
-msgstr "no interesante (El par no tiene piezas que nos interesen.)"
+msgstr "no interesante (El par no tiene partes que nos interesen.)"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:945
 msgid "Choked (The peer is not allowing us to request pieces)"
-msgstr "moderado (De momento el par no nos permite solicitar más piezas)"
+msgstr "moderado (De momento el par no nos permite solicitar más partes)"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:959
 msgid "Uninterested (We have no pieces the peer needs)"
-msgstr "desinteresado (No tenemos las piezas que el par quiere.)"
+msgstr "desinteresado (No tenemos las partes que el par quiere.)"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:961
 msgid "Choking (We are not allowing the peer to request pieces)"
-msgstr "Moderando (De momento no se le permite al par solicitar más piezas)"
+msgstr "Moderando (De momento no se le permite al par solicitar más partes)"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1005
 msgid "Add Torrent"
