@@ -123,7 +123,7 @@ class UDPEndpoint {
             if (_listenPort > 0)
                 _log.error("SSU Unable to bind to requested port " + _listenPort + ", using random port " + port);
             else
-                _log.error("SSU selected random port " + port);
+                _log.logAlways(Log.INFO, "UDP selected random port " + port);
         }
         _listenPort = port;
         return socket;
