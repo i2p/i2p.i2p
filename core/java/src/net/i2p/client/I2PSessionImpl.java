@@ -9,6 +9,7 @@ package net.i2p.client;
  *
  */
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -515,7 +516,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
 
     /** 
      * Recieve notifiation of an error reading the I2CP stream
-     *
+     * @param error non-null
      */
     public void readError(I2CPMessageReader reader, Exception error) {
         propogateError("There was an error reading data", error);
@@ -574,10 +575,23 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /**
      * Pass off the error to the listener
      * Misspelled, oh well.
+     * @param error non-null
      */
     void propogateError(String msg, Throwable error) {
-        if (_log.shouldLog(Log.ERROR)) 
-            _log.error(getPrefix() + "Error occurred: " + msg, error);
+        // Only log as WARN if the router went away
+        int level;
+        String msgpfx;
+        if ((error instanceof EOFException) ||
+            (error.getMessage() != null && error.getMessage().startsWith("Pipe closed"))) {
+            level = Log.WARN;
+            msgpfx = "Router closed connection: ";
+        } else {
+            level = Log.ERROR;
+            msgpfx = "Error occurred communicating with router: ";
+        }
+
+        if (_log.shouldLog(level)) 
+            _log.log(level, getPrefix() + msgpfx + msg, error);
         if (_sessionListener != null) _sessionListener.errorOccurred(this, msg, error);
     }
 
@@ -706,7 +720,25 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         }
     }
     
-    protected String getPrefix() { return "[" + (_sessionId == null ? -1 : _sessionId.getSessionId()) + "]: "; }
+    /**
+     * try hard to make a decent identifier as this will appear in error logs
+     */
+    protected String getPrefix() {
+        StringBuilder buf = new StringBuilder();
+        buf.append('[');
+        String s = _options.getProperty("inbound.nickname");
+        if (s != null)
+            buf.append(s);
+        else
+            buf.append(getClass().getSimpleName());
+        buf.append(" #");
+        if (_sessionId != null)
+            buf.append(_sessionId.getSessionId());
+        else
+            buf.append("n/a");
+        buf.append("]: ");
+        return buf.toString();
+    }
 
     public Destination lookupDest(Hash h) throws I2PSessionException {
         return null;

@@ -8,6 +8,7 @@ package net.i2p.router.client;
  *
  */
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -451,6 +452,7 @@ public class ClientConnectionRunner {
     void writeMessage(I2CPMessage msg) {
         long before = _context.clock().now();
         try {
+            // We don't still need synchronization here? isn't ClientWriterRunner the only writer?
             synchronized (_out) {
                 msg.writeMessage(_out);
                 _out.flush();
@@ -459,13 +461,29 @@ public class ClientConnectionRunner {
                 _log.debug("after writeMessage("+ msg.getClass().getName() + "): " 
                            + (_context.clock().now()-before) + "ms");
         } catch (I2CPMessageException ime) {
-            _log.error("Message exception sending I2CP message: " + ime);
+            _log.error("Error sending I2CP message to client", ime);
+            stopRunning();
+        } catch (EOFException eofe) {
+            // only warn if client went away
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Error sending I2CP message - client went away", eofe);
             stopRunning();
         } catch (IOException ioe) {
-            _log.error("IO exception sending I2CP message: " + ioe);
+            // only warn if client went away
+            int level;
+            String emsg;
+            if (ioe.getMessage() != null && ioe.getMessage().startsWith("Pipe closed")) {
+                level = Log.WARN;
+                emsg = "Error sending I2CP message - client went away";
+            } else {
+                level = Log.ERROR;
+                emsg = "IO Error sending I2CP message to client";
+            }
+            if (_log.shouldLog(level)) 
+                _log.log(level, emsg, ioe);
             stopRunning();
         } catch (Throwable t) {
-            _log.log(Log.CRIT, "Unhandled exception sending I2CP message", t);
+            _log.log(Log.CRIT, "Unhandled exception sending I2CP message to client", t);
             stopRunning();
         } finally {
             long after = _context.clock().now();
