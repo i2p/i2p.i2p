@@ -39,8 +39,10 @@ import net.i2p.data.i2cp.I2CPMessageException;
 import net.i2p.data.i2cp.I2CPMessageReader;
 import net.i2p.data.i2cp.MessagePayloadMessage;
 import net.i2p.data.i2cp.SessionId;
+import net.i2p.internal.I2CPMessageQueue;
+import net.i2p.internal.InternalClientManager;
+import net.i2p.internal.QueuedI2CPMessageReader;
 import net.i2p.util.I2PThread;
-import net.i2p.util.InternalSocket;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
@@ -78,6 +80,13 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     protected ClientWriterRunner _writer;
     /** where we pipe our messages */
     protected /* FIXME final FIXME */OutputStream _out;
+
+    /**
+     *  Used for internal connections to the router.
+     *  If this is set, _socket, _writer, and _out will be null.
+     *  @since 0.8.3
+     */
+    protected I2CPMessageQueue _queue;
 
     /** who we send events to */
     protected I2PSessionListener _sessionListener;
@@ -285,17 +294,27 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             
         long startConnect = _context.clock().now();
         try {
-            // If we are in the router JVM, connect using the interal pseudo-socket
-            _socket = InternalSocket.getSocket(_hostname, _portNum);
-            // _socket.setSoTimeout(1000000); // Uhmmm we could really-really use a real timeout, and handle it.
-            _out = _socket.getOutputStream();
-            synchronized (_out) {
-                _out.write(I2PClient.PROTOCOL_BYTE);
-                _out.flush();
+            // If we are in the router JVM, connect using the interal queue
+            if (_context.isRouterContext()) {
+                // _socket, _out, and _writer remain null
+                InternalClientManager mgr = _context.internalClientManager();
+                if (mgr == null)
+                    throw new I2PSessionException("Router is not ready for connections");
+                // the following may throw an I2PSessionException
+                _queue = mgr.connect();
+                _reader = new QueuedI2CPMessageReader(_queue, this);
+            } else {
+                _socket = new Socket(_hostname, _portNum);
+                // _socket.setSoTimeout(1000000); // Uhmmm we could really-really use a real timeout, and handle it.
+                _out = _socket.getOutputStream();
+                synchronized (_out) {
+                    _out.write(I2PClient.PROTOCOL_BYTE);
+                    _out.flush();
+                }
+                _writer = new ClientWriterRunner(_out, this);
+                InputStream in = _socket.getInputStream();
+                _reader = new I2CPMessageReader(in, this);
             }
-            _writer = new ClientWriterRunner(_out, this);
-            InputStream in = _socket.getInputStream();
-            _reader = new I2CPMessageReader(in, this);
             if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "before startReading");
             _reader.startReading();
             if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Before getDate");
@@ -567,9 +586,14 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * @throws I2PSessionException if the message is malformed or there is an error writing it out
      */
     void sendMessage(I2CPMessage message) throws I2PSessionException {
-        if (isClosed() || _writer == null)
+        if (isClosed())
             throw new I2PSessionException("Already closed");
-        _writer.addMessage(message);
+        else if (_queue != null)
+            _queue.offer(message);  // internal
+        else if (_writer == null)
+            throw new I2PSessionException("Already closed");
+        else
+            _writer.addMessage(message);
     }
 
     /**
@@ -581,8 +605,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         // Only log as WARN if the router went away
         int level;
         String msgpfx;
-        if ((error instanceof EOFException) ||
-            (error.getMessage() != null && error.getMessage().startsWith("Pipe closed"))) {
+        if (error instanceof EOFException) {
             level = Log.WARN;
             msgpfx = "Router closed connection: ";
         } else {
@@ -646,6 +669,10 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         if (_reader != null) {
             _reader.stopReading();
             _reader = null;
+        }
+        if (_queue != null) {
+            // internal
+            _queue.close();
         }
         if (_writer != null) {
             _writer.stopWriting();

@@ -19,6 +19,9 @@ import net.i2p.data.i2cp.DestLookupMessage;
 import net.i2p.data.i2cp.DestReplyMessage;
 import net.i2p.data.i2cp.GetBandwidthLimitsMessage;
 import net.i2p.data.i2cp.I2CPMessageReader;
+import net.i2p.internal.I2CPMessageQueue;
+import net.i2p.internal.InternalClientManager;
+import net.i2p.internal.QueuedI2CPMessageReader;
 import net.i2p.util.I2PThread;
 import net.i2p.util.InternalSocket;
 
@@ -72,16 +75,26 @@ class I2PSimpleSession extends I2PSessionImpl2 {
         notifier.start();
         
         try {
-            // If we are in the router JVM, connect using the interal pseudo-socket
-            _socket = InternalSocket.getSocket(_hostname, _portNum);
-            _out = _socket.getOutputStream();
-            synchronized (_out) {
-                _out.write(I2PClient.PROTOCOL_BYTE);
-                _out.flush();
+            // If we are in the router JVM, connect using the interal queue
+            if (_context.isRouterContext()) {
+                // _socket, _out, and _writer remain null
+                InternalClientManager mgr = _context.internalClientManager();
+                if (mgr == null)
+                    throw new I2PSessionException("Router is not ready for connections");
+                // the following may throw an I2PSessionException
+                _queue = mgr.connect();
+                _reader = new QueuedI2CPMessageReader(_queue, this);
+            } else {
+                _socket = new Socket(_hostname, _portNum);
+                _out = _socket.getOutputStream();
+                synchronized (_out) {
+                    _out.write(I2PClient.PROTOCOL_BYTE);
+                    _out.flush();
+                }
+                _writer = new ClientWriterRunner(_out, this);
+                InputStream in = _socket.getInputStream();
+                _reader = new I2CPMessageReader(in, this);
             }
-            _writer = new ClientWriterRunner(_out, this);
-            InputStream in = _socket.getInputStream();
-            _reader = new I2CPMessageReader(in, this);
             _reader.startReading();
 
         } catch (UnknownHostException uhe) {

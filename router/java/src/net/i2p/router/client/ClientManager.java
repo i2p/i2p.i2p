@@ -15,7 +15,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
 
+import net.i2p.client.I2PSessionException;
 import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -23,8 +25,10 @@ import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.Payload;
 import net.i2p.data.TunnelId;
+import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.MessageId;
 import net.i2p.data.i2cp.SessionConfig;
+import net.i2p.internal.I2CPMessageQueue;
 import net.i2p.router.ClientManagerFacade;
 import net.i2p.router.ClientMessage;
 import net.i2p.router.Job;
@@ -42,7 +46,6 @@ import net.i2p.util.Log;
 public class ClientManager {
     private Log _log;
     private ClientListenerRunner _listener;
-    private ClientListenerRunner _internalListener;
     private final HashMap<Destination, ClientConnectionRunner>  _runners;        // Destination --> ClientConnectionRunner
     private final Set<ClientConnectionRunner> _pendingRunners; // ClientConnectionRunner for clients w/out a Dest yet
     private RouterContext _ctx;
@@ -69,11 +72,6 @@ public class ClientManager {
         t.setName("ClientListener:" + port);
         t.setDaemon(true);
         t.start();
-        _internalListener = new InternalClientListenerRunner(_ctx, this, port);
-        t = new I2PThread(_internalListener);
-        t.setName("ClientListener:" + port + "-i");
-        t.setDaemon(true);
-        t.start();
     }
     
     public void restart() {
@@ -97,7 +95,6 @@ public class ClientManager {
     public void shutdown() {
         _log.info("Shutting down the ClientManager");
         _listener.stopListening();
-        _internalListener.stopListening();
         Set<ClientConnectionRunner> runners = new HashSet();
         synchronized (_runners) {
             for (Iterator<ClientConnectionRunner> iter = _runners.values().iterator(); iter.hasNext();) {
@@ -117,6 +114,23 @@ public class ClientManager {
         }
     }
     
+    /**
+     *  The InternalClientManager interface.
+     *  Connects to the router, receiving a message queue to talk to the router with.
+     *  Might throw I2PSessionException if the router isn't ready, someday.
+     *  @since 0.8.3
+     */
+    public I2CPMessageQueue internalConnect() {
+        // for now we make these unlimited size
+        LinkedBlockingQueue<I2CPMessage> in = new LinkedBlockingQueue();
+        LinkedBlockingQueue<I2CPMessage> out = new LinkedBlockingQueue();
+        I2CPMessageQueue myQueue = new I2CPMessageQueueImpl(in, out);
+        I2CPMessageQueue hisQueue = new I2CPMessageQueueImpl(out, in);
+        ClientConnectionRunner runner = new QueuedClientConnectionRunner(_ctx, this, myQueue);
+        registerConnection(runner);
+        return hisQueue;
+    }
+
     public boolean isAlive() { return _listener.isListening(); }
 
     public void registerConnection(ClientConnectionRunner runner) {

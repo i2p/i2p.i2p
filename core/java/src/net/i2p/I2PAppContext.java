@@ -22,6 +22,7 @@ import net.i2p.crypto.SHA256Generator;
 import net.i2p.crypto.SessionKeyManager;
 import net.i2p.crypto.TransientSessionKeyManager;
 import net.i2p.data.RoutingKeyGenerator;
+import net.i2p.internal.InternalClientManager;
 import net.i2p.stat.StatManager;
 import net.i2p.util.Clock;
 import net.i2p.util.ConcurrentHashSet;
@@ -842,5 +843,14 @@ public class I2PAppContext {
      */
     public boolean isRouterContext() {
         return false;
+    }
+
+    /**
+     *  Use this to connect to the router in the same JVM.
+     *  @return always null in I2PAppContext, the client manager if in RouterContext
+     *  @since 0.8.3
+     */
+    public InternalClientManager internalClientManager() {
+        return null;
     }
 }
