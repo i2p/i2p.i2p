@@ -158,7 +158,7 @@ thead {
 th {
      padding: 4px 2px 4px 4px;
      font-size: 9pt;
-     border-top: 1px outset #001;
+     border-top: 1px outset #604;
      border-bottom: 1px inset #604;
      whitespace: nowrap;
      font-variant: small-caps !important;
@@ -501,15 +501,16 @@ input[type=submit]:active {
 
 input[type=image] {
      padding: 0 !important;
-     background: none;
      -moz-border-radius: 0px;
      -khtml-border-radius: 0px;
      border-radius: 0px;
      border: medium none;
      margin: 0 2px;
+     opacity: 0.9 !important;
 }
 
 input[type=image]:hover {
+     opacity: 1 !important;
 }
 
 input[type=text]:active, input[type=text]:hover, input.r:hover {

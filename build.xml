@@ -1069,7 +1069,7 @@
 			<copy todir="pkg-temp/docs/themes/console/light/" overwrite="true" >
 				<fileset dir="installer/resources/themes/console/light/" includes="**.css" />
 			</copy>
-<!-- @dr.zed where is your CJK fix for the default theme ??	put it here		<copy file="installer/resources/themes/console/classic/console_big.css" todir="portable/docs/themes/console/light/" / -->
+			<copy file="installer/resources/themes/console/light/console_big.css" todir="portable/docs/themes/console/light/" />
 			<copy todir="pkg-temp/docs/themes/console/images/" >
 				<fileset dir="installer/resources/themes/console/images/" />
 			</copy>

@@ -163,7 +163,7 @@ div.routersummary {
      width: 190px; 
      color: inherit; 
      margin: 0; 
-     padding: 10px 1px 5px 1px; 
+     padding: 8px 1px 4px 1px; 
      text-align: center !important; 
      border: 1px solid #99f; 
      font-size: 9pt; 
@@ -237,6 +237,11 @@ div.routersummary tr {
      background-image: none !important;
      background-color: transparent !important;
      border: 0 !important;
+}
+
+div.routersummary td:first-child {
+     max-width: 90px;
+     overflow: hidden;
 }
 
 div.tunnels table{
@@ -888,5 +893,19 @@ code {
      text-align: left;
      font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      color: #0d0;
-     padding: 0 5px;
+     padding: 0 2px;
+}
+
+div.footnote {
+     text-align: right;
+     color: #99f;
+     font-size: 7pt;
+}
+
+div.footnote hr{
+     margin: 15px 0 5px 0 !important;
+     color: #99f;
+     background: #99f;
+     height: 1px;
+     border: 0px solid #99f;
 }
