@@ -91,8 +91,8 @@ div.routersummaryouter {
 
 div.routersummary {
 /*  margin: 0px 20px 20px 0px; */
-     width: 175px;
-     padding: 10px;
+     width: 180 px;
+     padding: 8px;
      text-align: center !important;
      border: 1px solid #447;
      background: #ccddf6);
@@ -118,7 +118,7 @@ div.routersummary hr {
      background: #eef;
      height: 2px;
      border-bottom: 1px solid #eef;
-     margin: 8px -10px 7px -10px;
+     margin: 8px -7px 7px -7px;
      -moz-box-shadow: inset 0px 1px 1px 1px #ddf;
 }
 
@@ -131,7 +131,7 @@ div.routersummary h3 {
      border: 0;
      font-size: 9.5pt;
      letter-spacing: 0.04em;
-     margin: -4px -6px;
+     margin: -4px -3px;
      padding: 2px 0;
      background: #c5d5fb;
      text-transform: uppercase;
@@ -154,7 +154,7 @@ div.routersummary h4 {
      border-bottom: 0 !important;
      font-size: 8.5pt;
      letter-spacing: 0.02em;
-     margin: -7px -9px -7px -9px !important;
+     margin: -7px -7px -7px -7px !important;
      padding: 0px 3px 1px 3px;
      background: #eef;
      text-transform: capitalize;
@@ -167,7 +167,7 @@ div.routersummary table {
      border: 0;
      text-align: center !important;
      margin: -7px -5px -6px -5px;
-     width: 185px !important;
+     width: 190px !important;
      overflow: hidden;
      font-size: 8pt;
      padding: 0px -10px;
@@ -179,6 +179,11 @@ div.routersummary tr {
      background-image: none !important;
      background-color: transparent !important;
      border: 0 !important;
+}
+
+div.routersummary td:first-child {
+     max-width: 90px;
+     overflow: hidden;
 }
 
 div.tunnels {
@@ -322,7 +327,7 @@ div.news {
      margin: 0px 15px 10px 220px;
      padding: 10px 25px 7px 25px;
      border: 1px solid #447;
-     color: #000;
+     color: #224;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
@@ -427,7 +432,7 @@ div.configure {
 div.configure h3, div.graphspanel h3 {
      border: 1px solid #447;
      border-left: 5px solid #447;
-     padding: 3px 5px 3px 5px;
+     padding: 5px;
      margin: 15px 0 15px 0;
      border-radius: 0 4px 4px 0;
      -moz-border-radius: 0 4px 4px 0;
@@ -1082,4 +1087,18 @@ div.joblog hr {
 
 .formaction {
      text-align: right;
+}
+
+div.footnote {
+     text-align: right;
+     color: #447;
+     font-size: 7pt;
+}
+
+div.footnote hr{
+     margin: 20px 0 5px 0 !important;
+     color: #447;
+     background: #447;
+     height: 1px;
+     border: 0px solid #447;
 }

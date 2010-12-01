@@ -1,25 +1,33 @@
-/* Welcome to the wonderful world of kludgey IE fixes */
+/* I2P Console IE theme override for Classic */
+/* Comment: Welcome to the wonderful world of kludgey IE fixes (for best results use another browser) */
+/* Author: dr|z3d */
 
 .wideload {
      overflow: auto;
      width: 100%;
 }
 
-.formaction {
+.formaction, form {
      text-align: left !important;
-     margin: -10px 0 10px 0;
+     margin: 0px 0 10px 0;
 }
 
 div.configure {
      text-align: center;
 }
 
+div.configure hr {
+/*     display: none; */
+     margin-bottom: 10px !important;
+}
+
 div.configure p, div.configure table  {
      text-align: justify;
+     margin: 10px 0;
 }
 
 div.main ul {
-     margin-right: 20px;
+     margin: 0 20px 0 40px;
 }
 
 div.configure textarea {
@@ -31,20 +39,23 @@ div.configure input {
 }
 
 div.configure table {
-     width: 550px !important;
-     text-align: center;
+     width: auto !important;
+     text-align: left !important;
 }
 
 h1 {
-     padding: 15px 10px 16px 10px !important;
-     margin: 0 0px 0 17	5px !important;
-     background-color: #bbf !important; /* background page color to fix overflow issue */
+     padding: 20px 10px 21px 10px !important;
+     margin: 0 0 0 195px !important;
      color: #001;
+     border: 1px solid #89f !important;
+     border-left: 1px solid #89f !important;
 }
 
+
 h2 {
-     padding-top: 0;
+     padding: 10px !important;
      text-align: left !important;
+     margin: 0 0 15px 0 !important;
 }
 
 h3 {
@@ -66,13 +77,23 @@ div.messages {
      margin: -10px -15px 0px -15px;
 }
 
-div.main, div.news {
-     margin: -5px 0px 10px 185px;
-     border: 5px solid #bbf;
+div.main {
+     margin: -5px 0px 10px 197px;
+     border: 1px solid #89f !important;
 }
 
 div.main hr, div.news hr {
-     margin: 0;	
+     margin: 0 10px !important;
+}
+
+div.news {
+     margin-left: 197px !important;
+     border-left: 1px solid #89f !important;
+}
+
+div.news hr {
+     height: 1px !important;
+     color: #ffffc0 !important; /* fixes immovable hr issue by making it invisible */
 }
 
 div.main {
@@ -81,7 +102,7 @@ div.main {
 
 div.news {
      border-left: 5px solid #bbf;
-     margin: -5px 0px 0 185px;
+     margin: -5px 0px 0 193px;
      padding-bottom: 8px;
 }
 
@@ -96,9 +117,11 @@ div.news hr {
 div.routersummary {
      color: #001;
      padding-left: 0px;
-     border-left: 5px solid #bbf;
+/*     border-left: 1px solid #bbf; */
      text-align: center !important;
      overflow: hidden; /* prevents IE from borking the sidepanel */
+     width: 195px !important;
+     padding-bottom: 20px !important;
 }
 
 div.routersummary submit {
@@ -111,12 +134,11 @@ div.routersummary input[type=text] {
 }
 
 div.routersummary hr {
-     color: #eef;
-     background: #eef;
-     height: 2px;
-     border-bottom: 1px solid #eef;
-     margin: 8px 1px 7px 1px;
-     -moz-box-shadow: inset 0px 1px 1px 1px #99f;
+     color: #89f;
+     background: #89f;
+     height: 1px;
+     border-bottom: 1px solid #89f;
+     margin: 8px -2px 7px -1px;
 }
 
 div.routersummary h3 {
@@ -125,7 +147,7 @@ div.routersummary h3 {
      font-size: 9pt;
      letter-spacing: 0.05em;
      margin: -14px 0px -15px 1px;
-     padding: 5px 0px 5px 0px;
+     padding: 1px 0px 1px 0px;
      background: #c5d5fb;
      text-transform: uppercase;
 }
@@ -136,31 +158,33 @@ div.routersummary h4 {
      font-size: 8.5pt;
      letter-spacing: 0.05em;
      margin: -14px 0px -15px 1px !important;
-     padding: 2px 3px 3px 3px;
+     padding: 7px 3px 5px 3px;
      background: #c1d1f7;
      text-transform: capitalize;
      text-decoration: none !important;
      color: #2b2;
      text-align: center !important;
+     line-height: 135%;
 }
 
 div.routersummary table {
      border: 0;
      text-align: center !important;
-     margin: -5px 5px;
-     width: 175px !important;
+     margin: -5px 5px !important;
+     width: 192px !important;
      overflow: hidden;
      font-size: 8pt;
      padding: 0px -10px;
      background-image: none !important;
      background-color: transparent !important;
-     text-align: center !important;
 }
 
-div.routersummary tr {
+div.routersummary tr, div.routersummary td {
      background-image: none !important;
      background-color: transparent !important;
      border: 0 !important;
+     line-height: 120% !important;
+     padding: 0 1px !important;
 }
 
 div.routersummary form {
@@ -173,19 +197,11 @@ div.routersummary p {
      padding: 0;
 }     
 
-/*
-div.routersummary img {
-     margin: 5px -10px -5px -10px;
-     overflow: hidden;
-}     
-*/
-
 div.routersummary a:link, div.routersummary a:visited {
-     text-shadow: 0px 0px 1px rgba(0, 0, 32, 0.3);
+     line-height: 120%;
 }
 
 div.routersummary a:hover {
-     text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.7);
      color: #f60;
 }
 
@@ -195,18 +211,12 @@ div.routersummary td {
      border: 0 !important;
 }
 
-div.routersummary tr:nth-child(even) {
-     background-color: #f60;
-     background-image: none !important;
-}
-
-div.routersummarytr:nth-child(odd) {
-     background-color: #f00;
-     background-image: none !important;
+div.routersummary form {
+     margin: -20px 0 !important;   
 }
 
 div.news li {
-     padding-top: 0px	0px !important;
+     padding-top: 0px !important;
      margin-bottom: -23px !important;
 }
 
@@ -220,7 +230,7 @@ div.warning {
 }
 
 .langbox {
-     margin: 22px -20px 0px 5px;
+     margin: 20px -18px 0px 5px;
 }
 
 td {
@@ -249,5 +259,9 @@ div.graphspanel img {
 }
 
 div.graphspanel hr {
-     margin: 20px 0;
+     margin: 20px 0 10px !important;
+}
+
+table {
+     width: 100% !important;
 }

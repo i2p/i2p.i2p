@@ -474,18 +474,18 @@ input[type=submit]:active {
      text-shadow: 0 !important;
 }
 
-input[type=image] {
+input[type=image], thead img {
      padding: 0 !important;
-     background: #000;
      -moz-border-radius: 0px;
      -khtml-border-radius: 0px;
      border-radius: 0px;
      border: medium none;
      margin: 0 2px;
+     opacity: 0.8;
 }
 
-input[type=image]:hover {
-     border: 1px outset #bbb;
+input[type=image]:hover, thead img:hover {
+     opacity: 1;
 }
 
 input[type=text]:active, input[type=text]:hover, input.r:hover {
