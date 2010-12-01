@@ -962,7 +962,7 @@ div.joblog li:first-child {
 }
 
 div.joblog li:last-child {
-     margin-bottom: -25px;
+/*     margin-bottom: -25px;*/
 }
 
 div.joblog form:first-child {
@@ -996,8 +996,8 @@ div.joblog p {
      border: 0;
      margin: 5px 5px 5px 10px;
      padding: 2px;
-overflow: hidden;
-position: relative;
+     overflow: hidden;
+     position: relative;
 }
 
 .optbox:hover {
@@ -1028,4 +1028,18 @@ position: relative;
 
 .formaction {
      text-align: right;
+}
+
+div.footnote {
+     text-align: right;
+     color: #494;
+     font-size: 7pt;
+}
+
+div.footnote hr{
+     margin: 10px 0 5px 0 !important;
+     color: #494;
+     background: #494;
+     height: 1px;
+     border: 0px solid #494;
 }
