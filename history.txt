@@ -1,3 +1,11 @@
+2010-12-01 dr|z3d
+    * Console: 
+      - Extensive reworking of ieshim.css for classic theme/Internet Explorer.
+      - Additional console_big.css files for other themes to enhance doublebyte glyph support.
+    * I2PSnark: 
+      - Make show/hide peers and stop/start all torrent buttons more obvious.
+      - Rework Vanilla icons to bring in line with color scheme.
+
 2010-11-30 zzz
     * I2CP: Try to hide Pipe closed messages (several tickets)
     * i2psnark: Move PeerCheckerTask from Timer to SimpleTimer2
@@ -10,7 +18,7 @@
     * Streaming: Change some logged errors to warnings
                  (tickets 76, 341 and others)
 
-20-11-29 dr|z3d
+2010-11-29 dr|z3d
     * Updated console theme "light".
 
 2010-11-29 zzz
