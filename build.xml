@@ -1061,7 +1061,7 @@
 			<copy file="installer/resources/start.ico" todir="pkg-temp/docs/" />
 			<copy file="installer/resources/console.ico" todir="pkg-temp/docs/" />
 			<!-- HTTP Header files, english only,
-				if you need a different lang do it in a sepreate target -->
+				if you need a different lang do it in a seperate target -->
 			<copy todir="pkg-temp/docs/" >
 				<fileset dir="installer/resources/proxy/"  includes="**-header.ht" />
 			</copy>
