@@ -22,8 +22,10 @@ import net.i2p.util.Log;
  * I2PSocketManager, it should not attempt to call I2PSession's setSessionListener
  * or receive any messages with its .receiveMessage
  *
+ * This is what I2PSocketManagerFactory.createManager() returns.
+ * Direct instantiation by others is deprecated.
  */
-class I2PSocketManagerFull implements I2PSocketManager {
+public class I2PSocketManagerFull implements I2PSocketManager {
     private I2PAppContext _context;
     private Log _log;
     private I2PSession _session;
