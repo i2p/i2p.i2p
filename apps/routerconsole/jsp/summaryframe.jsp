@@ -64,7 +64,12 @@
             // this will load in the iframe but subsequent pages will not have the iframe
             out.print("<input type=\"hidden\" name=\"refresh\" value=\"0\" >\n");
             out.print("<button type=\"submit\" value=\"Disable\" >");
-            out.print(intl._("Disable {0}s Refresh", d));
+            long refreshMS = 60*1000;
+            try {
+                refreshMS = 1000 * Long.parseLong(d);
+            } catch (NumberFormatException nfe) {}
+            String refreshTime = net.i2p.data.DataHelper.formatDuration2(refreshMS);
+            out.print(intl._("Disable {0} Refresh", refreshTime));
             out.print("</button></div>\n");
         }
         out.print("</form>\n");

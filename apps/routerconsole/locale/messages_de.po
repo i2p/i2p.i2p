@@ -5212,8 +5212,8 @@ msgstr "I2P-Router-Statistiken"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/summaryframe_jsp.java:244
 #, java-format
-msgid "Disable {0}s Refresh"
-msgstr "alle {0}s Auffrischen ausschalten"
+msgid "Disable {0} Refresh"
+msgstr "alle {0} Auffrischen ausschalten"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:105
 msgid "tunnel summary"

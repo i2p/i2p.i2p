@@ -1,4 +1,6 @@
 2010-12-02 zzz
+    * Console: Format console refresh time
+    * i2psnark: Fix extension messages
     * Streaming: Restore I2PSocketManagerFull as public
                  (broke jwebcahe ticket #345)
     * Transport: Hamachi address block 5/8 assigned by IANA

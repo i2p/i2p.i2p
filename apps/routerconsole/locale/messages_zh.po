@@ -5035,8 +5035,8 @@ msgstr "I2P 路由器统计数据"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/summaryframe_jsp.java:244
 #, java-format
-msgid "Disable {0}s Refresh"
-msgstr "停止 {0}秒 刷新"
+msgid "Disable {0} Refresh"
+msgstr "停止 {0} 刷新"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:105
 msgid "tunnel summary"
