@@ -66,6 +66,11 @@ public class Addresses {
             ia.isLoopbackAddress() ||
             ia.isMulticastAddress() ||
             ia.isSiteLocalAddress() ||
+            // Hamachi 5/8 allocated to RIPE (30 November 2010)
+            // Removed from TransportImpl.isPubliclyRoutable()
+            // Check moved to here, for now, but will eventually need to
+            // remove it from here also.
+            ia.getHostAddress().startsWith("5.") ||
             !(ia instanceof Inet4Address)) {
 //            System.err.println("Skipping: " + ia.getHostAddress());
             return;

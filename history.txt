@@ -1,3 +1,8 @@
+2010-12-02 zzz
+    * Streaming: Restore I2PSocketManagerFull as public
+                 (broke jwebcahe ticket #345)
+    * Transport: Hamachi address block 5/8 assigned by IANA
+
 2010-12-01 dr|z3d
     * Console: 
       - Extensive reworking of ieshim.css for classic theme/Internet Explorer.

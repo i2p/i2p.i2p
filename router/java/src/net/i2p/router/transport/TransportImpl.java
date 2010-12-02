@@ -583,7 +583,8 @@ public abstract class TransportImpl implements Transport {
             if ((addr[0]&0xFF) >= 224) return false; // no multicast
             if ((addr[0]&0xFF) == 0) return false;
             if ( ((addr[0]&0xFF) == 169) && ((addr[1]&0xFF) == 254) ) return false;
-            if ((addr[0]&0xFF) == 5) return false;  // Hamachi
+            // 5/8 allocated to RIPE (30 November 2010)
+            //if ((addr[0]&0xFF) == 5) return false;  // Hamachi
             return true; // or at least possible to be true
         } else if (addr.length == 16) {
             return false;
