@@ -493,7 +493,10 @@ class PeerState implements DataLoader
               Map map = bev.getMap();
               if (_log.shouldLog(Log.DEBUG))
                   _log.debug("Got extension handshake message " + bev.toString());
-          } catch (Exception e) {}
+          } catch (Exception e) {
+              if (_log.shouldLog(Log.DEBUG))
+                  _log.debug("Failed extension decode", e);
+          }
       } else {
           if (_log.shouldLog(Log.DEBUG))
               _log.debug("Got extended message type: " + id + " length: " + bs.length);

@@ -178,6 +178,7 @@ class PeerConnectionIn implements Runnable
                 ps.extensionMessage(id, payload);
                 if (_log.shouldLog(Log.DEBUG)) 
                     _log.debug("Received extension message from " + peer + " on " + peer.metainfo.getName());
+                break;
               default:
                 byte[] bs = new byte[i-1];
                 din.readFully(bs);
