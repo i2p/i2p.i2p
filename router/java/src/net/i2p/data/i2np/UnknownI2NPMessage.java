@@ -37,7 +37,6 @@ public class UnknownI2NPMessage extends I2NPMessageImpl {
     
     /** warning - only public for equals() */
     public byte[] getData() { 
-        verifyUnwritten();
         return _data; 
     }
 
@@ -62,7 +61,6 @@ public class UnknownI2NPMessage extends I2NPMessageImpl {
 
     /** write the message body to the output array, starting at the given index */
     protected int writeMessageBody(byte out[], int curIndex) {
-        verifyUnwritten();
         if (_data == null) {
             out[curIndex++] = 0x0;
             out[curIndex++] = 0x0;
@@ -76,12 +74,6 @@ public class UnknownI2NPMessage extends I2NPMessageImpl {
             curIndex += _data.length;
         }
         return curIndex;
-    }
-    
-    @Override
-    protected void written() {
-        super.written();
-        _data = null;
     }
     
     /** @return 0-255 */

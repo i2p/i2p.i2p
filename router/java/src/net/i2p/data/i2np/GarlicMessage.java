@@ -29,11 +29,9 @@ public class GarlicMessage extends I2NPMessageImpl {
     }
     
     public byte[] getData() { 
-        verifyUnwritten();
         return _data; 
     }
     public void setData(byte[] data) { 
-        verifyUnwritten();
         _data = data; 
     }
     
@@ -50,12 +48,10 @@ public class GarlicMessage extends I2NPMessageImpl {
     
     /** calculate the message body's length (not including the header and footer */
     protected int calculateWrittenLength() {
-        verifyUnwritten();
         return 4 + _data.length;
     }
     /** write the message body to the output array, starting at the given index */
     protected int writeMessageBody(byte out[], int curIndex) throws I2NPMessageException {
-        verifyUnwritten();
         byte len[] = DataHelper.toLong(4, _data.length);
         System.arraycopy(len, 0, out, curIndex, 4);
         curIndex += 4;
@@ -69,12 +65,6 @@ public class GarlicMessage extends I2NPMessageImpl {
     @Override
     public int hashCode() {
         return DataHelper.hashCode(getData());
-    }
-    
-    @Override
-    protected void written() {
-        super.written();
-        _data = null;
     }
     
     @Override
