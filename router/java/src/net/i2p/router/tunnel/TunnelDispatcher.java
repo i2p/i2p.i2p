@@ -490,7 +490,8 @@ public class TunnelDispatcher implements Service {
         } else {
             _context.messageHistory().droppedTunnelGatewayMessageUnknown(msg.getUniqueId(), outboundTunnel.getTunnelId());
 
-            int level = (_context.router().getUptime() > 10*60*1000 ? Log.ERROR : Log.WARN);
+            //int level = (_context.router().getUptime() > 10*60*1000 ? Log.ERROR : Log.WARN);
+            int level = Log.WARN;
             if (_log.shouldLog(level))
                 _log.log(level, "no matching outbound tunnel for id=" + outboundTunnel
                            + ": existing = " + _outboundGateways.size(), new Exception("src"));
