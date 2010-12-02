@@ -27,16 +27,13 @@ public class DataMessage extends I2NPMessageImpl {
     }
     
     public byte[] getData() { 
-        verifyUnwritten();
         return _data; 
     }
     public void setData(byte[] data) { 
-        verifyUnwritten();
         _data = data; 
     }
     
     public int getSize() { 
-        verifyUnwritten();
         return _data.length;
     }
     
@@ -60,7 +57,6 @@ public class DataMessage extends I2NPMessageImpl {
     }
     /** write the message body to the output array, starting at the given index */
     protected int writeMessageBody(byte out[], int curIndex) {
-        verifyUnwritten();
         if (_data == null) {
             out[curIndex++] = 0x0;
             out[curIndex++] = 0x0;
@@ -74,12 +70,6 @@ public class DataMessage extends I2NPMessageImpl {
             curIndex += _data.length;
         }
         return curIndex;
-    }
-    
-    @Override
-    protected void written() {
-        super.written();
-        _data = null;
     }
     
     public int getType() { return MESSAGE_TYPE; }

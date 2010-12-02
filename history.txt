@@ -1,5 +1,7 @@
 2010-12-02 zzz
     * Console: Format console refresh time
+    * I2NP: Allow message to be written more than once,
+            instead of throwing an IllegalStateException
     * i2psnark: Fix extension messages
     * Streaming: Restore I2PSocketManagerFull as public
                  (broke jwebcahe ticket #345)
