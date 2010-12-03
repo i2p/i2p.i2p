@@ -14,9 +14,21 @@ div.routersummary h3, div.routersummary h4, div.routersummary p, div.routersumma
      text-shadow: 0 0 0 #fff !important;
 }
 
+
+div.routersummary h4 {
+     font-size: 11pt;
+     letter-spacing: 0.1em;
+}
 div.routersummary b {
      font-size: 9pt;
      font-weight: normal !important;
+}
+
+div.routersummary a {
+     word-spacing: 0.2em !important;
+     letter-spacing: 0.1em !important;
+     font-size: 10.5pt;
+     line-height: 150%;
 }
 
 h1, h2,h3,h4 {
@@ -25,7 +37,7 @@ h1, h2,h3,h4 {
      word-spacing: 0.1em;
 }
 
-b, a, input, button, submit , i{
+b, a, input, button, submit, i, th, thead, tfoot{
      font-weight: normal !important;
      font-style: normal !important;
 }
@@ -45,9 +57,6 @@ div.news {
 
 input, input:visited {
      font-size: 10pt !Important;
-}
-div.routersummary a {
-     font-size: 10pt;
 }
 
 .smallhead {
