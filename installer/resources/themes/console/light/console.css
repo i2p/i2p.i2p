@@ -92,7 +92,7 @@ div.routersummaryouter {
 div.routersummary {
 /*  margin: 0px 20px 20px 0px; */
      width: 180px;
-     padding: 6px 8px 10px 8px;
+     padding: 10px 8px 10px 8px;
      text-align: center !important;
      border: 1px solid #447;
      background: #ccddf6);
@@ -208,7 +208,13 @@ div.tunnels td:last-child {
 }
 
 div.routersummary img:first-child {
-     margin-bottom: -5px !important;
+     margin-bottom: 0px !important;
+     opacity: 0.8;
+}
+
+div.routersummary img:hover:first-child {
+     margin-bottom: 0px !important;
+     opacity: 1;
 }
 
 div.tunnels {
