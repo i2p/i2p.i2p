@@ -3,12 +3,12 @@
 /* Author: dr|z3d */
 
 body {
-     margin: 15px 0 0 15px;
-     padding: 0em;
+     margin: 10px 0px 0 10px;
      text-align: center;
      background: #eef url('images/snowcamo.png');
      color: #000;
      font: 9pt/130% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     background: #99f url('images/magic.png') center bottom;
 }
 
 .hide {
@@ -103,7 +103,7 @@ div.routersummary {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      background: #eef;
-/* 
+     background: #fff url('images/magic.png') center bottom;/* 
      float: left;
 */     
      -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
@@ -114,17 +114,21 @@ div.routersummary input[type=text] {
 }
 
 div.routersummary hr {
-     color: #eef;
-     background: #eef;
-     height: 2px;
-     border-bottom: 1px solid #eef;
+     color: #ddf;
+     background: ddf;
+     height: 1px;
+     border-bottom: 1px solid #ddf;
      margin: 8px -7px 7px -7px;
-     -moz-box-shadow: inset 0px 1px 1px 1px #ddf;
+     -moz-box-shadow: inset 0px 1px 1px 1px #bbf;
 }
 
 div routersummary hr:last-child {
      margin-top: 5px;
      margin-bottom: -5px !important;
+}
+
+div.routersummary hr:first-child {
+     margin-top: -5px !important;
 }
 
 div.routersummary h3 {
@@ -154,8 +158,8 @@ div.routersummary h4 {
      border-bottom: 0 !important;
      font-size: 8.5pt;
      letter-spacing: 0.02em;
-     margin: -7px -7px -7px -7px !important;
-     padding: 0px 3px 1px 3px;
+     margin: -7px -7px -8px -7px !important;
+     padding: 3px 3px 5px 3px;
      background: #eef;
      text-transform: capitalize;
      text-decoration: none !important;
@@ -265,7 +269,7 @@ div.warning {
 /* console error messages */
 
 div.sorry {
-     margin: 5px 15px 10px 215px;
+     margin: 5px 10px 10px 210px;
      padding: 20px 20px 20px 75px;
      background: #eef;
      border: 1px solid #447;
@@ -291,7 +295,7 @@ div.sorry hr {
 }     
 
 div.main {
-     margin: 15px 15px 20px 215px;
+     margin: 10px 10px 20px 210px;
      padding: 0 15px 15px 15px;
      background: #eef;
      text-align: left;
@@ -303,7 +307,7 @@ div.main {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
-}
+     background: #fff url('images/magic.png') center bottom;}
 
 div.main hr, hr {
      color: #447;
@@ -324,7 +328,7 @@ div.main textarea {
 }
 
 div.news {
-     margin: 0px 15px 10px 215px;
+     margin: 0px 10px 5px 210px;
      padding: 10px 25px 7px 25px;
      border: 1px solid #447;
      color: #224;
@@ -334,10 +338,9 @@ div.news {
      text-align: right !important;
      font-size: 7.5pt;
      line-height: 140%;
-     background: #eef; /*url('images/sandtile.png');*/
+     background: #def; /*url('images/sandtile.png');*/
      -moz-box-shadow: inset 0px 0px 1px 0px #410;
-     background: #eef; /*url("images/bg2.png")no-repeat scroll bottom right;*/
-}
+     background: #eff url('images/magic.png') center bottom;}
 
 div.news p {
      font-size: 8.5pt;
@@ -364,10 +367,10 @@ div.news a:active{
 */
 
 div.news hr{
-     color: #447;
-     background: #447;
+     color: #bbf;
+     background: #bbf;
      height: 1px;
-     border: 0px solid #447;
+     border: 0px dotted #bbf;
      margin: 10px 0 5px;
 }
 
@@ -701,7 +704,7 @@ h1 {
      text-align: left;
      color: #002;
      padding: 10px 15px;
-     margin: 0 15px 15px 215px;
+     margin: 0 10px 10px 210px;
      font: normal bold 16pt/120% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      letter-spacing: 0.15em;
      text-transform: uppercase;
