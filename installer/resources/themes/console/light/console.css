@@ -8,7 +8,7 @@ body {
      background: #eef url('images/snowcamo.png');
      color: #000;
      font: 10pt/130% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
-     background: #99f url('images/magic.png') center bottom;
+     background: #99f url('images/itile.png') center bottom;
 }
 
 .hide {
@@ -500,7 +500,7 @@ div.messages {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      border: 1px solid #447;
-     background: #eef; /*url('images/lightbluetile.png');*/
+     background: #ffe url('images/magic.png');
      font-weight: bold;
      -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
 }
