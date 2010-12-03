@@ -755,6 +755,10 @@ h2 a:hover {
      padding-bottom: 5px;
 }
 
+h2 img {
+     opacity: 0.9 !important;
+}
+
 h3 {
      border: 1px solid #113;
      border-left: 5px solid #113;
@@ -769,6 +773,7 @@ h3 {
      font-size: 11pt;
      color: #000;
      -moz-box-shadow: 0px 1px 1px 1px #ccf;
+     opacity: 0.9;
 }
 
 h4 {
@@ -827,10 +832,11 @@ button:active{
      text-align: right;
      float: right;
      valign: middle;
+     opacity: 1 !important;
 }
 
 .langbox img {
-     opacity: 0.8;
+     opacity: 0.9 !important;
      -moz-box-shadow: 0 0 1px #447;
 }
 
