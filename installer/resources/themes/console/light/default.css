@@ -262,15 +262,15 @@ hr {
 }
 
 #globalOperationsPanel {
-     background-color: #ddf;
+     background-color: #fff;
      border: 1px solid #003;
      padding: 5px 20px 11px 10px;
-     background: url(images/lightbluetile.png);
+
      -moz-box-shadow: inset 0px 0px 0px 1px #f00;
-     -moz-box-shadow: inset 0px 0px 1px 0px #002;
-    background: none repeat scroll 0 0 #EEEEFF;
-    border: 1px solid #444477;
-    color: #000011;
+     -moz-box-shadow: inset 0px 0px 1px 0px #f60;
+     background: #fff url(images/magic.png);
+     border: 1px solid #444477;
+     color: #000011;
 
 }
 

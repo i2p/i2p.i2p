@@ -136,6 +136,7 @@ div.routersummary h3 {
      background: #ddf url('images/header_on.png') center center repeat-x;
      border: 1px solid #99f !important;
      -moz-border-radius: 3px;
+     -moz-box-shadow: 0px 1px 5px #bbf;
 }
 
 div.routersummary h3 a {
@@ -724,19 +725,19 @@ h1 {
 }
 
 h2 {
-     font-size: 12pt;
-     color: #001;
+     font-size: 13pt;
+     color: #000;
      letter-spacing: 0.05em;
      background: #ddf url('images/header.png') center center repeat-x;
      text-shadow: 0px 0px 1px rgba(0, 0, 64, 0.5);
      padding: 10px 10px;
      wordwrap: none;
-     border: 1px solid #447;
+     border: 1px solid #117;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      margin: 15px 0px 12px 0 !important;
-     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
+     -moz-box-shadow: 0px 1px 1px 1px #99f;
      word-wrap: break-word;
      text-transform: uppercase;
 }
@@ -748,8 +749,8 @@ h2 a:hover {
 }
 
 h3 {
-     border: 1px solid #447;
-     border-left: 5px solid #447;
+     border: 1px solid #113;
+     border-left: 5px solid #113;
      padding: 5px 5px 5px 5px;
      margin: 12px 0 12px 0;
      border-radius: 0 4px 4px 0;
@@ -758,6 +759,9 @@ h3 {
      background: #ddf url('images/header.png') center center repeat-x !important;
      text-transform: uppercase;
      text-shadow: 0px 0px 1px #77f;
+     font-size: 11pt;
+     color: #000;
+     -moz-box-shadow: 0px 1px 1px 1px #99f;
 }
 
 h4 {
