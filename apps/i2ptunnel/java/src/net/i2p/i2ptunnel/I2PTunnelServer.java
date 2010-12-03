@@ -30,8 +30,7 @@ import net.i2p.util.Log;
 
 public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
 
-    private final static Log _log = new Log(I2PTunnelServer.class);
-
+    protected final Log _log;
     protected I2PSocketManager sockMgr;
     protected I2PServerSocket i2pss;
 
@@ -67,6 +66,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
      */
     public I2PTunnelServer(InetAddress host, int port, String privData, Logging l, EventDispatcher notifyThis, I2PTunnel tunnel) {
         super("Server at " + host + ':' + port, notifyThis, tunnel);
+        _log = tunnel.getContext().logManager().getLog(getClass());
         ByteArrayInputStream bais = new ByteArrayInputStream(Base64.decode(privData));
         SetUsePool(tunnel);
         init(host, port, bais, privData, l);
@@ -79,6 +79,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     public I2PTunnelServer(InetAddress host, int port, File privkey, String privkeyname, Logging l,
                            EventDispatcher notifyThis, I2PTunnel tunnel) {
         super("Server at " + host + ':' + port, notifyThis, tunnel);
+        _log = tunnel.getContext().logManager().getLog(getClass());
         SetUsePool(tunnel);
         FileInputStream fis = null;
         try {
@@ -99,6 +100,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
      */
     public I2PTunnelServer(InetAddress host, int port, InputStream privData, String privkeyname, Logging l,  EventDispatcher notifyThis, I2PTunnel tunnel) {
         super("Server at " + host + ':' + port, notifyThis, tunnel);
+        _log = tunnel.getContext().logManager().getLog(getClass());
         SetUsePool(tunnel);
         init(host, port, privData, privkeyname, l);
     }

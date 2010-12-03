@@ -58,7 +58,6 @@ import net.i2p.util.Log;
  * @author zzz a stripped-down I2PTunnelHTTPClient
  */
 public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements Runnable {
-    private static final Log _log = new Log(I2PTunnelConnectClient.class);
 
     private final static byte[] ERR_DESTINATION_UNKNOWN =
         ("HTTP/1.1 503 Service Unavailable\r\n"+
@@ -340,8 +339,8 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
             _requestId = id;
         }
         public void run() {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Timeout occured requesting " + _target);
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("Timeout occured requesting " + _target);
             handleConnectClientException(new RuntimeException("Timeout"), _out, 
                                       _target, _usingProxy, _wwwProxy, _requestId);
             closeSocket(_socket);

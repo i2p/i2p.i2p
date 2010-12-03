@@ -34,9 +34,9 @@ import net.i2p.util.SimpleTimer;
 
 public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runnable {
 
-    private static final Log _log = new Log(I2PTunnelClientBase.class);
-    protected I2PAppContext _context;
-    protected Logging l;
+    protected final Log _log;
+    protected final I2PAppContext _context;
+    protected final Logging l;
 
     static final long DEFAULT_CONNECT_TIMEOUT = 60 * 1000;
 
@@ -109,6 +109,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         _context.statManager().createRateStat("i2ptunnel.client.closeNoBacklog", "How many pending sockets remain when it was removed prior to backlog timeout?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("i2ptunnel.client.manageTime", "How long it takes to accept a socket and fire it into an i2ptunnel runner (or queue it for the pool)?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("i2ptunnel.client.buildRunTime", "How long it takes to run a queued socket into an i2ptunnel runner?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _log = _context.logManager().getLog(getClass());
 
         Thread t = new I2PAppThread(this);
         t.setName("Client " + _clientId);
@@ -163,6 +164,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         _context.statManager().createRateStat("i2ptunnel.client.closeNoBacklog", "How many pending sockets remain when it was removed prior to backlog timeout?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("i2ptunnel.client.manageTime", "How long it takes to accept a socket and fire it into an i2ptunnel runner (or queue it for the pool)?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("i2ptunnel.client.buildRunTime", "How long it takes to run a queued socket into an i2ptunnel runner?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
+        _log = _context.logManager().getLog(getClass());
 
         // normalize path so we can find it
         if (pkf != null) {
@@ -321,6 +323,8 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
      *                                  badly that we cant create a socketManager
      */
     protected static synchronized I2PSocketManager getSocketManager(I2PTunnel tunnel, String pkf) {
+        // shadows instance _log
+        Log _log = tunnel.getContext().logManager().getLog(I2PTunnelClientBase.class);
         if (socketManager != null) {
             I2PSession s = socketManager.getSession();
             if ( (s == null) || (s.isClosed()) ) {
@@ -378,6 +382,8 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
      *                                  badly that we cant create a socketManager
      */
     protected static I2PSocketManager buildSocketManager(I2PTunnel tunnel, String pkf, Logging log) {
+        // shadows instance _log
+        Log _log = tunnel.getContext().logManager().getLog(I2PTunnelClientBase.class);
         Properties props = new Properties();
         props.putAll(tunnel.getClientOptions());
         int portNum = 7654;
@@ -696,7 +702,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         try {
             s.close();
         } catch (IOException ex) {
-            _log.error("Could not close socket", ex);
+            //_log.error("Could not close socket", ex);
         }
     }
     

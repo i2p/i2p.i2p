@@ -30,7 +30,7 @@ import net.i2p.data.Base32;
  *
  */
 public class I2PTunnelHTTPServer extends I2PTunnelServer {
-    private final static Log _log = new Log(I2PTunnelHTTPServer.class);
+
     /** what Host: should we seem to be to the webserver? */
     private String _spoofHost;
     private static final String HASH_HEADER = "X-I2P-DestHash";
@@ -118,7 +118,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 useGZIP = true;
             
             if (allowGZIP && useGZIP) {
-                I2PAppThread req = new I2PAppThread(new CompressedRequestor(s, socket, modifiedHeader), Thread.currentThread().getName()+".hc");
+                I2PAppThread req = new I2PAppThread(new CompressedRequestor(s, socket, modifiedHeader, _log), Thread.currentThread().getName()+".hc");
                 req.start();
             } else {
                 new I2PTunnelRunner(s, socket, slock, null, modifiedHeader.getBytes(), null);
@@ -152,14 +152,19 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     }
     
     private static class CompressedRequestor implements Runnable {
-        private Socket _webserver;
-        private I2PSocket _browser;
-        private String _headers;
-        public CompressedRequestor(Socket webserver, I2PSocket browser, String headers) {
+        private final Socket _webserver;
+        private final I2PSocket _browser;
+        private final String _headers;
+        // shadows _log in super()
+        private final Log _log;
+
+        public CompressedRequestor(Socket webserver, I2PSocket browser, String headers, Log log) {
             _webserver = webserver;
             _browser = browser;
             _headers = headers;
+            _log = log;
         }
+
         public void run() {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Compressed requestor running");
@@ -174,7 +179,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                     _log.info("request headers: " + _headers);
                 serverout.write(_headers.getBytes());
                 browserin = _browser.getInputStream();
-                I2PAppThread sender = new I2PAppThread(new Sender(serverout, browserin, "server: browser to server"), Thread.currentThread().getName() + "hcs");
+                I2PAppThread sender = new I2PAppThread(new Sender(serverout, browserin, "server: browser to server", _log), Thread.currentThread().getName() + "hcs");
                 sender.start();
                 
                 browserout = _browser.getOutputStream();
@@ -197,7 +202,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                     throw new IOException("getInputStream NPE");
                 }
                 CompressedResponseOutputStream compressedOut = new CompressedResponseOutputStream(browserout);
-                Sender s = new Sender(compressedOut, serverin, "server: server to browser");
+                Sender s = new Sender(compressedOut, serverin, "server: server to browser", _log);
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Before pumping the compressed response");
                 s.run(); // same thread
@@ -216,14 +221,19 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     }
 
     private static class Sender implements Runnable {
-        private OutputStream _out;
-        private InputStream _in;
-        private String _name;
-        public Sender(OutputStream out, InputStream in, String name) {
+        private final OutputStream _out;
+        private final InputStream _in;
+        private final String _name;
+        // shadows _log in super()
+        private final Log _log;
+
+        public Sender(OutputStream out, InputStream in, String name, Log log) {
             _out = out;
             _in = in;
             _name = name;
+            _log = log;
         }
+
         public void run() {
             if (_log.shouldLog(Log.INFO))
                 _log.info(_name + ": Begin sending");
@@ -260,16 +270,16 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         protected boolean shouldCompress() { return true; }
         @Override
         protected void finishHeaders() throws IOException {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Including x-i2p-gzip as the content encoding in the response");
+            //if (_log.shouldLog(Log.INFO))
+            //    _log.info("Including x-i2p-gzip as the content encoding in the response");
             out.write("Content-encoding: x-i2p-gzip\r\n".getBytes());
             super.finishHeaders();
         }
 
         @Override
         protected void beginProcessing() throws IOException {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Beginning compression processing");
+            //if (_log.shouldLog(Log.INFO))
+            //    _log.info("Beginning compression processing");
             //out.flush();
             _gzipOut = new InternalGZIPOutputStream(out);
             out = _gzipOut;

@@ -11,7 +11,6 @@ import net.i2p.util.EventDispatcher;
 import net.i2p.util.Log;
 
 public class I2PTunnelHTTPBidirServer extends I2PTunnelHTTPServer {
-    private final static Log log = new Log(I2PTunnelHTTPBidirServer.class);
 
     public I2PTunnelHTTPBidirServer(InetAddress host, int port, int proxyport, String privData, String spoofHost, Logging l, EventDispatcher notifyThis, I2PTunnel tunnel) {
         super(host, port, privData, spoofHost, l, notifyThis, tunnel);

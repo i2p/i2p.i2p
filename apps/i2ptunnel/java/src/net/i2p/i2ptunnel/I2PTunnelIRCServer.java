@@ -62,9 +62,6 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
     public static final String PROP_HOSTNAME="ircserver.fakeHostname";
     public static final String PROP_HOSTNAME_DEFAULT="%f.b32.i2p";
     
-    private static final Log _log = new Log(I2PTunnelIRCServer.class);
-    
-    
     /**
      * @throws IllegalArgumentException if the I2PTunnel does not contain
      *                                  valid config to contact the router
@@ -181,8 +178,8 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
             if (++lineCount > 10)
                 throw new IOException("Too many lines before USER or SERVER, giving up");
             s = s.trim();
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Got line: " + s);
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("Got line: " + s);
 
             String field[]=s.split(" ",5);
             String command;
@@ -214,8 +211,8 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
             if ("SERVER".equalsIgnoreCase(command))
                 break;
         }
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("All done, sending: " + buf.toString());
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("All done, sending: " + buf.toString());
         return buf.toString();
     }
     

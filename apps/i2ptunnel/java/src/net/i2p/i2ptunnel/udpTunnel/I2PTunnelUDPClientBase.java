@@ -45,7 +45,6 @@ import net.i2p.util.Log;
      */
  public abstract class I2PTunnelUDPClientBase extends I2PTunnelTask implements Source, Sink {
 
-    private static final Log _log = new Log(I2PTunnelUDPClientBase.class);
     protected I2PAppContext _context;
     protected Logging l;
 

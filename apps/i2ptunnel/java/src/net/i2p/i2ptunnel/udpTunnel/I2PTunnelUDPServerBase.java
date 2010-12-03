@@ -46,7 +46,7 @@ import net.i2p.util.Log;
 
 public class I2PTunnelUDPServerBase extends I2PTunnelTask implements Source, Sink {
 
-    private final static Log _log = new Log(I2PTunnelUDPServerBase.class);
+    private final Log _log;
 
     private final Object lock = new Object();
     protected Object slock = new Object();
@@ -73,6 +73,7 @@ public class I2PTunnelUDPServerBase extends I2PTunnelTask implements Source, Sin
     public I2PTunnelUDPServerBase(boolean verify, File privkey, String privkeyname, Logging l,
                            EventDispatcher notifyThis, I2PTunnel tunnel) {
         super("UDPServer <- " + privkeyname, notifyThis, tunnel);
+        _log = tunnel.getContext().logManager().getLog(I2PTunnelUDPServerBase.class);
         FileInputStream fis = null;
         try {
             fis = new FileInputStream(privkey);
