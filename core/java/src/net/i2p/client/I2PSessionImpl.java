@@ -68,9 +68,9 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /** currently granted lease set, or null */
     private LeaseSet _leaseSet;
 
-    /** hostname of router */
+    /** hostname of router - will be null if in RouterContext */
     protected String _hostname;
-    /** port num to router */
+    /** port num to router - will be 0 if in RouterContext */
     protected int _portNum;
     /** socket for comm */
     protected Socket _socket;
@@ -181,15 +181,17 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     protected void loadConfig(Properties options) {
         _options = new Properties();
         _options.putAll(filter(options));
-        _hostname = _options.getProperty(I2PClient.PROP_TCP_HOST, "127.0.0.1");
-        String portNum = _options.getProperty(I2PClient.PROP_TCP_PORT, LISTEN_PORT + "");
-        try {
-            _portNum = Integer.parseInt(portNum);
-        } catch (NumberFormatException nfe) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn(getPrefix() + "Invalid port number specified, defaulting to "
-                          + LISTEN_PORT, nfe);
-            _portNum = LISTEN_PORT;
+        if (!_context.isRouterContext()) {
+            _hostname = _options.getProperty(I2PClient.PROP_TCP_HOST, "127.0.0.1");
+            String portNum = _options.getProperty(I2PClient.PROP_TCP_PORT, LISTEN_PORT + "");
+            try {
+                _portNum = Integer.parseInt(portNum);
+            } catch (NumberFormatException nfe) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn(getPrefix() + "Invalid port number specified, defaulting to "
+                              + LISTEN_PORT, nfe);
+                _portNum = LISTEN_PORT;
+            }
         }
 
         // auto-add auth if required, not set in the options, and we are in the same JVM
