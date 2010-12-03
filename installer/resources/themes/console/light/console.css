@@ -397,7 +397,7 @@ div.news li {
      -moz-border-radius: 0 4px 4px 0;
      -khtml-border-radius: 0 4px 4px 0;
      font-size: 10pt;
-     opacity: 1;
+     opacity: 0.8;
      background: #fff url('images/header.png') center center repeat-x;
      -moz-box-shadow: 0px 1px 1px 1px #ccf;
 }
