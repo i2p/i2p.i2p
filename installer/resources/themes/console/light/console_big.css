@@ -1,0 +1,59 @@
+/* I2P Theme Override: Light */
+/* Comment: Larger text & other optimizations for Chinese & other doublebyte charactersets */
+/* Author: dr|z3d */
+
+div.routersummary table {
+    font-size: 8.5pt;
+}
+
+div.routersummary a {
+    font-size: 10pt;
+}
+
+div.routersummary h3, div.routersummary h4, div.routersummary p, div.routersummary h3 a, div.routersummary a {
+     text-shadow: 0 0 0 #fff !important;
+}
+
+div.routersummary b {
+     font-size: 9pt;
+     font-weight: normal !important;
+}
+
+h1, h2,h3,h4 {
+     font-weight: normal !important;
+     text-shadow: 0 0 0;
+     word-spacing: 0.1em;
+}
+
+b, a, input, button, submit , i{
+     font-weight: normal !important;
+     font-style: normal !important;
+}
+
+button, button:visited {
+    font-size: 10.5pt;
+    font-family: Verdana, "Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
+}
+
+b {
+     color: #505;
+}
+
+div.news {
+     font-size: 9pt;
+}
+
+input, input:visited {
+     font-size: 10pt !Important;
+}
+div.routersummary a {
+     font-size: 10pt;
+}
+
+.smallhead {
+     font-size: 8.5pt
+}
+
+table {
+     font: 8.5pt/130% Verdana, "Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
+}
