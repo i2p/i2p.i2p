@@ -61,6 +61,7 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
 	public static final String PROP_WEBIRC_SPOOF_IP_DEFAULT="127.0.0.1";
     public static final String PROP_HOSTNAME="ircserver.fakeHostname";
     public static final String PROP_HOSTNAME_DEFAULT="%f.b32.i2p";
+    private static final long HEADER_TIMEOUT = 60*1000;
     
     /**
      * @throws IllegalArgumentException if the I2PTunnel does not contain
@@ -105,8 +106,9 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
         try {
 			String modifiedRegistration;
 			if(!this.method.equals("webirc")) {
-				// give them 15 seconds to send in the request
-				socket.setReadTimeout(15*1000);
+				// The headers _should_ be in the first packet, but
+				// may not be, depending on the client-side options
+				socket.setReadTimeout(HEADER_TIMEOUT);
 				InputStream in = socket.getInputStream();
 				modifiedRegistration = filterRegistration(in, cloakDest(socket.getPeerDestination()));
 				socket.setReadTimeout(readTimeout);

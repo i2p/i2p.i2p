@@ -36,6 +36,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     private static final String HASH_HEADER = "X-I2P-DestHash";
     private static final String DEST64_HEADER = "X-I2P-DestB64";
     private static final String DEST32_HEADER = "X-I2P-DestB32";
+    private static final long HEADER_TIMEOUT = 60*1000;
 
     private final static byte[] ERR_UNAVAILABLE =
         ("HTTP/1.1 503 Service Unavailable\r\n"+
@@ -82,8 +83,9 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         //local is fast, so synchronously. Does not need that many
         //threads.
         try {
-            // give them 5 seconds to send in the HTTP request
-            socket.setReadTimeout(5*1000);
+            // The headers _should_ be in the first packet, but
+            // may not be, depending on the client-side options
+            socket.setReadTimeout(HEADER_TIMEOUT);
 
             InputStream in = socket.getInputStream();
 
