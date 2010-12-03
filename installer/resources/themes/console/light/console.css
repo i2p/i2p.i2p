@@ -205,13 +205,13 @@ div.tunnels td:last-child {
      padding-right: 1px;
 }
 
-div.routersummary img:first-child {
+div.routersummary img:first-child  { 
      margin-bottom: -2px !important;
      opacity: 0.7;
 }
 
 div.routersummary img:hover:first-child {
-     margin-bottom: 0px !important;
+     margin-bottom: -2px !important;
      opacity: 1;
 }
 
