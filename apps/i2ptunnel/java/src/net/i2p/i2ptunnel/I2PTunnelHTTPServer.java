@@ -138,6 +138,13 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             } else {
                 new I2PTunnelRunner(s, socket, slock, null, modifiedHeader.getBytes(), null);
             }
+
+            long afterHandle = getTunnel().getContext().clock().now();
+            long timeToHandle = afterHandle - afterAccept;
+            getTunnel().getContext().statManager().addRateData("i2ptunnel.httpserver.blockingHandleTime", timeToHandle, 0);
+            if ( (timeToHandle > 1000) && (_log.shouldLog(Log.WARN)) )
+                _log.warn("Took a while to handle the request for " + remoteHost + ':' + remotePort +
+                          " [" + timeToHandle + ", socket create: " + (afterSocket-afterAccept) + "]");
         } catch (SocketException ex) {
             try {
                 // Send a 503, so the user doesn't get an HTTP Proxy error message
@@ -162,13 +169,6 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("OOM in HTTP server", oom);
         }
-
-        long afterHandle = getTunnel().getContext().clock().now();
-        long timeToHandle = afterHandle - afterAccept;
-        getTunnel().getContext().statManager().addRateData("i2ptunnel.httpserver.blockingHandleTime", timeToHandle, 0);
-        if ( (timeToHandle > 1000) && (_log.shouldLog(Log.WARN)) )
-            _log.warn("Took a while to handle the request for " + remoteHost + ':' + remotePort +
-                      " [" + timeToHandle + ", socket create: " + (afterSocket-afterAccept) + "]");
     }
     
     private static class CompressedRequestor implements Runnable {
