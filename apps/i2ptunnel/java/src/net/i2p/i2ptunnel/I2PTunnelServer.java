@@ -68,7 +68,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         super("Server at " + host + ':' + port, notifyThis, tunnel);
         _log = tunnel.getContext().logManager().getLog(getClass());
         ByteArrayInputStream bais = new ByteArrayInputStream(Base64.decode(privData));
-        SetUsePool(tunnel);
+        setUsePool(tunnel);
         init(host, port, bais, privData, l);
     }
 
@@ -80,7 +80,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                            EventDispatcher notifyThis, I2PTunnel tunnel) {
         super("Server at " + host + ':' + port, notifyThis, tunnel);
         _log = tunnel.getContext().logManager().getLog(getClass());
-        SetUsePool(tunnel);
+        setUsePool(tunnel);
         FileInputStream fis = null;
         try {
             fis = new FileInputStream(privkey);
@@ -101,13 +101,13 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     public I2PTunnelServer(InetAddress host, int port, InputStream privData, String privkeyname, Logging l,  EventDispatcher notifyThis, I2PTunnel tunnel) {
         super("Server at " + host + ':' + port, notifyThis, tunnel);
         _log = tunnel.getContext().logManager().getLog(getClass());
-        SetUsePool(tunnel);
+        setUsePool(tunnel);
         init(host, port, privData, privkeyname, l);
     }
 
 
-    private void SetUsePool(I2PTunnel Tunnel) {
-        String usePool = Tunnel.getClientOptions().getProperty("i2ptunnel.usePool");
+    private void setUsePool(I2PTunnel tunnel) {
+        String usePool = tunnel.getClientOptions().getProperty("i2ptunnel.usePool");
         if (usePool != null)
             _usePool = "true".equalsIgnoreCase(usePool);
         else
@@ -269,15 +269,14 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     }
     
     public void run() {
+        I2PServerSocket i2pS_S = sockMgr.getServerSocket();
         if (shouldUsePool()) {
-            I2PServerSocket i2pS_S = sockMgr.getServerSocket();
             int handlers = getHandlerCount();
             for (int i = 0; i < handlers; i++) {
                 I2PAppThread handler = new I2PAppThread(new Handler(i2pS_S), "Handle Server " + i);
                 handler.start();
             }
         } else {
-            I2PServerSocket i2pS_S = sockMgr.getServerSocket();
             while (true) {
                 try {
                     final I2PSocket i2ps = i2pS_S.accept();
@@ -340,17 +339,18 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         } catch (SocketException ex) {
             try {
                 socket.close();
-            } catch (IOException ioe) {
-                _log.error("Error while closing the received i2p con", ex);
-            }
+            } catch (IOException ioe) {}
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Error connecting to server " + remoteHost + ':' + remotePort, ex);
         } catch (IOException ex) {
             _log.error("Error while waiting for I2PConnections", ex);
         }
 
         long afterHandle = I2PAppContext.getGlobalContext().clock().now();
         long timeToHandle = afterHandle - afterAccept;
-        if (timeToHandle > 1000)
-            _log.warn("Took a while to handle the request [" + timeToHandle + ", socket create: " + (afterSocket-afterAccept) + "]");
+        if ( (timeToHandle > 1000) && (_log.shouldLog(Log.WARN)) )
+            _log.warn("Took a while to handle the request for " + remoteHost + ':' + remotePort +
+                      " [" + timeToHandle + ", socket create: " + (afterSocket-afterAccept) + "]");
     }
 }
 

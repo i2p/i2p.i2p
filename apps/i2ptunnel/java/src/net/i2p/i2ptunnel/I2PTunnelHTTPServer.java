@@ -37,6 +37,19 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     private static final String DEST64_HEADER = "X-I2P-DestB64";
     private static final String DEST32_HEADER = "X-I2P-DestB32";
 
+    private final static byte[] ERR_UNAVAILABLE =
+        ("HTTP/1.1 503 Service Unavailable\r\n"+
+         "Content-Type: text/html; charset=iso-8859-1\r\n"+
+         "Cache-control: no-cache\r\n"+
+         "Connection: close\r\n"+
+         "Proxy-Connection: close\r\n"+
+         "\r\n"+
+         "<html><head><title>503 Service Unavailable<title></head>\n"+
+         "<body><h2>503 Service Unavailable</h2>\n" +
+         "<p>This I2P eepsite is unavailable. It may be down or undergoing maintenance.</p>\n" +
+         "</body></html>")
+         .getBytes();
+
     public I2PTunnelHTTPServer(InetAddress host, int port, String privData, String spoofHost, Logging l, EventDispatcher notifyThis, I2PTunnel tunnel) {
         super(host, port, privData, l, notifyThis, tunnel);
         setupI2PTunnelHTTPServer(spoofHost);
@@ -125,11 +138,15 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             }
         } catch (SocketException ex) {
             try {
+                // Send a 503, so the user doesn't get an HTTP Proxy error message
+                // and blame his router or the network.
+                socket.getOutputStream().write(ERR_UNAVAILABLE);
+            } catch (IOException ioe) {}
+            try {
                 socket.close();
-            } catch (IOException ioe) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Error while closing the received i2p con", ex);
-            }
+            } catch (IOException ioe) {}
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Error connecting to HTTP server " + remoteHost + ':' + remotePort, ex);
         } catch (IOException ex) {
             try {
                 socket.close();
@@ -148,7 +165,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         long timeToHandle = afterHandle - afterAccept;
         getTunnel().getContext().statManager().addRateData("i2ptunnel.httpserver.blockingHandleTime", timeToHandle, 0);
         if ( (timeToHandle > 1000) && (_log.shouldLog(Log.WARN)) )
-            _log.warn("Took a while to handle the request [" + timeToHandle + ", socket create: " + (afterSocket-afterAccept) + "]");
+            _log.warn("Took a while to handle the request for " + remoteHost + ':' + remotePort +
+                      " [" + timeToHandle + ", socket create: " + (afterSocket-afterAccept) + "]");
     }
     
     private static class CompressedRequestor implements Runnable {

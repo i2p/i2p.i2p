@@ -123,12 +123,12 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
             Socket s = new Socket(remoteHost, remotePort);
             new I2PTunnelRunner(s, socket, slock, null, modifiedRegistration.getBytes(), null);
         } catch (SocketException ex) {
+            // TODO send the equivalent of a 503?
             try {
                 socket.close();
-            } catch (IOException ioe) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Error while closing the received i2p con", ex);
-            }
+            } catch (IOException ioe) {}
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Error connecting to IRC server " + remoteHost + ':' + remotePort, ex);
         } catch (IOException ex) {
             try {
                 socket.close();
