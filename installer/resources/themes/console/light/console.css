@@ -548,11 +548,11 @@ tr {
 }
 
 tr:nth-child(even) {
-     background: #eef; /*url('images/tabletile.png') !important;*/
+     background: #eef url(images/magic.png);
 }
 
 tr:nth-child(odd) {
-     background: #ddf; /*url('images/tabletile_alt.png') !important;*/
+     background: #ddf url(images/magic.png);
 }
 /*
 tr:last-child {
