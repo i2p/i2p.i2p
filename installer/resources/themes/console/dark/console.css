@@ -331,10 +331,9 @@ div.news {
      -khtml-border-radius: 4px 4px 0 0;
      font-size: 7.5pt;
      text-align: right;
-/*     -moz-box-shadow: inset 0px 0px 0px 0px #EE9;
-     -khtml-box-shadow: inset 0px 0px 1px 0px #EE9;
-     box-shadow: inset 0px 0px 1px 0px #EE9;*/
      -moz-box-shadow: 0 1px 5px #000;
+     -khtml-box-shadow: 0 1px 5px #000;
+     box-shadow: 0 1px 5px #000;
      min-width: 590px;
 }
 
@@ -663,6 +662,8 @@ h1 {
      line-height: 120%;
      min-width: 620px;
      -moz-box-shadow: 0 1px 5px #000;
+     -khtml-box-shadow: 0 1px 5px #000;
+     box-shadow: 0 1px 5px #000;
 }
 
 h2 {
