@@ -160,6 +160,7 @@ div.routersummary h4 {
      text-decoration: none !important;
      color: #2b2;
      line-height: 105%;
+     text-shadow: 0px 1px 1px #99f;
 }
 
 div.routersummary table {
@@ -372,11 +373,12 @@ div.news a:active{
 */
 
 div.news hr{
-     color: #bbf;
-     background: #bbf;
+     color: #77f;
+     background: #77f;
      height: 1px;
-     border: 0px dotted #bbf;
+     border: 0px dotted #77f;
      margin: 10px 0 5px;
+/*     -moz-box-shadow: 0px -1px 1px 1px #ddf;*/
 }
 
 div.news li {
@@ -384,8 +386,8 @@ div.news li {
      list-style: none;
      margin: 10px 0 20px 0 !important;
      vertical-align: bottom;
-     border: 1px solid #447;
-     border-left: 5px solid #447;
+     border: 1px solid #113;
+     border-left: 5px solid #113;
      padding: 4px 5px;
      border-radius: 0 4px 4px 0;
      -moz-border-radius: 0 4px 4px 0;
@@ -393,6 +395,7 @@ div.news li {
      font-size: 10pt;
      opacity: 1;
      background: #fff url('images/header.png') center center repeat-x;
+     -moz-box-shadow: 0px 1px 1px 1px #bbf;
 }
 
 /*
@@ -713,7 +716,7 @@ h1 {
      font: normal bold 16pt/120% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      letter-spacing: 0.15em;
      text-transform: uppercase;
-     text-shadow: 0px 0px 1px #77f;;
+     text-shadow: 0px 0px 1px #77f;
      -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
      white-space: normal;
      background: #ddf url('images/header.png') center center repeat-x;
