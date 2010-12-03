@@ -7,7 +7,7 @@ body {
      text-align: center;
      background: #eef url('images/snowcamo.png');
      color: #000;
-     font: 9pt/130% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     font: 10pt/130% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      background: #99f url('images/magic.png') center bottom;
 }
 
@@ -269,7 +269,7 @@ div.warning {
 /* console error messages */
 
 div.sorry {
-     margin: 5px 10px 10px 210px;
+     margin: 5px 10px 10px 207px;
      padding: 20px 20px 20px 75px;
      background: #eef;
      border: 1px solid #447;
@@ -295,7 +295,7 @@ div.sorry hr {
 }     
 
 div.main {
-     margin: 10px 10px 20px 210px;
+     margin: 10px 10px 20px 207px;
      padding: 0 15px 15px 15px;
      background: #eef;
      text-align: left;
@@ -328,7 +328,7 @@ div.main textarea {
 }
 
 div.news {
-     margin: 0px 10px 5px 210px;
+     margin: 0px 10px 5px 207px;
      padding: 10px 25px 7px 25px;
      border: 1px solid #447;
      color: #224;
@@ -340,7 +340,9 @@ div.news {
      line-height: 140%;
      background: #def; /*url('images/sandtile.png');*/
      -moz-box-shadow: inset 0px 0px 1px 0px #410;
-     background: #eff url('images/magic.png') center bottom;}
+     background: #eff url('images/magic.png') center bottom;
+     min-width: 480px;
+}
 
 div.news p {
      font-size: 8.5pt;
@@ -704,7 +706,7 @@ h1 {
      text-align: left;
      color: #002;
      padding: 10px 15px;
-     margin: 0 10px 10px 210px;
+     margin: 0 10px 10px 207px;
      font: normal bold 16pt/120% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      letter-spacing: 0.15em;
      text-transform: uppercase;
@@ -716,6 +718,7 @@ h1 {
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
+     min-width: 500px;
 }
 
 h2 {
@@ -946,7 +949,7 @@ form {}
      border-top: 0 !important;
      margin: -5px 0 5px 0; 
      padding: 7px;
-     background: #bcf;
+     background: #def url('images/magic.png') center bottom;
      -moz-box-shadow: inset 0px 0px 2px 1px #eef;
 }
 
