@@ -552,7 +552,7 @@ tr:nth-child(even) {
 }
 
 tr:nth-child(odd) {
-     background: #ddf url(images/magic.png);
+     background: #fff url(images/magic.png);
 }
 /*
 tr:last-child {
