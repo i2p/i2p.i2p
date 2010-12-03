@@ -118,6 +118,8 @@ div.routersummary hr {
      border-bottom: 1px solid #ddf;
      margin: 8px -7px 8px -7px;
      -moz-box-shadow: inset 0px 1px 1px 1px #bbf;
+     -khtml-box-shadow: inset 0px 1px 1px 1px #bbf;
+     box-shadow: inset 0px 1px 1px 1px #bbf;
 }
 
 div routersummary hr:last-child {
@@ -134,6 +136,8 @@ div.routersummary h3 {
      background: #ddf url('images/header_on.png') center center repeat-x;
      border: 1px solid #99f !important;
      -moz-border-radius: 3px;
+     -khtml-border-radius: 3px;
+     border-radius: 3px;
      -moz-box-shadow: 0px 1px 5px #bbf;
 }
 
@@ -785,7 +789,7 @@ h4 {
      font-size: 11pt;
 }
 
-button, button:visited {
+button, button:visited{
      font: bold 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      border: 1px outset #999;
      padding: 1px 3px;
@@ -800,6 +804,8 @@ button, button:visited {
      text-align: center;
      min-width: 80px;
      -moz-box-shadow: inset 0px 2px 8px 0px #fff;
+     -khtml-box-shadow: inset 0px 2px 8px 0px #fff;
+     box-shadow: inset 0px 2px 8px 0px #fff;
      color: #006;
 }
 
@@ -808,6 +814,8 @@ button:hover{
      background: #f60 !important;
      color: #fff;
      -moz-box-shadow: inset 0px 0px 0px 1px #fff;
+     -khtml-box-shadow: inset 0px 0px 0px 1px #fff;
+     box-shadow: inset 0px 0px 0px 1px #fff;
 }
 
 button:active{
@@ -815,6 +823,8 @@ button:active{
      background: #001 !important;
      color: #f60;
      -moz-box-shadow: inset 0px 0px 0px 1px #f60;
+     box-shadow: inset 0px 0px 0px 1px #f60;
+     -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
 }
 
 .underline {

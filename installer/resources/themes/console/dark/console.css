@@ -3,7 +3,7 @@
 /* Author: dr|z3d */
 
 body {
-     margin: 20px 5px 0 15px;
+     margin: 5px 0px 0 0px;
      padding: 0;
      text-align: center;
      background: #010 url('images/camotile.png') center bottom;
@@ -130,6 +130,8 @@ div.routersummary hr {
      border-bottom: 1px solid #494;
      margin: 8px -10px 7px -10px;
      -moz-box-shadow: inset 0px 1px 1px 1px #000;
+     -khtml-box-shadow: inset 0px 1px 1px 1px #000;
+     box-shadow: inset 0px 1px 1px 1px #000;
 }
 
 div.routersummary h3 {
@@ -270,7 +272,7 @@ div.warning {
 /* console error messages */
 
 div.sorry {
-     margin: 15px 15px 10px 220px;
+     margin: 15px 15px 10px 215px;
      padding: 20px 20px 20px 75px;
      background: #020;
      border: 1px solid #494;
@@ -296,16 +298,16 @@ div.sorry hr {
 }     
 
 div.main {
-     margin: 15px 15px 20px 220px;
+     margin: -3px 5px 5px 205px;
      padding: 0 15px 15px 15px;
      text-align: left;
      color: #EE9;
      width: auto;
 /*  overflow-x: scroll; */
      border: 1px solid #494;
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
-     border-radius: 4px;
+     -moz-border-radius: 0 0 4px 4px;
+     -khtml-border-radius: 0 0 4px 4px;
+     border-radius: 0 0 4px 4px;
      background: #000;/* url(images/camotile2.png);*/
      min-width: 620px;
      -moz-box-shadow: 0 1px 5px #000;
@@ -318,7 +320,7 @@ div.main textarea {
 }
 
 div.news {
-     margin: 15px 15px 15px 220px;
+     margin: 5px 5px 1px 205px;
      padding: 5px 30px 10px 30px;
      border: 1px solid #494;
      background: #000;
@@ -641,8 +643,8 @@ p {
 h1 {
      text-align: left;
      color: #EE9;
-     padding: 10px 15px;
-     margin: 0 15px 10px 220px;
+     padding: 16px 15px;
+     margin: 0 5px 0px 205px !important;
      font-size: 16pt;
      font-weight: bold;
      font-style: normal;
