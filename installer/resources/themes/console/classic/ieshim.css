@@ -44,8 +44,9 @@ div.configure table {
 }
 
 h1 {
-     padding: 20px 10px 21px 10px !important;
-     margin: 0 0 0 195px !important;
+     padding: 24px 10px 23px 10px !important;
+     margin: 0 0px 0 195px !important;
+     margin: 0 16px 0 213px !important;
      color: #001;
      border: 1px solid #89f !important;
      border-left: 1px solid #89f !important;
@@ -67,7 +68,7 @@ div.confignav {
      padding: 15px 0 15px 0;
      border-left: 0px;
      margin-left: -15px;
-     border-top: 5px solid #bbf;
+     border-top: 1px solid #89f;
      margin-bottom: 10px !important;
 }
 
