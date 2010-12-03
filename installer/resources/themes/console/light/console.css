@@ -80,7 +80,7 @@ a:active{
 
 div.routersummaryouter {
      float: left;
-     width: 210px;
+     width: 200px;
      margin: 0 0 10px 0px;
      padding: 0;
      border: 0;
@@ -265,7 +265,7 @@ div.warning {
 /* console error messages */
 
 div.sorry {
-     margin: 5px 15px 10px 220px;
+     margin: 5px 15px 10px 215px;
      padding: 20px 20px 20px 75px;
      background: #eef;
      border: 1px solid #447;
@@ -291,7 +291,7 @@ div.sorry hr {
 }     
 
 div.main {
-     margin: 15px 15px 20px 220px;
+     margin: 15px 15px 20px 215px;
      padding: 0 15px 15px 15px;
      background: #eef;
      text-align: left;
@@ -324,7 +324,7 @@ div.main textarea {
 }
 
 div.news {
-     margin: 0px 15px 10px 220px;
+     margin: 0px 15px 10px 215px;
      padding: 10px 25px 7px 25px;
      border: 1px solid #447;
      color: #224;
@@ -701,7 +701,7 @@ h1 {
      text-align: left;
      color: #002;
      padding: 10px 15px;
-     margin: 0 15px 15px 220px;
+     margin: 0 15px 15px 215px;
      font: normal bold 16pt/120% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      letter-spacing: 0.15em;
      text-transform: uppercase;
