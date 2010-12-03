@@ -743,7 +743,7 @@ h2 {
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
-     margin: 15px 0px 12px 0 !important;
+     margin: 15px 0px 15px 0 !important;
      -moz-box-shadow: 0px 1px 1px 1px #ccf;
      word-wrap: break-word;
      text-transform: uppercase;
@@ -763,7 +763,7 @@ h3 {
      border: 1px solid #113;
      border-left: 5px solid #113;
      padding: 5px 5px 5px 5px;
-     margin: 12px 0 12px 0;
+     margin: 12px 0 15px 0;
      border-radius: 0 4px 4px 0;
      -moz-border-radius: 0 4px 4px 0;
      -khtml-border-radius: 0 4px 4px 0;
@@ -1118,6 +1118,7 @@ div.footnote {
      text-align: right;
      color: #447;
      font-size: 7pt;
+     margin-top: -10px;
 }
 
 div.footnote hr{
