@@ -667,14 +667,14 @@ code {
 }
 
 a:link{
-     color: #005;
+     color: #613;
      text-decoration: none;
      font-weight: bold;
      word-wrap: break-word;
 }
 
 a:visited{
-     color: #309;
+     color: #314;
      text-decoration: none;
      font-weight: bold;
 }
@@ -806,7 +806,7 @@ button, button:visited{
      -moz-box-shadow: inset 0px 2px 8px 0px #fff;
      -khtml-box-shadow: inset 0px 2px 8px 0px #fff;
      box-shadow: inset 0px 2px 8px 0px #fff;
-     color: #006;
+     color: #413;
 }
 
 button:hover{
@@ -857,7 +857,7 @@ button:active{
 
 input {
      background: #eef;
-     color: #001;
+     color: #413;
      margin: 5px 10px 5px 10px;
      padding: 4px 2px;
      font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
@@ -869,7 +869,7 @@ input {
 input, input:visited {
      border: 1px outset #999;
      background: #ddf;
-     color: #001;
+     color: #413;
      margin: 5px;
      font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      padding: 1px 2px;
@@ -879,7 +879,7 @@ input, input:visited {
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      -moz-box-shadow: inset 0px 2px 8px 0px #fff;
-     color: #006;
+     color: #413
      opacity: 0.9;
 }
 
