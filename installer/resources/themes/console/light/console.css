@@ -3,7 +3,7 @@
 /* Author: dr|z3d */
 
 body {
-     margin: 10px 0px 0 10px;
+     margin: 10px 0px -10px 10px;
      text-align: center;
      background: #eef url('images/snowcamo.png');
      color: #000;
