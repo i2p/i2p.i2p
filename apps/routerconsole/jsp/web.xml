@@ -17,6 +17,11 @@
       <url-pattern>/javadoc/*</url-pattern>
     </servlet-mapping>
     
+    <servlet-mapping> 
+      <servlet-name>net.i2p.router.web.jsp.viewhistory_jsp</servlet-name>
+      <url-pattern>/history.txt</url-pattern>
+    </servlet-mapping>
+    
     <session-config>
         <session-timeout>
             30
