@@ -95,14 +95,12 @@ div.routersummary {
      padding: 10px 8px 10px 8px;
      text-align: center !important;
      border: 1px solid #447;
-     background: #ccddf6);
      color: #000;
      font-size: 8pt;
      clear: left;/* fixes a bug in Opera */
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     background: #eef;
      background: #fff url('images/magic.png') center bottom;/* 
      float: left;
 */     
@@ -149,7 +147,7 @@ div.routersummary h3:hover {
 }
 
 div.routersummary h4 {
-     border: 0px solid #f00;
+     border: 0px solid #fff;
      border-bottom: 0 !important;
      font-size: 8.5pt;
      letter-spacing: 0.02em;
@@ -348,9 +346,8 @@ div.news {
      text-align: right !important;
      font-size: 7.5pt;
      line-height: 140%;
-     background: #def; /*url('images/sandtile.png');*/
      -moz-box-shadow: inset 0px 0px 1px 0px #410;
-     background: #eff url('images/magic.png') center bottom;
+     background: #fff url('images/magic.png') center bottom;
      min-width: 480px;
 }
 
@@ -379,12 +376,13 @@ div.news a:active{
 */
 
 div.news hr{
-     color: #77f;
-     background: #77f;
+     color: #225;
+     background: #225;
      height: 1px;
-     border: 0px dotted #77f;
+     border: 0px dotted #779;
      margin: 10px 0 5px;
 /*     -moz-box-shadow: 0px -1px 1px 1px #ddf;*/
+     opacity: 0.6;
 }
 
 div.news li {
