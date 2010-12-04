@@ -52,7 +52,6 @@ class I2PSimpleSession extends I2PSessionImpl2 {
         _handlerMap = new SimpleMessageHandlerMap(context);
         _closed = true;
         _closing = false;
-        _availabilityNotifier = new AvailabilityNotifier();
         if (options == null)
             options = System.getProperties();
         loadConfig(options);
@@ -68,9 +67,6 @@ class I2PSimpleSession extends I2PSessionImpl2 {
     @Override
     public void connect() throws I2PSessionException {
         _closed = false;
-        _availabilityNotifier.stopNotifying();
-        Thread notifier = new I2PAppThread(_availabilityNotifier, "Simple Notifier", true);
-        notifier.start();
         
         try {
             // If we are in the router JVM, connect using the interal queue
@@ -93,6 +89,7 @@ class I2PSimpleSession extends I2PSessionImpl2 {
                 InputStream in = _socket.getInputStream();
                 _reader = new I2CPMessageReader(in, this);
             }
+            // we do not receive payload messages, so we do not need an AvailabilityNotifier
             _reader.startReading();
 
         } catch (UnknownHostException uhe) {
