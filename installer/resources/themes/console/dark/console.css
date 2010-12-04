@@ -308,7 +308,7 @@ div.main {
      -moz-border-radius: 0 0 4px 4px;
      -khtml-border-radius: 0 0 4px 4px;
      border-radius: 0 0 4px 4px;
-     background: #000 url(images/scarface.png) center bottom no-repeat !important;
+     background: #000 url(images/scarface.jpg) center bottom no-repeat !important;
      min-width: 620px;
      -moz-box-shadow: 0 1px 5px #000;
 }
@@ -436,7 +436,7 @@ div.graphspanel {
      -khtml-border-radius: 4px;
      border-radius: 4px;
 /*     border: 1px solid #494;*/
-     background: #000;/* url(images/camotile.png);*/
+     background: none;/* url(images/camotile.png);*/
      text-align: center;
 }
 
