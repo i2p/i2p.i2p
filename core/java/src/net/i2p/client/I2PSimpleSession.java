@@ -22,7 +22,7 @@ import net.i2p.data.i2cp.I2CPMessageReader;
 import net.i2p.internal.I2CPMessageQueue;
 import net.i2p.internal.InternalClientManager;
 import net.i2p.internal.QueuedI2CPMessageReader;
-import net.i2p.util.I2PThread;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.InternalSocket;
 
 /**
@@ -69,9 +69,7 @@ class I2PSimpleSession extends I2PSessionImpl2 {
     public void connect() throws I2PSessionException {
         _closed = false;
         _availabilityNotifier.stopNotifying();
-        I2PThread notifier = new I2PThread(_availabilityNotifier);
-        notifier.setName("Simple Notifier");
-        notifier.setDaemon(true);
+        Thread notifier = new I2PAppThread(_availabilityNotifier, "Simple Notifier", true);
         notifier.start();
         
         try {

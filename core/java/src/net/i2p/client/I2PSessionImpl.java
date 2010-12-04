@@ -42,7 +42,7 @@ import net.i2p.data.i2cp.SessionId;
 import net.i2p.internal.I2CPMessageQueue;
 import net.i2p.internal.InternalClientManager;
 import net.i2p.internal.QueuedI2CPMessageReader;
-import net.i2p.util.I2PThread;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
@@ -283,9 +283,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         setOpening(true);
         _closed = false;
         _availabilityNotifier.stopNotifying();
-        I2PThread notifier = new I2PThread(_availabilityNotifier);
-        notifier.setName("Notifier " + _myDestination.calculateHash().toBase64().substring(0,4));
-        notifier.setDaemon(true);
+        Thread notifier = new I2PAppThread(_availabilityNotifier, "ClientNotifier " + getPrefix(), true);
         notifier.start();
         
         if ( (_options != null) && 
@@ -760,11 +758,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             buf.append(s);
         else
             buf.append(getClass().getSimpleName());
-        buf.append(" #");
         if (_sessionId != null)
-            buf.append(_sessionId.getSessionId());
-        else
-            buf.append("n/a");
+            buf.append(" #").append(_sessionId.getSessionId());
         buf.append("]: ");
         return buf.toString();
     }
