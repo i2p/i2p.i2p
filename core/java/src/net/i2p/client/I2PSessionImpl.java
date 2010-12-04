@@ -659,7 +659,9 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                 propogateError("Error destroying the session", ipe);
             }
         }
-        _availabilityNotifier.stopNotifying();
+        // SimpleSession does not initialize
+        if (_availabilityNotifier != null)
+            _availabilityNotifier.stopNotifying();
         _closed = true;
         _closing = false;
         closeSocket();

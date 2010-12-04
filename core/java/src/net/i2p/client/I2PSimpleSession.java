@@ -47,6 +47,7 @@ class I2PSimpleSession extends I2PSessionImpl2 {
      * @throws I2PSessionException if there is a problem
      */
     public I2PSimpleSession(I2PAppContext context, Properties options) throws I2PSessionException {
+        // Warning, does not call super()
         _context = context;
         _log = context.logManager().getLog(I2PSimpleSession.class);
         _handlerMap = new SimpleMessageHandlerMap(context);
