@@ -17,7 +17,7 @@ import java.net.SocketTimeoutException;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -59,13 +59,11 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     protected static volatile long __serverId = 0;
     /** max number of threads  - this many slowlorisses will DOS this server, but too high could OOM the JVM */
     private static final String PROP_HANDLER_COUNT = "i2ptunnel.blockingHandlerCount";
-    private static final int DEFAULT_HANDLER_COUNT = 40;
+    private static final int DEFAULT_HANDLER_COUNT = 65;
     /** min number of threads */
     private static final int MIN_HANDLERS = 0;
-    /** how many accept()s to queue waiting for a thread */
-    private static final int HANDLER_QUEUE_SIZE = 99;
     /** how long to wait before dropping an idle thread */
-    private static final long HANDLER_KEEPALIVE_MS = 10*1000;
+    private static final long HANDLER_KEEPALIVE_MS = 30*1000;
 
     protected I2PTunnelTask task = null;
     protected boolean bidir = false;
@@ -301,6 +299,9 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                     try {
                         executor.execute(new Handler(i2ps));
                     } catch (RejectedExecutionException ree) {
+                         try {
+                             i2ps.close();
+                         } catch (IOException ioe) {}
                          if (open && _log.shouldLog(Log.ERROR))
                              _log.error("ServerHandler queue full for " + remoteHost + ':' + remotePort +
                                         "; increase " + PROP_HANDLER_COUNT + '?', ree);
@@ -330,13 +331,11 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     
     /**
      * Not really needed for now but in case we want to add some hooks like afterExecute().
-     * By default, sets up a pool of 0-10 threads with a max queue of 90 and
-     * an idle time expiration of 5 seconds.
      */
     private static class CustomThreadPoolExecutor extends ThreadPoolExecutor {
         public CustomThreadPoolExecutor(int max, String name) {
              super(MIN_HANDLERS, max, HANDLER_KEEPALIVE_MS, TimeUnit.MILLISECONDS,
-                   new LinkedBlockingQueue(HANDLER_QUEUE_SIZE), new CustomThreadFactory(name));
+                   new SynchronousQueue(), new CustomThreadFactory(name));
         }
     }
 
