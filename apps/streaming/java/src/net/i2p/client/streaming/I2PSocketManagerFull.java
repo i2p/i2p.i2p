@@ -112,7 +112,7 @@ class I2PSocketManagerFull implements I2PSocketManager {
 
     /**
      * 
-     * @return connected I2PSocket
+     * @return connected I2PSocket OR NULL
      * @throws net.i2p.I2PException
      * @throws java.net.SocketTimeoutException
      */
