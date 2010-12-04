@@ -35,7 +35,7 @@ label {
      -moz-box-sizing: border-box;
      box-sizing: border-box;
      line-height: 120%;
-     color: #427;
+     color: #101;
 }
 
 h4 {
@@ -160,7 +160,7 @@ hr {
      overflow: hidden;
      min-width: 60px;
      font-weight: bold;
-     background-color: #bbbbff;
+     background: #ffe url(images/header.png) center center repeat:x !important;
      color: #001;
      border: 1px outset #ddddc0;
      text-align: center;
@@ -201,7 +201,7 @@ hr {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      margin-top: 8px;
-     background: #bbf url(images/header_on.png) center center repeat:x !important;
+     background: #ffe url(images/header.png) center center repeat:x !important;
      text-decoration: none;
 }
 
@@ -270,7 +270,7 @@ hr {
      -moz-box-shadow: inset 0px 0px 1px 0px #f60;
      background: #fff url(images/magic.png);
      border: 1px solid #444477;
-     color: #000011;
+     color: #613;
 
 }
 
@@ -298,7 +298,7 @@ globalOperationsPanel .control:link {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      margin-top: 8px;
-     background: url(images/header_on.png) 0 0 repeat: x !important;
+     background: #ffe url(images/header.png) 0 0 repeat: x !important;
 }
 
 
@@ -308,7 +308,7 @@ globalOperationsPanel .control:visited {
      padding: 2px;
      overflow: hidden;
      font-weight: bold;
-     background-color: #bbbbff;
+     background-color: #ffe;
      color: black;
      border: 1px outset #ddddc0;
      text-align: center;
@@ -317,7 +317,7 @@ globalOperationsPanel .control:visited {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      margin-top: 8px;
-     background: url(images/header_on.png) 0 0 repeat: x !important;
+     background: url(images/header.png) 0 0 repeat: x !important;
 }
 
 globalOperationsPanel .control:hover {
@@ -357,7 +357,7 @@ select {
 }
 
 a:link{
-     color: #813;
+     color: #613;
      text-decoration: none;
      font-weight: bold;
      word-wrap: break-word;

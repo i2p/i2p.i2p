@@ -402,7 +402,7 @@ div.news li {
      -moz-border-radius: 0 4px 4px 0;
      -khtml-border-radius: 0 4px 4px 0;
      font-size: 10pt;
-     opacity: 0.8;
+     opacity: 1;
      background: #fff url('images/header.png') center center repeat-x;
      -moz-box-shadow: 0px 1px 1px 1px #ccf;
 }
@@ -675,7 +675,7 @@ a:link{
 }
 
 a:visited{
-     color: #314;
+     color: #316;
      text-decoration: none;
      font-weight: bold;
 }
@@ -719,7 +719,7 @@ p {
 
 h1 {
      text-align: left;
-     color: #002;
+     color: #000;
      padding: 10px 15px;
      margin: 0 10px 10px 207px;
      font: normal bold 16pt/120% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
@@ -752,6 +752,7 @@ h2 {
      -moz-box-shadow: 0px 1px 1px 1px #ccf;
      word-wrap: break-word;
      text-transform: uppercase;
+     opacity: 1;
 }
 
 h2 a:hover {
@@ -778,7 +779,7 @@ h3 {
      font-size: 11pt;
      color: #000;
      -moz-box-shadow: 0px 1px 1px 1px #ccf;
-     opacity: 0.9;
+     opacity: 1;
 }
 
 h4 {
@@ -807,7 +808,7 @@ button, button:visited{
      -moz-box-shadow: inset 0px 2px 8px 0px #fff;
      -khtml-box-shadow: inset 0px 2px 8px 0px #fff;
      box-shadow: inset 0px 2px 8px 0px #fff;
-     color: #413;
+     color: #316;
 }
 
 button:hover{
@@ -821,7 +822,7 @@ button:hover{
 
 button:active{
      border: 1px solid #f60;
-     background: #001 !important;
+     background: #202 !important;
      color: #f60;
      -moz-box-shadow: inset 0px 0px 0px 1px #f60;
      box-shadow: inset 0px 0px 0px 1px #f60;
@@ -847,7 +848,7 @@ button:active{
 }
 
 .langbox img {
-     opacity: 0.7 !important;
+     opacity: 0.9 !important;
      -moz-box-shadow: 0 0 1px #447;
 }
 
