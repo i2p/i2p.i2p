@@ -5,10 +5,10 @@
 body {
      margin: 10px 0px -10px 10px;
      text-align: center;
-     background: #eef url('images/snowcamo.png');
+     background: #ffe url('images/snowcamo.png');
      color: #000;
      font: 10pt/130% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
-     background: #99f url('images/itile.png') center bottom;
+     background: #99f url('images/magic.png') center bottom;
 }
 
 .hide {
@@ -38,7 +38,7 @@ div.logo {
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     background: #eef; /*url('images/lightbluetile.png')*/
+     background: #ffe; /*url('images/lightbluetile.png')*/
      width: 185px;
      -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
 }
@@ -47,7 +47,7 @@ div.toolbar {
      margin: 0;
      padding: 10px;
      font-weight: bold;
-     background: #eef;
+     background: #ffe;
      border: 1px solid #447;
      display: none !important;
 }
@@ -65,11 +65,11 @@ div.toolbar a:link {
 }
 
 div.toolbar a:visited {
-     background: #ddf;
+     background: #ffe;
 }
 
 div.toolbar a:hover{
-     border: 1px solid #eeeeff;
+     border: 1px solid #eeffef;
      background: #003;
      color: #f60;
 }
@@ -101,7 +101,7 @@ div.routersummary {
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     background: #fff url('images/magic.png') center bottom;/* 
+     background: #ffe url('images/magic.png') center bottom;/* 
      float: left;
 */     
      -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
@@ -112,12 +112,14 @@ div.routersummary input[type=text] {
 }
 
 div.routersummary hr {
-     color: #ddf;
-     background: ddf;
+     color: #ffe;
+     background: ffe;
      height: 1px;
-     border-bottom: 1px solid #ddf;
+     border-bottom: 1px solid #ffe;
      margin: 8px -7px 8px -7px;
      -moz-box-shadow: inset 0px 1px 1px 1px #bbf;
+     -khtml-box-shadow: inset 0px 1px 1px 1px #bbf;
+     box-shadow: inset 0px 1px 1px 1px #bbf;
 }
 
 div routersummary hr:last-child {
@@ -129,11 +131,13 @@ div.routersummary h3 {
      letter-spacing: 0.04em;
      margin: -4px -3px;
      padding: 2px 0;
-     background: #c5d5fb;
+     background: #ffe;
      text-transform: uppercase;
-     background: #ddf url('images/header_on.png') center center repeat-x;
+     background: #ffe url('images/header_on.png') center center repeat-x;
      border: 1px solid #99f !important;
      -moz-border-radius: 3px;
+     -khtml-border-radius: 3px;
+     border-radius: 3px;
      -moz-box-shadow: 0px 1px 5px #bbf;
 }
 
@@ -142,7 +146,7 @@ div.routersummary h3 a {
 }
 
 div.routersummary h3:hover {
-     background: #ddf url('images/header.png') center center repeat-x;
+     background: #ffe url('images/header.png') center center repeat-x;
      text-shadow: 0 0 0;
 }
 
@@ -153,7 +157,7 @@ div.routersummary h4 {
      letter-spacing: 0.02em;
      margin: -5px -7px -5px -7px !important;
      padding: 3px 3px 5px 3px;
-     background: #eef url(images/magic.png);
+     background: #eed url(images/magic.png);
      text-transform: capitalize;
      text-decoration: none !important;
      color: #2b2;
@@ -279,7 +283,7 @@ div.warning {
 div.sorry {
      margin: 5px 10px 10px 207px;
      padding: 20px 20px 20px 75px;
-     background: #eef;
+     background: #ffe;
      border: 1px solid #447;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
@@ -305,7 +309,7 @@ div.sorry hr {
 div.main {
      margin: 10px 10px 20px 207px;
      padding: 0 15px 15px 15px;
-     background: #eef;
+     background: #ffe;
      text-align: left;
      color: #001;
      width: auto;
@@ -315,7 +319,7 @@ div.main {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
-     background: #fff url('images/magic.png') center bottom;}
+     background: #ffe url('images/magic.png') center bottom;}
 
 div.main hr, hr {
      color: #447;
@@ -330,7 +334,7 @@ hr:last-child {
 }
 
 div.main textarea {
-     background: #eef;
+     background: #ffe;
      color: #001;
      font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
 }
@@ -347,13 +351,14 @@ div.news {
      font-size: 7.5pt;
      line-height: 140%;
      -moz-box-shadow: inset 0px 0px 1px 0px #410;
-     background: #fff url('images/magic.png') center bottom;
+     background: #ffe url('images/magic.png') center bottom;
      min-width: 480px;
 }
 
 div.news p {
-     font-size: 8.5pt;
+     font-size: 9pt;
      text-align: justify !important;
+     line-height: 120%;
 }
 /*
 div.news a:link{
@@ -381,7 +386,7 @@ div.news hr{
      height: 1px;
      border: 0px dotted #779;
      margin: 10px 0 5px;
-/*     -moz-box-shadow: 0px -1px 1px 1px #ddf;*/
+/*     -moz-box-shadow: 0px -1px 1px 1px #ffe;*/
      opacity: 0.6;
 }
 
@@ -419,7 +424,7 @@ div.news h4 {
 div.confignav {
      padding: 15px 10px !important;
      margin: 15px 0 15px 0;
-     background: #ddf url('images/header.png') center center repeat-x;
+     background: #ffe url('images/header.png') center center repeat-x;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
@@ -434,7 +439,7 @@ div.confignav {
 div.configure {
 /*     padding: 5px 15px 0px 15px !important;
      margin: 0px 0px 15px 0;
-     background: #eef; url('images/lightbluetile.png')
+     background: #ffe; url('images/lightbluetile.png')
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
@@ -452,13 +457,13 @@ div.configure h3, div.graphspanel h3 {
      border-radius: 0 4px 4px 0;
      -moz-border-radius: 0 4px 4px 0;
      -khtml-border-radius: 0 4px 4px 0;
-     background: #eef;
+     background: #ffe;
 }
 
 div.graphspanel {
 /*     padding: 12px;
      margin: 10px 0px 25px 0;
-     background: #ddf url('images/lightbluetile.png');
+     background: #ffe url('images/lightbluetile.png');
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
@@ -495,7 +500,7 @@ div.graphspanel form {
 div.messages {
      padding: 10px;
      margin: 10px 0 15px 0;
-     background: #ddf;
+     background: #ffe;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
@@ -546,7 +551,7 @@ table hr {
 th {
      padding: 6px 2px;
      color: #000;
-     background: #ddf url('images/header.png') center center repeat-x;
+     background: #ffe url('images/header.png') center center repeat-x;
      text-align: center;
      font-size: 9pt;
      line-height: 110%;
@@ -606,7 +611,7 @@ div.main li {
 }
 
 div.main li b {
-     color: #700 !important;
+     color: #151!important;
      letter-spacing: 0.02em;
      font-size: 9.5pt;
      line-height: 170%;
@@ -663,14 +668,14 @@ code {
 }
 
 a:link{
-     color: #005;
+     color: #613;
      text-decoration: none;
      font-weight: bold;
      word-wrap: break-word;
 }
 
 a:visited{
-     color: #309;
+     color: #314;
      text-decoration: none;
      font-weight: bold;
 }
@@ -723,7 +728,7 @@ h1 {
      text-shadow: 0px 0px 1px #77f;
      -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
      white-space: normal;
-     background: #eef url('images/header.png') center center repeat-x;
+     background: #ffe url('images/header.png') center center repeat-x;
      border: 1px solid #447;
      border-radius: 4px;
      -moz-border-radius: 4px;
@@ -735,7 +740,7 @@ h2 {
      font-size: 13pt;
      color: #000;
      letter-spacing: 0.05em;
-     background: #ddf url('images/header.png') center center repeat-x;
+     background: #ffe url('images/header.png') center center repeat-x;
      text-shadow: 0px 0px 1px rgba(0, 0, 64, 0.5);
      padding: 10px 10px;
      wordwrap: none;
@@ -767,7 +772,7 @@ h3 {
      border-radius: 0 4px 4px 0;
      -moz-border-radius: 0 4px 4px 0;
      -khtml-border-radius: 0 4px 4px 0;
-     background: #ddf url('images/header.png') center center repeat-x !important;
+     background: #ffe url('images/header.png') center center repeat-x !important;
      text-transform: uppercase;
      text-shadow: 0px 0px 1px #77f;
      font-size: 11pt;
@@ -785,11 +790,11 @@ h4 {
      font-size: 11pt;
 }
 
-button, button:visited {
+button, button:visited{
      font: bold 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      border: 1px outset #999;
      padding: 1px 3px;
-     background: #ddf !important;
+     background: #ffe !important;
      text-decoration: none;
      border-radius: 4px;
      -moz-border-radius: 4px;
@@ -800,7 +805,9 @@ button, button:visited {
      text-align: center;
      min-width: 80px;
      -moz-box-shadow: inset 0px 2px 8px 0px #fff;
-     color: #006;
+     -khtml-box-shadow: inset 0px 2px 8px 0px #fff;
+     box-shadow: inset 0px 2px 8px 0px #fff;
+     color: #413;
 }
 
 button:hover{
@@ -808,6 +815,8 @@ button:hover{
      background: #f60 !important;
      color: #fff;
      -moz-box-shadow: inset 0px 0px 0px 1px #fff;
+     -khtml-box-shadow: inset 0px 0px 0px 1px #fff;
+     box-shadow: inset 0px 0px 0px 1px #fff;
 }
 
 button:active{
@@ -815,6 +824,8 @@ button:active{
      background: #001 !important;
      color: #f60;
      -moz-box-shadow: inset 0px 0px 0px 1px #f60;
+     box-shadow: inset 0px 0px 0px 1px #f60;
+     -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
 }
 
 .underline {
@@ -846,8 +857,8 @@ button:active{
 }
 
 input {
-     background: #eef;
-     color: #001;
+     background: #ffe;
+     color: #813;
      margin: 5px 10px 5px 10px;
      padding: 4px 2px;
      font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
@@ -858,8 +869,8 @@ input {
 
 input, input:visited {
      border: 1px outset #999;
-     background: #ddf;
-     color: #001;
+     background: #ffe;
+     color: #813;
      margin: 5px;
      font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      padding: 1px 2px;
@@ -869,7 +880,7 @@ input, input:visited {
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      -moz-box-shadow: inset 0px 2px 8px 0px #fff;
-     color: #006;
+     color: #813
      opacity: 0.9;
 }
 
@@ -892,7 +903,7 @@ input:active {
 }
 
 input[type=text] {
-     background: #eef;
+     background: #ffe;
      color: #001;
      margin: 5px 10px 5px 10px;
      padding: 4px 2px;
@@ -903,7 +914,7 @@ input[type=text] {
 
 submit {
      background: #f00;
-     color: #eef;
+     color: #ffe;
      margin: 10px 2px 10px 0;
      padding: 2px;
      font-family: "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
@@ -917,7 +928,7 @@ input checkbox {
 }
 
 select {
-     background: #eef;
+     background: #ffe;
      color: #003;
      margin: 5px 10px 5px 10px;
      padding: 4px;
@@ -933,7 +944,7 @@ select {
 textarea {
      padding: 5px;
      margin: 5px 15px 5px 10px;
-     background: #eef;
+     background: #ffe;
      color: #003;
      border-radius: 4px;
      -moz-border-radius: 4px;
@@ -968,8 +979,8 @@ form {}
      border-top: 0 !important;
      margin: -5px 0 5px 0; 
      padding: 7px;
-     background: #def url('images/magic.png') center bottom;
-     -moz-box-shadow: inset 0px 0px 2px 1px #eef;
+     background: #ffe url('images/magic.png') center bottom;
+     -moz-box-shadow: inset 0px 0px 2px 1px #ffe;
 }
 
 /*
@@ -978,7 +989,7 @@ form {}
      padding: 10px 20px !important;
      border: 1px solid #447;
      background-color: #004;
-     background: #ddf url('images/lightbluetile.png');
+     background: #ffe url('images/lightbluetile.png');
      color: #001;
      border-radius: 4px;
      -moz-border-radius: 4px;
@@ -1006,7 +1017,7 @@ div.joblog {
      padding: 10px 20px !important;
      border: 1px solid #447;
      background-color: #004;
-     background: #eef; /*url('images/lightbluetile.png')
+     background: #ffe; /*url('images/lightbluetile.png')
      color: #001;
      border-radius: 4px;
      -moz-border-radius: 4px;
@@ -1102,7 +1113,7 @@ div.joblog hr {
 }
 
 .tablefooter tr, .tablefooter td {
-     background: #ddf url('images/header.png') center center repeat-x;
+     background: #ffe url('images/header.png') center center repeat-x;
      border-top: 1px solid #447;
      border-bottom: 1px solid #447 !important;     
      padding: 8px 2px !important;
