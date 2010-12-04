@@ -117,9 +117,9 @@ div.routersummary hr {
      height: 1px;
      border-bottom: 1px solid #99f;
      margin: 8px -7px 8px -7px;
-     -moz-box-shadow: inset 0px 1px 1px 1px #bbf;
-     -khtml-box-shadow: inset 0px 1px 1px 1px #bbf;
-     box-shadow: inset 0px 1px 1px 1px #bbf;
+     -moz-box-shadow: inset 0px 1px 1px 1px #fff;
+    -khtml-box-shadow: inset 0px 0px 1px #fff;
+     box-shadow: inset 0px 1px 1px 1px #fff;
 }
 
 div routersummary hr:last-child {
