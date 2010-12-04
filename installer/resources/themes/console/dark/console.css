@@ -201,7 +201,7 @@ div.refresh {
 
 div.routersummary a:link, div.routersummary a:visited {
      text-shadow: 1px 1px 1px rgba(0, 16, 0, 0.8);
-     text-shadow: 0px 0px 2px #010 !important;
+     text-shadow: 0px 0px 2px #101 !important;
 }
 
 div.routersummary a:hover {
@@ -308,7 +308,7 @@ div.main {
      -moz-border-radius: 0 0 4px 4px;
      -khtml-border-radius: 0 0 4px 4px;
      border-radius: 0 0 4px 4px;
-     background: #000;/* url(images/camotile2.png);*/
+     background: #000 url(images/scarface.png) center bottom no-repeat !important;
      min-width: 620px;
      -moz-box-shadow: 0 1px 5px #000;
 }
