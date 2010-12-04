@@ -69,6 +69,13 @@ public class SimpleScheduler {
         re.schedule();
     }
     
+    /**
+     * Queue up the given event to be fired after timeoutMs and every
+     * timeoutMs thereafter. The TimedEvent must not do its own rescheduling.
+     * As all Exceptions are caught in run(), these will not prevent
+     * subsequent executions (unlike SimpleTimer, where the TimedEvent does
+     * its own rescheduling).
+     */
     public void addPeriodicEvent(SimpleTimer.TimedEvent event, long timeoutMs) {
         addPeriodicEvent(event, timeoutMs, timeoutMs);
     }
