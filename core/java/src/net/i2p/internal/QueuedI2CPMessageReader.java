@@ -27,6 +27,12 @@ public class QueuedI2CPMessageReader extends I2CPMessageReader {
         }
 
         @Override
+        public void cancelRunner() {
+            super.cancelRunner();
+            _readerThread.interrupt();
+        }
+
+        @Override
         public void run() {
             while (_stayAlive) {
                 while (_doRun) {
@@ -40,7 +46,8 @@ public class QueuedI2CPMessageReader extends I2CPMessageReader {
                             _listener.messageReceived(QueuedI2CPMessageReader.this, msg);
                     } catch (InterruptedException ie) {}
                 }
-                if (!_doRun) {
+                // ??? unused
+                if (_stayAlive && !_doRun) {
                     // pause .5 secs when we're paused
                     try {
                         Thread.sleep(500);
