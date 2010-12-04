@@ -112,10 +112,10 @@ div.routersummary input[type=text] {
 }
 
 div.routersummary hr {
-     color: #ffe;
-     background: ffe;
+     color: #99f;
+     background: 99f;
      height: 1px;
-     border-bottom: 1px solid #ffe;
+     border-bottom: 1px solid #99f;
      margin: 8px -7px 8px -7px;
      -moz-box-shadow: inset 0px 1px 1px 1px #bbf;
      -khtml-box-shadow: inset 0px 1px 1px 1px #bbf;
