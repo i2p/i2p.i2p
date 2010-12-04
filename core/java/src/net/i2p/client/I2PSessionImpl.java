@@ -283,8 +283,6 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         setOpening(true);
         _closed = false;
         _availabilityNotifier.stopNotifying();
-        Thread notifier = new I2PAppThread(_availabilityNotifier, "ClientNotifier " + getPrefix(), true);
-        notifier.start();
         
         if ( (_options != null) && 
              (I2PClient.PROP_RELIABILITY_GUARANTEED.equals(_options.getProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_BEST_EFFORT))) ) {
@@ -315,6 +313,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                 InputStream in = _socket.getInputStream();
                 _reader = new I2CPMessageReader(in, this);
             }
+            Thread notifier = new I2PAppThread(_availabilityNotifier, "ClientNotifier " + getPrefix(), true);
+            notifier.start();
             if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "before startReading");
             _reader.startReading();
             if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Before getDate");
@@ -454,6 +454,10 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         }
     }
 
+    /**
+     *  This notifies the client of payload messages.
+     *  Needs work.
+     */
     protected class AvailabilityNotifier implements Runnable {
         private List _pendingIds;
         private List _pendingSizes;
@@ -516,8 +520,9 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     }
     
     /**
-     * Recieve notification of some I2CP message and handle it if possible
-     *
+     * The I2CPMessageEventListener callback.
+     * Recieve notification of some I2CP message and handle it if possible.
+     * @param reader unused
      */
     public void messageReceived(I2CPMessageReader reader, I2CPMessage message) {
         I2CPMessageHandler handler = _handlerMap.getHandler(message.getType());
@@ -534,7 +539,9 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     }
 
     /** 
-     * Recieve notifiation of an error reading the I2CP stream
+     * The I2CPMessageEventListener callback.
+     * Recieve notifiation of an error reading the I2CP stream.
+     * @param reader unused
      * @param error non-null
      */
     public void readError(I2CPMessageReader reader, Exception error) {
@@ -691,7 +698,9 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     }
 
     /**
-     * Recieve notification that the I2CP connection was disconnected
+     * The I2CPMessageEventListener callback.
+     * Recieve notification that the I2CP connection was disconnected.
+     * @param reader unused
      */
     public void disconnected(I2CPMessageReader reader) {
         if (_log.shouldLog(Log.DEBUG)) _log.debug(getPrefix() + "Disconnected", new Exception("Disconnected"));
