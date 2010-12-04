@@ -82,18 +82,25 @@ your eepsite will be visible (but not discoverable) to others. Detailed instruct
       <li class="tidylist"><b>Be Patient!</b><br>I2P may be slow to start the first time, as it searches for peers. 
   If, after 30 minutes, your Active: connected/recent count still has less than 10 connected 
   peers, there are several things you can do to check for problems: 
-  </li>  
+  </li>
+
+  <li class="tidylist"><b>Check your Configuration &amp; Bandwidth Allocation</b><br>I2P functions best when you can accurately reflect the speed of your network connection in the <a href="/config">bandwidth configuration section</a> by default it is configured with some fairly conservative values that will not suit many use cases, so please take time to review these settings and correct where necessary. The more bandwidth you allocate, the more you benefit from the network. If you're behind a prohibitive firewall but have unrestricted outbound access, I2P can still function; you can turn off inbound access and rely on <a href="http://www.i2p2.i2p/udp.html" target="_blank">SSU IP Address Detection</a> to connect you to the network. For optimal performance, where possible please ensure I2P's <a href="/config">external port</a> is visible from the internet (see below for more information).
+  </li>
+  
   <li class="tidylist"><b>Check Your Proxy Setttings</b><br>If 
   you cannot see any eepsites at all (not even <a href="http://www.i2p2.i2p/" target="_blank">www.i2p2.i2p</a>), 
   make sure your browser's proxy is set to access http traffic (<i>not</i> https, <i>not</i> socks) via <code>127.0.0.1 port 4444</code>. If you need some help, there's <a href="http://www.i2p2.i2p/htproxyports.html" target="_blank">a guide</a> to configuring your browser for I2P use, also <a href="http://www.i2p2.de/htproxyports.html" target="_blank">available</a> on the normal web. </li>
 
-  <li class="tidylist"><b>Verify Java is Up to Date and Functioning</b><br>Ensure your Java is up to date [version 1.6 recommended and required for some features]. If you don't have Java installed, you want some implementation of the JRE; if you're a developer, the SDK may also be of interest.
-  </li>
   <li class="tidylist"><b>Check Your Logs</b><br><a href="/logs">Logs</a> may help resolve a problem. You may wish to paste excerpts in a forum for help, or perhaps <a href="http://paste.i2p2.i2p" target="_blank">paste</a> it instead and reference the link on IRC for help.</li> 
+  <li class="tidylist"><b>Verify Java is Up to Date</b><br>Ensure your Java is up to date [version 1.6 recommended and required for some features]. If you don't have Java installed, you probably want some implementation of the JRE (<a href="https://secure.wikimedia.org/wikipedia/en/wiki/JRE" target="_blank">Java Runtime Engine</a>); if you're a developer, the <a href="https://secure.wikimedia.org/wikipedia/en/wiki/Java_SDK" target="_blank">SDK</a> may also be of interest, and possibly <a href="http://ant.apache.org/" target="_blank">Apache Ant</a> which we use to build the I2P Java binaries.
+  </li>
+ 
   <li class="tidylist"><b>Problems running on Legacy Hardware</b><br>[Linux/Unix/Solaris] If you can't start the router with <code>i2p/i2prouter start</code> try the <code>runplain.sh</code> script in the same directory. Root privileges are usually not required to run I2P. If you need to compile the <a href="http://www.i2p2.i2p/jbigi.html" target="_blank">jBigi library</a> (which is necessary in rare cases), consult appropriate documentation, visit the forums, or come pay a visit to our <a href="irc://127.0.0.1:6668/i2p-dev">IRC developer channel</a>.
-  <li class="tidylist"><b>Port Forwarding</b><br>Open <a href="/config">I2P's port</a> on your modem, router and/or firewall(s) for better connectivity (ideally both UDP and TCP). More information on how to go about port forwarding can be found at <a href="http://portforward.com" target="_blank">portforward.com</a>, in addition to our forums and IRC channels listed below.      
- </li><li class="tidylist"><b>Enable Universal Plug and Play</b><br>Your modem or router may support Universal Plug &amp; Play (UPnP), which permits automatic port forwarding. Try enabling UPnP on your modem/router and possibly your computer also, and then restarting the <a href="/">I2P router</a>.
+
+  <li class="tidylist"><b>Enable Universal Plug and Play</b><br>Your modem or router may support Universal Plug &amp; Play (<a href="https://secure.wikimedia.org/wikipedia/en/wiki/Universal_Plug_and_Play" target="_blank">UPnP</a>), which permits automatic port forwarding. Ensure UPnp support for I2P is enabled on the <a href="/config">config page</a>, then try ensure UPnP is activated on your modem/router and possibly your computer also. Now try restarting the <a href="/">I2P router</a>. If successful, I2P should report "Network: OK" in the sidepanel once the I2P router completes initial connectivity tests.
     </li>
+  <li class="tidylist"><b>Port Forwarding</b><br>Open <a href="/config">I2P's port</a> on your modem, router and/or firewall(s) for better connectivity (ideally both UDP and TCP). More information on how to go about port forwarding can be found at <a href="http://portforward.com" target="_blank">portforward.com</a>, in addition to our forums and IRC channels listed below. Note that I2P does not at this time support proxying via an intermediate web (eg. Squid, Polipo) or socks (eg. Tor) proxy [patches welcome!].     
+ </li>
   <li class="tidylist"><b>Getting Support Online</b><br>You may also want 
   to review the information on the <a href="http://www.i2p2.i2p/" target="_blank">I2P website</a>, 
   post up messages to the <a href="http://forum.i2p2.de/" target="_blank">I2P discussion forum</a>, 
