@@ -84,8 +84,11 @@ your eepsite will be visible (but not discoverable) to others. Detailed instruct
   peers, there are several things you can do to check for problems: 
   </li>
 
-  <li class="tidylist"><b>Check your Configuration &amp; Bandwidth Allocation</b><br>I2P functions best when you can accurately reflect the speed of your network connection in the <a href="/config">bandwidth configuration section</a> by default it is configured with some fairly conservative values that will not suit many use cases, so please take time to review these settings and correct where necessary. The more bandwidth you allocate, the more you benefit from the network. If you're behind a prohibitive firewall but have unrestricted outbound access, I2P can still function; you can turn off inbound access and rely on <a href="http://www.i2p2.i2p/udp.html" target="_blank">SSU IP Address Detection</a> to connect you to the network. For optimal performance, where possible please ensure I2P's <a href="/config">external port</a> is visible from the internet (see below for more information).
+  <li class="tidylist"><b>Check your Configuration &amp; Bandwidth Allocation</b><br>I2P functions best when you can accurately reflect the speed of your network connection in the <a href="/config">bandwidth configuration section</a>. By default I2P is configured with some fairly conservative values that will not suit many use cases, so please take time to review these settings and correct where necessary. The more bandwidth you allocate and <i>specifically</i> upstream bandwidth, the more you benefit from the network. 
   </li>
+
+    <li class="tidylist"><b>Firewall</b><br>Where possible, please ensure I2P/Java is allowed bi-directional port access from the internet by configuring your modem/router/pc firewall accordingly.  
+If you're behind a prohibitive firewall but have unrestricted outbound access, I2P can still function; you can turn off inbound access and rely on <a href="http://www.i2p2.i2p/udp.html" target="_blank">SSU IP Address Detection</a> to connect you to the network. For optimal performance, where possible please ensure I2P's <a href="/config">external port</a> is visible from the internet (see below for more information).</li>
   
   <li class="tidylist"><b>Check Your Proxy Setttings</b><br>If 
   you cannot see any eepsites at all (not even <a href="http://www.i2p2.i2p/" target="_blank">www.i2p2.i2p</a>), 
