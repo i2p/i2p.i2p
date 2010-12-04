@@ -428,7 +428,7 @@ public class PeerCoordinator implements PeerListener
               peer.runConnection(_util, listener, bitfield);
             }
           };
-        String threadName = peer.toString();
+        String threadName = "Snark peer " + peer.toString();
         new I2PAppThread(r, threadName).start();
         return true;
       }

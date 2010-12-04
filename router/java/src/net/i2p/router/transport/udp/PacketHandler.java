@@ -31,11 +31,13 @@ class PacketHandler {
     private boolean _keepReading;
     private final Handler[] _handlers;
     
-    private static final int NUM_HANDLERS = 5;
+    private static final int MIN_NUM_HANDLERS = 2;  // unless < 32MB
+    private static final int MAX_NUM_HANDLERS = 5;
     /** let packets be up to 30s slow */
     private static final long GRACE_PERIOD = Router.CLOCK_FUDGE_FACTOR + 30*1000;
     
-    PacketHandler(RouterContext ctx, UDPTransport transport, UDPEndpoint endpoint, EstablishmentManager establisher, InboundMessageFragments inbound, PeerTestManager testManager, IntroductionManager introManager) {// LINT -- Exporting non-public type through public API
+    PacketHandler(RouterContext ctx, UDPTransport transport, UDPEndpoint endpoint, EstablishmentManager establisher,
+                  InboundMessageFragments inbound, PeerTestManager testManager, IntroductionManager introManager) {
         _context = ctx;
         _log = ctx.logManager().getLog(PacketHandler.class);
         _transport = transport;
@@ -44,10 +46,20 @@ class PacketHandler {
         _inbound = inbound;
         _testManager = testManager;
         _introManager = introManager;
-        _handlers = new Handler[NUM_HANDLERS];
-        for (int i = 0; i < NUM_HANDLERS; i++) {
+
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        int num_handlers;
+        if (maxMemory < 32*1024*1024)
+            num_handlers = 1;
+        else if (maxMemory < 64*1024*1024)
+            num_handlers = 2;
+        else
+            num_handlers = Math.max(MIN_NUM_HANDLERS, Math.min(MAX_NUM_HANDLERS, ctx.bandwidthLimiter().getInboundKBytesPerSecond() / 20));
+        _handlers = new Handler[num_handlers];
+        for (int i = 0; i < num_handlers; i++) {
             _handlers[i] = new Handler();
         }
+
         _context.statManager().createRateStat("udp.handleTime", "How long it takes to handle a received packet after its been pulled off the queue", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.queueTime", "How long after a packet is received can we begin handling it", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.receivePacketSkew", "How long ago after the packet was sent did we receive it", "udp", UDPTransport.RATES);
@@ -79,8 +91,8 @@ class PacketHandler {
     
     public void startup() { 
         _keepReading = true;
-        for (int i = 0; i < NUM_HANDLERS; i++) {
-            I2PThread t = new I2PThread(_handlers[i], "UDP Packet handler " + i + '/' + NUM_HANDLERS, true);
+        for (int i = 0; i < _handlers.length; i++) {
+            I2PThread t = new I2PThread(_handlers[i], "UDP Packet handler " + (i+1) + '/' + _handlers.length, true);
             t.start();
         }
     }
@@ -91,8 +103,8 @@ class PacketHandler {
 
     String getHandlerStatus() {
         StringBuilder rv = new StringBuilder();
-        rv.append("Handlers: ").append(NUM_HANDLERS);
-        for (int i = 0; i < NUM_HANDLERS; i++) {
+        rv.append("Handlers: ").append(_handlers.length);
+        for (int i = 0; i < _handlers.length; i++) {
             Handler handler = _handlers[i];
             rv.append(" handler ").append(i).append(" state: ").append(handler._state);
         }

@@ -16,22 +16,26 @@ public class TunnelGatewayPumper implements Runnable {
     private RouterContext _context;
     private final BlockingQueue<PumpedTunnelGateway> _wantsPumping;
     private boolean _stop;
-    private static final int PUMPERS = 4;
+    private static final int MIN_PUMPERS = 1;
+    private static final int MAX_PUMPERS = 4;
+    private final int _pumpers;
     
     /** Creates a new instance of TunnelGatewayPumper */
     public TunnelGatewayPumper(RouterContext ctx) {
         _context = ctx;
         _wantsPumping = new LinkedBlockingQueue();
         _stop = false;
-        for (int i = 0; i < PUMPERS; i++)
-            new I2PThread(this, "Tunnel GW pumper " + i + '/' + PUMPERS, true).start();
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        _pumpers = (int) Math.max(MIN_PUMPERS, Math.min(MAX_PUMPERS, 1 + (maxMemory / (32*1024*1024))));
+        for (int i = 0; i < _pumpers; i++)
+            new I2PThread(this, "Tunnel GW pumper " + (i+1) + '/' + _pumpers, true).start();
     }
 
     public void stopPumping() {
         _stop=true;
         _wantsPumping.clear();
         PumpedTunnelGateway poison = new PoisonPTG(_context);
-        for (int i = 0; i < PUMPERS; i++)
+        for (int i = 0; i < _pumpers; i++)
             _wantsPumping.offer(poison);
         for (int i = 1; i <= 5 && !_wantsPumping.isEmpty(); i++) {
             try {

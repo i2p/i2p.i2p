@@ -27,7 +27,9 @@ class MessageReceiver {
     private final BlockingQueue<InboundMessageState> _completeMessages;
     private boolean _alive;
     //private ByteCache _cache;
-    private static final int THREADS = 5;
+    private static final int MIN_THREADS = 2;  // unless < 32MB
+    private static final int MAX_THREADS = 5;
+    private final int _threadCount;
     private static final long POISON_IMS = -99999999999l;
     
     public MessageReceiver(RouterContext ctx, UDPTransport transport) {
@@ -35,10 +37,19 @@ class MessageReceiver {
         _log = ctx.logManager().getLog(MessageReceiver.class);
         _transport = transport;
         _completeMessages = new LinkedBlockingQueue();
+
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        if (maxMemory < 32*1024*1024)
+            _threadCount = 1;
+        else if (maxMemory < 64*1024*1024)
+            _threadCount = 2;
+        else
+            _threadCount = Math.max(MIN_THREADS, Math.min(MAX_THREADS, ctx.bandwidthLimiter().getInboundKBytesPerSecond() / 20));
+
         // the runners run forever, no need to have a cache
         //_cache = ByteCache.getInstance(64, I2NPMessage.MAX_SIZE);
         _context.statManager().createRateStat("udp.inboundExpired", "How many messages were expired before reception?", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.inboundRemaining", "How many messages were remaining when a message is pulled off the complete queue?", "udp", UDPTransport.RATES);
+        //_context.statManager().createRateStat("udp.inboundRemaining", "How many messages were remaining when a message is pulled off the complete queue?", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.inboundReady", "How many messages were ready when a message is added to the complete queue?", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.inboundReadTime", "How long it takes to parse in the completed fragments into a message?", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.inboundReceiveProcessTime", "How long it takes to add the message to the transport?", "udp", UDPTransport.RATES);
@@ -49,8 +60,8 @@ class MessageReceiver {
     
     public void startup() {
         _alive = true;
-        for (int i = 0; i < THREADS; i++) {
-            I2PThread t = new I2PThread(new Runner(), "UDP message receiver " + i + '/' + THREADS, true);
+        for (int i = 0; i < _threadCount; i++) {
+            I2PThread t = new I2PThread(new Runner(), "UDP message receiver " + (i+1) + '/' + _threadCount, true);
             t.start();
         }
     }
@@ -64,7 +75,7 @@ class MessageReceiver {
     public void shutdown() {
         _alive = false;
         _completeMessages.clear();
-        for (int i = 0; i < THREADS; i++) {
+        for (int i = 0; i < _threadCount; i++) {
             InboundMessageState ims = new InboundMessageState(_context, POISON_IMS, null);
             _completeMessages.offer(ims);
         }
@@ -119,8 +130,8 @@ class MessageReceiver {
             
             if (message != null) {
                 long before = System.currentTimeMillis();
-                if (remaining > 0)
-                    _context.statManager().addRateData("udp.inboundRemaining", remaining, 0);
+                //if (remaining > 0)
+                //    _context.statManager().addRateData("udp.inboundRemaining", remaining, 0);
                 int size = message.getCompleteSize();
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Full message received (" + message.getMessageId() + ") after " + message.getLifetime());
