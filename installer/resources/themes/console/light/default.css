@@ -46,7 +46,7 @@ h4 {
      border: 1px solid #225;
      margin: 5px 0 15px 0;
      padding: 5px 10px;
-     background: #b4c8ff url(images/header_on.png) repeat-x center center;
+     background: #eef url(images/header.png) repeat-x center center;
      text-transform: uppercase;
      letter-spacing: 0.08em;
      -moz-box-shadow: inset 0px 0px 4px 0px #bbf;
@@ -357,7 +357,7 @@ select {
 }
 
 a:link{
-     color: #007;
+     color: #813;
      text-decoration: none;
      font-weight: bold;
      word-wrap: break-word;
