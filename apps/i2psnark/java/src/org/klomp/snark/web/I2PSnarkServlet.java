@@ -257,7 +257,7 @@ public class I2PSnarkServlet extends Default {
         out.write(" title=\"");
         out.write(_("Status"));
         out.write("\"> ");
-        out.write(_("Status"));
+//        out.write(_("Status"));
         if (_manager.util().connected() && !snarks.isEmpty()) {
             out.write(" <a href=\"");
             out.write(req.getRequestURI());
@@ -279,35 +279,36 @@ public class I2PSnarkServlet extends Default {
             out.write("</a><br>\n"); 
         }
         out.write("</th>\n<th align=\"left\">");
-        out.write("<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/torrent.png\" title=\"");
-        out.write(_("Torrent"));
+//        out.write("<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/torrent.png\"\">");
+        out.write("<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/head_torrent.png\" title=\"");
+        out.write(_("Loaded Torrents"));
         out.write("\">");
-        out.write(_("Torrent"));
+//        out.write(_("Torrent"));
         out.write("</th>\n<th align=\"center\">");
-        out.write("<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/eta.png\" title=\"");
+        out.write("<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/head_eta.png\" title=\"");
         out.write(_("Estimated Download Time"));
         out.write("\">");  // space here would look better but nbsp is too big and thinsp breaks
-        out.write(_("ETA"));
+ //       out.write(_("ETA"));
         out.write("</th>\n<th align=\"center\">");
-        out.write("<img border=\"0\" src=\"/themes/console/images/inbound.png\" title=\"");
+        out.write("<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/head_rx.png\" title=\"");
         out.write(_("Downloaded"));
         out.write("\">");
-        out.write(_("RX"));
+//        out.write(_("RX"));
         out.write("</th>\n<th align=\"center\">");
-        out.write("<img border=\"0\" src=\"/themes/console/images/outbound.png\" title=\"");
+        out.write("<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/head_tx.png\" title=\"");
         out.write(_("Uploaded"));
         out.write("\">");
-        out.write(_("TX"));
+//        out.write(_("TX"));
         out.write("</th>\n<th align=\"center\">");
-        out.write("<img border=\"0\" src=\"/themes/console/images/inbound.png\" title=\"");
+        out.write("<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/head_rxspeed.png\" title=\"");
         out.write(_("Down Rate"));
         out.write("\">");
-        out.write(_("Rate"));
+//        out.write(_("Rate"));
         out.write("</th>\n<th align=\"center\">");
-        out.write("<img border=\"0\" src=\"/themes/console/images/outbound.png\" title=\"");
+        out.write("<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/head_txspeed.png\" title=\"");
         out.write(_("Up Rate"));
         out.write("\">");
-        out.write(_("Rate"));
+//        out.write(_("Rate"));
         out.write("</th>\n");
         out.write("<th align=\"center\">");
         if (_manager.util().connected()) {
