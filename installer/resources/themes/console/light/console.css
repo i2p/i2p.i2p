@@ -668,14 +668,14 @@ code {
 }
 
 a:link{
-     color: #53f;
+     color: #503;
      text-decoration: none;
      font-weight: bold;
      word-wrap: break-word;
 }
 
 a:visited{
-     color: #517;
+     color: #218;
      text-decoration: none;
      font-weight: bold;
 }
