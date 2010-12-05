@@ -299,7 +299,7 @@ div.sorry hr {
 }     
 
 div.main {
-     margin: -3px 5px 5px 205px;
+     margin: -1px 5px 5px 205px;
      padding: 0 15px 15px 15px;
      text-align: left;
      color: #EE9;
@@ -321,7 +321,7 @@ div.main textarea {
 }
 
 div.news {
-     margin: -4px 5px 1px 205px;
+     margin: -1px 5px 0px 205px;
      padding: 5px 30px 10px 30px;
      border: 1px solid #494;
      background: #000;
@@ -645,7 +645,7 @@ p {
 h1 {
      text-align: left;
      color: #EE9;
-     padding: 15px 15px 17px;
+     padding: 15px 15px 14px;
      margin: 0 5px 0px 205px !important;
      font-size: 17pt;
      font-weight: bold;
