@@ -325,7 +325,7 @@ div.news {
      padding: 5px 30px 10px 30px;
      border: 1px solid #494;
      background: #000;
-     background: #0d0d09 url("images/bg2.png")no-repeat scroll bottom right;
+     background: #000 url("images/news.png")no-repeat scroll center right;
      color: #7b7;
 /*     border-radius: 4px 4px 0 0;
      -moz-border-radius: 4px 4px 0 0;
@@ -335,7 +335,9 @@ div.news {
      -moz-box-shadow: 0 1px 5px #000;
      -khtml-box-shadow: 0 1px 5px #000;
      box-shadow: 0 1px 5px #000;
-     min-width: 590px;
+     min-width: 580px;
+/*     height: 164px;
+     overflow-y: auto;*/
 }
 
 div.news li {
@@ -935,7 +937,7 @@ div.joblog {
      -moz-border-radius: 4px 4px 0 0;
      -khtml-border-radius: 4px 4px 0 0;
      text-align: justify !important;
-     overflow-x: scroll; /* Opera fix */
+     overflow-x: auto; /* Opera fix */
  }
 
 div.main li {
