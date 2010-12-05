@@ -244,11 +244,11 @@ hr {
 }
 
 #globalOperationsPanel {
-     background-color: #030;
+     background-color: #000;
      border: 1px solid #494;
      -moz-box-shadow: inset 0px 0px 0px 1px #932;
      padding: 5px 20px 11px 10px !important;
-     background: #000; /*url(images/camotile2.png);*/
+     background: #000 url(images/scarface.jpg) center center no-repeat !important;
 }
 
 #globalOperationsPanel .control {
