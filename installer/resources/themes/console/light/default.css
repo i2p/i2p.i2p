@@ -160,7 +160,7 @@ hr {
      overflow: hidden;
      min-width: 60px;
      font-weight: bold;
-     background: #ffe url(images/header.png) center center repeat:x !important;
+     background: #ffe;
      color: #001;
      border: 1px outset #ddddc0;
      text-align: center;
