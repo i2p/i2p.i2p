@@ -15,6 +15,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -426,6 +427,7 @@ public class DataHelper {
      * @param rawStream stream to read from
      * @param numBytes number of bytes to read and format into a number
      * @throws DataFormatException if the stream doesn't contain a validly formatted number of that many bytes
+     * @throws EOFException since 0.8.2, if there aren't enough bytes to read the number
      * @throws IOException if there is an IO error reading the number
      * @return number
      */
@@ -437,7 +439,8 @@ public class DataHelper {
         long rv = 0;
         for (int i = 0; i < numBytes; i++) {
             long cur = rawStream.read();
-            if (cur == -1) throw new DataFormatException("Not enough bytes for the field");
+            // was DataFormatException
+            if (cur == -1) throw new EOFException("EOF reading " + numBytes + " byte value");
             cur &= 0xFF;
             // we loop until we find a nonzero byte (or we reach the end)
             if (cur != 0) {
@@ -449,8 +452,9 @@ public class DataHelper {
                     rv += cur;
                     if (j + 1 < remaining) {
                         cur = rawStream.read();
+                        // was DataFormatException
                         if (cur == -1)
-                            throw new DataFormatException("Not enough bytes for the field");
+                            throw new EOFException("EOF reading " + numBytes + " byte value");
                         cur &= 0xFF;
                     }
                 }
@@ -572,6 +576,7 @@ public class DataHelper {
      *
      * @param in stream to read from
      * @throws DataFormatException if the stream doesn't contain a validly formatted string
+     * @throws EOFException since 0.8.2, if there aren't enough bytes to read the string
      * @throws IOException if there is an IO error reading the string
      * @return UTF-8 string
      */
@@ -579,7 +584,8 @@ public class DataHelper {
         int size = (int) readLong(in, 1);
         byte raw[] = new byte[size];
         int read = read(in, raw);
-        if (read != size) throw new DataFormatException("Not enough bytes to read the string");
+        // was DataFormatException
+        if (read != size) throw new EOFException("EOF reading string");
         // the following constructor throws an UnsupportedEncodingException which is an IOException,
         // but that's only if UTF-8 is not supported. Other encoding errors are not thrown.
         return new String(raw, "UTF-8");

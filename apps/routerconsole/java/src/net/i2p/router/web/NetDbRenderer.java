@@ -384,7 +384,7 @@ public class NetDbRenderer {
         }
         buf.append("</td></tr>\n");
         if (full) {
-            buf.append("<tr><td>" + _("Stats") + ": <br><code>\n");
+            buf.append("<tr><td>" + _("Stats") + ": <br><code>");
             for (Iterator iter = info.getOptions().keySet().iterator(); iter.hasNext(); ) {
                 String key = (String)iter.next();
                 String val = info.getOption(key);

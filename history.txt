@@ -1,3 +1,9 @@
+2010-12-05 zzz
+    * DataHelper: Have readLong() and readString() throw an
+      EOFException instead of a DataFormatException on EOF,
+      which should lower the log severity in I2CP and I2NP
+      when a client or peer disconnects.
+
 2010-12-02 zzz
     * Console: Format console refresh time
     * I2NP: Allow message to be written more than once,
