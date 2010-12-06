@@ -232,6 +232,7 @@ div.tunnels table {
 
 div.tunnels td, div.tunnels img:first-child {
      margin: 0 !important;
+    text-transform: capitalize;
 }
 
 .tunnels tr {
@@ -405,6 +406,7 @@ div.news li {
      opacity: 1;
      background: #ffe url('images/header.png') center center repeat-x;
      -moz-box-shadow: 0px 1px 1px 1px #ccf;
+     -moz-box-shadow: 0 1px 1px 1px rgba(176, 176, 216, 0.4);
 }
 
 /*
@@ -611,7 +613,7 @@ div.main li {
 }
 
 div.main li b {
-     color: #151!important;
+     color: #514!important;
      letter-spacing: 0.02em;
      font-size: 9.5pt;
      line-height: 170%;
