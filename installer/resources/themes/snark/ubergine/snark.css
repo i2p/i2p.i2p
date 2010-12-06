@@ -234,6 +234,12 @@ td:first-child {
      padding: 2px 0 0;
 }
 
+.snarkTorrentName img {
+     padding: 1px;
+     text-align: left;
+     vertical-align: middle;
+}
+
 .snarkTorrentAction {
      text-shadow:1px 1px #550000;
      padding: 1px 1px 1px 1px !important;
