@@ -350,10 +350,17 @@ public class I2PSnarkServlet extends Default {
             out.write(_("Totals"));
             out.write("\"> ");
             out.write("&nbsp;");
-            out.write(ngettext("1 torrent", "{0} torrents", snarks.size()));
-            out.write(", ");
-            out.write(DataHelper.formatSize2(stats[5]) + "B, ");
-            out.write(ngettext("1 connected peer", "{0} connected peers", (int) stats[4]));
+//            out.write(ngettext("1 connected peer", "{0} connected peers", (int) stats[4]));
+
+            out.write("<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/head_peers.png\">");
+            out.write(ngettext("1", "{0}", (int) stats[4]));
+            out.write("&nbsp;&nbsp;");
+//            out.write(ngettext("1 torrent", "{0} torrents", snarks.size()));
+            out.write("<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/head_snarks.png\">");
+            out.write(ngettext("1", "{0}", snarks.size()));
+            out.write("&nbsp;&nbsp;");
+            out.write("<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/head_loaded.png\">");
+            out.write(DataHelper.formatSize2(stats[5]) + "B");
             out.write("</th>\n" +
                       "    <th>&nbsp;</th>\n" +
                       "    <th align=\"right\">" + formatSize(stats[0]) + "</th>\n" +
