@@ -136,8 +136,8 @@ tr {
 }
 
 thead, tfoot {
-     background: url("/themes/snark/ubergine/images/snark_thead.png") repeat-x scroll 0 0 #101;
      text-shadow:0 2px 5px #333333;
+     background: #101;
 }
 
 thead a, tfoot a {
