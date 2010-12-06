@@ -1,3 +1,9 @@
+2010-12-06 dr|z3d
+    * I2PSnark: 
+      - Resolve table header wrapping issue.
+      - Phase 2 of UI overhaul, now with 100% more universality!
+      - Vanilla/Ubergine theme enhancements.
+      
 2010-12-05 zzz
     * DataHelper: Have readLong() and readString() throw an
       EOFException instead of a DataFormatException on EOF,
