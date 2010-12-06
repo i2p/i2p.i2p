@@ -267,20 +267,21 @@ td:first-child {
 }
 
 .snarkTorrentStatus {
-     padding: 1px 0 2px;
+     padding: 2px 0 2px;
 }
 
 .snarkTorrentStatus:first-child {
      text-align: left !important;
      padding-left: 0px;
-     min-width: 120px;
+     min-width: 48px;
      font-weight: bold;
      color: #dd9 !important;
      font-size: 8pt;
+     padding: 1px !important;
 }
 
 .snarkTorrentStatus:first-child img {
-     margin-right: 0px !important;
+     margin-right: 8px !important;
 }
 
 .snarkTorrentRateUp, .snarkTorrentRateDown, .snarkTorrentDownloaded, .snarkTorrentUploaded {

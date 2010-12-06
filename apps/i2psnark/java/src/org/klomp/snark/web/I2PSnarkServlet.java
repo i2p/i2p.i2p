@@ -264,14 +264,14 @@ public class I2PSnarkServlet extends Default {
             if (peerParam != null) {
                 out.write("\">");
                 out.write("<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/showpeers.png\" title=\"");
-                out.write(_("Hide Peers"));
+                out.write(_("Hide All Attached Peers [connected/total in swarm]"));
                 out.write("\" alt=\"");
                 out.write(_("Hide Peers"));
                 out.write("\">");
             } else {
                 out.write("?p=1\">");
                 out.write("<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/hidepeers.png\" title=\"");
-                out.write(_("Show Peers"));
+                out.write(_("Show All Attached Peers [connected/total in swarm]"));
                 out.write("\" alt=\"");
                 out.write(_("Show Peers"));
                 out.write("\">");
@@ -343,8 +343,13 @@ public class I2PSnarkServlet extends Default {
         } else if (snarks.size() > 1) {
             out.write("<tfoot><tr>\n" +
                       "    <th align=\"left\" colspan=\"2\">");
+//            out.write(_("Totals"));
+//            out.write(" &raquo;&nbsp;");
+            out.write("<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/status.png\"");
+            out.write(" title=\"");
             out.write(_("Totals"));
-            out.write(" &raquo;&nbsp;");
+            out.write("\"> ");
+            out.write("&nbsp;");
             out.write(ngettext("1 torrent", "{0} torrents", snarks.size()));
             out.write(", ");
             out.write(DataHelper.formatSize2(stats[5]) + "B, ");
@@ -714,11 +719,13 @@ public class I2PSnarkServlet extends Default {
                 statusString = "<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/trackererror.png\" title=\"" + _("Tracker Error") +
                                "\"><a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">" +
                                ' ' + curPeers + "&thinsp;/&thinsp;" +
-                               ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
+                               // ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
+                               ngettext("1", "{0}", knownPeers) + "</a>";
             else if (isRunning)
                 statusString = "<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/trackererror.png\" title=\"" + _("Tracker Error") +
                                "\">" + ' ' + curPeers + "&thinsp;/&thinsp;" +
-                               ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
+                               // ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
+                               ngettext("1", "{0}", knownPeers) + "</a>";
             else {
                 if (err.length() > MAX_DISPLAYED_ERROR_LENGTH)
                     err = err.substring(0, MAX_DISPLAYED_ERROR_LENGTH) + "&hellip;";
@@ -730,11 +737,13 @@ public class I2PSnarkServlet extends Default {
                 statusString = "<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/seeding.png\" title=\"" + _("Seeding") + "\">" +
                                "<a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">" +
                                ' ' + curPeers + "&thinsp;/&thinsp;" +
-                               ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
+                               // ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
+                               ngettext("1", "{0}", knownPeers) + "</a>";
             else if (isRunning)
                 statusString = "<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/seeding.png\" title=\"" + _("Seeding") + "\">" +
                                ' ' + curPeers + "&thinsp;/&thinsp;" +
-                               ngettext("1 peer", "{0} peers", knownPeers)  + "</a>";
+                               // ngettext("1 peer", "{0} peers", knownPeers)  + "</a>";
+                               ngettext("1", "{0}", knownPeers)  + "</a>";
             else
                 statusString = "<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/complete.png\" title=\"" + _("Complete") + "\"> " + _("Complete");
         } else {
@@ -742,24 +751,29 @@ public class I2PSnarkServlet extends Default {
                 statusString = "<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/downloading.png\" title=\"" + _("Downloading") + "\">" +
                                "<a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">" +
                                ' ' + curPeers + "&thinsp;/&thinsp;" +
-                               ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
+                             //  ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
+                               ngettext("1", "{0}", knownPeers) + "</a>";
             else if (isRunning && curPeers > 0 && downBps > 0)
                 statusString = "<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/downloading.png\" title=\"" + _("Downloading") + "\">" +
                                ' ' + curPeers + "&thinsp;/&thinsp;" +
-                               ngettext("1 peer", "{0} peers", knownPeers);
+                               ngettext("1", "{0}", knownPeers);
+                              //  ngettext("1 peer", "{0} peers", knownPeers);
             else if (isRunning && curPeers > 0 && !showPeers)
                 statusString = "<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/stalled.png\" title=\"" + _("Stalled") + "\">" +
                                "<a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">" +
                                ' ' + curPeers + "&thinsp;/&thinsp;" +
-                               ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
+                               // ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
+                               ngettext("1", "{0}", knownPeers) + "</a>";                               
             else if (isRunning && curPeers > 0)
                 statusString = "<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/stalled.png\" title=\"" + _("Stalled") + "\">" +
                                ' ' + curPeers + "&thinsp;/&thinsp;" +
-                               ngettext("1 peer", "{0} peers", knownPeers);
+                               // ngettext("1 peer", "{0} peers", knownPeers);
+                               ngettext("1", "{0}", knownPeers);
             else if (isRunning)
                 statusString = "<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/nopeers.png\" title=\"" + _("No Peers") + "\">" +
                                ' ' + curPeers + "&thinsp;/&thinsp;" +
-                               ngettext("1 peer", "{0} peers", knownPeers);
+                               // ngettext("1 peer", "{0} peers", knownPeers);
+                               ngettext("1", "{0}", knownPeers);
             else
                 statusString = "<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/stopped.png\" title=\"" + _("Stopped") + "\"> " + _("Stopped");
         }
