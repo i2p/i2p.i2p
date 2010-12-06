@@ -167,7 +167,7 @@ th {
 
 th:first-child {
      text-align: left !important;
-     padding-left: 2px;
+     padding-left: 3px;
 }
 
 tfoot td:first-child {
@@ -220,7 +220,7 @@ tfoot th {
 }
 
 td {
-     padding: 1px;
+     padding: 2px 1px;
      color: #501 !important;
      opacity: 1;
      font-size: 9.5pt;
@@ -237,7 +237,13 @@ td:first-child {
 
 .snarkTorrentName {
 /*     text-shadow:1px 1px #540;*/
-     padding: 2px 0 0;
+     padding: 3px 0 0;
+}
+
+.snarkTorrentName img {
+     padding-bottom: 2px;
+     text-align: left;
+     vertical-align: middle;
 }
 
 .snarkTorrentAction {
@@ -269,7 +275,7 @@ td:first-child {
 }
 
 .snarkTorrentStatus {
-     padding: 1px 0 2px;
+     padding: -1px 0 2px;
      font-size: 8pt !important;
      letter-spacing: -0.05em;
 }
@@ -285,6 +291,7 @@ td:first-child {
 
 .snarkTorrentStatus:first-child img {
      margin-right: 10px !important;
+     margin-left: 5px !important;
 }
 
 .snarkTorrentRateUp, .snarkTorrentRateDown, .snarkTorrentDownloaded, .snarkTorrentUploaded {
