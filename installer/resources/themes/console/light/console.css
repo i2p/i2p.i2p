@@ -133,7 +133,7 @@ div.routersummary h3 {
      padding: 2px 0;
      background: #ffe;
      text-transform: uppercase;
-     background: #ffe url('images/header_on.png') center center repeat-x;
+     background: #ffe url('images/header.png') center center repeat-x;
      border: 1px solid #99f !important;
      -moz-border-radius: 3px;
      -khtml-border-radius: 3px;
@@ -146,7 +146,7 @@ div.routersummary h3 a {
 }
 
 div.routersummary h3:hover {
-     background: #ffe url('images/header.png') center center repeat-x;
+     background: #ffa url('images/header.png') center center repeat-x !important;
      text-shadow: 0 0 0;
 }
 
@@ -668,7 +668,7 @@ code {
 }
 
 a:link{
-     color: #503;
+     color: #359;
      text-decoration: none;
      font-weight: bold;
      word-wrap: break-word;
@@ -848,7 +848,7 @@ button:active{
 }
 
 .langbox img {
-     opacity: 0.9 !important;
+     opacity: 0.5 !important;
      -moz-box-shadow: 0 0 1px #447;
 }
 
