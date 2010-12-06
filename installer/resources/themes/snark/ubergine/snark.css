@@ -170,7 +170,7 @@ tfoot td:first-child {
 }
 
 th:first-child img {
-     margin: 1px 1px 3px 1px !important;
+     margin: 1px 1px 3px 3px !important;
 }
 
 th:nth-child(2) img {
@@ -273,7 +273,7 @@ td:first-child {
 }
 
 .snarkTorrentStatus {
-     padding: 2px 0 2px;
+     padding: 2px 2px 2px 0;
 }
 
 .snarkTorrentStatus:first-child {
@@ -288,6 +288,7 @@ td:first-child {
 
 .snarkTorrentStatus:first-child img {
      margin-right: 8px !important;
+     margin-left: 5px;
 }
 
 .snarkTorrentRateUp, .snarkTorrentRateDown, .snarkTorrentDownloaded, .snarkTorrentUploaded {
