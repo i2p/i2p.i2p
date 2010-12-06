@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P i2ptunnel\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-11-18 18:06+0000\n"
-"PO-Revision-Date: 2010-11-18 23:55+0100\n"
+"POT-Creation-Date: 2010-12-04 17:23+0000\n"
+"PO-Revision-Date: 2010-12-04 18:31+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -17,12 +17,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: German\n"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:478
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:475
 #, java-format
 msgid "To visit the destination in your host database, click <a href=\"{0}\">here</a>. To visit the conflicting addresshelper destination, click <a href=\"{1}\">here</a>."
 msgstr "Um das Ziel in Ihrer Host-Datenbank zu besuchen, klicken Sie <a href=\"{0}\">hier</a>, und um das Ziel aus der kollidierenden Adresshelfer-Anfrage zu besuchen, <a href=\"{1}\">hier</a>!"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:939
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:932
 msgid "Click a link below to look for an address helper by using a \"jump\" service:"
 msgstr "Durch Klicken auf einen der untenstehenden Links bekommen Sie einen Adresshelfer von einem \"Sprung\"-Service:"
 
@@ -36,12 +36,12 @@ msgstr "Einstellungen für alle Tunnel neugeladen"
 
 #. and give them something to look at in any case
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:229
-msgid "Starting tunnel..."
+msgid "Starting tunnel"
 msgstr "Starte Tunnel ..."
 
 #. and give them something to look at in any case
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:242
-msgid "Stopping tunnel..."
+msgid "Stopping tunnel"
 msgstr "Beende Tunnel ..."
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:389
