@@ -405,7 +405,7 @@ div.news li {
      font-size: 10pt;
      opacity: 1;
      background: #ffe url('images/header.png') center center repeat-x;
-     -moz-box-shadow: 0px 1px 1px 1px #ccf;
+     -moz-box-shadow: 0 1px 1px 1px rgba(176, 176, 216, 0.4);
      -moz-box-shadow: 0 1px 1px 1px rgba(176, 176, 216, 0.4);
 }
 
@@ -752,7 +752,7 @@ h2 {
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      margin: 15px 0px 15px 0 !important;
-     -moz-box-shadow: 0px 1px 1px 1px #ccf;
+     -moz-box-shadow: 0 1px 1px 1px rgba(176, 176, 216, 0.4);
      word-wrap: break-word;
      text-transform: uppercase;
      opacity: 1;
@@ -781,7 +781,7 @@ h3 {
      text-shadow: 0px 0px 1px #77f;
      font-size: 11pt;
      color: #000;
-     -moz-box-shadow: 0px 1px 1px 1px #ccf;
+     -moz-box-shadow: 0 1px 1px 1px rgba(176, 176, 216, 0.4);
      opacity: 1;
 }
 
@@ -851,7 +851,7 @@ button:active{
 }
 
 .langbox img {
-     opacity: 0.5 !important;
+     opacity: 0.7 !important;
      -moz-box-shadow: 0 0 1px #447;
 }
 
