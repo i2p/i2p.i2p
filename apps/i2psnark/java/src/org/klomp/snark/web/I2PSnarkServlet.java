@@ -348,28 +348,28 @@ public class I2PSnarkServlet extends Default {
             out.write("<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/status.png\"");
             out.write(" title=\"");
             out.write(_("Totals"));
-            out.write("\"> ");
+            out.write("\">");
             out.write("&nbsp;");
 //            out.write(ngettext("1 connected peer", "{0} connected peers", (int) stats[4]));
 
             out.write("<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/head_peers.png\"");
             out.write(" title=\"");
             out.write(ngettext("1 connected peer", "{0} connected peers", (int) stats[4]));
-            out.write("\"> ");
+            out.write("\">");
             out.write(ngettext("1", "{0}", (int) stats[4]));
             out.write("&nbsp;&nbsp;");
 //            out.write(ngettext("1 torrent", "{0} torrents", snarks.size()));
             out.write("<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/head_snarks.png\"");
             out.write(" title=\"");
             out.write(ngettext("1 torrent loaded", "{0} torrents loaded", snarks.size()));
-            out.write("\"> ");
+            out.write("\">");
             out.write(ngettext("1", "{0}", snarks.size()));
             out.write("&nbsp;&nbsp;");
             out.write("<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/head_loaded.png\"");
             out.write(" title=\"");
             out.write(_("Total download size (pre-allocated): "));
             out.write(DataHelper.formatSize2(stats[5]) + "B");
-            out.write("\"> ");
+            out.write("\">");
             out.write(DataHelper.formatSize2(stats[5]) + "B");
             out.write("</th>\n" +
                       "    <th>&nbsp;</th>\n" +
