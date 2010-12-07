@@ -98,7 +98,7 @@ body {
      background: #101 url('/themes/snark/ubergine/images/hat.png') no-repeat scroll right center;
 }
 
-.snarkMessages a:link {
+.snarkMessages a:link, .snarkMessages a:visited {
      color: #37f !important;
 }
 
