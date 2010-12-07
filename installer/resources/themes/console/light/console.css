@@ -162,7 +162,7 @@ div.routersummary h4 {
      text-decoration: none !important;
      color: #2b2;
      line-height: 105%;
-     text-shadow: 0px 1px 1px #99f;
+/*     text-shadow: 0px 1px 1px #99f;*/
 }
 
 div.routersummary table {
@@ -207,6 +207,10 @@ div.tunnels td:first-child {
 div.tunnels td:last-child {
      text-align: right;
      padding-right: 1px;
+}
+
+div.tunnels img, div.tunnels img:hover {
+     opacity: 1 !important;
 }
 
 div.routersummary img:first-child  { 
