@@ -325,7 +325,7 @@ div.news {
      padding: 5px 30px 10px 30px;
      border: 1px solid #494;
      background: #000;
-     background: #000 url("images/news.jpg")no-repeat scroll center right;
+     background: #000 url("images/news.png")no-repeat scroll bottom right;
      color: #7b7;
 /*     border-radius: 4px 4px 0 0;
      -moz-border-radius: 4px 4px 0 0;
