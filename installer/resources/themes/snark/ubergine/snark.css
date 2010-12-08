@@ -181,6 +181,15 @@ tfoot th {
      padding-bottom: 4px !important;
 }
 
+tfoot img, tfoot:nth-child(2) img, tfoot:nth-child(1) img, tfoot:nth-child(3) img, tfoot:nth-child(4) img {
+     margin: 0px 2px 3px 0px !important;
+     padding-right: 0 !important;
+}
+
+tfoot tr:nth-child(n+1) {
+     text-align: left;
+}
+
 .headerstatus {
      text-align: left;
      padding-left: 15px;
