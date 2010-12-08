@@ -1440,9 +1440,10 @@ public class I2PSnarkServlet extends Default {
             .append(_("Download Status")).append("\">").append("</th>");
         if (showPriority)
             buf.append("<th class=\"headerpriority\">")
-            .append("<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/priority.png\" title=\"\">")
+            .append("<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/priority.png\" title=\"")
+            .append(_("Priority")).append("\">").append("</th>");
 //            .append(_("Priority")).append("</th>");
-            .append("</th>");
+//            .append("</th>");
             buf.append("</tr></thead>\n");
             buf.append("<tr><td colspan=\"4\" class=\"ParentDir\"><A HREF=\"");
             buf.append(URI.addPaths(base,"../"));
