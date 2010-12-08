@@ -192,11 +192,19 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 //     at java.lang.Thread.run(Thread.java:619)
                 //     at net.i2p.util.I2PThread.run(I2PThread.java:71)
                 try {
-                    serverin = _webserver.getInputStream(); 
+                    serverin = _webserver.getInputStream();
                 } catch (NullPointerException npe) {
                     throw new IOException("getInputStream NPE");
                 }
                 CompressedResponseOutputStream compressedOut = new CompressedResponseOutputStream(browserout);
+
+                //Change headers to protect server identity
+                StringBuilder command = new StringBuilder(128);
+                Properties headers = readHeaders(serverin, command);
+                headers.setProperty("Server", "I2PServer");
+                String modifiedHeaders = formatHeaders(headers, command);
+                compressedOut.write(modifiedHeaders.getBytes());
+
                 Sender s = new Sender(compressedOut, serverin, "server: server to browser");
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Before pumping the compressed response");
@@ -328,7 +336,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     /** ridiculously long, just to prevent OOM DOS @since 0.7.13 */
     private static final int MAX_HEADERS = 60;
 
-    private Properties readHeaders(InputStream in, StringBuilder command) throws IOException {
+    private static Properties readHeaders(InputStream in, StringBuilder command) throws IOException {
         Properties headers = new Properties();
         StringBuilder buf = new StringBuilder(128);
         
@@ -348,8 +356,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 }
             }
         }
-        if (trimmed > 0)
-            getTunnel().getContext().statManager().addRateData("i2ptunnel.httpNullWorkaround", trimmed, 0);
+        //if (trimmed > 0)
+        //    getTunnel().getContext().statManager().addRateData("i2ptunnel.httpNullWorkaround", trimmed, 0);
         
         int i = 0;
         while (true) {
