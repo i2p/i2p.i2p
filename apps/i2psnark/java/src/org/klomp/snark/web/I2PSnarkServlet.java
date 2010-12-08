@@ -1432,14 +1432,17 @@ public class I2PSnarkServlet extends Default {
             .append(_("File")).append("\" alt=\"").append(_("File")).append("\">&nbsp;")
             .append(title).append("</th><th align=\"right\">")
             .append("<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/size.png\" title=\"")
-            .append(_("FileSize")).append("\" alt=\"").append(_("FileSize")).append("\">").append(_("Size"));
+//            .append(_("FileSize")).append("\" alt=\"").append(_("FileSize")).append("\">").append(_("Size"));
+            .append(_("FileSize")).append("\" alt=\"").append(_("FileSize")).append("\">");
             buf.append("</th><th class=\"headerstatus\">")
             .append("<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/status.png\" title=\"")
-            .append(_("Download Status")).append("\">").append(_("Status")).append("</th>");
+//            .append(_("Download Status")).append("\">").append(_("Status")).append("</th>");
+            .append(_("Download Status")).append("\">").append("</th>");
         if (showPriority)
             buf.append("<th class=\"headerpriority\">")
             .append("<img border=\"0\" src=\"/themes/snark/" + _manager.getTheme() + "/images/priority.png\" title=\"\">")
-            .append(_("Priority")).append("</th>");
+//            .append(_("Priority")).append("</th>");
+            .append("</th>");
             buf.append("</tr></thead>\n");
             buf.append("<tr><td colspan=\"4\" class=\"ParentDir\"><A HREF=\"");
             buf.append(URI.addPaths(base,"../"));
