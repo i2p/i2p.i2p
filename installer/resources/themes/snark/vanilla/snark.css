@@ -299,8 +299,8 @@ td:first-child {
 }
 
 .snarkTorrentStatus:first-child img {
-     margin-right: 10px !important;
-     margin-left: 5px !important;
+     margin-right: 12px !important;
+     margin-left: 6px !important;
 }
 
 .snarkTorrentRateUp, .snarkTorrentRateDown, .snarkTorrentDownloaded, .snarkTorrentUploaded {
