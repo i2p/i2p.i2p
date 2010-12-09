@@ -2,6 +2,7 @@ package net.i2p.desktopgui.router;
 
 import java.io.IOException;
 
+import net.i2p.desktopgui.i18n.DesktopguiTranslator;
 import net.i2p.desktopgui.util.ConfigurationManager;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
@@ -55,5 +56,9 @@ public class RouterManager {
 	 */
 	public static void shutDown() {
 		getRouter().shutdownGracefully();
+    }
+
+    private static String _(String s) {
+        return DesktopguiTranslator._(s);
     }
 }

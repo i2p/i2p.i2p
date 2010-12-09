@@ -31,6 +31,7 @@ public class Main {
      * Main method launching the application.
      */
     public static void main(String[] args) {
+    	System.setProperty("java.awt.headless", "false");
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException ex) {

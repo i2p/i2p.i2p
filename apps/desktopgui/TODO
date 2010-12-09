@@ -1,7 +1,12 @@
 HIGH PRIORITY:
 - Allow desktopgui to start, stop and restart I2P. - DONE
 - Correct logging system - DONE
-- Internationalisation
+- Internationalisation:
+    * Add strings
+    * Add Windows support
+    * Might need some kind of trigger to reload the menu (for live language switching)
+    * Language choice is not actually set as a parameter in I2P config?
+        As a result, desktopgui always starts with the default, unless you manually set the language.
 - Modify installer to set I2P directory parameter; or use $I2P?
 UNKNOWN:
 - API to allow applications to add themselves to the menu?

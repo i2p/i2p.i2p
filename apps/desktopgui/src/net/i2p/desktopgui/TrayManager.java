@@ -18,6 +18,7 @@ import java.net.URL;
 
 import javax.swing.SwingWorker;
 
+import net.i2p.desktopgui.i18n.DesktopguiTranslator;
 import net.i2p.desktopgui.router.RouterManager;
 import net.i2p.desktopgui.util.ConfigurationManager;
 import net.i2p.util.Log;
@@ -69,7 +70,7 @@ public class TrayManager {
     	boolean inI2P = ConfigurationManager.getInstance().getBooleanConfiguration("startWithI2P", false);
     	
         PopupMenu popup = new PopupMenu();
-        MenuItem browserLauncher = new MenuItem("Launch I2P Browser");
+        MenuItem browserLauncher = new MenuItem(_("Launch I2P Browser"));
         browserLauncher.addActionListener(new ActionListener() {
             
             @Override
@@ -95,8 +96,8 @@ public class TrayManager {
                                 }
                             }
                             else {
-                                trayIcon.displayMessage("Browser not found",
-                                        "The default browser for your system was not found.",
+                                trayIcon.displayMessage(_("Browser not found"),
+                                        _("The default browser for your system was not found."),
                                         TrayIcon.MessageType.WARNING);
                             }
                         }    
@@ -107,7 +108,7 @@ public class TrayManager {
         });
         popup.add(browserLauncher);
         popup.addSeparator();
-        MenuItem startItem = new MenuItem("Start I2P");
+        MenuItem startItem = new MenuItem(_("Start I2P"));
         startItem.addActionListener(new ActionListener() {
 
 			@Override
@@ -122,7 +123,7 @@ public class TrayManager {
 					
 					@Override
 					protected void done() {
-						trayIcon.displayMessage("Starting", "I2P is starting!", TrayIcon.MessageType.INFO);
+						trayIcon.displayMessage(_("Starting"), _("I2P is starting!"), TrayIcon.MessageType.INFO);
 						//Hide the tray icon.
 						//We cannot stop the desktopgui program entirely,
 						//since that risks killing the I2P process as well.
@@ -136,7 +137,7 @@ public class TrayManager {
         if(!inI2P) {
         	popup.add(startItem);
         }
-        MenuItem restartItem = new MenuItem("Restart I2P");
+        MenuItem restartItem = new MenuItem(_("Restart I2P"));
         restartItem.addActionListener(new ActionListener() {
 
             @Override
@@ -157,7 +158,7 @@ public class TrayManager {
         if(inI2P) {
         	popup.add(restartItem);
         }
-        MenuItem stopItem = new MenuItem("Stop I2P");
+        MenuItem stopItem = new MenuItem(_("Stop I2P"));
         stopItem.addActionListener(new ActionListener() {
 
             @Override
@@ -189,5 +190,9 @@ public class TrayManager {
         URL url = getClass().getResource("/desktopgui/resources/images/logo.jpg");
         Image image = Toolkit.getDefaultToolkit().getImage(url);
         return image;
+    }
+    
+    private static String _(String s) {
+        return DesktopguiTranslator._(s);
     }
 }
