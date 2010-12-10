@@ -798,9 +798,9 @@ tt {
 .tidylist code {
      text-align: left;
      font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
-     color: #390;
+     color: #723;
      padding: 2px 3px;
-     background: #eeb;
+/*     background: #fff;*/
      font-weight: bold;
 }
 
