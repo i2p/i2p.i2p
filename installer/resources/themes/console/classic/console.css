@@ -153,7 +153,7 @@ div.routersummaryouter {
 }
 
 div.routersummary {
-     background: #ddf;
+     background: #eef;
      width: 193px;
      color: inherit;
      margin: 0 0 5px;
@@ -182,9 +182,9 @@ div.routersummary h3 {
      border: 0px solid #f00;
      font-size: 9.5pt;
      letter-spacing: 0.05em;
-     margin: -7px 0px -8px 0px;
+     margin: -7px -1px -8px -1px;
      padding: 1px 0;
-     background: #c5d5fb;
+     background: #f;
      text-transform: uppercase;
 }
 
@@ -193,9 +193,9 @@ div.routersummary h4 {
      border-bottom: 0 !important;
      font-size: 8.5pt;
      letter-spacing: 0.05em;
-     margin: -7px 0px -8px 0px !important;
-     padding: 3px 0;
-     background: #c1d1f7;
+     margin: -7px -1px -8px -1px !important;
+     padding: 8px 0;
+     background: #fff;
      text-transform: capitalize;
      text-decoration: none !important;
      color: #2b2;
@@ -220,7 +220,7 @@ div.routersummary table {
 
 div.routersummary tr {
      background-image: none !important;
-     background-color: transparent !important;
+     background-color: transparent !important; 
      border: 0 !important;
 }
 
@@ -541,10 +541,17 @@ h3 {
 }
 
 h2, h3 {
-     background-image: url("images/titlebg.png"); 
+     background-image: url("images/titlebg.png") !important; 
      background-repeat: no-repeat; 
-     background-position: right center;
+     background-position: center right;
 }
+
+.routersummary h2, .routersummary h3 {
+     background-image: url("images/tinytitle.png") !important; 
+     background-repeat: repeat-x; 
+     background-position: center right;
+}
+
 
 .proxyfooter{
      font-size: 7pt;
@@ -800,7 +807,7 @@ tt {
 div.graphspanel {
      padding: 10px 5px 20px 5px;
      margin: -16px -16px -11px -16px;
-     border: 1px solid #89f;
+/*     border: 1px solid #89f;*/
      text-align: center !important;   
 }
 
