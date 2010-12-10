@@ -44,7 +44,7 @@ div.configure table {
 }
 
 h1 {
-     padding: 24px 10px 23px 10px !important;
+     padding: 24px 10px 23px 20px !important;
      margin: 0 px 0 195px !important;
      margin: 0 2px 0 200px !important;
      color: #001;
@@ -54,7 +54,7 @@ h1 {
 }
 
 h2 {
-     padding: 10px !important;
+     padding: 12px !important;
      text-align: left !important;
      margin: 0 0 15px 0 !important;
 }
