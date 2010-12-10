@@ -429,7 +429,6 @@ div.news hr {
 
 div.confignav {
      padding: 11px 0;
-     background: #ddf;
      margin: -16px -16px 0 -16px;
      border: 1px solid #89f;
      font-size: 9.5pt;
@@ -546,7 +545,7 @@ h2, h3 {
      background-position: center right;
 }
 
-.routersummary h2, .routersummary h3 {
+.routersummary h2, .routersummary h3, div.confignav {
      background-image: url("images/tinytitle.png") !important; 
      background-repeat: repeat-x; 
      background-position: center right;
