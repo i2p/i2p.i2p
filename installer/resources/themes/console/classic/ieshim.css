@@ -53,10 +53,6 @@ h1 {
      text-align: left;
 }
 
-h1, h2, h3 {
-}
-
-
 h2 {
      padding: 10px !important;
      text-align: left !important;
@@ -153,7 +149,7 @@ div.routersummary h3 {
      font-size: 9pt;
      letter-spacing: 0.05em;
      margin: -14px 0px -15px 1px;
-     padding: 1px 0px 1px 0px;
+     padding: 3px 0px !important;
      background: #c5d5fb;
      text-transform: uppercase;
 }
@@ -165,7 +161,7 @@ div.routersummary h4 {
      letter-spacing: 0.05em;
      margin: -14px 0px -15px 1px !important;
      padding: 7px 3px 5px 3px;
-     background: #c1d1f7;
+     background: #fff;
      text-transform: capitalize;
      text-decoration: none !important;
      color: #2b2;
@@ -297,3 +293,10 @@ div.news {
      padding-right: 10px;
      font-size: 7pt;
 }
+
+h1, h2, h3 {
+     background: #fff url(images/titlebg.png) center right no-repeat !important;
+}
+
+.routersummary h2, .routersummary h3 {
+     background: #fff url(images/tinytitle.png) center right tile-x !important;     
