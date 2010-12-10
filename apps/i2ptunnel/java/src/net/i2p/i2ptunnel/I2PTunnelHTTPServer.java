@@ -15,6 +15,7 @@ import java.util.Properties;
 import java.util.zip.GZIPOutputStream;
 
 import net.i2p.client.streaming.I2PSocket;
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.I2PAppThread;
@@ -36,6 +37,9 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     private static final String HASH_HEADER = "X-I2P-DestHash";
     private static final String DEST64_HEADER = "X-I2P-DestB64";
     private static final String DEST32_HEADER = "X-I2P-DestB32";
+    private static final String[] CLIENT_SKIPHEADERS = {HASH_HEADER, DEST64_HEADER, DEST32_HEADER};
+    private static final String SERVER_HEADER = "Server";
+    private static final String[] SERVER_SKIPHEADERS = {SERVER_HEADER};
 
     public I2PTunnelHTTPServer(InetAddress host, int port, String privData, String spoofHost, Logging l, EventDispatcher notifyThis, I2PTunnel tunnel) {
         super(host, port, privData, l, notifyThis, tunnel);
@@ -75,7 +79,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             InputStream in = socket.getInputStream();
 
             StringBuilder command = new StringBuilder(128);
-            Properties headers = readHeaders(in, command);
+            Properties headers = readHeaders(in, command,
+                CLIENT_SKIPHEADERS, getTunnel().getContext());
             headers.setProperty(HASH_HEADER, socket.getPeerDestination().calculateHash().toBase64());
             headers.setProperty(DEST32_HEADER, Base32.encode(socket.getPeerDestination().calculateHash().getData()) + ".b32.i2p" );
             headers.setProperty(DEST64_HEADER, socket.getPeerDestination().toBase64());
@@ -118,7 +123,9 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 useGZIP = true;
             
             if (allowGZIP && useGZIP) {
-                I2PAppThread req = new I2PAppThread(new CompressedRequestor(s, socket, modifiedHeader), Thread.currentThread().getName()+".hc");
+                I2PAppThread req = new I2PAppThread(
+                    new CompressedRequestor(s, socket, modifiedHeader, getTunnel().getContext()),
+                        Thread.currentThread().getName()+".hc");
                 req.start();
             } else {
                 new I2PTunnelRunner(s, socket, slock, null, modifiedHeader.getBytes(), null);
@@ -155,10 +162,12 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         private Socket _webserver;
         private I2PSocket _browser;
         private String _headers;
-        public CompressedRequestor(Socket webserver, I2PSocket browser, String headers) {
+        private I2PAppContext _ctx;
+        public CompressedRequestor(Socket webserver, I2PSocket browser, String headers, I2PAppContext ctx) {
             _webserver = webserver;
             _browser = browser;
             _headers = headers;
+            _ctx = ctx;
         }
         public void run() {
             if (_log.shouldLog(Log.INFO))
@@ -200,8 +209,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
 
                 //Change headers to protect server identity
                 StringBuilder command = new StringBuilder(128);
-                Properties headers = readHeaders(serverin, command);
-                headers.setProperty("Server", "I2PServer");
+                Properties headers = readHeaders(serverin, command,
+                    SERVER_SKIPHEADERS, _ctx);
                 String modifiedHeaders = formatHeaders(headers, command);
                 compressedOut.write(modifiedHeaders.getBytes());
 
@@ -336,7 +345,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     /** ridiculously long, just to prevent OOM DOS @since 0.7.13 */
     private static final int MAX_HEADERS = 60;
 
-    private static Properties readHeaders(InputStream in, StringBuilder command) throws IOException {
+    private static Properties readHeaders(InputStream in, StringBuilder command, String[] skipHeaders, I2PAppContext ctx) throws IOException {
         Properties headers = new Properties();
         StringBuilder buf = new StringBuilder(128);
         
@@ -356,8 +365,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 }
             }
         }
-        //if (trimmed > 0)
-        //    getTunnel().getContext().statManager().addRateData("i2ptunnel.httpNullWorkaround", trimmed, 0);
+        if (trimmed > 0)
+            ctx.statManager().addRateData("i2ptunnel.httpNullWorkaround", trimmed, 0);
         
         int i = 0;
         while (true) {
@@ -379,16 +388,24 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                     value = buf.substring(split+1).trim(); // ":"
                 else
                     value = "";
+
                 if ("Accept-encoding".equalsIgnoreCase(name))
                     name = "Accept-encoding";
                 else if ("X-Accept-encoding".equalsIgnoreCase(name))
                     name = "X-Accept-encoding";
-                else if (HASH_HEADER.equalsIgnoreCase(name))
-                    continue;     // Prevent spoofing
-                else if (DEST64_HEADER.equalsIgnoreCase(name))
-                    continue;     // Prevent spoofing
-                else if (DEST32_HEADER.equalsIgnoreCase(name))
-                    continue;     // Prevent spoofing
+
+                //We want to remove certain headers to improve anonymity
+                boolean skip = false;
+                for (String skipHeader: skipHeaders) {
+                    if (skipHeader.equalsIgnoreCase(name)) {
+                        skip = true;
+                        break;
+                    }
+                }
+                if(skip) {
+                    continue;
+                }
+
                 headers.setProperty(name, value);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Read the header [" + name + "] = [" + value + "]");

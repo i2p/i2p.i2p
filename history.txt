@@ -1,3 +1,5 @@
+2010-12-10 Mathiasdm
+    * I2PTunnel: Fixed up security fix.
 2010-12-07 Mathiasdm
     * I2PTunnel: Security fix: change server reply
       to return 'I2PServer' instead of the actual servername.
