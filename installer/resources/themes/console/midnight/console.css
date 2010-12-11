@@ -170,6 +170,9 @@ div.routersummary {
      word-wrap: break-word; 
      font: 9pt/125%; 
      -moz-box-shadow: inset 0px 0px 0px 1px #00000A; 
+/*     -moz-border-radius: 3px;
+     -khtml-border-radius: 3px;
+     border-radius: 3px;*/
 }
 
 div.routersummary input[type=text] {
@@ -192,10 +195,12 @@ div.routersummary h3 {
      border: 0px solid #f00;
      font-size: 9.5pt;
      letter-spacing: 0.05em;
-     margin: -6px 1px -6px 1px;
-     padding: 1px 0;
+     margin: -6px 0px -6px 0px;
+     padding: 3px 0;
      background: #002;
      text-transform: uppercase;
+     background: #002 url("images/titles.png") repeat-x !important; 
+     background-position: center center !important;
 }
 
 div.routersummary h3 a, div.routersummary h4 a {
@@ -208,9 +213,9 @@ div.routersummary h4 {
      border-bottom: 0 !important;
      font-size: 8.5pt;
      letter-spacing: 0.05em;
-     margin: -6px 1px -5px 1px !important;
-     padding: 1px 3px;
-     background: #001;
+     margin: -6px 0px -6px 0px !important;
+     padding: 5px 2px;
+     background: #000;
      text-transform: capitalize;
      text-decoration: none !important;
      color: #2b2;
@@ -313,6 +318,9 @@ div.main {
      text-align: left;
      color: #eef;
      min-width: 570px;
+/*     -moz-border-radius: 0 0 3px 3px;
+     -khtml-border-radius: 0 0 3px 3px;
+     border-radius: 0 0 3px 3px;*/
 }
 
 div.main ul {
@@ -391,6 +399,7 @@ div.news {
      padding-right: 10px;
      -moz-box-shadow: inset 0px 0px 4px 2px #00000A;
      font-size: 7pt;
+     background: #001 url("images/planet.png")no-repeat scroll bottom right;
 }
 
 /* convert the list entry to our title */
@@ -446,9 +455,9 @@ div.news hr {
 }
 
 div.confignav {
-     padding: 12px 0 15px 0;
+     padding: 15px 0;
      background: #000018;
-     margin: -10px -16px 0 -16px;
+     margin: -17px -16px 0 -16px;
      border: 1px solid #99f;
      -moz-box-shadow: inset 0px 0px 4px 2px #00000A;
 }
@@ -539,6 +548,9 @@ h1 {
      min-width: 600px;
      line-height: 100%;
      color: #fff;
+/*     -moz-border-radius: 3px 3px 0 0;
+     -khtml-border-radius: 3px 3px 0 0;
+     border-radius: 3px 3px 0 0; */
 }
 
 h2 {
@@ -551,28 +563,36 @@ h2 {
 /*     font-variant: small-caps; */
      text-transform: uppercase; 
      letter-spacing: 0.07em;
+/*     -moz-border-radius: 0 3px 0 0;
+     -khtml-border-radius: 0 3px 0 0;
+     border-radius: 0 3px 0 0;*/
 }
 
 h3 {
      font-size: 11pt;
-     padding: 5px 10px;
+     padding: 6px 10px;
      border: 1px solid #99f;
      border-right: 1px solid #77f;
      border-bottom: 1px solid #77f;
-     letter-spacing: 0.04em;
+     letter-spacing: 0.05em;
      margin-bottom: 10px;
      font-weight: bold !important;
      text-transform: uppercase; 
+/*     -moz-border-radius: 0 3px 0 0;
+     -khtml-border-radius: 0 3px 0 0;
+     border-radius: 0 3px 0 0;*/
 }
 
 h3 a {
      font-weight: bold !important;
 }
 
-h2, h3 {
-     background-image: url("images/h2bg.png"); 
-     background-repeat: no-repeat; 
-     background-position: right center;
+h2, h3, .confignav {
+     background: #002 url("images/tinytitles.png") center center repeat-x !important; 
+}
+
+thead, tfoot, th {
+     background: #002 url("images/titles.png") repeat-x center center !important; 
 }
 
 .proxyfooter{
@@ -774,8 +794,18 @@ p {
      padding-right: 15px !important;
 }
 
+.links li:first-child {
+     padding-top: 10px !important;
+}
+
 .links li:last-child {
      padding-bottom: 10px !important;
+}
+
+.links b {
+     margin-bottom: 25px !important;
+     line-height: 250%;
+     letter-spacing: 0.12em !important;
 }
 
 a:link{
@@ -913,7 +943,7 @@ div.footnote hr{
 .topness {
      font-size: 7.5pt;
      text-align: right;
-     margin-top: -23px;
-     margin-bottom: -5px;
+     margin-top: -5px;
+     margin-bottom: -10px;
      margin-right: 5px;
 }
