@@ -44,17 +44,17 @@ div.configure table {
 }
 
 h1 {
-     padding: 24px 10px 23px 10px !important;
-     margin: 0 0px 0 195px !important;
-     margin: 0 16px 0 213px !important;
+     padding: 24px 10px 23px 20px !important;
+     margin: 0 px 0 195px !important;
+     margin: 0 2px 0 200px !important;
      color: #001;
      border: 1px solid #89f !important;
      border-left: 1px solid #89f !important;
+     text-align: left;
 }
 
-
 h2 {
-     padding: 10px !important;
+     padding: 12px !important;
      text-align: left !important;
      margin: 0 0 15px 0 !important;
 }
@@ -79,7 +79,7 @@ div.messages {
 }
 
 div.main {
-     margin: -5px 0px 10px 197px;
+     margin: -5px 2px 10px 200px;
      border: 1px solid #89f !important;
 }
 
@@ -89,6 +89,7 @@ div.main hr, div.news hr {
 
 div.news {
      margin-left: 197px !important;
+     margin-right: 100px !important;
      border-left: 1px solid #89f !important;
 }
 
@@ -103,7 +104,7 @@ div.main {
 
 div.news {
      border-left: 5px solid #bbf;
-     margin: -5px 0px 0 193px;
+     margin: 0px 5px 0 193px;
      padding-bottom: 8px;
 }
 
@@ -148,7 +149,7 @@ div.routersummary h3 {
      font-size: 9pt;
      letter-spacing: 0.05em;
      margin: -14px 0px -15px 1px;
-     padding: 1px 0px 1px 0px;
+     padding: 3px 0px !important;
      background: #c5d5fb;
      text-transform: uppercase;
 }
@@ -160,7 +161,7 @@ div.routersummary h4 {
      letter-spacing: 0.05em;
      margin: -14px 0px -15px 1px !important;
      padding: 7px 3px 5px 3px;
-     background: #c1d1f7;
+     background: #fff;
      text-transform: capitalize;
      text-decoration: none !important;
      color: #2b2;
@@ -213,7 +214,7 @@ div.routersummary td {
 }
 
 div.routersummary form {
-     margin: -20px 0 !important;   
+     margin: -20px 0 !important; 
 }
 
 div.news li {
@@ -266,3 +267,36 @@ div.graphspanel hr {
 table {
      width: 100% !important;
 }
+
+.links li {
+     list-style-image: url("images/link.png") !important;
+     list-style-image: none !important;
+     margin: 2px 15px 10px 0px !important;
+     padding-right: 5px;
+     list-style-position: outside;
+     display:list-item;
+}
+
+
+div.news {
+     margin: -1px 2px 0 200px !important;
+     padding: -10px 0px 8px 0px;
+     background: #ffffc0;
+     border: 1px solid #89f;
+     border-bottom: 1px solid #89f;
+     border-right: 1px solid #89f;
+     text-align: right;
+     color: #770;
+     min-width: 500px;
+     padding-bottom: 8px;
+     padding-left: 10px;
+     padding-right: 10px;
+     font-size: 7pt;
+}
+
+h1, h2, h3 {
+     background: #fff url(images/titlebg.png) center right no-repeat !important;
+}
+
+.routersummary h2, .routersummary h3 {
+     background: #fff url(images/tinytitle.png) center right tile-x !important;     

@@ -153,7 +153,7 @@ div.routersummaryouter {
 }
 
 div.routersummary {
-     background: #ddf;
+     background: #eef;
      width: 193px;
      color: inherit;
      margin: 0 0 5px;
@@ -164,6 +164,9 @@ div.routersummary {
      border-right: 1px solid #89f;
      word-wrap: break-word;
      font: 9pt/125% !important;
+     -moz-border-radius: 3px 0 0 3px;
+     -khtml-border-radius: 3px 0 0 3px;
+     border-radius: 3px 0 0 3px;
 }
 
 div.routersummary input[type=text] {
@@ -182,9 +185,9 @@ div.routersummary h3 {
      border: 0px solid #f00;
      font-size: 9.5pt;
      letter-spacing: 0.05em;
-     margin: -7px 0px -8px 0px;
-     padding: 1px 0;
-     background: #c5d5fb;
+     margin: -7px -1px -8px -1px;
+     padding: 3px 0;
+     background: #f;
      text-transform: uppercase;
 }
 
@@ -193,9 +196,9 @@ div.routersummary h4 {
      border-bottom: 0 !important;
      font-size: 8.5pt;
      letter-spacing: 0.05em;
-     margin: -7px 0px -8px 0px !important;
-     padding: 3px 0;
-     background: #c1d1f7;
+     margin: -7px -1px -8px -1px !important;
+     padding: 8px 0;
+     background: #fff;
      text-transform: capitalize;
      text-decoration: none !important;
      color: #2b2;
@@ -220,7 +223,7 @@ div.routersummary table {
 
 div.routersummary tr {
      background-image: none !important;
-     background-color: transparent !important;
+     background-color: transparent !important; 
      border: 0 !important;
 }
 
@@ -301,6 +304,9 @@ div.main {
      text-align: left;
      color: #001;
      min-width: 500px;
+     -moz-border-radius: 0 0 3px 0;
+     -khtml-border-radius: 0 0 3px 0;
+     border-radius: 0 0 3px 0;
 }
 
 div.main ul {
@@ -331,6 +337,9 @@ div.main textarea {
 div.main h2 {
      margin-top: 20px;
      margin-bottom: 10px !important;
+     -moz-border-radius: 0 3px 0 0;
+     -khtml-border-radius: 0 3px 0 0;
+     border-radius: 0 3px 0 0;
 }
 
 div.welcome {
@@ -428,8 +437,7 @@ div.news hr {
 }
 
 div.confignav {
-     padding: 11px 0;
-     background: #ddf;
+     padding: 15px 0;
      margin: -16px -16px 0 -16px;
      border: 1px solid #89f;
      font-size: 9.5pt;
@@ -516,6 +524,9 @@ h1 {
      letter-spacing: 0.3em;
      background: #fff;
      min-width: 500px;
+     -moz-border-radius: 0 3px 0 0;
+     -khtml-border-radius: 0 3px 0 0;
+     border-radius: 0 3px 0 0;
 }
 
 h2 {
@@ -531,7 +542,7 @@ h2 {
 
 h3 {
      font-size: 12pt;
-     padding: 5px 10px;
+     padding: 6px 10px 8px;
      border: 1px solid #89f;
      letter-spacing: 0.04em;
      margin-bottom: 10px;
@@ -541,10 +552,20 @@ h3 {
 }
 
 h2, h3 {
-     background-image: url("images/titlebg.png"); 
+     background-image: url("images/titlebg.png") !important; 
      background-repeat: no-repeat; 
-     background-position: right center;
+     background-position: center right;
+     -moz-border-radius: 0 3px 0 0;
+     -khtml-border-radius: 0 3px 0 0;
+     border-radius: 0 3px 0 0;
 }
+
+.routersummary h2, .routersummary h3, div.confignav {
+     background-image: url("images/tinytitle.png") !important; 
+     background-repeat: repeat-x; 
+     background-position: center right;
+}
+
 
 .proxyfooter{
      font-size: 7pt;
@@ -618,11 +639,14 @@ hr {
      font-size: 8pt;
      color: #001;
      text-align: center;
-     margin: -7px 0 7px 0; 
-     background: #bbf;
-     border: 5px solid #bbf;
+     margin: -5px 0 7px 0; 
+     background: #fff;
+     border: 1px solid #bbf;
      border-top: 0;
      padding: 4px 0 2px 0;
+     background-image: url("images/tinytitle.png") !important; 
+     background-repeat: repeat-x; 
+     background-position: center right;
 }
 
 div.joblog {
@@ -729,6 +753,22 @@ p {
 
 .links li {
      list-style-image: url("images/link.png") !important;
+     padding: 5px 10px 0 !important;
+}
+
+.links li:first-child {
+     padding: 14px 10px 5px !important;
+}
+
+.links li:last-child {
+     margin-bottom: 0px !important;
+     margin-top: 0px;
+}
+
+.links b {
+     font-size: 10pt;
+     line-height: 150%;
+     letter-spacing: 0.02em;
 }
 
 a:link{
@@ -773,7 +813,10 @@ tt {
 }
 
 .tablefooter tr, .tablefooter td {
-     background: #bbf;
+     background: #fff;
+     background-image: url("images/tinytitle.png") !important; 
+     background-repeat: repeat-x; 
+     background-position: center right;
      font-size: 8pt;
      font-weight: bold;
      line-height: 150%;
@@ -784,23 +827,24 @@ tt {
 
 .tidylist {
      text-align: justify;
-     padding-right: 30px;
-     margin-right: 20px;
+     padding-right: 25px;
+     margin-right: 15px !important;
+     margin-left: 15px;
 }
 
 .tidylist code {
      text-align: left;
      font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
-     color: #390;
+     color: #723;
      padding: 2px 3px;
-     background: #eeb;
+/*     background: #fff;*/
      font-weight: bold;
 }
 
 div.graphspanel {
      padding: 10px 5px 20px 5px;
      margin: -16px -16px -11px -16px;
-     border: 1px solid #89f;
+/*     border: 1px solid #89f;*/
      text-align: center !important;   
 }
 
@@ -849,4 +893,12 @@ div.footnote hr{
      background: #99f;
      height: 1px;
      border: 0px solid #99f;
+}
+
+.topness {
+     font-size: 7.5pt;
+     text-align: right;
+     margin-top: -8px;
+     margin-bottom: -5px;
+     margin-right: 5px;
 }

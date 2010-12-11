@@ -584,6 +584,7 @@ div.main li b {
      color: #dd0;
      padding: 1px 2px;
      background: #030;
+     margin: 0 2px;
 }
 
 ol {
@@ -1048,4 +1049,12 @@ div.footnote hr{
      background: #494;
      height: 1px;
      border: 0px solid #494;
+}
+
+.topness {
+     font-size: 7.5pt;
+     text-align: right;
+     margin-top: -23px;
+     margin-bottom: -5px;
+     margin-right: 5px;
 }

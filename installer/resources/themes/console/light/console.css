@@ -1147,3 +1147,11 @@ div.footnote hr{
      height: 1px;
      border: 0px solid #447;
 }
+
+.topness {
+     font-size: 7.5pt;
+     text-align: right;
+     margin-top: -10px;
+     margin-bottom: -18px;
+     margin-right: 5px;
+}
