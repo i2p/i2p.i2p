@@ -29,6 +29,14 @@ class LogRecordFormatter {
     private final static int MAX_PRIORITY_LENGTH = 5;
 
     public static String formatRecord(LogManager manager, LogRecord rec) {
+        return formatRecord(manager, rec, true);
+    }
+
+    /**
+     *  @param showDate if false, skip any date in the format (use when writing to wrapper log)
+     *  @since 0.8.2
+     */
+    static String formatRecord(LogManager manager, LogRecord rec, boolean showDate) {
         int size = 128 + rec.getMessage().length();
         if (rec.getThrowable() != null)
             size += 512;
@@ -37,7 +45,10 @@ class LogRecordFormatter {
         for (int i = 0; i < format.length; ++i) {
             switch (format[i]) {
             case LogManager.DATE:
-                buf.append(getWhen(manager, rec));
+                if (showDate)
+                    buf.append(getWhen(manager, rec));
+                else if (i+1 < format.length && format[i+1] == ' ')
+                    i++;  // skip following space
                 break;
             case LogManager.CLASS:
                 buf.append(getWhere(rec));

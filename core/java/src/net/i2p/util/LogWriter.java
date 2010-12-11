@@ -17,8 +17,6 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Queue;
 
-import net.i2p.I2PAppContext;
-
 /**
  * Log writer thread that pulls log records from the LogManager, writes them to
  * the current logfile, and rotates the logs as necessary.  This also periodically
@@ -112,7 +110,7 @@ class LogWriter implements Runnable {
     }
 
     private void writeRecord(LogRecord rec) {
-        String val = LogRecordFormatter.formatRecord(_manager, rec);
+        String val = LogRecordFormatter.formatRecord(_manager, rec, true);
         writeRecord(val);
 
         // we always add to the console buffer, but only sometimes write to stdout
@@ -121,7 +119,11 @@ class LogWriter implements Runnable {
             _manager.getBuffer().addCritical(val);
         if (_manager.getDisplayOnScreenLevel() <= rec.getPriority()) {
             if (_manager.displayOnScreen()) {
-                System.out.print(val);
+                // wrapper log already does time stamps, so reformat without the date
+                if (System.getProperty("wrapper.version") != null)
+                    System.out.print(LogRecordFormatter.formatRecord(_manager, rec, false));
+                else
+                    System.out.print(val);
             }
         }
     }
@@ -199,7 +201,7 @@ class LogWriter implements Runnable {
         File f = new File(pattern);
         File base = null;
         if (!f.isAbsolute())
-            base = I2PAppContext.getGlobalContext().getLogDir();
+            base = _manager.getContext().getLogDir();
 
         if ( (pattern.indexOf('#') < 0) && (pattern.indexOf('@') <= 0) ) {
             if (base != null)
