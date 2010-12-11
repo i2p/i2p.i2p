@@ -525,8 +525,8 @@ h1 {
      background: #fff;
      min-width: 500px;
      -moz-border-radius: 0 3px 0 0;
-     -khtml-border-radius: 3px 0 0 3px;
-     border-radius: 3px 0 0 3px;
+     -khtml-border-radius: 0 3px 0 0;
+     border-radius: 0 3px 0 0;
 }
 
 h2 {
@@ -639,11 +639,14 @@ hr {
      font-size: 8pt;
      color: #001;
      text-align: center;
-     margin: -7px 0 7px 0; 
-     background: #bbf;
-     border: 5px solid #bbf;
+     margin: -5px 0 7px 0; 
+     background: #fff;
+     border: 1px solid #bbf;
      border-top: 0;
      padding: 4px 0 2px 0;
+     background-image: url("images/tinytitle.png") !important; 
+     background-repeat: repeat-x; 
+     background-position: center right;
 }
 
 div.joblog {
@@ -750,7 +753,7 @@ p {
 
 .links li {
      list-style-image: url("images/link.png") !important;
-     padding: 5px 10px !important;
+     padding: 5px 10px 0 !important;
 }
 
 .links li:first-child {
@@ -758,7 +761,14 @@ p {
 }
 
 .links li:last-child {
-     margin-bottom: -10px !important;
+     margin-bottom: 0px !important;
+     margin-top: 0px;
+}
+
+.links b {
+     font-size: 10pt;
+     line-height: 150%;
+     letter-spacing: 0.02em;
 }
 
 a:link{
@@ -888,7 +898,7 @@ div.footnote hr{
 .topness {
      font-size: 7.5pt;
      text-align: right;
-     margin-top: -23px;
+     margin-top: -8px;
      margin-bottom: -5px;
      margin-right: 5px;
 }
