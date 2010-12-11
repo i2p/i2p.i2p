@@ -176,23 +176,30 @@ JXQAnA28vDmMMMH/WPbC5ixmJeGGNUiR
     /**
      *  Duplicate keys or names rejected,
      *  except that duplicate empty names are allowed
+     *  @param key 172 character base64 string
+     *  @param name non-null but "" ok
      *  @since 0.7.12
      *  @return true if successful
      */
     public boolean addKey(String key, String name) {
-        SigningPublicKey signingPublicKey = new SigningPublicKey();
-        try {
-            // fromBase64() won't reject a string that is too long
-            if (key.length() != KEYSIZE_B64_BYTES)
-                throw new DataFormatException("x");
-            signingPublicKey.fromBase64(key);
-        } catch (DataFormatException dfe) {
-            _log.error("Bad signing key for " + name + " : " + key);
+        String oldName = _trustedKeys.get(key);
+        // already there?
+        if (name.equals(oldName))
+            return true;
+        if (oldName != null && !oldName.equals("")) {
+            _log.error("Key for " + name + " already stored for different name " + oldName + " : " + key);
             return false;
         }
-        if (_trustedKeys.containsKey(signingPublicKey) ||
-            ((!name.equals("")) && _trustedKeys.containsValue(name))) {
-            _log.error("Duplicate signing key for " + name + " : " + key);
+        SigningPublicKey signingPublicKey = new SigningPublicKey();
+        try {
+            // fromBase64() will throw a DFE if length is not right
+            signingPublicKey.fromBase64(key);
+        } catch (DataFormatException dfe) {
+            _log.error("Invalid signing key for " + name + " : " + key, dfe);
+            return false;
+        }
+        if ((!name.equals("")) && _trustedKeys.containsValue(name)) {
+            _log.error("Key mismatch for " + name + ", spoof attempt? : " + key);
             return false;
         }
         _trustedKeys.put(signingPublicKey, name);
