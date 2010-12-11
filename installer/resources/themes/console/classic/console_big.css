@@ -26,6 +26,11 @@ div.routersummary table a:link, div.routersummary table a:visited {
      font-size: 10.5pt;
 }
 
+div.routersummary a {
+     word-spacing: 0em !important;
+     letter-spacing: 0.2em !important;
+}
+
 div.tunnels a {
      font-size: 9pt !important;
 }
@@ -49,6 +54,14 @@ div.tunnels td {
 a, b, div.routersummary h3 a, div.routersummary h4 {
     font-weight: normal !important;
     font-size: 100%;
+}
+
+b, a, input, button, submit, i, th, thead, tfoot, h1, h2, h3, h4{
+     font-weight: normal !important;
+     font-style: normal !important;
+     -moz-text-shadow: 0 0 0;
+     -khtml-text-shadow: 0 0 0;
+     text-shadow: 0 0 0;
 }
 
 body {
