@@ -67,7 +67,7 @@ div.logo a:hover {
 /* http proxy error warning */
 
 div.warning {
-     margin: 25px 25px 10px 260px;
+     margin: 25px 25px 15px 260px;
      padding: 0px 20px 20px 75px;
      background: #001;
      border: 1px solid #99f;
@@ -766,12 +766,12 @@ p {
      padding-bottom: -2px;
      text-align: justify;
      margin-top: 5px !important;
-     margin-left: 5px !important;     
+     margin-left: 5px !important;
 }
 
 .links li {
      list-style-image: url("images/link.png") !important;
-     padding-right: 20px !important;
+     padding-right: 15px !important;
 }
 
 .links li:last-child {
@@ -830,8 +830,8 @@ tt {
 
 .tidylist {
      text-align: justify;
-     padding-right: 30px;
-     margin-right: 20px;
+     padding-right: 20px;
+     margin-right: 10px !important;
 }
 
 div.graphspanel {
@@ -908,4 +908,12 @@ div.footnote hr{
      background: #99f;
      height: 1px;
      border: 0px solid #99f;
+}
+
+.topness {
+     font-size: 7.5pt;
+     text-align: right;
+     margin-top: -23px;
+     margin-bottom: -5px;
+     margin-right: 5px;
 }
