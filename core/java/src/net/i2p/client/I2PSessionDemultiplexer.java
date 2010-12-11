@@ -38,8 +38,13 @@ public class I2PSessionDemultiplexer implements I2PSessionMuxedListener {
             l.messageAvailable(session, msgId, size, proto, fromport, toport);
         else {
             // no listener, throw it out
-            _log.error("No listener found for proto: " + proto + " port: " + toport + "msg id: " + msgId +
-                       " from pool of " + _listeners.size() + " listeners");
+            if (_listeners.isEmpty()) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("No listeners for incoming message");
+            } else {
+                _log.error("No listener found for proto: " + proto + " port: " + toport + " msg id: " + msgId +
+                           " from pool of " + _listeners.size() + " listeners");
+            }
             try {
                 session.receiveMessage(msgId);
             } catch (I2PSessionException ise) {}

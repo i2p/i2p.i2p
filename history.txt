@@ -1,5 +1,6 @@
 2010-12-11 zzz
     * Build: Fix 'ant distclean poupdate' again
+    * I2CP: Change a log error to a warning (ticket #353)
     * i2psnark:
       - Restore text (ticket #273)
       - Fix several HTML errors (ticket #273)
@@ -22,6 +23,7 @@
 
 2010-12-10 Mathiasdm
     * I2PTunnel: Fixed up security fix.
+
 2010-12-07 Mathiasdm
     * I2PTunnel: Security fix: change server reply
       to return 'I2PServer' instead of the actual servername.
