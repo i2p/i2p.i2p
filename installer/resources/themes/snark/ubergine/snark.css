@@ -155,7 +155,6 @@ th {
      border-bottom: 1px inset #101;
      color: #ddd;
      whitespace: nowrap;
-     font-variant: small-caps !important;
      letter-spacing: 0.05em;
 }
 
@@ -238,6 +237,10 @@ td:first-child {
      font-size: 9.5pt;
 }
 
+.center {
+     text-align: center !important;
+}
+
 .snarkTorrentName {
      text-shadow:1px 1px #550000;
      padding: 2px 0 0;
@@ -268,7 +271,6 @@ td:first-child {
 }
 
 .snarkTorrentEven {
-     background: #545;
      font-size: 8pt;
      background: #202;
 }
@@ -323,7 +325,6 @@ td:first-child {
 }
 
 .snarkTorrentOdd {
-     background: #656;
      background: #351933;
      font-size: 8pt;
      border: 0px inset #101 !important;

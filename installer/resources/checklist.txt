@@ -8,7 +8,6 @@ Deploy the Jetty archive, a clean checkout lacks it
 
 Change revision in:
 	history.txt
-	installer/resources/initialNews.xml
 	installer/install.xml
 	installer/resources/news.xml
 	router/java/src/net/i2p/router/RouterVersion.java
@@ -21,7 +20,7 @@ Review the complete diff from the last release:
 
 Verify that no untrusted revisions were inadvertently
 blessed by a trusted party:
-        mtn log --brief --no-graph --to t:i2p-0.7.(xx-1) | cut -d ' ' -f 2- | sort
+        mtn log --brief --no-graph --to t:i2p-0.8.(xx-1) | cut -d ' ' -f 2 | sort | uniq -c
 
 NOTE: Most tasks below here are now automated by 'ant release'
 

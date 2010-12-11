@@ -23,9 +23,10 @@
         <echo message="  dist:      pkg and javadoc" />
         <echo message="  installer: build the GUI installer" />
         <echo message="  tarball:   tar the full install into i2p.tar.bz2 (extracts to build a new clean install)" />
-        <echo message="  updater:   tar the built i2p specific files into an i2pupdate.zip (extracts safely over existing installs)" />
+        <echo message="  updater:   Package the built files in i2pupdate.zip (extracts safely over existing installs)" />
+        <echo message="  updater200: Updater compressed with pack200 (creates i2pupdate200.zip, 60% smaller)" />
         <echo message="  updaterWithJavadoc: updater including the javadocs, for display in the console" />
-        <echo message="  updaterWithJetty:   tar the built i2p specific files and jetty into an i2pupdate.zip (extracts safely over existing installs)" />
+        <echo message="  updaterWithJetty: Updater including Jetty" />
         <echo message="  updaterWithJettyFixes: updater including local jetty patches" />
         <echo message="  updaterWithGeoIP: updater including GeoIP Files" />
         <echo message="  updaterWithJettyFixesAndGeoIP" />
@@ -199,7 +200,8 @@
         <copy file="installer/lib/jbigi/jbigi.jar" todir="build" />
         <copy file="apps/addressbook/dist/addressbook.war" todir="build/" />
     </target>
-    <target name="poupdate">
+    <!-- the apps need to compile the jsps to poupdate -->
+    <target name="poupdate" depends="buildRouter, buildStreaming, buildSystray, buildJetty" >
         <ant dir="apps/routerconsole/java/" target="poupdate" />
         <ant dir="apps/i2psnark/java/" target="poupdate" />
         <ant dir="apps/i2ptunnel/java/" target="poupdate" />

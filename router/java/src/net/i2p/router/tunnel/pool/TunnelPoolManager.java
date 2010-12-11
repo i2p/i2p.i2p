@@ -131,10 +131,14 @@ public class TunnelPoolManager implements TunnelManagerFacade {
                 if (info != null)
                     return info;
         }
-        info = _inboundExploratory.getTunnel(id);
-        if (info != null) return info;
-        info = _outboundExploratory.getTunnel(id);
-        if (info != null) return info;
+        if (_inboundExploratory != null) {
+            info = _inboundExploratory.getTunnel(id);
+            if (info != null) return info;
+        }
+        if (_outboundExploratory != null) {
+            info = _outboundExploratory.getTunnel(id);
+            if (info != null) return info;
+        }
         return null;
     }
     

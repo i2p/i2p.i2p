@@ -1,3 +1,29 @@
+2010-12-11 zzz
+    * Build: Fix 'ant distclean poupdate' again
+    * I2CP: Change a log error to a warning (ticket #353)
+    * i2psnark:
+      - Restore text (ticket #273)
+      - Fix several HTML errors (ticket #273)
+      - Fix HTML error causing info links to be unclickable in dillo (tiicket #273)
+      - Fix alt text duplicated or looking bad in text browsers (ticket #273)
+      - Fix Opera button errors (ticket #332)
+      - Fix POST resubmission errors (ticket #334)
+      - Catch FetchAndAdd copy error (ticket #352)
+      - Set permissions on downloaded torrent files
+      - Hide some columns when not running
+      - Lots of spacing cleanups
+      - Rename images so users don't end up with unused files
+      - Remove ~15 unused images
+      - Clean up theme selection speed-coding exercise
+      - Indent fixes
+    * Log: Don't double-timestamp CRITS in wrapper.log
+    * News: XML fixes (ticket #350)
+    * Plugins: Better handling of signing keys (Ticket #351)
+    * TunnelPoolManager: Fix rare startup NPE (http://forum.i2p/viewtopic.php?t=5192)
+
+2010-12-10 Mathiasdm
+    * I2PTunnel: Fixed up security fix.
+
 2010-12-07 Mathiasdm
     * I2PTunnel: Security fix: change server reply
       to return 'I2PServer' instead of the actual servername.
