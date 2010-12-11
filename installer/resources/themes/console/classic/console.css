@@ -164,6 +164,9 @@ div.routersummary {
      border-right: 1px solid #89f;
      word-wrap: break-word;
      font: 9pt/125% !important;
+     -moz-border-radius: 3px 0 0 3px;
+     -khtml-border-radius: 3px 0 0 3px;
+     border-radius: 3px 0 0 3px;
 }
 
 div.routersummary input[type=text] {
@@ -301,6 +304,9 @@ div.main {
      text-align: left;
      color: #001;
      min-width: 500px;
+     -moz-border-radius: 0 0 3px 0;
+     -khtml-border-radius: 0 0 3px 0;
+     border-radius: 0 0 3px 0;
 }
 
 div.main ul {
@@ -518,6 +524,9 @@ h1 {
      letter-spacing: 0.3em;
      background: #fff;
      min-width: 500px;
+     -moz-border-radius: 0 3px 0 0;
+     -khtml-border-radius: 3px 0 0 3px;
+     border-radius: 3px 0 0 3px;
 }
 
 h2 {
