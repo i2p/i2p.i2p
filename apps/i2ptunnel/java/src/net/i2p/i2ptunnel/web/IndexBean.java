@@ -537,11 +537,11 @@ public class IndexBean {
     public void setDescription(String description) { 
         _description = (description != null ? description.trim() : null);
     }
-    /** I2CP host the router is on */
+    /** I2CP host the router is on, ignored when in router context */
     public void setClientHost(String host) {
         _i2cpHost = (host != null ? host.trim() : null);
     }
-    /** I2CP port the router is on */
+    /** I2CP port the router is on, ignored when in router context */
     public void setClientport(String port) {
         _i2cpPort = (port != null ? port.trim() : null);
     }
@@ -929,12 +929,14 @@ public class IndexBean {
             config.setProperty("name", _name);
         if (_description != null)
             config.setProperty("description", _description);
-        if (_i2cpHost != null)
-            config.setProperty("i2cpHost", _i2cpHost);
-        if ( (_i2cpPort != null) && (_i2cpPort.trim().length() > 0) ) {
-            config.setProperty("i2cpPort", _i2cpPort);
-        } else {
-            config.setProperty("i2cpPort", "7654");
+        if (!_context.isRouterContext()) {
+            if (_i2cpHost != null)
+                config.setProperty("i2cpHost", _i2cpHost);
+            if ( (_i2cpPort != null) && (_i2cpPort.trim().length() > 0) ) {
+                config.setProperty("i2cpPort", _i2cpPort);
+            } else {
+                config.setProperty("i2cpPort", "7654");
+            }
         }
         if (_privKeyFile != null)
             config.setProperty("privKeyFile", _privKeyFile);
@@ -1020,7 +1022,7 @@ public class IndexBean {
         }
     }
 
-    private String _(String key) {
+    protected String _(String key) {
         return Messages._(key, _context);
     }
 }

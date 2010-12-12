@@ -286,19 +286,19 @@
          <% } // !streamrclient %>
 
             <div id="optionsField" class="rowItem">
-                <label><%=intl._("I2CP Options")%>:</label>
+                <label><%=intl._("Router I2CP Address")%>:</label>
             </div>
             <div id="optionsHostField" class="rowItem">
                 <label for="clientHost" accesskey="o">
                     <%=intl._("Host")%>(<span class="accessKey">o</span>):
                 </label>
-                <input type="text" id="clientHost" name="clientHost" size="20" title="I2CP Hostname or IP" value="<%=editBean.getI2CPHost(curTunnel)%>" class="freetext" />                
+                <input type="text" id="clientHost" name="clientHost" size="20" title="I2CP Hostname or IP" value="<%=editBean.getI2CPHost(curTunnel)%>" class="freetext" <% if (editBean.isRouterContext()) { %> readonly="readonly" <% } %> />                
             </div>
             <div id="optionsPortField" class="rowItem">
                 <label for="clientPort" accesskey="r">
                     <%=intl._("Port")%>(<span class="accessKey">r</span>):
                 </label>
-                <input type="text" id="port" name="clientport" size="20" title="I2CP Port Number" value="<%=editBean.getI2CPPort(curTunnel)%>" class="freetext" />                
+                <input type="text" id="clientPort" name="clientport" size="20" title="I2CP Port Number" value="<%=editBean.getI2CPPort(curTunnel)%>" class="freetext" <% if (editBean.isRouterContext()) { %> readonly="readonly" <% } %> />                
             </div>
                  
          <% if (!"streamrclient".equals(tunnelType)) { // streamr client sends pings so it will never be idle %>

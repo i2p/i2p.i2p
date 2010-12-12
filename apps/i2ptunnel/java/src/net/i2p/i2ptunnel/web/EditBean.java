@@ -270,7 +270,14 @@ public class EditBean extends IndexBean {
         return false;
     }
     
+    /** @since 0.8.3 */
+    public boolean isRouterContext() {
+        return _context.isRouterContext();
+    }
+
     public String getI2CPHost(int tunnel) {
+        if (_context.isRouterContext())
+            return _("internal");
         TunnelController tun = getController(tunnel);
         if (tun != null)
             return tun.getI2CPHost();
@@ -279,6 +286,8 @@ public class EditBean extends IndexBean {
     }
     
     public String getI2CPPort(int tunnel) {
+        if (_context.isRouterContext())
+            return _("internal");
         TunnelController tun = getController(tunnel);
         if (tun != null)
             return tun.getI2CPPort();
