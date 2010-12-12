@@ -268,8 +268,10 @@ msgid "Estimated Download Time"
 msgstr "Temps estimé de téléchargement"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:278
+# NOTE: purposely left blank to leave more room in the table header
+#msgstr "Temps&nbsp;restant"
 msgid "ETA"
-msgstr "Temps&nbsp;restant"
+msgstr " "
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:281
 msgid "Downloaded"

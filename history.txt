@@ -1,3 +1,10 @@
+2010-12-12 zzz
+    * i2psnark:
+      - Fix end-game deadlock
+      - Fix last-modified check for multifile torrents, causing
+        apparent loss of data after abnormal exit
+      - Tweaks
+
 2010-12-11 zzz
     * Build: Fix 'ant distclean poupdate' again
     * I2CP: Change a log error to a warning (ticket #353)

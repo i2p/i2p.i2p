@@ -289,18 +289,21 @@ public class I2PSnarkServlet extends Default {
             out.write("<img border=\"0\" src=\"" + _imgPath + "eta.png\" alt=\"\" title=\"");
             out.write(_("Estimated time remaining"));
             out.write("\">");
+            // Translators: Please keep short or translate as " "
             out.write(_("ETA"));
         }
         out.write("</th>\n<th align=\"right\">");
         out.write("<img border=\"0\" src=\"" + _imgPath + "head_rx.png\" alt=\"\" title=\"");
         out.write(_("Downloaded"));
         out.write("\">");
+        // Translators: Please keep short or translate as " "
         out.write(_("RX"));
         out.write("</th>\n<th align=\"right\">");
         if (_manager.util().connected() && !snarks.isEmpty()) {
             out.write("<img border=\"0\" src=\"" + _imgPath + "head_tx.png\" alt=\"\" title=\"");
             out.write(_("Uploaded"));
             out.write("\">");
+            // Translators: Please keep short or translate as " "
             out.write(_("TX"));
         }
         out.write("</th>\n<th align=\"right\">");
@@ -310,6 +313,7 @@ public class I2PSnarkServlet extends Default {
             out.write("\" alt=\"");
             out.write(_("RX"));
             out.write(" \">");
+            // Translators: Please keep short or translate as " "
             out.write(_("Rate"));
         }
         out.write("</th>\n<th align=\"right\">");
@@ -1007,39 +1011,39 @@ public class I2PSnarkServlet extends Default {
                 out.write("<td align=\"right\" class=\"snarkTorrentStatus " + rowClass + "\">");
                 if (remaining > 0) {
                     if (peer.isInteresting() && !peer.isChoked()) {
-                        out.write("<font color=#00ff00>");
-                        out.write(formatSize(peer.getDownloadRate()) + "ps</font>");
+                        out.write("<span class=\"unchoked\">");
+                        out.write(formatSize(peer.getDownloadRate()) + "ps</span>");
                     } else {
-                        out.write("<font color=#ff0000><a title=\"");
+                        out.write("<span class=\"choked\"><a title=\"");
                         if (!peer.isInteresting())
                             out.write(_("Uninteresting (The peer has no pieces we need)"));
                         else
                             out.write(_("Choked (The peer is not allowing us to request pieces)"));
                         out.write("\">");
-                        out.write(formatSize(peer.getDownloadRate()) + "ps</a></font>");
+                        out.write(formatSize(peer.getDownloadRate()) + "ps</a></span>");
                     }
                 }
                 out.write("</td>\n\t");
                 out.write("<td align=\"right\" class=\"snarkTorrentStatus " + rowClass + "\">");
                 if (pct != 100.0) {
                     if (peer.isInterested() && !peer.isChoking()) {
-                        out.write("<font color=#00ff00>");
-                        out.write(formatSize(peer.getUploadRate()) + "ps</font>");
+                        out.write("<span class=\"unchoked\">");
+                        out.write(formatSize(peer.getUploadRate()) + "ps</span>");
                     } else {
-                        out.write("<font color=#ff0000><a title=\"");
+                        out.write("<span class=\"choked\"><a title=\"");
                         if (!peer.isInterested())
                             out.write(_("Uninterested (We have no pieces the peer needs)"));
                         else
                             out.write(_("Choking (We are not allowing the peer to request pieces)"));
                         out.write("\">");
-                        out.write(formatSize(peer.getUploadRate()) + "ps</a></font>");
+                        out.write(formatSize(peer.getUploadRate()) + "ps</a></span>");
                     }
                 }
                 out.write("</td>\n\t");
                 out.write("<td class=\"snarkTorrentStatus " + rowClass + "\">");
                 out.write("</td></tr>\n\t");
                 if (showDebug)
-                    out.write("<tr><td></td><td colspan=\"10\" align=\"right\" class=\"" + rowClass + "\">" + peer.getSocket() + "</td></tr>");
+                    out.write("<tr class=\"" + rowClass + "\"><td></td><td colspan=\"10\" align=\"right\" class=\"" + rowClass + "\">" + peer.getSocket() + "</td></tr>");
             }
         }
     }

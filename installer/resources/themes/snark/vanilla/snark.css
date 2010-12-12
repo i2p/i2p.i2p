@@ -365,6 +365,14 @@ td:first-child {
      color: #505 !important;
 }
 
+.choked {
+     color: #a00000 !important;
+}
+
+.unchoked {
+     color: #008000 !important;
+}
+
 .thumb {
      max-height: 64px;
      max-width: 96px;

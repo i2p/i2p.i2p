@@ -277,16 +277,20 @@ msgid "Downloaded"
 msgstr "heruntergeladen"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:295
+# NOTE: purposely left blank to leave more room in the table header
+#msgstr "heruntergeladen"
 msgid "RX"
-msgstr "heruntergeladen"
+msgstr " "
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:298
 msgid "Uploaded"
 msgstr "hochgeladen"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:300
+# NOTE: purposely left blank to leave more room in the table header
+#msgstr "hochgeladen"
 msgid "TX"
-msgstr "hochgeladen"
+msgstr " "
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:303
 msgid "Down Rate"
@@ -294,8 +298,10 @@ msgstr "eingehend"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:305
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:310
+# NOTE: purposely left blank to leave more room in the table header
+#msgstr "Übertragung"
 msgid "Rate"
-msgstr "Übertragung"
+msgstr " "
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:308
 msgid "Up Rate"

@@ -514,7 +514,7 @@ public class Storage
             RAFfile[i] = f;
             total += lengths[i];
             if (useSavedBitField) {
-                long lm = base.lastModified();
+                long lm = f.lastModified();
                 if (lm <= 0 || lm > savedTime)
                     useSavedBitField = false;
             }

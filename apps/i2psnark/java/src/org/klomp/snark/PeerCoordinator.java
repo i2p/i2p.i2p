@@ -566,12 +566,13 @@ public class PeerCoordinator implements PeerListener
       return -1;
     }
 
+    Piece piece = null;
+    List<Piece> requested = new ArrayList(); 
+    int wantedSize = END_GAME_THRESHOLD + 1;
     synchronized(wantedPieces)
       {
-        Piece piece = null;
         if (record)
             Collections.sort(wantedPieces); // Sort in order of rarest first.
-        List<Piece> requested = new ArrayList(); 
         Iterator<Piece> it = wantedPieces.iterator();
         while (piece == null && it.hasNext())
           {
@@ -588,13 +589,18 @@ public class PeerCoordinator implements PeerListener
                 requested.add(p);
             }
           }
+        if (piece == null)
+            wantedSize = wantedPieces.size();
+      } // synch
         
+        // Don't sync the following, deadlock from calling each Peer's isRequesting()
+
         //Only request a piece we've requested before if there's no other choice.
         if (piece == null) {
             // AND if there are almost no wanted pieces left (real end game).
             // If we do end game all the time, we generate lots of extra traffic
             // when the seeder is super-slow and all the peers are "caught up"
-            if (wantedPieces.size() > END_GAME_THRESHOLD)
+            if (wantedSize > END_GAME_THRESHOLD)
                 return -1;  // nothing to request and not in end game
             // let's not all get on the same piece
             // Even better would be to sort by number of requests
@@ -608,6 +614,7 @@ public class PeerCoordinator implements PeerListener
                     // limit number of parallel requests
                     int requestedCount = 0;
                         for (Peer pr : peers) {
+                            // deadlock if synced on wantedPieces
                             if (pr.isRequesting(p.getId())) {
                                 if (pr.equals(peer)) {
                                     // don't give it to him again
@@ -644,7 +651,6 @@ public class PeerCoordinator implements PeerListener
             piece.setRequested(true);
         }
         return piece.getId();
-      }
   }
 
   /**

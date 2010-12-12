@@ -269,8 +269,10 @@ msgstr "tiempo restante de descarga"
 
 #. space here would look better but nbsp is too big and thinsp breaks
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:290
+# NOTE: purposely left blank to leave more room in the table header
+#msgstr "Completado&nbsp;en"
 msgid "ETA"
-msgstr "Completado&nbsp;en"
+msgstr " "
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:293
 msgid "Downloaded"
@@ -294,8 +296,10 @@ msgstr "Tasa&nbsp;de descarga"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:305
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:310
+# NOTE: purposely left blank to leave more room in the table header
+#msgstr "Tasa&nbsp;de transferencia"
 msgid "Rate"
-msgstr "Tasa&nbsp;de transferencia"
+msgstr " "
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:308
 msgid "Up Rate"
