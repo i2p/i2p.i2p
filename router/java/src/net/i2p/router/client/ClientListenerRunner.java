@@ -24,7 +24,7 @@ import net.i2p.util.Log;
  *
  * @author jrandom
  */
-public class ClientListenerRunner implements Runnable {
+class ClientListenerRunner implements Runnable {
     protected Log _log;
     protected RouterContext _context;
     protected ClientManager _manager;

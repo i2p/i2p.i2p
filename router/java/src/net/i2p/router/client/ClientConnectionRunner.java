@@ -50,7 +50,7 @@ import net.i2p.util.SimpleTimer;
  *
  * @author jrandom
  */
-public class ClientConnectionRunner {
+class ClientConnectionRunner {
     private Log _log;
     protected final RouterContext _context;
     private ClientManager _manager;

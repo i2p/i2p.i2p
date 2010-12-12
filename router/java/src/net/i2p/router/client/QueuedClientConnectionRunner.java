@@ -16,7 +16,7 @@ import net.i2p.util.Log;
  * @author zzz
  * @since 0.8.3
  */
-public class QueuedClientConnectionRunner extends ClientConnectionRunner {
+class QueuedClientConnectionRunner extends ClientConnectionRunner {
     private final I2CPMessageQueue queue;
     
     /**
