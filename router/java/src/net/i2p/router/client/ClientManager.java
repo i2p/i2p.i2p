@@ -43,12 +43,16 @@ import net.i2p.util.Log;
  *
  * @author jrandom
  */
-public class ClientManager {
-    private Log _log;
+class ClientManager {
+    private final Log _log;
     private ClientListenerRunner _listener;
     private final HashMap<Destination, ClientConnectionRunner>  _runners;        // Destination --> ClientConnectionRunner
     private final Set<ClientConnectionRunner> _pendingRunners; // ClientConnectionRunner for clients w/out a Dest yet
-    private RouterContext _ctx;
+    private final RouterContext _ctx;
+    private boolean _isStarted;
+
+    /** Disable external interface, allow internal clients only @since 0.8.3 */
+    private static final String PROP_DISABLE_EXTERNAL = "i2cp.disableInterface";
 
     /** ms to wait before rechecking for inbound messages to deliver to clients */
     private final static int INBOUND_POLL_INTERVAL = 300;
@@ -67,11 +71,12 @@ public class ClientManager {
 
     /** Todo: Start a 3rd listener for IPV6? */
     private void startListeners(int port) {
-        _listener = new ClientListenerRunner(_ctx, this, port);
-        Thread t = new I2PThread(_listener);
-        t.setName("ClientListener:" + port);
-        t.setDaemon(true);
-        t.start();
+        if (!_ctx.getBooleanProperty(PROP_DISABLE_EXTERNAL)) {
+            _listener = new ClientListenerRunner(_ctx, this, port);
+            Thread t = new I2PThread(_listener, "ClientListener:" + port, true);
+            t.start();
+        }
+        _isStarted = true;
     }
     
     public void restart() {
@@ -93,8 +98,10 @@ public class ClientManager {
     }
     
     public void shutdown() {
+        _isStarted = false;
         _log.info("Shutting down the ClientManager");
-        _listener.stopListening();
+        if (_listener != null)
+            _listener.stopListening();
         Set<ClientConnectionRunner> runners = new HashSet();
         synchronized (_runners) {
             for (Iterator<ClientConnectionRunner> iter = _runners.values().iterator(); iter.hasNext();) {
@@ -117,10 +124,12 @@ public class ClientManager {
     /**
      *  The InternalClientManager interface.
      *  Connects to the router, receiving a message queue to talk to the router with.
-     *  Might throw I2PSessionException if the router isn't ready, someday.
+     *  @throws I2PSessionException if the router isn't ready
      *  @since 0.8.3
      */
-    public I2CPMessageQueue internalConnect() {
+    public I2CPMessageQueue internalConnect() throws I2PSessionException {
+        if (!_isStarted)
+            throw new I2PSessionException("Router client manager is shut down");
         // for now we make these unlimited size
         LinkedBlockingQueue<I2CPMessage> in = new LinkedBlockingQueue();
         LinkedBlockingQueue<I2CPMessage> out = new LinkedBlockingQueue();
@@ -131,7 +140,9 @@ public class ClientManager {
         return hisQueue;
     }
 
-    public boolean isAlive() { return _listener.isListening(); }
+    public boolean isAlive() {
+        return _isStarted && (_listener == null || _listener.isListening());
+    }
 
     public void registerConnection(ClientConnectionRunner runner) {
         synchronized (_pendingRunners) {
