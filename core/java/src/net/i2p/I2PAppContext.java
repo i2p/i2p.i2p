@@ -3,6 +3,7 @@ package net.i2p;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Properties;
+import java.util.Random;
 import java.util.Set;
 
 import net.i2p.client.naming.NamingService;
@@ -21,6 +22,7 @@ import net.i2p.crypto.KeyGenerator;
 import net.i2p.crypto.SHA256Generator;
 import net.i2p.crypto.SessionKeyManager;
 import net.i2p.crypto.TransientSessionKeyManager;
+import net.i2p.data.Base64;
 import net.i2p.data.RoutingKeyGenerator;
 import net.i2p.internal.InternalClientManager;
 import net.i2p.stat.StatManager;
@@ -364,10 +366,12 @@ public class I2PAppContext {
             if (_tmpDir == null) {
                 String d = getProperty("i2p.dir.temp", System.getProperty("java.io.tmpdir"));
                 // our random() probably isn't warmed up yet
-                String f = "i2p-" + Math.abs((new java.util.Random()).nextInt()) + ".tmp";
+                byte[] rand = new byte[6];
+                (new Random()).nextBytes(rand);
+                String f = "i2p-" + Base64.encode(rand) + ".tmp";
                 _tmpDir = new SecureDirectory(d, f);
                 if (_tmpDir.exists()) {
-                    // good or bad ?
+                    // good or bad ? loop and try again?
                 } else if (_tmpDir.mkdir()) {
                     _tmpDir.deleteOnExit();
                 } else {
