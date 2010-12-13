@@ -307,6 +307,7 @@ div.main {
      -moz-border-radius: 0 0 3px 0;
      -khtml-border-radius: 0 0 3px 0;
      border-radius: 0 0 3px 0;
+     background: #eef url("/themes/snark/ubergine/images/hat.png") no-repeat scroll right bottom !important;
 }
 
 div.main ul {
@@ -322,6 +323,13 @@ div.main li {
 
 div.main li:first-child {
      padding-top: 15px;
+}
+
+div.main li b {
+     color: #415!important;
+     letter-spacing: 0.01em;
+     font-size: 9.5pt;
+     line-height: 170%;
 }
 
 div.main hr:last-child {
@@ -883,8 +891,9 @@ div.graphspanel h3 {
 
 div.footnote {
      text-align: right;
-     color: #99f;
+     color: #339;
      font-size: 7pt;
+     margin-bottom: -4px !Important;
 }
 
 div.footnote hr{
