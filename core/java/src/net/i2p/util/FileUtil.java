@@ -231,9 +231,10 @@ public class FileUtil {
     }
     
     /**
+     * Public since 0.8.3
      * @since 0.8.1
      */
-    private static boolean isPack200Supported() {
+    public static boolean isPack200Supported() {
         try {
             Class.forName("java.util.jar.Pack200", false, ClassLoader.getSystemClassLoader());
             return true;
