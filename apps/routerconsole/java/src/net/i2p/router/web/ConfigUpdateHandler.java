@@ -66,7 +66,12 @@ public class ConfigUpdateHandler extends FormHandler {
             Class.forName("java.util.jar.Pack200", false, ClassLoader.getSystemClassLoader());
             foo = PACK200_URLS;
         } catch (ClassNotFoundException cnfe) {
-            foo = NO_PACK200_URLS;
+            try {
+                Class.forName("org.apache.harmony.unpack200.Archive", false, ClassLoader.getSystemClassLoader());
+                foo = PACK200_URLS;
+            } catch (ClassNotFoundException cnfe2) {
+                foo = NO_PACK200_URLS;
+            }
         }
         DEFAULT_UPDATE_URL = foo;
     }
