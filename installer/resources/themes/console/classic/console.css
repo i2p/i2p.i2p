@@ -198,11 +198,11 @@ div.routersummary h4 {
      letter-spacing: 0.05em;
      margin: -7px -1px -8px -1px !important;
      padding: 8px 0;
-     background: #fff;
      text-transform: capitalize;
      text-decoration: none !important;
      color: #2b2;
      line-height: 90%;
+     background: #fff url(../light/images/magic.png);
 }
 
 div.routersummary h3 a, div.routersummary h4 a {
@@ -560,7 +560,7 @@ h2, h3 {
      border-radius: 0 3px 0 0;
 }
 
-.routersummary h2, .routersummary h3, div.confignav {
+.routersummary h2, .routersummary h3, div.confignav, th {
      background-image: url("images/tinytitle.png") !important; 
      background-repeat: repeat-x; 
      background-position: center right;
@@ -619,11 +619,11 @@ td {
 }
 
 tr:nth-child(even) {
-     background-color: #eef;
+     background: #fff url(../light/images/magic.png);
 }
 
 tr:nth-child(odd) {
-     background-color: #ddf;
+     background: #eef url(../light/images/magic.png);
 }
 
 hr {
