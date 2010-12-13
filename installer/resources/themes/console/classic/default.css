@@ -29,7 +29,7 @@ h4, label {
 
 h4 {
      font-size: 10.5pt;
-     text-align: center !important;
+     text-align: left !important;
      font-weight: bold;
      border: 1px solid #77f;
      border-top: 2px solid #77f;
@@ -41,6 +41,7 @@ h4 {
      white-space: nowrap;
      width: 782px;
      letter-spacing: 0.09em;
+     background: #fff url("/themes/console/classic/images/titlebg.png") no-repeat right center !important; 
 }
 
 label {

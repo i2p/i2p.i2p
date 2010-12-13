@@ -513,11 +513,11 @@ div.messages span.notice {
 h1 {
      font-size: 18pt;
      text-shadow: 0px 0px 1px rgba(0, 0, 32, 0.7);
-     text-align: center;
+     text-align: left;
      border: 1px solid #89f;
      border-bottom: 1px solid #89f;
      border-right: 1px solid #89f;
-     padding: 19px 10px;
+     padding: 19px 20px;
      margin: 0 1px 0 200px;
      line-height: 93%;
      text-transform: uppercase;
