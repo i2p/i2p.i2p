@@ -1,3 +1,6 @@
+2010-12-13 dr|z3d
+    * Console themes: Midnight & Classic renovations.
+
 2010-12-12 zzz
     * i2psnark:
       - Fix end-game deadlock
@@ -38,7 +41,6 @@
 2010-12-06 dr|z3d
     * I2PSnark: 
       - Resolve table header wrapping issue.
-      - Phase 2 of UI overhaul, now with 100% more universality!
       - Vanilla/Ubergine theme enhancements.
       
 2010-12-05 zzz
