@@ -464,6 +464,7 @@ div.configure h3, div.graphspanel h3 {
      -moz-border-radius: 0 4px 4px 0;
      -khtml-border-radius: 0 4px 4px 0;
      background: #ffe;
+     text-align: left;
 }
 
 div.graphspanel {
@@ -618,7 +619,7 @@ div.main li {
 
 div.main li b {
      color: #514!important;
-     letter-spacing: 0.02em;
+     letter-spacing: 0.01em;
      font-size: 9.5pt;
      line-height: 170%;
 }
@@ -1036,26 +1037,33 @@ div.joblog {
      border: 0;
      margin-top: 5px;
  }
+
+div.joblog i {
+     color: #050;
+     font-weight: bold;
+}
  
- div.joblog:ul {
+ div.joblog ul {
      word-wrap: break-word !important;
      text-align: justify;
      line-height: 100% !important;
+     margin-top: -5px !important;
 }
 
- div.joblog:li {
+ div.joblog li {
      word-wrap: break-word !important;
      text-align: justify !important;
-     line-height: 80% !important;
+     line-height: 115% !important;
      padding: 0;
+     font-size: 9pt !important;
+}
+
+div.joblog li:last-child {
+     margin-bottom: -5px;
 }
 
 div.joblog li:first-child {
-     margin-top: 10px;
-
-}
-div.joblog li:last-child {
-     margin-bottom: 5px;
+     margin-top: 10px !important;
 }
 
 div.joblog form:first-child {
@@ -1072,6 +1080,10 @@ div.joblog p {
 
 div.joblog hr {
      margin: 15px 0;
+}
+
+div.joblog h3 {
+     margin-bottom: 5px;
 }
 
 .smallhead {
