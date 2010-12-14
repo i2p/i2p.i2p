@@ -234,6 +234,31 @@ public class EditBean extends IndexBean {
         return getProperty(tunnel, I2PTunnelHTTPClientBase.PROP_OUTPROXY_PW, "");
     }
     
+    /** all of these are @since 0.8.3 */
+    public String getLimitMinute(int tunnel) {
+        return getProperty(tunnel, PROP_MAX_CONNS_MIN, "0");
+    }
+
+    public String getLimitHour(int tunnel) {
+        return getProperty(tunnel, PROP_MAX_CONNS_HOUR, "0");
+    }
+
+    public String getLimitDay(int tunnel) {
+        return getProperty(tunnel, PROP_MAX_CONNS_DAY, "0");
+    }
+
+    public String getTotalMinute(int tunnel) {
+        return getProperty(tunnel, PROP_MAX_TOTAL_CONNS_MIN, "0");
+    }
+
+    public String getTotalHour(int tunnel) {
+        return getProperty(tunnel, PROP_MAX_TOTAL_CONNS_HOUR, "0");
+    }
+
+    public String getTotalDay(int tunnel) {
+        return getProperty(tunnel, PROP_MAX_TOTAL_CONNS_DAY, "0");
+    }
+
     private int getProperty(int tunnel, String prop, int def) {
         TunnelController tun = getController(tunnel);
         if (tun != null) {

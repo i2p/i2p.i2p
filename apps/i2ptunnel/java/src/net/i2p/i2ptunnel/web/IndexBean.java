@@ -712,6 +712,44 @@ public class IndexBean {
             _otherOptions.put(I2PTunnelHTTPClientBase.PROP_OUTPROXY_PW, s.trim());
     }
     
+    /** all of these are @since 0.8.3 */
+    protected static final String PROP_MAX_CONNS_MIN = "i2p.streaming.maxConnsPerMinute";
+    protected static final String PROP_MAX_CONNS_HOUR = "i2p.streaming.maxConnsPerHour";
+    protected static final String PROP_MAX_CONNS_DAY = "i2p.streaming.maxConnsPerDay";
+    protected static final String PROP_MAX_TOTAL_CONNS_MIN = "i2p.streaming.maxTotalConnsPerMinute";
+    protected static final String PROP_MAX_TOTAL_CONNS_HOUR = "i2p.streaming.maxTotalConnsPerHour";
+    protected static final String PROP_MAX_TOTAL_CONNS_DAY = "i2p.streaming.maxTotalConnsPerDay";
+
+    public void setLimitMinute(String s) {
+        if (s != null)
+            _otherOptions.put(PROP_MAX_CONNS_MIN, s.trim());
+    }
+
+    public void setLimitHour(String s) {
+        if (s != null)
+            _otherOptions.put(PROP_MAX_CONNS_HOUR, s.trim());
+    }
+
+    public void setLimitDay(String s) {
+        if (s != null)
+            _otherOptions.put(PROP_MAX_CONNS_DAY, s.trim());
+    }
+
+    public void setTotalMinute(String s) {
+        if (s != null)
+            _otherOptions.put(PROP_MAX_TOTAL_CONNS_MIN, s.trim());
+    }
+
+    public void setTotalHour(String s) {
+        if (s != null)
+            _otherOptions.put(PROP_MAX_TOTAL_CONNS_HOUR, s.trim());
+    }
+
+    public void setTotalDay(String s) {
+        if (s != null)
+            _otherOptions.put(PROP_MAX_TOTAL_CONNS_DAY, s.trim());
+    }
+
     /** params needed for hashcash and dest modification */
     public void setEffort(String val) {
         if (val != null) {
@@ -911,7 +949,9 @@ public class IndexBean {
         "proxyUsername", "proxyPassword", "outproxyUsername", "outproxyPassword"
         };
     private static final String _otherServerOpts[] = {
-        "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.leaseSetKey", "i2cp.accessList"
+        "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.leaseSetKey", "i2cp.accessList",
+         PROP_MAX_CONNS_MIN, PROP_MAX_CONNS_HOUR, PROP_MAX_CONNS_DAY,
+         PROP_MAX_TOTAL_CONNS_MIN, PROP_MAX_TOTAL_CONNS_HOUR, PROP_MAX_TOTAL_CONNS_DAY
         };
     protected static final Set _noShowSet = new HashSet();
     static {

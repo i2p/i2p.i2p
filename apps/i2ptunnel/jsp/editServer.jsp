@@ -368,10 +368,46 @@
                 <label for="accessList" accesskey="s">
                     <%=intl._("Access List")%>:
                 </label>
-                <textarea rows="2" style="height: 4em;" cols="60" id="hostField" name="accessList" title="Access List" wrap="off"><%=editBean.getAccessList(curTunnel)%></textarea>               
+                <textarea rows="2" style="height: 6em;" cols="60" id="hostField" name="accessList" title="Access List" wrap="off"><%=editBean.getAccessList(curTunnel)%></textarea>               
                 <span class="comment"><%=intl._("(Restrict to these clients only)")%></span>
             </div>
                  
+            <div class="subdivider">
+                <hr />
+            </div>
+
+            <div class="rowItem">
+              <div id="optionsField" class="rowItem">
+                  <label><%=intl._("Inbound connection limits (0 to disable)")%><br><%=intl._("Per client")%>:</label>
+              </div>
+              <div id="portField" class="rowItem">
+                  <label><%=intl._("Per minute")%>:</label>
+                  <input type="text" id="port" name="limitMinute" value="<%=editBean.getLimitMinute(curTunnel)%>" class="freetext" />                
+              </div>
+              <div id="portField" class="rowItem">
+                  <label><%=intl._("Per hour")%>:</label>
+                  <input type="text" id="port" name="limitHour" value="<%=editBean.getLimitHour(curTunnel)%>" class="freetext" />                
+              </div>
+              <div id="portField" class="rowItem">
+                  <label><%=intl._("Per day")%>:</label>
+                  <input type="text" id="port" name="limitDay" value="<%=editBean.getLimitDay(curTunnel)%>" class="freetext" />                
+              </div>
+            </div>
+            <div class="rowItem">
+              <div id="optionsField" class="rowItem">
+                  <label><%=intl._("Total")%>:</label>
+              </div>
+              <div id="portField" class="rowItem">
+                  <input type="text" id="port" name="totalMinute" value="<%=editBean.getTotalMinute(curTunnel)%>" class="freetext" />                
+              </div>
+              <div id="portField" class="rowItem">
+                  <input type="text" id="port" name="totalHour" value="<%=editBean.getTotalHour(curTunnel)%>" class="freetext" />                
+              </div>
+              <div id="portField" class="rowItem">
+                  <input type="text" id="port" name="totalDay" value="<%=editBean.getTotalDay(curTunnel)%>" class="freetext" />                
+              </div>
+            </div>
+
             <div class="subdivider">
                 <hr />
             </div>
