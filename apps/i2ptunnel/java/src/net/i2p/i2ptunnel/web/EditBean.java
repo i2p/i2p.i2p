@@ -171,8 +171,12 @@ public class EditBean extends IndexBean {
         return getProperty(tunnel, "i2cp.leaseSetKey", "");
     }
     
-    public boolean getAccess(int tunnel) {
-        return getBooleanProperty(tunnel, "i2cp.enableAccessList");
+    public String getAccessMode(int tunnel) {
+        if (getBooleanProperty(tunnel, PROP_ENABLE_ACCESS_LIST))
+            return "1";
+        if (getBooleanProperty(tunnel, PROP_ENABLE_BLACKLIST))
+            return "2";
+        return "0";
     }
     
     public String getAccessList(int tunnel) {

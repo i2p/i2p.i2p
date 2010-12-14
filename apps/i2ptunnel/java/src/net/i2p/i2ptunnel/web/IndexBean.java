@@ -643,9 +643,17 @@ public class IndexBean {
     public void setEncrypt(String moo) {
         _booleanOptions.add("i2cp.encryptLeaseSet");
     }
-    public void setAccess(String moo) {
-        _booleanOptions.add("i2cp.enableAccessList");
+
+    protected static final String PROP_ENABLE_ACCESS_LIST = "i2cp.enableAccessList";
+    protected static final String PROP_ENABLE_BLACKLIST = "i2cp.enableBlackList";
+
+    public void setAccessMode(String val) {
+        if ("1".equals(val))
+            _booleanOptions.add(PROP_ENABLE_ACCESS_LIST);
+        else if ("2".equals(val))
+            _booleanOptions.add(PROP_ENABLE_BLACKLIST);
     }
+
     public void setDelayOpen(String moo) {
         _booleanOptions.add("i2cp.delayOpen");
     }
@@ -942,7 +950,7 @@ public class IndexBean {
         I2PTunnelHTTPClientBase.PROP_AUTH, I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH
         };
     private static final String _booleanServerOpts[] = {
-        "i2cp.reduceOnIdle", "i2cp.encryptLeaseSet", "i2cp.enableAccessList"
+        "i2cp.reduceOnIdle", "i2cp.encryptLeaseSet", PROP_ENABLE_ACCESS_LIST, PROP_ENABLE_BLACKLIST
         };
     private static final String _otherClientOpts[] = {
         "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.closeIdleTime",

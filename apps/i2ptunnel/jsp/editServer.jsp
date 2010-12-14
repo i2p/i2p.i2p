@@ -359,17 +359,18 @@
                 </label>
             </div>
             <div id="portField" class="rowItem">
-                <label for="access" accesskey="s">
-                    <%=intl._("Enable")%>:
-                </label>
-                <input value="1" type="checkbox" id="startOnLoad" name="access" title="Enable Access List"<%=(editBean.getAccess(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <label><%=intl._("Disable")%></label>
+                <input value="0" type="radio" id="startOnLoad" name="accessMode" title="Allow all clients"<%=(editBean.getAccessMode(curTunnel).equals("0") ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <label><%=intl._("Whitelist")%></label>
+                <input value="1" type="radio" id="startOnLoad" name="accessMode" title="Allow listed clients only"<%=(editBean.getAccessMode(curTunnel).equals("1") ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <label><%=intl._("Blacklist")%></label>
+                <input value="2" type="radio" id="startOnLoad" name="accessMode" title="Reject listed clients"<%=(editBean.getAccessMode(curTunnel).equals("2") ? " checked=\"checked\"" : "")%> class="tickbox" />                
             </div>
             <div id="hostField" class="rowItem">
                 <label for="accessList" accesskey="s">
                     <%=intl._("Access List")%>:
                 </label>
-                <textarea rows="2" style="height: 6em;" cols="60" id="hostField" name="accessList" title="Access List" wrap="off"><%=editBean.getAccessList(curTunnel)%></textarea>               
-                <span class="comment"><%=intl._("(Restrict to these clients only)")%></span>
+                <textarea rows="2" style="height: 8em;" cols="60" id="hostField" name="accessList" title="Access List" wrap="off"><%=editBean.getAccessList(curTunnel)%></textarea>               
             </div>
                  
             <div class="subdivider">
