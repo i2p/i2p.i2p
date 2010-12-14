@@ -131,6 +131,9 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     private long _lastActivity;
     private boolean _isReduced;
 
+    /** SSL interface (only) @since 0.8.3 */
+    protected static final String PROP_ENABLE_SSL = "i2cp.SSL";
+
     void dateUpdated() {
         _dateReceived = true;
         synchronized (_dateReceivedLock) {
@@ -181,7 +184,10 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     protected void loadConfig(Properties options) {
         _options = new Properties();
         _options.putAll(filter(options));
-        if (!_context.isRouterContext()) {
+        if (_context.isRouterContext()) {
+            // just for logging
+            _hostname = "[internal connection]";
+        } else {
             _hostname = _options.getProperty(I2PClient.PROP_TCP_HOST, "127.0.0.1");
             String portNum = _options.getProperty(I2PClient.PROP_TCP_PORT, LISTEN_PORT + "");
             try {
@@ -195,6 +201,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         }
 
         // auto-add auth if required, not set in the options, and we are in the same JVM
+        // TODO bypass this on router side for internal connections
         if (_context.isRouterContext() &&
             Boolean.valueOf(_context.getProperty("i2cp.auth")).booleanValue() &&
             ((!options.containsKey("i2cp.username")) || (!options.containsKey("i2cp.password")))) {
@@ -302,7 +309,10 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                 _queue = mgr.connect();
                 _reader = new QueuedI2CPMessageReader(_queue, this);
             } else {
-                _socket = new Socket(_hostname, _portNum);
+                if (Boolean.valueOf(_options.getProperty(PROP_ENABLE_SSL)).booleanValue())
+                    _socket = I2CPSSLSocketFactory.createSocket(_context, _hostname, _portNum);
+                else
+                    _socket = new Socket(_hostname, _portNum);
                 // _socket.setSoTimeout(1000000); // Uhmmm we could really-really use a real timeout, and handle it.
                 _out = _socket.getOutputStream();
                 synchronized (_out) {

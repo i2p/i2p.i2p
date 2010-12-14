@@ -53,6 +53,8 @@ class ClientManager {
 
     /** Disable external interface, allow internal clients only @since 0.8.3 */
     private static final String PROP_DISABLE_EXTERNAL = "i2cp.disableInterface";
+    /** SSL interface (only) @since 0.8.3 */
+    private static final String PROP_ENABLE_SSL = "i2cp.SSL";
 
     /** ms to wait before rechecking for inbound messages to deliver to clients */
     private final static int INBOUND_POLL_INTERVAL = 300;
@@ -60,10 +62,10 @@ class ClientManager {
     public ClientManager(RouterContext context, int port) {
         _ctx = context;
         _log = context.logManager().getLog(ClientManager.class);
-        _ctx.statManager().createRateStat("client.receiveMessageSize", 
-                                              "How large are messages received by the client?", 
-                                              "ClientMessages", 
-                                              new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+        //_ctx.statManager().createRateStat("client.receiveMessageSize", 
+        //                                      "How large are messages received by the client?", 
+        //                                      "ClientMessages", 
+        //                                      new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
         _runners = new HashMap();
         _pendingRunners = new HashSet();
         startListeners(port);
@@ -72,7 +74,11 @@ class ClientManager {
     /** Todo: Start a 3rd listener for IPV6? */
     private void startListeners(int port) {
         if (!_ctx.getBooleanProperty(PROP_DISABLE_EXTERNAL)) {
-            _listener = new ClientListenerRunner(_ctx, this, port);
+            // there's no option to start both an SSL and non-SSL listener
+            if (_ctx.getBooleanProperty(PROP_ENABLE_SSL))
+                _listener = new SSLClientListenerRunner(_ctx, this, port);
+            else
+                _listener = new ClientListenerRunner(_ctx, this, port);
             Thread t = new I2PThread(_listener, "ClientListener:" + port, true);
             t.start();
         }
@@ -494,8 +500,8 @@ class ClientManager {
                 runner = getRunner(_msg.getDestinationHash());
 
             if (runner != null) {
-                _ctx.statManager().addRateData("client.receiveMessageSize", 
-                                                   _msg.getPayload().getSize(), 0);
+                //_ctx.statManager().addRateData("client.receiveMessageSize", 
+                //                                   _msg.getPayload().getSize(), 0);
                 runner.receiveMessage(_msg.getDestination(), null, _msg.getPayload());
             } else {
                 // no client connection...

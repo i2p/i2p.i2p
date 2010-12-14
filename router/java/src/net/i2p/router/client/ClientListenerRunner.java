@@ -25,12 +25,12 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 class ClientListenerRunner implements Runnable {
-    protected Log _log;
-    protected RouterContext _context;
-    protected ClientManager _manager;
+    protected final Log _log;
+    protected final RouterContext _context;
+    protected final ClientManager _manager;
     protected ServerSocket _socket;
-    protected int _port;
-    private boolean _bindAllInterfaces;
+    protected final int _port;
+    protected final boolean _bindAllInterfaces;
     protected boolean _running;
     protected boolean _listening;
     
@@ -38,18 +38,33 @@ class ClientListenerRunner implements Runnable {
 
     public ClientListenerRunner(RouterContext context, ClientManager manager, int port) {
         _context = context;
-        _log = _context.logManager().getLog(ClientListenerRunner.class);
+        _log = _context.logManager().getLog(getClass());
         _manager = manager;
         _port = port;
-        
-        String val = context.getProperty(BIND_ALL_INTERFACES);
-        _bindAllInterfaces = Boolean.valueOf(val).booleanValue();
+        _bindAllInterfaces = context.getBooleanProperty(BIND_ALL_INTERFACES);
     }
     
-    public void setPort(int port) { _port = port; }
-    public int getPort() { return _port; }
     public boolean isListening() { return _running && _listening; }
     
+    /** 
+     * Get a ServerSocket.
+     * Split out so it can be overridden for SSL.
+     * @since 0.8.3
+     */
+    protected ServerSocket getServerSocket() throws IOException {
+        if (_bindAllInterfaces) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Listening on port " + _port + " on all interfaces");
+            return new ServerSocket(_port);
+        } else {
+            String listenInterface = _context.getProperty(ClientManagerFacadeImpl.PROP_CLIENT_HOST, 
+                                                          ClientManagerFacadeImpl.DEFAULT_HOST);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Listening on port " + _port + " of the specific interface: " + listenInterface);
+            return new ServerSocket(_port, 0, InetAddress.getByName(listenInterface));
+        }
+    }
+                
     /** 
      * Start up the socket listener, listens for connections, and
      * fires those connections off via {@link #runConnection runConnection}.  
@@ -62,18 +77,7 @@ class ClientListenerRunner implements Runnable {
         int curDelay = 1000;
         while (_running) {
             try {
-                if (_bindAllInterfaces) {
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Listening on port " + _port + " on all interfaces");
-                    _socket = new ServerSocket(_port);
-                } else {
-                    String listenInterface = _context.getProperty(ClientManagerFacadeImpl.PROP_CLIENT_HOST, 
-                                                                  ClientManagerFacadeImpl.DEFAULT_HOST);
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Listening on port " + _port + " of the specific interface: " + listenInterface);
-                    _socket = new ServerSocket(_port, 0, InetAddress.getByName(listenInterface));
-                }
-                
+                _socket = getServerSocket();
                 
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("ServerSocket created, before accept: " + _socket);
@@ -131,7 +135,8 @@ class ClientListenerRunner implements Runnable {
     }
     
     /** give the i2cp client 5 seconds to show that they're really i2cp clients */
-    private final static int CONNECT_TIMEOUT = 5*1000;
+    protected final static int CONNECT_TIMEOUT = 5*1000;
+    private final static int LOOP_DELAY = 250;
 
     /**
      *  Verify the first byte.
@@ -141,16 +146,17 @@ class ClientListenerRunner implements Runnable {
     protected boolean validate(Socket socket) {
         try {
             InputStream is = socket.getInputStream();
-            for (int i = 0; i < 20; i++) {
+            for (int i = 0; i < CONNECT_TIMEOUT / LOOP_DELAY; i++) {
                 if (is.available() > 0)
                     return is.read() == I2PClient.PROTOCOL_BYTE;
-                try { Thread.sleep(250); } catch (InterruptedException ie) {}
+                try { Thread.sleep(LOOP_DELAY); } catch (InterruptedException ie) {}
             }
         } catch (IOException ioe) {}
         if (_log.shouldLog(Log.WARN))
              _log.warn("Peer did not authenticate themselves as I2CP quickly enough, dropping");
         return false;
     }
+
     /**
      * Handle the connection by passing it off to a {@link ClientConnectionRunner ClientConnectionRunner}
      *

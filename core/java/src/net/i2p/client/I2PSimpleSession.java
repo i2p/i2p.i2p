@@ -23,7 +23,6 @@ import net.i2p.internal.I2CPMessageQueue;
 import net.i2p.internal.InternalClientManager;
 import net.i2p.internal.QueuedI2CPMessageReader;
 import net.i2p.util.I2PAppThread;
-import net.i2p.util.InternalSocket;
 
 /**
  * Create a new session for doing naming and bandwidth queries only. Do not create a Destination.
@@ -80,7 +79,10 @@ class I2PSimpleSession extends I2PSessionImpl2 {
                 _queue = mgr.connect();
                 _reader = new QueuedI2CPMessageReader(_queue, this);
             } else {
-                _socket = new Socket(_hostname, _portNum);
+                if (Boolean.valueOf(getOptions().getProperty(PROP_ENABLE_SSL)).booleanValue())
+                    _socket = I2CPSSLSocketFactory.createSocket(_context, _hostname, _portNum);
+                else
+                    _socket = new Socket(_hostname, _portNum);
                 _out = _socket.getOutputStream();
                 synchronized (_out) {
                     _out.write(I2PClient.PROTOCOL_BYTE);
