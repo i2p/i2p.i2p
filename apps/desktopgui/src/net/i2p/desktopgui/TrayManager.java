@@ -20,29 +20,37 @@ import javax.swing.SwingWorker;
 
 import net.i2p.desktopgui.i18n.DesktopguiTranslator;
 import net.i2p.desktopgui.router.RouterManager;
+import net.i2p.desktopgui.util.BrowseException;
 import net.i2p.desktopgui.util.ConfigurationManager;
+import net.i2p.desktopgui.util.I2PDesktop;
 import net.i2p.util.Log;
 
 /**
  * Manages the tray icon life.
  */
-public class TrayManager {
+public abstract class TrayManager {
 
 	private static TrayManager instance = null;
 	///The tray area, or null if unsupported
-    private SystemTray tray = null;
+    protected SystemTray tray = null;
     ///Our tray icon, or null if unsupported
-    private TrayIcon trayIcon = null;
+    protected TrayIcon trayIcon = null;
     private final static Log log = new Log(TrayManager.class);
     
     /**
      * Instantiate tray manager.
      */
-    private TrayManager() {}
+    protected TrayManager() {}
     
     public static TrayManager getInstance() {
     	if(instance == null) {
-    		instance = new TrayManager();
+    		boolean inI2P = ConfigurationManager.getInstance().getBooleanConfiguration("startWithI2P", false);
+    		if(inI2P) {
+    			instance = new InternalTrayManager();
+    		}
+    		else {
+    			instance = new ExternalTrayManager();
+    		}
     	}
     	return instance;
     }
@@ -66,121 +74,7 @@ public class TrayManager {
      * Build a popup menu, adding callbacks to the different items.
      * @return popup menu
      */
-    public PopupMenu getMainMenu() {
-    	boolean inI2P = ConfigurationManager.getInstance().getBooleanConfiguration("startWithI2P", false);
-    	
-        PopupMenu popup = new PopupMenu();
-        MenuItem browserLauncher = new MenuItem(_("Launch I2P Browser"));
-        browserLauncher.addActionListener(new ActionListener() {
-            
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                new SwingWorker<Object, Object>() {
-
-                    @Override
-                    protected Object doInBackground() throws Exception {
-                        return null;
-                    }
-                    
-                    @Override
-                    protected void done() {
-                        if(Desktop.isDesktopSupported()) {
-                            Desktop desktop = Desktop.getDesktop();
-                            if(desktop.isSupported(Action.BROWSE)) {
-                                try {
-                                    desktop.browse(new URI("http://localhost:7657"));
-                                } catch (IOException e) {
-                                    log.log(Log.WARN, "Failed to open browser!", e);
-                                } catch (URISyntaxException e) {
-                                    log.log(Log.WARN, "Failed to open browser!", e);
-                                }
-                            }
-                            else {
-                                trayIcon.displayMessage(_("Browser not found"),
-                                        _("The default browser for your system was not found."),
-                                        TrayIcon.MessageType.WARNING);
-                            }
-                        }    
-                    }
-                    
-                }.execute();
-            }
-        });
-        popup.add(browserLauncher);
-        popup.addSeparator();
-        MenuItem startItem = new MenuItem(_("Start I2P"));
-        startItem.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				new SwingWorker<Object, Object>() {
-
-					@Override
-					protected Object doInBackground() throws Exception {
-						RouterManager.start();
-						return null;
-					}
-					
-					@Override
-					protected void done() {
-						trayIcon.displayMessage(_("Starting"), _("I2P is starting!"), TrayIcon.MessageType.INFO);
-						//Hide the tray icon.
-						//We cannot stop the desktopgui program entirely,
-						//since that risks killing the I2P process as well.
-						tray.remove(trayIcon);
-					}
-					
-				}.execute();
-			}
-        	
-        });
-        if(!inI2P) {
-        	popup.add(startItem);
-        }
-        MenuItem restartItem = new MenuItem(_("Restart I2P"));
-        restartItem.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                new SwingWorker<Object, Object>() {
-
-                    @Override
-                    protected Object doInBackground() throws Exception {
-                        RouterManager.restart();
-                        return null;
-                    }
-                    
-                }.execute();
-                
-            }
-            
-        });
-        if(inI2P) {
-        	popup.add(restartItem);
-        }
-        MenuItem stopItem = new MenuItem(_("Stop I2P"));
-        stopItem.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                new SwingWorker<Object, Object>() {
-                    
-                    @Override
-                    protected Object doInBackground() throws Exception {
-                        RouterManager.shutDown();
-                        return null;
-                    }
-                    
-                }.execute();
-                
-            }
-            
-        });
-        if(inI2P) {
-        	popup.add(stopItem);
-        }
-        return popup;
-    }
+    public abstract PopupMenu getMainMenu();
     
     /**
      * Get tray icon image from the desktopgui resources in the jar file.
@@ -192,7 +86,7 @@ public class TrayManager {
         return image;
     }
     
-    private static String _(String s) {
+    protected static String _(String s) {
         return DesktopguiTranslator._(s);
     }
 }
