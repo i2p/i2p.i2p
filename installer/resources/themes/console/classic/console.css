@@ -326,7 +326,7 @@ div.main li:first-child {
 }
 
 div.main li b {
-     color: #415!important;
+     color: #161!important;
      letter-spacing: 0.01em;
      font-size: 9.5pt;
      line-height: 170%;
@@ -698,7 +698,7 @@ div.joblog h3 {
 }
 
 div.joblog h3:first-child {
-     margin: 5px 0 15px 0;
+     margin: -10px 0 15px 0;
 }
 
 div.joblog hr {

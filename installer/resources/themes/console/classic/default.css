@@ -123,7 +123,7 @@ hr {
 
 .control {
      margin: 2px;
-     padding: 2px;
+     padding: 1px 2px 2px 2px;
      overflow: hidden;
      height: 20px;
      width: 60px;
