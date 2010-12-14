@@ -626,7 +626,9 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             try {
                 _producer.disconnect(this);
             } catch (I2PSessionException ipe) {
-                propogateError("Error destroying the session", ipe);
+                //propogateError("Error destroying the session", ipe);
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Error destroying the session", ipe);
             }
         }
         _availabilityNotifier.stopNotifying();
