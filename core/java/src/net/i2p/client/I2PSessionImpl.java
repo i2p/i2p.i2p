@@ -200,9 +200,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             }
         }
 
-        // auto-add auth if required, not set in the options, and we are in the same JVM
-        // TODO bypass this on router side for internal connections
-        if (_context.isRouterContext() &&
+        // auto-add auth if required, not set in the options, and we are not in the same JVM
+        if ((!_context.isRouterContext()) &&
             Boolean.valueOf(_context.getProperty("i2cp.auth")).booleanValue() &&
             ((!options.containsKey("i2cp.username")) || (!options.containsKey("i2cp.password")))) {
             String configUser = _context.getProperty("i2cp.username");

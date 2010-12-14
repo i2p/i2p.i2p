@@ -109,7 +109,7 @@ class ClientConnectionRunner {
      */
     public void startRunning() {
         try {
-            _reader = new I2CPMessageReader(_socket.getInputStream(), new ClientMessageEventListener(_context, this));
+            _reader = new I2CPMessageReader(_socket.getInputStream(), new ClientMessageEventListener(_context, this, true));
             _writer = new ClientWriterRunner(_context, this);
             I2PThread t = new I2PThread(_writer);
             t.setName("I2CP Writer " + ++__id);

@@ -35,7 +35,7 @@ class QueuedClientConnectionRunner extends ClientConnectionRunner {
      */
     @Override
     public void startRunning() {
-        _reader = new QueuedI2CPMessageReader(this.queue, new ClientMessageEventListener(_context, this));
+        _reader = new QueuedI2CPMessageReader(this.queue, new ClientMessageEventListener(_context, this, false));
         _reader.startReading();
     }
     
