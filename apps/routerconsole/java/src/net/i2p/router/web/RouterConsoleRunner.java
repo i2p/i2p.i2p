@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.security.KeyStore;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -87,7 +88,7 @@ public class RouterConsoleRunner {
      */
     public RouterConsoleRunner(String args[]) {
         if (args.length == 0) {
-            // _listenHost and _webAppsDir are defaulted above
+            // _listenHost and _webAppsDir are defaulted below
             _listenPort = DEFAULT_LISTEN_PORT;
         } else {
             boolean ssl = false;
@@ -352,7 +353,7 @@ public class RouterConsoleRunner {
         String[] args = new String[] {
                    keytool,
                    "-genkey",            // -genkeypair preferred in newer keytools, but this works with more
-                   "-storetype", "JKS",
+                   "-storetype", KeyStore.getDefaultType(),
                    "-keystore", ks.getAbsolutePath(),
                    "-storepass", DEFAULT_KEYSTORE_PASSWORD,
                    "-alias", "console",
