@@ -51,8 +51,6 @@ public class PoisonI2CPMessage extends I2CPMessageImpl {
 
     @Override
     public String toString() {
-        StringBuilder buf = new StringBuilder();
-        buf.append("[PoisonMessage]");
-        return buf.toString();
+        return "[PoisonMessage]";
     }
 }
