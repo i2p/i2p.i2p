@@ -939,8 +939,12 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         // Skip jump servers we don't know
                         String jumphost = jurl.substring(7);  // "http://"
                         jumphost = jumphost.substring(0, jumphost.indexOf('/'));
-                        Destination dest = I2PAppContext.getGlobalContext().namingService().lookup(jumphost);
-                        if (dest == null) continue;
+                        if (!jumphost.endsWith(".i2p"))
+                            continue;
+                        if (!jumphost.endsWith(".b32.i2p")) {
+                            Destination dest = I2PAppContext.getGlobalContext().namingService().lookup(jumphost);
+                            if (dest == null) continue;
+                        }
 
                         out.write("<br><a href=\"".getBytes());
                         out.write(jurl.getBytes());
