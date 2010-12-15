@@ -172,5 +172,5 @@
  <jsp:setProperty name="contenthelper" property="startAtBeginning" value="true" />
  <jsp:getProperty name="contenthelper" property="textContent" />
 
- <p>Более подробный список изменений можно найти в файле history.txt в каталоге Вашего I2P.
+ <p>Более подробный список изменений можно найти в файле history.txt, который находится в директории установки I2P.
  </p><hr></div></body></html>
