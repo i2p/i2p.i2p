@@ -8,6 +8,8 @@ import java.util.concurrent.LinkedBlockingQueue;
  * data referenced in it is needed (which often is only one or two lines
  * of code)
  *
+ * Unused as a class, as the keys are cached in the SessionKey objects,
+ * but the static methods are used in FortunaStandalone.
  */
 public final class CryptixAESKeyCache {
     private final LinkedBlockingQueue<KeyCacheEntry> _availableKeys;
@@ -20,6 +22,9 @@ public final class CryptixAESKeyCache {
     
     private static final int MAX_KEYS = 64;
     
+    /*
+     * @deprecated unused, keys are now cached in the SessionKey objects
+     */
     public CryptixAESKeyCache() {
         _availableKeys = new LinkedBlockingQueue(MAX_KEYS);
     }
@@ -27,6 +32,7 @@ public final class CryptixAESKeyCache {
     /**
      * Get the next available structure, either from the cache or a brand new one
      *
+     * @deprecated unused, keys are now cached in the SessionKey objects
      */
     public final KeyCacheEntry acquireKey() {
         KeyCacheEntry rv = _availableKeys.poll();
@@ -38,6 +44,7 @@ public final class CryptixAESKeyCache {
     /**
      * Put this structure back onto the available cache for reuse
      *
+     * @deprecated unused, keys are now cached in the SessionKey objects
      */
     public final void releaseKey(KeyCacheEntry key) {
         _availableKeys.offer(key);

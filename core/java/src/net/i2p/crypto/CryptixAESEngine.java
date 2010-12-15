@@ -27,18 +27,16 @@ import net.i2p.util.Log;
  * @author jrandom, thecrypto
  */
 public class CryptixAESEngine extends AESEngine {
-    private Log _log;
     private final static CryptixRijndael_Algorithm _algo = new CryptixRijndael_Algorithm();
     private final static boolean USE_FAKE_CRYPTO = false;
-    private final static byte FAKE_KEY = 0x2A;
-    private CryptixAESKeyCache _cache;
+    // keys are now cached in the SessionKey objects
+    //private CryptixAESKeyCache _cache;
     
     private static final ByteCache _prevCache = ByteCache.getInstance(16, 16);
     
     public CryptixAESEngine(I2PAppContext context) {
         super(context);
-        _log = context.logManager().getLog(CryptixAESEngine.class);
-        _cache = new CryptixAESKeyCache();
+        //_cache = new CryptixAESKeyCache();
     }
     
     /** @param length must be a multiple of 16 */
