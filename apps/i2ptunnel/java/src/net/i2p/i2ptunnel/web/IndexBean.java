@@ -735,6 +735,7 @@ public class IndexBean {
     protected static final String PROP_MAX_TOTAL_CONNS_MIN = "i2p.streaming.maxTotalConnsPerMinute";
     protected static final String PROP_MAX_TOTAL_CONNS_HOUR = "i2p.streaming.maxTotalConnsPerHour";
     protected static final String PROP_MAX_TOTAL_CONNS_DAY = "i2p.streaming.maxTotalConnsPerDay";
+    protected static final String PROP_MAX_STREAMS = "i2p.streaming.maxConcurrentStreams";
 
     public void setLimitMinute(String s) {
         if (s != null)
@@ -764,6 +765,11 @@ public class IndexBean {
     public void setTotalDay(String s) {
         if (s != null)
             _otherOptions.put(PROP_MAX_TOTAL_CONNS_DAY, s.trim());
+    }
+
+    public void setMaxStreams(String s) {
+        if (s != null)
+            _otherOptions.put(PROP_MAX_STREAMS, s.trim());
     }
 
     /** params needed for hashcash and dest modification */
@@ -968,9 +974,10 @@ public class IndexBean {
     private static final String _otherServerOpts[] = {
         "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.leaseSetKey", "i2cp.accessList",
          PROP_MAX_CONNS_MIN, PROP_MAX_CONNS_HOUR, PROP_MAX_CONNS_DAY,
-         PROP_MAX_TOTAL_CONNS_MIN, PROP_MAX_TOTAL_CONNS_HOUR, PROP_MAX_TOTAL_CONNS_DAY
+         PROP_MAX_TOTAL_CONNS_MIN, PROP_MAX_TOTAL_CONNS_HOUR, PROP_MAX_TOTAL_CONNS_DAY,
+         PROP_MAX_STREAMS
         };
-    protected static final Set _noShowSet = new HashSet();
+    protected static final Set _noShowSet = new HashSet(64);
     static {
         _noShowSet.addAll(Arrays.asList(_noShowOpts));
         _noShowSet.addAll(Arrays.asList(_booleanClientOpts));

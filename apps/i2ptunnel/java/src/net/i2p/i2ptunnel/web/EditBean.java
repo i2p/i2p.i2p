@@ -269,6 +269,10 @@ public class EditBean extends IndexBean {
         return getProperty(tunnel, PROP_MAX_TOTAL_CONNS_DAY, "0");
     }
 
+    public String getMaxStreams(int tunnel) {
+        return getProperty(tunnel, PROP_MAX_STREAMS, "0");
+    }
+
     private int getProperty(int tunnel, String prop, int def) {
         TunnelController tun = getController(tunnel);
         if (tun != null) {

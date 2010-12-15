@@ -333,7 +333,7 @@
                 <label for="encrypt" accesskey="e">
                     <%=intl._("Enable")%>:
                 </label>
-                <input value="1" type="checkbox" id="startOnLoad" name="encrypt" title="Encrypt LeaseSet"<%=(editBean.getEncrypt(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <input value="1" type="checkbox" id="startOnLoad" name="encrypt" title="ONLY clients with the encryption key will be able to connect"<%=(editBean.getEncrypt(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
             </div>
             <div id="portField" class="rowItem">
                 <label for="encrypt" accesskey="e">
@@ -406,6 +406,14 @@
               </div>
               <div id="portField" class="rowItem">
                   <input type="text" id="port" name="totalDay" value="<%=editBean.getTotalDay(curTunnel)%>" class="freetext" />                
+              </div>
+            </div>
+            <div class="rowItem">
+              <div id="optionsField" class="rowItem">
+                  <label><%=intl._("Max concurrent connections (0 to disable)")%>:</label>
+              </div>
+              <div id="portField" class="rowItem">
+                  <input type="text" id="port" name="maxStreams" value="<%=editBean.getMaxStreams(curTunnel)%>" class="freetext" />                
               </div>
             </div>
 
