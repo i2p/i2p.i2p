@@ -168,6 +168,7 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
         //System.out.println("Refilling " + (++refillCount) + " after " + diff + " for the PRNG took " + refillTime);
     }
     
+/*****
     public static void main(String args[]) {
         try {
             AsyncFortunaStandalone rand = new AsyncFortunaStandalone(null);  // Will cause NPEs above; fix this if you want to test! Sorry...
@@ -195,4 +196,5 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
         } catch (Exception e) { e.printStackTrace(); }
         try { Thread.sleep(5*60*1000); } catch (InterruptedException ie) {}
     }
+*****/
 }
