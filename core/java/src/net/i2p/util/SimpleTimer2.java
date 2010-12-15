@@ -27,12 +27,14 @@ import net.i2p.I2PAppContext;
 public class SimpleTimer2 {
     private static final SimpleTimer2 _instance = new SimpleTimer2();
     public static SimpleTimer2 getInstance() { return _instance; }
-    private static final int THREADS = 4;
+    private static final int MIN_THREADS = 2;
+    private static final int MAX_THREADS = 4;
     private I2PAppContext _context;
     private static Log _log; // static so TimedEvent can use it
     private ScheduledThreadPoolExecutor _executor;
     private String _name;
     private int _count;
+    private final int _threads;
 
     protected SimpleTimer2() { this("SimpleTimer2"); }
     protected SimpleTimer2(String name) {
@@ -40,7 +42,9 @@ public class SimpleTimer2 {
         _log = _context.logManager().getLog(SimpleTimer2.class);
         _name = name;
         _count = 0;
-        _executor = new CustomScheduledThreadPoolExecutor(THREADS, new CustomThreadFactory());
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        _threads = (int) Math.max(MIN_THREADS, Math.min(MAX_THREADS, 1 + (maxMemory / (32*1024*1024))));
+        _executor = new CustomScheduledThreadPoolExecutor(_threads, new CustomThreadFactory());
         _executor.prestartAllCoreThreads();
     }
     
@@ -67,7 +71,7 @@ public class SimpleTimer2 {
     private class CustomThreadFactory implements ThreadFactory {
         public Thread newThread(Runnable r) {
             Thread rv = Executors.defaultThreadFactory().newThread(r);
-            rv.setName(_name + ' ' + (++_count) + '/' + THREADS);
+            rv.setName(_name + ' ' + (++_count) + '/' + _threads);
 // Uncomment this to test threadgrouping, but we should be all safe now that the constructor preallocates!
 //            String name = rv.getThreadGroup().getName();
 //            if(!name.equals("main")) {

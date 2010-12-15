@@ -50,9 +50,9 @@ import net.i2p.util.SimpleTimer;
  *
  * @author jrandom
  */
-public class ClientConnectionRunner {
+class ClientConnectionRunner {
     private Log _log;
-    private RouterContext _context;
+    protected final RouterContext _context;
     private ClientManager _manager;
     /** socket for this particular peer connection */
     private Socket _socket;
@@ -71,7 +71,7 @@ public class ClientConnectionRunner {
     /** set of messageIds created but not yet ACCEPTED */
     private Set<MessageId> _acceptedPending;
     /** thingy that does stuff */
-    private I2CPMessageReader _reader;
+    protected I2CPMessageReader _reader;
     /** just for this destination */
     private SessionKeyManager _sessionKeyManager;
     /** 
@@ -109,7 +109,7 @@ public class ClientConnectionRunner {
      */
     public void startRunning() {
         try {
-            _reader = new I2CPMessageReader(_socket.getInputStream(), new ClientMessageEventListener(_context, this));
+            _reader = new I2CPMessageReader(_socket.getInputStream(), new ClientMessageEventListener(_context, this, true));
             _writer = new ClientWriterRunner(_context, this);
             I2PThread t = new I2PThread(_writer);
             t.setName("I2CP Writer " + ++__id);
@@ -469,18 +469,8 @@ public class ClientConnectionRunner {
                 _log.warn("Error sending I2CP message - client went away", eofe);
             stopRunning();
         } catch (IOException ioe) {
-            // only warn if client went away
-            int level;
-            String emsg;
-            if (ioe.getMessage() != null && ioe.getMessage().startsWith("Pipe closed")) {
-                level = Log.WARN;
-                emsg = "Error sending I2CP message - client went away";
-            } else {
-                level = Log.ERROR;
-                emsg = "IO Error sending I2CP message to client";
-            }
-            if (_log.shouldLog(level)) 
-                _log.log(level, emsg, ioe);
+            if (_log.shouldLog(Log.ERROR)) 
+                _log.error("IO Error sending I2CP message to client", ioe);
             stopRunning();
         } catch (Throwable t) {
             _log.log(Log.CRIT, "Unhandled exception sending I2CP message to client", t);

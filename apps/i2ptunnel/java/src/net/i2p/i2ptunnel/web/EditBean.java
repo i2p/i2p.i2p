@@ -18,6 +18,7 @@ import net.i2p.data.Destination;
 import net.i2p.data.PrivateKeyFile;
 import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
+import net.i2p.i2ptunnel.I2PTunnelHTTPClient;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
 import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.i2ptunnel.TunnelControllerGroup;
@@ -171,12 +172,21 @@ public class EditBean extends IndexBean {
         return getProperty(tunnel, "i2cp.leaseSetKey", "");
     }
     
-    public boolean getAccess(int tunnel) {
-        return getBooleanProperty(tunnel, "i2cp.enableAccessList");
+    public String getAccessMode(int tunnel) {
+        if (getBooleanProperty(tunnel, PROP_ENABLE_ACCESS_LIST))
+            return "1";
+        if (getBooleanProperty(tunnel, PROP_ENABLE_BLACKLIST))
+            return "2";
+        return "0";
     }
     
     public String getAccessList(int tunnel) {
         return getProperty(tunnel, "i2cp.accessList", "").replace(",", "\n");
+    }
+    
+    public String getJumpList(int tunnel) {
+        return getProperty(tunnel, I2PTunnelHTTPClient.PROP_JUMP_SERVERS,
+                           I2PTunnelHTTPClient.DEFAULT_JUMP_SERVERS).replace(",", "\n");
     }
     
     public boolean getClose(int tunnel) {
@@ -234,6 +244,35 @@ public class EditBean extends IndexBean {
         return getProperty(tunnel, I2PTunnelHTTPClientBase.PROP_OUTPROXY_PW, "");
     }
     
+    /** all of these are @since 0.8.3 */
+    public String getLimitMinute(int tunnel) {
+        return getProperty(tunnel, PROP_MAX_CONNS_MIN, "0");
+    }
+
+    public String getLimitHour(int tunnel) {
+        return getProperty(tunnel, PROP_MAX_CONNS_HOUR, "0");
+    }
+
+    public String getLimitDay(int tunnel) {
+        return getProperty(tunnel, PROP_MAX_CONNS_DAY, "0");
+    }
+
+    public String getTotalMinute(int tunnel) {
+        return getProperty(tunnel, PROP_MAX_TOTAL_CONNS_MIN, "0");
+    }
+
+    public String getTotalHour(int tunnel) {
+        return getProperty(tunnel, PROP_MAX_TOTAL_CONNS_HOUR, "0");
+    }
+
+    public String getTotalDay(int tunnel) {
+        return getProperty(tunnel, PROP_MAX_TOTAL_CONNS_DAY, "0");
+    }
+
+    public String getMaxStreams(int tunnel) {
+        return getProperty(tunnel, PROP_MAX_STREAMS, "0");
+    }
+
     private int getProperty(int tunnel, String prop, int def) {
         TunnelController tun = getController(tunnel);
         if (tun != null) {
@@ -270,7 +309,14 @@ public class EditBean extends IndexBean {
         return false;
     }
     
+    /** @since 0.8.3 */
+    public boolean isRouterContext() {
+        return _context.isRouterContext();
+    }
+
     public String getI2CPHost(int tunnel) {
+        if (_context.isRouterContext())
+            return _("internal");
         TunnelController tun = getController(tunnel);
         if (tun != null)
             return tun.getI2CPHost();
@@ -279,6 +325,8 @@ public class EditBean extends IndexBean {
     }
     
     public String getI2CPPort(int tunnel) {
+        if (_context.isRouterContext())
+            return _("internal");
         TunnelController tun = getController(tunnel);
         if (tun != null)
             return tun.getI2CPPort();

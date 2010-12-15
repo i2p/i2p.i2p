@@ -6,6 +6,7 @@ import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
+import net.i2p.internal.InternalClientManager;
 import net.i2p.router.client.ClientManagerFacadeImpl;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.peermanager.Calculator;
@@ -34,7 +35,7 @@ import net.i2p.util.KeyRing;
  */
 public class RouterContext extends I2PAppContext {
     private Router _router;
-    private ClientManagerFacade _clientManagerFacade;
+    private ClientManagerFacadeImpl _clientManagerFacade;
     private ClientMessagePool _clientMessagePool;
     private JobQueue _jobQueue;
     private InNetMessagePool _inNetMessagePool;
@@ -106,10 +107,12 @@ public class RouterContext extends I2PAppContext {
     }
 
     public void initAll() {
-        if ("false".equals(getProperty("i2p.dummyClientFacade", "false")))
-            _clientManagerFacade = new ClientManagerFacadeImpl(this);
-        else
-            _clientManagerFacade = new DummyClientManagerFacade(this);
+        if (getBooleanProperty("i2p.dummyClientFacade"))
+            System.err.println("i2p.dummpClientFacade currently unsupported");
+        _clientManagerFacade = new ClientManagerFacadeImpl(this);
+        // removed since it doesn't implement InternalClientManager for now
+        //else
+        //    _clientManagerFacade = new DummyClientManagerFacade(this);
         _clientMessagePool = new ClientMessagePool(this);
         _jobQueue = new JobQueue(this);
         _inNetMessagePool = new InNetMessagePool(this);
@@ -394,5 +397,14 @@ public class RouterContext extends I2PAppContext {
      */
     public boolean isRouterContext() {
         return true;
+    }
+
+    /**
+     *  Use this to connect to the router in the same JVM.
+     *  @return the client manager
+     *  @since 0.8.3
+     */
+    public InternalClientManager internalClientManager() {
+        return _clientManagerFacade;
     }
 }

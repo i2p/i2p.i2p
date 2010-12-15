@@ -42,14 +42,19 @@ import net.i2p.util.RandomSource;
  *
  */
 class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventListener {
-    private Log _log;
-    private RouterContext _context;
-    private ClientConnectionRunner _runner;
+    private final Log _log;
+    private final RouterContext _context;
+    private final ClientConnectionRunner _runner;
+    private final boolean  _enforceAuth;
     
-    public ClientMessageEventListener(RouterContext context, ClientConnectionRunner runner) {
+    /**
+     *  @param enforceAuth set false for in-JVM, true for socket access
+     */
+    public ClientMessageEventListener(RouterContext context, ClientConnectionRunner runner, boolean enforceAuth) {
         _context = context;
         _log = _context.logManager().getLog(ClientMessageEventListener.class);
         _runner = runner;
+        _enforceAuth = enforceAuth;
         _context.statManager().createRateStat("client.distributeTime", "How long it took to inject the client message into the router", "ClientMessages", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
     }
     
@@ -153,10 +158,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         }
 
         // Auth, since 0.8.2
-        // In-JVM accesses have access to the same context properties, so
-        // they will be set on the client side... therefore we don't need to pass in
-        // some indication of (socket instanceof InternalSocket)
-        if (Boolean.valueOf(_context.getProperty("i2cp.auth")).booleanValue()) {
+        if (_enforceAuth && Boolean.valueOf(_context.getProperty("i2cp.auth")).booleanValue()) {
             String configUser = _context.getProperty("i2cp.username");
             String configPW = _context.getProperty("i2cp.password");
             if (configUser != null && configPW != null) {

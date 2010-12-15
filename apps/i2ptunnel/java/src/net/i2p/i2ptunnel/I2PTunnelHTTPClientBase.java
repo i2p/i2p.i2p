@@ -25,7 +25,7 @@ import net.i2p.util.Log;
  * @since 0.8.2
  */
 public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implements Runnable {
-    private static final Log _log = new Log(I2PTunnelHTTPClientBase.class);
+
     protected final List<String> _proxyList;
 
     protected final static byte[] ERR_NO_OUTPROXY =

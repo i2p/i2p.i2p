@@ -30,7 +30,6 @@ import net.i2p.util.Log;
  */
 public class I2PSOCKSIRCTunnel extends I2PSOCKSTunnel {
 
-    private static final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(I2PSOCKSIRCTunnel.class);
     private static int __clientId = 0;
 
     /** @param pkf private key file name or null for transient key */

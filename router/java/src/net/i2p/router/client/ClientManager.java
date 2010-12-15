@@ -15,7 +15,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
 
+import net.i2p.client.I2PSessionException;
 import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -23,8 +25,10 @@ import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.Payload;
 import net.i2p.data.TunnelId;
+import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.MessageId;
 import net.i2p.data.i2cp.SessionConfig;
+import net.i2p.internal.I2CPMessageQueue;
 import net.i2p.router.ClientManagerFacade;
 import net.i2p.router.ClientMessage;
 import net.i2p.router.Job;
@@ -39,13 +43,18 @@ import net.i2p.util.Log;
  *
  * @author jrandom
  */
-public class ClientManager {
-    private Log _log;
+class ClientManager {
+    private final Log _log;
     private ClientListenerRunner _listener;
-    private ClientListenerRunner _internalListener;
     private final HashMap<Destination, ClientConnectionRunner>  _runners;        // Destination --> ClientConnectionRunner
     private final Set<ClientConnectionRunner> _pendingRunners; // ClientConnectionRunner for clients w/out a Dest yet
-    private RouterContext _ctx;
+    private final RouterContext _ctx;
+    private boolean _isStarted;
+
+    /** Disable external interface, allow internal clients only @since 0.8.3 */
+    private static final String PROP_DISABLE_EXTERNAL = "i2cp.disableInterface";
+    /** SSL interface (only) @since 0.8.3 */
+    private static final String PROP_ENABLE_SSL = "i2cp.SSL";
 
     /** ms to wait before rechecking for inbound messages to deliver to clients */
     private final static int INBOUND_POLL_INTERVAL = 300;
@@ -53,10 +62,10 @@ public class ClientManager {
     public ClientManager(RouterContext context, int port) {
         _ctx = context;
         _log = context.logManager().getLog(ClientManager.class);
-        _ctx.statManager().createRateStat("client.receiveMessageSize", 
-                                              "How large are messages received by the client?", 
-                                              "ClientMessages", 
-                                              new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+        //_ctx.statManager().createRateStat("client.receiveMessageSize", 
+        //                                      "How large are messages received by the client?", 
+        //                                      "ClientMessages", 
+        //                                      new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
         _runners = new HashMap();
         _pendingRunners = new HashSet();
         startListeners(port);
@@ -64,16 +73,16 @@ public class ClientManager {
 
     /** Todo: Start a 3rd listener for IPV6? */
     private void startListeners(int port) {
-        _listener = new ClientListenerRunner(_ctx, this, port);
-        Thread t = new I2PThread(_listener);
-        t.setName("ClientListener:" + port);
-        t.setDaemon(true);
-        t.start();
-        _internalListener = new InternalClientListenerRunner(_ctx, this, port);
-        t = new I2PThread(_internalListener);
-        t.setName("ClientListener:" + port + "-i");
-        t.setDaemon(true);
-        t.start();
+        if (!_ctx.getBooleanProperty(PROP_DISABLE_EXTERNAL)) {
+            // there's no option to start both an SSL and non-SSL listener
+            if (_ctx.getBooleanProperty(PROP_ENABLE_SSL))
+                _listener = new SSLClientListenerRunner(_ctx, this, port);
+            else
+                _listener = new ClientListenerRunner(_ctx, this, port);
+            Thread t = new I2PThread(_listener, "ClientListener:" + port, true);
+            t.start();
+        }
+        _isStarted = true;
     }
     
     public void restart() {
@@ -95,9 +104,10 @@ public class ClientManager {
     }
     
     public void shutdown() {
+        _isStarted = false;
         _log.info("Shutting down the ClientManager");
-        _listener.stopListening();
-        _internalListener.stopListening();
+        if (_listener != null)
+            _listener.stopListening();
         Set<ClientConnectionRunner> runners = new HashSet();
         synchronized (_runners) {
             for (Iterator<ClientConnectionRunner> iter = _runners.values().iterator(); iter.hasNext();) {
@@ -117,7 +127,28 @@ public class ClientManager {
         }
     }
     
-    public boolean isAlive() { return _listener.isListening(); }
+    /**
+     *  The InternalClientManager interface.
+     *  Connects to the router, receiving a message queue to talk to the router with.
+     *  @throws I2PSessionException if the router isn't ready
+     *  @since 0.8.3
+     */
+    public I2CPMessageQueue internalConnect() throws I2PSessionException {
+        if (!_isStarted)
+            throw new I2PSessionException("Router client manager is shut down");
+        // for now we make these unlimited size
+        LinkedBlockingQueue<I2CPMessage> in = new LinkedBlockingQueue();
+        LinkedBlockingQueue<I2CPMessage> out = new LinkedBlockingQueue();
+        I2CPMessageQueue myQueue = new I2CPMessageQueueImpl(in, out);
+        I2CPMessageQueue hisQueue = new I2CPMessageQueueImpl(out, in);
+        ClientConnectionRunner runner = new QueuedClientConnectionRunner(_ctx, this, myQueue);
+        registerConnection(runner);
+        return hisQueue;
+    }
+
+    public boolean isAlive() {
+        return _isStarted && (_listener == null || _listener.isListening());
+    }
 
     public void registerConnection(ClientConnectionRunner runner) {
         synchronized (_pendingRunners) {
@@ -469,8 +500,8 @@ public class ClientManager {
                 runner = getRunner(_msg.getDestinationHash());
 
             if (runner != null) {
-                _ctx.statManager().addRateData("client.receiveMessageSize", 
-                                                   _msg.getPayload().getSize(), 0);
+                //_ctx.statManager().addRateData("client.receiveMessageSize", 
+                //                                   _msg.getPayload().getSize(), 0);
                 runner.receiveMessage(_msg.getDestination(), null, _msg.getPayload());
             } else {
                 // no client connection...

@@ -14,12 +14,12 @@ import net.i2p.util.Log;
  *
  */
 class Writer {
-    private RouterContext _context;
-    private Log _log;
+    private final RouterContext _context;
+    private final Log _log;
     private final List<NTCPConnection> _pendingConnections;
-    private List<NTCPConnection> _liveWrites;
-    private List<NTCPConnection> _writeAfterLive;
-    private List<Runner> _runners;
+    private final List<NTCPConnection> _liveWrites;
+    private final List<NTCPConnection> _writeAfterLive;
+    private final List<Runner> _runners;
     
     public Writer(RouterContext ctx) {
         _context = ctx;
@@ -31,9 +31,9 @@ class Writer {
     }
     
     public void startWriting(int numWriters) {
-        for (int i = 0; i < numWriters; i++) {
+        for (int i = 1; i <=numWriters; i++) {
             Runner r = new Runner();
-            I2PThread t = new I2PThread(r, "NTCP write " + i, true);
+            I2PThread t = new I2PThread(r, "NTCP writer " + i + '/' + numWriters, true);
             _runners.add(r);
             t.start();
         }

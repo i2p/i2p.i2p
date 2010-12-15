@@ -3,6 +3,7 @@ package net.i2p.router.web;
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
+import net.i2p.util.FileUtil;
 
 /**
  *
@@ -61,14 +62,10 @@ public class ConfigUpdateHandler extends FormHandler {
 
     public static final String DEFAULT_UPDATE_URL;
     static {
-        String foo;
-        try {
-            Class.forName("java.util.jar.Pack200", false, ClassLoader.getSystemClassLoader());
-            foo = PACK200_URLS;
-        } catch (ClassNotFoundException cnfe) {
-            foo = NO_PACK200_URLS;
-        }
-        DEFAULT_UPDATE_URL = foo;
+        if (FileUtil.isPack200Supported())
+            DEFAULT_UPDATE_URL = PACK200_URLS;
+        else
+            DEFAULT_UPDATE_URL = NO_PACK200_URLS;
     }
 
     public static final String PROP_TRUSTED_KEYS = "router.trustedUpdateKeys";

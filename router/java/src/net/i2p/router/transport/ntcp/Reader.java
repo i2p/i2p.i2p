@@ -15,13 +15,13 @@ import net.i2p.util.Log;
  *
  */
 class Reader {
-    private RouterContext _context;
-    private Log _log;
+    private final RouterContext _context;
+    private final Log _log;
     // TODO change to LBQ ??
     private final List<NTCPConnection> _pendingConnections;
-    private List<NTCPConnection> _liveReads;
-    private List<NTCPConnection> _readAfterLive;
-    private List<Runner> _runners;
+    private final List<NTCPConnection> _liveReads;
+    private final List<NTCPConnection> _readAfterLive;
+    private final List<Runner> _runners;
     
     public Reader(RouterContext ctx) {
         _context = ctx;
@@ -33,9 +33,9 @@ class Reader {
     }
     
     public void startReading(int numReaders) {
-        for (int i = 0; i < numReaders; i++) {
+        for (int i = 1; i <= numReaders; i++) {
             Runner r = new Runner();
-            I2PThread t = new I2PThread(r, "NTCP read " + i, true);
+            I2PThread t = new I2PThread(r, "NTCP reader " + i + '/' + numReaders, true);
             _runners.add(r);
             t.start();
         }

@@ -18,14 +18,16 @@ import net.i2p.I2PAppContext;
 public class SimpleTimer {
     private static final SimpleTimer _instance = new SimpleTimer();
     public static SimpleTimer getInstance() { return _instance; }
-    private I2PAppContext _context;
-    private Log _log;
+    private final I2PAppContext _context;
+    private final Log _log;
     /** event time (Long) to event (TimedEvent) mapping */
     private final TreeMap _events;
     /** event (TimedEvent) to event time (Long) mapping */
     private Map _eventTimes;
     private final List _readyEvents;
     private SimpleStore runn;
+    private static final int MIN_THREADS = 2;
+    private static final int MAX_THREADS = 4;
 
     protected SimpleTimer() { this("SimpleTimer"); }
     protected SimpleTimer(String name) {
@@ -39,9 +41,11 @@ public class SimpleTimer {
         runner.setName(name);
         runner.setDaemon(true);
         runner.start();
-        for (int i = 0; i < 3; i++) {
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        int threads = (int) Math.max(MIN_THREADS, Math.min(MAX_THREADS, 1 + (maxMemory / (32*1024*1024))));
+        for (int i = 1; i <= threads ; i++) {
             I2PThread executor = new I2PThread(new Executor(_context, _log, _readyEvents, runn));
-            executor.setName(name + "Executor " + i);
+            executor.setName(name + "Executor " + i + '/' + threads);
             executor.setDaemon(true);
             executor.start();
         }

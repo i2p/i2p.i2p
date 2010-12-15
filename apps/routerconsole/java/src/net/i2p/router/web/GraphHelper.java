@@ -59,7 +59,13 @@ public class GraphHelper extends FormHandler {
         try { _width = Math.min(Integer.parseInt(str), MAX_X); } catch (NumberFormatException nfe) {}
     }
     public void setRefreshDelay(String str) {
-        try { _refreshDelaySeconds = Math.max(Integer.parseInt(str), MIN_REFRESH); } catch (NumberFormatException nfe) {}
+        try {
+            int rds = Integer.parseInt(str);
+            if (rds > 0)
+                _refreshDelaySeconds = Math.max(rds, MIN_REFRESH);
+            else
+                _refreshDelaySeconds = -1;
+        } catch (NumberFormatException nfe) {}
     }
     
     public String getImages() { 
@@ -83,7 +89,7 @@ public class GraphHelper extends FormHandler {
                            + "&amp;periodCount=" + (3 * _periodCount )
                            + "&amp;width=" + (3 * _width)
                            + "&amp;height=" + (3 * _height)
-                           + "\" / target=\"_blank\">");
+                           + "\" target=\"_blank\">");
                 String title = _("Combined bandwidth graph");
                 _out.write("<img class=\"statimage\" width=\""
                            + (_width + 83) + "\" height=\"" + (_height + 92)
@@ -129,6 +135,8 @@ public class GraphHelper extends FormHandler {
         return ""; 
     }
 
+    private static final int[] times = { 60, 2*60, 5*60, 10*60, 30*60, 60*60, -1 };
+
     public String getForm() { 
         String prev = System.getProperty("net.i2p.router.web.GraphHelper.nonce");
         if (prev != null) System.setProperty("net.i2p.router.web.GraphHelper.noncePrev", prev);
@@ -145,8 +153,22 @@ public class GraphHelper extends FormHandler {
             _out.write(_("Image sizes") + ": " + _("width") + ": <input size=\"4\" type=\"text\" name=\"width\" value=\"" + _width 
                        + "\"> " + _("pixels") + ", " + _("height") + ": <input size=\"4\" type=\"text\" name=\"height\" value=\"" + _height  
                        + "\"> " + _("pixels") + "<br>\n");
-            _out.write(_("Refresh delay") + ": <select name=\"refreshDelay\"><option value=\"60\">1 " + _("minute") + "</option><option value=\"120\">2 " + _("minutes") + "</option><option value=\"300\">5 " + _("minutes") + "</option><option value=\"600\">10 " + _("minutes") + "</option><option value=\"1800\">30 " + _("minutes") + "</option><option value=\"3600\">1 " + _("hour") + "</option><option value=\"-1\">" + _("Never") + "</option></select><br>\n");
-            _out.write("<hr><div class=\"formaction\"><input type=\"submit\" value=\"" + _("Redraw") + "\"></div></form>");
+            _out.write(_("Refresh delay") + ": <select name=\"refreshDelay\">");
+            for (int i = 0; i < times.length; i++) {
+                _out.write("<option value=\"");
+                _out.write(Integer.toString(times[i]));
+                _out.write("\"");
+                if (times[i] == _refreshDelaySeconds)
+                    _out.write(" selected=\"true\"");
+                _out.write(">");
+                if (times[i] > 0)
+                    _out.write(DataHelper.formatDuration2(times[i] * 1000));
+                else
+                    _out.write(_("Never"));
+                _out.write("</option>\n");
+            }
+            _out.write("</select><br>\n" +
+                       "<hr><div class=\"formaction\"><input type=\"submit\" value=\"" + _("Redraw") + "\"></div></form>");
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }

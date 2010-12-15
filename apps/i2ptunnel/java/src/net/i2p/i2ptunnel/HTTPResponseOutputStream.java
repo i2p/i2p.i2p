@@ -16,6 +16,7 @@ import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.zip.GZIPInputStream;
+import java.util.concurrent.RejectedExecutionException;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
@@ -228,7 +229,15 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         //out.flush();
         PipedInputStream pi = new PipedInputStream();
         PipedOutputStream po = new PipedOutputStream(pi);
-        new I2PAppThread(new Pusher(pi, out), "HTTP decompressor").start();
+        // Run in the client thread pool, as there should be an unused thread
+        // there after the accept().
+        // Overridden in I2PTunnelHTTPServer, where it does not use the client pool.
+        try {
+            I2PTunnelClientBase._executor.execute(new Pusher(pi, out));
+        } catch (RejectedExecutionException ree) {
+            // shouldn't happen
+            throw ree;
+        }
         out = po;
     }
     

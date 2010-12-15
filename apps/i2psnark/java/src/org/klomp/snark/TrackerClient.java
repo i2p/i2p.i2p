@@ -72,8 +72,10 @@ public class TrackerClient extends I2PAppThread
 
   public TrackerClient(I2PSnarkUtil util, MetaInfo meta, PeerCoordinator coordinator)
   {
+    super();
     // Set unique name.
-    super("TrackerClient-" + urlencode(coordinator.getID()));
+    String id = urlencode(coordinator.getID());
+    setName("TrackerClient " + id.substring(id.length() - 12));
     _util = util;
     this.meta = meta;
     this.coordinator = coordinator;

@@ -24,6 +24,7 @@ import net.i2p.data.Certificate;
 import net.i2p.data.Destination;
 import net.i2p.data.PrivateKeyFile;
 import net.i2p.data.SessionKey;
+import net.i2p.i2ptunnel.I2PTunnelHTTPClient;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
 import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.i2ptunnel.TunnelControllerGroup;
@@ -537,11 +538,11 @@ public class IndexBean {
     public void setDescription(String description) { 
         _description = (description != null ? description.trim() : null);
     }
-    /** I2CP host the router is on */
+    /** I2CP host the router is on, ignored when in router context */
     public void setClientHost(String host) {
         _i2cpHost = (host != null ? host.trim() : null);
     }
-    /** I2CP port the router is on */
+    /** I2CP port the router is on, ignored when in router context */
     public void setClientport(String port) {
         _i2cpPort = (port != null ? port.trim() : null);
     }
@@ -643,9 +644,17 @@ public class IndexBean {
     public void setEncrypt(String moo) {
         _booleanOptions.add("i2cp.encryptLeaseSet");
     }
-    public void setAccess(String moo) {
-        _booleanOptions.add("i2cp.enableAccessList");
+
+    protected static final String PROP_ENABLE_ACCESS_LIST = "i2cp.enableAccessList";
+    protected static final String PROP_ENABLE_BLACKLIST = "i2cp.enableBlackList";
+
+    public void setAccessMode(String val) {
+        if ("1".equals(val))
+            _booleanOptions.add(PROP_ENABLE_ACCESS_LIST);
+        else if ("2".equals(val))
+            _booleanOptions.add(PROP_ENABLE_BLACKLIST);
     }
+
     public void setDelayOpen(String moo) {
         _booleanOptions.add("i2cp.delayOpen");
     }
@@ -671,10 +680,17 @@ public class IndexBean {
         if (val != null)
             _otherOptions.put("i2cp.leaseSetKey", val.trim());
     }
+
     public void setAccessList(String val) {
         if (val != null)
             _otherOptions.put("i2cp.accessList", val.trim().replace("\r\n", ",").replace("\n", ",").replace(" ", ","));
     }
+
+    public void setJumpList(String val) {
+        if (val != null)
+            _otherOptions.put(I2PTunnelHTTPClient.PROP_JUMP_SERVERS, val.trim().replace("\r\n", ",").replace("\n", ",").replace(" ", ","));
+    }
+
     public void setCloseTime(String val) {
         if (val != null) {
             try {
@@ -712,6 +728,50 @@ public class IndexBean {
             _otherOptions.put(I2PTunnelHTTPClientBase.PROP_OUTPROXY_PW, s.trim());
     }
     
+    /** all of these are @since 0.8.3 */
+    protected static final String PROP_MAX_CONNS_MIN = "i2p.streaming.maxConnsPerMinute";
+    protected static final String PROP_MAX_CONNS_HOUR = "i2p.streaming.maxConnsPerHour";
+    protected static final String PROP_MAX_CONNS_DAY = "i2p.streaming.maxConnsPerDay";
+    protected static final String PROP_MAX_TOTAL_CONNS_MIN = "i2p.streaming.maxTotalConnsPerMinute";
+    protected static final String PROP_MAX_TOTAL_CONNS_HOUR = "i2p.streaming.maxTotalConnsPerHour";
+    protected static final String PROP_MAX_TOTAL_CONNS_DAY = "i2p.streaming.maxTotalConnsPerDay";
+    protected static final String PROP_MAX_STREAMS = "i2p.streaming.maxConcurrentStreams";
+
+    public void setLimitMinute(String s) {
+        if (s != null)
+            _otherOptions.put(PROP_MAX_CONNS_MIN, s.trim());
+    }
+
+    public void setLimitHour(String s) {
+        if (s != null)
+            _otherOptions.put(PROP_MAX_CONNS_HOUR, s.trim());
+    }
+
+    public void setLimitDay(String s) {
+        if (s != null)
+            _otherOptions.put(PROP_MAX_CONNS_DAY, s.trim());
+    }
+
+    public void setTotalMinute(String s) {
+        if (s != null)
+            _otherOptions.put(PROP_MAX_TOTAL_CONNS_MIN, s.trim());
+    }
+
+    public void setTotalHour(String s) {
+        if (s != null)
+            _otherOptions.put(PROP_MAX_TOTAL_CONNS_HOUR, s.trim());
+    }
+
+    public void setTotalDay(String s) {
+        if (s != null)
+            _otherOptions.put(PROP_MAX_TOTAL_CONNS_DAY, s.trim());
+    }
+
+    public void setMaxStreams(String s) {
+        if (s != null)
+            _otherOptions.put(PROP_MAX_STREAMS, s.trim());
+    }
+
     /** params needed for hashcash and dest modification */
     public void setEffort(String val) {
         if (val != null) {
@@ -904,16 +964,20 @@ public class IndexBean {
         I2PTunnelHTTPClientBase.PROP_AUTH, I2PTunnelHTTPClientBase.PROP_OUTPROXY_AUTH
         };
     private static final String _booleanServerOpts[] = {
-        "i2cp.reduceOnIdle", "i2cp.encryptLeaseSet", "i2cp.enableAccessList"
+        "i2cp.reduceOnIdle", "i2cp.encryptLeaseSet", PROP_ENABLE_ACCESS_LIST, PROP_ENABLE_BLACKLIST
         };
     private static final String _otherClientOpts[] = {
         "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.closeIdleTime",
-        "proxyUsername", "proxyPassword", "outproxyUsername", "outproxyPassword"
+        "proxyUsername", "proxyPassword", "outproxyUsername", "outproxyPassword",
+        I2PTunnelHTTPClient.PROP_JUMP_SERVERS
         };
     private static final String _otherServerOpts[] = {
-        "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.leaseSetKey", "i2cp.accessList"
+        "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.leaseSetKey", "i2cp.accessList",
+         PROP_MAX_CONNS_MIN, PROP_MAX_CONNS_HOUR, PROP_MAX_CONNS_DAY,
+         PROP_MAX_TOTAL_CONNS_MIN, PROP_MAX_TOTAL_CONNS_HOUR, PROP_MAX_TOTAL_CONNS_DAY,
+         PROP_MAX_STREAMS
         };
-    protected static final Set _noShowSet = new HashSet();
+    protected static final Set _noShowSet = new HashSet(64);
     static {
         _noShowSet.addAll(Arrays.asList(_noShowOpts));
         _noShowSet.addAll(Arrays.asList(_booleanClientOpts));
@@ -929,12 +993,14 @@ public class IndexBean {
             config.setProperty("name", _name);
         if (_description != null)
             config.setProperty("description", _description);
-        if (_i2cpHost != null)
-            config.setProperty("i2cpHost", _i2cpHost);
-        if ( (_i2cpPort != null) && (_i2cpPort.trim().length() > 0) ) {
-            config.setProperty("i2cpPort", _i2cpPort);
-        } else {
-            config.setProperty("i2cpPort", "7654");
+        if (!_context.isRouterContext()) {
+            if (_i2cpHost != null)
+                config.setProperty("i2cpHost", _i2cpHost);
+            if ( (_i2cpPort != null) && (_i2cpPort.trim().length() > 0) ) {
+                config.setProperty("i2cpPort", _i2cpPort);
+            } else {
+                config.setProperty("i2cpPort", "7654");
+            }
         }
         if (_privKeyFile != null)
             config.setProperty("privKeyFile", _privKeyFile);
@@ -1020,7 +1086,7 @@ public class IndexBean {
         }
     }
 
-    private String _(String key) {
+    protected String _(String key) {
         return Messages._(key, _context);
     }
 }

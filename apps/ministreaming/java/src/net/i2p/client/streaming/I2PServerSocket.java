@@ -19,9 +19,10 @@ public interface I2PServerSocket {
     /**
      * Waits for the next socket connecting.  If a remote user tried to make a 
      * connection and the local application wasn't .accept()ing new connections,
-     * they should get refused (if .accept() doesnt occur in some small period)
+     * they should get refused (if .accept() doesnt occur in some small period).
+     * Warning - unlike regular ServerSocket, may return null.
      *
-     * @return a connected I2PSocket
+     * @return a connected I2PSocket OR NULL
      *
      * @throws I2PException if there is a problem with reading a new socket
      *         from the data available (aka the I2PSession closed, etc)

@@ -161,7 +161,8 @@ public class I2NPMessageReader {
                         cancelRunner();
                     }
                 }
-                if (!_doRun) {
+                // ??? unused
+                if (_stayAlive && !_doRun) {
                     // pause .5 secs when we're paused
                     try { Thread.sleep(500); } catch (InterruptedException ie) {}
                 }
