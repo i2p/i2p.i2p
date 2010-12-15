@@ -18,6 +18,7 @@ import net.i2p.data.Destination;
 import net.i2p.data.PrivateKeyFile;
 import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
+import net.i2p.i2ptunnel.I2PTunnelHTTPClient;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
 import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.i2ptunnel.TunnelControllerGroup;
@@ -181,6 +182,11 @@ public class EditBean extends IndexBean {
     
     public String getAccessList(int tunnel) {
         return getProperty(tunnel, "i2cp.accessList", "").replace(",", "\n");
+    }
+    
+    public String getJumpList(int tunnel) {
+        return getProperty(tunnel, I2PTunnelHTTPClient.PROP_JUMP_SERVERS,
+                           I2PTunnelHTTPClient.DEFAULT_JUMP_SERVERS).replace(",", "\n");
     }
     
     public boolean getClose(int tunnel) {

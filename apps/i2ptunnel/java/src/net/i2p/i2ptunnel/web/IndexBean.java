@@ -24,6 +24,7 @@ import net.i2p.data.Certificate;
 import net.i2p.data.Destination;
 import net.i2p.data.PrivateKeyFile;
 import net.i2p.data.SessionKey;
+import net.i2p.i2ptunnel.I2PTunnelHTTPClient;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
 import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.i2ptunnel.TunnelControllerGroup;
@@ -679,10 +680,17 @@ public class IndexBean {
         if (val != null)
             _otherOptions.put("i2cp.leaseSetKey", val.trim());
     }
+
     public void setAccessList(String val) {
         if (val != null)
             _otherOptions.put("i2cp.accessList", val.trim().replace("\r\n", ",").replace("\n", ",").replace(" ", ","));
     }
+
+    public void setJumpList(String val) {
+        if (val != null)
+            _otherOptions.put(I2PTunnelHTTPClient.PROP_JUMP_SERVERS, val.trim().replace("\r\n", ",").replace("\n", ",").replace(" ", ","));
+    }
+
     public void setCloseTime(String val) {
         if (val != null) {
             try {
@@ -954,7 +962,8 @@ public class IndexBean {
         };
     private static final String _otherClientOpts[] = {
         "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.closeIdleTime",
-        "proxyUsername", "proxyPassword", "outproxyUsername", "outproxyPassword"
+        "proxyUsername", "proxyPassword", "outproxyUsername", "outproxyPassword",
+        I2PTunnelHTTPClient.PROP_JUMP_SERVERS
         };
     private static final String _otherServerOpts[] = {
         "i2cp.reduceIdleTime", "i2cp.reduceQuantity", "i2cp.leaseSetKey", "i2cp.accessList",

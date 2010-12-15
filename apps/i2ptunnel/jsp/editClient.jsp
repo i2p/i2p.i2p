@@ -465,6 +465,18 @@
             </div>
          <% } // httpclient || connect || socks || socksirc %>
 
+         <% if ("httpclient".equals(tunnelType)) { %>
+            <div id="optionsField" class="rowItem">
+                <label><%=intl._("Jump URL List")%>:</label>
+            </div>
+            <div id="hostField" class="rowItem">
+                <textarea rows="2" style="height: 8em;" cols="60" id="hostField" name="jumpList" title="List of helper URLs to offer when a host is not found in your addressbook" wrap="off"><%=editBean.getJumpList(curTunnel)%></textarea>               
+            </div>
+            <div class="subdivider">
+                <hr />
+            </div>
+         <% } // httpclient %>
+
             <div id="customOptionsField" class="rowItem">
                 <label for="customOptions" accesskey="u">
                     <%=intl._("Custom options")%>(<span class="accessKey">u</span>):
