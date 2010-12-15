@@ -41,7 +41,7 @@ class YKGenerator {
     private static final int MIN_NUM_BUILDERS;
     private static final int MAX_NUM_BUILDERS;
     private static final int CALC_DELAY;
-    private static final LinkedBlockingQueue<BigInteger[]> _values = new LinkedBlockingQueue(50); // list of BigInteger[] values (y and k)
+    private static final LinkedBlockingQueue<BigInteger[]> _values;
     private static final Thread _precalcThread;
     private static final I2PAppContext ctx;
 
@@ -53,13 +53,21 @@ class YKGenerator {
     public final static int DEFAULT_YK_PRECALC_DELAY = 200;
 
     /** check every 30 seconds whether we have less than the minimum */
-    private static long CHECK_DELAY = 30 * 1000;
+    private static long _checkDelay = 30 * 1000;
 
     static {
         ctx = I2PAppContext.getGlobalContext();
-        MIN_NUM_BUILDERS = ctx.getProperty(PROP_YK_PRECALC_MIN, DEFAULT_YK_PRECALC_MIN);
-        MAX_NUM_BUILDERS = ctx.getProperty(PROP_YK_PRECALC_MAX, DEFAULT_YK_PRECALC_MAX);
+
+        // add to the defaults for every 128MB of RAM, up to 1GB
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        int factor = Math.min(8, (int) (1 + (maxMemory / (128*1024*1024l))));
+        int defaultMin = DEFAULT_YK_PRECALC_MIN * factor;
+        int defaultMax = DEFAULT_YK_PRECALC_MAX * factor;
+        MIN_NUM_BUILDERS = ctx.getProperty(PROP_YK_PRECALC_MIN, defaultMin);
+        MAX_NUM_BUILDERS = ctx.getProperty(PROP_YK_PRECALC_MAX, defaultMax);
+
         CALC_DELAY = ctx.getProperty(PROP_YK_PRECALC_DELAY, DEFAULT_YK_PRECALC_DELAY);
+        _values = new LinkedBlockingQueue(MAX_NUM_BUILDERS);
 
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("ElGamal YK Precalc (minimum: " + MIN_NUM_BUILDERS + " max: " + MAX_NUM_BUILDERS + ", delay: "
@@ -137,12 +145,13 @@ class YKGenerator {
             long endNeg = Clock.getInstance().now();
             negTime += endNeg - startNeg;
         }
+        // 173ms each on a 2008 netbook
         System.out.println("YK fetch time for 5 runs: " + negTime + " @ " + negTime / 5l + "ms each");
     }
 
     private static class YKPrecalcRunner implements Runnable {
-        private int _minSize;
-        private int _maxSize;
+        private final int _minSize;
+        private final int _maxSize;
 
         private YKPrecalcRunner(int minSize, int maxSize) {
             _minSize = minSize;
@@ -155,10 +164,10 @@ class YKGenerator {
                 //long start = Clock.getInstance().now();
                 int startSize = getSize();
                 // Adjust delay
-                if (startSize <= (_minSize / 2) && CHECK_DELAY > 1000)
-                    CHECK_DELAY -= 1000;
-                else if (startSize > (_minSize * 2) && CHECK_DELAY < 60000)
-                         CHECK_DELAY += 1000;
+                if (startSize <= (_minSize * 2 / 3) && _checkDelay > 1000)
+                    _checkDelay -= 1000;
+                else if (startSize > (_minSize * 3 / 2) && _checkDelay < 60*1000)
+                    _checkDelay += 1000;
                 curSize = startSize;
                 if (curSize < _minSize) {
                     for (int i = curSize; i < _maxSize; i++) {
@@ -183,7 +192,7 @@ class YKGenerator {
                 //                   + (CALC_DELAY * numCalc) + "ms relief).  now sleeping");
                 //}
                 try {
-                    Thread.sleep(CHECK_DELAY);
+                    Thread.sleep(_checkDelay);
                 } catch (InterruptedException ie) { // nop
                 }
             }
