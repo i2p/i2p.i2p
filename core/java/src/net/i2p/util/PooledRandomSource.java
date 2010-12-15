@@ -196,6 +196,7 @@ public class PooledRandomSource extends RandomSource {
         return prng.harvester();
     }
     
+/*****
     public static void main(String args[]) {
         //PooledRandomSource prng = new PooledRandomSource(I2PAppContext.getGlobalContext());
         long start = System.currentTimeMillis();
@@ -214,4 +215,5 @@ public class PooledRandomSource extends RandomSource {
         System.out.println("Written to random.file: create took " + (created-start) + ", generate took " + (done-created));
 	prng.saveSeed();
     }    
+*****/
 }
