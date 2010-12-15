@@ -139,7 +139,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             
             if (allowGZIP && useGZIP) {
                 I2PAppThread req = new I2PAppThread(
-                    new CompressedRequestor(s, socket, modifiedHeader, getTunnel().getContext()),
+                    new CompressedRequestor(s, socket, modifiedHeader, getTunnel().getContext(), _log),
                         Thread.currentThread().getName()+".hc");
                 req.start();
             } else {
@@ -179,15 +179,19 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     }
     
     private static class CompressedRequestor implements Runnable {
-        private Socket _webserver;
-        private I2PSocket _browser;
-        private String _headers;
-        private I2PAppContext _ctx;
-        public CompressedRequestor(Socket webserver, I2PSocket browser, String headers, I2PAppContext ctx) {
+        private final Socket _webserver;
+        private final I2PSocket _browser;
+        private final String _headers;
+        private final I2PAppContext _ctx;
+        // shadows _log in super()
+        private final Log _log;
+
+        public CompressedRequestor(Socket webserver, I2PSocket browser, String headers, I2PAppContext ctx, Log log) {
             _webserver = webserver;
             _browser = browser;
             _headers = headers;
             _ctx = ctx;
+            _log = log;
         }
 
         public void run() {
@@ -235,7 +239,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 String modifiedHeaders = formatHeaders(headers, command);
                 compressedOut.write(modifiedHeaders.getBytes());
 
-                Sender s = new Sender(compressedOut, serverin, "server: server to browser");
+                Sender s = new Sender(compressedOut, serverin, "server: server to browser", _log);
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Before pumping the compressed response");
                 s.run(); // same thread
@@ -378,8 +382,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         boolean ok = DataHelper.readLine(in, command);
         if (!ok) throw new IOException("EOF reached while reading the HTTP command [" + command.toString() + "]");
         
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Read the http command [" + command.toString() + "]");
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Read the http command [" + command.toString() + "]");
         
         int trimmed = 0;
         if (command.length() > 0) {
@@ -433,8 +437,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 }
 
                 headers.setProperty(name, value);
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Read the header [" + name + "] = [" + value + "]");
+                //if (_log.shouldLog(Log.DEBUG))
+                //    _log.debug("Read the header [" + name + "] = [" + value + "]");
             }
         }
     }
