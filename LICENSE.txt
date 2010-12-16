@@ -241,6 +241,6 @@ distributions. See the source package for the additional license information.
    SAM Python Library:
    Public domain.
    
-   I2PSnark: 
-   "Man with hat over face" graphic licensed under a Creative Commons 2.0 license.
-   Original photo by Florian Kuhlmann. http://www.flickr.com/photos/floriankuhlmann/3117758155
+   I2PSnark/Console themes: 
+   "Man with hat over face" & related images licensed under a Creative Commons 2.0 license.
+   Original photos by Florian Kuhlmann. http://www.flickr.com/photos/floriankuhlmann/3117758155

@@ -226,7 +226,7 @@ public class IndexBean {
         // give the messages a chance to make it to the window
         try { Thread.sleep(1000); } catch (InterruptedException ie) {}
         // and give them something to look at in any case
-        return _("Starting tunnel") + ' ' + getTunnelName(_tunnel) + " &hellip";
+        return _("Starting tunnel") + ' ' + getTunnelName(_tunnel) + "&hellip;";
     }
     
     private String stop() {
@@ -239,7 +239,7 @@ public class IndexBean {
         // give the messages a chance to make it to the window
         try { Thread.sleep(1000); } catch (InterruptedException ie) {}
         // and give them something to look at in any case
-        return _("Stopping tunnel") + ' ' + getTunnelName(_tunnel) + " &hellip";
+        return _("Stopping tunnel") + ' ' + getTunnelName(_tunnel) + "&hellip;";
     }
     
     private String saveChanges() {

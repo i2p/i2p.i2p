@@ -108,8 +108,8 @@ public class Log {
 
     public void log(int priority, String msg, Throwable t) {
         // Boost the priority of NPE and friends so they get seen and reported
-        if (t != null && t instanceof RuntimeException && !(t instanceof IllegalArgumentException))
-            priority = CRIT;
+        //if (t != null && t instanceof RuntimeException && !(t instanceof IllegalArgumentException))
+        //    priority = CRIT;
         if (priority >= _minPriority) {
             _manager.addRecord(new LogRecord(_class, _name, 
                                              Thread.currentThread().getName(), priority,

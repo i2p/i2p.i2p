@@ -198,11 +198,11 @@ div.routersummary h4 {
      letter-spacing: 0.05em;
      margin: -7px -1px -8px -1px !important;
      padding: 8px 0;
-     background: #fff;
      text-transform: capitalize;
      text-decoration: none !important;
      color: #2b2;
      line-height: 90%;
+     background: #fff url(../light/images/magic.png);
 }
 
 div.routersummary h3 a, div.routersummary h4 a {
@@ -307,6 +307,7 @@ div.main {
      -moz-border-radius: 0 0 3px 0;
      -khtml-border-radius: 0 0 3px 0;
      border-radius: 0 0 3px 0;
+     background: #eef url("/themes/snark/ubergine/images/hat.png") no-repeat scroll right bottom !important;
 }
 
 div.main ul {
@@ -322,6 +323,13 @@ div.main li {
 
 div.main li:first-child {
      padding-top: 15px;
+}
+
+div.main li b {
+     color: #161!important;
+     letter-spacing: 0.01em;
+     font-size: 9.5pt;
+     line-height: 170%;
 }
 
 div.main hr:last-child {
@@ -513,11 +521,11 @@ div.messages span.notice {
 h1 {
      font-size: 18pt;
      text-shadow: 0px 0px 1px rgba(0, 0, 32, 0.7);
-     text-align: center;
+     text-align: left;
      border: 1px solid #89f;
      border-bottom: 1px solid #89f;
      border-right: 1px solid #89f;
-     padding: 19px 10px;
+     padding: 19px 20px;
      margin: 0 1px 0 200px;
      line-height: 93%;
      text-transform: uppercase;
@@ -560,7 +568,7 @@ h2, h3 {
      border-radius: 0 3px 0 0;
 }
 
-.routersummary h2, .routersummary h3, div.confignav {
+.routersummary h2, .routersummary h3, div.confignav, th {
      background-image: url("images/tinytitle.png") !important; 
      background-repeat: repeat-x; 
      background-position: center right;
@@ -619,11 +627,11 @@ td {
 }
 
 tr:nth-child(even) {
-     background-color: #eef;
+     background: #fff url(../light/images/magic.png);
 }
 
 tr:nth-child(odd) {
-     background-color: #ddf;
+     background: #eef url(../light/images/magic.png);
 }
 
 hr {
@@ -690,7 +698,7 @@ div.joblog h3 {
 }
 
 div.joblog h3:first-child {
-     margin: 5px 0 15px 0;
+     margin: -10px 0 15px 0;
 }
 
 div.joblog hr {
@@ -883,8 +891,9 @@ div.graphspanel h3 {
 
 div.footnote {
      text-align: right;
-     color: #99f;
+     color: #339;
      font-size: 7pt;
+     margin-bottom: -4px !Important;
 }
 
 div.footnote hr{

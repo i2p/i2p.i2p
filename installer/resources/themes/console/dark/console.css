@@ -1041,6 +1041,7 @@ div.footnote {
      text-align: right;
      color: #494;
      font-size: 7pt;
+     margin-bottom: -8px !important; 
 }
 
 div.footnote hr{
