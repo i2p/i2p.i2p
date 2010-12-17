@@ -157,7 +157,7 @@ public class BEValue
    * values. This operation only succeeds when the BEValue is actually
    * a Map, otherwise it will throw a InvalidBEncodingException.
    */
-  public Map<BEValue, BEValue> getMap() throws InvalidBEncodingException
+  public Map<String, BEValue> getMap() throws InvalidBEncodingException
   {
     try
       {
