@@ -428,6 +428,7 @@ div.news li {
      font-size: 10pt;
      color: #eef;
      text-transform: capitalize;
+     font-weight: bold;
 }
 
 div.news p {
@@ -943,10 +944,11 @@ div.footnote {
      text-align: right;
      color: #99f;
      font-size: 7pt;
+     margin-bottom: -5px;
 }
 
 div.footnote hr{
-     margin: 15px 0 5px 0 !important;
+     margin: 15px 0 3px 0 !important;
      color: #99f;
      background: #99f;
      height: 1px;

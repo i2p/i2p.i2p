@@ -322,7 +322,7 @@ div.main textarea {
 
 div.news {
      margin: -1px 5px 0px 205px;
-     padding: 5px 30px 10px 30px;
+     padding: 5px 30px 5px 30px;
      border: 1px solid #494;
      background: #000;
      background: #000 url("images/news.png")no-repeat scroll bottom right;
@@ -349,6 +349,10 @@ div.news li {
      vertical-align: middle;
      word-wrap: break-word;
      color: #494;
+     font-weight: bold;
+     font-size: 9pt;
+     border-bottom: 1px dotted #494;
+     margin-bottom: 8px;
 }
 
 div.news h4 {
@@ -372,10 +376,11 @@ div.news p {
      margin-top: -5px;
      font-size: 8.5pt;
      color: #EE9;
+     margin-bottom: 0;
 }
 
 div.news hr {
-     margin: -2px 0 5px 0;
+     margin: 5px 0 3px 0;
 }     
 
 div.confignav {

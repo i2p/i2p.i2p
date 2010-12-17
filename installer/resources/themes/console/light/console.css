@@ -364,7 +364,9 @@ div.news p {
      font-size: 9pt;
      text-align: justify !important;
      line-height: 120%;
+     margin-top: -10px;
 }
+
 /*
 div.news a:link{
      color: #a30;
@@ -411,6 +413,7 @@ div.news li {
      background: #ffe url('images/header.png') center center repeat-x;
      -moz-box-shadow: 0 1px 1px 1px rgba(176, 176, 216, 0.4);
      -moz-box-shadow: 0 1px 1px 1px rgba(176, 176, 216, 0.4);
+     font-weight: bold;
 }
 
 /*
@@ -1149,7 +1152,7 @@ div.footnote {
      text-align: right;
      color: #447;
      font-size: 7pt;
-     margin-top: -10px;
+     margin-bottom: -5px !important;
 }
 
 div.footnote hr{
