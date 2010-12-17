@@ -344,15 +344,16 @@ div.news li {
      text-align: justify;
      list-style: url('images/info_dark.png');
      list-style: none;
-     margin: 0 10px 0 0px;
+     margin: 0;
      padding: 5px 5px 5px 0;
      vertical-align: middle;
      word-wrap: break-word;
      color: #494;
      font-weight: bold;
-     font-size: 9pt;
+     font-size: 9.5pt;
      border-bottom: 1px dotted #494;
-     margin-bottom: 8px;
+     margin-bottom: 5px;
+     text-transform: capitalize;
 }
 
 div.news h4 {
@@ -362,7 +363,7 @@ div.news h4 {
      padding: 0 0 0px 0;
      margin: 5px 0 10px 0;
      font-size: 10pt;
-     opacity: 0.8;
+     opacity: 1;
      text-transform: capitalize;
 }
 
@@ -379,8 +380,12 @@ div.news p {
      margin-bottom: 0;
 }
 
+div.news p:nth-child(n+1) {
+     margin-top: 5px;
+}
+
 div.news hr {
-     margin: 5px 0 3px 0;
+     margin: 8px 0 3px 0;
 }     
 
 div.confignav {
