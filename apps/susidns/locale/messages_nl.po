@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P susidns\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-07-05 22:40+0000\n"
+"POT-Creation-Date: 2010-12-17 15:05+0000\n"
 "PO-Revision-Date: 2010-06-15 11:22+0100\n"
 "Last-Translator: duck <duck@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>, monkeybrains <monkeybrains@mail.i2p>\n"
@@ -17,63 +17,63 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: Dutch\n"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:199
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:200
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:193
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:197
 msgid "Search"
 msgstr "Zoek"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:203
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:204
 msgid "Search within filtered list"
 msgstr "Zoek binnen gefilterde lijst"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:205
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:206
 msgid "Filtered list"
 msgstr "Gefilterde lijst"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:209
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:210
 msgid "no matches"
 msgstr "geen resultaten"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:212
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:213
 msgid "Addressbook"
 msgstr "Adresboek"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:214
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:215
 msgid "contains no entries"
 msgstr "bevat geen items"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:216
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:217
 msgid "contains 1 entry"
 msgstr "bevat 1 item"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:218
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:219
 #, java-format
 msgid "contains {0} entries"
 msgstr "bevat {0} items"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:228
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:229
 #, java-format
 msgid "Showing {0} of {1}"
 msgstr "Toon {0} van {1}"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:259
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:260
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:368
 msgid "Add"
 msgstr "Toevoegen"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:259
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:264
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:260
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:265
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:366
 msgid "Replace"
 msgstr "Vervang"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:263
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:264
 #, java-format
 msgid "Host name {0} is already in addressbook, unchanged."
 msgstr "Host naam {0} is al in het adresboek, ongewijzigd."
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:265
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:266
 #, java-format
 msgid ""
 "Host name {0} is already in addressbook with a different destination. Click "
@@ -82,50 +82,50 @@ msgstr ""
 "Host naam {0} is al in het adresboek met een andere destination. Klik op "
 "\"Vervang\" om te overschrijven."
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:277
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:278
 #, java-format
 msgid "Destination added for {0}."
 msgstr "Destination toegevoegd voor {0}."
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:279
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:280
 #, java-format
 msgid "Destination changed for {0}."
 msgstr "Destination gewijzigd voor {0}."
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:284
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:285
 msgid "Invalid Base 64 destination."
 msgstr "Ongeldige Base 64 destination."
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:288
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:289
 msgid "Please enter a host name and destination"
 msgstr "Voer een host naam en destination in"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:292
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:293
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:314
 msgid "Delete Selected"
 msgstr "Verwijderen Selectie"
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:302
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:303
 #, java-format
 msgid "Destination {0} deleted."
 msgstr "Destination {0} verwijderd."
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:304
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:305
 #, java-format
 msgid "{0} destinations deleted."
 msgstr "{0} destinations verwijderd."
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:310
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:311
 msgid "Addressbook saved."
 msgstr "Adresboek opgeslagen."
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:313
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:314
 msgid "ERROR: Could not write addressbook file."
 msgstr "ERROR: Kan het adresboek bestand niet wegschrijven."
 
-#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:318
+#: ../src/java/src/i2p/susi/dns/AddressbookBean.java:319
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:148
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:150
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:151
 msgid ""
 "Invalid form submission, probably because you used the \"back\" or \"reload"
 "\" button on your browser. Please resubmit."
@@ -134,7 +134,7 @@ msgstr ""
 "\"vernieuw\" knop in je browser hebt gebruikt. Probeer opnieuw te verzenden."
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:139
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:129
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:130
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:130
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:130
 msgid "Save"
@@ -145,7 +145,7 @@ msgid "Configuration saved."
 msgstr "Configuratie opgeslagen."
 
 #: ../src/java/src/i2p/susi/dns/ConfigBean.java:142
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:144
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:145
 #: ../src/tmp/i2p/susi/dns/jsp/config_jsp.java:128
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:128
 msgid "Reload"
@@ -160,18 +160,18 @@ msgstr "Configuratie herladen."
 #. Fetching from the addressbook servlet
 #. with the correct parameters will kick off a
 #. config reload and fetch.
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:138
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:139
 msgid ""
 "Subscriptions saved, updating addressbook from subscription sources now."
 msgstr ""
 "Subscriptions opgeslagen, adresboek wordt nu vernieuwd van de subscription "
 "bronnen."
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:142
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:143
 msgid "Subscriptions saved."
 msgstr "Subscriptions opgeslagen."
 
-#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:146
+#: ../src/java/src/i2p/susi/dns/SubscriptionsBean.java:147
 msgid "Subscriptions reloaded."
 msgstr "Subscriptions herladen."
 
