@@ -63,6 +63,7 @@ public class Peer implements Comparable
   //  bytes per bt spec:                 0011223344556677
   static final long OPTION_EXTENSION = 0x0000000000100000l;
   static final long OPTION_FAST      = 0x0000000000000004l;
+  static final long OPTION_DHT       = 0x0000000000000001l;
   private long options;
 
   /**
