@@ -273,13 +273,13 @@ div.warning {
 /* console error messages */
 
 div.sorry {
-     margin: 15px 15px 10px 215px;
+     margin: -1px 5px 10px 205px;
      padding: 20px 20px 20px 75px;
      background: #020;
      border: 1px solid #494;
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
-     border-radius: 4px;
+     -moz-border-radius: 0 0 4px 4px;
+     -khtml-border-radius: 0 0 4px 4px;
+     border-radius: 0 0 4px 4px;
      text-align: justify;
      background-image:url("images/errortriangle.png");
      background-position:15px center;
