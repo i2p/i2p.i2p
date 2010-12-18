@@ -378,7 +378,6 @@ div.wideload p !important {
 
 div.news {
      margin: -1px 1px 0 200px;
-     padding: -10px 0px 8px 0px;
      background: #ffffc0;
      border: 1px solid #89f;
      border-bottom: 1px solid #89f;
@@ -389,6 +388,7 @@ div.news {
      padding-bottom: 8px;
      padding-left: 10px;
      padding-right: 10px;
+     padding: 0 10px 3px 10px;
      font-size: 7pt;
 }
 
@@ -441,7 +441,7 @@ div.news hr {
      background: #cc7;
      height: 1px;
      border: 0px solid #cc7;
-     margin: 10px 0 0 0;
+     margin: 10px 0 2px 0;
 }
 
 div.confignav {
