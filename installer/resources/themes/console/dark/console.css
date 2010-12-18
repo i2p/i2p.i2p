@@ -575,14 +575,6 @@ div.main li b {
      text-shadow: 0 1px 1px #700;
 }
 
-.links b{
-     color: #b70 !important;
-     letter-spacing: 0.07em;
-     font-size: 9.5pt;
-     line-height: 165%;
-     text-shadow: 0 1px 1px #700;
-}
-
 .tidylist {
      text-align: justify !important;
      line-height: 150%;
@@ -654,6 +646,14 @@ a:hover{
 
 .links li {
      list-style-image: url("images/link.png") !important;
+}
+
+.links b{
+     color: #b70 !important;
+     letter-spacing: 0.07em;
+     font-size: 9.5pt;
+     line-height: 165%;
+     text-shadow: 0 1px 1px #700;
 }
 
 p {
