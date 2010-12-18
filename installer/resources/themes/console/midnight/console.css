@@ -469,7 +469,7 @@ div.news hr {
 }
 
 div.confignav {
-     padding: 15px 0;
+     padding: 14px 0 15px;
      background: #000018;
      margin: -16px -16px 0 -16px;
      border: 1px solid #99f;
