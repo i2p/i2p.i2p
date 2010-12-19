@@ -299,7 +299,7 @@ msgstr "Tasa&nbsp;de descarga"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:317
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:326
 msgid "Rate"
-msgstr "Tasa&nbsp;de transferencia"
+msgstr "Tasa"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:322
 msgid "Up Rate"
