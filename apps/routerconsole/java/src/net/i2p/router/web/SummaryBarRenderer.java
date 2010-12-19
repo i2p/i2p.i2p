@@ -267,7 +267,7 @@ public class SummaryBarRenderer {
            .append(":</b></td><td align=\"right\">");
         int active = _helper.getActivePeers();
         buf.append(active)
-           .append("&thinsp;/&thinsp;")
+           .append(SummaryHelper.THINSP)
            .append(Math.max(active, _helper.getActiveProfiles()))
            .append("</td></tr>\n" +
 
@@ -376,7 +376,7 @@ public class SummaryBarRenderer {
            .append(_("Used"))
            .append(":</b></td><td align=\"right\">")
            .append(_helper.getInboundTransferred())
-           .append("&thinsp;/&thinsp;")
+           .append(SummaryHelper.THINSP)
            .append(_helper.getOutboundTransferred())
            .append("</td></tr></table>\n" +
 
