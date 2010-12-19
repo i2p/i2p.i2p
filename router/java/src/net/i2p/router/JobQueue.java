@@ -58,7 +58,16 @@ public class JobQueue {
     private final Object _jobLock;
     
     /** how many when we go parallel */
-    private static final int RUNNERS = 4;
+    private static final int RUNNERS;
+    static {
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        if (maxMemory < 64*1024*1024)
+            RUNNERS = 3;
+        else if (maxMemory < 256*1024*1024)
+            RUNNERS = 4;
+        else
+            RUNNERS = 5;
+    }
 
     /** default max # job queue runners operating */
     private final static int DEFAULT_MAX_RUNNERS = 1;
