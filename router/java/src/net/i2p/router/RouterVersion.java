@@ -18,7 +18,7 @@ public class RouterVersion {
     /** deprecated */
     public final static String ID = "Monotone";
     public final static String VERSION = CoreVersion.VERSION;
-    public final static long BUILD = 39;
+    public final static long BUILD = 40;
 
     /** for example "-test" */
     public final static String EXTRA = "-rc";
