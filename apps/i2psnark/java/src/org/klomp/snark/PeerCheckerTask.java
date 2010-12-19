@@ -51,10 +51,7 @@ class PeerCheckerTask extends TimerTask
   {
         List<Peer> peerList = coordinator.peerList();
         if (peerList.isEmpty() || coordinator.halted()) {
-          coordinator.peerCount = 0;
-          coordinator.interestedAndChoking = 0;
           coordinator.setRateHistory(0, 0);
-          coordinator.uploaders = 0;
           if (coordinator.halted())
             cancel();
           return;

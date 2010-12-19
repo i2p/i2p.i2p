@@ -359,7 +359,7 @@ public class SnarkManager implements Snark.CompleteListener {
                 Set names = listTorrentFiles();
                 for (Iterator iter = names.iterator(); iter.hasNext(); ) {
                     Snark snark = getTorrent((String)iter.next());
-                    if ( (snark != null) && (!snark.stopped) ) {
+                    if ( (snark != null) && (!snark.isStopped()) ) {
                         snarksActive = true;
                         break;
                     }
@@ -398,9 +398,8 @@ public class SnarkManager implements Snark.CompleteListener {
                         for (Iterator iter = names.iterator(); iter.hasNext(); ) {
                             String name = (String)iter.next();
                             Snark snark = getTorrent(name);
-                            if ( (snark != null) && (snark.acceptor != null) ) {
-                                snark.acceptor.restart();
-                                addMessage(_("I2CP listener restarted for \"{0}\"", snark.meta.getName()));
+                            if (snark != null && snark.restartAcceptor()) {
+                                addMessage(_("I2CP listener restarted for \"{0}\"", snark.getBaseName()));
                             }
                         }
                     }
@@ -478,7 +477,7 @@ public class SnarkManager implements Snark.CompleteListener {
     public Snark getTorrentByBaseName(String filename) {
         synchronized (_snarks) {
             for (Snark s : _snarks.values()) {
-                if (s.storage.getBaseName().equals(filename))
+                if (s.getBaseName().equals(filename))
                     return s;
             }
         }
@@ -554,7 +553,6 @@ public class SnarkManager implements Snark.CompleteListener {
                                             _peerCoordinatorSet, _connectionAcceptor,
                                             false, dataDir.getPath());
                         loadSavedFilePriorities(torrent);
-                        torrent.completeListener = this;
                         synchronized (_snarks) {
                             _snarks.put(filename, torrent);
                         }
@@ -572,12 +570,11 @@ public class SnarkManager implements Snark.CompleteListener {
             return;
         }
         // ok, snark created, now lets start it up or configure it further
-        File f = new File(filename);
         if (!dontAutoStart && shouldAutoStart()) {
             torrent.startTorrent();
-            addMessage(_("Torrent added and started: \"{0}\"", torrent.storage.getBaseName()));
+            addMessage(_("Torrent added and started: \"{0}\"", torrent.getBaseName()));
         } else {
-            addMessage(_("Torrent added: \"{0}\"", torrent.storage.getBaseName()));
+            addMessage(_("Torrent added: \"{0}\"", torrent.getBaseName()));
         }
     }
     
@@ -585,8 +582,7 @@ public class SnarkManager implements Snark.CompleteListener {
      * Get the timestamp for a torrent from the config file
      */
     public long getSavedTorrentTime(Snark snark) {
-        MetaInfo metainfo = snark.meta;
-        byte[] ih = metainfo.getInfoHash();
+        byte[] ih = snark.getInfoHash();
         String infohash = Base64.encode(ih);
         infohash = infohash.replace('=', '$');
         String time = _config.getProperty(PROP_META_PREFIX + infohash + PROP_META_BITFIELD_SUFFIX);
@@ -605,8 +601,10 @@ public class SnarkManager implements Snark.CompleteListener {
      * Convert "." to a full bitfield.
      */
     public BitField getSavedTorrentBitField(Snark snark) {
-        MetaInfo metainfo = snark.meta;
-        byte[] ih = metainfo.getInfoHash();
+        MetaInfo metainfo = snark.getMetaInfo();
+        if (metainfo == null)
+            return null;
+        byte[] ih = snark.getInfoHash();
         String infohash = Base64.encode(ih);
         infohash = infohash.replace('=', '$');
         String bf = _config.getProperty(PROP_META_PREFIX + infohash + PROP_META_BITFIELD_SUFFIX);
@@ -636,10 +634,13 @@ public class SnarkManager implements Snark.CompleteListener {
      * @since 0.8.1
      */
     public void loadSavedFilePriorities(Snark snark) {
-        MetaInfo metainfo = snark.meta;
+        MetaInfo metainfo = snark.getMetaInfo();
+        Storage storage = snark.getStorage();
+        if (metainfo == null || storage == null)
+            return;
         if (metainfo.getFiles() == null)
             return;
-        byte[] ih = metainfo.getInfoHash();
+        byte[] ih = snark.getInfoHash();
         String infohash = Base64.encode(ih);
         infohash = infohash.replace('=', '$');
         String pri = _config.getProperty(PROP_META_PREFIX + infohash + PROP_META_PRIORITY_SUFFIX);
@@ -655,7 +656,7 @@ public class SnarkManager implements Snark.CompleteListener {
                 } catch (Throwable t) {}
             }
         }
-        snark.storage.setFilePriorities(rv);
+        storage.setFilePriorities(rv);
     }
     
     /**
@@ -777,21 +778,15 @@ public class SnarkManager implements Snark.CompleteListener {
             remaining = _snarks.size();
         }
         if (torrent != null) {
-            boolean wasStopped = torrent.stopped;
+            boolean wasStopped = torrent.isStopped();
             torrent.stopTorrent();
             if (remaining == 0) {
                 // should we disconnect/reconnect here (taking care to deal with the other thread's
                 // I2PServerSocket.accept() call properly?)
                 ////_util.
             }
-            String name;
-            if (torrent.storage != null) {
-                name = torrent.storage.getBaseName();
-            } else {
-                name = sfile.getName();
-            }
             if (!wasStopped)
-                addMessage(_("Torrent stopped: \"{0}\"", name));
+                addMessage(_("Torrent stopped: \"{0}\"", torrent.getBaseName()));
         }
         return torrent;
     }
@@ -804,14 +799,10 @@ public class SnarkManager implements Snark.CompleteListener {
         if (torrent != null) {
             File torrentFile = new File(filename);
             torrentFile.delete();
-            String name;
-            if (torrent.storage != null) {
-                removeTorrentStatus(torrent.storage.getMetaInfo());
-                name = torrent.storage.getBaseName();
-            } else {
-                name = torrentFile.getName();
-            }
-            addMessage(_("Torrent removed: \"{0}\"", name));
+            Storage storage = torrent.getStorage();
+            if (storage != null)
+                removeTorrentStatus(storage.getMetaInfo());
+            addMessage(_("Torrent removed: \"{0}\"", torrent.getBaseName()));
         }
     }
     
@@ -843,18 +834,24 @@ public class SnarkManager implements Snark.CompleteListener {
     
     /** two listeners */
     public void torrentComplete(Snark snark) {
+        MetaInfo meta = snark.getMetaInfo();
+        Storage storage = snark.getStorage();
+        if (meta == null || storage == null)
+            return;
         StringBuilder buf = new StringBuilder(256);
-        buf.append("<a href=\"/i2psnark/").append(snark.storage.getBaseName());
-        if (snark.meta.getFiles() != null)
+        buf.append("<a href=\"/i2psnark/").append(storage.getBaseName());
+        if (meta.getFiles() != null)
             buf.append('/');
-        buf.append("\">").append(snark.storage.getBaseName()).append("</a>");
-        long len = snark.meta.getTotalLength();
+        buf.append("\">").append(storage.getBaseName()).append("</a>");
         addMessage(_("Download finished: {0}", buf.toString())); //  + " (" + _("size: {0}B", DataHelper.formatSize2(len)) + ')');
         updateStatus(snark);
     }
     
     public void updateStatus(Snark snark) {
-        saveTorrentStatus(snark.meta, snark.storage.getBitField(), snark.storage.getFilePriorities());
+        MetaInfo meta = snark.getMetaInfo();
+        Storage storage = snark.getStorage();
+        if (meta != null && storage != null)
+            saveTorrentStatus(meta, storage.getBitField(), storage.getFilePriorities());
     }
     
     private void monitorTorrents(File dir) {
@@ -984,7 +981,7 @@ public class SnarkManager implements Snark.CompleteListener {
             Set names = listTorrentFiles();
             for (Iterator iter = names.iterator(); iter.hasNext(); ) {
                 Snark snark = getTorrent((String)iter.next());
-                if ( (snark != null) && (!snark.stopped) )
+                if ( (snark != null) && (!snark.isStopped()) )
                     snark.stopTorrent();
             }
         }

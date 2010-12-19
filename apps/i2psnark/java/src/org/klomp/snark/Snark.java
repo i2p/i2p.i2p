@@ -26,6 +26,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -112,6 +113,8 @@ public class Snark
       
   }
   
+/******** No, not maintaining a command-line client
+
   public static void main(String[] args)
   {
     System.out.println(copyright);
@@ -235,19 +238,27 @@ public class Snark
       }
   }
 
+***********/
+
   public static final String PROP_MAX_CONNECTIONS = "i2psnark.maxConnections";
-  public String torrent;
-  public MetaInfo meta;
-  public Storage storage;
-  public PeerCoordinator coordinator;
-  public ConnectionAcceptor acceptor;
-  public TrackerClient trackerclient;
-  public String rootDataDir = ".";
-  public CompleteListener completeListener;
-  public boolean stopped;
-  byte[] id;
-  public I2PSnarkUtil _util;
-  private PeerCoordinatorSet _peerCoordinatorSet;
+
+  /** most of these used to be public, use accessors below instead */
+  private final String torrent;
+  private MetaInfo meta;
+  private Storage storage;
+  private PeerCoordinator coordinator;
+  private ConnectionAcceptor acceptor;
+  private TrackerClient trackerclient;
+  private String rootDataDir = ".";
+  private final CompleteListener completeListener;
+  private boolean stopped;
+  private byte[] id;
+  private byte[] infoHash;
+  private final I2PSnarkUtil _util;
+  private final PeerCoordinatorSet _peerCoordinatorSet;
+  private String trackerProblems;
+  private int trackerSeenPeers;
+
 
   /** from main() via parseArguments() single torrent */
   Snark(I2PSnarkUtil util, String torrent, String ip, int user_port,
@@ -486,7 +497,7 @@ public class Snark
             // single torrent
             acceptor = new ConnectionAcceptor(_util, serversocket, new PeerAcceptor(coordinator));
         }
-        trackerclient = new TrackerClient(_util, meta, coordinator);
+        trackerclient = new TrackerClient(_util, meta, coordinator, this);
     }
 
     stopped = false;
@@ -496,8 +507,7 @@ public class Snark
         // restart safely, so lets build a new one to replace the old
         if (_peerCoordinatorSet != null)
             _peerCoordinatorSet.remove(coordinator);
-        PeerCoordinator newCoord = new PeerCoordinator(_util, coordinator.getID(), coordinator.getMetaInfo(), 
-                                                       coordinator.getStorage(), coordinator.getListener(), this);
+        PeerCoordinator newCoord = new PeerCoordinator(_util, id, meta, storage, this, this);
         if (_peerCoordinatorSet != null)
             _peerCoordinatorSet.add(newCoord);
         coordinator = newCoord;
@@ -517,7 +527,7 @@ public class Snark
             }
             fatal("Could not reopen storage", ioe);
           }
-        TrackerClient newClient = new TrackerClient(_util, coordinator.getMetaInfo(), coordinator);
+        TrackerClient newClient = new TrackerClient(_util, coordinator.getMetaInfo(), coordinator, this);
         if (!trackerclient.halted())
             trackerclient.halt();
         trackerclient = newClient;
@@ -553,10 +563,215 @@ public class Snark
         _util.disconnect();
   }
 
-  static Snark parseArguments(String[] args)
+  private static Snark parseArguments(String[] args)
   {
     return parseArguments(args, null, null);
   }
+
+    // Accessors
+
+    /**
+     *  @return file name of .torrent file (should be full absolute path), or a fake name if in magnet mode.
+     *  @since 0.8.4
+     */
+    public String getName() {
+        return torrent;
+    }
+
+    /**
+     *  @return base name of torrent [filtered version of getMetaInfo.getName()], or a fake name if in magnet mode
+     *  @since 0.8.4
+     */
+    public String getBaseName() {
+        if (storage != null)
+            return storage.getBaseName();
+        return torrent;
+    }
+
+    /**
+     *  @return always will be valid even in magnet mode
+     *  @since 0.8.4
+     */
+    public byte[] getID() {
+        return id;
+    }
+
+    /**
+     *  @return always will be valid even in magnet mode
+     *  @since 0.8.4
+     */
+    public byte[] getInfoHash() {
+        if (meta != null)
+            return meta.getInfoHash();
+        return infoHash;
+    }
+
+    /**
+     *  @return may be null if in magnet mode
+     *  @since 0.8.4
+     */
+    public MetaInfo getMetaInfo() {
+        return meta;
+    }
+
+    /**
+     *  @return may be null if in magnet mode
+     *  @since 0.8.4
+     */
+    public Storage getStorage() {
+        return storage;
+    }
+
+    /**
+     *  @since 0.8.4
+     */
+    public boolean isStopped() {
+        return stopped;
+    }
+
+    /**
+     *  @since 0.8.4
+     */
+    public long getDownloadRate() {
+        PeerCoordinator coord = coordinator;
+        if (coord != null)
+            return coord.getDownloadRate();
+        return 0;
+    }
+
+    /**
+     *  @since 0.8.4
+     */
+    public long getUploadRate() {
+        PeerCoordinator coord = coordinator;
+        if (coord != null)
+            return coord.getUploadRate();
+        return 0;
+    }
+
+    /**
+     *  @since 0.8.4
+     */
+    public long getDownloaded() {
+        PeerCoordinator coord = coordinator;
+        if (coord != null)
+            return coord.getDownloaded();
+        return 0;
+    }
+
+    /**
+     *  @since 0.8.4
+     */
+    public long getUploaded() {
+        PeerCoordinator coord = coordinator;
+        if (coord != null)
+            return coord.getUploaded();
+        return 0;
+    }
+
+    /**
+     *  @since 0.8.4
+     */
+    public int getPeerCount() {
+        PeerCoordinator coord = coordinator;
+        if (coord != null)
+            return coord.getPeerCount();
+        return 0;
+    }
+
+    /**
+     *  @since 0.8.4
+     */
+    public List<Peer> getPeerList() {
+        PeerCoordinator coord = coordinator;
+        if (coord != null)
+            return coord.peerList();
+        return Collections.EMPTY_LIST;
+    }
+
+    /**
+     *  @return String returned from tracker, or null if no error
+     *  @since 0.8.4
+     */
+    public String getTrackerProblems() {
+        return trackerProblems;
+    }
+
+    /**
+     *  @param p tracker error string or null
+     *  @since 0.8.4
+     */
+    public void setTrackerProblems(String p) {
+        trackerProblems = p;
+    }
+
+    /**
+     *  @return count returned from tracker
+     *  @since 0.8.4
+     */
+    public int getTrackerSeenPeers() {
+        return trackerSeenPeers;
+    }
+
+    /**
+     *  @since 0.8.4
+     */
+    public void setTrackerSeenPeers(int p) {
+        trackerSeenPeers = p;
+    }
+
+    /**
+     *  @since 0.8.4
+     */
+    public void updatePiecePriorities() {
+        PeerCoordinator coord = coordinator;
+        if (coord != null)
+            coord.updatePiecePriorities();
+    }
+
+    /**
+     *  @return total of all torrent files, or total of metainfo file if fetching magnet, or -1
+     *  @since 0.8.4
+     */
+    public long getTotalLength() {
+        if (meta != null)
+            return meta.getTotalLength();
+        // FIXME else return metainfo length if available
+        return -1;
+    }
+
+    /**
+     *  @return needed of all torrent files, or total of metainfo file if fetching magnet, or -1
+     *  @since 0.8.4
+     */
+    public long getNeeded() {
+        if (storage != null)
+            return storage.needed();
+        // FIXME else return metainfo length if available
+        return -1;
+    }
+
+    /**
+     *  @param p the piece number
+     *  @return metainfo piece length or 16K if fetching magnet
+     *  @since 0.8.4
+     */
+    public int getPieceLength(int p) {
+        if (meta != null)
+            return meta.getPieceLength(p);
+        return 16*1024;
+    }
+
+    /**
+     *  @return true if restarted
+     *  @since 0.8.4
+     */
+    public boolean restartAcceptor() {
+        if (acceptor == null)
+            return false;
+        acceptor.restart();
+        return true;
+    }
 
   /**
    * Sets debug, ip and torrent variables then creates a Snark
@@ -564,7 +779,7 @@ public class Snark
    * non-valid argument list.  The given listeners will be
    * passed to all components that take one.
    */
-  static Snark parseArguments(String[] args,
+  private static Snark parseArguments(String[] args,
                               StorageListener slistener,
                               CoordinatorListener clistener)
   {
@@ -719,7 +934,7 @@ public class Snark
   /**
    * Aborts program abnormally.
    */
-  public void fatal(String s)
+  private void fatal(String s)
   {
     fatal(s, null);
   }
@@ -727,7 +942,7 @@ public class Snark
   /**
    * Aborts program abnormally.
    */
-  public void fatal(String s, Throwable t)
+  private void fatal(String s, Throwable t)
   {
     _util.debug(s, ERROR, t);
     //System.err.println("snark: " + s + ((t == null) ? "" : (": " + t)));
@@ -751,7 +966,7 @@ public class Snark
     // System.out.println(peer.toString());
   }
   
-  boolean allocating = false;
+  private boolean allocating = false;
   public void storageCreateFile(Storage storage, String name, long length)
   {
     //if (allocating)
@@ -774,9 +989,9 @@ public class Snark
     //  System.out.println(); // We have all the disk space we need.
   }
 
-  boolean allChecked = false;
-  boolean checking = false;
-  boolean prechecking = true;
+  private boolean allChecked = false;
+  private boolean checking = false;
+  private boolean prechecking = true;
   public void storageChecked(Storage storage, int num, boolean checked)
   {
     allocating = false;

@@ -42,18 +42,33 @@ import net.i2p.util.SimpleTimer2;
 public class PeerCoordinator implements PeerListener
 {
   private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(PeerCoordinator.class);
+
+  /**
+   * External use by PeerMonitorTask only.
+   */
   final MetaInfo metainfo;
+
+  /**
+   * External use by PeerMonitorTask only.
+   */
   final Storage storage;
-  final Snark snark;
+  private final Snark snark;
 
   // package local for access by CheckDownLoadersTask
   final static long CHECK_PERIOD = 40*1000; // 40 seconds
   final static int MAX_UPLOADERS = 6;
 
-  // Approximation of the number of current uploaders.
-  // Resynced by PeerChecker once in a while.
-  int uploaders = 0;
-  int interestedAndChoking = 0;
+  /**
+   * Approximation of the number of current uploaders.
+   * Resynced by PeerChecker once in a while.
+   * External use by PeerCheckerTask only.
+   */
+  int uploaders;
+
+  /**
+   * External use by PeerCheckerTask only.
+   */
+  int interestedAndChoking;
 
   // final static int MAX_DOWNLOADERS = MAX_CONNECTIONS;
   // int downloaders = 0;
@@ -61,14 +76,18 @@ public class PeerCoordinator implements PeerListener
   private long uploaded;
   private long downloaded;
   final static int RATE_DEPTH = 3; // make following arrays RATE_DEPTH long
-  private long uploaded_old[] = {-1,-1,-1};
-  private long downloaded_old[] = {-1,-1,-1};
+  private final long uploaded_old[] = {-1,-1,-1};
+  private final long downloaded_old[] = {-1,-1,-1};
 
-  // synchronize on this when changing peers or downloaders
-  // This is a Queue, not a Set, because PeerCheckerTask keeps things in order for choking/unchoking
+  /**
+   * synchronize on this when changing peers or downloaders.
+   * This is a Queue, not a Set, because PeerCheckerTask keeps things in order for choking/unchoking.
+   * External use by PeerMonitorTask only.
+   */
   final Queue<Peer> peers;
+
   /** estimate of the peers, without requiring any synchronization */
-  volatile int peerCount;
+  private volatile int peerCount;
 
   /** Timer to handle all periodical tasks. */
   private final CheckEvent timer;
@@ -86,12 +105,9 @@ public class PeerCoordinator implements PeerListener
   private boolean halted = false;
 
   private final CoordinatorListener listener;
-  public I2PSnarkUtil _util;
+  private final I2PSnarkUtil _util;
   private static final Random _random = I2PAppContext.getGlobalContext().random();
   
-  public String trackerProblems = null;
-  public int trackerSeenPeers = 0;
-
   public PeerCoordinator(I2PSnarkUtil util, byte[] id, MetaInfo metainfo, Storage storage,
                          CoordinatorListener listener, Snark torrent)
   {
@@ -153,7 +169,6 @@ public class PeerCoordinator implements PeerListener
   }
 
   public Storage getStorage() { return storage; }
-  public CoordinatorListener getListener() { return listener; }
 
   // for web page detailed stats
   public List<Peer> peerList()
@@ -164,6 +179,11 @@ public class PeerCoordinator implements PeerListener
   public byte[] getID()
   {
     return id;
+  }
+
+  public String getName()
+  {
+    return snark.getName();
   }
 
   public boolean completed()
@@ -1105,6 +1125,14 @@ public class PeerCoordinator implements PeerListener
         return uploaders + 1;
     else
         return MAX_UPLOADERS;
+  }
+
+  /**
+   *  @return current
+   *  @since 0.8.4
+   */
+  public int getUploaders() {
+      return uploaders;
   }
 
   public boolean overUpBWLimit()

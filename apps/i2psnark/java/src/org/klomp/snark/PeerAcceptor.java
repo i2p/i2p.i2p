@@ -120,7 +120,7 @@ public class PeerAcceptor
                 else 
                   {
                     if (_log.shouldLog(Log.DEBUG))
-                      _log.debug("Rejecting new peer for " + cur.snark.torrent);
+                      _log.debug("Rejecting new peer for " + cur.getName());
                     socket.close();
                     return;
                   }
