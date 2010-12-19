@@ -3,7 +3,7 @@
 
 i2p_start() {
  # Check if router is up first!
- /bin/su - -c "( export PATH=\"$PATH:/usr/lib/java/bin:/usr/lib/java/jre/bin\"; directory status )" > /dev/null
+ /bin/su - -c "/bin/bash -l -c '( export PATH=\"$PATH:/usr/lib/java/bin:/usr/lib/java/jre/bin\" ; directory status )'" > /dev/null
  if [ $? -eq 0 ] ; then {
   # I2p is already running, so tell the user.
   echo "I2P is already running..."
@@ -14,13 +14,13 @@ i2p_start() {
   # Just in-case there are leftover junk in /tmp...
   rm -Rf `grep /tmp/hsperfdata_root/* -le i2p` /tmp/i2p-*.tmp /tmp/router.ping
   # Now that all junk is cleaned up, start.
-  /bin/su - -c "( export PATH=\"$PATH:/usr/lib/java/bin:/usr/lib/java/jre/bin\"; directory start )"
+  /bin/su - -c "/bin/bash -l -c '( export PATH=\"$PATH:/usr/lib/java/bin:/usr/lib/java/jre/bin\" ; directory start )'"
  }
  fi
 }
 
 i2p_stop() {
- /bin/su - -c "( export PATH=\"$PATH:/usr/lib/java/bin:/usr/lib/java/jre/bin\"; directory stop )"
+ /bin/su - -c "/bin/bash -l -c '( export PATH=\"$PATH:/usr/lib/java/bin:/usr/lib/java/jre/bin\" ; directory stop )'"
  rm -Rf `grep /tmp/hsperfdata_root/* -le i2p` /tmp/i2p-*.tmp /tmp/router.ping
 }
 
@@ -31,15 +31,15 @@ i2p_restart() {
 }
 
 i2p_status() {
- /bin/su - -c "( export PATH=\"$PATH:/usr/lib/java/bin:/usr/lib/java/jre/bin\"; directory status )"
+ /bin/su - -c "/bin/bash -l -c '( export PATH=\"$PATH:/usr/lib/java/bin:/usr/lib/java/jre/bin\" ; directory status )'"
 }
 
 i2p_console() {
- /bin/su - -c "( export PATH=\"$PATH:/usr/lib/java/bin:/usr/lib/java/jre/bin\"; directory console )"
+ /bin/su - -c "/bin/bash -l -c '( export PATH=\"$PATH:/usr/lib/java/bin:/usr/lib/java/jre/bin\" ; directory console )'"
 }
 
 i2p_dump() {
- /bin/su - -c "( export PATH=\"$PATH:/usr/lib/java/bin:/usr/lib/java/jre/bin\"; directory dump )"
+ /bin/su - -c "/bin/bash -l -c '( export PATH=\"$PATH:/usr/lib/java/bin:/usr/lib/java/jre/bin\" ; directory dump )'"
 }
 
 case "$1" in
