@@ -114,7 +114,7 @@ div.warning h3 {
      font-variant: small-caps; 
      text-transform: capitalize; 
      font-size: 12.5pt;
-     background: none;
+     background: none !important;
 }
 
 /* console error messages */
@@ -428,6 +428,7 @@ div.news li {
      font-size: 10pt;
      color: #eef;
      text-transform: capitalize;
+     font-weight: bold;
 }
 
 div.news p {
@@ -464,11 +465,11 @@ div.news hr {
      background: #99f;
      height: 1px;
      border: 0px solid #99f;
-     margin: 20px 0 2px 0;
+     margin: 10px 0 2px 0;
 }
 
 div.confignav {
-     padding: 15px 0;
+     padding: 14px 0 15px;
      background: #000018;
      margin: -16px -16px 0 -16px;
      border: 1px solid #99f;
@@ -552,7 +553,7 @@ h1 {
      text-shadow: 0px 0px 2px rgba(255, 255, 255, 0.4);
      text-align: center;
      border: 1px solid #99f;
-     padding: 16px 10px 16px 10px;
+     padding: 15px 10px;
      margin: 5px 5px 0 200px;
      line-height: 93%;
      text-transform: uppercase;
@@ -816,8 +817,7 @@ p {
 }
 
 .links b {
-     margin-bottom: 25px !important;
-     line-height: 250%;
+     line-height: 170%;
      letter-spacing: 0.12em !important;
 }
 
@@ -943,10 +943,11 @@ div.footnote {
      text-align: right;
      color: #99f;
      font-size: 7pt;
+     margin-bottom: -5px;
 }
 
 div.footnote hr{
-     margin: 15px 0 5px 0 !important;
+     margin: 15px 0 3px 0 !important;
      color: #99f;
      background: #99f;
      height: 1px;

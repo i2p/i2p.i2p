@@ -63,6 +63,10 @@ public class NTCPTransport extends TransportImpl {
     private long _lastBadSkew;
     private static final long[] RATES = { 10*60*1000 };
 
+    // Opera doesn't have the char, TODO check UA
+    //private static final String THINSP = "&thinsp;/&thinsp;";
+    private static final String THINSP = " / ";
+
     public NTCPTransport(RouterContext ctx) {
         super(ctx);
 
@@ -740,7 +744,7 @@ public class NTCPTransport extends TransportImpl {
                 buf.append("<img src=\"/themes/console/images/outbound.png\" alt=\"Outbound\" title=\"").append(_("Outbound")).append("\"/>");
             buf.append("</td><td class=\"cells\" align=\"right\">");
             buf.append(DataHelper.formatDuration2(con.getTimeSinceReceive()));
-            buf.append("&thinsp;/&thinsp;").append(DataHelper.formatDuration2(con.getTimeSinceSend()));
+            buf.append(THINSP).append(DataHelper.formatDuration2(con.getTimeSinceSend()));
             buf.append("</td><td class=\"cells\" align=\"right\">");
             if (con.getTimeSinceReceive() < 10*1000) {
                 buf.append(formatRate(con.getRecvRate()/1024));
@@ -748,7 +752,7 @@ public class NTCPTransport extends TransportImpl {
             } else {
                 buf.append(formatRate(0));
             }
-            buf.append("&thinsp;/&thinsp;");
+            buf.append(THINSP);
             if (con.getTimeSinceSend() < 10*1000) {
                 buf.append(formatRate(con.getSendRate()/1024));
                 bpsSend += con.getSendRate();
@@ -785,7 +789,7 @@ public class NTCPTransport extends TransportImpl {
         if (!peers.isEmpty()) {
 //            buf.append("<tr> <td colspan=\"11\"><hr></td></tr>\n");
             buf.append("<tr class=\"tablefooter\"><td align=\"center\"><b>").append(peers.size()).append(' ').append(_("peers")).append("</b></td><td>&nbsp;</td><td>&nbsp;");
-            buf.append("</td><td align=\"center\"><b>").append(formatRate(bpsRecv/1024)).append("&thinsp;/&thinsp;").append(formatRate(bpsSend/1024)).append("</b>");
+            buf.append("</td><td align=\"center\"><b>").append(formatRate(bpsRecv/1024)).append(THINSP).append(formatRate(bpsSend/1024)).append("</b>");
             buf.append("</td><td align=\"center\"><b>").append(DataHelper.formatDuration2(totalUptime/peers.size()));
             buf.append("</b></td><td align=\"center\"><b>").append(DataHelper.formatDuration2(offsetTotal*1000/peers.size()));
             buf.append("</b></td><td align=\"center\"><b>").append(totalSend).append("</b></td><td align=\"center\"><b>").append(totalRecv);

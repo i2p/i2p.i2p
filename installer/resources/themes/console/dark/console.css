@@ -273,13 +273,13 @@ div.warning {
 /* console error messages */
 
 div.sorry {
-     margin: 15px 15px 10px 215px;
+     margin: -1px 5px 10px 205px;
      padding: 20px 20px 20px 75px;
      background: #020;
      border: 1px solid #494;
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
-     border-radius: 4px;
+     -moz-border-radius: 0 0 4px 4px;
+     -khtml-border-radius: 0 0 4px 4px;
+     border-radius: 0 0 4px 4px;
      text-align: justify;
      background-image:url("images/errortriangle.png");
      background-position:15px center;
@@ -322,7 +322,7 @@ div.main textarea {
 
 div.news {
      margin: -1px 5px 0px 205px;
-     padding: 5px 30px 10px 30px;
+     padding: 5px 30px 5px 30px;
      border: 1px solid #494;
      background: #000;
      background: #000 url("images/news.png")no-repeat scroll bottom right;
@@ -344,11 +344,16 @@ div.news li {
      text-align: justify;
      list-style: url('images/info_dark.png');
      list-style: none;
-     margin: 0 10px 0 0px;
+     margin: 0;
      padding: 5px 5px 5px 0;
      vertical-align: middle;
      word-wrap: break-word;
      color: #494;
+     font-weight: bold;
+     font-size: 9.5pt;
+     border-bottom: 1px dotted #494;
+     margin-bottom: 5px;
+     text-transform: capitalize;
 }
 
 div.news h4 {
@@ -358,7 +363,7 @@ div.news h4 {
      padding: 0 0 0px 0;
      margin: 5px 0 10px 0;
      font-size: 10pt;
-     opacity: 0.8;
+     opacity: 1;
      text-transform: capitalize;
 }
 
@@ -372,10 +377,15 @@ div.news p {
      margin-top: -5px;
      font-size: 8.5pt;
      color: #EE9;
+     margin-bottom: 0;
+}
+
+div.news p:nth-child(n+1) {
+     margin-top: 5px;
 }
 
 div.news hr {
-     margin: -2px 0 5px 0;
+     margin: 8px 0 3px 0;
 }     
 
 div.confignav {
@@ -557,11 +567,11 @@ div.main li {
      word-wrap: break-word;
 }
 
+
 div.main li b {
      color: #b70 !important;
      letter-spacing: 0.07em;
-     font-size: 9.5pt;
-     line-height: 200%;
+     font-size: 9pt;
      text-shadow: 0 1px 1px #700;
 }
 
@@ -575,7 +585,7 @@ div.main li b {
 }
 
 .tidylist:last-child {
-     padding-bottom: 15px;
+     padding-bottom: 10px;
 }
 
 .tidylist code {
@@ -636,6 +646,14 @@ a:hover{
 
 .links li {
      list-style-image: url("images/link.png") !important;
+}
+
+.links b{
+     color: #b70 !important;
+     letter-spacing: 0.07em;
+     font-size: 9.5pt;
+     line-height: 165%;
+     text-shadow: 0 1px 1px #700;
 }
 
 p {

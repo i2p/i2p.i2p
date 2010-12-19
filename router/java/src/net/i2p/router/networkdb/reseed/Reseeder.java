@@ -42,12 +42,13 @@ public class Reseeder {
 
     private static final String DEFAULT_SEED_URL =
               "http://a.netdb.i2p2.de/,http://b.netdb.i2p2.de/,http://c.netdb.i2p2.de/," +
-              "http://reseed.i2p-projekt.de/,http://www.i2pbote.net/netDb/,http://r31453.ovh.net/static_media/netDb/";
+              "http://reseed.i2p-projekt.de/,http://www.i2pbote.net/netDb/,http://r31453.ovh.net/static_media/files/netDb/";
 
     /** @since 0.8.2 */
     private static final String DEFAULT_SSL_SEED_URL =
               "https://a.netdb.i2p2.de/,https://c.netdb.i2p2.de/," +
-              "https://www.i2pbote.net/netDb/";
+              "https://www.i2pbote.net/netDb/," +
+              "https://r31453.ovh.net/static_media/files/netDb/";
 
     private static final String PROP_INPROGRESS = "net.i2p.router.web.ReseedHandler.reseedInProgress";
     /** the console shows this message while reseedInProgress == false */

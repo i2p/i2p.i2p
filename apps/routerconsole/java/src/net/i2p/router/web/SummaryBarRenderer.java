@@ -267,7 +267,7 @@ public class SummaryBarRenderer {
            .append(":</b></td><td align=\"right\">");
         int active = _helper.getActivePeers();
         buf.append(active)
-           .append("&thinsp;/&thinsp;")
+           .append(SummaryHelper.THINSP)
            .append(Math.max(active, _helper.getActiveProfiles()))
            .append("</td></tr>\n" +
 
@@ -351,7 +351,7 @@ public class SummaryBarRenderer {
                    "<table>\n" +
 
                    "<tr><td align=\"left\"><b>")
-           .append(_("1 sec"))   // formatDuration2() would say 1000 ms
+           .append(DataHelper.formatDuration2(3 * 1000))   // lie and say 3 sec since 1 sec would appear as 1000 ms
            .append(":</b></td><td align=\"right\">")
            .append(_helper.getSecondKBps())
            .append("Bps</td></tr>\n");
@@ -376,7 +376,7 @@ public class SummaryBarRenderer {
            .append(_("Used"))
            .append(":</b></td><td align=\"right\">")
            .append(_helper.getInboundTransferred())
-           .append("&thinsp;/&thinsp;")
+           .append(SummaryHelper.THINSP)
            .append(_helper.getOutboundTransferred())
            .append("</td></tr></table>\n" +
 
