@@ -53,6 +53,9 @@ public class URI
     private String _query;
     private UrlEncoded _parameters;
     private boolean _dirty;
+    private static String unreserved = "/0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_.~";
+    private static String reserved = "!*'();:@&=+$,?%#[]";
+    private static String hexchars = "0123456789ABCDEF";
     
     /* ------------------------------------------------------------ */
     /** Copy Constructor .
@@ -237,6 +240,7 @@ public class URI
                 else
                     _parameters.clear();
                 _parameters.decode(_query,__CHARSET);
+                
             }
             else
                 _query=null;           
@@ -566,52 +570,48 @@ public class URI
      */
     public static StringBuffer encodePath(StringBuffer buf, String path)
     {
-        if (buf==null)
-        {
-        loop:
-            for (int i=0;i<path.length();i++)
-            {
-                char c=path.charAt(i);
-                switch(c)
-                {
-                  case '%':
-                  case '?':
-                  case ';':
-                  case '#':
-                  case ' ':
-                      buf=new StringBuffer(path.length()<<1);
-                      break loop;
+        // Convert path to native first.
+        byte[] b = null;
+        /*
+        try {
+            b = path.getBytes(__CHARSET);
+        } catch(UnsupportedEncodingException ex) {
+            return null; // Shouldn't be possible.
+        }
+        */
+        b = path.getBytes();
+        StringBuffer x = new StringBuffer(b.length);
+        for(int i=0; i<b.length; i++) {
+            x.append((char)(b[i]&0xff));
+        }
+        String _path = new String(x);
+        if(buf == null) {
+            loop:
+            for(int i = 0; i < _path.length(); i++) {
+                char c = _path.charAt(i);
+                String cs = "" + c;
+                if(reserved.contains(cs) || !unreserved.contains(cs)) {
+                    buf = new StringBuffer(_path.length() << 1);
+                    break loop;
                 }
             }
-            if (buf==null)
+            if(buf == null) {
                 return null;
+            }
         }
-        
-        synchronized(buf)
-        {
-            for (int i=0;i<path.length();i++)
-            {
-                char c=path.charAt(i);       
-                switch(c)
-                {
-                  case '%':
-                      buf.append("%25");
-                      continue;
-                  case '?':
-                      buf.append("%3F");
-                      continue;
-                  case ';':
-                      buf.append("%3B");
-                      continue;
-                  case '#':
-                      buf.append("%23");
-                      continue;
-                  case ' ':
-                      buf.append("%20");
-                      continue;
-                  default:
-                      buf.append(c);
-                      continue;
+        synchronized(buf) {
+            for(int i = 0; i < _path.length(); i++) {
+                char c = _path.charAt(i);
+                String cs = "" + c;
+                if(reserved.contains(cs) || !unreserved.contains(cs)) {
+                    if((c & 0xff) == c) {
+                        buf.append(gethex(c & 0xff));
+                    } else {
+                        buf.append(gethex((c >> 8) & 0xff));
+                        buf.append(gethex(c & 0xff));
+                    }
+                } else {
+                    buf.append(c);
                 }
             }
         }
@@ -619,6 +619,14 @@ public class URI
         return buf;
     }
     
+    /**
+     *
+     * @param decimal value not greater than 255.
+     * @return a percent sign followed by two hexadecimal digits.
+     */
+    private static String gethex(int decimal) {
+        return new String("%" + hexchars.charAt(decimal >> 4) + hexchars.charAt(decimal & 0xF));
+    }
     /* ------------------------------------------------------------ */
     /** Encode a URI path.
      * @param path The path the encode
@@ -708,6 +716,7 @@ public class URI
         if (noDecode)
             return path;
 
+        /*
         try
         {    
             return new String(bytes,0,n,__CHARSET);
@@ -717,6 +726,10 @@ public class URI
             log.warn(LogSupport.EXCEPTION,e);
             return new String(bytes,0,n);
         }
+        */
+        
+        return new String(bytes,0,n);
+        
     }
 
     /* ------------------------------------------------------------ */
