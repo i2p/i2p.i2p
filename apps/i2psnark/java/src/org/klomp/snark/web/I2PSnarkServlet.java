@@ -803,7 +803,7 @@ public class I2PSnarkServlet extends Default {
                                ngettext("1 peer", "{0} peers", knownPeers);
             else if (isRunning && knownPeers > 0)
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "nopeers.png\" ></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("No Peers") +
-                               ": 0&thinsp;/&thinsp;" + knownPeers ;
+                               ": 0" + thinsp(isDegraded) + knownPeers ;
             else if (isRunning)
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "nopeers.png\" ></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("No Peers");
             else
