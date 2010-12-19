@@ -168,8 +168,9 @@ public class FileResource extends URLResource
     /* ------------------------------------------------------------ */
     public URL getAlias()
     {
-        if (__checkAliases && !_aliasChecked)
-        {
+        if (__checkAliases) {
+          if (!_aliasChecked)
+          {
             try
             {    
                 String abs=_file.getAbsolutePath();
@@ -179,7 +180,7 @@ public class FileResource extends URLResource
                     _alias=new File(can).toURI().toURL();
                 
                 _aliasChecked=true;
-                
+
                 if (_alias!=null && log.isDebugEnabled())
                 {
                     log.debug("ALIAS abs="+abs);
@@ -190,8 +191,9 @@ public class FileResource extends URLResource
             {
                 log.warn(LogSupport.EXCEPTION,e);
                 return getURL();
-            }                
-        }
+            }
+          }                
+        } else return null;
         return _alias;
     }
     
