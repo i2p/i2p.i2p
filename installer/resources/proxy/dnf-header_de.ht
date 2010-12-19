@@ -19,5 +19,5 @@ Proxy-Connection: close
 Die Eepseite war nicht erreichbar.
 Sie ist vielleicht offline, es gibt eine Überlast oder Verstopfung im Netz,
 oder Ihr Router ist noch nicht gut ins Netzwerk integriert.
-Versuchen Sie ein <a href="javascript: window.location.reload()">Neuladen</a>! 
+Versuchen Sie, die Seite <a href="javascript: window.location.reload()">erneut zu laden</a>! 
 <hr><b>Konnte das folgende Ziel nicht finden:</b><BR><BR>
