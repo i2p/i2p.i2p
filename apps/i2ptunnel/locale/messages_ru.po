@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P i2ptunnel\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-11-13 22:04+0000\n"
-"PO-Revision-Date: 2010-11-14 19:56+0500\n"
+"POT-Creation-Date: 2010-12-13 19:43+0000\n"
+"PO-Revision-Date: 2010-12-14 00:54+0500\n"
 "Last-Translator: Hidden Z <hiddenz@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "Language: \n"
@@ -18,64 +18,82 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: Russian\n"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:492
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:475
 #, java-format
 msgid "To visit the destination in your host database, click <a href=\"{0}\">here</a>. To visit the conflicting addresshelper destination, click <a href=\"{1}\">here</a>."
 msgstr "Для перехода по ссылке из локальной адресной книги, нажмите <a href=\"{0}\">здесь</a>. Для перехода по новой addresshelper-ссылке, нажмите <a href=\"{1}\">здесь</a>."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:917
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:932
 msgid "Click a link below to look for an address helper by using a \"jump\" service:"
 msgstr "Jump-сервисы, которые, возможно, знают нужную Вам addresshelper-ссылку:"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:382
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:170
+msgid "Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit."
+msgstr "Неправильно переданная форма, возможно вы использовали действие браузера \"назад\" или \"обновить\". Пожалуйста повторите попытку."
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:217
+msgid "Configuration reloaded for all tunnels"
+msgstr "Конфигурация для всех туннелей перечитана"
+
+#. and give them something to look at in any case
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:229
+msgid "Starting tunnel"
+msgstr "Запуск туннеля"
+
+#. and give them something to look at in any case
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:242
+msgid "Stopping tunnel"
+msgstr "Остановка туннеля"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:389
 msgid "New Tunnel"
 msgstr "Новый туннель"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:402
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:409
 msgid "Standard client"
 msgstr "Обычный клиент"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:403
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:410
 msgid "HTTP client"
 msgstr "HTTP-клиент"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:404
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:411
 msgid "IRC client"
 msgstr "IRC-клиент"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:405
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:412
 msgid "Standard server"
 msgstr "Обычный сервер"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:406
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:413
 msgid "HTTP server"
 msgstr "HTTP-сервер"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:407
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:414
 msgid "SOCKS 4/4a/5 proxy"
 msgstr "SOCKS 4/4a/5 прокси"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:408
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:415
 msgid "SOCKS IRC proxy"
 msgstr "SOCKS IRC прокси"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:409
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:416
 msgid "CONNECT/SSL/HTTPS proxy"
 msgstr "CONNECT/SSL/HTTPS прокси"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:410
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:417
 msgid "IRC server"
 msgstr "IRC-сервер"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:411
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:418
 msgid "Streamr client"
 msgstr "Streamr-клиент"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:412
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:419
 msgid "Streamr server"
 msgstr "Streamr-сервер"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:413
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:420
 msgid "HTTP bidir"
 msgstr "HTTP bidir (экспериментальный двунаправленный режим, инструкцию спрашивайте у sponge)"
 
@@ -110,7 +128,7 @@ msgstr "Тип"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:120
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:120
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:226
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:358
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:367
 msgid "Description"
 msgstr "Описание"
 
@@ -380,6 +398,8 @@ msgstr "Снижать количество туннелей при просто
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:437
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:449
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:459
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:479
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:493
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:426
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:442
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:454
@@ -430,27 +450,45 @@ msgstr "Локальный адрес назначения"
 msgid "(if known)"
 msgstr "(если известен)"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:475
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:477
+msgid "Local Authorization"
+msgstr "Локальная авторизация"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:483
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:497
+msgid "Username"
+msgstr "Имя пользователя"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:487
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:501
+msgid "Password"
+msgstr "Пароль"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:491
+msgid "Outproxy Authorization"
+msgstr "Авторизация outproxy"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:507
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:498
 msgid "Custom options"
 msgstr "Дополнительные параметры"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:479
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:511
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:502
 msgid "NOTE: If tunnel is currently running, most changes will not take effect until tunnel is stopped and restarted."
 msgstr "ПРИМЕЧАНИЕ: для вступления в силу измененных настроек потребуется остановка и перезапуск туннеля"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:481
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:513
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:504
 msgid "Cancel"
 msgstr "Отмена"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:485
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:517
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:508
 msgid "Delete"
 msgstr "Удалить"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:487
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:519
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:510
 msgid "Save"
 msgstr "Сохранить"
@@ -647,12 +685,12 @@ msgid "New server tunnel"
 msgstr "Новый серверный туннель"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:236
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:368
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:377
 msgid "Standard"
 msgstr "Стандартный"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:238
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:370
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:379
 msgid "Create"
 msgstr "Создать"
 
@@ -670,15 +708,19 @@ msgid "Standby"
 msgstr "Режим ожидания"
 
 # This term intentionally left in English
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:346
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:344
 msgid "Outproxy"
 msgstr "Outproxy"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:350
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:348
 msgid "Destination"
 msgstr "Адрес назначения"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:366
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:362
+msgid "none"
+msgstr "нет"
+
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:375
 msgid "New client tunnel"
 msgstr "Новый клиентский туннель"
 
