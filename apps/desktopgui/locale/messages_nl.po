@@ -1,0 +1,31 @@
+#: src/net/i2p/desktopgui/TrayManager.java:73
+msgid "Launch I2P Browser"
+msgstr "Start I2P Browser"
+
+#: src/net/i2p/desktopgui/TrayManager.java:99
+msgid "Browser not found"
+msgstr "Browser niet gevonden"
+
+#: src/net/i2p/desktopgui/TrayManager.java:100
+msgid "The default browser for your system was not found."
+msgstr "De standaard webbrowser voor je systeem werd niet gevonden."
+
+#: src/net/i2p/desktopgui/TrayManager.java:111
+msgid "Start I2P"
+msgstr "I2P starten"
+
+#: src/net/i2p/desktopgui/TrayManager.java:126
+msgid "I2P is starting!"
+msgstr "I2P is aan het starten!"
+
+#: src/net/i2p/desktopgui/TrayManager.java:126
+msgid "Starting"
+msgstr "Bezig met starten"
+
+#: src/net/i2p/desktopgui/TrayManager.java:140
+msgid "Restart I2P"
+msgstr "I2P herstarten"
+
+#: src/net/i2p/desktopgui/TrayManager.java:161
+msgid "Stop I2P"
+msgstr "I2P stoppen"

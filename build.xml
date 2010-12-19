@@ -34,6 +34,7 @@
         <echo message="  updaterRouter:  updater with the i2p.jar and router.jar only" />
         <echo message="  distclean: clean up all derived files" />
         <echo message="  syndie:    generate a standalone syndie install" />
+        <echo message="  desktopgui: generate a standalone desktopgui install" />
         <echo message="  i2psnark:  generate a standalone i2psnark install" />
         <echo message="  justBOB:  generate a standalone BOB-one.jar" />
         <echo message="  javadoc:   generate javadoc for the entire project into ./build/javadoc" />
@@ -42,10 +43,6 @@
         <echo message="  debian: generate Debian packages in ./debian/packages" />
         <echo message="          (libc6-i686 and libc6-amd64 required, ant>=1.8 required)" />
         <echo message="  debianrepo: build a Debian repository (reprepro required)" />
-        <echo message="  updaterWithDesktopgui: tar the built files and desktopgui in an i2pupdate.zip" />
-        <echo message="  pkgWithDesktopgui: distclean then package everything up with the desktopgui" />
-        <echo message="  distWithDesktopgui: pkgWithDesktopgui and javadoc" />
-        <echo message="  distcleanWithDesktopgui: clean up all derived files (including desktopgui files)" />
         <echo message="  poupdate: update the .po files for translators" />
     </target>
     <target name="debianhowto">
@@ -738,6 +735,10 @@
 		<ant dir="core/java/" target="fullclovertest" />
 		<ant dir="router/java/" target="fullclovertest" />
     </target>
+    <target name="desktopgui" depends="builddepSmall">
+        <ant dir="apps/desktopgui" target="jar" />
+        <copy file="apps/desktopgui/dist/desktopgui.jar" todir="." />
+    </target>
     <target name="syndie" >
         <ant dir="apps/syndie/java/" target="standalone" />
         <copy file="apps/syndie/java/syndie-standalone.zip" todir="." />
@@ -790,34 +791,6 @@
             <arg value="build/systray.jar"/>
         </exec>
         <echo message="Findbugs output stored in findbugs.xml" />
-    </target>
-    <target name="buildWithDesktopgui" depends="buildrouter,builddepSmall">
-        <ant dir="apps/desktopgui" target="build_jar" />
-    </target>
-    <target name="preppkgWithDesktopgui" depends="buildWithDesktopgui,preppkg">
-        <copy file="apps/desktopgui/dist/desktopgui.jar" todir="pkg-temp/lib/" />
-        <copy file="apps/desktopgui/lib/swing-worker.jar" todir="pkg-temp/lib/" />
-        <copy file="apps/desktopgui/lib/appframework.jar" todir="pkg-temp/lib/" />
-        <mkdir dir="pkg-temp/desktopgui/resources/" />
-        <copy todir="pkg-temp/desktopgui/resources/">
-            <fileset dir="apps/desktopgui/desktopgui/resources/" />
-        </copy>
-    </target>
-    <target name="installerWithDesktopgui" depends="preppkgWithDesktopgui,installer" />
-    <target name="prepupdateWithDesktopgui" depends="buildWithDesktopgui,prepupdate">
-        <copy file="apps/desktopgui/dist/desktopgui.jar" todir="pkg-temp/lib/" />
-        <copy file="apps/desktopgui/lib/swing-worker.jar" todir="pkg-temp/lib/" />
-        <copy file="apps/desktopgui/lib/appframework.jar" todir="pkg-temp/lib/" />
-        <mkdir dir="pkg-temp/desktopgui/resources/" />
-        <copy todir="pkg-temp/desktopgui/resources/">
-            <fileset dir="apps/desktopgui/desktopgui/resources/" />
-        </copy>
-    </target>
-    <target name="updaterWithDesktopgui" depends="prepupdateWithDesktopgui,updater" />
-    <target name="pkgWithDesktopgui" depends="distclean, updaterWithDesktopgui, installerWithDesktopgui, preppkg" />
-    <target name="distWithDesktopgui" depends="pkgWithDesktopgui, javadoc" />
-    <target name="distcleanWithDesktopgui" depends="distclean">
-        <ant dir="apps/desktopgui" target="build_clean" />
     </target>
 
     <!-- this is the same dependency as pkg, but with updater200 in the middle,
