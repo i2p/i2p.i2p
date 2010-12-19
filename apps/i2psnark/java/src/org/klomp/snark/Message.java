@@ -53,6 +53,7 @@ class Message
 
   // Used for HAVE, REQUEST, PIECE and CANCEL messages.
   // low byte used for EXTENSION message
+  // low two bytes used for PORT message
   int piece;
 
   // Used for REQUEST, PIECE and CANCEL messages.
@@ -107,6 +108,9 @@ class Message
     if (type == EXTENSION)
       datalen += 1;
 
+    if (type == PORT)
+      datalen += 2;
+
     // add length of data for piece or bitfield array.
     if (type == BITFIELD || type == PIECE || type == EXTENSION)
       datalen += len;
@@ -129,6 +133,9 @@ class Message
 
     if (type == EXTENSION)
         dos.writeByte((byte) piece & 0xff);
+
+    if (type == PORT)
+        dos.writeShort(piece & 0xffff);
 
     // Send actual data
     if (type == BITFIELD || type == PIECE || type == EXTENSION)

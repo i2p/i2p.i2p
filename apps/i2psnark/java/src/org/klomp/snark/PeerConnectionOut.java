@@ -547,4 +547,12 @@ class PeerConnectionOut implements Runnable
     m.len = bytes.length;
     addMessage(m);
   }
+
+  /** @since 0.8.4 */
+  void sendPort(int port) {
+    Message m = new Message();
+    m.type = Message.PORT;
+    m.piece = port;
+    addMessage(m);
+  }
 }

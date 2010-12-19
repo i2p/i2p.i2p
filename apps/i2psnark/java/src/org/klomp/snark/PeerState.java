@@ -32,9 +32,6 @@ import java.util.Set;
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
 
-import org.klomp.snark.bencode.BDecoder;
-import org.klomp.snark.bencode.BEValue;
-
 class PeerState implements DataLoader
 {
   private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(PeerState.class);
@@ -485,22 +482,13 @@ class PeerState implements DataLoader
   /** @since 0.8.2 */
   void extensionMessage(int id, byte[] bs)
   {
-      if (id == 0) {
-          InputStream is = new ByteArrayInputStream(bs);
-          try {
-              BDecoder dec = new BDecoder(is);
-              BEValue bev = dec.bdecodeMap();
-              Map map = bev.getMap();
-              if (_log.shouldLog(Log.DEBUG))
-                  _log.debug("Got extension handshake message " + bev.toString());
-          } catch (Exception e) {
-              if (_log.shouldLog(Log.DEBUG))
-                  _log.debug("Failed extension decode", e);
-          }
-      } else {
-          if (_log.shouldLog(Log.DEBUG))
-              _log.debug("Got extended message type: " + id + " length: " + bs.length);
-      }
+      listener.gotExtension(peer, id, bs);
+  }
+
+  /** @since 0.8.4 */
+  void portMessage(int port)
+  {
+      listener.gotPort(peer, port);
   }
 
   void unknownMessage(int type, byte[] bs)

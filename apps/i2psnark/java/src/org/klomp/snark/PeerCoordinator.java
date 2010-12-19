@@ -1086,6 +1086,12 @@ public class PeerCoordinator implements PeerListener
       }
   }
 
+  /** @since 0.8.4 */
+  public void gotExtension(Peer peer, int id, byte[] bs) {}
+
+  /** @since 0.8.4 */
+  public void gotPort(Peer peer, int port) {}
+
   /** Return number of allowed uploaders for this torrent.
    ** Check with Snark to see if we are over the total upload limit.
    */

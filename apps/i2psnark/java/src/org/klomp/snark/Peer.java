@@ -72,7 +72,6 @@ public class Peer implements Comparable
    * relevant MetaInfo.
    */
   public Peer(PeerID peerID, byte[] my_id, MetaInfo metainfo)
-    throws IOException
   {
     this.peerID = peerID;
     this.my_id = my_id;
@@ -253,6 +252,13 @@ public class Peer implements Comparable
             out.sendExtension(0, ExtensionHandshake.getPayload());
         }
 
+        if ((options & OPTION_DHT) != 0 && util.getDHT() != null) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Peer supports DHT, sending PORT message");
+            int port = util.getDHT().getPort();
+            out.sendPort(port);
+        }
+
         // Send our bitmap
         if (bitfield != null)
           s.out.sendBitfield(bitfield);
@@ -303,7 +309,8 @@ public class Peer implements Comparable
     dout.write(19);
     dout.write("BitTorrent protocol".getBytes("UTF-8"));
     // Handshake write - options
-    dout.writeLong(OPTION_EXTENSION);
+    // FIXME not if DHT disabled
+    dout.writeLong(OPTION_EXTENSION | OPTION_DHT);
     // Handshake write - metainfo hash
     byte[] shared_hash = metainfo.getInfoHash();
     dout.write(shared_hash);
@@ -343,12 +350,17 @@ public class Peer implements Comparable
         _log.debug("Read the remote side's hash and peerID fully from " + toString());
 
     if (options != 0) {
-        // send them something
+        // send them something in runConnection() above
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Peer supports options 0x" + Long.toString(options, 16) + ": " + toString());
     }
 
     return bs;
+  }
+
+  /** @since 0.8.4 */
+  public long getOptions() {
+      return options;
   }
 
   public boolean isConnected()

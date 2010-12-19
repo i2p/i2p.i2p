@@ -171,6 +171,11 @@ class PeerConnectionIn implements Runnable
                 if (_log.shouldLog(Log.DEBUG)) 
                     _log.debug("Received cancel(" + piece + "," + begin + ") from " + peer + " on " + peer.metainfo.getName());
                 break;
+              case 9:  // PORT message
+                int port = din.readUnsignedShort();
+                ps.portMessage(port);
+                if (_log.shouldLog(Log.DEBUG)) 
+                    _log.debug("Received port message from " + peer + " on " + peer.metainfo.getName());
               case 20:  // Extension message
                 int id = din.readUnsignedByte();
                 byte[] payload = new byte[i-2];
