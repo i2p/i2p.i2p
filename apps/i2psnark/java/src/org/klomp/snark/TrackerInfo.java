@@ -144,7 +144,7 @@ public class TrackerInfo
                 continue;
             }
         }
-        peers.add(new Peer(peerID, my_id, metainfo));
+        peers.add(new Peer(peerID, my_id, metainfo.getInfoHash(), metainfo));
       }
 
     return peers;
@@ -172,7 +172,7 @@ public class TrackerInfo
             // won't happen
             continue;
         }
-        peers.add(new Peer(peerID, my_id, metainfo));
+        peers.add(new Peer(peerID, my_id, metainfo.getInfoHash(), metainfo));
       }
 
     return peers;

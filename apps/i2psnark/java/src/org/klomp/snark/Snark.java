@@ -317,31 +317,7 @@ public class Snark
     stopped = true;
     activity = "Network setup";
 
-    // "Taking Three as the subject to reason about--
-    // A convenient number to state--
-    // We add Seven, and Ten, and then multiply out
-    // By One Thousand diminished by Eight.
-    //
-    // "The result we proceed to divide, as you see,
-    // By Nine Hundred and Ninety Two:
-    // Then subtract Seventeen, and the answer must be
-    // Exactly and perfectly true.
-
-    // Create a new ID and fill it with something random.  First nine
-    // zeros bytes, then three bytes filled with snark and then
-    // sixteen random bytes.
-    byte snark = (((3 + 7 + 10) * (1000 - 8)) / 992) - 17;
-    id = new byte[20];
-    Random random = I2PAppContext.getGlobalContext().random();
-    int i;
-    for (i = 0; i < 9; i++)
-      id[i] = 0;
-    id[i++] = snark;
-    id[i++] = snark;
-    id[i++] = snark;
-    while (i < 20)
-      id[i++] = (byte)random.nextInt(256);
-
+    id = generateID();
     debug("My peer id: " + PeerID.idencode(id), Snark.INFO);
 
     int port;
@@ -468,6 +444,64 @@ public class Snark
     if (start)
         startTorrent();
   }
+
+  /**
+   *  multitorrent, magnet
+   *
+   *  @param torrent a fake name for now (not a file name)
+   *  @param ih 20-byte info hash
+   *  @since 0.8.4
+   */
+  public Snark(I2PSnarkUtil util, String torrent, byte[] ih,
+        CompleteListener complistener, PeerCoordinatorSet peerCoordinatorSet,
+        ConnectionAcceptor connectionAcceptor, boolean start, String rootDir)
+  {
+    completeListener = complistener;
+    _util = util;
+    _peerCoordinatorSet = peerCoordinatorSet;
+    acceptor = connectionAcceptor;
+    this.torrent = torrent;
+    this.infoHash = ih;
+    this.rootDataDir = rootDir;
+    stopped = true;
+    id = generateID();
+
+    // All we have is an infoHash
+    // meta remains null
+    // storage remains null
+
+    if (start)
+        startTorrent();
+  }
+
+  private static byte[] generateID() {
+    // "Taking Three as the subject to reason about--
+    // A convenient number to state--
+    // We add Seven, and Ten, and then multiply out
+    // By One Thousand diminished by Eight.
+    //
+    // "The result we proceed to divide, as you see,
+    // By Nine Hundred and Ninety Two:
+    // Then subtract Seventeen, and the answer must be
+    // Exactly and perfectly true.
+
+    // Create a new ID and fill it with something random.  First nine
+    // zeros bytes, then three bytes filled with snark and then
+    // sixteen random bytes.
+    byte snark = (((3 + 7 + 10) * (1000 - 8)) / 992) - 17;
+    byte[] rv = new byte[20];
+    Random random = I2PAppContext.getGlobalContext().random();
+    int i;
+    for (i = 0; i < 9; i++)
+      rv[i] = 0;
+    rv[i++] = snark;
+    rv[i++] = snark;
+    rv[i++] = snark;
+    while (i < 20)
+      rv[i++] = (byte)random.nextInt(256);
+    return rv;
+  }
+
   /**
    * Start up contacting peers and querying the tracker
    */
@@ -484,7 +518,7 @@ public class Snark
         }
         debug("Starting PeerCoordinator, ConnectionAcceptor, and TrackerClient", NOTICE);
         activity = "Collecting pieces";
-        coordinator = new PeerCoordinator(_util, id, meta, storage, this, this);
+        coordinator = new PeerCoordinator(_util, id, infoHash, meta, storage, this, this);
         if (_peerCoordinatorSet != null) {
             // multitorrent
             _peerCoordinatorSet.add(coordinator);
@@ -507,7 +541,7 @@ public class Snark
         // restart safely, so lets build a new one to replace the old
         if (_peerCoordinatorSet != null)
             _peerCoordinatorSet.remove(coordinator);
-        PeerCoordinator newCoord = new PeerCoordinator(_util, id, meta, storage, this, this);
+        PeerCoordinator newCoord = new PeerCoordinator(_util, id, infoHash, meta, storage, this, this);
         if (_peerCoordinatorSet != null)
             _peerCoordinatorSet.add(newCoord);
         coordinator = newCoord;
@@ -516,18 +550,17 @@ public class Snark
     if (!trackerclient.started() && !coordinatorChanged) {
         trackerclient.start();
     } else if (trackerclient.halted() || coordinatorChanged) {
-        try
-          {
-            storage.reopen(rootDataDir);
-          }
-        catch (IOException ioe)
-          {
-            try { storage.close(); } catch (IOException ioee) {
-                ioee.printStackTrace();
-            }
-            fatal("Could not reopen storage", ioe);
-          }
-        TrackerClient newClient = new TrackerClient(_util, coordinator.getMetaInfo(), coordinator, this);
+        if (storage != null) {
+            try {
+                 storage.reopen(rootDataDir);
+             }   catch (IOException ioe) {
+                 try { storage.close(); } catch (IOException ioee) {
+                     ioee.printStackTrace();
+                 }
+                 fatal("Could not reopen storage", ioe);
+             }
+        }
+        TrackerClient newClient = new TrackerClient(_util, meta, coordinator, this);
         if (!trackerclient.halted())
             trackerclient.halt();
         trackerclient = newClient;
@@ -601,6 +634,7 @@ public class Snark
      *  @since 0.8.4
      */
     public byte[] getInfoHash() {
+        // should always be the same
         if (meta != null)
             return meta.getInfoHash();
         return infoHash;

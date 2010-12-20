@@ -38,6 +38,7 @@ import net.i2p.data.Hash;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
+import org.klomp.snark.dht.KRPC;
 
 /**
  * Informs metainfo tracker of events and gets new peers for peer
@@ -73,6 +74,9 @@ public class TrackerClient extends I2PAppThread
 
   private List trackers;
 
+  /**
+   * @param meta null if in magnet mode
+   */
   public TrackerClient(I2PSnarkUtil util, MetaInfo meta, PeerCoordinator coordinator, Snark snark)
   {
     super();
@@ -173,6 +177,7 @@ public class TrackerClient extends I2PAppThread
         // FIXME really need to get this message to the gui
         stop = true;
         _log.error("No valid trackers for infoHash: " + infoHash);
+        // FIXME keep going if DHT enabled
         return;
     }
 
@@ -192,6 +197,9 @@ public class TrackerClient extends I2PAppThread
         Random r = I2PAppContext.getGlobalContext().random();
         while(!stop)
           {
+            // Local DHT tracker announce
+            if (_util.getDHT() != null)
+                _util.getDHT().announce(snark.getInfoHash());
             try
               {
                 // Sleep some minutes...
@@ -319,6 +327,45 @@ public class TrackerClient extends I2PAppThread
                   maxSeenPeers = tr.seenPeers;
             }  // *** end of trackers loop here
 
+            // Get peers from DHT
+            // FIXME this needs to be in its own thread
+            if (_util.getDHT() != null && !stop) {
+                int numwant;
+                if (left <= 0 || event.equals(STOPPED_EVENT) || !coordinator.needPeers())
+                    numwant = 1;
+                else
+                    numwant = _util.getMaxConnections();
+                List<Hash> hashes = _util.getDHT().getPeers(snark.getInfoHash(), numwant, 2*60*1000);
+                _util.debug("Got " + hashes + " from DHT", Snark.INFO);
+                // announce  ourselves while the token is still good
+                // FIXME this needs to be in its own thread
+                if (!stop) {
+                    int good = _util.getDHT().announce(snark.getInfoHash(), 8, 5*60*1000);
+                    _util.debug("Sent " + good + " good announces to DHT", Snark.INFO);
+                }
+
+                // now try these peers
+                if ((!stop) && !hashes.isEmpty()) {
+                    List<Peer> peers = new ArrayList(hashes.size());
+                    for (Hash h : hashes) {
+                        PeerID pID = new PeerID(h.getData());
+                        peers.add(new Peer(pID, snark.getID(), snark.getInfoHash(), meta));
+                    }
+                    Collections.shuffle(peers, r);
+                    Iterator<Peer> it = peers.iterator();
+                    while ((!stop) && it.hasNext()) {
+                        Peer cur = it.next();
+                        if (coordinator.addPeer(cur)) {
+                            int delay = DELAY_MUL;
+                            delay *= ((int)cur.getPeerID().getAddress().calculateHash().toBase64().charAt(0)) % 10;
+                            delay += DELAY_MIN;
+                            try { Thread.sleep(delay); } catch (InterruptedException ie) {}
+                         }
+                    }
+                }
+            }
+
+
             // we could try and total the unique peers but that's too hard for now
             snark.setTrackerSeenPeers(maxSeenPeers);
             if (!runStarted)
@@ -333,6 +380,9 @@ public class TrackerClient extends I2PAppThread
       }
     finally
       {
+        // Local DHT tracker unannounce
+        if (_util.getDHT() != null)
+            _util.getDHT().unannounce(snark.getInfoHash());
         try
           {
             // try to contact everybody we can

@@ -32,6 +32,8 @@ import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.Translate;
 
+import org.klomp.snark.dht.KRPC;
+
 /**
  * I2P specific helpers for I2PSnark
  * We use this class as a sort of context for i2psnark
@@ -56,6 +58,7 @@ public class I2PSnarkUtil {
     private int _maxConnections;
     private File _tmpDir;
     private int _startupDelay;
+    private KRPC _krpc;
 
     public static final int DEFAULT_STARTUP_DELAY = 3;
     public static final String PROP_USE_OPENTRACKERS = "i2psnark.useOpentrackers";
@@ -64,6 +67,8 @@ public class I2PSnarkUtil {
     public static final String DEFAULT_OPENTRACKERS = "http://tracker.welterde.i2p/a";
     public static final int DEFAULT_MAX_UP_BW = 8;  //KBps
     public static final int MAX_CONNECTIONS = 16; // per torrent
+    private static final boolean ENABLE_DHT = true;
+
     public I2PSnarkUtil(I2PAppContext ctx) {
         _context = ctx;
         _log = _context.logManager().getLog(Snark.class);
@@ -185,10 +190,20 @@ public class I2PSnarkUtil {
             //    opts.setProperty("i2p.streaming.readTimeout", "120000");
             _manager = I2PSocketManagerFactory.createManager(_i2cpHost, _i2cpPort, opts);
         }
+        // FIXME this only instantiates krpc once, left stuck with old manager
+        if (ENABLE_DHT && _manager != null && _krpc == null)
+            _krpc = new KRPC(_context, _manager.getSession());
         return (_manager != null);
     }
     
+    /**
+     * @return null if disabled or not started
+     * @since 0.8.4
+     */
+    public KRPC getDHT() { return _krpc; }
+
     public boolean connected() { return _manager != null; }
+
     /**
      * Destroy the destination itself
      */

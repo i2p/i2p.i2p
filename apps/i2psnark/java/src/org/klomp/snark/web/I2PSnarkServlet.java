@@ -61,6 +61,10 @@ public class I2PSnarkServlet extends Default {
     private String _imgPath;
     
     public static final String PROP_CONFIG_FILE = "i2psnark.configFile";
+    /** BEP 9 */
+    private static final String MAGNET = "magnet:?xt=urn:btih:";
+    /** http://sponge.i2p/files/maggotspec.txt */
+    private static final String MAGGOT = "maggot://";
  
     @Override
     public void init(ServletConfig cfg) throws ServletException {
@@ -455,8 +459,10 @@ public class I2PSnarkServlet extends Default {
                     _manager.addMessage(_("Fetching {0}", urlify(newURL)));
                     I2PAppThread fetch = new I2PAppThread(new FetchAndAdd(_manager, newURL), "Fetch and add", true);
                     fetch.start();
+                } else if (newURL.startsWith(MAGNET) || newURL.startsWith(MAGGOT)) {
+                    addMagnet(newURL);
                 } else {
-                    _manager.addMessage(_("Invalid URL - must start with http://"));
+                    _manager.addMessage(_("Invalid URL - must start with http://, {0} or {1}", MAGNET, MAGGOT));
                 }
             } else {
                 // no file or URL specified
@@ -503,6 +509,8 @@ public class I2PSnarkServlet extends Default {
                             _manager.stopTorrent(name, true);
                             MetaInfo meta = snark.getMetaInfo();
                             if (meta == null) {
+                                // magnet
+                                _manager.deleteMagnet(snark.getInfoHash());
                                 return;
                             }
                             // should we delete the torrent file?
@@ -527,6 +535,8 @@ public class I2PSnarkServlet extends Default {
                             _manager.stopTorrent(name, true);
                             MetaInfo meta = snark.getMetaInfo();
                             if (meta == null) {
+                                // magnet
+                                _manager.deleteMagnet(snark.getInfoHash());
                                 return;
                             }
                             File f = new File(name);
@@ -1312,6 +1322,48 @@ public class I2PSnarkServlet extends Default {
         out.write("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "config.png\"> ");
         out.write(_("Configuration"));
         out.write("</a></span></span></div>\n");
+    }
+
+    /**
+     *  @param url in base32 or hex, xt must be first magnet param
+     *  @since 0.8.4
+     */
+    private void addMagnet(String url) {
+        String ihash;
+        String name;
+        if (url.startsWith(MAGNET)) {
+            ihash = url.substring(MAGNET.length()).trim();
+            int amp = ihash.indexOf('&');
+            if (amp >= 0)
+                ihash = url.substring(0, amp);
+            name = "Magnet " + ihash;
+        } else if (url.startsWith(MAGGOT)) {
+            ihash = url.substring(MAGGOT.length()).trim();
+            int col = ihash.indexOf(':');
+            if (col >= 0)
+                ihash = url.substring(0, col);
+            name = "Maggot " + ihash;
+        } else {
+            return;
+        }
+        byte[] ih = null;
+        if (ihash.length() == 32) {
+            ih = Base32.decode(ihash);
+        } else if (ihash.length() == 40) {
+            ih = new byte[20];
+            try {
+                for (int i = 0; i < 20; i++) {
+                    ih[i] = (byte) (Integer.parseInt(ihash.substring(i*2, (i*2) + 2), 16) & 0xff);
+                }
+            } catch (NumberFormatException nfe) {
+                ih = null;
+            }
+        }
+        if (ih == null || ih.length != 20) {
+            _manager.addMessage(_("Invalid info hash in magnet URL {0}", url));
+            return;
+        }
+        _manager.addMagnet(ihash, ih);
     }
 
     /** copied from ConfigTunnelsHelper */

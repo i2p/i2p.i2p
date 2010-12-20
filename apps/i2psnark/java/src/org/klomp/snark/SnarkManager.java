@@ -579,6 +579,44 @@ public class SnarkManager implements Snark.CompleteListener {
     }
     
     /**
+     * Add a torrent with the info hash alone (magnet / maggot)
+     *
+     * @param name hex or b32 name from the magnet link
+     * @param ih 20 byte info hash
+     * @since 0.8.4
+     */
+    public void addMagnet(String name, byte[] ih) {
+        Snark torrent = new Snark(_util, name, ih, this,
+                                  _peerCoordinatorSet, _connectionAcceptor,
+                                  false, getDataDir().getPath());
+
+        // TODO tell the dir monitor not to delete us
+        synchronized (_snarks) {
+            _snarks.put(name, torrent);
+        }
+        if (shouldAutoStart()) {
+            torrent.startTorrent();
+            addMessage(_("Fetching {0}", name));
+            boolean haveSavedPeers = false;
+            if ((!util().connected()) && !haveSavedPeers) {
+                addMessage(_("We have no saved peers and no other torrents are running. " +
+                             "Fetch of {0} will not succeed until you start another torrent.", name));
+            }
+        } else {
+            addMessage(_("Adding {0}", name));
+      }
+    }
+
+    /**
+     * Delete a torrent with the info hash alone (magnet / maggot)
+     *
+     * @param ih 20 byte info hash
+     * @since 0.8.4
+     */
+    public void deleteMagnet(byte[] ih) {
+    }
+
+    /**
      * Get the timestamp for a torrent from the config file
      */
     public long getSavedTorrentTime(Snark snark) {

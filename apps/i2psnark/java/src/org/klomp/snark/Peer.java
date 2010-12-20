@@ -39,6 +39,7 @@ public class Peer implements Comparable
   private final PeerID peerID;
 
   private final byte[] my_id;
+  private final byte[] infohash;
   final MetaInfo metainfo;
 
   // The data in/output streams set during the handshake and used by
@@ -70,11 +71,13 @@ public class Peer implements Comparable
    * Outgoing connection.
    * Creates a disconnected peer given a PeerID, your own id and the
    * relevant MetaInfo.
+   * @param metainfo null if in magnet mode
    */
-  public Peer(PeerID peerID, byte[] my_id, MetaInfo metainfo)
+  public Peer(PeerID peerID, byte[] my_id, byte[] infohash, MetaInfo metainfo)
   {
     this.peerID = peerID;
     this.my_id = my_id;
+    this.infohash = infohash;
     this.metainfo = metainfo;
     _id = ++__id;
     //_log.debug("Creating a new peer with " + peerID.getAddress().calculateHash().toBase64(), new Exception("creating"));
@@ -88,12 +91,14 @@ public class Peer implements Comparable
    * get the remote peer id. To completely start the connection call
    * the connect() method.
    *
+   * @param metainfo null if in magnet mode
    * @exception IOException when an error occurred during the handshake.
    */
-  public Peer(final I2PSocket sock, InputStream in, OutputStream out, byte[] my_id, MetaInfo metainfo)
+  public Peer(final I2PSocket sock, InputStream in, OutputStream out, byte[] my_id, byte[] infohash, MetaInfo metainfo)
     throws IOException
   {
     this.my_id = my_id;
+    this.infohash = infohash;
     this.metainfo = metainfo;
     this.sock = sock;
 
@@ -312,8 +317,7 @@ public class Peer implements Comparable
     // FIXME not if DHT disabled
     dout.writeLong(OPTION_EXTENSION | OPTION_DHT);
     // Handshake write - metainfo hash
-    byte[] shared_hash = metainfo.getInfoHash();
-    dout.write(shared_hash);
+    dout.write(infohash);
     // Handshake write - peer id
     dout.write(my_id);
     dout.flush();
@@ -341,7 +345,7 @@ public class Peer implements Comparable
     // Handshake read - metainfo hash
     bs = new byte[20];
     din.readFully(bs);
-    if (!Arrays.equals(shared_hash, bs))
+    if (!Arrays.equals(infohash, bs))
       throw new IOException("Unexpected MetaInfo hash");
 
     // Handshake read - peer id

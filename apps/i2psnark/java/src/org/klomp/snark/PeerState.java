@@ -71,6 +71,9 @@ class PeerState implements DataLoader
   public final static int PARTSIZE = 16*1024; // outbound request
   private final static int MAX_PARTSIZE = 64*1024; // Don't let anybody request more than this
 
+  /**
+   * @param metainfo null if in magnet mode
+   */
   PeerState(Peer peer, PeerListener listener, MetaInfo metainfo,
             PeerConnectionIn in, PeerConnectionOut out)
   {
@@ -132,6 +135,9 @@ class PeerState implements DataLoader
   {
     if (_log.shouldLog(Log.DEBUG))
       _log.debug(peer + " rcv have(" + piece + ")");
+    // FIXME we will lose these until we get the metainfo
+    if (metainfo == null)
+        return;
     // Sanity check
     if (piece < 0 || piece >= metainfo.getPieces())
       {
@@ -169,8 +175,15 @@ class PeerState implements DataLoader
           }
         
         // XXX - Check for weird bitfield and disconnect?
-        bitfield = new BitField(bitmap, metainfo.getPieces());
+        // FIXME will have to regenerate the bitfield after we know exactly
+        // how many pieces there are, as we don't know how many spare bits there are.
+        if (metainfo == null)
+            bitfield = new BitField(bitmap, bitmap.length * 8);
+        else
+            bitfield = new BitField(bitmap, metainfo.getPieces());
       }
+    if (metainfo == null)
+        return;
     boolean interest = listener.gotBitField(peer, bitfield);
     setInteresting(interest);
     if (bitfield.complete() && !interest) {
@@ -188,6 +201,8 @@ class PeerState implements DataLoader
     if (_log.shouldLog(Log.DEBUG))
       _log.debug(peer + " rcv request("
                   + piece + ", " + begin + ", " + length + ") ");
+    if (metainfo == null)
+        return;
     if (choking)
       {
         if (_log.shouldLog(Log.INFO))
@@ -605,6 +620,8 @@ class PeerState implements DataLoader
   {
     // no bitfield yet? nothing to request then.
     if (bitfield == null)
+        return;
+    if (metainfo == null)
         return;
     boolean more_pieces = true;
     while (more_pieces)
