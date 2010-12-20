@@ -244,8 +244,9 @@ class PeerCheckerTask extends TimerTask
 	coordinator.setRateHistory(uploaded, downloaded);
 
         // close out unused files, but we don't need to do it every time
-        if (random.nextInt(4) == 0)
-            coordinator.getStorage().cleanRAFs();
-
+        Storage storage = coordinator.getStorage();
+        if (storage != null && random.nextInt(4) == 0) {
+                storage.cleanRAFs();
+        }
   }
 }
