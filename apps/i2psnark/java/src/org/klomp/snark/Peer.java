@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.i2p.client.streaming.I2PSocket;
+import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
 public class Peer implements Comparable
@@ -352,6 +353,9 @@ public class Peer implements Comparable
     din.readFully(bs);
     if (_log.shouldLog(Log.DEBUG))
         _log.debug("Read the remote side's hash and peerID fully from " + toString());
+
+    if (DataHelper.eq(my_id, bs))
+        throw new IOException("Connected to myself");
 
     if (options != 0) {
         // send them something in runConnection() above

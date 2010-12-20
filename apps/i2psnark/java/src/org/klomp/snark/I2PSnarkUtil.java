@@ -227,6 +227,8 @@ public class I2PSnarkUtil {
         Destination addr = peer.getAddress();
         if (addr == null)
             throw new IOException("Null address");
+        if (addr.equals(getMyDestination()))
+            throw new IOException("Attempt to connect to myself");
         Hash dest = addr.calculateHash();
         if (_shitlist.contains(dest))
             throw new IOException("Not trying to contact " + dest.toBase64() + ", as they are shitlisted");
@@ -300,15 +302,23 @@ public class I2PSnarkUtil {
     }
     
     String getOurIPString() {
-        if (_manager == null)
-            return "unknown";
-        I2PSession sess = _manager.getSession();
-        if (sess != null) {
-            Destination dest = sess.getMyDestination();
-            if (dest != null)
-                return dest.toBase64();
-        }
+        Destination dest = getMyDestination();
+        if (dest != null)
+            return dest.toBase64();
         return "unknown";
+    }
+
+    /**
+     *  @return dest or null
+     *  @since 0.8.4
+     */
+    Destination getMyDestination() {
+        if (_manager == null)
+            return null;
+        I2PSession sess = _manager.getSession();
+        if (sess != null)
+            return sess.getMyDestination();
+        return null;
     }
 
     /** Base64 only - static (no naming service) */
