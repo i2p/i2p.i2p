@@ -531,6 +531,7 @@ public class Snark
             // single torrent
             acceptor = new ConnectionAcceptor(_util, serversocket, new PeerAcceptor(coordinator));
         }
+        // TODO pass saved closest DHT nodes to the tracker? or direct to the coordinator?
         trackerclient = new TrackerClient(_util, meta, coordinator, this);
     }
 
@@ -781,8 +782,11 @@ public class Snark
     public long getNeeded() {
         if (storage != null)
             return storage.needed();
-        // FIXME else return metainfo length if available
-        return -1;
+        if (meta != null)
+            // FIXME subtract chunks we have
+            return meta.getTotalLength();
+        // FIXME fake
+        return 16 * 16 * 1024;
     }
 
     /**

@@ -126,10 +126,9 @@ public class TrackerClient extends I2PAppThread
     @Override
   public void run()
   {
-    String infoHash = urlencode(meta.getInfoHash());
+    String infoHash = urlencode(snark.getInfoHash());
     String peerID = urlencode(snark.getID());
 
-    _log.debug("Announce: [" + meta.getAnnounce() + "] infoHash: " + infoHash);
 
     // Construct the list of trackers for this torrent,
     // starting with the primary one listed in the metainfo,
@@ -138,12 +137,18 @@ public class TrackerClient extends I2PAppThread
     // the primary tracker, that we don't add it twice.
     // todo: check for b32 matches as well
     trackers = new ArrayList(2);
-    String primary = meta.getAnnounce();
-    if (isValidAnnounce(primary)) {
-        trackers.add(new Tracker(meta.getAnnounce(), true));
+    String primary;
+    if (meta != null) {
+        primary = meta.getAnnounce();
+        if (isValidAnnounce(primary)) {
+            trackers.add(new Tracker(meta.getAnnounce(), true));
+        } else {
+            _log.warn("Skipping invalid or non-i2p announce: " + primary);
+        }
     } else {
-        _log.warn("Skipping invalid or non-i2p announce: " + primary);
+        primary = "";
     }
+    _log.debug("Announce: [" + primary + "] infoHash: " + infoHash);
     List tlist = _util.getOpenTrackers();
     if (tlist != null) {
         for (int i = 0; i < tlist.size(); i++) {

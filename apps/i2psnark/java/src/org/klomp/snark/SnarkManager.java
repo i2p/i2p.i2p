@@ -20,6 +20,7 @@ import java.util.Collection;
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
+import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
@@ -34,6 +35,8 @@ public class SnarkManager implements Snark.CompleteListener {
     
     /** map of (canonical) filename of the .torrent file to Snark instance (unsynchronized) */
     private final Map<String, Snark> _snarks;
+    /** used to prevent DirMonitor from deleting torrents that don't have a torrent file yet */
+    private final Set<String> _magnets;
     private final Object _addSnarkLock;
     private /* FIXME final FIXME */ File _configFile;
     private Properties _config;
@@ -72,6 +75,7 @@ public class SnarkManager implements Snark.CompleteListener {
     public static final int DEFAULT_STARTUP_DELAY = 3; 
     private SnarkManager() {
         _snarks = new HashMap();
+        _magnets = new ConcurrentHashSet();
         _addSnarkLock = new Object();
         _context = I2PAppContext.getGlobalContext();
         _log = _context.logManager().getLog(SnarkManager.class);
@@ -90,8 +94,6 @@ public class SnarkManager implements Snark.CompleteListener {
         _running = true;
         _peerCoordinatorSet = new PeerCoordinatorSet();
         _connectionAcceptor = new ConnectionAcceptor(_util);
-        int minutes = getStartupDelayMinutes();
-        _messages.add(_("Adding torrents in {0} minutes", minutes));
         _monitor = new I2PAppThread(new DirMonitor(), "Snark DirMonitor", true);
         _monitor.start();
         _context.addShutdownTask(new SnarkManagerShutdown());
@@ -321,7 +323,7 @@ public class SnarkManager implements Snark.CompleteListener {
                 	    _util.setStartupDelay(minutes);
 	                    changed = true;
         	            _config.setProperty(PROP_STARTUP_DELAY, "" + minutes);
-                	    addMessage(_("Startup delay limit changed to {0} minutes", minutes));
+                	    addMessage(_("Startup delay changed to {0}", DataHelper.formatDuration2(minutes * 60 * 1000)));
                 	}
 
 	}
@@ -549,6 +551,7 @@ public class SnarkManager implements Snark.CompleteListener {
                         addMessage(rejectMessage);
                         return;
                     } else {
+                        // TODO load saved closest DHT nodes and pass to the Snark ?
                         torrent = new Snark(_util, filename, null, -1, null, null, this,
                                             _peerCoordinatorSet, _connectionAcceptor,
                                             false, dataDir.getPath());
@@ -583,6 +586,7 @@ public class SnarkManager implements Snark.CompleteListener {
      *
      * @param name hex or b32 name from the magnet link
      * @param ih 20 byte info hash
+     * @throws RuntimeException via Snark.fatal()
      * @since 0.8.4
      */
     public void addMagnet(String name, byte[] ih) {
@@ -590,7 +594,8 @@ public class SnarkManager implements Snark.CompleteListener {
                                   _peerCoordinatorSet, _connectionAcceptor,
                                   false, getDataDir().getPath());
 
-        // TODO tell the dir monitor not to delete us
+        // Tell the dir monitor not to delete us
+        _magnets.add(name);
         synchronized (_snarks) {
             _snarks.put(name, torrent);
         }
@@ -608,12 +613,17 @@ public class SnarkManager implements Snark.CompleteListener {
     }
 
     /**
-     * Delete a torrent with the info hash alone (magnet / maggot)
+     * Stop and delete a torrent running in magnet mode
      *
-     * @param ih 20 byte info hash
+     * @param snark a torrent with a fake file name ("Magnet xxxx")
      * @since 0.8.4
      */
-    public void deleteMagnet(byte[] ih) {
+    public void deleteMagnet(Snark snark) {
+        synchronized (_snarks) {
+            _snarks.remove(snark.getName());
+        }
+        snark.stopTorrent();
+        _magnets.remove(snark.getName());
     }
 
     /**
@@ -748,6 +758,8 @@ public class SnarkManager implements Snark.CompleteListener {
             _config.remove(prop);
         }
 
+        // TODO save closest DHT nodes too
+
         saveConfig();
     }
     
@@ -828,6 +840,23 @@ public class SnarkManager implements Snark.CompleteListener {
         }
         return torrent;
     }
+
+    /**
+     * Stop the torrent, leaving it on the list of torrents unless told to remove it
+     * @since 0.8.4
+     */
+    public void stopTorrent(Snark torrent, boolean shouldRemove) {
+        if (shouldRemove) {
+            synchronized (_snarks) {
+                _snarks.remove(torrent.getName());
+            }
+        }
+        boolean wasStopped = torrent.isStopped();
+        torrent.stopTorrent();
+        if (!wasStopped)
+            addMessage(_("Torrent stopped: \"{0}\"", torrent.getBaseName()));
+    }
+
     /**
      * Stop the torrent and delete the torrent file itself, but leaving the data
      * behind.
@@ -846,11 +875,16 @@ public class SnarkManager implements Snark.CompleteListener {
     
     private class DirMonitor implements Runnable {
         public void run() {
-            try { Thread.sleep(60*1000*getStartupDelayMinutes()); } catch (InterruptedException ie) {}
-            // the first message was a "We are starting up in 1m" 
-            synchronized (_messages) { 
-                if (_messages.size() == 1)
-                    _messages.remove(0);
+            // don't bother delaying if auto start is false
+            long delay = 60 * 1000 * getStartupDelayMinutes();
+            if (delay > 0 && shouldAutoStart()) {
+                _messages.add(_("Adding torrents in {0}", DataHelper.formatDuration2(delay)));
+                try { Thread.sleep(delay); } catch (InterruptedException ie) {}
+                // the first message was a "We are starting up in 1m" 
+                synchronized (_messages) { 
+                    if (_messages.size() == 1)
+                        _messages.remove(0);
+                }
             }
 
             // here because we need to delay until I2CP is up
@@ -922,6 +956,8 @@ public class SnarkManager implements Snark.CompleteListener {
                 }
             }
         }
+        // Don't remove magnet torrents that don't have a torrent file yet
+        existingNames.removeAll(_magnets);
         // now lets see which ones have been removed...
         for (Iterator iter = existingNames.iterator(); iter.hasNext(); ) {
             String name = (String)iter.next();
@@ -975,12 +1011,12 @@ public class SnarkManager implements Snark.CompleteListener {
     
     /** comma delimited list of name=announceURL=baseURL for the trackers to be displayed */
     public static final String PROP_TRACKERS = "i2psnark.trackers";
-    private static Map trackerMap = null;
+    private static Map<String, String> trackerMap = null;
     /** sorted map of name to announceURL=baseURL */
-    public Map getTrackers() { 
+    public Map<String, String> getTrackers() { 
         if (trackerMap != null) // only do this once, can't be updated while running
             return trackerMap;
-        Map rv = new TreeMap();
+        Map<String, String> rv = new TreeMap();
         String trackers = _config.getProperty(PROP_TRACKERS);
         if ( (trackers == null) || (trackers.trim().length() <= 0) )
             trackers = _context.getProperty(PROP_TRACKERS);
