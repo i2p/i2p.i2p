@@ -3,7 +3,7 @@ HIGH PRIORITY:
 - Correct logging system - DONE
 - Internationalisation:
     * Add strings - DONE
-    * Add Windows support
+    * Add Windows support - NEED TO CHECK
     * Might need some kind of trigger to reload the menu (for live language switching)
     * Language choice is not actually set as a parameter in I2P config?
         As a result, desktopgui always starts with the default, unless you manually set the language.

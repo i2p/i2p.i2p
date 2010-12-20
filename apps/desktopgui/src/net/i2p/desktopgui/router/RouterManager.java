@@ -2,6 +2,7 @@ package net.i2p.desktopgui.router;
 
 import java.io.IOException;
 
+import net.i2p.I2PAppContext;
 import net.i2p.desktopgui.i18n.DesktopguiTranslator;
 import net.i2p.desktopgui.util.ConfigurationManager;
 import net.i2p.router.Router;
@@ -31,14 +32,11 @@ public class RouterManager {
 	 */
 	public static void start() {
 		try {
-			//TODO: detect I2P directory
 			//TODO: set/get PID
 			String separator = System.getProperty("file.separator");
-			String homeDirectory = System.getProperty("user.home");
-			String location = ConfigurationManager.getInstance()
-				.getStringConfiguration("I2PLocation", homeDirectory + separator + "i2p");
+			String location = I2PAppContext.getCurrentContext().getBaseDir().getAbsolutePath();
 			
-			Runtime.getRuntime().exec(location + separator + "i2psvc" + location + separator + "wrapper.config");
+			Runtime.getRuntime().exec(location + separator + "i2psvc " + location + separator + "wrapper.config");
 		} catch (IOException e) {
 			log.log(Log.WARN, "Failed to start I2P", e);
 		}
