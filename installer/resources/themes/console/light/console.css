@@ -368,6 +368,10 @@ div.news p {
      padding: 0 15px;
 }
 
+div.news h3 {
+     text-align: left !important;
+}
+
 /*
 div.news a:link{
      color: #a30;
@@ -768,7 +772,6 @@ h2 {
      margin: 15px 0px 15px 0 !important;
      -moz-box-shadow: 0 1px 1px 1px rgba(176, 176, 216, 0.4);
      word-wrap: break-word;
-     text-transform: uppercase;
      opacity: 1;
 }
 
@@ -791,8 +794,6 @@ h3 {
      -moz-border-radius: 0 4px 4px 0;
      -khtml-border-radius: 0 4px 4px 0;
      background: #ffe url('images/header.png') center center repeat-x !important;
-     text-transform: uppercase;
-     text-shadow: 0px 0px 1px #77f;
      font-size: 11pt;
      color: #000;
      -moz-box-shadow: 0 1px 1px 1px rgba(176, 176, 216, 0.4);
@@ -865,7 +866,7 @@ button:active{
 }
 
 .langbox img {
-     opacity: 0.7 !important;
+     opacity: 0.8 !important;
      -moz-box-shadow: 0 0 1px #447;
 }
 

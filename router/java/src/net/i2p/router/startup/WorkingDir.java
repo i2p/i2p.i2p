@@ -150,7 +150,7 @@ public class WorkingDir {
         success &= migrateJettyXml(oldDirf, dirf);
         success &= migrateClientsConfig(oldDirf, dirf);
         // for later news.xml updates (we don't copy initialNews.xml over anymore)
-        success &= (new SecureDirectory(dirf, "docs")) .mkdir();
+        success &= (new SecureDirectory(dirf, "docs")).mkdir();
 
         // Report success or failure
         if (success) {

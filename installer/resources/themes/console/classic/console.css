@@ -407,6 +407,10 @@ div.news li {
      text-transform: capitalize;
 }
 
+div.news h3 {
+     text-align: left !important;
+}
+
 div.news p {
      color: #330;
      font-size: 9pt;
