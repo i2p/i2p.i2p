@@ -59,6 +59,7 @@ public class I2PSnarkServlet extends Default {
     private Resource _resourceBase;
     private String _themePath;
     private String _imgPath;
+    private String _lastAnnounceURL = "";
     
     public static final String PROP_CONFIG_FILE = "i2psnark.configFile";
     /** BEP 9 */
@@ -605,23 +606,23 @@ public class I2PSnarkServlet extends Default {
                 if (announceURL == null || announceURL.length() <= 0)
                     _manager.addMessage(_("Error creating torrent - you must select a tracker"));
                 else if (baseFile.exists()) {
+                    _lastAnnounceURL = announceURL;
+                    if (announceURL.equals("none"))
+                        announceURL = null;
                     try {
+                        // This may take a long time to check the storage, but since it already exists,
+                        // it shouldn't be THAT bad, so keep it in this thread.
                         Storage s = new Storage(_manager.util(), baseFile, announceURL, null);
                         s.create();
                         s.close(); // close the files... maybe need a way to pass this Storage to addTorrent rather than starting over
                         MetaInfo info = s.getMetaInfo();
-                        File torrentFile = new File(baseFile.getParent(), baseFile.getName() + ".torrent");
-                        if (torrentFile.exists())
-                            throw new IOException("Cannot overwrite an existing .torrent file: " + torrentFile.getPath());
-                        _manager.saveTorrentStatus(info, s.getBitField(), null); // so addTorrent won't recheck
-                        // DirMonitor could grab this first, maybe hold _snarks lock?
-                        FileOutputStream out = new FileOutputStream(torrentFile);
-                        out.write(info.getTorrentData());
-                        out.close();
+                        File torrentFile = new File(_manager.getDataDir(), s.getBaseName() + ".torrent");
+                        // FIXME is the storage going to stay around thanks to the info reference?
+                        // now add it, but don't automatically start it
+                        _manager.addTorrent(info, s.getBitField(), torrentFile.getAbsolutePath(), true);
                         _manager.addMessage(_("Torrent created for \"{0}\"", baseFile.getName()) + ": " + torrentFile.getAbsolutePath());
-                        // now fire it up, but don't automatically seed it
-                        _manager.addTorrent(torrentFile.getCanonicalPath(), true);
-                        _manager.addMessage(_("Many I2P trackers require you to register new torrents before seeding - please do so before starting \"{0}\"", baseFile.getName()));
+                        if (announceURL != null)
+                            _manager.addMessage(_("Many I2P trackers require you to register new torrents before seeding - please do so before starting \"{0}\"", baseFile.getName()));
                     } catch (IOException ioe) {
                         _manager.addMessage(_("Error creating a torrent for \"{0}\"", baseFile.getAbsolutePath()) + ": " + ioe.getMessage());
                     }
@@ -1165,6 +1166,10 @@ public class I2PSnarkServlet extends Default {
         out.write(":<td><select name=\"announceURL\"><option value=\"\">");
         out.write(_("Select a tracker"));
         out.write("</option>\n");
+        // todo remember this one with _lastAnnounceURL also
+        out.write("<option value=\"none\">");
+        out.write(_("Open trackers and DHT only"));
+        out.write("</option>\n");
         Map trackers = _manager.getTrackers();
         for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
             Map.Entry entry = (Map.Entry)iter.next();
@@ -1173,6 +1178,8 @@ public class I2PSnarkServlet extends Default {
             int e = announceURL.indexOf('=');
             if (e > 0)
                 announceURL = announceURL.substring(0, e);
+            if (announceURL.equals(_lastAnnounceURL))
+                announceURL += "\" selected=\"selected";
             out.write("\t<option value=\"" + announceURL + "\">" + name + "</option>\n");
         }
         out.write("</select>\n");
@@ -1801,15 +1808,18 @@ private static class FetchAndAdd implements Runnable {
                 FileInputStream in = null;
                 try {
                     in = new FileInputStream(file);
+                    // we do not retain this MetaInfo object, hopefully it will go away quickly
                     MetaInfo info = new MetaInfo(in);
-                    String name = info.getName();
-                    name = DataHelper.stripHTML(name);  // XSS
-                    name = name.replace('/', '_');
-                    name = name.replace('\\', '_');
-                    name = name.replace('&', '+');
-                    name = name.replace('\'', '_');
-                    name = name.replace('"', '_');
-                    name = name.replace('`', '_');
+                    try { in.close(); } catch (IOException ioe) {}
+                    Snark snark = _manager.getTorrentByInfoHash(info.getInfoHash());
+                    if (snark != null) {
+                        _manager.addMessage(_("Torrent with this info hash is already running: {0}", snark.getBaseName()));
+                        return;
+                    }
+
+                    // don't hold object from this MetaInfo
+                    String name = new String(info.getName());
+                    name = Storage.filterName(name);
                     name = name + ".torrent";
                     File torrentFile = new File(_manager.getDataDir(), name);
 
@@ -1821,18 +1831,13 @@ private static class FetchAndAdd implements Runnable {
                         else
                             _manager.addMessage(_("Torrent already in the queue: {0}", name));
                     } else {
-                        boolean success = FileUtil.copy(file.getAbsolutePath(), canonical, false);
-                        if (success) {
-                            SecureFileOutputStream.setPerms(torrentFile);
-                            _manager.addTorrent(canonical);
-                        } else {
-                            _manager.addMessage(_("Failed to copy torrent file to {0}", canonical));
-                        }
+                        // This may take a LONG time to create the storage.
+                        _manager.copyAndAddTorrent(file, canonical);
                     }
                 } catch (IOException ioe) {
                     _manager.addMessage(_("Torrent at {0} was not valid", urlify(_url)) + ": " + ioe.getMessage());
                 } finally {
-                    try { in.close(); } catch (IOException ioe) {}
+                    try { if (in != null) in.close(); } catch (IOException ioe) {}
                 }
             } else {
                 _manager.addMessage(_("Torrent was not retrieved from {0}", urlify(_url)));

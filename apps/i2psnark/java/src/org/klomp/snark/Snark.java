@@ -1084,6 +1084,16 @@ public class Snark
   public interface CompleteListener {
     public void torrentComplete(Snark snark);
     public void updateStatus(Snark snark);
+
+    /**
+     * We transitioned from magnet mode, we have now initialized our
+     * metainfo and storage. The listener should now call getMetaInfo()
+     * and save the data to disk.
+     *
+     * @since 0.8.4
+     */
+    public void gotMetaInfo(Snark snark);
+
     // not really listeners but the easiest way to get back to an optional SnarkManager
     public long getSavedTorrentTime(Snark snark);
     public BitField getSavedTorrentBitField(Snark snark);

@@ -87,6 +87,9 @@ public class Storage
    * Creates a storage from the existing file or directory together
    * with an appropriate MetaInfo file as can be announced on the
    * given announce String location.
+   *
+   * @param announce may be null
+   * @param listener may be null
    */
   public Storage(I2PSnarkUtil util, File baseFile, String announce, StorageListener listener)
     throws IOException
@@ -590,7 +593,7 @@ public class Storage
    * Removes 'suspicious' characters from the given file name.
    * http://msdn.microsoft.com/en-us/library/aa365247%28VS.85%29.aspx
    */
-  private static String filterName(String name)
+  public static String filterName(String name)
   {
     if (name.equals(".") || name.equals(" "))
         return "_";

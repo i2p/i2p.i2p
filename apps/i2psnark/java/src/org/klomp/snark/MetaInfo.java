@@ -64,6 +64,8 @@ public class MetaInfo
 
   /**
    *  Called by Storage when creating a new torrent from local data
+   *
+   *  @param announce may be null
    */
   MetaInfo(String announce, String name, String name_utf8, List files, List lengths,
            int piece_length, byte[] piece_hashes, long length)
@@ -86,6 +88,7 @@ public class MetaInfo
    * Creates a new MetaInfo from the given InputStream.  The
    * InputStream must start with a correctly bencoded dictonary
    * describing the torrent.
+   * Caller must close the stream.
    */
   public MetaInfo(InputStream in) throws IOException
   {
@@ -107,7 +110,9 @@ public class MetaInfo
    * the original bencoded info dictonary (this is a hack, we could
    * reconstruct the bencoded stream and recalculate the hash). Will
    * NOT throw a InvalidBEncodingException if the given map does not
-   * contain a valid announce string or info dictonary.
+   * contain a valid announce string.
+   * WILL throw a InvalidBEncodingException if the given map does not
+   * contain a valid info dictionary.
    */
   public MetaInfo(Map m) throws InvalidBEncodingException
   {
@@ -401,7 +406,8 @@ public class MetaInfo
   public synchronized byte[] getTorrentData()
   {
         Map m = new HashMap();
-        m.put("announce", announce);
+        if (announce != null)
+            m.put("announce", announce);
         Map info = createInfoMap();
         m.put("info", info);
         // don't save this locally, we should only do this once
