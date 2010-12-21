@@ -78,6 +78,9 @@ button {
 
 textarea {
      border: 1px solid #9999ff;
+     color: #001;
+     background: #ddf;
+     border: 1px solid #44d;
 }
 
 br {
