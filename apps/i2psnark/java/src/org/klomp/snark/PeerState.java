@@ -497,7 +497,19 @@ class PeerState implements DataLoader
   /** @since 0.8.2 */
   void extensionMessage(int id, byte[] bs)
   {
+      ExtensionHandler.handleMessage(peer, id, bs);
+      // Peer coord will get metadata from MagnetState,
+      // verify, and then call gotMetaInfo()
       listener.gotExtension(peer, id, bs);
+  }
+
+  /**
+   *  Switch from magnet mode to normal mode
+   *  @since 0.8.4
+   */
+  public void gotMetaInfo(MetaInfo meta) {
+      // set metainfo
+      // fix bitfield
   }
 
   /** @since 0.8.4 */

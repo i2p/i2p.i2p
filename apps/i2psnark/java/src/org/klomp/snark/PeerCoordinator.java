@@ -105,6 +105,7 @@ public class PeerCoordinator implements PeerListener
 
   private boolean halted = false;
 
+  private final MagnetState magnetState;
   private final CoordinatorListener listener;
   private final I2PSnarkUtil _util;
   private static final Random _random = I2PAppContext.getGlobalContext().random();
@@ -128,6 +129,7 @@ public class PeerCoordinator implements PeerListener
     setWantedPieces();
     partialPieces = new ArrayList(getMaxConnections() + 1);
     peers = new LinkedBlockingQueue();
+    magnetState = new MagnetState(infohash, metainfo);
 
     // Install a timer to check the uploaders.
     // Randomize the first start time so multiple tasks are spread out,
@@ -484,7 +486,7 @@ public class PeerCoordinator implements PeerListener
           {
             public void run()
             {
-              peer.runConnection(_util, listener, bitfield);
+              peer.runConnection(_util, listener, bitfield, magnetState);
             }
           };
         String threadName = "Snark peer " + peer.toString();
@@ -1149,10 +1151,30 @@ public class PeerCoordinator implements PeerListener
   }
 
   /** @since 0.8.4 */
-  public void gotExtension(Peer peer, int id, byte[] bs) {}
+  public void gotExtension(Peer peer, int id, byte[] bs) {
+      if (_log.shouldLog(Log.DEBUG))
+          _log.debug("Got extension message " + id + " from " + peer);
+      // basic handling done in PeerState... here we just check if we are done
+      if (metainfo == null && id == ExtensionHandler.ID_METADATA) {
+          synchronized (magnetState) {
+              if (magnetState.isComplete()) {
+                  if (_log.shouldLog(Log.WARN))
+                      _log.warn("Got completed metainfo via extension");
+                  MetaInfo newinfo = magnetState.getMetaInfo();
+                  // more validation
+                  // set global
+                  // instantiate storage
+                  // tell Snark listener
+                  // tell all peers
+              }
+          }
+      }
+  }
 
   /** @since 0.8.4 */
-  public void gotPort(Peer peer, int port) {}
+  public void gotPort(Peer peer, int port) {
+      // send to DHT
+  }
 
   /** Return number of allowed uploaders for this torrent.
    ** Check with Snark to see if we are over the total upload limit.

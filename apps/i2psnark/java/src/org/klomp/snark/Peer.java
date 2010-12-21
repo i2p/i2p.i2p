@@ -28,10 +28,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
+
+import org.klomp.snark.bencode.BEValue;
 
 public class Peer implements Comparable
 {
@@ -41,7 +44,9 @@ public class Peer implements Comparable
 
   private final byte[] my_id;
   private final byte[] infohash;
-  final MetaInfo metainfo;
+  /** will start out null in magnet mode */
+  private MetaInfo metainfo;
+  private Map<String, BEValue> handshakeMap;
 
   // The data in/output streams set during the handshake and used by
   // the actual connections.
@@ -51,6 +56,9 @@ public class Peer implements Comparable
   // Keeps state for in/out connections.  Non-null when the handshake
   // was successful, the connection setup and runs
   PeerState state;
+
+  /** shared across all peers on this torrent */
+  MagnetState magnetState;
 
   private I2PSocket sock;
   
@@ -197,7 +205,7 @@ public class Peer implements Comparable
    * If the given BitField is non-null it is send to the peer as first
    * message.
    */
-  public void runConnection(I2PSnarkUtil util, PeerListener listener, BitField bitfield)
+  public void runConnection(I2PSnarkUtil util, PeerListener listener, BitField bitfield, MagnetState mState)
   {
     if (state != null)
       throw new IllegalStateException("Peer already started");
@@ -255,7 +263,7 @@ public class Peer implements Comparable
         if ((options & OPTION_EXTENSION) != 0) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Peer supports extensions, sending test message");
-            out.sendExtension(0, ExtensionHandshake.getPayload());
+            out.sendExtension(0, ExtensionHandler.getHandshake());
         }
 
         if ((options & OPTION_DHT) != 0 && util.getDHT() != null) {
@@ -271,6 +279,7 @@ public class Peer implements Comparable
     
         // We are up and running!
         state = s;
+        magnetState = mState;
         listener.connected(this);
   
         if (_log.shouldLog(Log.DEBUG))
@@ -369,6 +378,42 @@ public class Peer implements Comparable
   /** @since 0.8.4 */
   public long getOptions() {
       return options;
+  }
+
+  /**
+   *  Shared state across all peers, callers must sync on returned object
+   *  @return non-null
+   *  @since 0.8.4
+   */
+  public MagnetState getMagnetState() {
+      return magnetState;
+  }
+
+  /** @return could be null @since 0.8.4 */
+  public Map<String, BEValue> getHandshakeMap() {
+      return handshakeMap;
+  }
+
+  /** @since 0.8.4 */
+  public void setHandshakeMap(Map<String, BEValue> map) {
+      handshakeMap = map;
+  }
+
+  /** @since 0.8.4 */
+  public void sendExtension(int type, byte[] payload) {
+    PeerState s = state;
+    if (s != null)
+        s.out.sendExtension(type, payload);
+  }
+
+  /**
+   *  Switch from magnet mode to normal mode
+   *  @since 0.8.4
+   */
+  public void gotMetaInfo(MetaInfo meta) {
+    PeerState s = state;
+    if (s != null)
+        s.gotMetaInfo(meta);
   }
 
   public boolean isConnected()

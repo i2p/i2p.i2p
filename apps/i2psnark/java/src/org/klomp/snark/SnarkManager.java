@@ -594,9 +594,15 @@ public class SnarkManager implements Snark.CompleteListener {
                                   _peerCoordinatorSet, _connectionAcceptor,
                                   false, getDataDir().getPath());
 
-        // Tell the dir monitor not to delete us
-        _magnets.add(name);
         synchronized (_snarks) {
+            for (Snark snark : _snarks.values()) {
+                if (DataHelper.eq(ih, snark.getInfoHash())) {
+                    addMessage(_("Torrent already running: {0}", snark.getBaseName()));
+                    return;
+                }
+            }
+            // Tell the dir monitor not to delete us
+            _magnets.add(name);
             _snarks.put(name, torrent);
         }
         if (shouldAutoStart()) {

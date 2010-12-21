@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -59,10 +60,11 @@ public class MetaInfo
   private final int piece_length;
   private final byte[] piece_hashes;
   private final long length;
-  private final Map infoMap;
+  private Map infoMap;
 
-  private byte[] torrentdata;
-
+  /**
+   *  Called by Storage when creating a new torrent from local data
+   */
   MetaInfo(String announce, String name, String name_utf8, List files, List lengths,
            int piece_length, byte[] piece_hashes, long length)
   {
@@ -77,7 +79,7 @@ public class MetaInfo
     this.length = length;
 
     this.info_hash = calculateInfoHash();
-    infoMap = null;
+    //infoMap = null;
   }
 
   /**
@@ -104,7 +106,7 @@ public class MetaInfo
    * Creates a new MetaInfo from a Map of BEValues and the SHA1 over
    * the original bencoded info dictonary (this is a hack, we could
    * reconstruct the bencoded stream and recalculate the hash). Will
-   * throw a InvalidBEncodingException if the given map does not
+   * NOT throw a InvalidBEncodingException if the given map does not
    * contain a valid announce string or info dictonary.
    */
   public MetaInfo(Map m) throws InvalidBEncodingException
@@ -112,9 +114,13 @@ public class MetaInfo
     if (_log.shouldLog(Log.DEBUG))
         _log.debug("Creating a metaInfo: " + m, new Exception("source"));
     BEValue val = (BEValue)m.get("announce");
-    if (val == null)
-        throw new InvalidBEncodingException("Missing announce string");
-    this.announce = val.getString();
+    // Disabled check, we can get info from a magnet now
+    if (val == null) {
+        //throw new InvalidBEncodingException("Missing announce string");
+        this.announce = null;
+    } else {
+        this.announce = val.getString();
+    }
 
     val = (BEValue)m.get("info");
     if (val == null)
@@ -215,6 +221,7 @@ public class MetaInfo
 
   /**
    * Returns the string representing the URL of the tracker for this torrent.
+   * @return may be null!
    */
   public String getAnnounce()
   {
@@ -388,26 +395,34 @@ public class MetaInfo
                         piece_hashes, length);
   }
 
-  public byte[] getTorrentData()
+  /**
+   *  Called by servlet to save a new torrent file generated from local data
+   */
+  public synchronized byte[] getTorrentData()
   {
-    if (torrentdata == null)
-      {
         Map m = new HashMap();
         m.put("announce", announce);
         Map info = createInfoMap();
         m.put("info", info);
-        torrentdata = BEncoder.bencode(m);
-      }
-    return torrentdata;
+        // don't save this locally, we should only do this once
+        return BEncoder.bencode(m);
   }
 
-  private Map createInfoMap()
+  /** @since 0.8.4 */
+  public synchronized byte[] getInfoBytes() {
+    if (infoMap == null)
+        createInfoMap();
+    return BEncoder.bencode(infoMap);
+  }
+
+  /** @return an unmodifiable view of the Map */
+  private Map<String, BEValue> createInfoMap()
   {
+    // if we loaded this metainfo from a file, we have the map
+    if (infoMap != null)
+        return Collections.unmodifiableMap(infoMap);
+    // otherwise we must create it
     Map info = new HashMap();
-    if (infoMap != null) {
-        info.putAll(infoMap);
-        return info;
-    }
     info.put("name", name);
     if (name_utf8 != null)
         info.put("name.utf-8", name_utf8);
@@ -429,7 +444,8 @@ public class MetaInfo
           }
         info.put("files", l);
       }
-    return info;
+    infoMap = info;
+    return Collections.unmodifiableMap(infoMap);
   }
 
   private byte[] calculateInfoHash()
