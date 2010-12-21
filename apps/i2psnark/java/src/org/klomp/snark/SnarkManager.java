@@ -573,9 +573,11 @@ public class SnarkManager implements Snark.CompleteListener {
                     
                     if (!TrackerClient.isValidAnnounce(info.getAnnounce())) {
                         if (_util.shouldUseOpenTrackers() && _util.getOpenTrackers() != null) {
-                            addMessage(_("Warning - Ignoring non-i2p tracker in \"{0}\", will announce to i2p open trackers only", info.getName()));
+                            addMessage(_("Warning - No I2P trackers in \"{0}\", will announce to I2P open trackers and DHT only.", info.getName()));
+                        } else if (_util.getDHT() != null) {
+                            addMessage(_("Warning - No I2P trackers in \"{0}\", and open trackers are disabled, will announce to DHT only.", info.getName()));
                         } else {
-                            addMessage(_("Warning - Ignoring non-i2p tracker in \"{0}\", and open trackers are disabled, you must enable open trackers before starting the torrent!", info.getName()));
+                            addMessage(_("Warning - No I2P trackers in \"{0}\", and DHT and open trackers are disabled, you should enable open trackers or DHT before starting the torrent.", info.getName()));
                             dontAutoStart = true;
                         }
                     }

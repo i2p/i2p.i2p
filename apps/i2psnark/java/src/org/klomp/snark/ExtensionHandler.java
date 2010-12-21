@@ -26,7 +26,8 @@ abstract class ExtensionHandler {
 
     public static final int ID_METADATA = 3;
     private static final String TYPE_METADATA = "ut_metadata";
-    private static final int MAX_METADATA_SIZE = Storage.MAX_PIECES * 32 * 5 / 4;
+    /** Pieces * SHA1 Hash length, + 25% extra for file names, benconding overhead, etc */
+    private static final int MAX_METADATA_SIZE = Storage.MAX_PIECES * 20 * 5 / 4;
     private static final int PARALLEL_REQUESTS = 3;
 
 
@@ -49,16 +50,16 @@ abstract class ExtensionHandler {
         return BEncoder.bencode(handshake);
     }
 
-    public static void handleMessage(Peer peer, int id, byte[] bs) {
+    public static void handleMessage(Peer peer, PeerListener listener, int id, byte[] bs) {
         if (id == 0)
-            handleHandshake(peer, bs);
+            handleHandshake(peer, listener, bs);
         else if (id == ID_METADATA)
-            handleMetadata(peer, bs);
+            handleMetadata(peer, listener, bs);
         else if (_log.shouldLog(Log.INFO))
             _log.info("Unknown extension msg " + id + " from " + peer);
     }
 
-    private static void handleHandshake(Peer peer, byte[] bs) {
+    private static void handleHandshake(Peer peer, PeerListener listener, byte[] bs) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Got handshake msg from " + peer);
         try {
@@ -67,11 +68,11 @@ abstract class ExtensionHandler {
             BDecoder dec = new BDecoder(is);
             BEValue bev = dec.bdecodeMap();
             Map<String, BEValue> map = bev.getMap();
-            Map<String, BEValue> msgmap = map.get("m").getMap();
             peer.setHandshakeMap(map);
+            Map<String, BEValue> msgmap = map.get("m").getMap();
 
-            // not used, just to throw out of here
-            int hisMsgCode = peer.getHandshakeMap().get("m").getMap().get(TYPE_METADATA).getInt();
+            // rv not used, just to throw an NPE to get out of here
+            msgmap.get(TYPE_METADATA).getInt();
 
             int metaSize = map.get("metadata_size").getInt();
             MagnetState state = peer.getMagnetState();
@@ -121,13 +122,12 @@ abstract class ExtensionHandler {
     private static final int TYPE_REJECT = 2;
 
     private static final int CHUNK_SIZE = 16*1024;
-    /** 25% extra for file names, benconding overhead, etc */
 
     /**
      * REF: BEP 9
      * @since 0.8.4
      */
-    private static void handleMetadata(Peer peer, byte[] bs) {
+    private static void handleMetadata(Peer peer, PeerListener listener, byte[] bs) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Got metadata msg from " + peer);
         try {
@@ -145,6 +145,9 @@ abstract class ExtensionHandler {
                     pc = state.getChunk(piece);
                 }
                 sendPiece(peer, piece, pc);
+                // Do this here because PeerConnectionOut only reports for PIECE messages
+                peer.uploaded(pc.length);
+                listener.uploaded(peer, pc.length);
             } else if (type == TYPE_DATA) {
                 int size = map.get("total_size").getInt();
                 boolean done;
@@ -153,6 +156,8 @@ abstract class ExtensionHandler {
                     if (state.isComplete())
                         return;
                     int len = is.available();
+                    peer.downloaded(len);
+                    listener.downloaded(peer, len);
                     done = state.saveChunk(piece, bs, bs.length - len, len);
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Got chunk " + piece + " from " + peer);
@@ -189,8 +194,17 @@ abstract class ExtensionHandler {
     }
 
     private static void sendRequest(Peer peer, int piece) {
+        sendMessage(peer, TYPE_REQUEST, piece);
+    }
+
+    private static void sendReject(Peer peer, int piece) {
+        sendMessage(peer, TYPE_REJECT, piece);
+    }
+
+    /** REQUEST and REJECT are the same except for message type */
+    private static void sendMessage(Peer peer, int type, int piece) {
         Map<String, Object> map = new HashMap();
-        map.put("msg_type", TYPE_REQUEST);
+        map.put("msg_type", Integer.valueOf(type));
         map.put("piece", Integer.valueOf(piece));
         byte[] payload = BEncoder.bencode(map);
         try {
@@ -205,7 +219,7 @@ abstract class ExtensionHandler {
 
     private static void sendPiece(Peer peer, int piece, byte[] data) {
         Map<String, Object> map = new HashMap();
-        map.put("msg_type", TYPE_REQUEST);
+        map.put("msg_type", Integer.valueOf(TYPE_REQUEST));
         map.put("piece", Integer.valueOf(piece));
         map.put("total_size", Integer.valueOf(data.length));
         byte[] dict = BEncoder.bencode(map);

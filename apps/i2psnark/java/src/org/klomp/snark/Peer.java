@@ -53,6 +53,10 @@ public class Peer implements Comparable
   private DataInputStream din;
   private DataOutputStream dout;
 
+  /** running counters */
+  private long downloaded;
+  private long uploaded;
+
   // Keeps state for in/out connections.  Non-null when the handshake
   // was successful, the connection setup and runs
   PeerState state;
@@ -410,10 +414,10 @@ public class Peer implements Comparable
    *  Switch from magnet mode to normal mode
    *  @since 0.8.4
    */
-  public void gotMetaInfo(MetaInfo meta) {
+  public void setMetaInfo(MetaInfo meta) {
     PeerState s = state;
     if (s != null)
-        s.gotMetaInfo(meta);
+        s.setMetaInfo(meta);
   }
 
   public boolean isConnected()
@@ -578,13 +582,28 @@ public class Peer implements Comparable
   }
 
   /**
+   * Increment the counter.
+   * @since 0.8.4
+   */
+  public void downloaded(int size) {
+      downloaded += size;
+  }
+
+  /**
+   * Increment the counter.
+   * @since 0.8.4
+   */
+  public void uploaded(int size) {
+      uploaded += size;
+  }
+
+  /**
    * Returns the number of bytes that have been downloaded.
    * Can be reset to zero with <code>resetCounters()</code>/
    */
   public long getDownloaded()
   {
-    PeerState s = state;
-    return (s != null) ? s.downloaded : 0;
+      return downloaded;
   }
 
   /**
@@ -593,8 +612,7 @@ public class Peer implements Comparable
    */
   public long getUploaded()
   {
-    PeerState s = state;
-    return (s != null) ? s.uploaded : 0;
+      return uploaded;
   }
 
   /**
@@ -602,12 +620,8 @@ public class Peer implements Comparable
    */
   public void resetCounters()
   {
-    PeerState s = state;
-    if (s != null)
-      {
-        s.downloaded = 0;
-        s.uploaded = 0;
-      }
+      downloaded = 0;
+      uploaded = 0;
   }
   
   public long getInactiveTime() {

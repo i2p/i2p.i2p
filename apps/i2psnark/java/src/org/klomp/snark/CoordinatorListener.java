@@ -31,6 +31,12 @@ public interface CoordinatorListener
    */
   void peerChange(PeerCoordinator coordinator, Peer peer);
 
+  /**
+   * Called when the PeerCoordinator got the MetaInfo via magnet.
+   * @since 0.8.4
+   */
+  void gotMetaInfo(PeerCoordinator coordinator, MetaInfo metainfo);
+
   public boolean overUploadLimit(int uploaders);
   public boolean overUpBWLimit();
   public boolean overUpBWLimit(long total);

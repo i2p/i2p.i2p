@@ -36,8 +36,9 @@ class PeerState implements DataLoader
 {
   private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(PeerState.class);
   private final Peer peer;
+  /** Fixme, used by Peer.disconnect() to get to the coordinator */
   final PeerListener listener;
-  private final MetaInfo metainfo;
+  private MetaInfo metainfo;
 
   // Interesting and choking describes whether we are interested in or
   // are choking the other side.
@@ -48,10 +49,6 @@ class PeerState implements DataLoader
   // interested in us or choked us.
   boolean interested = false;
   boolean choked = true;
-
-  // Package local for use by Peer.
-  long downloaded;
-  long uploaded;
 
   /** the pieces the peer has */
   BitField bitfield;
@@ -285,7 +282,7 @@ class PeerState implements DataLoader
    */
   void uploaded(int size)
   {
-    uploaded += size;
+    peer.uploaded(size);
     listener.uploaded(peer, size);
   }
 
@@ -305,7 +302,7 @@ class PeerState implements DataLoader
   void pieceMessage(Request req)
   {
     int size = req.len;
-    downloaded += size;
+    peer.downloaded(size);
     listener.downloaded(peer, size);
 
     if (_log.shouldLog(Log.DEBUG))
@@ -326,9 +323,6 @@ class PeerState implements DataLoader
           {
             if (_log.shouldLog(Log.WARN))
               _log.warn("Got BAD " + req.piece + " from " + peer);
-            // XXX ARGH What now !?!
-            // FIXME Why would we set downloaded to 0?
-            downloaded = 0;
           }
       }
 
@@ -372,7 +366,6 @@ class PeerState implements DataLoader
           _log.info("Unrequested 'piece: " + piece + ", "
                       + begin + ", " + length + "' received from "
                       + peer);
-        downloaded = 0; // XXX - punishment?
         return null;
       }
 
@@ -397,7 +390,6 @@ class PeerState implements DataLoader
                           + begin + ", "
                           + length + "' received from "
                           + peer);
-            downloaded = 0; // XXX - punishment?
             return null;
           }
 
@@ -497,7 +489,7 @@ class PeerState implements DataLoader
   /** @since 0.8.2 */
   void extensionMessage(int id, byte[] bs)
   {
-      ExtensionHandler.handleMessage(peer, id, bs);
+      ExtensionHandler.handleMessage(peer, listener, id, bs);
       // Peer coord will get metadata from MagnetState,
       // verify, and then call gotMetaInfo()
       listener.gotExtension(peer, id, bs);
@@ -507,9 +499,18 @@ class PeerState implements DataLoader
    *  Switch from magnet mode to normal mode
    *  @since 0.8.4
    */
-  public void gotMetaInfo(MetaInfo meta) {
-      // set metainfo
-      // fix bitfield
+  public void setMetaInfo(MetaInfo meta) {
+      BitField oldBF = bitfield;
+      if (oldBF != null) {
+          if (oldBF.size() != meta.getPieces())
+              // fix bitfield, it was too big by 1-7 bits
+              bitfield = new BitField(oldBF.getFieldBytes(), meta.getPieces());
+          // else no extra
+      } else {
+          // it will be initialized later
+          //bitfield = new BitField(meta.getPieces());
+      }
+      metainfo = meta;
   }
 
   /** @since 0.8.4 */

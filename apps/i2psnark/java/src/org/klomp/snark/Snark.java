@@ -1004,6 +1004,30 @@ public class Snark
     // System.out.println(peer.toString());
   }
   
+  /**
+   * Called when the PeerCoordinator got the MetaInfo via magnet.
+   * CoordinatorListener.
+   * Create the storage, tell SnarkManager, and give the storage
+   * back to the coordinator.
+   *
+   * @throws RuntimeException via fatal()
+   * @since 0.8.4
+   */
+  public void gotMetaInfo(PeerCoordinator coordinator, MetaInfo metainfo) {
+      meta = metainfo;
+      try {
+          storage = new Storage(_util, meta, this);
+          if (completeListener != null)
+              completeListener.gotMetaInfo(this);
+          coordinator.setStorage(storage);
+      } catch (IOException ioe) {
+          if (storage != null) {
+              try { storage.close(); } catch (IOException ioee) {}
+          }
+          fatal("Could not check or create storage", ioe);
+      }
+  }
+
   private boolean allocating = false;
   public void storageCreateFile(Storage storage, String name, long length)
   {

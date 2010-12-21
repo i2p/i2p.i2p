@@ -45,13 +45,15 @@ public class PeerCoordinator implements PeerListener
 
   /**
    * External use by PeerMonitorTask only.
+   * Will be null when in magnet mode.
    */
-  final MetaInfo metainfo;
+  MetaInfo metainfo;
 
   /**
    * External use by PeerMonitorTask only.
+   * Will be null when in magnet mode.
    */
-  final Storage storage;
+  Storage storage;
   private final Snark snark;
 
   // package local for access by CheckDownLoadersTask
@@ -1150,7 +1152,10 @@ public class PeerCoordinator implements PeerListener
       }
   }
 
-  /** @since 0.8.4 */
+  /**
+   *  PeerListener callback
+   *  @since 0.8.4
+   */
   public void gotExtension(Peer peer, int id, byte[] bs) {
       if (_log.shouldLog(Log.DEBUG))
           _log.debug("Got extension message " + id + " from " + peer);
@@ -1160,18 +1165,29 @@ public class PeerCoordinator implements PeerListener
               if (magnetState.isComplete()) {
                   if (_log.shouldLog(Log.WARN))
                       _log.warn("Got completed metainfo via extension");
-                  MetaInfo newinfo = magnetState.getMetaInfo();
-                  // more validation
-                  // set global
-                  // instantiate storage
-                  // tell Snark listener
-                  // tell all peers
+                  metainfo = magnetState.getMetaInfo();
+                  listener.gotMetaInfo(this, metainfo);
+                  for (Peer p : peers) {
+                      p.setMetaInfo(metainfo);
+                  }
               }
           }
       }
   }
 
-  /** @since 0.8.4 */
+  /**
+   *  Sets the storage after transition out of magnet mode
+   *  Snark calls this after we call gotMetaInfo()
+   *  @since 0.8.4
+   */
+  public void setStorage(Storage stg) {
+      storage = stg;
+  }
+
+  /**
+   *  PeerListener callback
+   *  @since 0.8.4
+   */
   public void gotPort(Peer peer, int port) {
       // send to DHT
   }
