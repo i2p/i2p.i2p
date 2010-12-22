@@ -36,6 +36,8 @@ import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
 
+import org.klomp.snark.dht.KRPC;
+
 /**
  * Coordinates what peer does what.
  */
@@ -1186,10 +1188,13 @@ public class PeerCoordinator implements PeerListener
 
   /**
    *  PeerListener callback
+   *  Tell the DHT to ping it, this will get back the node info
    *  @since 0.8.4
    */
   public void gotPort(Peer peer, int port) {
-      // send to DHT
+      KRPC krpc = _util.getDHT();
+      if (krpc != null)
+          krpc.ping(peer.getDestination(), port);
   }
 
   /** Return number of allowed uploaders for this torrent.

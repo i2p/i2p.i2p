@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.Collator;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -875,8 +876,7 @@ public class I2PSnarkServlet extends Default {
         else if (isValid)
             icon = toIcon(meta.getName());
         else
-            // todo get a nice magnet icon?
-            icon = "page_white";
+            icon = "magnet";
         if (remaining == 0 || isMultiFile) {
             out.write(toImg(icon, _("Open")));
             out.write("</a>");
@@ -1375,6 +1375,7 @@ public class I2PSnarkServlet extends Default {
         if (ihash.length() == 32) {
             ih = Base32.decode(ihash);
         } else if (ihash.length() == 40) {
+            //  Like DataHelper.fromHexString() but ensures no loss of leading zero bytes
             ih = new byte[20];
             try {
                 for (int i = 0; i < 20; i++) {
@@ -1539,6 +1540,7 @@ public class I2PSnarkServlet extends Default {
 
         if (title.endsWith("/"))
             title = title.substring(0, title.length() - 1);
+        String directory = title;
         title = _("Torrent") + ": " + title;
         buf.append(title);
         buf.append("</TITLE>").append(HEADER_A).append(_themePath).append(HEADER_B).append("<link rel=\"shortcut icon\" href=\"" + _themePath + "favicon.ico\">" +
@@ -1550,10 +1552,40 @@ public class I2PSnarkServlet extends Default {
         boolean showPriority = snark != null && snark.getStorage() != null && !snark.getStorage().complete();
         if (showPriority)
             buf.append("<form action=\"").append(base).append("\" method=\"POST\">\n");
-        buf.append("<TABLE BORDER=0 class=\"snarkTorrents\" >" +
-            "<thead><tr><th>")
+        buf.append("<TABLE BORDER=0 class=\"snarkTorrents\" ><thead>");
+        if (snark != null) {
+            // first row - torrent info
+            // FIXME center
+            buf.append("<tr><th colspan=\"" + (showPriority ? '4' : '3') + "\"><div>")
+                .append(_("Torrent")).append(": ").append(snark.getBaseName());
+            int pieces = snark.getPieces();
+            double completion = (pieces - snark.getNeeded()) / (double) pieces;
+            if (completion < 1.0)
+                buf.append("<br>").append(_("Completion")).append(": ").append((new DecimalFormat("0.00%")).format(completion));
+            else
+                buf.append("<br>").append(_("Complete"));
+            // else unknown
+            buf.append("<br>").append(_("Size")).append(": ").append(formatSize(snark.getTotalLength()));
+            MetaInfo meta = snark.getMetaInfo();
+            if (meta != null) {
+                List files = meta.getFiles();
+                int fileCount = files != null ? files.size() : 1;
+                buf.append("<br>").append(_("Files")).append(": ").append(fileCount);
+            }
+            buf.append("<br>").append(_("Pieces")).append(": ").append(pieces);
+            buf.append("<br>").append(_("Piece size")).append(": ").append(formatSize(snark.getPieceLength(0)));
+            String hex = toHex(snark.getInfoHash());
+            buf.append("<br>").append(_("Magnet link")).append(": <a href=\"").append(MAGNET).append(hex).append("\">")
+               .append(MAGNET).append(hex).append("</a>");
+            // We don't have the hash of the torrent file
+            //buf.append("<br>").append(_("Maggot link")).append(": <a href=\"").append(MAGGOT).append(hex).append(':').append(hex).append("\">")
+            //   .append(MAGGOT).append(hex).append(':').append(hex).append("</a>");
+            buf.append("</div></th></tr>");
+        }
+        // second row - dir info
+        buf.append("<tr><th>")
             .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "file.png\" >&nbsp;")
-            .append(title).append("</th><th align=\"right\">")
+            .append(_("Directory")).append(": ").append(directory).append("</th><th align=\"right\">")
             .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "size.png\" >&nbsp;")
             .append(_("Size"));
         buf.append("</th><th class=\"headerstatus\">")
@@ -1765,6 +1797,21 @@ public class I2PSnarkServlet extends Default {
     /** @since 0.8.2 */
     private static String toImg(String icon, String altText) {
         return "<img alt=\"" + altText + "\" height=\"16\" width=\"16\" src=\"/i2psnark/_icons/" + icon + ".png\">";
+    }
+
+    /**
+     *  Like DataHelper.toHexString but ensures no loss of leading zero bytes
+     *  @since 0.8.4
+     */
+    private static String toHex(byte[] b) {
+        StringBuilder buf = new StringBuilder(40);
+        for (int i = 0; i < b.length; i++) {
+            int bi = b[i] & 0xff;
+            if (bi < 16)
+                buf.append('0');
+            buf.append(Integer.toHexString(bi));
+        }
+        return buf.toString();
     }
 
     /** @since 0.8.1 */

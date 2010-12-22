@@ -37,7 +37,8 @@ class PeerCheckerTask extends TimerTask
   private static final long KILOPERSECOND = 1024*(PeerCoordinator.CHECK_PERIOD/1000);
 
   private final PeerCoordinator coordinator;
-  public I2PSnarkUtil _util;
+  private final I2PSnarkUtil _util;
+  private int _runCount;
 
   PeerCheckerTask(I2PSnarkUtil util, PeerCoordinator coordinator)
   {
@@ -49,6 +50,7 @@ class PeerCheckerTask extends TimerTask
 
   public void run()
   {
+        _runCount++;
         List<Peer> peerList = coordinator.peerList();
         if (peerList.isEmpty() || coordinator.halted()) {
           coordinator.setRateHistory(0, 0);
@@ -204,6 +206,10 @@ class PeerCheckerTask extends TimerTask
               }
             peer.retransmitRequests();
             peer.keepAlive();
+            // announce them to local tracker (TrackerClient does this too)
+            if (_util.getDHT() != null && (_runCount % 5) == 0) {
+                _util.getDHT().announce(coordinator.getInfoHash(), peer.getPeerID().getDestHash());
+            }
           }
 
         // Resync actual uploaders value
@@ -245,8 +251,13 @@ class PeerCheckerTask extends TimerTask
 
         // close out unused files, but we don't need to do it every time
         Storage storage = coordinator.getStorage();
-        if (storage != null && random.nextInt(4) == 0) {
+        if (storage != null && (_runCount % 4) == 0) {
                 storage.cleanRAFs();
+        }
+
+        // announce ourselves to local tracker (TrackerClient does this too)
+        if (_util.getDHT() != null && (_runCount % 16) == 0) {
+            _util.getDHT().announce(coordinator.getInfoHash());
         }
   }
 }

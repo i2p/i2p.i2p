@@ -32,6 +32,7 @@ import java.util.Map;
 
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Destination;
 import net.i2p.util.Log;
 
 import org.klomp.snark.bencode.BEValue;
@@ -382,6 +383,13 @@ public class Peer implements Comparable
   /** @since 0.8.4 */
   public long getOptions() {
       return options;
+  }
+
+  /** @since 0.8.4 */
+  public Destination getDestination() {
+      if (sock == null)
+          return null;
+      return sock.getPeerDestination();
   }
 
   /**

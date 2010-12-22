@@ -277,18 +277,26 @@ public class TrackerClient extends I2PAppThread
                     runStarted = true;
                     tr.started = true;
 
-                    Set peers = info.getPeers();
+                    Set<Peer> peers = info.getPeers();
                     tr.seenPeers = info.getPeerCount();
                     if (snark.getTrackerSeenPeers() < tr.seenPeers) // update rising number quickly
                         snark.setTrackerSeenPeers(tr.seenPeers);
+
+                    // pass everybody over to our tracker
+                    if (_util.getDHT() != null) {
+                        for (Peer peer : peers) {
+                            _util.getDHT().announce(snark.getInfoHash(), peer.getPeerID().getDestHash());
+                        }
+                    }
+
                     if ( (left > 0) && (!completed) ) {
                         // we only want to talk to new people if we need things
                         // from them (duh)
-                        List ordered = new ArrayList(peers);
+                        List<Peer> ordered = new ArrayList(peers);
                         Collections.shuffle(ordered, r);
-                        Iterator it = ordered.iterator();
+                        Iterator<Peer> it = ordered.iterator();
                         while ((!stop) && it.hasNext()) {
-                          Peer cur = (Peer)it.next();
+                          Peer cur = it.next();
                           // FIXME if id == us || dest == us continue;
                           // only delay if we actually make an attempt to add peer
                           if(coordinator.addPeer(cur)) {

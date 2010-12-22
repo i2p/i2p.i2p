@@ -776,7 +776,7 @@ public class Snark
     }
 
     /**
-     *  @return needed of all torrent files, or total of metainfo file if fetching magnet, or -1
+     *  @return number of pieces still needed (magnet mode or not), or -1 if unknown
      *  @since 0.8.4
      */
     public long getNeeded() {
@@ -786,7 +786,7 @@ public class Snark
             // FIXME subtract chunks we have
             return meta.getTotalLength();
         // FIXME fake
-        return 16 * 16 * 1024;
+        return -1;
     }
 
     /**
@@ -798,6 +798,17 @@ public class Snark
         if (meta != null)
             return meta.getPieceLength(p);
         return 16*1024;
+    }
+
+    /**
+     *  @return number of pieces
+     *  @since 0.8.4
+     */
+    public int getPieces() {
+        if (meta != null)
+            return meta.getPieces();
+        // FIXME else return metainfo pieces if available
+        return -1;
     }
 
     /**

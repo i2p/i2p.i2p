@@ -54,28 +54,30 @@ public class MetaInfo
   private final byte[] info_hash;
   private final String name;
   private final String name_utf8;
-  private final List files;
-  private final List files_utf8;
-  private final List lengths;
+  private final List<List<String>> files;
+  private final List<List<String>> files_utf8;
+  private final List<Long> lengths;
   private final int piece_length;
   private final byte[] piece_hashes;
   private final long length;
-  private Map infoMap;
+  private Map<String, BEValue> infoMap;
 
   /**
    *  Called by Storage when creating a new torrent from local data
    *
    *  @param announce may be null
+   *  @param files null for single-file torrent
+   *  @param lengths null for single-file torrent
    */
-  MetaInfo(String announce, String name, String name_utf8, List files, List lengths,
+  MetaInfo(String announce, String name, String name_utf8, List<List<String>> files, List<Long> lengths,
            int piece_length, byte[] piece_hashes, long length)
   {
     this.announce = announce;
     this.name = name;
     this.name_utf8 = name_utf8;
-    this.files = files;
+    this.files = files == null ? null : Collections.unmodifiableList(files);
     this.files_utf8 = null;
-    this.lengths = lengths;
+    this.lengths = lengths == null ? null : Collections.unmodifiableList(lengths);
     this.piece_length = piece_length;
     this.piece_hashes = piece_hashes;
     this.length = length;
@@ -131,7 +133,7 @@ public class MetaInfo
     if (val == null)
         throw new InvalidBEncodingException("Missing info map");
     Map info = val.getMap();
-    infoMap = info;
+    infoMap = Collections.unmodifiableMap(info);
 
     val = (BEValue)info.get("name");
     if (val == null)
@@ -171,39 +173,39 @@ public class MetaInfo
           throw new InvalidBEncodingException
             ("Missing length number and/or files list");
 
-        List list = val.getList();
+        List<BEValue> list = val.getList();
         int size = list.size();
         if (size == 0)
           throw new InvalidBEncodingException("zero size files list");
 
-        files = new ArrayList(size);
-        files_utf8 = new ArrayList(size);
-        lengths = new ArrayList(size);
+        List<List<String>> m_files = new ArrayList(size);
+        List<List<String>> m_files_utf8 = new ArrayList(size);
+        List<Long> m_lengths = new ArrayList(size);
         long l = 0;
         for (int i = 0; i < list.size(); i++)
           {
-            Map desc = ((BEValue)list.get(i)).getMap();
-            val = (BEValue)desc.get("length");
+            Map<String, BEValue> desc = list.get(i).getMap();
+            val = desc.get("length");
             if (val == null)
               throw new InvalidBEncodingException("Missing length number");
             long len = val.getLong();
-            lengths.add(new Long(len));
+            m_lengths.add(new Long(len));
             l += len;
 
             val = (BEValue)desc.get("path");
             if (val == null)
               throw new InvalidBEncodingException("Missing path list");
-            List path_list = val.getList();
+            List<BEValue> path_list = val.getList();
             int path_length = path_list.size();
             if (path_length == 0)
               throw new InvalidBEncodingException("zero size file path list");
 
-            List file = new ArrayList(path_length);
-            Iterator it = path_list.iterator();
+            List<String> file = new ArrayList(path_length);
+            Iterator<BEValue> it = path_list.iterator();
             while (it.hasNext())
-              file.add(((BEValue)it.next()).getString());
+              file.add(it.next().getString());
 
-            files.add(file);
+            m_files.add(Collections.unmodifiableList(file));
             
             val = (BEValue)desc.get("path.utf-8");
             if (val != null) {
@@ -213,11 +215,14 @@ public class MetaInfo
                     file = new ArrayList(path_length);
                     it = path_list.iterator();
                     while (it.hasNext())
-                        file.add(((BEValue)it.next()).getString());
-                    files_utf8.add(file);
+                        file.add(it.next().getString());
+                    m_files_utf8.add(Collections.unmodifiableList(file));
                 }
             }
           }
+        files = Collections.unmodifiableList(m_files);
+        files_utf8 = Collections.unmodifiableList(m_files_utf8);
+        lengths = Collections.unmodifiableList(m_lengths);
         length = l;
       }
 
@@ -265,9 +270,8 @@ public class MetaInfo
    * a single name. It has the same size as the list returned by
    * getLengths().
    */
-  public List getFiles()
+  public List<List<String>> getFiles()
   {
-    // XXX - Immutable?
     return files;
   }
 
@@ -276,9 +280,8 @@ public class MetaInfo
    * files, or null if it is a single file. It has the same size as
    * the list returned by getFiles().
    */
-  public List getLengths()
+  public List<Long> getLengths()
   {
-    // XXX - Immutable?
     return lengths;
   }
 

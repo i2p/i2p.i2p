@@ -100,7 +100,7 @@ public class Storage
     getFiles(baseFile);
     
     long total = 0;
-    ArrayList lengthsList = new ArrayList();
+    ArrayList<Long> lengthsList = new ArrayList();
     for (int i = 0; i < lengths.length; i++)
       {
         long length = lengths[i];
@@ -122,10 +122,10 @@ public class Storage
     bitfield = new BitField(pieces);
     needed = 0;
 
-    List files = new ArrayList();
+    List<List<String>> files = new ArrayList();
     for (int i = 0; i < names.length; i++)
       {
-        List file = new ArrayList();
+        List<String> file = new ArrayList();
         StringTokenizer st = new StringTokenizer(names[i], File.separator);
         while (st.hasMoreTokens())
           {

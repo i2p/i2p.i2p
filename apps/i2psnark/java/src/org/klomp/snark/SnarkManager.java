@@ -68,6 +68,7 @@ public class SnarkManager implements Snark.CompleteListener {
     public static final String PROP_META_PREFIX = "i2psnark.zmeta.";
     public static final String PROP_META_BITFIELD_SUFFIX = ".bitfield";
     public static final String PROP_META_PRIORITY_SUFFIX = ".priority";
+    public static final String PROP_META_MAGNET_SUFFIX = ".magnet";
 
     private static final String CONFIG_FILE = "i2psnark.config";
     public static final String PROP_AUTO_START = "i2snark.autoStart";   // oops
@@ -1031,6 +1032,9 @@ public class SnarkManager implements Snark.CompleteListener {
                 }
             }
 
+//start magnets
+
+
             // here because we need to delay until I2CP is up
             // although the user will see the default until then
             getBWLimit();
@@ -1245,6 +1249,7 @@ public class SnarkManager implements Snark.CompleteListener {
                 if ( (snark != null) && (!snark.isStopped()) )
                     snark.stopTorrent();
             }
+//save magnets
         }
     }
 }
