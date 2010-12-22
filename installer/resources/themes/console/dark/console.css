@@ -356,6 +356,10 @@ div.news li {
      text-transform: capitalize;
 }
 
+div.news h3 {
+     text-align: left !important;
+}
+
 div.news h4 {
      border-bottom: 1px;
      border-bottom-style: dotted;

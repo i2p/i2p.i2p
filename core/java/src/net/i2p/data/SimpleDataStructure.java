@@ -28,7 +28,7 @@ public abstract class SimpleDataStructure extends DataStructureImpl {
     /** this is just to avoid lots of calls to length() */
     protected final int _length;
     
-    /** A new instance with the data set to null. Call readBytes(), setData(), or from ByteArray() after this to set the data */
+    /** A new instance with the data set to null. Call readBytes(), setData(), or fromByteArray() after this to set the data */
     public SimpleDataStructure() {
         _length = length();
     }

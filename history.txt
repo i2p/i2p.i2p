@@ -1,7 +1,4 @@
-2010-12-19 sponge
-    * Fix missing </A> in Resource.java
-    * Fix URI.java parse issue
-    * Fix FileResource.java logic bug
+* 2010-12-22  0.8.2 released
 
 2010-12-13 dr|z3d
     * Console themes: Midnight & Classic renovations.

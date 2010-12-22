@@ -7,6 +7,8 @@ package org.klomp.snark;
  * It is also passed from PeerState to PeerCoordinator when
  * a piece is not completely downloaded, for example
  * when the Peer disconnects or chokes.
+ *
+ * @since 0.8.2
  */
 class PartialPiece implements Comparable {
 

@@ -431,6 +431,10 @@ div.news li {
      font-weight: bold;
 }
 
+div.news h3 {
+     text-align: left !important;
+}
+
 div.news p {
      color: #eef;
      font-size: 9pt;

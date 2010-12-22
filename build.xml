@@ -529,7 +529,7 @@
 
     <!-- readme and proxy error page files, initialNews.xml files, GeoIP files, and flag icons -->
     <target name="prepConsoleDocs" depends="prepConsoleDocUpdates, prepgeoupdate" >
-        <copy todir="pkg-temp/docs/" >
+        <copy todir="pkg-temp/docs/initialNews/">
           <fileset dir="installer/resources/initialNews/" />
         </copy>
     </target>
