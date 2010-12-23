@@ -346,7 +346,7 @@ div.main textarea {
 
 div.news {
      margin: 0px 10px 5px 207px;
-     padding: 10px 25px 7px 25px;
+     padding: 7px 20px 7px 20px;
      border: 1px solid #447;
      color: #224;
      border-radius: 4px;
@@ -364,7 +364,14 @@ div.news p {
      font-size: 9pt;
      text-align: justify !important;
      line-height: 120%;
+     margin-top: -7px;
+     padding: 0 15px;
 }
+
+div.news h3 {
+     text-align: left !important;
+}
+
 /*
 div.news a:link{
      color: #a30;
@@ -389,7 +396,7 @@ div.news hr{
      color: #225;
      background: #225;
      height: 1px;
-     border: 0px dotted #779;
+     border: 0px dotted #225;
      margin: 10px 0 5px;
 /*     -moz-box-shadow: 0px -1px 1px 1px #ffe;*/
      opacity: 0.6;
@@ -398,7 +405,7 @@ div.news hr{
 div.news li {
      text-align: justify;
      list-style: none;
-     margin: 10px 0 20px 0 !important;
+     margin: 5px 0 16px 0 !important;
      vertical-align: bottom;
      border: 1px solid #113;
      border-left: 5px solid #113;
@@ -411,6 +418,12 @@ div.news li {
      background: #ffe url('images/header.png') center center repeat-x;
      -moz-box-shadow: 0 1px 1px 1px rgba(176, 176, 216, 0.4);
      -moz-box-shadow: 0 1px 1px 1px rgba(176, 176, 216, 0.4);
+     font-weight: bold;
+     text-transform: capitalize;
+}
+
+div.news li:first-child {
+     margin-top: 10px !important;
 }
 
 /*
@@ -759,7 +772,6 @@ h2 {
      margin: 15px 0px 15px 0 !important;
      -moz-box-shadow: 0 1px 1px 1px rgba(176, 176, 216, 0.4);
      word-wrap: break-word;
-     text-transform: uppercase;
      opacity: 1;
 }
 
@@ -782,8 +794,6 @@ h3 {
      -moz-border-radius: 0 4px 4px 0;
      -khtml-border-radius: 0 4px 4px 0;
      background: #ffe url('images/header.png') center center repeat-x !important;
-     text-transform: uppercase;
-     text-shadow: 0px 0px 1px #77f;
      font-size: 11pt;
      color: #000;
      -moz-box-shadow: 0 1px 1px 1px rgba(176, 176, 216, 0.4);
@@ -856,7 +866,7 @@ button:active{
 }
 
 .langbox img {
-     opacity: 0.7 !important;
+     opacity: 0.8 !important;
      -moz-box-shadow: 0 0 1px #447;
 }
 
@@ -1149,7 +1159,7 @@ div.footnote {
      text-align: right;
      color: #447;
      font-size: 7pt;
-     margin-top: -10px;
+     margin-bottom: -5px !important;
 }
 
 div.footnote hr{

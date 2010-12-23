@@ -1,25 +1,24 @@
 <!--
-<i2p.news date="$Date: 2010-11-15 00:00:00 $">
-<i2p.release version="0.8.1" date="2010/11/15" minVersion="0.6" />
+<i2p.news date="$Date: 2010-12-22 00:00:00 $">
+<i2p.release version="0.8.2" date="2010/12/22" minVersion="0.6" />
 -->
 <div lang="en">
-<h3>2010-11-15: <b>0.8.1 <a href="http://www.i2p2.i2p/release-0.8.1.html">Released</a></b></h3>
+<h3>2010-12-22: <b>0.8.2 <a href="http://www.i2p2.i2p/release-0.8.2.html">Released</a></b></h3>
 <p>
-The 0.8.1 release contains the usual collection of bug fixes,
-and a newly colorful i2psnark theme by dr|zed.
-For increased security, files created by the router will now be readable only by the owner (mode 600).
+The 0.8.2 release includes extensive bug fixes and theme updates in the router and in i2psnark.
+There are also optimizations to reduce memory usage in i2psnark.
+The HTTP and SOCKS proxies now support local and remote authorization.
 As usual, upgrading is recommended.
 </p><p>
-We have updated all our <a href="http://www.i2p2.i2p/how">technical specifications</a>
-and <a href="http://docs.i2p2.de/javadoc/">Javadocs</a>, check them out.
-
-Please help grow the network!
+I2P will be at 27C3 in Berlin the week of the December 27th.
+Look for the I2P people there and ask for I2P stickers!
+</p><p>
+Please help grow the network.
 Say hello to the volunteers on the <a href="irc://127.0.0.1:6668/i2p-help">#i2p-help IRC channel</a>.
-Give the
-developers feedback on <a href="irc://127.0.0.1:6668/i2p">IRC #i2p</a> or <a href="http://forum.i2p">forum.i2p</a>
-and <a href="http://www.i2p2.i2p/getinvolved.html">get involved</a>,
+<a href="http://www.i2p2.i2p/getinvolved.html">Get involved</a>,
 spread the word,
 and <a href="http://www.i2p2.i2p/donate.html">donate</a>!
+If you find a bug, please enter a report on <a href="http://trac.i2p2.i2p/report/1">trac</a>.
 We are still looking for volunteers to work on new and existing translations.
 Please volunteer on <a href="irc://127.0.0.1:6668/i2p">IRC #i2p</a>.
 </p>

@@ -392,7 +392,7 @@ public abstract class Resource implements Serializable
             buf.append(path);
             buf.append("\">");
             buf.append(StringUtil.replace(StringUtil.replace(ls[i],"<","&lt;"),">","&gt;"));
-            buf.append("&nbsp;");
+            buf.append("</A>&nbsp;");
             buf.append("</TD><TD ALIGN=right>");
             buf.append(item.length());
             buf.append(" bytes&nbsp;</TD><TD>");

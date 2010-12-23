@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-12-12 23:30+0000\n"
-"PO-Revision-Date: 2010-12-13 00:57+0100\n"
+"POT-Creation-Date: 2010-12-19 03:16+0000\n"
+"PO-Revision-Date: 2010-12-19 04:49+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -101,7 +101,7 @@ msgstr "Lista de rastreadores abiertos cambiada - Para aplicar ello es necesario
 #: ../java/src/org/klomp/snark/SnarkManager.java:438
 #, java-format
 msgid "{0} theme loaded, return to main i2psnark page to view."
-msgstr "Cargado el tema {0}. ¡Vuelve al menú principal de i2psnark para verlo!"
+msgstr "Tema {0} cargado. ¡Vuelve a la página principal de i2psnark para verlo!"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:445
 msgid "Configuration unchanged."
@@ -264,14 +264,12 @@ msgstr "Torrent"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:290
 msgid "Estimated time remaining"
-msgstr "Tiempo restante estimado"
+msgstr "Tiempo restante para completar la descarga"
 
-# NOTE: purposely left blank to leave more room in the table header
-# msgstr "Completado&nbsp;en"
 #. Translators: Please keep short or translate as " "
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:293
 msgid "ETA"
-msgstr " "
+msgstr "Completado&nbsp;en"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:297
 msgid "Downloaded"
@@ -297,13 +295,11 @@ msgstr "Subido"
 msgid "Down Rate"
 msgstr "Tasa&nbsp;de descarga"
 
-# NOTE: purposely left blank to leave more room in the table header
-# msgstr "Tasa&nbsp;de transferencia"
 #. Translators: Please keep short or translate as " "
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:317
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:326
 msgid "Rate"
-msgstr " "
+msgstr "Tasa"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:322
 msgid "Up Rate"
@@ -795,7 +791,7 @@ msgstr "Torrent ya encolado: {0}"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1755
 #, java-format
 msgid "Failed to copy torrent file to {0}"
-msgstr "No se pudo copiar el archivo torrent a {0}."
+msgstr "No se pudo copiar el torrent a {0}."
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1759
 #, java-format
@@ -809,8 +805,18 @@ msgstr "Torrent no se ha podido obtener de {0}"
 
 #~ msgid " theme locked and loaded."
 #~ msgstr "tema cargado"
+#~ msgid "Hide All Attached Peers [connected/total in swarm]"
+#~ msgstr "Ocultar todos los pares conectados [conectados/todos]"
+#~ msgid "Show All Attached Peers [connected/total in swarm]"
+#~ msgstr "Mostrar todos los pares conectados [conectados/todos]"
+#~ msgid "Loaded Torrents"
+#~ msgstr "Torrents"
 #~ msgid "Estimated Download Time"
 #~ msgstr "tiempo restante de descarga"
+#~ msgid "1"
+#~ msgid_plural "{0}"
+#~ msgstr[0] "{0}"
+#~ msgstr[1] "{0}"
 #~ msgid "Torrent file {0} does not exist"
 #~ msgstr "Archivo del torrent {0} no existe"
 #~ msgid "Copying torrent to {0}"

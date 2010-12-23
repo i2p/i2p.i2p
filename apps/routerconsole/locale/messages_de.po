@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-12-12 23:29+0000\n"
-"PO-Revision-Date: 2010-12-13 01:17+0100\n"
+"PO-Revision-Date: 2010-12-19 04:36+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: echelon <echelon@mail.i2p>, Sperreingang <sperrbezirk@mail.i2p>\n"
 "MIME-Version: 1.0\n"
@@ -1759,7 +1759,7 @@ msgstr "zum Schlüsselbund hinzugefügt"
 
 #: ../java/src/net/i2p/router/web/ConfigKeyringHandler.java:36
 msgid "Invalid destination or key"
-msgstr "Ungültiges Ziel oder Schlüssel"
+msgstr "ungültiges Ziel oder Schlüssel"
 
 #: ../java/src/net/i2p/router/web/ConfigKeyringHandler.java:41
 msgid "removed from keyring"
@@ -1771,7 +1771,7 @@ msgstr "nicht im Schlüsselbund gefunden"
 
 #: ../java/src/net/i2p/router/web/ConfigKeyringHandler.java:45
 msgid "Invalid destination"
-msgstr "Ungültiges Ziel"
+msgstr "ungültiges Ziel"
 
 #: ../java/src/net/i2p/router/web/ConfigLoggingHandler.java:82
 msgid "Log overrides updated"
@@ -2000,7 +2000,7 @@ msgstr "gesperrt bis zum Neustart"
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:38
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:59
 msgid "Invalid peer"
-msgstr "Ungültiger Teilnehmer"
+msgstr "ungültiger Teilnehmer"
 
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:28
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:317
@@ -2022,11 +2022,11 @@ msgstr "Teilnehmer-Boni anpassen"
 
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:47
 msgid "Bad speed value"
-msgstr "Ungültige Geschwindigkeitsangabe"
+msgstr "ungültige Geschwindigkeitsangabe"
 
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:52
 msgid "Bad capacity value"
-msgstr "Ungültiger Wert zur Kapazität"
+msgstr "ungültiger Wert für die Kapazität"
 
 #. Normal browsers send value, IE sends button label
 #: ../java/src/net/i2p/router/web/ConfigRestartBean.java:32
@@ -2510,7 +2510,7 @@ msgstr "Datei nicht gefunden"
 
 #: ../java/src/net/i2p/router/web/LogsHelper.java:52
 msgid "No log messages"
-msgstr "Keine Ereignisse"
+msgstr "keine Ereignisse"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:80
 msgid "Network Database RouterInfo Lookup"
@@ -2544,11 +2544,11 @@ msgstr "LeaseSet"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:133
 msgid "Local"
-msgstr "Lokal"
+msgstr "lokal"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:135
 msgid "Unpublished"
-msgstr "Unveröffentlicht"
+msgstr "unveröffentlicht"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:136
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:143
@@ -2685,12 +2685,12 @@ msgstr "NTCP und SSU mit Hilfsrouter"
 #: ../java/src/net/i2p/router/web/NewsFetcher.java:93
 #, java-format
 msgid "News last updated {0} ago."
-msgstr "Nachrichten wurden vor {0} aktualisiert"
+msgstr "Zeit seit letzter Aktualisierung der Nachrichten: {0}"
 
 #: ../java/src/net/i2p/router/web/NewsFetcher.java:99
 #, java-format
 msgid "News last checked {0} ago."
-msgstr "Vor {0} wurde auf neue Nachrichten geprüft"
+msgstr "Zeit seit letzter Prüfung auf neue Nachrichten: {0}"
 
 #: ../java/src/net/i2p/router/web/PluginUpdateChecker.java:77
 #, java-format
@@ -3178,7 +3178,7 @@ msgstr "innerhalb dieser Periode, welche vor {0} endete."
 
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:204
 msgid "No events"
-msgstr "Keine Ereignisse"
+msgstr "keine Ereignisse"
 
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:210
 msgid "Average event count"

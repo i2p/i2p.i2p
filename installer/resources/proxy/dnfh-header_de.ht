@@ -5,7 +5,7 @@ Connection: close
 Proxy-Connection: close
 
 <html><head>
-<title>I2P-Warnung: Eepsite unbekannt</title>
+<title>I2P-Warnung: Eepseite unbekannt</title>
 <link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico" >
 <link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css" >
 </head>
@@ -16,12 +16,12 @@ Proxy-Connection: close
 </div>
 <div class=warning id=warning>
 <h3>Warnung: Eepseite nicht im Adressbuch gefunden</h3>
-Die Eepseite konnte in nicht im Adressbuch des Routers gefunden werden.
+Die Eepseite konnte nicht im Adressbuch des Routers gefunden werden.
 Überprüfen Sie den Link oder finden Sie eine BASIS64-Adresse!
 Wenn Sie eine BASIS64-Adresse haben, fügen Sie diese unter folgendem Link zu Ihrer userhosts.txt hinzu:
 <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=master">SusiDNS</a>,
 benutzen Sie einen BASIS64-Adresshelfer oder einen der folgenden Sprungdienste:<br><br>
-(Sehen Sie diese Seite öfters? Dann lesen Sie die <a href="http://www.i2p2.i2p/faq.html#subscriptions">FAQ</a>
+(Sehen Sie diese Seite öfters? Dann lesen Sie die <a href="http://www.i2p2.i2p/faq.html#subscriptions">FAQ</a> 
 für Hilfe beim <a href="http://127.0.0.1:7657/susidns/config.jsp">Hinzufügen von Abonnements</a>
 zu Ihrem Adressbuch.)<hr>
 <b>Konnte das folgende Ziel nicht finden:</b><BR><BR>

@@ -181,7 +181,7 @@ public class Reseeder {
             if (defaulted && !SSLDisable) {
                 // put the non-SSL at the end of the SSL
                 List<String> URLList2 = new ArrayList();
-                tok = new StringTokenizer(DEFAULT_SSL_SEED_URL, " ,");
+                tok = new StringTokenizer(DEFAULT_SEED_URL, " ,");
                 while (tok.hasMoreTokens())
                     URLList2.add(tok.nextToken().trim());
                 Collections.shuffle(URLList2);

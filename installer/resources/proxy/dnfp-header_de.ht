@@ -17,11 +17,11 @@ Proxy-Connection: close
 <div class=warning id=warning>
 <h3>Warnung: I2P-Proxy nicht gefunden</h3>
 Der WWW-Outproxy wurde nicht gefunden.
-Er ist offline, das Netz ist überlastet oder verstopft,
+Er ist offline, das Netz überlastet oder verstopft,
 oder Ihr Router ist noch nicht gut ins Netzwerk integriert.
-Versuchen Sie ein <a href="javascript: parent.window.location.reload()">Neuladen</a> 
-da dies eine erneute zufällige Auswahl des Outproxys aus der von Ihnen <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">hier</a> vorgegebenen Liste trifft 
-(falls mehr als einer angegeben ist)!
-Wenn das Problem weiterhin bestehen sollte, passen Sie die Liste Ihrer Outproxys 
+Laden Sie die Seite <a href="javascript: parent.window.location.reload()">neu</a>! 
+Dies trifft eine erneute zufällige Auswahl des Outproxys aus der von Ihnen <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">hier</a> vorgegebenen Liste 
+(falls mehr als einer angegeben ist).
+Sollte das Problem weiterhin bestehen, passen Sie die Liste Ihrer Outproxys 
 <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=0">hier</a> an!
 <hr><b>Konnte das folgende Ziel nicht finden:</b><BR><BR>

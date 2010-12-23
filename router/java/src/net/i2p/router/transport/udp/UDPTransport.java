@@ -170,6 +170,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static final int TRANSIENT_FAIL_BID = 8;
     private final TransportBid[] _cachedBid;
 
+    // Opera doesn't have the char, TODO check UA
+    //private static final String THINSP = "&thinsp;/&thinsp;";
+    private static final String THINSP = " / ";
+
     public UDPTransport(RouterContext ctx) {
         super(ctx);
         _context = ctx;
@@ -1982,7 +1986,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             
             buf.append("<td class=\"cells\" align=\"right\">");
             buf.append(DataHelper.formatDuration2(idleIn));
-            buf.append("&thinsp/&thinsp;");
+            buf.append(THINSP);
             buf.append(DataHelper.formatDuration2(idleOut));
             buf.append("</td>");
  
@@ -1991,7 +1995,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             
             buf.append("<td class=\"cells\" align=\"right\" nowrap>");
             buf.append(formatKBps(recvBps));
-            buf.append("&thinsp;/&thinsp;");
+            buf.append(THINSP);
             buf.append(formatKBps(sendBps));
             //buf.append(" K/s");
             //buf.append(formatKBps(peer.getReceiveACKBps()));
@@ -2017,9 +2021,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append("<td class=\"cells\" align=\"right\">");
             buf.append(sendWindow/1024);
             buf.append("K");
-            buf.append("&thinsp;/&thinsp;").append(peer.getConcurrentSends());
-            buf.append("&thinsp;/&thinsp;").append(peer.getConcurrentSendWindow());
-            buf.append("&thinsp;/&thinsp;").append(peer.getConsecutiveSendRejections());
+            buf.append(THINSP).append(peer.getConcurrentSends());
+            buf.append(THINSP).append(peer.getConcurrentSendWindow());
+            buf.append(THINSP).append(peer.getConsecutiveSendRejections());
             buf.append("</td>");
 
             buf.append("<td class=\"cells\" align=\"right\">");
@@ -2042,7 +2046,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             buf.append("</td>");
             
             buf.append("<td class=\"cells\" align=\"right\">");
-            buf.append(peer.getMTU()).append("&thinsp;/&thinsp;").append(peer.getReceiveMTU());
+            buf.append(peer.getMTU()).append(THINSP).append(peer.getReceiveMTU());
             
             //.append('/');
             //buf.append(peer.getMTUIncreases()).append('/');
@@ -2102,7 +2106,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 //        buf.append("<tr><td colspan=\"16\"><hr></td></tr>\n");
         buf.append("<tr class=\"tablefooter\"> <td colspan=\"3\" align=\"left\"><b>").append(_("SUMMARY")).append("</b></td>" +
                    "<td align=\"center\" nowrap><b>");
-        buf.append(formatKBps(bpsIn)).append("&thinsp;/&thinsp;").append(formatKBps(bpsOut));
+        buf.append(formatKBps(bpsIn)).append(THINSP).append(formatKBps(bpsOut));
         long x = numPeers > 0 ? uptimeMsTotal/numPeers : 0;
         buf.append("</b></td>" +
                    "<td align=\"center\"><b>").append(DataHelper.formatDuration2(x));

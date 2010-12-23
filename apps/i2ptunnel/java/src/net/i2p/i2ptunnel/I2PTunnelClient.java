@@ -31,7 +31,9 @@ public class I2PTunnelClient extends I2PTunnelClientBase {
     public I2PTunnelClient(int localPort, String destinations, Logging l, 
                            boolean ownDest, EventDispatcher notifyThis, 
                            I2PTunnel tunnel, String pkf) throws IllegalArgumentException {
-        super(localPort, ownDest, l, notifyThis, "SynSender", tunnel, pkf);
+        super(localPort, ownDest, l, notifyThis,
+              "Standard client on " + tunnel.listenHost + ':' + localPort,
+              tunnel, pkf);
 
         if (waitEventValue("openBaseClientResult").equals("error")) {
             notifyEvent("openClientResult", "error");
