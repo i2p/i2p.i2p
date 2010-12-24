@@ -46,7 +46,7 @@ class MessageWrapper {
         instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_LOCAL);
 
         PayloadGarlicConfig payload = new PayloadGarlicConfig();
-        payload.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
+        payload.setCertificate(Certificate.NULL_CERT);
         payload.setId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         payload.setPayload(m);
         payload.setRecipient(to);

@@ -872,7 +872,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         instructions.setDelaySeconds(0);
         instructions.setEncrypted(false);
         
-        clove.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
+        clove.setCertificate(Certificate.NULL_CERT);
         clove.setDeliveryInstructions(instructions);
         clove.setExpiration(OVERALL_TIMEOUT_MS_DEFAULT+getContext().clock().now());
         clove.setId(getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE));

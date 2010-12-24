@@ -65,8 +65,9 @@ public class KeysAndCert extends DataStructureImpl {
         _publicKey.readBytes(in);
         _signingKey = new SigningPublicKey();
         _signingKey.readBytes(in);
-        _certificate = new Certificate();
-        _certificate.readBytes(in);
+        //_certificate = new Certificate();
+        //_certificate.readBytes(in);
+        _certificate = Certificate.create(in);
         __calculatedHash = null;
     }
     

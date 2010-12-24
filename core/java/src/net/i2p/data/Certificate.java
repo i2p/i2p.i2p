@@ -26,8 +26,10 @@ import java.io.OutputStream;
  * @author jrandom
  */
 public class Certificate extends DataStructureImpl {
-    private int _type;
-    private byte[] _payload;
+    public final static Certificate NULL_CERT = new NullCert();
+
+    protected int _type;
+    protected byte[] _payload;
 
     /** Specifies a null certificate type with no payload */
     public final static int CERTIFICATE_TYPE_NULL = 0;
@@ -40,6 +42,25 @@ public class Certificate extends DataStructureImpl {
     public final static int CERTIFICATE_LENGTH_SIGNED_WITH_HASH = Signature.SIGNATURE_BYTES + Hash.HASH_LENGTH;
     /** Contains multiple certs */
     public final static int CERTIFICATE_TYPE_MULTIPLE = 4;
+
+    /**
+     * If null cert, return immutable static instance, else create new
+     * @since 0.8.3
+     */
+    public static Certificate create(InputStream in) throws DataFormatException, IOException {
+        int type = (int) DataHelper.readLong(in, 1);
+        int length = (int) DataHelper.readLong(in, 2);
+        if (type == 0 && length == 0)
+            return NULL_CERT;
+        // from here down roughly the same as readBytes() below
+        if (length == 0)
+            return new Certificate(type, null);
+        byte[] payload = new byte[length];
+        int read = DataHelper.read(in, payload);
+        if (read != length)
+            throw new DataFormatException("Not enough bytes for the payload (read: " + read + " length: " + length + ')');
+        return new Certificate(type, payload);
+    }
 
     public Certificate() {
     }
@@ -140,10 +161,12 @@ public class Certificate extends DataStructureImpl {
         Certificate cert = (Certificate) object;
         return _type == cert.getCertificateType() && DataHelper.eq(_payload, cert.getPayload());
     }
+
     @Override
     public int hashCode() {
         return _type + DataHelper.hashCode(_payload);
     }
+
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder(64);
@@ -176,5 +199,68 @@ public class Certificate extends DataStructureImpl {
         }
         buf.append("]");
         return buf.toString();
+    }
+
+    /**
+     *  An immutable null certificate.
+     *  @since 0.8.3
+     */
+    private static final class NullCert extends Certificate {
+        private static final int NULL_LENGTH = 1 + 2;
+        private static final byte[] NULL_DATA = new byte[NULL_LENGTH];
+
+        public NullCert() {
+            // zero already
+            //_type = CERTIFICATE_TYPE_NULL;
+        }
+
+        /** @throws RuntimeException always */
+        @Override
+        public void setCertificateType(int type) {
+            throw new RuntimeException("Data already set");
+        }
+
+        /** @throws RuntimeException always */
+        @Override
+        public void setPayload(byte[] payload) {
+            throw new RuntimeException("Data already set");
+        }
+    
+        /** @throws RuntimeException always */
+        @Override
+        public void readBytes(InputStream in) throws DataFormatException, IOException {
+            throw new RuntimeException("Data already set");
+        }
+    
+        /** Overridden for efficiency */
+        @Override
+        public void writeBytes(OutputStream out) throws IOException {
+            out.write(NULL_DATA);
+        }
+    
+        /** Overridden for efficiency */
+        @Override
+        public int writeBytes(byte target[], int offset) {
+            System.arraycopy(NULL_DATA, 0, target, offset, NULL_LENGTH);
+            return offset + NULL_LENGTH;
+        }
+    
+        /** @throws RuntimeException always */
+        @Override
+        public int readBytes(byte source[], int offset) throws DataFormatException {
+            throw new RuntimeException("Data already set");
+        }
+    
+        /** Overridden for efficiency */
+        @Override
+        public int size() {
+            return NULL_LENGTH;
+        }
+    
+        /** Overridden for efficiency */
+        @Override
+        public int hashCode() {
+            return 99999;
+        }
     }
 }
