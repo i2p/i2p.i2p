@@ -47,7 +47,51 @@ button span.hide{
  <input type="submit" name="edit" value="<%=intl._("Add Client")%>" />
 <% } %>
  <input type="submit" name="action" value="<%=intl._("Save Client Configuration")%>" />
-</div></div><h3><a name="webapp"></a><%=intl._("WebApp Configuration")%></h3><p>
+</div></div>
+
+<h3><a name="i2cp"></a><%=intl._("Advanced Client Interface Configuration")%></h3><p>
+<b><%=intl._("External I2CP (I2P Client Protocol) Interface Configuration")%></b><br>
+<input type="radio" class="optbox" name="mode" value="1" <%=clientshelper.i2cpModeChecked(1) %> >
+<%=intl._("Enabled without SSL")%><br>
+<input type="radio" class="optbox" name="mode" value="2" <%=clientshelper.i2cpModeChecked(2) %> >
+<%=intl._("Enabled with SSL required")%><br>
+<input type="radio" class="optbox" name="mode" value="0" <%=clientshelper.i2cpModeChecked(0) %> >
+<%=intl._("Disabled - Clients outside this Java process may not connect")%><br>
+<%=intl._("I2CP Port")%>:
+<input name="port" type="text" size="5" maxlength="5" value="<jsp:getProperty name="clientshelper" property="port" />" ><br>
+<%=intl._("I2CP Interface")%>:
+<select name="interface">
+<%
+       String[] ips = clientshelper.intfcAddresses();
+       for (int i = 0; i < ips.length; i++) {
+           out.print("<option value=\"");
+           out.print(ips[i]);
+           out.print('\"');
+           if (clientshelper.isIFSelected(ips[i]))
+               out.print(" selected=\"selected\"");
+           out.print('>');
+           out.print(ips[i]);
+           out.print("</option>\n");
+       }
+%>
+</select><br>
+<b><%=intl._("Authorization")%></b><br>
+<input type="checkbox" class="optbox" name="auth" value="true" <jsp:getProperty name="clientshelper" property="auth" /> >
+<%=intl._("Requre username and password")%><br>
+<%=intl._("Username")%>:
+<input name="user" type="text" value="<jsp:getProperty name="clientshelper" property="user" />" ><br>
+<%=intl._("Password")%>:
+<input name="pw" type="password" value="<jsp:getProperty name="clientshelper" property="pw" />" ><br>
+</p><p><b><%=intl._("The default settings will work for most people.")%></b>
+<%=intl._("Any changes made here must also be configured in the external client.")%>
+<%=intl._("Many clients do not support SSL or authorization.")%>
+<i><%=intl._("All changes require restart to take effect.")%></i>
+</p><hr><div class="formaction">
+<input type="submit" name="foo" value="<%=intl._("Cancel")%>" />
+<input type="submit" name="action" value="<%=intl._("Save Interface Configuration")%>" />
+</div>
+
+<h3><a name="webapp"></a><%=intl._("WebApp Configuration")%></h3><p>
  <%=intl._("The Java web applications listed below are started by the webConsole client and run in the same JVM as the router. They are usually web applications accessible through the router console. They may be complete applications (e.g. i2psnark),front-ends to another client or application which must be separately enabled (e.g. susidns, i2ptunnel), or have no web interface at all (e.g. addressbook).")%>
  </p><p>
  <%=intl._("A web app may also be disabled by removing the .war file from the webapps directory; however the .war file and web app will reappear when you update your router to a newer version, so disabling the web app here is the preferred method.")%>
