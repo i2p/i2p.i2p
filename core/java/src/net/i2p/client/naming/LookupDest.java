@@ -22,6 +22,13 @@ import net.i2p.data.Hash;
  *
  * All calls are blocking and return null on failure.
  * Timeout is set to 10 seconds in I2PSimpleSession.
+ *
+ * As of 0.8.3, standard I2PSessions support lookups,
+ * including multiple lookups in parallel, and overriding
+ * the default timeout.
+ * Using an existing I2PSession is much more efficient and
+ * flexible than using this class.
+ *
  */
 class LookupDest {
 

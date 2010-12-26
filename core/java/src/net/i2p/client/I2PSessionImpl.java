@@ -15,7 +15,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -23,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataFormatException;
@@ -33,6 +34,8 @@ import net.i2p.data.PrivateKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
 import net.i2p.data.SigningPrivateKey;
+import net.i2p.data.i2cp.DestLookupMessage;
+import net.i2p.data.i2cp.GetBandwidthLimitsMessage;
 import net.i2p.data.i2cp.GetDateMessage;
 import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.I2CPMessageException;
@@ -95,6 +98,11 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     protected I2CPMessageProducer _producer;
     /** map of Long --> MessagePayloadMessage */
     protected Map<Long, MessagePayloadMessage> _availableMessages;
+
+    /** hashes of lookups we are waiting for */
+    protected final LinkedBlockingQueue<LookupWaiter> _pendingLookups = new LinkedBlockingQueue();
+    protected final Object _bwReceivedLock = new Object();
+    protected int[] _bwLimits;
     
     protected I2PClientMessageHandlerMap _handlerMap;
     
@@ -786,12 +794,104 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         return buf.toString();
     }
 
-    public Destination lookupDest(Hash h) throws I2PSessionException {
-        return null;
+    /** called by the message handler */
+    void destReceived(Destination d) {
+        Hash h = d.calculateHash();
+        for (LookupWaiter w : _pendingLookups) {
+            if (w.hash.equals(h)) {
+                w.destination = d;
+                synchronized (w) {
+                    w.notifyAll();
+                }
+            }
+        }
     }
 
+    /** called by the message handler */
+    void destLookupFailed(Hash h) {
+        for (LookupWaiter w : _pendingLookups) {
+            if (w.hash.equals(h)) {
+                synchronized (w) {
+                    w.notifyAll();
+                }
+            }
+        }
+    }
+
+    /** called by the message handler */
+    void bwReceived(int[] i) {
+        _bwLimits = i;
+        synchronized (_bwReceivedLock) {
+            _bwReceivedLock.notifyAll();
+        }
+    }
+
+    /**
+     *  Simple object to wait for lookup replies
+     *  @since 0.8.3
+     */
+    private static class LookupWaiter {
+        /** the request */
+        public final Hash hash;
+        /** the reply */
+        public Destination destination;
+
+        public LookupWaiter(Hash h) {
+            this.hash = h;
+        }
+    }
+
+    /**
+     *  Blocking. Waits a max of 10 seconds by default.
+     *  See lookupDest with maxWait parameter to change.
+     *  Implemented in 0.8.3 in I2PSessionImpl;
+     *  previously was available only in I2PSimpleSession.
+     *  Multiple outstanding lookups are now allowed.
+     *  @return null on failure
+     */
+    public Destination lookupDest(Hash h) throws I2PSessionException {
+        return lookupDest(h, 10*1000);
+    }
+
+    /**
+     *  Blocking.
+     *  @param maxWait ms
+     *  @since 0.8.3
+     *  @return null on failure
+     */
+    public Destination lookupDest(Hash h, long maxWait) throws I2PSessionException {
+        if (_closed)
+            return null;
+        LookupWaiter waiter = new LookupWaiter(h);
+        _pendingLookups.offer(waiter);
+        sendMessage(new DestLookupMessage(h));
+        try {
+            synchronized (waiter) {
+                waiter.wait(maxWait);
+            }
+        } catch (InterruptedException ie) {}
+        _pendingLookups.remove(waiter);
+        return waiter.destination;
+    }
+
+    /**
+     *  Blocking. Waits a max of 5 seconds.
+     *  But shouldn't take long.
+     *  Implemented in 0.8.3 in I2PSessionImpl;
+     *  previously was available only in I2PSimpleSession.
+     *  Multiple outstanding lookups are now allowed.
+     *  @return null on failure
+     */
     public int[] bandwidthLimits() throws I2PSessionException {
-        return null;
+        if (_closed)
+            return null;
+        sendMessage(new GetBandwidthLimitsMessage());
+        try {
+            synchronized (_bwReceivedLock) {
+                _bwReceivedLock.wait(5*1000);
+            }
+        } catch (InterruptedException ie) {}
+        return _bwLimits;
     }
 
     protected void updateActivity() {

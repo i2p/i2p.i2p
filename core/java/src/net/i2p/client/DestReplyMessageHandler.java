@@ -10,6 +10,9 @@ import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.DestReplyMessage;
 import net.i2p.util.Log;
 
+import net.i2p.data.Destination;
+import net.i2p.data.Hash;
+
 /**
  * Handle I2CP dest replies from the router
  */
@@ -22,6 +25,12 @@ class DestReplyMessageHandler extends HandlerImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Handle message " + message);
         DestReplyMessage msg = (DestReplyMessage) message;
-       ((I2PSimpleSession)session).destReceived(msg.getDestination());
+        Destination d = msg.getDestination();
+        if (d != null)
+            session.destReceived(d);
+        Hash h = msg.getHash();
+        if (h != null)
+            session.destLookupFailed(h);
+        // else let it time out
     }
 }

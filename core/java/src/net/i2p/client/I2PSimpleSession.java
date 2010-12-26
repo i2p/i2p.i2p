@@ -33,12 +33,6 @@ import net.i2p.util.I2PAppThread;
  * @author zzz
  */
 class I2PSimpleSession extends I2PSessionImpl2 {
-    private boolean _destReceived;
-    private /* FIXME final FIXME */ Object _destReceivedLock;
-    private Destination _destination;
-    private boolean _bwReceived;
-    private /* FIXME final FIXME */ Object _bwReceivedLock;
-    private int[] _bwLimits;
 
     /**
      * Create a new session for doing naming and bandwidth queries only. Do not create a destination.
@@ -102,57 +96,6 @@ class I2PSimpleSession extends I2PSessionImpl2 {
             _closed = true;
             throw new I2PSessionException(getPrefix() + "Cannot connect to the router on " + _hostname + ':' + _portNum, ioe);
         }
-    }
-
-    /** called by the message handler */
-    void destReceived(Destination d) {
-        _destReceived = true;
-        _destination = d;
-        synchronized (_destReceivedLock) {
-            _destReceivedLock.notifyAll();
-        }
-    }
-
-    void bwReceived(int[] i) {
-        _bwReceived = true;
-        _bwLimits = i;
-        synchronized (_bwReceivedLock) {
-            _bwReceivedLock.notifyAll();
-        }
-    }
-
-    @Override
-    public Destination lookupDest(Hash h) throws I2PSessionException {
-        if (_closed)
-            return null;
-        _destReceivedLock = new Object();
-        sendMessage(new DestLookupMessage(h));
-        for (int i = 0; i < 10 && !_destReceived; i++) {
-            try {
-                synchronized (_destReceivedLock) {
-                    _destReceivedLock.wait(1000);
-                }
-            } catch (InterruptedException ie) {}
-        }
-        _destReceived = false;
-        return _destination;
-    }
-
-    @Override
-    public int[] bandwidthLimits() throws I2PSessionException {
-        if (_closed)
-            return null;
-        _bwReceivedLock = new Object();
-        sendMessage(new GetBandwidthLimitsMessage());
-        for (int i = 0; i < 5 && !_bwReceived; i++) {
-            try {
-                synchronized (_bwReceivedLock) {
-                    _bwReceivedLock.wait(1000);
-                }
-            } catch (InterruptedException ie) {}
-        }
-        _bwReceived = false;
-        return _bwLimits;
     }
 
     /**
