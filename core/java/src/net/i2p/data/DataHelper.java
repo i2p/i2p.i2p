@@ -914,9 +914,20 @@ public class DataHelper {
         return c;
     }
 
+    /**
+     *  This is different than InputStream.read(target), in that it
+     *  does repeated reads until the full data is received.
+     */
     public static int read(InputStream in, byte target[]) throws IOException {
         return read(in, target, 0, target.length);
     }
+
+    /**
+     *  This is different than InputStream.read(target, offset, length), in that it
+     *  returns the new offset (== old offset + bytes read).
+     *  It also does repeated reads until the full data is received.
+     *  @return the new offset (== old offset + bytes read)
+     */
     public static int read(InputStream in, byte target[], int offset, int length) throws IOException {
         int cur = offset;
         while (cur < length) {

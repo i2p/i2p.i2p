@@ -306,7 +306,7 @@ public class MetaInfo
     if (piece >= 0 && piece < pieces -1)
       return piece_length;
     else if (piece == pieces -1)
-      return (int)(length - piece * piece_length);
+      return (int)(length - ((long)piece * piece_length));
     else
       throw new IndexOutOfBoundsException("no piece: " + piece);
   }

@@ -31,17 +31,40 @@ public class Addresses {
     }
 
     /**
-     *  @return an array of all addresses, excluding
+     *  @return a sorted array of all addresses, excluding
      *  IPv6, local, broadcast, multicast, etc.
      */
     public static String[] getAddresses() {
+        return getAddresses(false);
+    }
+
+    /**
+     *  @return a sorted array of all addresses, excluding
+     *  only link local and multicast
+     *  @since 0.8.3
+     */
+    public static String[] getAllAddresses() {
+        return getAddresses(true);
+    }
+
+    /**
+     *  @return a sorted array of all addresses
+     *  @param whether to exclude IPV6 and local
+     *  @return an array of all addresses
+     *  @since 0.8.3
+     */
+    public static String[] getAddresses(boolean all) {
         Set<String> rv = new HashSet(4);
         try {
             InetAddress localhost = InetAddress.getLocalHost();
             InetAddress[] allMyIps = InetAddress.getAllByName(localhost.getCanonicalHostName());
             if (allMyIps != null) {
-                for (int i = 0; i < allMyIps.length; i++)
-                     add(rv, allMyIps[i]);
+                for (int i = 0; i < allMyIps.length; i++) {
+                    if (all)
+                        addAll(rv, allMyIps[i]);
+                    else
+                        add(rv, allMyIps[i]);
+                }
             }
         } catch (UnknownHostException e) {}
 
@@ -50,7 +73,10 @@ public class Addresses {
                 NetworkInterface ifc = ifcs.nextElement();
                 for(Enumeration<InetAddress> addrs =  ifc.getInetAddresses(); addrs.hasMoreElements();) {
                     InetAddress addr = addrs.nextElement();
-                    add(rv, addr);
+                    if (all)
+                        addAll(rv, addr);
+                    else
+                        add(rv, addr);
                 }
             }
         } catch (SocketException e) {}
@@ -79,8 +105,16 @@ public class Addresses {
         set.add(ip);
     }
 
+    private static void addAll(Set<String> set, InetAddress ia) {
+        if (ia.isLinkLocalAddress() ||
+            ia.isMulticastAddress())
+            return;
+        String ip = ia.getHostAddress();
+        set.add(ip);
+    }
+
     public static void main(String[] args) {
-        String[] a = getAddresses();
+        String[] a = getAddresses(true);
         for (String s : a)
             System.err.println("Address: " + s);
     }

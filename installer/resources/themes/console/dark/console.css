@@ -843,7 +843,7 @@ input:active {
      color: #EE9;
 }
 
-input[type=text] {
+input[type=text], input[type=password] {
      background: #000;
      color: #EE9;
      margin: 5px 10px;
@@ -859,7 +859,7 @@ input[type=text] {
      box-shadow: inset 1px 1px 1px 0px #000;
 }
 
-input[type=text]:active, input[type=text]:hover {
+input[type=text]:active, input[type=text]:hover, input[type=password]:active, input[type=password]:hover {
      background: #000;
 }
 

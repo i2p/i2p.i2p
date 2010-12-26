@@ -68,8 +68,9 @@ public class GarlicClove extends DataStructureImpl {
         _expiration = DataHelper.readDate(in);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("CloveID read: " + _cloveId + " expiration read: " + _expiration);
-        _certificate = new Certificate();
-        _certificate.readBytes(in);
+        //_certificate = new Certificate();
+        //_certificate.readBytes(in);
+        _certificate = Certificate.create(in);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Read cert: " + _certificate);
     }

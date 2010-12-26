@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import net.i2p.router.client.ClientManagerFacadeImpl;
 import net.i2p.router.startup.ClientAppConfig;
 import net.i2p.router.startup.LoadClientAppsJob;
 
@@ -33,6 +34,10 @@ public class ConfigClientsHandler extends FormHandler {
 
         if (_action.equals(_("Save Client Configuration"))) {
             saveClientChanges();
+            return;
+        }
+        if (_action.equals(_("Save Interface Configuration"))) {
+            saveInterfaceChanges();
             return;
         }
         if (_action.equals(_("Save WebApp Configuration"))) {
@@ -193,7 +198,7 @@ public class ConfigClientsHandler extends FormHandler {
         String[] arr = (String[]) _settings.get(key);
         if (arr == null)
             return null;
-        return arr[0];
+        return arr[0].trim();
     }
 
     private void startClient(int i) {
@@ -336,5 +341,38 @@ public class ConfigClientsHandler extends FormHandler {
             addFormError(_("Error starting plugin {0}", app) + ": " + e);
             _log.error("Error starting plugin " + app,  e);
         }
+    }
+
+    /**
+     *  Handle interface form
+     *  @since 0.8.3
+     */
+    private void saveInterfaceChanges() {
+        String port = getJettyString("port");
+        if (port != null)
+            _context.router().setConfigSetting(ClientManagerFacadeImpl.PROP_CLIENT_PORT, port);
+        String intfc = getJettyString("interface");
+        if (intfc != null)
+            _context.router().setConfigSetting(ClientManagerFacadeImpl.PROP_CLIENT_HOST, intfc);
+        String user = getJettyString("user");
+        if (user != null)
+            _context.router().setConfigSetting(ConfigClientsHelper.PROP_USER, user);
+        String pw = getJettyString("pw");
+        if (pw != null)
+            _context.router().setConfigSetting(ConfigClientsHelper.PROP_PW, pw);
+        String mode = getJettyString("mode");
+        boolean disabled = "0".equals(mode);
+        boolean ssl = "2".equals(mode);
+        _context.router().setConfigSetting(ConfigClientsHelper.PROP_DISABLE_EXTERNAL,
+                                           Boolean.toString(disabled));
+        _context.router().setConfigSetting(ConfigClientsHelper.PROP_ENABLE_SSL,
+                                           Boolean.toString(ssl));
+        _context.router().setConfigSetting(ConfigClientsHelper.PROP_AUTH,
+                                           Boolean.toString((_settings.get("auth") != null)));
+        boolean all = "0.0.0.0".equals(intfc) || "0:0:0:0:0:0:0:0".equals(intfc) ||
+                      "::".equals(intfc);
+        _context.router().setConfigSetting(ConfigClientsHelper.BIND_ALL_INTERFACES, Boolean.toString(all));
+        _context.router().saveConfig();
+        addFormNotice(_("Interface configuration saved successfully - restart required to take effect."));
     }
 }

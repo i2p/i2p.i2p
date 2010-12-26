@@ -115,7 +115,7 @@ class OutboundClientMessageJobHelper {
         instructions.setRouter(null);
         instructions.setTunnelId(null);
         
-        config.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
+        config.setCertificate(Certificate.NULL_CERT);
         config.setDeliveryInstructions(instructions);
         config.setId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         config.setExpiration(expiration); // +2*Router.CLOCK_FUDGE_FACTOR);
@@ -165,7 +165,7 @@ class OutboundClientMessageJobHelper {
         if (log.shouldLog(Log.DEBUG))
             log.debug("Delivery status message key: " + replyToken + " arrival: " + msg.getArrival());
         
-        ackClove.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
+        ackClove.setCertificate(Certificate.NULL_CERT);
         ackClove.setDeliveryInstructions(ackInstructions);
         ackClove.setExpiration(expiration);
         ackClove.setId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
@@ -196,7 +196,7 @@ class OutboundClientMessageJobHelper {
         instructions.setDelaySeconds(0);
         instructions.setEncrypted(false);
         
-        clove.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
+        clove.setCertificate(Certificate.NULL_CERT);
         clove.setDeliveryInstructions(instructions);
         clove.setExpiration(expiration);
         clove.setId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
@@ -222,7 +222,7 @@ class OutboundClientMessageJobHelper {
         instructions.setDelaySeconds(0);
         instructions.setEncrypted(false);
         
-        clove.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
+        clove.setCertificate(Certificate.NULL_CERT);
         clove.setDeliveryInstructions(instructions);
         clove.setExpiration(expiration);
         clove.setId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
