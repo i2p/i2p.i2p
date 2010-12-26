@@ -9,10 +9,10 @@ import java.net.Inet4Address;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 
 /**
@@ -21,31 +21,31 @@ import java.util.Set;
  * @since 0.8.3 moved to core
  * @author zzz
  */
-public class Addresses {
+public abstract class Addresses {
     
     /** @return the first non-local address it finds, or null */
     public static String getAnyAddress() {
-        String[] a = getAddresses();
-        if (a.length > 0)
-            return a[0];
+        SortedSet<String> a = getAddresses();
+        if (!a.isEmpty())
+            return a.first();
         return null;
     }
 
     /**
-     *  @return a sorted array of all addresses, excluding
+     *  @return a sorted set of all addresses, excluding
      *  IPv6, local, broadcast, multicast, etc.
      */
-    public static String[] getAddresses() {
-        return getAddresses(false);
+    public static SortedSet<String> getAddresses() {
+        return getAddresses(false, false);
     }
 
     /**
-     *  @return a sorted array of all addresses, excluding
+     *  @return a sorted set of all addresses, excluding
      *  only link local and multicast
      *  @since 0.8.3
      */
-    public static String[] getAllAddresses() {
-        return getAddresses(true);
+    public static SortedSet<String> getAllAddresses() {
+        return getAddresses(true, true);
     }
 
     /**
@@ -54,17 +54,15 @@ public class Addresses {
      *  @return an array of all addresses
      *  @since 0.8.3
      */
-    public static String[] getAddresses(boolean all) {
-        Set<String> rv = new HashSet(4);
+    public static SortedSet<String> getAddresses(boolean includeLocal, boolean includeIPv6) {
+        SortedSet<String> rv = new TreeSet();
         try {
             InetAddress localhost = InetAddress.getLocalHost();
             InetAddress[] allMyIps = InetAddress.getAllByName(localhost.getCanonicalHostName());
             if (allMyIps != null) {
                 for (int i = 0; i < allMyIps.length; i++) {
-                    if (all)
-                        addAll(rv, allMyIps[i]);
-                    else
-                        add(rv, allMyIps[i]);
+                    if (shouldInclude(allMyIps[i], includeLocal, includeIPv6))
+                        rv.add(allMyIps[i].getHostAddress());
                 }
             }
         } catch (UnknownHostException e) {}
@@ -74,49 +72,54 @@ public class Addresses {
                 NetworkInterface ifc = ifcs.nextElement();
                 for(Enumeration<InetAddress> addrs =  ifc.getInetAddresses(); addrs.hasMoreElements();) {
                     InetAddress addr = addrs.nextElement();
-                    if (all)
-                        addAll(rv, addr);
-                    else
-                        add(rv, addr);
+                    if (shouldInclude(addr, includeLocal, includeIPv6))
+                        rv.add(addr.getHostAddress());
                 }
             }
         } catch (SocketException e) {}
 
-        String[] rva = rv.toArray(new String[rv.size()]);
-        Arrays.sort(rva);
-        return rva;
+        if (includeLocal)
+            rv.add("0.0.0.0");
+        if (includeLocal && includeIPv6) {
+            boolean ipv6 = false;
+            for (String a : rv) {
+                if (a.indexOf(':') >= 0) {
+                    ipv6 = true;
+                    break;
+                }
+            }
+            if (ipv6)
+                rv.add("0:0:0:0:0:0:0:0");  // we could do "::" but all the other ones are probably in long form
+        }
+        return rv;
     }
 
-    private static void add(Set<String> set, InetAddress ia) {
-        if (ia.isAnyLocalAddress() ||
-            ia.isLinkLocalAddress() ||
-            ia.isLoopbackAddress() ||
-            ia.isMulticastAddress() ||
-            ia.isSiteLocalAddress() ||
+    private static boolean shouldInclude(InetAddress ia, boolean includeLocal, boolean includeIPv6) {
+        return
+            (!ia.isLinkLocalAddress()) &&
+            (!ia.isMulticastAddress()) &&
+            (includeLocal ||
+             ((!ia.isAnyLocalAddress()) &&
+              (!ia.isLoopbackAddress()) &&
+              (!ia.isSiteLocalAddress()))) &&
             // Hamachi 5/8 allocated to RIPE (30 November 2010)
             // Removed from TransportImpl.isPubliclyRoutable()
             // Check moved to here, for now, but will eventually need to
             // remove it from here also.
-            ia.getHostAddress().startsWith("5.") ||
-            !(ia instanceof Inet4Address)) {
-//            System.err.println("Skipping: " + ia.getHostAddress());
-            return;
-        }
-        String ip = ia.getHostAddress();
-        set.add(ip);
-    }
-
-    private static void addAll(Set<String> set, InetAddress ia) {
-        if (ia.isLinkLocalAddress() ||
-            ia.isMulticastAddress())
-            return;
-        String ip = ia.getHostAddress();
-        set.add(ip);
+            (includeLocal ||
+            (!ia.getHostAddress().startsWith("5."))) &&
+            (includeIPv6 ||
+             (ia instanceof Inet4Address));
     }
 
     public static void main(String[] args) {
-        String[] a = getAddresses(true);
+        System.err.println("External Addresses:");
+        Set<String> a = getAddresses(false, false);
         for (String s : a)
-            System.err.println("Address: " + s);
+            System.err.println(s);
+        System.err.println("All addresses:");
+        a = getAddresses(true, true);
+        for (String s : a)
+            System.err.println(s);
     }
 }

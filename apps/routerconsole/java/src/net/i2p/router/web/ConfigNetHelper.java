@@ -1,5 +1,7 @@
 package net.i2p.router.web;
 
+import java.util.ArrayList;
+
 import net.i2p.data.DataHelper;
 import net.i2p.data.RouterAddress;
 import net.i2p.router.CommSystemFacade;
@@ -147,7 +149,8 @@ public class ConfigNetHelper extends HelperBase {
     }
     
     public String[] getAddresses() {
-        return Addresses.getAddresses();
+        ArrayList<String> al = new ArrayList(Addresses.getAddresses());
+        return al.toArray(new String[al.size()]);
     }
 
     public String getInboundRate() {

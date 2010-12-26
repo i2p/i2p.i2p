@@ -2,8 +2,6 @@ package net.i2p.router.web;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -67,22 +65,8 @@ public class ConfigClientsHelper extends HelperBase {
 
     /** @since 0.8.3 */
     public String[] intfcAddresses() {
-        String[] addrs = Addresses.getAllAddresses();
-        List<String> aList = new ArrayList();
-        aList.addAll(Arrays.asList(addrs));
-        boolean ipv6 = false;
-        for (String a : aList) {
-            if (a.indexOf(':') >= 0) {
-                ipv6 = true;
-                break;
-            }
-        }
-        if (!aList.contains("0.0.0.0"))
-            aList.add("0.0.0.0");
-        if (ipv6 && !aList.contains("0:0:0:0:0:0:0:0"))
-            aList.add("0:0:0:0:0:0:0:0");  // we could do "::" but all the other ones are probably in long form
-        Collections.sort(aList);
-        return aList.toArray(addrs);
+        ArrayList<String> al = new ArrayList(Addresses.getAllAddresses());
+        return al.toArray(new String[al.size()]);
     }
 
     /** @since 0.8.3 */
