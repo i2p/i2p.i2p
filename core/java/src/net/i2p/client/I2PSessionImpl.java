@@ -864,13 +864,16 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             return null;
         LookupWaiter waiter = new LookupWaiter(h);
         _pendingLookups.offer(waiter);
-        sendMessage(new DestLookupMessage(h));
         try {
-            synchronized (waiter) {
-                waiter.wait(maxWait);
-            }
-        } catch (InterruptedException ie) {}
-        _pendingLookups.remove(waiter);
+            sendMessage(new DestLookupMessage(h));
+            try {
+                synchronized (waiter) {
+                    waiter.wait(maxWait);
+                }
+            } catch (InterruptedException ie) {}
+        } finally {
+            _pendingLookups.remove(waiter);
+        }
         return waiter.destination;
     }
 
