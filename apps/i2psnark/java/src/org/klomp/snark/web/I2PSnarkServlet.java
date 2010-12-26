@@ -35,6 +35,7 @@ import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFileOutputStream;
 
+import org.klomp.snark.I2PSnarkUtil;
 import org.klomp.snark.MetaInfo;
 import org.klomp.snark.Peer;
 import org.klomp.snark.Snark;
@@ -1389,7 +1390,7 @@ public class I2PSnarkServlet extends Default {
             _manager.addMessage(_("Invalid info hash in magnet URL {0}", url));
             return;
         }
-        _manager.addMagnet(name, ih);
+        _manager.addMagnet(name, ih, true);
     }
 
     /** copied from ConfigTunnelsHelper */
@@ -1574,7 +1575,7 @@ public class I2PSnarkServlet extends Default {
             }
             buf.append("<br>").append(_("Pieces")).append(": ").append(pieces);
             buf.append("<br>").append(_("Piece size")).append(": ").append(formatSize(snark.getPieceLength(0)));
-            String hex = toHex(snark.getInfoHash());
+            String hex = I2PSnarkUtil.toHex(snark.getInfoHash());
             buf.append("<br>").append(_("Magnet link")).append(": <a href=\"").append(MAGNET).append(hex).append("\">")
                .append(MAGNET).append(hex).append("</a>");
             // We don't have the hash of the torrent file
@@ -1797,21 +1798,6 @@ public class I2PSnarkServlet extends Default {
     /** @since 0.8.2 */
     private static String toImg(String icon, String altText) {
         return "<img alt=\"" + altText + "\" height=\"16\" width=\"16\" src=\"/i2psnark/_icons/" + icon + ".png\">";
-    }
-
-    /**
-     *  Like DataHelper.toHexString but ensures no loss of leading zero bytes
-     *  @since 0.8.4
-     */
-    private static String toHex(byte[] b) {
-        StringBuilder buf = new StringBuilder(40);
-        for (int i = 0; i < b.length; i++) {
-            int bi = b[i] & 0xff;
-            if (bi < 16)
-                buf.append('0');
-            buf.append(Integer.toHexString(bi));
-        }
-        return buf.toString();
     }
 
     /** @since 0.8.1 */

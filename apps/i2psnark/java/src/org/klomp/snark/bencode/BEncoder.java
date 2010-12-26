@@ -50,6 +50,8 @@ public class BEncoder
   public static void bencode(Object o, OutputStream out)
     throws IOException, IllegalArgumentException
   {
+    if (o == null)
+      throw new NullPointerException("Cannot bencode null");
     if (o instanceof String)
       bencode((String)o, out);
     else if (o instanceof byte[])
