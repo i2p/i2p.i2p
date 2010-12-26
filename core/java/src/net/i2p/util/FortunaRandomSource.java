@@ -23,7 +23,7 @@ import net.i2p.crypto.EntropyHarvester;
  *
  */
 public class FortunaRandomSource extends RandomSource implements EntropyHarvester {
-    private AsyncFortunaStandalone _fortuna;
+    private final AsyncFortunaStandalone _fortuna;
     private double _nextGaussian;
     private boolean _haveNextGaussian;
 
@@ -210,6 +210,7 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
         _fortuna.addRandomBytes(data, offset, len);
     }
     
+/*****
     public static void main(String args[]) {
         try {
             RandomSource rand = I2PAppContext.getGlobalContext().random();
@@ -231,4 +232,5 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
             System.out.println("Compressed size of 1MB: " + compressed.length);
         } catch (Exception e) { e.printStackTrace(); }
     }
+*****/
 }

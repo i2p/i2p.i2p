@@ -25,18 +25,23 @@ import net.i2p.data.Base64;
  * @author jrandom
  */
 public class RandomSource extends SecureRandom implements EntropyHarvester {
-    private Log _log;
-    private EntropyHarvester _entropyHarvester;
-    protected I2PAppContext _context;
+    private final EntropyHarvester _entropyHarvester;
+    protected final I2PAppContext _context;
 
     public RandomSource(I2PAppContext context) {
         super();
         _context = context;
-        _log = context.logManager().getLog(RandomSource.class);
         // when we replace to have hooks for fortuna (etc), replace with
         // a factory (or just a factory method)
         _entropyHarvester = this;
     }
+
+    /**
+     * Singleton for whatever PRNG i2p uses.  
+     * Same as I2PAppContext.getGlobalContext().random();
+     * use context.random() if you have a context already.
+     * @return I2PAppContext.getGlobalContext().random()
+     */
     public static RandomSource getInstance() {
         return I2PAppContext.getGlobalContext().random();
     }
