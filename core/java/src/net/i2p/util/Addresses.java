@@ -1,4 +1,4 @@
-package net.i2p.router.transport;
+package net.i2p.util;
 
 /*
  * public domain
@@ -18,6 +18,7 @@ import java.util.Set;
 /**
  * Get the local addresses
  *
+ * @since 0.8.3 moved to core
  * @author zzz
  */
 public class Addresses {

@@ -4,11 +4,11 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.RouterAddress;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.Router;
-import net.i2p.router.transport.Addresses;
 import net.i2p.router.transport.TransportManager;
 import net.i2p.router.transport.udp.UDPAddress;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.time.Timestamper;
+import net.i2p.util.Addresses;
 
 public class ConfigNetHelper extends HelperBase {
     public ConfigNetHelper() {}

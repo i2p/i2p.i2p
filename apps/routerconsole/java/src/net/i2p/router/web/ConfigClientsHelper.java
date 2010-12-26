@@ -13,7 +13,7 @@ import java.util.TreeSet;
 
 import net.i2p.router.client.ClientManagerFacadeImpl;
 import net.i2p.router.startup.ClientAppConfig;
-import net.i2p.router.transport.Addresses;
+import net.i2p.util.Addresses;
 
 public class ConfigClientsHelper extends HelperBase {
     private String _edit;
