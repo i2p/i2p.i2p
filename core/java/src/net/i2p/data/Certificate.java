@@ -111,8 +111,10 @@ public class Certificate extends DataStructureImpl {
             DataHelper.writeLong(out, 2, 0L);
         }
     }
-    
-    
+
+    /**
+     *  @return the written length (NOT the new offset)    
+     */    
     public int writeBytes(byte target[], int offset) {
         int cur = offset;
         DataHelper.toLong(target, cur, 1, _type);
@@ -242,7 +244,7 @@ public class Certificate extends DataStructureImpl {
         @Override
         public int writeBytes(byte target[], int offset) {
             System.arraycopy(NULL_DATA, 0, target, offset, NULL_LENGTH);
-            return offset + NULL_LENGTH;
+            return NULL_LENGTH;
         }
     
         /** @throws RuntimeException always */
