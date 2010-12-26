@@ -138,13 +138,21 @@ public interface I2PSession {
     public SigningPrivateKey getPrivateKey();
 
     /**
-     * Lookup up a Hash
-     *
+     * Lookup a Destination by Hash.
+     * Blocking. Waits a max of 10 seconds by default.
      */
     public Destination lookupDest(Hash h) throws I2PSessionException;
 
     /**
-     * Get the current bandwidth limits
+     *  Blocking.
+     *  @param maxWait ms
+     *  @since 0.8.3
+     *  @return null on failure
+     */
+    public Destination lookupDest(Hash h, long maxWait) throws I2PSessionException;
+
+    /**
+     * Get the current bandwidth limits. Blocking.
      */
     public int[] bandwidthLimits() throws I2PSessionException;
 
