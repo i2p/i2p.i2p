@@ -1,3 +1,10 @@
+2010-12-26 sponge
+    * URI resource fixes from pre-review time from upstream prior merge
+    * Evolve URI fixs another step.
+    * Document how the URI path fix works.
+    * Fix 302 redirects so they URL encode properly.
+    * bump to -1
+
 * 2010-12-22  0.8.2 released
 
 2010-12-13 dr|z3d

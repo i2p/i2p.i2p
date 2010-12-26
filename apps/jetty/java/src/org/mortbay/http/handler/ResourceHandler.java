@@ -296,7 +296,13 @@ public class ResourceHandler extends AbstractHttpHandler
                     log.debug("Redirect to directory/");
                     
                     String q=request.getQuery();
-                    StringBuffer buf = URI.encodePath(null, request.getRequestURL().toString());
+                    
+                    // Properly fix URI
+                    URI urifix = new URI(request.getRequestURL().toString());
+                    urifix.setPath(urifix.getPath());
+                    StringBuffer buf = new StringBuffer(urifix.toString());
+                    urifix = null;
+                    
                     if (q!=null&&q.length()!=0)
                     {
                         buf.append('?');

@@ -570,9 +570,14 @@ public class URI
      */
     public static StringBuffer encodePath(StringBuffer buf, String path)
     {
-        // Convert path to native first.
+        /* Convert path to native character set not __CHARSET.
+         * This is important to do this way because the path 
+         * contains *OS specific characters* and __CHARSET could
+         * be wrong and not encode/decode the path correctly.
+         */
         byte[] b = null;
         /*
+        Keep commented out unless you can prove that this does the right thing.
         try {
             b = path.getBytes(__CHARSET);
         } catch(UnsupportedEncodingException ex) {
@@ -604,12 +609,16 @@ public class URI
                 char c = _path.charAt(i);
                 String cs = "" + c;
                 if(reserved.contains(cs) || !unreserved.contains(cs)) {
+                    /*
+                    We are already bytes
                     if((c & 0xff) == c) {
                         buf.append(gethex(c & 0xff));
                     } else {
                         buf.append(gethex((c >> 8) & 0xff));
                         buf.append(gethex(c & 0xff));
                     }
+                    */
+                    buf.append(gethex(c & 0xff));
                 } else {
                     buf.append(c);
                 }
@@ -717,6 +726,7 @@ public class URI
             return path;
 
         /*
+        Keep commented out unless you can prove that this does the right thing.
         try
         {    
             return new String(bytes,0,n,__CHARSET);
@@ -752,6 +762,11 @@ public class URI
     /** Add two URI path segments.
      * Handles null and empty paths, path and query params (eg ?a=b or
      * ;JSESSIONID=xxx) and avoids duplicate '/'
+     *
+     * WARNING: URI path segments must be encoded properly first!
+     *          Use the encodePath method above BEFORE attaching a path
+     *          that contains characters that need escaping! --Sponge
+     *
      * @param p1 URI path segment 
      * @param p2 URI path segment
      * @return Legally combined path segments.
