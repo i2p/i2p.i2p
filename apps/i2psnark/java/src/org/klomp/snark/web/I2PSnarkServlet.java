@@ -827,32 +827,13 @@ public class I2PSnarkServlet extends Default {
         out.write(statusString + "</td>\n\t");
 
         out.write("<td class=\"" + rowClass + "\">");
-        // temporarily hardcoded for postman* and anonymity, requires bytemonsoon patch for lookup by info_hash
         String announce = null;
-        if (isValid)
+        if (isValid) {
             announce = meta.getAnnounce();
-        if (announce != null && (announce.startsWith("http://YRgrgTLG") || announce.startsWith("http://8EoJZIKr") ||
-              announce.startsWith("http://lnQ6yoBT") || announce.startsWith("http://tracker2.postman.i2p/") ||
-              announce.startsWith("http://ahsplxkbhemefwvvml7qovzl5a2b5xo5i7lyai7ntdunvcyfdtna.b32.i2p/"))) {
-            Map trackers = _manager.getTrackers();
-            for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
-                Map.Entry entry = (Map.Entry)iter.next();
-                String name = (String)entry.getKey();
-                String baseURL = (String)entry.getValue();
-                if (!(baseURL.startsWith(announce) || // vvv hack for non-b64 announce in list vvv
-                      (announce.startsWith("http://lnQ6yoBT") && baseURL.startsWith("http://tracker2.postman.i2p/")) ||
-                      (announce.startsWith("http://ahsplxkbhemefwvvml7qovzl5a2b5xo5i7lyai7ntdunvcyfdtna.b32.i2p/") && baseURL.startsWith("http://tracker2.postman.i2p/"))))
-                    continue;
-                int e = baseURL.indexOf('=');
-                if (e < 0)
-                    continue;
-                baseURL = baseURL.substring(e + 1);
-                out.write("<a href=\"" + baseURL + "details.php?dllist=1&amp;filelist=1&amp;info_hash=");
-                out.write(TrackerClient.urlencode(snark.getInfoHash()));
-                out.write("\" title=\"" + _("Details at {0} tracker", name) + "\" target=\"_blank\">");
-                out.write("<img alt=\"" + _("Info") + "\" border=\"0\" src=\"" + _imgPath + "details.png\">");
-                out.write("</a>");
-                break;
+            if (announce != null) {
+                String trackerLink = getTrackerLink(announce, snark.getInfoHash());
+                if (trackerLink != null)
+                    out.write(trackerLink);
             }
         }
 
@@ -1092,6 +1073,39 @@ public class I2PSnarkServlet extends Default {
                 return diff;
             return l.toString().substring(5, 9).compareTo(r.toString().substring(5, 9));
         }
+    }
+
+    /**
+     *  @return string or null
+     *  @since 0.8.4
+     */
+    private String getTrackerLink(String announce, byte[] infohash) {
+        // temporarily hardcoded for postman* and anonymity, requires bytemonsoon patch for lookup by info_hash
+        if (announce != null && (announce.startsWith("http://YRgrgTLG") || announce.startsWith("http://8EoJZIKr") ||
+              announce.startsWith("http://lnQ6yoBT") || announce.startsWith("http://tracker2.postman.i2p/") ||
+              announce.startsWith("http://ahsplxkbhemefwvvml7qovzl5a2b5xo5i7lyai7ntdunvcyfdtna.b32.i2p/"))) {
+            Map<String, String> trackers = _manager.getTrackers();
+            for (Map.Entry<String, String> entry : trackers.entrySet()) {
+                String baseURL = entry.getValue();
+                if (!(baseURL.startsWith(announce) || // vvv hack for non-b64 announce in list vvv
+                      (announce.startsWith("http://lnQ6yoBT") && baseURL.startsWith("http://tracker2.postman.i2p/")) ||
+                      (announce.startsWith("http://ahsplxkbhemefwvvml7qovzl5a2b5xo5i7lyai7ntdunvcyfdtna.b32.i2p/") && baseURL.startsWith("http://tracker2.postman.i2p/"))))
+                    continue;
+                int e = baseURL.indexOf('=');
+                if (e < 0)
+                    continue;
+                baseURL = baseURL.substring(e + 1);
+                String name = entry.getKey();
+                StringBuilder buf = new StringBuilder(128);
+                buf.append("<a href=\"").append(baseURL).append("details.php?dllist=1&amp;filelist=1&amp;info_hash=")
+                   .append(TrackerClient.urlencode(infohash))
+                   .append("\" title=\"").append(_("Details at {0} tracker", name)).append("\" target=\"_blank\">" +
+                          "<img alt=\"").append(_("Info")).append("\" border=\"0\" src=\"")
+                   .append(_imgPath).append("details.png\"></a>");
+                return buf.toString();
+            }
+        }
+        return null;
     }
 
     private void writeAddForm(PrintWriter out, HttpServletRequest req) throws IOException {
@@ -1577,8 +1591,25 @@ public class I2PSnarkServlet extends Default {
             }
             buf.append("<br>").append(_("Pieces")).append(": ").append(pieces);
             buf.append("<br>").append(_("Piece size")).append(": ").append(formatSize(snark.getPieceLength(0)));
+
+            if (meta != null) {
+                String announce = meta.getAnnounce();
+                if (announce != null) {
+                    String trackerLink = getTrackerLink(announce, snark.getInfoHash());
+                    if (trackerLink != null) {
+                        if (announce.startsWith("http://"))
+                            announce = announce.substring(7);
+                        int slsh = announce.indexOf('/');
+                        if (slsh > 0)
+                            announce = announce.substring(0, slsh);
+                        buf.append("<br>").append(trackerLink).append(' ').append(announce);
+                    }
+                }
+            }
+
             String hex = I2PSnarkUtil.toHex(snark.getInfoHash());
-            buf.append("<br>").append(_("Magnet link")).append(": <a href=\"").append(MAGNET).append(hex).append("\">")
+            buf.append("<br>").append(toImg("magnet", _("Magnet link"))).append(" <a href=\"")
+               .append(MAGNET).append(hex).append("\">")
                .append(MAGNET).append(hex).append("</a>");
             // We don't have the hash of the torrent file
             //buf.append("<br>").append(_("Maggot link")).append(": <a href=\"").append(MAGGOT).append(hex).append(':').append(hex).append("\">")
