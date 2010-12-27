@@ -8,6 +8,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import net.i2p.data.i2cp.I2CPMessage;
 import net.i2p.data.i2cp.I2CPMessageImpl;
 import net.i2p.data.i2cp.I2CPMessageException;
+import net.i2p.internal.PoisonI2CPMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
@@ -52,7 +53,7 @@ class ClientWriterRunner implements Runnable {
     public void stopWriting() {
         _messagesToWrite.clear();
         try {
-            _messagesToWrite.put(new PoisonMessage());
+            _messagesToWrite.put(new PoisonI2CPMessage());
         } catch (InterruptedException ie) {}
     }
 
@@ -64,23 +65,9 @@ class ClientWriterRunner implements Runnable {
             } catch (InterruptedException ie) {
                 continue;
             }
-            if (msg.getType() == PoisonMessage.MESSAGE_TYPE)
+            if (msg.getType() == PoisonI2CPMessage.MESSAGE_TYPE)
                 break;
             _runner.writeMessage(msg);
         }
-    }
-
-    /**
-     * End-of-stream msg used to stop the concurrent queue
-     * See http://java.sun.com/j2se/1.5.0/docs/api/java/util/concurrent/BlockingQueue.html
-     *
-     */
-    private static class PoisonMessage extends I2CPMessageImpl {
-        public static final int MESSAGE_TYPE = 999999;
-        public int getType() {
-            return MESSAGE_TYPE;
-        }
-        public void doReadMessage(InputStream buf, int size) throws I2CPMessageException, IOException {}
-        public byte[] doWriteMessage() throws I2CPMessageException, IOException { return null; }
     }
 }

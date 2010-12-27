@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -16,13 +18,11 @@ import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-// Pack200 import
-// you must also uncomment the correct line in unpack() below
-// For gcj, gij, etc., comment both out
+// Pack200 now loaded dynamically in unpack() below
 //
 // For Sun, OpenJDK, IcedTea, etc, use this
-import java.util.jar.Pack200;
-
+//import java.util.jar.Pack200;
+//
 // For Apache Harmony or if you put its pack200.jar in your library directory use this
 //import org.apache.harmony.unpack200.Archive;
 
@@ -231,37 +231,79 @@ public class FileUtil {
     }
     
     /**
-     * This won't work right if one of the two options in unpack() is commented out.
+     * Public since 0.8.3
      * @since 0.8.1
      */
-    private static boolean isPack200Supported() {
+    public static boolean isPack200Supported() {
         try {
             Class.forName("java.util.jar.Pack200", false, ClassLoader.getSystemClassLoader());
             return true;
         } catch (Exception e) {}
         try {
-            Class.forName("org.apache.harmony.pack200.Archive", false, ClassLoader.getSystemClassLoader());
+            Class.forName("org.apache.harmony.unpack200.Archive", false, ClassLoader.getSystemClassLoader());
             return true;
         } catch (Exception e) {}
         return false;
     }
 
+    private static boolean _failedOracle;
+    private static boolean _failedApache;
+
     /**
+     * Unpack using either Oracle or Apache's unpack200 library,
+     * with the classes discovered at runtime so neither is required at compile time.
+     *
      * Caller must close streams
+     * @throws IOException on unpack error or if neither library is available.
+     *         Will not throw ClassNotFoundException.
+     * @throws org.apache.harmony.pack200.Pack200Exception which is not an IOException
      * @since 0.8.1
      */
     private static void unpack(InputStream in, JarOutputStream out) throws Exception {
         // For Sun, OpenJDK, IcedTea, etc, use this
-        Pack200.newUnpacker().unpack(in, out);
+        //Pack200.newUnpacker().unpack(in, out);
+        if (!_failedOracle) {
+            try {
+                Class p200 = Class.forName("java.util.jar.Pack200", true, ClassLoader.getSystemClassLoader());
+                Method newUnpacker = p200.getMethod("newUnpacker", (Class[]) null);
+                Object unpacker = newUnpacker.invoke(null,(Object[])  null);
+                Method unpack = unpacker.getClass().getMethod("unpack", new Class[] {InputStream.class, JarOutputStream.class});
+                // throws IOException
+                unpack.invoke(unpacker, new Object[] {in, out});
+                return;
+            } catch (ClassNotFoundException e) {
+                _failedOracle = true;
+                //e.printStackTrace();
+            } catch (NoSuchMethodException e) {
+                _failedOracle = true;
+                //e.printStackTrace();
+            }
+        }
 
         // ------------------
         // For Apache Harmony or if you put its pack200.jar in your library directory use this
         //(new Archive(in, out)).unpack();
-
+        if (!_failedApache) {
+            try {
+                Class p200 = Class.forName("org.apache.harmony.unpack200.Archive", true, ClassLoader.getSystemClassLoader());
+                Constructor newUnpacker = p200.getConstructor(new Class[] {InputStream.class, JarOutputStream.class});
+                Object unpacker = newUnpacker.newInstance(new Object[] {in, out});
+                Method unpack = unpacker.getClass().getMethod("unpack", (Class[]) null);
+                // throws IOException or Pack200Exception
+                unpack.invoke(unpacker, (Object[]) null);
+                return;
+            } catch (ClassNotFoundException e) {
+                _failedApache = true;
+                //e.printStackTrace();
+            } catch (NoSuchMethodException e) {
+                _failedApache = true;
+                //e.printStackTrace();
+            }
+        }
 
         // ------------------
         // For gcj, gij, etc., use this
-        //throw new IOException("Pack200 not supported");
+        throw new IOException("Unpack200 not supported");
     }
 
     /**
@@ -378,12 +420,13 @@ public class FileUtil {
     }
     
     /**
-     * Usage: FileUtil (delete path | copy source dest)
+     * Usage: FileUtil (delete path | copy source dest | unzip path.zip)
      *
      */
     public static void main(String args[]) {
         if ( (args == null) || (args.length < 2) ) {
-            testRmdir();
+            System.err.println("Usage: delete path | copy source dest | unzip path.zip");
+            //testRmdir();
         } else if ("delete".equals(args[0])) {
             boolean deleted = FileUtil.rmdir(args[1], false);
             if (!deleted)
@@ -407,6 +450,7 @@ public class FileUtil {
         }
     }
     
+  /*****
     private static void testRmdir() {
         File t = new File("rmdirTest/test/subdir/blah");
         boolean created = t.mkdirs();
@@ -417,4 +461,5 @@ public class FileUtil {
         else
             System.out.println("PASS: rmdirTest deleted");
     }
+   *****/
 }

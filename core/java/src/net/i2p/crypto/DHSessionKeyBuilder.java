@@ -13,8 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
@@ -48,14 +47,15 @@ import net.i2p.util.RandomSource;
  * @author jrandom
  */
 public class DHSessionKeyBuilder {
-    private static I2PAppContext _context = I2PAppContext.getGlobalContext();
-    private final static Log _log = new Log(DHSessionKeyBuilder.class);
-    private static int MIN_NUM_BUILDERS = -1;
-    private static int MAX_NUM_BUILDERS = -1;
-    private static int CALC_DELAY = -1;
-    /* FIXME this should be final if you syncronize FIXME */
-    private static volatile List _builders = new ArrayList(50);
-    private static Thread _precalcThread = null;
+    private static final I2PAppContext _context = I2PAppContext.getGlobalContext();
+    private static final Log _log;
+    private static final int MIN_NUM_BUILDERS;
+    private static final int MAX_NUM_BUILDERS;
+    private static final int CALC_DELAY;
+    private static final LinkedBlockingQueue<DHSessionKeyBuilder> _builders;
+    private static final Thread _precalcThread;
+
+    // the data of importance
     private BigInteger _myPrivateValue;
     private BigInteger _myPublicValue;
     private BigInteger _peerValue;
@@ -65,17 +65,31 @@ public class DHSessionKeyBuilder {
     public final static String PROP_DH_PRECALC_MIN = "crypto.dh.precalc.min";
     public final static String PROP_DH_PRECALC_MAX = "crypto.dh.precalc.max";
     public final static String PROP_DH_PRECALC_DELAY = "crypto.dh.precalc.delay";
-    public final static int DEFAULT_DH_PRECALC_MIN = 5;
-    public final static int DEFAULT_DH_PRECALC_MAX = 50;
-    public final static int DEFAULT_DH_PRECALC_DELAY = 10000;
+    public final static int DEFAULT_DH_PRECALC_MIN = 15;
+    public final static int DEFAULT_DH_PRECALC_MAX = 40;
+    public final static int DEFAULT_DH_PRECALC_DELAY = 200;
+
+    /** check every 30 seconds whether we have less than the minimum */
+    private static long _checkDelay = 30 * 1000;
 
     static {
         I2PAppContext ctx = _context;
-        ctx.statManager().createRateStat("crypto.dhGeneratePublicTime", "How long it takes to create x and X", "Encryption", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
-        ctx.statManager().createRateStat("crypto.dhCalculateSessionTime", "How long it takes to create the session key", "Encryption", new long[] { 60*1000, 5*60*1000, 60*60*1000 });        
-        MIN_NUM_BUILDERS = ctx.getProperty(PROP_DH_PRECALC_MIN, DEFAULT_DH_PRECALC_MIN);
-        MAX_NUM_BUILDERS = ctx.getProperty(PROP_DH_PRECALC_MAX, DEFAULT_DH_PRECALC_MAX);
+        _log = ctx.logManager().getLog(DHSessionKeyBuilder.class);
+        ctx.statManager().createRateStat("crypto.dhGeneratePublicTime", "How long it takes to create x and X", "Encryption", new long[] { 60*60*1000 });
+        ctx.statManager().createRateStat("crypto.dhCalculateSessionTime", "How long it takes to create the session key", "Encryption", new long[] { 60*60*1000 });        
+        ctx.statManager().createRateStat("crypto.DHUsed", "Need a DH from the queue", "Encryption", new long[] { 60*60*1000 });
+        ctx.statManager().createRateStat("crypto.DHEmpty", "DH queue empty", "Encryption", new long[] { 60*60*1000 });
+
+        // add to the defaults for every 128MB of RAM, up to 512MB
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        int factor = Math.min(4, (int) (1 + (maxMemory / (128*1024*1024l))));
+        int defaultMin = DEFAULT_DH_PRECALC_MIN * factor;
+        int defaultMax = DEFAULT_DH_PRECALC_MAX * factor;
+        MIN_NUM_BUILDERS = ctx.getProperty(PROP_DH_PRECALC_MIN, defaultMin);
+        MAX_NUM_BUILDERS = ctx.getProperty(PROP_DH_PRECALC_MAX, defaultMax);
+
         CALC_DELAY = ctx.getProperty(PROP_DH_PRECALC_DELAY, DEFAULT_DH_PRECALC_DELAY);
+        _builders = new LinkedBlockingQueue(MAX_NUM_BUILDERS);
 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("DH Precalc (minimum: " + MIN_NUM_BUILDERS + " max: " + MAX_NUM_BUILDERS + ", delay: "
@@ -90,40 +104,33 @@ public class DHSessionKeyBuilder {
 
     /**
      * Construct a new DH key builder
-     *
+     * or pulls a prebuilt one from the queue.
      */
     public DHSessionKeyBuilder() {
-        this(false);
-        DHSessionKeyBuilder builder = null;
-        synchronized (_builders) {
-            if (!_builders.isEmpty()) {
-                builder = (DHSessionKeyBuilder) _builders.remove(0);
-                if (_log.shouldLog(Log.DEBUG)) _log.debug("Removing a builder.  # left = " + _builders.size());
-            } else {
-                if (_log.shouldLog(Log.WARN)) _log.warn("NO MORE BUILDERS!  creating one now");
-            }
-        }
+        _context.statManager().addRateData("crypto.DHUsed", 1, 0);
+        DHSessionKeyBuilder builder = _builders.poll();
         if (builder != null) {
+            if (_log.shouldLog(Log.DEBUG)) _log.debug("Removing a builder.  # left = " + _builders.size());
             _myPrivateValue = builder._myPrivateValue;
             _myPublicValue = builder._myPublicValue;
-            _peerValue = builder._peerValue;
-            _sessionKey = builder._sessionKey;
+            // these two are still null after precalc
+            //_peerValue = builder._peerValue;
+            //_sessionKey = builder._sessionKey;
             _extraExchangedBytes = builder._extraExchangedBytes;
         } else {
-            _myPrivateValue = null;
-            _myPublicValue = null;
-            _peerValue = null;
-            _sessionKey = null;
+            if (_log.shouldLog(Log.INFO)) _log.info("No more builders, creating one now");
+            _context.statManager().addRateData("crypto.DHEmpty", 1, 0);
+            // sets _myPrivateValue as a side effect
             _myPublicValue = generateMyValue();
             _extraExchangedBytes = new ByteArray();
         }
     }
 
-    public DHSessionKeyBuilder(boolean usePool) {
-        _myPrivateValue = null;
-        _myPublicValue = null;
-        _peerValue = null;
-        _sessionKey = null;
+    /**
+     * Only for internal use
+     * @parameter usePool unused, just to make it different from other constructor
+     */
+    private DHSessionKeyBuilder(boolean usePool) {
         _extraExchangedBytes = new ByteArray();
     }
     
@@ -189,18 +196,12 @@ public class DHSessionKeyBuilder {
     }
     
     private static final int getSize() {
-        synchronized (_builders) {
             return _builders.size();
-        }
     }
 
-    private static final int addBuilder(DHSessionKeyBuilder builder) {
-        int sz = 0;
-        synchronized (_builders) {
-            _builders.add(builder);
-            sz = _builders.size();
-        }
-        return sz;
+    /** @return true if successful, false if full */
+    private static final boolean addBuilder(DHSessionKeyBuilder builder) {
+        return _builders.offer(builder);
     }
 
     /**
@@ -210,7 +211,7 @@ public class DHSessionKeyBuilder {
      */
     public BigInteger generateMyValue() {
         long start = System.currentTimeMillis();
-        _myPrivateValue = new NativeBigInteger(KeyGenerator.PUBKEY_EXPONENT_SIZE, RandomSource.getInstance());
+        _myPrivateValue = new NativeBigInteger(KeyGenerator.PUBKEY_EXPONENT_SIZE, _context.random());
         BigInteger myValue = CryptoConstants.elgg.modPow(_myPrivateValue, CryptoConstants.elgp);
         long end = System.currentTimeMillis();
         long diff = end - start;
@@ -314,6 +315,7 @@ public class DHSessionKeyBuilder {
      * If there aren't enough bytes (with all of them being consumed by the 32 byte key),
      * the SHA256 of the key itself is used.
      *
+     * @return non-null (but rv.getData() may be null)
      */
     public ByteArray getExtraBytes() {
         return _extraExchangedBytes;
@@ -406,6 +408,7 @@ public class DHSessionKeyBuilder {
     }
     */
     
+/******
     public static void main(String args[]) {
         //if (true) { testValidation(); return; }
         
@@ -419,7 +422,7 @@ public class DHSessionKeyBuilder {
         long negTime = 0;
         try {
             for (int i = 0; i < 5; i++) {
-                long startNeg = Clock.getInstance().now();
+                long startNeg = System.currentTimeMillis();
                 DHSessionKeyBuilder builder1 = new DHSessionKeyBuilder();
                 DHSessionKeyBuilder builder2 = new DHSessionKeyBuilder();
                 BigInteger pub1 = builder1.getMyPublicValue();
@@ -428,7 +431,7 @@ public class DHSessionKeyBuilder {
                 builder1.setPeerPublicValue(pub2);
                 SessionKey key1 = builder1.getSessionKey();
                 SessionKey key2 = builder2.getSessionKey();
-                long endNeg = Clock.getInstance().now();
+                long endNeg = System.currentTimeMillis();
                 negTime += endNeg - startNeg;
 
                 if (!key1.equals(key2))
@@ -458,10 +461,11 @@ public class DHSessionKeyBuilder {
         } catch (InterruptedException ie) { // nop
         }
     }
+******/
 
     private static class DHSessionKeyBuilderPrecalcRunner implements Runnable {
-        private int _minSize;
-        private int _maxSize;
+        private final int _minSize;
+        private final int _maxSize;
 
         private DHSessionKeyBuilderPrecalcRunner(int minSize, int maxSize) {
             _minSize = minSize;
@@ -472,22 +476,28 @@ public class DHSessionKeyBuilder {
             while (true) {
 
                 int curSize = 0;
-                long start = Clock.getInstance().now();
+                long start = System.currentTimeMillis();
                 int startSize = getSize();
+                // Adjust delay
+                if (startSize <= (_minSize * 2 / 3) && _checkDelay > 1000)
+                    _checkDelay -= 1000;
+                else if (startSize > (_minSize * 3 / 2) && _checkDelay < 60*1000)
+                    _checkDelay += 1000;
                 curSize = startSize;
-                while (curSize < _minSize) {
-                    while (curSize < _maxSize) {
+                if (curSize < _minSize) {
+                    for (int i = curSize; i < _maxSize; i++) {
                         long curStart = System.currentTimeMillis();
-                        curSize = addBuilder(precalc(curSize));
+                        if (!addBuilder(precalc()))
+                            break;
                         long curCalc = System.currentTimeMillis() - curStart;
                         // for some relief...
                         try {
-                            Thread.sleep(CALC_DELAY + curCalc * 10);
+                            Thread.sleep(CALC_DELAY + (curCalc * 3));
                         } catch (InterruptedException ie) { // nop
                         }
                     }
                 }
-                long end = Clock.getInstance().now();
+                long end = System.currentTimeMillis();
                 int numCalc = curSize - startSize;
                 if (numCalc > 0) {
                     if (_log.shouldLog(Log.DEBUG))
@@ -496,16 +506,15 @@ public class DHSessionKeyBuilder {
                                    + (CALC_DELAY * numCalc) + "ms relief).  now sleeping");
                 }
                 try {
-                    Thread.sleep(30 * 1000);
+                    Thread.sleep(_checkDelay);
                 } catch (InterruptedException ie) { // nop
                 }
             }
         }
 
-        private DHSessionKeyBuilder precalc(int i) {
+        private static DHSessionKeyBuilder precalc() {
             DHSessionKeyBuilder builder = new DHSessionKeyBuilder(false);
             builder.getMyPublicValue();
-            //_log.debug("Precalc " + i + " complete");
             return builder;
         }
     }

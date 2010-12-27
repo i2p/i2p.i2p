@@ -61,9 +61,7 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
 	public static final String PROP_WEBIRC_SPOOF_IP_DEFAULT="127.0.0.1";
     public static final String PROP_HOSTNAME="ircserver.fakeHostname";
     public static final String PROP_HOSTNAME_DEFAULT="%f.b32.i2p";
-    
-    private static final Log _log = new Log(I2PTunnelIRCServer.class);
-    
+    private static final long HEADER_TIMEOUT = 60*1000;
     
     /**
      * @throws IllegalArgumentException if the I2PTunnel does not contain
@@ -108,8 +106,9 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
         try {
 			String modifiedRegistration;
 			if(!this.method.equals("webirc")) {
-				// give them 15 seconds to send in the request
-				socket.setReadTimeout(15*1000);
+				// The headers _should_ be in the first packet, but
+				// may not be, depending on the client-side options
+				socket.setReadTimeout(HEADER_TIMEOUT);
 				InputStream in = socket.getInputStream();
 				modifiedRegistration = filterRegistration(in, cloakDest(socket.getPeerDestination()));
 				socket.setReadTimeout(readTimeout);
@@ -126,12 +125,12 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
             Socket s = new Socket(remoteHost, remotePort);
             new I2PTunnelRunner(s, socket, slock, null, modifiedRegistration.getBytes(), null);
         } catch (SocketException ex) {
+            // TODO send the equivalent of a 503?
             try {
                 socket.close();
-            } catch (IOException ioe) {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Error while closing the received i2p con", ex);
-            }
+            } catch (IOException ioe) {}
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Error connecting to IRC server " + remoteHost + ':' + remotePort, ex);
         } catch (IOException ex) {
             try {
                 socket.close();
@@ -181,8 +180,8 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
             if (++lineCount > 10)
                 throw new IOException("Too many lines before USER or SERVER, giving up");
             s = s.trim();
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Got line: " + s);
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("Got line: " + s);
 
             String field[]=s.split(" ",5);
             String command;
@@ -214,8 +213,8 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
             if ("SERVER".equalsIgnoreCase(command))
                 break;
         }
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("All done, sending: " + buf.toString());
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("All done, sending: " + buf.toString());
         return buf.toString();
     }
     

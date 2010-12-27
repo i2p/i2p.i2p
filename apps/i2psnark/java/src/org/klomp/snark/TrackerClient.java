@@ -72,8 +72,10 @@ public class TrackerClient extends I2PAppThread
 
   public TrackerClient(I2PSnarkUtil util, MetaInfo meta, PeerCoordinator coordinator)
   {
+    super();
     // Set unique name.
-    super("TrackerClient-" + urlencode(coordinator.getID()));
+    String id = urlencode(coordinator.getID());
+    setName("TrackerClient " + id.substring(id.length() - 12));
     _util = util;
     this.meta = meta;
     this.coordinator = coordinator;
@@ -274,7 +276,7 @@ public class TrackerClient extends I2PAppThread
                           // only delay if we actually make an attempt to add peer
                           if(coordinator.addPeer(cur)) {
                             int delay = DELAY_MUL;
-                            delay *= ((int)cur.getPeerID().getAddress().calculateHash().toBase64().charAt(0)) % 10;
+                            delay *= r.nextInt(10);
                             delay += DELAY_MIN;
                             sleptTime += delay;
                             try { Thread.sleep(delay); } catch (InterruptedException ie) {}

@@ -6,10 +6,8 @@
     <!--
         <property name="javac.compilerargs" value="-warn:-unchecked,raw,unused,serial" />
     -->
-    <!-- Add Apache Harmony's Pack200 library if you don't have java.util.jar.Pack200
-         See core/java/src/net/i2p/util/FileUtil.java for code changes required
-         to use this library instead of Sun's version.
-         Or to comment it all out if you don't have either.
+    <!-- Additional classpath. No longer required; we find pack200 classes at runtime.
+         See core/java/src/net/i2p/util/FileUtil.java for more info.
     -->
     <!--
         <property name="javac.classpath" value="/PATH/TO/pack200.jar" />
@@ -239,7 +237,7 @@
             splitindex="true" 
             doctitle="I2P Javadocs for Release ${release.number} Build ${build.number}"
             windowtitle="I2P Anonymous Network - Java Documentation - Version ${release.number}">
-            <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:freenet.support.CPUInformation:org.bouncycastle.crypto:org.bouncycastle.crypto.*:gnu.crypto.*:gnu.gettext:org.xlattice.crypto.filters:com.nettgryppa.security" />
+            <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.crypto:org.bouncycastle.crypto.*:gnu.crypto.*:gnu.gettext:org.xlattice.crypto.filters:com.nettgryppa.security" />
             <group title="Streaming Library" packages="net.i2p.client.streaming" />
             <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:org.cybergarage.*:org.freenetproject" />
             <group title="Router Console" packages="net.i2p.router.web" />

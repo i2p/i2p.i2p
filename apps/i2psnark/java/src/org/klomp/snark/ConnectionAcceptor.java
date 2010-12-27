@@ -137,7 +137,7 @@ public class ConnectionAcceptor implements Runnable
                     }
                 }
             } else {
-                Thread t = new I2PAppThread(new Handler(socket), "Connection-" + socket);
+                Thread t = new I2PAppThread(new Handler(socket), "I2PSnark incoming connection");
                 t.start();
             }
           }

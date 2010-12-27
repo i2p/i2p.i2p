@@ -22,13 +22,14 @@ import net.i2p.util.RandomSource;
  * See CryptixAESEngine for the real thing.
  */
 public class AESEngine {
-    private Log _log;
-    private I2PAppContext _context;
+    protected final Log _log;
+    protected final I2PAppContext _context;
+
     public AESEngine(I2PAppContext ctx) {
         _context = ctx;
-        _log = _context.logManager().getLog(AESEngine.class);
-        if (getClass() == AESEngine.class)
-            _log.warn("Warning: AES is disabled");
+        _log = _context.logManager().getLog(getClass());
+        if (getClass().equals(AESEngine.class))
+            _log.logAlways(Log.WARN, "AES is disabled");
     }
     
     /** Encrypt the payload with the session key
@@ -44,7 +45,10 @@ public class AESEngine {
         encrypt(payload, payloadIndex, out, outIndex, sessionKey, iv, 0, length);
     }
     
-    /** Encrypt the payload with the session key
+    /**
+     * Encrypt the payload with the session key.
+     * This just copies payload to out, see extension for the real thing.
+     *
      * @param payload data to be encrypted
      * @param payloadIndex index into the payload to start encrypting
      * @param out where to store the result
@@ -55,7 +59,7 @@ public class AESEngine {
      */
     public void encrypt(byte payload[], int payloadIndex, byte out[], int outIndex, SessionKey sessionKey, byte iv[], int ivOffset, int length) {
         System.arraycopy(payload, payloadIndex, out, outIndex, length);
-        _log.warn("Warning: AES is disabled");
+        _log.logAlways(Log.WARN, "AES is disabled");
     }
 
     public byte[] safeEncrypt(byte payload[], SessionKey sessionKey, byte iv[], int paddedSize) {
@@ -118,7 +122,6 @@ public class AESEngine {
         return data;
     }
 
-
     /** Decrypt the data with the session key
      * @param payload data to be decrypted
      * @param payloadIndex index into the payload to start decrypting
@@ -132,7 +135,10 @@ public class AESEngine {
         decrypt(payload, payloadIndex, out, outIndex, sessionKey, iv, 0, length);
     }
     
-    /** Decrypt the data with the session key
+    /**
+     * Decrypt the data with the session key.
+     * This just copies payload to out, see extension for the real thing.
+     *
      * @param payload data to be decrypted
      * @param payloadIndex index into the payload to start decrypting
      * @param out where to store the cleartext
@@ -143,18 +149,20 @@ public class AESEngine {
      */
     public void decrypt(byte payload[], int payloadIndex, byte out[], int outIndex, SessionKey sessionKey, byte iv[], int ivOffset, int length) {
         System.arraycopy(payload, payloadIndex, out, outIndex, length);
-        _log.warn("Warning: AES is disabled");
+        _log.logAlways(Log.WARN, "AES is disabled");
     }
 
     /**
-     *   Just copies payload to out
+     * This just copies payload to out, see extension for the real thing.
      *   @param sessionKey unused
      */
     public void encryptBlock(byte payload[], int inIndex, SessionKey sessionKey, byte out[], int outIndex) {
         System.arraycopy(payload, inIndex, out, outIndex, out.length - outIndex);
     }
 
-    /** decrypt the data with the session key provided
+    /**
+     * This just copies payload to rv, see extension for the real thing.
+     *
      * @param payload encrypted data
      * @param sessionKey private session key
      */

@@ -61,7 +61,6 @@ import net.i2p.util.Translate;
  *
  */
 public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runnable {
-    private static final Log _log = new Log(I2PTunnelHTTPClient.class);
 
     private HashMap addressHelpers = new HashMap();
 
@@ -894,15 +893,15 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             _requestId = id;
         }
         public void run() {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Timeout occured requesting " + _target);
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("Timeout occured requesting " + _target);
             handleHTTPClientException(new RuntimeException("Timeout"), _out,
                                       _target, _usingProxy, _wwwProxy, _requestId);
             closeSocket(_socket);
         }
     }
 
-    private static String DEFAULT_JUMP_SERVERS =
+    public static final String DEFAULT_JUMP_SERVERS =
                                            "http://i2host.i2p/cgi-bin/i2hostjump?," +
                                            "http://stats.i2p/cgi-bin/jump.cgi?a=," +
                                            "http://i2jump.i2p/";
@@ -940,8 +939,12 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         // Skip jump servers we don't know
                         String jumphost = jurl.substring(7);  // "http://"
                         jumphost = jumphost.substring(0, jumphost.indexOf('/'));
-                        Destination dest = I2PAppContext.getGlobalContext().namingService().lookup(jumphost);
-                        if (dest == null) continue;
+                        if (!jumphost.endsWith(".i2p"))
+                            continue;
+                        if (!jumphost.endsWith(".b32.i2p")) {
+                            Destination dest = I2PAppContext.getGlobalContext().namingService().lookup(jumphost);
+                            if (dest == null) continue;
+                        }
 
                         out.write("<br><a href=\"".getBytes());
                         out.write(jurl.getBytes());

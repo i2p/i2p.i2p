@@ -206,7 +206,7 @@ public class StatManager {
      * @return true if the stat should be ignored.
      */
     public boolean ignoreStat(String statName) {
-        if (_context.getBooleanPropertyDefaultTrue(PROP_STAT_FULL))
+        if (_context.getBooleanProperty(PROP_STAT_FULL))
             return false;
         String required = _context.getProperty(PROP_STAT_REQUIRED, DEFAULT_STAT_REQUIRED);
         String req[] = required.split(",");

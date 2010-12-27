@@ -305,19 +305,19 @@
          <% } // !streamrserver %>
 
             <div id="optionsField" class="rowItem">
-                <label><%=intl._("I2CP Options")%>:</label>
+                <label><%=intl._("Router I2CP Address")%>:</label>
             </div>
             <div id="optionsHostField" class="rowItem">
                 <label for="clientHost" accesskey="o">
                     <%=intl._("Host")%>(<span class="accessKey">o</span>):
                 </label>
-                <input type="text" id="clientHost" name="clientHost" size="20" title="I2CP Hostname or IP" value="<%=editBean.getI2CPHost(curTunnel)%>" class="freetext" />                
+                <input type="text" id="clientHost" name="clientHost" size="20" title="I2CP Hostname or IP" value="<%=editBean.getI2CPHost(curTunnel)%>" class="freetext" <% if (editBean.isRouterContext()) { %> readonly="readonly" <% } %> />                
             </div>
             <div id="optionsPortField" class="rowItem">
                 <label for="clientPort" accesskey="r">
                     <%=intl._("Port")%>(<span class="accessKey">r</span>):
                 </label>
-                <input type="text" id="clientPort" name="clientport" size="20" title="I2CP Port Number" value="<%=editBean.getI2CPPort(curTunnel)%>" class="freetext" />                
+                <input type="text" id="clientPort" name="clientport" size="20" title="I2CP Port Number" value="<%=editBean.getI2CPPort(curTunnel)%>" class="freetext" <% if (editBean.isRouterContext()) { %> readonly="readonly" <% } %> />                
             </div>
             
             <div class="subdivider">
@@ -333,7 +333,7 @@
                 <label for="encrypt" accesskey="e">
                     <%=intl._("Enable")%>:
                 </label>
-                <input value="1" type="checkbox" id="startOnLoad" name="encrypt" title="Encrypt LeaseSet"<%=(editBean.getEncrypt(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <input value="1" type="checkbox" id="startOnLoad" name="encrypt" title="ONLY clients with the encryption key will be able to connect"<%=(editBean.getEncrypt(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
             </div>
             <div id="portField" class="rowItem">
                 <label for="encrypt" accesskey="e">
@@ -359,19 +359,64 @@
                 </label>
             </div>
             <div id="portField" class="rowItem">
-                <label for="access" accesskey="s">
-                    <%=intl._("Enable")%>:
-                </label>
-                <input value="1" type="checkbox" id="startOnLoad" name="access" title="Enable Access List"<%=(editBean.getAccess(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <label><%=intl._("Disable")%></label>
+                <input value="0" type="radio" id="startOnLoad" name="accessMode" title="Allow all clients"<%=(editBean.getAccessMode(curTunnel).equals("0") ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <label><%=intl._("Whitelist")%></label>
+                <input value="1" type="radio" id="startOnLoad" name="accessMode" title="Allow listed clients only"<%=(editBean.getAccessMode(curTunnel).equals("1") ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <label><%=intl._("Blacklist")%></label>
+                <input value="2" type="radio" id="startOnLoad" name="accessMode" title="Reject listed clients"<%=(editBean.getAccessMode(curTunnel).equals("2") ? " checked=\"checked\"" : "")%> class="tickbox" />                
             </div>
             <div id="hostField" class="rowItem">
                 <label for="accessList" accesskey="s">
                     <%=intl._("Access List")%>:
                 </label>
-                <textarea rows="2" style="height: 4em;" cols="60" id="hostField" name="accessList" title="Access List" wrap="off"><%=editBean.getAccessList(curTunnel)%></textarea>               
-                <span class="comment"><%=intl._("(Restrict to these clients only)")%></span>
+                <textarea rows="2" style="height: 8em;" cols="60" id="hostField" name="accessList" title="Access List" wrap="off"><%=editBean.getAccessList(curTunnel)%></textarea>               
             </div>
                  
+            <div class="subdivider">
+                <hr />
+            </div>
+
+            <div class="rowItem">
+              <div id="optionsField" class="rowItem">
+                  <label><%=intl._("Inbound connection limits (0 to disable)")%><br><%=intl._("Per client")%>:</label>
+              </div>
+              <div id="portField" class="rowItem">
+                  <label><%=intl._("Per minute")%>:</label>
+                  <input type="text" id="port" name="limitMinute" value="<%=editBean.getLimitMinute(curTunnel)%>" class="freetext" />                
+              </div>
+              <div id="portField" class="rowItem">
+                  <label><%=intl._("Per hour")%>:</label>
+                  <input type="text" id="port" name="limitHour" value="<%=editBean.getLimitHour(curTunnel)%>" class="freetext" />                
+              </div>
+              <div id="portField" class="rowItem">
+                  <label><%=intl._("Per day")%>:</label>
+                  <input type="text" id="port" name="limitDay" value="<%=editBean.getLimitDay(curTunnel)%>" class="freetext" />                
+              </div>
+            </div>
+            <div class="rowItem">
+              <div id="optionsField" class="rowItem">
+                  <label><%=intl._("Total")%>:</label>
+              </div>
+              <div id="portField" class="rowItem">
+                  <input type="text" id="port" name="totalMinute" value="<%=editBean.getTotalMinute(curTunnel)%>" class="freetext" />                
+              </div>
+              <div id="portField" class="rowItem">
+                  <input type="text" id="port" name="totalHour" value="<%=editBean.getTotalHour(curTunnel)%>" class="freetext" />                
+              </div>
+              <div id="portField" class="rowItem">
+                  <input type="text" id="port" name="totalDay" value="<%=editBean.getTotalDay(curTunnel)%>" class="freetext" />                
+              </div>
+            </div>
+            <div class="rowItem">
+              <div id="optionsField" class="rowItem">
+                  <label><%=intl._("Max concurrent connections (0 to disable)")%>:</label>
+              </div>
+              <div id="portField" class="rowItem">
+                  <input type="text" id="port" name="maxStreams" value="<%=editBean.getMaxStreams(curTunnel)%>" class="freetext" />                
+              </div>
+            </div>
+
             <div class="subdivider">
                 <hr />
             </div>

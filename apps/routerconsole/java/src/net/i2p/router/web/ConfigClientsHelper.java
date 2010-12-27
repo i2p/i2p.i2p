@@ -1,6 +1,7 @@
 package net.i2p.router.web;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -8,13 +9,76 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.i2p.router.client.ClientManagerFacadeImpl;
 import net.i2p.router.startup.ClientAppConfig;
+import net.i2p.util.Addresses;
 
 public class ConfigClientsHelper extends HelperBase {
     private String _edit;
 
+    /** from ClientListenerRunner */
+    public static final String BIND_ALL_INTERFACES = "i2cp.tcp.bindAllInterfaces";
+    /** from ClientManager */
+    public static final String PROP_DISABLE_EXTERNAL = "i2cp.disableInterface";
+    public static final String PROP_ENABLE_SSL = "i2cp.SSL";
+    /** from ClientMessageEventListener */
+    public static final String PROP_AUTH = "i2cp.auth";
+    public static final String PROP_USER = "i2cp.username";
+    public static final String PROP_PW = "i2cp.password";
+
     public ConfigClientsHelper() {}
-    
+
+    /** @since 0.8.3 */
+    public String getPort() {
+        return _context.getProperty(ClientManagerFacadeImpl.PROP_CLIENT_PORT,
+                                    Integer.toString(ClientManagerFacadeImpl.DEFAULT_PORT));
+    }
+
+    /** @since 0.8.3 */
+    public String getUser() {
+        return _context.getProperty(PROP_USER, "");
+    }
+
+    /** @since 0.8.3 */
+    public String getPw() {
+        return _context.getProperty(PROP_PW, "");
+    }
+
+    /** @since 0.8.3 */
+    public String i2cpModeChecked(int mode) {
+        boolean disabled =  _context.getBooleanProperty(PROP_DISABLE_EXTERNAL);
+        boolean ssl =  _context.getBooleanProperty(PROP_ENABLE_SSL);
+        if ((mode == 0 && disabled) ||
+            (mode == 1 && (!disabled) && (!ssl)) ||
+            (mode == 2 && (!disabled) && ssl))
+            return "checked=\"true\"";
+        return "";
+    }
+
+    /** @since 0.8.3 */
+    public String getAuth() {
+        boolean enabled =  _context.getBooleanProperty(PROP_AUTH);
+        if (enabled)
+            return "checked=\"true\"";
+        return "";
+    }
+
+    /** @since 0.8.3 */
+    public String[] intfcAddresses() {
+        ArrayList<String> al = new ArrayList(Addresses.getAllAddresses());
+        return al.toArray(new String[al.size()]);
+    }
+
+    /** @since 0.8.3 */
+    public boolean isIFSelected(String addr) {
+        boolean bindAll = _context.getBooleanProperty(BIND_ALL_INTERFACES);
+        if (bindAll && addr.equals("0.0.0.0") || addr.equals("::"))
+            return true;
+        String host = _context.getProperty(ClientManagerFacadeImpl.PROP_CLIENT_HOST, 
+                                           ClientManagerFacadeImpl.DEFAULT_HOST);
+        return (host.equals(addr));
+    }
+
     public void setEdit(String edit) {
          if (edit == null)
              return;
@@ -92,9 +156,9 @@ public class ConfigClientsHelper extends HelperBase {
                     continue;
                 StringBuilder desc = new StringBuilder(256);
                 desc.append("<table border=\"0\">")
-                    .append("<tr><td><b>").append(_("Version")).append("<td>").append(stripHTML(appProps, "version"))
+                    .append("<tr><td><b>").append(_("Version")).append("</b></td><td>").append(stripHTML(appProps, "version"))
                     .append("<tr><td><b>")
-                    .append(_("Signed by")).append("<td>");
+                    .append(_("Signed by")).append("</b></td><td>");
                 String s = stripHTML(appProps, "signer");
                 if (s != null) {
                     if (s.indexOf("@") > 0)
@@ -111,13 +175,13 @@ public class ConfigClientsHelper extends HelperBase {
                     if (ms > 0) {
                         String date = (new SimpleDateFormat("yyyy-MM-dd HH:mm")).format(new Date(ms));
                         desc.append("<tr><td><b>")
-                            .append(_("Date")).append("<td>").append(date);
+                            .append(_("Date")).append("</b></td><td>").append(date);
                     }
                 }
                 s = stripHTML(appProps, "author");
                 if (s != null) {
                     desc.append("<tr><td><b>")
-                        .append(_("Author")).append("<td>");
+                        .append(_("Author")).append("</b></td><td>");
                     if (s.indexOf("@") > 0)
                         desc.append("<a href=\"mailto:").append(s).append("\">").append(s).append("</a>");
                     else
@@ -128,12 +192,12 @@ public class ConfigClientsHelper extends HelperBase {
                     s = stripHTML(appProps, "description");
                 if (s != null) {
                     desc.append("<tr><td><b>")
-                        .append(_("Description")).append("<td>").append(s);
+                        .append(_("Description")).append("</b></td><td>").append(s);
                 }
                 s = stripHTML(appProps, "license");
                 if (s != null) {
                     desc.append("<tr><td><b>")
-                        .append(_("License")).append("<td>").append(s);
+                        .append(_("License")).append("</b></td><td>").append(s);
                 }
                 s = stripHTML(appProps, "websiteURL");
                 if (s != null) {

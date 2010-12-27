@@ -63,6 +63,7 @@ public class Peer implements Comparable
   //  bytes per bt spec:                 0011223344556677
   static final long OPTION_EXTENSION = 0x0000000000100000l;
   static final long OPTION_FAST      = 0x0000000000000004l;
+  static final long OPTION_DHT       = 0x0000000000000001l;
   private long options;
 
   /**
@@ -77,7 +78,7 @@ public class Peer implements Comparable
     this.my_id = my_id;
     this.metainfo = metainfo;
     _id = ++__id;
-    //_log.debug("Creating a new peer with " + peerID.getAddress().calculateHash().toBase64(), new Exception("creating"));
+    //_log.debug("Creating a new peer with " + peerID.toString(), new Exception("creating"));
   }
 
   /**
@@ -101,7 +102,7 @@ public class Peer implements Comparable
     this.peerID = new PeerID(id, sock.getPeerDestination());
     _id = ++__id;
     if (_log.shouldLog(Log.DEBUG))
-        _log.debug("Creating a new peer with " + peerID.getAddress().calculateHash().toBase64(), new Exception("creating " + _id));
+        _log.debug("Creating a new peer with " + peerID.toString(), new Exception("creating " + _id));
   }
 
   /**
@@ -197,7 +198,7 @@ public class Peer implements Comparable
       throw new IllegalStateException("Peer already started");
 
     if (_log.shouldLog(Log.DEBUG))
-        _log.debug("Running connection to " + peerID.getAddress().calculateHash().toBase64(), new Exception("connecting"));    
+        _log.debug("Running connection to " + peerID.toString(), new Exception("connecting"));    
     try
       {
         // Do we need to handshake?

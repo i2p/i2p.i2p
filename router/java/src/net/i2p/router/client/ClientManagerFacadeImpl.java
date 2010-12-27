@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
+import net.i2p.client.I2PSessionException;
 import net.i2p.crypto.SessionKeyManager;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -21,6 +22,8 @@ import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.i2cp.MessageId;
 import net.i2p.data.i2cp.SessionConfig;
+import net.i2p.internal.I2CPMessageQueue;
+import net.i2p.internal.InternalClientManager;
 import net.i2p.router.ClientManagerFacade;
 import net.i2p.router.ClientMessage;
 import net.i2p.router.Job;
@@ -32,7 +35,7 @@ import net.i2p.util.Log;
  *
  * @author jrandom
  */
-public class ClientManagerFacadeImpl extends ClientManagerFacade {
+public class ClientManagerFacadeImpl extends ClientManagerFacade implements InternalClientManager {
     private final static Log _log = new Log(ClientManagerFacadeImpl.class);
     private ClientManager _manager; 
     private RouterContext _context;
@@ -219,5 +222,17 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade {
             return _manager.listClients();
         else
             return Collections.EMPTY_SET;
+    }
+
+    /**
+     *  The InternalClientManager interface.
+     *  Connect to the router, receiving a message queue to talk to the router with.
+     *  @throws I2PSessionException if the router isn't ready
+     *  @since 0.8.3
+     */
+    public I2CPMessageQueue connect() throws I2PSessionException {
+        if (_manager != null)
+            return _manager.internalConnect();
+        throw new I2PSessionException("No manager yet");
     }
 }

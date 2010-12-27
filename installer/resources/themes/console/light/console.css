@@ -921,7 +921,7 @@ input:active {
      -moz-box-shadow: inset 0px 0px 0px 1px #f60;
 }
 
-input[type=text] {
+input[type=text], input[type=password] {
      background: #ffe;
      color: #001;
      margin: 5px 10px 5px 10px;

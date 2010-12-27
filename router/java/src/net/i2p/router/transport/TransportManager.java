@@ -32,6 +32,7 @@ import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.ntcp.NTCPTransport;
 import net.i2p.router.transport.udp.UDPTransport;
+import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 import net.i2p.util.Translate;
 

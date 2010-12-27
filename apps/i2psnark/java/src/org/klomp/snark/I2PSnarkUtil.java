@@ -14,11 +14,13 @@ import java.util.StringTokenizer;
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PSession;
+import net.i2p.client.I2PSessionException;
 import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketEepGet;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketManagerFactory;
+import net.i2p.data.Base32;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -316,21 +318,44 @@ public class I2PSnarkUtil {
         }
     }
 
+    private static final int BASE32_HASH_LENGTH = 52;   // 1 + Hash.HASH_LENGTH * 8 / 5
+
     /** Base64 Hash or Hash.i2p or name.i2p using naming service */
     Destination getDestination(String ip) {
         if (ip == null) return null;
         if (ip.endsWith(".i2p")) {
             if (ip.length() < 520) {   // key + ".i2p"
-                Destination dest = _context.namingService().lookup(ip);
-                if (dest != null)
-                    return dest;
+                if (_manager != null && ip.length() == BASE32_HASH_LENGTH + 8 && ip.endsWith(".b32.i2p")) {
+                    // Use existing I2PSession for b32 lookups if we have it
+                    // This is much more efficient than using the naming service
+                    I2PSession sess = _manager.getSession();
+                    if (sess != null) {
+                        byte[] b = Base32.decode(ip.substring(0, BASE32_HASH_LENGTH));
+                        if (b != null) {
+                            Hash h = new Hash(b);
+                            if (_log.shouldLog(Log.INFO))
+                                _log.info("Using existing session for lookup of " + ip);
+                            try {
+                                return sess.lookupDest(h);
+                            } catch (I2PSessionException ise) {
+                            }
+                        }
+                    }
+                }
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Using naming service for lookup of " + ip);
+                return _context.namingService().lookup(ip);
             }
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Creating Destination for " + ip);
             try {
                 return new Destination(ip.substring(0, ip.length()-4)); // sans .i2p
             } catch (DataFormatException dfe) {
                 return null;
             }
         } else {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Creating Destination for " + ip);
             try {
                 return new Destination(ip);
             } catch (DataFormatException dfe) {

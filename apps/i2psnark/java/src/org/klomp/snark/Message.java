@@ -39,7 +39,13 @@ class Message
   final static byte REQUEST      = 6;
   final static byte PIECE        = 7;
   final static byte CANCEL       = 8;
-  final static byte EXTENSION    = 20;
+  final static byte PORT         = 9;   // DHT  (BEP 5)
+  final static byte SUGGEST      = 13;  // Fast (BEP 6)
+  final static byte HAVE_ALL     = 14;  // Fast (BEP 6)
+  final static byte HAVE_NONE    = 15;  // Fast (BEP 6)
+  final static byte REJECT       = 16;  // Fast (BEP 6)
+  final static byte ALLOWED_FAST = 17;  // Fast (BEP 6)
+  final static byte EXTENSION    = 20;  // BEP 10
   
   // Not all fields are used for every message.
   // KEEP_ALIVE doesn't have a real wire representation

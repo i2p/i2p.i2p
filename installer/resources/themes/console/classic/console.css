@@ -718,7 +718,7 @@ input {
      vertical-align: middle;
 }
 
-input[type=text] {
+input[type=text], input[type=password] {
      margin: 3px 5px 3px 5px;
      vertical-align: middle;
 }

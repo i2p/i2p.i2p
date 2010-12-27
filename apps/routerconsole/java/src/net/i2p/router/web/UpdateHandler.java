@@ -1,8 +1,11 @@
 package net.i2p.router.web;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -15,10 +18,12 @@ import net.i2p.router.RouterVersion;
 import net.i2p.util.EepGet;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
+import net.i2p.util.PartialEepGet;
+import net.i2p.util.VersionComparator;
 
 /**
- * <p>Handles the request to update the router by firing off an
- * {@link net.i2p.util.EepGet} call to download the latest signed update file
+ * <p>Handles the request to update the router by firing one or more
+ * {@link net.i2p.util.EepGet} calls to download the latest signed update file
  * and displaying the status to anyone who asks.
  * </p>
  * <p>After the download completes the signed update file is verified with
@@ -125,6 +130,11 @@ public class UpdateHandler {
         protected boolean done;
         protected EepGet _get;
         protected final DecimalFormat _pct = new DecimalFormat("0.0%");
+        /** tells the listeners what mode we are in */
+        private boolean _isPartial;
+        /** set by the listeners on completion */
+        private boolean _isNewer;
+        private ByteArrayOutputStream _baos;
 
         public UpdateRunner() { 
             _isRunning = false;
@@ -141,39 +151,88 @@ public class UpdateHandler {
             System.setProperty(PROP_UPDATE_IN_PROGRESS, "false");
             _isRunning = false;
         }
+
+        /**
+         *  Loop through the entire list of update URLs.
+         *  For each one, first get the version from the first 56 bytes and see if
+         *  it is newer than what we are running now.
+         *  If it is, get the whole thing.
+         */
         protected void update() {
-            updateStatus("<b>" + _("Updating") + "</b>");
             // TODO:
             // Do a PartialEepGet on the selected URL, check for version we expect,
             // and loop if it isn't what we want.
             // This will allow us to do a release without waiting for the last host to install the update.
             // Alternative: In bytesTransferred(), Check the data in the output file after
             // we've received at least 56 bytes. Need a cancel() method in EepGet ?
-            String updateURL = selectUpdateURL();
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Selected update URL: " + updateURL);
+
             boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
             String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
             int proxyPort = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_PORT, ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT);
-            try {
-                if (shouldProxy)
-                    // 40 retries!!
-                    _get = new EepGet(_context, proxyHost, proxyPort, 40, _updateFile, updateURL, false);
-                else
-                    _get = new EepGet(_context, 1, _updateFile, updateURL, false);
-                _get.addStatusListener(UpdateRunner.this);
-                _get.fetch();
-            } catch (Throwable t) {
-                _log.error("Error updating", t);
+
+            List<String> urls = getUpdateURLs();
+            if (urls.isEmpty()) {
+                // not likely, don't bother translating
+                updateStatus("<b>Update source list is empty, cannot download update</b>");
+                _log.log(Log.CRIT, "Update source list is empty - cannot download update");
+                return;
+            }
+
+            if (shouldProxy)
+                _baos = new ByteArrayOutputStream(TrustedUpdate.HEADER_BYTES);
+            for (String updateURL : urls) {
+                updateStatus("<b>" + _("Updating from {0}", linkify(updateURL)) + "</b>");
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Selected update URL: " + updateURL);
+
+                // Check the first 56 bytes for the version
+                if (shouldProxy) {
+                    _isPartial = true;
+                    _isNewer = false;
+                    _baos.reset();
+                    try {
+                        // no retries
+                        _get = new PartialEepGet(_context, proxyHost, proxyPort, _baos, updateURL, TrustedUpdate.HEADER_BYTES);
+                        _get.addStatusListener(UpdateRunner.this);
+                        _get.fetch();
+                    } catch (Throwable t) {
+                        _isNewer = false;
+                    }
+                    _isPartial = false;
+                    if (!_isNewer)
+                        continue;
+                }
+
+                // Now get the whole thing
+                try {
+                    if (shouldProxy)
+                        // 40 retries!!
+                        _get = new EepGet(_context, proxyHost, proxyPort, 40, _updateFile, updateURL, false);
+                    else
+                        _get = new EepGet(_context, 1, _updateFile, updateURL, false);
+                    _get.addStatusListener(UpdateRunner.this);
+                    _get.fetch();
+                } catch (Throwable t) {
+                    _log.error("Error updating", t);
+                }
+                if (this.done)
+                    break;
             }
         }
         
+        // EepGet Listeners below.
+        // We use the same for both the partial and the full EepGet,
+        // with a couple of adjustments depending on which mode.
+
         public void attemptFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt, int numRetries, Exception cause) {
+            _isNewer = false;
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Attempt failed on " + url, cause);
             // ignored
         }
         public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {
+            if (_isPartial)
+                return;
             StringBuilder buf = new StringBuilder(64);
             buf.append("<b>").append(_("Updating")).append("</b> ");
             double pct = ((double)alreadyTransferred + (double)currentWrite) /
@@ -186,6 +245,19 @@ public class UpdateHandler {
             updateStatus(buf.toString());
         }
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
+            if (_isPartial) {
+                // Compare version with what we have now
+                String newVersion = TrustedUpdate.getVersionString(new ByteArrayInputStream(_baos.toByteArray()));
+                boolean newer = (new VersionComparator()).compare(newVersion, RouterVersion.VERSION) > 0;
+                if (!newer) {
+                    updateStatus("<b>" + _("No new version found at {0}", linkify(url)) + "</b>");
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Found old version \"" + newVersion + "\" at " + url);
+                }
+                _isNewer = newer;
+                return;
+            }
+            // Process the .sud/.su2 file
             updateStatus("<b>" + _("Update downloaded") + "</b>");
             TrustedUpdate up = new TrustedUpdate(_context);
             File f = new File(_updateFile);
@@ -223,15 +295,16 @@ public class UpdateHandler {
                 }
             } else {
                 _log.log(Log.CRIT, err + " from " + url);
-                updateStatus("<b>" + err + ' ' + _("from {0}", url) + " </b>");
+                updateStatus("<b>" + err + ' ' + _("from {0}", linkify(url)) + " </b>");
             }
         }
         public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {
+            _isNewer = false;
             // don't display bytesTransferred as it is meaningless
-            _log.log(Log.CRIT, "Update from " + url + " did not download completely (" +
+            _log.error("Update from " + url + " did not download completely (" +
                                bytesRemaining + " remaining after " + currentAttempt + " tries)");
 
-            updateStatus("<b>" + _("Transfer failed") + "</b>");
+            updateStatus("<b>" + _("Transfer failed from {0}", linkify(url)) + "</b>");
         }
         public void headerReceived(String url, int attemptNum, String key, String val) {}
         public void attempting(String url) {}
@@ -242,25 +315,22 @@ public class UpdateHandler {
         _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
     }
 
-    private String selectUpdateURL() {
+    private List<String> getUpdateURLs() {
         String URLs = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_URL, ConfigUpdateHandler.DEFAULT_UPDATE_URL);
         StringTokenizer tok = new StringTokenizer(URLs, " ,\r\n");
-        List URLList = new ArrayList();
+        List<String> URLList = new ArrayList();
         while (tok.hasMoreTokens())
             URLList.add(tok.nextToken().trim());
-        int size = URLList.size();
-        //_log.log(Log.DEBUG, "Picking update source from " + size + " candidates.");
-        if (size <= 0) {
-            _log.log(Log.CRIT, "Update source list is empty - cannot download update");
-            return null;
-        }
-        int index = I2PAppContext.getGlobalContext().random().nextInt(size);
-        _log.log(Log.DEBUG, "Picked update source " + index + ".");
-        return (String) URLList.get(index);
+        Collections.shuffle(URLList, _context.random());
+        return URLList;
     }
     
     protected void updateStatus(String s) {
         _status = s;
+    }
+
+    protected static String linkify(String url) {
+        return "<a target=\"_blank\" href=\"" + url + "\"/>" + url + "</a>";
     }
 
     /** translate a string */

@@ -16,8 +16,6 @@ import net.i2p.util.Log;
 
 public class I2PTunnelClient extends I2PTunnelClientBase {
 
-    private static final Log _log = new Log(I2PTunnelClient.class);
-
     /** list of Destination objects that we point at */
     protected List<Destination> dests;
     private static final long DEFAULT_READ_TIMEOUT = 5*60*1000; // -1

@@ -28,12 +28,14 @@ import net.i2p.I2PAppContext;
 public class SimpleScheduler {
     private static final SimpleScheduler _instance = new SimpleScheduler();
     public static SimpleScheduler getInstance() { return _instance; }
-    private static final int THREADS = 4;
+    private static final int MIN_THREADS = 2;
+    private static final int MAX_THREADS = 4;
     private I2PAppContext _context;
     private Log _log;
     private ScheduledThreadPoolExecutor _executor;
     private String _name;
     private int _count;
+    private final int _threads;
 
     protected SimpleScheduler() { this("SimpleScheduler"); }
     protected SimpleScheduler(String name) {
@@ -41,7 +43,9 @@ public class SimpleScheduler {
         _log = _context.logManager().getLog(SimpleScheduler.class);
         _name = name;
         _count = 0;
-        _executor = new ScheduledThreadPoolExecutor(THREADS, new CustomThreadFactory());
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        _threads = (int) Math.max(MIN_THREADS, Math.min(MAX_THREADS, 1 + (maxMemory / (32*1024*1024))));
+        _executor = new ScheduledThreadPoolExecutor(_threads, new CustomThreadFactory());
         _executor.prestartAllCoreThreads();
     }
     
@@ -65,6 +69,13 @@ public class SimpleScheduler {
         re.schedule();
     }
     
+    /**
+     * Queue up the given event to be fired after timeoutMs and every
+     * timeoutMs thereafter. The TimedEvent must not do its own rescheduling.
+     * As all Exceptions are caught in run(), these will not prevent
+     * subsequent executions (unlike SimpleTimer, where the TimedEvent does
+     * its own rescheduling).
+     */
     public void addPeriodicEvent(SimpleTimer.TimedEvent event, long timeoutMs) {
         addPeriodicEvent(event, timeoutMs, timeoutMs);
     }
@@ -90,7 +101,7 @@ public class SimpleScheduler {
     private class CustomThreadFactory implements ThreadFactory {
         public Thread newThread(Runnable r) {
             Thread rv = Executors.defaultThreadFactory().newThread(r);
-            rv.setName(_name +  ' ' + (++_count) + '/' + THREADS);
+            rv.setName(_name +  ' ' + (++_count) + '/' + _threads);
 // Uncomment this to test threadgrouping, but we should be all safe now that the constructor preallocates!
 //            String name = rv.getThreadGroup().getName();
 //            if(!name.equals("main")) {

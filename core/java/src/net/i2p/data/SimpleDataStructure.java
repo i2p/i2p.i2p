@@ -20,6 +20,12 @@ import net.i2p.crypto.SHA256Generator;
  *
  * Implemented in 0.8.2 and retrofitted over several of the classes in this package.
  *
+ * As of 0.8.3, SDS objects may be cached. An SDS may be instantiated with null data,
+ * and setData(null) is also OK. However,
+ * once non-null data is set, the data reference is immutable;
+ * subsequent attempts to set the data via setData(), readBytes(),
+ * or fromBase64() will throw a RuntimeException.
+ *
  * @since 0.8.2
  * @author zzz
  */
@@ -57,14 +63,24 @@ public abstract class SimpleDataStructure extends DataStructureImpl {
      * Sets the data.
      * @param data of correct length, or null
      * @throws IllegalArgumentException if data is not the legal number of bytes (but null is ok)
+     * @throws RuntimeException if data already set.
      */
     public void setData(byte[] data) {
+        if (_data != null)
+            throw new RuntimeException("Data already set");
         if (data != null && data.length != _length)
             throw new IllegalArgumentException("Bad data length");
         _data = data;
     }
 
+    /**
+     * Sets the data.
+     * @param data of correct length, or null
+     * @throws RuntimeException if data already set.
+     */
     public void readBytes(InputStream in) throws DataFormatException, IOException {
+        if (_data != null)
+            throw new RuntimeException("Data already set");
         _data = new byte[_length];
         int read = read(in, _data);
         if (read != _length) throw new DataFormatException("Not enough bytes to read the data");
@@ -85,6 +101,7 @@ public abstract class SimpleDataStructure extends DataStructureImpl {
     /**
      * Sets the data.
      * @throws DataFormatException if decoded data is not the legal number of bytes or on decoding error
+     * @throws RuntimeException if data already set.
      */
     @Override
     public void fromBase64(String data) throws DataFormatException {
@@ -162,5 +179,4 @@ public abstract class SimpleDataStructure extends DataStructureImpl {
         if ((obj == null) || !(obj instanceof SimpleDataStructure)) return false;
         return DataHelper.eq(_data, ((SimpleDataStructure) obj)._data);
     }
-    
 }

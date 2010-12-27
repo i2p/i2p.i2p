@@ -20,8 +20,6 @@ import net.i2p.util.Log;
  */
 public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable {
 
-    private static final Log _log = new Log(I2PTunnelIRCClient.class);
-    
     /** used to assign unique IDs to the threads / clients.  no logic or functionality */
     private static volatile long __clientId = 0;
     
@@ -130,6 +128,8 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         private Socket local;
         private I2PSocket remote;
         private StringBuffer expectedPong;
+        // shadows _log in super()
+        private final Log _log = new Log(I2PTunnelIRCClient.class);
                 
         public IrcInboundFilter(Socket _local, I2PSocket _remote, StringBuffer pong) {
             local=_local;
@@ -207,6 +207,8 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
             private Socket local;
             private I2PSocket remote;
             private StringBuffer expectedPong;
+            // shadows _log in super()
+            private final Log _log = new Log(I2PTunnelIRCClient.class);
                 
             public IrcOutboundFilter(Socket _local, I2PSocket _remote, StringBuffer pong) {
                 local=_local;
@@ -308,7 +310,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         try { command = field[idx++]; }
          catch (IndexOutOfBoundsException ioobe) // wtf, server sent borked command?
         {
-           _log.warn("Dropping defective message: index out of bounds while extracting command.");
+           //_log.warn("Dropping defective message: index out of bounds while extracting command.");
            return null;
         }
 
@@ -431,13 +433,13 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
                 rv = "PING " + field[1];
                 expectedPong.append("PONG ").append(field[2]).append(" :").append(field[1]); // PONG serverLocation nonce
             } else {
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("IRC client sent a PING we don't understand, filtering it (\"" + s + "\")");
+                //if (_log.shouldLog(Log.ERROR))
+                //    _log.error("IRC client sent a PING we don't understand, filtering it (\"" + s + "\")");
                 rv = null;
             }
             
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("sending ping [" + rv + "], waiting for [" + expectedPong + "] orig was [" + s  + "]");
+            //if (_log.shouldLog(Log.WARN))
+            //    _log.warn("sending ping [" + rv + "], waiting for [" + expectedPong + "] orig was [" + s  + "]");
             
             return rv;
         }

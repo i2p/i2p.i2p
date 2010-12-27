@@ -1281,11 +1281,7 @@ public class Router {
      */
     private void beginMarkingLiveliness() {
         File f = getPingFile();
-        // not an I2PThread for context creation issues
-        Thread t = new Thread(new MarkLiveliness(_context, this, f));
-        t.setName("Mark router liveliness");
-        t.setDaemon(true);
-        t.start();
+        SimpleScheduler.getInstance().addPeriodicEvent(new MarkLiveliness(this, f), 0, LIVELINESS_DELAY);
     }
     
     public static final String PROP_BANDWIDTH_SHARE_PERCENTAGE = "router.sharePercentage";
@@ -1523,22 +1519,24 @@ private static class UpdateRoutingKeyModifierJob extends JobImpl {
     }
 }
 
-private static class MarkLiveliness implements Runnable {
-    private RouterContext _context;
+/**
+ *  Write a timestamp to the ping file where the wrapper can see it
+ */
+private static class MarkLiveliness implements SimpleTimer.TimedEvent {
     private Router _router;
     private File _pingFile;
-    public MarkLiveliness(RouterContext ctx, Router router, File pingFile) {
-        _context = ctx;
+
+    public MarkLiveliness(Router router, File pingFile) {
         _router = router;
         _pingFile = pingFile;
-    }
-    public void run() {
         _pingFile.deleteOnExit();
-        do {
+    }
+
+    public void timeReached() {
+        if (_router.isAlive())
             ping();
-            try { Thread.sleep(Router.LIVELINESS_DELAY); } catch (InterruptedException ie) {}
-        } while (_router.isAlive());
-        _pingFile.delete();
+        else
+            _pingFile.delete();
     }
 
     private void ping() {

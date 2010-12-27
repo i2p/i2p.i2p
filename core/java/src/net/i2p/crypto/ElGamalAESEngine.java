@@ -29,17 +29,17 @@ import net.i2p.util.Log;
 /**
  * Handles the actual ElGamal+AES encryption and decryption scenarios using the
  * supplied keys and data.
+ *
+ * No, this does not extend AESEngine or CryptixAESEngine.
  */
 public class ElGamalAESEngine {
-    private final static Log _log = new Log(ElGamalAESEngine.class);
+    private final Log _log;
     private final static int MIN_ENCRYPTED_SIZE = 80; // smallest possible resulting size
-    private I2PAppContext _context;
-
-    private ElGamalAESEngine() { // nop
-    }
+    private final I2PAppContext _context;
 
     public ElGamalAESEngine(I2PAppContext ctx) {
         _context = ctx;
+        _log = _context.logManager().getLog(ElGamalAESEngine.class);
         
         _context.statManager().createFrequencyStat("crypto.elGamalAES.encryptNewSession",
                                                    "how frequently we encrypt to a new ElGamal/AES+SessionTag session?",
@@ -627,6 +627,7 @@ public class ElGamalAESEngine {
         return numPadding;
     }
 
+/****
     public static void main(String args[]) {
         I2PAppContext ctx = new I2PAppContext();
         ElGamalAESEngine e = new ElGamalAESEngine(ctx);
@@ -656,4 +657,5 @@ public class ElGamalAESEngine {
             }
         }
     }
+****/
 }

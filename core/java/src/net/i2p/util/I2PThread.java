@@ -61,8 +61,8 @@ public class I2PThread extends Thread {
             _createdBy = new Exception("Created by");
     }
 
-    private void log(int level, String msg) { log(level, msg, null); }
-    private void log(int level, String msg, Throwable t) {
+    private static void log(int level, String msg) { log(level, msg, null); }
+    private static void log(int level, String msg, Throwable t) {
         // we cant assume log is created
         if (_log == null) _log = new Log(I2PThread.class);
         if (_log.shouldLog(level))
@@ -72,12 +72,12 @@ public class I2PThread extends Thread {
     @Override
     public void run() {
         _name = Thread.currentThread().getName();
-        log(Log.DEBUG, "New thread started: " + _name, _createdBy);
+        log(Log.INFO, "New thread started" + (isDaemon() ? " (daemon): " : ": ") + _name, _createdBy);
         try {
             super.run();
         } catch (Throwable t) {
             try {
-                log(Log.CRIT, "Killing thread " + getName(), t);
+                log(Log.CRIT, "Thread terminated unexpectedly: " + getName(), t);
             } catch (Throwable woof) {
                 System.err.println("Died within the OOM itself");
                 t.printStackTrace();
@@ -85,12 +85,12 @@ public class I2PThread extends Thread {
             if (t instanceof OutOfMemoryError)
                 fireOOM((OutOfMemoryError)t);
         }
-        log(Log.DEBUG, "Thread finished gracefully: " + _name);
+        log(Log.INFO, "Thread finished normally: " + _name);
     }
     
     @Override
     protected void finalize() throws Throwable {
-        log(Log.DEBUG, "Thread finalized: " + _name);
+        //log(Log.DEBUG, "Thread finalized: " + _name);
         super.finalize();
     }
     

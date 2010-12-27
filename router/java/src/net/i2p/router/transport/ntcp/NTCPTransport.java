@@ -437,8 +437,10 @@ public class NTCPTransport extends TransportImpl {
         return skews;
     }
 
-    private static final int NUM_CONCURRENT_READERS = 3;
-    private static final int NUM_CONCURRENT_WRITERS = 3;
+    private static final int MIN_CONCURRENT_READERS = 2;  // unless < 32MB
+    private static final int MIN_CONCURRENT_WRITERS = 2;  // unless < 32MB
+    private static final int MAX_CONCURRENT_READERS = 4;
+    private static final int MAX_CONCURRENT_WRITERS = 4;
 
     /**
      *  Called by TransportManager.
@@ -453,12 +455,8 @@ public class NTCPTransport extends TransportImpl {
         if (_pumper.isAlive())
             return _myAddress != null ? _myAddress.toRouterAddress() : null;
         if (_log.shouldLog(Log.WARN)) _log.warn("Starting ntcp transport listening");
-        _finisher.start();
-        _pumper.startPumping();
 
-        _reader.startReading(NUM_CONCURRENT_READERS);
-        _writer.startWriting(NUM_CONCURRENT_WRITERS);
-
+        startIt();
         configureLocalAddress();
         return bindAddress();
     }
@@ -475,17 +473,35 @@ public class NTCPTransport extends TransportImpl {
         if (_pumper.isAlive())
             return _myAddress != null ? _myAddress.toRouterAddress() : null;
         if (_log.shouldLog(Log.WARN)) _log.warn("Restarting ntcp transport listening");
-        _finisher.start();
-        _pumper.startPumping();
 
-        _reader.startReading(NUM_CONCURRENT_READERS);
-        _writer.startWriting(NUM_CONCURRENT_WRITERS);
-
+        startIt();
         if (addr == null)
             _myAddress = null;
         else
             _myAddress = new NTCPAddress(addr);
         return bindAddress();
+    }
+
+    /**
+     *  Start up. Caller must synchronize.
+     *  @since 0.8.3
+     */
+    private void startIt() {
+        _finisher.start();
+        _pumper.startPumping();
+
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        int nr, nw;
+        if (maxMemory < 32*1024*1024) {
+            nr = nw = 1;
+        } else if (maxMemory < 64*1024*1024) {
+            nr = nw = 2;
+        } else {
+            nr = Math.max(MIN_CONCURRENT_READERS, Math.min(MAX_CONCURRENT_READERS, _context.bandwidthLimiter().getInboundKBytesPerSecond() / 20));
+            nw = Math.max(MIN_CONCURRENT_WRITERS, Math.min(MAX_CONCURRENT_WRITERS, _context.bandwidthLimiter().getOutboundKBytesPerSecond() / 20));
+        }
+        _reader.startReading(nr);
+        _writer.startWriting(nw);
     }
 
     public boolean isAlive() {

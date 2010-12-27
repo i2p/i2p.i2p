@@ -351,6 +351,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
     }
   }
   
+/*****
   public static void main(String args[]) {
       byte in[] = new byte[16];
       byte out[] = new byte[16];
@@ -379,7 +380,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
           long after = System.currentTimeMillis();
           System.out.println("encrypting 4MB took " + (after-beforeAll));
       } catch (Exception e) { e.printStackTrace(); }
-      /*
+****/ /*
       FortunaStandalone f = new FortunaStandalone();
       java.util.HashMap props = new java.util.HashMap();
       byte initSeed[] = new byte[1234];
@@ -394,5 +395,7 @@ public class FortunaStandalone extends BasePRNGStandalone implements Serializabl
       long time = System.currentTimeMillis() - before;
       System.out.println("512MB took " + time + ", or " + (8*64d)/((double)time/1000d) +"MBps");
        */
+/*****
   }
+*****/
 }

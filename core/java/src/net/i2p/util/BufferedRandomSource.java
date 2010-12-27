@@ -204,6 +204,7 @@ public class BufferedRandomSource extends RandomSource {
         return super.nextGaussian(); 
     }
     
+/*****
     public static void main(String args[]) {
         for (int i = 0; i < 16; i++)
             test();
@@ -232,4 +233,5 @@ public class BufferedRandomSource extends RandomSource {
         }
         return buf.toString();
     }
+*****/
 }

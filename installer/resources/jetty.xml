@@ -71,17 +71,29 @@
 
 
   <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-  <!-- Add a HTTPS SSL listener on port 8443                           -->
+  <!-- Add a HTTPS SSL listener on port 8443                               -->
+  <!--                                                                     -->
+  <!-- In the unlikely event you would want SSL support for your eepsite.  -->
+  <!-- You would need to generate a selfsigned certificate in a keystore   -->
+  <!-- in ~/.i2p/eepsite/keystore.ks, for example with the command line:   -->
+  <!--
+       keytool -genkey -storetype JKS -keystore ~/.i2p/eepsite/keystore.ks -storepass changeit -alias console -dname CN=xyz123.eepsite.i2p.net,OU=Eepsite,O=I2P Anonymous Network,L=XX,ST=XX,C=XX -validity 3650 -keyalg DSA -keysize 1024 -keypass myKeyPassword 
+   -->
+  <!-- Change the CN and key password in the example, of course.           -->
+  <!-- You wouldn't want to open this up to the regular internet,          -->
+  <!-- would you?? Untested and not recommended.                           -->
   <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
   <!-- UNCOMMENT TO ACTIVATE
   <Call name="addListener">
     <Arg>
-      <New class="org.mortbay.http.SunJsseListener">
+      <New class="org.mortbay.http.SslListener">
         <Set name="Port">8443</Set>
         <Set name="PoolName">main</Set>
-        <Set name="Keystore"><SystemProperty name="jetty.home" default="."/>/etc/demokeystore</Set>
-	<Set name="Password">OBF:1vny1zlo1x8e1vnw1vn61x8g1zlu1vn4</Set>
-	<Set name="KeyPassword">OBF:1u2u1wml1z7s1z7a1wnl1u2g</Set>
+        <Set name="Keystore">./eepsite/keystore.ks</Set>
+        <!-- the keystore password -->
+	<Set name="Password">changeit</Set>
+        <!-- the X.509 certificate password -->
+	<Set name="KeyPassword">myKeyPassword</Set>
         <Set name="NonPersistentUserAgent">MSIE 5</Set>
       </New>
     </Arg>
