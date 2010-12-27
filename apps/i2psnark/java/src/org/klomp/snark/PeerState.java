@@ -511,6 +511,8 @@ class PeerState implements DataLoader
           //bitfield = new BitField(meta.getPieces());
       }
       metainfo = meta;
+      if (bitfield.count() > 0)
+          setInteresting(true);
   }
 
   /** @since 0.8.4 */

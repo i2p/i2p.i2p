@@ -120,7 +120,7 @@ public class Peer implements Comparable
     this.peerID = new PeerID(id, sock.getPeerDestination());
     _id = ++__id;
     if (_log.shouldLog(Log.DEBUG))
-        _log.debug("Creating a new peer with " + peerID.toString(), new Exception("creating " + _id));
+        _log.debug("Creating a new peer " + peerID.toString(), new Exception("creating " + _id));
   }
 
   /**
@@ -261,14 +261,22 @@ public class Peer implements Comparable
                 _log.debug("Already have din [" + sock + "] with " + toString());
           }
         
+        // bad idea?
+        if (metainfo == null && (options & OPTION_EXTENSION) == 0) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Peer does not support extensions and we need metainfo, dropping");
+            throw new IOException("Peer does not support extensions and we need metainfo, dropping");
+        }
+
         PeerConnectionIn in = new PeerConnectionIn(this, din);
         PeerConnectionOut out = new PeerConnectionOut(this, dout);
         PeerState s = new PeerState(this, listener, metainfo, in, out);
         
         if ((options & OPTION_EXTENSION) != 0) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Peer supports extensions, sending test message");
-            out.sendExtension(0, ExtensionHandler.getHandshake());
+                _log.debug("Peer supports extensions, sending reply message");
+            int metasize = metainfo != null ? metainfo.getInfoBytes().length : -1;
+            out.sendExtension(0, ExtensionHandler.getHandshake(metasize));
         }
 
         if ((options & OPTION_DHT) != 0 && util.getDHT() != null) {
@@ -423,6 +431,7 @@ public class Peer implements Comparable
    *  @since 0.8.4
    */
   public void setMetaInfo(MetaInfo meta) {
+    metainfo = meta;
     PeerState s = state;
     if (s != null)
         s.setMetaInfo(meta);

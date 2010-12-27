@@ -1314,15 +1314,17 @@ public class I2PSnarkServlet extends Default {
         out.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
         out.write(renderOptions(0, 4, options.remove("outbound.length"), "outbound.length", HOP));
 
-        out.write("<tr><td>");
-        out.write(_("I2CP host"));
-        out.write(": <td><input type=\"text\" name=\"i2cpHost\" value=\"" 
-                  + _manager.util().getI2CPHost() + "\" size=\"15\" > ");
+        if (!_context.isRouterContext()) {
+            out.write("<tr><td>");
+            out.write(_("I2CP host"));
+            out.write(": <td><input type=\"text\" name=\"i2cpHost\" value=\"" 
+                      + _manager.util().getI2CPHost() + "\" size=\"15\" > ");
 
-        out.write("<tr><td>");
-        out.write(_("I2CP port"));
-        out.write(": <td><input type=\"text\" name=\"i2cpPort\" class=\"r\" value=\"" +
-                  + _manager.util().getI2CPPort() + "\" size=\"5\" maxlength=\"5\" > <br>\n");
+            out.write("<tr><td>");
+            out.write(_("I2CP port"));
+            out.write(": <td><input type=\"text\" name=\"i2cpPort\" class=\"r\" value=\"" +
+                      + _manager.util().getI2CPPort() + "\" size=\"5\" maxlength=\"5\" > <br>\n");
+        }
 
         StringBuilder opts = new StringBuilder(64);
         for (Iterator iter = options.entrySet().iterator(); iter.hasNext(); ) {

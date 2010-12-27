@@ -173,7 +173,8 @@ public class TrackerClient extends I2PAppThread
                 continue;
              if (primary.startsWith("http://i2p/" + dest))
                 continue;
-             trackers.add(new Tracker(url, false));
+             // opentrackers are primary if we don't have primary
+             trackers.add(new Tracker(url, primary.equals("")));
              _log.debug("Additional announce: [" + url + "] for infoHash: " + infoHash);
         }
     }
@@ -238,7 +239,7 @@ public class TrackerClient extends I2PAppThread
             
             uploaded = coordinator.getUploaded();
             downloaded = coordinator.getDownloaded();
-            left = coordinator.getLeft();
+            left = coordinator.getLeft();   // -1 in magnet mode
             
             // First time we got a complete download?
             String event;
@@ -289,7 +290,7 @@ public class TrackerClient extends I2PAppThread
                         }
                     }
 
-                    if ( (left > 0) && (!completed) ) {
+                    if ( (left != 0) && (!completed) ) {
                         // we only want to talk to new people if we need things
                         // from them (duh)
                         List<Peer> ordered = new ArrayList(peers);
@@ -344,7 +345,7 @@ public class TrackerClient extends I2PAppThread
             // FIXME this needs to be in its own thread
             if (_util.getDHT() != null && !stop) {
                 int numwant;
-                if (left <= 0 || event.equals(STOPPED_EVENT) || !coordinator.needPeers())
+                if (left == 0 || event.equals(STOPPED_EVENT) || !coordinator.needPeers())
                     numwant = 1;
                 else
                     numwant = _util.getMaxConnections();
@@ -362,7 +363,7 @@ public class TrackerClient extends I2PAppThread
                     List<Peer> peers = new ArrayList(hashes.size());
                     for (Hash h : hashes) {
                         PeerID pID = new PeerID(h.getData());
-                        peers.add(new Peer(pID, snark.getID(), snark.getInfoHash(), meta));
+                        peers.add(new Peer(pID, snark.getID(), snark.getInfoHash(), snark.getMetaInfo()));
                     }
                     Collections.shuffle(peers, r);
                     Iterator<Peer> it = peers.iterator();
@@ -370,7 +371,7 @@ public class TrackerClient extends I2PAppThread
                         Peer cur = it.next();
                         if (coordinator.addPeer(cur)) {
                             int delay = DELAY_MUL;
-                            delay *= ((int)cur.getPeerID().getAddress().calculateHash().toBase64().charAt(0)) % 10;
+                            delay *= r.nextInt(10);
                             delay += DELAY_MIN;
                             try { Thread.sleep(delay); } catch (InterruptedException ie) {}
                          }
@@ -418,6 +419,8 @@ public class TrackerClient extends I2PAppThread
                                 long downloaded, long left, String event)
     throws IOException
   {
+    // What do we send for left in magnet mode? Can we omit it?
+    long tleft = left >= 0 ? left : 1;
     String s = tr.announce
       + "?info_hash=" + infoHash
       + "&peer_id=" + peerID
@@ -425,10 +428,10 @@ public class TrackerClient extends I2PAppThread
       + "&ip=" + _util.getOurIPString() + ".i2p"
       + "&uploaded=" + uploaded
       + "&downloaded=" + downloaded
-      + "&left=" + left
+      + "&left=" + tleft
       + "&compact=1"   // NOTE: opentracker will return 400 for &compact alone
       + ((! event.equals(NO_EVENT)) ? ("&event=" + event) : "");
-    if (left <= 0 || event.equals(STOPPED_EVENT) || !coordinator.needPeers())
+    if (left == 0 || event.equals(STOPPED_EVENT) || !coordinator.needPeers())
         s += "&numwant=0";
     else
         s += "&numwant=" + _util.getMaxConnections();
@@ -445,7 +448,7 @@ public class TrackerClient extends I2PAppThread
         in = new FileInputStream(fetched);
 
         TrackerInfo info = new TrackerInfo(in, snark.getID(),
-                                           snark.getMetaInfo());
+                                           snark.getInfoHash(), snark.getMetaInfo());
         _util.debug("TrackerClient response: " + info, Snark.INFO);
 
         String failure = info.getFailureReason();

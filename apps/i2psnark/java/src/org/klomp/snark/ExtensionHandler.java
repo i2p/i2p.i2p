@@ -21,7 +21,6 @@ import org.klomp.snark.bencode.InvalidBEncodingException;
  */
 abstract class ExtensionHandler {
 
-    private static final byte[] _handshake = buildHandshake();
     private static final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(ExtensionHandler.class);
 
     public static final int ID_METADATA = 3;
@@ -32,17 +31,15 @@ abstract class ExtensionHandler {
 
 
   /**
+   *  @param metasize -1 if unknown
    *  @return bencoded outgoing handshake message
    */
-    public static byte[] getHandshake() {
-        return _handshake;
-    }
-
-    /** outgoing handshake message */
-    private static byte[] buildHandshake() {
+    public static byte[] getHandshake(int metasize) {
         Map<String, Object> handshake = new HashMap();
         Map<String, Integer> m = new HashMap();
         m.put(TYPE_METADATA, Integer.valueOf(ID_METADATA));
+        if (metasize >= 0)
+            handshake.put("metadata_size", Integer.valueOf(metasize));
         handshake.put("m", m);
         handshake.put("p", Integer.valueOf(6881));
         handshake.put("v", "I2PSnark");
@@ -51,6 +48,8 @@ abstract class ExtensionHandler {
     }
 
     public static void handleMessage(Peer peer, PeerListener listener, int id, byte[] bs) {
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Got extension msg " + id + " length " + bs.length + " from " + peer);
         if (id == 0)
             handleHandshake(peer, listener, bs);
         else if (id == ID_METADATA)
@@ -71,10 +70,24 @@ abstract class ExtensionHandler {
             peer.setHandshakeMap(map);
             Map<String, BEValue> msgmap = map.get("m").getMap();
 
-            // rv not used, just to throw an NPE to get out of here
-            msgmap.get(TYPE_METADATA).getInt();
+            if (msgmap.get(TYPE_METADATA) == null) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.debug("Peer does not support metadata extension: " + peer);
+                // drop if we need metainfo ?
+                return;
+            }
 
-            int metaSize = map.get("metadata_size").getInt();
+            BEValue msize = map.get("metadata_size");
+            if (msize == null) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.debug("Peer does not have the metainfo size yet: " + peer);
+                // drop if we need metainfo ?
+                return;
+            }
+            int metaSize = msize.getInt();
+            if (_log.shouldLog(Log.WARN))
+                _log.debug("Got the metainfo size: " + metaSize);
+
             MagnetState state = peer.getMagnetState();
             int remaining;
             synchronized(state) {
@@ -83,12 +96,16 @@ abstract class ExtensionHandler {
 
                 if (state.isInitialized()) {
                     if (state.getSize() != metaSize) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.debug("Wrong metainfo size " + metaSize + " from: " + peer);
                         peer.disconnect();
                         return;
                     }
                 } else {
                     // initialize it
                     if (metaSize > MAX_METADATA_SIZE) {
+                        if (_log.shouldLog(Log.WARN))
+                            _log.debug("Huge metainfo size " + metaSize + " from: " + peer);
                         peer.disconnect(false);
                         return;
                     }
@@ -112,8 +129,7 @@ abstract class ExtensionHandler {
             }
         } catch (Exception e) {
             if (_log.shouldLog(Log.WARN))
-                _log.info("Handshake exception from " + peer, e);
-           //peer.disconnect(false);
+                _log.warn("Handshake exception from " + peer, e);
         }
     }
 
@@ -140,6 +156,8 @@ abstract class ExtensionHandler {
 
             MagnetState state = peer.getMagnetState();
             if (type == TYPE_REQUEST) {
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Got request for " + piece + " from: " + peer);
                 byte[] pc;
                 synchronized(state) {
                     pc = state.getChunk(piece);
@@ -150,12 +168,19 @@ abstract class ExtensionHandler {
                 listener.uploaded(peer, pc.length);
             } else if (type == TYPE_DATA) {
                 int size = map.get("total_size").getInt();
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Got data for " + piece + " length " + size + " from: " + peer);
                 boolean done;
                 int chk = -1;
                 synchronized(state) {
                     if (state.isComplete())
                         return;
                     int len = is.available();
+                    if (len != size) {
+                        // probably fatal
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("total_size " + size + " but avail data " + len);
+                    }
                     peer.downloaded(len);
                     listener.downloaded(peer, len);
                     done = state.saveChunk(piece, bs, bs.length - len, len);
@@ -219,15 +244,15 @@ abstract class ExtensionHandler {
 
     private static void sendPiece(Peer peer, int piece, byte[] data) {
         Map<String, Object> map = new HashMap();
-        map.put("msg_type", Integer.valueOf(TYPE_REQUEST));
+        map.put("msg_type", Integer.valueOf(TYPE_DATA));
         map.put("piece", Integer.valueOf(piece));
         map.put("total_size", Integer.valueOf(data.length));
         byte[] dict = BEncoder.bencode(map);
         byte[] payload = new byte[dict.length + data.length];
         System.arraycopy(dict, 0, payload, 0, dict.length);
-        System.arraycopy(data, 0, payload, dict.length, payload.length);
+        System.arraycopy(data, 0, payload, dict.length, data.length);
         try {
-            int hisMsgCode = peer.getHandshakeMap().get("m").getMap().get("METADATA").getInt();
+            int hisMsgCode = peer.getHandshakeMap().get("m").getMap().get(TYPE_METADATA).getInt();
             peer.sendExtension(hisMsgCode, payload);
         } catch (Exception e) {
             // NPE, no metadata caps

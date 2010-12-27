@@ -24,6 +24,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 
+import net.i2p.data.Base64;
+
 /**
  * Holds different types that a bencoded byte array can represent.
  * You need to call the correct get method to get the correct java
@@ -180,10 +182,14 @@ public class BEValue
       {
         byte[] bs = (byte[])value;
         // XXX - Stupid heuristic... and not UTF-8
-        if (bs.length <= 12)
-          valueString = new String(bs);
+        //if (bs.length <= 12)
+        //  valueString = new String(bs);
+        //else
+        //  valueString = "bytes:" + bs.length;
+        if (bs.length <= 32)
+          valueString =  bs.length + " bytes: " + Base64.encode(bs);
         else
-          valueString = "bytes:" + bs.length;
+          valueString =  bs.length + " bytes";
       }
     else
       valueString = value.toString();

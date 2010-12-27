@@ -53,8 +53,6 @@ class MagnetState {
             metainfo = meta;
             initialize(meta.getInfoBytes().length);
             complete = true;
-        } else {
-            metainfoBytes = new byte[metaSize];
         }
     }
 
@@ -68,10 +66,13 @@ class MagnetState {
         isInitialized = true;
         metaSize = size;
         totalChunks = (size + (CHUNK_SIZE - 1)) / CHUNK_SIZE;
-        if (metainfo == null) {
+        if (metainfo != null) {
+            metainfoBytes = metainfo.getInfoBytes();
+        } else {
             // we don't need these if complete
             have = new BitField(totalChunks);
             requested = new BitField(totalChunks);
+            metainfoBytes = new byte[metaSize];
         }
     }
 
@@ -194,8 +195,7 @@ class MagnetState {
         InputStream is = new ByteArrayInputStream(metainfoBytes);
         BDecoder dec = new BDecoder(is);
         BEValue bev = dec.bdecodeMap();
-        Map<String, BEValue> info = bev.getMap();
-        map.put("info", info);
+        map.put("info", bev);
         MetaInfo newmeta = new MetaInfo(map);
         if (!DataHelper.eq(newmeta.getInfoHash(), infohash))
             throw new IOException("info hash mismatch");

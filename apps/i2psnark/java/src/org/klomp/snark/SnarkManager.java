@@ -68,7 +68,7 @@ public class SnarkManager implements Snark.CompleteListener {
     public static final String PROP_META_PREFIX = "i2psnark.zmeta.";
     public static final String PROP_META_BITFIELD_SUFFIX = ".bitfield";
     public static final String PROP_META_PRIORITY_SUFFIX = ".priority";
-    public static final String PROP_META_MAGNET_SUFFIX = ".magnet";
+    public static final String PROP_META_MAGNET_PREFIX = "i2psnark.magnet.";
 
     private static final String CONFIG_FILE = "i2psnark.config";
     public static final String PROP_AUTO_START = "i2snark.autoStart";   // oops
@@ -340,7 +340,9 @@ public class SnarkManager implements Snark.CompleteListener {
             int oldI2CPPort = _util.getI2CPPort();
             String oldI2CPHost = _util.getI2CPHost();
             int port = oldI2CPPort;
-            try { port = Integer.parseInt(i2cpPort); } catch (NumberFormatException nfe) {}
+            if (i2cpPort != null) {
+                try { port = Integer.parseInt(i2cpPort); } catch (NumberFormatException nfe) {}
+            }
             String host = oldI2CPHost;
             Map opts = new HashMap();
             if (i2cpOpts == null) i2cpOpts = "";
@@ -627,7 +629,7 @@ public class SnarkManager implements Snark.CompleteListener {
      * @throws RuntimeException via Snark.fatal()
      * @since 0.8.4
      */
-    public void addMagnet(String name, byte[] ih) {
+    public void addMagnet(String name, byte[] ih, boolean updateStatus) {
         Snark torrent = new Snark(_util, name, ih, this,
                                   _peerCoordinatorSet, _connectionAcceptor,
                                   false, getDataDir().getPath());
@@ -640,6 +642,8 @@ public class SnarkManager implements Snark.CompleteListener {
             }
             // Tell the dir monitor not to delete us
             _magnets.add(name);
+            if (updateStatus)
+                saveMagnetStatus(ih);
             _snarks.put(name, torrent);
         }
         if (shouldAutoStart()) {
@@ -667,6 +671,7 @@ public class SnarkManager implements Snark.CompleteListener {
         }
         snark.stopTorrent();
         _magnets.remove(snark.getName());
+        removeMagnetStatus(snark.getInfoHash());
     }
 
     /**
@@ -915,6 +920,28 @@ public class SnarkManager implements Snark.CompleteListener {
     }
     
     /**
+     *  Just remember we have it
+     *  @since 0.8.4
+     */
+    public void saveMagnetStatus(byte[] ih) {
+        String infohash = Base64.encode(ih);
+        infohash = infohash.replace('=', '$');
+        _config.setProperty(PROP_META_MAGNET_PREFIX + infohash, ".");
+        saveConfig();
+    }
+    
+    /**
+     *  Remove the magnet marker from the config file.
+     *  @since 0.8.4
+     */
+    public void removeMagnetStatus(byte[] ih) {
+        String infohash = Base64.encode(ih);
+        infohash = infohash.replace('=', '$');
+        _config.remove(PROP_META_MAGNET_PREFIX + infohash);
+        saveConfig();
+    }
+    
+    /**
      *  Does not really delete on failure, that's the caller's responsibility.
      *  Warning - does not validate announce URL - use TrackerClient.isValidAnnounce()
      *  @return failure message or null on success
@@ -1032,12 +1059,10 @@ public class SnarkManager implements Snark.CompleteListener {
                 }
             }
 
-//start magnets
-
-
             // here because we need to delay until I2CP is up
             // although the user will see the default until then
             getBWLimit();
+            boolean doMagnets = true;
             while (true) {
                 File dir = getDataDir();
                 if (_log.shouldLog(Log.DEBUG))
@@ -1049,6 +1074,10 @@ public class SnarkManager implements Snark.CompleteListener {
                     }
                 } catch (Exception e) {
                     _log.error("Error in the DirectoryMonitor", e);
+                }
+                if (doMagnets) {
+                    addMagnets();
+                    doMagnets = false;
                 }
                 try { Thread.sleep(60*1000); } catch (InterruptedException ie) {}
             }
@@ -1090,9 +1119,10 @@ public class SnarkManager implements Snark.CompleteListener {
      * and save the data to disk.
      * A Snark.CompleteListener method.
      *
+     * @return the new name for the torrent or null on error
      * @since 0.8.4
      */
-    public void gotMetaInfo(Snark snark) {
+    public String gotMetaInfo(Snark snark) {
         MetaInfo meta = snark.getMetaInfo();
         Storage storage = snark.getStorage();
         if (meta != null && storage != null) {
@@ -1100,22 +1130,50 @@ public class SnarkManager implements Snark.CompleteListener {
             if (rejectMessage != null) {
                 addMessage(rejectMessage);
                 snark.stopTorrent();
-                return;
+                return null;
             }
             saveTorrentStatus(meta, storage.getBitField(), null); // no file priorities
             String name = (new File(getDataDir(), storage.getBaseName() + ".torrent")).getAbsolutePath();
             try {
                 synchronized (_snarks) {
                     locked_writeMetaInfo(meta, name);
+                    // put it in the list under the new name
+                    _snarks.remove(snark.getName());
+                    _snarks.put(name, snark);
                 }
+                _magnets.remove(snark.getName());
+                removeMagnetStatus(snark.getInfoHash());
+                addMessage(_("Metainfo received for {0}", snark.getName()));
+                addMessage(_("Starting up torrent {0}", storage.getBaseName()));
+                return name;
             } catch (IOException ioe) {
                 addMessage(_("Failed to copy torrent file to {0}", name));
                 _log.error("Failed to write torrent file", ioe);
             }
         }
+        return null;
     }
 
     // End Snark.CompleteListeners
+
+    /**
+     * Add all magnets from the config file
+     * @since 0.8.4
+     */
+    private void addMagnets() {
+        for (Object o : _config.keySet()) {
+            String k = (String) o;
+            if (k.startsWith(PROP_META_MAGNET_PREFIX)) {
+                String b64 = k.substring(PROP_META_MAGNET_PREFIX.length());
+                b64 = b64.replace('$', '=');
+                byte[] ih = Base64.decode(b64);
+                // ignore value
+                if (ih != null && ih.length == 20)
+                    addMagnet("Magnet: " + I2PSnarkUtil.toHex(ih), ih, false);
+                // else remove from config?
+            }
+        }
+    }
 
     private void monitorTorrents(File dir) {
         String fileNames[] = dir.list(TorrentFilenameFilter.instance());

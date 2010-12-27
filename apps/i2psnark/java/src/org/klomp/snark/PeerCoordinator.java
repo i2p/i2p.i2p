@@ -410,7 +410,7 @@ public class PeerCoordinator implements PeerListener
                     name = "Magnet";
                 else
                     name = metainfo.getName();
-               _log.info("New connection to peer: " + peer + " for " + metainfo.getName());
+               _log.info("New connection to peer: " + peer + " for " + name);
             }
 
             // Add it to the beginning of the list.
@@ -1169,9 +1169,6 @@ public class PeerCoordinator implements PeerListener
                       _log.warn("Got completed metainfo via extension");
                   metainfo = magnetState.getMetaInfo();
                   listener.gotMetaInfo(this, metainfo);
-                  for (Peer p : peers) {
-                      p.setMetaInfo(metainfo);
-                  }
               }
           }
       }
@@ -1184,6 +1181,11 @@ public class PeerCoordinator implements PeerListener
    */
   public void setStorage(Storage stg) {
       storage = stg;
+      setWantedPieces();
+      // ok we should be in business
+      for (Peer p : peers) {
+          p.setMetaInfo(metainfo);
+      }
   }
 
   /**

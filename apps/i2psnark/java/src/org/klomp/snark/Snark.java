@@ -243,7 +243,7 @@ public class Snark
   public static final String PROP_MAX_CONNECTIONS = "i2psnark.maxConnections";
 
   /** most of these used to be public, use accessors below instead */
-  private final String torrent;
+  private String torrent;
   private MetaInfo meta;
   private Storage storage;
   private PeerCoordinator coordinator;
@@ -360,6 +360,7 @@ public class Snark
             }
           }
         meta = new MetaInfo(new BDecoder(in));
+        infoHash = meta.getInfoHash();
       }
     catch(IOException ioe)
       {
@@ -1028,8 +1029,13 @@ public class Snark
       meta = metainfo;
       try {
           storage = new Storage(_util, meta, this);
-          if (completeListener != null)
-              completeListener.gotMetaInfo(this);
+          storage.check(rootDataDir);
+          if (completeListener != null) {
+              String newName = completeListener.gotMetaInfo(this);
+              if (newName != null)
+                  torrent = newName;
+              // else some horrible problem
+          }
           coordinator.setStorage(storage);
       } catch (IOException ioe) {
           if (storage != null) {
@@ -1125,9 +1131,10 @@ public class Snark
      * metainfo and storage. The listener should now call getMetaInfo()
      * and save the data to disk.
      *
+     * @return the new name for the torrent or null on error
      * @since 0.8.4
      */
-    public void gotMetaInfo(Snark snark);
+    public String gotMetaInfo(Snark snark);
 
     // not really listeners but the easiest way to get back to an optional SnarkManager
     public long getSavedTorrentTime(Snark snark);

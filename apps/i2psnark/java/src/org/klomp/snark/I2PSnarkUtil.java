@@ -446,6 +446,21 @@ public class I2PSnarkUtil {
         return Boolean.valueOf(rv).booleanValue();
     }
 
+    /**
+     *  Like DataHelper.toHexString but ensures no loss of leading zero bytes
+     *  @since 0.8.4
+     */
+    public static String toHex(byte[] b) {
+        StringBuilder buf = new StringBuilder(40);
+        for (int i = 0; i < b.length; i++) {
+            int bi = b[i] & 0xff;
+            if (bi < 16)
+                buf.append('0');
+            buf.append(Integer.toHexString(bi));
+        }
+        return buf.toString();
+    }
+
     /** hook between snark's logger and an i2p log */
     void debug(String msg, int snarkDebugLevel) {
         debug(msg, snarkDebugLevel, null);

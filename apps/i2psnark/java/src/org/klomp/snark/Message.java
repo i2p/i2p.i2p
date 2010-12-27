@@ -104,7 +104,7 @@ class Message
     if (type == REQUEST || type == CANCEL)
       datalen += 4;
 
-    // length is 1 byte
+    // msg type is 1 byte
     if (type == EXTENSION)
       datalen += 1;
 
@@ -167,6 +167,8 @@ class Message
         return "PIECE(" + piece + "," + begin + "," + length + ")";
       case CANCEL:
         return "CANCEL(" + piece + "," + begin + "," + length + ")";
+      case PORT:
+        return "PORT(" + piece + ")";
       case EXTENSION:
         return "EXTENSION(" + piece + ',' + data.length + ')';
       default:

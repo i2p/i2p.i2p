@@ -32,6 +32,13 @@ class PeerConnectionIn implements Runnable
   private final Peer peer;
   private final DataInputStream din;
 
+  // The max length of a complete message in bytes.
+  // The biggest is the piece message, for which the length is the
+  // request size (32K) plus 9. (we could also check if Storage.MAX_PIECES / 8
+  // in the bitfield message is bigger but it's currently 5000/8 = 625 so don't bother)
+  private static final int MAX_MSG_SIZE = Math.max(PeerState.PARTSIZE + 9,
+                                                   MagnetState.CHUNK_SIZE + 100);  // 100 for the ext msg dictionary
+
   private Thread thread;
   private volatile boolean quit;
 
@@ -77,13 +84,9 @@ class PeerConnectionIn implements Runnable
             int len;
         
             // Wait till we hear something...
-            // The length of a complete message in bytes.
-            // The biggest is the piece message, for which the length is the
-            // request size (32K) plus 9. (we could also check if Storage.MAX_PIECES / 8
-            // in the bitfield message is bigger but it's currently 5000/8 = 625 so don't bother)
             int i = din.readInt();
             lastRcvd = System.currentTimeMillis();
-            if (i < 0 || i > PeerState.PARTSIZE + 9)
+            if (i < 0 || i > MAX_MSG_SIZE)
               throw new IOException("Unexpected length prefix: " + i);
 
             if (i == 0)
@@ -176,13 +179,14 @@ class PeerConnectionIn implements Runnable
                 ps.portMessage(port);
                 if (_log.shouldLog(Log.DEBUG)) 
                     _log.debug("Received port message from " + peer);
+                break;
               case 20:  // Extension message
                 int id = din.readUnsignedByte();
                 byte[] payload = new byte[i-2];
                 din.readFully(payload);
-                ps.extensionMessage(id, payload);
                 if (_log.shouldLog(Log.DEBUG)) 
                     _log.debug("Received extension message from " + peer);
+                ps.extensionMessage(id, payload);
                 break;
               default:
                 byte[] bs = new byte[i-1];
