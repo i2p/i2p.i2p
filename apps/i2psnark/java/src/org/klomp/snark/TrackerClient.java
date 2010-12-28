@@ -137,18 +137,18 @@ public class TrackerClient extends I2PAppThread
     // the primary tracker, that we don't add it twice.
     // todo: check for b32 matches as well
     trackers = new ArrayList(2);
-    String primary;
+    String primary = null;
     if (meta != null) {
         primary = meta.getAnnounce();
         if (isValidAnnounce(primary)) {
             trackers.add(new Tracker(meta.getAnnounce(), true));
+            _log.debug("Announce: [" + primary + "] infoHash: " + infoHash);
         } else {
             _log.warn("Skipping invalid or non-i2p announce: " + primary);
         }
-    } else {
-        primary = "";
     }
-    _log.debug("Announce: [" + primary + "] infoHash: " + infoHash);
+    if (primary == null)
+        primary = "";
     List tlist = _util.getOpenTrackers();
     if (tlist != null) {
         for (int i = 0; i < tlist.size(); i++) {
@@ -179,7 +179,7 @@ public class TrackerClient extends I2PAppThread
         }
     }
 
-    if (tlist.isEmpty()) {
+    if (trackers.isEmpty()) {
         // FIXME really need to get this message to the gui
         stop = true;
         _log.error("No valid trackers for infoHash: " + infoHash);

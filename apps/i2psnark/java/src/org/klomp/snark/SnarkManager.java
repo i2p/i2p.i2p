@@ -263,7 +263,9 @@ public class SnarkManager implements Snark.CompleteListener {
         String ot = _config.getProperty(I2PSnarkUtil.PROP_OPENTRACKERS);
         if (ot != null)
             _util.setOpenTrackerString(ot);
-        // FIXME set util use open trackers property somehow
+        String useOT = _config.getProperty(I2PSnarkUtil.PROP_USE_OPENTRACKERS);
+        boolean bOT = useOT == null || Boolean.valueOf(useOT).booleanValue();
+        _util.setUseOpenTrackers(bOT);
         getDataDir().mkdirs();
     }
     
@@ -434,6 +436,7 @@ public class SnarkManager implements Snark.CompleteListener {
                 addMessage(_("Enabled open trackers - torrent restart required to take effect."));
             else
                 addMessage(_("Disabled open trackers - torrent restart required to take effect."));
+            _util.setUseOpenTrackers(useOpenTrackers);
             changed = true;
         }
         if (openTrackers != null) {
@@ -605,6 +608,8 @@ public class SnarkManager implements Snark.CompleteListener {
                     if (sfile.exists())
                         sfile.delete();
                     return;
+                } catch (OutOfMemoryError oom) {
+                    addMessage(_("ERROR - Out of memory, cannot create torrent from {0}", sfile.getName()) + ": " + oom.getMessage());
                 } finally {
                     if (fis != null) try { fis.close(); } catch (IOException ioe) {}
                 }

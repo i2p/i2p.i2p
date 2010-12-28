@@ -1902,6 +1902,8 @@ private static class FetchAndAdd implements Runnable {
                     }
                 } catch (IOException ioe) {
                     _manager.addMessage(_("Torrent at {0} was not valid", urlify(_url)) + ": " + ioe.getMessage());
+                } catch (OutOfMemoryError oom) {
+                    _manager.addMessage(_("ERROR - Out of memory, cannot create torrent from {0}", urlify(_url)) + ": " + oom.getMessage());
                 } finally {
                     try { if (in != null) in.close(); } catch (IOException ioe) {}
                 }

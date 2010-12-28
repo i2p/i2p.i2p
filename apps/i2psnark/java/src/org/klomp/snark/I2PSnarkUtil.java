@@ -60,6 +60,7 @@ public class I2PSnarkUtil {
     private int _maxConnections;
     private File _tmpDir;
     private int _startupDelay;
+    private boolean _shouldUseOT;
     private KRPC _krpc;
 
     public static final int DEFAULT_STARTUP_DELAY = 3;
@@ -83,6 +84,7 @@ public class I2PSnarkUtil {
         _maxUpBW = DEFAULT_MAX_UP_BW;
         _maxConnections = MAX_CONNECTIONS;
         _startupDelay = DEFAULT_STARTUP_DELAY;
+        _shouldUseOT = DEFAULT_USE_OPENTRACKERS;
         // This is used for both announce replies and .torrent file downloads,
         // so it must be available even if not connected to I2CP.
         // so much for multiple instances
@@ -425,10 +427,10 @@ public class I2PSnarkUtil {
 
     /** comma delimited list open trackers to use as backups */
     /** sorted map of name to announceURL=baseURL */
-    public List getOpenTrackers() { 
+    public List<String> getOpenTrackers() { 
         if (!shouldUseOpenTrackers())
             return null;
-        List rv = new ArrayList(1);
+        List<String> rv = new ArrayList(1);
         String trackers = getOpenTrackerString();
         StringTokenizer tok = new StringTokenizer(trackers, ", ");
         while (tok.hasMoreTokens())
@@ -439,11 +441,12 @@ public class I2PSnarkUtil {
         return rv;
     }
     
+    public void setUseOpenTrackers(boolean yes) {
+        _shouldUseOT = yes;
+    }
+
     public boolean shouldUseOpenTrackers() {
-        String rv = (String) _opts.get(PROP_USE_OPENTRACKERS);
-        if (rv == null)
-            return DEFAULT_USE_OPENTRACKERS;
-        return Boolean.valueOf(rv).booleanValue();
+        return _shouldUseOT;
     }
 
     /**

@@ -180,15 +180,36 @@ public class BEValue
     String valueString;
     if (value instanceof byte[])
       {
+        // try to do a nice job for debugging
         byte[] bs = (byte[])value;
-        // XXX - Stupid heuristic... and not UTF-8
-        //if (bs.length <= 12)
-        //  valueString = new String(bs);
-        //else
-        //  valueString = "bytes:" + bs.length;
-        if (bs.length <= 32)
-          valueString =  bs.length + " bytes: " + Base64.encode(bs);
-        else
+        if (bs.length == 0)
+          valueString =  "0 bytes";
+        else if (bs.length <= 32) {
+          StringBuilder buf = new StringBuilder(32);
+          boolean bin = false;
+          for (int i = 0; i < bs.length; i++) {
+              int b = bs[i] & 0xff;
+              // no UTF-8
+              if (b < ' ' || b > 0x7e) {
+                  bin = true;
+                  break;
+              }
+          }
+          if (bin && bs.length <= 8) {
+              buf.append(bs.length).append(" bytes: 0x");
+              for (int i = 0; i < bs.length; i++) {
+                  int b = bs[i] & 0xff;
+                  if (b < 16)
+                      buf.append('0');
+                  buf.append(Integer.toHexString(b));
+              }
+          } else if (bin) {
+              buf.append(bs.length).append(" bytes: ").append(Base64.encode(bs));
+          } else {
+              buf.append('"').append(new String(bs)).append('"');
+          }
+          valueString = buf.toString();
+        } else
           valueString =  bs.length + " bytes";
       }
     else
