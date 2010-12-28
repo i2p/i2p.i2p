@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-12-19 03:15+0000\n"
-"PO-Revision-Date: 2010-12-19 22:45+0100\n"
+"PO-Revision-Date: 2010-12-28 00:46+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -1828,14 +1828,14 @@ msgstr "Red"
 
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:18
 msgid "Service"
-msgstr ""
+msgstr "Servicio"
 
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:18
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:101
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:386
 #: ../java/strings/Strings.java:72
 msgid "Tunnels"
-msgstr ""
+msgstr "Túneles"
 
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:18
 msgid "UI"
@@ -2915,7 +2915,7 @@ msgstr "Fallando"
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:131
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:287
 msgid "Integrated"
-msgstr "Integrado"
+msgstr "Integrados"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:164
 msgid "Unreachable"
@@ -3206,15 +3206,15 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:41
 msgid "I2P Router Help &amp; FAQ"
-msgstr ""
+msgstr "Ayuda acerca del enrutador I2P &amp; FAQ"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:43
 msgid "Help &amp; FAQ"
-msgstr ""
+msgstr "Ayuda"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:55
 msgid "Configure startup of clients and webapps (services); manually start dormant services"
-msgstr ""
+msgstr "Configura el arranque de clientes y servicios o lanza servicios no activados"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:57
 msgid "I2P Services"
@@ -3326,7 +3326,7 @@ msgstr "General"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:171
 msgid "Local Identity"
-msgstr "Identidad local"
+msgstr "Identidad propia"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:175
 msgid "Your unique I2P router identity is"
@@ -3338,7 +3338,7 @@ msgstr "¡Nunca se la digas a nadie!"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:181
 msgid "show"
-msgstr ""
+msgstr "mostrar"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:192
 msgid "How long we've been running for this session"
@@ -3362,11 +3362,11 @@ msgstr "Descargar de forma no authentificada"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:266
 msgid "Active"
-msgstr "Activo"
+msgstr "Activos"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:275
 msgid "Fast"
-msgstr "Rápido"
+msgstr "Rápidos"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:281
 msgid "High capacity"
@@ -3394,7 +3394,7 @@ msgstr "Configurar ancho de banda del enrutador I2P"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:349
 msgid "Bandwidth in/out"
-msgstr "Ancho de Bande entrante/saliente"
+msgstr "Ancho de Banda entrante/saliente"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:369
 msgid "Total"
@@ -3402,7 +3402,7 @@ msgstr "Total"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:376
 msgid "Used"
-msgstr "Utilizado"
+msgstr "Usado"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:391
 msgid "Exploratory"
@@ -5079,7 +5079,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/index_jsp.java:105
 msgid "home"
-msgstr ""
+msgstr "página de inicio"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/jobs_jsp.java:105
 msgid "job queue"
@@ -5182,7 +5182,7 @@ msgstr "Estadísticas del enrutador I2P"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/summaryframe_jsp.java:248
 #, java-format
 msgid "Disable {0} Refresh"
-msgstr ""
+msgstr "Deshabilitar el recargar cada {0}"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:105
 msgid "tunnel summary"
