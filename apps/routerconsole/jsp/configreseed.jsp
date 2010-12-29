@@ -28,7 +28,7 @@
     System.setProperty("net.i2p.router.web.ConfigReseedHandler.nonce", new java.util.Random().nextLong()+""); %>
 <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigReseedHandler.nonce")%>" >
 <h3><%=intl._("Reseeding Configuration")%></h3>
-<p><%=intl._("Reeseeding is the bootstrapping process used to find other routers when you first install I2P, or when your router has too few router references remaining.")%>
+<p><%=intl._("Reseeding is the bootstrapping process used to find other routers when you first install I2P, or when your router has too few router references remaining.")%>
 <%=intl._("If reseeding has failed, you should first check your network connection.")%>
 <p><b><%=intl._("The default settings will work for most people.")%></b>
 <%=intl._("Change these only if HTTP is blocked by a restrictive firewall, reseed has failed, and you have access to an HTTP proxy.")%>
