@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-12-19 03:16+0000\n"
-"PO-Revision-Date: 2010-12-28 00:38+0100\n"
+"PO-Revision-Date: 2010-12-29 16:29+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -118,12 +118,12 @@ msgstr "Conectando com I2P"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:497
 msgid "Error connecting to I2P - check your I2CP settings!"
-msgstr "Error ao se conectar com I2P - Verifique a sua configuração I2CP!"
+msgstr "Erro ao se conectar com I2P - Verifique a sua configuração I2CP!"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:506
 #, java-format
 msgid "Error: Could not add the torrent {0}"
-msgstr "Error: Não se pode adicionar o torrent {0}."
+msgstr "Erro: Não se pode adicionar o torrent {0}."
 
 #. catch this here so we don't try do delete it below
 #: ../java/src/org/klomp/snark/SnarkManager.java:528
@@ -194,7 +194,7 @@ msgstr "Torrents maiores que \"{0}\" Bytes ainda não funcionam, se apagará \"{
 #: ../java/src/org/klomp/snark/SnarkManager.java:767
 #, java-format
 msgid "Error: Could not remove the torrent {0}"
-msgstr "Error: Não se pode quitar o torrent \"{0}\"."
+msgstr "Erro: Não se pode quitar o torrent \"{0}\"."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:794
 #, java-format
@@ -382,7 +382,7 @@ msgstr "Apagada a pasta de dados: {0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:587
 msgid "Error creating torrent - you must select a tracker"
-msgstr "Error ao criar o torrent - Tens que elegir um rastreador."
+msgstr "Erro ao criar o torrent - Tens que elegir um rastreador."
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:602
 #, java-format
@@ -392,12 +392,12 @@ msgstr "Torrent criado para \"{0}\""
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:605
 #, java-format
 msgid "Many I2P trackers require you to register new torrents before seeding - please do so before starting \"{0}\""
-msgstr "Muitos rastreadores no I2P exigem que você registre novos torrents antes de poder sembrá-los. Por favor, faça isto antes de iniciar \"{0}\"!"
+msgstr "Muitos rastreadores no I2P exigem que você registre novos torrents antes de poder semeá-los. Por favor, faça isto antes de iniciar \"{0}\"!"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:607
 #, java-format
 msgid "Error creating a torrent for \"{0}\""
-msgstr "Error ao criar o torrent \"{0}\""
+msgstr "Erro ao criar o torrent \"{0}\""
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:610
 #, java-format
@@ -406,7 +406,7 @@ msgstr "Não se pode criar um torrent para dados que não existam: {0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:613
 msgid "Error creating torrent - you must enter a file or directory"
-msgstr "Error ao criar o torrent - Tens que especificar um arquivo ou uma pasta."
+msgstr "Erro ao criar o torrent - Tens que especificar um arquivo ou uma pasta."
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:616
 msgid "Stopping all torrents and closing the I2P tunnel."
@@ -424,7 +424,7 @@ msgstr "Abrendo o túnel I2P e iniciando os torrents ..."
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:764
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:770
 msgid "Tracker Error"
-msgstr "Error do rastreador"
+msgstr "Erro do rastreador"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:762
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:766
@@ -443,7 +443,7 @@ msgstr[1] "{0} pares"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:775
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:780
 msgid "Seeding"
-msgstr "sembrando"
+msgstr "semeando"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:784
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1533
@@ -453,7 +453,7 @@ msgstr "completo"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:787
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:792
 msgid "OK"
-msgstr "Bien"
+msgstr "Bem"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:796
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:801
@@ -545,7 +545,7 @@ msgstr "desconhecido"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1001
 msgid "Seed"
-msgstr "Sembrador"
+msgstr "Semeador"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1019
 msgid "Uninteresting (The peer has no pieces we need)"
@@ -595,11 +595,11 @@ msgstr "Criar um torrent"
 #. out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>\n");
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1134
 msgid "Data to seed"
-msgstr "Dados para sembrar"
+msgstr "Dados para semear"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1138
 msgid "File or directory to seed (must be within the specified path)"
-msgstr "Arquivo ou pasta para sembrar (deve estar no caminho especificado)"
+msgstr "Arquivo ou pasta para semear (deve estar no caminho especificado)"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1140
 msgid "Tracker"
