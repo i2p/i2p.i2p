@@ -33,7 +33,7 @@
           "<a href=\"http://trac.i2p2.de/newticket\">trac.i2p2.de</a>")%>
 <%=intl._("You may use the username \"guest\" and password \"guest\" if you do not wish to register.")%>
 <p><%=intl._("Please include this information in bug reports")%>:
-</p></div><div class="sorry" id="warning">
+</p></div><div class="sorry" id="warning2">
 <h3><%=intl._("Error Details")%></h3>
 <p>
 <%=intl._("Error {0}", ERROR_CODE)%>: <%=ERROR_URI%> <%=ERROR_MESSAGE%>
@@ -51,7 +51,7 @@
     }
 %>
 </p>
-<h3><%=intl._("I2P Version & Running Environment")%></h3>
+<h3><%=intl._("I2P Version and Running Environment")%></h3>
 <p>
 <b>I2P version:</b> <%=net.i2p.router.RouterVersion.FULL_VERSION%><br>
 <b>Java version:</b> <%=System.getProperty("java.vendor")%> <%=System.getProperty("java.version")%> (<%=System.getProperty("java.runtime.name")%> <%=System.getProperty("java.runtime.version")%>)<br>
