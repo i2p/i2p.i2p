@@ -38,12 +38,13 @@ import net.i2p.data.Hash;
 import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
+import net.i2p.data.SimpleDataStructure;
 import net.i2p.util.Log;
 import net.i2p.util.NativeBigInteger;
 
 /**
  *  Params and rv's changed from Hash to SHA1Hash for version 0.8.1
- *  There shouldn't be any external users of those variants.
+ *  Hash variants of sign() and verifySignature() restored in 0.8.3, required by Syndie.
  */
 public class DSAEngine {
     private Log _log;
@@ -68,6 +69,22 @@ public class DSAEngine {
 
     /** @param hash SHA-1 hash, NOT a SHA-256 hash */
     public boolean verifySignature(Signature signature, SHA1Hash hash, SigningPublicKey verifyingKey) {
+        return verifySig(signature, hash, verifyingKey);
+    }
+
+    /**
+     *  Used by Syndie.
+     *  @since 0.8.3 (restored, was removed in 0.8.1 and 0.8.2)
+     */
+    public boolean verifySignature(Signature signature, Hash hash, SigningPublicKey verifyingKey) {
+        return verifySig(signature, hash, verifyingKey);
+    }
+
+    /**
+     *  @param hash either a Hash or a SHA1Hash
+     *  @since 0.8.3
+     */
+    private boolean verifySig(Signature signature, SimpleDataStructure hash, SigningPublicKey verifyingKey) {
         long start = _context.clock().now();
 
         try {
@@ -129,6 +146,22 @@ public class DSAEngine {
 
     /** @param hash SHA-1 hash, NOT a SHA-256 hash */
     public Signature sign(SHA1Hash hash, SigningPrivateKey signingKey) {
+        return signIt(hash, signingKey);
+    }
+
+    /**
+     *  Used by Syndie.
+     *  @since 0.8.3 (restored, was removed in 0.8.1 and 0.8.2)
+     */
+    public Signature sign(Hash hash, SigningPrivateKey signingKey) {
+        return signIt(hash, signingKey);
+    }
+
+    /**
+     *  @param hash either a Hash or a SHA1Hash
+     *  @since 0.8.3
+     */
+    private Signature signIt(SimpleDataStructure hash, SigningPrivateKey signingKey) {
         if ((signingKey == null) || (hash == null)) return null;
         long start = _context.clock().now();
 

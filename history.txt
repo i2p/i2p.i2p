@@ -1,5 +1,7 @@
 2010-12-29 zzz
     * Console: Add 500 error page
+    * DSAEngine: Restore variants of methods using a Hash argument,
+                 required by Syndie, removed in 0.8.1
     * Reseed:
       - Add new configreseed page
       - Add StartCom CA cert required for www.i2pbote.net
