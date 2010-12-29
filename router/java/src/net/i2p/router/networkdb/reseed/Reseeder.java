@@ -40,12 +40,12 @@ public class Reseeder {
     // Reject unreasonably big files, because we download into a ByteArrayOutputStream.
     private static final long MAX_RESEED_RESPONSE_SIZE = 1024 * 1024;
 
-    private static final String DEFAULT_SEED_URL =
+    public static final String DEFAULT_SEED_URL =
               "http://a.netdb.i2p2.de/,http://b.netdb.i2p2.de/,http://c.netdb.i2p2.de/," +
               "http://reseed.i2p-projekt.de/,http://www.i2pbote.net/netDb/,http://r31453.ovh.net/static_media/files/netDb/";
 
     /** @since 0.8.2 */
-    private static final String DEFAULT_SSL_SEED_URL =
+    public static final String DEFAULT_SSL_SEED_URL =
               "https://a.netdb.i2p2.de/,https://c.netdb.i2p2.de/," +
               "https://www.i2pbote.net/netDb/," +
               "https://r31453.ovh.net/static_media/files/netDb/";
@@ -63,11 +63,8 @@ public class Reseeder {
     public static final String PROP_SSL_DISABLE = "router.reseedSSLDisable";
     /** @since 0.8.2 */
     public static final String PROP_SSL_REQUIRED = "router.reseedSSLRequired";
-
-    private static final String RESEED_TIPS =
-            _x("Ensure that nothing blocks outbound HTTP, check <a target=\"_top\" href=\"logs.jsp\">logs</a> " +
-               "and if nothing helps, read the <a target=\"_top\" href=\"http://www.i2p2.de/faq.html\">FAQ</a> about reseeding manually.");
-        
+    /** @since 0.8.3 */
+    public static final String PROP_RESEED_URL = "i2p.reseedURL";
 
     public Reseeder(RouterContext ctx) {
         _context = ctx;
@@ -128,7 +125,9 @@ public class Reseeder {
                 System.out.println(
                      "Ensure that nothing blocks outbound HTTP, check the logs, " +
                      "and if nothing helps, read the FAQ about reseeding manually.");
-                System.setProperty(PROP_ERROR, _("Reseed failed.") + ' '  + _(RESEED_TIPS));
+                System.setProperty(PROP_ERROR, _("Reseed failed.") + ' '  +
+                                               _("See {0} for help.",
+                                                 "<a target=\"_top\" href=\"/configreseed\">" + _("reseed configuration page") + "</a>"));
             }	
             System.setProperty(PROP_INPROGRESS, "false");
             System.clearProperty(PROP_STATUS);
@@ -165,7 +164,7 @@ public class Reseeder {
         */
         private int reseed(boolean echoStatus) {
             List<String> URLList = new ArrayList();
-            String URLs = _context.getProperty("i2p.reseedURL");
+            String URLs = _context.getProperty(PROP_RESEED_URL);
             boolean defaulted = URLs == null;
             boolean SSLDisable = _context.getBooleanProperty(PROP_SSL_DISABLE);
             if (defaulted) {
@@ -367,6 +366,11 @@ public class Reseeder {
     /** translate */
     private String _(String key) {
         return Translate.getString(key, _context, BUNDLE_NAME);
+    }
+
+    /** translate */
+    private String _(String s, Object o) {
+        return Translate.getString(s, o, _context, BUNDLE_NAME);
     }
 
     /** translate */

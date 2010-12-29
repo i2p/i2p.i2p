@@ -1,3 +1,9 @@
+2010-12-29 zzz
+    * Console: Add 500 error page
+    * Reseed:
+      - Add new configreseed page
+      - Add StartCom CA cert required for www.i2pbote.net
+
 2010-12-27 zzz
     * Crypto: Cleanups and fixups
     * Console:
