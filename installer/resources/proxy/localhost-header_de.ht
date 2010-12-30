@@ -18,6 +18,6 @@ Proxy-Connection: close
 </div>
 ------------------------------>
 <div class=warning id=warning>
-<h3>Fehler: Lokaler Zugriff</h3>
-Ihr Browser ist fehlkonfiguriert. Benutzen Sie diesen Proxy nicht, um auf lokale Ziele wie die I2P-Routerkonsole, localhost oder LAN-Ziele zuzugreifen!
+<h3>Fehler: lokaler Zugriff</h3>
+Ihr Browser ist fehlkonfiguriert: Benutzen Sie diesen Proxy nicht, um auf lokale Ziele wie die I2P-Routerkonsole, localhost oder LAN-Ziele zuzugreifen!
 </div>

@@ -1,3 +1,84 @@
+2010-12-29 zzz
+    * Console: Add 500 error page
+    * DSAEngine: Restore variants of methods using a Hash argument,
+                 required by Syndie, removed in 0.8.1
+    * Reseed:
+      - Add new configreseed page
+      - Add StartCom CA cert required for www.i2pbote.net
+
+2010-12-27 zzz
+    * Crypto: Cleanups and fixups
+    * Console:
+      - Add SSL support - To enable, change clients.config. Examples:
+          ## Change to SSL only: just add a '-s'
+          clientApp.0.args=-s 7657 ::1,127.0.0.1 ./webapps/
+          ## Use both non-SSL and SSL: add '-s port interface'
+          clientApp.0.args=7657 ::1,127.0.0.1 -s 7667 ::1,127.0.0.1 ./webapps/
+          ## ...and change URLLauncher args further down for the browser to open https:// at startup if you like.
+      - Add a simple history.txt servlet
+      - Add form for I2CP options on configclients.jsp
+    * Context:
+      - Add hook for internal I2CP
+      - Change temp file random to Base64 http://zzz.i2p/topics/804
+    * Data structure caching:
+      - Use a single static null certificate in place of
+        tens of thousands of them
+    * graphs.jsp: Form tweaks, fix setting delay to 'Never'
+    * I2CP:
+      - Change from the internal pseudo-socket that was
+        implemented in 0.7.9 to an internal Queue that directly
+        passes I2CPMessage objects. For in-JVM clients,
+        this eliminates two writer threads per client and
+        avoids the serialization/deserialization of I2CP messages.
+      - New option i2cp.disableInterface to turn off external I2CP port
+        (7654) and allow internal clients only
+      - I2CP over SSL, enable with i2cp.SSL=true
+      - Bypass authorization for internal accesses
+      - Move BWLimits and DestLookup message support from
+        I2PSimpleSession to I2PSessionImpl
+      - Include the Hash in the DestReplyMessage on a failed lookup
+        so the client may correlate replies
+      - Add support for parallel lookups and BWLimits requests
+      - Add support for specifying the timeout for DestLookups
+        (can only be smaller than the router timeout for now)
+      - Extend dest lookup router timeout from 10s to 15s
+    * i2psnark: Backport TrackerClient NPE fix
+    * i2ptunnel:
+      - Get Log from the logManager instead of instantiating,
+        so we may adjust the levels on the fly
+      - Better logging of server errors
+      - Return 503 to client before closing i2p socket if server is not there
+      - Extend header timeouts for HTTP and IRC server tunnels
+      - Limit server blockingHandle threads
+      - Run standard server blockingHandles inline
+      - For clients, use a common thread pool that expires idle threads
+        rather than keeping 5 accept() threads for each client.
+      - Use pool for HTTP decompression also.
+      - Disable router host/port options when in router context
+      - Add blacklist, connection limit, and jump list options to edit form
+    * Pack200: Find and use either Oracle or Apache library at runtime;
+               neither required at compile time.
+    * Router: Convert 'mark router liveliness' thread to SimpleScheduler
+    * Stats: Change stat.full default to false
+    * Threads:
+      - Reduce thread pool sizes based on memory and/or bandwidth limits
+      - Tweak some thread names for clarity
+    * Update:
+      - Change the UpdateHandler to try all sources in a loop, rather than one,
+        so the user need not retry manually
+      - For each source, fetch the first 56 bytes and check the version
+        before downloading the whole thing, so we need not wait for every
+        host to have the latest before updating the news.
+
+2010-12-26 sponge
+    * URI resource fixes from pre-review time from upstream prior merge
+    * Evolve URI fixs another step.
+    * Document how the URI path fix works.
+    * Fix 302 redirects so they URL encode properly.
+    * bump to -1
+
+* 2010-12-22  0.8.2 released
+
 2010-12-13 dr|z3d
     * Console themes: Midnight & Classic renovations.
 

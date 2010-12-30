@@ -71,7 +71,8 @@ button {
 }
 
 textarea {
-     border: 1px solid #ddddc0;
+     border: 1px solid #aaf;
+     min-height: 40px;
 }
 
 br {

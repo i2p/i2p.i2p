@@ -77,7 +77,7 @@ button span.hide{
 </select><br>
 <b><%=intl._("Authorization")%></b><br>
 <input type="checkbox" class="optbox" name="auth" value="true" <jsp:getProperty name="clientshelper" property="auth" /> >
-<%=intl._("Requre username and password")%><br>
+<%=intl._("Require username and password")%><br>
 <%=intl._("Username")%>:
 <input name="user" type="text" value="<jsp:getProperty name="clientshelper" property="user" />" ><br>
 <%=intl._("Password")%>:

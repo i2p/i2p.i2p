@@ -16,5 +16,5 @@ Proxy-Connection: close
 </div>
 <div class=warning id=warning>
 <h3>Warnung: Kein Outproxy eingerichtet</h3>
-Sie haben eine Seite außerhalb des I2P-Netzes angefordert, jedoch ist kein HTTP-Outproxy eingerichtet. Bitte richten sie einen Outproxy in I2PTunnel ein!
+Sie haben eine Seite außerhalb des I2P-Netzes angefordert, jedoch ist kein HTTP-Outproxy eingerichtet. Bitte richten Sie einen Outproxy in der Sektion I2PTunnel ein!
 </div>

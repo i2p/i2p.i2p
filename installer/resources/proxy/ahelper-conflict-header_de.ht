@@ -11,17 +11,17 @@ Proxy-Connection: close
 </head>
 <body>
 <div class=logo>
- <a href="http://127.0.0.1:7657/index.jsp" title="Router Console"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="I2P Router Console" border="0"></a><hr>
- <a href="http://127.0.0.1:7657/config.jsp">Configuratie</a> <a href="http://127.0.0.1:7657/help.jsp">Help</a> <a href="http://127.0.0.1:7657/susidns/">Adresboek</a>
+ <a href="http://127.0.0.1:7657/index.jsp" title="Routerkonsole"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="I2P Router Console" border="0"></a><hr>
+ <a href="http://127.0.0.1:7657/config.jsp">Einstellungen</a> <a href="http://127.0.0.1:7657/help.jsp">Hilfe</a> <a href="http://127.0.0.1:7657/susidns/">Adressbuch</a>
 </div>
 <div class=warning id=warning>
 <h3>Warnung: Zielkonflikt</h3>
-Dier Adresshelperverweis, dem Sie folgen wollen, verwendet für diesen Hostnamen ein anderes kryptographisches Ziel
+Der Adresshelferverweis, dem Sie folgen wollen, verwendet für diesen Hostnamen ein anderes kryptographisches Ziel
 als im zugehörigen Eintrag in Ihrem Routeradressbuch angegeben.
-Jemand könnte versuchen, fälschlicherweise eine andere Eepseite als die gesuchte auszugeben.
-Möglicherweise haben aber die betreiber beider Eepseiten auch nur zufällig denselben Namen ausgewählt.
+Jemand könnte versuchen, fälschlicherweise eine andere als die gesuchte Eepseite auszugeben.
+Möglicherweise haben aber die betreiber beider Eepseiten nur zufällig denselben Namen ausgewählt.
 <p>
-Diesen Konflikt können sie lösen, indem Sie entscheiden, welchem Ziel Sie trauen, das gesuchte zu sein,
+Diesen Konflikt können Sie lösen, indem Sie entscheiden, welchem Ziel Sie trauen, das gesuchte zu sein,
 und dann entweder den Verweis des Adresshelfers verwerfen, den Eintrag in Ihrem Routeradressbuch löschen, 
 oder beiden Zielen unterschiedliche Namen zuweisen.
 <p>

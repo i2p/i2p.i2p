@@ -9,7 +9,7 @@
 <%@include file="summary.jsi" %>
 <h1><%=intl._("I2P Router Logs")%></h1>
 <div class="main" id="main">
- <div class="joblog"><h3><%=intl._("I2P Version & Running Environment")%></h3><a name="version"> </a>
+<div class="joblog"><h3><%=intl._("I2P Version and Running Environment")%></h3><a name="version"> </a>
 <p>
 <% /* note to translators - both parameters are URLs */
 %><%=intl._("Please report bugs on {0} or {1}.",

@@ -385,6 +385,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("Read the http command [" + command.toString() + "]");
         
+        // FIXME we probably don't need or want this in the outgoing direction
         int trimmed = 0;
         if (command.length() > 0) {
             for (int i = 0; i < command.length(); i++) {
@@ -424,7 +425,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 else if ("X-Accept-encoding".equalsIgnoreCase(name))
                     name = "X-Accept-encoding";
 
-                //We want to remove certain headers to improve anonymity
+                // For incoming, we remove certain headers to prevent spoofing.
+                // For outgoing, we remove certain headers to improve anonymity.
                 boolean skip = false;
                 for (String skipHeader: skipHeaders) {
                     if (skipHeader.equalsIgnoreCase(name)) {

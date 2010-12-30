@@ -13,11 +13,11 @@ Proxy-Connection: close
 <body>
 <div class=warning id=warning>
 <h3>Autorisierung für den I2P-HTTP-Proxy erforderlich</h3>
-Dieser Proxy ist eingestellt, Zugang nur für gültige Kombinationen aus einem Benutzernamen und einem Passwort zuzulasseen.
-Bitte geben Sie Ihren Benutzernamen und Passwort an, überprüfen Sie Ihre 
+Dieser Proxy ist so eingestellt, dass er Zugang nur für gültige Kombinationen aus einem Benutzernamen und einem Passwort zulässt.
+Bitte geben Sie Ihren Benutzernamen und Passwort an bzw. überprüfen Sie Ihre 
 <a href="http://127.0.0.1:7657/advancedconfig.jsp">Routereinstellungen</a>
 oder Ihre
 <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">I2PTunnel-Einstellungen</a>!
-Um das Autrorsierungserfordernis zu aufzuheben, entfernen Sie 
+Um das Autorsierungserfordernis aufzuheben, entfernen Sie 
 <code>i2ptunnel.proxy.auth=basic</code> aus der betreffenden Tunneleinstellung, stoppen Sie den HTTP-Proxy-Tunnel dann und starten Sie ihn neu!
 </div>

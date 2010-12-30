@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-12-12 23:30+0000\n"
-"PO-Revision-Date: 2010-12-13 01:01+0100\n"
+"PO-Revision-Date: 2010-12-19 04:37+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -118,12 +118,12 @@ msgstr "Verbinde mit I2P"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:497
 msgid "Error connecting to I2P - check your I2CP settings!"
-msgstr "Fehler beim Verbinden mit I2P - Kontrollieren Sie die I2CP Einstellungen!"
+msgstr "Fehler beim Verbinden mit I2P - Kontrollieren Sie die I2CP-Einstellungen!"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:506
 #, java-format
 msgid "Error: Could not add the torrent {0}"
-msgstr "Fehler: Konnte den Torrent nicht hinzufügen {0}"
+msgstr "Fehler: Konnte den Torrent \"{0}\" nicht hinzufügen"
 
 #. catch this here so we don't try do delete it below
 #: ../java/src/org/klomp/snark/SnarkManager.java:528
@@ -164,7 +164,7 @@ msgstr "Zu viele Dateien in  \"{0}\" ({1}), wird gelöscht! "
 #: ../java/src/org/klomp/snark/SnarkManager.java:736
 #, java-format
 msgid "Torrent file \"{0}\" cannot end in \".torrent\", deleting it!"
-msgstr "Torrentdatei \"{0}\" darf nicht mit '.torrent' enden, wird gelöscht!"
+msgstr "Torrentdatei \"{0}\" darf nicht auf '.torrent' enden, wird gelöscht!"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:738
 #, java-format
@@ -269,7 +269,7 @@ msgstr "geschätzte verbleibende Zeit"
 #. Translators: Please keep short or translate as " "
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:293
 msgid "ETA"
-msgstr "Fertig&nbsp;in"
+msgstr "Dauer"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:297
 msgid "Downloaded"
@@ -388,7 +388,7 @@ msgstr "Datenverzeichnis wurde gelöscht: {0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:587
 msgid "Error creating torrent - you must select a tracker"
-msgstr "Fehler beim Erstellen des Torrents - Sie müssen einen Tracker auswählen"
+msgstr "Fehler beim Erstellen des Torrents - Sie müssen einen Tracker auswählen!"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:602
 #, java-format
@@ -638,7 +638,7 @@ msgstr "Datenverzeichnis"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1186
 msgid "Edit i2psnark.config and restart to change"
-msgstr "Zum Ändern bearbeite die i2psnark.config und starte neu!"
+msgstr "Zum Ändern, bearbeite die i2psnark.config und starte neu!"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1190
 msgid "Auto start"
