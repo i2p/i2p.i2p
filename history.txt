@@ -1,3 +1,15 @@
+2010-12-30 zzz
+    * Data Structures:
+      - New SDSCache for SimpleDataStructures
+      - New SimpleByteCache for byte[]
+      - Cache Hash, PublicKey, and SigningPublicKey
+      - Remove global lock in ByteCache
+    * I2CP: Missing piece of parallel naming lookup
+    * i2psnark: Fix buttons on Firefox 4.0b
+    * i2ptunnel:
+      - Use dropdown box to select interface for clients
+      - Warn on index page if required fields not set
+
 2010-12-29 zzz
     * Console: Add 500 error page
     * DSAEngine: Restore variants of methods using a Hash argument,
@@ -42,7 +54,9 @@
       - Add support for specifying the timeout for DestLookups
         (can only be smaller than the router timeout for now)
       - Extend dest lookup router timeout from 10s to 15s
-    * i2psnark: Backport TrackerClient NPE fix
+    * i2psnark:
+      - Backport TrackerClient NPE fix
+      - Fix last piece length calculation for torrents > 2GB (ticket #361)
     * i2ptunnel:
       - Get Log from the logManager instead of instantiating,
         so we may adjust the levels on the fly
