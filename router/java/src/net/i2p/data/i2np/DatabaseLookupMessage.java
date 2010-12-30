@@ -133,15 +133,17 @@ public class DatabaseLookupMessage extends I2NPMessageImpl {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
         int curIndex = offset;
         
-        byte keyData[] = new byte[Hash.HASH_LENGTH];
-        System.arraycopy(data, curIndex, keyData, 0, Hash.HASH_LENGTH);
+        //byte keyData[] = new byte[Hash.HASH_LENGTH];
+        //System.arraycopy(data, curIndex, keyData, 0, Hash.HASH_LENGTH);
+        _key = Hash.create(data, curIndex);
         curIndex += Hash.HASH_LENGTH;
-        _key = new Hash(keyData);
+        //_key = new Hash(keyData);
         
-        byte fromData[] = new byte[Hash.HASH_LENGTH];
-        System.arraycopy(data, curIndex, fromData, 0, Hash.HASH_LENGTH);
+        //byte fromData[] = new byte[Hash.HASH_LENGTH];
+        //System.arraycopy(data, curIndex, fromData, 0, Hash.HASH_LENGTH);
+        _fromHash = Hash.create(data, curIndex);
         curIndex += Hash.HASH_LENGTH;
-        _fromHash = new Hash(fromData);
+        //_fromHash = new Hash(fromData);
         
         boolean tunnelSpecified = false;
         switch (data[curIndex]) {
@@ -168,10 +170,11 @@ public class DatabaseLookupMessage extends I2NPMessageImpl {
             throw new I2NPMessageException("Invalid number of peers - " + numPeers);
         Set<Hash> peers = new HashSet(numPeers);
         for (int i = 0; i < numPeers; i++) {
-            byte peer[] = new byte[Hash.HASH_LENGTH];
-            System.arraycopy(data, curIndex, peer, 0, Hash.HASH_LENGTH);
+            //byte peer[] = new byte[Hash.HASH_LENGTH];
+            //System.arraycopy(data, curIndex, peer, 0, Hash.HASH_LENGTH);
+            Hash p = Hash.create(data, curIndex);
             curIndex += Hash.HASH_LENGTH;
-            peers.add(new Hash(peer));
+            peers.add(p);
         }
         _dontIncludePeers = peers;
     }

@@ -327,11 +327,12 @@ public class FragmentHandler {
             offset += 4;
         }
         if ( (type == TYPE_ROUTER) || (type == TYPE_TUNNEL) ) {
-            byte h[] = new byte[Hash.HASH_LENGTH];
             if (offset + Hash.HASH_LENGTH >= preprocessed.length)
                 return -1;
-            System.arraycopy(preprocessed, offset, h, 0, Hash.HASH_LENGTH);
-            router = new Hash(h);
+            //byte h[] = new byte[Hash.HASH_LENGTH];
+            //System.arraycopy(preprocessed, offset, h, 0, Hash.HASH_LENGTH);
+            //router = new Hash(h);
+            router = Hash.create(preprocessed, offset);
             offset += Hash.HASH_LENGTH;
         }
         if (fragmented) {

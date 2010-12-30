@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -290,15 +291,19 @@ class ProfilePersistenceHelper {
                 _log.warn("Error loading properties from " + file.getName(), ioe);
         }
     }
-    
+
     private Hash getHash(String name) {
         String key = name.substring("profile-".length());
         key = key.substring(0, key.length() - ".dat".length());
-        Hash h = new Hash();
+        //Hash h = new Hash();
         try {
-            h.fromBase64(key);
+            //h.fromBase64(key);
+            byte[] b = Base64.decode(key);
+            if (b == null)
+                return null;
+            Hash h = Hash.create(b);
             return h;
-        } catch (DataFormatException dfe) {
+        } catch (Exception dfe) {
             _log.warn("Invalid base64 [" + key + "]", dfe);
             return null;
         }

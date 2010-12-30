@@ -327,11 +327,12 @@ public class ElGamalAESEngine {
             //_log.debug("len: " + len);
             if ((len < 0) || (len > decrypted.length - cur - Hash.HASH_LENGTH - 1)) 
                 throw new Exception("Invalid size of payload (" + len + ", remaining " + (decrypted.length-cur) +")");
-            byte hashval[] = new byte[Hash.HASH_LENGTH];
-            System.arraycopy(decrypted, cur, hashval, 0, Hash.HASH_LENGTH);
+            //byte hashval[] = new byte[Hash.HASH_LENGTH];
+            //System.arraycopy(decrypted, cur, hashval, 0, Hash.HASH_LENGTH);
+            //readHash = new Hash();
+            //readHash.setData(hashval);
+            readHash = Hash.create(decrypted, cur);
             cur += Hash.HASH_LENGTH;
-            readHash = new Hash();
-            readHash.setData(hashval);
             byte flag = decrypted[cur++];
             if (flag == 0x01) {
                 byte rekeyVal[] = new byte[SessionKey.KEYSIZE_BYTES];
