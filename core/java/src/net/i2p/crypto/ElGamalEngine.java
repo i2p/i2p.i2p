@@ -202,9 +202,10 @@ public class ElGamalEngine {
         }
 
         //ByteArrayInputStream bais = new ByteArrayInputStream(val, i, val.length - i);
-        byte hashData[] = new byte[Hash.HASH_LENGTH];
-        System.arraycopy(val, i + 1, hashData, 0, Hash.HASH_LENGTH);
-        Hash hash = new Hash(hashData);
+        //byte hashData[] = new byte[Hash.HASH_LENGTH];
+        //System.arraycopy(val, i + 1, hashData, 0, Hash.HASH_LENGTH);
+        //Hash hash = new Hash(hashData);
+        Hash hash = Hash.create(val, i + 1);
         byte rv[] = new byte[payloadLen];
         System.arraycopy(val, i + 1 + Hash.HASH_LENGTH, rv, 0, rv.length);
 

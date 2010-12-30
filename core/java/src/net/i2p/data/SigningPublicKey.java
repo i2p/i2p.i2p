@@ -9,6 +9,9 @@ package net.i2p.data;
  *
  */
 
+import java.io.InputStream;
+import java.io.IOException;
+
 /**
  * Defines the SigningPublicKey as defined by the I2P data structure spec.
  * A public key is 256byte Integer. The public key represents only the 
@@ -19,6 +22,17 @@ package net.i2p.data;
  */
 public class SigningPublicKey extends SimpleDataStructure {
     public final static int KEYSIZE_BYTES = 128;
+    private static final int CACHE_SIZE = 256;
+
+    private static final SDSCache<SigningPublicKey> _cache = new SDSCache(SigningPublicKey.class, KEYSIZE_BYTES, CACHE_SIZE);
+
+    /**
+     * Pull from cache or return new
+     * @since 0.8.3
+     */
+    public static SigningPublicKey create(InputStream in) throws IOException {
+        return _cache.get(in);
+    }
 
     public SigningPublicKey() {
         super();
