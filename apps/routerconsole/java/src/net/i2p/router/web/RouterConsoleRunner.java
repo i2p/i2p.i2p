@@ -210,7 +210,7 @@ public class RouterConsoleRunner {
                             _server.addListener(ssll);
                             boundAddresses++;
                         } catch (Exception e) {   // probably no exceptions at this point
-                            System.err.println("Unable to bind routerconsole to " + host + " port " + _listenPort + " for SSL: " + e);
+                            System.err.println("Unable to bind routerconsole to " + host + " port " + sslPort + " for SSL: " + e);
                         }
                     }
                 } else {
@@ -224,7 +224,8 @@ public class RouterConsoleRunner {
             }
             _server.setRootWebApp(ROUTERCONSOLE);
             WebApplicationContext wac = _server.addWebApplication("/", _webAppsDir + ROUTERCONSOLE + ".war");
-            File tmpdir = new SecureDirectory(workDir, ROUTERCONSOLE + "-" + _listenPort);
+            File tmpdir = new SecureDirectory(workDir, ROUTERCONSOLE + "-" +
+                                                       (_listenPort != null ? _listenPort : _sslListenPort));
             tmpdir.mkdir();
             wac.setTempDirectory(tmpdir);
             baseHandler = new LocaleWebAppHandler(I2PAppContext.getGlobalContext());
@@ -239,7 +240,8 @@ public class RouterConsoleRunner {
                         String enabled = props.getProperty(PREFIX + appName + ENABLED);
                         if (! "false".equals(enabled)) {
                             String path = new File(dir, fileNames[i]).getCanonicalPath();
-                            tmpdir = new SecureDirectory(workDir, appName + "-" + _listenPort);
+                            tmpdir = new SecureDirectory(workDir, appName + "-" +
+                                                                  (_listenPort != null ? _listenPort : _sslListenPort));
                             WebAppStarter.addWebApp(I2PAppContext.getGlobalContext(), _server, appName, path, tmpdir);
 
                             if (enabled == null) {

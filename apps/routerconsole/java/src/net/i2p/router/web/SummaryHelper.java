@@ -29,6 +29,11 @@ import net.i2p.stat.RateStat;
  * the summary sections on the router console.  
  */
 public class SummaryHelper extends HelperBase {
+
+    // Opera 10.63 doesn't have the char, TODO check UA
+    //static final String THINSP = "&thinsp;/&thinsp;";
+    static final String THINSP = " / ";
+
     /**
      * Retrieve the shortened 4 character ident for the router located within
      * the current JVM at the given context.
@@ -321,7 +326,7 @@ public class SummaryHelper extends HelperBase {
             fmt = new DecimalFormat("#0.0");
         else
             fmt = new DecimalFormat("#0.00");
-        return fmt.format(in) + "&thinsp;/&thinsp;" + fmt.format(out) + "&nbsp;" +
+        return fmt.format(in) + THINSP + fmt.format(out) + "&nbsp;" +
                (mega ? 'M' : 'K');
     }
 

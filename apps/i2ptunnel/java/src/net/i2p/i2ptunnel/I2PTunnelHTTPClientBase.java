@@ -73,7 +73,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         _proxyList = new ArrayList(4);
     }
 
-    /** all auth @ince 0.8.2 */
+    /** all auth @since 0.8.2 */
     public static final String PROP_AUTH = "proxyAuth";
     public static final String PROP_USER = "proxyUsername";
     public static final String PROP_PW = "proxyPassword";

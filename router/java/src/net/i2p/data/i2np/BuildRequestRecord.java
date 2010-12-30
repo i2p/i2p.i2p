@@ -93,9 +93,10 @@ public class BuildRequestRecord {
      * the gateway to which the reply should be sent.
      */
     public Hash readNextIdentity() {
-        byte rv[] = new byte[Hash.HASH_LENGTH];
-        System.arraycopy(_data.getData(), _data.getOffset() + OFF_SEND_IDENT, rv, 0, Hash.HASH_LENGTH);
-        return new Hash(rv);
+        //byte rv[] = new byte[Hash.HASH_LENGTH];
+        //System.arraycopy(_data.getData(), _data.getOffset() + OFF_SEND_IDENT, rv, 0, Hash.HASH_LENGTH);
+        //return new Hash(rv);
+        return Hash.create(_data.getData(), _data.getOffset() + OFF_SEND_IDENT);
     }
     /**
      * Tunnel layer encryption key that the current hop should use

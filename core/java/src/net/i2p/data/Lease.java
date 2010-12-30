@@ -110,8 +110,9 @@ public class Lease extends DataStructureImpl {
     }
     
     public void readBytes(InputStream in) throws DataFormatException, IOException {
-        _gateway = new Hash();
-        _gateway.readBytes(in);
+        //_gateway = new Hash();
+        //_gateway.readBytes(in);
+        _gateway = Hash.create(in);
         _tunnelId = new TunnelId();
         _tunnelId.readBytes(in);
         _end = DataHelper.readDate(in);

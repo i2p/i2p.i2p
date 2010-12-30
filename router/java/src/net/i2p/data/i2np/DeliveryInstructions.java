@@ -90,18 +90,21 @@ public class DeliveryInstructions extends DataStructureImpl {
             case FLAG_MODE_LOCAL:
                 break;
             case FLAG_MODE_DESTINATION:
-                Hash destHash = new Hash();
-                destHash.readBytes(in);
+                //Hash destHash = new Hash();
+                //destHash.readBytes(in);
+                Hash destHash = Hash.create(in);
                 setDestination(destHash);
                 break;
             case FLAG_MODE_ROUTER:
-                Hash routerHash = new Hash();
-                routerHash.readBytes(in);
+                //Hash routerHash = new Hash();
+                //routerHash.readBytes(in);
+                Hash routerHash = Hash.create(in);
                 setRouter(routerHash);
                 break;
             case FLAG_MODE_TUNNEL:
-                Hash tunnelRouterHash = new Hash();
-                tunnelRouterHash.readBytes(in);
+                //Hash tunnelRouterHash = new Hash();
+                //tunnelRouterHash.readBytes(in);
+                Hash tunnelRouterHash = Hash.create(in);
                 setRouter(tunnelRouterHash);
                 TunnelId id = new TunnelId();
                 id.readBytes(in);
@@ -140,22 +143,25 @@ public class DeliveryInstructions extends DataStructureImpl {
             case FLAG_MODE_LOCAL:
                 break;
             case FLAG_MODE_DESTINATION:
-                byte destHash[] = new byte[Hash.HASH_LENGTH];
-                System.arraycopy(data, cur, destHash, 0, Hash.HASH_LENGTH);
+                //byte destHash[] = new byte[Hash.HASH_LENGTH];
+                //System.arraycopy(data, cur, destHash, 0, Hash.HASH_LENGTH);
+                Hash dh = Hash.create(data, cur);
                 cur += Hash.HASH_LENGTH;
-                setDestination(new Hash(destHash));
+                setDestination(dh);
                 break;
             case FLAG_MODE_ROUTER:
-                byte routerHash[] = new byte[Hash.HASH_LENGTH];
-                System.arraycopy(data, cur, routerHash, 0, Hash.HASH_LENGTH);
+                //byte routerHash[] = new byte[Hash.HASH_LENGTH];
+                //System.arraycopy(data, cur, routerHash, 0, Hash.HASH_LENGTH);
+                Hash rh = Hash.create(data, cur);
                 cur += Hash.HASH_LENGTH;
-                setRouter(new Hash(routerHash));
+                setRouter(rh);
                 break;
             case FLAG_MODE_TUNNEL:
-                byte tunnelRouterHash[] = new byte[Hash.HASH_LENGTH];
-                System.arraycopy(data, cur, tunnelRouterHash, 0, Hash.HASH_LENGTH);
+                //byte tunnelRouterHash[] = new byte[Hash.HASH_LENGTH];
+                //System.arraycopy(data, cur, tunnelRouterHash, 0, Hash.HASH_LENGTH);
+                Hash trh = Hash.create(data, cur);
                 cur += Hash.HASH_LENGTH;
-                setRouter(new Hash(tunnelRouterHash));
+                setRouter(trh);
                 setTunnelId(new TunnelId(DataHelper.fromLong(data, cur, 4)));
                 cur += 4;
                 break;

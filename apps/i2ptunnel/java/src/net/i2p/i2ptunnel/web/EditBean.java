@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.Set;
 
 import net.i2p.data.Base64;
 import net.i2p.data.Destination;
@@ -22,6 +23,7 @@ import net.i2p.i2ptunnel.I2PTunnelHTTPClient;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
 import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.i2ptunnel.TunnelControllerGroup;
+import net.i2p.util.Addresses;
 
 /**
  * Ugly little accessor for the edit page
@@ -312,6 +314,11 @@ public class EditBean extends IndexBean {
     /** @since 0.8.3 */
     public boolean isRouterContext() {
         return _context.isRouterContext();
+    }
+
+    /** @since 0.8.3 */
+    public Set<String> interfaceSet() {
+        return Addresses.getAllAddresses();
     }
 
     public String getI2CPHost(int tunnel) {

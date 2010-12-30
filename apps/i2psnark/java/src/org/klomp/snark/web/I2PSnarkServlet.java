@@ -337,14 +337,18 @@ public class I2PSnarkServlet extends Default {
 
         // Opera and text-mode browsers: no &thinsp; and no input type=image values submitted
         String ua = req.getHeader("User-Agent");
-        boolean isDegraded = ua != null && (ua.startsWith("Opera") || ua.startsWith("Lynx") ||
+        boolean isDegraded = ua != null && (ua.startsWith("Lynx") ||
                                             ua.startsWith("ELinks") || ua.startsWith("Dillo"));
 
+        boolean noThinsp = isDegraded || ua.startsWith("Opera");
         if (_manager.util().connected()) {
             if (isDegraded)
                 out.write("<a href=\"/i2psnark/?action=StopAll&amp;nonce=" + _nonce + "\"><img title=\"");
-            else
-                out.write("<input type=\"image\" name=\"action\" value=\"StopAll\" title=\"");
+            else {
+                // http://www.onenaught.com/posts/382/firefox-4-change-input-type-image-only-submits-x-and-y-not-name
+                //out.write("<input type=\"image\" name=\"action\" value=\"StopAll\" title=\"");
+                out.write("<input type=\"image\" name=\"action_StopAll\" value=\"foo\" title=\"");
+            }
             out.write(_("Stop all torrents and the I2P tunnel"));
             out.write("\" src=\"" + _imgPath + "stop_all.png\" alt=\"");
             out.write(_("Stop All"));
@@ -355,7 +359,7 @@ public class I2PSnarkServlet extends Default {
             if (isDegraded)
                 out.write("<a href=\"/i2psnark/?action=StartAll&amp;nonce=" + _nonce + "\"><img title=\"");
             else
-                out.write("<input type=\"image\" name=\"action\" value=\"StartAll\" title=\"");
+                out.write("<input type=\"image\" name=\"action_StartAll\" value=\"foo\" title=\"");
             out.write(_("Start all torrents and the I2P tunnel"));
             out.write("\" src=\"" + _imgPath + "start_all.png\" alt=\"");
             out.write(_("Start All"));
@@ -412,8 +416,19 @@ public class I2PSnarkServlet extends Default {
     private void processRequest(HttpServletRequest req) {
         String action = req.getParameter("action");
         if (action == null) {
-            _manager.addMessage("No action specified");
-            return;
+            // http://www.onenaught.com/posts/382/firefox-4-change-input-type-image-only-submits-x-and-y-not-name
+            Map params = req.getParameterMap();
+            for (Object o : params.keySet()) {
+                String key = (String) o;
+                if (key.startsWith("action_") && key.endsWith(".x")) {
+                    action = key.substring(0, key.length() - 2).substring(7);
+                    break;
+                }
+            }
+            if (action == null) {
+                _manager.addMessage("No action specified");
+                return;
+            }
         }
         // sadly, Opera doesn't send value with input type=image, so we have to use GET there
         //if (!"POST".equals(req.getMethod())) {
@@ -774,7 +789,7 @@ public class I2PSnarkServlet extends Default {
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning)
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "trackererror.png\" title=\"" + err + "\"></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Tracker Error") +
-                               ": " + curPeers + thinsp(isDegraded) +
+                               ": " + curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers);
             else {
                 if (err.length() > MAX_DISPLAYED_ERROR_LENGTH)
@@ -790,7 +805,7 @@ public class I2PSnarkServlet extends Default {
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning)
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "seeding.png\" ></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Seeding") +
-                               ": " + curPeers + thinsp(isDegraded) +
+                               ": " + curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers);
             else
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "complete.png\" ></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Complete");
@@ -802,7 +817,7 @@ public class I2PSnarkServlet extends Default {
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning && curPeers > 0 && downBps > 0)
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "downloading.png\" ></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("OK") +
-                               ": " + curPeers + thinsp(isDegraded) +
+                               ": " + curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers);
             else if (isRunning && curPeers > 0 && !showPeers)
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "stalled.png\" ></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Stalled") +
@@ -811,11 +826,11 @@ public class I2PSnarkServlet extends Default {
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning && curPeers > 0)
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "stalled.png\" ></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Stalled") +
-                               ": " + curPeers + thinsp(isDegraded) +
+                               ": " + curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers);
             else if (isRunning && knownPeers > 0)
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "nopeers.png\" ></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("No Peers") +
-                               ": 0&thinsp;/&thinsp;" + knownPeers ;
+                               ": 0" + thinsp(noThinsp) + knownPeers ;
             else if (isRunning)
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "nopeers.png\" ></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("No Peers");
             else
@@ -905,7 +920,7 @@ public class I2PSnarkServlet extends Default {
             if (isDegraded)
                 out.write("<a href=\"/i2psnark/?action=Stop_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");
             else
-                out.write("<input type=\"image\" name=\"action\" value=\"Stop_" + b64 + "\" title=\"");
+                out.write("<input type=\"image\" name=\"action_Stop_" + b64 + "\" value=\"foo\" title=\"");
             out.write(_("Stop the torrent"));
             out.write("\" src=\"" + _imgPath + "stop.png\" alt=\"");
             out.write(_("Stop"));
@@ -916,7 +931,7 @@ public class I2PSnarkServlet extends Default {
                 if (isDegraded)
                     out.write("<a href=\"/i2psnark/?action=Start_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");
                 else
-                    out.write("<input type=\"image\" name=\"action\" value=\"Start_" + b64 + "\" title=\"");
+                    out.write("<input type=\"image\" name=\"action_Start_" + b64 + "\" value=\"foo\" title=\"");
                 out.write(_("Start the torrent"));
                 out.write("\" src=\"" + _imgPath + "start.png\" alt=\"");
                 out.write(_("Start"));
@@ -946,7 +961,7 @@ public class I2PSnarkServlet extends Default {
             if (isDegraded)
                 out.write("<a href=\"/i2psnark/?action=Delete_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");
             else
-                out.write("<input type=\"image\" name=\"action\" value=\"Delete_" + b64 + "\" title=\"");
+                out.write("<input type=\"image\" name=\"action_Delete_" + b64 + "\" value=\"foo\" title=\"");
             out.write(_("Delete the .torrent file and the associated data file(s)"));
             out.write("\" onclick=\"if (!confirm('");
             // Can't figure out how to escape double quotes inside the onclick string.
@@ -1480,7 +1495,7 @@ public class I2PSnarkServlet extends Default {
     private static String urlify(String s) {
         StringBuilder buf = new StringBuilder(256);
         // browsers seem to work without doing this but let's be strict
-        String link = s.replace("&", "&amp;");
+        String link = s.replace("&", "&amp;").replace(" ", "%20");
         buf.append("<a href=\"").append(link).append("\">").append(link).append("</a>");
         return buf.toString();
     }

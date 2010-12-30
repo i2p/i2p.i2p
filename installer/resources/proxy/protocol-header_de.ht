@@ -5,7 +5,7 @@ Connection: close
 Proxy-Connection: close
 
 <html><head>
-<title>I2P-Warnung: nicht HTTP-Protokoll</title>
+<title>I2P-Warnung: kein HTTP-Protokoll</title>
 <link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico" >
 <link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css" >
 </head>
@@ -15,7 +15,7 @@ Proxy-Connection: close
  <a href="http://127.0.0.1:7657/config.jsp">Einstellungen</a> <a href="http://127.0.0.1:7657/help.jsp">Hilfe</a> <a href="http://127.0.0.1:7657/susidns/">Adressbuch</a>
 </div>
 <div class=warning id=warning>
-<h3>Warnung: nicht HTTP-Protokoll</h3>
+<h3>Warnung: kein HTTP-Protokoll</h3>
 Die Anfrage verwendet ein falsches Protokoll.
 I2Ps HTTP-Proxy unterstützt AUSSCHLIEßLICH Anfragen des HTTP-Protokolls ( http:// ). Andere Protokolle wie https:// und ftp:// sind nicht erlaubt.
 </div>

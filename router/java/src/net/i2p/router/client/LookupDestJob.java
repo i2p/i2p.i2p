@@ -28,7 +28,8 @@ class LookupDestJob extends JobImpl {
     public String getName() { return "LeaseSet Lookup for Client"; }
     public void runJob() {
         DoneJob done = new DoneJob(getContext());
-        getContext().netDb().lookupLeaseSet(_hash, done, done, 10*1000);
+        // TODO add support for specifying the timeout in the lookup message
+        getContext().netDb().lookupLeaseSet(_hash, done, done, 15*1000);
     }
 
     private class DoneJob extends JobImpl {
@@ -41,12 +42,23 @@ class LookupDestJob extends JobImpl {
             if (ls != null)
                 returnDest(ls.getDestination());
             else
-                returnDest(null);
+                returnHash(_hash);
         }
     }
 
     private void returnDest(Destination d) {
         DestReplyMessage msg = new DestReplyMessage(d);
+        try {
+            _runner.doSend(msg);
+        } catch (I2CPMessageException ime) {}
+    }
+
+    /**
+     *  Return the failed hash so the client can correlate replies with requests
+     *  @since 0.8.3
+     */
+    private void returnHash(Hash h) {
+        DestReplyMessage msg = new DestReplyMessage(h);
         try {
             _runner.doSend(msg);
         } catch (I2CPMessageException ime) {}

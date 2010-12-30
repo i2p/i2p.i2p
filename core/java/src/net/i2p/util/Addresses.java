@@ -55,12 +55,18 @@ public abstract class Addresses {
      *  @since 0.8.3
      */
     public static SortedSet<String> getAddresses(boolean includeLocal, boolean includeIPv6) {
+        boolean haveIPv4 = false;
+        boolean haveIPv6 = false;
         SortedSet<String> rv = new TreeSet();
         try {
             InetAddress localhost = InetAddress.getLocalHost();
             InetAddress[] allMyIps = InetAddress.getAllByName(localhost.getCanonicalHostName());
             if (allMyIps != null) {
                 for (int i = 0; i < allMyIps.length; i++) {
+                    if (allMyIps[i] instanceof Inet4Address)
+                        haveIPv4 = true;
+                    else
+                        haveIPv6 = true;
                     if (shouldInclude(allMyIps[i], includeLocal, includeIPv6))
                         rv.add(allMyIps[i].getHostAddress());
                 }
@@ -72,25 +78,20 @@ public abstract class Addresses {
                 NetworkInterface ifc = ifcs.nextElement();
                 for(Enumeration<InetAddress> addrs =  ifc.getInetAddresses(); addrs.hasMoreElements();) {
                     InetAddress addr = addrs.nextElement();
+                    if (addr instanceof Inet4Address)
+                        haveIPv4 = true;
+                    else
+                        haveIPv6 = true;
                     if (shouldInclude(addr, includeLocal, includeIPv6))
                         rv.add(addr.getHostAddress());
                 }
             }
         } catch (SocketException e) {}
 
-        if (includeLocal)
+        if (includeLocal && haveIPv4)
             rv.add("0.0.0.0");
-        if (includeLocal && includeIPv6) {
-            boolean ipv6 = false;
-            for (String a : rv) {
-                if (a.indexOf(':') >= 0) {
-                    ipv6 = true;
-                    break;
-                }
-            }
-            if (ipv6)
-                rv.add("0:0:0:0:0:0:0:0");  // we could do "::" but all the other ones are probably in long form
-        }
+        if (includeLocal && includeIPv6 && haveIPv6)
+            rv.add("0:0:0:0:0:0:0:0");  // we could do "::" but all the other ones are probably in long form
         return rv;
     }
 

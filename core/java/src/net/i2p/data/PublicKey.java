@@ -9,6 +9,9 @@ package net.i2p.data;
  *
  */
 
+import java.io.InputStream;
+import java.io.IOException;
+
 /**
  * Defines the PublicKey as defined by the I2P data structure spec.
  * A public key is 256byte Integer. The public key represents only the 
@@ -18,6 +21,17 @@ package net.i2p.data;
  */
 public class PublicKey extends SimpleDataStructure {
     public final static int KEYSIZE_BYTES = 256;
+    private static final int CACHE_SIZE = 256;
+
+    private static final SDSCache<PublicKey> _cache = new SDSCache(PublicKey.class, KEYSIZE_BYTES, CACHE_SIZE);
+
+    /**
+     * Pull from cache or return new
+     * @since 0.8.3
+     */
+    public static PublicKey create(InputStream in) throws IOException {
+        return _cache.get(in);
+    }
 
     public PublicKey() {
         super();

@@ -80,7 +80,7 @@
                 <label><%=intl._("Target")%>:</label>
          <% } else { %>
                 <label><%=intl._("Access Point")%>:</label>
-         <% } %>
+         <% } /* streamrclient */ %>
             </div>
             <div id="portField" class="rowItem">
                 <label for="port" accesskey="P">
@@ -95,46 +95,41 @@
                 </label>
                 <input type="text" size="6" maxlength="5" id="port" name="port" title="Access Port Number" value="<%=editBean.getClientPort(curTunnel)%>" class="freetext" />               
             </div>
-         <% String otherInterface = "";
-            String clientInterface = editBean.getClientInterface(curTunnel);
-            if ("streamrclient".equals(tunnelType)) {   
-                otherInterface = clientInterface;
-            } else { %>
             <div id="reachField" class="rowItem">
                 <label for="reachableBy" accesskey="r">
-                    <%=intl._("Reachable by")%>(<span class="accessKey">R</span>):
-                </label>
-                <select id="reachableBy" name="reachableBy" title="Valid IP for Client Access" class="selectbox">
-                  <%   if (!("127.0.0.1".equals(clientInterface)) &&
-                           !("0.0.0.0".equals(clientInterface)) &&
-                            (clientInterface != null) &&
-                            (clientInterface.trim().length() > 0)) {
-                            otherInterface = clientInterface;
-                       }
-                  %><option value="127.0.0.1"<%=("127.0.0.1".equals(clientInterface) ? " selected=\"selected\"" : "")%>><%=intl._("Locally (127.0.0.1)")%></option>
-                    <option value="0.0.0.0"<%=("0.0.0.0".equals(clientInterface) ? " selected=\"selected\"" : "")%>><%=intl._("Everyone (0.0.0.0)")%></option>
-                    <option value="other"<%=(!("".equals(otherInterface))    ? " selected=\"selected\"" : "")%>><%=intl._("LAN Hosts (Please specify your LAN address)")%></option>
-                </select>                
-            </div> 
-         <% } // streamrclient %>
-            <div id="otherField" class="rowItem">
-                <label for="reachableByOther" accesskey="O">
-         <% if ("streamrclient".equals(tunnelType)) { %>
-                    Host:
-                    <% String vvv = otherInterface;
-                       if (vvv == null || "".equals(vvv.trim())) {
+         <%
+            if ("streamrclient".equals(tunnelType)) {
+                       out.write("Host:");
+                       String targetHost = editBean.getTargetHost(curTunnel);
+                       if (targetHost == null || "".equals(targetHost.trim())) {
                            out.write(" <font color=\"red\">(");
                            out.write(intl._("required"));
                            out.write(")</font>");
                        }   
-                     %>
-         <% } else { %>
-                    <%=intl._("Other")%>(<span class="accessKey">O</span>):
-         <% } %>
+          %>
                 </label>
-                <input type="text" size="20" id="reachableByOther" name="reachableByOther" title="Alternative IP for Client Access" value="<%=otherInterface%>" class="freetext" />                
-            </div>
-                                            
+                <input type="text" size="20" id="targetHost" name="targetHost" title="Target Hostname or IP" value="<%=targetHost%>" class="freetext" />                
+         <% } else { %>
+                    <%=intl._("Reachable by")%>(<span class="accessKey">R</span>):
+                </label>
+                <select id="reachableBy" name="reachableBy" title="IP for Client Access" class="selectbox">
+              <%
+                    String clientInterface = editBean.getClientInterface(curTunnel);
+                    for (String ifc : editBean.interfaceSet()) {
+                        out.write("<option value=\"");
+                        out.write(ifc);
+                        out.write('\"');
+                        if (ifc.equals(clientInterface))
+                            out.write(" selected=\"selected\"");
+                        out.write('>');
+                        out.write(ifc);
+                        out.write("</option>\n");
+                    }
+              %>
+                </select>                
+         <% } /* streamrclient */ %>
+            </div> 
+
             <div class="subdivider">
                 <hr />
             </div>

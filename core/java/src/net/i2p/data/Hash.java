@@ -25,7 +25,34 @@ public class Hash extends SimpleDataStructure {
 
     public final static int HASH_LENGTH = 32;
     public final static Hash FAKE_HASH = new Hash(new byte[HASH_LENGTH]);
+    private static final int CACHE_SIZE = 2048;
     
+    private static final SDSCache<Hash> _cache = new SDSCache(Hash.class, HASH_LENGTH, CACHE_SIZE);
+
+    /**
+     * Pull from cache or return new
+     * @since 0.8.3
+     */
+    public static Hash create(byte[] data) {
+        return _cache.get(data);
+    }
+
+    /**
+     * Pull from cache or return new
+     * @since 0.8.3
+     */
+    public static Hash create(byte[] data, int off) {
+        return _cache.get(data, off);
+    }
+
+    /**
+     * Pull from cache or return new
+     * @since 0.8.3
+     */
+    public static Hash create(InputStream in) throws IOException {
+        return _cache.get(in);
+    }
+
     public Hash() {
         super();
     }

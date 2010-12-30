@@ -12,12 +12,12 @@ public class ConfigNavHelper extends HelperBase {
     private static final String pages[] =
                                           {"", "ui", "service", "update", "tunnels",
                                            "clients", "peer", "keyring", "logging", "stats",
-                                           "advanced" };
+                                           "reseed", "advanced" };
 
     private static final String titles[] =
                                           {_x("Network"), _x("UI"), _x("Service"), _x("Update"), _x("Tunnels"),
                                            _x("Clients"), _x("Peers"), _x("Keyring"), _x("Logging"), _x("Stats"),
-                                           _x("Advanced") };
+                                           _x("Reseeding"), _x("Advanced") };
 
     public void renderNavBar(String requestURI) throws IOException {
         StringBuilder buf = new StringBuilder(1024);

@@ -33,13 +33,15 @@ public class DestLookupMessage extends I2CPMessageImpl {
     }
 
     protected void doReadMessage(InputStream in, int size) throws I2CPMessageException, IOException {
-        Hash h = new Hash();
+        //Hash h = new Hash();
         try {
-            h.readBytes(in);
-        } catch (DataFormatException dfe) {
+            //h.readBytes(in);
+            _hash = Hash.create(in);
+        //} catch (DataFormatException dfe) {
+        } catch (IllegalArgumentException dfe) {
             throw new I2CPMessageException("Unable to load the hash", dfe);
         }
-        _hash = h;
+        //_hash = h;
     }
 
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {

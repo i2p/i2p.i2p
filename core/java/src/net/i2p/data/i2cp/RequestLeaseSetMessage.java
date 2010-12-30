@@ -86,8 +86,9 @@ public class RequestLeaseSetMessage extends I2CPMessageImpl {
             int numTunnels = (int) DataHelper.readLong(in, 1);
             _endpoints.clear();
             for (int i = 0; i < numTunnels; i++) {
-                Hash router = new Hash();
-                router.readBytes(in);
+                //Hash router = new Hash();
+                //router.readBytes(in);
+                Hash router = Hash.create(in);
                 TunnelId tunnel = new TunnelId();
                 tunnel.readBytes(in);
                 _endpoints.add(new TunnelEndpoint(router, tunnel));
