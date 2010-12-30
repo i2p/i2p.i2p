@@ -374,7 +374,7 @@ public class I2PSnarkServlet extends Default {
             Snark snark = (Snark)snarks.get(i);
             boolean showDebug = "2".equals(peerParam);
             boolean showPeers = showDebug || "1".equals(peerParam) || Base64.encode(snark.getInfoHash()).equals(peerParam);
-            displaySnark(out, snark, uri, i, stats, showPeers, isDegraded, showDebug);
+            displaySnark(out, snark, uri, i, stats, showPeers, isDegraded, noThinsp, showDebug);
         }
 
         if (snarks.isEmpty()) {
@@ -735,7 +735,7 @@ public class I2PSnarkServlet extends Default {
     private static final int MAX_DISPLAYED_FILENAME_LENGTH = 50;
     private static final int MAX_DISPLAYED_ERROR_LENGTH = 43;
     private void displaySnark(PrintWriter out, Snark snark, String uri, int row, long stats[], boolean showPeers,
-                              boolean isDegraded, boolean showDebug) throws IOException {
+                              boolean isDegraded, boolean noThinsp, boolean showDebug) throws IOException {
         String filename = snark.getName();
         File f = new File(filename);
         filename = f.getName(); // the torrent may be the canonical name, so lets just grab the local name
@@ -785,7 +785,7 @@ public class I2PSnarkServlet extends Default {
             if (isRunning && curPeers > 0 && !showPeers)
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "trackererror.png\" title=\"" + err + "\"></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Tracker Error") +
                                ": <a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + "\">" +
-                               curPeers + thinsp(isDegraded) +
+                               curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning)
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "trackererror.png\" title=\"" + err + "\"></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Tracker Error") +
@@ -801,7 +801,7 @@ public class I2PSnarkServlet extends Default {
             if (isRunning && curPeers > 0 && !showPeers)
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "seeding.png\" ></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Seeding") +
                                ": <a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + "\">" +
-                               curPeers + thinsp(isDegraded) +
+                               curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning)
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "seeding.png\" ></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Seeding") +
@@ -813,7 +813,7 @@ public class I2PSnarkServlet extends Default {
             if (isRunning && curPeers > 0 && downBps > 0 && !showPeers)
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "downloading.png\" ></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("OK") +
                                ": <a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + "\">" +
-                               curPeers + thinsp(isDegraded) +
+                               curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning && curPeers > 0 && downBps > 0)
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "downloading.png\" ></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("OK") +
@@ -822,7 +822,7 @@ public class I2PSnarkServlet extends Default {
             else if (isRunning && curPeers > 0 && !showPeers)
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "stalled.png\" ></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Stalled") +
                                ": <a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + "\">" +
-                               curPeers + thinsp(isDegraded) +
+                               curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning && curPeers > 0)
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "stalled.png\" ></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Stalled") +
@@ -893,7 +893,7 @@ public class I2PSnarkServlet extends Default {
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentDownloaded " + rowClass + "\">");
         if (remaining > 0)
-            out.write(formatSize(total-remaining) + thinsp(isDegraded) + formatSize(total));
+            out.write(formatSize(total-remaining) + thinsp(noThinsp) + formatSize(total));
         else if (remaining == 0)
             out.write(formatSize(total)); // 3GB
         else
