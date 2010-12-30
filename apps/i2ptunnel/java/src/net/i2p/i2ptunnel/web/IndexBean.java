@@ -63,7 +63,6 @@ public class IndexBean {
     private String _proxyList;
     private String _port;
     private String _reachableBy;
-    private String _reachableByOther;
     private String _targetDestination;
     private String _targetHost;
     private String _targetPort;
@@ -432,10 +431,13 @@ public class IndexBean {
     
     public String getClientInterface(int tunnel) {
         TunnelController tun = getController(tunnel);
-        if (tun != null)
-            return tun.getListenOnInterface();
-        else
-            return "";
+        if (tun != null) {
+            if ("streamrclient".equals(tun.getType()))
+                return tun.getTargetHost();
+            else
+                return tun.getListenOnInterface();
+        } else
+            return "127.0.0.1";
     }
     
     public int getTunnelStatus(int tunnel) {
@@ -478,11 +480,38 @@ public class IndexBean {
         return rv != null ? rv : "";
     }
     
+    /**
+     * Call this to see if it is ok to linkify getServerTarget()
+     * @since 0.8.3
+     */
+    public boolean isServerTargetLinkValid(int tunnel) {
+        TunnelController tun = getController(tunnel);
+        return tun != null &&
+               "httpserver".equals(tun.getType()) &&
+               tun.getTargetHost() != null &&
+               tun.getTargetPort() != null;
+    }
+
+    /**
+     * @return valid host:port only if isServerTargetLinkValid() is true
+     */
     public String getServerTarget(int tunnel) {
         TunnelController tun = getController(tunnel);
-        if (tun != null)
-            return tun.getTargetHost() + ':' + tun.getTargetPort();
-        else
+        if (tun != null) {
+            String host;
+            if ("streamrserver".equals(tun.getType()))
+                host = tun.getListenOnInterface();
+            else
+                host = tun.getTargetHost();
+            String port = tun.getTargetPort();
+            if (host == null)
+                host = "<font color=\"red\">" + _("Host not set") + "</font>";
+            else if (host.indexOf(':') >= 0)
+                host = '[' + host + ']';
+            if (port == null)
+                port = "<font color=\"red\">" + _("Port not set") + "</font>";
+            return host + ':' + port;
+       }  else
             return "";
     }
     
@@ -575,18 +604,10 @@ public class IndexBean {
         _port = (port != null ? port.trim() : null);
     }
     /** 
-     * what interface should this client/httpclient/ircclient listen on (unless 
-     * overridden by the setReachableByOther() field)
+     * what interface should this client/httpclient/ircclient listen on
      */
     public void setReachableBy(String reachableBy) { 
         _reachableBy = (reachableBy != null ? reachableBy.trim() : null);
-    }
-    /**
-     * If specified, defines the exact IP interface to listen for requests
-     * on (in the case of client/httpclient/ircclient tunnels)
-     */
-    public void setReachableByOther(String reachableByOther) { 
-        _reachableByOther = (reachableByOther != null ? reachableByOther.trim() : null);
     }
     /** What peer does this client tunnel point at */
     public void setTargetDestination(String dest) { 
@@ -891,17 +912,22 @@ public class IndexBean {
         Properties config = new Properties();
         updateConfigGeneric(config);
         
+        if ((isClient(_type) && !"streamrclient".equals(_type)) || "streamrserver".equals(_type)) {
+            // streamrserver uses interface
+            if (_reachableBy != null)
+                config.setProperty("interface", _reachableBy);
+            else
+                config.setProperty("interface", "");
+        } else {
+            // streamrclient uses targetHost
+            if (_targetHost != null)
+                config.setProperty("targetHost", _targetHost);
+        }
+
         if (isClient(_type)) {
             // generic client stuff
             if (_port != null)
                 config.setProperty("listenPort", _port);
-            if (_reachableByOther != null)
-                config.setProperty("interface", _reachableByOther);
-            else if (_reachableBy != null)
-                config.setProperty("interface", _reachableBy);
-            else
-                config.setProperty("interface", "");
-
             config.setProperty("sharedClient", _sharedClient + "");
             for (String p : _booleanClientOpts)
                 config.setProperty("option." + p, "" + _booleanOptions.contains(p));
@@ -910,8 +936,6 @@ public class IndexBean {
                     config.setProperty("option." + p, _otherOptions.get(p));
         } else {
             // generic server stuff
-            if (_targetHost != null)
-                config.setProperty("targetHost", _targetHost);
             if (_targetPort != null)
                 config.setProperty("targetPort", _targetPort);
             for (String p : _booleanServerOpts)
@@ -940,9 +964,7 @@ public class IndexBean {
         if ("httpbidirserver".equals(_type)) {
             if (_port != null)
                 config.setProperty("listenPort", _port);
-            if (_reachableByOther != null)
-                config.setProperty("interface", _reachableByOther);
-            else if (_reachableBy != null)
+            if (_reachableBy != null)
                 config.setProperty("interface", _reachableBy);
             else if (_targetHost != null)
                 config.setProperty("interface", _targetHost);
