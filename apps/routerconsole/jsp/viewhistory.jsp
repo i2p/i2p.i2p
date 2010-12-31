@@ -8,5 +8,9 @@
  */
 response.setContentType("text/plain");
 String base = net.i2p.I2PAppContext.getGlobalContext().getBaseDir().getAbsolutePath();
-net.i2p.util.FileUtil.readFile("history.txt", base, response.getOutputStream());
+try {
+    net.i2p.util.FileUtil.readFile("history.txt", base, response.getOutputStream());
+} catch (java.io.IOException ioe) {
+    response.sendError(403, ioe.toString());
+}
 %>

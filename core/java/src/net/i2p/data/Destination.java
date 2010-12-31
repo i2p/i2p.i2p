@@ -49,20 +49,14 @@ public class Destination extends KeysAndCert {
             throw new DataFormatException("Not enough data (len=" + source.length + " off=" + offset + ")");
         int cur = offset;
         
-        _publicKey = new PublicKey();
-        byte buf[] = new byte[PublicKey.KEYSIZE_BYTES];
-        System.arraycopy(source, cur, buf, 0, PublicKey.KEYSIZE_BYTES);
-        _publicKey.setData(buf);
+        _publicKey = PublicKey.create(source, cur);
         cur += PublicKey.KEYSIZE_BYTES;
         
-        _signingKey = new SigningPublicKey();
-        buf = new byte[SigningPublicKey.KEYSIZE_BYTES];
-        System.arraycopy(source, cur, buf, 0, SigningPublicKey.KEYSIZE_BYTES);
-        _signingKey.setData(buf);
+        _signingKey = SigningPublicKey.create(source, cur);
         cur += SigningPublicKey.KEYSIZE_BYTES;
         
-        _certificate = new Certificate();
-        cur += _certificate.readBytes(source, cur);
+        _certificate = Certificate.create(source, cur);
+        cur += _certificate.size();
         
         return cur - offset;
     }

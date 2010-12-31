@@ -44,6 +44,24 @@ public class Certificate extends DataStructureImpl {
     public final static int CERTIFICATE_TYPE_MULTIPLE = 4;
 
     /**
+     * Pull from cache or return new
+     * @throws AIOOBE if not enough bytes
+     * @since 0.8.3
+     */
+    public static Certificate create(byte[] data, int off) {
+        int type = data[off] & 0xff;
+        int length = (int) DataHelper.fromLong(data, off + 1, 2);
+        if (type == 0 && length == 0)
+            return NULL_CERT;
+        // from here down roughly the same as readBytes() below
+        if (length == 0)
+            return new Certificate(type, null);
+        byte[] payload = new byte[length];
+        System.arraycopy(data, off = 3, payload, 0, length);
+        return new Certificate(type, payload);
+    }
+
+    /**
      * If null cert, return immutable static instance, else create new
      * @since 0.8.3
      */

@@ -54,7 +54,7 @@ class LookupDest {
 
     /** @param h 32 byte hash */
     static Destination lookupHash(I2PAppContext ctx, byte[] h) {
-        Hash key = new Hash(h);
+        Hash key = Hash.create(h);
         Destination rv = null;
         try {
             I2PClient client = new I2PSimpleClient();

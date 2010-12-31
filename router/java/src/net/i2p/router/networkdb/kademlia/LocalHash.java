@@ -28,7 +28,7 @@ import net.i2p.util.Log;
  */
 class LocalHash extends Hash {
     private final static Log _log = new Log(LocalHash.class);
-    private /* FIXME final FIXME */ Map _xorCache;
+    private /* FIXME final FIXME */ Map<Hash, byte[]> _xorCache;
 
     private static final int MAX_CACHED_XOR = 1024;
     
@@ -65,7 +65,7 @@ class LocalHash extends Hash {
     public byte[] cachedXor(Hash key) throws IllegalStateException {
         if (_xorCache == null)
             throw new IllegalStateException("To use the cache, you must first prepare it");
-        byte[] distance = (byte[])_xorCache.get(key);
+        byte[] distance = _xorCache.get(key);
         
         if (distance == null) {
             // not cached, lets cache it
@@ -83,7 +83,7 @@ class LocalHash extends Hash {
                         _xorCache.remove(iter.next());
                 }
                 distance = DataHelper.xor(key.getData(), getData());
-                _xorCache.put(key, (Object) distance);
+                _xorCache.put(key, distance);
                 cached = _xorCache.size();
             }
             if (_log.shouldLog(Log.DEBUG)) {

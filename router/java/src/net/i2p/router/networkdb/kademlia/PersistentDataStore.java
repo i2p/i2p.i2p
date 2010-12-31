@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataStructure;
 import net.i2p.data.Hash;
@@ -481,8 +482,12 @@ class PersistentDataStore extends TransientDataStore {
         try {
             String key = filename.substring(prefix.length());
             key = key.substring(0, key.length() - suffix.length());
-            Hash h = new Hash();
-            h.fromBase64(key);
+            //Hash h = new Hash();
+            //h.fromBase64(key);
+            byte[] b = Base64.decode(key);
+            if (b == null)
+                return null;
+            Hash h = Hash.create(b);
             return h;
         } catch (Exception e) {
             // static

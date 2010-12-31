@@ -937,11 +937,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             RouterAddress addr = _externalAddress;
             UDPAddress ua = new UDPAddress(addr);
             int valid = 0;
-            Hash peerHash = new Hash();
             for (int i = 0; i < ua.getIntroducerCount(); i++) {
                 // warning: this is only valid as long as we use the ident hash as their key.
-                peerHash.setData(ua.getIntroducerKey(i));
-                PeerState peer = getPeerState(peerHash);
+                PeerState peer = getPeerState(Hash.create(ua.getIntroducerKey(i)));
                 if (peer != null)
                     valid++;
             }

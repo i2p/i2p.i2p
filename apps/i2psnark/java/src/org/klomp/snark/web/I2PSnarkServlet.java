@@ -108,6 +108,17 @@ public class I2PSnarkServlet extends Default {
     }
 
     /**
+     *  Tell the browser to cache the icons
+     *  @since 0.8.3
+     */
+    @Override
+    public void handleGet(HttpServletRequest request, HttpServletResponse response, String pathInContext, Resource resource, boolean endsWithSlash) throws ServletException, IOException {
+        if (resource.getName().startsWith("jar:file:"))
+            response.setHeader("Cache-Control", "max-age=86400");  // cache for a day
+        super.handleGet(request, response, pathInContext, resource, endsWithSlash);
+    }
+
+    /**
      * Some parts modified from:
      * <pre>
       // ========================================================================

@@ -37,9 +37,9 @@ public final class I2PDatagramDissector {
 
     private Hash rxHash = null;
 
-    private Signature rxSign = new Signature();
+    private Signature rxSign;
 
-    private Destination rxDest = new Destination();
+    private Destination rxDest;
 
     private byte[] rxPayload = new byte[DGRAM_BUFSIZE];
 
@@ -68,6 +68,9 @@ public final class I2PDatagramDissector {
 		this.valid = false;
 
         try {
+            rxDest = new Destination();
+            rxSign = new Signature();
+
 			// read destination
             rxDest.readBytes(dgStream);
 
@@ -153,6 +156,8 @@ public final class I2PDatagramDissector {
      * @return The Destination of the I2P repliable datagram sender
      */
     public Destination extractSender() {
+        if (this.rxDest == null)
+            return null;
         Destination retDest = new Destination();
         try {
             retDest.fromByteArray(this.rxDest.toByteArray());
@@ -184,6 +189,10 @@ public final class I2PDatagramDissector {
         if(this.valid)
             return;
         
+        if (rxSign == null || rxSign.getData() == null ||
+            rxDest == null || rxDest.getSigningPublicKey() == null)
+            throw new I2PInvalidDatagramException("Datagram not yet read");
+
         // now validate
         if (!this.dsaEng.verifySignature(rxSign, rxHash.getData(), rxDest.getSigningPublicKey()))
             throw new I2PInvalidDatagramException("Incorrect I2P repliable datagram signature");

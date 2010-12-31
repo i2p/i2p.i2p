@@ -60,9 +60,7 @@ public class DestReplyMessage extends I2CPMessageImpl {
         } else {
             try {
                 if (size == Hash.HASH_LENGTH) {
-                    Hash h = new Hash();
-                    h.readBytes(in);
-                    _hash = h;
+                    _hash = Hash.create(in);
                 } else {
                     Destination d = new Destination();
                     d.readBytes(in);

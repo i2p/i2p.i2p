@@ -216,7 +216,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
       *
       * Key the cache on the source+dest pair.
       */
-    private final static HashMap<String, LeaseSet> _leaseSetCache = new HashMap();
+    private final static HashMap<HashPair, LeaseSet> _leaseSetCache = new HashMap();
+
     private LeaseSet getReplyLeaseSet(boolean force) {
         LeaseSet newLS = getContext().netDb().lookupLeaseSetLocally(_from.calculateHash());
         if (newLS == null)
@@ -316,7 +317,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      * lease).
      *
      */
-    private final static HashMap<String, Lease> _leaseCache = new HashMap();
+    private final static HashMap<HashPair, Lease> _leaseCache = new HashMap();
+
     private boolean getNextLease() {
         _leaseSet = getContext().netDb().lookupLeaseSetLocally(_to.calculateHash());
         if (_leaseSet == null) {
@@ -456,7 +458,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      * before upper layers like streaming lib fail, even for low-bandwidth
      * connections like IRC.
      */
-    private final static HashMap<String, Long> _lastReplyRequestCache = new HashMap();
+    private final static HashMap<HashPair, Long> _lastReplyRequestCache = new HashMap();
 
     /**
      * Send the message to the specified tunnel by creating a new garlic message containing
@@ -628,23 +630,46 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      */
 
     /**
-     * String used to cache things with based on source + dest
-     * Put the dest first to make string matching faster
+     * Key used to cache things with based on source + dest
      */
-    private String _hashPair;
-    private String hashPair() {
+    private HashPair _hashPair;
+    private HashPair hashPair() {
         if (_hashPair == null)
-            _hashPair = _to.calculateHash().toBase64() + _from.calculateHash().toBase64();
+            _hashPair = new HashPair(_from.calculateHash(), _to.calculateHash());
         return _hashPair;
     }
 
     /**
+     * Key used to cache things with based on source + dest
+     * @since 0.8.3
+     */
+    private static class HashPair {
+        private final Hash sh, dh;
+
+        public HashPair(Hash s, Hash d) {
+            sh = s;
+            dh = d;
+        }
+
+        public int hashCode() {
+            return sh.hashCode() + dh.hashCode();
+        }
+
+        public boolean equals(Object o) {
+            if (o == null || !(o instanceof HashPair))
+                return false;
+            HashPair hp = (HashPair) o;
+            return sh.equals(hp.sh) && dh.equals(hp.dh);
+        }
+    }
+
+
+    /**
      * This is a little sneaky, but get the _from back out of the "opaque" hash key
      * (needed for cleanTunnelCache)
-     * 44 = 32 * 4 / 3
      */
-    private static Hash sourceFromHashPair(String s) {
-        return new Hash(Base64.decode(s.substring(44, 88)));
+    private static Hash sourceFromHashPair(HashPair s) {
+        return s.sh;
     }
 
     /**
@@ -655,7 +680,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      * But it's a start.
      */
     private void clearCaches() {
-        String key = hashPair();
+        HashPair key = hashPair();
         if (_inTunnel != null) {   // if we wanted an ack, we sent our lease too
             synchronized(_leaseSetCache) {
                 _leaseSetCache.remove(key);
@@ -681,42 +706,38 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     }
 
     /**
-     * Clean out old leaseSets from a set.
+     * Clean out old leaseSets
      * Caller must synchronize on tc.
      */
-    private static void cleanLeaseSetCache(RouterContext ctx, HashMap tc) {
+    private static void cleanLeaseSetCache(RouterContext ctx, Map<HashPair, LeaseSet> tc) {
         long now = ctx.clock().now();
-        for (Iterator iter = tc.entrySet().iterator(); iter.hasNext(); ) {
-            Map.Entry entry = (Map.Entry)iter.next();
-            String k = (String) entry.getKey();
-            LeaseSet l = (LeaseSet) entry.getValue();
+        for (Iterator<LeaseSet> iter = tc.values().iterator(); iter.hasNext(); ) {
+            LeaseSet l = iter.next();
             if (l.getEarliestLeaseDate() < now)
                 iter.remove();
         }
     }
 
     /**
-     * Clean out old leases from a set.
+     * Clean out old leases
      * Caller must synchronize on tc.
      */
-    private static void cleanLeaseCache(HashMap tc) {
-        for (Iterator iter = tc.entrySet().iterator(); iter.hasNext(); ) {
-            Map.Entry entry = (Map.Entry)iter.next();
-            String k = (String) entry.getKey();
-            Lease l = (Lease) entry.getValue();
+    private static void cleanLeaseCache(Map<HashPair, Lease> tc) {
+        for (Iterator<Lease> iter = tc.values().iterator(); iter.hasNext(); ) {
+            Lease l = iter.next();
             if (l.isExpired(Router.CLOCK_FUDGE_FACTOR))
                 iter.remove();
         }
     }
 
     /**
-     * Clean out old tunnels from a set.
+     * Clean out old tunnels
      * Caller must synchronize on tc.
      */
-    private static void cleanTunnelCache(RouterContext ctx, HashMap tc) {
+    private static void cleanTunnelCache(RouterContext ctx, Map<HashPair, TunnelInfo> tc) {
         for (Iterator iter = tc.entrySet().iterator(); iter.hasNext(); ) {
             Map.Entry entry = (Map.Entry)iter.next();
-            String k = (String) entry.getKey();
+            HashPair k = (HashPair) entry.getKey();
             TunnelInfo tunnel = (TunnelInfo) entry.getValue();
             if (!ctx.tunnelManager().isValidTunnel(sourceFromHashPair(k), tunnel))
                 iter.remove();
@@ -727,7 +748,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      * Clean out old reply times
      * Caller must synchronize on tc.
      */
-    private static void cleanReplyCache(RouterContext ctx, HashMap tc) {
+    private static void cleanReplyCache(RouterContext ctx, Map<HashPair, Long> tc) {
         long now = ctx.clock().now();
         for (Iterator iter = tc.values().iterator(); iter.hasNext(); ) {
             Long l = (Long) iter.next();
@@ -766,8 +787,10 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      * Key the caches on the source+dest pair.
      *
      */
-    private static final HashMap<String, TunnelInfo> _tunnelCache = new HashMap();
-    private static HashMap<String, TunnelInfo> _backloggedTunnelCache = new HashMap();
+    private static final HashMap<HashPair, TunnelInfo> _tunnelCache = new HashMap();
+
+    private static HashMap<HashPair, TunnelInfo> _backloggedTunnelCache = new HashMap();
+
     private TunnelInfo selectOutboundTunnel(Destination to) {
         TunnelInfo tunnel;
         long now = getContext().clock().now();
