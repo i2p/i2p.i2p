@@ -1,9 +1,9 @@
 package net.i2p.util;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
@@ -57,7 +57,8 @@ import net.i2p.data.ByteArray;
  */
 public final class ByteCache {
 
-    private static final Map<Integer, ByteCache> _caches = new HashMap(16);
+    private static final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(ByteCache.class);
+    private static final Map<Integer, ByteCache> _caches = new ConcurrentHashMap(16);
 
     /**
      *  max size in bytes of each cache
@@ -74,8 +75,9 @@ public final class ByteCache {
     /**
      * Get a cache responsible for objects of the given size
      *
-     * @param cacheSize how large we want the cache to grow before using on 
-     *                  demand allocation
+     * @param cacheSize how large we want the cache to grow 
+     *                  (number of objects, NOT memory size)
+     *                  before discarding released objects.
      *                  Since 0.7.14, a limit of 1MB / size is enforced
      *                  for the typical 128MB max memory JVM
      * @param size how large should the objects cached be?
@@ -84,12 +86,11 @@ public final class ByteCache {
         if (cacheSize * size > MAX_CACHE)
             cacheSize = MAX_CACHE / size;
         Integer sz = Integer.valueOf(size);
-        ByteCache cache = null;
-        synchronized (_caches) {
-            if (!_caches.containsKey(sz))
-                _caches.put(sz, new ByteCache(cacheSize, size));
-            cache = _caches.get(sz);
-        }
+        ByteCache cache = _caches.get(sz);
+        if (cache == null) {
+            cache = new ByteCache(cacheSize, size);
+            _caches.put(sz, cache);
+;       }
         cache.resize(cacheSize);
         //I2PAppContext.getGlobalContext().logManager().getLog(ByteCache.class).error("ByteCache size: " + size + " max: " + cacheSize, new Exception("from"));
         return cache;
@@ -102,10 +103,9 @@ public final class ByteCache {
     public static void clearAll() {
         for (ByteCache bc : _caches.values())
             bc.clear();
-        I2PAppContext.getGlobalContext().logManager().getLog(ByteCache.class).warn("WARNING: Low memory, clearing byte caches");
+        _log.warn("WARNING: Low memory, clearing byte caches");
     }
 
-    private Log _log;
     /** list of available and available entries */
     private Queue<ByteArray> _available;
     private int _maxCached;
@@ -116,7 +116,7 @@ public final class ByteCache {
     private static final boolean _cache = true;
     
     /** how often do we cleanup the cache */
-    private static final int CLEANUP_FREQUENCY = 30*1000;
+    private static final int CLEANUP_FREQUENCY = 33*1000;
     /** if we haven't exceeded the cache size in 2 minutes, cut our cache in half */
     private static final long EXPIRE_PERIOD = 2*60*1000;
     
@@ -126,9 +126,8 @@ public final class ByteCache {
         _maxCached = maxCachedEntries;
         _entrySize = entrySize;
         _lastOverflow = -1;
-        SimpleScheduler.getInstance().addPeriodicEvent(new Cleanup(), CLEANUP_FREQUENCY);
-        _log = I2PAppContext.getGlobalContext().logManager().getLog(ByteCache.class);
-        I2PAppContext.getGlobalContext().statManager().createRateStat("byteCache.memory." + entrySize, "Memory usage (B)", "Router", new long[] { 60*1000 });
+        SimpleScheduler.getInstance().addPeriodicEvent(new Cleanup(), CLEANUP_FREQUENCY + (entrySize % 7));   //stagger
+        I2PAppContext.getGlobalContext().statManager().createRateStat("byteCache.memory." + entrySize, "Memory usage (B)", "Router", new long[] { 10*60*1000 });
     }
     
     private void resize(int maxCachedEntries) {

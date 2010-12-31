@@ -35,7 +35,8 @@ public final class SHA256Generator {
         digest.update(source, start, len);
         byte rv[] = digest.digest();
         releaseGnu(digest);
-        return new Hash(rv);
+        //return new Hash(rv);
+        return Hash.create(rv);
     }
     
     public final void calculateHash(byte[] source, int start, int len, byte out[], int outOffset) {

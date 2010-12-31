@@ -61,10 +61,12 @@ public class KeysAndCert extends DataStructureImpl {
     }
     
     public void readBytes(InputStream in) throws DataFormatException, IOException {
-        _publicKey = new PublicKey();
-        _publicKey.readBytes(in);
-        _signingKey = new SigningPublicKey();
-        _signingKey.readBytes(in);
+        //_publicKey = new PublicKey();
+        //_publicKey.readBytes(in);
+        _publicKey = PublicKey.create(in);
+        //_signingKey = new SigningPublicKey();
+        //_signingKey.readBytes(in);
+        _signingKey = SigningPublicKey.create(in);
         //_certificate = new Certificate();
         //_certificate.readBytes(in);
         _certificate = Certificate.create(in);

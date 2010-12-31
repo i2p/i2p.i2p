@@ -55,26 +55,29 @@ public class DatabaseSearchReplyMessage extends I2NPMessageImpl {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
         int curIndex = offset;
         
-        byte keyData[] = new byte[Hash.HASH_LENGTH];
-        System.arraycopy(data, curIndex, keyData, 0, Hash.HASH_LENGTH);
+        //byte keyData[] = new byte[Hash.HASH_LENGTH];
+        //System.arraycopy(data, curIndex, keyData, 0, Hash.HASH_LENGTH);
+        _key = Hash.create(data, curIndex);
         curIndex += Hash.HASH_LENGTH;
-        _key = new Hash(keyData);
+        //_key = new Hash(keyData);
         
         int num = (int)DataHelper.fromLong(data, curIndex, 1);
         curIndex++;
         
         _peerHashes.clear();
         for (int i = 0; i < num; i++) {
-            byte peer[] = new byte[Hash.HASH_LENGTH];
-            System.arraycopy(data, curIndex, peer, 0, Hash.HASH_LENGTH);
+            //byte peer[] = new byte[Hash.HASH_LENGTH];
+            //System.arraycopy(data, curIndex, peer, 0, Hash.HASH_LENGTH);
+            Hash p = Hash.create(data, curIndex);
             curIndex += Hash.HASH_LENGTH;
-            addReply(new Hash(peer));
+            addReply(p);
         }
             
-        byte from[] = new byte[Hash.HASH_LENGTH];
-        System.arraycopy(data, curIndex, from, 0, Hash.HASH_LENGTH);
+        //byte from[] = new byte[Hash.HASH_LENGTH];
+        //System.arraycopy(data, curIndex, from, 0, Hash.HASH_LENGTH);
+        _from = Hash.create(data, curIndex);
         curIndex += Hash.HASH_LENGTH;
-        _from = new Hash(from);
+        //_from = new Hash(from);
 
         //_context.statManager().addRateData("netDb.searchReplyMessageReceive", num*32 + 64, 1);
     }

@@ -259,10 +259,9 @@ public class TunnelController implements Logging {
     
     /*
      *  Streamr client is a UDP server, use the listenPort field for targetPort
-     *  and the listenOnInterface field for the targetHost
      */
     private void startStreamrClient() {
-        String targetHost = getListenOnInterface();
+        String targetHost = getTargetHost();
         String targetPort = getListenPort();
         String dest = getTargetDestination();
         _tunnel.runStreamrClient(new String[] { targetHost, targetPort, dest }, this);
@@ -270,10 +269,9 @@ public class TunnelController implements Logging {
     
     /**
      *  Streamr server is a UDP client, use the targetPort field for listenPort
-     *  and the targetHost field for the listenOnInterface
      */
     private void startStreamrServer() {
-        String listenOn = getTargetHost();
+        String listenOn = getListenOnInterface();
         if ( (listenOn != null) && (listenOn.length() > 0) ) {
             _tunnel.runListenOn(new String[] { listenOn }, this);
         }

@@ -89,16 +89,14 @@
                 <label><%=intl._("Target")%>:</label>
          <% } %>
             </div>
+         <% if (!"streamrserver".equals(tunnelType)) { %>
             <div id="hostField" class="rowItem">
                 <label for="targetHost" accesskey="H">
-         <% if ("streamrserver".equals(tunnelType)) { %>
-                    <%=intl._("Reachable by")%>(<span class="accessKey">R</span>):
-         <% } else { %>
                     <%=intl._("Host")%>(<span class="accessKey">H</span>):
-         <% } %>
                 </label>
                 <input type="text" size="20" id="targetHost" name="targetHost" title="Target Hostname or IP" value="<%=editBean.getTargetHost(curTunnel)%>" class="freetext" />                
             </div>
+         <% } /* !streamrserver */ %>
             <div id="portField" class="rowItem">
                 <label for="targetPort" accesskey="P">
                     <%=intl._("Port")%>(<span class="accessKey">P</span>):
@@ -113,8 +111,7 @@
                 <input type="text" size="6" maxlength="5" id="targetPort" name="targetPort" title="Target Port Number" value="<%=editBean.getTargetPort(curTunnel)%>" class="freetext" />               
             </div>
             
-            <% if ("httpbidirserver".equals(tunnelType)) {
-            %>
+         <% if ("httpbidirserver".equals(tunnelType)) { %>
             <div class="subdivider">
                 <hr />
             </div>
@@ -134,32 +131,30 @@
               	 </label>
                  <input type="text" size="6" maxlength="5" id="port" name="port" title="Access Port Number" value="<%=editBean.getClientPort(curTunnel)%>" class="freetext" />
             </div>
-            <% String otherInterface = "";
-            String clientInterface = editBean.getClientInterface(curTunnel);
-            %>
+         <% } /* httpbidirserver */ %>
+         <% if ("httpbidirserver".equals(tunnelType) || "streamrserver".equals(tunnelType)) { %>
             <div id="reachField" class="rowItem">
                 <label for="reachableBy" accesskey="r">
                     <%=intl._("Reachable by")%>(<span class="accessKey">R</span>):
                 </label>
-                <select id="reachableBy" name="reachableBy" title="Valid IP for Client Access" class="selectbox">
-                  <%   if (!("127.0.0.1".equals(clientInterface)) &&
-                           !("0.0.0.0".equals(clientInterface)) &&
-                            (clientInterface != null) &&
-                            (clientInterface.trim().length() > 0)) {
-                            otherInterface = clientInterface;
-                       }
-                  %><option value="127.0.0.1"<%=("127.0.0.1".equals(clientInterface) ? " selected=\"selected\"" : "")%>><%=intl._("Locally (127.0.0.1)")%></option>
-                    <option value="0.0.0.0"<%=("0.0.0.0".equals(clientInterface) ? " selected=\"selected\"" : "")%>><%=intl._("Everyone (0.0.0.0)")%></option>
-                    <option value="other"<%=(!("".equals(otherInterface))    ? " selected=\"selected\"" : "")%>><%=intl._("LAN Hosts (Please specify your LAN address)")%></option>
+                <select id="reachableBy" name="reachableBy" title="IP for Client Access" class="selectbox">
+              <%
+                    String clientInterface = editBean.getClientInterface(curTunnel);
+                    for (String ifc : editBean.interfaceSet()) {
+                        out.write("<option value=\"");
+                        out.write(ifc);
+                        out.write('\"');
+                        if (ifc.equals(clientInterface))
+                            out.write(" selected=\"selected\"");
+                        out.write('>');
+                        out.write(ifc);
+                        out.write("</option>\n");
+                    }
+              %>
                 </select>                
-            </div> 
-            <div id="otherField" class="rowItem">
-                <label for="reachableByOther" accesskey="O">
-                    <%=intl._("Other")%>(<span class="accessKey">O</span>):
-                </label>
-                <input type="text" size="20" id="reachableByOther" name="reachableByOther" title="Alternative IP for Client Access" value="<%=otherInterface%>" class="freetext" />                
             </div>
-            <% } %>
+         <% } /* httpbidirserver || streamrserver */ %>
+
             <div class="subdivider">
                 <hr />
             </div>
@@ -302,7 +297,7 @@
             <div class="subdivider">
                 <hr />
             </div>
-         <% } // !streamrserver %>
+         <% } /* !streamrserver */ %>
 
             <div id="optionsField" class="rowItem">
                 <label><%=intl._("Router I2CP Address")%>:</label>

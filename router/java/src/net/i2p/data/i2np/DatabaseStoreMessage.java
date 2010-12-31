@@ -113,10 +113,11 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
         int curIndex = offset;
         
-        byte keyData[] = new byte[Hash.HASH_LENGTH];
-        System.arraycopy(data, curIndex, keyData, 0, Hash.HASH_LENGTH);
+        //byte keyData[] = new byte[Hash.HASH_LENGTH];
+        //System.arraycopy(data, curIndex, keyData, 0, Hash.HASH_LENGTH);
+        _key = Hash.create(data, curIndex);
         curIndex += Hash.HASH_LENGTH;
-        _key = new Hash(keyData);
+        //_key = new Hash(keyData);
         
         _type = (int)DataHelper.fromLong(data, curIndex, 1);
         curIndex++;
@@ -130,10 +131,11 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
                 _replyTunnel = new TunnelId(tunnel);
             curIndex += 4;
             
-            byte gw[] = new byte[Hash.HASH_LENGTH];
-            System.arraycopy(data, curIndex, gw, 0, Hash.HASH_LENGTH);
+            //byte gw[] = new byte[Hash.HASH_LENGTH];
+            //System.arraycopy(data, curIndex, gw, 0, Hash.HASH_LENGTH);
+            _replyGateway = Hash.create(data, curIndex);
             curIndex += Hash.HASH_LENGTH;
-            _replyGateway = new Hash(gw);
+            //_replyGateway = new Hash(gw);
         } else {
             _replyTunnel = null;
             _replyGateway = null;

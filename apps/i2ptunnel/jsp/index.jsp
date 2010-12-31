@@ -95,7 +95,7 @@
             <label><%=intl._("Points at")%>:</label>
             <span class="text">
         <%
-            if ("httpserver".equals(indexBean.getInternalType(curServer))) {
+            if (indexBean.isServerTargetLinkValid(curServer)) {
           %>
             <a href="http://<%=indexBean.getServerTarget(curServer)%>/" title="Test HTTP server, bypassing I2P"><%=indexBean.getServerTarget(curServer)%></a>
         <%
@@ -213,7 +213,18 @@
         </div>
         <div class="portField rowItem">
             <label><%=intl._("Port")%>:</label>
-            <span class="text"><%=indexBean.getClientPort(curClient)%></span>
+            <span class="text">
+         <%
+               String cPort= indexBean.getClientPort(curClient);
+               if ("".equals(cPort)) {
+                   out.write("<font color=\"red\">");
+                   out.write(intl._("Port not set"));
+                   out.write("</font>");
+               } else {
+                   out.write(cPort);
+               }
+          %>
+            </span>
         </div>
         <div class="typeField rowItem">
             <label><%=intl._("Type")%>:</label>
@@ -221,7 +232,19 @@
         </div>
         <div class="interfaceField rowItem">
             <label><%=intl._("Interface")%>:</label>
-            <span class="text"><%=indexBean.getClientInterface(curClient)%></span>
+            <span class="text">
+         <%
+               /* should only happen for streamr client */
+               String cHost= indexBean.getClientInterface(curClient);
+               if ("".equals(cHost)) {
+                   out.write("<font color=\"red\">");
+                   out.write(intl._("Hort not set"));
+                   out.write("</font>");
+               } else {
+                   out.write(cHost);
+               }
+          %>
+            </span>
         </div>
         <div class="statusField rowItem">
             <label><%=intl._("Status")%>:</label>
