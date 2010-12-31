@@ -59,7 +59,7 @@ body {
      font-weight: bold;
      font-size: 11pt;
      color: #fb0;
-     background: #eeb url('images/snarknav_lowlight.png') repeat-x scroll center center;
+     background: #eeb;
 }
 
 .snarkRefresh:last-child {
