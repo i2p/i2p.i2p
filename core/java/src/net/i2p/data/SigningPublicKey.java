@@ -28,6 +28,15 @@ public class SigningPublicKey extends SimpleDataStructure {
 
     /**
      * Pull from cache or return new
+     * @throws AIOOBE if not enough bytes
+     * @since 0.8.3
+     */
+    public static SigningPublicKey create(byte[] data, int off) {
+        return _cache.get(data, off);
+    }
+
+    /**
+     * Pull from cache or return new
      * @since 0.8.3
      */
     public static SigningPublicKey create(InputStream in) throws IOException {

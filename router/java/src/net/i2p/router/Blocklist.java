@@ -305,7 +305,7 @@ public class Blocklist {
         if (end1 - start1 == 44 && buf.substring(start1).indexOf(".") < 0) {
             byte b[] = Base64.decode(buf.substring(start1));
             if (b != null)
-                return new Entry(comment, new Hash(b), null, null);
+                return new Entry(comment, Hash.create(b), null, null);
         }
         index = buf.indexOf("-", start1);
         if (index >= 0) {

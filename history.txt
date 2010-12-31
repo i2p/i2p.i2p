@@ -1,3 +1,17 @@
+2010-12-31 zzz
+    * Console:
+      - Make themes and history.txt return 403 on error,
+        not 500, to avoid the new error page
+      - Add logging, enable with routerconsole.log=filename
+      - Link to full history.txt on help page
+    * Data Structures: Caching cleanups
+    * Datagram Dissector: Fix RuntimeException caused by reuse,
+                          preventing iMule from connecting on UDP
+                          (thanks devzero)
+    * i2psnark:
+      - Send cache directive for in-war icons
+    * OCMOSJ: Refactor cache keys for efficiency
+
 2010-12-30 zzz
     * Data Structures:
       - New SDSCache for SimpleDataStructures
