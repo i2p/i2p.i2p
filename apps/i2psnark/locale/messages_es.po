@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-12-19 03:16+0000\n"
-"PO-Revision-Date: 2010-12-28 00:36+0100\n"
+"PO-Revision-Date: 2010-12-31 01:09+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -453,7 +453,7 @@ msgstr "completo"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:787
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:792
 msgid "OK"
-msgstr "Bien"
+msgstr "bien"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:796
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:801
