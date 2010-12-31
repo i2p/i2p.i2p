@@ -44,5 +44,9 @@ if (themePath != null)
 else
     base = net.i2p.I2PAppContext.getGlobalContext().getBaseDir().getAbsolutePath() +
               java.io.File.separatorChar + "docs";
-net.i2p.util.FileUtil.readFile(uri, base, response.getOutputStream());
+try {
+    net.i2p.util.FileUtil.readFile(uri, base, response.getOutputStream());
+} catch (java.io.IOException ioe) {
+    response.sendError(403, ioe.toString());
+}
 %>
