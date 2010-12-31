@@ -39,8 +39,10 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade implements Inte
     private final static Log _log = new Log(ClientManagerFacadeImpl.class);
     private ClientManager _manager; 
     private RouterContext _context;
+    /** note that this is different than the property the client side uses, i2cp.tcp.port */
     public final static String PROP_CLIENT_PORT = "i2cp.port";
     public final static int DEFAULT_PORT = 7654;
+    /** note that this is different than the property the client side uses, i2cp.tcp.host */
     public final static String PROP_CLIENT_HOST = "i2cp.hostname";
     public final static String DEFAULT_HOST = "127.0.0.1";
     

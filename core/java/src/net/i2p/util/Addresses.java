@@ -50,7 +50,8 @@ public abstract class Addresses {
 
     /**
      *  @return a sorted array of all addresses
-     *  @param whether to exclude IPV6 and local
+     *  @param includeLocal whether to include local
+     *  @param includeIPv6 whether to include IPV6
      *  @return an array of all addresses
      *  @since 0.8.3
      */
