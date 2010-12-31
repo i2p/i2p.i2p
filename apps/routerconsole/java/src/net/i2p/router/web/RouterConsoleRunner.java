@@ -22,6 +22,7 @@ import net.i2p.util.ShellCommand;
 
 import org.mortbay.http.DigestAuthenticator;
 import org.mortbay.http.HashUserRealm;
+import org.mortbay.http.NCSARequestLog;
 import org.mortbay.http.SecurityConstraint;
 import org.mortbay.http.SslListener;
 import org.mortbay.http.handler.SecurityHandler;
@@ -141,6 +142,18 @@ public class RouterConsoleRunner {
         // so Jetty can find WebAppConfiguration
         System.setProperty("jetty.class.path", I2PAppContext.getGlobalContext().getBaseDir() + "/lib/routerconsole.jar");
         _server = new Server();
+
+        String log = I2PAppContext.getGlobalContext().getProperty("routerconsole.log");
+        if (log != null) {
+            File logFile = new File(log);
+            if (!logFile.isAbsolute())
+                logFile = new File(I2PAppContext.getGlobalContext().getLogDir(), "logs/" + log);
+            try {
+                _server.setRequestLog(new NCSARequestLog(logFile.getAbsolutePath()));
+            } catch (IOException ioe) {
+                System.err.println("ERROR: Unable to create Jetty log: " + ioe);
+            }
+        }
         boolean rewrite = false;
         Properties props = webAppProperties();
         if (props.isEmpty()) {
