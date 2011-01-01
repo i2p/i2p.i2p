@@ -34,6 +34,7 @@ import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.Translate;
 
+import org.klomp.snark.dht.DHT;
 import org.klomp.snark.dht.KRPC;
 
 /**
@@ -61,7 +62,7 @@ public class I2PSnarkUtil {
     private File _tmpDir;
     private int _startupDelay;
     private boolean _shouldUseOT;
-    private KRPC _krpc;
+    private DHT _dht;
 
     public static final int DEFAULT_STARTUP_DELAY = 3;
     public static final String PROP_USE_OPENTRACKERS = "i2psnark.useOpentrackers";
@@ -195,8 +196,8 @@ public class I2PSnarkUtil {
             _manager = I2PSocketManagerFactory.createManager(_i2cpHost, _i2cpPort, opts);
         }
         // FIXME this only instantiates krpc once, left stuck with old manager
-        if (ENABLE_DHT && _manager != null && _krpc == null)
-            _krpc = new KRPC(_context, _manager.getSession());
+        if (ENABLE_DHT && _manager != null && _dht == null)
+            _dht = new KRPC(_context, _manager.getSession());
         return (_manager != null);
     }
     
@@ -204,7 +205,7 @@ public class I2PSnarkUtil {
      * @return null if disabled or not started
      * @since 0.8.4
      */
-    public KRPC getDHT() { return _krpc; }
+    public DHT getDHT() { return _dht; }
 
     public boolean connected() { return _manager != null; }
 
