@@ -10,6 +10,7 @@ package net.i2p.data;
  */
 
 import net.i2p.util.RandomSource;
+import net.i2p.util.SimpleByteCache;
 
 /**
  *  32 bytes, usually of random data.
@@ -28,7 +29,7 @@ public class SessionTag extends SimpleDataStructure {
     public SessionTag(boolean create) {
         super();
         if (create) {
-            _data = new byte[BYTE_LENGTH];
+            _data = SimpleByteCache.acquire(BYTE_LENGTH);
             RandomSource.getInstance().nextBytes(_data);
         }
     }
