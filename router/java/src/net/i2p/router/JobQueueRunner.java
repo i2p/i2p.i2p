@@ -161,8 +161,8 @@ class JobQueueRunner implements Runnable {
             if (_log.shouldLog(Log.CRIT))
                 _log.log(Log.CRIT, "Error processing job [" + _currentJob.getName() 
                                    + "] on thread " + _id + ": " + t.getMessage(), t);
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("The above job was enqueued by: ", _currentJob.getAddedBy());
+            //if (_log.shouldLog(Log.ERROR))
+            //    _log.error("The above job was enqueued by: ", _currentJob.getAddedBy());
         }
     }
 }
