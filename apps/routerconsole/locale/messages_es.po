@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-12-28 00:08+0000\n"
-"PO-Revision-Date: 2010-12-31 03:12+0100\n"
+"PO-Revision-Date: 2011-01-02 03:24+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -119,13 +119,13 @@ msgstr "rechazando túneles: límite alcanzado"
 #. always leave at least 4KBps free when allowing
 #: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:301
 msgid "Rejecting tunnels: Bandwidth limit"
-msgstr "rechazando túneles: límite de ancho de banda"
+msgstr "rechazando túneles: límite del ancho de banda"
 
 #. hard to do {0} from here
 #. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels: Bandwidth limit");
 #: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:371
 msgid "Rejecting most tunnels: Bandwidth limit"
-msgstr "rechazando la mayor parte de los túneles: límite de ancho de banda"
+msgstr "rechazando la mayor parte de los túneles: límite del ancho de banda"
 
 #. hard to do {0} from here
 #. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of tunnels");
@@ -1727,7 +1727,7 @@ msgstr "Buscar actualizaciones"
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:235
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:242
 msgid "Update"
-msgstr "Actualizar"
+msgstr "Actualización"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:266
 #, java-format
@@ -3887,7 +3887,7 @@ msgstr "Ancho de Banda"
 
 #: ../java/strings/Strings.java:58
 msgid "BandwidthLimiter"
-msgstr "Limitador de Ancho de Banda"
+msgstr "Limitador del ancho de banda"
 
 #: ../java/strings/Strings.java:59
 msgid "ClientMessages"
@@ -4089,7 +4089,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:298
 msgid "Bandwidth limiter"
-msgstr "Limitador de ancho de banda"
+msgstr "Limitador del ancho de banda"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:300
 msgid "I2P will work best if you configure your rates to match the speed of your internet connection."
