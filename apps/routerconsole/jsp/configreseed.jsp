@@ -44,7 +44,7 @@
 <input type="radio" class="optbox" name="mode" value="2" <%=reseedHelper.modeChecked(2) %> >
 <%=intl._("Use non-SSL only")%></td></tr>
 <tr><td class="mediumtags" align="right"><b><%=intl._("Reseed URLs")%></b></td>
-<td><textarea name="reseedURL" wrap="off"><jsp:getProperty name="reseedHelper" property="reseedURL" /></textarea></td></tr>
+<td><textarea name="reseedURL" wrap="off" spellcheck="false"><jsp:getProperty name="reseedHelper" property="reseedURL" /></textarea></td></tr>
 <tr><td class="mediumtags" align="right"><b><%=intl._("Enable HTTP proxy (not used for SSL)")%></b></td>
 <td><input type="checkbox" class="optbox" name="enable" value="true" <jsp:getProperty name="reseedHelper" property="enable" /> ></td></tr>
 <tr><td class="mediumtags" align="right"><b><%=intl._("HTTP Proxy Host")%>:</b></td>

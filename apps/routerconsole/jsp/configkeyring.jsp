@@ -38,7 +38,7 @@
   <div class="wideload">
       <p><table><tr>
           <td class="mediumtags" align="right"><%=intl._("Dest. name, hash, or full key")%>:</td>
-          <td><textarea name="peer" cols="44" rows="1" style="height: 3em;" wrap="off"></textarea></td>
+          <td><textarea name="peer" cols="44" rows="1" style="height: 3em;" wrap="off" spellcheck="false"></textarea></td>
         </tr><tr>
           <td class="mediumtags" align="right"><%=intl._("Encryption Key")%>:</td>
           <td><input type="text" size="55" name="key" ></td>
