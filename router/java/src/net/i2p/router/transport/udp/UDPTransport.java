@@ -18,6 +18,7 @@ import java.util.TreeSet;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
@@ -769,8 +770,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     public void messageReceived(I2NPMessage inMsg, RouterIdentity remoteIdent, Hash remoteIdentHash, long msToReceive, int bytesReceived) {
         if (inMsg.getType() == DatabaseStoreMessage.MESSAGE_TYPE) {
             DatabaseStoreMessage dsm = (DatabaseStoreMessage)inMsg;
-            if ( (dsm.getRouterInfo() != null) && 
-                 (dsm.getRouterInfo().getNetworkId() != Router.NETWORK_ID) ) {
+            DatabaseEntry entry = dsm.getEntry();
+            if (entry == null)
+                return;
+            if (entry.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO &&
+                ((RouterInfo) entry).getNetworkId() != Router.NETWORK_ID) {
                 // this is pre-0.6.1.10, so it isn't going to happen any more
 
                 /*
@@ -788,7 +792,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                                    + " because they are in the wrong net");
                 }
                  */
-                Hash peerHash = dsm.getRouterInfo().getIdentity().calculateHash();
+                Hash peerHash = entry.getHash();
                 PeerState peer = getPeerState(peerHash);
                 if (peer != null) {
                     RemoteHostId remote = peer.getRemoteHostId();
@@ -797,14 +801,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     SimpleScheduler.getInstance().addEvent(new RemoveDropList(remote), DROPLIST_PERIOD);
                 }
                 markUnreachable(peerHash);
-                _context.shitlist().shitlistRouter(peerHash, "Part of the wrong network, version = " + dsm.getRouterInfo().getOption("router.version"));
+                _context.shitlist().shitlistRouter(peerHash, "Part of the wrong network, version = " + ((RouterInfo) entry).getOption("router.version"));
                 //_context.shitlist().shitlistRouter(peerHash, "Part of the wrong network", STYLE);
                 dropPeer(peerHash, false, "wrong network");
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Dropping the peer " + peerHash.toBase64() + " because they are in the wrong net: " + dsm.getRouterInfo());
+                    _log.warn("Dropping the peer " + peerHash.toBase64() + " because they are in the wrong net: " + entry);
                 return;
             } else {
-                if (dsm.getRouterInfo() != null) {
+                if (entry.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Received an RI from the same net");
                 } else {

@@ -344,8 +344,7 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         OutNetMessage infoMsg = new OutNetMessage(_context);
         infoMsg.setExpiration(_context.clock().now()+10*1000);
         DatabaseStoreMessage dsm = new DatabaseStoreMessage(_context);
-        dsm.setKey(_context.routerHash());
-        dsm.setRouterInfo(_context.router().getRouterInfo());
+        dsm.setEntry(_context.router().getRouterInfo());
         infoMsg.setMessage(dsm);
         infoMsg.setPriority(100);
         RouterInfo target = _context.netDb().lookupRouterInfoLocally(_remotePeer.calculateHash());

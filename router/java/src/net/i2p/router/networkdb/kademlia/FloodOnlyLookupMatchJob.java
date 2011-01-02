@@ -1,5 +1,8 @@
 package net.i2p.router.networkdb.kademlia;
 
+import net.i2p.data.DatabaseEntry;
+import net.i2p.data.LeaseSet;
+import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
@@ -61,14 +64,15 @@ class FloodOnlyLookupMatchJob extends JobImpl implements ReplyJob {
             // We do it here first to make sure it is in the DB before
             // runJob() and search.success() is called???
             // Should we just pass the DataStructure directly back to somebody?
-            if (dsm.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET) {
+            if (dsm.getEntry().getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
                 // Since HFDSMJ wants to setReceivedAsPublished(), we have to
                 // set a flag saying this was really the result of a query,
                 // so don't do that.
-                dsm.getLeaseSet().setReceivedAsReply();
-                getContext().netDb().store(dsm.getKey(), dsm.getLeaseSet());
+                LeaseSet ls = (LeaseSet) dsm.getEntry();
+                ls.setReceivedAsReply();
+                getContext().netDb().store(dsm.getKey(), ls);
             } else {
-                getContext().netDb().store(dsm.getKey(), dsm.getRouterInfo());
+                getContext().netDb().store(dsm.getKey(), (RouterInfo) dsm.getEntry());
             }
         } catch (IllegalArgumentException iae) {
             if (_log.shouldLog(Log.WARN))

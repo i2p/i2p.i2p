@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataFormatException;
-import net.i2p.data.DataStructure;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterInfo;
@@ -93,11 +93,11 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     }
     
     @Override
-    public void sendStore(Hash key, DataStructure ds, Job onSuccess, Job onFailure, long sendTimeout, Set toIgnore) {
+    public void sendStore(Hash key, DatabaseEntry ds, Job onSuccess, Job onFailure, long sendTimeout, Set toIgnore) {
         // if we are a part of the floodfill netDb, don't send out our own leaseSets as part 
         // of the flooding - instead, send them to a random floodfill peer so *they* can flood 'em out.
         // perhaps statistically adjust this so we are the source every 1/N times... or something.
-        if (floodfillEnabled() && (ds instanceof RouterInfo)) {
+        if (floodfillEnabled() && (ds.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO)) {
             flood(ds);
             if (onSuccess != null) 
                 _context.jobQueue().addJob(onSuccess);
@@ -129,12 +129,8 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
      *  We do this to implement Kademlia within the floodfills, i.e.
      *  we flood to those closest to the key.
      */
-    public void flood(DataStructure ds) {
-        Hash key;
-        if (ds instanceof LeaseSet)
-            key = ((LeaseSet)ds).getDestination().calculateHash();
-        else
-            key = ((RouterInfo)ds).getIdentity().calculateHash();
+    public void flood(DatabaseEntry ds) {
+        Hash key = ds.getHash();
         Hash rkey = _context.routingKeyGenerator().getRoutingKey(key);
         FloodfillPeerSelector sel = (FloodfillPeerSelector)getPeerSelector();
         List peers = sel.selectFloodfillParticipants(rkey, MAX_TO_FLOOD, getKBuckets());
@@ -151,12 +147,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             if (peer.equals(_context.routerHash()))
                 continue;
             DatabaseStoreMessage msg = new DatabaseStoreMessage(_context);
-            if (ds instanceof LeaseSet) {
-                msg.setLeaseSet((LeaseSet)ds);
-            } else {
-                msg.setRouterInfo((RouterInfo)ds);
-            }
-            msg.setKey(key);
+            msg.setEntry(ds);
             msg.setReplyGateway(null);
             msg.setReplyToken(0);
             msg.setReplyTunnel(null);
@@ -242,13 +233,9 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         List<RouterInfo> rv = new ArrayList();
         DataStore ds = getDataStore();
         if (ds != null) {
-            Set keys = ds.getKeys();
-            if (keys != null) {
-                for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
-                    Object o = ds.get((Hash)iter.next());
-                    if (o instanceof RouterInfo)
-                        rv.add((RouterInfo)o);
-                }
+            for (DatabaseEntry o : ds.getEntries()) {
+                if (o.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO)
+                    rv.add((RouterInfo)o);
             }
         }
         return rv;

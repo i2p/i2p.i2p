@@ -18,8 +18,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataFormatException;
-import net.i2p.data.DataStructure;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterInfo;
@@ -38,19 +38,22 @@ import net.i2p.util.SecureFileOutputStream;
  *
  */
 class PersistentDataStore extends TransientDataStore {
-    private Log _log;
-    private String _dbDir;
-    private KademliaNetworkDatabaseFacade _facade;
-    private Writer _writer;
-    private ReadJob _readJob;
+    private final Log _log;
+    private final File _dbDir;
+    private final KademliaNetworkDatabaseFacade _facade;
+    private final Writer _writer;
+    private final ReadJob _readJob;
     private boolean _initialized;
     
     private final static int READ_DELAY = 60*1000;
     
-    public PersistentDataStore(RouterContext ctx, String dbDir, KademliaNetworkDatabaseFacade facade) {
+    /**
+     *  @param dbDir relative path
+     */
+    public PersistentDataStore(RouterContext ctx, String dbDir, KademliaNetworkDatabaseFacade facade) throws IOException {
         super(ctx);
         _log = ctx.logManager().getLog(PersistentDataStore.class);
-        _dbDir = dbDir;
+        _dbDir = getDbDir(dbDir);
         _facade = facade;
         _readJob = new ReadJob();
         _context.jobQueue().addJob(_readJob);
@@ -78,7 +81,6 @@ class PersistentDataStore extends TransientDataStore {
     @Override
     public void restart() {
         super.restart();
-        _dbDir = _facade.getDbDir();
     }
     
     @Override
@@ -88,7 +90,7 @@ class PersistentDataStore extends TransientDataStore {
     }
 
     @Override
-    public DataStructure get(Hash key) {
+    public DatabaseEntry get(Hash key) {
         return get(key, true);
     }
 
@@ -97,8 +99,8 @@ class PersistentDataStore extends TransientDataStore {
      *  @param persist if false, call super only, don't access disk
      */
     @Override
-    public DataStructure get(Hash key, boolean persist) {
-        DataStructure rv =  super.get(key);
+    public DatabaseEntry get(Hash key, boolean persist) {
+        DatabaseEntry rv =  super.get(key);
 /*****
         if (rv != null || !persist)
             return rv;
@@ -113,7 +115,7 @@ class PersistentDataStore extends TransientDataStore {
     }
 
     @Override
-    public DataStructure remove(Hash key) {
+    public DatabaseEntry remove(Hash key) {
         return remove(key, true);
     }
 
@@ -121,7 +123,7 @@ class PersistentDataStore extends TransientDataStore {
      *  @param persist if false, call super only, don't access disk
      */
     @Override
-    public DataStructure remove(Hash key, boolean persist) {
+    public DatabaseEntry remove(Hash key, boolean persist) {
         if (persist) {
             _writer.remove(key);
             _context.jobQueue().addJob(new RemoveJob(key));
@@ -130,7 +132,7 @@ class PersistentDataStore extends TransientDataStore {
     }
     
     @Override
-    public boolean put(Hash key, DataStructure data) {
+    public boolean put(Hash key, DatabaseEntry data) {
         return put(key, data, true);
     }
 
@@ -139,11 +141,11 @@ class PersistentDataStore extends TransientDataStore {
      *  @return success
      */
     @Override
-    public boolean put(Hash key, DataStructure data, boolean persist) {
+    public boolean put(Hash key, DatabaseEntry data, boolean persist) {
         if ( (data == null) || (key == null) ) return false;
         boolean rv = super.put(key, data);
         // Don't bother writing LeaseSets to disk
-        if (rv && persist && data instanceof RouterInfo)
+        if (rv && persist && data.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO)
             _writer.queue(key, data);
         return rv;
     }
@@ -159,8 +161,7 @@ class PersistentDataStore extends TransientDataStore {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Removing key " + _key /* , getAddedBy() */);
             try {
-                File dbDir = getDbDir();
-                removeFile(_key, dbDir);
+                removeFile(_key, _dbDir);
             } catch (IOException ioe) {
                 _log.error("Error removing key " + _key, ioe);
             }
@@ -179,10 +180,10 @@ class PersistentDataStore extends TransientDataStore {
      * We store a reference to the data here too,
      * rather than simply pull it from super.get(), because
      * we will soon have to implement a scheme for keeping only
-     * a subset of all DataStructures in memory and keeping the rest on disk.
+     * a subset of all DatabaseEntrys in memory and keeping the rest on disk.
      */
     private class Writer implements Runnable {
-        private final Map<Hash, DataStructure>_keys;
+        private final Map<Hash, DatabaseEntry>_keys;
         private final Object _waitLock;
         private volatile boolean _quit;
 
@@ -191,7 +192,7 @@ class PersistentDataStore extends TransientDataStore {
             _waitLock = new Object();
         }
 
-        public void queue(Hash key, DataStructure data) {
+        public void queue(Hash key, DatabaseEntry data) {
             int pending = _keys.size();
             boolean exists = (null != _keys.put(key, data));
             if (exists)
@@ -200,7 +201,7 @@ class PersistentDataStore extends TransientDataStore {
         }
 
         /** check to see if it's in the write queue */
-        public DataStructure get(Hash key) {
+        public DatabaseEntry get(Hash key) {
             return _keys.get(key);
         }
 
@@ -211,16 +212,16 @@ class PersistentDataStore extends TransientDataStore {
         public void run() {
             _quit = false;
             Hash key = null;
-            DataStructure data = null;
+            DatabaseEntry data = null;
             int count = 0;
             int lastCount = 0;
             long startTime = 0;
             while (true) {
                 // get a new iterator every time to get a random entry without
                 // having concurrency issues or copying to a List or Array
-                Iterator<Map.Entry<Hash, DataStructure>> iter = _keys.entrySet().iterator();
+                Iterator<Map.Entry<Hash, DatabaseEntry>> iter = _keys.entrySet().iterator();
                 try {
-                    Map.Entry<Hash, DataStructure> entry = iter.next();
+                    Map.Entry<Hash, DatabaseEntry> entry = iter.next();
                     key = entry.getKey();
                     data = entry.getValue();
                     iter.remove();
@@ -235,7 +236,10 @@ class PersistentDataStore extends TransientDataStore {
 
                 if (key != null) {
                     if (data != null) {
-                        write(key, data);
+                        // synch with the reader job
+                        synchronized (_dbDir) {
+                            write(key, data);
+                        }
                         data = null;
                     }
                     key = null;
@@ -270,23 +274,22 @@ class PersistentDataStore extends TransientDataStore {
         }
     }
     
-    private void write(Hash key, DataStructure data) {
+    private void write(Hash key, DatabaseEntry data) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Writing key " + key);
         FileOutputStream fos = null;
         File dbFile = null;
         try {
             String filename = null;
-            File dbDir = getDbDir();
 
-            if (data instanceof LeaseSet)
+            if (data.getType() == DatabaseEntry.KEY_TYPE_LEASESET)
                 filename = getLeaseSetName(key);
-            else if (data instanceof RouterInfo)
+            else if (data.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO)
                 filename = getRouterInfoName(key);
             else
                 throw new IOException("We don't know how to write objects of type " + data.getClass().getName());
 
-            dbFile = new File(dbDir, filename);
+            dbFile = new File(_dbDir, filename);
             long dataPublishDate = getPublishDate(data);
             if (dbFile.lastModified() < dataPublishDate) {
                 // our filesystem is out of date, lets replace it
@@ -312,27 +315,33 @@ class PersistentDataStore extends TransientDataStore {
             if (fos != null) try { fos.close(); } catch (IOException ioe) {}
         }
     }
-    private long getPublishDate(DataStructure data) {
-        if (data instanceof RouterInfo) {
-            return ((RouterInfo)data).getPublished();
-        } else if (data instanceof LeaseSet) {
-            return ((LeaseSet)data).getEarliestLeaseDate();
-        } else {
-            return -1;
-        }
+    private long getPublishDate(DatabaseEntry data) {
+        return data.getDate();
     }
     
     /** This is only for manual reseeding? Why bother every 60 sec??? */
     private class ReadJob extends JobImpl {
         private boolean _alreadyWarned;
+        private long _lastModified;
+
         public ReadJob() {
             super(PersistentDataStore.this._context);
             _alreadyWarned = false;
         }
+
         public String getName() { return "DB Read Job"; }
+
         public void runJob() {
-            _log.info("Rereading new files");
-            readFiles();
+            // check directory mod time to save a lot of object churn in scanning all the file names
+            long lastMod = _dbDir.lastModified();
+            if (lastMod > _lastModified) {
+                _lastModified = lastMod;
+                _log.info("Rereading new files");
+                // synch with the writer job
+                synchronized (_dbDir) {
+                    readFiles();
+                }
+            }
             requeue(READ_DELAY);
         }
         
@@ -342,9 +351,8 @@ class PersistentDataStore extends TransientDataStore {
         
         private void readFiles() {
             int routerCount = 0;
-            try {
-                File dbDir = getDbDir();
-                File routerInfoFiles[] = dbDir.listFiles(RouterInfoFilter.getInstance());
+
+                File routerInfoFiles[] = _dbDir.listFiles(RouterInfoFilter.getInstance());
                 if (routerInfoFiles != null) {
                     routerCount += routerInfoFiles.length;
                     if (routerInfoFiles.length > 5)
@@ -359,9 +367,6 @@ class PersistentDataStore extends TransientDataStore {
                         }
                     }
                 }
-            } catch (IOException ioe) {
-                _log.error("Error reading files in the db dir", ioe);
-            }
             
             if (!_alreadyWarned) {
                 ReseedChecker.checkReseed(_context, routerCount);
@@ -383,9 +388,9 @@ class PersistentDataStore extends TransientDataStore {
         
         private boolean shouldRead() {
             // persist = false to call only super.get()
-            DataStructure data = get(_key, false);
+            DatabaseEntry data = get(_key, false);
             if (data == null) return true;
-            if (data instanceof RouterInfo) {
+            if (data.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
                 long knownDate = ((RouterInfo)data).getPublished();
                 long fileDate = _routerFile.lastModified();
                 if (fileDate > knownDate)
@@ -441,8 +446,8 @@ class PersistentDataStore extends TransientDataStore {
     }
     
     
-    private File getDbDir() throws IOException {
-        File f = new SecureDirectory(_context.getRouterDir(), _dbDir);
+    private File getDbDir(String dbDir) throws IOException {
+        File f = new SecureDirectory(_context.getRouterDir(), dbDir);
         if (!f.exists()) {
             boolean created = f.mkdirs();
             if (!created)

@@ -2,7 +2,9 @@ package net.i2p.router.networkdb.kademlia;
 
 import java.util.Date;
 
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
+import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
@@ -78,22 +80,23 @@ class SearchUpdateReplyFoundJob extends JobImpl implements ReplyJob {
             long timeToReply = _state.dataFound(_peer);
             
             DatabaseStoreMessage msg = (DatabaseStoreMessage)message;
-            if (msg.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET) {
+            DatabaseEntry entry = msg.getEntry();
+            if (entry.getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
                 try {
-                    _facade.store(msg.getKey(), msg.getLeaseSet());
+                    _facade.store(msg.getKey(), (LeaseSet) entry);
                     getContext().profileManager().dbLookupSuccessful(_peer, timeToReply);
                 } catch (IllegalArgumentException iae) {
                     if (_log.shouldLog(Log.ERROR))
                         _log.warn("Peer " + _peer + " sent us an invalid leaseSet: " + iae.getMessage());
                     getContext().profileManager().dbLookupReply(_peer, 0, 0, 1, 0, timeToReply);
                 }
-            } else if (msg.getValueType() == DatabaseStoreMessage.KEY_TYPE_ROUTERINFO) {
+            } else if (entry.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info(getJobId() + ": dbStore received on search containing router " 
                               + msg.getKey() + " with publishDate of " 
-                              + new Date(msg.getRouterInfo().getPublished()));
+                              + new Date(entry.getDate()));
                 try {
-                    _facade.store(msg.getKey(), msg.getRouterInfo());
+                    _facade.store(msg.getKey(), (RouterInfo) entry);
                     getContext().profileManager().dbLookupSuccessful(_peer, timeToReply);
                 } catch (IllegalArgumentException iae) {
                     if (_log.shouldLog(Log.ERROR))
@@ -102,7 +105,7 @@ class SearchUpdateReplyFoundJob extends JobImpl implements ReplyJob {
                 }
             } else {
                 if (_log.shouldLog(Log.ERROR))
-                    _log.error(getJobId() + ": Unknown db store type?!@ " + msg.getValueType());
+                    _log.error(getJobId() + ": Unknown db store type?!@ " + entry.getType());
             }
         } else if (message instanceof DatabaseSearchReplyMessage) {
             _job.replyFound((DatabaseSearchReplyMessage)message, _peer);

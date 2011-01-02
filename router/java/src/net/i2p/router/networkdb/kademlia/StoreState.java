@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.i2p.data.DataStructure;
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
 
@@ -19,7 +19,7 @@ import net.i2p.router.RouterContext;
 class StoreState {
     private RouterContext _context;
     private Hash _key;
-    private DataStructure _data;
+    private DatabaseEntry _data;
     private final HashSet<Hash> _pendingPeers;
     private Map<Hash, Long> _pendingPeerTimes;
     private Map<Hash, MessageWrapper.WrappedMessage> _pendingMessages;
@@ -31,10 +31,10 @@ class StoreState {
     private volatile long _completed;
     private volatile long _started;
 
-    public StoreState(RouterContext ctx, Hash key, DataStructure data) {
+    public StoreState(RouterContext ctx, Hash key, DatabaseEntry data) {
         this(ctx, key, data, null);
     }
-    public StoreState(RouterContext ctx, Hash key, DataStructure data, Set<Hash> toSkip) {
+    public StoreState(RouterContext ctx, Hash key, DatabaseEntry data, Set<Hash> toSkip) {
         _context = ctx;
         _key = key;
         _data = data;
@@ -54,7 +54,7 @@ class StoreState {
     }
 
     public Hash getTarget() { return _key; }
-    public DataStructure getData() { return _data; }
+    public DatabaseEntry getData() { return _data; }
     public Set<Hash> getPending() { 
         synchronized (_pendingPeers) {
             return (Set<Hash>)_pendingPeers.clone(); 

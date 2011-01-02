@@ -57,9 +57,7 @@ public class HandleFloodfillDatabaseLookupMessageJob extends HandleDatabaseLooku
             // that would increment the netDb.lookupsHandled and netDb.lookupsMatched stats
             DatabaseStoreMessage msg = new DatabaseStoreMessage(getContext());
             RouterInfo me = getContext().router().getRouterInfo();
-            msg.setKey(me.getIdentity().getHash());
-            msg.setRouterInfo(me);
-            msg.setValueType(DatabaseStoreMessage.KEY_TYPE_ROUTERINFO);
+            msg.setEntry(me);
             sendMessage(msg, toPeer, replyTunnel);
         }
     }

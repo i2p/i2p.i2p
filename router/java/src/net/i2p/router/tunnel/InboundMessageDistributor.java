@@ -1,8 +1,10 @@
 package net.i2p.router.tunnel;
 
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.Payload;
+import net.i2p.data.RouterInfo;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.DataMessage;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
@@ -71,7 +73,7 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
             msg = newMsg;
         } else if ( (_client != null) && 
              (msg.getType() == DatabaseStoreMessage.MESSAGE_TYPE) &&
-             (((DatabaseStoreMessage)msg).getValueType() == DatabaseStoreMessage.KEY_TYPE_ROUTERINFO)) {
+             (((DatabaseStoreMessage)msg).getEntry().getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO)) {
             // FVSJ may result in an unsolicited RI store if the peer went non-ff.
             // Maybe we can figure out a way to handle this safely, so we don't ask him again.
             // For now, just hope we eventually find out through other means.
@@ -165,7 +167,7 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
                         // unnecessarily
                         DatabaseStoreMessage dsm = (DatabaseStoreMessage)data;
                         try {
-                            if (dsm.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET) {
+                            if (dsm.getEntry().getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
                                 // If it was stored to us before, don't undo the
                                 // receivedAsPublished flag so we will continue to respond to requests
                                 // for the leaseset. That is, we don't want this to change the
@@ -173,10 +175,11 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
                                 // When the keyspace rotates at midnight, and this leaseset moves out
                                 // of our keyspace, maybe we shouldn't do this?
                                 // Should we do this whether ff or not?
-                                LeaseSet old = _context.netDb().store(dsm.getKey(), dsm.getLeaseSet());
+                                LeaseSet ls = (LeaseSet) dsm.getEntry();
+                                LeaseSet old = _context.netDb().store(dsm.getKey(), ls);
                                 if (old != null && old.getReceivedAsPublished()
                                     /** && ((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled() **/ )
-                                    dsm.getLeaseSet().setReceivedAsPublished(true);
+                                    ls.setReceivedAsPublished(true);
                                 if (_log.shouldLog(Log.INFO))
                                     _log.info("Storing LS for: " + dsm.getKey() + " sent to: " + _client);
                             } else {                                        
@@ -189,7 +192,7 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
                                     _log.error("Dropped dangerous message down a tunnel for " + _client.toBase64() + ": " + dsm, new Exception("cause"));
                                     return;
                                 }
-                                _context.netDb().store(dsm.getKey(), dsm.getRouterInfo());
+                                _context.netDb().store(dsm.getKey(), (RouterInfo) dsm.getEntry());
                             }
                         } catch (IllegalArgumentException iae) {
                             if (_log.shouldLog(Log.WARN))

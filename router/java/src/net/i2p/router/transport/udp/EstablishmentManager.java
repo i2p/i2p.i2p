@@ -577,8 +577,7 @@ class EstablishmentManager {
                       (isInbound ? " inbound con from " + peer : "outbound con to " + peer));
         
         DatabaseStoreMessage m = new DatabaseStoreMessage(_context);
-        m.setKey(_context.routerHash());
-        m.setRouterInfo(_context.router().getRouterInfo());
+        m.setEntry(_context.router().getRouterInfo());
         m.setMessageExpiration(_context.clock().now() + 10*1000);
         _transport.send(m, peer);
     }
