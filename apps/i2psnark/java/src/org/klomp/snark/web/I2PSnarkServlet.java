@@ -161,7 +161,7 @@ public class I2PSnarkServlet extends Default {
                 resp.setCharacterEncoding("UTF-8");
                 resp.setContentType("text/html; charset=UTF-8");
                 Resource resource = getResource(pathInContext);
-                if (resource == null || (!resource.exists()) || !resource.isDirectory()) {
+                if (resource == null || (!resource.exists())) {
                     resp.sendError(HttpResponse.__404_Not_Found);
                 } else {
                     String base = URI.addPaths(req.getRequestURI(), "/");
@@ -853,14 +853,13 @@ public class I2PSnarkServlet extends Default {
         out.write(statusString + "</td>\n\t");
 
         out.write("<td class=\"" + rowClass + "\">");
-        String announce = null;
         if (isValid) {
-            announce = meta.getAnnounce();
-            if (announce != null) {
-                String trackerLink = getTrackerLink(announce, snark.getInfoHash());
-                if (trackerLink != null)
-                    out.write(trackerLink);
-            }
+            StringBuilder buf = new StringBuilder(128);
+            buf.append("<a href=\"").append(snark.getBaseName())
+               .append("/\" title=\"").append(_("Torrent details"))
+               .append("\"><img alt=\"").append(_("Info")).append("\" border=\"0\" src=\"")
+               .append(_imgPath).append("details.png\"></a>");
+             out.write(buf.toString());
         }
 
         out.write("</td>\n<td class=\"" + rowClass + "\">");
@@ -1555,13 +1554,11 @@ public class I2PSnarkServlet extends Default {
     private String getListHTML(Resource r, String base, boolean parent, Map postParams)
         throws IOException
     {
-        if (!r.isDirectory())
-            return null;
-        
-        String[] ls = r.list();
-        if (ls==null)
-            return null;
-        Arrays.sort(ls, Collator.getInstance());
+        String[] ls = null;
+        if (r.isDirectory()) {
+            ls = r.list();
+            Arrays.sort(ls, Collator.getInstance());
+        }  // if r is not a directory, we are only showing torrent info section
         
         StringBuilder buf=new StringBuilder(4096);
         buf.append(DOCTYPE + "<HTML><HEAD><TITLE>");
@@ -1592,7 +1589,7 @@ public class I2PSnarkServlet extends Default {
         
         if (parent)  // always true
             buf.append("<div class=\"page\"><div class=\"mainsection\">");
-        boolean showPriority = snark != null && snark.getStorage() != null && !snark.getStorage().complete();
+        boolean showPriority = ls != null && snark != null && snark.getStorage() != null && !snark.getStorage().complete();
         if (showPriority)
             buf.append("<form action=\"").append(base).append("\" method=\"POST\">\n");
         buf.append("<TABLE BORDER=0 class=\"snarkTorrents\" ><thead>");
@@ -1621,15 +1618,17 @@ public class I2PSnarkServlet extends Default {
             if (meta != null) {
                 String announce = meta.getAnnounce();
                 if (announce != null) {
+                    buf.append("<br>");
                     String trackerLink = getTrackerLink(announce, snark.getInfoHash());
-                    if (trackerLink != null) {
-                        if (announce.startsWith("http://"))
-                            announce = announce.substring(7);
-                        int slsh = announce.indexOf('/');
-                        if (slsh > 0)
-                            announce = announce.substring(0, slsh);
-                        buf.append("<br>").append(trackerLink).append(' ').append(announce);
-                    }
+                    if (trackerLink != null)
+                        buf.append(trackerLink).append(' ');
+                    buf.append(_("Tracker")).append(": ");
+                    if (announce.startsWith("http://"))
+                        announce = announce.substring(7);
+                    int slsh = announce.indexOf('/');
+                    if (slsh > 0)
+                        announce = announce.substring(0, slsh);
+                    buf.append(announce);
                 }
             }
 
@@ -1642,6 +1641,12 @@ public class I2PSnarkServlet extends Default {
             //   .append(MAGGOT).append(hex).append(':').append(hex).append("</a>");
             buf.append("</div></th></tr>");
         }
+        if (ls == null) {
+            // We are only showing the torrent info section
+            buf.append("</thead></table></div></div></BODY></HTML>");
+            return buf.toString();
+        }
+
         // second row - dir info
         buf.append("<tr><th>")
             .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "file.png\" >&nbsp;")
