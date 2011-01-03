@@ -4,10 +4,13 @@ HIGH PRIORITY:
 - Internationalisation:
     * Add strings - DONE
     * Add Windows support - NEED TO CHECK
-    * Might need some kind of trigger to reload the menu (for live language switching)
+    * Might need some kind of trigger to reload the menu (for live language switching) - DONE
     * Language choice is not actually set as a parameter in I2P config?
         As a result, desktopgui always starts with the default, unless you manually set the language.
-- Modify installer to set I2P directory parameter; or use $I2P?
+        DONE - uses routerconsole.lang -- this parameter is now updated in routerconsole as well
+- Check if we're inside I2P without using a command-line parameter - DONE
+- Modify installer to set I2P directory parameter; or use $I2P? - Is already there
+- Include in installer - TODO
 - Fix tabs versus spaces ;-)
 UNKNOWN:
 - API to allow applications to add themselves to the menu?

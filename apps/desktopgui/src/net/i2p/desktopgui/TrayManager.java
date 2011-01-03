@@ -42,9 +42,9 @@ public abstract class TrayManager {
      */
     protected TrayManager() {}
     
-    public static TrayManager getInstance() {
+    protected static TrayManager getInstance() {
     	if(instance == null) {
-    		boolean inI2P = ConfigurationManager.getInstance().getBooleanConfiguration("startWithI2P", false);
+    		boolean inI2P = RouterManager.inI2P();
     		if(inI2P) {
     			instance = new InternalTrayManager();
     		}
@@ -58,7 +58,7 @@ public abstract class TrayManager {
     /**
      * Add the tray icon to the system tray and start everything up.
      */
-    public void startManager() {
+    protected void startManager() {
         if(SystemTray.isSupported()) {
             tray = SystemTray.getSystemTray();
             trayIcon = new TrayIcon(getTrayImage(), "I2P", getMainMenu());
@@ -70,17 +70,21 @@ public abstract class TrayManager {
         }
     }
     
+    protected void languageChanged() {
+    	trayIcon.setPopupMenu(getMainMenu());
+    }
+    
     /**
      * Build a popup menu, adding callbacks to the different items.
      * @return popup menu
      */
-    public abstract PopupMenu getMainMenu();
+    protected abstract PopupMenu getMainMenu();
     
     /**
      * Get tray icon image from the desktopgui resources in the jar file.
      * @return image used for the tray icon
      */
-    public Image getTrayImage() {
+    private Image getTrayImage() {
         URL url = getClass().getResource("/desktopgui/resources/images/logo.jpg");
         Image image = Toolkit.getDefaultToolkit().getImage(url);
         return image;

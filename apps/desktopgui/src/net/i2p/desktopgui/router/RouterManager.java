@@ -55,6 +55,13 @@ public class RouterManager {
 	public static void shutDown() {
 		getRouter().shutdownGracefully();
     }
+	
+	/**
+	 * Check if we are running inside I2P.
+	 */
+	public static boolean inI2P() {
+		return (RouterContext.listContexts().size() > 0);
+	}
 
     private static String _(String s) {
         return DesktopguiTranslator._(s);
