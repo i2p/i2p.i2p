@@ -484,6 +484,21 @@ public class I2PAppContext {
     }
     
     /**
+     * Access the configuration attributes of this context, listing the properties 
+     * provided during the context construction, as well as the ones included in
+     * System.getProperties.
+     *
+     * @return new Properties with system and context properties
+     * @since 0.8.4
+     */
+    public Properties getProperties() { 
+        Properties rv = new Properties();
+        rv.putAll(System.getProperties());
+        rv.putAll(_overrideProps);
+        return rv;
+    }
+    
+    /**
      * The statistics component with which we can track various events
      * over time.
      */
