@@ -79,6 +79,7 @@ public class Peer implements Comparable
   static final long OPTION_EXTENSION = 0x0000000000100000l;
   static final long OPTION_FAST      = 0x0000000000000004l;
   static final long OPTION_DHT       = 0x0000000000000001l;
+  static final long OPTION_AZMP      = 0x1000000000000000l;
   private long options;
 
   /**

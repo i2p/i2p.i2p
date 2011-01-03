@@ -23,8 +23,10 @@ abstract class ExtensionHandler {
 
     private static final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(ExtensionHandler.class);
 
-    public static final int ID_METADATA = 3;
+    public static final int ID_METADATA = 1;
     private static final String TYPE_METADATA = "ut_metadata";
+    public static final int ID_PEX = 2;
+    private static final String TYPE_PEX = "ut_pex";
     /** Pieces * SHA1 Hash length, + 25% extra for file names, benconding overhead, etc */
     private static final int MAX_METADATA_SIZE = Storage.MAX_PIECES * 20 * 5 / 4;
     private static final int PARALLEL_REQUESTS = 3;
