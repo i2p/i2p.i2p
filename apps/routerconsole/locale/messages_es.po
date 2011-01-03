@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-12-28 00:08+0000\n"
-"PO-Revision-Date: 2011-01-03 01:03+0100\n"
+"PO-Revision-Date: 2011-01-03 01:13+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -3435,7 +3435,7 @@ msgstr "Demora - túnel"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:440
 msgid "Backlog"
-msgstr "Peticiones"
+msgstr "Peticiones pendientes"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:106
 msgid "ERR-Client Manager I2CP Error - check logs"
