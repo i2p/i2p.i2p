@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-12-28 00:08+0000\n"
-"PO-Revision-Date: 2011-01-02 03:24+0100\n"
+"PO-Revision-Date: 2011-01-03 01:03+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -2412,7 +2412,7 @@ msgstr "Nunca"
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:90
 msgid "Every"
-msgstr "Cada"
+msgstr "cada"
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:108
 msgid "Notify only"
@@ -3247,11 +3247,11 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:83
 msgid "Webserver"
-msgstr ""
+msgstr "Servidor web"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:91
 msgid "Configure I2P Router"
-msgstr "Configura Enrutador I2P"
+msgstr "Configura enrutador I2P"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:93
 msgid "I2P Internals"
@@ -3435,7 +3435,7 @@ msgstr "Demora - túnel"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:440
 msgid "Backlog"
-msgstr "tareas"
+msgstr "Peticiones"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:106
 msgid "ERR-Client Manager I2CP Error - check logs"
@@ -5073,7 +5073,7 @@ msgstr "Actualizando"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:317
 msgid "News URL"
-msgstr "URL de Noticias"
+msgstr "URL de noticias"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:321
 msgid "Refresh frequency"
