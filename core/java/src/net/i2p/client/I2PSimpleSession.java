@@ -99,6 +99,13 @@ class I2PSimpleSession extends I2PSessionImpl2 {
     }
 
     /**
+     * Ignore, does nothing
+     * @since 0.8.4
+     */
+    @Override
+    public void updateOptions(Properties options) {}
+
+    /**
      * Only map message handlers that we will use
      */
     class SimpleMessageHandlerMap extends I2PClientMessageHandlerMap {

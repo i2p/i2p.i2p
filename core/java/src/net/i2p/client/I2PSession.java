@@ -9,6 +9,7 @@ package net.i2p.client;
  *
  */
 
+import java.util.Properties;
 import java.util.Set;
 
 import net.i2p.data.Destination;
@@ -150,6 +151,13 @@ public interface I2PSession {
      *  @return null on failure
      */
     public Destination lookupDest(Hash h, long maxWait) throws I2PSessionException;
+
+    /**
+     *  Does not remove properties previously present but missing from this options parameter.
+     *  @param options non-null
+     *  @since 0.8.4
+     */
+    public void updateOptions(Properties options);
 
     /**
      * Get the current bandwidth limits. Blocking.
