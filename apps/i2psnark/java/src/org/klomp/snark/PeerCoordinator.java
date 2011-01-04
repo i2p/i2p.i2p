@@ -1171,6 +1171,16 @@ public class PeerCoordinator implements PeerListener
                   listener.gotMetaInfo(this, metainfo);
               }
           }
+      } else if (id == ExtensionHandler.ID_HANDSHAKE) {
+          try {
+              if (peer.getHandshakeMap().get("m").getMap().get(ExtensionHandler.TYPE_PEX) != null) {
+                  List<Peer> pList = peerList();
+                  pList.remove(peer);
+                  ExtensionHandler.sendPEX(peer, pList);
+              }
+          } catch (Exception e) {
+              // NPE, no map
+          }
       }
   }
 
@@ -1197,6 +1207,14 @@ public class PeerCoordinator implements PeerListener
       DHT dht = _util.getDHT();
       if (dht != null)
           dht.ping(peer.getDestination(), port);
+  }
+
+  /**
+   *  PeerListener callback
+   *  @since 0.8.4
+   */
+  public void gotPeers(Peer peer, List<PeerID> peers) {
+
   }
 
   /** Return number of allowed uploaders for this torrent.
