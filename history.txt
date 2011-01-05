@@ -1,3 +1,10 @@
+2011-01-05 zzz
+    * build.xml: Fix findbugs target
+    * Fix some miscellaneous findbugs bugs
+    * i2psnark: Refactor request tracking to prevent possible deadlocks
+    * OCMOSJ: Fix cache bug
+    * TrustedUpdate: Fix key store bug
+
 2011-01-02 zzz
     * Console: Disable spellcheck in textareas
     * Data Structures: More tweaks
