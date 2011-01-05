@@ -591,10 +591,7 @@ public class PeerCoordinator implements PeerListener
           }
         if (piece == null)
             wantedSize = wantedPieces.size();
-      } // synch
         
-        // Don't sync the following, deadlock from calling each Peer's isRequesting()
-
         //Only request a piece we've requested before if there's no other choice.
         if (piece == null) {
             // AND if there are almost no wanted pieces left (real end game).
@@ -612,22 +609,12 @@ public class PeerCoordinator implements PeerListener
                 Piece p = it2.next();
                 if (havePieces.get(p.getId())) {
                     // limit number of parallel requests
-                    int requestedCount = 0;
-                        for (Peer pr : peers) {
-                            // deadlock if synced on wantedPieces
-                            if (pr.isRequesting(p.getId())) {
-                                if (pr.equals(peer)) {
-                                    // don't give it to him again
-                                    requestedCount = MAX_PARALLEL_REQUESTS;
-                                    break;
-                                }
-                                if (++requestedCount >= MAX_PARALLEL_REQUESTS)
-                                    break;
-                            }
-                        }
-                    if (requestedCount >= MAX_PARALLEL_REQUESTS)
-                        continue;
-                    piece = p;
+                    int requestedCount = p.getRequestCount();
+                    if (requestedCount < MAX_PARALLEL_REQUESTS &&
+                        !p.isRequestedBy(peer)) {
+                        piece = p;
+                        break;
+                    }
                 }
               }
             if (piece == null) {
@@ -648,9 +635,10 @@ public class PeerCoordinator implements PeerListener
         if (record) {
             if (_log.shouldLog(Log.INFO))
                 _log.info(peer + " is now requesting: piece " + piece + " priority " + piece.getPriority());
-            piece.setRequested(true);
+            piece.setRequested(peer, true);
         }
         return piece.getId();
+      } // synch
   }
 
   /**
@@ -948,7 +936,7 @@ public class PeerCoordinator implements PeerListener
                   }
               }  // else drop the empty partial piece
               // synchs on wantedPieces...
-              markUnrequestedIfOnlyOne(peer, pp.getPiece());
+              markUnrequested(peer, pp.getPiece());
           }
           if (_log.shouldLog(Log.INFO))
               _log.info("Partial list size now: " + partialPieces.size());
@@ -974,7 +962,7 @@ public class PeerCoordinator implements PeerListener
                  // this is just a double-check, it should be in there
                  for(Piece piece : wantedPieces) {
                      if (piece.getId() == savedPiece) {
-                         piece.setRequested(true);
+                         piece.setRequested(peer, true);
                          if (_log.shouldLog(Log.INFO)) {
                              _log.info("Restoring orphaned partial piece " + pp +
                                        " Partial list size now: " + partialPieces.size());
@@ -1053,33 +1041,16 @@ public class PeerCoordinator implements PeerListener
       }
   }
 
-  /** Clear the requested flag for a piece if the peer
-   ** is the only one requesting it
+  /**
+   *  Clear the requested flag for a piece
    */
-  private void markUnrequestedIfOnlyOne(Peer peer, int piece)
+  private void markUnrequested(Peer peer, int piece)
   {
-    // see if anybody else is requesting
-        for (Peer p : peers) {
-          if (p.equals(peer))
-            continue;
-          if (p.state == null)
-            continue;
-          // FIXME don't go into the state
-          if (p.state.getRequestedPieces().contains(Integer.valueOf(piece))) {
-              if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Another peer is requesting piece " + piece);
-              return;
-          }
-        }
-
-    // nobody is, so mark unrequested
     synchronized(wantedPieces)
       {
         for (Piece pc : wantedPieces) {
           if (pc.getId() == piece) {
-            pc.setRequested(false);
-            if (_log.shouldLog(Log.DEBUG))
-              _log.debug("Removing from request list piece " + piece);
+            pc.setRequested(peer, false);
             return;
           }
         }

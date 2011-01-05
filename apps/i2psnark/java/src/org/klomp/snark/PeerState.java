@@ -464,7 +464,7 @@ class PeerState implements DataLoader
   /**
    * @return all pieces we are currently requesting, or empty Set
    */
-  synchronized Set<Integer> getRequestedPieces() {
+  synchronized private Set<Integer> getRequestedPieces() {
       Set<Integer> rv = new HashSet(outstandingRequests.size() + 1);
       for (Request req : outstandingRequests) {
           rv.add(Integer.valueOf(req.piece));
@@ -564,6 +564,7 @@ class PeerState implements DataLoader
 
   /**
    * Are we currently requesting the piece?
+   * @deprecated deadlocks
    * @since 0.8.1
    */
   synchronized boolean isRequesting(int piece) {
