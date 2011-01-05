@@ -54,6 +54,6 @@
 </table></div>
 <hr><div class="formaction">
 <input type="submit" name="foo" value="<%=intl._("Cancel")%>" />
-<input type="submit" name="action" value="<%=intl._("Save Configuration and Reseed Now")%>" />
-<input type="submit" name="action" value="<%=intl._("Save Configuration")%>" />
+<input type="submit" name="action" value="<%=intl._("Save changes and reseed now")%>" />
+<input type="submit" name="action" value="<%=intl._("Save changes")%>" />
 </div></form></div></div></body></html>

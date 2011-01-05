@@ -14,7 +14,7 @@ public class ConfigReseedHandler extends FormHandler {
     @Override
     protected void processForm() {
 
-        if (_action.equals(_("Save Configuration and Reseed Now"))) {
+        if (_action.equals(_("Save changes and reseed now"))) {
             saveChanges();
             boolean reseedInProgress = Boolean.valueOf(System.getProperty("net.i2p.router.web.ReseedHandler.reseedInProgress")).booleanValue();
             if (reseedInProgress) {
@@ -26,7 +26,7 @@ public class ConfigReseedHandler extends FormHandler {
             }
             return;
         }
-        if (_action.equals(_("Save Configuration"))) {
+        if (_action.equals(_("Save changes"))) {
             saveChanges();
             return;
         }
