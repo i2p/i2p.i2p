@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-12-19 03:16+0000\n"
-"PO-Revision-Date: 2010-12-31 01:09+0100\n"
+"PO-Revision-Date: 2011-01-03 00:58+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -323,7 +323,7 @@ msgstr "Arrancar todos"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:372
 msgid "No torrents loaded."
-msgstr "No cargado ningún torrent"
+msgstr "No está cargado ningún torrent"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:377
 msgid "Totals"
@@ -644,7 +644,7 @@ msgstr "Si marcado, los torrents añadidos se iniciarán de forma automática."
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1198
 msgid "Theme"
-msgstr "tema"
+msgstr "Tema"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1211
 msgid "Startup delay"
@@ -664,7 +664,7 @@ msgstr "pares"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1244
 msgid "Up bandwidth limit"
-msgstr "Límite de ancho de banda para la subida"
+msgstr "Límite del ancho de banda para la subida"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1247
 msgid "Half available bandwidth recommended."
@@ -696,7 +696,7 @@ msgstr "Preferencias de salida"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1286
 msgid "I2CP host"
-msgstr "Huésped I2CP"
+msgstr "Anfitrión I2CP"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1291
 msgid "I2CP port"

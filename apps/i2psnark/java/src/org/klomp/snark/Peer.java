@@ -518,6 +518,7 @@ public class Peer implements Comparable
 
   /**
    * Are we currently requesting the piece?
+   * @deprecated deadlocks
    * @since 0.8.1
    */
   boolean isRequesting(int p) {

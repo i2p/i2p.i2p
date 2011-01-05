@@ -1,3 +1,15 @@
+2011-01-05 zzz
+    * build.xml: Fix findbugs target
+    * Fix some miscellaneous findbugs bugs
+    * i2psnark: Refactor request tracking to prevent possible deadlocks
+    * OCMOSJ: Fix cache bug
+    * TrustedUpdate: Fix key store bug
+
+2011-01-02 zzz
+    * Console: Disable spellcheck in textareas
+    * Data Structures: More tweaks
+    * I2CP: Fix BWLimits Message reply in standard session
+
 2010-12-31 zzz
     * Console:
       - Make themes and history.txt return 403 on error,

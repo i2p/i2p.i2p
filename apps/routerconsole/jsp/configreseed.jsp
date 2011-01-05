@@ -44,7 +44,7 @@
 <input type="radio" class="optbox" name="mode" value="2" <%=reseedHelper.modeChecked(2) %> >
 <%=intl._("Use non-SSL only")%></td></tr>
 <tr><td class="mediumtags" align="right"><b><%=intl._("Reseed URLs")%></b></td>
-<td><textarea name="reseedURL" wrap="off"><jsp:getProperty name="reseedHelper" property="reseedURL" /></textarea></td></tr>
+<td><textarea name="reseedURL" wrap="off" spellcheck="false"><jsp:getProperty name="reseedHelper" property="reseedURL" /></textarea></td></tr>
 <tr><td class="mediumtags" align="right"><b><%=intl._("Enable HTTP proxy (not used for SSL)")%></b></td>
 <td><input type="checkbox" class="optbox" name="enable" value="true" <jsp:getProperty name="reseedHelper" property="enable" /> ></td></tr>
 <tr><td class="mediumtags" align="right"><b><%=intl._("HTTP Proxy Host")%>:</b></td>
@@ -54,6 +54,6 @@
 </table></div>
 <hr><div class="formaction">
 <input type="submit" name="foo" value="<%=intl._("Cancel")%>" />
-<input type="submit" name="action" value="<%=intl._("Save Configuration and Reseed Now")%>" />
-<input type="submit" name="action" value="<%=intl._("Save Configuration")%>" />
+<input type="submit" name="action" value="<%=intl._("Save changes and reseed now")%>" />
+<input type="submit" name="action" value="<%=intl._("Save changes")%>" />
 </div></form></div></div></body></html>

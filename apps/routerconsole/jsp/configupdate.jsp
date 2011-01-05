@@ -50,9 +50,9 @@
         </tr><tr><td class= "mediumtags" align="right"><b><%=intl._("eepProxy port")%>:</b></td>
           <td><input type="text" size="4" name="proxyPort" value="<jsp:getProperty name="updatehelper" property="proxyPort" />" /></td>
         </tr><tr><td class= "mediumtags" align="right"><b><%=intl._("Update URLs")%>:</b></td>
-          <td><textarea name="updateURL" wrap="off"><jsp:getProperty name="updatehelper" property="updateURL" /></textarea></td>
+          <td><textarea name="updateURL" wrap="off" spellcheck="false"><jsp:getProperty name="updatehelper" property="updateURL" /></textarea></td>
         </tr><tr><td class= "mediumtags" align="right"><b><%=intl._("Trusted keys")%>:</b></td>
-          <td><textarea name="trustedKeys" wrap="off"><jsp:getProperty name="updatehelper" property="trustedKeys" /></textarea></td>
+          <td><textarea name="trustedKeys" wrap="off" spellcheck="false"><jsp:getProperty name="updatehelper" property="trustedKeys" /></textarea></td>
         </tr><tr><td class= "mediumtags" align="right"><b><%=intl._("Update with unsigned development builds?")%></b></td>
           <td><jsp:getProperty name="updatehelper" property="updateUnsigned" /></td>
         </tr><tr><td class= "mediumtags" align="right"><b><%=intl._("Unsigned Build URL")%>:</b></td>

@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-12-28 00:08+0000\n"
-"PO-Revision-Date: 2010-12-31 02:47+0100\n"
+"PO-Revision-Date: 2011-01-01 21:19+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: echelon <echelon@mail.i2p>, Sperreingang <sperrbezirk@mail.i2p>\n"
 "MIME-Version: 1.0\n"
@@ -2683,7 +2683,7 @@ msgstr "NTCP und SSU mit Hilfsrouter"
 #: ../java/src/net/i2p/router/web/NewsFetcher.java:93
 #, java-format
 msgid "News last updated {0} ago."
-msgstr "Zeit seit letzter Aktualisierung der Nachrichten: {0}"
+msgstr "Zeit seit letzter Aktualisierung der Nachrichten: {0};"
 
 #: ../java/src/net/i2p/router/web/NewsFetcher.java:99
 #, java-format

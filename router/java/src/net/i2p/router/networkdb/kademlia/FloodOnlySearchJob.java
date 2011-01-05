@@ -37,7 +37,6 @@ import net.i2p.util.Log;
  *
  */
 class FloodOnlySearchJob extends FloodSearchJob {
-    protected volatile int _lookupsRemaining;
     private volatile boolean _dead;
     private long _created;
     private boolean _shouldProcessDSRM;

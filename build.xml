@@ -763,9 +763,9 @@
             <arg value="-sortByClass"/>
             <arg value="-xml"/>
             <arg value="-output"/>
-            <arg value="findbugs.xml"/>
+            <arg value="i2p.fba"/>
             <arg value="-auxclasspath"/>
-            <arg value="build/commons-el.jar:build/commons-logging.jar:build/jasper-compiler.jar:build/jasper-runtime.jar:build/javax.servlet.jar:build/org.mortbay.jetty.jar:apps/jrobin/jrobin-1.4.0.jar:apps/systray/java/lib/systray4j.jar:installer/lib/wrapper/linux/wrapper.jar"/>
+            <arg value="build/commons-el.jar:build/commons-logging.jar:build/jasper-compiler.jar:build/jasper-runtime.jar:build/javax.servlet.jar:build/org.mortbay.jetty.jar:apps/jrobin/jrobin-1.4.0.jar:apps/systray/java/lib/systray4j.jar:installer/lib/wrapper/linux/wrapper.jar:apps/susidns/src/WEB-INF/lib/standard.jar:apps/susidns/src/WEB-INF/lib/jstl.jar:apps/jrobin/jrobin-1.4.0.jar"/>
             <arg value="-sourcepath"/>
             <arg value="apps/BOB/src/:apps/addressbook/java/src/:apps/i2psnark/java/src/:apps/i2ptunnel/java/src/:apps/ministreaming/java/src/:apps/routerconsole/java/src/:apps/sam/java/src/:apps/streaming/java/src/:apps/susidns/src/java/src/:apps/susimail/src/src/:apps/systray/java/src/:core/java/src/:router/java/src/"/>
             <!-- start of the files to be analyzed -->
@@ -779,15 +779,16 @@
             <arg value="build/jbigi.jar"/>
             <arg value="build/mstreaming.jar"/>
             <arg value="build/router.jar/"/>
-            <!-- use the class files rather than the jar for routerconsole so we don't analyze jrobin -->
-            <arg value="apps/routerconsole/java/build/obj/"/>
+            <arg value="build/routerconsole.jar"/>
+            <arg value="build/routerconsole.war"/>
             <arg value="build/sam.jar"/>
             <arg value="build/streaming.jar"/>
             <arg value="build/susidns.war"/>
             <arg value="build/susimail.war"/>
             <arg value="build/systray.jar"/>
         </exec>
-        <echo message="Findbugs output stored in findbugs.xml" />
+        <echo message="Findbugs output stored in i2p.fba" />
+        <echo message="Now run: findbugs i2p.fba" />
     </target>
     <target name="buildWithDesktopgui" depends="buildrouter,builddepSmall">
         <ant dir="apps/desktopgui" target="build_jar" />

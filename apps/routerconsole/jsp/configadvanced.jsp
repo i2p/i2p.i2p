@@ -31,7 +31,7 @@
  <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigAdvancedHandler.nonce")%>" >
  <input type="hidden" name="action" value="blah" >
  <h3><%=intl._("Advanced I2P Configuration")%></h3>
- <textarea rows="32" cols="60" name="config" wrap="off"><jsp:getProperty name="advancedhelper" property="settings" /></textarea><br><hr>
+ <textarea rows="32" cols="60" name="config" wrap="off" spellcheck="false"><jsp:getProperty name="advancedhelper" property="settings" /></textarea><br><hr>
       <div class="formaction">
         <input type="reset" value="<%=intl._("Cancel")%>" >
         <input type="submit" name="shouldsave" value="<%=intl._("Save changes")%>" >

@@ -497,7 +497,7 @@ class MessageOutputStream extends OutputStream {
             if (ws.writeFailed())
                 throw new IOException("Flush available failed");
             else if (!ws.writeAccepted())
-                throw new InterruptedIOException("Flush available timed out");
+                throw new InterruptedIOException("Flush available timed out (" + _writeTimeout + "ms)");
         }
         long afterAccept = System.currentTimeMillis();
         if ( (afterAccept - afterBuild > 1000) && (_log.shouldLog(Log.DEBUG)) )
