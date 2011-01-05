@@ -127,8 +127,8 @@ class BuildRequestor {
         TunnelBuildMessage msg = createTunnelBuildMessage(ctx, pool, cfg, pairedTunnel, exec);
         long createTime = System.currentTimeMillis()-beforeCreate;
         if (msg == null) {
-            if (log.shouldLog(Log.ERROR))
-                log.error("Tunnel build failed, as we couldn't create the tunnel build message for " + cfg);
+            if (log.shouldLog(Log.WARN))
+                log.warn("Tunnel build failed, as we couldn't create the tunnel build message for " + cfg);
             exec.buildComplete(cfg, pool);
             return;
         }
@@ -202,6 +202,7 @@ class BuildRequestor {
      *  If the tunnel is short enough, and everybody in the tunnel, and the
      *  OBEP or IBGW for the paired tunnel, all support the new variable-sized tunnel build message,
      *  then use that, otherwise the old 8-entry version.
+     *  @return null on error
      */
     private static TunnelBuildMessage createTunnelBuildMessage(RouterContext ctx, TunnelPool pool, PooledTunnelCreatorConfig cfg, TunnelInfo pairedTunnel, BuildExecutor exec) {
         Log log = ctx.logManager().getLog(BuildRequestor.class);
@@ -275,8 +276,8 @@ class BuildRequestor {
                 Hash peer = cfg.getPeer(hop);
                 RouterInfo peerInfo = ctx.netDb().lookupRouterInfoLocally(peer);
                 if (peerInfo == null) {
-                    if (log.shouldLog(Log.ERROR))
-                        log.error("Peer selected for hop " + i + "/" + hop + " was not found locally: " 
+                    if (log.shouldLog(Log.WARN))
+                        log.warn("Peer selected for hop " + i + "/" + hop + " was not found locally: " 
                                   + peer.toBase64() + " for " + cfg);
                     return null;
                 } else {
