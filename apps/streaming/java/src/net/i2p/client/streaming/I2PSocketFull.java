@@ -46,6 +46,10 @@ class I2PSocketFull implements I2PSocket {
     
     Connection getConnection() { return _connection; }
     
+    /**
+     *  Warning, may return null instead of throwing IOE,
+     *  which is not what the interface says.
+     */
     public InputStream getInputStream() {
         Connection c = _connection;
         if (c != null)
@@ -62,6 +66,10 @@ class I2PSocketFull implements I2PSocket {
             return null;
     }
     
+    /**
+     *  Warning, may return null instead of throwing IOE,
+     *  which is not what the interface says.
+     */
     public OutputStream getOutputStream() throws IOException {
         Connection c = _connection;
         if (c != null)

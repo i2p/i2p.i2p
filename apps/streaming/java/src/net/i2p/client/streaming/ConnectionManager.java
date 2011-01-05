@@ -40,7 +40,7 @@ class ConnectionManager {
     private int _maxConcurrentStreams;
     private ConnectionOptions _defaultOptions;
     private volatile int _numWaiting;
-    private long SoTimeout;
+    private long _soTimeout;
     private ConnThrottler _minuteThrottler;
     private ConnThrottler _hourThrottler;
     private ConnThrottler _dayThrottler;
@@ -64,7 +64,7 @@ class ConnectionManager {
         _allowIncoming = false;
         _numWaiting = 0;
         /** Socket timeout for accept() */
-        SoTimeout = -1;
+        _soTimeout = -1;
 
         _context.statManager().createRateStat("stream.con.lifetimeMessagesSent", "How many messages do we send on a stream?", "Stream", new long[] { 60*60*1000, 24*60*60*1000 });
         _context.statManager().createRateStat("stream.con.lifetimeMessagesReceived", "How many messages do we receive on a stream?", "Stream", new long[] { 60*60*1000, 24*60*60*1000 });
@@ -97,16 +97,16 @@ class ConnectionManager {
      * Set the socket accept() timeout.
      * @param x
      */
-    public void MsetSoTimeout(long x) {
-        SoTimeout = x;
+    public void setSoTimeout(long x) {
+        _soTimeout = x;
     }
 
     /**
      * Get the socket accept() timeout.
      * @return accept timeout in ms.
      */
-    public long MgetSoTimeout() {
-        return SoTimeout;
+    public long getSoTimeout() {
+        return _soTimeout;
     }
 
     public void setAllowIncomingConnections(boolean allow) { 
