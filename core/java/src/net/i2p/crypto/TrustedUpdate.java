@@ -182,20 +182,20 @@ JXQAnA28vDmMMMH/WPbC5ixmJeGGNUiR
      *  @return true if successful
      */
     public boolean addKey(String key, String name) {
-        String oldName = _trustedKeys.get(key);
-        // already there?
-        if (name.equals(oldName))
-            return true;
-        if (oldName != null && !oldName.equals("")) {
-            _log.error("Key for " + name + " already stored for different name " + oldName + " : " + key);
-            return false;
-        }
         SigningPublicKey signingPublicKey = new SigningPublicKey();
         try {
             // fromBase64() will throw a DFE if length is not right
             signingPublicKey.fromBase64(key);
         } catch (DataFormatException dfe) {
             _log.error("Invalid signing key for " + name + " : " + key, dfe);
+            return false;
+        }
+        String oldName = _trustedKeys.get(signingPublicKey);
+        // already there?
+        if (name.equals(oldName))
+            return true;
+        if (oldName != null && !oldName.equals("")) {
+            _log.error("Key for " + name + " already stored for different name " + oldName + " : " + key);
             return false;
         }
         if ((!name.equals("")) && _trustedKeys.containsValue(name)) {

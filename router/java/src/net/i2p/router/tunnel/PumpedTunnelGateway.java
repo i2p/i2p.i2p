@@ -135,7 +135,6 @@ public class PumpedTunnelGateway extends TunnelGateway {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Time to add " + queueBuf.size() + " messages to " + toString() + ": " + (complete-startAdd)
                        + " delayed? " + delayedFlush + " remaining: " + remaining
-                       + " prepare: " + (beforeLock-startAdd)
                        + " add: " + (afterAdded-beforeLock)
                        + " preprocess: " + (afterPreprocess-afterAdded)
                        + " expire: " + (afterExpire-afterPreprocess)

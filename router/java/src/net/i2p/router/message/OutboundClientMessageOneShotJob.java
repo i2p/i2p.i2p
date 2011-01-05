@@ -348,7 +348,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                 }
                 if (_log.shouldLog(Log.INFO))
                     _log.info(getJobId() + ": Expired from cache - lease for " + _toString); 
-                _leaseCache.remove(_to);
+                _leaseCache.remove(hashPair());
             }
         }
 
