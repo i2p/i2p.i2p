@@ -26,7 +26,7 @@ import net.i2p.util.Log;
 /**
  *
  */
-public class EventPumper implements Runnable {
+class EventPumper implements Runnable {
     private RouterContext _context;
     private Log _log;
     private volatile boolean _alive;

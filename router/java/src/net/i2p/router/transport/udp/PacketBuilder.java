@@ -661,7 +661,6 @@ class PacketBuilder {
      */
     public UDPPacket buildSessionDestroyPacket(PeerState peer) {
         UDPPacket packet = buildPacketHeader((byte)(UDPPacket.PAYLOAD_TYPE_SESSION_DESTROY << 4));
-        byte data[] = packet.getPacket().getData();
         int off = HEADER_SIZE;
         
         StringBuilder msg = null;

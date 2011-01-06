@@ -53,7 +53,7 @@ import net.i2p.util.Log;
  *</pre>
  *
  */
-public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
+class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     private final RouterContext _context;
     private final Log _log;
     private SocketChannel _chan;
@@ -1088,15 +1088,6 @@ public class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         // enqueueInfoMessage(); // this often?
     }
     
-    @Override
-    public int hashCode() { return System.identityHashCode(this); }
-    @Override
-    public boolean equals(Object obj) {
-        if(obj == null) return false;
-        if(obj.getClass() != NTCPConnection.class) return false;
-        return obj == this;
-    }
-
     private static final int MAX_HANDLERS = 4;
     private final static LinkedBlockingQueue<I2NPMessageHandler> _i2npHandlers = new LinkedBlockingQueue(MAX_HANDLERS);
 

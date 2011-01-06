@@ -623,7 +623,7 @@ public class TunnelDispatcher implements Service {
         // drop in proportion to size w.r.t. a standard 1024-byte message
         // this is a little expensive but we want to adjust the curve between 0 and 1
         // Most messages are 1024, only at the OBEP do we see other sizes
-        if (len != 1024d)
+        if ((int)len != 1024)
             pctDrop = (float) Math.pow(pctDrop, 1024d / len);
         float rand = _context.random().nextFloat();
         boolean reject = rand <= pctDrop;

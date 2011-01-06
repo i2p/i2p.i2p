@@ -87,8 +87,9 @@ public class UPnPManager {
         if (!_isRunning)
             return;
         Set<ForwardPort> forwards = new HashSet(ports.size());
-        for (String style : ports.keySet()) {
-            int port = ports.get(style).intValue();
+        for (Map.Entry<String, Integer> entry : ports.entrySet()) {
+            String style = entry.getKey();
+            int port = entry.getValue().intValue();
             int protocol = -1;
             if ("SSU".equals(style))
                 protocol = ForwardPort.PROTOCOL_UDP_IPV4;
@@ -136,8 +137,9 @@ public class UPnPManager {
                     _log.debug("No external address returned");
             }
 
-            for (ForwardPort fp : statuses.keySet()) {
-                ForwardPortStatus fps = statuses.get(fp);
+            for (Map.Entry<ForwardPort, ForwardPortStatus> entry : statuses.entrySet()) {
+                ForwardPort fp = entry.getKey();
+                ForwardPortStatus fps = entry.getValue();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug(fp.name + " " + fp.protocol + " " + fp.portNumber +
                                " status: " + fps.status + " reason: " + fps.reasonString + " ext port: " + fps.externalPort);

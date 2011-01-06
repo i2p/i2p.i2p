@@ -215,7 +215,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      * This should really be moved to ntcp/NTCPTransport.java, why is it here?
      */
     public static RouterAddress createNTCPAddress(RouterContext ctx) {
-        if (!TransportManager.enableNTCP(ctx)) return null;
+        if (!TransportManager.isNTCPEnabled(ctx)) return null;
         String name = ctx.router().getConfigSetting(PROP_I2NP_NTCP_HOSTNAME);
         String port = ctx.router().getConfigSetting(PROP_I2NP_NTCP_PORT);
         /*

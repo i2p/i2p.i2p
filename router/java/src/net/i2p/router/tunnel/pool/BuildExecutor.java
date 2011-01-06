@@ -294,7 +294,9 @@ class BuildExecutor implements Runnable {
                         if (!_repoll) {
                             if (_log.shouldLog(Log.DEBUG))
                                 _log.debug("No tunnel to build with (allowed=" + allowed + ", wanted=" + wanted.size() + ", pending=" + pendingRemaining + "), wait for a while");
-                            _currentlyBuilding.wait(1*1000+_context.random().nextInt(1*1000));
+                            try {
+                                _currentlyBuilding.wait(1*1000+_context.random().nextInt(1*1000));
+                            } catch (InterruptedException ie) {}
                         }
                     }
                 } else {
@@ -369,7 +371,7 @@ class BuildExecutor implements Runnable {
                 
                 wanted.clear();
                 pools.clear();
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 if (_log.shouldLog(Log.CRIT))
                     _log.log(Log.CRIT, "B0rked in the tunnel builder", e);
             }
@@ -459,7 +461,7 @@ class BuildExecutor implements Runnable {
                     for (int i = 0; i < 32; i++)
                         _recentBuildIds.remove(0);
                 }
-                _recentBuildIds.add(new Long(id));
+                _recentBuildIds.add(Long.valueOf(id));
             }
         }
     }
@@ -483,7 +485,7 @@ class BuildExecutor implements Runnable {
     
     public boolean wasRecentlyBuilding(long replyId) {
         synchronized (_recentBuildIds) {
-            return _recentBuildIds.contains(new Long(replyId));
+            return _recentBuildIds.contains(Long.valueOf(replyId));
         }
     }
     

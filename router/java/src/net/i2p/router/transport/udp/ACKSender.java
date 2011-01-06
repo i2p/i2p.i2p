@@ -2,6 +2,7 @@ package net.i2p.router.transport.udp;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -120,7 +121,7 @@ class ACKSender implements Runnable {
                             try {
                                 // bulk operations may throw an exception
                                 _peersToACK.addAll(notYet);
-                            } catch (Exception e) {}
+                            } catch (NoSuchElementException nsee) {}
                             notYet.clear();
                             break;
                         } else { 
