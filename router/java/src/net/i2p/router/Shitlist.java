@@ -10,13 +10,13 @@ package net.i2p.router;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -31,9 +31,9 @@ import net.i2p.util.Log;
  * shitlist.
  */
 public class Shitlist {
-    private Log _log;
-    private RouterContext _context;
-    private Map<Hash, Entry> _entries;
+    private final Log _log;
+    private final RouterContext _context;
+    private final Map<Hash, Entry> _entries;
     
     public static class Entry {
         /** when it should expire, per the i2p clock */

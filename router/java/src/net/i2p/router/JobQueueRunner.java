@@ -4,10 +4,10 @@ import net.i2p.util.Log;
 
 /** a do run run run a do run run */
 class JobQueueRunner implements Runnable {
-    private Log _log;
-    private RouterContext _context;
+    private final Log _log;
+    private final RouterContext _context;
     private boolean _keepRunning;
-    private int _id;
+    private final int _id;
     private long _numJobs;
     private Job _currentJob;
     private Job _lastJob;
@@ -19,9 +19,6 @@ class JobQueueRunner implements Runnable {
         _context = context;
         _id = id;
         _keepRunning = true;
-        _numJobs = 0;
-        _currentJob = null;
-        _lastJob = null;
         _log = _context.logManager().getLog(JobQueueRunner.class);
         _context.statManager().createRateStat("jobQueue.jobRun", "How long jobs take", "JobQueue", new long[] { 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("jobQueue.jobRunSlow", "How long jobs that take over a second take", "JobQueue", new long[] { 60*60*1000l, 24*60*60*1000l });

@@ -12,9 +12,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.DataFormatException;
@@ -37,14 +35,14 @@ import net.i2p.util.SecureFileOutputStream;
  *
  */
 public class KeyManager {
-    private Log _log;
-    private RouterContext _context;
+    private final Log _log;
+    private final RouterContext _context;
     private PrivateKey _privateKey;
     private PublicKey _publicKey;
     private SigningPrivateKey _signingPrivateKey;
     private SigningPublicKey _signingPublicKey;
     private final Map<Hash, LeaseSetKeys> _leaseSetKeys; // Destination --> LeaseSetKeys
-    private SynchronizeKeysJob _synchronizeJob;
+    private final SynchronizeKeysJob _synchronizeJob;
     
     public final static String PROP_KEYDIR = "router.keyBackupDir";
     public final static String DEFAULT_KEYDIR = "keyBackup";
@@ -61,10 +59,6 @@ public class KeyManager {
         _context = context;
         _log = _context.logManager().getLog(KeyManager.class);	
         _synchronizeJob = new SynchronizeKeysJob();
-        setPrivateKey(null);
-        setPublicKey(null);
-        setSigningPrivateKey(null);
-        setSigningPublicKey(null);
         _leaseSetKeys = new ConcurrentHashMap();
     }
     
@@ -130,12 +124,6 @@ public class KeyManager {
     }
     public LeaseSetKeys getKeys(Hash dest) {
             return _leaseSetKeys.get(dest);
-    }
-    
-    public Set<LeaseSetKeys> getAllKeys() {
-        HashSet keys = new HashSet();
-        keys.addAll(_leaseSetKeys.values());
-        return keys;
     }
     
     private class SynchronizeKeysJob extends JobImpl {
