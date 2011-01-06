@@ -39,7 +39,11 @@ public class PoisonI2CPMessage extends I2CPMessageImpl {
         return MESSAGE_TYPE;
     }
 
-    /* FIXME missing hashCode() method FIXME */
+    @Override
+    public int hashCode() {
+        return MESSAGE_TYPE;
+    }
+
     @Override
     public boolean equals(Object object) {
         if ((object != null) && (object instanceof PoisonI2CPMessage)) {
