@@ -266,10 +266,8 @@ public class LeaseSet extends DatabaseEntry {
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _destination = new Destination();
         _destination.readBytes(in);
-        _encryptionKey = new PublicKey();
-        _encryptionKey.readBytes(in);
-        _signingKey = new SigningPublicKey();
-        _signingKey.readBytes(in);
+        _encryptionKey = PublicKey.create(in);
+        _signingKey = SigningPublicKey.create(in);
         int numLeases = (int) DataHelper.readLong(in, 1);
         if (numLeases > MAX_LEASES)
             throw new DataFormatException("Too many leases - max is " + MAX_LEASES);
