@@ -149,7 +149,7 @@ public class CryptixAESEngine extends AESEngine {
     @Override
     public final void decryptBlock(byte payload[], int inIndex, SessionKey sessionKey, byte rv[], int outIndex) {
         if ( (payload == null) || (rv == null) )
-            throw new IllegalArgumentException("null block args [payload=" + payload + " rv="+rv);
+            throw new IllegalArgumentException("null block args");
         if (payload.length - inIndex > rv.length - outIndex)
             throw new IllegalArgumentException("bad block args [payload.len=" + payload.length 
                                                + " inIndex=" + inIndex + " rv.len=" + rv.length 

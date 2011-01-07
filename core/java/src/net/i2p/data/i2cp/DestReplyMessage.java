@@ -76,10 +76,11 @@ public class DestReplyMessage extends I2CPMessageImpl {
     }
 
     protected byte[] doWriteMessage() throws I2CPMessageException, IOException {
-        if (_dest == null && _hash == null)
-            return new byte[0];  // null response allowed
-        if (_dest == null && _hash != null)
+        if (_dest == null) {
+            if (_hash == null)
+                return new byte[0];  // null response allowed
             return _hash.getData();
+        }
         ByteArrayOutputStream os = new ByteArrayOutputStream(_dest.size());
         try {
             _dest.writeBytes(os);

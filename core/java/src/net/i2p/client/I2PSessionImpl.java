@@ -421,7 +421,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      *
      */
     public byte[] receiveMessage(int msgId) throws I2PSessionException {
-        MessagePayloadMessage msg = _availableMessages.remove(new Long(msgId));
+        MessagePayloadMessage msg = _availableMessages.remove(Long.valueOf(msgId));
         if (msg == null) {
             _log.error("Receive message " + msgId + " had no matches");
             return null;
@@ -468,7 +468,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * Recieve a payload message and let the app know its available
      */
     public void addNewMessage(MessagePayloadMessage msg) {
-        Long mid = new Long(msg.getMessageId());
+        Long mid = Long.valueOf(msg.getMessageId());
         _availableMessages.put(mid, msg);
         long id = msg.getMessageId();
         byte data[] = msg.getPayload().getUnencryptedData();
@@ -518,7 +518,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         
         public void available(long msgId, int size) {
             synchronized (AvailabilityNotifier.this) {
-                _pendingIds.add(new Long(msgId));
+                _pendingIds.add(Long.valueOf(msgId));
                 _pendingSizes.add(Integer.valueOf(size));
                 AvailabilityNotifier.this.notifyAll();
             }

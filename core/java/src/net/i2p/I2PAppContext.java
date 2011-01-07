@@ -63,7 +63,7 @@ import net.i2p.util.SecureDirectory;
  */
 public class I2PAppContext {
     /** the context that components without explicit root are bound */
-    protected static I2PAppContext _globalAppContext;
+    protected static volatile I2PAppContext _globalAppContext;
     
     private Properties _overrideProps;
     
@@ -117,7 +117,8 @@ public class I2PAppContext {
      *
      */
     public static I2PAppContext getGlobalContext() { 
-        // skip the global lock
+        // skip the global lock - _gAC must be volatile
+        // http://www.cs.umd.edu/~pugh/java/memoryModel/DoubleCheckedLocking.html
         I2PAppContext rv = _globalAppContext;
         if (rv != null)
             return rv;
@@ -473,6 +474,9 @@ public class I2PAppContext {
      * Access the configuration attributes of this context, listing the properties 
      * provided during the context construction, as well as the ones included in
      * System.getProperties.
+     *
+     * WARNING - not overridden in RouterContext, doesn't contain router config settings,
+     * use getProperties() instead.
      *
      * @return set of Strings containing the names of defined system properties
      */

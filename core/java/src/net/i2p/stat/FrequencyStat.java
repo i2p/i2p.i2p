@@ -89,7 +89,7 @@ public class FrequencyStat {
     /** @since 0.8.2 */
     @Override
     public boolean equals(Object obj) {
-        if ((obj == null) || (obj.getClass() != FrequencyStat.class)) return false;
+        if ((obj == null) || !(obj instanceof FrequencyStat)) return false;
         return _statName.equals(((FrequencyStat)obj)._statName);
     }
 
