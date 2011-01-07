@@ -34,6 +34,9 @@ import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.Translate;
 
+import org.klomp.snark.dht.DHT;
+import org.klomp.snark.dht.KRPC;
+
 /**
  * I2P specific helpers for I2PSnark
  * We use this class as a sort of context for i2psnark
@@ -58,6 +61,8 @@ public class I2PSnarkUtil {
     private int _maxConnections;
     private File _tmpDir;
     private int _startupDelay;
+    private boolean _shouldUseOT;
+    private DHT _dht;
 
     public static final int DEFAULT_STARTUP_DELAY = 3;
     public static final String PROP_USE_OPENTRACKERS = "i2psnark.useOpentrackers";
@@ -66,6 +71,8 @@ public class I2PSnarkUtil {
     public static final String DEFAULT_OPENTRACKERS = "http://tracker.welterde.i2p/a";
     public static final int DEFAULT_MAX_UP_BW = 8;  //KBps
     public static final int MAX_CONNECTIONS = 16; // per torrent
+    private static final boolean ENABLE_DHT = true;
+
     public I2PSnarkUtil(I2PAppContext ctx) {
         _context = ctx;
         _log = _context.logManager().getLog(Snark.class);
@@ -78,6 +85,7 @@ public class I2PSnarkUtil {
         _maxUpBW = DEFAULT_MAX_UP_BW;
         _maxConnections = MAX_CONNECTIONS;
         _startupDelay = DEFAULT_STARTUP_DELAY;
+        _shouldUseOT = DEFAULT_USE_OPENTRACKERS;
         // This is used for both announce replies and .torrent file downloads,
         // so it must be available even if not connected to I2CP.
         // so much for multiple instances
@@ -187,10 +195,20 @@ public class I2PSnarkUtil {
             //    opts.setProperty("i2p.streaming.readTimeout", "120000");
             _manager = I2PSocketManagerFactory.createManager(_i2cpHost, _i2cpPort, opts);
         }
+        // FIXME this only instantiates krpc once, left stuck with old manager
+        if (ENABLE_DHT && _manager != null && _dht == null)
+            _dht = new KRPC(_context, _manager.getSession());
         return (_manager != null);
     }
     
+    /**
+     * @return null if disabled or not started
+     * @since 0.8.4
+     */
+    public DHT getDHT() { return _dht; }
+
     public boolean connected() { return _manager != null; }
+
     /**
      * Destroy the destination itself
      */
@@ -214,6 +232,8 @@ public class I2PSnarkUtil {
         Destination addr = peer.getAddress();
         if (addr == null)
             throw new IOException("Null address");
+        if (addr.equals(getMyDestination()))
+            throw new IOException("Attempt to connect to myself");
         Hash dest = addr.calculateHash();
         if (_shitlist.contains(dest))
             throw new IOException("Not trying to contact " + dest.toBase64() + ", as they are shitlisted");
@@ -287,15 +307,23 @@ public class I2PSnarkUtil {
     }
     
     String getOurIPString() {
-        if (_manager == null)
-            return "unknown";
-        I2PSession sess = _manager.getSession();
-        if (sess != null) {
-            Destination dest = sess.getMyDestination();
-            if (dest != null)
-                return dest.toBase64();
-        }
+        Destination dest = getMyDestination();
+        if (dest != null)
+            return dest.toBase64();
         return "unknown";
+    }
+
+    /**
+     *  @return dest or null
+     *  @since 0.8.4
+     */
+    Destination getMyDestination() {
+        if (_manager == null)
+            return null;
+        I2PSession sess = _manager.getSession();
+        if (sess != null)
+            return sess.getMyDestination();
+        return null;
     }
 
     /** Base64 only - static (no naming service) */
@@ -400,10 +428,10 @@ public class I2PSnarkUtil {
 
     /** comma delimited list open trackers to use as backups */
     /** sorted map of name to announceURL=baseURL */
-    public List getOpenTrackers() { 
+    public List<String> getOpenTrackers() { 
         if (!shouldUseOpenTrackers())
             return null;
-        List rv = new ArrayList(1);
+        List<String> rv = new ArrayList(1);
         String trackers = getOpenTrackerString();
         StringTokenizer tok = new StringTokenizer(trackers, ", ");
         while (tok.hasMoreTokens())
@@ -414,11 +442,27 @@ public class I2PSnarkUtil {
         return rv;
     }
     
+    public void setUseOpenTrackers(boolean yes) {
+        _shouldUseOT = yes;
+    }
+
     public boolean shouldUseOpenTrackers() {
-        String rv = (String) _opts.get(PROP_USE_OPENTRACKERS);
-        if (rv == null)
-            return DEFAULT_USE_OPENTRACKERS;
-        return Boolean.valueOf(rv).booleanValue();
+        return _shouldUseOT;
+    }
+
+    /**
+     *  Like DataHelper.toHexString but ensures no loss of leading zero bytes
+     *  @since 0.8.4
+     */
+    public static String toHex(byte[] b) {
+        StringBuilder buf = new StringBuilder(40);
+        for (int i = 0; i < b.length; i++) {
+            int bi = b[i] & 0xff;
+            if (bi < 16)
+                buf.append('0');
+            buf.append(Integer.toHexString(bi));
+        }
+        return buf.toString();
     }
 
     /** hook between snark's logger and an i2p log */

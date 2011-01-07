@@ -28,9 +28,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import net.i2p.client.streaming.I2PSocket;
+import net.i2p.data.DataHelper;
+import net.i2p.data.Destination;
 import net.i2p.util.Log;
+
+import org.klomp.snark.bencode.BEValue;
 
 public class Peer implements Comparable
 {
@@ -39,16 +44,26 @@ public class Peer implements Comparable
   private final PeerID peerID;
 
   private final byte[] my_id;
-  final MetaInfo metainfo;
+  private final byte[] infohash;
+  /** will start out null in magnet mode */
+  private MetaInfo metainfo;
+  private Map<String, BEValue> handshakeMap;
 
   // The data in/output streams set during the handshake and used by
   // the actual connections.
   private DataInputStream din;
   private DataOutputStream dout;
 
+  /** running counters */
+  private long downloaded;
+  private long uploaded;
+
   // Keeps state for in/out connections.  Non-null when the handshake
   // was successful, the connection setup and runs
   PeerState state;
+
+  /** shared across all peers on this torrent */
+  MagnetState magnetState;
 
   private I2PSocket sock;
   
@@ -64,18 +79,20 @@ public class Peer implements Comparable
   static final long OPTION_EXTENSION = 0x0000000000100000l;
   static final long OPTION_FAST      = 0x0000000000000004l;
   static final long OPTION_DHT       = 0x0000000000000001l;
+  static final long OPTION_AZMP      = 0x1000000000000000l;
   private long options;
 
   /**
    * Outgoing connection.
    * Creates a disconnected peer given a PeerID, your own id and the
    * relevant MetaInfo.
+   * @param metainfo null if in magnet mode
    */
-  public Peer(PeerID peerID, byte[] my_id, MetaInfo metainfo)
-    throws IOException
+  public Peer(PeerID peerID, byte[] my_id, byte[] infohash, MetaInfo metainfo)
   {
     this.peerID = peerID;
     this.my_id = my_id;
+    this.infohash = infohash;
     this.metainfo = metainfo;
     _id = ++__id;
     //_log.debug("Creating a new peer with " + peerID.toString(), new Exception("creating"));
@@ -89,12 +106,14 @@ public class Peer implements Comparable
    * get the remote peer id. To completely start the connection call
    * the connect() method.
    *
+   * @param metainfo null if in magnet mode
    * @exception IOException when an error occurred during the handshake.
    */
-  public Peer(final I2PSocket sock, InputStream in, OutputStream out, byte[] my_id, MetaInfo metainfo)
+  public Peer(final I2PSocket sock, InputStream in, OutputStream out, byte[] my_id, byte[] infohash, MetaInfo metainfo)
     throws IOException
   {
     this.my_id = my_id;
+    this.infohash = infohash;
     this.metainfo = metainfo;
     this.sock = sock;
 
@@ -102,7 +121,7 @@ public class Peer implements Comparable
     this.peerID = new PeerID(id, sock.getPeerDestination());
     _id = ++__id;
     if (_log.shouldLog(Log.DEBUG))
-        _log.debug("Creating a new peer with " + peerID.toString(), new Exception("creating " + _id));
+        _log.debug("Creating a new peer " + peerID.toString(), new Exception("creating " + _id));
   }
 
   /**
@@ -192,7 +211,7 @@ public class Peer implements Comparable
    * If the given BitField is non-null it is send to the peer as first
    * message.
    */
-  public void runConnection(I2PSnarkUtil util, PeerListener listener, BitField bitfield)
+  public void runConnection(I2PSnarkUtil util, PeerListener listener, BitField bitfield, MagnetState mState)
   {
     if (state != null)
       throw new IllegalStateException("Peer already started");
@@ -243,14 +262,29 @@ public class Peer implements Comparable
                 _log.debug("Already have din [" + sock + "] with " + toString());
           }
         
+        // bad idea?
+        if (metainfo == null && (options & OPTION_EXTENSION) == 0) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Peer does not support extensions and we need metainfo, dropping");
+            throw new IOException("Peer does not support extensions and we need metainfo, dropping");
+        }
+
         PeerConnectionIn in = new PeerConnectionIn(this, din);
         PeerConnectionOut out = new PeerConnectionOut(this, dout);
         PeerState s = new PeerState(this, listener, metainfo, in, out);
         
         if ((options & OPTION_EXTENSION) != 0) {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Peer supports extensions, sending test message");
-            out.sendExtension(0, ExtensionHandshake.getPayload());
+                _log.debug("Peer supports extensions, sending reply message");
+            int metasize = metainfo != null ? metainfo.getInfoBytes().length : -1;
+            out.sendExtension(0, ExtensionHandler.getHandshake(metasize));
+        }
+
+        if ((options & OPTION_DHT) != 0 && util.getDHT() != null) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Peer supports DHT, sending PORT message");
+            int port = util.getDHT().getPort();
+            out.sendPort(port);
         }
 
         // Send our bitmap
@@ -259,6 +293,7 @@ public class Peer implements Comparable
     
         // We are up and running!
         state = s;
+        magnetState = mState;
         listener.connected(this);
   
         if (_log.shouldLog(Log.DEBUG))
@@ -303,10 +338,10 @@ public class Peer implements Comparable
     dout.write(19);
     dout.write("BitTorrent protocol".getBytes("UTF-8"));
     // Handshake write - options
-    dout.writeLong(OPTION_EXTENSION);
+    // FIXME not if DHT disabled
+    dout.writeLong(OPTION_EXTENSION | OPTION_DHT);
     // Handshake write - metainfo hash
-    byte[] shared_hash = metainfo.getInfoHash();
-    dout.write(shared_hash);
+    dout.write(infohash);
     // Handshake write - peer id
     dout.write(my_id);
     dout.flush();
@@ -334,7 +369,7 @@ public class Peer implements Comparable
     // Handshake read - metainfo hash
     bs = new byte[20];
     din.readFully(bs);
-    if (!Arrays.equals(shared_hash, bs))
+    if (!Arrays.equals(infohash, bs))
       throw new IOException("Unexpected MetaInfo hash");
 
     // Handshake read - peer id
@@ -342,13 +377,65 @@ public class Peer implements Comparable
     if (_log.shouldLog(Log.DEBUG))
         _log.debug("Read the remote side's hash and peerID fully from " + toString());
 
+    if (DataHelper.eq(my_id, bs))
+        throw new IOException("Connected to myself");
+
     if (options != 0) {
-        // send them something
+        // send them something in runConnection() above
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Peer supports options 0x" + Long.toString(options, 16) + ": " + toString());
     }
 
     return bs;
+  }
+
+  /** @since 0.8.4 */
+  public long getOptions() {
+      return options;
+  }
+
+  /** @since 0.8.4 */
+  public Destination getDestination() {
+      if (sock == null)
+          return null;
+      return sock.getPeerDestination();
+  }
+
+  /**
+   *  Shared state across all peers, callers must sync on returned object
+   *  @return non-null
+   *  @since 0.8.4
+   */
+  public MagnetState getMagnetState() {
+      return magnetState;
+  }
+
+  /** @return could be null @since 0.8.4 */
+  public Map<String, BEValue> getHandshakeMap() {
+      return handshakeMap;
+  }
+
+  /** @since 0.8.4 */
+  public void setHandshakeMap(Map<String, BEValue> map) {
+      handshakeMap = map;
+  }
+
+  /** @since 0.8.4 */
+  public void sendExtension(int type, byte[] payload) {
+    PeerState s = state;
+    if (s != null)
+        s.out.sendExtension(type, payload);
+  }
+
+  /**
+   *  Switch from magnet mode to normal mode
+   *  @since 0.8.4
+   */
+  public void setMetaInfo(MetaInfo meta) {
+    metainfo = meta;
+    PeerState s = state;
+    if (s != null)
+        s.setMetaInfo(meta);
   }
 
   public boolean isConnected()
@@ -514,13 +601,28 @@ public class Peer implements Comparable
   }
 
   /**
+   * Increment the counter.
+   * @since 0.8.4
+   */
+  public void downloaded(int size) {
+      downloaded += size;
+  }
+
+  /**
+   * Increment the counter.
+   * @since 0.8.4
+   */
+  public void uploaded(int size) {
+      uploaded += size;
+  }
+
+  /**
    * Returns the number of bytes that have been downloaded.
    * Can be reset to zero with <code>resetCounters()</code>/
    */
   public long getDownloaded()
   {
-    PeerState s = state;
-    return (s != null) ? s.downloaded : 0;
+      return downloaded;
   }
 
   /**
@@ -529,8 +631,7 @@ public class Peer implements Comparable
    */
   public long getUploaded()
   {
-    PeerState s = state;
-    return (s != null) ? s.uploaded : 0;
+      return uploaded;
   }
 
   /**
@@ -538,12 +639,8 @@ public class Peer implements Comparable
    */
   public void resetCounters()
   {
-    PeerState s = state;
-    if (s != null)
-      {
-        s.downloaded = 0;
-        s.uploaded = 0;
-      }
+      downloaded = 0;
+      uploaded = 0;
   }
   
   public long getInactiveTime() {

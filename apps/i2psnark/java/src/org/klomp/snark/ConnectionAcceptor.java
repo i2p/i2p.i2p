@@ -137,6 +137,11 @@ public class ConnectionAcceptor implements Runnable
                     }
                 }
             } else {
+                if (socket.getPeerDestination().equals(_util.getMyDestination())) {
+                    _util.debug("Incoming connection from myself", Snark.ERROR);
+                    try { socket.close(); } catch (IOException ioe) {}
+                    continue;
+                }
                 Thread t = new I2PAppThread(new Handler(socket), "I2PSnark incoming connection");
                 t.start();
             }

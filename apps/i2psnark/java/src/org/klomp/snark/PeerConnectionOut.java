@@ -151,7 +151,7 @@ class PeerConnectionOut implements Runnable
             if (m != null)
               {
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Send " + peer + ": " + m + " on " + peer.metainfo.getName());
+                    _log.debug("Send " + peer + ": " + m);
 
                 // This can block for quite a while.
                 // To help get slow peers going, and track the bandwidth better,
@@ -545,6 +545,14 @@ class PeerConnectionOut implements Runnable
     m.data = bytes;
     m.off = 0;
     m.len = bytes.length;
+    addMessage(m);
+  }
+
+  /** @since 0.8.4 */
+  void sendPort(int port) {
+    Message m = new Message();
+    m.type = Message.PORT;
+    m.piece = port;
     addMessage(m);
   }
 }

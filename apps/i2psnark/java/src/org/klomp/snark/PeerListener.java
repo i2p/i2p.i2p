@@ -179,4 +179,32 @@ interface PeerListener
    * @since 0.8.2
    */
   PartialPiece getPartialPiece(Peer peer, BitField havePieces);
+
+  /**
+   * Called when an extension message is received.
+   *
+   * @param peer the Peer that got the message.
+   * @param id the message ID
+   * @param bs the message payload
+   * @since 0.8.4
+   */
+  void gotExtension(Peer peer, int id, byte[] bs);
+
+  /**
+   * Called when a port message is received.
+   *
+   * @param peer the Peer that got the message.
+   * @param port the port
+   * @since 0.8.4
+   */
+  void gotPort(Peer peer, int port);
+
+  /**
+   * Called when peers are received via PEX
+   *
+   * @param peer the Peer that got the message.
+   * @param pIDList the peer IDs (dest hashes)
+   * @since 0.8.4
+   */
+  void gotPeers(Peer peer, List<PeerID> pIDList);
 }

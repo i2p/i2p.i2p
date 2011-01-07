@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -53,37 +54,43 @@ public class MetaInfo
   private final byte[] info_hash;
   private final String name;
   private final String name_utf8;
-  private final List files;
-  private final List files_utf8;
-  private final List lengths;
+  private final List<List<String>> files;
+  private final List<List<String>> files_utf8;
+  private final List<Long> lengths;
   private final int piece_length;
   private final byte[] piece_hashes;
   private final long length;
-  private final Map infoMap;
+  private Map<String, BEValue> infoMap;
 
-  private byte[] torrentdata;
-
-  MetaInfo(String announce, String name, String name_utf8, List files, List lengths,
+  /**
+   *  Called by Storage when creating a new torrent from local data
+   *
+   *  @param announce may be null
+   *  @param files null for single-file torrent
+   *  @param lengths null for single-file torrent
+   */
+  MetaInfo(String announce, String name, String name_utf8, List<List<String>> files, List<Long> lengths,
            int piece_length, byte[] piece_hashes, long length)
   {
     this.announce = announce;
     this.name = name;
     this.name_utf8 = name_utf8;
-    this.files = files;
+    this.files = files == null ? null : Collections.unmodifiableList(files);
     this.files_utf8 = null;
-    this.lengths = lengths;
+    this.lengths = lengths == null ? null : Collections.unmodifiableList(lengths);
     this.piece_length = piece_length;
     this.piece_hashes = piece_hashes;
     this.length = length;
 
     this.info_hash = calculateInfoHash();
-    infoMap = null;
+    //infoMap = null;
   }
 
   /**
    * Creates a new MetaInfo from the given InputStream.  The
    * InputStream must start with a correctly bencoded dictonary
    * describing the torrent.
+   * Caller must close the stream.
    */
   public MetaInfo(InputStream in) throws IOException
   {
@@ -104,23 +111,29 @@ public class MetaInfo
    * Creates a new MetaInfo from a Map of BEValues and the SHA1 over
    * the original bencoded info dictonary (this is a hack, we could
    * reconstruct the bencoded stream and recalculate the hash). Will
-   * throw a InvalidBEncodingException if the given map does not
-   * contain a valid announce string or info dictonary.
+   * NOT throw a InvalidBEncodingException if the given map does not
+   * contain a valid announce string.
+   * WILL throw a InvalidBEncodingException if the given map does not
+   * contain a valid info dictionary.
    */
   public MetaInfo(Map m) throws InvalidBEncodingException
   {
     if (_log.shouldLog(Log.DEBUG))
         _log.debug("Creating a metaInfo: " + m, new Exception("source"));
     BEValue val = (BEValue)m.get("announce");
-    if (val == null)
-        throw new InvalidBEncodingException("Missing announce string");
-    this.announce = val.getString();
+    // Disabled check, we can get info from a magnet now
+    if (val == null) {
+        //throw new InvalidBEncodingException("Missing announce string");
+        this.announce = null;
+    } else {
+        this.announce = val.getString();
+    }
 
     val = (BEValue)m.get("info");
     if (val == null)
         throw new InvalidBEncodingException("Missing info map");
     Map info = val.getMap();
-    infoMap = info;
+    infoMap = Collections.unmodifiableMap(info);
 
     val = (BEValue)info.get("name");
     if (val == null)
@@ -160,39 +173,39 @@ public class MetaInfo
           throw new InvalidBEncodingException
             ("Missing length number and/or files list");
 
-        List list = val.getList();
+        List<BEValue> list = val.getList();
         int size = list.size();
         if (size == 0)
           throw new InvalidBEncodingException("zero size files list");
 
-        files = new ArrayList(size);
-        files_utf8 = new ArrayList(size);
-        lengths = new ArrayList(size);
+        List<List<String>> m_files = new ArrayList(size);
+        List<List<String>> m_files_utf8 = new ArrayList(size);
+        List<Long> m_lengths = new ArrayList(size);
         long l = 0;
         for (int i = 0; i < list.size(); i++)
           {
-            Map desc = ((BEValue)list.get(i)).getMap();
-            val = (BEValue)desc.get("length");
+            Map<String, BEValue> desc = list.get(i).getMap();
+            val = desc.get("length");
             if (val == null)
               throw new InvalidBEncodingException("Missing length number");
             long len = val.getLong();
-            lengths.add(new Long(len));
+            m_lengths.add(new Long(len));
             l += len;
 
             val = (BEValue)desc.get("path");
             if (val == null)
               throw new InvalidBEncodingException("Missing path list");
-            List path_list = val.getList();
+            List<BEValue> path_list = val.getList();
             int path_length = path_list.size();
             if (path_length == 0)
               throw new InvalidBEncodingException("zero size file path list");
 
-            List file = new ArrayList(path_length);
-            Iterator it = path_list.iterator();
+            List<String> file = new ArrayList(path_length);
+            Iterator<BEValue> it = path_list.iterator();
             while (it.hasNext())
-              file.add(((BEValue)it.next()).getString());
+              file.add(it.next().getString());
 
-            files.add(file);
+            m_files.add(Collections.unmodifiableList(file));
             
             val = (BEValue)desc.get("path.utf-8");
             if (val != null) {
@@ -202,11 +215,14 @@ public class MetaInfo
                     file = new ArrayList(path_length);
                     it = path_list.iterator();
                     while (it.hasNext())
-                        file.add(((BEValue)it.next()).getString());
-                    files_utf8.add(file);
+                        file.add(it.next().getString());
+                    m_files_utf8.add(Collections.unmodifiableList(file));
                 }
             }
           }
+        files = Collections.unmodifiableList(m_files);
+        files_utf8 = Collections.unmodifiableList(m_files_utf8);
+        lengths = Collections.unmodifiableList(m_lengths);
         length = l;
       }
 
@@ -215,6 +231,7 @@ public class MetaInfo
 
   /**
    * Returns the string representing the URL of the tracker for this torrent.
+   * @return may be null!
    */
   public String getAnnounce()
   {
@@ -253,9 +270,8 @@ public class MetaInfo
    * a single name. It has the same size as the list returned by
    * getLengths().
    */
-  public List getFiles()
+  public List<List<String>> getFiles()
   {
-    // XXX - Immutable?
     return files;
   }
 
@@ -264,9 +280,8 @@ public class MetaInfo
    * files, or null if it is a single file. It has the same size as
    * the list returned by getFiles().
    */
-  public List getLengths()
+  public List<Long> getLengths()
   {
-    // XXX - Immutable?
     return lengths;
   }
 
@@ -388,26 +403,35 @@ public class MetaInfo
                         piece_hashes, length);
   }
 
-  public byte[] getTorrentData()
+  /**
+   *  Called by servlet to save a new torrent file generated from local data
+   */
+  public synchronized byte[] getTorrentData()
   {
-    if (torrentdata == null)
-      {
         Map m = new HashMap();
-        m.put("announce", announce);
+        if (announce != null)
+            m.put("announce", announce);
         Map info = createInfoMap();
         m.put("info", info);
-        torrentdata = BEncoder.bencode(m);
-      }
-    return torrentdata;
+        // don't save this locally, we should only do this once
+        return BEncoder.bencode(m);
   }
 
-  private Map createInfoMap()
+  /** @since 0.8.4 */
+  public synchronized byte[] getInfoBytes() {
+    if (infoMap == null)
+        createInfoMap();
+    return BEncoder.bencode(infoMap);
+  }
+
+  /** @return an unmodifiable view of the Map */
+  private Map<String, BEValue> createInfoMap()
   {
+    // if we loaded this metainfo from a file, we have the map
+    if (infoMap != null)
+        return Collections.unmodifiableMap(infoMap);
+    // otherwise we must create it
     Map info = new HashMap();
-    if (infoMap != null) {
-        info.putAll(infoMap);
-        return info;
-    }
     info.put("name", name);
     if (name_utf8 != null)
         info.put("name.utf-8", name_utf8);
@@ -429,7 +453,8 @@ public class MetaInfo
           }
         info.put("files", l);
       }
-    return info;
+    infoMap = info;
+    return Collections.unmodifiableMap(infoMap);
   }
 
   private byte[] calculateInfoHash()

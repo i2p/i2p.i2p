@@ -87,6 +87,9 @@ public class Storage
    * Creates a storage from the existing file or directory together
    * with an appropriate MetaInfo file as can be announced on the
    * given announce String location.
+   *
+   * @param announce may be null
+   * @param listener may be null
    */
   public Storage(I2PSnarkUtil util, File baseFile, String announce, StorageListener listener)
     throws IOException
@@ -97,7 +100,7 @@ public class Storage
     getFiles(baseFile);
     
     long total = 0;
-    ArrayList lengthsList = new ArrayList();
+    ArrayList<Long> lengthsList = new ArrayList();
     for (int i = 0; i < lengths.length; i++)
       {
         long length = lengths[i];
@@ -119,10 +122,10 @@ public class Storage
     bitfield = new BitField(pieces);
     needed = 0;
 
-    List files = new ArrayList();
+    List<List<String>> files = new ArrayList();
     for (int i = 0; i < names.length; i++)
       {
-        List file = new ArrayList();
+        List<String> file = new ArrayList();
         StringTokenizer st = new StringTokenizer(names[i], File.separator);
         while (st.hasMoreTokens())
           {
@@ -590,7 +593,7 @@ public class Storage
    * Removes 'suspicious' characters from the given file name.
    * http://msdn.microsoft.com/en-us/library/aa365247%28VS.85%29.aspx
    */
-  private static String filterName(String name)
+  public static String filterName(String name)
   {
     if (name.equals(".") || name.equals(" "))
         return "_";
