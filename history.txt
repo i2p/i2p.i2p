@@ -1,3 +1,7 @@
+2011-01-07 zzz
+    * Data Structures: More caching
+    * i2psnark: Improve request tracking to reduce memory usage
+
 2011-01-05 zzz
     * build.xml: Fix findbugs target
     * Fix some miscellaneous findbugs bugs
