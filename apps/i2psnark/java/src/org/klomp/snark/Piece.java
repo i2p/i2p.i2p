@@ -1,17 +1,16 @@
 package org.klomp.snark;
 
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
-
-import net.i2p.util.ConcurrentHashSet;
 
 /**
  * This class is used solely by PeerCoordinator.
+ * Caller must synchronize on many of these methods.
  */
 class Piece implements Comparable {
 
-    private int id;
-    private Set<PeerID> peers;
+    private final int id;
+    private final Set<PeerID> peers;
     /** @since 0.8.3 */
     private Set<PeerID> requests;
     /** @since 0.8.1 */
@@ -19,8 +18,8 @@ class Piece implements Comparable {
     
     public Piece(int id) {
         this.id = id;
-        this.peers = new ConcurrentHashSet(I2PSnarkUtil.MAX_CONNECTIONS);
-        this.requests = new ConcurrentHashSet(2);
+        this.peers = new HashSet(I2PSnarkUtil.MAX_CONNECTIONS);
+        // defer creating requests to save memory
     }
     
     /**
@@ -51,35 +50,50 @@ class Piece implements Comparable {
     }
     
     public int getId() { return this.id; }
+
+    /** caller must synchronize */
     public boolean addPeer(Peer peer) { return this.peers.add(peer.getPeerID()); }
+
+    /** caller must synchronize */
     public boolean removePeer(Peer peer) { return this.peers.remove(peer.getPeerID()); }
-    public boolean isRequested() { return !this.requests.isEmpty(); }
+
+    /** caller must synchronize */
+    public boolean isRequested() {
+        return this.requests != null && !this.requests.isEmpty();
+    }
 
     /**
      * Since 0.8.3, keep track of who is requesting here,
      * to avoid deadlocks from querying each peer.
+     * Caller must synchronize
      */
     public void setRequested(Peer peer, boolean requested) {
-        if (requested)
+        if (requested) {
+            if (this.requests == null)
+                this.requests = new HashSet(2);
             this.requests.add(peer.getPeerID());
-        else
-            this.requests.remove(peer.getPeerID());
+        } else {
+            if (this.requests != null)
+                this.requests.remove(peer.getPeerID());
+        } 
     } 
     
     /**
      * Is peer requesting this piece?
+     * Caller must synchronize
      * @since 0.8.3
      */
     public boolean isRequestedBy(Peer peer) {
-        return this.requests.contains(peer.getPeerID());
+        return this.requests != null && this.requests.contains(peer.getPeerID());
     } 
     
     /**
      * How many peers are requesting this piece?
+     * Caller must synchronize
      * @since 0.8.3
      */
     public int getRequestCount() {
-        return this.requests.size();
+        return this.requests == null ? 0 : this.requests.size();
     } 
     
     /** @return default 0 @since 0.8.1 */
