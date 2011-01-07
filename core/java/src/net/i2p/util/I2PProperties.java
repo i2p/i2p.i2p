@@ -17,7 +17,6 @@ public class I2PProperties extends Properties {
 	/**
 	 * Keep a list of callbacks to contact the interested parties
 	 * that want to know about property changes.
-	 * @todo Use a map of lists, so we don't need to loop over all the callbacks on every change.
 	 */
 	private final List<I2PPropertyCallback> _callbacks = new CopyOnWriteArrayList<I2PPropertyCallback>();
 
@@ -40,9 +39,7 @@ public class I2PProperties extends Properties {
 	public Object setProperty(String key, String value) {
 		Object returnValue = super.setProperty(key, value);
 		for(I2PPropertyCallback callback: _callbacks) {
-			if(callback.getPropertyKey().equals(key)) {
-				callback.propertyChanged(key, value);
-			}
+			callback.propertyChanged(key, value);
 		}
 		return returnValue;
 	}
@@ -51,7 +48,6 @@ public class I2PProperties extends Properties {
 		
 		public void propertyChanged(String key, String value);
 		
-		public String getPropertyKey();
 	}
 
 }

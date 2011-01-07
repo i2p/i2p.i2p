@@ -64,7 +64,7 @@ public class I2PAppContext {
     /** the context that components without explicit root are bound */
     protected static I2PAppContext _globalAppContext;
     
-    private I2PProperties _overrideProps;
+    protected I2PProperties _overrideProps;
     
     private StatManager _statManager;
     private SessionKeyManager _sessionKeyManager;
@@ -481,25 +481,12 @@ public class I2PAppContext {
     }
     
     /**
-     * Modify the configuration attributes of this context, changing
-     * one of the properties provided during the context construction.
-     * @param propName The name of the property.
-     * @param value The new value for the property.
-     */
-    public void setProperty(String propName, String value) {
-    	if(_overrideProps != null) {
-    		_overrideProps.setProperty(propName, value);
-    	}
-    }
-    
-    /**
      * Add a callback, which will fire upon changes in the property
      * given in the specific callback.
+     * Unimplemented in I2PAppContext: this only makes sense in a router context.
      * @param callback The implementation of the callback.
      */
-    public void addPropertyCallback(I2PPropertyCallback callback) {
-    	_overrideProps.addCallBack(callback);
-    }
+    public void addPropertyCallback(I2PPropertyCallback callback) {}
     
     /**
      * The statistics component with which we can track various events

@@ -19,7 +19,7 @@ public class ContentHelper extends HelperBase {
         _startAtBeginning = Boolean.valueOf(""+moo).booleanValue(); 
     }
     public void setLang(String l) {
-        if(_lang == null || !_lang.equals(l)) {
+        if((_lang == null || !_lang.equals(l)) && (l != null)) {
             //Set language for router console
             _lang = l;
 

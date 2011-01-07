@@ -9,6 +9,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import net.i2p.I2PAppContext;
+import net.i2p.desktopgui.router.RouterManager;
 import net.i2p.desktopgui.util.*;
 import net.i2p.util.Log;
 import net.i2p.util.Translate;
@@ -25,23 +26,24 @@ public class Main {
 
 	/**
 	 * Start the tray icon code (loads tray icon in the tray area).
+	 * @throws Exception 
 	 */
-    private void startUp() {
+    private void startUp() throws Exception {
         trayManager = TrayManager.getInstance();
         trayManager.startManager();
-        I2PAppContext.getCurrentContext().addPropertyCallback(new I2PPropertyCallback() {
+        
+        if(RouterManager.inI2P()) {
+            RouterManager.getRouterContext().addPropertyCallback(new I2PPropertyCallback() {
 
-			@Override
-			public String getPropertyKey() {
-				return Translate.PROP_LANG;
-			}
-
-			@Override
-			public void propertyChanged(String arg0, String arg1) {
-				trayManager.languageChanged();
-			}
-        	
-        });
+    			@Override
+    			public void propertyChanged(String arg0, String arg1) {
+    				if(arg0.equals(Translate.PROP_LANG)) {
+    					trayManager.languageChanged();
+    				}
+    			}
+            	
+            });
+        }
     }
 
     /**
@@ -71,7 +73,12 @@ public class Main {
 
             @Override
             public void run() {
-                main.startUp();
+                try {
+                	main.startUp();
+                }
+                catch(Exception e) {
+                	log.error("Failed while running desktopgui!", e);
+                }
                 
             }
             
