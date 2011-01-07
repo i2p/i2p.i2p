@@ -360,10 +360,10 @@ public class FragmentHandler {
         FragmentedMessage msg = null;
         if (fragmented) {
             synchronized (_fragmentedMessages) {
-                msg = _fragmentedMessages.get(new Long(messageId));
+                msg = _fragmentedMessages.get(Long.valueOf(messageId));
                 if (msg == null) {
                     msg = new FragmentedMessage(_context);
-                    _fragmentedMessages.put(new Long(messageId), msg);
+                    _fragmentedMessages.put(Long.valueOf(messageId), msg);
                 }
             }
         } else {
@@ -377,7 +377,7 @@ public class FragmentHandler {
                 if (!ok) return -1;
                 if (msg.isComplete()) {
                     synchronized (_fragmentedMessages) {
-                        _fragmentedMessages.remove(new Long(messageId));
+                        _fragmentedMessages.remove(Long.valueOf(messageId));
                     }
                     if (msg.getExpireEvent() != null)
                         SimpleTimer.getInstance().removeEvent(msg.getExpireEvent());
@@ -432,10 +432,10 @@ public class FragmentHandler {
         
         FragmentedMessage msg = null;
         synchronized (_fragmentedMessages) {
-            msg = _fragmentedMessages.get(new Long(messageId));
+            msg = _fragmentedMessages.get(Long.valueOf(messageId));
             if (msg == null) {
                 msg = new FragmentedMessage(_context);
-                _fragmentedMessages.put(new Long(messageId), msg);
+                _fragmentedMessages.put(Long.valueOf(messageId), msg);
             }
         }
         
@@ -446,7 +446,7 @@ public class FragmentHandler {
             
             if (msg.isComplete()) {
                 synchronized (_fragmentedMessages) {
-                    _fragmentedMessages.remove(new Long(messageId));
+                    _fragmentedMessages.remove(Long.valueOf(messageId));
                 }
                 if (msg.getExpireEvent() != null)
                     SimpleTimer.getInstance().removeEvent(msg.getExpireEvent());
@@ -529,7 +529,7 @@ public class FragmentHandler {
         public void timeReached() {
             boolean removed = false;
             synchronized (_fragmentedMessages) {
-                removed = (null != _fragmentedMessages.remove(new Long(_msg.getMessageId())));
+                removed = (null != _fragmentedMessages.remove(Long.valueOf(_msg.getMessageId())));
             }
             synchronized (_msg) {
                 if (removed && !_msg.getReleased()) {

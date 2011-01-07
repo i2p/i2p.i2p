@@ -191,7 +191,7 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 implements I2PSession {
      */
     @Override
     public void addNewMessage(MessagePayloadMessage msg) {
-        Long mid = new Long(msg.getMessageId());
+        Long mid = Long.valueOf(msg.getMessageId());
         _availableMessages.put(mid, msg);
         long id = msg.getMessageId();
         byte data[] = msg.getPayload().getUnencryptedData();

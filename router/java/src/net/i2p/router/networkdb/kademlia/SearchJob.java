@@ -14,8 +14,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataHelper;
-import net.i2p.data.DataStructure;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterInfo;
@@ -293,12 +293,12 @@ class SearchJob extends JobImpl {
                 attempted.addAll(closestHashes);
                 for (Iterator iter = closestHashes.iterator(); iter.hasNext(); ) {
                     Hash peer = (Hash)iter.next();
-                    DataStructure ds = _facade.getDataStore().get(peer);
+                    DatabaseEntry ds = _facade.getDataStore().get(peer);
                     if (ds == null) {
                         if (_log.shouldLog(Log.INFO))
                             _log.info("Next closest peer " + peer + " was only recently referred to us, sending a search for them");
                         getContext().netDb().lookupRouterInfo(peer, null, null, _timeoutMs);
-                    } else if (!(ds instanceof RouterInfo)) {
+                    } else if (!(ds.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO)) {
                         if (_log.shouldLog(Log.WARN))
                             _log.warn(getJobId() + ": Error selecting closest hash that wasnt a router! " 
                                       + peer + " : " + ds.getClass().getName());
@@ -635,7 +635,7 @@ class SearchJob extends JobImpl {
      *
      */
     private void resend() {
-        DataStructure ds = _facade.lookupLeaseSetLocally(_state.getTarget());
+        DatabaseEntry ds = _facade.lookupLeaseSetLocally(_state.getTarget());
         if (ds == null) {
             if (SHOULD_RESEND_ROUTERINFO) {
                 ds = _facade.lookupRouterInfoLocally(_state.getTarget());
@@ -665,8 +665,7 @@ class SearchJob extends JobImpl {
      */
     private boolean resend(RouterInfo toPeer, LeaseSet ls) {
         DatabaseStoreMessage msg = new DatabaseStoreMessage(getContext());
-        msg.setKey(ls.getDestination().calculateHash());
-        msg.setLeaseSet(ls);
+        msg.setEntry(ls);
         msg.setMessageExpiration(getContext().clock().now() + RESEND_TIMEOUT);
 
         TunnelInfo outTunnel = getContext().tunnelManager().selectOutboundTunnel();

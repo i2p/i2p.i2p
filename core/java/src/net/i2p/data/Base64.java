@@ -178,13 +178,13 @@ public class Base64 {
     }
 
     private static void runApp(String args[]) {
+        if ("encodestring".equalsIgnoreCase(args[0])) {
+            System.out.println(encode(args[1].getBytes()));
+            return;
+        }
+        InputStream in = System.in;
+        OutputStream out = System.out;
         try {
-            if ("encodestring".equalsIgnoreCase(args[0])) {
-                System.out.println(encode(args[1].getBytes()));
-                return;
-            }
-            InputStream in = System.in;
-            OutputStream out = System.out;
             if (args.length >= 3) {
                 out = new FileOutputStream(args[2]);
             }
@@ -201,6 +201,9 @@ public class Base64 {
             }
         } catch (IOException ioe) {
             ioe.printStackTrace(System.err);
+        } finally {
+            try { in.close(); } catch (IOException e) {}
+            try { out.close(); } catch (IOException e) {}
         }
     }
 

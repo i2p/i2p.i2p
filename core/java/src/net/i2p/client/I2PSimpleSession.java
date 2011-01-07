@@ -99,9 +99,16 @@ class I2PSimpleSession extends I2PSessionImpl2 {
     }
 
     /**
+     * Ignore, does nothing
+     * @since 0.8.4
+     */
+    @Override
+    public void updateOptions(Properties options) {}
+
+    /**
      * Only map message handlers that we will use
      */
-    class SimpleMessageHandlerMap extends I2PClientMessageHandlerMap {
+    private static class SimpleMessageHandlerMap extends I2PClientMessageHandlerMap {
         public SimpleMessageHandlerMap(I2PAppContext context) {
             int highest = Math.max(DestReplyMessage.MESSAGE_TYPE, BandwidthLimitsMessage.MESSAGE_TYPE);
             _handlers = new I2CPMessageHandler[highest+1];

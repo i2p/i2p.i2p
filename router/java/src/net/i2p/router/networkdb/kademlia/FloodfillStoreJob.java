@@ -12,7 +12,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import net.i2p.data.DataStructure;
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterInfo;
@@ -30,7 +30,7 @@ class FloodfillStoreJob extends StoreJob {
      * Send a data structure to the floodfills
      * 
      */
-    public FloodfillStoreJob(RouterContext context, FloodfillNetworkDatabaseFacade facade, Hash key, DataStructure data, Job onSuccess, Job onFailure, long timeoutMs) {
+    public FloodfillStoreJob(RouterContext context, FloodfillNetworkDatabaseFacade facade, Hash key, DatabaseEntry data, Job onSuccess, Job onFailure, long timeoutMs) {
         this(context, facade, key, data, onSuccess, onFailure, timeoutMs, null);
     }
     
@@ -38,7 +38,7 @@ class FloodfillStoreJob extends StoreJob {
      * @param toSkip set of peer hashes of people we dont want to send the data to (e.g. we
      *               already know they have it).  This can be null.
      */
-    public FloodfillStoreJob(RouterContext context, FloodfillNetworkDatabaseFacade facade, Hash key, DataStructure data, Job onSuccess, Job onFailure, long timeoutMs, Set<Hash> toSkip) {
+    public FloodfillStoreJob(RouterContext context, FloodfillNetworkDatabaseFacade facade, Hash key, DatabaseEntry data, Job onSuccess, Job onFailure, long timeoutMs, Set<Hash> toSkip) {
         super(context, facade, key, data, onSuccess, onFailure, timeoutMs, toSkip);
         _facade = facade;
     }
@@ -63,15 +63,12 @@ class FloodfillStoreJob extends StoreJob {
             }
             // Get the time stamp from the data we sent, so the Verify job can meke sure that
             // it finds something stamped with that time or newer.
-            long published = 0;
-            DataStructure data = _state.getData();
-            boolean isRouterInfo = data instanceof RouterInfo;
+            DatabaseEntry data = _state.getData();
+            boolean isRouterInfo = data.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO;
+            long published = data.getDate();
             if (isRouterInfo) {
-                published = ((RouterInfo) data).getPublished();
                 // Temporarily disable
                 return;
-            } else if (data instanceof LeaseSet) {
-                published = ((LeaseSet) data).getEarliestLeaseDate();
             }
             // we should always have exactly one successful entry
             Hash sentTo = null;

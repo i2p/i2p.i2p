@@ -46,10 +46,10 @@ public class TransportManager implements TransportEventListener {
     private RouterContext _context;
     private UPnPManager _upnpManager;
 
+    /** default true */
     public final static String PROP_ENABLE_UDP = "i2np.udp.enable";
+    /** default true */
     public final static String PROP_ENABLE_NTCP = "i2np.ntcp.enable";
-    public final static String DEFAULT_ENABLE_NTCP = "true";
-    public final static String DEFAULT_ENABLE_UDP = "true";
     /** default true */
     public final static String PROP_ENABLE_UPNP = "i2np.upnp.enable";
     
@@ -80,37 +80,33 @@ public class TransportManager implements TransportEventListener {
     }
 
     private void configTransports() {
-        String enableUDP = _context.router().getConfigSetting(PROP_ENABLE_UDP);
-        if (enableUDP == null)
-            enableUDP = DEFAULT_ENABLE_UDP;
-        if ("true".equalsIgnoreCase(enableUDP)) {
+        boolean enableUDP = _context.getBooleanPropertyDefaultTrue(PROP_ENABLE_UDP);
+        if (enableUDP) {
             UDPTransport udp = new UDPTransport(_context);
             addTransport(udp);
             initializeAddress(udp);
         }
-        if (enableNTCP(_context))
+        if (isNTCPEnabled(_context))
             addTransport(new NTCPTransport(_context));
         if (_transports.isEmpty())
             _log.log(Log.CRIT, "No transports are enabled");
     }
     
-    public static boolean enableNTCP(RouterContext ctx) {
-        String enableNTCP = ctx.router().getConfigSetting(PROP_ENABLE_NTCP);
-        if (enableNTCP == null)
-            enableNTCP = DEFAULT_ENABLE_NTCP;
-        return "true".equalsIgnoreCase(enableNTCP);
+    public static boolean isNTCPEnabled(RouterContext ctx) {
+        return ctx.getBooleanPropertyDefaultTrue(PROP_ENABLE_NTCP);
     }
     
-    private static void initializeAddress(Transport t) {
+    private void initializeAddress(Transport t) {
         String ips = Addresses.getAnyAddress();
         if (ips == null)
             return;
-        InetAddress ia = null;
+        InetAddress ia;
         try {
             ia = InetAddress.getByName(ips);
-        } catch (UnknownHostException e) {return;}
-        if (ia == null)
+        } catch (UnknownHostException e) {
+            _log.error("UDP failed to bind to local address", e);
             return;
+        }
         byte[] ip = ia.getAddress();
         t.externalAddressReceived(Transport.SOURCE_INTERFACE, ip, 0);
     }

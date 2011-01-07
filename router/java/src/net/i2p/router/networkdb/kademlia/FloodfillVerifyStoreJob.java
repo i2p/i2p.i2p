@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.i2p.data.DataStructure;
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.DatabaseLookupMessage;
@@ -201,10 +201,7 @@ public class FloodfillVerifyStoreJob extends JobImpl {
                 // Verify it's as recent as the one we sent
                 boolean success = false;
                 DatabaseStoreMessage dsm = (DatabaseStoreMessage)_message;
-                if (_isRouterInfo && dsm.getValueType() == DatabaseStoreMessage.KEY_TYPE_ROUTERINFO)
-                    success = dsm.getRouterInfo().getPublished() >= _published;
-                else if ((!_isRouterInfo) && dsm.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET)
-                    success = dsm.getLeaseSet().getEarliestLeaseDate() >= _published;
+                success = dsm.getEntry().getDate() >= _published;
                 if (success) {
                     // store ok, w00t!
                     getContext().profileManager().dbLookupSuccessful(_target, delay);
@@ -218,7 +215,7 @@ public class FloodfillVerifyStoreJob extends JobImpl {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Verify failed (older) for " + _key);
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Rcvd older lease: " + dsm.getLeaseSet());
+                    _log.info("Rcvd older lease: " + dsm.getEntry());
             } else if (_message instanceof DatabaseSearchReplyMessage) {
                 // assume 0 old, all new, 0 invalid, 0 dup
                 getContext().profileManager().dbLookupReply(_target,  0,
@@ -245,11 +242,7 @@ public class FloodfillVerifyStoreJob extends JobImpl {
      *  So at least we'll try THREE ffs round-robin if things continue to fail...
      */
     private void resend() {
-        DataStructure ds;
-        if (_isRouterInfo)
-            ds = _facade.lookupRouterInfoLocally(_key);
-        else
-            ds = _facade.lookupLeaseSetLocally(_key);
+        DatabaseEntry ds = _facade.lookupLocally(_key);
         if (ds != null) {
             Set<Hash> toSkip = new HashSet(2);
             if (_sentTo != null)

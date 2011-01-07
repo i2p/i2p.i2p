@@ -13,14 +13,13 @@ import net.i2p.util.Log;
  *
  */
 public class MessageValidator {
-    private Log _log;
-    private RouterContext _context;
+    private final Log _log;
+    private final RouterContext _context;
     private DecayingBloomFilter _filter;
     
     
     public MessageValidator(RouterContext context) {
         _log = context.logManager().getLog(MessageValidator.class);
-        _filter = null;
         _context = context;
         context.statManager().createRateStat("router.duplicateMessageId", "Note that a duplicate messageId was received", "Router", 
                                              new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });

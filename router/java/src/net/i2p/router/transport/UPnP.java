@@ -554,7 +554,10 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 		return retval;
 	}
 
-	/** non-blocking */
+	/**
+	 *  non-blocking
+	 *  @param ports non-null
+	 */
 	public void onChangePublicPorts(Set<ForwardPort> ports, ForwardPortCallback cb) {
 		Set<ForwardPort> portsToDumpNow = null;
 		Set<ForwardPort> portsToForwardNow = null;
@@ -568,7 +571,7 @@ public class UPnP extends ControlPoint implements DeviceChangeListener, EventLis
 				portsToForward = ports;
 				portsToForwardNow = ports;
 				portsToDumpNow = null;
-			} else if(ports == null || ports.isEmpty()) {
+			} else if(ports.isEmpty()) {
 				portsToDumpNow = portsToForward;
 				portsToForward = ports;
 				portsToForwardNow = null;

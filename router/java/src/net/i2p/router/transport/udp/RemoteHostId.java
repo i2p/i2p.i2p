@@ -28,21 +28,15 @@ final class RemoteHostId {
     
     @Override
     public int hashCode() {
-        int rv = 0;
-        for (int i = 0; _ip != null && i < _ip.length; i++)
-            rv += _ip[i] << i;
-        for (int i = 0; _peerHash != null && i < _peerHash.length; i++)
-            rv += _peerHash[i] << i;
-        rv += _port;
-        return rv;
+        return DataHelper.hashCode(_ip) ^ DataHelper.hashCode(_peerHash) ^ _port;
     }
     
     @Override
     public boolean equals(Object obj) {
         if (obj == null) 
-            throw new NullPointerException("obj is null");
+            return false;
         if (!(obj instanceof RemoteHostId)) 
-            throw new ClassCastException("obj is a " + obj.getClass().getName());
+            return false;
         RemoteHostId id = (RemoteHostId)obj;
         return (_port == id.getPort()) && DataHelper.eq(_ip, id.getIP()) && DataHelper.eq(_peerHash, id.getPeerHash());
     }

@@ -69,7 +69,7 @@ import net.i2p.util.Log;
  * NOTE: Check info is unused.
  *
  */
-public class EstablishState {
+class EstablishState {
     private RouterContext _context;
     private Log _log;
 

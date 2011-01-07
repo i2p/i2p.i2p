@@ -484,14 +484,17 @@ public class PeerProfile {
     
     @Override
     public int hashCode() { return (_peer == null ? 0 : _peer.hashCode()); }
+
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) return false;
-        if (obj.getClass() != PeerProfile.class) return false;
-        if (_peer == null) return false;
+        if (obj == null ||
+            (!(obj instanceof PeerProfile)) ||
+            _peer == null)
+            return false;
         PeerProfile prof = (PeerProfile)obj;
         return _peer.equals(prof.getPeer());
     }
+
     @Override
     public String toString() { return "Profile: " + getPeer().toBase64(); }
     

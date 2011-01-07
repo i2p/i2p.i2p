@@ -178,8 +178,7 @@ public class PeerTestJob extends JobImpl {
      */
     private DatabaseStoreMessage buildMessage(RouterInfo peer, TunnelId replyTunnel, Hash replyGateway, long nonce, long expiration) {
         DatabaseStoreMessage msg = new DatabaseStoreMessage(getContext());
-        msg.setKey(peer.getIdentity().getHash());
-        msg.setRouterInfo(peer);
+        msg.setEntry(peer);
         msg.setReplyGateway(replyGateway);
         msg.setReplyTunnel(replyTunnel);
         msg.setReplyToken(nonce);

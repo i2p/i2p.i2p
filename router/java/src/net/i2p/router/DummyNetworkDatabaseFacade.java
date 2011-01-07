@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterInfo;
@@ -36,6 +37,7 @@ class DummyNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _routers.put(info.getIdentity().getHash(), info);
     }
     
+    public DatabaseEntry lookupLocally(Hash key) { return null; }
     public void lookupLeaseSet(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs) {}
     public LeaseSet lookupLeaseSetLocally(Hash key) { return null; }
     public void lookupRouterInfo(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs) {

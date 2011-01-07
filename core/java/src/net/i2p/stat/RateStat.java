@@ -108,7 +108,7 @@ public class RateStat {
 
     @Override
     public boolean equals(Object obj) {
-        if ((obj == null) || (obj.getClass() != RateStat.class)) return false;
+        if ((obj == null) || !(obj instanceof RateStat)) return false;
         RateStat rs = (RateStat) obj;
         if (DataHelper.eq(getGroupName(), rs.getGroupName()) && DataHelper.eq(getDescription(), rs.getDescription())
             && DataHelper.eq(getName(), rs.getName())) {

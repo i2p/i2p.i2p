@@ -352,6 +352,18 @@ public class RouterContext extends I2PAppContext {
     }
 
     /**
+     * @return new Properties with system and context properties
+     * @since 0.8.4
+     */
+    @Override
+    public Properties getProperties() { 
+        Properties rv = super.getProperties();
+        if (_router != null)
+            rv.putAll(_router.getConfigMap());
+        return rv;
+    }
+    
+    /**
      * The context's synchronized clock, which is kept context specific only to
      * enable simulators to play with clock skew among different instances.
      *

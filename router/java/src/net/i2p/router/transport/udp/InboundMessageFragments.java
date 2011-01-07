@@ -100,7 +100,7 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
 
         for (int i = 0; i < fragments; i++) {
             long mid = data.readMessageId(i);
-            Long messageId = new Long(mid);
+            Long messageId = Long.valueOf(mid);
 
             if (_recentlyCompletedMessages.isKnown(mid)) {
                 _context.statManager().addRateData("udp.ignoreRecentDuplicate", 1, 0);

@@ -73,7 +73,7 @@ public class HopConfig {
     }
     public void setSendTunnelId(byte id[]) { _sendTunnelId = id; }
     
-    private TunnelId getTunnel(byte id[]) {
+    private static TunnelId getTunnel(byte id[]) {
         if (id == null)
             return null;
         else

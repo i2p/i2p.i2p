@@ -30,15 +30,17 @@ import net.i2p.util.Log;
  *
  */
 public class InNetMessagePool implements Service {
-    private Log _log;
-    private RouterContext _context;
-    private HandlerJobBuilder _handlerJobBuilders[];
+    private final Log _log;
+    private final RouterContext _context;
+    private final HandlerJobBuilder _handlerJobBuilders[];
+
     /** following 5 unused unless DISPATCH_DIRECT == false */
     private final List _pendingDataMessages;
     private final List _pendingDataMessagesFrom;
     private final List _pendingGatewayMessages;
     private SharedShortCircuitDataJob _shortCircuitDataJob;
     private SharedShortCircuitGatewayJob _shortCircuitGatewayJob;
+
     private boolean _alive;
     private boolean _dispatchThreaded;
     
