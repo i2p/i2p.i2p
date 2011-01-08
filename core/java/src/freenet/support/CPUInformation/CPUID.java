@@ -1,5 +1,6 @@
 /*
  * Created on Jul 14, 2004
+ * Updated on Jan 8, 2011
  */
 package freenet.support.CPUInformation;
 
@@ -129,10 +130,25 @@ public class CPUID {
         CPUIDResult c = doCPUID(1);
         return c.EAX & 0xf;
     }
-    private static int getCPUFlags()
+    private static int getEDXCPUFlags()
     {
         CPUIDResult c = doCPUID(1);
         return c.EDX;
+    }
+    private static int getECXCPUFlags()
+    {
+        CPUIDResult c = doCPUID(1);
+        return c.ECX;
+    }
+    private static int getExtendedEDXCPUFlags()
+    {
+        CPUIDResult c = doCPUID(0x80000001);
+        return c.EDX;
+    }
+    private static int getExtendedECXCPUFlags()
+    {
+        CPUIDResult c = doCPUID(0x80000001);
+        return c.ECX;
     }
     
     //Returns a CPUInfo item for the current type of CPU
@@ -163,13 +179,25 @@ public class CPUID {
             return getCPUVendorID();
         }
         public boolean hasMMX(){
-            return (getCPUFlags() & 0x800000) >0; //Bit 23
+            return (getEDXCPUFlags() & 0x800000) >0; //EDX Bit 23
         }
         public boolean hasSSE(){
-            return (getCPUFlags() & 0x2000000) >0; //Bit 25
+            return (getEDXCPUFlags() & 0x2000000) >0; //EDX Bit 25
         }
         public boolean hasSSE2(){
-            return (getCPUFlags() & 0x4000000) >0; //Bit 26
+            return (getEDXCPUFlags() & 0x4000000) >0; //EDX Bit 26
+        }
+        public boolean hasSSE3(){
+            return (getEDXCPUFlags() & 0x1) >0; //ECX Bit 0
+        }
+        public boolean hasSSE41(){
+            return (getEDXCPUFlags() & 0x80000) >0; //ECX Bit 19
+        }
+        public boolean hasSSE42(){
+            return (getEDXCPUFlags() & 0x100000) >0; //ECX Bit 20
+        }
+        public boolean hasSSE4A(){
+            return (getExtendedECXCPUFlags() & 0x40) >0; //Extended ECX Bit 6
         }
         public boolean IsC3Compatible() { return false; }
     }
@@ -301,72 +329,102 @@ public class CPUID {
         }
         public boolean IsPentium4Compatible()
         {
-            return getCPUFamily() >= 15;
+        	if (getCPUFamily() >= 15){
+        		return true;
+        	} else if (getCPUExtendedModel() == 1 && (getCPUFamily() == 6 && (getCPUModel() == 10 || getCPUModel() == 13))){
+        		return true;
+        	} else if (getCPUExtendedModel() == 1 && getCPUFamily() == 6 && getCPUModel() == 10){
+        		return true;
+        	} else {
+        		return false;
+        	}
         }
         public String getCPUModelString() throws UnknownCPUException {
-            if(getCPUFamily() == 4){
-                switch(getCPUModel()){
-                    case 0:
-                        return "486 DX-25/33";
-                    case 1:
-                        return "486 DX-50";
-                    case 2:
-                        return "486 SX";
-                    case 3:
-                        return "486 DX/2";
-                    case 4:
-                        return "486 SL";
-                    case 5:
-                        return "486 SX/2";
-                    case 7:
-                        return "486 DX/2-WB";
-                    case 8:
-                        return "486 DX/4";
-                    case 9:
-                        return "486 DX/4-WB";
-                }
-            }
-            if(getCPUFamily() == 5){
-                switch(getCPUModel()){
-                    case 0:
-                        return "Pentium 60/66 A-step";
-                    case 1:
-                        return "Pentium 60/66";
-                    case 2:
-                        return "Pentium 75 - 200";
-                    case 3:
-                        return "OverDrive PODP5V83";
-                    case 4:
-                        return "Pentium MMX";
-                    case 7:
-                        return "Mobile Pentium 75 - 200";
-                    case 8:
-                        return "Mobile Pentium MMX";
-                }
+        	if (getCPUExtendedModel() == 0){
+	            if(getCPUFamily() == 4){
+	                switch(getCPUModel()){
+	                    case 0:
+	                        return "486 DX-25/33";
+	                    case 1:
+	                        return "486 DX-50";
+	                    case 2:
+	                        return "486 SX";
+	                    case 3:
+	                        return "486 DX/2";
+	                    case 4:
+	                        return "486 SL";
+	                    case 5:
+	                        return "486 SX/2";
+	                    case 7:
+	                        return "486 DX/2-WB";
+	                    case 8:
+	                        return "486 DX/4";
+	                    case 9:
+	                        return "486 DX/4-WB";
+	                }
+	            }
+        	}
+            if (getCPUExtendedModel() == 0){
+	            if(getCPUFamily() == 5){
+	                switch(getCPUModel()){
+	                    case 0:
+	                        return "Pentium 60/66 A-step";
+	                    case 1:
+	                        return "Pentium 60/66";
+	                    case 2:
+	                        return "Pentium 75 - 200";
+	                    case 3:
+	                        return "OverDrive PODP5V83";
+	                    case 4:
+	                        return "Pentium MMX";
+	                    case 7:
+	                        return "Mobile Pentium 75 - 200";
+	                    case 8:
+	                        return "Mobile Pentium MMX";
+	                }
+	            }
             }
             if(getCPUFamily() == 6){
-                switch(getCPUModel()){
-                    case 0:
-                        return "Pentium Pro A-step";
-                    case 1:
-                        return "Pentium Pro";
-                    case 3:
-                        return "Pentium II (Klamath)";
-                    case 5:
-                        return "Pentium II (Deschutes), Celeron (Covington), Mobile Pentium II (Dixon)";
-                    case 6:
-                        return "Mobile Pentium II, Celeron (Mendocino)";
-                    case 7:
-                        return "Pentium III (Katmai)";
-                    case 8:
-                        return "Pentium III (Coppermine), Celeron w/SSE";
-                    case 9:
-                        return "Mobile Pentium III";
-                    case 10:
-                        return "Pentium III Xeon (Cascades)";
-                    case 11:
-                        return "Pentium III (130 nm)";
-                }
+            	if (getCPUExtendedModel() == 0){
+	                switch(getCPUModel()){
+	                    case 0:
+	                        return "Pentium Pro A-step";
+	                    case 1:
+	                        return "Pentium Pro";
+	                    case 3:
+	                        return "Pentium II (Klamath)";
+	                    case 5:
+	                        return "Pentium II (Deschutes), Celeron (Covington), Mobile Pentium II (Dixon)";
+	                    case 6:
+	                        return "Mobile Pentium II, Celeron (Mendocino)";
+	                    case 7:
+	                        return "Pentium III (Katmai)";
+	                    case 8:
+	                        return "Pentium III (Coppermine), Celeron w/SSE";
+	                    case 9:
+	                        return "Mobile Pentium III (Banias)";
+	                    case 10:
+	                        return "Pentium III Xeon (Cascades)";
+	                    case 11:
+	                        return "Pentium III (130 nm)";
+	                    case 13:
+	                        return "Mobile Pentium III (Dothan)";
+	                    case 14:
+	                        return "Mobile Core (Yonah)";
+	                    case 15:
+	                        return "Core 2 (Conroe)";
+	                }
+            	}
+            	if (getCPUExtendedModel() == 1){
+            		 switch(getCPUModel()){
+            		 	case 10:
+            		 		return "Core i7";
+            		 	case 12:
+            		 		return "Atom";
+            		 	case 13:
+            		 		return "Xeon MP";
+            		 }
+            	}
             }
             if(getCPUFamily() == 7){
                 switch(getCPUModel()){
@@ -384,6 +442,10 @@ public class CPUID {
                             return "Pentium IV (130 nm)";
                         case 3:
                             return "Pentium IV (90 nm)";
+                        case 4:
+                            return "Pentium IV (90 nm)";
+                        case 6:
+                            return "Pentium IV (65 nm)";
                     }
                 }
                 if(getCPUExtendedFamily() == 1){
@@ -407,7 +469,7 @@ public class CPUID {
         System.out.println("CPU Family: " + getCPUFamily());
         System.out.println("CPU Model: " + getCPUModel());
         System.out.println("CPU Stepping: " + getCPUStepping());
-        System.out.println("CPU Flags: " + getCPUFlags());
+        System.out.println("CPU Flags: " + getEDXCPUFlags());
         
         CPUInfo c = getInfo();
         System.out.println(" **More CPUInfo**");
@@ -415,6 +477,10 @@ public class CPUID {
         System.out.println(" CPU has MMX: " + c.hasMMX());
         System.out.println(" CPU has SSE: " + c.hasSSE());
         System.out.println(" CPU has SSE2: " + c.hasSSE2());
+        System.out.println(" CPU has SSE3: " + c.hasSSE3());
+        System.out.println(" CPU has SSE4.1: " + c.hasSSE41());
+        System.out.println(" CPU has SSE4.2: " + c.hasSSE42());
+        System.out.println(" CPU has SSE4A: " + c.hasSSE4A());
         if(c instanceof IntelCPUInfo){
             System.out.println("  **Intel-info**");
             System.out.println("  Is pII-compatible: "+((IntelCPUInfo)c).IsPentium2Compatible());
