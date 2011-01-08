@@ -333,7 +333,7 @@ public class CPUID {
         		return true;
         	} else if (getCPUExtendedModel() == 1 && (getCPUFamily() == 6 && (getCPUModel() == 10 || getCPUModel() == 13))){
         		return true;
-        	} else if (getCPUExtendedModel() == 1 && getCPUFamily() == 6 && getCPUModel() == 10){
+        	} else if (getCPUExtendedModel() == 0 && getCPUFamily() == 6 && getCPUModel() == 15){
         		return true;
         	} else {
         		return false;
