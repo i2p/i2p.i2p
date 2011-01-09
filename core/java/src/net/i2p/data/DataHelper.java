@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -1040,23 +1041,43 @@ public class DataHelper {
     }
 
     /**
-     *  Sort based on the Hash of the DataStructure
+     *  Sort based on the Hash of the DataStructure.
      *  Warning - relatively slow.
-     *  Only used by RouterInfo
-     *  Why? Just because it has to be consistent so signing will work?
+     *  WARNING - this sort order must be consistent network-wide, so while the order is arbitrary,
+     *  it cannot be changed.
+     *  Why? Just because it has to be consistent so signing will work.
      *  How to spec as returning the same type as the param?
+     *  DEPRECATED - Only used by RouterInfo.
      */
     public static List<? extends DataStructure> sortStructures(Collection<? extends DataStructure> dataStructures) {
         if (dataStructures == null) return Collections.EMPTY_LIST;
-        ArrayList<DataStructure> rv = new ArrayList(dataStructures.size());
-        TreeMap<String, DataStructure> tm = new TreeMap();
-        for (DataStructure struct : dataStructures) {
-            tm.put(struct.calculateHash().toString(), struct);
-        }
-        for (DataStructure struct : tm.values()) {
-            rv.add(struct);
-        }
+
+        // This used to use Hash.toString(), which is insane, since a change to toString()
+        // would break the whole network. Now use Hash.toBase64().
+        // Note that the Base64 sort order is NOT the same as the raw byte sort order,
+        // despite what you may read elsewhere.
+
+        //ArrayList<DataStructure> rv = new ArrayList(dataStructures.size());
+        //TreeMap<String, DataStructure> tm = new TreeMap();
+        //for (DataStructure struct : dataStructures) {
+        //    tm.put(struct.calculateHash().toString(), struct);
+        //}
+        //for (DataStructure struct : tm.values()) {
+        //    rv.add(struct);
+        //}
+        ArrayList<DataStructure> rv = new ArrayList(dataStructures);
+        Collections.sort(rv, new DataStructureComparator());
         return rv;
+    }
+
+    /**
+     * See sortStructures() comments.
+     * @since 0.8.3
+     */
+    private static class DataStructureComparator implements Comparator<DataStructure> {
+        public int compare(DataStructure l, DataStructure r) {
+            return l.calculateHash().toBase64().compareTo(r.calculateHash().toBase64());
+        }
     }
 
     /**
