@@ -39,19 +39,22 @@ import net.i2p.util.SecureFileOutputStream;
  *
  */
 class PersistentDataStore extends TransientDataStore {
-    private Log _log;
-    private String _dbDir;
-    private KademliaNetworkDatabaseFacade _facade;
-    private Writer _writer;
-    private ReadJob _readJob;
+    private final Log _log;
+    private final File _dbDir;
+    private final KademliaNetworkDatabaseFacade _facade;
+    private final Writer _writer;
+    private final ReadJob _readJob;
     private boolean _initialized;
     
     private final static int READ_DELAY = 60*1000;
     
-    public PersistentDataStore(RouterContext ctx, String dbDir, KademliaNetworkDatabaseFacade facade) {
+    /**
+     *  @param dbDir relative path
+     */
+    public PersistentDataStore(RouterContext ctx, String dbDir, KademliaNetworkDatabaseFacade facade) throws IOException {
         super(ctx);
         _log = ctx.logManager().getLog(PersistentDataStore.class);
-        _dbDir = dbDir;
+        _dbDir = getDbDir(dbDir);
         _facade = facade;
         _readJob = new ReadJob();
         _context.jobQueue().addJob(_readJob);
@@ -79,7 +82,6 @@ class PersistentDataStore extends TransientDataStore {
     @Override
     public void restart() {
         super.restart();
-        _dbDir = _facade.getDbDir();
     }
     
     @Override
@@ -160,8 +162,7 @@ class PersistentDataStore extends TransientDataStore {
             if (_log.shouldLog(Log.INFO))
                 _log.info("Removing key " + _key /* , getAddedBy() */);
             try {
-                File dbDir = getDbDir();
-                removeFile(_key, dbDir);
+                removeFile(_key, _dbDir);
             } catch (IOException ioe) {
                 _log.error("Error removing key " + _key, ioe);
             }
@@ -236,7 +237,10 @@ class PersistentDataStore extends TransientDataStore {
 
                 if (key != null) {
                     if (data != null) {
-                        write(key, data);
+                        // synch with the reader job
+                        synchronized (_dbDir) {
+                            write(key, data);
+                        }
                         data = null;
                     }
                     key = null;
@@ -278,7 +282,6 @@ class PersistentDataStore extends TransientDataStore {
         File dbFile = null;
         try {
             String filename = null;
-            File dbDir = getDbDir();
 
             if (data instanceof LeaseSet)
                 filename = getLeaseSetName(key);
@@ -287,7 +290,7 @@ class PersistentDataStore extends TransientDataStore {
             else
                 throw new IOException("We don't know how to write objects of type " + data.getClass().getName());
 
-            dbFile = new File(dbDir, filename);
+            dbFile = new File(_dbDir, filename);
             long dataPublishDate = getPublishDate(data);
             if (dbFile.lastModified() < dataPublishDate) {
                 // our filesystem is out of date, lets replace it
@@ -326,14 +329,26 @@ class PersistentDataStore extends TransientDataStore {
     /** This is only for manual reseeding? Why bother every 60 sec??? */
     private class ReadJob extends JobImpl {
         private boolean _alreadyWarned;
+        private long _lastModified;
+
         public ReadJob() {
             super(PersistentDataStore.this._context);
             _alreadyWarned = false;
         }
+
         public String getName() { return "DB Read Job"; }
+
         public void runJob() {
-            _log.info("Rereading new files");
-            readFiles();
+            // check directory mod time to save a lot of object churn in scanning all the file names
+            long lastMod = _dbDir.lastModified();
+            if (lastMod > _lastModified) {
+                _lastModified = lastMod;
+                _log.info("Rereading new files");
+                // synch with the writer job
+                synchronized (_dbDir) {
+                    readFiles();
+                }
+            }
             requeue(READ_DELAY);
         }
         
@@ -343,9 +358,8 @@ class PersistentDataStore extends TransientDataStore {
         
         private void readFiles() {
             int routerCount = 0;
-            try {
-                File dbDir = getDbDir();
-                File routerInfoFiles[] = dbDir.listFiles(RouterInfoFilter.getInstance());
+
+                File routerInfoFiles[] = _dbDir.listFiles(RouterInfoFilter.getInstance());
                 if (routerInfoFiles != null) {
                     routerCount += routerInfoFiles.length;
                     if (routerInfoFiles.length > 5)
@@ -360,9 +374,6 @@ class PersistentDataStore extends TransientDataStore {
                         }
                     }
                 }
-            } catch (IOException ioe) {
-                _log.error("Error reading files in the db dir", ioe);
-            }
             
             if (!_alreadyWarned) {
                 ReseedChecker.checkReseed(_context, routerCount);
@@ -442,8 +453,8 @@ class PersistentDataStore extends TransientDataStore {
     }
     
     
-    private File getDbDir() throws IOException {
-        File f = new SecureDirectory(_context.getRouterDir(), _dbDir);
+    private File getDbDir(String dbDir) throws IOException {
+        File f = new SecureDirectory(_context.getRouterDir(), dbDir);
         if (!f.exists()) {
             boolean created = f.mkdirs();
             if (!created)
