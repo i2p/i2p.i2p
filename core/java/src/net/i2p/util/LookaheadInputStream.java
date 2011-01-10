@@ -78,6 +78,7 @@ public class LookaheadInputStream extends FilterInputStream {
     /** grab the lookahead footer */
     public byte[] getFooter() { return _footerLookahead; }
     
+/*******
     public static void main(String args[]) {
         byte buf[] = new byte[32];
         for (int i = 0; i < 32; i++)
@@ -128,4 +129,5 @@ public class LookaheadInputStream extends FilterInputStream {
             return false;
         }
     }
+******/
 }

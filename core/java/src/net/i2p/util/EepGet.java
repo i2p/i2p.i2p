@@ -430,29 +430,33 @@ public class EepGet {
             _log.debug("Fetching (proxied? " + _shouldProxy + ") url=" + _actualURL);
         while (_keepFetching) {
             SocketTimeout timeout = null;
-            if (_fetchHeaderTimeout > 0)
+            if (_fetchHeaderTimeout > 0) {
                 timeout = new SocketTimeout(_fetchHeaderTimeout);
-            final SocketTimeout stimeout = timeout; // ugly - why not use sotimeout?
-            timeout.setTimeoutCommand(new Runnable() {
-                public void run() {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("timeout reached on " + _url + ": " + stimeout);
-                    _aborted = true;
-                }
-            });
-            timeout.setTotalTimeoutPeriod(_fetchEndTime);
+                final SocketTimeout stimeout = timeout; // ugly - why not use sotimeout?
+                timeout.setTimeoutCommand(new Runnable() {
+                    public void run() {
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("timeout reached on " + _url + ": " + stimeout);
+                        _aborted = true;
+                    }
+                });
+                timeout.setTotalTimeoutPeriod(_fetchEndTime);
+            }
             try {
                 for (int i = 0; i < _listeners.size(); i++) 
                     _listeners.get(i).attempting(_url);
                 sendRequest(timeout);
-                timeout.resetTimer();
+                if (timeout != null)
+                    timeout.resetTimer();
                 doFetch(timeout);
-                timeout.cancel();
+                if (timeout != null)
+                    timeout.cancel();
                 if (!_transferFailed)
                     return true;
                 break;
             } catch (IOException ioe) {
-                timeout.cancel();
+                if (timeout != null)
+                    timeout.cancel();
                 for (int i = 0; i < _listeners.size(); i++) 
                     _listeners.get(i).attemptFailed(_url, _bytesTransferred, _bytesRemaining, _currentAttempt, _numRetries, ioe);
                 if (_log.shouldLog(Log.WARN))
@@ -492,7 +496,10 @@ public class EepGet {
         return false;
     }
 
-    /** single fetch */
+    /**
+     *  single fetch
+     *  @param timeout may be null
+     */
     protected void doFetch(SocketTimeout timeout) throws IOException {
         _headersRead = false;
         _aborted = false;
@@ -504,11 +511,13 @@ public class EepGet {
         if (_aborted)
             throw new IOException("Timed out reading the HTTP headers");
         
-        timeout.resetTimer();
-        if (_fetchInactivityTimeout > 0)
-            timeout.setInactivityTimeout(_fetchInactivityTimeout);
-        else
-            timeout.setInactivityTimeout(INACTIVITY_TIMEOUT);
+        if (timeout != null) {
+            timeout.resetTimer();
+            if (_fetchInactivityTimeout > 0)
+                timeout.setInactivityTimeout(_fetchInactivityTimeout);
+            else
+                timeout.setInactivityTimeout(INACTIVITY_TIMEOUT);
+        }
         
         if (_redirectLocation != null) {
             //try {
@@ -571,7 +580,8 @@ public class EepGet {
             int read = _proxyIn.read(buf, 0, toRead);
             if (read == -1)
                 break;
-            timeout.resetTimer();
+            if (timeout != null)
+                timeout.resetTimer();
             _out.write(buf, 0, read);
             _bytesTransferred += read;
             if ((_maxSize > -1) && (_alreadyTransferred + read > _maxSize)) // could transfer a little over maxSize
@@ -597,7 +607,8 @@ public class EepGet {
                     read++;
                 }
             }
-            timeout.resetTimer();
+            if (timeout != null)
+                timeout.resetTimer();
             if (_bytesRemaining >= read) // else chunked?
                 _bytesRemaining -= read;
             if (read > 0) {
@@ -622,7 +633,8 @@ public class EepGet {
         if (_aborted)
             throw new IOException("Timed out reading the HTTP data");
         
-        timeout.cancel();
+        if (timeout != null)
+            timeout.cancel();
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Done transferring " + _bytesTransferred + " (ok? " + !_transferFailed + ")");
@@ -867,6 +879,9 @@ public class EepGet {
     private static final byte NL = '\n';
     private static boolean isNL(byte b) { return (b == NL); }
 
+    /**
+     *  @param timeout may be null
+     */
     protected void sendRequest(SocketTimeout timeout) throws IOException {
         if (_outputStream != null) {
             // We are reading into a stream supplied by a caller,
@@ -907,7 +922,8 @@ public class EepGet {
         _proxyIn = _proxy.getInputStream();
         _proxyOut = _proxy.getOutputStream();
         
-        timeout.setSocket(_proxy);
+        if (timeout != null)
+            timeout.setSocket(_proxy);
         
         _proxyOut.write(DataHelper.getUTF8(req));
         _proxyOut.flush();

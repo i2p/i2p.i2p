@@ -90,7 +90,7 @@ public class SimpleTimer {
         int totalEvents = 0;
         long now = System.currentTimeMillis();
         long eventTime = now + timeoutMs;
-        Long time = new Long(eventTime);
+        Long time = Long.valueOf(eventTime);
         synchronized (_events) {
             // remove the old scheduled position, then reinsert it
             Long oldTime = (Long)_eventTimes.get(event);

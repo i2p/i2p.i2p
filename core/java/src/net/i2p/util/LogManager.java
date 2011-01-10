@@ -164,8 +164,10 @@ public class LogManager {
         Log rv = _logs.get(scope);
         if (rv == null) {
             rv = new Log(this, cls, name);
-            _logs.putIfAbsent(scope, rv);
-            isNew = true;
+            Log old = _logs.putIfAbsent(scope, rv);
+            isNew = old == null;
+            if (!isNew)
+                rv = old;
         }
         if (isNew)
             updateLimit(rv);
@@ -178,8 +180,9 @@ public class LogManager {
     }
 
     void addLog(Log log) {
-        _logs.putIfAbsent(log.getScope(), log);
-        updateLimit(log);
+        Log old = _logs.putIfAbsent(log.getScope(), log);
+        if (old == null)
+            updateLimit(log);
     }
     
     public LogConsoleBuffer getBuffer() { return _consoleBuffer; }

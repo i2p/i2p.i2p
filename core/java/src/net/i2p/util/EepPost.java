@@ -31,6 +31,7 @@ public class EepPost {
         _log = ctx.logManager().getLog(EepPost.class);
     }
     
+/*****
     public static void main(String args[]) {
         EepPost e = new EepPost();
         Map fields = new HashMap();
@@ -47,6 +48,8 @@ public class EepPost {
         //e.postFiles("http://localhost/cgi-bin/read.pl", null, -1, fields, null);
         //e.postFiles("http://localhost:2001/import.jsp", null, -1, fields, null);
     }
+*****/
+
     /**
      * Submit an HTTP POST to the given URL (using the proxy if specified),
      * uploading the given fields.  If the field's value is a File object, then
@@ -117,7 +120,7 @@ public class EepPost {
                     }
                 }
                 out.close();
-            } catch (Exception e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             } finally {
                 if (s != null) try { s.close(); } catch (IOException ioe) {}

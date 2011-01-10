@@ -55,7 +55,7 @@ public class SimpleTimer2 {
         _executor.shutdownNow();
     }
 
-    private class CustomScheduledThreadPoolExecutor extends ScheduledThreadPoolExecutor {
+    private static class CustomScheduledThreadPoolExecutor extends ScheduledThreadPoolExecutor {
         public CustomScheduledThreadPoolExecutor(int threads, ThreadFactory factory) {
              super(threads, factory);
         }
