@@ -249,7 +249,6 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         }
 
         // If the last leaseSet we sent him is still good, don't bother sending again
-        long now = getContext().clock().now();
         synchronized (_leaseSetCache) {
             if (!force) {
                 LeaseSet ls = _leaseSetCache.get(hashPair());
@@ -326,7 +325,6 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                 _log.warn(getJobId() + ": Lookup locally didn't find the leaseSet for " + _toString);
             return false;
         } 
-        long now = getContext().clock().now();
 
         // Use the same lease if it's still good
         // Even if _leaseSet changed, _leaseSet.getEncryptionKey() didn't...
@@ -373,7 +371,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         
         // randomize the ordering (so leases with equal # of failures per next 
         // sort are randomly ordered)
-        Collections.shuffle(leases);
+        Collections.shuffle(leases, getContext().random());
         
 /****
         if (false) {
@@ -793,7 +791,6 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
 
     private TunnelInfo selectOutboundTunnel(Destination to) {
         TunnelInfo tunnel;
-        long now = getContext().clock().now();
         synchronized (_tunnelCache) {
             /**
              * If old tunnel is valid and no longer backlogged, use it.
