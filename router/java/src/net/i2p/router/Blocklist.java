@@ -679,7 +679,7 @@ public class Blocklist {
             return;
         Job job = new ShitlistJob(peer);
         if (number > 0)
-            job.getTiming().setStartAfter(_context.clock().now() + (number * 30*1000));
+            job.getTiming().setStartAfter(_context.clock().now() + (30*1000l * number));
         _context.jobQueue().addJob(job);
     }
 

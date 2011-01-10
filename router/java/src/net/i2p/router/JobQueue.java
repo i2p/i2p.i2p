@@ -208,7 +208,7 @@ public class JobQueue {
      * <code>false</code> if the job is finished or doesn't exist in the queue.
      */
     public boolean isJobActive(Job job) {
-        if (_readyJobs.contains(job) | _timedJobs.contains(job))
+        if (_readyJobs.contains(job) || _timedJobs.contains(job))
             return true;
         for (JobQueueRunner runner: _queueRunners.values())
             if (runner.getCurrentJob() == job)
@@ -689,7 +689,7 @@ public class JobQueue {
         TreeMap<Long, Job> ordered = new TreeMap();
         for (int i = 0; i < timedJobs.size(); i++) {
             Job j = timedJobs.get(i);
-            ordered.put(new Long(j.getTiming().getStartAfter()), j);
+            ordered.put(Long.valueOf(j.getTiming().getStartAfter()), j);
         }
         for (Iterator<Job> iter = ordered.values().iterator(); iter.hasNext(); ) {
             Job j = iter.next();

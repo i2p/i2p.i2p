@@ -98,7 +98,7 @@ class RouterThrottleImpl implements RouterThrottle {
         if (_context.router().getUptime() < 20*60*1000)
             return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
 
-        long lag = _context.jobQueue().getMaxLag();
+        //long lag = _context.jobQueue().getMaxLag();
         // reject here if lag too high???
         
         RateStat rs = _context.statManager().getRate("transport.sendProcessingTime");

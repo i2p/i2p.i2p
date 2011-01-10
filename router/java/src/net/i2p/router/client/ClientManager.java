@@ -433,7 +433,9 @@ class ClientManager {
         }
     }
     
+    /** @deprecated unused */
     public void renderStatusHTML(Writer out) throws IOException {
+/******
         StringBuilder buf = new StringBuilder(8*1024);
         buf.append("<u><b>Local destinations</b></u><br>");
         
@@ -479,6 +481,7 @@ class ClientManager {
         buf.append("\n<hr>\n");
         out.write(buf.toString());
         out.flush();
+******/
     }
     
     public void messageReceived(ClientMessage msg) {

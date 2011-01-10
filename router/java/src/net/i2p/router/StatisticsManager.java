@@ -157,9 +157,12 @@ public class StatisticsManager implements Service {
         return stats;
     }
     
+/*****
     private void includeRate(String rateName, Properties stats, long selectedPeriods[]) {
         includeRate(rateName, stats, selectedPeriods, false);
     }
+*****/
+
     /**
      * @param fudgeQuantity the data being published in this stat is too sensitive to, uh
      *                      publish, so we're kludge the quantity (allowing the fairly safe
@@ -258,7 +261,6 @@ public class StatisticsManager implements Service {
             // bah saturation
             buf.append("0;0;0;0;");
         }
-        long numPeriods = rate.getLifetimePeriods();
         buf.append(num(fudgeQuantity)).append(';');
         return buf.toString();
     }

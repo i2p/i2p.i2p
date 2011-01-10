@@ -89,15 +89,18 @@ public class OutNetMessage {
             // only timestamp if we are debugging
             synchronized (this) {
                 locked_initTimestamps();
-                while (_timestamps.containsKey(eventName)) {
-                    eventName = eventName + '.';
-                }
-                _timestamps.put(eventName, new Long(now));
+                // ???
+                //while (_timestamps.containsKey(eventName)) {
+                //    eventName = eventName + '.';
+                //}
+                _timestamps.put(eventName, Long.valueOf(now));
                 _timestampOrder.add(eventName);
             }
         }
         return now - _created;
     }
+
+    /** @deprecated unused */
     public Map<String, Long> getTimestamps() {
         if (_log.shouldLog(Log.INFO)) {
             synchronized (this) {
@@ -107,6 +110,8 @@ public class OutNetMessage {
         }
         return Collections.EMPTY_MAP;
     }
+
+    /** @deprecated unused */
     public Long getTimestamp(String eventName) {
         if (_log.shouldLog(Log.INFO)) {
             synchronized (this) {
@@ -368,7 +373,7 @@ public class OutNetMessage {
     @Override
     public boolean equals(Object obj) {
         if(obj == null) return false;
-        if(obj.getClass() != OutNetMessage.class) return false;
+        if(!(obj instanceof OutNetMessage)) return false;
         return obj == this; // two OutNetMessages are different even if they contain the same message
     }
 }
