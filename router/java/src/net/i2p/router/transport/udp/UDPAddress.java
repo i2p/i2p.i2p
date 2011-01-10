@@ -10,6 +10,7 @@ import net.i2p.data.SessionKey;
 
 /**
  * basic helper to parse out peer info from a udp address
+ * FIXME public for ConfigNetHelper
  */
 public class UDPAddress {
     private String _host;
@@ -152,7 +153,7 @@ public class UDPAddress {
     }
     
     public String getHost() { return _host; }
-    public InetAddress getHostAddress() {
+    InetAddress getHostAddress() {
         if (_hostAddress == null) {
             try {
                 _hostAddress = InetAddress.getByName(_host);
@@ -163,10 +164,10 @@ public class UDPAddress {
         return _hostAddress;
     }
     public int getPort() { return _port; }
-    public byte[] getIntroKey() { return _introKey; }
+    byte[] getIntroKey() { return _introKey; }
     
-    public int getIntroducerCount() { return (_introAddresses == null ? 0 : _introAddresses.length); }
-    public InetAddress getIntroducerHost(int i) { 
+    int getIntroducerCount() { return (_introAddresses == null ? 0 : _introAddresses.length); }
+    InetAddress getIntroducerHost(int i) { 
         if (_introAddresses[i] == null) {
             try {
                 _introAddresses[i] = InetAddress.getByName(_introHosts[i]);
@@ -176,8 +177,8 @@ public class UDPAddress {
         }
         return _introAddresses[i];
     }
-    public int getIntroducerPort(int i) { return _introPorts[i]; }
-    public byte[] getIntroducerKey(int i) { return _introKeys[i]; }
-    public long getIntroducerTag(int i) { return _introTags[i]; }
+    int getIntroducerPort(int i) { return _introPorts[i]; }
+    byte[] getIntroducerKey(int i) { return _introKeys[i]; }
+    long getIntroducerTag(int i) { return _introTags[i]; }
         
 }
