@@ -229,7 +229,7 @@ public class TunnelGateway {
             synchronized (Pending.this) {
                 if (_messageIds == null)
                     _messageIds = new ArrayList();
-                _messageIds.add(new Long(id));
+                _messageIds.add(Long.valueOf(id));
             }
         }
         /**

@@ -743,7 +743,7 @@ public class TunnelDispatcher implements Service {
         
         private static final int LEAVE_BATCH_TIME = 10*1000;
         public void add(HopConfig cfg) {
-            Long dropTime = new Long(cfg.getExpiration() + 2*Router.CLOCK_FUDGE_FACTOR + LEAVE_BATCH_TIME);
+            Long dropTime = Long.valueOf(cfg.getExpiration() + 2*Router.CLOCK_FUDGE_FACTOR + LEAVE_BATCH_TIME);
             boolean noTunnels;
             synchronized (LeaveTunnel.this) {
                 noTunnels = _configs.isEmpty();
