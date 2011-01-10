@@ -247,11 +247,9 @@ public class SnarkManager implements Snark.CompleteListener {
                     i2cpOpts.put(pair.substring(0, split), pair.substring(split+1));
             }
         }
-        if (i2cpHost != null) {
-            _util.setI2CPConfig(i2cpHost, i2cpPort, i2cpOpts);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Configuring with I2CP options " + i2cpOpts);
-        }
+        _util.setI2CPConfig(i2cpHost, i2cpPort, i2cpOpts);
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Configuring with I2CP options " + i2cpOpts);
         //I2PSnarkUtil.instance().setI2CPConfig("66.111.51.110", 7654, new Properties());
         //String eepHost = _config.getProperty(PROP_EEP_HOST);
         //int eepPort = getInt(PROP_EEP_PORT, 4444);
@@ -338,6 +336,7 @@ public class SnarkManager implements Snark.CompleteListener {
                 	}
 
 	}
+        // FIXME do this even if == null
 	if (i2cpHost != null) {
             int oldI2CPPort = _util.getI2CPPort();
             String oldI2CPHost = _util.getI2CPHost();
@@ -383,6 +382,7 @@ public class SnarkManager implements Snark.CompleteListener {
                     Properties p = new Properties();
                     p.putAll(opts);
                     _util.setI2CPConfig(i2cpHost, port, p);
+                    _util.setMaxUpBW(getInt(PROP_UPBW_MAX, DEFAULT_MAX_UP_BW));
                     addMessage(_("I2CP and tunnel changes will take effect after stopping all torrents"));
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("i2cp host [" + i2cpHost + "] i2cp port " + port + " opts [" + opts 
@@ -396,6 +396,7 @@ public class SnarkManager implements Snark.CompleteListener {
                     p.putAll(opts);
                     addMessage(_("I2CP settings changed to {0}", i2cpHost + ":" + port + " (" + i2cpOpts.trim() + ")"));
                     _util.setI2CPConfig(i2cpHost, port, p);
+                    _util.setMaxUpBW(getInt(PROP_UPBW_MAX, DEFAULT_MAX_UP_BW));
                     boolean ok = _util.connect();
                     if (!ok) {
                         addMessage(_("Unable to connect with the new settings, reverting to the old I2CP settings"));

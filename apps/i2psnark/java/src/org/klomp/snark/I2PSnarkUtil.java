@@ -71,6 +71,7 @@ public class I2PSnarkUtil {
     public static final String DEFAULT_OPENTRACKERS = "http://tracker.welterde.i2p/a";
     public static final int DEFAULT_MAX_UP_BW = 8;  //KBps
     public static final int MAX_CONNECTIONS = 16; // per torrent
+    private static final String PROP_MAX_BW = "i2cp.outboundBytesPerSecond";
     private static final boolean ENABLE_DHT = true;
 
     public I2PSnarkUtil(I2PAppContext ctx) {
@@ -132,9 +133,21 @@ public class I2PSnarkUtil {
         _configured = true;
     }
     
+    /**
+     *  @param KBps
+     */
     public void setMaxUpBW(int limit) {
         _maxUpBW = limit;
+        _opts.put(PROP_MAX_BW, Integer.toString(limit * (1024 * 6 / 5)));   // add a little for overhead
         _configured = true;
+        if (_manager != null) {
+            I2PSession sess = _manager.getSession();
+            if (sess != null) {
+                Properties newProps = new Properties();
+                newProps.putAll(_opts);
+                sess.updateOptions(newProps);
+            }
+        }
     }
     
     public void setMaxConnections(int limit) {
@@ -154,6 +167,10 @@ public class I2PSnarkUtil {
     public int getEepProxyPort() { return _proxyPort; }
     public boolean getEepProxySet() { return _shouldProxy; }
     public int getMaxUploaders() { return _maxUploaders; }
+
+    /**
+     *  @return KBps
+     */
     public int getMaxUpBW() { return _maxUpBW; }
     public int getMaxConnections() { return _maxConnections; }
     public int getStartupDelay() { return _startupDelay; }  
@@ -166,7 +183,7 @@ public class I2PSnarkUtil {
             // try to find why reconnecting after stop
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Connecting to I2P", new Exception("I did it"));
-            Properties opts = new Properties();
+            Properties opts = _context.getProperties();
             if (_opts != null) {
                 for (Iterator iter = _opts.keySet().iterator(); iter.hasNext(); ) {
                     String key = (String)iter.next();

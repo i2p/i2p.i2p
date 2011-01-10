@@ -105,7 +105,7 @@ public class Storage
       {
         long length = lengths[i];
         total += length;
-        lengthsList.add(new Long(length));
+        lengthsList.add(Long.valueOf(length));
       }
 
     piece_size = MIN_PIECE_SIZE;
@@ -753,7 +753,8 @@ public class Storage
     openRAF(nr, false);  // RW
     // XXX - Is this the best way to make sure we have enough space for
     // the whole file?
-    listener.storageCreateFile(this, names[nr], lengths[nr]);
+    if (listener != null)
+        listener.storageCreateFile(this, names[nr], lengths[nr]);
     final int ZEROBLOCKSIZE = metainfo.getPieceLength(0);
     byte[] zeros;
     try {

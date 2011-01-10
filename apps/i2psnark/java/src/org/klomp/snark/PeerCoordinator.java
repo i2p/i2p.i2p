@@ -1185,7 +1185,7 @@ public class PeerCoordinator implements PeerListener
    *  @since 0.8.4
    */
   public void gotPeers(Peer peer, List<PeerID> peers) {
-
+      // spin off thread or timer task to do a new Peer() and an addPeer() for each one
   }
 
   /** Return number of allowed uploaders for this torrent.

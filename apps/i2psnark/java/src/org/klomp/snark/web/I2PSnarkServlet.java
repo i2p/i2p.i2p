@@ -755,8 +755,12 @@ public class I2PSnarkServlet extends Default {
             filename = filename.substring(0, i);
         String fullFilename = filename;
         if (filename.length() > MAX_DISPLAYED_FILENAME_LENGTH) {
-            fullFilename = new String(filename);
-            filename = filename.substring(0, MAX_DISPLAYED_FILENAME_LENGTH) + "&hellip;";
+            String start = filename.substring(0, MAX_DISPLAYED_FILENAME_LENGTH);
+            if (start.indexOf(" ") < 0 && start.indexOf("-") < 0) {
+                // browser has nowhere to break it
+                fullFilename = filename;
+                filename = start + "&hellip;";
+            }
         }
         long total = snark.getTotalLength();
         // Early typecast, avoid possibly overflowing a temp integer
@@ -1035,7 +1039,7 @@ public class I2PSnarkServlet extends Default {
                 } else {
                     pct = (float) 101.0;
                     // until we get the metainfo we don't know how many pieces there are
-                    out.write("??");
+                    //out.write("??");
                 }
                 out.write("</td>\n\t");
                 out.write("<td class=\"snarkTorrentStatus " + rowClass + "\">");
@@ -1134,7 +1138,6 @@ public class I2PSnarkServlet extends Default {
     }
 
     private void writeAddForm(PrintWriter out, HttpServletRequest req) throws IOException {
-        String uri = req.getRequestURI();
         String newURL = req.getParameter("newURL");
         if ( (newURL == null) || (newURL.trim().length() <= 0) )
             newURL = "";
@@ -1175,7 +1178,6 @@ public class I2PSnarkServlet extends Default {
     }
     
     private void writeSeedForm(PrintWriter out, HttpServletRequest req) throws IOException {
-        String uri = req.getRequestURI();
         String baseFile = req.getParameter("baseFile");
         if (baseFile == null || baseFile.trim().length() <= 0)
             baseFile = "";
@@ -1235,7 +1237,6 @@ public class I2PSnarkServlet extends Default {
     }
     
     private void writeConfigForm(PrintWriter out, HttpServletRequest req) throws IOException {
-        String uri = req.getRequestURI();
         String dataDir = _manager.getDataDir().getAbsolutePath();
         boolean autoStart = _manager.shouldAutoStart();
         boolean useOpenTrackers = _manager.util().shouldUseOpenTrackers();
@@ -1914,8 +1915,7 @@ private static class FetchAndAdd implements Runnable {
                         return;
                     }
 
-                    // don't hold object from this MetaInfo
-                    String name = new String(info.getName());
+                    String name = info.getName();
                     name = Storage.filterName(name);
                     name = name + ".torrent";
                     File torrentFile = new File(_manager.getDataDir(), name);

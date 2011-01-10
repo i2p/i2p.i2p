@@ -20,7 +20,6 @@
 
 package org.klomp.snark;
 
-import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -231,19 +230,8 @@ public class Peer implements Comparable
                 throw new IOException("Unable to reach " + peerID);
             }
             InputStream in = sock.getInputStream();
-            OutputStream out = sock.getOutputStream(); //new BufferedOutputStream(sock.getOutputStream());
-            if (true) {
-                // buffered output streams are internally synchronized, so we can't get through to the underlying
-                // I2PSocket's MessageOutputStream to close() it if we are blocking on a write(...).  Oh, and the
-                // buffer is unnecessary anyway, as unbuffered access lets the streaming lib do the 'right thing'.
-                //out = new BufferedOutputStream(out);
-                in = new BufferedInputStream(sock.getInputStream());
-            }
-            //BufferedInputStream bis
-            //  = new BufferedInputStream(sock.getInputStream());
-            //BufferedOutputStream bos
-            //  = new BufferedOutputStream(sock.getOutputStream());
-            byte [] id = handshake(in, out); //handshake(bis, bos);
+            OutputStream out = sock.getOutputStream();
+            byte [] id = handshake(in, out);
             byte [] expected_id = peerID.getID();
             if (expected_id == null) {
                 peerID.setID(id);
@@ -328,7 +316,7 @@ public class Peer implements Comparable
    * Sets DataIn/OutputStreams, does the handshake and returns the id
    * reported by the other side.
    */
-  private byte[] handshake(InputStream in, OutputStream out) //BufferedInputStream bis, BufferedOutputStream bos)
+  private byte[] handshake(InputStream in, OutputStream out)
     throws IOException
   {
     din = new DataInputStream(in);

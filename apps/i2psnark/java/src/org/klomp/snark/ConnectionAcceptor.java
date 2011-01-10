@@ -179,11 +179,8 @@ public class ConnectionAcceptor implements Runnable
           try {
               InputStream in = _socket.getInputStream();
               OutputStream out = _socket.getOutputStream();
-
-              if (true) {
-                  in = new BufferedInputStream(in);
-                  //out = new BufferedOutputStream(out);
-              }
+              // this is for the readahead in PeerAcceptor.connection()
+              in = new BufferedInputStream(in);
               if (_log.shouldLog(Log.DEBUG))
                   _log.debug("Handling socket from " + _socket.getPeerDestination().calculateHash().toBase64());
               peeracceptor.connection(_socket, in, out);

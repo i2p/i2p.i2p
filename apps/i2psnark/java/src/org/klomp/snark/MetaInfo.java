@@ -189,7 +189,7 @@ public class MetaInfo
             if (val == null)
               throw new InvalidBEncodingException("Missing length number");
             long len = val.getLong();
-            m_lengths.add(new Long(len));
+            m_lengths.add(Long.valueOf(len));
             l += len;
 
             val = (BEValue)desc.get("path");
@@ -438,7 +438,7 @@ public class MetaInfo
     info.put("piece length", Integer.valueOf(piece_length));
     info.put("pieces", piece_hashes);
     if (files == null)
-      info.put("length", new Long(length));
+      info.put("length", Long.valueOf(length));
     else
       {
         List l = new ArrayList();

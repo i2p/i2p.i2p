@@ -210,6 +210,7 @@ class PeerCheckerTask extends TimerTask
             if (_util.getDHT() != null && (_runCount % 5) == 0) {
                 _util.getDHT().announce(coordinator.getInfoHash(), peer.getPeerID().getDestHash());
             }
+            // send PEX
           }
 
         // Resync actual uploaders value

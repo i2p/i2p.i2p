@@ -108,7 +108,7 @@ public class Snark
           } catch (Throwable t) {
               System.out.println("OOM in the OOM");
           }
-          System.exit(0);
+          //System.exit(0);
       }
       
   }
@@ -980,7 +980,6 @@ public class Snark
       ("  <file> \tEither a local .torrent metainfo file to download");
     System.out.println
       ("         \tor (with --share) a file to share.");
-    System.exit(-1);
   }
 
   /**
@@ -1117,11 +1116,12 @@ public class Snark
     coordinator.setWantedPieces();
   }
 
+  /** SnarkSnutdown callback unused */
   public void shutdown()
   {
     // Should not be necessary since all non-deamon threads should
     // have died. But in reality this does not always happen.
-    System.exit(0);
+    //System.exit(0);
   }
   
   public interface CompleteListener {
