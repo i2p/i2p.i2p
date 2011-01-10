@@ -30,11 +30,13 @@ import net.i2p.util.Clock;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.FortunaRandomSource;
+import net.i2p.util.I2PProperties;
 import net.i2p.util.KeyRing;
 import net.i2p.util.LogManager;
 //import net.i2p.util.PooledRandomSource;
 import net.i2p.util.RandomSource;
 import net.i2p.util.SecureDirectory;
+import net.i2p.util.I2PProperties.I2PPropertyCallback;
 
 /**
  * <p>Provide a base scope for accessing singletons that I2P exposes.  Rather than
@@ -65,7 +67,7 @@ public class I2PAppContext {
     /** the context that components without explicit root are bound */
     protected static I2PAppContext _globalAppContext;
     
-    private Properties _overrideProps;
+    protected I2PProperties _overrideProps;
     
     private StatManager _statManager;
     private SessionKeyManager _sessionKeyManager;
@@ -168,7 +170,7 @@ public class I2PAppContext {
                     _globalAppContext = this;
             }
         }
-        _overrideProps = envProps;
+        _overrideProps = new I2PProperties(envProps);
         _statManager = null;
         _sessionKeyManager = null;
         _namingService = null;
@@ -482,6 +484,14 @@ public class I2PAppContext {
             names.addAll(_overrideProps.keySet());
         return names;
     }
+    
+    /**
+     * Add a callback, which will fire upon changes in the property
+     * given in the specific callback.
+     * Unimplemented in I2PAppContext: this only makes sense in a router context.
+     * @param callback The implementation of the callback.
+     */
+    public void addPropertyCallback(I2PPropertyCallback callback) {}
     
     /**
      * The statistics component with which we can track various events
