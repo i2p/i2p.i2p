@@ -74,7 +74,7 @@ public class RouterManager {
 	 */
 	public static void shutDown() {
 		if(inI2P()) {
-			getRouter().shutdownGracefully();
+			getRouter().shutdown(0);
 		}
     }
 	

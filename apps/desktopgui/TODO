@@ -11,6 +11,10 @@ HIGH PRIORITY:
 - Check if we're inside I2P without using a command-line parameter - DONE
 - Modify installer to set I2P directory parameter; or use $I2P? - Is already there
 - Include in installer - TODO
+- Start desktopgui without adding to clients.config and without adding a dependency on routerconsole!
+  * One possibility:
+        Adding some kind of 'ApplicationManager' that allows starting applications.
+        Extra remark: ApplicationManager should also allow stopping certain applications from launching.
 - Fix tabs versus spaces ;-)
 UNKNOWN:
 - API to allow applications to add themselves to the menu?
