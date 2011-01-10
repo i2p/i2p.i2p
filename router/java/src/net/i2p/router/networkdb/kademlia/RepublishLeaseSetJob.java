@@ -89,7 +89,7 @@ public class RepublishLeaseSetJob extends JobImpl {
         return _lastPublished;
     }
 
-    class OnRepublishSuccess extends JobImpl {
+    private static class OnRepublishSuccess extends JobImpl {
         public OnRepublishSuccess(RouterContext ctx) { super(ctx); }
         public String getName() { return "Publish leaseSet successful"; }
         public void runJob() { 
@@ -98,7 +98,7 @@ public class RepublishLeaseSetJob extends JobImpl {
         }
     }
 
-    class OnRepublishFailure extends JobImpl {
+    private static class OnRepublishFailure extends JobImpl {
         private RepublishLeaseSetJob _job;
         public OnRepublishFailure(RouterContext ctx, RepublishLeaseSetJob job) { 
             super(ctx); 

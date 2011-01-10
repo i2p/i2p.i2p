@@ -88,9 +88,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     void searchComplete(Hash key) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("search Complete: " + key);
-        SearchJob removed = null;
         synchronized (_activeRequests) {
-            removed = (SearchJob)_activeRequests.remove(key);
+            _activeRequests.remove(key);
         }
     }
     

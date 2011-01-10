@@ -443,7 +443,6 @@ class StoreJob extends JobImpl {
                 sent = wm.getMessage();
                 _state.addPending(to, wm);
             } else {
-                sent = msg;
                 _state.addPending(to);
                 // now that almost all floodfills are at 0.7.10,
                 // just refuse to store unencrypted to older ones.

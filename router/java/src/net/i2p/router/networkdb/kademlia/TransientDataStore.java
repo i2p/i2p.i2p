@@ -162,16 +162,6 @@ class TransientDataStore implements DataStore {
     }
     
     @Override
-    public int hashCode() {
-        return DataHelper.hashCode(_data);
-    }
-    @Override
-    public boolean equals(Object obj) {
-        if ( (obj == null) || (obj.getClass() != getClass()) ) return false;
-        TransientDataStore ds = (TransientDataStore)obj;
-        return DataHelper.eq(ds._data, _data);
-    }
-    @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("Transient DataStore: ").append(_data.size()).append("\nKeys: ");

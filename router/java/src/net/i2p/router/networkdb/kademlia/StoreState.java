@@ -114,7 +114,7 @@ class StoreState {
     public void addPending(Hash peer) {
         synchronized (_pendingPeers) {
             _pendingPeers.add(peer);
-            _pendingPeerTimes.put(peer, new Long(_context.clock().now()));
+            _pendingPeerTimes.put(peer, Long.valueOf(_context.clock().now()));
         }
         synchronized (_attemptedPeers) {
             _attemptedPeers.add(peer);
@@ -124,7 +124,7 @@ class StoreState {
         synchronized (_pendingPeers) {
             _pendingPeers.addAll(pending);
             for (Iterator<Hash> iter = pending.iterator(); iter.hasNext(); ) 
-                _pendingPeerTimes.put(iter.next(), new Long(_context.clock().now()));
+                _pendingPeerTimes.put(iter.next(), Long.valueOf(_context.clock().now()));
         }
         synchronized (_attemptedPeers) {
             _attemptedPeers.addAll(pending);

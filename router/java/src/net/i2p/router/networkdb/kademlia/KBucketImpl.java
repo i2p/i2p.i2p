@@ -387,15 +387,15 @@ class KBucketImpl implements KBucket {
         local.prepareCache();
         KBucketImpl bucket = new KBucketImpl(I2PAppContext.getGlobalContext(), local);
         bucket.setRange(low, high);
-        Hash lowerBoundKey = bucket.getRangeBeginKey();
-        Hash upperBoundKey = bucket.getRangeEndKey();
+        //Hash lowerBoundKey = bucket.getRangeBeginKey();
+        //Hash upperBoundKey = bucket.getRangeEndKey();
         for (int i = 0; i < 100000; i++) {
             Hash rnd = bucket.generateRandomKey();
             //buf.append(toString(rnd.getData())).append('\n');
             boolean ok = bucket.shouldContain(rnd);
             if (!ok) {
                 byte diff[] = bucket.getLocal().cachedXor(rnd);
-                BigInteger dv = new BigInteger(1, diff);
+                //BigInteger dv = new BigInteger(1, diff);
                 //log.error("WTF! bucket doesn't want: \n" + toString(rnd.getData()) 
                 //          + "\nDelta: \n" + toString(diff) + "\nDelta val: \n" + dv.toString(2) 
                 //          + "\nBucket: \n"+bucket, new Exception("WTF"));
@@ -403,7 +403,7 @@ class KBucketImpl implements KBucket {
                 log.error("\nLow: " + DataHelper.toHexString(bucket.getRangeBeginKey().getData()) 
                            + "\nVal: " + DataHelper.toHexString(rnd.getData())
                            + "\nHigh:" + DataHelper.toHexString(bucket.getRangeEndKey().getData()));
-                try { Thread.sleep(1000); } catch (Exception e) {}
+                try { Thread.sleep(1000); } catch (InterruptedException e) {}
                 System.exit(0);
             } else {
                 //_log.debug("Ok, bucket wants: \n" + toString(rnd.getData()));
@@ -415,7 +415,6 @@ class KBucketImpl implements KBucket {
     
     private static void testRand2() {
         Log log = I2PAppContext.getGlobalContext().logManager().getLog(KBucketImpl.class);
-        StringBuilder buf = new StringBuilder(1024*1024*16);
         int low = 1;
         int high = 200;
         byte hash[] = new byte[Hash.HASH_LENGTH];
@@ -424,15 +423,15 @@ class KBucketImpl implements KBucket {
         local.prepareCache();
         KBucketImpl bucket = new KBucketImpl(I2PAppContext.getGlobalContext(), local);
         bucket.setRange(low, high);
-        Hash lowerBoundKey = bucket.getRangeBeginKey();
-        Hash upperBoundKey = bucket.getRangeEndKey();
+        //Hash lowerBoundKey = bucket.getRangeBeginKey();
+        //Hash upperBoundKey = bucket.getRangeEndKey();
         for (int i = 0; i < 100000; i++) {
             Hash rnd = bucket.generateRandomKey();
             //buf.append(toString(rnd.getData())).append('\n');
             boolean ok = bucket.shouldContain(rnd);
             if (!ok) {
                 byte diff[] = bucket.getLocal().cachedXor(rnd);
-                BigInteger dv = new BigInteger(1, diff);
+                //BigInteger dv = new BigInteger(1, diff);
                 //log.error("WTF! bucket doesn't want: \n" + toString(rnd.getData()) 
                 //          + "\nDelta: \n" + toString(diff) + "\nDelta val: \n" + dv.toString(2) 
                 //          + "\nBucket: \n"+bucket, new Exception("WTF"));
@@ -440,13 +439,13 @@ class KBucketImpl implements KBucket {
                 log.error("\nLow: " + DataHelper.toHexString(bucket.getRangeBeginKey().getData()) 
                            + "\nVal: " + DataHelper.toHexString(rnd.getData())
                            + "\nHigh:" + DataHelper.toHexString(bucket.getRangeEndKey().getData()));
-                try { Thread.sleep(1000); } catch (Exception e) {}
+                try { Thread.sleep(1000); } catch (InterruptedException e) {}
                 System.exit(0);
             } else {
                 //_log.debug("Ok, bucket wants: \n" + toString(rnd.getData()));
             }
         }
-        log.info("Passed 100,000 random key generations against a random hash\n" + buf.toString());
+        log.info("Passed 100,000 random key generations against a random hash");
     }
     
     private final static String toString(byte b[]) {
