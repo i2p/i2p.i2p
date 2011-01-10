@@ -29,8 +29,8 @@ import java.util.List;
 import net.i2p.I2PAppContext;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
-import net.i2p.util.SimpleScheduler;
-import net.i2p.util.SimpleTimer;
+//import net.i2p.util.SimpleScheduler;
+//import net.i2p.util.SimpleTimer;
 
 class PeerConnectionOut implements Runnable
 {
@@ -124,27 +124,27 @@ class PeerConnectionOut implements Runnable
                           {
                             if (state.choking) {
                               it.remove();
-                              SimpleTimer.getInstance().removeEvent(nm.expireEvent);
+                              //SimpleTimer.getInstance().removeEvent(nm.expireEvent);
                             }
                             nm = null;
                           }
                         else if (nm.type == Message.REQUEST && state.choked)
                           {
                             it.remove();
-                            SimpleTimer.getInstance().removeEvent(nm.expireEvent);
+                            //SimpleTimer.getInstance().removeEvent(nm.expireEvent);
                             nm = null;
                           }
                           
                         if (m == null && nm != null)
                           {
                             m = nm;
-                            SimpleTimer.getInstance().removeEvent(nm.expireEvent);
+                            //SimpleTimer.getInstance().removeEvent(nm.expireEvent);
                             it.remove();
                           }
                       }
                     if (m == null && !sendQueue.isEmpty()) {
                       m = (Message)sendQueue.remove(0);
-                      SimpleTimer.getInstance().removeEvent(m.expireEvent);
+                      //SimpleTimer.getInstance().removeEvent(m.expireEvent);
                     }
                   }
               }
@@ -241,6 +241,8 @@ class PeerConnectionOut implements Runnable
   
   /** remove messages not sent in 3m */
   private static final int SEND_TIMEOUT = 3*60*1000;
+
+/*****
   private class RemoveTooSlow implements SimpleTimer.TimedEvent {
       private Message _m;
       public RemoveTooSlow(Message m) {
@@ -258,6 +260,7 @@ class PeerConnectionOut implements Runnable
               _log.info("Took too long to send " + _m + " to " + peer);
       }
   }
+*****/
 
   /**
    * Removes a particular message type from the queue.
@@ -474,7 +477,8 @@ class PeerConnectionOut implements Runnable
     m.off = 0;
     m.len = length;
     // since we have the data already loaded, queue a timeout to remove it
-    SimpleScheduler.getInstance().addEvent(new RemoveTooSlow(m), SEND_TIMEOUT);
+    // no longer prefetched
+    //SimpleScheduler.getInstance().addEvent(new RemoveTooSlow(m), SEND_TIMEOUT);
     addMessage(m);
   }
 

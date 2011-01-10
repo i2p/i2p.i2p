@@ -68,7 +68,8 @@ class Message
   // Used to do deferred fetch of data
   DataLoader dataLoader;
 
-  SimpleTimer.TimedEvent expireEvent;
+  // now unused
+  //SimpleTimer.TimedEvent expireEvent;
   
   /** Utility method for sending a message through a DataStream. */
   void sendMessage(DataOutputStream dos) throws IOException
