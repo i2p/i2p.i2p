@@ -178,7 +178,7 @@
         <launch4j configFile="./installer/i2pstandalone.xml" />
 	<!-- thazzit -->
     </target>
-    <target name="compile" />
+
     <target name="jar" depends="jarSmall" >
         <copy file="apps/BOB/dist/BOB.jar" todir="build/" />
         <copy file="apps/sam/java/build/sam.jar" todir="build/" />
@@ -186,8 +186,9 @@
         <copy file="apps/susidns/src/susidns.war" todir="build/" />
         <copy file="apps/i2psnark/i2psnark.war" todir="build/" />
         <copy file="apps/i2psnark/java/build/i2psnark.jar" todir="build/" />
+
     </target>
-    <target name="jarSmall" depends="compile" >
+    <target name="jarSmall" depends="builddepSmall" >
         <copy file="core/java/build/i2p.jar" todir="build/" />
         <copy file="router/java/build/router.jar" todir="build/" />
         <copy file="apps/ministreaming/java/build/mstreaming.jar" todir="build/" />
@@ -195,9 +196,27 @@
         <copy file="apps/i2ptunnel/java/build/i2ptunnel.jar" todir="build/" />
         <copy file="apps/i2ptunnel/java/build/i2ptunnel.war" todir="build/" />
         <copy file="apps/systray/java/build/systray.jar" todir="build/" />
-        <copy file="installer/lib/jbigi/jbigi.jar" todir="build" />
         <copy file="apps/addressbook/dist/addressbook.war" todir="build/" />
     </target>
+
+    <target name="jbigi">
+        <jar destfile="build/jbigi.jar" whenmanifestonly="fail" >
+            <fileset dir="installer/lib/jbigi" includes="*.so *.dll *.jnilib" />
+        </jar>
+    </target>
+
+    <target name="jbigi-windows-only" >
+        <jar destfile="build/jbigi.jar" whenmanifestonly="fail" >
+            <fileset dir="installer/lib/jbigi" includes="*windows*.dll" />
+        </jar>
+    </target>
+
+    <target name="jbigi-linux-only">
+        <jar destfile="build/jbigi.jar"  whenmanifestonly="fail" >
+            <fileset dir="installer/lib/jbigi" includes="*linux*.so" />
+        </jar>
+    </target>
+
     <!-- the apps need to compile the jsps to poupdate -->
     <target name="poupdate" depends="buildRouter, buildStreaming, buildSystray, buildJetty" >
         <ant dir="apps/routerconsole/java/" target="poupdate" />
@@ -361,7 +380,7 @@
         </delete>
     </target>
 
-    <target name="preppkg" depends="preppkg-linux, preppkg-windows">
+    <target name="preppkg" depends="preppkg-linux, preppkg-windows, jbigi">
         <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
         <copy todir="pkg-temp/lib/wrapper/freebsd/">
             <fileset dir="installer/lib/wrapper/freebsd/" />
@@ -391,14 +410,8 @@
     </target>
 
     <!-- only what is needed for debian, etc. -->
-    <target name="preppkg-linux-only" depends="preppkg-linux">
-        <!-- rip the non-linux stuff out of jbigi.jar -->
-        <mkdir dir="tmpextract" />
-        <unjar src="build/jbigi.jar" dest="tmpextract/" />
-        <jar destfile="pkg-temp/lib/jbigi.jar" >
-            <fileset dir="tmpextract/" includes="*linux*" />
-        </jar>
-        <delete dir="tmpextract/" />
+    <target name="preppkg-linux-only" depends="preppkg-linux, jbigi-linux-only" >
+        <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
     </target>
 
     <target name="preppkg-linux" depends="preppkg-base">
@@ -755,7 +768,7 @@
     </target>
     <target name="findbugs" depends="build2">
         <echo message="Starting findbugs, this will take a while..." />
-        <exec executable="nice">
+        <exec executable="nice" failonerror="true">
             <arg value="findbugs"/>
             <arg value="-textui"/>
             <arg value="-projectName"/>
@@ -776,7 +789,6 @@
             <arg value="build/i2psnark.war"/>
             <arg value="build/i2ptunnel.jar"/>
             <arg value="build/i2ptunnel.war"/>
-            <arg value="build/jbigi.jar"/>
             <arg value="build/mstreaming.jar"/>
             <arg value="build/router.jar/"/>
             <arg value="build/routerconsole.jar"/>
@@ -1021,25 +1033,11 @@
 		we need to make sure its small, with NO redundent jars or wars.
 		thus cleaning is required before each build-->
 	<target name="buildSmallOnly" depends="pkg-portable-clean,buildSmall"/>
+
 <!-- *1* preparing the jars by OS dependent de-bloating -->
-	<target name="preppkg-portable-win32-jbigi" depends="buildSmallOnly">
-		<!-- rip the non-windows stuff out of jbigi.jar -->
-		<mkdir dir="tmpextract" />
-		<unjar src="build/jbigi.jar" dest="tmpextract/" />
-		<jar destfile="build/jbigi.jar" >
-			<fileset dir="tmpextract/" includes="*windows*" />
-		</jar>
-		<delete dir="tmpextract/" />
-	</target>
-	<target name="preppkg-portable-linux-jbigi"  depends="buildSmallOnly">
-		<!-- rip the non-linux stuff out of jbigi.jar -->
-		<mkdir dir="tmpextract" />
-		<unjar src="build/jbigi.jar" dest="tmpextract/" />
-		<jar destfile="build/jbigi.jar" >
-			<fileset dir="tmpextract/" includes="*linux*" />
-		</jar>
-		<delete dir="tmpextract/" />
-	</target>
+	<target name="preppkg-portable-win32-jbigi" depends="buildSmallOnly, jbigi-windows-only" />
+
+	<target name="preppkg-portable-linux-jbigi"  depends="buildSmallOnly, jbigi-linux-only" />
 
 <!-- *2* os independent procedure  -->
 	<target name="preppkg-portable-basic" >
