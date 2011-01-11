@@ -177,14 +177,14 @@ public class Reseeder {
             StringTokenizer tok = new StringTokenizer(URLs, " ,");
             while (tok.hasMoreTokens())
                 URLList.add(tok.nextToken().trim());
-            Collections.shuffle(URLList);
+            Collections.shuffle(URLList, _context.random());
             if (defaulted && !SSLDisable) {
                 // put the non-SSL at the end of the SSL
                 List<String> URLList2 = new ArrayList();
                 tok = new StringTokenizer(DEFAULT_SEED_URL, " ,");
                 while (tok.hasMoreTokens())
                     URLList2.add(tok.nextToken().trim());
-                Collections.shuffle(URLList2);
+                Collections.shuffle(URLList2, _context.random());
                 URLList.addAll(URLList2);
             }
             int total = 0;
@@ -263,7 +263,7 @@ public class Reseeder {
                 }
 
                 List<String> urlList = new ArrayList(urls);
-                Collections.shuffle(urlList);
+                Collections.shuffle(urlList, _context.random());
                 int fetched = 0;
                 int errors = 0;
                 // 200 max from one URL
