@@ -247,7 +247,11 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             _enforceNetId = DEFAULT_ENFORCE_NETID;
         
         _kb = new KBucketSet(_context, ri.getIdentity().getHash());
-        _ds = new PersistentDataStore(_context, dbDir, this);
+        try {
+            _ds = new PersistentDataStore(_context, dbDir, this);
+        } catch (IOException ioe) {
+            throw new RuntimeException("Unable to initialize netdb storage", ioe);
+        }
         //_ds = new TransientDataStore();
 //        _exploreKeys = new HashSet(64);
         _dbDir = dbDir;
