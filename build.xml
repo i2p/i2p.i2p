@@ -755,7 +755,7 @@
     </target>
     <target name="findbugs" depends="build2">
         <echo message="Starting findbugs, this will take a while..." />
-        <exec executable="nice">
+        <exec executable="nice" failonerror="true">
             <arg value="findbugs"/>
             <arg value="-textui"/>
             <arg value="-projectName"/>

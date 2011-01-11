@@ -1,3 +1,12 @@
+2011-01-09 zzz
+    * DataHelper: Speed up and annotate sortStructures()
+    * Data Structures: More caching improvements, don't cache where we shouldn't
+    * NetDB: Don't rescan netDb directory unless changed,
+             to reduce Hash cache thrash (backport from test4)
+    * RouterInfo:
+      - Don't cache byteified data by default, to save ~1.5 MB
+      - Don't create empty peers Set, to save ~100KB
+
 2011-01-07 zzz
     * Data Structures: More caching
     * i2psnark: Improve request tracking to reduce memory usage
