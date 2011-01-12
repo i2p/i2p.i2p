@@ -34,6 +34,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.transport.Transport;
 import net.i2p.router.transport.TransportBid;
 import net.i2p.router.transport.TransportImpl;
+import net.i2p.router.util.RandomIterator;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
@@ -2326,9 +2327,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     PeerState pickTestPeer(RemoteHostId dontInclude) {
         List<PeerState> peers = new ArrayList(_peersByIdent.values());
-        Collections.shuffle(peers, _context.random());
-        for (int i = 0; i < peers.size(); i++) {
-            PeerState peer = peers.get(i);
+        for (Iterator<PeerState> iter = new RandomIterator(peers); iter.hasNext(); ) {
+            PeerState peer = iter.next();
             if ( (dontInclude != null) && (dontInclude.equals(peer.getRemoteHostId())) )
                 continue;
             RouterInfo peerInfo = _context.netDb().lookupRouterInfoLocally(peer.getRemotePeer());

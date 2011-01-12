@@ -28,6 +28,7 @@ import net.i2p.data.RouterInfo;
 import net.i2p.router.NetworkDatabaseFacade;
 import net.i2p.router.RouterContext;
 import net.i2p.router.tunnel.pool.TunnelPeerSelector;
+import net.i2p.router.util.RandomIterator;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
@@ -1043,17 +1044,19 @@ public class ProfileOrganizer {
     private void locked_selectPeers(Map<Hash, PeerProfile> peers, int howMany, Set<Hash> toExclude, Set<Hash> matches) {
         locked_selectPeers(peers, howMany, toExclude, matches, 0);
     }
+
     private void locked_selectPeers(Map<Hash, PeerProfile> peers, int howMany, Set<Hash> toExclude, Set<Hash> matches, int mask) {
-        List all = new ArrayList(peers.keySet());
-        if (toExclude != null)
-            all.removeAll(toExclude);
-        
-        all.removeAll(matches);
-        all.remove(_us);
-        Collections.shuffle(all, _random);
+        List<Hash> all = new ArrayList(peers.keySet());
         Set<Integer> IPSet = new HashSet(8);
-        for (int i = 0; (matches.size() < howMany) && (i < all.size()); i++) {
-            Hash peer = (Hash)all.get(i);
+        // use RandomIterator to avoid shuffling the whole thing
+        for (Iterator<Hash> iter = new RandomIterator(all); (matches.size() < howMany) && iter.hasNext(); ) {
+            Hash peer = iter.next();
+            if (toExclude != null && toExclude.contains(peer))
+                continue;
+            if (matches.contains(peer))
+                continue;
+            if (_us.equals(peer))
+                continue;
             boolean ok = isSelectable(peer);
             if (ok) {
                 ok = mask <= 0 || notRestricted(peer, IPSet, mask);
