@@ -326,10 +326,10 @@ public class CPUID {
         public boolean IsPentium3Compatible()
         {	
 		// Atom
-		if (getCPUExtendedModel() == 1 && (getCPUFamily() == 6 && (getCPUModel() == 10))){
+		if (getCPUExtendedModel() == 1 && (getCPUFamily() == 6 && (getCPUModel() == 12))){
 			return true;
 		// ??
-		} else if (getCPUFamily() > 6 || (getCPUFamily() == 6 && getCPUModel() >=7)){
+		} else if (getCPUExtendedModel() == 0 && (getCPUFamily() > 6 || (getCPUFamily() == 6 && getCPUModel() >=7))){
 			return true;
 		} else {
 			return false;
@@ -337,13 +337,13 @@ public class CPUID {
         }
         public boolean IsPentium4Compatible()
         {	
-			// P4
+		// P4
         	if (getCPUFamily() >= 15){
         		return true;
-			// Xeon MP (45nm) or Core i7
+		// Xeon MP (45nm) or Core i7
         	} else if (getCPUExtendedModel() == 1 && (getCPUFamily() == 6 && (getCPUModel() == 10 || getCPUModel() == 13))){
         		return true;
-			// Core 2 Duo
+		// Core 2 Duo
         	} else if (getCPUExtendedModel() == 0 && getCPUFamily() == 6 && getCPUModel() == 15){
         		return true;
         	} else {
