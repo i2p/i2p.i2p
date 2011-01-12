@@ -408,7 +408,19 @@ div.news li {
 }
 
 div.news h3 {
-     text-align: left !important;
+     background: none !important;
+     text-align: left;
+     border: none !important;
+     border-bottom: 1px dotted !important;
+     -moz-box-shadow: none;
+     -hktml-box-shadow: none;
+     box-shadow: none;
+     font-size: 10pt !important;
+     letter-spacing: 0.05em;
+     text-transform: capitalize !important;
+     text-shadow: none !important;
+     padding: 5px 10px 3px;
+     margin: 10px 10px -7px !important;
 }
 
 div.news p {
