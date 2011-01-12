@@ -538,7 +538,7 @@ public class Storage
     } else {
       // the following sets the needed variable
       changed = true;
-      checkCreateFiles();
+      checkCreateFiles(false);
     }
     if (complete()) {
         _util.debug("Torrent is complete", Snark.NOTICE);
@@ -649,15 +649,26 @@ public class Storage
   /**
    * This is called at the beginning, and at presumed completion,
    * so we have to be careful about locking.
+   *
+   * @param recheck if true, this is a check after we downloaded the
+   *        last piece, and we don't modify the global bitfield unless
+   *        the check fails.
    */
-  private void checkCreateFiles() throws IOException
+  private void checkCreateFiles(boolean recheck) throws IOException
   {
     // Whether we are resuming or not,
     // if any of the files already exists we assume we are resuming.
     boolean resume = false;
 
     _probablyComplete = true;
-    needed = metainfo.getPieces();
+    // use local variables during the check
+    int need = metainfo.getPieces();
+    BitField bfield;
+    if (recheck) {
+        bfield = new BitField(need);
+    } else {
+        bfield = bitfield;
+    }
 
     // Make sure all files are available and of correct length
     for (int i = 0; i < rafs.length; i++)
@@ -718,8 +729,8 @@ public class Storage
             }
             if (correctHash)
               {
-                bitfield.set(i);
-                needed--;
+                bfield.set(i);
+                need--;
               }
 
             if (listener != null)
@@ -738,6 +749,15 @@ public class Storage
     //    } catch (IOException ioe) {}
     //  }
     //}
+
+    // do this here so we don't confuse the user during checking
+    needed = need;
+    if (recheck && need > 0) {
+        // whoops, recheck failed
+        synchronized(bitfield) {
+            bitfield = bfield;
+        }
+    }
 
     if (listener != null) {
       listener.storageAllChecked(this);
@@ -903,11 +923,7 @@ public class Storage
       // checkCreateFiles() which will set 'needed' and 'bitfield'
       // and also call listener.storageCompleted() if the double-check
       // was successful.
-      // Todo: set a listener variable so the web shows "checking" and don't
-      // have the user panic when completed amount goes to zero temporarily?
-      needed = metainfo.getPieces();
-      bitfield = new BitField(needed);
-      checkCreateFiles();
+      checkCreateFiles(true);
       if (needed > 0) {
         if (listener != null)
             listener.setWantedPieces(this);
