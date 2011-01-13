@@ -16,6 +16,9 @@ import net.i2p.crypto.KeyGenerator;
  * A private key is 256byte Integer. The private key represents only the 
  * exponent, not the primes, which are constant and defined in the crypto spec.
  *
+ * Note that we use short exponents, so all but the last 28.25 bytes are zero.
+ * See http://www.i2p2.i2p/how_cryptography for details.
+ *
  * @author jrandom
  */
 public class PrivateKey extends SimpleDataStructure {
@@ -50,4 +53,24 @@ public class PrivateKey extends SimpleDataStructure {
         return KeyGenerator.getPublicKey(this);
     }
 
+    /**
+     * We assume the data has enough randomness in it, so use the last 4 bytes for speed.
+     * Overridden since we use short exponents, so the first 227 bytes are all zero.
+     * Not that we are storing PrivateKeys in any Sets or Maps anywhere.
+     */
+    @Override
+    public int hashCode() {
+        if (_data == null)
+            return 0;
+        int rv = _data[KEYSIZE_BYTES - 4];
+        for (int i = 1; i < 4; i++)
+            rv ^= (_data[i + (KEYSIZE_BYTES - 4)] << (i*8));
+        return rv;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if ((obj == null) || !(obj instanceof PrivateKey)) return false;
+        return DataHelper.eq(_data, ((PrivateKey) obj)._data);
+    }
 }
