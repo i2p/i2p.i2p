@@ -11,7 +11,6 @@ package net.i2p.router.peermanager;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -116,7 +115,9 @@ class PeerManager {
      */
     List<Hash> selectPeers(PeerSelectionCriteria criteria) {
         Set<Hash> peers = new HashSet(criteria.getMinimumRequired());
-        Set<Hash> exclude = Collections.singleton(_context.routerHash());
+        // not a singleton, SANFP adds to it
+        Set<Hash> exclude = new HashSet(1);
+        exclude.add(_context.routerHash());
         switch (criteria.getPurpose()) {
             case PeerSelectionCriteria.PURPOSE_TEST:
                 // for now, the peers we test will be the reliable ones
