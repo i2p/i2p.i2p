@@ -439,6 +439,9 @@ div.news h3 {
      text-shadow: 0px 0px 0px #77f;
 }
 
+div.news i {
+     font-style: normal;
+}
 
 /*
 div.news  h4 a{
@@ -645,7 +648,8 @@ div.main li {
 }
 
 div.main li b {
-     color: #514!important;
+     color: #514 !important;
+     color: #003 !important;
      letter-spacing: 0.01em;
      font-size: 9.5pt;
      line-height: 170%;
@@ -671,9 +675,8 @@ div.main li:first-child {
      font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      color: #910;
      padding: 2px 3px;
-     background: #fff;
      font-weight: bold;
-     background: #ffb url('images/magic.png') center bottom;
+/*     background: #ffb url('images/magic.png') center bottom;*/
 }
 
 ol {
@@ -777,7 +780,7 @@ h2 {
      letter-spacing: 0.07em;
      background: #ffe url('images/header.png') center center repeat-x;
      text-shadow: 0px 1px 1px #77f;
-     padding: 10px 10px;
+     padding: 10px;
      wordwrap: none;
      border: 1px solid #447;
      border-radius: 4px;
@@ -803,7 +806,7 @@ h2 img {
 h3 {
      border: 1px solid #447;
      border-left: 5px solid #447;
-     padding: 5px 5px 5px 5px;
+     padding: 5px 5px 5px 10px;
      margin: 12px 0 15px 0;
      border-radius: 0 4px 4px 0;
      -moz-border-radius: 0 4px 4px 0;
