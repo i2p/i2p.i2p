@@ -46,19 +46,20 @@ public class TrackerInfo
   private int complete;
   private int incomplete;
 
-  public TrackerInfo(InputStream in, byte[] my_id, MetaInfo metainfo)
+  /** @param metainfo may be null */
+  public TrackerInfo(InputStream in, byte[] my_id, byte[] infohash, MetaInfo metainfo)
     throws IOException
   {
-    this(new BDecoder(in), my_id, metainfo);
+    this(new BDecoder(in), my_id, infohash, metainfo);
   }
 
-  public TrackerInfo(BDecoder be, byte[] my_id, MetaInfo metainfo)
+  private TrackerInfo(BDecoder be, byte[] my_id, byte[] infohash, MetaInfo metainfo)
     throws IOException
   {
-    this(be.bdecodeMap().getMap(), my_id, metainfo);
+    this(be.bdecodeMap().getMap(), my_id, infohash, metainfo);
   }
 
-  public TrackerInfo(Map m, byte[] my_id, MetaInfo metainfo)
+  private TrackerInfo(Map m, byte[] my_id, byte[] infohash, MetaInfo metainfo)
     throws IOException
   {
     BEValue reason = (BEValue)m.get("failure reason");
@@ -84,10 +85,10 @@ public class TrackerInfo
             Set<Peer> p;
             try {
               // One big string (the official compact format)
-              p = getPeers(bePeers.getBytes(), my_id, metainfo);
+              p = getPeers(bePeers.getBytes(), my_id, infohash, metainfo);
             } catch (InvalidBEncodingException ibe) {
               // List of Dictionaries or List of Strings
-              p = getPeers(bePeers.getList(), my_id, metainfo);
+              p = getPeers(bePeers.getList(), my_id, infohash, metainfo);
             }
             peers = p;
         }
@@ -123,7 +124,7 @@ public class TrackerInfo
 ******/
 
   /** List of Dictionaries or List of Strings */
-  private static Set<Peer> getPeers(List<BEValue> l, byte[] my_id, MetaInfo metainfo)
+  private static Set<Peer> getPeers(List<BEValue> l, byte[] my_id, byte[] infohash, MetaInfo metainfo)
     throws IOException
   {
     Set<Peer> peers = new HashSet(l.size());
@@ -144,7 +145,7 @@ public class TrackerInfo
                 continue;
             }
         }
-        peers.add(new Peer(peerID, my_id, metainfo));
+        peers.add(new Peer(peerID, my_id, infohash, metainfo));
       }
 
     return peers;
@@ -156,7 +157,7 @@ public class TrackerInfo
    *  One big string of concatenated 32-byte hashes
    *  @since 0.8.1
    */
-  private static Set<Peer> getPeers(byte[] l, byte[] my_id, MetaInfo metainfo)
+  private static Set<Peer> getPeers(byte[] l, byte[] my_id, byte[] infohash, MetaInfo metainfo)
     throws IOException
   {
     int count = l.length / HASH_LENGTH;
@@ -172,7 +173,7 @@ public class TrackerInfo
             // won't happen
             continue;
         }
-        peers.add(new Peer(peerID, my_id, metainfo));
+        peers.add(new Peer(peerID, my_id, infohash, metainfo));
       }
 
     return peers;

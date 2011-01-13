@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.Collator;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -26,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.Base32;
 import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.util.FileUtil;
@@ -33,6 +35,7 @@ import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFileOutputStream;
 
+import org.klomp.snark.I2PSnarkUtil;
 import org.klomp.snark.MetaInfo;
 import org.klomp.snark.Peer;
 import org.klomp.snark.Snark;
@@ -58,8 +61,13 @@ public class I2PSnarkServlet extends Default {
     private Resource _resourceBase;
     private String _themePath;
     private String _imgPath;
+    private String _lastAnnounceURL = "";
     
     public static final String PROP_CONFIG_FILE = "i2psnark.configFile";
+    /** BEP 9 */
+    private static final String MAGNET = "magnet:?xt=urn:btih:";
+    /** http://sponge.i2p/files/maggotspec.txt */
+    private static final String MAGGOT = "maggot://";
  
     @Override
     public void init(ServletConfig cfg) throws ServletException {
@@ -153,7 +161,7 @@ public class I2PSnarkServlet extends Default {
                 resp.setCharacterEncoding("UTF-8");
                 resp.setContentType("text/html; charset=UTF-8");
                 Resource resource = getResource(pathInContext);
-                if (resource == null || (!resource.exists()) || !resource.isDirectory()) {
+                if (resource == null || (!resource.exists())) {
                     resp.sendError(HttpResponse.__404_Not_Found);
                 } else {
                     String base = URI.addPaths(req.getRequestURI(), "/");
@@ -376,7 +384,7 @@ public class I2PSnarkServlet extends Default {
         for (int i = 0; i < snarks.size(); i++) {
             Snark snark = (Snark)snarks.get(i);
             boolean showDebug = "2".equals(peerParam);
-            boolean showPeers = showDebug || "1".equals(peerParam) || Base64.encode(snark.meta.getInfoHash()).equals(peerParam);
+            boolean showPeers = showDebug || "1".equals(peerParam) || Base64.encode(snark.getInfoHash()).equals(peerParam);
             displaySnark(out, snark, uri, i, stats, showPeers, isDegraded, noThinsp, showDebug);
         }
 
@@ -478,10 +486,12 @@ public class I2PSnarkServlet extends Default {
             if (newURL != null) {
                 if (newURL.startsWith("http://")) {
                     _manager.addMessage(_("Fetching {0}", urlify(newURL)));
-                    I2PAppThread fetch = new I2PAppThread(new FetchAndAdd(_manager, newURL), "Fetch and add");
+                    I2PAppThread fetch = new I2PAppThread(new FetchAndAdd(_manager, newURL), "Fetch and add", true);
                     fetch.start();
+                } else if (newURL.startsWith(MAGNET) || newURL.startsWith(MAGGOT)) {
+                    addMagnet(newURL);
                 } else {
-                    _manager.addMessage(_("Invalid URL - must start with http://"));
+                    _manager.addMessage(_("Invalid URL: Must start with \"http://\", \"{0}\", or \"{1}\"", MAGNET, MAGGOT));
                 }
             } else {
                 // no file or URL specified
@@ -494,8 +504,8 @@ public class I2PSnarkServlet extends Default {
                     for (Iterator iter = _manager.listTorrentFiles().iterator(); iter.hasNext(); ) {
                         String name = (String)iter.next();
                         Snark snark = _manager.getTorrent(name);
-                        if ( (snark != null) && (DataHelper.eq(infoHash, snark.meta.getInfoHash())) ) {
-                            _manager.stopTorrent(name, false);
+                        if ( (snark != null) && (DataHelper.eq(infoHash, snark.getInfoHash())) ) {
+                            _manager.stopTorrent(snark, false);
                             break;
                         }
                     }
@@ -508,11 +518,9 @@ public class I2PSnarkServlet extends Default {
                 if ( (infoHash != null) && (infoHash.length == 20) ) { // valid sha1
                     for (String name : _manager.listTorrentFiles()) {
                         Snark snark = _manager.getTorrent(name);
-                        if ( (snark != null) && (DataHelper.eq(infoHash, snark.meta.getInfoHash())) ) {
+                        if ( (snark != null) && (DataHelper.eq(infoHash, snark.getInfoHash())) ) {
                             snark.startTorrent();
-                            if (snark.storage != null)
-                                name = snark.storage.getBaseName();
-                            _manager.addMessage(_("Starting up torrent {0}", name));
+                            _manager.addMessage(_("Starting up torrent {0}", snark.getBaseName()));
                             break;
                         }
                     }
@@ -526,8 +534,15 @@ public class I2PSnarkServlet extends Default {
                     for (Iterator iter = _manager.listTorrentFiles().iterator(); iter.hasNext(); ) {
                         String name = (String)iter.next();
                         Snark snark = _manager.getTorrent(name);
-                        if ( (snark != null) && (DataHelper.eq(infoHash, snark.meta.getInfoHash())) ) {
-                            _manager.stopTorrent(name, true);
+                        if ( (snark != null) && (DataHelper.eq(infoHash, snark.getInfoHash())) ) {
+                            MetaInfo meta = snark.getMetaInfo();
+                            if (meta == null) {
+                                // magnet - remove and delete are the same thing
+                                _manager.deleteMagnet(snark);
+                                _manager.addMessage(_("Magnet deleted: {0}", name));
+                                return;
+                            }
+                            _manager.stopTorrent(snark, true);
                             // should we delete the torrent file?
                             // yeah, need to, otherwise it'll get autoadded again (at the moment
                             File f = new File(name);
@@ -546,13 +561,20 @@ public class I2PSnarkServlet extends Default {
                     for (Iterator iter = _manager.listTorrentFiles().iterator(); iter.hasNext(); ) {
                         String name = (String)iter.next();
                         Snark snark = _manager.getTorrent(name);
-                        if ( (snark != null) && (DataHelper.eq(infoHash, snark.meta.getInfoHash())) ) {
-                            _manager.stopTorrent(name, true);
+                        if ( (snark != null) && (DataHelper.eq(infoHash, snark.getInfoHash())) ) {
+                            MetaInfo meta = snark.getMetaInfo();
+                            if (meta == null) {
+                                // magnet - remove and delete are the same thing
+                                _manager.deleteMagnet(snark);
+                                _manager.addMessage(_("Magnet deleted: {0}", name));
+                                return;
+                            }
+                            _manager.stopTorrent(snark, true);
                             File f = new File(name);
                             f.delete();
                             _manager.addMessage(_("Torrent file deleted: {0}", f.getAbsolutePath()));
-                            List files = snark.meta.getFiles();
-                            String dataFile = snark.meta.getName();
+                            List files = meta.getFiles();
+                            String dataFile = snark.getBaseName();
                             f = new File(_manager.getDataDir(), dataFile);
                             if (files == null) { // single file torrent
                                 if (f.delete())
@@ -612,23 +634,23 @@ public class I2PSnarkServlet extends Default {
                 if (announceURL == null || announceURL.length() <= 0)
                     _manager.addMessage(_("Error creating torrent - you must select a tracker"));
                 else if (baseFile.exists()) {
+                    _lastAnnounceURL = announceURL;
+                    if (announceURL.equals("none"))
+                        announceURL = null;
                     try {
+                        // This may take a long time to check the storage, but since it already exists,
+                        // it shouldn't be THAT bad, so keep it in this thread.
                         Storage s = new Storage(_manager.util(), baseFile, announceURL, null);
                         s.create();
                         s.close(); // close the files... maybe need a way to pass this Storage to addTorrent rather than starting over
                         MetaInfo info = s.getMetaInfo();
-                        File torrentFile = new File(baseFile.getParent(), baseFile.getName() + ".torrent");
-                        if (torrentFile.exists())
-                            throw new IOException("Cannot overwrite an existing .torrent file: " + torrentFile.getPath());
-                        _manager.saveTorrentStatus(info, s.getBitField(), null); // so addTorrent won't recheck
-                        // DirMonitor could grab this first, maybe hold _snarks lock?
-                        FileOutputStream out = new FileOutputStream(torrentFile);
-                        out.write(info.getTorrentData());
-                        out.close();
+                        File torrentFile = new File(_manager.getDataDir(), s.getBaseName() + ".torrent");
+                        // FIXME is the storage going to stay around thanks to the info reference?
+                        // now add it, but don't automatically start it
+                        _manager.addTorrent(info, s.getBitField(), torrentFile.getAbsolutePath(), true);
                         _manager.addMessage(_("Torrent created for \"{0}\"", baseFile.getName()) + ": " + torrentFile.getAbsolutePath());
-                        // now fire it up, but don't automatically seed it
-                        _manager.addTorrent(torrentFile.getCanonicalPath(), true);
-                        _manager.addMessage(_("Many I2P trackers require you to register new torrents before seeding - please do so before starting \"{0}\"", baseFile.getName()));
+                        if (announceURL != null)
+                            _manager.addMessage(_("Many I2P trackers require you to register new torrents before seeding - please do so before starting \"{0}\"", baseFile.getName()));
                     } catch (IOException ioe) {
                         _manager.addMessage(_("Error creating a torrent for \"{0}\"", baseFile.getAbsolutePath()) + ": " + ioe.getMessage());
                     }
@@ -643,8 +665,8 @@ public class I2PSnarkServlet extends Default {
             List snarks = getSortedSnarks(req);
             for (int i = 0; i < snarks.size(); i++) {
                 Snark snark = (Snark)snarks.get(i);
-                if (!snark.stopped)
-                    _manager.stopTorrent(snark.torrent, false);
+                if (!snark.isStopped())
+                    _manager.stopTorrent(snark, false);
             }
             if (_manager.util().connected()) {
                 // Give the stopped announces time to get out
@@ -657,7 +679,7 @@ public class I2PSnarkServlet extends Default {
             List snarks = getSortedSnarks(req);
             for (int i = 0; i < snarks.size(); i++) {
                 Snark snark = (Snark)snarks.get(i);
-                if (snark.stopped)
+                if (snark.isStopped())
                     snark.startTorrent();
             }
         } else {
@@ -725,7 +747,7 @@ public class I2PSnarkServlet extends Default {
     private static final int MAX_DISPLAYED_ERROR_LENGTH = 43;
     private void displaySnark(PrintWriter out, Snark snark, String uri, int row, long stats[], boolean showPeers,
                               boolean isDegraded, boolean noThinsp, boolean showDebug) throws IOException {
-        String filename = snark.torrent;
+        String filename = snark.getName();
         File f = new File(filename);
         filename = f.getName(); // the torrent may be the canonical name, so lets just grab the local name
         int i = filename.lastIndexOf(".torrent");
@@ -733,31 +755,28 @@ public class I2PSnarkServlet extends Default {
             filename = filename.substring(0, i);
         String fullFilename = filename;
         if (filename.length() > MAX_DISPLAYED_FILENAME_LENGTH) {
-            fullFilename = new String(filename);
-            filename = filename.substring(0, MAX_DISPLAYED_FILENAME_LENGTH) + "&hellip;";
+            String start = filename.substring(0, MAX_DISPLAYED_FILENAME_LENGTH);
+            if (start.indexOf(" ") < 0 && start.indexOf("-") < 0) {
+                // browser has nowhere to break it
+                fullFilename = filename;
+                filename = start + "&hellip;";
+            }
         }
-        long total = snark.meta.getTotalLength();
+        long total = snark.getTotalLength();
         // Early typecast, avoid possibly overflowing a temp integer
-        long remaining = (long) snark.storage.needed() * (long) snark.meta.getPieceLength(0); 
+        long remaining = (long) snark.getNeeded() * (long) snark.getPieceLength(0); 
         if (remaining > total)
             remaining = total;
-        long downBps = 0;
-        long upBps = 0;
-        if (snark.coordinator != null) {
-            downBps = snark.coordinator.getDownloadRate();
-            upBps = snark.coordinator.getUploadRate();
-        }
+        long downBps = snark.getDownloadRate();
+        long upBps = snark.getUploadRate();
         long remainingSeconds;
         if (downBps > 0)
             remainingSeconds = remaining / downBps;
         else
             remainingSeconds = -1;
-        boolean isRunning = !snark.stopped;
-        long uploaded = 0;
-        if (snark.coordinator != null) {
-            uploaded = snark.coordinator.getUploaded();
-            stats[0] += snark.coordinator.getDownloaded();
-        }
+        boolean isRunning = !snark.isStopped();
+        long uploaded = snark.getUploaded();
+        stats[0] += snark.getDownloaded();
         stats[1] += uploaded;
         if (isRunning) {
             stats[2] += downBps;
@@ -765,25 +784,22 @@ public class I2PSnarkServlet extends Default {
         }
         stats[5] += total;
         
-        boolean isValid = snark.meta != null;
-        boolean singleFile = snark.meta.getFiles() == null;
+        MetaInfo meta = snark.getMetaInfo();
+        // isValid means isNotMagnet
+        boolean isValid = meta != null;
+        boolean isMultiFile = isValid && meta.getFiles() != null;
         
-        String err = null;
-        int curPeers = 0;
-        int knownPeers = 0;
-        if (snark.coordinator != null) {
-            err = snark.coordinator.trackerProblems;
-            curPeers = snark.coordinator.getPeerCount();
-            stats[4] += curPeers;
-            knownPeers = Math.max(curPeers, snark.coordinator.trackerSeenPeers);
-        }
+        String err = snark.getTrackerProblems();
+        int curPeers = snark.getPeerCount();
+        stats[4] += curPeers;
+        int knownPeers = Math.max(curPeers, snark.getTrackerSeenPeers());
         
         String rowClass = (row % 2 == 0 ? "snarkTorrentEven" : "snarkTorrentOdd");
         String statusString;
         if (err != null) {
             if (isRunning && curPeers > 0 && !showPeers)
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "trackererror.png\" title=\"" + err + "\"></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Tracker Error") +
-                               ": <a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">" +
+                               ": <a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + "\">" +
                                curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning)
@@ -796,10 +812,10 @@ public class I2PSnarkServlet extends Default {
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "trackererror.png\" title=\"" + err + "\"></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Tracker Error") +
                 "<br>" + err;
             }
-        } else if (remaining <= 0) {
+        } else if (remaining == 0) {  // < 0 means no meta size yet
             if (isRunning && curPeers > 0 && !showPeers)
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "seeding.png\" ></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Seeding") +
-                               ": <a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">" +
+                               ": <a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + "\">" +
                                curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning)
@@ -811,7 +827,7 @@ public class I2PSnarkServlet extends Default {
         } else {
             if (isRunning && curPeers > 0 && downBps > 0 && !showPeers)
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "downloading.png\" ></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("OK") +
-                               ": <a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">" +
+                               ": <a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + "\">" +
                                curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning && curPeers > 0 && downBps > 0)
@@ -820,7 +836,7 @@ public class I2PSnarkServlet extends Default {
                                ngettext("1 peer", "{0} peers", knownPeers);
             else if (isRunning && curPeers > 0 && !showPeers)
                 statusString = "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "stalled.png\" ></td><td class=\"snarkTorrentStatus " + rowClass + "\">" + _("Stalled") +
-                               ": <a href=\"" + uri + "?p=" + Base64.encode(snark.meta.getInfoHash()) + "\">" +
+                               ": <a href=\"" + uri + "?p=" + Base64.encode(snark.getInfoHash()) + "\">" +
                                curPeers + thinsp(noThinsp) +
                                ngettext("1 peer", "{0} peers", knownPeers) + "</a>";
             else if (isRunning && curPeers > 0)
@@ -841,41 +857,24 @@ public class I2PSnarkServlet extends Default {
         out.write(statusString + "</td>\n\t");
 
         out.write("<td class=\"" + rowClass + "\">");
-        // temporarily hardcoded for postman* and anonymity, requires bytemonsoon patch for lookup by info_hash
-        String announce = snark.meta.getAnnounce();
-        if (announce.startsWith("http://YRgrgTLG") || announce.startsWith("http://8EoJZIKr") ||
-            announce.startsWith("http://lnQ6yoBT") || announce.startsWith("http://tracker2.postman.i2p/") || announce.startsWith("http://ahsplxkbhemefwvvml7qovzl5a2b5xo5i7lyai7ntdunvcyfdtna.b32.i2p/")) {
-            Map trackers = _manager.getTrackers();
-            for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
-                Map.Entry entry = (Map.Entry)iter.next();
-                String name = (String)entry.getKey();
-                String baseURL = (String)entry.getValue();
-                if (!(baseURL.startsWith(announce) || // vvv hack for non-b64 announce in list vvv
-                      (announce.startsWith("http://lnQ6yoBT") && baseURL.startsWith("http://tracker2.postman.i2p/")) ||
-                      (announce.startsWith("http://ahsplxkbhemefwvvml7qovzl5a2b5xo5i7lyai7ntdunvcyfdtna.b32.i2p/") && baseURL.startsWith("http://tracker2.postman.i2p/"))))
-                    continue;
-                int e = baseURL.indexOf('=');
-                if (e < 0)
-                    continue;
-                baseURL = baseURL.substring(e + 1);
-                out.write("<a href=\"" + baseURL + "details.php?dllist=1&amp;filelist=1&amp;info_hash=");
-                out.write(TrackerClient.urlencode(snark.meta.getInfoHash()));
-                out.write("\" title=\"" + _("Details at {0} tracker", name) + "\" target=\"_blank\">");
-                out.write("<img alt=\"" + _("Info") + "\" border=\"0\" src=\"" + _imgPath + "details.png\">");
-                out.write("</a>");
-                break;
-            }
+        if (isValid) {
+            StringBuilder buf = new StringBuilder(128);
+            buf.append("<a href=\"").append(snark.getBaseName())
+               .append("/\" title=\"").append(_("Torrent details"))
+               .append("\"><img alt=\"").append(_("Info")).append("\" border=\"0\" src=\"")
+               .append(_imgPath).append("details.png\"></a>");
+             out.write(buf.toString());
         }
 
         out.write("</td>\n<td class=\"" + rowClass + "\">");
         StringBuilder buf = null;
-        if (remaining == 0 || snark.meta.getFiles() != null) {
+        if (remaining == 0 || isMultiFile) {
             buf = new StringBuilder(128);
-            buf.append("<a href=\"").append(snark.storage.getBaseName());
-            if (snark.meta.getFiles() != null)
+            buf.append("<a href=\"").append(snark.getBaseName());
+            if (isMultiFile)
                 buf.append('/');
             buf.append("\" title=\"");
-            if (snark.meta.getFiles() != null)
+            if (isMultiFile)
                 buf.append(_("View files"));
             else
                 buf.append(_("Open file"));
@@ -883,21 +882,23 @@ public class I2PSnarkServlet extends Default {
             out.write(buf.toString());
         }
         String icon;
-        if (snark.meta.getFiles() != null)
+        if (isMultiFile)
             icon = "folder";
+        else if (isValid)
+            icon = toIcon(meta.getName());
         else
-            icon = toIcon(snark.meta.getName());
-        if (remaining == 0 || snark.meta.getFiles() != null) {
+            icon = "magnet";
+        if (remaining == 0 || isMultiFile) {
             out.write(toImg(icon, _("Open")));
             out.write("</a>");
         } else {
             out.write(toImg(icon));
         }
         out.write("</td><td class=\"snarkTorrentName " + rowClass + "\">");
-        if (remaining == 0 || snark.meta.getFiles() != null)
+        if (remaining == 0 || isMultiFile)
             out.write(buf.toString());
         out.write(filename);
-        if (remaining == 0 || snark.meta.getFiles() != null)
+        if (remaining == 0 || isMultiFile)
             out.write("</a>");
 
         out.write("<td align=\"right\" class=\"snarkTorrentETA " + rowClass + "\">");
@@ -907,24 +908,26 @@ public class I2PSnarkServlet extends Default {
         out.write("<td align=\"right\" class=\"snarkTorrentDownloaded " + rowClass + "\">");
         if (remaining > 0)
             out.write(formatSize(total-remaining) + thinsp(noThinsp) + formatSize(total));
-        else
+        else if (remaining == 0)
             out.write(formatSize(total)); // 3GB
+        else
+            out.write("??");  // no meta size yet
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentUploaded " + rowClass + "\">");
-        if(isRunning)
+        if(isRunning && isValid)
            out.write(formatSize(uploaded));
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentRateDown\">");
-        if(isRunning && remaining > 0)
+        if(isRunning && remaining != 0)
             out.write(formatSize(downBps) + "ps");
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentRateUp\">");
-        if(isRunning)
+        if(isRunning && isValid)
             out.write(formatSize(upBps) + "ps");
         out.write("</td>\n\t");
         out.write("<td align=\"center\" class=\"snarkTorrentAction " + rowClass + "\">");
-        String parameters = "&nonce=" + _nonce + "&torrent=" + Base64.encode(snark.meta.getInfoHash());
-        String b64 = Base64.encode(snark.meta.getInfoHash());
+        String parameters = "&nonce=" + _nonce + "&torrent=" + Base64.encode(snark.getInfoHash());
+        String b64 = Base64.encode(snark.getInfoHash());
         if (showPeers)
             parameters = parameters + "&p=1";
         if (isRunning) {
@@ -939,7 +942,6 @@ public class I2PSnarkServlet extends Default {
             if (isDegraded)
                 out.write("</a>");
         } else {
-            if (isValid) {
                 if (isDegraded)
                     out.write("<a href=\"/i2psnark/?action=Start_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");
                 else
@@ -950,24 +952,25 @@ public class I2PSnarkServlet extends Default {
                 out.write("\">");
                 if (isDegraded)
                     out.write("</a>");
-            }
 
-            if (isDegraded)
-                out.write("<a href=\"/i2psnark/?action=Remove_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");
-            else
-                out.write("<input type=\"image\" name=\"action_Remove_" + b64 + "\" value=\"foo\" title=\"");
-            out.write(_("Remove the torrent from the active list, deleting the .torrent file"));
-            out.write("\" onclick=\"if (!confirm('");
-            // Can't figure out how to escape double quotes inside the onclick string.
-            // Single quotes in translate strings with parameters must be doubled.
-            // Then the remaining single quite must be escaped
-            out.write(_("Are you sure you want to delete the file \\''{0}.torrent\\'' (downloaded data will not be deleted) ?", fullFilename));
-            out.write("')) { return false; }\"");
-            out.write(" src=\"" + _imgPath + "remove.png\" alt=\"");
-            out.write(_("Remove"));
-            out.write("\">");
-            if (isDegraded)
-                out.write("</a>");
+            if (isValid) {
+                if (isDegraded)
+                    out.write("<a href=\"/i2psnark/?action=Remove_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");
+                else
+                    out.write("<input type=\"image\" name=\"action\" value=\"Remove_" + b64 + "\" title=\"");
+                out.write(_("Remove the torrent from the active list, deleting the .torrent file"));
+                out.write("\" onclick=\"if (!confirm('");
+                // Can't figure out how to escape double quotes inside the onclick string.
+                // Single quotes in translate strings with parameters must be doubled.
+                // Then the remaining single quite must be escaped
+                out.write(_("Are you sure you want to delete the file \\''{0}.torrent\\'' (downloaded data will not be deleted) ?", fullFilename));
+                out.write("')) { return false; }\"");
+                out.write(" src=\"" + _imgPath + "remove.png\" alt=\"");
+                out.write(_("Remove"));
+                out.write("\">");
+                if (isDegraded)
+                    out.write("</a>");
+            }
 
             if (isDegraded)
                 out.write("<a href=\"/i2psnark/?action=Delete_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");
@@ -989,7 +992,7 @@ public class I2PSnarkServlet extends Default {
         out.write("</td>\n</tr>\n");
 
         if(showPeers && isRunning && curPeers > 0) {
-            List<Peer> peers = snark.coordinator.peerList();
+            List<Peer> peers = snark.getPeerList();
             if (!showDebug)
                 Collections.sort(peers, new PeerComparator());
             for (Peer peer : peers) {
@@ -1022,14 +1025,21 @@ public class I2PSnarkServlet extends Default {
                 out.write("<td class=\"snarkTorrentStatus " + rowClass + "\">");
                 out.write("</td>\n\t");
                 out.write("<td align=\"right\" class=\"snarkTorrentStatus " + rowClass + "\">");
-                float pct = (float) (100.0 * (float) peer.completed() / snark.meta.getPieces());
-                if (pct == 100.0)
-                    out.write(_("Seed"));
-                else {
-                    String ps = String.valueOf(pct);
-                    if (ps.length() > 5)
-                        ps = ps.substring(0, 5);
-                    out.write(ps + "%");
+                float pct;
+                if (isValid) {
+                    pct = (float) (100.0 * (float) peer.completed() / meta.getPieces());
+                    if (pct == 100.0)
+                        out.write(_("Seed"));
+                    else {
+                        String ps = String.valueOf(pct);
+                        if (ps.length() > 5)
+                            ps = ps.substring(0, 5);
+                        out.write(ps + "%");
+                    }
+                } else {
+                    pct = (float) 101.0;
+                    // until we get the metainfo we don't know how many pieces there are
+                    //out.write("??");
                 }
                 out.write("</td>\n\t");
                 out.write("<td class=\"snarkTorrentStatus " + rowClass + "\">");
@@ -1051,7 +1061,7 @@ public class I2PSnarkServlet extends Default {
                 }
                 out.write("</td>\n\t");
                 out.write("<td align=\"right\" class=\"snarkTorrentStatus " + rowClass + "\">");
-                if (pct != 100.0) {
+                if (isValid && pct < 100.0) {
                     if (peer.isInterested() && !peer.isChoking()) {
                         out.write("<span class=\"unchoked\">");
                         out.write(formatSize(peer.getUploadRate()) + "ps</span>");
@@ -1094,8 +1104,40 @@ public class I2PSnarkServlet extends Default {
         }
     }
 
+    /**
+     *  @return string or null
+     *  @since 0.8.4
+     */
+    private String getTrackerLink(String announce, byte[] infohash) {
+        // temporarily hardcoded for postman* and anonymity, requires bytemonsoon patch for lookup by info_hash
+        if (announce != null && (announce.startsWith("http://YRgrgTLG") || announce.startsWith("http://8EoJZIKr") ||
+              announce.startsWith("http://lnQ6yoBT") || announce.startsWith("http://tracker2.postman.i2p/") ||
+              announce.startsWith("http://ahsplxkbhemefwvvml7qovzl5a2b5xo5i7lyai7ntdunvcyfdtna.b32.i2p/"))) {
+            Map<String, String> trackers = _manager.getTrackers();
+            for (Map.Entry<String, String> entry : trackers.entrySet()) {
+                String baseURL = entry.getValue();
+                if (!(baseURL.startsWith(announce) || // vvv hack for non-b64 announce in list vvv
+                      (announce.startsWith("http://lnQ6yoBT") && baseURL.startsWith("http://tracker2.postman.i2p/")) ||
+                      (announce.startsWith("http://ahsplxkbhemefwvvml7qovzl5a2b5xo5i7lyai7ntdunvcyfdtna.b32.i2p/") && baseURL.startsWith("http://tracker2.postman.i2p/"))))
+                    continue;
+                int e = baseURL.indexOf('=');
+                if (e < 0)
+                    continue;
+                baseURL = baseURL.substring(e + 1);
+                String name = entry.getKey();
+                StringBuilder buf = new StringBuilder(128);
+                buf.append("<a href=\"").append(baseURL).append("details.php?dllist=1&amp;filelist=1&amp;info_hash=")
+                   .append(TrackerClient.urlencode(infohash))
+                   .append("\" title=\"").append(_("Details at {0} tracker", name)).append("\" target=\"_blank\">" +
+                          "<img alt=\"").append(_("Info")).append("\" border=\"0\" src=\"")
+                   .append(_imgPath).append("details.png\"></a>");
+                return buf.toString();
+            }
+        }
+        return null;
+    }
+
     private void writeAddForm(PrintWriter out, HttpServletRequest req) throws IOException {
-        String uri = req.getRequestURI();
         String newURL = req.getParameter("newURL");
         if ( (newURL == null) || (newURL.trim().length() <= 0) )
             newURL = "";
@@ -1136,7 +1178,6 @@ public class I2PSnarkServlet extends Default {
     }
     
     private void writeSeedForm(PrintWriter out, HttpServletRequest req) throws IOException {
-        String uri = req.getRequestURI();
         String baseFile = req.getParameter("baseFile");
         if (baseFile == null || baseFile.trim().length() <= 0)
             baseFile = "";
@@ -1167,6 +1208,10 @@ public class I2PSnarkServlet extends Default {
         out.write(":<td><select name=\"announceURL\"><option value=\"\">");
         out.write(_("Select a tracker"));
         out.write("</option>\n");
+        // todo remember this one with _lastAnnounceURL also
+        out.write("<option value=\"none\">");
+        out.write(_("Open trackers and DHT only"));
+        out.write("</option>\n");
         Map trackers = _manager.getTrackers();
         for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
             Map.Entry entry = (Map.Entry)iter.next();
@@ -1175,6 +1220,8 @@ public class I2PSnarkServlet extends Default {
             int e = announceURL.indexOf('=');
             if (e > 0)
                 announceURL = announceURL.substring(0, e);
+            if (announceURL.equals(_lastAnnounceURL))
+                announceURL += "\" selected=\"selected";
             out.write("\t<option value=\"" + announceURL + "\">" + name + "</option>\n");
         }
         out.write("</select>\n");
@@ -1190,7 +1237,6 @@ public class I2PSnarkServlet extends Default {
     }
     
     private void writeConfigForm(PrintWriter out, HttpServletRequest req) throws IOException {
-        String uri = req.getRequestURI();
         String dataDir = _manager.getDataDir().getAbsolutePath();
         boolean autoStart = _manager.shouldAutoStart();
         boolean useOpenTrackers = _manager.util().shouldUseOpenTrackers();
@@ -1308,15 +1354,17 @@ public class I2PSnarkServlet extends Default {
         out.write("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
         out.write(renderOptions(0, 4, options.remove("outbound.length"), "outbound.length", HOP));
 
-        out.write("<tr><td>");
-        out.write(_("I2CP host"));
-        out.write(": <td><input type=\"text\" name=\"i2cpHost\" value=\"" 
-                  + _manager.util().getI2CPHost() + "\" size=\"15\" > ");
+        if (!_context.isRouterContext()) {
+            out.write("<tr><td>");
+            out.write(_("I2CP host"));
+            out.write(": <td><input type=\"text\" name=\"i2cpHost\" value=\"" 
+                      + _manager.util().getI2CPHost() + "\" size=\"15\" > ");
 
-        out.write("<tr><td>");
-        out.write(_("I2CP port"));
-        out.write(": <td><input type=\"text\" name=\"i2cpPort\" class=\"r\" value=\"" +
-                  + _manager.util().getI2CPPort() + "\" size=\"5\" maxlength=\"5\" > <br>\n");
+            out.write("<tr><td>");
+            out.write(_("I2CP port"));
+            out.write(": <td><input type=\"text\" name=\"i2cpPort\" class=\"r\" value=\"" +
+                      + _manager.util().getI2CPPort() + "\" size=\"5\" maxlength=\"5\" > <br>\n");
+        }
 
         StringBuilder opts = new StringBuilder(64);
         for (Iterator iter = options.entrySet().iterator(); iter.hasNext(); ) {
@@ -1342,6 +1390,49 @@ public class I2PSnarkServlet extends Default {
         out.write("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "config.png\"> ");
         out.write(_("Configuration"));
         out.write("</a></span></span></div>\n");
+    }
+
+    /**
+     *  @param url in base32 or hex, xt must be first magnet param
+     *  @since 0.8.4
+     */
+    private void addMagnet(String url) {
+        String ihash;
+        String name;
+        if (url.startsWith(MAGNET)) {
+            ihash = url.substring(MAGNET.length()).trim();
+            int amp = ihash.indexOf('&');
+            if (amp >= 0)
+                ihash = url.substring(0, amp);
+            name = "Magnet " + ihash;
+        } else if (url.startsWith(MAGGOT)) {
+            ihash = url.substring(MAGGOT.length()).trim();
+            int col = ihash.indexOf(':');
+            if (col >= 0)
+                ihash = url.substring(0, col);
+            name = "Maggot " + ihash;
+        } else {
+            return;
+        }
+        byte[] ih = null;
+        if (ihash.length() == 32) {
+            ih = Base32.decode(ihash);
+        } else if (ihash.length() == 40) {
+            //  Like DataHelper.fromHexString() but ensures no loss of leading zero bytes
+            ih = new byte[20];
+            try {
+                for (int i = 0; i < 20; i++) {
+                    ih[i] = (byte) (Integer.parseInt(ihash.substring(i*2, (i*2) + 2), 16) & 0xff);
+                }
+            } catch (NumberFormatException nfe) {
+                ih = null;
+            }
+        }
+        if (ih == null || ih.length != 20) {
+            _manager.addMessage(_("Invalid info hash in magnet URL {0}", url));
+            return;
+        }
+        _manager.addMagnet(name, ih, true);
     }
 
     /** copied from ConfigTunnelsHelper */
@@ -1382,6 +1473,11 @@ public class I2PSnarkServlet extends Default {
     /** translate */
     private String _(String s, Object o) {
         return _manager.util().getString(s, o);
+    }
+
+    /** translate */
+    private String _(String s, Object o, Object o2) {
+        return _manager.util().getString(s, o, o2);
     }
 
     /** translate (ngettext) @since 0.7.14 */
@@ -1459,13 +1555,11 @@ public class I2PSnarkServlet extends Default {
     private String getListHTML(Resource r, String base, boolean parent, Map postParams)
         throws IOException
     {
-        if (!r.isDirectory())
-            return null;
-        
-        String[] ls = r.list();
-        if (ls==null)
-            return null;
-        Arrays.sort(ls, Collator.getInstance());
+        String[] ls = null;
+        if (r.isDirectory()) {
+            ls = r.list();
+            Arrays.sort(ls, Collator.getInstance());
+        }  // if r is not a directory, we are only showing torrent info section
         
         StringBuilder buf=new StringBuilder(4096);
         buf.append(DOCTYPE + "<HTML><HEAD><TITLE>");
@@ -1487,6 +1581,7 @@ public class I2PSnarkServlet extends Default {
 
         if (title.endsWith("/"))
             title = title.substring(0, title.length() - 1);
+        String directory = title;
         title = _("Torrent") + ": " + title;
         buf.append(title);
         buf.append("</TITLE>").append(HEADER_A).append(_themePath).append(HEADER_B).append("<link rel=\"shortcut icon\" href=\"" + _themePath + "favicon.ico\">" +
@@ -1495,13 +1590,68 @@ public class I2PSnarkServlet extends Default {
         
         if (parent)  // always true
             buf.append("<div class=\"page\"><div class=\"mainsection\">");
-        boolean showPriority = snark != null && !snark.storage.complete();
+        boolean showPriority = ls != null && snark != null && snark.getStorage() != null && !snark.getStorage().complete();
         if (showPriority)
             buf.append("<form action=\"").append(base).append("\" method=\"POST\">\n");
-        buf.append("<TABLE BORDER=0 class=\"snarkTorrents\" >" +
-            "<thead><tr><th>")
+        buf.append("<TABLE BORDER=0 class=\"snarkTorrents\" ><thead>");
+        if (snark != null) {
+            // first row - torrent info
+            // FIXME center
+            buf.append("<tr><th colspan=\"" + (showPriority ? '4' : '3') + "\"><div>")
+                .append(_("Torrent")).append(": ").append(snark.getBaseName());
+            int pieces = snark.getPieces();
+            double completion = (pieces - snark.getNeeded()) / (double) pieces;
+            if (completion < 1.0)
+                buf.append("<br>").append(_("Completion")).append(": ").append((new DecimalFormat("0.00%")).format(completion));
+            else
+                buf.append("<br>").append(_("Complete"));
+            // else unknown
+            buf.append("<br>").append(_("Size")).append(": ").append(formatSize(snark.getTotalLength()));
+            MetaInfo meta = snark.getMetaInfo();
+            if (meta != null) {
+                List files = meta.getFiles();
+                int fileCount = files != null ? files.size() : 1;
+                buf.append("<br>").append(_("Files")).append(": ").append(fileCount);
+            }
+            buf.append("<br>").append(_("Pieces")).append(": ").append(pieces);
+            buf.append("<br>").append(_("Piece size")).append(": ").append(formatSize(snark.getPieceLength(0)));
+
+            if (meta != null) {
+                String announce = meta.getAnnounce();
+                if (announce != null) {
+                    buf.append("<br>");
+                    String trackerLink = getTrackerLink(announce, snark.getInfoHash());
+                    if (trackerLink != null)
+                        buf.append(trackerLink).append(' ');
+                    buf.append(_("Tracker")).append(": ");
+                    if (announce.startsWith("http://"))
+                        announce = announce.substring(7);
+                    int slsh = announce.indexOf('/');
+                    if (slsh > 0)
+                        announce = announce.substring(0, slsh);
+                    buf.append(announce);
+                }
+            }
+
+            String hex = I2PSnarkUtil.toHex(snark.getInfoHash());
+            buf.append("<br>").append(toImg("magnet", _("Magnet link"))).append(" <a href=\"")
+               .append(MAGNET).append(hex).append("\">")
+               .append(MAGNET).append(hex).append("</a>");
+            // We don't have the hash of the torrent file
+            //buf.append("<br>").append(_("Maggot link")).append(": <a href=\"").append(MAGGOT).append(hex).append(':').append(hex).append("\">")
+            //   .append(MAGGOT).append(hex).append(':').append(hex).append("</a>");
+            buf.append("</div></th></tr>");
+        }
+        if (ls == null) {
+            // We are only showing the torrent info section
+            buf.append("</thead></table></div></div></BODY></HTML>");
+            return buf.toString();
+        }
+
+        // second row - dir info
+        buf.append("<tr><th>")
             .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "file.png\" >&nbsp;")
-            .append(title).append("</th><th align=\"right\">")
+            .append(_("Directory")).append(": ").append(directory).append("</th><th align=\"right\">")
             .append("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "size.png\" >&nbsp;")
             .append(_("Size"));
         buf.append("</th><th class=\"headerstatus\">")
@@ -1542,15 +1692,16 @@ public class I2PSnarkServlet extends Default {
                 complete = true;
                 status = toImg("tick") + ' ' + _("Directory");
             } else {
-                if (snark == null) {
+                if (snark == null || snark.getStorage() == null) {
                     // Assume complete, perhaps he removed a completed torrent but kept a bookmark
                     complete = true;
                     status = toImg("cancel") + ' ' + _("Torrent not found?");
                 } else {
+                    Storage storage = snark.getStorage();
                     try {
                         File f = item.getFile();
                         if (f != null) {
-                            long remaining = snark.storage.remaining(f.getCanonicalPath());
+                            long remaining = storage.remaining(f.getCanonicalPath());
                             if (remaining < 0) {
                                 complete = true;
                                 status = toImg("cancel") + ' ' + _("File not found in torrent?");
@@ -1558,7 +1709,7 @@ public class I2PSnarkServlet extends Default {
                                 complete = true;
                                 status = toImg("tick") + ' ' + _("Complete");
                             } else {
-                                int priority = snark.storage.getPriority(f.getCanonicalPath());
+                                int priority = storage.getPriority(f.getCanonicalPath());
                                 if (priority < 0)
                                     status = toImg("cancel");
                                 else if (priority == 0)
@@ -1614,7 +1765,7 @@ public class I2PSnarkServlet extends Default {
                 buf.append("<td class=\"priority\">");
                 File f = item.getFile();
                 if ((!complete) && (!item.isDirectory()) && f != null) {
-                    int pri = snark.storage.getPriority(f.getCanonicalPath());
+                    int pri = snark.getStorage().getPriority(f.getCanonicalPath());
                     buf.append("<input type=\"radio\" value=\"5\" name=\"pri.").append(f.getCanonicalPath()).append("\" ");
                     if (pri > 0)
                         buf.append("checked=\"true\"");
@@ -1716,6 +1867,9 @@ public class I2PSnarkServlet extends Default {
 
     /** @since 0.8.1 */
     private void savePriorities(Snark snark, Map postParams) {
+        Storage storage = snark.getStorage();
+        if (storage == null)
+            return;
         Set<Map.Entry> entries = postParams.entrySet();
         for (Map.Entry entry : entries) {
             String key = (String)entry.getKey();
@@ -1724,14 +1878,13 @@ public class I2PSnarkServlet extends Default {
                     String file = key.substring(4);
                     String val = ((String[])entry.getValue())[0];   // jetty arrays
                     int pri = Integer.parseInt(val);
-                    snark.storage.setPriority(file, pri);
+                    storage.setPriority(file, pri);
                     //System.err.println("Priority now " + pri + " for " + file);
                 } catch (Throwable t) { t.printStackTrace(); }
             }
         }
-        if (snark.coordinator != null)
-            snark.coordinator.updatePiecePriorities();
-        _manager.saveTorrentStatus(snark.storage.getMetaInfo(), snark.storage.getBitField(), snark.storage.getFilePriorities());
+         snark.updatePiecePriorities();
+        _manager.saveTorrentStatus(snark.getMetaInfo(), storage.getBitField(), storage.getFilePriorities());
     }
 
 
@@ -1753,15 +1906,17 @@ private static class FetchAndAdd implements Runnable {
                 FileInputStream in = null;
                 try {
                     in = new FileInputStream(file);
+                    // we do not retain this MetaInfo object, hopefully it will go away quickly
                     MetaInfo info = new MetaInfo(in);
+                    try { in.close(); } catch (IOException ioe) {}
+                    Snark snark = _manager.getTorrentByInfoHash(info.getInfoHash());
+                    if (snark != null) {
+                        _manager.addMessage(_("Torrent with this info hash is already running: {0}", snark.getBaseName()));
+                        return;
+                    }
+
                     String name = info.getName();
-                    name = DataHelper.stripHTML(name);  // XSS
-                    name = name.replace('/', '_');
-                    name = name.replace('\\', '_');
-                    name = name.replace('&', '+');
-                    name = name.replace('\'', '_');
-                    name = name.replace('"', '_');
-                    name = name.replace('`', '_');
+                    name = Storage.filterName(name);
                     name = name + ".torrent";
                     File torrentFile = new File(_manager.getDataDir(), name);
 
@@ -1773,18 +1928,15 @@ private static class FetchAndAdd implements Runnable {
                         else
                             _manager.addMessage(_("Torrent already in the queue: {0}", name));
                     } else {
-                        boolean success = FileUtil.copy(file.getAbsolutePath(), canonical, false);
-                        if (success) {
-                            SecureFileOutputStream.setPerms(torrentFile);
-                            _manager.addTorrent(canonical);
-                        } else {
-                            _manager.addMessage(_("Failed to copy torrent file to {0}", canonical));
-                        }
+                        // This may take a LONG time to create the storage.
+                        _manager.copyAndAddTorrent(file, canonical);
                     }
                 } catch (IOException ioe) {
                     _manager.addMessage(_("Torrent at {0} was not valid", urlify(_url)) + ": " + ioe.getMessage());
+                } catch (OutOfMemoryError oom) {
+                    _manager.addMessage(_("ERROR - Out of memory, cannot create torrent from {0}", urlify(_url)) + ": " + oom.getMessage());
                 } finally {
-                    try { in.close(); } catch (IOException ioe) {}
+                    try { if (in != null) in.close(); } catch (IOException ioe) {}
                 }
             } else {
                 _manager.addMessage(_("Torrent was not retrieved from {0}", urlify(_url)));

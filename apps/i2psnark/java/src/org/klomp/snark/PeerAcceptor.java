@@ -88,12 +88,11 @@ public class PeerAcceptor
     }
     if (coordinator != null) {
         // single torrent capability
-        MetaInfo meta = coordinator.getMetaInfo();
-        if (DataHelper.eq(meta.getInfoHash(), peerInfoHash)) {
+        if (DataHelper.eq(coordinator.getInfoHash(), peerInfoHash)) {
             if (coordinator.needPeers())
               {
                 Peer peer = new Peer(socket, in, out, coordinator.getID(),
-                                     coordinator.getMetaInfo());
+                                     coordinator.getInfoHash(), coordinator.getMetaInfo());
                 coordinator.addPeer(peer);
               }
             else
@@ -101,26 +100,25 @@ public class PeerAcceptor
         } else {
           // its for another infohash, but we are only single torrent capable.  b0rk.
             throw new IOException("Peer wants another torrent (" + Base64.encode(peerInfoHash) 
-                                  + ") while we only support (" + Base64.encode(meta.getInfoHash()) + ")");
+                                  + ") while we only support (" + Base64.encode(coordinator.getInfoHash()) + ")");
         }
     } else {
         // multitorrent capable, so lets see what we can handle
         for (Iterator iter = coordinators.iterator(); iter.hasNext(); ) {
             PeerCoordinator cur = (PeerCoordinator)iter.next();
-            MetaInfo meta = cur.getMetaInfo();
-            
-            if (DataHelper.eq(meta.getInfoHash(), peerInfoHash)) {
+
+            if (DataHelper.eq(cur.getInfoHash(), peerInfoHash)) {
                 if (cur.needPeers())
                   {
                     Peer peer = new Peer(socket, in, out, cur.getID(),
-                                         cur.getMetaInfo());
+                                         cur.getInfoHash(), cur.getMetaInfo());
                     cur.addPeer(peer);
                     return;
                   }
                 else 
                   {
                     if (_log.shouldLog(Log.DEBUG))
-                      _log.debug("Rejecting new peer for " + cur.snark.torrent);
+                      _log.debug("Rejecting new peer for " + cur.getName());
                     socket.close();
                     return;
                   }

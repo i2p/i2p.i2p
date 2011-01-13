@@ -87,6 +87,9 @@ public class Storage
    * Creates a storage from the existing file or directory together
    * with an appropriate MetaInfo file as can be announced on the
    * given announce String location.
+   *
+   * @param announce may be null
+   * @param listener may be null
    */
   public Storage(I2PSnarkUtil util, File baseFile, String announce, StorageListener listener)
     throws IOException
@@ -97,12 +100,12 @@ public class Storage
     getFiles(baseFile);
     
     long total = 0;
-    ArrayList lengthsList = new ArrayList();
+    ArrayList<Long> lengthsList = new ArrayList();
     for (int i = 0; i < lengths.length; i++)
       {
         long length = lengths[i];
         total += length;
-        lengthsList.add(new Long(length));
+        lengthsList.add(Long.valueOf(length));
       }
 
     piece_size = MIN_PIECE_SIZE;
@@ -119,10 +122,10 @@ public class Storage
     bitfield = new BitField(pieces);
     needed = 0;
 
-    List files = new ArrayList();
+    List<List<String>> files = new ArrayList();
     for (int i = 0; i < names.length; i++)
       {
-        List file = new ArrayList();
+        List<String> file = new ArrayList();
         StringTokenizer st = new StringTokenizer(names[i], File.separator);
         while (st.hasMoreTokens())
           {
@@ -535,7 +538,7 @@ public class Storage
     } else {
       // the following sets the needed variable
       changed = true;
-      checkCreateFiles();
+      checkCreateFiles(false);
     }
     if (complete()) {
         _util.debug("Torrent is complete", Snark.NOTICE);
@@ -590,7 +593,7 @@ public class Storage
    * Removes 'suspicious' characters from the given file name.
    * http://msdn.microsoft.com/en-us/library/aa365247%28VS.85%29.aspx
    */
-  private static String filterName(String name)
+  public static String filterName(String name)
   {
     if (name.equals(".") || name.equals(" "))
         return "_";
@@ -646,15 +649,26 @@ public class Storage
   /**
    * This is called at the beginning, and at presumed completion,
    * so we have to be careful about locking.
+   *
+   * @param recheck if true, this is a check after we downloaded the
+   *        last piece, and we don't modify the global bitfield unless
+   *        the check fails.
    */
-  private void checkCreateFiles() throws IOException
+  private void checkCreateFiles(boolean recheck) throws IOException
   {
     // Whether we are resuming or not,
     // if any of the files already exists we assume we are resuming.
     boolean resume = false;
 
     _probablyComplete = true;
-    needed = metainfo.getPieces();
+    // use local variables during the check
+    int need = metainfo.getPieces();
+    BitField bfield;
+    if (recheck) {
+        bfield = new BitField(need);
+    } else {
+        bfield = bitfield;
+    }
 
     // Make sure all files are available and of correct length
     for (int i = 0; i < rafs.length; i++)
@@ -715,8 +729,8 @@ public class Storage
             }
             if (correctHash)
               {
-                bitfield.set(i);
-                needed--;
+                bfield.set(i);
+                need--;
               }
 
             if (listener != null)
@@ -736,6 +750,15 @@ public class Storage
     //  }
     //}
 
+    // do this here so we don't confuse the user during checking
+    needed = need;
+    if (recheck && need > 0) {
+        // whoops, recheck failed
+        synchronized(bitfield) {
+            bitfield = bfield;
+        }
+    }
+
     if (listener != null) {
       listener.storageAllChecked(this);
       if (needed <= 0)
@@ -750,7 +773,8 @@ public class Storage
     openRAF(nr, false);  // RW
     // XXX - Is this the best way to make sure we have enough space for
     // the whole file?
-    listener.storageCreateFile(this, names[nr], lengths[nr]);
+    if (listener != null)
+        listener.storageCreateFile(this, names[nr], lengths[nr]);
     final int ZEROBLOCKSIZE = metainfo.getPieceLength(0);
     byte[] zeros;
     try {
@@ -899,11 +923,7 @@ public class Storage
       // checkCreateFiles() which will set 'needed' and 'bitfield'
       // and also call listener.storageCompleted() if the double-check
       // was successful.
-      // Todo: set a listener variable so the web shows "checking" and don't
-      // have the user panic when completed amount goes to zero temporarily?
-      needed = metainfo.getPieces();
-      bitfield = new BitField(needed);
-      checkCreateFiles();
+      checkCreateFiles(true);
       if (needed > 0) {
         if (listener != null)
             listener.setWantedPieces(this);
