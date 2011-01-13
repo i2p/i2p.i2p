@@ -310,7 +310,7 @@ public class TunnelControllerGroup {
         synchronized (_sessions) {
             Set<TunnelController> owners = _sessions.get(session);
             if (owners == null) {
-                owners = new HashSet(1);
+                owners = new HashSet(2);
                 _sessions.put(session, owners);
             }
             owners.add(controller);

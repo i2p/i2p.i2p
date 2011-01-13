@@ -156,7 +156,7 @@ public class Shitlist {
         e.causeCode = reasonCode;
         e.transports = null;
         if (transport != null) {
-            e.transports = new ConcurrentHashSet(1);
+            e.transports = new ConcurrentHashSet(2);
             e.transports.add(transport);
         }
         

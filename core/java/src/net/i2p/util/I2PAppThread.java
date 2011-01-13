@@ -10,9 +10,9 @@ package net.i2p.util;
  */
 
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Like I2PThread but with per-thread OOM listeners,
@@ -22,7 +22,7 @@ import java.util.Set;
  */
 public class I2PAppThread extends I2PThread {
 
-    private Set _threadListeners = new HashSet(0);
+    private final Set _threadListeners = new CopyOnWriteArraySet();
 
     public I2PAppThread() {
         super();

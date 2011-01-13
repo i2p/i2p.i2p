@@ -225,7 +225,7 @@ public class OutNetMessage {
     
     public void transportFailed(String transportStyle) { 
         if (_failedTransports == null)
-            _failedTransports = new HashSet(1);
+            _failedTransports = new HashSet(2);
         _failedTransports.add(transportStyle); 
     }
     /** not thread safe - dont fail transports and iterate over this at the same time */

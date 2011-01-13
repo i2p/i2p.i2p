@@ -34,7 +34,7 @@ public class RouterClock extends Clock {
     private long _lastChanged;
     private int _lastStratum;
 
-    RouterContext _contextRC; // LINT field hides another field
+    private final RouterContext _contextRC;
 
     public RouterClock(RouterContext context) {
         super(context);

@@ -9,7 +9,7 @@ package net.i2p.router.networkdb.kademlia;
  */
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -800,8 +800,7 @@ class SearchJob extends JobImpl {
         if (rv) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(getJobId() + ": Queueing up for next time: " + peer);
-            Set s = new HashSet(1);
-            s.add(peer);
+            Set<Hash> s = Collections.singleton(peer);
             _facade.queueForExploration(s);
         }
         return rv;

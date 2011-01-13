@@ -1,6 +1,6 @@
 package net.i2p.router.tunnel.pool;
 
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Set;
 
 import net.i2p.crypto.SessionKeyManager;
@@ -144,8 +144,7 @@ class TestJob extends JobImpl {
             scheduleRetest();
             return;
         }
-        Set encryptTags = new HashSet(1);
-        encryptTags.add(encryptTag);
+        Set<SessionTag> encryptTags = Collections.singleton(encryptTag);
         // Register the single tag with the appropriate SKM
         if (_cfg.isInbound() && !_pool.getSettings().isExploratory()) {
             SessionKeyManager skm = getContext().clientManager().getClientSessionKeyManager(_pool.getSettings().getDestination());

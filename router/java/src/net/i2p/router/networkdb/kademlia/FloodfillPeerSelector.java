@@ -74,8 +74,9 @@ class FloodfillPeerSelector extends PeerSelector {
      */
     List<Hash> selectNearestExplicitThin(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet kbuckets, boolean preferConnected) { 
         if (peersToIgnore == null)
-            peersToIgnore = new HashSet(1);
-        peersToIgnore.add(_context.routerHash());
+            peersToIgnore = Collections.singleton(_context.routerHash());
+        else
+            peersToIgnore.add(_context.routerHash());
         // TODO this is very slow
         FloodfillSelectionCollector matches = new FloodfillSelectionCollector(key, peersToIgnore, maxNumRouters);
         if (kbuckets == null) return new ArrayList();
@@ -94,8 +95,7 @@ class FloodfillPeerSelector extends PeerSelector {
      *  List is not sorted and not shuffled.
      */
     List<Hash> selectFloodfillParticipants(KBucketSet kbuckets) {
-        Set<Hash> ignore = new HashSet(1);
-        ignore.add(_context.routerHash());
+        Set<Hash> ignore = Collections.singleton(_context.routerHash());
         return selectFloodfillParticipants(ignore, kbuckets);
     }
 
@@ -132,8 +132,7 @@ class FloodfillPeerSelector extends PeerSelector {
      *  Group 3: All others
      */
     List<Hash> selectFloodfillParticipants(Hash key, int maxNumRouters, KBucketSet kbuckets) {
-        Set<Hash> ignore = new HashSet(1);
-        ignore.add(_context.routerHash());
+        Set<Hash> ignore = Collections.singleton(_context.routerHash());
         return selectFloodfillParticipants(key, maxNumRouters, ignore, kbuckets);
     }
 
@@ -152,8 +151,7 @@ class FloodfillPeerSelector extends PeerSelector {
      */
     List<Hash> selectFloodfillParticipants(Hash key, int howMany, Set<Hash> toIgnore, KBucketSet kbuckets) {
         if (toIgnore == null) {
-            toIgnore = new HashSet(1);
-            toIgnore.add(_context.routerHash());
+            toIgnore = Collections.singleton(_context.routerHash());
         } else if (!toIgnore.contains(_context.routerHash())) {
             // copy the Set so we don't confuse StoreJob
             toIgnore = new HashSet(toIgnore);
