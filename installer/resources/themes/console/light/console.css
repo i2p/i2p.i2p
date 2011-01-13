@@ -139,6 +139,7 @@ div.routersummary h3 {
      -khtml-border-radius: 3px;
      border-radius: 3px;
      -moz-box-shadow: 0px 1px 5px #bbf;
+     text-shadow: 0px 0px 1px #77f;
 }
 
 div.routersummary h3 a {
@@ -752,13 +753,13 @@ p {
 
 h1 {
      text-align: left;
-     color: #000;
+     color: #003;
      padding: 10px 15px;
      margin: 0 10px 10px 207px;
      font: normal bold 16pt/120% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      letter-spacing: 0.15em;
      text-transform: uppercase;
-     text-shadow: 0px 0px 1px #77f;
+     text-shadow: 0px 1px 1px #77f;
      -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
      white-space: normal;
      background: #ffe url('images/header.png') center center repeat-x;
@@ -771,18 +772,18 @@ h1 {
 
 h2 {
      font-size: 13pt;
-     color: #000;
-     letter-spacing: 0.05em;
+     color: #003;
+     letter-spacing: 0.07em;
      background: #ffe url('images/header.png') center center repeat-x;
-     text-shadow: 0px 0px 1px rgba(0, 0, 64, 0.5);
+     text-shadow: 0px 1px 1px #77f;
      padding: 10px 10px;
      wordwrap: none;
-     border: 1px solid #113;
+     border: 1px solid #447;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      margin: 15px 0px 15px 0 !important;
-     -moz-box-shadow: 0 1px 1px 1px rgba(176, 176, 216, 0.4);
+     -moz-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
      word-wrap: break-word;
      text-transform: uppercase;
      opacity: 1;
@@ -799,8 +800,8 @@ h2 img {
 }
 
 h3 {
-     border: 1px solid #113;
-     border-left: 5px solid #113;
+     border: 1px solid #447;
+     border-left: 5px solid #447;
      padding: 5px 5px 5px 5px;
      margin: 12px 0 15px 0;
      border-radius: 0 4px 4px 0;
@@ -808,11 +809,12 @@ h3 {
      -khtml-border-radius: 0 4px 4px 0;
      background: #ffe url('images/header.png') center center repeat-x !important;
      text-transform: uppercase;
-     text-shadow: 0px 0px 1px #77f;
+     text-shadow: 0px 1px 1px #77f;
      font-size: 11pt;
-     color: #000;
-     -moz-box-shadow: 0 1px 1px 1px rgba(176, 176, 216, 0.4);
+     color: #003;
+     -moz-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
      opacity: 1;
+     letter-spacing: 0.07em;
 }
 
 h4 {
