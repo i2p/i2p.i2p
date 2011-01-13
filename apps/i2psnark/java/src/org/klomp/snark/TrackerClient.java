@@ -300,10 +300,8 @@ public class TrackerClient extends I2PAppThread
                           Peer cur = it.next();
                           // FIXME if id == us || dest == us continue;
                           // only delay if we actually make an attempt to add peer
-                          if(coordinator.addPeer(cur)) {
-                            int delay = DELAY_MUL;
-                            delay *= r.nextInt(10);
-                            delay += DELAY_MIN;
+                          if(coordinator.addPeer(cur) && it.hasNext()) {
+                            int delay = (DELAY_MUL * r.nextInt(10)) + DELAY_MIN;
                             sleptTime += delay;
                             try { Thread.sleep(delay); } catch (InterruptedException ie) {}
                           }
@@ -341,6 +339,27 @@ public class TrackerClient extends I2PAppThread
                   maxSeenPeers = tr.seenPeers;
             }  // *** end of trackers loop here
 
+            // Get peers from PEX
+            if (left > 0 && coordinator.needPeers() && !stop) {
+                Set<PeerID> pids = coordinator.getPEXPeers();
+                if (!pids.isEmpty()) {
+                    _util.debug("Got " + pids.size() + " from PEX", Snark.INFO);
+                    List<Peer> peers = new ArrayList(pids.size());
+                    for (PeerID pID : pids) {
+                        peers.add(new Peer(pID, snark.getID(), snark.getInfoHash(), snark.getMetaInfo()));
+                    }
+                    Collections.shuffle(peers, r);
+                    Iterator<Peer> it = peers.iterator();
+                    while ((!stop) && it.hasNext()) {
+                        Peer cur = it.next();
+                        if (coordinator.addPeer(cur) && it.hasNext()) {
+                            int delay = (DELAY_MUL * r.nextInt(10)) + DELAY_MIN;
+                            try { Thread.sleep(delay); } catch (InterruptedException ie) {}
+                         }
+                    }
+                }
+            }
+
             // Get peers from DHT
             // FIXME this needs to be in its own thread
             if (_util.getDHT() != null && !stop) {
@@ -369,10 +388,8 @@ public class TrackerClient extends I2PAppThread
                     Iterator<Peer> it = peers.iterator();
                     while ((!stop) && it.hasNext()) {
                         Peer cur = it.next();
-                        if (coordinator.addPeer(cur)) {
-                            int delay = DELAY_MUL;
-                            delay *= r.nextInt(10);
-                            delay += DELAY_MIN;
+                        if (coordinator.addPeer(cur) && it.hasNext()) {
+                            int delay = (DELAY_MUL * r.nextInt(10)) + DELAY_MIN;
                             try { Thread.sleep(delay); } catch (InterruptedException ie) {}
                          }
                     }

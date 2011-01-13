@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
@@ -38,7 +39,7 @@ import org.klomp.snark.bencode.BEValue;
 
 public class Peer implements Comparable
 {
-  private Log _log = new Log(Peer.class);
+  private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(Peer.class);
   // Identifying property, the peer id of the other side.
   private final PeerID peerID;
 

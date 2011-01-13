@@ -35,7 +35,7 @@ import net.i2p.util.SimpleTimer;
 import net.i2p.util.Translate;
 
 import org.klomp.snark.dht.DHT;
-import org.klomp.snark.dht.KRPC;
+//import org.klomp.snark.dht.KRPC;
 
 /**
  * I2P specific helpers for I2PSnark
@@ -213,8 +213,8 @@ public class I2PSnarkUtil {
             _manager = I2PSocketManagerFactory.createManager(_i2cpHost, _i2cpPort, opts);
         }
         // FIXME this only instantiates krpc once, left stuck with old manager
-        if (ENABLE_DHT && _manager != null && _dht == null)
-            _dht = new KRPC(_context, _manager.getSession());
+        //if (ENABLE_DHT && _manager != null && _dht == null)
+        //    _dht = new KRPC(_context, _manager.getSession());
         return (_manager != null);
     }
     

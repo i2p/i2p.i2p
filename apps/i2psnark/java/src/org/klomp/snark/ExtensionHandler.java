@@ -85,10 +85,18 @@ abstract class ExtensionHandler {
                 // peer state calls peer listener calls sendPEX()
             }
 
+            MagnetState state = peer.getMagnetState();
+
             if (msgmap.get(TYPE_METADATA) == null) {
                 if (_log.shouldLog(Log.WARN))
                     _log.debug("Peer does not support metadata extension: " + peer);
-                // drop if we need metainfo ?
+                // drop if we need metainfo and we haven't found anybody yet
+                synchronized(state) {
+                    if (!state.isInitialized()) {
+                        _log.debug("Dropping peer, we need metadata! " + peer);
+                        peer.disconnect();
+                    }
+                }
                 return;
             }
 
@@ -96,14 +104,19 @@ abstract class ExtensionHandler {
             if (msize == null) {
                 if (_log.shouldLog(Log.WARN))
                     _log.debug("Peer does not have the metainfo size yet: " + peer);
-                // drop if we need metainfo ?
+                // drop if we need metainfo and we haven't found anybody yet
+                synchronized(state) {
+                    if (!state.isInitialized()) {
+                        _log.debug("Dropping peer, we need metadata! " + peer);
+                        peer.disconnect();
+                    }
+                }
                 return;
             }
             int metaSize = msize.getInt();
             if (_log.shouldLog(Log.WARN))
                 _log.debug("Got the metainfo size: " + metaSize);
 
-            MagnetState state = peer.getMagnetState();
             int remaining;
             synchronized(state) {
                 if (state.isComplete())

@@ -205,12 +205,14 @@ class PeerCheckerTask extends TimerTask
                   }
               }
             peer.retransmitRequests();
+            // send PEX
+            if ((_runCount % 17) == 0 && !peer.isCompleted())
+                coordinator.sendPeers(peer);
             peer.keepAlive();
             // announce them to local tracker (TrackerClient does this too)
             if (_util.getDHT() != null && (_runCount % 5) == 0) {
                 _util.getDHT().announce(coordinator.getInfoHash(), peer.getPeerID().getDestHash());
             }
-            // send PEX
           }
 
         // Resync actual uploaders value

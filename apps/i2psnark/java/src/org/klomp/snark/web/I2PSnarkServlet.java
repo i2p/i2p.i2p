@@ -910,8 +910,8 @@ public class I2PSnarkServlet extends Default {
             out.write(formatSize(total-remaining) + thinsp(noThinsp) + formatSize(total));
         else if (remaining == 0)
             out.write(formatSize(total)); // 3GB
-        else
-            out.write("??");  // no meta size yet
+        //else
+        //    out.write("??");  // no meta size yet
         out.write("</td>\n\t");
         out.write("<td align=\"right\" class=\"snarkTorrentUploaded " + rowClass + "\">");
         if(isRunning && isValid)
@@ -1058,6 +1058,12 @@ public class I2PSnarkServlet extends Default {
                         out.write("\">");
                         out.write(formatSize(peer.getDownloadRate()) + "ps</a></span>");
                     }
+                } else if (!isValid) {
+                    //if (peer supports metadata extension) {
+                        out.write("<span class=\"unchoked\">");
+                        out.write(formatSize(peer.getDownloadRate()) + "ps</span>");
+                    //} else {
+                    //}
                 }
                 out.write("</td>\n\t");
                 out.write("<td align=\"right\" class=\"snarkTorrentStatus " + rowClass + "\">");
@@ -1629,6 +1635,8 @@ public class I2PSnarkServlet extends Default {
                     int slsh = announce.indexOf('/');
                     if (slsh > 0)
                         announce = announce.substring(0, slsh);
+                    if (announce.length() > 67)
+                        announce = announce.substring(0, 40) + "&hellip;" + announce.substring(announce.length() - 8);
                     buf.append(announce);
                 }
             }

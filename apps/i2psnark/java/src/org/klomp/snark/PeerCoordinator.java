@@ -27,15 +27,22 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
+import net.i2p.data.Destination;
+import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
 
+import org.klomp.snark.bencode.BEValue;
+import org.klomp.snark.bencode.InvalidBEncodingException;
 import org.klomp.snark.dht.DHT;
 
 /**
@@ -90,6 +97,11 @@ public class PeerCoordinator implements PeerListener
    */
   final Queue<Peer> peers;
 
+  /**
+   * Peers we heard about via PEX
+   */
+  private final Set<PeerID> pexPeers;
+
   /** estimate of the peers, without requiring any synchronization */
   private volatile int peerCount;
 
@@ -134,6 +146,7 @@ public class PeerCoordinator implements PeerListener
     partialPieces = new ArrayList(getMaxConnections() + 1);
     peers = new LinkedBlockingQueue();
     magnetState = new MagnetState(infohash, metainfo);
+    pexPeers = new ConcurrentHashSet();
 
     // Install a timer to check the uploaders.
     // Randomize the first start time so multiple tasks are spread out,
@@ -1143,16 +1156,31 @@ public class PeerCoordinator implements PeerListener
               }
           }
       } else if (id == ExtensionHandler.ID_HANDSHAKE) {
-          try {
-              if (peer.getHandshakeMap().get("m").getMap().get(ExtensionHandler.TYPE_PEX) != null) {
-                  List<Peer> pList = peerList();
-                  pList.remove(peer);
-                  ExtensionHandler.sendPEX(peer, pList);
-              }
-          } catch (Exception e) {
-              // NPE, no map
-          }
+          sendPeers(peer);
       }
+  }
+
+  /**
+   *  Send a PEX message to the peer, if he supports PEX.
+   *  This just sends everybody we are connected to, we don't
+   *  track new vs. old peers yet.
+   *  @since 0.8.4
+   */
+  void sendPeers(Peer peer) {
+      Map<String, BEValue> handshake = peer.getHandshakeMap();
+      if (handshake == null)
+          return;
+      BEValue bev = handshake.get("m");
+      if (bev == null)
+          return;
+      try {
+          if (bev.getMap().get(ExtensionHandler.TYPE_PEX) != null) {
+              List<Peer> pList = peerList();
+              pList.remove(peer);
+              if (!pList.isEmpty())
+                  ExtensionHandler.sendPEX(peer, pList);
+          }
+      } catch (InvalidBEncodingException ibee) {}
   }
 
   /**
@@ -1185,7 +1213,30 @@ public class PeerCoordinator implements PeerListener
    *  @since 0.8.4
    */
   public void gotPeers(Peer peer, List<PeerID> peers) {
-      // spin off thread or timer task to do a new Peer() and an addPeer() for each one
+      if (completed() || !needPeers())
+          return;
+      Destination myDest = _util.getMyDestination();
+      if (myDest == null)
+          return;
+      byte[] myHash = myDest.calculateHash().getData();
+      List<Peer> pList = peerList();
+      for (PeerID id : peers) {
+           if (peerIDInList(id, pList) != null)
+               continue;
+           if (DataHelper.eq(myHash, id.getDestHash()))
+               continue;
+           pexPeers.add(id);
+      }
+      // TrackerClient will poll for pexPeers and do the add in its thread,
+      // rather than running another thread here.
+  }
+
+  /**
+   *  Called by TrackerClient
+   *  @since 0.8.4
+   */
+  Set<PeerID> getPEXPeers() {
+      return pexPeers;
   }
 
   /** Return number of allowed uploaders for this torrent.
