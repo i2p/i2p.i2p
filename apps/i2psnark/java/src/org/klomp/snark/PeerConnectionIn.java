@@ -32,6 +32,13 @@ class PeerConnectionIn implements Runnable
   private final Peer peer;
   private final DataInputStream din;
 
+  // The max length of a complete message in bytes.
+  // The biggest is the piece message, for which the length is the
+  // request size (32K) plus 9. (we could also check if Storage.MAX_PIECES / 8
+  // in the bitfield message is bigger but it's currently 5000/8 = 625 so don't bother)
+  private static final int MAX_MSG_SIZE = Math.max(PeerState.PARTSIZE + 9,
+                                                   MagnetState.CHUNK_SIZE + 100);  // 100 for the ext msg dictionary
+
   private Thread thread;
   private volatile boolean quit;
 
@@ -77,20 +84,16 @@ class PeerConnectionIn implements Runnable
             int len;
         
             // Wait till we hear something...
-            // The length of a complete message in bytes.
-            // The biggest is the piece message, for which the length is the
-            // request size (32K) plus 9. (we could also check if Storage.MAX_PIECES / 8
-            // in the bitfield message is bigger but it's currently 5000/8 = 625 so don't bother)
             int i = din.readInt();
             lastRcvd = System.currentTimeMillis();
-            if (i < 0 || i > PeerState.PARTSIZE + 9)
+            if (i < 0 || i > MAX_MSG_SIZE)
               throw new IOException("Unexpected length prefix: " + i);
 
             if (i == 0)
               {
                 ps.keepAliveMessage();
                 if (_log.shouldLog(Log.DEBUG)) 
-                    _log.debug("Received keepalive from " + peer + " on " + peer.metainfo.getName());
+                    _log.debug("Received keepalive from " + peer);
                 continue;
               }
             
@@ -102,35 +105,35 @@ class PeerConnectionIn implements Runnable
               case 0:
                 ps.chokeMessage(true);
                 if (_log.shouldLog(Log.DEBUG)) 
-                    _log.debug("Received choke from " + peer + " on " + peer.metainfo.getName());
+                    _log.debug("Received choke from " + peer);
                 break;
               case 1:
                 ps.chokeMessage(false);
                 if (_log.shouldLog(Log.DEBUG)) 
-                    _log.debug("Received unchoke from " + peer + " on " + peer.metainfo.getName());
+                    _log.debug("Received unchoke from " + peer);
                 break;
               case 2:
                 ps.interestedMessage(true);
                 if (_log.shouldLog(Log.DEBUG)) 
-                    _log.debug("Received interested from " + peer + " on " + peer.metainfo.getName());
+                    _log.debug("Received interested from " + peer);
                 break;
               case 3:
                 ps.interestedMessage(false);
                 if (_log.shouldLog(Log.DEBUG)) 
-                    _log.debug("Received not interested from " + peer + " on " + peer.metainfo.getName());
+                    _log.debug("Received not interested from " + peer);
                 break;
               case 4:
                 piece = din.readInt();
                 ps.haveMessage(piece);
                 if (_log.shouldLog(Log.DEBUG)) 
-                    _log.debug("Received havePiece(" + piece + ") from " + peer + " on " + peer.metainfo.getName());
+                    _log.debug("Received havePiece(" + piece + ") from " + peer);
                 break;
               case 5:
                 byte[] bitmap = new byte[i-1];
                 din.readFully(bitmap);
                 ps.bitfieldMessage(bitmap);
                 if (_log.shouldLog(Log.DEBUG)) 
-                    _log.debug("Received bitmap from " + peer + " on " + peer.metainfo.getName() + ": size=" + (i-1) /* + ": " + ps.bitfield */ );
+                    _log.debug("Received bitmap from " + peer  + ": size=" + (i-1) /* + ": " + ps.bitfield */ );
                 break;
               case 6:
                 piece = din.readInt();
@@ -138,7 +141,7 @@ class PeerConnectionIn implements Runnable
                 len = din.readInt();
                 ps.requestMessage(piece, begin, len);
                 if (_log.shouldLog(Log.DEBUG)) 
-                    _log.debug("Received request(" + piece + "," + begin + ") from " + peer + " on " + peer.metainfo.getName());
+                    _log.debug("Received request(" + piece + "," + begin + ") from " + peer);
                 break;
               case 7:
                 piece = din.readInt();
@@ -152,7 +155,7 @@ class PeerConnectionIn implements Runnable
                     din.readFully(piece_bytes, begin, len);
                     ps.pieceMessage(req);
                     if (_log.shouldLog(Log.DEBUG)) 
-                        _log.debug("Received data(" + piece + "," + begin + ") from " + peer + " on " + peer.metainfo.getName());
+                        _log.debug("Received data(" + piece + "," + begin + ") from " + peer);
                   }
                 else
                   {
@@ -160,7 +163,7 @@ class PeerConnectionIn implements Runnable
                     piece_bytes = new byte[len];
                     din.readFully(piece_bytes);
                     if (_log.shouldLog(Log.DEBUG)) 
-                        _log.debug("Received UNWANTED data(" + piece + "," + begin + ") from " + peer + " on " + peer.metainfo.getName());
+                        _log.debug("Received UNWANTED data(" + piece + "," + begin + ") from " + peer);
                   }
                 break;
               case 8:
@@ -169,22 +172,28 @@ class PeerConnectionIn implements Runnable
                 len = din.readInt();
                 ps.cancelMessage(piece, begin, len);
                 if (_log.shouldLog(Log.DEBUG)) 
-                    _log.debug("Received cancel(" + piece + "," + begin + ") from " + peer + " on " + peer.metainfo.getName());
+                    _log.debug("Received cancel(" + piece + "," + begin + ") from " + peer);
+                break;
+              case 9:  // PORT message
+                int port = din.readUnsignedShort();
+                ps.portMessage(port);
+                if (_log.shouldLog(Log.DEBUG)) 
+                    _log.debug("Received port message from " + peer);
                 break;
               case 20:  // Extension message
                 int id = din.readUnsignedByte();
                 byte[] payload = new byte[i-2];
                 din.readFully(payload);
-                ps.extensionMessage(id, payload);
                 if (_log.shouldLog(Log.DEBUG)) 
-                    _log.debug("Received extension message from " + peer + " on " + peer.metainfo.getName());
+                    _log.debug("Received extension message from " + peer);
+                ps.extensionMessage(id, payload);
                 break;
               default:
                 byte[] bs = new byte[i-1];
                 din.readFully(bs);
                 ps.unknownMessage(b, bs);
                 if (_log.shouldLog(Log.DEBUG)) 
-                    _log.debug("Received unknown message from " + peer + " on " + peer.metainfo.getName());
+                    _log.debug("Received unknown message from " + peer);
               }
           }
       }
