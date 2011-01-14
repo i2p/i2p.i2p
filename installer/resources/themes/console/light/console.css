@@ -905,13 +905,13 @@ button:active{
 }
 
 .langbox img {
-     opacity: 0.7 !important;
-     -moz-box-shadow: 0 0 1px #447;
+     opacity: 0.8 !important;
+/*     -moz-box-shadow: 0 0 1px #447;*/
 }
 
 .langbox img:hover {
      opacity: 1 !important;
-     -moz-box-shadow: 0 0 1px #f60;
+/*     -moz-box-shadow: 0 0 1px #f60;*/
 }
 
 input {
