@@ -141,10 +141,10 @@ div.routersummary h3 {
      -khtml-border-radius: 3px;
      border-radius: 3px;
      -moz-box-shadow: 0px 1px 5px #bbf;
-     text-shadow: 0px 0px 1px #77f;
-     -moz-box-shadow: inset 0px 0px 2px 1px #bbf;
-     -khtml-box-shadow: inset 0px 0px 2px 1px #bbf;
-     box-shadow: inset 0px 0px 2px 1px #bbf;
+     text-shadow: 0px 1px 1px #77f;
+     -moz-box-shadow: outset 0px 0px 2px 1px #bbf;
+     -khtml-box-shadow: outset 0px 0px 2px 1px #bbf;
+     box-shadow: outset 0px 0px 2px 1px #bbf;
 }
 
 div.routersummary h3 a {
