@@ -105,6 +105,8 @@ div.routersummary {
      float: left;
 */     
      -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
+     -khtml-box-shadow: inset 0px 0px 1px 1px #bbf;
+     box-shadow: inset 0px 0px 1px 1px #bbf;
 }
 
 div.routersummary input[type=text] {
@@ -140,6 +142,9 @@ div.routersummary h3 {
      border-radius: 3px;
      -moz-box-shadow: 0px 1px 5px #bbf;
      text-shadow: 0px 0px 1px #77f;
+     -moz-box-shadow: inset 0px 0px 2px 1px #bbf;
+     -khtml-box-shadow: inset 0px 0px 2px 1px #bbf;
+     box-shadow: inset 0px 0px 2px 1px #bbf;
 }
 
 div.routersummary h3 a {
@@ -325,6 +330,8 @@ div.main {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
+     -khtml-box-shadow: inset 0px 0px 1px 1px #bbf;
+     box-shadow: inset 0px 0px 1px 1px #bbf;
      background: #ffe url('images/magic.png') center bottom;}
 
 div.main hr, hr {
@@ -356,7 +363,9 @@ div.news {
      text-align: right !important;
      font-size: 7.5pt;
      line-height: 140%;
-     -moz-box-shadow: inset 0px 0px 1px 0px #410;
+     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
+     -khtml-box-shadow: inset 0px 0px 1px 1px #bbf;
+     box-shadow: inset 0px 0px 1px 1px #bbf;
      background: #ffe url('images/magic.png') center bottom;
      min-width: 480px;
 }
@@ -431,7 +440,7 @@ div.news h3 {
      padding-top: 0px;
      border-bottom: 1px dotted #225 !important;
      -moz-box-shadow: none;
-     -hktml-box-shadow: none;
+     -khtml-box-shadow: none;
      box-shadow: none;
      font-size: 10pt !important;
      letter-spacing: 0.05em;
@@ -765,6 +774,8 @@ h1 {
      text-transform: uppercase;
      text-shadow: 0px 1px 1px #77f;
      -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
+     -khtml-box-shadow: inset 0px 0px 1px 1px #bbf;
+     box-shadow: inset 0px 0px 1px 1px #bbf;
      white-space: normal;
      background: #ffe url('images/header.png') center center repeat-x;
      border: 1px solid #447;
@@ -788,6 +799,8 @@ h2 {
      -khtml-border-radius: 4px;
      margin: 15px 0px 15px 0 !important;
      -moz-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     -khtml-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
      word-wrap: break-word;
      text-transform: uppercase;
      opacity: 1;
@@ -817,6 +830,8 @@ h3 {
      font-size: 11pt;
      color: #003;
      -moz-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     -khtml-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
      opacity: 1;
      letter-spacing: 0.07em;
 }
