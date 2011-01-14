@@ -130,6 +130,10 @@ class I2PSessionImpl2 extends I2PSessionImpl {
                                int proto, int fromport, int toport) throws I2PSessionException {
         throw new IllegalArgumentException("Use MuxedImpl");
     }
+    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent, long expire,
+                               int proto, int fromport, int toport, int flags) throws I2PSessionException {
+        throw new IllegalArgumentException("Use MuxedImpl");
+    }
 
     @Override
     public boolean sendMessage(Destination dest, byte[] payload) throws I2PSessionException {
@@ -222,13 +226,22 @@ class I2PSessionImpl2 extends I2PSessionImpl {
     private static final int NUM_TAGS = 50;
 
     /**
-     * TODO - Don't need to save MessageState since actuallyWait is false...
-     * But for now just use sendNoEffort() instead.
-     *
      * @param keyUsed unused - no end-to-end crypto
      * @param tagsSent unused - no end-to-end crypto
      */
     protected boolean sendBestEffort(Destination dest, byte payload[], SessionKey keyUsed, Set tagsSent, long expires)
+                    throws I2PSessionException {
+        return sendBestEffort(dest, payload, expires, 0);
+    }
+
+    /**
+     * TODO - Don't need to save MessageState since actuallyWait is false...
+     * But for now just use sendNoEffort() instead.
+     *
+     * @param flags to be passed to the router
+     * @since 0.8.4
+     */
+    protected boolean sendBestEffort(Destination dest, byte payload[], long expires, int flags)
                     throws I2PSessionException {
         //SessionKey key = null;
         //SessionKey newKey = null;
@@ -324,7 +337,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
                        + " sync took " + (inSendingSync-beforeSendingSync) 
                        + " add took " + (afterSendingSync-inSendingSync));
         //_producer.sendMessage(this, dest, nonce, payload, tag, key, sentTags, newKey, expires);
-        _producer.sendMessage(this, dest, nonce, payload, null, null, null, null, expires);
+        _producer.sendMessage(this, dest, nonce, payload, expires, flags);
         
         // since this is 'best effort', all we're waiting for is a status update 
         // saying that the router received it - in theory, that should come back

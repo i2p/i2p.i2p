@@ -438,21 +438,6 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         _producer.reportAbuse(this, msgId, severity);
     }
 
-    /**
-     * Send the data to the destination.  
-     * TODO: this currently always returns true, regardless of whether the message was 
-     * delivered successfully.  make this wait for at least ACCEPTED
-     *
-     */
-    public abstract boolean sendMessage(Destination dest, byte[] payload) throws I2PSessionException;
-    
-    /**
-     * @param keyUsed unused - no end-to-end crypto
-     * @param tagsSent unused - no end-to-end crypto
-     */
-    public abstract boolean sendMessage(Destination dest, byte[] payload, SessionKey keyUsed, 
-                                        Set tagsSent) throws I2PSessionException;
-
     public abstract void receiveStatus(int msgId, long nonce, int status);
 
 /****** no end-to-end crypto

@@ -130,19 +130,31 @@ class I2CPMessageProducer {
      */
     public void sendMessage(I2PSessionImpl session, Destination dest, long nonce, byte[] payload, SessionTag tag,
                             SessionKey key, Set tags, SessionKey newKey, long expires) throws I2PSessionException {
+        sendMessage(session, dest, nonce, payload, expires, 0);
+    }
+
+    /**
+     * Package up and send the payload to the router for delivery
+     * @since 0.8.4
+     */
+    public void sendMessage(I2PSessionImpl session, Destination dest, long nonce, byte[] payload,
+                            long expires, int flags) throws I2PSessionException {
+
         if (!updateBps(payload.length, expires))
             // drop the message... send fail notification?
             return;
         SendMessageMessage msg;
-        if (expires > 0) {
-            msg = new SendMessageExpiresMessage();
-            ((SendMessageExpiresMessage)msg).setExpiration(new Date(expires));
+        if (expires > 0 || flags > 0) {
+            SendMessageExpiresMessage smsg = new SendMessageExpiresMessage();
+            smsg.setExpiration(expires);
+            smsg.setFlags(flags);
+            msg = smsg;
         } else
             msg = new SendMessageMessage();
         msg.setDestination(dest);
         msg.setSessionId(session.getSessionId());
         msg.setNonce(nonce);
-        Payload data = createPayload(dest, payload, tag, key, tags, newKey);
+        Payload data = createPayload(dest, payload, null, null, null, null);
         msg.setPayload(data);
         session.sendMessage(msg);
     }

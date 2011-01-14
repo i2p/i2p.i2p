@@ -28,16 +28,10 @@ public class ClientMessage {
     private Hash _destinationHash;
     private MessageId _messageId;
     private long _expiration;
+    /** only for outbound messages */
+    private int _flags;
     
     public ClientMessage() {
-	setPayload(null);
-	setDestination(null);
-	setFromDestination(null);
-	setReceptionInfo(null);
-	setSenderConfig(null);
-	setDestinationHash(null);
-	setMessageId(null);
-        setExpiration(0);
     }
     
     /**
@@ -101,4 +95,17 @@ public class ClientMessage {
      */
     public long getExpiration() { return _expiration; }
     public void setExpiration(long e) { _expiration = e; }
+
+    /**
+     * Flags requested by the client that sent the message.  This will only be available
+     * for locally originated messages.
+     *
+     * @since 0.8.4
+     */
+    public int getFlags() { return _flags; }
+
+    /**
+     * @since 0.8.4
+     */
+    public void setFlags(int f) { _flags = f; }
 }

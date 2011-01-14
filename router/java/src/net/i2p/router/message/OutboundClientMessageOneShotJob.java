@@ -47,21 +47,21 @@ import net.i2p.util.SimpleTimer;
  *
  */
 public class OutboundClientMessageOneShotJob extends JobImpl {
-    private Log _log;
+    private final Log _log;
     private long _overallExpiration;
     private ClientMessage _clientMessage;
-    private MessageId _clientMessageId;
-    private int _clientMessageSize;
-    private Destination _from;
-    private Destination _to;
-    private String _toString;
+    private final MessageId _clientMessageId;
+    private final int _clientMessageSize;
+    private final Destination _from;
+    private final Destination _to;
+    private final String _toString;
     /** target destination's leaseSet, if known */
     private LeaseSet _leaseSet;
     /** Actual lease the message is being routed through */
     private Lease _lease;
     private PayloadGarlicConfig _clove;
     private long _cloveId;
-    private long _start;
+    private final long _start;
     private boolean _finished;
     private long _leaseSetLookupBegin;
     private TunnelInfo _outTunnel;

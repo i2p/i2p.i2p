@@ -16,32 +16,66 @@ import java.util.Date;
 
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
+import net.i2p.data.DateAndFlags;
 import net.i2p.data.Destination;
 import net.i2p.data.Payload;
 
 /**
  * Same as SendMessageMessage, but with an expiration to be passed to the router
  *
+ * As of 0.8.4, retrofitted to use DateAndFlags. Backwards compatible.
+ *
  * @author zzz
  */
 public class SendMessageExpiresMessage extends SendMessageMessage {
     /* FIXME hides another field FIXME */
     public final static int MESSAGE_TYPE = 36;
-    private SessionId _sessionId;
-    private Destination _destination;
-    private Payload _payload;
-    private Date _expiration;
+    private final DateAndFlags _daf;
 
     public SendMessageExpiresMessage() {
         super();
+        _daf = new DateAndFlags();
     }
 
+    /**
+     *  The Date object is created here, it is not cached.
+     *  Use getExpirationTime() if you only need the long value.
+     */
     public Date getExpiration() {
-        return _expiration;
+        return _daf.getDate();
+    }
+
+    /**
+     *  Use this instead of getExpiration().getTime()
+     *  @since 0.8.4
+     */
+    public long getExpirationTime() {
+        return _daf.getTime();
     }
 
     public void setExpiration(Date d) {
-        _expiration = d;
+        _daf.setDate(d);
+    }
+
+    /**
+     *  @since 0.8.4
+     */
+    public void setExpiration(long d) {
+        _daf.setDate(d);
+    }
+
+    /**
+     *  @since 0.8.4
+     */
+    public int getFlags() {
+        return _daf.getFlags();
+    }
+
+    /**
+     *  @since 0.8.4
+     */
+    public void setFlags(int f) {
+        _daf.setFlags(f);
     }
 
     /**
@@ -54,7 +88,7 @@ public class SendMessageExpiresMessage extends SendMessageMessage {
         super.readMessage(in, length, type);
 
         try {
-            _expiration = DataHelper.readDate(in);
+            _daf.readBytes(in);
         } catch (DataFormatException dfe) {
             throw new I2CPMessageException("Unable to load the message data", dfe);
         }
@@ -68,7 +102,7 @@ public class SendMessageExpiresMessage extends SendMessageMessage {
      */
     @Override
     public void writeMessage(OutputStream out) throws I2CPMessageException, IOException {
-        if ((getSessionId() == null) || (getDestination() == null) || (getPayload() == null) || (getNonce() <= 0) || (_expiration == null))
+        if ((getSessionId() == null) || (getDestination() == null) || (getPayload() == null) || (getNonce() <= 0))
             throw new I2CPMessageException("Unable to write out the message as there is not enough data");
         int len = 2 + getDestination().size() + getPayload().getSize() + 4 + 4 + DataHelper.DATE_LENGTH;
         
@@ -79,7 +113,7 @@ public class SendMessageExpiresMessage extends SendMessageMessage {
             getDestination().writeBytes(out);
             getPayload().writeBytes(out);
             DataHelper.writeLong(out, 4, getNonce());
-            DataHelper.writeDate(out, _expiration);
+            _daf.writeBytes(out);
         } catch (DataFormatException dfe) {
             throw new I2CPMessageException("Error writing the msg", dfe);
         }
@@ -96,7 +130,7 @@ public class SendMessageExpiresMessage extends SendMessageMessage {
         if ((object != null) && (object instanceof SendMessageExpiresMessage)) {
             SendMessageExpiresMessage msg = (SendMessageExpiresMessage) object;
             return super.equals(object)
-                   && DataHelper.eq(getExpiration(), msg.getExpiration());
+                   && _daf.equals(msg._daf);
         }
          
         return false;

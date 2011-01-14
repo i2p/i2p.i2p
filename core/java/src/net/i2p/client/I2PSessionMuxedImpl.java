@@ -162,11 +162,33 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 implements I2PSession {
      *         255 disallowed
      *  @param fromPort 1-65535 or 0 for unset
      *  @param toPort 1-65535 or 0 for unset
+     *  @since 0.7.1
      */
     @Override
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size,
                                SessionKey keyUsed, Set tagsSent, long expires,
                                int proto, int fromPort, int toPort)
+                   throws I2PSessionException {
+        return sendMessage(dest, payload, offset, size, keyUsed, tagsSent, 0, proto, fromPort, toPort, 0);
+    }
+
+    /**
+     *  @param keyUsed unused - no end-to-end crypto
+     *  @param tagsSent unused - no end-to-end crypto
+     *  @param proto 1-254 or 0 for unset; recommended:
+     *         I2PSession.PROTO_UNSPECIFIED
+     *         I2PSession.PROTO_STREAMING
+     *         I2PSession.PROTO_DATAGRAM
+     *         255 disallowed
+     *  @param fromPort 1-65535 or 0 for unset
+     *  @param toPort 1-65535 or 0 for unset
+     *  @param flags to be passed to the router
+     *  @since 0.8.4
+     */
+    @Override
+    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size,
+                               SessionKey keyUsed, Set tagsSent, long expires,
+                               int proto, int fromPort, int toPort, int flags)
                    throws I2PSessionException {
         if (isClosed()) throw new I2PSessionException("Already closed");
         updateActivity();
@@ -183,7 +205,7 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 implements I2PSession {
 
         _context.statManager().addRateData("i2cp.tx.msgCompressed", payload.length, 0);
         _context.statManager().addRateData("i2cp.tx.msgExpanded", size, 0);
-        return sendBestEffort(dest, payload, keyUsed, tagsSent, expires);
+        return sendBestEffort(dest, payload, expires, flags);
     }
 
     /**
