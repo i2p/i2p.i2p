@@ -152,7 +152,9 @@ public class LogManager {
         if (_writer != null)
             return;
         _writer = new LogWriter(this);
-        Thread t = new I2PThread(_writer, "LogWriter", true);
+        // NOT an I2PThread, as it contains logging and we end up with problems
+        Thread t = new Thread(_writer, "LogWriter");
+        t.setDaemon(true);
         t.start();
     }
 
