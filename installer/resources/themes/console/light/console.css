@@ -154,6 +154,9 @@ div.routersummary h3 a {
 div.routersummary h3:hover {
      background: #ffa url('images/header.png') center center repeat-x !important;
      text-shadow: 0 0 0;
+     -moz-box-shadow: inset 0px 0px 2px 1px #ffa;
+     -khtml-box-shadow: inset 0px 0px 2px 1px #ffa;
+     box-shadow: inset 0px 0px 2px 1px #ffa;
 }
 
 div.routersummary h4 {
