@@ -960,6 +960,8 @@ input:active {
      border: 1px solid #f60;
      opacity: 1.0;
      -moz-box-shadow: inset 0px 0px 0px 1px #f60;
+     -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
+     box-shadow: inset 0px 0px 0px 1px #f60;
 }
 
 input[type=text] {
@@ -1001,6 +1003,12 @@ select {
      text-align: left !important;
 }
 
+select:active {
+     -moz-box-shadow: inset 0px 0px 0px 1px #f60;
+     -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
+     box-shadow: inset 0px 0px 0px 1px #f60;     
+}
+
 textarea {
      padding: 5px;
      margin: 5px 15px 5px 10px;
@@ -1013,6 +1021,12 @@ textarea {
      min-height: 100px;
      min-width: 97%;
      border: 1px solid #447;
+}
+
+textarea:active {
+     -moz-box-shadow: inset 0px 0px 0px 1px #f60;
+     -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
+     box-shadow: inset 0px 0px 0px 1px #f60;     
 }
 
 form {}

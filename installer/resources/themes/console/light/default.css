@@ -94,6 +94,8 @@ textarea {
 
 textarea:active {
      -moz-box-shadow: inset 0px 0px 0px 1px #f60;
+     -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
+     box-shadow: inset 0px 0px 0px 1px #f60;     
 }
 
 br {
@@ -172,6 +174,8 @@ hr {
 
 .freetext:active {
      -moz-box-shadow: inset 0px 0px 0px 1px #f60;
+     -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
+     box-shadow: inset 0px 0px 0px 1px #f60;     
 }
 
 .control, control:link, control:visited {
@@ -370,7 +374,7 @@ globalOperationsPanel .control:hover {
 }
 
 select {
-     background-color: #eef;
+     background-color: #fff;
      color: #003;
      margin: 4px;
      font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
@@ -387,6 +391,8 @@ select {
 
 select:active {
      -moz-box-shadow: inset 0px 0px 0px 1px #f60;
+     -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
+     box-shadow: inset 0px 0px 0px 1px #f60;     
 }
 
 a:link{
