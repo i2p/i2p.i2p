@@ -954,7 +954,7 @@ code {
      text-align: left;
      font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      color: #0d0;
-     padding: 0 2px;
+/*     padding: 0 2px;*/
 }
 
 div.footnote {
