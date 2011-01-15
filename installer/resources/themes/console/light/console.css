@@ -164,14 +164,16 @@ div.routersummary h4 {
      border-bottom: 0 !important;
      font-size: 8.5pt;
      letter-spacing: 0.02em;
-     margin: -5px -7px -5px -7px !important;
+     margin: -6px !important;
      padding: 3px 3px 5px 3px;
-     background: #eed url(images/magic.png);
+     background: #ddf url(images/magic.png);
      text-transform: capitalize;
      text-decoration: none !important;
      color: #2b2;
      line-height: 105%;
-/*     text-shadow: 0px 1px 1px #99f;*/
+     -moz-box-shadow: 0px 0px 1px 1px #fff;
+     -khtml-box-shadow: 0px 0px 1px 1px #fff;
+     box-shadow: 0px 0px 1px 1px #fff;
 }
 
 div.routersummary table {
