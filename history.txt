@@ -1,3 +1,10 @@
+2011-01-15 zzz
+    * Console: Add some HTTP headers in the view servlets
+
+2011-01-12 zzz
+    * Log: Fix rare initialization problem
+    * PrivateKey: Fix hashCode()
+
 2011-01-09 zzz
     * DataHelper: Speed up and annotate sortStructures()
     * Data Structures: More caching improvements, don't cache where we shouldn't

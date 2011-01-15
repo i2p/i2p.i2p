@@ -15,11 +15,27 @@ boolean rendered = false;
 String c = request.getParameter("c");
 if (c != null && c.length() > 0) {
     java.io.OutputStream cout = response.getOutputStream();
-    response.setContentType("image/png");
-    response.setHeader("Cache-Control", "max-age=86400");  // cache for a day
     String base = net.i2p.I2PAppContext.getGlobalContext().getBaseDir().getAbsolutePath();
     String file = "docs" + java.io.File.separatorChar + "icons" + java.io.File.separatorChar +
                   "flags" + java.io.File.separatorChar + c + ".png";
+    java.io.File ffile = new java.io.File(base, file);
+    long lastmod = ffile.lastModified();
+    if (lastmod > 0) {
+        long iflast = request.getDateHeader("If-Modified-Since");
+        // iflast is -1 if not present; round down file time
+        if (iflast >= ((lastmod / 1000) * 1000)) {
+            response.sendError(304, "Not Modified");
+            return;
+        }
+        response.setDateHeader("Last-Modified", lastmod);
+        // cache for a day
+        response.setDateHeader("Expires", net.i2p.I2PAppContext.getGlobalContext().clock().now() + 86400000l);
+        response.setHeader("Cache-Control", "public, max-age=86400");
+    }
+    long length = ffile.length();
+    if (length > 0)
+        response.setHeader("Content-Length", Long.toString(length));
+    response.setContentType("image/png");
     try {
         net.i2p.util.FileUtil.readFile(file, base, cout);
         rendered = true;
