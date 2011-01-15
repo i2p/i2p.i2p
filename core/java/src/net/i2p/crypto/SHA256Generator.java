@@ -23,13 +23,18 @@ public final class SHA256Generator {
         return I2PAppContext.getGlobalContext().sha();
     }
     
-    /** Calculate the SHA-256 has of the source
+    /**
+     * Calculate the SHA-256 hash of the source and cache the result.
      * @param source what to hash
      * @return hash of the source
      */
     public final Hash calculateHash(byte[] source) {
         return calculateHash(source, 0, source.length);
     }
+
+    /**
+     * Calculate the hash and cache the result.
+     */
     public final Hash calculateHash(byte[] source, int start, int len) {
         Sha256Standalone digest = acquireGnu();
         digest.update(source, start, len);
@@ -39,6 +44,10 @@ public final class SHA256Generator {
         return Hash.create(rv);
     }
     
+    /**
+     * Use this if you only need the data, not a Hash object.
+     * Does not cache.
+     */
     public final void calculateHash(byte[] source, int start, int len, byte out[], int outOffset) {
         Sha256Standalone digest = acquireGnu();
         digest.update(source, start, len);

@@ -329,7 +329,7 @@ div.main {
      border-top: 0;
      text-align: left;
      color: #eef;
-     min-width: 570px;
+     min-width: 590px;
 /*     -moz-border-radius: 0 0 3px 3px;
      -khtml-border-radius: 0 0 3px 3px;
      border-radius: 0 0 3px 3px;*/
@@ -432,13 +432,27 @@ div.news li {
 }
 
 div.news h3 {
-     text-align: left !important;
+     background: none !important;
+     text-align: left;
+     border: none !important;
+     padding-left: 0;
+     padding-top: 0px;
+     border-bottom: 1px dotted !important;
+     -moz-box-shadow: none;
+     -hktml-box-shadow: none;
+     box-shadow: none;
+     font-size: 10pt !important;
+     letter-spacing: 0.05em;
+     text-transform: uppercase !important;
+     margin: 15px 10px -5px;
+     padding: 5px 0 5px;
 }
 
 div.news p {
      color: #eef;
      font-size: 9pt;
      margin-bottom: -10px;
+     margin-top: 10px;
 }
 /*
 div.news p:first-child {
@@ -755,7 +769,7 @@ input {
      vertical-align: middle;
 }
 
-input[type=text], input[type=password] {
+input[type=text] {
      margin: 3px 5px 3px 5px;
      vertical-align: middle;
 }
@@ -765,7 +779,7 @@ select {
      vertical-align: middle;
 }
 
-input[type=text], input[type=password] select {
+input[type=text], select {
      background: #001;
      color: #eef;
      border: 1px solid #99f;

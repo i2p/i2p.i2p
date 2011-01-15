@@ -327,17 +327,12 @@ div.news {
      background: #000;
      background: #000 url("images/news.png")no-repeat scroll bottom right;
      color: #7b7;
-/*     border-radius: 4px 4px 0 0;
-     -moz-border-radius: 4px 4px 0 0;
-     -khtml-border-radius: 4px 4px 0 0;*/
      font-size: 7.5pt;
      text-align: right;
      -moz-box-shadow: 0 1px 5px #000;
      -khtml-box-shadow: 0 1px 5px #000;
      box-shadow: 0 1px 5px #000;
-     min-width: 580px;
-/*     height: 164px;
-     overflow-y: auto;*/
+     min-width: 590px;
 }
 
 div.news li {
@@ -357,7 +352,12 @@ div.news li {
 }
 
 div.news h3 {
-     text-align: left !important;
+     background: none;
+     text-align: left;
+     border: none;
+     padding-left: 0;
+     padding-top: 2px;
+     border-bottom: 1px dotted;
 }
 
 div.news h4 {
@@ -865,7 +865,7 @@ input:active {
      color: #EE9;
 }
 
-input[type=text], input[type=password] {
+input[type=text] {
      background: #000;
      color: #EE9;
      margin: 5px 10px;
@@ -881,7 +881,7 @@ input[type=text], input[type=password] {
      box-shadow: inset 1px 1px 1px 0px #000;
 }
 
-input[type=text]:active, input[type=text]:hover, input[type=password]:active, input[type=password]:hover {
+input[type=text]:active, input[type=text]:hover {
      background: #000;
 }
 

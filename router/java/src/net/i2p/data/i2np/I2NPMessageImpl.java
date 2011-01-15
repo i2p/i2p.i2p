@@ -20,6 +20,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.DataStructureImpl;
 import net.i2p.data.Hash;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleByteCache;
 
 /**
  * Defines the base message implementation.
@@ -72,6 +73,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
      *  Read the header, then read the rest into buffer, then call
      *  readMessage in the implemented message type
      *
+     *<pre>
      *  Specifically:
      *    1 byte type (if caller didn't read already, as specified by the type param
      *    4 byte ID
@@ -79,9 +81,11 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
      *    2 byte size
      *    1 byte checksum
      *    size bytes of payload (read by readMessage() in implementation)
+     *</pre>
      *
      *  @param type the message type or -1 if we should read it here
      *  @param buffer temp buffer to use
+     *  @return total length of the message
      */
     public int readBytes(InputStream in, int type, byte buffer[]) throws I2NPMessageException, IOException {
         try {
@@ -110,9 +114,11 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
                 cur += numRead;
             }
             
-            Hash calc = _context.sha().calculateHash(buffer, 0, size);
+            byte[] calc = SimpleByteCache.acquire(Hash.HASH_LENGTH);
+            _context.sha().calculateHash(buffer, 0, size, calc, 0);
             //boolean eq = calc.equals(h);
-            boolean eq = DataHelper.eq(checksum, 0, calc.getData(), 0, CHECKSUM_LENGTH);
+            boolean eq = DataHelper.eq(checksum, 0, calc, 0, CHECKSUM_LENGTH);
+            SimpleByteCache.release(calc);
             if (!eq)
                 throw new I2NPMessageException("Hash does not match for " + getClass().getName());
 
@@ -123,11 +129,29 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             //long time = _context.clock().now() - start;
             //if (time > 50)
             //    _context.statManager().addRateData("i2np.readTime", time, time);
-            return size + Hash.HASH_LENGTH + 1 + 4 + DataHelper.DATE_LENGTH;
+            return CHECKSUM_LENGTH + 1 + 2 + 4 + DataHelper.DATE_LENGTH + size;
         } catch (DataFormatException dfe) {
             throw new I2NPMessageException("Error reading the message header", dfe);
         }
     }
+
+    /**
+     *  Read the header, then read the rest into buffer, then call
+     *  readMessage in the implemented message type
+     *
+     *<pre>
+     *  Specifically:
+     *    1 byte type (if caller didn't read already, as specified by the type param
+     *    4 byte ID
+     *    8 byte expiration
+     *    2 byte size
+     *    1 byte checksum
+     *    size bytes of payload (read by readMessage() in implementation)
+     *</pre>
+     *
+     *  @param type the message type or -1 if we should read it here
+     *  @return total length of the message
+     */
     public int readBytes(byte data[], int type, int offset) throws I2NPMessageException, IOException {
         int cur = offset;
         if (type < 0) {
@@ -153,9 +177,10 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
                                            + " cur=" + cur 
                                            + " wanted=" + size + "]: " + getClass().getName());
 
-        Hash calc = _context.sha().calculateHash(data, cur, size);
-        //boolean eq = calc.equals(h);
-        boolean eq = DataHelper.eq(hdata, 0, calc.getData(), 0, CHECKSUM_LENGTH);
+        byte[] calc = SimpleByteCache.acquire(Hash.HASH_LENGTH);
+        _context.sha().calculateHash(data, cur, size, calc, 0);
+        boolean eq = DataHelper.eq(hdata, 0, calc, 0, CHECKSUM_LENGTH);
+        SimpleByteCache.release(calc);
         if (!eq)
             throw new I2NPMessageException("Hash does not match for " + getClass().getName());
 
@@ -231,7 +256,8 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         try {
             int writtenLen = writeMessageBody(buffer, prefixLen);
             int payloadLen = writtenLen - prefixLen;
-            Hash h = _context.sha().calculateHash(buffer, prefixLen, payloadLen);
+            byte[] h = SimpleByteCache.acquire(Hash.HASH_LENGTH);
+            _context.sha().calculateHash(buffer, prefixLen, payloadLen, h, 0);
 
             int off = 0;
             DataHelper.toLong(buffer, off, 1, getType());
@@ -242,7 +268,8 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             off += DataHelper.DATE_LENGTH;
             DataHelper.toLong(buffer, off, 2, payloadLen);
             off += 2;
-            System.arraycopy(h.getData(), 0, buffer, off, CHECKSUM_LENGTH);
+            System.arraycopy(h, 0, buffer, off, CHECKSUM_LENGTH);
+            SimpleByteCache.release(h);
 
             //long time = _context.clock().now() - start;
             //if (time > 50)

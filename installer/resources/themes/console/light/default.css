@@ -1,3 +1,7 @@
+/* I2P Tunnel Manager Theme: Light */
+/* Description: Light blue highlights. */
+/* Author: dr|z3d */
+    
 body {
      margin: 0px;
      padding: 0px;
@@ -39,7 +43,7 @@ label {
 }
 
 h4 {
-     font-size: 14px;
+     font-size: 11pt;
      font-weight: bold !important;
      color: #001;
      text-align: center;
@@ -47,11 +51,15 @@ h4 {
      margin: 5px 0 15px 0;
      padding: 5px 10px;
      background: #eef url(images/header.png) repeat-x center center;
-     letter-spacing: 0.08em;
-     -moz-box-shadow: inset 0px 0px 4px 0px #bbf;
+     text-transform: uppercase;
+     letter-spacing: 0.07em;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
+     text-shadow: 0px 1px 1px #77f;
+     -moz-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     -khtml-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
 }
 
 a {
@@ -76,10 +84,18 @@ button {
 }
 
 textarea {
-     border: 1px solid #9999ff;
-     color: #001;
-     background: #ddf;
-     border: 1px solid #44d;
+     color: #003;
+     background: #fff;
+     border: 1px solid #447;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+}
+
+textarea:active {
+     -moz-box-shadow: inset 0px 0px 0px 1px #f60;
+     -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
+     box-shadow: inset 0px 0px 0px 1px #f60;     
 }
 
 br {
@@ -126,34 +142,40 @@ hr {
 .separator, .subdivider {
      clear: both;
      height: 1px;
-     margin: 1px 0px 1px 0px;
-     border-bottom: 1px solid #225;
+     margin: 10px 0px 10px 0px;
+     border-bottom: 1px dotted #447;
 /*
      display: none;
 */
 }
 
 .subdivider {
-     border-bottom: 1px solid #225;
-     padding: 5px 0px 0px 0px;
+     border-bottom: 1px dotted #447;
+     padding: 5px 0;
 }
 
 .freetext {
      width: 150px;
      height: 24px;
-     border: 1px solid #44d;
+     border: 1px solid #447;
      padding: 2px;
      margin: 4px 0 2px 0px;
      font: 10pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      font-weight: bold;
-     background: #ddf;
-     color: #001;
-     -moz-border-radius: 0 4px 4px 0;
-     -khtml-border-radius: 0 4px 4px 0;
-     border-radius: 0 4px 4px 0;
+     background: #fff;
+     color: #003;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
 /*
      -moz-box-shadow: inset 0px -1px 1px 0px #fff;
 */
+}
+
+.freetext:active {
+     -moz-box-shadow: inset 0px 0px 0px 1px #f60;
+     -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
+     box-shadow: inset 0px 0px 0px 1px #f60;     
 }
 
 .control, control:link, control:visited {
@@ -164,7 +186,7 @@ hr {
      font-weight: bold;
      background: #ffe;
      color: #001;
-     border: 1px outset #ddddc0;
+     border: 1px outset #66a;
      text-align: center;
      white-space: nowrap;
      -moz-border-radius: 4px;
@@ -182,11 +204,17 @@ hr {
      text-decoration: none;
 }
 */
+
 .control:hover, control:visited:hover {
-     border: 1px solid #eef;
      background-color: #f60;
      color: #fff !important;
      text-decoration: none;
+     border: 1px solid #f60 !important;
+     background: #f60 !important;
+     color: #fff;
+     -moz-box-shadow: inset 0px 0px 0px 1px #fff !important;
+     -khtml-box-shadow: inset 0px 0px 0px 1px #fff !important;
+     box-shadow: inset 0px 0px 0px 1px #fff !important;
 }
 
 .control:link, control:visited {
@@ -196,7 +224,7 @@ hr {
      min-width: 60px;
      font-weight: bold;
      color: #001;
-     border: 1px outset #ddddc0;
+     border: 1px outset #66a;
      text-align: center;
      white-space: nowrap;
      -moz-border-radius: 4px;
@@ -239,7 +267,7 @@ hr {
 .rowItem {
      width: 750px;
      float: left;
-     margin: 0px;
+     margin: 2px 0;
 }
 
 .comment {
@@ -346,27 +374,36 @@ globalOperationsPanel .control:hover {
 }
 
 select {
-     background-color: #eef;
-     color: #001;
+     background-color: #fff;
+     color: #003;
      margin: 4px;
      font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
      font-weight: bold;
-     border: 1px solid #001;
-     padding: 2px;
+     border: 1px solid #447;
+     padding: 3px 3px 3px 0;
      min-width: 270px;
      font-size: 8pt;
      max-height: 24px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+}
+
+select:active {
+     -moz-box-shadow: inset 0px 0px 0px 1px #f60;
+     -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
+     box-shadow: inset 0px 0px 0px 1px #f60;     
 }
 
 a:link{
-     color: #613;
+     color: #359;
      text-decoration: none;
      font-weight: bold;
      word-wrap: break-word;
 }
 
 a:visited{
-     color: #606;
+     color: #218;
      text-decoration: none;
      font-weight: bold;
 }

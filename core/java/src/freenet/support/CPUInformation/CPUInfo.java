@@ -1,6 +1,6 @@
 /*
- * Created on Jul 16, 2004
- *
+ * Created on Jul 14, 2004
+ * Updated on Jan 8, 2011
  */
 package freenet.support.CPUInformation;
 
@@ -41,6 +41,26 @@ public interface CPUInfo
      * @return true iff the CPU support the SSE2 instruction set.
      */
     public boolean hasSSE2();
+
+    /**
+     * @return true iff the CPU support the SSE3 instruction set.
+     */
+    public boolean hasSSE3();
+    
+    /**
+     * @return true iff the CPU support the SSE4.1 instruction set.
+     */
+    public boolean hasSSE41();
+
+    /**
+     * @return true iff the CPU support the SSE4.2 instruction set.
+     */
+    public boolean hasSSE42();
+
+    /**
+     * @return true iff the CPU support the SSE4A instruction set.
+     */
+    public boolean hasSSE4A();
 
     public boolean IsC3Compatible();
 }
