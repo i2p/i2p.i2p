@@ -87,6 +87,13 @@ textarea {
      color: #003;
      background: #fff;
      border: 1px solid #447;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+}
+
+textarea:active {
+     -moz-box-shadow: inset 0px 0px 0px 1px #f60;
 }
 
 br {
@@ -155,12 +162,16 @@ hr {
      font-weight: bold;
      background: #fff;
      color: #003;
-     -moz-border-radius: 0 4px 4px 0;
-     -khtml-border-radius: 0 4px 4px 0;
-     border-radius: 0 4px 4px 0;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
 /*
      -moz-box-shadow: inset 0px -1px 1px 0px #fff;
 */
+}
+
+.freetext:active {
+     -moz-box-shadow: inset 0px 0px 0px 1px #f60;
 }
 
 .control, control:link, control:visited {
@@ -252,7 +263,7 @@ hr {
 .rowItem {
      width: 750px;
      float: left;
-     margin: 0px;
+     margin: 2px 0;
 }
 
 .comment {
@@ -365,10 +376,17 @@ select {
      font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
      font-weight: bold;
      border: 1px solid #447;
-     padding: 2px;
+     padding: 3px 3px 3px 0;
      min-width: 270px;
      font-size: 8pt;
      max-height: 24px;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border-radius: 4px;
+}
+
+select:active {
+     -moz-box-shadow: inset 0px 0px 0px 1px #f60;
 }
 
 a:link{
