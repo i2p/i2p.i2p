@@ -52,16 +52,16 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private PacketHandler _handler;
     private EstablishmentManager _establisher;
     private final MessageQueue _outboundMessages;
-    private OutboundMessageFragments _fragments;
+    private final OutboundMessageFragments _fragments;
     private final OutboundMessageFragments.ActiveThrottle _activeThrottle;
     private OutboundRefiller _refiller;
     private PacketPusher _pusher;
-    private InboundMessageFragments _inboundFragments;
+    private final InboundMessageFragments _inboundFragments;
     private UDPFlooder _flooder;
     private PeerTestManager _testManager;
     private final IntroductionManager _introManager;
-    private ExpirePeerEvent _expireEvent;
-    private PeerTestEvent _testEvent;
+    private final ExpirePeerEvent _expireEvent;
+    private final PeerTestEvent _testEvent;
     private short _reachabilityStatus;
     private long _reachabilityStatusLastUpdated;
     private long _introducersSelectedOn;
@@ -227,8 +227,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     public void startup() {
-        if (_fragments != null)
-            _fragments.shutdown();
+        _fragments.shutdown();
         if (_pusher != null)
             _pusher.shutdown();
         if (_handler != null) 
@@ -239,8 +238,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _establisher.shutdown();
         if (_refiller != null)
             _refiller.shutdown();
-        if (_inboundFragments != null)
-            _inboundFragments.shutdown();
+        _inboundFragments.shutdown();
         if (_flooder != null)
             _flooder.shutdown();
         _introManager.reset();
@@ -345,14 +343,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _refiller.shutdown();
         if (_handler != null)
             _handler.shutdown();
-        if (_fragments != null)
-            _fragments.shutdown();
+        _fragments.shutdown();
         if (_pusher != null)
             _pusher.shutdown();
         if (_establisher != null)
             _establisher.shutdown();
-        if (_inboundFragments != null)
-            _inboundFragments.shutdown();
+        _inboundFragments.shutdown();
         _expireEvent.setIsAlive(false);
         _testEvent.setIsAlive(false);
     }
@@ -1116,7 +1112,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (msg == null) return;
         if (msg.getTarget() == null) return;
         if (msg.getTarget().getIdentity() == null) return;
-    
+        if (_establisher == null) {
+            failed(msg, "UDP not up yet");
+            return;    
+        }
+
         msg.timestamp("sending on UDP transport");
         Hash to = msg.getTarget().getIdentity().calculateHash();
         PeerState peer = getPeerState(to);
@@ -1443,11 +1443,12 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (_log.shouldLog(Log.INFO))
             _log.info("Sending message failed: " + msg, new Exception("failed from"));
         
-        if (!_context.messageHistory().getDoLog())
+        if (_context.messageHistory().getDoLog())
             _context.messageHistory().sendMessage(msg.getMessageType(), msg.getMessageId(), msg.getExpiration(), 
                                               msg.getTarget().getIdentity().calculateHash(), false, reason);
         super.afterSend(msg, false);
     }
+
     public void succeeded(OutboundMessageState msg) {
         if (msg == null) return;
         if (_log.shouldLog(Log.DEBUG))
