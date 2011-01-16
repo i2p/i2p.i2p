@@ -1,3 +1,10 @@
+2011-01-16 zzz
+    * Console: Allow editing of console args
+    * UDP: Prevent rare startup NPE
+    * UPnP:
+      - Change all log errors to warns (tickets #76, #95, #120)
+      - Double socket soTimeout to 2 seconds
+
 2011-01-15 zzz
     * Console: Add some HTTP headers in the view servlets
 
