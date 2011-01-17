@@ -238,7 +238,7 @@
                String cHost= indexBean.getClientInterface(curClient);
                if ("".equals(cHost)) {
                    out.write("<font color=\"red\">");
-                   out.write(intl._("Hort not set"));
+                   out.write(intl._("Host not set"));
                    out.write("</font>");
                } else {
                    out.write(cHost);
