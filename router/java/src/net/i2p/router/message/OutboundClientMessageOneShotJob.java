@@ -127,10 +127,17 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         // otherwise router config, otherwise default
         _overallExpiration = msg.getExpiration();
         if (_overallExpiration > 0) {
-           _overallExpiration = Math.max(_overallExpiration, _start + OVERALL_TIMEOUT_MS_MIN);
-           _overallExpiration = Math.min(_overallExpiration, _start + OVERALL_TIMEOUT_MS_DEFAULT);
-           if (_log.shouldLog(Log.INFO))
-               _log.info(getJobId() + ": Message Expiration (ms): " + (_overallExpiration - _start));
+            // Unless it's already expired, set a min and max expiration
+            if (_overallExpiration <= _start) {
+                _overallExpiration = Math.max(_overallExpiration, _start + OVERALL_TIMEOUT_MS_MIN);
+                _overallExpiration = Math.min(_overallExpiration, _start + OVERALL_TIMEOUT_MS_DEFAULT);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info(getJobId() + ": Message Expiration (ms): " + (_overallExpiration - _start));
+            } else {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn(getJobId() + ": Expired before we got to it");
+                // runJob() will call dieFatal()
+            }
         } else {
             String param = msg.getSenderConfig().getOptions().getProperty(OVERALL_TIMEOUT_MS_PARAM);
             if (param == null)
@@ -149,7 +156,6 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
            if (_log.shouldLog(Log.INFO))
                _log.info(getJobId() + " Default Expiration (ms): " + timeoutMs);
         }
-        _finished = false;
     }
     
     /** call once only */
@@ -174,9 +180,14 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     public String getName() { return "Outbound client message"; }
     
     public void runJob() {
+        long now = getContext().clock().now();
+        if (now >= _overallExpiration) {
+            dieFatal();
+            return;
+        }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": Send outbound client message job beginning");
-        long timeoutMs = _overallExpiration - getContext().clock().now();
+        long timeoutMs = _overallExpiration - now;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": preparing to search for the leaseSet for " + _toString);
         Hash key = _to.calculateHash();
