@@ -28,7 +28,7 @@ public class Main {
 	 * Start the tray icon code (loads tray icon in the tray area).
 	 * @throws Exception 
 	 */
-    private void startUp() throws Exception {
+    public void startUp() throws Exception {
         trayManager = TrayManager.getInstance();
         trayManager.startManager();
         
@@ -45,11 +45,15 @@ public class Main {
             });
         }
     }
+    
+    public static void main(String[] args) {
+    	beginStartup(args);
+    }
 
     /**
      * Main method launching the application.
      */
-    public static void main(String[] args) {
+    public static void beginStartup(String[] args) {
     	System.setProperty("java.awt.headless", "false");
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
