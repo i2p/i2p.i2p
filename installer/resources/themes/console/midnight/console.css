@@ -169,10 +169,7 @@ div.routersummary {
      font-size: 9pt; 
      word-wrap: break-word; 
      font: 9pt/125%; 
-     -moz-box-shadow: inset 0px 0px 0px 1px #00000A; 
-/*     -moz-border-radius: 3px;
-     -khtml-border-radius: 3px;
-     border-radius: 3px;*/
+     -moz-box-shadow: inset 0px 0px 0px 1px #00000A;
 }
 
 div.routersummary input[type=text] {
@@ -330,9 +327,6 @@ div.main {
      text-align: left;
      color: #eef;
      min-width: 590px;
-/*     -moz-border-radius: 0 0 3px 3px;
-     -khtml-border-radius: 0 0 3px 3px;
-     border-radius: 0 0 3px 3px;*/
      background: #000 url(images/scarface.jpg) right bottom no-repeat !important;
 }
 
@@ -454,16 +448,7 @@ div.news p {
      margin-bottom: -10px;
      margin-top: 10px;
 }
-/*
-div.news p:first-child {
-     padding-top: 15px !important;
-}
 
- 
-div.news p:nth-child(2n) {
-     padding-top: 15px !important;
-}
-*/
 div.news p:last-child {
      margin-bottom: 10px;
 }
@@ -580,9 +565,6 @@ h1 {
      min-width: 600px;
      line-height: 100%;
      color: #fff;
-/*     -moz-border-radius: 3px 3px 0 0;
-     -khtml-border-radius: 3px 3px 0 0;
-     border-radius: 3px 3px 0 0; */
 }
 
 h2 {
@@ -592,12 +574,8 @@ h2 {
      border-top: 1px solid #99f;
      border-left: 1px solid #99f;
      background: #000008;
-/*     font-variant: small-caps; */
      text-transform: uppercase; 
      letter-spacing: 0.07em;
-/*     -moz-border-radius: 0 3px 0 0;
-     -khtml-border-radius: 0 3px 0 0;
-     border-radius: 0 3px 0 0;*/
 }
 
 h3 {
@@ -610,9 +588,6 @@ h3 {
      margin-bottom: 10px;
      font-weight: bold !important;
      text-transform: uppercase; 
-/*     -moz-border-radius: 0 3px 0 0;
-     -khtml-border-radius: 0 3px 0 0;
-     border-radius: 0 3px 0 0;*/
 }
 
 h3 a {
@@ -786,7 +761,7 @@ input[type=text], select {
 }
 submit {
      margin: 3px 5px 3px 5px;
-     padding 2px 0;
+     padding: 2px 0;
      font: 8pt/140% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
 }
 
@@ -807,7 +782,7 @@ p {
      width: 240px;
      text-align: center;
      float: right;
-     valign: middle;
+     vertical-align: middle;
 }
 
 .langbox img {

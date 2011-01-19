@@ -38,7 +38,7 @@ div.logo {
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     background: #ffe; /*url('images/lightbluetile.png')*/
+     background: #ffe;
      width: 185px;
      -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
 }
@@ -90,7 +90,6 @@ div.routersummaryouter {
 }
 
 div.routersummary {
-/*  margin: 0px 20px 20px 0px; */
      width: 180px;
      padding: 8px 8px 10px 8px;
      text-align: center !important;
@@ -101,9 +100,7 @@ div.routersummary {
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     background: #ffe url('images/magic.png') center bottom;/* 
-     float: left;
-*/     
+     background: #ffe url('images/magic.png') center bottom;
      -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
      -khtml-box-shadow: inset 0px 0px 1px 1px #bbf;
      box-shadow: inset 0px 0px 1px 1px #bbf;
@@ -164,16 +161,16 @@ div.routersummary h4 {
      border-bottom: 0 !important;
      font-size: 8.5pt;
      letter-spacing: 0.02em;
-     margin: -6px !important;
+     margin: -6px -6px !important;
      padding: 3px 3px 5px 3px;
      background: #ddf url(images/magic.png);
      text-transform: capitalize;
      text-decoration: none !important;
      color: #2b2;
      line-height: 105%;
-     -moz-box-shadow: 0px 0px 1px 1px #fff;
-     -khtml-box-shadow: 0px 0px 1px 1px #fff;
-     box-shadow: 0px 0px 1px 1px #fff;
+     -moz-box-shadow: inset 0px 0px 1px 10px #dfd;
+     -khtml-box-shadow: 0px 0px 1px 1px #dfd;
+     box-shadow: 0px 0px 1px 1px #fdf;
 }
 
 div.routersummary table {
@@ -383,33 +380,12 @@ div.news p {
      padding: 0 15px;
 }
 
-/*
-div.news a:link{
-     color: #a30;
-     text-decoration: none;
-}
-
-div.news a:visited{
-     color: #930;
-}
-
-div.news a:hover{
-     color: #d20;
-     text-decoration: underline;
-}
-
-div.news a:active{
-     color: #c30;
-}
-*/
-
 div.news hr{
      color: #225;
      background: #225;
      height: 1px;
      border: 0px dotted #225;
      margin: 10px 0 5px;
-/*     -moz-box-shadow: 0px -1px 1px 1px #ffe;*/
      opacity: 0.6;
 }
 
@@ -457,13 +433,6 @@ div.news i {
      font-style: normal;
 }
 
-/*
-div.news  h4 a{
-     color: #910 !important;
-     opacity: 1 !important;
-}
-*/
-
 div.news h4 {
      border-bottom: 0px;
      padding: 0;
@@ -478,30 +447,25 @@ div.confignav {
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     border: 1px solid #113;
+     border: 1px solid #115;
      font-size: 9.5pt !important;
      font-weight: bold !important;
      line-height: 160% !important;
-     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
+     -moz-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     -khtml-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     opacity: 1;
      min-width: 400px;
 }
 
 div.configure {
-/*     padding: 5px 15px 0px 15px !important;
-     margin: 0px 0px 15px 0;
-     background: #ffe; url('images/lightbluetile.png')
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
-     border-radius: 4px;
-     border: 1px solid #447;
-     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;*/
      min-width: 400px;
      margin-bottom: 0px;
 }
 
 div.configure h3, div.graphspanel h3 {
-     border: 1px solid #113;
-     border-left: 5px solid #113;
+     border: 1px solid #115;
+     border-left: 5px solid #115;
      padding: 5px;
      margin: 15px 0 15px 0;
      border-radius: 0 4px 4px 0;
@@ -512,14 +476,6 @@ div.configure h3, div.graphspanel h3 {
 }
 
 div.graphspanel {
-/*     padding: 12px;
-     margin: 10px 0px 25px 0;
-     background: #ffe url('images/lightbluetile.png');
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
-     border-radius: 4px;
-     border: 1px solid #447;
-     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;*/
      text-align: center !important;
      margin: 15px 0px -15px;
 }
@@ -622,13 +578,7 @@ tr:nth-child(even) {
 tr:nth-child(odd) {
      background: #fff url(images/magic.png);
 }
-/*
-tr:last-child {
-     background: #bbf url('images/tabletilelighter.png') !important;
-     font-weight: bold;
-     border: 1px solid #002 !important;
-}
-*/
+
 td {
      padding: 5px 3px;
      color: #000;
@@ -690,7 +640,6 @@ div.main li:first-child {
      color: #910;
      padding: 2px 3px;
      font-weight: bold;
-/*     background: #ffb url('images/magic.png') center bottom;*/
 }
 
 ol {
@@ -715,7 +664,6 @@ code {
      text-align: left;
      font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      color: #390;
-/*     padding: 2px 3px; */
      font-weight: bold;
 }
 
@@ -771,7 +719,7 @@ p {
 
 h1 {
      text-align: left;
-     color: #003;
+     color: #115;
      padding: 10px 15px;
      margin: 0 10px 10px 207px;
      font: normal bold 16pt/120% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
@@ -792,13 +740,13 @@ h1 {
 
 h2 {
      font-size: 13pt;
-     color: #003;
+     color: #115;
      letter-spacing: 0.07em;
      background: #ffe url('images/header.png') center center repeat-x;
-     text-shadow: 0px 1px 1px #77f;
+     text-shadow: 0px 1px 1px #99f;
      padding: 10px;
      wordwrap: none;
-     border: 1px solid #447;
+     border: 1px solid #115;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
@@ -822,18 +770,18 @@ h2 img {
 }
 
 h3 {
-     border: 1px solid #447;
-     border-left: 5px solid #447;
-     padding: 5px 5px 5px 10px;
+     border: 1px solid #115;
+     border-left: 5px solid #115;
+     padding: 4px 5px 4px 8px;
      margin: 12px 0 15px 0;
      border-radius: 0 4px 4px 0;
      -moz-border-radius: 0 4px 4px 0;
      -khtml-border-radius: 0 4px 4px 0;
      background: #ffe url('images/header.png') center center repeat-x !important;
      text-transform: uppercase;
-     text-shadow: 0px 1px 1px #77f;
-     font-size: 11pt;
-     color: #003;
+     text-shadow: 0px 1px 1px #99f;
+     font-size: 10.5pt;
+     color: #115;
      -moz-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
      -khtml-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
      box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
@@ -864,7 +812,7 @@ button, button:visited{
      margin: 0 1px;
      text-align: center;
      min-width: 80px;
-     -moz-box-shadow: inset 0px 2px 8px 0px #fff;
+     -moz-box-shadow: inset 0px 0px 2px 1px #fff;
      -khtml-box-shadow: inset 0px 2px 8px 0px #fff;
      box-shadow: inset 0px 2px 8px 0px #fff;
      color: #316;
@@ -902,18 +850,16 @@ button:active{
      width: 260px;
      text-align: right;
      float: right;
-     valign: middle;
+     vertical-align: middle;
      opacity: 1 !important;
 }
 
 .langbox img {
      opacity: 0.8 !important;
-/*     -moz-box-shadow: 0 0 1px #447;*/
 }
 
 .langbox img:hover {
      opacity: 1 !important;
-/*     -moz-box-shadow: 0 0 1px #f60;*/
 }
 
 input {
@@ -1057,47 +1003,7 @@ form {}
      -moz-box-shadow: inset 0px 0px 2px 1px #ffe;
 }
 
-/*
-.joblog {
-     margin: 15px 0;
-     padding: 10px 20px !important;
-     border: 1px solid #447;
-     background-color: #004;
-     background: #ffe url('images/lightbluetile.png');
-     color: #001;
-     border-radius: 4px;
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
-     text-align: justify;
-     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
-     overflow: auto;
- }
- 
- div.joblog:li {
-     word-wrap: break-word !important;
-}
-
- .joblog:ul {
-     word-wrap: break-word !important;
-}
-
-.joblog table {
-     margin-top: 10px;
-}
-*/
-
 div.joblog {
-/*     margin: 15px 0;
-     padding: 10px 20px !important;
-     border: 1px solid #447;
-     background-color: #004;
-     background: #ffe; /*url('images/lightbluetile.png')
-     color: #001;
-     border-radius: 4px;
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
-     text-align: justify;
-     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;*/
      overflow: auto;
      border: 0;
      margin-top: 5px;
