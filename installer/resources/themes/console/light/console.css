@@ -772,7 +772,7 @@ h2 img {
 h3 {
      border: 1px solid #115;
      border-left: 5px solid #115;
-     padding: 4px 5px 4px 8px;
+     padding: 5px 5px 5px 8px;
      margin: 12px 0 15px 0;
      border-radius: 0 4px 4px 0;
      -moz-border-radius: 0 4px 4px 0;
@@ -780,7 +780,7 @@ h3 {
      background: #ffe url('images/header.png') center center repeat-x !important;
      text-transform: uppercase;
      text-shadow: 0px 1px 1px #99f;
-     font-size: 10.5pt;
+     font-size: 11pt;
      color: #115;
      -moz-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
      -khtml-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
