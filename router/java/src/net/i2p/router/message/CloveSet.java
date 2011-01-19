@@ -25,7 +25,7 @@ class CloveSet {
     private long _expiration;
     
     public CloveSet() {
-	_cloves = new ArrayList();
+	_cloves = new ArrayList(4);
 	_msgId = -1;
 	_expiration = -1;
     }

@@ -39,7 +39,7 @@ class GarlicConfig {
     public GarlicConfig() {
 	_id = -1;
 	_expiration = -1;
-	_cloveConfigs = new ArrayList();
+	_cloveConfigs = new ArrayList(4);
 	_replyBlockMessageId = -1;
 	_replyBlockExpiration = -1;
     }
