@@ -24,7 +24,7 @@ import org.freenetproject.ForwardPortStatus;
  *
  * @author zzz
  */
-public class UPnPManager {
+class UPnPManager {
     private Log _log;
     private RouterContext _context;
     private UPnP _upnp;

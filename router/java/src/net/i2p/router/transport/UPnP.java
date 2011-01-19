@@ -52,7 +52,7 @@ import org.freenetproject.ForwardPortStatus;
  * TODO: Advertise the node like the MDNS plugin does
  * TODO: Implement EventListener and react on ip-change
  */ 
-public class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
+class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	private Log _log;
 	private I2PAppContext _context;
 	

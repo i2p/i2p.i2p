@@ -21,10 +21,10 @@ import net.i2p.util.Log;
  * pass it on to the transport for processing
  *
  */
-public class GetBidsJob extends JobImpl {
-    private Log _log;
-    private CommSystemFacadeImpl _facade;
-    private OutNetMessage _msg;
+class GetBidsJob extends JobImpl {
+    private final Log _log;
+    private final CommSystemFacadeImpl _facade;
+    private final OutNetMessage _msg;
     
     public GetBidsJob(RouterContext ctx, CommSystemFacadeImpl facade, OutNetMessage msg) {
         super(ctx);
