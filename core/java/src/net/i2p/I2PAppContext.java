@@ -776,7 +776,7 @@ public class I2PAppContext {
      * enable simulators to play with clock skew among different instances.
      *
      */
-    public Clock clock() { // overridden in RouterContext
+    public Clock clock() {
         if (!_clockInitialized)
             initializeClock();
         return _clock;
