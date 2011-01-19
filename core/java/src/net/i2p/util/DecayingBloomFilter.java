@@ -20,28 +20,34 @@ import org.xlattice.crypto.filters.BloomSHA1;
  * Further analysis and tweaking for the tunnel IVV may be required.
  */
 public class DecayingBloomFilter {
-    private I2PAppContext _context;
-    private Log _log;
+    protected final I2PAppContext _context;
+    protected final Log _log;
     private BloomSHA1 _current;
     private BloomSHA1 _previous;
-    private int _durationMs;
-    private int _entryBytes;
+    protected final int _durationMs;
+    protected final int _entryBytes;
     private byte _extenders[][];
     private byte _extended[];
     private byte _longToEntry[];
     private long _longToEntryMask;
     protected long _currentDuplicates;
-    private boolean _keepDecaying;
-    private DecayEvent _decayEvent;
+    protected volatile boolean _keepDecaying;
+    protected SimpleTimer.TimedEvent _decayEvent;
     /** just for logging */
-    private String _name;
+    protected final String _name;
     
     private static final int DEFAULT_M = 23;
     private static final int DEFAULT_K = 11;
     private static final boolean ALWAYS_MISS = false;
    
-    /** noop for DHS */
-    public DecayingBloomFilter() {}
+    /** only for extension by DHS */
+    protected DecayingBloomFilter(int durationMs, int entryBytes, String name, I2PAppContext context) {
+        _context = context;
+        _log = context.logManager().getLog(getClass());
+        _entryBytes = entryBytes;
+        _name = name;
+        _durationMs = durationMs;
+    }
 
     /**
      * Create a bloom filter that will decay its entries over time.  
@@ -87,7 +93,6 @@ public class DecayingBloomFilter {
             _longToEntry = new byte[_entryBytes];
             _longToEntryMask = (1l << (_entryBytes * 8l)) -1;
         }
-        _currentDuplicates = 0;
         _decayEvent = new DecayEvent();
         _keepDecaying = true;
         SimpleTimer.getInstance().addEvent(_decayEvent, _durationMs);
@@ -105,11 +110,13 @@ public class DecayingBloomFilter {
     }
     
     public long getCurrentDuplicateCount() { return _currentDuplicates; }
+
     public int getInsertedCount() { 
         synchronized (this) {
             return _current.size() + _previous.size(); 
         }
     }
+
     public double getFalsePositiveRate() { 
         synchronized (this) {
             return _current.falsePositives(); 
@@ -117,12 +124,15 @@ public class DecayingBloomFilter {
     }
     
     /** 
-     * return true if the entry added is a duplicate
-     *
+     * @return true if the entry added is a duplicate
      */
     public boolean add(byte entry[]) {
         return add(entry, 0, entry.length);
     }
+
+    /** 
+     * @return true if the entry added is a duplicate
+     */
     public boolean add(byte entry[], int off, int len) {
         if (ALWAYS_MISS) return false;
         if (entry == null) 
@@ -131,55 +141,52 @@ public class DecayingBloomFilter {
             throw new IllegalArgumentException("Bad entry [" + len + ", expected " 
                                                + _entryBytes + "]");
         synchronized (this) {
-            return locked_add(entry, off, len);
+            return locked_add(entry, off, len, true);
         }
     }
     
     /** 
-     * return true if the entry added is a duplicate.  the number of low order 
+     * @return true if the entry added is a duplicate.  the number of low order 
      * bits used is determined by the entryBytes parameter used on creation of the
      * filter.
      *
      */
     public boolean add(long entry) {
         if (ALWAYS_MISS) return false;
+        if (_entryBytes <= 7)
+            entry = ((entry ^ _longToEntryMask) & ((1 << 31)-1)) | (entry ^ _longToEntryMask);
+            //entry &= _longToEntryMask; 
+        if (entry < 0) {
+            DataHelper.toLong(_longToEntry, 0, _entryBytes, 0-entry);
+            _longToEntry[0] |= (1 << 7);
+        } else {
+            DataHelper.toLong(_longToEntry, 0, _entryBytes, entry);
+        }
         synchronized (this) {
-            if (_entryBytes <= 7)
-                entry = ((entry ^ _longToEntryMask) & ((1 << 31)-1)) | (entry ^ _longToEntryMask);
-                //entry &= _longToEntryMask; 
-            if (entry < 0) {
-                DataHelper.toLong(_longToEntry, 0, _entryBytes, 0-entry);
-                _longToEntry[0] |= (1 << 7);
-            } else {
-                DataHelper.toLong(_longToEntry, 0, _entryBytes, entry);
-            }
-            return locked_add(_longToEntry, 0, _longToEntry.length);
+            return locked_add(_longToEntry, 0, _longToEntry.length, true);
         }
     }
     
     /** 
-     * return true if the entry is already known.  this does NOT add the
+     * @return true if the entry is already known.  this does NOT add the
      * entry however.
      *
      */
     public boolean isKnown(long entry) {
         if (ALWAYS_MISS) return false;
+        if (_entryBytes <= 7)
+            entry = ((entry ^ _longToEntryMask) & ((1 << 31)-1)) | (entry ^ _longToEntryMask); 
+        if (entry < 0) {
+            DataHelper.toLong(_longToEntry, 0, _entryBytes, 0-entry);
+            _longToEntry[0] |= (1 << 7);
+        } else {
+            DataHelper.toLong(_longToEntry, 0, _entryBytes, entry);
+        }
         synchronized (this) {
-            if (_entryBytes <= 7)
-                entry = ((entry ^ _longToEntryMask) & ((1 << 31)-1)) | (entry ^ _longToEntryMask); 
-            if (entry < 0) {
-                DataHelper.toLong(_longToEntry, 0, _entryBytes, 0-entry);
-                _longToEntry[0] |= (1 << 7);
-            } else {
-                DataHelper.toLong(_longToEntry, 0, _entryBytes, entry);
-            }
             return locked_add(_longToEntry, 0, _longToEntry.length, false);
         }
     }
     
-    private boolean locked_add(byte entry[], int offset, int len) {
-        return locked_add(entry, offset, len, true);
-    }
     private boolean locked_add(byte entry[], int offset, int len, boolean addIfNew) {
         if (_extended != null) {
             // extend the entry to 32 bytes
@@ -195,7 +202,6 @@ public class DecayingBloomFilter {
             } else {
                 if (addIfNew) {
                     _current.locked_insert(_extended);
-                    _previous.locked_insert(_extended);
                 }
                 return false;
             }
@@ -208,7 +214,6 @@ public class DecayingBloomFilter {
             } else {
                 if (addIfNew) {
                     _current.locked_insert(entry, offset, len);
-                    _previous.locked_insert(entry, offset, len);
                 }
                 return false;
             }
