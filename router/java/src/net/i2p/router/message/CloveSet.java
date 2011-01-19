@@ -18,15 +18,14 @@ import net.i2p.data.i2np.GarlicClove;
  * Wrap up the data contained in a CloveMessage after being decrypted
  *
  */
-public class CloveSet {
-    private List _cloves;
+class CloveSet {
+    private final List _cloves;
     private Certificate _cert;
     private long _msgId;
     private long _expiration;
     
     public CloveSet() {
 	_cloves = new ArrayList();
-	_cert = null;
 	_msgId = -1;
 	_expiration = -1;
     }

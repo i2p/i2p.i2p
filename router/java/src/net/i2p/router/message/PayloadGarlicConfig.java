@@ -19,7 +19,6 @@ public class PayloadGarlicConfig extends GarlicConfig {
 
     public PayloadGarlicConfig() {
 	super();
-	_payload = null;
     }
     
     /**

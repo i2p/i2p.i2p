@@ -28,9 +28,9 @@ import net.i2p.util.Log;
  * need to be. soon)
  *
  */
-public class HandleGarlicMessageJob extends JobImpl implements GarlicMessageReceiver.CloveReceiver {
-    private Log _log;
-    private GarlicMessage _message;
+class HandleGarlicMessageJob extends JobImpl implements GarlicMessageReceiver.CloveReceiver {
+    private final Log _log;
+    private final GarlicMessage _message;
     //private RouterIdentity _from;
     //private Hash _fromHash;
     //private Map _cloves; // map of clove Id --> Expiration of cloves we've already seen
