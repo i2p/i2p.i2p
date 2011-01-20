@@ -90,9 +90,7 @@
         <Set name="Port">8443</Set>
         <Set name="PoolName">main</Set>
         <Set name="Keystore">./eepsite/keystore.ks</Set>
-        <!-- the keystore password -->
 	<Set name="Password">changeit</Set>
-        <!-- the X.509 certificate password -->
 	<Set name="KeyPassword">myKeyPassword</Set>
         <Set name="NonPersistentUserAgent">MSIE 5</Set>
       </New>
