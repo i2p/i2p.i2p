@@ -19,6 +19,7 @@ import net.i2p.util.I2PAppThread;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.ShellCommand;
+import net.i2p.util.VersionComparator;
 
 import org.mortbay.http.DigestAuthenticator;
 import org.mortbay.http.HashUserRealm;
@@ -303,8 +304,11 @@ public class RouterConsoleRunner {
         try {
         	//TODO: move away from routerconsole into a separate application.
         	//ApplicationManager?
-            String[] args = new String[0];
-            net.i2p.desktopgui.Main.beginStartup(args);
+        	VersionComparator v = new VersionComparator();
+        	if(v.compare(System.getProperty("java.runtime.version"), "1.6") >= 0) {
+                String[] args = new String[0];
+                net.i2p.desktopgui.Main.beginStartup(args);	
+        	}
         } catch (Throwable t) {
             t.printStackTrace();
         }

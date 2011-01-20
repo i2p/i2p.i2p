@@ -2,6 +2,8 @@ package net.i2p.desktopgui.router;
 
 import java.io.IOException;
 
+import org.tanukisoftware.wrapper.WrapperManager;
+
 import net.i2p.I2PAppContext;
 import net.i2p.desktopgui.i18n.DesktopguiTranslator;
 import net.i2p.desktopgui.util.ConfigurationManager;
@@ -74,7 +76,16 @@ public class RouterManager {
 	 */
 	public static void shutDown() {
 		if(inI2P()) {
-			getRouter().shutdown(0);
+			Thread t = new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					WrapperManager.signalStopped(Router.EXIT_HARD);	
+				}
+				
+			});
+			t.start();
+			getRouter().shutdown(Router.EXIT_HARD);
 		}
     }
 	
