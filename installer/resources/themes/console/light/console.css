@@ -1004,16 +1004,19 @@ form {}
 }    
 
 .statusnotes {
-     font-style: italic;
+     font-style: normal;
      font-size: 8pt;
-     font-color: #001 !important;
+     font-color: #225 !important;
      text-align: center;
      border: 1px solid #447 !important;
      border-top: 0 !important;
      margin: -5px 0 5px 0; 
      padding: 7px;
-     background: #ffe url('images/magic.png') center bottom;
-     -moz-box-shadow: inset 0px 0px 2px 1px #ffe;
+     background: #fff url('images/magic.png') center bottom;
+     -moz-box-shadow: inset 0px 0px 40px 5px #ccf;
+     text-shadow: 0 1px #99f;
+     letter-spacing: 0em !important;
+     text-transform: capitalize;
 }
 
 div.joblog {
