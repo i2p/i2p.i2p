@@ -759,6 +759,19 @@ h2 {
      opacity: 1;
 }
 
+h2 a, h3 a {
+    text-transform: capitalize;
+    letter-spacing: 0.03em;
+}
+
+h2 a:hover, h3 a:hover {
+     text-shadow: none;
+}
+
+.routersummary h3 a{
+    text-transform: uppercase;
+}
+
 h2 a:hover {
      text-shadow: 0px 0px 1px rgba(255, 255, 72, 0.9);
      border-bottom: 1px #ff6600;
