@@ -742,7 +742,7 @@ h2 {
      font-size: 13pt;
      color: #115;
      letter-spacing: 0.07em;
-     background: #ffe url('images/header.png') center center repeat-x;
+     background: url('images/header.png') center center repeat-x;
      text-shadow: 0px 1px 1px #99f;
      padding: 10px;
      wordwrap: none;
@@ -790,7 +790,7 @@ h3 {
      border-radius: 0 4px 4px 0;
      -moz-border-radius: 0 4px 4px 0;
      -khtml-border-radius: 0 4px 4px 0;
-     background: #ffe url('images/header.png') center center repeat-x !important;
+     background: url('images/header.png') center center repeat-x !important;
      text-transform: uppercase;
      text-shadow: 0px 1px 1px #99f;
      font-size: 11pt;
@@ -1012,8 +1012,7 @@ form {}
      border-top: 0 !important;
      margin: -5px 0 5px 0; 
      padding: 7px;
-     background: #fff url('images/magic.png') center bottom;
-     -moz-box-shadow: inset 0px 0px 40px 5px #ccf;
+     background: url("images/header.png") repeat scroll center center #eef;
      text-shadow: 0 1px #99f;
      letter-spacing: 0em !important;
      text-transform: capitalize;
