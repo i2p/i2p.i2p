@@ -22,6 +22,7 @@ import net.i2p.I2PException;
  * You may not create an unbound StandardServerSocket.
  * Create this through the SocketManager.
  *
+ * @author zzz
  * @since 0.8.4
  */
 class StandardServerSocket extends ServerSocket {
@@ -34,6 +35,7 @@ class StandardServerSocket extends ServerSocket {
         _socket = socket;
     }
 
+    @Override
     public Socket accept() throws IOException {
         try {
             I2PSocket sock = _socket.accept();

@@ -23,6 +23,9 @@ import net.i2p.I2PException;
  * You may not create an unbound StandardSocket.
  * Create this through the SocketManager.
  *
+ * Todo: Make public and add getPeerDestination() ?
+ *
+ * @author zzz
  * @since 0.8.4
  */
 class StandardSocket extends Socket {
@@ -132,7 +135,7 @@ class StandardSocket extends Socket {
         OutputStream rv = _socket.getOutputStream();
         if (rv != null)
             return rv;
-        throw new IOException("Mo stream");
+        throw new IOException("No stream");
     }
 
     /**
