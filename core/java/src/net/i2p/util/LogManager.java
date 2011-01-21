@@ -639,6 +639,7 @@ public class LogManager {
         return _dateFormatPattern;
     }
 
+/*****
     public static void main(String args[]) {
         I2PAppContext ctx = new I2PAppContext();
         Log l1 = ctx.logManager().getLog("test.1");
@@ -659,6 +660,7 @@ public class LogManager {
         }
         System.exit(0);
     }
+*****/
 
     public void shutdown() {
         if (_writer != null) {
