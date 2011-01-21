@@ -168,7 +168,7 @@ div.routersummary h4 {
      text-decoration: none !important;
      color: #2b2;
      line-height: 105%;
-     -moz-box-shadow: inset 0px 0px 1px 10px #dfd;
+     -moz-box-shadow: inset 0px 0px 1px 30px #dfd;
      -khtml-box-shadow: 0px 0px 1px 1px #dfd;
      box-shadow: 0px 0px 1px 1px #fdf;
 }
@@ -507,14 +507,15 @@ div.graphspanel form {
 div.messages {
      padding: 10px;
      margin: 10px 0 15px 0;
-     background: #ffe;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
      border: 1px solid #447;
-     background: #ffe url('images/magic.png');
+     background: #fff url('images/magic.png');
      font-weight: bold;
-     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
+     -moz-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     -khtml-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
 }
 
 div.messages span.error {
