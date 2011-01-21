@@ -732,10 +732,6 @@ msgstr "Клиентские I2P туннели"
 msgid "Interface"
 msgstr "Сетевой интерфейс"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:290
-msgid "Host not set"
-msgstr "Хост не задан"
-
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:318
 msgid "Standby"
 msgstr "Режим ожидания"
