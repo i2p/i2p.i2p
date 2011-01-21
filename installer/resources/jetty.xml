@@ -65,7 +65,6 @@
         <Set name="LowResourcePersistTimeMs">1000</Set>
         <Set name="ConfidentialPort">8443</Set>
         <Set name="IntegralPort">8443</Set>
-        <Set name="PoolName">main</Set>
       </New>
     </Arg>
   </Call>
