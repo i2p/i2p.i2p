@@ -15,19 +15,19 @@ div.routersummary h3, div.routersummary h4, div.routersummary p, div.routersumma
 }
 
 
-div.routersummary h4 {
-     font-size: 11pt;
+div.routersummary h4, div.routersummary h4 a {
+     font-size: 11pt !important;
      letter-spacing: 0.1em;
      -moz-box-shadow: inset 0px 0px 1px 15px #dfd;
 }
 div.routersummary b {
-     font-size: 9pt;
+     font-size: 9.5pt;
      font-weight: normal !important;
 }
 
 div.routersummary a {
-     word-spacing: 0.2em !important;
-     letter-spacing: 0.1em !important;
+     word-spacing: 0.1em !important;
+     letter-spacing: 0.05em !important;
      font-size: 10.5pt;
      line-height: 150%;
 }
@@ -66,4 +66,28 @@ input, input:visited {
 
 table {
      font: 8.5pt/130% Verdana, "Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
+}
+
+td {
+     font-size: 9pt;
+}
+
+.statusnotes {
+     font-size: 10pt;
+     letter-spacing: 0.2em !important;
+     text-shadow: none !important;
+}
+
+.tablefooter tr, .tablefooter td {
+     font-size: 10pt !important;
+}
+
+div.tunnels a {
+     font-size: 9.5pt !important;
+     letter-spacing: 0 !important;
+     word-spacing: 0 !important;
+}
+
+code, tt {
+     font-size: 10pt !important;
 }
