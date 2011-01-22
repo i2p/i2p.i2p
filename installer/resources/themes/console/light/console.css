@@ -443,7 +443,7 @@ div.news h4 {
 div.confignav {
      padding: 15px 10px !important;
      margin: 15px 0 15px 0;
-     background: #ffe url('images/header.png') center center repeat-x;
+     background: url('images/header.png') center center repeat-x;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
