@@ -84,13 +84,13 @@
      padding: 4px;
      margin: 2px 0 3px 0;
      background-color: #005;
-     color: #030;
+     color: #292;
      font-family: "Lucida Console", "DejaVu Sans Mono", "Andale Mono", "Courier New", Courier, mono;
      border: 1px inset #002;
      font-size: 9pt !important;
      font-weight: bold;
      text-align: justify !important;
-     background: #ddf; /*url(images/tabletile.png);*/
+     background: #dfd url(images/magic.png);
 }
 
 #tunnelListPage .footer .control {
@@ -140,6 +140,6 @@
 #tunnelListPage .descriptionField label, #tunnelListPage .destinationField label {
      text-align: right;
      width: 150px;
-     height: 24px;
+     height: 28px;
      float: left;
 }

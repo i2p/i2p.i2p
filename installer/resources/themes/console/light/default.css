@@ -45,12 +45,12 @@ label {
 h4 {
      font-size: 11pt;
      font-weight: bold !important;
-     color: #001;
-     text-align: center;
-     border: 1px solid #225;
+     color: #115;
+     text-align: left;
+     border: 1px solid #115;
      margin: 5px 0 15px 0;
      padding: 5px 10px;
-     background: #eef url(images/header.png) repeat-x center center;
+     background: url(images/header.png) repeat-x center center;
      text-transform: uppercase;
      letter-spacing: 0.07em;
      -moz-border-radius: 4px;
@@ -73,7 +73,7 @@ form {
 textarea, input, select, button, a {
      -moz-box-sizing: border-box;
      box-sizing: border-box;
-     font-size: 9pt;
+     font-size: 8.5pt;
      float: left;
      vertical-align: middle;
 }
@@ -160,7 +160,7 @@ hr {
      border: 1px solid #447;
      padding: 2px;
      margin: 4px 0 2px 0px;
-     font: 10pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
+     font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      font-weight: bold;
      background: #fff;
      color: #003;
@@ -283,7 +283,7 @@ hr {
      padding: 0 0 0 2px;
      float: left;
      margin: 0;
-     font-size: 9pt !important;
+     font-size: 8.5pt !important;
      font-weight: bold;
 }
 
