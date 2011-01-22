@@ -99,6 +99,8 @@
 
 #tunnelListPage .footer .control {
      margin-left: 2px;
+     font-family: "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
+     font-weight: bold;
 }
 
 #tunnelListPage .footer label {
