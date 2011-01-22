@@ -248,7 +248,9 @@ hr {
      border-radius: 4px;
      border: 1px solid #002;
      padding: 10px 20px;
-     -moz-box-shadow: inset 0px 0px 1px 0px #002;
+     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
+     -khtml-box-shadow: inset 0px 0px 1px 1px #bbf;
+     box-shadow: inset 0px 0px 1px 1px #bbf;
     background: none repeat scroll 0 0 #EEEEFF;
     background: #fff url(images/magic.png);
     border: 1px solid #444477;
@@ -295,17 +297,17 @@ hr {
      background-color: #fff;
      border: 1px solid #003;
      padding: 5px 20px 11px 10px;
-
      -moz-box-shadow: inset 0px 0px 0px 1px #f00;
      -moz-box-shadow: inset 0px 0px 1px 0px #f60;
      background: #fff url(images/magic.png);
      border: 1px solid #444477;
      color: #613;
-
 }
 
 #globalOperationsPanel .control {
      min-width: 120px;
+     font-family: "Lucida Sans Unicode", Verdana, Tahoma, Helvetica, sans-serif;
+     font-weight: bold;
 }
 
 #globalOperationsPanel .control:link {

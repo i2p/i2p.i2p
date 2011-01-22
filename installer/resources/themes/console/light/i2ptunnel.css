@@ -101,6 +101,11 @@
      margin-left: 2px;
      font-family: "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      font-weight: bold;
+     color: #001 !important;
+}
+
+#tunnelListPage .footer .control:hover {
+     color: white !important;
 }
 
 #tunnelListPage .footer label {

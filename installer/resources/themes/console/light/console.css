@@ -117,7 +117,7 @@ div.routersummary hr {
      border-bottom: 1px solid #99f;
      margin: 8px -7px 8px -7px;
      -moz-box-shadow: inset 0px 1px 1px 1px #fff;
-    -khtml-box-shadow: inset 0px 0px 1px #fff;
+    -khtml-box-shadow: inset 0px 1px 0px #fff;
      box-shadow: inset 0px 1px 1px 1px #fff;
 }
 
@@ -161,7 +161,7 @@ div.routersummary h4 {
      border-bottom: 0 !important;
      font-size: 8.5pt;
      letter-spacing: 0.02em;
-     margin: -6px -6px !important;
+     margin: -6px -6px -7px !important;
      padding: 3px 3px 5px 3px;
      background: #ddf url(images/magic.png);
      text-transform: capitalize;
