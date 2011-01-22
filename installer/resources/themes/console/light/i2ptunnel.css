@@ -82,15 +82,19 @@
      width: 100%;
      height: 100px;
      padding: 4px;
-     margin: 2px 0 3px 0;
+     margin: 2px 0 12px 0;
      background-color: #005;
      color: #292;
      font-family: "Lucida Console", "DejaVu Sans Mono", "Andale Mono", "Courier New", Courier, mono;
-     border: 1px inset #002;
-     font-size: 9pt !important;
+     border: 1px solid #225;
+     font-size: 8pt !important;
      font-weight: bold;
      text-align: justify !important;
-     background: #dfd url(images/magic.png);
+     background: #efe url(images/magic.png);
+     -moz-box-shadow: 0 0 0px 1px #7f7;
+     -khtml-box-shadow: 0 0 0px 1px #7f7;
+     box-shadow: 0 0 0px 1px #7f7;
+     opacity: 0.9;
 }
 
 #tunnelListPage .footer .control {
