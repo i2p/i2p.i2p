@@ -62,6 +62,7 @@ public abstract class TrayManager {
         if(SystemTray.isSupported()) {
             tray = SystemTray.getSystemTray();
             trayIcon = new TrayIcon(getTrayImage(), "I2P", getMainMenu());
+            trayIcon.setImageAutoSize(true); //Resize image to fit the system tray
             try {
                 tray.add(trayIcon);
             } catch (AWTException e) {
@@ -85,7 +86,7 @@ public abstract class TrayManager {
      * @return image used for the tray icon
      */
     private Image getTrayImage() {
-        URL url = getClass().getResource("/desktopgui/resources/images/logo.jpg");
+        URL url = getClass().getResource("/desktopgui/resources/images/logo.png");
         Image image = Toolkit.getDefaultToolkit().getImage(url);
         return image;
     }
