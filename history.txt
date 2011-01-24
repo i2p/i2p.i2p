@@ -1,3 +1,5 @@
+* 2011-01-24  0.8.3 released
+
 2011-01-16 zzz
     * Console: Allow editing of console args
     * UDP: Prevent rare startup NPE
