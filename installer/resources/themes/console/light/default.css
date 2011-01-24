@@ -51,12 +51,10 @@ h4 {
      margin: 5px 0 15px 0;
      padding: 5px 10px;
      background: url(images/header.png) repeat-x center center;
-     text-transform: uppercase;
      letter-spacing: 0.07em;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     text-shadow: 0px 1px 1px #77f;
      -moz-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
      -khtml-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
      box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);

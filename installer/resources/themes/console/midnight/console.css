@@ -744,7 +744,7 @@ input {
      vertical-align: middle;
 }
 
-input[type=text] {
+input[type=text], input[type=password] {
      margin: 3px 5px 3px 5px;
      vertical-align: middle;
 }
@@ -754,7 +754,7 @@ select {
      vertical-align: middle;
 }
 
-input[type=text], select {
+input[type=text], input[type=password] select {
      background: #001;
      color: #eef;
      border: 1px solid #99f;

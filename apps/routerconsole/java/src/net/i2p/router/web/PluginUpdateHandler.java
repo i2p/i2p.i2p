@@ -144,6 +144,7 @@ public class PluginUpdateHandler extends UpdateHandler {
             }
             buf.append(": ");
             buf.append(_("{0}B transferred", DataHelper.formatSize2(currentWrite + alreadyTransferred)));
+            buf.append("</b>");
             updateStatus(buf.toString());
         }
 

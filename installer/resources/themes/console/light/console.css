@@ -138,7 +138,6 @@ div.routersummary h3 {
      -khtml-border-radius: 3px;
      border-radius: 3px;
      -moz-box-shadow: 0px 1px 5px #bbf;
-     text-shadow: 0px 1px 1px #77f;
      -moz-box-shadow: outset 0px 0px 2px 1px #bbf;
      -khtml-box-shadow: outset 0px 0px 2px 1px #bbf;
      box-shadow: outset 0px 0px 2px 1px #bbf;
@@ -726,7 +725,6 @@ h1 {
      font: normal bold 16pt/120% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      letter-spacing: 0.15em;
      text-transform: uppercase;
-     text-shadow: 0px 1px 1px #77f;
      -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
      -khtml-box-shadow: inset 0px 0px 1px 1px #bbf;
      box-shadow: inset 0px 0px 1px 1px #bbf;
@@ -744,7 +742,6 @@ h2 {
      color: #115;
      letter-spacing: 0.07em;
      background: url('images/header.png') center center repeat-x;
-     text-shadow: 0px 1px 1px #99f;
      padding: 10px;
      wordwrap: none;
      border: 1px solid #115;
@@ -756,7 +753,6 @@ h2 {
      -khtml-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
      box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
      word-wrap: break-word;
-     text-transform: uppercase;
      opacity: 1;
 }
 
@@ -792,8 +788,6 @@ h3 {
      -moz-border-radius: 0 4px 4px 0;
      -khtml-border-radius: 0 4px 4px 0;
      background: url('images/header.png') center center repeat-x !important;
-     text-transform: uppercase;
-     text-shadow: 0px 1px 1px #99f;
      font-size: 11pt;
      color: #115;
      -moz-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
@@ -924,7 +918,7 @@ input:active {
      box-shadow: inset 0px 0px 0px 1px #f60;
 }
 
-input[type=text] {
+input[type=text], input[type=password] {
      background: #ffe;
      color: #001;
      margin: 5px 10px 5px 10px;
@@ -1014,9 +1008,7 @@ form {}
      margin: -5px 0 5px 0; 
      padding: 7px;
      background: url("images/header.png") repeat scroll center center #eef;
-     text-shadow: 0 1px #99f;
      letter-spacing: 0em !important;
-     text-transform: capitalize;
 }
 
 div.joblog {
