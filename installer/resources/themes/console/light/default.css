@@ -58,6 +58,8 @@ h4 {
      -moz-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
      -khtml-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
      box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     text-shadow: 0px 1px 1px #77f;
+     text-transform: uppercase;
 }
 
 a {
