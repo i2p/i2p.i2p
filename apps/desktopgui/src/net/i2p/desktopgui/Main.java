@@ -19,15 +19,15 @@ import net.i2p.util.I2PProperties.I2PPropertyCallback;
  * The main class of the application.
  */
 public class Main {
-	
+    
     ///Manages the lifetime of the tray icon.
     private TrayManager trayManager = null;
     private final static Log log = new Log(Main.class);
 
-	/**
-	 * Start the tray icon code (loads tray icon in the tray area).
-	 * @throws Exception 
-	 */
+    /**
+     * Start the tray icon code (loads tray icon in the tray area).
+     * @throws Exception 
+     */
     public void startUp() throws Exception {
         trayManager = TrayManager.getInstance();
         trayManager.startManager();
@@ -35,26 +35,26 @@ public class Main {
         if(RouterManager.inI2P()) {
             RouterManager.getRouterContext().addPropertyCallback(new I2PPropertyCallback() {
 
-    			@Override
-    			public void propertyChanged(String arg0, String arg1) {
-    				if(arg0.equals(Translate.PROP_LANG)) {
-    					trayManager.languageChanged();
-    				}
-    			}
-            	
+                @Override
+                public void propertyChanged(String arg0, String arg1) {
+                    if(arg0.equals(Translate.PROP_LANG)) {
+                        trayManager.languageChanged();
+                    }
+                }
+                
             });
         }
     }
     
     public static void main(String[] args) {
-    	beginStartup(args);
+        beginStartup(args);
     }
 
     /**
      * Main method launching the application.
      */
     public static void beginStartup(String[] args) {
-    	System.setProperty("java.awt.headless", "false");
+        System.setProperty("java.awt.headless", "false");
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException ex) {
@@ -62,9 +62,9 @@ public class Main {
         } catch (InstantiationException ex) {
             log.log(Log.ERROR, null, ex);
         } catch (IllegalAccessException ex) {
-        	log.log(Log.ERROR, null, ex);
+            log.log(Log.ERROR, null, ex);
         } catch (UnsupportedLookAndFeelException ex) {
-        	log.log(Log.ERROR, null, ex);
+            log.log(Log.ERROR, null, ex);
         }
         
         ConfigurationManager.getInstance().loadArguments(args);
@@ -78,10 +78,10 @@ public class Main {
             @Override
             public void run() {
                 try {
-                	main.startUp();
+                    main.startUp();
                 }
                 catch(Exception e) {
-                	log.error("Failed while running desktopgui!", e);
+                    log.error("Failed while running desktopgui!", e);
                 }
                 
             }

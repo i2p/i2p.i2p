@@ -38,61 +38,61 @@ public class RouterManager {
 		try {
 			return getRouterContext().router();
 		} catch (Exception e) {
-			log.error("Failed to get router. Why did we request it if no RouterContext is available?", e);
-			return null;
-		}
-	}
-	
-	/**
-	 * Start an I2P router instance.
-	 * This method has limited knowledge
-	 * (there is no I2P instance running to collect information from).
-	 * 
-	 * It determines the I2P location using the I2PAppContext.
-	 */
-	public static void start() {
-		try {
-			//TODO: set/get PID
-			String separator = System.getProperty("file.separator");
-			String location = getAppContext().getBaseDir().getAbsolutePath();
-			
-			Runtime.getRuntime().exec(location + separator + "i2psvc " + location + separator + "wrapper.config");
-		} catch (IOException e) {
-			log.log(Log.WARN, "Failed to start I2P", e);
-		}
-	}
-	
-	/**
-	 * Restart the running I2P instance.
-	 */
-	public static void restart() {
-		if(inI2P()) {
-			getRouter().restart();
-		}
-	}
-
-	/**
-	 * Stop the running I2P instance.
-	 */
-	public static void shutDown() {
-		if(inI2P()) {
-			Thread t = new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-					WrapperManager.signalStopped(Router.EXIT_HARD);	
-				}
-				
-			});
-			t.start();
-			getRouter().shutdown(Router.EXIT_HARD);
-		}
+	        log.error("Failed to get router. Why did we request it if no RouterContext is available?", e);
+            return null;
+        }
     }
-	
-	/**
-	 * Check if we are running inside I2P.
-	 */
-	public static boolean inI2P() {
-		return context.isRouterContext();
-	}
+    
+    /**
+     * Start an I2P router instance.
+     * This method has limited knowledge
+     * (there is no I2P instance running to collect information from).
+     * 
+     * It determines the I2P location using the I2PAppContext.
+     */
+    public static void start() {
+        try {
+            //TODO: set/get PID
+            String separator = System.getProperty("file.separator");
+            String location = getAppContext().getBaseDir().getAbsolutePath();
+            
+            Runtime.getRuntime().exec(location + separator + "i2psvc " + location + separator + "wrapper.config");
+        } catch (IOException e) {
+            log.log(Log.WARN, "Failed to start I2P", e);
+        }
+    }
+    
+    /**
+     * Restart the running I2P instance.
+     */
+    public static void restart() {
+        if(inI2P()) {
+            getRouter().restart();
+        }
+    }
+
+    /**
+     * Stop the running I2P instance.
+     */
+    public static void shutDown() {
+        if(inI2P()) {
+            Thread t = new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    WrapperManager.signalStopped(Router.EXIT_HARD);    
+                }
+                
+            });
+            t.start();
+            getRouter().shutdown(Router.EXIT_HARD);
+        }
+    }
+    
+    /**
+     * Check if we are running inside I2P.
+     */
+    public static boolean inI2P() {
+        return context.isRouterContext();
+    }
 }
