@@ -10,7 +10,7 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
-import net.i2p.apps.systray.SysTray;
+import net.i2p.desktopgui.Main;
 import net.i2p.data.Base32;
 import net.i2p.data.DataHelper;
 import net.i2p.router.RouterContext;
@@ -19,6 +19,7 @@ import net.i2p.util.I2PAppThread;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.ShellCommand;
+import net.i2p.util.VersionComparator;
 
 import org.mortbay.http.DigestAuthenticator;
 import org.mortbay.http.HashUserRealm;
@@ -301,7 +302,13 @@ public class RouterConsoleRunner {
         }
 
         try {
-            SysTray tray = SysTray.getInstance();
+        	//TODO: move away from routerconsole into a separate application.
+        	//ApplicationManager?
+        	VersionComparator v = new VersionComparator();
+        	if(v.compare(System.getProperty("java.runtime.version"), "1.6") >= 0) {
+                String[] args = new String[0];
+                net.i2p.desktopgui.Main.beginStartup(args);	
+        	}
         } catch (Throwable t) {
             t.printStackTrace();
         }

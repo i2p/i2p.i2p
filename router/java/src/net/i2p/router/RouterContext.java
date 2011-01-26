@@ -24,6 +24,7 @@ import net.i2p.router.tunnel.TunnelDispatcher;
 import net.i2p.router.tunnel.pool.TunnelPoolManager;
 import net.i2p.util.Clock;
 import net.i2p.util.KeyRing;
+import net.i2p.util.I2PProperties.I2PPropertyCallback;
 
 /**
  * Build off the core I2P context to provide a root for a router instance to
@@ -105,6 +106,24 @@ public class RouterContext extends I2PAppContext {
         }
         return envProps;
     }
+    
+    /**
+     * Modify the configuration attributes of this context, changing
+     * one of the properties provided during the context construction.
+     * @param propName The name of the property.
+     * @param value The new value for the property.
+     */
+    public void setProperty(String propName, String value) {
+    	if(_overrideProps != null) {
+    		_overrideProps.setProperty(propName, value);
+    	}
+    }
+
+    
+    public void addPropertyCallback(I2PPropertyCallback callback) {
+    	_overrideProps.addCallBack(callback);
+    }
+
 
     public void initAll() {
         if (getBooleanProperty("i2p.dummyClientFacade"))
