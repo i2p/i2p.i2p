@@ -30,8 +30,8 @@ import net.i2p.util.Log;
  */
 public abstract class TrayManager {
 
-	private static TrayManager instance = null;
-	///The tray area, or null if unsupported
+    private static TrayManager instance = null;
+    ///The tray area, or null if unsupported
     protected SystemTray tray = null;
     ///Our tray icon, or null if unsupported
     protected TrayIcon trayIcon = null;
@@ -43,16 +43,16 @@ public abstract class TrayManager {
     protected TrayManager() {}
     
     protected static TrayManager getInstance() {
-    	if(instance == null) {
-    		boolean inI2P = RouterManager.inI2P();
-    		if(inI2P) {
-    			instance = new InternalTrayManager();
-    		}
-    		else {
-    			instance = new ExternalTrayManager();
-    		}
-    	}
-    	return instance;
+        if(instance == null) {
+            boolean inI2P = RouterManager.inI2P();
+            if(inI2P) {
+                instance = new InternalTrayManager();
+            }
+            else {
+                instance = new ExternalTrayManager();
+            }
+        }
+        return instance;
     }
 
     /**
@@ -66,13 +66,13 @@ public abstract class TrayManager {
             try {
                 tray.add(trayIcon);
             } catch (AWTException e) {
-            	log.log(Log.WARN, "Problem creating system tray icon!", e);
+                log.log(Log.WARN, "Problem creating system tray icon!", e);
             }
         }
     }
     
     protected void languageChanged() {
-    	trayIcon.setPopupMenu(getMainMenu());
+        trayIcon.setPopupMenu(getMainMenu());
     }
     
     /**

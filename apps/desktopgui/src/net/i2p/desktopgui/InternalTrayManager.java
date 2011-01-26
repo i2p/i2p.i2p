@@ -16,13 +16,13 @@ public class InternalTrayManager extends TrayManager {
 	
 	private final static Log log = new Log(InternalTrayManager.class);
 
-	protected InternalTrayManager() {}
+    protected InternalTrayManager() {}
 
-	@Override
-	public PopupMenu getMainMenu() {
-		PopupMenu popup = new PopupMenu();
-		
-		MenuItem browserLauncher = new MenuItem(_("Launch I2P Browser"));
+    @Override
+    public PopupMenu getMainMenu() {
+        PopupMenu popup = new PopupMenu();
+        
+        MenuItem browserLauncher = new MenuItem(_("Launch I2P Browser"));
         browserLauncher.addActionListener(new ActionListener() {
             
             @Override
@@ -36,11 +36,11 @@ public class InternalTrayManager extends TrayManager {
                     
                     @Override
                     protected void done() {
-                    	try {
-							I2PDesktop.browse("http://localhost:7657");
-						} catch (BrowseException e1) {
-							log.log(Log.WARN, "Failed to open browser!", e1);
-						}    
+                        try {
+                            I2PDesktop.browse("http://localhost:7657");
+                        } catch (BrowseException e1) {
+                            log.log(Log.WARN, "Failed to open browser!", e1);
+                        }    
                     }
                     
                 }.execute();
@@ -89,5 +89,5 @@ public class InternalTrayManager extends TrayManager {
         popup.add(stopItem);
         
         return popup;
-	}
+    }
 }
