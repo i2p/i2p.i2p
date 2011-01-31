@@ -48,7 +48,7 @@ public class Reseeder {
     /** @since 0.8.2 */
     public static final String DEFAULT_SSL_SEED_URL =
               "https://a.netdb.i2p2.de/,https://c.netdb.i2p2.de/," +
-              "https://www.i2pbote.net/netDb/," +
+              "https://forum.i2p2.de/netdb/,https://www.i2pbote.net/netDb/," +
               "https://r31453.ovh.net/static_media/files/netDb/";
 
     private static final String PROP_INPROGRESS = "net.i2p.router.web.ReseedHandler.reseedInProgress";
