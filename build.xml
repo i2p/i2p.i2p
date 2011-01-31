@@ -32,6 +32,7 @@
         <echo message="  updaterRouter:  updater with the i2p.jar and router.jar only" />
         <echo message="  distclean: clean up all derived files" />
         <echo message="  syndie:    generate a standalone syndie install" />
+        <echo message="  desktopgui: generate a standalone desktopgui install" />
         <echo message="  i2psnark:  generate a standalone i2psnark install" />
         <echo message="  justBOB:  generate a standalone BOB-one.jar" />
         <echo message="  javadoc:   generate javadoc for the entire project into ./build/javadoc" />
@@ -40,10 +41,6 @@
         <echo message="  debian: generate Debian packages in ./debian/packages" />
         <echo message="          (libc6-i686 and libc6-amd64 required, ant>=1.8 required)" />
         <echo message="  debianrepo: build a Debian repository (reprepro required)" />
-        <echo message="  updaterWithDesktopgui: tar the built files and desktopgui in an i2pupdate.zip" />
-        <echo message="  pkgWithDesktopgui: distclean then package everything up with the desktopgui" />
-        <echo message="  distWithDesktopgui: pkgWithDesktopgui and javadoc" />
-        <echo message="  distcleanWithDesktopgui: clean up all derived files (including desktopgui files)" />
         <echo message="  poupdate: update the .po files for translators" />
     </target>
     <target name="debianhowto">
@@ -64,7 +61,7 @@
 
     <target name="builddep" depends="builddepSmall, buildBOB, buildSAM, buildSusiMail, buildSusiDNS, buildI2PSnark" />
 
-    <target name="builddepSmall" depends="buildrouter, buildSystray, buildRouterConsole, buildStreaming, buildI2PTunnel, buildAddressbook" />
+    <target name="builddepSmall" depends="buildrouter, buildSystray, buildDesktopGui, buildRouterConsole, buildStreaming, buildI2PTunnel, buildAddressbook" />
 
     <!-- start of buildX, one for each sub-build.xml.
          Do not put ant tasks in the sub-build.xmls anymore,
@@ -100,7 +97,11 @@
         <ant dir="apps/i2ptunnel/java/" target="build" />
     </target>
 
-    <target name="buildRouterConsole" depends="buildrouter, buildSystray, buildJetty" >
+    <target name="buildDesktopGui" depends="buildCore, buildrouter" >
+        <ant dir="apps/desktopgui" target="jar" />
+    </target>
+
+    <target name="buildRouterConsole" depends="buildrouter, buildSystray, buildDesktopGui, buildJetty" >
         <ant dir="apps/routerconsole/java/" target="jar" />
     </target>
 
@@ -168,7 +169,7 @@
         <jar destfile="./build/launchi2p.jar">
             <manifest>
 	     <attribute name="Main-Class" value="net.i2p.router.RouterLaunch" />
-	     <attribute name="Class-Path" value="lib/i2p.jar lib/router.jar lib/jbigi.jar lib/BOB.jar lib/sam.jar lib/mstreaming.jar lib/streaming.jar lib/routerconsole.jar lib/i2ptunnel.jar lib/org.mortbay.jetty.jar lib/javax.servlet.jar lib/jasper-compiler.jar lib/jasper-runtime.jar lib/commons-logging.jar lib/commons-el.jar lib/wrapper.jar lib/systray.jar lib/systray4j.jar" />
+	     <attribute name="Class-Path" value="lib/i2p.jar lib/router.jar lib/jbigi.jar lib/BOB.jar lib/sam.jar lib/mstreaming.jar lib/streaming.jar lib/routerconsole.jar lib/i2ptunnel.jar lib/org.mortbay.jetty.jar lib/javax.servlet.jar lib/jasper-compiler.jar lib/jasper-runtime.jar lib/commons-logging.jar lib/commons-el.jar lib/wrapper.jar lib/systray.jar lib/systray4j.jar lib/desktopgui.jar" />
 	    </manifest>
         </jar>
 	<!-- now the standalone launcher exe -->
@@ -195,6 +196,7 @@
         <copy file="apps/i2ptunnel/java/build/i2ptunnel.jar" todir="build/" />
         <copy file="apps/i2ptunnel/java/build/i2ptunnel.war" todir="build/" />
         <copy file="apps/systray/java/build/systray.jar" todir="build/" />
+        <copy file="apps/desktopgui/dist/desktopgui.jar" todir="build/" />
         <copy file="installer/lib/jbigi/jbigi.jar" todir="build" />
         <copy file="apps/addressbook/dist/addressbook.war" todir="build/" />
     </target>
@@ -204,6 +206,7 @@
         <ant dir="apps/i2psnark/java/" target="poupdate" />
         <ant dir="apps/i2ptunnel/java/" target="poupdate" />
         <ant dir="apps/susidns/src/" target="poupdate" />
+        <ant dir="apps/desktopgui" target="poupdate" />
     </target>
     <target name="javadoc">
         <ant dir="apps/jetty" target="ensureJettylib" />
@@ -249,6 +252,7 @@
             <group title="SusiDNS Application" packages="i2p.susi.dns" />
             <group title="SusiMail Application" packages="i2p.susi.webmail:i2p.susi.webmail.*:i2p.susi.debug:i2p.susi.util" />
             <group title="Systray Application" packages="net.i2p.apps.systray" />
+            <group title="Desktopgui Application" packages="net.i2p.desktopgui.*" />
             <sourcepath>
                 <pathelement location="core/java/src" />
                 <!--<pathelement location="core/java/test" />-->
@@ -258,6 +262,7 @@
                 <pathelement location="apps/streaming/java/src" />
                 <pathelement location="apps/i2ptunnel/java/src" />
                 <pathelement location="apps/systray/java/src" />
+                <pathelement location="apps/desktopgui/src" />
                 <pathelement location="apps/routerconsole/java/src" />
                 <pathelement location="apps/addressbook/java/src" />
                 <pathelement location="apps/i2psnark/java/src" />
@@ -304,6 +309,7 @@
         <ant dir="apps/i2ptunnel/java/" target="distclean" />
         <ant dir="apps/sam/java/" target="distclean" />
         <ant dir="apps/BOB" target="clean" />
+        <ant dir="apps/desktopgui" target="clean" />
         <ant dir="apps/routerconsole/java/" target="distclean" />
         <ant dir="apps/addressbook/" target="distclean" />
         <ant dir="apps/susimail/" target="distclean" />
@@ -435,6 +441,7 @@
         <copy file="build/streaming.jar" todir="pkg-temp/lib/" />
         <copy file="build/org.mortbay.jetty.jar" todir="pkg-temp/lib/" />
         <copy file="build/router.jar" todir="pkg-temp/lib/" />
+        <copy file="build/desktopgui.jar" todir="pkg-temp/lib/" />
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
         <!-- pulled out of routerconsole.jar in 0.7.12; name without version so we can overwrite if we upgrade  -->
         <copy file="apps/jrobin/jrobin-1.4.0.jar" tofile="pkg-temp/lib/jrobin.jar" />
@@ -605,6 +612,7 @@
         <copy file="build/i2psnark.jar" todir="pkg-temp/lib" />
         <!-- include systray changes in 0.7.5 -->
         <copy file="build/systray.jar" todir="pkg-temp/lib/" />
+        <copy file="build/desktopgui.jar" todir="pkg-temp/lib/" />
         <copy file="build/susimail.war" todir="pkg-temp/webapps/" />
         <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
         <!-- as of 0.7.12; someday, we can remove these from the updater -->
@@ -779,6 +787,7 @@
             <arg value="build/jbigi.jar"/>
             <arg value="build/mstreaming.jar"/>
             <arg value="build/router.jar/"/>
+            <arg value="build/desktopgui.jar"/>
             <arg value="build/routerconsole.jar"/>
             <arg value="build/routerconsole.war"/>
             <arg value="build/sam.jar"/>
@@ -789,34 +798,6 @@
         </exec>
         <echo message="Findbugs output stored in i2p.fba" />
         <echo message="Now run: findbugs i2p.fba" />
-    </target>
-    <target name="buildWithDesktopgui" depends="buildrouter,builddepSmall">
-        <ant dir="apps/desktopgui" target="build_jar" />
-    </target>
-    <target name="preppkgWithDesktopgui" depends="buildWithDesktopgui,preppkg">
-        <copy file="apps/desktopgui/dist/desktopgui.jar" todir="pkg-temp/lib/" />
-        <copy file="apps/desktopgui/lib/swing-worker.jar" todir="pkg-temp/lib/" />
-        <copy file="apps/desktopgui/lib/appframework.jar" todir="pkg-temp/lib/" />
-        <mkdir dir="pkg-temp/desktopgui/resources/" />
-        <copy todir="pkg-temp/desktopgui/resources/">
-            <fileset dir="apps/desktopgui/desktopgui/resources/" />
-        </copy>
-    </target>
-    <target name="installerWithDesktopgui" depends="preppkgWithDesktopgui,installer" />
-    <target name="prepupdateWithDesktopgui" depends="buildWithDesktopgui,prepupdate">
-        <copy file="apps/desktopgui/dist/desktopgui.jar" todir="pkg-temp/lib/" />
-        <copy file="apps/desktopgui/lib/swing-worker.jar" todir="pkg-temp/lib/" />
-        <copy file="apps/desktopgui/lib/appframework.jar" todir="pkg-temp/lib/" />
-        <mkdir dir="pkg-temp/desktopgui/resources/" />
-        <copy todir="pkg-temp/desktopgui/resources/">
-            <fileset dir="apps/desktopgui/desktopgui/resources/" />
-        </copy>
-    </target>
-    <target name="updaterWithDesktopgui" depends="prepupdateWithDesktopgui,updater" />
-    <target name="pkgWithDesktopgui" depends="distclean, updaterWithDesktopgui, installerWithDesktopgui, preppkg" />
-    <target name="distWithDesktopgui" depends="pkgWithDesktopgui, javadoc" />
-    <target name="distcleanWithDesktopgui" depends="distclean">
-        <ant dir="apps/desktopgui" target="build_clean" />
     </target>
 
     <!-- this is the same dependency as pkg, but with updater200 in the middle,

@@ -24,6 +24,7 @@
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="../../systray/java/build/obj" />
                 <pathelement location="../../systray/java/lib/systray4j.jar" />
+                <pathelement location="../../desktopgui/build" />
                 <pathelement location="../../../installer/lib/wrapper/win32/wrapper.jar" /> <!-- we dont care if we're not on win32 -->
                 <pathelement location="../../jrobin/jrobin-1.4.0.jar" />
             </classpath>
@@ -54,6 +55,7 @@
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="../../systray/java/build/systray.jar" />
                 <pathelement location="../../systray/java/lib/systray4j.jar" />
+                <pathelement location="../../desktopgui/dist/desktopgui.jar" />
                 <pathelement location="../../../installer/lib/wrapper/win32/wrapper.jar" /> <!-- we dont care if we're not on win32 -->
                 <pathelement location="../../jrobin/jrobin-1.4.0.jar" />
             </classpath>
@@ -161,6 +163,7 @@
                 <pathelement location="../../jetty/jettylib/ant.jar" />
                 <pathelement location="../../systray/java/build/obj" />
                 <pathelement location="../../systray/java/lib/systray4j.jar" />
+                <pathelement location="../../desktopgui/dist/desktopgui.jar" />
                 <pathelement location="../../../installer/lib/wrapper/win32/wrapper.jar" />
                 <pathelement location="build/routerconsole.jar" />
                 <pathelement location="build/" />
@@ -191,6 +194,7 @@
                 <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
                 <pathelement location="../../systray/java/build/obj" />
                 <pathelement location="../../systray/java/lib/systray4j.jar" />
+                <pathelement location="../../desktopgui/dist/desktopgui.jar" />
                 <pathelement location="../../../installer/lib/wrapper/win32/wrapper.jar" />
                 <pathelement location="build/routerconsole.jar" />
                 <pathelement location="build" />
@@ -220,7 +224,7 @@
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc" />
         <javadoc 
-            sourcepath="./src:../../../core/java/src:../../../router/java/src:../../systray/java/src" destdir="./build/javadoc" 
+            sourcepath="./src:../../../core/java/src:../../../router/java/src:../../systray/java/src:../../desktopgui/src" destdir="./build/javadoc" 
             packagenames="*" 
             use="true" 
             splitindex="true" 

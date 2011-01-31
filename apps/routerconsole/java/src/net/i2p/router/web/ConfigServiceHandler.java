@@ -88,30 +88,6 @@ public class ConfigServiceHandler extends FormHandler {
                 addFormError("Warning: unable to contact the service manager - " + t.getMessage());
             }
             addFormNotice("Threads dumped to wrapper.log");
-        } else if (_("Show systray icon").equals(_action)) {
-            try {
-                SysTray tray = SysTray.getInstance();
-                if (tray != null) {
-                    tray.show();
-                    addFormNotice(_("System tray icon enabled."));
-                } else {
-                    addFormNotice(_("System tray icon feature not supported on this platform. Sorry!"));
-                }
-            } catch (Throwable t) {
-                addFormError(_("Warning: unable to contact the systray manager") + " - " + t.getMessage());
-            }
-        } else if (_("Hide systray icon").equals(_action)) {
-            try {
-                SysTray tray = SysTray.getInstance();
-                if (tray != null) {
-                    tray.hide();
-                    addFormNotice(_("System tray icon disabled."));
-                } else {
-                    addFormNotice(_("System tray icon feature not supported on this platform. Sorry!"));
-                }
-            } catch (Throwable t) {
-                addFormError(_("Warning: unable to contact the systray manager") + " - " + t.getMessage());
-            }
         } else if (_("View console on startup").equals(_action)) {
             browseOnStartup(true);
             addFormNotice(_("Console is to be shown on startup"));
