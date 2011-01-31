@@ -22,16 +22,16 @@ import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 public class SendMessageDirectJob extends JobImpl {
-    private Log _log;
-    private I2NPMessage _message;
-    private Hash _targetHash;
+    private final Log _log;
+    private final I2NPMessage _message;
+    private final Hash _targetHash;
     private RouterInfo _router;
-    private long _expiration;
-    private int _priority;
-    private Job _onSend;
-    private ReplyJob _onSuccess;
-    private Job _onFail;
-    private MessageSelector _selector;
+    private final long _expiration;
+    private final int _priority;
+    private final Job _onSend;
+    private final ReplyJob _onSuccess;
+    private final Job _onFail;
+    private final MessageSelector _selector;
     private boolean _alreadySearched;
     private boolean _sent;
     private long _searchOn;
@@ -47,7 +47,6 @@ public class SendMessageDirectJob extends JobImpl {
         _log = getContext().logManager().getLog(SendMessageDirectJob.class);
         _message = message;
         _targetHash = toPeer;
-        _router = null;
         if (timeoutMs < 10*1000) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Very little time given [" + timeoutMs + "], resetting to 5s", new Exception("stingy bastard"));
@@ -56,8 +55,6 @@ public class SendMessageDirectJob extends JobImpl {
             _expiration = timeoutMs + ctx.clock().now();
         }
         _priority = priority;
-        _searchOn = 0;
-        _alreadySearched = false;
         _onSend = onSend;
         _onSuccess = onSuccess;
         _onFail = onFail;
@@ -66,7 +63,6 @@ public class SendMessageDirectJob extends JobImpl {
             throw new IllegalArgumentException("Attempt to send a null message");
         if (_targetHash == null)
             throw new IllegalArgumentException("Attempt to send a message to a null peer");
-        _sent = false;
     }
     
     public String getName() { return "Send Message Direct"; }

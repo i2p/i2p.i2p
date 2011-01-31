@@ -26,11 +26,11 @@ import net.i2p.util.Log;
  *
  */
 public class GarlicMessageReceiver {
-    private RouterContext _context;
-    private Log _log;
-    private CloveReceiver _receiver;
-    private Hash _clientDestination;
-    private GarlicMessageParser _parser;
+    private final RouterContext _context;
+    private final Log _log;
+    private final CloveReceiver _receiver;
+    private final Hash _clientDestination;
+    private final GarlicMessageParser _parser;
    
     private final static int FORWARD_PRIORITY = 50;
     

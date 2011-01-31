@@ -24,8 +24,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataHelper;
-import net.i2p.data.DataStructure;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.Lease;
@@ -88,9 +88,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     void searchComplete(Hash key) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("search Complete: " + key);
-        SearchJob removed = null;
         synchronized (_activeRequests) {
-            removed = (SearchJob)_activeRequests.remove(key);
+            _activeRequests.remove(key);
         }
     }
     
@@ -235,11 +234,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     public void startup() {
         _log.info("Starting up the kademlia network database");
         RouterInfo ri = _context.router().getRouterInfo();
-        String dbDir = _context.router().getConfigSetting(PROP_DB_DIR);
-        if (dbDir == null) {
-            _log.info("No DB dir specified [" + PROP_DB_DIR + "], using [" + DEFAULT_DB_DIR + "]");
-            dbDir = DEFAULT_DB_DIR;
-        }
+        String dbDir = _context.getProperty(PROP_DB_DIR, DEFAULT_DB_DIR);
         String enforce = _context.getProperty(PROP_ENFORCE_NETID);
         if (enforce != null) 
             _enforceNetId = Boolean.valueOf(enforce).booleanValue();
@@ -354,21 +349,11 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     /** get the hashes for all known routers */
     public Set<Hash> getAllRouters() {
         if (!_initialized) return Collections.EMPTY_SET;
-        Set<Hash> keys = _ds.getKeys();
-        Set<Hash> rv = new HashSet(keys.size());
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("getAllRouters(): # keys in the datastore: " + keys.size());
-        for (Hash key : keys) {
-            DataStructure ds = _ds.get(key);
-            if (ds == null) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Selected hash " + key.toBase64() + " is not stored locally");
-            } else if ( !(ds instanceof RouterInfo) ) {
-                // leaseSet 
-            } else {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("getAllRouters(): key is router: " + key.toBase64());
-                rv.add(key);
+        Set<Map.Entry<Hash, DatabaseEntry>> entries = _ds.getMapEntries();
+        Set<Hash> rv = new HashSet(entries.size());
+        for (Map.Entry<Hash, DatabaseEntry> entry : entries) {
+            if (entry.getValue().getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
+                rv.add(entry.getKey());
             }
         }
         return rv;
@@ -387,8 +372,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         public int size() { return _count; }
         public void add(Hash entry) {
             if (_ds == null) return;
-            Object o = _ds.get(entry);
-            if (o instanceof RouterInfo)
+            DatabaseEntry o = _ds.get(entry);
+            if (o != null && o.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO)
                 _count++;
         }
     }
@@ -404,12 +389,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     public int getKnownLeaseSets() {  
         if (_ds == null) return 0;
         //return _ds.countLeaseSets();
-        Set<Hash> keys = _ds.getKeys();
         int rv = 0;
-        for (Hash key : keys) {
-            DataStructure ds = _ds.get(key);
-            if (ds != null &&
-                ds instanceof LeaseSet &&
+        for (DatabaseEntry ds : _ds.getEntries()) {
+            if (ds.getType() == DatabaseEntry.KEY_TYPE_LEASESET &&
                 ((LeaseSet)ds).getReceivedAsPublished())
                 rv++;
         }
@@ -422,8 +404,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         public int size() { return _count; }
         public void add(Hash entry) {
             if (_ds == null) return;
-            Object o = _ds.get(entry);
-            if (o instanceof LeaseSet)
+            DatabaseEntry o = _ds.get(entry);
+            if (o != null && o.getType() == DatabaseEntry.KEY_TYPE_LEASESET)
                 _count++;
         }
     }
@@ -438,6 +420,32 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         return _kb.size();
     }
     
+    /**
+     *  @return RouterInfo, LeaseSet, or null, validated
+     *  @since 0.8.3
+     */
+    public DatabaseEntry lookupLocally(Hash key) {
+        if (!_initialized)
+            return null;
+        DatabaseEntry rv = _ds.get(key);
+        if (rv == null)
+            return null;
+        if (rv.getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
+            LeaseSet ls = (LeaseSet)rv;
+            if (ls.isCurrent(Router.CLOCK_FUDGE_FACTOR))
+                return rv;
+            else
+                fail(key);
+        } else if (rv.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
+            try {
+                if (validate(key, (RouterInfo)rv) == null)
+                    return rv;
+            } catch (IllegalArgumentException iae) {}
+            fail(key);
+        }
+        return null;
+    }
+
     public void lookupLeaseSet(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs) {
         if (!_initialized) return;
         LeaseSet ls = lookupLeaseSetLocally(key);
@@ -457,9 +465,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     
     public LeaseSet lookupLeaseSetLocally(Hash key) {
         if (!_initialized) return null;
-        if (_ds.isKnown(key)) {
-            DataStructure ds = _ds.get(key);
-            if (ds instanceof LeaseSet) {
+        DatabaseEntry ds = _ds.get(key);
+        if (ds != null) {
+            if (ds.getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
                 LeaseSet ls = (LeaseSet)ds;
                 if (ls.isCurrent(Router.CLOCK_FUDGE_FACTOR)) {
                     return ls;
@@ -493,9 +501,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     
     public RouterInfo lookupRouterInfoLocally(Hash key) {
         if (!_initialized) return null;
-        DataStructure ds = _ds.get(key);
+        DatabaseEntry ds = _ds.get(key);
         if (ds != null) {
-            if (ds instanceof RouterInfo) {
+            if (ds.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
                 // more aggressive than perhaps is necessary, but makes sure we
                 // drop old references that we had accepted on startup (since 
                 // startup allows some lax rules).
@@ -614,6 +622,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * Determine whether this leaseSet will be accepted as valid and current
      * given what we know now.
      *
+     * TODO this is called several times, only check the key and signature once
+     *
      * @return reason why the entry is not valid, or null if it is valid
      */
     String validate(Hash key, LeaseSet leaseSet) {
@@ -696,6 +706,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * Determine whether this routerInfo will be accepted as valid and current
      * given what we know now.
      *
+     * TODO this is called several times, only check the key and signature once
      */
     String validate(Hash key, RouterInfo routerInfo) throws IllegalArgumentException {
         long now = _context.clock().now();
@@ -811,30 +822,26 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     
     public void fail(Hash dbEntry) {
         if (!_initialized) return;
-        boolean isRouterInfo = false;
-        Object o = _ds.get(dbEntry);
-        if (o instanceof RouterInfo)
-            isRouterInfo = true;
-        
-        if (isRouterInfo) {
-            lookupBeforeDropping(dbEntry, (RouterInfo)o);
-            return;
-        } else {
-            // we always drop leaseSets that are failed [timed out],
-            // regardless of how many routers we have.  this is called on a lease if
-            // it has expired *or* its tunnels are failing and we want to see if there
-            // are any updates
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Dropping a lease: " + dbEntry);
-        }
-        
+        DatabaseEntry o = _ds.get(dbEntry);
         if (o == null) {
+            // if we dont know the key, lets make sure it isn't a now-dead peer
             _kb.remove(dbEntry);
             _context.peerManager().removeCapabilities(dbEntry);
-            // if we dont know the key, lets make sure it isn't a now-dead peer
+            return;
         }
-        
-        _ds.remove(dbEntry, isRouterInfo);
+
+        if (o.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
+            lookupBeforeDropping(dbEntry, (RouterInfo)o);
+            return;
+        }
+
+        // we always drop leaseSets that are failed [timed out],
+        // regardless of how many routers we have.  this is called on a lease if
+        // it has expired *or* its tunnels are failing and we want to see if there
+        // are any updates
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Dropping a lease: " + dbEntry);
+        _ds.remove(dbEntry, false);
     }
     
     /** don't use directly - see F.N.D.F. override */
@@ -856,7 +863,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     public void unpublish(LeaseSet localLeaseSet) {
         if (!_initialized) return;
         Hash h = localLeaseSet.getDestination().calculateHash();
-        DataStructure data = _ds.remove(h);
+        DatabaseEntry data = _ds.remove(h);
         
         if (data == null) {
             if (_log.shouldLog(Log.WARN))
@@ -910,8 +917,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         Set keys = getDataStore().getKeys();
         for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
             Hash key = (Hash)iter.next();
-            Object o = getDataStore().get(key);
-            if (o instanceof LeaseSet)
+            DatabaseEntry o = getDataStore().get(key);
+            if (o.getType() == DatabaseEntry.KEY_TYPE_LEASESET)
                 leases.add(o);
         }
         return leases;
@@ -924,8 +931,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         Set keys = getDataStore().getKeys();
         for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
             Hash key = (Hash)iter.next();
-            Object o = getDataStore().get(key);
-            if (o instanceof RouterInfo)
+            DatabaseEntry o = getDataStore().get(key);
+            if (o.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO)
                 routers.add(o);
         }
         return routers;
@@ -957,7 +964,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     }
 
     /** unused (overridden in FNDF) */
-    public void sendStore(Hash key, DataStructure ds, Job onSuccess, Job onFailure, long sendTimeout, Set toIgnore) {
+    public void sendStore(Hash key, DatabaseEntry ds, Job onSuccess, Job onFailure, long sendTimeout, Set toIgnore) {
         if ( (ds == null) || (key == null) ) {
             if (onFailure != null) 
                 _context.jobQueue().addJob(onFailure);

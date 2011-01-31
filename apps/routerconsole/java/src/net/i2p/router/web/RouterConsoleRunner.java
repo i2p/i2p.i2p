@@ -25,6 +25,7 @@ import org.mortbay.http.DigestAuthenticator;
 import org.mortbay.http.HashUserRealm;
 import org.mortbay.http.NCSARequestLog;
 import org.mortbay.http.SecurityConstraint;
+import org.mortbay.http.SocketListener;
 import org.mortbay.http.SslListener;
 import org.mortbay.http.handler.SecurityHandler;
 import org.mortbay.jetty.Server;
@@ -185,11 +186,21 @@ public class RouterConsoleRunner {
                 while (tok.hasMoreTokens()) {
                     String host = tok.nextToken().trim();
                     try {
-                        if (host.indexOf(":") >= 0) // IPV6 - requires patched Jetty 5
-                            _server.addListener('[' + host + "]:" + _listenPort);
-                        else
-                            _server.addListener(host + ':' + _listenPort);
+                        //if (host.indexOf(":") >= 0) // IPV6 - requires patched Jetty 5
+                        //    _server.addListener('[' + host + "]:" + _listenPort);
+                        //else
+                        //    _server.addListener(host + ':' + _listenPort);
+                        Integer lport = Integer.parseInt(_listenPort);
+                        InetAddrPort iap = new InetAddrPort(host, lport);
+                        SocketListener lsnr = new SocketListener(iap);
+                        lsnr.setMinThreads(1);           // default 2
+                        lsnr.setMaxThreads(24);          // default 256
+                        lsnr.setMaxIdleTimeMs(90*1000);  // default 10 sec
+                        lsnr.setName("ConsoleSocket");   // all with same name will use the same thread pool
+                        _server.addListener(lsnr);
                         boundAddresses++;
+                    } catch (NumberFormatException nfe) {
+                        System.err.println("Unable to bind routerconsole to " + host + " port " + _listenPort + ' ' + nfe);
                     } catch (IOException ioe) { // this doesn't seem to work, exceptions don't happen until start() below
                         System.err.println("Unable to bind routerconsole to " + host + " port " + _listenPort + ' ' + ioe);
                     }
@@ -221,6 +232,10 @@ public class RouterConsoleRunner {
                             ssll.setPassword(ctx.getProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD));
                             // the X.509 cert password (if not present, verifyKeyStore() returned false)
                             ssll.setKeyPassword(ctx.getProperty(PROP_KEY_PASSWORD, "thisWontWork"));
+                            ssll.setMinThreads(1);           // default 2
+                            ssll.setMaxThreads(24);          // default 256
+                            ssll.setMaxIdleTimeMs(90*1000);  // default 10 sec
+                            ssll.setName("ConsoleSocket");   // all with same name will use the same thread pool
                             _server.addListener(ssll);
                             boundAddresses++;
                         } catch (Exception e) {   // probably no exceptions at this point

@@ -464,9 +464,9 @@ public class TunnelPool {
      * but we use latest expiration first, since we need to sort them by that anyway.
      *
      */
-    class LeaseComparator implements Comparator {
-         public int compare(Object l, Object r) {
-             return ((Lease)r).getEndDate().compareTo(((Lease)l).getEndDate());
+    private static class LeaseComparator implements Comparator<Lease> {
+         public int compare(Lease l, Lease r) {
+             return r.getEndDate().compareTo(l.getEndDate());
         }
     }
 

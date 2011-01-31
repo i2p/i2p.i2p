@@ -4,7 +4,7 @@ import net.i2p.data.DataHelper;
 
 /** glorified struct to contain basic job stats */
 class JobStats {
-    private String _job;
+    private final String _job;
     private volatile long _numRuns;
     private volatile long _totalTime;
     private volatile long _maxTime;

@@ -24,10 +24,10 @@ import net.i2p.util.Log;
  */
 
 public class PeerProfile {
-    private Log _log;
-    private RouterContext _context;
+    private final Log _log;
+    private final RouterContext _context;
     // whoozaat?
-    private Hash _peer;
+    private final Hash _peer;
     // general peer stats
     private long _firstHeardAbout;
     private long _lastHeardAbout;
@@ -65,13 +65,6 @@ public class PeerProfile {
     public PeerProfile(RouterContext context, Hash peer, boolean expand) {
         _context = context;
         _log = context.logManager().getLog(PeerProfile.class);
-        _expanded = false;
-        _speedValue = 0;
-        _capacityValue = 0;
-        _integrationValue = 0;
-        _isFailing = false;
-        _consecutiveShitlists = 0;
-        _tunnelTestResponseTimeAvg = 0.0d;
         _peer = peer;
         // this is always true, and there are several places in the router that will NPE
         // if it is false, so all need to be fixed before we can have non-expanded profiles
@@ -81,7 +74,6 @@ public class PeerProfile {
     
     /** what peer is being profiled */
     public Hash getPeer() { return _peer; }
-    public void setPeer(Hash peer) { _peer = peer; }
     
     /**
      * are we keeping an expanded profile on the peer, or just the bare minimum.
@@ -474,9 +466,9 @@ public class PeerProfile {
             _log.debug("Coalesced: speed [" + _speedValue + "] capacity [" + _capacityValue + "] integration [" + _integrationValue + "] failing? [" + _isFailing + "]");
     }
     
-    private double calculateSpeed() { return _context.speedCalculator().calc(this); }
-    private double calculateCapacity() { return _context.capacityCalculator().calc(this); }
-    private double calculateIntegration() { return _context.integrationCalculator().calc(this); }
+    private double calculateSpeed() { return SpeedCalculator.calc(this); }
+    private double calculateCapacity() { return CapacityCalculator.calc(this); }
+    private double calculateIntegration() { return IntegrationCalculator.calc(this); }
     /** deprecated - unused - always false */
     private boolean calculateIsFailing() { return false; }
     /** deprecated - unused - always false */
@@ -484,14 +476,17 @@ public class PeerProfile {
     
     @Override
     public int hashCode() { return (_peer == null ? 0 : _peer.hashCode()); }
+
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) return false;
-        if (obj.getClass() != PeerProfile.class) return false;
-        if (_peer == null) return false;
+        if (obj == null ||
+            (!(obj instanceof PeerProfile)) ||
+            _peer == null)
+            return false;
         PeerProfile prof = (PeerProfile)obj;
         return _peer.equals(prof.getPeer());
     }
+
     @Override
     public String toString() { return "Profile: " + getPeer().toBase64(); }
     

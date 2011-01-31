@@ -9,13 +9,9 @@ import net.i2p.data.Hash;
 import net.i2p.internal.InternalClientManager;
 import net.i2p.router.client.ClientManagerFacadeImpl;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
-import net.i2p.router.peermanager.Calculator;
-import net.i2p.router.peermanager.CapacityCalculator;
-import net.i2p.router.peermanager.IntegrationCalculator;
 import net.i2p.router.peermanager.PeerManagerFacadeImpl;
 import net.i2p.router.peermanager.ProfileManagerImpl;
 import net.i2p.router.peermanager.ProfileOrganizer;
-import net.i2p.router.peermanager.SpeedCalculator;
 import net.i2p.router.transport.CommSystemFacadeImpl;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.router.transport.OutboundMessageRegistry;
@@ -58,11 +54,6 @@ public class RouterContext extends I2PAppContext {
     private MessageValidator _messageValidator;
     private MessageStateMonitor _messageStateMonitor;
     private RouterThrottle _throttle;
-    private RouterClock _clockX;  // LINT field hides another field, hope rename won't break anything.
-    private Calculator _integrationCalc;
-    private Calculator _speedCalc;
-    private Calculator _capacityCalc;
-
 
     private static List<RouterContext> _contexts = new ArrayList(1);
     
@@ -166,9 +157,6 @@ public class RouterContext extends I2PAppContext {
         _messageValidator = new MessageValidator(this);
         _throttle = new RouterThrottleImpl(this);
         //_throttle = new RouterDoSThrottle(this);
-        _integrationCalc = new IntegrationCalculator(this);
-        _speedCalc = new SpeedCalculator(this);
-        _capacityCalc = new CapacityCalculator(this);
     }
     
     /**
@@ -290,13 +278,6 @@ public class RouterContext extends I2PAppContext {
      */
     public RouterThrottle throttle() { return _throttle; }
     
-    /** how do we rank the integration of profiles? */
-    public Calculator integrationCalculator() { return _integrationCalc; }
-    /** how do we rank the speed of profiles? */
-    public Calculator speedCalculator() { return _speedCalc; } 
-    /** how do we rank the capacity of profiles? */
-    public Calculator capacityCalculator() { return _capacityCalc; }
-    
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder(512);
@@ -320,8 +301,6 @@ public class RouterContext extends I2PAppContext {
         buf.append(_statPublisher).append('\n');
         buf.append(_shitlist).append('\n');
         buf.append(_messageValidator).append('\n');
-        buf.append(_integrationCalc).append('\n');
-        buf.append(_speedCalc).append('\n');
         return buf.toString();
     }
     
@@ -371,23 +350,22 @@ public class RouterContext extends I2PAppContext {
     }
 
     /**
-     * The context's synchronized clock, which is kept context specific only to
-     * enable simulators to play with clock skew among different instances.
-     *
-     * It wouldn't be necessary to override clock(), except for the reason
-     * that it triggers initializeClock() of which we definitely
-     * need the local version to run.
+     * @return new Properties with system and context properties
+     * @since 0.8.4
      */
     @Override
-    public Clock clock() {
-        if (!_clockInitialized) initializeClock();
-        return _clockX;
+    public Properties getProperties() { 
+        Properties rv = super.getProperties();
+        if (_router != null)
+            rv.putAll(_router.getConfigMap());
+        return rv;
     }
+    
     @Override
     protected void initializeClock() {
         synchronized (this) {
-            if (_clockX == null)
-                _clockX = new RouterClock(this);
+            if (_clock == null)
+                _clock = new RouterClock(this);
             _clockInitialized = true;
         }
     }

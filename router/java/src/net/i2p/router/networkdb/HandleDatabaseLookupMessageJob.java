@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import net.i2p.data.DataStructure;
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterIdentity;
@@ -227,20 +227,19 @@ public class HandleDatabaseLookupMessageJob extends JobImpl {
         return routerHashSet.contains(getContext().routerHash());
     }
     
-    private void sendData(Hash key, DataStructure data, Hash toPeer, TunnelId replyTunnel) {
+    private void sendData(Hash key, DatabaseEntry data, Hash toPeer, TunnelId replyTunnel) {
+        if (!key.equals(data.getHash())) {
+            _log.error("Hash mismatch HDLMJ");
+            return;
+        }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending data matching key " + key.toBase64() + " to peer " + toPeer.toBase64() 
                        + " tunnel " + replyTunnel);
         DatabaseStoreMessage msg = new DatabaseStoreMessage(getContext());
-        msg.setKey(key);
-        if (data instanceof LeaseSet) {
-            msg.setLeaseSet((LeaseSet)data);
-            msg.setValueType(DatabaseStoreMessage.KEY_TYPE_LEASESET);
+        if (data.getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
             getContext().statManager().addRateData("netDb.lookupsMatchedLeaseSet", 1, 0);
-        } else if (data instanceof RouterInfo) {
-            msg.setRouterInfo((RouterInfo)data);
-            msg.setValueType(DatabaseStoreMessage.KEY_TYPE_ROUTERINFO);
         }
+        msg.setEntry(data);
         getContext().statManager().addRateData("netDb.lookupsMatched", 1, 0);
         getContext().statManager().addRateData("netDb.lookupsHandled", 1, 0);
         sendMessage(msg, toPeer, replyTunnel);

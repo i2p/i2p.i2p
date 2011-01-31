@@ -35,7 +35,7 @@ import net.i2p.util.Log;
  *
  * @author zzz
  */
-public class GeoIP {
+class GeoIP {
     private Log _log;
     private RouterContext _context;
     private final Map<String, String> _codeToName;

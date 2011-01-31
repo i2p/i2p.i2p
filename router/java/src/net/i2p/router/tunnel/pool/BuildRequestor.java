@@ -25,9 +25,9 @@ import net.i2p.util.VersionComparator;
  *
  */
 class BuildRequestor {
-    private static final List<Integer> ORDER = new ArrayList(BuildMessageGenerator.ORDER.length);
+    private static final List<Integer> ORDER = new ArrayList(TunnelBuildMessage.MAX_RECORD_COUNT);
     static {
-        for (int i = 0; i < BuildMessageGenerator.ORDER.length; i++)
+        for (int i = 0; i < TunnelBuildMessage.MAX_RECORD_COUNT; i++)
             ORDER.add(Integer.valueOf(i));
     }
     private static final int PRIORITY = 500;

@@ -31,8 +31,8 @@ import net.i2p.util.Log;
  *  Mostly unused, see overrides in FloodfillPeerSelector
  */
 class PeerSelector {
-    protected Log _log;
-    protected RouterContext _context;
+    protected final Log _log;
+    protected final RouterContext _context;
     
     public PeerSelector(RouterContext ctx) {
         _context = ctx;

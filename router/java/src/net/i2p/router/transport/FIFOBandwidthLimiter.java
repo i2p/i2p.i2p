@@ -31,18 +31,18 @@ import net.i2p.util.Log;
  *
  */
 public class FIFOBandwidthLimiter {
-    private Log _log;
-    private I2PAppContext _context;
+    private final Log _log;
+    private final I2PAppContext _context;
     private final List<Request> _pendingInboundRequests;
     private final List<Request> _pendingOutboundRequests;
     /** how many bytes we can consume for inbound transmission immediately */
-    private AtomicInteger _availableInbound = new AtomicInteger();
+    private final AtomicInteger _availableInbound = new AtomicInteger();
     /** how many bytes we can consume for outbound transmission immediately */
-    private AtomicInteger _availableOutbound = new AtomicInteger();
+    private final AtomicInteger _availableOutbound = new AtomicInteger();
     /** how many bytes we can queue up for bursting */
-    private AtomicInteger _unavailableInboundBurst = new AtomicInteger();
+    private final AtomicInteger _unavailableInboundBurst = new AtomicInteger();
     /** how many bytes we can queue up for bursting */
-    private AtomicInteger _unavailableOutboundBurst = new AtomicInteger();
+    private final AtomicInteger _unavailableOutboundBurst = new AtomicInteger();
     /** how large _unavailableInbound can get */
     private int _maxInboundBurst;
     /** how large _unavailableInbound can get */
@@ -56,14 +56,14 @@ public class FIFOBandwidthLimiter {
     /** shortcut of whether our inbound rate is unlimited */
     private boolean _inboundUnlimited;
     /** lifetime counter of bytes received */
-    private AtomicLong _totalAllocatedInboundBytes = new AtomicLong();
+    private final AtomicLong _totalAllocatedInboundBytes = new AtomicLong();
     /** lifetime counter of bytes sent */
-    private AtomicLong _totalAllocatedOutboundBytes = new AtomicLong();
+    private final AtomicLong _totalAllocatedOutboundBytes = new AtomicLong();
     /** lifetime counter of tokens available for use but exceeded our maxInboundBurst size */
-    private AtomicLong _totalWastedInboundBytes = new AtomicLong();
+    private final AtomicLong _totalWastedInboundBytes = new AtomicLong();
     /** lifetime counter of tokens available for use but exceeded our maxOutboundBurst size */
-    private AtomicLong _totalWastedOutboundBytes = new AtomicLong();
-    private FIFOBandwidthRefiller _refiller;
+    private final AtomicLong _totalWastedOutboundBytes = new AtomicLong();
+    private final FIFOBandwidthRefiller _refiller;
     
     private long _lastTotalSent;
     private long _lastTotalReceived;
@@ -72,8 +72,6 @@ public class FIFOBandwidthLimiter {
     private float _recvBps;
     private float _sendBps15s;
     private float _recvBps15s;
-    
-    private static int __id = 0;
     
     public /* static */ long now() {
         // dont use the clock().now(), since that may jump
@@ -98,13 +96,9 @@ public class FIFOBandwidthLimiter {
         _pendingOutboundRequests = new ArrayList(16);
         _lastTotalSent = _totalAllocatedOutboundBytes.get();
         _lastTotalReceived = _totalAllocatedInboundBytes.get();
-        _sendBps = 0;
-        _recvBps = 0;
         _lastStatsUpdated = now();
         _refiller = new FIFOBandwidthRefiller(_context, this);
-        I2PThread t = new I2PThread(_refiller);
-        t.setName("BWRefiller" + (++__id));
-        t.setDaemon(true);
+        I2PThread t = new I2PThread(_refiller, "BWRefiller", true);
         t.setPriority(I2PThread.NORM_PRIORITY-1);
         t.start();
     }
@@ -753,7 +747,7 @@ public class FIFOBandwidthLimiter {
         private int _allocationsSinceWait;
         private boolean _aborted;
         private boolean _waited;
-        List<Request> satisfiedBuffer;
+        final List<Request> satisfiedBuffer;
         private CompleteListener _lsnr;
         private Object _attachment;
         

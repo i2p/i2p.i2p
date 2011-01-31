@@ -1,6 +1,9 @@
 package net.i2p.client.streaming;
 
+import java.io.IOException;
 import java.net.NoRouteToHostException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -30,6 +33,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     private Log _log;
     private I2PSession _session;
     private I2PServerSocketFull _serverSocket;
+    private StandardServerSocket _realServerSocket;
     private ConnectionOptions _defaultOptions;
     private long _acceptTimeout;
     private String _name;
@@ -44,8 +48,6 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     private static final long ACCEPT_TIMEOUT_DEFAULT = 5*1000;
     
     public I2PSocketManagerFull() {
-        _context = null;
-        _session = null;
     }
 
     /**
@@ -120,7 +122,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      */
     public I2PSocket receiveSocket() throws I2PException, SocketTimeoutException {
         verifySession();
-        Connection con = _connectionManager.getConnectionHandler().accept(_connectionManager.MgetSoTimeout());
+        Connection con = _connectionManager.getConnectionHandler().accept(_connectionManager.getSoTimeout());
         if(_log.shouldLog(Log.DEBUG)) {
             _log.debug("receiveSocket() called: " + con);
         }
@@ -129,7 +131,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
             con.setSocket(sock);
             return sock;
         } else { 
-            if(_connectionManager.MgetSoTimeout() == -1) {
+            if(_connectionManager.getSoTimeout() == -1) {
                 return null;
             }
             throw new SocketTimeoutException("I2PSocket timed out");
@@ -171,6 +173,17 @@ public class I2PSocketManagerFull implements I2PSocketManager {
         return _serverSocket;
     }
 
+    /**
+     *  Like getServerSocket but returns a real ServerSocket for easier porting of apps.
+     *  @since 0.8.4
+     */
+    public synchronized ServerSocket getStandardServerSocket() throws IOException {
+        if (_realServerSocket == null)
+            _realServerSocket = new StandardServerSocket(_serverSocket);
+        _connectionManager.setAllowIncomingConnections(true);
+        return _realServerSocket;
+    }
+
     private void verifySession() throws I2PException {
         if (!_connectionManager.getSession().isClosed())
             return;
@@ -185,7 +198,7 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      * this data will be bundled in the SYN packet.
      *
      * @param peer Destination to connect to
-     * @param options I2P socket options to be used for connecting
+     * @param options I2P socket options to be used for connecting, may be null
      *
      * @return I2PSocket if successful
      * @throws NoRouteToHostException if the peer is not found or not reachable
@@ -236,6 +249,45 @@ public class I2PSocketManagerFull implements I2PSocketManager {
     }
 
     /**
+     *  Like connect() but returns a real Socket, and throws only IOE,
+     *  for easier porting of apps.
+     *  @since 0.8.4
+     */
+    public Socket connectToSocket(Destination peer) throws IOException {
+        return connectToSocket(peer, _defaultOptions);
+    }
+
+    /**
+     *  Like connect() but returns a real Socket, and throws only IOE,
+     *  for easier porting of apps.
+     *  @param timeout ms if > 0, forces blocking (disables connectDelay)
+     *  @since 0.8.4
+     */
+    public Socket connectToSocket(Destination peer, int timeout) throws IOException {
+        ConnectionOptions opts = new ConnectionOptions(_defaultOptions);
+        opts.setConnectTimeout(timeout);
+        if (timeout > 0)
+            opts.setConnectDelay(-1);
+        return connectToSocket(peer, opts);
+    }
+
+    /**
+     *  Like connect() but returns a real Socket, and throws only IOE,
+     *  for easier porting of apps.
+     *  @param options may be null
+     *  @since 0.8.4
+     */
+    private Socket connectToSocket(Destination peer, I2PSocketOptions options) throws IOException {
+        try {
+            I2PSocket sock = connect(peer, options);
+            return new StandardSocket(sock);
+        } catch (I2PException i2pe) {
+            // fixme in 1.6 change to cause
+            throw new IOException(i2pe.toString());
+        }
+    }
+
+    /**
      * Destroy the socket manager, freeing all the associated resources.  This
      * method will block untill all the managed sockets are closed.
      *
@@ -259,11 +311,10 @@ public class I2PSocketManagerFull implements I2PSocketManager {
      *
      * @return set of currently connected I2PSockets
      */
-    public Set listSockets() {
-        Set connections = _connectionManager.listConnections();
-        Set rv = new HashSet(connections.size());
-        for (Iterator iter = connections.iterator(); iter.hasNext(); ) {
-            Connection con = (Connection)iter.next();
+    public Set<I2PSocket> listSockets() {
+        Set<Connection> connections = _connectionManager.listConnections();
+        Set<I2PSocket> rv = new HashSet(connections.size());
+        for (Connection con : connections) {
             if (con.getSocket() != null)
                 rv.add(con.getSocket());
         }

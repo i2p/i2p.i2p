@@ -166,8 +166,10 @@ public class LogManager {
         Log rv = _logs.get(scope);
         if (rv == null) {
             rv = new Log(this, cls, name);
-            _logs.putIfAbsent(scope, rv);
-            isNew = true;
+            Log old = _logs.putIfAbsent(scope, rv);
+            isNew = old == null;
+            if (!isNew)
+                rv = old;
         }
         if (isNew)
             updateLimit(rv);
@@ -180,8 +182,9 @@ public class LogManager {
     }
 
     void addLog(Log log) {
-        _logs.putIfAbsent(log.getScope(), log);
-        updateLimit(log);
+        Log old = _logs.putIfAbsent(log.getScope(), log);
+        if (old == null)
+            updateLimit(log);
     }
     
     public LogConsoleBuffer getBuffer() { return _consoleBuffer; }
@@ -636,6 +639,7 @@ public class LogManager {
         return _dateFormatPattern;
     }
 
+/*****
     public static void main(String args[]) {
         I2PAppContext ctx = new I2PAppContext();
         Log l1 = ctx.logManager().getLog("test.1");
@@ -656,6 +660,7 @@ public class LogManager {
         }
         System.exit(0);
     }
+*****/
 
     public void shutdown() {
         if (_writer != null) {

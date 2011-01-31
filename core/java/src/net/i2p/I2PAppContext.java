@@ -65,7 +65,7 @@ import net.i2p.util.I2PProperties.I2PPropertyCallback;
  */
 public class I2PAppContext {
     /** the context that components without explicit root are bound */
-    protected static I2PAppContext _globalAppContext;
+    protected static volatile I2PAppContext _globalAppContext;
     
     protected I2PProperties _overrideProps;
     
@@ -119,7 +119,8 @@ public class I2PAppContext {
      *
      */
     public static I2PAppContext getGlobalContext() { 
-        // skip the global lock
+        // skip the global lock - _gAC must be volatile
+        // http://www.cs.umd.edu/~pugh/java/memoryModel/DoubleCheckedLocking.html
         I2PAppContext rv = _globalAppContext;
         if (rv != null)
             return rv;
@@ -476,6 +477,9 @@ public class I2PAppContext {
      * provided during the context construction, as well as the ones included in
      * System.getProperties.
      *
+     * WARNING - not overridden in RouterContext, doesn't contain router config settings,
+     * use getProperties() instead.
+     *
      * @return set of Strings containing the names of defined system properties
      */
     public Set getPropertyNames() { 
@@ -483,6 +487,21 @@ public class I2PAppContext {
         if (_overrideProps != null)
             names.addAll(_overrideProps.keySet());
         return names;
+    }
+    
+    /**
+     * Access the configuration attributes of this context, listing the properties 
+     * provided during the context construction, as well as the ones included in
+     * System.getProperties.
+     *
+     * @return new Properties with system and context properties
+     * @since 0.8.4
+     */
+    public Properties getProperties() { 
+        Properties rv = new Properties();
+        rv.putAll(System.getProperties());
+        rv.putAll(_overrideProps);
+        return rv;
     }
     
     /**
@@ -767,7 +786,7 @@ public class I2PAppContext {
      * enable simulators to play with clock skew among different instances.
      *
      */
-    public Clock clock() { // overridden in RouterContext
+    public Clock clock() {
         if (!_clockInitialized)
             initializeClock();
         return _clock;

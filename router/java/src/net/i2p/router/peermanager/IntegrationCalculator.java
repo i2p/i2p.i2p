@@ -1,24 +1,13 @@
 package net.i2p.router.peermanager;
 
-import net.i2p.router.RouterContext;
-import net.i2p.util.Log;
-
 /**
  * Determine how well integrated the peer is - how likely they will be useful
  * to us if we are trying to get further connected.
  *
  */
-public class IntegrationCalculator extends Calculator {
-    private Log _log;
-    private RouterContext _context;
+class IntegrationCalculator {
     
-    public IntegrationCalculator(RouterContext context) {
-        _context = context;
-        _log = context.logManager().getLog(IntegrationCalculator.class);
-    }
-    
-    @Override
-    public double calc(PeerProfile profile) {
+    public static double calc(PeerProfile profile) {
         long val = 0;
         if (profile.getIsExpandedDB()) {
             // give more weight to recent counts

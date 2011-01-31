@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.router.JobImpl;
@@ -61,8 +62,8 @@ class ExpireLeasesJob extends JobImpl {
         Set toExpire = new HashSet(128);
         for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
             Hash key = (Hash)iter.next();
-            Object obj = _facade.getDataStore().get(key);
-            if (obj instanceof LeaseSet) {
+            DatabaseEntry obj = _facade.getDataStore().get(key);
+            if (obj.getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
                 LeaseSet ls = (LeaseSet)obj;
                 if (!ls.isCurrent(Router.CLOCK_FUDGE_FACTOR))
                     toExpire.add(key);

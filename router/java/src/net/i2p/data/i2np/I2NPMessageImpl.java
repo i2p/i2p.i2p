@@ -122,7 +122,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             if (!eq)
                 throw new I2NPMessageException("Hash does not match for " + getClass().getName());
 
-            long start = _context.clock().now();
+            //long start = _context.clock().now();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Reading bytes: type = " + type + " / uniqueId : " + _uniqueId + " / expiration : " + _expiration);
             readMessage(buffer, 0, size, type);
@@ -184,7 +184,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         if (!eq)
             throw new I2NPMessageException("Hash does not match for " + getClass().getName());
 
-        long start = _context.clock().now();
+        //long start = _context.clock().now();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Reading bytes: type = " + type + " / uniqueId : " + _uniqueId + " / expiration : " + _expiration);
         readMessage(data, cur, size, type);
@@ -240,7 +240,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     }
     
     public int toByteArray(byte buffer[]) {
-        long start = _context.clock().now();
+        //long start = _context.clock().now();
 
         int prefixLen = 1 // type
                         + 4 // uniqueId

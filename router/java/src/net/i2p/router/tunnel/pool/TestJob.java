@@ -144,6 +144,7 @@ class TestJob extends JobImpl {
             scheduleRetest();
             return;
         }
+        // can't be a singleton, the SKM modifies it
         Set encryptTags = new HashSet(1);
         encryptTags.add(encryptTag);
         // Register the single tag with the appropriate SKM

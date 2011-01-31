@@ -18,7 +18,7 @@ public class JobTiming implements Clock.ClockUpdateListener {
     private long _start;
     private long _actualStart;
     private long _actualEnd;
-    private RouterContext _context;
+    private final RouterContext _context;
     
     public JobTiming(RouterContext context) {
         _context = context;

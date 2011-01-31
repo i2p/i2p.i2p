@@ -23,12 +23,13 @@ import net.i2p.util.Log;
  *
  */
 public class ClientMessagePool {
-    private Log _log;
-    private RouterContext _context;
+    private final Log _log;
+    private final RouterContext _context;
     
     public ClientMessagePool(RouterContext context) {
         _context = context;
         _log = _context.logManager().getLog(ClientMessagePool.class);
+        OutboundClientMessageOneShotJob.init(_context);
     }
   
     /**
@@ -65,6 +66,7 @@ public class ClientMessagePool {
         }
     }
     
+/******
     private boolean isGuaranteed(ClientMessage msg) {
         Properties opts = null;
         if (msg.getSenderConfig() != null)
@@ -76,4 +78,5 @@ public class ClientMessagePool {
             return false;
         }
     }
+******/
 }

@@ -9,6 +9,7 @@ package net.i2p.client;
  *
  */
 
+import java.util.Properties;
 import java.util.Set;
 
 import net.i2p.data.Destination;
@@ -20,17 +21,20 @@ import net.i2p.data.SigningPrivateKey;
 /**
  * <p>Define the standard means of sending and receiving messages on the 
  * I2P network by using the I2CP (the client protocol).  This is done over a 
- * bidirectional TCP socket and never sends any private keys - all end to end 
- * encryption is done transparently within the client's I2PSession
- * itself.  Periodically the router will ask the client to authorize a new set of
+ * bidirectional TCP socket and never sends any private keys.
+ *
+ * End to end encryption in I2PSession was disabled in release 0.6.
+ *
+ * Periodically the router will ask the client to authorize a new set of
  * tunnels to be allocated to the client, which the client can accept by sending a
  * {@link net.i2p.data.LeaseSet} signed by the {@link net.i2p.data.Destination}.  
- * In addition, the router may on occation provide the client with an updated 
+ * In addition, the router may on occasion provide the client with an updated 
  * clock offset so that the client can stay in sync with the network (even if 
  * the host computer's clock is off).</p>
  *
  */
 public interface I2PSession {
+
     /** Send a new message to the given destination, containing the specified
      * payload, returning true if the router feels confident that the message
      * was delivered.
@@ -39,11 +43,18 @@ public interface I2PSession {
      * @return whether it was accepted by the router for delivery or not
      */
     public boolean sendMessage(Destination dest, byte[] payload) throws I2PSessionException;
+
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size) throws I2PSessionException;
-    /** See I2PSessionMuxedImpl for details */
+
+    /**
+     * See I2PSessionMuxedImpl for proto/port details.
+     * @since 0.7.1
+     */
     public boolean sendMessage(Destination dest, byte[] payload, int proto, int fromport, int toport) throws I2PSessionException;
 
     /**
+     * End-to-End Crypto is disabled, tags and keys are ignored!
+     * 
      * Like sendMessage above, except the key used and the tags sent are exposed to the 
      * application.  <p /> 
      * 
@@ -61,24 +72,61 @@ public interface I2PSession {
      *
      * @param dest location to send the message
      * @param payload body of the message to be sent (unencrypted)
-     * @param keyUsed session key delivered to the destination for association with the tags sent.  This is essentially
+     * @param keyUsed UNUSED, IGNORED. Session key delivered to the destination for association with the tags sent.  This is essentially
      *                an output parameter - keyUsed.getData() is ignored during this call, but after the call completes,
      *                it will be filled with the bytes of the session key delivered.  Typically the key delivered is the
      *                same one as the key encrypted with, but not always.  If this is null then the key data will not be
      *                exposed.
-     * @param tagsSent set of tags delivered to the peer and associated with the keyUsed.  This is also an output parameter -
+     * @param tagsSent UNUSED, IGNORED. Set of tags delivered to the peer and associated with the keyUsed.  This is also an output parameter -
      *                 the contents of the set is ignored during the call, but afterwards it contains a set of SessionTag 
      *                 objects that were sent along side the given keyUsed.
      */
     public boolean sendMessage(Destination dest, byte[] payload, SessionKey keyUsed, Set tagsSent) throws I2PSessionException;
+
+    /**
+     * End-to-End Crypto is disabled, tags and keys are ignored.
+     * @param keyUsed UNUSED, IGNORED.
+     * @param tagsSent UNUSED, IGNORED.
+     */
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent) throws I2PSessionException;
+
+    /**
+     * End-to-End Crypto is disabled, tags and keys are ignored.
+     * @param keyUsed UNUSED, IGNORED.
+     * @param tagsSent UNUSED, IGNORED.
+     * @since 0.7.1
+     */
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent, long expire) throws I2PSessionException;
-    /** See I2PSessionMuxedImpl for details */
+
+    /**
+     * See I2PSessionMuxedImpl for proto/port details.
+     * End-to-End Crypto is disabled, tags and keys are ignored.
+     * @param keyUsed UNUSED, IGNORED.
+     * @param tagsSent UNUSED, IGNORED.
+     * @since 0.7.1
+     */
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent,
                                int proto, int fromport, int toport) throws I2PSessionException;
-    /** See I2PSessionMuxedImpl for details */
+
+    /**
+     * See I2PSessionMuxedImpl for proto/port details.
+     * End-to-End Crypto is disabled, tags and keys are ignored.
+     * @param keyUsed UNUSED, IGNORED.
+     * @param tagsSent UNUSED, IGNORED.
+     * @since 0.7.1
+     */
     public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent, long expire,
                                int proto, int fromport, int toport) throws I2PSessionException;
+
+    /**
+     * See I2PSessionMuxedImpl for proto/port details.
+     * End-to-End Crypto is disabled, tags and keys are ignored.
+     * @param keyUsed UNUSED, IGNORED.
+     * @param tagsSent UNUSED, IGNORED.
+     * @since 0.8.4
+     */
+    public boolean sendMessage(Destination dest, byte[] payload, int offset, int size, SessionKey keyUsed, Set tagsSent, long expire,
+                               int proto, int fromport, int toport, int flags) throws I2PSessionException;
 
     /** Receive a message that the router has notified the client about, returning
      * the payload.
@@ -152,7 +200,15 @@ public interface I2PSession {
     public Destination lookupDest(Hash h, long maxWait) throws I2PSessionException;
 
     /**
+     *  Does not remove properties previously present but missing from this options parameter.
+     *  @param options non-null
+     *  @since 0.8.4
+     */
+    public void updateOptions(Properties options);
+
+    /**
      * Get the current bandwidth limits. Blocking.
+     * @since 0.8.3
      */
     public int[] bandwidthLimits() throws I2PSessionException;
 

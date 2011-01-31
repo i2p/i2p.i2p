@@ -115,6 +115,7 @@ class PeerManager {
      */
     List<Hash> selectPeers(PeerSelectionCriteria criteria) {
         Set<Hash> peers = new HashSet(criteria.getMinimumRequired());
+        // not a singleton, SANFP adds to it
         Set<Hash> exclude = new HashSet(1);
         exclude.add(_context.routerHash());
         switch (criteria.getPurpose()) {

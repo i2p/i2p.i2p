@@ -4,6 +4,7 @@ package net.i2p.client.streaming;
  * Like a StringBuffer, but for bytes.  This class is not internally synchronized,
  * so care should be taken when using in a multithreaded environment.
  *
+ * @deprecated Only used by deprecated I2PSocketImpl
  */
 class ByteCollector {
     byte[] contents;

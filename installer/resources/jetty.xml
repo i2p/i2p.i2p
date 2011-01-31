@@ -12,7 +12,9 @@
 <!--           been patched to allow IPv6 addresses as well,                   -->
 <!--           enclosed in brackets e.g. [::1]                                 -->
 <!--   * port: Default 7658 in the addListener section                         -->
-<!--   * threads: Raise MaxThreads in the addListener section                  -->
+<!--   * docroot: Change the ResourceBase in the addContext section            -->
+<!--           to serve files from a different location.                       -->
+<!--   * threads: Raise MinThreads and/or MaxThreads in the addListener section -->
 <!--           if you have a high-traffic site and get a lot of warnings.      -->
 <!--   * Uncomment the addWebApplications section to use to enable             -->
 <!--           war files placed in the webapps/ dir.                           -->
@@ -23,7 +25,7 @@
 <!-- found in Jetty 5, you may install and run Jetty 6 in a different JVM,     -->
 <!-- or run any other web server such as Apache. If you do run another         -->
 <!-- web server instead, be sure and disable the Jetty 5 server for your       -->
-<!-- eepsite on http://127.0.0.1/configclients.jsp .                           -->
+<!-- eepsite on http://127.0.0.1:7657/configclients.jsp .                      -->
 <!--                                                                           -->
 <!-- Jetty errors and warnings will appear in wrapper.log, check there         -->
 <!-- to diagnose problems.                                                     -->
@@ -57,13 +59,12 @@
             <Set name="port">7658</Set>
           </New>
         </Arg>
-        <Set name="MinThreads">3</Set>
-        <Set name="MaxThreads">10</Set>
+        <Set name="MinThreads">1</Set>
+        <Set name="MaxThreads">16</Set>
         <Set name="MaxIdleTimeMs">60000</Set>
         <Set name="LowResourcePersistTimeMs">1000</Set>
         <Set name="ConfidentialPort">8443</Set>
         <Set name="IntegralPort">8443</Set>
-        <Set name="PoolName">main</Set>
       </New>
     </Arg>
   </Call>

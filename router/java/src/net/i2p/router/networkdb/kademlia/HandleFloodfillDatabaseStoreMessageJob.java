@@ -11,6 +11,7 @@ package net.i2p.router.networkdb.kademlia;
 import java.util.Date;
 import java.util.Set;
 
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterIdentity;
@@ -55,7 +56,8 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
         boolean wasNew = false;
         RouterInfo prevNetDb = null;
         Hash key = _message.getKey();
-        if (_message.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET) {
+        DatabaseEntry entry = _message.getEntry();
+        if (entry.getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
             getContext().statManager().addRateData("netDb.storeLeaseSetHandled", 1, 0);
             if (_log.shouldLog(Log.INFO))
                 _log.info("Handling dbStore of leaseset " + _message);
@@ -75,7 +77,7 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                     throw new IllegalArgumentException("Peer attempted to store local leaseSet: " +
                                                        key.toBase64().substring(0, 4));
                 }
-                LeaseSet ls = _message.getLeaseSet();
+                LeaseSet ls = (LeaseSet) entry;
                 //boolean oldrar = ls.getReceivedAsReply();
                 //boolean oldrap = ls.getReceivedAsPublished();
                 // If this was received as a response to a query,
@@ -91,10 +93,10 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                 //boolean rap = ls.getReceivedAsPublished();
                 //if (_log.shouldLog(Log.INFO))
                 //    _log.info("oldrap? " + oldrap + " oldrar? " + oldrar + " newrap? " + rap);
-                LeaseSet match = getContext().netDb().store(key, _message.getLeaseSet());
+                LeaseSet match = getContext().netDb().store(key, ls);
                 if (match == null) {
                     wasNew = true;
-                } else if (match.getEarliestLeaseDate() < _message.getLeaseSet().getEarliestLeaseDate()) {
+                } else if (match.getEarliestLeaseDate() < ls.getEarliestLeaseDate()) {
                     wasNew = true;
                     // If it is in our keyspace and we are talking to it
 
@@ -117,11 +119,12 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
             } catch (IllegalArgumentException iae) {
                 invalidMessage = iae.getMessage();
             }
-        } else if (_message.getValueType() == DatabaseStoreMessage.KEY_TYPE_ROUTERINFO) {
+        } else if (entry.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
+            RouterInfo ri = (RouterInfo) entry;
             getContext().statManager().addRateData("netDb.storeRouterInfoHandled", 1, 0);
             if (_log.shouldLog(Log.INFO))
                 _log.info("Handling dbStore of router " + key + " with publishDate of " 
-                          + new Date(_message.getRouterInfo().getPublished()));
+                          + new Date(ri.getPublished()));
             try {
                 // Never store our RouterInfo received from somebody else.
                 // This generally happens from a FloodfillVerifyStoreJob.
@@ -132,8 +135,8 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                     // throw rather than return, so that we send the ack below (prevent easy attack)
                     throw new IllegalArgumentException("Peer attempted to store our RouterInfo");
                 }
-                prevNetDb = getContext().netDb().store(key, _message.getRouterInfo());
-                wasNew = ((null == prevNetDb) || (prevNetDb.getPublished() < _message.getRouterInfo().getPublished()));
+                prevNetDb = getContext().netDb().store(key, ri);
+                wasNew = ((null == prevNetDb) || (prevNetDb.getPublished() < ri.getPublished()));
                 // Check new routerinfo address against blocklist
                 if (wasNew) {
                     if (prevNetDb == null) {
@@ -143,7 +146,7 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                                 _log.warn("Blocklisting new peer " + key);
                     } else {
                         Set oldAddr = prevNetDb.getAddresses();
-                        Set newAddr = _message.getRouterInfo().getAddresses();
+                        Set newAddr = ri.getAddresses();
                         if (newAddr != null && (!newAddr.equals(oldAddr)) &&
                             (!getContext().shitlist().isShitlistedForever(key)) &&
                             getContext().blocklist().isBlocklisted(key) &&
@@ -157,7 +160,7 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
             }
         } else {
             if (_log.shouldLog(Log.ERROR))
-                _log.error("Invalid DatabaseStoreMessage data type - " + _message.getValueType() 
+                _log.error("Invalid DatabaseStoreMessage data type - " + entry.getType() 
                            + ": " + _message);
         }
         
@@ -198,12 +201,9 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                     return;
                 }
                 long floodBegin = System.currentTimeMillis();
-                if (_message.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET)
-                    _facade.flood(_message.getLeaseSet());
+                _facade.flood(_message.getEntry());
                 // ERR: see comment in HandleDatabaseLookupMessageJob regarding hidden mode
                 //else if (!_message.getRouterInfo().isHidden())
-                else
-                    _facade.flood(_message.getRouterInfo());
                 long floodEnd = System.currentTimeMillis();
                 getContext().statManager().addRateData("netDb.storeFloodNew", floodEnd-floodBegin, 0);
             } else {

@@ -1,9 +1,11 @@
 package net.i2p.router.peermanager;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
+import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashSet;
@@ -270,11 +272,12 @@ class ProfilePersistenceHelper {
     }
     
     private void loadProps(Properties props, File file) {
+        InputStream fin = null;
         try {
-            FileInputStream fin = new FileInputStream(file);
+            fin = new BufferedInputStream(new FileInputStream(file), 1);
+            fin.mark(1);
             int c = fin.read(); 
-            fin.close();
-            fin = new FileInputStream(file); // ghetto mark+reset
+            fin.reset();
             if (c == '#') {
                 // uncompressed
                 if (_log.shouldLog(Log.INFO))
@@ -289,6 +292,10 @@ class ProfilePersistenceHelper {
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error loading properties from " + file.getName(), ioe);
+        } finally {
+            try {
+                if (fin != null) fin.close();
+            } catch (IOException e) {}
         }
     }
 

@@ -21,13 +21,13 @@ import net.i2p.data.i2np.DeliveryInstructions;
  * Define the contents of a garlic chunk that contains 1 or more sub garlics
  *
  */
-public class GarlicConfig {
+class GarlicConfig {
     private RouterInfo _recipient;
     private PublicKey _recipientPublicKey;
     private Certificate _cert;
     private long _id;
     private long _expiration;
-    private List _cloveConfigs;
+    private final List _cloveConfigs;
     private DeliveryInstructions _instructions;
     private boolean _requestAck;
     private RouterInfo _replyThroughRouter; // router through which any replies will be sent before delivery to us
@@ -39,7 +39,7 @@ public class GarlicConfig {
     public GarlicConfig() {
 	_id = -1;
 	_expiration = -1;
-	_cloveConfigs = new ArrayList();
+	_cloveConfigs = new ArrayList(4);
 	_replyBlockMessageId = -1;
 	_replyBlockExpiration = -1;
     }

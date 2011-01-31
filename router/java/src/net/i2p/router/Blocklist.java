@@ -59,7 +59,7 @@ import net.i2p.util.Log;
  *
  */
 public class Blocklist {
-    private Log _log;
+    private final Log _log;
     private RouterContext _context;
     private long _blocklist[];
     private int _blocklistSize;
@@ -72,15 +72,11 @@ public class Blocklist {
     public Blocklist(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(Blocklist.class);
-        _blocklist = null;
-        _blocklistSize = 0;
-        _wrapSave = null;
     }
     
+    /** only for testing with main() */
     public Blocklist() {
         _log = new Log(Blocklist.class);
-        _blocklist = null;
-        _blocklistSize = 0;
     }
     
     static final String PROP_BLOCKLIST_ENABLED = "router.blocklist.enable";
@@ -683,7 +679,7 @@ public class Blocklist {
             return;
         Job job = new ShitlistJob(peer);
         if (number > 0)
-            job.getTiming().setStartAfter(_context.clock().now() + (number * 30*1000));
+            job.getTiming().setStartAfter(_context.clock().now() + (30*1000l * number));
         _context.jobQueue().addJob(job);
     }
 

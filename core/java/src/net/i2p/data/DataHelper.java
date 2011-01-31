@@ -845,7 +845,7 @@ public class DataHelper {
      */
     public final static void xor(byte lhs[], int startLeft, byte rhs[], int startRight, byte out[], int startOut, int len) {
         if ( (lhs == null) || (rhs == null) || (out == null) )
-            throw new NullPointerException("Invalid params to xor (" + lhs + ", " + rhs + ", " + out + ")");
+            throw new NullPointerException("Null params to xor");
         if (lhs.length < startLeft + len)
             throw new IllegalArgumentException("Left hand side is too short");
         if (rhs.length < startRight + len)

@@ -3,6 +3,7 @@ package net.i2p.router.networkdb.reseed;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -176,14 +177,14 @@ public class Reseeder {
             StringTokenizer tok = new StringTokenizer(URLs, " ,");
             while (tok.hasMoreTokens())
                 URLList.add(tok.nextToken().trim());
-            Collections.shuffle(URLList);
+            Collections.shuffle(URLList, _context.random());
             if (defaulted && !SSLDisable) {
                 // put the non-SSL at the end of the SSL
                 List<String> URLList2 = new ArrayList();
                 tok = new StringTokenizer(DEFAULT_SEED_URL, " ,");
                 while (tok.hasMoreTokens())
                     URLList2.add(tok.nextToken().trim());
-                Collections.shuffle(URLList2);
+                Collections.shuffle(URLList2, _context.random());
                 URLList.addAll(URLList2);
             }
             int total = 0;
@@ -262,7 +263,7 @@ public class Reseeder {
                 }
 
                 List<String> urlList = new ArrayList(urls);
-                Collections.shuffle(urlList);
+                Collections.shuffle(urlList, _context.random());
                 int fetched = 0;
                 int errors = 0;
                 // 200 max from one URL
@@ -278,7 +279,7 @@ public class Reseeder {
                             if (fetched % 60 == 0)
                                 System.out.println();
                         }
-                    } catch (Exception e) {
+                    } catch (IOException e) {
                         errors++;
                     }
                 }
@@ -298,20 +299,20 @@ public class Reseeder {
         }
     
         /* Since we don't return a value, we should always throw an exception if something fails. */
-        private void fetchSeed(String seedURL, String peer) throws Exception {
+        private void fetchSeed(String seedURL, String peer) throws IOException {
             URL url = new URL(seedURL + (seedURL.endsWith("/") ? "" : "/") + "routerInfo-" + peer + ".dat");
 
             byte data[] = readURL(url);
             if (data == null) {
                 // Logging deprecated here since attemptFailed() provides better info
                 _log.debug("Failed fetching seed: " + url.toString());
-                throw new Exception ("Failed fetching seed.");
+                throw new IOException("Failed fetching seed.");
             }
             //System.out.println("read: " + (data != null ? data.length : -1));
             writeSeed(peer, data);
         }
 
-        private byte[] readURL(URL url) throws Exception {
+        private byte[] readURL(URL url) throws IOException {
             ByteArrayOutputStream baos = new ByteArrayOutputStream(4*1024);
 
             EepGet get;
@@ -338,15 +339,21 @@ public class Reseeder {
             return null;
         }
     
-        private void writeSeed(String name, byte data[]) throws Exception {
+        private void writeSeed(String name, byte data[]) throws IOException {
             String dirName = "netDb"; // _context.getProperty("router.networkDatabase.dbDir", "netDb");
             File netDbDir = new SecureDirectory(_context.getRouterDir(), dirName);
             if (!netDbDir.exists()) {
                 boolean ok = netDbDir.mkdirs();
             }
-            FileOutputStream fos = new SecureFileOutputStream(new File(netDbDir, "routerInfo-" + name + ".dat"));
-            fos.write(data);
-            fos.close();
+            FileOutputStream fos = null;
+            try {
+                fos = new SecureFileOutputStream(new File(netDbDir, "routerInfo-" + name + ".dat"));
+                fos.write(data);
+            } finally {
+                try {
+                    if (fos != null) fos.close();
+                } catch (IOException ioe) {}
+            }
         }
 
     }

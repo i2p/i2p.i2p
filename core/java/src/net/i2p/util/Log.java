@@ -205,7 +205,8 @@ public class Log {
         }
         @Override
         public boolean equals(Object obj) {
-            if (obj == null) throw new NullPointerException("Null object scope?");
+            if (obj == null)
+                return false;
             if (obj instanceof LogScope) {
                 LogScope s = (LogScope)obj;
                 return s._scopeCache.equals(_scopeCache);

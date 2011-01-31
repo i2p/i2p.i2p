@@ -12,12 +12,12 @@ import net.i2p.util.Log;
  *
  */
 class RouterThrottleImpl implements RouterThrottle {
-    private RouterContext _context;
-    private Log _log;
+    private final RouterContext _context;
+    private final Log _log;
     private String _tunnelStatus;
     
     /** 
-     * arbitrary hard limit of 10 seconds - if its taking this long to get 
+     * arbitrary hard limit - if it's taking this long to get 
      * to a job, we're congested.
      *
      */
@@ -98,7 +98,7 @@ class RouterThrottleImpl implements RouterThrottle {
         if (_context.router().getUptime() < 20*60*1000)
             return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
 
-        long lag = _context.jobQueue().getMaxLag();
+        //long lag = _context.jobQueue().getMaxLag();
         // reject here if lag too high???
         
         RateStat rs = _context.statManager().getRate("transport.sendProcessingTime");

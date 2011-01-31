@@ -19,8 +19,8 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.Base64;
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.DataFormatException;
-import net.i2p.data.DataStructure;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterInfo;
@@ -91,7 +91,7 @@ class PersistentDataStore extends TransientDataStore {
     }
 
     @Override
-    public DataStructure get(Hash key) {
+    public DatabaseEntry get(Hash key) {
         return get(key, true);
     }
 
@@ -100,8 +100,8 @@ class PersistentDataStore extends TransientDataStore {
      *  @param persist if false, call super only, don't access disk
      */
     @Override
-    public DataStructure get(Hash key, boolean persist) {
-        DataStructure rv =  super.get(key);
+    public DatabaseEntry get(Hash key, boolean persist) {
+        DatabaseEntry rv =  super.get(key);
 /*****
         if (rv != null || !persist)
             return rv;
@@ -116,7 +116,7 @@ class PersistentDataStore extends TransientDataStore {
     }
 
     @Override
-    public DataStructure remove(Hash key) {
+    public DatabaseEntry remove(Hash key) {
         return remove(key, true);
     }
 
@@ -124,7 +124,7 @@ class PersistentDataStore extends TransientDataStore {
      *  @param persist if false, call super only, don't access disk
      */
     @Override
-    public DataStructure remove(Hash key, boolean persist) {
+    public DatabaseEntry remove(Hash key, boolean persist) {
         if (persist) {
             _writer.remove(key);
             _context.jobQueue().addJob(new RemoveJob(key));
@@ -133,7 +133,7 @@ class PersistentDataStore extends TransientDataStore {
     }
     
     @Override
-    public boolean put(Hash key, DataStructure data) {
+    public boolean put(Hash key, DatabaseEntry data) {
         return put(key, data, true);
     }
 
@@ -142,11 +142,11 @@ class PersistentDataStore extends TransientDataStore {
      *  @return success
      */
     @Override
-    public boolean put(Hash key, DataStructure data, boolean persist) {
+    public boolean put(Hash key, DatabaseEntry data, boolean persist) {
         if ( (data == null) || (key == null) ) return false;
         boolean rv = super.put(key, data);
         // Don't bother writing LeaseSets to disk
-        if (rv && persist && data instanceof RouterInfo)
+        if (rv && persist && data.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO)
             _writer.queue(key, data);
         return rv;
     }
@@ -181,10 +181,10 @@ class PersistentDataStore extends TransientDataStore {
      * We store a reference to the data here too,
      * rather than simply pull it from super.get(), because
      * we will soon have to implement a scheme for keeping only
-     * a subset of all DataStructures in memory and keeping the rest on disk.
+     * a subset of all DatabaseEntrys in memory and keeping the rest on disk.
      */
     private class Writer implements Runnable {
-        private final Map<Hash, DataStructure>_keys;
+        private final Map<Hash, DatabaseEntry>_keys;
         private final Object _waitLock;
         private volatile boolean _quit;
 
@@ -193,7 +193,7 @@ class PersistentDataStore extends TransientDataStore {
             _waitLock = new Object();
         }
 
-        public void queue(Hash key, DataStructure data) {
+        public void queue(Hash key, DatabaseEntry data) {
             int pending = _keys.size();
             boolean exists = (null != _keys.put(key, data));
             if (exists)
@@ -202,7 +202,7 @@ class PersistentDataStore extends TransientDataStore {
         }
 
         /** check to see if it's in the write queue */
-        public DataStructure get(Hash key) {
+        public DatabaseEntry get(Hash key) {
             return _keys.get(key);
         }
 
@@ -213,16 +213,16 @@ class PersistentDataStore extends TransientDataStore {
         public void run() {
             _quit = false;
             Hash key = null;
-            DataStructure data = null;
+            DatabaseEntry data = null;
             int count = 0;
             int lastCount = 0;
             long startTime = 0;
             while (true) {
                 // get a new iterator every time to get a random entry without
                 // having concurrency issues or copying to a List or Array
-                Iterator<Map.Entry<Hash, DataStructure>> iter = _keys.entrySet().iterator();
+                Iterator<Map.Entry<Hash, DatabaseEntry>> iter = _keys.entrySet().iterator();
                 try {
-                    Map.Entry<Hash, DataStructure> entry = iter.next();
+                    Map.Entry<Hash, DatabaseEntry> entry = iter.next();
                     key = entry.getKey();
                     data = entry.getValue();
                     iter.remove();
@@ -275,7 +275,7 @@ class PersistentDataStore extends TransientDataStore {
         }
     }
     
-    private void write(Hash key, DataStructure data) {
+    private void write(Hash key, DatabaseEntry data) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Writing key " + key);
         FileOutputStream fos = null;
@@ -283,9 +283,9 @@ class PersistentDataStore extends TransientDataStore {
         try {
             String filename = null;
 
-            if (data instanceof LeaseSet)
+            if (data.getType() == DatabaseEntry.KEY_TYPE_LEASESET)
                 filename = getLeaseSetName(key);
-            else if (data instanceof RouterInfo)
+            else if (data.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO)
                 filename = getRouterInfoName(key);
             else
                 throw new IOException("We don't know how to write objects of type " + data.getClass().getName());
@@ -316,14 +316,8 @@ class PersistentDataStore extends TransientDataStore {
             if (fos != null) try { fos.close(); } catch (IOException ioe) {}
         }
     }
-    private long getPublishDate(DataStructure data) {
-        if (data instanceof RouterInfo) {
-            return ((RouterInfo)data).getPublished();
-        } else if (data instanceof LeaseSet) {
-            return ((LeaseSet)data).getEarliestLeaseDate();
-        } else {
-            return -1;
-        }
+    private long getPublishDate(DatabaseEntry data) {
+        return data.getDate();
     }
     
     /** This is only for manual reseeding? Why bother every 60 sec??? */
@@ -395,9 +389,9 @@ class PersistentDataStore extends TransientDataStore {
         
         private boolean shouldRead() {
             // persist = false to call only super.get()
-            DataStructure data = get(_key, false);
+            DatabaseEntry data = get(_key, false);
             if (data == null) return true;
-            if (data instanceof RouterInfo) {
+            if (data.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
                 long knownDate = ((RouterInfo)data).getPublished();
                 long fileDate = _routerFile.lastModified();
                 if (fileDate > knownDate)

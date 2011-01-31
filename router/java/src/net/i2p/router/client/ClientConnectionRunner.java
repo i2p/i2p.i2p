@@ -280,8 +280,12 @@ class ClientConnectionRunner {
         MessageId id = new MessageId();
         id.setMessageId(getNextMessageId()); 
         long expiration = 0;
-        if (message instanceof SendMessageExpiresMessage)
-            expiration = ((SendMessageExpiresMessage) message).getExpiration().getTime();
+        int flags = 0;
+        if (message.getType() == SendMessageExpiresMessage.MESSAGE_TYPE) {
+            SendMessageExpiresMessage msg = (SendMessageExpiresMessage) message;
+            expiration = msg.getExpirationTime();
+            flags = msg.getFlags();
+        }
         if (!_dontSendMSM)
             _acceptedPending.add(id);
 
@@ -289,16 +293,17 @@ class ClientConnectionRunner {
             _log.debug("** Receiving message [" + id.getMessageId() + "] with payload of size [" 
                        + payload.getSize() + "]" + " for session [" + _sessionId.getSessionId() 
                        + "]");
-        long beforeDistribute = _context.clock().now();
+        //long beforeDistribute = _context.clock().now();
         // the following blocks as described above
         SessionConfig cfg = _config;
         if (cfg != null)
-            _manager.distributeMessage(cfg.getDestination(), dest, payload, id, expiration);
-        long timeToDistribute = _context.clock().now() - beforeDistribute;
-        if (_log.shouldLog(Log.DEBUG))
-            _log.warn("Time to distribute in the manager to " 
-                      + dest.calculateHash().toBase64() + ": " 
-                      + timeToDistribute);
+            _manager.distributeMessage(cfg.getDestination(), dest, payload, id, expiration, flags);
+        // else log error?
+        //long timeToDistribute = _context.clock().now() - beforeDistribute;
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.warn("Time to distribute in the manager to " 
+        //              + dest.calculateHash().toBase64() + ": " 
+        //              + timeToDistribute);
         return id;
     }
     

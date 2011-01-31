@@ -36,15 +36,14 @@ import net.i2p.util.SimpleTimer;
 import net.i2p.util.Translate;
 
 public class CommSystemFacadeImpl extends CommSystemFacade {
-    private Log _log;
-    private RouterContext _context;
+    private final Log _log;
+    private final RouterContext _context;
     private TransportManager _manager;
     private GeoIP _geoIP;
     
     public CommSystemFacadeImpl(RouterContext context) {
         _context = context;
         _log = _context.logManager().getLog(CommSystemFacadeImpl.class);
-        _manager = null;
         _context.statManager().createRateStat("transport.getBidsJobTime", "How long does it take?", "Transport", new long[] { 10*60*1000l });
         startGeoIP();
     }
@@ -215,7 +214,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
      * This should really be moved to ntcp/NTCPTransport.java, why is it here?
      */
     public static RouterAddress createNTCPAddress(RouterContext ctx) {
-        if (!TransportManager.enableNTCP(ctx)) return null;
+        if (!TransportManager.isNTCPEnabled(ctx)) return null;
         String name = ctx.router().getConfigSetting(PROP_I2NP_NTCP_HOSTNAME);
         String port = ctx.router().getConfigSetting(PROP_I2NP_NTCP_PORT);
         /*

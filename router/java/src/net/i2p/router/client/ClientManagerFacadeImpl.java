@@ -207,6 +207,7 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade implements Inte
         }
     }
     
+    /** @deprecated unused */
     @Override
     public void renderStatusHTML(Writer out) throws IOException { 
         if (_manager != null)

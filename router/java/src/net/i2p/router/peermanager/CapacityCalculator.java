@@ -1,21 +1,14 @@
 package net.i2p.router.peermanager;
 
-import net.i2p.router.RouterContext;
+import net.i2p.I2PAppContext;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
-import net.i2p.util.Log;
 
 /**
  * Estimate how many of our tunnels the peer can join per hour.
  */
-public class CapacityCalculator extends Calculator {
-    private Log _log;
-    private RouterContext _context;
-    
-    public CapacityCalculator(RouterContext context) {
-        _context = context;
-        _log = context.logManager().getLog(CapacityCalculator.class);
-    }
+class CapacityCalculator {
+    private static final I2PAppContext _context = I2PAppContext.getGlobalContext();
     
     /** used to adjust each period so that we keep trying to expand the peer's capacity */
     static long GROWTH_FACTOR = 5;
@@ -23,8 +16,7 @@ public class CapacityCalculator extends Calculator {
     /** the calculator estimates over a 1 hour period */
     private static long ESTIMATE_PERIOD = 60*60*1000;
     
-    @Override
-    public double calc(PeerProfile profile) {
+    public static double calc(PeerProfile profile) {
         double capacity;
 
         if (tooOld(profile)) { 
