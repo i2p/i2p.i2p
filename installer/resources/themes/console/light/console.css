@@ -735,7 +735,6 @@ h1 {
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      min-width: 500px;
-     text-shadow: 0px 1px 1px #99f;
 }
 
 h2 {
@@ -755,8 +754,6 @@ h2 {
      box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
      word-wrap: break-word;
      opacity: 1;
-     text-transform: uppercase;
-     text-shadow: 0px 1px 1px #99f;
 }
 
 h2 a, h3 a {
@@ -798,8 +795,6 @@ h3 {
      box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
      opacity: 1;
      letter-spacing: 0.07em;
-     text-transform: uppercase;
-     text-shadow: 0px 1px 1px #99f;
 }
 
 h4 {
