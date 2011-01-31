@@ -171,7 +171,9 @@ public class I2PAppContext {
                     _globalAppContext = this;
             }
         }
-        _overrideProps = new I2PProperties(envProps);
+        _overrideProps = new I2PProperties();
+        if (envProps != null)
+            _overrideProps.putAll(envProps);
         _statManager = null;
         _sessionKeyManager = null;
         _namingService = null;

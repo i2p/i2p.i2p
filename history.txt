@@ -1,3 +1,40 @@
+2011-01-31 zzz
+    * Console: Put all socket handlers in same thread pool,
+               set min/max threads and idle timeout
+    * Context: Fix properties init
+    * DataStructures:
+      - Cleanups
+    * DecayingBloomFilter, DecayingHashSet: Cleanups and speedups
+    * Findbugs: Lots of cleanups
+    * I2CP:
+      - Add experimental bandwidth limiter
+      - Add I2PSession API method to update tunnel and bandwidth
+        configuration on an existing session
+      - Filter more system properties before passing them to the router
+      - Start work on passing per-message flags to the router via I2CP
+    * I2PAppContext: New getProperties() method
+    * i2ptunnel:
+      - Use context properties as defaults
+    * NetDB, DatabaseStoreMessage:
+      - Convert everything from DataStructure to the
+        new DatabaseEntry superclass
+      - Optimizations made possible by DatabaseEntry
+      - Don't rescan netDb directory unless changed
+    * OCMOSJ:
+      - Don't send expired messages
+      - Clean up stat init
+    * PeerManager: Make calculators static, take out of router context
+    * Router:
+      - Add new RandomIterator, use in UDP, peer selector,
+        profile organizer
+      - Add a stat to monitor peer selector run time
+    * RouterContext: Clean up clock overrides
+    * Streaming:
+      - Add new real sockets for easier porting of apps.
+        See http://zzz.i2p/topics/792 for info. Untested.
+      - Case cleanups
+      - Javadoc
+
 * 2011-01-24  0.8.3 released
 
 2011-01-16 zzz
