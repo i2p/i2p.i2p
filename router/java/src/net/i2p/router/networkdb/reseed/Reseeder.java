@@ -42,8 +42,8 @@ public class Reseeder {
     private static final long MAX_RESEED_RESPONSE_SIZE = 1024 * 1024;
 
     public static final String DEFAULT_SEED_URL =
-              "http://a.netdb.i2p2.de/,http://b.netdb.i2p2.de/,http://c.netdb.i2p2.de/," +
-              "http://reseed.i2p-projekt.de/,http://www.i2pbote.net/netDb/,http://r31453.ovh.net/static_media/files/netDb/";
+              "http://a.netdb.i2p2.de/,http://c.netdb.i2p2.de/," +
+              "http://reseed.i2p-projekt.de/,http://forum.i2p2.de/netdb/,http://www.i2pbote.net/netDb/,http://r31453.ovh.net/static_media/files/netDb/";
 
     /** @since 0.8.2 */
     public static final String DEFAULT_SSL_SEED_URL =
