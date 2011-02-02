@@ -32,66 +32,19 @@ public class SHA256Test extends TestCase{
             SHA256Generator.getInstance().calculateHash(message);
         }
     }
-    
-    public void testCopyConstructor(){
-        SHA256Digest orig = new SHA256Digest();
-        byte[] message = "update this!".getBytes();
-        orig.update(message, 0, message.length);
-        
-        SHA256Digest copy = new SHA256Digest(orig);
-        
-        byte[] origData = new byte[32];
-        orig.doFinal(origData, 0);
-        byte[] copyData = new byte[32];
-        copy.doFinal(copyData, 0);
-        
-        assertTrue(DataHelper.eq(origData, copyData));
-        
-    }
-    
-    public void testCheckName(){
-        SHA256Digest digest = new SHA256Digest();
-        assertEquals("SHA-256", digest.getAlgorithmName());
-    }
-    
-    public void testManualUpdate(){
-        byte[] data = "deathnotronic".getBytes();
-        
-        SHA256Digest one = new SHA256Digest();
-        for(int i = 0; i < data.length; i++){
-            one.update(data[i]);
+
+    /**
+     * Check if the behaviour remains the same.
+     */
+    public void testMultipleEquality(){
+        byte[] data = "blahblah".getBytes();
+
+        Hash firstHash = SHA256Generator.getInstance().calculateHash(data);
+
+        for(int i=0; i<5; i++){
+            Hash h = SHA256Generator.getInstance().calculateHash(data);
+            assertEquals(firstHash, h);
         }
-        
-        SHA256Digest two = new SHA256Digest();
-        two.update(data[0]);
-        two.update(data, 1, data.length-1);
-        
-        byte[] oneData = new byte[32];
-        one.doFinal(oneData, 0);
-        byte[] twoData = new byte[32];
-        two.doFinal(twoData, 0);
-        
-        assertTrue(DataHelper.eq(oneData, twoData));
-    }
-    
-    public void test14Words(){
-        byte message[] = new byte[56];
-        _context.random().nextBytes(message);
-        SHA256Digest orig = new SHA256Digest();
-        orig.update(message, 0, message.length);
-        orig.doFinal(new byte[32], 0);
-    }
-    
-    public void testSHA(){
-        I2PAppContext ctx = I2PAppContext.getGlobalContext();
-        byte orig[] = new byte[4096];
-        ctx.random().nextBytes(orig);
-        Hash old = ctx.sha().calculateHash(orig);
-        SHA256Digest d = new SHA256Digest();
-        d.update(orig, 0, orig.length);
-        byte out[] = new byte[Hash.HASH_LENGTH];
-        d.doFinal(out, 0);
-        assertTrue(DataHelper.eq(out, old.getData()));
     }
         
 }
