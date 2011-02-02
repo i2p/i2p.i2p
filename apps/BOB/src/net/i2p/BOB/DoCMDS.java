@@ -32,11 +32,12 @@ import java.net.Socket;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
+import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
 import net.i2p.client.I2PClientFactory;
-import net.i2p.data.DataFormatException;
+//import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
-import net.i2p.i2ptunnel.I2PTunnel;
+//import net.i2p.i2ptunnel.I2PTunnel;
 import net.i2p.util.Log;
 // needed only for debugging.
 // import java.util.logging.Level;
@@ -52,7 +53,7 @@ public class DoCMDS implements Runnable {
 
 	// FIX ME
 	// I need a better way to do versioning, but this will do for now.
-	public static final String BMAJ = "00",  BMIN = "00",  BREV = "0E",  BEXT = "";
+	public static final String BMAJ = "00",  BMIN = "00",  BREV = "0F",  BEXT = "";
 	public static final String BOBversion = BMAJ + "." + BMIN + "." + BREV + BEXT;
 	private Socket server;
 	private Properties props;
@@ -456,11 +457,14 @@ public class DoCMDS implements Runnable {
 									String reply = null;
 									if (Arg.endsWith(".i2p")) {
 										try {
-											try {
-												dest = I2PTunnel.destFromName(Arg);
-											} catch (DataFormatException ex) {
+											//try {
+												//dest = I2PTunnel.destFromName(Arg);
+											//} catch (DataFormatException ex) {
+											//}
+											dest = I2PAppContext.getGlobalContext().namingService().lookup(Arg);
+											if(dest != null) {
+												reply = dest.toBase64();
 											}
-											reply = dest.toBase64();
 										} catch (NullPointerException npe) {
 											// Could not find the destination!?
 										}
