@@ -1,3 +1,6 @@
+2011-02-02 sponge
+    * BOB: Revise lookup code, bump BOB version
+
 2011-01-31 zzz
     * Console: Put all socket handlers in same thread pool,
                set min/max threads and idle timeout
