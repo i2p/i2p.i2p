@@ -43,13 +43,24 @@
         <mkdir dir="./build/javadoc" />
         <javadoc sourcepath="./src:./test" destdir="./build/javadoc" packagenames="*" use="true" splitindex="true" windowtitle="I2P SDK" />
     </target>
-    <target name="test" depends="clean, compileTest">
+    <target name="prepareTest" depends="compileTest" if="with.cobertura">
+        <taskdef classpath="${with.cobertura}" resource="tasks.properties" onerror="report" />
+        <mkdir dir="./build/obj_test" />
+        <cobertura-instrument todir="./build/obj_test">
+            <fileset dir="./build/obj">
+                <include name="**/*.class"/>
+            </fileset>
+        </cobertura-instrument>
+    </target>
+    <target name="test" depends="clean, compileTest, prepareTest">
         <junit printsummary="on" fork="yes">
+            <sysproperty key="net.sourceforge.cobertura.datafile" file="./cobertura.ser" />
             <classpath>
                 <pathelement path="${classpath}" />
+                <pathelement location="./build/obj_test" />
                 <pathelement location="./build/obj" />
                 <pathelement location="../../installer/lib/jbigi/jbigi.jar" />
-                <pathelement path="${ant.home}/lib/clover.jar"/>
+                <pathelement location="${with.cobertura}" />
             </classpath>
             <batchtest>
                 <fileset dir="./test/">
@@ -79,6 +90,11 @@
             </fileset>
         </delete>
     </target>
+    <target name="cobertura" depends="test" if="with.cobertura">
+        <mkdir dir="../../reports/core/cobertura" />
+        <cobertura-report format="xml" srcdir="./src" destdir="../../reports/core/cobertura" />
+        <delete file="./cobertura.ser" />
+    </target>
     <target name="junit.report">
         <junitreport todir="../../reports/core/junit">
             <fileset dir="../../reports/core/junit">
@@ -87,28 +103,8 @@
             <report format="frames" todir="../../reports/core/html/junit"/>
         </junitreport>
     </target>
-    <target name="clover.report">
-        <taskdef resource="clovertasks"/>
-        <mkdir dir="../../reports/" />
-        <mkdir dir="../../reports/core" />
-        <mkdir dir="../../reports/core/clover" />
-        <clover-setup initString="../../reports/core/clover/coverage.db"/>
-        <clover-report>
-            <current outfile="../../reports/core/html/clover">
-                <format type="html"/>
-            </current>
-        </clover-report>
-    </target>
-    <target name="test.report" depends="junit.report, clover.report"/>
-    <target name="useclover">
-        <taskdef resource="clovertasks"/>
-        <mkdir dir="../../reports/" />
-        <mkdir dir="../../reports/core/" />
-        <mkdir dir="../../reports/core/clover" />
-        <clover-setup initString="../../reports/core/clover/coverage.db"/>
-    </target>
+    <target name="test.report" depends="junit.report"/>
     <target name="fulltest" depends="test, junit.report" />
-    <target name="fullclovertest" depends="useclover, test, test.report" />
     <target name="clean">
         <delete dir="./build" />
     </target>
