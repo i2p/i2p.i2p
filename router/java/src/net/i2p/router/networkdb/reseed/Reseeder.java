@@ -35,12 +35,18 @@ import net.i2p.util.Translate;
  */
 public class Reseeder {
     private static ReseedRunner _reseedRunner;
-    private RouterContext _context;
-    private Log _log;
+    private final RouterContext _context;
+    private final Log _log;
 
     // Reject unreasonably big files, because we download into a ByteArrayOutputStream.
     private static final long MAX_RESEED_RESPONSE_SIZE = 1024 * 1024;
+    /** limit to spend on a single host, to avoid getting stuck on one that is seriously overloaded */
+    private static final int MAX_TIME_PER_HOST = 7 * 60 * 1000;
 
+    /**
+     *  NOTE - URLs in both the standard and SSL groups should use the same hostname and path,
+     *         so the reseed process will not download from both.
+     */
     public static final String DEFAULT_SEED_URL =
               "http://a.netdb.i2p2.de/,http://c.netdb.i2p2.de/," +
               "http://reseed.i2p-projekt.de/,http://forum.i2p2.de/netdb/,http://www.i2pbote.net/netDb/,http://r31453.ovh.net/static_media/files/netDb/";
@@ -229,6 +235,7 @@ public class Reseeder {
          **/
         private int reseedOne(String seedURL, boolean echoStatus) {
             try {
+                final long timeLimit = _context.clock().now() + MAX_TIME_PER_HOST;
                 System.setProperty(PROP_STATUS, _("Reseeding: fetching seed URL."));
                 System.err.println("Reseeding from " + seedURL);
                 URL dir = new URL(seedURL);
@@ -267,7 +274,8 @@ public class Reseeder {
                 int fetched = 0;
                 int errors = 0;
                 // 200 max from one URL
-                for (Iterator<String> iter = urlList.iterator(); iter.hasNext() && fetched < 200; ) {
+                for (Iterator<String> iter = urlList.iterator();
+                     iter.hasNext() && fetched < 200 && _context.clock().now() < timeLimit; ) {
                     try {
                         System.setProperty(PROP_STATUS,
                             _("Reseeding: fetching router info from seed URL ({0} successful, {1} errors).", fetched, errors));

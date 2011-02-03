@@ -1,3 +1,9 @@
+2011-02-03 zzz
+    * Console: Add DTG to classpath for old installs
+    * I2PTunnel: Fix NPE
+    * RandomSource: Fix seeding from /dev/urandom
+    * Reseed: Limit time spent downloading from a single source
+
 2011-02-02 sponge
     * BOB: Revise lookup code, bump BOB version
 
