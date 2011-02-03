@@ -1,4 +1,7 @@
 2011-02-03 zzz
+    * Build:
+      - Remove dup flag files (ticket #316)
+      - Remove BOB dependency on i2ptunnel
     * Console: Add DTG to classpath for old installs
     * I2PTunnel: Fix NPE
     * RandomSource: Fix seeding from /dev/urandom

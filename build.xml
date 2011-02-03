@@ -68,8 +68,7 @@
          so the build will go faster.
       -->
 
-    <!-- TODO remove I2PTunnel dependency in BOB -->
-    <target name="buildBOB" depends="buildStreaming, buildI2PTunnel" >
+    <target name="buildBOB" depends="buildStreaming" >
         <ant dir="apps/BOB/" target="jar" />
     </target>
 
@@ -484,7 +483,10 @@
         <mkdir dir="pkg-temp/eepsite/docroot/help" />
         <mkdir dir="pkg-temp/eepsite/docroot/help/lib" />
         <copy todir="pkg-temp/eepsite/docroot/" >
-            <fileset dir="installer/resources/eepsite.help/"  includes="robots.txt index.html help/pagetemplate.html help/index*.html **/*.png **/*.css" />
+            <fileset dir="installer/resources/eepsite.help/" />
+        </copy>
+        <copy todir="pkg-temp/eepsite/docroot/help/lib/" >
+            <fileset dir="installer/resources/icons/flags/" includes="cn.png de.png es.png fr.png ir.png it.png jp.png nl.png ru.png se.png us.png" />
         </copy>
         <copy file="installer/resources/themes/console/images/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />
         <copy file="installer/resources/jetty.xml" tofile="pkg-temp/eepsite/jetty.xml" />
