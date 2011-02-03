@@ -45,8 +45,8 @@ public final class I2PDatagramMaker {
      * @param session I2PSession used to send I2PDatagrams through
      */
     public I2PDatagramMaker(I2PSession session) {
-        sxPrivKey = session.getPrivateKey();
-        sxDestBytes = session.getMyDestination().toByteArray();
+        this();
+        this.setI2PDatagramMaker(session);
     }
     /**
      * Construct a new I2PDatagramMaker that is null.
