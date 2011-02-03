@@ -236,7 +236,7 @@
          <%
                /* should only happen for streamr client */
                String cHost= indexBean.getClientInterface(curClient);
-               if ("".equals(cHost)) {
+               if (cHost == null || "".equals(cHost)) {
                    out.write("<font color=\"red\">");
                    out.write(intl._("Host not set"));
                    out.write("</font>");
