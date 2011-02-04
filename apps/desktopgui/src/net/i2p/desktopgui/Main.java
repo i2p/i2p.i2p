@@ -7,6 +7,7 @@ package net.i2p.desktopgui;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import java.awt.GraphicsEnvironment;
 
 import net.i2p.I2PAppContext;
 import net.i2p.desktopgui.router.RouterManager;
@@ -54,7 +55,21 @@ public class Main {
      * Main method launching the application.
      */
     public static void beginStartup(String[] args) {
-        System.setProperty("java.awt.headless", "false");
+        boolean wasHeadless = Boolean.valueOf(System.getProperty("java.awt.headless")).booleanValue();
+        if(wasHeadless) {
+            System.setProperty("java.awt.headless", "false");
+        }
+        boolean headless_check = true;
+        try {
+            // X permissions error is a java.lang.InternalError (a Throwable)
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            headless_check = ge.isHeadlessInstance();
+        } catch (Throwable t) {}
+        if (wasHeadless)
+            System.setProperty("java.awt.headless", "true");
+        if (headless_check) {
+            return;
+        }
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException ex) {
@@ -87,6 +102,7 @@ public class Main {
             }
             
         });
+
     }
     
     /**
