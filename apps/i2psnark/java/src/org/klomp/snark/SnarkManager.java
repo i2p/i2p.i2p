@@ -750,8 +750,7 @@ public class SnarkManager implements Snark.CompleteListener {
      *                 Must be a filesystem-safe name.
      * @since 0.8.4
      */
-    private void locked_writeMetaInfo(MetaInfo metainfo, String filename) throws IOException {
-        // prevent interference by DirMonitor
+    private static void locked_writeMetaInfo(MetaInfo metainfo, String filename) throws IOException {
         File file = new File(filename);
         if (file.exists())
             throw new IOException("Cannot overwrite an existing .torrent file: " + file.getPath());
@@ -1313,7 +1312,6 @@ public class SnarkManager implements Snark.CompleteListener {
                 if ( (snark != null) && (!snark.isStopped()) )
                     snark.stopTorrent();
             }
-//save magnets
         }
     }
 }

@@ -1,7 +1,6 @@
 package org.klomp.snark.dht;
 
 /*
- *  Copyright 2010 zzz (zzz@mail.i2p)
  *  GPLv2
  */
 

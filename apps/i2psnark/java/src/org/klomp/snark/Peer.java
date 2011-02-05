@@ -79,6 +79,8 @@ public class Peer implements Comparable
   static final long OPTION_EXTENSION = 0x0000000000100000l;
   static final long OPTION_FAST      = 0x0000000000000004l;
   static final long OPTION_DHT       = 0x0000000000000001l;
+  /** we use a different bit since the compact format is different */
+  static final long OPTION_I2P_DHT   = 0x0000000040000000l;
   static final long OPTION_AZMP      = 0x1000000000000000l;
   private long options;
 
@@ -269,7 +271,7 @@ public class Peer implements Comparable
             out.sendExtension(0, ExtensionHandler.getHandshake(metasize));
         }
 
-        if ((options & OPTION_DHT) != 0 && util.getDHT() != null) {
+        if ((options & OPTION_I2P_DHT) != 0 && util.getDHT() != null) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Peer supports DHT, sending PORT message");
             int port = util.getDHT().getPort();
@@ -327,8 +329,11 @@ public class Peer implements Comparable
     dout.write(19);
     dout.write("BitTorrent protocol".getBytes("UTF-8"));
     // Handshake write - options
-    // FIXME not if DHT disabled
-    dout.writeLong(OPTION_EXTENSION | OPTION_DHT);
+    long myOptions = OPTION_EXTENSION;
+    // FIXME get util here somehow
+    //if (util.getDHT() != null)
+    //    myOptions |= OPTION_I2P_DHT;
+    dout.writeLong(myOptions);
     // Handshake write - metainfo hash
     dout.write(infohash);
     // Handshake write - peer id
