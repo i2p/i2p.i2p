@@ -27,14 +27,23 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
+import net.i2p.data.Destination;
+import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer2;
+
+import org.klomp.snark.bencode.BEValue;
+import org.klomp.snark.bencode.InvalidBEncodingException;
+import org.klomp.snark.dht.DHT;
 
 /**
  * Coordinates what peer does what.
@@ -42,18 +51,35 @@ import net.i2p.util.SimpleTimer2;
 public class PeerCoordinator implements PeerListener
 {
   private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(PeerCoordinator.class);
-  final MetaInfo metainfo;
-  final Storage storage;
-  final Snark snark;
+
+  /**
+   * External use by PeerMonitorTask only.
+   * Will be null when in magnet mode.
+   */
+  MetaInfo metainfo;
+
+  /**
+   * External use by PeerMonitorTask only.
+   * Will be null when in magnet mode.
+   */
+  Storage storage;
+  private final Snark snark;
 
   // package local for access by CheckDownLoadersTask
   final static long CHECK_PERIOD = 40*1000; // 40 seconds
   final static int MAX_UPLOADERS = 6;
 
-  // Approximation of the number of current uploaders.
-  // Resynced by PeerChecker once in a while.
-  int uploaders = 0;
-  int interestedAndChoking = 0;
+  /**
+   * Approximation of the number of current uploaders.
+   * Resynced by PeerChecker once in a while.
+   * External use by PeerCheckerTask only.
+   */
+  int uploaders;
+
+  /**
+   * External use by PeerCheckerTask only.
+   */
+  int interestedAndChoking;
 
   // final static int MAX_DOWNLOADERS = MAX_CONNECTIONS;
   // int downloaders = 0;
@@ -61,19 +87,29 @@ public class PeerCoordinator implements PeerListener
   private long uploaded;
   private long downloaded;
   final static int RATE_DEPTH = 3; // make following arrays RATE_DEPTH long
-  private long uploaded_old[] = {-1,-1,-1};
-  private long downloaded_old[] = {-1,-1,-1};
+  private final long uploaded_old[] = {-1,-1,-1};
+  private final long downloaded_old[] = {-1,-1,-1};
 
-  // synchronize on this when changing peers or downloaders
-  // This is a Queue, not a Set, because PeerCheckerTask keeps things in order for choking/unchoking
+  /**
+   * synchronize on this when changing peers or downloaders.
+   * This is a Queue, not a Set, because PeerCheckerTask keeps things in order for choking/unchoking.
+   * External use by PeerMonitorTask only.
+   */
   final Queue<Peer> peers;
+
+  /**
+   * Peers we heard about via PEX
+   */
+  private final Set<PeerID> pexPeers;
+
   /** estimate of the peers, without requiring any synchronization */
-  volatile int peerCount;
+  private volatile int peerCount;
 
   /** Timer to handle all periodical tasks. */
   private final CheckEvent timer;
 
   private final byte[] id;
+  private final byte[] infohash;
 
   /** The wanted pieces. We could use a TreeSet but we'd have to clear and re-add everything
    *  when priorities change.
@@ -85,18 +121,21 @@ public class PeerCoordinator implements PeerListener
 
   private boolean halted = false;
 
+  private final MagnetState magnetState;
   private final CoordinatorListener listener;
-  public I2PSnarkUtil _util;
+  private final I2PSnarkUtil _util;
   private static final Random _random = I2PAppContext.getGlobalContext().random();
   
-  public String trackerProblems = null;
-  public int trackerSeenPeers = 0;
-
-  public PeerCoordinator(I2PSnarkUtil util, byte[] id, MetaInfo metainfo, Storage storage,
+  /**
+   *  @param metainfo null if in magnet mode
+   *  @param storage null if in magnet mode
+   */
+  public PeerCoordinator(I2PSnarkUtil util, byte[] id, byte[] infohash, MetaInfo metainfo, Storage storage,
                          CoordinatorListener listener, Snark torrent)
   {
     _util = util;
     this.id = id;
+    this.infohash = infohash;
     this.metainfo = metainfo;
     this.storage = storage;
     this.listener = listener;
@@ -106,6 +145,8 @@ public class PeerCoordinator implements PeerListener
     setWantedPieces();
     partialPieces = new ArrayList(getMaxConnections() + 1);
     peers = new LinkedBlockingQueue();
+    magnetState = new MagnetState(infohash, metainfo);
+    pexPeers = new ConcurrentHashSet();
 
     // Install a timer to check the uploaders.
     // Randomize the first start time so multiple tasks are spread out,
@@ -133,6 +174,8 @@ public class PeerCoordinator implements PeerListener
   // only called externally from Storage after the double-check fails
   public void setWantedPieces()
   {
+    if (metainfo == null || storage == null)
+        return;
     // Make a list of pieces
       synchronized(wantedPieces) {
           wantedPieces.clear();
@@ -153,7 +196,6 @@ public class PeerCoordinator implements PeerListener
   }
 
   public Storage getStorage() { return storage; }
-  public CoordinatorListener getListener() { return listener; }
 
   // for web page detailed stats
   public List<Peer> peerList()
@@ -166,8 +208,16 @@ public class PeerCoordinator implements PeerListener
     return id;
   }
 
+  public String getName()
+  {
+    return snark.getName();
+  }
+
   public boolean completed()
   {
+    // FIXME return metainfo complete status
+    if (storage == null)
+        return false;
     return storage.complete();
   }
 
@@ -184,9 +234,12 @@ public class PeerCoordinator implements PeerListener
 
   /**
    * Returns how many bytes are still needed to get the complete file.
+   * @return -1 if in magnet mode
    */
   public long getLeft()
   {
+    if (metainfo == null | storage == null)
+        return -1;
     // XXX - Only an approximation.
     return ((long) storage.needed()) * metainfo.getPieceLength(0);
   }
@@ -271,6 +324,12 @@ public class PeerCoordinator implements PeerListener
     return metainfo;
   }
 
+  /** @since 0.8.4 */
+  public byte[] getInfoHash()
+  {
+    return infohash;
+  }
+
   public boolean needPeers()
   {
         return !halted && peers.size() < getMaxConnections();
@@ -281,6 +340,8 @@ public class PeerCoordinator implements PeerListener
    *  @return 512K: 16; 1M: 11; 2M: 6
    */
   private int getMaxConnections() {
+    if (metainfo == null)
+        return 6;
     int size = metainfo.getPieceLength(0);
     int max = _util.getMaxConnections();
     if (size <= 512*1024 || completed())
@@ -355,8 +416,15 @@ public class PeerCoordinator implements PeerListener
           }
         else
           {
-            if (_log.shouldLog(Log.INFO))
-              _log.info("New connection to peer: " + peer + " for " + metainfo.getName());
+            if (_log.shouldLog(Log.INFO)) {
+                // just for logging
+                String name;
+                if (metainfo == null)
+                    name = "Magnet";
+                else
+                    name = metainfo.getName();
+               _log.info("New connection to peer: " + peer + " for " + name);
+            }
 
             // Add it to the beginning of the list.
             // And try to optimistically make it a uploader.
@@ -415,17 +483,27 @@ public class PeerCoordinator implements PeerListener
 
     if (need_more)
       {
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Adding a peer " + peer.getPeerID().toString() + " for " + metainfo.getName(), new Exception("add/run"));
-
+        if (_log.shouldLog(Log.DEBUG)) {
+            // just for logging
+            String name;
+            if (metainfo == null)
+                name = "Magnet";
+            else
+                name = metainfo.getName();
+            _log.debug("Adding a peer " + peer.getPeerID().toString() + " for " + name, new Exception("add/run"));
+        }
         // Run the peer with us as listener and the current bitfield.
         final PeerListener listener = this;
-        final BitField bitfield = storage.getBitField();
+        final BitField bitfield;
+        if (storage != null)
+            bitfield = storage.getBitField();
+        else
+            bitfield = null;
         Runnable r = new Runnable()
           {
             public void run()
             {
-              peer.runConnection(_util, listener, bitfield);
+              peer.runConnection(_util, listener, bitfield, magnetState);
             }
           };
         String threadName = "Snark peer " + peer.toString();
@@ -484,11 +562,6 @@ public class PeerCoordinator implements PeerListener
             peerCount = peers.size();
           }
         interestedAndChoking = count;
-  }
-
-  public byte[] getBitMap()
-  {
-    return storage.getBitField().getFieldBytes();
   }
 
   /**
@@ -647,6 +720,8 @@ public class PeerCoordinator implements PeerListener
    *  @since 0.8.1
    */
   public void updatePiecePriorities() {
+      if (storage == null)
+          return;
       int[] pri = storage.getPiecePriorities();
       if (pri == null) {
           _log.debug("Updated piece priorities called but no priorities to set?");
@@ -713,6 +788,8 @@ public class PeerCoordinator implements PeerListener
   {
     if (halted)
       return null;
+    if (metainfo == null || storage == null)
+        return null;
 
     try
       {
@@ -755,6 +832,8 @@ public class PeerCoordinator implements PeerListener
    */
   public boolean gotPiece(Peer peer, int piece, byte[] bs)
   {
+    if (metainfo == null || storage == null)
+        return true;
     if (halted) {
       _log.info("Got while-halted piece " + piece + "/" + metainfo.getPieces() +" from " + peer + " for " + metainfo.getName());
       return true; // We don't actually care anymore.
@@ -951,6 +1030,8 @@ public class PeerCoordinator implements PeerListener
    *  @since 0.8.2
    */
   public PartialPiece getPartialPiece(Peer peer, BitField havePieces) {
+      if (metainfo == null)
+          return null;
       synchronized(wantedPieces) {
           // sorts by remaining bytes, least first
           Collections.sort(partialPieces);
@@ -1057,6 +1138,107 @@ public class PeerCoordinator implements PeerListener
       }
   }
 
+  /**
+   *  PeerListener callback
+   *  @since 0.8.4
+   */
+  public void gotExtension(Peer peer, int id, byte[] bs) {
+      if (_log.shouldLog(Log.DEBUG))
+          _log.debug("Got extension message " + id + " from " + peer);
+      // basic handling done in PeerState... here we just check if we are done
+      if (metainfo == null && id == ExtensionHandler.ID_METADATA) {
+          synchronized (magnetState) {
+              if (magnetState.isComplete()) {
+                  if (_log.shouldLog(Log.WARN))
+                      _log.warn("Got completed metainfo via extension");
+                  metainfo = magnetState.getMetaInfo();
+                  listener.gotMetaInfo(this, metainfo);
+              }
+          }
+      } else if (id == ExtensionHandler.ID_HANDSHAKE) {
+          sendPeers(peer);
+      }
+  }
+
+  /**
+   *  Send a PEX message to the peer, if he supports PEX.
+   *  This just sends everybody we are connected to, we don't
+   *  track new vs. old peers yet.
+   *  @since 0.8.4
+   */
+  void sendPeers(Peer peer) {
+      Map<String, BEValue> handshake = peer.getHandshakeMap();
+      if (handshake == null)
+          return;
+      BEValue bev = handshake.get("m");
+      if (bev == null)
+          return;
+      try {
+          if (bev.getMap().get(ExtensionHandler.TYPE_PEX) != null) {
+              List<Peer> pList = peerList();
+              pList.remove(peer);
+              if (!pList.isEmpty())
+                  ExtensionHandler.sendPEX(peer, pList);
+          }
+      } catch (InvalidBEncodingException ibee) {}
+  }
+
+  /**
+   *  Sets the storage after transition out of magnet mode
+   *  Snark calls this after we call gotMetaInfo()
+   *  @since 0.8.4
+   */
+  public void setStorage(Storage stg) {
+      storage = stg;
+      setWantedPieces();
+      // ok we should be in business
+      for (Peer p : peers) {
+          p.setMetaInfo(metainfo);
+      }
+  }
+
+  /**
+   *  PeerListener callback
+   *  Tell the DHT to ping it, this will get back the node info
+   *  @since 0.8.4
+   */
+  public void gotPort(Peer peer, int port) {
+      DHT dht = _util.getDHT();
+      if (dht != null)
+          dht.ping(peer.getDestination(), port);
+  }
+
+  /**
+   *  PeerListener callback
+   *  @since 0.8.4
+   */
+  public void gotPeers(Peer peer, List<PeerID> peers) {
+      if (completed() || !needPeers())
+          return;
+      Destination myDest = _util.getMyDestination();
+      if (myDest == null)
+          return;
+      byte[] myHash = myDest.calculateHash().getData();
+      List<Peer> pList = peerList();
+      for (PeerID id : peers) {
+           if (peerIDInList(id, pList) != null)
+               continue;
+           if (DataHelper.eq(myHash, id.getDestHash()))
+               continue;
+           pexPeers.add(id);
+      }
+      // TrackerClient will poll for pexPeers and do the add in its thread,
+      // rather than running another thread here.
+  }
+
+  /**
+   *  Called by TrackerClient
+   *  @since 0.8.4
+   */
+  Set<PeerID> getPEXPeers() {
+      return pexPeers;
+  }
+
   /** Return number of allowed uploaders for this torrent.
    ** Check with Snark to see if we are over the total upload limit.
    */
@@ -1070,6 +1252,14 @@ public class PeerCoordinator implements PeerListener
         return uploaders + 1;
     else
         return MAX_UPLOADERS;
+  }
+
+  /**
+   *  @return current
+   *  @since 0.8.4
+   */
+  public int getUploaders() {
+      return uploaders;
   }
 
   public boolean overUpBWLimit()
