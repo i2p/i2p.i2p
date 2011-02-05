@@ -1,3 +1,31 @@
+2011-02-05 zzz
+    * .mtn-ignore: New, to make it harder to check in stuff you shouldn't
+    * BOB: Drop checked-in build dir
+    * i2psnark:
+      - Big refactor to support torrents where only the infohash is known
+        (i.e., added by magnet links)
+      - Big refactor to use accessors instead of public fields
+      - Add support for metadata transfer (BEP 9) via the
+        extension protocol (BEP 10)
+      - Add support for adding torrents via standard magnet links (BEP 9)
+        and "maggot" links (http://sponge.i2p/files/maggotspec.txt)
+      - Add support for peer exchange (i2p_pex)
+      - Add stubs for future DHT support (BEP 5)
+      - Add more information on torrent details page;
+        add details page for single-file torrents
+      - Make filename filtering consistent (ticket #368)
+      - Fix add-torrent locking (ticket #371)
+      - Fix opentracker configuration
+      - Add several connect-to-self checks
+      - Add support for using new I2CP bandwidth limiter
+      - Add support for using new in-session I2CP naming lookups
+      - Don't expire outbound Piece messages, since we now defer loading the
+        data from disk
+    * i2ptunnel:
+      - Change connect proxy default to outproxy2.h2ik.i2p
+      - IRCClient: Use tunnel log instance
+      - Server: Full queue log tweak
+
 2011-02-03 zzz
     * Build:
       - Remove dup flag files (ticket #316)
