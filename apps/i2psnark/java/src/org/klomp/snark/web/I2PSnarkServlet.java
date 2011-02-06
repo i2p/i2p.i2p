@@ -1409,13 +1409,13 @@ public class I2PSnarkServlet extends Default {
             ihash = url.substring(MAGNET.length()).trim();
             int amp = ihash.indexOf('&');
             if (amp >= 0)
-                ihash = url.substring(0, amp);
+                ihash = ihash.substring(0, amp);
             name = "Magnet " + ihash;
         } else if (url.startsWith(MAGGOT)) {
             ihash = url.substring(MAGGOT.length()).trim();
             int col = ihash.indexOf(':');
             if (col >= 0)
-                ihash = url.substring(0, col);
+                ihash = ihash.substring(0, col);
             name = "Maggot " + ihash;
         } else {
             return;

@@ -1,3 +1,6 @@
+2011-02-06 zzz
+    * i2psnark: Fix maggot links, and magnet links with trailing parameters (thx user)
+
 2011-02-05 zzz
     * .mtn-ignore: New, to make it harder to check in stuff you shouldn't
     * BOB: Drop checked-in build dir
