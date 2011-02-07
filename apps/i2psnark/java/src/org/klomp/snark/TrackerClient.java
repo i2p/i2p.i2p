@@ -34,8 +34,11 @@ import java.util.Random;
 import java.util.Set;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.Hash;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
+
+import org.klomp.snark.dht.DHT;
 
 /**
  * Informs metainfo tracker of events and gets new peers for peer
@@ -63,6 +66,7 @@ public class TrackerClient extends I2PAppThread
   private I2PSnarkUtil _util;
   private final MetaInfo meta;
   private final PeerCoordinator coordinator;
+  private final Snark snark;
   private final int port;
 
   private boolean stop;
@@ -70,15 +74,19 @@ public class TrackerClient extends I2PAppThread
 
   private List trackers;
 
-  public TrackerClient(I2PSnarkUtil util, MetaInfo meta, PeerCoordinator coordinator)
+  /**
+   * @param meta null if in magnet mode
+   */
+  public TrackerClient(I2PSnarkUtil util, MetaInfo meta, PeerCoordinator coordinator, Snark snark)
   {
     super();
     // Set unique name.
-    String id = urlencode(coordinator.getID());
+    String id = urlencode(snark.getID());
     setName("TrackerClient " + id.substring(id.length() - 12));
     _util = util;
     this.meta = meta;
     this.coordinator = coordinator;
+    this.snark = snark;
 
     this.port = 6881; //(port == -1) ? 9 : port;
 
@@ -118,11 +126,10 @@ public class TrackerClient extends I2PAppThread
     @Override
   public void run()
   {
-    String infoHash = urlencode(meta.getInfoHash());
-    String peerID = urlencode(coordinator.getID());
+    String infoHash = urlencode(snark.getInfoHash());
+    String peerID = urlencode(snark.getID());
 
-    _log.debug("Announce: [" + meta.getAnnounce() + "] infoHash: " + infoHash);
-    
+
     // Construct the list of trackers for this torrent,
     // starting with the primary one listed in the metainfo,
     // followed by the secondary open trackers
@@ -130,12 +137,18 @@ public class TrackerClient extends I2PAppThread
     // the primary tracker, that we don't add it twice.
     // todo: check for b32 matches as well
     trackers = new ArrayList(2);
-    String primary = meta.getAnnounce();
-    if (isValidAnnounce(primary)) {
-        trackers.add(new Tracker(meta.getAnnounce(), true));
-    } else {
-        _log.warn("Skipping invalid or non-i2p announce: " + primary);
+    String primary = null;
+    if (meta != null) {
+        primary = meta.getAnnounce();
+        if (isValidAnnounce(primary)) {
+            trackers.add(new Tracker(meta.getAnnounce(), true));
+            _log.debug("Announce: [" + primary + "] infoHash: " + infoHash);
+        } else {
+            _log.warn("Skipping invalid or non-i2p announce: " + primary);
+        }
     }
+    if (primary == null)
+        primary = "";
     List tlist = _util.getOpenTrackers();
     if (tlist != null) {
         for (int i = 0; i < tlist.size(); i++) {
@@ -160,15 +173,17 @@ public class TrackerClient extends I2PAppThread
                 continue;
              if (primary.startsWith("http://i2p/" + dest))
                 continue;
-             trackers.add(new Tracker(url, false));
+             // opentrackers are primary if we don't have primary
+             trackers.add(new Tracker(url, primary.equals("")));
              _log.debug("Additional announce: [" + url + "] for infoHash: " + infoHash);
         }
     }
 
-    if (tlist.isEmpty()) {
+    if (trackers.isEmpty()) {
         // FIXME really need to get this message to the gui
         stop = true;
         _log.error("No valid trackers for infoHash: " + infoHash);
+        // FIXME keep going if DHT enabled
         return;
     }
 
@@ -188,6 +203,9 @@ public class TrackerClient extends I2PAppThread
         Random r = I2PAppContext.getGlobalContext().random();
         while(!stop)
           {
+            // Local DHT tracker announce
+            if (_util.getDHT() != null)
+                _util.getDHT().announce(snark.getInfoHash());
             try
               {
                 // Sleep some minutes...
@@ -200,7 +218,7 @@ public class TrackerClient extends I2PAppThread
                   firstTime = false;
                 } else if (completed && runStarted)
                   delay = 3*SLEEP*60*1000 + random;
-                else if (coordinator.trackerProblems != null && ++consecutiveFails < MAX_CONSEC_FAILS)
+                else if (snark.getTrackerProblems() != null && ++consecutiveFails < MAX_CONSEC_FAILS)
                   delay = INITIAL_SLEEP;
                 else
                   // sleep a while, when we wake up we will contact only the trackers whose intervals have passed
@@ -221,7 +239,7 @@ public class TrackerClient extends I2PAppThread
             
             uploaded = coordinator.getUploaded();
             downloaded = coordinator.getDownloaded();
-            left = coordinator.getLeft();
+            left = coordinator.getLeft();   // -1 in magnet mode
             
             // First time we got a complete download?
             String event;
@@ -251,7 +269,7 @@ public class TrackerClient extends I2PAppThread
                                                  uploaded, downloaded, left,
                                                  event);
 
-                    coordinator.trackerProblems = null;
+                    snark.setTrackerProblems(null);
                     tr.trackerProblems = null;
                     tr.registerFails = 0;
                     tr.consecutiveFails = 0;
@@ -260,24 +278,30 @@ public class TrackerClient extends I2PAppThread
                     runStarted = true;
                     tr.started = true;
 
-                    Set peers = info.getPeers();
+                    Set<Peer> peers = info.getPeers();
                     tr.seenPeers = info.getPeerCount();
-                    if (coordinator.trackerSeenPeers < tr.seenPeers) // update rising number quickly
-                        coordinator.trackerSeenPeers = tr.seenPeers;
-                    if ( (left > 0) && (!completed) ) {
+                    if (snark.getTrackerSeenPeers() < tr.seenPeers) // update rising number quickly
+                        snark.setTrackerSeenPeers(tr.seenPeers);
+
+                    // pass everybody over to our tracker
+                    if (_util.getDHT() != null) {
+                        for (Peer peer : peers) {
+                            _util.getDHT().announce(snark.getInfoHash(), peer.getPeerID().getDestHash());
+                        }
+                    }
+
+                    if ( (left != 0) && (!completed) ) {
                         // we only want to talk to new people if we need things
                         // from them (duh)
-                        List ordered = new ArrayList(peers);
+                        List<Peer> ordered = new ArrayList(peers);
                         Collections.shuffle(ordered, r);
-                        Iterator it = ordered.iterator();
+                        Iterator<Peer> it = ordered.iterator();
                         while ((!stop) && it.hasNext()) {
-                          Peer cur = (Peer)it.next();
+                          Peer cur = it.next();
                           // FIXME if id == us || dest == us continue;
                           // only delay if we actually make an attempt to add peer
-                          if(coordinator.addPeer(cur)) {
-                            int delay = DELAY_MUL;
-                            delay *= r.nextInt(10);
-                            delay += DELAY_MIN;
+                          if(coordinator.addPeer(cur) && it.hasNext()) {
+                            int delay = (DELAY_MUL * r.nextInt(10)) + DELAY_MIN;
                             sleptTime += delay;
                             try { Thread.sleep(delay); } catch (InterruptedException ie) {}
                           }
@@ -293,12 +317,12 @@ public class TrackerClient extends I2PAppThread
                     tr.trackerProblems = ioe.getMessage();
                     // don't show secondary tracker problems to the user
                     if (tr.isPrimary)
-                      coordinator.trackerProblems = tr.trackerProblems;
+                      snark.setTrackerProblems(tr.trackerProblems);
                     if (tr.trackerProblems.toLowerCase().startsWith(NOT_REGISTERED)) {
                       // Give a guy some time to register it if using opentrackers too
                       if (trackers.size() == 1) {
                         stop = true;
-                        coordinator.snark.stopTorrent();
+                        snark.stopTorrent();
                       } else { // hopefully each on the opentrackers list is really open
                         if (tr.registerFails++ > MAX_REGISTER_FAILS)
                           tr.stop = true;
@@ -315,8 +339,66 @@ public class TrackerClient extends I2PAppThread
                   maxSeenPeers = tr.seenPeers;
             }  // *** end of trackers loop here
 
+            // Get peers from PEX
+            if (left > 0 && coordinator.needPeers() && !stop) {
+                Set<PeerID> pids = coordinator.getPEXPeers();
+                if (!pids.isEmpty()) {
+                    _util.debug("Got " + pids.size() + " from PEX", Snark.INFO);
+                    List<Peer> peers = new ArrayList(pids.size());
+                    for (PeerID pID : pids) {
+                        peers.add(new Peer(pID, snark.getID(), snark.getInfoHash(), snark.getMetaInfo()));
+                    }
+                    Collections.shuffle(peers, r);
+                    Iterator<Peer> it = peers.iterator();
+                    while ((!stop) && it.hasNext()) {
+                        Peer cur = it.next();
+                        if (coordinator.addPeer(cur) && it.hasNext()) {
+                            int delay = (DELAY_MUL * r.nextInt(10)) + DELAY_MIN;
+                            try { Thread.sleep(delay); } catch (InterruptedException ie) {}
+                         }
+                    }
+                }
+            }
+
+            // Get peers from DHT
+            // FIXME this needs to be in its own thread
+            if (_util.getDHT() != null && !stop) {
+                int numwant;
+                if (left == 0 || event.equals(STOPPED_EVENT) || !coordinator.needPeers())
+                    numwant = 1;
+                else
+                    numwant = _util.getMaxConnections();
+                List<Hash> hashes = _util.getDHT().getPeers(snark.getInfoHash(), numwant, 2*60*1000);
+                _util.debug("Got " + hashes + " from DHT", Snark.INFO);
+                // announce  ourselves while the token is still good
+                // FIXME this needs to be in its own thread
+                if (!stop) {
+                    int good = _util.getDHT().announce(snark.getInfoHash(), 8, 5*60*1000);
+                    _util.debug("Sent " + good + " good announces to DHT", Snark.INFO);
+                }
+
+                // now try these peers
+                if ((!stop) && !hashes.isEmpty()) {
+                    List<Peer> peers = new ArrayList(hashes.size());
+                    for (Hash h : hashes) {
+                        PeerID pID = new PeerID(h.getData());
+                        peers.add(new Peer(pID, snark.getID(), snark.getInfoHash(), snark.getMetaInfo()));
+                    }
+                    Collections.shuffle(peers, r);
+                    Iterator<Peer> it = peers.iterator();
+                    while ((!stop) && it.hasNext()) {
+                        Peer cur = it.next();
+                        if (coordinator.addPeer(cur) && it.hasNext()) {
+                            int delay = (DELAY_MUL * r.nextInt(10)) + DELAY_MIN;
+                            try { Thread.sleep(delay); } catch (InterruptedException ie) {}
+                         }
+                    }
+                }
+            }
+
+
             // we could try and total the unique peers but that's too hard for now
-            coordinator.trackerSeenPeers = maxSeenPeers;
+            snark.setTrackerSeenPeers(maxSeenPeers);
             if (!runStarted)
                 _util.debug("         Retrying in one minute...", Snark.DEBUG);
           } // *** end of while loop
@@ -329,6 +411,9 @@ public class TrackerClient extends I2PAppThread
       }
     finally
       {
+        // Local DHT tracker unannounce
+        if (_util.getDHT() != null)
+            _util.getDHT().unannounce(snark.getInfoHash());
         try
           {
             // try to contact everybody we can
@@ -351,6 +436,8 @@ public class TrackerClient extends I2PAppThread
                                 long downloaded, long left, String event)
     throws IOException
   {
+    // What do we send for left in magnet mode? Can we omit it?
+    long tleft = left >= 0 ? left : 1;
     String s = tr.announce
       + "?info_hash=" + infoHash
       + "&peer_id=" + peerID
@@ -358,10 +445,10 @@ public class TrackerClient extends I2PAppThread
       + "&ip=" + _util.getOurIPString() + ".i2p"
       + "&uploaded=" + uploaded
       + "&downloaded=" + downloaded
-      + "&left=" + left
+      + "&left=" + tleft
       + "&compact=1"   // NOTE: opentracker will return 400 for &compact alone
       + ((! event.equals(NO_EVENT)) ? ("&event=" + event) : "");
-    if (left <= 0 || event.equals(STOPPED_EVENT) || !coordinator.needPeers())
+    if (left == 0 || event.equals(STOPPED_EVENT) || !coordinator.needPeers())
         s += "&numwant=0";
     else
         s += "&numwant=" + _util.getMaxConnections();
@@ -377,8 +464,8 @@ public class TrackerClient extends I2PAppThread
     try {
         in = new FileInputStream(fetched);
 
-        TrackerInfo info = new TrackerInfo(in, coordinator.getID(),
-                                           coordinator.getMetaInfo());
+        TrackerInfo info = new TrackerInfo(in, snark.getID(),
+                                           snark.getInfoHash(), snark.getMetaInfo());
         _util.debug("TrackerClient response: " + info, Snark.INFO);
 
         String failure = info.getFailureReason();

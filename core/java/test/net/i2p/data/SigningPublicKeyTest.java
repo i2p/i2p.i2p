@@ -66,14 +66,17 @@ public class SigningPublicKeyTest extends StructureTest {
         byte data[] = new byte[56];
         for (int i = 0; i < data.length; i++)
             data[i] = (byte)(i);
-        publicKey.setData(data);
         
         boolean error = false;
         try{
+            publicKey.setData(data);
             publicKey.writeBytes(new ByteArrayOutputStream());
         }catch(DataFormatException dfe){
             error = true;
+        }catch(IllegalArgumentException exc) {
+            error = true;
         }
+        
         assertTrue(error);
     }
     

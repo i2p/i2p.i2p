@@ -89,9 +89,9 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
             i2ps = createI2PSocket(clientDest);
             i2ps.setReadTimeout(readTimeout);
             StringBuffer expectedPong = new StringBuffer();
-            Thread in = new I2PAppThread(new IrcInboundFilter(s,i2ps, expectedPong), "IRC Client " + __clientId + " in", true);
+            Thread in = new I2PAppThread(new IrcInboundFilter(s,i2ps, expectedPong, _log), "IRC Client " + __clientId + " in", true);
             in.start();
-            Thread out = new I2PAppThread(new IrcOutboundFilter(s,i2ps, expectedPong), "IRC Client " + __clientId + " out", true);
+            Thread out = new I2PAppThread(new IrcOutboundFilter(s,i2ps, expectedPong, _log), "IRC Client " + __clientId + " out", true);
             out.start();
         } catch (Exception ex) {
             if (_log.shouldLog(Log.ERROR))
@@ -128,13 +128,13 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
         private Socket local;
         private I2PSocket remote;
         private StringBuffer expectedPong;
-        // shadows _log in super()
-        private final Log _log = new Log(I2PTunnelIRCClient.class);
+        private final Log _log;
                 
-        public IrcInboundFilter(Socket _local, I2PSocket _remote, StringBuffer pong) {
+        public IrcInboundFilter(Socket _local, I2PSocket _remote, StringBuffer pong, Log log) {
             local=_local;
             remote=_remote;
             expectedPong=pong;
+            _log = log;
         }
 
         public void run() {
@@ -207,13 +207,13 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
             private Socket local;
             private I2PSocket remote;
             private StringBuffer expectedPong;
-            // shadows _log in super()
-            private final Log _log = new Log(I2PTunnelIRCClient.class);
+            private final Log _log;
                 
-            public IrcOutboundFilter(Socket _local, I2PSocket _remote, StringBuffer pong) {
+            public IrcOutboundFilter(Socket _local, I2PSocket _remote, StringBuffer pong, Log log) {
                 local=_local;
                 remote=_remote;
                 expectedPong=pong;
+                _log = log;
             }
                 
             public void run() {

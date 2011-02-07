@@ -302,9 +302,10 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                          try {
                              i2ps.close();
                          } catch (IOException ioe) {}
-                         if (open && _log.shouldLog(Log.ERROR))
-                             _log.error("ServerHandler queue full for " + remoteHost + ':' + remotePort +
-                                        "; increase " + PROP_HANDLER_COUNT + '?', ree);
+                         if (open)
+                             _log.logAlways(Log.WARN, "ServerHandler queue full, dropping incoming connection to " +
+                                        remoteHost + ':' + remotePort +
+                                        "; increase server max threads or " + PROP_HANDLER_COUNT);
                     }
                 } else {
                     // use only for standard servers that can't get slowlorissed! Not for http or irc
