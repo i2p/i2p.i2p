@@ -53,7 +53,15 @@
         </cobertura-instrument>
     </target>
     <target name="test" depends="clean, compileTest, prepareTest">
-        <junit printsummary="on" fork="yes">
+        <delete>
+            <fileset dir="../../reports/core/junit">
+                <include name="TEST-*.xml"/>
+            </fileset>
+        </delete>
+        <mkdir dir="../../reports/" />
+        <mkdir dir="../../reports/core/" />
+        <mkdir dir="../../reports/core/junit/" />
+        <junit printsummary="on" fork="yes" maxmemory="384m">
             <sysproperty key="net.sourceforge.cobertura.datafile" file="./cobertura.ser" />
             <classpath>
                 <pathelement path="${classpath}" />
@@ -62,7 +70,7 @@
                 <pathelement location="../../installer/lib/jbigi/jbigi.jar" />
                 <pathelement location="${with.cobertura}" />
             </classpath>
-            <batchtest>
+            <batchtest todir="../../reports/core/junit/">
                 <fileset dir="./test/">
                     <include name="**/*Test.java" />
                     <exclude name="**/ElGamalAESEngineTest.java" />
@@ -71,24 +79,6 @@
             </batchtest>
             <formatter type="xml"/>
         </junit>
-        <mkdir dir="../../reports/" />
-        <mkdir dir="../../reports/core/" />
-        <mkdir dir="../../reports/core/junit/" />
-        <delete>
-            <fileset dir="../../reports/core/junit">
-                <include name="TEST-*.xml"/>
-            </fileset>
-        </delete>
-        <copy todir="../../reports/core/junit">
-            <fileset dir=".">
-                <include name="TEST-*.xml"/>
-            </fileset>
-        </copy>
-        <delete>
-            <fileset dir=".">
-                <include name="TEST-*.xml"/>
-            </fileset>
-        </delete>
     </target>
     <target name="cobertura" depends="test" if="with.cobertura">
         <mkdir dir="../../reports/core/cobertura" />
