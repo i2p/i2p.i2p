@@ -1381,7 +1381,7 @@ public class I2PSnarkServlet extends Default {
         }
         out.write("<tr><td>");
         out.write(_("I2CP options"));
-        out.write(": <td><textarea name=\"i2cpOpts\" cols=\"60\" rows=\"1\" wrap=\"off\" >"
+        out.write(": <td><textarea name=\"i2cpOpts\" cols=\"60\" rows=\"1\" wrap=\"off\" spellcheck=\"false\" >"
                   + opts.toString() + "</textarea><br>\n");
 
         out.write("<tr><td>&nbsp;<td><input type=\"submit\" value=\"");
@@ -1833,7 +1833,8 @@ public class I2PSnarkServlet extends Default {
             icon = "html";
         else if (mime.equals("text/plain") || plc.endsWith(".nfo"))
             icon = "page";
-        else if (mime.equals("application/java-archive") || plc.endsWith(".war"))
+        else if (mime.equals("application/java-archive") || plc.endsWith(".war") ||
+                 plc.endsWith(".deb"))
             icon = "package";
         else if (plc.endsWith(".xpi2p"))
             icon = "plugin";

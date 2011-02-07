@@ -1,3 +1,11 @@
+2011-02-07 zzz
+    * i2psnark:
+      - Check for dup magnet torrent when adding torrent file
+      - Add exotrack.i2p (ticket #403)
+      - Disable spellcheck in textarea
+    * i2ptunnel: Generate error message when i2ptunnel.config save fails
+                 (ticket #404)
+
 2011-02-06 zzz
     * i2psnark: Fix maggot links, and magnet links with trailing parameters (thx user)
 
