@@ -65,7 +65,7 @@ import net.metanotion.util.skiplist.SkipList;
  * </pre>
  *
  */
-public class BlockfileNamingService extends NamingService {
+public class BlockfileNamingService extends DummyNamingService {
 
     private final Log _log;
     private final BlockFile _bf;
@@ -77,7 +77,6 @@ public class BlockfileNamingService extends NamingService {
     private static final Serializer _stringSerializer = new StringSerializer();
     private static final Serializer _destSerializer = new DestEntrySerializer();
 
-    private static final int BASE32_HASH_LENGTH = 52;   // 1 + Hash.HASH_LENGTH * 8 / 5
     private static final String HOSTS_DB = "hostsdb.blockfile";
     private static final String PROP_HOSTS_FILE = "i2p.hostsfilelist";
     private static final String PROP_B32 = "i2p.naming.hostsTxt.useB32";
@@ -178,8 +177,11 @@ public class BlockfileNamingService extends NamingService {
                         if (split <= 0)
                             continue;
                         String key = line.substring(0, split).toLowerCase();
-                        if (line.indexOf('#') > 0)  // trim off any end of line comment
+                        if (line.indexOf('#') > 0)  { // trim off any end of line comment
                             line = line.substring(0, line.indexOf('#')).trim();
+                            if (line.length() < split + 1)
+                                continue;
+                        }
                         String b64 = line.substring(split+1);   //.trim() ??????????????
                         Destination d = lookupBase64(b64);
                         if (d != null) {
@@ -193,7 +195,7 @@ public class BlockfileNamingService extends NamingService {
                     if (in != null) try { in.close(); } catch (IOException ioe) {}
                 }
                 total += count;
-                _log.error("Added " + count + " hosts from " + file);
+                _log.logAlways(Log.INFO, "Added " + count + " hosts from " + file);
                 _lists.add(hostsfile);
             }
             _log.error("DB init took " + DataHelper.formatDuration(_context.clock().now() - start));
@@ -342,27 +344,9 @@ public class BlockfileNamingService extends NamingService {
     
     @Override
     public Destination lookup(String hostname) {
-        Destination d = getCache(hostname);
+        Destination d = super.lookup(hostname);
         if (d != null)
             return d;
-
-        // If it's long, assume it's a key.
-        if (hostname.length() >= 516) {
-            d = lookupBase64(hostname);
-            // What the heck, cache these too
-            putCache(hostname, d);
-            return d;
-        }
-
-        // Try Base32 decoding
-        if (hostname.length() == BASE32_HASH_LENGTH + 8 && hostname.endsWith(".b32.i2p") &&
-            Boolean.valueOf(_context.getProperty(PROP_B32, "true")).booleanValue()) {
-            d = LookupDest.lookupBase32Hash(_context, hostname.substring(0, BASE32_HASH_LENGTH));
-            if (d != null) {
-                putCache(hostname, d);
-                return d;
-            }
-        }
 
         String key = hostname.toLowerCase();
         synchronized(_bf) {
@@ -504,7 +488,6 @@ public class BlockfileNamingService extends NamingService {
 
     public static void main(String[] args) {
         BlockfileNamingService bns = new BlockfileNamingService(I2PAppContext.getGlobalContext());
-        //System.out.println("zzz.i2p: " + bns._lists.get(2).get("zzz.i2p"));
         System.out.println("zzz.i2p: " + bns.lookup("zzz.i2p"));
         List<String> names = null;
         try {
@@ -531,9 +514,6 @@ public class BlockfileNamingService extends NamingService {
         }
         System.out.println("BFNS took " + DataHelper.formatDuration(System.currentTimeMillis() - start));
         System.out.println("found " + found + " notfound " + notfound);
-synchronized(bns) {
-try { bns.wait(); } catch (InterruptedException ie) {}
-}
         bns.close();
 
         HostsTxtNamingService htns = new HostsTxtNamingService(I2PAppContext.getGlobalContext());

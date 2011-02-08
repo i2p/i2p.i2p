@@ -96,7 +96,7 @@ public abstract class NamingService {
             Constructor con = cls.getConstructor(new Class[] { I2PAppContext.class });
             instance = (NamingService)con.newInstance(new Object[] { context });
         } catch (Exception ex) {
-            _log.error("Cannot loadNaming service implementation", ex);
+            _log.error("Cannot load naming service " + impl, ex);
             instance = new DummyNamingService(context); // fallback
         }
         return instance;
