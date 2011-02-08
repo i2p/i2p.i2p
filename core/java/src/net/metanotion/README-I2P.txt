@@ -25,6 +25,9 @@ Changes for i2p:
 
 - Commented out some System.out.println()
 
+- Convert Errors without message or cause to RuntimeExceptions with a message and cause
+
+
 TODO:
 
 - Change PAGESIZE from default 1024 to 4096? No, wastes too much disk.

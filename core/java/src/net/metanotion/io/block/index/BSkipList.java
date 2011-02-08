@@ -53,7 +53,7 @@ public class BSkipList extends SkipList {
 	}
 
 	public BSkipList(int spanSize, BlockFile bf, int skipPage, Serializer key, Serializer val, boolean fileOnly) throws IOException {
-		if(spanSize < 1) { throw new Error("Span size too small"); }
+		if(spanSize < 1) { throw new RuntimeException("Span size too small"); }
 
 		this.skipPage = skipPage;
 		this.bf = bf;
@@ -88,7 +88,7 @@ public class BSkipList extends SkipList {
 			bf.file.writeInt(size);
 			bf.file.writeInt(spans);
 			
-		} catch (IOException ioe) { throw new Error(); }
+		} catch (IOException ioe) { throw new RuntimeException("Error writing to database", ioe); }
 	}
 
 	public void delete() throws IOException {

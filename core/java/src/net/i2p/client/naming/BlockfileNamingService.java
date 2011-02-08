@@ -202,10 +202,7 @@ public class BlockfileNamingService extends DummyNamingService {
             if (total <= 0)
                 _log.error("Warning - initialized database with zero entries");
             return rv;
-        } catch (IOException e) {
-            throw e;
-        } catch (Error e) {
-            // blockfile noxiously converts IOEs to Errors with no message
+        } catch (RuntimeException e) {
             throw new IOException(e.toString());
         }
     }
@@ -247,10 +244,7 @@ public class BlockfileNamingService extends DummyNamingService {
             _lists.addAll(skiplists);
             _log.error("DB init took " + DataHelper.formatDuration(_context.clock().now() - start));
             return bf;
-        } catch (IOException e) {
-            throw e;
-        } catch (Error e) {
-            // blockfile noxiously converts IOEs to Errors with no message
+        } catch (RuntimeException e) {
             throw new IOException(e.toString());
         }
     }
@@ -272,8 +266,7 @@ public class BlockfileNamingService extends DummyNamingService {
             _log.error("DB Lookup error", ioe);
             // delete index??
             throw ioe;
-        } catch (Error e) {
-            // blockfile noxiously converts IOEs to Errors with no message
+        } catch (RuntimeException e) {
             _log.error("DB Lookup error", e);
             throw new IOException(e.toString());
         }
@@ -302,8 +295,7 @@ public class BlockfileNamingService extends DummyNamingService {
             _log.error("DB add error", ioe);
             // delete index??
             throw ioe;
-        } catch (Error e) {
-            // blockfile noxiously converts IOEs to Errors with no message
+        } catch (RuntimeException e) {
             _log.error("DB add error", e);
             throw new IOException(e.toString());
         }
@@ -312,7 +304,7 @@ public class BlockfileNamingService extends DummyNamingService {
     /**
      *  Caller must synchronize
      *  @param source may be null
-     *  @throws Error
+     *  @throws RuntimeException
      */
     private void addEntry(SkipList sl, String key, Destination dest, String source) {
         Properties props = new Properties();
@@ -325,7 +317,7 @@ public class BlockfileNamingService extends DummyNamingService {
     /**
      *  Caller must synchronize
      *  @param props may be null
-     *  @throws Error
+     *  @throws RuntimeException
      */
     private static void addEntry(SkipList sl, String key, Destination dest, Properties props) {
         DestEntry de = new DestEntry();
@@ -374,7 +366,7 @@ public class BlockfileNamingService extends DummyNamingService {
             try {
                 _bf.close();
             } catch (IOException ioe) {
-            } catch (Error e) {
+            } catch (RuntimeException e) {
             }
             try {
                 _raf.close();
@@ -488,7 +480,7 @@ public class BlockfileNamingService extends DummyNamingService {
 
     public static void main(String[] args) {
         BlockfileNamingService bns = new BlockfileNamingService(I2PAppContext.getGlobalContext());
-        System.out.println("zzz.i2p: " + bns.lookup("zzz.i2p"));
+        //System.out.println("zzz.i2p: " + bns.lookup("zzz.i2p"));
         List<String> names = null;
         try {
             Properties props = new Properties();

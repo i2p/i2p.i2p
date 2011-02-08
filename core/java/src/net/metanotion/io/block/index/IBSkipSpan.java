@@ -69,7 +69,7 @@ public class IBSkipSpan extends BSkipSpan {
 			rv.keys = new Comparable[bf.spanSize];
 			rv.vals = new Object[bf.spanSize];
 			return rv;
-		} catch (IOException ioe) { throw new Error(ioe); }
+		} catch (IOException ioe) { throw new RuntimeException("Error creating database page", ioe); }
 	}
 
 	/**
@@ -247,7 +247,7 @@ public class IBSkipSpan extends BSkipSpan {
 		try {
 			seekAndLoadData();
 		} catch (IOException ioe) {
-			throw new Error(ioe);
+			throw new RuntimeException("Error reading database", ioe);
 		}
 		SkipSpan rv = super.getSpan(key, search);
 		this.keys = null;
@@ -266,7 +266,7 @@ public class IBSkipSpan extends BSkipSpan {
 				return next.get(key);
 			return getData(key);
 		} catch (IOException ioe) {
-			throw new Error(ioe);
+			throw new RuntimeException("Error reading database", ioe);
 		}
 	}
 
@@ -278,7 +278,7 @@ public class IBSkipSpan extends BSkipSpan {
 		try {
 			seekAndLoadData();
 		} catch (IOException ioe) {
-			throw new Error(ioe);
+			throw new RuntimeException("Error reading database", ioe);
 		}
 		SkipSpan rv = super.put(key, val, sl);
 		// flush() nulls out the data
@@ -293,7 +293,7 @@ public class IBSkipSpan extends BSkipSpan {
 		try {
 			seekAndLoadData();
 		} catch (IOException ioe) {
-			throw new Error(ioe);
+			throw new RuntimeException("Error reading database", ioe);
 		}
 		Object[] rv = super.remove(key, sl);
 		// flush() nulls out the data

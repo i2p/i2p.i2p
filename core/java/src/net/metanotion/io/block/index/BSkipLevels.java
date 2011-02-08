@@ -91,13 +91,13 @@ public class BSkipLevels extends SkipLevels {
 				if(levels[i]==null) { break; }
 				bf.file.writeInt(((BSkipLevels) levels[i]).levelPage);
 			}
-		} catch (IOException ioe) { throw new Error(); }
+		} catch (IOException ioe) { throw new RuntimeException("Error writing to database", ioe); }
 	}
 
 	public void killInstance() {
 		try {
 			bf.freePage(levelPage);
-		} catch (IOException ioe) { throw new Error(); }
+		} catch (IOException ioe) { throw new RuntimeException("Error freeing database page", ioe); }
 	}
 
 	public SkipLevels newInstance(int levels, SkipSpan ss, SkipList sl) {
@@ -107,6 +107,6 @@ public class BSkipLevels extends SkipLevels {
 			int page = bf.allocPage();
 			BSkipLevels.init(bf, page, bss.page, levels);
 			return new BSkipLevels(bf, page, bsl);
-		} catch (IOException ioe) { throw new Error(); }
+		} catch (IOException ioe) { throw new RuntimeException("Error creating database page", ioe); }
 	}
 }

@@ -65,7 +65,7 @@ public class BSkipSpan extends SkipSpan {
 			int newPage = bf.allocPage();
 			init(bf, newPage, bf.spanSize);
 			return new BSkipSpan(bf, (BSkipList) sl, newPage, keySer, valSer);
-		} catch (IOException ioe) { throw new Error(); }
+		} catch (IOException ioe) { throw new RuntimeException("Error creating database page", ioe); }
 	}
 
 	public void killInstance() {
@@ -79,7 +79,7 @@ public class BSkipSpan extends SkipSpan {
 				curPage = next;
 			}
 			bf.freePage(page);
-		} catch(IOException ioe) { throw new Error(); }
+		} catch (IOException ioe) { throw new RuntimeException("Error freeing database page", ioe); }
 	}
 
 	public void flush() {
@@ -124,7 +124,7 @@ public class BSkipSpan extends SkipSpan {
 			}
 			BlockFile.pageSeek(bf.file, this.page);
 			this.overflowPage = bf.file.readInt();
-		} catch(IOException ioe) { throw new Error(); }
+		} catch (IOException ioe) { throw new RuntimeException("Error writing to database", ioe); }
 	}
 
 	private static void load(BSkipSpan bss, BlockFile bf, BSkipList bsl, int spanPage, Serializer key, Serializer val) throws IOException {
