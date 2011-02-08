@@ -48,6 +48,9 @@ public class BSkipSpan extends SkipSpan {
 	protected Serializer keySer;
 	protected Serializer valSer;
 
+	// I2P
+	protected int spanSize;
+
 	public static void init(BlockFile bf, int page, int spanSize) throws IOException {
 		BlockFile.pageSeek(bf.file, page);
 		bf.file.writeInt(0);
@@ -125,6 +128,15 @@ public class BSkipSpan extends SkipSpan {
 	}
 
 	private static void load(BSkipSpan bss, BlockFile bf, BSkipList bsl, int spanPage, Serializer key, Serializer val) throws IOException {
+		loadInit(bss, bf, bsl, spanPage, key, val);
+		loadData(bss, bf, spanPage, key, val);
+	}
+
+	/**
+	 * I2P - first half of load()
+	 * Only read the span headers
+	 */
+	protected static void loadInit(BSkipSpan bss, BlockFile bf, BSkipList bsl, int spanPage, Serializer key, Serializer val) throws IOException {
 		bss.bf = bf;
 		bss.page = spanPage;
 		bss.keySer = key;
@@ -137,11 +149,17 @@ public class BSkipSpan extends SkipSpan {
 		bss.overflowPage = bf.file.readInt();
 		bss.prevPage = bf.file.readInt();
 		bss.nextPage = bf.file.readInt();
-		int sz = bf.file.readShort();
+		bss.spanSize = bf.file.readShort();
 		bss.nKeys = bf.file.readShort();
+	}
 
-		bss.keys = new Comparable[sz];
-		bss.vals = new Object[sz];
+	/**
+	 * I2P - second half of load()
+	 * Load the whole span's keys and values into memory
+	 */
+	protected static void loadData(BSkipSpan bss, BlockFile bf, int spanPage, Serializer key, Serializer val) throws IOException {
+		bss.keys = new Comparable[bss.spanSize];
+		bss.vals = new Object[bss.spanSize];
 
 		int ksz, vsz;
 		int curPage = spanPage;

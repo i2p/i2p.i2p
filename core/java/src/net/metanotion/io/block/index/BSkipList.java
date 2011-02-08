@@ -47,7 +47,12 @@ public class BSkipList extends SkipList {
 	public HashMap levelHash = new HashMap();
 
 	protected BSkipList() { }
+
 	public BSkipList(int spanSize, BlockFile bf, int skipPage, Serializer key, Serializer val) throws IOException {
+		this(spanSize, bf, skipPage, key, val, false);
+	}
+
+	public BSkipList(int spanSize, BlockFile bf, int skipPage, Serializer key, Serializer val, boolean fileOnly) throws IOException {
 		if(spanSize < 1) { throw new Error("Span size too small"); }
 
 		this.skipPage = skipPage;
@@ -58,15 +63,18 @@ public class BSkipList extends SkipList {
 		firstLevelPage = bf.file.readInt();
 		size = bf.file.readInt();
 		spans = bf.file.readInt();
-		System.out.println(size + " " + spans); 
+		//System.out.println(size + " " + spans); 
 
-		first = new BSkipSpan(bf, this, firstSpanPage, key, val);
+		if (fileOnly)
+			first = new IBSkipSpan(bf, this, firstSpanPage, key, val);
+		else
+			first = new BSkipSpan(bf, this, firstSpanPage, key, val);
 		stack = new BSkipLevels(bf, firstLevelPage, this);
-		rng = new Random(System.currentTimeMillis());
+		//rng = new Random(System.currentTimeMillis());
 	}
 
 	public void close() {
-		System.out.println("Closing index " + size + " and " + spans);
+		//System.out.println("Closing index " + size + " and " + spans);
 		flush();
 		first = null;
 		stack = null;

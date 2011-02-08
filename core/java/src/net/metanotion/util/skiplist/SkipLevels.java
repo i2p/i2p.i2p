@@ -81,7 +81,7 @@ public class SkipLevels {
 		return bottom.getSpan(key, search);
 	}
 
-	public Comparable key() { return bottom.keys[0]; }
+	public Comparable key() { return bottom.firstKey(); }
 
 	public Object get(int start, Comparable key) {
 		for(int i=Math.min(start, levels.length - 1);i>=0;i--) {

@@ -183,7 +183,7 @@ public class SkipSpan {
 		if(loc < 0) {
 			loc = -1 * (loc + 1);
 			if(next != null) {
-				int cmp = next.keys[0].compareTo(key);
+				int cmp = next.firstKey().compareTo(key);
 				if((loc >= nKeys) && (cmp > 0)) {
 					// It fits in between this span and the next
 					// Try to avoid a split...
@@ -263,5 +263,10 @@ public class SkipSpan {
 			this.flush();
 		}
 		return res;
+	}
+
+	/** I2P */
+	public Comparable firstKey() {
+		return keys[0];
 	}
 }

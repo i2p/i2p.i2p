@@ -30,10 +30,13 @@ package net.metanotion.util.skiplist;
 
 import java.util.Random;
 
+import net.i2p.util.RandomSource;
+
 public class SkipList {
 	protected SkipSpan first;
 	protected SkipLevels stack;
-	public Random rng;
+	// I2P mod
+	public static final Random rng = RandomSource.getInstance();
 
 	public int size=0;
 	public int spans=0;
@@ -46,7 +49,7 @@ public class SkipList {
 		first = new SkipSpan(span);
 		stack = new SkipLevels(1, first);
 		spans = 1;
-		rng = new Random(System.currentTimeMillis());
+		//rng = new Random(System.currentTimeMillis());
 	}
 
 	public int size() { return size; }

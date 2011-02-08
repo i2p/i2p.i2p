@@ -44,6 +44,7 @@ import net.metanotion.io.data.NullBytes;
 import net.metanotion.io.data.StringBytes;
 
 import net.metanotion.io.block.index.BSkipList;
+import net.metanotion.util.skiplist.SkipList;
 
 class CorruptFileException extends IOException { }
 class BadFileFormatException extends IOException { }
@@ -59,7 +60,7 @@ public class BlockFile {
 	private long fileLen = PAGESIZE * 2;
 	private int freeListStart = 0;
 	private short mounted = 0;
-	public short spanSize = 127;
+	public short spanSize = 16;
 
 	private BSkipList metaIndex = null;
 	private HashMap openIndices = new HashMap();
@@ -246,9 +247,14 @@ public class BlockFile {
 	}
 
 	public BSkipList getIndex(String name, Serializer key, Serializer val) throws IOException {
+		// added I2P
+		BSkipList bsl = (BSkipList) openIndices.get(name);
+		if (bsl != null)
+			return bsl;
+
 		Integer page = (Integer) metaIndex.get(name);
 		if (page == null) { return null; }
-		BSkipList bsl = new BSkipList(spanSize, this, page.intValue(), key, val);
+		bsl = new BSkipList(spanSize, this, page.intValue(), key, val, true);
 		openIndices.put(name, bsl);
 		return bsl;
 	}
@@ -258,7 +264,7 @@ public class BlockFile {
 		int page = allocPage();
 		metaIndex.put(name, new Integer(page));
 		BSkipList.init(this, page, spanSize);
-		BSkipList bsl = new BSkipList(spanSize, this, page, key, val);
+		BSkipList bsl = new BSkipList(spanSize, this, page, key, val, true);
 		openIndices.put(name, bsl);
 		return bsl;
 	}
@@ -267,11 +273,28 @@ public class BlockFile {
 		Integer page = (Integer) metaIndex.remove(name);
 		if (page == null) { return; }
 		NullBytes nb = new NullBytes();
-		BSkipList bsl = new BSkipList(spanSize, this, page.intValue(), nb, nb);
+		BSkipList bsl = new BSkipList(spanSize, this, page.intValue(), nb, nb, true);
 		bsl.delete();
 	}
 
+	/**
+	 *  Added I2P
+	 */
+	public void closeIndex(String name) {
+		BSkipList bsl = (BSkipList) openIndices.remove(name);
+		if (bsl != null)
+			bsl.flush();
+	}
+
+	/**
+	 *  Note (I2P)
+         *  Does NOT close the RAF / RAI.
+	 */
 	public void close() throws IOException {
+		// added I2P
+		if (metaIndex == null)
+			return;
+
 		metaIndex.close();
 		metaIndex = null;
 
