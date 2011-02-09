@@ -9,9 +9,11 @@ if not exist ..\locale\*.only goto updateALL
 
 rem put a messages_xx.only(eg messages_zh.only) into locale folder
 rem this script will only touch the po file(eg zh) you specified, leaving other po files untact.
-
+echo [tip] Puting a messages_{LangCode}.only (eg messages_zh.only) 
+echo   into locale folder will restrict the PO file update
+echo   process to your choosen language ONLY.
 for %%i in (..\locale\*.only) do set PO=%%~ni
-echo [Notice] Yu choose to Ony update the choosen file: %PO%.po 
+echo [info] %PO%.only found, will ONLY update file : %PO%.po
 for %%i in (..\locale\*.po) do if not %%~ni==%PO% ren %%i %%~ni.po-
 
 call sh --login %cd%\bmsg.sh

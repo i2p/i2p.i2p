@@ -45,7 +45,11 @@
         <exec executable="sh" osfamily="mac" failifexecutionfails="true" >
             <arg value="./bundle-messages.sh" />
         </exec>
-
+        <exec executable="cmd" osfamily="windows" failifexecutionfails="true" >
+            <arg value="/c" />
+			<!-- no leading ./ here, windoz complains about it. -->
+            <arg value="bundle-messages.bat" />
+        </exec>
 		<jar basedir="${build}" destfile="${dist}/${jar}">
 			<manifest>
 				<attribute name="Main-Class" value="net.i2p.desktopgui.Main"/>
@@ -76,6 +80,12 @@
         </exec>
         <exec executable="sh" osfamily="mac" failifexecutionfails="true" >
             <arg value="./bundle-messages.sh" />
+            <arg value="-p" />
+        </exec>
+        <exec executable="cmd" osfamily="windows" failifexecutionfails="true" >
+            <arg value="/c" />
+			<!-- no leading ./ here, windoz complains about it. -->
+            <arg value="bundle-messages.bat" />
             <arg value="-p" />
         </exec>
     </target>

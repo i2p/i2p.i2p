@@ -6,32 +6,32 @@ msgstr ""
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: src/net/i2p/desktopgui/ExternalTrayManager.java:23
 msgid "Start I2P"
-msgstr "I2P starten"
+msgstr "启动 I2P"
 
 #: src/net/i2p/desktopgui/ExternalTrayManager.java:38
 msgid "I2P is starting!"
-msgstr "I2P is aan het starten!"
+msgstr "正在启动 I2P !"
 
 #: src/net/i2p/desktopgui/ExternalTrayManager.java:38
 msgid "Starting"
-msgstr "Bezig met starten"
+msgstr "正在启动"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:25
 msgid "Launch I2P Browser"
-msgstr "Start I2P Browser"
+msgstr "正在启动I2P浏览器"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:49
 msgid "Restart I2P"
-msgstr "I2P herstarten"
+msgstr "重启 I2P"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:67
 msgid "Stop I2P"
-msgstr "I2P stoppen"
+msgstr "停止 I2P"
 
 #~ msgid "Browser not found"
 #~ msgstr "Browser niet gevonden"
