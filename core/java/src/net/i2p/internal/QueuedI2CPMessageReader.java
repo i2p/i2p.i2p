@@ -11,11 +11,13 @@ import net.i2p.util.I2PThread;
  * @since 0.8.3
  */
 public class QueuedI2CPMessageReader extends I2CPMessageReader {
-    private final I2CPMessageQueue in;
+    private /* final */ I2CPMessageQueue in;
 
     public QueuedI2CPMessageReader(I2CPMessageQueue in, I2CPMessageEventListener lsnr) {
         super(lsnr);
         this.in = in;
+        _reader = null;
+        _readerThread = null;
         _reader = new QueuedI2CPMessageReaderRunner();
         _readerThread = new I2PThread(_reader, "I2CP Internal Reader " + (++__readerId), true);
     }
@@ -57,6 +59,10 @@ public class QueuedI2CPMessageReader extends I2CPMessageReader {
                     }
                 }
             }
+            super.run(); // Since we are dead, this will do some clean up, nothing else :-)
+            in = null;
+            _readerThread = null;
+            _reader = null;
         }
     }
 }

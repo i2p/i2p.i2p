@@ -120,6 +120,7 @@ public class BOB {
 	public final static String PROP_CONFIG_LOCATION = "BOB.config";
 	public final static String PROP_BOB_PORT = "BOB.port";
 	public final static String PROP_BOB_HOST = "BOB.host";
+	public final static String PROP_CFG_VER = "BOB.CFG.VER";
 	private static NamedDB database;
 	private static Properties props = new Properties();
 	private static AtomicBoolean spin = new AtomicBoolean(true);
@@ -209,30 +210,41 @@ public class BOB {
 			// Global router and client API configurations that are missing are set to defaults here.
 			if (!props.containsKey(I2PClient.PROP_TCP_HOST)) {
 				props.setProperty(I2PClient.PROP_TCP_HOST, "localhost");
+				save = true;
 			}
 			if (!props.containsKey(I2PClient.PROP_TCP_PORT)) {
 				props.setProperty(I2PClient.PROP_TCP_PORT, "7654");
-			}
-			if (!props.containsKey(I2PClient.PROP_RELIABILITY)) {
-				props.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_BEST_EFFORT);
+				save = true;
 			}
 			if (!props.containsKey(PROP_BOB_PORT)) {
 				props.setProperty(PROP_BOB_PORT, "2827"); // 0xB0B
+				save = true;
 			}
 			if (!props.containsKey("inbound.length")) {
 				props.setProperty("inbound.length", "1");
+				save = true;
 			}
 			if (!props.containsKey("outbound.length")) {
 				props.setProperty("outbound.length", "1");
+				save = true;
 			}
 			if (!props.containsKey("inbound.lengthVariance")) {
 				props.setProperty("inbound.lengthVariance", "0");
+				save = true;
 			}
 			if (!props.containsKey("outbound.lengthVariance")) {
 				props.setProperty("outbound.lengthVariance", "0");
+				save = true;
 			}
 			if (!props.containsKey(PROP_BOB_HOST)) {
 				props.setProperty(PROP_BOB_HOST, "localhost");
+				save = true;
+			}
+			// PROP_RELIABILITY_NONE, PROP_RELIABILITY_BEST_EFFORT, PROP_RELIABILITY_GUARANTEED
+			if (!props.containsKey(PROP_CFG_VER)) {
+				props.setProperty(I2PClient.PROP_RELIABILITY, I2PClient.PROP_RELIABILITY_NONE);
+				props.setProperty(PROP_CFG_VER,"1");
+				save = true;
 			}
 			if (save) {
 				File cfg = new File(configLocation);

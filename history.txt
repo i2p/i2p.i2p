@@ -1,3 +1,10 @@
+2011-02-09 sponge
+    * BOB: fixup delivery in config, adds config file versioning.
+    * I2CP: Fix most of the I2CP leaks. Two leaks remain, but they are small.
+            net.i2p.internal.QueuedI2CPMessageReader and
+            net.i2p.router.client.I2CPMessageQueueImpl
+            are the two remaining leaks.
+
 2011-02-07 zzz
     * i2psnark:
       - Check for dup magnet torrent when adding torrent file

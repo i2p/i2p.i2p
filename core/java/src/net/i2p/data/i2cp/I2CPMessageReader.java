@@ -197,6 +197,9 @@ public class I2CPMessageReader {
                 }
             }
             _stream = null;
+            _listener = null;
+            _reader = null;
+            _readerThread = null;
         }
     }
 }
