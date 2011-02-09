@@ -10,7 +10,11 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.zip.GZIPOutputStream;
 
@@ -94,23 +98,24 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             InputStream in = socket.getInputStream();
 
             StringBuilder command = new StringBuilder(128);
-            Properties headers = readHeaders(in, command,
+            Map<String, List<String>> headers = readHeaders(in, command,
                 CLIENT_SKIPHEADERS, getTunnel().getContext());
-            headers.setProperty(HASH_HEADER, socket.getPeerDestination().calculateHash().toBase64());
-            headers.setProperty(DEST32_HEADER, Base32.encode(socket.getPeerDestination().calculateHash().getData()) + ".b32.i2p" );
-            headers.setProperty(DEST64_HEADER, socket.getPeerDestination().toBase64());
+            
+            addEntry(headers, HASH_HEADER, socket.getPeerDestination().calculateHash().toBase64());
+            addEntry(headers, DEST32_HEADER, Base32.encode(socket.getPeerDestination().calculateHash().getData()) + ".b32.i2p");
+            addEntry(headers, DEST64_HEADER, socket.getPeerDestination().toBase64());
 
             if ( (_spoofHost != null) && (_spoofHost.trim().length() > 0) )
-                headers.setProperty("Host", _spoofHost);
-            headers.setProperty("Connection", "close");
+                setEntry(headers, "Host", _spoofHost);
+            setEntry(headers, "Connection", "close");
             // we keep the enc sent by the browser before clobbering it, since it may have 
             // been x-i2p-gzip
-            String enc = headers.getProperty("Accept-encoding");
-            String altEnc = headers.getProperty("X-Accept-encoding");
+            String enc = getEntryOrNull(headers, "Accept-encoding");
+            String altEnc = getEntryOrNull(headers, "X-Accept-encoding");
             
             // according to rfc2616 s14.3, this *should* force identity, even if
             // "identity;q=1, *;q=0" didn't.  
-            headers.setProperty("Accept-encoding", ""); 
+            setEntry(headers, "Accept-encoding", ""); 
             String modifiedHeader = formatHeaders(headers, command);
             
             //String modifiedHeader = getModifiedHeader(socket);
@@ -234,7 +239,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
 
                 //Change headers to protect server identity
                 StringBuilder command = new StringBuilder(128);
-                Properties headers = readHeaders(serverin, command,
+                Map<String, List<String>> headers = readHeaders(serverin, command,
                     SERVER_SKIPHEADERS, _ctx);
                 String modifiedHeaders = formatHeaders(headers, command);
                 compressedOut.write(modifiedHeaders.getBytes());
@@ -360,13 +365,14 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         }
     }
 
-    private static String formatHeaders(Properties headers, StringBuilder command) {
+    private static String formatHeaders(Map<String, List<String>> headers, StringBuilder command) {
         StringBuilder buf = new StringBuilder(command.length() + headers.size() * 64);
         buf.append(command.toString().trim()).append("\r\n");
-        for (Iterator iter = headers.keySet().iterator(); iter.hasNext(); ) {
+        for (Iterator<String> iter = headers.keySet().iterator(); iter.hasNext(); ) {
             String name = (String)iter.next();
-            String val  = headers.getProperty(name);
-            buf.append(name.trim()).append(": ").append(val.trim()).append("\r\n");
+            for(String val: headers.get(name)) {
+                buf.append(name.trim()).append(": ").append(val.trim()).append("\r\n");
+            }
         }
         buf.append("\r\n");
         return buf.toString();
@@ -374,9 +380,46 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     
     /** ridiculously long, just to prevent OOM DOS @since 0.7.13 */
     private static final int MAX_HEADERS = 60;
+    
+    /**
+     * Add an entry to the multimap.
+     */
+    private static void addEntry(Map<String, List<String>> headers, String key, String value) {
+        List<String> entry = headers.get(key);
+        if(entry == null) {
+        	headers.put(key, entry = new ArrayList<String>());
+        }
+        entry.add(value);    	
+    }
+    
+    /**
+     * Remove the other matching entries and set this entry as the only one.
+     */
+    private static void setEntry(Map<String, List<String>> headers, String key, String value) {
+    	List<String> entry = headers.get(key);
+    	if(entry == null) {
+    		headers.put(key, entry = new ArrayList<String>());
+    	}
+    	entry.clear();
+    	entry.add(value);
+    }
+    
+    /**
+     * Get the first matching entry in the multimap
+     * @return the first matching entry or null
+     */
+    private static String getEntryOrNull(Map<String, List<String>> headers, String key) {
+    	List<String> entries = headers.get(key);
+    	if(entries == null || entries.size() < 1) {
+    		return null;
+    	}
+    	else {
+    		return entries.get(0);
+    	}
+    }
 
-    private static Properties readHeaders(InputStream in, StringBuilder command, String[] skipHeaders, I2PAppContext ctx) throws IOException {
-        Properties headers = new Properties();
+    private static Map<String, List<String>> readHeaders(InputStream in, StringBuilder command, String[] skipHeaders, I2PAppContext ctx) throws IOException {
+    	HashMap<String, List<String>> headers = new HashMap<String, List<String>>();
         StringBuilder buf = new StringBuilder(128);
         
         boolean ok = DataHelper.readLine(in, command);
@@ -438,7 +481,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                     continue;
                 }
 
-                headers.setProperty(name, value);
+                addEntry(headers, name, value);
                 //if (_log.shouldLog(Log.DEBUG))
                 //    _log.debug("Read the header [" + name + "] = [" + value + "]");
             }
