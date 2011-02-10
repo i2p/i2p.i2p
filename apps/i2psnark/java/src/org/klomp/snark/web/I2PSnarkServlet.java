@@ -1216,7 +1216,8 @@ public class I2PSnarkServlet extends Default {
         out.write("</option>\n");
         // todo remember this one with _lastAnnounceURL also
         out.write("<option value=\"none\">");
-        out.write(_("Open trackers and DHT only"));
+        //out.write(_("Open trackers and DHT only"));
+        out.write(_("Open trackers only"));
         out.write("</option>\n");
         Map trackers = _manager.getTrackers();
         for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
