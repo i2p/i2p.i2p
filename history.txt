@@ -1,3 +1,6 @@
+2011-02-10 sponge
+    * I2CP: fix NPE in QueuedClientConnectionRunner
+
 2011-02-10 zzz
     * I2CP: Correctly close internal connections on the router side
             when closed by the client, was causing massive memory leak

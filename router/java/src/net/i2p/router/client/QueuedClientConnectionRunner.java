@@ -17,7 +17,7 @@ import net.i2p.util.Log;
  * @since 0.8.3
  */
 class QueuedClientConnectionRunner extends ClientConnectionRunner {
-    private /* final */ I2CPMessageQueue queue;
+    private final I2CPMessageQueue queue;
     
     /**
      * Create a new runner with the given queues
@@ -46,7 +46,7 @@ class QueuedClientConnectionRunner extends ClientConnectionRunner {
     void stopRunning() {
         super.stopRunning();
         queue.close();
-        queue = null;
+        // queue = null;
     }
     
     /**
