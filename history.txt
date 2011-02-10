@@ -1,3 +1,12 @@
+2011-02-10 zzz
+    * I2CP: Correctly close internal connections on the router side
+            when closed by the client, was causing massive memory leak
+            for internal clients using lots of sessions (thanks sponge)
+    * i2psnark:
+      - Improved magnet link parsing, use tr parameter if present
+    * i2ptunnel: Change shared clients default for new clients to false
+    * Streaming: Don't use iter.remove() on a COWAS
+
 2011-02-09 sponge
     * BOB: fixup delivery in config, adds config file versioning.
     * I2CP: Fix most of the I2CP leaks. Two leaks remain, but they are small.

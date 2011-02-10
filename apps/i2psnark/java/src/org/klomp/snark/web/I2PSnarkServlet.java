@@ -65,7 +65,8 @@ public class I2PSnarkServlet extends Default {
     
     public static final String PROP_CONFIG_FILE = "i2psnark.configFile";
     /** BEP 9 */
-    private static final String MAGNET = "magnet:?xt=urn:btih:";
+    private static final String MAGNET = "magnet:";
+    private static final String MAGNET_FULL = MAGNET + "?xt=urn:btih:";
     /** http://sponge.i2p/files/maggotspec.txt */
     private static final String MAGGOT = "maggot://";
  
@@ -1406,13 +1407,22 @@ public class I2PSnarkServlet extends Default {
     private void addMagnet(String url) {
         String ihash;
         String name;
+        String trackerURL = null;
         if (url.startsWith(MAGNET)) {
-            ihash = url.substring(MAGNET.length()).trim();
-            int amp = ihash.indexOf('&');
-            if (amp >= 0)
-                ihash = ihash.substring(0, amp);
+            // magnet:?xt=urn:btih:0691e40aae02e552cfcb57af1dca56214680c0c5&tr=http://tracker2.postman.i2p/announce.php
+            String xt = getParam("xt", url);
+            if (xt == null || !xt.startsWith("urn:btih:")) {
+                _manager.addMessage(_("Invalid magnet URL {0}", url));
+                return;
+            }
+            ihash = xt.substring("urn:btih:".length());
+            trackerURL = getParam("tr", url);
             name = "Magnet " + ihash;
+            String dn = getParam("dn", url);
+            if (dn != null)
+                name += " (" + Storage.filterName(dn) + ')';
         } else if (url.startsWith(MAGGOT)) {
+            // maggot://0691e40aae02e552cfcb57af1dca56214680c0c5:0b557bbdf8718e95d352fbe994dec3a383e2ede7
             ihash = url.substring(MAGGOT.length()).trim();
             int col = ihash.indexOf(':');
             if (col >= 0)
@@ -1439,7 +1449,27 @@ public class I2PSnarkServlet extends Default {
             _manager.addMessage(_("Invalid info hash in magnet URL {0}", url));
             return;
         }
-        _manager.addMagnet(name, ih, true);
+        _manager.addMagnet(name, ih, trackerURL, true);
+    }
+
+    private static String getParam(String key, String uri) {
+        int idx = uri.indexOf('?' + key + '=');
+        if (idx >= 0) {
+            idx += key.length() + 2;
+        } else {
+            idx = uri.indexOf('&' + key + '=');
+            if (idx >= 0)
+                idx += key.length() + 2;
+        }
+        if (idx < 0 || idx > uri.length())
+            return null;
+        String rv = uri.substring(idx);
+        idx = rv.indexOf('&');
+        if (idx >= 0)
+            rv = rv.substring(0, idx);
+        else
+            rv = rv.trim();
+        return rv;
     }
 
     /** copied from ConfigTunnelsHelper */
@@ -1644,8 +1674,8 @@ public class I2PSnarkServlet extends Default {
 
             String hex = I2PSnarkUtil.toHex(snark.getInfoHash());
             buf.append("<br>").append(toImg("magnet", _("Magnet link"))).append(" <a href=\"")
-               .append(MAGNET).append(hex).append("\">")
-               .append(MAGNET).append(hex).append("</a>");
+               .append(MAGNET_FULL).append(hex).append("\">")
+               .append(MAGNET_FULL).append(hex).append("</a>");
             // We don't have the hash of the torrent file
             //buf.append("<br>").append(_("Maggot link")).append(": <a href=\"").append(MAGGOT).append(hex).append(':').append(hex).append("\">")
             //   .append(MAGGOT).append(hex).append(':').append(hex).append("</a>");
