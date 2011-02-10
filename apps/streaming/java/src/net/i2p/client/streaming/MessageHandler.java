@@ -81,8 +81,8 @@ class MessageHandler implements I2PSessionListener {
         for (Iterator<I2PSocketManager.DisconnectListener> iter = _listeners.iterator(); iter.hasNext(); ) {
             I2PSocketManager.DisconnectListener lsnr = iter.next();
             lsnr.sessionDisconnected();
-            iter.remove();
         }
+        _listeners.clear();
     }
 
     /**
