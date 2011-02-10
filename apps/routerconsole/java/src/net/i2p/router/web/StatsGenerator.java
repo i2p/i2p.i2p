@@ -197,9 +197,10 @@ public class StatsGenerator {
                     buf.append("; ");
                 }
 
-                buf.append(ngettext((int) curRate.getLastEventCount(), "There was 1 event", "There were {0} events"));
-                buf.append(' ');
-                buf.append(_("in this period which ended {0} ago.", DataHelper.formatDuration2(now - curRate.getLastCoalesceDate())));
+                // breaking the sentence like before makes translation in my language impossible.
+				buf.append(_("There were {0} event(s) in this period", curRate.getLastEventCount()));
+                // buf.append(' ');
+                buf.append(_(" which ended {0} ago.", DataHelper.formatDuration2(now - curRate.getLastCoalesceDate())));
             } else {
                 buf.append(" <i>").append(_("No events")).append("</i> ");
             }
