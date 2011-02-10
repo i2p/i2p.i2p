@@ -418,7 +418,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     	}
     }
 
-    private static Map<String, List<String>> readHeaders(InputStream in, StringBuilder command, String[] skipHeaders, I2PAppContext ctx) throws IOException {
+    protected static Map<String, List<String>> readHeaders(InputStream in, StringBuilder command, String[] skipHeaders, I2PAppContext ctx) throws IOException {
     	HashMap<String, List<String>> headers = new HashMap<String, List<String>>();
         StringBuilder buf = new StringBuilder(128);
         

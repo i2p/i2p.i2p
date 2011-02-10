@@ -141,6 +141,52 @@
             splitindex="true" 
             windowtitle="I2PTunnel" />
     </target>
+
+    <target name="compileTest">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/obj" />
+        <javac srcdir="./src:./test" debug="true" source="1.5" target="1.5" deprecation="on" destdir="./build/obj" >
+            <compilerarg line="${javac.compilerargs}" />
+            <classpath>
+                <pathelement location="../../../core/java/build/i2p.jar" />
+                <pathelement location="../../ministreaming/java/build/mstreaming.jar" />
+            </classpath>
+        </javac>
+    </target>
+    <target name="test" depends="clean, compileTest">
+        <junit printsummary="on" fork="yes">
+            <classpath>
+                <pathelement path="${classpath}" />
+                <pathelement location="./build/obj" />
+                <pathelement location="../../../core/java/build/i2p.jar" />
+            </classpath>
+            <batchtest>
+                <fileset dir="./test/">
+                    <include name="**/*Test.java" />
+                </fileset>
+            </batchtest>
+            <formatter type="xml"/>
+        </junit>
+        <mkdir dir="../../../reports/" />
+        <mkdir dir="../../../reports/i2ptunnel/" />
+        <mkdir dir="../../../reports/i2ptunnel/junit/" />
+        <delete>
+            <fileset dir="../../../reports/i2ptunnel/junit">
+                <include name="TEST-*.xml"/>
+            </fileset>
+        </delete>
+        <copy todir="../../../reports/i2ptunnel/junit">
+            <fileset dir=".">
+                <include name="TEST-*.xml"/>
+            </fileset>
+        </copy>
+        <delete>
+            <fileset dir=".">
+                <include name="TEST-*.xml"/>
+            </fileset>
+        </delete>
+    </target>
+
     <target name="clean">
         <delete dir="./build" />
         <delete dir="../jsp/WEB-INF/" />
