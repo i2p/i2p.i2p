@@ -365,7 +365,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         }
     }
 
-    private static String formatHeaders(Map<String, List<String>> headers, StringBuilder command) {
+    protected static String formatHeaders(Map<String, List<String>> headers, StringBuilder command) {
         StringBuilder buf = new StringBuilder(command.length() + headers.size() * 64);
         buf.append(command.toString().trim()).append("\r\n");
         for (Iterator<String> iter = headers.keySet().iterator(); iter.hasNext(); ) {

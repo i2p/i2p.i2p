@@ -41,5 +41,21 @@ public class I2PTunnelHTTPServerTest extends TestCase {
 		assertEquals(headers.size(), 1);
 		assertEquals(headers.get("someHeader").size(), 2);
 	}
+	
+	public void testDuplicateHeadersFormat() throws IOException {
+		String headerString = "GET /something HTTP/1.1\r\n";
+		headerString += "abc: def\r\n";
+		headerString += "abc: blaaah\r\n";
+		headerString += "manamana: toe toe toedoedoe\r\n";
+		headerString += "\r\n";
+		InputStream in = fillInputStream(headerString);
+		StringBuilder builder = new StringBuilder(128);
+		Map<String, List<String>> headers = I2PTunnelHTTPServer.readHeaders(in, builder, new String[0], null);
+		String result = I2PTunnelHTTPServer.formatHeaders(headers, builder);
+		int first = result.indexOf("abc");
+		assertTrue(first >= 0);
+		int second = result.indexOf("abc", first);
+		assertTrue(second >= 0);
+	}
 
 }
