@@ -1,3 +1,7 @@
+2011-02-11 Mathiasdm
+    * routerconsole: fixed graphs using jrobin; and headless issue
+          in general: no more switches between headless and non-headless.
+
 2011-02-10 sponge
     * I2CP: fix NPE in QueuedClientConnectionRunner
 
