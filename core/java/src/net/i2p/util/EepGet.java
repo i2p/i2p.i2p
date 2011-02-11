@@ -28,21 +28,21 @@ import net.i2p.util.InternalSocket;
  * Bug: a malformed url http://example.i2p (no trailing '/') fails cryptically
  */
 public class EepGet {
-    protected I2PAppContext _context;
-    protected Log _log;
-    protected boolean _shouldProxy;
-    private String _proxyHost;
-    private int _proxyPort;
-    protected int _numRetries;
-    private long _minSize; // minimum and maximum acceptable response size, -1 signifies unlimited,
-    private long _maxSize; // applied both against whole responses and chunks
-    protected String _outputFile;
-    protected OutputStream _outputStream;
+    protected final I2PAppContext _context;
+    protected final Log _log;
+    protected final boolean _shouldProxy;
+    private final String _proxyHost;
+    private final int _proxyPort;
+    protected final int _numRetries;
+    private final long _minSize; // minimum and maximum acceptable response size, -1 signifies unlimited,
+    private final long _maxSize; // applied both against whole responses and chunks
+    protected final String _outputFile;
+    protected final OutputStream _outputStream;
     /** url we were asked to fetch */
-    protected String _url;
+    protected final String _url;
     /** the URL we actually fetch from (may differ from the _url in case of redirect) */
     protected String _actualURL;
-    private String _postData;
+    private final String _postData;
     private boolean _allowCaching;
     protected final List<StatusListener> _listeners;
     
@@ -106,7 +106,7 @@ public class EepGet {
                   String outputFile, OutputStream outputStream, String url, boolean allowCaching,
                   String etag, String lastModified, String postData) {
         _context = ctx;
-        _log = ctx.logManager().getLog(EepGet.class);
+        _log = ctx.logManager().getLog(getClass());
         _shouldProxy = (proxyHost != null) && (proxyHost.length() > 0) && (proxyPort > 0) && shouldProxy;
         _proxyHost = proxyHost;
         _proxyPort = proxyPort;
@@ -118,13 +118,7 @@ public class EepGet {
         _url = url;
         _actualURL = url;
         _postData = postData;
-        _alreadyTransferred = 0;
-        _bytesTransferred = 0;
         _bytesRemaining = -1;
-        _currentAttempt = 0;
-        _transferFailed = false;
-        _headersRead = false;
-        _aborted = false;
         _fetchHeaderTimeout = CONNECT_TIMEOUT;
         _listeners = new ArrayList(1);
         _etag = etag;
@@ -255,9 +249,9 @@ public class EepGet {
         public void attempting(String url);
     }
     protected class CLIStatusListener implements StatusListener {
-        private int _markSize;
-        private int _lineSize;
-        private long _startedOn;
+        private final int _markSize;
+        private final int _lineSize;
+        private final long _startedOn;
         private long _written;
         private long _previousWritten;
         private long _discarded;
@@ -271,9 +265,6 @@ public class EepGet {
         public CLIStatusListener(int markSize, int lineSize) { 
             _markSize = markSize;
             _lineSize = lineSize;
-            _written = 0;
-            _previousWritten = 0;
-            _discarded = 0;
             _lastComplete = _context.clock().now();
             _startedOn = _lastComplete;
             _firstTime = true;

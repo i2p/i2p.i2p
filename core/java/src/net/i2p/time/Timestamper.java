@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.I2PThread;
@@ -56,7 +57,7 @@ public class Timestamper implements Runnable {
     public Timestamper(I2PAppContext ctx, UpdateListener lsnr, boolean daemon) {
         // moved here to prevent problems with synchronized statements.
         _servers = new ArrayList(3);
-        _listeners = new ArrayList(1);
+        _listeners = new CopyOnWriteArrayList();
         // Don't bother starting a thread if we are disabled.
         // This means we no longer check every 5 minutes to see if we got enabled,
         // so the property must be set at startup.
@@ -92,24 +93,16 @@ public class Timestamper implements Runnable {
     public boolean getIsDisabled() { return _disabled; }
     
     public void addListener(UpdateListener lsnr) {
-        synchronized (_listeners) {
             _listeners.add(lsnr);
-        }
     }
     public void removeListener(UpdateListener lsnr) {
-        synchronized (_listeners) {
             _listeners.remove(lsnr);
-        }
     }
     public int getListenerCount() {
-        synchronized (_listeners) {
             return _listeners.size();
-        }
     }
     public UpdateListener getListener(int index) {
-        synchronized (_listeners) {
             return _listeners.get(index);
-        }
     }
     
     private void startTimestamper() {
@@ -257,11 +250,8 @@ public class Timestamper implements Runnable {
      */
     private void stampTime(long now, int stratum) {
         long before = _context.clock().now();
-        synchronized (_listeners) {
-            for (int i = 0; i < _listeners.size(); i++) {
-                UpdateListener lsnr = _listeners.get(i);
-                lsnr.setNow(now, stratum);
-            }
+        for (UpdateListener lsnr : _listeners) {
+             lsnr.setNow(now, stratum);
         }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Stamped the time as " + now + " (delta=" + (now-before) + ")");

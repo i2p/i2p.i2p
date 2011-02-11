@@ -14,7 +14,10 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
+import net.i2p.router.RouterClock;
 import net.i2p.router.RouterContext;
+import net.i2p.router.util.RFC822Date;
 import net.i2p.util.EepGet;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
@@ -34,6 +37,7 @@ import net.i2p.util.Translate;
  * the router log, and the wrapper log.
  */
 public class Reseeder {
+    /** FIXME don't keep a static reference, store _isRunning some other way */
     private static ReseedRunner _reseedRunner;
     private final RouterContext _context;
     private final Log _log;
@@ -46,6 +50,10 @@ public class Reseeder {
     /**
      *  NOTE - URLs in both the standard and SSL groups should use the same hostname and path,
      *         so the reseed process will not download from both.
+     *
+     *  NOTE - Each seedURL must be a directory, it must end with a '/',
+     *         it can't end with 'index.html', for example. Both because of how individual file
+     *         URLs are constructed, and because SSLEepGet doesn't follow redirects.
      */
     public static final String DEFAULT_SEED_URL =
               "http://a.netdb.i2p2.de/,http://c.netdb.i2p2.de/," +
@@ -98,13 +106,13 @@ public class Reseeder {
         private String _proxyHost;
         private int _proxyPort;
         private SSLEepGet.SSLState _sslState;
+        private int _gotDate;
+        private long _attemptStarted;
+        private static final int MAX_DATE_SETS = 2;
 
         public ReseedRunner() {
-            _isRunning = false; 
-            System.clearProperty(PROP_ERROR);
-            System.setProperty(PROP_STATUS, _("Reseeding"));
-            System.setProperty(PROP_INPROGRESS, "true");
         }
+
         public boolean isRunning() { return _isRunning; }
 
         /*
@@ -113,6 +121,11 @@ public class Reseeder {
          */
         public void run() {
             _isRunning = true;
+            System.clearProperty(PROP_ERROR);
+            System.setProperty(PROP_STATUS, _("Reseeding"));
+            System.setProperty(PROP_INPROGRESS, "true");
+            _attemptStarted = 0;
+            _gotDate = 0;
             _sslState = null;  // start fresh
             if (_context.getBooleanProperty(PROP_PROXY_ENABLE)) {
                 _proxyHost = _context.getProperty(PROP_PROXY_HOST);
@@ -152,8 +165,48 @@ public class Reseeder {
         public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {}
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {}
         public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {}
-        public void headerReceived(String url, int attemptNum, String key, String val) {}
-        public void attempting(String url) {}
+
+        /**
+         *  Use the Date header as a backup time source
+         */
+        public void headerReceived(String url, int attemptNum, String key, String val) {
+            // We do this more than once, because
+            // the first SSL handshake may take a while, and it may take the server
+            // a while to render the index page.
+            if (_gotDate < MAX_DATE_SETS && "date".equalsIgnoreCase(key) && _attemptStarted > 0) {
+                long timeRcvd = System.currentTimeMillis();
+                long serverTime = RFC822Date.parse822Date(val);
+                if (serverTime > 0) {
+                    // add 500ms since it's 1-sec resolution, and add half the RTT
+                    long now = serverTime + 500 + ((timeRcvd - _attemptStarted) / 2);
+                    long offset = now - _context.clock().now();
+                    if (_context.clock().getUpdatedSuccessfully()) {
+                        // 2nd time better than the first
+                        if (_gotDate > 0)
+                            _context.clock().setNow(now, RouterClock.DEFAULT_STRATUM - 2);
+                        else
+                            _context.clock().setNow(now, RouterClock.DEFAULT_STRATUM - 1);
+                        if (_log.shouldLog(Log.WARN))
+                            _log.warn("Reseed adjusting clock by " +
+                                      DataHelper.formatDuration(Math.abs(offset)));
+                    } else {
+                        // No peers or NTP yet, this is probably better than the peer average will be for a while
+                        // default stratum - 1, so the peer average is a worse stratum
+                        _context.clock().setNow(now, RouterClock.DEFAULT_STRATUM - 1);
+                        _log.logAlways(Log.WARN, "NTP failure, Reseed adjusting clock by " +
+                                                 DataHelper.formatDuration(Math.abs(offset)));
+                    }
+                    _gotDate++;
+                }
+            }
+        }
+
+        /** save the start time */
+        public void attempting(String url) {
+            if (_gotDate < MAX_DATE_SETS)
+                _attemptStarted = System.currentTimeMillis();
+        }
+
         // End of EepGet status listeners
 
         /**
@@ -235,7 +288,8 @@ public class Reseeder {
          **/
         private int reseedOne(String seedURL, boolean echoStatus) {
             try {
-                final long timeLimit = _context.clock().now() + MAX_TIME_PER_HOST;
+                // Don't use context clock as we may be adjusting the time
+                final long timeLimit = System.currentTimeMillis() + MAX_TIME_PER_HOST;
                 System.setProperty(PROP_STATUS, _("Reseeding: fetching seed URL."));
                 System.err.println("Reseeding from " + seedURL);
                 URL dir = new URL(seedURL);
@@ -275,7 +329,7 @@ public class Reseeder {
                 int errors = 0;
                 // 200 max from one URL
                 for (Iterator<String> iter = urlList.iterator();
-                     iter.hasNext() && fetched < 200 && _context.clock().now() < timeLimit; ) {
+                     iter.hasNext() && fetched < 200 && System.currentTimeMillis() < timeLimit; ) {
                     try {
                         System.setProperty(PROP_STATUS,
                             _("Reseeding: fetching router info from seed URL ({0} successful, {1} errors).", fetched, errors));

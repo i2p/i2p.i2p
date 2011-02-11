@@ -473,7 +473,7 @@ class PacketHandler {
                 // so we have to wait for NTCP to do it
                 _context.clock().setOffset(0 - skew, true);
                 if (skew != 0)
-                    _log.error("NTP failure, UDP adjusting clock by " + DataHelper.formatDuration(Math.abs(skew)));
+                    _log.logAlways(Log.WARN, "NTP failure, UDP adjusting clock by " + DataHelper.formatDuration(Math.abs(skew)));
             }
 
             if (skew > GRACE_PERIOD) {

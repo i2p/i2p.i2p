@@ -49,14 +49,22 @@ public class Clock implements Timestamper.UpdateListener {
     /** if the clock skewed changes by less than this, ignore the update (so we don't slide all over the place) */
     public final static long MIN_OFFSET_CHANGE = 5 * 1000;
 
+    /**
+     * Specify how far away from the "correct" time the computer is - a positive
+     * value means that the system time is slow, while a negative value means the system time is fast.
+     *
+     * @param offsetMs the delta from System.currentTimeMillis() (NOT the delta from now())
+     */
     public void setOffset(long offsetMs) {
         setOffset(offsetMs, false);        
     }
     
     /**
      * Specify how far away from the "correct" time the computer is - a positive
-     * value means that we are slow, while a negative value means we are fast.
+     * value means that the system time is slow, while a negative value means the system time is fast.
      * Warning - overridden in RouterClock
+     *
+     * @param offsetMs the delta from System.currentTimeMillis() (NOT the delta from now())
      */
     public void setOffset(long offsetMs, boolean force) {
         if (false) return;
@@ -101,6 +109,9 @@ public class Clock implements Timestamper.UpdateListener {
         fireOffsetChanged(delta);
     }
 
+    /*
+     * @return the current delta from System.currentTimeMillis() in milliseconds
+     */
     public long getOffset() {
         return _offset;
     }

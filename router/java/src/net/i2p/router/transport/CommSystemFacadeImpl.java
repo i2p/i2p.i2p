@@ -509,7 +509,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         buf.append("<tt>");
         boolean found = _context.netDb().lookupRouterInfoLocally(peer) != null;
         if (found)
-            buf.append("<a title=\"").append(_("NetDb entry")).append("\" href=\"netdb.jsp?r=").append(h).append("\">");
+            buf.append("<a title=\"").append(_("NetDb entry")).append("\" href=\"netdb?r=").append(h).append("\">");
         buf.append(h);
         if (found)
             buf.append("</a>");
