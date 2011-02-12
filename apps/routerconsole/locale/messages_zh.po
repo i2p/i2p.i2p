@@ -144,7 +144,7 @@ msgstr "拒绝参与共享隧道"
 #: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:105
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:20
 msgid "Reseeding"
-msgstr "正在补种(引导网络启动)..."
+msgstr "网络引导"
 
 #: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:128
 #, java-format
