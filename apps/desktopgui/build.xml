@@ -45,10 +45,8 @@
         <exec executable="sh" osfamily="mac" failifexecutionfails="true" >
             <arg value="./bundle-messages.sh" />
         </exec>
-        <exec executable="cmd" osfamily="windows" failifexecutionfails="true" >
-            <arg value="/c" />
-			<!-- no leading ./ here, windoz complains about it. -->
-            <arg value="bundle-messages.bat" />
+        <exec executable="sh" osfamily="windows" failifexecutionfails="true" >
+            <arg value="./bundle-messages.sh" />
         </exec>
 		<jar basedir="${build}" destfile="${dist}/${jar}">
 			<manifest>
@@ -82,10 +80,8 @@
             <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>
-        <exec executable="cmd" osfamily="windows" failifexecutionfails="true" >
-            <arg value="/c" />
-			<!-- no leading ./ here, windoz complains about it. -->
-            <arg value="bundle-messages.bat" />
+        <exec executable="sh" osfamily="windows" failifexecutionfails="true" >
+            <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>
     </target>

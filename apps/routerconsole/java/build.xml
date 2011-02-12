@@ -80,13 +80,13 @@
 
         <!-- Update the messages_*.po files.
              We need to supply the bat file for windows, and then change the fail property to true -->
-        <exec executable="sh" osfamily="unix" failifexecutionfails="false" >
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" >
             <arg value="./bundle-messages.sh" />
         </exec>
-        <exec executable="sh" osfamily="mac" failifexecutionfails="false" >
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" >
             <arg value="./bundle-messages.sh" />
         </exec>
-        <exec executable="sh" osfamily="windows" failifexecutionfails="false" >
+        <exec executable="sh" osfamily="windows" failifexecutionfails="true" >
             <arg value="./bundle-messages.sh" />
         </exec>
         <!-- jar again to get the latest messages_*.class files -->
