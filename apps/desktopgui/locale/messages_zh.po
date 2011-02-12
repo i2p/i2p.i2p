@@ -1,7 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-02-12 11:40+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -35,6 +36,6 @@ msgstr "停止 I2P"
 
 #~ msgid "Browser not found"
 #~ msgstr "Browser niet gevonden"
+
 #~ msgid "The default browser for your system was not found."
 #~ msgstr "De standaard webbrowser voor je systeem werd niet gevonden."
-

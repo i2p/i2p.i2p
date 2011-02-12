@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-10 09:19+0000\n"
+"POT-Creation-Date: 2011-02-12 11:39+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -3165,6 +3165,7 @@ msgstr "最高均值"
 msgid "There were {0} event(s) in this period"
 msgstr "本周期共有{0}个事件，"
 
+#. buf.append(' ');
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:203
 #, java-format
 msgid " which ended {0} ago."
@@ -4626,7 +4627,7 @@ msgid "All changes require restart to take effect."
 msgstr "所有更改均需要程序重启才能生效。"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:337
-msgid "Client Interface Configuration (Advacned)"
+msgid "Advanced Client Interface Configuration"
 msgstr "客户端接口设置(高级)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:339
@@ -5345,6 +5346,8 @@ msgstr "隧道概况"
 msgid "I2P Tunnel Summary"
 msgstr "I2P 隧道概况"
 
+#~ msgid "Client Interface Configuration (Advacned)"
+#~ msgstr "客户端接口设置(高级)"
 #~ msgid ""
 #~ "Ensure that nothing blocks outbound HTTP, check <a target=\"_top\" href="
 #~ "\"logs.jsp\">logs</a> and if nothing helps, read the <a target=\"_top\" "
