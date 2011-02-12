@@ -97,6 +97,7 @@
     </target>
 
     <target name="buildDesktopGui" depends="buildCore, buildrouter" >
+        <ant dir="apps/desktopgui" target="clean" />
         <ant dir="apps/desktopgui" target="jar" />
     </target>
 
