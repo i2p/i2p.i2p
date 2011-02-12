@@ -86,9 +86,8 @@
         <exec executable="sh" osfamily="mac" failifexecutionfails="false" >
             <arg value="./bundle-messages.sh" />
         </exec>
-        <exec executable="cmd" osfamily="windows" failifexecutionfails="false" >
-            <arg value="/c" />
-            <arg value="bundle-messages.bat" />
+        <exec executable="sh" osfamily="windows" failifexecutionfails="false" >
+            <arg value="./bundle-messages.sh" />
         </exec>
         <!-- jar again to get the latest messages_*.class files -->
         <jar destfile="./build/routerconsole.jar" basedir="./build/obj" includes="**/*.class" update="true" />
@@ -106,9 +105,8 @@
             <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>
-        <exec executable="cmd" osfamily="windows" failifexecutionfails="true" >
-            <arg value="/c" />
-            <arg value="bundle-messages.bat" />
+        <exec executable="sh" osfamily="windows" failifexecutionfails="true" >
+            <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>
     </target>
