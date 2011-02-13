@@ -95,15 +95,19 @@ do
 		touch $i
 	fi
 
-	echo "Generating ${CLASS}_$LG ResourceBundle..."
+    if [ "$LG" != "en" ]
+    then
+        # only generate for non-source language
+        echo "Generating ${CLASS}_$LG ResourceBundle..."
 
-	# convert to class files in build
-	msgfmt --java --statistics -r $CLASS -l $LG -d build $i
-	if [ $? -ne 0 ]
-	then
-		echo 'Warning - msgfmt failed, not updating translations'
-		break
-	fi
+        # convert to class files in build
+        msgfmt --java --statistics -r $CLASS -l $LG -d build $i
+        if [ $? -ne 0 ]
+        then
+            echo 'Warning - msgfmt failed, not updating translations'
+            break
+        fi
+    fi
 done
 rm -f $TMPFILE
 # todo: return failure
