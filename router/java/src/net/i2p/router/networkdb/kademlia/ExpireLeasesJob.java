@@ -9,7 +9,7 @@ package net.i2p.router.networkdb.kademlia;
  */
 
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import net.i2p.data.DatabaseEntry;
@@ -27,8 +27,8 @@ import net.i2p.util.Log;
  *
  */
 class ExpireLeasesJob extends JobImpl {
-    private Log _log;
-    private KademliaNetworkDatabaseFacade _facade;
+    private final Log _log;
+    private final KademliaNetworkDatabaseFacade _facade;
     
     private final static long RERUN_DELAY_MS = 1*60*1000;
     
@@ -39,11 +39,11 @@ class ExpireLeasesJob extends JobImpl {
     }
     
     public String getName() { return "Expire Lease Sets Job"; }
+
     public void runJob() {
-        Set toExpire = selectKeysToExpire();
+        Set<Hash> toExpire = selectKeysToExpire();
         _log.info("Leases to expire: " + toExpire);
-        for (Iterator iter = toExpire.iterator(); iter.hasNext(); ) {
-            Hash key = (Hash)iter.next();
+        for (Hash key : toExpire) {
             _facade.fail(key);
             //_log.info("Lease " + key + " is expiring, so lets look for it again", new Exception("Expire and search"));
             //_facade.lookupLeaseSet(key, null, null, RERUN_DELAY_MS);
@@ -57,17 +57,15 @@ class ExpireLeasesJob extends JobImpl {
      * don't have any leases that haven't yet passed, even with the CLOCK_FUDGE_FACTOR)
      *
      */
-    private Set selectKeysToExpire() {
-        Set keys = _facade.getDataStore().getKeys();
-        Set toExpire = new HashSet(128);
-        for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
-            Hash key = (Hash)iter.next();
-            DatabaseEntry obj = _facade.getDataStore().get(key);
+    private Set<Hash> selectKeysToExpire() {
+        Set<Hash> toExpire = new HashSet(128);
+        for (Map.Entry<Hash, DatabaseEntry> entry : _facade.getDataStore().getMapEntries()) {
+            DatabaseEntry obj = entry.getValue();
             if (obj.getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
                 LeaseSet ls = (LeaseSet)obj;
                 if (!ls.isCurrent(Router.CLOCK_FUDGE_FACTOR))
-                    toExpire.add(key);
-                else
+                    toExpire.add(entry.getKey());
+                else if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Lease " + ls.getDestination().calculateHash() + " is current, no need to expire");
             }
         }
