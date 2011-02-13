@@ -1,3 +1,9 @@
+2011-02-13 zzz
+    * Connect Client: Minor NPE fix cleanup
+    * JobQueue: Prevet NPE at shutdown (thanks liberty)
+    * GeoIP: Prevent startup NPE (ticket #413, thanks RN)
+    * NetDB: Prevent ExpireLeaseJob NPE (thanks sponge)
+
 2011-02-11 Mathiasdm
     * routerconsole: fixed graphs using jrobin; and headless issue
           in general: no more switches between headless and non-headless.

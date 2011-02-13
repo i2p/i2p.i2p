@@ -9,7 +9,6 @@ package net.i2p.router.networkdb.kademlia;
  */
 
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Set;
 
 import net.i2p.data.Hash;
@@ -28,8 +27,8 @@ import net.i2p.util.Log;
  *
  */
 class ExpireRoutersJob extends JobImpl {
-    private Log _log;
-    private KademliaNetworkDatabaseFacade _facade;
+    private final Log _log;
+    private final KademliaNetworkDatabaseFacade _facade;
     
     /** rerun fairly often, so the fails don't queue up too many netdb searches at once */
     private final static long RERUN_DELAY_MS = 120*1000;
@@ -41,11 +40,13 @@ class ExpireRoutersJob extends JobImpl {
     }
     
     public String getName() { return "Expire Routers Job"; }
+
     public void runJob() {
-        Set toExpire = selectKeysToExpire();
-        _log.info("Routers to expire (drop and try to refetch): " + toExpire);
-        for (Iterator iter = toExpire.iterator(); iter.hasNext(); ) {
-            Hash key = (Hash)iter.next();
+        // this always returns an empty set (see below)
+        Set<Hash> toExpire = selectKeysToExpire();
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Routers to expire (drop and try to refetch): " + toExpire);
+        for (Hash key : toExpire) {
             _facade.fail(key);
         }
         _facade.queueForExploration(toExpire);
@@ -61,9 +62,8 @@ class ExpireRoutersJob extends JobImpl {
      *
      * @return nothing for now
      */
-    private Set selectKeysToExpire() {
-        for (Iterator iter = _facade.getAllRouters().iterator(); iter.hasNext(); ) {
-            Hash key = (Hash)iter.next();
+    private Set<Hash> selectKeysToExpire() {
+        for (Hash key : _facade.getAllRouters()) {
             // Don't expire anybody we are connected to
             if (!getContext().commSystem().isEstablished(key)) {
                 // This does a _facade.validate() and fail() which is sufficient...

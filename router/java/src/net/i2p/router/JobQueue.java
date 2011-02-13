@@ -227,10 +227,14 @@ public class JobQueue {
     }
 
     public long getMaxLag() { 
+            // first job is the one that has been waiting the longest
             Job j = _readyJobs.peek();
             if (j == null) return 0;
-            // first job is the one that has been waiting the longest
-            long startAfter = j.getTiming().getStartAfter();
+            JobTiming jt = j.getTiming();
+            // PoisonJob timing is null, prevent NPE at shutdown
+            if (jt == null)
+                return 0;
+            long startAfter = jt.getStartAfter();
             return _context.clock().now() - startAfter;
     }
     
