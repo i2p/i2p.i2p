@@ -506,7 +506,7 @@ msgstr "Arrêter"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:921
 msgid "Start the torrent"
-msgstr "Arrêter le torrent"
+msgstr "Démarrer le torrent"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:923
 msgid "Start"
