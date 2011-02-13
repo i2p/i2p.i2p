@@ -6,6 +6,7 @@ import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
+import net.i2p.data.RouterInfo;
 import net.i2p.internal.InternalClientManager;
 import net.i2p.router.client.ClientManagerFacadeImpl;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
@@ -170,8 +171,20 @@ public class RouterContext extends I2PAppContext {
     
     /** what router is this context working for? */
     public Router router() { return _router; }
-    /** convenience method for querying the router's ident */
-    public Hash routerHash() { return _router.getRouterInfo().getIdentity().getHash(); }
+
+    /**
+     *  Convenience method for getting the router hash.
+     *  Equivalent to context.router().getRouterInfo().getIdentity().getHash()
+     *  @return may be null if called very early
+     */
+    public Hash routerHash() {
+        if (_router == null)
+            return null;
+        RouterInfo ri = _router.getRouterInfo();
+        if (ri == null)
+            return null;
+        return ri.getIdentity().getHash();
+    }
 
     /**
      * How are we coordinating clients for the router?
