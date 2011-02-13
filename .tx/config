@@ -1,0 +1,46 @@
+[I2P.i2ptunnel]
+source_file = apps/i2ptunnel/locale/messages_en.po
+source_lang = en
+trans.de = apps/i2ptunnel/locale/messages_de.po
+trans.nl = apps/i2ptunnel/locale/messages_nl.po
+trans.ru = apps/i2ptunnel/locale/messages_ru.po
+trans.zh_CN = apps/i2ptunnel/locale/messages_zh.po
+
+[I2P.routerconsole]
+source_file = apps/routerconsole/locale/messages_en.po
+source_lang = en
+trans.de = apps/routerconsole/locale/messages_de.po
+trans.es = apps/routerconsole/locale/messages_es.po
+trans.fr = apps/routerconsole/locale/messages_fr.po
+trans.nl = apps/routerconsole/locale/messages_nl.po
+trans.ru = apps/routerconsole/locale/messages_ru.po
+trans.zh_CN = apps/routerconsole/locale/messages_zh.po
+
+[I2P.susidns]
+source_file = apps/susidns/locale/messages_en.po
+source_lang = en
+trans.de = apps/susidns/locale/messages_de.po
+trans.nl = apps/susidns/locale/messages_nl.po
+trans.ru = apps/susidns/locale/messages_ru.po
+trans.zh_CN = apps/susidns/locale/messages_zh.po
+
+[I2P.i2psnark]
+source_file = apps/i2psnark/locale/messages_en.po
+source_lang = en
+trans.de = apps/i2psnark/locale/messages_de.po
+trans.es = apps/i2psnark/locale/messages_es.po
+trans.fr = apps/i2psnark/locale/messages_fr.po
+trans.nl = apps/i2psnark/locale/messages_nl.po
+trans.pt = apps/i2psnark/locale/messages_pt.po
+trans.ru = apps/i2psnark/locale/messages_ru.po
+trans.zh_CN = apps/i2psnark/locale/messages_zh.po
+
+[I2P.desktopgui]
+source_file = apps/desktopgui/locale/messages_en.po
+source_lang = en
+trans.nl = apps/desktopgui/locale/messages_nl.po
+trans.zh_CN = apps/desktopgui/locale/messages_zh.po
+
+[main]
+host = http://www.transifex.net
+
