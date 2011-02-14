@@ -1,5 +1,6 @@
 package net.i2p.stat;
 
+import java.io.ByteArrayInputStream;
 import java.util.Properties;
 
 import junit.framework.TestCase;
@@ -19,7 +20,7 @@ public class RateTest extends TestCase {
         byte data[] = buf.toString().getBytes();
 
         Properties props = new Properties();
-        props.load(new java.io.ByteArrayInputStream(data));
+        props.load(new ByteArrayInputStream(data));
 
         Rate r = new Rate(props, "rate.test", true);
 

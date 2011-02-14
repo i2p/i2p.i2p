@@ -1,6 +1,6 @@
 package net.i2p.stat;
 
-public class SizeTest {
+public class SizeMeasure {
     public static void main(String args[]) {
         testRateSize(100); //117KB
         testRateSize(100000); // 4.5MB
