@@ -1,3 +1,43 @@
+2011-02-13 zzz
+    * Connect Client: Minor NPE fix cleanup
+    * JobQueue: Prevet NPE at shutdown (thanks liberty)
+    * GeoIP: Prevent startup NPE (ticket #413, thanks RN)
+    * NetDB: Prevent ExpireLeaseJob NPE (thanks sponge)
+
+2011-02-11 Mathiasdm
+    * routerconsole: fixed graphs using jrobin; and headless issue
+          in general: no more switches between headless and non-headless.
+
+2011-02-11 sponge
+    * I2PTunnel: fix NPE in I2PTunnelConnectClient
+
+2011-02-10 sponge
+    * I2CP: fix NPE in QueuedClientConnectionRunner
+
+2011-02-10 zzz
+    * I2CP: Correctly close internal connections on the router side
+            when closed by the client, was causing massive memory leak
+            for internal clients using lots of sessions (thanks sponge)
+    * i2psnark:
+      - Improved magnet link parsing, use tr parameter if present
+    * i2ptunnel: Change shared clients default for new clients to false
+    * Streaming: Don't use iter.remove() on a COWAS
+
+2011-02-09 sponge
+    * BOB: fixup delivery in config, adds config file versioning.
+    * I2CP: Fix most of the I2CP leaks. Two leaks remain, but they are small.
+            net.i2p.internal.QueuedI2CPMessageReader and
+            net.i2p.router.client.I2CPMessageQueueImpl
+            are the two remaining leaks.
+
+2011-02-07 zzz
+    * i2psnark:
+      - Check for dup magnet torrent when adding torrent file
+      - Add exotrack.i2p (ticket #403)
+      - Disable spellcheck in textarea
+    * i2ptunnel: Generate error message when i2ptunnel.config save fails
+                 (ticket #404)
+
 2011-02-06 zzz
     * i2psnark: Fix maggot links, and magnet links with trailing parameters (thx user)
 

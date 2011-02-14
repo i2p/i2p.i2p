@@ -97,6 +97,7 @@
     </target>
 
     <target name="buildDesktopGui" depends="buildCore, buildrouter" >
+        <ant dir="apps/desktopgui" target="clean" />
         <ant dir="apps/desktopgui" target="jar" />
     </target>
 
@@ -200,7 +201,7 @@
         <copy file="apps/addressbook/dist/addressbook.war" todir="build/" />
     </target>
     <!-- the apps need to compile the jsps to poupdate -->
-    <target name="poupdate" depends="buildRouter, buildStreaming, buildSystray, buildJetty" >
+    <target name="poupdate" depends="buildRouter, buildStreaming, buildSystray, buildJetty, buildDesktopGui" >
         <ant dir="apps/routerconsole/java/" target="poupdate" />
         <ant dir="apps/i2psnark/java/" target="poupdate" />
         <ant dir="apps/i2ptunnel/java/" target="poupdate" />

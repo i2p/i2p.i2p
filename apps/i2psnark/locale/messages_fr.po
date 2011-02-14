@@ -15,6 +15,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n>1\n"
 "X-Poedit-Language: French\n"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:94
@@ -35,17 +36,17 @@ msgstr "La limite minimale agrégée des uploaders est : {0}"
 #: ../java/src/org/klomp/snark/SnarkManager.java:310
 #, java-format
 msgid "Up BW limit changed to {0}KBps"
-msgstr "La limite d'upload modifiée : {0} Ko/s"
+msgstr "La limite d’upload modifiée : {0} Ko/s"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:312
 #, java-format
 msgid "Minimum up bandwidth limit is {0}KBps"
-msgstr "La limite minimale d'upload est {0} Ko/s"
+msgstr "La limite minimale d’upload est {0} Ko/s"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:324
 #, java-format
 msgid "Startup delay limit changed to {0} minutes"
-msgstr "Delais de démarrage modifié : {0] minutes"
+msgstr "Delais de démarrage modifié : {0} minutes"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:371
 msgid "I2CP and tunnel changes will take effect after stopping all torrents"
@@ -122,13 +123,13 @@ msgstr "Erreur de connexion à I2P - Vérifiez vos paramètres I2CP!"
 #: ../java/src/org/klomp/snark/SnarkManager.java:506
 #, java-format
 msgid "Error: Could not add the torrent {0}"
-msgstr "Erreur : Impossible d'ajouter le torrent : {0}"
+msgstr "Erreur : Impossible d’ajouter le torrent : {0}"
 
 #. catch this here so we don't try do delete it below
 #: ../java/src/org/klomp/snark/SnarkManager.java:528
 #, java-format
 msgid "Cannot open \"{0}\""
-msgstr "Impossible d'ouvrir: \"{0}\""
+msgstr "Impossible d’ouvrir: \"{0}\""
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:541
 #, java-format
@@ -217,7 +218,7 @@ msgstr "Impossible de se connecter à I2P!"
 #: ../java/src/org/klomp/snark/SnarkManager.java:886
 #, java-format
 msgid "Unable to add {0}"
-msgstr "Impossible d'ajouter {0}"
+msgstr "Impossible d’ajouter {0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:185
 msgid "I2PSnark - Anonymous BitTorrent Client"
@@ -394,7 +395,7 @@ msgstr "Torrent créé pour \"{0}\""
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:605
 #, java-format
 msgid "Many I2P trackers require you to register new torrents before seeding - please do so before starting \"{0}\""
-msgstr "De nombreux trackers I2P nécessitent d'enregistrer les nouveaux torrents avant de seeder - faites-le avant de démarrer \"{0}\"!"
+msgstr "De nombreux trackers I2P nécessitent d’enregistrer les nouveaux torrents avant de seeder - faites-le avant de démarrer \"{0}\"!"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:607
 #, java-format
@@ -505,7 +506,7 @@ msgstr "Arrêter"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:921
 msgid "Start the torrent"
-msgstr "Arrêter le torrent"
+msgstr "Démarrer le torrent"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:923
 msgid "Start"
@@ -805,7 +806,7 @@ msgstr "Le torrent {0} n'est pas valide"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1764
 #, java-format
 msgid "Torrent was not retrieved from {0}"
-msgstr "Le torrent n'a pas été reçu par {0}"
+msgstr "Le torrent n’a pas été reçu par {0}"
 
 #~ msgid "size: {0}B"
 #~ msgstr "Taille: {0}Octets"

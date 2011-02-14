@@ -1,18 +1,15 @@
 package net.i2p.i2ptunnel;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.TreeMap;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
@@ -20,7 +17,7 @@ import net.i2p.client.I2PSessionException;
 import net.i2p.data.DataHelper;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
-import net.i2p.util.SecureFileOutputStream;
+import net.i2p.util.OrderedProperties;
 
 /**
  * Coordinate a set of tunnels within the JVM, loading and storing their config
@@ -223,14 +220,15 @@ public class TunnelControllerGroup {
      * file
      *
      */
-    public void saveConfig() {
+    public void saveConfig() throws IOException {
         saveConfig(_configFile);
     }
+
     /**
      * Save the configuration of all known tunnels to the given file
      *
      */
-    public void saveConfig(String configFile) {
+    public void saveConfig(String configFile) throws IOException {
         _configFile = configFile;
         File cfgFile = new File(configFile);
         if (!cfgFile.isAbsolute())
@@ -239,32 +237,14 @@ public class TunnelControllerGroup {
         if ( (parent != null) && (!parent.exists()) )
             parent.mkdirs();
         
-        
-        TreeMap map = new TreeMap();
+        Properties map = new OrderedProperties();
         for (int i = 0; i < _controllers.size(); i++) {
             TunnelController controller = _controllers.get(i);
             Properties cur = controller.getConfig("tunnel." + i + ".");
             map.putAll(cur);
         }
         
-        StringBuilder buf = new StringBuilder(1024);
-        for (Iterator iter = map.keySet().iterator(); iter.hasNext(); ) {
-            String key = (String)iter.next();
-            String val = (String)map.get(key);
-            buf.append(key).append('=').append(val).append('\n');
-        }
-        
-        FileOutputStream fos = null;
-        try {
-            fos = new SecureFileOutputStream(cfgFile);
-            fos.write(buf.toString().getBytes("UTF-8"));
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Config written to " + cfgFile.getPath());
-        } catch (IOException ioe) {
-            _log.error("Error writing out the config");
-        } finally {
-            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
-        }
+        DataHelper.storeProps(map, cfgFile);
     }
     
     /**

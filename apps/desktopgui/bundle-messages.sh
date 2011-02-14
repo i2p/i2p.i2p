@@ -19,6 +19,17 @@ then
 	POUPDATE=1
 fi
 
+# on windows, one must specify the path of commnad find
+# since windows has its own retarded version of find.
+if which find|grep -q -i windows ; then
+	export PATH=.:/bin:/usr/local/bin:$PATH
+fi
+# Fast mode - update ondemond
+echo Placing a file named messages_{LangCode}.only in locale folder,
+echo will limit .po file update to the language specified by {LangCode}.
+LG2=$(find locale -iname messages_*.only|tail -1)
+[ LG2 ] && LG2=${LG2#locale/messages_} && LG2=${LG2%.only}
+
 # add ../java/ so the refs will work in the po file
 JPATHS="src"
 for i in locale/messages_*.po
@@ -26,6 +37,11 @@ do
 	# get language
 	LG=${i#locale/messages_}
 	LG=${LG%.po}
+	
+	# skip, if specified
+	if [ $LG2 ]; then
+		[ $LG != $LG2 ] && continue || echo INFO: Language update is set to [$LG2] only.
+	fi
 
 	if [ "$POUPDATE" = "1" ]
 	then
@@ -33,7 +49,6 @@ do
 		find $JPATHS -name *.java -newer $i > $TMPFILE
 	fi
 
-    echo $LG
 	if [ -s build/net/i2p/desktopgui/messages_$LG.class -a \
 	     build/net/i2p/desktopgui/messages_$LG.class -nt $i -a \
 	     ! -s $TMPFILE ]
@@ -80,15 +95,19 @@ do
 		touch $i
 	fi
 
-	echo "Generating ${CLASS}_$LG ResourceBundle..."
+    if [ "$LG" != "en" ]
+    then
+        # only generate for non-source language
+        echo "Generating ${CLASS}_$LG ResourceBundle..."
 
-	# convert to class files in build
-	msgfmt --java --statistics -r $CLASS -l $LG -d build $i
-	if [ $? -ne 0 ]
-	then
-		echo 'Warning - msgfmt failed, not updating translations'
-		break
-	fi
+        # convert to class files in build
+        msgfmt --java --statistics -r $CLASS -l $LG -d build $i
+        if [ $? -ne 0 ]
+        then
+            echo 'Warning - msgfmt failed, not updating translations'
+            break
+        fi
+    fi
 done
 rm -f $TMPFILE
 # todo: return failure

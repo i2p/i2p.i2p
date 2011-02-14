@@ -1,3 +1,15 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+# ＮＬ
+
 #: src/net/i2p/desktopgui/ExternalTrayManager.java:23
 msgid "Start I2P"
 msgstr "I2P starten"
@@ -24,6 +36,6 @@ msgstr "I2P stoppen"
 
 #~ msgid "Browser not found"
 #~ msgstr "Browser niet gevonden"
-
 #~ msgid "The default browser for your system was not found."
 #~ msgstr "De standaard webbrowser voor je systeem werd niet gevonden."
+

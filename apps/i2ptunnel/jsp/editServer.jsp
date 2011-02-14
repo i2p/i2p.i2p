@@ -374,7 +374,7 @@
 
             <div class="rowItem">
               <div id="optionsField" class="rowItem">
-                  <label><%=intl._("Inbound connection limits (0 to disable)")%><br><%=intl._("Per client")%>:</label>
+                  <label><%=intl._("Inbound connection limits (0=unlimited)")%><br><%=intl._("Per client")%>:</label>
               </div>
               <div id="portField" class="rowItem">
                   <label><%=intl._("Per minute")%>:</label>
@@ -405,7 +405,7 @@
             </div>
             <div class="rowItem">
               <div id="optionsField" class="rowItem">
-                  <label><%=intl._("Max concurrent connections (0 to disable)")%>:</label>
+                  <label><%=intl._("Max concurrent connections (0=unlimited)")%>:</label>
               </div>
               <div id="portField" class="rowItem">
                   <input type="text" id="port" name="maxStreams" value="<%=editBean.getMaxStreams(curTunnel)%>" class="freetext" />                

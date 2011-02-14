@@ -8,7 +8,7 @@ package net.i2p.i2ptunnel.web;
  *
  */
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base32;
@@ -299,14 +300,22 @@ public class IndexBean {
             }
         }
         
-        List msgs = doSave();
-        msgs.add(0, "Changes saved");
+        List<String> msgs = doSave();
         return getMessages(msgs);
     }
-    private List doSave() { 
-        _group.saveConfig();
-        return _group.clearAllMessages();
+
+    private List<String> doSave() { 
+        List<String> rv = _group.clearAllMessages();
+        try {
+            _group.saveConfig();
+            rv.add(0, _("Configuration changes saved"));
+        } catch (IOException ioe) {
+            _log.error("Failed to save config file", ioe);
+            rv.add(0, _("Failed to save configuration") + ": " + ioe.toString());
+        }
+        return rv;
     } 
+
     private String deleteTunnel() {
         if (!_removeConfirmed)
             return "Please confirm removal";
@@ -1095,16 +1104,16 @@ public class IndexBean {
             return null;
     }
     
-    private static String getMessages(List msgs) {
+    private static String getMessages(List<String> msgs) {
         StringBuilder buf = new StringBuilder(128);
         getMessages(msgs, buf);
         return buf.toString();
     }
 
-    private static void getMessages(List msgs, StringBuilder buf) {
+    private static void getMessages(List<String> msgs, StringBuilder buf) {
         if (msgs == null) return;
         for (int i = 0; i < msgs.size(); i++) {
-            buf.append((String)msgs.get(i)).append("\n");
+            buf.append(msgs.get(i)).append("\n");
         }
     }
 

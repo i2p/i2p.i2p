@@ -254,6 +254,7 @@ public class Snark
   private boolean stopped;
   private byte[] id;
   private byte[] infoHash;
+  private String additionalTrackerURL;
   private final I2PSnarkUtil _util;
   private final PeerCoordinatorSet _peerCoordinatorSet;
   private String trackerProblems;
@@ -453,9 +454,10 @@ public class Snark
    *
    *  @param torrent a fake name for now (not a file name)
    *  @param ih 20-byte info hash
+   *  @param trackerURL may be null
    *  @since 0.8.4
    */
-  public Snark(I2PSnarkUtil util, String torrent, byte[] ih,
+  public Snark(I2PSnarkUtil util, String torrent, byte[] ih, String trackerURL,
         CompleteListener complistener, PeerCoordinatorSet peerCoordinatorSet,
         ConnectionAcceptor connectionAcceptor, boolean start, String rootDir)
   {
@@ -465,6 +467,7 @@ public class Snark
     acceptor = connectionAcceptor;
     this.torrent = torrent;
     this.infoHash = ih;
+    this.additionalTrackerURL = trackerURL;
     this.rootDataDir = rootDir;
     stopped = true;
     id = generateID();
@@ -535,7 +538,7 @@ public class Snark
             acceptor = new ConnectionAcceptor(_util, serversocket, new PeerAcceptor(coordinator));
         }
         // TODO pass saved closest DHT nodes to the tracker? or direct to the coordinator?
-        trackerclient = new TrackerClient(_util, meta, coordinator, this);
+        trackerclient = new TrackerClient(_util, meta, additionalTrackerURL, coordinator, this);
     }
 
     stopped = false;
@@ -564,11 +567,13 @@ public class Snark
                  fatal("Could not reopen storage", ioe);
              }
         }
-        TrackerClient newClient = new TrackerClient(_util, meta, coordinator, this);
+        TrackerClient newClient = new TrackerClient(_util, meta, additionalTrackerURL, coordinator, this);
         if (!trackerclient.halted())
             trackerclient.halt();
         trackerclient = newClient;
         trackerclient.start();
+    } else {
+        debug("NOT starting TrackerClient???", NOTICE);
     }
   }
   /**
@@ -823,6 +828,14 @@ public class Snark
             return false;
         acceptor.restart();
         return true;
+    }
+
+    /**
+     *  @return trackerURL string from magnet-mode constructor, may be null
+     *  @since 0.8.4
+     */
+    public String getTrackerURL() {
+        return additionalTrackerURL;
     }
 
   /**

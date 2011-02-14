@@ -45,7 +45,9 @@
         <exec executable="sh" osfamily="mac" failifexecutionfails="true" >
             <arg value="./bundle-messages.sh" />
         </exec>
-
+        <exec executable="sh" osfamily="windows" failifexecutionfails="true" >
+            <arg value="./bundle-messages.sh" />
+        </exec>
 		<jar basedir="${build}" destfile="${dist}/${jar}">
 			<manifest>
 				<attribute name="Main-Class" value="net.i2p.desktopgui.Main"/>
@@ -75,6 +77,10 @@
             <arg value="-p" />
         </exec>
         <exec executable="sh" osfamily="mac" failifexecutionfails="true" >
+            <arg value="./bundle-messages.sh" />
+            <arg value="-p" />
+        </exec>
+        <exec executable="sh" osfamily="windows" failifexecutionfails="true" >
             <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>

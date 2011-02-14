@@ -40,10 +40,12 @@ public class QueuedI2CPMessageReader extends I2CPMessageReader {
                     I2CPMessage msg = null;
                     try {
                         msg = in.take();
-                        if (msg.getType() == PoisonI2CPMessage.MESSAGE_TYPE)
+                        if (msg.getType() == PoisonI2CPMessage.MESSAGE_TYPE) {
+                            _listener.disconnected(QueuedI2CPMessageReader.this);
                             cancelRunner();
-                        else
+                        } else {
                             _listener.messageReceived(QueuedI2CPMessageReader.this, msg);
+                        }
                     } catch (InterruptedException ie) {}
                 }
                 // ??? unused

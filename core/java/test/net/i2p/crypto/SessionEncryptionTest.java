@@ -102,7 +102,8 @@ public class SessionEncryptionTest extends TestCase{
         
         
         
-        _context.sessionKeyManager().tagsDelivered(pubKey, curKey, firstTags);
+        TagSetHandle tsh = _context.sessionKeyManager().tagsDelivered(pubKey, curKey, firstTags);
+        _context.sessionKeyManager().tagsAcked(pubKey, curKey, tsh);
         
         curKey = _context.sessionKeyManager().getCurrentKey(pubKey);
         SessionTag curTag = _context.sessionKeyManager().consumeNextAvailableTag(pubKey, curKey);
@@ -130,7 +131,8 @@ public class SessionEncryptionTest extends TestCase{
         
         
         
-        _context.sessionKeyManager().tagsDelivered(pubKey, curKey, secondTags);
+        tsh = _context.sessionKeyManager().tagsDelivered(pubKey, curKey, secondTags);
+        _context.sessionKeyManager().tagsAcked(pubKey, curKey, tsh);
         
         curKey = _context.sessionKeyManager().getCurrentKey(pubKey);
         curTag = _context.sessionKeyManager().consumeNextAvailableTag(pubKey, curKey);
@@ -199,7 +201,8 @@ public class SessionEncryptionTest extends TestCase{
         
         
         
-        _context.sessionKeyManager().tagsDelivered(pubKey, curKey, firstTags);
+        TagSetHandle tsh = _context.sessionKeyManager().tagsDelivered(pubKey, curKey, firstTags);
+        _context.sessionKeyManager().tagsAcked(pubKey, curKey, tsh);
         
         curKey = _context.sessionKeyManager().getCurrentKey(pubKey);
         SessionTag curTag = _context.sessionKeyManager().consumeNextAvailableTag(pubKey, curKey);
@@ -226,7 +229,8 @@ public class SessionEncryptionTest extends TestCase{
         
         
         
-        _context.sessionKeyManager().tagsDelivered(pubKey, nextKey, secondTags); // note nextKey not curKey
+        tsh = _context.sessionKeyManager().tagsDelivered(pubKey, nextKey, secondTags); // note nextKey not curKey
+        _context.sessionKeyManager().tagsAcked(pubKey, nextKey, tsh);
         
         curKey = _context.sessionKeyManager().getCurrentKey(pubKey);
         curTag = _context.sessionKeyManager().consumeNextAvailableTag(pubKey, curKey);
@@ -288,9 +292,11 @@ public class SessionEncryptionTest extends TestCase{
             
             if ( (tags != null) && (tags.size() > 0) ) {
                 if (nextKey == null) {
-                    _context.sessionKeyManager().tagsDelivered(pubKey, curKey, tags);
+                    TagSetHandle tsh = _context.sessionKeyManager().tagsDelivered(pubKey, curKey, tags);
+                    _context.sessionKeyManager().tagsAcked(pubKey, curKey, tsh);
                 } else {
-                    _context.sessionKeyManager().tagsDelivered(pubKey, nextKey, tags);
+                    TagSetHandle tsh = _context.sessionKeyManager().tagsDelivered(pubKey, nextKey, tags);
+                    _context.sessionKeyManager().tagsAcked(pubKey, nextKey, tsh);
                 }
             }
         }
