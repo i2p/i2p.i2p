@@ -25,4 +25,50 @@ public class LeaseSetTest extends StructureTest {
         return leaseSet; 
     }
     public DataStructure createStructureToRead() { return new LeaseSet(); }
+    
+    public void testGetLeaseInvalid() {
+        // create test subject
+        LeaseSet subj = new LeaseSet();
+        
+        // should contain no leases now..
+        try {
+            assertNull(subj.getLease(0));
+        } catch(RuntimeException exc) {
+            // all good
+        }
+        
+        // this shouldn't work either
+        try {
+            assertNull(subj.getLease(-1));
+        } catch(RuntimeException exc) {
+            // all good
+        }
+    }
+    
+    public void testAddLeaseNull() {
+        // create test subject
+        LeaseSet subj = new LeaseSet();
+        
+        // now add an null lease
+        try {
+            subj.addLease(null);
+            fail("Failed at failing.");
+        } catch(IllegalArgumentException exc) {
+            // all good
+        }
+    }
+    
+    public void testAddLeaseInvalid() {
+        // create test subject
+        LeaseSet subj = new LeaseSet();
+        
+        // try to add completely invalid lease(ie. no data)
+        try {
+            subj.addLease(new Lease());
+            fail("Failed at failing.");
+        } catch(IllegalArgumentException exc) {
+            // all good
+        }
+    }
+            
 }
