@@ -56,9 +56,10 @@ public class Main {
      */
     public static void beginStartup(String[] args) {
         try {
-            String headless = RouterManager.getRouterContext().getProperty("router.isHeadless");
+            String headless = System.getProperty("java.awt.headless");
             boolean isHeadless = Boolean.parseBoolean(headless);
             if(isHeadless) {
+            	log.warn("Headless environment: not starting desktopgui!");
                 return;
             }
         }

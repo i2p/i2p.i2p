@@ -1,3 +1,6 @@
+2011-02-14 Mathiasdm
+    * Fix headless issue without reboot
+
 2011-02-13 zzz
     * Connect Client: Minor NPE fix cleanup
     * JobQueue: Prevet NPE at shutdown (thanks liberty)
