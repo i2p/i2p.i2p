@@ -49,6 +49,7 @@
         <cobertura-instrument todir="./build/obj_test">
             <fileset dir="./build/obj">
                 <include name="**/*.class"/>
+                <exclude name="**/*Test.class" />
             </fileset>
         </cobertura-instrument>
     </target>
