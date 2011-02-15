@@ -39,6 +39,7 @@ trans.zh_CN = apps/i2psnark/locale/messages_zh.po
 source_file = apps/desktopgui/locale/messages_en.po
 source_lang = en
 trans.nl = apps/desktopgui/locale/messages_nl.po
+trans.ru = apps/desktopgui/locale/messages_ru.po
 trans.zh_CN = apps/desktopgui/locale/messages_zh.po
 
 [main]
