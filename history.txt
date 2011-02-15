@@ -1,9 +1,15 @@
+2011-02-15 zzz
+    * i2psnark: Details link shuffle, mostly restore 0.8.3 behavior
+    * Profiles: Punish rejections more, in an attempt to spread the
+                load more through the network
+    * Timers: Log cleanup
+
 2011-02-14 Mathiasdm
     * Fix headless issue without reboot
 
 2011-02-13 zzz
     * Connect Client: Minor NPE fix cleanup
-    * JobQueue: Prevet NPE at shutdown (thanks liberty)
+    * JobQueue: Prevent NPE at shutdown (thanks liberty)
     * GeoIP: Prevent startup NPE (ticket #413, thanks RN)
     * NetDB: Prevent ExpireLeaseJob NPE (thanks sponge)
 
@@ -21,6 +27,7 @@
     * I2CP: Correctly close internal connections on the router side
             when closed by the client, was causing massive memory leak
             for internal clients using lots of sessions (thanks sponge)
+            (ticket #397)
     * i2psnark:
       - Improved magnet link parsing, use tr parameter if present
     * i2ptunnel: Change shared clients default for new clients to false
