@@ -14,6 +14,8 @@ import net.i2p.I2PAppContext;
  * appropriate time.  The method that is fired however should NOT block (otherwise
  * they b0rk the timer).
  *
+ * WARNING - Deprecated.
+ * This is an inefficient mess. Use SimpleScheduler or SimpleTimer2 if possible.
  */
 public class SimpleTimer {
     private static final SimpleTimer _instance = new SimpleTimer();

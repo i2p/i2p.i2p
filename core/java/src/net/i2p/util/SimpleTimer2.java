@@ -29,10 +29,10 @@ public class SimpleTimer2 {
     public static SimpleTimer2 getInstance() { return _instance; }
     private static final int MIN_THREADS = 2;
     private static final int MAX_THREADS = 4;
-    private I2PAppContext _context;
+    private final I2PAppContext _context;
     private static Log _log; // static so TimedEvent can use it
-    private ScheduledThreadPoolExecutor _executor;
-    private String _name;
+    private final ScheduledThreadPoolExecutor _executor;
+    private final String _name;
     private int _count;
     private final int _threads;
 
@@ -223,7 +223,7 @@ public class SimpleTimer2 {
             try {
                 timeReached();
             } catch (Throwable t) {
-                _log.log(Log.CRIT, _pool + " wtf, event borked: " + this, t);
+                _log.log(Log.CRIT, _pool + ": Timed task " + this + " exited unexpectedly, please report", t);
             }
             long time = System.currentTimeMillis() - before;
             if (time > 500 && _log.shouldLog(Log.WARN))
