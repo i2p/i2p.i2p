@@ -179,6 +179,7 @@ public class DataHelper {
      * @param props source
      * @return new offset
      */
+    @Deprecated
     public static int toProperties(byte target[], int offset, Properties props) throws DataFormatException, IOException {
         if (props != null) {
             OrderedProperties p = new OrderedProperties();
@@ -219,6 +220,7 @@ public class DataHelper {
      * @param target returned Properties
      * @return new offset
      */
+    @Deprecated
     public static int fromProperties(byte source[], int offset, Properties target) throws DataFormatException, IOException {
         int size = (int)fromLong(source, offset, 2);
         offset += 2;
@@ -254,6 +256,7 @@ public class DataHelper {
      *
      * @throws RuntimeException if either is too long.
      */
+    @Deprecated
     public static byte[] toProperties(Properties opts) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream(2);
@@ -544,6 +547,7 @@ public class DataHelper {
     }
 
     /** @deprecated unused */
+    @Deprecated
     public static byte[] toDate(Date date) throws IllegalArgumentException {
         if (date == null)
             return toLong(DATE_LENGTH, 0L);
@@ -678,6 +682,7 @@ public class DataHelper {
      * @throws IOException if there is an IO error writing the boolean
      * @deprecated unused
      */
+    @Deprecated
     public static void writeBoolean(OutputStream out, Boolean bool) 
         throws DataFormatException, IOException {
         if (bool == null)
@@ -689,6 +694,7 @@ public class DataHelper {
     }
     
     /** @deprecated unused */
+    @Deprecated
     public static Boolean fromBoolean(byte data[], int offset) {
         if (data[offset] == BOOLEAN_TRUE)
             return Boolean.TRUE;
@@ -699,11 +705,13 @@ public class DataHelper {
     }
     
     /** @deprecated unused */
+    @Deprecated
     public static void toBoolean(byte data[], int offset, boolean value) {
         data[offset] = (value ? BOOLEAN_TRUE : BOOLEAN_FALSE);
     }
 
     /** @deprecated unused */
+    @Deprecated
     public static void toBoolean(byte data[], int offset, Boolean value) {
         if (value == null)
             data[offset] = BOOLEAN_UNKNOWN;
@@ -712,12 +720,16 @@ public class DataHelper {
     }
     
     /** deprecated - used only in DatabaseLookupMessage */
+    @Deprecated
     public static final byte BOOLEAN_TRUE = 0x1;
     /** deprecated - used only in DatabaseLookupMessage */
+    @Deprecated
     public static final byte BOOLEAN_FALSE = 0x0;
     /** @deprecated unused */
+    @Deprecated
     public static final byte BOOLEAN_UNKNOWN = 0x2;
     /** @deprecated unused */
+    @Deprecated
     public static final int BOOLEAN_LENGTH = 1;
 
     //
@@ -780,6 +792,7 @@ public class DataHelper {
      * Compare two integers, really just for consistency.
      * @deprecated inefficient
      */
+    @Deprecated
     public final static boolean eq(int lhs, int rhs) {
         return lhs == rhs;
     }
@@ -788,6 +801,7 @@ public class DataHelper {
      * Compare two longs, really just for consistency.
      * @deprecated inefficient
      */
+    @Deprecated
     public final static boolean eq(long lhs, long rhs) {
         return lhs == rhs;
     }
@@ -796,6 +810,7 @@ public class DataHelper {
      * Compare two bytes, really just for consistency.
      * @deprecated inefficient
      */
+    @Deprecated
     public final static boolean eq(byte lhs, byte rhs) {
         return lhs == rhs;
     }
@@ -974,6 +989,7 @@ public class DataHelper {
      * @return true if the line was read, false if eof was reached before a 
      *              newline was found
      */
+    @Deprecated
     public static boolean readLine(InputStream in, StringBuffer buf) throws IOException {
         return readLine(in, buf, null);
     }
@@ -987,6 +1003,7 @@ public class DataHelper {
      * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
      * @deprecated use StringBuilder version
      */
+    @Deprecated
     public static boolean readLine(InputStream in, StringBuffer buf, Sha256Standalone hash) throws IOException {
         int c = -1;
         int i = 0;
