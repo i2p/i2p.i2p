@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P desktopgui\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-13 11:54+0000\n"
+"POT-Creation-Date: 2011-02-16 17:10+0000\n"
 "PO-Revision-Date: 2010-06-15 14:09+0100\n"
 "Last-Translator: duck <duck@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
@@ -29,14 +29,23 @@ msgstr ""
 msgid "Starting"
 msgstr ""
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:25
+#: src/net/i2p/desktopgui/InternalTrayManager.java:26
 msgid "Launch I2P Browser"
 msgstr ""
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:49
-msgid "Restart I2P"
+#: src/net/i2p/desktopgui/InternalTrayManager.java:50
+msgid "Configure desktopgui"
 msgstr ""
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:67
+msgid "Restart I2P"
+msgstr ""
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:85
 msgid "Stop I2P"
+msgstr ""
+
+#. Translate interface
+#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:26
+msgid "Should tray icon be enabled?"
 msgstr ""

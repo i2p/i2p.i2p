@@ -329,7 +329,9 @@ public class RouterConsoleRunner {
             //TODO: move away from routerconsole into a separate application.
             //ApplicationManager?
             VersionComparator v = new VersionComparator();
-            if(v.compare(System.getProperty("java.runtime.version"), "1.6") >= 0) {
+            String desktopguiEnabled = I2PAppContext.getGlobalContext().getProperty("desktopgui.enabled");
+            int recentJava = v.compare(System.getProperty("java.runtime.version"), "1.6");
+            if(recentJava >= 0 && (desktopguiEnabled == null || desktopguiEnabled.equalsIgnoreCase("true"))) {
                 String[] args = new String[0];
                 net.i2p.desktopgui.Main.beginStartup(args);    
             }
