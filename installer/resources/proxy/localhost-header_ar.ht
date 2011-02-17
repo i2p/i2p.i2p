@@ -1,29 +1,24 @@
-HTTP/1.1 504 Gateway Timeout
+HTTP/1.1 403 Access Denied
 Content-Type: text/html; charset=UTF-8
 Cache-control: no-cache
 Connection: close
 Proxy-Connection: close
 
 <html lang="ar" dir="rtl"><head>
-<title>I2P Warning: Outproxy Not Found</title>
+<title>خطأ: تم رفض الطلب</title>
 <link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico" >
 <link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css" >
 </head>
 <body>
+<!-----------------------------
+  Let's not infinite loop here....
 <div class=logo>
  <a href="http://127.0.0.1:7657/index.jsp" title="Router Console"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="I2P Router Console" border="0"></a><hr>
  <a href="http://127.0.0.1:7657/config.jsp">Configuration</a> <a href="http://127.0.0.1:7657/help.jsp">Help</a> <a href="http://127.0.0.1:7657/susidns/">Addressbook</a>
 </div>
+------------------------------>
 <div class=warning id=warning>
-<h3>Warning: I2P Proxy Not Found</h3>
-The WWW Outproxy was not found. 
-It is offline, there is network congestion,
-or your router is not yet well-integrated with peers.
-You may want to 
-<a href="javascript: parent.window.location.reload()">retry</a> 
-as this will randomly reselect an outproxy from the pool you have defined 
-<a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">here</a> 
-(if you have more than one configured). 
-If you continue to have trouble you may want to edit your outproxy list 
-<a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=0">here</a>. 
-<hr><b>Could not find the following destination:</b><BR><BR>
+<h3>خطـأ: عنوان محلي</h3>
+خطأ في اعدادات المتصفح. لا تستعمل بروكسي للوصول الى شاشة التحكم، localhost او الشبكة المحلية LAN.
+
+</div>
