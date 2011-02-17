@@ -63,36 +63,36 @@ public final class I2PDatagramDissector {
     public void loadI2PDatagram(byte[] dgram) throws DataFormatException {
         ByteArrayInputStream dgStream = new ByteArrayInputStream(dgram);
         byte[] rxTrimmedPayload;
-
-		// set invalid(very important!)
-		this.valid = false;
-
+        
+        // set invalid(very important!)
+        this.valid = false;
+        
         try {
             rxDest = new Destination();
             rxSign = new Signature();
-
-			// read destination
+            
+            // read destination
             rxDest.readBytes(dgStream);
-
-			// read signature
+            
+            // read signature
             rxSign.readBytes(dgStream);
-
-			// read payload
+            
+            // read payload
             rxPayloadLen = dgStream.read(rxPayload);
-			
-			// calculate the hash of the payload
+            
+            // calculate the hash of the payload
             this.rxHash = hashGen.calculateHash(rxPayload, 0, rxPayloadLen);
-			assert this.hashGen.calculateHash(this.extractPayload()).equals(this.rxHash);
+            assert this.hashGen.calculateHash(this.extractPayload()).equals(this.rxHash);
         } catch (IOException e) {
             _log.error("Caught IOException - INCONSISTENT STATE!", e);
         } catch(AssertionError e) {
-			_log.error("Assertion failed!", e);
-		}
-
+            _log.error("Assertion failed!", e);
+        }
+        
         //_log.debug("Datagram payload size: " + rxPayloadLen + "; content:\n"
         //           + HexDump.dump(rxPayload, 0, rxPayloadLen));
     }
-
+    
     /**
      * Get the payload carried by an I2P repliable datagram (previously loaded
      * with the loadI2PDatagram() method), verifying the datagram signature.
@@ -106,7 +106,7 @@ public final class I2PDatagramDissector {
         
         return this.extractPayload();
     }
-
+    
     /**
      * Get the sender of an I2P repliable datagram (previously loaded with the
      * loadI2PDatagram() method), verifying the datagram signature.
@@ -118,23 +118,23 @@ public final class I2PDatagramDissector {
     public Destination getSender() throws I2PInvalidDatagramException {
         this.verifySignature();
         
-		return this.extractSender();
+        return this.extractSender();
     }
-
-	/**
-	 * Extract the hash of the payload of an I2P repliable datagram (previously
-	 * loaded with the loadI2PDatagram() method), verifying the datagram
-	 * signature.
-	 * @return The hash of the payload of the I2P repliable datagram
-	 * @throws I2PInvalidDatagramException if the signature verification fails
-	 */
-	public Hash getHash() throws I2PInvalidDatagramException {
-		// make sure it has a valid signature
-		this.verifySignature();
-
-		return this.extractHash();
-	}
-
+    
+    /**
+     * Extract the hash of the payload of an I2P repliable datagram (previously
+     * loaded with the loadI2PDatagram() method), verifying the datagram
+     * signature.
+     * @return The hash of the payload of the I2P repliable datagram
+     * @throws I2PInvalidDatagramException if the signature verification fails
+     */
+    public Hash getHash() throws I2PInvalidDatagramException {
+        // make sure it has a valid signature
+        this.verifySignature();
+        
+        return this.extractHash();
+    }
+    
     /**
      * Extract the payload carried by an I2P repliable datagram (previously
      * loaded with the loadI2PDatagram() method), without verifying the
@@ -145,10 +145,10 @@ public final class I2PDatagramDissector {
     public byte[] extractPayload() {
         byte[] retPayload = new byte[this.rxPayloadLen];
         System.arraycopy(this.rxPayload, 0, retPayload, 0, this.rxPayloadLen);
-
+        
         return retPayload;
     }
-
+    
     /**
      * Extract the sender of an I2P repliable datagram (previously loaded with
      * the loadI2PDatagram() method), without verifying the datagram signature.
@@ -168,21 +168,21 @@ public final class I2PDatagramDissector {
         
         return retDest;
     }
-
-	/**
-	 * Extract the hash of the payload of an I2P repliable datagram (previously
-	 * loaded with the loadI2PDatagram() method), without verifying the datagram
-	 * signature.
-	 * @return The hash of the payload of the I2P repliable datagram
-	 */
-	public Hash extractHash() {
-		return this.rxHash;
-	}
+    
+    /**
+     * Extract the hash of the payload of an I2P repliable datagram (previously
+     * loaded with the loadI2PDatagram() method), without verifying the datagram
+     * signature.
+     * @return The hash of the payload of the I2P repliable datagram
+     */
+    public Hash extractHash() {
+        return this.rxHash;
+    }
     
     /**
      * Verify the signature of this datagram (previously loaded with the
      * loadI2PDatagram() method)
-	 * @throws I2PInvalidDatagramException if the signature is invalid
+     * @throws I2PInvalidDatagramException if the signature is invalid
      */
     public void verifySignature() throws I2PInvalidDatagramException {
         // first check if it already got validated
@@ -191,7 +191,7 @@ public final class I2PDatagramDissector {
         
         if (rxSign == null || rxSign.getData() == null || rxDest == null || rxDest.getSigningPublicKey() == null)
             throw new I2PInvalidDatagramException("Datagram not yet read");
-
+        
         // now validate
         if (!this.dsaEng.verifySignature(rxSign, rxHash.getData(), rxDest.getSigningPublicKey()))
             throw new I2PInvalidDatagramException("Incorrect I2P repliable datagram signature");

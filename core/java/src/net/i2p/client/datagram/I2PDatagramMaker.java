@@ -70,12 +70,12 @@ public final class I2PDatagramMaker {
         
         try {
             sxDGram.write(sxDestBytes);
-        
+            
             dsaEng.sign(hashGen.calculateHash(payload).toByteArray(),
                         sxPrivKey).writeBytes(sxDGram);
-
+            
             sxDGram.write(payload);
-
+            
             return sxDGram.toByteArray();
         } catch (IOException e) {
             _log.error("Caught IOException", e);
