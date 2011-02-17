@@ -1,11 +1,11 @@
-HTTP/1.1 409 Conflict
+HTTP/1.1 403 Request Denied
 Content-Type: text/html; charset=UTF-8
 Cache-control: no-cache
 Connection: close
 Proxy-Connection: close
 
 <html lang="ar" dir="rtl"><head>
-<title>I2P Warning: Destination key conflict</title>
+<title>تحذير: لم يحدد بروكسي خارجي</title>
 <link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico" >
 <link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css" >
 </head>
@@ -15,14 +15,6 @@ Proxy-Connection: close
  <a href="http://127.0.0.1:7657/config.jsp">اعدادات</a> <a href="http://127.0.0.1:7657/help.jsp">مساعدة</a> <a href="http://127.0.0.1:7657/susidns/">دفتر العناوين</a>
 </div>
 <div class=warning id=warning>
-<h3>Warning: Destination Key Conflict</h3>
-The addresshelper link you followed specifies a different destination key
-than a host entry in your host database.
-Someone could be trying to impersonate another eepsite,
-or people have given two eepsites identical names.
-<p>
-You can resolve the conflict by considering which key you trust,
-and either discarding the addresshelper link,
-discarding the host entry from your host database,
-or naming one of them differently.
-<p>
+<h3>تحذير : رفض طلب</h3>
+حاولت الدخول الى موقع I2P خارج الشبكة.
+</div>
