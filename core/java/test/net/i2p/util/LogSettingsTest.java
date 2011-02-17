@@ -82,28 +82,33 @@ public class LogSettingsTest extends TestCase {
         
         System.setOut(pout);
 
-        log.debug("DEBUG" + ": debug");
-        log.info("DEBUG" + ": info");
-        log.warn("DEBUG" + ": warn");
-        log.error("DEBUG" + ": error");
-        log.log(Log.CRIT, "DEBUG" + ": crit");
-        _context.logManager().shutdown();
-        
-        String l1 = in.readLine();
-        String l2 = in.readLine();
-        String l3 = in.readLine();
-        String l4 = in.readLine();
-        String l5 = in.readLine();
-        
-        assertTrue(
-            l1.matches(".*DEBUG: debug") &&
-            l2.matches(".*DEBUG: info") &&
-            l3.matches(".*DEBUG: warn") &&
-            l4.matches(".*DEBUG: error") &&
-            l5.matches(".*DEBUG: crit")
-        );    
+        try {
+            log.debug("DEBUG" + ": debug");
+            log.info("DEBUG" + ": info");
+            log.warn("DEBUG" + ": warn");
+            log.error("DEBUG" + ": error");
+            log.log(Log.CRIT, "DEBUG" + ": crit");
 
-        System.setOut(systemOut);
+            // The following will take about 10 seconds as we wait for the
+            // LogWriter to flush. There is no public flush() method
+            String l1 = in.readLine();
+            String l2 = in.readLine();
+            String l3 = in.readLine();
+            String l4 = in.readLine();
+            String l5 = in.readLine();
+        
+            assertTrue(
+                l1.matches(".*DEBUG: debug") &&
+                l2.matches(".*DEBUG: info") &&
+                l3.matches(".*DEBUG: warn") &&
+                l4.matches(".*DEBUG: error") &&
+                l5.matches(".*DEBUG: crit")
+            );    
+        } finally {
+            System.setOut(systemOut);
+            pout.close();
+        }
+
         
     }
 
@@ -122,26 +127,31 @@ public class LogSettingsTest extends TestCase {
         
         System.setOut(pout);
         
-        log.debug("INFO" + ": debug");
-        log.info("INFO" + ": info");
-        log.warn("INFO" + ": warn");
-        log.error("INFO" + ": error");
-        log.log(Log.CRIT, "INFO" + ": crit");
-        _context.logManager().shutdown();
-       
-        String l1 = in.readLine();
-        String l2 = in.readLine();
-        String l3 = in.readLine();
-        String l4 = in.readLine();
-        
-        assertTrue(
-            l1.matches(".*INFO: info") &&
-            l2.matches(".*INFO: warn") &&
-            l3.matches(".*INFO: error") &&
-            l4.matches(".*INFO: crit")
-        );
+        try {
+            log.debug("INFO" + ": debug");
+            log.info("INFO" + ": info");
+            log.warn("INFO" + ": warn");
+            log.error("INFO" + ": error");
+            log.log(Log.CRIT, "INFO" + ": crit");
 
-        System.setOut(systemOut);
+            // The following will take about 10 seconds as we wait for the
+            // LogWriter to flush. There is no public flush() method
+            String l1 = in.readLine();
+            String l2 = in.readLine();
+            String l3 = in.readLine();
+            String l4 = in.readLine();
+        
+            assertTrue(
+                l1.matches(".*INFO: info") &&
+                l2.matches(".*INFO: warn") &&
+                l3.matches(".*INFO: error") &&
+                l4.matches(".*INFO: crit")
+            );
+        } finally {
+            System.setOut(systemOut);
+            pout.close();
+        }
+
 
     }
 
@@ -160,24 +170,29 @@ public class LogSettingsTest extends TestCase {
         
         System.setOut(pout);
         
-        log.debug("WARN" + ": debug");
-        log.info("WARN" + ": info");
-        log.warn("WARN" + ": warn");
-        log.error("WARN" + ": error");
-        log.log(Log.CRIT, "WARN" + ": crit");
-        _context.logManager().shutdown();
-        
-        String l1 = in.readLine();
-        String l2 = in.readLine();
-        String l3 = in.readLine();
-        
-        assertTrue(
-            l1.matches(".*WARN: warn") &&
-            l2.matches(".*WARN: error") &&
-            l3.matches(".*WARN: crit")
-        );
+        try {
+            log.debug("WARN" + ": debug");
+            log.info("WARN" + ": info");
+            log.warn("WARN" + ": warn");
+            log.error("WARN" + ": error");
+            log.log(Log.CRIT, "WARN" + ": crit");
 
-        System.setOut(systemOut);
+            // The following will take about 10 seconds as we wait for the
+            // LogWriter to flush. There is no public flush() method
+            String l1 = in.readLine();
+            String l2 = in.readLine();
+            String l3 = in.readLine();
+        
+            assertTrue(
+                l1.matches(".*WARN: warn") &&
+                l2.matches(".*WARN: error") &&
+                l3.matches(".*WARN: crit")
+            );
+        } finally {
+            System.setOut(systemOut);
+            pout.close();
+        }
+
     }
 
     public void testError() throws IOException{
@@ -195,22 +210,27 @@ public class LogSettingsTest extends TestCase {
         
         System.setOut(pout);
         
-        log.debug("ERROR" + ": debug");
-        log.info("ERROR" + ": info");
-        log.warn("ERROR" + ": warn");
-        log.error("ERROR" + ": error");
-        log.log(Log.CRIT, "ERROR" + ": crit");
-        _context.logManager().shutdown();
-        
-        String l1 = in.readLine();
-        String l2 = in.readLine();
-        
-        assertTrue(
-            l1.matches(".*ERROR: error") &&
-            l2.matches(".*ERROR: crit")
-        );
+        try {
+            log.debug("ERROR" + ": debug");
+            log.info("ERROR" + ": info");
+            log.warn("ERROR" + ": warn");
+            log.error("ERROR" + ": error");
+            log.log(Log.CRIT, "ERROR" + ": crit");
 
-        System.setOut(systemOut);
+            // The following will take about 10 seconds as we wait for the
+            // LogWriter to flush. There is no public flush() method
+            String l1 = in.readLine();
+            String l2 = in.readLine();
+        
+            assertTrue(
+                l1.matches(".*ERROR: error") &&
+                l2.matches(".*ERROR: crit")
+            );
+        } finally {
+            System.setOut(systemOut);
+            pout.close();
+        }
+
     }
 
     public void testCrit() throws IOException {
@@ -228,20 +248,25 @@ public class LogSettingsTest extends TestCase {
         
         System.setOut(pout);
         
-        log.debug("CRIT" + ": debug");
-        log.info("CRIT" + ": info");
-        log.warn("CRIT" + ": warn");
-        log.error("CRIT" + ": error");
-        log.log(Log.CRIT, "CRIT" + ": crit");
-        _context.logManager().shutdown();
-        
-        String l1 = in.readLine();
-        
-        assertTrue(
-            l1.matches(".*CRIT: crit")
-        );
+        try {
+            log.debug("CRIT" + ": debug");
+            log.info("CRIT" + ": info");
+            log.warn("CRIT" + ": warn");
+            log.error("CRIT" + ": error");
+            log.log(Log.CRIT, "CRIT" + ": crit");
 
-        System.setOut(systemOut);
+            // The following will take about 10 seconds as we wait for the
+            // LogWriter to flush. There is no public flush() method
+            String l1 = in.readLine();
+        
+            assertTrue(
+                l1.matches(".*CRIT: crit")
+            );
+        } finally {
+            System.setOut(systemOut);
+            pout.close();
+        }
+
     }
 
     
