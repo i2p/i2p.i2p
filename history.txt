@@ -1,3 +1,12 @@
+2011-02-17 zzz
+    * Build:
+      - Add includeAntRuntime=false to all javac targets
+      - Add build date, mtn rev, and changed file list to all manifests
+      - Add unless=uptodate to all jar and war targets
+        (bob and dtg still todo)
+    * Console: Add Arabic
+    * i2ptunnel: outproxy2 -> outproxyng (Ticket #394 take 2)
+
 2011-02-15 zzz
     * i2psnark: Details link shuffle, mostly restore 0.8.3 behavior
     * Profiles: Punish rejections more, in an attempt to spread the
@@ -75,7 +84,7 @@
       - Don't expire outbound Piece messages, since we now defer loading the
         data from disk
     * i2ptunnel:
-      - Change connect proxy default to outproxy2.h2ik.i2p
+      - Change connect proxy default to outproxy2.h2ik.i2p (ticket #394)
       - IRCClient: Use tunnel log instance
       - Server: Full queue log tweak
 
