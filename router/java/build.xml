@@ -41,11 +41,13 @@
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
+
     <target name="compileTest" depends="builddeptest">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
+        <!-- junit classes are in ant runtime -->
         <javac srcdir="./src:./test" debug="true" source="1.5" target="1.5" deprecation="on"
-               includeAntRuntime="false"
+               includeAntRuntime="true"
                destdir="./build/obj" classpath="../../core/java/build/i2ptest.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
