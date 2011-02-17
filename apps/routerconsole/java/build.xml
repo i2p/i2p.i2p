@@ -46,6 +46,7 @@
         <javac 
             srcdir="./src" 
             debug="true" deprecation="on" source="1.5" target="1.5" 
+            includeAntRuntime="false"
             destdir="./build/obj">
             <compilerarg line="${javac.compilerargs}" />
             <classpath>
@@ -61,12 +62,27 @@
             </classpath>
         </javac>
     </target>
-    <target name="jar" depends="compile">
+
+    <target name="jar" depends="compile, jarUpToDate" unless="jar.uptodate" >
+        <exec executable="mtn" outputproperty="workspace.changes.j" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="list" />
+            <arg value="changed" />
+            <arg value="." />
+        </exec>
+        <!-- \n in an attribute value generates an invalid manifest -->
+        <exec executable="tr" inputstring="${workspace.changes.j}" outputproperty="workspace.changes.j.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="-s" />
+            <arg value="[:space:]" />
+            <arg value="," />
+        </exec>
         <jar destfile="./build/routerconsole.jar" basedir="./build/obj" includes="**/*.class">
             <manifest>
                 <!-- top level installer will rename to jrobin.jar -->
                 <!-- DTG added in 0.8.4, not in the classpath for very old installs, before we changed wrapper.config to specify * -->
                 <attribute name="Class-Path" value="i2p.jar router.jar jrobin.jar desktopgui.jar" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.j.tr}" />
             </manifest>
         </jar>
         <delete dir="./tmpextract" />
@@ -93,6 +109,13 @@
         <jar destfile="./build/routerconsole.jar" basedir="./build/obj" includes="**/*.class" update="true" />
     </target>
 
+
+    <target name="jarUpToDate">
+        <uptodate property="jar.uptodate" targetfile="build/routerconsole.jar" >
+            <srcfiles dir= "build/obj" includes="**/*.class" />
+        </uptodate>
+    </target>
+
     <target name="poupdate" depends="build">
         <ant target="war" />
         <!-- Update the messages_*.po files.
@@ -110,12 +133,36 @@
             <arg value="-p" />
         </exec>
     </target>
-    <target name="war" depends="precompilejsp">
+
+    <target name="war" depends="precompilejsp, warUpToDate" unless="war.uptodate" >
+        <exec executable="mtn" outputproperty="workspace.changes.w" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="list" />
+            <arg value="changed" />
+            <arg value="../jsp" />
+        </exec>
+        <!-- \n in an attribute value generates an invalid manifest -->
+        <exec executable="tr" inputstring="${workspace.changes.w}" outputproperty="workspace.changes.w.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="-s" />
+            <arg value="[:space:]" />
+            <arg value="," />
+        </exec>
         <!-- Don't include the css in the war, the main build.xml will copy it to docs/themes/console/ -->
         <war destfile="build/routerconsole.war" webxml="../jsp/web-out.xml"
              basedir="../jsp/" excludes="web.xml, *.css, **/*.java, *.jsp, *.jsi, web-fragment.xml, web-out.xml">
+            <manifest>
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.w.tr}" />
+            </manifest>
         </war>
     </target>
+
+    <target name="warUpToDate">
+        <uptodate property="war.uptodate" targetfile="build/routerconsole.war" >
+            <srcfiles dir= "../jsp" excludes="web.xml, web-fragment.xml, *.css, **/*.java, *.jsp, *.jsi" />
+        </uptodate>
+    </target>
+
     <target name="precompilejsp" unless="precompilejsp.uptodate">
         <delete dir="../jsp/WEB-INF/" />
         <delete file="../jsp/web-fragment.xml" />
@@ -182,6 +229,7 @@
         
         <javac debug="true" deprecation="on" source="1.5" target="1.5" 
                encoding="UTF-8"
+               includeAntRuntime="false"
                destdir="../jsp/WEB-INF/classes/" 
                srcdir="../jsp/WEB-INF/classes" includes="**/*.java">
             <compilerarg line="${javac.compilerargs}" />

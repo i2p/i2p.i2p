@@ -24,6 +24,7 @@
 
 	<target name="compile" depends="init">
 		<javac debug="true" deprecation="on" source="1.5" target="1.5" 
+                       includeAntRuntime="false"
                        srcdir="${src}" destdir="${build}">
             <compilerarg line="${javac.compilerargs}" />
             <classpath>
@@ -48,9 +49,23 @@
         <exec executable="sh" osfamily="windows" failifexecutionfails="true" >
             <arg value="./bundle-messages.sh" />
         </exec>
+        <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="list" />
+            <arg value="changed" />
+            <arg value="." />
+        </exec>
+        <!-- \n in an attribute value generates an invalid manifest -->
+        <exec executable="tr" inputstring="${workspace.changes}" outputproperty="workspace.changes.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="-s" />
+            <arg value="[:space:]" />
+            <arg value="," />
+        </exec>
 		<jar basedir="${build}" destfile="${dist}/${jar}">
 			<manifest>
 				<attribute name="Main-Class" value="net.i2p.desktopgui.Main"/>
+				<attribute name="Build-Date" value="${build.timestamp}" />
+				<attribute name="Base-Revision" value="${workspace.version}" />
+				<attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
 			</manifest>
 		</jar>
 	</target>

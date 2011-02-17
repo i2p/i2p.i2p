@@ -97,7 +97,9 @@
     </target>
 
     <target name="buildDesktopGui" depends="buildCore, buildrouter" >
+<!--
         <ant dir="apps/desktopgui" target="clean" />
+-->
         <ant dir="apps/desktopgui" target="jar" />
     </target>
 
@@ -105,7 +107,7 @@
         <ant dir="apps/routerconsole/java/" target="jar" />
     </target>
 
-    <target name="buildJetty" >
+    <target name="buildJetty" depends="buildProperties" >
         <ant dir="apps/jetty" target="build" />
     </target>
 
@@ -127,9 +129,19 @@
         <copy file="router/java/build/router.jar" todir="build/" />
     </target>
 
-    <target name="buildCore" >
+    <target name="buildCore" depends="buildProperties" >
         <ant dir="core/java/" target="jar" />
         <copy file="core/java/build/i2p.jar" todir="build/" />
+    </target>
+
+    <target name="buildProperties" >
+        <exec executable="mtn" outputproperty="workspace.version" errorproperty="mtn.error1" failifexecutionfails="false" >
+            <arg value="automate" />
+            <arg value="get_base_revision_id" />
+        </exec>
+        <tstamp>
+            <format property="build.timestamp" pattern="yyyy-MM-dd HH:mm:ss z" timezone="UTC" locale="en" />
+        </tstamp>
     </target>
 
     <!-- end of sub-build.xml targets -->
@@ -165,11 +177,13 @@
 	</condition>
 	<ant target="doBuildEXE" />
     </target>
-    <target name="doBuildEXE" unless="noExe">
+    <target name="doBuildEXE" depends="buildProperties" unless="noExe">
         <jar destfile="./build/launchi2p.jar">
             <manifest>
 	     <attribute name="Main-Class" value="net.i2p.router.RouterLaunch" />
 	     <attribute name="Class-Path" value="lib/i2p.jar lib/router.jar lib/jbigi.jar lib/BOB.jar lib/sam.jar lib/mstreaming.jar lib/streaming.jar lib/routerconsole.jar lib/i2ptunnel.jar lib/org.mortbay.jetty.jar lib/javax.servlet.jar lib/jasper-compiler.jar lib/jasper-runtime.jar lib/commons-logging.jar lib/commons-el.jar lib/wrapper.jar lib/systray.jar lib/systray4j.jar lib/desktopgui.jar" />
+             <attribute name="Build-Date" value="${build.timestamp}" />
+             <attribute name="Base-Revision" value="${workspace.version}" />
 	    </manifest>
         </jar>
 	<!-- now the standalone launcher exe -->
@@ -678,17 +692,43 @@
     <target name="prepjupdatefixes" depends="prepupdate, buildWEB">
         <copy file="build/org.mortbay.jetty.jar" todir="pkg-temp/lib/" />
     </target>
-    <target name="installer" depends="preppkg">
+    <target name="installer" depends="preppkg, buildProperties">
         <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />
         <mkdir dir="pkg-temp/installer" />
+        <exec executable="mtn" outputproperty="workspace.changes.util" errorproperty="mtn.error.util" failifexecutionfails="false" >
+            <arg value="list" />
+            <arg value="changed" />
+            <arg value="core/java/src/net/i2p/util" />
+        </exec>
+        <!-- \n in an attribute value generates an invalid manifest -->
+        <exec executable="tr" inputstring="${workspace.changes.util}" outputproperty="workspace.changes.util.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="-s" />
+            <arg value="[:space:]" />
+            <arg value="," />
+        </exec>
         <jar destfile="./pkg-temp/installer/copy.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Copy.class net/i2p/util/FileUtil.class">
-            <manifest><attribute name="Main-Class" value="net.i2p.util.Copy" /></manifest>
+            <manifest>
+                <attribute name="Main-Class" value="net.i2p.util.Copy" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
+            </manifest>
         </jar>
         <jar destfile="./pkg-temp/installer/delete.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Delete.class net/i2p/util/FileUtil.class">
-            <manifest><attribute name="Main-Class" value="net.i2p.util.Delete" /></manifest>
+            <manifest>
+                <attribute name="Main-Class" value="net.i2p.util.Delete" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
+            </manifest>
         </jar>
         <jar destfile="./pkg-temp/installer/exec.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Exec.class">
-            <manifest><attribute name="Main-Class" value="net.i2p.util.Exec" /></manifest>
+            <manifest>
+                <attribute name="Main-Class" value="net.i2p.util.Exec" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
+            </manifest>
         </jar>
         <!--
           Force 1.5 pack200 output

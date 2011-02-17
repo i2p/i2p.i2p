@@ -23,13 +23,16 @@
         <pathelement location="../../../core/java/build/i2p.jar" />
  	</path>
 	<property name="javac.compilerargs" value="" />
+
  	<target name="compile">
 		<mkdir dir="${bin}" />
 		<javac debug="true" deprecation="on" source="1.5" target="1.5"
+			includeAntRuntime="false"
  			classpathref="cp" destdir="${bin}" srcdir="${src}" includes="**/*.java" >
 			<compilerarg line="${javac.compilerargs}" />
 		</javac>
 	</target>
+
     <target name="precompilejsp" unless="precompilejsp.uptodate">
         <delete file="WEB-INF/web-fragment.xml" />
         <delete file="WEB-INF/web-out.xml" />
@@ -47,6 +50,7 @@
             <arg value="./jsp" />
         </java>
         <javac debug="true" deprecation="on" source="1.5" target="1.5" 
+               includeAntRuntime="false"
                destdir="${bin}" srcdir="${tmp}" includes="**/*.java" classpathref="cp">
 		<compilerarg line="${javac.compilerargs}" />
          </javac>
@@ -61,8 +65,20 @@
         <srcfiles dir= "." includes="jsp/*.jsp, WEB-INF/web-template.xml"/>
     </uptodate>
 
-    <target name="all" depends="compile,precompilejsp,bundle,war"/> 
-    <target name="war"> 
+    <target name="all" depends="war"/> 
+
+    <target name="war" depends="compile, precompilejsp, bundle, warUpToDate" unless="war.uptodate" > 
+        <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="list" />
+            <arg value="changed" />
+            <arg value="." />
+        </exec>
+        <!-- \n in an attribute value generates an invalid manifest -->
+        <exec executable="tr" inputstring="${workspace.changes}" outputproperty="workspace.changes.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="-s" />
+            <arg value="[:space:]" />
+            <arg value="," />
+        </exec>
         <war destfile="${project}.war" webxml="WEB-INF/web-out.xml">
         	<fileset dir=".">
         		<include name="WEB-INF/**/*.class"/>
@@ -74,7 +90,18 @@
         		<include name="index.html"/>
         		<include name="WEB-INF/classes/${project}.properties"/>
         	</fileset>
+            <manifest>
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+            </manifest>
         </war>
+    </target>
+
+    <target name="warUpToDate">
+        <uptodate property="war.uptodate" targetfile="${project}.war">
+            <srcfiles dir= "." includes="WEB-INF/web-out.xml WEB-INF/**/*.class images/*.png css.css index.html WEB-INF/classes/${project}.properties" />
+        </uptodate>
     </target>
 
     <target name="bundle" depends="compile, precompilejsp">
