@@ -55,50 +55,17 @@ public class RouterConsoleRunner {
     private static final String DEFAULT_WEBAPPS_DIR = "./webapps/";
     private static final String USAGE = "Bad RouterConsoleRunner arguments, check clientApp.0.args in your clients.config file! " +
                                         "Usage: [[port host[,host]] [-s sslPort [host[,host]]] [webAppsDir]]";
-    private static final String PROP_HEADLESS = "router.isHeadless";
     
     static {
         System.setProperty("org.mortbay.http.Version.paranoid", "true");
         
         //Check if we are in a headless environment, set properties accordingly
-        List<RouterContext> contexts = RouterContext.listContexts();
-        if(contexts != null && contexts.size() > 0) {
-        	RouterContext context = contexts.get(0);
-        	String headless = context.getProperty(PROP_HEADLESS);
-        	if(headless == null) {
-        		/*
-        		 * Let's check if we are in a headless environment.
-        		 * We do this by setting headless to false
-        		 * and trying to get the graphics environment.
-        		 * If this fails, we should be headless.
-        		 */
-        		System.setProperty("java.awt.headless", "false");
-        		try {
-	                GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-	                ge.isHeadlessInstance();
-	                context.setProperty(PROP_HEADLESS, "false");
-        		}
-        		catch(InternalError e) {
-        			context.setProperty(PROP_HEADLESS, "true");
-        		}
-        		context.router().setConfigSetting(PROP_HEADLESS, context.getProperty(PROP_HEADLESS));
-                context.router().saveConfig();
-                context.router().shutdown(0);
-        	}
-        	boolean isHeadless = true;
-        	try {
-        		isHeadless = Boolean.parseBoolean(headless);
-        	}
-        	catch(Exception e) {
-        		//Incorrect setting, let's choose headless for safety
-        		isHeadless = true;
-        	}
-        	if(isHeadless) {
-        		System.setProperty("java.awt.headless", "true");
-        	}
-        	else {
-        		System.setProperty("java.awt.headless", "false");
-        	}
+        String headless = "java.awt.headless";
+        if(GraphicsEnvironment.isHeadless()) {
+        	System.setProperty(headless, "true");
+        }
+        else {
+        	System.setProperty(headless, "false");
         }
     }
     
@@ -359,13 +326,13 @@ public class RouterConsoleRunner {
         }
 
         try {
-        	//TODO: move away from routerconsole into a separate application.
-        	//ApplicationManager?
-        	VersionComparator v = new VersionComparator();
-        	if(v.compare(System.getProperty("java.runtime.version"), "1.6") >= 0) {
+            //TODO: move away from routerconsole into a separate application.
+            //ApplicationManager?
+            VersionComparator v = new VersionComparator();
+            if(v.compare(System.getProperty("java.runtime.version"), "1.6") >= 0) {
                 String[] args = new String[0];
-                net.i2p.desktopgui.Main.beginStartup(args);	
-        	}
+                net.i2p.desktopgui.Main.beginStartup(args);    
+            }
         } catch (Throwable t) {
             t.printStackTrace();
         }

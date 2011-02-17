@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P i2ptunnel\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-17 18:54+0000\n"
-"PO-Revision-Date: 2011-01-18 00:34+0500\n"
+"POT-Creation-Date: 2011-02-14 18:14+0000\n"
+"PO-Revision-Date: 2011-02-14 23:24+0500\n"
 "Last-Translator: Hidden Z <hiddenz@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "Language: \n"
@@ -32,81 +32,90 @@ msgstr "Jump-сервисы, которые, возможно, знают нуж
 msgid "internal"
 msgstr "внутренний"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:170
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:171
 msgid "Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit."
 msgstr "Неправильно переданная форма, возможно вы использовали действие браузера \"назад\" или \"обновить\". Пожалуйста повторите попытку."
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:217
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:218
 msgid "Configuration reloaded for all tunnels"
 msgstr "Конфигурация для всех туннелей перечитана"
 
 #. and give them something to look at in any case
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:229
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:230
 msgid "Starting tunnel"
 msgstr "Запуск туннеля"
 
 #. and give them something to look at in any case
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:242
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:243
 msgid "Stopping tunnel"
 msgstr "Остановка туннеля"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:389
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:311
+msgid "Configuration changes saved"
+msgstr "Настройки сохранены"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:314
+msgid "Failed to save configuration"
+msgstr "Не удалось сохранить настройки"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:398
 msgid "New Tunnel"
 msgstr "Новый туннель"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:409
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:418
 msgid "Standard client"
 msgstr "Обычный клиент"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:410
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:419
 msgid "HTTP client"
 msgstr "HTTP-клиент"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:411
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:420
 msgid "IRC client"
 msgstr "IRC-клиент"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:412
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:421
 msgid "Standard server"
 msgstr "Обычный сервер"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:413
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:422
 msgid "HTTP server"
 msgstr "HTTP-сервер"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:414
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:423
 msgid "SOCKS 4/4a/5 proxy"
 msgstr "SOCKS 4/4a/5 прокси"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:415
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:424
 msgid "SOCKS IRC proxy"
 msgstr "SOCKS IRC прокси"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:416
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:425
 msgid "CONNECT/SSL/HTTPS proxy"
 msgstr "CONNECT/SSL/HTTPS прокси"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:417
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:426
 msgid "IRC server"
 msgstr "IRC-сервер"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:418
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:427
 msgid "Streamr client"
 msgstr "Streamr-клиент"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:419
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:428
 msgid "Streamr server"
 msgstr "Streamr-сервер"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:420
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:429
 msgid "HTTP bidir"
 msgstr "HTTP bidir (экспериментальный двунаправленный режим, инструкцию спрашивайте у sponge)"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:508
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:517
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:290
 msgid "Host not set"
 msgstr "Хост не задан"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:512
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:521
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:272
 msgid "Port not set"
 msgstr "Порт не задан"
@@ -560,8 +569,8 @@ msgid "Access List"
 msgstr "Список доступа"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:451
-msgid "Inbound connection limits (0 to disable)"
-msgstr "Ограничение входящих соединений (0 для отключения)"
+msgid "Inbound connection limits (0=unlimited)"
+msgstr "Ограничение входящих соединений (0=неограниченно)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:453
 msgid "Per client"
@@ -584,8 +593,8 @@ msgid "Total"
 msgstr "Всего"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:475
-msgid "Max concurrent connections (0 to disable)"
-msgstr "Максимум одновременных соединений (0 для отключения)"
+msgid "Max concurrent connections (0=unlimited)"
+msgstr "Максимум одновременных соединений (0=неограниченно)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:493
 msgid "New Certificate type"

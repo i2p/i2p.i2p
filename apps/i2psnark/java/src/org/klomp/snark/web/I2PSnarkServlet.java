@@ -857,20 +857,53 @@ public class I2PSnarkServlet extends Default {
         out.write("<td class=\"center " + rowClass + "\">");
         out.write(statusString + "</td>\n\t");
 
+        // (i) icon column
         out.write("<td class=\"" + rowClass + "\">");
+        if (isValid && meta.getAnnounce() != null) {
+            // Link to local details page - note that trailing slash on a single-file torrent
+            // gets us to the details page instead of the file.
+            //StringBuilder buf = new StringBuilder(128);
+            //buf.append("<a href=\"").append(snark.getBaseName())
+            //   .append("/\" title=\"").append(_("Torrent details"))
+            //   .append("\"><img alt=\"").append(_("Info")).append("\" border=\"0\" src=\"")
+            //   .append(_imgPath).append("details.png\"></a>");
+            //out.write(buf.toString());
+
+            // Link to tracker details page
+            String trackerLink = getTrackerLink(meta.getAnnounce(), snark.getInfoHash());
+            if (trackerLink != null)
+                out.write(trackerLink);
+        }
+
+        // File type icon column
+        out.write("</td>\n<td class=\"" + rowClass + "\">");
         if (isValid) {
+            // Link to local details page - note that trailing slash on a single-file torrent
+            // gets us to the details page instead of the file.
             StringBuilder buf = new StringBuilder(128);
             buf.append("<a href=\"").append(snark.getBaseName())
                .append("/\" title=\"").append(_("Torrent details"))
-               .append("\"><img alt=\"").append(_("Info")).append("\" border=\"0\" src=\"")
-               .append(_imgPath).append("details.png\"></a>");
-             out.write(buf.toString());
+               .append("\">");
+            out.write(buf.toString());
+        }
+        String icon;
+        if (isMultiFile)
+            icon = "folder";
+        else if (isValid)
+            icon = toIcon(meta.getName());
+        else
+            icon = "magnet";
+        if (isValid) {
+            out.write(toImg(icon, _("Info")));
+            out.write("</a>");
+        } else {
+            out.write(toImg(icon));
         }
 
-        out.write("</td>\n<td class=\"" + rowClass + "\">");
-        StringBuilder buf = null;
+        // Torrent name column
+        out.write("</td><td class=\"snarkTorrentName " + rowClass + "\">");
         if (remaining == 0 || isMultiFile) {
-            buf = new StringBuilder(128);
+            StringBuilder buf = new StringBuilder(128);
             buf.append("<a href=\"").append(snark.getBaseName());
             if (isMultiFile)
                 buf.append('/');
@@ -882,22 +915,6 @@ public class I2PSnarkServlet extends Default {
             buf.append("\">");
             out.write(buf.toString());
         }
-        String icon;
-        if (isMultiFile)
-            icon = "folder";
-        else if (isValid)
-            icon = toIcon(meta.getName());
-        else
-            icon = "magnet";
-        if (remaining == 0 || isMultiFile) {
-            out.write(toImg(icon, _("Open")));
-            out.write("</a>");
-        } else {
-            out.write(toImg(icon));
-        }
-        out.write("</td><td class=\"snarkTorrentName " + rowClass + "\">");
-        if (remaining == 0 || isMultiFile)
-            out.write(buf.toString());
         out.write(filename);
         if (remaining == 0 || isMultiFile)
             out.write("</a>");
@@ -1169,7 +1186,7 @@ public class I2PSnarkServlet extends Default {
         out.write(_("From URL"));
         out.write(":<td><input type=\"text\" name=\"newURL\" size=\"85\" value=\"" + newURL + "\"");
         out.write("title=\"");
-        out.write(_("Torrent file must originate from an I2P-based tracker"));
+        out.write(_("Enter the torrent file download URL (I2P only), magnet link, or maggot link"));
         out.write("\"> \n");
         // not supporting from file at the moment, since the file name passed isn't always absolute (so it may not resolve)
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>");
