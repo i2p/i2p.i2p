@@ -771,29 +771,31 @@
         <launch4j configFile="./installer/i2pstandalone.xml" />
 	<!-- thazzit -->
     </target>
-    <target name="test">
+
+    <target name="test" depends="buildProperties" >
         <ant dir="core/java/" target="test" />
     </target>
-    <target name="junit.report">
+    <target name="junit.report" depends="buildProperties" >
         <ant dir="core/java/" target="junit.report" />
     </target>
-    <target name="clover.report">
+    <target name="clover.report" depends="buildProperties" >
         <ant dir="core/java/" target="clover.report" />
     </target>
     <target name="test.report" depends="junit.report, clover.report"/>
-    <target name="fulltest">
+    <target name="fulltest" depends="buildProperties" >
 		<ant dir="core/java/" target="fulltest" />
 		<ant dir="router/java/" target="fulltest" />
     </target>
-    <target name="fullclovertest">
+    <target name="fullclovertest" depends="buildProperties" >
 		<ant dir="core/java/" target="fullclovertest" />
 		<ant dir="router/java/" target="fullclovertest" />
     </target>
+
     <target name="syndie" >
         <ant dir="apps/syndie/java/" target="standalone" />
         <copy file="apps/syndie/java/syndie-standalone.zip" todir="." />
     </target>
-    <target name="i2psnark">
+    <target name="i2psnark" depends="buildProperties" >
         <ant dir="apps/i2psnark/java" target="standalone" />
         <copy file="apps/i2psnark/java/i2psnark-standalone.zip" todir="." />
     </target>
@@ -998,7 +1000,7 @@
 
     <target name="debian" depends="distclean, debian-source, debian-binary" />
 
-    <target name="debian-binary">
+    <target name="debian-binary" depends="buildProperties" >
         <echo message="Did you update the version in these files?" />
         <exec executable="ls" failonerror="true">
             <arg value="-l" />
@@ -1015,7 +1017,7 @@
             <arg value="amd64" />
         </exec>
     </target>
-    <target name="debian-source">
+    <target name="debian-source" depends="buildProperties" >
         <!-- bundle the 20MB jetty 5 lib since there probably isn't a deb for it -->
         <ant dir="apps/jetty" target="ensureJettylib" />
         <echo message="Did you update the version in these files?" />
