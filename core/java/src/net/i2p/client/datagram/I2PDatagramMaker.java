@@ -28,15 +28,15 @@ public final class I2PDatagramMaker {
 
     private static Log _log = new Log(I2PDatagramMaker.class);
 
-    private static int DGRAM_BUFSIZE = 32768;
+    private static final int DGRAM_BUFSIZE = 32768;
 
-    private SHA256Generator hashGen = SHA256Generator.getInstance();
-    private DSAEngine dsaEng = DSAEngine.getInstance();
+    private final SHA256Generator hashGen = SHA256Generator.getInstance();
+    private final DSAEngine dsaEng = DSAEngine.getInstance();
 
     private SigningPrivateKey sxPrivKey = null;
     private byte[] sxDestBytes = null;
 
-    private ByteArrayOutputStream sxDGram = new ByteArrayOutputStream(DGRAM_BUFSIZE);
+    private final ByteArrayOutputStream sxDGram = new ByteArrayOutputStream(DGRAM_BUFSIZE);
 
     /**
      * Construct a new I2PDatagramMaker that will be able to create I2P

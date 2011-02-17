@@ -30,10 +30,10 @@ public final class I2PDatagramDissector {
 
     private static Log _log = new Log(I2PDatagramDissector.class);
 
-    private static int DGRAM_BUFSIZE = 32768;
+    private static final int DGRAM_BUFSIZE = 32768;
 
-    private DSAEngine dsaEng = DSAEngine.getInstance();
-    private SHA256Generator hashGen = SHA256Generator.getInstance();
+    private final DSAEngine dsaEng = DSAEngine.getInstance();
+    private final SHA256Generator hashGen = SHA256Generator.getInstance();
 
     private Hash rxHash = null;
 
@@ -41,7 +41,7 @@ public final class I2PDatagramDissector {
 
     private Destination rxDest;
 
-    private byte[] rxPayload = new byte[DGRAM_BUFSIZE];
+    private final byte[] rxPayload = new byte[DGRAM_BUFSIZE];
 
     private int rxPayloadLen = 0;
     
@@ -189,8 +189,7 @@ public final class I2PDatagramDissector {
         if(this.valid)
             return;
         
-        if (rxSign == null || rxSign.getData() == null ||
-            rxDest == null || rxDest.getSigningPublicKey() == null)
+        if (rxSign == null || rxSign.getData() == null || rxDest == null || rxDest.getSigningPublicKey() == null)
             throw new I2PInvalidDatagramException("Datagram not yet read");
 
         // now validate
