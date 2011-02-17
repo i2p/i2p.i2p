@@ -561,6 +561,8 @@
         <copy todir="pkg-temp/docs/" >
           <fileset dir="installer/resources/readme/" includes="readme*.html" />
           <fileset dir="installer/resources/proxy/" includes="*.ht" />
+          <!-- lang_ar.png added in 0.8.4 -->
+          <fileset dir="installer/resources/" includes="icons/flags/lang_ar.png" />
         </copy>
     </target>
 
