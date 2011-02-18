@@ -89,8 +89,12 @@ public class LogSettingsTest extends TestCase {
             log.error("DEBUG" + ": error");
             log.log(Log.CRIT, "DEBUG" + ": crit");
 
-            // The following will take about 10 seconds as we wait for the
-            // LogWriter to flush. There is no public flush() method
+            // Wait for the LogWriter to flush, then write extra stuff so
+            // the test doesn't hang on failure
+            try { Thread.sleep(12*1000); } catch (InterruptedException ie) {}
+            for (int i = 0; i < 5; i++)
+                 pout.println("");
+            pout.flush();
             String l1 = in.readLine();
             String l2 = in.readLine();
             String l3 = in.readLine();
@@ -134,8 +138,12 @@ public class LogSettingsTest extends TestCase {
             log.error("INFO" + ": error");
             log.log(Log.CRIT, "INFO" + ": crit");
 
-            // The following will take about 10 seconds as we wait for the
-            // LogWriter to flush. There is no public flush() method
+            // Wait for the LogWriter to flush, then write extra stuff so
+            // the test doesn't hang on failure
+            try { Thread.sleep(12*1000); } catch (InterruptedException ie) {}
+            for (int i = 0; i < 4; i++)
+                 pout.println("");
+            pout.flush();
             String l1 = in.readLine();
             String l2 = in.readLine();
             String l3 = in.readLine();
@@ -177,8 +185,12 @@ public class LogSettingsTest extends TestCase {
             log.error("WARN" + ": error");
             log.log(Log.CRIT, "WARN" + ": crit");
 
-            // The following will take about 10 seconds as we wait for the
-            // LogWriter to flush. There is no public flush() method
+            // Wait for the LogWriter to flush, then write extra stuff so
+            // the test doesn't hang on failure
+            try { Thread.sleep(12*1000); } catch (InterruptedException ie) {}
+            for (int i = 0; i < 3; i++)
+                 pout.println("");
+            pout.flush();
             String l1 = in.readLine();
             String l2 = in.readLine();
             String l3 = in.readLine();
@@ -217,8 +229,12 @@ public class LogSettingsTest extends TestCase {
             log.error("ERROR" + ": error");
             log.log(Log.CRIT, "ERROR" + ": crit");
 
-            // The following will take about 10 seconds as we wait for the
-            // LogWriter to flush. There is no public flush() method
+            // Wait for the LogWriter to flush, then write extra stuff so
+            // the test doesn't hang on failure
+            try { Thread.sleep(12*1000); } catch (InterruptedException ie) {}
+            for (int i = 0; i < 2; i++)
+                 pout.println("");
+            pout.flush();
             String l1 = in.readLine();
             String l2 = in.readLine();
         
@@ -255,8 +271,11 @@ public class LogSettingsTest extends TestCase {
             log.error("CRIT" + ": error");
             log.log(Log.CRIT, "CRIT" + ": crit");
 
-            // The following will take about 10 seconds as we wait for the
-            // LogWriter to flush. There is no public flush() method
+            // Wait for the LogWriter to flush, then write extra stuff so
+            // the test doesn't hang on failure
+            try { Thread.sleep(12*1000); } catch (InterruptedException ie) {}
+            pout.println("");
+            pout.flush();
             String l1 = in.readLine();
         
             assertTrue(
