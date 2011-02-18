@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-12 11:40+0000\n"
+"POT-Creation-Date: 2011-02-16 17:10+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -22,17 +22,26 @@ msgstr "正在启动 I2P !"
 msgid "Starting"
 msgstr "正在启动"
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:25
+#: src/net/i2p/desktopgui/InternalTrayManager.java:26
 msgid "Launch I2P Browser"
 msgstr "正在启动I2P浏览器"
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:49
+#: src/net/i2p/desktopgui/InternalTrayManager.java:50
+msgid "Configure desktopgui"
+msgstr ""
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:67
 msgid "Restart I2P"
 msgstr "重启 I2P"
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:67
+#: src/net/i2p/desktopgui/InternalTrayManager.java:85
 msgid "Stop I2P"
 msgstr "停止 I2P"
+
+#. Translate interface
+#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:26
+msgid "Should tray icon be enabled?"
+msgstr ""
 
 #~ msgid "Browser not found"
 #~ msgstr "Browser niet gevonden"
