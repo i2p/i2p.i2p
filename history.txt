@@ -1,3 +1,5 @@
+2011-02-18 Mathiasdm
+    * Desktopgui now has an option to be disabled (desktopgui.enabled)
 2011-02-17 zzz
     * Build:
       - Add includeAntRuntime=false to all javac targets
