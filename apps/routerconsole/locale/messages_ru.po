@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-14 18:14+0000\n"
-"PO-Revision-Date: 2011-02-14 23:21+0500\n"
+"POT-Creation-Date: 2011-02-19 17:25+0000\n"
+"PO-Revision-Date: 2011-02-19 22:43+0500\n"
 "Last-Translator: Hidden Z <hiddenz@mail.i2p>\n"
 "Language-Team: \n"
 "Language: \n"
@@ -28,7 +28,7 @@ msgstr ""
 #. {0,number,####} prevents 1234 from being output as 1,234 in the English locale.
 #. If you want the digit separator in your locale, translate as {0}.
 #. alternates: msec, msecs
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1124
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1141
 #, java-format
 msgid "1 ms"
 msgid_plural "{0,number,####} ms"
@@ -39,7 +39,7 @@ msgstr[2] "{0,number,####} мс"
 #. seconds
 #. Note to translators: quantity will always be greater than one.
 #. alternates: secs, sec. 'seconds' is probably too long.
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1129
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1146
 #, java-format
 msgid "1 sec"
 msgid_plural "{0} sec"
@@ -50,7 +50,7 @@ msgstr[2] "{0} с."
 #. minutes
 #. Note to translators: quantity will always be greater than one.
 #. alternates: mins, min. 'minutes' is probably too long.
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1134
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1151
 #, java-format
 msgid "1 min"
 msgid_plural "{0} min"
@@ -61,7 +61,7 @@ msgstr[2] "{0} мин."
 #. hours
 #. Note to translators: quantity will always be greater than one.
 #. alternates: hrs, hr., hrs.
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1139
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1156
 #, java-format
 msgid "1 hour"
 msgid_plural "{0} hours"
@@ -69,14 +69,14 @@ msgstr[0] "{0} час"
 msgstr[1] "{0} часа"
 msgstr[2] "{0} часов"
 
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1141
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1158
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:313
 msgid "n/a"
 msgstr "нет данных"
 
 #. days
 #. Note to translators: quantity will always be greater than one.
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1145
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1162
 #, java-format
 msgid "1 day"
 msgid_plural "{0} days"
@@ -2340,38 +2340,42 @@ msgid "Refresh the page to view."
 msgstr "Обновите страницу для просмотра."
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:51
+msgid "Arabic"
+msgstr "Арабский"
+
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:52
 msgid "English"
 msgstr "English"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:51
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:52
 msgid "French"
 msgstr "Français"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:51
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:52
 msgid "German"
 msgstr "Deutsch"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:51
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:52
 msgid "Spanish"
 msgstr "Испанский"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:52
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:53
 msgid "Dutch"
 msgstr "Nederlands"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:52
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:53
 msgid "Portuguese"
 msgstr "Португальский"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:52
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:53
 msgid "Russian"
 msgstr "Русский"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:53
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:54
 msgid "Chinese"
 msgstr "中文"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:53
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:54
 msgid "Swedish"
 msgstr "Svenska"
 
