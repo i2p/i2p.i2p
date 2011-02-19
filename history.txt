@@ -1,6 +1,8 @@
 2011-02-19 zzz
     * I2PTunnel: Fix standalone server tunnels
                  http://forum.i2p/viewtopic.php?t=5376
+    * Plugins: Fix signature verification if router.config specifies
+               trustedUpdateKeys (ticket #416)
 
 2011-02-18 Mathiasdm
     * Desktopgui now has an option to be disabled (desktopgui.enabled)
