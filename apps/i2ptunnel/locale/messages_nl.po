@@ -6,16 +6,17 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: I2P i2ptunnel\n"
+"Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-13 17:44+0000\n"
-"PO-Revision-Date: 2010-06-15 14:09+0100\n"
-"Last-Translator: duck <duck@mail.i2p>\n"
-"Language-Team: duck <duck@mail.i2p>, monkeybrains <monkeybrains@mail.i2p>\n"
+"POT-Creation-Date: 2011-02-20 12:18+0000\n"
+"PO-Revision-Date: 2011-02-20 12:14+0000\n"
+"Last-Translator: ducki2p <ducki2p@gmail.com>\n"
+"Language-Team: Dutch <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Language: Dutch\n"
+"Language: nl\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:474
 #, java-format
@@ -64,11 +65,11 @@ msgstr "Stoppen van tunnel"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:311
 msgid "Configuration changes saved"
-msgstr ""
+msgstr "Configuratie wijzigingen opgeslagen"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:314
 msgid "Failed to save configuration"
-msgstr ""
+msgstr "Opslaan van de configuratie mislukt"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:398
 msgid "New Tunnel"
