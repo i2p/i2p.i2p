@@ -46,7 +46,7 @@ public class BSkipList extends SkipList {
 	public HashMap spanHash = new HashMap();
 	public HashMap levelHash = new HashMap();
 
-	protected BSkipList() { }
+	private final boolean fileOnly;
 
 	public BSkipList(int spanSize, BlockFile bf, int skipPage, Serializer key, Serializer val) throws IOException {
 		this(spanSize, bf, skipPage, key, val, false);
@@ -65,6 +65,7 @@ public class BSkipList extends SkipList {
 		spans = bf.file.readInt();
 		//System.out.println(size + " " + spans); 
 
+		this.fileOnly = fileOnly;
 		if (fileOnly)
 			first = new IBSkipSpan(bf, this, firstSpanPage, key, val);
 		else
@@ -125,6 +126,36 @@ public class BSkipList extends SkipList {
 		int max = super.maxLevels();
 		int cells = (int) ((BlockFile.PAGESIZE - 8) / 4);
 		return (max > cells) ? cells : max;
+	}
+
+	@Override
+	public SkipIterator iterator() {
+		if (!this.fileOnly)
+			return super.iterator();
+		return new IBSkipIterator(first, 0);
+	}
+
+	@Override
+	public SkipIterator min() {
+		return iterator();
+	}
+
+	@Override
+	public SkipIterator max() {
+		if (!this.fileOnly)
+			return super.max();
+		SkipSpan ss = stack.getEnd();
+		return new IBSkipIterator(ss, ss.nKeys - 1);
+	}
+
+	@Override
+	public SkipIterator find(Comparable key) {
+		if (!this.fileOnly)
+			return super.find(key);
+		int[] search = new int[1];
+		SkipSpan ss = stack.getSpan(stack.levels.length - 1, key, search);
+		if(search[0] < 0) { search[0] = -1 * (search[0] + 1); }
+		return new IBSkipIterator(ss, search[0]);
 	}
 
 }

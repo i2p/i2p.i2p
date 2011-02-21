@@ -26,42 +26,43 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package net.metanotion.util.skiplist;
+package net.metanotion.io.block.index;
 
-import java.util.ListIterator;
+import java.io.IOException;
 import java.util.NoSuchElementException;
 
-/**	A basic iterator for a skip list.
- 	This is not a complete ListIterator, in particular, since the
- 	skip list is a map and is therefore indexed by Comparable objects instead
- 	of int's, the nextIndex and previousIndex methods are not really relevant.
+import net.metanotion.util.skiplist.SkipIterator;
+import net.metanotion.util.skiplist.SkipSpan;
 
-	To be clear, this is an iterator through the values.
-	To get the key, call nextKey() BEFORE calling next().
+/**
+	I2P
+	Overridden to load the span when required and null out the keys and values
+	when the iterator leaves the span.
+	If the caller does not iterate all the way through, the last span
+	will remain in memory.
 */
-public class SkipIterator implements ListIterator {
-	protected SkipSpan ss;
-	protected int index;
+public class IBSkipIterator extends SkipIterator {
 
-	protected SkipIterator() { }
-	public SkipIterator(SkipSpan ss, int index) {
-		if(ss==null) { throw new NullPointerException(); }
-		this.ss = ss;
-		this.index = index;
-	}
-
-	public boolean hasNext() {
-		if(index < ss.nKeys) { return true; }
-		return false;
+	public IBSkipIterator(SkipSpan ss, int index) {
+		super(ss, index);
 	}
 
 	/**
 	 * @return the next value, and advances the index
 	 * @throws NoSuchElementException
+	 * @throws RuntimeException on IOE
 	 */
+	@Override
 	public Object next() {
 		Object o;
 		if(index < ss.nKeys) {
+			if (ss.vals == null) {
+				try {
+					((IBSkipSpan)ss).seekAndLoadData();
+				} catch (IOException ioe) {
+					throw new RuntimeException("Error in iterator", ioe);
+				}
+			}
 			o = ss.vals[index];
 		} else {
 			throw new NoSuchElementException();
@@ -70,52 +71,67 @@ public class SkipIterator implements ListIterator {
 		if(index < (ss.nKeys-1)) {
 			index++;
 		} else if(ss.next != null) {
+			ss.keys = null;
+			ss.vals = null;
 			ss = ss.next;
 			index = 0;
 		} else {
+			ss.keys = null;
+			ss.vals = null;
 			index = ss.nKeys;
 		}
 		return o;
 	}
 
 	/**
-         * The key. Does NOT advance the index.
+	 * The key. Does NOT advance the index.
 	 * @return the key for which the value will be returned in the subsequent call to next()
 	 * @throws NoSuchElementException
+	 * @throws RuntimeException on IOE
 	 */
+	@Override
 	public Comparable nextKey() {
 		Comparable c;
-		if(index < ss.nKeys) { return ss.keys[index]; }
+		if(index < ss.nKeys) {
+			if (ss.keys == null) {
+				try {
+					((IBSkipSpan)ss).seekAndLoadData();
+				} catch (IOException ioe) {
+					throw new RuntimeException("Error in iterator", ioe);
+				}
+			}
+			return ss.keys[index];
+		}
 		throw new NoSuchElementException();
-	}
-
-	public boolean hasPrevious() {
-		if(index > 0) { return true; }
-		if((ss.prev != null) && (ss.prev.nKeys > 0)) { return true; }
-		return false;
 	}
 
 	/**
 	 * @return the previous value, and decrements the index
 	 * @throws NoSuchElementException
+	 * @throws RuntimeException on IOE
 	 */
+	@Override
 	public Object previous() {
 		if(index > 0) {
 			index--;
 		} else if(ss.prev != null) {
+			ss.keys = null;
+			ss.vals = null;
 			ss = ss.prev;
 			if(ss.nKeys <= 0) { throw new NoSuchElementException(); }
 			index = (ss.nKeys - 1);
+		} else {
+			ss.keys = null;
+			ss.vals = null;
+			throw new NoSuchElementException();
+		}
+		if (ss.vals == null) {
+			try {
+				((IBSkipSpan)ss).seekAndLoadData();
+			} catch (IOException ioe) {
+				throw new RuntimeException("Error in iterator", ioe);
+			}
 		}
 		return ss.vals[index];
 	}
-
-
-	// Optional methods
-	public void add(Object o)	{ throw new UnsupportedOperationException(); }
-	public void remove()		{ throw new UnsupportedOperationException(); }
-	public void set(Object o)	{ throw new UnsupportedOperationException(); }
-	public int nextIndex()		{ throw new UnsupportedOperationException(); }
-	public int previousIndex()	{ throw new UnsupportedOperationException(); }
-
 }

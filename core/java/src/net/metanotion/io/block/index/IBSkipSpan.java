@@ -92,12 +92,13 @@ public class IBSkipSpan extends BSkipSpan {
 	 * I2P - second half of load()
 	 * Load the whole span's keys and values into memory
 	 */
-	protected static void loadData(IBSkipSpan bss, BlockFile bf, int spanPage, Serializer key, Serializer val) throws IOException {
-		BSkipSpan.loadData(bss, bf, spanPage, key, val);
-		if (bss.nKeys > 0)
-			bss.firstKey = bss.keys[0];
+	@Override
+	protected void loadData() throws IOException {
+		super.loadData();
+		if (this.nKeys > 0)
+			this.firstKey = this.keys[0];
 		if (DEBUG)
-			System.err.println("Loaded data for page " + spanPage + " containing " + bss.nKeys + '/' + bss.spanSize + " first key: " + bss.firstKey);
+			System.err.println("Loaded data for page " + this.page + " containing " + this.nKeys + '/' + this.spanSize + " first key: " + this.firstKey);
 	}
 
 	/**
@@ -134,10 +135,11 @@ public class IBSkipSpan extends BSkipSpan {
 
 	/**
 	 * Seek to the start of the span and load the data
+	 * Package private so BSkipIterator can call it
 	 */
-	private void seekAndLoadData() throws IOException {
+	void seekAndLoadData() throws IOException {
 		seekData();
-		loadData(this, this.bf, this.page, this.keySer, this.valSer);
+		loadData();
 	}
 
 	/**

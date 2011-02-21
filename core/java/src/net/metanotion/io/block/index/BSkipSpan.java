@@ -129,7 +129,7 @@ public class BSkipSpan extends SkipSpan {
 
 	private static void load(BSkipSpan bss, BlockFile bf, BSkipList bsl, int spanPage, Serializer key, Serializer val) throws IOException {
 		loadInit(bss, bf, bsl, spanPage, key, val);
-		loadData(bss, bf, spanPage, key, val);
+		bss.loadData();
 	}
 
 	/**
@@ -157,34 +157,34 @@ public class BSkipSpan extends SkipSpan {
 	 * I2P - second half of load()
 	 * Load the whole span's keys and values into memory
 	 */
-	protected static void loadData(BSkipSpan bss, BlockFile bf, int spanPage, Serializer key, Serializer val) throws IOException {
-		bss.keys = new Comparable[bss.spanSize];
-		bss.vals = new Object[bss.spanSize];
+	protected void loadData() throws IOException {
+		this.keys = new Comparable[this.spanSize];
+		this.vals = new Object[this.spanSize];
 
 		int ksz, vsz;
-		int curPage = spanPage;
+		int curPage = this.page;
 		int[] curNextPage = new int[1];
-		curNextPage[0] = bss.overflowPage;
+		curNextPage[0] = this.overflowPage;
 		int[] pageCounter = new int[1];
 		pageCounter[0] = 16;
 //		System.out.println("Span Load " + sz + " nKeys " + nKeys + " page " + curPage);
-		for(int i=0;i<bss.nKeys;i++) {
+		for(int i=0;i<this.nKeys;i++) {
 			if((pageCounter[0] + 4) > BlockFile.PAGESIZE) {
-				BlockFile.pageSeek(bf.file, curNextPage[0]);
+				BlockFile.pageSeek(this.bf.file, curNextPage[0]);
 				curPage = curNextPage[0];
-				curNextPage[0] = bf.file.readInt();
+				curNextPage[0] = this.bf.file.readInt();
 				pageCounter[0] = 4;
 			}
-			ksz = bf.file.readShort();
-			vsz = bf.file.readShort();
+			ksz = this.bf.file.readShort();
+			vsz = this.bf.file.readShort();
 			pageCounter[0] +=4;
 			byte[] k = new byte[ksz];
 			byte[] v = new byte[vsz];
-			curPage = bf.readMultiPageData(k, curPage, pageCounter, curNextPage);
-			curPage = bf.readMultiPageData(v, curPage, pageCounter, curNextPage);
+			curPage = this.bf.readMultiPageData(k, curPage, pageCounter, curNextPage);
+			curPage = this.bf.readMultiPageData(v, curPage, pageCounter, curNextPage);
 //			System.out.println("i=" + i + ", Page " + curPage + ", offset " + pageCounter[0] + " ksz " + ksz + " vsz " + vsz);
-			bss.keys[i] = (Comparable) bss.keySer.construct(k);
-			bss.vals[i] = bss.valSer.construct(v);
+			this.keys[i] = (Comparable) this.keySer.construct(k);
+			this.vals[i] = this.valSer.construct(v);
 		}
 
 	}

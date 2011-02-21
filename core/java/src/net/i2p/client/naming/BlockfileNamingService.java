@@ -32,6 +32,7 @@ import net.i2p.util.Log;
 
 import net.metanotion.io.Serializer;
 import net.metanotion.io.block.BlockFile;
+import net.metanotion.util.skiplist.SkipIterator;
 import net.metanotion.util.skiplist.SkipList;
 
 
@@ -361,6 +362,33 @@ public class BlockfileNamingService extends DummyNamingService {
         return d;
     }
 
+    private void dumpDB() {
+        synchronized(_bf) {
+            if (_isClosed)
+                _log.error("Database is closed");
+            for (String list : _lists) { 
+                try {
+                    SkipList sl = _bf.getIndex(list, _stringSerializer, _destSerializer);
+                    if (sl == null) {
+                        _log.error("No list found for " + list);
+                        continue;
+                    }
+                    int i = 0;
+                    for (SkipIterator iter = sl.iterator(); iter.hasNext(); ) {
+                         String key = (String) iter.nextKey();
+                         DestEntry de = (DestEntry) iter.next();
+                         _log.error("DB " + list + " key " + key + " val " + de);
+                         i++;
+                    }
+                    _log.error(i + " entries found for " + list);
+                } catch (IOException ioe) {
+                    _log.error("Fail", ioe);
+                    break;
+                }
+            }
+        }
+    }
+
     public void close() {
         synchronized(_bf) {
             try {
@@ -506,6 +534,7 @@ public class BlockfileNamingService extends DummyNamingService {
         }
         System.out.println("BFNS took " + DataHelper.formatDuration(System.currentTimeMillis() - start));
         System.out.println("found " + found + " notfound " + notfound);
+        bns.dumpDB();
         bns.close();
 
         HostsTxtNamingService htns = new HostsTxtNamingService(I2PAppContext.getGlobalContext());

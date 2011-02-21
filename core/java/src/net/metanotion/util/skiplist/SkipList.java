@@ -136,6 +136,7 @@ public class SkipList {
 		return new SkipIterator(ss, ss.nKeys - 1);
 	}
 
+	/** @return an iterator where nextKey() is the first one greater than or equal to 'key' */
 	public SkipIterator find(Comparable key) {
 		int[] search = new int[1];
 		SkipSpan ss = stack.getSpan(stack.levels.length - 1, key, search);
@@ -163,6 +164,7 @@ public class SkipList {
 
 		Repeat, with splits induced, and collapse induced.
 */
+/*****
 	public static void main(String args[]) {
 		SkipList sl = new SkipList(3);
 		sl.put(".1", "1");
@@ -171,11 +173,14 @@ public class SkipList {
 		sl.put(".1", "1-1");
 		sl.put(".2", "2");
 		sl.put(".3", "3");
+*****/
 /*		System.out.println("\n#1");
 		sl.print();
 */
+/*****
 
 		sl.put(".4", "4");
+*****/
 /*		System.out.println("\n#2");
 		sl.print();
 
@@ -193,6 +198,7 @@ public class SkipList {
 		System.out.println("\n#3");
 		sl.print();
 */
+/******
 		sl.put(".1", "1-2");
 		sl.put(".2", "2-1");
 		sl.put(".3", "3-1");
@@ -311,4 +317,5 @@ public class SkipList {
 			System.out.println("Iterator: " + si.next());
 		}
 	}
+*****/
 }
