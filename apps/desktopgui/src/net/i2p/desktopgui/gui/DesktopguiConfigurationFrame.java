@@ -40,7 +40,7 @@ public class DesktopguiConfigurationFrame extends javax.swing.JFrame {
         okButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(_("Tray icon configuration"));
 
         desktopguiEnabled.setSelected(true);
@@ -49,15 +49,15 @@ public class DesktopguiConfigurationFrame extends javax.swing.JFrame {
 
         okButton.setText("OK");
         okButton.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                okButtonMouseClicked(evt);
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                okButtonMouseReleased(evt);
             }
         });
 
         cancelButton.setText("Cancel");
         cancelButton.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                cancelButtonMouseClicked(evt);
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                cancelButtonMouseReleased(evt);
             }
         });
 
@@ -90,7 +90,20 @@ public class DesktopguiConfigurationFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void okButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_okButtonMouseClicked
+    private void cancelButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cancelButtonMouseReleased
+        System.out.println("Cancelling configuration change.");
+        this.dispose();
+    }//GEN-LAST:event_cancelButtonMouseReleased
+
+    private void okButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_okButtonMouseReleased
+        configureDesktopgui();
+    }//GEN-LAST:event_okButtonMouseReleased
+
+    protected static String _(String s) {
+        return DesktopguiTranslator._(s);
+    }
+
+    private void configureDesktopgui() {
         String property = "desktopgui.enabled";
         String value;
         if(!desktopguiEnabled.isSelected()) {
@@ -108,15 +121,6 @@ public class DesktopguiConfigurationFrame extends javax.swing.JFrame {
         }
         System.out.println("Applying desktopgui configuration!");
         this.dispose();
-    }//GEN-LAST:event_okButtonMouseClicked
-
-    private void cancelButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cancelButtonMouseClicked
-        System.out.println("Cancelling configuration!");
-        this.dispose();
-    }//GEN-LAST:event_cancelButtonMouseClicked
-
-    protected static String _(String s) {
-        return DesktopguiTranslator._(s);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
