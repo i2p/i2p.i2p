@@ -4,7 +4,7 @@ Cache-control: no-cache
 Connection: close
 Proxy-Connection: close
 
-<html lang="ar" dir="rtl"><head>
+<html><head>
 <title>I2P Warning: Outproxy Not Found</title>
 <link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico" >
 <link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css" >
