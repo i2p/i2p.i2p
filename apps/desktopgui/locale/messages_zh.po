@@ -28,7 +28,7 @@ msgstr "正在启动I2P浏览器"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:50
 msgid "Configure desktopgui"
-msgstr ""
+msgstr "界面设置"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:67
 msgid "Restart I2P"
@@ -41,10 +41,10 @@ msgstr "停止 I2P"
 #. Translate interface
 #: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:26
 msgid "Should tray icon be enabled?"
-msgstr ""
+msgstr "显示托盘图标。"
 
 #~ msgid "Browser not found"
 #~ msgstr "Browser niet gevonden"
-
 #~ msgid "The default browser for your system was not found."
 #~ msgstr "De standaard webbrowser voor je systeem werd niet gevonden."
+
