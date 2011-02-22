@@ -335,8 +335,7 @@ public class BlockfileNamingService extends DummyNamingService {
         return rv;
     }
     
-    @Override
-    public Destination lookup(String hostname) {
+    public Destination lookup(String hostname, Properties lookupOptions, Properties storedOptions) {
         Destination d = super.lookup(hostname);
         if (d != null)
             return d;

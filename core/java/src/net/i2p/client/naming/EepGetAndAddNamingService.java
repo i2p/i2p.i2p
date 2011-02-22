@@ -30,6 +30,7 @@ import net.i2p.data.Destination;
  * i2p.naming.eepget.list=http://stats.i2p/cgi-bin/hostquery.cgi?a=,http://i2host.i2p/cgi-bin/i2hostquery?
  *
  * @author zzz
+ * @deprecated use HostsTxtNamingService.put()
  * @since 0.7.9
  */
 public class EepGetAndAddNamingService extends EepGetNamingService {
