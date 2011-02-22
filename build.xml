@@ -42,7 +42,8 @@
         <echo message="          (libc6-i686 and libc6-amd64 required, ant>=1.8 required)" />
         <echo message="  debianrepo: build a Debian repository (reprepro required)" />
         <echo message="  poupdate: update the .po files for translators" />
-    </target>
+        <echo message="  pkg-portable-win32:  build a minimum portable version for win32" />
+   </target>
     <target name="debianhowto">
         <echo message="To build debian packages, you must run dpkg-buildpackage as root in the source directory. It will then run ant for you. dpkg-buildpackage is found in the 'dpkg-dev' package. Also it should work fine to use the 'fakeroot' package with dpkg-buildpackage, if you don't want to run as root. Please read 'man dpkg-buildpackage' before building any packages yourself." />
     </target>
