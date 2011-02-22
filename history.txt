@@ -1,3 +1,9 @@
+2011-02-22 zzz
+    * BuildHandler: Prelmiinary participating tunnel throttler
+    * I2PTunnel:
+      - Add spellcheck=false to textareas
+      - Fix HTML error in 503 error page
+
 2011-02-19 zzz
     * I2PTunnel: Fix standalone server tunnels
                  http://forum.i2p/viewtopic.php?t=5376
