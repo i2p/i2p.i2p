@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-11-19 18:16+0000\n"
-"PO-Revision-Date: 2011-02-22 12:09-0000\n"
+"PO-Revision-Date: 2011-02-23 14:26-0000\n"
 "Last-Translator: hamada <hamada@mail.i2p>\n"
 "Language-Team: hamada@mail.i2p\n"
 "Language: ar\n"
@@ -228,7 +228,7 @@ msgstr ""
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:519
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:257
 msgid "Definitions"
-msgstr "Définitions"
+msgstr "التعاريف"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:520
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:715
@@ -240,7 +240,7 @@ msgstr "Définitions"
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:187
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:238
 msgid "Peer"
-msgstr "Pair"
+msgstr "مستخدم"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:520
 msgid "The remote peer, identified by router hash"
@@ -1564,7 +1564,7 @@ msgstr "إبدأ"
 #: ../java/src/net/i2p/router/web/ConfigKeyringHandler.java:49
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:61
 msgid "Unsupported"
-msgstr "Non supportée"
+msgstr "غير مدعومة"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:184
 msgid "New client added"
@@ -1572,7 +1572,7 @@ msgstr "اضافة مستخدم جديد"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:188
 msgid "Client configuration saved successfully - restart required to take effect."
-msgstr "La configuration du client a été sauvegardé avec succès - redémarrer pour prendre effet. "
+msgstr "تم حفظ العدادات بنجاح - يجب اعادة التشغيل لأخذها بالاعتبار"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:202
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:213
@@ -1758,11 +1758,11 @@ msgstr "حذف مفتاح"
 
 #: ../java/src/net/i2p/router/web/ConfigKeyringHandler.java:21
 msgid "You must enter a destination"
-msgstr "Vous devez saisir une destination"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/ConfigKeyringHandler.java:23
 msgid "You must enter a key"
-msgstr "Vous devez saisir une clé"
+msgstr "عليك ادخال مفتاح"
 
 #: ../java/src/net/i2p/router/web/ConfigKeyringHandler.java:34
 #: ../java/src/net/i2p/router/web/ConfigKeyringHandler.java:41
@@ -1776,7 +1776,7 @@ msgstr "أضف الى المفاتيح"
 
 #: ../java/src/net/i2p/router/web/ConfigKeyringHandler.java:36
 msgid "Invalid destination or key"
-msgstr "Destination ou clé pas valable"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/ConfigKeyringHandler.java:41
 msgid "removed from keyring"
@@ -1976,11 +1976,11 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:314
 msgid "Updating bandwidth share percentage"
-msgstr "Mise à jour du pourcentage de bande passante partagée"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:397
 msgid "Updated bandwidth limits"
-msgstr "Limitations mises à jour de la bande passante "
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/ConfigNetHelper.java:39
 #: ../java/src/net/i2p/router/web/ConfigNetHelper.java:47
@@ -2017,7 +2017,7 @@ msgstr "ممنوع حتى إعادة التشغيل"
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:38
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:59
 msgid "Invalid peer"
-msgstr "Pair pas valable"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:28
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:316
@@ -2123,7 +2123,7 @@ msgstr "أعد التشغيل التدريجي"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:67
 msgid "Graceful restart requested"
-msgstr "Redémarrage gracieux demandé"
+msgstr "اعادة التشغبل تدريجية"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:68
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:308
@@ -2163,7 +2163,7 @@ msgstr "لا تقوم باطلاق I2P عند البداية"
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:84
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:354
 msgid "Dump threads"
-msgstr "Dump fils d'exécution"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:91
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:322
@@ -2213,7 +2213,7 @@ msgstr "لن يتم إظهار شاشة التحكم عند البداية"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:129
 msgid "Service installed"
-msgstr "Service installé"
+msgstr "تم تثبيت الخدمة"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:131
 msgid "Warning: unable to install the service"
@@ -2285,7 +2285,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:46
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:61
 msgid "Client tunnels for"
-msgstr "Tunnels clients pour"
+msgstr "نفق لـ"
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:69
 msgid "ANONYMITY WARNING - Settings include 0-hop tunnels."
@@ -2322,19 +2322,19 @@ msgstr "الكمية"
 #. tunnel backup quantity
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:145
 msgid "Backup quantity"
-msgstr "'Backup' quantité"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:167
 msgid "Inbound options"
-msgstr "Options Entrants"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:180
 msgid "Outbound options"
-msgstr "Options Sortants"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/ConfigUIHandler.java:31
 msgid "Theme change saved."
-msgstr "Changement de thème sauvegardé."
+msgstr "تم حفظ تغيير التيمة."
 
 #: ../java/src/net/i2p/router/web/ConfigUIHandler.java:33
 msgid "Refresh the page to view."
@@ -2374,11 +2374,11 @@ msgstr "السويدية"
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:88
 msgid "Update available, attempting to download now"
-msgstr "Mise à jour disponible, en tentant de la télécharger actuellement"
+msgstr "يوجد اصدار جديد "
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:90
 msgid "Update available, click button on left to download"
-msgstr "Mise à jour disponible, cliquez sur le bouton sur la gauche pour la télécharger"
+msgstr "توجد تحديثات، انقر زر على اليسار للتحميل"
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:96
 msgid "No update available"
@@ -2427,11 +2427,11 @@ msgstr "كل"
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:108
 msgid "Notify only"
-msgstr "Notifier seulement"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:115
 msgid "Download and verify only"
-msgstr "Télécharger et vérifier seulement"
+msgstr "حمل فقط"
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:123
 msgid "Download, verify, and restart"
@@ -2453,7 +2453,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:130
 msgid "Configure Graph Display"
-msgstr "Graphe affichage configuration"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:130
 msgid "Select Stats"
@@ -2461,11 +2461,11 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:132
 msgid "Periods"
-msgstr "Périodes"
+msgstr "مدة"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:133
 msgid "Plot averages"
-msgstr "Tracer les moyennes"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:134
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:416
@@ -2475,7 +2475,7 @@ msgstr "أو"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:134
 msgid "plot events"
-msgstr "tracer les événements"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:135
 msgid "Image sizes"
@@ -2573,12 +2573,12 @@ msgstr "الغاية"
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:153
 #, java-format
 msgid "Expires in {0}"
-msgstr "Expirera en {0}"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:155
 #, java-format
 msgid "Expired {0} ago"
-msgstr "Périmé il y a {0}"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:167
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:156
@@ -2637,7 +2637,7 @@ msgstr "المعلومات"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:344
 msgid "Peer info for"
-msgstr "Mise à jour en cours"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:348
 msgid "Full entry"
@@ -2651,7 +2651,7 @@ msgstr "مختفي"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:354
 msgid "Updated"
-msgstr "Mise à jour fini"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:355
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:358
@@ -2663,7 +2663,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:357
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:361
 msgid "Published"
-msgstr "Publié il y a"
+msgstr "تم نشره منذ"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:363
 msgid "Address(es)"
@@ -2700,12 +2700,12 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/NewsFetcher.java:82
 #, java-format
 msgid "News last updated {0} ago."
-msgstr "Actualités mises à jour il y a {0}"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/NewsFetcher.java:88
 #, java-format
 msgid "News last checked {0} ago."
-msgstr "Actualités vérifiés il y a {0}"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/PluginUpdateChecker.java:77
 #, java-format
@@ -2869,17 +2869,17 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:72
 msgid "Peer Profiles"
-msgstr "Profils des pairs"
+msgstr "بروفايل المستخدمين"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:73
 #, java-format
 msgid "Showing {0} recent profiles."
-msgstr "Montrant {0} profiles récents"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:75
 #, java-format
 msgid "Hiding {0} older profiles."
-msgstr "Cachant {0} profiles anciens"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:77
 #, java-format
@@ -2926,16 +2926,16 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:129
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:163
 msgid "Failing"
-msgstr "Défaillant"
+msgstr "فشل"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:131
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:282
 msgid "Integrated"
-msgstr "Intégré"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:164
 msgid "Unreachable"
-msgstr "Inaccessible"
+msgstr ""
 
 #. hide if < 10%
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:171
@@ -2948,7 +2948,7 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:184
 msgid "Floodfill and Integrated Peers"
-msgstr "Floodfill et pairs intégrés"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:188
 msgid "Caps"
@@ -3055,7 +3055,7 @@ msgstr "سرعة"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:261
 msgid "capacity"
-msgstr ""
+msgstr "القدرة"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:261
 msgid "how many tunnels can we ask them to join in an hour?"
@@ -3239,7 +3239,7 @@ msgstr "خدمات I2P"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:63
 msgid "Manage your I2P hosts file here (I2P domain name resolution)"
-msgstr "Gérer votre fichier 'I2P hosts' ici (I2P DNS)"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:65
 msgid "Addressbook"
@@ -3247,7 +3247,7 @@ msgstr "دفتر العناوين"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:69
 msgid "Built-in anonymous BitTorrent Client"
-msgstr "Client bittorrent anonyme"
+msgstr "برنامج تورنت مجهول"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:71
 msgid "Torrents"
@@ -3263,7 +3263,7 @@ msgstr "بريد الكتروني"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:81
 msgid "Anonymous resident webserver"
-msgstr "Serveur web anonyme"
+msgstr "خادم ويب مجهول"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:83
 msgid "Webserver"
@@ -3280,24 +3280,24 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:99
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:379
 msgid "View existing tunnels and tunnel build status"
-msgstr "Montrer les tunnels existants et le statut de création des tunnels"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:105
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:254
 msgid "Show all current peer connections"
-msgstr "Montrer toutes les connexions actuelles aux pairs"
+msgstr "أظهر اتصالات المشاركين"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:111
 msgid "Show recent peer performance profiles"
-msgstr "Montrer les profils de la performance récente des pairs"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:113
 msgid "Profiles"
-msgstr "Profiles"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:117
 msgid "Show list of all known I2P routers"
-msgstr "Montrer une liste de touts le routeurs I2P connus"
+msgstr "أظهر قائمة بكل I2P المعروفة"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:119
 msgid "NetDB"
@@ -3305,15 +3305,15 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:123
 msgid "Health Report"
-msgstr "Fichier traces du routeur"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:125
 msgid "Logs"
-msgstr "Fichier traces"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:135
 msgid "Graph router performance"
-msgstr "Montrer la performance du routeur avec des graphes"
+msgstr "أظهر اشتغال الموجه بريم بياني"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:137
 msgid "Graphs"
@@ -3321,12 +3321,12 @@ msgstr "رسم بياني"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:141
 msgid "Textual router performance statistics"
-msgstr "La performance statistique du routeur en texte"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:147
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:365
 msgid "Local Destinations"
-msgstr "Destinations locales"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:149
 #: ../java/strings/Strings.java:62
@@ -3339,15 +3339,15 @@ msgstr "مساعدة روتر I2P"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:162
 msgid "General"
-msgstr "Général"
+msgstr "عام"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:167
 msgid "Local Identity"
-msgstr "Identité locale"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:171
 msgid "Your unique I2P router identity is"
-msgstr "L'identité unique de votre routeur est"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:175
 msgid "never reveal it to anyone"
@@ -3363,11 +3363,11 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:191
 msgid "Uptime"
-msgstr ""
+msgstr "مدة الاشتغال"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:198
 msgid "Help with configuring your firewall and router for optimal I2P performance"
-msgstr "Aide avec la configuration du pare-feu et du routeur afin d'optimiser la performance d'I2P"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:227
 msgid "Download"
@@ -3375,7 +3375,7 @@ msgstr "تحميل"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:236
 msgid "Download Unsigned"
-msgstr "Télécharger pas signé"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:262
 msgid "Active"
@@ -3387,7 +3387,7 @@ msgstr "سريع"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:276
 msgid "High capacity"
-msgstr "Haute capacité"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:288
 msgid "Known"
@@ -3395,11 +3395,11 @@ msgstr "معروف"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:303
 msgid "Help with firewall configuration"
-msgstr "Aide avec la configuration du pare-feu"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:305
 msgid "Check NAT/firewall"
-msgstr "Vérifier NAT/pare-feu"
+msgstr "تأكد من NAT/جدار ناري"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:325
 msgid "Reseed"
@@ -3407,11 +3407,11 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:342
 msgid "Configure router bandwidth allocation"
-msgstr "Configurer la bande passante du routeur"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:344
 msgid "Bandwidth in/out"
-msgstr "Bande passante entrante/sortante"
+msgstr "الاتصال الداخلي/خارجي"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:364
 msgid "Total"
@@ -3435,27 +3435,27 @@ msgstr "نسبة المشاركة"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:410
 msgid "What's in the router's job queue?"
-msgstr "Montrer les tâches du routeur qui sont à traiter "
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:412
 msgid "Congestion"
-msgstr "Saturation réseau"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:417
 msgid "Job lag"
-msgstr "Tâche décalage"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:423
 msgid "Message delay"
-msgstr "Message retard"
+msgstr "تأخر الرسالة"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:429
 msgid "Tunnel lag"
-msgstr "Tunnel décalage"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:435
 msgid "Backlog"
-msgstr "Retard accumulé"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:101
 msgid "ERR-Client Manager I2CP Error - check logs"
@@ -3473,23 +3473,23 @@ msgstr "موافق"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:118
 msgid "ERR-Private TCP Address"
-msgstr "ERR - Adresse TCP privée"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:120
 msgid "ERR-SymmetricNAT"
-msgstr "ERR - NAT symétrique"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:123
 msgid "WARN-Firewalled with Inbound TCP Enabled"
-msgstr "WARN - pare-feu avec TCP entrant activé"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:125
 msgid "WARN-Firewalled and Floodfill"
-msgstr "WARN - Pare-feu et Floodfill"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:127
 msgid "WARN-Firewalled and Fast"
-msgstr "WARN - Pare-feu et Rapide"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:128
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:580
@@ -3510,12 +3510,12 @@ msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:141
 msgid "WARN-Firewalled with UDP Disabled"
-msgstr "WARN - Pare-feu avec UDP desactivé"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:143
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:596
 msgid "Testing"
-msgstr "Test en cours"
+msgstr "جاري التجريب"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:365
 msgid "Add/remove/edit &amp; control your client and server tunnels"
@@ -3531,7 +3531,7 @@ msgstr "أظهر الانفاق"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:392
 msgid "Leases expired"
-msgstr "Bails périmés"
+msgstr ""
 
 #. red or yellow light
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:392
@@ -3568,7 +3568,7 @@ msgstr ""
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:416
 #: ../java/strings/Strings.java:36
 msgid "shared clients"
-msgstr "clients partagés"
+msgstr "المستخدمين المشتركين"
 
 #. Note to translators: all runtime zh translation disabled in this file, no font available in RRD
 #: ../java/src/net/i2p/router/web/SummaryRenderer.java:89
@@ -3613,15 +3613,15 @@ msgstr "من"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:72
 msgid "Receive on"
-msgstr "Réception active"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:73
 msgid "Expiration"
-msgstr "Expiration"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:73
 msgid "Send on"
-msgstr "Envoyer activé"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:73
 msgid "To"
@@ -3629,7 +3629,7 @@ msgstr "إلى"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:74
 msgid "Rate"
-msgstr "Taux"
+msgstr ""
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:74
 msgid "Role"
@@ -3847,7 +3847,7 @@ msgstr ""
 
 #: ../java/strings/Strings.java:39
 msgid "I2P webserver"
-msgstr ""
+msgstr "I2P خادم ويب"
 
 #: ../java/strings/Strings.java:40
 msgid "HTTP Proxy"
@@ -4103,19 +4103,19 @@ msgstr "اعدادات شبكة I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:297
 msgid "Bandwidth limiter"
-msgstr "Limiteur de bande passante"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:299
 msgid "I2P will work best if you configure your rates to match the speed of your internet connection."
-msgstr "I2P fonctionnera mieux si vous configurez le débit de transmission et réception pour qu'ils soient égales à ceux de votre connexion internet."
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:303
 msgid "KBps In"
-msgstr "KOps entrant"
+msgstr "KBps الداخلة"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:317
 msgid "KBps Out"
-msgstr "KOps sortant"
+msgstr "KBps الخارجة"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:333
 msgid "Share"
@@ -4130,28 +4130,28 @@ msgstr "ملاحظة"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:342
 #, java-format
 msgid "You have configured I2P to share only {0} KBps."
-msgstr "Vous avez configuré I2P à partager que {0} KOps."
+msgstr "لقد قمت باعداد I2P لمشاركة {0} KOps."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:345
 msgid "I2P requires at least 12KBps to enable sharing. "
-msgstr "I2P a besoin de plus de 12KOps afin d'activer le partage de bande passante"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:346
 msgid "Please enable sharing (participating in tunnels) by configuring more bandwidth. "
-msgstr "Veuillez activer le partage de bande passante (tunnels participants) en augmentant votre bande passante."
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:347
 msgid "It improves your anonymity by creating cover traffic, and helps the network."
-msgstr "Cela aidera votre anonymat en cachant vos données parmi les données des autres, et cela améliorera le réseau."
+msgstr "هذا يزيد من مجهولية المستخدم و يساعد الشبكة بشكل عام."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:350
 #, java-format
 msgid "You have configured I2P to share {0} KBps."
-msgstr "Vous avez configuré I2P à partager {0} KOps."
+msgstr "قمت باعداد I2P لمشاركة {0} KOps."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:353
 msgid "The higher the share bandwidth the more you improve your anonymity and help the network."
-msgstr "En partageant plus de votre bande passante, vous améliorerez votre anonymat et le réseau."
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:357
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:513
@@ -4172,7 +4172,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:376
 msgid "The default settings will work for most people."
-msgstr "La configuration par défaut marchera pour la plupart des gens."
+msgstr "الاعدادات التي تشتغل غالبية الوقت."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:378
 msgid "There is help below."
@@ -4180,53 +4180,53 @@ msgstr "أنظر التعليمات أسفله."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:380
 msgid "UPnP Configuration"
-msgstr "Configuration UPnP"
+msgstr "اعدادات UPnP"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:384
 msgid "Enable UPnP to open firewall ports"
-msgstr "Activer UPnP afin d'ouvrir les ports du pare-feu"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:386
 msgid "UPnP status"
-msgstr "Statut UPnP"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:388
 msgid "IP Configuration"
-msgstr "Configuration IP"
+msgstr "اعدادات IP"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:390
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:460
 msgid "Externally reachable hostname or IP address"
-msgstr "Adresse IP ou nom d'hôte qui est joignable depuis l'exterieur"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:394
 msgid "Use all auto-detect methods"
-msgstr "Utiliser toute méthode d'auto-détection"
+msgstr "استعمال جميع طرق الاكتشاف التلقائي"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:398
 msgid "Disable UPnP IP address detection"
-msgstr "Desactiver la détection de l'adresse IP par UPnP"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:402
 msgid "Ignore local interface IP address"
-msgstr "Ignorer l'adresse IP de l'interface locale"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:406
 msgid "Use SSU IP address detection only"
-msgstr "Utiliser seulement SSU pour détecter l'adresse IP"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:410
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:478
 msgid "Specify hostname or IP"
-msgstr "Saisir l'adresse IP ou le nom de l'hôte"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:416
 msgid "Select Interface"
-msgstr "Choisir l'interface"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:430
 msgid "Hidden mode - do not publish IP"
-msgstr "Mode caché - ne pas publier l'adresse IP"
+msgstr "لا تنشر عنوان  IP"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:432
 msgid "(prevents participating traffic)"
@@ -4258,7 +4258,7 @@ msgstr "اعدادات TCP"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:464
 msgid "Use auto-detected IP address"
-msgstr "Utiliser l'adresse IP qui a été auto-détectée"
+msgstr "استعمل دائما عنوان IP المكتشف "
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:466
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:498
@@ -4271,19 +4271,19 @@ msgstr "لايوجد جدار ناري"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:474
 msgid "Always use auto-detected IP address (Not firewalled)"
-msgstr "Utiliser toujours l'adresse IP qui a été auto-détectée (pas de pare-feu)"
+msgstr "استعمل دائما عنوان IP المكتشف (لا يوجد جدار ناري)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:484
 msgid "Disable inbound (Firewalled)"
-msgstr "Desactiver les connexions entrantes (derrière un pare-feu)"
+msgstr "الغاء الاتصال الداخلي (وراء جدار ناري)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:488
 msgid "Completely disable"
-msgstr "Desactiver complètement"
+msgstr "الغاء"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:490
 msgid "(select only if behind a firewall that throttles or blocks outbound TCP)"
-msgstr "(selectionner seulement si derrière un pare-feu qui limite les connexions sortantes TCP)"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:492
 msgid "Externally reachable TCP port"
@@ -4291,7 +4291,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:496
 msgid "Use the same port configured for UDP"
-msgstr "Utiliser le même port qui a été configuré pour UDP"
+msgstr "استعمل نفس المنفذ المخصص لمنفذ UDP"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:504
 msgid "Specify Port"
@@ -4318,79 +4318,79 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:521
 msgid "If you can, please poke a hole in your firewall to allow unsolicited UDP and TCP packets to reach you."
-msgstr "Si vous pouvez, ouvrez un port dans votre pare-feu afin de permettre la réception des les paquets TCP et UDP non sollicités."
+msgstr "ان توفرت الامكانية قم بفتح منفذ في الجدار الناري لسماح بوصول اتصال UDP و TCP"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:523
 msgid "If you can't, I2P supports UPnP (Universal Plug and Play) and UDP hole punching with \"SSU introductions\" to relay traffic."
-msgstr "Si vous ne pouvez pas, I2P est compatible avec UPnp (Universal Plug and Play)  et \"UDP hole punching\" avec \"SSU introductions\" afin de relayer le trafic I2P."
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:525
 msgid "Most of the options above are for special situations, for example where UPnP does not work correctly, or a firewall not under your control is doing harm."
-msgstr "Le plupart des possibilités décrites ci-avant sont pour les situtations particulieres, par exemple le cas où UPnP ne fonctionne pas correctement, ou un pare-feu empeche la connexion au réseau I2P."
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:527
 msgid "Certain firewalls such as symmetric NATs may not work well with I2P."
-msgstr "Il y a des certains types de pare-feu (tel que les NAT symétriques) qui ne fonctionnent pas bien avec I2P."
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:536
 msgid "UPnP is used to communicate with Internet Gateway Devices (IGDs) to detect the external IP address and forward ports."
-msgstr "UPnP est utilisé pour communiquer avec des \"Internet Gateway Devices (IGDs)\" afin de détecter l'adresse IP extérieure et de contrôler la redirection des ports."
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:538
 msgid "UPnP support is beta, and may not work for any number of reasons"
-msgstr "UPnP est toujours en développement, et il peut arrêter de fonctionner correctement à cause de "
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:540
 msgid "No UPnP-compatible device present"
-msgstr "Il n'y a pas d'appareil qui est compatible avec UPnP"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:542
 msgid "UPnP disabled on the device"
-msgstr "UPnP est desactivé sur l'appareil"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:544
 msgid "Software firewall interference with UPnP"
-msgstr "Il y a de l'intérference entre un pare-feu en software et UPnP"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:546
 msgid "Bugs in the device's UPnP implementation"
-msgstr "Il y a des bogues dans l'implementation d'UPnP dans l'appareil"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:548
 msgid "Multiple firewall/routers in the internet connection path"
-msgstr "Il y a plusieurs routeurs/pare-feux entre le routeur I2P et l'internet"
+msgstr "هناك عدة موجهات و جدار ناري في طريق الاتصال بالانترنت"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:550
 msgid "UPnP device change, reset, or address change"
-msgstr "Un changement de l'appareil UPnP, une redémarrage, ou une changement d'adresse IP"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:552
 msgid "Review the UPnP status here."
-msgstr "Consulter le statut de UPnP ici."
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:554
 msgid "UPnP may be enabled or disabled above, but a change requires a router restart to take effect."
-msgstr "UPnP peut être activé ou desactivé au-dessus, mais afin de prendre en compte la changement il faut rédemarrer le routeur I2P."
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:556
 msgid "Hostnames entered above will be published in the network database."
-msgstr "Les noms d'hôtes qui ont été saisis au-dessus seront publié dans la base de données du réseau I2P."
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:558
 msgid "They are <b>not private</b>."
-msgstr "Ils ne sont pas <b>privés</b>."
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:560
 msgid "Also, <b>do not enter a private IP address</b> like 127.0.0.1 or 192.168.1.1."
-msgstr "En plus, <b>ne saisissez pas une adresse IP privée</b> tel que 127.0.0.1 ou 192.168.1.1."
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:562
 msgid "If you specify the wrong IP address or hostname, or do not properly configure your NAT or firewall, your network performance will degrade substantially."
-msgstr "Si vous saisissez une mauvaise adresse IP ou nom d'hôte, ou configurer votre NAT ou pare-feu incorrectement, votre intégration avec le réseau I2P dégradera substantiellement."
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:564
 msgid "When in doubt, leave the settings at the defaults."
-msgstr "Si vous n'êtes pas sûr de vous, laisser la configuration par défaut."
+msgstr "ان لم تكن متأكدا دع الاعدادات كما هي."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:566
 msgid "Reachability Help"
@@ -4586,7 +4586,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:107
 msgid "config advanced"
-msgstr "configuration avancé"
+msgstr "اعدادات متقدمة"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:242
 msgid "I2P Advanced Configuration"
@@ -4627,7 +4627,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:336
 msgid "WebApp Configuration"
-msgstr "Configuration WebApp"
+msgstr "اعدادات تطبيق ويب"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:338
 msgid "The Java web applications listed below are started by the webConsole client and run in the same JVM as the router. They are usually web applications accessible through the router console. They may be complete applications (e.g. i2psnark),front-ends to another client or application which must be separately enabled (e.g. susidns, i2ptunnel), or have no web interface at all (e.g. addressbook)."
@@ -4687,7 +4687,7 @@ msgstr "صفحة النفق I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:316
 msgid "Dest. name, hash, or full key"
-msgstr "Nom de destination, empreinte, ou clé complète"
+msgstr "نقطة الوصول، اسم، بصمة، او مفتاح كامل"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:318
 msgid "Encryption Key"
@@ -4695,7 +4695,7 @@ msgstr "مفتاح التشفير"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:107
 msgid "config logging"
-msgstr "configuration enregistrements"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:242
 msgid "I2P Logging Configuration"
@@ -4719,7 +4719,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:311
 msgid "(use 'd' = date, 'c' = class, 't' = thread, 'p' = priority, 'm' = message)"
-msgstr "(use 'd' = date, 'c' = classe, 't' = fil d'exécution, 'p' = priorité, 'm' = message)"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:313
 msgid "Log date format"
@@ -4727,7 +4727,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:317
 msgid "('MM' = month, 'dd' = day, 'HH' = hour, 'mm' = minute, 'ss' = second, 'SSS' = millisecond)"
-msgstr "('MM' = mois, 'dd' = jour, 'HH' = heure, 'mm' = minute, 'ss' = seconde, 'SSS' = milliseconde)"
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:319
 msgid "Max log file size"
@@ -4755,7 +4755,7 @@ msgstr "اعدادات النظائر"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:228
 msgid "I2P Peer Configuration"
-msgstr "Configuration des pairs I2P"
+msgstr "اعدادات مستخدمي I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:304
 msgid "Manual Peer Controls"
@@ -4763,7 +4763,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:306
 msgid "Router Hash"
-msgstr "Routeur empreinte"
+msgstr "بصمة الموجه"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:310
 msgid "Manually Ban / Unban a Peer"
@@ -4779,7 +4779,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:326
 msgid "profiles page"
-msgstr "page des profiles"
+msgstr "صفحة البروفايل"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:342
 msgid "Adjust peer bonuses"
@@ -4788,7 +4788,7 @@ msgstr ""
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:344
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/profiles_jsp.java:253
 msgid "Banned Peers"
-msgstr "Pairs interdits"
+msgstr "مستخدمون ممنوعون"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:366
 msgid "Banned IPs"
@@ -4824,7 +4824,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:302
 msgid "A graceful restart will take a few minutes (but your peers will appreciate your patience), while a hard restart does so immediately."
-msgstr "Une redémarrage gracieux prendra quelques minutes (mais vos pairs apprécieront votre patience), une redémarrage immédiate est quasi instantané."
+msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:304
 msgid "After tearing down the router, it will wait 1 minute before starting back up again."
@@ -4974,7 +4974,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:339
 msgid "i2ptunnel page"
-msgstr ""
+msgstr "i2ptunnel صفحة"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:106
 msgid "config UI"
@@ -5050,7 +5050,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:338
 msgid "eepProxy port"
-msgstr ""
+msgstr "eepProxy منفذ"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:342
 msgid "Update URLs"
@@ -5094,7 +5094,7 @@ msgstr "غير موجود"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/graphs_jsp.java:106
 msgid "graphs"
-msgstr ""
+msgstr "رسم بياني"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/graphs_jsp.java:228
 msgid "I2P Performance Graphs"
@@ -5159,7 +5159,7 @@ msgstr "صفحة غير موجودة"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/nowebapp_jsp.java:231
 msgid "Web Application Not Running"
-msgstr "Tunnels d'application"
+msgstr "تطبيق الويب لا يشتغل"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/nowebapp_jsp.java:233
 msgid "The requested web application is not running."
@@ -5179,7 +5179,7 @@ msgstr "I2P شبكة المستخدمين"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/profiles_jsp.java:105
 msgid "peer profiles"
-msgstr ""
+msgstr "بروفايل المستخدمين"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/profiles_jsp.java:227
 msgid "I2P Network Peer Profiles"
