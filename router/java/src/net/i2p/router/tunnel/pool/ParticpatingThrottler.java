@@ -19,6 +19,9 @@ import net.i2p.util.SimpleTimer;
  * This also effectively limits the number of tunnels between
  * any given pair of routers, which probably isn't a bad thing.
  *
+ * Note that the actual limits will be higher than specified
+ * by up to 1 / LIFETIME_PORTION because the counter window resets.
+ *
  * Note that the counts are of previous + next hops, so the total will
  * be higher than the participating tunnel count, and will also grow
  * as the network uses more 3-hop tunnels.
@@ -32,9 +35,9 @@ class ParticipatingThrottler {
     /** portion of the tunnel lifetime */
     private static final int LIFETIME_PORTION = 3;
     private static final int MIN_LIMIT = 18 / LIFETIME_PORTION;
-    private static final int MAX_LIMIT = 81 / LIFETIME_PORTION;
+    private static final int MAX_LIMIT = 66 / LIFETIME_PORTION;
     private static final int PERCENT_LIMIT = 12 / LIFETIME_PORTION;
-    private static final long CLEAN_TIME = 10*60*1000 / LIFETIME_PORTION;
+    private static final long CLEAN_TIME = 11*60*1000 / LIFETIME_PORTION;
 
     ParticipatingThrottler(RouterContext ctx) {
         this.context = ctx;
