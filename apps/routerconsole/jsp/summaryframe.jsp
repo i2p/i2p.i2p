@@ -59,7 +59,6 @@
             out.print(":</b> <input size=\"3\" type=\"text\" name=\"refresh\" value=\"60\" >\n");
             out.print("<button type=\"submit\" value=\"Enable\" >");
             out.print(intl._("Enable"));
-            out.print("</button></div>\n");
         } else {
             // this will load in the iframe but subsequent pages will not have the iframe
             out.print("<input type=\"hidden\" name=\"refresh\" value=\"0\" >\n");
@@ -70,9 +69,8 @@
             } catch (NumberFormatException nfe) {}
             String refreshTime = net.i2p.data.DataHelper.formatDuration2(refreshMS);
             out.print(intl._("Disable {0} Refresh", refreshTime));
-            out.print("</button></div>\n");
         }
-        out.print("</form>\n");
+        out.print("</button></form></div>\n");
     }
 %>
 </div></body></html>
