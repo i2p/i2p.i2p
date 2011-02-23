@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-12 11:39+0000\n"
+"POT-Creation-Date: 2011-02-20 07:23+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -27,47 +27,47 @@ msgstr ""
 #. {0,number,####} prevents 1234 from being output as 1,234 in the English locale.
 #. If you want the digit separator in your locale, translate as {0}.
 #. alternates: msec, msecs
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1124
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1141
 #, java-format
 msgid "1 ms"
 msgid_plural "{0,number,####} ms"
-msgstr[0] "{0,number,####} 毫秒"
+msgstr[0] "{0,number,####} ms"
 
 #. seconds
 #. Note to translators: quantity will always be greater than one.
 #. alternates: secs, sec. 'seconds' is probably too long.
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1129
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1146
 #, java-format
 msgid "1 sec"
 msgid_plural "{0} sec"
-msgstr[0] "{0} 秒"
+msgstr[0] "{0} sec"
 
 #. minutes
 #. Note to translators: quantity will always be greater than one.
 #. alternates: mins, min. 'minutes' is probably too long.
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1134
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1151
 #, java-format
 msgid "1 min"
 msgid_plural "{0} min"
-msgstr[0] "{0} 分钟"
+msgstr[0] "{0} min"
 
 #. hours
 #. Note to translators: quantity will always be greater than one.
 #. alternates: hrs, hr., hrs.
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1139
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1156
 #, java-format
 msgid "1 hour"
 msgid_plural "{0} hours"
-msgstr[0] "{0} 小时"
+msgstr[0] "{0} hr"
 
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1141
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1158
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:313
 msgid "n/a"
 msgstr "N/A"
 
 #. days
 #. Note to translators: quantity will always be greater than one.
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1145
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1162
 #, java-format
 msgid "1 day"
 msgid_plural "{0} days"
@@ -2318,38 +2318,42 @@ msgid "Refresh the page to view."
 msgstr "刷新页面后查看。"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHelper.java:51
+msgid "Arabic"
+msgstr ""
+
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:52
 msgid "English"
 msgstr "英语"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:51
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:52
 msgid "French"
 msgstr "法语"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:51
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:52
 msgid "German"
 msgstr "德语"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:51
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:52
 msgid "Spanish"
 msgstr "西班牙语"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:52
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:53
 msgid "Dutch"
 msgstr "荷兰语"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:52
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:53
 msgid "Portuguese"
 msgstr "葡萄牙语"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:52
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:53
 msgid "Russian"
 msgstr "俄语"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:53
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:54
 msgid "Chinese"
 msgstr "中文"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:53
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:54
 msgid "Swedish"
 msgstr "瑞士语"
 
@@ -2720,7 +2724,7 @@ msgid "Plugin downloaded"
 msgstr "插件下载完成"
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:158
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:345
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:356
 #, java-format
 msgid "Cannot create plugin directory {0}"
 msgstr "无法创建插件目录 {0}"
@@ -2747,95 +2751,95 @@ msgstr "由 {0} 获取的插件缺少必要的配置文件"
 msgid "Plugin from {0} contains an invalid key"
 msgstr "由 {0} 获取的插件签名密钥无效"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:220
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:229
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:238
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:225
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:235
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:249
 #, java-format
 msgid "Plugin signature verification of {0} failed"
 msgstr "插件 {0} 的签名验证失败。"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:253
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:264
 #, java-format
 msgid "Plugin from {0} has invalid name or version"
 msgstr "从 {0} 获取的插件缺少有效的名称或版本"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:258
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:269
 #, java-format
 msgid "Plugin {0} has mismatched versions"
 msgstr "插件 {0} 的内部版本不符。"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:266
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:277
 #, java-format
 msgid "This plugin requires I2P version {0} or higher"
 msgstr "插件需要I2P版本 {0} 或更高"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:274
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:285
 #, java-format
 msgid "This plugin requires Java version {0} or higher"
 msgstr "插件需要 Java 版本 {0} 或更高"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:282
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:293
 msgid "Downloaded plugin is for new installs only, but the plugin is already installed"
 msgstr "所下插件包仅用于全新安装，但您已经安装过该插件"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:294
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:305
 msgid "Installed plugin does not contain the required configuration file"
 msgstr "已安装插件缺少所需的配置文件"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:302
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:313
 msgid "Signature of downloaded plugin does not match installed plugin"
 msgstr "所下插件的签名(人)与所安装插件的签名不符"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:309
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:320
 #, java-format
 msgid "Downloaded plugin version {0} is not newer than installed plugin"
 msgstr "所下插件版本 {0} 没有已安装插件的版本新"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:316
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:327
 #, java-format
 msgid "Plugin update requires installed plugin version {0} or higher"
 msgstr "插件更新包需要安装插件的版本为 {0} 或更高"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:323
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:334
 #, java-format
 msgid "Plugin update requires installed plugin version {0} or lower"
 msgstr "插件更新包需要安装插件的版本不高于 {0}"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:340
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:351
 msgid "Plugin is for upgrades only, but the plugin is not installed"
 msgstr "插件更新包包找不到对应的原版插件"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:353
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:364
 #, java-format
 msgid "Failed to install plugin in {0}"
 msgstr "无法将插件安装至目录{0}"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:360
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:371
 #, java-format
 msgid "Plugin {0} installed, router restart required"
 msgstr "插件 {0} 已安装，重启I2P后生效"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:362
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:373
 #, java-format
 msgid "Plugin {0} installed"
 msgstr "插件 {0} 已安装"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:380
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:391
 #, java-format
 msgid "Plugin {0} installed and started"
 msgstr "插件 {0} 已安装并启动"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:383
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:394
 #, java-format
 msgid "Plugin {0} installed but failed to start, check logs"
 msgstr "插件 {0} 已安装但启动失败，请检查日志。"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:385
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:396
 #, java-format
 msgid "Plugin {0} installed but failed to start"
 msgstr "插件 {0} 已安装但启动失败"
 
-#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:395
+#: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:406
 #, java-format
 msgid "Failed to download plugin from {0}"
 msgstr "重 {0} 下载插件失败"

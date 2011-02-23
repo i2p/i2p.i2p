@@ -53,7 +53,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
          "Connection: close\r\n"+
          "Proxy-Connection: close\r\n"+
          "\r\n"+
-         "<html><head><title>503 Service Unavailable<title></head>\n"+
+         "<html><head><title>503 Service Unavailable</title></head>\n"+
          "<body><h2>503 Service Unavailable</h2>\n" +
          "<p>This I2P eepsite is unavailable. It may be down or undergoing maintenance.</p>\n" +
          "</body></html>")

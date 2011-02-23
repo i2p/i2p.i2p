@@ -37,18 +37,19 @@ import net.i2p.util.Log;
  *
  */
 class BuildHandler {
-    private RouterContext _context;
-    private Log _log;
-    private BuildExecutor _exec;
-    private Job _buildMessageHandlerJob;
-    private Job _buildReplyMessageHandlerJob;
+    private final RouterContext _context;
+    private final Log _log;
+    private final BuildExecutor _exec;
+    private final Job _buildMessageHandlerJob;
+    private final Job _buildReplyMessageHandlerJob;
     /** list of BuildMessageState, oldest first */
     private final List<BuildMessageState> _inboundBuildMessages;
     /** list of BuildReplyMessageState, oldest first - unused unless HANDLE_REPLIES_INLINE == false */
     private final List<BuildReplyMessageState> _inboundBuildReplyMessages;
     /** list of BuildEndMessageState, oldest first - unused unless HANDLE_REPLIES_INLINE == false */
     private final List<BuildEndMessageState> _inboundBuildEndMessages;
-    private BuildMessageProcessor _processor;
+    private final BuildMessageProcessor _processor;
+    private final ParticipatingThrottler _throttler;
 
     private static final boolean HANDLE_REPLIES_INLINE = true;
     
@@ -101,6 +102,7 @@ class BuildHandler {
         ctx.inNetMessagePool().registerHandlerJobBuilder(TunnelBuildReplyMessage.MESSAGE_TYPE, tbrmhjb);
         ctx.inNetMessagePool().registerHandlerJobBuilder(VariableTunnelBuildMessage.MESSAGE_TYPE, tbmhjb);
         ctx.inNetMessagePool().registerHandlerJobBuilder(VariableTunnelBuildReplyMessage.MESSAGE_TYPE, tbrmhjb);
+        _throttler = new ParticipatingThrottler(ctx);
     }
     
     private static final int MAX_HANDLE_AT_ONCE = 2;
@@ -498,6 +500,7 @@ class BuildHandler {
         long nextId = req.readNextTunnelId();
         boolean isInGW = req.readIsInboundGateway();
         boolean isOutEnd = req.readIsOutboundEndpoint();
+
         // time is in hours, and only for log below - what's the point?
         // tunnel-alt-creation.html specifies that this is enforced +/- 1 hour but it is not.
         long time = req.readRequestTime();
@@ -531,7 +534,7 @@ class BuildHandler {
                 _context.statManager().addRateData("tunnel.acceptLoad", recvDelay, recvDelay);
             }
         }
-        
+
         /*
          * Being a IBGW or OBEP generally leads to more connections, so if we are
          * approaching our connection limit (i.e. !haveCapacity()),
@@ -549,6 +552,28 @@ class BuildHandler {
              (isOutEnd && ! _context.commSystem().haveOutboundCapacity(87)))) {
                 _context.throttle().setTunnelStatus(_x("Rejecting tunnels: Connection limit"));
                 response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
+        }
+        
+        // Check participating throttle counters for previous and next hops
+        // This is at the end as it compares to a percentage of created tunnels.
+        // We may need another counter above for requests.
+        if (response == 0 && !isInGW) {
+            Hash from = state.fromHash;
+            if (from == null)
+                from = state.from.calculateHash();
+            if (_throttler.shouldThrottle(from)) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Rejecting tunnel (hop throttle), previous hop: " + from);
+                // no setTunnelStatus() indication
+                response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
+            }
+        }
+        if (response == 0 && (!isOutEnd) &&
+            _throttler.shouldThrottle(req.readNextIdentity())) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Rejecting tunnel (hop throttle), next hop: " + req.readNextIdentity());
+            // no setTunnelStatus() indication
+            response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
         }
 
         if (_log.shouldLog(Log.DEBUG))
