@@ -501,6 +501,25 @@ class BuildHandler {
         boolean isInGW = req.readIsInboundGateway();
         boolean isOutEnd = req.readIsOutboundEndpoint();
 
+        // Loop checks
+        if ((!isOutEnd) && _context.routerHash().equals(nextPeer)) {
+            // We are 2 hops in a row? Drop it without a reply.
+            // No way to recognize if we are every other hop, but see below
+            _log.error("Dropping build request where we are in two consecutive hops");
+            return;
+        }
+        if ((!isOutEnd) && (!isInGW)) {
+            Hash from = state.fromHash;
+            if (from == null)
+                from = state.from.calculateHash();
+            // Previous and next hop the same? Don't help somebody be evil. Drop it without a reply.
+            // A-B-C-A is not preventable
+            if (nextPeer.equals(from)) {
+                _log.error("Dropping build request with the same previous and next hop");
+                return;
+            }
+        }
+
         // time is in hours, and only for log below - what's the point?
         // tunnel-alt-creation.html specifies that this is enforced +/- 1 hour but it is not.
         long time = req.readRequestTime();
@@ -569,9 +588,9 @@ class BuildHandler {
             }
         }
         if (response == 0 && (!isOutEnd) &&
-            _throttler.shouldThrottle(req.readNextIdentity())) {
+            _throttler.shouldThrottle(nextPeer)) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Rejecting tunnel (hop throttle), next hop: " + req.readNextIdentity());
+                _log.warn("Rejecting tunnel (hop throttle), next hop: " + nextPeer);
             // no setTunnelStatus() indication
             response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
         }
@@ -606,7 +625,7 @@ class BuildHandler {
                 cfg.setSendTo(null);
                 cfg.setSendTunnelId(null);
             } else {
-                cfg.setSendTo(req.readNextIdentity());
+                cfg.setSendTo(nextPeer);
                 cfg.setSendTunnelId(DataHelper.toLong(4, nextId));
             }
 
@@ -622,7 +641,7 @@ class BuildHandler {
                 _context.tunnelDispatcher().joinParticipant(cfg);
         } else {
             _context.statManager().addRateData("tunnel.reject." + response, 1, 1);
-            _context.messageHistory().tunnelRejected(state.fromHash, new TunnelId(ourId), req.readNextIdentity(), 
+            _context.messageHistory().tunnelRejected(state.fromHash, new TunnelId(ourId), nextPeer, 
                                                      "rejecting for " + response + ": " +
                                                      state.msg.getUniqueId() + "/" + ourId + "/" + req.readNextTunnelId() + " delay " +
                                                      recvDelay + " as " +
