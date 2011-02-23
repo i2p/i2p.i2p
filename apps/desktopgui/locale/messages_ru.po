@@ -8,14 +8,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P desktopgui\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-16 17:10+0000\n"
-"PO-Revision-Date: 2011-02-15 00:18+0500\n"
+"POT-Creation-Date: 2011-02-19 17:26+0000\n"
+"PO-Revision-Date: 2011-02-23 10:23+0500\n"
 "Last-Translator: Hidden Z <hiddenz@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: \n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: src/net/i2p/desktopgui/ExternalTrayManager.java:23
@@ -27,7 +27,6 @@ msgid "I2P is starting!"
 msgstr "I2P запускается!"
 
 #: src/net/i2p/desktopgui/ExternalTrayManager.java:38
-#, fuzzy
 msgid "Starting"
 msgstr "Запускается"
 
@@ -37,7 +36,7 @@ msgstr "Запустить I2P браузер"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:50
 msgid "Configure desktopgui"
-msgstr ""
+msgstr "Настроить desktopgui"
 
 #: src/net/i2p/desktopgui/InternalTrayManager.java:67
 msgid "Restart I2P"
@@ -47,7 +46,11 @@ msgstr "Перезапустить I2P"
 msgid "Stop I2P"
 msgstr "Остановить I2P"
 
-#. Translate interface
-#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:26
+#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:44
+msgid "Tray icon configuration"
+msgstr "Настройка иконки в трее"
+
+#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:47
 msgid "Should tray icon be enabled?"
-msgstr ""
+msgstr "Отображать ли иконку в трее?"
+
