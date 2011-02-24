@@ -185,10 +185,12 @@ public class TrackerClient extends I2PAppThread
     }
 
     if (trackers.isEmpty()) {
-        // FIXME really need to get this message to the gui
         stop = true;
-        _log.error("No valid trackers for infoHash: " + infoHash);
+        // FIXME translate
+        SnarkManager.instance().addMessage("No valid trackers for " + this.snark.getBaseName() + " - enable opentrackers?");
+        _log.error("No valid trackers for " + this.snark.getBaseName());
         // FIXME keep going if DHT enabled
+        this.snark.stopTorrent();
         return;
     }
 

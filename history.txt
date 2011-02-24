@@ -1,3 +1,9 @@
+2011-02-24 zzz
+    * i2psnark:
+      - Fix delete and remove buttons for Opera and w3m
+      - Stop torrent if no valid trackers
+      - Fix war build dependencies
+
 2011-02-23 zzz
     * BuildHandler:
       - Lower participating throttler max limit

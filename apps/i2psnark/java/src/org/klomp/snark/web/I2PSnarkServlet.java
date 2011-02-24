@@ -348,8 +348,9 @@ public class I2PSnarkServlet extends Default {
         out.write("</th>\n<th align=\"center\">");
 
         // Opera and text-mode browsers: no &thinsp; and no input type=image values submitted
+        // Using a unique name fixes Opera, except for the buttons with js confirms, see below
         String ua = req.getHeader("User-Agent");
-        boolean isDegraded = ua != null && (ua.startsWith("Lynx") ||
+        boolean isDegraded = ua != null && (ua.startsWith("Lynx") || ua.startsWith("w3m") ||
                                             ua.startsWith("ELinks") || ua.startsWith("Dillo"));
 
         boolean noThinsp = isDegraded || ua.startsWith("Opera");
@@ -960,7 +961,8 @@ public class I2PSnarkServlet extends Default {
             if (isDegraded)
                 out.write("</a>");
         } else {
-                if (isDegraded)
+                // This works in Opera but it's displayed a little differently, so use noThinsp here too so all 3 icons are consistent
+                if (noThinsp)
                     out.write("<a href=\"/i2psnark/?action=Start_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");
                 else
                     out.write("<input type=\"image\" name=\"action_Start_" + b64 + "\" value=\"foo\" title=\"");
@@ -972,7 +974,8 @@ public class I2PSnarkServlet extends Default {
                     out.write("</a>");
 
             if (isValid) {
-                if (isDegraded)
+                // Doesnt work with Opera so use noThinsp instead of isDegraded
+                if (noThinsp)
                     out.write("<a href=\"/i2psnark/?action=Remove_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");
                 else
                     out.write("<input type=\"image\" name=\"action\" value=\"Remove_" + b64 + "\" title=\"");
@@ -990,7 +993,8 @@ public class I2PSnarkServlet extends Default {
                     out.write("</a>");
             }
 
-            if (isDegraded)
+            // Doesnt work with Opera so use noThinsp instead of isDegraded
+            if (noThinsp)
                 out.write("<a href=\"/i2psnark/?action=Delete_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");
             else
                 out.write("<input type=\"image\" name=\"action_Delete_" + b64 + "\" value=\"foo\" title=\"");

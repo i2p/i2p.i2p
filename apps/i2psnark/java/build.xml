@@ -86,7 +86,7 @@
     
     <target name="warUpToDate">
         <uptodate property="war.uptodate" targetfile="../i2psnark.war" >
-            <srcfiles dir= "." includes="build/obj/web/**/*.class ../_icons/* ../web.xml" />
+            <srcfiles dir= "." includes="build/obj/org/klomp/snark/web/*.class ../_icons/* ../web.xml" />
         </uptodate>
     </target>
     
