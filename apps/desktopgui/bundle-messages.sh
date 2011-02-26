@@ -25,10 +25,7 @@ if which find|grep -q -i windows ; then
 	export PATH=.:/bin:/usr/local/bin:$PATH
 fi
 # Fast mode - update ondemond
-echo Placing a file named messages_{LangCode}.only in locale folder,
-echo will limit .po file update to the language specified by {LangCode}.
-LG2=$(find locale -iname messages_*.only|tail -1)
-[ LG2 ] && LG2=${LG2#locale/messages_} && LG2=${LG2%.only}
+# set LG2 to the language you need in envrionment varibales to enable this
 
 # add ../java/ so the refs will work in the po file
 JPATHS="src"

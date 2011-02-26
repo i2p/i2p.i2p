@@ -217,6 +217,8 @@
     </target>
     <!-- the apps need to compile the jsps to poupdate -->
     <target name="poupdate" depends="buildRouter, buildStreaming, buildSystray, buildJetty, buildDesktopGui" >
+        <echo message="Setting environment variable LG2 to a lang code (eg: de,zh,nl etc)" />
+        <echo message=" will restrict language update to the language you specified, leaving other language untact." />
         <ant dir="apps/routerconsole/java/" target="poupdate" />
         <ant dir="apps/i2psnark/java/" target="poupdate" />
         <ant dir="apps/i2ptunnel/java/" target="poupdate" />
