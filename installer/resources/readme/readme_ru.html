@@ -1,19 +1,21 @@
 <div lang="ru">
-
-  <div class="langbox" >
-    <a href="/index.jsp?lang=en"><img src="/flags.jsp?c=us" title="English" alt="English"></a> 
+ <div class="welcome">
+  <div class="langbox">
+    <a href="/?lang=en"><img src="/flags.jsp?c=us" title="English" alt="English"></a> 
     <a href="/?lang=ar"><img src="/flags.jsp?c=lang_ar" title="عربية" alt="عربية"></a>
-    <a href="/index.jsp?lang=zh"><img src="/flags.jsp?c=cn" title="中文" alt="中文"></a> 
-    <a href="/index.jsp?lang=de"><img src="/flags.jsp?c=de" title="Deutsch" alt="Deutsch"></a> 
-    <a href="/index.jsp?lang=fr"><img src="/flags.jsp?c=fr" title="Français" alt="Français"></a> 
-    <a href="/index.jsp?lang=es"><img src="/flags.jsp?c=es" title="Español" alt="Español"></a> 
-    <a href="/index.jsp?lang=pt"><img src="/flags.jsp?c=pt" title="Português" alt="Português"></a> 
-    <a href="/index.jsp?lang=nl"><img src="/flags.jsp?c=nl" title="Nederlands" alt="Nederlands"></a> 
-    <a href="/index.jsp?lang=ru"><img src="/flags.jsp?c=ru" title="Русский" alt="Русский"></a> 
-    <a href="/index.jsp?lang=sv"><img src="/flags.jsp?c=se" title="Svenska" alt="Svenska"></a>
-</div>
-<a name="top"></a>
-<div class="welcome"><h2>Добро пожаловать в Невидимый Интернет</h2></div>
+    <a href="/?lang=zh"><img src="/flags.jsp?c=cn" title="中文" alt="中文"></a> 
+    <a href="/?lang=de"><img src="/flags.jsp?c=de" title="Deutsch" alt="Deutsch"></a> 
+    <a href="/?lang=fr"><img src="/flags.jsp?c=fr" title="Français" alt="Français"></a> 
+    <a href="/?lang=es"><img src="/flags.jsp?c=es" title="Español" alt="Español"></a> 
+    <a href="/?lang=pt"><img src="/flags.jsp?c=pt" title="Português" alt="Português"></a> 
+    <a href="/?lang=nl"><img src="/flags.jsp?c=nl" title="Nederlands" alt="Nederlands"></a> 
+    <a href="/?lang=ru"><img src="/flags.jsp?c=ru" title="Русский" alt="Русский"></a> 
+    <a href="/?lang=sv"><img src="/flags.jsp?c=se" title="Svenska" alt="Svenska"></a>
+  </div>
+  <a name="top"></a>
+  <h2>Добро пожаловать в Невидимый Интернет</h2>
+ </div>
+
 <ul class="links"><li class="tidylist"><b>Начало&hellip;</b><br>Если вы только что запустили I2P, число <i>Активных пиров</i>, отображаемых под секцией <i>Пиры</i> на боковой панели должно начать увеличиваться через несколько минут, и вы так же увидите <i>Локальный туннель</i> с именем <i>Коллективные Клиенты</i>, и, возможно, другие клиентские и серверные туннели в зависимости от того, как настроен I2P (если нет, смотрите секцию по разрешению проблем <a href="#trouble">ниже</a>). Эти <i>Локальные туннели</i> предоставляют соединения на разных портах (и иногда разные протоколы) для сети I2P, позволяя функционировать вашим torrent, e-mail, прокси и другим сервисам. Ваша <a href="/netdb">База данных сети I2P</a> показывает всех известных роутеру пиров в сети. Больше информации доступно на <a href="/help">странице помощи</a>.</li>
 <li class="tidylist"><b>Сетевая интеграция</b><br> Когда вы впервые запускаете I2P, это может занять несколько минут, т.к. роутер выполняет процедуру начальной загрузки (bootstrap) для интеграции в сеть и поиска пиров для оптимизации интегрированности. Будте терпеливы. Когда I2P запускается, и во время нормальной работы, индикатор готовности к построению туннелей (прямо над секцией <i>Локальные туннели</i> на боковой панели) может показывать "Не принимаем туннели"; это нормальное поведение и не стоит слишком беспокоиться. Когда возле ваших <i>Локальных туннелей</i> загорятся зелёные звёздочки, вы сможете делать с I2P разнообразные вещи, и ниже мы представим вам некоторые из них. </li></ul>
   
@@ -34,7 +36,7 @@
 
       <li class="tidylist"><b>Форумы и блоги</b><br>Если вы намереваетесь запустить собственный блог или форум, возможно вы заинтересуетесь <a href="http://syndie.i2p2.de/" target="_blank">Syndie</a>, распределённой платформой для форума или ведения блога в I2P [нужны разработчики!]. Ещё есть порт <a href="http://pebble.sourceforge.net/" target="_blank">pebble</a> - написанной на Java блоггинг-платформы, выполненный zzz в виде плагина для I2P, доступен на <a href="http://i2plugins.i2p" target="_blank">i2plugins.i2p</a>. И, конечно, все обычные блоги, форумы и CMS будут работать через I2P, но будте аккуратны при их настройке, уделите должное внимание безопасности, в том числе и связанному софту (php, MySQL, Python, Apache и т.д.). Так же, в I2P есть несколько форумов на разных языках, поддерживаемых  сообществом; <a href="#eepsites">ниже</a> имеется несколько ссылок.</li>
 
-      <a name="plugins"></a><li class="tidylist"><b>Плагины для I2P</b><br>Повысьте полезность I2P установив плагины&hellip; блоггинг, чат, обмен файлами и другие плагины уже были написаны или портированы и ждут когда вы их <a href="http://i2plugins.i2p/plugins/" target="_blank">установите</a>! Смотрите плагины и сопутствующую информацию на <a href="http://i2plugins.i2p" target="_blank">i2plugins.i2p</a>. Если вы <a href="http://i2plugins.i2p/developers/" target="_blank">программист</a>, полный языконезависимый фреймворк для написания плагинов доступен и <a href="http://www.i2p2.i2p/plugins.html" target="_blank">документирован</a>; I2P плагины могут быть написаны на любом языке.</li>
+      <li class="tidylist"><a name="plugins"></a><b>Плагины для I2P</b><br>Повысьте полезность I2P установив плагины&hellip; блоггинг, чат, обмен файлами и другие плагины уже были написаны или портированы и ждут когда вы их <a href="http://i2plugins.i2p/plugins/" target="_blank">установите</a>! Смотрите плагины и сопутствующую информацию на <a href="http://i2plugins.i2p" target="_blank">i2plugins.i2p</a>. Если вы <a href="http://i2plugins.i2p/developers/" target="_blank">программист</a>, полный языконезависимый фреймворк для написания плагинов доступен и <a href="http://www.i2p2.i2p/plugins.html" target="_blank">документирован</a>; I2P плагины могут быть написаны на любом языке.</li>
 </ul>
 
 <h3>Анонимный шифрованный веб-хостинг в I2P</h3>
@@ -89,7 +91,7 @@
 
   <li class="tidylist"><b>Проверьте логи</b><br><a href="/logs">Логи</a> могут помочь решить проблему. У вас может возникнуть желание запостить часть логов на <a href="http://forum.i2p/viewforum.php?f=10" target="_blank">форум</a>, чтобы получить помощь, или, может быть, на <a href="http://paste.i2p2.i2p" target="_blank">pastebin</a>, чтобы дать ссылку на IRC.</li> 
 
-  <li class="tidylist"><b>Проверьте свежесть Java</b><br>Убедитесь, что у вас достаточно свежая Java [версия 1.6 рекомендуется и необходима для функционирования некоторых возможностей]. Если у вас не установлена Java, скорее всего, вам требуется какая-нибудь реализация JRE (<a href="https://secure.wikimedia.org/wikipedia/en/wiki/JRE" target="_blank">Java Runtime Engine</a>); если вы программист, <a href="https://secure.wikimedia.org/wikipedia/en/wiki/Java_SDK" target="_blank">SDK</a> так же может быть интересен, и, возможно, <a href="http://ant.apache.org/" target="_blank">Apache Ant</a>, который мы используем для сборки бинарников I2P.
+  <li class="tidylist"><b>Проверьте свежесть Java</b><br>Убедитесь, что у вас достаточно свежая Java [версия 1.6 рекомендуется и необходима для функционирования некоторых возможностей]. Если у вас не установлена Java, скорее всего, вам требуется какая-нибудь реализация JRE (<a href="https://secure.wikimedia.org/wikipedia/en/wiki/JRE" target="_blank">Java Runtime Environment</a>); если вы программист, <a href="https://secure.wikimedia.org/wikipedia/en/wiki/Java_SDK" target="_blank">SDK</a> так же может быть интересен, и, возможно, <a href="http://ant.apache.org/" target="_blank">Apache Ant</a>, который мы используем для сборки бинарников I2P.
   </li>
  
   <li class="tidylist"><b>Проблемы использования на устаревшем железе</b><br>[Linux/Unix/Solaris] Если вы не можете запустить роутер с помощью <code>i2p/i2prouter start</code>, попробуйте воспользоваться скриптом <code>runplain.sh</code>, который находится в той же директории. Root-привилегии обычно не требуются для запуска I2P. Если вам нужно скомпилировать <a href="http://www.i2p2.i2p/jbigi.html" target="_blank">библиотеку jBigi</a> (что необходимо в редких случаях), изучите соответствующую документацию, посетите форумы, или приходите на наш <a href="irc://127.0.0.1:6668/i2p-dev">IRC-канал для разработчиков</a>.
@@ -109,3 +111,4 @@
 <li class="tidylist"><b>Вовлекайтесь!</b><br>I2P разрабатывается и сопровождается в основном за счёт неоплачиваемого, добровольного участия членов сообщества. Мы рады принимать <a href="http://www.i2p2.i2p/donate.html" target="_blank">пожертвования</a>, которые идут на необходимые административные затраты и хостинг. Для разработчиков, ищущих материальные стимулы, у нас есть <a href="http://www.i2p2.i2p/bounties.html" target="_blank">денежные премии</a> за работу над некоторыми аспектами I2P, и мы всегда ищем <a href="http://www.i2p2.i2p/newdevelopers.html" target="_blank">Java программистов</a>, <a href="http://www.i2p2.i2p/newtranslators.html" target="_blank">переводчиков</a>, популяризаторов и пользователей, помогающих I2P расширяться. Чем больше I2P-сеть, тем больше общая выгода, поэтому простой рассказ об I2P своим друзьям (и помощь с установкой и настройкой если нужно) - уже большая помощь. Для получения дальнейшей информации о том, как вы можете принять участие, посетите <a href="http://www.i2p2.i2p/getinvolved.html" target="_blank">страницу для добровольцев</a> на официальном сайте.</li>
 </ul><div class="topness"><a href="#top">[Наверх]</a></div>
 <div class="footnote"><hr>Документ обновлён: декабрь 2010.</div>
+</div>

@@ -1,3 +1,14 @@
+2011-02-27 zzz
+    * Console:
+      - Fix numerous readme HTML errors
+      - Fix flag locations in readmes
+      - desktopgui.enable now defaults to false; run systray if false
+      - Start icon app before console
+      - Restore systray form in configservice.jsp
+      - Only save lang when clicking on flags if desktopgui is running
+      - Only allow two-letter lang code from cgi parameter
+    * Reseed: Disable HTTPS until we have enough working hosts again
+
 2011-02-24 zzz
     * i2psnark:
       - Fix delete and remove buttons for Opera and w3m

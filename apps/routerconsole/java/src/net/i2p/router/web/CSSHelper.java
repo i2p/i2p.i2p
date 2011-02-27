@@ -30,7 +30,8 @@ public class CSSHelper extends HelperBase {
 
     /** change default language for the router but don't save it */
     public void setLang(String lang) {
-        if (lang != null && lang.length() > 0)
+        // TODO: Protect with nonce or require POST
+        if (lang != null && lang.length() == 2)
             _context.router().setConfigSetting(Messages.PROP_LANG, lang);
     }
 

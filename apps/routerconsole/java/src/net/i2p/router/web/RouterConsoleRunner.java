@@ -11,9 +11,10 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
-import net.i2p.desktopgui.Main;
+import net.i2p.apps.systray.SysTray;
 import net.i2p.data.Base32;
 import net.i2p.data.DataHelper;
+import net.i2p.desktopgui.Main;
 import net.i2p.router.RouterContext;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
@@ -58,15 +59,6 @@ public class RouterConsoleRunner {
     
     static {
         System.setProperty("org.mortbay.http.Version.paranoid", "true");
-        
-        //Check if we are in a headless environment, set properties accordingly
-        String headless = "java.awt.headless";
-        if(GraphicsEnvironment.isHeadless()) {
-        	System.setProperty(headless, "true");
-        }
-        else {
-        	System.setProperty(headless, "false");
-        }
     }
     
     /**
@@ -137,10 +129,34 @@ public class RouterConsoleRunner {
     }
     
     public static void main(String args[]) {
+        startTrayApp();
         RouterConsoleRunner runner = new RouterConsoleRunner(args);
         runner.startConsole();
     }
     
+    private static void startTrayApp() {
+        try {
+            //TODO: move away from routerconsole into a separate application.
+            //ApplicationManager?
+            VersionComparator v = new VersionComparator();
+            boolean recentJava = v.compare(System.getProperty("java.runtime.version"), "1.6") >= 0;
+            // default false for now
+            boolean desktopguiEnabled = I2PAppContext.getGlobalContext().getBooleanProperty("desktopgui.enabled");
+            if (recentJava && desktopguiEnabled) {
+                //Check if we are in a headless environment, set properties accordingly
+          	System.setProperty("java.awt.headless", Boolean.toString(GraphicsEnvironment.isHeadless()));
+                String[] args = new String[0];
+                net.i2p.desktopgui.Main.beginStartup(args);    
+            } else {
+                // required true for jrobin to work
+          	System.setProperty("java.awt.headless", "true");
+                SysTray.getInstance();
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
+
     public void startConsole() {
         File workDir = new SecureDirectory(I2PAppContext.getGlobalContext().getTempDir(), "jetty-work");
         boolean workDirRemoved = FileUtil.rmdir(workDir, false);
@@ -323,20 +339,6 @@ public class RouterConsoleRunner {
                      System.err.println(me);
                 }
             }
-        }
-
-        try {
-            //TODO: move away from routerconsole into a separate application.
-            //ApplicationManager?
-            VersionComparator v = new VersionComparator();
-            String desktopguiEnabled = I2PAppContext.getGlobalContext().getProperty("desktopgui.enabled");
-            int recentJava = v.compare(System.getProperty("java.runtime.version"), "1.6");
-            if(recentJava >= 0 && (desktopguiEnabled == null || desktopguiEnabled.equalsIgnoreCase("true"))) {
-                String[] args = new String[0];
-                net.i2p.desktopgui.Main.beginStartup(args);    
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
         }
 
         NewsFetcher fetcher = NewsFetcher.getInstance(I2PAppContext.getGlobalContext());
