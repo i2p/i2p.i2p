@@ -65,7 +65,7 @@ public class MetaNamingService extends DummyNamingService {
 
     @Override
     public List<NamingService> getNamingServices() {
-        return new Collections.unmodifiableList(_services);
+        return Collections.unmodifiableList(_services);
     }
 
     @Override

@@ -19,7 +19,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -335,6 +337,18 @@ public class BlockfileNamingService extends DummyNamingService {
         return rv;
     }
     
+    /**
+     *  Caller must synchronize
+     *  @return removed object or null
+     *  @throws RuntimeException
+     */
+    private static Object removeEntry(SkipList sl, String key) {
+        return sl.remove(key);
+    }
+
+    ////////// Start NamingService API
+
+    @Override
     public Destination lookup(String hostname, Properties lookupOptions, Properties storedOptions) {
         Destination d = super.lookup(hostname);
         if (d != null)
@@ -349,6 +363,8 @@ public class BlockfileNamingService extends DummyNamingService {
                     DestEntry de = getEntry(list, key);
                     if (de != null) {
                         d = de.dest;
+                        if (storedOptions != null)
+                            storedOptions.putAll(de.props);
                         break;
                     }
                 } catch (IOException ioe) {
@@ -360,6 +376,178 @@ public class BlockfileNamingService extends DummyNamingService {
             putCache(hostname, d);
         return d;
     }
+
+    /**
+     * @param options If non-null and contains the key "list", add to that list
+     *                (default "hosts.txt")
+     *                Use the key "s" for the source
+     */
+    @Override
+    public boolean put(String hostname, Destination d, Properties options) {
+        return put(hostname, d, options, false);
+    }
+
+    /**
+     * @param options If non-null and contains the key "list", add to that list
+     *                (default "hosts.txt")
+     *                Use the key "s" for the source
+     */
+    @Override
+    public boolean putIfAbsent(String hostname, Destination d, Properties options) {
+        return put(hostname, d, options, true);
+    }
+
+    private boolean put(String hostname, Destination d, Properties options, boolean checkExisting) {
+        String key = hostname.toLowerCase();
+        String listname = FALLBACK_LIST;
+        Properties props = new Properties();
+        if (options != null) {
+            props.putAll(options);
+            String list = options.getProperty("list");
+            if (list != null) {
+                listname = list;
+                props.remove("list");
+            }
+        }
+        props.setProperty(PROP_ADDED, Long.toString(_context.clock().now()));
+        synchronized(_bf) {
+            try {
+                SkipList sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
+                if (sl == null)
+                    sl = _bf.makeIndex(listname, _stringSerializer, _destSerializer);
+                boolean changed =  (checkExisting || !_listeners.isEmpty()) && sl.get(key) != null;
+                if (changed && checkExisting)
+                        return false;
+                addEntry(sl, key, d, props);
+                for (NamingServiceListener nsl : _listeners) { 
+                    if (changed)
+                        nsl.entryChanged(this, hostname, d, options);
+                    else
+                        nsl.entryAdded(this, hostname, d, options);
+                }
+                return true;
+            } catch (IOException re) {
+                return false;
+            } catch (RuntimeException re) {
+                return false;
+            }
+        }
+    }
+
+    /**
+     * @param options If non-null and contains the key "list", remove
+     *                from that list (default "hosts.txt", NOT all lists)
+     */
+    @Override
+    public boolean remove(String hostname, Properties options) {
+        String key = hostname.toLowerCase();
+        String listname = FALLBACK_LIST;
+        if (options != null) {
+            String list = options.getProperty("list");
+            if (list != null) {
+                listname = list;
+            }
+        }
+        synchronized(_bf) {
+            try {
+                SkipList sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
+                if (sl == null)
+                    return false;
+                boolean rv = removeEntry(sl, key) != null;
+                if (rv) {
+                    for (NamingServiceListener nsl : _listeners) { 
+                        nsl.entryRemoved(this, key);
+                    }
+                }
+                return rv;
+            } catch (IOException re) {
+                return false;
+            } catch (RuntimeException re) {
+                return false;
+            }
+        }
+    }
+
+    /**
+     * @param options If non-null and contains the key "list", get
+     *                from that list (default "hosts.txt", NOT all lists)
+     *                Key "limit": max number to return
+     *                Key "startsWith": return only those starting with
+     *                Key "beginWith": start here in the iteration
+     *                Don't use both
+     */
+    @Override
+    public Map<String, Destination> getEntries(Properties options) {
+        String listname = FALLBACK_LIST;
+        String startsWith = null;
+        String beginWith = null;
+        int limit = Integer.MAX_VALUE;
+        if (options != null) {
+            listname = options.getProperty("list");
+            startsWith = options.getProperty("startsWith");
+            beginWith = options.getProperty("beginWith");
+            if (beginWith == null)
+                beginWith = startsWith;
+            String lim = options.getProperty("limit");
+            try {
+                limit = Integer.parseInt(lim);
+            } catch (NumberFormatException nfe) {}
+        }
+        synchronized(_bf) {
+            try {
+                SkipList sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
+                if (sl == null)
+                    return Collections.EMPTY_MAP;
+                SkipIterator iter;
+                if (startsWith != null)
+                    iter = sl.find(beginWith);
+                else
+                    iter = sl.iterator();
+                Map<String, Destination> rv = new HashMap();
+                for (int i = 0; i < limit && iter.hasNext(); i++) {
+                     String key = (String) iter.nextKey();
+                     if (startsWith != null && !key.startsWith(startsWith))
+                         break;
+                     DestEntry de = (DestEntry) iter.next();
+                     rv.put(key, de.dest);
+                }
+                return rv;
+            } catch (IOException re) {
+                return Collections.EMPTY_MAP;
+            } catch (RuntimeException re) {
+                return Collections.EMPTY_MAP;
+            }
+        }
+    }
+
+    /**
+     * @param options If non-null and contains the key "list", return the
+     *                size of that list (default "hosts.txt", NOT all lists)
+     */
+    @Override
+    public int size(Properties options) {
+        String listname = FALLBACK_LIST;
+        if (options != null) {
+            String list = options.getProperty("list");
+            if (list != null) {
+                listname = list;
+            }
+        }
+        synchronized(_bf) {
+            try {
+                SkipList sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
+                if (sl == null)
+                    return 0;
+                return sl.size();
+            } catch (IOException re) {
+                return 0;
+            } catch (RuntimeException re) {
+                return 0;
+            }
+        }
+    }
+
+    ////////// End NamingService API
 
     private void dumpDB() {
         synchronized(_bf) {
