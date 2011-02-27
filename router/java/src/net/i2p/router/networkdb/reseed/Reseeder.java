@@ -173,7 +173,7 @@ public class Reseeder {
             List<String> URLList = new ArrayList();
             String URLs = _context.getProperty(PROP_RESEED_URL);
             boolean defaulted = URLs == null;
-            boolean SSLDisable = _context.getBooleanProperty(PROP_SSL_DISABLE);
+            boolean SSLDisable = _context.getBooleanPropertyDefaultTrue(PROP_SSL_DISABLE);
             if (defaulted) {
                 if (SSLDisable)
                     URLs = DEFAULT_SEED_URL;

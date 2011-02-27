@@ -22,7 +22,7 @@ public class ConfigReseedHelper extends HelperBase {
 
     public String modeChecked(int mode) {
         boolean required =  _context.getBooleanProperty(Reseeder.PROP_SSL_REQUIRED);
-        boolean disabled =  _context.getBooleanProperty(Reseeder.PROP_SSL_DISABLE);
+        boolean disabled =  _context.getBooleanPropertyDefaultTrue(Reseeder.PROP_SSL_DISABLE);
         if ((mode == 0 && (!disabled) && (!required)) ||
             (mode == 1 && (!disabled) && required) ||
             (mode == 2 && disabled))
