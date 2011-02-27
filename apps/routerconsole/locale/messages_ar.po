@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-11-19 18:16+0000\n"
-"PO-Revision-Date: 2011-02-23 14:26-0000\n"
+"PO-Revision-Date: 2011-02-26 18:15-0000\n"
 "Last-Translator: hamada <hamada@mail.i2p>\n"
 "Language-Team: hamada@mail.i2p\n"
 "Language: ar\n"
@@ -2573,12 +2573,12 @@ msgstr "الغاية"
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:153
 #, java-format
 msgid "Expires in {0}"
-msgstr ""
+msgstr "ينتهي في مدة {0}"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:155
 #, java-format
 msgid "Expired {0} ago"
-msgstr ""
+msgstr "انتهى {0} منذ"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:167
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:156
@@ -2621,7 +2621,7 @@ msgstr "احصائيات قاعدة البيانات I2P"
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:285
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:303
 msgid "Count"
-msgstr ""
+msgstr "عدد"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:285
 msgid "Transports"
@@ -4998,7 +4998,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:315
 msgid "Router Console Language"
-msgstr ""
+msgstr "لغة لوحة التحكم"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:319
 msgid "Please contribute to the router console translation project! Contact the developers on IRC #i2p to help."

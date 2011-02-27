@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-02-20 11:53+0000\n"
-"PO-Revision-Date: 2011-02-24 14:50-0000\n"
+"PO-Revision-Date: 2011-02-25 21:06-0000\n"
 "Last-Translator: hamada <hamada@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
 "MIME-Version: 1.0\n"
@@ -61,7 +61,7 @@ msgstr ""
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:406
 msgid "Unable to reconnect with the old settings!"
-msgstr ""
+msgstr "فشل في اعادة الاتصال بالاعدادات القديمة!"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:408
 msgid "Reconnected on the new I2CP destination"
@@ -149,7 +149,7 @@ msgstr ""
 #: ../java/src/org/klomp/snark/SnarkManager.java:619
 #, java-format
 msgid "Torrent in \"{0}\" is invalid"
-msgstr ""
+msgstr "تورنت في \"{0}\"غير صحيح"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:624
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1994
@@ -171,7 +171,7 @@ msgstr "تمت اضافة: \"{0}\""
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:489
 #, java-format
 msgid "Fetching {0}"
-msgstr ""
+msgstr "يحمل {0}"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:675
 #, java-format
@@ -193,7 +193,7 @@ msgstr "فشل في نسخ التورنت الى {0}"
 #: ../java/src/org/klomp/snark/SnarkManager.java:972
 #, java-format
 msgid "Too many files in \"{0}\" ({1}), deleting it!"
-msgstr ""
+msgstr "ملفات كثيرة في  \"{0}\" ({1}) تم حذف"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:974
 #, java-format
@@ -218,12 +218,12 @@ msgstr ""
 #: ../java/src/org/klomp/snark/SnarkManager.java:981
 #, java-format
 msgid "Limit is {0}B"
-msgstr ""
+msgstr "حدود {0}B"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:989
 #, java-format
 msgid "Torrents larger than {0}B are not supported yet, deleting \"{1}\""
-msgstr ""
+msgstr "تورنت أكبر من {0}B غير مدعومة سيحذف \"{1}\""
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1005
 #, java-format
@@ -345,13 +345,13 @@ msgstr ""
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:332
 msgid "Down Rate"
-msgstr ""
+msgstr "معدل التحميل"
 
 #. Translators: Please keep short or translate as " "
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:337
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:346
 msgid "Rate"
-msgstr ""
+msgstr "معدل"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:342
 msgid "Up Rate"
@@ -410,19 +410,19 @@ msgstr ""
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:576
 #, java-format
 msgid "Torrent file deleted: {0}"
-msgstr ""
+msgstr "تم خذف ملف التورنت: {0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:582
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:592
 #, java-format
 msgid "Data file deleted: {0}"
-msgstr ""
+msgstr "خذف ملف البيانات: {0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:584
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:594
 #, java-format
 msgid "Data file could not be deleted: {0}"
-msgstr ""
+msgstr "فشل في حذف الملف: {0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:603
 #, java-format
@@ -431,12 +431,12 @@ msgstr ""
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:636
 msgid "Error creating torrent - you must select a tracker"
-msgstr ""
+msgstr "فشل في انشاء تورنت - عليك اختيار tracker"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:652
 #, java-format
 msgid "Torrent created for \"{0}\""
-msgstr ""
+msgstr "تم انشاء تورنت لـ \"{0}\""
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:654
 #, java-format
@@ -473,7 +473,7 @@ msgstr "فتح النفق واطلاق جميع التورنت"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:807
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:813
 msgid "Tracker Error"
-msgstr ""
+msgstr "Tracker خطأ"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:805
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:809
@@ -562,7 +562,7 @@ msgstr "حذف التورنت من القائمة، حذف ملف .torrent"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:984
 #, java-format
 msgid "Are you sure you want to delete the file \\''{0}.torrent\\'' (downloaded data will not be deleted) ?"
-msgstr ""
+msgstr "هل أنت متأكد من حذف الملف \\''{0}.تورنت\\'' (سيتم خذف ايضا الملفات التي تم تحميلها) ?"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:987
 msgid "Remove"
@@ -632,7 +632,7 @@ msgstr "أضف تورنت"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1197
 #, java-format
 msgid "You can also copy .torrent files to: {0}."
-msgstr ""
+msgstr "يمكن ايضا .نقل ملفات تورنت الى: {0}."
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1199
 msgid "Removing a .torrent will cause it to stop."
@@ -658,12 +658,12 @@ msgstr ""
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1233
 msgid "Select a tracker"
-msgstr ""
+msgstr "اختر tracker"
 
 #. out.write(_("Open trackers and DHT only"));
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1238
 msgid "Open trackers only"
-msgstr ""
+msgstr "trackers المفتوحة فقط"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1253
 msgid "or"
@@ -704,7 +704,7 @@ msgstr "تيمة"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1308
 msgid "Startup delay"
-msgstr ""
+msgstr "تأخر البداية"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1310
 msgid "minutes"
@@ -769,7 +769,7 @@ msgstr "حفظ الاعدادات"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1432
 #, java-format
 msgid "Invalid magnet URL {0}"
-msgstr ""
+msgstr "غنوان مغناطيس غير صحيح {0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1466
 #, java-format
@@ -836,7 +836,7 @@ msgstr "تورنت غير موجود؟"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1763
 msgid "File not found in torrent?"
-msgstr ""
+msgstr "الملف غير موجود في التورنت؟"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1776
 msgid "complete"
@@ -844,7 +844,7 @@ msgstr "اكتمل"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1777
 msgid "bytes remaining"
-msgstr ""
+msgstr "البايت المتبقية"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1802
 msgid "Open"
@@ -869,22 +869,22 @@ msgstr "حفظ الأولويات"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1962
 #, java-format
 msgid "Torrent fetched from {0}"
-msgstr ""
+msgstr "تم تحميل الملف من {0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1984
 #, java-format
 msgid "Torrent already running: {0}"
-msgstr ""
+msgstr "تورنت مفعل: {0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1986
 #, java-format
 msgid "Torrent already in the queue: {0}"
-msgstr ""
+msgstr "تورنت في قائمة الانتظار: {0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1992
 #, java-format
 msgid "Torrent at {0} was not valid"
-msgstr ""
+msgstr "تورنت غير صحيح {0} "
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1999
 #, java-format
