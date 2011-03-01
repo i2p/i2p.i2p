@@ -353,7 +353,7 @@ public class I2PSnarkServlet extends Default {
         boolean isDegraded = ua != null && (ua.startsWith("Lynx") || ua.startsWith("w3m") ||
                                             ua.startsWith("ELinks") || ua.startsWith("Dillo"));
 
-        boolean noThinsp = isDegraded || ua.startsWith("Opera");
+        boolean noThinsp = isDegraded || (ua != null && ua.startsWith("Opera"));
         if (_manager.util().connected()) {
             if (isDegraded)
                 out.write("<a href=\"/i2psnark/?action=StopAll&amp;nonce=" + _nonce + "\"><img title=\"");
@@ -1883,7 +1883,8 @@ public class I2PSnarkServlet extends Default {
             mime = "";
         if (mime.equals("text/html"))
             icon = "html";
-        else if (mime.equals("text/plain") || plc.endsWith(".nfo"))
+        else if (mime.equals("text/plain") || plc.endsWith(".nfo") ||
+                 mime.equals("application/rtf"))
             icon = "page";
         else if (mime.equals("application/java-archive") || plc.endsWith(".war") ||
                  plc.endsWith(".deb"))

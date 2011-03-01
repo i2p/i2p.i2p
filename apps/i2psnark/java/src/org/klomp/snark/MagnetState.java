@@ -57,7 +57,7 @@ class MagnetState {
     }
 
     /**
-     *  @param call this for a new magnet when you have the size
+     *  Call this for a new magnet when you have the size
      *  @throws IllegalArgumentException
      */
     public void initialize(int size) {
@@ -77,7 +77,7 @@ class MagnetState {
     }
 
     /**
-     *  @param Call this for a new magnet when the download is complete.
+     *  Call this for a new magnet when the download is complete.
      *  @throws IllegalArgumentException
      */
     public void setMetaInfo(MetaInfo meta) {

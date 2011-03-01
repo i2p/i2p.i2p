@@ -644,7 +644,7 @@ public class SnarkManager implements Snark.CompleteListener {
      * @param name hex or b32 name from the magnet link
      * @param ih 20 byte info hash
      * @param trackerURL may be null
-     * @param udpateStatus should we add this magnet to the config file,
+     * @param updateStatus should we add this magnet to the config file,
      *                     to save it across restarts, in case we don't get
      *                     the metadata before shutdown?
      * @throws RuntimeException via Snark.fatal()
