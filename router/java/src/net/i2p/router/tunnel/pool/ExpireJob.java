@@ -5,16 +5,21 @@ import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.tunnel.TunnelCreatorConfig;
 
+/**
+ *  This runs twice for each tunnel.
+ *  The first time, remove it from the LeaseSet.
+ *  The second time, stop accepting data for it.
+ */
 class ExpireJob extends JobImpl {
-    private TunnelPool _pool;
-    private TunnelCreatorConfig _cfg;
+    private final TunnelPool _pool;
+    private final TunnelCreatorConfig _cfg;
     private boolean _leaseUpdated;
-    private long _dropAfter;
+    private final long _dropAfter;
+
     public ExpireJob(RouterContext ctx, TunnelCreatorConfig cfg, TunnelPool pool) {
         super(ctx);
         _pool = pool;
         _cfg = cfg;
-        _leaseUpdated = false;
         // we act as if this tunnel expires a random skew before it actually does
         // so we rebuild out of sync.  otoh, we will honor tunnel messages on it
         // up through the full lifetime of the tunnel, plus a clock skew, since
@@ -28,9 +33,11 @@ class ExpireJob extends JobImpl {
         cfg.setExpiration(expire);
         getTiming().setStartAfter(expire);
     }
+
     public String getName() {
         return "Expire tunnel";
     }
+
     public void runJob() {
         if (!_leaseUpdated) {
             _pool.removeTunnel(_cfg);

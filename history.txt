@@ -1,3 +1,13 @@
+2011-03-02 zzz
+    * BuildHandler:
+      - Limit request queue size
+      - Concurrent request queue
+      - Remove dead code for queued rely handling
+    * OutNetMessage: Remove dead code
+    * Tunnel cleanups, final, javadoc
+
+* 2011-03-02  0.8.4 released
+
 2011-02-27 zzz
     * Console:
       - Fix numerous readme HTML errors

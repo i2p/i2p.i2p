@@ -63,11 +63,16 @@
         </javac>
     </target>
 
-    <target name="jar" depends="compile, jarUpToDate" unless="jar.uptodate" >
+    <!-- the jar with the latest message classes from the jsps, and the war too -->
+    <target name="jar" depends="jar1, war, bundle" />
+
+    <!-- the jar without the latest message classes from the jsps -->
+    <target name="jar1" depends="compile, jarUpToDate" unless="jar.uptodate" >
         <exec executable="mtn" outputproperty="workspace.changes.j" errorproperty="mtn.error2" failifexecutionfails="false" >
             <arg value="list" />
             <arg value="changed" />
             <arg value="." />
+            <arg value="../locale" />
         </exec>
         <!-- \n in an attribute value generates an invalid manifest -->
         <exec executable="tr" inputstring="${workspace.changes.j}" outputproperty="workspace.changes.j.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
@@ -85,15 +90,16 @@
                 <attribute name="Workspace-Changes" value="${workspace.changes.j.tr}" />
             </manifest>
         </jar>
-        <delete dir="./tmpextract" />
        <!-- jrobin taken out of routerconsole.jar in 0.7.12
+        <delete dir="./tmpextract" />
         <unjar src="../../jrobin/jrobin-1.4.0.jar" dest="./tmpextract" />
         <jar destfile="./build/routerconsole.jar" basedir="./tmpextract" update="true" />
         <delete dir="./tmpextract" />
        -->
-        
-        <ant target="war" />
+    </target>
 
+    <!-- this is tricky because the message classes go in the jar, not in the war -->
+    <target name="bundle" depends="jar1, precompilejsp" >
         <!-- Update the messages_*.po files.
              We need to supply the bat file for windows, and then change the fail property to true -->
         <exec executable="sh" osfamily="unix" failifexecutionfails="true" >
@@ -117,8 +123,7 @@
         </uptodate>
     </target>
 
-    <target name="poupdate" depends="build">
-        <ant target="war" />
+    <target name="poupdate" depends="precompilejsp">
         <!-- Update the messages_*.po files.
              We need to supply the bat file for windows, and then change the fail property to true -->
         <exec executable="sh" osfamily="unix" failifexecutionfails="true" >
@@ -135,6 +140,7 @@
         </exec>
     </target>
 
+    <!-- does NOT update the message classes, as those go in the jar -->
     <target name="war" depends="precompilejsp, warUpToDate" unless="war.uptodate" >
         <exec executable="mtn" outputproperty="workspace.changes.w" errorproperty="mtn.error2" failifexecutionfails="false" >
             <arg value="list" />
@@ -164,7 +170,7 @@
         </uptodate>
     </target>
 
-    <target name="precompilejsp" unless="precompilejsp.uptodate">
+    <target name="precompilejsp" depends="jar1" unless="precompilejsp.uptodate">
         <delete dir="../jsp/WEB-INF/" />
         <delete file="../jsp/web-fragment.xml" />
         <delete file="../jsp/web-out.xml" />
@@ -265,7 +271,7 @@
     </target>
 
     <uptodate property="precompilejsp.uptodate" targetfile="../jsp/web-out.xml">
-        <srcfiles dir= "../jsp" includes="**/*.jsp, **/*.html, *.css, susimail/susimail, web.xml"/>
+        <srcfiles dir= "../jsp" includes="**/*.jsp, *.jsi, **/*.html, *.css, susimail/susimail, web.xml"/>
     </uptodate>
 
     <target name="javadoc">

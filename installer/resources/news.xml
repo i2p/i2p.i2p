@@ -1,24 +1,13 @@
 <!--
-<i2p.news date="$Date: 2011-01-24 00:00:00 $">
-<i2p.release version="0.8.3" date="2011/01/24" minVersion="0.6" />
+<i2p.news date="$Date: 2011-03-02 00:00:00 $">
+<i2p.release version="0.8.4" date="2011/03/02" minVersion="0.6" />
 -->
 <div lang="en">
-<h3>2011-01-24: <b>0.8.3 <a href="http://www.i2p2.i2p/release-0.8.3.html">Released</a></b></h3>
+<h3>2011-03-02: <b>0.8.4 <a href="http://www.i2p2.i2p/release-0.8.4.html">Released</a></b></h3>
 <p>
-The 0.8.3 release contains several performance improvements, including reduction of threads and
-memory usage, and faster I2CP (client-router) communication.
-</p><p>
-There is also new SSL router console support
-(<a href="http://zzz.i2p/topics/800">instructions here</a>),
-a new <a href="/configreseed">reseed configuration page</a> including HTTP proxy support for those behind restrictive firewalls,
-a new <a href="/configclients#i2cp">I2CP configuration section</a> including I2CP-over-SSL support for remote clients,
-a new <a href="/i2ptunnel/edit?tunnel=3">server connection limits and blacklist configuration section</a> for enhanced DoS protection,
-and a new
-<a href="/i2ptunnel/edit?tunnel=0">HTTP proxy jump server configuration section</a> so you may easily add alternative jump servers.
-Statistics are now limited by default to reduce memory usage; the full set of statistics may be re-enabled on the
-<a href="/configstats">stats configuration page</a>.
-There are also bug fixes, of course, so
-as usual, upgrading is recommended.
+The 0.8.4 release contains some performance improvements and important bug fixes.
+Also, i2psnark now supports magnet links.
+As usual, upgrading is recommended.
 </p><p>
 Please help grow the network.
 Say hello to the volunteers on the <a href="irc://127.0.0.1:6668/i2p-help">#i2p-help IRC channel</a>.
@@ -27,6 +16,6 @@ spread the word,
 and <a href="http://www.i2p2.i2p/donate.html">donate</a>!
 If you find a bug, please enter a report on <a href="http://trac.i2p2.i2p/report/1">trac</a>.
 We are still looking for volunteers to work on new and existing translations.
-Please volunteer on <a href="irc://127.0.0.1:6668/i2p">IRC #i2p</a>.
+Please volunteer on <a href="irc://127.0.0.1:6668/i2p">IRC #i2p-dev</a>.
 </p>
 </div>

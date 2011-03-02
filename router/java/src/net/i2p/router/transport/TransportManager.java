@@ -459,9 +459,9 @@ public class TransportManager implements TransportEventListener {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("I2NPMessage received: " + message.getClass().getName(), new Exception("Where did I come from again?"));
         try {
-            int num = _context.inNetMessagePool().add(message, fromRouter, fromRouterHash);
+            _context.inNetMessagePool().add(message, fromRouter, fromRouterHash);
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Added to in pool: "+ num);
+                _log.debug("Added to in pool");
         } catch (IllegalArgumentException iae) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error receiving message", iae);

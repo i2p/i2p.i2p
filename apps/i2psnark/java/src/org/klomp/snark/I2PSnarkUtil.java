@@ -134,7 +134,7 @@ public class I2PSnarkUtil {
     }
     
     /**
-     *  @param KBps
+     *  @param limit KBps
      */
     public void setMaxUpBW(int limit) {
         _maxUpBW = limit;

@@ -22,21 +22,21 @@ import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 
 /**
- *
+ *  A group of tunnels for the router or a particular client, in a single direction.
  */
 public class TunnelPool {
     private final List _inProgress = new ArrayList();
-    private RouterContext _context;
-    private Log _log;
+    private final RouterContext _context;
+    private final Log _log;
     private TunnelPoolSettings _settings;
     private final ArrayList<TunnelInfo> _tunnels;
-    private TunnelPeerSelector _peerSelector;
-    private TunnelPoolManager _manager;
+    private final TunnelPeerSelector _peerSelector;
+    private final TunnelPoolManager _manager;
     private boolean _alive;
     private long _lifetimeProcessed;
     private TunnelInfo _lastSelected;
     private long _lastSelectionPeriod;
-    private int _expireSkew;
+    private final int _expireSkew;
     private long _started;
     private long _lastRateUpdate;
     private long _lastLifetimeProcessed;
@@ -50,14 +50,9 @@ public class TunnelPool {
         _settings = settings;
         _tunnels = new ArrayList(settings.getLength() + settings.getBackupQuantity());
         _peerSelector = sel;
-        _alive = false;
-        _lastSelectionPeriod = 0;
-        _lastSelected = null;
-        _lifetimeProcessed = 0;
         _expireSkew = _context.random().nextInt(90*1000);
         _started = System.currentTimeMillis();
         _lastRateUpdate = _started;
-        _lastLifetimeProcessed = 0;
         _rateName = "tunnel.Bps." +
                     (_settings.isExploratory() ? "exploratory" : _settings.getDestinationNickname()) +
                     (_settings.isInbound() ? ".in" : ".out");
@@ -412,11 +407,12 @@ public class TunnelPool {
         }
     }
 
+    /** noop for outbound */
     void refreshLeaseSet() {
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug(toString() + ": refreshing leaseSet on tunnel expiration (but prior to grace timeout)");
-        LeaseSet ls = null;
         if (_settings.isInbound() && (_settings.getDestination() != null) ) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug(toString() + ": refreshing leaseSet on tunnel expiration (but prior to grace timeout)");
+            LeaseSet ls = null;
             synchronized (_tunnels) {
                 ls = locked_buildNewLeaseSet();
             }
@@ -427,7 +423,7 @@ public class TunnelPool {
     }
 
     /**
-     * Return true if a fallback tunnel is built
+     * @return true if a fallback tunnel is built
      *
      */
     boolean buildFallback() {
@@ -851,6 +847,7 @@ public class TunnelPool {
     }
     
     PooledTunnelCreatorConfig configureNewTunnel() { return configureNewTunnel(false); }
+
     private PooledTunnelCreatorConfig configureNewTunnel(boolean forceZeroHop) {
         TunnelPoolSettings settings = getSettings();
         List peers = null;

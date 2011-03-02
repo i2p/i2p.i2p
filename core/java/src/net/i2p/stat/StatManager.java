@@ -54,7 +54,7 @@ public class StatManager {
         "jobQueue.jobLag,netDb.successTime,peer.failedLookupRate,router.fastPeers," +
         "prng.bufferFillTime,prng.bufferWaitTime,router.memoryUsed," +
         "transport.receiveMessageSize,transport.sendMessageSize,transport.sendProcessingTime," +
-        "tunnel.acceptLoad,tunnel.buildRequestTime,tunnel.rejectOverloaded,tunnel.rejectTimeout" +
+        "tunnel.acceptLoad,tunnel.buildRequestTime,tunnel.rejectOverloaded,tunnel.rejectTimeout," +
         "tunnel.buildClientExpire,tunnel.buildClientReject,tunnel.buildClientSuccess," +
         "tunnel.buildExploratoryExpire,tunnel.buildExploratoryReject,tunnel.buildExploratorySuccess," +
         "tunnel.buildRatio.*,tunnel.corruptMessage,tunnel.dropLoad*," +
