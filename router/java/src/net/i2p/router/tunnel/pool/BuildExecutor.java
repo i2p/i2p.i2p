@@ -27,9 +27,9 @@ import net.i2p.util.Log;
  */
 class BuildExecutor implements Runnable {
     private final ArrayList<Long> _recentBuildIds = new ArrayList(100);
-    private RouterContext _context;
-    private Log _log;
-    private TunnelPoolManager _manager;
+    private final RouterContext _context;
+    private final Log _log;
+    private final TunnelPoolManager _manager;
     /** list of TunnelCreatorConfig elements of tunnels currently being built */
     private final Object _currentlyBuilding;
     /** indexed by ptcc.getReplyMessageId() */
@@ -37,7 +37,7 @@ class BuildExecutor implements Runnable {
     /** indexed by ptcc.getReplyMessageId() */
     private final ConcurrentHashMap<Long, PooledTunnelCreatorConfig> _recentlyBuildingMap;
     private boolean _isRunning;
-    private BuildHandler _handler;
+    private final BuildHandler _handler;
     private boolean _repoll;
     private static final int MAX_CONCURRENT_BUILDS = 10;
     /** accept replies up to a minute after we gave up on them */
@@ -248,8 +248,6 @@ class BuildExecutor implements Runnable {
         int pendingRemaining = 0;
         
         //long loopBegin = 0;
-        //long beforeHandleInboundReplies = 0;
-        //long afterHandleInboundReplies = 0;
         //long afterBuildZeroHop = 0;
         long afterBuildReal = 0;
         long afterHandleInbound = 0;
@@ -268,10 +266,6 @@ class BuildExecutor implements Runnable {
                         wanted.add(pool);
                 }
 
-                //beforeHandleInboundReplies = System.currentTimeMillis();
-                _handler.handleInboundReplies();
-                //afterHandleInboundReplies = System.currentTimeMillis();
-                
                 // allowed() also expires timed out requests (for new style requests)
                 int allowed = allowed();
                 
@@ -327,9 +321,6 @@ class BuildExecutor implements Runnable {
                                     _log.debug("Configuring new tunnel " + i + " for " + pool + ": " + cfg);
                                 buildTunnel(pool, cfg);
                                 realBuilt++;
-                                
-                                // we want replies to go to the top of the queue
-                                _handler.handleInboundReplies();
                             } else {
                                 i--;
                             }
@@ -391,10 +382,8 @@ class BuildExecutor implements Runnable {
      *  This prevents a large number of client pools from starving the exploratory pool.
      *
      */
-    private static class TunnelPoolComparator implements Comparator {
-        public int compare(Object l, Object r) {
-            TunnelPool tpl = (TunnelPool) l;
-            TunnelPool tpr = (TunnelPool) r;
+    private static class TunnelPoolComparator implements Comparator<TunnelPool> {
+        public int compare(TunnelPool tpl, TunnelPool tpr) {
             if (tpl.getSettings().isExploratory() && !tpr.getSettings().isExploratory())
                 return -1;
             if (tpr.getSettings().isExploratory() && !tpl.getSettings().isExploratory())
