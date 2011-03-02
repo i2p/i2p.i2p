@@ -1,3 +1,5 @@
+* 2011-03-02  0.8.4 released
+
 2011-02-27 zzz
     * Console:
       - Fix numerous readme HTML errors
