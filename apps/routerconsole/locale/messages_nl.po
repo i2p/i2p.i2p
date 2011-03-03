@@ -8,14 +8,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-20 12:17+0000\n"
+"POT-Creation-Date: 2011-03-03 18:28+0000\n"
 "PO-Revision-Date: 2011-02-20 12:15+0000\n"
 "Last-Translator: ducki2p <ducki2p@gmail.com>\n"
 "Language-Team: Dutch <>\n"
+"Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: nl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #. NOTE TO TRANSLATORS: Feel free to translate all these as you see fit, there are several options...
@@ -555,28 +555,29 @@ msgstr "Verbannen"
 msgid "SUMMARY"
 msgstr "SAMENVATTING"
 
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:145
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:124
 msgid "Dropping tunnel requests: Too slow"
 msgstr "Negeer tunnel aanvragen: Te traag"
 
 #. don't even bother, since we are so overloaded locally
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:352
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:267
 msgid "Dropping tunnel requests: Overloaded"
 msgstr "Negeer tunnel aanvragen: Overladen"
 
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:525
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:460
 msgid "Rejecting tunnels: Request overload"
 msgstr "Weiger tunnels: Overladen met aanvragen"
 
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:550
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:485
 msgid "Rejecting tunnels: Connection limit"
 msgstr "Weiger tunnels: Connectie limiet"
 
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:744
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:685
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:706
 msgid "Dropping tunnel requests: High load"
 msgstr "Negeer tunnel aanvragen: Hoge load"
 
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:753
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:698
 msgid "Dropping tunnel requests: Queue time"
 msgstr "Negeer tunnel aanvragen: Wachttijd"
 
@@ -1506,7 +1507,7 @@ msgstr "Zambia"
 msgid "Zimbabwe"
 msgstr "Zimbabwe"
 
-#: ../java/src/net/i2p/router/web/CSSHelper.java:57
+#: ../java/src/net/i2p/router/web/CSSHelper.java:58
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:35
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:37
 #: ../java/strings/Strings.java:29
@@ -2209,22 +2210,22 @@ msgid "Rekeying after graceful shutdown"
 msgstr "Hersleuteling na gecontrolleerde stop"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:80
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:323
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:335
 msgid "Run I2P on startup"
 msgstr "Start I2P bij opstarten"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:82
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:325
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:337
 msgid "Don't run I2P on startup"
 msgstr "Start I2P niet bij opstarten"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:84
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:343
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:355
 msgid "Dump threads"
 msgstr "Dump threads"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:91
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:351
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:363
 msgid "View console on startup"
 msgstr "Toon console na opstarten"
 
@@ -2233,7 +2234,7 @@ msgid "Console is to be shown on startup"
 msgstr "Console wordt getoond na opstarten"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:94
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:353
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:365
 msgid "Do not view console on startup"
 msgstr "Toon console niet na opstarten"
 
@@ -2511,7 +2512,7 @@ msgstr "Teken gemiddelden"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:152
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:417
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:321
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:333
 msgid "or"
 msgstr "of"
 
@@ -4123,6 +4124,7 @@ msgstr "configureer netwerk"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/debug_jsp.java:219
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error_jsp.java:227
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/graphs_jsp.java:216
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005far_jsp.java:219
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005fnl_jsp.java:219
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005fru_jsp.java:219
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:219
@@ -4156,6 +4158,7 @@ msgstr "Ververs (s)"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/debug_jsp.java:223
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error_jsp.java:231
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/graphs_jsp.java:220
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005far_jsp.java:223
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005fnl_jsp.java:223
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005fru_jsp.java:223
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:223
@@ -4400,7 +4403,7 @@ msgid "Specify Port"
 msgstr "Specificeer Poort"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:509
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:327
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:339
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:330
 msgid "Note"
 msgstr "Opmerking"
@@ -5289,10 +5292,39 @@ msgstr ""
 "starten."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:315
+#, fuzzy
+msgid "Systray integration"
+msgstr "integratie"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:317
+msgid ""
+"On the windows platform, there is a small application to sit in the system "
+"tray, allowing you to view the router's status"
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:319
+msgid ""
+"(later on, I2P client applications will be able to integrate their own "
+"functionality into the system tray as well)."
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:321
+msgid "If you are on windows, you can either enable or disable that icon here."
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:323
+msgid "Show systray icon"
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:325
+msgid "Hide systray icon"
+msgstr ""
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:327
 msgid "Run on startup"
 msgstr "Aan bij opstarten"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:317
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:329
 msgid ""
 "You can control whether I2P is run on startup or not by selecting one of the "
 "following options - I2P will install (or remove) a service accordingly."
@@ -5300,12 +5332,12 @@ msgstr ""
 "Je kan bepalen of I2P al dan niet bij het opstarten moet starten met behulp "
 "van de volgende opties - I2P zal dan de service toevoegen (of verwijderen)."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:319
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:331
 msgid "If you prefer the command line, you can also run the "
 msgstr ""
 "Indien je de voorkeur geeft aan de command line, kan je het ook starten met "
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:329
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:341
 msgid ""
 "If you are running I2P as service right now, removing it will shut down your "
 "router immediately."
@@ -5313,7 +5345,7 @@ msgstr ""
 "Indien je op dit moment I2P als service draait zal het verwijderen je router "
 "onmiddelijk stoppen."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:331
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:343
 msgid ""
 "You may want to consider shutting down gracefully, as above, then running "
 "uninstall_i2p_service_winnt.bat."
@@ -5321,15 +5353,15 @@ msgstr ""
 "Overweeg om hierboven je router gecontrolleerd te stoppen, en daarna "
 "uninstall_i2p_service_winnt.bat te draaien."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:335
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:347
 msgid "Debugging"
 msgstr "Debugging"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:337
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:349
 msgid "View the job queue"
 msgstr "Bekijk de taak wachtrij"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:341
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:353
 msgid ""
 "At times, it may be helpful to debug I2P by getting a thread dump. To do so, "
 "please select the following option and review the thread dumped to <a href="
@@ -5339,11 +5371,11 @@ msgstr ""
 "doen, selecteer de volgende optie en bekijk de thread dump in de <a href="
 "\"logs.jsp#servicelogs\">wrapper.log</a>."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:347
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:359
 msgid "Launch browser on router startup?"
 msgstr "Start browser bij opstarten router?"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:349
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:361
 msgid ""
 "I2P's main configuration interface is this web console, so for your "
 "convenience I2P can launch a web browser on startup pointing at"
@@ -5735,7 +5767,7 @@ msgstr "statistieken"
 msgid "I2P Router Statistics"
 msgstr "I2P Router Statistieken"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/summaryframe_jsp.java:248
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/summaryframe_jsp.java:247
 #, java-format
 msgid "Disable {0} Refresh"
 msgstr "{0} Verversing Uitschakelen"
