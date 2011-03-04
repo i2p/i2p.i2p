@@ -21,85 +21,77 @@
 <br>يمكن ايضا<a href="http://forum.i2p/">I2P منتدى</a>
 او بالدردشة على  IRC.</p>
 
-<h2>Summary Bar Information</h2><p>
-Many of the stats on the summary bar may be
-<a href="configstats.jsp">configured</a> to be
-<a href="graphs.jsp">graphed</a> for further analysis.
-</p><h3>General</h3><ul>
-<li class="tidylist"><b>Ident:</b>
-The first four characters (24 bits) of your 44-character (256-bit) Base64 router hash.
-The full hash is shown on your <a href="netdb.jsp?r=.">router info page</a>.
-Never reveal this to anyone, as your router info contains your IP.
-<li class="tidylist"><b>Version:</b>
-The version of the I2P software you are running.
-<li class="tidylist"><b>Now:</b>
-The current time (UTC) and the skew, if any. I2P requires your computer's time be accurate.
-If the skew is more than a few seconds, please correct the problem by adjusting
-your computer's time.
-<li class="tidylist"><b>Reachability:</b>
-The router's view of whether it can be contacted by other routers.
-Further information is on the <a href="config.jsp#help">configuration page</a>.
-</ul><h3>Peers</h3><ul>
-<li class="tidylist"><b>Active:</b>
-The first number is the number of peers you've sent or received a message from in the last few minutes.
-This may range from 8-10 to several hundred, depending on your total bandwidth,
-shared bandwidth, and locally-generated traffic.
-The second number is the number of peers seen in the last hour or so.
-Do not be concerned if these numbers vary widely.
-<a href="configstats.jsp#router.activePeers">[Enable graphing]</a>.
-<li class="tidylist"><b>Fast:</b>
-This is the number of peers you use for building client tunnels. It is generally in the
-range 8-30. Your fast peers are shown on the <a href="profiles.jsp">profiles page</a>.
-<a href="configstats.jsp#router.fastPeers">[Enable graphing]</a>.
-<li class="tidylist"><b>High Capacity:</b>
-This is the number of peers you use for building some of your exploratory tunnels. It is generally in the
-range 8-75. The fast peers are included in the high capacity tier.
-Your high capacity peers are shown on the <a href="profiles.jsp">profiles page</a>.
-<a href="configstats.jsp#router.highCapacityPeers">[Enable graphing]</a>.
-<li class="tidylist"><b>Well Integrated:</b>
-This is the number of peers you use for network database inquiries.
-These are usually the "floodfill" peers.
-Your well integrated peers are shown on the bottom of the <a href="profiles.jsp">profiles page</a>.
-<li class="tidylist"><b>Known:</b>
-This is the total number of routers you know about.
-They are listed on the <a href="netdb.jsp">network database page</a>.
-This may range from under 100 to 1000 or more.
-This number is not the total size of the network;
-it may vary widely depending on your total bandwidth,
-shared bandwidth, and locally-generated traffic.
-I2P does not require a router to know every other router.
-</ul><h3>Bandwidth in/out</h3><div align="justify">
-Should be self-explanatory. All values are in bytes per second, not bits per second.
-Change your bandwidth limits on the <a href="config.jsp#help">configuration page</a>.
-Bandwidth is <a href="graphs.jsp">graphed</a> by default.</div>
+<h2>شريط المعلومات</h2><p>
+يمكن للاحصائات أن
+<a href="configstats.jsp">تتغير</a> لكي تظهر على شكل
+<a href="graphs.jsp">رسم بياني</a> للمزيد من التحاليل
+</p><h3>عام</h3><ul>
+<li class="tidylist"><b>:هوية</b>
+الحروف الأولى (24 bits) من 44-حرف (256-) Base64 hash.
+The full hash is shown on your <a href="netdb.jsp?r=.">صفحة معلومات الموجه</a>.
+هذا لا يكشف عن عنوان  IP الخاص بك لأحد.
+<li class="tidylist"><b>الاصدار</b>
+اصدار I2P المستعمل
+<li class="tidylist"><b>الآن</b>
+الوقت الحالي (UTC)والانحراف الممكن. يحتاج I2P الى ساعة مضبوطة. اذا كان انحراف الساعة اكثر من بضع ثواني، قم بتصحيح الخلل.
+<li class="tidylist"><b>إمكانية الوصول</b>
+امكانية الاتصال الخارجي بالموجه
+المزيد من التفاصيل في  <a href="config.jsp#help">صفحة الاعدادات</a>.
+</ul><h3>النظائر</h3><ul>
+<li class="tidylist"><b>مفعل</b>
+هذا هو عدد النظائر التي تم إرسال أو تلقيها رسالة  في الدقائق القليلة الماضية.
+قد يكون هذا النطاق 8-10 الى عدة مئات، اعتمادا على عرض النطاق الترددي الإجمالي ،
+تقاسم عرض النطاق الترددي ، وحركة المرور المولدة محليا.
+والرقم الثاني هو عدد من نظرائه ينظر في آخر ساعة أو نحو ذلك.
+لا تشعر بالقلق إذا كانت هذه الأرقام تختلف على نطاق واسع.
+<a href="configstats.jsp#router.activePeers">[تفعيل الرسم البياني]</a>.
+<li class="tidylist"><b>سريع</b>
+هذا هو عدد النظائر التي تستعملها لانشاء أنفاق جديدة. هي في نطاق 8-30. النظائر السريعة في 
+ <a href="profiles.jsp">صفحة البروفايل</a>.
+<a href="configstats.jsp#router.fastPeers">[تفعيل الرسم البياني]</a>.
+<li class="tidylist"><b>قدرة عالية</b>
+هذا هو عدد النظائر التي تستعملها لانشاء أنفاق الاكتشاف. هي في نطاق 8-75. النظائر السريعة. النظائر القدرة عالية تظهر هنا.
+ <a href="profiles.jsp">صفحة البروفايل</a>.
+<a href="configstats.jsp#router.highCapacityPeers">[تفعيل الرسم البياني]</a>.
+<li class="tidylist"><b>المندمجة جيدا</b>
+هذا هو عدد النظائر المستعملة في الاتصال بقاعدة البيانات. النظائر المندمجة جيدا موجودة في أسفل
+<a href="profiles.jsp">صفحة البروفايل</a>.
+<li class="tidylist"><b>المعروفة</b>
+هذا هو عدد الموجهات المعروفة.
+والظاهرة في صفحة <a href="netdb.jsp">قاعدة البيانات</a>
+هي مابين 100 الى 1000 او أكثر.
+هذا العدد ليس حجم الاجمالي للشبكة، 
+يمكنه ان بتغيير حسب سرعة الاتصال.
 
-<h3>Local destinations</h3><div align="justify">
-The local applications connecting through your router.
-These may be clients started through <a href="i2ptunnel/index.jsp">I2PTunnel</a>
-or external programs connecting through SAM, BOB, or directly to I2CP.
-</div><h3>Tunnels in/out</h3><div align="justify">
-The actual tunnels are shown on the <a href="tunnels.jsp">the tunnels page</a>.</div><ul>
-<li class="tidylist"><div align="justify"><b>Exploratory:</b>
-Tunnels built by your router and used for communication with the floodfill peers,
-building new tunnels, and testing existing tunnels.</div>
-<li class="tidylist"><b>Client:</b>
-Tunnels built by your router for each client's use.
-<li class="tidylist"><b>Participating:</b>
-Tunnels built by other routers through your router.
-This may vary widely depending on network demand, your
-shared bandwidth, and amount of locally-generated traffic.
-The recommended method for limiting participating tunnels is
-to change your share percentage on the <a href="config.jsp#help">configuration page</a>.
+</ul><h3>سرعة الاتصال الداخلي/خارجي</h3><div align="justify">
+السرعة ب بايت في الثانية
+غير السرعة في <a href="config.jsp#help">صفحة الاعدادات</a>.
+السرعة <a href="graphs.jsp">مرسومة</a> </div>
+<h3>الوجهات الداخلية</h3><div align="justify">
+الاتصالات الداخلية 
+البرامج المحلية المتصلة عبر الموجه
+<a href="i2ptunnel/index.jsp">I2PTunnel</a>
+او برامج خارجية متصلة SAM, BOB, او مباشرة بـ I2CP.
+</div><h3>الأنفاق الداخلة/خارجة</h3><div align="justify">
+الأنفاق الحالية موجودة في <a href="tunnels.jsp">صفحة الأنفاق</a>.</div><ul>
+<li class="tidylist"><div align="justify"><b>تصفح</b>
+الأنفاق المستخدمة من طرف الموجه تستعمل في الاتصال مع النظائر، انشاء انفاق جديدة.
+</div>
+<li class="tidylist"><b>المستخدمين</b>
+الأنفاق المستخدمة من طرف الموجه 
+<li class="tidylist"><b>المشاركة</b>
+الأنفاق المنشئة من طرف موجهات أخرى عبر موجهك.
+هذا ينبني على درجة استخدام الشبكة، مقدار المشاركة...
+يمكنك تغيير درجة المشاركة بـ <a href="config.jsp#help">صفحة الاعدادات</a>.
 You may also limit the total number by setting <tt>router.maxParticipatingTunnels=nnn</tt> on
-the <a href="configadvanced.jsp">advanced configuration page</a>. <a href="configstats.jsp#tunnel.participatingTunnels">[Enable graphing]</a>.
-<li class="tidylist"><b>Share ratio:</b>
-The number of participating tunnels you route for others, divided by the total number of hops in
-all your exploratory and client tunnels.
-A number greater than 1.00 means you are contributing more tunnels to the network than you are using.
+the <a href="configadvanced.jsp">صفحة الاعدادات المتقدمة</a>. <a href="configstats.jsp#tunnel.participatingTunnels">[تفعيل الرسم البياني]</a>.
+<li class="tidylist"><b>نسبة المشاركة</b>
+عدد الانفاق المشاركة، مقسوما على عدد اجمالي الانفاق.
+عدد أكبر من 1.00 يعني انك تساهم في الشبكة بعدد اكبر مما تستهلك.
 </ul>
 
-<h3>Congestion</h3><div align="justify">
-Some basic indications of router overload:</div><ul>
+<h3>ازدحام</h3><div align="justify">
+بعض مشرات ازدحام الموجه</div><ul>
 <li class="tidylist"><b>Job lag:</b>
 How long jobs are waiting before execution. The job queue is listed on the <a href="jobs.jsp">jobs page</a>.
 Unfortunately, there are several other job queues in the router that may be congested,
@@ -107,21 +99,21 @@ and their status is not available in the router console.
 The job lag should generally be zero.
 If it is consistently higher than 500ms, your computer is very slow, or the
 router has serious problems.
-<a href="configstats.jsp#jobQueue.jobLag">[Enable graphing]</a>.
+<a href="configstats.jsp#jobQueue.jobLag">[تفعيل الرسم البياني]</a>.
 <li class="tidylist"><b>Message delay:</b>
 How long an outbound message waits in the queue.
 This should generally be a few hundred milliseconds or less.
 If it is consistently higher than 1000ms, your computer is very slow,
 or you should adjust your bandwidth limits, or your (bittorrent?) clients
 may be sending too much data and should have their transmit bandwidth limit reduced.
-<a href="configstats.jsp#transport.sendProcessingTime">[Enable graphing]</a> (transport.sendProcessingTime).
+<a href="configstats.jsp#transport.sendProcessingTime">[تفعيل الرسم البياني]</a> (transport.sendProcessingTime).
 <li class="tidylist"><b>Tunnel lag:</b>
 This is the round trip time for a tunnel test, which sends a single message
 out a client tunnel and in an exploratory tunnel, or vice versa.
 It should usually be less than 5 seconds.
 If it is consistently higher than that, your computer is very slow,
 or you should adjust your bandwidth limits, or there are network problems.
-<a href="configstats.jsp#tunnel.testSuccessTime">[Enable graphing]</a> (tunnel.testSuccessTime).
+<a href="configstats.jsp#tunnel.testSuccessTime">[تفعيل الرسم البياني]</a> (tunnel.testSuccessTime).
 <li class="tidylist"><b>Handle backlog:</b>
 This is the number of pending requests from other routers to build a
 participating tunnel through your router.

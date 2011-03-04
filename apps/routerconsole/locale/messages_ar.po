@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-03 18:27+0000\n"
-"PO-Revision-Date: 2011-03-03 21:10-0000\n"
+"PO-Revision-Date: 2011-03-04 14:02-0000\n"
 "Last-Translator: hamada <hamada@mail.i2p>\n"
 "Language-Team: hamada@mail.i2p\n"
 "Language: ar\n"
@@ -1674,7 +1674,6 @@ msgid "Error starting plugin {0}"
 msgstr "خطأ في تطلاق الملحق {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:376
-#, fuzzy
 msgid "Interface configuration saved successfully - restart required to take effect."
 msgstr "تم حفظ العدادات بنجاح - يجب اعادة التشغيل لأخذها بالاعتبار"
 
@@ -3210,9 +3209,9 @@ msgstr "هناك {0} حدث في هذه المدة"
 
 #. buf.append(' ');
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:203
-#, fuzzy, java-format
+#, java-format
 msgid " which ended {0} ago."
-msgstr "آخر تحديث للأخبار {0} "
+msgstr "انتهت منذ {0} "
 
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:205
 msgid "No events"
@@ -3581,7 +3580,7 @@ msgstr "جاري بناء النفق"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:410
 msgid "none"
-msgstr ""
+msgstr "ﻻشيئ"
 
 #. tunnel nicknames, taken from i2ptunnel.config so they will display
 #. nicely under 'local destinations' in the summary bar
@@ -3635,7 +3634,7 @@ msgstr "من"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:72
 msgid "Receive on"
-msgstr ""
+msgstr "استقبل في"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:73
 msgid "Expiration"
@@ -4684,7 +4683,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:359
 msgid "I2CP Port"
-msgstr ""
+msgstr "I2CP منفذ"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:363
 msgid "I2CP Interface"
@@ -4764,11 +4763,11 @@ msgstr "اضافة المفاتيح يدويا"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:310
 msgid "Enter keys for encrypted remote destinations here."
-msgstr ""
+msgstr "ادخل مفاتيح الوجهات المشفرة هنا"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:313
 msgid "Keys for local destinations must be entered on the"
-msgstr ""
+msgstr "يجب ادخال مفاتيح الوجهات المحلية في"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:315
 msgid "I2PTunnel page"
@@ -4888,14 +4887,12 @@ msgid "config reseeding"
 msgstr "اعدادات اعادة التوزيع"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:240
-#, fuzzy
 msgid "I2P Reseeding Configuration"
-msgstr "اعدادات المفاتيح I2P"
+msgstr "اعدادات اعادة التوزيع"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:300
-#, fuzzy
 msgid "Reseeding Configuration"
-msgstr "اعدادات المفاتيح I2P"
+msgstr "اعدادات اعادة التوزيع"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:302
 msgid "Reseeding is the bootstrapping process used to find other routers when you first install I2P, or when your router has too few router references remaining."
@@ -4935,9 +4932,8 @@ msgid "Use non-SSL only"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:332
-#, fuzzy
 msgid "Reseed URLs"
-msgstr "اعادة توزيع"
+msgstr "اعادة توزيع العناوين"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:336
 msgid "Enable HTTP proxy (not used for SSL)"
@@ -4948,9 +4944,8 @@ msgid "HTTP Proxy Host"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:344
-#, fuzzy
 msgid "HTTP Proxy Port"
-msgstr "eepProxy منفذ"
+msgstr "HTTP Proxy منفذ"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:106
 msgid "config service"
@@ -5022,7 +5017,7 @@ msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:331
 msgid "If you prefer the command line, you can also run the "
-msgstr ""
+msgstr "اذا كنت تفضل استعمال سطر الأوامر، يمكنك تطبيق"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:341
 msgid "If you are running I2P as service right now, removing it will shut down your router immediately."
@@ -5243,7 +5238,7 @@ msgstr "حفظ"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error500_jsp.java:115
 msgid "Internal Error"
-msgstr ""
+msgstr "مشكل داخلي"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error500_jsp.java:117
 msgid "Router Console"
@@ -5255,7 +5250,7 @@ msgstr "اعدادات"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error500_jsp.java:129
 msgid "Sorry! There has been an internal error."
-msgstr ""
+msgstr "خطأ هذا مشكل داخلي"
 
 #. note to translators - both parameters are URLs
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error500_jsp.java:133
@@ -5339,7 +5334,7 @@ msgstr "I2P سجل الموجه"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:281
 msgid "Critical Logs"
-msgstr ""
+msgstr "سجلات هامة"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:285
 msgid "Router Logs"
