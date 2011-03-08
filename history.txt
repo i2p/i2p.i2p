@@ -1,10 +1,12 @@
 2011-03-08 zzz
+    * Clock: Cleanups and javadocs
     * Console:
       - Parameterize download button tags (ticket #425)
       - Clean up summary bar HTML warnings
       - Just display a summary bar link for text browsers
       - Move welcome div from the readme files to index.jsp
       - Require a nonce to change language
+    * EepGet: Cleanups and javadocs
     * i2psnark:
       - More efficient metainfo handling, reduce instantiations
       - Improved handling of storage errors
@@ -12,6 +14,7 @@
       - More metainfo sanity checks
       - Metadata transfer error handling improvements
       - Code cleanup, remove dead and duplicated code
+    * Reseed: Use the reseeder as a clock source
 
 2011-03-02 zzz
     * BuildHandler:
