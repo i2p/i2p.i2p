@@ -11,7 +11,7 @@ class CapacityCalculator {
     private static final I2PAppContext _context = I2PAppContext.getGlobalContext();
     
     /** used to adjust each period so that we keep trying to expand the peer's capacity */
-    static long GROWTH_FACTOR = 5;
+    static final long GROWTH_FACTOR = 5;
     
     /** the calculator estimates over a 1 hour period */
     private static long ESTIMATE_PERIOD = 60*60*1000;
@@ -83,37 +83,42 @@ class CapacityCalculator {
      *
      * Let A = accects, R = rejects, F = fails
      * @return estimated and adjusted accepts per hour, for the given period
-     *         which is, more or less, max(0, 5 + (A * (A / (A + R))) - (4 * F))
+     *         which is, more or less, max(0, 5 + (A * (A / (A + 2R))) - (4 * F))
      */
     private static double estimateCapacity(RateStat acceptStat, RateStat rejectStat, RateStat failedStat, int period) {
         Rate curAccepted = acceptStat.getRate(period);
         Rate curRejected = rejectStat.getRate(period);
         Rate curFailed = failedStat.getRate(period);
 
-        long eventCount = 0;
-        if (curAccepted != null)
+        double eventCount = 0;
+        if (curAccepted != null) {
             eventCount = curAccepted.getCurrentEventCount() + curAccepted.getLastEventCount();
-        // Punish for rejections.
-        // We don't want to simply do eventCount -= rejected or we get to zero with 50% rejection,
-        // and we don't want everybody to be at zero during times of congestion.
-        if (eventCount > 0) {
-            long rejected = curRejected.getCurrentEventCount() + curRejected.getLastEventCount();
-            eventCount = eventCount * eventCount / (eventCount + rejected);
+            // Punish for rejections.
+            // We don't want to simply do eventCount -= rejected or we get to zero with 50% rejection,
+            // and we don't want everybody to be at zero during times of congestion.
+            if (eventCount > 0 && curRejected != null) {
+                long rejected = curRejected.getCurrentEventCount() + curRejected.getLastEventCount();
+                if (rejected > 0)
+                    eventCount *= eventCount / (eventCount + (2 * rejected));
+            }
         }
+
         double stretch = ((double)ESTIMATE_PERIOD) / period;
         double val = eventCount * stretch;
-        long failed = 0;
+
         // Let's say a failure is 4 times worse than a rejection.
         // It's actually much worse than that, but with 2-hop tunnels and a 8-peer
         // fast pool, for example, you have a 1/7 chance of being falsely blamed.
         // We also don't want to drive everybody's capacity to zero, that isn't helpful.
-        if (curFailed != null)
-            failed = (long) (0.5 + (4.0 * (curFailed.getCurrentTotalValue() + curFailed.getLastTotalValue()) / 100.0));
-        if (failed > 0) {
-            //if ( (period <= 10*60*1000) && (curFailed.getCurrentEventCount() > 0) )
-            //    return 0.0d; // their tunnels have failed in the last 0-10 minutes
-            //else
-            val -= failed * stretch;
+        if (curFailed != null) {
+            double failed = curFailed.getCurrentTotalValue() + curFailed.getLastTotalValue();
+            if (failed > 0) {
+                //if ( (period <= 10*60*1000) && (curFailed.getCurrentEventCount() > 0) )
+                //    return 0.0d; // their tunnels have failed in the last 0-10 minutes
+                //else
+                // .04 = 4.0 / 100.0 adjustment to failed
+                val -= 0.04 * failed * stretch;
+            }
         }
         
         val += GROWTH_FACTOR;

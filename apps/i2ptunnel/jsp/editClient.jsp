@@ -400,7 +400,7 @@
                 <label for="localDestination" accesskey="L">
                     <%=intl._("Local destination")%>(<span class="accessKey">L</span>):
                 </label>
-                <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Read Only: Local Destination (if known)" wrap="off"><%=editBean.getDestinationBase64(curTunnel)%></textarea>               
+                <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Read Only: Local Destination (if known)" wrap="off" spellcheck="false"><%=editBean.getDestinationBase64(curTunnel)%></textarea>               
                 <span class="comment"><%=intl._("(if known)")%></span>
             </div>
 
@@ -465,7 +465,7 @@
                 <label><%=intl._("Jump URL List")%>:</label>
             </div>
             <div id="hostField" class="rowItem">
-                <textarea rows="2" style="height: 8em;" cols="60" id="hostField" name="jumpList" title="List of helper URLs to offer when a host is not found in your addressbook" wrap="off"><%=editBean.getJumpList(curTunnel)%></textarea>               
+                <textarea rows="2" style="height: 8em;" cols="60" id="hostField" name="jumpList" title="List of helper URLs to offer when a host is not found in your addressbook" wrap="off" spellcheck="false"><%=editBean.getJumpList(curTunnel)%></textarea>               
             </div>
             <div class="subdivider">
                 <hr />

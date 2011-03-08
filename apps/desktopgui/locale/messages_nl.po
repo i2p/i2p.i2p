@@ -1,3 +1,23 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the desktopgui package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# foo <foo@bar>, 2009.
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: http://trac.i2p2.de/\n"
+"POT-Creation-Date: 2011-02-20 11:53+0000\n"
+"PO-Revision-Date: 2011-02-20 12:15+0000\n"
+"Last-Translator: ducki2p <ducki2p@gmail.com>\n"
+"Language-Team: Dutch <>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: nl\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
 #: src/net/i2p/desktopgui/ExternalTrayManager.java:23
 msgid "Start I2P"
 msgstr "I2P starten"
@@ -10,20 +30,26 @@ msgstr "I2P is aan het starten!"
 msgid "Starting"
 msgstr "Bezig met starten"
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:25
+#: src/net/i2p/desktopgui/InternalTrayManager.java:26
 msgid "Launch I2P Browser"
 msgstr "Start I2P Browser"
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:49
+#: src/net/i2p/desktopgui/InternalTrayManager.java:50
+msgid "Configure desktopgui"
+msgstr "Configureer desktopgui"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:67
 msgid "Restart I2P"
 msgstr "I2P herstarten"
 
-#: src/net/i2p/desktopgui/InternalTrayManager.java:67
+#: src/net/i2p/desktopgui/InternalTrayManager.java:85
 msgid "Stop I2P"
 msgstr "I2P stoppen"
 
-#~ msgid "Browser not found"
-#~ msgstr "Browser niet gevonden"
+#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:44
+msgid "Tray icon configuration"
+msgstr "Systeemvak icoon configuratie"
 
-#~ msgid "The default browser for your system was not found."
-#~ msgstr "De standaard webbrowser voor je systeem werd niet gevonden."
+#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:47
+msgid "Should tray icon be enabled?"
+msgstr "Systeemvak icoon inschakelen?"

@@ -55,19 +55,15 @@ public class Main {
      * Main method launching the application.
      */
     public static void beginStartup(String[] args) {
-        boolean wasHeadless = Boolean.valueOf(System.getProperty("java.awt.headless")).booleanValue();
-        if(wasHeadless) {
-            System.setProperty("java.awt.headless", "false");
-        }
-        boolean headless_check = true;
         try {
-            // X permissions error is a java.lang.InternalError (a Throwable)
-            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-            headless_check = ge.isHeadlessInstance();
-        } catch (Throwable t) {}
-        if (wasHeadless)
-            System.setProperty("java.awt.headless", "true");
-        if (headless_check) {
+            String headless = System.getProperty("java.awt.headless");
+            boolean isHeadless = Boolean.parseBoolean(headless);
+            if(isHeadless) {
+            	log.warn("Headless environment: not starting desktopgui!");
+                return;
+            }
+        }
+        catch(Exception e) {
             return;
         }
         try {

@@ -16,28 +16,41 @@
             source="1.5"
             target="1.5"
             destdir="./build/obj"
+            includeAntRuntime="false"
             includes="**/*.java"
             classpath="./lib/systray4j.jar:../../../core/java/build/i2p.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
-    <target name="jar" depends="compile" unless="jar.uptodate">
-        <mkdir dir="./build/jar_temp" />
-        <copy todir="./build/jar_temp">
-            <fileset dir="./build/obj" includes="**/*.class" />
-        </copy>
-        <jar destfile="./build/systray.jar" basedir="./build/jar_temp" includes="**/*">
+
+    <target name="jar" depends="compile, jarUpToDate" unless="jar.uptodate">
+        <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="list" />
+            <arg value="changed" />
+            <arg value="." />
+        </exec>
+        <!-- \n in an attribute value generates an invalid manifest -->
+        <exec executable="tr" inputstring="${workspace.changes}" outputproperty="workspace.changes.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="-s" />
+            <arg value="[:space:]" />
+            <arg value="," />
+        </exec>
+        <jar destfile="./build/systray.jar" basedir="./build/obj" includes="**/*.class">
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.apps.systray.SysTray" />
                 <attribute name="Class-Path" value="systray4j.jar" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
             </manifest>
         </jar>
-        <delete dir="./build/jar_temp" />
     </target>
 
-    <uptodate property="jar.uptodate" targetfile="./build/systray.jar">
-        <srcfiles dir= "src" includes="**/*.java" />
-    </uptodate>
+    <target name="jarUpToDate">
+        <uptodate property="jar.uptodate" targetfile="./build/systray.jar">
+            <srcfiles dir= "build/obj" includes="**/*.class" />
+        </uptodate>
+    </target>
 
     <target name="javadoc">
         <mkdir dir="./build" />

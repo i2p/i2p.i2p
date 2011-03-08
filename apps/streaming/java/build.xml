@@ -27,6 +27,7 @@
         <javac 
             srcdir="./src" 
             debug="true" deprecation="on" source="1.5" target="1.5" 
+            includeAntRuntime="false"
             destdir="./build/obj" 
             classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar" >
             <compilerarg line="${javac.compilerargs}" />
@@ -36,14 +37,40 @@
         <javac 
             srcdir="./test" 
             debug="true" deprecation="on" source="1.5" target="1.5" 
+            includeAntRuntime="false"
             destdir="./build/obj" 
             classpath="../../../core/java/build/i2p.jar:../../ministreaming/java/build/mstreaming.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
-    <target name="jar" depends="builddep, compile">
-        <jar destfile="./build/streaming.jar" basedir="./build/obj" includes="**/*.class" />
+
+    <target name="jar" depends="builddep, compile, jarUpToDate" unless="jar.uptodate" >
+        <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="list" />
+            <arg value="changed" />
+            <arg value="." />
+        </exec>
+        <!-- \n in an attribute value generates an invalid manifest -->
+        <exec executable="tr" inputstring="${workspace.changes}" outputproperty="workspace.changes.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="-s" />
+            <arg value="[:space:]" />
+            <arg value="," />
+        </exec>
+        <jar destfile="./build/streaming.jar" basedir="./build/obj" includes="**/*.class" >
+            <manifest>
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+            </manifest>
+        </jar>
     </target>
+
+    <target name="jarUpToDate">
+        <uptodate property="jar.uptodate" targetfile="build/streaming.jar" >
+            <srcfiles dir= "." includes="build/obj/**/*.class" />
+        </uptodate>
+    </target>
+
     <target name="jarTest" depends="jar, compileTest">
         <jar destfile="./build/streaming.jar" basedir="./build/obj" includes="**/*Test*.class" update="true" />
     </target>

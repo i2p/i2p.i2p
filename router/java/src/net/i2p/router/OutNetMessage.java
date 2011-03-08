@@ -29,8 +29,8 @@ import net.i2p.util.Log;
  *
  */
 public class OutNetMessage {
-    private Log _log;
-    private RouterContext _context;
+    private final Log _log;
+    private final RouterContext _context;
     private RouterInfo _target;
     private I2NPMessage _message;
     /** cached message class name, for use after we discard the message */
@@ -50,7 +50,7 @@ public class OutNetMessage {
     private long _sendBegin;
     private long _transmitBegin;
     private Exception _createdBy;
-    private long _created;
+    private final long _created;
     /** for debugging, contains a mapping of even name to Long (e.g. "begin sending", "handleOutbound", etc) */
     private HashMap<String, Long> _timestamps;
     /**

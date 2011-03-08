@@ -572,6 +572,9 @@ public class SnarkManager implements Snark.CompleteListener {
                 }
 
                 try {
+                    // This is somewhat wasteful as this metainfo is thrown away,
+                    // the real one is created in the Snark constructor.
+                    // TODO: Make a Snark constructor where we pass the MetaInfo in as a parameter.
                     MetaInfo info = new MetaInfo(fis);
                     try {
                         fis.close();
@@ -595,7 +598,7 @@ public class SnarkManager implements Snark.CompleteListener {
                         //    addMessage(_("Warning - No I2P trackers in \"{0}\", and open trackers are disabled, will announce to DHT only.", info.getName()));
                         } else {
                             //addMessage(_("Warning - No I2P trackers in \"{0}\", and DHT and open trackers are disabled, you should enable open trackers or DHT before starting the torrent.", info.getName()));
-                            addMessage(_("Warning - No I2P trackers in \"{0}\", and DHT and open trackers are disabled, you should enable open trackers before starting the torrent.", info.getName()));
+                            addMessage(_("Warning - No I2P Trackers found in \"{0}\". Make sure Open Tracker is enabled before starting this torrent.", info.getName()));
                             dontAutoStart = true;
                         }
                     }
@@ -622,6 +625,7 @@ public class SnarkManager implements Snark.CompleteListener {
                     return;
                 } catch (OutOfMemoryError oom) {
                     addMessage(_("ERROR - Out of memory, cannot create torrent from {0}", sfile.getName()) + ": " + oom.getMessage());
+                    return;
                 } finally {
                     if (fis != null) try { fis.close(); } catch (IOException ioe) {}
                 }
@@ -643,11 +647,15 @@ public class SnarkManager implements Snark.CompleteListener {
      *
      * @param name hex or b32 name from the magnet link
      * @param ih 20 byte info hash
+     * @param trackerURL may be null
+     * @param updateStatus should we add this magnet to the config file,
+     *                     to save it across restarts, in case we don't get
+     *                     the metadata before shutdown?
      * @throws RuntimeException via Snark.fatal()
      * @since 0.8.4
      */
-    public void addMagnet(String name, byte[] ih, boolean updateStatus) {
-        Snark torrent = new Snark(_util, name, ih, this,
+    public void addMagnet(String name, byte[] ih, String trackerURL, boolean updateStatus) {
+        Snark torrent = new Snark(_util, name, ih, trackerURL, this,
                                   _peerCoordinatorSet, _connectionAcceptor,
                                   false, getDataDir().getPath());
 
@@ -1151,6 +1159,10 @@ public class SnarkManager implements Snark.CompleteListener {
             saveTorrentStatus(meta, storage.getBitField(), null); // no file priorities
             String name = (new File(getDataDir(), storage.getBaseName() + ".torrent")).getAbsolutePath();
             try {
+                // put the announce URL in the file
+                String announce = snark.getTrackerURL();
+                if (announce != null)
+                    meta = meta.reannounce(announce);
                 synchronized (_snarks) {
                     locked_writeMetaInfo(meta, name);
                     // put it in the list under the new name
@@ -1183,9 +1195,9 @@ public class SnarkManager implements Snark.CompleteListener {
                 String b64 = k.substring(PROP_META_MAGNET_PREFIX.length());
                 b64 = b64.replace('$', '=');
                 byte[] ih = Base64.decode(b64);
-                // ignore value
+                // ignore value - TODO put tracker URL in value
                 if (ih != null && ih.length == 20)
-                    addMagnet("Magnet: " + I2PSnarkUtil.toHex(ih), ih, false);
+                    addMagnet("Magnet: " + I2PSnarkUtil.toHex(ih), ih, null, false);
                 // else remove from config?
             }
         }

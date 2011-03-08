@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.SwingWorker;
+import net.i2p.desktopgui.gui.DesktopguiConfigurationFrame;
 
 import net.i2p.desktopgui.router.RouterManager;
 import net.i2p.desktopgui.util.BrowseException;
@@ -46,6 +47,23 @@ public class InternalTrayManager extends TrayManager {
                 }.execute();
             }
         });
+        MenuItem desktopguiConfigurationLauncher = new MenuItem(_("Configure desktopgui"));
+        desktopguiConfigurationLauncher.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                new SwingWorker<Object, Object>() {
+
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        new DesktopguiConfigurationFrame().setVisible(true);
+                        return null;
+                    }
+
+                }.execute();
+            }
+
+        });
         MenuItem restartItem = new MenuItem(_("Restart I2P"));
         restartItem.addActionListener(new ActionListener() {
 
@@ -84,6 +102,8 @@ public class InternalTrayManager extends TrayManager {
         });
         
         popup.add(browserLauncher);
+        popup.addSeparator();
+        popup.add(desktopguiConfigurationLauncher);
         popup.addSeparator();
         popup.add(restartItem);
         popup.add(stopItem);

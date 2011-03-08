@@ -42,6 +42,14 @@
  <% } %></div>
 
  <% if ( (System.getProperty("os.name") != null) && (System.getProperty("os.name").startsWith("Win")) ) { %>
+ <h3><%=intl._("Systray integration")%></h3>
+ <p><%=intl._("On the windows platform, there is a small application to sit in the system tray, allowing you to view the router's status")%> 
+    <%=intl._("(later on, I2P client applications will be able to integrate their own functionality into the system tray as well).")%> 
+    <%=intl._("If you are on windows, you can either enable or disable that icon here.")%></p>
+ <hr><div class="formaction">
+ <input type="submit" name="action" value="<%=intl._("Show systray icon")%>" >
+ <input type="submit" name="action" value="<%=intl._("Hide systray icon")%>" >
+ </div>
  <h3><%=intl._("Run on startup")%></h3>
  <p><%=intl._("You can control whether I2P is run on startup or not by selecting one of the following options - I2P will install (or remove) a service accordingly.")%> 
     <%=intl._("If you prefer the command line, you can also run the ")%> <code>install_i2p_service_winnt.bat</code> (<%=intl._("or")%>

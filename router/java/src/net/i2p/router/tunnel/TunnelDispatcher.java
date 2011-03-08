@@ -709,7 +709,8 @@ public class TunnelDispatcher implements Service {
         _validator = new BloomFilterIVValidator(_context, getShareBandwidth(_context));
     }
 
-    private static int getShareBandwidth(RouterContext ctx) {
+    /** @return in KBps */
+    public static int getShareBandwidth(RouterContext ctx) {
         int irateKBps = ctx.bandwidthLimiter().getInboundKBytesPerSecond();
         int orateKBps = ctx.bandwidthLimiter().getOutboundKBytesPerSecond();
         double pct = ctx.router().getSharePercentage();

@@ -41,7 +41,7 @@
             <br> <i><%=intl._("('MM' = month, 'dd' = day, 'HH' = hour, 'mm' = minute, 'ss' = second, 'SSS' = millisecond)")%>
             </i></td>
         </tr><tr><td class="mediumtags" align="right"><b><%=intl._("Max log file size")%>:</b></td>
-          <td><input type="text" name="logfilesize" size="4" value="<jsp:getProperty name="logginghelper" property="maxFileSize" />" ><br></td>
+          <td><input type="text" name="logfilesize" size="10" value="<jsp:getProperty name="logginghelper" property="maxFileSize" />" ><br></td>
         </tr><tr><td class="mediumtags" align="right"><b><%=intl._("Default log level")%>:</b></td>
           <td><jsp:getProperty name="logginghelper" property="defaultLogLevelBox" /><br><i><%=intl._("(DEBUG and INFO are not recommended defaults, as they will drastically slow down your router)")%>
           </i></td>

@@ -58,6 +58,7 @@ public class RouterAddressTest extends StructureTest {
         addr.setOptions(options);
         addr.setTransportStyle("Blah");
         assertFalse(addr.equals(null));
+        assertFalse(addr.equals(""));
     }
     
     public void testToString(){
@@ -72,6 +73,8 @@ public class RouterAddressTest extends StructureTest {
         options.setProperty("portnum", "1234");
         addr.setOptions(options);
         addr.setTransportStyle("Blah");
+        addr.toString();
+        addr.setOptions(null);
         addr.toString();
     }
 }

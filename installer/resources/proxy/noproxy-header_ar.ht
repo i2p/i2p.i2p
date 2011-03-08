@@ -1,0 +1,20 @@
+HTTP/1.1 503 Service Unavailable
+Content-Type: text/html; charset=UTF-8
+Cache-control: no-cache
+Connection: close
+Proxy-Connection: close
+
+<html lang="ar" dir="rtl"><head>
+<title>تحذير: لم يحدد بروكسي خارجي</title>
+<link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico" >
+<link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css" >
+</head>
+<body>
+<div class=logo>
+ <a href="http://127.0.0.1:7657/index.jsp" title="Router Console"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="I2P Router Console" border="0"></a><hr>
+ <a href="http://127.0.0.1:7657/config.jsp">اعدادات</a> <a href="http://127.0.0.1:7657/help.jsp">مساعدة</a> <a href="http://127.0.0.1:7657/susidns/">دفتر العناوين</a>
+</div>
+<div class=warning id=warning>
+<h3>تحذير: لم يحدد بروكسي خارجي</h3>
+قمت بطلب موقع خارج عن شبكة I2P، لكن لم تقم بتحديد بروكسي خارجي. قم يتحديد بروكسي خارجي في اعدادات I2PTunnel.
+</div>

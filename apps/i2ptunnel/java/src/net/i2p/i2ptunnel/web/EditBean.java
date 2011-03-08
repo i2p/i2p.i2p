@@ -115,7 +115,7 @@ public class EditBean extends IndexBean {
         if (tun != null)
             return "true".equalsIgnoreCase(tun.getSharedClient());
         else
-            return true;
+            return false;
     }
     
     public boolean shouldDelay(int tunnel) {

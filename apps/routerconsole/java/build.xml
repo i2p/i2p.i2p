@@ -46,6 +46,7 @@
         <javac 
             srcdir="./src" 
             debug="true" deprecation="on" source="1.5" target="1.5" 
+            includeAntRuntime="false"
             destdir="./build/obj">
             <compilerarg line="${javac.compilerargs}" />
             <classpath>
@@ -61,41 +62,68 @@
             </classpath>
         </javac>
     </target>
-    <target name="jar" depends="compile">
+
+    <!-- the jar with the latest message classes from the jsps, and the war too -->
+    <target name="jar" depends="jar1, war, bundle" />
+
+    <!-- the jar without the latest message classes from the jsps -->
+    <target name="jar1" depends="compile, jarUpToDate" unless="jar.uptodate" >
+        <exec executable="mtn" outputproperty="workspace.changes.j" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="list" />
+            <arg value="changed" />
+            <arg value="." />
+            <arg value="../locale" />
+        </exec>
+        <!-- \n in an attribute value generates an invalid manifest -->
+        <exec executable="tr" inputstring="${workspace.changes.j}" outputproperty="workspace.changes.j.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="-s" />
+            <arg value="[:space:]" />
+            <arg value="," />
+        </exec>
         <jar destfile="./build/routerconsole.jar" basedir="./build/obj" includes="**/*.class">
             <manifest>
                 <!-- top level installer will rename to jrobin.jar -->
                 <!-- DTG added in 0.8.4, not in the classpath for very old installs, before we changed wrapper.config to specify * -->
                 <attribute name="Class-Path" value="i2p.jar router.jar jrobin.jar desktopgui.jar" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.j.tr}" />
             </manifest>
         </jar>
-        <delete dir="./tmpextract" />
        <!-- jrobin taken out of routerconsole.jar in 0.7.12
+        <delete dir="./tmpextract" />
         <unjar src="../../jrobin/jrobin-1.4.0.jar" dest="./tmpextract" />
         <jar destfile="./build/routerconsole.jar" basedir="./tmpextract" update="true" />
         <delete dir="./tmpextract" />
        -->
-        
-        <ant target="war" />
+    </target>
 
+    <!-- this is tricky because the message classes go in the jar, not in the war -->
+    <target name="bundle" depends="jar1, precompilejsp" >
         <!-- Update the messages_*.po files.
              We need to supply the bat file for windows, and then change the fail property to true -->
-        <exec executable="sh" osfamily="unix" failifexecutionfails="false" >
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" >
             <arg value="./bundle-messages.sh" />
         </exec>
-        <exec executable="sh" osfamily="mac" failifexecutionfails="false" >
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" >
             <arg value="./bundle-messages.sh" />
         </exec>
-        <exec executable="cmd" osfamily="windows" failifexecutionfails="false" >
-            <arg value="/c" />
-            <arg value="bundle-messages.bat" />
+		<!-- multi-lang is optional -->
+        <exec executable="sh" osfamily="windows" failifexecutionfails="false" >
+            <arg value="./bundle-messages.sh" />
         </exec>
         <!-- jar again to get the latest messages_*.class files -->
         <jar destfile="./build/routerconsole.jar" basedir="./build/obj" includes="**/*.class" update="true" />
     </target>
 
-    <target name="poupdate" depends="build">
-        <ant target="war" />
+
+    <target name="jarUpToDate">
+        <uptodate property="jar.uptodate" targetfile="build/routerconsole.jar" >
+            <srcfiles dir= "build/obj" includes="**/*.class" />
+        </uptodate>
+    </target>
+
+    <target name="poupdate" depends="precompilejsp">
         <!-- Update the messages_*.po files.
              We need to supply the bat file for windows, and then change the fail property to true -->
         <exec executable="sh" osfamily="unix" failifexecutionfails="true" >
@@ -106,19 +134,43 @@
             <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>
-        <exec executable="cmd" osfamily="windows" failifexecutionfails="true" >
-            <arg value="/c" />
-            <arg value="bundle-messages.bat" />
+        <exec executable="sh" osfamily="windows" failifexecutionfails="true" >
+            <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>
     </target>
-    <target name="war" depends="precompilejsp">
+
+    <!-- does NOT update the message classes, as those go in the jar -->
+    <target name="war" depends="precompilejsp, warUpToDate" unless="war.uptodate" >
+        <exec executable="mtn" outputproperty="workspace.changes.w" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="list" />
+            <arg value="changed" />
+            <arg value="../jsp" />
+        </exec>
+        <!-- \n in an attribute value generates an invalid manifest -->
+        <exec executable="tr" inputstring="${workspace.changes.w}" outputproperty="workspace.changes.w.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="-s" />
+            <arg value="[:space:]" />
+            <arg value="," />
+        </exec>
         <!-- Don't include the css in the war, the main build.xml will copy it to docs/themes/console/ -->
         <war destfile="build/routerconsole.war" webxml="../jsp/web-out.xml"
              basedir="../jsp/" excludes="web.xml, *.css, **/*.java, *.jsp, *.jsi, web-fragment.xml, web-out.xml">
+            <manifest>
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.w.tr}" />
+            </manifest>
         </war>
     </target>
-    <target name="precompilejsp" unless="precompilejsp.uptodate">
+
+    <target name="warUpToDate">
+        <uptodate property="war.uptodate" targetfile="build/routerconsole.war" >
+            <srcfiles dir= "../jsp" excludes="web.xml, web-fragment.xml, *.css, **/*.java, *.jsp, *.jsi" />
+        </uptodate>
+    </target>
+
+    <target name="precompilejsp" depends="jar1" unless="precompilejsp.uptodate">
         <delete dir="../jsp/WEB-INF/" />
         <delete file="../jsp/web-fragment.xml" />
         <delete file="../jsp/web-out.xml" />
@@ -184,6 +236,7 @@
         
         <javac debug="true" deprecation="on" source="1.5" target="1.5" 
                encoding="UTF-8"
+               includeAntRuntime="false"
                destdir="../jsp/WEB-INF/classes/" 
                srcdir="../jsp/WEB-INF/classes" includes="**/*.java">
             <compilerarg line="${javac.compilerargs}" />
@@ -218,7 +271,7 @@
     </target>
 
     <uptodate property="precompilejsp.uptodate" targetfile="../jsp/web-out.xml">
-        <srcfiles dir= "../jsp" includes="**/*.jsp, **/*.html, *.css, susimail/susimail, web.xml"/>
+        <srcfiles dir= "../jsp" includes="**/*.jsp, *.jsi, **/*.html, *.css, susimail/susimail, web.xml"/>
     </uptodate>
 
     <target name="javadoc">

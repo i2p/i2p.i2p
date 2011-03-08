@@ -1,27 +1,41 @@
-<% // put width here too to prevent bad layout at startup %>
-<% // let's remove that for now since we're no longer using percentage width here %>
 <div class="routersummaryouter">
 <%
-    // skip the iframe if refresh disabled
-    String d = request.getParameter("refresh");
-    String newDelay = "";
-    if (d == null || "".equals(d))
-        d = intl.getRefresh();
-    else {
-        d = net.i2p.data.DataHelper.stripHTML(d);  // XSS
-        // pass the new delay parameter to the iframe
-        newDelay = "?refresh=" + d;
+    // The refresh delay, 0 to disable
+    String d = "0";
+    boolean allowIFrame = intl.allowIFrame(request.getHeader("User-Agent"));
+    if (allowIFrame) {
+        // skip the iframe if refresh disabled
+        d = request.getParameter("refresh");
+        String newDelay = "";
+        if (d == null || "".equals(d))
+            d = intl.getRefresh();
+        else {
+            d = net.i2p.data.DataHelper.stripHTML(d);  // XSS
+            // pass the new delay parameter to the iframe
+            newDelay = "?refresh=" + d;
+        }
+        if (!"0".equals(d))
+            out.print("<iframe src=\"/summaryframe.jsp" + newDelay + "\" height=\"1500\" width=\"200\" scrolling=\"auto\" frameborder=\"0\" title=\"sidepanel\">\n");
     }
-    if (!"0".equals(d))
-        out.print("<iframe src=\"/summaryframe.jsp" + newDelay + "\" height=\"1500\" width=\"200\" scrolling=\"auto\" frameborder=\"0\" title=\"sidepanel\">\n");
 %>
 <div class="routersummary">
+<%
+    if (allowIFrame) {
+        // Display the whole summary bar
+%>
 <%@include file="summarynoframe.jsi" %>
 <%
-    // d defined above
+    } else {
+        // Text browsers don't render the two divs side-by-side, so just provide a link
+        out.print("<a href=\"/summaryframe\">");
+        out.print(intl._("Summary Bar"));
+        out.print("</a>");
+    }
+
+    // d and allowIFrame defined above
     if (!"0".equals(d)) {
         out.print("</div></iframe>\n");
-    } else {
+    } else if (allowIFrame) {
         // since we don't have an iframe this will reload the base page, and
         // the new delay will be passed to the iframe above
         out.print("<div class=\"refresh\"><form action=\"" + request.getRequestURI() + "\" method=\"POST\">\n");
@@ -34,6 +48,8 @@
         out.print(intl._("Enable"));
         out.print("</button>\n");
         out.print("</form></div></div>\n");
+    } else {
+        out.print("</div>\n");
     }
 %>
 </div>

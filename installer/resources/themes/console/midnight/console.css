@@ -280,16 +280,6 @@ div.tunnels table{
      padding-right: 0;
 }     
      
-div.routersummary form {
-     margin-top: -8px !important;
-     margin-bottom: -8px !important;     
-}
-
-div.routersummary form:last-child {
-     padding-top: 3px !important;
-     margin-bottom: -10px !important;     
-}
-
 div.refresh {
      margin-top: 10px !important;
      margin-bottom: 10px !important;
@@ -776,7 +766,7 @@ p {
 }
 
 .langbox {
-     margin: 17px 0px 0px 5px;
+     margin: 4px 0px 0px 5px;
      color: #eef;
      font-size: 7pt;
      width: 240px;

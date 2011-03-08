@@ -18,22 +18,16 @@ import net.i2p.util.Log;
  * that wants to send a message, and the communication subsystem periodically 
  * retrieves messages for delivery.
  *
+ * Actually, this doesn't 'pool' anything, it calls the comm system directly.
+ * Nor does it organize by priority. But perhaps it could someday.
  */
 public class OutNetMessagePool {
-    private Log _log;
-    private RouterContext _context;
+    private final Log _log;
+    private final RouterContext _context;
     
     public OutNetMessagePool(RouterContext context) {
         _context = context;
         _log = _context.logManager().getLog(OutNetMessagePool.class);
-    }
-    
-    /**
-     * Remove the highest priority message, or null if none are available.
-     *
-     */
-    public OutNetMessage getNext() {
-        return null;
     }
     
     /**
@@ -47,8 +41,8 @@ public class OutNetMessagePool {
             return;
         }        
         
-        if (_log.shouldLog(Log.INFO))
-                _log.info("Adding outbound message to " 
+        if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Adding outbound message to " 
                           + msg.getTarget().getIdentity().getHash().toBase64().substring(0,6)
                           + " with id " + msg.getMessage().getUniqueId()
                           + " expiring on " + msg.getMessage().getMessageExpiration()
@@ -70,7 +64,7 @@ public class OutNetMessagePool {
             return false;
         }
         if (msg.getTarget() == null) {
-            _log.error("No target in the OutNetMessage: " + msg, new Exception("Definitely a fuckup"));
+            _log.error("No target in the OutNetMessage: " + msg, new Exception());
             return false;
         }
         if (msg.getPriority() < 0) {
@@ -82,39 +76,5 @@ public class OutNetMessagePool {
             return false;
         }
         return true;
-    }
-    
-    /**
-     * Clear any messages that have expired, enqueuing any appropriate jobs
-     *
-     */
-    public void clearExpired() {
-        // noop
-    }
-    
-    /**
-     * Retrieve the number of messages, regardless of priority.
-     *
-     */
-    public int getCount() {  return 0; }
-    
-    /**
-     * Retrieve the number of messages at the given priority.  This can be used for
-     * subsystems that maintain a pool of messages to be sent whenever there is spare time, 
-     * where all of these 'spare' messages are of the same priority.
-     *
-     */
-    public int getCount(int priority) { return 0; }
-    
-    public void dumpPoolInfo() { return; }
-    
-    private static class ReverseIntegerComparator implements Comparator {
-        public int compare(Object lhs, Object rhs) {
-            if ( (lhs == null) || (rhs == null) ) return 0; // invalid, but never used
-            if ( !(lhs instanceof Integer) || !(rhs instanceof Integer)) return 0; 
-            Integer lv = (Integer)lhs;
-            Integer rv = (Integer)rhs;
-            return - (lv.compareTo(rv));
-        }
     }
 }

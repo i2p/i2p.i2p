@@ -783,6 +783,8 @@ public class PeerCoordinator implements PeerListener
   /**
    * Returns a byte array containing the requested piece or null of
    * the piece is unknown.
+   *
+   * @throws RuntimeException on IOE getting the data
    */
   public byte[] gotRequest(Peer peer, int piece, int off, int len)
   {
@@ -798,8 +800,11 @@ public class PeerCoordinator implements PeerListener
     catch (IOException ioe)
       {
         snark.stopTorrent();
-        _log.error("Error reading the storage for " + metainfo.getName(), ioe);
-        throw new RuntimeException("B0rked");
+        String msg = "Error reading the storage (piece " + piece + ") for " + metainfo.getName() + ": " + ioe;
+        _log.error(msg, ioe);
+        SnarkManager.instance().addMessage(msg);
+        SnarkManager.instance().addMessage("Fatal storage error: Stopping torrent " + metainfo.getName());
+        throw new RuntimeException(msg, ioe);
       }
   }
 
@@ -829,6 +834,8 @@ public class PeerCoordinator implements PeerListener
    * Returns false if the piece is no good (according to the hash).
    * In that case the peer that supplied the piece should probably be
    * blacklisted.
+   *
+   * @throws RuntimeException on IOE saving the piece
    */
   public boolean gotPiece(Peer peer, int piece, byte[] bs)
   {
@@ -872,8 +879,11 @@ public class PeerCoordinator implements PeerListener
         catch (IOException ioe)
           {
             snark.stopTorrent();
-            _log.error("Error writing storage for " + metainfo.getName(), ioe);
-            throw new RuntimeException("B0rked");
+            String msg = "Error writing storage (piece " + piece + ") for " + metainfo.getName() + ": " + ioe;
+            _log.error(msg, ioe);
+            SnarkManager.instance().addMessage(msg);
+            SnarkManager.instance().addMessage("Fatal storage error: Stopping torrent " + metainfo.getName());
+            throw new RuntimeException(msg, ioe);
           }
         wantedPieces.remove(p);
       }

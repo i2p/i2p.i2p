@@ -6,27 +6,28 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: I2P i2ptunnel\n"
+"Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-20 19:26+0000\n"
-"PO-Revision-Date: 2010-06-15 14:09+0100\n"
-"Last-Translator: duck <duck@mail.i2p>\n"
-"Language-Team: duck <duck@mail.i2p>, monkeybrains <monkeybrains@mail.i2p>\n"
+"POT-Creation-Date: 2011-03-03 18:29+0000\n"
+"PO-Revision-Date: 2011-02-20 12:14+0000\n"
+"Last-Translator: ducki2p <ducki2p@gmail.com>\n"
+"Language-Team: Dutch <>\n"
+"Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Poedit-Language: Dutch\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:474
 #, java-format
 msgid ""
 "To visit the destination in your host database, click <a href=\"{0}\">here</"
-"a>. To visit the conflicting addresshelper destination, click <a href=\"{1}"
-"\">here</a>."
+"a>. To visit the conflicting addresshelper destination, click <a href="
+"\"{1}\">here</a>."
 msgstr ""
-"Om de destination in je host database te bezoeken, klik <a href=\"{0}"
-"\">hier</a>. Om de conflicterende adreshelper destination te bezoeken, klik "
-"<a href=\"{1}\">hier</a>."
+"Om de destination in je host database te bezoeken, klik <a href="
+"\"{0}\">hier</a>. Om de conflicterende adreshelper destination te bezoeken, "
+"klik <a href=\"{1}\">hier</a>."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:931
 msgid ""
@@ -40,7 +41,7 @@ msgstr ""
 msgid "internal"
 msgstr "intern"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:170
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:171
 msgid ""
 "Invalid form submission, probably because you used the 'back' or 'reload' "
 "button on your browser. Please resubmit."
@@ -48,78 +49,86 @@ msgstr ""
 "Ongeldige formulier verzonden, waarschijnlijk doordat je de 'back' of "
 "'reload' button van je browser hebt gebruikt. Verzend opnieuw."
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:217
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:218
 msgid "Configuration reloaded for all tunnels"
 msgstr "Configuratie van alle tunnels opnieuw geladen"
 
 #. and give them something to look at in any case
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:229
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:230
 msgid "Starting tunnel"
 msgstr "Opstarten van tunnel"
 
 #. and give them something to look at in any case
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:242
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:243
 msgid "Stopping tunnel"
 msgstr "Stoppen van tunnel"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:389
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:311
+msgid "Configuration changes saved"
+msgstr "Configuratie wijzigingen opgeslagen"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:314
+msgid "Failed to save configuration"
+msgstr "Opslaan van de configuratie mislukt"
+
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:398
 msgid "New Tunnel"
 msgstr "Nieuwe Tunnel"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:409
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:418
 msgid "Standard client"
 msgstr "Standaard client"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:410
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:419
 msgid "HTTP client"
 msgstr "HTTP client"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:411
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:420
 msgid "IRC client"
 msgstr "IRC client"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:412
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:421
 msgid "Standard server"
 msgstr "Standaard server"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:413
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:422
 msgid "HTTP server"
 msgstr "HTTP server"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:414
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:423
 msgid "SOCKS 4/4a/5 proxy"
 msgstr "SOCKS 4/4a/5 proxy"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:415
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:424
 msgid "SOCKS IRC proxy"
 msgstr "SOCKS IRC proxy"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:416
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:425
 msgid "CONNECT/SSL/HTTPS proxy"
 msgstr "CONNECT/SSL/HTTPS proxy"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:417
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:426
 msgid "IRC server"
 msgstr "IRC server"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:418
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:427
 msgid "Streamr client"
 msgstr "Streamr client"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:419
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:428
 msgid "Streamr server"
 msgstr "Streamr server"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:420
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:429
 msgid "HTTP bidir"
 msgstr "HTTP bidir"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:508
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:517
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:290
 msgid "Host not set"
 msgstr "Host niet opgegeven"
 
-#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:512
+#: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:521
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:272
 msgid "Port not set"
 msgstr "Poort niet opgegeven"
@@ -604,8 +613,8 @@ msgid "Access List"
 msgstr "Toegangslijst"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:451
-msgid "Inbound connection limits (0 to disable)"
-msgstr "Inkomende connectie limieten (0 om uit te schakelen)"
+msgid "Inbound connection limits (0=unlimited)"
+msgstr "Inkomende connectie limieten (0=onbeperkt)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:453
 msgid "Per client"
@@ -628,8 +637,8 @@ msgid "Total"
 msgstr "Totaal"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:475
-msgid "Max concurrent connections (0 to disable)"
-msgstr "Maximum gelijktijdige connecties (0 om uit te schakelen)"
+msgid "Max concurrent connections (0=unlimited)"
+msgstr "Maximum gelijktijdige connecties (0=onbeperkt)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:493
 msgid "New Certificate type"

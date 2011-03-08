@@ -1,3 +1,117 @@
+2011-03-08 zzz
+    * Console:
+      - Parameterize download button tags (ticket #425)
+      - Clean up summary bar HTML warnings
+      - Just display a summary bar link for text browsers
+      - Move welcome div from the readme files to index.jsp
+      - Require a nonce to change language
+    * i2psnark:
+      - More efficient metainfo handling, reduce instantiations
+      - Improved handling of storage errors
+      - Improved handling of duplicate file names
+      - More metainfo sanity checks
+      - Metadata transfer error handling improvements
+      - Code cleanup, remove dead and duplicated code
+
+2011-03-02 zzz
+    * BuildHandler:
+      - Limit request queue size
+      - Concurrent request queue
+      - Remove dead code for queued reply handling
+    * OutNetMessage: Remove dead code
+    * Tunnel cleanups, final, javadoc
+
+* 2011-03-02  0.8.4 released
+
+2011-02-27 zzz
+    * Console:
+      - Fix numerous readme HTML errors
+      - Fix flag locations in readmes
+      - desktopgui.enable now defaults to false; run systray if false
+      - Start icon app before console
+      - Restore systray form in configservice.jsp
+      - Only save lang when clicking on flags if desktopgui is running
+      - Only allow two-letter lang code from cgi parameter
+    * Reseed: Disable HTTPS until we have enough working hosts again
+
+2011-02-24 zzz
+    * i2psnark:
+      - Fix delete and remove buttons for Opera and w3m
+      - Stop torrent if no valid trackers
+      - Fix war build dependencies
+
+2011-02-23 zzz
+    * BuildHandler:
+      - Lower participating throttler max limit
+      - Cleanups and loop checks
+    * Console: Fix summary bar HTML error
+
+2011-02-22 zzz
+    * BuildHandler: Prelmiinary participating tunnel throttler
+    * I2PTunnel:
+      - Add spellcheck=false to textareas
+      - Fix HTML error in 503 error page
+
+2011-02-19 zzz
+    * I2PTunnel: Fix standalone server tunnels
+                 http://forum.i2p/viewtopic.php?t=5376
+    * Plugins: Fix signature verification if router.config specifies
+               trustedUpdateKeys (ticket #416)
+
+2011-02-18 Mathiasdm
+    * Desktopgui now has an option to be disabled (desktopgui.enabled)
+
+2011-02-17 zzz
+    * Build:
+      - Add includeAntRuntime=false to all javac targets
+      - Add build date, mtn rev, and changed file list to all manifests
+      - Add unless=uptodate to all jar and war targets
+        (bob and dtg still todo)
+    * Console: Add Arabic
+    * i2ptunnel: outproxy2 -> outproxyng (Ticket #394 take 2)
+
+2011-02-15 zzz
+    * i2psnark: Details link shuffle, mostly restore 0.8.3 behavior
+    * Profiles: Punish rejections more, in an attempt to spread the
+                load more through the network
+    * Timers: Log cleanup
+
+2011-02-14 Mathiasdm
+    * Fix headless issue without reboot
+
+2011-02-13 zzz
+    * Connect Client: Minor NPE fix cleanup
+    * JobQueue: Prevent NPE at shutdown (thanks liberty)
+    * GeoIP: Prevent startup NPE (ticket #413, thanks RN)
+    * NetDB: Prevent ExpireLeaseJob NPE (thanks sponge)
+
+2011-02-11 Mathiasdm
+    * routerconsole: fixed graphs using jrobin; and headless issue
+          in general: no more switches between headless and non-headless.
+
+2011-02-11 sponge
+    * I2PTunnel: fix NPE in I2PTunnelConnectClient
+
+2011-02-10 sponge
+    * I2CP: fix NPE in QueuedClientConnectionRunner
+
+2011-02-10 zzz
+    * I2CP: Correctly close internal connections on the router side
+            when closed by the client, was causing massive memory leak
+            for internal clients using lots of sessions (thanks sponge)
+            (ticket #397)
+    * i2psnark:
+      - Improved magnet link parsing, use tr parameter if present
+    * i2ptunnel: Change shared clients default for new clients to false
+    * Streaming: Don't use iter.remove() on a COWAS
+
+2011-02-09 sponge
+    * BOB: fixup delivery in config, adds config file versioning.
+    * I2CP: Fix most of the I2CP leaks. Two leaks remain, but they are small.
+            net.i2p.internal.QueuedI2CPMessageReader and
+            net.i2p.router.client.I2CPMessageQueueImpl
+            are the two remaining leaks.
+
 2011-02-07 zzz
     * i2psnark:
       - Check for dup magnet torrent when adding torrent file
@@ -33,7 +147,7 @@
       - Don't expire outbound Piece messages, since we now defer loading the
         data from disk
     * i2ptunnel:
-      - Change connect proxy default to outproxy2.h2ik.i2p
+      - Change connect proxy default to outproxy2.h2ik.i2p (ticket #394)
       - IRCClient: Use tunnel log instance
       - Server: Full queue log tweak
 

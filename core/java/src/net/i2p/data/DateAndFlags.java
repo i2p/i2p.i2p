@@ -36,7 +36,7 @@ public class DateAndFlags extends DataStructureImpl {
     /**
      *  @param flags 0 - 65535
      */
-    public DateAndFlags(int flags, long date) {
+    public DateAndFlags(long date, int flags) {
         _flags = flags;
         _date = date;
     }
@@ -44,7 +44,7 @@ public class DateAndFlags extends DataStructureImpl {
     /**
      *  @param flags 0 - 65535
      */
-    public DateAndFlags(int flags, Date date) {
+    public DateAndFlags(Date date, int flags) {
         _flags = flags;
         _date = date.getTime();
     }

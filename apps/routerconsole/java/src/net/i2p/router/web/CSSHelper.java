@@ -28,10 +28,13 @@ public class CSSHelper extends HelperBase {
         return url;
     }
 
-    /** change default language for the router but don't save it */
+    /** change default language for the router AND save it */
     public void setLang(String lang) {
-        if (lang != null && lang.length() > 0)
+        // Protected with nonce in css.jsi
+        if (lang != null && lang.length() == 2 && !lang.equals(_context.getProperty(Messages.PROP_LANG))) {
             _context.router().setConfigSetting(Messages.PROP_LANG, lang);
+            _context.router().saveConfig();
+        }
     }
 
     /** needed for conditional css loads for zh */
@@ -59,5 +62,14 @@ public class CSSHelper extends HelperBase {
             .append(_(s))
             .append("</title>");
          return buf.toString();
+    }
+
+    /**
+     *  Should we allow a refreshing IFrame?
+     *  @since 0.8.5
+     */
+    public boolean allowIFrame(String ua) {
+        return ua == null || !(ua.startsWith("Lynx") || ua.startsWith("w3m") ||
+                               ua.startsWith("ELinks") || ua.startsWith("Dillo"));
     }
 }

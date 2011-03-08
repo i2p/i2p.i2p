@@ -10,6 +10,7 @@
         <javac 
             srcdir="./src/src"
             debug="true" deprecation="off" source="1.5" target="1.5" 
+            includeAntRuntime="false"
             destdir="./src/WEB-INF/classes">
             <compilerarg line="${javac.compilerargs}" />
             <classpath>
@@ -20,11 +21,35 @@
         </javac>
     </target>
     <target name="jar" depends="compile, war" />
-    <target name="war" depends="compile">
+
+    <target name="war" depends="compile, warUpToDate" unless="war.uptodate" >
+        <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="list" />
+            <arg value="changed" />
+            <arg value="." />
+        </exec>
+        <!-- \n in an attribute value generates an invalid manifest -->
+        <exec executable="tr" inputstring="${workspace.changes}" outputproperty="workspace.changes.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="-s" />
+            <arg value="[:space:]" />
+            <arg value="," />
+        </exec>
         <war destfile="susimail.war" webxml="src/WEB-INF/web.xml"
              basedir="src/" excludes="WEB-INF/web.xml LICENSE src/**/*">
+            <manifest>
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+            </manifest>
         </war>
     </target>
+
+    <target name="warUpToDate">
+        <uptodate property="war.uptodate" targetfile="susimail.war">
+            <srcfiles dir= "src" excludes="LICENSE src/**/*" />
+        </uptodate>
+    </target>
+
     <target name="javadoc">
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc" />

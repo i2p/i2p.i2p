@@ -250,22 +250,13 @@ div.tunnels td, div.tunnels img:first-child {
      padding: 4px 0 !important;
 }
 
-div.routersummary form {
-     margin: -6px 0 -5px 0;
-}
-
-div.routersummary form:last-child {
-     margin: 6px 0 0 0 !important;
-     padding: 0;
-}
-
 div.routersummary p {
      padding: 0;
 }     
 
 div.refresh {
-     margin-top: -6px !important;
-     margin-bottom: 0px !important;
+     margin-top: 10px !important;
+     margin-bottom: 10px !important;
      padding: 2px 0 0px 0 !important;
 }
 
@@ -851,7 +842,7 @@ button:active{
 }
 
 .langbox {
-     margin: 20px 10px 4px 5px;
+     margin: 7px 10px 4px 5px;
      padding: 8px 5px;
      color: #001;
      font-size: 7pt;
@@ -870,17 +861,6 @@ button:active{
      opacity: 1 !important;
 }
 
-input {
-     background: #ffe;
-     color: #316;
-     margin: 5px 10px 5px 10px;
-     padding: 4px 2px;
-     font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
-     border: 1px solid #447;
-     text-decoration: none;
-     min-width: 110px;
-}
-
 input, input:visited {
      border: 1px outset #999;
      background: #ffe;
@@ -889,7 +869,6 @@ input, input:visited {
      font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      padding: 1px 2px;
      text-decoration: none;
-     min-width: 110px;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
@@ -982,8 +961,6 @@ textarea:active {
      -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
      box-shadow: inset 0px 0px 0px 1px #f60;     
 }
-
-form {}
 
 .proxyfooter {
      margin: 0 20px 10px 240px;

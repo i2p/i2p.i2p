@@ -1,0 +1,28 @@
+HTTP/1.1 504 Gateway Timeout
+Content-Type: text/html; charset=UTF-8
+Cache-control: no-cache
+Connection: close
+Proxy-Connection: close
+
+<html lang="ar" dir="rtl"><head>
+<title>تحذير: لابوجد بروكسي خارجي</title>
+<link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico" >
+<link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css" >
+</head>
+<body>
+<div class=logo>
+ <a href="http://127.0.0.1:7657/index.jsp" title="Router Console"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="I2P Router Console" border="0"></a><hr>
+ <a href="http://127.0.0.1:7657/config.jsp">اعدادات</a> <a href="http://127.0.0.1:7657/help.jsp">مساعدة</a> <a href="http://127.0.0.1:7657/susidns/">دفتر العناوين</a>
+</div>
+<div class=warning id=warning>
+<h3>تحذير: لابوجد بروكسي خارجي</h3>
+لم يتم ايجاد بروكسي خارجي www
+خارج الشبكة أو غير متصل جيدا بباقي المستخدمين.
+يمكنك
+<a href="javascript: parent.window.location.reload()">اعادة المحاولة</a> 
+لإختيار بروكسي خارجي جديد
+<a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">هنا</a> 
+(اذا كان لديك اكثر من واحد). 
+اذا استمر المشكل قم بتحرير قائمة البروكسي الخارجية
+<a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=0">هنا</a>. 
+<hr><b>لم يستطع الوصول الى هذا العنوان</b><BR><BR>

@@ -107,7 +107,7 @@ public class DoCMDS implements Runnable {
 	private static final String C_visit = "visit";
 	private static final String C_zap = "zap";
 
-	/* all the coomands available, plus description */
+	/* all the commands available, plus description */
 	private static final String C_ALL[][] = {
 		{C_help, C_help + " <command> * Get help on a command."},
 		{C_clear, C_clear + " * Clear the current nickname out of the list."},
@@ -962,7 +962,7 @@ public class DoCMDS implements Runnable {
 										} catch (Exception e) {
 											break die;
 										}
-// Finally say OK.
+										// Finally say OK.
 										out.println("OK Nickname set to " + Arg);
 									}
 
@@ -1472,7 +1472,7 @@ public class DoCMDS implements Runnable {
 					} // die
 					out.print("ERROR A really bad error just happened, ");
 				} // quit
-// Say goodbye.
+				// Say goodbye.
 
 				out.println("OK Bye!");
 

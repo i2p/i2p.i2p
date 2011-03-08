@@ -224,25 +224,21 @@ public class SummaryBarRenderer {
                     System.setProperty("net.i2p.router.web.UpdateHandler.noncePrev", prev);
                 System.setProperty("net.i2p.router.web.UpdateHandler.nonce", nonce+"");
                 String uri = _helper.getRequestURI();
-                buf.append("<p><form action=\"").append(uri).append("\" method=\"POST\">\n");
+                buf.append("<form action=\"").append(uri).append("\" method=\"POST\">\n");
                 buf.append("<input type=\"hidden\" name=\"updateNonce\" value=\"").append(nonce).append("\" >\n");
                 if (_helper.updateAvailable()) {
                     buf.append("<button type=\"submit\" name=\"updateAction\" value=\"signed\" >")
-                       .append(_("Download"))
-                       .append(' ')
-                       .append(_helper.getUpdateVersion())
-                       .append(' ')
-                       .append(_("Update"))
-                       .append("</button>\n");
+                       // Note to translators: parameter is a version, e.g. "0.8.4"
+                       .append(_("Download {0} Update", _helper.getUpdateVersion()))
+                       .append("</button><br>\n");
                 }
                 if (_helper.unsignedUpdateAvailable()) {
                     buf.append("<button type=\"submit\" name=\"updateAction\" value=\"Unsigned\" >")
-                       .append(_("Download Unsigned"))
-                       .append("<br>")
-                       .append(_("Update"))
-                       .append(' ')
-                       .append(_helper.getUnsignedUpdateVersion())
-                       .append("</button>\n");
+                       // Note to translators: parameter is a date and time, e.g. "02-Mar 20:34 UTC"
+                       // <br> is optional, to help the browser make the lines even in the button
+                       // If the translation is shorter than the English, you should probably not include <br>
+                       .append(_("Download Unsigned<br>Update {0}", _helper.getUnsignedUpdateVersion()))
+                       .append("</button><br>\n");
                 }
                 buf.append("</form>\n");
             }
@@ -251,10 +247,9 @@ public class SummaryBarRenderer {
 
 
 
-        buf.append("<p>")
-           .append(ConfigRestartBean.renderStatus(_helper.getRequestURI(), _helper.getAction(), _helper.getConsoleNonce()))
+        buf.append(ConfigRestartBean.renderStatus(_helper.getRequestURI(), _helper.getAction(), _helper.getConsoleNonce()))
 
-           .append("</p><hr><h3><a href=\"/peers\" target=\"_top\" title=\"")
+           .append("<hr><h3><a href=\"/peers\" target=\"_top\" title=\"")
            .append(_("Show all current peer connections"))
            .append("\">")
            .append(_("Peers"))
@@ -455,5 +450,10 @@ public class SummaryBarRenderer {
     /** translate a string */
     private String _(String s) {
         return Messages.getString(s, _context);
+    }
+
+    /** translate a string with a parameter */
+    private String _(String s, Object o) {
+        return Messages.getString(s, o, _context);
     }
 }

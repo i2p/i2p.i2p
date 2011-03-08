@@ -65,6 +65,7 @@ public class TrackerClient extends I2PAppThread
 
   private I2PSnarkUtil _util;
   private final MetaInfo meta;
+  private final String additionalTrackerURL;
   private final PeerCoordinator coordinator;
   private final Snark snark;
   private final int port;
@@ -76,8 +77,10 @@ public class TrackerClient extends I2PAppThread
 
   /**
    * @param meta null if in magnet mode
+   * @param additionalTrackerURL may be null, from the ?tr= param in magnet mode, otherwise ignored
    */
-  public TrackerClient(I2PSnarkUtil util, MetaInfo meta, PeerCoordinator coordinator, Snark snark)
+  public TrackerClient(I2PSnarkUtil util, MetaInfo meta, String additionalTrackerURL,
+                       PeerCoordinator coordinator, Snark snark)
   {
     super();
     // Set unique name.
@@ -85,13 +88,11 @@ public class TrackerClient extends I2PAppThread
     setName("TrackerClient " + id.substring(id.length() - 12));
     _util = util;
     this.meta = meta;
+    this.additionalTrackerURL = additionalTrackerURL;
     this.coordinator = coordinator;
     this.snark = snark;
 
     this.port = 6881; //(port == -1) ? 9 : port;
-
-    stop = false;
-    started = false;
   }
 
     @Override
@@ -138,17 +139,21 @@ public class TrackerClient extends I2PAppThread
     // todo: check for b32 matches as well
     trackers = new ArrayList(2);
     String primary = null;
-    if (meta != null) {
+    if (meta != null)
         primary = meta.getAnnounce();
+    else if (additionalTrackerURL != null)
+        primary = additionalTrackerURL;
+    if (primary != null) {
         if (isValidAnnounce(primary)) {
-            trackers.add(new Tracker(meta.getAnnounce(), true));
+            trackers.add(new Tracker(primary, true));
             _log.debug("Announce: [" + primary + "] infoHash: " + infoHash);
         } else {
             _log.warn("Skipping invalid or non-i2p announce: " + primary);
         }
-    }
-    if (primary == null)
+    } else {
+        _log.warn("No primary announce");
         primary = "";
+    }
     List tlist = _util.getOpenTrackers();
     if (tlist != null) {
         for (int i = 0; i < tlist.size(); i++) {
@@ -180,10 +185,12 @@ public class TrackerClient extends I2PAppThread
     }
 
     if (trackers.isEmpty()) {
-        // FIXME really need to get this message to the gui
         stop = true;
-        _log.error("No valid trackers for infoHash: " + infoHash);
+        // FIXME translate
+        SnarkManager.instance().addMessage("No valid trackers for " + this.snark.getBaseName() + " - enable opentrackers?");
+        _log.error("No valid trackers for " + this.snark.getBaseName());
         // FIXME keep going if DHT enabled
+        this.snark.stopTorrent();
         return;
     }
 

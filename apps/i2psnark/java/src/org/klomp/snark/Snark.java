@@ -40,8 +40,6 @@ import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.data.Destination;
 import net.i2p.util.I2PThread;
 
-import org.klomp.snark.bencode.BDecoder;
-
 /**
  * Main Snark program startup class.
  *
@@ -254,6 +252,7 @@ public class Snark
   private boolean stopped;
   private byte[] id;
   private byte[] infoHash;
+  private String additionalTrackerURL;
   private final I2PSnarkUtil _util;
   private final PeerCoordinatorSet _peerCoordinatorSet;
   private String trackerProblems;
@@ -359,7 +358,7 @@ public class Snark
                 in = new FileInputStream(torrentFile);
             }
           }
-        meta = new MetaInfo(new BDecoder(in));
+        meta = new MetaInfo(in);
         infoHash = meta.getInfoHash();
       }
     catch(IOException ioe)
@@ -453,9 +452,10 @@ public class Snark
    *
    *  @param torrent a fake name for now (not a file name)
    *  @param ih 20-byte info hash
+   *  @param trackerURL may be null
    *  @since 0.8.4
    */
-  public Snark(I2PSnarkUtil util, String torrent, byte[] ih,
+  public Snark(I2PSnarkUtil util, String torrent, byte[] ih, String trackerURL,
         CompleteListener complistener, PeerCoordinatorSet peerCoordinatorSet,
         ConnectionAcceptor connectionAcceptor, boolean start, String rootDir)
   {
@@ -465,6 +465,7 @@ public class Snark
     acceptor = connectionAcceptor;
     this.torrent = torrent;
     this.infoHash = ih;
+    this.additionalTrackerURL = trackerURL;
     this.rootDataDir = rootDir;
     stopped = true;
     id = generateID();
@@ -535,7 +536,7 @@ public class Snark
             acceptor = new ConnectionAcceptor(_util, serversocket, new PeerAcceptor(coordinator));
         }
         // TODO pass saved closest DHT nodes to the tracker? or direct to the coordinator?
-        trackerclient = new TrackerClient(_util, meta, coordinator, this);
+        trackerclient = new TrackerClient(_util, meta, additionalTrackerURL, coordinator, this);
     }
 
     stopped = false;
@@ -564,11 +565,13 @@ public class Snark
                  fatal("Could not reopen storage", ioe);
              }
         }
-        TrackerClient newClient = new TrackerClient(_util, meta, coordinator, this);
+        TrackerClient newClient = new TrackerClient(_util, meta, additionalTrackerURL, coordinator, this);
         if (!trackerclient.halted())
             trackerclient.halt();
         trackerclient = newClient;
         trackerclient.start();
+    } else {
+        debug("NOT starting TrackerClient???", NOTICE);
     }
   }
   /**
@@ -584,7 +587,7 @@ public class Snark
         pc.halt();
     Storage st = storage;
     if (st != null) {
-        boolean changed = storage.changed;
+        boolean changed = storage.isChanged();
         try { 
             storage.close(); 
         } catch (IOException ioe) {
@@ -825,6 +828,14 @@ public class Snark
         return true;
     }
 
+    /**
+     *  @return trackerURL string from magnet-mode constructor, may be null
+     *  @since 0.8.4
+     */
+    public String getTrackerURL() {
+        return additionalTrackerURL;
+    }
+
   /**
    * Sets debug, ip and torrent variables then creates a Snark
    * instance.  Calls usage(), which terminates the program, if
@@ -1000,7 +1011,7 @@ public class Snark
     //if (debug >= INFO && t != null)
     //  t.printStackTrace();
     stopTorrent();
-    throw new RuntimeException(s + (t == null ? "" : ": " + t));
+    throw new RuntimeException(s, t);
   }
 
   /**
@@ -1098,7 +1109,7 @@ public class Snark
 
     allChecked = true;
     checking = false;
-    if (storage.changed && completeListener != null)
+    if (storage.isChanged() && completeListener != null)
         completeListener.updateStatus(this);
   }
   

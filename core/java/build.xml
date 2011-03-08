@@ -21,20 +21,51 @@
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
-        <javac srcdir="./src" debug="true" source="1.5" target="1.5" deprecation="on" destdir="./build/obj" classpath="${javac.classpath}" >
+        <javac srcdir="./src" debug="true" source="1.5" target="1.5" deprecation="on"
+               includeAntRuntime="false"
+               destdir="./build/obj" classpath="${javac.classpath}" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
+
     <target name="compileTest">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
-        <javac srcdir="./src:./test" debug="true" source="1.5" target="1.5" deprecation="on" destdir="./build/obj" >
+        <!-- junit classes are in ant runtime -->
+        <javac srcdir="./src:./test" debug="true" source="1.5" target="1.5" deprecation="on"
+               includeAntRuntime="true"
+               destdir="./build/obj" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
-    <target name="jar" depends="compile">
-        <jar destfile="./build/i2p.jar" basedir="./build/obj" includes="**/*.class" />
+
+    <target name="jar" depends="compile, jarUpToDate" unless="jar.uptodate" >
+        <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="list" />
+            <arg value="changed" />
+            <arg value="." />
+        </exec>
+        <!-- \n in an attribute value generates an invalid manifest -->
+        <exec executable="tr" inputstring="${workspace.changes}" outputproperty="workspace.changes.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="-s" />
+            <arg value="[:space:]" />
+            <arg value="," />
+        </exec>
+        <jar destfile="./build/i2p.jar" basedir="./build/obj" includes="**/*.class" >
+            <manifest>
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+            </manifest>
+        </jar>
     </target>
+
+    <target name="jarUpToDate" >
+        <uptodate property="jar.uptodate" targetfile="build/i2p.jar" >
+            <srcfiles dir= "build/obj" includes="**/*.class" />
+        </uptodate>
+    </target>
+
     <target name="jarTest" depends="compileTest">
         <jar destfile="./build/i2ptest.jar" basedir="./build/obj" includes="**/*.class" />
     </target>
@@ -49,6 +80,7 @@
         <cobertura-instrument todir="./build/obj_test">
             <fileset dir="./build/obj">
                 <include name="**/*.class"/>
+                <exclude name="**/*Test.class" />
             </fileset>
         </cobertura-instrument>
     </target>

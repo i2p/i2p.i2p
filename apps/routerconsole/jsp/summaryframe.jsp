@@ -15,7 +15,9 @@
     String action = request.getParameter("action");
     String d = request.getParameter("refresh");
     // Normal browsers send value, IE sends button label
-    boolean shutdownSoon = "shutdownImmediate".equals(action) || "restartImmediate".equals(action) ||
+    boolean allowIFrame = intl.allowIFrame(request.getHeader("User-Agent"));
+    boolean shutdownSoon = (!allowIFrame) ||
+                           "shutdownImmediate".equals(action) || "restartImmediate".equals(action) ||
                            "Shutdown immediately".equals(action) || "Restart immediately".equals(action);
     if (!shutdownSoon) {
         if (d == null || "".equals(d)) {
@@ -59,7 +61,6 @@
             out.print(":</b> <input size=\"3\" type=\"text\" name=\"refresh\" value=\"60\" >\n");
             out.print("<button type=\"submit\" value=\"Enable\" >");
             out.print(intl._("Enable"));
-            out.print("</button></div>\n");
         } else {
             // this will load in the iframe but subsequent pages will not have the iframe
             out.print("<input type=\"hidden\" name=\"refresh\" value=\"0\" >\n");
@@ -70,9 +71,8 @@
             } catch (NumberFormatException nfe) {}
             String refreshTime = net.i2p.data.DataHelper.formatDuration2(refreshMS);
             out.print(intl._("Disable {0} Refresh", refreshTime));
-            out.print("</button></div>\n");
         }
-        out.print("</form>\n");
+        out.print("</button></form></div>\n");
     }
 %>
 </div></body></html>
