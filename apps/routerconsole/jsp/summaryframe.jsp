@@ -15,7 +15,9 @@
     String action = request.getParameter("action");
     String d = request.getParameter("refresh");
     // Normal browsers send value, IE sends button label
-    boolean shutdownSoon = "shutdownImmediate".equals(action) || "restartImmediate".equals(action) ||
+    boolean allowIFrame = intl.allowIFrame(request.getHeader("User-Agent"));
+    boolean shutdownSoon = (!allowIFrame) ||
+                           "shutdownImmediate".equals(action) || "restartImmediate".equals(action) ||
                            "Shutdown immediately".equals(action) || "Restart immediately".equals(action);
     if (!shutdownSoon) {
         if (d == null || "".equals(d)) {

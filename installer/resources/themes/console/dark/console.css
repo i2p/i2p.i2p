@@ -182,22 +182,14 @@ div.routersummary tr {
      border: 0 !important;
 }
 
-div.routersummary form {
-     margin: -6px 0 -7px;
-}
-
-div.routersummary form:first-child {
-     margin: 6px 0 -4px 0 !important;
-}
-
 div.routersummary p {
      padding: 0;
 }     
 
 div.refresh {
-     margin-top: -10px !important;
-     margin-bottom: -4px !important;
-     padding: 2px 0 0px 0 !important;
+     margin-top: 10px !important;
+     margin-bottom: 10px !important;
+     padding: 2px 0 !important;
 }
 
 div.routersummary a:link, div.routersummary a:visited {
@@ -838,7 +830,6 @@ input {
      font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      padding: 1px 2px;
      text-decoration: none;
-     min-width: 110px;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
@@ -917,8 +908,6 @@ textarea {
      text-align: left;
      border: 1px solid #494;
 }
-
-form {}
 
 .proxyfooter {
      margin: 0 20px 10px 240px;

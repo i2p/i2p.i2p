@@ -1,8 +1,23 @@
+2011-03-08 zzz
+    * Console:
+      - Parameterize download button tags (ticket #425)
+      - Clean up summary bar HTML warnings
+      - Just display a summary bar link for text browsers
+      - Move welcome div from the readme files to index.jsp
+      - Require a nonce to change language
+    * i2psnark:
+      - More efficient metainfo handling, reduce instantiations
+      - Improved handling of storage errors
+      - Improved handling of duplicate file names
+      - More metainfo sanity checks
+      - Metadata transfer error handling improvements
+      - Code cleanup, remove dead and duplicated code
+
 2011-03-02 zzz
     * BuildHandler:
       - Limit request queue size
       - Concurrent request queue
-      - Remove dead code for queued rely handling
+      - Remove dead code for queued reply handling
     * OutNetMessage: Remove dead code
     * Tunnel cleanups, final, javadoc
 

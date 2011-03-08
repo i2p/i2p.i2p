@@ -19,15 +19,14 @@ public class ContentHelper extends HelperBase {
         _startAtBeginning = Boolean.valueOf(""+moo).booleanValue(); 
     }
     public void setLang(String l) {
+/*****
         if((_lang == null || !_lang.equals(l)) && (l != null)) {
             //Set language for router console
             _lang = l;
-/*****
  TODO - Temporary for 0.8.4
         Needed for desktopgui. But there's no nonce protection.
         Move the following to CSSHelper setLang(), or disable completely,
         See comments in CSSHelper
-*****/
             if(_context == null) {
                 setContextId(null);
             }
@@ -39,6 +38,7 @@ public class ContentHelper extends HelperBase {
                 _context.setProperty(Messages.PROP_LANG, _lang);
             }
         }
+*****/
     }
     
     public void setMaxLines(String lines) {

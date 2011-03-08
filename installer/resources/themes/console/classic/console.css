@@ -258,16 +258,6 @@ div.tunnels table{
      margin-right: -2px;
 }    
      
-div.routersummary form {
-     margin-top: -6px !important;
-     margin-bottom: -4px !important;     
-}
-
-div.routersummary form:last-child {
-     padding-top: 3px !important;
-     margin-bottom: -10px !important;     
-}
-
 div.refresh {
      margin-top: 10px !important;
      margin-bottom: 10px !important;
