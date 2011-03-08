@@ -643,7 +643,6 @@ public class I2PSnarkServlet extends Default {
                         // This may take a long time to check the storage, but since it already exists,
                         // it shouldn't be THAT bad, so keep it in this thread.
                         Storage s = new Storage(_manager.util(), baseFile, announceURL, null);
-                        s.create();
                         s.close(); // close the files... maybe need a way to pass this Storage to addTorrent rather than starting over
                         MetaInfo info = s.getMetaInfo();
                         File torrentFile = new File(_manager.getDataDir(), s.getBaseName() + ".torrent");
@@ -1968,16 +1967,15 @@ private static class FetchAndAdd implements Runnable {
                 FileInputStream in = null;
                 try {
                     in = new FileInputStream(file);
-                    // we do not retain this MetaInfo object, hopefully it will go away quickly
-                    MetaInfo info = new MetaInfo(in);
+                    byte[] fileInfoHash = new byte[20];
+                    String name = MetaInfo.getNameAndInfoHash(in, fileInfoHash);
                     try { in.close(); } catch (IOException ioe) {}
-                    Snark snark = _manager.getTorrentByInfoHash(info.getInfoHash());
+                    Snark snark = _manager.getTorrentByInfoHash(fileInfoHash);
                     if (snark != null) {
                         _manager.addMessage(_("Torrent with this info hash is already running: {0}", snark.getBaseName()));
                         return;
                     }
 
-                    String name = info.getName();
                     name = Storage.filterName(name);
                     name = name + ".torrent";
                     File torrentFile = new File(_manager.getDataDir(), name);

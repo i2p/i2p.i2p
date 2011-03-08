@@ -572,6 +572,9 @@ public class SnarkManager implements Snark.CompleteListener {
                 }
 
                 try {
+                    // This is somewhat wasteful as this metainfo is thrown away,
+                    // the real one is created in the Snark constructor.
+                    // TODO: Make a Snark constructor where we pass the MetaInfo in as a parameter.
                     MetaInfo info = new MetaInfo(fis);
                     try {
                         fis.close();
@@ -622,6 +625,7 @@ public class SnarkManager implements Snark.CompleteListener {
                     return;
                 } catch (OutOfMemoryError oom) {
                     addMessage(_("ERROR - Out of memory, cannot create torrent from {0}", sfile.getName()) + ": " + oom.getMessage());
+                    return;
                 } finally {
                     if (fis != null) try { fis.close(); } catch (IOException ioe) {}
                 }

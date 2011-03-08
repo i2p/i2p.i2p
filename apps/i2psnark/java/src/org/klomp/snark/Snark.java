@@ -40,8 +40,6 @@ import net.i2p.client.streaming.I2PServerSocket;
 import net.i2p.data.Destination;
 import net.i2p.util.I2PThread;
 
-import org.klomp.snark.bencode.BDecoder;
-
 /**
  * Main Snark program startup class.
  *
@@ -360,7 +358,7 @@ public class Snark
                 in = new FileInputStream(torrentFile);
             }
           }
-        meta = new MetaInfo(new BDecoder(in));
+        meta = new MetaInfo(in);
         infoHash = meta.getInfoHash();
       }
     catch(IOException ioe)
@@ -589,7 +587,7 @@ public class Snark
         pc.halt();
     Storage st = storage;
     if (st != null) {
-        boolean changed = storage.changed;
+        boolean changed = storage.isChanged();
         try { 
             storage.close(); 
         } catch (IOException ioe) {
@@ -1013,7 +1011,7 @@ public class Snark
     //if (debug >= INFO && t != null)
     //  t.printStackTrace();
     stopTorrent();
-    throw new RuntimeException(s + (t == null ? "" : ": " + t));
+    throw new RuntimeException(s, t);
   }
 
   /**
@@ -1111,7 +1109,7 @@ public class Snark
 
     allChecked = true;
     checking = false;
-    if (storage.changed && completeListener != null)
+    if (storage.isChanged() && completeListener != null)
         completeListener.updateStatus(this);
   }
   

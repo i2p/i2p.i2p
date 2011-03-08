@@ -191,14 +191,21 @@ class MagnetState {
      */
     public MetaInfo buildMetaInfo() throws Exception {
         // top map has nothing in it but the info map (no announce)
-        Map<String, Object> map = new HashMap();
+        Map<String, BEValue> map = new HashMap();
         InputStream is = new ByteArrayInputStream(metainfoBytes);
         BDecoder dec = new BDecoder(is);
         BEValue bev = dec.bdecodeMap();
         map.put("info", bev);
         MetaInfo newmeta = new MetaInfo(map);
-        if (!DataHelper.eq(newmeta.getInfoHash(), infohash))
+        if (!DataHelper.eq(newmeta.getInfoHash(), infohash)) {
+            // Disaster. Start over. ExtensionHandler will catch
+            // the IOE and disconnect the peer, hopefully we will
+            // find a new peer.
+            // TODO: Count fails and give up eventually
+            have = new BitField(totalChunks);
+            requested = new BitField(totalChunks);
             throw new IOException("info hash mismatch");
+        }
         return newmeta;
     }
 }
