@@ -262,7 +262,9 @@ public class NetDbRenderer {
             }
         }
             
-        buf.append("<table border=\"0\" cellspacing=\"30\"><tr><th colspan=\"3\">").append(_("Network Database Router Statistics")).append("</th><tr><td>");
+        buf.append("<table border=\"0\" cellspacing=\"30\"><tr><th colspan=\"3\">")
+           .append(_("Network Database Router Statistics"))
+           .append("</th><tr><td style=\"vertical-align: top;\">");
         // versions table
         List<String> versionList = new ArrayList(versions.objects());
         if (!versionList.isEmpty()) {
@@ -276,7 +278,7 @@ public class NetDbRenderer {
             }
             buf.append("</table>\n");
         }
-        buf.append("</td><td>");
+        buf.append("</td><td style=\"vertical-align: top;\">");
         out.write(buf.toString());
         buf.setLength(0);
             
@@ -291,7 +293,7 @@ public class NetDbRenderer {
             }
         }
         buf.append("</table>\n");
-        buf.append("</td><td>");
+        buf.append("</td><td style=\"vertical-align: top;\">");
         out.write(buf.toString());
         buf.setLength(0);
 
