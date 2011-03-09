@@ -114,8 +114,6 @@ public class PartialEepGet extends EepGet {
         buf.append(_fetchSize - 1);
         buf.append("\r\n");
 
-        if (_shouldProxy)
-            buf.append("X-Accept-Encoding: x-i2p-gzip;q=1.0, identity;q=0.5, deflate;q=0, gzip;q=0, *;q=0\r\n");
         buf.append("Cache-control: no-cache\r\n" +
                    "Pragma: no-cache\r\n");
         // This will be replaced if we are going through I2PTunnelHTTPClient

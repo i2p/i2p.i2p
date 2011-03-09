@@ -202,8 +202,6 @@ public class EepHead extends EepGet {
         buf.append("HEAD ").append(_actualURL).append(" HTTP/1.1\r\n");
         buf.append("Host: ").append(url.getHost()).append("\r\n");
         buf.append("Accept-Encoding: \r\n");
-        if (_shouldProxy)
-            buf.append("X-Accept-Encoding: x-i2p-gzip;q=1.0, identity;q=0.5, deflate;q=0, gzip;q=0, *;q=0\r\n");
         // This will be replaced if we are going through I2PTunnelHTTPClient
         buf.append("User-Agent: " + USER_AGENT + "\r\n");
         buf.append("Connection: close\r\n\r\n");

@@ -952,8 +952,6 @@ public class EepGet {
             buf.append(_alreadyTransferred);
             buf.append("-\r\n");
         }
-        if (_shouldProxy)
-            buf.append("X-Accept-Encoding: x-i2p-gzip;q=1.0, identity;q=0.5, deflate;q=0, gzip;q=0, *;q=0\r\n");
         if (!_allowCaching) {
             buf.append("Cache-control: no-cache\r\n" +
                        "Pragma: no-cache\r\n");
