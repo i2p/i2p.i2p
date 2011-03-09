@@ -108,22 +108,37 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
 
         //_log.debug("# pad bytes:  " + numPadBytes + " payloadLength: " + payloadLength + " instructions: " + instructionsLength);
 
-        int paddingRemaining = numPadBytes;
-        // FIXME inefficient, waste of 3/4 of the entropy
-        // Should get a byte array of random, change all the zeros to something else, and ArrayCopy
-        while (paddingRemaining > 0) {
-            byte b = (byte)(_context.random().nextInt() & 0xFF);
-            if (b != 0x00) {
-                fragments[offset] = b;
-                offset++;
-                paddingRemaining--;
-            }
+        if (numPadBytes > 0) {
+            fillRandomNonZero(fragments, offset, numPadBytes);
+            offset += numPadBytes;
         }
        
         fragments[offset] = 0x0; // no more padding
         offset++;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Preprocessing beginning of the fragment instructions at " + offset);
+    }
+
+    /**
+     *  Efficiently fill with nonzero random data
+     *  Don't waste too much entropy or call random() too often.
+     *  @since 0.8.5
+     */
+    private void fillRandomNonZero(byte[] b, int off, int len) {
+        // get about as much as we think we will need, overestimate some
+        final int est = len + (len / 128) + 3;
+        final byte[] tmp = new byte[est];
+        _context.random().nextBytes(tmp);
+        int extra = len;
+        for (int i = 0; i < len; i++) {
+            while (tmp[i] == 0) {
+                if (extra < est)
+                    tmp[i] = tmp[extra++];  // use from the extra we have at the end
+                else
+                    tmp[i] = (byte)(_context.random().nextInt() & 0xFF);  // waste 3/4 of the entropy
+            }
+        }
+        System.arraycopy(tmp, 0, b, off, len);
     }
 
     /** is this a follw up byte? */
