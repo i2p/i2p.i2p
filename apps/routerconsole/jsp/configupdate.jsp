@@ -23,10 +23,7 @@
 <i><jsp:getProperty name="updatehelper" property="newsStatus" /></i></div>
 <div class="configure">
  <form action="" method="POST">
- <% String prev = System.getProperty("net.i2p.router.web.ConfigUpdateHandler.nonce");
-    if (prev != null) System.setProperty("net.i2p.router.web.ConfigUpdateHandler.noncePrev", prev);
-    System.setProperty("net.i2p.router.web.ConfigUpdateHandler.nonce", new java.util.Random().nextLong()+""); %>
- <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigUpdateHandler.nonce")%>" >
+ <input type="hidden" name="nonce" value="<jsp:getProperty name="formhandler" property="newNonce" />" >
  <% /* set hidden default */ %>
  <input type="submit" name="action" value="" style="display:none" >
       <h3><%=intl._("Check for I2P and news updates")%></h3>

@@ -26,6 +26,8 @@ public class FormHandler {
     private final List<String> _notices;
     private boolean _processed;
     private boolean _valid;
+    private static final String NONCE_SUFFIX = ".nonce";
+    private static final String PREV_SUFFIX = "Prev";
     
     public FormHandler() {
         _errors = new ArrayList();
@@ -162,8 +164,8 @@ public class FormHandler {
             return;
         }
         
-        String nonce = System.getProperty(getClass().getName() + ".nonce");
-        String noncePrev = System.getProperty(getClass().getName() + ".noncePrev");
+        String nonce = System.getProperty(getClass().getName() + NONCE_SUFFIX);
+        String noncePrev = nonce + PREV_SUFFIX;
         if ( ( (nonce == null) || (!_nonce.equals(nonce)) ) &&
              ( (noncePrev == null) || (!_nonce.equals(noncePrev)) ) ) {
                  
@@ -201,6 +203,22 @@ public class FormHandler {
         }
     }
     
+    /**
+     *  Generate a new nonce, store old and new in the system properties.
+     *  Only call once per page!
+     *  @return a new random long as a String
+     *  @since 0.8.5
+     */
+    public String getNewNonce() {
+        String prop = getClass().getName() + NONCE_SUFFIX;
+        String prev = System.getProperty(prop);
+        if (prev != null)
+            System.setProperty(prop + PREV_SUFFIX, prev);
+        String rv = Long.toString(_context.random().nextLong());
+        System.setProperty(prop, rv);
+        return rv;
+    }
+
     /** translate a string */
     public String _(String s) {
         return Messages.getString(s, _context);

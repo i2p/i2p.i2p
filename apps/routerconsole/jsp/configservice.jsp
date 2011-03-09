@@ -19,10 +19,7 @@
  <jsp:getProperty name="formhandler" property="allMessages" />
  <div class="configure">
  <form action="" method="POST">
- <% String prev = System.getProperty("net.i2p.router.web.ConfigServiceHandler.nonce");
-    if (prev != null) System.setProperty("net.i2p.router.web.ConfigServiceHandler.noncePrev", prev);
-    System.setProperty("net.i2p.router.web.ConfigServiceHandler.nonce", new java.util.Random().nextLong()+""); %>
- <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigServiceHandler.nonce")%>" >
+ <input type="hidden" name="nonce" value="<jsp:getProperty name="formhandler" property="newNonce" />" >
  <h3><%=intl._("Shutdown the router")%></h3>
  <p><%=intl._("Graceful shutdown lets the router satisfy the agreements it has already made before shutting down, but may take a few minutes.")%> 
     <%=intl._("If you need to kill the router immediately, that option is available as well.")%></p>

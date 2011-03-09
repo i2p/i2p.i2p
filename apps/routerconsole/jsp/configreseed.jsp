@@ -23,10 +23,7 @@
 <jsp:setProperty name="formhandler" property="settings" value="<%=request.getParameterMap()%>" />
 <jsp:getProperty name="formhandler" property="allMessages" />
 <div class="configure"><form action="" method="POST">
-<%  String prev = System.getProperty("net.i2p.router.web.ConfigReseedHandler.nonce");
-    if (prev != null) System.setProperty("net.i2p.router.web.ConfigReseedHandler.noncePrev", prev);
-    System.setProperty("net.i2p.router.web.ConfigReseedHandler.nonce", new java.util.Random().nextLong()+""); %>
-<input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigReseedHandler.nonce")%>" >
+<input type="hidden" name="nonce" value="<jsp:getProperty name="formhandler" property="newNonce" />" >
 <h3><%=intl._("Reseeding Configuration")%></h3>
 <p><%=intl._("Reseeding is the bootstrapping process used to find other routers when you first install I2P, or when your router has too few router references remaining.")%>
 <%=intl._("If reseeding has failed, you should first check your network connection.")%>

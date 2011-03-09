@@ -21,10 +21,7 @@
  <jsp:getProperty name="formhandler" property="allMessages" />
 <div class="configure">
  <form action="" method="POST">
- <% String prev = System.getProperty("net.i2p.router.web.ConfigLoggingHandler.nonce");
-    if (prev != null) System.setProperty("net.i2p.router.web.ConfigLoggingHandler.noncePrev", prev);
-    System.setProperty("net.i2p.router.web.ConfigLoggingHandler.nonce", new java.util.Random().nextLong()+""); %>
- <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigLoggingHandler.nonce")%>" >
+ <input type="hidden" name="nonce" value="<jsp:getProperty name="formhandler" property="newNonce" />" >
  <input type="hidden" name="action" value="blah" >
  <h3><%=intl._("Configure I2P Logging Options")%></h3>
  <div class="wideload">

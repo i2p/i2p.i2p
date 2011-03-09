@@ -22,10 +22,7 @@
  <jsp:getProperty name="formhandler" property="allMessages" />
 <div class="configure">
  <form action="" method="POST">
- <% String prev = System.getProperty("net.i2p.router.web.ConfigNetHandler.nonce");
-    if (prev != null) System.setProperty("net.i2p.router.web.ConfigNetHandler.noncePrev", prev);
-    System.setProperty("net.i2p.router.web.ConfigNetHandler.nonce", new java.util.Random().nextLong()+""); %>
- <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigNetHandler.nonce")%>" >
+ <input type="hidden" name="nonce" value="<jsp:getProperty name="formhandler" property="newNonce" />" >
  <input type="hidden" name="action" value="blah" >
  <h3><%=intl._("Bandwidth limiter")%></h3><p>
  <b><%=intl._("I2P will work best if you configure your rates to match the speed of your internet connection.")%></b>

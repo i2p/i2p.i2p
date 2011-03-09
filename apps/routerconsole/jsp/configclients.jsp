@@ -28,10 +28,9 @@ button span.hide{
  <jsp:setProperty name="formhandler" property="settings" value="<%=request.getParameterMap()%>" />
  <jsp:getProperty name="formhandler" property="allMessages" />
  <div class="configure">
- <% String prev = System.getProperty("net.i2p.router.web.ConfigClientsHandler.nonce");
-    if (prev != null) System.setProperty("net.i2p.router.web.ConfigClientsHandler.noncePrev", prev);
-    String pageNonce = Long.toString(new java.util.Random().nextLong());
-    System.setProperty("net.i2p.router.web.ConfigClientsHandler.nonce", pageNonce); %>
+<%
+    String pageNonce = formhandler.getNewNonce();
+%>
  <h3><%=intl._("Client Configuration")%></h3><p>
  <%=intl._("The Java clients listed below are started by the router and run in the same JVM.")%>
  </p><div class="wideload">

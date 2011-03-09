@@ -67,11 +67,8 @@ function toggleAll(category)
  <jsp:setProperty name="statshelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
  <div class="configure">
  <form id="statsForm" name="statsForm" action="" method="POST">
- <% String prev = System.getProperty("net.i2p.router.web.ConfigStatsHandler.nonce");
-    if (prev != null) System.setProperty("net.i2p.router.web.ConfigStatsHandler.noncePrev", prev);
-    System.setProperty("net.i2p.router.web.ConfigStatsHandler.nonce", new java.util.Random().nextLong()+""); %>
  <input type="hidden" name="action" value="foo" >
- <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigStatsHandler.nonce")%>" >
+ <input type="hidden" name="nonce" value="<jsp:getProperty name="formhandler" property="newNonce" />" >
  <h3><%=intl._("Configure I2P Stat Collection")%></h3>
  <p><%=intl._("Enable full stats?")%>
  <input type="checkbox" class="optbox" name="isFull" value="true" <%
