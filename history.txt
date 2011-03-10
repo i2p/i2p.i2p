@@ -1,3 +1,12 @@
+2011-03-10 zzz
+    * configclients.jsp: Split form up, fix HTML warnings
+    * configui.jsp: Fix lang setting broken by previous nonce change
+    * Console: Consolidate nonce handling
+    * eepget: Don't send X-Accept-Encoding header to proxy (ticket #422)
+    * logs.jsp: Fix NPE (ticket #430)
+    * netdb.jsp: Fix table alignment
+    * Tunnel Preprocessor: Use entropy for padding more efficiently
+
 2011-03-08 zzz
     * Clock: Cleanups and javadocs
     * Console:
