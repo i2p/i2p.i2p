@@ -42,12 +42,13 @@ import net.i2p.util.SecureFileOutputStream;
 
 public class AddressbookBean
 {
-	private String book, action, serial, lastSerial, filter, search, hostname, destination;
-	private int beginIndex, endIndex;
-	private Properties properties, addressbook;
+	protected String book, action, serial, lastSerial, filter, search, hostname, destination;
+	protected int beginIndex, endIndex;
+	protected final Properties properties;
+	private Properties addressbook;
 	private int trClass;
-	private LinkedList deletionMarks;
-	private static Comparator sorter;
+	protected final LinkedList<String> deletionMarks;
+	protected static final Comparator<AddressBean> sorter;
 	private static final int DISPLAY_SIZE=100;
 
 	static {
@@ -88,7 +89,7 @@ public class AddressbookBean
 	private long configLastLoaded = 0;
 	private static final String PRIVATE_BOOK = "private_addressbook";
 	private static final String DEFAULT_PRIVATE_BOOK = "../privatehosts.txt";
-	private void loadConfig()
+	protected void loadConfig()
 	{
 		long currentTime = System.currentTimeMillis();
 		
@@ -123,11 +124,14 @@ public class AddressbookBean
 		} catch (IOException ioe) {}
 		return filename;
 	}
-	private Object[] entries;
-	public Object[] getEntries()
+
+	protected AddressBean[] entries;
+
+	public AddressBean[] getEntries()
 	{
 		return entries;
 	}
+
 	public String getAction() {
 		return action;
 	}
@@ -167,7 +171,7 @@ public class AddressbookBean
 		try {
 			fis =  new FileInputStream( getFileName() );
 			addressbook.load( fis );
-			LinkedList list = new LinkedList();
+			LinkedList<AddressBean> list = new LinkedList();
 			Enumeration e = addressbook.keys();
 			while( e.hasMoreElements() ) {
 				String name = (String)e.nextElement();
@@ -189,52 +193,11 @@ public class AddressbookBean
 				}
 				list.addLast( new AddressBean( name, destination ) );
 			}
-			Object array[] = list.toArray();
+			AddressBean array[] = list.toArray(new AddressBean[list.size()]);
 			Arrays.sort( array, sorter );
 			entries = array;
 
-			// Format a message about filtered addressbook size, and the number of displayed entries
-			// addressbook.jsp catches the case where the whole book is empty.
-			String filterArg = "";
-			if( search != null && search.length() > 0 ) {
-				message = _("Search") + ' ';
-			}
-			if( filter != null && filter.length() > 0 ) {
-				if( search != null && search.length() > 0 )
-					message = _("Search within filtered list") + ' ';
-				else
-					message = _("Filtered list") + ' ';
-				filterArg = "&filter=" + filter;
-			}
-			if (entries.length == 0) {
-				message += "- " + _("no matches") + '.';
-			} else if (getBeginInt() == 0 && getEndInt() == entries.length - 1) {
-				if (message.length() == 0)
-					message = _("Addressbook") + ' ';
-				if (entries.length <= 0)
-					message += _("contains no entries");
-				else if (entries.length == 1)
-					message += _("contains 1 entry");
-				else
-					message += _("contains {0} entries", entries.length);
-				message += '.';
-			} else {
-				if (getBeginInt() > 0) {
-					int newBegin = Math.max(0, getBeginInt() - DISPLAY_SIZE);
-					int newEnd = Math.max(0, getBeginInt() - 1);
-			       		message += "<a href=\"addressbook.jsp?book=" + getBook() + filterArg +
-					           "&begin=" + newBegin + "&end=" + newEnd + "\">" + newBegin +
-					           '-' + newEnd + "</a> | ";
-		       		}
-				message += _("Showing {0} of {1}", "" + getBegin() + '-' + getEnd(), entries.length);
-				if (getEndInt() < entries.length - 1) {
-					int newBegin = Math.min(entries.length - 1, getEndInt() + 1);
-					int newEnd = Math.min(entries.length, getEndInt() + DISPLAY_SIZE);
-			       		message += " | <a href=\"addressbook.jsp?book=" + getBook() + filterArg +
-					           "&begin=" + newBegin + "&end=" + newEnd + "\">" + newBegin +
-					           '-' + newEnd + "</a>";
-				}
-			}
+			message = generateLoadMessage();
 		}
 		catch (Exception e) {
 			Debug.debug( e.getClass().getName() + ": " + e.getMessage() );
@@ -246,6 +209,54 @@ public class AddressbookBean
 			message = "<p>" + message + "</p>";
 		return message;
 	}
+
+	/**
+	 *  Format a message about filtered addressbook size, and the number of displayed entries
+	 *  addressbook.jsp catches the case where the whole book is empty.
+	 */
+	protected String generateLoadMessage() {
+		String message = "";
+		String filterArg = "";
+		if( search != null && search.length() > 0 ) {
+			message = _("Search") + ' ';
+		}
+		if( filter != null && filter.length() > 0 ) {
+			if( search != null && search.length() > 0 )
+				message = _("Search within filtered list") + ' ';
+			else
+				message = _("Filtered list") + ' ';
+			filterArg = "&amp;filter=" + filter;
+		}
+		if (entries.length == 0) {
+			message += "- " + _("no matches") + '.';
+		} else if (getBeginInt() == 0 && getEndInt() == entries.length - 1) {
+			if (message.length() == 0)
+				message = _("Addressbook") + ' ';
+			if (entries.length <= 0)
+				message += _("contains no entries");
+			else
+				message += _(entries.length, "contains 1 entry", "contains {0} entries");
+			message += '.';
+		} else {
+			if (getBeginInt() > 0) {
+				int newBegin = Math.max(0, getBeginInt() - DISPLAY_SIZE);
+				int newEnd = Math.max(0, getBeginInt() - 1);
+		       		message += "<a href=\"addressbook.jsp?book=" + getBook() + filterArg +
+				           "&amp;begin=" + newBegin + "&amp;end=" + newEnd + "\">" + newBegin +
+				           '-' + newEnd + "</a> | ";
+	       		}
+			message += _("Showing {0} of {1}", "" + getBegin() + '-' + getEnd(), entries.length);
+			if (getEndInt() < entries.length - 1) {
+				int newBegin = Math.min(entries.length - 1, getEndInt() + 1);
+				int newEnd = Math.min(entries.length, getEndInt() + DISPLAY_SIZE);
+		       		message += " | <a href=\"addressbook.jsp?book=" + getBook() + filterArg +
+				           "&amp;begin=" + newBegin + "&amp;end=" + newEnd + "\">" + newBegin +
+				           '-' + newEnd + "</a>";
+			}
+		}
+		return message;
+	}
+
 	/** Perform actions, returning messages about this. */
 	public String getMessages()
 	{
@@ -255,8 +266,6 @@ public class AddressbookBean
 		if( action != null ) {
 			if( lastSerial != null && serial != null && serial.compareTo( lastSerial ) == 0 ) {
 				boolean changed = false;
-				int deleted = 0;
-				String name = null;
 				if (action.equals(_("Add")) || action.equals(_("Replace"))) {
 					if( addressbook != null && hostname != null && destination != null ) {
 						String oldDest = (String) addressbook.get(hostname);
@@ -291,12 +300,14 @@ public class AddressbookBean
 					// clear search when adding
 					search = null;
 				} else if (action.equals(_("Delete Selected"))) {
-					Iterator it = deletionMarks.iterator();
-					while( it.hasNext() ) {
-						name = (String)it.next();
-						addressbook.remove( name );
-						changed = true;
-						deleted++;
+					String name = null;
+					int deleted = 0;
+					for (String n : deletionMarks) {
+						addressbook.remove(n);
+						if (deleted++ == 0) {
+							changed = true;
+							name = n;
+						}
 					}
 					if( changed ) {
 						if (deleted == 1)
@@ -337,6 +348,7 @@ public class AddressbookBean
 			fos.close();
 		} catch (IOException ioe) {}
 	}
+
 	public String getFilter() {
 		return filter;
 	}
@@ -382,7 +394,7 @@ public class AddressbookBean
 	public void setHostname(String hostname) {
 		this.hostname = DataHelper.stripHTML(hostname).trim();  // XSS
 	}
-	private int getBeginInt() {
+	protected int getBeginInt() {
 		return Math.max(0, Math.min(entries.length - 1, beginIndex));
 	}
 	public String getBegin() {
@@ -393,7 +405,7 @@ public class AddressbookBean
 			beginIndex = Integer.parseInt(s);
 		} catch (NumberFormatException nfe) {}
 	}
-	private int getEndInt() {
+	protected int getEndInt() {
 		return Math.max(0, Math.max(getBeginInt(), Math.min(entries.length - 1, endIndex)));
 	}
 	public String getEnd() {
@@ -406,17 +418,22 @@ public class AddressbookBean
 	}
 
 	/** translate */
-	private static String _(String s) {
+	protected static String _(String s) {
 		return Messages.getString(s);
 	}
 
 	/** translate */
-	private static String _(String s, Object o) {
+	protected static String _(String s, Object o) {
 		return Messages.getString(s, o);
 	}
 
 	/** translate */
-	private static String _(String s, Object o, Object o2) {
+	protected static String _(String s, Object o, Object o2) {
 		return Messages.getString(s, o, o2);
+	}
+
+	/** translate (ngettext) @since 0.8.6 */
+	protected static String _(int n, String s, String p) {
+		return Messages.getString(n, s, p);
 	}
 }

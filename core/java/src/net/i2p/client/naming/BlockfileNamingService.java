@@ -67,6 +67,7 @@ import net.metanotion.util.skiplist.SkipList;
  *
  * </pre>
  *
+ * All host names are converted to lower case.
  */
 public class BlockfileNamingService extends DummyNamingService {
 
@@ -350,7 +351,7 @@ public class BlockfileNamingService extends DummyNamingService {
 
     @Override
     public Destination lookup(String hostname, Properties lookupOptions, Properties storedOptions) {
-        Destination d = super.lookup(hostname);
+        Destination d = super.lookup(hostname, null, null);
         if (d != null)
             return d;
 
@@ -460,9 +461,11 @@ public class BlockfileNamingService extends DummyNamingService {
                     }
                 }
                 return rv;
-            } catch (IOException re) {
+            } catch (IOException ioe) {
+                _log.error("DB remove error", ioe);
                 return false;
             } catch (RuntimeException re) {
+                _log.error("DB remove error", re);
                 return false;
             }
         }
@@ -471,6 +474,7 @@ public class BlockfileNamingService extends DummyNamingService {
     /**
      * @param options If non-null and contains the key "list", get
      *                from that list (default "hosts.txt", NOT all lists)
+     *                Key "skip": skip that many entries
      *                Key "limit": max number to return
      *                Key "startsWith": return only those starting with
      *                Key "beginWith": start here in the iteration
@@ -482,8 +486,11 @@ public class BlockfileNamingService extends DummyNamingService {
         String startsWith = null;
         String beginWith = null;
         int limit = Integer.MAX_VALUE;
+        int skip = 0;
         if (options != null) {
-            listname = options.getProperty("list");
+            String ln = options.getProperty("list");
+            if (ln != null)
+                listname = ln;
             startsWith = options.getProperty("startsWith");
             beginWith = options.getProperty("beginWith");
             if (beginWith == null)
@@ -492,18 +499,30 @@ public class BlockfileNamingService extends DummyNamingService {
             try {
                 limit = Integer.parseInt(lim);
             } catch (NumberFormatException nfe) {}
+            String sk = options.getProperty("skip");
+            try {
+                skip = Integer.parseInt(sk);
+            } catch (NumberFormatException nfe) {}
         }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Searching " + listname + " beginning with " + beginWith + " starting with " + startsWith + " limit=" + limit + " skip=" + skip);
         synchronized(_bf) {
             try {
                 SkipList sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
-                if (sl == null)
+                if (sl == null) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("No skiplist found for lookup in " + listname);
                     return Collections.EMPTY_MAP;
+                }
                 SkipIterator iter;
-                if (startsWith != null)
+                if (beginWith != null)
                     iter = sl.find(beginWith);
                 else
                     iter = sl.iterator();
                 Map<String, Destination> rv = new HashMap();
+                for (int i = 0; i < skip && iter.hasNext(); i++) {
+                    iter.next();
+                }
                 for (int i = 0; i < limit && iter.hasNext(); i++) {
                      String key = (String) iter.nextKey();
                      if (startsWith != null && !key.startsWith(startsWith))
@@ -512,9 +531,11 @@ public class BlockfileNamingService extends DummyNamingService {
                      rv.put(key, de.dest);
                 }
                 return rv;
-            } catch (IOException re) {
+            } catch (IOException ioe) {
+                _log.error("DB lookup error", ioe);
                 return Collections.EMPTY_MAP;
             } catch (RuntimeException re) {
+                _log.error("DB lookup error", re);
                 return Collections.EMPTY_MAP;
             }
         }
@@ -539,9 +560,11 @@ public class BlockfileNamingService extends DummyNamingService {
                 if (sl == null)
                     return 0;
                 return sl.size();
-            } catch (IOException re) {
+            } catch (IOException ioe) {
+                _log.error("DB size error", ioe);
                 return 0;
             } catch (RuntimeException re) {
+                _log.error("DB size error", re);
                 return 0;
             }
         }
@@ -707,6 +730,9 @@ public class BlockfileNamingService extends DummyNamingService {
             bns.close();
             return;
         }
+
+        System.out.println("size() reports " + bns.size());
+        System.out.println("getEntries() returns " + bns.getEntries().size());
 
         System.out.println("Testing with " + names.size() + " hostnames");
         int found = 0;

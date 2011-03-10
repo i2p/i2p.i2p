@@ -85,6 +85,11 @@ public abstract class NamingService {
         }
     }
 
+    @Override
+    public String toString() {
+        return getClass().getSimpleName();
+    }
+
     ///// New API Starts Here
 
     /**

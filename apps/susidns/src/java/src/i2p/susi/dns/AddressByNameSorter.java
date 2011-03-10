@@ -26,13 +26,10 @@ package i2p.susi.dns;
 
 import java.util.Comparator;
 
-public 	class AddressByNameSorter implements Comparator
+public 	class AddressByNameSorter implements Comparator<AddressBean>
 {
-	public int compare(Object arg0, Object arg1)
+	public int compare(AddressBean a, AddressBean b)
 	{
-		AddressBean a = (AddressBean)arg0;
-		AddressBean b = (AddressBean)arg1;
-		
 		if( a == null )
 			return 1;
 		
