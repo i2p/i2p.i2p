@@ -5,6 +5,7 @@
 package net.i2p.client.naming;
 
 import java.io.InputStream;
+import java.util.Properties;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Destination;
@@ -27,6 +28,7 @@ import net.i2p.util.Log;
  *
  * Can be used from MetaNamingService, (e.g. after HostsTxtNamingService),
  * or as the sole naming service.
+ * Supports caching, b32, and b64.
  *
  * Sample chained config to put in configadvanced.jsp (restart required):
  *
@@ -40,7 +42,7 @@ import net.i2p.util.Log;
  * i2p.naming.exec.command=/usr/local/bin/i2presolve
  *
  */
-public class ExecNamingService extends NamingService {
+public class ExecNamingService extends DummyNamingService {
 
     private final static String PROP_EXEC_CMD = "i2p.naming.exec.command";
     private final static String DEFAULT_EXEC_CMD = "/usr/local/bin/i2presolve";
@@ -59,21 +61,12 @@ public class ExecNamingService extends NamingService {
     }
     
     @Override
-    public Destination lookup(String hostname) {
-        // If it's long, assume it's a key.
-        if (hostname.length() >= DEST_SIZE)
-            return lookupBase64(hostname);
-
-        hostname = hostname.toLowerCase();
-
-        // If you want b32, chain with HostsTxtNamingService
-        if (hostname.length() == 60 && hostname.endsWith(".b32.i2p"))
-            return null;
-
-        // check the cache
-        Destination d = getCache(hostname);
+    public Destination lookup(String hostname, Properties lookupOptions, Properties storedOptions) {
+        Destination d = super.lookup(hostname, null, null);
         if (d != null)
             return d;
+
+        hostname = hostname.toLowerCase();
 
         // lookup
         String key = fetchAddr(hostname);	  	
@@ -87,7 +80,6 @@ public class ExecNamingService extends NamingService {
     }
 
     // FIXME allow larger Dests for non-null Certs
-    private static final int DEST_SIZE = 516;                    // Std. Base64 length (no certificate)
     private static final int MAX_RESPONSE = DEST_SIZE + 68 + 10; // allow for hostname= and some trailing stuff
     private String fetchAddr(String hostname) {
         String[] commandArr = new String[3];
