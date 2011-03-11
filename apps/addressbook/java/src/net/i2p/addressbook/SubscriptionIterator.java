@@ -35,9 +35,9 @@ import net.i2p.data.DataHelper;  // debug
  * 
  * @author Ragnarok
  */
-class SubscriptionIterator implements Iterator {
+class SubscriptionIterator implements Iterator<AddressBook> {
 
-    private Iterator subIterator;
+    private Iterator<Subscription> subIterator;
     private String proxyHost;
     private int proxyPort;
     private final long delay;
@@ -51,7 +51,7 @@ class SubscriptionIterator implements Iterator {
      * @param proxyHost proxy hostname
      * @param proxyPort proxt port number
      */
-    public SubscriptionIterator(List subscriptions, long delay, String proxyHost, int proxyPort) {
+    public SubscriptionIterator(List<Subscription> subscriptions, long delay, String proxyHost, int proxyPort) {
         this.subIterator = subscriptions.iterator();
         this.delay = delay;
         this.proxyHost = proxyHost;
@@ -72,8 +72,8 @@ class SubscriptionIterator implements Iterator {
      * see java.util.Iterator#next()
      * @return an AddressBook (empty if the minimum delay has not been met)
      */
-    public Object next() {
-        Subscription sub = (Subscription) this.subIterator.next();
+    public AddressBook next() {
+        Subscription sub = this.subIterator.next();
         if (sub.getLastFetched() + this.delay < I2PAppContext.getGlobalContext().clock().now()) {
             //System.err.println("Fetching addressbook from " + sub.getLocation());
             return new AddressBook(sub, this.proxyHost, this.proxyPort);

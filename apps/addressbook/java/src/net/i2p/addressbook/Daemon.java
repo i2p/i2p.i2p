@@ -83,26 +83,26 @@ public class Daemon {
      * @param home
      *            The directory containing addressbook's configuration files.
      */
-    public void update(Map settings, String home) {
-        File masterFile = new File(home, (String) settings
+    public void update(Map<String, String> settings, String home) {
+        File masterFile = new File(home, settings
                 .get("master_addressbook"));
-        File routerFile = new File(home, (String) settings
+        File routerFile = new File(home, settings
                 .get("router_addressbook"));
         File published = null;
         if ("true".equals(settings.get("should_publish"))) 
-            published = new File(home, (String) settings
+            published = new File(home, settings
                 .get("published_addressbook"));
-        File subscriptionFile = new File(home, (String) settings
+        File subscriptionFile = new File(home, settings
                 .get("subscriptions"));
-        File logFile = new File(home, (String) settings.get("log"));
-        File etagsFile = new File(home, (String) settings.get("etags"));
-        File lastModifiedFile = new File(home, (String) settings
+        File logFile = new File(home, settings.get("log"));
+        File etagsFile = new File(home, settings.get("etags"));
+        File lastModifiedFile = new File(home, settings
                 .get("last_modified"));
-        File lastFetchedFile = new File(home, (String) settings
+        File lastFetchedFile = new File(home, settings
                 .get("last_fetched"));
         long delay;
         try {
-            delay = Long.parseLong((String) settings.get("update_delay"));
+            delay = Long.parseLong(settings.get("update_delay"));
         } catch (NumberFormatException nfe) {
             delay = 12;
         }
@@ -111,13 +111,13 @@ public class Daemon {
         AddressBook master = new AddressBook(masterFile);
         AddressBook router = new AddressBook(routerFile);
         
-        List defaultSubs = new LinkedList();
+        List<String> defaultSubs = new LinkedList();
         // defaultSubs.add("http://i2p/NF2RLVUxVulR3IqK0sGJR0dHQcGXAzwa6rEO4WAWYXOHw-DoZhKnlbf1nzHXwMEJoex5nFTyiNMqxJMWlY54cvU~UenZdkyQQeUSBZXyuSweflUXFqKN-y8xIoK2w9Ylq1k8IcrAFDsITyOzjUKoOPfVq34rKNDo7fYyis4kT5bAHy~2N1EVMs34pi2RFabATIOBk38Qhab57Umpa6yEoE~rbyR~suDRvD7gjBvBiIKFqhFueXsR2uSrPB-yzwAGofTXuklofK3DdKspciclTVzqbDjsk5UXfu2nTrC1agkhLyqlOfjhyqC~t1IXm-Vs2o7911k7KKLGjB4lmH508YJ7G9fLAUyjuB-wwwhejoWqvg7oWvqo4oIok8LG6ECR71C3dzCvIjY2QcrhoaazA9G4zcGMm6NKND-H4XY6tUWhpB~5GefB3YczOqMbHq4wi0O9MzBFrOJEOs3X4hwboKWANf7DT5PZKJZ5KorQPsYRSq0E3wSOsFCSsdVCKUGsAAAA/i2p/hosts.txt");
         defaultSubs.add("http://www.i2p2.i2p/hosts.txt");
         
         SubscriptionList subscriptions = new SubscriptionList(subscriptionFile,
-                etagsFile, lastModifiedFile, lastFetchedFile, delay, defaultSubs, (String) settings
-                .get("proxy_host"), Integer.parseInt((String) settings.get("proxy_port")));
+                etagsFile, lastModifiedFile, lastFetchedFile, delay, defaultSubs, settings
+                .get("proxy_host"), Integer.parseInt(settings.get("proxy_port")));
         Log log = new Log(logFile);
 
         update(master, router, published, subscriptions, log);
@@ -149,7 +149,7 @@ public class Daemon {
             homeFile = new SecureDirectory(System.getProperty("user.dir"));
         }
         
-        Map defaultSettings = new HashMap();
+        Map<String, String> defaultSettings = new HashMap();
         defaultSettings.put("proxy_host", "127.0.0.1");
         defaultSettings.put("proxy_port", "4444");
         defaultSettings.put("master_addressbook", "../userhosts.txt");
@@ -173,7 +173,7 @@ public class Daemon {
         
         File settingsFile = new File(homeFile, settingsLocation);
         
-        Map settings = ConfigParser.parse(settingsFile, defaultSettings);
+        Map<String, String> settings = ConfigParser.parse(settingsFile, defaultSettings);
         // wait
         try {
             Thread.sleep(5*60*1000 + I2PAppContext.getGlobalContext().random().nextLong(5*60*1000));
@@ -181,7 +181,7 @@ public class Daemon {
         } catch (InterruptedException ie) {}
         
         while (_running) {
-            long delay = Long.parseLong((String) settings.get("update_delay"));
+            long delay = Long.parseLong(settings.get("update_delay"));
             if (delay < 1) {
                 delay = 1;
             }

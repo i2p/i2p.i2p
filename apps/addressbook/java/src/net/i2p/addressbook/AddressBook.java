@@ -42,7 +42,7 @@ class AddressBook {
 
     private String location;
 
-    private Map addresses;
+    private Map<String, String> addresses;
 
     private boolean modified;
 
@@ -53,7 +53,7 @@ class AddressBook {
      *            A Map containing human readable addresses as keys, mapped to
      *            base64 i2p destinations.
      */
-    public AddressBook(Map addresses) {
+    public AddressBook(Map<String, String> addresses) {
         this.addresses = addresses;
     }
 
@@ -139,7 +139,7 @@ class AddressBook {
      *         is a human readable name, and the value is a base64 i2p
      *         destination.
      */
-    public Map getAddresses() {
+    public Map<String, String> getAddresses() {
         return this.addresses;
     }
 
