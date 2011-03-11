@@ -97,10 +97,23 @@ public class SingleFileNamingService extends NamingService {
     @Override
     public String reverseLookup(Destination dest, Properties options) {
         String destkey = dest.toBase64();
-        Properties hosts = new Properties();
+        BufferedReader in = null;
         getReadLock();
         try {
-            DataHelper.loadProps(hosts, _file, true);
+            in = new BufferedReader(new InputStreamReader(new FileInputStream(_file), "UTF-8"), 16*1024);
+            String line = null;
+            while ( (line = in.readLine()) != null) {
+                if (line.startsWith("#"))
+                    continue;
+                if (line.indexOf('#') > 0)  // trim off any end of line comment
+                    line = line.substring(0, line.indexOf('#')).trim();
+                int split = line.indexOf('=');
+                if (split <= 0)
+                    continue;
+                if (destkey.equals(line.substring(split + 1)))
+                    return line.substring(0, split);
+            }
+            return null;
         } catch (Exception ioe) {
             if (_file.exists())
                 _log.error("Error loading hosts file " + _file, ioe);
@@ -110,15 +123,6 @@ public class SingleFileNamingService extends NamingService {
         } finally {
             releaseReadLock();
         }
-        Set keyset = hosts.keySet();
-        Iterator iter = keyset.iterator();
-        while (iter.hasNext()) {
-            String host = (String)iter.next();
-            String key = hosts.getProperty(host);
-            if (destkey.equals(key))
-                return host;
-        }
-        return null;
     }
 
     /**
@@ -313,6 +317,8 @@ public class SingleFileNamingService extends NamingService {
                 if (line.indexOf('#') > 0)  // trim off any end of line comment
                     line = line.substring(0, line.indexOf('#')).trim();
                 int split = line.indexOf('=');
+                if (split <= 0)
+                    continue;
                 String key = line.substring(split);
                 String b64 = line.substring(split+1);   //.trim() ??????????????
                 try {
