@@ -223,6 +223,7 @@
         <ant dir="apps/i2psnark/java/" target="poupdate" />
         <ant dir="apps/i2ptunnel/java/" target="poupdate" />
         <ant dir="apps/susidns/src/" target="poupdate" />
+        <ant dir="apps/susimail/" target="poupdate" />
         <ant dir="apps/desktopgui" target="poupdate" />
     </target>
     <target name="javadoc">

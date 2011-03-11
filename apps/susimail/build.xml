@@ -22,7 +22,7 @@
     </target>
     <target name="jar" depends="compile, war" />
 
-    <target name="war" depends="compile, warUpToDate" unless="war.uptodate" >
+    <target name="war" depends="compile, bundle, warUpToDate" unless="war.uptodate" >
         <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
             <arg value="list" />
             <arg value="changed" />
@@ -48,6 +48,37 @@
         <uptodate property="war.uptodate" targetfile="susimail.war">
             <srcfiles dir= "src" excludes="LICENSE src/**/*" />
         </uptodate>
+    </target>
+
+    <target name="bundle" depends="compile">
+        <!-- Update the messages_*.po files.
+             We need to supply the bat file for windows, and then change the fail property to true -->
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" >
+            <arg value="./bundle-messages.sh" />
+        </exec>
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" >
+            <arg value="./bundle-messages.sh" />
+        </exec>
+        <!-- multi-lang is optional -->
+        <exec executable="sh" osfamily="windows" failifexecutionfails="false" >
+            <arg value="./bundle-messages.sh" />
+        </exec>
+    </target>
+
+    <target name="poupdate" depends="builddep, compile">
+        <!-- Update the messages_*.po files.  -->
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" >
+            <arg value="./bundle-messages.sh" />
+            <arg value="-p" />
+        </exec>
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" >
+            <arg value="./bundle-messages.sh" />
+            <arg value="-p" />
+        </exec>
+        <exec executable="sh" osfamily="windows" failifexecutionfails="true" >
+            <arg value="./bundle-messages.sh" />
+            <arg value="-p" />
+        </exec>
     </target>
 
     <target name="javadoc">
