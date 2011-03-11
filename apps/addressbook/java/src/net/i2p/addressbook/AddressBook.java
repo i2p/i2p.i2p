@@ -24,7 +24,6 @@ package net.i2p.addressbook;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import net.i2p.I2PAppContext;
@@ -218,11 +217,9 @@ class AddressBook {
      *            The log to write messages about new addresses or conflicts to.
      */
     public void merge(AddressBook other, boolean overwrite, Log log) {
-        Iterator otherIter = other.addresses.keySet().iterator();
-
-        while (otherIter.hasNext()) {
-            String otherKey = (String) otherIter.next();
-            String otherValue = (String) other.addresses.get(otherKey);
+        for (Map.Entry<String, String> entry : other.addresses.entrySet()) {
+            String otherKey = entry.getKey();
+            String otherValue = entry.getValue();
 
             if (valid(otherKey, otherValue)) {
                 if (this.addresses.containsKey(otherKey) && !overwrite) {

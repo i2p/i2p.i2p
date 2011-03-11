@@ -64,10 +64,10 @@ public class Daemon {
     public void update(AddressBook master, AddressBook router,
             File published, SubscriptionList subscriptions, Log log) {
         router.merge(master, true, null);
-        Iterator iter = subscriptions.iterator();
+        Iterator<AddressBook> iter = subscriptions.iterator();
         while (iter.hasNext()) {
             // yes, the EepGet fetch() is done in next()
-            router.merge((AddressBook) iter.next(), false, log);
+            router.merge(iter.next(), false, log);
         }
         router.write();
         if (published != null)
