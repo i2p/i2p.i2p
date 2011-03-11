@@ -13,10 +13,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -280,6 +283,78 @@ public class SingleFileNamingService extends NamingService {
             return false;
         } finally {
             releaseWriteLock();
+        }
+    }
+
+    /**
+     * @param options As follows:
+     *                Key "startsWith": return only those starting with
+     */
+    @Override
+    public Map<String, Destination> getEntries(Properties options) {
+        if (!_file.exists())
+            return Collections.EMPTY_MAP;
+        String startsWith = "";
+        if (options != null) {
+            startsWith = options.getProperty("startsWith");
+        }
+        BufferedReader in = null;
+        getReadLock();
+        try {
+            in = new BufferedReader(new InputStreamReader(new FileInputStream(_file), "UTF-8"), 16*1024);
+            String line = null;
+            String search = startsWith + '=';
+            Map<String, Destination> rv = new HashMap();
+            while ( (line = in.readLine()) != null) {
+                if ((!startsWith.equals("")) && !line.startsWith(search))
+                    continue;
+                if (line.startsWith("#"))
+                    continue;
+                if (line.indexOf('#') > 0)  // trim off any end of line comment
+                    line = line.substring(0, line.indexOf('#')).trim();
+                int split = line.indexOf('=');
+                String key = line.substring(split);
+                String b64 = line.substring(split+1);   //.trim() ??????????????
+                try {
+                    Destination dest = new Destination(b64);
+                    rv.put(key, dest);
+                } catch (DataFormatException dfe) {}
+            }
+            return rv;
+        } catch (IOException ioe) {
+            _log.error("getEntries error", ioe);
+            return Collections.EMPTY_MAP;
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
+            releaseReadLock();
+        }
+    }
+
+    /** 
+     *  @param options ignored
+     */
+    @Override
+    public int size(Properties options) {
+        if (!_file.exists())
+            return 0;
+        BufferedReader in = null;
+        getReadLock();
+        try {
+            in = new BufferedReader(new InputStreamReader(new FileInputStream(_file), "UTF-8"), 16*1024);
+            String line = null;
+            int rv = 0;
+            while ( (line = in.readLine()) != null) {
+                if (line.startsWith("#"))
+                    continue;
+                rv++;
+            }
+            return rv;
+        } catch (IOException ioe) {
+            _log.error("size() error", ioe);
+            return -1;
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
+            releaseReadLock();
         }
     }
 

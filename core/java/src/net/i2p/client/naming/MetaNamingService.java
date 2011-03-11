@@ -3,8 +3,9 @@ package net.i2p.client.naming;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -150,6 +151,32 @@ public class MetaNamingService extends DummyNamingService {
         }
         if (rv)
             removeCache(hostname);
+        return rv;
+    }
+
+    /**
+     *  All services aggregated
+     */
+    @Override
+    public Map<String, Destination> getEntries(Properties options) {
+        Map<String, Destination> rv = new HashMap();
+        for (NamingService ns : _services) { 
+             rv.putAll(ns.getEntries(options));
+        }
+        return rv;
+    }
+
+    /**
+     *  All services aggregated
+     */
+    @Override
+    public int size(Properties options) {
+        int rv = 0;
+        for (NamingService ns : _services) { 
+             int s = ns.size(options);
+             if (s > 0)
+                 rv += s;
+        }
         return rv;
     }
 }
