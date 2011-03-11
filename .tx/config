@@ -24,6 +24,11 @@ trans.nl = apps/susidns/locale/messages_nl.po
 trans.ru = apps/susidns/locale/messages_ru.po
 trans.zh_CN = apps/susidns/locale/messages_zh.po
 
+[I2P.susimail]
+source_file = apps/susimail/locale/messages_en.po
+source_lang = en
+trans.nl = apps/susimail/locale/messages_nl.po
+
 [I2P.i2psnark]
 source_file = apps/i2psnark/locale/messages_en.po
 source_lang = en
