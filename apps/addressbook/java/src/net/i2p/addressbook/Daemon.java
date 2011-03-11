@@ -61,7 +61,7 @@ public class Daemon {
      * @param log
      *            The log to write changes and conflicts to.
      */
-    public void update(AddressBook master, AddressBook router,
+    public static void update(AddressBook master, AddressBook router,
             File published, SubscriptionList subscriptions, Log log) {
         router.merge(master, true, null);
         Iterator<AddressBook> iter = subscriptions.iterator();
@@ -83,7 +83,7 @@ public class Daemon {
      * @param home
      *            The directory containing addressbook's configuration files.
      */
-    public void update(Map<String, String> settings, String home) {
+    public static void update(Map<String, String> settings, String home) {
         File masterFile = new File(home, settings
                 .get("master_addressbook"));
         File routerFile = new File(home, settings
