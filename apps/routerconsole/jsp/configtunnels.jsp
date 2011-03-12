@@ -41,4 +41,4 @@
 <input type="reset" value="<%=intl._("Cancel")%>" >
 <input type="submit" name="shouldsave" value="<%=intl._("Save changes")%>" >
 </div>
- </form></p></div></div></div></body></html>
+ </form></div></div></div></body></html>

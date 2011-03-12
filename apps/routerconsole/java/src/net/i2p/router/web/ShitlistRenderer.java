@@ -43,6 +43,11 @@ public class ShitlistRenderer {
         Map<Hash, Shitlist.Entry> entries = new TreeMap(new HashComparator());
         
         entries.putAll(_context.shitlist().getEntries());
+        if (entries.isEmpty()) {
+            buf.append("<i>").append(_("none")).append("</i>");
+            out.write(buf.toString());
+            return;
+        }
 
         buf.append("<ul>");
         

@@ -82,7 +82,7 @@ public class ConfigUpdateHelper extends HelperBase {
         for (int i = 0; i < PERIODS.length; i++) {
             buf.append("<option value=\"").append(PERIODS[i]);
             if (PERIODS[i] == ms)
-                buf.append("\" selected=\"true\"");
+                buf.append("\" selected=\"true");
             
             if (PERIODS[i] == -1)
                 buf.append("\">" + _("Never") + "</option>\n");
