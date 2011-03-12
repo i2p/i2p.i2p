@@ -105,6 +105,7 @@
     <panels>
         <panel classname="HelloPanel"/>
         <panel classname="InfoPanel"/>
+        <panel classname="PacksPanel"><os family="windows" /></panel>
         <panel classname="TargetPanel"/>
         <panel classname="InstallPanel"/>
         <panel classname="ShortcutPanel"><os family="windows" /></panel>
@@ -177,6 +178,35 @@
             <executable targetfile="$INSTALL_PATH/postinstall.sh" type="bin" stage="postinstall" keep="true" failure="warn"><os family="unix" />
                 <args><arg value="$INSTALL_PATH" /></args></executable>
 
+        </pack>
+
+        <pack name="Windows Service" required="no">
+            <description>Automatically start I2P in the background</description>
+            <os family="windows" />
+<!--
+            <executable targetfile="$INSTALL_PATH/install_i2p_service_winnt.bat" stage="postinstall" failure="warn" keep="true" />
+-->
+            <executable targetfile="$INSTALL_PATH/install_i2p_service_winnt.bat" stage="postinstall" failure="warn" keep="true">
+                <args>
+                    <arg value="$INSTALL_PATH\wrapper.config" />
+                    <arg value="--nopause" />
+                </args>
+            </executable>
+            <executable targetfile="$INSTALL_PATH/I2Psvc.exe" stage="postinstall" failure="warn" keep="true">
+                <args>
+                    <arg value="-t" />
+                    <arg value="$INSTALL_PATH\wrapper.config" />
+                </args>
+            </executable>
+<!--
+            <executable targetfile="$INSTALL_PATH/uninstall_i2p_service_winnt.bat" stage="uninstall" failure="warn" keep="true" />
+-->
+            <executable targetfile="$INSTALL_PATH/uninstall_i2p_service_winnt.bat" stage="uninstall" failure="warn" keep="true">
+                <args>
+                    <arg value="$INSTALL_PATH\wrapper.config" />
+                    <arg value="--nopause" />
+                </args>
+            </executable>
         </pack>
     </packs>
 
