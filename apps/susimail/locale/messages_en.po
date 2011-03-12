@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P susimail\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-11 20:33+0000\n"
+"POT-Creation-Date: 2011-03-12 20:49+0000\n"
 "PO-Revision-Date: 2010-06-15 14:09+0100\n"
 "Last-Translator: duck <duck@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
@@ -163,8 +163,10 @@ msgstr ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:1144
 #, java-format
-msgid "{0} messages deleted."
-msgstr ""
+msgid "1 message deleted."
+msgid_plural "{0} messages deleted."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:1264
 #: src/src/i2p/susi/webmail/WebMail.java:1587
@@ -173,8 +175,10 @@ msgstr ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:1266
 #, java-format
-msgid "{0} Messages"
-msgstr ""
+msgid "1 Message"
+msgid_plural "{0} Messages"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:1268
 msgid "Show Message"
@@ -363,8 +367,10 @@ msgstr ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:1639
 #, java-format
-msgid "{0} Bytes"
-msgstr ""
+msgid "1 Byte"
+msgid_plural "{0} Bytes"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:1644
 msgid "Mark All"
@@ -414,7 +420,7 @@ msgid "Set"
 msgstr ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:1668
-msgid "Really delete this messages?"
+msgid "Really delete this message?"
 msgstr ""
 
 #: src/src/i2p/susi/webmail/WebMail.java:1668
