@@ -198,10 +198,9 @@ public class StatsGenerator {
                     buf.append("; ");
                 }
 
-                // breaking the sentence like before makes translation in my language impossible.
-				buf.append(_("There were {0} event(s) in this period", curRate.getLastEventCount()));
-                // buf.append(' ');
-                buf.append(_(" which ended {0} ago.", DataHelper.formatDuration2(now - curRate.getLastCoalesceDate())));
+                buf.append(ngettext((int)curRate.getLastEventCount(), "There was 1 event in this period.", "There were {0} events in this period."));
+                buf.append(' ');
+                buf.append(_("The period ended {0} ago.", DataHelper.formatDuration2(now - curRate.getLastCoalesceDate())));
             } else {
                 buf.append(" <i>").append(_("No events")).append("</i> ");
             }

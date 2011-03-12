@@ -70,11 +70,11 @@ class ProfileOrganizerRenderer {
         int failing = 0;
         StringBuilder buf = new StringBuilder(16*1024);
         buf.append("<h2>").append(_("Peer Profiles")).append("</h2>\n<p>");
-        buf.append(_("Showing {0} recent profiles.", order.size())).append('\n');
+        buf.append(_(order.size(), "Showing 1 recent profile.", "Showing {0} recent profiles.")).append('\n');
         if (older > 0)
-            buf.append(_("Hiding {0} older profiles.", older)).append('\n');
+            buf.append(_(older, "Hiding 1 older profile.", "Hiding {0} older profiles.")).append('\n');
         if (standard > 0)
-            buf.append("<a href=\"/profiles?f=1\">").append(_("Hiding {0} standard profiles.", standard)).append("</a>\n");
+            buf.append("<a href=\"/profiles?f=1\">").append(_(standard, "Hiding 1 standard profile.", "Hiding {0} standard profiles.")).append("</a>\n");
         buf.append("</p>");
                    buf.append("<table>");
                    buf.append("<tr>");
@@ -359,4 +359,10 @@ class ProfileOrganizerRenderer {
     private String _(String s, Object o) {
         return Messages.getString(s, o, _context);
     }
+
+    /** translate (ngettext) @since 0.8.5 */
+    public String _(int n, String s, String p) {
+        return Messages.getString(n, s, p, _context);
+    }
+
 }
