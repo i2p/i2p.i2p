@@ -1,3 +1,13 @@
+2011-03-12 zzz
+    * Blocklist: Add bogons since they won't change any more
+    * BuildHandler: Loop double-check
+    * Console:
+      - Fix HTML errors in form message box,
+        logs.jsp, netdb.jsp, profiles.jsp, stats.jsp,
+        configpeer.jsp, configtunnels.jsp, configupdate.jsp
+      - ngettext cleanups
+    * LogWriter: Prevent NPE after permissions fail
+
 2011-03-11 duck
     * Susimail: translation support, including dutch translation.
 
