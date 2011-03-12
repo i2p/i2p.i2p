@@ -418,8 +418,18 @@ class BuildHandler {
         if ((!isOutEnd) && _context.routerHash().equals(nextPeer)) {
             // We are 2 hops in a row? Drop it without a reply.
             // No way to recognize if we are every other hop, but see below
-            _log.error("Dropping build request where we are in two consecutive hops");
+            _log.error("Dropping build request, we the next hop");
             return;
+        }
+        // previous test should be sufficient to keep it from getting here but maybe not?
+        if (!isInGW) {
+            Hash from = state.fromHash;
+            if (from == null)
+                from = state.from.calculateHash();
+            if (_context.routerHash().equals(from)) {
+                _log.error("Dropping build request, we are the previous hop");
+                return;
+            }
         }
         if ((!isOutEnd) && (!isInGW)) {
             Hash from = state.fromHash;
