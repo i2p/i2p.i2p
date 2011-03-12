@@ -264,7 +264,7 @@ public class NetDbRenderer {
             
         buf.append("<table border=\"0\" cellspacing=\"30\"><tr><th colspan=\"3\">")
            .append(_("Network Database Router Statistics"))
-           .append("</th><tr><td style=\"vertical-align: top;\">");
+           .append("</th></tr><tr><td style=\"vertical-align: top;\">");
         // versions table
         List<String> versionList = new ArrayList(versions.objects());
         if (!versionList.isEmpty()) {
@@ -345,9 +345,9 @@ public class NetDbRenderer {
         } else {
             buf.append("<b>" + _("Peer info for") + ":</b> ").append(hash).append("\n");
             if (full) {
-                buf.append("[<a href=\"netdb\" >Back</a>]</th></tr><td>\n");
+                buf.append("[<a href=\"netdb\" >Back</a>]</th></tr><tr><td>\n");
             } else {
-                buf.append("[<a href=\"netdb?r=").append(hash.substring(0, 6)).append("\" >").append(_("Full entry")).append("</a>]</th></tr><td>\n");
+                buf.append("[<a href=\"netdb?r=").append(hash.substring(0, 6)).append("\" >").append(_("Full entry")).append("</a>]</th></tr><tr><td>\n");
             }
         }
         
@@ -393,9 +393,8 @@ public class NetDbRenderer {
                 buf.append(DataHelper.stripHTML(key)).append(" = ").append(DataHelper.stripHTML(val)).append("<br>\n");
             }
             buf.append("</code></td></tr>\n");
-        } else {
         }
-        buf.append("</td></tr>\n");
+        buf.append("</table>\n");
     }
 
     private static final int SSU = 1;

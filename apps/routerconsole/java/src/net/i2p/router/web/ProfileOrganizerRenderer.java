@@ -213,7 +213,6 @@ class ProfileOrganizerRenderer {
                 buf.append("<td align=\"center\">").append(DataHelper.stripHTML(info.getCapabilities())).append("</td>");
             else
                 buf.append("<td>&nbsp;</td>");
-            buf.append("</code></td>");
             buf.append("<td align=\"right\">").append(num(prof.getIntegrationValue())).append("</td>");
             long time;
             time = now - prof.getLastHeardAbout();
@@ -261,7 +260,7 @@ class ProfileOrganizerRenderer {
         buf.append("<li><b>").append(_("capacity")).append("</b>: ").append(_("how many tunnels can we ask them to join in an hour?")).append("</li>");
         buf.append("<li><b>").append(_("integration")).append("</b>: ").append(_("how many new peers have they told us about lately?")).append("</li>");
         buf.append("<li><b>").append(_("status")).append("</b>: ").append(_("is the peer banned, or unreachable, or failing tunnel tests?")).append("</li>");
-        buf.append("</ul></i>");
+        buf.append("</ul>");
         out.write(buf.toString());
         out.flush();
     }

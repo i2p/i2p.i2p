@@ -508,11 +508,11 @@ div.messages {
      box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
 }
 
-div.messages span.error {
+div.error {
      color: #d00000;
 }
 
-div.messages span.notice {
+div.notice {
      font-style: italic;
 }
 

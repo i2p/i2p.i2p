@@ -53,7 +53,6 @@ public class LogsHelper extends HelperBase {
         boolean colorize = Boolean.valueOf(_context.getProperty("routerconsole.logs.color")).booleanValue();
         StringBuilder buf = new StringBuilder(16*1024); 
         buf.append("<ul>");
-        buf.append("<code>\n");
         for (int i = msgs.size(); i > 0; i--) { 
             String msg = msgs.get(i - 1);
             msg = msg.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
@@ -87,7 +86,7 @@ public class LogsHelper extends HelperBase {
             }
             buf.append("</li>\n");
         }
-        buf.append("</code></ul>\n");
+        buf.append("</ul>\n");
         
         return buf.toString();
     }

@@ -421,11 +421,11 @@ div.messages {
      color: #4f4;
 }
 
-div.messages span.error {
+div.error {
      color: #d90;
 }
 
-div.messages span.notice {
+div.notice {
      font-style: italic;
 }
 

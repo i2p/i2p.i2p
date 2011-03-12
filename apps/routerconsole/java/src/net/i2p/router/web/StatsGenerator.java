@@ -93,6 +93,7 @@ public class StatsGenerator {
             }
             out.write("</ul><br>\n");
         }
+        out.write("</div>");
         out.flush();
     }
     
@@ -167,7 +168,7 @@ public class StatsGenerator {
             buf.append("<li>");
             renderPeriod(buf, periods[i], _("rate"));
             if (curRate.getLastEventCount() > 0) {
-                buf.append(_("Average")).append(":</i> ");
+                buf.append(_("Average")).append(": ");
                 buf.append(num(curRate.getAverageValue()));
                 buf.append("; ");
                 buf.append(_("Highest average"));

@@ -533,11 +533,11 @@ div.main li b{
      font-size: 9.5pt;
 }
 
-div.messages span.error {
+div.error {
      color: #d00000;
 }
 
-div.messages span.notice {
+div.notice {
      font-style: italic;
 }
 

@@ -516,11 +516,11 @@ div.messages li, div.messages ul {
      margin: -10px 0 0 0;
 }
 
-div.messages span.error {
+div.error {
      color: #d00000;
 }
 
-div.messages span.notice {
+div.notice {
      font-style: italic;
 }
 

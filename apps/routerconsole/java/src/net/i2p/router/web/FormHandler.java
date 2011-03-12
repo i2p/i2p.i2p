@@ -95,18 +95,18 @@ public class FormHandler {
         if (_errors.isEmpty() && _notices.isEmpty())
             return "";
         StringBuilder buf = new StringBuilder(512);
-        buf.append("<div class=\"messages\" id=\"messages\"><p>");
+        buf.append("<div class=\"messages\" id=\"messages\">");
         if (!_errors.isEmpty()) {
-            buf.append("<span class=\"error\">");
+            buf.append("<div class=\"error\">");
             buf.append(render(_errors));
-            buf.append("</span>");
+            buf.append("</div>");
         }
         if (!_notices.isEmpty()) {
-            buf.append("<span class=\"notice\">");
+            buf.append("<div class=\"notice\">");
             buf.append(render(_notices));
-            buf.append("</span>");
+            buf.append("</div>");
         }
-        buf.append("</p></div>");
+        buf.append("</div>");
         return buf.toString();
     }
     
