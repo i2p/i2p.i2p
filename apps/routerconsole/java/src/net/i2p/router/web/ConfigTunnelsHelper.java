@@ -196,12 +196,16 @@ public class ConfigTunnelsHelper extends HelperBase {
 //        buf.append("<tr><td colspan=\"3\"><br></td></tr>\n");
     }
 
+    /** to fool xgettext so the following isn't tagged */
+    private static final String DUMMY1 = "1 ";
+    private static final String DUMMY2 = "{0} ";
+
     private void renderOptions(StringBuilder buf, int min, int max, int now, String prefix, String name) {
         for (int i = min; i <= max; i++) {
             buf.append("<option value=\"").append(i).append("\" ");
             if (i == now)
                 buf.append("selected=\"true\" ");
-            buf.append(">").append(_(i, "1 " + name, "{0} " + name + 's'));
+            buf.append(">").append(ngettext(DUMMY1 + name, DUMMY2 + name + 's', i));
             buf.append("</option>\n");
         }
     }
