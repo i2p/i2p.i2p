@@ -1665,7 +1665,7 @@ public class WebMail extends HttpServlet
 	private void showMessage( PrintWriter out, SessionObject sessionObject )
 	{
 		if( sessionObject.reallyDelete ) {
-			out.println( "<p class=\"error\">" + _("Really delete this messages?") + " " + button( REALLYDELETE, _("Yes, really delete it!") ) + "</p>" );
+			out.println( "<p class=\"error\">" + _("Really delete this message?") + " " + button( REALLYDELETE, _("Yes, really delete it!") ) + "</p>" );
 		}
 		Mail mail = sessionObject.mailCache.getMail( sessionObject.showUIDL, MailCache.FETCH_ALL );
 		if( mail != null && mail.body != null && mail.part == null ) {

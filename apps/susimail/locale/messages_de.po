@@ -414,7 +414,7 @@ msgid "Set"
 msgstr "festlegen"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1668
-msgid "Really delete this messages?"
+msgid "Really delete this message?"
 msgstr "Diese Nachricht wirklich löschen?"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1668
