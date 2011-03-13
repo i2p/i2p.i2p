@@ -8,14 +8,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P susimail\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-11 20:33+0000\n"
-"PO-Revision-Date: 2011-03-12 03:18+0100\n"
+"POT-Creation-Date: 2011-03-12 22:04+0000\n"
+"PO-Revision-Date: 2011-03-13 12:31+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: mixxy <m1xxy@mail.i2p>\n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #: src/src/i2p/susi/webmail/WebMail.java:454
@@ -163,8 +163,10 @@ msgstr "Fehler beim Löschen der Nachricht: {0}"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1144
 #, java-format
-msgid "{0} messages deleted."
-msgstr "{0} Nachrichten gelöscht"
+msgid "1 message deleted."
+msgid_plural "{0} messages deleted."
+msgstr[0] "Eine Nachricht gelöscht"
+msgstr[1] "{0} Nachrichten gelöscht"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1264
 #: src/src/i2p/susi/webmail/WebMail.java:1587
@@ -173,8 +175,10 @@ msgstr "Anmelden"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1266
 #, java-format
-msgid "{0} Messages"
-msgstr "{0} Nachrichten"
+msgid "1 Message"
+msgid_plural "{0} Messages"
+msgstr[0] "Eine Nachricht"
+msgstr[1] "{0} Nachrichten"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1268
 msgid "Show Message"
@@ -363,8 +367,10 @@ msgstr "Größe"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1639
 #, java-format
-msgid "{0} Bytes"
-msgstr "{0} Bytes"
+msgid "1 Byte"
+msgid_plural "{0} Bytes"
+msgstr[0] "1 Byte"
+msgstr[1] "{0} Bytes"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1644
 msgid "Mark All"
