@@ -4,6 +4,9 @@ import java.util.Properties;
 
 import net.i2p.data.Destination;
 
+/**
+ * @since 0.8.6
+ */
 public interface NamingServiceListener {
 
     /** also called when a NamingService is added or removed */

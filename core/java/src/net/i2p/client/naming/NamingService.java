@@ -31,6 +31,7 @@ public abstract class NamingService {
     private final static Log _log = new Log(NamingService.class);
     protected final I2PAppContext _context;
     protected final Set<NamingServiceListener> _listeners;
+    protected final Set<NamingServiceUpdater> _updaters;
 
     /** what classname should be used as the naming service impl? */
     public static final String PROP_IMPL = "i2p.naming.impl";
@@ -45,6 +46,7 @@ public abstract class NamingService {
     protected NamingService(I2PAppContext context) {
         _context = context;
         _listeners = new CopyOnWriteArraySet();
+        _updaters = new CopyOnWriteArraySet();
     }
     
     /**
@@ -315,12 +317,15 @@ public abstract class NamingService {
     }
 
     /**
-     *  Ask the NamingService to update its database
-     *  Should this be a separate interface? This is what addressbook needs
-     *  @param options NamingService-specific, can be null
+     *  Ask any registered updaters to update now
+     *  @param options NamingService- or updater-specific, may be null
      *  @since 0.8.5
      */
-    public void requestUpdate(Properties options) {}
+    public void requestUpdate(Properties options) {
+        for (NamingServiceUpdater nsu : _updaters) {
+            nsu.update(options);
+        }
+    }
 
     /**
      *  @since 0.8.5
@@ -334,6 +339,20 @@ public abstract class NamingService {
      */
     public void unregisterListener(NamingServiceListener nsl) {
         _listeners.remove(nsl);
+    }
+
+    /**
+     *  @since 0.8.6
+     */
+    public void registerUpdater(NamingServiceUpdater nsu) {
+        _updaters.add(nsu);
+    }
+
+    /**
+     *  @since 0.8.6
+     */
+    public void unregisterUpdater(NamingServiceUpdater nsu) {
+        _updaters.remove(nsu);
     }
 
     /**
