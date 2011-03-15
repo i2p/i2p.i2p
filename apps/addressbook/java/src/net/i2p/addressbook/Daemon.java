@@ -29,6 +29,10 @@ import java.util.List;
 import java.util.Map;
 
 import net.i2p.I2PAppContext;
+import net.i2p.client.naming.NamingService;
+import net.i2p.client.naming.SingleFileNamingService;
+import net.i2p.data.DataFormatException;
+import net.i2p.data.Destination;
 import net.i2p.util.SecureDirectory;
 
 /**
@@ -55,6 +59,7 @@ public class Daemon {
      * @param published
      *            The published AddressBook. This address book is published on
      *            the user's eepsite so that others may subscribe to it.
+     *            If non-null, overwrite with the new addressbook.
      * @param subscriptions
      *            A SubscriptionList listing the remote address books to update
      *            from.
@@ -73,6 +78,71 @@ public class Daemon {
         if (published != null)
             router.write(published);
         subscriptions.write();
+    }
+
+    /**
+     * Update the router and published address books using remote data from the
+     * subscribed address books listed in subscriptions.
+     * 
+     * @param router
+     *            The router AddressBook. This is the address book read by
+     *            client applications.
+     * @param published
+     *            The published AddressBook. This address book is published on
+     *            the user's eepsite so that others may subscribe to it.
+     *            If non-null, overwrite with the new addressbook.
+     * @param subscriptions
+     *            A SubscriptionList listing the remote address books to update
+     *            from.
+     * @param log
+     *            The log to write changes and conflicts to.
+     * @since 0.8.6
+     */
+    public static void update(NamingService router, File published, SubscriptionList subscriptions, Log log) {
+        NamingService publishedNS = null;
+        Iterator<AddressBook> iter = subscriptions.iterator();
+        while (iter.hasNext()) {
+            // yes, the EepGet fetch() is done in next()
+            AddressBook sub = iter.next();
+            for (Map.Entry<String, String> entry : sub.getAddresses().entrySet()) {
+                String key = entry.getKey();
+                Destination oldDest = router.lookup(key);
+                try {
+                    if (oldDest == null) {
+                        if (AddressBook.isValidKey(key)) {
+                            Destination dest = new Destination(entry.getValue());
+                            boolean success = router.put(key, dest);
+                            if (log != null) {
+                                if (success)
+                                    log.append("New address " + key +
+                                               " added to address book. From: " + sub.getLocation());
+                                else
+                                    log.append("Save to naming service " + router + " failed for new key " + key);
+                            }
+                            // now update the published addressbook
+                            if (published != null) {
+                                if (publishedNS == null)
+                                    publishedNS = new SingleFileNamingService(I2PAppContext.getGlobalContext(), published.getAbsolutePath());
+                                success = publishedNS.putIfAbsent(key, dest);
+                                if (!success)
+                                    log.append("Save to published addressbook " + published.getAbsolutePath() + " failed for new key " + key);
+                            }
+                        } else if (log != null) {
+                            log.append("Bad hostname " + key + " from "
+                                   + sub.getLocation());
+                        }        
+                    } else if (!oldDest.toBase64().equals(entry.getValue()) && log != null) {
+                        log.append("Conflict for " + key + " from "
+                                   + sub.getLocation()
+                                   + ". Destination in remote address book is "
+                                   + entry.getValue());
+                    }
+                } catch (DataFormatException dfe) {
+                    if (log != null)
+                        log.append("Invalid b64 for" + key + " From: " + sub.getLocation());
+                }
+            }
+        }
     }
 
     /**
@@ -120,7 +190,35 @@ public class Daemon {
                 .get("proxy_host"), Integer.parseInt(settings.get("proxy_port")));
         Log log = new Log(logFile);
 
-        update(master, router, published, subscriptions, log);
+        if (true)
+            update(getNamingService(), published, subscriptions, log);
+        else
+            update(master, router, published, subscriptions, log);
+    }
+
+    /** depth-first search */
+    private static NamingService searchNamingService(NamingService ns, String srch)
+    {
+        String name = ns.getName();
+        if (name == srch)
+                return ns;
+        List<NamingService> list = ns.getNamingServices();
+        if (list != null) {
+            for (NamingService nss : list) {
+                NamingService rv = searchNamingService(nss, srch);
+                if (rv != null)
+                    return rv;
+            }
+        }
+        return null;                
+    }
+
+    /** @return the NamingService for the current file name, or the root NamingService */
+    private static NamingService getNamingService()
+    {
+        NamingService root = I2PAppContext.getGlobalContext().namingService();
+        NamingService rv = searchNamingService(root, "hosts.txt");
+        return rv != null ? rv : root;                
     }
 
     /**

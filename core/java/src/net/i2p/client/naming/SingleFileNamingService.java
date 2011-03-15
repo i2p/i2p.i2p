@@ -53,6 +53,10 @@ public class SingleFileNamingService extends NamingService {
     private final static Log _log = new Log(SingleFileNamingService.class);
     private final File _file;
     private final ReentrantReadWriteLock _fileLock;
+    /** cached number of entries */
+    private int _size;
+    /** last write time */
+    private long _lastWrite;
 
     public SingleFileNamingService(I2PAppContext context, String filename) {
         super(context);
@@ -292,14 +296,18 @@ public class SingleFileNamingService extends NamingService {
 
     /**
      * @param options As follows:
+     *                Key "search": return only those matching substring
      *                Key "startsWith": return only those starting with
+     *                                  ("[0-9]" allowed)
      */
     @Override
     public Map<String, Destination> getEntries(Properties options) {
         if (!_file.exists())
             return Collections.EMPTY_MAP;
-        String startsWith = "";
+        String searchOpt = null;
+        String startsWith = null;
         if (options != null) {
+            searchOpt = options.getProperty("search");
             startsWith = options.getProperty("startsWith");
         }
         BufferedReader in = null;
@@ -307,11 +315,19 @@ public class SingleFileNamingService extends NamingService {
         try {
             in = new BufferedReader(new InputStreamReader(new FileInputStream(_file), "UTF-8"), 16*1024);
             String line = null;
-            String search = startsWith + '=';
+            String search = startsWith  == null ? null : startsWith + '=';
             Map<String, Destination> rv = new HashMap();
             while ( (line = in.readLine()) != null) {
-                if ((!startsWith.equals("")) && !line.startsWith(search))
+                if (line.length() <= 0)
                     continue;
+                if (search != null) {
+                    if (startsWith.equals("[0-9]")) {
+                        if (line.charAt(0) < '0' || line.charAt(0) > '9')
+                            continue;
+                    } else if (!line.startsWith(search)) {
+                        continue;
+                    }
+                }
                 if (line.startsWith("#"))
                     continue;
                 if (line.indexOf('#') > 0)  // trim off any end of line comment
@@ -320,11 +336,17 @@ public class SingleFileNamingService extends NamingService {
                 if (split <= 0)
                     continue;
                 String key = line.substring(split);
+                if (searchOpt != null && key.indexOf(searchOpt) < 0)
+                    continue;
                 String b64 = line.substring(split+1);   //.trim() ??????????????
                 try {
                     Destination dest = new Destination(b64);
                     rv.put(key, dest);
                 } catch (DataFormatException dfe) {}
+            }
+            if (searchOpt == null && startsWith == null) {
+                _lastWrite = _file.lastModified();
+                _size = rv.size();
             }
             return rv;
         } catch (IOException ioe) {
@@ -346,14 +368,18 @@ public class SingleFileNamingService extends NamingService {
         BufferedReader in = null;
         getReadLock();
         try {
+            if (_file.lastModified() <= _lastWrite)
+                return _size;
             in = new BufferedReader(new InputStreamReader(new FileInputStream(_file), "UTF-8"), 16*1024);
             String line = null;
             int rv = 0;
             while ( (line = in.readLine()) != null) {
-                if (line.startsWith("#"))
+                if (line.startsWith("#") || line.length() <= 0)
                     continue;
                 rv++;
             }
+            _lastWrite = _file.lastModified();
+            _size = rv;
             return rv;
         } catch (IOException ioe) {
             _log.error("size() error", ioe);

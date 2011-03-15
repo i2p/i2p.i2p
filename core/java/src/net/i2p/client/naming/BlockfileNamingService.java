@@ -476,13 +476,17 @@ public class BlockfileNamingService extends DummyNamingService {
      *                from that list (default "hosts.txt", NOT all lists)
      *                Key "skip": skip that many entries
      *                Key "limit": max number to return
+     *                Key "search": return only those matching substring
      *                Key "startsWith": return only those starting with
+     *                                  ("[0-9]" allowed)
      *                Key "beginWith": start here in the iteration
-     *                Don't use both
+     *                Don't use both startsWith and beginWith.
+     *                Search, startsWith, and beginWith values must be lower case.
      */
     @Override
     public Map<String, Destination> getEntries(Properties options) {
         String listname = FALLBACK_LIST;
+        String search = null;
         String startsWith = null;
         String beginWith = null;
         int limit = Integer.MAX_VALUE;
@@ -491,10 +495,15 @@ public class BlockfileNamingService extends DummyNamingService {
             String ln = options.getProperty("list");
             if (ln != null)
                 listname = ln;
+            search = options.getProperty("search");
             startsWith = options.getProperty("startsWith");
             beginWith = options.getProperty("beginWith");
-            if (beginWith == null)
-                beginWith = startsWith;
+            if (beginWith == null && startsWith != null) {
+                if (startsWith.equals("[0-9]"))
+                    beginWith = "0";
+                else
+                    beginWith = startsWith;
+            }
             String lim = options.getProperty("limit");
             try {
                 limit = Integer.parseInt(lim);
@@ -505,7 +514,9 @@ public class BlockfileNamingService extends DummyNamingService {
             } catch (NumberFormatException nfe) {}
         }
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Searching " + listname + " beginning with " + beginWith + " starting with " + startsWith + " limit=" + limit + " skip=" + skip);
+            _log.debug("Searching " + listname + " beginning with " + beginWith +
+                       " starting with " + startsWith + " search string " + search +
+                       " limit=" + limit + " skip=" + skip);
         synchronized(_bf) {
             try {
                 SkipList sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
@@ -523,12 +534,21 @@ public class BlockfileNamingService extends DummyNamingService {
                 for (int i = 0; i < skip && iter.hasNext(); i++) {
                     iter.next();
                 }
-                for (int i = 0; i < limit && iter.hasNext(); i++) {
-                     String key = (String) iter.nextKey();
-                     if (startsWith != null && !key.startsWith(startsWith))
-                         break;
-                     DestEntry de = (DestEntry) iter.next();
-                     rv.put(key, de.dest);
+                for (int i = 0; i < limit && iter.hasNext(); ) {
+                    String key = (String) iter.nextKey();
+                    if (startsWith != null) {
+                        if (startsWith.equals("[0-9]")) {
+                            if (key.charAt(0) > '9')
+                                break;
+                        } else if (!key.startsWith(startsWith)) {
+                            break;
+                        }
+                    }
+                    DestEntry de = (DestEntry) iter.next();
+                    if (search != null && key.indexOf(search) < 0)
+                        continue;
+                    rv.put(key, de.dest);
+                    i++;
                 }
                 return rv;
             } catch (IOException ioe) {

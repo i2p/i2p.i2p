@@ -166,10 +166,10 @@ class AddressBook {
     private static final int MAX_DEST_LENGTH = MIN_DEST_LENGTH + 100;  // longer than any known cert type for now
 
     /**
-     * Do basic validation of the hostname and dest
+     * Do basic validation of the hostname
      * hostname was already converted to lower case by ConfigParser.parse()
      */
-    private static boolean valid(String host, String dest) {
+    public static boolean isValidKey(String host) {
 	return
 		host.endsWith(".i2p") &&
 		host.length() > 4 &&
@@ -193,8 +193,15 @@ class AddressBook {
                 (! host.equals("console.i2p")) &&
                 (! host.endsWith(".proxy.i2p")) &&
                 (! host.endsWith(".router.i2p")) &&
-                (! host.endsWith(".console.i2p")) &&
+                (! host.endsWith(".console.i2p"))
+                ;	
+    }
 
+    /**
+     * Do basic validation of the b64 dest, without bothering to instantiate it
+     */
+    private static boolean isValidDest(String dest) {
+	return
                 // null cert ends with AAAA but other zero-length certs would be AA
 		((dest.length() == MIN_DEST_LENGTH && dest.endsWith("AA")) ||
 		 (dest.length() > MIN_DEST_LENGTH && dest.length() <= MAX_DEST_LENGTH)) &&
@@ -221,7 +228,7 @@ class AddressBook {
             String otherKey = entry.getKey();
             String otherValue = entry.getValue();
 
-            if (valid(otherKey, otherValue)) {
+            if (isValidKey(otherKey) && isValidDest(otherValue)) {
                 if (this.addresses.containsKey(otherKey) && !overwrite) {
                     if (!this.addresses.get(otherKey).equals(otherValue)
                             && log != null) {

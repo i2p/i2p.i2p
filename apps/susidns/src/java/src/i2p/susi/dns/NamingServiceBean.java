@@ -37,24 +37,58 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 
 /**
- *  Talk to the NamingService API instead of modifying the hosts.txt files directly
+ *  Talk to the NamingService API instead of modifying the hosts.txt files directly,
+ *  except for the 'published' addressbook.
  *
- *  @since 0.8.5
+ *  @since 0.8.6
  */
 public class NamingServiceBean extends AddressbookBean
 {
 	private static final String DEFAULT_NS = "BlockfileNamingService";
 
+	private boolean isDirect() {
+		return getBook().equals("published");
+	}
+
+	@Override
+	protected boolean isPrefiltered() {
+		if (isDirect())
+			return super.isPrefiltered();
+		return (search == null || search.length() <= 0) &&
+		       (filter == null || filter.length() <= 0);
+		// and right naming service...
+	}
+
+	@Override
+	protected int resultSize() {
+		if (isDirect())
+			return super.resultSize();
+		return isPrefiltered() ? totalSize() : entries.length;
+	}
+
+	@Override
+	protected int totalSize() {
+		if (isDirect())
+			return super.totalSize();
+		// only blockfile needs the list property
+		Properties props = new Properties();
+		props.setProperty("list", getFileName());
+		return getNamingService().size(props);
+	}
 
 	@Override
 	public boolean isNotEmpty()
 	{
-		return getNamingService().size() > 0;
+		if (isDirect())
+			return super.isNotEmpty();
+		return totalSize() > 0;
 	}
 
 	@Override
 	public String getFileName()
 	{
+		if (isDirect())
+			return super.getFileName();
 		loadConfig();
 		String filename = properties.getProperty( getBook() + "_addressbook" );
 		int slash = filename.lastIndexOf('/');
@@ -64,7 +98,7 @@ public class NamingServiceBean extends AddressbookBean
 	}
 
 	/** depth-first search */
-	private NamingService searchNamingService(NamingService ns, String srch)
+	private static NamingService searchNamingService(NamingService ns, String srch)
 	{
 		String name = ns.getName();
 		if (name == srch || name == DEFAULT_NS)
@@ -88,10 +122,16 @@ public class NamingServiceBean extends AddressbookBean
 		return rv != null ? rv : root;		
 	}
 
-	/** Load addressbook and apply filter, returning messages about this. */
+	/**
+	 *  Load addressbook and apply filter, returning messages about this.
+	 *  To control memory, don't load the whole addressbook if we can help it...
+	 *  only load what is searched for.
+	 */
 	@Override
 	public String getLoadBookMessages()
 	{
+		if (isDirect())
+			return super.getLoadBookMessages();
 		NamingService service = getNamingService();
 		Debug.debug("Searching within " + service + " with filename=" + getFileName() + " and with filter=" + filter + " and with search=" + search);
 		String message = "";
@@ -100,16 +140,22 @@ public class NamingServiceBean extends AddressbookBean
 			Map<String, Destination> results;
 			Properties searchProps = new Properties();
 			// only blockfile needs this
-                        searchProps.setProperty("list", getFileName());
+			searchProps.setProperty("list", getFileName());
 			if (filter != null) {
-				String startsAt = filter == "0-9" ? "0" : filter;
+				String startsAt = filter.equals("0-9") ? "[0-9]" : filter;
 				searchProps.setProperty("startsWith", startsAt);
 			}
-			if (beginIndex > 0)
-				searchProps.setProperty("skip", Integer.toString(beginIndex));
-			int limit = 1 + endIndex - beginIndex;
-			if (limit > 0)
-				searchProps.setProperty("limit", Integer.toString(limit));
+			if (isPrefiltered()) {
+				// Only limit if we not searching or filtering, so we will
+				// know the total number of results
+				if (beginIndex > 0)
+					searchProps.setProperty("skip", Integer.toString(beginIndex));
+				int limit = 1 + endIndex - beginIndex;
+				if (limit > 0)
+					searchProps.setProperty("limit", Integer.toString(limit));
+			}
+			if (search != null && search.length() > 0)
+				searchProps.setProperty("search", search.toLowerCase());
 			results = service.getEntries(searchProps);
 
 			Debug.debug("Result count: " + results.size());
@@ -151,6 +197,8 @@ public class NamingServiceBean extends AddressbookBean
 	@Override
 	public String getMessages()
 	{
+		if (isDirect())
+			return super.getMessages();
 		// Loading config and addressbook moved into getLoadBookMessages()
 		String message = "";
 		
@@ -168,23 +216,22 @@ public class NamingServiceBean extends AddressbookBean
 						} else if (oldDest != null && !action.equals(_("Replace"))) {
 							message = _("Host name {0} is already in addressbook with a different destination. Click \"Replace\" to overwrite.", hostname);
 						} else {
-							boolean valid = true;
 							try {
 								Destination dest = new Destination(destination);
-								getNamingService().put(hostname, dest, nsOptions);
+								boolean success = getNamingService().put(hostname, dest, nsOptions);
+								if (success) {
+									changed = true;
+									if (oldDest == null)
+										message = _("Destination added for {0}.", hostname);
+									else
+										message = _("Destination changed for {0}.", hostname);
+									// clear form
+									hostname = null;
+									destination = null;
+								} else {
+									message = _("Failed to add Destination for {0} to naming service {1}", hostname, getNamingService()) + "<br>";
+								}
 							} catch (DataFormatException dfe) {
-								valid = false;
-							}
-							if (valid) {
-								changed = true;
-								if (oldDest == null)
-									message = _("Destination added for {0}.", hostname);
-								else
-									message = _("Destination changed for {0}.", hostname);
-								// clear form
-								hostname = null;
-								destination = null;
-							} else {
 								message = _("Invalid Base 64 destination.");
 							}
 						}
@@ -197,17 +244,20 @@ public class NamingServiceBean extends AddressbookBean
 					String name = null;
 					int deleted = 0;
 					for (String n : deletionMarks) {
-						getNamingService().remove(n, nsOptions);
-						if (deleted++ == 0) {
+						boolean success = getNamingService().remove(n, nsOptions);
+						if (!success) {
+							message += _("Failed to delete Destination for {0} from naming service {1}", name, getNamingService()) + "<br>";
+						} else if (deleted++ == 0) {
 							changed = true;
 							name = n;
 						}
 					}
 					if( changed ) {
 						if (deleted == 1)
-							message = _("Destination {0} deleted.", name);
+							message += _("Destination {0} deleted.", name);
 						else
-							message = _("{0} destinations deleted.", deleted);
+							// parameter will always be >= 2
+							message = ngettext("1 destination deleted.", "{0} destinations deleted.", deleted);
 					}
 				}
 				if( changed ) {

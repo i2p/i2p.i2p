@@ -79,6 +79,7 @@ public class AddressbookBean
 	{
 		return addressbook != null && !addressbook.isEmpty();
 	}
+
 	public AddressbookBean()
 	{
 		properties = new Properties();
@@ -86,9 +87,11 @@ public class AddressbookBean
 		beginIndex = 0;
 		endIndex = DISPLAY_SIZE - 1;
 	}
+
 	private long configLastLoaded = 0;
 	private static final String PRIVATE_BOOK = "private_addressbook";
 	private static final String DEFAULT_PRIVATE_BOOK = "../privatehosts.txt";
+
 	protected void loadConfig()
 	{
 		long currentTime = System.currentTimeMillis();
@@ -113,6 +116,7 @@ public class AddressbookBean
 				try { fis.close(); } catch (IOException ioe) {}
 		}	
 	}
+
 	public String getFileName()
 	{
 		loadConfig();
@@ -144,7 +148,7 @@ public class AddressbookBean
 				book.compareToIgnoreCase( "router" ) != 0 &&
 				book.compareToIgnoreCase( "private" ) != 0 &&
 				book.compareToIgnoreCase( "published" ) != 0  ))
-			book = "master";
+			book = "router";
 		
 		return book;
 	}
@@ -215,40 +219,49 @@ public class AddressbookBean
 	 *  addressbook.jsp catches the case where the whole book is empty.
 	 */
 	protected String generateLoadMessage() {
-		String message = "";
+		String message;
 		String filterArg = "";
-		if( search != null && search.length() > 0 ) {
-			message = _("Search") + ' ';
-		}
+		int resultCount = resultSize();
 		if( filter != null && filter.length() > 0 ) {
 			if( search != null && search.length() > 0 )
-				message = _("Search within filtered list") + ' ';
+				message = ngettext("One result for search within filtered list.",
+				                   "{0} results for search within filtered list.",
+				                   resultCount);
 			else
-				message = _("Filtered list") + ' ';
+				message = ngettext("Filtered list contains 1 entry.",
+				                   "Fltered list contains {0} entries.",
+				                   resultCount);
 			filterArg = "&amp;filter=" + filter;
-		}
-		if (entries.length == 0) {
-			message += "- " + _("no matches") + '.';
-		} else if (getBeginInt() == 0 && getEndInt() == entries.length - 1) {
-			if (message.length() == 0)
-				message = _("Addressbook") + ' ';
-			if (entries.length <= 0)
-				message += _("contains no entries");
+		} else if( search != null && search.length() > 0 ) {
+			message = ngettext("One result for search.",
+			                   "{0} results for search.",
+			                   resultCount);
+		} else {
+			if (resultCount <= 0)
+				// covered in jsp
+				//message = _("This addressbook is empty.");
+				message = "";
 			else
-				message += _(entries.length, "contains 1 entry", "contains {0} entries");
-			message += '.';
+				message = ngettext("Addressbook contains 1 entry.",
+				                   "Addressbook contains {0} entries.",
+				                   resultCount);
+		}
+		if (resultCount <= 0) {
+			// nothing to display
+		} else if (getBeginInt() == 0 && getEndInt() == resultCount - 1) {
+			// nothing to display
 		} else {
 			if (getBeginInt() > 0) {
 				int newBegin = Math.max(0, getBeginInt() - DISPLAY_SIZE);
 				int newEnd = Math.max(0, getBeginInt() - 1);
-		       		message += "<a href=\"addressbook.jsp?book=" + getBook() + filterArg +
+		       		message += " <a href=\"addressbook.jsp?book=" + getBook() + filterArg +
 				           "&amp;begin=" + newBegin + "&amp;end=" + newEnd + "\">" + newBegin +
 				           '-' + newEnd + "</a> | ";
 	       		}
-			message += _("Showing {0} of {1}", "" + getBegin() + '-' + getEnd(), entries.length);
-			if (getEndInt() < entries.length - 1) {
-				int newBegin = Math.min(entries.length - 1, getEndInt() + 1);
-				int newEnd = Math.min(entries.length, getEndInt() + DISPLAY_SIZE);
+			message += ' ' + _("Showing {0} of {1}", "" + getBegin() + '-' + getEnd(), Integer.valueOf(resultCount));
+			if (getEndInt() < resultCount - 1) {
+				int newBegin = Math.min(resultCount - 1, getEndInt() + 1);
+				int newEnd = Math.min(resultCount, getEndInt() + DISPLAY_SIZE);
 		       		message += " | <a href=\"addressbook.jsp?book=" + getBook() + filterArg +
 				           "&amp;begin=" + newBegin + "&amp;end=" + newEnd + "\">" + newBegin +
 				           '-' + newEnd + "</a>";
@@ -313,7 +326,8 @@ public class AddressbookBean
 						if (deleted == 1)
 							message = _("Destination {0} deleted.", name);
 						else
-							message = _("{0} destinations deleted.", deleted);
+							// parameter will always be >= 2
+							message = ngettext("1 destination deleted.", "{0} destinations deleted.", deleted);
 					}
 				}
 				if( changed ) {
@@ -394,27 +408,74 @@ public class AddressbookBean
 	public void setHostname(String hostname) {
 		this.hostname = DataHelper.stripHTML(hostname).trim();  // XSS
 	}
+
 	protected int getBeginInt() {
-		return Math.max(0, Math.min(entries.length - 1, beginIndex));
+		return Math.max(0, Math.min(resultSize() - 1, beginIndex));
 	}
+
 	public String getBegin() {
 		return "" + getBeginInt();
 	}
+
+	/**
+	 *  @return beginning index into results
+	 *  @since 0.8.6
+	 */
+	public String getResultBegin() {
+		return isPrefiltered() ? "0" : Integer.toString(getBeginInt());
+	}
+
 	public void setBegin(String s) {
 		try {
 			beginIndex = Integer.parseInt(s);
 		} catch (NumberFormatException nfe) {}
 	}
+
 	protected int getEndInt() {
-		return Math.max(0, Math.max(getBeginInt(), Math.min(entries.length - 1, endIndex)));
+		return Math.max(0, Math.max(getBeginInt(), Math.min(resultSize() - 1, endIndex)));
 	}
+
 	public String getEnd() {
 		return "" + getEndInt();
 	}
+
+	/**
+	 *  @return ending index into results
+	 *  @since 0.8.6
+	 */
+	public String getResultEnd() {
+		return Integer.toString(isPrefiltered() ? resultSize() - 1 : getEndInt());
+	}
+
 	public void setEnd(String s) {
 		try {
 			endIndex = Integer.parseInt(s);
 		} catch (NumberFormatException nfe) {}
+	}
+
+	/**
+	 *  Does the entries map contain only the lookup result,
+	 *  or must we index into it?
+	 *  @since 0.8.6
+	 */
+	protected boolean isPrefiltered() {
+		return false;
+	}
+
+	/**
+	 *  @return the size of the lookup result
+	 *  @since 0.8.6
+	 */
+	protected int resultSize() {
+		return entries.length;
+	}
+
+	/**
+	 *  @return the total size of the address book
+	 *  @since 0.8.6
+	 */
+	protected int totalSize() {
+		return entries.length;
 	}
 
 	/** translate */
@@ -433,7 +494,7 @@ public class AddressbookBean
 	}
 
 	/** translate (ngettext) @since 0.8.6 */
-	protected static String _(int n, String s, String p) {
+	protected static String ngettext(String s, String p, int n) {
 		return Messages.getString(n, s, p);
 	}
 }

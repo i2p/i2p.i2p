@@ -144,7 +144,7 @@ ${book.loadBookMessages}
 <th><%=intl._("Destination")%></th>
 </tr>
 <!-- limit iterator, or "Form too large" may result on submit, and is a huge web page if we don't -->
-<c:forEach items="${book.entries}" var="addr" begin="${book.begin}" end="${book.end}">
+<c:forEach items="${book.entries}" var="addr" begin="${book.resultBegin}" end="${book.resultEnd}">
 <tr class="list${book.trClass}">
 <c:if test="${book.master || book.router || book.published || book.private}">
 <td class="checkbox"><input type="checkbox" name="checked" value="${addr.name}" title="<%=intl._("Mark for deletion")%>"></td>
