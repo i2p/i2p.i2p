@@ -31,6 +31,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.util.Log;
+import net.i2p.util.SecureFileOutputStream;
 
 import net.metanotion.io.Serializer;
 import net.metanotion.io.block.BlockFile;
@@ -81,10 +82,6 @@ public class BlockfileNamingService extends DummyNamingService {
     private static final Serializer _destSerializer = new DestEntrySerializer();
 
     private static final String HOSTS_DB = "hostsdb.blockfile";
-    private static final String PROP_HOSTS_FILE = "i2p.hostsfilelist";
-    private static final String PROP_B32 = "i2p.naming.hostsTxt.useB32";
-    private static final String DEFAULT_HOSTS_FILE = 
-        "privatehosts.txt,userhosts.txt,hosts.txt";
     private static final String FALLBACK_LIST = "hosts.txt";
 
     private static final String INFO_SKIPLIST = "%%__INFO__%%";
@@ -130,6 +127,7 @@ public class BlockfileNamingService extends DummyNamingService {
                 // closing a BlockFile does not close the underlying file,
                 // so we must create and retain a RAF so we may close it later
                 raf = new RandomAccessFile(f, "rw");
+                SecureFileOutputStream.setPerms(f);
                 bf = init(raf);
             } catch (IOException ioe) {
                 if (raf != null) {
@@ -157,7 +155,8 @@ public class BlockfileNamingService extends DummyNamingService {
             Properties info = new Properties();
             info.setProperty(PROP_VERSION, VERSION);
             info.setProperty(PROP_CREATED, Long.toString(_context.clock().now()));
-            String list = _context.getProperty(PROP_HOSTS_FILE, DEFAULT_HOSTS_FILE);
+            String list = _context.getProperty(HostsTxtNamingService.PROP_HOSTS_FILE,
+                                               HostsTxtNamingService.DEFAULT_HOSTS_FILE);
             info.setProperty(PROP_LISTS, list);
             hdr.put(PROP_INFO, info);
 
