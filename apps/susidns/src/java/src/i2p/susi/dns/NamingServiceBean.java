@@ -222,6 +222,7 @@ public class NamingServiceBean extends AddressbookBean
 						} else {
 							try {
 								Destination dest = new Destination(destination);
+					                        nsOptions.setProperty("s", _("Manually added via SusiDNS"));
 								boolean success = getNamingService().put(hostname, dest, nsOptions);
 								if (success) {
 									changed = true;

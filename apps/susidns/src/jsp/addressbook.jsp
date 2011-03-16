@@ -141,6 +141,7 @@ ${book.loadBookMessages}
 </c:if>
 
 <th><%=intl._("Name")%></th>
+<th><%=intl._("Links")%></th>
 <th><%=intl._("Destination")%></th>
 </tr>
 <!-- limit iterator, or "Form too large" may result on submit, and is a huge web page if we don't -->
@@ -149,8 +150,10 @@ ${book.loadBookMessages}
 <c:if test="${book.master || book.router || book.published || book.private}">
 <td class="checkbox"><input type="checkbox" name="checked" value="${addr.name}" title="<%=intl._("Mark for deletion")%>"></td>
 </c:if>
-<td class="names"><a href="http://${addr.name}/">${addr.name}</a> -
-<span class="addrhlpr">(<a href="http://${addr.name}/?i2paddresshelper=${addr.destination}"><%=intl._("address helper link")%></a>)</span>
+<td class="names"><a href="http://${addr.name}/">${addr.name}</a>
+</td><td class="names">
+<span class="addrhlpr">(<a href="http://${addr.b32}/">b32</a>)</span>
+<span class="addrhlpr">(<a href="http://${addr.name}/?i2paddresshelper=${addr.destination}"><%=intl._("helper")%></a>)</span>
 </td>
 <td class="destinations"><textarea rows="1" style="height: 3em;" cols="40" wrap="off" readonly="readonly" name="dest_${addr.name}" >${addr.destination}</textarea></td>
 </tr>
