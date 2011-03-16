@@ -28,7 +28,7 @@ import net.i2p.util.Log;
  */
 public abstract class NamingService {
 
-    private final static Log _log = new Log(NamingService.class);
+    protected final Log _log;
     protected final I2PAppContext _context;
     protected final Set<NamingServiceListener> _listeners;
     protected final Set<NamingServiceUpdater> _updaters;
@@ -45,6 +45,7 @@ public abstract class NamingService {
      */
     protected NamingService(I2PAppContext context) {
         _context = context;
+        _log = context.logManager().getLog(getClass());
         _listeners = new CopyOnWriteArraySet();
         _updaters = new CopyOnWriteArraySet();
     }
@@ -430,7 +431,8 @@ public abstract class NamingService {
             Constructor con = cls.getConstructor(new Class[] { I2PAppContext.class });
             instance = (NamingService)con.newInstance(new Object[] { context });
         } catch (Exception ex) {
-            _log.error("Cannot load naming service " + impl, ex);
+            Log log = context.logManager().getLog(NamingService.class);
+            log.error("Cannot load naming service " + impl, ex);
             instance = new DummyNamingService(context); // fallback
         }
         return instance;

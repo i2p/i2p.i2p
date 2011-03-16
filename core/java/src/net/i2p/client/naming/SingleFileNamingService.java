@@ -50,13 +50,13 @@ import net.i2p.util.SecureFileOutputStream;
  */
 public class SingleFileNamingService extends NamingService {
 
-    private final static Log _log = new Log(SingleFileNamingService.class);
     private final File _file;
     private final ReentrantReadWriteLock _fileLock;
     /** cached number of entries */
     private int _size;
     /** last write time */
     private long _lastWrite;
+    private volatile boolean _isClosed;
 
     public SingleFileNamingService(I2PAppContext context, String filename) {
         super(context);
@@ -171,6 +171,8 @@ public class SingleFileNamingService extends NamingService {
         BufferedReader in = null;
         BufferedWriter out = null;
         try {
+            if (_isClosed)
+                return false;
             File tmp = SecureFile.createTempFile("temp-", ".tmp", _file.getAbsoluteFile().getParentFile());
             out = new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(tmp), "UTF-8"));
             if (_file.exists()) {
@@ -211,10 +213,12 @@ public class SingleFileNamingService extends NamingService {
      */
     @Override
     public boolean putIfAbsent(String hostname, Destination d, Properties options) {
+        OutputStream out = null;
         if (!getWriteLock())
             return false;
-        OutputStream out = null;
         try {
+            if (_isClosed)
+                return false;
             // simply check if present, and if not, append
             try {
                 if (getKey(hostname) != null)
@@ -250,13 +254,15 @@ public class SingleFileNamingService extends NamingService {
      */
     @Override
     public boolean remove(String hostname, Properties options) {
-        if (!getWriteLock())
-            return false;
-        if (!_file.exists())
-            return false;
         BufferedReader in = null;
         BufferedWriter out = null;
+        if (!getWriteLock())
+            return false;
         try {
+            if (!_file.exists())
+                return false;
+            if (_isClosed)
+                return false;
             in = new BufferedReader(new InputStreamReader(new FileInputStream(_file), "UTF-8"), 16*1024);
             File tmp = SecureFile.createTempFile("temp-", ".tmp", _file.getAbsoluteFile().getParentFile());
             out = new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(tmp), "UTF-8"));
@@ -388,6 +394,16 @@ public class SingleFileNamingService extends NamingService {
         } finally {
             if (in != null) try { in.close(); } catch (IOException ioe) {}
             releaseReadLock();
+        }
+    }
+
+    public void shutdown() {
+        if (!getWriteLock())
+            return;
+        try {
+            _isClosed = true;
+        } finally {
+            releaseWriteLock();
         }
     }
 

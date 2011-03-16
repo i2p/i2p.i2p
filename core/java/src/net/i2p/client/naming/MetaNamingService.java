@@ -90,6 +90,7 @@ public class MetaNamingService extends DummyNamingService {
 
     @Override
     public Destination lookup(String hostname, Properties lookupOptions, Properties storedOptions) {
+        // cache check is in super()
         Destination d = super.lookup(hostname, null, null);
         if (d != null)
             return d;
@@ -136,7 +137,10 @@ public class MetaNamingService extends DummyNamingService {
     public boolean putIfAbsent(String hostname, Destination d, Properties options) {
         if (_services.isEmpty())
             return false;
-        return _services.get(_services.size() - 1).putIfAbsent(hostname, d, options);
+        boolean rv = _services.get(_services.size() - 1).putIfAbsent(hostname, d, options);
+        if (rv)
+            putCache(hostname, d);
+        return rv;
     }
 
     /**

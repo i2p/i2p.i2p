@@ -71,7 +71,6 @@ import net.metanotion.util.skiplist.SkipList;
  */
 public class BlockfileNamingService extends DummyNamingService {
 
-    private final Log _log;
     private final BlockFile _bf;
     private final RandomAccessFile _raf;
     private final List<String> _lists;
@@ -104,7 +103,6 @@ public class BlockfileNamingService extends DummyNamingService {
      */
     public BlockfileNamingService(I2PAppContext context) {
         super(context);
-        _log = context.logManager().getLog(BlockfileNamingService.class);
         _lists = new ArrayList();
         BlockFile bf = null;
         RandomAccessFile raf = null;
@@ -199,10 +197,11 @@ public class BlockfileNamingService extends DummyNamingService {
                     if (in != null) try { in.close(); } catch (IOException ioe) {}
                 }
                 total += count;
-                _log.logAlways(Log.INFO, "Added " + count + " hosts from " + file);
+                _log.logAlways(Log.INFO, "Migrating " + count + " hosts from " + file + " to new hosts database");
                 _lists.add(hostsfile);
             }
-            _log.error("DB init took " + DataHelper.formatDuration(_context.clock().now() - start));
+            if (_log.shouldLog(Log.INFO))
+                _log.info("DB init took " + DataHelper.formatDuration(_context.clock().now() - start));
             if (total <= 0)
                 _log.error("Warning - initialized database with zero entries");
             return rv;
@@ -239,8 +238,9 @@ public class BlockfileNamingService extends DummyNamingService {
                     createdOn = Long.parseLong(created);
                 } catch (NumberFormatException nfe) {}
             }
-            _log.error("Found database version " + version + " created " + (new Date(createdOn)).toString() +
-                       " containing lists: " + list);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Found database version " + version + " created " + (new Date(createdOn)).toString() +
+                          " containing lists: " + list);
 
             List<String> skiplists = getFilenames(list);
             if (skiplists.isEmpty())
@@ -422,6 +422,8 @@ public class BlockfileNamingService extends DummyNamingService {
                 if (changed && checkExisting)
                         return false;
                 addEntry(sl, key, d, props);
+                if (changed)
+                    removeCache(hostname);
                 for (NamingServiceListener nsl : _listeners) { 
                     if (changed)
                         nsl.entryChanged(this, hostname, d, options);
@@ -460,6 +462,7 @@ public class BlockfileNamingService extends DummyNamingService {
                     return false;
                 boolean rv = removeEntry(sl, key) != null;
                 if (rv) {
+                    removeCache(hostname);
                     for (NamingServiceListener nsl : _listeners) { 
                         nsl.entryRemoved(this, key);
                     }

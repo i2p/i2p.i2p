@@ -48,7 +48,6 @@ public class ExecNamingService extends DummyNamingService {
     private final static String DEFAULT_EXEC_CMD = "/usr/local/bin/i2presolve";
     private final static String PROP_SHELL_CMD = "i2p.naming.exec.shell";
     private final static String DEFAULT_SHELL_CMD = "/bin/bash";
-    private final static Log _log = new Log(ExecNamingService.class);
 
     /** 
      * The naming service should only be constructed and accessed through the 

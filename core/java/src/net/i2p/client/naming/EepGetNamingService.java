@@ -39,7 +39,6 @@ public class EepGetNamingService extends DummyNamingService {
 
     private final static String PROP_EEPGET_LIST = "i2p.naming.eepget.list";
     private final static String DEFAULT_EEPGET_LIST = "http://i2host.i2p/cgi-bin/i2hostquery?";
-    private final static Log _log = new Log(EepGetNamingService.class);
 
     /** 
      * The naming service should only be constructed and accessed through the 
