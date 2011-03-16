@@ -335,7 +335,7 @@ public class SingleFileNamingService extends NamingService {
                 int split = line.indexOf('=');
                 if (split <= 0)
                     continue;
-                String key = line.substring(split);
+                String key = line.substring(0, split);
                 if (searchOpt != null && key.indexOf(searchOpt) < 0)
                     continue;
                 String b64 = line.substring(split+1);   //.trim() ??????????????

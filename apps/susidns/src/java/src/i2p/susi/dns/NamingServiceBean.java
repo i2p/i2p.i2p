@@ -55,8 +55,8 @@ public class NamingServiceBean extends AddressbookBean
 		if (isDirect())
 			return super.isPrefiltered();
 		return (search == null || search.length() <= 0) &&
-		       (filter == null || filter.length() <= 0);
-		// and right naming service...
+		       (filter == null || filter.length() <= 0) &&
+		       getNamingService().getName().equals(DEFAULT_NS);
 	}
 
 	@Override
@@ -91,17 +91,14 @@ public class NamingServiceBean extends AddressbookBean
 			return super.getFileName();
 		loadConfig();
 		String filename = properties.getProperty( getBook() + "_addressbook" );
-		int slash = filename.lastIndexOf('/');
-		if (slash >= 0)
-			filename = filename.substring(slash + 1);
-		return filename;
+		return basename(filename);
 	}
 
 	/** depth-first search */
 	private static NamingService searchNamingService(NamingService ns, String srch)
 	{
 		String name = ns.getName();
-		if (name == srch || name == DEFAULT_NS)
+		if (name.equals(srch) || basename(name).equals(srch) || name.equals(DEFAULT_NS))
 			return ns;
 		List<NamingService> list = ns.getNamingServices();
 		if (list != null) {
@@ -112,6 +109,13 @@ public class NamingServiceBean extends AddressbookBean
 			}
 		}
 		return null;		
+	}
+
+	private static String basename(String filename) {
+		int slash = filename.lastIndexOf('/');
+		if (slash >= 0)
+			filename = filename.substring(slash + 1);
+		return filename;
 	}
 
 	/** @return the NamingService for the current file name, or the root NamingService */
