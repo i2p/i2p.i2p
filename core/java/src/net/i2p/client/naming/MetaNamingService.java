@@ -179,4 +179,10 @@ public class MetaNamingService extends DummyNamingService {
         }
         return rv;
     }
+
+    public void shutdown() {
+        for (NamingService ns : _services) { 
+            ns.shutdown();
+        }
+    }
 }

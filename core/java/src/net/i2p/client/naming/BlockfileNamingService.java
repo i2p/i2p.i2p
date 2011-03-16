@@ -412,6 +412,8 @@ public class BlockfileNamingService extends DummyNamingService {
         }
         props.setProperty(PROP_ADDED, Long.toString(_context.clock().now()));
         synchronized(_bf) {
+            if (_isClosed)
+                return false;
             try {
                 SkipList sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
                 if (sl == null)
@@ -450,6 +452,8 @@ public class BlockfileNamingService extends DummyNamingService {
             }
         }
         synchronized(_bf) {
+            if (_isClosed)
+                return false;
             try {
                 SkipList sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
                 if (sl == null)
@@ -518,6 +522,8 @@ public class BlockfileNamingService extends DummyNamingService {
                        " starting with " + startsWith + " search string " + search +
                        " limit=" + limit + " skip=" + skip);
         synchronized(_bf) {
+            if (_isClosed)
+                return Collections.EMPTY_MAP;
             try {
                 SkipList sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
                 if (sl == null) {
@@ -575,6 +581,8 @@ public class BlockfileNamingService extends DummyNamingService {
             }
         }
         synchronized(_bf) {
+            if (_isClosed)
+                return 0;
             try {
                 SkipList sl = _bf.getIndex(listname, _stringSerializer, _destSerializer);
                 if (sl == null)
@@ -588,6 +596,10 @@ public class BlockfileNamingService extends DummyNamingService {
                 return 0;
             }
         }
+    }
+
+    public void shutdown() {
+        close();
     }
 
     ////////// End NamingService API
@@ -619,7 +631,7 @@ public class BlockfileNamingService extends DummyNamingService {
         }
     }
 
-    public void close() {
+    private void close() {
         synchronized(_bf) {
             try {
                 _bf.close();

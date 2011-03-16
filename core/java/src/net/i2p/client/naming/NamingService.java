@@ -412,7 +412,7 @@ public abstract class NamingService {
      *  Should not be called by others.
      *  @since 0.8.5
      */
-    public void stop() {}
+    public void shutdown() {}
 
     //// End New API
 
