@@ -310,21 +310,22 @@ public class SingleFileNamingService extends NamingService {
             searchOpt = options.getProperty("search");
             startsWith = options.getProperty("startsWith");
         }
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Searching " + " starting with " + startsWith + " search string " + searchOpt);
         BufferedReader in = null;
         getReadLock();
         try {
             in = new BufferedReader(new InputStreamReader(new FileInputStream(_file), "UTF-8"), 16*1024);
             String line = null;
-            String search = startsWith  == null ? null : startsWith + '=';
             Map<String, Destination> rv = new HashMap();
             while ( (line = in.readLine()) != null) {
                 if (line.length() <= 0)
                     continue;
-                if (search != null) {
+                if (startsWith != null) {
                     if (startsWith.equals("[0-9]")) {
                         if (line.charAt(0) < '0' || line.charAt(0) > '9')
                             continue;
-                    } else if (!line.startsWith(search)) {
+                    } else if (!line.startsWith(startsWith)) {
                         continue;
                     }
                 }
