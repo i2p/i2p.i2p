@@ -1,5 +1,6 @@
 package net.i2p.router.web;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -9,12 +10,15 @@ import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.stat.RateSummaryListener;
 import net.i2p.util.Log;
+import net.i2p.util.SecureFile;
+import net.i2p.util.SecureFileOutputStream;
 
 import org.jrobin.core.RrdBackendFactory;
 import org.jrobin.core.RrdDb;
 import org.jrobin.core.RrdDef;
 import org.jrobin.core.RrdException;
 import org.jrobin.core.RrdMemoryBackendFactory;
+import org.jrobin.core.RrdNioBackendFactory;
 import org.jrobin.core.Sample;
 import org.jrobin.graph.RrdGraph;
 import org.jrobin.graph.RrdGraphDef;
@@ -27,9 +31,16 @@ import org.jrobin.graph.RrdGraphDefTemplate;
  *  @since 0.6.1.13
  */
 class SummaryListener implements RateSummaryListener {
+    private static final String PROP_PERSISTENT = "routerconsole.graphPersistent";
+    /** note that .jrb files are NOT compatible with .rrd files */
+    private static final String RRD_DIR = "rrd";
+    private static final String RRD_PREFIX = "rrd-";
+    private static final String RRD_SUFFIX = ".jrb";
+
     private final I2PAppContext _context;
     private final Log _log;
     private final Rate _rate;
+    private final boolean _isPersistent;
     private String _name;
     private String _eventName;
     private RrdDb _db;
@@ -39,18 +50,11 @@ class SummaryListener implements RateSummaryListener {
     
     static final int PERIODS = 1440;
     
-    static {
-        try {
-            RrdBackendFactory.setDefaultFactory("MEMORY");
-        } catch (RrdException re) {
-            re.printStackTrace();
-        }
-    }
-    
     public SummaryListener(Rate r) {
         _context = I2PAppContext.getGlobalContext();
         _rate = r;
         _log = _context.logManager().getLog(SummaryListener.class);
+        _isPersistent = _context.getBooleanProperty(PROP_PERSISTENT);
     }
     
     public void add(double totalValue, long eventCount, double totalEventTime, long period) {
@@ -99,24 +103,44 @@ class SummaryListener implements RateSummaryListener {
         _name = createName(_context, baseName);
         _eventName = createName(_context, baseName + ".events");
         try {
-            RrdDef def = new RrdDef(_name, now()/1000, period/1000);
-            // for info on the heartbeat, xff, steps, etc, see the rrdcreate man page, aka
-            // http://www.jrobin.org/support/man/rrdcreate.html
-            long heartbeat = period*10/1000;
-            def.addDatasource(_name, "GAUGE", heartbeat, Double.NaN, Double.NaN);
-            def.addDatasource(_eventName, "GAUGE", heartbeat, 0, Double.NaN);
-            double xff = 0.9;
-            int steps = 1;
-            int rows = PERIODS;
-            def.addArchive("AVERAGE", xff, steps, rows);
-            _factory = (RrdMemoryBackendFactory)RrdBackendFactory.getDefaultFactory();
-            _db = new RrdDb(def, _factory);
+            RrdBackendFactory factory = RrdBackendFactory.getFactory(getBackendName());
+            String rrdDefName;
+            if (_isPersistent) {
+                // generate full path for persistent RRD files
+                File rrdDir = new SecureFile(_context.getRouterDir(), RRD_DIR);
+                File rrdFile = new File(rrdDir, RRD_PREFIX + _name + RRD_SUFFIX);
+                rrdDefName = rrdFile.getAbsolutePath();
+                if (rrdFile.exists()) {
+                    _db = new RrdDb(rrdDefName, factory);
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Existing RRD " + baseName + " (" + rrdDefName + ") consuming " + _db.getRrdBackend().getLength() + " bytes");
+                } else {
+                    rrdDir.mkdir();
+                }
+            } else {
+                rrdDefName = _name;
+            }
+            if (_db == null) {
+                // not persistent or not previously existing
+                RrdDef def = new RrdDef(rrdDefName, now()/1000, period/1000);
+                // for info on the heartbeat, xff, steps, etc, see the rrdcreate man page, aka
+                // http://www.jrobin.org/support/man/rrdcreate.html
+                long heartbeat = period*10/1000;
+                def.addDatasource(_name, "GAUGE", heartbeat, Double.NaN, Double.NaN);
+                def.addDatasource(_eventName, "GAUGE", heartbeat, 0, Double.NaN);
+                double xff = 0.9;
+                int steps = 1;
+                int rows = PERIODS;
+                def.addArchive("AVERAGE", xff, steps, rows);
+                _db = new RrdDb(def, factory);
+                if (_isPersistent)
+                    SecureFileOutputStream.setPerms(new File(rrdDefName));
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("New RRD " + baseName + " (" + rrdDefName + ") consuming " + _db.getRrdBackend().getLength() + " bytes");
+            }
             _sample = _db.createSample();
             _renderer = new SummaryRenderer(_context, this);
             _rate.setSummaryListener(this);
-            // Typical usage is 23456 bytes ~= 1440 * 16
-            if (_log.shouldLog(Log.INFO))
-                _log.info("New RRD " + baseName + " consuming " + _db.getRrdBackend().getLength() + " bytes");
         } catch (RrdException re) {
             _log.error("Error starting", re);
         } catch (IOException ioe) {
@@ -132,7 +156,12 @@ class SummaryListener implements RateSummaryListener {
             _log.error("Error closing", ioe);
         }
         _rate.setSummaryListener(null);
-        _factory.delete(_db.getPath());
+        if (!_isPersistent) {
+            // close() does not release resources for memory backend
+            try {
+                ((RrdMemoryBackendFactory)RrdBackendFactory.getFactory(RrdMemoryBackendFactory.NAME)).delete(_db.getPath());
+            } catch (RrdException re) {}
+        }
         _db = null;
     }
 
@@ -150,6 +179,11 @@ class SummaryListener implements RateSummaryListener {
 
     long now() { return _context.clock().now(); }
     
+    /** @since 0.8.6 */
+    String getBackendName() {
+        return _isPersistent ? RrdNioBackendFactory.NAME : RrdMemoryBackendFactory.NAME;
+    }
+
     @Override
     public boolean equals(Object obj) {
         return ((obj instanceof SummaryListener) && ((SummaryListener)obj)._rate.equals(_rate));

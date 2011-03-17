@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Semaphore;
 
 import javax.imageio.ImageIO;
@@ -44,20 +45,24 @@ public class StatSummarizer implements Runnable {
     private static StatSummarizer _instance;
     private static final int MAX_CONCURRENT_PNG = 3;
     private final Semaphore _sem;
+    private volatile boolean _isRunning = true;
+    private Thread _thread;
     
     public StatSummarizer() {
         _context = (RouterContext)RouterContext.listContexts().get(0); // fuck it, only summarize one per jvm
         _log = _context.logManager().getLog(getClass());
-        _listeners = new ArrayList(16);
+        _listeners = new CopyOnWriteArrayList();
         _instance = this;
         _sem = new Semaphore(MAX_CONCURRENT_PNG, true);
+        _context.addShutdownTask(new Shutdown());
     }
     
     public static StatSummarizer instance() { return _instance; }
     
     public void run() {
+        _thread = Thread.currentThread();
         String specs = "";
-        while (_context.router().isAlive()) {
+        while (_isRunning && _context.router().isAlive()) {
             specs = adjustDatabases(specs);
             try { Thread.sleep(60*1000); } catch (InterruptedException ie) {}
         }
@@ -236,6 +241,20 @@ public class StatSummarizer implements Runnable {
     private boolean locked_renderRatePng(OutputStream out, int width, int height, boolean hideLegend,
                                               boolean hideGrid, boolean hideTitle, boolean showEvents,
                                               int periodCount, boolean showCredit) throws IOException {
+
+        // go to some trouble to see if we have the data for the combined bw graph
+        SummaryListener txLsnr = null;
+        SummaryListener rxLsnr = null;
+        for (SummaryListener lsnr : StatSummarizer.instance().getListeners()) {
+            String title = lsnr.getRate().getRateStat().getName();
+            if (title.equals("bw.sendRate"))
+                txLsnr = lsnr;
+            else if (title.equals("bw.recvRate"))
+                rxLsnr = lsnr;
+        }
+        if (txLsnr == null || rxLsnr == null)
+            throw new IOException("no rates for combined graph");
+
         long end = _context.clock().now() - 60*1000;
         if (width > GraphHelper.MAX_X)
             width = GraphHelper.MAX_X;
@@ -260,10 +279,13 @@ public class StatSummarizer implements Runnable {
             String title = _("Bandwidth usage");
             if (!hideTitle)
                 def.setTitle(title);
+            long started = _context.router().getWhenStarted();
+            if (started > start && started < end)
+                def.vrule(started / 1000, Color.BLACK, null, 4.0f);  // no room for legend
             String sendName = SummaryListener.createName(_context, "bw.sendRate.60000");
             String recvName = SummaryListener.createName(_context, "bw.recvRate.60000");
-            def.datasource(sendName, sendName, sendName, "AVERAGE", "MEMORY");
-            def.datasource(recvName, recvName, recvName, "AVERAGE", "MEMORY");
+            def.datasource(sendName, txLsnr.getData().getPath(), sendName, "AVERAGE", txLsnr.getBackendName());
+            def.datasource(recvName, rxLsnr.getData().getPath(), recvName, "AVERAGE", rxLsnr.getBackendName());
             def.area(sendName, Color.BLUE, _("Outbound Bytes/sec"));
             //def.line(sendName, Color.BLUE, "Outbound bytes/sec", 3);
             def.line(recvName, Color.RED, _("Inbound Bytes/sec") + "\\r", 3);
@@ -271,7 +293,7 @@ public class StatSummarizer implements Runnable {
             if (!hideLegend) {
                 def.gprint(sendName, "AVERAGE", _("Out average") + ": %.2f %s" + _("Bps"));
                 def.gprint(sendName, "MAX", ' ' + _("max") + ": %.2f %S" + _("Bps") + "\\r");
-                def.gprint(recvName, "AVERAGE", _("In average") + ":  %.2f %S" + _("Bps"));
+                def.gprint(recvName, "AVERAGE", _("In average") + ": %.2f %S" + _("Bps"));
                 def.gprint(recvName, "MAX", ' ' + _("max") + ": %.2f %S" + _("Bps") + "\\r");
             }
             if (!showCredit)
@@ -347,8 +369,25 @@ public class StatSummarizer implements Runnable {
     /** translate a string */
     private String _(String s) {
         // the RRD font doesn't have zh chars, at least on my system
-        if ("zh".equals(Messages.getLanguage(_context)))
-            return s;
+        // Works on 1.5.9
+        //if ("zh".equals(Messages.getLanguage(_context)))
+        //    return s;
         return Messages.getString(s, _context);
+    }
+
+    /**
+     *  Make sure any persistent RRDs are closed
+     *  @since 0.8.6
+     */
+    private class Shutdown implements Runnable {
+        public void run() {
+            _isRunning = false;
+            if (_thread != null)
+                _thread.interrupt();
+            for (SummaryListener lsnr : _listeners) {
+                lsnr.stopListening();
+            }
+            _listeners.clear();
+        }
     }
 }

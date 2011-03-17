@@ -13,6 +13,7 @@ import javax.imageio.stream.MemoryCacheImageOutputStream;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
+import net.i2p.router.RouterContext;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.stat.RateSummaryListener;
@@ -130,7 +131,10 @@ class SummaryRenderer {
                 // Strings.java
                 descr = _(_listener.getRate().getRateStat().getDescription());
             }
-            def.datasource(plotName, path, plotName, "AVERAGE", "MEMORY");
+            long started = ((RouterContext)_context).router().getWhenStarted();
+            if (started > start && started < end)
+                def.vrule(started / 1000, Color.BLACK, _("Restart"), 4.0f);
+            def.datasource(plotName, path, plotName, "AVERAGE", _listener.getBackendName());
             def.area(plotName, Color.BLUE, descr + "\\r");
             if (!hideLegend) {
                 def.gprint(plotName, "AVERAGE", _("avg") + ": %.2f %s");
@@ -189,8 +193,9 @@ class SummaryRenderer {
     /** translate a string */
     private String _(String s) {
         // the RRD font doesn't have zh chars, at least on my system
-        if ("zh".equals(Messages.getLanguage(_context)))
-            return s;
+        // Works on 1.5.9
+        //if ("zh".equals(Messages.getLanguage(_context)))
+        //  return s;
         return Messages.getString(s, _context);
     }
 
@@ -199,8 +204,9 @@ class SummaryRenderer {
      */
     private String _(String s, String o) {
         // the RRD font doesn't have zh chars, at least on my system
-        if ("zh".equals(Messages.getLanguage(_context)))
-            return s.replace("{0}", o);
+        // Works on 1.5.9
+        //if ("zh".equals(Messages.getLanguage(_context)))
+        //  return s.replace("{0}", o);
         return Messages.getString(s, o, _context);
     }
 }
