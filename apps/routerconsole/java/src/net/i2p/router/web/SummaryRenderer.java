@@ -1,8 +1,15 @@
 package net.i2p.router.web;
 
 import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
+
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageOutputStream;
+import javax.imageio.stream.MemoryCacheImageOutputStream;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
@@ -38,6 +45,7 @@ class SummaryRenderer {
      * DOM level 3 load and store support.  Perhaps we can bundle that, or
      * specify who can get it from where, etc.
      *
+     * @deprecated unsed
      */
     public static synchronized void render(I2PAppContext ctx, OutputStream out, String filename) throws IOException {
         long end = ctx.clock().now() - 60*1000;
@@ -45,10 +53,21 @@ class SummaryRenderer {
         try {
             RrdGraphDefTemplate template = new RrdGraphDefTemplate(filename);
             RrdGraphDef def = template.getRrdGraphDef();
-            def.setTimePeriod(start/1000, end/1000); // ignore the periods in the template
+            def.setTimeSpan(start/1000, end/1000); // ignore the periods in the template
+            // FIXME not clear how to get the height and width from the template
+            int width = GraphHelper.DEFAULT_X;
+            int height = GraphHelper.DEFAULT_Y;
+            def.setWidth(width);
+            def.setHeight(height);
+
             RrdGraph graph = new RrdGraph(def);
-            byte img[] = graph.getPNGBytes();
-            out.write(img);
+            int totalWidth = graph.getRrdGraphInfo().getWidth();
+            int totalHeight = graph.getRrdGraphInfo().getHeight();
+            BufferedImage img = new BufferedImage(totalWidth, totalHeight, BufferedImage.TYPE_USHORT_565_RGB);
+            Graphics gfx = img.getGraphics();
+            graph.render(gfx);
+            ImageOutputStream ios = new MemoryCacheImageOutputStream(out);
+            ImageIO.write(img, "png", ios);
         } catch (RrdException re) {
             //_log.error("Error rendering " + filename, re);
             throw new IOException("Error plotting: " + re.getMessage());
@@ -58,7 +77,8 @@ class SummaryRenderer {
         }
     }
 
-    public void render(OutputStream out) throws IOException { render(out, -1, -1, false, false, false, false, -1, false); }
+    public void render(OutputStream out) throws IOException { render(out, GraphHelper.DEFAULT_X, GraphHelper.DEFAULT_Y,
+                                                                     false, false, false, false, -1, false); }
 
     public void render(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount, boolean showCredit) throws IOException {
         long end = _listener.now() - 60*1000;
@@ -69,13 +89,13 @@ class SummaryRenderer {
         //long begin = System.currentTimeMillis();
         try {
             RrdGraphDef def = new RrdGraphDef();
-            def.setTimePeriod(start/1000, 0);
-            def.setLowerLimit(0d);
+            def.setTimeSpan(start/1000, end/1000);
+            def.setMinValue(0d);
             String name = _listener.getRate().getRateStat().getName();
             // heuristic to set K=1024
             if ((name.startsWith("bw.") || name.indexOf("Size") >= 0 || name.indexOf("Bps") >= 0 || name.indexOf("memory") >= 0)
                 && !showEvents)
-                def.setBaseValue(1024);
+                def.setBase(1024);
             if (!hideTitle) {
                 String title;
                 String p;
@@ -109,11 +129,11 @@ class SummaryRenderer {
                 descr = _(_listener.getRate().getRateStat().getDescription());
             }
             def.datasource(plotName, path, plotName, "AVERAGE", "MEMORY");
-            def.area(plotName, Color.BLUE, descr + "@r");
+            def.area(plotName, Color.BLUE, descr + "\\r");
             if (!hideLegend) {
-                def.gprint(plotName, "AVERAGE", _("avg") + ": @2@s");
-                def.gprint(plotName, "MAX", ' ' + _("max") + ": @2@s");
-                def.gprint(plotName, "LAST", ' ' + _("now") + ": @2@s@r");
+                def.gprint(plotName, "AVERAGE", _("avg") + ": %.2f %s");
+                def.gprint(plotName, "MAX", ' ' + _("max") + ": %.2f %S");
+                def.gprint(plotName, "LAST", ' ' + _("now") + ": %.2f %S\\r");
             }
             if (!showCredit)
                 def.setShowSignature(false);
@@ -126,24 +146,28 @@ class SummaryRenderer {
                 def.line(dsNames[1], Color.RED, "Events per period");
             */
             if (hideLegend) 
-                def.setShowLegend(false);
+                def.setNoLegend(true);
             if (hideGrid) {
-                def.setGridX(false);
-                def.setGridY(false);
+                def.setDrawXGrid(false);
+                def.setDrawYGrid(false);
             }
             //System.out.println("rendering: path=" + path + " dsNames[0]=" + dsNames[0] + " dsNames[1]=" + dsNames[1] + " lsnr.getName=" + _listener.getName());
             def.setAntiAliasing(false);
             //System.out.println("Rendering: \n" + def.exportXmlTemplate());
             //System.out.println("*****************\nData: \n" + _listener.getData().dump());
+            def.setWidth(width);
+            def.setHeight(height);
+
             RrdGraph graph = new RrdGraph(def);
+            int totalWidth = graph.getRrdGraphInfo().getWidth();
+            int totalHeight = graph.getRrdGraphInfo().getHeight();
+            BufferedImage img = new BufferedImage(totalWidth, totalHeight, BufferedImage.TYPE_USHORT_565_RGB);
+            Graphics gfx = img.getGraphics();
+            graph.render(gfx);
+            ImageOutputStream ios = new MemoryCacheImageOutputStream(out);
+            ImageIO.write(img, "png", ios);
             //System.out.println("Graph created");
-            byte data[] = null;
-            if ( (width <= 0) || (height <= 0) )
-                data = graph.getPNGBytes();
-            else
-                data = graph.getPNGBytes(width, height);
-            //long timeToPlot = System.currentTimeMillis() - begin;
-            out.write(data);
+
             //File t = File.createTempFile("jrobinData", ".xml");
             //_listener.getData().dumpXml(new FileOutputStream(t));
             //System.out.println("plotted: " + (data != null ? data.length : 0) + " bytes in " + timeToPlot

@@ -26,7 +26,7 @@
                 <pathelement location="../../systray/java/lib/systray4j.jar" />
                 <pathelement location="../../desktopgui/build" />
                 <pathelement location="../../../installer/lib/wrapper/win32/wrapper.jar" /> <!-- we dont care if we're not on win32 -->
-                <pathelement location="../../jrobin/jrobin-1.4.0.jar" />
+                <pathelement location="../../jrobin/jrobin-1.5.9.jar" />
             </classpath>
         </depend>
     </target>
@@ -58,7 +58,7 @@
                 <pathelement location="../../systray/java/lib/systray4j.jar" />
                 <pathelement location="../../desktopgui/dist/desktopgui.jar" />
                 <pathelement location="../../../installer/lib/wrapper/win32/wrapper.jar" /> <!-- we dont care if we're not on win32 -->
-                <pathelement location="../../jrobin/jrobin-1.4.0.jar" />
+                <pathelement location="../../jrobin/jrobin-1.5.9.jar" />
             </classpath>
         </javac>
     </target>
@@ -92,7 +92,7 @@
         </jar>
        <!-- jrobin taken out of routerconsole.jar in 0.7.12
         <delete dir="./tmpextract" />
-        <unjar src="../../jrobin/jrobin-1.4.0.jar" dest="./tmpextract" />
+        <unjar src="../../jrobin/jrobin-1.5.9.jar" dest="./tmpextract" />
         <jar destfile="./build/routerconsole.jar" basedir="./tmpextract" update="true" />
         <delete dir="./tmpextract" />
        -->

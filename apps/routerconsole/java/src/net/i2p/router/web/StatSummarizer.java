@@ -1,12 +1,18 @@
 package net.i2p.router.web;
 
 import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.Semaphore;
+
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageOutputStream;
+import javax.imageio.stream.MemoryCacheImageOutputStream;
 
 import net.i2p.router.RouterContext;
 import net.i2p.stat.Rate;
@@ -122,7 +128,8 @@ public class StatSummarizer implements Runnable {
     }
 
     public boolean renderPng(Rate rate, OutputStream out) throws IOException { 
-        return renderPng(rate, out, -1, -1, false, false, false, false, -1, true); 
+        return renderPng(rate, out, GraphHelper.DEFAULT_X, GraphHelper.DEFAULT_Y,
+                         false, false, false, false, -1, true); 
     }
 
     /**
@@ -150,8 +157,12 @@ public class StatSummarizer implements Runnable {
                                           boolean showCredit) throws IOException {
         if (width > GraphHelper.MAX_X)
             width = GraphHelper.MAX_X;
+        else if (width <= 0)
+            width = GraphHelper.DEFAULT_X;
         if (height > GraphHelper.MAX_Y)
             height = GraphHelper.MAX_Y;
+        else if (height <= 0)
+            height = GraphHelper.DEFAULT_Y;
         for (int i = 0; i < _listeners.size(); i++) {
             SummaryListener lsnr = _listeners.get(i);
             if (lsnr.getRate().equals(rate)) {
@@ -162,6 +173,7 @@ public class StatSummarizer implements Runnable {
         return false;
     }
 
+    /** @deprecated unused */
     public boolean renderPng(OutputStream out, String templateFilename) throws IOException {
         SummaryRenderer.render(_context, out, templateFilename);
         return true;
@@ -206,8 +218,12 @@ public class StatSummarizer implements Runnable {
         long end = _context.clock().now() - 60*1000;
         if (width > GraphHelper.MAX_X)
             width = GraphHelper.MAX_X;
+        else if (width <= 0)
+            width = GraphHelper.DEFAULT_X;
         if (height > GraphHelper.MAX_Y)
             height = GraphHelper.MAX_Y;
+        else if (height <= 0)
+            height = GraphHelper.DEFAULT_Y;
         if (periodCount <= 0) periodCount = SummaryListener.PERIODS;
         if (periodCount > SummaryListener.PERIODS)
             periodCount = SummaryListener.PERIODS;
@@ -216,9 +232,9 @@ public class StatSummarizer implements Runnable {
         //long begin = System.currentTimeMillis();
         try {
             RrdGraphDef def = new RrdGraphDef();
-            def.setTimePeriod(start/1000, 0);
-            def.setLowerLimit(0d);
-            def.setBaseValue(1024);
+            def.setTimeSpan(start/1000, end/1000);
+            def.setMinValue(0d);
+            def.setBase(1024);
             // Note to translators: all runtime zh translation disabled in this file, no font available in RRD
             String title = _("Bandwidth usage");
             if (!hideTitle)
@@ -227,37 +243,41 @@ public class StatSummarizer implements Runnable {
             String recvName = SummaryListener.createName(_context, "bw.recvRate.60000");
             def.datasource(sendName, sendName, sendName, "AVERAGE", "MEMORY");
             def.datasource(recvName, recvName, recvName, "AVERAGE", "MEMORY");
-            def.area(sendName, Color.BLUE, _("Outbound bytes/sec"));
+            def.area(sendName, Color.BLUE, _("Outbound Bytes/sec"));
             //def.line(sendName, Color.BLUE, "Outbound bytes/sec", 3);
-            def.line(recvName, Color.RED, _("Inbound bytes/sec") + "@r", 3);
+            def.line(recvName, Color.RED, _("Inbound Bytes/sec") + "\\r", 3);
             //def.area(recvName, Color.RED, "Inbound bytes/sec@r");
             if (!hideLegend) {
-                def.gprint(sendName, "AVERAGE", _("out average") + ": @2@s" + _("bytes/sec"));
-                def.gprint(sendName, "MAX", ' ' + _("max") + ": @2@s" + _("bytes/sec") + "@r");
-                def.gprint(recvName, "AVERAGE", _("in average") + ":  @2@s" + _("bytes/sec"));
-                def.gprint(recvName, "MAX", ' ' + _("max") + ": @2@s" + _("bytes/sec") + "@r");
+                def.gprint(sendName, "AVERAGE", _("Out average") + ": %.2f %s" + _("Bps"));
+                def.gprint(sendName, "MAX", ' ' + _("max") + ": %.2f %S" + _("Bps") + "\\r");
+                def.gprint(recvName, "AVERAGE", _("In average") + ":  %.2f %S" + _("Bps"));
+                def.gprint(recvName, "MAX", ' ' + _("max") + ": %.2f %S" + _("Bps") + "\\r");
             }
             if (!showCredit)
                 def.setShowSignature(false);
             if (hideLegend) 
-                def.setShowLegend(false);
+                def.setNoLegend(true);
             if (hideGrid) {
-                def.setGridX(false);
-                def.setGridY(false);
+                def.setDrawXGrid(false);
+                def.setDrawYGrid(false);
             }
             //System.out.println("rendering: path=" + path + " dsNames[0]=" + dsNames[0] + " dsNames[1]=" + dsNames[1] + " lsnr.getName=" + _listener.getName());
             def.setAntiAliasing(false);
             //System.out.println("Rendering: \n" + def.exportXmlTemplate());
             //System.out.println("*****************\nData: \n" + _listener.getData().dump());
+            def.setWidth(width);
+            def.setHeight(height);
+
             RrdGraph graph = new RrdGraph(def);
             //System.out.println("Graph created");
-            byte data[] = null;
-            if ( (width <= 0) || (height <= 0) )
-                data = graph.getPNGBytes();
-            else
-                data = graph.getPNGBytes(width, height);
-            //long timeToPlot = System.currentTimeMillis() - begin;
-            out.write(data);
+            int totalWidth = graph.getRrdGraphInfo().getWidth();
+            int totalHeight = graph.getRrdGraphInfo().getHeight();
+            BufferedImage img = new BufferedImage(totalWidth, totalHeight, BufferedImage.TYPE_USHORT_565_RGB);
+            Graphics gfx = img.getGraphics();
+            graph.render(gfx);
+            ImageOutputStream ios = new MemoryCacheImageOutputStream(out);
+            ImageIO.write(img, "png", ios);
+
             //File t = File.createTempFile("jrobinData", ".xml");
             //_listener.getData().dumpXml(new FileOutputStream(t));
             //System.out.println("plotted: " + (data != null ? data.length : 0) + " bytes in " + timeToPlot

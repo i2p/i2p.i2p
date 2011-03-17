@@ -23,8 +23,8 @@ public class GraphHelper extends FormHandler {
     private static final String PROP_REFRESH = "routerconsole.graphRefresh";
     private static final String PROP_PERIODS = "routerconsole.graphPeriods";
     private static final String PROP_EVENTS = "routerconsole.graphEvents";
-    private static final int DEFAULT_X = 250;
-    private static final int DEFAULT_Y = 100;
+    public static final int DEFAULT_X = 250;
+    public static final int DEFAULT_Y = 100;
     private static final int DEFAULT_REFRESH = 60;
     private static final int DEFAULT_PERIODS = 60;
     static final int MAX_X = 2048;
@@ -91,12 +91,11 @@ public class GraphHelper extends FormHandler {
                            + "&amp;height=" + (3 * _height)
                            + "\" target=\"_blank\">");
                 String title = _("Combined bandwidth graph");
-                _out.write("<img class=\"statimage\" width=\""
-                           + (_width + 83) + "\" height=\"" + (_height + 92)
-                           + "\" src=\"viewstat.jsp?stat=bw.combined"
+                _out.write("<img class=\"statimage\""
+                           + " src=\"viewstat.jsp?stat=bw.combined"
                            + "&amp;periodCount=" + _periodCount 
                            + "&amp;width=" + _width
-                           + "&amp;height=" + (_height - 14)
+                           + "&amp;height=" + (_height - 13)
                            + "\" alt=\"" + title + "\" title=\"" + title + "\"></a>\n");
             }
             
@@ -113,9 +112,8 @@ public class GraphHelper extends FormHandler {
                            + "&amp;width=" + (3 * _width)
                            + "&amp;height=" + (3 * _height)
                            + "\" target=\"_blank\">");
-                _out.write("<img class=\"statimage\" border=\"0\" width=\""
-                           + (_width + 83) + "\" height=\"" + (_height + 92)
-                           + "\" src=\"viewstat.jsp?stat="
+                _out.write("<img class=\"statimage\" border=\"0\""
+                           + " src=\"viewstat.jsp?stat="
                            + r.getRateStat().getName() 
                            + "&amp;showEvents=" + _showEvents
                            + "&amp;period=" + r.getPeriod() 
