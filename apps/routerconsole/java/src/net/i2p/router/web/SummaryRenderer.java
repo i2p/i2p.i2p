@@ -85,9 +85,8 @@ class SummaryRenderer {
 
     public void render(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount, boolean showCredit) throws IOException {
         long end = _listener.now() - 60*1000;
-        if (periodCount <= 0) periodCount = SummaryListener.PERIODS;
-        if (periodCount > SummaryListener.PERIODS)
-            periodCount = SummaryListener.PERIODS;
+        if (periodCount <= 0 || periodCount > _listener.getRows())
+            periodCount = _listener.getRows();
         long start = end - _listener.getRate().getPeriod()*periodCount;
         //long begin = System.currentTimeMillis();
         try {
@@ -134,10 +133,10 @@ class SummaryRenderer {
             long started = ((RouterContext)_context).router().getWhenStarted();
             if (started > start && started < end)
                 def.vrule(started / 1000, Color.BLACK, _("Restart"), 4.0f);
-            def.datasource(plotName, path, plotName, "AVERAGE", _listener.getBackendName());
+            def.datasource(plotName, path, plotName, SummaryListener.CF, _listener.getBackendName());
             def.area(plotName, Color.BLUE, descr + "\\r");
             if (!hideLegend) {
-                def.gprint(plotName, "AVERAGE", _("avg") + ": %.2f %s");
+                def.gprint(plotName, SummaryListener.CF, _("avg") + ": %.2f %s");
                 def.gprint(plotName, "MAX", ' ' + _("max") + ": %.2f %S");
                 def.gprint(plotName, "LAST", ' ' + _("now") + ": %.2f %S\\r");
             }

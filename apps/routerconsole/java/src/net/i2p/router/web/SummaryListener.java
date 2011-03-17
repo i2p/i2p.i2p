@@ -13,6 +13,7 @@ import net.i2p.util.Log;
 import net.i2p.util.SecureFile;
 import net.i2p.util.SecureFileOutputStream;
 
+import org.jrobin.core.Archive;
 import org.jrobin.core.RrdBackendFactory;
 import org.jrobin.core.RrdDb;
 import org.jrobin.core.RrdDef;
@@ -36,6 +37,9 @@ class SummaryListener implements RateSummaryListener {
     private static final String RRD_DIR = "rrd";
     private static final String RRD_PREFIX = "rrd-";
     private static final String RRD_SUFFIX = ".jrb";
+    static final String CF = "AVERAGE";
+    private static final double XFF = 0.9d;
+    private static final int STEPS = 1;
 
     private final I2PAppContext _context;
     private final Log _log;
@@ -47,8 +51,12 @@ class SummaryListener implements RateSummaryListener {
     private Sample _sample;
     private RrdMemoryBackendFactory _factory;
     private SummaryRenderer _renderer;
+    private int _rows;
     
-    static final int PERIODS = 1440;
+    static final int PERIODS = 60 * 24;  // 1440
+    private static final int MIN_ROWS = PERIODS;
+    private static final int MAX_ROWS = 91 * MIN_ROWS;
+    private static final long THREE_MONTHS = 91l * 24 * 60 * 60 * 1000;
     
     public SummaryListener(Rate r) {
         _context = I2PAppContext.getGlobalContext();
@@ -112,8 +120,12 @@ class SummaryListener implements RateSummaryListener {
                 rrdDefName = rrdFile.getAbsolutePath();
                 if (rrdFile.exists()) {
                     _db = new RrdDb(rrdDefName, factory);
+                    Archive arch = _db.getArchive(CF, STEPS);
+                    if (arch == null)
+                        throw new IOException("No average CF in " + rrdDefName);
+                    _rows = arch.getRows();
                     if (_log.shouldLog(Log.INFO))
-                        _log.info("Existing RRD " + baseName + " (" + rrdDefName + ") consuming " + _db.getRrdBackend().getLength() + " bytes");
+                        _log.info("Existing RRD " + baseName + " (" + rrdDefName + ") with " + _rows + " rows consuming " + _db.getRrdBackend().getLength() + " bytes");
                 } else {
                     rrdDir.mkdir();
                 }
@@ -128,15 +140,18 @@ class SummaryListener implements RateSummaryListener {
                 long heartbeat = period*10/1000;
                 def.addDatasource(_name, "GAUGE", heartbeat, Double.NaN, Double.NaN);
                 def.addDatasource(_eventName, "GAUGE", heartbeat, 0, Double.NaN);
-                double xff = 0.9;
                 int steps = 1;
-                int rows = PERIODS;
-                def.addArchive("AVERAGE", xff, steps, rows);
+                if (_isPersistent) {
+                    _rows = (int) Math.max(MIN_ROWS, Math.min(MAX_ROWS, THREE_MONTHS / period));
+                } else {
+                    _rows = MIN_ROWS;
+                }
+                def.addArchive(CF, XFF, STEPS, _rows);
                 _db = new RrdDb(def, factory);
                 if (_isPersistent)
                     SecureFileOutputStream.setPerms(new File(rrdDefName));
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("New RRD " + baseName + " (" + rrdDefName + ") consuming " + _db.getRrdBackend().getLength() + " bytes");
+                    _log.info("New RRD " + baseName + " (" + rrdDefName + ") with " + _rows + " rows consuming " + _db.getRrdBackend().getLength() + " bytes");
             }
             _sample = _db.createSample();
             _renderer = new SummaryRenderer(_context, this);
@@ -182,6 +197,11 @@ class SummaryListener implements RateSummaryListener {
     /** @since 0.8.6 */
     String getBackendName() {
         return _isPersistent ? RrdNioBackendFactory.NAME : RrdMemoryBackendFactory.NAME;
+    }
+
+    /** @since 0.8.6 */
+    int getRows() {
+        return _rows;
     }
 
     @Override

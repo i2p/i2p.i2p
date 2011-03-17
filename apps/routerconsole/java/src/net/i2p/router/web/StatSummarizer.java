@@ -264,9 +264,8 @@ public class StatSummarizer implements Runnable {
             height = GraphHelper.MAX_Y;
         else if (height <= 0)
             height = GraphHelper.DEFAULT_Y;
-        if (periodCount <= 0) periodCount = SummaryListener.PERIODS;
-        if (periodCount > SummaryListener.PERIODS)
-            periodCount = SummaryListener.PERIODS;
+        if (periodCount <= 0 || periodCount > txLsnr.getRows())
+            periodCount = txLsnr.getRows();
         long period = 60*1000;
         long start = end - period*periodCount;
         //long begin = System.currentTimeMillis();
@@ -284,16 +283,16 @@ public class StatSummarizer implements Runnable {
                 def.vrule(started / 1000, Color.BLACK, null, 4.0f);  // no room for legend
             String sendName = SummaryListener.createName(_context, "bw.sendRate.60000");
             String recvName = SummaryListener.createName(_context, "bw.recvRate.60000");
-            def.datasource(sendName, txLsnr.getData().getPath(), sendName, "AVERAGE", txLsnr.getBackendName());
-            def.datasource(recvName, rxLsnr.getData().getPath(), recvName, "AVERAGE", rxLsnr.getBackendName());
+            def.datasource(sendName, txLsnr.getData().getPath(), sendName, SummaryListener.CF, txLsnr.getBackendName());
+            def.datasource(recvName, rxLsnr.getData().getPath(), recvName, SummaryListener.CF, rxLsnr.getBackendName());
             def.area(sendName, Color.BLUE, _("Outbound Bytes/sec"));
             //def.line(sendName, Color.BLUE, "Outbound bytes/sec", 3);
             def.line(recvName, Color.RED, _("Inbound Bytes/sec") + "\\r", 3);
             //def.area(recvName, Color.RED, "Inbound bytes/sec@r");
             if (!hideLegend) {
-                def.gprint(sendName, "AVERAGE", _("Out average") + ": %.2f %s" + _("Bps"));
+                def.gprint(sendName, SummaryListener.CF, _("Out average") + ": %.2f %s" + _("Bps"));
                 def.gprint(sendName, "MAX", ' ' + _("max") + ": %.2f %S" + _("Bps") + "\\r");
-                def.gprint(recvName, "AVERAGE", _("In average") + ": %.2f %S" + _("Bps"));
+                def.gprint(recvName, SummaryListener.CF, _("In average") + ": %.2f %S" + _("Bps"));
                 def.gprint(recvName, "MAX", ' ' + _("max") + ": %.2f %S" + _("Bps") + "\\r");
             }
             if (!showCredit)
