@@ -170,7 +170,7 @@ Applications:
    See licenses/LICENSE-Apache2.0.txt
    See licenses/NOTICE-Commons-Logging.txt
 
-   JRobin 1.4.0:
+   JRobin 1.5.9.1:
    See licenses/LICENSE-LGPLv2.1.txt
 
    Ministreaming Lib:

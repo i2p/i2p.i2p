@@ -135,6 +135,18 @@
         <copy file="core/java/build/i2p.jar" todir="build/" />
     </target>
 
+    <target name="buildJrobin" depends="buildProperties" >
+        <!-- take only what we need from the jrobin jar -->
+        <jar destfile="build/jrobin.jar" >
+            <zipfileset src="apps/jrobin/jrobin-1.5.9.1.jar"
+                        excludes="org/jrobin/cmd/ org/jrobin/convertor/ org/jrobin/inspector/" />
+            <manifest>
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+	    </manifest>
+        </jar>
+    </target>
+
     <target name="buildProperties" >
         <exec executable="mtn" outputproperty="workspace.version" errorproperty="mtn.error1" failifexecutionfails="false" >
             <arg value="automate" />
@@ -203,7 +215,7 @@
         <copy file="apps/i2psnark/i2psnark.war" todir="build/" />
         <copy file="apps/i2psnark/java/build/i2psnark.jar" todir="build/" />
     </target>
-    <target name="jarSmall" depends="compile" >
+    <target name="jarSmall" depends="compile, buildJrobin" >
         <copy file="core/java/build/i2p.jar" todir="build/" />
         <copy file="router/java/build/router.jar" todir="build/" />
         <copy file="apps/ministreaming/java/build/mstreaming.jar" todir="build/" />
@@ -293,7 +305,7 @@
                 <pathelement location="apps/jetty/jettylib/org.mortbay.jetty.jar" />
                 <pathelement location="apps/jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="apps/systray/java/lib/systray4j.jar" />
-                <pathelement location="apps/jrobin/jrobin-1.5.9.jar" />
+                <pathelement location="apps/jrobin/jrobin-1.5.9.1.jar" />
                 <pathelement location="installer/lib/wrapper/win32/wrapper.jar" />
                 <pathelement location="core/lib/junit.jar" />                
             </classpath>
@@ -462,7 +474,7 @@
         <copy file="build/desktopgui.jar" todir="pkg-temp/lib/" />
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
         <!-- pulled out of routerconsole.jar in 0.7.12; name without version so we can overwrite if we upgrade  -->
-        <copy file="apps/jrobin/jrobin-1.5.9.jar" tofile="pkg-temp/lib/jrobin.jar" />
+        <copy file="build/jrobin.jar" tofile="pkg-temp/lib/jrobin.jar" />
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
         <copy file="build/BOB.jar" todir="pkg-temp/lib/" />
         <copy file="build/systray.jar" todir="pkg-temp/lib" />
@@ -665,7 +677,7 @@
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
         <!-- pulled out of routerconsole.jar in 0.7.12, someday we can take out of updater -->
         <!-- name without version so we can overwrite if we upgrade  -->
-        <copy file="apps/jrobin/jrobin-1.5.9.jar" tofile="pkg-temp/lib/jrobin.jar" />
+        <copy file="build/jrobin.jar" tofile="pkg-temp/lib/jrobin.jar" />
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
@@ -824,7 +836,7 @@
             <arg value="-output"/>
             <arg value="i2p.fba"/>
             <arg value="-auxclasspath"/>
-            <arg value="build/commons-el.jar:build/commons-logging.jar:build/jasper-compiler.jar:build/jasper-runtime.jar:build/javax.servlet.jar:build/org.mortbay.jetty.jar:apps/jrobin/jrobin-1.5.9.jar:apps/systray/java/lib/systray4j.jar:installer/lib/wrapper/linux/wrapper.jar:apps/susidns/src/WEB-INF/lib/standard.jar:apps/susidns/src/WEB-INF/lib/jstl.jar:apps/jrobin/jrobin-1.5.9.jar"/>
+            <arg value="build/commons-el.jar:build/commons-logging.jar:build/jasper-compiler.jar:build/jasper-runtime.jar:build/javax.servlet.jar:build/org.mortbay.jetty.jar:apps/jrobin/jrobin-1.5.9.1.jar:apps/systray/java/lib/systray4j.jar:installer/lib/wrapper/linux/wrapper.jar:apps/susidns/src/WEB-INF/lib/standard.jar:apps/susidns/src/WEB-INF/lib/jstl.jar:apps/jrobin/jrobin-1.5.9.1.jar"/>
             <arg value="-sourcepath"/>
             <arg value="apps/BOB/src/:apps/addressbook/java/src/:apps/i2psnark/java/src/:apps/i2ptunnel/java/src/:apps/ministreaming/java/src/:apps/routerconsole/java/src/:apps/sam/java/src/:apps/streaming/java/src/:apps/susidns/src/java/src/:apps/susimail/src/src/:apps/systray/java/src/:core/java/src/:router/java/src/"/>
             <!-- start of the files to be analyzed -->
@@ -1120,7 +1132,7 @@
 			</copy>
 			<!-- 3rd party jars from apps/  -->
 				<!-- jrobin - without jobin , you lost graph and get a lot error entry in logs -->
-			<copy file="apps/jrobin/jrobin-1.5.9.jar" tofile="pkg-temp/lib/jrobin.jar" />
+			<copy file="build/jrobin.jar" tofile="pkg-temp/lib/jrobin.jar" />
 	</target>
 <!-- *3* os dependent procedure/commands -->
 	<target name = "preppkg-portable-win32" depends="preppkg-portable-win32-jbigi,preppkg-portable-basic">
