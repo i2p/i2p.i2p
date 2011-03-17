@@ -24,7 +24,17 @@ import org.jrobin.graph.RrdGraph;
 import org.jrobin.graph.RrdGraphDef;
 
 /**
+ *  A thread started by RouterConsoleRunner that
+ *  checks the configuration for stats to be tracked via jrobin,
+ *  and adds or deletes RRDs as necessary.
  *
+ *  This also contains methods to generate xml or png image output.
+ *  The actual png rendering code is here for the special dual-rate graph;
+ *  the rendering for standard graphs is in SummaryRenderer.
+ *
+ *  To control memory, the number of simultaneous renderings is limited.
+ *
+ *  @since 0.6.1.13
  */
 public class StatSummarizer implements Runnable {
     private final RouterContext _context;
@@ -148,7 +158,7 @@ public class StatSummarizer implements Runnable {
             return locked_renderPng(rate, out, width, height, hideLegend, hideGrid, hideTitle, showEvents,
                                     periodCount, showCredit);
         } finally {
-                _sem.release();
+            _sem.release();
         }
     }
 
@@ -180,6 +190,17 @@ public class StatSummarizer implements Runnable {
     }
 
     public boolean getXML(Rate rate, OutputStream out) throws IOException {
+        try {
+            try {
+                _sem.acquire();
+            } catch (InterruptedException ie) {}
+            return locked_getXML(rate, out);
+        } finally {
+            _sem.release();
+        }
+    }
+
+    private boolean locked_getXML(Rate rate, OutputStream out) throws IOException {
         for (int i = 0; i < _listeners.size(); i++) {
             SummaryListener lsnr = _listeners.get(i);
             if (lsnr.getRate().equals(rate)) {
@@ -208,7 +229,7 @@ public class StatSummarizer implements Runnable {
             return locked_renderRatePng(out, width, height, hideLegend, hideGrid, hideTitle, showEvents,
                                         periodCount, showCredit);
         } finally {
-                _sem.release();
+            _sem.release();
         }
     }
 

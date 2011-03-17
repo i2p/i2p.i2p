@@ -18,20 +18,22 @@ import net.i2p.stat.RateStat;
 import net.i2p.stat.RateSummaryListener;
 import net.i2p.util.Log;
 
-import org.jrobin.core.RrdBackendFactory;
-import org.jrobin.core.RrdDb;
-import org.jrobin.core.RrdDef;
 import org.jrobin.core.RrdException;
-import org.jrobin.core.RrdMemoryBackendFactory;
-import org.jrobin.core.Sample;
 import org.jrobin.graph.RrdGraph;
 import org.jrobin.graph.RrdGraphDef;
 import org.jrobin.graph.RrdGraphDefTemplate;
 
+/**
+ *  Generate the RRD graph png images,
+ *  except for the combined rate graph, which is
+ *  generated in StatSummarizer.
+ *
+ *  @since 0.6.1.13
+ */
 class SummaryRenderer {
-    private Log _log;
-    private SummaryListener _listener;
-    private I2PAppContext _context;
+    private final Log _log;
+    private final SummaryListener _listener;
+    private final I2PAppContext _context;
 
     public SummaryRenderer(I2PAppContext ctx, SummaryListener lsnr) { 
         _log = ctx.logManager().getLog(SummaryRenderer.class);

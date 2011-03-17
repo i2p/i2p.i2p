@@ -1,6 +1,5 @@
 package net.i2p.router.web;
 
-import java.awt.Color;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -21,10 +20,16 @@ import org.jrobin.graph.RrdGraph;
 import org.jrobin.graph.RrdGraphDef;
 import org.jrobin.graph.RrdGraphDefTemplate;
 
+/**
+ *  Creates and updates the in-memory RRD database,
+ *  and provides methods to generate graphs of the data
+ *
+ *  @since 0.6.1.13
+ */
 class SummaryListener implements RateSummaryListener {
-    private I2PAppContext _context;
-    private Log _log;
-    private Rate _rate;
+    private final I2PAppContext _context;
+    private final Log _log;
+    private final Rate _rate;
     private String _name;
     private String _eventName;
     private RrdDb _db;
@@ -86,6 +91,7 @@ class SummaryListener implements RateSummaryListener {
     }
     
     public Rate getRate() { return _rate; }
+
     public void startListening() {
         RateStat rs = _rate.getRateStat();
         long period = _rate.getPeriod();
@@ -108,12 +114,16 @@ class SummaryListener implements RateSummaryListener {
             _sample = _db.createSample();
             _renderer = new SummaryRenderer(_context, this);
             _rate.setSummaryListener(this);
+            // Typical usage is 23456 bytes ~= 1440 * 16
+            if (_log.shouldLog(Log.INFO))
+                _log.info("New RRD " + baseName + " consuming " + _db.getRrdBackend().getLength() + " bytes");
         } catch (RrdException re) {
             _log.error("Error starting", re);
         } catch (IOException ioe) {
             _log.error("Error starting", ioe);
         }
     }
+
     public void stopListening() {
         if (_db == null) return;
         try {
@@ -125,20 +135,26 @@ class SummaryListener implements RateSummaryListener {
         _factory.delete(_db.getPath());
         _db = null;
     }
+
     public void renderPng(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount, boolean showCredit) throws IOException {
         _renderer.render(out, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount, showCredit); 
     }
+
     public void renderPng(OutputStream out) throws IOException { _renderer.render(out); }
  
     String getName() { return _name; }
+
     String getEventName() { return _eventName; }
+
     RrdDb getData() { return _db; }
+
     long now() { return _context.clock().now(); }
     
     @Override
     public boolean equals(Object obj) {
         return ((obj instanceof SummaryListener) && ((SummaryListener)obj)._rate.equals(_rate));
     }
+
     @Override
     public int hashCode() { return _rate.hashCode(); }
 }
