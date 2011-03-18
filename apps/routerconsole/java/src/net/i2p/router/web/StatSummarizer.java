@@ -384,6 +384,7 @@ public class StatSummarizer implements Runnable {
             if (_thread != null)
                 _thread.interrupt();
             for (SummaryListener lsnr : _listeners) {
+                // FIXME could cause exceptions if rendering?
                 lsnr.stopListening();
             }
             _listeners.clear();

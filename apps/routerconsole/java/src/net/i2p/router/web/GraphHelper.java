@@ -123,10 +123,13 @@ public class GraphHelper extends FormHandler {
                            + "\" alt=\"" + title 
                            + "\" title=\"" + title + "\"></a>\n");
             }
+            // FIXME <meta> not allowed inside <div>, move to the .jsp
             if (_refreshDelaySeconds > 0)
                 // shorten the refresh by 3 seconds so we beat the iframe
                 _out.write("<meta http-equiv=\"refresh\" content=\"" + (_refreshDelaySeconds - 3) + "\">\n");
 
+            // FIXME jrobin doesn't support setting the timezone, will have to mod TimeAxis.java
+            _out.write("<p<i>" + _("All times are UTC.") + "</i></p>\n");
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
