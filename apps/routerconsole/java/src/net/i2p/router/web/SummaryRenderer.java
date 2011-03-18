@@ -101,12 +101,11 @@ class SummaryRenderer {
                 String title;
                 String p;
                 // we want the formatting and translation of formatDuration2(), except not zh, and not the &nbsp;
-                if ("zh".equals(Messages.getLanguage(_context)))
-                    p = DataHelper.formatDuration(_listener.getRate().getPeriod());
-                else
+                //if ("zh".equals(Messages.getLanguage(_context)))
+                //    p = DataHelper.formatDuration(_listener.getRate().getPeriod());
+                //else
                     p = DataHelper.formatDuration2(_listener.getRate().getPeriod()).replace("&nbsp;", " ");
                 if (showEvents)
-                    // Note to translators: all runtime zh translation disabled in this file, no font available in RRD
                     title = name + ' ' + _("events in {0}", p);
                 else
                     title = name + ' ' + _("averaged for {0}", p);
@@ -133,7 +132,10 @@ class SummaryRenderer {
             if (started > start && started < end)
                 def.vrule(started / 1000, Color.BLACK, _("Restart"), 4.0f);
             def.datasource(plotName, path, plotName, SummaryListener.CF, _listener.getBackendName());
-            def.area(plotName, Color.BLUE, descr + "\\r");
+            if (descr.length() > 0)
+                def.area(plotName, Color.BLUE, descr + "\\r");
+            else
+                def.area(plotName, Color.BLUE);
             if (!hideLegend) {
                 def.gprint(plotName, SummaryListener.CF, _("avg") + ": %.2f %s");
                 def.gprint(plotName, "MAX", ' ' + _("max") + ": %.2f %S");

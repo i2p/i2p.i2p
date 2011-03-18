@@ -3,6 +3,7 @@ package net.i2p.router.web;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import javax.imageio.stream.MemoryCacheImageOutputStream;
 import net.i2p.router.RouterContext;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
+import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 
 import org.jrobin.core.RrdException;
@@ -60,6 +62,9 @@ public class StatSummarizer implements Runnable {
     public static StatSummarizer instance() { return _instance; }
     
     public void run() {
+        boolean isPersistent = _context.getBooleanPropertyDefaultTrue(SummaryListener.PROP_PERSISTENT);
+        if (!isPersistent)
+            deleteOldRRDs();
         _thread = Thread.currentThread();
         String specs = "";
         while (_isRunning && _context.router().isAlive()) {
@@ -126,10 +131,10 @@ public class StatSummarizer implements Runnable {
     }
     
     private void removeDb(Rate r) {
-        for (int i = 0; i < _listeners.size(); i++) {
-            SummaryListener lsnr = _listeners.get(i);
+        for (SummaryListener lsnr : _listeners) {
             if (lsnr.getRate().equals(r)) {
-                _listeners.remove(i);
+                // no iter.remove() in COWAL
+                _listeners.remove(lsnr);
                 lsnr.stopListening();
                 return;
             }
@@ -178,8 +183,7 @@ public class StatSummarizer implements Runnable {
             height = GraphHelper.MAX_Y;
         else if (height <= 0)
             height = GraphHelper.DEFAULT_Y;
-        for (int i = 0; i < _listeners.size(); i++) {
-            SummaryListener lsnr = _listeners.get(i);
+        for (SummaryListener lsnr : _listeners) {
             if (lsnr.getRate().equals(rate)) {
                 lsnr.renderPng(out, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount, showCredit);
                 return true;
@@ -206,8 +210,7 @@ public class StatSummarizer implements Runnable {
     }
 
     private boolean locked_getXML(Rate rate, OutputStream out) throws IOException {
-        for (int i = 0; i < _listeners.size(); i++) {
-            SummaryListener lsnr = _listeners.get(i);
+        for (SummaryListener lsnr : _listeners) {
             if (lsnr.getRate().equals(rate)) {
                 lsnr.getData().exportXml(out);
                 out.write(("<!-- Rate: " + lsnr.getRate().getRateStat().getName() + " for period " + lsnr.getRate().getPeriod() + " -->\n").getBytes());
@@ -274,7 +277,6 @@ public class StatSummarizer implements Runnable {
             def.setTimeSpan(start/1000, end/1000);
             def.setMinValue(0d);
             def.setBase(1024);
-            // Note to translators: all runtime zh translation disabled in this file, no font available in RRD
             String title = _("Bandwidth usage");
             if (!hideTitle)
                 def.setTitle(title);
@@ -363,6 +365,15 @@ public class StatSummarizer implements Runnable {
             } catch (NumberFormatException nfe) {}
         }
         return rv;
+    }
+
+    /**
+     *  Delete the old rrd dir if we are no longer persistent
+     *  @since 0.8.6
+     */
+    private void deleteOldRRDs() {
+        File rrdDir = new File(_context.getRouterDir(), SummaryListener.RRD_DIR);
+        FileUtil.rmdir(rrdDir, false);
     }
 
     /** translate a string */

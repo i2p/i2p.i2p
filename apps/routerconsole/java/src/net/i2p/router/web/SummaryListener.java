@@ -32,9 +32,9 @@ import org.jrobin.graph.RrdGraphDefTemplate;
  *  @since 0.6.1.13
  */
 class SummaryListener implements RateSummaryListener {
-    private static final String PROP_PERSISTENT = "routerconsole.graphPersistent";
+    static final String PROP_PERSISTENT = "routerconsole.graphPersistent";
     /** note that .jrb files are NOT compatible with .rrd files */
-    private static final String RRD_DIR = "rrd";
+    static final String RRD_DIR = "rrd";
     private static final String RRD_PREFIX = "rrd-";
     private static final String RRD_SUFFIX = ".jrb";
     static final String CF = "AVERAGE";
@@ -62,7 +62,7 @@ class SummaryListener implements RateSummaryListener {
         _context = I2PAppContext.getGlobalContext();
         _rate = r;
         _log = _context.logManager().getLog(SummaryListener.class);
-        _isPersistent = _context.getBooleanProperty(PROP_PERSISTENT);
+        _isPersistent = _context.getBooleanPropertyDefaultTrue(PROP_PERSISTENT);
     }
     
     public void add(double totalValue, long eventCount, double totalEventTime, long period) {
