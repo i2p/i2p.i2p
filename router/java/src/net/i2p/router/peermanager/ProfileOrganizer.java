@@ -256,10 +256,15 @@ public class ProfileOrganizer {
         return false;
     }
     
-    public void exportProfile(Hash profile, OutputStream out) throws IOException {
+    /**
+     *  @return true if successful, false if not found
+     */
+    public boolean exportProfile(Hash profile, OutputStream out) throws IOException {
         PeerProfile prof = getProfile(profile);
-        if (prof != null)
+        boolean rv = prof != null;
+        if (rv)
             _persistenceHelper.writeProfile(prof, out);
+        return rv;
     }
     
     /**

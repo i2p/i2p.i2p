@@ -1,10 +1,16 @@
 package net.i2p.stat;
 
+import java.util.Date;
 import java.util.Properties;
 
+import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
-/** object orientation gives you hairy palms. */
+/**
+ *  Output rate data.
+ *  This is used via ProfilePersistenceHelper and the output
+ *  must be compatible.
+ */
 class PersistenceHelper {
     private final static Log _log = new Log(PersistenceHelper.class);
     private final static String NL = System.getProperty("line.separator");
@@ -13,6 +19,18 @@ class PersistenceHelper {
         buf.append("# ").append(prefix).append(name).append(NL);
         buf.append("# ").append(description).append(NL);
         buf.append(prefix).append(name).append('=').append(value).append(NL).append(NL);
+    }
+
+    /** @since 0.8.5 */
+    public final static void addDate(StringBuilder buf, String prefix, String name, String description, long value) {
+        String when = value > 0 ? (new Date(value)).toString() : "Never";
+        add(buf, prefix, name, description + ' ' + when, value);
+    }
+
+    /** @since 0.8.5 */
+    public final static void addTime(StringBuilder buf, String prefix, String name, String description, long value) {
+        String when = DataHelper.formatDuration(value);
+        add(buf, prefix, name, description + ' ' + when, value);
     }
 
     public final static void add(StringBuilder buf, String prefix, String name, String description, long value) {
