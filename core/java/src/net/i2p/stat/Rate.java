@@ -3,6 +3,7 @@ package net.i2p.stat;
 import java.io.IOException;
 import java.util.Properties;
 
+import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
 /**
@@ -471,48 +472,28 @@ public class Rate {
         coalesce();
     }
 
+    /**
+     * This is used in StatSummarizer and SummaryListener.
+     * We base it on the stat we are tracking, not the stored data.
+     */
     @Override
     public boolean equals(Object obj) {
         if ((obj == null) || !(obj instanceof Rate)) return false;
         if (obj == this) return true;
         Rate r = (Rate) obj;
         return _period == r.getPeriod() && _creationDate == r.getCreationDate() &&
-        //_lastCoalesceDate == r.getLastCoalesceDate() &&
-               _currentTotalValue == r.getCurrentTotalValue() && _currentEventCount == r.getCurrentEventCount()
-               && _currentTotalEventTime == r.getCurrentTotalEventTime() && _lastTotalValue == r.getLastTotalValue()
-               && _lastEventCount == r.getLastEventCount() && _lastTotalEventTime == r.getLastTotalEventTime()
-               && _extremeTotalValue == r.getExtremeTotalValue() && _extremeEventCount == r.getExtremeEventCount()
-               && _extremeTotalEventTime == r.getExtremeTotalEventTime()
-               && _lifetimeTotalValue == r.getLifetimeTotalValue() && _lifetimeEventCount == r.getLifetimeEventCount()
-               && _lifetimeTotalEventTime == r.getLifetimeTotalEventTime();
+               // do this the easy way to avoid NPEs.
+               // Alternative: compare name and group name (very carefully to avoid NPEs)
+               _stat == r._stat;
     }
 
     /**
      * It doesn't appear that Rates are ever stored in a Set or Map
      * (RateStat stores in an array) so let's make this easy.
-     * We can always make something faster if it's actually used.
      */
     @Override
     public int hashCode() {
-/*****
-        int hash = 5;
-        hash = 67 * hash + (int)(Double.doubleToLongBits(this._currentTotalValue) ^ (Double.doubleToLongBits(this._currentTotalValue) >>> 32));
-        hash = 67 * hash + (int)(this._currentEventCount ^ (this._currentEventCount >>> 32));
-        hash = 67 * hash + (int)(this._currentTotalEventTime ^ (this._currentTotalEventTime >>> 32));
-        hash = 67 * hash + (int)(Double.doubleToLongBits(this._lastTotalValue) ^ (Double.doubleToLongBits(this._lastTotalValue) >>> 32));
-        hash = 67 * hash + (int)(this._lastEventCount ^ (this._lastEventCount >>> 32));
-        hash = 67 * hash + (int)(this._lastTotalEventTime ^ (this._lastTotalEventTime >>> 32));
-        hash = 67 * hash + (int)(Double.doubleToLongBits(this._extremeTotalValue) ^ (Double.doubleToLongBits(this._extremeTotalValue) >>> 32));
-        hash = 67 * hash + (int)(this._extremeEventCount ^ (this._extremeEventCount >>> 32));
-        hash = 67 * hash + (int)(this._extremeTotalEventTime ^ (this._extremeTotalEventTime >>> 32));
-        hash = 67 * hash + (int)(Double.doubleToLongBits(this._lifetimeTotalValue) ^ (Double.doubleToLongBits(this._lifetimeTotalValue) >>> 32));
-        hash = 67 * hash + (int)(this._lifetimeEventCount ^ (this._lifetimeEventCount >>> 32));
-        hash = 67 * hash + (int)(this._lifetimeTotalEventTime ^ (this._lifetimeTotalEventTime >>> 32));
-        hash = 67 * hash + (int)(this._creationDate ^ (this._creationDate >>> 32));
-        hash = 67 * hash + (int)(this._period ^ (this._period >>> 32));
-        return hash;
-******/
-        return toString().hashCode();
+        return DataHelper.hashCode(_stat) ^ ((int)_period) ^ ((int) _creationDate);
     }
 
     @Override
