@@ -70,6 +70,7 @@ public class CSSHelper extends HelperBase {
      */
     public boolean allowIFrame(String ua) {
         return ua == null || !(ua.startsWith("Lynx") || ua.startsWith("w3m") ||
-                               ua.startsWith("ELinks") || ua.startsWith("Dillo"));
+                               ua.startsWith("ELinks") || ua.startsWith("Links") ||
+                               ua.startsWith("Dillo"));
     }
 }
