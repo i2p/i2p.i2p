@@ -426,6 +426,10 @@ public class PeerCoordinator implements PeerListener
                _log.info("New connection to peer: " + peer + " for " + name);
             }
 
+            // We may have gotten the metainfo after the peer was created.
+            if (metainfo != null)
+                peer.setMetaInfo(metainfo);
+
             // Add it to the beginning of the list.
             // And try to optimistically make it a uploader.
             // Can't add to beginning since we converted from a List to a Queue

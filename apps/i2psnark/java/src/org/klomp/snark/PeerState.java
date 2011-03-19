@@ -496,10 +496,14 @@ class PeerState implements DataLoader
   }
 
   /**
-   *  Switch from magnet mode to normal mode
+   *  Switch from magnet mode to normal mode.
+   *  If we already have the metainfo, this does nothing.
+   *  @param meta non-null
    *  @since 0.8.4
    */
   public void setMetaInfo(MetaInfo meta) {
+      if (metainfo != null)
+          return;
       BitField oldBF = bitfield;
       if (oldBF != null) {
           if (oldBF.size() != meta.getPieces())
@@ -511,7 +515,7 @@ class PeerState implements DataLoader
           //bitfield = new BitField(meta.getPieces());
       }
       metainfo = meta;
-      if (bitfield.count() > 0)
+      if (bitfield != null && bitfield.count() > 0)
           setInteresting(true);
   }
 
