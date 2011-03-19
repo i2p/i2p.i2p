@@ -16,6 +16,7 @@ DIRS="\
   apps/i2ptunnel/locale \
   apps/i2psnark/locale \
   apps/susidns/locale \
+  apps/susimail/locale \
   apps/desktopgui/locale \
   installer/resources/eepsite.help/help \
   installer/resources/initialNews \
