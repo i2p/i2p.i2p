@@ -119,14 +119,14 @@ class ProfilePersistenceHelper {
         buf.append("#").append(NL);
         buf.append("########################################################################").append(NL);
         buf.append("##").append(NL);
+        add(buf, "speedBonus", profile.getSpeedBonus(), "Manual adjustment to the speed score");
         add(buf, "capacityBonus", profile.getCapacityBonus(), "Manual adjustment to the capacity score");
         add(buf, "integrationBonus", profile.getIntegrationBonus(), "Manual adjustment to the integration score");
-        add(buf, "speedBonus", profile.getSpeedBonus(), "Manual adjustment to the speed score");
-        addDate(buf, "lastHeardAbout", profile.getLastHeardAbout(), "When did we last get a reference to this peer?");
         addDate(buf, "firstHeardAbout", profile.getFirstHeardAbout(), "When did we first get a reference to this peer?");
+        addDate(buf, "lastHeardAbout", profile.getLastHeardAbout(), "When did we last get a reference to this peer?");
+        addDate(buf, "lastHeardFrom", profile.getLastHeardFrom(), "When did we last get a message from the peer?");
         addDate(buf, "lastSentToSuccessfully", profile.getLastSendSuccessful(), "When did we last send the peer a message successfully?");
         addDate(buf, "lastFailedSend", profile.getLastSendFailed(), "When did we last fail to send a message to the peer?");
-        addDate(buf, "lastHeardFrom", profile.getLastHeardFrom(), "When did we last get a message from the peer?");
         add(buf, "tunnelTestTimeAverage", profile.getTunnelTestTimeAverage(), "Moving average as to how fast the peer replies");
         add(buf, "tunnelPeakThroughput", profile.getPeakThroughputKBps(), "KBytes/sec");
         add(buf, "tunnelPeakTunnelThroughput", profile.getPeakTunnelThroughputKBps(), "KBytes/sec");

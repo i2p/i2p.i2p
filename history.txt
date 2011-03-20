@@ -1,3 +1,16 @@
+2011-03-20 zzz
+    * Console: Remove cache directives
+    * i2psnark: Fix peers stuck at uninteresting after metainfo fetch
+    * i2ptunnel: Change all clients to 3 hops by default (new installs only)
+    * Profiles:
+      - Nicer profile dump
+      - More efficient profile lookup for display
+      - Fix dumpprofile NPE
+      - Change file suffix from .dat to .txt.gz
+      - Set firstHeardAbout on creation
+    * Rate: Fix equals()
+    * Recognize links and links2 as text browsers
+
 2011-03-12 zzz
     * Blocklist: Add bogons since they won't change any more
     * BuildHandler: Loop double-check
