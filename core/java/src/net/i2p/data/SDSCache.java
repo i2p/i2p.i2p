@@ -50,6 +50,8 @@ public class SDSCache<V extends SimpleDataStructure> {
     private static final double FACTOR;
     static {
         long maxMemory = Runtime.getRuntime().maxMemory();
+        if (maxMemory == Long.MAX_VALUE)
+            maxMemory = 96*1024*1024l;
         FACTOR = Math.max(MIN_FACTOR, Math.min(MAX_FACTOR, maxMemory / (128*1024*1024d)));
     }
 

@@ -43,6 +43,8 @@ public class SimpleTimer2 {
         _name = name;
         _count = 0;
         long maxMemory = Runtime.getRuntime().maxMemory();
+        if (maxMemory == Long.MAX_VALUE)
+            maxMemory = 96*1024*1024l;
         _threads = (int) Math.max(MIN_THREADS, Math.min(MAX_THREADS, 1 + (maxMemory / (32*1024*1024))));
         _executor = new CustomScheduledThreadPoolExecutor(_threads, new CustomThreadFactory());
         _executor.prestartAllCoreThreads();

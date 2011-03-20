@@ -26,6 +26,8 @@ public class TunnelGatewayPumper implements Runnable {
         _wantsPumping = new LinkedBlockingQueue();
         _stop = false;
         long maxMemory = Runtime.getRuntime().maxMemory();
+        if (maxMemory == Long.MAX_VALUE)
+            maxMemory = 96*1024*1024l;
         _pumpers = (int) Math.max(MIN_PUMPERS, Math.min(MAX_PUMPERS, 1 + (maxMemory / (32*1024*1024))));
         for (int i = 0; i < _pumpers; i++)
             new I2PThread(this, "Tunnel GW pumper " + (i+1) + '/' + _pumpers, true).start();

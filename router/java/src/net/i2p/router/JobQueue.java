@@ -61,6 +61,8 @@ public class JobQueue {
     private static final int RUNNERS;
     static {
         long maxMemory = Runtime.getRuntime().maxMemory();
+        if (maxMemory == Long.MAX_VALUE)
+            maxMemory = 128*1024*1024l;
         if (maxMemory < 64*1024*1024)
             RUNNERS = 3;
         else if (maxMemory < 256*1024*1024)
