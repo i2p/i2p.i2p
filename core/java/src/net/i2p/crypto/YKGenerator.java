@@ -60,7 +60,9 @@ class YKGenerator {
 
         // add to the defaults for every 128MB of RAM, up to 1GB
         long maxMemory = Runtime.getRuntime().maxMemory();
-        int factor = Math.min(8, (int) (1 + (maxMemory / (128*1024*1024l))));
+        if (maxMemory == Long.MAX_VALUE)
+            maxMemory = 127*1024*1024l;
+        int factor = (int) Math.max(1l, Math.min(8l, 1 + (maxMemory / (128*1024*1024l))));
         int defaultMin = DEFAULT_YK_PRECALC_MIN * factor;
         int defaultMax = DEFAULT_YK_PRECALC_MAX * factor;
         MIN_NUM_BUILDERS = ctx.getProperty(PROP_YK_PRECALC_MIN, defaultMin);

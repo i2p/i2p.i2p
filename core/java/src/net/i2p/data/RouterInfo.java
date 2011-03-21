@@ -52,7 +52,8 @@ public class RouterInfo extends DatabaseEntry {
     /** should we cache the byte and string versions _byteified ? **/
     private boolean _shouldCache;
     /** maybe we should check if we are floodfill? */
-    private static final boolean CACHE_ALL = Runtime.getRuntime().maxMemory() > 128*1024*1024l;
+    private static final boolean CACHE_ALL = Runtime.getRuntime().maxMemory() > 128*1024*1024l &&
+                                             Runtime.getRuntime().maxMemory() < Long.MAX_VALUE;
 
     public static final String PROP_NETWORK_ID = "netId";
     public static final String PROP_CAPABILITIES = "caps";

@@ -62,6 +62,10 @@ public class PeerProfile {
     public PeerProfile(RouterContext context, Hash peer) {
         this(context, peer, true);
     }
+
+    /**
+     *  @param expand must be true (see below)
+     */
     public PeerProfile(RouterContext context, Hash peer, boolean expand) {
         _context = context;
         _log = context.logManager().getLog(PeerProfile.class);
@@ -125,7 +129,10 @@ public class PeerProfile {
     }
     
     
-    /** when did we first hear about this peer? */
+    /**
+     *  When did we first hear about this peer?
+     *  Currently unused, candidate for removal.
+     */
     public long getFirstHeardAbout() { return _firstHeardAbout; }
     public void setFirstHeardAbout(long when) { _firstHeardAbout = when; }
     

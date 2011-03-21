@@ -93,6 +93,8 @@ public class RouterContext extends I2PAppContext {
             // or about 2 seconds per buffer - so about 200x faster
             // to fill than to drain - so we don't need too many
             long maxMemory = Runtime.getRuntime().maxMemory();
+            if (maxMemory == Long.MAX_VALUE)
+                maxMemory = 96*1024*1024l;
             long buffs = Math.min(16, Math.max(2, maxMemory / (14 * 1024 * 1024)));
             envProps.setProperty("prng.buffers", "" + buffs);
         }

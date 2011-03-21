@@ -10,9 +10,12 @@
    if (request.getCharacterEncoding() == null)
        request.setCharacterEncoding("UTF-8");
 
-   response.setHeader("Pragma", "no-cache");
-   response.setHeader("Cache-Control","no-cache");
-   response.setDateHeader("Expires", 0);
+   // Now that we use POST for most forms, these prevent the back button from working after a form submit
+   // Just let the browser do its thing
+   //response.setHeader("Pragma", "no-cache");
+   //response.setHeader("Cache-Control","no-cache");
+   //response.setDateHeader("Expires", 0);
+
    // the above will b0rk if the servlet engine has already flushed
    // the response prior to including this file, so it should be
    // near the top

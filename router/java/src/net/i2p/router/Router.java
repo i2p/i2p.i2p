@@ -1432,7 +1432,10 @@ private static class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
         ctx.statManager().createRateStat("router.highCapacityPeers", "How many high capacity peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
         ctx.statManager().createRateStat("router.fastPeers", "How many fast peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
         _maxMemory = Runtime.getRuntime().maxMemory();
-        ctx.statManager().createRateStat("router.memoryUsed", "(Bytes) Max is " + (_maxMemory / (1024*1024)) + "MB", "Router", new long[] { 60*1000 });
+        String legend = "(Bytes)";
+        if (_maxMemory < Long.MAX_VALUE)
+            legend += " Max is " + DataHelper.formatSize(_maxMemory) + 'B';
+        ctx.statManager().createRateStat("router.memoryUsed", legend, "Router", new long[] { 60*1000 });
     }
     private RouterContext getContext() { return _ctx; }
     public void timeReached() {

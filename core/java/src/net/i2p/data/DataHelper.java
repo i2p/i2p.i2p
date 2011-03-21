@@ -1195,6 +1195,10 @@ public class DataHelper {
             case 2: return str + "M";
             case 3: return str + "G";
             case 4: return str + "T";
+            case 5: return str + "P";
+            case 6: return str + "E";
+            case 7: return str + "Z";
+            case 8: return str + "Y";
             default: return bytes + "";
         }
     }
@@ -1221,12 +1225,17 @@ public class DataHelper {
             case 2: return str + "&nbsp;M";
             case 3: return str + "&nbsp;G";
             case 4: return str + "&nbsp;T";
+            case 5: return str + "&nbsp;P";
+            case 6: return str + "&nbsp;E";
+            case 7: return str + "&nbsp;Z";
+            case 8: return str + "&nbsp;Y";
             default: return bytes + "&nbsp;";
         }
     }
     
     /**
      * Strip out any HTML (simply removing any less than / greater than symbols)
+     * @param orig may be null, returns empty string if null
      */
     public static String stripHTML(String orig) {
         if (orig == null) return "";

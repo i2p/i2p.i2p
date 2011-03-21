@@ -48,6 +48,8 @@ class PacketHandler {
         _introManager = introManager;
 
         long maxMemory = Runtime.getRuntime().maxMemory();
+        if (maxMemory == Long.MAX_VALUE)
+            maxMemory = 96*1024*1024l;
         int num_handlers;
         if (maxMemory < 32*1024*1024)
             num_handlers = 1;

@@ -171,8 +171,10 @@ class ProfileOrganizerRenderer {
                     buf.append(' ').append(fails).append('/').append(total).append(' ').append(_("Test Fails"));
             }
             buf.append("&nbsp;</td>");
-            buf.append("<td nowrap align=\"center\"><a target=\"_blank\" href=\"dumpprofile.jsp?peer=")
-               .append(peer.toBase64().substring(0,6)).append("\">").append(_("profile")).append("</a>");
+            //buf.append("<td nowrap align=\"center\"><a target=\"_blank\" href=\"dumpprofile.jsp?peer=")
+            //   .append(peer.toBase64().substring(0,6)).append("\">").append(_("profile")).append("</a>");
+            buf.append("<td nowrap align=\"center\"><a href=\"viewprofile?peer=")
+               .append(peer.toBase64()).append("\">").append(_("profile")).append("</a>");
             buf.append("&nbsp;<a href=\"configpeer?peer=").append(peer.toBase64()).append("\">+-</a></td>\n");
             buf.append("</tr>");
             // let's not build the whole page in memory (~500 bytes per peer)

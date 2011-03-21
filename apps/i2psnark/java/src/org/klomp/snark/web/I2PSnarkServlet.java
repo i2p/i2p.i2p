@@ -351,7 +351,8 @@ public class I2PSnarkServlet extends Default {
         // Using a unique name fixes Opera, except for the buttons with js confirms, see below
         String ua = req.getHeader("User-Agent");
         boolean isDegraded = ua != null && (ua.startsWith("Lynx") || ua.startsWith("w3m") ||
-                                            ua.startsWith("ELinks") || ua.startsWith("Dillo"));
+                                            ua.startsWith("ELinks") || ua.startsWith("Links") ||
+                                            ua.startsWith("Dillo"));
 
         boolean noThinsp = isDegraded || (ua != null && ua.startsWith("Opera"));
         if (_manager.util().connected()) {

@@ -1,37 +1,73 @@
 package net.i2p.router.web;
 
-import java.util.Iterator;
+import java.io.IOException;
 import java.util.Set;
 
+import net.i2p.data.DataFormatException;
 import net.i2p.data.Hash;
-import net.i2p.router.RouterContext;
 
 /**
- * uuuugly.  dump the peer profile data if given a peer.
+ *  Dump the peer profile data if given a full B64 peer string or prefix.
  *
  */
 public class StatHelper extends HelperBase {
     private String _peer;
     
+    /**
+     * Caller should strip HTML (XSS)
+     */
     public void setPeer(String peer) { _peer = peer; }
     
+    /**
+     *  Look up based on a b64 prefix or full b64.
+     *  Prefix is inefficient.
+     */
     public String getProfile() { 
-        RouterContext ctx = (RouterContext)net.i2p.router.RouterContext.listContexts().get(0);
-        Set peers = ctx.profileOrganizer().selectAllPeers();
-        for (Iterator iter = peers.iterator(); iter.hasNext(); ) {
-            Hash peer = (Hash)iter.next();
+        if (_peer == null || _peer.length() <= 0)
+            return "No peer specified";
+        if (_peer.length() >= 44)
+            return outputProfile();
+        Set<Hash> peers = _context.profileOrganizer().selectAllPeers();
+        for (Hash peer : peers) {
             if (peer.toBase64().startsWith(_peer)) {
-                try {
-                    WriterOutputStream wos = new WriterOutputStream(_out);
-                    ctx.profileOrganizer().exportProfile(peer, wos);
-                    wos.flush();
-                    _out.flush();
-                    return "";
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                return dumpProfile(peer);
             }
         }
-        return "Unknown";
+        return "Unknown peer " + _peer;
+    }
+
+    /**
+     *  Look up based on the full b64 - efficient
+     *  @since 0.8.5
+     */
+    private String outputProfile() { 
+        Hash peer = new Hash();
+        try {
+            peer.fromBase64(_peer);
+            return dumpProfile(peer);
+        } catch (DataFormatException dfe) {
+            return "Bad peer hash " + _peer;
+        }
+    }
+
+    /**
+     *  dump the profile
+     *  @since 0.8.5
+     */
+    private String dumpProfile(Hash peer) { 
+        try {
+            WriterOutputStream wos = new WriterOutputStream(_out);
+            boolean success = _context.profileOrganizer().exportProfile(peer, wos);
+            if (success) {
+                wos.flush();
+                _out.flush();
+                return "";
+            } else {
+                return "Unknown peer " + _peer;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "IO Error " + e;
+        }
     }
 }

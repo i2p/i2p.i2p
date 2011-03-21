@@ -82,7 +82,9 @@ public class DHSessionKeyBuilder {
 
         // add to the defaults for every 128MB of RAM, up to 512MB
         long maxMemory = Runtime.getRuntime().maxMemory();
-        int factor = Math.min(4, (int) (1 + (maxMemory / (128*1024*1024l))));
+        if (maxMemory == Long.MAX_VALUE)
+            maxMemory = 127*1024*1024l;
+        int factor = (int) Math.max(1l, Math.min(4l, 1 + (maxMemory / (128*1024*1024l))));
         int defaultMin = DEFAULT_DH_PRECALC_MIN * factor;
         int defaultMax = DEFAULT_DH_PRECALC_MAX * factor;
         MIN_NUM_BUILDERS = ctx.getProperty(PROP_DH_PRECALC_MIN, defaultMin);

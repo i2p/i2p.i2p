@@ -8,6 +8,7 @@ import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Properties;
@@ -24,13 +25,24 @@ import net.i2p.util.Log;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFileOutputStream;
 
+/**
+ *  Write profiles to disk at shutdown,
+ *  read at startup.
+ *  The files are gzip compressed, however we unfortunately store them
+ *  with a ".dat" extension instead of ".txt.gz", so it isn't apparent.
+ *  TODO: Migrate to new extension.
+ */
 class ProfilePersistenceHelper {
-    private Log _log;
-    private RouterContext _context;
+    private final Log _log;
+    private final RouterContext _context;
     
     public final static String PROP_PEER_PROFILE_DIR = "router.profileDir";
     public final static String DEFAULT_PEER_PROFILE_DIR = "peerProfiles";
     private final static String NL = System.getProperty("line.separator");
+    private static final String PREFIX = "profile-";
+    private static final String SUFFIX = ".txt.gz";
+    private static final String UNCOMPRESSED_SUFFIX = ".txt";
+    private static final String OLD_SUFFIX = ".dat";
     
     /**
      * If we haven't been able to get a message through to the peer in 3 days,
@@ -76,58 +88,49 @@ class ProfilePersistenceHelper {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Writing the profile to " + f.getName() + " took " + delay + "ms");
     }
+
     /** write out the data from the profile to the stream */
     public void writeProfile(PeerProfile profile, OutputStream out) throws IOException {
         String groups = null;
         if (_context.profileOrganizer().isFailing(profile.getPeer())) {
-            groups = "failing";
+            groups = "Failing";
         } else if (!_context.profileOrganizer().isHighCapacity(profile.getPeer())) {
-            groups = "not failing";
+            groups = "Standard";
         } else {
             if (_context.profileOrganizer().isFast(profile.getPeer()))
-                groups = "fast and high capacity";
+                groups = "Fast, High Capacity";
             else
-                groups = "high capacity";
+                groups = "High Capacity";
             
             if (_context.profileOrganizer().isWellIntegrated(profile.getPeer()))
-                groups = groups + ", well integrated";
+                groups = groups + ", Integrated";
         }
         
         StringBuilder buf = new StringBuilder(512);
         buf.append("########################################################################").append(NL);
-        buf.append("# profile for ").append(profile.getPeer().toBase64()).append(NL);
+        buf.append("# Profile for peer ").append(profile.getPeer().toBase64()).append(NL);
         if (_us != null)
             buf.append("# as calculated by ").append(_us.toBase64()).append(NL);
         buf.append("#").append(NL);
-        buf.append("# capacity: ").append(profile.getCapacityValue()).append(NL);
-        buf.append("# integration: ").append(profile.getIntegrationValue()).append(NL);
-        buf.append("# speedValue: ").append(profile.getSpeedValue()).append(NL);
-        buf.append("#").append(NL);
+        buf.append("# Speed: ").append(profile.getSpeedValue()).append(NL);
+        buf.append("# Capacity: ").append(profile.getCapacityValue()).append(NL);
+        buf.append("# Integration: ").append(profile.getIntegrationValue()).append(NL);
         buf.append("# Groups: ").append(groups).append(NL);
+        buf.append("#").append(NL);
         buf.append("########################################################################").append(NL);
         buf.append("##").append(NL);
-        buf.append("# Capacity bonus: used to affect the capacity score after all other calculations are done").append(NL);
-        buf.append("capacityBonus=").append(profile.getCapacityBonus()).append(NL);
-        buf.append("# Integration bonus: used to affect the integration score after all other calculations are done").append(NL);
-        buf.append("integrationBonus=").append(profile.getIntegrationBonus()).append(NL);
-        buf.append("# Speed bonus: used to affect the speed score after all other calculations are done").append(NL);
-        buf.append("speedBonus=").append(profile.getSpeedBonus()).append(NL);
-        buf.append(NL).append(NL);
-        buf.append("# Last heard about: when did we last get a reference to this peer?  (milliseconds since the epoch)").append(NL);
-        buf.append("lastHeardAbout=").append(profile.getLastHeardAbout()).append(NL);
-        buf.append("# First heard about: when did we first get a reference to this peer?  (milliseconds since the epoch)").append(NL);
-        buf.append("firstHeardAbout=").append(profile.getFirstHeardAbout()).append(NL);
-        buf.append("# Last sent to successfully: when did we last send the peer a message successfully?  (milliseconds from the epoch)").append(NL);
-        buf.append("lastSentToSuccessfully=").append(profile.getLastSendSuccessful()).append(NL);
-        buf.append("# Last failed send: when did we last fail to send a message to the peer?  (milliseconds from the epoch)").append(NL);
-        buf.append("lastFailedSend=").append(profile.getLastSendFailed()).append(NL);
-        buf.append("# Last heard from: when did we last get a message from the peer?  (milliseconds from the epoch)").append(NL);
-        buf.append("lastHeardFrom=").append(profile.getLastHeardFrom()).append(NL);
-        buf.append("# moving average as to how fast the peer replies").append(NL);
-        buf.append("tunnelTestTimeAverage=").append(profile.getTunnelTestTimeAverage()).append(NL);
-        buf.append("tunnelPeakThroughput=").append(profile.getPeakThroughputKBps()).append(NL);
-        buf.append("tunnelPeakTunnelThroughput=").append(profile.getPeakTunnelThroughputKBps()).append(NL);
-        buf.append("tunnelPeakTunnel1mThroughput=").append(profile.getPeakTunnel1mThroughputKBps()).append(NL);
+        add(buf, "speedBonus", profile.getSpeedBonus(), "Manual adjustment to the speed score");
+        add(buf, "capacityBonus", profile.getCapacityBonus(), "Manual adjustment to the capacity score");
+        add(buf, "integrationBonus", profile.getIntegrationBonus(), "Manual adjustment to the integration score");
+        addDate(buf, "firstHeardAbout", profile.getFirstHeardAbout(), "When did we first get a reference to this peer?");
+        addDate(buf, "lastHeardAbout", profile.getLastHeardAbout(), "When did we last get a reference to this peer?");
+        addDate(buf, "lastHeardFrom", profile.getLastHeardFrom(), "When did we last get a message from the peer?");
+        addDate(buf, "lastSentToSuccessfully", profile.getLastSendSuccessful(), "When did we last send the peer a message successfully?");
+        addDate(buf, "lastFailedSend", profile.getLastSendFailed(), "When did we last fail to send a message to the peer?");
+        add(buf, "tunnelTestTimeAverage", profile.getTunnelTestTimeAverage(), "Moving average as to how fast the peer replies");
+        add(buf, "tunnelPeakThroughput", profile.getPeakThroughputKBps(), "KBytes/sec");
+        add(buf, "tunnelPeakTunnelThroughput", profile.getPeakTunnelThroughputKBps(), "KBytes/sec");
+        add(buf, "tunnelPeakTunnel1mThroughput", profile.getPeakTunnel1mThroughputKBps(), "KBytes/sec");
         buf.append(NL);
         
         out.write(buf.toString().getBytes());
@@ -148,12 +151,29 @@ class ProfilePersistenceHelper {
         }
     }
     
-    public Set readProfiles() {
+    /** @since 0.8.5 */
+    private static void addDate(StringBuilder buf, String name, long val, String description) {
+        String when = val > 0 ? (new Date(val)).toString() : "Never";
+        add(buf, name, val, description + ' ' + when);
+    }
+    
+    /** @since 0.8.5 */
+    private static void add(StringBuilder buf, String name, long val, String description) {
+        buf.append("# ").append(name).append(NL).append("# ").append(description).append(NL);
+        buf.append(name).append('=').append(val).append(NL).append(NL);
+    }
+    
+    /** @since 0.8.5 */
+    private static void add(StringBuilder buf, String name, double val, String description) {
+        buf.append("# ").append(name).append(NL).append("# ").append(description).append(NL);
+        buf.append(name).append('=').append(val).append(NL).append(NL);
+    }
+    
+    public Set<PeerProfile> readProfiles() {
         long start = _context.clock().now();
-        Set files = selectFiles();
-        Set profiles = new HashSet(files.size());
-        for (Iterator iter = files.iterator(); iter.hasNext();) {
-            File f = (File)iter.next();
+        Set<File> files = selectFiles();
+        Set<PeerProfile> profiles = new HashSet(files.size());
+        for (File f :  files) {
             PeerProfile profile = readProfile(f);
             if (profile != null)
                 profiles.add(profile);
@@ -164,10 +184,11 @@ class ProfilePersistenceHelper {
         return profiles;
     }
     
-    private Set selectFiles() {
+    private Set<File> selectFiles() {
         File files[] = getProfileDir().listFiles(new FilenameFilter() {
             public boolean accept(File dir, String filename) {
-                return (filename.startsWith("profile-") && filename.endsWith(".dat"));
+                return (filename.startsWith(PREFIX) &&
+                        (filename.endsWith(SUFFIX) || filename.endsWith(OLD_SUFFIX) || filename.endsWith(UNCOMPRESSED_SUFFIX)));
             }
         });
         Set rv = new HashSet(files.length);
@@ -200,6 +221,14 @@ class ProfilePersistenceHelper {
                               ", since we haven't heard from them in a long time");
                 file.delete();
                 return null;
+            } else if (file.getName().endsWith(OLD_SUFFIX)) {
+                // migrate to new file name, ignore failure
+                String newName = file.getAbsolutePath();
+                newName = newName.substring(0, newName.length() - OLD_SUFFIX.length()) + SUFFIX;
+                boolean success = file.renameTo(new File(newName));
+                if (!success)
+                    // new file exists and on Windows?
+                    file.delete();
             }
             
             profile.setCapacityBonus(getLong(props, "capacityBonus"));
@@ -300,8 +329,8 @@ class ProfilePersistenceHelper {
     }
 
     private Hash getHash(String name) {
-        String key = name.substring("profile-".length());
-        key = key.substring(0, key.length() - ".dat".length());
+        String key = name.substring(PREFIX.length());
+        key = key.substring(0, 44);
         //Hash h = new Hash();
         try {
             //h.fromBase64(key);
@@ -317,7 +346,7 @@ class ProfilePersistenceHelper {
     }
     
     private File pickFile(PeerProfile profile) {
-        return new File(getProfileDir(), "profile-" + profile.getPeer().toBase64() + ".dat");
+        return new File(getProfileDir(), PREFIX + profile.getPeer().toBase64() + SUFFIX);
     }
     
     private File getProfileDir() {
@@ -339,7 +368,7 @@ class ProfilePersistenceHelper {
             rnd.nextBytes(data);
             Hash peer = new Hash(data);
             try {
-                File f = new File(dir, "profile-" + peer.toBase64() + ".dat");
+                File f = new File(dir, PREFIX + peer.toBase64() + SUFFIX);
                 f.createNewFile();
                 System.out.println("Created " + peer.toBase64());
             } catch (IOException ioe) {}

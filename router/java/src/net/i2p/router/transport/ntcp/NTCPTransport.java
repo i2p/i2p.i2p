@@ -491,6 +491,8 @@ public class NTCPTransport extends TransportImpl {
         _pumper.startPumping();
 
         long maxMemory = Runtime.getRuntime().maxMemory();
+        if (maxMemory == Long.MAX_VALUE)
+            maxMemory = 128*1024*1024l;
         int nr, nw;
         if (maxMemory < 32*1024*1024) {
             nr = nw = 1;

@@ -79,7 +79,7 @@
             <manifest>
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
-                <attribute name="Workspace-Changes" value="${workspace.changes}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
             </manifest>
         </war>
     </target>
