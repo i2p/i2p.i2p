@@ -88,8 +88,8 @@ class RouterWatchdog implements Runnable {
             r = null;
             if (rs != null)
                 r = rs.getRate(60*1000);
-            double kbps = (r != null ? r.getAverageValue() : 0);
-            _log.error("Outbound send rate: " + kbps + "KBps");
+            double bps = (r != null ? r.getAverageValue() : 0);
+            _log.error("Outbound send rate: " + bps + " Bps");
             long max = Runtime.getRuntime().maxMemory();
             long used = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
             _log.error("Memory: " + DataHelper.formatSize(used) + '/' + DataHelper.formatSize(max));

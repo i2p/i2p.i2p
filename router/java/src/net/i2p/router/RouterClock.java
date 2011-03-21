@@ -131,7 +131,7 @@ public class RouterClock extends Clock {
                 getLog().info("Updating target clock offset to " + offsetMs + "ms from " + _offset + "ms, Stratum " + stratum);
             
             if (!_statCreated) {
-                _contextRC.statManager().createRateStat("clock.skew", "How far is the already adjusted clock being skewed?", "Clock", new long[] { 10*60*1000, 3*60*60*1000, 24*60*60*60 });
+                _contextRC.statManager().createRequiredRateStat("clock.skew", "Clock step adjustment (ms)", "Clock", new long[] { 10*60*1000, 3*60*60*1000, 24*60*60*60 });
                 _statCreated = true;
             }
             _contextRC.statManager().addRateData("clock.skew", delta, 0);

@@ -83,7 +83,7 @@ class SummaryRenderer {
                                                                      false, false, false, false, -1, false); }
 
     public void render(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount, boolean showCredit) throws IOException {
-        long end = _listener.now() - 60*1000;
+        long end = _listener.now() - 75*1000;
         if (periodCount <= 0 || periodCount > _listener.getRows())
             periodCount = _listener.getRows();
         long start = end - _listener.getRate().getPeriod()*periodCount;

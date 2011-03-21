@@ -258,7 +258,7 @@ public class StatSummarizer implements Runnable {
         if (txLsnr == null || rxLsnr == null)
             throw new IOException("no rates for combined graph");
 
-        long end = _context.clock().now() - 60*1000;
+        long end = _context.clock().now() - 75*1000;
         if (width > GraphHelper.MAX_X)
             width = GraphHelper.MAX_X;
         else if (width <= 0)

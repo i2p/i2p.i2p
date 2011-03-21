@@ -57,9 +57,9 @@ public class TunnelDispatcher implements Service {
         _validator = null;
         _pumper = new TunnelGatewayPumper(ctx);
         _leaveJob = new LeaveTunnel(ctx);
-        ctx.statManager().createRateStat("tunnel.participatingTunnels", 
-                                         "How many tunnels are we participating in?", "Tunnels", 
-                                         new long[] { 60*1000, 10*60*1000l, 60*60*1000l });
+        ctx.statManager().createRequiredRateStat("tunnel.participatingTunnels", 
+                                         "Tunnels routed for others", "Tunnels", 
+                                         new long[] { 60*1000, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
         ctx.statManager().createRateStat("tunnel.dispatchOutboundPeer", 
                                          "How many messages we send out a tunnel targetting a peer?", "Tunnels", 
                                          new long[] { 10*60*1000l, 60*60*1000l });
@@ -108,17 +108,17 @@ public class TunnelDispatcher implements Service {
         ctx.statManager().createRateStat("tunnel.dispatchOutboundZeroHopTime", 
                                          "How long it takes to dispatch an outbound message through a zero hop tunnel", "Tunnels", 
                                          new long[] { 60*1000l, 60*60*1000l });
-        ctx.statManager().createRateStat("tunnel.participatingBandwidth", 
-                                         "Participating traffic", "Tunnels", 
+        ctx.statManager().createRequiredRateStat("tunnel.participatingBandwidth", 
+                                         "Participating traffic received (Bytes/sec)", "Tunnels", 
                                          new long[] { 60*1000l, 60*10*1000l });
-        ctx.statManager().createRateStat("tunnel.participatingBandwidthOut", 
-                                         "Participating traffic", "Tunnels", 
+        ctx.statManager().createRequiredRateStat("tunnel.participatingBandwidthOut", 
+                                         "Participating traffic sent (Bytes/sec)", "Tunnels", 
                                          new long[] { 60*1000l, 60*10*1000l });
         ctx.statManager().createRateStat("tunnel.participatingMessageDropped", 
                                          "Dropped for exceeding share limit", "Tunnels", 
                                          new long[] { 60*1000l, 60*10*1000l });
-        ctx.statManager().createRateStat("tunnel.participatingMessageCount", 
-                                         "How many messages are sent through a participating tunnel?", "Tunnels", 
+        ctx.statManager().createRequiredRateStat("tunnel.participatingMessageCount", 
+                                         "Number of 1KB participating messages", "Tunnels", 
                                          new long[] { 60*1000l, 60*10*1000l, 60*60*1000l });
         ctx.statManager().createRateStat("tunnel.ownedMessageCount", 
                                          "How many messages are sent through a tunnel we created (period == failures)?", "Tunnels", 

@@ -1423,19 +1423,20 @@ private static class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
 
     public CoalesceStatsEvent(RouterContext ctx) { 
         _ctx = ctx; 
-        ctx.statManager().createRateStat("bw.receiveBps", "How fast we receive data (in KBps)", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
-        ctx.statManager().createRateStat("bw.sendBps", "How fast we send data (in KBps)", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
-        ctx.statManager().createRateStat("bw.sendRate", "Low level bandwidth send rate", "Bandwidth", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
-        ctx.statManager().createRateStat("bw.recvRate", "Low level bandwidth receive rate", "Bandwidth", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
+        ctx.statManager().createRequiredRateStat("bw.receiveBps", "Message receive rate (Bytes/sec)", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
+        // used in the router watchdog
+        ctx.statManager().createRequiredRateStat("bw.sendBps", "Message send rate (Bytes/sec)", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
+        ctx.statManager().createRequiredRateStat("bw.sendRate", "Low-level send rate (Bytes/sec)", "Bandwidth", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
+        ctx.statManager().createRequiredRateStat("bw.recvRate", "Low-level receive rate (Bytes/sec)", "Bandwidth", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
         ctx.statManager().createRateStat("router.activePeers", "How many peers we are actively talking with", "Throttle", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         ctx.statManager().createRateStat("router.activeSendPeers", "How many peers we've sent to this minute", "Throttle", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         ctx.statManager().createRateStat("router.highCapacityPeers", "How many high capacity peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
-        ctx.statManager().createRateStat("router.fastPeers", "How many fast peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
+        ctx.statManager().createRequiredRateStat("router.fastPeers", "Known fast peers", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
         _maxMemory = Runtime.getRuntime().maxMemory();
         String legend = "(Bytes)";
         if (_maxMemory < Long.MAX_VALUE)
             legend += " Max is " + DataHelper.formatSize(_maxMemory) + 'B';
-        ctx.statManager().createRateStat("router.memoryUsed", legend, "Router", new long[] { 60*1000 });
+        ctx.statManager().createRequiredRateStat("router.memoryUsed", legend, "Router", new long[] { 60*1000 });
     }
     private RouterContext getContext() { return _ctx; }
     public void timeReached() {
@@ -1468,8 +1469,8 @@ private static class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
             Rate rate = receiveRate.getRate(60*1000);
             if (rate != null) { 
                 double bytes = rate.getLastTotalValue();
-                double KBps = (bytes*1000.0d)/(rate.getPeriod()*1024.0d); 
-                getContext().statManager().addRateData("bw.receiveBps", (long)KBps, 60*1000);
+                double bps = (bytes*1000.0d)/rate.getPeriod(); 
+                getContext().statManager().addRateData("bw.receiveBps", (long)bps, 60*1000);
             }
         }
 
@@ -1478,8 +1479,8 @@ private static class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
             Rate rate = sendRate.getRate(60*1000);
             if (rate != null) {
                 double bytes = rate.getLastTotalValue();
-                double KBps = (bytes*1000.0d)/(rate.getPeriod()*1024.0d); 
-                getContext().statManager().addRateData("bw.sendBps", (long)KBps, 60*1000);
+                double bps = (bytes*1000.0d)/rate.getPeriod(); 
+                getContext().statManager().addRateData("bw.sendBps", (long)bps, 60*1000);
             }
         }
     }

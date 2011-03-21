@@ -116,7 +116,7 @@ public class ProfileOrganizer {
         _context.statManager().createRateStat("peer.profilePlaceTime", "How long the reorg takes placing peers in the tiers", "Peers", new long[] { 10*60*1000 });
         _context.statManager().createRateStat("peer.profileReorgTime", "How long the reorg takes overall", "Peers", new long[] { 10*60*1000 });
         // used in DBHistory
-        _context.statManager().createRateStat("peer.failedLookupRate", "DB Lookup fail rate", "Peers", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRequiredRateStat("peer.failedLookupRate", "Net DB Lookup fail rate", "Peers", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
     }
     
     private void getReadLock() {

@@ -104,14 +104,21 @@ public class ConfigStatsHandler extends FormHandler {
         }
             
         _context.router().setConfigSetting(StatManager.PROP_STAT_FILTER, stats.toString());
+        boolean graphsChanged = !_graphs.equals(_context.getProperty("stat.summaries"));
         _context.router().setConfigSetting("stat.summaries", _graphs);
+        boolean fullChanged = _context.getBooleanProperty(StatManager.PROP_STAT_FULL) != _isFull;
         _context.router().setConfigSetting(StatManager.PROP_STAT_FULL, "" + _isFull);
-        boolean ok = _context.router().saveConfig();
-        if (ok) 
+        _context.router().saveConfig();
+        if (!_stats.isEmpty())
             addFormNotice(_("Stat filter and location updated successfully to") + ": " + stats.toString());
-        else
-            addFormError(_("Failed to update the stat filter and location"));
-        addFormNotice(_("Graph list updated, may take up to 60s to be reflected here and on the <a href=\"graphs.jsp\">Graphs Page</a>"));
+        if (fullChanged) {
+            if (_isFull)
+                addFormNotice(_("Full statistics enabled - restart required to take effect"));
+            else
+                addFormNotice(_("Full statistics disabled - restart required to take effect"));
+        }
+        if (graphsChanged)
+            addFormNotice(_("Graph list updated, may take up to 60s to be reflected here and on the <a href=\"graphs.jsp\">Graphs Page</a>"));
     }
     
 }

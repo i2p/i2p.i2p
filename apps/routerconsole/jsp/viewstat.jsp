@@ -42,6 +42,8 @@ if ( !rendered && ((rs != null) || fakeBw) ) {
         }
       } else {
         response.setContentType("image/png");
+        // very brief 45 sec expire
+        response.setDateHeader("Expires", net.i2p.I2PAppContext.getGlobalContext().clock().now() + (45*1000));
         int width = -1;
         int height = -1;
         int periodCount = -1;

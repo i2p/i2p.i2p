@@ -80,7 +80,7 @@ public class TunnelPool {
                 _context.clientManager().requestLeaseSet(_settings.getDestination(), ls);
         }
         _context.statManager().createRateStat(_rateName,
-                               "Tunnel Bandwidth", "Tunnels", 
+                               "Tunnel Bandwidth (Bytes/sec)", "Tunnels", 
                                new long[] { 5*60*1000l });
     }
     
@@ -599,7 +599,7 @@ public class TunnelPool {
         if (rs == null) {
             // Create the RateStat here rather than at the top because
             // the user could change the length settings while running
-            _context.statManager().createRateStat(buildRateName(),
+            _context.statManager().createRequiredRateStat(buildRateName(),
                                    "Tunnel Build Frequency", "Tunnels",
                                    new long[] { TUNNEL_LIFETIME });
             rs = _context.statManager().getRate(buildRateName());
