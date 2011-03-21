@@ -188,7 +188,7 @@
                 </label>
                 <textarea rows="1" style="height: 3em;" cols="60" readonly="readonly" id="localDestination" title="Read Only: Local Destination (if known)" wrap="off" spellcheck="false"><%=editBean.getDestinationBase64(curTunnel)%></textarea>               
          <% if (!"".equals(editBean.getDestinationBase64(curTunnel))) { %>    
-            <a href="/susidns/addressbook.jsp?book=private&hostname=<%=editBean.getTunnelName(curTunnel)%>&destination=<%=editBean.getDestinationBase64(curTunnel)%>#add"><%=intl._("Add to local addressbook")%></a>    
+            <a href="/susidns/addressbook.jsp?book=private&amp;hostname=<%=editBean.getTunnelName(curTunnel)%>&amp;destination=<%=editBean.getDestinationBase64(curTunnel)%>#add"><%=intl._("Add to local addressbook")%></a>    
          <% } %>
             </div>
 
@@ -340,7 +340,7 @@
                 <label for="force" accesskey="c">
                     <%=intl._("Generate New Key")%>:
                 </label>
-                <button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="Generate" title="Generate New Key Now"><%=intl._("Generate")%></button>
+                <button accesskey="S" class="control" type="submit" name="action" value="Generate" title="Generate New Key Now"><%=intl._("Generate")%></button>
                 <span class="comment"><%=intl._("(Tunnel must be stopped first)")%></span>
             </div>
                  
@@ -374,7 +374,7 @@
 
             <div class="rowItem">
               <div id="optionsField" class="rowItem">
-                  <label><%=intl._("Inbound connection limits (0=unlimited)")%><br><%=intl._("Per client")%>:</label>
+                  <label><%=intl._("Inbound connection limits (0=unlimited)")%><br /><%=intl._("Per client")%>:</label>
               </div>
               <div id="portField" class="rowItem">
                   <label><%=intl._("Per minute")%>:</label>
@@ -453,7 +453,6 @@
               <div id="portField" class="rowItem">
                 <label><%=intl._("None")%></label>
                 <input value="0" type="radio" id="startOnLoad" name="cert" title="No Certificate"<%=(editBean.getCert(curTunnel)==0 ? " checked=\"checked\"" : "")%> class="tickbox" />                
-                <span class="comment"></span>
               </div>
               <div id="portField" class="rowItem">
                 <label><%=intl._("Hashcash (effort)")%></label>
@@ -465,13 +464,12 @@
                 <label for="force" accesskey="c">
                     <%=intl._("Hashcash Calc Time")%>:
                 </label>
-                <button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="Estimate" title="Estimate Calculation Time"><%=intl._("Estimate")%></button>
+                <button accesskey="S" class="control" type="submit" name="action" value="Estimate" title="Estimate Calculation Time"><%=intl._("Estimate")%></button>
             </div>
             <div id="hostField" class="rowItem">
               <div id="portField" class="rowItem">
                 <label><%=intl._("Hidden")%></label>
                 <input value="2" type="radio" id="startOnLoad" name="cert" title="Hidden Certificate"<%=(editBean.getCert(curTunnel)==2 ? " checked=\"checked\"" : "")%> class="tickbox" />                
-                <span class="comment"></span>
               </div>
               <div id="portField" class="rowItem">
                 <label for="signer" accesskey="c">
@@ -479,14 +477,13 @@
                 </label>
                 <input value="3" type="radio" id="startOnLoad" name="cert" title="Signed Certificate"<%=(editBean.getCert(curTunnel)==3 ? " checked=\"checked\"" : "")%> class="tickbox" />                
                 <input type="text" id="port" name="signer" size="50" title="Cert Signer" value="<%=editBean.getSigner(curTunnel)%>" class="freetext" />                
-                <span class="comment"></span>
               </div>
             </div>
             <div id="portField" class="rowItem">
                 <label for="force" accesskey="c">
                     <%=intl._("Modify Certificate")%>:
                 </label>
-                <button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="Modify" title="Force New Cert Now"><%=intl._("Modify")%></button>
+                <button accesskey="S" class="control" type="submit" name="action" value="Modify" title="Force New Cert Now"><%=intl._("Modify")%></button>
                 <span class="comment"><%=intl._("(Tunnel must be stopped first)")%></span>
             </div>
                  

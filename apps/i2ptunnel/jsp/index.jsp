@@ -1,10 +1,13 @@
 <%
+    // NOTE: Do the header carefully so there is no whitespace before the <?xml... line
+
     // http://www.crazysquirrel.com/computing/general/form-encoding.jspx
     if (request.getCharacterEncoding() == null)
         request.setCharacterEncoding("UTF-8");
-%>
-<%@page pageEncoding="UTF-8"%>
-<%@page contentType="text/html" import="net.i2p.i2ptunnel.web.IndexBean"%><?xml version="1.0" encoding="UTF-8"?>
+
+%><%@page pageEncoding="UTF-8"
+%><%@page contentType="text/html" import="net.i2p.i2ptunnel.web.IndexBean"
+%><?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <jsp:useBean class="net.i2p.i2ptunnel.web.IndexBean" id="indexBean" scope="request" />
 <jsp:setProperty name="indexBean" property="*" />
