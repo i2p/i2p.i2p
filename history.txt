@@ -1,3 +1,7 @@
+2011-03-22 zzz
+    * Handle GNU JRE returning Long.MAX_VALUE for max memory
+    * i2ptunnel: HTML fixes
+
 2011-03-20 zzz
     * Console: Remove cache directives
     * i2psnark: Fix peers stuck at uninteresting after metainfo fetch
