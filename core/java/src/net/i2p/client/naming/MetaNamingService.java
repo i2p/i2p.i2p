@@ -4,9 +4,11 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -170,6 +172,18 @@ public class MetaNamingService extends DummyNamingService {
         Map<String, Destination> rv = new HashMap();
         for (NamingService ns : _services) { 
              rv.putAll(ns.getEntries(options));
+        }
+        return rv;
+    }
+
+    /**
+     *  All services aggregated
+     */
+    @Override
+    public Set<String> getNames(Properties options) {
+        Set<String> rv = new HashSet();
+        for (NamingService ns : _services) { 
+             rv.addAll(ns.getNames(options));
         }
         return rv;
     }

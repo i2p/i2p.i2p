@@ -17,6 +17,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -359,6 +360,40 @@ public class SingleFileNamingService extends NamingService {
         } catch (IOException ioe) {
             _log.error("getEntries error", ioe);
             return Collections.EMPTY_MAP;
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
+            releaseReadLock();
+        }
+    }
+
+    /**
+     *  @param options ignored
+     *  @return all known host names, unsorted
+     */
+    public Set<String> getNames(Properties options) {
+        if (!_file.exists())
+            return Collections.EMPTY_SET;
+        BufferedReader in = null;
+        getReadLock();
+        try {
+            in = new BufferedReader(new InputStreamReader(new FileInputStream(_file), "UTF-8"), 16*1024);
+            String line = null;
+            Set<String> rv = new HashSet();
+            while ( (line = in.readLine()) != null) {
+                if (line.length() <= 0)
+                    continue;
+                if (line.startsWith("#"))
+                    continue;
+                int split = line.indexOf('=');
+                if (split <= 0)
+                    continue;
+                String key = line.substring(0, split);
+                rv.add(key);
+            }
+            return rv;
+        } catch (IOException ioe) {
+            _log.error("getNames error", ioe);
+            return Collections.EMPTY_SET;
         } finally {
             if (in != null) try { in.close(); } catch (IOException ioe) {}
             releaseReadLock();

@@ -27,6 +27,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.naming.NamingService;
@@ -54,52 +56,69 @@ public class Daemon {
      * @param master
      *            The master AddressBook. This address book is never
      *            overwritten, so it is safe for the user to write to.
+     *            It is only merged to the published addressbook.
+     *            May be null.
      * @param router
      *            The router AddressBook. This is the address book read by
      *            client applications.
      * @param published
      *            The published AddressBook. This address book is published on
      *            the user's eepsite so that others may subscribe to it.
+     *            May be null.
      *            If non-null, overwrite with the new addressbook.
      * @param subscriptions
      *            A SubscriptionList listing the remote address books to update
      *            from.
      * @param log
      *            The log to write changes and conflicts to.
+     *            May be null.
      */
     public static void update(AddressBook master, AddressBook router,
             File published, SubscriptionList subscriptions, Log log) {
-        router.merge(master, true, null);
         Iterator<AddressBook> iter = subscriptions.iterator();
         while (iter.hasNext()) {
             // yes, the EepGet fetch() is done in next()
             router.merge(iter.next(), false, log);
         }
         router.write();
-        if (published != null)
+        if (published != null) {
+            if (master != null)
+                router.merge(master, true, null);
             router.write(published);
+        }
         subscriptions.write();
     }
 
     /**
      * Update the router and published address books using remote data from the
      * subscribed address books listed in subscriptions.
+     * Merging of the "master" addressbook is NOT supported.
      * 
      * @param router
-     *            The router AddressBook. This is the address book read by
+     *            The NamingService to update, generally the root NamingService from the context.
      *            client applications.
      * @param published
      *            The published AddressBook. This address book is published on
      *            the user's eepsite so that others may subscribe to it.
+     *            May be null.
      *            If non-null, overwrite with the new addressbook.
      * @param subscriptions
      *            A SubscriptionList listing the remote address books to update
      *            from.
      * @param log
      *            The log to write changes and conflicts to.
+     *            May be null.
      * @since 0.8.6
      */
     public static void update(NamingService router, File published, SubscriptionList subscriptions, Log log) {
+        // If the NamingService is a database, we look up as we go.
+        // If it is a text file, we do things differently, to avoid O(n**2) behavior
+        // when scanning large subscription results (i.e. those that return the whole file, not just the new entries) -
+        // we load all the known hostnames into a Set one time.
+        String nsClass = router.getClass().getSimpleName();
+        boolean isTextFile = nsClass.equals("HostsTxtNamingService") || nsClass.equals("SingleFileNamingService");
+        Set<String> knownNames = null;
+
         NamingService publishedNS = null;
         Iterator<AddressBook> iter = subscriptions.iterator();
         while (iter.hasNext()) {
@@ -114,9 +133,22 @@ public class Daemon {
             for (Iterator<Map.Entry<String, String>> eIter = sub.iterator(); eIter.hasNext(); ) {
                 Map.Entry<String, String> entry = eIter.next();
                 String key = entry.getKey();
-                Destination oldDest = router.lookup(key);
+                boolean isKnown;
+                Destination oldDest = null;
+                if (isTextFile) {
+                    if (knownNames == null) {
+                        // load the hostname set
+                        Properties opts = new Properties();
+                        opts.setProperty("file", "hosts.txt");
+                        knownNames = router.getNames(opts);
+                    }
+                    isKnown = knownNames.contains(key);
+                } else {
+                    oldDest = router.lookup(key);
+                    isKnown = oldDest != null;
+                }
                 try {
-                    if (oldDest == null) {
+                    if (!isKnown) {
                         if (AddressBook.isValidKey(key)) {
                             Destination dest = new Destination(entry.getValue());
                             boolean success = router.put(key, dest);
@@ -135,14 +167,20 @@ public class Daemon {
                                 if (!success)
                                     log.append("Save to published addressbook " + published.getAbsolutePath() + " failed for new key " + key);
                             }
+                            if (isTextFile)
+                                // keep track for later dup check
+                                knownNames.add(key);
                             nnew++;
                         } else if (log != null) {
                             log.append("Bad hostname " + key + " from "
                                    + sub.getLocation());
                             invalid++;
                         }        
-                    } else if (DEBUG && log != null) {
-                        if (!oldDest.toBase64().equals(entry.getValue())) {
+                    } else if (false && DEBUG && log != null) {
+                        // lookup the conflict if we haven't yet (O(n**2) for text file)
+                        if (isTextFile)
+                            oldDest = router.lookup(key);
+                        if (oldDest != null && !oldDest.toBase64().equals(entry.getValue())) {
                             log.append("Conflict for " + key + " from "
                                        + sub.getLocation()
                                        + ". Destination in remote address book is "
@@ -170,6 +208,7 @@ public class Daemon {
             }
             sub.delete();
         }
+        subscriptions.write();
     }
 
     /**
@@ -181,12 +220,9 @@ public class Daemon {
      *            The directory containing addressbook's configuration files.
      */
     public static void update(Map<String, String> settings, String home) {
-        File masterFile = new File(home, settings
-                .get("master_addressbook"));
-        File routerFile = new File(home, settings
-                .get("router_addressbook"));
         File published = null;
-        if ("true".equals(settings.get("should_publish"))) 
+        boolean should_publish = Boolean.valueOf(settings.get("should_publish")).booleanValue();
+        if (should_publish) 
             published = new File(home, settings
                 .get("published_addressbook"));
         File subscriptionFile = new File(home, settings
@@ -204,9 +240,6 @@ public class Daemon {
             delay = 12;
         }
         delay *= 60 * 60 * 1000;
-
-        AddressBook master = new AddressBook(masterFile);
-        AddressBook router = new AddressBook(routerFile);
         
         List<String> defaultSubs = new LinkedList();
         // defaultSubs.add("http://i2p/NF2RLVUxVulR3IqK0sGJR0dHQcGXAzwa6rEO4WAWYXOHw-DoZhKnlbf1nzHXwMEJoex5nFTyiNMqxJMWlY54cvU~UenZdkyQQeUSBZXyuSweflUXFqKN-y8xIoK2w9Ylq1k8IcrAFDsITyOzjUKoOPfVq34rKNDo7fYyis4kT5bAHy~2N1EVMs34pi2RFabATIOBk38Qhab57Umpa6yEoE~rbyR~suDRvD7gjBvBiIKFqhFueXsR2uSrPB-yzwAGofTXuklofK3DdKspciclTVzqbDjsk5UXfu2nTrC1agkhLyqlOfjhyqC~t1IXm-Vs2o7911k7KKLGjB4lmH508YJ7G9fLAUyjuB-wwwhejoWqvg7oWvqo4oIok8LG6ECR71C3dzCvIjY2QcrhoaazA9G4zcGMm6NKND-H4XY6tUWhpB~5GefB3YczOqMbHq4wi0O9MzBFrOJEOs3X4hwboKWANf7DT5PZKJZ5KorQPsYRSq0E3wSOsFCSsdVCKUGsAAAA/i2p/hosts.txt");
@@ -217,18 +250,32 @@ public class Daemon {
                 .get("proxy_host"), Integer.parseInt(settings.get("proxy_port")));
         Log log = new Log(logFile);
 
-        if (true)
-            update(getNamingService(), published, subscriptions, log);
-        else
+        // If false, add hosts via naming service; if true, write hosts.txt file directly
+        // Default false
+        if (Boolean.valueOf(settings.get("update_direct")).booleanValue()) {
+            // Direct hosts.txt access
+            File routerFile = new File(home, settings.get("router_addressbook"));
+            AddressBook master;
+            if (should_publish) {
+                File masterFile = new File(home, settings.get("master_addressbook"));
+                master = new AddressBook(masterFile);
+            } else {
+                master = null;
+            }
+            AddressBook router = new AddressBook(routerFile);
             update(master, router, published, subscriptions, log);
+        } else {
+            // Naming service - no merging of master to router and published is supported.
+            update(getNamingService(settings.get("naming_service")), published, subscriptions, log);
+        }
     }
 
     /** depth-first search */
     private static NamingService searchNamingService(NamingService ns, String srch)
     {
         String name = ns.getName();
-        if (name == srch)
-                return ns;
+        if (name.equals(srch) || name.endsWith('/' + srch) || name.endsWith('\\' + srch))
+            return ns;
         List<NamingService> list = ns.getNamingServices();
         if (list != null) {
             for (NamingService nss : list) {
@@ -240,11 +287,11 @@ public class Daemon {
         return null;                
     }
 
-    /** @return the NamingService for the current file name, or the root NamingService */
-    private static NamingService getNamingService()
+    /** @return the configured NamingService, or the root NamingService */
+    private static NamingService getNamingService(String srch)
     {
         NamingService root = I2PAppContext.getGlobalContext().namingService();
-        NamingService rv = searchNamingService(root, "hosts.txt");
+        NamingService rv = searchNamingService(root, srch);
         return rv != null ? rv : root;                
     }
 
@@ -287,6 +334,8 @@ public class Daemon {
         defaultSettings.put("last_modified", "last_modified");
         defaultSettings.put("last_fetched", "last_fetched");
         defaultSettings.put("update_delay", "12");
+        defaultSettings.put("update_direct", "false");
+        defaultSettings.put("naming_service", "hosts.txt");
         
         if (!homeFile.exists()) {
             boolean created = homeFile.mkdirs();

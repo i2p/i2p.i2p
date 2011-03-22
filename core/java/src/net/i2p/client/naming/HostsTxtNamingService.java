@@ -8,8 +8,10 @@
 package net.i2p.client.naming;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
@@ -76,5 +78,24 @@ public class HostsTxtNamingService extends MetaNamingService {
     @Override
     public boolean remove(String hostname, Properties options) {
         return super.remove(hostname.toLowerCase(), options);
+    }
+
+    /**
+     *  All services aggregated, unless options contains
+     *  the property "file", in which case only for that file
+     */
+    @Override
+    public Set<String> getNames(Properties options) {
+        String file = null;
+        if (options != null)
+            file = options.getProperty("file");
+        if (file == null)
+            return super.getNames(options);
+        for (NamingService ns : _services) { 
+             String name = ns.getName();
+             if (name.equals(file) || name.endsWith('/' + file) || name.endsWith('\\' + file))
+                 return ns.getNames(options);
+        }
+        return new HashSet(0);
     }
 }
