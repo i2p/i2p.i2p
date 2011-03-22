@@ -23,11 +23,14 @@ package net.i2p.addressbook;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.EepGet;
+import net.i2p.util.SecureFile;
 
 /**
  * An address book for storing human readable names mapped to base64 i2p
@@ -39,11 +42,12 @@ import net.i2p.util.EepGet;
  */
 class AddressBook {
 
-    private String location;
-
-    private Map<String, String> addresses;
-
+    private final String location;
+    /** either addresses or subFile will be non-null, but not both */
+    private final Map<String, String> addresses;
+    private final File subFile;
     private boolean modified;
+    private static final boolean DEBUG = true;
 
     /**
      * Construct an AddressBook from the contents of the Map addresses.
@@ -54,6 +58,8 @@ class AddressBook {
      */
     public AddressBook(Map<String, String> addresses) {
         this.addresses = addresses;
+        this.subFile = null;
+        this.location = null;
     }
 
     /*
@@ -81,6 +87,7 @@ class AddressBook {
     }
 */
     static final long MAX_SUB_SIZE = 3 * 1024 * 1024l; //about 5,000 hosts
+
     /**
      * Construct an AddressBook from the Subscription subscription. If the
      * address book at subscription has not changed since the last time it was
@@ -89,33 +96,46 @@ class AddressBook {
      * 
      * Yes, the EepGet fetch() is done in this constructor.
      * 
+     * This stores the subscription in a temporary file and does not read the whole thing into memory.
+     * An AddressBook created with this constructor may not be modified or written using write().
+     * It may be a merge source (an parameter for another AddressBook's merge())
+     * but may not be a merge target (this.merge() will throw an exception).
+     * 
      * @param subscription
      *            A Subscription instance pointing at a remote address book.
      * @param proxyHost hostname of proxy
      * @param proxyPort port number of proxy
      */
     public AddressBook(Subscription subscription, String proxyHost, int proxyPort) {
-        File tmp = new File(I2PAppContext.getGlobalContext().getTempDir(), "addressbook.tmp");
+        Map<String, String> a = null;
+        File subf = null;
+        try {
+            File tmp = SecureFile.createTempFile("addressbook", null, I2PAppContext.getGlobalContext().getTempDir());
+            EepGet get = new EepGet(I2PAppContext.getGlobalContext(), true,
+                    proxyHost, proxyPort, 0, -1l, MAX_SUB_SIZE, tmp.getAbsolutePath(), null,
+                    subscription.getLocation(), true, subscription.getEtag(), subscription.getLastModified(), null);
+            if (get.fetch()) {
+                subscription.setEtag(get.getETag());
+                subscription.setLastModified(get.getLastModified());
+                subscription.setLastFetched(I2PAppContext.getGlobalContext().clock().now());
+                subf = tmp;
+            } else {
+                a = Collections.EMPTY_MAP;
+                tmp.delete();
+            }
+        } catch (IOException ioe) {
+            a = Collections.EMPTY_MAP;
+        }
+        this.addresses = a;
+        this.subFile = subf;
         this.location = subscription.getLocation();
-        EepGet get = new EepGet(I2PAppContext.getGlobalContext(), true,
-                proxyHost, proxyPort, 0, -1l, MAX_SUB_SIZE, tmp.getAbsolutePath(), null,
-                subscription.getLocation(), true, subscription.getEtag(), subscription.getLastModified(), null);
-        if (get.fetch()) {
-            subscription.setEtag(get.getETag());
-            subscription.setLastModified(get.getLastModified());
-            subscription.setLastFetched(I2PAppContext.getGlobalContext().clock().now());
-        }
-        try {            
-            this.addresses = ConfigParser.parse(tmp);
-        } catch (IOException exp) {
-            this.addresses = new HashMap();
-        }
-        tmp.delete();
     }
 
     /**
      * Construct an AddressBook from the contents of the file at file. If the
-     * file cannot be read, construct an empty AddressBook
+     * file cannot be read, construct an empty AddressBook.
+     * This reads the entire file into memory.
+     * The resulting map is modifiable and may be a merge target.
      * 
      * @param file
      *            A File pointing at a file with lines in the format
@@ -124,22 +144,38 @@ class AddressBook {
      */
     public AddressBook(File file) {
         this.location = file.toString();
+        Map<String, String> a;
         try {
-            this.addresses = ConfigParser.parse(file);
+            a = ConfigParser.parse(file);
         } catch (IOException exp) {
-            this.addresses = new HashMap();
+            a = new HashMap();
         }
+        this.addresses = a;
+        this.subFile = null;
     }
 
     /**
-     * Return a Map containing the addresses in the AddressBook.
-     * 
-     * @return A Map containing the addresses in the AddressBook, where the key
-     *         is a human readable name, and the value is a base64 i2p
-     *         destination.
+     * Return an iterator over the addresses in the AddressBook.
+     * @since 0.8.6
      */
-    public Map<String, String> getAddresses() {
-        return this.addresses;
+    public Iterator<Map.Entry<String, String>> iterator() {
+        if (this.subFile != null)
+            return new ConfigIterator(this.subFile);
+        return this.addresses.entrySet().iterator();
+    }
+
+    /**
+     * Delete the temp file or clear the map.
+     * @since 0.8.6
+     */
+    public void delete() {
+        if (this.subFile != null) {
+            this.subFile.delete();
+        } else if (this.addresses != null) {
+            try {
+                this.addresses.clear();
+            } catch (UnsupportedOperationException uoe) {}
+        }
     }
 
     /**
@@ -147,19 +183,22 @@ class AddressBook {
      * 
      * @return A String representing either an abstract path, or a url,
      *         depending on how the instance was constructed.
+     *         Will be null if created with the Map constructor.
      */
     public String getLocation() {
         return this.location;
     }
 
     /**
-     * Return a string representation of the contents of the AddressBook.
+     * Return a string representation of the origin of the AddressBook.
      * 
-     * @return A String representing the contents of the AddressBook.
+     * @return A String representing the origin of the AddressBook.
      */
     @Override
     public String toString() {
-        return this.addresses.toString();
+        if (this.location != null)
+            return "Book from " + this.location;
+        return "Map containing " + this.addresses.size() + " entries";
     }
 
     private static final int MIN_DEST_LENGTH = 516;
@@ -222,16 +261,21 @@ class AddressBook {
      * @param overwrite True to overwrite
      * @param log
      *            The log to write messages about new addresses or conflicts to.
+     *
+     * @throws IllegalStateException if this was created with the Subscription constructor.
      */
     public void merge(AddressBook other, boolean overwrite, Log log) {
-        for (Map.Entry<String, String> entry : other.addresses.entrySet()) {
+        if (this.addresses == null)
+            throw new IllegalStateException();
+        for (Iterator<Map.Entry<String, String>> iter = other.iterator(); iter.hasNext(); ) {
+            Map.Entry<String, String> entry = iter.next();
             String otherKey = entry.getKey();
             String otherValue = entry.getValue();
 
             if (isValidKey(otherKey) && isValidDest(otherValue)) {
                 if (this.addresses.containsKey(otherKey) && !overwrite) {
-                    if (!this.addresses.get(otherKey).equals(otherValue)
-                            && log != null) {
+                    if (DEBUG && log != null &&
+                        !this.addresses.get(otherKey).equals(otherValue)) {
                         log.append("Conflict for " + otherKey + " from "
                                 + other.location
                                 + ". Destination in remote address book is "
@@ -256,8 +300,12 @@ class AddressBook {
      * 
      * @param file
      *            The file to write the contents of this AddressBook too.
+     *
+     * @throws IllegalStateException if this was created with the Subscription constructor.
      */
     public void write(File file) {
+        if (this.addresses == null)
+            throw new IllegalStateException();
         if (this.modified) {
             try {
                 ConfigParser.write(this.addresses, file);
@@ -271,8 +319,17 @@ class AddressBook {
      * Write this AddressBook out to the file it was read from. Requires that
      * AddressBook was constructed from a file on the local filesystem. If the
      * file cannot be writen to, this method will silently fail.
+     *
+     * @throws IllegalStateException if this was not created with the File constructor.
      */
     public void write() {
+        if (this.location == null || this.location.startsWith("http://"))
+            throw new IllegalStateException();
         this.write(new File(this.location));
+    }
+
+    @Override
+    protected void finalize() {
+        delete();
     }
 }

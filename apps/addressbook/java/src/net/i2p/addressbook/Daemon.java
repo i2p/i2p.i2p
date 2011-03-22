@@ -45,6 +45,7 @@ public class Daemon {
     public static final String VERSION = "2.0.4";
     private static final Daemon _instance = new Daemon();
     private boolean _running;
+    private static final boolean DEBUG = true;
     
     /**
      * Update the router and published address books using remote data from the
@@ -103,8 +104,15 @@ public class Daemon {
         Iterator<AddressBook> iter = subscriptions.iterator();
         while (iter.hasNext()) {
             // yes, the EepGet fetch() is done in next()
+            long start = System.currentTimeMillis();
             AddressBook sub = iter.next();
-            for (Map.Entry<String, String> entry : sub.getAddresses().entrySet()) {
+            long end = System.currentTimeMillis();
+            if (DEBUG && log != null)
+                log.append("Fetch of " + sub.getLocation() + " took " + (end - start));
+            start = end;
+            int old = 0, nnew = 0, invalid = 0, conflict = 0;
+            for (Iterator<Map.Entry<String, String>> eIter = sub.iterator(); eIter.hasNext(); ) {
+                Map.Entry<String, String> entry = eIter.next();
                 String key = entry.getKey();
                 Destination oldDest = router.lookup(key);
                 try {
@@ -127,21 +135,40 @@ public class Daemon {
                                 if (!success)
                                     log.append("Save to published addressbook " + published.getAbsolutePath() + " failed for new key " + key);
                             }
+                            nnew++;
                         } else if (log != null) {
                             log.append("Bad hostname " + key + " from "
                                    + sub.getLocation());
+                            invalid++;
                         }        
-                    } else if (!oldDest.toBase64().equals(entry.getValue()) && log != null) {
-                        log.append("Conflict for " + key + " from "
-                                   + sub.getLocation()
-                                   + ". Destination in remote address book is "
-                                   + entry.getValue());
+                    } else if (DEBUG && log != null) {
+                        if (!oldDest.toBase64().equals(entry.getValue())) {
+                            log.append("Conflict for " + key + " from "
+                                       + sub.getLocation()
+                                       + ". Destination in remote address book is "
+                                       + entry.getValue());
+                            conflict++;
+                        } else {
+                            old++;
+                        }
+                    } else {
+                        old++;
                     }
                 } catch (DataFormatException dfe) {
                     if (log != null)
                         log.append("Invalid b64 for" + key + " From: " + sub.getLocation());
+                    invalid++;
                 }
             }
+            if (DEBUG && log != null) {
+                log.append("Merge of " + sub.getLocation() + " into " + router +
+                           " took " + (System.currentTimeMillis() - start) + " ms with " +
+                           nnew + " new, " +
+                           old + " old, " +
+                           invalid + " invalid, " +
+                           conflict + " conflicts");
+            }
+            sub.delete();
         }
     }
 
