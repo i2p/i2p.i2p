@@ -43,11 +43,11 @@ import net.i2p.util.ConcurrentHashSet;
  *
  */
 class PeerManager {
-    private Log _log;
-    private RouterContext _context;
-    private ProfileOrganizer _organizer;
-    private ProfilePersistenceHelper _persistenceHelper;
-    private Set<Hash> _peersByCapability[];
+    private final Log _log;
+    private final RouterContext _context;
+    private final ProfileOrganizer _organizer;
+    private final ProfilePersistenceHelper _persistenceHelper;
+    private final Set<Hash> _peersByCapability[];
     private final Map<Hash, String> _capabilitiesByPeer;
     
     public PeerManager(RouterContext context) {

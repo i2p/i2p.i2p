@@ -40,23 +40,23 @@ import net.i2p.util.Log;
  * should be used to add new profiles (placing them into the appropriate groupings).
  */
 public class ProfileOrganizer {
-    private Log _log;
-    private RouterContext _context;
+    private final Log _log;
+    private final RouterContext _context;
     /** H(routerIdentity) to PeerProfile for all peers that are fast and high capacity*/
-    private Map<Hash, PeerProfile> _fastPeers;
+    private final Map<Hash, PeerProfile> _fastPeers;
     /** H(routerIdentity) to PeerProfile for all peers that have high capacities */
-    private Map<Hash, PeerProfile> _highCapacityPeers;
+    private final Map<Hash, PeerProfile> _highCapacityPeers;
     /** H(routerIdentity) to PeerProfile for all peers that well integrated into the network and not failing horribly */
-    private Map<Hash, PeerProfile> _wellIntegratedPeers;
+    private final Map<Hash, PeerProfile> _wellIntegratedPeers;
     /** H(routerIdentity) to PeerProfile for all peers that are not failing horribly */
-    private Map<Hash, PeerProfile> _notFailingPeers;
+    private final Map<Hash, PeerProfile> _notFailingPeers;
     /** H(routerIdnetity), containing elements in _notFailingPeers */
-    private List<Hash> _notFailingPeersList;
+    private final List<Hash> _notFailingPeersList;
     /** H(routerIdentity) to PeerProfile for all peers that ARE failing horribly (but that we haven't dropped reference to yet) */
-    private Map<Hash, PeerProfile> _failingPeers;
+    private final Map<Hash, PeerProfile> _failingPeers;
     /** who are we? */
     private Hash _us;
-    private ProfilePersistenceHelper _persistenceHelper;
+    private final ProfilePersistenceHelper _persistenceHelper;
     
     /** PeerProfile objects for all peers profiled, orderd by the ones with the highest capacity first */
     private Set<PeerProfile> _strictCapacityOrder;
@@ -68,7 +68,7 @@ public class ProfileOrganizer {
     /** integration value, seperating well integrated from not well integrated */
     private double _thresholdIntegrationValue;
     
-    private InverseCapacityComparator _comp;
+    private final InverseCapacityComparator _comp;
 
     /**
      * Defines the minimum number of 'fast' peers that the organizer should select.  See
@@ -105,9 +105,6 @@ public class ProfileOrganizer {
         _notFailingPeersList = new ArrayList(256);
         _failingPeers = new HashMap(16);
         _strictCapacityOrder = new TreeSet(_comp);
-        _thresholdSpeedValue = 0.0d;
-        _thresholdCapacityValue = 0.0d;
-        _thresholdIntegrationValue = 0.0d;
         _persistenceHelper = new ProfilePersistenceHelper(_context);
         
         _context.statManager().createRateStat("peer.profileSortTime", "How long the reorg takes sorting peers", "Peers", new long[] { 10*60*1000 });

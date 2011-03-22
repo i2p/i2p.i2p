@@ -24,11 +24,11 @@ import net.i2p.util.Log;
  *
  */
 public class PeerManagerFacadeImpl implements PeerManagerFacade {
-    private Log _log;
+    private final Log _log;
     private PeerManager _manager;
-    private RouterContext _context;
-    private ProfilePersistenceHelper _persistenceHelper;
-    private PeerTestJob _testJob;
+    private final RouterContext _context;
+    private final ProfilePersistenceHelper _persistenceHelper;
+    private final PeerTestJob _testJob;
     
     public PeerManagerFacadeImpl(RouterContext ctx) {
         _context = ctx;

@@ -27,7 +27,7 @@ import net.i2p.util.Log;
  *
  */
 public class PeerTestJob extends JobImpl {
-    private Log _log;
+    private final Log _log;
     private PeerManager _manager;
     private boolean _keepTesting;
     private static final long DEFAULT_PEER_TEST_DELAY = 5*60*1000;

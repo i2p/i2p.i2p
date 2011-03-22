@@ -14,8 +14,8 @@ import net.i2p.util.Log;
  *
  */
 public class TunnelHistory {
-    private RouterContext _context;
-    private Log _log;
+    private final RouterContext _context;
+    private final Log _log;
     private volatile long _lifetimeAgreedTo;
     private volatile long _lifetimeRejected;
     private volatile long _lastAgreedTo;
@@ -27,7 +27,7 @@ public class TunnelHistory {
     private volatile long _lastFailed;
     private RateStat _rejectRate;
     private RateStat _failRate;
-    private String _statGroup;
+    private final String _statGroup;
     
     /** probabalistic tunnel rejection due to a flood of requests - essentially unused */
     public static final int TUNNEL_REJECT_PROBABALISTIC_REJECT = 10;

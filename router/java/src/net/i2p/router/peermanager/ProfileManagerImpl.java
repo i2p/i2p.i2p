@@ -22,8 +22,8 @@ import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 public class ProfileManagerImpl implements ProfileManager {
-    private Log _log;
-    private RouterContext _context;
+    private final Log _log;
+    private final RouterContext _context;
     
     public ProfileManagerImpl(RouterContext context) {
         _context = context;
