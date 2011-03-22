@@ -104,7 +104,10 @@ class SummaryListener implements RateSummaryListener {
     
     public Rate getRate() { return _rate; }
 
-    public void startListening() {
+    /**
+     *  @return success
+     */
+    public boolean startListening() {
         RateStat rs = _rate.getRateStat();
         long period = _rate.getPeriod();
         String baseName = rs.getName() + "." + period;
@@ -156,11 +159,15 @@ class SummaryListener implements RateSummaryListener {
             _sample = _db.createSample();
             _renderer = new SummaryRenderer(_context, this);
             _rate.setSummaryListener(this);
+            return true;
+        } catch (OutOfMemoryError oom) {
+            _log.error("Error starting RRD for stat " + baseName, oom);
         } catch (RrdException re) {
-            _log.error("Error starting", re);
+            _log.error("Error starting RRD for stat " + baseName, re);
         } catch (IOException ioe) {
-            _log.error("Error starting", ioe);
+            _log.error("Error starting RRD for stat " + baseName, ioe);
         }
+        return false;
     }
 
     public void stopListening() {
@@ -181,10 +188,16 @@ class SummaryListener implements RateSummaryListener {
     }
 
     public void renderPng(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount, boolean showCredit) throws IOException {
+        if (_renderer == null || _db == null)
+            throw new IOException("No RRD, check logs for previous errors");
         _renderer.render(out, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount, showCredit); 
     }
 
-    public void renderPng(OutputStream out) throws IOException { _renderer.render(out); }
+    public void renderPng(OutputStream out) throws IOException {
+        if (_renderer == null || _db == null)
+            throw new IOException("No RRD, check logs for previous errors");
+        _renderer.render(out);
+    }
  
     String getName() { return _name; }
 

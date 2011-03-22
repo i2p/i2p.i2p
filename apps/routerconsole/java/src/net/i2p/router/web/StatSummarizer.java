@@ -48,6 +48,7 @@ public class StatSummarizer implements Runnable {
     private static final int MAX_CONCURRENT_PNG = 3;
     private final Semaphore _sem;
     private volatile boolean _isRunning = true;
+    private volatile boolean _isDisabled;
     private Thread _thread;
     
     public StatSummarizer() {
@@ -62,6 +63,20 @@ public class StatSummarizer implements Runnable {
     public static StatSummarizer instance() { return _instance; }
     
     public void run() {
+        // JRobin 1.5.9 crashes these JVMs
+        String vendor = System.getProperty("java.vendor");
+        if (vendor.startsWith("Apache") ||                      // Harmony
+            vendor.startsWith("GNU Classpath") ||               // JamVM
+            vendor.startsWith("Free Software Foundation")) {    // gij
+            _log.logAlways(Log.WARN, "Graphing not supported with this JVM: " +
+                                     vendor + ' ' +
+                                     System.getProperty("java.version") + " (" +
+                                     System.getProperty("java.runtime.name") + ' ' +
+                                     System.getProperty("java.runtime.version") + ')');
+            _isDisabled = true;
+            _isRunning = false;
+            return;
+        }
         boolean isPersistent = _context.getBooleanPropertyDefaultTrue(SummaryListener.PROP_PERSISTENT);
         if (!isPersistent)
             deleteOldRRDs();
@@ -73,6 +88,11 @@ public class StatSummarizer implements Runnable {
         }
     }
     
+    /** @since 0.8.6 */
+    boolean isDisabled() {
+        return _isDisabled;
+    }
+
     /** list of SummaryListener instances */
     List<SummaryListener> getListeners() { return _listeners; }
     
@@ -142,8 +162,11 @@ public class StatSummarizer implements Runnable {
     }
     private void addDb(Rate r) {
         SummaryListener lsnr = new SummaryListener(r);
-        _listeners.add(lsnr);
-        lsnr.startListening();
+        boolean success = lsnr.startListening();
+        if (success)
+            _listeners.add(lsnr);
+        else
+            _log.error("Failed to add RRD for rate " + r.getRateStat().getName() + '.' + r.getPeriod());
         //System.out.println("Start listening for " + r.getRateStat().getName() + ": " + r.getPeriod());
     }
 

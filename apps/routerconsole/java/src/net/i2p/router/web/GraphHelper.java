@@ -89,6 +89,8 @@ public class GraphHelper extends FormHandler {
     public void setPersistent(String foo) { _persistent = true; }
     
     public String getImages() { 
+        if (StatSummarizer.instance().isDisabled())
+            return "";
         try {
             List listeners = StatSummarizer.instance().getListeners();
             TreeSet ordered = new TreeSet(new AlphaComparator());
@@ -155,6 +157,8 @@ public class GraphHelper extends FormHandler {
     private static final int[] times = { 60, 2*60, 5*60, 10*60, 30*60, 60*60, -1 };
 
     public String getForm() { 
+        if (StatSummarizer.instance().isDisabled())
+            return "";
         String prev = System.getProperty("net.i2p.router.web.GraphHelper.nonce");
         if (prev != null) System.setProperty("net.i2p.router.web.GraphHelper.noncePrev", prev);
         String nonce = "" + _context.random().nextLong();
@@ -196,6 +200,27 @@ public class GraphHelper extends FormHandler {
             ioe.printStackTrace();
         }
         return ""; 
+    }
+
+    /**
+     *  We have to do this here because processForm() isn't called unless the nonces are good
+     *  @since 0.8.6
+     */
+    @Override
+    public String getAllMessages() {
+        if (StatSummarizer.instance().isDisabled()) {
+            addFormError("Graphing not supported with this JVM: " +
+                         System.getProperty("java.vendor") + ' ' +
+                         System.getProperty("java.version") + " (" +
+                         System.getProperty("java.runtime.name") + ' ' +
+                         System.getProperty("java.runtime.version") + ')');
+            if (_context.getProperty(PROP_REFRESH, 0) >= 0) {
+                // force no refresh, save silently
+                _context.router().setConfigSetting(PROP_REFRESH, "-1");
+                _context.router().saveConfig();
+            }
+        }
+        return super.getAllMessages();
     }
 
     /**
