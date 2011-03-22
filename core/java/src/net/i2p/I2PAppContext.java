@@ -7,7 +7,6 @@ import java.util.Random;
 import java.util.Set;
 
 import net.i2p.client.naming.NamingService;
-import net.i2p.client.naming.PetNameDB;
 import net.i2p.crypto.AESEngine;
 import net.i2p.crypto.CryptixAESEngine;
 import net.i2p.crypto.DSAEngine;
@@ -72,7 +71,6 @@ public class I2PAppContext {
     private StatManager _statManager;
     private SessionKeyManager _sessionKeyManager;
     private NamingService _namingService;
-    private PetNameDB _petnameDb;
     private ElGamalEngine _elGamalEngine;
     private ElGamalAESEngine _elGamalAESEngine;
     private AESEngine _AESEngine;
@@ -89,7 +87,6 @@ public class I2PAppContext {
     private volatile boolean _statManagerInitialized;
     private volatile boolean _sessionKeyManagerInitialized;
     private volatile boolean _namingServiceInitialized;
-    private volatile boolean _petnameDbInitialized;
     private volatile boolean _elGamalEngineInitialized;
     private volatile boolean _elGamalAESEngineInitialized;
     private volatile boolean _AESEngineInitialized;
@@ -177,7 +174,6 @@ public class I2PAppContext {
         _statManager = null;
         _sessionKeyManager = null;
         _namingService = null;
-        _petnameDb = null;
         _elGamalEngine = null;
         _elGamalAESEngine = null;
         _logManager = null;
@@ -577,23 +573,6 @@ public class I2PAppContext {
                 _namingService = NamingService.createInstance(this);
             }
             _namingServiceInitialized = true;
-        }
-    }
-    
-    /** @deprecated unused */
-    public PetNameDB petnameDb() {
-        if (!_petnameDbInitialized)
-            initializePetnameDb();
-        return _petnameDb;
-    }
-
-    /** @deprecated unused */
-    private void initializePetnameDb() {
-        synchronized (this) {
-            if (_petnameDb == null) {
-                _petnameDb = new PetNameDB();
-            }
-            _petnameDbInitialized = true;
         }
     }
     

@@ -24,7 +24,6 @@ package net.i2p.addressbook;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import net.i2p.I2PAppContext;
@@ -42,7 +41,7 @@ class AddressBook {
 
     private String location;
 
-    private Map addresses;
+    private Map<String, String> addresses;
 
     private boolean modified;
 
@@ -53,7 +52,7 @@ class AddressBook {
      *            A Map containing human readable addresses as keys, mapped to
      *            base64 i2p destinations.
      */
-    public AddressBook(Map addresses) {
+    public AddressBook(Map<String, String> addresses) {
         this.addresses = addresses;
     }
 
@@ -139,7 +138,7 @@ class AddressBook {
      *         is a human readable name, and the value is a base64 i2p
      *         destination.
      */
-    public Map getAddresses() {
+    public Map<String, String> getAddresses() {
         return this.addresses;
     }
 
@@ -167,10 +166,10 @@ class AddressBook {
     private static final int MAX_DEST_LENGTH = MIN_DEST_LENGTH + 100;  // longer than any known cert type for now
 
     /**
-     * Do basic validation of the hostname and dest
+     * Do basic validation of the hostname
      * hostname was already converted to lower case by ConfigParser.parse()
      */
-    private static boolean valid(String host, String dest) {
+    public static boolean isValidKey(String host) {
 	return
 		host.endsWith(".i2p") &&
 		host.length() > 4 &&
@@ -194,8 +193,15 @@ class AddressBook {
                 (! host.equals("console.i2p")) &&
                 (! host.endsWith(".proxy.i2p")) &&
                 (! host.endsWith(".router.i2p")) &&
-                (! host.endsWith(".console.i2p")) &&
+                (! host.endsWith(".console.i2p"))
+                ;	
+    }
 
+    /**
+     * Do basic validation of the b64 dest, without bothering to instantiate it
+     */
+    private static boolean isValidDest(String dest) {
+	return
                 // null cert ends with AAAA but other zero-length certs would be AA
 		((dest.length() == MIN_DEST_LENGTH && dest.endsWith("AA")) ||
 		 (dest.length() > MIN_DEST_LENGTH && dest.length() <= MAX_DEST_LENGTH)) &&
@@ -218,13 +224,11 @@ class AddressBook {
      *            The log to write messages about new addresses or conflicts to.
      */
     public void merge(AddressBook other, boolean overwrite, Log log) {
-        Iterator otherIter = other.addresses.keySet().iterator();
+        for (Map.Entry<String, String> entry : other.addresses.entrySet()) {
+            String otherKey = entry.getKey();
+            String otherValue = entry.getValue();
 
-        while (otherIter.hasNext()) {
-            String otherKey = (String) otherIter.next();
-            String otherValue = (String) other.addresses.get(otherKey);
-
-            if (valid(otherKey, otherValue)) {
+            if (isValidKey(otherKey) && isValidDest(otherValue)) {
                 if (this.addresses.containsKey(otherKey) && !overwrite) {
                     if (!this.addresses.get(otherKey).equals(otherValue)
                             && log != null) {

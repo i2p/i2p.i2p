@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<link rel="home" title="Home" href="http://www.metanotion.net/software/sandbox/" />
+
+		<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+		<meta name="robots" content="all" />
+
+		<title>BlockFile</title>
+	</head>
+	<body>
+		<h1>Metanotion BlockFile Database</h1>
+		<p>A 100% Java 1.3, BSD Licensed, embeddable single file database engine in 32KB. This database was designed for PDA based and J2ME applications.</p>
+
+		<h2>Table of Contents</h2>
+		<ul>
+			<li><a href="#features">Features</a></li>
+			<li><a href="#unfeatures">Unfeatures</a></li>
+			<li><a href="#future">Future Plans</a></li>
+			<li><a href="#design">What kind of database is this?</a></li>
+			<li><a href="#examples">Examples and API</a></li>
+			<li><a href="#download">Download</a></li>
+		</ul>
+		
+		<a name="features"><h2>Features</h2></a>
+		<ul>
+			<li>100% Java 1.3. No JNI.</li>
+			<li>Will work with any "file" as long as you can approximate something like <a href="http://java.sun.com/j2se/1.3/docs/api/java/io/RandomAccessFile.html">java.io.RandomAccessFile</a>, you can use this.</li>
+			<li>BSD Licensed. Yes, this means you can use it for free in a commercial project. However, if you base some really cool mobile technology startup on this code we'll gladly accept stock options...</p>
+			<li>No dependence on file API's(useful for mobile apps)</li>
+			<li>Small. 32KB in a JAR file. &lt;2000 lines of code.</li>
+			<li>Reasonably fast. This is used in an app running on a sub 200MHz StrongARM PocketPC, and quite handily deals with 70,000 records. The load time is a little slow, but its been tested with a <a href="http://java.sun.com/javame/reference/apis.jsp">CDC 1.0/Personal Profile</a> device.
+			</li>
+		</ul>
+
+		<a name="unfeatures"><h2>Unfeatures</h2></a>
+		<p>A good, ACID database is a nice thing to work with. Unfortunately, in the goal to make this small, fast, and work with minimal dependencies, something had to give. So I list things which this database will likely never have. Of course, since it is BSD Licensed, patches welcome...</p>
+		
+		<ul>
+			<li>No transactions.</li>
+			<li>No SQL.</li>
+			<li>No JDBC.</li>
+			<li>No use of reflection or automagical serialization tricks.</li>
+		</ul>
+
+		<a name="future"><h2>Future Plans</h2></a>
+		<p>There are still bugs(none known...). The app that this was written for is still in testing, but we should most of the issues sorted by the time we deploy it in a few weeks(early November, 2006). Some loading speed issues on large record sets, and memory usage could still be improved. All this and feedback from other uses will direct this products evolution.</p>
+		<p>What is currently up here is not "1.0" code, but we will release a labeled "1.0" version once we feel happy with the state of the codebase.</p>
+	
+		<a name="design"><h2>What KIND of database is this?</h2></a>
+		<p>You probably store at least part of your application data in memory in a class from the <a href="http://java.sun.com/j2se/1.4.2/docs/guide/collections/">Java Collections Framework</a>. The BlockFile database stores data in a <a href="http://en.wikipedia.org/wiki/Skip_list">Skip</a> <a href="http://eternallyconfuzzled.com/tuts/skip.html">List</a> that almost implements <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/util/SortedMap.html">java.util.SortedMap</a>. You can create and store as many named(with a string) SkipList in the database as you want.</p>
+		<p>To serialize your data, you have to either extend our SerialStreams class or implement our Serializer interface. We could have done something cool and fancy with reflection(and other cool stuff with Java 1.5), but that would probably not do the Right Thing&trade; most of the time.  As you can see, there's not a lot to it anyway:</p>
+		<h3>net.metanotion.io.SerialStreams</h3>
+<pre>
+public abstract class SerialStreams implements Serializer {
+// ...
+	abstract public void writeOut(DataOutputStream dos, Object o) throws IOException;
+	abstract public Object readIn(DataInputStream dis) throws IOException;
+}
+</pre>
+		<h3>net.metanotion.io.Serializer</h3>
+<pre>
+public interface Serializer {
+	public byte[] getBytes(Object o);
+	public Object construct(byte[] b);
+}
+</pre>
+
+		<p>Now, about those skip lists. They implement a <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/util/ListIterator.html">java.util.ListIterator</a> so you can get "nearby" values, and you can use anything for a key that implements <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/lang/Comparable.html">java.lang.Comparable</a>. So, here's the interface to a SkipList:
+<pre>
+public class SkipList {
+	...
+	public void put(Comparable key, Object val) ...
+	public Object remove(Comparable key) ...
+	public Object get(Comparable key) ...
+	public ListIterator iterator() ...
+	public ListIterator min() ...
+	public ListIterator max() ...
+	// Find the first key bigger than or equal to key,
+	// or the biggest key less than key if there is no bigger or equal.
+	public ListIterator find(Comparable key) ...
+}
+</pre>
+</p>
+
+		<a name="examples"><h2>Examples</h2></a>
+		<p>Better documentation is forthcoming, but there really isn't much to know. The entire public interface to the library is on this page. Where possible, it sticks to idiomatic Java and standard interfaces.</p>
+		<ul>
+			<li>Open a database:
+<pre>
+import net.metanotion.io.block.BlockFile;
+...
+	try {
+		BlockFile db = new BlockFile(new File("my.db"), false); // true will create
+	} catch (IOException ioe) {
+		System.out.println("Bummer");
+	}
+</pre>
+			<li>
+			<li>Load or Create a SkipList:
+<pre>
+import net.metanotion.util.skiplist.SkipList;
+import net.metanotion.io.Serializer;
+...
+class KeySerializer implements Serializer ...
+class ValueSerializer implements Serializer ...
+...
+// Open preexisting
+SkipList index = db.getIndex("My Index", new KeySerializer(), new ValueSerializer());
+// Create
+SkipList index = db.makeIndex("My Index", new KeySerializer(), new ValueSerializer());
+</pre>
+			</li>
+		</ul>
+
+		<h3>net.metanotion.io.block.BlockFile</h3>
+All the public interface methods:
+<pre>
+public class BlockFile implements Closeable {
+	public BlockFile(RandomAccessInterface rai) ...
+	public BlockFile(RandomAccessFile raf) ...
+	public BlockFile(RandomAccessFile raf, boolean init) ...
+	public BlockFile(File f, boolean init) ...
+	public BlockFile(RandomAccessInterface rai, boolean init) ...
+
+	public SkipList getIndex(String name, Serializer key, Serializer val) ...
+	public SkipList makeIndex(String name, Serializer key, Serializer val) ...
+	public void delIndex(String name) ...
+
+	public void close() ...
+}
+</pre>
+
+		<h3>What's this "net.metanotion.io.RandomAccessInterface"?</h3>
+		<p>Basically, its an interface version of <a href="http://java.sun.com/j2se/1.3/docs/api/java/io/RandomAccessFile.html">java.io.RandomAccessFile</a>(which itself implements <a href="http://java.sun.com/j2se/1.3/docs/api/java/io/DataInput.html">DataInput</a>, <a href="http://java.sun.com/j2se/1.3/docs/api/java/io/DataOutput.html">DataOutput</a> and a few methods for getting/setting the file pointer).</p>
+		
+		<p>So, in other words, if you can provide an implementation of this interface, you can use the BlockFile database. This frees it from dependence on the RandomAccessFile class. If you don't see why this is useful and you're going to be using "files" on PDA's and phone's, well, you'll understand soon enough...</p>
+
+		<a name="download"><h2>Download</h2></a>
+		<h3>Bugfix and cleanup Release 10/6/2006</h2>
+		<p>An unnecessary class was removed, some junk methods removed, and a couple of JDK compatability issues were fixed. The StringBytes class was switched to ASCII(from UTF-8) for better compatibility.</p>
+		<ul>
+			<li><a href="BlockFile.2006.10.06.jar">BlockFile binary JAR, version 0.1.1</a></li>
+			<li><a href="BlockFile.src.2006.10.06.zip">BlockFile source code</a></li>
+		</ul>
+		
+		<h3>Initial Release 9/28/2006</h3>
+		<ul>
+			<li><a href="BlockFile.2006.09.28.jar">BlockFile binary JAR, version 0.1</a></li>
+			<li><a href="BlockFile.src.2006.09.28.zip">BlockFile source code</a></li>
+		</ul>
+
+		<hr />
+		<center>&copy; 2006 <a href="http://www.metanotion.net/">Metanotion Software</a></center>
+	</body>
+</html>

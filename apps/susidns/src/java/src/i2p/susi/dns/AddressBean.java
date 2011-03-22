@@ -24,6 +24,10 @@
 
 package i2p.susi.dns;
 
+import net.i2p.I2PAppContext;
+import net.i2p.data.Base32;
+import net.i2p.data.Base64;
+
 public class AddressBean
 {
 	private String name, destination;
@@ -57,5 +61,15 @@ public class AddressBean
 	public void setName(String name)
 	{
 		this.name = name;
+	}
+
+	/** @since 0.8.6 */
+	public String getB32() 
+	{
+		byte[] dest = Base64.decode(destination);
+		if (dest == null)
+			return "";
+		byte[] hash = I2PAppContext.getGlobalContext().sha().calculateHash(dest).getData();
+		return Base32.encode(hash) + ".b32.i2p";
 	}
 }

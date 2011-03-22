@@ -24,7 +24,6 @@ package net.i2p.addressbook;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +36,7 @@ import java.util.Map;
  */
 class SubscriptionList {
 
-    private List subscriptions;
+    private List<Subscription> subscriptions;
 
     private File etagsFile;
 
@@ -68,7 +67,7 @@ class SubscriptionList {
      * @param proxyPort proxy port number
      */
     public SubscriptionList(File locationsFile, File etagsFile,
-            File lastModifiedFile, File lastFetchedFile, long delay, List defaultSubs, String proxyHost, 
+            File lastModifiedFile, File lastFetchedFile, long delay, List<String> defaultSubs, String proxyHost, 
             int proxyPort) {
         this.subscriptions = new LinkedList();
         this.etagsFile = etagsFile;
@@ -77,11 +76,10 @@ class SubscriptionList {
         this.delay = delay;
         this.proxyHost = proxyHost;
         this.proxyPort = proxyPort;
-        Map etags;
-        Map lastModified;
-        Map lastFetched;
-        String location;
-        List locations = ConfigParser.parseSubscriptions(locationsFile, 
+        Map<String, String> etags;
+        Map<String, String> lastModified;
+        Map<String, String> lastFetched;
+        List<String> locations = ConfigParser.parseSubscriptions(locationsFile, 
                 defaultSubs);
         try {
             etags = ConfigParser.parse(etagsFile);
@@ -98,12 +96,10 @@ class SubscriptionList {
         } catch (IOException exp) {
             lastFetched = new HashMap();
         }
-        Iterator iter = locations.iterator();
-        while (iter.hasNext()) {
-            location = (String) iter.next();
-            this.subscriptions.add(new Subscription(location, (String) etags.get(location),
-                                   (String) lastModified.get(location),
-                                   (String) lastFetched.get(location)));
+        for (String location : locations) {
+            this.subscriptions.add(new Subscription(location, etags.get(location),
+                                   lastModified.get(location),
+                                   lastFetched.get(location)));
         }
     }
     
@@ -125,13 +121,10 @@ class SubscriptionList {
      * won't be read back correctly; the '=' should be escaped.
      */
     public void write() {
-        Iterator iter = this.subscriptions.iterator();
-        Subscription sub;
-        Map etags = new HashMap();
-        Map lastModified = new HashMap();
-        Map lastFetched = new HashMap();
-        while (iter.hasNext()) {
-            sub = (Subscription) iter.next();
+        Map<String, String> etags = new HashMap();
+        Map<String, String>  lastModified = new HashMap();
+        Map<String, String>  lastFetched = new HashMap();
+        for (Subscription sub : this.subscriptions) {
             if (sub.getEtag() != null) {
                 etags.put(sub.getLocation(), sub.getEtag());
             }
