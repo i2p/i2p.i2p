@@ -681,7 +681,11 @@ public class BlockfileNamingService extends DummyNamingService {
     private static class PropertiesSerializer implements Serializer {
         public byte[] getBytes(Object o) {
             Properties p = (Properties) o;
-            return DataHelper.toProperties(p);
+            try {
+                return DataHelper.toProperties(p);
+            } catch (DataFormatException dfe) {
+                return null;
+            }
         }
 
         public Object construct(byte[] b) {
