@@ -202,9 +202,10 @@ public class BlockfileNamingService extends DummyNamingService {
             if (_log.shouldLog(Log.INFO))
                 _log.info("DB init took " + DataHelper.formatDuration(_context.clock().now() - start));
             if (total <= 0)
-                _log.error("Warning - initialized database with zero entries");
+                _log.logAlways(Log.WARN, "No hosts.txt files found, Initialized hosts database with zero entries");
             return rv;
         } catch (RuntimeException e) {
+            _log.error("Failed to initialize database", e);
             throw new IOException(e.toString());
         }
     }
@@ -245,9 +246,11 @@ public class BlockfileNamingService extends DummyNamingService {
             if (skiplists.isEmpty())
                 skiplists.add(FALLBACK_LIST);
             _lists.addAll(skiplists);
-            _log.error("DB init took " + DataHelper.formatDuration(_context.clock().now() - start));
+            if (_log.shouldLog(Log.INFO))
+                _log.info("DB init took " + DataHelper.formatDuration(_context.clock().now() - start));
             return bf;
         } catch (RuntimeException e) {
+            _log.error("Failed to initialize database", e);
             throw new IOException(e.toString());
         }
     }
@@ -262,8 +265,6 @@ public class BlockfileNamingService extends DummyNamingService {
             if (sl == null)
                 return null;
             DestEntry rv = (DestEntry) sl.get(key);
-            // Control memory usage
-////////    _bf.closeIndex(listname);
             return rv;
         } catch (IOException ioe) {
             _log.error("DB Lookup error", ioe);
@@ -292,8 +293,6 @@ public class BlockfileNamingService extends DummyNamingService {
             if (source != null)
                 props.setProperty(PROP_SOURCE, source);
             addEntry(sl, key, dest, props);
-            // Control memory usage
-//////      bf.closeIndex(listname);
         } catch (IOException ioe) {
             _log.error("DB add error", ioe);
             // delete index??
@@ -752,7 +751,6 @@ public class BlockfileNamingService extends DummyNamingService {
 
     public static void main(String[] args) {
         BlockfileNamingService bns = new BlockfileNamingService(I2PAppContext.getGlobalContext());
-        //System.out.println("zzz.i2p: " + bns.lookup("zzz.i2p"));
         List<String> names = null;
         try {
             Properties props = new Properties();

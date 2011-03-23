@@ -126,10 +126,11 @@ public class Daemon {
             long start = System.currentTimeMillis();
             AddressBook sub = iter.next();
             long end = System.currentTimeMillis();
-            if (DEBUG && log != null)
+            // SubscriptionIterator puts in a dummy AddressBook with no location if no fetch is done
+            if (DEBUG && log != null && sub.getLocation() != null)
                 log.append("Fetch of " + sub.getLocation() + " took " + (end - start));
             start = end;
-            int old = 0, nnew = 0, invalid = 0, conflict = 0;
+            int old = 0, nnew = 0, invalid = 0, conflict = 0, total = 0;
             for (Iterator<Map.Entry<String, String>> eIter = sub.iterator(); eIter.hasNext(); ) {
                 Map.Entry<String, String> entry = eIter.next();
                 String key = entry.getKey();
@@ -197,10 +198,12 @@ public class Daemon {
                         log.append("Invalid b64 for" + key + " From: " + sub.getLocation());
                     invalid++;
                 }
+                total++;
             }
-            if (DEBUG && log != null) {
+            if (DEBUG && log != null && total > 0) {
                 log.append("Merge of " + sub.getLocation() + " into " + router +
                            " took " + (System.currentTimeMillis() - start) + " ms with " +
+                           total + " total, " +
                            nnew + " new, " +
                            old + " old, " +
                            invalid + " invalid, " +

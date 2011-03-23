@@ -66,6 +66,7 @@ class DaemonThread extends Thread implements NamingServiceUpdater {
 
     /**
      *  The NamingServiceUpdater interface
+     *  @param options ignored
      *  @since 0.8.6
      */
     public void update(Properties options) {

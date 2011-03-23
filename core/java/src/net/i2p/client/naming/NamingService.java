@@ -432,7 +432,7 @@ public abstract class NamingService {
             instance = (NamingService)con.newInstance(new Object[] { context });
         } catch (Exception ex) {
             Log log = context.logManager().getLog(NamingService.class);
-            log.error("Cannot load naming service " + impl, ex);
+            log.error("Cannot load naming service " + impl + ", only .b32.i2p lookups will succeed", ex);
             instance = new DummyNamingService(context); // fallback
         }
         return instance;
