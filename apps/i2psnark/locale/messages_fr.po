@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-03 18:28+0000\n"
-"PO-Revision-Date: 2010-12-31 02:22+0100\n"
-"Last-Translator: mixxy <m1xxy@mail.i2p>\n"
+"POT-Creation-Date: 2010-12-28 00:08+0000\n"
+"PO-Revision-Date: 2011-03-22 22:58+0100\n"
+"Last-Translator: \n"
 "Language-Team: foo <foo@bar>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -108,7 +108,7 @@ msgstr ""
 #: ../java/src/org/klomp/snark/SnarkManager.java:454
 #, java-format
 msgid "{0} theme loaded, return to main i2psnark page to view."
-msgstr ""
+msgstr "Thème {0}  chargé, revenez à la page d'accueil d'i2psnark pour voir comme c'est beau!"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:461
 msgid "Configuration unchanged."
@@ -342,10 +342,9 @@ msgstr "Afficher les pairs"
 msgid "Torrent"
 msgstr "Torrent"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:310
-#, fuzzy
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:290
 msgid "Estimated time remaining"
-msgstr "Octets restants"
+msgstr "temps restant estimé"
 
 # NOTE: purposely left blank to leave more room in the table header
 # msgstr "Temps&nbsp;restant"
@@ -556,16 +555,14 @@ msgstr "Pas de pair"
 msgid "Stopped"
 msgstr "Arrêté"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:886
-#, fuzzy
-msgid "Torrent details"
-msgstr "Torrents"
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:837
+#, java-format
+msgid "Details at {0} tracker"
+msgstr "Détails au tracker {0}"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:898
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1160
-#, fuzzy
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:838
 msgid "Info"
-msgstr "Ignore"
+msgstr "Info"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:913
 msgid "View files"
@@ -575,7 +572,12 @@ msgstr "Voir les fichiers"
 msgid "Open file"
 msgstr "Ouvrir fichier"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:957
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:865
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1569
+msgid "Open"
+msgstr "Ouvrir le fichier"
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:909
 msgid "Stop the torrent"
 msgstr "Arrêter le torrent"
 
@@ -751,7 +753,7 @@ msgstr "Si coché, les torrents démarrerons automatiquement lors de l'ajout"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1299
 msgid "Theme"
-msgstr ""
+msgstr "Thème"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1312
 msgid "Startup delay"
@@ -918,7 +920,7 @@ msgstr "Normal"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1842
 msgid "Skip"
-msgstr ""
+msgstr "Ignorer"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1851
 msgid "Save priorities"
@@ -939,7 +941,12 @@ msgstr "Torrent déjà actif: {0}"
 msgid "Torrent already in the queue: {0}"
 msgstr "Torrent déjà dans la queue: {0}"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1997
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1755
+#, java-format
+msgid "Failed to copy torrent file to {0}"
+msgstr "Impossible de copier le torrent vers {0}"
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1759
 #, java-format
 msgid "Torrent at {0} was not valid"
 msgstr "Le torrent {0} n'est pas valide"
