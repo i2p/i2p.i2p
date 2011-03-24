@@ -115,6 +115,7 @@ public class Daemon {
         // If it is a text file, we do things differently, to avoid O(n**2) behavior
         // when scanning large subscription results (i.e. those that return the whole file, not just the new entries) -
         // we load all the known hostnames into a Set one time.
+        // This also has the advantage of not flushing the NamingService's LRU cache.
         String nsClass = router.getClass().getSimpleName();
         boolean isTextFile = nsClass.equals("HostsTxtNamingService") || nsClass.equals("SingleFileNamingService");
         Set<String> knownNames = null;
@@ -152,7 +153,9 @@ public class Daemon {
                     if (!isKnown) {
                         if (AddressBook.isValidKey(key)) {
                             Destination dest = new Destination(entry.getValue());
-                            boolean success = router.put(key, dest);
+                            Properties props = new Properties();
+                            props.setProperty("s", sub.getLocation());
+                            boolean success = router.put(key, dest, props);
                             if (log != null) {
                                 if (success)
                                     log.append("New address " + key +

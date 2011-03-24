@@ -347,17 +347,31 @@ public class BlockfileNamingService extends DummyNamingService {
 
     ////////// Start NamingService API
 
+    /*
+     * @param options If non-null and contains the key "list", lookup in
+     *                that list only, otherwise all lists
+     */
     @Override
     public Destination lookup(String hostname, Properties lookupOptions, Properties storedOptions) {
-        Destination d = super.lookup(hostname, null, null);
-        if (d != null)
-            return d;
+        String listname = null;
+        if (lookupOptions != null)
+            listname = lookupOptions.getProperty("list");
+
+        Destination d = null;
+        // only use cache if we aren't retreiving options or specifying the list
+        if (listname == null && storedOptions == null) {
+            d = super.lookup(hostname, null, null);
+            if (d != null)
+                return d;
+        }
 
         String key = hostname.toLowerCase();
         synchronized(_bf) {
             if (_isClosed)
                 return null;
             for (String list : _lists) { 
+                if (listname != null && !list.equals(listname))
+                    continue;
                 try {
                     DestEntry de = getEntry(list, key);
                     if (de != null) {

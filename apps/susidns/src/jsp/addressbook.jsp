@@ -153,7 +153,7 @@ ${book.loadBookMessages}
 <td class="names"><a href="http://${addr.name}/">${addr.name}</a>
 </td><td class="names">
 <span class="addrhlpr">(<a href="http://${addr.b32}/">b32</a>)</span>
-<span class="addrhlpr">(<a href="http://${addr.name}/?i2paddresshelper=${addr.destination}"><%=intl._("helper")%></a>)</span>
+<span class="addrhlpr">(<a href="details.jsp?h=${addr.name}"><%=intl._("details")%></a>)</span>
 </td>
 <td class="destinations"><textarea rows="1" style="height: 3em;" cols="40" wrap="off" readonly="readonly" name="dest_${addr.name}" >${addr.destination}</textarea></td>
 </tr>

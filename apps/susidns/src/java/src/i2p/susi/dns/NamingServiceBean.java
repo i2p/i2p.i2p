@@ -45,6 +45,7 @@ import net.i2p.data.Destination;
 public class NamingServiceBean extends AddressbookBean
 {
 	private static final String DEFAULT_NS = "BlockfileNamingService";
+	private String detail;
 
 	private boolean isDirect() {
 		return getBook().equals("published");
@@ -209,7 +210,7 @@ public class NamingServiceBean extends AddressbookBean
 		if( action != null ) {
 			Properties nsOptions = new Properties();
 			// only blockfile needs this
-                        nsOptions.setProperty("list", getFileName());
+			nsOptions.setProperty("list", getFileName());
 			if( lastSerial != null && serial != null && serial.compareTo( lastSerial ) == 0 ) {
 				boolean changed = false;
 				if (action.equals(_("Add")) || action.equals(_("Replace"))) {
@@ -279,5 +280,23 @@ public class NamingServiceBean extends AddressbookBean
 		if( message.length() > 0 )
 			message = "<p class=\"messages\">" + message + "</p>";
 		return message;
+	}
+
+	public void setH(String h) {
+		this.detail = h;
+	}
+
+	public AddressBean getLookup() {
+		if (this.detail == null)
+			return null;
+		Properties nsOptions = new Properties();
+		Properties outProps = new Properties();
+		nsOptions.setProperty("list", getFileName());
+		Destination dest = getNamingService().lookup(this.detail, nsOptions, outProps);
+		if (dest == null)
+			return null;
+		AddressBean rv = new AddressBean(this.detail, dest.toBase64());
+		rv.setProperties(outProps);
+		return rv;
 	}
 }

@@ -24,19 +24,19 @@
 
 package i2p.susi.dns;
 
+import java.util.Date;
+import java.util.Properties;
+
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base32;
 import net.i2p.data.Base64;
+import net.i2p.data.Certificate;
 
 public class AddressBean
 {
-	private String name, destination;
+	private final String name, destination;
+	private Properties props;
 
-	public AddressBean()
-	{
-		
-	}
-	
 	public AddressBean(String name, String destination)
 	{
 		this.name = name;
@@ -48,19 +48,9 @@ public class AddressBean
 		return destination;
 	}
 
-	public void setDestination(String destination)
-	{
-		this.destination = destination;
-	}
-
 	public String getName()
 	{
 		return name;
-	}
-
-	public void setName(String name)
-	{
-		this.name = name;
 	}
 
 	/** @since 0.8.6 */
@@ -71,5 +61,89 @@ public class AddressBean
 			return "";
 		byte[] hash = I2PAppContext.getGlobalContext().sha().calculateHash(dest).getData();
 		return Base32.encode(hash) + ".b32.i2p";
+	}
+
+	/** @since 0.8.6 */
+	public void setProperties(Properties p) {
+		props = p;
+	}
+
+	/** @since 0.8.6 */
+	public String getSource() {
+		String rv = getProp("s");
+                if (rv.startsWith("http://"))
+                    rv = "<a href=\"" + rv + "\">" + rv + "</a>";
+		return rv;
+	}
+
+	/** @since 0.8.6 */
+	public String getAdded() {
+		return getDate("a");
+	}
+
+	/** @since 0.8.6 */
+	public String getModded() {
+		return getDate("m");
+	}
+
+
+	/** @since 0.8.6 */
+	public String getNotes() {
+		return getProp("notes");
+	}
+
+	/**
+	 * Do this the easy way
+	 * @since 0.8.6
+	 */
+	public String getCert() {
+		// (4 / 3) * (pubkey length + signing key length)
+		String cert = destination.substring(512);
+                if (cert.equals("AAAA"))
+			return _("None");
+		byte[] enc = Base64.decode(cert);
+		if (enc == null)
+			// shouldn't happen
+			return "invalid";
+		int type = enc[0] & 0xff;
+		switch (type) {
+			case Certificate.CERTIFICATE_TYPE_HASHCASH:
+				return _("Hashcash");
+			case Certificate.CERTIFICATE_TYPE_HIDDEN:
+				return _("Hidden");
+			case Certificate.CERTIFICATE_TYPE_SIGNED:
+				return _("Signed");
+			default:
+				return _("Type {0}", type);
+		}
+	}
+
+	/** @since 0.8.6 */
+	private String getProp(String p) {
+		if (props == null)
+                    return "";
+		String rv = props.getProperty(p);
+		return rv != null ? rv : "";
+	}
+
+	/** @since 0.8.6 */
+	private String getDate(String key) {
+		String d = getProp(key);
+		if (d.length() > 0) {
+			try {
+				d = FormatDate.format(Long.parseLong(d));
+			} catch (NumberFormatException nfe) {}
+		}
+		return d;
+	}
+
+	/** translate */
+	private static String _(String s) {
+		return Messages.getString(s);
+	}
+
+	/** translate */
+	private static String _(String s, Object o) {
+		return Messages.getString(s, o);
 	}
 }
