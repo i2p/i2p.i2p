@@ -114,12 +114,16 @@ public class IBSkipSpan extends BSkipSpan {
 		curNextPage[0] = this.overflowPage;
 		int[] pageCounter = new int[1];
 		pageCounter[0] = 16;
-		ksz = this.bf.file.readShort();
+		ksz = this.bf.file.readUnsignedShort();
 		this.bf.file.skipBytes(2);  //vsz
 		pageCounter[0] +=4;
 		byte[] k = new byte[ksz];
 		curPage = this.bf.readMultiPageData(k, curPage, pageCounter, curNextPage);
 		this.firstKey = (Comparable) this.keySer.construct(k);
+		if (this.firstKey == null) {
+			BlockFile.log.error("Null deserialized first key in page " + curPage);
+			repair(1);
+		}
 		if (DEBUG)
 			System.err.println("Loaded header for page " + this.page + " containing " + this.nKeys + '/' + this.spanSize + " first key: " + this.firstKey);
 	}
@@ -153,16 +157,17 @@ public class IBSkipSpan extends BSkipSpan {
 		curNextPage[0] = this.overflowPage;
 		int[] pageCounter = new int[1];
 		pageCounter[0] = 16;
+		int fail = 0;
 		//System.out.println("Span Load " + sz + " nKeys " + nKeys + " page " + curPage);
 		for(int i=0;i<this.nKeys;i++) {
 			if((pageCounter[0] + 4) > BlockFile.PAGESIZE) {
 				BlockFile.pageSeek(this.bf.file, curNextPage[0]);
 				curPage = curNextPage[0];
-				curNextPage[0] = this.bf.file.readInt();
+				curNextPage[0] = this.bf.file.readUnsignedInt();
 				pageCounter[0] = 4;
 			}
-			ksz = this.bf.file.readShort();
-			vsz = this.bf.file.readShort();
+			ksz = this.bf.file.readUnsignedShort();
+			vsz = this.bf.file.readUnsignedShort();
 			pageCounter[0] +=4;
 			byte[] k = new byte[ksz];
 			byte[] v = new byte[vsz];
@@ -170,18 +175,47 @@ public class IBSkipSpan extends BSkipSpan {
 			curPage = this.bf.readMultiPageData(v, curPage, pageCounter, curNextPage);
 			//System.out.println("i=" + i + ", Page " + curPage + ", offset " + pageCounter[0] + " ksz " + ksz + " vsz " + vsz);
 			Comparable ckey = (Comparable) this.keySer.construct(k);
+			if (ckey == null) {
+				BlockFile.log.error("Null deserialized key in entry " + i + " page " + curPage);
+				fail++;
+				continue;
+			}
 			int diff = ckey.compareTo(key);
 			if (diff == 0) {
 				//System.err.println("Found " + key + " at " + i + " (first: " + this.firstKey + ')');
-				return this.valSer.construct(v);
+				Object rv = this.valSer.construct(v);
+				if (rv == null) {
+					BlockFile.log.error("Null deserialized value in entry " + i + " page " + curPage +
+					                    " key=" + ckey);
+					fail++;
+				}
+				if (fail > 0)
+					repair(fail);
+				return rv;
 			}
 			if (diff > 0) {
 				//System.err.println("NOT Found " + key + " at " + i + " (first: " + this.firstKey + " current: " + ckey + ')');
+				if (fail > 0)
+					repair(fail);
 				return null;
 			}
 		}
 		//System.err.println("NOT Found " + key + " at end (first: " + this.firstKey + ')');
+		if (fail > 0)
+			repair(fail);
 		return null;
+	}
+
+        private void repair(int fail) {
+		try {
+			loadData(false);
+			if (this.nKeys > 0)
+				this.firstKey = this.keys[0];
+			flush();
+			BlockFile.log.error("Repaired corruption of " + fail + " entries");
+		} catch (IOException ioe) {
+			BlockFile.log.error("Failed to repair corruption of " + fail + " entries", ioe);
+		}
 	}
 
 	protected IBSkipSpan() { }

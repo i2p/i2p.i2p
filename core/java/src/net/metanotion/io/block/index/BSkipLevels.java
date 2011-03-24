@@ -50,15 +50,15 @@ public class BSkipLevels extends SkipLevels {
 
 		bsl.levelHash.put(new Integer(this.levelPage), this);
 
-		int maxLen = bf.file.readShort();
-		int nonNull = bf.file.readShort();
-		spanPage = bf.file.readInt();
+		int maxLen = bf.file.readUnsignedShort();
+		int nonNull = bf.file.readUnsignedShort();
+		spanPage = bf.file.readUnsignedInt();
 		bottom = (BSkipSpan) bsl.spanHash.get(new Integer(spanPage));
 
 		this.levels = new BSkipLevels[maxLen];
 		int lp;
 		for(int i=0;i<nonNull;i++) {
-			lp = bf.file.readInt();
+			lp = bf.file.readUnsignedInt();
 			if(lp != 0) {
 				levels[i] = (BSkipLevels) bsl.levelHash.get(new Integer(lp));
 				if(levels[i] == null) {

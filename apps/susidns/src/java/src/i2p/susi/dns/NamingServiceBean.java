@@ -183,7 +183,12 @@ public class NamingServiceBean extends AddressbookBean
 					}
 				}
 				String destination = entry.getValue().toBase64();
-				list.addLast( new AddressBean( name, destination ) );
+				if (destination != null) {
+					list.addLast( new AddressBean( name, destination ) );
+				} else {
+					// delete it too?
+					System.err.println("Bad entry " + name + " in database " + service.getName());
+				}
 			}
 			AddressBean array[] = list.toArray(new AddressBean[list.size()]);
 			Arrays.sort( array, sorter );

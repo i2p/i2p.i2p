@@ -82,6 +82,17 @@ public class RAIFile implements RandomAccessInterface, DataInput, DataOutput {
 	public int readUnsignedByte()		throws IOException { return delegate.readUnsignedByte(); }
 	public int readUnsignedShort()		throws IOException { return delegate.readUnsignedShort(); }
 
+	/**
+	 *  I2P
+	 *  @throws IOException if the read value is negative
+	 */
+	public int readUnsignedInt()  throws IOException {
+		int rv = readInt();
+		if (rv < 0)
+			throw new IOException("Negative value for unsigned int: " + rv);
+		return rv;
+	}
+
 	/** Read a UTF encoded string
 	 	I would delegate here. But Java's read/writeUTF combo suck.
 	 	A signed 2 byte length is not enough.

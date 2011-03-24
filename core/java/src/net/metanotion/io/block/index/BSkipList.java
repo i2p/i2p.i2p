@@ -59,10 +59,10 @@ public class BSkipList extends SkipList {
 		this.bf = bf;
 
 		BlockFile.pageSeek(bf.file, skipPage);
-		firstSpanPage = bf.file.readInt();
-		firstLevelPage = bf.file.readInt();
-		size = bf.file.readInt();
-		spans = bf.file.readInt();
+		firstSpanPage = bf.file.readUnsignedInt();
+		firstLevelPage = bf.file.readUnsignedInt();
+		size = bf.file.readUnsignedInt();
+		spans = bf.file.readUnsignedInt();
 		//System.out.println(size + " " + spans); 
 
 		this.fileOnly = fileOnly;

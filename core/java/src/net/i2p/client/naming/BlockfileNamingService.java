@@ -75,6 +75,7 @@ public class BlockfileNamingService extends DummyNamingService {
     private final BlockFile _bf;
     private final RandomAccessFile _raf;
     private final List<String> _lists;
+    private final List<InvalidEntry> _invalid;
     private volatile boolean _isClosed;
 
     private static final Serializer _infoSerializer = new PropertiesSerializer();
@@ -101,6 +102,7 @@ public class BlockfileNamingService extends DummyNamingService {
     public BlockfileNamingService(I2PAppContext context) {
         super(context);
         _lists = new ArrayList();
+        _invalid = new ArrayList();
         BlockFile bf = null;
         RandomAccessFile raf = null;
         File f = new File(_context.getRouterDir(), HOSTS_DB);
@@ -375,8 +377,10 @@ public class BlockfileNamingService extends DummyNamingService {
                 try {
                     DestEntry de = getEntry(list, key);
                     if (de != null) {
+                        if (!validate(key, de, listname))
+                            continue;
                         d = de.dest;
-                        if (storedOptions != null)
+                        if (storedOptions != null && de.props != null)
                             storedOptions.putAll(de.props);
                         break;
                     }
@@ -384,6 +388,7 @@ public class BlockfileNamingService extends DummyNamingService {
                     break;
                 }
             }
+            deleteInvalid();
         }
         if (d != null)
             putCache(hostname, d);
@@ -553,6 +558,7 @@ public class BlockfileNamingService extends DummyNamingService {
                     iter = sl.iterator();
                 Map<String, Destination> rv = new HashMap();
                 for (int i = 0; i < skip && iter.hasNext(); i++) {
+                    // don't bother validating here
                     iter.next();
                 }
                 for (int i = 0; i < limit && iter.hasNext(); ) {
@@ -566,6 +572,8 @@ public class BlockfileNamingService extends DummyNamingService {
                         }
                     }
                     DestEntry de = (DestEntry) iter.next();
+                    if (!validate(key, de, listname))
+                        continue;
                     if (search != null && key.indexOf(search) < 0)
                         continue;
                     rv.put(key, de.dest);
@@ -578,6 +586,8 @@ public class BlockfileNamingService extends DummyNamingService {
             } catch (RuntimeException re) {
                 _log.error("DB lookup error", re);
                 return Collections.EMPTY_MAP;
+            } finally {
+                deleteInvalid();
             }
         }
     }
@@ -619,6 +629,60 @@ public class BlockfileNamingService extends DummyNamingService {
 
     ////////// End NamingService API
 
+    /**
+     *  Continuously validate anything we read in.
+     *  Queue anything invalid to be removed at the end of the operation.
+     *  Caller must sync!
+     *  @return valid
+     */
+    private boolean validate(String key, DestEntry de, String listname) {
+        if (key == null)
+            return false;
+        // de.props may be null
+        // publickey check is a quick proxy to detect dest deserialization failure
+        boolean rv = key.length() > 0 &&
+                     de != null &&
+                     de.dest != null &&
+                     de.dest.getPublicKey() != null;
+        if (!rv)
+            _invalid.add(new InvalidEntry(key, listname));
+        return rv;
+    }
+
+    /**
+     *  Remove and log all invalid entries queued by validate()
+     *  while scanning in lookup() or getEntries().
+     *  We delete in the order detected, as an error may be corrupting later entries in the skiplist.
+     *  Caller must sync!
+     */
+    private void deleteInvalid() {
+        if (_invalid.isEmpty())
+            return;
+        _log.error("Removing " + _invalid.size() + " corrupt entries from database");
+        for (InvalidEntry ie : _invalid) {
+            String key = ie.key;
+            String list = ie.list;
+            try {
+                SkipList sl = _bf.getIndex(list, _stringSerializer, _destSerializer);
+                if (sl == null) {
+                    _log.error("No list found to remove corrupt \"" + key + "\" from database " + list);
+                    continue;
+                }
+                // this will often return null since it was corrupt
+                boolean success = removeEntry(sl, key) != null;
+                if (success)
+                    _log.error("Removed corrupt \"" + key + "\" from database " + list);
+                else
+                    _log.error("May have Failed to remove corrupt \"" + key + "\" from database " + list);
+            } catch (RuntimeException re) {
+                _log.error("Error while removing corrupt \"" + key + "\" from database " + list, re);
+            } catch (IOException ioe) {
+                _log.error("Error while removing corrput \"" + key + "\" from database " + list, ioe);
+            }
+        }
+        _invalid.clear();
+    }
+
     private void dumpDB() {
         synchronized(_bf) {
             if (_isClosed)
@@ -634,6 +698,8 @@ public class BlockfileNamingService extends DummyNamingService {
                     for (SkipIterator iter = sl.iterator(); iter.hasNext(); ) {
                          String key = (String) iter.nextKey();
                          DestEntry de = (DestEntry) iter.next();
+                         if (!validate(key, de, list))
+                             continue;
                          _log.error("DB " + list + " key " + key + " val " + de);
                          i++;
                     }
@@ -643,6 +709,7 @@ public class BlockfileNamingService extends DummyNamingService {
                     break;
                 }
             }
+            deleteInvalid();
         }
     }
 
@@ -659,6 +726,11 @@ public class BlockfileNamingService extends DummyNamingService {
             }
             _isClosed = true;
         }
+    }
+
+    /** for logging errors in the static serializers below */
+    private static void logError(String msg, Throwable t) {
+        I2PAppContext.getGlobalContext().logManager().getLog(BlockfileNamingService.class).error(msg, t);
     }
 
     private class Shutdown implements Runnable {
@@ -691,24 +763,33 @@ public class BlockfileNamingService extends DummyNamingService {
 
     /**
      *  Used for the values in the header skiplist
+     *  Take care not to throw on any error.
+     *  This means that some things will fail with no indication other than the log,
+     *  but if we threw a RuntimeException we would prevent access to entries later in
+     *  the SkipSpan.
      */
     private static class PropertiesSerializer implements Serializer {
+        /**
+         *  A format error on the properties is non-fatal (returns an empty properties)
+         */
         public byte[] getBytes(Object o) {
             Properties p = (Properties) o;
             try {
                 return DataHelper.toProperties(p);
             } catch (DataFormatException dfe) {
-                return null;
+                logError("DB Write Fail - properties too big?", dfe);
+                // null properties is a two-byte length of 0.
+                return new byte[2];
             }
         }
 
+        /** returns null on error */
         public Object construct(byte[] b) {
             Properties rv = new Properties();
             try {
                 DataHelper.fromProperties(b, 0, rv);
-            } catch (IOException ioe) {
-                return null;
             } catch (DataFormatException dfe) {
+                logError("DB Read Fail", dfe);
                 return null;
             }
             return rv;
@@ -734,22 +815,38 @@ public class BlockfileNamingService extends DummyNamingService {
 
     /**
      *  Used for the values in the addressbook skiplists
+     *  Take care not to throw on any error.
+     *  This means that some things will fail with no indication other than the log,
+     *  but if we threw a RuntimeException we would prevent access to entries later in
+     *  the SkipSpan.
      */
     private static class DestEntrySerializer implements Serializer {
+
+        /**
+         *  A format error on the properties is non-fatal (only the properties are lost)
+         *  A format error on the destination is fatal
+         */
         public byte[] getBytes(Object o) {
             DestEntry de = (DestEntry) o;
             ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
             try {
-                DataHelper.writeProperties(baos, de.props);
+                try {
+                    DataHelper.writeProperties(baos, de.props, true, false);  // UTF-8, unsorted
+                } catch (DataFormatException dfe) {
+                    logError("DB Write Fail - properties too big?", dfe);
+                    // null properties is a two-byte length of 0.
+                    baos.write(new byte[2]);
+		}
                 de.dest.writeBytes(baos);
             } catch (IOException ioe) {
-                return null;
+                logError("DB Write Fail", ioe);
             } catch (DataFormatException dfe) {
-                return null;
+                logError("DB Write Fail", dfe);
             }
             return baos.toByteArray();
         }
 
+        /** returns null on error */
         public Object construct(byte[] b) {
             DestEntry rv = new DestEntry();
             Destination dest = new Destination();
@@ -759,11 +856,26 @@ public class BlockfileNamingService extends DummyNamingService {
                 rv.props = DataHelper.readProperties(bais);
                 dest.readBytes(bais);
             } catch (IOException ioe) {
+                logError("DB Read Fail", ioe);
                 return null;
             } catch (DataFormatException dfe) {
+                logError("DB Read Fail", dfe);
                 return null;
             }
             return rv;
+        }
+    }
+
+    /**
+     *  Used to store entries that need deleting
+     */
+    private static class InvalidEntry {
+        public final String key;
+        public final String list;
+
+        public InvalidEntry(String k, String l) {
+            key = k;
+            list = l;
         }
     }
 

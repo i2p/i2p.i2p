@@ -42,9 +42,11 @@ import net.metanotion.io.data.IntBytes;
 import net.metanotion.io.data.LongBytes;
 import net.metanotion.io.data.NullBytes;
 import net.metanotion.io.data.StringBytes;
-
 import net.metanotion.io.block.index.BSkipList;
 import net.metanotion.util.skiplist.SkipList;
+
+import net.i2p.I2PAppContext;
+import net.i2p.util.Log;
 
 class CorruptFileException extends IOException { }
 class BadFileFormatException extends IOException { }
@@ -53,14 +55,15 @@ class BadVersionException extends IOException { }
 public class BlockFile {
 	public static final long PAGESIZE = 1024;
 	public static final long OFFSET_MOUNTED = 20;
+	public static final Log log = I2PAppContext.getGlobalContext().logManager().getLog(BlockFile.class);
 
 	public RandomAccessInterface file;
 
 	private long magicBytes = 0x3141deadbeef0100L;
 	private long fileLen = PAGESIZE * 2;
 	private int freeListStart = 0;
-	private short mounted = 0;
-	public short spanSize = 16;
+	private int mounted = 0;
+	public int spanSize = 16;
 
 	private BSkipList metaIndex = null;
 	private HashMap openIndices = new HashMap();
@@ -84,9 +87,9 @@ public class BlockFile {
 		file.seek(0);
 		magicBytes		= file.readLong();
 		fileLen			= file.readLong();
-		freeListStart	= file.readInt();
-		mounted			= file.readShort();
-		spanSize		= file.readShort();
+		freeListStart	= file.readUnsignedInt();
+		mounted			= file.readUnsignedShort();
+		spanSize		= file.readUnsignedShort();
 	}
 
 	public static void main(String args[]) {
@@ -125,7 +128,7 @@ public class BlockFile {
 				}
 				BlockFile.pageSeek(this.file, curNextPage);
 				curPage = curNextPage;
-				curNextPage = this.file.readInt();
+				curNextPage = this.file.readUnsignedInt();
 				pageCounter = 4;
 				len = ((int) BlockFile.PAGESIZE) - pageCounter;
 			}
@@ -149,7 +152,7 @@ public class BlockFile {
 			if(len <= 0) {
 				BlockFile.pageSeek(this.file, curNextPage);
 				curPage = curNextPage;
-				curNextPage = this.file.readInt();
+				curNextPage = this.file.readUnsignedInt();
 				pageCounter = 4;
 				len = ((int) BlockFile.PAGESIZE) - pageCounter;
 			}

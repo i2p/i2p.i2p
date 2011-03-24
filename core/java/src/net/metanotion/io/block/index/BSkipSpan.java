@@ -74,7 +74,7 @@ public class BSkipSpan extends SkipSpan {
 			int next;
 			while(curPage != 0) {
 				BlockFile.pageSeek(bf.file, curPage);
-				next = bf.file.readInt();
+				next = bf.file.readUnsignedInt();
 				bf.freePage(curPage);
 				curPage = next;
 			}
@@ -83,6 +83,13 @@ public class BSkipSpan extends SkipSpan {
 	}
 
 	public void flush() {
+		fflush();
+	}
+
+	/**
+	 * I2P - avoid super.flush()
+	 */
+	private void fflush() {
 		try {
 			BlockFile.pageSeek(bf.file, page);
 			bf.file.writeInt(overflowPage);
@@ -111,11 +118,27 @@ public class BSkipSpan extends SkipSpan {
 					}
 					BlockFile.pageSeek(bf.file, curNextPage[0]);
 					curPage = curNextPage[0];
-					curNextPage[0] = bf.file.readInt();
+					curNextPage[0] = bf.file.readUnsignedInt();
 					pageCounter[0] = 4;
+				}
+				// Drop bad entry without throwing exception
+				if (keys[i] == null || vals[i] == null) {
+					BlockFile.log.error("Dropping null data in entry " + i + " page " + curPage +
+					                    " key=" + this.keys[i] + " val=" + this.vals[i]);
+					nKeys--;
+					i--;
+					continue;
 				}
 				keyData = this.keySer.getBytes(keys[i]);
 				valData = this.valSer.getBytes(vals[i]);
+				// Drop bad entry without throwing exception
+				if (keyData.length > 65535 || valData.length > 65535) {
+					BlockFile.log.error("Dropping huge data in entry " + i + " page " + curPage +
+					                    " keylen=" + keyData.length + " vallen=" + valData.length);
+					nKeys--;
+					i--;
+					continue;
+				}
 				pageCounter[0] += 4;
 				bf.file.writeShort(keyData.length);
 				bf.file.writeShort(valData.length);
@@ -123,8 +146,11 @@ public class BSkipSpan extends SkipSpan {
 				curPage = bf.writeMultiPageData(valData, curPage, pageCounter, curNextPage);
 			}
 			BlockFile.pageSeek(bf.file, this.page);
-			this.overflowPage = bf.file.readInt();
+			this.overflowPage = bf.file.readUnsignedInt();
 		} catch (IOException ioe) { throw new RuntimeException("Error writing to database", ioe); }
+		// FIXME can't get there from here
+		//bsl.size -= fail;
+		//bsl.flush();
 	}
 
 	private static void load(BSkipSpan bss, BlockFile bf, BSkipList bsl, int spanPage, Serializer key, Serializer val) throws IOException {
@@ -146,11 +172,11 @@ public class BSkipSpan extends SkipSpan {
 
 		BlockFile.pageSeek(bf.file, spanPage);
 
-		bss.overflowPage = bf.file.readInt();
-		bss.prevPage = bf.file.readInt();
-		bss.nextPage = bf.file.readInt();
-		bss.spanSize = bf.file.readShort();
-		bss.nKeys = bf.file.readShort();
+		bss.overflowPage = bf.file.readUnsignedInt();
+		bss.prevPage = bf.file.readUnsignedInt();
+		bss.nextPage = bf.file.readUnsignedInt();
+		bss.spanSize = bf.file.readUnsignedShort();
+		bss.nKeys = bf.file.readUnsignedShort();
 	}
 
 	/**
@@ -158,6 +184,15 @@ public class BSkipSpan extends SkipSpan {
 	 * Load the whole span's keys and values into memory
 	 */
 	protected void loadData() throws IOException {
+		loadData(true);
+	}
+
+	/**
+	 * I2P - second half of load()
+	 * Load the whole span's keys and values into memory
+	 * @param flushOnError set to false if you are going to flush anyway
+	 */
+	protected void loadData(boolean flushOnError) throws IOException {
 		this.keys = new Comparable[this.spanSize];
 		this.vals = new Object[this.spanSize];
 
@@ -168,15 +203,16 @@ public class BSkipSpan extends SkipSpan {
 		int[] pageCounter = new int[1];
 		pageCounter[0] = 16;
 //		System.out.println("Span Load " + sz + " nKeys " + nKeys + " page " + curPage);
+		int fail = 0;
 		for(int i=0;i<this.nKeys;i++) {
 			if((pageCounter[0] + 4) > BlockFile.PAGESIZE) {
 				BlockFile.pageSeek(this.bf.file, curNextPage[0]);
 				curPage = curNextPage[0];
-				curNextPage[0] = this.bf.file.readInt();
+				curNextPage[0] = this.bf.file.readUnsignedInt();
 				pageCounter[0] = 4;
 			}
-			ksz = this.bf.file.readShort();
-			vsz = this.bf.file.readShort();
+			ksz = this.bf.file.readUnsignedShort();
+			vsz = this.bf.file.readUnsignedShort();
 			pageCounter[0] +=4;
 			byte[] k = new byte[ksz];
 			byte[] v = new byte[vsz];
@@ -185,8 +221,24 @@ public class BSkipSpan extends SkipSpan {
 //			System.out.println("i=" + i + ", Page " + curPage + ", offset " + pageCounter[0] + " ksz " + ksz + " vsz " + vsz);
 			this.keys[i] = (Comparable) this.keySer.construct(k);
 			this.vals[i] = this.valSer.construct(v);
+			// Drop bad entry without throwing exception
+			if (this.keys[i] == null || this.vals[i] == null) {
+				BlockFile.log.error("Null deserialized data in entry " + i + " page " + curPage +
+				                    " key=" + this.keys[i] + " val=" + this.vals[i]);
+				fail++;
+				nKeys--;
+				i--;
+				continue;
+			}
 		}
-
+		if (fail > 0) {
+			BlockFile.log.error("Repairing corruption of " + fail + " entries");
+			if (flushOnError)
+				fflush();
+			// FIXME can't get there from here
+			//bsl.size -= fail;
+			//bsl.flush();
+		}
 	}
 
 	protected BSkipSpan() { }

@@ -56,6 +56,8 @@ public interface RandomAccessInterface {
 	public short readShort() throws IOException;
 	public int readUnsignedByte() throws IOException;
 	public int readUnsignedShort() throws IOException;
+	// I2P
+	public int readUnsignedInt() throws IOException;
 	public String readUTF() throws IOException;
 	public int skipBytes(int n) throws IOException;
 

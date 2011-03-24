@@ -54,8 +54,16 @@ import net.i2p.util.Translate;
  * @author jrandom
  */
 public class DataHelper {
-    private final static byte EQUAL_BYTES[] = "=".getBytes(); // in UTF-8
-    private final static byte SEMICOLON_BYTES[] = ";".getBytes(); // in UTF-8
+    private static final byte EQUAL_BYTES[];
+    private static final byte SEMICOLON_BYTES[];
+    static {
+        try {
+            EQUAL_BYTES = "=".getBytes("UTF-8");
+            SEMICOLON_BYTES = ";".getBytes("UTF-8");
+        } catch (UnsupportedEncodingException uee) {
+            throw new RuntimeException("no utf8!?");
+        }
+    }
 
     /** Read a mapping from the stream, as defined by the I2P data structure spec,
      * and store it into a Properties object.
@@ -80,7 +88,7 @@ public class DataHelper {
         long size = readLong(rawStream, 2);
         byte data[] = new byte[(int) size];
         int read = read(rawStream, data);
-        if (read != size) throw new DataFormatException("Not enough data to read the properties");
+        if (read != size) throw new DataFormatException("Not enough data to read the properties, expected " + size + " but got " + read);
         ByteArrayInputStream in = new ByteArrayInputStream(data);
         byte eqBuf[] = new byte[EQUAL_BYTES.length];
         byte semiBuf[] = new byte[SEMICOLON_BYTES.length];
@@ -251,22 +259,32 @@ public class DataHelper {
      * @param target returned Properties
      * @return new offset
      */
-    public static int fromProperties(byte source[], int offset, Properties target) throws DataFormatException, IOException {
+    public static int fromProperties(byte source[], int offset, Properties target) throws DataFormatException {
         int size = (int)fromLong(source, offset, 2);
         offset += 2;
         ByteArrayInputStream in = new ByteArrayInputStream(source, offset, size);
         byte eqBuf[] = new byte[EQUAL_BYTES.length];
         byte semiBuf[] = new byte[SEMICOLON_BYTES.length];
         while (in.available() > 0) {
-            String key = readString(in);
-            int read = read(in, eqBuf);
-            if ((read != eqBuf.length) || (!eq(eqBuf, EQUAL_BYTES))) {
-                throw new DataFormatException("Bad key");
+            String key;
+            try {
+                key = readString(in);
+                int read = read(in, eqBuf);
+                if ((read != eqBuf.length) || (!eq(eqBuf, EQUAL_BYTES))) {
+                    throw new DataFormatException("Bad key");
+                }
+            } catch (IOException ioe) {
+                throw new DataFormatException("Bad key", ioe);
             }
-            String val = readString(in);
-            read = read(in, semiBuf);
-            if ((read != semiBuf.length) || (!eq(semiBuf, SEMICOLON_BYTES))) {
-                throw new DataFormatException("Bad value");
+            String val;
+            try {
+                val = readString(in);
+                int read = read(in, semiBuf);
+                if ((read != semiBuf.length) || (!eq(semiBuf, SEMICOLON_BYTES))) {
+                    throw new DataFormatException("Bad value");
+                }
+            } catch (IOException ioe) {
+                throw new DataFormatException("Bad value", ioe);
             }
             target.put(key, val);
         }

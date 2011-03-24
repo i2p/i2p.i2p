@@ -43,12 +43,12 @@ public class FreeListBlock {
 		this.file = file;
 		this.page = startPage;
 		BlockFile.pageSeek(file, startPage);
-		nextPage = file.readInt();
-		len = file.readInt();
+		nextPage = file.readUnsignedInt();
+		len = file.readUnsignedInt();
 		if(len > 0) {
 			branches = new int[len];
 			for(int i=0;i<len;i++) {
-				branches[i] = file.readInt();
+				branches[i] = file.readUnsignedInt();
 			}
 		}
 	}
