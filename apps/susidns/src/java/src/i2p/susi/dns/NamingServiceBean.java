@@ -221,7 +221,8 @@ public class NamingServiceBean extends AddressbookBean
 				boolean changed = false;
 				if (action.equals(_("Add")) || action.equals(_("Replace"))) {
 					if(hostname != null && destination != null) {
-						Destination oldDest = getNamingService().lookup(hostname, nsOptions, null);
+						Properties outProperties= new Properties();
+						Destination oldDest = getNamingService().lookup(hostname, nsOptions, outProperties);
 						if (oldDest != null && destination.equals(oldDest.toBase64())) {
 							message = _("Host name {0} is already in addressbook, unchanged.", hostname);
 						} else if (oldDest != null && !action.equals(_("Replace"))) {
@@ -235,6 +236,10 @@ public class NamingServiceBean extends AddressbookBean
 									} catch (IllegalArgumentException iae) {}
 								}
 								Destination dest = new Destination(destination);
+								if (oldDest != null) {
+									nsOptions.putAll(outProperties);
+						                        nsOptions.setProperty("m", Long.toString(I2PAppContext.getGlobalContext().clock().now()));
+								}
 					                        nsOptions.setProperty("s", _("Manually added via SusiDNS"));
 								boolean success = getNamingService().put(host, dest, nsOptions);
 								if (success) {

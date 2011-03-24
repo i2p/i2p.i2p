@@ -408,7 +408,9 @@ public class BlockfileNamingService extends DummyNamingService {
     /**
      * @param options If non-null and contains the key "list", add to that list
      *                (default "hosts.txt")
-     *                Use the key "s" for the source
+     *                Use the key "s" for the source.
+     *                Key "a" will be added with the current time, unless
+     *                "a" is present in options.
      */
     @Override
     public boolean putIfAbsent(String hostname, Destination d, Properties options) {
@@ -419,6 +421,7 @@ public class BlockfileNamingService extends DummyNamingService {
         String key = hostname.toLowerCase();
         String listname = FALLBACK_LIST;
         Properties props = new Properties();
+        props.setProperty(PROP_ADDED, Long.toString(_context.clock().now()));
         if (options != null) {
             props.putAll(options);
             String list = options.getProperty("list");
@@ -427,7 +430,6 @@ public class BlockfileNamingService extends DummyNamingService {
                 props.remove("list");
             }
         }
-        props.setProperty(PROP_ADDED, Long.toString(_context.clock().now()));
         synchronized(_bf) {
             if (_isClosed)
                 return false;
