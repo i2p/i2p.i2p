@@ -36,6 +36,6 @@ public 	class AddressByNameSorter implements Comparator<AddressBean>
 		if( b == null )
 			return -1;
 		
-		return a.getName().compareToIgnoreCase(b.getName());
+		return a.getDisplayName().compareToIgnoreCase(b.getDisplayName());
 	}	
 }

@@ -24,6 +24,7 @@
 
 package i2p.susi.dns;
 
+import java.net.IDN;
 import java.util.Date;
 import java.util.Properties;
 
@@ -36,6 +37,19 @@ public class AddressBean
 {
 	private final String name, destination;
 	private Properties props;
+	/** available as of Java 6 */
+	static final boolean haveIDN;
+
+	static {
+		boolean h;
+		try {
+			Class.forName("java.net.IDN", false, ClassLoader.getSystemClassLoader());
+			h = true;
+		} catch (ClassNotFoundException cnfe) {
+			h = false;
+		}
+		haveIDN = h;
+	}
 
 	public AddressBean(String name, String destination)
 	{
@@ -48,9 +62,32 @@ public class AddressBean
 		return destination;
 	}
 
+	/**
+	 * The ASCII (Punycode) name
+	 */
 	public String getName()
 	{
 		return name;
+	}
+
+	/**
+	 * The Unicode name, translated from Punycode
+	 * @since 0.8.6
+	 */
+	public String getDisplayName()
+	{
+		if (haveIDN)
+			return IDN.toUnicode(name);
+		return name;
+	}
+
+	/**
+	 * Is the ASCII name Punycode-encoded?
+	 * @since 0.8.6
+	 */
+	public boolean isIDN()
+	{
+		return haveIDN && !IDN.toUnicode(name).equals(name);
 	}
 
 	/** @since 0.8.6 */

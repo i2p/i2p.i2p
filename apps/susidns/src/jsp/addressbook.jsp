@@ -150,7 +150,7 @@ ${book.loadBookMessages}
 <c:if test="${book.master || book.router || book.published || book.private}">
 <td class="checkbox"><input type="checkbox" name="checked" value="${addr.name}" title="<%=intl._("Mark for deletion")%>"></td>
 </c:if>
-<td class="names"><a href="http://${addr.name}/">${addr.name}</a>
+<td class="names"><a href="http://${addr.name}/">${addr.displayName}</a>
 </td><td class="names">
 <span class="addrhlpr">(<a href="http://${addr.b32}/">b32</a>)</span>
 <span class="addrhlpr">(<a href="details.jsp?h=${addr.name}"><%=intl._("details")%></a>)</span>

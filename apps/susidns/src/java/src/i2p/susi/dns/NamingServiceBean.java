@@ -22,6 +22,7 @@
 
 package i2p.susi.dns;
 
+import java.net.IDN;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -222,9 +223,15 @@ public class NamingServiceBean extends AddressbookBean
 							message = _("Host name {0} is already in addressbook with a different destination. Click \"Replace\" to overwrite.", hostname);
 						} else {
 							try {
+								String host = hostname;
+								if (AddressBean.haveIDN) {
+									try {
+										host = IDN.toASCII(hostname, IDN.ALLOW_UNASSIGNED);
+									} catch (IllegalArgumentException iae) {}
+								}
 								Destination dest = new Destination(destination);
 					                        nsOptions.setProperty("s", _("Manually added via SusiDNS"));
-								boolean success = getNamingService().put(hostname, dest, nsOptions);
+								boolean success = getNamingService().put(host, dest, nsOptions);
 								if (success) {
 									changed = true;
 									if (oldDest == null)

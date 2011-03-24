@@ -82,8 +82,17 @@
 <table class="book" cellspacing="0" cellpadding="5">
 <tr class="list${book.trClass}">
 <td><%=intl._("Host Name")%></td>
+<td><a href="http://<%=addr.getName()%>/"><%=addr.getDisplayName()%></a></td>
+</tr><tr class="list${book.trClass}">
+<%
+    if (addr.isIDN()) {
+%>
+<td><%=intl._("Punycode Name")%></td>
 <td><a href="http://<%=addr.getName()%>/"><%=addr.getName()%></a></td>
 </tr><tr class="list${book.trClass}">
+<%
+    }
+%>
 <td><%=intl._("Base 32 Address")%></td>
 <td><a href="http://<%=b32%>/"><%=b32%></a></td>
 </tr><tr class="list${book.trClass}">
