@@ -1,0 +1,21 @@
+HTTP/1.1 403 Protocole incorrect
+Content-Type: text/html; charset=UTF-8
+Cache-control: no-cache
+Connection: close
+Proxy-Connection: close
+
+<html><head>
+<title>Avertissement I2P: Protocole Non-HTTP</title>
+<link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico" >
+<link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css" >
+</head>
+<body>
+<div class=logo>
+ <a href="http://127.0.0.1:7657/index.jsp" title="Console Routeur I2P"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="Console Routeur I2P" border="0"></a><hr>
+ <a href="http://127.0.0.1:7657/config.jsp">Configuration</a> <a href="http://127.0.0.1:7657/help.jsp">Aide</a> <a href="http://127.0.0.1:7657/susidns/">Carnet d'adresses</a>
+</div>
+<div class=warning id=warning>
+<h3>Avertissement I2P: Protocole Non-HTTP</h3>
+La requête a utilisé un protocole inadpté.
+Le mandataire HTTP I2P prend en charge les requêtes http:// seulement. Les autre protocoles tels que https:// and ftp:// ne sont pas permis.
+</div>
