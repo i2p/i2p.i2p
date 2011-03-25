@@ -2203,11 +2203,6 @@ msgstr "Fonctionnalité \"Icône de zone de notification système\" non disponib
 msgid "Warning: unable to contact the systray manager"
 msgstr "Avertissement: impossible de contacter le gestionnaire de zone de notification."
 
-#: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:103
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:324
-msgid "Hide systray icon"
-msgstr "Masquer l'icône de zone de notification"
-
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:108
 msgid "System tray icon disabled."
 msgstr "Icône de zone de notification système désactivée."
@@ -4339,30 +4334,6 @@ msgstr "Aide avec la configuration"
 msgid "While I2P will work fine behind most firewalls, your speeds and network integration will generally improve if the I2P port is forwarded for both UDP and TCP."
 msgstr "I2P fonctionnera derrière la plupart des pare-feux, mais votre vitesse et votre intégration avec le réseau sera améliorée par la redirection des ports UDP et TCP d'I2P."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:521
-msgid "If you can, please poke a hole in your firewall to allow unsolicited UDP and TCP packets to reach you."
-msgstr "Si vous pouvez, ouvrez un port dans votre pare-feu afin de permettre la réception des les paquets TCP et UDP non sollicités."
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:523
-msgid "If you can't, I2P supports UPnP (Universal Plug and Play) and UDP hole punching with \"SSU introductions\" to relay traffic."
-msgstr "Si vous ne pouvez pas, I2P est compatible avec UPnp (Universal Plug and Play)  et \"UDP hole punching\" avec \"SSU introductions\" afin de relayer le trafic I2P."
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:525
-msgid "Most of the options above are for special situations, for example where UPnP does not work correctly, or a firewall not under your control is doing harm."
-msgstr "La plupart des possibilités décrites ci-avant sont pour les situtations particulieres, par exemple le cas où UPnP ne fonctionne pas correctement, ou un pare-feu empeche la connexion au réseau I2P."
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:522
-msgid "If you can, please poke a hole in your firewall to allow unsolicited UDP and TCP packets to reach you."
-msgstr "Si vous pouvez, ouvrez un port dans votre pare-feu afin de permettre la réception des les paquets TCP et UDP non sollicités."
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:524
-msgid "If you can't, I2P supports UPnP (Universal Plug and Play) and UDP hole punching with \"SSU introductions\" to relay traffic."
-msgstr "Si vous ne pouvez pas, I2P est compatible avec UPnp (Universal Plug and Play)  et \"UDP hole punching\" avec \"SSU introductions\" afin de relayer le trafic I2P."
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:526
-msgid "Most of the options above are for special situations, for example where UPnP does not work correctly, or a firewall not under your control is doing harm."
-msgstr "La plupart des possibilités décrites ci-avant sont pour les situtations particulieres, par exemple le cas où UPnP ne fonctionne pas correctement, ou un pare-feu empeche la connexion au réseau I2P."
-
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:528
 msgid "Certain firewalls such as symmetric NATs may not work well with I2P."
 msgstr "Il y a des certains types de pare-feu (tel que les NAT symétriques) qui ne fonctionnent pas bien avec I2P."
@@ -4439,10 +4410,6 @@ msgstr "Si vous pensez que vous avez ouvert votre pare-feu et qu'I2P indique tou
 msgid "If there is an error, the <a href=\"logs.jsp\">logs</a> may also help diagnose the problem."
 msgstr "S'il y a une erreur, les <a href=\"logs.jsp\">historiques</a> peuvent aider au diagnostic."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:579
-msgid "Your UDP port does not appear to be firewalled."
-msgstr "Votre port UDP ne semble pas bloqué par un pare-feu."
-
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:583
 msgid "Your UDP port appears to be firewalled."
 msgstr "Votre port UDP semble bloqué par un pare-feu."
@@ -4487,14 +4454,6 @@ msgstr "WARN - Pare-feu et Rapide"
 msgid "You have configured I2P to share more than 128KBps of bandwidth, but you are firewalled."
 msgstr "Vous avez configuré I2P pour partager plus de 128ko/s de bande passante, mais vous êtes bloqué par un pare-feu."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:608
-msgid "While I2P will work fine in this configuration, if you really have over 128KBps of bandwidth to share, it will be much more helpful to the network if you open your firewall."
-msgstr "Bien qu'I2P fonctionne très bien dans cette configuration, si vous avez plus de 128ko/s à partager, ça aiderait fortement le réseau si vous pouviez ouvrir votre pare-feu."
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:609
-msgid "While I2P will work fine in this configuration, if you really have over 128KBps of bandwidth to share, it will be much more helpful to the network if you open your firewall."
-msgstr "Bien qu'I2P fonctionne correctement dans cette configuration, si vous avez vraiment plus de 128 ko/s de bande passante à partager, il serait bénéfique pour le réseau que vous ouvriez votre pare-feu."
-
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:611
 msgid "WARN - Firewalled and Floodfill"
 msgstr "WARN - Pare-feu et Floodfill"
@@ -4514,14 +4473,6 @@ msgstr "WARN - Pare-feu avec TCP entrant activé"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:618
 msgid "You have configured inbound TCP, however your UDP port is firewalled, and therefore it is likely that your TCP port is firewalled as well."
 msgstr "Vous avez configuré le TCP entrant,  cependant votre port UDP est bloqué et en conséquence il est probable que TCP l'est aussi."
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:620
-msgid "If your TCP port is firewalled with inbound TCP enabled, routers will not be able to contact you via TCP, which will hurt the network."
-msgstr "Si votre port TCp est bloqué et les connexions entrantes TCP activées dans la console, les routeurs ne pourront pas vous contacter via TCP, ce qui va perturber le réseau. "
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:621
-msgid "If your TCP port is firewalled with inbound TCP enabled, routers will not be able to contact you via TCP, which will hurt the network."
-msgstr "Si votre port TCP entrant est activé ET bloqué par un pare-feu, les routeurs ne pourront pas le contacter par TCP, ce qui dégrade le réseau."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:623
 msgid "Please open your firewall or disable inbound TCP above."
@@ -4865,14 +4816,6 @@ msgstr "(Dé)banissement manuel d'un pair"
 msgid "Banning will prevent the participation of this peer in tunnels you create."
 msgstr "Le banissement empêchera ce pair de participer aux tunnels que vous créez."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:324
-msgid "Bonuses may be positive or negative, and affect the peer's inclusion in Fast and High Capacity tiers. Fast peers are used for client tunnels, and High Capacity peers are used for some exploratory tunnels. Current bonuses are displayed on the"
-msgstr "Les boni peuvent être positifs ou négatifs, et influencent l'affectation des pairs dans les groupes \"Rapides\" et \"Hautes capacités\". Les pairs rapides sont utilisés pour les tunnels clients, et les pairs à hautes capacités pour quelques tunnels exploratoires. Les boni actuels sont affichés sur la"
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:325
-msgid "Bonuses may be positive or negative, and affect the peer's inclusion in Fast and High Capacity tiers. Fast peers are used for client tunnels, and High Capacity peers are used for some exploratory tunnels. Current bonuses are displayed on the"
-msgstr "Les boni peuvent être positifs ou négatifs, et influencent l'inclusion des pairs dans les groupes \"Rapides\" et \"Hautes capacités\". Les pairs rapides servent pour les tunnels clients, et les pairs à hautes capacités servent pour quelques tunnels exploratoires. Les boni actuels sont affichés sur la"
-
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:327
 msgid "profiles page"
 msgstr "page des profils"
@@ -4941,10 +4884,6 @@ msgstr "(Ultérieurement, Les applications clientes I2P pourront intégrer leurs
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:321
 msgid "If you are on windows, you can either enable or disable that icon here."
 msgstr "Si vous êtes sur Windows, vous pouvez (dés)activer cette icône ici."
-
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:325
-msgid "Hide systray icon"
-msgstr "Masquer l'icône de la zone de notification"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:327
 msgid "Run on startup"
