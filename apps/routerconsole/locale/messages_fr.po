@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-11-19 18:16+0000\n"
-"PO-Revision-Date: 2011-03-25 15:35+0100\n"
-"Last-Translator: \n"
+"PO-Revision-Date: 2011-03-25 20:38+0100\n"
+"Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -3377,7 +3377,7 @@ msgstr "Durée de cette session"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:195
 msgid "Uptime"
-msgstr "Temps de service"
+msgstr "Lancé depuis"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:202
 msgid "Help with configuring your firewall and router for optimal I2P performance"
