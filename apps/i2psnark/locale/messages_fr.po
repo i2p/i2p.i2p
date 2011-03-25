@@ -617,11 +617,6 @@ msgstr "aucun intérêt (nous n'avons aucun morceau utile au pair)"
 msgid "Choking (We are not allowing the peer to request pieces)"
 msgstr "bridage (nous ne permettons pas au pair de demander un morceau)"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1159
-#, java-format
-msgid "Details at {0} tracker"
-msgstr "Détails au tracker {0}"
-
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1188
 msgid "Add Torrent"
 msgstr "Ajouter torrent"
@@ -855,10 +850,6 @@ msgstr "complet"
 msgid "bytes remaining"
 msgstr "Octets restants"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1806
-msgid "Open"
-msgstr "Ouvrir"
-
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1832
 msgid "High"
 msgstr "Haut"
@@ -889,11 +880,6 @@ msgstr "Torrent déjà actif: {0}"
 #, java-format
 msgid "Torrent already in the queue: {0}"
 msgstr "Torrent déjà dans la queue: {0}"
-
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1755
-#, java-format
-msgid "Failed to copy torrent file to {0}"
-msgstr "Impossible de copier le torrent vers {0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1759
 #, java-format
