@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-11-19 18:16+0000\n"
-"PO-Revision-Date: 2011-03-25 20:38+0100\n"
+"PO-Revision-Date: 2011-03-25 20:54+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "Language: \n"
@@ -3381,7 +3381,7 @@ msgstr "Lancé depuis"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:202
 msgid "Help with configuring your firewall and router for optimal I2P performance"
-msgstr "Aide avec la configuration du pare-feu et du routeur afin d\\''optimiser la performance d\\''I2P"
+msgstr "Aide à la configuration du pare-feu et du routeur afin d\\''optimiser la performance d\\''I2P"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:231
 msgid "Download"
@@ -3409,7 +3409,7 @@ msgstr "Connu"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:308
 msgid "Help with firewall configuration"
-msgstr "Aide avec la configuration du pare-feu"
+msgstr "Aide à la configuration du pare-feu"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:310
 msgid "Check NAT/firewall"
@@ -4327,7 +4327,7 @@ msgstr "Un changement de cette configuration entraînera un redémarrage du rout
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:518
 msgid "Configuration Help"
-msgstr "Aide avec la configuration"
+msgstr "Aide à la configuration"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:519
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:568
