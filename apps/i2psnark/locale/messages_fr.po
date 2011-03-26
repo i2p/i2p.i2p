@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-25 12:48+0000\n"
-"PO-Revision-Date: 2011-03-26 01:27+0100\n"
+"PO-Revision-Date: 2011-03-26 09:58+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "Language: \n"
@@ -873,7 +873,7 @@ msgstr "Sauvegarder les priorités"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1967
 #, java-format
 msgid "Torrent fetched from {0}"
-msgstr "Torrent envoyé de {0}"
+msgstr "Torrent reçu de {0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1988
 #, java-format
