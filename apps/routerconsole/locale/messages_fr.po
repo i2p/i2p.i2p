@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-26 08:34+0000\n"
-"PO-Revision-Date: 2011-03-26 11:45+0100\n"
+"PO-Revision-Date: 2011-03-26 21:54+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "Language: \n"
@@ -99,44 +99,44 @@ msgstr "IP bannie(s) via entrée blocklist.txt {0}"
 
 #: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:92
 msgid "Rejecting tunnels: Shutting down"
-msgstr "Rejet tous tunnels: Arrêt en cours"
+msgstr "Refuse les tunnels: (arrêt en cours)"
 
 #: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:141
 msgid "Rejecting tunnels: High message delay"
-msgstr "Tunnels rejetés: délai de messages élevé"
+msgstr "Refus de tunnels: (délai de messages élevé)"
 
 #. hard to do {0} from here
 #. setTunnelStatus("Rejecting " + (100 - (int) probAccept*100) + "% of tunnels: High number of requests");
 #: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:177
 msgid "Rejecting most tunnels: High number of requests"
-msgstr "Rejet tous tunnels: trop de requêtes"
+msgstr "Refuse la plupart des tunnels: (trop de requêtes)"
 
 #: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:233
 msgid "Rejecting tunnels: Limit reached"
-msgstr "Rejets de tunnels: limite atteinte"
+msgstr "Refus de tunnels: (limite atteinte)"
 
 #. .067KBps
 #. * also limited to 90% - see below
 #. always leave at least 4KBps free when allowing
 #: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:301
 msgid "Rejecting tunnels: Bandwidth limit"
-msgstr "Rejets de tunnels: limite de bande passante"
+msgstr "Refus de tunnels: (limite de bande passante)"
 
 #. hard to do {0} from here
 #. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels: Bandwidth limit");
 #: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:371
 msgid "Rejecting most tunnels: Bandwidth limit"
-msgstr "Rejet tous tunnels: limite de bande passante"
+msgstr "Refuse la plupart des tunnels: (limite de bande passante)"
 
 #. hard to do {0} from here
 #. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of tunnels");
 #: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:375
 msgid "Accepting most tunnels"
-msgstr "Tunnels acceptés en majorité"
+msgstr "Accepte la plupart des tunnels"
 
 #: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:377
 msgid "Accepting tunnels"
-msgstr "Tunnels acceptés"
+msgstr "Accepte les tunnels"
 
 #. NPE, too early
 #. if (_context.router().getRouterInfo().getBandwidthTier().equals("K"))
@@ -144,7 +144,7 @@ msgstr "Tunnels acceptés"
 #. else
 #: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:488
 msgid "Rejecting tunnels"
-msgstr "Rejet de tunnels"
+msgstr "Refus des tunnels"
 
 #: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:125
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:20
@@ -5222,7 +5222,7 @@ msgstr "Mise à jour en cours"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:335
 msgid "News URL"
-msgstr "Actualités URL"
+msgstr "URL des actualités"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:339
 msgid "Refresh frequency"
