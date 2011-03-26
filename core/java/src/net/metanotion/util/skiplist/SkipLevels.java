@@ -94,6 +94,13 @@ public class SkipLevels {
 		return bottom.get(key);
 	}
 
+	/**
+	 *  @return An array of two objects or null.
+	 *          rv[0] is the removed object.
+	 *          rv[1] is the deleted SkipLevels if the removed object was the last in the SkipLevels,
+	 *                and the deleted SkipLevels is taller than this SkipLevels.
+	 *          rv is null if no object was removed.
+	 */
 	public Object[] remove(int start, Comparable key, SkipList sl) {
 		Object[] res = null;
 		SkipLevels slvls = null;

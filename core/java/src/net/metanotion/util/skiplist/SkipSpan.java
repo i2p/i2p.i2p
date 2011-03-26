@@ -225,6 +225,12 @@ public class SkipSpan {
 		}
 	}
 
+	/**
+	 *  @return An array of two objects or null.
+	 *          rv[0] is the removed object.
+	 *          rv[1] is the deleted SkipSpan if the removed object was the last in the SkipSpan.
+	 *          rv is null if no object was removed.
+	 */
 	public Object[] remove(Comparable key, SkipList sl) {
 		if(nKeys == 0) { return null; }
 		if(keys[nKeys - 1].compareTo(key) < 0) {
