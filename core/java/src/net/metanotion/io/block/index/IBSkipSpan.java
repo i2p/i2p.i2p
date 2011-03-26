@@ -114,7 +114,7 @@ public class IBSkipSpan extends BSkipSpan {
 		int[] curNextPage = new int[1];
 		curNextPage[0] = this.overflowPage;
 		int[] pageCounter = new int[1];
-		pageCounter[0] = 16;
+		pageCounter[0] = HEADER_LEN;
 		ksz = this.bf.file.readUnsignedShort();
 		this.bf.file.skipBytes(2);  //vsz
 		pageCounter[0] +=4;
@@ -134,8 +134,11 @@ public class IBSkipSpan extends BSkipSpan {
 	 */
 	private void seekData() throws IOException {
 		BlockFile.pageSeek(this.bf.file, this.page);
+		int magic = bf.file.readInt();
+		if (magic != MAGIC)
+			throw new IOException("Bad SkipSpan magic number 0x" + Integer.toHexString(magic) + " on page " + this.page);
 		// 3 ints and 2 shorts
-		this.bf.file.skipBytes(16);
+		this.bf.file.skipBytes(HEADER_LEN - 4);
 	}
 
 	/**
@@ -157,15 +160,18 @@ public class IBSkipSpan extends BSkipSpan {
 		int[] curNextPage = new int[1];
 		curNextPage[0] = this.overflowPage;
 		int[] pageCounter = new int[1];
-		pageCounter[0] = 16;
+		pageCounter[0] = HEADER_LEN;
 		int fail = 0;
 		//System.out.println("Span Load " + sz + " nKeys " + nKeys + " page " + curPage);
 		for(int i=0;i<this.nKeys;i++) {
 			if((pageCounter[0] + 4) > BlockFile.PAGESIZE) {
 				BlockFile.pageSeek(this.bf.file, curNextPage[0]);
 				curPage = curNextPage[0];
+				int magic = bf.file.readInt();
+				if (magic != BlockFile.MAGIC_CONT)
+					throw new IOException("Bad SkipSpan continuation magic number 0x" + Integer.toHexString(magic) + " on page " + curPage);
 				curNextPage[0] = this.bf.file.readUnsignedInt();
-				pageCounter[0] = 4;
+				pageCounter[0] = CONT_HEADER_LEN;
 			}
 			ksz = this.bf.file.readUnsignedShort();
 			vsz = this.bf.file.readUnsignedShort();

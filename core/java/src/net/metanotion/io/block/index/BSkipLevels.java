@@ -38,12 +38,14 @@ import net.metanotion.util.skiplist.SkipSpan;
 
 /**
  * On-disk format:
+ *    Magic number (long)
  *    max height (unsigned short)
  *    non-null height (unsigned short)
  *    span page (unsigned int)
  *    height number of level pages (unsigned ints)
  */
 public class BSkipLevels extends SkipLevels {
+	private static final long MAGIC = 0x42534c6576656c73l;  // "BSLevels"
 	public final int levelPage;
 	public final int spanPage;
 	public final BlockFile bf;
@@ -53,6 +55,9 @@ public class BSkipLevels extends SkipLevels {
 		this.bf = bf;
 
 		BlockFile.pageSeek(bf.file, levelPage);
+		long magic = bf.file.readLong();
+		if (magic != MAGIC)
+			throw new IOException("Bad SkipLevels magic number 0x" + Long.toHexString(magic) + " on page " + levelPage);
 
 		bsl.levelHash.put(new Integer(this.levelPage), this);
 
@@ -87,6 +92,7 @@ public class BSkipLevels extends SkipLevels {
 
 	public static void init(BlockFile bf, int page, int spanPage, int maxHeight) throws IOException {
 		BlockFile.pageSeek(bf.file, page);
+		bf.file.writeLong(MAGIC);
 		bf.file.writeShort((short) maxHeight);
 		bf.file.writeShort(0);
 		bf.file.writeInt(spanPage);
@@ -95,6 +101,7 @@ public class BSkipLevels extends SkipLevels {
 	public void flush() {
 		try {
 			BlockFile.pageSeek(bf.file, levelPage);
+			bf.file.writeLong(MAGIC);
 			bf.file.writeShort((short) levels.length);
 			int i = 0;
 			for( ; i < levels.length; i++) {

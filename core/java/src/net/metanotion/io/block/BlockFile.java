@@ -51,10 +51,20 @@ import net.metanotion.util.skiplist.SkipList;
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
 
-class CorruptFileException extends IOException { }
-class BadFileFormatException extends IOException { }
-class BadVersionException extends IOException { }
-
+/**
+ * On-disk format:
+ *    Magic number (6 bytes)
+ *    Version major/minor (2 bytes)
+ *    file length (long)
+ *    free list start (unsigned int)
+ *    is mounted (unsigned short) 0 = no, 1 = yes
+ *    span size (unsigned short)
+ *
+ * Metaindex skiplist is on page 2
+ *
+ * Pages are 1 KB and are numbered starting from 1.
+ * e.g. the Metaindex skiplist is at offset 1024 bytes
+ */
 public class BlockFile {
 	public static final long PAGESIZE = 1024;
 	public static final long OFFSET_MOUNTED = 20;
@@ -62,7 +72,13 @@ public class BlockFile {
 
 	public RandomAccessInterface file;
 
-	private long magicBytes = 0x3141deadbeef0100L;
+	private static final int MAJOR = 0x01;
+	private static final int MINOR = 0x01;
+	// I2P changed magic number, format changed, magic numbers now on all pages
+	private static final long MAGIC_BASE = 0x3141de4932500000L;   // 0x3141de I 2 P 00 00
+	private static final long MAGIC = MAGIC_BASE | (MAJOR << 8) | MINOR;
+	private long magicBytes = MAGIC;
+	public static final int MAGIC_CONT = 0x434f4e54;   // "CONT"
 	private long fileLen = PAGESIZE * 2;
 	private int freeListStart = 0;
 	private int mounted = 0;
@@ -123,14 +139,17 @@ public class BlockFile {
 				if(curNextPage==0) {
 					curNextPage = this.allocPage();
 					BlockFile.pageSeek(this.file, curNextPage);
+					this.file.writeInt(MAGIC_CONT);
 					this.file.writeInt(0);
 					BlockFile.pageSeek(this.file, curPage);
+					this.file.skipBytes(4);   // skip magic
 					this.file.writeInt(curNextPage);
 				}
 				BlockFile.pageSeek(this.file, curNextPage);
 				curPage = curNextPage;
+				this.file.skipBytes(4);   // skip magic
 				curNextPage = this.file.readUnsignedInt();
-				pageCounter = 4;
+				pageCounter = 8;
 				len = ((int) BlockFile.PAGESIZE) - pageCounter;
 			}
 			this.file.write(data, dct, Math.min(len, data.length - dct));
@@ -152,9 +171,12 @@ public class BlockFile {
 			int len = ((int) BlockFile.PAGESIZE) - pageCounter;
 			if(len <= 0) {
 				BlockFile.pageSeek(this.file, curNextPage);
+				int magic = this.file.readInt();
+				if (magic != MAGIC_CONT)
+					throw new IOException("Bad SkipSpan continuation magic number 0x" + Integer.toHexString(magic) + " on page " + curNextPage);
 				curPage = curNextPage;
 				curNextPage = this.file.readUnsignedInt();
-				pageCounter = 4;
+				pageCounter = 8;
 				len = ((int) BlockFile.PAGESIZE) - pageCounter;
 			}
 			res = this.file.read(arr, dct, Math.min(len, arr.length - dct));
@@ -184,16 +206,19 @@ public class BlockFile {
 		}
 
 		readSuperBlock();
-		if(magicBytes != 0x3141deadbeef0100L) {
-			if((magicBytes & 0x3141deadbeef0000L) == 0x3141deadbeef0000L) {
-				throw new BadVersionException();
+		if(magicBytes != MAGIC) {
+			if((magicBytes & MAGIC_BASE) == MAGIC_BASE) {
+				throw new IOException("Expected " + MAJOR + '.' + MINOR +
+				                      " but got " + (magicBytes >> 8 & 0xff) + '.' + (magicBytes & 0xff));
 			} else {
-				throw new BadFileFormatException();
+				throw new IOException("Bad magic number");
 			}
 		}
 		if (mounted != 0)
 			log.warn("Warning - file was not previously closed");
-		if(fileLen != file.length()) { throw new CorruptFileException(); }
+		if(fileLen != file.length())
+			throw new IOException("Expected file length " + fileLen +
+		                              " but actually " + file.length());
 		mount();
 
 		metaIndex = new BSkipList(spanSize, this, 2, new StringBytes(), new IntBytes());

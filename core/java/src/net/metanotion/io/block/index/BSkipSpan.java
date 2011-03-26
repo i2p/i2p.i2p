@@ -36,8 +36,30 @@ import net.metanotion.io.block.BlockFile;
 import net.metanotion.util.skiplist.SkipList;
 import net.metanotion.util.skiplist.SkipSpan;
 
+/**
+ * On-disk format:
+ *
+ *   First Page:
+ *     Magic number (int)
+ *     overflow page (unsigned int)
+ *     previous page (unsigned int)
+ *     next page (unsigned int)
+ *     max keys (unsigned short)
+ *     number of keys (unsigned short)
+ *     for each key:
+ *         key length (unsigned short)
+ *         value length (unsigned short)
+ *         key data
+ *         value data
+ *
+ *   Overflow pages:
+ *     Magic number (int)
+ *     next overflow page (unsigned int)
+ */
 public class BSkipSpan extends SkipSpan {
-
+	protected static final int MAGIC = 0x5370616e;  // "Span"
+	protected static final int HEADER_LEN = 20;
+	protected static final int CONT_HEADER_LEN = 8;
 	protected BlockFile bf;
 	protected int page;
 	protected int overflowPage;
@@ -52,6 +74,7 @@ public class BSkipSpan extends SkipSpan {
 
 	public static void init(BlockFile bf, int page, int spanSize) throws IOException {
 		BlockFile.pageSeek(bf.file, page);
+		bf.file.writeInt(MAGIC);
 		bf.file.writeInt(0);
 		bf.file.writeInt(0);
 		bf.file.writeInt(0);
@@ -73,6 +96,7 @@ public class BSkipSpan extends SkipSpan {
 			int next;
 			while(curPage != 0) {
 				BlockFile.pageSeek(bf.file, curPage);
+				bf.file.skipBytes(4);   // skip magic
 				next = bf.file.readUnsignedInt();
 				bf.freePage(curPage);
 				curPage = next;
@@ -91,6 +115,7 @@ public class BSkipSpan extends SkipSpan {
 	private void fflush() {
 		try {
 			BlockFile.pageSeek(bf.file, page);
+			bf.file.writeInt(MAGIC);
 			bf.file.writeInt(overflowPage);
 			bf.file.writeInt((prev != null) ? ((BSkipSpan) prev).page : 0);
 			bf.file.writeInt((next != null) ? ((BSkipSpan) next).page : 0);
@@ -102,7 +127,7 @@ public class BSkipSpan extends SkipSpan {
 			int[] curNextPage = new int[1];
 			curNextPage[0] = this.overflowPage;
 			int[] pageCounter = new int[1];
-			pageCounter[0] = 16;
+			pageCounter[0] = HEADER_LEN;
 			byte[] keyData;
 			byte[] valData;
 
@@ -111,14 +136,17 @@ public class BSkipSpan extends SkipSpan {
 					if(curNextPage[0] == 0) {
 						curNextPage[0] = bf.allocPage();
 						BlockFile.pageSeek(bf.file, curNextPage[0]);
+						bf.file.writeInt(BlockFile.MAGIC_CONT);
 						bf.file.writeInt(0);
 						BlockFile.pageSeek(bf.file, curPage);
+						bf.file.skipBytes(4);  // skip magic
 						bf.file.writeInt(curNextPage[0]);
 					}
 					BlockFile.pageSeek(bf.file, curNextPage[0]);
 					curPage = curNextPage[0];
+					bf.file.skipBytes(4);  // skip magic
 					curNextPage[0] = bf.file.readUnsignedInt();
-					pageCounter[0] = 4;
+					pageCounter[0] = CONT_HEADER_LEN;
 				}
 				// Drop bad entry without throwing exception
 				if (keys[i] == null || vals[i] == null) {
@@ -144,7 +172,9 @@ public class BSkipSpan extends SkipSpan {
 				curPage = bf.writeMultiPageData(keyData, curPage, pageCounter, curNextPage);
 				curPage = bf.writeMultiPageData(valData, curPage, pageCounter, curNextPage);
 			}
+			// FIXME why seek and rescan the overflow page?
 			BlockFile.pageSeek(bf.file, this.page);
+			bf.file.skipBytes(4);  // skip magic
 			this.overflowPage = bf.file.readUnsignedInt();
 		} catch (IOException ioe) { throw new RuntimeException("Error writing to database", ioe); }
 		// FIXME can't get there from here
@@ -171,6 +201,9 @@ public class BSkipSpan extends SkipSpan {
 
 		BlockFile.pageSeek(bf.file, spanPage);
 
+		int magic = bf.file.readInt();
+		if (magic != MAGIC)
+			throw new IOException("Bad SkipSpan magic number 0x" + Integer.toHexString(magic) + " on page " + spanPage);
 		bss.overflowPage = bf.file.readUnsignedInt();
 		bss.prevPage = bf.file.readUnsignedInt();
 		bss.nextPage = bf.file.readUnsignedInt();
@@ -200,15 +233,18 @@ public class BSkipSpan extends SkipSpan {
 		int[] curNextPage = new int[1];
 		curNextPage[0] = this.overflowPage;
 		int[] pageCounter = new int[1];
-		pageCounter[0] = 16;
+		pageCounter[0] = HEADER_LEN;
 //		System.out.println("Span Load " + sz + " nKeys " + nKeys + " page " + curPage);
 		int fail = 0;
 		for(int i=0;i<this.nKeys;i++) {
 			if((pageCounter[0] + 4) > BlockFile.PAGESIZE) {
 				BlockFile.pageSeek(this.bf.file, curNextPage[0]);
 				curPage = curNextPage[0];
+				int magic = bf.file.readInt();
+				if (magic != BlockFile.MAGIC_CONT)
+					throw new IOException("Bad SkipSpan magic number 0x" + Integer.toHexString(magic) + " on page " + curPage);
 				curNextPage[0] = this.bf.file.readUnsignedInt();
-				pageCounter[0] = 4;
+				pageCounter[0] = CONT_HEADER_LEN;
 			}
 			ksz = this.bf.file.readUnsignedShort();
 			vsz = this.bf.file.readUnsignedShort();

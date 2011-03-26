@@ -37,7 +37,16 @@ import net.metanotion.io.Serializer;
 import net.metanotion.io.block.BlockFile;
 import net.metanotion.util.skiplist.*;
 
+/**
+ * On-disk format:
+ *    Magic number (long)
+ *    first span page (unsigned int)
+ *    first level page (unsigned int)
+ *    size (unsigned int)
+ *    spans (unsigned int)
+ */
 public class BSkipList extends SkipList {
+	private static final long MAGIC = 0x536b69704c697374l;  // "SkipList"
 	public int firstSpanPage = 0;
 	public int firstLevelPage = 0;
 	public int skipPage = 0;
@@ -59,6 +68,9 @@ public class BSkipList extends SkipList {
 		this.bf = bf;
 
 		BlockFile.pageSeek(bf.file, skipPage);
+		long magic = bf.file.readLong();
+		if (magic != MAGIC)
+			throw new IOException("Bad SkipList magic number 0x" + Long.toHexString(magic) + " on page " + skipPage);
 		firstSpanPage = bf.file.readUnsignedInt();
 		firstLevelPage = bf.file.readUnsignedInt();
 		size = bf.file.readUnsignedInt();
@@ -84,6 +96,7 @@ public class BSkipList extends SkipList {
 	public void flush() {
 		try {
 			BlockFile.pageSeek(bf.file, skipPage);
+			bf.file.writeLong(MAGIC);
 			bf.file.writeInt(firstSpanPage);
 			bf.file.writeInt(firstLevelPage);
 			bf.file.writeInt(size);
@@ -114,6 +127,7 @@ public class BSkipList extends SkipList {
 		int firstSpan = bf.allocPage();
 		int firstLevel = bf.allocPage();
 		BlockFile.pageSeek(bf.file, page);
+		bf.file.writeLong(MAGIC);
 		bf.file.writeInt(firstSpan);
 		bf.file.writeInt(firstLevel);
 		bf.file.writeInt(0);
