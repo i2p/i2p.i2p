@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-25 21:19+0000\n"
-"PO-Revision-Date: 2011-03-26 02:46+0100\n"
+"POT-Creation-Date: 2011-03-26 08:34+0000\n"
+"PO-Revision-Date: 2011-03-26 11:02+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "Language: \n"
@@ -4070,6 +4070,7 @@ msgstr "Interconnexion configuration"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error_jsp.java:234
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/graphs_jsp.java:223
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005far_jsp.java:226
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005ffr_jsp.java:226
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005fnl_jsp.java:226
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005fru_jsp.java:226
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:226
@@ -4104,6 +4105,7 @@ msgstr "Panneau de contrôle"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error_jsp.java:247
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/graphs_jsp.java:236
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005far_jsp.java:239
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005ffr_jsp.java:239
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005fnl_jsp.java:239
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005fru_jsp.java:239
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:239
@@ -4139,6 +4141,7 @@ msgstr "Actualiser (s)"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error_jsp.java:251
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/graphs_jsp.java:240
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005far_jsp.java:243
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005ffr_jsp.java:243
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005fnl_jsp.java:243
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_005fru_jsp.java:243
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/help_jsp.java:243
@@ -4163,23 +4166,23 @@ msgstr "Configuration I2P réseau"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:316
 msgid "Bandwidth limiter"
-msgstr "Limiteur de bande passante"
+msgstr "Gestionnaire de bande passante"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:318
 msgid "I2P will work best if you configure your rates to match the speed of your internet connection."
-msgstr "I2P fonctionnera mieux si vous configurez le débit de transmission et réception pour qu\\''ils soient égales à ceux de votre connexion internet."
+msgstr "I2P fonctionnera mieux si vous configurez les débits de réception et d\\''émission pour qu\\''ils correspondent à ceux de votre connexion Internet."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:322
 msgid "KBps In"
-msgstr "KOps entrant"
+msgstr "ko/s entrants"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:336
 msgid "KBps Out"
-msgstr "KOps sortant"
+msgstr "ko/s sortants"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:352
 msgid "Share"
-msgstr "Partager"
+msgstr "Partagés"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:359
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:327
@@ -4190,15 +4193,15 @@ msgstr "NOTER"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:361
 #, java-format
 msgid "You have configured I2P to share only {0} KBps."
-msgstr "Vous avez configuré I2P à partager que {0} KOps."
+msgstr "Vous avez configuré I2P pour qu'il ne partage que {0} ko/s."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:364
 msgid "I2P requires at least 12KBps to enable sharing. "
-msgstr "I2P a besoin de plus de 12KOps afin d\\''activer le partage de bande passante"
+msgstr "I2P a besoin de plus de 12ko/s afin d\\''activer le partage de bande passante."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:365
 msgid "Please enable sharing (participating in tunnels) by configuring more bandwidth. "
-msgstr "Veuillez activer le partage de bande passante (tunnels participants) en augmentant votre bande passante."
+msgstr "Merci d\\'' activer le partage de bande passante (en participant aux tunnels) en augmentant votre bande passante, si possible."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:366
 msgid "It improves your anonymity by creating cover traffic, and helps the network."
@@ -4207,7 +4210,7 @@ msgstr "Cela aidera votre anonymat en cachant vos données parmi les données de
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:369
 #, java-format
 msgid "You have configured I2P to share {0} KBps."
-msgstr "Vous avez configuré I2P à partager {0} KOps."
+msgstr "Vous avez configuré le partage I2P à {0}ko/s."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:372
 msgid "The higher the share bandwidth the more you improve your anonymity and help the network."
