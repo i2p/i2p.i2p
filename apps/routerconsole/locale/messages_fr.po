@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-26 08:34+0000\n"
-"PO-Revision-Date: 2011-03-26 11:02+0100\n"
+"PO-Revision-Date: 2011-03-26 11:45+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "Language: \n"
@@ -3268,7 +3268,7 @@ msgstr "Client webmail anonyme"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:77
 msgid "Webmail"
-msgstr "messagerie Web"
+msgstr "Messagerie web"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:81
 msgid "Anonymous resident webserver"
@@ -3454,23 +3454,23 @@ msgstr "Montrer les tâches du routeur qui sont à traiter "
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:412
 msgid "Congestion"
-msgstr "Saturation réseau"
+msgstr "Encombrement"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:417
 msgid "Job lag"
-msgstr "Tâche décalage"
+msgstr "Retard de tâches"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:423
 msgid "Message delay"
-msgstr "Message retard"
+msgstr "Retard de messages"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:429
 msgid "Tunnel lag"
-msgstr "Tunnel décalage"
+msgstr "Retard de tunnels"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:435
 msgid "Backlog"
-msgstr "Retard accumulé"
+msgstr "En attente"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:106
 msgid "ERR-Client Manager I2CP Error - check logs"

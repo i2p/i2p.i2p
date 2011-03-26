@@ -40,7 +40,7 @@ Plus d'infos sur la page de <a href="config.jsp#help">configuration</a>.
 </ul><h3>Pairs</h3><ul>
 <li class="tidylist"><b>Actifs:</b>
 le premier nombre est celui des routeurs avec qui le votre a communiqué dans les dernières minutes. Ça peut varier de 
-8-10 à plusieurs centaines, suivant votre bande passante, son ratio de partage, et le trafic généré localement. Le 
+8-10 à plusieurs centaines, selon votre bande passante et son rapport de partage, et le trafic généré localement. Le 
 second est celui des pairs vus dans les dernières heures. Ces nombres penvent varier sensiblement sans conséquence.
 <a href="configstats.jsp#router.activePeers">[Activer les courbes]</a>.
 <li class="tidylist"><b>Rapides:</b>
@@ -56,11 +56,10 @@ la page <a href="profiles.jsp">profils</a>.
 vous utilisez ce groupe pour vos requêtes à la base de données du réseau. Ils sont souvent des pairs de remplissage par 
 diffusion ("floodfill"). Vos pairs "bien intégrés" sont affichés en bas de la même page 
 <a href="profiles.jsp">profils</a>.
-<li class="tidylist"><b>Connus:</b>
-c'est tous les routeurs dont vous connaissez l'existance. Il sont listés sur la page 
-<a href="netdb.jsp">base de données du réseau</a>. De moins de 100 à 1000 ou plus. Ce nombre ne représente pas la 
-taille totale du réseau; il varie en fonction de votre bande passante totale, du ratio de partage, et du trafic local. 
-I2P n'a pas besoin que chaque routeur connaisse tous les autres.
+<li class="tidylist"><b>Connus:</b> c'est tous les routeurs dont vous connaissez l'existance. Il sont listés sur la 
+page <a href="netdb.jsp">base de données du réseau</a>. De moins de 100 à 1000 ou plus. Ce nombre ne représente pas la 
+taille totale du réseau; il varie en fonction de votre bande passante totale et son rapport de partage, et du trafic 
+local. I2P n'a pas besoin que chaque routeur connaisse tous les autres.
 </ul><h3>Bande passante entrée/sortie</h3><div align="justify"> 
 Ça parle tout seul. Toutes les valeurs sont en octets par seconde (o/s), pas en bits par seconde (b/s). Modifiez vos 
 limites de bande passante sur la page de <a href="config.jsp#help">configuration</a>.
@@ -70,30 +69,25 @@ Le graphique de <a href="graphs.jsp">bande passante</a> est activé par défaut.
 C'est le nom I2P des applications qui se connectent par votre routeur. Elles peuvent être des clients lancés depuis 
 <a href="i2ptunnel/index.jsp">I2PTunnel</a> ou des programmes tiers qui se connectent via SAM, BOB ou directement à 
 I2CP.
-</div><h3>Tunnels entrée/sortie</h3><div align="justify">
-The actual tunnels are shown on the <a href="tunnels.jsp">the tunnels page</a>.</div><ul>
-<li class="tidylist"><div align="justify"><b>Exploratory:</b>
-Tunnels built by your router and used for communication with the floodfill peers,
-building new tunnels, and testing existing tunnels.</div>
-<li class="tidylist"><b>Client:</b>
-Tunnels built by your router for each client's use.
-<li class="tidylist"><b>Participating:</b>
-Tunnels built by other routers through your router.
-This may vary widely depending on network demand, your
-shared bandwidth, and amount of locally-generated traffic.
-The recommended method for limiting participating tunnels is
-to change your share percentage on the <a href="config.jsp#help">configuration page</a>.
-You may also limit the total number by setting <tt>router.maxParticipatingTunnels=nnn</tt> on
-the <a href="configadvanced.jsp">advanced configuration page</a>. <a href="configstats.jsp#tunnel.participatingTunnels">[Enable graphing]</a>.
-<li class="tidylist"><b>Share ratio:</b>
-The number of participating tunnels you route for others, divided by the total number of hops in
-all your exploratory and client tunnels.
-A number greater than 1.00 means you are contributing more tunnels to the network than you are using.
+</div><h3>TUNNELS:</h3><div align="justify">
+Les tunnels actuels sont affichés sur la page <a href="tunnels.jsp">tunnels</a>.</div><ul>
+<li class="tidylist"><div align="justify"><b>Exploratoires:</b> tunnels créés par votre routeur et utilisés avec les 
+pairs diffuseurs pour la création des nouveaux tunnels et le test des tunnels existants.</div>
+<li class="tidylist"><b>Clients:</b> tunnels créés par votre routeur pour chaque utilisation cliente.
+<li class="tidylist"><b>Participants:</b> les tunnels créés par d'autres routeurs et qui passent par le votre. Leur 
+nombre dépend largement de la demande du réseau, de votre part de bande passante partagée, et du trafic local. 
+La méthode recommandée pour limiter leur nombre est de diminuer le rapport de bande passante partagée dans la 
+<a href="config.jsp#help">configuration</a>. Vous pouvez également limiter ce nombre en définissant la variable 
+<tt>router.maxParticipatingTunnels=nnn</tt> dans la <a href="configadvanced.jsp">configuration avancée</a>. 
+<a href="configstats.jsp#tunnel.participatingTunnels">[Activer les statistiques]</a>.
+<li class="tidylist"><b>Rapport de partage:</b> le nombre de tunnels participants que vous routez pour les autres, 
+divisé par le nombre total de sauts dans tous vos tunnels exploratoires et clients. S'il est supérieur à 1, cela 
+signifie que vous contribuez à plus de tunnels que vous n'en utilisez.
 </ul>
 
-<h3>Congestion</h3><div align="justify">
-Some basic indications of router overload:</div><ul>
-<li class="tidylist"><b>Job lag:</b>
+<h3>ENCOMBREMENT</h3><div align="justify">
+Indications de base sur la charge du routeur:</div><ul>
+<li class="tidylist"><b>Retard de tâches:</b>
 How long jobs are waiting before execution. The job queue is listed on the <a href="jobs.jsp">jobs page</a>.
 Unfortunately, there are several other job queues in the router that may be congested,
 and their status is not available in the router console.
@@ -101,21 +95,21 @@ The job lag should generally be zero.
 If it is consistently higher than 500ms, your computer is very slow, or the
 router has serious problems.
 <a href="configstats.jsp#jobQueue.jobLag">[Enable graphing]</a>.
-<li class="tidylist"><b>Message delay:</b>
+<li class="tidylist"><b>Retard de messages:</b>
 How long an outbound message waits in the queue.
 This should generally be a few hundred milliseconds or less.
 If it is consistently higher than 1000ms, your computer is very slow,
 or you should adjust your bandwidth limits, or your (bittorrent?) clients
 may be sending too much data and should have their transmit bandwidth limit reduced.
 <a href="configstats.jsp#transport.sendProcessingTime">[Enable graphing]</a> (transport.sendProcessingTime).
-<li class="tidylist"><b>Tunnel lag:</b>
+<li class="tidylist"><b>Retard de tunnels:</b>
 This is the round trip time for a tunnel test, which sends a single message
 out a client tunnel and in an exploratory tunnel, or vice versa.
 It should usually be less than 5 seconds.
 If it is consistently higher than that, your computer is very slow,
 or you should adjust your bandwidth limits, or there are network problems.
 <a href="configstats.jsp#tunnel.testSuccessTime">[Enable graphing]</a> (tunnel.testSuccessTime).
-<li class="tidylist"><b>Handle backlog:</b>
+<li class="tidylist"><b>En attente:</b>
 This is the number of pending requests from other routers to build a
 participating tunnel through your router.
 It should usually be close to zero.
@@ -160,7 +154,10 @@ more information).</p>
 <p>The router by default also includes human's public domain <a href="http://www.i2p2.i2p/sam">SAM</a> bridge,
 which other client applications (such the <a href="http://duck.i2p/i2p-bt/">bittorrent port</a>) can use.
 There is also an optimized library for doing large number calculations - jbigi - which in turn uses the
-LGPL licensed <a href="http://swox.com/gmp/">GMP</a> library, tuned for various PC architectures.  Launchers for windows users are built with <a href="http://launch4j.sourceforge.net/">Launch4J</a>, and the installer is built with <a href="http://www.izforge.com/izpack/">IzPack</a>.  For
+LGPL licensed <a href="http://swox.com/gmp/">GMP</a> library, tuned for various PC architectures. 
+Launchers for windows users are built 
+with <a href="http://launch4j.sourceforge.net/">Launch4J</a>, and the installer is built with 
+<a href="http://www.izforge.com/izpack/">IzPack</a>.  For
 details on other applications available, as well as their licenses, please see the
 <a href="http://www.i2p2.i2p/licenses">license policy</a>.  Source for the I2P code and most bundled
 client applications can be found on our <a href="http://www.i2p2.i2p/download">download page</a>.
