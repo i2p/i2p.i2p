@@ -32,6 +32,8 @@ import java.util.Random;
 
 import net.i2p.util.RandomSource;
 
+import net.metanotion.io.block.BlockFile;
+
 public class SkipList {
 	protected SkipSpan first;
 	protected SkipLevels stack;
@@ -45,7 +47,7 @@ public class SkipList {
 	protected SkipList() { }
 
 	public SkipList(int span) {
-		if(span < 1) { throw new Error("Span size too small"); }
+		if(span < 1) { throw new RuntimeException("Span size too small"); }
 		first = new SkipSpan(span);
 		stack = new SkipLevels(1, first);
 		spans = 1;
@@ -54,24 +56,30 @@ public class SkipList {
 
 	public int size() { return size; }
 
+	/**
+	 *  @return log2(spans), minimum 4
+	 */
 	public int maxLevels() {
 		int hob = 0, s = spans;
-		while(spans > 0) {
+		while(s > 0) {
 			hob++;
-			spans = spans / 2;
+			s /= 2;
 		}
-		return (hob > 4) ? hob : 4;
+		return Math.max(hob, 4);
 	}
 
+	/**
+	 *  @return 0..maxLevels()
+	 */
 	public int generateColHeight() {
 		int bits = rng.nextInt();
-		boolean cont = true;
-		int res=0;
-		for(res=0; cont; res++) {
-			cont = ((bits % 2) == 0) ? true : false;
-			bits = bits / 2;
+		int max = maxLevels();
+		for(int res = 0; res < max; res++) {
+			if (bits % 2 == 0)
+				return res;
+			bits /= 2;
 		}
-		return Math.max(0, Math.min(res, maxLevels()));
+		return max;
 	}
 
 	public void put(Comparable key, Object val)	{
@@ -79,6 +87,8 @@ public class SkipList {
 		if(val == null) { throw new NullPointerException(); }
 		SkipLevels slvls = stack.put(stack.levels.length - 1, key, val, this);
 		if(slvls != null) {
+			// grow our stack
+			BlockFile.log.info("Top level old hgt " + stack.levels.length +  " new hgt " + slvls.levels.length);
 			SkipLevels[] levels = new SkipLevels[slvls.levels.length];
 			for(int i=0;i < slvls.levels.length; i++) {
 				if(i < stack.levels.length) {

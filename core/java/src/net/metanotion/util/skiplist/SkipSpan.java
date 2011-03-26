@@ -45,9 +45,11 @@ public class SkipSpan {
 	}
 
 	public void print() {
-		System.out.println("Span");
-		for(int i=0;i<nKeys;i++) {
-			System.out.println("\t" + keys[i] + " => " + vals[i]);
+		System.out.println("Span containing " + nKeys + " keys");
+		if (nKeys > 0 && keys != null && vals != null) {
+			for(int i=0;i<nKeys;i++) {
+				System.out.println("\t" + keys[i] + " => " + vals[i]);
+			}
 		}
 		if(next != null) { next.print(); }
 	}
@@ -155,6 +157,9 @@ public class SkipSpan {
 		this.next.flush();
 	}
 
+	/**
+	 *  @return the new span if it caused a split, else null if it went in this span
+	 */
 	private SkipSpan insert(int loc, Comparable key, Object val, SkipList sl) {
 		sl.size++;
 		if(nKeys == keys.length) {
@@ -170,6 +175,9 @@ public class SkipSpan {
 		}
 	}
 
+	/**
+	 *  @return the new span if it caused a split, else null if it went in an existing span
+	 */
 	public SkipSpan put(Comparable key, Object val, SkipList sl)	{
 		if(nKeys == 0) {
 			sl.size++;

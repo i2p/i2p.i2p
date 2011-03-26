@@ -158,4 +158,33 @@ public class BSkipList extends SkipList {
 		return new IBSkipIterator(ss, search[0]);
 	}
 
+	public void bslck(boolean isMeta, boolean fix) {
+		BlockFile.log.warn("    size " + this.size);
+		BlockFile.log.warn("    spans " + this.spans);
+		BlockFile.log.warn("    skipPage " + this.skipPage);
+		BlockFile.log.warn("    firstSpanPage " + this.firstSpanPage);
+		BlockFile.log.warn("    firstLevelPage " + this.firstLevelPage);
+		BlockFile.log.warn("    maxLevels " + this.maxLevels());
+		BlockFile.log.warn("*** printSL() ***");
+		printSL();
+		BlockFile.log.warn("*** print() ***");
+		print();
+		BlockFile.log.warn("*** Lvlck() ***");
+		stack.blvlck(fix, 0);
+		int items = 0;
+		for (SkipIterator iter = this.iterator(); iter.hasNext(); ) {
+			String key = (String) iter.nextKey();
+			if (isMeta) {
+				int sz = ((Integer) iter.next()).intValue();
+				BlockFile.log.warn("        Item " + key + " page " + sz);
+			} else {
+				String cls= iter.next().getClass().getSimpleName();
+				BlockFile.log.warn("        Item " + key + " size " + cls);
+			}
+			items++;
+		}
+		BlockFile.log.warn("    actual size " + items);
+		if (items != this.size)
+			BlockFile.log.warn("****** size mismatch, header = " + this.size + " actual = " + items);
+	}
 }

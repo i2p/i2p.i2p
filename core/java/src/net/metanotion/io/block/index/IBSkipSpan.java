@@ -35,6 +35,8 @@ import net.metanotion.io.block.BlockFile;
 import net.metanotion.util.skiplist.SkipList;
 import net.metanotion.util.skiplist.SkipSpan;
 
+import net.i2p.util.Log;
+
 /**
  * I2P version of BSkipSpan
  *
@@ -55,12 +57,11 @@ import net.metanotion.util.skiplist.SkipSpan;
 public class IBSkipSpan extends BSkipSpan {
 
 	private Comparable firstKey;
-	private static final boolean DEBUG = false;
 
 	@Override
 	public SkipSpan newInstance(SkipList sl) {
-		if (DEBUG)
-			System.err.println("Splitting page " + this.page + " containing " + this.nKeys + '/' + this.spanSize);
+		if (BlockFile.log.shouldLog(Log.DEBUG))
+			BlockFile.log.debug("Splitting page " + this.page + " containing " + this.nKeys + '/' + this.spanSize);
 		try {
 			int newPage = bf.allocPage();
 			init(bf, newPage, bf.spanSize);
@@ -84,8 +85,8 @@ public class IBSkipSpan extends BSkipSpan {
 			this.firstKey = null;
 		this.keys = null;
 		this.vals = null;
-		if (DEBUG)
-			System.err.println("Flushed data for page " + this.page + " containing " + this.nKeys + '/' + this.spanSize);
+		if (BlockFile.log.shouldLog(Log.DEBUG))
+			BlockFile.log.debug("Flushed data for page " + this.page + " containing " + this.nKeys + '/' + this.spanSize);
 	}
 
 	/**
@@ -97,8 +98,8 @@ public class IBSkipSpan extends BSkipSpan {
 		super.loadData();
 		if (this.nKeys > 0)
 			this.firstKey = this.keys[0];
-		if (DEBUG)
-			System.err.println("Loaded data for page " + this.page + " containing " + this.nKeys + '/' + this.spanSize + " first key: " + this.firstKey);
+		if (BlockFile.log.shouldLog(Log.DEBUG))
+			BlockFile.log.debug("Loaded data for page " + this.page + " containing " + this.nKeys + '/' + this.spanSize + " first key: " + this.firstKey);
 	}
 
 	/**
@@ -124,8 +125,8 @@ public class IBSkipSpan extends BSkipSpan {
 			BlockFile.log.error("Null deserialized first key in page " + curPage);
 			repair(1);
 		}
-		if (DEBUG)
-			System.err.println("Loaded header for page " + this.page + " containing " + this.nKeys + '/' + this.spanSize + " first key: " + this.firstKey);
+		if (BlockFile.log.shouldLog(Log.DEBUG))
+			BlockFile.log.debug("Loaded header for page " + this.page + " containing " + this.nKeys + '/' + this.spanSize + " first key: " + this.firstKey);
 	}
 
 	/**
@@ -221,8 +222,8 @@ public class IBSkipSpan extends BSkipSpan {
 	protected IBSkipSpan() { }
 
 	public IBSkipSpan(BlockFile bf, BSkipList bsl, int spanPage, Serializer key, Serializer val) throws IOException {
-		if (DEBUG)
-			System.err.println("New ibss page " + spanPage);
+		if (BlockFile.log.shouldLog(Log.DEBUG))
+			BlockFile.log.debug("New ibss page " + spanPage);
 		BSkipSpan.loadInit(this, bf, bsl, spanPage, key, val);
 		loadFirstKey();
 		this.next = null;

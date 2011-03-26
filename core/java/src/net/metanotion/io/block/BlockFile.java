@@ -38,11 +38,14 @@ import java.util.Set;
 import net.metanotion.io.RAIFile;
 import net.metanotion.io.RandomAccessInterface;
 import net.metanotion.io.Serializer;
+import net.metanotion.io.data.IdentityBytes;
 import net.metanotion.io.data.IntBytes;
 import net.metanotion.io.data.LongBytes;
 import net.metanotion.io.data.NullBytes;
 import net.metanotion.io.data.StringBytes;
+import net.metanotion.io.data.UTF8StringBytes;
 import net.metanotion.io.block.index.BSkipList;
+import net.metanotion.util.skiplist.SkipIterator;
 import net.metanotion.util.skiplist.SkipList;
 
 import net.i2p.I2PAppContext;
@@ -93,17 +96,15 @@ public class BlockFile {
 	}
 
 	public static void main(String args[]) {
+		if (args.length != 1) {
+			System.err.println("Usage: BlockFile file");
+			return;
+		}
+		boolean init = !(new File(args[0])).exists();
 		try {
 			RAIFile raif = new RAIFile(new File(args[0]), true, true);
-			BlockFile bf = new BlockFile(raif, true);
-
-			//bf.metaIndex.delete();
-			bf.makeIndex("foo", new NullBytes(), new NullBytes());
-
-
-			BSkipList b = bf.getIndex("foo", new NullBytes(), new NullBytes());
-			System.out.println(bf.allocPage());
-
+			BlockFile bf = new BlockFile(raif, init);
+			bf.bfck(true);
 			bf.close();
 			raif.close();
 		} catch (Exception e) {
@@ -190,7 +191,8 @@ public class BlockFile {
 				throw new BadFileFormatException();
 			}
 		}
-//		if(mounted != 0) { throw new CorruptFileException(); }
+		if (mounted != 0)
+			log.warn("Warning - file was not previously closed");
 		if(fileLen != file.length()) { throw new CorruptFileException(); }
 		mount();
 
@@ -275,7 +277,7 @@ public class BlockFile {
 	public void delIndex(String name) throws IOException {
 		Integer page = (Integer) metaIndex.remove(name);
 		if (page == null) { return; }
-		NullBytes nb = new NullBytes();
+		Serializer nb = new IdentityBytes();
 		BSkipList bsl = new BSkipList(spanSize, this, page.intValue(), nb, nb, true);
 		bsl.delete();
 	}
@@ -313,5 +315,33 @@ public class BlockFile {
 		// Unmount.
 		file.seek(BlockFile.OFFSET_MOUNTED);
 		file.writeShort(0);
+	}
+
+	public void bfck(boolean fix) {
+		log.warn("magic bytes " + magicBytes);
+		log.warn("fileLen " + fileLen);
+		log.warn("freeListStart " + freeListStart);
+		log.warn("mounted " + mounted);
+		log.warn("spanSize " + spanSize);
+		log.warn("Metaindex");
+		metaIndex.bslck(true, fix);
+		int items = 0;
+		for (SkipIterator iter = metaIndex.iterator(); iter.hasNext(); ) {
+			String slname = (String) iter.nextKey();
+			Integer page = (Integer) iter.next();
+			log.warn("List " + slname + " page " + page);
+			try {
+				BSkipList bsl = getIndex(slname, new UTF8StringBytes(), new IdentityBytes());
+				if (bsl == null) {
+					log.error("Can't find list? " + slname);
+					continue;
+				}
+				bsl.bslck(false, fix);
+				items++;
+			} catch (IOException ioe) {
+				log.error("Error with list " + slname, ioe);
+			}
+		}
+		log.warn("actual size " + items);
 	}
 }

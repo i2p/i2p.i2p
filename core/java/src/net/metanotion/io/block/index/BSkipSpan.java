@@ -33,7 +33,6 @@ import java.io.IOException;
 import net.metanotion.io.RandomAccessInterface;
 import net.metanotion.io.Serializer;
 import net.metanotion.io.block.BlockFile;
-import net.metanotion.io.data.NullBytes;
 import net.metanotion.util.skiplist.SkipList;
 import net.metanotion.util.skiplist.SkipSpan;
 
