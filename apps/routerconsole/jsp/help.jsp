@@ -47,7 +47,7 @@ This may range from 8-10 to several hundred, depending on your total bandwidth,
 shared bandwidth, and locally-generated traffic.
 The second number is the number of peers seen in the last hour or so.
 Do not be concerned if these numbers vary widely.
-<a href="configstats.jsp#router.activePeers">[Enable graphing]</a>.
+<!-- <a href="configstats.jsp#router.activePeers">[Enable graphing]</a>. -->
 <li class="tidylist"><b>Fast:</b>
 This is the number of peers you use for building client tunnels. It is generally in the
 range 8-30. Your fast peers are shown on the <a href="profiles.jsp">profiles page</a>.
