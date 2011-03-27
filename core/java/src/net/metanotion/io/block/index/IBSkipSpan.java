@@ -232,9 +232,12 @@ public class IBSkipSpan extends BSkipSpan {
 		}
 	}
 
-	protected IBSkipSpan() { }
+	private IBSkipSpan(BlockFile bf, BSkipList bsl) {
+		super(bf, bsl);
+	}
 
 	public IBSkipSpan(BlockFile bf, BSkipList bsl, int spanPage, Serializer key, Serializer val) throws IOException {
+		super(bf, bsl);
 		if (BlockFile.log.shouldLog(Log.DEBUG))
 			BlockFile.log.debug("New ibss page " + spanPage);
 		BSkipSpan.loadInit(this, bf, bsl, spanPage, key, val);
@@ -251,7 +254,7 @@ public class IBSkipSpan extends BSkipSpan {
 				bss.next = temp;
 				break;
 			}
-			bss.next = new IBSkipSpan();
+			bss.next = new IBSkipSpan(bf, bsl);
 			bss.next.next = null;
 			bss.next.prev = bss;
 			bss = (IBSkipSpan) bss.next;
@@ -269,7 +272,7 @@ public class IBSkipSpan extends BSkipSpan {
 				bss.next = temp;
 				break;
 			}
-			bss.prev = new IBSkipSpan();
+			bss.prev = new IBSkipSpan(bf, bsl);
 			bss.prev.next = bss;
 			bss.prev.prev = null;
 			bss = (IBSkipSpan) bss.prev;

@@ -54,11 +54,13 @@ public class BSkipLevels extends SkipLevels {
 	public final int levelPage;
 	public final int spanPage;
 	public final BlockFile bf;
+	private final BSkipList bsl;
 	private boolean isKilled;
 
 	public BSkipLevels(BlockFile bf, int levelPage, BSkipList bsl) throws IOException {
 		this.levelPage = levelPage;
 		this.bf = bf;
+		this.bsl = bsl;
 
 		BlockFile.pageSeek(bf.file, levelPage);
 		long magic = bf.file.readLong();
@@ -73,6 +75,9 @@ public class BSkipLevels extends SkipLevels {
 			throw new IOException("Invalid Level Skip size " + nonNull + " / " + maxLen);
 		spanPage = bf.file.readUnsignedInt();
 		bottom = bsl.spanHash.get(Integer.valueOf(spanPage));
+		if (bottom == null)
+			// FIXME recover better?
+			BlockFile.log.error("No span found in cache???");
 
 		this.levels = new BSkipLevels[maxLen];
 		if (BlockFile.log.shouldLog(Log.DEBUG))
@@ -138,6 +143,7 @@ public class BSkipLevels extends SkipLevels {
 		if (BlockFile.log.shouldLog(Log.INFO))
 			BlockFile.log.info("Killing " + this);
 		isKilled = true;
+		bsl.levelHash.remove(levelPage);
 		bf.freePage(levelPage);
 	}
 

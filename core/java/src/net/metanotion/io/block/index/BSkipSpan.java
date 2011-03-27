@@ -60,7 +60,8 @@ public class BSkipSpan extends SkipSpan {
 	protected static final int MAGIC = 0x5370616e;  // "Span"
 	protected static final int HEADER_LEN = 20;
 	protected static final int CONT_HEADER_LEN = 8;
-	protected BlockFile bf;
+	protected final BlockFile bf;
+	private final BSkipList bsl;
 	protected int page;
 	protected int overflowPage;
 
@@ -113,6 +114,7 @@ public class BSkipSpan extends SkipSpan {
 		} catch (IOException ioe) {
 			BlockFile.log.error("Error freeing " + this, ioe);
 		}
+		bsl.spanHash.remove(this.page);
 	}
 
 	public void flush() {
@@ -213,7 +215,6 @@ public class BSkipSpan extends SkipSpan {
 	protected static void loadInit(BSkipSpan bss, BlockFile bf, BSkipList bsl, int spanPage, Serializer key, Serializer val) throws IOException {
 		if (bss.isKilled)
 			BlockFile.log.error("Already killed!! " + bss, new Exception());
-		bss.bf = bf;
 		bss.page = spanPage;
 		bss.keySer = key;
 		bss.valSer = val;
@@ -301,8 +302,14 @@ public class BSkipSpan extends SkipSpan {
 		}
 	}
 
-	protected BSkipSpan() { }
+	protected BSkipSpan(BlockFile bf, BSkipList bsl) {
+		this.bf = bf;
+		this.bsl = bsl;
+	}
+
 	public BSkipSpan(BlockFile bf, BSkipList bsl, int spanPage, Serializer key, Serializer val) throws IOException {
+		this.bf = bf;
+		this.bsl = bsl;
 		BSkipSpan.load(this, bf, bsl, spanPage, key, val);
 		this.next = null;
 		this.prev = null;
@@ -315,7 +322,7 @@ public class BSkipSpan extends SkipSpan {
 				bss.next = temp;
 				break;
 			}
-			bss.next = new BSkipSpan();
+			bss.next = new BSkipSpan(bf, bsl);
 			bss.next.next = null;
 			bss.next.prev = bss;
 			bss = (BSkipSpan) bss.next;
@@ -332,7 +339,7 @@ public class BSkipSpan extends SkipSpan {
 				bss.next = temp;
 				break;
 			}
-			bss.prev = new BSkipSpan();
+			bss.prev = new BSkipSpan(bf, bsl);
 			bss.prev.next = bss;
 			bss.prev.prev = null;
 			bss = (BSkipSpan) bss.prev;
