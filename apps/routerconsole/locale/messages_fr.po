@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-26 08:34+0000\n"
-"PO-Revision-Date: 2011-03-26 21:54+0100\n"
+"PO-Revision-Date: 2011-03-27 11:56+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "Language: \n"
@@ -1900,7 +1900,7 @@ msgstr "Avancé"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:397
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:362
 msgid "Save changes"
-msgstr "Sauvegarder"
+msgstr "Enregistrer"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:121
 msgid "Rechecking router reachability..."
@@ -2435,7 +2435,7 @@ msgstr "Soumission de formulaire incorrecte: vous avez peut-être utilisé le bo
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:93
 msgid "Combined bandwidth graph"
-msgstr "Graphique de bandes passantes combinées"
+msgstr "Graphique combiné de bandes passantes"
 
 #. e.g. "statname for 60m"
 #: ../java/src/net/i2p/router/web/GraphHelper.java:107
@@ -2445,15 +2445,15 @@ msgstr "{0} pour {1}"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:146
 msgid "Configure Graph Display"
-msgstr "Graphe affichage configuration"
+msgstr "Paramètres d'affichage des graphiques"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:146
 msgid "Select Stats"
-msgstr "Sélectionnez les statistiques"
+msgstr "Choix des statistiques"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:150
 msgid "Periods"
-msgstr "Périodes"
+msgstr "Plage (mn)"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:151
 msgid "Plot averages"
@@ -2467,7 +2467,7 @@ msgstr "ou"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:152
 msgid "plot events"
-msgstr "tracer les événements"
+msgstr "les événements"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:153
 msgid "Image sizes"
@@ -2488,7 +2488,7 @@ msgstr "pixels"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:156
 msgid "Refresh delay"
-msgstr "Delai d\\''actualisation"
+msgstr "Actualiser toutes les"
 
 #: ../java/src/net/i2p/router/web/GraphHelper.java:171
 msgid "Redraw"
@@ -5089,19 +5089,19 @@ msgstr "Configuration des statistiques d\\''I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:320
 msgid "Configure I2P Stat Collection"
-msgstr "Configurer les groupes de statistiques "
+msgstr "Sélection des données à collecter"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:322
 msgid "Enable full stats?"
-msgstr "Activer toutes les statistiques?"
+msgstr "Activer toutes les statistiques"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:329
 msgid "change requires restart to take effect"
-msgstr "La modification sera prise en compte au démarrage suivant"
+msgstr "la modification sera prise en compte au prochain démarrage"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:331
 msgid "Stat file"
-msgstr "Fichier de statistiques"
+msgstr "Fichier des statistiques"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:335
 msgid "Filter"
@@ -5110,15 +5110,15 @@ msgstr "Filtre"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:337
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:348
 msgid "toggle all"
-msgstr "basculer tous"
+msgstr "basculer tout"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:350
 msgid "Log"
-msgstr "Historique"
+msgstr "Histo."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:352
 msgid "Graph"
-msgstr "Graphique"
+msgstr "Graph."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:391
 msgid "Advanced filter"
@@ -5342,7 +5342,7 @@ msgstr "graphiques"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/graphs_jsp.java:249
 msgid "I2P Performance Graphs"
-msgstr "Graphiques de performances"
+msgstr "Graphiques de performances I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/index_jsp.java:111
 msgid "home"

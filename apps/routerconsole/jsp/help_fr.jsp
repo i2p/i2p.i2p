@@ -22,9 +22,10 @@ la page consacrée aux <a href="http://www.i2p2.i2p/getinvolved_fr.html">volonta
 <br>Il y a aussi le <a href="http://forum.i2p/">forum I2P</a>
 et l'IRC.</p>
 
-<h2>Informations du panneau de contrôle</h2><p>
-Plusieurs des statistiques du panneau de contrôle peuvent être <a href="configstats.jsp">configurées</a> pour être 
-affichées sous forme de <a href="graphs.jsp">graphiques</a> pour l'analyse à posteriori.
+<h2>Informations du panneau de surveillance</h2><p>
+Plusieurs des statistiques affichées dans le panneau de surveillance peuvent être 
+<a href="configstats.jsp">configurées</a> pour être affichées sous forme de <a href="graphs.jsp">graphiques</a> pour 
+analyse sur la durée.
 </p><h3>GÉNÉRAL</h3><ul>
 <li class="tidylist"><b>Identité locale:</b>
 Cliquez sur "Afficher" pour voir l'empreinte Base64 à 44 caractères (256 bits) de votre routeur. Le hachage 
