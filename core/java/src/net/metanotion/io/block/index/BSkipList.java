@@ -44,6 +44,7 @@ import net.metanotion.util.skiplist.*;
  *    first level page (unsigned int)
  *    size (unsigned int)
  *    spans (unsigned int)
+ *    levels (unsigned int)
  *
  * Always fits on one page.
  */
@@ -52,10 +53,11 @@ public class BSkipList extends SkipList {
 	public int firstSpanPage = 0;
 	public int firstLevelPage = 0;
 	public int skipPage = 0;
-	public BlockFile bf;
+	public final BlockFile bf;
+	private boolean isClosed;
 
-	public HashMap spanHash = new HashMap();
-	public HashMap levelHash = new HashMap();
+	final HashMap<Integer, BSkipSpan> spanHash = new HashMap();
+	final HashMap<Integer, SkipLevels> levelHash = new HashMap();
 
 	private final boolean fileOnly;
 
@@ -77,6 +79,7 @@ public class BSkipList extends SkipList {
 		firstLevelPage = bf.file.readUnsignedInt();
 		size = bf.file.readUnsignedInt();
 		spans = bf.file.readUnsignedInt();
+		levelCount = bf.file.readUnsignedInt();
 		//System.out.println(size + " " + spans); 
 
 		this.fileOnly = fileOnly;
@@ -91,18 +94,24 @@ public class BSkipList extends SkipList {
 	public void close() {
 		//System.out.println("Closing index " + size + " and " + spans);
 		flush();
-		first = null;
-		stack = null;
+		spanHash.clear();
+		levelHash.clear();
+		isClosed = true;
 	}
 
 	public void flush() {
+		if (isClosed) {
+			BlockFile.log.error("Already closed!! " + this, new Exception());
+			return;
+		}
 		try {
 			BlockFile.pageSeek(bf.file, skipPage);
 			bf.file.writeLong(MAGIC);
 			bf.file.writeInt(firstSpanPage);
 			bf.file.writeInt(firstLevelPage);
-			bf.file.writeInt(size);
-			bf.file.writeInt(spans);
+			bf.file.writeInt(Math.max(0, size));
+			bf.file.writeInt(Math.max(0, spans));
+			bf.file.writeInt(Math.max(0, levelCount));
 			
 		} catch (IOException ioe) { throw new RuntimeException("Error writing to database", ioe); }
 	}
@@ -177,6 +186,7 @@ public class BSkipList extends SkipList {
 	public void bslck(boolean isMeta, boolean fix) {
 		BlockFile.log.warn("    size " + this.size);
 		BlockFile.log.warn("    spans " + this.spans);
+		BlockFile.log.warn("    levels " + this.levelCount);
 		BlockFile.log.warn("    skipPage " + this.skipPage);
 		BlockFile.log.warn("    firstSpanPage " + this.firstSpanPage);
 		BlockFile.log.warn("    firstLevelPage " + this.firstLevelPage);
@@ -200,5 +210,13 @@ public class BSkipList extends SkipList {
 		BlockFile.log.warn("    actual size " + items);
 		if (items != this.size)
 			BlockFile.log.warn("****** size mismatch, header = " + this.size + " actual = " + items);
+	}
+
+	@Override
+	public String toString() {
+		String rv = getClass().getSimpleName() + " page " + skipPage;
+		if (isClosed)
+			rv += " CLOSED";
+		return rv;
 	}
 }

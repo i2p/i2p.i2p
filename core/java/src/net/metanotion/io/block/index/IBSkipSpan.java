@@ -246,7 +246,7 @@ public class IBSkipSpan extends BSkipSpan {
 		IBSkipSpan temp;
 		int np = nextPage;
 		while(np != 0) {
-			temp = (IBSkipSpan) bsl.spanHash.get(new Integer(np));
+			temp = (IBSkipSpan) bsl.spanHash.get(Integer.valueOf(np));
 			if(temp != null) {
 				bss.next = temp;
 				break;
@@ -264,7 +264,7 @@ public class IBSkipSpan extends BSkipSpan {
 		bss = this;
 		np = prevPage;
 		while(np != 0) {
-			temp = (IBSkipSpan) bsl.spanHash.get(new Integer(np));
+			temp = (IBSkipSpan) bsl.spanHash.get(Integer.valueOf(np));
 			if(temp != null) {
 				bss.next = temp;
 				break;

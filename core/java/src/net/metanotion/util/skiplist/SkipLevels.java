@@ -187,6 +187,7 @@ public class SkipLevels {
 				}
 				res[1] = null;
 			}
+			sl.delSpan(res[1] != null);
 		}
 		if((bottom.nKeys == 0) && (sl.first != bottom)) { this.killInstance(); }
 		return res;
@@ -243,6 +244,7 @@ public class SkipLevels {
 				if(levels.length < height)
 					return slvls;
 			}
+			sl.addSpan(height != 0);
 		}
 		return null;
 	}

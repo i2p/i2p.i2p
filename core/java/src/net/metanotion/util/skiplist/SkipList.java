@@ -32,16 +32,21 @@ import java.util.Random;
 
 import net.i2p.util.RandomSource;
 
-import net.metanotion.io.block.BlockFile;
+//import net.metanotion.io.block.BlockFile;
 
 public class SkipList {
+	/** the probability of each next higher level */
+	private static final int P = 2;
+	private static final int MIN_SLOTS = 4;
+	// these two are really final
 	protected SkipSpan first;
 	protected SkipLevels stack;
 	// I2P mod
 	public static final Random rng = RandomSource.getInstance();
 
-	public int size=0;
-	public int spans=0;
+	protected int size;
+	protected int spans;
+	protected int levelCount;
 
 	public void flush() { }
 	protected SkipList() { }
@@ -56,10 +61,33 @@ public class SkipList {
 		first = new SkipSpan(span);
 		stack = new SkipLevels(1, first);
 		spans = 1;
+		levelCount = 1;
 		//rng = new Random(System.currentTimeMillis());
 	}
 
 	public int size() { return size; }
+
+	public void addItem() {
+		size++;
+	}
+
+	public void delItem() {
+		if (size > 0)
+		       size--;
+	}
+
+	public void addSpan(boolean addLevel) {
+		spans++;
+		if (addLevel)
+			levelCount++;
+	}
+
+	public void delSpan(boolean delLevel) {
+		if (spans > 0)
+			spans--;
+		if (delLevel && levelCount > 0)
+			levelCount--;
+	}
 
 	/**
 	 *  @return log2(spans), minimum 4
@@ -68,21 +96,21 @@ public class SkipList {
 		int hob = 0, s = spans;
 		while(s > 0) {
 			hob++;
-			s /= 2;
+			s /= P;
 		}
-		return Math.max(hob, 4);
+		return Math.max(hob, MIN_SLOTS);
 	}
 
 	/**
-	 *  @return 0..maxLevels()
+	 *  @return 0..maxLevels(), each successive one with probability 1 / P
 	 */
 	public int generateColHeight() {
 		int bits = rng.nextInt();
 		int max = maxLevels();
 		for(int res = 0; res < max; res++) {
-			if (bits % 2 == 0)
+			if (bits % P == 0)
 				return res;
-			bits /= 2;
+			bits /= P;
 		}
 		return max;
 	}
@@ -93,7 +121,7 @@ public class SkipList {
 		SkipLevels slvls = stack.put(stack.levels.length - 1, key, val, this);
 		if(slvls != null) {
 			// grow our stack
-			BlockFile.log.info("Top level old hgt " + stack.levels.length +  " new hgt " + slvls.levels.length);
+			//BlockFile.log.info("Top level old hgt " + stack.levels.length +  " new hgt " + slvls.levels.length);
 			SkipLevels[] levels = new SkipLevels[slvls.levels.length];
 			for(int i=0;i < slvls.levels.length; i++) {
 				if(i < stack.levels.length) {

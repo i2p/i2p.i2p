@@ -218,7 +218,7 @@ public class BSkipSpan extends SkipSpan {
 		bss.keySer = key;
 		bss.valSer = val;
 
-		bsl.spanHash.put(new Integer(spanPage), bss);
+		bsl.spanHash.put(Integer.valueOf(spanPage), bss);
 
 		BlockFile.pageSeek(bf.file, spanPage);
 
@@ -308,10 +308,9 @@ public class BSkipSpan extends SkipSpan {
 		this.prev = null;
 
 		BSkipSpan bss = this;
-		BSkipSpan temp;
 		int np = nextPage;
 		while(np != 0) {
-			temp = (BSkipSpan) bsl.spanHash.get(new Integer(np));
+			BSkipSpan temp = bsl.spanHash.get(Integer.valueOf(np));
 			if(temp != null) {
 				bss.next = temp;
 				break;
@@ -328,7 +327,7 @@ public class BSkipSpan extends SkipSpan {
 		bss = this;
 		np = prevPage;
 		while(np != 0) {
-			temp = (BSkipSpan) bsl.spanHash.get(new Integer(np));
+			BSkipSpan temp = bsl.spanHash.get(Integer.valueOf(np));
 			if(temp != null) {
 				bss.next = temp;
 				break;

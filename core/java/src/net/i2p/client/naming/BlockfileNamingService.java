@@ -35,6 +35,7 @@ import net.i2p.util.SecureFileOutputStream;
 
 import net.metanotion.io.Serializer;
 import net.metanotion.io.block.BlockFile;
+import net.metanotion.io.data.UTF8StringBytes;
 import net.metanotion.util.skiplist.SkipIterator;
 import net.metanotion.util.skiplist.SkipList;
 
@@ -79,7 +80,7 @@ public class BlockfileNamingService extends DummyNamingService {
     private volatile boolean _isClosed;
 
     private static final Serializer _infoSerializer = new PropertiesSerializer();
-    private static final Serializer _stringSerializer = new StringSerializer();
+    private static final Serializer _stringSerializer = new UTF8StringBytes();
     private static final Serializer _destSerializer = new DestEntrySerializer();
 
     private static final String HOSTS_DB = "hostsdb.blockfile";
@@ -740,28 +741,6 @@ public class BlockfileNamingService extends DummyNamingService {
     private class Shutdown implements Runnable {
         public void run() {
             close();
-        }
-    }
-
-    /**
-     *  UTF-8 Serializer (the one in the lib is US-ASCII).
-     *  Used for all keys.
-     */
-    private static class StringSerializer implements Serializer {
-        public byte[] getBytes(Object o) {
-            try {
-                return ((String) o).getBytes("UTF-8");
-            } catch (UnsupportedEncodingException uee) {
-                throw new RuntimeException("No UTF-8", uee);
-            }
-        }
-
-        public Object construct(byte[] b) {
-            try {
-                return new String(b, "UTF-8");
-            } catch (UnsupportedEncodingException uee) {
-                throw new RuntimeException("No UTF-8", uee);
-            }
         }
     }
 

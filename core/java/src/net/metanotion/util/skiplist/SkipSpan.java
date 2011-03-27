@@ -138,7 +138,6 @@ public class SkipSpan {
 
 	private void split(int loc, Comparable key, Object val, SkipList sl) {
 		SkipSpan right = newInstance(sl);
-		sl.spans++;
 
 		if(this.next != null) { this.next.prev = right; }
 		right.next = this.next;
@@ -175,7 +174,7 @@ public class SkipSpan {
 	 *  @return the new span if it caused a split, else null if it went in this span
 	 */
 	private SkipSpan insert(int loc, Comparable key, Object val, SkipList sl) {
-		sl.size++;
+		sl.addItem();
 		if(nKeys == keys.length) {
 			// split.
 			split(loc, key, val, sl);
@@ -194,7 +193,7 @@ public class SkipSpan {
 	 */
 	public SkipSpan put(Comparable key, Object val, SkipList sl)	{
 		if(nKeys == 0) {
-			sl.size++;
+			sl.addItem();
 			keys[0] = key;
 			vals[0] = val;
 			nKeys++;
@@ -256,9 +255,8 @@ public class SkipSpan {
 		Object o = vals[loc];
 		Object[] res = new Object[2];
 		res[0] = o;
-		sl.size--;
+		sl.delItem();
 		if(nKeys == 1) {
-			if(sl.spans > 1) { sl.spans--; }
 			if((this.prev == null) && (this.next != null)) {
 				res[1] = this.next;
 				// We're the first node in the list... copy the next node over and kill it. See also bottom of SkipLevels.java

@@ -65,14 +65,14 @@ public class BSkipLevels extends SkipLevels {
 		if (magic != MAGIC)
 			throw new IOException("Bad SkipLevels magic number 0x" + Long.toHexString(magic) + " on page " + levelPage);
 
-		bsl.levelHash.put(new Integer(this.levelPage), this);
+		bsl.levelHash.put(Integer.valueOf(this.levelPage), this);
 
 		int maxLen = bf.file.readUnsignedShort();
 		int nonNull = bf.file.readUnsignedShort();
 		if(maxLen < 1 || maxLen > MAX_SIZE || nonNull > maxLen)
 			throw new IOException("Invalid Level Skip size " + nonNull + " / " + maxLen);
 		spanPage = bf.file.readUnsignedInt();
-		bottom = (BSkipSpan) bsl.spanHash.get(new Integer(spanPage));
+		bottom = bsl.spanHash.get(Integer.valueOf(spanPage));
 
 		this.levels = new BSkipLevels[maxLen];
 		if (BlockFile.log.shouldLog(Log.DEBUG))
@@ -86,10 +86,10 @@ public class BSkipLevels extends SkipLevels {
 		for(int i = 0; i < nonNull; i++) {
 			int lp = lps[i];
 			if(lp != 0) {
-				levels[i] = (BSkipLevels) bsl.levelHash.get(new Integer(lp));
+				levels[i] = bsl.levelHash.get(Integer.valueOf(lp));
 				if(levels[i] == null) {
 					levels[i] = new BSkipLevels(bf, lp, bsl);
-					bsl.levelHash.put(new Integer(lp), levels[i]);
+					bsl.levelHash.put(Integer.valueOf(lp), levels[i]);
 				} else {
 				}
 			} else {
