@@ -79,14 +79,19 @@ public class IBSkipSpan extends BSkipSpan {
 	@Override
 	public void flush() {
 		super.flush();
-		if (nKeys > 0)
-			this.firstKey = keys[0];
-		else
+		if (nKeys <= 0)
 			this.firstKey = null;
-		this.keys = null;
-		this.vals = null;
-		if (BlockFile.log.shouldLog(Log.DEBUG))
-			BlockFile.log.debug("Flushed data for page " + this.page + " containing " + this.nKeys + '/' + this.spanSize);
+		if (keys != null) {
+			if (nKeys > 0)
+				this.firstKey = keys[0];
+			this.keys = null;
+			this.vals = null;
+			if (BlockFile.log.shouldLog(Log.DEBUG))
+				BlockFile.log.debug("Flushed data for page " + this.page + " containing " + this.nKeys + '/' + this.spanSize);
+		} else if (BlockFile.log.shouldLog(Log.DEBUG)) {
+			// if keys is null, we are (hopefully) just updating the prev/next pages on an unloaded span
+			BlockFile.log.debug("Flushed pointers for for unloaded page " + this.page + " containing " + this.nKeys + '/' + this.spanSize);
+		}
 	}
 
 	/**
@@ -133,6 +138,8 @@ public class IBSkipSpan extends BSkipSpan {
 	 * Seek past the span header
 	 */
 	private void seekData() throws IOException {
+		if (isKilled)
+			throw new IOException("Already killed! " + this);
 		BlockFile.pageSeek(this.bf.file, this.page);
 		int magic = bf.file.readInt();
 		if (magic != MAGIC)
@@ -333,10 +340,20 @@ public class IBSkipSpan extends BSkipSpan {
 	 */
 	@Override
 	public Object[] remove(Comparable key, SkipList sl) {
+		if (BlockFile.log.shouldLog(Log.DEBUG))
+			BlockFile.log.debug("Remove " + key + " in " + this);
+		if (nKeys <= 0)
+			return null;
 		try {
 			seekAndLoadData();
+			if (this.nKeys == 1 && this.prev == null && this.next != null && this.next.keys == null) {
+				// fix for NPE in SkipSpan if next is not loaded
+				if (BlockFile.log.shouldLog(Log.INFO))
+					BlockFile.log.info("Loading next data for remove");
+				((IBSkipSpan)this.next).seekAndLoadData();
+			}
 		} catch (IOException ioe) {
-			throw new RuntimeException("Error reading database", ioe);
+			throw new RuntimeException("Error reading database attempting to remove " + key, ioe);
 		}
 		Object[] rv = super.remove(key, sl);
 		// flush() nulls out the data

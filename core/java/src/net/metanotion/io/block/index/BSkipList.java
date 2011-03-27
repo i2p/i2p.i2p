@@ -44,6 +44,8 @@ import net.metanotion.util.skiplist.*;
  *    first level page (unsigned int)
  *    size (unsigned int)
  *    spans (unsigned int)
+ *
+ * Always fits on one page.
  */
 public class BSkipList extends SkipList {
 	private static final long MAGIC = 0x536b69704c697374l;  // "SkipList"
@@ -138,8 +140,8 @@ public class BSkipList extends SkipList {
 
 	public int maxLevels() {
 		int max = super.maxLevels();
-		int cells = (int) ((BlockFile.PAGESIZE - 8) / 4);
-		return (max > cells) ? cells : max;
+		int cells = (BlockFile.PAGESIZE - BSkipLevels.HEADER_LEN) / 4;
+		return Math.min(cells, max);
 	}
 
 	@Override
@@ -179,9 +181,7 @@ public class BSkipList extends SkipList {
 		BlockFile.log.warn("    firstSpanPage " + this.firstSpanPage);
 		BlockFile.log.warn("    firstLevelPage " + this.firstLevelPage);
 		BlockFile.log.warn("    maxLevels " + this.maxLevels());
-		BlockFile.log.warn("*** printSL() ***");
 		printSL();
-		BlockFile.log.warn("*** print() ***");
 		print();
 		BlockFile.log.warn("*** Lvlck() ***");
 		stack.blvlck(fix, 0);

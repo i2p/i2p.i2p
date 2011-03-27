@@ -66,7 +66,7 @@ import net.i2p.util.Log;
  * e.g. the Metaindex skiplist is at offset 1024 bytes
  */
 public class BlockFile {
-	public static final long PAGESIZE = 1024;
+	public static final int PAGESIZE = 1024;
 	public static final long OFFSET_MOUNTED = 20;
 	public static final Log log = I2PAppContext.getGlobalContext().logManager().getLog(BlockFile.class);
 
@@ -79,6 +79,10 @@ public class BlockFile {
 	private static final long MAGIC = MAGIC_BASE | (MAJOR << 8) | MINOR;
 	private long magicBytes = MAGIC;
 	public static final int MAGIC_CONT = 0x434f4e54;   // "CONT"
+	public static final int METAINDEX_PAGE = 2;
+	/** 2**32 pages of 1024 bytes each, more or less */
+	private static final long MAX_LEN = (2l << (32 + 10)) - 1;
+
 	private long fileLen = PAGESIZE * 2;
 	private int freeListStart = 0;
 	private int mounted = 0;
@@ -134,7 +138,7 @@ public class BlockFile {
 		int curPage = page;
 		int dct = 0;
 		while(dct < data.length) {
-			int len = ((int) BlockFile.PAGESIZE) - pageCounter;
+			int len = PAGESIZE - pageCounter;
 			if(len <= 0) {
 				if(curNextPage==0) {
 					curNextPage = this.allocPage();
@@ -150,7 +154,7 @@ public class BlockFile {
 				this.file.skipBytes(4);   // skip magic
 				curNextPage = this.file.readUnsignedInt();
 				pageCounter = 8;
-				len = ((int) BlockFile.PAGESIZE) - pageCounter;
+				len = PAGESIZE - pageCounter;
 			}
 			this.file.write(data, dct, Math.min(len, data.length - dct));
 			pageCounter += Math.min(len, data.length - dct);
@@ -168,7 +172,7 @@ public class BlockFile {
 		int dct = 0;
 		int res;
 		while(dct < arr.length) {
-			int len = ((int) BlockFile.PAGESIZE) - pageCounter;
+			int len = PAGESIZE - pageCounter;
 			if(len <= 0) {
 				BlockFile.pageSeek(this.file, curNextPage);
 				int magic = this.file.readInt();
@@ -177,7 +181,7 @@ public class BlockFile {
 				curPage = curNextPage;
 				curNextPage = this.file.readUnsignedInt();
 				pageCounter = 8;
-				len = ((int) BlockFile.PAGESIZE) - pageCounter;
+				len = PAGESIZE - pageCounter;
 			}
 			res = this.file.read(arr, dct, Math.min(len, arr.length - dct));
 			if(res == -1) { throw new IOException(); }
@@ -221,59 +225,85 @@ public class BlockFile {
 		                              " but actually " + file.length());
 		mount();
 
-		metaIndex = new BSkipList(spanSize, this, 2, new StringBytes(), new IntBytes());
+		metaIndex = new BSkipList(spanSize, this, METAINDEX_PAGE, new StringBytes(), new IntBytes());
 	}
 
-
-	public static void pageSeek(RandomAccessInterface file, int page) throws IOException { file.seek((((long)page) - 1L) * BlockFile.PAGESIZE ); }
+	/**
+	 *  Go to any page but the superblock.
+	 *  Page 1 is the superblock, must use file.seek(0) to get there.
+	 *  @param page >= 2
+	 */
+	public static void pageSeek(RandomAccessInterface file, int page) throws IOException {
+		if (page < METAINDEX_PAGE)
+			throw new IOException("Negative page or superblock access attempt: " + page);
+		file.seek((((long)page) - 1L) * PAGESIZE );
+	}
 
 	public int allocPage() throws IOException {
 		if(freeListStart != 0) {
-			FreeListBlock flb = new FreeListBlock(file, freeListStart);
-			if(flb.len > 0) {
-				flb.len = flb.len - 1;
-				int page = flb.branches[flb.len];
-				flb.writeBlock();
-				return page;
-			} else {
-				freeListStart = flb.nextPage;
-				writeSuperBlock();
-				return flb.page;
+			try {
+				FreeListBlock flb = new FreeListBlock(file, freeListStart);
+				if(!flb.isEmpty()) {
+					return flb.takePage();
+				} else {
+					freeListStart = flb.getNextPage();
+					writeSuperBlock();
+					return flb.page;
+				}
+			} catch (IOException ioe) {
+				log.error("Discarding corrupt free list block page " + freeListStart, ioe);
+				freeListStart = 0;
 			}
 		}
 		long offset = file.length();
-		fileLen = offset + BlockFile.PAGESIZE;
+		fileLen = offset + PAGESIZE;
 		file.setLength(fileLen);
 		writeSuperBlock();
-		return ((int) ((long) (offset / BlockFile.PAGESIZE))) + 1;
+		return (int) ((offset / PAGESIZE) + 1);
 	}
 
-	public void freePage(int page) throws IOException {
-		System.out.println("Free Page " + page);
-		if(freeListStart == 0) {
-			freeListStart = page;
-			FreeListBlock.initPage(file, page);
-			writeSuperBlock();
+	/**
+	 *  Add the page to the free list. The file is never shrunk.
+	 *  TODO: Reclaim free pages at end of file, or even do a full compaction.
+	 *  Does not throw exceptions; logs on failure.
+	 */
+	public void freePage(int page) {
+		if (page < METAINDEX_PAGE) {
+			log.error("Negative page or superblock free attempt: " + page);
 			return;
 		}
-		FreeListBlock flb = new FreeListBlock(file, freeListStart);
-		if(flb.isFull()) {
-			FreeListBlock.initPage(file, page);
-			if(flb.nextPage == 0) {
-				flb.nextPage = page;
-				flb.writeBlock();
-				return;
-			} else {
-				flb = new FreeListBlock(file, page);
-				flb.nextPage = freeListStart;
-				flb.writeBlock();
+		try {
+			if(freeListStart == 0) {
 				freeListStart = page;
+				FreeListBlock.initPage(file, page);
 				writeSuperBlock();
 				return;
 			}
+			try {
+				FreeListBlock flb = new FreeListBlock(file, freeListStart);
+				if(flb.isFull()) {
+					FreeListBlock.initPage(file, page);
+					if(flb.getNextPage() == 0) {
+						flb.setNextPage(page);
+						return;
+					} else {
+						flb = new FreeListBlock(file, page);
+						flb.setNextPage(freeListStart);
+						freeListStart = page;
+						writeSuperBlock();
+						return;
+					}
+				}
+				flb.addPage(page);
+			} catch (IOException ioe) {
+				log.error("Discarding corrupt free list block page " + freeListStart, ioe);
+				freeListStart = page;
+				FreeListBlock.initPage(file, page);
+				writeSuperBlock();
+			}
+		} catch (IOException ioe) {
+			log.error("Error freeing page: " + page, ioe);
 		}
-		flb.addPage(page);
-		flb.writeBlock();
 	}
 
 	public BSkipList getIndex(String name, Serializer key, Serializer val) throws IOException {

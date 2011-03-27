@@ -36,6 +36,8 @@ import net.metanotion.util.skiplist.SkipList;
 import net.metanotion.util.skiplist.SkipLevels;
 import net.metanotion.util.skiplist.SkipSpan;
 
+import net.i2p.util.Log;
+
 /**
  * On-disk format:
  *    Magic number (long)
@@ -43,12 +45,16 @@ import net.metanotion.util.skiplist.SkipSpan;
  *    non-null height (unsigned short)
  *    span page (unsigned int)
  *    height number of level pages (unsigned ints)
+ *
+ * Always fits on one page.
  */
 public class BSkipLevels extends SkipLevels {
 	private static final long MAGIC = 0x42534c6576656c73l;  // "BSLevels"
+	static final int HEADER_LEN = 16;
 	public final int levelPage;
 	public final int spanPage;
 	public final BlockFile bf;
+	private boolean isKilled;
 
 	public BSkipLevels(BlockFile bf, int levelPage, BSkipList bsl) throws IOException {
 		this.levelPage = levelPage;
@@ -63,11 +69,14 @@ public class BSkipLevels extends SkipLevels {
 
 		int maxLen = bf.file.readUnsignedShort();
 		int nonNull = bf.file.readUnsignedShort();
+		if(maxLen < 1 || maxLen > MAX_SIZE || nonNull > maxLen)
+			throw new IOException("Invalid Level Skip size " + nonNull + " / " + maxLen);
 		spanPage = bf.file.readUnsignedInt();
 		bottom = (BSkipSpan) bsl.spanHash.get(new Integer(spanPage));
 
 		this.levels = new BSkipLevels[maxLen];
-		BlockFile.log.debug("Reading New BSkipLevels with " + nonNull + " valid levels out of " + maxLen + " page " + levelPage);
+		if (BlockFile.log.shouldLog(Log.DEBUG))
+			BlockFile.log.debug("Reading New BSkipLevels with " + nonNull + " / " + maxLen + " valid levels page " + levelPage);
 		// We have to read now because new BSkipLevels() will move the file pointer
 		int[] lps = new int[nonNull];
 		for(int i = 0; i < nonNull; i++) {
@@ -84,7 +93,8 @@ public class BSkipLevels extends SkipLevels {
 				} else {
 				}
 			} else {
-				BlockFile.log.warn("WTF page " + levelPage + " i = " + i + " of " + nonNull + " valid levels out of " + maxLen + " but level page is zero");
+				if (BlockFile.log.shouldLog(Log.WARN))
+					BlockFile.log.warn("WTF " + this + " i = " + i + " of " + nonNull + " / " + maxLen + " valid levels but page is zero");
 				levels[i] = null;
 			}
 		}
@@ -99,6 +109,10 @@ public class BSkipLevels extends SkipLevels {
 	}
 
 	public void flush() {
+		if (isKilled) {
+			BlockFile.log.error("Already killed!! " + this, new Exception());
+			return;
+		}
 		try {
 			BlockFile.pageSeek(bf.file, levelPage);
 			bf.file.writeLong(MAGIC);
@@ -117,9 +131,14 @@ public class BSkipLevels extends SkipLevels {
 	}
 
 	public void killInstance() {
-		try {
-			bf.freePage(levelPage);
-		} catch (IOException ioe) { throw new RuntimeException("Error freeing database page", ioe); }
+		if (isKilled) {
+			BlockFile.log.error("Already killed!! " + this, new Exception());
+			return;
+		}
+		if (BlockFile.log.shouldLog(Log.INFO))
+			BlockFile.log.info("Killing " + this);
+		isKilled = true;
+		bf.freePage(levelPage);
 	}
 
 	public SkipLevels newInstance(int levels, SkipSpan ss, SkipList sl) {
@@ -149,5 +168,13 @@ public class BSkipLevels extends SkipLevels {
 		}
 		if (levels[0] != null)
 			levels[0].blvlck(fix, width + 1);
+	}
+
+	@Override
+	public String toString() {
+		String rv = "BSL height: " + levels.length + " page: " + levelPage + " span: " + bottom;
+		if (isKilled)
+			rv += " KILLED";
+		return rv;
 	}
 }

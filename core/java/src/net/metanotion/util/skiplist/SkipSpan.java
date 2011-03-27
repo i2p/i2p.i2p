@@ -28,7 +28,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package net.metanotion.util.skiplist;
 
+//import net.metanotion.io.block.BlockFile;
+
 public class SkipSpan {
+	/** This is actually limited by BlockFile.spanSize which is much smaller */
+	public static final int MAX_SIZE = 256;
+
 	public int nKeys = 0;
 	public Comparable[] keys;
 	public Object[] vals;
@@ -39,19 +44,28 @@ public class SkipSpan {
 	public void flush() { }
 
 	protected SkipSpan() { }
+
+	/*
+	 *  @throws IllegalArgumentException if size too big or too small
+	 */
 	public SkipSpan(int size) {
+		if(size < 1 || size > MAX_SIZE)
+			throw new IllegalArgumentException("Invalid span size " + size);
 		keys = new Comparable[size];
 		vals = new Object[size];
 	}
 
-	public void print() {
-		System.out.println("Span containing " + nKeys + " keys");
+	/** dumps all the data from here to the end */
+	public String print() {
+		StringBuilder buf = new StringBuilder(1024);
+		buf.append("Span with ").append(nKeys).append(" keys\n");
 		if (nKeys > 0 && keys != null && vals != null) {
 			for(int i=0;i<nKeys;i++) {
-				System.out.println("\t" + keys[i] + " => " + vals[i]);
+				buf.append('\t').append(keys[i]).append(" => ").append(vals[i]).append('\n');
 			}
 		}
-		if(next != null) { next.print(); }
+		if (next != null) { buf.append(next.print()); }
+		return buf.toString();
 	}
 
 	private int binarySearch(Comparable key) {
@@ -247,18 +261,26 @@ public class SkipSpan {
 			if(sl.spans > 1) { sl.spans--; }
 			if((this.prev == null) && (this.next != null)) {
 				res[1] = this.next;
-				// We're the first node in the list...
+				// We're the first node in the list... copy the next node over and kill it. See also bottom of SkipLevels.java
 				for(int i=0;i<next.nKeys;i++) {
 					keys[i] = next.keys[i];
 					vals[i] = next.vals[i];
 				}
+
 				nKeys = next.nKeys;
+				//BlockFile.log.error("Killing next span " + next + ") and copying to this span " + this + " in remove of " + key);
+				// Make us point to next.next and him point back to us
 				SkipSpan nn = next.next;
 				next.killInstance();
-				this.flush();
+				if (nn != null) {
+					nn.prev = this;
+					nn.flush();
+				}
 				this.next = nn;
+				this.flush();
 			} else {
-				res[1] = this;
+				// Normal situation. We are now empty, kill ourselves
+				//BlockFile.log.error("Killing this span " + this + ", prev " + this.prev + ", next " + this.next);
 				if(this.prev != null) {
 					this.prev.next = this.next;
 					this.prev.flush();
@@ -266,11 +288,20 @@ public class SkipSpan {
 				if(this.next != null) {
 					this.next.prev = this.prev;
 					this.next.flush();
+					this.next = null;
 				}
-				this.next = null;
-				this.prev = null;
+				if (this.prev != null) {
+					// Kill ourselves
+					this.prev = null;
+					this.killInstance();
+					res[1] = this;
+				} else {
+					// Never kill first span
+					//BlockFile.log.error("Not killing First span, now empty!!!!!!!!!!!!!!!!!!");
+					this.flush();
+					res[1] = null;
+				}
 				nKeys = 0;
-				this.killInstance();
 			}
 		} else {
 			pushTogether(loc);

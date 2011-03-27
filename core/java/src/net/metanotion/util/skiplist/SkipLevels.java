@@ -30,7 +30,12 @@ package net.metanotion.util.skiplist;
 
 import net.metanotion.io.block.BlockFile;
 
+import net.i2p.util.Log;
+
 public class SkipLevels {
+	/** We can't have more than 2**32 pages */
+	public static final int MAX_SIZE = 32;
+
 	/*
 	 *	"Next" pointers
 	 *	The highest indexed level is the "highest" level in the list.
@@ -46,25 +51,40 @@ public class SkipLevels {
 	public void flush() { }
 
 	protected SkipLevels() { }
+
+	/*
+	 *  @throws IllegalArgumentException if size too big or too small
+	 */
 	public SkipLevels(int size, SkipSpan span) {
-		if(size < 1) { throw new RuntimeException("Invalid Level Skip size"); }
+		if(size < 1 || size > MAX_SIZE)
+			throw new IllegalArgumentException("Invalid Level Skip size");
 		levels = new SkipLevels[size];
 		bottom = span;
 	}
 
-	public void print() {
-		System.out.print("SL:" + key() + "::");
+	public String print() {
+		StringBuilder buf = new StringBuilder(128);
+		buf.append("SL: ").append(key()).append(" :: ");
 		for(int i=0;i<levels.length;i++) {
+			buf.append(i);
 			if(levels[i] != null) {
-				System.out.print(i + "->" + levels[i].key() + " ");
+				buf.append("->").append(levels[i].key()).append(' ');
 			} else {
-				System.out.print(i + "->() ");
+				buf.append("->() ");
 			}
 		}
-		System.out.print("\n");
+		buf.append('\n');
+		return buf.toString();
+	}
+
+	public String printAll() {
+		StringBuilder buf = new StringBuilder(128);
+		buf.append(print());
 		if(levels[0] != null) {
-			levels[0].print();
+			buf.append('\n');
+			buf.append(levels[0].print());
 		}
+		return buf.toString();
 	}
 
 	public SkipSpan getEnd() {
@@ -104,15 +124,17 @@ public class SkipLevels {
 	public Object[] remove(int start, Comparable key, SkipList sl) {
 		Object[] res = null;
 		SkipLevels slvls = null;
-		for(int i=Math.min(start, levels.length - 1);i>=0;i--) {
+		for(int i = Math.min(start, levels.length - 1); i >= 0; i--) {
 			if(levels[i] != null) {
 				int cmp = levels[i].key().compareTo(key);
 				if((cmp < 0) || ((i==0) && (cmp <= 0)))  {
 					res = levels[i].remove(i, key, sl);
 					if((res != null) && (res[1] != null)) {
 						slvls = (SkipLevels) res[1];
-						if(levels.length >= slvls.levels.length) { res[1] = null; }
-						for(int j=0;j<(Math.min(slvls.levels.length,levels.length));j++) {
+						if(levels.length >= slvls.levels.length) {
+							res[1] = null;
+						}
+						for(int j = 0 ; j < Math.min(slvls.levels.length, levels.length); j++) {
 							if(levels[j] == slvls) {
 								levels[j] = slvls.levels[j];
 							}
@@ -128,6 +150,41 @@ public class SkipLevels {
 			if(res[1] == bottom) {
 				res[1] = this;
 			} else {
+				// Special handling required if we are the head SkipLevels to fix up our level pointers
+				// if the returned SkipSpan was already copied to us
+				boolean isFirst = sl.first == bottom;
+				if (isFirst && levels[0] != null) {
+					SkipSpan ssres = (SkipSpan)res[1];
+					if (bottom.firstKey().equals(ssres.firstKey())) {
+						// bottom copied the next span to itself
+						if (BlockFile.log.shouldLog(Log.INFO)) {
+							BlockFile.log.info("First Level, bottom.remove() copied and did not return itself!!!! in remove " + key);
+							BlockFile.log.info("Us:     " + print());
+							BlockFile.log.info("next:   " + levels[0].print());
+							BlockFile.log.info("ssres.firstKey():   " + ssres.firstKey());
+							BlockFile.log.info("ssres.keys[0]:   " + ssres.keys[0]);
+							BlockFile.log.info("FIXUP TIME");
+						}
+						
+						SkipLevels replace = levels[0];
+						for (int i = 0; i < levels.length; i++) {
+							if (levels[i] == null)
+								break;
+							if (i >= replace.levels.length)
+								break;
+							if (levels[i].key().equals(replace.key())) {
+								if (BlockFile.log.shouldLog(Log.INFO))
+							        	BlockFile.log.info("equal level " + i);
+								levels[i] = replace.levels[i];
+							} else if (BlockFile.log.shouldLog(Log.INFO)) {
+								BlockFile.log.info("not equal level " + i + ' ' + levels[i].key());
+							}
+						}
+						if (BlockFile.log.shouldLog(Log.INFO))
+							BlockFile.log.info("new Us: " + print());
+						replace.killInstance();
+					}
+				}
 				res[1] = null;
 			}
 		}

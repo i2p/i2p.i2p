@@ -46,8 +46,13 @@ public class SkipList {
 	public void flush() { }
 	protected SkipList() { }
 
+	/*
+	 *  @param span span size
+	 *  @throws IllegalArgumentException if size too big or too small
+	 */
 	public SkipList(int span) {
-		if(span < 1) { throw new RuntimeException("Span size too small"); }
+		if(span < 1 || span > SkipSpan.MAX_SIZE)
+			throw new IllegalArgumentException("Invalid span size");
 		first = new SkipSpan(span);
 		stack = new SkipLevels(1, first);
 		spans = 1;
@@ -122,14 +127,16 @@ public class SkipList {
 		return null;
 	}
 
+	/** dumps all the skip levels */
 	public void printSL() {
 		System.out.println("List size " + size + " spans " + spans);
-		stack.print();
+		System.out.println(stack.printAll());
 	}
 
+	/** dumps all the data */
 	public void print() {
 		System.out.println("List size " + size + " spans " + spans);
-		first.print();
+		System.out.println(first.print());
 	}
 
 	public Object get(Comparable key) {

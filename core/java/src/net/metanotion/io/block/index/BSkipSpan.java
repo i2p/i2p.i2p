@@ -71,6 +71,7 @@ public class BSkipSpan extends SkipSpan {
 
 	// I2P
 	protected int spanSize;
+	protected boolean isKilled;
 
 	public static void init(BlockFile bf, int page, int spanSize) throws IOException {
 		BlockFile.pageSeek(bf.file, page);
@@ -91,18 +92,27 @@ public class BSkipSpan extends SkipSpan {
 	}
 
 	public void killInstance() {
+		if (isKilled) {
+			BlockFile.log.error("Already killed!! " + this, new Exception());
+			return;
+		}
+		BlockFile.log.info("Killing " + this);
+		isKilled = true;
 		try {
 			int curPage = overflowPage;
-			int next;
+			bf.freePage(page);
 			while(curPage != 0) {
 				BlockFile.pageSeek(bf.file, curPage);
-				bf.file.skipBytes(4);   // skip magic
-				next = bf.file.readUnsignedInt();
+				int magic = bf.file.readInt();
+				if (magic != BlockFile.MAGIC_CONT)
+					throw new IOException("Bad SkipSpan magic number 0x" + Integer.toHexString(magic) + " on page " + curPage);
+				int next = bf.file.readUnsignedInt();
 				bf.freePage(curPage);
 				curPage = next;
 			}
-			bf.freePage(page);
-		} catch (IOException ioe) { throw new RuntimeException("Error freeing database page", ioe); }
+		} catch (IOException ioe) {
+			BlockFile.log.error("Error freeing " + this, ioe);
+		}
 	}
 
 	public void flush() {
@@ -113,12 +123,21 @@ public class BSkipSpan extends SkipSpan {
 	 * I2P - avoid super.flush()
 	 */
 	private void fflush() {
+		if (isKilled) {
+			BlockFile.log.error("Already killed!! " + this, new Exception());
+			return;
+		}
 		try {
 			BlockFile.pageSeek(bf.file, page);
 			bf.file.writeInt(MAGIC);
 			bf.file.writeInt(overflowPage);
-			bf.file.writeInt((prev != null) ? ((BSkipSpan) prev).page : 0);
-			bf.file.writeInt((next != null) ? ((BSkipSpan) next).page : 0);
+			prevPage = (prev != null) ? ((BSkipSpan) prev).page : 0;
+			nextPage = (next != null) ? ((BSkipSpan) next).page : 0;
+			bf.file.writeInt(prevPage);
+			bf.file.writeInt(nextPage);
+			// if keys is null, we are (hopefully) just updating the prev/next pages on an unloaded span
+			if (keys == null)
+				return;
 			bf.file.writeShort((short) keys.length);
 			bf.file.writeShort((short) nKeys);
 
@@ -192,6 +211,8 @@ public class BSkipSpan extends SkipSpan {
 	 * Only read the span headers
 	 */
 	protected static void loadInit(BSkipSpan bss, BlockFile bf, BSkipList bsl, int spanPage, Serializer key, Serializer val) throws IOException {
+		if (bss.isKilled)
+			BlockFile.log.error("Already killed!! " + bss, new Exception());
 		bss.bf = bf;
 		bss.page = spanPage;
 		bss.keySer = key;
@@ -209,6 +230,8 @@ public class BSkipSpan extends SkipSpan {
 		bss.nextPage = bf.file.readUnsignedInt();
 		bss.spanSize = bf.file.readUnsignedShort();
 		bss.nKeys = bf.file.readUnsignedShort();
+		if(bss.spanSize < 1 || bss.spanSize > SkipSpan.MAX_SIZE || bss.nKeys > bss.spanSize)
+			throw new IOException("Invalid span size " + bss.nKeys + " / "+  bss.spanSize);
 	}
 
 	/**
@@ -225,6 +248,8 @@ public class BSkipSpan extends SkipSpan {
 	 * @param flushOnError set to false if you are going to flush anyway
 	 */
 	protected void loadData(boolean flushOnError) throws IOException {
+		if (isKilled)
+			BlockFile.log.error("Already killed!! " + this, new Exception());
 		this.keys = new Comparable[this.spanSize];
 		this.vals = new Object[this.spanSize];
 
@@ -316,5 +341,13 @@ public class BSkipSpan extends SkipSpan {
 			BSkipSpan.load(bss, bf, bsl, np, key, val);
 			np = bss.prevPage;
 		}
+	}
+
+	@Override
+	public String toString() {
+		String rv = "BSS page: " + page + " key: \"" + firstKey() + '"';
+		if (isKilled)
+			rv += " KILLED";
+		return rv;
 	}
 }

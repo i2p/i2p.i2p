@@ -450,9 +450,11 @@ public class BlockfileNamingService extends DummyNamingService {
                         nsl.entryAdded(this, hostname, d, options);
                 }
                 return true;
-            } catch (IOException re) {
+            } catch (IOException ioe) {
+                _log.error("DB add error", ioe);
                 return false;
             } catch (RuntimeException re) {
+                _log.error("DB add error", re);
                 return false;
             }
         }
@@ -884,8 +886,8 @@ public class BlockfileNamingService extends DummyNamingService {
     public static void main(String[] args) {
         BlockfileNamingService bns = new BlockfileNamingService(I2PAppContext.getGlobalContext());
         List<String> names = null;
+        Properties props = new Properties();
         try {
-            Properties props = new Properties();
             DataHelper.loadProps(props, new File("hosts.txt"), true);
             names = new ArrayList(props.keySet());
             Collections.shuffle(names);
@@ -911,8 +913,42 @@ public class BlockfileNamingService extends DummyNamingService {
         }
         System.out.println("BFNS took " + DataHelper.formatDuration(System.currentTimeMillis() - start));
         System.out.println("found " + found + " notfound " + notfound);
-        bns.dumpDB();
+
+        System.out.println("Removing all " + names.size() + " hostnames");
+        found = 0;
+        notfound = 0;
+        Collections.shuffle(names);
+        start = System.currentTimeMillis();
+        for (String name : names) {
+             if (bns.remove(name))
+                 found++;
+             else
+                 notfound++;
+        }
+        System.out.println("BFNS took " + DataHelper.formatDuration(System.currentTimeMillis() - start));
+        System.out.println("removed " + found + " not removed " + notfound);
+
+        System.out.println("Adding back " + names.size() + " hostnames");
+        found = 0;
+        notfound = 0;
+        Collections.shuffle(names);
+        start = System.currentTimeMillis();
+        for (String name : names) {
+            try {
+                 if (bns.put(name, new Destination(props.getProperty(name))))
+                     found++;
+                 else
+                     notfound++;
+            } catch (DataFormatException dfe) {}
+        }
+        System.out.println("BFNS took " + DataHelper.formatDuration(System.currentTimeMillis() - start));
+        System.out.println("Added " + found + " not added " + notfound);
+
+
+
+        //bns.dumpDB();
         bns.close();
+        if (true) return;
 
         HostsTxtNamingService htns = new HostsTxtNamingService(I2PAppContext.getGlobalContext());
         found = 0;
