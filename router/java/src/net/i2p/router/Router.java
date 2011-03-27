@@ -1428,7 +1428,7 @@ private static class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
         ctx.statManager().createRequiredRateStat("bw.sendBps", "Message send rate (Bytes/sec)", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         ctx.statManager().createRequiredRateStat("bw.sendRate", "Low-level send rate (Bytes/sec)", "Bandwidth", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
         ctx.statManager().createRequiredRateStat("bw.recvRate", "Low-level receive rate (Bytes/sec)", "Bandwidth", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
-        ctx.statManager().createRateStat("router.activePeers", "How many peers we are actively talking with", "Throttle", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
+        ctx.statManager().createRequiredRateStat("router.activePeers", "How many peers we are actively talking with", "Throttle", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         ctx.statManager().createRateStat("router.activeSendPeers", "How many peers we've sent to this minute", "Throttle", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         ctx.statManager().createRateStat("router.highCapacityPeers", "How many high capacity peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
         ctx.statManager().createRequiredRateStat("router.fastPeers", "Known fast peers", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
