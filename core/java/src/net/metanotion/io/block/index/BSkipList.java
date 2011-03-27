@@ -143,6 +143,7 @@ public class BSkipList extends SkipList {
 		bf.file.writeInt(firstLevel);
 		bf.file.writeInt(0);
 		bf.file.writeInt(1);
+		bf.file.writeInt(1);
 		BSkipSpan.init(bf, firstSpan, spanSize);
 		BSkipLevels.init(bf, firstLevel, firstSpan, 4);
 	}
