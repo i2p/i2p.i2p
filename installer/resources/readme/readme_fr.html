@@ -3,7 +3,7 @@
 <ul class="links"><li class="tidylist"><b>Démarrage&hellip;</b><br>Si vous venez juste de lancer I2P, le nombre de 
 <i>pairs actifs</i> indiqués dans la section <i>Pairs</i> du "Panneau de surveillance" sur la  gauche devrait 
 commencer à augmenter dans les prochaines minutes et vous verrez alors en bas du panneau une <i>destination locale</i> 
-intitulée <i>Clients partagés</i>, avec d'éventuels autres clients et serveurs suivant la configuration initale d'I2P
+intitulée <i>Clients partagés</i>, avec d'éventuels autres clients et serveurs suivant la configuration initiale d'I2P
 (sinon, voir plus bas la <a href=#trouble>section dépannage</a>). Ces <i>destinations locales</i> fournissent des 
 connexions sur différent ports (et parfois des protocoles) au réseau I2P, pour permettre le fonctionnement de votre 
 client BitTorrent, de votre messagerie, du mandataire Internet et autres services. Votre 
@@ -35,125 +35,121 @@ adaptée à i2P. Si vous voulez désactiver ou modifier l'accès mandaté à l'I
 <a href="/i2ptunnel/edit?tunnel=0" target="_blank">mandataire HTTP I2P</a>. Dans la section "Sites intéressants" 
 <a href="#eepsites">ci-dessous</a>, vous trouverez notre petite sélection de sites hébergés sur I2P.</li>
 
-<li class="tidylist"><b>Anonymous E-Mail</b><br>Postman's I2P-based mail system can be accessed either via 
-<a href="/susimail/susimail">I2P's built-in mail client</a>
-  (susimail) or using any mail client that supports smtp and pop3.
-  Accounts can send and receive mail from the normal internet. For an
-  account, visit <a href="http://hq.postman.i2p/" target="_blank">hq.postman.i2p</a>. Additionally, 
-<a href="http://i2pbote.i2p/" target="_blank">I2P-Bote</a> is a new I2P-internal serverless, secure (end-to-end 
-encrypted) e-mail system with an integrated anonymous/pseudonymous remailer, providing a web interface and a built-in 
-addressbook. It is developed by HungryHobo, and can be installed as a <a href="#plugins">plugin</a>.</li>
+<li class="tidylist"><b>Messagerie anonyme</b><br>Le système de messagerie basé sur I2P de Postman est utilisable soit 
+par le <a href="/susimail/susimail">client de messagerie I2P intégré</a> dans la console du routeur (susimail), soit en 
+configurant n'importe quel logiciel client de messagerie compatible SMTP et POP3. Les comptes peuvent recevoir et 
+envoyer du courrier de/vers l'Internet normal. Créez au moins votre compte sur 
+<a href="http://hq.postman.i2p/" target="_blank">hq.postman.i2p</a>. En complément, 
+<a href="http://i2pbote.i2p/" target="_blank">I2P-Bote</a> est le nouveau système intra-I2P décentralisé, sécurisé 
+(crypté de bout en bout) et équipé d'un système de relayage anonymo-pseudonymique, ainsi que d'une interface web et d'un 
+carnet d'adresses intégré. Développé par HungryHobo, il s'installe en tant que <a href="#plugins">greffon</a>.</li>
 
 
-<li class="tidylist"><b>Anonymous File Transfer</b><br><a href="/i2psnark/" target="_blank">I2PSnark</a> is integrated 
-into I2P, providing anonymous, encrypted 
-<a href="https://secure.wikimedia.org/wikipedia/en/wiki/BitTorrent_%28protocol%29" target="_blank">BitTorrent</a> 
-transfers.
-  In addition, Sponge develops a bittorrent client called <a href="http://bob.i2p/Robert.html">Robert</a> written in 
-Python.
-  There is also a port of <a href="http://www.emule-project.net/" target="_blank">eMule</a> to I2P called 
-<a href="http://echelon.i2p/imule/">iMule</a> [Needs developers!], an anonymous, secure implementation of a 
-<a href="https://secure.wikimedia.org/wikipedia/en/wiki/Gnutella" target="_blank">Gnutella network</a>, accessible 
-using 
-<a href="http://echelon.i2p/i2phex/" target="_blank">I2Phex</a> [maintained by Complication, seeking new 
-developers!], and additional facilities including browser-based file hosting.</li>
-<li class="tidylist"><b>Anonymous Chat</b><br>Start your IRC client (e.g. Chatzilla, Pidgin, XChat)
-  and connect to the <a href="irc://127.0.0.1:6668/i2p-help">server</a> at <code>127.0.0.1 port 6668</code>. 
-You do not need to configure a proxy in your IRC client; I2P provides you with a local IRC tunnel (configured in your 
-IRC client as an IRC server or remote host).
-  Your local I2P IRC tunnel on <code>localhost:6668</code> will direct you to one of two IRC servers hosted on I2P by 
-Postman and Badger, but neither you nor they know where the other is, and your mom, ISP or government is unable to 
-intercept your conversation!
-  Once you're there, <code>#i2p-help</code>,<code>#i2p</code>,<code>#i2p-chat</code> and <code>#i2p-dev</code> are just 
-a few of the available channels you may wish to /join.
-  There's also an I2P-based <a href="http://echelon.i2p/qti2pmessenger/">Instant Messenger</a> for unmonitorable and 
-uncensorable anonymous chat, as well as alternative IRC servers, Jabber servers, website-based chat, and more.
-  And of course you're entirely free to run your own servers over I2P in whatever flavor you choose, or if you're a 
-developer write your own <a href="http://www.i2p2.i2p/applications.html" target="_blank">I2P applications</a> (both 
-<a href="https://secure.wikimedia.org/wikipedia/en/wiki/User_Datagram_Protocol" target="_blank">UDP</a> and 
-<a href="https://secure.wikimedia.org/wikipedia/en/wiki/Transmission_Control_Protocol" target="_blank">TCP</a> 
-protocols are <a href="http://www.i2p2.i2p/techintro.html#op.transport" target="_blank">provisioned</a>), and 
-<a href="http://www.i2p2.i2p/streaming.html" target="_blank">realtime streaming</a> is also possible.
-  We also provide full access to the <a href="http://docs.i2p2.de/javadoc/" target="_blank">Java API</a>.</li>
-<li class="tidylist"><b>Forums &amp; Blogging</b><br>If you're looking to run your own blog or forum, you might be 
-interested in <a href="http://syndie.i2p2.de/" target="_blank">Syndie</a>, a distributed forum and blogging platform 
-for I2P [Needs developers!].
-  There's also an I2P plugin port of the Java-based <a href="http://pebble.sourceforge.net/" target="_blank">pebble</a> 
-blogging platform ported to I2P by zzz, available on <a href="http://i2plugins.i2p/" target="_blank">i2plugins.i2p</a>.
-  And, of course, all normal blogging, forum and cms software will run over I2P, though you're advised to take extra 
-precautions with security when setting up and to keep all associated software (e.g. Php, MySql, Python, Apache) up to 
-date and locked-down!
-  Also, there are quite a few community run forums on I2P in various languages; see <a href="#eepsites">below</a> for 
-some suggestions.</li>
-  <li class="tidylist"><a name="plugins"></a><b>Plugins for I2P</b><br>Extend the usefulness of I2P by installing 
-plugins&hellip; blogging, chatting, file sharing and other plugins have already been written or ported and await your 
-<a href="http://i2plugins.i2p/plugins/" target="_blank">installation</a>!
-  Browse the plugins and related info at <a href="http://i2plugins.i2p/" target="_blank">i2plugins.i2p</a>.
-  If you're a <a href="http://i2plugins.i2p/developers/" target="_blank">developer</a>, a complete language-agnostic 
-framework for writing your own plugins is provided with 
-<a href="http://www.i2p2.i2p/plugins.html" target="_blank">documentation</a>; I2P plugins can be coded in any 
-language.</li>
+<li class="tidylist"><b>Transfert de fichiers anonyme</b><br><a href="/i2psnark/" target="_blank">I2PSnark</a> est 
+intégré dans le router I2P. Il permet les transferts anonymes et cryptés 
+<a href="https://secure.wikimedia.org/wikipedia/fr/wiki/BitTorrent_%28protocole%29" target="_blank">BitTorrent</a>. 
+Sponge a développé en Python un autre client bittorrent appelé <a href="http://bob.i2p/Robert.html">Robert</a>.
+Il y a aussi un portage d'<a href="http://www.emule-project.net/" target="_blank">eMule/aMule</a> sur I2P:&hellip; 
+<a href="http://echelon.i2p/imule/">iMule</a> [Cherche développeurs!], une implémentation anonyme et sécurisée d'un 
+<a href="https://secure.wikimedia.org/wikipedia/fr/wiki/Gnutella" target="_blank">réseau Gnutella</a> accessible par  
+<a href="http://echelon.i2p/i2phex/" target="_blank">I2Phex</a> [maintenu par Complication, mais on cherche de nouveaux 
+développeurs!], ainsi que d'autres utilitaires dont un hébergement de fichiers basé sur le navigateur.</li>
+<li class="tidylist"><b>Claviotage anonyme (non ça n'est pas le nom de mon chat)</b><br>Lancez votre client IRC (p.e. 
+Chatzilla, Pidgin, XChat, etc&hellip;) et connectez-vous au <a href="irc://127.0.0.1:6668/i2p-help">serveur</a> sur 
+<code>127.0.0.1 port 6668</code>. Vous n'avez pas besoin de configurer un proxy dans votre client IRC: I2P vous fournit 
+un tunnel IRC local (configuré dans votre client IRC en tant qu'hôte serveur IRC distant). Votre tunnel IRC local 
+sur <code>localhost:6668</code> vous emmènera sur un des deux serveurs hébergés sur I2P par Postman and Badger, mais 
+ni vous ni eux ne sauront où se trouve l'autre, et ni <mode délire> ta maman ni ton gouvernement ne sera capable 
+d'intercepter ta  conversation!&hellip; (sauf,&hellip; heu&hellip; regarde quand même dans ton dos!&hellip;ET dans le 
+faux plafond ET dis à ton correspondant d'en faire autant&hellip; ET coulez vos PC dans du béton). Une fois là, /join 
+<code>#i2p-help</code>, <code>#i2p-chat</code>, <code>#i2p</code>, <code>#i2p-chat</code> ou <code>#i2p-dev</code> 
+ne sont que quelques unes des possibilités pour mettre la tête dehors, même si ça va pas améliorer le bronzage de ta 
+couenne d'endive.</mode délire> Il y a aussi une 
+<a href="http://echelon.i2p/qti2pmessenger/">messagerie instantanée</a> à la sauce I2P pour le claviotage anonyme 
+(tiens, le rev'là) non surveillable et non censurable, ainsi que d'autres serveurs IRC, Jabber, website-based chat, 
+and more. Et bien sûr vous avez l'entière liberté de faire tourner vos propres serveurs sur I2P, dans la version qui 
+vous émoustille les papilles, et si vous êtes un développeur, d'écrire vos propres 
+<a href="http://www.i2p2.i2p/applications.html" target="_blank">applications I2P</a> (les protocoles 
+<a href="https://secure.wikimedia.org/wikipedia/fr/wiki/User_Datagram_Protocol" target="_blank">UDP</a> et 
+<a href="https://secure.wikimedia.org/wikipedia/fr/wiki/Transmission_Control_Protocol" target="_blank">TCP</a> 
+sont tous deux <a href="http://www.i2p2.i2p/techintro_fr.html#op.transport" target="_blank">compatibles</a>), et 
+<a href="http://www.i2p2.i2p/streaming.html" target="_bla_nk">les flux en temps réel</a> sont aussi au menu. 
+Nous fournissons aussi un accès complet à l'<a href="http://docs.i2p2.de/javadoc/" target="_blank">API Java</a>.</li>
+<li class="tidylist"><b>Forums &amp; Blogs</b><br>Si vous cherchez à faire votre propre blog ou forum , vous pourriez 
+être intéressé par <a href="http://syndie.i2p2.de/" target="_blank">Syndie</a>, une plateforme décentralisée de 
+forum et blog pour I2P [Nids de développeurs! (prononcez à l'anglaise)].
+On trouve également en greffon I2P, un portage réalisé par zzz de la plateforme de blog Java 
+<a href="http://pebble.sourceforge.net/" target="_blank">pebble</a>. Il est disponible sur 
+<a href="http://i2plugins.i2p/" target="_blank">i2plugins.i2p</a>. Bien entendu, tous les logiciels de blog, forum et 
+cms fonctionnent sur I2P, bien qu'il vous soit conseillé de faire très attention à la sécurité quand vous les 
+configurez et de tenir tous les logiciels associés (p.e. Php, MySql, Python, Apache) bien à jour et verrouillés! 
+Vous trouverez aussi un petit nombre de forums I2P dans diverses langues: voir <a href="#eepsites">plus bas</a> 
+d'autres suggestions.</li>
+  <li class="tidylist"><a name="plugins"></a><b>Greffons pour I2P</b><br>Étendez l'usage et la portée d'I2P en 
+installant des greffons&hellip; blog, chat, partage de fichiers et autres sont déjà écrits ou portés, et n'attendent 
+autre chose que vous les <a href="http://i2plugins.i2p/plugins/" target="_blank">installiez</a>! 
+Consultez la carte (et les secrets du chef) sur <a href="http://i2plugins.i2p/" target="_blank">i2plugins.i2p</a>. 
+Si vous êtes <a href="http://i2plugins.i2p/developers/" target="_blank">développeur</a>, vous disposez d'un 
+environnement d'écriture de greffons indépendant de tout langage dans la  
+<a href="http://www.i2p2.i2p/plugins.html" target="_blank">documentation</a>; les greffons I2P peuvent être codés dans 
+n'importe quel langage.</li>
 </ul>
 
-<h3>Anonymous Encrypted Web Hosting on I2P</h3>
+<h3>Hébergement crypté anonyme sur I2P</h3>
 <ul class="links">
 
-<li class="tidylist"><b>Ready to Roll!</b><br>I2P comes with a built-in, ready-to-go web server for hosting your own 
-anonymous website (eepsite) on the I2P network: a <a href="http://jetty.mortbay.org/" target="_blank">Jetty</a> 
-instance listening on <a href="http://127.0.0.1:7658/" target="_blank">http://127.0.0.1:7658/</a>. To host your own 
-content,
-  simply place your files in the <code>eepsite/docroot/</code> directory (or place 
-  any standard JSP/Servlet .war files under <code>eepsite/webapps</code>, 
-  or standard CGI scripts under <code>eepsite/cgi-bin</code>) and they'll show 
-  up. You can also run any alternative web server platform over I2P and replace the built-in server, or run it on 
-another tunnel.</li>
-<li class="tidylist"><b>Start Your Tunnel</b><br>  
-  After starting up, your pre-configured <a href="/i2ptunnel/" target="_blank">I2P Webserver Tunnel</a>,  
-  your eepsite will be visible (but not discoverable) to others. Detailed instructions for starting 
-  your eepsite, registering an .i2p domain and promoting your site to others are accessible via your own I2P webserver 
-on <a href="http://127.0.0.1:7658/help/" target="_blank">http://127.0.0.1:7658/help/</a>.</li></ul>
+<li class="tidylist"><b>Prêt à servir!</b><br>I2P arrive avec un serveur intégré, prêt à servir votre propre site web 
+anonyme (eepsite) sur le réseau I2P: une instance <a href="http://jetty.mortbay.org/" target="_blank">Jetty</a> qui 
+écoute sur <a href="http://127.0.0.1:7658/" target="_blank">http://127.0.0.1:7658/</a>. Pour héberger votre propre 
+contenu, placez tout bêtement vos fichiers dans le répertoire <code>eepsite/docroot/</code> (ou déposez n'importe quel 
+fichier JSP/Servlet standard .war dans <code>eepsite/webapps</code>, ou des scripts CGI standards dans 
+<code>eepsite/cgi-bin</code>) et ils s'afficheront. Vous gardez tout loisir de choisir le serveur web qui vous convient 
+pour fonctionner sur I2P et remplacer le serveur intégré, ou exécuter celui-ci sur un autre tunnel.</li>
+<li class="tidylist"><b>Démarrez votre tunnel</b><br>  
+  Après le démarrage de votre <a href="/i2ptunnel/" target="_blank">Tunnel serveurWeb I2P</a>, votre eepsite sera 
+visible (mais pas encore découvrable) par les I2P'nautes. Les instructions détaillées de démarrage de votre eepsite, 
+d'enregistrement d'un domaine .i2p et de promotion de votre site sont accessibles via votre propre serveur à 
+l'adresse <a href="http://127.0.0.1:7658/help/" target="_blank">http://127.0.0.1:7658/help/</a>.</li></ul>
     
 <a name="eepsites"></a>    
-    <h3>I2P-Hosted Sites of Interest</h3>
+    <h3>Sites I2P intéressants</h3>
     <ul class="links">
-      <li class="tidylist"><b>Invisible Internet Project (I2P) Official Website</b><br>
-<a href="http://www.i2p2.i2p/" target="_blank">www.i2p2.i2p</a> and 
-        its mirror <a href="http://i2p-projekt.i2p/" target="_blank">i2p-projekt.i2p</a>: Secure and 
-        anonymous connections to <a href="http://www.i2p2.de/" target="_blank">www.i2p2.de</a>. There's also an 
-official mirror running on <a href="http://geti2p.net/" target="_blank">geti2p.net</a>. If you want to know more about 
-how I2P works or how you can participate, this is your first port of call!</li>
-      <li class="tidylist"><b>I2P Community Forums</b><br><a href="http://forum.i2p/" target="_blank">forum.i2p</a>: A 
-secure 
-        and anonymous connection to <a href="http://forum.i2p2.de/" target="_blank">forum.i2p2.de</a>, an online forum 
-community where developers and users alike discuss problems and ideas relating to I2P and associated topics, and 
-<a href="http://zzz.i2p/" target="_blank">zzz's developer forums</a> for both end users and developers.</li>
-      <li class="tidylist"><b>I2P Anonymous Pastebin</b><br>
-<a href="http://paste.i2p2.i2p/" target="_blank">paste.i2p2.i2p</a>: Secure and 
-        anonymous paste service allowing anonymous text and text-based code sharing over I2P.</li>
-      <li class="tidylist"><b>Echelon's I2P Resources</b>
-<br><a href="http://echelon.i2p/" target="_blank">echelon.i2p</a>: I2P software 
-        archive  with  source code (where permissible), information about I2P, including a 
-<a href="http://echelon.i2p/I2Pguide/index.html" target="_blank">beginner's guide</a> and pre-release developer builds 
-of I2P for the adventurous to try.</li>
-        <li class="tidylist"><b>Ugha's Wiki</b><br><a href="http://ugha.i2p/" target="_blank">ugha.i2p</a>: An open 
-wiki that anyone can edit with plenty of information  about I2P, help for beginners, additional links into the network, 
-and more.</li>
-      <li class="tidylist"><b>I2P-to-Freenet Proxy</b><br>
-<a href="http://fproxy.tino.i2p/" target="_blank">fproxy.tino.i2p</a>: 
-        Peer into the world of the <a href="http://freenetproject.org/" target="_blank">Freenet</a> network with Tino's 
-I2P-to-Freenet proxy.</li>
-        <li class="tidylist"><b>The Planet (on I2P)</b><br><a href="http://planet.i2p/" target="_blank">planet.i2p</a>: 
-An RSS aggregator site that takes news and events from around I2P and publishes them all in one place. A good site to 
-visit to see the community at work!</li>
-        <li class="tidylist"><b>Eepsite Search Engine</b><br>
-<a href="http://eepsites.i2p/" target="_blank">eepsites.i2p</a>: An 
-        anonymously-hosted eepsite search engine.</li>
-      <li class="tidylist"><b>I2P Network Health</b><br>
-<a href="http://stats.i2p/cgi-bin/dashboard.cgi" target="_blank">stats.i2p</a>: Check out various aspects of network 
-performance with this I2P network monitoring site run by zzz.</li> 
-      <li class="tidylist"><b>Discover I2P</b><br>There are many more eepsites - just follow the links from the ones 
-you see, 
-      bookmark your favourites, and visit them often!<br></li>     
+      <li class="tidylist"><b>Le site officiel de l'Invisible Internet Project (I2P)</b><br>
+<a href="http://www.i2p2.i2p/" target="_blank">www.i2p2.i2p</a> et son miroir 
+<a href="http://i2p-projekt.i2p/" target="_blank">i2p-projekt.i2p</a> sont les adresses de connexions sécurisées et 
+anonymes des sites classiques <a href="http://www.i2p2.de/" target="_blank">www.i2p2.de</a> et 
+<a href="http://geti2p.net/" target="_blank">geti2p.net</a>. Si vous êtes curieux du fonctionnement d'I2P et de la 
+façon d'y contribuer, vous venez de trouver la porte d'entrée.</li>
+      <li class="tidylist"><b>Les fora de la communauté</b><br>
+<a href="http://forum.i2p/" target="_blank">forum.i2p</a>: la version anonyme et sécurisée de 
+<a href="http://forum.i2p2.de/" target="_blank">forum.i2p2.de</a>, le forum sur lequel les développeurs et les 
+utilisateurs aiment discuter de problèmes et d'idées relatifs à I2P et aux sujets apparentés, et le 
+<a href="http://zzz.i2p/" target="_blank">forum des développeurs de zzz</a> également ouvert aux utilisateurs.</li>
+      <li class="tidylist"><b>Pastebin anonyme I2P</b><br>
+<a href="http://paste.i2p2.i2p/" target="_blank">paste.i2p2.i2p</a>: service de collage sécurisé et anonyme pour le 
+partage de texte et de code au format textuel sur I2P.</li>
+      <li class="tidylist"><b>Les ressources i2P d'Echelon</b>
+<br><a href="http://echelon.i2p/" target="_blank">echelon.i2p</a>: dépôt de logiciels I2P (I2PFox, iMule, 
+I2P-Messenger&hellip;) avec leurs code sources (quand c'est permis), informations sur I2P, dont le  
+<a href="http://echelon.i2p/I2Pguide/index.html" target="_blank">guide du débutant</a> et pour les plus téméraires, 
+les pré-versions d'I2P à essayer.</li>
+        <li class="tidylist"><b>Le Wiki d'Ugha</b><br><a href="http://ugha.i2p/" target="_blank">ugha.i2p</a>: un wiki 
+ouvert et anonyme sur lequel chacun peut modifier toute sorte d'informations sur I2P, l'aide pour les débutants, 
+des liens supplémentaires dans le réseau, etc&hellip;</li>
+      <li class="tidylist"><b>Proxy I2P-vers-Freenet</b><br>
+<a href="http://fproxy.tino.i2p/" target="_blank">fproxy.tino.i2p</a>: une fenêtre sur le monde du réseau 
+<a href="http://freenetproject.org/" target="_blank">Freenet</a> grâce au mandataire I2P-vers-Freenet de Tino.</li>
+     <li class="tidylist"><b>The Planet (sur I2P)</b><br><a href="http://planet.i2p/" target="_blank">planet.i2p</a>: 
+un site agrégateur RSS qui collecte les nouvelles et évènements concernant I2P et les publie toutes regroupée en un 
+seul endroit. Un bon aperçu de la communauté au travail!</li>
+        <li class="tidylist"><b>Moteur de recherches eepsites</b><br>
+<a href="http://eepsites.i2p/" target="_blank">eepsites.i2p</a>: moteur de recherches sur les contenus I2P hébergé 
+anonymement.</li>
+      <li class="tidylist"><b>Météo du réseau I2P</b><br>
+<a href="http://stats.i2p/cgi-bin/dashboard.cgi" target="_blank">stats.i2p</a>: vérifiez divers aspects des 
+performances du réseau I2P avec ce site superviseur maintenu par zzz.</li> 
+      <li class="tidylist"><b>Découvrez I2P</b><br>Il y a plein d'autres eepsites: suivez simplement les liens que vous 
+rencontrez, marquez-les en favoris, et retournez-y souvent!<br></li>     
     </ul>
 
 
@@ -168,7 +164,7 @@ essayez de le laisser marcher le plus longtemps que vous pouvez, 24h/24 7j/7 si 
 inférieur à 5, voici ce que vous pouvez faire pour trouver l'origine du problème: 
   </li>
 
-<li class="tidylist"><b>Vérifiez votre configuration &amp; allocation de bande passante</b><br>I2P functionne au mieux 
+<li class="tidylist"><b>Vérifiez votre configuration &amp; allocation de bande passante</b><br>I2P fonctionne au mieux 
 quand vous reflétez correctement la vitesse de votre connexion Internet dans la section  
 <a href="/config">Gestionnaire de bande passante</a>. 
 I2P est configuré par défaut avec des valeurs volontairement faibles qui ne conviennent généralement pas. Merci de 
@@ -234,8 +230,8 @@ de surveillance devrait alors indiquer "Réseau: OK" une fois que le routeur I2P
 et/ou pare-feu(x) logiciels pour améliorer la connectivité (idéalement, pour UDP et TCP). Plus d'informations sur la 
 façon de s'y prendre pour divers matériels est accessible sur 
 <a href="http://portforward.com/" target="_blank">portforward.com</a>, avec nos forums et canaux IRC listés ci-dessous. 
-Notez qu'I2P ne prend pas en charge la connexion à Internet via des mandataires (proxies) http ou socks [bienvenue 
-correctifs!], bien qui vous puissiez vous connecter à des mandataires via I2P lui-même quand il connecté au réseau</li>
+Notez qu'I2P ne prend pas en charge la connexion à Internet via des mandataires (proxies) http ou socks [correctifs 
+bienvenus!], bien qui vous puissiez vous connecter à des mandataires via I2P lui-même quand il connecté au réseau</li>
 
 <li class="tidylist"><b>Aide en ligne</b><br>Vous pouvez trouver de l'information à parcourir sur le 
 <a href="http://www.i2p2.i2p/" target="_blank">site web I2P</a>, poster des messages sur le 
@@ -250,7 +246,7 @@ via le serveur IRC <a href="irc://irc.freenode.net/i2p">Freenode</a>.
   
 <li class="tidylist"><b>Rapports de bogues</b><br>Si vous voulez rapporter un bogue, merci d'enregistrer un ticket sur 
 <a href="http://trac.i2p2.i2p/" target="_blank">trac.i2p2.i2p</a>. Les développeurs discutent sur les 
-<a href="http://zzz.i2p/" target="_blank">fora de developpeurs de zzz</a> ou sur le 
+<a href="http://zzz.i2p/" target="_blank">fora de développeurs de zzz</a> ou sur le 
 <a href="irc://127.0.0.1:6668/i2p-dev">canal des développeurs</a>. Les développeurs peuvent consulter les sources sur 
 <a href="http://stats.i2p/cgi-bin/viewmtn/" target="_blank">l'explorateur du dépôt de zzz</a>, 
 <a href="http://i2host.i2p/cgi-bin/view/branch/changes/i2p.i2p" target="_blank">l'instance de Sponge</a>, ou par  
@@ -267,7 +263,7 @@ développeurs qui rechercheraient des incitations, et nous sommes en recherche p
 <a href="http://www.i2p2.i2p/newdevelopers_fr.html" target="_blank">codeurs Java</a>, de
 <a href="http://www.i2p2.i2p/newtranslators_fr.html" target="_blank">traducteurs</a>, de prescripteurs et 
 d'utilisateurs pour accélérer la diffusion d'I2P. Plus grand sera le réseau I2P, plus tout le monde en profitera, 
-alors en parler simplement avec vos amis au lieu de vous étriper à l'apéro pour savoir si le PSG est plus tafiole 
+alors en parler simplement à l'apéro avec vos amis au lieu de vous étriper pour savoir si le PSG est plus tafiole 
 que l'OM n'est tarlouze, (et tendre la main à votre pire ennemi pour l'installation et les réglages chaque fois que 
 le besoin s'en fait sentir) sera une belle participation! Pour en savoir plus sur les façons de participer, venez 
 visiter le zoo sur la page <a href="http://www.i2p2.i2p/getinvolved_fr.html" target="_blank">\"Engagez-vous!\"</a> du 
