@@ -40,11 +40,13 @@ import net.i2p.util.Log;
 
 /**
  * On-disk format:
+ *<pre>
  *    Magic number (long)
  *    max height (unsigned short)
  *    non-null height (unsigned short)
  *    span page (unsigned int)
  *    height number of level pages (unsigned ints)
+ *</pre>
  *
  * Always fits on one page.
  */
@@ -113,6 +115,7 @@ public class BSkipLevels extends SkipLevels {
 		bf.file.writeInt(spanPage);
 	}
 
+	@Override
 	public void flush() {
 		if (isKilled) {
 			BlockFile.log.error("Already killed!! " + this, new Exception());
@@ -135,6 +138,7 @@ public class BSkipLevels extends SkipLevels {
 		} catch (IOException ioe) { throw new RuntimeException("Error writing to database", ioe); }
 	}
 
+	@Override
 	public void killInstance() {
 		if (isKilled) {
 			BlockFile.log.error("Already killed!! " + this, new Exception());
@@ -143,10 +147,11 @@ public class BSkipLevels extends SkipLevels {
 		if (BlockFile.log.shouldLog(Log.INFO))
 			BlockFile.log.info("Killing " + this);
 		isKilled = true;
-		bsl.levelHash.remove(levelPage);
+		bsl.levelHash.remove(Integer.valueOf(levelPage));
 		bf.freePage(levelPage);
 	}
 
+	@Override
 	public SkipLevels newInstance(int levels, SkipSpan ss, SkipList sl) {
 		try {
 			BSkipSpan bss = (BSkipSpan) ss;

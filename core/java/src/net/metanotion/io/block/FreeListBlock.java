@@ -34,15 +34,19 @@ import net.metanotion.io.RandomAccessInterface;
 
 /**
  * On-disk format:
+ *<pre>
  *    Magic number (long)
  *    next freelist block page (unsigned int)
  *    size (unsigned int)
  *    that many free pages (unsigned ints)
+ *</pre>
  *
  * Always fits on one page.
  *
  * Free page format:
+ *<pre>
  *    Magic number (long)
+ *</pre>
  */
 class FreeListBlock {
 	private static final long MAGIC = 0x2366724c69737423l;  // "#frList#"

@@ -41,6 +41,7 @@ import net.i2p.util.Log;
 /**
  * On-disk format:
  *
+ *<pre>
  *   First Page:
  *     Magic number (int)
  *     overflow page (unsigned int)
@@ -57,6 +58,7 @@ import net.i2p.util.Log;
  *   Overflow pages:
  *     Magic number (int)
  *     next overflow page (unsigned int)
+ *</pre>
  */
 public class BSkipSpan extends SkipSpan {
 	protected static final int MAGIC = 0x5370616e;  // "Span"
@@ -86,6 +88,7 @@ public class BSkipSpan extends SkipSpan {
 		bf.file.writeShort(0);
 	}
 
+	@Override
 	public SkipSpan newInstance(SkipList sl) {
 		try {
 			int newPage = bf.allocPage();
@@ -94,6 +97,7 @@ public class BSkipSpan extends SkipSpan {
 		} catch (IOException ioe) { throw new RuntimeException("Error creating database page", ioe); }
 	}
 
+	@Override
 	public void killInstance() {
 		if (isKilled) {
 			BlockFile.log.error("Already killed!! " + this, new Exception());
@@ -108,7 +112,7 @@ public class BSkipSpan extends SkipSpan {
 		} catch (IOException ioe) {
 			BlockFile.log.error("Error freeing " + this, ioe);
 		}
-		bsl.spanHash.remove(this.page);
+		bsl.spanHash.remove(Integer.valueOf(this.page));
 	}
 
 	/**
@@ -131,6 +135,7 @@ public class BSkipSpan extends SkipSpan {
 		return rv;
 	}
 
+	@Override
 	public void flush() {
 		fflush();
 	}
@@ -242,7 +247,7 @@ public class BSkipSpan extends SkipSpan {
 	 */
 	protected static void loadInit(BSkipSpan bss, BlockFile bf, BSkipList bsl, int spanPage, Serializer key, Serializer val) throws IOException {
 		if (bss.isKilled)
-			BlockFile.log.error("Already killed!! " + bss, new Exception());
+			throw new IOException("Already killed!! " + bss);
 		bss.page = spanPage;
 		bss.keySer = key;
 		bss.valSer = val;
@@ -278,7 +283,7 @@ public class BSkipSpan extends SkipSpan {
 	 */
 	protected void loadData(boolean flushOnError) throws IOException {
 		if (isKilled)
-			BlockFile.log.error("Already killed!! " + this, new Exception());
+			throw new IOException("Already killed!! " + this);
 		this.keys = new Comparable[this.spanSize];
 		this.vals = new Object[this.spanSize];
 

@@ -37,14 +37,18 @@ import net.metanotion.io.Serializer;
 import net.metanotion.io.block.BlockFile;
 import net.metanotion.util.skiplist.*;
 
+import net.i2p.util.Log;
+
 /**
  * On-disk format:
+ *<pre>
  *    Magic number (long)
  *    first span page (unsigned int)
  *    first level page (unsigned int)
  *    size (unsigned int)
  *    spans (unsigned int)
  *    levels (unsigned int)
+ *</pre>
  *
  * Always fits on one page.
  */
@@ -88,6 +92,8 @@ public class BSkipList extends SkipList {
 		else
 			first = new BSkipSpan(bf, this, firstSpanPage, key, val);
 		stack = new BSkipLevels(bf, firstLevelPage, this);
+		if (BlockFile.log.shouldLog(Log.DEBUG))
+			BlockFile.log.debug("Loaded " + this + " cached " + levelHash.size() + " levels and " + spanHash.size() + " spans");
 		//rng = new Random(System.currentTimeMillis());
 	}
 
@@ -99,6 +105,7 @@ public class BSkipList extends SkipList {
 		isClosed = true;
 	}
 
+	@Override
 	public void flush() {
 		if (isClosed) {
 			BlockFile.log.error("Already closed!! " + this, new Exception());
@@ -116,22 +123,31 @@ public class BSkipList extends SkipList {
 		} catch (IOException ioe) { throw new RuntimeException("Error writing to database", ioe); }
 	}
 
+	/** must be open (do not call close() first) */
 	public void delete() throws IOException {
-		SkipLevels curLevel = stack, nextLevel;
+		if (isClosed) {
+			BlockFile.log.error("Already closed!! " + this, new Exception());
+			return;
+		}
+		SkipLevels curLevel = stack;
 		while(curLevel != null) {
-			nextLevel = curLevel.levels[0];
+			SkipLevels nextLevel = curLevel.levels[0];
 			curLevel.killInstance();
 			curLevel = nextLevel;
 		}
+		stack.killInstance();
 
-		SkipSpan curSpan = first, nextSpan;
+		SkipSpan curSpan = first;
 		while(curSpan != null) {
-			nextSpan = curSpan.next;
+			SkipSpan nextSpan = curSpan.next;
 			curSpan.killInstance();
 			curSpan = nextSpan;
 		}
 
 		bf.freePage(skipPage);
+		spanHash.clear();
+		levelHash.clear();
+		isClosed = true;
 	}
 
 	public static void init(BlockFile bf, int page, int spanSize) throws IOException {
@@ -148,6 +164,7 @@ public class BSkipList extends SkipList {
 		BSkipLevels.init(bf, firstLevel, firstSpan, 4);
 	}
 
+	@Override
 	public int maxLevels() {
 		int max = super.maxLevels();
 		int cells = (BlockFile.PAGESIZE - BSkipLevels.HEADER_LEN) / 4;
@@ -204,7 +221,7 @@ public class BSkipList extends SkipList {
 				BlockFile.log.warn("        Item " + key + " page " + sz);
 			} else {
 				String cls= iter.next().getClass().getSimpleName();
-				BlockFile.log.warn("        Item " + key + " size " + cls);
+				BlockFile.log.warn("        Item " + key + " class " + cls);
 			}
 			items++;
 		}
