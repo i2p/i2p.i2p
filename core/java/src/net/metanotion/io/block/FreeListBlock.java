@@ -69,8 +69,16 @@ class FreeListBlock {
 			throw new IOException("Bad freelist size " + len);
 		branches = new int[MAX_SIZE];
 		if(len > 0) {
+			int good = 0;
 			for(int i=0;i<len;i++) {
-				branches[i] = file.readUnsignedInt();
+				int fpg = file.readInt();
+				if (fpg > BlockFile.METAINDEX_PAGE)
+					branches[good++] = fpg;
+			}
+			if (good != len) {
+				BlockFile.log.error((len - good) + " bad pages in " + this);
+				len = good;
+				writeBlock();
 			}
 		}
 	}
@@ -123,7 +131,7 @@ class FreeListBlock {
 	}
 
 	public boolean isFull() {
-		return len < MAX_SIZE;
+		return len >= MAX_SIZE;
 	}
 
 	/**
@@ -152,6 +160,9 @@ class FreeListBlock {
 		len--;
 		writeLen();
 		int rv = branches[len];
+		if (rv <= BlockFile.METAINDEX_PAGE)
+			// shouldn't happen
+			throw new IOException("Bad free page " + rv);
 		long magic = getMagic(rv);
 		if (magic != MAGIC_FREE)
 			// TODO keep trying until empty
@@ -176,5 +187,9 @@ class FreeListBlock {
 		file.writeInt(0);
 		file.writeInt(0);
 	}
-}
 
+	@Override
+	public String toString() {
+		return "FLB with " + len + " / " + MAX_SIZE + " page " + page + " next page " + nextPage;
+	}
+}

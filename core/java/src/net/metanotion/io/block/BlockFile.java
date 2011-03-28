@@ -71,7 +71,7 @@ public class BlockFile {
 	public static final long OFFSET_MOUNTED = 20;
 	public static final Log log = I2PAppContext.getGlobalContext().logManager().getLog(BlockFile.class);
 
-	public RandomAccessInterface file;
+	public final RandomAccessInterface file;
 
 	private static final int MAJOR = 0x01;
 	private static final int MINOR = 0x01;
@@ -84,13 +84,16 @@ public class BlockFile {
 	/** 2**32 pages of 1024 bytes each, more or less */
 	private static final long MAX_LEN = (2l << (32 + 10)) - 1;
 
+	/** new BlockFile length, containing a superblock page and a metaindex page. */
 	private long fileLen = PAGESIZE * 2;
 	private int freeListStart = 0;
 	private int mounted = 0;
 	public int spanSize = 16;
 
-	private BSkipList metaIndex = null;
-	private HashMap openIndices = new HashMap();
+	private BSkipList metaIndex;
+	/** cached list of free pages, only valid if freListStart > 0 */
+	private FreeListBlock flb;
+	private final HashMap openIndices = new HashMap();
 
 	private void mount() throws IOException {
 		file.seek(BlockFile.OFFSET_MOUNTED);
@@ -268,7 +271,7 @@ public class BlockFile {
 		if(init) {
 			file.setLength(fileLen);
 			writeSuperBlock();
-			BSkipList.init(this, 2, spanSize);
+			BSkipList.init(this, METAINDEX_PAGE, spanSize);
 		}
 
 		readSuperBlock();
@@ -304,13 +307,20 @@ public class BlockFile {
 	public int allocPage() throws IOException {
 		if(freeListStart != 0) {
 			try {
-				FreeListBlock flb = new FreeListBlock(file, freeListStart);
+				if (flb == null)
+					flb = new FreeListBlock(file, freeListStart);
 				if(!flb.isEmpty()) {
+					if (log.shouldLog(Log.INFO))
+						log.info("Alloc from " + flb);
 					return flb.takePage();
 				} else {
+					if (log.shouldLog(Log.INFO))
+						log.info("Alloc returning empty " + flb);
 					freeListStart = flb.getNextPage();
 					writeSuperBlock();
-					return flb.page;
+					int rv = flb.page;
+					flb = null;
+					return rv;
 				}
 			} catch (IOException ioe) {
 				log.error("Discarding corrupt free list block page " + freeListStart, ioe);
@@ -330,8 +340,8 @@ public class BlockFile {
 	 *  Does not throw exceptions; logs on failure.
 	 */
 	public void freePage(int page) {
-		if (page < METAINDEX_PAGE) {
-			log.error("Negative page or superblock free attempt: " + page);
+		if (page <= METAINDEX_PAGE) {
+			log.error("Bad page free attempt: " + page);
 			return;
 		}
 		try {
@@ -339,29 +349,43 @@ public class BlockFile {
 				freeListStart = page;
 				FreeListBlock.initPage(file, page);
 				writeSuperBlock();
+				if (log.shouldLog(Log.INFO))
+					log.info("Freed page " + page + " as new FLB");
 				return;
 			}
 			try {
-				FreeListBlock flb = new FreeListBlock(file, freeListStart);
+				if (flb == null)
+					flb = new FreeListBlock(file, freeListStart);
 				if(flb.isFull()) {
+					// Make the free page a new FLB
+					if (log.shouldLog(Log.INFO))
+						log.info("Full: " + flb);
 					FreeListBlock.initPage(file, page);
 					if(flb.getNextPage() == 0) {
+						// Put it at the tail.
+						// Next free will make a new FLB at the head,
+						// so we have one more FLB than we need.
 						flb.setNextPage(page);
-						return;
 					} else {
+						// Put it at the head
 						flb = new FreeListBlock(file, page);
 						flb.setNextPage(freeListStart);
 						freeListStart = page;
 						writeSuperBlock();
-						return;
 					}
+					if (log.shouldLog(Log.INFO))
+						log.info("Freed page " + page + " to full " + flb);
+					return;
 				}
 				flb.addPage(page);
+				if (log.shouldLog(Log.INFO))
+					log.info("Freed page " + page + " to " + flb);
 			} catch (IOException ioe) {
 				log.error("Discarding corrupt free list block page " + freeListStart, ioe);
 				freeListStart = page;
 				FreeListBlock.initPage(file, page);
 				writeSuperBlock();
+				flb = null;
 			}
 		} catch (IOException ioe) {
 			log.error("Error freeing page: " + page, ioe);
