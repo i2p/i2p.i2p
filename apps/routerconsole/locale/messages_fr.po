@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-26 08:34+0000\n"
-"PO-Revision-Date: 2011-03-27 20:35+0100\n"
+"PO-Revision-Date: 2011-03-28 12:17+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "Language: \n"
@@ -2899,7 +2899,7 @@ msgstr "Intégration"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:86
 msgid "Status"
-msgstr "état"
+msgstr "État"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:126
 msgid "Fast, High Capacity"
@@ -2921,7 +2921,7 @@ msgstr "Défaillant"
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:131
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:282
 msgid "Integrated"
-msgstr "Intégré"
+msgstr "Bien intégrés"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:164
 msgid "Unreachable"
@@ -2930,7 +2930,7 @@ msgstr "Inaccessible"
 #. hide if < 10%
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:171
 msgid "Test Fails"
-msgstr "Test échec"
+msgstr "Échec de test"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:177
 msgid "profile"
@@ -2938,59 +2938,59 @@ msgstr "Profil"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:186
 msgid "Floodfill and Integrated Peers"
-msgstr "Floodfill et pairs intégrés"
+msgstr "Pairs diffuseurs et intégrés"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:190
 msgid "Caps"
-msgstr "Majuscules"
+msgstr "Possib."
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:191
 msgid "Integ. Value"
-msgstr "Valeur entière"
+msgstr "Valeur intég."
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:192
 msgid "Last Heard About"
-msgstr "Signalé pour la dernière fois"
+msgstr "Signalé la dernière fois"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:193
 msgid "Last Heard From"
-msgstr "Dernière signalisation par"
+msgstr "Entendu depuis"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:194
 msgid "Last Good Send"
-msgstr "Dernière envoi correct"
+msgstr "Dernier envoi OK"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:195
 msgid "Last Bad Send"
-msgstr "Dernier mauvais envoi"
+msgstr "Dernier envoi KO"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:196
 msgid "10m Resp. Time"
-msgstr "Temps de réponse (10mn)"
+msgstr "Tps de rép.(10mn)"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:197
 msgid "1h Resp. Time"
-msgstr "Temps de réponse (1h)"
+msgstr "Tps de rép. (1h)"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:198
 msgid "1d Resp. Time"
-msgstr "Temps de réponse (1j)"
+msgstr "Tps de rép.(1j)"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:199
 msgid "Last Good Lookup"
-msgstr "Dernière bonne recherche"
+msgstr "Dernière req. OK"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:200
 msgid "Last Bad Lookup"
-msgstr "Dernière mauvaise recherche"
+msgstr "Dernière req. KO"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:201
 msgid "Last Good Store"
-msgstr "Dernier bon stockage"
+msgstr "Dernier stk.OK"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:202
 msgid "Last Bad Store"
-msgstr "Dernier mauvais stockage"
+msgstr "Dernier stk.KO"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:203
 msgid "1h Fail Rate"
@@ -3006,65 +3006,65 @@ msgstr "Seuils"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:253
 msgid "fast peers"
-msgstr "Pairs rapides"
+msgstr "pairs rapides"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:255
 msgid "high capacity peers"
-msgstr "Pairs à haute capacités"
+msgstr "pairs à haute capacités"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:257
 msgid " well integrated peers"
-msgstr "Pairs bien intégrés"
+msgstr "pairs bien intégrés"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:259
 msgid "as determined by the profile organizer"
-msgstr "tel que défini par l\\''organisateur du profil"
+msgstr "tels que définis par le  gestionnaire de profils"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:259
 msgid "groups"
-msgstr "groupes"
+msgstr "Groupes"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:260
 msgid "capabilities in the netDb, not used to determine profiles"
-msgstr "possibilités de la NetDb, non utilisée pour déterminer les profils"
+msgstr "possibilités vues dans la base de données du réseau (non utilisées pour définir les profils)"
 
 #. capabilities
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:260
 #: ../java/strings/Strings.java:81
 msgid "caps"
-msgstr "capitales"
+msgstr "Possib."
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:261
 msgid "peak throughput (bytes per second) over a 1 minute period that the peer has sustained in a single tunnel"
-msgstr "débit crête (o/s) sur 1mn maintenu par le pair sur un seul tunnel"
+msgstr "débit crête (o/s) tenu sur 1mn par le pair sur un seul tunnel"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:261
 msgid "speed"
-msgstr "vitesse"
+msgstr "Vitesse"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:262
 msgid "capacity"
-msgstr "capacité"
+msgstr "Capacité"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:262
 msgid "how many tunnels can we ask them to join in an hour?"
-msgstr "combien de tunnels pouvons nous leur demander de joindre en une heure?"
+msgstr "combien de tunnels nous pouvons lui demander de rejoindre en une heure."
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:263
 msgid "how many new peers have they told us about lately?"
-msgstr "de combien de nouveaux pairs nous ont-ils parlé récemment?"
+msgstr "sur combien de nouveaux pairs il nous a renseigné récemment."
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:263
 msgid "integration"
-msgstr "intégration"
+msgstr "Intégration"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:264
 msgid "is the peer banned, or unreachable, or failing tunnel tests?"
-msgstr "Le pair est-il banni, injoignable ou échoue-t-il à tester le tunnel?"
+msgstr "Le pair banni, injoignable ou les tests de tunnels échouent."
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:264
 msgid "status"
-msgstr "état"
+msgstr "État"
 
 #: ../java/src/net/i2p/router/web/ShitlistRenderer.java:47
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:410
@@ -3394,19 +3394,19 @@ msgstr "Télécharger la version<br> non signée {0}"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:261
 msgid "Active"
-msgstr "Actif"
+msgstr "Actifs"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:270
 msgid "Fast"
-msgstr "Rapide"
+msgstr "Rapides"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:276
 msgid "High capacity"
-msgstr "Haute capacité"
+msgstr "Hautes capacités"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:288
 msgid "Known"
-msgstr "Connu"
+msgstr "Connus"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:303
 msgid "Help with firewall configuration"
