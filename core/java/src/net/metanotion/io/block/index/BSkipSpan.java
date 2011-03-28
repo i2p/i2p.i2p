@@ -36,6 +36,8 @@ import net.metanotion.io.block.BlockFile;
 import net.metanotion.util.skiplist.SkipList;
 import net.metanotion.util.skiplist.SkipSpan;
 
+import net.i2p.util.Log;
+
 /**
  * On-disk format:
  *
@@ -59,7 +61,7 @@ import net.metanotion.util.skiplist.SkipSpan;
 public class BSkipSpan extends SkipSpan {
 	protected static final int MAGIC = 0x5370616e;  // "Span"
 	protected static final int HEADER_LEN = 20;
-	protected static final int CONT_HEADER_LEN = 8;
+	public static final int CONT_HEADER_LEN = 8;
 	protected final BlockFile bf;
 	private final BSkipList bsl;
 	protected int page;
@@ -102,19 +104,31 @@ public class BSkipSpan extends SkipSpan {
 		try {
 			int curPage = overflowPage;
 			bf.freePage(page);
-			while(curPage != 0) {
-				BlockFile.pageSeek(bf.file, curPage);
-				int magic = bf.file.readInt();
-				if (magic != BlockFile.MAGIC_CONT)
-					throw new IOException("Bad SkipSpan magic number 0x" + Integer.toHexString(magic) + " on page " + curPage);
-				int next = bf.file.readUnsignedInt();
-				bf.freePage(curPage);
-				curPage = next;
-			}
+			freeContinuationPages(curPage);
 		} catch (IOException ioe) {
 			BlockFile.log.error("Error freeing " + this, ioe);
 		}
 		bsl.spanHash.remove(this.page);
+	}
+
+	/**
+	 *  Free a chain of continuation pages
+	 *  @param curPage the first page to be freed, if 0 this does nothing.
+	 *  @return number freed
+	 */
+	private int freeContinuationPages(int curPage) throws IOException {
+		int rv = 0;
+		while(curPage > 0) {
+			BlockFile.pageSeek(bf.file, curPage);
+			int magic = bf.file.readInt();
+			if (magic != BlockFile.MAGIC_CONT)
+				throw new IOException("Bad SkipSpan magic number 0x" + Integer.toHexString(magic) + " on page " + curPage);
+			int next = bf.file.readUnsignedInt();
+			bf.freePage(curPage);
+			curPage = next;
+			rv++;
+		}
+		return rv;
 	}
 
 	public void flush() {
@@ -193,10 +207,24 @@ public class BSkipSpan extends SkipSpan {
 				curPage = bf.writeMultiPageData(keyData, curPage, pageCounter, curNextPage);
 				curPage = bf.writeMultiPageData(valData, curPage, pageCounter, curNextPage);
 			}
-			// FIXME why seek and rescan the overflow page?
 			BlockFile.pageSeek(bf.file, this.page);
 			bf.file.skipBytes(4);  // skip magic
 			this.overflowPage = bf.file.readUnsignedInt();
+			if (curNextPage[0] != 0) {
+				// free extra continuation pages
+				BlockFile.pageSeek(bf.file, curPage);
+				bf.file.skipBytes(4);  // skip magic
+				bf.file.writeInt(0);
+				if (curPage == this.page)
+					this.overflowPage = 0;
+				try {
+					int freed = freeContinuationPages(curNextPage[0]);
+					if (BlockFile.log.shouldLog(Log.INFO))
+						BlockFile.log.info("Freed " + freed + " continuation pages");
+				} catch (IOException ioe) {
+					BlockFile.log.error("Error freeing " + this, ioe);
+				}
+			}
 		} catch (IOException ioe) { throw new RuntimeException("Error writing to database", ioe); }
 		// FIXME can't get there from here
 		//bsl.size -= fail;
@@ -292,6 +320,7 @@ public class BSkipSpan extends SkipSpan {
 				continue;
 			}
 		}
+		// free any excess overflow pages?
 		if (fail > 0) {
 			BlockFile.log.error("Repairing corruption of " + fail + " entries");
 			if (flushOnError)

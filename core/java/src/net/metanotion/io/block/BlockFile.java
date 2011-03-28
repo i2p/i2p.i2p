@@ -45,6 +45,7 @@ import net.metanotion.io.data.NullBytes;
 import net.metanotion.io.data.StringBytes;
 import net.metanotion.io.data.UTF8StringBytes;
 import net.metanotion.io.block.index.BSkipList;
+import net.metanotion.io.block.index.BSkipSpan;
 import net.metanotion.util.skiplist.SkipIterator;
 import net.metanotion.util.skiplist.SkipList;
 
@@ -132,6 +133,16 @@ public class BlockFile {
 		}
 	}
 
+	/**
+	 *  Write bytes
+	 *  This will allocate additional continuation pages as necessary.
+	 *
+	 *  @param data data to write
+	 *  @param page current page
+	 *  @param curPageOff in (current) and out (new) parameter at index 0
+	 *  @param nextPage in (current) and out (new) parameter at index 0
+	 *  @return current page
+	 */
 	public int writeMultiPageData(byte[] data, int page, int[] curPageOff, int[] nextPage) throws IOException {
 		int pageCounter = curPageOff[0];
 		int curNextPage = nextPage[0];
@@ -151,9 +162,11 @@ public class BlockFile {
 				}
 				BlockFile.pageSeek(this.file, curNextPage);
 				curPage = curNextPage;
-				this.file.skipBytes(4);   // skip magic
+				int magic = this.file.readInt();
+				if (magic != MAGIC_CONT)
+					throw new IOException("Bad SkipSpan continuation magic number 0x" + Integer.toHexString(magic) + " on page " + curNextPage);
 				curNextPage = this.file.readUnsignedInt();
-				pageCounter = 8;
+				pageCounter = BSkipSpan.CONT_HEADER_LEN;
 				len = PAGESIZE - pageCounter;
 			}
 			this.file.write(data, dct, Math.min(len, data.length - dct));
@@ -165,27 +178,76 @@ public class BlockFile {
 		return curPage;
 	}
 
+	/**
+	 *  Read bytes
+	 *
+	 *  @param arr fill this array fully with data
+	 *  @param page current page
+	 *  @param curPageOff in (current) and out (new) parameter at index 0
+	 *  @param nextPage in (current) and out (new) parameter at index 0
+	 *  @return current page
+	 */
 	public int readMultiPageData(byte[] arr, int page, int[] curPageOff, int[] nextPage) throws IOException {
 		int pageCounter = curPageOff[0];
 		int curNextPage = nextPage[0];
 		int curPage = page;
 		int dct = 0;
-		int res;
 		while(dct < arr.length) {
 			int len = PAGESIZE - pageCounter;
 			if(len <= 0) {
+				if (curNextPage <= 0)
+					throw new IOException("not enough pages to read data still need " + (arr.length - dct));
 				BlockFile.pageSeek(this.file, curNextPage);
 				int magic = this.file.readInt();
 				if (magic != MAGIC_CONT)
 					throw new IOException("Bad SkipSpan continuation magic number 0x" + Integer.toHexString(magic) + " on page " + curNextPage);
 				curPage = curNextPage;
 				curNextPage = this.file.readUnsignedInt();
-				pageCounter = 8;
+				pageCounter = BSkipSpan.CONT_HEADER_LEN;
 				len = PAGESIZE - pageCounter;
 			}
-			res = this.file.read(arr, dct, Math.min(len, arr.length - dct));
+			int res = this.file.read(arr, dct, Math.min(len, arr.length - dct));
 			if(res == -1) { throw new IOException(); }
 			pageCounter += Math.min(len, arr.length - dct);
+			dct += res;
+		}
+		nextPage[0] = curNextPage;
+		curPageOff[0] = pageCounter;
+		return curPage;
+	}
+
+	/**
+	 *  Skip length bytes
+	 *  The same as readMultiPageData() without returning a result
+	 *
+	 *  @param length number of bytes to skip
+	 *  @param page current page
+	 *  @param curPageOff in (current) and out (new) parameter at index 0
+	 *  @param nextPage in (current) and out (new) parameter at index 0
+	 *  @return current page
+	 */
+	public int skipMultiPageBytes(int length, int page, int[] curPageOff, int[] nextPage) throws IOException {
+		int pageCounter = curPageOff[0];
+		int curNextPage = nextPage[0];
+		int curPage = page;
+		int dct = 0;
+		while(dct < length) {
+			int len = PAGESIZE - pageCounter;
+			if(len <= 0) {
+				if (curNextPage <= 0)
+					throw new IOException("not enough pages to skip");
+				BlockFile.pageSeek(this.file, curNextPage);
+				int magic = this.file.readInt();
+				if (magic != MAGIC_CONT)
+					throw new IOException("Bad SkipSpan continuation magic number 0x" + Integer.toHexString(magic) + " on page " + curNextPage);
+				curPage = curNextPage;
+				curNextPage = this.file.readUnsignedInt();
+				pageCounter = BSkipSpan.CONT_HEADER_LEN;
+				len = PAGESIZE - pageCounter;
+			}
+			int res = Math.min(len, length - dct);
+			this.file.skipBytes(res);
+			pageCounter += res;
 			dct += res;
 		}
 		nextPage[0] = curNextPage;

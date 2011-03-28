@@ -162,7 +162,6 @@ public class IBSkipSpan extends BSkipSpan {
 	 */
 	private Object getData(Comparable key) throws IOException {
 		seekData();
-		int ksz, vsz;
 		int curPage = this.page;
 		int[] curNextPage = new int[1];
 		curNextPage[0] = this.overflowPage;
@@ -180,16 +179,16 @@ public class IBSkipSpan extends BSkipSpan {
 				curNextPage[0] = this.bf.file.readUnsignedInt();
 				pageCounter[0] = CONT_HEADER_LEN;
 			}
-			ksz = this.bf.file.readUnsignedShort();
-			vsz = this.bf.file.readUnsignedShort();
+			int ksz = this.bf.file.readUnsignedShort();
+			int vsz = this.bf.file.readUnsignedShort();
 			pageCounter[0] +=4;
 			byte[] k = new byte[ksz];
-			byte[] v = new byte[vsz];
 			curPage = this.bf.readMultiPageData(k, curPage, pageCounter, curNextPage);
-			curPage = this.bf.readMultiPageData(v, curPage, pageCounter, curNextPage);
 			//System.out.println("i=" + i + ", Page " + curPage + ", offset " + pageCounter[0] + " ksz " + ksz + " vsz " + vsz);
 			Comparable ckey = (Comparable) this.keySer.construct(k);
 			if (ckey == null) {
+				// skip the value and keep going
+				curPage = this.bf.skipMultiPageBytes(vsz, curPage, pageCounter, curNextPage);
 				BlockFile.log.error("Null deserialized key in entry " + i + " page " + curPage);
 				fail++;
 				continue;
@@ -197,6 +196,8 @@ public class IBSkipSpan extends BSkipSpan {
 			int diff = ckey.compareTo(key);
 			if (diff == 0) {
 				//System.err.println("Found " + key + " at " + i + " (first: " + this.firstKey + ')');
+				byte[] v = new byte[vsz];
+				curPage = this.bf.readMultiPageData(v, curPage, pageCounter, curNextPage);
 				Object rv = this.valSer.construct(v);
 				if (rv == null) {
 					BlockFile.log.error("Null deserialized value in entry " + i + " page " + curPage +
@@ -213,6 +214,8 @@ public class IBSkipSpan extends BSkipSpan {
 					repair(fail);
 				return null;
 			}
+			// skip the value and keep going
+			curPage = this.bf.skipMultiPageBytes(vsz, curPage, pageCounter, curNextPage);
 		}
 		//System.err.println("NOT Found " + key + " at end (first: " + this.firstKey + ')');
 		if (fail > 0)
