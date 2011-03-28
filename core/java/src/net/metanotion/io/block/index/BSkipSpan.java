@@ -161,6 +161,8 @@ public class BSkipSpan extends SkipSpan {
 				return;
 			bf.file.writeShort((short) keys.length);
 			bf.file.writeShort((short) nKeys);
+			if (nKeys <= 0 && prev != null)
+				BlockFile.log.error("Flushing with no entries?" + this, new Exception());
 
 			int ksz, vsz;
 			int curPage = this.page;
@@ -264,8 +266,11 @@ public class BSkipSpan extends SkipSpan {
 		bss.nextPage = bf.file.readUnsignedInt();
 		bss.spanSize = bf.file.readUnsignedShort();
 		bss.nKeys = bf.file.readUnsignedShort();
-		if(bss.spanSize < 1 || bss.spanSize > SkipSpan.MAX_SIZE || bss.nKeys > bss.spanSize)
-			throw new IOException("Invalid span size " + bss.nKeys + " / "+  bss.spanSize);
+		if(bss.spanSize < 1 || bss.spanSize > SkipSpan.MAX_SIZE || bss.nKeys > bss.spanSize) {
+			BlockFile.log.error("Invalid span size " + bss.nKeys + " / "+  bss.spanSize);
+			bss.nKeys = 0;
+			bss.spanSize = bf.spanSize;
+		}
 	}
 
 	/**
@@ -298,10 +303,13 @@ public class BSkipSpan extends SkipSpan {
 		for(int i=0;i<this.nKeys;i++) {
 			if((pageCounter[0] + 4) > BlockFile.PAGESIZE) {
 				BlockFile.pageSeek(this.bf.file, curNextPage[0]);
-				curPage = curNextPage[0];
 				int magic = bf.file.readInt();
-				if (magic != BlockFile.MAGIC_CONT)
-					throw new IOException("Bad SkipSpan magic number 0x" + Integer.toHexString(magic) + " on page " + curPage);
+				if (magic != BlockFile.MAGIC_CONT) {
+					BlockFile.log.error("Lost " + (this.nKeys - i) + " entries - Bad SkipSpan magic number 0x" + Integer.toHexString(magic) + " on page " + curNextPage[0]);
+					lostEntries(i, curPage);
+					break;
+				}
+				curPage = curNextPage[0];
 				curNextPage[0] = this.bf.file.readUnsignedInt();
 				pageCounter[0] = CONT_HEADER_LEN;
 			}
@@ -310,8 +318,15 @@ public class BSkipSpan extends SkipSpan {
 			pageCounter[0] +=4;
 			byte[] k = new byte[ksz];
 			byte[] v = new byte[vsz];
-			curPage = this.bf.readMultiPageData(k, curPage, pageCounter, curNextPage);
-			curPage = this.bf.readMultiPageData(v, curPage, pageCounter, curNextPage);
+			int lastGood = curPage;
+			try {
+				curPage = this.bf.readMultiPageData(k, curPage, pageCounter, curNextPage);
+				curPage = this.bf.readMultiPageData(v, curPage, pageCounter, curNextPage);
+			} catch (IOException ioe) {
+				BlockFile.log.error("Lost " + (this.nKeys - i) + " entries - Error loading " + this + " on page " + curPage, ioe);
+				lostEntries(i, lastGood);
+				break;
+			}
 //			System.out.println("i=" + i + ", Page " + curPage + ", offset " + pageCounter[0] + " ksz " + ksz + " vsz " + vsz);
 			this.keys[i] = (Comparable) this.keySer.construct(k);
 			this.vals[i] = this.valSer.construct(v);
@@ -333,6 +348,33 @@ public class BSkipSpan extends SkipSpan {
 			// FIXME can't get there from here
 			//bsl.size -= fail;
 			//bsl.flush();
+		}
+	}
+
+	/**
+	 *  Attempt to recover from corrupt data in this span.
+	 *  All entries starting with firstBadEntry are lost.
+	 *  Zero out the overflow page on lastGoodPage,
+         *  and corect the number of entries in the first page.
+	 *  We don't attempt to free the lost continuation pages.
+         */
+	protected void lostEntries(int firstBadEntry, int lastGoodPage) {
+		try {
+			this.nKeys = firstBadEntry;
+			// zero overflow page pointer
+			BlockFile.pageSeek(this.bf.file, lastGoodPage);
+			bf.file.skipBytes(4);  // skip magic
+			bf.file.writeInt(0);
+			// write new number of keys
+			if (lastGoodPage != this.page) {					
+				BlockFile.pageSeek(this.bf.file, this.page);
+				bf.file.skipBytes(18);
+			} else {
+				bf.file.skipBytes(10);
+			}
+			bf.file.writeShort(this.nKeys);
+		} catch (IOException ioe) {
+			BlockFile.log.error("Error while recovering from corruption of " + this, ioe);
 		}
 	}
 

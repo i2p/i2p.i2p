@@ -172,10 +172,13 @@ public class IBSkipSpan extends BSkipSpan {
 		for(int i=0;i<this.nKeys;i++) {
 			if((pageCounter[0] + 4) > BlockFile.PAGESIZE) {
 				BlockFile.pageSeek(this.bf.file, curNextPage[0]);
-				curPage = curNextPage[0];
 				int magic = bf.file.readInt();
-				if (magic != BlockFile.MAGIC_CONT)
-					throw new IOException("Bad SkipSpan continuation magic number 0x" + Integer.toHexString(magic) + " on page " + curPage);
+				if (magic != BlockFile.MAGIC_CONT) {
+					BlockFile.log.error("Lost " + (this.nKeys - i) + " entries - Bad SkipSpan magic number 0x" + Integer.toHexString(magic) + " on page " + curNextPage[0]);
+					lostEntries(i, curPage);
+					break;
+				}
+				curPage = curNextPage[0];
 				curNextPage[0] = this.bf.file.readUnsignedInt();
 				pageCounter[0] = CONT_HEADER_LEN;
 			}
@@ -183,7 +186,13 @@ public class IBSkipSpan extends BSkipSpan {
 			int vsz = this.bf.file.readUnsignedShort();
 			pageCounter[0] +=4;
 			byte[] k = new byte[ksz];
-			curPage = this.bf.readMultiPageData(k, curPage, pageCounter, curNextPage);
+			try {
+				curPage = this.bf.readMultiPageData(k, curPage, pageCounter, curNextPage);
+			} catch (IOException ioe) {
+				BlockFile.log.error("Lost " + (this.nKeys - i) + " entries - Error loading " + this + " on page " + curPage, ioe);
+				lostEntries(i, curPage);
+				break;
+			}
 			//System.out.println("i=" + i + ", Page " + curPage + ", offset " + pageCounter[0] + " ksz " + ksz + " vsz " + vsz);
 			Comparable ckey = (Comparable) this.keySer.construct(k);
 			if (ckey == null) {
@@ -197,7 +206,13 @@ public class IBSkipSpan extends BSkipSpan {
 			if (diff == 0) {
 				//System.err.println("Found " + key + " at " + i + " (first: " + this.firstKey + ')');
 				byte[] v = new byte[vsz];
-				curPage = this.bf.readMultiPageData(v, curPage, pageCounter, curNextPage);
+				try {
+					curPage = this.bf.readMultiPageData(v, curPage, pageCounter, curNextPage);
+				} catch (IOException ioe) {
+					BlockFile.log.error("Lost " + (this.nKeys - i) + " entries - Error loading " + this + " on page " + curPage, ioe);
+					lostEntries(i, curPage);
+					break;
+				}
 				Object rv = this.valSer.construct(v);
 				if (rv == null) {
 					BlockFile.log.error("Null deserialized value in entry " + i + " page " + curPage +
@@ -224,6 +239,7 @@ public class IBSkipSpan extends BSkipSpan {
 	}
 
         private void repair(int fail) {
+	/*****  needs work
 		try {
 			loadData(false);
 			if (this.nKeys > 0)
@@ -233,6 +249,7 @@ public class IBSkipSpan extends BSkipSpan {
 		} catch (IOException ioe) {
 			BlockFile.log.error("Failed to repair corruption of " + fail + " entries", ioe);
 		}
+	*****/
 	}
 
 	private IBSkipSpan(BlockFile bf, BSkipList bsl) {

@@ -82,8 +82,8 @@ public class BSkipList extends SkipList {
 		firstSpanPage = bf.file.readUnsignedInt();
 		firstLevelPage = bf.file.readUnsignedInt();
 		size = bf.file.readUnsignedInt();
-		spans = bf.file.readUnsignedInt();
-		levelCount = bf.file.readUnsignedInt();
+		int spans = bf.file.readInt();
+		int levelCount = bf.file.readInt();
 		//System.out.println(size + " " + spans); 
 
 		this.fileOnly = fileOnly;
@@ -92,8 +92,18 @@ public class BSkipList extends SkipList {
 		else
 			first = new BSkipSpan(bf, this, firstSpanPage, key, val);
 		stack = new BSkipLevels(bf, firstLevelPage, this);
+		int total = 0;
+		for (BSkipSpan ss : spanHash.values()) {
+			total += ss.nKeys;
+		}
 		if (BlockFile.log.shouldLog(Log.DEBUG))
-			BlockFile.log.debug("Loaded " + this + " cached " + levelHash.size() + " levels and " + spanHash.size() + " spans");
+			BlockFile.log.debug("Loaded " + this + " cached " + levelHash.size() + " levels and " + spanHash.size() + " spans with " + total + " entries");
+		if (levelCount != levelHash.size() || spans != spanHash.size() || size != total) {
+			if (BlockFile.log.shouldLog(Log.WARN))
+				BlockFile.log.warn("On-disk counts were " + levelCount + " / " + spans + " / " +  size + ", correcting");
+			size = total;
+			flush();
+		}
 		//rng = new Random(System.currentTimeMillis());
 	}
 
@@ -117,8 +127,8 @@ public class BSkipList extends SkipList {
 			bf.file.writeInt(firstSpanPage);
 			bf.file.writeInt(firstLevelPage);
 			bf.file.writeInt(Math.max(0, size));
-			bf.file.writeInt(Math.max(0, spans));
-			bf.file.writeInt(Math.max(0, levelCount));
+			bf.file.writeInt(spanHash.size());
+			bf.file.writeInt(levelHash.size());
 			
 		} catch (IOException ioe) { throw new RuntimeException("Error writing to database", ioe); }
 	}
@@ -164,11 +174,21 @@ public class BSkipList extends SkipList {
 		BSkipLevels.init(bf, firstLevel, firstSpan, 4);
 	}
 
+	/**
+	 *  @return log2(span count), minimum 4
+	 */
 	@Override
 	public int maxLevels() {
-		int max = super.maxLevels();
-		int cells = (BlockFile.PAGESIZE - BSkipLevels.HEADER_LEN) / 4;
-		return Math.min(cells, max);
+		int hob = 0;
+		int s = spanHash.size();
+		while(s > 0) {
+			hob++;
+			s /= P;
+		}
+		int max = Math.max(hob, super.maxLevels());
+		// 252
+		//int cells = (BlockFile.PAGESIZE - BSkipLevels.HEADER_LEN) / 4;
+		return Math.min(BSkipLevels.MAX_SIZE, max);
 	}
 
 	@Override
@@ -203,8 +223,8 @@ public class BSkipList extends SkipList {
 
 	public void bslck(boolean isMeta, boolean fix) {
 		BlockFile.log.warn("    size " + this.size);
-		BlockFile.log.warn("    spans " + this.spans);
-		BlockFile.log.warn("    levels " + this.levelCount);
+		BlockFile.log.warn("    spans " + this.spanHash.size());
+		BlockFile.log.warn("    levels " + this.levelHash.size());
 		BlockFile.log.warn("    skipPage " + this.skipPage);
 		BlockFile.log.warn("    firstSpanPage " + this.firstSpanPage);
 		BlockFile.log.warn("    firstLevelPage " + this.firstLevelPage);

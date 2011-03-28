@@ -36,7 +36,7 @@ import net.i2p.util.RandomSource;
 
 public class SkipList {
 	/** the probability of each next higher level */
-	private static final int P = 2;
+	protected static final int P = 2;
 	private static final int MIN_SLOTS = 4;
 	// these two are really final
 	protected SkipSpan first;
@@ -45,8 +45,6 @@ public class SkipList {
 	public static final Random rng = RandomSource.getInstance();
 
 	protected int size;
-	protected int spans;
-	protected int levelCount;
 
 	public void flush() { }
 	protected SkipList() { }
@@ -60,8 +58,6 @@ public class SkipList {
 			throw new IllegalArgumentException("Invalid span size");
 		first = new SkipSpan(span);
 		stack = new SkipLevels(1, first);
-		spans = 1;
-		levelCount = 1;
 		//rng = new Random(System.currentTimeMillis());
 	}
 
@@ -76,29 +72,12 @@ public class SkipList {
 		       size--;
 	}
 
-	public void addSpan(boolean addLevel) {
-		spans++;
-		if (addLevel)
-			levelCount++;
-	}
-
-	public void delSpan(boolean delLevel) {
-		if (spans > 0)
-			spans--;
-		if (delLevel && levelCount > 0)
-			levelCount--;
-	}
-
 	/**
-	 *  @return log2(spans), minimum 4
+	 *  @return 4 since we don't track span count here any more - see override
+	 *  Fix if for some reason you want a huge in-memory skiplist.
 	 */
 	public int maxLevels() {
-		int hob = 0, s = spans;
-		while(s > 0) {
-			hob++;
-			s /= P;
-		}
-		return Math.max(hob, MIN_SLOTS);
+		return MIN_SLOTS;
 	}
 
 	/**
@@ -157,13 +136,13 @@ public class SkipList {
 
 	/** dumps all the skip levels */
 	public void printSL() {
-		System.out.println("List size " + size + " spans " + spans);
+		System.out.println("List size " + size);
 		System.out.println(stack.printAll());
 	}
 
 	/** dumps all the data */
 	public void print() {
-		System.out.println("List size " + size + " spans " + spans);
+		System.out.println("List size " + size);
 		System.out.println(first.print());
 	}
 
