@@ -263,7 +263,7 @@ public class NamingServiceBean extends AddressbookBean
 					}
 					// clear search when adding
 					search = null;
-				} else if (action.equals(_("Delete Selected"))) {
+				} else if (action.equals(_("Delete Selected")) || action.equals(_("Delete Entry"))) {
 					String name = null;
 					int deleted = 0;
 					for (String n : deletionMarks) {
@@ -281,6 +281,8 @@ public class NamingServiceBean extends AddressbookBean
 						else
 							// parameter will always be >= 2
 							message = ngettext("1 destination deleted.", "{0} destinations deleted.", deleted);
+					} else {
+						message = _("No entries selected to delete.");
 					}
 				}
 				if( changed ) {

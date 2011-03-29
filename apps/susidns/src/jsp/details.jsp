@@ -125,10 +125,12 @@
 </tr></table>
 </div>
 <div id="buttons">
-<form method="POST" action="details.jsp">
+<form method="POST" action="addressbook.jsp">
 <input type="hidden" name="serial" value="${book.serial}">
-<input type="hidden" name="h" value="<%=detail%>">
-<input type="submit" name="action" value="<%=intl._("Delete")%>" >
+<input type="hidden" name="begin" value="0">
+<input type="hidden" name="end" value="99">
+<input type="hidden" name="checked" value="<%=detail%>">
+<input type="submit" name="action" value="<%=intl._("Delete Entry")%>" >
 </form>
 </div>
 <%
