@@ -22,6 +22,7 @@
 package net.i2p.addressbook;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -168,8 +169,11 @@ public class Daemon {
                                 if (publishedNS == null)
                                     publishedNS = new SingleFileNamingService(I2PAppContext.getGlobalContext(), published.getAbsolutePath());
                                 success = publishedNS.putIfAbsent(key, dest);
-                                if (!success)
-                                    log.append("Save to published addressbook " + published.getAbsolutePath() + " failed for new key " + key);
+                                if (!success) {
+                                    try {
+                                        log.append("Save to published address book " + published.getCanonicalPath() + " failed for new key " + key);
+                                    } catch (IOException ioe) {}
+                                }
                             }
                             if (isTextFile)
                                 // keep track for later dup check

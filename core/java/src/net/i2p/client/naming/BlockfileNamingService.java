@@ -163,7 +163,6 @@ public class BlockfileNamingService extends DummyNamingService {
             info.setProperty(PROP_LISTS, list);
             hdr.put(PROP_INFO, info);
 
-            // TODO all in one skiplist or separate?
             int total = 0;
             for (String hostsfile : getFilenames(list)) {
                 File file = new File(_context.getRouterDir(), hostsfile);
@@ -171,6 +170,7 @@ public class BlockfileNamingService extends DummyNamingService {
                     continue;
                 int count = 0;
                 BufferedReader in = null;
+                String sourceMsg = "Imported from " + hostsfile + " file";
                 try {
                     in = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"), 16*1024);
                     String line = null;
@@ -189,8 +189,11 @@ public class BlockfileNamingService extends DummyNamingService {
                         String b64 = line.substring(split+1);   //.trim() ??????????????
                         Destination d = lookupBase64(b64);
                         if (d != null) {
-                            addEntry(rv, hostsfile, key, d, hostsfile);
+                            addEntry(rv, hostsfile, key, d, sourceMsg);
                             count++;
+                        } else {
+                            _log.logAlways(Log.WARN, "Unable to import entry for " + key +
+                                                     " from file " + file + " - bad Base 64: " + b64);
                         }
                     }
                 } catch (IOException ioe) {

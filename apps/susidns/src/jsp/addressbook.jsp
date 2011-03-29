@@ -141,7 +141,7 @@ ${book.loadBookMessages}
 </c:if>
 
 <th><%=intl._("Name")%></th>
-<th><%=intl._("Links")%></th>
+<th colspan="2"><%=intl._("Links")%></th>
 <th><%=intl._("Destination")%></th>
 </tr>
 <!-- limit iterator, or "Form too large" may result on submit, and is a huge web page if we don't -->
@@ -152,8 +152,9 @@ ${book.loadBookMessages}
 </c:if>
 <td class="names"><a href="http://${addr.name}/">${addr.displayName}</a>
 </td><td class="names">
-<span class="addrhlpr">(<a href="http://${addr.b32}/">b32</a>)</span>
-<span class="addrhlpr">(<a href="details.jsp?h=${addr.name}"><%=intl._("details")%></a>)</span>
+<span class="addrhlpr"><a href="http://${addr.b32}/" title="<%=intl._("Base 32 address")%>">b32</a></span>
+</td><td class="names">
+<span class="addrhlpr"><a href="details.jsp?h=${addr.name}" title="<%=intl._("More information on this entry")%>"><%=intl._("details")%></a></span>
 </td>
 <td class="destinations"><textarea rows="1" style="height: 3em;" cols="40" wrap="off" readonly="readonly" name="dest_${addr.name}" >${addr.destination}</textarea></td>
 </tr>
@@ -180,10 +181,13 @@ ${book.loadBookMessages}
 
 <div id="add">
 <h3><%=intl._("Add new destination")%>:</h3>
-<p class="add">
-<b><%=intl._("Hostname")%>:</b> <input type="text" name="hostname" value="${book.hostname}" size="20">
-<b><%=intl._("Destination")%>:</b> <textarea name="destination" rows="1" style="height: 3em;" cols="40" wrap="off" >${book.destination}</textarea><br/>
-</p><p>
+<table><tr><td>
+<b><%=intl._("Host Name")%></b></td><td><input type="text" name="hostname" value="${book.hostname}" size="54">
+</td></tr><tr><td>
+<b><%=intl._("Destination")%></b></td><td><textarea name="destination" rows="1" style="height: 3em;" cols="70" wrap="off" spellcheck="false">${book.destination}</textarea>
+</td></tr></table>
+<p>
+<input type="reset" value="<%=intl._("Cancel")%>" >
 <input type="submit" name="action" value="<%=intl._("Replace")%>" >
 <input type="submit" name="action" value="<%=intl._("Add")%>" >
 </p>
