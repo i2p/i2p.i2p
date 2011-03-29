@@ -103,6 +103,7 @@ ${book.loadBookMessages}
 <a href="addressbook.jsp?filter=y&amp;begin=0&amp;end=99">y</a>
 <a href="addressbook.jsp?filter=z&amp;begin=0&amp;end=99">z</a>
 <a href="addressbook.jsp?filter=0-9&amp;begin=0&amp;end=99">0-9</a>
+<a href="addressbook.jsp?filter=xn--&amp;begin=0&amp;end=99"><%=intl._("other")%></a>
 <a href="addressbook.jsp?filter=none&amp;begin=0&amp;end=99"><%=intl._("all")%></a></p>
 <c:if test="${book.hasFilter}">
 <p><%=intl._("Current filter")%>: ${book.filter}
@@ -150,11 +151,11 @@ ${book.loadBookMessages}
 <c:if test="${book.master || book.router || book.published || book.private}">
 <td class="checkbox"><input type="checkbox" name="checked" value="${addr.name}" title="<%=intl._("Mark for deletion")%>"></td>
 </c:if>
-<td class="names"><a href="${addr.uri}">${addr.displayName}</a>
+<td class="names"><a href="http://${addr.name}/">${addr.displayName}</a>
 </td><td class="names">
 <span class="addrhlpr"><a href="http://${addr.b32}/" title="<%=intl._("Base 32 address")%>">b32</a></span>
 </td><td class="names">
-<span class="addrhlpr"><a href="details.jsp?h=${addr.query}" title="<%=intl._("More information on this entry")%>"><%=intl._("details")%></a></span>
+<span class="addrhlpr"><a href="details.jsp?h=${addr.name}" title="<%=intl._("More information on this entry")%>"><%=intl._("details")%></a></span>
 </td>
 <td class="destinations"><textarea rows="1" style="height: 3em;" cols="40" wrap="off" readonly="readonly" name="dest_${addr.name}" >${addr.destination}</textarea></td>
 </tr>

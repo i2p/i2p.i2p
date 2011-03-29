@@ -281,31 +281,42 @@ public class AddressbookBean
 				boolean changed = false;
 				if (action.equals(_("Add")) || action.equals(_("Replace"))) {
 					if( addressbook != null && hostname != null && destination != null ) {
-						String oldDest = (String) addressbook.get(hostname);
-						if (destination.equals(oldDest)) {
-							message = _("Host name {0} is already in addressbook, unchanged.", hostname);
-						} else if (oldDest != null && !action.equals(_("Replace"))) {
-							message = _("Host name {0} is already in addressbook with a different destination. Click \"Replace\" to overwrite.", hostname);
-						} else {
-							boolean valid = true;
-							try {
-								Destination dest = new Destination(destination);
-							} catch (DataFormatException dfe) {
-								valid = false;
-							}
-							if (valid) {
-								addressbook.put( hostname, destination );
-								changed = true;
-								if (oldDest == null)
-									message = _("Destination added for {0}.", hostname);
-								else
-									message = _("Destination changed for {0}.", hostname);
-								// clear form
-								hostname = null;
-								destination = null;
+						try {
+							// throws IAE with translated message
+							String host = AddressBean.toASCII(hostname);
+							String displayHost = host.equals(hostname) ? hostname :
+							                                             hostname + " (" + host + ')';
+
+							String oldDest = (String) addressbook.get(host);
+							if (destination.equals(oldDest)) {
+								message = _("Host name {0} is already in addressbook, unchanged.", displayHost);
+							} else if (oldDest != null && !action.equals(_("Replace"))) {
+								message = _("Host name {0} is already in addressbook with a different destination. Click \"Replace\" to overwrite.", displayHost);
 							} else {
-								message = _("Invalid Base 64 destination.");
+								boolean valid = true;
+								try {
+									Destination dest = new Destination(destination);
+								} catch (DataFormatException dfe) {
+									valid = false;
+								}
+								if (valid) {
+									addressbook.put( host, destination );
+									changed = true;
+									if (oldDest == null)
+										message = _("Destination added for {0}.", displayHost);
+									else
+										message = _("Destination changed for {0}.", displayHost);
+									// clear form
+									hostname = null;
+									destination = null;
+								} else {
+									message = _("Invalid Base 64 destination.");
+								}
 							}
+						} catch (IllegalArgumentException iae) {
+							message = iae.getMessage();
+							if (message == null)
+								message = _("Invalid host name \"{0}\".", hostname);
 						}
 					} else {
 						message = _("Please enter a host name and destination");
@@ -317,9 +328,11 @@ public class AddressbookBean
 					int deleted = 0;
 					for (String n : deletionMarks) {
 						addressbook.remove(n);
+						String uni = AddressBean.toUnicode(n);
+						String displayHost = uni.equals(n) ? n :  uni + " (" + n + ')';
 						if (deleted++ == 0) {
 							changed = true;
-							name = n;
+							name = displayHost;
 						}
 					}
 					if( changed ) {
