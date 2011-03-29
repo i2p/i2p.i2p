@@ -221,42 +221,47 @@ public class NamingServiceBean extends AddressbookBean
 				boolean changed = false;
 				if (action.equals(_("Add")) || action.equals(_("Replace"))) {
 					if(hostname != null && destination != null) {
-						Properties outProperties= new Properties();
-						Destination oldDest = getNamingService().lookup(hostname, nsOptions, outProperties);
-						if (oldDest != null && destination.equals(oldDest.toBase64())) {
-							message = _("Host name {0} is already in addressbook, unchanged.", hostname);
-						} else if (oldDest != null && !action.equals(_("Replace"))) {
-							message = _("Host name {0} is already in addressbook with a different destination. Click \"Replace\" to overwrite.", hostname);
-						} else {
-							try {
-								String host = hostname;
-								if (AddressBean.haveIDN) {
-									try {
-										host = IDN.toASCII(hostname, IDN.ALLOW_UNASSIGNED);
-									} catch (IllegalArgumentException iae) {}
+						try {
+							// throws IAE with translated message
+							String host = AddressBean.toASCII(hostname);
+							String displayHost = host.equals(hostname) ? hostname :
+							                                             hostname + " (" + host + ')';
+
+							Properties outProperties= new Properties();
+							Destination oldDest = getNamingService().lookup(host, nsOptions, outProperties);
+							if (oldDest != null && destination.equals(oldDest.toBase64())) {
+								message = _("Host name {0} is already in addressbook, unchanged.", displayHost);
+							} else if (oldDest != null && !action.equals(_("Replace"))) {
+								message = _("Host name {0} is already in addressbook with a different destination. Click \"Replace\" to overwrite.", displayHost);
+							} else {
+								try {
+									Destination dest = new Destination(destination);
+									if (oldDest != null) {
+										nsOptions.putAll(outProperties);
+							                        nsOptions.setProperty("m", Long.toString(I2PAppContext.getGlobalContext().clock().now()));
+									}
+						                        nsOptions.setProperty("s", _("Manually added via SusiDNS"));
+									boolean success = getNamingService().put(host, dest, nsOptions);
+									if (success) {
+										changed = true;
+										if (oldDest == null)
+											message = _("Destination added for {0}.", displayHost);
+										else
+											message = _("Destination changed for {0}.", displayHost);
+										// clear form
+										hostname = null;
+										destination = null;
+									} else {
+										message = _("Failed to add Destination for {0} to naming service {1}", displayHost, getNamingService()) + "<br>";
+									}
+								} catch (DataFormatException dfe) {
+									message = _("Invalid Base 64 destination.");
 								}
-								Destination dest = new Destination(destination);
-								if (oldDest != null) {
-									nsOptions.putAll(outProperties);
-						                        nsOptions.setProperty("m", Long.toString(I2PAppContext.getGlobalContext().clock().now()));
-								}
-					                        nsOptions.setProperty("s", _("Manually added via SusiDNS"));
-								boolean success = getNamingService().put(host, dest, nsOptions);
-								if (success) {
-									changed = true;
-									if (oldDest == null)
-										message = _("Destination added for {0}.", hostname);
-									else
-										message = _("Destination changed for {0}.", hostname);
-									// clear form
-									hostname = null;
-									destination = null;
-								} else {
-									message = _("Failed to add Destination for {0} to naming service {1}", hostname, getNamingService()) + "<br>";
-								}
-							} catch (DataFormatException dfe) {
-								message = _("Invalid Base 64 destination.");
 							}
+						} catch (IllegalArgumentException iae) {
+							message = iae.getMessage();
+							if (message == null)
+								message = _("Invalid host name \"{0}\".", hostname);
 						}
 					} else {
 						message = _("Please enter a host name and destination");
@@ -268,15 +273,18 @@ public class NamingServiceBean extends AddressbookBean
 					int deleted = 0;
 					for (String n : deletionMarks) {
 						boolean success = getNamingService().remove(n, nsOptions);
+						String uni = AddressBean.toUnicode(n);
+						String displayHost = uni.equals(n) ? n :  uni + " (" + n + ')';
 						if (!success) {
-							message += _("Failed to delete Destination for {0} from naming service {1}", name, getNamingService()) + "<br>";
+							message += _("Failed to delete Destination for {0} from naming service {1}", displayHost, getNamingService()) + "<br>";
 						} else if (deleted++ == 0) {
 							changed = true;
-							name = n;
+							name = displayHost;
 						}
 					}
 					if( changed ) {
 						if (deleted == 1)
+							// parameter is a host name
 							message += _("Destination {0} deleted.", name);
 						else
 							// parameter will always be >= 2
@@ -284,6 +292,9 @@ public class NamingServiceBean extends AddressbookBean
 					} else {
 						message = _("No entries selected to delete.");
 					}
+					// clear search when deleting
+					if (action.equals(_("Delete Entry")))
+						search = null;
 				}
 				if( changed ) {
 					message += "<br>" + _("Addressbook saved.");

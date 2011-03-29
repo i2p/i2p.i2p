@@ -110,29 +110,29 @@ ${book.loadBookMessages}
 </c:if>
 </div>
 
+<div id="search">
 <form method="POST" action="addressbook.jsp">
 <input type="hidden" name="begin" value="0">
 <input type="hidden" name="end" value="99">
-<div id="search">
 <table><tr>
 <td class="search"><%=intl._("Search")%>: <input type="text" name="search" value="${book.search}" size="20" ></td>
 <td class="search"><input type="submit" name="submitsearch" value="<%=intl._("Search")%>" ></td>
 </tr>
 </table>
-</div>
-
-</form>
+</form></div>
 </c:if>
 
+<%
+    // have to only do this once per page
+    String susiNonce = book.getSerial();
+%>
+<c:if test="${book.notEmpty}">
 <form method="POST" action="addressbook.jsp">
-<input type="hidden" name="serial" value="${book.serial}">
+<input type="hidden" name="serial" value="<%=susiNonce%>">
 <input type="hidden" name="begin" value="0">
 <input type="hidden" name="end" value="99">
-
-<c:if test="${book.notEmpty}">
-
-<div id="book">
 <jsp:setProperty name="book" property="trClass"	value="0" />
+<div id="book">
 <table class="book" cellspacing="0" cellpadding="5">
 <tr class="head">
 
@@ -150,11 +150,11 @@ ${book.loadBookMessages}
 <c:if test="${book.master || book.router || book.published || book.private}">
 <td class="checkbox"><input type="checkbox" name="checked" value="${addr.name}" title="<%=intl._("Mark for deletion")%>"></td>
 </c:if>
-<td class="names"><a href="http://${addr.name}/">${addr.displayName}</a>
+<td class="names"><a href="${addr.uri}">${addr.displayName}</a>
 </td><td class="names">
 <span class="addrhlpr"><a href="http://${addr.b32}/" title="<%=intl._("Base 32 address")%>">b32</a></span>
 </td><td class="names">
-<span class="addrhlpr"><a href="details.jsp?h=${addr.name}" title="<%=intl._("More information on this entry")%>"><%=intl._("details")%></a></span>
+<span class="addrhlpr"><a href="details.jsp?h=${addr.query}" title="<%=intl._("More information on this entry")%>"><%=intl._("details")%></a></span>
 </td>
 <td class="destinations"><textarea rows="1" style="height: 3em;" cols="40" wrap="off" readonly="readonly" name="dest_${addr.name}" >${addr.destination}</textarea></td>
 </tr>
@@ -168,7 +168,7 @@ ${book.loadBookMessages}
 <input type="reset" value="<%=intl._("Cancel")%>" >
 <input type="submit" name="action" value="<%=intl._("Delete Selected")%>" >
 </p>
-</div>
+</div></form>
 </c:if>
 
 </c:if>
@@ -179,6 +179,10 @@ ${book.loadBookMessages}
 </div>
 </c:if>
 
+<form method="POST" action="addressbook.jsp">
+<input type="hidden" name="serial" value="<%=susiNonce%>">
+<input type="hidden" name="begin" value="0">
+<input type="hidden" name="end" value="99">
 <div id="add">
 <h3><%=intl._("Add new destination")%>:</h3>
 <table><tr><td>
@@ -186,14 +190,13 @@ ${book.loadBookMessages}
 </td></tr><tr><td>
 <b><%=intl._("Destination")%></b></td><td><textarea name="destination" rows="1" style="height: 3em;" cols="70" wrap="off" spellcheck="false">${book.destination}</textarea>
 </td></tr></table>
-<p>
+<p class="buttons">
 <input type="reset" value="<%=intl._("Cancel")%>" >
 <input type="submit" name="action" value="<%=intl._("Replace")%>" >
 <input type="submit" name="action" value="<%=intl._("Add")%>" >
 </p>
-</div>
+</div></form>
 
-</form>
 <hr>
 <div id="footer">
 <p class="footer">susidns v${version.version} &copy; <a href="${version.url}">susi</a> 2005</p>

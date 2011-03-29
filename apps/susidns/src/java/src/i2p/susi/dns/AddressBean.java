@@ -72,13 +72,23 @@ public class AddressBean
 
 	/**
 	 * The Unicode name, translated from Punycode
+	 * @return the original string on error
 	 * @since 0.8.6
 	 */
 	public String getDisplayName()
 	{
+		return toUnicode(name);
+	}
+
+	/**
+	 * The Unicode name, translated from Punycode
+	 * @return the original string on error
+	 * @since 0.8.6
+	 */
+	public static String toUnicode(String host) {
 		if (haveIDN)
-			return IDN.toUnicode(name);
-		return name;
+			return IDN.toUnicode(host);
+		return host;
 	}
 
 	/**
@@ -88,6 +98,65 @@ public class AddressBean
 	public boolean isIDN()
 	{
 		return haveIDN && !IDN.toUnicode(name).equals(name);
+	}
+
+	private static final char DOT = '.';
+	private static final char DOT2 = 0x3002;
+	private static final char DOT3 = 0xFF0E;
+	private static final char DOT4 = 0xFF61;
+
+	/**
+	 * Ref: java.net.IDN and RFC 3940
+	 * @param name will be converted to lower case
+	 * @return name converted to lower case and punycoded if necessary
+	 * @throws IAE on various errors or if IDN is needed but not available
+	 * @since 0.8.6
+	 */
+	static String toASCII(String host) throws IllegalArgumentException {
+		host = host.toLowerCase();
+
+		boolean needsIDN = false;
+		// Here we do easy checks and throw translated exceptions.
+		// We do checks on the whole host name, not on each "label", so
+		// we allow '.', and some untranslated errors will be thrown by IDN.toASCII()
+		for (int i = 0; i < host.length(); i++) {
+			char c = host.charAt(i);
+			if (c <= 0x2c ||
+			    c == 0x2f ||
+			    c >= 0x3a && c <= 0x40 ||
+			    c >= 0x5b && c <= 0x60 ||
+			    c >= 0x7b && c <= 0x7f) {
+				String bad = "\"" + c + "\" (0x" + Integer.toHexString(c) + ')';
+				throw new IllegalArgumentException(_("Host name \"{0}\" contains illegal character {1}",
+                                                                     host, bad));
+			}
+			if (c == DOT2)
+				 host = host.replace(DOT2, DOT);
+			else if (c == DOT3)
+				 host = host.replace(DOT3, DOT);
+			else if (c == DOT4)
+				 host = host.replace(DOT4, DOT);
+			else if (c > 0x7f)
+				needsIDN = true;
+		}
+		if (host.startsWith("-"))
+			throw new IllegalArgumentException(_("Host name cannot start with \"{0}\"", "-"));
+		if (host.startsWith("."))
+			throw new IllegalArgumentException(_("Host name cannot start with \"{0}\"", "."));
+		if (host.endsWith("-"))
+			throw new IllegalArgumentException(_("Host name cannot end with \"{0}\"", "-"));
+		if (host.endsWith("."))
+			throw new IllegalArgumentException(_("Host name cannot end with \"{0}\"", "."));
+		if (needsIDN) {
+			if (host.startsWith("xn--"))
+				throw new IllegalArgumentException(_("Host name cannot start with \"{0}\"", "xn--"));
+			if (host.contains(".xn--"))
+				throw new IllegalArgumentException(_("Host name cannot contain \"{0}\"", ".xn--"));
+			if (haveIDN)
+				return IDN.toASCII(host, IDN.ALLOW_UNASSIGNED);
+			throw new IllegalArgumentException(_("Host name \"{0}\" requires conversion to ASCII but the conversion library is unavailable in this JVM", host));
+		}
+		return host;
 	}
 
 	/** @since 0.8.6 */
@@ -182,5 +251,10 @@ public class AddressBean
 	/** translate */
 	private static String _(String s, Object o) {
 		return Messages.getString(s, o);
+	}
+
+	/** translate */
+	private static String _(String s, Object o, Object o2) {
+		return Messages.getString(s, o, o2);
 	}
 }

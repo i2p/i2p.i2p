@@ -58,7 +58,7 @@ public class AddressbookBean
 		return search;
 	}
 	public void setSearch(String search) {
-		this.search = search;
+		this.search = DataHelper.stripHTML(search).trim();  // XSS;
 	}
 	public boolean isHasFilter()
 	{
@@ -331,6 +331,8 @@ public class AddressbookBean
 					} else {
 						message = _("No entries selected to delete.");
 					}
+					if (action.equals(_("Delete Entry")))
+						search = null;
 				}
 				if( changed ) {
 					try {
@@ -390,7 +392,7 @@ public class AddressbookBean
 			filter = null;
 			search = null;
 		}
-		this.filter = filter;
+		this.filter = DataHelper.stripHTML(filter);  // XSS
 	}
 	public String getDestination() {
 		return destination;
@@ -405,7 +407,7 @@ public class AddressbookBean
 		deletionMarks.clear();
 	}
 	public void setMarkedForDeletion( String name ) {
-		deletionMarks.addLast( name );
+		deletionMarks.addLast( DataHelper.stripHTML(name) );    // XSS
 	}
 	public void setHostname(String hostname) {
 		this.hostname = DataHelper.stripHTML(hostname).trim();  // XSS

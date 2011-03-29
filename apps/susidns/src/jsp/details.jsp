@@ -126,11 +126,13 @@
 </div>
 <div id="buttons">
 <form method="POST" action="addressbook.jsp">
+<p class="buttons">
 <input type="hidden" name="serial" value="${book.serial}">
 <input type="hidden" name="begin" value="0">
 <input type="hidden" name="end" value="99">
 <input type="hidden" name="checked" value="<%=detail%>">
 <input type="submit" name="action" value="<%=intl._("Delete Entry")%>" >
+</p>
 </form>
 </div>
 <%
