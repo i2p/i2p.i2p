@@ -306,6 +306,18 @@ public class NamingServiceBean extends AddressbookBean
 	public AddressBean getLookup() {
 		if (this.detail == null)
 			return null;
+		if (isDirect()) {
+			// go to some trouble to make this work for the published addressbook
+			this.filter = this.detail.substring(0, 1);
+			this.search = this.detail;
+			// we don't want the messages, we just want to populate entries
+			super.getLoadBookMessages();
+			for (int i = 0; i < this.entries.length; i++) {
+				if (this.search.equals(this.entries[i].getName()))
+					return this.entries[i];
+			}
+			return null;
+		}
 		Properties nsOptions = new Properties();
 		Properties outProps = new Properties();
 		nsOptions.setProperty("list", getFileName());

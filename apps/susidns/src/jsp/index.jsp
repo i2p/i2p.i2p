@@ -82,7 +82,7 @@
 <%=intl._("Hosts in the private addressbook can be accessed by you but their addresses are never distributed to others.")%>
 <%=intl._("The private addressbook can also be used for aliases of hosts in your other addressbooks.")%>
 </p>
-<p><center><img src="images/how.png" border="0" alt="addressbook working scheme" title="How the addressbook works" class="illustrate" /></center></p>
+<center><img src="images/how.png" border="0" alt="addressbook working scheme" title="How the addressbook works" class="illustrate" /></center>
 </div>	
 <hr>
 <div id="footer">

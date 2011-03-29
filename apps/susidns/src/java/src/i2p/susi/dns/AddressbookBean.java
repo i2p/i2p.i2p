@@ -258,7 +258,7 @@ public class AddressbookBean
 				           "&amp;begin=" + newBegin + "&amp;end=" + newEnd + "\">" + newBegin +
 				           '-' + newEnd + "</a> | ";
 	       		}
-			message += ' ' + _("Showing {0} of {1}", "" + getBegin() + '-' + getEnd(), Integer.valueOf(resultCount));
+			message += ' ' + _("Showing {0} of {1}", getBegin() + '-' + getEnd(), Integer.valueOf(resultCount));
 			if (getEndInt() < resultCount - 1) {
 				int newBegin = Math.min(resultCount - 1, getEndInt() + 1);
 				int newEnd = Math.min(resultCount, getEndInt() + DISPLAY_SIZE);
