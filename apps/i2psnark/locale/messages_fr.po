@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-25 12:48+0000\n"
-"PO-Revision-Date: 2011-03-26 09:58+0100\n"
+"PO-Revision-Date: 2011-03-30 22:08+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "Language: \n"
@@ -205,17 +205,17 @@ msgstr "Le fichier torrent \"{0}\" ne peut pas se terminer par \".torrent\", sup
 #: ../java/src/org/klomp/snark/SnarkManager.java:980
 #, java-format
 msgid "No pieces in \"{0}\",  deleting it!"
-msgstr "Pas de morceaux dans \"{0}\", suppression!"
+msgstr "Pas de tronçon dans \"{0}\", suppression!"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:982
 #, java-format
 msgid "Too many pieces in \"{0}\", limit is {1}, deleting it!"
-msgstr "Trop de morceaux dans \"{0}\" , la limite est {1}, suppression!"
+msgstr "Trop de tronçons dans \"{0}\" , la limite est {1}, suppression!"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:984
 #, java-format
 msgid "Pieces are too large in \"{0}\" ({1}B), deleting it."
-msgstr "Les morceaux sont trop larges dans \"{0}\" ({1}B), suppresion."
+msgstr "Les tronçons sont trop larges dans \"{0}\" ({1}B), suppresion."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:985
 #, java-format
@@ -598,19 +598,19 @@ msgstr "Seed"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1077
 msgid "Uninteresting (The peer has no pieces we need)"
-msgstr "aucun intérêt (le pair n'a aucun morceau utile)"
+msgstr "aucun intérêt (le pair n'a aucun tronçon utile)"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1079
 msgid "Choked (The peer is not allowing us to request pieces)"
-msgstr "bridé (le pair ne nous permet pas de demander un morceau)"
+msgstr "bridé (le pair ne nous permet pas de demander des tronçons)"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1099
 msgid "Uninterested (We have no pieces the peer needs)"
-msgstr "aucun intérêt (nous n'avons aucun morceau utile au pair)"
+msgstr "aucun intérêt (nous n'avons aucun tronçon utile au pair)"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1101
 msgid "Choking (We are not allowing the peer to request pieces)"
-msgstr "bridage (nous ne permettons pas au pair de demander un morceau)"
+msgstr "bridage (nous ne permettons pas au pair de demander un tronçon)"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1159
 #, java-format
@@ -811,11 +811,11 @@ msgstr "Fichiers"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1674
 msgid "Pieces"
-msgstr "Pièces"
+msgstr "Tronçons"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1675
 msgid "Piece size"
-msgstr "Taille des pièces"
+msgstr "Taille des tronçons"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1697
 msgid "Magnet link"
@@ -883,7 +883,7 @@ msgstr "Torrent déjà actif: {0}"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1990
 #, java-format
 msgid "Torrent already in the queue: {0}"
-msgstr "Torrent déjà dans la queue: {0}"
+msgstr "Torrent déjà dans la file d'attente: {0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1996
 #, java-format
@@ -893,7 +893,7 @@ msgstr "Le torrent {0} n'est pas valide"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2003
 #, java-format
 msgid "Torrent was not retrieved from {0}"
-msgstr "Le torrent n’a pas été reçu par {0}"
+msgstr "Le torrent n’a pas été reçu de {0}"
 
 #~ msgid "Torrent file must originate from an I2P-based tracker"
 #~ msgstr "Le fichier torrent doit provenir d'un tracker I2P"
