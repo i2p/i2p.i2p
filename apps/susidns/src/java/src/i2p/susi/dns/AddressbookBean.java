@@ -247,8 +247,8 @@ public class AddressbookBean
 				//message = _("This addressbook is empty.");
 				message = "";
 			else
-				message = ngettext("Addressbook contains 1 entry.",
-				                   "Addressbook contains {0} entries.",
+				message = ngettext("Address book contains 1 entry.",
+				                   "Address book contains {0} entries.",
 				                   resultCount);
 		}
 		if (resultCount <= 0) {
@@ -294,9 +294,9 @@ public class AddressbookBean
 
 							String oldDest = (String) addressbook.get(host);
 							if (destination.equals(oldDest)) {
-								message = _("Host name {0} is already in addressbook, unchanged.", displayHost);
+								message = _("Host name {0} is already in address book, unchanged.", displayHost);
 							} else if (oldDest != null && !action.equals(_("Replace"))) {
-								message = _("Host name {0} is already in addressbook with a different destination. Click \"Replace\" to overwrite.", displayHost);
+								message = _("Host name {0} is already in address book with a different destination. Click \"Replace\" to overwrite.", displayHost);
 							} else {
 								boolean valid = true;
 								try {
@@ -357,7 +357,7 @@ public class AddressbookBean
 				if( changed ) {
 					try {
 						save();
-						message += "<br>" + _("Addressbook saved.");
+						message += "<br>" + _("Address book saved.");
 					} catch (Exception e) {
 						Debug.debug( e.getClass().getName() + ": " + e.getMessage() );
 						message += "<br>" + _("ERROR: Could not write addressbook file.");

@@ -239,9 +239,9 @@ public class NamingServiceBean extends AddressbookBean
 							Properties outProperties= new Properties();
 							Destination oldDest = getNamingService().lookup(host, nsOptions, outProperties);
 							if (oldDest != null && destination.equals(oldDest.toBase64())) {
-								message = _("Host name {0} is already in addressbook, unchanged.", displayHost);
+								message = _("Host name {0} is already in address book, unchanged.", displayHost);
 							} else if (oldDest != null && !action.equals(_("Replace"))) {
-								message = _("Host name {0} is already in addressbook with a different destination. Click \"Replace\" to overwrite.", displayHost);
+								message = _("Host name {0} is already in address book with a different destination. Click \"Replace\" to overwrite.", displayHost);
 							} else {
 								try {
 									Destination dest = new Destination(destination);
@@ -308,7 +308,7 @@ public class NamingServiceBean extends AddressbookBean
 						search = null;
 				}
 				if( changed ) {
-					message += "<br>" + _("Addressbook saved.");
+					message += "<br>" + _("Address book saved.");
 				}
 			}			
 			else {

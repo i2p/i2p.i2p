@@ -88,7 +88,7 @@
 <%
     if (addr.isIDN()) {
 %>
-<td><%=intl._("Punycode Name")%></td>
+<td><%=intl._("Encoded Name")%></td>
 <td><a href="http://<%=addr.getName()%>/"><%=addr.getName()%></a></td>
 </tr><tr class="list${book.trClass}">
 <%

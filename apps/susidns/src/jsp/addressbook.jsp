@@ -43,7 +43,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>${book.book} <%=intl._("addressbook")%> - susidns</title>
+<title>${book.book} <%=intl._("address book")%> - susidns</title>
 <link rel="stylesheet" type="text/css" href="css.css">
 </head>
 <body>
@@ -177,7 +177,7 @@ ${book.loadBookMessages}
 
 <c:if test="${book.isEmpty}">
 <div id="book">
-<p class="book"><%=intl._("This addressbook is empty.")%></p>
+<p class="book"><%=intl._("This address book is empty.")%></p>
 </div>
 </c:if>
 
