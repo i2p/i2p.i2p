@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-26 08:34+0000\n"
-"PO-Revision-Date: 2011-03-29 00:53+0100\n"
+"PO-Revision-Date: 2011-03-30 22:34+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "Language: \n"
@@ -81,7 +81,7 @@ msgstr[1] "{0} jours"
 #: ../../../router/java/src/net/i2p/router/Blocklist.java:122
 #, java-format
 msgid "Banned by router hash: {0}"
-msgstr "Banni(s) pour hachage routeur hash: {0}"
+msgstr "Banni(s) par hachage routeur: {0}"
 
 #: ../../../router/java/src/net/i2p/router/Blocklist.java:124
 msgid "Banned by router hash"
@@ -1420,7 +1420,7 @@ msgstr "Îles mineures éloignées des États-Unis"
 
 #: ../java/build/Countries.java:223
 msgid "United States"
-msgstr "États unis d\\''amérique"
+msgstr "États unis"
 
 #: ../java/build/Countries.java:224
 msgid "Uruguay"
@@ -2318,7 +2318,7 @@ msgstr "Options Sortants"
 
 #: ../java/src/net/i2p/router/web/ConfigUIHandler.java:31
 msgid "Theme change saved."
-msgstr "Changement de thème sauvegardé."
+msgstr "Changement de thème enregistré."
 
 #: ../java/src/net/i2p/router/web/ConfigUIHandler.java:33
 msgid "Refresh the page to view."
@@ -2366,11 +2366,11 @@ msgstr "Suédois"
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:85
 msgid "Update available, attempting to download now"
-msgstr "Mise à jour disponible, en tentant de la télécharger actuellement"
+msgstr "Mise à jour disponible, essai de téléchargement en cours"
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:87
 msgid "Update available, click button on left to download"
-msgstr "Mise à jour disponible, cliquez sur le bouton sur la gauche pour la télécharger"
+msgstr "Mise à jour disponible, cliquez sur le bouton de gauche pour la télécharger"
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:93
 msgid "No update available"
@@ -2579,7 +2579,7 @@ msgstr "Tunnel"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:215
 msgid "View LeaseSets"
-msgstr "Afficher les LeaseSets"
+msgstr "Afficher les jeux de baux"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:217
 msgid "Not initialized"
@@ -2679,7 +2679,7 @@ msgstr "NTCP et SSU"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:404
 msgid "NTCP and SSU with introducers"
-msgstr "NTCP et SSU avec introducers"
+msgstr "NTCP et SSU avec présentateurs"
 
 #: ../java/src/net/i2p/router/web/NewsFetcher.java:92
 #, java-format
@@ -4609,7 +4609,7 @@ msgstr "ERR - Port UDP en cours d\\''utilisation - réglez i2np.udp.internalPort
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:671
 msgid "I2P was unable to bind to port 8887 or other configured port."
-msgstr "I2P n\\''a pas pu s\\''attacher au port 8887 ou un autre port configuré."
+msgstr "I2P n\\''a pas pu s\\''attacher au port configuré."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:673
 msgid "Check to see if another program is using the configured port. If so, stop that program or configure I2P to use a different port."
@@ -5234,7 +5234,7 @@ msgstr "Méthode de mise à jour"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:349
 msgid "Update through the eepProxy?"
-msgstr "Mettre à jour utilisant l\\''eeProxy ?"
+msgstr "Mettre à jour via l\\''eeProxy ?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:353
 msgid "eepProxy host"
