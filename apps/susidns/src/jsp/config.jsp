@@ -45,7 +45,7 @@
 <body>
 <div class="page">
 <div id="logo">
-<img src="images/logo.png" alt="susidns logo" border="0"/>
+<a href="index.jsp"><img src="images/logo.png" alt="" title="<%=intl._("Overview")%>" border="0"/></a>
 </div><hr>
 <div id="navi">
 <p>

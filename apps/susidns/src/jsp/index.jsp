@@ -62,27 +62,27 @@
 <div id="content">
 <h3><%=intl._("What is the addressbook?")%></h3>
 <p>
-<%=intl._("The addressbook application is part of your i2p installation.")%>
+<%=intl._("The addressbook application is part of your I2P installation.")%>
 <%=intl._("It regularly updates your hosts.txt file from distributed sources or \"subscriptions\".")%>
 </p>
 <p>
-<%=intl._("In the default configuration, the addressbook is only subscribed to www.i2p2.i2p.")%>
+<%=intl._("In the default configuration, the address book is only subscribed to www.i2p2.i2p.")%>
 <%=intl._("Subscribing to additional sites is easy, just add them to your <a href=\"subscriptions.jsp\">subscriptions</a> file.")%>
 </p>
 <p>
-<%=intl._("For more information on naming in i2p, see <a href=\"http://www.i2p2.i2p/naming.html\">the overview on www.i2p2.i2p</a>.")%>
+<%=intl._("For more information on naming in I2P, see <a href=\"http://www.i2p2.i2p/naming.html\">the overview on www.i2p2.i2p</a>.")%>
 </p>
-<h3><%=intl._("How does the addressbook work?")%></h3>
+<h3><%=intl._("How does the addressbook application work?")%></h3>
 <p>
-<%=intl._("The addressbook application regularly polls your subscriptions and merges their content into your \"router\" addressbook, stored in the hosts.txt file.")%>
-<%=intl._("Then it merges your \"master\" addressbook (userhosts.txt) into the router addressbook as well.")%>
-<%=intl._("If configured, the router addressbook is now written to the \"published\" addressbook, which will be publicly available if you are running an eepsite.")%>
+<%=intl._("The addressbook application regularly polls your subscriptions and merges their content into your \"router\" address book.")%>
+<%=intl._("Then it merges your \"master\" address book into the router address book as well.")%>
+<%=intl._("If configured, the router address book is now written to the \"published\" address book, which will be publicly available if you are running an eepsite.")%>
 </p><p>
-<%=intl._("The router also uses a private addressbook (privatehosts.txt, not shown in the picture), which is not merged or published.")%>
-<%=intl._("Hosts in the private addressbook can be accessed by you but their addresses are never distributed to others.")%>
-<%=intl._("The private addressbook can also be used for aliases of hosts in your other addressbooks.")%>
+<%=intl._("The router also uses a private address book (not shown in the picture), which is not merged or published.")%>
+<%=intl._("Hosts in the private address book can be accessed by you but their addresses are never distributed to others.")%>
+<%=intl._("The private address book can also be used for aliases of hosts in your other address books.")%>
 </p>
-<center><img src="images/how.png" border="0" alt="addressbook working scheme" title="How the addressbook works" class="illustrate" /></center>
+<center><img src="images/how.png" border="0" alt="address book working scheme" title="How the address book works" class="illustrate" /></center>
 </div>	
 <hr>
 <div id="footer">
