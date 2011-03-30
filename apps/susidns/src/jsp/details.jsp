@@ -51,19 +51,20 @@
 <hr>
 <div id="navi">
 <p>
-<%=intl._("addressbooks")%>
+<%=intl._("Address books")%>:
 <a href="addressbook.jsp?book=private&amp;filter=none&amp;begin=0&amp;end=99"><%=intl._("private")%></a> |
 <a href="addressbook.jsp?book=master&amp;filter=none&amp;begin=0&amp;end=99"><%=intl._("master")%></a> |
 <a href="addressbook.jsp?book=router&amp;filter=none&amp;begin=0&amp;end=99"><%=intl._("router")%></a> |
 <a href="addressbook.jsp?book=published&amp;filter=none&amp;begin=0&amp;end=99"><%=intl._("published")%></a> *
-<a href="subscriptions.jsp"><%=intl._("subscriptions")%></a> *
-<a href="config.jsp"><%=intl._("configuration")%></a> *
-<a href="index.jsp"><%=intl._("overview")%></a>
+<a href="subscriptions.jsp"><%=intl._("Subscriptions")%></a> *
+<a href="config.jsp"><%=intl._("Configuration")%></a> *
+<a href="index.jsp"><%=intl._("Overview")%></a>
 </p>
 </div>
 <hr>
 <div id="headline">
-<h3><%=intl._(book.getBook())%> <%=intl._("addressbook")%>: ${book.fileName}</h3>
+<h3><%=intl._("Address book")%>: <%=intl._(book.getBook())%></h3>
+<h4><%=intl._("Storage")%>: ${book.displayName}</h4>
 </div>
 
 <div id="book">

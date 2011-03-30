@@ -129,6 +129,11 @@ public class AddressbookBean
 		return filename;
 	}
 
+	public String getDisplayName()
+	{
+		return getFileName();
+	}
+
 	protected AddressBean[] entries;
 
 	public AddressBean[] getEntries()
@@ -306,6 +311,8 @@ public class AddressbookBean
 										message = _("Destination added for {0}.", displayHost);
 									else
 										message = _("Destination changed for {0}.", displayHost);
+									if (!host.endsWith(".i2p"))
+										message += "<br>" + _("Warning - host name does not end with \".i2p\"");
 									// clear form
 									hostname = null;
 									destination = null;

@@ -96,6 +96,15 @@ public class NamingServiceBean extends AddressbookBean
 		return basename(filename);
 	}
 
+	@Override
+	public String getDisplayName()
+	{
+		if (isDirect())
+			return super.getDisplayName();
+		loadConfig();
+		return _("{0} address book in {1} database", getFileName(), getNamingService().getName());
+	}
+
 	/** depth-first search */
 	private static NamingService searchNamingService(NamingService ns, String srch)
 	{
@@ -248,11 +257,13 @@ public class NamingServiceBean extends AddressbookBean
 											message = _("Destination added for {0}.", displayHost);
 										else
 											message = _("Destination changed for {0}.", displayHost);
+										if (!host.endsWith(".i2p"))
+											message += "<br>" + _("Warning - host name does not end with \".i2p\"");
 										// clear form
 										hostname = null;
 										destination = null;
 									} else {
-										message = _("Failed to add Destination for {0} to naming service {1}", displayHost, getNamingService()) + "<br>";
+										message = _("Failed to add Destination for {0} to naming service {1}", displayHost, getNamingService().getName()) + "<br>";
 									}
 								} catch (DataFormatException dfe) {
 									message = _("Invalid Base 64 destination.");
@@ -276,7 +287,7 @@ public class NamingServiceBean extends AddressbookBean
 						String uni = AddressBean.toUnicode(n);
 						String displayHost = uni.equals(n) ? n :  uni + " (" + n + ')';
 						if (!success) {
-							message += _("Failed to delete Destination for {0} from naming service {1}", displayHost, getNamingService()) + "<br>";
+							message += _("Failed to delete Destination for {0} from naming service {1}", displayHost, getNamingService().getName()) + "<br>";
 						} else if (deleted++ == 0) {
 							changed = true;
 							name = displayHost;

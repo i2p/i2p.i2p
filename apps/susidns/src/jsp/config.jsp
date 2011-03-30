@@ -49,14 +49,14 @@
 </div><hr>
 <div id="navi">
 <p>
-<%=intl._("addressbooks")%>
+<%=intl._("Address books")%>:
 <a href="addressbook.jsp?book=private"><%=intl._("private")%></a> |
 <a href="addressbook.jsp?book=master"><%=intl._("master")%></a> |
 <a href="addressbook.jsp?book=router"><%=intl._("router")%></a> |
 <a href="addressbook.jsp?book=published"><%=intl._("published")%></a> *
-<a href="subscriptions.jsp"><%=intl._("subscriptions")%></a> *
-<%=intl._("configuration")%> *
-<a href="index.jsp"><%=intl._("overview")%></a>
+<a href="subscriptions.jsp"><%=intl._("Subscriptions")%></a> *
+<%=intl._("Configuration")%> *
+<a href="index.jsp"><%=intl._("Overview")%></a>
 </p>
 </div><hr>
 <div id="headline">
