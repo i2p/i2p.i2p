@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: I2P desktopgui\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-03 18:29+0000\n"
-"PO-Revision-Date: 2011-03-25 10:12+0100\n"
-"Last-Translator: \n"
+"PO-Revision-Date: 2011-03-30 21:58+0100\n"
+"Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -52,5 +52,5 @@ msgstr "configuration de l'icône de notification"
 
 #: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:47
 msgid "Should tray icon be enabled?"
-msgstr "Activer l'icône de notification?"
+msgstr "Activer l'icône de notification"
 
