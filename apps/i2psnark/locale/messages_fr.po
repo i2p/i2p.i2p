@@ -883,7 +883,7 @@ msgstr "Torrent déjà actif: {0}"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1990
 #, java-format
 msgid "Torrent already in the queue: {0}"
-msgstr "Torrent déjà dans la file d'attente: {0}"
+msgstr "Torrent déjà dans la file d\\''attente: {0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1996
 #, java-format

@@ -155,8 +155,8 @@ msgstr "Réamorçage en cours"
 #, java-format
 msgid "Reseed fetched only 1 router."
 msgid_plural "Reseed fetched only {0} routers."
-msgstr[0] "Le réamorçage n'a trouvé qu'un seul routeur."
-msgstr[1] "Le réamorçage n'a trouvé que {0} routeurs."
+msgstr[0] "Le réamorçage n\\''a trouvé qu\\''un seul routeur."
+msgstr[1] "Le réamorçage n\\''a trouvé que {0} routeurs."
 
 #: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:148
 msgid "Reseed failed."
@@ -178,7 +178,7 @@ msgstr "Réamorçage: collecte des URL sources."
 #: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:335
 #, java-format
 msgid "Reseeding: fetching router info from seed URL ({0} successful, {1} errors)."
-msgstr "Réamorçage: collecte routerInfo depuis l'URL source ({0} réussie, {1} erreurs)."
+msgstr "Réamorçage: collecte routerInfo depuis l\\''URL source ({0} réussie, {1} erreurs)."
 
 #: ../../../router/java/src/net/i2p/router/transport/CommSystemFacadeImpl.java:512
 msgid "NetDb entry"
@@ -382,7 +382,7 @@ msgstr "Le nombre de paquets en double reçus du pair"
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java:627
 #, java-format
 msgid "Excessive clock skew: {0}"
-msgstr "Décalage excessif de l'horloge: {0}"
+msgstr "Décalage excessif de l\\''horloge: {0}"
 
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:732
 msgid "NTCP connections"
@@ -1549,7 +1549,7 @@ msgstr "Greffon {0} arrêté"
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:103
 #, java-format
 msgid "Error stopping plugin {0}"
-msgstr "Erreur d'arrêt du greffon {0}"
+msgstr "Erreur d\\''arrêt du greffon {0}"
 
 #. label (IE)
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:124
@@ -2819,7 +2819,7 @@ msgstr "Ce greffon est seulement une mise à jour, mais le greffon prérequis n'
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:364
 #, java-format
 msgid "Failed to install plugin in {0}"
-msgstr "Échec d'installation du greffon {0}"
+msgstr "Échec d\\''installation du greffon {0}"
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:371
 #, java-format
@@ -3079,7 +3079,7 @@ msgstr "Le bannissement temporaire expire dans {0}"
 #: ../java/src/net/i2p/router/web/ShitlistRenderer.java:64
 #, java-format
 msgid "Banned until restart or in {0}"
-msgstr "Banni jusqu'au redémarrage ou dans {0}"
+msgstr "Banni jusqu\\''au redémarrage ou dans {0}"
 
 #: ../java/src/net/i2p/router/web/ShitlistRenderer.java:76
 msgid "unban now"
@@ -3199,7 +3199,7 @@ msgstr[1] "Il y a eu {0} évènements sur cette période."
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:203
 #, java-format
 msgid "The period ended {0} ago."
-msgstr "La période s'est terminée il y a {0}."
+msgstr "La période s\\''est terminée il y a {0}."
 
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:205
 msgid "No events"
@@ -4193,7 +4193,7 @@ msgstr "NOTE"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:361
 #, java-format
 msgid "You have configured I2P to share only {0} KBps."
-msgstr "Vous avez configuré I2P pour qu'il ne partage que {0} ko/s."
+msgstr "Vous avez configuré I2P pour qu\\''il ne partage que {0} ko/s."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:364
 msgid "I2P requires at least 12KBps to enable sharing. "
@@ -5077,7 +5077,7 @@ msgstr "Lancer le navigateur au démarrage du routeur?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:379
 msgid "I2P's main configuration interface is this web console, so for your convenience I2P can launch a web browser on startup pointing at"
-msgstr "La plus grande partie de la configuration d\'I2P se fait dans cette console, et donc pour votre confort, I2P peut lancer  au démarrage votre navigateur sur "
+msgstr "La plus grande partie de la configuration d'I2P se fait dans cette console, et donc pour votre confort, I2P peut lancer  au démarrage votre navigateur sur "
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:113
 msgid "config stats"
@@ -5431,7 +5431,7 @@ msgstr "Statistiques du routeur I2P"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/summaryframe_jsp.java:255
 #, java-format
 msgid "Disable {0} Refresh"
-msgstr "Désactiver l'actualisation automatique {0}"
+msgstr "Désactiver l\\''actualisation automatique {0}"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:111
 msgid "tunnel summary"
