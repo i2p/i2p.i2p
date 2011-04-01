@@ -42,6 +42,7 @@ trans.zh_CN = apps/susidns/locale/messages_zh.po
 [I2P.desktopgui]
 source_file = apps/desktopgui/locale/messages_en.po
 source_lang = en
+trans.de = apps/desktopgui/locale/messages_de.po
 trans.es = apps/desktopgui/locale/messages_es.po
 trans.fr = apps/desktopgui/locale/messages_fr.po
 trans.nl = apps/desktopgui/locale/messages_nl.po
