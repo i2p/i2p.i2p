@@ -48,8 +48,8 @@ msgstr "I2P beenden"
 
 #: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:44
 msgid "Tray icon configuration"
-msgstr "Tray Icon konfigurieren"
+msgstr "Systemleistensymbol konfigurieren"
 
 #: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:47
 msgid "Should tray icon be enabled?"
-msgstr " Tray Icon aktivieren?"
+msgstr "Systemleistensymbol aktivieren?"
