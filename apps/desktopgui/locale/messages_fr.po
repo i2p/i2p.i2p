@@ -48,7 +48,7 @@ msgstr "Arrêter I2P"
 
 #: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:44
 msgid "Tray icon configuration"
-msgstr "configuration de l'icône de notification"
+msgstr "Configuration de l'icône de notification"
 
 #: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:47
 msgid "Should tray icon be enabled?"
