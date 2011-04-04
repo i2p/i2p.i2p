@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P i2ptunnel\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-25 15:21+0000\n"
-"PO-Revision-Date: 2011-03-25 18:18+0100\n"
+"PO-Revision-Date: 2011-04-04 22:26+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
 "Language: \n"
@@ -21,11 +21,11 @@ msgstr ""
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:474
 #, java-format
 msgid "To visit the destination in your host database, click <a href=\"{0}\">here</a>. To visit the conflicting addresshelper destination, click <a href=\"{1}\">here</a>."
-msgstr "Pour aller à la destination de votre base de données d\\''hôtes, cliquez <a href=\"{0}\">here</a>. Pour aller à la destination de l\\''aide d\\''adresse en conflit, cliquez <a href=\"{1}\">là</a>."
+msgstr "Pour aller à la destination de votre base de données d'hôtes, cliquez <a href=\"{0}\">here</a>. Pour aller à la destination de l'aide d'adresse en conflit, cliquez <a href=\"{1}\">là</a>."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:931
 msgid "Click a link below to look for an address helper by using a \"jump\" service:"
-msgstr "Cliquez sur un des liens ci-dessous pour chercher une aide d'adresse en utilisant un service de \"saut\":"
+msgstr "Cliquez sur un des liens ci-dessous pour chercher une aide d'adresse en utilisant un \"service de saut\":"
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:326
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:336
@@ -34,7 +34,7 @@ msgstr "interne"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:171
 msgid "Invalid form submission, probably because you used the 'back' or 'reload' button on your browser. Please resubmit."
-msgstr "Échec de soumission du formulaire: vous avez peut-être utilisé le bouton 'Page précédente' ou 'Recherger' de votre navigateur. Merci de soumettre à nouveau."
+msgstr "Échec de soumission du formulaire: vous avez peut-être utilisé le bouton \"Page précédente\" ou \"Recharger\" de votre navigateur. Merci de soumettre à nouveau."
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:218
 msgid "Configuration reloaded for all tunnels"
