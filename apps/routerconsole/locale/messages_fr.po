@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-26 08:34+0000\n"
-"PO-Revision-Date: 2011-04-04 14:28+0100\n"
+"PO-Revision-Date: 2011-04-04 22:06+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "Language: \n"
@@ -1856,7 +1856,7 @@ msgstr "Tunnels"
 
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:18
 msgid "UI"
-msgstr "IHM"
+msgstr "Apparence"
 
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:19
 msgid "Clients"
@@ -3771,7 +3771,7 @@ msgstr "cliquez sur Redémarrer pour installer"
 #: ../java/src/net/i2p/router/web/UnsignedUpdateHandler.java:121
 #: ../java/src/net/i2p/router/web/UpdateHandler.java:291
 msgid "Click Shutdown and restart to install"
-msgstr "Cliquez sur \"Arrêter\" et redémarrez pour installer"
+msgstr "Cliquez sur \"Arrêter\" puis \"Démarrer\" pour installer"
 
 #: ../java/src/net/i2p/router/web/UnsignedUpdateHandler.java:122
 #: ../java/src/net/i2p/router/web/UpdateHandler.java:293
