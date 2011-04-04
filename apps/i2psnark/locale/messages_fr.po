@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-25 12:48+0000\n"
-"PO-Revision-Date: 2011-03-30 22:08+0100\n"
+"PO-Revision-Date: 2011-04-04 22:20+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "Language: \n"
@@ -215,17 +215,17 @@ msgstr "Trop de tronçons dans \"{0}\" , la limite est {1}, suppression!"
 #: ../java/src/org/klomp/snark/SnarkManager.java:984
 #, java-format
 msgid "Pieces are too large in \"{0}\" ({1}B), deleting it."
-msgstr "Les tronçons sont trop larges dans \"{0}\" ({1}B), suppresion."
+msgstr "Les tronçons sont trop larges dans \"{0}\" ({1}B), suppression."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:985
 #, java-format
 msgid "Limit is {0}B"
-msgstr "La limite est de \"{0}\"Octets"
+msgstr "La limite est de \"{0}\"octets"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:993
 #, java-format
 msgid "Torrents larger than {0}B are not supported yet, deleting \"{1}\""
-msgstr "Les torrents dont la taille est supérieure à \"{0}\"Octets ne sont pas encore supportés, suppression \"{1}\"."
+msgstr "Les torrents dont la taille est supérieure à \"{0}\"octets ne sont pas encore supportés, suppression \"{1}\"."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:1009
 #, java-format
