@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-26 08:34+0000\n"
-"PO-Revision-Date: 2011-04-04 22:06+0100\n"
+"PO-Revision-Date: 2011-04-04 22:12+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "Language: \n"
@@ -1735,7 +1735,7 @@ msgstr "Vérifier les mises à jour"
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:263
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:18
 msgid "Update"
-msgstr "Mettre à jour"
+msgstr "Mise à jour"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:268
 #, java-format
