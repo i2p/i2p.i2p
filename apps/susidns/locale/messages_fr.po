@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P susidns\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-24 16:49+0000\n"
-"PO-Revision-Date: 2011-04-04 22:37+0100\n"
+"PO-Revision-Date: 2011-04-06 17:16+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
 "Language: \n"
@@ -72,12 +72,12 @@ msgstr "Remplacer"
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:264
 #, java-format
 msgid "Host name {0} is already in addressbook, unchanged."
-msgstr "L'hôte {0} est déjà présent: inchangé."
+msgstr "L\\''hôte {0} est déjà présent: inchangé."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:266
 #, java-format
 msgid "Host name {0} is already in addressbook with a different destination. Click \"Replace\" to overwrite."
-msgstr "L'hôte {0} est déjà présent avec une destination différente. Cliquez sur \"Remplacer\"...pour le remplacer."
+msgstr "L\\''hôte {0} est déjà présent avec une destination différente. Cliquez sur \"Remplacer\"...pour le remplacer."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:278
 #, java-format
