@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-26 08:34+0000\n"
-"PO-Revision-Date: 2011-04-04 22:12+0100\n"
+"PO-Revision-Date: 2011-04-06 17:32+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "Language: \n"
@@ -155,7 +155,7 @@ msgstr "Réamorçage en cours"
 #, java-format
 msgid "Reseed fetched only 1 router."
 msgid_plural "Reseed fetched only {0} routers."
-msgstr[0] "Le réamorçage n\\''a trouvé qu\\''un seul routeur."
+msgstr[0] "Le réamorçage n'a trouvé qu'un seul routeur."
 msgstr[1] "Le réamorçage n\\''a trouvé que {0} routeurs."
 
 #: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:148
@@ -5431,7 +5431,7 @@ msgstr "Statistiques du routeur I2P"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/summaryframe_jsp.java:255
 #, java-format
 msgid "Disable {0} Refresh"
-msgstr "Désactiver l\\''actualisation automatique {0}"
+msgstr "Désactiver l'actualisation automatique {0}"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/tunnels_jsp.java:111
 msgid "tunnel summary"
