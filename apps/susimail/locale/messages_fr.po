@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P susimail\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-24 16:49+0000\n"
-"PO-Revision-Date: 2011-04-04 22:43+0100\n"
+"PO-Revision-Date: 2011-04-06 17:20+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
 "Language: \n"
@@ -29,7 +29,7 @@ msgstr "Avertissement: pas d'encodage de transfert trouvé: retour en 7bits."
 #: src/src/i2p/susi/webmail/WebMail.java:478
 #, java-format
 msgid "No encoder found for encoding \\''{0}\\''."
-msgstr "Pas d'encodeur trouvé pour encoder \\''{0}\\''."
+msgstr "Pas d\\''encodeur trouvé pour encoder \\''{0}\\''."
 
 #: src/src/i2p/susi/webmail/WebMail.java:484
 msgid "Warning: no charset found, fallback to US-ASCII."
@@ -132,12 +132,12 @@ msgstr "ID de message incorrecte."
 #: src/src/i2p/susi/webmail/WebMail.java:958
 #, java-format
 msgid "No Encoding found for {0}"
-msgstr "Pas d'encodage trouvé pour {0}"
+msgstr "Pas d\\''encodage trouvé pour {0}"
 
 #: src/src/i2p/susi/webmail/WebMail.java:962
 #, java-format
 msgid "Could not encode data: {0}"
-msgstr "Impossible d'encoder les données: {0}"
+msgstr "Impossible d\\''encoder les données: {0}"
 
 #: src/src/i2p/susi/webmail/WebMail.java:967
 #, java-format
@@ -204,7 +204,7 @@ msgstr "Adresse d'expéditeur correcte non trouvée"
 #: src/src/i2p/susi/webmail/WebMail.java:1400
 #, java-format
 msgid "Found no valid address in \\''{0}\\''."
-msgstr "Pas d'adresse correcte dans \\''{0}\\''."
+msgstr "Pas d\\''adresse correcte dans \\''{0}\\''."
 
 #: src/src/i2p/susi/webmail/WebMail.java:1419
 msgid "No recipients found."
