@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-26 08:34+0000\n"
-"PO-Revision-Date: 2011-04-07 13:44+0100\n"
+"PO-Revision-Date: 2011-04-07 16:29+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "Language: \n"
@@ -149,7 +149,7 @@ msgstr "Refus des tunnels"
 #: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:125
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:20
 msgid "Reseeding"
-msgstr "Réamorçage en cours"
+msgstr "Réamorçage"
 
 #: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:141
 #, java-format
@@ -1509,12 +1509,12 @@ msgstr "Erreur pendant l'enregistrement de la configuration (appliquée mais non
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:35
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:355
 msgid "Save Client Configuration"
-msgstr "Sauvegarder Configuration Client "
+msgstr "Enregistrer la configuration du client "
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:39
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:427
 msgid "Save Interface Configuration"
-msgstr "Sauvegarder la configuration de l'interface"
+msgstr "Enregistrer la configuration de l'interface"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:43
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:441
@@ -1869,7 +1869,7 @@ msgstr "Porte-clés"
 
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:19
 msgid "Logging"
-msgstr "Enregistrements"
+msgstr "Historiques"
 
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:19
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:107
@@ -2239,7 +2239,7 @@ msgstr "Mise à jour des réglages pour tous les groupes."
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHandler.java:140
 msgid "Exploratory tunnel configuration saved successfully."
-msgstr "Configuration du tunnel exploratoire a été sauvegardé avec succès."
+msgstr "Configuration des tunnels exploratoires sauvegardée avec succès."
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHandler.java:142
 #: ../java/src/net/i2p/router/web/ConfigUIHandler.java:36
@@ -2285,7 +2285,7 @@ msgstr "AVERTISSEMENT de PERFORMANES: les réglages incluent des tunnels très l
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:85
 msgid "PERFORMANCE WARNING - Settings include high tunnel quantities."
-msgstr "AVERTISSEMENT de PERFORMANES: les réglages incluent de grandes quantités de tunnels!"
+msgstr "AVERTISSEMENT de PERFORMANES: les réglages incluent un grand nombre de tunnels!"
 
 #. buf.append("<tr><th></th><th>Inbound</th><th>Outbound</th></tr>\n");
 #. tunnel depth
@@ -2296,17 +2296,17 @@ msgstr "Longueur"
 #. tunnel depth variance
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:109
 msgid "Randomization"
-msgstr "Randomisation"
+msgstr "Aléas"
 
 #. tunnel quantity
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:133
 msgid "Quantity"
-msgstr "Quantité"
+msgstr "Nombre"
 
 #. tunnel backup quantity
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:150
 msgid "Backup quantity"
-msgstr "Quantité de secours"
+msgstr "Secours"
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:172
 msgid "Inbound options"
@@ -3438,11 +3438,11 @@ msgstr "Utilisée"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:386
 msgid "Exploratory"
-msgstr "Exploratoire"
+msgstr "Exploratoires"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:398
 msgid "Participating"
-msgstr "Participant"
+msgstr "Participants"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:404
 msgid "Share ratio"
@@ -3454,7 +3454,7 @@ msgstr "Afficher la file d'attente de travaux du routeur. "
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:412
 msgid "Congestion"
-msgstr "Liste des tâches"
+msgstr "Charge"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:417
 msgid "Job lag"
@@ -3500,7 +3500,7 @@ msgstr "WARN - pare-feu avec TCP entrant activé"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:130
 msgid "WARN-Firewalled and Floodfill"
-msgstr "WARN - Pare-feu et Floodfill"
+msgstr "WARN - Pare-feu et Diffuseur"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:132
 msgid "WARN-Firewalled and Fast"
@@ -4449,11 +4449,11 @@ msgstr "Ils ne sont pas <b>privés</b>."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:579
 msgid "Also, <b>do not enter a private IP address</b> like 127.0.0.1 or 192.168.1.1."
-msgstr "En plus, <b>ne saisissez pas une adresse IP privée</b> tel que 127.0.0.1 ou 192.168.1.1."
+msgstr "De plus, <b>ne saisissez pas une adresse IP privée</b> tel que 127.0.0.1 ou 192.168.1.1."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:581
 msgid "If you specify the wrong IP address or hostname, or do not properly configure your NAT or firewall, your network performance will degrade substantially."
-msgstr "Si vous saisissez une mauvaise adresse IP ou nom d'hôte, ou configurer votre NAT ou pare-feu incorrectement, votre intégration avec le réseau I2P dégradera substantiellement."
+msgstr "Si vous saisissez une mauvaise adresse IP ou nom d'hôte, ou configurez votre NAT ou pare-feu incorrectement, votre intégration avec le réseau I2P sera substantiellement dégradée."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:583
 msgid "When in doubt, leave the settings at the defaults."
@@ -5154,15 +5154,15 @@ msgstr "Modifiez ces réglages avec prudence, et fignolez-les en cas de problèm
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:351
 msgid "Exploratory tunnel setting changes are stored in the router.config file."
-msgstr "Les modifications de réglages des tunnels exploratoires sont enregistrés dans le fichier router.config."
+msgstr "Les modifications des réglages de tunnels exploratoires sont enregistrés dans le fichier router.config."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:354
 msgid "Client tunnel changes are temporary and are not saved."
-msgstr "Les modifications de tunnel client sont temporaires et ne sont pas enregistrées."
+msgstr "Les modifications des tunnels de client partagé sont temporaires et ne sont pas enregistrées."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:356
 msgid "To make permanent client tunnel changes see the"
-msgstr "Pour faire de modifications permanentes à un tunnel client, voyez la"
+msgstr "Pour faire de modifications permanentes à un tunnel client particulier, voyez la"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:358
 msgid "i2ptunnel page"
