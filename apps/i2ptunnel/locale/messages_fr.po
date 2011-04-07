@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P i2ptunnel\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-25 15:21+0000\n"
-"PO-Revision-Date: 2011-04-07 11:11+0100\n"
+"PO-Revision-Date: 2011-04-07 16:30+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
 "Language: \n"
@@ -221,7 +221,7 @@ msgstr "Options de réseau avancées"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:224
 msgid "(NOTE: when this client proxy is configured to share tunnels, then these options are for all the shared proxy clients!)"
-msgstr "(NOTE: quand ce mandataire client est configuré pour partager les tunnels, ces options sont appliquées à tous les mandataires clients partagés)"
+msgstr "(ATTENTION : quand ce mandataire client est configuré pour partager les tunnels, ces options sont appliquées à tous les mandataires clients partagés)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:226
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:245
@@ -410,7 +410,7 @@ msgstr "Activer"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:412
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:485
 msgid "Reduced tunnel count"
-msgstr "Tunnels réduits"
+msgstr "Réduire à"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:416
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:436
