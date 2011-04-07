@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-25 12:48+0000\n"
-"PO-Revision-Date: 2011-04-04 22:20+0100\n"
+"PO-Revision-Date: 2011-04-07 10:58+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "Language: \n"
@@ -97,11 +97,11 @@ msgstr "Liste des Open trackers modifiée - redémarrage des torrents requis pou
 #: ../java/src/org/klomp/snark/SnarkManager.java:454
 #, java-format
 msgid "{0} theme loaded, return to main i2psnark page to view."
-msgstr "Thème {0}  chargé, revenez à la page d'accueil d'i2psnark pour voir comme c'est beau!"
+msgstr "Thème {0}  chargé, revenez à la page d''accueil d''i2psnark pour voir comme il est beau !"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:461
 msgid "Configuration unchanged."
-msgstr "La configuration n'a pas été modifiée"
+msgstr "Aucun changement de configuration."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:471
 #, java-format
@@ -566,7 +566,7 @@ msgstr "Enlever le torrent de la liste active, suprression du fichier .torrent"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:987
 #, java-format
 msgid "Are you sure you want to delete the file \\''{0}.torrent\\'' (downloaded data will not be deleted) ?"
-msgstr "Etes-vous certain de vouloir supprimer le fichier  \\''{0}.torrent\\'' (les données déjà téléchargées ne seront pas supprimées) ?"
+msgstr "Êtes-vous certain de vouloir supprimer le fichier  \\''{0}.torrent\\'' (les données déjà téléchargées ne seront pas supprimées) ?"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:990
 msgid "Remove"
@@ -582,7 +582,7 @@ msgstr "Supprimer le fichier .torrent et le(s) fichier(s) de données associé(s
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1006
 #, java-format
 msgid "Are you sure you want to delete the torrent \\''{0}\\'' and all downloaded data?"
-msgstr "Etes-vous certain de vouloir supprimer le torrent \\''{0}\\'' ainsi que toutes les données téléchargées ?"
+msgstr "Êtes-vous certain de vouloir supprimer le torrent \\''{0}\\'' ainsi que toutes les données téléchargées ?"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1009
 msgid "Delete"
@@ -598,7 +598,7 @@ msgstr "Seed"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1077
 msgid "Uninteresting (The peer has no pieces we need)"
-msgstr "aucun intérêt (le pair n'a aucun tronçon utile)"
+msgstr "Aucun intérêt (le pair n'a aucun tronçon utile)"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1079
 msgid "Choked (The peer is not allowing us to request pieces)"
@@ -606,7 +606,7 @@ msgstr "bridé (le pair ne nous permet pas de demander des tronçons)"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1099
 msgid "Uninterested (We have no pieces the peer needs)"
-msgstr "aucun intérêt (nous n'avons aucun tronçon utile au pair)"
+msgstr "Pas intéressé (aucun tronçon utile au pair)"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1101
 msgid "Choking (We are not allowing the peer to request pieces)"
@@ -623,11 +623,11 @@ msgstr "Ajouter torrent"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1190
 msgid "From URL"
-msgstr "Depuis l'url"
+msgstr "Depuis l'URL"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1193
 msgid "Enter the torrent file download URL (I2P only), magnet link, or maggot link"
-msgstr "Entrez l'URL (i2p uniquement) de téléchargement du fichier torrent, du lien magnet ou maggot."
+msgstr "Entrez l'URL (I2P uniquement) de téléchargement du fichier torrent, du lien magnet ou maggot."
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1198
 msgid "Add torrent"
@@ -640,7 +640,7 @@ msgstr "Vous pouvez aussi copier les fichiers .torrent vers {0}."
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1203
 msgid "Removing a .torrent will cause it to stop."
-msgstr "La suppression d'un fichier .torrent entraine l'arrêt du torrent"
+msgstr "La suppression d'un fichier .torrent entraîne l'arrêt du torrent."
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1226
 msgid "Create Torrent"
@@ -675,7 +675,7 @@ msgstr "ou"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1260
 msgid "Specify custom tracker announce URL"
-msgstr "Spécifier une URL personnalisée d'annonce de tracker"
+msgstr "Spécifier une URL d'annonce de tracker personnalisé"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1263
 msgid "Create torrent"
@@ -700,7 +700,7 @@ msgstr "Démarrage automatique"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1295
 msgid "If checked, automatically start torrents that are added"
-msgstr "Si coché, les torrents démarrerons automatiquement lors de l'ajout"
+msgstr "Si coché, les torrents démarreront automatiquement lors de l'ajout"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1299
 msgid "Theme"
@@ -744,7 +744,7 @@ msgstr "Si coché, les torrents seront annoncés vers les open trackers ainsi qu
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1362
 msgid "Open tracker announce URLs"
-msgstr "URL d'annonce open tracker"
+msgstr "URLs d'annonce open tracker"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1374
 msgid "Inbound Settings"
@@ -883,12 +883,12 @@ msgstr "Torrent déjà actif: {0}"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1990
 #, java-format
 msgid "Torrent already in the queue: {0}"
-msgstr "Torrent déjà dans la file d\\''attente: {0}"
+msgstr "Torrent déjà dans la file d''attente: {0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1996
 #, java-format
 msgid "Torrent at {0} was not valid"
-msgstr "Le torrent {0} n'est pas valide"
+msgstr "Le torrent {0} n''est pas valide"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2003
 #, java-format
