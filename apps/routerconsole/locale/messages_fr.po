@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-26 08:34+0000\n"
-"PO-Revision-Date: 2011-04-07 17:04+0100\n"
+"PO-Revision-Date: 2011-04-07 21:04+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "Language: \n"
@@ -3628,7 +3628,7 @@ msgstr "De"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:72
 msgid "Receive on"
-msgstr "Réception active"
+msgstr "Reçus"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:73
 msgid "Expiration"
@@ -3636,11 +3636,11 @@ msgstr "Expiration"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:73
 msgid "Send on"
-msgstr "Envoyer activé"
+msgstr "Envoyés"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:73
 msgid "To"
-msgstr "à"
+msgstr "À"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:74
 msgid "Rate"
@@ -3661,11 +3661,11 @@ msgstr "délai de grâce"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:117
 msgid "Outbound Endpoint"
-msgstr "Endpoint Sortant"
+msgstr "Point terminal sortant"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:119
 msgid "Inbound Gateway"
-msgstr "Gateway Entrant"
+msgstr "Passerelle entrante"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:121
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:162
@@ -3696,7 +3696,7 @@ msgstr "Point terminal"
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:205
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:212
 msgid "Build in progress"
-msgstr "Création d'un tunnel en cours"
+msgstr "Création en cours"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:205
 msgid "inbound"
@@ -3708,15 +3708,15 @@ msgstr "sortant"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:217
 msgid "No tunnels; waiting for the grace period to end."
-msgstr "Pas de tunnel; attendant la fin du délai de grâce"
+msgstr "Pas de tunnel; attente de la fin du délai de grâce"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:219
 msgid "in"
-msgstr "entrer"
+msgstr "entrés"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:220
 msgid "out"
-msgstr "sortir"
+msgstr "sortis"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:237
 msgid "Tunnel Counts By Peer"
