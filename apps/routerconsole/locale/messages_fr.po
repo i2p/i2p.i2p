@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-26 08:34+0000\n"
-"PO-Revision-Date: 2011-04-07 21:04+0100\n"
+"PO-Revision-Date: 2011-04-07 23:11+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "Language: \n"
@@ -3628,7 +3628,7 @@ msgstr "De"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:72
 msgid "Receive on"
-msgstr "Reçus"
+msgstr "Reçoit sur"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:73
 msgid "Expiration"
@@ -3636,7 +3636,7 @@ msgstr "Expiration"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:73
 msgid "Send on"
-msgstr "Envoyés"
+msgstr "Envoie sur"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:73
 msgid "To"
