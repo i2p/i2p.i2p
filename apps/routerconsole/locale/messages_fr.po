@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-26 08:34+0000\n"
-"PO-Revision-Date: 2011-04-07 16:29+0100\n"
+"PO-Revision-Date: 2011-04-07 16:44+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "Language: \n"
@@ -2415,7 +2415,7 @@ msgstr "Jamais"
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:90
 msgid "Every"
-msgstr "Chaque"
+msgstr "Tou(te)s les"
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:108
 msgid "Notify only"
