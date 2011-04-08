@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
 "POT-Creation-Date: 2011-03-03 18:28+0000\n"
-"PO-Revision-Date: 2011-04-02 22:36+0100\n"
+"PO-Revision-Date: 2011-04-03 01:46+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: Spanish (Castilian) <None>\n"
 "MIME-Version: 1.0\n"
@@ -41,7 +41,7 @@ msgstr "El límite mínimo de ancho de banda para la subida está en {0} kbyte/s
 #: ../java/src/org/klomp/snark/SnarkManager.java:335
 #, java-format
 msgid "Startup delay changed to {0}"
-msgstr "La Espera del inicio fue cambiada a {0}."
+msgstr "Tiempo de espera al inicio fue cambiada a {0}."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:386
 msgid "I2CP and tunnel changes will take effect after stopping all torrents"
@@ -710,7 +710,7 @@ msgstr "Tema"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1312
 msgid "Startup delay"
-msgstr "Demora del arranque"
+msgstr "Tiempo de espera al arrancar"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1314
 msgid "minutes"
