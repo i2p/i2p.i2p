@@ -9,14 +9,14 @@ msgstr ""
 "Project-Id-Version: I2P i2ptunnel\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-25 15:21+0000\n"
-"PO-Revision-Date: 2011-04-07 16:30+0100\n"
+"PO-Revision-Date: 2011-04-09 02:46+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Plural-Forms: nplurals=2; plural=(n >= 2)\n"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:474
 #, java-format
@@ -361,15 +361,15 @@ msgstr "connexion interactive"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:376
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:395
 msgid "bulk connection (downloads/websites/BT)"
-msgstr "connexion portefaix (téléchargements/sites web/BT)"
+msgstr "connexion forts transferts (téléchargements/sites web/BT)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:378
 msgid "Delay Connect"
-msgstr "Connexion à retard"
+msgstr "Retard à la connexion"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:382
 msgid "for request/response connections"
-msgstr "connexions pour demandes/réponses"
+msgstr "pour les connexions de demandes/réponses"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:386
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:399
@@ -501,7 +501,7 @@ msgstr "Enregistrer"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:73
 msgid "I2P Tunnel Manager - Edit Server Tunnel"
-msgstr "Gestionnaire de tunnels I2P: Modifier le tunnel serveur"
+msgstr "Gestionnaire de tunnels I2P: modifier le tunnel serveur"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:93
 msgid "Edit server settings"
@@ -554,7 +554,7 @@ msgstr "(Le tunnel doit préalablement être arrêté)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:433
 msgid "Restricted Access List"
-msgstr "Liste d'accès réservée"
+msgstr "Contrôle d'accès"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:439
 msgid "Whitelist"
@@ -610,7 +610,7 @@ msgstr "Pénalité"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:505
 msgid "Hashcash Calc Time"
-msgstr "Temps de calcul de pénalisation"
+msgstr "Durée de calcul de pénalisation"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:507
 msgid "Estimate"
@@ -701,7 +701,7 @@ msgstr "Démarrage..."
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:328
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:342
 msgid "Stop"
-msgstr "Arrêt"
+msgstr "Arrêter"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:201
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:335
