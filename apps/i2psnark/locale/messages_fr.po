@@ -9,14 +9,14 @@ msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-25 12:48+0000\n"
-"PO-Revision-Date: 2011-04-07 10:58+0100\n"
+"PO-Revision-Date: 2011-04-09 03:00+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n>1\n"
+"Plural-Forms: nplurals=2; plural=(n >= 2)\n"
 "X-Poedit-Language: French\n"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:307
@@ -389,14 +389,14 @@ msgstr "Totaux"
 #, java-format
 msgid "1 torrent"
 msgid_plural "{0} torrents"
-msgstr[0] "1 torrent"
+msgstr[0] "{0} torrent"
 msgstr[1] "{0} torrents"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:408
 #, java-format
 msgid "1 connected peer"
 msgid_plural "{0} connected peers"
-msgstr[0] "1 pair connecté"
+msgstr[0] "{0} pair connecté"
 msgstr[1] "{0} pairs connectés"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:497
@@ -490,8 +490,8 @@ msgstr "Erreur du tracker"
 #, java-format
 msgid "1 peer"
 msgid_plural "{0} peers"
-msgstr[0] "1 Pair"
-msgstr[1] "{0} Pairs"
+msgstr[0] "{0} pair"
+msgstr[1] "{0} pairs"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:819
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:824
@@ -785,14 +785,14 @@ msgstr "Info d'empreinte incorrecte dans l'URL magnet {0}"
 #, java-format
 msgid "1 hop"
 msgid_plural "{0} hops"
-msgstr[0] "1 saut"
+msgstr[0] "{0} saut"
 msgstr[1] "{0} sauts"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1501
 #, java-format
 msgid "1 tunnel"
 msgid_plural "{0} tunnels"
-msgstr[0] "1 tunnel"
+msgstr[0] "{0} tunnel"
 msgstr[1] "{0} tunnels"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1663

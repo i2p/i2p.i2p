@@ -9,14 +9,14 @@ msgstr ""
 "Project-Id-Version: I2P susidns\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-24 16:49+0000\n"
-"PO-Revision-Date: 2011-04-07 12:19+0100\n"
+"PO-Revision-Date: 2011-04-09 02:53+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Plural-Forms: nplurals=2; plural=(n >= 2)\n"
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:200
 #: ../src/tmp/i2p/susi/dns/jsp/addressbook_jsp.java:193

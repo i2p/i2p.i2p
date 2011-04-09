@@ -9,14 +9,14 @@ msgstr ""
 "Project-Id-Version: I2P susimail\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-24 16:49+0000\n"
-"PO-Revision-Date: 2011-04-07 12:31+0100\n"
+"PO-Revision-Date: 2011-04-09 03:06+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Plural-Forms: nplurals=2; plural=(n >= 2)\n"
 
 #: src/src/i2p/susi/webmail/WebMail.java:454
 msgid "unknown"
@@ -29,7 +29,7 @@ msgstr "Avertissement: pas d'encodage de transfert trouvé: retour en 7bits."
 #: src/src/i2p/susi/webmail/WebMail.java:478
 #, java-format
 msgid "No encoder found for encoding \\''{0}\\''."
-msgstr "Pas d''encodeur trouvé pour encoder \\''{0}\\''."
+msgstr "Pas d''encodeur trouvé pour encoder \"{0}\"."
 
 #: src/src/i2p/susi/webmail/WebMail.java:484
 msgid "Warning: no charset found, fallback to US-ASCII."
@@ -165,8 +165,8 @@ msgstr "Erreur de suppression du message: {0}"
 #, java-format
 msgid "1 message deleted."
 msgid_plural "{0} messages deleted."
-msgstr[0] "1 message supprimé"
-msgstr[1] "{0} message(s) supprimé(s)"
+msgstr[0] "{0} message supprimé"
+msgstr[1] "{0} messages supprimés"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1264
 #: src/src/i2p/susi/webmail/WebMail.java:1587
@@ -177,8 +177,8 @@ msgstr "Identification"
 #, java-format
 msgid "1 Message"
 msgid_plural "{0} Messages"
-msgstr[0] "1 Message"
-msgstr[1] "{0} Message(s)"
+msgstr[0] "{0} Message"
+msgstr[1] "{0} Messages"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1268
 msgid "Show Message"
@@ -369,8 +369,8 @@ msgstr "Taille"
 #, java-format
 msgid "1 Byte"
 msgid_plural "{0} Bytes"
-msgstr[0] "1 octet"
-msgstr[1] "{0} octet(s)"
+msgstr[0] "{0} octet"
+msgstr[1] "{0} octets"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1644
 msgid "Mark All"
