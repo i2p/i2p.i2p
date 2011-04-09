@@ -9,15 +9,15 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-26 08:34+0000\n"
-"PO-Revision-Date: 2011-04-07 23:11+0100\n"
+"PO-Revision-Date: 2011-04-09 02:14+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
-"Language-Team: foo <foo@bar>\n"
+"Language-Team: I2P Project <foo@bar>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: French\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Plural-Forms: nplurals=2; plural=(n >= 2)\n"
 
 #. NOTE TO TRANSLATORS: Feel free to translate all these as you see fit, there are several options...
 #. spaces or not, '.' or not, plural or not. Try not to make it too long, it is used in
@@ -31,7 +31,7 @@ msgstr ""
 #, java-format
 msgid "1 ms"
 msgid_plural "{0,number,####} ms"
-msgstr[0] "1 ms"
+msgstr[0] "{0,number,####}ms"
 msgstr[1] "{0,number,####}ms"
 
 #. seconds
@@ -41,8 +41,8 @@ msgstr[1] "{0,number,####}ms"
 #, java-format
 msgid "1 sec"
 msgid_plural "{0} sec"
-msgstr[0] "1 s"
-msgstr[1] "{0} s"
+msgstr[0] "{0}s"
+msgstr[1] "{0}s"
 
 #. minutes
 #. Note to translators: quantity will always be greater than one.
@@ -51,8 +51,8 @@ msgstr[1] "{0} s"
 #, java-format
 msgid "1 min"
 msgid_plural "{0} min"
-msgstr[0] "1 mn"
-msgstr[1] "{0} mn"
+msgstr[0] "{0}mn"
+msgstr[1] "{0}mn"
 
 #. hours
 #. Note to translators: quantity will always be greater than one.
@@ -61,8 +61,8 @@ msgstr[1] "{0} mn"
 #, java-format
 msgid "1 hour"
 msgid_plural "{0} hours"
-msgstr[0] "1 heure"
-msgstr[1] "{0} heures"
+msgstr[0] "{0}h"
+msgstr[1] "{0}h"
 
 #: ../../../core/java/src/net/i2p/data/DataHelper.java:1158
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:314
@@ -75,8 +75,8 @@ msgstr "n/d"
 #, java-format
 msgid "1 day"
 msgid_plural "{0} days"
-msgstr[0] "1 jour"
-msgstr[1] "{0} jours"
+msgstr[0] "{0}j"
+msgstr[1] "{0}j"
 
 #: ../../../router/java/src/net/i2p/router/Blocklist.java:122
 #, java-format
@@ -252,11 +252,11 @@ msgstr "Connexion sortante"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:530
 msgid "They offered to introduce us (help other peers traverse our firewall)"
-msgstr "Ils ont proposé de nous présenter (aide d'autres pairs à passer notre pare-feu)"
+msgstr "A proposé de nous représenter (aide de la part d'autres pairs pour traverser notre pare-feu)"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:532
 msgid "We offered to introduce them (help other peers traverse their firewall)"
-msgstr "Nous avons proposé de les présenter (aide d'autres pairs à passer leur pare-feu)"
+msgstr "Nous avons proposé de le représenter (aide à d'autres pairs pour traverser passer leur pare-feu)"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:533
 msgid "How long since a packet has been received / sent"
@@ -334,7 +334,7 @@ msgstr "Dérive standard d'aller-retour en ms"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:544
 msgid "The retransmit timeout in milliseconds"
-msgstr "Le délai de retransmission en ms"
+msgstr "Délai de retransmission en millisecondes"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:545
 msgid "Current maximum send packet size / estimated maximum receive packet size (bytes)"
@@ -348,7 +348,7 @@ msgstr "TX"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:546
 msgid "The total number of packets sent to the peer"
-msgstr "Le nombre de paquets envoyés au pair"
+msgstr "Nombre de paquets envoyés au pair"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:547
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:744
@@ -358,7 +358,7 @@ msgstr "RX"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:547
 msgid "The total number of packets received from the peer"
-msgstr "Le nombre de paquets reçus du pair"
+msgstr "Nombre de paquets reçus du pair"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:548
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1929
@@ -367,7 +367,7 @@ msgstr "TX dupl."
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:548
 msgid "The total number of packets retransmitted to the peer"
-msgstr "Le nombre de paquets retransmis au pair"
+msgstr "Nombre de paquets retransmis au pair"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:549
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1931
@@ -376,7 +376,7 @@ msgstr "RX dupl."
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:549
 msgid "The total number of duplicate packets received from the peer"
-msgstr "Le nombre de paquets en double reçus du pair"
+msgstr "Nombre de paquets en double reçus du pair"
 
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java:409
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java:627
@@ -396,7 +396,7 @@ msgstr "Limite"
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:734
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1887
 msgid "Timeout"
-msgstr "Dépassement d'attente"
+msgstr "Échéance"
 
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:745
 msgid "Out Queue"
@@ -404,7 +404,7 @@ msgstr "File de sortie"
 
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:746
 msgid "Backlogged?"
-msgstr "Rétro enregistré?"
+msgstr "Réinscrit?"
 
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:760
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1949
@@ -1968,7 +1968,7 @@ msgstr "Désactivation mode portable"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:250
 msgid "Requiring SSU introducers"
-msgstr "Nécessite des présentateurs SSU"
+msgstr "Nécessite des représentants SSU"
 
 #. There's a few changes that don't really require restart (e.g. enabling inbound TCP)
 #. But it would be hard to get right, so just do a restart.
@@ -2251,14 +2251,14 @@ msgstr "Erreur pendant l'enregistrement de la configuration (appliquée mais non
 #, java-format
 msgid "1 hop"
 msgid_plural "{0} hops"
-msgstr[0] "1 saut"
+msgstr[0] "{0} saut"
 msgstr[1] "{0} sauts"
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:15
 #, java-format
 msgid "1 tunnel"
 msgid_plural "{0} tunnels"
-msgstr[0] "1 tunnel"
+msgstr[0] "{0} tunnel"
 msgstr[1] "{0} tunnels"
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:35
@@ -2621,11 +2621,11 @@ msgstr "Ce routeur"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:346
 msgid "Peer info for"
-msgstr "Mise à jour en cours"
+msgstr "Informations pair"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:350
 msgid "Full entry"
-msgstr "Entrée complète"
+msgstr "Détails"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:356
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:115
@@ -2667,7 +2667,7 @@ msgstr "SSU"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:403
 msgid "SSU with introducers"
-msgstr "SSU avec introducers"
+msgstr "SSU avec représentants"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:404
 msgid "NTCP"
@@ -2679,7 +2679,7 @@ msgstr "NTCP et SSU"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:404
 msgid "NTCP and SSU with introducers"
-msgstr "NTCP et SSU avec présentateurs"
+msgstr "NTCP et SSU avec représentants"
 
 #: ../java/src/net/i2p/router/web/NewsFetcher.java:92
 #, java-format
@@ -2859,21 +2859,21 @@ msgstr "Profils des pairs"
 #, java-format
 msgid "Showing 1 recent profile."
 msgid_plural "Showing {0} recent profiles."
-msgstr[0] "Affichage de 1 profil récent,"
-msgstr[1] "Affichage de {0} profils récents,"
+msgstr[0] "Affichage d'un profil récent."
+msgstr[1] "Affichage de {0} profils récents."
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:75
 #, java-format
 msgid "Hiding 1 older profile."
 msgid_plural "Hiding {0} older profiles."
-msgstr[0] "Masquage de 1 profil très anciens,"
-msgstr[1] "Masquage de {0} très anciens profils,"
+msgstr[0] "Masquage d'un très vieux profil."
+msgstr[1] "Masquage de {0} très vieux profils."
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:77
 #, java-format
 msgid "Hiding 1 standard profile."
 msgid_plural "Hiding {0} standard profiles."
-msgstr[0] "Masquage de 1 profil standard."
+msgstr[0] "Masquage d'un profil standard."
 msgstr[1] "Masquage de {0} profils standards."
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:82
@@ -3122,7 +3122,7 @@ msgstr "dans la moyenne"
 
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:57
 msgid "GO"
-msgstr "GO"
+msgstr "Lancer"
 
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:60
 msgid "Statistics gathered during this router's uptime"
@@ -3162,7 +3162,7 @@ msgstr "Maximum d'évènements par période"
 #. buf.append(num(curFreq.getMinAverageInterval())).append("ms)");
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:136
 msgid "Lifetime average events per period"
-msgstr "évènements de durée de vie moyenne par période"
+msgstr "évènements de moyenne de durée de vie par période"
 
 #. Display the strict average
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:141
@@ -3211,7 +3211,7 @@ msgstr "Nombre moyen d'évènements"
 
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:213
 msgid "Events in peak period"
-msgstr "Évènements dans la période crête"
+msgstr "Pic d'évènements dans la période"
 
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:221
 msgid "Graph Data"
@@ -3228,7 +3228,7 @@ msgstr "Exporter en XML"
 #. Display the strict average
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:231
 msgid "Lifetime average value"
-msgstr "Valeur de la durée de vie moyenne"
+msgstr "Durée de vie moyenne"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:41
 msgid "I2P Router Help &amp; FAQ"
@@ -3318,7 +3318,7 @@ msgstr "Bilan de santé"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:125
 msgid "Logs"
-msgstr "Fichier traces"
+msgstr "Historiques"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:135
 msgid "Graph router performance"
