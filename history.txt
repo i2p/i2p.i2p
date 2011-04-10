@@ -1,3 +1,11 @@
+2011-04-11 zzz
+    * Console: Hide iframe on mobile browsers
+    * DataHelper: Speed up eq() (Ticket #437)
+    * HTTPServer: Strip inbound X-Accept-Encoding header
+    * netdb.jsp: HTML fixes
+    * Plugins: Log error when console server not found
+    * Reseed: Log tweak
+
 2011-04-02 m1xxy
     * routerconsole, i2psnark, ...  I2P ahora también en español: ¡Bienvenidos los hispanohablantes!
       - routerconsole, i2ptunnel, i2psnark, SusiDNS, Susimail fully translated into Spanish

@@ -111,6 +111,9 @@ public class Storage
         lengthsList.add(Long.valueOf(length));
       }
 
+    if (total <= 0)
+        throw new IOException("Torrent contains no data");
+
     int pc_size = MIN_PIECE_SIZE;
     int pcs = (int) ((total - 1)/pc_size) + 1;
     while (pcs > MAX_PIECES && pc_size < MAX_PIECE_SIZE)

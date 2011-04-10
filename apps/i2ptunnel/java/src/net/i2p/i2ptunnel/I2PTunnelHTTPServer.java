@@ -138,9 +138,11 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             }
             if (_log.shouldLog(Log.INFO))
                 _log.info("HTTP server encoding header: " + enc + "/" + altEnc);
-            boolean useGZIP = ( (enc != null) && (enc.indexOf("x-i2p-gzip") >= 0) );
-            if ( (!useGZIP) && (altEnc != null) && (altEnc.indexOf("x-i2p-gzip") >= 0) )
-                useGZIP = true;
+            boolean alt = (altEnc != null) && (altEnc.indexOf("x-i2p-gzip") >= 0);
+            boolean useGZIP = alt || ( (enc != null) && (enc.indexOf("x-i2p-gzip") >= 0) );
+            // Don't pass this on, outproxies should strip so I2P traffic isn't so obvious but they probably don't
+            if (alt)
+                headers.remove("X-Accept-encoding");
             
             if (allowGZIP && useGZIP) {
                 I2PAppThread req = new I2PAppThread(
