@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-04-11 08:20+0000\n"
-"PO-Revision-Date: 2011-04-11 11:18+0100\n"
+"PO-Revision-Date: 2011-04-11 12:51+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: I2P Project <foo@bar>\n"
 "Language: \n"
@@ -2635,7 +2635,7 @@ msgstr "Caché"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:356
 msgid "Updated"
-msgstr "Mise à jour fini"
+msgstr "Mise à jour terminée"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:357
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:360
@@ -2839,12 +2839,12 @@ msgstr "Greffon {0} installé et démarré"
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:394
 #, java-format
 msgid "Plugin {0} installed but failed to start, check logs"
-msgstr "Greffon {0} installé, mais son démarrage à échoué. Vérifiez les historiques"
+msgstr "Greffon {0} installé, mais son démarrage a échoué. Vérifiez les historiques"
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:396
 #, java-format
 msgid "Plugin {0} installed but failed to start"
-msgstr "Greffon {0} installé, mais son démarrage à échoué"
+msgstr "Greffon {0} installé, mais son démarrage a échoué"
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:406
 #, java-format
@@ -3376,7 +3376,7 @@ msgstr "Lancé depuis"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:202
 msgid "Help with configuring your firewall and router for optimal I2P performance"
-msgstr "Aide à la configuration du pare-feu et du routeur afin d'optimiser la performance d'I2P"
+msgstr "Aide à la configuration du pare-feu et du routeur pour optimiser les performances d'I2P"
 
 #. Note to translators: parameter is a version, e.g. "0.8.4"
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:232
@@ -3640,7 +3640,7 @@ msgstr "Envoie sur"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:73
 msgid "To"
-msgstr "À"
+msgstr "Vers"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:74
 msgid "Rate"
@@ -4932,7 +4932,7 @@ msgstr "Le réamorçage est le processus de lancement utilisé pour trouver d'au
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:322
 msgid "If reseeding has failed, you should first check your network connection."
-msgstr "Si le réamorçage à échoué, vérifiez d'abord l'état de votre connexion au réseau."
+msgstr "Si le réamorçage a échoué, vérifiez d'abord l'état de votre connexion au réseau."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:326
 msgid "Change these only if HTTP is blocked by a restrictive firewall, reseed has failed, and you have access to an HTTP proxy."
@@ -5202,7 +5202,7 @@ msgstr "Appliquer"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:112
 msgid "config update"
-msgstr "Mettre à jour la configuration"
+msgstr "mise à jour config"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:249
 msgid "I2P Update Configuration"
@@ -5214,7 +5214,7 @@ msgstr "Vérification de mises à jour I2P et nouvelles"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:323
 msgid "News &amp; I2P Updates"
-msgstr "Actualités &amp; mises à jour"
+msgstr "Actualités &amp; mises à jour i2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:327
 msgid "Update In Progress"
@@ -5254,7 +5254,7 @@ msgstr "Clés de confiance"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:369
 msgid "Update with unsigned development builds?"
-msgstr "Mettre à jour avec une version non signée?"
+msgstr "Mettre à jour avec les versions intermédiaires de développement non signées?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:373
 msgid "Unsigned Build URL"
