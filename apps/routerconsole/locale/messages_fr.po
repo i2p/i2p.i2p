@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-04-11 08:20+0000\n"
-"PO-Revision-Date: 2011-04-11 15:05+0100\n"
+"PO-Revision-Date: 2011-04-11 15:19+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: I2P Project <foo@bar>\n"
 "Language: \n"
@@ -5025,7 +5025,7 @@ msgstr "Sur Windows, une icône pour la zone de notification indiquant l'état d
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:337
 msgid "(later on, I2P client applications will be able to integrate their own functionality into the system tray as well)."
-msgstr "(Ultérieurement, Les applications clientes I2P pourront aussi intégrer leurs propres fonctionnalités dans la zone de notification système)"
+msgstr "(Ultérieurement, les applications clientes I2P pourront aussi intégrer leurs propres fonctionnalités dans la zone de notification système)."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:339
 msgid "If you are on windows, you can either enable or disable that icon here."
