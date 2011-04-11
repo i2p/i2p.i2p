@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-04-11 08:20+0000\n"
-"PO-Revision-Date: 2011-04-11 13:24+0100\n"
+"PO-Revision-Date: 2011-04-11 14:25+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: I2P Project <foo@bar>\n"
 "Language: \n"
@@ -5134,7 +5134,7 @@ msgstr "Configuration des tunnels I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:328
 msgid "The default settings work for most people."
-msgstr "La configuration défaut fonctionne pour la plupart des utilisateurs"
+msgstr "La configuration défaut fonctionne pour la plupart des utilisateurs."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:332
 msgid "There is a fundamental tradeoff between anonymity and performance."
