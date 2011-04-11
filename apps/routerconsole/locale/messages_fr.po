@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-26 08:34+0000\n"
-"PO-Revision-Date: 2011-04-09 02:14+0100\n"
+"PO-Revision-Date: 2011-04-11 10:09+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: I2P Project <foo@bar>\n"
 "Language: \n"
@@ -5166,7 +5166,7 @@ msgstr "Pour faire de modifications permanentes à un tunnel client particulier,
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:358
 msgid "i2ptunnel page"
-msgstr "page i2ptunnnel."
+msgstr "page i2ptunnel"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:112
 msgid "config UI"
