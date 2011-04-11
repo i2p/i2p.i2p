@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-04-11 08:20+0000\n"
-"PO-Revision-Date: 2011-04-11 14:25+0100\n"
+"PO-Revision-Date: 2011-04-11 15:05+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: I2P Project <foo@bar>\n"
 "Language: \n"
@@ -1583,7 +1583,7 @@ msgstr "Index client incorrect."
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:392
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:384
 msgid "Client"
-msgstr "Client"
+msgstr "Clients"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:212
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:271
@@ -3534,7 +3534,7 @@ msgstr "Test en cours"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:370
 msgid "Add/remove/edit &amp; control your client and server tunnels"
-msgstr "Ajouter/enlever/éditer &amp; contrôler vos tunnels client et serveur"
+msgstr "Ajoutez, modifiez/supprimez &amp; contrôlez vos tunnels clients et serveurs"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:382
 msgid "Server"
@@ -3579,7 +3579,7 @@ msgstr "Création des tunnels en cours"
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:421
 #: ../java/strings/Strings.java:36
 msgid "shared clients"
-msgstr "client partagé"
+msgstr "clients partagés"
 
 #. Note to translators: all runtime zh translation disabled in this file, no font available in RRD
 #: ../java/src/net/i2p/router/web/SummaryRenderer.java:89
@@ -4681,7 +4681,7 @@ msgstr "Préférences"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:332
 msgid "The Java clients listed below are started by the router and run in the same JVM."
-msgstr "Les client Java listés ci-dessous sont démarrés par le routeur et s'exécutent dans la même JVM."
+msgstr "Les clients Java listés ci-dessous sont démarrés par le routeur et s'exécutent dans la même JVM."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:338
 msgid "To change other client options, edit the file"
@@ -5025,7 +5025,7 @@ msgstr "Sur Windows, une icône pour la zone de notification indiquant l'état d
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:337
 msgid "(later on, I2P client applications will be able to integrate their own functionality into the system tray as well)."
-msgstr "(Ultérieurement, Les applications clientes I2P pourront intégrer leurs propres fonctionnalités dans la zone de notification système)"
+msgstr "(Ultérieurement, Les applications clientes I2P pourront aussi intégrer leurs propres fonctionnalités dans la zone de notification système)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:339
 msgid "If you are on windows, you can either enable or disable that icon here."
@@ -5402,7 +5402,7 @@ msgstr "L'application web demandée n'est pas lancée."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/nowebapp_jsp.java:256
 msgid "Please visit the <a href=\"/configclients.jsp#webapp\">config clients page</a> to start it."
-msgstr "Merci de visiter la page de <a href=\"/configclients.jsp#webapp\">configuration des clients</a> pour le lancer."
+msgstr "Pour la lancer, rendez-vous sur <a href=\"/configclients.jsp#webapp\">configuration des clients</a>."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/peers_jsp.java:111
 msgid "peer connections"
