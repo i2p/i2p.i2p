@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-04-11 08:20+0000\n"
-"PO-Revision-Date: 2011-04-11 12:51+0100\n"
+"PO-Revision-Date: 2011-04-11 13:24+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: I2P Project <foo@bar>\n"
 "Language: \n"
@@ -2531,7 +2531,7 @@ msgstr "Contenus NetDb"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:107
 msgid "View RouterInfo"
-msgstr "Afficher RouterInfo"
+msgstr "Retour synthèse routeurs"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:108
 msgid "LeaseSets"
@@ -2543,7 +2543,7 @@ msgstr "Jeu de baux"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:132
 msgid "Local"
-msgstr "Locale"
+msgstr "Local"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:134
 msgid "Unpublished"
@@ -2587,15 +2587,15 @@ msgstr "Pas initialisé"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:226
 msgid "Routers"
-msgstr "Routeurs"
+msgstr "Synthèse routeurs"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:228
 msgid "Show all routers"
-msgstr "Tous, avec statistiques basiques"
+msgstr "Afficher tous, avec statistiques basiques"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:230
 msgid "Show all routers with full stats"
-msgstr "Tous, avec statistiques complètes"
+msgstr "Afficher tous, avec statistiques complètes"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:266
 msgid "Network Database Router Statistics"
