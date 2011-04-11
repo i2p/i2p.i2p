@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-26 08:34+0000\n"
-"PO-Revision-Date: 2011-04-11 10:09+0100\n"
+"POT-Creation-Date: 2011-04-11 08:20+0000\n"
+"PO-Revision-Date: 2011-04-11 10:44+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: I2P Project <foo@bar>\n"
 "Language: \n"
@@ -27,7 +27,7 @@ msgstr ""
 #. {0,number,####} prevents 1234 from being output as 1,234 in the English locale.
 #. If you want the digit separator in your locale, translate as {0}.
 #. alternates: msec, msecs
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1141
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1140
 #, java-format
 msgid "1 ms"
 msgid_plural "{0,number,####} ms"
@@ -37,7 +37,7 @@ msgstr[1] "{0,number,####}ms"
 #. seconds
 #. Note to translators: quantity will always be greater than one.
 #. alternates: secs, sec. 'seconds' is probably too long.
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1146
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1145
 #, java-format
 msgid "1 sec"
 msgid_plural "{0} sec"
@@ -47,7 +47,7 @@ msgstr[1] "{0}s"
 #. minutes
 #. Note to translators: quantity will always be greater than one.
 #. alternates: mins, min. 'minutes' is probably too long.
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1151
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1150
 #, java-format
 msgid "1 min"
 msgid_plural "{0} min"
@@ -57,21 +57,21 @@ msgstr[1] "{0}mn"
 #. hours
 #. Note to translators: quantity will always be greater than one.
 #. alternates: hrs, hr., hrs.
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1156
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1155
 #, java-format
 msgid "1 hour"
 msgid_plural "{0} hours"
 msgstr[0] "{0}h"
 msgstr[1] "{0}h"
 
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1158
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1157
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:314
 msgid "n/a"
 msgstr "n/d"
 
 #. days
 #. Note to translators: quantity will always be greater than one.
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1162
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1161
 #, java-format
 msgid "1 day"
 msgid_plural "{0} days"
@@ -2511,69 +2511,69 @@ msgstr "Fichier pas trouvé"
 msgid "No log messages"
 msgstr "Historique vide"
 
-#: ../java/src/net/i2p/router/web/NetDbRenderer.java:80
+#: ../java/src/net/i2p/router/web/NetDbRenderer.java:79
 msgid "Network Database RouterInfo Lookup"
 msgstr "Recherche RouterInfo dans la base de données du réseau "
 
-#: ../java/src/net/i2p/router/web/NetDbRenderer.java:95
+#: ../java/src/net/i2p/router/web/NetDbRenderer.java:94
 #: ../java/strings/Strings.java:68
 msgid "Router"
 msgstr "Routeur"
 
-#: ../java/src/net/i2p/router/web/NetDbRenderer.java:95
+#: ../java/src/net/i2p/router/web/NetDbRenderer.java:94
 msgid "not found in network database"
 msgstr "non trouvé dans la NetDb"
 
-#: ../java/src/net/i2p/router/web/NetDbRenderer.java:107
+#: ../java/src/net/i2p/router/web/NetDbRenderer.java:106
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:215
 msgid "Network Database Contents"
 msgstr "Contenus NetDb"
 
-#: ../java/src/net/i2p/router/web/NetDbRenderer.java:108
+#: ../java/src/net/i2p/router/web/NetDbRenderer.java:107
 msgid "View RouterInfo"
 msgstr "Afficher RouterInfo"
 
-#: ../java/src/net/i2p/router/web/NetDbRenderer.java:109
+#: ../java/src/net/i2p/router/web/NetDbRenderer.java:108
 msgid "LeaseSets"
 msgstr "Jeux de baux"
 
-#: ../java/src/net/i2p/router/web/NetDbRenderer.java:131
+#: ../java/src/net/i2p/router/web/NetDbRenderer.java:130
 msgid "LeaseSet"
 msgstr "Jeu de baux"
 
-#: ../java/src/net/i2p/router/web/NetDbRenderer.java:133
+#: ../java/src/net/i2p/router/web/NetDbRenderer.java:132
 msgid "Local"
 msgstr "Locale"
 
-#: ../java/src/net/i2p/router/web/NetDbRenderer.java:135
+#: ../java/src/net/i2p/router/web/NetDbRenderer.java:134
 msgid "Unpublished"
 msgstr "Pas publié"
 
-#: ../java/src/net/i2p/router/web/NetDbRenderer.java:136
-#: ../java/src/net/i2p/router/web/NetDbRenderer.java:143
+#: ../java/src/net/i2p/router/web/NetDbRenderer.java:135
+#: ../java/src/net/i2p/router/web/NetDbRenderer.java:142
 msgid "Destination"
 msgstr "Destination"
 
-#: ../java/src/net/i2p/router/web/NetDbRenderer.java:153
+#: ../java/src/net/i2p/router/web/NetDbRenderer.java:152
 #, java-format
 msgid "Expires in {0}"
 msgstr "Expirera dans {0}"
 
-#: ../java/src/net/i2p/router/web/NetDbRenderer.java:155
+#: ../java/src/net/i2p/router/web/NetDbRenderer.java:154
 #, java-format
 msgid "Expired {0} ago"
 msgstr "Périmé il y a {0}"
 
-#: ../java/src/net/i2p/router/web/NetDbRenderer.java:167
+#: ../java/src/net/i2p/router/web/NetDbRenderer.java:166
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:156
 msgid "Gateway"
 msgstr "Passerelle"
 
-#: ../java/src/net/i2p/router/web/NetDbRenderer.java:167
+#: ../java/src/net/i2p/router/web/NetDbRenderer.java:166
 msgid "Lease"
 msgstr "Bail"
 
-#: ../java/src/net/i2p/router/web/NetDbRenderer.java:169
+#: ../java/src/net/i2p/router/web/NetDbRenderer.java:168
 msgid "Tunnel"
 msgstr "Tunnel"
 
@@ -5077,7 +5077,7 @@ msgstr "Lancer le navigateur au démarrage du routeur?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:379
 msgid "I2P's main configuration interface is this web console, so for your convenience I2P can launch a web browser on startup pointing at"
-msgstr "La plus grande partie de la configuration d'I2P se fait dans cette console, et donc pour votre confort, I2P peut lancer  au démarrage votre navigateur sur "
+msgstr "La plus grande partie de la configuration d'I2P se fait dans cette console, et donc pour votre confort, I2P peut lancer au démarrage votre navigateur sur "
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:113
 msgid "config stats"
