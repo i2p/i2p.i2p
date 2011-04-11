@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-25 12:48+0000\n"
-"PO-Revision-Date: 2011-04-11 10:32+0100\n"
+"PO-Revision-Date: 2011-04-11 15:45+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "Language: \n"
@@ -32,12 +32,12 @@ msgstr "La limite minimale agrégée des uploaders est : {0}"
 #: ../java/src/org/klomp/snark/SnarkManager.java:321
 #, java-format
 msgid "Up BW limit changed to {0}KBps"
-msgstr "Limite d’upload modifiée : {0} ko/s"
+msgstr "Limite d’envoi modifiée : {0} ko/s"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:323
 #, java-format
 msgid "Minimum up bandwidth limit is {0}KBps"
-msgstr "La limite minimale d’upload est {0} ko/s"
+msgstr "La limite minimale d’envoi est {0} ko/s"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:335
 #, java-format
@@ -325,7 +325,7 @@ msgstr "temps restant estimé"
 #. Translators: Please keep short or translate as " "
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:313
 msgid "ETA"
-msgstr " Temps"
+msgstr "Temps"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:317
 msgid "Downloaded"
