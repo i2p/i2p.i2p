@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-25 12:46+0000\n"
-"PO-Revision-Date: 2011-03-25 16:01+0100\n"
-"Last-Translator: \n"
+"PO-Revision-Date: 2011-04-16 02:57+0100\n"
+"Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: echelon <echelon@mail.i2p>, Sperreingang <sperrbezirk@mail.i2p>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -3448,9 +3448,7 @@ msgstr "teilnehmend an"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:404
 msgid "Share ratio"
-msgstr ""
-"Verhältnis \n"
-" fremder/eigenen Hops"
+msgstr "Kooperationsfaktor"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:410
 msgid "What's in the router's job queue?"
