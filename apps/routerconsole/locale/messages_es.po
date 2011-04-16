@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
 "POT-Creation-Date: 2011-03-21 18:01+0000\n"
-"PO-Revision-Date: 2011-04-08 23:38+0100\n"
+"PO-Revision-Date: 2011-04-12 03:53+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: Spanish (Castilian) <None>\n"
 "MIME-Version: 1.0\n"
@@ -1653,7 +1653,7 @@ msgstr "Buscando actualizaciones para el plugin {0}"
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:339
 #, java-format
 msgid "Started plugin {0}"
-msgstr "Plugin Iniciado {0}"
+msgstr "Plugin {0} iniciado"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:341
 #, java-format
@@ -3250,7 +3250,7 @@ msgstr "Ayuda del router I2P &amp; preguntas frecuentes"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:43
 msgid "Help &amp; FAQ"
-msgstr "Ayuda &amp; Preguntas frecuentes"
+msgstr "Ayuda"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:55
 msgid "Configure startup of clients and webapps (services); manually start dormant services"
@@ -3461,7 +3461,7 @@ msgstr "Participando en"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:404
 msgid "Share ratio"
-msgstr "Tasa de compartición"
+msgstr "Relación de compartición"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:410
 msgid "What's in the router's job queue?"
