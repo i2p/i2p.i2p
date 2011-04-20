@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
 "POT-Creation-Date: 2011-03-21 18:01+0000\n"
-"PO-Revision-Date: 2011-04-19 23:39+0100\n"
+"PO-Revision-Date: 2011-04-20 02:25+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: Spanish (Castilian) <None>\n"
 "MIME-Version: 1.0\n"
@@ -3861,7 +3861,7 @@ msgstr "Túneles de aplicaciónes"
 
 #: ../java/strings/Strings.java:25
 msgid "My eepsite web server"
-msgstr "Mi servidor web eepsite"
+msgstr "Mi servidor web I2P"
 
 #: ../java/strings/Strings.java:26
 msgid "I2P webserver (eepsite)"
@@ -3885,7 +3885,7 @@ msgstr "proxy IRC"
 
 #: ../java/strings/Strings.java:38
 msgid "eepsite"
-msgstr "eepsite"
+msgstr "sitio I2P"
 
 #: ../java/strings/Strings.java:39
 msgid "I2P webserver"
@@ -5248,7 +5248,7 @@ msgstr "Política de actualizaciones"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:349
 msgid "Update through the eepProxy?"
-msgstr "¿Actualizar utilizando el eeProxy?"
+msgstr "¿Actualizar utilizando el eepProxy?"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:353
 msgid "eepProxy host"
