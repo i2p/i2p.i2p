@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
 "POT-Creation-Date: 2011-03-03 18:29+0000\n"
-"PO-Revision-Date: 2011-04-08 23:36+0100\n"
+"PO-Revision-Date: 2011-04-18 21:39+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: Spanish (Castilian) <None>\n"
 "MIME-Version: 1.0\n"
@@ -43,12 +43,12 @@ msgstr "Configuración recargada para todos los túneles"
 #. and give them something to look at in any case
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:230
 msgid "Starting tunnel"
-msgstr "Túnel Inicial"
+msgstr "Inicializando el túnel"
 
 #. and give them something to look at in any case
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:243
 msgid "Stopping tunnel"
-msgstr "Túnel final"
+msgstr "Deteniendo el túnel"
 
 #: ../java/src/net/i2p/i2ptunnel/web/IndexBean.java:311
 msgid "Configuration changes saved"

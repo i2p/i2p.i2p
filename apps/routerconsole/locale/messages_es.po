@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
 "POT-Creation-Date: 2011-03-21 18:01+0000\n"
-"PO-Revision-Date: 2011-04-12 03:53+0100\n"
+"PO-Revision-Date: 2011-04-19 23:39+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: Spanish (Castilian) <None>\n"
 "MIME-Version: 1.0\n"
@@ -155,18 +155,18 @@ msgstr "Rechazando túneles"
 #: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:125
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:20
 msgid "Reseeding"
-msgstr "Reiniciando semillas"
+msgstr "Resembrando"
 
 #: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:141
 #, java-format
 msgid "Reseed fetched only 1 router."
 msgid_plural "Reseed fetched only {0} routers."
-msgstr[0] "Al reinicar semillas se ha encontrado un solo router."
-msgstr[1] "Al reiniciar semillas se han encontrado sólo {0} routers."
+msgstr[0] "El proceso de resembrar ha encontrado un solo router."
+msgstr[1] "El proceso de resembrar ha encontrado sólo {0} routers."
 
 #: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:148
 msgid "Reseed failed."
-msgstr "El reinicio de semillas ha fallado"
+msgstr "El proceso de resembrar ha fallado"
 
 #: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:149
 #, java-format
@@ -175,16 +175,16 @@ msgstr "Consulta {0} para obtener ayuda."
 
 #: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:150
 msgid "reseed configuration page"
-msgstr "Página de configuración del reinicio de semillas"
+msgstr "Página de configuración del proceso de resembrar"
 
 #: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:293
 msgid "Reseeding: fetching seed URL."
-msgstr "Reiniciando semillas: Buscando la URL semilla"
+msgstr "Resembrar: Buscando URL sembradora"
 
 #: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:335
 #, java-format
 msgid "Reseeding: fetching router info from seed URL ({0} successful, {1} errors)."
-msgstr "Reiniciando semillas: buscando información de routers de la URL semilla ({0} exitosas, {1} errores)."
+msgstr "Resembrar: buscando informaciones de routers desde la URL sembradora ({0} exitosas, {1} errores)."
 
 #: ../../../router/java/src/net/i2p/router/transport/CommSystemFacadeImpl.java:512
 msgid "NetDb entry"
@@ -1952,11 +1952,11 @@ msgstr "a"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:221
 msgid "Gracefully restarting into Hidden Router Mode"
-msgstr "Reiniciando de forma segura en modo router oculto"
+msgstr "Reiniciando de forma controlada en modo router oculto"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:223
 msgid "Gracefully restarting to exit Hidden Router Mode"
-msgstr "Reiniciando de forma segura para salir del modo router oculto"
+msgstr "Reiniciando de forma controlada para salir del modo router oculto"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:232
 msgid "Enabling UPnP, restart required to take effect"
@@ -1983,7 +1983,7 @@ msgstr "Exigir introductores SSU"
 #. But it would be hard to get right, so just do a restart.
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:291
 msgid "Gracefully restarting I2P to change published router address"
-msgstr "Reiniciando I2P de forma piadosa para cambiar la dirección publicada del router"
+msgstr "Reiniciando I2P de forma controlada para cambiar la dirección publicada del router"
 
 #: ../java/src/net/i2p/router/web/ConfigNetHandler.java:314
 msgid "Updating bandwidth share percentage"
@@ -2059,16 +2059,16 @@ msgstr "valor de la capacidad Malo"
 #: ../java/src/net/i2p/router/web/ConfigReseedHandler.java:17
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:368
 msgid "Save changes and reseed now"
-msgstr "Guardar cambios y reiniciar semillas ahora"
+msgstr "Guardar cambios y resembrar ahora"
 
 #: ../java/src/net/i2p/router/web/ConfigReseedHandler.java:21
 msgid "Reseeding is already in progress"
-msgstr "Reinicio de semillas ya está en proceso"
+msgstr "Resembrar ya está en proceso"
 
 #. skip the nonce checking in ReseedHandler
 #: ../java/src/net/i2p/router/web/ConfigReseedHandler.java:24
 msgid "Starting reseed process"
-msgstr "Iniciando el proceso de reinicio de semillas"
+msgstr "Iniciando el proceso de resembrar"
 
 #: ../java/src/net/i2p/router/web/ConfigReseedHandler.java:66
 msgid "Configuration saved successfully."
@@ -2126,11 +2126,11 @@ msgstr "Reiniciando en {0}"
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:53
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:309
 msgid "Shutdown gracefully"
-msgstr "Apagar de forma piadosa"
+msgstr "Apagar de forma controlada"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:56
 msgid "Graceful shutdown initiated"
-msgstr "Apagado de forma piadosa iniciado"
+msgstr "Iniciado el apagado controlado"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:60
 msgid "Shutdown immediately!  boom bye bye bad bwoy"
@@ -2139,20 +2139,20 @@ msgstr "Apagar inmediatamente!   Boom adiós chico malo"
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:61
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:313
 msgid "Cancel graceful shutdown"
-msgstr "Cancelar apagado piadoso"
+msgstr "Cancelar el apagado controlado"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:63
 msgid "Graceful shutdown cancelled"
-msgstr "Apagado piadoso cancelado"
+msgstr "Cancelado el apagado controlado"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:64
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:325
 msgid "Graceful restart"
-msgstr "Reinicio seguro"
+msgstr "Reinicio controlado"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:67
 msgid "Graceful restart requested"
-msgstr "Reinicio seguro solicitado"
+msgstr "Ha sido solicitado el reinicio controlado"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:68
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:327
@@ -2169,7 +2169,7 @@ msgstr "limpiar claves y reiniciar"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:73
 msgid "Rekeying after graceful restart"
-msgstr "Reinicio de claves después de reinicio de forma segura"
+msgstr "Reinicio de claves después del reinicio controlado"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:76
 msgid "Rekey and Shutdown"
@@ -2177,7 +2177,7 @@ msgstr "limpiar claves y apagar"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:77
 msgid "Rekeying after graceful shutdown"
-msgstr "Reinicio de claves después de apagado de forma segura"
+msgstr "Reinicio de claves después del apagado controlado"
 
 #: ../java/src/net/i2p/router/web/ConfigServiceHandler.java:80
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:353
@@ -3433,7 +3433,7 @@ msgstr "Comprobar NAT/cortafuegos"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:325
 msgid "Reseed"
-msgstr "Reiniciar Semillas"
+msgstr "Rresembrar"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:342
 msgid "Configure router bandwidth allocation"
@@ -4930,32 +4930,32 @@ msgstr "IPs Baneadas"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:112
 msgid "config reseeding"
-msgstr "config de reinicio de semillas"
+msgstr "config para resembrar "
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:262
 msgid "I2P Reseeding Configuration"
-msgstr "configuración de reinicio de semillas I2P"
+msgstr "Configuración del proceso de resembrar I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:318
 msgid "Reseeding Configuration"
-msgstr "Configuración de reinicio de semillas"
+msgstr "Configuración de Resembrar"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:320
 msgid "Reseeding is the bootstrapping process used to find other routers when you first install I2P, or when your router has too few router references remaining."
-msgstr "El reinicio de semillas es el proceso de bootstrapping para encontrar otros routers cuando I2P se instala por primera vez , o cuando al router le quedan muy pocas referencias de otros routers."
+msgstr "Resembrar es el proceso de bootstrapping para encontrar otros routers cuando I2P se instala por primera vez o cuando al router le quedan muy pocas referencias de otros routers."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:322
 msgid "If reseeding has failed, you should first check your network connection."
-msgstr "Si el reinicio de semillas ha fallado, primero debe comprobar la conexión de red."
+msgstr "El proceso de resembrar ha fallado, primero debes comprobar la conexión de red."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:326
 msgid "Change these only if HTTP is blocked by a restrictive firewall, reseed has failed, and you have access to an HTTP proxy."
-msgstr "¡Sólo cambia estos parámetros si HTTP está bloqueado por un cortafuegos restrictivo, reiniciar semillas ha fracasado, y si tienes acceso a un proxy HTTP!"
+msgstr "¡Cambia estos parámetros solamente si HTTP está bloqueado por un cortafuegos restrictivo, el proceso de resembrar ha fracasado, y si tienes acceso a un proxy HTTP!"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:328
 #, java-format
 msgid "See {0} for instructions on reseeding manually."
-msgstr "Ver {0} para obtener instrucciones sobre el reinicio de semillas manual."
+msgstr "Ver {0} para obtener instrucciones sobre cómo resembrar manualmente."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:328
 msgid "the FAQ"
@@ -4963,7 +4963,7 @@ msgstr "las preguntas más frecuentes"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:330
 msgid "Reseed URL Selection"
-msgstr "Reinicializar URL Seleccionada"
+msgstr "Selección de URL resembradora"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:336
 msgid "Try SSL first then non-SSL"
@@ -4979,7 +4979,7 @@ msgstr "Usar no-SSL exclusivamente"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:350
 msgid "Reseed URLs"
-msgstr "Reinicializar URLs"
+msgstr "URLs resembradoras"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:354
 msgid "Enable HTTP proxy (not used for SSL)"
@@ -5007,7 +5007,7 @@ msgstr "Apagar el router"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:305
 msgid "Graceful shutdown lets the router satisfy the agreements it has already made before shutting down, but may take a few minutes."
-msgstr "El apagado seguro permite al router cumplir los acuerdos que ya ha hecho antes de apagar, pero puede tardar unos minutos."
+msgstr "El apagado controlado permite al router cumplir los acuerdos que ya ha hecho antes de apagar, pero puede tardar unos minutos."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:307
 msgid "If you need to kill the router immediately, that option is available as well."
@@ -5023,7 +5023,7 @@ msgstr "Esto es útil en algunas situaciones - por ejemplo, si has cambiado algu
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:321
 msgid "A graceful restart will take a few minutes (but your peers will appreciate your patience), while a hard restart does so immediately."
-msgstr "Un reinicio seguro tardará unos minutos (pero sus pares le agradecerán su paciencia), mientras que un reinicio duro lo hace inmediatamente."
+msgstr "Un reinicio controlado tardará unos minutos (pero tus pares te agradecerán tu paciencia), mientras que un reinicio duro lo hace inmediatamente."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:323
 msgid "After tearing down the router, it will wait 1 minute before starting back up again."
@@ -5071,7 +5071,7 @@ msgstr "Si está ejecutando I2p como servicio en este momento, quitarlo hará qu
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:361
 msgid "You may want to consider shutting down gracefully, as above, then running uninstall_i2p_service_winnt.bat."
-msgstr "Es posible que desee considerar el apagado seguro como se indica arriba, para ello, ejecute uninstall_i2p_service_winnt.bat."
+msgstr "Es posible que desees considerar el apagado controlado como se indica arriba, para ello, ejecuta uninstall_i2p_service_winnt.bat."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:365
 msgid "Debugging"
