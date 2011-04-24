@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
 "POT-Creation-Date: 2011-03-12 20:49+0000\n"
-"PO-Revision-Date: 2011-04-08 23:54+0100\n"
+"PO-Revision-Date: 2011-04-18 21:35+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: Spanish (Castilian) <None>\n"
 "MIME-Version: 1.0\n"
@@ -314,7 +314,7 @@ msgstr "Cancelar"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1599
 msgid "Really delete the marked messages?"
-msgstr "¿Realmente desea borrar los mensajes marcados?"
+msgstr "¿Realmente deseas borrar los mensajes marcados?"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1599
 msgid "Yes, really delete them!"
@@ -421,7 +421,7 @@ msgstr "Set"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1668
 msgid "Really delete this message?"
-msgstr "¿Realmente desea borrar este mensaje?"
+msgstr "¿Realmente deseas borrar este mensaje?"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1668
 msgid "Yes, really delete it!"

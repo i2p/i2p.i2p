@@ -28,9 +28,9 @@ import net.i2p.util.SecureFileOutputStream;
 /**
  *  Write profiles to disk at shutdown,
  *  read at startup.
- *  The files are gzip compressed, however we unfortunately store them
- *  with a ".dat" extension instead of ".txt.gz", so it isn't apparent.
- *  TODO: Migrate to new extension.
+ *  The files are gzip compressed, we previously stored them
+ *  with a ".dat" extension instead of ".txt.gz", so it wasn't apparent.
+ *  Now migrated to a ".txt.gz" extension.
  */
 class ProfilePersistenceHelper {
     private final Log _log;

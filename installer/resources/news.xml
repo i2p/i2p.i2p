@@ -1,12 +1,11 @@
 <!--
-<i2p.news date="$Date: 2011-03-02 00:00:00 $">
-<i2p.release version="0.8.4" date="2011/03/02" minVersion="0.6" />
+<i2p.news date="$Date: 2011-04-18 00:00:00 $">
+<i2p.release version="0.8.5" date="2011/04/18" minVersion="0.6" />
 -->
 <div lang="en">
-<h3>2011-03-02: <b>0.8.4 <a href="http://www.i2p2.i2p/release-0.8.4.html">Released</a></b></h3>
+<h3>2011-04-18: <b>0.8.5 <a href="http://www.i2p2.i2p/release-0.8.5.html">Released</a></b></h3>
 <p>
-The 0.8.4 release contains some performance improvements and important bug fixes.
-Also, i2psnark now supports magnet links.
+The 0.8.5 release contains a few bug fixes and performance improvements, and lots of translation updates.
 As usual, upgrading is recommended.
 </p><p>
 Please help grow the network.
