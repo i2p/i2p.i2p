@@ -11,6 +11,13 @@ String base = net.i2p.I2PAppContext.getGlobalContext().getBaseDir().getAbsoluteP
 try {
     net.i2p.util.FileUtil.readFile("history.txt", base, response.getOutputStream());
 } catch (java.io.IOException ioe) {
-    response.sendError(403, ioe.toString());
+    // prevent 'Committed' IllegalStateException from Jetty
+    if (!response.isCommitted()) {
+        response.sendError(403, ioe.toString());
+    }  else {
+        net.i2p.I2PAppContext.getGlobalContext().logManager().getLog(getClass()).error("Error serving history.txt", ioe);
+        // Jetty doesn't log this
+        throw ioe;
+    }
 }
 %>
