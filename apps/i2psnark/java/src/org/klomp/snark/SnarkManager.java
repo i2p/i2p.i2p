@@ -983,6 +983,8 @@ public class SnarkManager implements Snark.CompleteListener {
         } else if (info.getPieceLength(0) > Storage.MAX_PIECE_SIZE) {
             return _("Pieces are too large in \"{0}\" ({1}B), deleting it.", info.getName(), DataHelper.formatSize2(info.getPieceLength(0))) + ' ' +
                    _("Limit is {0}B", DataHelper.formatSize2(Storage.MAX_PIECE_SIZE));
+        } else if (info.getTotalLength() <= 0) {
+            return _("Torrent \"{0}\" has no data, deleting it!", info.getName());
         } else if (info.getTotalLength() > Storage.MAX_TOTAL_SIZE) {
             System.out.println("torrent info: " + info.toString());
             List lengths = info.getLengths();
