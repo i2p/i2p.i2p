@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
 "POT-Creation-Date: 2011-03-21 18:01+0000\n"
-"PO-Revision-Date: 2011-04-20 02:25+0100\n"
+"PO-Revision-Date: 2011-04-27 05:13+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: Spanish (Castilian) <None>\n"
 "MIME-Version: 1.0\n"
@@ -3481,7 +3481,7 @@ msgstr "Demora - mensajes"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:429
 msgid "Tunnel lag"
-msgstr "Demora - túnel"
+msgstr "Demora - túneles"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:435
 msgid "Backlog"
