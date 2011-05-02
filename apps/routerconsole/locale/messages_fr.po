@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-04-11 08:20+0000\n"
-"PO-Revision-Date: 2011-04-11 15:22+0100\n"
+"PO-Revision-Date: 2011-05-02 13:21+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: I2P Project <foo@bar>\n"
 "Language: \n"
@@ -2281,11 +2281,11 @@ msgstr "AVERTISSEMENT d'ANONYMAT: les réglages incluent des tunnels à 1 saut!"
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:82
 msgid "PERFORMANCE WARNING - Settings include very long tunnels."
-msgstr "AVERTISSEMENT de PERFORMANES: les réglages incluent des tunnels très longs!"
+msgstr "AVERTISSEMENT de PERFORMANCES: les réglages incluent des tunnels très longs!"
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:85
 msgid "PERFORMANCE WARNING - Settings include high tunnel quantities."
-msgstr "AVERTISSEMENT de PERFORMANES: les réglages incluent un grand nombre de tunnels!"
+msgstr "AVERTISSEMENT de PERFORMANCES: les réglages incluent un grand nombre de tunnels!"
 
 #. buf.append("<tr><th></th><th>Inbound</th><th>Outbound</th></tr>\n");
 #. tunnel depth
@@ -3616,7 +3616,7 @@ msgstr "Tunnels clients pour"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:65
 msgid "dead"
-msgstr "mort"
+msgstr "Morts"
 
 #: ../java/src/net/i2p/router/web/TunnelRenderer.java:71
 msgid "Participating tunnels"
@@ -5454,55 +5454,75 @@ msgstr "Profil du pair {0}"
 #~ msgid "Last reseed failed fully (failed reading seed URL)."
 #~ msgstr ""
 #~ "Échec complet du dernier réamorçage (échec de lecture de l\\''URL source)"
+
 #~ msgid "Last reseed failed fully (no routerInfo URLs at seed URL)."
 #~ msgstr ""
 #~ "Échec complet du dernier réamorçage (pas de routerInfo à l\\''URL source)"
+
 #~ msgid "Last reseed failed partly ({0}% of {1})."
 #~ msgstr "Échec partiel du dernier réamorçage ({0}% de {1})."
+
 #~ msgid "Last reseed failed ({0}% of {1})."
 #~ msgstr "Échec du dernier réamorçage ({0}% de {1})."
+
 #~ msgid "Last reseed failed fully (exception caught)."
 #~ msgstr "Échec complet du dernier réamorçage (exception interceptée)."
+
 #~ msgid "System tray icon enabled."
 #~ msgstr "Icône de zone de notification système activée."
+
 #~ msgid "System tray icon feature not supported on this platform. Sorry!"
 #~ msgstr ""
 #~ "Fonctionnalité \"Icône de zone de notification système\" non disponible "
 #~ "sur cette plateforme. Désolé!"
+
 #~ msgid "Warning: unable to contact the systray manager"
 #~ msgstr ""
 #~ "Avertissement: impossible de contacter le gestionnaire de zone de "
 #~ "notification."
+
 #~ msgid "System tray icon disabled."
 #~ msgstr "Icône de zone de notification système désactivée."
+
 #~ msgid "hour"
 #~ msgstr "heure"
+
 #~ msgid "minute"
 #~ msgstr "mn"
+
 #~ msgid "minutes"
 #~ msgstr "minutes"
+
 #~ msgid "Download"
 #~ msgstr "Télécharger"
+
 #~ msgid ""
 #~ "Please report bugs on <a href=\"http://trac.i2p2.i2p/newticket\">trac."
 #~ "i2p2.i2p</a>."
 #~ msgstr ""
 #~ "Merci de signaler les bogues sur <a href=\"http://trac.i2p2.i2p/newticket"
 #~ "\">trac.i2p2.i2p</a>."
+
 #~ msgid "This is useful in some situations"
 #~ msgstr "C'est utile dans certains cas"
+
 #~ msgid "Start Now"
 #~ msgstr "Démarrer tout de suite"
+
 #~ msgid "Depth"
 #~ msgstr "Profondeur"
+
 #~ msgid "view without"
 #~ msgstr "montrer sans"
+
 #~ msgid "view with"
 #~ msgstr "montrer avec"
+
 #~ msgid "Show the router's workload, and how it's performing"
 #~ msgstr "Montrer les tâches en cours"
+
 #~ msgid "Jobs"
 #~ msgstr "Tâches"
+
 #~ msgid "Tunnels in/out"
 #~ msgstr "Tunnels entrants/sortants"
-
