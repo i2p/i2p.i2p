@@ -53,8 +53,8 @@ ROUTERFILES="\
    ../../../router/java/src/net/i2p/router/transport/CommSystemFacadeImpl.java \
    ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java \
    ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java \
-   ../../../router/java/src/net/i2p/router/transport/udp/UPnP.java \
-   ../../../router/java/src/net/i2p/router/transport/udp/UPnPManager.java"
+   ../../../router/java/src/net/i2p/router/transport/UPnP.java \
+   ../../../router/java/src/net/i2p/router/transport/UPnPManager.java"
 
 # add ../java/ so the refs will work in the po file
 JPATHS="../java/src ../jsp/WEB-INF ../java/strings $JFILE $ROUTERFILES"
