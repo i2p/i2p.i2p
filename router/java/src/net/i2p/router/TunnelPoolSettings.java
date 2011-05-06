@@ -16,7 +16,7 @@ public class TunnelPoolSettings {
     private int _quantity;
     private int _backupQuantity;
     // private int _rebuildPeriod;
-    private int _duration;
+    //private int _duration;
     private int _length;
     private int _lengthVariance;
     private int _lengthOverride;
@@ -24,8 +24,8 @@ public class TunnelPoolSettings {
     private boolean _isExploratory;
     private boolean _allowZeroHop;
     private int _IPRestriction;
-    private Properties _unknownOptions;
-    private Hash _randomKey;
+    private final Properties _unknownOptions;
+    private final Hash _randomKey;
     
     /** prefix used to override the router's defaults for clients */
     public static final String  PREFIX_DEFAULT = "router.defaultPool.";
@@ -57,7 +57,7 @@ public class TunnelPoolSettings {
         _quantity = DEFAULT_QUANTITY;
         _backupQuantity = DEFAULT_BACKUP_QUANTITY;
         // _rebuildPeriod = DEFAULT_REBUILD_PERIOD;
-        _duration = DEFAULT_DURATION;
+        //_duration = DEFAULT_DURATION;
         _length = DEFAULT_LENGTH;
         _lengthVariance = DEFAULT_LENGTH_VARIANCE;
         _allowZeroHop = DEFAULT_ALLOW_ZERO_HOP;
@@ -107,8 +107,9 @@ public class TunnelPoolSettings {
     public boolean isExploratory() { return _isExploratory; }
     public void setIsExploratory(boolean isExploratory) { _isExploratory = isExploratory; }
     
-    public int getDuration() { return _duration; }
-    public void setDuration(int ms) { _duration = ms; }
+    // Duration is hardcoded
+    //public int getDuration() { return _duration; }
+    //public void setDuration(int ms) { _duration = ms; }
     
     /** what destination is this a tunnel for (or null if none) */
     public Hash getDestination() { return _destination; }
@@ -141,8 +142,8 @@ public class TunnelPoolSettings {
                     _allowZeroHop = getBoolean(value, DEFAULT_ALLOW_ZERO_HOP);
                 else if (name.equalsIgnoreCase(prefix + PROP_BACKUP_QUANTITY))
                     _backupQuantity = getInt(value, DEFAULT_BACKUP_QUANTITY);
-                else if (name.equalsIgnoreCase(prefix + PROP_DURATION))
-                    _duration = getInt(value, DEFAULT_DURATION);
+                //else if (name.equalsIgnoreCase(prefix + PROP_DURATION))
+                //    _duration = getInt(value, DEFAULT_DURATION);
                 else if (name.equalsIgnoreCase(prefix + PROP_LENGTH))
                     _length = getInt(value, DEFAULT_LENGTH);
                 else if (name.equalsIgnoreCase(prefix + PROP_LENGTH_VARIANCE))
@@ -165,7 +166,7 @@ public class TunnelPoolSettings {
         if (props == null) return;
         props.setProperty(prefix + PROP_ALLOW_ZERO_HOP, ""+_allowZeroHop);
         props.setProperty(prefix + PROP_BACKUP_QUANTITY, ""+_backupQuantity);
-        props.setProperty(prefix + PROP_DURATION, ""+_duration);
+        //props.setProperty(prefix + PROP_DURATION, ""+_duration);
         props.setProperty(prefix + PROP_LENGTH, ""+_length);
         props.setProperty(prefix + PROP_LENGTH_VARIANCE, ""+_lengthVariance);
         if (_destinationNickname != null)

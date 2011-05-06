@@ -455,6 +455,10 @@ class BuildExecutor implements Runnable {
         }
     }
     
+    /**
+     *  This wakes up the executor, so call this after TunnelPool.addTunnel()
+     *  so we don't build too many.
+     */
     public void buildComplete(PooledTunnelCreatorConfig cfg, TunnelPool pool) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Build complete for " + cfg);

@@ -40,23 +40,23 @@ import net.i2p.util.Log;
  * should be used to add new profiles (placing them into the appropriate groupings).
  */
 public class ProfileOrganizer {
-    private Log _log;
-    private RouterContext _context;
+    private final Log _log;
+    private final RouterContext _context;
     /** H(routerIdentity) to PeerProfile for all peers that are fast and high capacity*/
-    private Map<Hash, PeerProfile> _fastPeers;
+    private final Map<Hash, PeerProfile> _fastPeers;
     /** H(routerIdentity) to PeerProfile for all peers that have high capacities */
-    private Map<Hash, PeerProfile> _highCapacityPeers;
+    private final Map<Hash, PeerProfile> _highCapacityPeers;
     /** H(routerIdentity) to PeerProfile for all peers that well integrated into the network and not failing horribly */
-    private Map<Hash, PeerProfile> _wellIntegratedPeers;
+    private final Map<Hash, PeerProfile> _wellIntegratedPeers;
     /** H(routerIdentity) to PeerProfile for all peers that are not failing horribly */
-    private Map<Hash, PeerProfile> _notFailingPeers;
+    private final Map<Hash, PeerProfile> _notFailingPeers;
     /** H(routerIdnetity), containing elements in _notFailingPeers */
-    private List<Hash> _notFailingPeersList;
+    private final List<Hash> _notFailingPeersList;
     /** H(routerIdentity) to PeerProfile for all peers that ARE failing horribly (but that we haven't dropped reference to yet) */
-    private Map<Hash, PeerProfile> _failingPeers;
+    private final Map<Hash, PeerProfile> _failingPeers;
     /** who are we? */
     private Hash _us;
-    private ProfilePersistenceHelper _persistenceHelper;
+    private final ProfilePersistenceHelper _persistenceHelper;
     
     /** PeerProfile objects for all peers profiled, orderd by the ones with the highest capacity first */
     private Set<PeerProfile> _strictCapacityOrder;
@@ -68,7 +68,7 @@ public class ProfileOrganizer {
     /** integration value, seperating well integrated from not well integrated */
     private double _thresholdIntegrationValue;
     
-    private InverseCapacityComparator _comp;
+    private final InverseCapacityComparator _comp;
 
     /**
      * Defines the minimum number of 'fast' peers that the organizer should select.  See
@@ -79,6 +79,8 @@ public class ProfileOrganizer {
     public static final int DEFAULT_MINIMUM_FAST_PEERS = 8;
     /** this is misnamed, it is really the max minimum number. */
     private static final int DEFAULT_MAXIMUM_FAST_PEERS = 16;
+    private static final int ABSOLUTE_MAX_FAST_PEERS = 60;
+
     /**
      * Defines the minimum number of 'high capacity' peers that the organizer should 
      * select when using the mean - if less than this many are available, select the 
@@ -87,6 +89,7 @@ public class ProfileOrganizer {
      */
     public static final String PROP_MINIMUM_HIGH_CAPACITY_PEERS = "profileOrganizer.minHighCapacityPeers";
     public static final int DEFAULT_MINIMUM_HIGH_CAPACITY_PEERS = 10;
+    private static final int ABSOLUTE_MAX_HIGHCAP_PEERS = 150;
     
     /** synchronized against this lock when updating the tier that peers are located in (and when fetching them from a peer) */
     private final ReentrantReadWriteLock _reorganizeLock = new ReentrantReadWriteLock(true);
@@ -276,11 +279,14 @@ public class ProfileOrganizer {
      * @param howMany how many peers are desired
      * @param exclude set of Hashes for routers that we don't want selected
      * @param matches set to store the return value in
+     * @param mask 0-4 Number of bytes to match to determine if peers in the same IP range should
+     *             not be in the same tunnel. 0 = disable check; 1 = /8; 2 = /16; 3 = /24; 4 = exact IP match
      *
      */
     public void selectFastPeers(int howMany, Set<Hash> exclude, Set<Hash> matches) {
         selectFastPeers(howMany, exclude, matches, 0);
     }
+
     public void selectFastPeers(int howMany, Set<Hash> exclude, Set<Hash> matches, int mask) {
         getReadLock();
         try {
@@ -304,6 +310,11 @@ public class ProfileOrganizer {
     public void selectHighCapacityPeers(int howMany, Set<Hash> exclude, Set<Hash> matches) {
         selectHighCapacityPeers(howMany, exclude, matches, 0);
     }
+
+    /**
+     * @param mask 0-4 Number of bytes to match to determine if peers in the same IP range should
+     *             not be in the same tunnel. 0 = disable check; 1 = /8; 2 = /16; 3 = /24; 4 = exact IP match
+     */
     public void selectHighCapacityPeers(int howMany, Set<Hash> exclude, Set<Hash> matches, int mask) {
         getReadLock();
         try {
@@ -328,13 +339,17 @@ public class ProfileOrganizer {
         }
         return;
     }
+
     /**
      * Return a set of Hashes for peers that are well integrated into the network.
      *
+     * @param mask 0-4 Number of bytes to match to determine if peers in the same IP range should
+     *             not be in the same tunnel. 0 = disable check; 1 = /8; 2 = /16; 3 = /24; 4 = exact IP match
      */
     public void selectWellIntegratedPeers(int howMany, Set<Hash> exclude, Set<Hash> matches) {
         selectWellIntegratedPeers(howMany, exclude, matches, 0);
     }
+
     public void selectWellIntegratedPeers(int howMany, Set<Hash> exclude, Set<Hash> matches, int mask) {
         getReadLock();
         try {
@@ -351,6 +366,7 @@ public class ProfileOrganizer {
         
         return;
     }
+
     /**
      * Return a set of Hashes for peers that are not failing, preferring ones that
      * we are already talking with
@@ -359,12 +375,18 @@ public class ProfileOrganizer {
     public void selectNotFailingPeers(int howMany, Set<Hash> exclude, Set<Hash> matches) {
         selectNotFailingPeers(howMany, exclude, matches, false, 0);
     }
+
+    /**
+     * @param mask ignored, should call locked_selectPeers, to be fixed
+     */
     public void selectNotFailingPeers(int howMany, Set<Hash> exclude, Set<Hash> matches, int mask) {
         selectNotFailingPeers(howMany, exclude, matches, false, mask);
     }
+
     public void selectNotFailingPeers(int howMany, Set<Hash> exclude, Set<Hash> matches, boolean onlyNotFailing) {
         selectNotFailingPeers(howMany, exclude, matches, onlyNotFailing, 0);
     }
+
     /**
      * Return a set of Hashes for peers that are not failing, preferring ones that
      * we are already talking with
@@ -373,6 +395,7 @@ public class ProfileOrganizer {
      * @param exclude what peers to skip (may be null)
      * @param matches set to store the matches in
      * @param onlyNotFailing if true, don't include any high capacity peers
+     * @param mask ignored, should call locked_selectPeers, to be fixed
      */
     public void selectNotFailingPeers(int howMany, Set<Hash> exclude, Set<Hash> matches, boolean onlyNotFailing, int mask) {
         if (matches.size() < howMany)
@@ -417,6 +440,9 @@ public class ProfileOrganizer {
      * and we're using this to try and limit connections.
      *
      * This DOES cascade further to non-connected peers.
+     *
+     * @param mask 0-4 Number of bytes to match to determine if peers in the same IP range should
+     *             not be in the same tunnel. 0 = disable check; 1 = /8; 2 = /16; 3 = /24; 4 = exact IP match
      */
     private void selectActiveNotFailingPeers2(int howMany, Set<Hash> exclude, Set<Hash> matches, int mask) {
         if (matches.size() < howMany) {
@@ -448,6 +474,7 @@ public class ProfileOrganizer {
     public void selectAllNotFailingPeers(int howMany, Set<Hash> exclude, Set<Hash> matches, boolean onlyNotFailing) {
         selectAllNotFailingPeers(howMany, exclude, matches, onlyNotFailing, 0);
     }
+
     /**
      * @param mask ignored, should call locked_selectPeers, to be fixed
      *
@@ -497,6 +524,7 @@ public class ProfileOrganizer {
         }
         return;
     }
+
     /**
      * I'm not quite sure why you'd want this... (other than for failover from the better results)
      *
@@ -614,6 +642,7 @@ public class ProfileOrganizer {
      *
      */
     public void reorganize() { reorganize(false); }
+
     public void reorganize(boolean shouldCoalesce) {
         long sortTime = 0;
         int coalesceTime = 0;
@@ -1050,6 +1079,10 @@ public class ProfileOrganizer {
         locked_selectPeers(peers, howMany, toExclude, matches, 0);
     }
 
+    /**
+     * @param mask 0-4 Number of bytes to match to determine if peers in the same IP range should
+     *             not be in the same tunnel. 0 = disable check; 1 = /8; 2 = /16; 3 = /24; 4 = exact IP match
+     */
     private void locked_selectPeers(Map<Hash, PeerProfile> peers, int howMany, Set<Hash> toExclude, Set<Hash> matches, int mask) {
         List<Hash> all = new ArrayList(peers.keySet());
         Set<Integer> IPSet = new HashSet(8);
@@ -1261,12 +1294,12 @@ public class ProfileOrganizer {
     
     /** fixme add config  @since 0.7.10 */
     protected int getMaximumFastPeers() {
-        return 30;
+        return ABSOLUTE_MAX_FAST_PEERS;
     }
     
     /** fixme add config  @since 0.7.11 */
     protected int getMaximumHighCapPeers() {
-        return 75;
+        return ABSOLUTE_MAX_HIGHCAP_PEERS;
     }
     
     /**

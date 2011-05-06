@@ -223,7 +223,7 @@ class BuildHandler {
                     _context.messageHistory().tunnelParticipantRejected(peer, "peer rejected after " + rtt + " with " + howBad + ": " + cfg.toString());
                 }
             }
-            _exec.buildComplete(cfg, cfg.getTunnelPool());
+
             if (allAgree) {
                 // wikked, completely build
                 if (cfg.isInbound())
@@ -231,6 +231,8 @@ class BuildHandler {
                 else
                     _context.tunnelDispatcher().joinOutbound(cfg);
                 cfg.getTunnelPool().addTunnel(cfg); // self.self.self.foo!
+                // call buildComplete() after addTunnel() so we don't try another build.
+                _exec.buildComplete(cfg, cfg.getTunnelPool());
                 _exec.buildSuccessful(cfg);
                 
                 ExpireJob expireJob = new ExpireJob(_context, cfg, cfg.getTunnelPool());
@@ -242,6 +244,7 @@ class BuildHandler {
                     _context.statManager().addRateData("tunnel.buildClientSuccess", rtt, rtt);
             } else {
                 // someone is no fun
+                _exec.buildComplete(cfg, cfg.getTunnelPool());
                 if (cfg.getDestination() == null)
                     _context.statManager().addRateData("tunnel.buildExploratoryReject", rtt, rtt);
                 else

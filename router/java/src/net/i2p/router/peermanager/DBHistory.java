@@ -13,8 +13,8 @@ import net.i2p.util.Log;
  *
  */
 public class DBHistory {
-    private Log _log;
-    private RouterContext _context;
+    private final Log _log;
+    private final RouterContext _context;
     private long _successfulLookups;
     private long _failedLookups;
     private RateStat _failedLookupRate;
@@ -32,25 +32,13 @@ public class DBHistory {
     private long _lastStoreFailed;
     private long _unpromptedDbStoreNew;
     private long _unpromptedDbStoreOld;
-    private String _statGroup;
+    private final String _statGroup;
     
     public DBHistory(RouterContext context, String statGroup) {
         _context = context;
         _log = context.logManager().getLog(DBHistory.class);
         _statGroup = statGroup;
-        _successfulLookups = 0;
-        _failedLookups = 0;
-        _failedLookupRate = null;
-        _invalidReplyRate = null;
-        _lookupReplyNew = 0;
-        _lookupReplyOld = 0;
-        _lookupReplyDuplicate = 0;
-        _lookupReplyInvalid = 0;
-        _lookupsReceived = 0;
-        _avgDelayBetweenLookupsReceived = 0;
         _lastLookupReceived = -1;
-        _unpromptedDbStoreNew = 0;
-        _unpromptedDbStoreOld = 0;
         createRates(statGroup);
     }
     

@@ -1,3 +1,10 @@
+2011-05-06 zzz
+    * Tunnels and profiles:
+      - Increase max fast and high-cap tier sizes
+      - Slow profile eval cycle after sufficient uptime
+      - Fix bug which started a new build after a successful build
+      - Misc. cleanups
+
 2011-04-28 zzz
     * Console: Try to prevent cascaded IllegalStateExceptions in .jsp code;
       add logging for original error
