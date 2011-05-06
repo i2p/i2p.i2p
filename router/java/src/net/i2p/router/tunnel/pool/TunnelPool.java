@@ -25,11 +25,11 @@ import net.i2p.util.Log;
  *  A group of tunnels for the router or a particular client, in a single direction.
  */
 public class TunnelPool {
-    private final List _inProgress = new ArrayList();
+    private final List<PooledTunnelCreatorConfig> _inProgress = new ArrayList();
     private final RouterContext _context;
     private final Log _log;
     private TunnelPoolSettings _settings;
-    private final ArrayList<TunnelInfo> _tunnels;
+    private final List<TunnelInfo> _tunnels;
     private final TunnelPeerSelector _peerSelector;
     private final TunnelPoolManager _manager;
     private boolean _alive;
@@ -276,9 +276,12 @@ public class TunnelPool {
         }
     }
     
-    public void addTunnel(TunnelInfo info) {
+    /**
+     *  Add to the pool.
+     */
+    void addTunnel(TunnelInfo info) {
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug(toString() + ": Adding tunnel " + info, new Exception("Creator"));
+            _log.debug(toString() + ": Adding tunnel " + info /* , new Exception("Creator") */ );
         LeaseSet ls = null;
         synchronized (_tunnels) {
             _tunnels.add(info);
@@ -290,7 +293,10 @@ public class TunnelPool {
             _context.clientManager().requestLeaseSet(_settings.getDestination(), ls);
     }
     
-    public void removeTunnel(TunnelInfo info) {
+    /**
+     *  Remove from the pool.
+     */
+    void removeTunnel(TunnelInfo info) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(toString() + ": Removing tunnel " + info);
         int remaining = 0;
@@ -467,8 +473,10 @@ public class TunnelPool {
     }
 
     /**
-     * Build a leaseSet with the required tunnels that aren't about to expire
+     * Build a leaseSet with the required tunnels that aren't about to expire.
+     * Caller must synchronize on _tunnels.
      *
+     * @return null on failure
      */
     private LeaseSet locked_buildNewLeaseSet() {
         if (!_alive)
@@ -724,8 +732,8 @@ public class TunnelPool {
         int inProgress = 0;
         synchronized (_inProgress) {
             inProgress = _inProgress.size();
-            for (int i = 0; i < _inProgress.size(); i++) {
-                PooledTunnelCreatorConfig cfg = (PooledTunnelCreatorConfig)_inProgress.get(i);
+            for (int i = 0; i < inProgress; i++) {
+                PooledTunnelCreatorConfig cfg = _inProgress.get(i);
                 if (cfg.getLength() <= 1)
                     fallback++;
             }
@@ -846,17 +854,25 @@ public class TunnelPool {
         return rv;
     }
     
+    /**
+     *  @return null on failure
+     */
     PooledTunnelCreatorConfig configureNewTunnel() { return configureNewTunnel(false); }
 
+    /**
+     *  @return null on failure
+     */
     private PooledTunnelCreatorConfig configureNewTunnel(boolean forceZeroHop) {
         TunnelPoolSettings settings = getSettings();
-        List peers = null;
-        long expiration = _context.clock().now() + settings.getDuration();
+        // peers for new tunnel, including us, ENDPOINT FIRST
+        List<Hash> peers = null;
+        long expiration = _context.clock().now() + TunnelPoolSettings.DEFAULT_DURATION;
 
         if (!forceZeroHop) {
             peers = _peerSelector.selectPeers(_context, settings);
+
             if ( (peers == null) || (peers.isEmpty()) ) {
-                // no inbound or outbound tunnels to send the request through, and 
+                // no peers to build the tunnel with, and 
                 // the pool is refusing 0 hop tunnels
                 if (peers == null) {
                     if (_log.shouldLog(Log.WARN))
@@ -871,12 +887,13 @@ public class TunnelPool {
             peers = new ArrayList(1);
             peers.add(_context.routerHash());
         }
+
         PooledTunnelCreatorConfig cfg = new PooledTunnelCreatorConfig(_context, peers.size(), settings.isInbound(), settings.getDestination());
         cfg.setTunnelPool(this);
-        // peers[] is ordered endpoint first, but cfg.getPeer() is ordered gateway first
+        // peers list is ordered endpoint first, but cfg.getPeer() is ordered gateway first
         for (int i = 0; i < peers.size(); i++) {
             int j = peers.size() - 1 - i;
-            cfg.setPeer(j, (Hash)peers.get(i));
+            cfg.setPeer(j, peers.get(i));
             HopConfig hop = cfg.getConfig(j);
             hop.setCreation(_context.clock().now());
             hop.setExpiration(expiration);
@@ -895,6 +912,9 @@ public class TunnelPool {
         return cfg;
     }
     
+    /**
+     *  Remove from the _inprogress list
+     */
     void buildComplete(PooledTunnelCreatorConfig cfg) {
         synchronized (_inProgress) { _inProgress.remove(cfg); }
         cfg.setTunnelPool(this);
