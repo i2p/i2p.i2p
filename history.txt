@@ -1,3 +1,6 @@
+2011-05-11 zzz
+    * Use partitions of fast tier for various hops of client tunnels
+
 2011-05-06 zzz
     * Tunnels and profiles:
       - Increase max fast and high-cap tier sizes

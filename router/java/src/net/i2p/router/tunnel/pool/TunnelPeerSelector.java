@@ -41,6 +41,9 @@ public abstract class TunnelPeerSelector {
      */
     public abstract List<Hash> selectPeers(RouterContext ctx, TunnelPoolSettings settings);
     
+    /**
+     *  @return randomized number of hops 0-7, not including ourselves
+     */
     protected int getLength(RouterContext ctx, TunnelPoolSettings settings) {
         int length = settings.getLength();
         int override = settings.getLengthOverride();
@@ -61,8 +64,8 @@ public abstract class TunnelPeerSelector {
         }
         if (length < 0)
             length = 0;
-        else if (length > 8) // as documented in tunnel.html
-            length = 8;
+        else if (length > 7) // as documented in tunnel.html
+            length = 7;
         /*
         if ( (ctx.tunnelManager().getOutboundTunnelCount() <= 0) || 
              (ctx.tunnelManager().getFreeTunnelCount() <= 0) ) {
