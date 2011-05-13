@@ -1,3 +1,6 @@
+2011-05-13 zzz
+    * Increase min floodfills; decrease min routerinfo expiration
+
 2011-05-11 zzz
     * Use partitions of fast tier for various hops of client tunnels
 
