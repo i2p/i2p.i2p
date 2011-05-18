@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-04-11 08:20+0000\n"
-"PO-Revision-Date: 2011-05-02 13:21+0100\n"
+"POT-Creation-Date: 2011-05-18 10:29+0000\n"
+"PO-Revision-Date: 2011-05-18 13:35+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: I2P Project <foo@bar>\n"
 "Language: \n"
@@ -378,6 +378,120 @@ msgstr "RX dupl."
 msgid "The total number of duplicate packets received from the peer"
 msgstr "Nombre de paquets en double reçus du pair"
 
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:402
+#: ../java/src/net/i2p/router/web/ConfigNavHelper.java:18
+msgid "Service"
+msgstr "Service"
+
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:404
+msgid "WAN Common Interface Configuration"
+msgstr "Configuration de l'interface commune Internet"
+
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:405
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:411
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:421
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:426
+#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:86
+msgid "Status"
+msgstr "État"
+
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:406
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:412
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:422
+msgid "Type"
+msgstr "Type"
+
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:407
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:413
+msgid "Upstream"
+msgstr "Montant"
+
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:408
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:414
+msgid "Downstream"
+msgstr "Descendant"
+
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:410
+msgid "WAN PPP Connection"
+msgstr "Connexion Internet PPP"
+
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:415
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:423
+msgid "External IP"
+msgstr "Adresse IP externe"
+
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:417
+msgid "Layer 3 Forwarding"
+msgstr "Transfert niveau 3"
+
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:418
+msgid "Default Connection Service"
+msgstr "Service de connexion par défaut"
+
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:420
+msgid "WAN IP Connection"
+msgstr "Connexion IP Internet"
+
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:425
+msgid "WAN Ethernet Link Configuration"
+msgstr "Configuration du lien Ethernet Internet"
+
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:438
+msgid "Found Device"
+msgstr "Appareil détecté"
+
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:440
+msgid "Subdevice"
+msgstr "Service"
+
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:461
+msgid "UPnP Status"
+msgstr "État d'UPnP"
+
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:464
+msgid "UPnP has been disabled; Do you have more than one UPnP Internet Gateway Device on your LAN ?"
+msgstr "UPnP a été désactivé; peut-être avez-vous plus d'une passerelle Internet avec UPnP activé sur votre réseau local."
+
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:467
+msgid "UPnP has not found any UPnP-aware, compatible device on your LAN."
+msgstr "UPnP n'a pas trouvé de passerelle compatible sur votre réseau local."
+
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:475
+#, java-format
+msgid "The current external IP address reported by UPnP is {0}"
+msgstr "Adresse IP externe détectée par UPnP : {0}"
+
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:477
+msgid "The current external IP address is not available."
+msgstr "L'adresse IP externe n'est pas disponible."
+
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:481
+#, java-format
+msgid "UPnP reports the maximum downstream bit rate is {0}bits/sec"
+msgstr "UPnP indique un débit descendant maximum de  {0}b/s"
+
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:483
+#, java-format
+msgid "UPnP reports the maximum upstream bit rate is {0}bits/sec"
+msgstr "UPnP indique un débit montant maximum de  {0}b/s"
+
+#. {0} is TCP or UDP
+#. {1,number,#####} prevents 12345 from being output as 12,345 in the English locale.
+#. If you want the digit separator in your locale, translate as {1}.
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:492
+#, java-format
+msgid "{0} port {1,number,#####} was successfully forwarded by UPnP."
+msgstr "Le port {0} {1,number,#####} est correctement transféré par UPnP."
+
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:494
+#, java-format
+msgid "{0} port {1,number,#####} was not forwarded by UPnP."
+msgstr "Le port {0} {1,number,#####} n'est pas transféré par UPnP."
+
+#: ../../../router/java/src/net/i2p/router/transport/UPnPManager.java:161
+msgid "UPnP is not enabled"
+msgstr "UPnP n'est pas activé"
+
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java:409
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/EstablishState.java:627
 #, java-format
@@ -535,24 +649,24 @@ msgid "Dropping tunnel requests: Too slow"
 msgstr "Perte de demandes de tunnels: Trop lent"
 
 #. don't even bother, since we are so overloaded locally
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:267
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:270
 msgid "Dropping tunnel requests: Overloaded"
 msgstr "Perte de demandes de tunnnels: Surchargé"
 
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:470
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:473
 msgid "Rejecting tunnels: Request overload"
 msgstr "Rejet de tunnels: Surcharge de requêtes "
 
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:495
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:498
 msgid "Rejecting tunnels: Connection limit"
 msgstr "Rejet de tunnels: Limite de connexions"
 
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:695
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:716
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:698
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:719
 msgid "Dropping tunnel requests: High load"
 msgstr "Perte de tunnels: Forte charge"
 
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:708
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:711
 msgid "Dropping tunnel requests: Queue time"
 msgstr "Demandes de fermeture de tunnel: temps en file d'attente"
 
@@ -1727,7 +1841,7 @@ msgid "Stop"
 msgstr "Arrêt"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:262
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:78
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:80
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:331
 msgid "Check for updates"
 msgstr "Vérifier les mises à jour"
@@ -1842,10 +1956,6 @@ msgstr "Choisissez une classe à ajouter"
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:204
 msgid "Network"
 msgstr "Réseau"
-
-#: ../java/src/net/i2p/router/web/ConfigNavHelper.java:18
-msgid "Service"
-msgstr "Service"
 
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:18
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:101
@@ -2364,47 +2474,47 @@ msgstr "Chinois"
 msgid "Swedish"
 msgstr "Suédois"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:85
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:87
 msgid "Update available, attempting to download now"
 msgstr "Mise à jour disponible, essai de téléchargement en cours"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:87
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:89
 msgid "Update available, click button on left to download"
 msgstr "Mise à jour disponible, cliquez sur le bouton de gauche pour la télécharger"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:93
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:95
 msgid "No update available"
 msgstr "Pas de mise à jour disponible"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:101
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:103
 msgid "Updating news URL to"
 msgstr "Mise à jour de l'URL de news vers "
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:109
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:111
 msgid "Updating proxy host to"
 msgstr "Mise à jour de l'hôte mandataire vers"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:117
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:119
 msgid "Updating proxy port to"
 msgstr "Mise à jour du port mandataire vers"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:130
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:132
 msgid "Updating refresh frequency to"
 msgstr "Mise à jour de la fréquence de rafraîchissement vers"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:137
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:139
 msgid "Updating update policy to"
 msgstr "Mise à jour de la stratégie de mises à jour vers"
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:146
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:148
 msgid "Updating update URLs."
 msgstr "Mise à jour de l'URL de mises à jour."
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:155
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:157
 msgid "Updating trusted keys."
 msgstr "Mise à jour des clefs de confiance."
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:163
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:165
 msgid "Updating unsigned update URL to"
 msgstr "Mise à jour de l'URL de mises à jour non signées vers"
 
@@ -2896,10 +3006,6 @@ msgstr "Capacité"
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:256
 msgid "Integration"
 msgstr "Intégration"
-
-#: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:86
-msgid "Status"
-msgstr "État"
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:126
 msgid "Fast, High Capacity"
@@ -4365,14 +4471,12 @@ msgid "Specify Port"
 msgstr "Saisir le port"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:527
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:357
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:348
-msgid "Note"
-msgstr "Note"
+msgid "Notes"
+msgstr "Remarques"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:530
-msgid "Changing these settings will restart your router."
-msgstr "Un changement de cette configuration entraînera un redémarrage du routeur"
+msgid "a) Do not reveal your port numbers to anyone!   b) Changing these settings will restart your router."
+msgstr "a)Ne révélez  vos n° de ports à personne! b)La modification de ces réglages redémarrera votre routeur. "
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:536
 msgid "Configuration Help"
@@ -5050,6 +5154,11 @@ msgstr "Vous pouvez contrôler si I2P est lancé ou pas au démarrage en choisis
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:349
 msgid "If you prefer the command line, you can also run the "
 msgstr "Si vous préférez la ligne commande, vous pouvez aussi exécuter la"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:357
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:348
+msgid "Note"
+msgstr "Note"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:359
 msgid "If you are running I2P as service right now, removing it will shut down your router immediately."
