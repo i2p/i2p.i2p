@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
 "POT-Creation-Date: 2011-03-21 18:01+0000\n"
-"PO-Revision-Date: 2011-04-27 05:13+0100\n"
+"PO-Revision-Date: 2011-05-18 23:34+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: Spanish (Castilian) <None>\n"
 "MIME-Version: 1.0\n"
@@ -1532,32 +1532,32 @@ msgstr "Guardar configuración de aplicaciones web"
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:47
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:453
 msgid "Save Plugin Configuration"
-msgstr "Guardar configuración de plugins"
+msgstr "Guardar configuración de complementos"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:51
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:461
 msgid "Install Plugin"
-msgstr "Instalar Plugins"
+msgstr "Instalar complemento"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:87
 #, java-format
 msgid "Deleted plugin {0}"
-msgstr "Eliminado el plugin {0}"
+msgstr "Eliminado el complemento {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:89
 #, java-format
 msgid "Error deleting plugin {0}"
-msgstr "Error al eliminar el plugin {0}"
+msgstr "Error al eliminar el complemento {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:101
 #, java-format
 msgid "Stopped plugin {0}"
-msgstr "Detenido plugin {0}"
+msgstr "Detenido complemento {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:103
 #, java-format
 msgid "Error stopping plugin {0}"
-msgstr "Error al detener el plugin {0}"
+msgstr "Error al detener el complemento {0}"
 
 #. label (IE)
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:124
@@ -1608,7 +1608,7 @@ msgstr "configuración de aplicación Web guardada."
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:256
 msgid "Plugin configuration saved."
-msgstr "configuración del plugin guardada."
+msgstr "configuración del complemento guardada."
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:271
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:124
@@ -1625,7 +1625,7 @@ msgstr "No se encontró el servidor"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:284
 msgid "No plugin URL specified."
-msgstr "Ninguna URL de plugin especificada."
+msgstr "Ninguna URL de complementos especificada."
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:294
 #, java-format
@@ -1637,28 +1637,28 @@ msgstr "Ninguna URL de actualización especificado para {0}"
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:320
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:325
 msgid "Plugin or update download already in progress."
-msgstr "Plugin o descarga de la actualización ya en curso."
+msgstr "Descarga del complemento o de la actualización ya en curso."
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:311
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:118
 #, java-format
 msgid "Downloading plugin from {0}"
-msgstr "Descargar plugin de {0}"
+msgstr "Descargar complemento de {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:329
 #, java-format
 msgid "Checking plugin {0} for updates"
-msgstr "Buscando actualizaciones para el plugin {0}"
+msgstr "Buscando actualizaciones para el complemento {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:339
 #, java-format
 msgid "Started plugin {0}"
-msgstr "Plugin {0} iniciado"
+msgstr "Complemento {0} iniciado"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:341
 #, java-format
 msgid "Error starting plugin {0}"
-msgstr "Error al iniciar el plugin {0}"
+msgstr "Error al iniciar el complemento {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHandler.java:376
 msgid "Interface configuration saved successfully - restart required to take effect."
@@ -1698,7 +1698,7 @@ msgstr "Descripción"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:148
 msgid "Plugin"
-msgstr "Plugin"
+msgstr "Complemento"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:161
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:273
@@ -2704,31 +2704,31 @@ msgstr "Noticias chequeadas hace {0}."
 #: ../java/src/net/i2p/router/web/PluginUpdateChecker.java:77
 #, java-format
 msgid "Cannot check, plugin {0} is not installed"
-msgstr "No se puede comprobar, el plugin {0} no está instalado"
+msgstr "No se puede comprobar, el complemento {0} no está instalado"
 
 #: ../java/src/net/i2p/router/web/PluginUpdateChecker.java:129
 #, java-format
 msgid "Checking for update of plugin {0}"
-msgstr "Buscando actualizaciones para el plugin {0}"
+msgstr "Buscando actualizaciones para el complemento {0}"
 
 #: ../java/src/net/i2p/router/web/PluginUpdateChecker.java:154
 #, java-format
 msgid "New plugin version {0} is available"
-msgstr "Hay una nueva versión del plugin {0} disponible"
+msgstr "Hay una nueva versión del complemento {0} disponible"
 
 #: ../java/src/net/i2p/router/web/PluginUpdateChecker.java:156
 #, java-format
 msgid "No new version is available for plugin {0}"
-msgstr "No hay nuevas versiones disponibles para el plugin {0}"
+msgstr "No hay nuevas versiones disponibles para el complemento {0}"
 
 #: ../java/src/net/i2p/router/web/PluginUpdateChecker.java:165
 #, java-format
 msgid "Update check failed for plugin {0}"
-msgstr "Fallo al buscar actualizaciones para el plugin {0}"
+msgstr "Fallo al buscar actualizaciones para el complemento {0}"
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:139
 msgid "Downloading plugin"
-msgstr "Descargando plugin"
+msgstr "Descargando complemento"
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:146
 #: ../java/src/net/i2p/router/web/UpdateHandler.java:245
@@ -2738,13 +2738,13 @@ msgstr "{0}B transferidos"
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:153
 msgid "Plugin downloaded"
-msgstr "Plugin descargado"
+msgstr "Complemento descargado"
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:158
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:356
 #, java-format
 msgid "Cannot create plugin directory {0}"
-msgstr "No se puede crear directorio de plugins {0}"
+msgstr "No se puede crear directorio del complemento {0}"
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:167
 #: ../java/src/net/i2p/router/web/UpdateHandler.java:299
@@ -2755,112 +2755,112 @@ msgstr "de {0}"
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:177
 #, java-format
 msgid "Plugin from {0} is corrupt"
-msgstr "Plugin de {0} está dañado"
+msgstr "El complemento de {0} está dañado."
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:188
 #, java-format
 msgid "Plugin from {0} does not contain the required configuration file"
-msgstr "El plugin de {0} no contiene el archivo de configuración necesario"
+msgstr "El complemento de {0} no contiene el archivo de configuración necesario."
 
 #. updateStatus("<b>" + "Plugin contains an invalid key" + ' ' + pubkey + ' '
 #. + signer + "</b>");
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:201
 #, java-format
 msgid "Plugin from {0} contains an invalid key"
-msgstr "Plugin de {0} contiene una clave no válida"
+msgstr "El complemento de {0} contiene una clave no válida."
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:225
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:235
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:249
 #, java-format
 msgid "Plugin signature verification of {0} failed"
-msgstr "Verificación de la firma de plugin de {0} ha fallado"
+msgstr "Verificación de la firma del complemento de {0} ha fallado"
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:264
 #, java-format
 msgid "Plugin from {0} has invalid name or version"
-msgstr "Plugin de {0} tiene nombre o versión no válido"
+msgstr "El complemento de {0} tiene nombre o versión no válido."
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:269
 #, java-format
 msgid "Plugin {0} has mismatched versions"
-msgstr "El plugin {0} tiene versiones no coincidentes"
+msgstr "El complemento {0} tiene versiones no coincidentes."
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:277
 #, java-format
 msgid "This plugin requires I2P version {0} or higher"
-msgstr "Este plugin requiere la versión I2P {0} o superior"
+msgstr "Este complemento requiere la versión {0} o superior de I2P."
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:285
 #, java-format
 msgid "This plugin requires Java version {0} or higher"
-msgstr "Este plugin requiere la versión de Java {0} o superior"
+msgstr "Este complemento requiere la versión {0} o superior de Java."
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:293
 msgid "Downloaded plugin is for new installs only, but the plugin is already installed"
-msgstr "El plugin descargado es sólo para instalaciones nuevas, pero el plugin ya está instalado"
+msgstr "El complemento descargado es sólo para instalaciones nuevas, pero el complemento ya está instalado."
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:305
 msgid "Installed plugin does not contain the required configuration file"
-msgstr "El plugin instalado no contiene el archivo de configuración necesario"
+msgstr "El complemento instalado no contiene el archivo de configuración necesario."
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:313
 msgid "Signature of downloaded plugin does not match installed plugin"
-msgstr "La firma del plugin descargado no coincide con la del plugin instalado"
+msgstr "La firma del complemento descargado no coincide con la del instalado."
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:320
 #, java-format
 msgid "Downloaded plugin version {0} is not newer than installed plugin"
-msgstr "El plugin descargado con versión {0} no es más reciente que el plugin instalado"
+msgstr "El complemento descargado con versión {0} no es más reciente que la versión ya instalada."
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:327
 #, java-format
 msgid "Plugin update requires installed plugin version {0} or higher"
-msgstr "La actualización del plugin requiere tener instalada la versión del plugin {0} o superior"
+msgstr "La actualización del complemento requiere tener instalada la versión {0} o superior de este complemento."
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:334
 #, java-format
 msgid "Plugin update requires installed plugin version {0} or lower"
-msgstr "La actualización del plugin requiere tener instalada la versión del plugin {0} o inferior"
+msgstr "La actualización del complemento requiere tener instalada la versión {0} o inferior de este complemento."
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:351
 msgid "Plugin is for upgrades only, but the plugin is not installed"
-msgstr "El plugin es sólo para actualizaciones, pero el plugin no está instalado"
+msgstr "El complemento es sólo para actualizaciones, pero el complemento aún no está instalado."
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:364
 #, java-format
 msgid "Failed to install plugin in {0}"
-msgstr "No se pudo instalar el plugin en {0}"
+msgstr "No se pudo instalar el complemento en {0}"
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:371
 #, java-format
 msgid "Plugin {0} installed, router restart required"
-msgstr "Plugin {0} instalado, se requiere un reinicio del router"
+msgstr "Complemento {0} instalado, se requiere un reinicio del router."
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:373
 #, java-format
 msgid "Plugin {0} installed"
-msgstr "Plugin {0} instalado"
+msgstr "Complemento {0} instalado"
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:391
 #, java-format
 msgid "Plugin {0} installed and started"
-msgstr "Plugin {0} instalado e iniciado"
+msgstr "Complemento {0} instalado e iniciado"
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:394
 #, java-format
 msgid "Plugin {0} installed but failed to start, check logs"
-msgstr "Plugin {0} instalado pero no funciona, revise los registros"
+msgstr "Complemento {0} instalado pero no funciona, ¡revisa los registros!"
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:396
 #, java-format
 msgid "Plugin {0} installed but failed to start"
-msgstr "Plugin {0} instalado pero no se pudo iniciar"
+msgstr "Complemento {0} instalado, pero no se pudo iniciar."
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:406
 #, java-format
 msgid "Failed to download plugin from {0}"
-msgstr "No se pudo descargar el plugin de {0}"
+msgstr "No se pudo descargar el complemento de {0}."
 
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:72
 msgid "Peer Profiles"
@@ -4773,19 +4773,19 @@ msgstr "Una aplicación web también se puede desactivar quitando el archivo .wa
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:445
 msgid "Plugin Configuration"
-msgstr "Configuración de Plugins"
+msgstr "Configuración de Complementos"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:447
 msgid "The plugins listed below are started by the webConsole client."
-msgstr "Los plugins enumerados a continuación son iniciados por el cliente de consola web."
+msgstr "Los complementos enumerados a continuación son iniciados por el cliente de consola web."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:455
 msgid "Plugin Installation"
-msgstr "Instalación de Plugin"
+msgstr "Instalación de Complementos"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:457
 msgid "To install a plugin, enter the download URL:"
-msgstr "Para instalar un plugin, ¡introduce la URL de descarga!"
+msgstr "Para instalar un complemento, ¡introduce la URL de descarga!"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:112
 msgid "config keyring"
@@ -5276,7 +5276,7 @@ msgstr "URL de versión no firmada"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:379
 msgid "I2P updates are disabled because you do not have write permission for the install directory."
-msgstr "las actualizaciones de I2P están desactivadas porque no tiene permiso de escritura en el directorio de la instalación."
+msgstr "Las actualizaciones de I2P están desactivadas porque no tienes permiso de escritura en el directorio de la instalación."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:385
 msgid "Save"
