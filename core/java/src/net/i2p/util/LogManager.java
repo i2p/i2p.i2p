@@ -664,7 +664,17 @@ public class LogManager {
 
     public void shutdown() {
         if (_writer != null) {
-            _log.log(Log.WARN, "Shutting down logger");
+            //_log.log(Log.WARN, "Shutting down logger");
+            // try to prevent out-of-order logging at shutdown
+            synchronized (_writer) {
+                _writer.notifyAll();
+            }
+            if (!_records.isEmpty()) {
+                try {
+                    Thread.sleep(250);
+                } catch (InterruptedException ie) {}
+            }
+            // this could generate out-of-order messages
             _writer.flushRecords(false);
             _writer.stopWriting();
         }
