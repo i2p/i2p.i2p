@@ -135,6 +135,18 @@
         <copy file="core/java/build/i2p.jar" todir="build/" />
     </target>
 
+    <target name="buildJrobin" depends="buildProperties" >
+        <!-- take only what we need from the jrobin jar -->
+        <jar destfile="build/jrobin.jar" >
+            <zipfileset src="apps/jrobin/jrobin-1.5.9.1.jar"
+                        excludes="org/jrobin/cmd/ org/jrobin/convertor/ org/jrobin/inspector/" />
+            <manifest>
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+	    </manifest>
+        </jar>
+    </target>
+
     <target name="buildProperties" >
         <exec executable="mtn" outputproperty="workspace.version" errorproperty="mtn.error1" failifexecutionfails="false" >
             <arg value="automate" />
@@ -194,7 +206,7 @@
         <launch4j configFile="./installer/i2pstandalone.xml" />
 	<!-- thazzit -->
     </target>
-    <target name="compile" />
+
     <target name="jar" depends="jarSmall" >
         <copy file="apps/BOB/dist/BOB.jar" todir="build/" />
         <copy file="apps/sam/java/build/sam.jar" todir="build/" />
@@ -202,8 +214,9 @@
         <copy file="apps/susidns/src/susidns.war" todir="build/" />
         <copy file="apps/i2psnark/i2psnark.war" todir="build/" />
         <copy file="apps/i2psnark/java/build/i2psnark.jar" todir="build/" />
+
     </target>
-    <target name="jarSmall" depends="compile" >
+    <target name="jarSmall" depends="builddepSmall, buildJrobin" >
         <copy file="core/java/build/i2p.jar" todir="build/" />
         <copy file="router/java/build/router.jar" todir="build/" />
         <copy file="apps/ministreaming/java/build/mstreaming.jar" todir="build/" />
@@ -212,9 +225,27 @@
         <copy file="apps/i2ptunnel/java/build/i2ptunnel.war" todir="build/" />
         <copy file="apps/systray/java/build/systray.jar" todir="build/" />
         <copy file="apps/desktopgui/dist/desktopgui.jar" todir="build/" />
-        <copy file="installer/lib/jbigi/jbigi.jar" todir="build" />
         <copy file="apps/addressbook/dist/addressbook.war" todir="build/" />
     </target>
+
+    <target name="jbigi">
+        <jar destfile="build/jbigi.jar" whenmanifestonly="fail" >
+            <fileset dir="installer/lib/jbigi" includes="*.so *.dll *.jnilib" />
+        </jar>
+    </target>
+
+    <target name="jbigi-windows-only" >
+        <jar destfile="build/jbigi.jar" whenmanifestonly="fail" >
+            <fileset dir="installer/lib/jbigi" includes="*windows*.dll" />
+        </jar>
+    </target>
+
+    <target name="jbigi-linux-only">
+        <jar destfile="build/jbigi.jar"  whenmanifestonly="fail" >
+            <fileset dir="installer/lib/jbigi" includes="*linux*.so" />
+        </jar>
+    </target>
+
     <!-- the apps need to compile the jsps to poupdate -->
     <target name="poupdate" depends="buildRouter, buildStreaming, buildSystray, buildJetty, buildDesktopGui" >
         <echo message="Setting environment variable LG2 to a lang code (eg: de,zh,nl etc)" />
@@ -293,7 +324,7 @@
                 <pathelement location="apps/jetty/jettylib/org.mortbay.jetty.jar" />
                 <pathelement location="apps/jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="apps/systray/java/lib/systray4j.jar" />
-                <pathelement location="apps/jrobin/jrobin-1.4.0.jar" />
+                <pathelement location="apps/jrobin/jrobin-1.5.9.1.jar" />
                 <pathelement location="installer/lib/wrapper/win32/wrapper.jar" />
                 <pathelement location="core/lib/junit.jar" />                
             </classpath>
@@ -385,7 +416,7 @@
         </delete>
     </target>
 
-    <target name="preppkg" depends="preppkg-linux, preppkg-windows">
+    <target name="preppkg" depends="preppkg-linux, preppkg-windows, jbigi">
         <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
         <copy todir="pkg-temp/lib/wrapper/freebsd/">
             <fileset dir="installer/lib/wrapper/freebsd/" />
@@ -408,6 +439,7 @@
         <copy file="installer/resources/fixperms.bat" todir="pkg-temp/" />
         <copy file="installer/resources/install_i2p_service_winnt.bat" todir="pkg-temp/" />
         <copy file="installer/resources/postinstall.bat" todir="pkg-temp/" />
+        <copy file="installer/resources/set_config_dir_for_nt_service.bat" todir="pkg-temp/" />
         <copy file="installer/resources/uninstall_i2p_service_winnt.bat" todir="pkg-temp/" />
         <copy todir="pkg-temp/lib/wrapper/win32/">
             <fileset dir="installer/lib/wrapper/win32/" />
@@ -415,14 +447,8 @@
     </target>
 
     <!-- only what is needed for debian, etc. -->
-    <target name="preppkg-linux-only" depends="preppkg-linux">
-        <!-- rip the non-linux stuff out of jbigi.jar -->
-        <mkdir dir="tmpextract" />
-        <unjar src="build/jbigi.jar" dest="tmpextract/" />
-        <jar destfile="pkg-temp/lib/jbigi.jar" >
-            <fileset dir="tmpextract/" includes="*linux*" />
-        </jar>
-        <delete dir="tmpextract/" />
+    <target name="preppkg-linux-only" depends="preppkg-linux, jbigi-linux-only" >
+        <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
     </target>
 
     <target name="preppkg-linux" depends="preppkg-base">
@@ -462,7 +488,7 @@
         <copy file="build/desktopgui.jar" todir="pkg-temp/lib/" />
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
         <!-- pulled out of routerconsole.jar in 0.7.12; name without version so we can overwrite if we upgrade  -->
-        <copy file="apps/jrobin/jrobin-1.4.0.jar" tofile="pkg-temp/lib/jrobin.jar" />
+        <copy file="build/jrobin.jar" tofile="pkg-temp/lib/jrobin.jar" />
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
         <copy file="build/BOB.jar" todir="pkg-temp/lib/" />
         <copy file="build/systray.jar" todir="pkg-temp/lib" />
@@ -665,7 +691,7 @@
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
         <!-- pulled out of routerconsole.jar in 0.7.12, someday we can take out of updater -->
         <!-- name without version so we can overwrite if we upgrade  -->
-        <copy file="apps/jrobin/jrobin-1.4.0.jar" tofile="pkg-temp/lib/jrobin.jar" />
+        <copy file="build/jrobin.jar" tofile="pkg-temp/lib/jrobin.jar" />
         <copy file="build/i2ptunnel.war" todir="pkg-temp/webapps/" />
         <copy file="build/routerconsole.war" todir="pkg-temp/webapps/" />
         <copy file="build/addressbook.war" todir="pkg-temp/webapps/" />
@@ -824,7 +850,7 @@
             <arg value="-output"/>
             <arg value="i2p.fba"/>
             <arg value="-auxclasspath"/>
-            <arg value="build/commons-el.jar:build/commons-logging.jar:build/jasper-compiler.jar:build/jasper-runtime.jar:build/javax.servlet.jar:build/org.mortbay.jetty.jar:apps/jrobin/jrobin-1.4.0.jar:apps/systray/java/lib/systray4j.jar:installer/lib/wrapper/linux/wrapper.jar:apps/susidns/src/WEB-INF/lib/standard.jar:apps/susidns/src/WEB-INF/lib/jstl.jar:apps/jrobin/jrobin-1.4.0.jar"/>
+            <arg value="build/commons-el.jar:build/commons-logging.jar:build/jasper-compiler.jar:build/jasper-runtime.jar:build/javax.servlet.jar:build/org.mortbay.jetty.jar:apps/jrobin/jrobin-1.5.9.1.jar:apps/systray/java/lib/systray4j.jar:installer/lib/wrapper/linux/wrapper.jar:apps/susidns/src/WEB-INF/lib/standard.jar:apps/susidns/src/WEB-INF/lib/jstl.jar:apps/jrobin/jrobin-1.5.9.1.jar"/>
             <arg value="-sourcepath"/>
             <arg value="apps/BOB/src/:apps/addressbook/java/src/:apps/i2psnark/java/src/:apps/i2ptunnel/java/src/:apps/ministreaming/java/src/:apps/routerconsole/java/src/:apps/sam/java/src/:apps/streaming/java/src/:apps/susidns/src/java/src/:apps/susimail/src/src/:apps/systray/java/src/:core/java/src/:router/java/src/"/>
             <!-- start of the files to be analyzed -->
@@ -835,7 +861,6 @@
             <arg value="build/i2psnark.war"/>
             <arg value="build/i2ptunnel.jar"/>
             <arg value="build/i2ptunnel.war"/>
-            <arg value="build/jbigi.jar"/>
             <arg value="build/mstreaming.jar"/>
             <arg value="build/router.jar/"/>
             <arg value="build/desktopgui.jar"/>
@@ -1053,25 +1078,11 @@
 		we need to make sure its small, with NO redundent jars or wars.
 		thus cleaning is required before each build-->
 	<target name="buildSmallOnly" depends="pkg-portable-clean,buildSmall"/>
+
 <!-- *1* preparing the jars by OS dependent de-bloating -->
-	<target name="preppkg-portable-win32-jbigi" depends="buildSmallOnly">
-		<!-- rip the non-windows stuff out of jbigi.jar -->
-		<mkdir dir="tmpextract" />
-		<unjar src="build/jbigi.jar" dest="tmpextract/" />
-		<jar destfile="build/jbigi.jar" >
-			<fileset dir="tmpextract/" includes="*windows*" />
-		</jar>
-		<delete dir="tmpextract/" />
-	</target>
-	<target name="preppkg-portable-linux-jbigi"  depends="buildSmallOnly">
-		<!-- rip the non-linux stuff out of jbigi.jar -->
-		<mkdir dir="tmpextract" />
-		<unjar src="build/jbigi.jar" dest="tmpextract/" />
-		<jar destfile="build/jbigi.jar" >
-			<fileset dir="tmpextract/" includes="*linux*" />
-		</jar>
-		<delete dir="tmpextract/" />
-	</target>
+	<target name="preppkg-portable-win32-jbigi" depends="buildSmallOnly, jbigi-windows-only" />
+
+	<target name="preppkg-portable-linux-jbigi"  depends="buildSmallOnly, jbigi-linux-only" />
 
 <!-- *2* os independent procedure  -->
 	<target name="preppkg-portable-basic" >
@@ -1120,7 +1131,7 @@
 			</copy>
 			<!-- 3rd party jars from apps/  -->
 				<!-- jrobin - without jobin , you lost graph and get a lot error entry in logs -->
-			<copy file="apps/jrobin/jrobin-1.4.0.jar" tofile="pkg-temp/lib/jrobin.jar" />
+			<copy file="build/jrobin.jar" tofile="pkg-temp/lib/jrobin.jar" />
 	</target>
 <!-- *3* os dependent procedure/commands -->
 	<target name = "preppkg-portable-win32" depends="preppkg-portable-win32-jbigi,preppkg-portable-basic">

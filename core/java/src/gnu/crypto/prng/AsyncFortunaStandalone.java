@@ -38,8 +38,8 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
         for (int i = 0; i < _bufferCount; i++)
             status[i] = STATUS_NEED_FILL;
         _context = context;
-        context.statManager().createRateStat("prng.bufferWaitTime", "", "Encryption", new long[] { 60*1000, 10*60*1000, 60*60*1000 } );
-        context.statManager().createRateStat("prng.bufferFillTime", "", "Encryption", new long[] { 60*1000, 10*60*1000, 60*60*1000 } );
+        context.statManager().createRequiredRateStat("prng.bufferWaitTime", "Delay for random number buffer (ms)", "Encryption", new long[] { 60*1000, 10*60*1000, 60*60*1000 } );
+        context.statManager().createRequiredRateStat("prng.bufferFillTime", "Time to fill random number buffer (ms)", "Encryption", new long[] { 60*1000, 10*60*1000, 60*60*1000 } );
         _log = context.logManager().getLog(AsyncFortunaStandalone.class);
     }
     

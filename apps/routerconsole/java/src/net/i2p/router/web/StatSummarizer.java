@@ -1,16 +1,25 @@
 package net.i2p.router.web;
 
 import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Semaphore;
+
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageOutputStream;
+import javax.imageio.stream.MemoryCacheImageOutputStream;
 
 import net.i2p.router.RouterContext;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
+import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 
 import org.jrobin.core.RrdException;
@@ -18,7 +27,17 @@ import org.jrobin.graph.RrdGraph;
 import org.jrobin.graph.RrdGraphDef;
 
 /**
+ *  A thread started by RouterConsoleRunner that
+ *  checks the configuration for stats to be tracked via jrobin,
+ *  and adds or deletes RRDs as necessary.
  *
+ *  This also contains methods to generate xml or png image output.
+ *  The actual png rendering code is here for the special dual-rate graph;
+ *  the rendering for standard graphs is in SummaryRenderer.
+ *
+ *  To control memory, the number of simultaneous renderings is limited.
+ *
+ *  @since 0.6.1.13
  */
 public class StatSummarizer implements Runnable {
     private final RouterContext _context;
@@ -28,25 +47,52 @@ public class StatSummarizer implements Runnable {
     private static StatSummarizer _instance;
     private static final int MAX_CONCURRENT_PNG = 3;
     private final Semaphore _sem;
+    private volatile boolean _isRunning = true;
+    private volatile boolean _isDisabled;
+    private Thread _thread;
     
     public StatSummarizer() {
         _context = (RouterContext)RouterContext.listContexts().get(0); // fuck it, only summarize one per jvm
         _log = _context.logManager().getLog(getClass());
-        _listeners = new ArrayList(16);
+        _listeners = new CopyOnWriteArrayList();
         _instance = this;
         _sem = new Semaphore(MAX_CONCURRENT_PNG, true);
+        _context.addShutdownTask(new Shutdown());
     }
     
     public static StatSummarizer instance() { return _instance; }
     
     public void run() {
+        // JRobin 1.5.9 crashes these JVMs
+        String vendor = System.getProperty("java.vendor");
+        if (vendor.startsWith("Apache") ||                      // Harmony
+            vendor.startsWith("GNU Classpath") ||               // JamVM
+            vendor.startsWith("Free Software Foundation")) {    // gij
+            _log.logAlways(Log.WARN, "Graphing not supported with this JVM: " +
+                                     vendor + ' ' +
+                                     System.getProperty("java.version") + " (" +
+                                     System.getProperty("java.runtime.name") + ' ' +
+                                     System.getProperty("java.runtime.version") + ')');
+            _isDisabled = true;
+            _isRunning = false;
+            return;
+        }
+        boolean isPersistent = _context.getBooleanPropertyDefaultTrue(SummaryListener.PROP_PERSISTENT);
+        if (!isPersistent)
+            deleteOldRRDs();
+        _thread = Thread.currentThread();
         String specs = "";
-        while (_context.router().isAlive()) {
+        while (_isRunning && _context.router().isAlive()) {
             specs = adjustDatabases(specs);
             try { Thread.sleep(60*1000); } catch (InterruptedException ie) {}
         }
     }
     
+    /** @since 0.8.6 */
+    boolean isDisabled() {
+        return _isDisabled;
+    }
+
     /** list of SummaryListener instances */
     List<SummaryListener> getListeners() { return _listeners; }
     
@@ -105,10 +151,10 @@ public class StatSummarizer implements Runnable {
     }
     
     private void removeDb(Rate r) {
-        for (int i = 0; i < _listeners.size(); i++) {
-            SummaryListener lsnr = _listeners.get(i);
+        for (SummaryListener lsnr : _listeners) {
             if (lsnr.getRate().equals(r)) {
-                _listeners.remove(i);
+                // no iter.remove() in COWAL
+                _listeners.remove(lsnr);
                 lsnr.stopListening();
                 return;
             }
@@ -116,13 +162,17 @@ public class StatSummarizer implements Runnable {
     }
     private void addDb(Rate r) {
         SummaryListener lsnr = new SummaryListener(r);
-        _listeners.add(lsnr);
-        lsnr.startListening();
+        boolean success = lsnr.startListening();
+        if (success)
+            _listeners.add(lsnr);
+        else
+            _log.error("Failed to add RRD for rate " + r.getRateStat().getName() + '.' + r.getPeriod());
         //System.out.println("Start listening for " + r.getRateStat().getName() + ": " + r.getPeriod());
     }
 
     public boolean renderPng(Rate rate, OutputStream out) throws IOException { 
-        return renderPng(rate, out, -1, -1, false, false, false, false, -1, true); 
+        return renderPng(rate, out, GraphHelper.DEFAULT_X, GraphHelper.DEFAULT_Y,
+                         false, false, false, false, -1, true); 
     }
 
     /**
@@ -141,7 +191,7 @@ public class StatSummarizer implements Runnable {
             return locked_renderPng(rate, out, width, height, hideLegend, hideGrid, hideTitle, showEvents,
                                     periodCount, showCredit);
         } finally {
-                _sem.release();
+            _sem.release();
         }
     }
 
@@ -150,10 +200,13 @@ public class StatSummarizer implements Runnable {
                                           boolean showCredit) throws IOException {
         if (width > GraphHelper.MAX_X)
             width = GraphHelper.MAX_X;
+        else if (width <= 0)
+            width = GraphHelper.DEFAULT_X;
         if (height > GraphHelper.MAX_Y)
             height = GraphHelper.MAX_Y;
-        for (int i = 0; i < _listeners.size(); i++) {
-            SummaryListener lsnr = _listeners.get(i);
+        else if (height <= 0)
+            height = GraphHelper.DEFAULT_Y;
+        for (SummaryListener lsnr : _listeners) {
             if (lsnr.getRate().equals(rate)) {
                 lsnr.renderPng(out, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount, showCredit);
                 return true;
@@ -162,14 +215,25 @@ public class StatSummarizer implements Runnable {
         return false;
     }
 
+    /** @deprecated unused */
     public boolean renderPng(OutputStream out, String templateFilename) throws IOException {
         SummaryRenderer.render(_context, out, templateFilename);
         return true;
     }
 
     public boolean getXML(Rate rate, OutputStream out) throws IOException {
-        for (int i = 0; i < _listeners.size(); i++) {
-            SummaryListener lsnr = _listeners.get(i);
+        try {
+            try {
+                _sem.acquire();
+            } catch (InterruptedException ie) {}
+            return locked_getXML(rate, out);
+        } finally {
+            _sem.release();
+        }
+    }
+
+    private boolean locked_getXML(Rate rate, OutputStream out) throws IOException {
+        for (SummaryListener lsnr : _listeners) {
             if (lsnr.getRate().equals(rate)) {
                 lsnr.getData().exportXml(out);
                 out.write(("<!-- Rate: " + lsnr.getRate().getRateStat().getName() + " for period " + lsnr.getRate().getPeriod() + " -->\n").getBytes());
@@ -196,68 +260,91 @@ public class StatSummarizer implements Runnable {
             return locked_renderRatePng(out, width, height, hideLegend, hideGrid, hideTitle, showEvents,
                                         periodCount, showCredit);
         } finally {
-                _sem.release();
+            _sem.release();
         }
     }
 
     private boolean locked_renderRatePng(OutputStream out, int width, int height, boolean hideLegend,
                                               boolean hideGrid, boolean hideTitle, boolean showEvents,
                                               int periodCount, boolean showCredit) throws IOException {
-        long end = _context.clock().now() - 60*1000;
+
+        // go to some trouble to see if we have the data for the combined bw graph
+        SummaryListener txLsnr = null;
+        SummaryListener rxLsnr = null;
+        for (SummaryListener lsnr : StatSummarizer.instance().getListeners()) {
+            String title = lsnr.getRate().getRateStat().getName();
+            if (title.equals("bw.sendRate"))
+                txLsnr = lsnr;
+            else if (title.equals("bw.recvRate"))
+                rxLsnr = lsnr;
+        }
+        if (txLsnr == null || rxLsnr == null)
+            throw new IOException("no rates for combined graph");
+
+        long end = _context.clock().now() - 75*1000;
         if (width > GraphHelper.MAX_X)
             width = GraphHelper.MAX_X;
+        else if (width <= 0)
+            width = GraphHelper.DEFAULT_X;
         if (height > GraphHelper.MAX_Y)
             height = GraphHelper.MAX_Y;
-        if (periodCount <= 0) periodCount = SummaryListener.PERIODS;
-        if (periodCount > SummaryListener.PERIODS)
-            periodCount = SummaryListener.PERIODS;
+        else if (height <= 0)
+            height = GraphHelper.DEFAULT_Y;
+        if (periodCount <= 0 || periodCount > txLsnr.getRows())
+            periodCount = txLsnr.getRows();
         long period = 60*1000;
         long start = end - period*periodCount;
         //long begin = System.currentTimeMillis();
         try {
             RrdGraphDef def = new RrdGraphDef();
-            def.setTimePeriod(start/1000, 0);
-            def.setLowerLimit(0d);
-            def.setBaseValue(1024);
-            // Note to translators: all runtime zh translation disabled in this file, no font available in RRD
+            def.setTimeSpan(start/1000, end/1000);
+            def.setMinValue(0d);
+            def.setBase(1024);
             String title = _("Bandwidth usage");
             if (!hideTitle)
                 def.setTitle(title);
+            long started = _context.router().getWhenStarted();
+            if (started > start && started < end)
+                def.vrule(started / 1000, Color.BLACK, null, 4.0f);  // no room for legend
             String sendName = SummaryListener.createName(_context, "bw.sendRate.60000");
             String recvName = SummaryListener.createName(_context, "bw.recvRate.60000");
-            def.datasource(sendName, sendName, sendName, "AVERAGE", "MEMORY");
-            def.datasource(recvName, recvName, recvName, "AVERAGE", "MEMORY");
-            def.area(sendName, Color.BLUE, _("Outbound bytes/sec"));
+            def.datasource(sendName, txLsnr.getData().getPath(), sendName, SummaryListener.CF, txLsnr.getBackendName());
+            def.datasource(recvName, rxLsnr.getData().getPath(), recvName, SummaryListener.CF, rxLsnr.getBackendName());
+            def.area(sendName, Color.BLUE, _("Outbound Bytes/sec"));
             //def.line(sendName, Color.BLUE, "Outbound bytes/sec", 3);
-            def.line(recvName, Color.RED, _("Inbound bytes/sec") + "@r", 3);
+            def.line(recvName, Color.RED, _("Inbound Bytes/sec") + "\\r", 3);
             //def.area(recvName, Color.RED, "Inbound bytes/sec@r");
             if (!hideLegend) {
-                def.gprint(sendName, "AVERAGE", _("out average") + ": @2@s" + _("bytes/sec"));
-                def.gprint(sendName, "MAX", ' ' + _("max") + ": @2@s" + _("bytes/sec") + "@r");
-                def.gprint(recvName, "AVERAGE", _("in average") + ":  @2@s" + _("bytes/sec"));
-                def.gprint(recvName, "MAX", ' ' + _("max") + ": @2@s" + _("bytes/sec") + "@r");
+                def.gprint(sendName, SummaryListener.CF, _("Out average") + ": %.2f %s" + _("Bps"));
+                def.gprint(sendName, "MAX", ' ' + _("max") + ": %.2f %S" + _("Bps") + "\\r");
+                def.gprint(recvName, SummaryListener.CF, _("In average") + ": %.2f %S" + _("Bps"));
+                def.gprint(recvName, "MAX", ' ' + _("max") + ": %.2f %S" + _("Bps") + "\\r");
             }
             if (!showCredit)
                 def.setShowSignature(false);
             if (hideLegend) 
-                def.setShowLegend(false);
+                def.setNoLegend(true);
             if (hideGrid) {
-                def.setGridX(false);
-                def.setGridY(false);
+                def.setDrawXGrid(false);
+                def.setDrawYGrid(false);
             }
             //System.out.println("rendering: path=" + path + " dsNames[0]=" + dsNames[0] + " dsNames[1]=" + dsNames[1] + " lsnr.getName=" + _listener.getName());
             def.setAntiAliasing(false);
             //System.out.println("Rendering: \n" + def.exportXmlTemplate());
             //System.out.println("*****************\nData: \n" + _listener.getData().dump());
+            def.setWidth(width);
+            def.setHeight(height);
+
             RrdGraph graph = new RrdGraph(def);
             //System.out.println("Graph created");
-            byte data[] = null;
-            if ( (width <= 0) || (height <= 0) )
-                data = graph.getPNGBytes();
-            else
-                data = graph.getPNGBytes(width, height);
-            //long timeToPlot = System.currentTimeMillis() - begin;
-            out.write(data);
+            int totalWidth = graph.getRrdGraphInfo().getWidth();
+            int totalHeight = graph.getRrdGraphInfo().getHeight();
+            BufferedImage img = new BufferedImage(totalWidth, totalHeight, BufferedImage.TYPE_USHORT_565_RGB);
+            Graphics gfx = img.getGraphics();
+            graph.render(gfx);
+            ImageOutputStream ios = new MemoryCacheImageOutputStream(out);
+            ImageIO.write(img, "png", ios);
+
             //File t = File.createTempFile("jrobinData", ".xml");
             //_listener.getData().dumpXml(new FileOutputStream(t));
             //System.out.println("plotted: " + (data != null ? data.length : 0) + " bytes in " + timeToPlot
@@ -303,11 +390,38 @@ public class StatSummarizer implements Runnable {
         return rv;
     }
 
+    /**
+     *  Delete the old rrd dir if we are no longer persistent
+     *  @since 0.8.6
+     */
+    private void deleteOldRRDs() {
+        File rrdDir = new File(_context.getRouterDir(), SummaryListener.RRD_DIR);
+        FileUtil.rmdir(rrdDir, false);
+    }
+
     /** translate a string */
     private String _(String s) {
         // the RRD font doesn't have zh chars, at least on my system
-        if ("zh".equals(Messages.getLanguage(_context)))
-            return s;
+        // Works on 1.5.9
+        //if ("zh".equals(Messages.getLanguage(_context)))
+        //    return s;
         return Messages.getString(s, _context);
+    }
+
+    /**
+     *  Make sure any persistent RRDs are closed
+     *  @since 0.8.6
+     */
+    private class Shutdown implements Runnable {
+        public void run() {
+            _isRunning = false;
+            if (_thread != null)
+                _thread.interrupt();
+            for (SummaryListener lsnr : _listeners) {
+                // FIXME could cause exceptions if rendering?
+                lsnr.stopListening();
+            }
+            _listeners.clear();
+        }
     }
 }

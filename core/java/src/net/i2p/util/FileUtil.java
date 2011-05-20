@@ -357,6 +357,9 @@ public class FileUtil {
      * Dump the contents of the given path (relative to the root) to the output 
      * stream.  The path must not go above the root, either - if it does, it will
      * throw a FileNotFoundException
+     *
+     * Closes the OutputStream out on successful completion
+     * but leaves it open when throwing IOE.
      */
     public static void readFile(String path, String root, OutputStream out) throws IOException {
         File rootDir = new File(root);
@@ -376,10 +379,10 @@ public class FileUtil {
             int read = 0;
             while ( (read = in.read(buf)) != -1) 
                 out.write(buf, 0, read);
-            out.close();
+            try { out.close(); } catch (IOException ioe) {}
         } finally {
             if (in != null) 
-                in.close();
+                try { in.close(); } catch (IOException ioe) {}
         }
     }
 

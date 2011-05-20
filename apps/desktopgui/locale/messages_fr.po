@@ -1,0 +1,56 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the desktopgui package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# foo <foo@bar>, 2009.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P desktopgui\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-03-03 18:29+0000\n"
+"PO-Revision-Date: 2011-03-30 21:58+0100\n"
+"Last-Translator: magma <magma@mail.i2p>\n"
+"Language-Team: duck <duck@mail.i2p>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:23
+msgid "Start I2P"
+msgstr "Démarrer I2P"
+
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:38
+msgid "I2P is starting!"
+msgstr "I2P démarre!"
+
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:38
+msgid "Starting"
+msgstr "Démarrage"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:26
+msgid "Launch I2P Browser"
+msgstr "Lancer le navigateur"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:50
+msgid "Configure desktopgui"
+msgstr "Configurer l'interface de bureau"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:67
+msgid "Restart I2P"
+msgstr "Redémarrer I2P"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:85
+msgid "Stop I2P"
+msgstr "Arrêter I2P"
+
+#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:44
+msgid "Tray icon configuration"
+msgstr "Configuration de l'icône de notification"
+
+#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:47
+msgid "Should tray icon be enabled?"
+msgstr "Activer l'icône de notification"
+

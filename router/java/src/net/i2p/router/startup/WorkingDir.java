@@ -164,14 +164,22 @@ public class WorkingDir {
         }
     }
 
-    /** Returns <code>false</code> if a directory is empty, or contains nothing besides a subdirectory named plugins */
+    /**
+     * Tests if <code>dir</code> has been set up as a I2P working directory.<br/>
+     * Returns <code>false</code> if a directory is empty, or contains nothing besides
+     * subdirectories named <code>plugins</code> and/or <code>logs</code>.<br/>
+     * Returns <code>true</code> if the directory contains something not named
+     * <code>plugins</code> or <code>logs</code>.</br>
+     * This allows to pre-install plugins before the first router start.
+     */
     private static boolean isSetup(File dir) {
         if (dir.isDirectory()) {
             String[] files = dir.list();
-            if (files.length == 0)
+            if (files == null)
                 return false;
-            if (files.length>1 || !"plugins".equals(files[0]))
-                return true;
+            for (String file: files)
+                if (!"plugins".equals(file) && !"logs".equals(file))
+                    return true;
         }
         return false;
     }

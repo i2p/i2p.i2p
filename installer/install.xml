@@ -4,7 +4,7 @@
 
     <info>
         <appname>i2p</appname>
-        <appversion>0.8.4</appversion>
+        <appversion>0.8.6</appversion>
         <authors>
             <author name="I2P" email="http://forum.i2p2.de/"/>
         </authors>
@@ -183,8 +183,8 @@
         <pack name="Windows Service" required="no">
             <description>Automatically start I2P in the background</description>
             <os family="windows" />
+            <executable targetfile="$INSTALL_PATH/set_config_dir_for_nt_service.bat" stage="postinstall" failure="warn" keep="false" />
 <!--
-            <executable targetfile="$INSTALL_PATH/install_i2p_service_winnt.bat" stage="postinstall" failure="warn" keep="true" />
 -->
             <executable targetfile="$INSTALL_PATH/install_i2p_service_winnt.bat" stage="postinstall" failure="warn" keep="true">
                 <args>
@@ -198,9 +198,6 @@
                     <arg value="$INSTALL_PATH\wrapper.config" />
                 </args>
             </executable>
-<!--
-            <executable targetfile="$INSTALL_PATH/uninstall_i2p_service_winnt.bat" stage="uninstall" failure="warn" keep="true" />
--->
             <executable targetfile="$INSTALL_PATH/uninstall_i2p_service_winnt.bat" stage="uninstall" failure="warn" keep="true">
                 <args>
                     <arg value="$INSTALL_PATH\wrapper.config" />

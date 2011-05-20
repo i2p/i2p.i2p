@@ -1,6 +1,6 @@
 package net.i2p.router.web;
 
-import java.awt.Color;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -10,42 +10,59 @@ import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.stat.RateSummaryListener;
 import net.i2p.util.Log;
+import net.i2p.util.SecureFile;
+import net.i2p.util.SecureFileOutputStream;
 
+import org.jrobin.core.Archive;
 import org.jrobin.core.RrdBackendFactory;
 import org.jrobin.core.RrdDb;
 import org.jrobin.core.RrdDef;
 import org.jrobin.core.RrdException;
 import org.jrobin.core.RrdMemoryBackendFactory;
+import org.jrobin.core.RrdNioBackendFactory;
 import org.jrobin.core.Sample;
 import org.jrobin.graph.RrdGraph;
 import org.jrobin.graph.RrdGraphDef;
 import org.jrobin.graph.RrdGraphDefTemplate;
 
+/**
+ *  Creates and updates the in-memory RRD database,
+ *  and provides methods to generate graphs of the data
+ *
+ *  @since 0.6.1.13
+ */
 class SummaryListener implements RateSummaryListener {
-    private I2PAppContext _context;
-    private Log _log;
-    private Rate _rate;
+    static final String PROP_PERSISTENT = "routerconsole.graphPersistent";
+    /** note that .jrb files are NOT compatible with .rrd files */
+    static final String RRD_DIR = "rrd";
+    private static final String RRD_PREFIX = "rrd-";
+    private static final String RRD_SUFFIX = ".jrb";
+    static final String CF = "AVERAGE";
+    private static final double XFF = 0.9d;
+    private static final int STEPS = 1;
+
+    private final I2PAppContext _context;
+    private final Log _log;
+    private final Rate _rate;
+    private final boolean _isPersistent;
     private String _name;
     private String _eventName;
     private RrdDb _db;
     private Sample _sample;
     private RrdMemoryBackendFactory _factory;
     private SummaryRenderer _renderer;
+    private int _rows;
     
-    static final int PERIODS = 1440;
-    
-    static {
-        try {
-            RrdBackendFactory.setDefaultFactory("MEMORY");
-        } catch (RrdException re) {
-            re.printStackTrace();
-        }
-    }
+    static final int PERIODS = 60 * 24;  // 1440
+    private static final int MIN_ROWS = PERIODS;
+    private static final int MAX_ROWS = 91 * MIN_ROWS;
+    private static final long THREE_MONTHS = 91l * 24 * 60 * 60 * 1000;
     
     public SummaryListener(Rate r) {
         _context = I2PAppContext.getGlobalContext();
         _rate = r;
         _log = _context.logManager().getLog(SummaryListener.class);
+        _isPersistent = _context.getBooleanPropertyDefaultTrue(PROP_PERSISTENT);
     }
     
     public void add(double totalValue, long eventCount, double totalEventTime, long period) {
@@ -86,34 +103,73 @@ class SummaryListener implements RateSummaryListener {
     }
     
     public Rate getRate() { return _rate; }
-    public void startListening() {
+
+    /**
+     *  @return success
+     */
+    public boolean startListening() {
         RateStat rs = _rate.getRateStat();
         long period = _rate.getPeriod();
         String baseName = rs.getName() + "." + period;
         _name = createName(_context, baseName);
         _eventName = createName(_context, baseName + ".events");
         try {
-            RrdDef def = new RrdDef(_name, now()/1000, period/1000);
-            // for info on the heartbeat, xff, steps, etc, see the rrdcreate man page, aka
-            // http://www.jrobin.org/support/man/rrdcreate.html
-            long heartbeat = period*10/1000;
-            def.addDatasource(_name, "GAUGE", heartbeat, Double.NaN, Double.NaN);
-            def.addDatasource(_eventName, "GAUGE", heartbeat, 0, Double.NaN);
-            double xff = 0.9;
-            int steps = 1;
-            int rows = PERIODS;
-            def.addArchive("AVERAGE", xff, steps, rows);
-            _factory = (RrdMemoryBackendFactory)RrdBackendFactory.getDefaultFactory();
-            _db = new RrdDb(def, _factory);
+            RrdBackendFactory factory = RrdBackendFactory.getFactory(getBackendName());
+            String rrdDefName;
+            if (_isPersistent) {
+                // generate full path for persistent RRD files
+                File rrdDir = new SecureFile(_context.getRouterDir(), RRD_DIR);
+                File rrdFile = new File(rrdDir, RRD_PREFIX + _name + RRD_SUFFIX);
+                rrdDefName = rrdFile.getAbsolutePath();
+                if (rrdFile.exists()) {
+                    _db = new RrdDb(rrdDefName, factory);
+                    Archive arch = _db.getArchive(CF, STEPS);
+                    if (arch == null)
+                        throw new IOException("No average CF in " + rrdDefName);
+                    _rows = arch.getRows();
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Existing RRD " + baseName + " (" + rrdDefName + ") with " + _rows + " rows consuming " + _db.getRrdBackend().getLength() + " bytes");
+                } else {
+                    rrdDir.mkdir();
+                }
+            } else {
+                rrdDefName = _name;
+            }
+            if (_db == null) {
+                // not persistent or not previously existing
+                RrdDef def = new RrdDef(rrdDefName, now()/1000, period/1000);
+                // for info on the heartbeat, xff, steps, etc, see the rrdcreate man page, aka
+                // http://www.jrobin.org/support/man/rrdcreate.html
+                long heartbeat = period*10/1000;
+                def.addDatasource(_name, "GAUGE", heartbeat, Double.NaN, Double.NaN);
+                def.addDatasource(_eventName, "GAUGE", heartbeat, 0, Double.NaN);
+                int steps = 1;
+                if (_isPersistent) {
+                    _rows = (int) Math.max(MIN_ROWS, Math.min(MAX_ROWS, THREE_MONTHS / period));
+                } else {
+                    _rows = MIN_ROWS;
+                }
+                def.addArchive(CF, XFF, STEPS, _rows);
+                _db = new RrdDb(def, factory);
+                if (_isPersistent)
+                    SecureFileOutputStream.setPerms(new File(rrdDefName));
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("New RRD " + baseName + " (" + rrdDefName + ") with " + _rows + " rows consuming " + _db.getRrdBackend().getLength() + " bytes");
+            }
             _sample = _db.createSample();
             _renderer = new SummaryRenderer(_context, this);
             _rate.setSummaryListener(this);
+            return true;
+        } catch (OutOfMemoryError oom) {
+            _log.error("Error starting RRD for stat " + baseName, oom);
         } catch (RrdException re) {
-            _log.error("Error starting", re);
+            _log.error("Error starting RRD for stat " + baseName, re);
         } catch (IOException ioe) {
-            _log.error("Error starting", ioe);
+            _log.error("Error starting RRD for stat " + baseName, ioe);
         }
+        return false;
     }
+
     public void stopListening() {
         if (_db == null) return;
         try {
@@ -122,23 +178,50 @@ class SummaryListener implements RateSummaryListener {
             _log.error("Error closing", ioe);
         }
         _rate.setSummaryListener(null);
-        _factory.delete(_db.getPath());
+        if (!_isPersistent) {
+            // close() does not release resources for memory backend
+            try {
+                ((RrdMemoryBackendFactory)RrdBackendFactory.getFactory(RrdMemoryBackendFactory.NAME)).delete(_db.getPath());
+            } catch (RrdException re) {}
+        }
         _db = null;
     }
+
     public void renderPng(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount, boolean showCredit) throws IOException {
+        if (_renderer == null || _db == null)
+            throw new IOException("No RRD, check logs for previous errors");
         _renderer.render(out, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount, showCredit); 
     }
-    public void renderPng(OutputStream out) throws IOException { _renderer.render(out); }
+
+    public void renderPng(OutputStream out) throws IOException {
+        if (_renderer == null || _db == null)
+            throw new IOException("No RRD, check logs for previous errors");
+        _renderer.render(out);
+    }
  
     String getName() { return _name; }
+
     String getEventName() { return _eventName; }
+
     RrdDb getData() { return _db; }
+
     long now() { return _context.clock().now(); }
     
+    /** @since 0.8.6 */
+    String getBackendName() {
+        return _isPersistent ? RrdNioBackendFactory.NAME : RrdMemoryBackendFactory.NAME;
+    }
+
+    /** @since 0.8.6 */
+    int getRows() {
+        return _rows;
+    }
+
     @Override
     public boolean equals(Object obj) {
         return ((obj instanceof SummaryListener) && ((SummaryListener)obj)._rate.equals(_rate));
     }
+
     @Override
     public int hashCode() { return _rate.hashCode(); }
 }

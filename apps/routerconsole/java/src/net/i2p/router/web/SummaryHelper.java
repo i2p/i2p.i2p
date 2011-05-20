@@ -384,7 +384,7 @@ public class SummaryHelper extends HelperBase {
                     buf.append("client.png\" alt=\"Client\" title=\"" + _("Client") + "\">");
                 buf.append("</td><td align=\"left\"><b><a href=\"tunnels#").append(h.toBase64().substring(0,4));
                 buf.append("\" target=\"_top\" title=\"" + _("Show tunnels") + "\">");
-                if (name.length() < 16)
+                if (name.length() < 18)
                     buf.append(name);
                 else
                     buf.append(name.substring(0,15)).append("&hellip;");

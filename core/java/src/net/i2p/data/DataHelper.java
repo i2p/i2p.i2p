@@ -823,11 +823,10 @@ public class DataHelper {
      * This treats (null == null) as true, (null == (!null)) as false, 
      * and unequal length arrays as false.
      *
+     * @return Arrays.equals(lhs, rhs)
      */
     public final static boolean eq(byte lhs[], byte rhs[]) {
-        // this appears to be the way Arrays.equals is defined, so all the extra tests are unnecessary?
-        boolean eq = (((lhs == null) && (rhs == null)) || ((lhs != null) && (rhs != null) && (Arrays.equals(lhs, rhs))));
-        return eq;
+        return Arrays.equals(lhs, rhs);
     }
 
     /**

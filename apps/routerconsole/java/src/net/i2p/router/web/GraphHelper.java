@@ -17,14 +17,15 @@ public class GraphHelper extends FormHandler {
     private int _width;
     private int _height;
     private int _refreshDelaySeconds;
+    private boolean _persistent;
 
     private static final String PROP_X = "routerconsole.graphX";
     private static final String PROP_Y = "routerconsole.graphY";
     private static final String PROP_REFRESH = "routerconsole.graphRefresh";
     private static final String PROP_PERIODS = "routerconsole.graphPeriods";
     private static final String PROP_EVENTS = "routerconsole.graphEvents";
-    private static final int DEFAULT_X = 250;
-    private static final int DEFAULT_Y = 100;
+    public static final int DEFAULT_X = 250;
+    public static final int DEFAULT_Y = 100;
     private static final int DEFAULT_REFRESH = 60;
     private static final int DEFAULT_PERIODS = 60;
     static final int MAX_X = 2048;
@@ -39,9 +40,21 @@ public class GraphHelper extends FormHandler {
         _height = _context.getProperty(PROP_Y, DEFAULT_Y);
         _periodCount = _context.getProperty(PROP_PERIODS, DEFAULT_PERIODS);
         _refreshDelaySeconds = _context.getProperty(PROP_REFRESH, DEFAULT_REFRESH);
-        _showEvents = Boolean.valueOf(_context.getProperty(PROP_EVENTS)).booleanValue();
+        _showEvents = _context.getBooleanProperty(PROP_EVENTS);
     }
     
+    /**
+     *  This must be output in the jsp since <meta> must be in the <head>
+     *  @since 0.8.6
+     */
+    public String getRefreshMeta() {
+        if (_refreshDelaySeconds <= 8 ||
+            ConfigRestartBean.getRestartTimeRemaining() < (1000 * (_refreshDelaySeconds + 30)))
+            return "";
+        // shorten the refresh by 3 seconds so we beat the iframe
+        return "<meta http-equiv=\"refresh\" content=\"" + (_refreshDelaySeconds - 3) + "\">";
+    }
+
     /**
      *  This was a HelperBase but now it's a FormHandler
      *  @since 0.8.2
@@ -51,13 +64,17 @@ public class GraphHelper extends FormHandler {
     public void setPeriodCount(String str) { 
         try { _periodCount = Integer.parseInt(str); } catch (NumberFormatException nfe) {}
     }
+
     public void setShowEvents(boolean b) { _showEvents = b; }
+
     public void setHeight(String str) {
         try { _height = Math.min(Integer.parseInt(str), MAX_Y); } catch (NumberFormatException nfe) {}
     }
+
     public void setWidth(String str) {
         try { _width = Math.min(Integer.parseInt(str), MAX_X); } catch (NumberFormatException nfe) {}
     }
+
     public void setRefreshDelay(String str) {
         try {
             int rds = Integer.parseInt(str);
@@ -67,8 +84,13 @@ public class GraphHelper extends FormHandler {
                 _refreshDelaySeconds = -1;
         } catch (NumberFormatException nfe) {}
     }
+
+    /** @since 0.8.6 */
+    public void setPersistent(String foo) { _persistent = true; }
     
     public String getImages() { 
+        if (StatSummarizer.instance().isDisabled())
+            return "";
         try {
             List listeners = StatSummarizer.instance().getListeners();
             TreeSet ordered = new TreeSet(new AlphaComparator());
@@ -91,12 +113,11 @@ public class GraphHelper extends FormHandler {
                            + "&amp;height=" + (3 * _height)
                            + "\" target=\"_blank\">");
                 String title = _("Combined bandwidth graph");
-                _out.write("<img class=\"statimage\" width=\""
-                           + (_width + 83) + "\" height=\"" + (_height + 92)
-                           + "\" src=\"viewstat.jsp?stat=bw.combined"
+                _out.write("<img class=\"statimage\""
+                           + " src=\"viewstat.jsp?stat=bw.combined"
                            + "&amp;periodCount=" + _periodCount 
                            + "&amp;width=" + _width
-                           + "&amp;height=" + (_height - 14)
+                           + "&amp;height=" + (_height - 13)
                            + "\" alt=\"" + title + "\" title=\"" + title + "\"></a>\n");
             }
             
@@ -113,9 +134,8 @@ public class GraphHelper extends FormHandler {
                            + "&amp;width=" + (3 * _width)
                            + "&amp;height=" + (3 * _height)
                            + "\" target=\"_blank\">");
-                _out.write("<img class=\"statimage\" border=\"0\" width=\""
-                           + (_width + 83) + "\" height=\"" + (_height + 92)
-                           + "\" src=\"viewstat.jsp?stat="
+                _out.write("<img class=\"statimage\" border=\"0\""
+                           + " src=\"viewstat.jsp?stat="
                            + r.getRateStat().getName() 
                            + "&amp;showEvents=" + _showEvents
                            + "&amp;period=" + r.getPeriod() 
@@ -125,10 +145,9 @@ public class GraphHelper extends FormHandler {
                            + "\" alt=\"" + title 
                            + "\" title=\"" + title + "\"></a>\n");
             }
-            if (_refreshDelaySeconds > 0)
-                // shorten the refresh by 3 seconds so we beat the iframe
-                _out.write("<meta http-equiv=\"refresh\" content=\"" + (_refreshDelaySeconds - 3) + "\">\n");
 
+            // FIXME jrobin doesn't support setting the timezone, will have to mod TimeAxis.java
+            _out.write("<p><i>" + _("All times are UTC.") + "</i></p>\n");
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
@@ -138,6 +157,8 @@ public class GraphHelper extends FormHandler {
     private static final int[] times = { 60, 2*60, 5*60, 10*60, 30*60, 60*60, -1 };
 
     public String getForm() { 
+        if (StatSummarizer.instance().isDisabled())
+            return "";
         String prev = System.getProperty("net.i2p.router.web.GraphHelper.nonce");
         if (prev != null) System.setProperty("net.i2p.router.web.GraphHelper.noncePrev", prev);
         String nonce = "" + _context.random().nextLong();
@@ -147,11 +168,11 @@ public class GraphHelper extends FormHandler {
             _out.write("<form action=\"graphs\" method=\"POST\">\n" +
                        "<input type=\"hidden\" name=\"action\" value=\"foo\">\n" +
                        "<input type=\"hidden\" name=\"nonce\" value=\"" + nonce + "\" >\n");
-            _out.write(_("Periods") + ": <input size=\"3\" type=\"text\" name=\"periodCount\" value=\"" + _periodCount + "\"><br>\n");
+            _out.write(_("Periods") + ": <input size=\"5\" style=\"text-align: right;\" type=\"text\" name=\"periodCount\" value=\"" + _periodCount + "\"><br>\n");
             _out.write(_("Plot averages") + ": <input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"false\" " + (_showEvents ? "" : "checked=\"true\" ") + "> ");
             _out.write(_("or")+ " " +_("plot events") + ": <input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"true\" "+ (_showEvents ? "checked=\"true\" " : "") + "><br>\n");
-            _out.write(_("Image sizes") + ": " + _("width") + ": <input size=\"4\" type=\"text\" name=\"width\" value=\"" + _width 
-                       + "\"> " + _("pixels") + ", " + _("height") + ": <input size=\"4\" type=\"text\" name=\"height\" value=\"" + _height  
+            _out.write(_("Image sizes") + ": " + _("width") + ": <input size=\"4\" style=\"text-align: right;\" type=\"text\" name=\"width\" value=\"" + _width 
+                       + "\"> " + _("pixels") + ", " + _("height") + ": <input size=\"4\" style=\"text-align: right;\" type=\"text\" name=\"height\" value=\"" + _height  
                        + "\"> " + _("pixels") + "<br>\n");
             _out.write(_("Refresh delay") + ": <select name=\"refreshDelay\">");
             for (int i = 0; i < times.length; i++) {
@@ -168,11 +189,38 @@ public class GraphHelper extends FormHandler {
                 _out.write("</option>\n");
             }
             _out.write("</select><br>\n" +
-                       "<hr><div class=\"formaction\"><input type=\"submit\" value=\"" + _("Redraw") + "\"></div></form>");
+                       _("Store graph data on disk?") +
+                       " <input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"persistent\"");
+            boolean persistent = _context.getBooleanPropertyDefaultTrue(SummaryListener.PROP_PERSISTENT);
+            if (persistent)
+                _out.write(" checked=\"true\"");
+            _out.write(">" +
+                       "<hr><div class=\"formaction\"><input type=\"submit\" value=\"" + _("Save settings and redraw graphs") + "\"></div></form>");
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
         return ""; 
+    }
+
+    /**
+     *  We have to do this here because processForm() isn't called unless the nonces are good
+     *  @since 0.8.6
+     */
+    @Override
+    public String getAllMessages() {
+        if (StatSummarizer.instance().isDisabled()) {
+            addFormError("Graphing not supported with this JVM: " +
+                         System.getProperty("java.vendor") + ' ' +
+                         System.getProperty("java.version") + " (" +
+                         System.getProperty("java.runtime.name") + ' ' +
+                         System.getProperty("java.runtime.version") + ')');
+            if (_context.getProperty(PROP_REFRESH, 0) >= 0) {
+                // force no refresh, save silently
+                _context.router().setConfigSetting(PROP_REFRESH, "-1");
+                _context.router().saveConfig();
+            }
+        }
+        return super.getAllMessages();
     }
 
     /**
@@ -193,26 +241,27 @@ public class GraphHelper extends FormHandler {
             _height != _context.getProperty(PROP_Y, DEFAULT_Y) ||
             _periodCount != _context.getProperty(PROP_PERIODS, DEFAULT_PERIODS) ||
             _refreshDelaySeconds != _context.getProperty(PROP_REFRESH, DEFAULT_REFRESH) ||
-            _showEvents != Boolean.valueOf(_context.getProperty(PROP_EVENTS)).booleanValue()) {
+            _showEvents != _context.getBooleanProperty(PROP_EVENTS) ||
+            _persistent != _context.getBooleanPropertyDefaultTrue(SummaryListener.PROP_PERSISTENT)) {
             _context.router().setConfigSetting(PROP_X, "" + _width);
             _context.router().setConfigSetting(PROP_Y, "" + _height);
             _context.router().setConfigSetting(PROP_PERIODS, "" + _periodCount);
             _context.router().setConfigSetting(PROP_REFRESH, "" + _refreshDelaySeconds);
             _context.router().setConfigSetting(PROP_EVENTS, "" + _showEvents);
+            _context.router().setConfigSetting(SummaryListener.PROP_PERSISTENT, "" + _persistent);
             _context.router().saveConfig();
             addFormNotice(_("Graph settings saved"));
         }
     }
 
-/** inner class, don't bother reindenting */
-private static class AlphaComparator implements Comparator {
-    public int compare(Object lhs, Object rhs) {
-        SummaryListener l = (SummaryListener)lhs;
-        SummaryListener r = (SummaryListener)rhs;
-        String lName = l.getRate().getRateStat().getName() + "." + l.getRate().getPeriod();
-        String rName = r.getRate().getRateStat().getName() + "." + r.getRate().getPeriod();
-        return lName.compareTo(rName);
+    private static class AlphaComparator implements Comparator<SummaryListener> {
+        public int compare(SummaryListener l, SummaryListener r) {
+            String lName = l.getRate().getRateStat().getName();
+            String rName = r.getRate().getRateStat().getName();
+            int rv = lName.compareTo(rName);
+            if (rv != 0)
+                return rv;
+            return (int) (l.getRate().getPeriod() - r.getRate().getPeriod());
+        }
     }
-}
-
 }

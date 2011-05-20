@@ -17,6 +17,8 @@
 
 package org.cybergarage.xml.parser;
 
+import java.io.FilterInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -102,7 +104,7 @@ public class JaxpParser extends Parser
 		try {
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = factory.newDocumentBuilder();
-			InputSource inSrc = new InputSource(inStream);
+			InputSource inSrc = new InputSource(new NullFilterInputStream(inStream));
 			Document doc = builder.parse(inSrc);
 
 			org.w3c.dom.Element docElem = doc.getDocumentElement();
@@ -124,4 +126,27 @@ public class JaxpParser extends Parser
 		return root;
 	}
 
+	/**
+	 *  I2P -
+	 *  Filter out nulls, hopefully to avoid
+	 *  SAXParserException "Content not allowed in trailing section",
+	 *  which is apparently caused by nulls.
+	 *  Alternative is to remove all stuff between '>' and '<',
+         *  which isn't so hard if we assume no CDATA.
+	 */
+	private static class NullFilterInputStream extends FilterInputStream {
+
+		public NullFilterInputStream(InputStream is) {
+			super(is);
+		}
+
+		@Override
+		public int read() throws IOException {
+			int rv;
+			while ((rv = super.read()) == 0) {
+				// try again
+			}
+			return rv;
+		}
+	}
 }
