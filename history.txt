@@ -1,3 +1,63 @@
+2011-05-20 zzz
+    * Certificate: Fix creation bug; improve router cert generation
+    * DataHelper:
+      - Undeprecate fromProperties() and toProperties()
+      - Undeprecate BOOLEAN_FALSE and BOOLEAN_TRUE
+      - Fix fromProperties() and toProperties() to correctly throw DataFormatExceptions
+      - Add sort option
+      - Efficiency improvements in writeProperties(), toProperties(), storeProps(), and toString()
+      - Fix encoding issues (ticket #436)
+    * i2ptunnel: Fix server-side stripping of X-Accept-encoding
+    * Jbigi / JCPUID:
+      - Remove nativeDoubleValue(), update jbigi README
+      - Unbundle jbigi.jar, create at build time
+      - Add support for new Intel family/model names.
+      - Add proper support for using Core2 machines as P4.
+      - Add support for identifying SSE 3/4.1/4.2/4A support on CPU.
+      - Rewrite cpuid.c so it builds with PIC (source only, binary not updated yet)
+    * LogManager: Try to prevent out-of-order logging at shutdown
+    * Naming Services, Addressbook, and SusiDNS:
+      - Add new API for Naming Services to support modifications
+      - Redesign HostsTxt NS as an interface to three
+        SingleFile NSs, one for each text file
+      - Add locking to SingleFile NS
+      - Redesign SusiDNS and addressbook to interface to the API
+        instead of accessing files directly
+      - SusiDNS requests addressbook update via the NS API
+      - Redesign addressbook to reduce memory usage when processing subscriptions
+      - Redesign SusiDNS to use much less memory by not loading in the whole
+        addressbook where possible
+      - Add new Blockfile NS for an on-disk database of hosts
+        Based on the BlockFile database:
+        http://www.metanotion.net/software/sandbox/block.html
+        with substantial enhancements to lower memory usage
+        and improve exception handling
+      - Remove old unused AddressDB NS, FilesystemAddress NS, and PetName NS.
+      - Restructure Dummy NS and Meta NS
+      - Redesign NS caching to use an LRU map
+      - SusiDNS checks for invalid host names
+      - SusiDNS IDN conversion and better support for non-ASCII host names
+      - Add b32 links in SusiDNS
+      - HTML fixes and cleanups in SusiDNS
+      - SusiDNS message and tagging cleanups
+      - SusiDNS new details page
+    * Stats and Graphs:
+      - Update to JRobin 1.5.9.1
+      - Major rework required for 1.5.9 API
+      - Disable graphs in JVMs that crash with 1.5.9 (gij, JamVM, Harmony)
+      - Make graph data persistent (3 month RRD on disk),
+        with option to disable
+      - Improve error handling
+      - Disable graph page refresh when appropriate
+      - Fix HTML errors
+      - Add restart marker on graphs
+      - Restore zh text on graphs
+      - Improve form save messages
+      - Add expires directive to graphs
+      - Refactor handling of required stats
+      - Clean up / shorten description for required stats
+      - Change bw.sendBps and bw.receiveBps from KBps to Bps
+
 * 2011-05-16  0.8.6 released
 
 2011-05-13 zzz
