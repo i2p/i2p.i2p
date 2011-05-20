@@ -213,7 +213,6 @@
         <copy file="apps/i2ptunnel/java/build/i2ptunnel.war" todir="build/" />
         <copy file="apps/systray/java/build/systray.jar" todir="build/" />
         <copy file="apps/desktopgui/dist/desktopgui.jar" todir="build/" />
-        <copy file="installer/lib/jbigi/jbigi.jar" todir="build" />
         <copy file="apps/addressbook/dist/addressbook.war" todir="build/" />
     </target>
 
