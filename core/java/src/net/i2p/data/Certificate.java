@@ -44,7 +44,7 @@ public class Certificate extends DataStructureImpl {
     public final static int CERTIFICATE_TYPE_MULTIPLE = 4;
 
     /**
-     * Pull from cache or return new
+     * If null cert, return immutable static instance, else create new
      * @throws AIOOBE if not enough bytes
      * @since 0.8.3
      */
@@ -57,7 +57,7 @@ public class Certificate extends DataStructureImpl {
         if (length == 0)
             return new Certificate(type, null);
         byte[] payload = new byte[length];
-        System.arraycopy(data, off = 3, payload, 0, length);
+        System.arraycopy(data, off + 3, payload, 0, length);
         return new Certificate(type, payload);
     }
 
