@@ -32,7 +32,7 @@ public class DBHistory {
     private long _lastStoreFailed;
     private long _unpromptedDbStoreNew;
     private long _unpromptedDbStoreOld;
-    private String _statGroup;
+    private final String _statGroup;
     
     public DBHistory(RouterContext context, String statGroup) {
         _context = context;

@@ -28,8 +28,7 @@ import net.i2p.I2PAppContext;
 /**
  * <p>BigInteger that takes advantage of the jbigi library for the modPow operation,
  * which accounts for a massive segment of the processing cost of asymmetric 
- * crypto. It also takes advantage of the jbigi library for converting a BigInteger
- * value to a double. Sun's implementation of the 'doubleValue()' method is _very_ lousy.
+ * crypto.
  * 
  * The jbigi library itself is basically just a JNI wrapper around the 
  * GMP library - a collection of insanely efficient routines for dealing with 
@@ -64,7 +63,7 @@ import net.i2p.I2PAppContext;
  * "net/i2p/util/jbigi-windows-none.dll").</p>
  *
  * <p>Running this class by itself does a basic unit test and benchmarks the
- * NativeBigInteger.modPow/doubleValue vs. the BigInteger.modPow/doubleValue by running a 2Kbit op 100
+ * NativeBigInteger.modPow vs. the BigInteger.modPow by running a 2Kbit op 100
  * times.  At the end of each test, if the native implementation is loaded this will output 
  * something like:</p>
  * <pre>
@@ -194,14 +193,6 @@ public class NativeBigInteger extends BigInteger {
      */
     public native static byte[] nativeModPow(byte base[], byte exponent[], byte modulus[]);
  
-    /**
-     * Converts a BigInteger byte-array to a 'double'
-     * @param ba Big endian twos complement representation of the BigInteger to convert to a double
-     * @return The plain double-value represented by 'ba'
-     * @deprecated unused
-     */
-    public native static double nativeDoubleValue(byte ba[]);
-
     private byte[] cachedBa;
 
     public NativeBigInteger(byte[] val) {
@@ -250,12 +241,9 @@ public class NativeBigInteger extends BigInteger {
         return cachedBa;
     }
     
-    /** @deprecated unused */
+    /** @deprecated unused, does not call native */
     @Override
     public double doubleValue() {
-        if (_nativeOk)
-            return nativeDoubleValue(toByteArray());
-        else
             return super.doubleValue();
     }
     /**
@@ -281,7 +269,7 @@ public class NativeBigInteger extends BigInteger {
     }
  
     /**
-     * <p>Compare the BigInteger.modPow/doubleValue vs the NativeBigInteger.modPow/doubleValue of some 
+     * <p>Compare the BigInteger.modPow vs the NativeBigInteger.modPow of some 
      * really big (2Kbit) numbers 100 different times and benchmark the 
      * performance (or shit a brick if they don't match).  </p>
      *
@@ -289,8 +277,6 @@ public class NativeBigInteger extends BigInteger {
     public static void main(String args[]) {
         _doLog = true;
         runModPowTest(100);
-        // i2p doesn't care about the double values
-        //runDoubleValueTest(100);
     }
 
     /* the sample numbers are elG generator/prime so we can test with reasonable numbers */
@@ -361,64 +347,6 @@ public class NativeBigInteger extends BigInteger {
         }
     }
     
-/********
-    private static void runDoubleValueTest(int numRuns) {
-        System.out.println("DEBUG: Warming up the random number generator...");
-        SecureRandom rand = new SecureRandom();
-        rand.nextBoolean();
-        System.out.println("DEBUG: Random number generator warmed up");
-
-        BigInteger jg = new BigInteger(_sampleGenerator);
-
-        long totalTime = 0;
-        long javaTime = 0;
-
-        int MULTIPLICATOR = 50000; //Run the doubleValue() calls within a loop since they are pretty fast.. 
-        int runsProcessed = 0;
-        for (runsProcessed = 0; runsProcessed < numRuns; runsProcessed++) {
-            NativeBigInteger g = new NativeBigInteger(_sampleGenerator);
-            long beforeDoubleValue = System.currentTimeMillis();
-            double dNative=0;
-            for(int mult=0;mult<MULTIPLICATOR;mult++)
-                dNative = g.doubleValue();
-            long afterDoubleValue = System.currentTimeMillis();
-            double jval=0;
-            for(int mult=0;mult<MULTIPLICATOR;mult++)
-                jval = jg.doubleValue();
-            long afterJavaDoubleValue = System.currentTimeMillis();
-
-            totalTime += (afterDoubleValue - beforeDoubleValue);
-            javaTime += (afterJavaDoubleValue - afterDoubleValue);
-            if (dNative!=jval) {
-                System.err.println("ERROR: [" + runsProcessed + "]\tnative double != java double");
-                System.err.println("ERROR: native double value: " + dNative);
-                System.err.println("ERROR: java double value: " + jval);
-                System.err.println("ERROR: run time: " + totalTime + "ms (" + (totalTime / (runsProcessed + 1)) + "ms each)");
-                break;
-            } else {
-                System.out.println("DEBUG: current run time: " + (afterDoubleValue - beforeDoubleValue) + "ms (total: " 
-                                   + totalTime + "ms, " + (totalTime / (runsProcessed + 1)) + "ms each)");
-            }
-        }
-        System.out.println("INFO: run time: " + totalTime + "ms (" + (totalTime / (runsProcessed + 1)) + "ms each)");
-        if (numRuns == runsProcessed)
-            System.out.println("INFO: " + runsProcessed + " runs complete without any errors");
-        else
-            System.out.println("ERROR: " + runsProcessed + " runs until we got an error");
-
-        if (_nativeOk) {
-            System.out.println("native run time: \t" + totalTime + "ms (" + (totalTime / (runsProcessed + 1))
-                               + "ms each)");
-            System.out.println("java run time:   \t" + javaTime + "ms (" + (javaTime / (runsProcessed + 1)) + "ms each)");
-            System.out.println("native = " + ((totalTime * 100.0d) / (double) javaTime) + "% of pure java time");
-        } else {
-            System.out.println("java run time: \t" + javaTime + "ms (" + (javaTime / (runsProcessed + 1)) + "ms each)");
-            System.out.println("However, we couldn't load the native library, so this doesn't test much");
-        }
-    }
-*********/
-    
- 
     /**
      * <p>Do whatever we can to load up the native library backing this BigInteger's native methods.
      * If it can find a custom built jbigi.dll / libjbigi.so, it'll use that.  Otherwise

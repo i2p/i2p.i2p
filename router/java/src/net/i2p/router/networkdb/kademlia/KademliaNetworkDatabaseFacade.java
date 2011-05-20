@@ -120,7 +120,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * know anyone or just started up) -- see validate() below
      */
     private final static long ROUTER_INFO_EXPIRATION = 3*24*60*60*1000l;
-    private final static long ROUTER_INFO_EXPIRATION_MIN = 150*60*1000l;
+    private final static long ROUTER_INFO_EXPIRATION_MIN = 120*60*1000l;
     private final static long ROUTER_INFO_EXPIRATION_SHORT = 90*60*1000l;
     private final static long ROUTER_INFO_EXPIRATION_FLOODFILL = 60*60*1000l;
     

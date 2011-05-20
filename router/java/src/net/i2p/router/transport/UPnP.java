@@ -10,8 +10,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import net.i2p.util.Log;
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
+import net.i2p.util.Log;
+import net.i2p.util.Translate;
 
 import org.cybergarage.upnp.Action;
 import org.cybergarage.upnp.ArgumentList;
@@ -53,8 +55,8 @@ import org.freenetproject.ForwardPortStatus;
  * TODO: Implement EventListener and react on ip-change
  */ 
 class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
-	private Log _log;
-	private I2PAppContext _context;
+	private final Log _log;
+	private final I2PAppContext _context;
 	
 	/** some schemas */
 	private static final String ROUTER_DEVICE = "urn:schemas-upnp-org:device:InternetGatewayDevice:1";
@@ -73,7 +75,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	/** List of ports we want to forward */
 	private Set<ForwardPort> portsToForward;
 	/** List of ports we have actually forwarded */
-	private Set<ForwardPort> portsForwarded;
+	private final Set<ForwardPort> portsForwarded;
 	/** Callback to call when a forward fails or succeeds */
 	private ForwardPortCallback forwardCallback;
 	
@@ -397,31 +399,31 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		for(int i=0; i<sl.size(); i++) {
 			Service serv = sl.getService(i);
 			if(serv == null) continue;
-			sb.append("<li>Service: ");
+			sb.append("<li>").append(_("Service")).append(": ");
 			if("urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1".equals(serv.getServiceType())){
-				sb.append("WAN Common Interface Config<ul>");
-				sb.append("<li>Status: " + toString("GetCommonLinkProperties", "NewPhysicalLinkStatus", serv));
-				sb.append("<li>Type: " + toString("GetCommonLinkProperties", "NewWANAccessType", serv));
-				sb.append("<li>Upstream: " + toString("GetCommonLinkProperties", "NewLayer1UpstreamMaxBitRate", serv));
-				sb.append("<li>Downstream: " + toString("GetCommonLinkProperties", "NewLayer1DownstreamMaxBitRate", serv) + "<br>");
+				sb.append(_("WAN Common Interface Configuration"));
+				sb.append("<ul><li>").append(_("Status")).append(": " + toString("GetCommonLinkProperties", "NewPhysicalLinkStatus", serv));
+				sb.append("<li>").append(_("Type")).append(": " + toString("GetCommonLinkProperties", "NewWANAccessType", serv));
+				sb.append("<li>").append(_("Upstream")).append(": " + toString("GetCommonLinkProperties", "NewLayer1UpstreamMaxBitRate", serv));
+				sb.append("<li>").append(_("Downstream")).append(": " + toString("GetCommonLinkProperties", "NewLayer1DownstreamMaxBitRate", serv) + "<br>");
 			}else if("urn:schemas-upnp-org:service:WANPPPConnection:1".equals(serv.getServiceType())){
-				sb.append("WAN PPP Connection<ul>");
-				sb.append("<li>Status: " + toString("GetStatusInfo", "NewConnectionStatus", serv));
-				sb.append("<li>Type: " + toString("GetConnectionTypeInfo", "NewConnectionType", serv));
-				sb.append("<li>Upstream: " + toString("GetLinkLayerMaxBitRates", "NewUpstreamMaxBitRate", serv));
-				sb.append("<li>Downstream: " + toString("GetLinkLayerMaxBitRates", "NewDownstreamMaxBitRate", serv) + "<br>");
-				sb.append("<li>External IP: " + toString("GetExternalIPAddress", "NewExternalIPAddress", serv) + "<br>");
+				sb.append(_("WAN PPP Connection"));
+				sb.append("<ul><li>").append(_("Status")).append(": " + toString("GetStatusInfo", "NewConnectionStatus", serv));
+				sb.append("<li>").append(_("Type")).append(": " + toString("GetConnectionTypeInfo", "NewConnectionType", serv));
+				sb.append("<li>").append(_("Upstream")).append(": " + toString("GetLinkLayerMaxBitRates", "NewUpstreamMaxBitRate", serv));
+				sb.append("<li>").append(_("Downstream")).append(": " + toString("GetLinkLayerMaxBitRates", "NewDownstreamMaxBitRate", serv) + "<br>");
+				sb.append("<li>").append(_("External IP")).append(": " + toString("GetExternalIPAddress", "NewExternalIPAddress", serv) + "<br>");
 			}else if("urn:schemas-upnp-org:service:Layer3Forwarding:1".equals(serv.getServiceType())){
-				sb.append("Layer 3 Forwarding<ul>");
-				sb.append("<li>Default Connection Service: " + toString("GetDefaultConnectionService", "NewDefaultConnectionService", serv));
+				sb.append(_("Layer 3 Forwarding"));
+				sb.append("<ul><li>").append(_("Default Connection Service")).append(": " + toString("GetDefaultConnectionService", "NewDefaultConnectionService", serv));
 			}else if(WAN_IP_CONNECTION.equals(serv.getServiceType())){
-				sb.append("WAN IP Connection<ul>");
-				sb.append("<li>Status: " + toString("GetStatusInfo", "NewConnectionStatus", serv));
-				sb.append("<li>Type: " + toString("GetConnectionTypeInfo", "NewConnectionType", serv));
-				sb.append("<li>External IP: " + toString("GetExternalIPAddress", "NewExternalIPAddress", serv) + "<br>");
+				sb.append(_("WAN IP Connection"));
+				sb.append("<ul><li>").append(_("Status")).append(": " + toString("GetStatusInfo", "NewConnectionStatus", serv));
+				sb.append("<li>").append(_("Type")).append(": " + toString("GetConnectionTypeInfo", "NewConnectionType", serv));
+				sb.append("<li>").append(_("External IP")).append(": " + toString("GetExternalIPAddress", "NewExternalIPAddress", serv) + "<br>");
 			}else if("urn:schemas-upnp-org:service:WANEthernetLinkConfig:1".equals(serv.getServiceType())){
-				sb.append("WAN Ethernet Link Config<ol>");
-				sb.append("<li>Status: " + toString("GetEthernetLinkStatus", "NewEthernetLinkStatus", serv) + "<br>");
+				sb.append(_("WAN Ethernet Link Configuration"));
+				sb.append("<ul><li>").append(_("Status")).append(": " + toString("GetEthernetLinkStatus", "NewEthernetLinkStatus", serv) + "<br>");
 			}else
 				sb.append("~~~~~~~ "+serv.getServiceType() + "<ul>");
 			//listActions(serv, sb);
@@ -433,10 +435,12 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	
 	private void listSubDev(String prefix, Device dev, StringBuilder sb){
                 if (prefix == null)
-			sb.append("Device: ");
+			sb.append("<p>").append(_("Found Device")).append(": ");
 		else
-			sb.append("<li>Subdevice: ");
+			sb.append("<li>").append(_("Subdevice")).append(": ");
 		sb.append(dev.getFriendlyName());
+                if (prefix == null)
+			sb.append("</p>");
 		listSubServices(dev, sb);
 		
 		DeviceList dl = dev.getDeviceList();
@@ -454,38 +458,40 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	/** warning - slow */
 	public String renderStatusHTML() {
 		final StringBuilder sb = new StringBuilder();
-		sb.append("<h3><a name=\"upnp\"></a>UPnP Status</h3>");
+		sb.append("<h3><a name=\"upnp\"></a>").append(_("UPnP Status")).append("</h3>");
 		
 		if(isDisabled) {
-			sb.append("UPnP has been disabled; Do you have more than one UPnP Internet Gateway Device on your LAN ?");
+			sb.append(_("UPnP has been disabled; Do you have more than one UPnP Internet Gateway Device on your LAN ?"));
 			return sb.toString();
 		} else if(!isNATPresent()) {
-			sb.append("UPnP has not found any UPnP-aware, compatible device on your LAN.");
+			sb.append(_("UPnP has not found any UPnP-aware, compatible device on your LAN."));
 			return sb.toString();
 		}
 		
-		// FIXME L10n!
-		sb.append("<p>Found ");
 		listSubDev(null, _router, sb);
 		String addr = getNATAddress();
+		sb.append("<p>");
 		if (addr != null)
-		    sb.append("<br>The current external IP address reported by UPnP is " + addr);
+		    sb.append(_("The current external IP address reported by UPnP is {0}", addr));
 		else
-		    sb.append("<br>The current external IP address is not available.");
+		    sb.append(_("The current external IP address is not available."));
 		int downstreamMaxBitRate = getDownstreamMaxBitRate();
 		int upstreamMaxBitRate = getUpstreamMaxBitRate();
 		if(downstreamMaxBitRate > 0)
-			sb.append("<br>UPnP reports the max downstream bit rate is : " + downstreamMaxBitRate+ " bits/sec\n");
+			sb.append("<br>").append(_("UPnP reports the maximum downstream bit rate is {0}bits/sec", DataHelper.formatSize2(downstreamMaxBitRate)));
 		if(upstreamMaxBitRate > 0)
-			sb.append("<br>UPnP reports the max upstream bit rate is : " + upstreamMaxBitRate+ " bits/sec\n");
+			sb.append("<br>").append(_("UPnP reports the maximum upstream bit rate is {0}bits/sec", DataHelper.formatSize2(upstreamMaxBitRate)));
 		synchronized(lock) {
 			if(portsToForward != null) {
 				for(ForwardPort port : portsToForward) {
-					sb.append("<br>" + protoToString(port.protocol) + " port " + port.portNumber + " for " + port.name);
+					sb.append("<br>");
 					if(portsForwarded.contains(port))
-						sb.append(" has been forwarded successfully by UPnP.\n");
+						// {0} is TCP or UDP
+						// {1,number,#####} prevents 12345 from being output as 12,345 in the English locale.
+						// If you want the digit separator in your locale, translate as {1}.
+						sb.append(_("{0} port {1,number,#####} was successfully forwarded by UPnP.", protoToString(port.protocol), port.portNumber));
 					else
-						sb.append(" has not been forwarded by UPnP.\n");
+						sb.append(_("{0} port {1,number,#####} was not forwarded by UPnP.", protoToString(port.protocol), port.portNumber));
 				}
 			}
 		}
@@ -711,4 +717,27 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 			Thread.sleep(2000);
 		}
 	}
+
+    private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
+
+    /**
+     *  Translate
+     */
+    private final String _(String s) {
+        return Translate.getString(s, _context, BUNDLE_NAME);
+    }
+
+    /**
+     *  Translate
+     */
+    private final String _(String s, Object o) {
+        return Translate.getString(s, o, _context, BUNDLE_NAME);
+    }
+
+    /**
+     *  Translate
+     */
+    private final String _(String s, Object o, Object o2) {
+        return Translate.getString(s, o, o2, _context, BUNDLE_NAME);
+    }
 }

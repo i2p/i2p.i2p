@@ -111,6 +111,7 @@ public class TunnelHistory {
         _lastFailed = _context.clock().now();
     }
     
+/*****  all unused
     public void setLifetimeAgreedTo(long num) { _lifetimeAgreedTo = num; }
     public void setLifetimeRejected(long num) { _lifetimeRejected = num; }
     public void setLifetimeFailed(long num) { _lifetimeFailed = num; }
@@ -120,6 +121,7 @@ public class TunnelHistory {
     public void setLastRejectedTransient(long when) { _lastRejectedTransient = when; }
     public void setLastRejectedProbabalistic(long when) { _lastRejectedProbabalistic = when; }
     public void setLastFailed(long when) { _lastFailed = when; }
+******/
     
     public RateStat getRejectionRate() { return _rejectRate; }
     public RateStat getFailedRate() { return _failRate; }

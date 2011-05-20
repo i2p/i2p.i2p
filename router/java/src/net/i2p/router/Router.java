@@ -539,16 +539,14 @@ public class Router {
             return true;
         return Boolean.valueOf(_context.getProperty(PROP_HIDDEN_HIDDEN)).booleanValue();
     }
+
+    /**
+     *  @return the certificate for a new RouterInfo - probably a null cert.
+     */
     public Certificate createCertificate() {
-        Certificate cert = new Certificate();
-        if (isHidden()) {
-            cert.setCertificateType(Certificate.CERTIFICATE_TYPE_HIDDEN);
-            cert.setPayload(null);
-        } else {
-            cert.setCertificateType(Certificate.CERTIFICATE_TYPE_NULL);
-            cert.setPayload(null);
-        }
-        return cert;
+        if (isHidden())
+            return new Certificate(Certificate.CERTIFICATE_TYPE_HIDDEN, null);
+        return Certificate.NULL_CERT;
     }
     
     /**

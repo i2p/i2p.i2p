@@ -95,7 +95,8 @@ public class PluginStarter implements Runnable {
             log.error("Cannot start nonexistent plugin: " + appName);
             return false;
         }
-        //log.error("Starting plugin: " + appName);
+        if (log.shouldLog(Log.INFO))
+            log.info("Starting plugin: " + appName);
 
         // register themes
         File dir = new File(pluginDir, "console/themes");
@@ -139,7 +140,8 @@ public class PluginStarter implements Runnable {
                         }
                         String enabled = props.getProperty(RouterConsoleRunner.PREFIX + warName + ENABLED);
                         if (! "false".equals(enabled)) {
-                            //log.error("Starting webapp: " + warName);
+                            if (log.shouldLog(Log.INFO))
+                                log.info("Starting webapp: " + warName);
                             String path = new File(webappDir, fileNames[i]).getCanonicalPath();
                             WebAppStarter.startWebApp(ctx, server, warName, path);
                             pluginWars.get(appName).add(warName);
@@ -149,6 +151,8 @@ public class PluginStarter implements Runnable {
                     }
                 }
             }
+        } else {
+            log.error("No console web server to start plugins?");
         }
 
         // add translation jars in console/locale

@@ -339,7 +339,6 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     
     /** queue a recurring test job if appropriate */
     void buildComplete(PooledTunnelCreatorConfig cfg) {
-        //buildComplete();
         if (cfg.getLength() > 1 &&
             (!_context.router().gracefulShutdownInProgress()) &&
             !Boolean.valueOf(_context.getProperty("router.disableTunnelTesting")).booleanValue()) {
@@ -367,9 +366,6 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         }
     }
 
-    /** ?? */
-    void buildComplete() {}
-    
     public void startup() { 
         _isShutdown = false;
         if (!_executor.isRunning()) {

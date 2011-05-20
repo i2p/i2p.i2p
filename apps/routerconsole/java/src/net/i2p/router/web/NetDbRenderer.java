@@ -24,7 +24,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
@@ -174,18 +173,19 @@ public class NetDbRenderer {
         }
         if (debug) {
             buf.append("<p><b>Total Leasesets: " + leases.size());
-            buf.append("<p><b>Published (RAP) Leasesets: " + _context.netDb().getKnownLeaseSets());
-            buf.append("<p>Mod Data: " + HexDump.dump(_context.routingKeyGenerator().getModData()) + "<p>");
-            buf.append("<p>Network data (only valid if floodfill):");
-            buf.append("<p>Center of Key Space (router hash): " + ourRKey.toBase64() + "<p>");
+            buf.append("</b></p><p><b>Published (RAP) Leasesets: " + _context.netDb().getKnownLeaseSets());
+            buf.append("</b></p><p><b>Mod Data: " + HexDump.dump(_context.routingKeyGenerator().getModData()));
+            buf.append("</b></p><p><b>Network data (only valid if floodfill):");
+            buf.append("</b></p><p><b>Center of Key Space (router hash): " + ourRKey.toBase64());
             if (median != null) {
                 double log2 = biLog2(median);
-                buf.append("<p>Median distance (bits): " + fmt.format(log2));
+                buf.append("</b></p><p><b>Median distance (bits): " + fmt.format(log2));
                 // 3 for 8 floodfills... -1 for median
                 int total = (int) Math.round(Math.pow(2, 3 + 256 - 1 - log2));
-                buf.append("<p>Estimated total floodfills: " + total);
-                buf.append("<p>Estimated network total leasesets: " + (total * leases.size() / 8));
+                buf.append("</b></p><p><b>Estimated total floodfills: " + total);
+                buf.append("</b></p><p><b>Estimated network total leasesets: " + (total * leases.size() / 8));
             }
+            buf.append("</b></p>");
         }
         out.write(buf.toString());
         out.flush();
@@ -405,11 +405,10 @@ public class NetDbRenderer {
     /**
      *  what transport types
      */
-    private int classifyTransports(RouterInfo info) {
+    private static int classifyTransports(RouterInfo info) {
         int rv = 0;
         String hash = info.getIdentity().getHash().toBase64();
-        for (Iterator iter = info.getAddresses().iterator(); iter.hasNext(); ) {
-            RouterAddress addr = (RouterAddress)iter.next();
+        for (RouterAddress addr : info.getAddresses()) {
             String style = addr.getTransportStyle();
             if (style.equals("NTCP")) {
                 rv |= NTCP;
