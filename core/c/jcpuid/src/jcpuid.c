@@ -3,6 +3,7 @@
 /**
 
 From: http://sam.zoy.org/blog/2007-04-13-shlib-with-non-pic-code-have-inline-assembly-and-pic-mix-well
+See also: http://homesource.nekomimicon.net/sourceforum/viewtopic.php?f=15&t=303
 
 Perhaps the most accessible documentation on what PIC code is and how an ELF dynamic linker works is
 John Levine's Linkers and Loaders (and it has amazing sketches, too!). The Gentoo documentation also 
@@ -61,11 +62,20 @@ JNIEXPORT jobject JNICALL Java_freenet_support_CPUInformation_CPUID_doCPUID
 		//Use GCC assembler notation
 		asm volatile
 		(
+#if (!defined(__X86_64__)) && (!defined(__x86_64__))
+			/* 32 bit */
 			"pushl %%ebx      \n\t" /* save %ebx */
+#endif
 			"cpuid            \n\t"
+#if (!defined(__X86_64__)) && (!defined(__x86_64__))
+			/* 32 bit */
 			"movl %%ebx, %1   \n\t" /* save what cpuid just put in %ebx */
 			"popl %%ebx       \n\t" /* restore the old %ebx */
 			: "=a" (a), "=r" (b), "=c" (c), "=d" (d)
+#else
+			/* 64 bit */
+			: "=a" (a), "=b" (b), "=c" (c), "=d" (d)
+#endif
 			:"a"(iFunction)
 			: "cc"
 		);
