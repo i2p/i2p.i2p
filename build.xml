@@ -216,7 +216,7 @@
         <copy file="apps/i2psnark/java/build/i2psnark.jar" todir="build/" />
 
     </target>
-    <target name="jarSmall" depends="builddepSmall" >
+    <target name="jarSmall" depends="builddepSmall, buildJrobin" >
         <copy file="core/java/build/i2p.jar" todir="build/" />
         <copy file="router/java/build/router.jar" todir="build/" />
         <copy file="apps/ministreaming/java/build/mstreaming.jar" todir="build/" />
