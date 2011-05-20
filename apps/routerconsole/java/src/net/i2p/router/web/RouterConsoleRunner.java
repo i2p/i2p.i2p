@@ -1,6 +1,7 @@
 package net.i2p.router.web;
 
 import java.util.ArrayList;
+import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -13,17 +14,20 @@ import net.i2p.I2PAppContext;
 import net.i2p.apps.systray.SysTray;
 import net.i2p.data.Base32;
 import net.i2p.data.DataHelper;
+import net.i2p.desktopgui.Main;
 import net.i2p.router.RouterContext;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.ShellCommand;
+import net.i2p.util.VersionComparator;
 
 import org.mortbay.http.DigestAuthenticator;
 import org.mortbay.http.HashUserRealm;
 import org.mortbay.http.NCSARequestLog;
 import org.mortbay.http.SecurityConstraint;
+import org.mortbay.http.SocketListener;
 import org.mortbay.http.SslListener;
 import org.mortbay.http.handler.SecurityHandler;
 import org.mortbay.jetty.Server;
@@ -55,7 +59,6 @@ public class RouterConsoleRunner {
     
     static {
         System.setProperty("org.mortbay.http.Version.paranoid", "true");
-        System.setProperty("java.awt.headless", "true");
     }
     
     /**
@@ -126,10 +129,34 @@ public class RouterConsoleRunner {
     }
     
     public static void main(String args[]) {
+        startTrayApp();
         RouterConsoleRunner runner = new RouterConsoleRunner(args);
         runner.startConsole();
     }
     
+    private static void startTrayApp() {
+        try {
+            //TODO: move away from routerconsole into a separate application.
+            //ApplicationManager?
+            VersionComparator v = new VersionComparator();
+            boolean recentJava = v.compare(System.getProperty("java.runtime.version"), "1.6") >= 0;
+            // default false for now
+            boolean desktopguiEnabled = I2PAppContext.getGlobalContext().getBooleanProperty("desktopgui.enabled");
+            if (recentJava && desktopguiEnabled) {
+                //Check if we are in a headless environment, set properties accordingly
+          	System.setProperty("java.awt.headless", Boolean.toString(GraphicsEnvironment.isHeadless()));
+                String[] args = new String[0];
+                net.i2p.desktopgui.Main.beginStartup(args);    
+            } else {
+                // required true for jrobin to work
+          	System.setProperty("java.awt.headless", "true");
+                SysTray.getInstance();
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
+
     public void startConsole() {
         File workDir = new SecureDirectory(I2PAppContext.getGlobalContext().getTempDir(), "jetty-work");
         boolean workDirRemoved = FileUtil.rmdir(workDir, false);
@@ -184,11 +211,21 @@ public class RouterConsoleRunner {
                 while (tok.hasMoreTokens()) {
                     String host = tok.nextToken().trim();
                     try {
-                        if (host.indexOf(":") >= 0) // IPV6 - requires patched Jetty 5
-                            _server.addListener('[' + host + "]:" + _listenPort);
-                        else
-                            _server.addListener(host + ':' + _listenPort);
+                        //if (host.indexOf(":") >= 0) // IPV6 - requires patched Jetty 5
+                        //    _server.addListener('[' + host + "]:" + _listenPort);
+                        //else
+                        //    _server.addListener(host + ':' + _listenPort);
+                        Integer lport = Integer.parseInt(_listenPort);
+                        InetAddrPort iap = new InetAddrPort(host, lport);
+                        SocketListener lsnr = new SocketListener(iap);
+                        lsnr.setMinThreads(1);           // default 2
+                        lsnr.setMaxThreads(24);          // default 256
+                        lsnr.setMaxIdleTimeMs(90*1000);  // default 10 sec
+                        lsnr.setName("ConsoleSocket");   // all with same name will use the same thread pool
+                        _server.addListener(lsnr);
                         boundAddresses++;
+                    } catch (NumberFormatException nfe) {
+                        System.err.println("Unable to bind routerconsole to " + host + " port " + _listenPort + ' ' + nfe);
                     } catch (IOException ioe) { // this doesn't seem to work, exceptions don't happen until start() below
                         System.err.println("Unable to bind routerconsole to " + host + " port " + _listenPort + ' ' + ioe);
                     }
@@ -220,6 +257,10 @@ public class RouterConsoleRunner {
                             ssll.setPassword(ctx.getProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD));
                             // the X.509 cert password (if not present, verifyKeyStore() returned false)
                             ssll.setKeyPassword(ctx.getProperty(PROP_KEY_PASSWORD, "thisWontWork"));
+                            ssll.setMinThreads(1);           // default 2
+                            ssll.setMaxThreads(24);          // default 256
+                            ssll.setMaxIdleTimeMs(90*1000);  // default 10 sec
+                            ssll.setName("ConsoleSocket");   // all with same name will use the same thread pool
                             _server.addListener(ssll);
                             boundAddresses++;
                         } catch (Exception e) {   // probably no exceptions at this point
@@ -298,12 +339,6 @@ public class RouterConsoleRunner {
                      System.err.println(me);
                 }
             }
-        }
-
-        try {
-            SysTray tray = SysTray.getInstance();
-        } catch (Throwable t) {
-            t.printStackTrace();
         }
 
         NewsFetcher fetcher = NewsFetcher.getInstance(I2PAppContext.getGlobalContext());

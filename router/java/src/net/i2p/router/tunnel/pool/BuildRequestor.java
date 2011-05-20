@@ -22,12 +22,12 @@ import net.i2p.util.Log;
 import net.i2p.util.VersionComparator;
 
 /**
- *
+ *  Methods for creating Tunnel Build Messages, i.e. requests
  */
-class BuildRequestor {
-    private static final List<Integer> ORDER = new ArrayList(BuildMessageGenerator.ORDER.length);
+abstract class BuildRequestor {
+    private static final List<Integer> ORDER = new ArrayList(TunnelBuildMessage.MAX_RECORD_COUNT);
     static {
-        for (int i = 0; i < BuildMessageGenerator.ORDER.length; i++)
+        for (int i = 0; i < TunnelBuildMessage.MAX_RECORD_COUNT; i++)
             ORDER.add(Integer.valueOf(i));
     }
     private static final int PRIORITY = 500;
@@ -37,7 +37,7 @@ class BuildRequestor {
      *  expl. vs. client, uptime, and network conditions.
      *  Put the expiration in the PTCC.
      *
-     *  Also, perhaps, save the PTCC even after expiration for an extended time,
+     *  Also, we now save the PTCC even after expiration for an extended time,
      *  so can we use a successfully built tunnel anyway.
      *
      */
@@ -49,12 +49,16 @@ class BuildRequestor {
     /** some randomization is added on to this */
     private static final int BUILD_MSG_TIMEOUT = 60*1000;
 
+    /**
+     *  "paired tunnels" means using a client's own inbound tunnel to receive the
+     *  reply for an outbound build request, and using a client's own outbound tunnel
+     *  to send an inbound build request.
+     *  This is more secure than using the router's exploratory tunnels, as it
+     *  makes correlation of multiple clients more difficult.
+     */
     private static boolean usePairedTunnels(RouterContext ctx) {
-        String val = ctx.getProperty("router.usePairedTunnels");
-        if ( (val == null) || (Boolean.valueOf(val).booleanValue()) )
-            return true;
-        else
-            return false;
+        return true;
+        //return ctx.getBooleanPropertyDefaultTrue("router.usePairedTunnels");
     }
     
     /** new style requests need to fill in the tunnel IDs before hand */
@@ -321,9 +325,9 @@ class BuildRequestor {
      *  Can't do this for inbound tunnels since the msg goes out an expl. tunnel.
      */
     private static class TunnelBuildFirstHopFailJob extends JobImpl {
-        TunnelPool _pool;
-        PooledTunnelCreatorConfig _cfg;
-        BuildExecutor _exec;
+        final TunnelPool _pool;
+        final PooledTunnelCreatorConfig _cfg;
+        final BuildExecutor _exec;
         private TunnelBuildFirstHopFailJob(RouterContext ctx, TunnelPool pool, PooledTunnelCreatorConfig cfg, BuildExecutor exec) {
             super(ctx);
             _cfg = cfg;

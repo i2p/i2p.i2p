@@ -35,8 +35,8 @@ class Piece implements Comparable {
     
     @Override
     public boolean equals(Object o) {
+        if (o == null) return false;
         if (o instanceof Piece) {
-            if (o == null) return false;
             return this.id == ((Piece)o).id;
         }
         return false;

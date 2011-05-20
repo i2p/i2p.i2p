@@ -92,10 +92,13 @@ class LogRecordFormatter {
     }
 
     /** don't translate */
+/****
     private static String getPriority(LogRecord rec) {
         return toString(Log.toLevelString(rec.getPriority()), MAX_PRIORITY_LENGTH);
     }
+****/
 
+    /** */
     private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
 
     /** translate @since 0.7.14 */

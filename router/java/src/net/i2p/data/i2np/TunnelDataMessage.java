@@ -160,7 +160,7 @@ public class TunnelDataMessage extends I2NPMessageImpl {
     /** write the message body to the output array, starting at the given index */
     protected int writeMessageBody(byte out[], int curIndex) throws I2NPMessageException {
         if ( (_tunnelId <= 0) || (_data == null) )
-            throw new I2NPMessageException("Not enough data to write out (id=" + _tunnelId + " data=" + _data + ")");
+            throw new I2NPMessageException("Not enough data to write out (id=" + _tunnelId + ")");
         if (_data.length <= 0) 
             throw new I2NPMessageException("Not enough data to write out (data.length=" + _data.length + ")");
 

@@ -512,7 +512,7 @@ public abstract class TransportImpl implements Transport {
     public void markUnreachable(Hash peer) {
         long now = _context.clock().now();
         synchronized (_unreachableEntries) {
-            _unreachableEntries.put(peer, new Long(now));
+            _unreachableEntries.put(peer, Long.valueOf(now));
         }
         markWasUnreachable(peer, true);
     }

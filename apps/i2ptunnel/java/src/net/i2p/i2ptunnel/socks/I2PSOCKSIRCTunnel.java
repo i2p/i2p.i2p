@@ -50,9 +50,11 @@ public class I2PSOCKSIRCTunnel extends I2PSOCKSTunnel {
             Socket clientSock = serv.getClientSocket();
             I2PSocket destSock = serv.getDestinationI2PSocket(this);
             StringBuffer expectedPong = new StringBuffer();
-            Thread in = new I2PAppThread(new I2PTunnelIRCClient.IrcInboundFilter(clientSock, destSock, expectedPong), "SOCKS IRC Client " + (++__clientId) + " in", true);
+            Thread in = new I2PAppThread(new I2PTunnelIRCClient.IrcInboundFilter(clientSock, destSock, expectedPong, _log),
+                                         "SOCKS IRC Client " + (++__clientId) + " in", true);
             in.start();
-            Thread out = new I2PAppThread(new I2PTunnelIRCClient.IrcOutboundFilter(clientSock, destSock, expectedPong), "SOCKS IRC Client " + __clientId + " out", true);
+            Thread out = new I2PAppThread(new I2PTunnelIRCClient.IrcOutboundFilter(clientSock, destSock, expectedPong, _log),
+                                          "SOCKS IRC Client " + __clientId + " out", true);
             out.start();
         } catch (SOCKSException e) {
             _log.error("Error from SOCKS connection", e);

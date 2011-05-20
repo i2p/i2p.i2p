@@ -4,6 +4,7 @@ import java.io.File;
 
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.util.RFC822Date;
 import net.i2p.util.EepGet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
@@ -101,7 +102,7 @@ public class UnsignedUpdateHandler extends UpdateHandler {
                 String lastmod = _get.getLastModified();
                 long modtime = 0;
                 if (lastmod != null)
-                    modtime = NewsFetcher.parse822Date(lastmod);
+                    modtime = RFC822Date.parse822Date(lastmod);
                 if (modtime <= 0)
                     modtime = _context.clock().now();
                 _context.router().setConfigSetting(PROP_LAST_UPDATE_TIME, "" + modtime);

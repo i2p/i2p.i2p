@@ -30,15 +30,17 @@ import net.i2p.util.Log;
  *
  */
 public class InNetMessagePool implements Service {
-    private Log _log;
-    private RouterContext _context;
-    private HandlerJobBuilder _handlerJobBuilders[];
+    private final Log _log;
+    private final RouterContext _context;
+    private final HandlerJobBuilder _handlerJobBuilders[];
+
     /** following 5 unused unless DISPATCH_DIRECT == false */
     private final List _pendingDataMessages;
     private final List _pendingDataMessagesFrom;
     private final List _pendingGatewayMessages;
     private SharedShortCircuitDataJob _shortCircuitDataJob;
     private SharedShortCircuitGatewayJob _shortCircuitGatewayJob;
+
     private boolean _alive;
     private boolean _dispatchThreaded;
     
@@ -79,7 +81,6 @@ public class InNetMessagePool implements Service {
             _shortCircuitGatewayJob = new SharedShortCircuitGatewayJob(context);
         }
         _log = _context.logManager().getLog(InNetMessagePool.class);
-        _alive = false;
         _context.statManager().createRateStat("inNetPool.dropped", "How often do we drop a message", "InNetPool", new long[] { 60*60*1000l });
         _context.statManager().createRateStat("inNetPool.droppedDeliveryStatusDelay", "How long after a delivery status message is created do we receive it back again (for messages that are too slow to be handled)", "InNetPool", new long[] { 60*60*1000l });
         _context.statManager().createRateStat("inNetPool.duplicate", "How often do we receive a duplicate message", "InNetPool", new long[] { 60*60*1000l });
@@ -87,12 +88,20 @@ public class InNetMessagePool implements Service {
         _context.statManager().createRateStat("inNetPool.droppedDbLookupResponseMessage", "How often we drop a slow-to-arrive db search response", "InNetPool", new long[] { 60*60*1000l });
     }
   
+    /**
+     * @return previous builder for this message type, or null
+     * @throws AIOOBE if i2npMessageType is greater than MAX_I2NP_MESSAGE_TYPE
+     */
     public HandlerJobBuilder registerHandlerJobBuilder(int i2npMessageType, HandlerJobBuilder builder) {
         HandlerJobBuilder old = _handlerJobBuilders[i2npMessageType];
         _handlerJobBuilders[i2npMessageType] = builder;
         return old;
     }
   
+    /**
+     * @return previous builder for this message type, or null
+     * @throws AIOOBE if i2npMessageType is greater than MAX_I2NP_MESSAGE_TYPE
+     */
     public HandlerJobBuilder unregisterHandlerJobBuilder(int i2npMessageType) {
         HandlerJobBuilder old = _handlerJobBuilders[i2npMessageType];
         _handlerJobBuilders[i2npMessageType] = null;
@@ -100,12 +109,14 @@ public class InNetMessagePool implements Service {
     }
     
     /**
-     * Add a new message to the pool, returning the number of messages in the 
-     * pool so that the comm system can throttle inbound messages.  If there is 
+     * Add a new message to the pool.
+     * If there is 
      * a HandlerJobBuilder for the inbound message type, the message is loaded
      * into a job created by that builder and queued up for processing instead
      * (though if the builder doesn't create a job, it is added to the pool)
      *
+     * @return -1 for some types of errors but not all; 0 otherwise
+     *         (was queue length, long ago)
      */
     public int add(I2NPMessage messageBody, RouterIdentity fromRouter, Hash fromRouterHash) {
         long exp = messageBody.getMessageExpiration();

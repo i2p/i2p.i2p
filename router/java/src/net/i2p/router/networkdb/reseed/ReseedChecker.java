@@ -35,9 +35,9 @@ public class ReseedChecker {
         if (!noReseedFile.exists() && !noReseedFileAlt1.exists() && !noReseedFileAlt2.exists() && !noReseedFileAlt3.exists()) {
             Log _log = context.logManager().getLog(ReseedChecker.class);
             if (count <= 1)
-                _log.error("Downloading peer router information for a new I2P installation");
+                _log.logAlways(Log.INFO, "Downloading peer router information for a new I2P installation");
             else
-                _log.error("Very few routerInfo files remaining - reseeding now");
+                _log.logAlways(Log.WARN, "Very few known peers remaining - reseeding now");
             Reseeder reseeder = new Reseeder(context);
             reseeder.requestReseed();
         }

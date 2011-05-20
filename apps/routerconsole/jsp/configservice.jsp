@@ -19,10 +19,7 @@
  <jsp:getProperty name="formhandler" property="allMessages" />
  <div class="configure">
  <form action="" method="POST">
- <% String prev = System.getProperty("net.i2p.router.web.ConfigServiceHandler.nonce");
-    if (prev != null) System.setProperty("net.i2p.router.web.ConfigServiceHandler.noncePrev", prev);
-    System.setProperty("net.i2p.router.web.ConfigServiceHandler.nonce", new java.util.Random().nextLong()+""); %>
- <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigServiceHandler.nonce")%>" >
+ <input type="hidden" name="nonce" value="<jsp:getProperty name="formhandler" property="newNonce" />" >
  <h3><%=intl._("Shutdown the router")%></h3>
  <p><%=intl._("Graceful shutdown lets the router satisfy the agreements it has already made before shutting down, but may take a few minutes.")%> 
     <%=intl._("If you need to kill the router immediately, that option is available as well.")%></p>
@@ -49,7 +46,8 @@
  <hr><div class="formaction">
  <input type="submit" name="action" value="<%=intl._("Show systray icon")%>" >
  <input type="submit" name="action" value="<%=intl._("Hide systray icon")%>" >
-</div><h3><%=intl._("Run on startup")%></h3>
+ </div>
+ <h3><%=intl._("Run on startup")%></h3>
  <p><%=intl._("You can control whether I2P is run on startup or not by selecting one of the following options - I2P will install (or remove) a service accordingly.")%> 
     <%=intl._("If you prefer the command line, you can also run the ")%> <code>install_i2p_service_winnt.bat</code> (<%=intl._("or")%>
  <code>uninstall_i2p_service_winnt.bat</code>).</p>

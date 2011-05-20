@@ -539,16 +539,14 @@ public class Router {
             return true;
         return Boolean.valueOf(_context.getProperty(PROP_HIDDEN_HIDDEN)).booleanValue();
     }
+
+    /**
+     *  @return the certificate for a new RouterInfo - probably a null cert.
+     */
     public Certificate createCertificate() {
-        Certificate cert = new Certificate();
-        if (isHidden()) {
-            cert.setCertificateType(Certificate.CERTIFICATE_TYPE_HIDDEN);
-            cert.setPayload(null);
-        } else {
-            cert.setCertificateType(Certificate.CERTIFICATE_TYPE_NULL);
-            cert.setPayload(null);
-        }
-        return cert;
+        if (isHidden())
+            return new Certificate(Certificate.CERTIFICATE_TYPE_HIDDEN, null);
+        return Certificate.NULL_CERT;
     }
     
     /**
@@ -1432,7 +1430,10 @@ private static class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
         ctx.statManager().createRateStat("router.highCapacityPeers", "How many high capacity peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
         ctx.statManager().createRateStat("router.fastPeers", "How many fast peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
         _maxMemory = Runtime.getRuntime().maxMemory();
-        ctx.statManager().createRateStat("router.memoryUsed", "(Bytes) Max is " + (_maxMemory / (1024*1024)) + "MB", "Router", new long[] { 60*1000 });
+        String legend = "(Bytes)";
+        if (_maxMemory < Long.MAX_VALUE)
+            legend += " Max is " + DataHelper.formatSize(_maxMemory) + 'B';
+        ctx.statManager().createRateStat("router.memoryUsed", legend, "Router", new long[] { 60*1000 });
     }
     private RouterContext getContext() { return _ctx; }
     public void timeReached() {

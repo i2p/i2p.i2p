@@ -182,22 +182,14 @@ div.routersummary tr {
      border: 0 !important;
 }
 
-div.routersummary form {
-     margin: -6px 0 -7px;
-}
-
-div.routersummary form:first-child {
-     margin: 6px 0 -4px 0 !important;
-}
-
 div.routersummary p {
      padding: 0;
 }     
 
 div.refresh {
-     margin-top: -10px !important;
-     margin-bottom: -4px !important;
-     padding: 2px 0 0px 0 !important;
+     margin-top: 10px !important;
+     margin-bottom: 10px !important;
+     padding: 2px 0 !important;
 }
 
 div.routersummary a:link, div.routersummary a:visited {
@@ -327,17 +319,12 @@ div.news {
      background: #000;
      background: #000 url("images/news.png")no-repeat scroll bottom right;
      color: #7b7;
-/*     border-radius: 4px 4px 0 0;
-     -moz-border-radius: 4px 4px 0 0;
-     -khtml-border-radius: 4px 4px 0 0;*/
      font-size: 7.5pt;
      text-align: right;
      -moz-box-shadow: 0 1px 5px #000;
      -khtml-box-shadow: 0 1px 5px #000;
      box-shadow: 0 1px 5px #000;
-     min-width: 580px;
-/*     height: 164px;
-     overflow-y: auto;*/
+     min-width: 590px;
 }
 
 div.news li {
@@ -357,7 +344,12 @@ div.news li {
 }
 
 div.news h3 {
-     text-align: left !important;
+     background: none;
+     text-align: left;
+     border: none;
+     padding-left: 0;
+     padding-top: 2px;
+     border-bottom: 1px dotted;
 }
 
 div.news h4 {
@@ -429,11 +421,11 @@ div.messages {
      color: #4f4;
 }
 
-div.messages span.error {
+div.error {
      color: #d90;
 }
 
-div.messages span.notice {
+div.notice {
      font-style: italic;
 }
 
@@ -617,7 +609,7 @@ code {
      text-align: left;
      font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      color: #dd0;
-     padding: 1px 2px;
+/*     padding: 1px 2px;*/
 }
 
 a:link, h2 a:link{
@@ -790,7 +782,7 @@ button:active {
 }
 
 .langbox {
-     margin: 21px 2px 2px 5px;
+     margin: 8px 2px 2px 5px;
      padding: 7px 10px 5px 10px;
      color: #EE9;
      font-size: 7pt;
@@ -838,7 +830,6 @@ input {
      font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      padding: 1px 2px;
      text-decoration: none;
-     min-width: 110px;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
@@ -917,8 +908,6 @@ textarea {
      text-align: left;
      border: 1px solid #494;
 }
-
-form {}
 
 .proxyfooter {
      margin: 0 20px 10px 240px;

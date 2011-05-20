@@ -623,7 +623,7 @@ public class TunnelDispatcher implements Service {
         // drop in proportion to size w.r.t. a standard 1024-byte message
         // this is a little expensive but we want to adjust the curve between 0 and 1
         // Most messages are 1024, only at the OBEP do we see other sizes
-        if (len != 1024d)
+        if ((int)len != 1024)
             pctDrop = (float) Math.pow(pctDrop, 1024d / len);
         float rand = _context.random().nextFloat();
         boolean reject = rand <= pctDrop;
@@ -709,7 +709,8 @@ public class TunnelDispatcher implements Service {
         _validator = new BloomFilterIVValidator(_context, getShareBandwidth(_context));
     }
 
-    private static int getShareBandwidth(RouterContext ctx) {
+    /** @return in KBps */
+    public static int getShareBandwidth(RouterContext ctx) {
         int irateKBps = ctx.bandwidthLimiter().getInboundKBytesPerSecond();
         int orateKBps = ctx.bandwidthLimiter().getOutboundKBytesPerSecond();
         double pct = ctx.router().getSharePercentage();
@@ -743,7 +744,7 @@ public class TunnelDispatcher implements Service {
         
         private static final int LEAVE_BATCH_TIME = 10*1000;
         public void add(HopConfig cfg) {
-            Long dropTime = new Long(cfg.getExpiration() + 2*Router.CLOCK_FUDGE_FACTOR + LEAVE_BATCH_TIME);
+            Long dropTime = Long.valueOf(cfg.getExpiration() + 2*Router.CLOCK_FUDGE_FACTOR + LEAVE_BATCH_TIME);
             boolean noTunnels;
             synchronized (LeaveTunnel.this) {
                 noTunnels = _configs.isEmpty();

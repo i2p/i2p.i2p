@@ -146,14 +146,18 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
     public final boolean initSeed(byte buf[]) {
         // why urandom?  because /dev/random blocks, and there are arguments
         // suggesting such blockages are largely meaningless
-        boolean ok = seedFromFile("/dev/urandom", buf);
+        boolean ok = seedFromFile(new File("/dev/urandom"), buf);
         // we merge (XOR) in the data from /dev/urandom with our own seedfile
-        ok = seedFromFile("prngseed.rnd", buf) || ok;
+        File localFile = new File(_context.getConfigDir(), SEEDFILE);
+        ok = seedFromFile(localFile, buf) || ok;
         return ok;
     }
     
-    private static final boolean seedFromFile(String filename, byte buf[]) {
-        File f = new File(I2PAppContext.getGlobalContext().getConfigDir(), filename);
+    /**
+     *  @param f absolute path
+     *  @return success
+     */
+    private static final boolean seedFromFile(File f, byte buf[]) {
         if (f.exists()) {
             FileInputStream fis = null;
             try {

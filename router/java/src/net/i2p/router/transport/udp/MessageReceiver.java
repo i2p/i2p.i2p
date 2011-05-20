@@ -39,6 +39,8 @@ class MessageReceiver {
         _completeMessages = new LinkedBlockingQueue();
 
         long maxMemory = Runtime.getRuntime().maxMemory();
+        if (maxMemory == Long.MAX_VALUE)
+            maxMemory = 96*1024*1024l;
         if (maxMemory < 32*1024*1024)
             _threadCount = 1;
         else if (maxMemory < 64*1024*1024)

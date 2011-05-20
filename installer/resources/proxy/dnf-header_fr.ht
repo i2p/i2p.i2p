@@ -1,0 +1,23 @@
+HTTP/1.1 504 Gateway Timeout
+Content-Type: text/html; charset=UTF-8
+Cache-control: no-cache
+Connection: close
+Proxy-Connection: close
+
+<html><head>
+<title>Avertissement I2P: site eep non joignable</title>
+<link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico" >
+<link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css" >
+</head>
+<body>
+<div class=logo>
+ <a href="http://127.0.0.1:7657/index.jsp" title="Console routeur I2P"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="Console routeur I2P" border="0"></a><hr>
+ <a href="http://127.0.0.1:7657/config.jsp">Configuration</a> <a href="http://127.0.0.1:7657/help.jsp">Aide</a> <a href="http://127.0.0.1:7657/susidns/index.jsp">Carnet d'adresse</a>
+</div>
+<div class=warning id=warning>
+<h3>Avertissement I2P: site eep non joignable</h3>
+Le site eep n'a pas pu être atteint. Il est hors service, 
+le réseau est surchargé, ou votre routeur n'est pas bien intégré aux pairs.
+Vous pouvez  
+<a href="javascript: window.location.reload()">réessayer</a>. 
+<hr><b>Destination injoignable:</b><BR><BR>

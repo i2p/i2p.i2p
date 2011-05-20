@@ -142,12 +142,12 @@ class SSLClientListenerRunner extends ClientListenerRunner {
     private void exportCert(File ks) {
         File sdir = new SecureDirectory(_context.getConfigDir(), "certificates");
         if (sdir.exists() || sdir.mkdir()) {
+            InputStream fis = null;
             try {
                 KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-                InputStream fis = new FileInputStream(ks);
+                fis = new FileInputStream(ks);
                 String ksPass = _context.getProperty(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD);
                 keyStore.load(fis, ksPass.toCharArray());
-                fis.close();
                 Certificate cert = keyStore.getCertificate(KEY_ALIAS);
                 if (cert != null) {
                     File certFile = new File(sdir, ASCII_KEYFILE);
@@ -159,6 +159,8 @@ class SSLClientListenerRunner extends ClientListenerRunner {
                 _log.error("Error saving ASCII SSL keys", gse);
             } catch (IOException ioe) {
                 _log.error("Error saving ASCII SSL keys", ioe);
+            } finally {
+                if (fis != null) try { fis.close(); } catch (IOException ioe) {}
             }
         } else {
             _log.error("Error saving ASCII SSL keys");
@@ -208,12 +210,12 @@ class SSLClientListenerRunner extends ClientListenerRunner {
                        " in " + (new File(_context.getConfigDir(), "router.config")).getAbsolutePath());
             return false;
         }
+        InputStream fis = null;
         try {
             SSLContext sslc = SSLContext.getInstance("TLS");
             KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            InputStream fis = new FileInputStream(ks);
+            fis = new FileInputStream(ks);
             keyStore.load(fis, ksPass.toCharArray());
-            fis.close();
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             kmf.init(keyStore, keyPass.toCharArray());
             sslc.init(kmf.getKeyManagers(), null, _context.random());
@@ -223,6 +225,8 @@ class SSLClientListenerRunner extends ClientListenerRunner {
             _log.error("Error loading SSL keys", gse);
         } catch (IOException ioe) {
             _log.error("Error loading SSL keys", ioe);
+        } finally {
+            if (fis != null) try { fis.close(); } catch (IOException ioe) {}
         }
         return false;
     }

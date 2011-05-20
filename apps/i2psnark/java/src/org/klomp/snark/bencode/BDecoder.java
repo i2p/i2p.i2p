@@ -60,22 +60,30 @@ public class BDecoder
   private int indicator = 0;
 
   // Used for ugly hack to get SHA hash over the metainfo info map
-  private String special_map = "info";
+  private final String special_map = "info";
   private boolean in_special_map = false;
-  private final MessageDigest sha_digest;
+  /** creation deferred until we encounter the special map, to make processing of announce replies more efficient */
+  private MessageDigest sha_digest;
 
-  // Ugly hack. Return the SHA has over bytes that make up the special map.
+  /**
+   * Ugly hack. Return the SHA has over bytes that make up the special map.
+   * @return null if there was no special map
+   */
   public byte[] get_special_map_digest()
   {
+    if (sha_digest == null)
+        return null;
     byte[] result = sha_digest.digest();
     return result;
   }
 
+/****
   // Ugly hack. Name defaults to "info".
   public void set_special_map_name(String name)
   {
     special_map = name;
   }
+****/
 
   /**
    * Initalizes a new BDecoder. Nothing is read from the given
@@ -84,15 +92,6 @@ public class BDecoder
   public BDecoder(InputStream in)
   {
     this.in = in;
-    // XXX - Used for ugly hack.
-    try
-      {
-        sha_digest = MessageDigest.getInstance("SHA");
-      }
-    catch(NoSuchAlgorithmException nsa)
-      {
-        throw new InternalError(nsa.toString());
-      }
   }
 
   /**
@@ -110,6 +109,24 @@ public class BDecoder
   public static BEValue bdecode(InputStream in) throws IOException
   {
     return new BDecoder(in).bdecode();
+  }
+
+  /**
+   *  Used for SHA1 hack
+   *  @since 0.8.5
+   */
+  private void createDigest() {
+      if (sha_digest == null) {
+          try {
+              sha_digest = MessageDigest.getInstance("SHA");
+          } catch(NoSuchAlgorithmException nsa) {
+              throw new InternalError(nsa.toString());
+          }
+      } else {
+          // there are two info maps, but not one inside the other,
+          // the resulting hash will be incorrect
+          // throw something? - no, the check in the MetaInfo constructor will catch it.
+      }
   }
 
   /**
@@ -294,9 +311,13 @@ public class BDecoder
         String key = bdecode().getString();
 
         // XXX ugly hack
-        boolean special = special_map.equals(key);
-        if (special)
+        // This will not screw up if an info map contains an info map,
+        // but it will if there are two info maps (not one inside the other)
+        boolean special = (!in_special_map) && special_map.equals(key);
+        if (special) {
+          createDigest();
           in_special_map = true;
+        }
 
         BEValue value = bdecode();
         result.put(key, value);

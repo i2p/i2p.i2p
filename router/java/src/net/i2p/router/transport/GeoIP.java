@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
@@ -35,7 +36,7 @@ import net.i2p.util.Log;
  *
  * @author zzz
  */
-public class GeoIP {
+class GeoIP {
     private Log _log;
     private RouterContext _context;
     private final Map<String, String> _codeToName;
@@ -251,7 +252,11 @@ public class GeoIP {
      */
     private void updateOurCountry() {
         String oldCountry = _context.router().getConfigSetting(PROP_IP_COUNTRY);
-        String country = _context.commSystem().getCountry(_context.routerHash());
+        Hash ourHash = _context.routerHash();
+        // we should always have a RouterInfo by now, but we had one report of an NPE here
+        if (ourHash == null)
+            return;
+        String country = _context.commSystem().getCountry(ourHash);
         if (country != null && !country.equals(oldCountry)) {
             _context.router().setConfigSetting(PROP_IP_COUNTRY, country);
             _context.router().saveConfig();

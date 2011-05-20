@@ -53,7 +53,7 @@ class IntroductionManager {
             _log.debug("Adding peer " + peer.getRemoteHostId() + ", weRelayToThemAs " 
                        + peer.getWeRelayToThemAs() + ", theyRelayToUsAs " + peer.getTheyRelayToUsAs());
         if (peer.getWeRelayToThemAs() > 0) 
-            _outbound.put(new Long(peer.getWeRelayToThemAs()), peer);
+            _outbound.put(Long.valueOf(peer.getWeRelayToThemAs()), peer);
         if (peer.getTheyRelayToUsAs() > 0) {
                     _inbound.add(peer);
         }
@@ -65,14 +65,14 @@ class IntroductionManager {
             _log.debug("removing peer " + peer.getRemoteHostId() + ", weRelayToThemAs " 
                        + peer.getWeRelayToThemAs() + ", theyRelayToUsAs " + peer.getTheyRelayToUsAs());
         if (peer.getWeRelayToThemAs() > 0) 
-            _outbound.remove(new Long(peer.getWeRelayToThemAs()));
+            _outbound.remove(Long.valueOf(peer.getWeRelayToThemAs()));
         if (peer.getTheyRelayToUsAs() > 0) {
             _inbound.remove(peer);
         }
     }
     
     public PeerState get(long id) {
-        return _outbound.get(new Long(id));
+        return _outbound.get(Long.valueOf(id));
     }
     
     /**

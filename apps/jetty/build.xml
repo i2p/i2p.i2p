@@ -96,14 +96,39 @@
             srcdir="./java/src" 
             debug="true" source="1.5" target="1.5" 
             destdir="./build/obj" 
+            includeAntRuntime="false"
             classpath="./jettylib/commons-logging.jar:./jettylib/javax.servlet.jar:./jettylib/org.mortbay.jetty.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
-    <target name="jar" depends="compile">
+
+    <target name="jar" depends="compile, jarUpToDate" unless="jar.uptodate" >
+        <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="list" />
+            <arg value="changed" />
+            <arg value="." />
+        </exec>
+        <!-- \n in an attribute value generates an invalid manifest -->
+        <exec executable="tr" inputstring="${workspace.changes}" outputproperty="workspace.changes.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="-s" />
+            <arg value="[:space:]" />
+            <arg value="," />
+        </exec>
         <jar destfile="./jettylib/org.mortbay.jetty.jar" basedir="./build/obj" includes="**/*.class" update="true" >
+            <manifest>
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+            </manifest>
         </jar>
     </target>    
+
+    <target name="jarUpToDate">
+        <uptodate property="jar.uptodate" targetfile="jettylib/org.mortbay.jetty.jar" >
+            <srcfiles dir= "build/obj" includes="**/*.class" />
+        </uptodate>
+    </target>    
+
     <target name="clean" >
         <delete dir="./build" />
         <delete file="${verified.filename}" />

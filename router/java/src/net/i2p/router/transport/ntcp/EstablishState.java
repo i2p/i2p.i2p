@@ -69,7 +69,7 @@ import net.i2p.util.Log;
  * NOTE: Check info is unused.
  *
  */
-public class EstablishState {
+class EstablishState {
     private RouterContext _context;
     private Log _log;
 
@@ -399,7 +399,7 @@ public class EstablishState {
                     _context.clock().setOffset(1000 * (_tsB - _tsA), true);
                     _tsA = _tsB;
                     if (diff != 0)
-                        _log.error("NTP failure, NTCP adjusting clock by " + DataHelper.formatDuration(diff));
+                        _log.logAlways(Log.WARN, "NTP failure, NTCP adjusting clock by " + DataHelper.formatDuration(diff));
                 } else if (diff >= Router.CLOCK_FUDGE_FACTOR) {
                     _context.statManager().addRateData("ntcp.invalidOutboundSkew", diff, 0);
                     _transport.markReachable(_con.getRemotePeer().calculateHash(), false);
@@ -617,7 +617,7 @@ public class EstablishState {
                     _context.clock().setOffset(1000 * (_tsB - tsA), true);
                     tsA = _tsB;
                     if (diff != 0)
-                        _log.error("NTP failure, NTCP adjusting clock by " + DataHelper.formatDuration(diff));
+                        _log.logAlways(Log.WARN, "NTP failure, NTCP adjusting clock by " + DataHelper.formatDuration(diff));
                 } else if (diff >= Router.CLOCK_FUDGE_FACTOR) {
                     _context.statManager().addRateData("ntcp.invalidInboundSkew", diff, 0);
                     _transport.markReachable(alice.calculateHash(), true);

@@ -4,7 +4,7 @@
 
     <info>
         <appname>i2p</appname>
-        <appversion>0.8.2</appversion>
+        <appversion>0.8.6</appversion>
         <authors>
             <author name="I2P" email="http://forum.i2p2.de/"/>
         </authors>
@@ -105,13 +105,14 @@
     <panels>
         <panel classname="HelloPanel"/>
         <panel classname="InfoPanel"/>
+        <panel classname="PacksPanel"><os family="windows" /></panel>
         <panel classname="TargetPanel"/>
-        <panel classname="InstallPanel"/>
         <panel classname="ShortcutPanel"><os family="windows" /></panel>
         <!-- <panel classname="ProcessPanel"><os family="windows" /></panel> -->
         <!-- unix|mac doesn't work, displays for windows too -->
         <panel classname="XInfoPanel" ><os family="unix" /></panel>
         <panel classname="XInfoPanel" ><os family="mac" /></panel>
+        <panel classname="InstallPanel"/>
         <panel classname="SimpleFinishPanel"/>
     </panels>
 
@@ -177,6 +178,32 @@
             <executable targetfile="$INSTALL_PATH/postinstall.sh" type="bin" stage="postinstall" keep="true" failure="warn"><os family="unix" />
                 <args><arg value="$INSTALL_PATH" /></args></executable>
 
+        </pack>
+
+        <pack name="Windows Service" required="no">
+            <description>Automatically start I2P in the background</description>
+            <os family="windows" />
+            <executable targetfile="$INSTALL_PATH/set_config_dir_for_nt_service.bat" stage="postinstall" failure="warn" keep="false" />
+<!--
+-->
+            <executable targetfile="$INSTALL_PATH/install_i2p_service_winnt.bat" stage="postinstall" failure="warn" keep="true">
+                <args>
+                    <arg value="$INSTALL_PATH\wrapper.config" />
+                    <arg value="--nopause" />
+                </args>
+            </executable>
+            <executable targetfile="$INSTALL_PATH/I2Psvc.exe" stage="postinstall" failure="warn" keep="true">
+                <args>
+                    <arg value="-t" />
+                    <arg value="$INSTALL_PATH\wrapper.config" />
+                </args>
+            </executable>
+            <executable targetfile="$INSTALL_PATH/uninstall_i2p_service_winnt.bat" stage="uninstall" failure="warn" keep="true">
+                <args>
+                    <arg value="$INSTALL_PATH\wrapper.config" />
+                    <arg value="--nopause" />
+                </args>
+            </executable>
         </pack>
     </packs>
 

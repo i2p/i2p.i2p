@@ -100,7 +100,7 @@ public class ConfigNetHelper extends HelperBase {
     }
 
     public String getTcpAutoIPChecked(int mode) {
-        boolean enabled = TransportManager.enableNTCP(_context);
+        boolean enabled = TransportManager.isNTCPEnabled(_context);
         String hostname = _context.getProperty(PROP_I2NP_NTCP_HOSTNAME); 
         boolean specified = hostname != null && hostname.length() > 0;
         String auto = _context.getProperty(PROP_I2NP_NTCP_AUTO_IP, "false");

@@ -21,20 +21,51 @@
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
-        <javac srcdir="./src" debug="true" source="1.5" target="1.5" deprecation="on" destdir="./build/obj" classpath="${javac.classpath}" >
+        <javac srcdir="./src" debug="true" source="1.5" target="1.5" deprecation="on"
+               includeAntRuntime="false"
+               destdir="./build/obj" classpath="${javac.classpath}" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
+
     <target name="compileTest">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
-        <javac srcdir="./src:./test" debug="true" source="1.5" target="1.5" deprecation="on" destdir="./build/obj" >
+        <!-- junit classes are in ant runtime -->
+        <javac srcdir="./src:./test" debug="true" source="1.5" target="1.5" deprecation="on"
+               includeAntRuntime="true"
+               destdir="./build/obj" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
-    <target name="jar" depends="compile">
-        <jar destfile="./build/i2p.jar" basedir="./build/obj" includes="**/*.class" />
+
+    <target name="jar" depends="compile, jarUpToDate" unless="jar.uptodate" >
+        <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="list" />
+            <arg value="changed" />
+            <arg value="." />
+        </exec>
+        <!-- \n in an attribute value generates an invalid manifest -->
+        <exec executable="tr" inputstring="${workspace.changes}" outputproperty="workspace.changes.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="-s" />
+            <arg value="[:space:]" />
+            <arg value="," />
+        </exec>
+        <jar destfile="./build/i2p.jar" basedir="./build/obj" includes="**/*.class" >
+            <manifest>
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+            </manifest>
+        </jar>
     </target>
+
+    <target name="jarUpToDate" >
+        <uptodate property="jar.uptodate" targetfile="build/i2p.jar" >
+            <srcfiles dir= "build/obj" includes="**/*.class" />
+        </uptodate>
+    </target>
+
     <target name="jarTest" depends="compileTest">
         <jar destfile="./build/i2ptest.jar" basedir="./build/obj" includes="**/*.class" />
     </target>
@@ -43,15 +74,35 @@
         <mkdir dir="./build/javadoc" />
         <javadoc sourcepath="./src:./test" destdir="./build/javadoc" packagenames="*" use="true" splitindex="true" windowtitle="I2P SDK" />
     </target>
-    <target name="test" depends="clean, compileTest">
-        <junit printsummary="on" fork="yes">
+    <target name="prepareTest" depends="compileTest" if="with.cobertura">
+        <taskdef classpath="${with.cobertura}" resource="tasks.properties" onerror="report" />
+        <mkdir dir="./build/obj_test" />
+        <cobertura-instrument todir="./build/obj_test">
+            <fileset dir="./build/obj">
+                <include name="**/*.class"/>
+                <exclude name="**/*Test.class" />
+            </fileset>
+        </cobertura-instrument>
+    </target>
+    <target name="test" depends="clean, compileTest, prepareTest">
+        <delete>
+            <fileset dir="../../reports/core/junit">
+                <include name="TEST-*.xml"/>
+            </fileset>
+        </delete>
+        <mkdir dir="../../reports/" />
+        <mkdir dir="../../reports/core/" />
+        <mkdir dir="../../reports/core/junit/" />
+        <junit printsummary="on" fork="yes" maxmemory="384m">
+            <sysproperty key="net.sourceforge.cobertura.datafile" file="./cobertura.ser" />
             <classpath>
                 <pathelement path="${classpath}" />
+                <pathelement location="./build/obj_test" />
                 <pathelement location="./build/obj" />
                 <pathelement location="../../installer/lib/jbigi/jbigi.jar" />
-                <pathelement path="${ant.home}/lib/clover.jar"/>
+                <pathelement location="${with.cobertura}" />
             </classpath>
-            <batchtest>
+            <batchtest todir="../../reports/core/junit/">
                 <fileset dir="./test/">
                     <include name="**/*Test.java" />
                     <exclude name="**/ElGamalAESEngineTest.java" />
@@ -60,24 +111,11 @@
             </batchtest>
             <formatter type="xml"/>
         </junit>
-        <mkdir dir="../../reports/" />
-        <mkdir dir="../../reports/core/" />
-        <mkdir dir="../../reports/core/junit/" />
-        <delete>
-            <fileset dir="../../reports/core/junit">
-                <include name="TEST-*.xml"/>
-            </fileset>
-        </delete>
-        <copy todir="../../reports/core/junit">
-            <fileset dir=".">
-                <include name="TEST-*.xml"/>
-            </fileset>
-        </copy>
-        <delete>
-            <fileset dir=".">
-                <include name="TEST-*.xml"/>
-            </fileset>
-        </delete>
+    </target>
+    <target name="cobertura" depends="test" if="with.cobertura">
+        <mkdir dir="../../reports/core/cobertura" />
+        <cobertura-report format="xml" srcdir="./src" destdir="../../reports/core/cobertura" />
+        <delete file="./cobertura.ser" />
     </target>
     <target name="junit.report">
         <junitreport todir="../../reports/core/junit">
@@ -87,28 +125,8 @@
             <report format="frames" todir="../../reports/core/html/junit"/>
         </junitreport>
     </target>
-    <target name="clover.report">
-        <taskdef resource="clovertasks"/>
-        <mkdir dir="../../reports/" />
-        <mkdir dir="../../reports/core" />
-        <mkdir dir="../../reports/core/clover" />
-        <clover-setup initString="../../reports/core/clover/coverage.db"/>
-        <clover-report>
-            <current outfile="../../reports/core/html/clover">
-                <format type="html"/>
-            </current>
-        </clover-report>
-    </target>
-    <target name="test.report" depends="junit.report, clover.report"/>
-    <target name="useclover">
-        <taskdef resource="clovertasks"/>
-        <mkdir dir="../../reports/" />
-        <mkdir dir="../../reports/core/" />
-        <mkdir dir="../../reports/core/clover" />
-        <clover-setup initString="../../reports/core/clover/coverage.db"/>
-    </target>
+    <target name="test.report" depends="junit.report"/>
     <target name="fulltest" depends="test, junit.report" />
-    <target name="fullclovertest" depends="useclover, test, test.report" />
     <target name="clean">
         <delete dir="./build" />
     </target>

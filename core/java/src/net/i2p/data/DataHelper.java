@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -178,6 +179,7 @@ public class DataHelper {
      * @param props source
      * @return new offset
      */
+    @Deprecated
     public static int toProperties(byte target[], int offset, Properties props) throws DataFormatException, IOException {
         if (props != null) {
             OrderedProperties p = new OrderedProperties();
@@ -218,6 +220,7 @@ public class DataHelper {
      * @param target returned Properties
      * @return new offset
      */
+    @Deprecated
     public static int fromProperties(byte source[], int offset, Properties target) throws DataFormatException, IOException {
         int size = (int)fromLong(source, offset, 2);
         offset += 2;
@@ -253,6 +256,7 @@ public class DataHelper {
      *
      * @throws RuntimeException if either is too long.
      */
+    @Deprecated
     public static byte[] toProperties(Properties opts) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream(2);
@@ -543,6 +547,7 @@ public class DataHelper {
     }
 
     /** @deprecated unused */
+    @Deprecated
     public static byte[] toDate(Date date) throws IllegalArgumentException {
         if (date == null)
             return toLong(DATE_LENGTH, 0L);
@@ -677,6 +682,7 @@ public class DataHelper {
      * @throws IOException if there is an IO error writing the boolean
      * @deprecated unused
      */
+    @Deprecated
     public static void writeBoolean(OutputStream out, Boolean bool) 
         throws DataFormatException, IOException {
         if (bool == null)
@@ -688,6 +694,7 @@ public class DataHelper {
     }
     
     /** @deprecated unused */
+    @Deprecated
     public static Boolean fromBoolean(byte data[], int offset) {
         if (data[offset] == BOOLEAN_TRUE)
             return Boolean.TRUE;
@@ -698,11 +705,13 @@ public class DataHelper {
     }
     
     /** @deprecated unused */
+    @Deprecated
     public static void toBoolean(byte data[], int offset, boolean value) {
         data[offset] = (value ? BOOLEAN_TRUE : BOOLEAN_FALSE);
     }
 
     /** @deprecated unused */
+    @Deprecated
     public static void toBoolean(byte data[], int offset, Boolean value) {
         if (value == null)
             data[offset] = BOOLEAN_UNKNOWN;
@@ -711,12 +720,16 @@ public class DataHelper {
     }
     
     /** deprecated - used only in DatabaseLookupMessage */
+    @Deprecated
     public static final byte BOOLEAN_TRUE = 0x1;
     /** deprecated - used only in DatabaseLookupMessage */
+    @Deprecated
     public static final byte BOOLEAN_FALSE = 0x0;
     /** @deprecated unused */
+    @Deprecated
     public static final byte BOOLEAN_UNKNOWN = 0x2;
     /** @deprecated unused */
+    @Deprecated
     public static final int BOOLEAN_LENGTH = 1;
 
     //
@@ -768,17 +781,17 @@ public class DataHelper {
      * This treats (null == null) as true, (null == (!null)) as false, 
      * and unequal length arrays as false.
      *
+     * @return Arrays.equals(lhs, rhs)
      */
     public final static boolean eq(byte lhs[], byte rhs[]) {
-        // this appears to be the way Arrays.equals is defined, so all the extra tests are unnecessary?
-        boolean eq = (((lhs == null) && (rhs == null)) || ((lhs != null) && (rhs != null) && (Arrays.equals(lhs, rhs))));
-        return eq;
+        return Arrays.equals(lhs, rhs);
     }
 
     /**
      * Compare two integers, really just for consistency.
      * @deprecated inefficient
      */
+    @Deprecated
     public final static boolean eq(int lhs, int rhs) {
         return lhs == rhs;
     }
@@ -787,6 +800,7 @@ public class DataHelper {
      * Compare two longs, really just for consistency.
      * @deprecated inefficient
      */
+    @Deprecated
     public final static boolean eq(long lhs, long rhs) {
         return lhs == rhs;
     }
@@ -795,6 +809,7 @@ public class DataHelper {
      * Compare two bytes, really just for consistency.
      * @deprecated inefficient
      */
+    @Deprecated
     public final static boolean eq(byte lhs, byte rhs) {
         return lhs == rhs;
     }
@@ -844,7 +859,7 @@ public class DataHelper {
      */
     public final static void xor(byte lhs[], int startLeft, byte rhs[], int startRight, byte out[], int startOut, int len) {
         if ( (lhs == null) || (rhs == null) || (out == null) )
-            throw new NullPointerException("Invalid params to xor (" + lhs + ", " + rhs + ", " + out + ")");
+            throw new NullPointerException("Null params to xor");
         if (lhs.length < startLeft + len)
             throw new IllegalArgumentException("Left hand side is too short");
         if (rhs.length < startRight + len)
@@ -973,6 +988,7 @@ public class DataHelper {
      * @return true if the line was read, false if eof was reached before a 
      *              newline was found
      */
+    @Deprecated
     public static boolean readLine(InputStream in, StringBuffer buf) throws IOException {
         return readLine(in, buf, null);
     }
@@ -986,6 +1002,7 @@ public class DataHelper {
      * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
      * @deprecated use StringBuilder version
      */
+    @Deprecated
     public static boolean readLine(InputStream in, StringBuffer buf, Sha256Standalone hash) throws IOException {
         int c = -1;
         int i = 0;
@@ -1040,23 +1057,43 @@ public class DataHelper {
     }
 
     /**
-     *  Sort based on the Hash of the DataStructure
+     *  Sort based on the Hash of the DataStructure.
      *  Warning - relatively slow.
-     *  Only used by RouterInfo
-     *  Why? Just because it has to be consistent so signing will work?
+     *  WARNING - this sort order must be consistent network-wide, so while the order is arbitrary,
+     *  it cannot be changed.
+     *  Why? Just because it has to be consistent so signing will work.
      *  How to spec as returning the same type as the param?
+     *  DEPRECATED - Only used by RouterInfo.
      */
     public static List<? extends DataStructure> sortStructures(Collection<? extends DataStructure> dataStructures) {
         if (dataStructures == null) return Collections.EMPTY_LIST;
-        ArrayList<DataStructure> rv = new ArrayList(dataStructures.size());
-        TreeMap<String, DataStructure> tm = new TreeMap();
-        for (DataStructure struct : dataStructures) {
-            tm.put(struct.calculateHash().toString(), struct);
-        }
-        for (DataStructure struct : tm.values()) {
-            rv.add(struct);
-        }
+
+        // This used to use Hash.toString(), which is insane, since a change to toString()
+        // would break the whole network. Now use Hash.toBase64().
+        // Note that the Base64 sort order is NOT the same as the raw byte sort order,
+        // despite what you may read elsewhere.
+
+        //ArrayList<DataStructure> rv = new ArrayList(dataStructures.size());
+        //TreeMap<String, DataStructure> tm = new TreeMap();
+        //for (DataStructure struct : dataStructures) {
+        //    tm.put(struct.calculateHash().toString(), struct);
+        //}
+        //for (DataStructure struct : tm.values()) {
+        //    rv.add(struct);
+        //}
+        ArrayList<DataStructure> rv = new ArrayList(dataStructures);
+        Collections.sort(rv, new DataStructureComparator());
         return rv;
+    }
+
+    /**
+     * See sortStructures() comments.
+     * @since 0.8.3
+     */
+    private static class DataStructureComparator implements Comparator<DataStructure> {
+        public int compare(DataStructure l, DataStructure r) {
+            return l.calculateHash().toBase64().compareTo(r.calculateHash().toBase64());
+        }
     }
 
     /**
@@ -1157,6 +1194,10 @@ public class DataHelper {
             case 2: return str + "M";
             case 3: return str + "G";
             case 4: return str + "T";
+            case 5: return str + "P";
+            case 6: return str + "E";
+            case 7: return str + "Z";
+            case 8: return str + "Y";
             default: return bytes + "";
         }
     }
@@ -1183,12 +1224,17 @@ public class DataHelper {
             case 2: return str + "&nbsp;M";
             case 3: return str + "&nbsp;G";
             case 4: return str + "&nbsp;T";
+            case 5: return str + "&nbsp;P";
+            case 6: return str + "&nbsp;E";
+            case 7: return str + "&nbsp;Z";
+            case 8: return str + "&nbsp;Y";
             default: return bytes + "&nbsp;";
         }
     }
     
     /**
      * Strip out any HTML (simply removing any less than / greater than symbols)
+     * @param orig may be null, returns empty string if null
      */
     public static String stripHTML(String orig) {
         if (orig == null) return "";

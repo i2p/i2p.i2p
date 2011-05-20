@@ -26,11 +26,13 @@ class DestReplyMessageHandler extends HandlerImpl {
             _log.debug("Handle message " + message);
         DestReplyMessage msg = (DestReplyMessage) message;
         Destination d = msg.getDestination();
-        if (d != null)
+        if (d != null) {
             session.destReceived(d);
-        Hash h = msg.getHash();
-        if (h != null)
-            session.destLookupFailed(h);
+        } else {
+            Hash h = msg.getHash();
+            if (h != null)
+                session.destLookupFailed(h);
+        }
         // else let it time out
     }
 }

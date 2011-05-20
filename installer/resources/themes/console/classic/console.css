@@ -258,16 +258,6 @@ div.tunnels table{
      margin-right: -2px;
 }    
      
-div.routersummary form {
-     margin-top: -6px !important;
-     margin-bottom: -4px !important;     
-}
-
-div.routersummary form:last-child {
-     padding-top: 3px !important;
-     margin-bottom: -10px !important;     
-}
-
 div.refresh {
      margin-top: 10px !important;
      margin-bottom: 10px !important;
@@ -303,7 +293,7 @@ div.main {
      border-top: 0;
      text-align: left;
      color: #001;
-     min-width: 500px;
+     min-width: 510px;
      -moz-border-radius: 0 0 3px 0;
      -khtml-border-radius: 0 0 3px 0;
      border-radius: 0 0 3px 0;
@@ -408,7 +398,19 @@ div.news li {
 }
 
 div.news h3 {
-     text-align: left !important;
+     background: none !important;
+     text-align: left;
+     border: none !important;
+     border-bottom: 1px dotted !important;
+     -moz-box-shadow: none;
+     -hktml-box-shadow: none;
+     box-shadow: none;
+     font-size: 10pt !important;
+     letter-spacing: 0.05em;
+     text-transform: capitalize !important;
+     text-shadow: none !important;
+     padding: 5px 10px 3px;
+     margin: 10px 10px -7px !important;
 }
 
 div.news p {
@@ -514,11 +516,11 @@ div.messages li, div.messages ul {
      margin: -10px 0 0 0;
 }
 
-div.messages span.error {
+div.error {
      color: #d00000;
 }
 
-div.messages span.notice {
+div.notice {
      font-style: italic;
 }
 
@@ -744,7 +746,7 @@ p {
 }
 
 .langbox {
-     margin: 18px -20px 0px 5px;
+     margin: 5px -20px 0px 5px;
      color: #001;
      font-size: 7pt;
      width: 280px;

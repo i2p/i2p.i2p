@@ -47,21 +47,21 @@ import net.i2p.util.SimpleTimer;
  *
  */
 public class OutboundClientMessageOneShotJob extends JobImpl {
-    private Log _log;
+    private final Log _log;
     private long _overallExpiration;
     private ClientMessage _clientMessage;
-    private MessageId _clientMessageId;
-    private int _clientMessageSize;
-    private Destination _from;
-    private Destination _to;
-    private String _toString;
+    private final MessageId _clientMessageId;
+    private final int _clientMessageSize;
+    private final Destination _from;
+    private final Destination _to;
+    private final String _toString;
     /** target destination's leaseSet, if known */
     private LeaseSet _leaseSet;
     /** Actual lease the message is being routed through */
     private Lease _lease;
     private PayloadGarlicConfig _clove;
     private long _cloveId;
-    private long _start;
+    private final long _start;
     private boolean _finished;
     private long _leaseSetLookupBegin;
     private TunnelInfo _outTunnel;
@@ -103,8 +103,6 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      */
     private static final int BUNDLE_PROBABILITY_DEFAULT = 100;
     
-    private static final Object _initializeLock = new Object();
-    private static boolean _initialized = false;
     private static final int CLEAN_INTERVAL = 5*60*1000;
     private static final int REPLY_REQUEST_INTERVAL = 60*1000;
 
@@ -115,26 +113,6 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         super(ctx);
         _log = ctx.logManager().getLog(OutboundClientMessageOneShotJob.class);
         
-        synchronized (_initializeLock) {
-            if (!_initialized) {
-                SimpleScheduler.getInstance().addPeriodicEvent(new OCMOSJCacheCleaner(ctx), CLEAN_INTERVAL, CLEAN_INTERVAL);
-                ctx.statManager().createFrequencyStat("client.sendMessageFailFrequency", "How often does a client fail to send a message?", "ClientMessages", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
-                ctx.statManager().createRateStat("client.sendMessageSize", "How large are messages sent by the client?", "ClientMessages", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
-                ctx.statManager().createRateStat("client.sendAckTime", "Message round trip time", "ClientMessages", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-                ctx.statManager().createRateStat("client.timeoutCongestionTunnel", "How lagged our tunnels are when a send times out?", "ClientMessages", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-                ctx.statManager().createRateStat("client.timeoutCongestionMessage", "How fast we process messages locally when a send times out?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-                ctx.statManager().createRateStat("client.timeoutCongestionInbound", "How much faster we are receiving data than our average bps when a send times out?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-                ctx.statManager().createRateStat("client.leaseSetFoundLocally", "How often we tried to look for a leaseSet and found it locally?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-                ctx.statManager().createRateStat("client.leaseSetFoundRemoteTime", "How long we tried to look for a remote leaseSet (when we succeeded)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-                ctx.statManager().createRateStat("client.leaseSetFailedRemoteTime", "How long we tried to look for a remote leaseSet (when we failed)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-                ctx.statManager().createRateStat("client.dispatchPrepareTime", "How long until we've queued up the dispatch job (since we started)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-                ctx.statManager().createRateStat("client.dispatchTime", "How long until we've dispatched the message (since we started)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-                ctx.statManager().createRateStat("client.dispatchSendTime", "How long the actual dispatching takes?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-                ctx.statManager().createRateStat("client.dispatchNoTunnels", "How long after start do we run out of tunnels to send/receive with?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
-                ctx.statManager().createRateStat("client.dispatchNoACK", "Repeated message sends to a peer (no ack required)", "ClientMessages", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l });
-                _initialized = true;
-            }
-        }
         long timeoutMs = OVERALL_TIMEOUT_MS_DEFAULT;
         _clientMessage = msg;
         _clientMessageId = msg.getMessageId();
@@ -149,10 +127,17 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         // otherwise router config, otherwise default
         _overallExpiration = msg.getExpiration();
         if (_overallExpiration > 0) {
-           _overallExpiration = Math.max(_overallExpiration, _start + OVERALL_TIMEOUT_MS_MIN);
-           _overallExpiration = Math.min(_overallExpiration, _start + OVERALL_TIMEOUT_MS_DEFAULT);
-           if (_log.shouldLog(Log.INFO))
-               _log.info(getJobId() + ": Message Expiration (ms): " + (_overallExpiration - _start));
+            // Unless it's already expired, set a min and max expiration
+            if (_overallExpiration <= _start) {
+                _overallExpiration = Math.max(_overallExpiration, _start + OVERALL_TIMEOUT_MS_MIN);
+                _overallExpiration = Math.min(_overallExpiration, _start + OVERALL_TIMEOUT_MS_DEFAULT);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info(getJobId() + ": Message Expiration (ms): " + (_overallExpiration - _start));
+            } else {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn(getJobId() + ": Expired before we got to it");
+                // runJob() will call dieFatal()
+            }
         } else {
             String param = msg.getSenderConfig().getOptions().getProperty(OVERALL_TIMEOUT_MS_PARAM);
             if (param == null)
@@ -171,15 +156,38 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
            if (_log.shouldLog(Log.INFO))
                _log.info(getJobId() + " Default Expiration (ms): " + timeoutMs);
         }
-        _finished = false;
     }
     
+    /** call once only */
+    public static void init(RouterContext ctx) {
+        SimpleScheduler.getInstance().addPeriodicEvent(new OCMOSJCacheCleaner(ctx), CLEAN_INTERVAL, CLEAN_INTERVAL);
+        ctx.statManager().createFrequencyStat("client.sendMessageFailFrequency", "How often does a client fail to send a message?", "ClientMessages", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("client.sendMessageSize", "How large are messages sent by the client?", "ClientMessages", new long[] { 60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("client.sendAckTime", "Message round trip time", "ClientMessages", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("client.timeoutCongestionTunnel", "How lagged our tunnels are when a send times out?", "ClientMessages", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("client.timeoutCongestionMessage", "How fast we process messages locally when a send times out?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("client.timeoutCongestionInbound", "How much faster we are receiving data than our average bps when a send times out?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("client.leaseSetFoundLocally", "How often we tried to look for a leaseSet and found it locally?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("client.leaseSetFoundRemoteTime", "How long we tried to look for a remote leaseSet (when we succeeded)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("client.leaseSetFailedRemoteTime", "How long we tried to look for a remote leaseSet (when we failed)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("client.dispatchPrepareTime", "How long until we've queued up the dispatch job (since we started)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("client.dispatchTime", "How long until we've dispatched the message (since we started)?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("client.dispatchSendTime", "How long the actual dispatching takes?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("client.dispatchNoTunnels", "How long after start do we run out of tunnels to send/receive with?", "ClientMessages", new long[] { 5*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        ctx.statManager().createRateStat("client.dispatchNoACK", "Repeated message sends to a peer (no ack required)", "ClientMessages", new long[] { 60*1000l, 5*60*1000l, 60*60*1000l });
+    }
+
     public String getName() { return "Outbound client message"; }
     
     public void runJob() {
+        long now = getContext().clock().now();
+        if (now >= _overallExpiration) {
+            dieFatal();
+            return;
+        }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": Send outbound client message job beginning");
-        long timeoutMs = _overallExpiration - getContext().clock().now();
+        long timeoutMs = _overallExpiration - now;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": preparing to search for the leaseSet for " + _toString);
         Hash key = _to.calculateHash();
@@ -249,7 +257,6 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         }
 
         // If the last leaseSet we sent him is still good, don't bother sending again
-        long now = getContext().clock().now();
         synchronized (_leaseSetCache) {
             if (!force) {
                 LeaseSet ls = _leaseSetCache.get(hashPair());
@@ -326,7 +333,6 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
                 _log.warn(getJobId() + ": Lookup locally didn't find the leaseSet for " + _toString);
             return false;
         } 
-        long now = getContext().clock().now();
 
         // Use the same lease if it's still good
         // Even if _leaseSet changed, _leaseSet.getEncryptionKey() didn't...
@@ -373,7 +379,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         
         // randomize the ordering (so leases with equal # of failures per next 
         // sort are randomly ordered)
-        Collections.shuffle(leases);
+        Collections.shuffle(leases, getContext().random());
         
 /****
         if (false) {
@@ -793,7 +799,6 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
 
     private TunnelInfo selectOutboundTunnel(Destination to) {
         TunnelInfo tunnel;
-        long now = getContext().clock().now();
         synchronized (_tunnelCache) {
             /**
              * If old tunnel is valid and no longer backlogged, use it.

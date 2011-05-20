@@ -18,17 +18,17 @@ import net.i2p.router.TunnelInfo;
  *
  */
 public class TunnelCreatorConfig implements TunnelInfo {
-    protected RouterContext _context;
+    protected final RouterContext _context;
     /** only necessary for client tunnels */
-    private Hash _destination;
+    private final Hash _destination;
     /** gateway first */
-    private HopConfig _config[];
+    private final HopConfig _config[];
     /** gateway first */
-    private Hash _peers[];
+    private final Hash _peers[];
     private long _expiration;
     private List<Integer> _order;
     private long _replyMessageId;
-    private boolean _isInbound;
+    private final boolean _isInbound;
     private long _messagesProcessed;
     private volatile long _verifiedBytesTransferred;
     private boolean _failed;
@@ -48,10 +48,6 @@ public class TunnelCreatorConfig implements TunnelInfo {
         }
         _isInbound = isInbound;
         _destination = destination;
-        _messagesProcessed = 0;
-        _verifiedBytesTransferred = 0;
-        _failed = false;
-        _failures = 0;
     }
     
     /**

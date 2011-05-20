@@ -23,7 +23,7 @@ import net.i2p.util.Log;
  *
  * @author zzz
  */
-public class NTCPSendFinisher {
+class NTCPSendFinisher {
     private static final int MIN_THREADS = 1;
     private static final int MAX_THREADS = 4;
     private final I2PAppContext _context;
@@ -31,7 +31,13 @@ public class NTCPSendFinisher {
     private final Log _log;
     private static int _count;
     private ThreadPoolExecutor _executor;
-    private static int _threads;
+    private static final int THREADS;
+    static {
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        if (maxMemory == Long.MAX_VALUE)
+            maxMemory = 96*1024*1024l;
+        THREADS = (int) Math.max(MIN_THREADS, Math.min(MAX_THREADS, 1 + (maxMemory / (32*1024*1024))));
+    }
 
     public NTCPSendFinisher(I2PAppContext context, NTCPTransport transport) {
         _context = context;
@@ -42,9 +48,7 @@ public class NTCPSendFinisher {
     
     public void start() {
         _count = 0;
-        long maxMemory = Runtime.getRuntime().maxMemory();
-        _threads = (int) Math.max(MIN_THREADS, Math.min(MAX_THREADS, 1 + (maxMemory / (32*1024*1024))));
-        _executor = new CustomThreadPoolExecutor(_threads);
+        _executor = new CustomThreadPoolExecutor(THREADS);
     }
 
     public void stop() {
@@ -73,7 +77,7 @@ public class NTCPSendFinisher {
     private static class CustomThreadFactory implements ThreadFactory {
         public Thread newThread(Runnable r) {
             Thread rv = Executors.defaultThreadFactory().newThread(r);
-            rv.setName("NTCPSendFinisher " + (++_count) + '/' + _threads);
+            rv.setName("NTCPSendFinisher " + (++_count) + '/' + THREADS);
             rv.setDaemon(true);
             return rv;
         }

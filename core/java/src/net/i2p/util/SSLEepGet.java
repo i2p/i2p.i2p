@@ -482,12 +482,14 @@ public class SSLEepGet extends EepGet {
         if (_aborted)
             throw new IOException("Timed out reading the HTTP headers");
         
-        timeout.resetTimer();
-        if (_fetchInactivityTimeout > 0)
-            timeout.setInactivityTimeout(_fetchInactivityTimeout);
-        else
-            timeout.setInactivityTimeout(60*1000);
-        
+        if (timeout != null) {
+            timeout.resetTimer();
+            if (_fetchInactivityTimeout > 0)
+                timeout.setInactivityTimeout(_fetchInactivityTimeout);
+            else
+                timeout.setInactivityTimeout(60*1000);
+        }        
+
         if (_redirectLocation != null) {
             throw new IOException("Server redirect to " + _redirectLocation + " not allowed");
         }
@@ -506,7 +508,8 @@ public class SSLEepGet extends EepGet {
             int read = _proxyIn.read(buf, 0, toRead);
             if (read == -1)
                 break;
-            timeout.resetTimer();
+            if (timeout != null)
+                timeout.resetTimer();
             _out.write(buf, 0, read);
             _bytesTransferred += read;
 
@@ -531,7 +534,8 @@ public class SSLEepGet extends EepGet {
                     read++;
                 }
             }
-            timeout.resetTimer();
+            if (timeout != null)
+                timeout.resetTimer();
             if (_bytesRemaining >= read) // else chunked?
                 _bytesRemaining -= read;
             if (read > 0) {
@@ -556,7 +560,8 @@ public class SSLEepGet extends EepGet {
         if (_aborted)
             throw new IOException("Timed out reading the HTTP data");
         
-        timeout.cancel();
+        if (timeout != null)
+            timeout.cancel();
         
         if (_transferFailed) {
             // 404, etc - transferFailed is called after all attempts fail, by fetch() above

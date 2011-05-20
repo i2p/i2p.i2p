@@ -50,6 +50,26 @@ public class TunnelId extends DataStructureImpl {
         DataHelper.writeLong(out, 4, _tunnelId);
     }
 
+    /**
+     * Overridden for efficiency.
+     */
+    @Override
+    public byte[] toByteArray() {
+        return DataHelper.toLong(4, _tunnelId);
+    }
+
+    /**
+     * Overridden for efficiency.
+     * @param data non-null
+     * @throws DataFormatException if null or wrong length
+     */
+    @Override
+    public void fromByteArray(byte data[]) throws DataFormatException {
+        if (data == null) throw new DataFormatException("Null data passed in");
+        if (data.length != 4) throw new DataFormatException("Bad data length");
+        _tunnelId = (int) DataHelper.fromLong(data, 0, 4);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if ( (obj == null) || !(obj instanceof TunnelId))

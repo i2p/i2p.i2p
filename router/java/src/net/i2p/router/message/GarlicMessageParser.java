@@ -24,9 +24,9 @@ import net.i2p.util.Log;
  * Read a GarlicMessage, decrypt it, and return the resulting CloveSet
  *
  */
-public class GarlicMessageParser {
-    private Log _log;
-    private RouterContext _context;
+class GarlicMessageParser {
+    private final Log _log;
+    private final RouterContext _context;
     
     public GarlicMessageParser(RouterContext context) { 
         _context = context;
@@ -47,7 +47,7 @@ public class GarlicMessageParser {
         }
         if (decrData == null) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Decryption of garlic message failed (data = " + encData + ")", new Exception("Decrypt fail"));
+                _log.warn("Decryption of garlic message failed", new Exception("Decrypt fail"));
             return null;
         } else {
             try {

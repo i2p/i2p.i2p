@@ -59,7 +59,6 @@ public class I2PSocketEepGet extends EepGet {
         // public EepGet(I2PAppContext ctx, boolean shouldProxy, String proxyHost, int proxyPort, int numRetries, long minSize, long maxSize, String outputFile, OutputStream outputStream, String url, boolean allowCaching, String etag, String postData) {
         super(ctx, false, null, -1, numRetries, minSize, maxSize, outputFile, outputStream, url, true, null, null);
         _socketManager = mgr;
-        _log = ctx.logManager().getLog(I2PSocketEepGet.class);
     }
    
     /**

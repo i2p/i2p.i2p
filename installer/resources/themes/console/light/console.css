@@ -38,7 +38,7 @@ div.logo {
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     background: #ffe; /*url('images/lightbluetile.png')*/
+     background: #ffe;
      width: 185px;
      -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
 }
@@ -90,7 +90,6 @@ div.routersummaryouter {
 }
 
 div.routersummary {
-/*  margin: 0px 20px 20px 0px; */
      width: 180px;
      padding: 8px 8px 10px 8px;
      text-align: center !important;
@@ -101,10 +100,10 @@ div.routersummary {
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     background: #ffe url('images/magic.png') center bottom;/* 
-     float: left;
-*/     
+     background: #ffe url('images/magic.png') center bottom;
      -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
+     -khtml-box-shadow: inset 0px 0px 1px 1px #bbf;
+     box-shadow: inset 0px 0px 1px 1px #bbf;
 }
 
 div.routersummary input[type=text] {
@@ -118,7 +117,7 @@ div.routersummary hr {
      border-bottom: 1px solid #99f;
      margin: 8px -7px 8px -7px;
      -moz-box-shadow: inset 0px 1px 1px 1px #fff;
-    -khtml-box-shadow: inset 0px 0px 1px #fff;
+    -khtml-box-shadow: inset 0px 1px 0px #fff;
      box-shadow: inset 0px 1px 1px 1px #fff;
 }
 
@@ -139,6 +138,9 @@ div.routersummary h3 {
      -khtml-border-radius: 3px;
      border-radius: 3px;
      -moz-box-shadow: 0px 1px 5px #bbf;
+     -moz-box-shadow: outset 0px 0px 2px 1px #bbf;
+     -khtml-box-shadow: outset 0px 0px 2px 1px #bbf;
+     box-shadow: outset 0px 0px 2px 1px #bbf;
 }
 
 div.routersummary h3 a {
@@ -148,6 +150,9 @@ div.routersummary h3 a {
 div.routersummary h3:hover {
      background: #ffa url('images/header.png') center center repeat-x !important;
      text-shadow: 0 0 0;
+     -moz-box-shadow: inset 0px 0px 2px 1px #ffa;
+     -khtml-box-shadow: inset 0px 0px 2px 1px #ffa;
+     box-shadow: inset 0px 0px 2px 1px #ffa;
 }
 
 div.routersummary h4 {
@@ -155,14 +160,16 @@ div.routersummary h4 {
      border-bottom: 0 !important;
      font-size: 8.5pt;
      letter-spacing: 0.02em;
-     margin: -5px -7px -5px -7px !important;
+     margin: -6px -6px -7px !important;
      padding: 3px 3px 5px 3px;
-     background: #eed url(images/magic.png);
+     background: #ddf url(images/magic.png);
      text-transform: capitalize;
      text-decoration: none !important;
      color: #2b2;
      line-height: 105%;
-/*     text-shadow: 0px 1px 1px #99f;*/
+     -moz-box-shadow: inset 0px 0px 1px 30px #dfd;
+     -khtml-box-shadow: 0px 0px 1px 1px #dfd;
+     box-shadow: 0px 0px 1px 1px #fdf;
 }
 
 div.routersummary table {
@@ -243,22 +250,13 @@ div.tunnels td, div.tunnels img:first-child {
      padding: 4px 0 !important;
 }
 
-div.routersummary form {
-     margin: -6px 0 -5px 0;
-}
-
-div.routersummary form:last-child {
-     margin: 6px 0 0 0 !important;
-     padding: 0;
-}
-
 div.routersummary p {
      padding: 0;
 }     
 
 div.refresh {
-     margin-top: -6px !important;
-     margin-bottom: 0px !important;
+     margin-top: 10px !important;
+     margin-bottom: 10px !important;
      padding: 2px 0 0px 0 !important;
 }
 
@@ -324,6 +322,8 @@ div.main {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
+     -khtml-box-shadow: inset 0px 0px 1px 1px #bbf;
+     box-shadow: inset 0px 0px 1px 1px #bbf;
      background: #ffe url('images/magic.png') center bottom;}
 
 div.main hr, hr {
@@ -355,9 +355,11 @@ div.news {
      text-align: right !important;
      font-size: 7.5pt;
      line-height: 140%;
-     -moz-box-shadow: inset 0px 0px 1px 0px #410;
+     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
+     -khtml-box-shadow: inset 0px 0px 1px 1px #bbf;
+     box-shadow: inset 0px 0px 1px 1px #bbf;
      background: #ffe url('images/magic.png') center bottom;
-     min-width: 480px;
+     min-width: 490px;
 }
 
 div.news p {
@@ -368,37 +370,12 @@ div.news p {
      padding: 0 15px;
 }
 
-div.news h3 {
-     text-align: left !important;
-}
-
-/*
-div.news a:link{
-     color: #a30;
-     text-decoration: none;
-}
-
-div.news a:visited{
-     color: #930;
-}
-
-div.news a:hover{
-     color: #d20;
-     text-decoration: underline;
-}
-
-div.news a:active{
-     color: #c30;
-}
-*/
-
 div.news hr{
      color: #225;
      background: #225;
      height: 1px;
      border: 0px dotted #225;
      margin: 10px 0 5px;
-/*     -moz-box-shadow: 0px -1px 1px 1px #ffe;*/
      opacity: 0.6;
 }
 
@@ -426,12 +403,25 @@ div.news li:first-child {
      margin-top: 10px !important;
 }
 
-/*
-div.news  h4 a{
-     color: #910 !important;
-     opacity: 1 !important;
+div.news h3 {
+     background: none !important;
+     text-align: left;
+     border: none !important;
+     padding-left: 0;
+     padding-top: 0px;
+     border-bottom: 1px dotted #225 !important;
+     -moz-box-shadow: none;
+     -khtml-box-shadow: none;
+     box-shadow: none;
+     font-size: 10pt !important;
+     letter-spacing: 0.05em;
+     text-transform: capitalize !important;
+     text-shadow: 0px 0px 0px #77f;
 }
-*/
+
+div.news i {
+     font-style: normal;
+}
 
 div.news h4 {
      border-bottom: 0px;
@@ -443,34 +433,29 @@ div.news h4 {
 div.confignav {
      padding: 15px 10px !important;
      margin: 15px 0 15px 0;
-     background: #ffe url('images/header.png') center center repeat-x;
+     background: url('images/header.png') center center repeat-x;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
-     border: 1px solid #113;
+     border: 1px solid #115;
      font-size: 9.5pt !important;
      font-weight: bold !important;
      line-height: 160% !important;
-     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
+     -moz-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     -khtml-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     opacity: 1;
      min-width: 400px;
 }
 
 div.configure {
-/*     padding: 5px 15px 0px 15px !important;
-     margin: 0px 0px 15px 0;
-     background: #ffe; url('images/lightbluetile.png')
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
-     border-radius: 4px;
-     border: 1px solid #447;
-     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;*/
      min-width: 400px;
      margin-bottom: 0px;
 }
 
 div.configure h3, div.graphspanel h3 {
-     border: 1px solid #113;
-     border-left: 5px solid #113;
+     border: 1px solid #115;
+     border-left: 5px solid #115;
      padding: 5px;
      margin: 15px 0 15px 0;
      border-radius: 0 4px 4px 0;
@@ -481,14 +466,6 @@ div.configure h3, div.graphspanel h3 {
 }
 
 div.graphspanel {
-/*     padding: 12px;
-     margin: 10px 0px 25px 0;
-     background: #ffe url('images/lightbluetile.png');
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
-     border-radius: 4px;
-     border: 1px solid #447;
-     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;*/
      text-align: center !important;
      margin: 15px 0px -15px;
 }
@@ -520,21 +497,22 @@ div.graphspanel form {
 div.messages {
      padding: 10px;
      margin: 10px 0 15px 0;
-     background: #ffe;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
      border: 1px solid #447;
-     background: #ffe url('images/magic.png');
+     background: #fff url('images/magic.png');
      font-weight: bold;
-     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
+     -moz-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     -khtml-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
 }
 
-div.messages span.error {
+div.error {
      color: #d00000;
 }
 
-div.messages span.notice {
+div.notice {
      font-style: italic;
 }
 
@@ -591,13 +569,7 @@ tr:nth-child(even) {
 tr:nth-child(odd) {
      background: #fff url(images/magic.png);
 }
-/*
-tr:last-child {
-     background: #bbf url('images/tabletilelighter.png') !important;
-     font-weight: bold;
-     border: 1px solid #002 !important;
-}
-*/
+
 td {
      padding: 5px 3px;
      color: #000;
@@ -631,7 +603,8 @@ div.main li {
 }
 
 div.main li b {
-     color: #514!important;
+     color: #514 !important;
+     color: #003 !important;
      letter-spacing: 0.01em;
      font-size: 9.5pt;
      line-height: 170%;
@@ -657,9 +630,7 @@ div.main li:first-child {
      font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      color: #910;
      padding: 2px 3px;
-     background: #fff;
      font-weight: bold;
-     background: #ffb url('images/magic.png') center bottom;
 }
 
 ol {
@@ -684,7 +655,6 @@ code {
      text-align: left;
      font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      color: #390;
-     padding: 2px 3px;
      font-weight: bold;
 }
 
@@ -740,16 +710,17 @@ p {
 
 h1 {
      text-align: left;
-     color: #000;
+     color: #115;
      padding: 10px 15px;
      margin: 0 10px 10px 207px;
      font: normal bold 16pt/120% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      letter-spacing: 0.15em;
      text-transform: uppercase;
-     text-shadow: 0px 0px 1px #77f;
      -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
+     -khtml-box-shadow: inset 0px 0px 1px 1px #bbf;
+     box-shadow: inset 0px 0px 1px 1px #bbf;
      white-space: normal;
-     background: #ffe url('images/header.png') center center repeat-x;
+     background: #ffe url('images/magic.png') center center repeat;
      border: 1px solid #447;
      border-radius: 4px;
      -moz-border-radius: 4px;
@@ -759,20 +730,34 @@ h1 {
 
 h2 {
      font-size: 13pt;
-     color: #000;
-     letter-spacing: 0.05em;
-     background: #ffe url('images/header.png') center center repeat-x;
-     text-shadow: 0px 0px 1px rgba(0, 0, 64, 0.5);
-     padding: 10px 10px;
+     color: #115;
+     letter-spacing: 0.07em;
+     background: url('images/header.png') center center repeat-x;
+     padding: 10px;
      wordwrap: none;
-     border: 1px solid #113;
+     border: 1px solid #115;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      margin: 15px 0px 15px 0 !important;
-     -moz-box-shadow: 0 1px 1px 1px rgba(176, 176, 216, 0.4);
+     -moz-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     -khtml-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
      word-wrap: break-word;
      opacity: 1;
+}
+
+h2 a, h3 a {
+    text-transform: capitalize;
+    letter-spacing: 0.03em;
+}
+
+h2 a:hover, h3 a:hover {
+     text-shadow: none;
+}
+
+.routersummary h3 a{
+    text-transform: uppercase;
 }
 
 h2 a:hover {
@@ -786,18 +771,21 @@ h2 img {
 }
 
 h3 {
-     border: 1px solid #113;
-     border-left: 5px solid #113;
-     padding: 5px 5px 5px 5px;
+     border: 1px solid #115;
+     border-left: 5px solid #115;
+     padding: 5px 5px 5px 8px;
      margin: 12px 0 15px 0;
      border-radius: 0 4px 4px 0;
      -moz-border-radius: 0 4px 4px 0;
      -khtml-border-radius: 0 4px 4px 0;
-     background: #ffe url('images/header.png') center center repeat-x !important;
+     background: url('images/header.png') center center repeat-x !important;
      font-size: 11pt;
-     color: #000;
-     -moz-box-shadow: 0 1px 1px 1px rgba(176, 176, 216, 0.4);
+     color: #115;
+     -moz-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     -khtml-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
+     box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
      opacity: 1;
+     letter-spacing: 0.07em;
 }
 
 h4 {
@@ -811,7 +799,7 @@ h4 {
 
 button, button:visited{
      font: bold 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
-     border: 1px outset #999;
+     border: 1px outset #66a;
      padding: 1px 3px;
      background: #ffe !important;
      text-decoration: none;
@@ -823,7 +811,7 @@ button, button:visited{
      margin: 0 1px;
      text-align: center;
      min-width: 80px;
-     -moz-box-shadow: inset 0px 2px 8px 0px #fff;
+     -moz-box-shadow: inset 0px 0px 2px 1px #fff;
      -khtml-box-shadow: inset 0px 2px 8px 0px #fff;
      box-shadow: inset 0px 2px 8px 0px #fff;
      color: #316;
@@ -854,36 +842,23 @@ button:active{
 }
 
 .langbox {
-     margin: 20px 10px 4px 5px;
+     margin: 7px 10px 4px 5px;
      padding: 8px 5px;
      color: #001;
      font-size: 7pt;
      width: 260px;
      text-align: right;
      float: right;
-     valign: middle;
+     vertical-align: middle;
      opacity: 1 !important;
 }
 
 .langbox img {
      opacity: 0.8 !important;
-     -moz-box-shadow: 0 0 1px #447;
 }
 
 .langbox img:hover {
      opacity: 1 !important;
-     -moz-box-shadow: 0 0 1px #f60;
-}
-
-input {
-     background: #ffe;
-     color: #316;
-     margin: 5px 10px 5px 10px;
-     padding: 4px 2px;
-     font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
-     border: 1px solid #447;
-     text-decoration: none;
-     min-width: 110px;
 }
 
 input, input:visited {
@@ -894,7 +869,6 @@ input, input:visited {
      font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      padding: 1px 2px;
      text-decoration: none;
-     min-width: 110px;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
@@ -919,6 +893,8 @@ input:active {
      border: 1px solid #f60;
      opacity: 1.0;
      -moz-box-shadow: inset 0px 0px 0px 1px #f60;
+     -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
+     box-shadow: inset 0px 0px 0px 1px #f60;
 }
 
 input[type=text], input[type=password] {
@@ -960,6 +936,12 @@ select {
      text-align: left !important;
 }
 
+select:active {
+     -moz-box-shadow: inset 0px 0px 0px 1px #f60;
+     -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
+     box-shadow: inset 0px 0px 0px 1px #f60;     
+}
+
 textarea {
      padding: 5px;
      margin: 5px 15px 5px 10px;
@@ -974,7 +956,11 @@ textarea {
      border: 1px solid #447;
 }
 
-form {}
+textarea:active {
+     -moz-box-shadow: inset 0px 0px 0px 1px #f60;
+     -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
+     box-shadow: inset 0px 0px 0px 1px #f60;     
+}
 
 .proxyfooter {
      margin: 0 20px 10px 240px;
@@ -990,59 +976,19 @@ form {}
 }    
 
 .statusnotes {
-     font-style: italic;
+     font-style: normal;
      font-size: 8pt;
-     font-color: #001 !important;
+     font-color: #225 !important;
      text-align: center;
      border: 1px solid #447 !important;
      border-top: 0 !important;
      margin: -5px 0 5px 0; 
      padding: 7px;
-     background: #ffe url('images/magic.png') center bottom;
-     -moz-box-shadow: inset 0px 0px 2px 1px #ffe;
+     background: url("images/header.png") repeat scroll center center #eef;
+     letter-spacing: 0em !important;
 }
-
-/*
-.joblog {
-     margin: 15px 0;
-     padding: 10px 20px !important;
-     border: 1px solid #447;
-     background-color: #004;
-     background: #ffe url('images/lightbluetile.png');
-     color: #001;
-     border-radius: 4px;
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
-     text-align: justify;
-     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
-     overflow: auto;
- }
- 
- div.joblog:li {
-     word-wrap: break-word !important;
-}
-
- .joblog:ul {
-     word-wrap: break-word !important;
-}
-
-.joblog table {
-     margin-top: 10px;
-}
-*/
 
 div.joblog {
-/*     margin: 15px 0;
-     padding: 10px 20px !important;
-     border: 1px solid #447;
-     background-color: #004;
-     background: #ffe; /*url('images/lightbluetile.png')
-     color: #001;
-     border-radius: 4px;
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
-     text-align: justify;
-     -moz-box-shadow: inset 0px 0px 1px 1px #bbf;*/
      overflow: auto;
      border: 0;
      margin-top: 5px;

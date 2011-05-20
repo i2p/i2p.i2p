@@ -18,6 +18,14 @@ then
 	POUPDATE=1
 fi
 
+# on windows, one must specify the path of commnad find
+# since windows has its own retarded version of find.
+if which find|grep -q -i windows ; then
+	export PATH=.:/bin:/usr/local/bin:$PATH
+fi
+# Fast mode - update ondemond
+# set LG2 to the language you need in envrionment varibales to enable this
+
 # add ../src/ so the refs will work in the po file
 JPATHS="../src/java/ ../src/tmp/"
 for i in ../locale/messages_*.po
@@ -25,6 +33,11 @@ do
 	# get language
 	LG=${i#../locale/messages_}
 	LG=${LG%.po}
+
+	# skip, if specified
+	if [ $LG2 ]; then
+		[ $LG != $LG2 ] && continue || echo INFO: Language update is set to [$LG2] only.
+	fi
 
 	if [ "$POUPDATE" = "1" ]
 	then
@@ -72,15 +85,19 @@ do
 		touch $i
 	fi
 
-	echo "Generating ${CLASS}_$LG ResourceBundle..."
+    if [ "$LG" != "en" ]
+    then
+        # only generate for non-source language
+        echo "Generating ${CLASS}_$LG ResourceBundle..."
 
-	# convert to class files in build/obj
-	msgfmt --java --statistics -r $CLASS -l $LG -d WEB-INF/classes $i
-	if [ $? -ne 0 ]
-	then
-		echo 'Warning - msgfmt failed, not updating translations'
-		break
-	fi
+        # convert to class files in build/obj
+        msgfmt --java --statistics -r $CLASS -l $LG -d WEB-INF/classes $i
+        if [ $? -ne 0 ]
+        then
+            echo 'Warning - msgfmt failed, not updating translations'
+            break
+        fi
+    fi
 done
 rm -f $TMPFILE
 # todo: return failure

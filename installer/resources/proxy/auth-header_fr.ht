@@ -1,0 +1,23 @@
+HTTP/1.1 407 Proxy Authorization Required
+Content-Type: text/html; charset=UTF-8
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.5
+Proxy-Authenticate: Basic realm="I2P HTTP Proxy"
+Cache-control: no-cache
+Connection: close
+Proxy-Connection: close
+
+<html><head>
+<title>Autorisation Proxy requise</title>
+<!-- we cannot have links to CSS or images here, but we could put in some simple inline style -->
+</head>
+<body>
+<div class=warning id=warning>
+<h3>Autorisation I2P HTTP Proxy requise</h3>
+Ce mandataire est configuré pour demander un nom d'utilisateur et un mot de passe pour les accès.
+Merci d'entrer votre identifiant / mot de passe, ou vérifier la 
+<a href="http://127.0.0.1:7657/advancedconfig.jsp">configuration</a> de votre routeur, 
+ou du 
+<a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">I2PTunnel</a>.
+Pour désactiver le contrôle d'accès, supprimez la configuration
+<code>i2ptunnel.proxy.auth=basic</code>, puis redémarrez le tunnel proxy HTTP.
+</div>

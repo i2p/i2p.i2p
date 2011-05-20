@@ -20,16 +20,16 @@ import net.i2p.util.SimpleTimer;
  *
  */
 class UDPReceiver {
-    private RouterContext _context;
-    private Log _log;
+    private final RouterContext _context;
+    private final Log _log;
     private DatagramSocket _socket;
     private String _name;
     private final BlockingQueue<UDPPacket> _inboundQueue;
     private boolean _keepRunning;
-    private Runner _runner;
-    private UDPTransport _transport;
+    private final Runner _runner;
+    private final UDPTransport _transport;
     private static int __id;
-    private int _id;
+    private final int _id;
     private static final int TYPE_POISON = -99999;
     
     public UDPReceiver(RouterContext ctx, UDPTransport transport, DatagramSocket socket, String name) {
@@ -179,8 +179,7 @@ class UDPReceiver {
             msg.append(queueSize);
             msg.append(" queued for ");
             msg.append(headPeriod);
-            if (_transport != null)
-                msg.append(" packet handlers: ").append(_transport.getPacketHandlerStatus());
+            msg.append(" packet handlers: ").append(_transport.getPacketHandlerStatus());
             _log.warn(msg.toString());
         }
         return queueSize;

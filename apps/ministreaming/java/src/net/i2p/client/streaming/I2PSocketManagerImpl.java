@@ -10,6 +10,8 @@ import java.io.InterruptedIOException;
 import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -462,6 +464,14 @@ class I2PSocketManagerImpl implements I2PSocketManager, I2PSessionListener {
     }
 
     /**
+     *  @throws UnsupportedOperationException
+     *  @since 0.8.4
+     */
+    public ServerSocket getStandardServerSocket() {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
      * Create a new connected socket (block until the socket is created)
      *
      * @param peer Destination to connect to
@@ -602,6 +612,22 @@ class I2PSocketManagerImpl implements I2PSocketManager, I2PSessionListener {
     }
 
     /**
+     *  @throws UnsupportedOperationException
+     *  @since 0.8.4
+     */
+    public Socket connectToSocket(Destination peer) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     *  @throws UnsupportedOperationException
+     *  @since 0.8.4
+     */
+    public Socket connectToSocket(Destination peer, int timeout) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
      * Destroy the socket manager, freeing all the associated resources.  This
      * method will block untill all the managed sockets are closed.
      *
@@ -660,7 +686,7 @@ class I2PSocketManagerImpl implements I2PSocketManager, I2PSessionListener {
      * Retrieve a set of currently connected I2PSockets, either initiated locally or remotely.
      *
      */
-    public Set listSockets() {
+    public Set<I2PSocket> listSockets() {
         Set<I2PSocket> sockets = new HashSet<I2PSocket>(8);
         synchronized (lock) {
             sockets.addAll(_inSockets.values());

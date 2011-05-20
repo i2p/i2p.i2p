@@ -1,0 +1,24 @@
+# Just to try and prevent some noob disasters.
+# Use mtn add --no-respect-ignore foo.jar to ignore this ignore list
+_jsp\.java$
+\.bz2$
+\.class$
+\.diff$
+\.exe$
+\.fba$
+\.gz$
+\.jar$
+\.out$
+\.patch$
+\.sig$
+\.sud$
+\.su2$
+\.tar$
+\.war$
+\.zip$
+^\.
+^build/
+^pkg-temp/
+~$
+/build/
+/classes/

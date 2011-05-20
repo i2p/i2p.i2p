@@ -26,8 +26,6 @@ class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
     }
     public PooledTunnelCreatorConfig(RouterContext ctx, int length, boolean isInbound, Hash destination) {
         super(ctx, length, isInbound, destination);
-        _pool = null;
-        _live = false;
     }
     
     // calls TestJob

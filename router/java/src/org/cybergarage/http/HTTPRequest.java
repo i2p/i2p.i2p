@@ -388,10 +388,10 @@ public class HTTPRequest extends HTTPPacket
 				// Set the timeout to be nice and short, the device should be local and fast.
 				// Yeah, the UPnP standard is a minute or something, too bad.
 				// If he can't get back to us in a few seconds, forget it.
-				// And set the soTimeout to 1 second (for reads).
+				// And set the soTimeout to 2 second (for reads).
 				//postSocket = new Socket(host, port);
 				postSocket = new Socket();
-				postSocket.setSoTimeout(1000);
+				postSocket.setSoTimeout(2000);
 				SocketAddress sa = new InetSocketAddress(host, port);
 				postSocket.connect(sa, 3000);
 			}

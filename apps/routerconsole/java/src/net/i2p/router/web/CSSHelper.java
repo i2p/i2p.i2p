@@ -28,10 +28,13 @@ public class CSSHelper extends HelperBase {
         return url;
     }
 
-    /** change default language for the router but don't save it */
+    /** change default language for the router AND save it */
     public void setLang(String lang) {
-        if (lang != null && lang.length() > 0)
+        // Protected with nonce in css.jsi
+        if (lang != null && lang.length() == 2 && !lang.equals(_context.getProperty(Messages.PROP_LANG))) {
             _context.router().setConfigSetting(Messages.PROP_LANG, lang);
+            _context.router().saveConfig();
+        }
     }
 
     /** needed for conditional css loads for zh */
@@ -59,5 +62,33 @@ public class CSSHelper extends HelperBase {
             .append(_(s))
             .append("</title>");
          return buf.toString();
+    }
+
+    /**
+     *  Should we allow a refreshing IFrame?
+     *  @since 0.8.5
+     */
+    public boolean allowIFrame(String ua) {
+        return ua == null ||
+                               // text
+                             !(ua.startsWith("Lynx") || ua.startsWith("w3m") ||
+                               ua.startsWith("ELinks") || ua.startsWith("Links") ||
+                               ua.startsWith("Dillo") ||
+                               // mobile
+                               // http://www.zytrax.com/tech/web/mobile_ids.html
+                               ua.contains("Android") || ua.contains("iPhone") ||
+                               ua.contains("iPod") || ua.contains("iPad") ||
+                               ua.contains("Kindle") || ua.contains("Mobile") ||
+                               ua.contains("Nintendo Wii") || ua.contains("Opera Mini") ||
+                               ua.contains("Palm") ||
+                               ua.contains("PLAYSTATION") || ua.contains("Playstation") ||
+                               ua.contains("Profile/MIDP-") || ua.contains("SymbianOS") ||
+                               ua.contains("Windows CE") || ua.contains("Windows Phone") ||
+                               ua.startsWith("BlackBerry") || ua.startsWith("DoCoMo") ||
+                               ua.startsWith("Nokia") || ua.startsWith("OPWV-SDK") ||
+                               ua.startsWith("MOT-") || ua.startsWith("SAMSUNG-") ||
+                               ua.startsWith("nook") || ua.startsWith("SCH-") ||
+                               ua.startsWith("SEC-") || ua.startsWith("SonyEricsson") ||
+                               ua.startsWith("Vodafone"));
     }
 }

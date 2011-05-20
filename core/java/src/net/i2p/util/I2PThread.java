@@ -10,9 +10,9 @@ package net.i2p.util;
  */
 
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * In case its useful later...
@@ -21,7 +21,7 @@ import java.util.Set;
  */
 public class I2PThread extends Thread {
     private static volatile Log _log;
-    private static Set _listeners = new HashSet(4);
+    private static final Set _listeners = new CopyOnWriteArraySet();
     private String _name;
     private Exception _createdBy;
 

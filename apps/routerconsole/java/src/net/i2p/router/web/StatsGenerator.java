@@ -93,6 +93,7 @@ public class StatsGenerator {
             }
             out.write("</ul><br>\n");
         }
+        out.write("</div>");
         out.flush();
     }
     
@@ -140,7 +141,7 @@ public class StatsGenerator {
         buf.append("<li><b>").append(_("Lifetime average frequency")).append(":</b> ");
         buf.append(DataHelper.formatDuration2(freq.getFrequency()));
         buf.append(" (");
-        buf.append(ngettext((int) freq.getEventCount(), "1 event", "{0} events"));
+        buf.append(ngettext("1 event", "{0} events", (int) freq.getEventCount()));
         buf.append(")</li></ul><br>\n");
     }
     
@@ -167,7 +168,7 @@ public class StatsGenerator {
             buf.append("<li>");
             renderPeriod(buf, periods[i], _("rate"));
             if (curRate.getLastEventCount() > 0) {
-                buf.append(_("Average")).append(":</i> ");
+                buf.append(_("Average")).append(": ");
                 buf.append(num(curRate.getAverageValue()));
                 buf.append("; ");
                 buf.append(_("Highest average"));
@@ -197,9 +198,9 @@ public class StatsGenerator {
                     buf.append("; ");
                 }
 
-                buf.append(ngettext((int) curRate.getLastEventCount(), "There was 1 event", "There were {0} events"));
+                buf.append(ngettext("There was 1 event in this period.", "There were {0} events in this period.", (int)curRate.getLastEventCount()));
                 buf.append(' ');
-                buf.append(_("in this period which ended {0} ago.", DataHelper.formatDuration2(now - curRate.getLastCoalesceDate())));
+                buf.append(_("The period ended {0} ago.", DataHelper.formatDuration2(now - curRate.getLastCoalesceDate())));
             } else {
                 buf.append(" <i>").append(_("No events")).append("</i> ");
             }
@@ -230,7 +231,7 @@ public class StatsGenerator {
         buf.append("<li><b>").append(_("Lifetime average value")).append(":</b> ");
         buf.append(num(rate.getLifetimeAverageValue()));
         buf.append(" (");
-        buf.append(ngettext((int) rate.getLifetimeEventCount(), "1 event", "{0} events"));
+        buf.append(ngettext("1 event", "{0} events", (int) rate.getLifetimeEventCount()));
         buf.append(")<br></li>" +
                    "</ul>" +
                    "<br>\n");
@@ -261,7 +262,7 @@ public class StatsGenerator {
     }
 
     /** translate a string */
-    private String ngettext(int n, String s, String p) {
+    private String ngettext(String s, String p, int n) {
         return Messages.getString(n, s, p, _context);
     }
 }

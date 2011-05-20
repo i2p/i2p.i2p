@@ -18,7 +18,28 @@ public class ContentHelper extends HelperBase {
     public void setStartAtBeginning(String moo) { 
         _startAtBeginning = Boolean.valueOf(""+moo).booleanValue(); 
     }
-    public void setLang(String l) { _lang = l; }
+    public void setLang(String l) {
+/*****
+        if((_lang == null || !_lang.equals(l)) && (l != null)) {
+            //Set language for router console
+            _lang = l;
+ TODO - Temporary for 0.8.4
+        Needed for desktopgui. But there's no nonce protection.
+        Move the following to CSSHelper setLang(), or disable completely,
+        See comments in CSSHelper
+            if(_context == null) {
+                setContextId(null);
+            }
+
+            if (_context.getBooleanProperty("desktopgui.enabled")) {
+                //Set language persistently throughout I2P
+                _context.router().setConfigSetting(Messages.PROP_LANG, _lang);
+                _context.router().saveConfig();
+                _context.setProperty(Messages.PROP_LANG, _lang);
+            }
+        }
+*****/
+    }
     
     public void setMaxLines(String lines) {
         if (lines != null) {

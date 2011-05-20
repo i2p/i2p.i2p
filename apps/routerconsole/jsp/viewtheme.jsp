@@ -19,7 +19,6 @@ if (uri.endsWith(".css")) {
 } else if (uri.endsWith(".ico")) {
   response.setContentType("image/x-icon");
 }
-response.setHeader("Cache-Control", "max-age=86400");  // cache for a day
 /*
  * User or plugin themes
  * If the request is for /themes/console/foo/bar/baz,
@@ -44,9 +43,33 @@ if (themePath != null)
 else
     base = net.i2p.I2PAppContext.getGlobalContext().getBaseDir().getAbsolutePath() +
               java.io.File.separatorChar + "docs";
+java.io.File file = new java.io.File(base, uri);
+long lastmod = file.lastModified();
+if (lastmod > 0) {
+    long iflast = request.getDateHeader("If-Modified-Since");
+    // iflast is -1 if not present; round down file time
+    if (iflast >= ((lastmod / 1000) * 1000)) {
+        response.sendError(304, "Not Modified");
+        return;
+    }
+    response.setDateHeader("Last-Modified", lastmod);
+    // cache for a day
+    response.setDateHeader("Expires", net.i2p.I2PAppContext.getGlobalContext().clock().now() + 86400000l);
+    response.setHeader("Cache-Control", "public, max-age=86400");
+}
+long length = file.length();
+if (length > 0)
+    response.setHeader("Content-Length", Long.toString(length));
 try {
     net.i2p.util.FileUtil.readFile(uri, base, response.getOutputStream());
 } catch (java.io.IOException ioe) {
-    response.sendError(403, ioe.toString());
+    // prevent 'Committed' IllegalStateException from Jetty
+    if (!response.isCommitted()) {
+        response.sendError(403, ioe.toString());
+    }  else {
+        net.i2p.I2PAppContext.getGlobalContext().logManager().getLog(getClass()).error("Error serving " + uri, ioe);
+        // Jetty doesn't log this
+        throw ioe;
+    }
 }
 %>

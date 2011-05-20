@@ -2,6 +2,7 @@ package net.i2p.router.peermanager;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Date;
 import java.util.Properties;
 
 import net.i2p.router.RouterContext;
@@ -13,8 +14,8 @@ import net.i2p.util.Log;
  *
  */
 public class TunnelHistory {
-    private RouterContext _context;
-    private Log _log;
+    private final RouterContext _context;
+    private final Log _log;
     private volatile long _lifetimeAgreedTo;
     private volatile long _lifetimeRejected;
     private volatile long _lastAgreedTo;
@@ -26,7 +27,7 @@ public class TunnelHistory {
     private volatile long _lastFailed;
     private RateStat _rejectRate;
     private RateStat _failRate;
-    private String _statGroup;
+    private final String _statGroup;
     
     /** probabalistic tunnel rejection due to a flood of requests - essentially unused */
     public static final int TUNNEL_REJECT_PROBABALISTIC_REJECT = 10;
@@ -110,6 +111,7 @@ public class TunnelHistory {
         _lastFailed = _context.clock().now();
     }
     
+/*****  all unused
     public void setLifetimeAgreedTo(long num) { _lifetimeAgreedTo = num; }
     public void setLifetimeRejected(long num) { _lifetimeRejected = num; }
     public void setLifetimeFailed(long num) { _lifetimeFailed = num; }
@@ -119,6 +121,7 @@ public class TunnelHistory {
     public void setLastRejectedTransient(long when) { _lastRejectedTransient = when; }
     public void setLastRejectedProbabalistic(long when) { _lastRejectedProbabalistic = when; }
     public void setLastFailed(long when) { _lastFailed = when; }
+******/
     
     public RateStat getRejectionRate() { return _rejectRate; }
     public RateStat getFailedRate() { return _failRate; }
@@ -138,12 +141,12 @@ public class TunnelHistory {
         buf.append("#################").append(NL);
         buf.append("# Tunnel history").append(NL);
         buf.append("###").append(NL);
-        add(buf, "lastAgreedTo", _lastAgreedTo, "When did the peer last agree to participate in a tunnel?  (milliseconds since the epoch)");
-        add(buf, "lastFailed", _lastFailed, "When was the last time a tunnel that the peer agreed to participate failed?  (milliseconds since the epoch)");
-        add(buf, "lastRejectedCritical", _lastRejectedCritical, "When was the last time the peer refused to participate in a tunnel?  (milliseconds since the epoch)");
-        add(buf, "lastRejectedBandwidth", _lastRejectedBandwidth, "When was the last time the peer refused to participate in a tunnel?  (milliseconds since the epoch)");
-        add(buf, "lastRejectedTransient", _lastRejectedTransient, "When was the last time the peer refused to participate in a tunnel?  (milliseconds since the epoch)");
-        add(buf, "lastRejectedProbabalistic", _lastRejectedProbabalistic, "When was the last time the peer refused to participate in a tunnel?  (milliseconds since the epoch)");
+        addDate(buf, "lastAgreedTo", _lastAgreedTo, "When did the peer last agree to participate in a tunnel?");
+        addDate(buf, "lastFailed", _lastFailed, "When was the last time a tunnel that the peer agreed to participate failed?");
+        addDate(buf, "lastRejectedCritical", _lastRejectedCritical, "When was the last time the peer refused to participate in a tunnel (Critical response code)?");
+        addDate(buf, "lastRejectedBandwidth", _lastRejectedBandwidth, "When was the last time the peer refused to participate in a tunnel (Bandwidth response code)?");
+        addDate(buf, "lastRejectedTransient", _lastRejectedTransient, "When was the last time the peer refused to participate in a tunnel (Transient load response code)?");
+        addDate(buf, "lastRejectedProbabalistic", _lastRejectedProbabalistic, "When was the last time the peer refused to participate in a tunnel (Probabalistic response code)?");
         add(buf, "lifetimeAgreedTo", _lifetimeAgreedTo, "How many tunnels has the peer ever agreed to participate in?");
         add(buf, "lifetimeFailed", _lifetimeFailed, "How many tunnels has the peer ever agreed to participate in that failed prematurely?");
         add(buf, "lifetimeRejected", _lifetimeRejected, "How many tunnels has the peer ever refused to participate in?");
@@ -152,8 +155,13 @@ public class TunnelHistory {
         _failRate.store(out, "tunnelHistory.failRate");
     }
     
+    private static void addDate(StringBuilder buf, String name, long val, String description) {
+        String when = val > 0 ? (new Date(val)).toString() : "Never";
+        add(buf, name, val, description + ' ' + when);
+    }
+    
     private static void add(StringBuilder buf, String name, long val, String description) {
-        buf.append("# ").append(name.toUpperCase()).append(NL).append("# ").append(description).append(NL);
+        buf.append("# ").append(name).append(NL).append("# ").append(description).append(NL);
         buf.append("tunnels.").append(name).append('=').append(val).append(NL).append(NL);
     }
     

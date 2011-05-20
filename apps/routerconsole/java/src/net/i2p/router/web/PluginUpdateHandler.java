@@ -144,6 +144,7 @@ public class PluginUpdateHandler extends UpdateHandler {
             }
             buf.append(": ");
             buf.append(_("{0}B transferred", DataHelper.formatSize2(currentWrite + alreadyTransferred)));
+            buf.append("</b>");
             updateStatus(buf.toString());
         }
 
@@ -212,10 +213,15 @@ public class PluginUpdateHandler extends UpdateHandler {
             if (up.haveKey(pubkey)) {
                 // the key is already in the TrustedUpdate keyring
                 // verify the sig and verify that it is signed by the signer in the plugin.config file
+                // Allow "" as the previously-known signer
                 String signingKeyName = up.verifyAndGetSigner(f);
-                if (!signer.equals(signingKeyName)) {
+                if (!(signer.equals(signingKeyName) || "".equals(signingKeyName))) {
                     f.delete();
                     to.delete();
+                    if (signingKeyName == null)
+                        _log.error("Failed to verify plugin signature, corrupt plugin or bad signature, signed by: " + signer);
+                    else
+                        _log.error("Plugin signer \"" + signer + "\" does not match existing signer in plugin.config file \"" + signingKeyName + "\"");
                     statusDone("<b>" + _("Plugin signature verification of {0} failed", url) + "</b>");
                     return;
                 }
@@ -225,6 +231,7 @@ public class PluginUpdateHandler extends UpdateHandler {
                     // bad or duplicate key
                     f.delete();
                     to.delete();
+                    _log.error("Bad key or key mismatch - Failed to add plugin key \"" + pubkey + "\" for plugin signer \"" + signer + "\"");
                     statusDone("<b>" + _("Plugin signature verification of {0} failed", url) + "</b>");
                     return;
                 }
@@ -234,6 +241,11 @@ public class PluginUpdateHandler extends UpdateHandler {
                 if (!signer.equals(signingKeyName)) {
                     f.delete();
                     to.delete();
+                    if (signingKeyName == null)
+                        _log.error("Failed to verify plugin signature, corrupt plugin or bad signature, signed by: " + signer);
+                    else
+                        // shouldn't happen
+                        _log.error("Plugin signer \"" + signer + "\" does not match new signer in plugin.config file \"" + signingKeyName + "\"");
                     statusDone("<b>" + _("Plugin signature verification of {0} failed", url) + "</b>");
                     return;
                 }

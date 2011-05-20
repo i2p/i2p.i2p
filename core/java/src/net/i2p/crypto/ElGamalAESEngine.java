@@ -10,6 +10,7 @@ package net.i2p.crypto;
  */
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -527,8 +528,6 @@ public class ElGamalAESEngine {
         return aesEncr;
     }
 
-    private final static Set EMPTY_SET = new HashSet();
-
     /**
      * For both scenarios, this method encrypts the AES area using the given key, iv
      * and making sure the resulting data is at least as long as the paddedSize and 
@@ -552,7 +551,7 @@ public class ElGamalAESEngine {
                                         long paddedSize, int prefixBytes) {
         //_log.debug("iv for encryption: " + DataHelper.toString(iv, 16));
         //_log.debug("Encrypting AES");
-        if (tagsForDelivery == null) tagsForDelivery = EMPTY_SET;
+        if (tagsForDelivery == null) tagsForDelivery = Collections.EMPTY_SET;
         int size = 2 // sizeof(tags)
                  + tagsForDelivery.size()
                  + SessionTag.BYTE_LENGTH*tagsForDelivery.size()

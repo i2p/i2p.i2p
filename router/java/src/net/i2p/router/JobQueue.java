@@ -34,22 +34,22 @@ import net.i2p.util.Log;
  *
  */
 public class JobQueue {
-    private Log _log;
-    private RouterContext _context;
+    private final Log _log;
+    private final RouterContext _context;
     
     /** Integer (runnerId) to JobQueueRunner for created runners */
     private final Map<Integer, JobQueueRunner> _queueRunners;
     /** a counter to identify a job runner */
     private volatile static int _runnerId = 0;
     /** list of jobs that are ready to run ASAP */
-    private BlockingQueue<Job> _readyJobs;
+    private final BlockingQueue<Job> _readyJobs;
     /** list of jobs that are scheduled for running in the future */
-    private List<Job> _timedJobs;
+    private final List<Job> _timedJobs;
     /** job name to JobStat for that job */
     private final Map<String, JobStats> _jobStats;
     /** how many job queue runners can go concurrently */
     private int _maxRunners = 1; 
-    private QueuePumper _pumper;
+    private final QueuePumper _pumper;
     /** will we allow the # job runners to grow beyond 1? */
     private boolean _allowParallelOperation;
     /** have we been killed or are we alive? */
@@ -61,6 +61,8 @@ public class JobQueue {
     private static final int RUNNERS;
     static {
         long maxMemory = Runtime.getRuntime().maxMemory();
+        if (maxMemory == Long.MAX_VALUE)
+            maxMemory = 128*1024*1024l;
         if (maxMemory < 64*1024*1024)
             RUNNERS = 3;
         else if (maxMemory < 256*1024*1024)
@@ -208,7 +210,7 @@ public class JobQueue {
      * <code>false</code> if the job is finished or doesn't exist in the queue.
      */
     public boolean isJobActive(Job job) {
-        if (_readyJobs.contains(job) | _timedJobs.contains(job))
+        if (_readyJobs.contains(job) || _timedJobs.contains(job))
             return true;
         for (JobQueueRunner runner: _queueRunners.values())
             if (runner.getCurrentJob() == job)
@@ -227,10 +229,14 @@ public class JobQueue {
     }
 
     public long getMaxLag() { 
+            // first job is the one that has been waiting the longest
             Job j = _readyJobs.peek();
             if (j == null) return 0;
-            // first job is the one that has been waiting the longest
-            long startAfter = j.getTiming().getStartAfter();
+            JobTiming jt = j.getTiming();
+            // PoisonJob timing is null, prevent NPE at shutdown
+            if (jt == null)
+                return 0;
+            long startAfter = jt.getStartAfter();
             return _context.clock().now() - startAfter;
     }
     
@@ -689,7 +695,7 @@ public class JobQueue {
         TreeMap<Long, Job> ordered = new TreeMap();
         for (int i = 0; i < timedJobs.size(); i++) {
             Job j = timedJobs.get(i);
-            ordered.put(new Long(j.getTiming().getStartAfter()), j);
+            ordered.put(Long.valueOf(j.getTiming().getStartAfter()), j);
         }
         for (Iterator<Job> iter = ordered.values().iterator(); iter.hasNext(); ) {
             Job j = iter.next();

@@ -4,7 +4,8 @@
 # edit the file in the configuration directory, NOT the install directory.
 #
 # Blocking is now enabled by default.
-# To disable blocking, set router.blocklist.enable=false on configadvanced.jsp and restart.
+# To disable blocking, set router.blocklist.enable=false on configadvanced.jsp,
+# or simply delete this file or remove all the entries below, and restart.
 #
 # Add additional entries as desired, sorting not required.
 # This file is only read at router startup.
@@ -14,8 +15,8 @@
 # For example, http://www.bluetack.co.uk/config/splist.zip is very broad and includes Tor users, it is not recommended.
 # A more reasonable list: http://www.bluetack.co.uk/config/level1.zip
 #
-# You may also wish to add the bogons from http://www.cymru.com/Documents/bogon-list.html ,
-# but you will have to update your blocklist manually as IP ranges are assigned.
+# We have included the bogons from http://www.team-cymru.org/Services/Bogons/http.html ,
+# but you will have to update your blocklist manually if the bogon list changes.
 # You must update this list yourself, it is not overwritten by the update process.
 #
 #   * Acceptable formats (IPV4 only):
@@ -34,7 +35,19 @@
 #   * For further information and downloads:
 #   *   http://www.bluetack.co.uk/forums/index.php?autocom=faq&CODE=02&qid=17
 #   *   http://blocklist.googlepages.com/
-#   *   http://www.cymru.com/Documents/bogon-list.html
+#   *   http://www.team-cymru.org/Services/Bogons/http.html
 #
 Chinese Floodfill Flooder:159.226.40.7
 Friend of the Chinese Floodfill Flooder:159.226.40.3
+<a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:0.0.0.0/8
+<a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:10.0.0.0/8
+<a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:127.0.0.0/8
+<a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:169.254.0.0/16
+<a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:172.16.0.0/12
+<a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:192.0.0.0/24
+<a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:192.0.2.0/24
+<a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:192.168.0.0/16
+<a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:198.18.0.0/15
+<a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:198.51.100.0/24
+<a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:203.0.113.0/24
+<a href="http://www.team-cymru.org/Services/Bogons/http.html">The Team Cymru Bogon List v6.8 03 FEB 2011</a>:224.0.0.0/3

@@ -20,14 +20,14 @@ import net.i2p.util.Log;
  *
  */
 class PacketHandler {
-    private RouterContext _context;
-    private Log _log;
-    private UDPTransport _transport;
-    private UDPEndpoint _endpoint;
-    private EstablishmentManager _establisher;
-    private InboundMessageFragments _inbound;
-    private PeerTestManager _testManager;
-    private IntroductionManager _introManager;
+    private final RouterContext _context;
+    private final Log _log;
+    private final UDPTransport _transport;
+    private final UDPEndpoint _endpoint;
+    private final EstablishmentManager _establisher;
+    private final InboundMessageFragments _inbound;
+    private final PeerTestManager _testManager;
+    private final IntroductionManager _introManager;
     private boolean _keepReading;
     private final Handler[] _handlers;
     
@@ -48,6 +48,8 @@ class PacketHandler {
         _introManager = introManager;
 
         long maxMemory = Runtime.getRuntime().maxMemory();
+        if (maxMemory == Long.MAX_VALUE)
+            maxMemory = 96*1024*1024l;
         int num_handlers;
         if (maxMemory < 32*1024*1024)
             num_handlers = 1;
@@ -337,6 +339,9 @@ class PacketHandler {
             _state = 30;
         }
 
+        /**
+         * @param state non-null
+         */
         private void receivePacket(UDPPacketReader reader, UDPPacket packet, InboundEstablishState state) {
             receivePacket(reader, packet, state, true);
         }
@@ -345,11 +350,12 @@ class PacketHandler {
          * Inbound establishing conn
          * Decrypt and validate the packet then call handlePacket()
          *
+         * @param state non-null
          * @param allowFallback if it isn't valid for this establishment state, try as a non-establishment packet
          */
         private void receivePacket(UDPPacketReader reader, UDPPacket packet, InboundEstablishState state, boolean allowFallback) {
             _state = 31;
-            if ( (state != null) && (_log.shouldLog(Log.DEBUG)) ) {
+            if (_log.shouldLog(Log.DEBUG)) {
                 StringBuilder buf = new StringBuilder(128);
                 buf.append("Attempting to receive a packet on a known inbound state: ");
                 buf.append(state);
@@ -388,10 +394,12 @@ class PacketHandler {
         /**
          * Outbound establishing conn
          * Decrypt and validate the packet then call handlePacket()
+         *
+         * @param state non-null
          */
         private void receivePacket(UDPPacketReader reader, UDPPacket packet, OutboundEstablishState state) {
             _state = 35;
-            if ( (state != null) && (_log.shouldLog(Log.DEBUG)) ) {
+            if (_log.shouldLog(Log.DEBUG)) {
                 StringBuilder buf = new StringBuilder(128);
                 buf.append("Attempting to receive a packet on a known outbound state: ");
                 buf.append(state);
@@ -467,7 +475,7 @@ class PacketHandler {
                 // so we have to wait for NTCP to do it
                 _context.clock().setOffset(0 - skew, true);
                 if (skew != 0)
-                    _log.error("NTP failure, UDP adjusting clock by " + DataHelper.formatDuration(Math.abs(skew)));
+                    _log.logAlways(Log.WARN, "NTP failure, UDP adjusting clock by " + DataHelper.formatDuration(Math.abs(skew)));
             }
 
             if (skew > GRACE_PERIOD) {

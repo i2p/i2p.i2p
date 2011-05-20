@@ -24,10 +24,16 @@
  <jsp:getProperty name="formhandler" property="allMessages" />
 <div class="configure"><div class="topshimten"><h3><%=uihelper._("Router Console Theme")%></h3></div>
  <form action="" method="POST">
- <% String prev = System.getProperty("net.i2p.router.web.ConfigUIHandler.nonce");
-    if (prev != null) System.setProperty("net.i2p.router.web.ConfigUIHandler.noncePrev", prev);
-    System.setProperty("net.i2p.router.web.ConfigUIHandler.nonce", new java.util.Random().nextLong()+""); %>
- <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigUIHandler.nonce")%>" >
+<%
+    /** lang setting is done in css.jsi, not in ConfigUIHandler */
+    String consoleNonce = System.getProperty("router.consoleNonce");
+    if (consoleNonce == null) {
+        consoleNonce = Long.toString(new java.util.Random().nextLong());
+        System.setProperty("router.consoleNonce", consoleNonce);
+    }
+%>
+ <input type="hidden" name="consoleNonce" value="<%=consoleNonce%>" >
+ <input type="hidden" name="nonce" value="<jsp:getProperty name="formhandler" property="newNonce" />" >
  <input type="hidden" name="action" value="blah" >
 <%
  String userAgent = request.getHeader("User-Agent");

@@ -133,9 +133,15 @@ public class PrivateKeyFile {
      */
     public Destination createIfAbsent() throws I2PException, IOException, DataFormatException {
         if(!this.file.exists()) {
-            FileOutputStream out = new FileOutputStream(this.file);
-            this.client.createDestination(out);
-            out.close();
+            FileOutputStream out = null;
+            try {
+                out = new FileOutputStream(this.file);
+                this.client.createDestination(out);
+            } finally {
+                if (out != null) {
+                    try { out.close(); } catch (IOException ioe) {}
+                }
+            }
         }
         return getDestination();
     }
@@ -243,29 +249,36 @@ public class PrivateKeyFile {
     public I2PSession open() throws I2PSessionException, IOException {
         return this.open(new Properties());
     }
+
     public I2PSession open(Properties opts) throws I2PSessionException, IOException {
-        // open input file
-        FileInputStream in = new FileInputStream(this.file);
-        
-        // create sesssion
-        I2PSession s = this.client.createSession(in, opts);
-        
-        // close file
-        in.close();
-        
-        return s;
+        FileInputStream in = null;
+        try {
+            in = new FileInputStream(this.file);
+            I2PSession s = this.client.createSession(in, opts);
+            return s;
+        } finally {
+            if (in != null) {
+                try { in.close(); } catch (IOException ioe) {}
+            }
+        }
     }
     
     /**
      *  Copied from I2PClientImpl.createDestination()
      */
     public void write() throws IOException, DataFormatException {
-        FileOutputStream out = new FileOutputStream(this.file);
-        this.dest.writeBytes(out);
-        this.privKey.writeBytes(out);
-        this.signingPrivKey.writeBytes(out);
-        out.flush();
-        out.close();
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream(this.file);
+            this.dest.writeBytes(out);
+            this.privKey.writeBytes(out);
+            this.signingPrivKey.writeBytes(out);
+            out.flush();
+        } finally {
+            if (out != null) {
+                try { out.close(); } catch (IOException ioe) {}
+            }
+        }
     }
 
     @Override
@@ -377,7 +390,8 @@ public class PrivateKeyFile {
                         }
                     }
                 }
-            } catch (Exception ioe) {
+            } catch (DataFormatException dfe) {
+            } catch (IOException ioe) {
             }
             // not found, continue to the next file
         }

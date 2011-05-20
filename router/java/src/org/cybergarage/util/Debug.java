@@ -52,14 +52,14 @@ public final class Debug
 	}
 	public static final void warning(String s) {
 		if (_log != null)
-			_log.error(s);
+			_log.warn(s);
 	}
 	public static final void warning(String m, Exception e) {
 		if (_log != null)
-			_log.error(m, e);
+			_log.warn(m, e);
 	}
 	public static final void warning(Exception e) {
 		if (_log != null)
-			_log.error("", e);
+			_log.warn("", e);
 	}
 }

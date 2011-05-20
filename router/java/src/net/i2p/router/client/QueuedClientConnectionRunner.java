@@ -46,6 +46,7 @@ class QueuedClientConnectionRunner extends ClientConnectionRunner {
     void stopRunning() {
         super.stopRunning();
         queue.close();
+        // queue = null;
     }
     
     /**

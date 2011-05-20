@@ -29,10 +29,7 @@
  %>
  <div class="configure">
  <form action="configpeer" method="POST">
- <% String prev = System.getProperty("net.i2p.router.web.ConfigPeerHandler.nonce");
-    if (prev != null) System.setProperty("net.i2p.router.web.ConfigPeerHandler.noncePrev", prev);
-    System.setProperty("net.i2p.router.web.ConfigPeerHandler.nonce", new java.util.Random().nextLong()+""); %>
- <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigPeerHandler.nonce")%>" />
+ <input type="hidden" name="nonce" value="<jsp:getProperty name="formhandler" property="newNonce" />" >
  <a name="sh"> </a>
  <a name="unsh"> </a>
  <a name="bonus"> </a>

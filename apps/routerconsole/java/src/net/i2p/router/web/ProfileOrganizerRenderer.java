@@ -70,11 +70,11 @@ class ProfileOrganizerRenderer {
         int failing = 0;
         StringBuilder buf = new StringBuilder(16*1024);
         buf.append("<h2>").append(_("Peer Profiles")).append("</h2>\n<p>");
-        buf.append(_("Showing {0} recent profiles.", order.size())).append('\n');
+        buf.append(ngettext("Showing 1 recent profile.", "Showing {0} recent profiles.", order.size())).append('\n');
         if (older > 0)
-            buf.append(_("Hiding {0} older profiles.", older)).append('\n');
+            buf.append(ngettext("Hiding 1 older profile.", "Hiding {0} older profiles.", older)).append('\n');
         if (standard > 0)
-            buf.append("<a href=\"/profiles?f=1\">").append(_("Hiding {0} standard profiles.", standard)).append("</a>\n");
+            buf.append("<a href=\"/profiles?f=1\">").append(ngettext("Hiding 1 standard profile.", "Hiding {0} standard profiles.", standard)).append("</a>\n");
         buf.append("</p>");
                    buf.append("<table>");
                    buf.append("<tr>");
@@ -171,8 +171,10 @@ class ProfileOrganizerRenderer {
                     buf.append(' ').append(fails).append('/').append(total).append(' ').append(_("Test Fails"));
             }
             buf.append("&nbsp;</td>");
-            buf.append("<td nowrap align=\"center\"><a target=\"_blank\" href=\"dumpprofile.jsp?peer=")
-               .append(peer.toBase64().substring(0,6)).append("\">").append(_("profile")).append("</a>");
+            //buf.append("<td nowrap align=\"center\"><a target=\"_blank\" href=\"dumpprofile.jsp?peer=")
+            //   .append(peer.toBase64().substring(0,6)).append("\">").append(_("profile")).append("</a>");
+            buf.append("<td nowrap align=\"center\"><a href=\"viewprofile?peer=")
+               .append(peer.toBase64()).append("\">").append(_("profile")).append("</a>");
             buf.append("&nbsp;<a href=\"configpeer?peer=").append(peer.toBase64()).append("\">+-</a></td>\n");
             buf.append("</tr>");
             // let's not build the whole page in memory (~500 bytes per peer)
@@ -213,7 +215,6 @@ class ProfileOrganizerRenderer {
                 buf.append("<td align=\"center\">").append(DataHelper.stripHTML(info.getCapabilities())).append("</td>");
             else
                 buf.append("<td>&nbsp;</td>");
-            buf.append("</code></td>");
             buf.append("<td align=\"right\">").append(num(prof.getIntegrationValue())).append("</td>");
             long time;
             time = now - prof.getLastHeardAbout();
@@ -261,7 +262,7 @@ class ProfileOrganizerRenderer {
         buf.append("<li><b>").append(_("capacity")).append("</b>: ").append(_("how many tunnels can we ask them to join in an hour?")).append("</li>");
         buf.append("<li><b>").append(_("integration")).append("</b>: ").append(_("how many new peers have they told us about lately?")).append("</li>");
         buf.append("<li><b>").append(_("status")).append("</b>: ").append(_("is the peer banned, or unreachable, or failing tunnel tests?")).append("</li>");
-        buf.append("</ul></i>");
+        buf.append("</ul>");
         out.write(buf.toString());
         out.flush();
     }
@@ -360,4 +361,10 @@ class ProfileOrganizerRenderer {
     private String _(String s, Object o) {
         return Messages.getString(s, o, _context);
     }
+
+    /** translate (ngettext) @since 0.8.5 */
+    public String ngettext(String s, String p, int n) {
+        return Messages.getString(n, s, p, _context);
+    }
+
 }

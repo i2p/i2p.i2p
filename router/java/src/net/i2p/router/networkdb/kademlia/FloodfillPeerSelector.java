@@ -11,6 +11,7 @@ package net.i2p.router.networkdb.kademlia;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -19,6 +20,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.RouterContext;
 import net.i2p.router.peermanager.PeerProfile;
+import net.i2p.router.util.RandomIterator;
 import net.i2p.stat.Rate;
 import net.i2p.util.Log;
 
@@ -72,8 +74,10 @@ class FloodfillPeerSelector extends PeerSelector {
      */
     List<Hash> selectNearestExplicitThin(Hash key, int maxNumRouters, Set<Hash> peersToIgnore, KBucketSet kbuckets, boolean preferConnected) { 
         if (peersToIgnore == null)
-            peersToIgnore = new HashSet(1);
-        peersToIgnore.add(_context.routerHash());
+            peersToIgnore = Collections.singleton(_context.routerHash());
+        else
+            peersToIgnore.add(_context.routerHash());
+        // TODO this is very slow
         FloodfillSelectionCollector matches = new FloodfillSelectionCollector(key, peersToIgnore, maxNumRouters);
         if (kbuckets == null) return new ArrayList();
         kbuckets.getAll(matches);
@@ -91,8 +95,7 @@ class FloodfillPeerSelector extends PeerSelector {
      *  List is not sorted and not shuffled.
      */
     List<Hash> selectFloodfillParticipants(KBucketSet kbuckets) {
-        Set<Hash> ignore = new HashSet(1);
-        ignore.add(_context.routerHash());
+        Set<Hash> ignore = Collections.singleton(_context.routerHash());
         return selectFloodfillParticipants(ignore, kbuckets);
     }
 
@@ -104,6 +107,8 @@ class FloodfillPeerSelector extends PeerSelector {
      */
     private List<Hash> selectFloodfillParticipants(Set<Hash> toIgnore, KBucketSet kbuckets) {
         if (kbuckets == null) return Collections.EMPTY_LIST;
+        // TODO this is very slow - use profile getPeersByCapability('f') instead
+        _context.statManager().addRateData("netDb.newFSC", 0, 0);
         FloodfillSelectionCollector matches = new FloodfillSelectionCollector(null, toIgnore, 0);
         kbuckets.getAll(matches);
         return matches.getFloodfillParticipants();
@@ -127,8 +132,7 @@ class FloodfillPeerSelector extends PeerSelector {
      *  Group 3: All others
      */
     List<Hash> selectFloodfillParticipants(Hash key, int maxNumRouters, KBucketSet kbuckets) {
-        Set<Hash> ignore = new HashSet(1);
-        ignore.add(_context.routerHash());
+        Set<Hash> ignore = Collections.singleton(_context.routerHash());
         return selectFloodfillParticipants(key, maxNumRouters, ignore, kbuckets);
     }
 
@@ -147,8 +151,7 @@ class FloodfillPeerSelector extends PeerSelector {
      */
     List<Hash> selectFloodfillParticipants(Hash key, int howMany, Set<Hash> toIgnore, KBucketSet kbuckets) {
         if (toIgnore == null) {
-            toIgnore = new HashSet(1);
-            toIgnore.add(_context.routerHash());
+            toIgnore = Collections.singleton(_context.routerHash());
         } else if (!toIgnore.contains(_context.routerHash())) {
             // copy the Set so we don't confuse StoreJob
             toIgnore = new HashSet(toIgnore);
@@ -320,7 +323,6 @@ class FloodfillPeerSelector extends PeerSelector {
          *  Group 4: Non-floodfills, sorted by closest-to-the-key
          */
         public List<Hash> get(int howMany, boolean preferConnected) {
-            Collections.shuffle(_floodfillMatches, _context.random());
             List<Hash> rv = new ArrayList(howMany);
             List<Hash> badff = new ArrayList(howMany);
             List<Hash> unconnectedff = new ArrayList(howMany);
@@ -329,8 +331,8 @@ class FloodfillPeerSelector extends PeerSelector {
             // Only add in "good" floodfills here...
             // Let's say published in last 3h and no failed sends in last 30m
             // (Forever shitlisted ones are excluded in add() above)
-            for (int i = 0; found < howMany && i < _floodfillMatches.size(); i++) {
-                Hash entry = (Hash) _floodfillMatches.get(i);
+            for (Iterator<Hash> iter = new RandomIterator(_floodfillMatches); (found < howMany) && iter.hasNext(); ) {
+                Hash entry = iter.next();
                 RouterInfo info = _context.netDb().lookupRouterInfoLocally(entry);
                 if (info != null && now - info.getPublished() > 3*60*60*1000) {
                     badff.add(entry);
@@ -391,6 +393,7 @@ class FloodfillPeerSelector extends PeerSelector {
         if (peersToIgnore != null && peersToIgnore.contains(Hash.FAKE_HASH)) {
             // return non-ff
             peersToIgnore.addAll(selectFloodfillParticipants(peersToIgnore, kbuckets));
+            // TODO this is very slow
             FloodfillSelectionCollector matches = new FloodfillSelectionCollector(rkey, peersToIgnore, maxNumRouters);
             kbuckets.getAll(matches);
             return matches.get(maxNumRouters);

@@ -26,6 +26,8 @@ public class FormHandler {
     private final List<String> _notices;
     private boolean _processed;
     private boolean _valid;
+    private static final String NONCE_SUFFIX = ".nonce";
+    private static final String PREV_SUFFIX = "Prev";
     
     public FormHandler() {
         _errors = new ArrayList();
@@ -93,18 +95,18 @@ public class FormHandler {
         if (_errors.isEmpty() && _notices.isEmpty())
             return "";
         StringBuilder buf = new StringBuilder(512);
-        buf.append("<div class=\"messages\" id=\"messages\"><p>");
+        buf.append("<div class=\"messages\" id=\"messages\">");
         if (!_errors.isEmpty()) {
-            buf.append("<span class=\"error\">");
+            buf.append("<div class=\"error\">");
             buf.append(render(_errors));
-            buf.append("</span>");
+            buf.append("</div>");
         }
         if (!_notices.isEmpty()) {
-            buf.append("<span class=\"notice\">");
+            buf.append("<div class=\"notice\">");
             buf.append(render(_notices));
-            buf.append("</span>");
+            buf.append("</div>");
         }
-        buf.append("</p></div>");
+        buf.append("</div>");
         return buf.toString();
     }
     
@@ -162,8 +164,8 @@ public class FormHandler {
             return;
         }
         
-        String nonce = System.getProperty(getClass().getName() + ".nonce");
-        String noncePrev = System.getProperty(getClass().getName() + ".noncePrev");
+        String nonce = System.getProperty(getClass().getName() + NONCE_SUFFIX);
+        String noncePrev = nonce + PREV_SUFFIX;
         if ( ( (nonce == null) || (!_nonce.equals(nonce)) ) &&
              ( (noncePrev == null) || (!_nonce.equals(noncePrev)) ) ) {
                  
@@ -201,6 +203,22 @@ public class FormHandler {
         }
     }
     
+    /**
+     *  Generate a new nonce, store old and new in the system properties.
+     *  Only call once per page!
+     *  @return a new random long as a String
+     *  @since 0.8.5
+     */
+    public String getNewNonce() {
+        String prop = getClass().getName() + NONCE_SUFFIX;
+        String prev = System.getProperty(prop);
+        if (prev != null)
+            System.setProperty(prop + PREV_SUFFIX, prev);
+        String rv = Long.toString(_context.random().nextLong());
+        System.setProperty(prop, rv);
+        return rv;
+    }
+
     /** translate a string */
     public String _(String s) {
         return Messages.getString(s, _context);

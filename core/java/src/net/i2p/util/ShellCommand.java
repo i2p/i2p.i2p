@@ -89,7 +89,7 @@ public class ShellCommand {
      * 
      * @author hypercubus
      */
-    private class StreamConsumer extends Thread {
+    private static class StreamConsumer extends Thread {
 
         private BufferedReader    bufferedReader;
         private InputStreamReader inputStreamReader;
@@ -123,7 +123,7 @@ public class ShellCommand {
      * 
      * @author hypercubus
      */
-    private class StreamReader extends Thread {
+    private static class StreamReader extends Thread {
 
         private BufferedReader    bufferedReader;
         private InputStreamReader inputStreamReader;
@@ -159,7 +159,7 @@ public class ShellCommand {
      * 
      * @author hypercubus
      */
-    private class StreamWriter extends Thread {
+    private static class StreamWriter extends Thread {
 
         private BufferedWriter     bufferedWriter;
         private BufferedReader     in;
@@ -183,7 +183,7 @@ public class ShellCommand {
                     bufferedWriter.write(input, 0, input.length());
                     bufferedWriter.flush();
                 }
-            } catch (Exception e) {
+            } catch (IOException e) {
                 try {
                     bufferedWriter.flush();
                 } catch (IOException e1) {

@@ -1,10 +1,13 @@
 <%
+    // NOTE: Do the header carefully so there is no whitespace before the <?xml... line
+
     // http://www.crazysquirrel.com/computing/general/form-encoding.jspx
     if (request.getCharacterEncoding() == null)
         request.setCharacterEncoding("UTF-8");
-%>
-<%@page pageEncoding="UTF-8"%>
-<%@page contentType="text/html" import="net.i2p.i2ptunnel.web.IndexBean"%><?xml version="1.0" encoding="UTF-8"?>
+
+%><%@page pageEncoding="UTF-8"
+%><%@page contentType="text/html" import="net.i2p.i2ptunnel.web.IndexBean"
+%><?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <jsp:useBean class="net.i2p.i2ptunnel.web.IndexBean" id="indexBean" scope="request" />
 <jsp:setProperty name="indexBean" property="*" />
@@ -236,9 +239,9 @@
          <%
                /* should only happen for streamr client */
                String cHost= indexBean.getClientInterface(curClient);
-               if ("".equals(cHost)) {
+               if (cHost == null || "".equals(cHost)) {
                    out.write("<font color=\"red\">");
-                   out.write(intl._("Hort not set"));
+                   out.write(intl._("Host not set"));
                    out.write("</font>");
                } else {
                    out.write(cHost);

@@ -24,13 +24,40 @@
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
         <!-- half of this is deprecated classes so turn deprecation off -->
-        <javac srcdir="./src" debug="true" deprecation="off" source="1.5" target="1.5" destdir="./build/obj" classpath="../../../core/java/build/i2p.jar" >
+        <javac srcdir="./src" debug="true" deprecation="off" source="1.5" target="1.5"
+               includeAntRuntime="false"
+               destdir="./build/obj" classpath="../../../core/java/build/i2p.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
-    <target name="jar" depends="compile">
-        <jar destfile="./build/mstreaming.jar" basedir="./build/obj" includes="**/*.class" />
+
+    <target name="jar" depends="compile, jarUpToDate" unless="jar.uptodate" >
+        <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="list" />
+            <arg value="changed" />
+            <arg value="." />
+        </exec>
+        <!-- \n in an attribute value generates an invalid manifest -->
+        <exec executable="tr" inputstring="${workspace.changes}" outputproperty="workspace.changes.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="-s" />
+            <arg value="[:space:]" />
+            <arg value="," />
+        </exec>
+        <jar destfile="./build/mstreaming.jar" basedir="./build/obj" includes="**/*.class" >
+            <manifest>
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+            </manifest>
+        </jar>
     </target>
+
+    <target name="jarUpToDate">
+        <uptodate property="jar.uptodate" targetfile="build/mstreaming.jar" >
+            <srcfiles dir= "." includes="build/obj/**/*.class" />
+        </uptodate>
+    </target>
+
     <target name="javadoc">
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc" />

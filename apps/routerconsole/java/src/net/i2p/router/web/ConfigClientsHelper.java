@@ -105,7 +105,9 @@ public class ConfigClientsHelper extends HelperBase {
         for (int cur = 0; cur < clients.size(); cur++) {
             ClientAppConfig ca = clients.get(cur);
             renderForm(buf, ""+cur, ca.clientName, false, !ca.disabled,
-                       "webConsole".equals(ca.clientName) || "Web console".equals(ca.clientName),
+                       // dangerous, but allow editing the console args too
+                       //"webConsole".equals(ca.clientName) || "Web console".equals(ca.clientName),
+                       false,
                        ca.className + ((ca.args != null) ? " " + ca.args : ""), (""+cur).equals(_edit),
                        true, false, false, true, ca.disabled);
         }

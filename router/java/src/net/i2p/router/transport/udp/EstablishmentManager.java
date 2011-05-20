@@ -577,8 +577,7 @@ class EstablishmentManager {
                       (isInbound ? " inbound con from " + peer : "outbound con to " + peer));
         
         DatabaseStoreMessage m = new DatabaseStoreMessage(_context);
-        m.setKey(_context.routerHash());
-        m.setRouterInfo(_context.router().getRouterInfo());
+        m.setEntry(_context.router().getRouterInfo());
         m.setMessageExpiration(_context.clock().now() + 10*1000);
         _transport.send(m, peer);
     }
@@ -642,7 +641,7 @@ class EstablishmentManager {
     private void handlePendingIntro(OutboundEstablishState state) {
         long nonce = _context.random().nextLong(MAX_NONCE);
         while (true) {
-                OutboundEstablishState old = _liveIntroductions.putIfAbsent(new Long(nonce), state);
+                OutboundEstablishState old = _liveIntroductions.putIfAbsent(Long.valueOf(nonce), state);
                 if (old != null) {
                     nonce = _context.random().nextLong(MAX_NONCE);
                 } else {
@@ -670,7 +669,7 @@ class EstablishmentManager {
         }
         public void timeReached() {
             // remove only if value equal to state
-            boolean removed = _liveIntroductions.remove(new Long(_nonce), _state);
+            boolean removed = _liveIntroductions.remove(Long.valueOf(_nonce), _state);
             if (removed) {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Send intro for " + _state.getRemoteHostId().toString() + " timed out");
@@ -682,7 +681,7 @@ class EstablishmentManager {
     
     void receiveRelayResponse(RemoteHostId bob, UDPPacketReader reader) {
         long nonce = reader.getRelayResponseReader().readNonce();
-        OutboundEstablishState state = _liveIntroductions.remove(new Long(nonce));
+        OutboundEstablishState state = _liveIntroductions.remove(Long.valueOf(nonce));
         if (state == null) 
             return; // already established
         

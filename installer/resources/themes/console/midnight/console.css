@@ -169,10 +169,7 @@ div.routersummary {
      font-size: 9pt; 
      word-wrap: break-word; 
      font: 9pt/125%; 
-     -moz-box-shadow: inset 0px 0px 0px 1px #00000A; 
-/*     -moz-border-radius: 3px;
-     -khtml-border-radius: 3px;
-     border-radius: 3px;*/
+     -moz-box-shadow: inset 0px 0px 0px 1px #00000A;
 }
 
 div.routersummary input[type=text] {
@@ -283,16 +280,6 @@ div.tunnels table{
      padding-right: 0;
 }     
      
-div.routersummary form {
-     margin-top: -8px !important;
-     margin-bottom: -8px !important;     
-}
-
-div.routersummary form:last-child {
-     padding-top: 3px !important;
-     margin-bottom: -10px !important;     
-}
-
 div.refresh {
      margin-top: 10px !important;
      margin-bottom: 10px !important;
@@ -329,10 +316,7 @@ div.main {
      border-top: 0;
      text-align: left;
      color: #eef;
-     min-width: 570px;
-/*     -moz-border-radius: 0 0 3px 3px;
-     -khtml-border-radius: 0 0 3px 3px;
-     border-radius: 0 0 3px 3px;*/
+     min-width: 590px;
      background: #000 url(images/scarface.jpg) right bottom no-repeat !important;
 }
 
@@ -432,24 +416,29 @@ div.news li {
 }
 
 div.news h3 {
-     text-align: left !important;
+     background: none !important;
+     text-align: left;
+     border: none !important;
+     padding-left: 0;
+     padding-top: 0px;
+     border-bottom: 1px dotted !important;
+     -moz-box-shadow: none;
+     -hktml-box-shadow: none;
+     box-shadow: none;
+     font-size: 10pt !important;
+     letter-spacing: 0.05em;
+     text-transform: uppercase !important;
+     margin: 15px 10px -5px;
+     padding: 5px 0 5px;
 }
 
 div.news p {
      color: #eef;
      font-size: 9pt;
      margin-bottom: -10px;
-}
-/*
-div.news p:first-child {
-     padding-top: 15px !important;
+     margin-top: 10px;
 }
 
- 
-div.news p:nth-child(2n) {
-     padding-top: 15px !important;
-}
-*/
 div.news p:last-child {
      margin-bottom: 10px;
 }
@@ -544,11 +533,11 @@ div.main li b{
      font-size: 9.5pt;
 }
 
-div.messages span.error {
+div.error {
      color: #d00000;
 }
 
-div.messages span.notice {
+div.notice {
      font-style: italic;
 }
 
@@ -566,9 +555,6 @@ h1 {
      min-width: 600px;
      line-height: 100%;
      color: #fff;
-/*     -moz-border-radius: 3px 3px 0 0;
-     -khtml-border-radius: 3px 3px 0 0;
-     border-radius: 3px 3px 0 0; */
 }
 
 h2 {
@@ -578,12 +564,8 @@ h2 {
      border-top: 1px solid #99f;
      border-left: 1px solid #99f;
      background: #000008;
-/*     font-variant: small-caps; */
      text-transform: uppercase; 
      letter-spacing: 0.07em;
-/*     -moz-border-radius: 0 3px 0 0;
-     -khtml-border-radius: 0 3px 0 0;
-     border-radius: 0 3px 0 0;*/
 }
 
 h3 {
@@ -596,9 +578,6 @@ h3 {
      margin-bottom: 10px;
      font-weight: bold !important;
      text-transform: uppercase; 
-/*     -moz-border-radius: 0 3px 0 0;
-     -khtml-border-radius: 0 3px 0 0;
-     border-radius: 0 3px 0 0;*/
 }
 
 h3 a {
@@ -772,7 +751,7 @@ input[type=text], input[type=password] select {
 }
 submit {
      margin: 3px 5px 3px 5px;
-     padding 2px 0;
+     padding: 2px 0;
      font: 8pt/140% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
 }
 
@@ -787,13 +766,13 @@ p {
 }
 
 .langbox {
-     margin: 17px 0px 0px 5px;
+     margin: 4px 0px 0px 5px;
      color: #eef;
      font-size: 7pt;
      width: 240px;
      text-align: center;
      float: right;
-     valign: middle;
+     vertical-align: middle;
 }
 
 .langbox img {
@@ -940,7 +919,7 @@ code {
      text-align: left;
      font: 9pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      color: #0d0;
-     padding: 0 2px;
+/*     padding: 0 2px;*/
 }
 
 div.footnote {

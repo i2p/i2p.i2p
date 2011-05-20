@@ -26,11 +26,11 @@ class I2PServerSocketFull implements I2PServerSocket {
     }
     
     public long getSoTimeout() {
-        return _socketManager.getConnectionManager().MgetSoTimeout();
+        return _socketManager.getConnectionManager().getSoTimeout();
     }
     
     public void setSoTimeout(long x) {
-        _socketManager.getConnectionManager().MsetSoTimeout(x);
+        _socketManager.getConnectionManager().setSoTimeout(x);
     }
     /**
      * Close the connection.

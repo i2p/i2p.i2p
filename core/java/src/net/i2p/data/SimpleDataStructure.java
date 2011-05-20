@@ -75,7 +75,7 @@ public abstract class SimpleDataStructure extends DataStructureImpl {
 
     /**
      * Sets the data.
-     * @param data of correct length, or null
+     * @param in the stream to read
      * @throws RuntimeException if data already set.
      */
     public void readBytes(InputStream in) throws DataFormatException, IOException {

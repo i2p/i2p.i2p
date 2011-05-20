@@ -2,13 +2,13 @@ package net.i2p.client.streaming;
 
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.client.I2PSessionListener;
 import net.i2p.util.Log;
-import net.i2p.util.ConcurrentHashSet;
 
 /**
  * Receive raw information from the I2PSession and turn it into
@@ -24,7 +24,7 @@ class MessageHandler implements I2PSessionListener {
     public MessageHandler(I2PAppContext ctx, ConnectionManager mgr) {
         _manager = mgr;
         _context = ctx;
-        _listeners = new ConcurrentHashSet(1);
+        _listeners = new CopyOnWriteArraySet();
         _log = ctx.logManager().getLog(MessageHandler.class);
         _context.statManager().createRateStat("stream.packetReceiveFailure", "When do we fail to decrypt or otherwise receive a packet sent to us?", "Stream", new long[] { 60*60*1000, 24*60*60*1000 });
     }
@@ -81,8 +81,8 @@ class MessageHandler implements I2PSessionListener {
         for (Iterator<I2PSocketManager.DisconnectListener> iter = _listeners.iterator(); iter.hasNext(); ) {
             I2PSocketManager.DisconnectListener lsnr = iter.next();
             lsnr.sessionDisconnected();
-            iter.remove();
         }
+        _listeners.clear();
     }
 
     /**

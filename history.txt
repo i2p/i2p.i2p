@@ -1,3 +1,311 @@
+* 2011-05-16  0.8.6 released
+
+2011-05-13 zzz
+    * Increase min floodfills; decrease min routerinfo expiration
+
+2011-05-11 zzz
+    * Use partitions of fast tier for various hops of client tunnels
+
+2011-05-06 zzz
+    * Tunnels and profiles:
+      - Increase max fast and high-cap tier sizes
+      - Slow profile eval cycle after sufficient uptime
+      - Fix bug which started a new build after a successful build
+      - Misc. cleanups
+
+2011-04-28 zzz
+    * Console: Try to prevent cascaded IllegalStateExceptions in .jsp code;
+      add logging for original error
+    * peers.jsp: Tag UPnP strings
+    * UPnP: Strip trailing nulls from incoming XML to prevent
+      "content not allowed in trailing section" exceptions
+
+* 2011-04-18  0.8.5 released
+
+2011-04-11 zzz
+    * Console: Hide iframe on mobile browsers
+    * DataHelper: Speed up eq() (Ticket #437)
+    * HTTPServer: Strip inbound X-Accept-Encoding header
+    * netdb.jsp: HTML fixes
+    * Plugins: Log error when console server not found
+    * Reseed: Log tweak
+
+2011-04-02 m1xxy
+    * routerconsole, i2psnark, ...  I2P ahora también en español: ¡Bienvenidos los hispanohablantes!
+      - routerconsole, i2ptunnel, i2psnark, SusiDNS, Susimail fully translated into Spanish
+        (thx to PunkiBastardo and user)
+    * routerconsole, i2psnark, ...  
+      - French translations completed by magma
+      
+2011-03-22 zzz
+    * Handle GNU JRE returning Long.MAX_VALUE for max memory
+    * i2ptunnel: HTML fixes
+
+2011-03-20 zzz
+    * Console: Remove cache directives
+    * i2psnark: Fix peers stuck at uninteresting after metainfo fetch
+    * i2ptunnel: Change all clients to 3 hops by default (new installs only)
+    * Profiles:
+      - Nicer profile dump
+      - More efficient profile lookup for display
+      - Fix dumpprofile NPE
+      - Change file suffix from .dat to .txt.gz
+      - Set firstHeardAbout on creation
+    * Rate: Fix equals()
+    * Recognize links and links2 as text browsers
+
+2011-03-12 zzz
+    * Blocklist: Add bogons since they won't change any more
+    * BuildHandler: Loop double-check
+    * Console:
+      - Fix HTML errors in form message box,
+        logs.jsp, netdb.jsp, profiles.jsp, stats.jsp,
+        configpeer.jsp, configtunnels.jsp, configupdate.jsp
+      - ngettext cleanups
+    * LogWriter: Prevent NPE after permissions fail
+
+2011-03-11 duck
+    * Susimail: translation support, including dutch translation.
+
+2011-03-10 zzz
+    * configclients.jsp: Split form up, fix HTML warnings
+    * configui.jsp: Fix lang setting broken by previous nonce change
+    * Console: Consolidate nonce handling
+    * eepget: Don't send X-Accept-Encoding header to proxy (ticket #422)
+    * logs.jsp: Fix NPE (ticket #430)
+    * netdb.jsp: Fix table alignment
+    * Tunnel Preprocessor: Use entropy for padding more efficiently
+
+2011-03-08 zzz
+    * Clock: Cleanups and javadocs
+    * Console:
+      - Parameterize download button tags (ticket #425)
+      - Clean up summary bar HTML warnings
+      - Just display a summary bar link for text browsers
+      - Move welcome div from the readme files to index.jsp
+      - Require a nonce to change language
+    * EepGet: Cleanups and javadocs
+    * i2psnark:
+      - More efficient metainfo handling, reduce instantiations
+      - Improved handling of storage errors
+      - Improved handling of duplicate file names
+      - More metainfo sanity checks
+      - Metadata transfer error handling improvements
+      - Code cleanup, remove dead and duplicated code
+    * Reseed: Use the reseeder as a clock source
+
+2011-03-02 zzz
+    * BuildHandler:
+      - Limit request queue size
+      - Concurrent request queue
+      - Remove dead code for queued reply handling
+    * OutNetMessage: Remove dead code
+    * Tunnel cleanups, final, javadoc
+
+* 2011-03-02  0.8.4 released
+
+2011-02-27 zzz
+    * Console:
+      - Fix numerous readme HTML errors
+      - Fix flag locations in readmes
+      - desktopgui.enable now defaults to false; run systray if false
+      - Start icon app before console
+      - Restore systray form in configservice.jsp
+      - Only save lang when clicking on flags if desktopgui is running
+      - Only allow two-letter lang code from cgi parameter
+    * Reseed: Disable HTTPS until we have enough working hosts again
+
+2011-02-24 zzz
+    * i2psnark:
+      - Fix delete and remove buttons for Opera and w3m
+      - Stop torrent if no valid trackers
+      - Fix war build dependencies
+
+2011-02-23 zzz
+    * BuildHandler:
+      - Lower participating throttler max limit
+      - Cleanups and loop checks
+    * Console: Fix summary bar HTML error
+
+2011-02-22 zzz
+    * BuildHandler: Prelmiinary participating tunnel throttler
+    * I2PTunnel:
+      - Add spellcheck=false to textareas
+      - Fix HTML error in 503 error page
+
+2011-02-19 zzz
+    * I2PTunnel: Fix standalone server tunnels
+                 http://forum.i2p/viewtopic.php?t=5376
+    * Plugins: Fix signature verification if router.config specifies
+               trustedUpdateKeys (ticket #416)
+
+2011-02-18 Mathiasdm
+    * Desktopgui now has an option to be disabled (desktopgui.enabled)
+
+2011-02-17 zzz
+    * Build:
+      - Add includeAntRuntime=false to all javac targets
+      - Add build date, mtn rev, and changed file list to all manifests
+      - Add unless=uptodate to all jar and war targets
+        (bob and dtg still todo)
+    * Console: Add Arabic
+    * i2ptunnel: outproxy2 -> outproxyng (Ticket #394 take 2)
+
+2011-02-15 zzz
+    * i2psnark: Details link shuffle, mostly restore 0.8.3 behavior
+    * Profiles: Punish rejections more, in an attempt to spread the
+                load more through the network
+    * Timers: Log cleanup
+
+2011-02-14 Mathiasdm
+    * Fix headless issue without reboot
+
+2011-02-13 zzz
+    * Connect Client: Minor NPE fix cleanup
+    * JobQueue: Prevent NPE at shutdown (thanks liberty)
+    * GeoIP: Prevent startup NPE (ticket #413, thanks RN)
+    * NetDB: Prevent ExpireLeaseJob NPE (thanks sponge)
+
+2011-02-11 Mathiasdm
+    * routerconsole: fixed graphs using jrobin; and headless issue
+          in general: no more switches between headless and non-headless.
+
+2011-02-11 sponge
+    * I2PTunnel: fix NPE in I2PTunnelConnectClient
+
+2011-02-10 sponge
+    * I2CP: fix NPE in QueuedClientConnectionRunner
+
+2011-02-10 zzz
+    * I2CP: Correctly close internal connections on the router side
+            when closed by the client, was causing massive memory leak
+            for internal clients using lots of sessions (thanks sponge)
+            (ticket #397)
+    * i2psnark:
+      - Improved magnet link parsing, use tr parameter if present
+    * i2ptunnel: Change shared clients default for new clients to false
+    * Streaming: Don't use iter.remove() on a COWAS
+
+2011-02-09 sponge
+    * BOB: fixup delivery in config, adds config file versioning.
+    * I2CP: Fix most of the I2CP leaks. Two leaks remain, but they are small.
+            net.i2p.internal.QueuedI2CPMessageReader and
+            net.i2p.router.client.I2CPMessageQueueImpl
+            are the two remaining leaks.
+
+2011-02-07 zzz
+    * i2psnark:
+      - Check for dup magnet torrent when adding torrent file
+      - Add exotrack.i2p (ticket #403)
+      - Disable spellcheck in textarea
+    * i2ptunnel: Generate error message when i2ptunnel.config save fails
+                 (ticket #404)
+
+2011-02-06 zzz
+    * i2psnark: Fix maggot links, and magnet links with trailing parameters (thx user)
+
+2011-02-05 zzz
+    * .mtn-ignore: New, to make it harder to check in stuff you shouldn't
+    * BOB: Drop checked-in build dir
+    * i2psnark:
+      - Big refactor to support torrents where only the infohash is known
+        (i.e., added by magnet links)
+      - Big refactor to use accessors instead of public fields
+      - Add support for metadata transfer (BEP 9) via the
+        extension protocol (BEP 10)
+      - Add support for adding torrents via standard magnet links (BEP 9)
+        and "maggot" links (http://sponge.i2p/files/maggotspec.txt)
+      - Add support for peer exchange (i2p_pex)
+      - Add stubs for future DHT support (BEP 5)
+      - Add more information on torrent details page;
+        add details page for single-file torrents
+      - Make filename filtering consistent (ticket #368)
+      - Fix add-torrent locking (ticket #371)
+      - Fix opentracker configuration
+      - Add several connect-to-self checks
+      - Add support for using new I2CP bandwidth limiter
+      - Add support for using new in-session I2CP naming lookups
+      - Don't expire outbound Piece messages, since we now defer loading the
+        data from disk
+    * i2ptunnel:
+      - Change connect proxy default to outproxy2.h2ik.i2p (ticket #394)
+      - IRCClient: Use tunnel log instance
+      - Server: Full queue log tweak
+
+2011-02-03 zzz
+    * Build:
+      - Remove dup flag files (ticket #316)
+      - Remove BOB dependency on i2ptunnel
+    * Console: Add DTG to classpath for old installs
+    * I2PTunnel: Fix NPE
+    * RandomSource: Fix seeding from /dev/urandom
+    * Reseed: Limit time spent downloading from a single source
+
+2011-02-02 sponge
+    * BOB: Revise lookup code, bump BOB version
+
+2011-01-31 zzz
+    * Console: Put all socket handlers in same thread pool,
+               set min/max threads and idle timeout
+    * Context: Fix properties init
+    * DataStructures:
+      - Cleanups
+    * DecayingBloomFilter, DecayingHashSet: Cleanups and speedups
+    * Findbugs: Lots of cleanups
+    * I2CP:
+      - Add experimental bandwidth limiter
+      - Add I2PSession API method to update tunnel and bandwidth
+        configuration on an existing session
+      - Filter more system properties before passing them to the router
+      - Start work on passing per-message flags to the router via I2CP
+    * I2PAppContext: New getProperties() method
+    * i2ptunnel:
+      - Use context properties as defaults
+    * NetDB, DatabaseStoreMessage:
+      - Convert everything from DataStructure to the
+        new DatabaseEntry superclass
+      - Optimizations made possible by DatabaseEntry
+      - Don't rescan netDb directory unless changed
+    * OCMOSJ:
+      - Don't send expired messages
+      - Clean up stat init
+    * PeerManager: Make calculators static, take out of router context
+    * Router:
+      - Add new RandomIterator, use in UDP, peer selector,
+        profile organizer
+      - Add a stat to monitor peer selector run time
+    * RouterContext: Clean up clock overrides
+    * Streaming:
+      - Add new real sockets for easier porting of apps.
+        See http://zzz.i2p/topics/792 for info. Untested.
+      - Case cleanups
+      - Javadoc
+
+* 2011-01-24  0.8.3 released
+
+2011-01-16 zzz
+    * Console: Allow editing of console args
+    * UDP: Prevent rare startup NPE
+    * UPnP:
+      - Change all log errors to warns (tickets #76, #95, #120)
+      - Double socket soTimeout to 2 seconds
+
+2011-01-15 zzz
+    * Console: Add some HTTP headers in the view servlets
+
+2011-01-12 zzz
+    * Log: Fix rare initialization problem
+    * PrivateKey: Fix hashCode()
+
+2011-01-09 zzz
+    * DataHelper: Speed up and annotate sortStructures()
+    * Data Structures: More caching improvements, don't cache where we shouldn't
+    * NetDB: Don't rescan netDb directory unless changed,
+             to reduce Hash cache thrash (backport from test4)
+    * RouterInfo:
+      - Don't cache byteified data by default, to save ~1.5 MB
+      - Don't create empty peers Set, to save ~100KB
+
 2011-01-07 zzz
     * Data Structures: More caching
     * i2psnark: Improve request tracking to reduce memory usage

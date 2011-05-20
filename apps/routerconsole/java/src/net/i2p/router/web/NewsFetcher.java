@@ -3,11 +3,9 @@ package net.i2p.router.web;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.TrustedUpdate;
@@ -15,6 +13,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.RouterVersion;
+import net.i2p.router.util.RFC822Date;
 import net.i2p.util.EepGet;
 import net.i2p.util.EepHead;
 import net.i2p.util.FileUtil;
@@ -73,7 +72,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
             if (_lastFetch == 0)
                 _lastFetch = _lastUpdated;
             if (_lastModified == null)
-                _lastModified = to822Date(_lastFetch);
+                _lastModified = RFC822Date.to822Date(_lastFetch);
         } else {
             _lastUpdated = 0;
             _lastFetch = 0;
@@ -212,7 +211,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
                 String lastmod = get.getLastModified();
                 if (lastmod != null) {
                     if (!(_context.isRouterContext())) return;
-                    long modtime = parse822Date(lastmod);
+                    long modtime = RFC822Date.parse822Date(lastmod);
                     if (modtime <= 0) return;
                     String lastUpdate = _context.getProperty(UpdateHandler.PROP_LAST_UPDATE_TIME);
                     if (lastUpdate == null) {
@@ -249,44 +248,6 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         UpdateHandler handler = new UnsignedUpdateHandler((RouterContext)_context, url,
                                                           _unsignedUpdateVersion);
         handler.update();
-    }
-
-    /**
-     * http://jimyjoshi.com/blog/2007/08/rfc822dateparsinginjava.html
-     * Apparently public domain
-     * Probably don't need all of these...
-     */
-    private static final SimpleDateFormat rfc822DateFormats[] = new SimpleDateFormat[] {
-                 new SimpleDateFormat("EEE, d MMM yy HH:mm:ss z", Locale.US),
-                 new SimpleDateFormat("EEE, d MMM yy HH:mm z", Locale.US),
-                 new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z", Locale.US),
-                 new SimpleDateFormat("EEE, d MMM yyyy HH:mm z", Locale.US),
-                 new SimpleDateFormat("d MMM yy HH:mm z", Locale.US),
-                 new SimpleDateFormat("d MMM yy HH:mm:ss z", Locale.US),
-                 new SimpleDateFormat("d MMM yyyy HH:mm z", Locale.US),
-                 new SimpleDateFormat("d MMM yyyy HH:mm:ss z", Locale.US)
-    };
-
-    /**
-     * new Date(String foo) is deprecated, so let's do this the hard way
-     *
-     * @param s non-null
-     * @return -1 on failure
-     */
-    public static long parse822Date(String s) {
-        for (int i = 0; i < rfc822DateFormats.length; i++) {
-            try {
-                Date date = rfc822DateFormats[i].parse(s);
-                if (date != null)
-                    return date.getTime();
-            } catch (ParseException pe) {}
-        }
-        return -1;
-    }
-
-    /** @since 0.8.2 */
-    private static String to822Date(long t) {
-        return (new SimpleDateFormat("d MMM yyyy HH:mm:ss z", Locale.US)).format(new Date(t));
     }
 
     private static final String VERSION_STRING = "version=\"" + RouterVersion.VERSION + "\"";

@@ -32,15 +32,13 @@ import java.util.Set;
 import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
 
-import org.klomp.snark.bencode.BDecoder;
-import org.klomp.snark.bencode.BEValue;
-
 class PeerState implements DataLoader
 {
   private final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(PeerState.class);
   private final Peer peer;
+  /** Fixme, used by Peer.disconnect() to get to the coordinator */
   final PeerListener listener;
-  private final MetaInfo metainfo;
+  private MetaInfo metainfo;
 
   // Interesting and choking describes whether we are interested in or
   // are choking the other side.
@@ -51,10 +49,6 @@ class PeerState implements DataLoader
   // interested in us or choked us.
   boolean interested = false;
   boolean choked = true;
-
-  // Package local for use by Peer.
-  long downloaded;
-  long uploaded;
 
   /** the pieces the peer has */
   BitField bitfield;
@@ -74,6 +68,9 @@ class PeerState implements DataLoader
   public final static int PARTSIZE = 16*1024; // outbound request
   private final static int MAX_PARTSIZE = 64*1024; // Don't let anybody request more than this
 
+  /**
+   * @param metainfo null if in magnet mode
+   */
   PeerState(Peer peer, PeerListener listener, MetaInfo metainfo,
             PeerConnectionIn in, PeerConnectionOut out)
   {
@@ -135,6 +132,9 @@ class PeerState implements DataLoader
   {
     if (_log.shouldLog(Log.DEBUG))
       _log.debug(peer + " rcv have(" + piece + ")");
+    // FIXME we will lose these until we get the metainfo
+    if (metainfo == null)
+        return;
     // Sanity check
     if (piece < 0 || piece >= metainfo.getPieces())
       {
@@ -172,8 +172,15 @@ class PeerState implements DataLoader
           }
         
         // XXX - Check for weird bitfield and disconnect?
-        bitfield = new BitField(bitmap, metainfo.getPieces());
+        // FIXME will have to regenerate the bitfield after we know exactly
+        // how many pieces there are, as we don't know how many spare bits there are.
+        if (metainfo == null)
+            bitfield = new BitField(bitmap, bitmap.length * 8);
+        else
+            bitfield = new BitField(bitmap, metainfo.getPieces());
       }
+    if (metainfo == null)
+        return;
     boolean interest = listener.gotBitField(peer, bitfield);
     setInteresting(interest);
     if (bitfield.complete() && !interest) {
@@ -191,6 +198,8 @@ class PeerState implements DataLoader
     if (_log.shouldLog(Log.DEBUG))
       _log.debug(peer + " rcv request("
                   + piece + ", " + begin + ", " + length + ") ");
+    if (metainfo == null)
+        return;
     if (choking)
       {
         if (_log.shouldLog(Log.INFO))
@@ -273,7 +282,7 @@ class PeerState implements DataLoader
    */
   void uploaded(int size)
   {
-    uploaded += size;
+    peer.uploaded(size);
     listener.uploaded(peer, size);
   }
 
@@ -293,7 +302,7 @@ class PeerState implements DataLoader
   void pieceMessage(Request req)
   {
     int size = req.len;
-    downloaded += size;
+    peer.downloaded(size);
     listener.downloaded(peer, size);
 
     if (_log.shouldLog(Log.DEBUG))
@@ -314,9 +323,6 @@ class PeerState implements DataLoader
           {
             if (_log.shouldLog(Log.WARN))
               _log.warn("Got BAD " + req.piece + " from " + peer);
-            // XXX ARGH What now !?!
-            // FIXME Why would we set downloaded to 0?
-            downloaded = 0;
           }
       }
 
@@ -360,7 +366,6 @@ class PeerState implements DataLoader
           _log.info("Unrequested 'piece: " + piece + ", "
                       + begin + ", " + length + "' received from "
                       + peer);
-        downloaded = 0; // XXX - punishment?
         return null;
       }
 
@@ -385,7 +390,6 @@ class PeerState implements DataLoader
                           + begin + ", "
                           + length + "' received from "
                           + peer);
-            downloaded = 0; // XXX - punishment?
             return null;
           }
 
@@ -485,22 +489,40 @@ class PeerState implements DataLoader
   /** @since 0.8.2 */
   void extensionMessage(int id, byte[] bs)
   {
-      if (id == 0) {
-          InputStream is = new ByteArrayInputStream(bs);
-          try {
-              BDecoder dec = new BDecoder(is);
-              BEValue bev = dec.bdecodeMap();
-              Map map = bev.getMap();
-              if (_log.shouldLog(Log.DEBUG))
-                  _log.debug("Got extension handshake message " + bev.toString());
-          } catch (Exception e) {
-              if (_log.shouldLog(Log.DEBUG))
-                  _log.debug("Failed extension decode", e);
-          }
+      ExtensionHandler.handleMessage(peer, listener, id, bs);
+      // Peer coord will get metadata from MagnetState,
+      // verify, and then call gotMetaInfo()
+      listener.gotExtension(peer, id, bs);
+  }
+
+  /**
+   *  Switch from magnet mode to normal mode.
+   *  If we already have the metainfo, this does nothing.
+   *  @param meta non-null
+   *  @since 0.8.4
+   */
+  public void setMetaInfo(MetaInfo meta) {
+      if (metainfo != null)
+          return;
+      BitField oldBF = bitfield;
+      if (oldBF != null) {
+          if (oldBF.size() != meta.getPieces())
+              // fix bitfield, it was too big by 1-7 bits
+              bitfield = new BitField(oldBF.getFieldBytes(), meta.getPieces());
+          // else no extra
       } else {
-          if (_log.shouldLog(Log.DEBUG))
-              _log.debug("Got extended message type: " + id + " length: " + bs.length);
+          // it will be initialized later
+          //bitfield = new BitField(meta.getPieces());
       }
+      metainfo = meta;
+      if (bitfield != null && bitfield.count() > 0)
+          setInteresting(true);
+  }
+
+  /** @since 0.8.4 */
+  void portMessage(int port)
+  {
+      listener.gotPort(peer, port);
   }
 
   void unknownMessage(int type, byte[] bs)
@@ -618,6 +640,8 @@ class PeerState implements DataLoader
   {
     // no bitfield yet? nothing to request then.
     if (bitfield == null)
+        return;
+    if (metainfo == null)
         return;
     boolean more_pieces = true;
     while (more_pieces)

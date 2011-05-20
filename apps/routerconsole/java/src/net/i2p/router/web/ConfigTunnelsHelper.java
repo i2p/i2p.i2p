@@ -18,17 +18,24 @@ public class ConfigTunnelsHelper extends HelperBase {
     
     public String getForm() {
         StringBuilder buf = new StringBuilder(1024);
+        // HTML: <input> cannot be inside a <table>
+        buf.append("<input type=\"hidden\" name=\"pool.0\" value=\"exploratory\" >\n");
+        int cur = 1;
+        Set<Destination> clients = _context.clientManager().listClients();
+        for (Destination dest : clients) {
+            buf.append("<input type=\"hidden\" name=\"pool.").append(cur).append("\" value=\"");
+            buf.append(dest.calculateHash().toBase64()).append("\" >\n");    
+            cur++;
+        }
+
         buf.append("<table>\n");
         TunnelPoolSettings exploratoryIn = _context.tunnelManager().getInboundSettings();
         TunnelPoolSettings exploratoryOut = _context.tunnelManager().getOutboundSettings();
         
-        buf.append("<input type=\"hidden\" name=\"pool.0\" value=\"exploratory\" >");
         renderForm(buf, 0, "exploratory", _("Exploratory tunnels"), exploratoryIn, exploratoryOut);
         
-        int cur = 1;
-        Set clients = _context.clientManager().listClients();
-        for (Iterator iter = clients.iterator(); iter.hasNext(); ) {
-            Destination dest = (Destination)iter.next();
+        cur = 1;
+        for (Destination dest : clients) {
             TunnelPoolSettings in = _context.tunnelManager().getInboundSettings(dest.calculateHash());
             TunnelPoolSettings out = _context.tunnelManager().getOutboundSettings(dest.calculateHash());
             
@@ -41,9 +48,7 @@ public class ConfigTunnelsHelper extends HelperBase {
                 name = dest.calculateHash().toBase64().substring(0,6);
         
             String prefix = dest.calculateHash().toBase64().substring(0,4);
-            buf.append("<input type=\"hidden\" name=\"pool.").append(cur).append("\" value=\"");
-            buf.append(dest.calculateHash().toBase64()).append("\" >");    
-            renderForm(buf, cur, prefix, _("Client tunnels for") + " " + _(name), in, out);
+            renderForm(buf, cur, prefix, _("Client tunnels for {0}", _(name)), in, out);
             cur++;
         }
         
@@ -191,12 +196,16 @@ public class ConfigTunnelsHelper extends HelperBase {
 //        buf.append("<tr><td colspan=\"3\"><br></td></tr>\n");
     }
 
+    /** to fool xgettext so the following isn't tagged */
+    private static final String DUMMY1 = "1 ";
+    private static final String DUMMY2 = "{0} ";
+
     private void renderOptions(StringBuilder buf, int min, int max, int now, String prefix, String name) {
         for (int i = min; i <= max; i++) {
             buf.append("<option value=\"").append(i).append("\" ");
             if (i == now)
                 buf.append("selected=\"true\" ");
-            buf.append(">").append(_(i, "1 " + name, "{0} " + name + 's'));
+            buf.append(">").append(ngettext(DUMMY1 + name, DUMMY2 + name + 's', i));
             buf.append("</option>\n");
         }
     }

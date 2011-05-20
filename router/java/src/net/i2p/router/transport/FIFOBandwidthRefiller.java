@@ -7,9 +7,9 @@ import net.i2p.I2PAppContext;
 import net.i2p.util.Log;
 
 public class FIFOBandwidthRefiller implements Runnable {
-    private Log _log;
-    private I2PAppContext _context;
-    private FIFOBandwidthLimiter _limiter;
+    private final Log _log;
+    private final I2PAppContext _context;
+    private final FIFOBandwidthLimiter _limiter;
     /** how many KBps do we want to allow? */
     private int _inboundKBytesPerSecond;
     /** how many KBps do we want to allow? */

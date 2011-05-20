@@ -193,7 +193,11 @@ class ClientManager {
         }
     }
     
-    void distributeMessage(Destination fromDest, Destination toDest, Payload payload, MessageId msgId, long expiration) { 
+    /**
+     * Distribute message to a local or remote destination.
+     * @param flags ignored for local
+     */
+    void distributeMessage(Destination fromDest, Destination toDest, Payload payload, MessageId msgId, long expiration, int flags) { 
         // check if there is a runner for it
         ClientConnectionRunner runner = getRunner(toDest);
         if (runner != null) {
@@ -204,6 +208,7 @@ class ClientManager {
                 // sender went away
                 return;
             }
+            // TODO can we just run this inline instead?
             _ctx.jobQueue().addJob(new DistributeLocal(toDest, runner, sender, fromDest, payload, msgId));
         } else {
             // remote.  w00t
@@ -217,22 +222,22 @@ class ClientManager {
             ClientMessage msg = new ClientMessage();
             msg.setDestination(toDest);
             msg.setPayload(payload);
-            msg.setReceptionInfo(null);
             msg.setSenderConfig(runner.getConfig());
             msg.setFromDestination(runner.getConfig().getDestination());
             msg.setMessageId(msgId);
             msg.setExpiration(expiration);
+            msg.setFlags(flags);
             _ctx.clientMessagePool().add(msg, true);
         }
     }
     
     private class DistributeLocal extends JobImpl {
-        private Destination _toDest;
-        private ClientConnectionRunner _to;
-        private ClientConnectionRunner _from;
-        private Destination _fromDest;
-        private Payload _payload;
-        private MessageId _msgId;
+        private final Destination _toDest;
+        private final ClientConnectionRunner _to;
+        private final ClientConnectionRunner _from;
+        private final Destination _fromDest;
+        private final Payload _payload;
+        private final MessageId _msgId;
         
         public DistributeLocal(Destination toDest, ClientConnectionRunner to, ClientConnectionRunner from, Destination fromDest, Payload payload, MessageId id) {
             super(_ctx);
@@ -433,7 +438,9 @@ class ClientManager {
         }
     }
     
+    /** @deprecated unused */
     public void renderStatusHTML(Writer out) throws IOException {
+/******
         StringBuilder buf = new StringBuilder(8*1024);
         buf.append("<u><b>Local destinations</b></u><br>");
         
@@ -479,6 +486,7 @@ class ClientManager {
         buf.append("\n<hr>\n");
         out.write(buf.toString());
         out.flush();
+******/
     }
     
     public void messageReceived(ClientMessage msg) {

@@ -22,9 +22,9 @@ import net.i2p.router.message.PayloadGarlicConfig;
 import net.i2p.util.Log;
 
 class TestJob extends JobImpl {
-    private Log _log;
-    private TunnelPool _pool;
-    private PooledTunnelCreatorConfig _cfg;
+    private final Log _log;
+    private final TunnelPool _pool;
+    private final PooledTunnelCreatorConfig _cfg;
     private boolean _found;
     private TunnelInfo _outTunnel;
     private TunnelInfo _replyTunnel;
@@ -39,9 +39,10 @@ class TestJob extends JobImpl {
     public TestJob(RouterContext ctx, PooledTunnelCreatorConfig cfg, TunnelPool pool) {
         super(ctx);
         _log = ctx.logManager().getLog(TestJob.class);
-        _pool = pool;
         _cfg = cfg;
-        if (_pool == null)
+        if (pool != null)
+            _pool = pool;
+        else
             _pool = cfg.getTunnelPool();
         if ( (_pool == null) && (_log.shouldLog(Log.ERROR)) )
             _log.error("Invalid tunnel test configuration: no pool for " + cfg, new Exception("origin"));
@@ -61,7 +62,9 @@ class TestJob extends JobImpl {
         ctx.statManager().createRateStat("tunnel.testAborted", "Tunnel test could not occur, since there weren't any tunnels to test with", "Tunnels", 
                                          RATES);
     }
+
     public String getName() { return "Test tunnel"; }
+
     public void runJob() {
         if (_pool == null)
             return;
@@ -144,6 +147,7 @@ class TestJob extends JobImpl {
             scheduleRetest();
             return;
         }
+        // can't be a singleton, the SKM modifies it
         Set encryptTags = new HashSet(1);
         encryptTags.add(encryptTag);
         // Register the single tag with the appropriate SKM
@@ -245,9 +249,10 @@ class TestJob extends JobImpl {
     }
     
     private class ReplySelector implements MessageSelector {
-        private RouterContext _context;
-        private long _id;
-        private long _expiration;
+        private final RouterContext _context;
+        private final long _id;
+        private final long _expiration;
+
         public ReplySelector(RouterContext ctx, long id, long expiration) {
             _context = ctx;
             _id = id;
@@ -256,7 +261,9 @@ class TestJob extends JobImpl {
         }
         
         public boolean continueMatching() { return !_found && _context.clock().now() < _expiration; }
+
         public long getExpiration() { return _expiration; }
+
         public boolean isMatch(I2NPMessage message) {
             if (message instanceof DeliveryStatusMessage) {
                 return ((DeliveryStatusMessage)message).getMessageId() == _id;
@@ -279,9 +286,13 @@ class TestJob extends JobImpl {
     private class OnTestReply extends JobImpl implements ReplyJob {
         private long _successTime;
         private OutNetMessage _sentMessage;
+
         public OnTestReply(RouterContext ctx) { super(ctx); }
+
         public String getName() { return "Tunnel test success"; }
+
         public void setSentMessage(OutNetMessage m) { _sentMessage = m; }
+
         public void runJob() { 
             if (_sentMessage != null)
                 getContext().messageRegistry().unregisterPending(_sentMessage);
@@ -291,6 +302,7 @@ class TestJob extends JobImpl {
                 testFailed(_successTime);
             _found = true;
         }
+
         // who cares about the details...
         public void setMessage(I2NPMessage message) {
             _successTime = getContext().clock().now() - ((DeliveryStatusMessage)message).getArrival();
@@ -309,12 +321,15 @@ class TestJob extends JobImpl {
      * Test failed (boo, hiss)
      */
     private class OnTestTimeout extends JobImpl {
-        private long _started;
+        private final long _started;
+
         public OnTestTimeout(RouterContext ctx) { 
             super(ctx); 
             _started = ctx.clock().now();
         }
+
         public String getName() { return "Tunnel test timeout"; }
+
         public void runJob() {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Timeout: found? " + _found);

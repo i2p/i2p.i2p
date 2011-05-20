@@ -27,18 +27,17 @@ button span.hide{
  <jsp:setProperty name="formhandler" property="nonce" value="<%=request.getParameter("nonce")%>" />
  <jsp:setProperty name="formhandler" property="settings" value="<%=request.getParameterMap()%>" />
  <jsp:getProperty name="formhandler" property="allMessages" />
- <div class="configure"><form action="" method="POST">
- <% String prev = System.getProperty("net.i2p.router.web.ConfigClientsHandler.nonce");
-    if (prev != null) System.setProperty("net.i2p.router.web.ConfigClientsHandler.noncePrev", prev);
-    System.setProperty("net.i2p.router.web.ConfigClientsHandler.nonce", new java.util.Random().nextLong()+""); %>
- <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigClientsHandler.nonce")%>" >
- <% /* set hidden default */ %>
- <button type="submit" name="action" value="" style="display:none" >Cancel</button>
+ <div class="configure">
+<%
+    String pageNonce = formhandler.getNewNonce();
+%>
  <h3><%=intl._("Client Configuration")%></h3><p>
  <%=intl._("The Java clients listed below are started by the router and run in the same JVM.")%>
  </p><div class="wideload">
- <p><jsp:getProperty name="clientshelper" property="form1" />
- </p><p><i><%=intl._("To change other client options, edit the file")%>
+<form action="" method="POST">
+<input type="hidden" name="nonce" value="<%=pageNonce%>" >
+<jsp:getProperty name="clientshelper" property="form1" />
+<p><i><%=intl._("To change other client options, edit the file")%>
  <%=net.i2p.router.startup.ClientAppConfig.configFile(net.i2p.I2PAppContext.getGlobalContext()).getAbsolutePath()%>.
  <%=intl._("All changes require restart to take effect.")%></i>
  </p><hr><div class="formaction">
@@ -47,9 +46,12 @@ button span.hide{
  <input type="submit" name="edit" value="<%=intl._("Add Client")%>" />
 <% } %>
  <input type="submit" name="action" value="<%=intl._("Save Client Configuration")%>" />
-</div></div>
+</div></form></div>
 
-<h3><a name="i2cp"></a><%=intl._("Advanced Client Interface Configuration")%></h3><p>
+<h3><a name="i2cp"></a><%=intl._("Advanced Client Interface Configuration")%></h3>
+<form action="" method="POST">
+<input type="hidden" name="nonce" value="<%=pageNonce%>" >
+<p>
 <b><%=intl._("External I2CP (I2P Client Protocol) Interface Configuration")%></b><br>
 <input type="radio" class="optbox" name="mode" value="1" <%=clientshelper.i2cpModeChecked(1) %> >
 <%=intl._("Enabled without SSL")%><br>
@@ -89,32 +91,41 @@ button span.hide{
 </p><hr><div class="formaction">
 <input type="submit" name="foo" value="<%=intl._("Cancel")%>" />
 <input type="submit" name="action" value="<%=intl._("Save Interface Configuration")%>" />
-</div>
+</div></form>
 
 <h3><a name="webapp"></a><%=intl._("WebApp Configuration")%></h3><p>
  <%=intl._("The Java web applications listed below are started by the webConsole client and run in the same JVM as the router. They are usually web applications accessible through the router console. They may be complete applications (e.g. i2psnark),front-ends to another client or application which must be separately enabled (e.g. susidns, i2ptunnel), or have no web interface at all (e.g. addressbook).")%>
  </p><p>
  <%=intl._("A web app may also be disabled by removing the .war file from the webapps directory; however the .war file and web app will reappear when you update your router to a newer version, so disabling the web app here is the preferred method.")%>
- </p><div class="wideload"><p>
+ </p><div class="wideload">
+<form action="" method="POST">
+<input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <jsp:getProperty name="clientshelper" property="form2" />
- </p><p>
- <i><%=intl._("All changes require restart to take effect.")%></i>
+ <p><i><%=intl._("All changes require restart to take effect.")%></i>
  </p><hr><div class="formaction">
  <input type="submit" name="action" value="<%=intl._("Save WebApp Configuration")%>" />
-</div></div>
+</div></form></div>
+
 <% if (clientshelper.showPlugins()) { %>
 <h3><a name="pconfig"></a><%=intl._("Plugin Configuration")%></h3><p>
  <%=intl._("The plugins listed below are started by the webConsole client.")%>
- </p><div class="wideload"><p>
+ </p><div class="wideload">
+<form action="" method="POST">
+<input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <jsp:getProperty name="clientshelper" property="form3" />
- </p><hr><div class="formaction">
+<hr><div class="formaction">
  <input type="submit" name="action" value="<%=intl._("Save Plugin Configuration")%>" />
-</div></div><h3><a name="plugin"></a><%=intl._("Plugin Installation")%></h3><p>
+</div></form></div>
+
+<h3><a name="plugin"></a><%=intl._("Plugin Installation")%></h3><p>
  <%=intl._("To install a plugin, enter the download URL:")%>
- </p><div class="wideload"><p>
+ </p><div class="wideload">
+<form action="" method="POST">
+<input type="hidden" name="nonce" value="<%=pageNonce%>" >
+<p>
  <input type="text" size="60" name="pluginURL" >
  </p><hr><div class="formaction">
  <input type="submit" name="action" value="<%=intl._("Install Plugin")%>" />
- </div></div>
+ </div></form></div>
 <% } %>
-</form></div></div></body></html>
+</div></div></body></html>

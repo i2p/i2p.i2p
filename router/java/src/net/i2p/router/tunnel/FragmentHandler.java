@@ -15,6 +15,7 @@ import net.i2p.data.i2np.I2NPMessageHandler;
 import net.i2p.router.RouterContext;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleByteCache;
 import net.i2p.util.SimpleTimer;
 
 /**
@@ -241,19 +242,21 @@ public class FragmentHandler {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("endpoint IV: " + Base64.encode(preV, validLength - HopProcessor.IV_LENGTH, HopProcessor.IV_LENGTH));
         
-        Hash v = _context.sha().calculateHash(preV, 0, validLength);
+        byte[] v = SimpleByteCache.acquire(Hash.HASH_LENGTH);
+        _context.sha().calculateHash(preV, 0, validLength, v, 0);
         _validateCache.release(ba);
         
-        boolean eq = DataHelper.eq(v.getData(), 0, preprocessed, offset + HopProcessor.IV_LENGTH, 4);
+        boolean eq = DataHelper.eq(v, 0, preprocessed, offset + HopProcessor.IV_LENGTH, 4);
         if (!eq) {
             if (_log.shouldLog(Log.WARN)) {
                 _log.warn("Corrupt tunnel message - verification fails: " + Base64.encode(preprocessed, offset+HopProcessor.IV_LENGTH, 4)
-                           + " != " + Base64.encode(v.getData(), 0, 4));
+                           + " != " + Base64.encode(v, 0, 4));
                 _log.warn("No matching endpoint: # pad bytes: " + (paddingEnd-(HopProcessor.IV_LENGTH+4)-1)
                            + " offset=" + offset + " length=" + length + " paddingEnd=" + paddingEnd + ' '
                            + Base64.encode(preprocessed, offset, length), new Exception("trace"));
             }
         }
+        SimpleByteCache.release(v);
         
         if (eq) {
             int excessPadding = paddingEnd - (HopProcessor.IV_LENGTH + 4 + 1);
@@ -360,10 +363,10 @@ public class FragmentHandler {
         FragmentedMessage msg = null;
         if (fragmented) {
             synchronized (_fragmentedMessages) {
-                msg = _fragmentedMessages.get(new Long(messageId));
+                msg = _fragmentedMessages.get(Long.valueOf(messageId));
                 if (msg == null) {
                     msg = new FragmentedMessage(_context);
-                    _fragmentedMessages.put(new Long(messageId), msg);
+                    _fragmentedMessages.put(Long.valueOf(messageId), msg);
                 }
             }
         } else {
@@ -377,7 +380,7 @@ public class FragmentHandler {
                 if (!ok) return -1;
                 if (msg.isComplete()) {
                     synchronized (_fragmentedMessages) {
-                        _fragmentedMessages.remove(new Long(messageId));
+                        _fragmentedMessages.remove(Long.valueOf(messageId));
                     }
                     if (msg.getExpireEvent() != null)
                         SimpleTimer.getInstance().removeEvent(msg.getExpireEvent());
@@ -432,10 +435,10 @@ public class FragmentHandler {
         
         FragmentedMessage msg = null;
         synchronized (_fragmentedMessages) {
-            msg = _fragmentedMessages.get(new Long(messageId));
+            msg = _fragmentedMessages.get(Long.valueOf(messageId));
             if (msg == null) {
                 msg = new FragmentedMessage(_context);
-                _fragmentedMessages.put(new Long(messageId), msg);
+                _fragmentedMessages.put(Long.valueOf(messageId), msg);
             }
         }
         
@@ -446,7 +449,7 @@ public class FragmentHandler {
             
             if (msg.isComplete()) {
                 synchronized (_fragmentedMessages) {
-                    _fragmentedMessages.remove(new Long(messageId));
+                    _fragmentedMessages.remove(Long.valueOf(messageId));
                 }
                 if (msg.getExpireEvent() != null)
                     SimpleTimer.getInstance().removeEvent(msg.getExpireEvent());
@@ -529,7 +532,7 @@ public class FragmentHandler {
         public void timeReached() {
             boolean removed = false;
             synchronized (_fragmentedMessages) {
-                removed = (null != _fragmentedMessages.remove(new Long(_msg.getMessageId())));
+                removed = (null != _fragmentedMessages.remove(Long.valueOf(_msg.getMessageId())));
             }
             synchronized (_msg) {
                 if (removed && !_msg.getReleased()) {

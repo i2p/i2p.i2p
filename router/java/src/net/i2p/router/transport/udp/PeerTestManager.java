@@ -153,7 +153,7 @@ class PeerTestManager {
             _log.debug("Running test with bob = " + bobIP + ":" + bobPort + " " + test.getNonce());
         while (_recentTests.size() > 16)
             _recentTests.poll();
-        _recentTests.offer(new Long(test.getNonce()));
+        _recentTests.offer(Long.valueOf(test.getNonce()));
         
         sendTestToBob();
         
@@ -432,7 +432,7 @@ class PeerTestManager {
             testInfo.readIP(testIP, 0);
         }
        
-        PeerTestState state = _activeTests.get(new Long(nonce));
+        PeerTestState state = _activeTests.get(Long.valueOf(nonce));
         
         if (state == null) {
             if ( (testIP == null) || (testPort <= 0) ) {
@@ -441,7 +441,7 @@ class PeerTestManager {
                     _log.debug("test IP/port are blank coming from " + from + ", assuming we are Bob and they are alice");
                 receiveFromAliceAsBob(from, testInfo, nonce, null);
             } else {
-                if (_recentTests.contains(new Long(nonce))) {
+                if (_recentTests.contains(Long.valueOf(nonce))) {
                     // ignore the packet, as its a holdover from a recently completed locally
                     // initiated test
                 } else {
@@ -536,7 +536,7 @@ class PeerTestManager {
                 _log.debug("Receive from bob (" + from + ") as charlie, sending back to bob and sending to alice @ " + aliceIP + ":" + alicePort);
             
             if (isNew) {
-                _activeTests.put(new Long(nonce), state);
+                _activeTests.put(Long.valueOf(nonce), state);
                 SimpleScheduler.getInstance().addEvent(new RemoveTest(nonce), MAX_CHARLIE_LIFETIME);
             }
 
@@ -615,7 +615,7 @@ class PeerTestManager {
             }
             
             if (isNew) {
-                _activeTests.put(new Long(nonce), state);
+                _activeTests.put(Long.valueOf(nonce), state);
                 SimpleScheduler.getInstance().addEvent(new RemoveTest(nonce), MAX_CHARLIE_LIFETIME);
             }
             
@@ -691,7 +691,7 @@ class PeerTestManager {
             _nonce = nonce;
         }
         public void timeReached() {
-                _activeTests.remove(new Long(_nonce));
+                _activeTests.remove(Long.valueOf(_nonce));
         }
     }
 }

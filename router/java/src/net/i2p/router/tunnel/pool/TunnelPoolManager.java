@@ -37,8 +37,8 @@ import net.i2p.util.SimpleTimer;
  * 
  */
 public class TunnelPoolManager implements TunnelManagerFacade {
-    private RouterContext _context;
-    private Log _log;
+    private final RouterContext _context;
+    private final Log _log;
     /** Hash (destination) to TunnelPool */
     private final Map<Hash, TunnelPool> _clientInboundPools;
     /** Hash (destination) to TunnelPool */
@@ -61,7 +61,6 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         _clientInboundPools = new ConcurrentHashMap(4);
         _clientOutboundPools = new ConcurrentHashMap(4);
         
-        _isShutdown = false;
         _executor = new BuildExecutor(ctx, this);
         I2PThread execThread = new I2PThread(_executor, "BuildExecutor");
         execThread.setDaemon(true);
@@ -330,7 +329,6 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     
     /** queue a recurring test job if appropriate */
     void buildComplete(PooledTunnelCreatorConfig cfg) {
-        //buildComplete();
         if (cfg.getLength() > 1 &&
             (!_context.router().gracefulShutdownInProgress()) &&
             !Boolean.valueOf(_context.getProperty("router.disableTunnelTesting")).booleanValue()) {
@@ -358,9 +356,6 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         }
     }
 
-    /** ?? */
-    void buildComplete() {}
-    
     public void startup() { 
         _isShutdown = false;
         if (!_executor.isRunning()) {

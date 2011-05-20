@@ -30,11 +30,13 @@ import net.i2p.util.Clock;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.FortunaRandomSource;
+import net.i2p.util.I2PProperties;
 import net.i2p.util.KeyRing;
 import net.i2p.util.LogManager;
 //import net.i2p.util.PooledRandomSource;
 import net.i2p.util.RandomSource;
 import net.i2p.util.SecureDirectory;
+import net.i2p.util.I2PProperties.I2PPropertyCallback;
 
 /**
  * <p>Provide a base scope for accessing singletons that I2P exposes.  Rather than
@@ -63,9 +65,9 @@ import net.i2p.util.SecureDirectory;
  */
 public class I2PAppContext {
     /** the context that components without explicit root are bound */
-    protected static I2PAppContext _globalAppContext;
+    protected static volatile I2PAppContext _globalAppContext;
     
-    private Properties _overrideProps;
+    protected I2PProperties _overrideProps;
     
     private StatManager _statManager;
     private SessionKeyManager _sessionKeyManager;
@@ -117,7 +119,8 @@ public class I2PAppContext {
      *
      */
     public static I2PAppContext getGlobalContext() { 
-        // skip the global lock
+        // skip the global lock - _gAC must be volatile
+        // http://www.cs.umd.edu/~pugh/java/memoryModel/DoubleCheckedLocking.html
         I2PAppContext rv = _globalAppContext;
         if (rv != null)
             return rv;
@@ -168,7 +171,9 @@ public class I2PAppContext {
                     _globalAppContext = this;
             }
         }
-        _overrideProps = envProps;
+        _overrideProps = new I2PProperties();
+        if (envProps != null)
+            _overrideProps.putAll(envProps);
         _statManager = null;
         _sessionKeyManager = null;
         _namingService = null;
@@ -474,6 +479,9 @@ public class I2PAppContext {
      * provided during the context construction, as well as the ones included in
      * System.getProperties.
      *
+     * WARNING - not overridden in RouterContext, doesn't contain router config settings,
+     * use getProperties() instead.
+     *
      * @return set of Strings containing the names of defined system properties
      */
     public Set getPropertyNames() { 
@@ -482,6 +490,29 @@ public class I2PAppContext {
             names.addAll(_overrideProps.keySet());
         return names;
     }
+    
+    /**
+     * Access the configuration attributes of this context, listing the properties 
+     * provided during the context construction, as well as the ones included in
+     * System.getProperties.
+     *
+     * @return new Properties with system and context properties
+     * @since 0.8.4
+     */
+    public Properties getProperties() { 
+        Properties rv = new Properties();
+        rv.putAll(System.getProperties());
+        rv.putAll(_overrideProps);
+        return rv;
+    }
+    
+    /**
+     * Add a callback, which will fire upon changes in the property
+     * given in the specific callback.
+     * Unimplemented in I2PAppContext: this only makes sense in a router context.
+     * @param callback The implementation of the callback.
+     */
+    public void addPropertyCallback(I2PPropertyCallback callback) {}
     
     /**
      * The statistics component with which we can track various events
@@ -757,7 +788,7 @@ public class I2PAppContext {
      * enable simulators to play with clock skew among different instances.
      *
      */
-    public Clock clock() { // overridden in RouterContext
+    public Clock clock() {
         if (!_clockInitialized)
             initializeClock();
         return _clock;

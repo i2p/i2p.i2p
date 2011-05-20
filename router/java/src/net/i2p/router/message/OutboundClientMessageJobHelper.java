@@ -227,9 +227,8 @@ class OutboundClientMessageJobHelper {
         clove.setExpiration(expiration);
         clove.setId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         DatabaseStoreMessage msg = new DatabaseStoreMessage(ctx);
-        msg.setLeaseSet(replyLeaseSet);
+        msg.setEntry(replyLeaseSet);
         msg.setMessageExpiration(expiration);
-        msg.setKey(replyLeaseSet.getDestination().calculateHash());
         clove.setPayload(msg);
         clove.setRecipientPublicKey(null);
         clove.setRequestAck(false);

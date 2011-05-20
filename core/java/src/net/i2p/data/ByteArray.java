@@ -24,6 +24,7 @@ public class ByteArray implements Serializable, Comparable {
     public ByteArray() {
     }
 
+    /** Sets valid */
     public ByteArray(byte[] data) {
         _data = data;
         _valid = (data != null ? data.length : 0);
@@ -38,6 +39,7 @@ public class ByteArray implements Serializable, Comparable {
         return _data;
     }
 
+    /** Warning, does not set valid */
     public void setData(byte[] data) {
         _data = data;
     }

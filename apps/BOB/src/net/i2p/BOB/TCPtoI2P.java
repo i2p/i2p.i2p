@@ -36,7 +36,8 @@ import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.Destination;
-import net.i2p.i2ptunnel.I2PTunnel;
+//import net.i2p.i2ptunnel.I2PTunnel;
+import net.i2p.I2PAppContext;
 
 /**
  *
@@ -146,11 +147,11 @@ public class TCPtoI2P implements Runnable {
 				input = line.toLowerCase();
 				Destination dest = null;
 				if (input.endsWith(".i2p")) {
-					try {
-						dest = I2PTunnel.destFromName(input);
+					//dest = I2PTunnel.destFromName(input);
+					dest = I2PAppContext.getGlobalContext().namingService().lookup(input);
+					if (dest != null) {
 						line = dest.toBase64();
-					} catch (NullPointerException npe) {
-						// Could not find the destination!?
+					} else {
 						Emsg("Can't find destination: " + input, out);
 						return;
 					}

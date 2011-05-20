@@ -122,24 +122,24 @@ public class FileUtil {
                         }
                     }
                 } else {
+                    InputStream in = null;
+                    FileOutputStream fos = null;
+                    JarOutputStream jos = null;
                     try {
-                        InputStream in = zip.getInputStream(entry);
+                        in = zip.getInputStream(entry);
                         if (entry.getName().endsWith(".jar.pack") || entry.getName().endsWith(".war.pack")) {
                             target = new File(targetDir, entry.getName().substring(0, entry.getName().length() - ".pack".length()));
-                            JarOutputStream fos = new JarOutputStream(new FileOutputStream(target));
-                            unpack(in, fos);
-                            fos.close();
+                            jos = new JarOutputStream(new FileOutputStream(target));
+                            unpack(in, jos);
                             System.err.println("INFO: File [" + entry.getName() + "] extracted and unpacked");
                         } else {
-                            FileOutputStream fos = new FileOutputStream(target);
+                            fos = new FileOutputStream(target);
                             int read = 0;
                             while ( (read = in.read(buf)) != -1) {
                                 fos.write(buf, 0, read);
                             }
-                            fos.close();
                             System.err.println("INFO: File [" + entry.getName() + "] extracted");
                         }
-                        in.close();
                     } catch (IOException ioe) {
                         System.err.println("ERROR: Error extracting the zip entry (" + entry.getName() + ')');
                         if (ioe.getMessage() != null && ioe.getMessage().indexOf("CAFED00D") >= 0)
@@ -151,6 +151,10 @@ public class FileUtil {
                         System.err.println("ERROR: Error unpacking the zip entry (" + entry.getName() +
                                            "), your JVM does not support unpack200");
                         return false;
+                    } finally {
+                        try { if (in != null) in.close(); } catch (IOException ioe) {}
+                        try { if (fos != null) fos.close(); } catch (IOException ioe) {}
+                        try { if (jos != null) jos.close(); } catch (IOException ioe) {}
                     }
                 }
             }
@@ -353,6 +357,9 @@ public class FileUtil {
      * Dump the contents of the given path (relative to the root) to the output 
      * stream.  The path must not go above the root, either - if it does, it will
      * throw a FileNotFoundException
+     *
+     * Closes the OutputStream out on successful completion
+     * but leaves it open when throwing IOE.
      */
     public static void readFile(String path, String root, OutputStream out) throws IOException {
         File rootDir = new File(root);
@@ -372,10 +379,10 @@ public class FileUtil {
             int read = 0;
             while ( (read = in.read(buf)) != -1) 
                 out.write(buf, 0, read);
-            out.close();
+            try { out.close(); } catch (IOException ioe) {}
         } finally {
             if (in != null) 
-                in.close();
+                try { in.close(); } catch (IOException ioe) {}
         }
     }
 
@@ -401,21 +408,24 @@ public class FileUtil {
         if (dst.exists() && !overwriteExisting) return false;
         
         byte buf[] = new byte[4096];
+        InputStream in = null;
+        OutputStream out = null;
         try {
-            FileInputStream in = new FileInputStream(src);
-            FileOutputStream out = new FileOutputStream(dst);
+            in = new FileInputStream(src);
+            out = new FileOutputStream(dst);
             
             int read = 0;
             while ( (read = in.read(buf)) != -1)
                 out.write(buf, 0, read);
             
-            in.close();
-            out.close();
             return true;
         } catch (IOException ioe) {
             if (!quiet)
                 ioe.printStackTrace();
             return false;
+        } finally {
+            try { if (in != null) in.close(); } catch (IOException ioe) {}
+            try { if (out != null) out.close(); } catch (IOException ioe) {}
         }
     }
     

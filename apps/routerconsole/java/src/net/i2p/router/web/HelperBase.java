@@ -63,7 +63,7 @@ public abstract class HelperBase {
     }
 
     /** translate (ngettext) @since 0.7.14 */
-    public String _(int n, String s, String p) {
+    public String ngettext(String s, String p, int n) {
         return Messages.getString(n, s, p, _context);
     }
 

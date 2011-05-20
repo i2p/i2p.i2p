@@ -3,6 +3,7 @@ package net.i2p.stat;
 import java.io.IOException;
 import java.util.Properties;
 
+import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
 /**
@@ -399,42 +400,41 @@ public class Rate {
     }
 
     public void store(String prefix, StringBuilder buf) throws IOException {
-        PersistenceHelper.add(buf, prefix, ".period", "Number of milliseconds in the period", _period);
-        PersistenceHelper.add(buf, prefix, ".creationDate",
-                              "When was this rate created?  (milliseconds since the epoch, GMT)", _creationDate);
-        PersistenceHelper.add(buf, prefix, ".lastCoalesceDate",
-                              "When did we last coalesce this rate?  (milliseconds since the epoch, GMT)",
+        PersistenceHelper.addTime(buf, prefix, ".period", "Length of the period:", _period);
+        PersistenceHelper.addDate(buf, prefix, ".creationDate",
+                              "When was this rate created?", _creationDate);
+        PersistenceHelper.addDate(buf, prefix, ".lastCoalesceDate",
+                              "When did we last coalesce this rate?",
                               _lastCoalesceDate);
-        PersistenceHelper.add(buf, prefix, ".currentDate",
-                              "When did this data get written?  (milliseconds since the epoch, GMT)", now());
+        PersistenceHelper.addDate(buf, prefix, ".currentDate",
+                              "When was this data written?", now());
         PersistenceHelper.add(buf, prefix, ".currentTotalValue",
                               "Total value of data points in the current (uncoalesced) period", _currentTotalValue);
-        PersistenceHelper
-                         .add(buf, prefix, ".currentEventCount",
+        PersistenceHelper.add(buf, prefix, ".currentEventCount",
                               "How many events have occurred in the current (uncoalesced) period?", _currentEventCount);
-        PersistenceHelper.add(buf, prefix, ".currentTotalEventTime",
-                              "How many milliseconds have the events in the current (uncoalesced) period consumed?",
+        PersistenceHelper.addTime(buf, prefix, ".currentTotalEventTime",
+                              "How much time have the events in the current (uncoalesced) period consumed?",
                               _currentTotalEventTime);
         PersistenceHelper.add(buf, prefix, ".lastTotalValue",
                               "Total value of data points in the most recent (coalesced) period", _lastTotalValue);
         PersistenceHelper.add(buf, prefix, ".lastEventCount",
                               "How many events have occurred in the most recent (coalesced) period?", _lastEventCount);
-        PersistenceHelper.add(buf, prefix, ".lastTotalEventTime",
-                              "How many milliseconds have the events in the most recent (coalesced) period consumed?",
+        PersistenceHelper.addTime(buf, prefix, ".lastTotalEventTime",
+                              "How much time have the events in the most recent (coalesced) period consumed?",
                               _lastTotalEventTime);
         PersistenceHelper.add(buf, prefix, ".extremeTotalValue",
                               "Total value of data points in the most extreme period", _extremeTotalValue);
         PersistenceHelper.add(buf, prefix, ".extremeEventCount",
                               "How many events have occurred in the most extreme period?", _extremeEventCount);
-        PersistenceHelper.add(buf, prefix, ".extremeTotalEventTime",
-                              "How many milliseconds have the events in the most extreme period consumed?",
+        PersistenceHelper.addTime(buf, prefix, ".extremeTotalEventTime",
+                              "How much time have the events in the most extreme period consumed?",
                               _extremeTotalEventTime);
         PersistenceHelper.add(buf, prefix, ".lifetimeTotalValue",
                               "Total value of data points since this stat was created", _lifetimeTotalValue);
         PersistenceHelper.add(buf, prefix, ".lifetimeEventCount",
                               "How many events have occurred since this stat was created?", _lifetimeEventCount);
-        PersistenceHelper.add(buf, prefix, ".lifetimeTotalEventTime",
-                              "How many milliseconds have the events since this stat was created consumed?",
+        PersistenceHelper.addTime(buf, prefix, ".lifetimeTotalEventTime",
+                              "How much total time was consumed by the events since this stat was created?",
                               _lifetimeTotalEventTime);
     }
 
@@ -471,48 +471,28 @@ public class Rate {
         coalesce();
     }
 
+    /**
+     * This is used in StatSummarizer and SummaryListener.
+     * We base it on the stat we are tracking, not the stored data.
+     */
     @Override
     public boolean equals(Object obj) {
-        if ((obj == null) || (obj.getClass() != Rate.class)) return false;
+        if ((obj == null) || !(obj instanceof Rate)) return false;
         if (obj == this) return true;
         Rate r = (Rate) obj;
         return _period == r.getPeriod() && _creationDate == r.getCreationDate() &&
-        //_lastCoalesceDate == r.getLastCoalesceDate() &&
-               _currentTotalValue == r.getCurrentTotalValue() && _currentEventCount == r.getCurrentEventCount()
-               && _currentTotalEventTime == r.getCurrentTotalEventTime() && _lastTotalValue == r.getLastTotalValue()
-               && _lastEventCount == r.getLastEventCount() && _lastTotalEventTime == r.getLastTotalEventTime()
-               && _extremeTotalValue == r.getExtremeTotalValue() && _extremeEventCount == r.getExtremeEventCount()
-               && _extremeTotalEventTime == r.getExtremeTotalEventTime()
-               && _lifetimeTotalValue == r.getLifetimeTotalValue() && _lifetimeEventCount == r.getLifetimeEventCount()
-               && _lifetimeTotalEventTime == r.getLifetimeTotalEventTime();
+               // do this the easy way to avoid NPEs.
+               // Alternative: compare name and group name (very carefully to avoid NPEs)
+               _stat == r._stat;
     }
 
     /**
      * It doesn't appear that Rates are ever stored in a Set or Map
      * (RateStat stores in an array) so let's make this easy.
-     * We can always make something faster if it's actually used.
      */
     @Override
     public int hashCode() {
-/*****
-        int hash = 5;
-        hash = 67 * hash + (int)(Double.doubleToLongBits(this._currentTotalValue) ^ (Double.doubleToLongBits(this._currentTotalValue) >>> 32));
-        hash = 67 * hash + (int)(this._currentEventCount ^ (this._currentEventCount >>> 32));
-        hash = 67 * hash + (int)(this._currentTotalEventTime ^ (this._currentTotalEventTime >>> 32));
-        hash = 67 * hash + (int)(Double.doubleToLongBits(this._lastTotalValue) ^ (Double.doubleToLongBits(this._lastTotalValue) >>> 32));
-        hash = 67 * hash + (int)(this._lastEventCount ^ (this._lastEventCount >>> 32));
-        hash = 67 * hash + (int)(this._lastTotalEventTime ^ (this._lastTotalEventTime >>> 32));
-        hash = 67 * hash + (int)(Double.doubleToLongBits(this._extremeTotalValue) ^ (Double.doubleToLongBits(this._extremeTotalValue) >>> 32));
-        hash = 67 * hash + (int)(this._extremeEventCount ^ (this._extremeEventCount >>> 32));
-        hash = 67 * hash + (int)(this._extremeTotalEventTime ^ (this._extremeTotalEventTime >>> 32));
-        hash = 67 * hash + (int)(Double.doubleToLongBits(this._lifetimeTotalValue) ^ (Double.doubleToLongBits(this._lifetimeTotalValue) >>> 32));
-        hash = 67 * hash + (int)(this._lifetimeEventCount ^ (this._lifetimeEventCount >>> 32));
-        hash = 67 * hash + (int)(this._lifetimeTotalEventTime ^ (this._lifetimeTotalEventTime >>> 32));
-        hash = 67 * hash + (int)(this._creationDate ^ (this._creationDate >>> 32));
-        hash = 67 * hash + (int)(this._period ^ (this._period >>> 32));
-        return hash;
-******/
-        return toString().hashCode();
+        return DataHelper.hashCode(_stat) ^ ((int)_period) ^ ((int) _creationDate);
     }
 
     @Override

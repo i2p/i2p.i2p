@@ -42,6 +42,7 @@ class KBucketSet {
         _context = context;
         _log = context.logManager().getLog(KBucketSet.class);
         createBuckets();
+        context.statManager().createRateStat("netDb.KBSGetAllTime", "Time to add all Hashes to the Collector", "NetworkDatabase", new long[] { 60*60*1000 });
     }
     
     /**
@@ -99,8 +100,10 @@ class KBucketSet {
     }
     
     public void getAll(SelectionCollector collector) {
+        long start = _context.clock().now();
         for (int i = 0; i < _buckets.length; i++)
             _buckets[i].getEntries(collector);
+        _context.statManager().addRateData("netDb.KBSGetAllTime", _context.clock().now() - start, 0);
     }
     
     public int pickBucket(Hash key) {

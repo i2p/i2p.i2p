@@ -43,13 +43,13 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
@@ -99,7 +99,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
     private final List tasks = new ArrayList();
     private int next_task_id = 1;
 
-    private final Set listeners = new HashSet();
+    private final Set listeners = new CopyOnWriteArraySet();
 
     public static void main(String[] args) throws IOException {
         new I2PTunnel(args);
@@ -118,8 +118,8 @@ public class I2PTunnel implements Logging, EventDispatcher {
         _tunnelId = ++__tunnelId;
         _log = _context.logManager().getLog(I2PTunnel.class);
         _event = new EventDispatcherImpl();
-        Properties p = new Properties();
-        p.putAll(System.getProperties());
+        // as of 0.8.4, include context properties
+        Properties p = _context.getProperties();
         _clientOptions = p;
         _sessions = new ArrayList(1);
         
@@ -1626,16 +1626,12 @@ public class I2PTunnel implements Logging, EventDispatcher {
 
     public void addConnectionEventListener(ConnectionEventListener lsnr) {
         if (lsnr == null) return;
-        synchronized (listeners) {
-            listeners.add(lsnr);
-        }
+        listeners.add(lsnr);
     }
 
     public void removeConnectionEventListener(ConnectionEventListener lsnr) {
         if (lsnr == null) return;
-        synchronized (listeners) {
-            listeners.remove(lsnr);
-        }
+        listeners.remove(lsnr);
     }
     
     private String getPrefix() { return "[" + _tunnelId + "]: "; }
@@ -1649,12 +1645,10 @@ public class I2PTunnel implements Logging, EventDispatcher {
      */
     void routerDisconnected() {
         _log.error(getPrefix() + "Router disconnected - firing notification events");
-        synchronized (listeners) {
             for (Iterator iter = listeners.iterator(); iter.hasNext();) {
                 ConnectionEventListener lsnr = (ConnectionEventListener) iter.next();
                 if (lsnr != null) lsnr.routerDisconnected();
             }
-        }
     }
 
     /**

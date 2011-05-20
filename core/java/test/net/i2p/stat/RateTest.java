@@ -1,5 +1,6 @@
 package net.i2p.stat;
 
+import java.io.ByteArrayInputStream;
 import java.util.Properties;
 
 import junit.framework.TestCase;
@@ -7,7 +8,7 @@ import junit.framework.TestCase;
 
 public class RateTest extends TestCase {
     public void testRate() throws Exception{
-        Rate rate = new Rate(1000);
+        Rate rate = new Rate(5000);
         for (int i = 0; i < 50; i++) {
             Thread.sleep(20);
             rate.addData(i * 100, 20);
@@ -19,7 +20,7 @@ public class RateTest extends TestCase {
         byte data[] = buf.toString().getBytes();
 
         Properties props = new Properties();
-        props.load(new java.io.ByteArrayInputStream(data));
+        props.load(new ByteArrayInputStream(data));
 
         Rate r = new Rate(props, "rate.test", true);
 

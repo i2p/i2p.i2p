@@ -24,7 +24,7 @@ public class RouterClock extends Clock {
      *  All of this is @since 0.7.12
      */
     private static final long MAX_SLEW = 50;
-    private static final int DEFAULT_STRATUM = 8;
+    public static final int DEFAULT_STRATUM = 8;
     private static final int WORST_STRATUM = 16;
     /** the max NTP Timestamper delay is 30m right now, make this longer than that */
     private static final long MIN_DELAY_FOR_WORSE_STRATUM = 45*60*1000;
@@ -34,7 +34,7 @@ public class RouterClock extends Clock {
     private long _lastChanged;
     private int _lastStratum;
 
-    RouterContext _contextRC; // LINT field hides another field
+    private final RouterContext _contextRC;
 
     public RouterClock(RouterContext context) {
         super(context);
@@ -44,20 +44,27 @@ public class RouterClock extends Clock {
 
     /**
      * Specify how far away from the "correct" time the computer is - a positive
-     * value means that we are slow, while a negative value means we are fast.
+     * value means that the system time is slow, while a negative value means the system time is fast.
      *
+     * @param offsetMs the delta from System.currentTimeMillis() (NOT the delta from now())
      */
     @Override
     public void setOffset(long offsetMs, boolean force) {
          setOffset(offsetMs, force, DEFAULT_STRATUM);
     }
 
-    /** @since 0.7.12 */
+    /**
+     * @since 0.7.12
+     * @param offsetMs the delta from System.currentTimeMillis() (NOT the delta from now())
+     */
     private void setOffset(long offsetMs, int stratum) {
          setOffset(offsetMs, false, stratum);
     }
 
-    /** @since 0.7.12 */
+    /**
+     * @since 0.7.12
+     * @param offsetMs the delta from System.currentTimeMillis() (NOT the delta from now())
+     */
     private void setOffset(long offsetMs, boolean force, int stratum) {
         long delta = offsetMs - _offset;
         if (!force) {
@@ -91,7 +98,7 @@ public class RouterClock extends Clock {
             }
             
             // If so configured, check sanity of proposed clock offset
-            if (Boolean.valueOf(_contextRC.getProperty("router.clockOffsetSanityCheck","true")).booleanValue() &&
+            if (_contextRC.getBooleanPropertyDefaultTrue("router.clockOffsetSanityCheck") &&
                 _alreadyChanged) {
 
                 // Try calculating peer clock skew
@@ -192,6 +199,7 @@ public class RouterClock extends Clock {
     /*
      *  How far we still have to slew, for diagnostics
      *  @since 0.7.12
+     *  @deprecated for debugging only
      */
     public long getDeltaOffset() {
         return _desiredOffset - _offset;

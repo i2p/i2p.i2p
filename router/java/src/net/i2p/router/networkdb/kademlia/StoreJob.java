@@ -13,7 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import net.i2p.data.DataStructure;
+import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterInfo;
@@ -61,7 +61,7 @@ class StoreJob extends JobImpl {
      * 
      */
     public StoreJob(RouterContext context, KademliaNetworkDatabaseFacade facade, Hash key, 
-                    DataStructure data, Job onSuccess, Job onFailure, long timeoutMs) {
+                    DatabaseEntry data, Job onSuccess, Job onFailure, long timeoutMs) {
         this(context, facade, key, data, onSuccess, onFailure, timeoutMs, null);
     }
     
@@ -70,7 +70,7 @@ class StoreJob extends JobImpl {
      *               already know they have it).  This can be null.
      */
     public StoreJob(RouterContext context, KademliaNetworkDatabaseFacade facade, Hash key, 
-                    DataStructure data, Job onSuccess, Job onFailure, long timeoutMs, Set<Hash> toSkip) {
+                    DatabaseEntry data, Job onSuccess, Job onFailure, long timeoutMs, Set<Hash> toSkip) {
         super(context);
         _log = context.logManager().getLog(StoreJob.class);
         _facade = facade;
@@ -167,8 +167,8 @@ class StoreJob extends JobImpl {
                 _log.info(getJobId() + ": Continue sending key " + _state.getTarget() + " after " + _state.getAttempted().size() + " tries to " + closestHashes);
             for (Iterator<Hash> iter = closestHashes.iterator(); iter.hasNext(); ) {
                 Hash peer = iter.next();
-                DataStructure ds = _facade.getDataStore().get(peer);
-                if ( (ds == null) || !(ds instanceof RouterInfo) ) {
+                DatabaseEntry ds = _facade.getDataStore().get(peer);
+                if ( (ds == null) || !(ds.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) ) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info(getJobId() + ": Error selecting closest hash that wasnt a router! " + peer + " : " + ds);
                     _state.addSkipped(peer);
@@ -255,16 +255,19 @@ class StoreJob extends JobImpl {
      *
      */
     private void sendStore(RouterInfo router, int responseTime) {
+        if (!_state.getTarget().equals(_state.getData().getHash())) {
+            _log.error("Hash mismatch StoreJob");
+            return;
+        }
         DatabaseStoreMessage msg = new DatabaseStoreMessage(getContext());
-        msg.setKey(_state.getTarget());
-        if (_state.getData() instanceof RouterInfo) {
-            msg.setRouterInfo((RouterInfo)_state.getData());
+        if (_state.getData().getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
             if (responseTime > MAX_DIRECT_EXPIRATION)
                 responseTime = MAX_DIRECT_EXPIRATION;
-        } else if (_state.getData() instanceof LeaseSet) 
-            msg.setLeaseSet((LeaseSet)_state.getData());
-        else
+        } else if (_state.getData().getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
+        } else {
             throw new IllegalArgumentException("Storing an unknown data type! " + _state.getData());
+        }
+        msg.setEntry(_state.getData());
         msg.setMessageExpiration(getContext().clock().now() + _timeoutMs);
 
         if (router.getIdentity().equals(getContext().router().getRouterInfo().getIdentity())) {
@@ -286,7 +289,7 @@ class StoreJob extends JobImpl {
      *
      */
     private void sendStore(DatabaseStoreMessage msg, RouterInfo peer, long expiration) {
-        if (msg.getValueType() == DatabaseStoreMessage.KEY_TYPE_LEASESET) {
+        if (msg.getEntry().getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
             getContext().statManager().addRateData("netDb.storeLeaseSetSent", 1, 0);
             // if it is an encrypted leaseset...
             if (getContext().keyRing().get(msg.getKey()) != null)
@@ -440,7 +443,6 @@ class StoreJob extends JobImpl {
                 sent = wm.getMessage();
                 _state.addPending(to, wm);
             } else {
-                sent = msg;
                 _state.addPending(to);
                 // now that almost all floodfills are at 0.7.10,
                 // just refuse to store unencrypted to older ones.

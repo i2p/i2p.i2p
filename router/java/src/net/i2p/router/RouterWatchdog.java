@@ -12,8 +12,8 @@ import net.i2p.util.Log;
  *
  */
 class RouterWatchdog implements Runnable {
-    private Log _log;
-    private RouterContext _context;
+    private final Log _log;
+    private final RouterContext _context;
     private int _consecutiveErrors;
     
     private static final long MAX_JOB_RUN_LAG = 60*1000;

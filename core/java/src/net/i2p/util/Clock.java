@@ -1,8 +1,8 @@
 package net.i2p.util;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import net.i2p.I2PAppContext;
 import net.i2p.time.Timestamper;
@@ -19,19 +19,19 @@ import net.i2p.time.Timestamper;
  *
  */
 public class Clock implements Timestamper.UpdateListener {
-    protected I2PAppContext _context;
-    private Timestamper _timestamper;
-    protected long _startedOn;
+    protected final I2PAppContext _context;
+    private final Timestamper _timestamper;
+    protected final long _startedOn;
     protected boolean _statCreated;
+    protected volatile long _offset;
+    protected boolean _alreadyChanged;
+    private final Set _listeners;
     
     public Clock(I2PAppContext context) {
         _context = context;
-        _offset = 0;
-        _alreadyChanged = false;
-        _listeners = new HashSet(1);
+        _listeners = new CopyOnWriteArraySet();
         _timestamper = new Timestamper(context, this);
         _startedOn = System.currentTimeMillis();
-        _statCreated = false;
     }
     public static Clock getInstance() {
         return I2PAppContext.getGlobalContext().clock();
@@ -41,10 +41,6 @@ public class Clock implements Timestamper.UpdateListener {
     
     /** we fetch it on demand to avoid circular dependencies (logging uses the clock) */
     protected Log getLog() { return _context.logManager().getLog(Clock.class); }
-    
-    protected volatile long _offset;
-    protected boolean _alreadyChanged;
-    private final Set _listeners;
 
     /** if the clock is skewed by 3+ days, fuck 'em */
     public final static long MAX_OFFSET = 3 * 24 * 60 * 60 * 1000;
@@ -53,14 +49,22 @@ public class Clock implements Timestamper.UpdateListener {
     /** if the clock skewed changes by less than this, ignore the update (so we don't slide all over the place) */
     public final static long MIN_OFFSET_CHANGE = 5 * 1000;
 
+    /**
+     * Specify how far away from the "correct" time the computer is - a positive
+     * value means that the system time is slow, while a negative value means the system time is fast.
+     *
+     * @param offsetMs the delta from System.currentTimeMillis() (NOT the delta from now())
+     */
     public void setOffset(long offsetMs) {
         setOffset(offsetMs, false);        
     }
     
     /**
      * Specify how far away from the "correct" time the computer is - a positive
-     * value means that we are slow, while a negative value means we are fast.
+     * value means that the system time is slow, while a negative value means the system time is fast.
      * Warning - overridden in RouterClock
+     *
+     * @param offsetMs the delta from System.currentTimeMillis() (NOT the delta from now())
      */
     public void setOffset(long offsetMs, boolean force) {
         if (false) return;
@@ -105,6 +109,9 @@ public class Clock implements Timestamper.UpdateListener {
         fireOffsetChanged(delta);
     }
 
+    /*
+     * @return the current delta from System.currentTimeMillis() in milliseconds
+     */
     public long getOffset() {
         return _offset;
     }
@@ -136,24 +143,18 @@ public class Clock implements Timestamper.UpdateListener {
     }
 
     public void addUpdateListener(ClockUpdateListener lsnr) {
-        synchronized (_listeners) {
             _listeners.add(lsnr);
-        }
     }
 
     public void removeUpdateListener(ClockUpdateListener lsnr) {
-        synchronized (_listeners) {
             _listeners.remove(lsnr);
-        }
     }
 
     protected void fireOffsetChanged(long delta) {
-        synchronized (_listeners) {
             for (Iterator iter = _listeners.iterator(); iter.hasNext();) {
                 ClockUpdateListener lsnr = (ClockUpdateListener) iter.next();
                 lsnr.offsetChanged(delta);
             }
-        }
     }
 
     public static interface ClockUpdateListener {

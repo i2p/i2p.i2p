@@ -23,10 +23,9 @@ import net.i2p.data.RouterInfo;
 import net.i2p.router.PeerSelectionCriteria;
 import net.i2p.router.RouterContext;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
-import net.i2p.util.Log;
-import net.i2p.util.SimpleScheduler;
-import net.i2p.util.SimpleTimer;
 import net.i2p.util.ConcurrentHashSet;
+import net.i2p.util.Log;
+import net.i2p.util.SimpleTimer2;
 
 /**
  * Manage the current state of the statistics
@@ -43,12 +42,15 @@ import net.i2p.util.ConcurrentHashSet;
  *
  */
 class PeerManager {
-    private Log _log;
-    private RouterContext _context;
-    private ProfileOrganizer _organizer;
-    private ProfilePersistenceHelper _persistenceHelper;
-    private Set<Hash> _peersByCapability[];
+    private final Log _log;
+    private final RouterContext _context;
+    private final ProfileOrganizer _organizer;
+    private final ProfilePersistenceHelper _persistenceHelper;
+    private final Set<Hash> _peersByCapability[];
     private final Map<Hash, String> _capabilitiesByPeer;
+    private static final long REORGANIZE_TIME = 45*1000;
+    private static final long REORGANIZE_TIME_MEDIUM = 123*1000;
+    private static final long REORGANIZE_TIME_LONG = 551*1000;
     
     public PeerManager(RouterContext context) {
         _context = context;
@@ -62,17 +64,30 @@ class PeerManager {
             _peersByCapability[i] = new ConcurrentHashSet();
         loadProfiles();
         ////_context.jobQueue().addJob(new EvaluateProfilesJob(_context));
-        SimpleScheduler.getInstance().addPeriodicEvent(new Reorg(), 0, 45*1000);
+        //SimpleScheduler.getInstance().addPeriodicEvent(new Reorg(), 0, REORGANIZE_TIME);
+        new Reorg();
         //_context.jobQueue().addJob(new PersistProfilesJob(_context, this));
     }
     
-    private class Reorg implements SimpleTimer.TimedEvent {
+    private class Reorg extends SimpleTimer2.TimedEvent {
+        public Reorg() {
+            super(SimpleTimer2.getInstance(), REORGANIZE_TIME);
+        }
         public void timeReached() {
             try {
                 _organizer.reorganize(true);
             } catch (Throwable t) {
                 _log.log(Log.CRIT, "Error evaluating profiles", t);
             }
+            long uptime = _context.router().getUptime();
+            long delay;
+            if (uptime > 2*60*60*1000)
+                delay = REORGANIZE_TIME_LONG;
+            else if (uptime > 10*60*1000)
+                delay = REORGANIZE_TIME_MEDIUM;
+            else
+                delay = REORGANIZE_TIME;
+            schedule(delay);
         }
     }
     
@@ -115,6 +130,7 @@ class PeerManager {
      */
     List<Hash> selectPeers(PeerSelectionCriteria criteria) {
         Set<Hash> peers = new HashSet(criteria.getMinimumRequired());
+        // not a singleton, SANFP adds to it
         Set<Hash> exclude = new HashSet(1);
         exclude.add(_context.routerHash());
         switch (criteria.getPurpose()) {

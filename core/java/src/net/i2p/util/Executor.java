@@ -5,10 +5,10 @@ import java.util.List;
 import net.i2p.I2PAppContext;
 
 class Executor implements Runnable {
-    private I2PAppContext _context;
+    private final I2PAppContext _context;
     private Log _log;
     private final List _readyEvents;
-    private SimpleStore runn;
+    private final SimpleStore runn;
 
     public Executor(I2PAppContext ctx, Log log, List events, SimpleStore x) {
         _context = ctx;
@@ -31,9 +31,10 @@ class Executor implements Runnable {
                 try {
                     evt.timeReached();
                 } catch (Throwable t) {
-                    log("wtf, event borked: " + evt, t);
+                    log("Executing task " + evt + " exited unexpectedly, please report", t);
                 }
                 long time = _context.clock().now() - before;
+                // FIXME _log won't be non-null unless we already had a CRIT
                 if ( (time > 1000) && (_log != null) && (_log.shouldLog(Log.WARN)) )
                     _log.warn("wtf, event execution took " + time + ": " + evt);
             }

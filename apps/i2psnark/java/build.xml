@@ -30,18 +30,41 @@
             srcdir="./src" 
             debug="true" deprecation="on" source="1.5" target="1.5" 
             destdir="./build/obj" 
+            includeAntRuntime="false"
             classpath="../../../core/java/build/i2p.jar:../../jetty/jettylib/org.mortbay.jetty.jar:../../jetty/jettylib/javax.servlet.jar:../../ministreaming/java/build/mstreaming.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
-    <target name="jar" depends="builddep, compile">
+
+    <target name="jar" depends="builddep, compile, jarUpToDate" unless="jar.uptodate" >
+        <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="list" />
+            <arg value="changed" />
+            <arg value=".." />
+        </exec>
+        <!-- \n in an attribute value generates an invalid manifest -->
+        <exec executable="tr" inputstring="${workspace.changes}" outputproperty="workspace.changes.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
+            <arg value="-s" />
+            <arg value="[:space:]" />
+            <arg value="," />
+        </exec>
         <jar destfile="./build/i2psnark.jar" basedir="./build/obj" includes="**/*.class" excludes="**/I2PSnarkServlet*.class **/messages_*.class">
             <manifest>
                 <attribute name="Main-Class" value="org.klomp.snark.Snark" />
                 <attribute name="Class-Path" value="i2p.jar mstreaming.jar streaming.jar" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
             </manifest>
         </jar>
     </target>    
+    
+    <target name="jarUpToDate">
+        <uptodate property="jar.uptodate" targetfile="build/i2psnark.jar" >
+            <srcfiles dir= "build/obj" includes="**/*.class" excludes="**/I2PSnarkServlet*.class **/messages_*.class" />
+        </uptodate>
+    </target>    
+
     <!-- Ideally we would include
       -  only include the servlet, everything else is in the jar.
       -  However, the wrapper.config classpath in existing installs
@@ -49,25 +72,36 @@
       -  So we must continue to duplicate everything in the war.
           <classes dir="./build/obj" includes="**/I2PSnarkServlet*.class" />
      -->
-    <target name="war" depends="jar, bundle"> 
+    <target name="war" depends="jar, bundle, warUpToDate" unless="war.uptodate" > 
         <war destfile="../i2psnark.war" webxml="../web.xml" basedir="../" includes="_icons/*" >
           <!-- include only the web stuff, as of 0.7.12 the router will add i2psnark.jar to the classpath for the war -->
           <classes dir="./build/obj" includes="**/web/*.class" />
+            <manifest>
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+            </manifest>
         </war>
+    </target>
+    
+    <target name="warUpToDate">
+        <uptodate property="war.uptodate" targetfile="../i2psnark.war" >
+            <srcfiles dir= "." includes="build/obj/org/klomp/snark/web/*.class ../_icons/* ../web.xml" />
+        </uptodate>
     </target>
     
     <target name="bundle" depends="compile">
         <!-- Update the messages_*.po files.
              We need to supply the bat file for windows, and then change the fail property to true -->
-        <exec executable="sh" osfamily="unix" failifexecutionfails="false" >
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" >
             <arg value="./bundle-messages.sh" />
         </exec>
-        <exec executable="sh" osfamily="mac" failifexecutionfails="false" >
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" >
             <arg value="./bundle-messages.sh" />
         </exec>
-        <exec executable="cmd" osfamily="windows" failifexecutionfails="false" >
-            <arg value="/c" />
-            <arg value="bundle-messages.bat" />
+		<!-- multi-lang is optional -->
+        <exec executable="sh" osfamily="windows" failifexecutionfails="false" >
+            <arg value="./bundle-messages.sh" />
         </exec>
     </target>
 
@@ -81,9 +115,8 @@
             <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>
-        <exec executable="cmd" osfamily="windows" failifexecutionfails="true" >
-            <arg value="/c" />
-            <arg value="bundle-messages.bat" />
+        <exec executable="sh" osfamily="windows" failifexecutionfails="true" >
+            <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>
     </target>

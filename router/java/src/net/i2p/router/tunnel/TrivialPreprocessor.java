@@ -52,91 +52,10 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
      * NOTE: Unused here, see BatchedPreprocessor override, super is not called.
      */
     public boolean preprocessQueue(List<TunnelGateway.Pending> pending, TunnelGateway.Sender sender, TunnelGateway.Receiver rec) {
-        if (true) throw new IllegalArgumentException("unused, right?");
-        long begin = System.currentTimeMillis();
-        StringBuilder buf = null;
-        if (_log.shouldLog(Log.DEBUG)) {
-            buf = new StringBuilder(256);
-            buf.append("Trivial preprocessing of ").append(pending.size()).append(" ");
-        }
-        while (!pending.isEmpty()) {
-            TunnelGateway.Pending msg = pending.remove(0);
-            long beforePreproc = System.currentTimeMillis();
-            byte preprocessed[][] = preprocess(msg);
-            long afterPreproc = System.currentTimeMillis();
-            if (buf != null)
-                buf.append("preprocessed into " + preprocessed.length + " fragments after " + (afterPreproc-beforePreproc) + ". ");
-            for (int i = 0; i < preprocessed.length; i++) {
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Preprocessed: fragment " + i + "/" + (preprocessed.length-1) + " in " 
-                               + msg.getMessageId() + ": "
-                               + " send through " + sender + " receive with " + rec);
-                               //Base64.encode(preprocessed[i]));
-                long beforeSend = System.currentTimeMillis();
-                long id = sender.sendPreprocessed(preprocessed[i], rec);
-                long afterSend = System.currentTimeMillis();
-                if (buf != null)
-                    buf.append("send of " + msg.getMessageId() + " took " + (afterSend-beforeSend) + ". ");
-                msg.addMessageId(id);
-            }
-            notePreprocessing(msg.getMessageId(), msg.getFragmentNumber(), preprocessed.length, msg.getMessageIds(), null);
-            if (preprocessed.length != msg.getFragmentNumber() + 1) {
-                throw new RuntimeException("wtf, preprocessed " + msg.getMessageId() + " into " 
-                                           + msg.getFragmentNumber() + "/" + preprocessed.length + " fragments, size = "
-                                           + msg.getData().length);
-            }
-            if (buf != null)
-                buf.append("all fragments sent after " + (System.currentTimeMillis()-afterPreproc) + ". ");
-        }
-        if (buf != null) {
-            buf.append("queue preprocessed after " + (System.currentTimeMillis()-begin) + ".");
-            _log.debug(buf.toString());
-        }
-        return false;
+        throw new IllegalArgumentException("unused, right?");
     }
     
     protected void notePreprocessing(long messageId, int numFragments, int totalLength, List<Long> messageIds, String msg) {}
-    
-    /*
-     * @deprecated unused except by above
-     */
-    private byte[][] preprocess(TunnelGateway.Pending msg) {
-        List<byte[]> fragments = new ArrayList(1);
-
-        while (msg.getOffset() < msg.getData().length) {
-            fragments.add(preprocessFragment(msg));
-            //if (_log.shouldLog(Log.DEBUG))
-            //    _log.debug("\n\nafter preprocessing fragment\n\n");
-        }
-
-        byte rv[][] = new byte[fragments.size()][];
-        for (int i = 0; i < fragments.size(); i++)
-            rv[i] = fragments.get(i);
-        return rv;
-    }
-    
-    /**
-     * Preprocess the next available fragment off the given one in phases:
-     * First, write it out as { instructions + payload + random IV }, calculate the 
-     * SHA256 of that, then move the instructions + payload to the end 
-     * of the target, setting IV as the beginning.  Then add the necessary random pad
-     * bytes after the IV, followed by the first 4 bytes of that SHA256, lining up
-     * exactly to meet the beginning of the instructions. (i hope)
-     *
-     * @deprecated unused except by above
-     */
-    private byte[] preprocessFragment(TunnelGateway.Pending msg) {
-        byte target[] = _dataCache.acquire().getData();
-
-        int offset = 0;
-        if (msg.getOffset() <= 0)
-            offset = writeFirstFragment(msg, target, offset);
-        else
-            offset = writeSubsequentFragment(msg, target, offset);
-        
-        preprocess(target, offset);
-        return target;
-    }
     
     /**
      * Wrap the preprocessed fragments with the necessary padding / checksums 
@@ -189,22 +108,37 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
 
         //_log.debug("# pad bytes:  " + numPadBytes + " payloadLength: " + payloadLength + " instructions: " + instructionsLength);
 
-        int paddingRemaining = numPadBytes;
-        // FIXME inefficient, waste of 3/4 of the entropy
-        // Should get a byte array of random, change all the zeros to something else, and ArrayCopy
-        while (paddingRemaining > 0) {
-            byte b = (byte)(_context.random().nextInt() & 0xFF);
-            if (b != 0x00) {
-                fragments[offset] = b;
-                offset++;
-                paddingRemaining--;
-            }
+        if (numPadBytes > 0) {
+            fillRandomNonZero(fragments, offset, numPadBytes);
+            offset += numPadBytes;
         }
        
         fragments[offset] = 0x0; // no more padding
         offset++;
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Preprocessing beginning of the fragment instructions at " + offset);
+    }
+
+    /**
+     *  Efficiently fill with nonzero random data
+     *  Don't waste too much entropy or call random() too often.
+     *  @since 0.8.5
+     */
+    private void fillRandomNonZero(byte[] b, int off, int len) {
+        // get about as much as we think we will need, overestimate some
+        final int est = len + (len / 128) + 3;
+        final byte[] tmp = new byte[est];
+        _context.random().nextBytes(tmp);
+        int extra = len;
+        for (int i = 0; i < len; i++) {
+            while (tmp[i] == 0) {
+                if (extra < est)
+                    tmp[i] = tmp[extra++];  // use from the extra we have at the end
+                else
+                    tmp[i] = (byte)(_context.random().nextInt() & 0xFF);  // waste 3/4 of the entropy
+            }
+        }
+        System.arraycopy(tmp, 0, b, off, len);
     }
 
     /** is this a follw up byte? */

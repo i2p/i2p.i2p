@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -39,7 +40,8 @@ public class RouterInfo extends DatabaseEntry {
     private RouterIdentity _identity;
     private volatile long _published;
     private final Set<RouterAddress> _addresses;
-    private final Set<Hash> _peers;
+    /** may be null to save memory, no longer final */
+    private Set<Hash> _peers;
     private /* FIXME final FIXME */ Properties _options;
     private volatile boolean _validated;
     private volatile boolean _isValid;
@@ -47,6 +49,11 @@ public class RouterInfo extends DatabaseEntry {
     private volatile byte _byteified[];
     private volatile int _hashCode;
     private volatile boolean _hashCodeInitialized;
+    /** should we cache the byte and string versions _byteified ? **/
+    private boolean _shouldCache;
+    /** maybe we should check if we are floodfill? */
+    private static final boolean CACHE_ALL = Runtime.getRuntime().maxMemory() > 128*1024*1024l &&
+                                             Runtime.getRuntime().maxMemory() < Long.MAX_VALUE;
 
     public static final String PROP_NETWORK_ID = "netId";
     public static final String PROP_CAPABILITIES = "caps";
@@ -58,7 +65,6 @@ public class RouterInfo extends DatabaseEntry {
     
     public RouterInfo() {
         _addresses = new HashSet(2);
-        _peers = new HashSet(0);
         _options = new OrderedProperties();
     }
 
@@ -70,6 +76,7 @@ public class RouterInfo extends DatabaseEntry {
         setPeers(old.getPeers());
         setOptions(old.getOptions());
         setSignature(old.getSignature());
+        // copy over _byteified?
     }
 
     public long getDate() {
@@ -105,6 +112,11 @@ public class RouterInfo extends DatabaseEntry {
     public void setIdentity(RouterIdentity ident) {
         _identity = ident;
         resetCache();
+        // We only want to cache the bytes for our own RI, which is frequently written.
+        // To cache for all RIs doubles the RI memory usage.
+        // setIdentity() is only called when we are creating our own RI.
+        // Otherwise, the data is populated with readBytes().
+        _shouldCache = true;
     }
 
     /**
@@ -159,6 +171,8 @@ public class RouterInfo extends DatabaseEntry {
      * @deprecated Implemented here but unused elsewhere
      */
     public Set<Hash> getPeers() {
+        if (_peers == null)
+            return Collections.EMPTY_SET;
         return _peers;
     }
 
@@ -169,9 +183,15 @@ public class RouterInfo extends DatabaseEntry {
      * @deprecated Implemented here but unused elsewhere
      */
     public void setPeers(Set<Hash> peers) {
+        if (peers == null || peers.isEmpty()) {
+            _peers = null;
+            return;
+        }
+        if (_peers == null)
+            _peers = new HashSet(2);
         synchronized (_peers) {
             _peers.clear();
-            if (peers != null) _peers.addAll(peers);
+            _peers.addAll(peers);
         }
         resetCache();
     }
@@ -223,7 +243,6 @@ public class RouterInfo extends DatabaseEntry {
         if (_byteified != null) return _byteified;
         if (_identity == null) throw new DataFormatException("Router identity isn't set? wtf!");
         if (_addresses == null) throw new DataFormatException("Router addressess isn't set? wtf!");
-        if (_peers == null) throw new DataFormatException("Router peers isn't set? wtf!");
         if (_options == null) throw new DataFormatException("Router options isn't set? wtf!");
 
         long before = Clock.getInstance().now();
@@ -239,6 +258,9 @@ public class RouterInfo extends DatabaseEntry {
                 DataHelper.writeLong(out, 1, sz);
                 Collection<RouterAddress> addresses = _addresses;
                 if (sz > 1)
+                    // WARNING this sort algorithm cannot be changed, as it must be consistent
+                    // network-wide. The signature is not checked at readin time, but only
+                    // later, and the addresses are stored in a Set, not a List.
                     addresses = (Collection<RouterAddress>) DataHelper.sortStructures(addresses);
                 for (RouterAddress addr : addresses) {
                     addr.writeBytes(out);
@@ -248,12 +270,14 @@ public class RouterInfo extends DatabaseEntry {
             // answer: they're always empty... they're a placeholder for one particular
             //         method of trusted links, which isn't implemented in the router
             //         at the moment, and may not be later.
-            // fixme to reduce objects - allow _peers == null
-            int psz = _peers.size();
+            int psz = _peers == null ? 0 : _peers.size();
             DataHelper.writeLong(out, 1, psz);
             if (psz > 0) {
                 Collection<Hash> peers = _peers;
                 if (psz > 1)
+                    // WARNING this sort algorithm cannot be changed, as it must be consistent
+                    // network-wide. The signature is not checked at readin time, but only
+                    // later, and the hashes are stored in a Set, not a List.
                     peers = (Collection<Hash>) DataHelper.sortStructures(peers);
                 for (Hash peerHash : peers) {
                     peerHash.writeBytes(out);
@@ -266,7 +290,8 @@ public class RouterInfo extends DatabaseEntry {
         byte data[] = out.toByteArray();
         long after = Clock.getInstance().now();
         _log.debug("getBytes()  took " + (after - before) + "ms");
-        _byteified = data;
+        if (CACHE_ALL || _shouldCache)
+            _byteified = data;
         return data;
     }
 
@@ -466,10 +491,15 @@ public class RouterInfo extends DatabaseEntry {
             _addresses.add(address);
         }
         int numPeers = (int) DataHelper.readLong(in, 1);
-        for (int i = 0; i < numPeers; i++) {
-            Hash peerIdentityHash = new Hash();
-            peerIdentityHash.readBytes(in);
-            _peers.add(peerIdentityHash);
+        if (numPeers == 0) {
+            _peers = null;
+        } else {
+            _peers = new HashSet(numPeers);
+            for (int i = 0; i < numPeers; i++) {
+                Hash peerIdentityHash = new Hash();
+                peerIdentityHash.readBytes(in);
+                _peers.add(peerIdentityHash);
+            }
         }
         _options = DataHelper.readProperties(in);
         _signature = new Signature();
@@ -504,7 +534,7 @@ public class RouterInfo extends DatabaseEntry {
                && _published == info.getPublished()
                && DataHelper.eq(_addresses, info.getAddresses())
                && DataHelper.eq(_options, info.getOptions()) 
-               && DataHelper.eq(_peers, info.getPeers());
+               && DataHelper.eq(getPeers(), info.getPeers());
     }
     
     @Override
@@ -530,7 +560,7 @@ public class RouterInfo extends DatabaseEntry {
             RouterAddress addr = (RouterAddress) iter.next();
             buf.append("\n\t\tAddress: ").append(addr);
         }
-        Set peers = _peers; // getPeers()
+        Set peers = getPeers();
         buf.append("\n\tPeers: #: ").append(peers.size());
         for (Iterator iter = peers.iterator(); iter.hasNext();) {
             Hash hash = (Hash) iter.next();

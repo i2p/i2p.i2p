@@ -11,6 +11,7 @@ import java.util.Set;
 
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
+import net.i2p.util.Translate;
 
 import org.cybergarage.util.Debug;
 import org.freenetproject.DetectedIP;
@@ -24,14 +25,14 @@ import org.freenetproject.ForwardPortStatus;
  *
  * @author zzz
  */
-public class UPnPManager {
-    private Log _log;
-    private RouterContext _context;
-    private UPnP _upnp;
-    private UPnPCallback _upnpCallback;
+class UPnPManager {
+    private final Log _log;
+    private final RouterContext _context;
+    private final UPnP _upnp;
+    private final UPnPCallback _upnpCallback;
     private volatile boolean _isRunning;
     private InetAddress _detectedAddress;
-    private TransportManager _manager;
+    private final TransportManager _manager;
     /**
      *  This is the TCP HTTP Event listener
      *  We move these so we don't conflict with other users of the same upnp library
@@ -56,7 +57,6 @@ public class UPnPManager {
         _upnp.setHTTPPort(_context.getProperty(PROP_HTTP_PORT, DEFAULT_HTTP_PORT));
         _upnp.setSSDPPort(_context.getProperty(PROP_SSDP_PORT, DEFAULT_SSDP_PORT));
         _upnpCallback = new UPnPCallback();
-        _isRunning = false;
     }
     
     public synchronized void start() {
@@ -87,8 +87,9 @@ public class UPnPManager {
         if (!_isRunning)
             return;
         Set<ForwardPort> forwards = new HashSet(ports.size());
-        for (String style : ports.keySet()) {
-            int port = ports.get(style).intValue();
+        for (Map.Entry<String, Integer> entry : ports.entrySet()) {
+            String style = entry.getKey();
+            int port = entry.getValue().intValue();
             int protocol = -1;
             if ("SSU".equals(style))
                 protocol = ForwardPort.PROTOCOL_UDP_IPV4;
@@ -136,8 +137,9 @@ public class UPnPManager {
                     _log.debug("No external address returned");
             }
 
-            for (ForwardPort fp : statuses.keySet()) {
-                ForwardPortStatus fps = statuses.get(fp);
+            for (Map.Entry<ForwardPort, ForwardPortStatus> entry : statuses.entrySet()) {
+                ForwardPort fp = entry.getKey();
+                ForwardPortStatus fps = entry.getValue();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug(fp.name + " " + fp.protocol + " " + fp.portNumber +
                                " status: " + fps.status + " reason: " + fps.reasonString + " ext port: " + fps.externalPort);
@@ -156,7 +158,17 @@ public class UPnPManager {
 
     public String renderStatusHTML() {
         if (!_isRunning)
-            return "<h3><a name=\"upnp\"></a>UPnP is not enabled</h3>\n";
+            return "<h3><a name=\"upnp\"></a>" + _("UPnP is not enabled") + "</h3>\n";
         return _upnp.renderStatusHTML();
     }
+
+    private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
+
+    /**
+     *  Translate
+     */
+    private final String _(String s) {
+        return Translate.getString(s, _context, BUNDLE_NAME);
+    }
+
 }

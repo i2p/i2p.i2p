@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ConcurrentHashSet<E> extends AbstractSet<E> implements Set<E> {
     private static final Object DUMMY = new Object();
-    private Map<E, Object> _map;
+    private final Map<E, Object> _map;
 
     public ConcurrentHashSet() {
         _map = new ConcurrentHashMap();

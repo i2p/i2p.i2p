@@ -221,20 +221,32 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         }
     }
 
+    /** save some memory, don't pass along the pointless properties */
     private Properties filter(Properties options) {
         Properties rv = new Properties();
         for (Iterator iter = options.keySet().iterator(); iter.hasNext();) {
             String key = (String) iter.next();
-            String val = options.getProperty(key);
-            if (key.startsWith("java") ||
-                key.startsWith("user") ||
-                key.startsWith("os") ||
-                key.startsWith("sun") ||
-                key.startsWith("file") ||
-                key.startsWith("line") ||
-                key.startsWith("wrapper")) {
+            if (key.startsWith("java.") ||
+                key.startsWith("user.") ||
+                key.startsWith("os.") ||
+                key.startsWith("sun.") ||
+                key.startsWith("file.") ||
+                key.equals("line.separator") ||
+                key.equals("path.separator") ||
+                key.equals("prng.buffers") ||
+                key.equals("router.trustedUpdateKeys") ||
+                key.startsWith("router.update") ||
+                key.startsWith("routerconsole.") ||
+                key.startsWith("time.") ||
+                key.startsWith("stat.") ||
+                key.startsWith("gnu.") ||  // gnu JVM
+                key.startsWith("net.i2p.router.web.") ||  // console nonces
+                key.startsWith("wrapper.")) {
                 if (_log.shouldLog(Log.DEBUG)) _log.debug("Skipping property: " + key);
-            } else if ((key.length() > 255) || (val.length() > 255)) {
+                continue;
+            }
+            String val = options.getProperty(key);
+            if ((key.length() > 255) || (val.length() > 255)) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn(getPrefix() + "Not passing on property ["
                               + key
@@ -245,6 +257,18 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             }
         }
         return rv;
+    }
+
+    /**
+     * Update the tunnel and bandwidth settings
+     * @since 0.8.4
+     */
+    public void updateOptions(Properties options) {
+        _options.putAll(filter(options));
+        _producer.updateBandwidth(this);
+        try {
+            _producer.updateTunnels(this, 0);
+        } catch (I2PSessionException ise) {}
     }
 
     void setLeaseSet(LeaseSet ls) {
@@ -397,7 +421,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      *
      */
     public byte[] receiveMessage(int msgId) throws I2PSessionException {
-        MessagePayloadMessage msg = _availableMessages.remove(new Long(msgId));
+        MessagePayloadMessage msg = _availableMessages.remove(Long.valueOf(msgId));
         if (msg == null) {
             _log.error("Receive message " + msgId + " had no matches");
             return null;
@@ -414,21 +438,6 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         _producer.reportAbuse(this, msgId, severity);
     }
 
-    /**
-     * Send the data to the destination.  
-     * TODO: this currently always returns true, regardless of whether the message was 
-     * delivered successfully.  make this wait for at least ACCEPTED
-     *
-     */
-    public abstract boolean sendMessage(Destination dest, byte[] payload) throws I2PSessionException;
-    
-    /**
-     * @param keyUsed unused - no end-to-end crypto
-     * @param tagsSent unused - no end-to-end crypto
-     */
-    public abstract boolean sendMessage(Destination dest, byte[] payload, SessionKey keyUsed, 
-                                        Set tagsSent) throws I2PSessionException;
-
     public abstract void receiveStatus(int msgId, long nonce, int status);
 
 /****** no end-to-end crypto
@@ -444,7 +453,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      * Recieve a payload message and let the app know its available
      */
     public void addNewMessage(MessagePayloadMessage msg) {
-        Long mid = new Long(msg.getMessageId());
+        Long mid = Long.valueOf(msg.getMessageId());
         _availableMessages.put(mid, msg);
         long id = msg.getMessageId();
         byte data[] = msg.getPayload().getUnencryptedData();
@@ -494,7 +503,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
         
         public void available(long msgId, int size) {
             synchronized (AvailabilityNotifier.this) {
-                _pendingIds.add(new Long(msgId));
+                _pendingIds.add(Long.valueOf(msgId));
                 _pendingSizes.add(Integer.valueOf(size));
                 AvailabilityNotifier.this.notifyAll();
             }

@@ -18,7 +18,7 @@
 <%=intl._("You may use the username \"guest\" and password \"guest\" if you do not wish to register.")%>
 <p><i><%=intl._("Please include this information in bug reports")%>:</i>
  <p>
-<b>I2P version:</b> <jsp:getProperty name="helper" property="version" /><br>
+<b>I2P version:</b> <%=net.i2p.router.RouterVersion.FULL_VERSION%><br>
 <b>Java version:</b> <%=System.getProperty("java.vendor")%> <%=System.getProperty("java.version")%> (<%=System.getProperty("java.runtime.name")%> <%=System.getProperty("java.runtime.version")%>)<br>
 <b>Platform:</b> <%=System.getProperty("os.name")%> <%=System.getProperty("os.arch")%> <%=System.getProperty("os.version")%><br>
 <b>Processor:</b> <%=net.i2p.util.NativeBigInteger.cpuModel()%> (<%=net.i2p.util.NativeBigInteger.cpuType()%>)<br>

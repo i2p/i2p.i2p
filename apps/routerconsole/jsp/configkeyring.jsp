@@ -27,10 +27,7 @@
 </p></div>
 
  <form action="" method="POST">
- <% String prev = System.getProperty("net.i2p.router.web.ConfigKeyringHandler.nonce");
-    if (prev != null) System.setProperty("net.i2p.router.web.ConfigKeyringHandler.noncePrev", prev);
-    System.setProperty("net.i2p.router.web.ConfigKeyringHandler.nonce", new java.util.Random().nextLong()+""); %>
- <input type="hidden" name="nonce" value="<%=System.getProperty("net.i2p.router.web.ConfigKeyringHandler.nonce")%>" >
+ <input type="hidden" name="nonce" value="<jsp:getProperty name="formhandler" property="newNonce" />" >
  <h3><%=intl._("Manual Keyring Addition")%></h3><p>
  <%=intl._("Enter keys for encrypted remote destinations here.")%>
  <%=intl._("Keys for local destinations must be entered on the")%> <a href="i2ptunnel/"><%=intl._("I2PTunnel page")%></a>.
