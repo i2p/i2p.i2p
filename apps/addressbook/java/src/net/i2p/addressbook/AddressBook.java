@@ -47,7 +47,7 @@ class AddressBook {
     private final Map<String, String> addresses;
     private final File subFile;
     private boolean modified;
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     /**
      * Construct an AddressBook from the contents of the Map addresses.
