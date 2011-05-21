@@ -1,3 +1,7 @@
+2011-05-21 sponge
+    * mbuild.sh document and fixes
+    * mbuild-all.sh add cpu types
+
 2011-05-20 zzz
     * Certificate: Fix creation bug; improve router cert generation
     * DataHelper:

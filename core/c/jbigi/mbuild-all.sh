@@ -10,14 +10,14 @@
 # please add them here.
 # Do NOT add any X86 platforms, do that below in the x86 platform list.
 #
-MISC_LINUX_PLATFORMS="hppa2.0 alphaev56 armv5tel mips64el itanium itanium2 ultrasparc2 ultrasparc2i alphaev6 powerpc970 powerpc7455 powerpc7447 atom"
+MISC_LINUX_PLATFORMS="hppa2.0 alphaev56 armv5tel mips64el itanium itanium2 ultrasparc2 ultrasparc2i alphaev6 powerpc970 powerpc7455 powerpc7447"
 
 #
 # If you know of other platforms i2p on FREEBSD works on, 
 # please add them here.
 # Do NOT add any X86 platforms, do that below in the x86 platform list.
 #
-MISC_FREEBSD_PLATFORMS="atom alphaev56 ultrasparc2i"
+MISC_FREEBSD_PLATFORMS="alphaev56 ultrasparc2i"
 
 #
 # MINGW/Windows??
@@ -29,7 +29,7 @@ MISC_MINGW_PLATFORMS=""
 #
 # Oddly athlon64 builds.... I wonder what others can :-)
 #
-X86_PLATFORMS="pentium pentiummmx pentium2 pentium3 pentium4 k6 k62 k63 athlon pentiumm core2 athlon64 geode"
+X86_PLATFORMS="pentium pentiummmx pentium2 pentium3 pentiumm pentium4 k6 k62 k63 athlon core2 corei athlon64 geode atom nano viac3 viac32"
 
 
 #
@@ -93,7 +93,7 @@ function configure_file {
 	echo -e "\n\n\nAttempting configure for ${3}${5}${2}\n\n\n"
 	sleep 10
 	# Nonfatal bail out on unsupported platform.
-	../../gmp-${1}/configure --build=${2} && return 0
+	../../gmp-${1}/configure --build=${2} --with-pic && return 0
 	cd ..
 	rm -R "$2"
 	echo -e "\n\nSorry, ${3}${5}${2} is not supported on your build environment.\a"
