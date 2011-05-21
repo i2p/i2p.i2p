@@ -1,3 +1,5 @@
+A1,Anonymous Proxy
+A2,Satellite Provider
 AD,Andorra
 AE,United Arab Emirates
 AF,Afghanistan
@@ -13,7 +15,7 @@ AS,American Samoa
 AT,Austria
 AU,Australia
 AW,Aruba
-AX,
+AX,Åland Islands
 AZ,Azerbaijan
 BA,Bosnia and Herzegovina
 BB,Barbados
@@ -95,14 +97,14 @@ HU,Hungary
 ID,Indonesia
 IE,Ireland
 IL,Israel
-IM,
+IM,Isle of Man
 IN,India
 IO,British Indian Ocean Territory
 IQ,Iraq
 IR,Islamic Republic of Iran
 IS,Iceland
 IT,Italy
-JE,
+JE,Jersey
 JM,Jamaica
 JO,Jordan
 JP,Japan
@@ -130,8 +132,8 @@ LY,Libyan Arab Jamahiriya
 MA,Morocco
 MC,Monaco
 MD,Republic of Moldova
-ME,
-MF,
+ME,Montenegro
+MF,Saint Martin
 MG,Madagascar
 MH,Marshall Islands
 MK,The Former Yugoslav Republic of Macedonia
