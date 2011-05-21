@@ -3,11 +3,15 @@
 #  Build the jbigi library for i2p
 #
 #  To build a static library:
-#     download gmp-4.2.2.tar.bz2 to this directory
-#       (if a different version, change the VER= line below)
+#     Set $I2P to point to your I2P installation
+#     Set $JAVA_HOME to point to your Java SDK
 #     build.sh
+#       This script downloads gmp-4.3.2.tar.bz2 to this directory
+#       (if a different version, change the VER= line below)
 #
 #  To build a dynamic library (you must have a libgmp.so somewhere in your system)
+#     Set $I2P to point to your I2P installation
+#     Set $JAVA_HOME to point to your Java SDK
 #     build.sh dynamic
 #
 #  The resulting library is lib/libjbigi.so
@@ -15,23 +19,23 @@
 
 mkdir -p lib/
 mkdir -p bin/local
-VER=4.3.1
+VER=4.3.2
 
 set -e
 
 if [ "$1" != "dynamic" -a ! -d gmp-$VER ]
 then
-	TAR=gmp-$VER.tar.lzma
+	TAR=gmp-$VER.tar.bz2
         if [ ! -f $TAR ]
         then
-	    echo "Downloading ftp://ftp.gmplib.org/pub/gmp-4.3.1/gmp-4.3.1.tar.lzma"
-	    wget ftp://ftp.gmplib.org/pub/gmp-4.3.1/gmp-4.3.1.tar.lzma
+	    echo "Downloading ftp://ftp.gmplib.org/pub/gmp-${VER}/gmp-${VER}.tar.bz2"
+	    wget ftp://ftp.gmplib.org/pub/gmp-${VER}/gmp-${VER}.tar.bz2
         fi
 
 	echo "Building the jbigi library with GMP Version $VER"
 
 	echo "Extracting GMP..."
-	tar -xf gmp-$VER.tar.lzma --lzma
+	tar -xjf gmp-$VER.tar.bz2
 fi
 
 cd bin/local
@@ -44,6 +48,7 @@ then
 			# --with-pic is required for static linking
 			../../gmp-$VER/configure --with-pic;;
 		*)
+			# and it's required for ASLR
 			../../gmp-$VER/configure --with-pic;;
 	esac
 	make
