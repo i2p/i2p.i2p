@@ -856,6 +856,10 @@ public class DataHelper {
         return lhs == rhs;
     }
 
+    /**
+     *  Unlike eq(byte[], byte[]), this returns false if both lhs and rhs are null.
+     *  @throws AIOOBE if either array isn't long enough
+     */
     public final static boolean eq(byte lhs[], int offsetLeft, byte rhs[], int offsetRight, int length) {
         if ( (lhs == null) || (rhs == null) ) return false;
         if (length <= 0) return true;
@@ -1004,6 +1008,7 @@ public class DataHelper {
      * the newline), or null if EOF reached before the newline was found
      * Warning - strips \n but not \r
      * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
+     * Warning - not UTF-8
      */
     public static String readLine(InputStream in) throws IOException { return readLine(in, (Sha256Standalone)null); }
 
@@ -1011,6 +1016,7 @@ public class DataHelper {
      * update the hash along the way
      * Warning - strips \n but not \r
      * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
+     * Warning - not UTF-8
      */
     public static String readLine(InputStream in, Sha256Standalone hash) throws IOException {
         StringBuilder buf = new StringBuilder(128);
@@ -1025,6 +1031,7 @@ public class DataHelper {
      * Read in a line, placing it into the buffer (excluding the newline).
      * Warning - strips \n but not \r
      * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
+     * Warning - not UTF-8
      * @deprecated use StringBuilder version
      *
      * @return true if the line was read, false if eof was reached before a 
@@ -1042,6 +1049,7 @@ public class DataHelper {
      * update the hash along the way
      * Warning - strips \n but not \r
      * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
+     * Warning - not UTF-8
      * @deprecated use StringBuilder version
      */
     @Deprecated
@@ -1066,6 +1074,7 @@ public class DataHelper {
      * Read in a line, placing it into the buffer (excluding the newline).
      * Warning - strips \n but not \r
      * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
+     * Warning - not UTF-8
      *
      * @return true if the line was read, false if eof was reached before a 
      *              newline was found
@@ -1078,6 +1087,7 @@ public class DataHelper {
      * update the hash along the way
      * Warning - strips \n but not \r
      * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
+     * Warning - not UTF-8
      */
     public static boolean readLine(InputStream in, StringBuilder buf, Sha256Standalone hash) throws IOException {
         int c = -1;
