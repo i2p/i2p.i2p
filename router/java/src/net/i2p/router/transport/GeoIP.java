@@ -4,10 +4,12 @@ package net.i2p.router.transport;
  * Use at your own risk.
  */
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.InetAddress;
+import java.io.InputStreamReader;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Map;
@@ -37,8 +39,8 @@ import net.i2p.util.Log;
  * @author zzz
  */
 class GeoIP {
-    private Log _log;
-    private RouterContext _context;
+    private final Log _log;
+    private final RouterContext _context;
     private final Map<String, String> _codeToName;
     private final Map<Long, String> _IPToCountry;
     private final Set<Long> _pendingSearch;
@@ -142,7 +144,7 @@ class GeoIP {
     private void readCountryFile() {
         File GeoFile = new File(_context.getBaseDir(), GEOIP_DIR_DEFAULT);
         GeoFile = new File(GeoFile, COUNTRY_FILE_DEFAULT);
-        if (GeoFile == null || (!GeoFile.exists())) {
+        if (!GeoFile.exists()) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Country file not found: " + GeoFile.getAbsolutePath());
             return;
@@ -150,19 +152,17 @@ class GeoIP {
         FileInputStream in = null;
         try {
             in = new FileInputStream(GeoFile);
-            StringBuilder buf = new StringBuilder(128);
-            while (DataHelper.readLine(in, buf)) {
+            BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+            String line = null;
+            while ( (line = br.readLine()) != null) {
                 try {
-                    if (buf.charAt(0) == '#') {
-                        buf.setLength(0);
+                    if (line.charAt(0) == '#') {
                         continue;
                     }
-                    String[] s = buf.toString().split(",");
-                    // todo convert name to mixed upper/lower case
+                    String[] s = line.split(",");
                     _codeToName.put(s[0].toLowerCase(), s[1]);
                 } catch (IndexOutOfBoundsException ioobe) {
                 }
-                buf.setLength(0);
             }
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.ERROR))

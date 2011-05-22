@@ -1,3 +1,8 @@
+2011-05-22 zzz
+    * GeoIP: Read countries.txt in UTF-8
+    * Jetty: Fix build error that omitted local jetty patches from org.mortbay.jetty.jar;
+             affected 0.8.4 and 0.8.6 installers. Include jar in the updater for the next release.
+
 2011-05-21 sponge
     * mbuild.sh document and fixes
     * mbuild-all.sh add cpu types
