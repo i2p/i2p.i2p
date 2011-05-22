@@ -67,20 +67,16 @@
         <gunzip src="${jetty.filename}" dest="jetty.tar" />
         <untar src="jetty.tar" dest="." />
         <mkdir dir="jettylib" />
-        <copy todir="jettylib">
+        <copy todir="jettylib" preservelastmodified="true" >
             <fileset dir="${jetty.base}/lib">
                 <include name="*.jar" />
             </fileset>
-        </copy>
-        <copy todir="jettylib">
             <fileset dir="${jetty.base}/ext">
                 <include name="ant.jar" />
                 <include name="commons-el.jar" />
                 <include name="commons-logging.jar" />
                 <include name="jasper-compiler.jar" />
                 <include name="jasper-runtime.jar" />
-                <include name="javax.servlet.jar" />
-                <include name="org.mortbay.jetty.jar" />
             </fileset>
         </copy>
         <delete file="jetty.tar" />
