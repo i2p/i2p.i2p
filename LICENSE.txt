@@ -56,7 +56,7 @@ Public domain except as listed below:
    Copyright (C) 2001, 2002, Free Software Foundation, Inc.
    See licenses/LICENSE-LGPLv2.1.txt
 
-   GMP 4.1.3:
+   GMP 4.1.3 / 4.1.4:
    Copyright 1991, 1996, 1999, 2000 Free Software Foundation, Inc.
    See licenses/LICENSE-LGPLv2.1.txt
 
@@ -194,6 +194,10 @@ Applications:
        Copyright (c) 2003 Direct Information Pvt. Ltd. All Rights Reserved.
        See licenses/LICENSE-GeoIP.txt
 
+   Router Console and I2PSnark themes:
+   "Man with hat over face" & related images licensed under a Creative Commons 2.0 license.
+   Original photos by Florian Kuhlmann. http://www.flickr.com/photos/floriankuhlmann/3117758155
+
    SAM:
    Public domain.
 
@@ -203,6 +207,8 @@ Applications:
    SusiDNS:
    Copyright (C) 2005 <susi23@mail.i2p>
    See licenses/LICENSE-GPLv2.txt
+       Uses Apache Jakarta Standard Tag Library 1.1.2:
+       See licenses/LICENSE-Apache2.0.txt
 
    SusiMail:
    Copyright (C) 2004-2005  <susi23@mail.i2p>
@@ -227,6 +233,10 @@ distributions. See the source package for the additional license information.
    Atalk:
    Public domain
 
+   BOB Demos:
+   Copyright (C) sponge
+   DWTFYWTPL
+
    Desktopgui
    Copyright (c) Mathias De Maré
    See apps/desktopgui/LICENSE
@@ -244,7 +254,3 @@ distributions. See the source package for the additional license information.
 
    SAM Python Library:
    Public domain.
-   
-   I2PSnark/Console themes: 
-   "Man with hat over face" & related images licensed under a Creative Commons 2.0 license.
-   Original photos by Florian Kuhlmann. http://www.flickr.com/photos/floriankuhlmann/3117758155

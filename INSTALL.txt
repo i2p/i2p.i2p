@@ -1,8 +1,8 @@
 I2P source installation instructions
 
 Prerequisites to build from source:
-	Java SDK (preferably Sun) 1.5.0 or higher (1.6 recommended)
-	The SDK must have Pack200 support (java.util.jar.Pack200)
+	Java SDK (preferably Oracle/Sun or OpenJDK) 1.6.0 or higher
+          Non-linux operating systems and JVMs: See http://trac.i2p2.de/wiki/java
 	Apache Ant 1.7.0 or higher
 	Optional, For multilanguage support: The xgettext, msgfmt, and msgmerge tools installed
 	from the GNU gettext package http://www.gnu.org/software/gettext/
@@ -24,10 +24,24 @@ From there, you can run the headless (console mode) installer:
 Or run the GUI installer:
   java -jar i2pinstall.exe
 
-Or move the update file into an existing installation directory and restart.
+Or move the i2pupdate.zip file into an existing installation directory and restart.
+
+To start I2P:
+   (*nix): sh i2prouter start
+   (win*): I2P.exe
+   (non-x86 platforms PPC, ARM, etc): sh runplain.sh
+
+To stop I2P (gracefully):
+   lynx http://localhost:7657/summaryframe (click "Shutdown")
+
+To stop I2P immediately:
+   sh i2prouter stop
+
+To uninstall I2P:
+   rm -rf $I2PInstallDir ~/.i2p
 
 Supported JVMs:
-  Windows: Latest available from http://java.sun.com/ (1.5+ supported)
-  Linux:   Latest available from http://java.sun.com/ (1.5+ supported)
-  FreeBSD: Sun 1.5-compatible (NIO required)
-  various: http://www.kaffe.org/ Sun 1.5-compatible (NIO required)
+  Windows: Latest available from http://java.com/download (1.5+ supported)
+  Linux:   Latest available from http://java.com/download (1.5+ supported)
+  FreeBSD: 1.5-compatible (NIO required)
+  Other operating systems and JVMs: See http://trac.i2p2.de/wiki/java

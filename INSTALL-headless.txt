@@ -1,4 +1,4 @@
-Headless I2P installation instructions
+Headless (console mode) I2P installation instructions
 
 1) java -jar i2pinstall.exe -console       (you've already done this)
 
@@ -6,9 +6,9 @@ This will run the installer in text mode, including running the postinstall.sh
 script. After that, you may run 'sh i2prouter start'
 which will start the router and attempt to launch a browser.
 
-If you do not have an X server running, the browser launch will probably fail, and
+If you do not have an X server running, the browser launch may fail, and
 you may use:
-  lynx http://localhost:7657/index.jsp
+  lynx http://localhost:7657/
 to configure the router.
 
 If you're having trouble, swing by http://forum.i2p2.de/, check the
@@ -24,22 +24,22 @@ edit the files i2prouter (Linux) and wrapper.config (Linux and Windows)
 where there are comments labeled "PORTABLE". Do this before you
 run I2P for the first time.
 
-To run I2P explicitly:
+To start I2P:
    (*nix): sh i2prouter start
    (win*): I2P.exe
-   (Platforms unsupported by the wrapper - PPC, ARM, etc): sh runplain.sh
+   (non-x86 platforms PPC, ARM, etc): sh runplain.sh
 
-To stop the router (gracefully):
-   lynx http://localhost:7657/configservice.jsp ("Shutdown gracefully")
+To stop I2P (gracefully):
+   lynx http://localhost:7657/summaryframe (click "Shutdown")
 
-To stop the router (immediately):
+To stop I2P immediately:
    sh i2prouter stop
 
 To uninstall I2P:
-   rm -rf $i2pInstallDir
+   rm -rf $I2PInstallDir ~/.i2p
 
 Supported JVMs:
-  Windows: Latest available from http://java.sun.com/ (1.5+ supported)
-  Linux:   Latest available from http://java.sun.com/ (1.5+ supported)
-  FreeBSD: Sun 1.5-compatible (NIO required)
-  various: http://www.kaffe.org/ Sun 1.5-compatible (NIO required)
+  Windows: Latest available from http://java.com/download (1.5+ supported)
+  Linux:   Latest available from http://java.com/download (1.5+ supported)
+  FreeBSD: 1.5-compatible (NIO required)
+  Other operating systems and JVMs: See http://trac.i2p2.de/wiki/java
