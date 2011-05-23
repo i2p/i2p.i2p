@@ -2,14 +2,16 @@
 # Automatic build of so files, ignores failed builds.
 # Place latest gmp tarball in the jbigi dir, and exec this script.
 
-JBIGI=../../../installer/lib/jbigi/jbigi.jar
+#JBIGI=../../../installer/lib/jbigi/jbigi.jar
 
-if [ -f jbigi.jarx ] ; then
-JBIGI=../jbigi.jar
-fi
+#if [ -f jbigi.jarx ] ; then
+#JBIGI=../jbigi.jar
+#fi
 
-(cd jcpuid ; sh build.sh )
-(cd jbigi ; sh mbuild-all.sh )
+rm -f t/* jcpuid/lib/freenet/support/CPUInformation/* jbigi/lib/net/i2p/util/*
+
+( cd jcpuid ; ./mbuild.sh )
+( cd jbigi ; ./mbuild-all.sh )
 
 rm -Rf t
 mkdir t
@@ -41,5 +43,5 @@ cp jbigi/lib/net/i2p/util/* t/
 )
 
 
-echo "jbigi.jar Refreshed."
-echo "raw files ar in t."
+echo "jbigi.jar created."
+echo "raw files are in t."

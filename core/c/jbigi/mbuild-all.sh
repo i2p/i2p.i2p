@@ -27,9 +27,12 @@ MISC_MINGW_PLATFORMS=""
 #
 # Are there any other X86 platforms that work on i2p? Add them here.
 #
-# Oddly athlon64 builds.... I wonder what others can :-)
-#
-X86_PLATFORMS="pentium pentiummmx pentium2 pentium3 pentiumm pentium4 k6 k62 k63 athlon core2 corei athlon64 geode atom nano viac3 viac32"
+
+# Note! these build on 32bit as 32bit when operating as 32bit...
+X86_64_PLATFORMS="atom athlon64 core2 corei nano pentium4"
+
+# Note! these are 32bit _ONLY_
+X86_PLATFORMS="pentium pentiummmx pentium2 pentium3 pentiumm k6 k62 k63 athlon geode viac3 viac32 ${X86_64_PLATFORMS}"
 
 
 #
@@ -55,11 +58,29 @@ MINGW*)
 	TARGET="-windows-"
 	echo "Building windows .dlls for all architectures";;
 Linux*)
-	PLATFORM_LIST="${LINUX_PLATFORMS}"
 	NAME="libjbigi"
 	TYPE="so"
+	PLATFORM_LIST=""
 	TARGET="-linux-"
-	echo "Building linux .sos for all architectures";;
+	arch=$(uname -m | cut -f1 -d" ")
+	case ${arch} in
+		i[3-6]86)
+			arch="x86";;
+	esac
+	case ${arch} in
+		x86_64)
+			PLATFORM_LIST="${X86_64_PLATFORMS}"
+			TARGET="-linux-X86_64-";;
+		ia64)
+			PLATFORM_LIST="${X86_64_PLATFORMS}"
+			TARGET="-linux-ia64-";;
+		x86)
+			PLATFORM_LIST="${X86_PLATFORMS}"
+			TARGET="-linux-x86-";;
+		*)
+			PLATFORM_LIST="${LINUX_PLATFORMS}";;
+	esac
+	echo "Building ${TARGET} .so's for ${arch}";;
 FreeBSD*)
 	PLATFORM_LIST="${FREEBSD_PLATFORMS}"
 	NAME="libjbigi"

@@ -1,3 +1,9 @@
+2011-05-23 sponge
+    * mbuild.sh fixups
+    * add new jcpuid/mbuild.sh -- pedantic naming
+    * jbigi/mbuild-all.sh -- pedantic naming
+    * see also http://zzz.i2p/topics/306?page=1#p3341
+
 2011-05-22 zzz
     * GeoIP: Read countries.txt in UTF-8
     * Jetty: Fix build error that omitted local jetty patches from org.mortbay.jetty.jar;
