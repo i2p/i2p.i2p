@@ -33,6 +33,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
     private String _updateVersion;
     private String _unsignedUpdateVersion;
     private String _lastModified;
+    private boolean _invalidated;
     private File _newsFile;
     private File _tempFile;
     private static NewsFetcher _instance;
@@ -134,6 +135,8 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
     }
     
     private boolean shouldFetchNews() {
+        if (_invalidated)
+            return true;
         updateLastFetched();
         String freq = _context.getProperty(ConfigUpdateHandler.PROP_REFRESH_FREQUENCY,
                                            ConfigUpdateHandler.DEFAULT_REFRESH_FREQUENCY);
@@ -155,6 +158,16 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
             return false;
         }
     }
+
+    /**
+     *  Call this when changing news URLs to force an update next time the timer fires.
+     *  @since 0.8.7
+     */
+    void invalidateNews() {
+        _lastModified = null;
+        _invalidated = true;
+    }
+
     public void fetchNews() {
         String newsURL = ConfigUpdateHelper.getNewsURL(_context);
         boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
@@ -172,6 +185,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
             get.addStatusListener(this);
             if (get.fetch()) {
                 _lastModified = get.getLastModified();
+                _invalidated = false;
             } else {
                 // backup news location - always proxied
                 _tempFile.delete();
