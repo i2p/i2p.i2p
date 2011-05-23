@@ -334,6 +334,8 @@ public class StatSummarizer implements Runnable {
             //System.out.println("*****************\nData: \n" + _listener.getData().dump());
             def.setWidth(width);
             def.setHeight(height);
+            def.setImageFormat("PNG");
+            def.setLazy(true);
 
             RrdGraph graph = new RrdGraph(def);
             //System.out.println("Graph created");

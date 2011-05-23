@@ -164,6 +164,8 @@ class SummaryRenderer {
             //System.out.println("*****************\nData: \n" + _listener.getData().dump());
             def.setWidth(width);
             def.setHeight(height);
+            def.setImageFormat("PNG");
+            def.setLazy(true);
 
             RrdGraph graph = new RrdGraph(def);
             int totalWidth = graph.getRrdGraphInfo().getWidth();
