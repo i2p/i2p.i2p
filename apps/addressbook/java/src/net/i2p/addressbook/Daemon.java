@@ -109,7 +109,7 @@ public class Daemon {
      * @param log
      *            The log to write changes and conflicts to.
      *            May be null.
-     * @since 0.8.6
+     * @since 0.8.7
      */
     public static void update(NamingService router, File published, SubscriptionList subscriptions, Log log) {
         // If the NamingService is a database, we look up as we go.

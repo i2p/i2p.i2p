@@ -443,7 +443,7 @@ public class AddressbookBean
 
 	/**
 	 *  @return beginning index into results
-	 *  @since 0.8.6
+	 *  @since 0.8.7
 	 */
 	public String getResultBegin() {
 		return isPrefiltered() ? "0" : Integer.toString(getBeginInt());
@@ -465,7 +465,7 @@ public class AddressbookBean
 
 	/**
 	 *  @return ending index into results
-	 *  @since 0.8.6
+	 *  @since 0.8.7
 	 */
 	public String getResultEnd() {
 		return Integer.toString(isPrefiltered() ? resultSize() - 1 : getEndInt());
@@ -480,7 +480,7 @@ public class AddressbookBean
 	/**
 	 *  Does the entries map contain only the lookup result,
 	 *  or must we index into it?
-	 *  @since 0.8.6
+	 *  @since 0.8.7
 	 */
 	protected boolean isPrefiltered() {
 		return false;
@@ -488,7 +488,7 @@ public class AddressbookBean
 
 	/**
 	 *  @return the size of the lookup result
-	 *  @since 0.8.6
+	 *  @since 0.8.7
 	 */
 	protected int resultSize() {
 		return entries.length;
@@ -496,7 +496,7 @@ public class AddressbookBean
 
 	/**
 	 *  @return the total size of the address book
-	 *  @since 0.8.6
+	 *  @since 0.8.7
 	 */
 	protected int totalSize() {
 		return entries.length;
@@ -517,7 +517,7 @@ public class AddressbookBean
 		return Messages.getString(s, o, o2);
 	}
 
-	/** translate (ngettext) @since 0.8.6 */
+	/** translate (ngettext) @since 0.8.7 */
 	protected static String ngettext(String s, String p, int n) {
 		return Messages.getString(n, s, p);
 	}

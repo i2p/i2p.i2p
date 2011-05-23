@@ -38,7 +38,7 @@ import java.util.NoSuchElementException;
  *  Callers should iterate all the way through or call close()
  *  to ensure the underlying stream is closed.
  *
- *  @since 0.8.6
+ *  @since 0.8.7
  */
 class ConfigIterator implements Iterator<Map.Entry<String, String>> {
 

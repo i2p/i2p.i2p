@@ -73,7 +73,7 @@ public class AddressBean
 	/**
 	 * The Unicode name, translated from Punycode
 	 * @return the original string on error
-	 * @since 0.8.6
+	 * @since 0.8.7
 	 */
 	public String getDisplayName()
 	{
@@ -83,7 +83,7 @@ public class AddressBean
 	/**
 	 * The Unicode name, translated from Punycode
 	 * @return the original string on error
-	 * @since 0.8.6
+	 * @since 0.8.7
 	 */
 	public static String toUnicode(String host) {
 		if (haveIDN)
@@ -93,7 +93,7 @@ public class AddressBean
 
 	/**
 	 * Is the ASCII name Punycode-encoded?
-	 * @since 0.8.6
+	 * @since 0.8.7
 	 */
 	public boolean isIDN()
 	{
@@ -110,7 +110,7 @@ public class AddressBean
 	 * @param name will be converted to lower case
 	 * @return name converted to lower case and punycoded if necessary
 	 * @throws IAE on various errors or if IDN is needed but not available
-	 * @since 0.8.6
+	 * @since 0.8.7
 	 */
 	static String toASCII(String host) throws IllegalArgumentException {
 		host = host.toLowerCase();
@@ -159,7 +159,7 @@ public class AddressBean
 		return host;
 	}
 
-	/** @since 0.8.6 */
+	/** @since 0.8.7 */
 	public String getB32() 
 	{
 		byte[] dest = Base64.decode(destination);
@@ -169,12 +169,12 @@ public class AddressBean
 		return Base32.encode(hash) + ".b32.i2p";
 	}
 
-	/** @since 0.8.6 */
+	/** @since 0.8.7 */
 	public void setProperties(Properties p) {
 		props = p;
 	}
 
-	/** @since 0.8.6 */
+	/** @since 0.8.7 */
 	public String getSource() {
 		String rv = getProp("s");
                 if (rv.startsWith("http://"))
@@ -182,25 +182,25 @@ public class AddressBean
 		return rv;
 	}
 
-	/** @since 0.8.6 */
+	/** @since 0.8.7 */
 	public String getAdded() {
 		return getDate("a");
 	}
 
-	/** @since 0.8.6 */
+	/** @since 0.8.7 */
 	public String getModded() {
 		return getDate("m");
 	}
 
 
-	/** @since 0.8.6 */
+	/** @since 0.8.7 */
 	public String getNotes() {
 		return getProp("notes");
 	}
 
 	/**
 	 * Do this the easy way
-	 * @since 0.8.6
+	 * @since 0.8.7
 	 */
 	public String getCert() {
 		// (4 / 3) * (pubkey length + signing key length)
@@ -224,7 +224,7 @@ public class AddressBean
 		}
 	}
 
-	/** @since 0.8.6 */
+	/** @since 0.8.7 */
 	private String getProp(String p) {
 		if (props == null)
                     return "";
@@ -232,7 +232,7 @@ public class AddressBean
 		return rv != null ? rv : "";
 	}
 
-	/** @since 0.8.6 */
+	/** @since 0.8.7 */
 	private String getDate(String key) {
 		String d = getProp(key);
 		if (d.length() > 0) {

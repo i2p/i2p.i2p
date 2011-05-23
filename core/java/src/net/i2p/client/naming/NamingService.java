@@ -97,7 +97,7 @@ public abstract class NamingService {
 
     /**
      *  @return Class simple name by default
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public String getName() {
         return getClass().getSimpleName();
@@ -105,7 +105,7 @@ public abstract class NamingService {
 
     /**
      *  @return NamingService-specific options or null
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public Properties getConfiguration() {
         return null;
@@ -113,7 +113,7 @@ public abstract class NamingService {
 
     /**
      *  @return success
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public boolean setConfiguration(Properties p) {
         return true;
@@ -123,7 +123,7 @@ public abstract class NamingService {
 
     /**
      *  @return chained naming services or null
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public List<NamingService> getNamingServices() {
         return null;
@@ -131,7 +131,7 @@ public abstract class NamingService {
 
     /**
      *  @return parent naming service or null if this is the root
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public NamingService getParent() {
         return null;
@@ -158,7 +158,7 @@ public abstract class NamingService {
     /**
      *  Only for chaining-capable NamingServices
      *  @return success
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public boolean removeNamingService(NamingService ns) {
         return false;
@@ -170,7 +170,7 @@ public abstract class NamingService {
 
     /**
      *  @return number of entries or -1 if unknown
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public int size() {
         return size(null);
@@ -179,7 +179,7 @@ public abstract class NamingService {
     /**
      *  @param options NamingService-specific, can be null
      *  @return number of entries (matching the options if non-null) or -1 if unknown
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public int size(Properties options) {
         return -1;
@@ -189,7 +189,7 @@ public abstract class NamingService {
      *  @return all mappings
      *          or empty Map if none;
      *          Returned Map is not necessarily sorted, implementation dependent
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public Map<String, Destination> getEntries() {
         return getEntries(null);
@@ -200,7 +200,7 @@ public abstract class NamingService {
      *  @return all mappings (matching the options if non-null)
      *          or empty Map if none;
      *          Returned Map is not necessarily sorted, implementation dependent
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public Map<String, Destination> getEntries(Properties options) {
         return Collections.EMPTY_MAP;
@@ -212,7 +212,7 @@ public abstract class NamingService {
      *  @return all mappings (matching the options if non-null)
      *          or empty Map if none;
      *          Returned Map is not necessarily sorted, implementation dependent
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public Map<String, String> getBase64Entries(Properties options) {
         return Collections.EMPTY_MAP;
@@ -222,7 +222,7 @@ public abstract class NamingService {
      *  @return all known host names
      *          or empty Set if none;
      *          Returned Set is not necessarily sorted, implementation dependent
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public Set<String> getNames() {
         return getNames(null);
@@ -233,7 +233,7 @@ public abstract class NamingService {
      *  @return all known host names (matching the options if non-null)
      *          or empty Set if none;
      *          Returned Set is not necessarily sorted, implementation dependent
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public Set<String> getNames(Properties options) {
         return Collections.EMPTY_SET;
@@ -241,7 +241,7 @@ public abstract class NamingService {
 
     /**
      *  @return success
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public boolean put(String hostname, Destination d) {
         return put(hostname, d, null);
@@ -250,7 +250,7 @@ public abstract class NamingService {
     /**
      *  @param options NamingService-specific, can be null
      *  @return success
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public boolean put(String hostname, Destination d, Properties options) {
         return false;
@@ -259,7 +259,7 @@ public abstract class NamingService {
     /**
      *  Fails if entry previously exists
      *  @return success
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public boolean putIfAbsent(String hostname, Destination d) {
         return putIfAbsent(hostname, d, null);
@@ -269,7 +269,7 @@ public abstract class NamingService {
      *  Fails if entry previously exists
      *  @param options NamingService-specific, can be null
      *  @return success
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public boolean putIfAbsent(String hostname, Destination d, Properties options) {
         return false;
@@ -278,7 +278,7 @@ public abstract class NamingService {
     /**
      *  @param options NamingService-specific, can be null
      *  @return success
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public boolean putAll(Map<String, Destination> entries, Properties options) {
         boolean rv = true;
@@ -294,7 +294,7 @@ public abstract class NamingService {
      *  @param d may be null if only options are changing
      *  @param options NamingService-specific, can be null
      *  @return success
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public boolean update(String hostname, Destination d, Properties options) {
         return false;
@@ -302,7 +302,7 @@ public abstract class NamingService {
 
     /**
      *  @return success
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public boolean remove(String hostname) {
         return remove(hostname, null);
@@ -311,7 +311,7 @@ public abstract class NamingService {
     /**
      *  @param options NamingService-specific, can be null
      *  @return success
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public boolean remove(String hostname, Properties options) {
         return false;
@@ -320,7 +320,7 @@ public abstract class NamingService {
     /**
      *  Ask any registered updaters to update now
      *  @param options NamingService- or updater-specific, may be null
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public void requestUpdate(Properties options) {
         for (NamingServiceUpdater nsu : _updaters) {
@@ -329,28 +329,28 @@ public abstract class NamingService {
     }
 
     /**
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public void registerListener(NamingServiceListener nsl) {
         _listeners.add(nsl);
     }
 
     /**
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public void unregisterListener(NamingServiceListener nsl) {
         _listeners.remove(nsl);
     }
 
     /**
-     *  @since 0.8.6
+     *  @since 0.8.7
      */
     public void registerUpdater(NamingServiceUpdater nsu) {
         _updaters.add(nsu);
     }
 
     /**
-     *  @since 0.8.6
+     *  @since 0.8.7
      */
     public void unregisterUpdater(NamingServiceUpdater nsu) {
         _updaters.remove(nsu);
@@ -363,7 +363,7 @@ public abstract class NamingService {
      *  @param lookupOptions input parameter, NamingService-specific, can be null
      *  @param storedOptions output parameter, NamingService-specific, any stored properties will be added if non-null
      *  @return dest or null
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public abstract Destination lookup(String hostname, Properties lookupOptions, Properties storedOptions);
 
@@ -371,7 +371,7 @@ public abstract class NamingService {
      *  Same as reverseLookup(dest) but with options
      *  @param options NamingService-specific, can be null
      *  @return host name or null
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public String reverseLookup(Destination d, Properties options) {
         return null;
@@ -383,7 +383,7 @@ public abstract class NamingService {
      *  @param hostname must be {52 chars}.b32.i2p
      *  @param timeout in seconds; <= 0 means use router default
      *  @return dest or null
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public Destination lookupBase32(String hostname, int timeout) {
         return null;
@@ -393,7 +393,7 @@ public abstract class NamingService {
      *  Same as lookupB32 but with the SHA256 Hash precalculated
      *  @param timeout in seconds; <= 0 means use router default
      *  @return dest or null
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public Destination lookup(Hash hash, int timeout) {
         return null;
@@ -403,7 +403,7 @@ public abstract class NamingService {
      *  Parent will call when added.
      *  If this is the root naming service, the core will start it.
      *  Should not be called by others.
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public void start() {}
 
@@ -411,7 +411,7 @@ public abstract class NamingService {
      *  Parent will call when removed.
      *  If this is the root naming service, the core will stop it.
      *  Should not be called by others.
-     *  @since 0.8.5
+     *  @since 0.8.7
      */
     public void shutdown() {}
 

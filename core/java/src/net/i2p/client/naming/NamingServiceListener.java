@@ -5,7 +5,7 @@ import java.util.Properties;
 import net.i2p.data.Destination;
 
 /**
- * @since 0.8.6
+ * @since 0.8.7
  */
 public interface NamingServiceListener {
 

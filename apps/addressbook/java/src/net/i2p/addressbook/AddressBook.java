@@ -156,7 +156,7 @@ class AddressBook {
 
     /**
      * Return an iterator over the addresses in the AddressBook.
-     * @since 0.8.6
+     * @since 0.8.7
      */
     public Iterator<Map.Entry<String, String>> iterator() {
         if (this.subFile != null)
@@ -166,7 +166,7 @@ class AddressBook {
 
     /**
      * Delete the temp file or clear the map.
-     * @since 0.8.6
+     * @since 0.8.7
      */
     public void delete() {
         if (this.subFile != null) {

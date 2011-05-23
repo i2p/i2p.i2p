@@ -70,6 +70,8 @@ import net.metanotion.util.skiplist.SkipList;
  * </pre>
  *
  * All host names are converted to lower case.
+ *
+ * @since 0.8.7
  */
 public class BlockfileNamingService extends DummyNamingService {
 

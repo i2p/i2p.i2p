@@ -165,7 +165,7 @@ public class DataHelper {
      * Use utf8 = true for SessionConfig (slow, UTF-8)
      * @param props source may be null
      * @param sort should we sort the properties? (set to false if already sorted, e.g. OrderedProperties)
-     * @since 0.8.6
+     * @since 0.8.7
      */
     public static void writeProperties(OutputStream rawStream, Properties props, boolean utf8, boolean sort) 
             throws DataFormatException, IOException {

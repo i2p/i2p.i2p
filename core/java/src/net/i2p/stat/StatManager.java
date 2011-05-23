@@ -89,7 +89,7 @@ public class StatManager {
      * @param description simple description of the statistic
      * @param group used to group statistics together
      * @param periods array of period lengths (in milliseconds)
-     * @since 0.8.6
+     * @since 0.8.7
      */
     public void createRequiredFrequencyStat(String name, String description, String group, long periods[]) {
         if (_frequencyStats.containsKey(name)) return;
@@ -118,7 +118,7 @@ public class StatManager {
      * @param description simple description of the statistic
      * @param group used to group statistics together
      * @param periods array of period lengths (in milliseconds)
-     * @since 0.8.6
+     * @since 0.8.7
      */
     public void createRequiredRateStat(String name, String description, String group, long periods[]) {
             if (_rateStats.containsKey(name)) return;

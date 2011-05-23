@@ -8,7 +8,7 @@ import net.i2p.I2PAppContext;
 
 /**
  * Format a date in local time zone
- * @since 0.8.6
+ * @since 0.8.7
  */
 public abstract class FormatDate
 {

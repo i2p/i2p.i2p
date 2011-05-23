@@ -47,7 +47,7 @@ import net.i2p.util.SecureFileOutputStream;
  * Use from HostsTxtNamingService or chain with another NamingService
  * via MetaNamingService if you need those features.
  *
- * @since 0.8.5
+ * @since 0.8.7
  */
 public class SingleFileNamingService extends NamingService {
 

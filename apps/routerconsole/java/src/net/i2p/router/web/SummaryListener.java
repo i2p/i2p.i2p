@@ -207,12 +207,12 @@ class SummaryListener implements RateSummaryListener {
 
     long now() { return _context.clock().now(); }
     
-    /** @since 0.8.6 */
+    /** @since 0.8.7 */
     String getBackendName() {
         return _isPersistent ? RrdNioBackendFactory.NAME : RrdMemoryBackendFactory.NAME;
     }
 
-    /** @since 0.8.6 */
+    /** @since 0.8.7 */
     int getRows() {
         return _rows;
     }

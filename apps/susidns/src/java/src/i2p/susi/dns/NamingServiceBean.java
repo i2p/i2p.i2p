@@ -17,7 +17,7 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *  
- * @since 0.8.6
+ * @since 0.8.7
  */
 
 package i2p.susi.dns;
@@ -41,7 +41,7 @@ import net.i2p.data.Destination;
  *  Talk to the NamingService API instead of modifying the hosts.txt files directly,
  *  except for the 'published' addressbook.
  *
- *  @since 0.8.6
+ *  @since 0.8.7
  */
 public class NamingServiceBean extends AddressbookBean
 {

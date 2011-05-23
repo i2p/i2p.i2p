@@ -86,7 +86,7 @@ class DummyNamingService extends NamingService {
         }
     }
 
-    /** @since 0.8.5 */
+    /** @since 0.8.7 */
     protected static void removeCache(String s) {
         synchronized (_cache) {
             _cache.remove(s);

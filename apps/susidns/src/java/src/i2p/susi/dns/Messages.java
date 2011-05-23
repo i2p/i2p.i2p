@@ -32,7 +32,7 @@ public class Messages {
         return Translate.getString(s, o, o2, I2PAppContext.getGlobalContext(), BUNDLE_NAME);
     }
 
-    /** translate (ngettext) @since 0.8.6 */
+    /** translate (ngettext) @since 0.8.7 */
     public static String getString(int n, String s, String p) {
         return Translate.getString(n, s, p, I2PAppContext.getGlobalContext(), BUNDLE_NAME);
     }
