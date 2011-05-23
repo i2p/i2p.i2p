@@ -48,7 +48,7 @@ public class StatSummarizer implements Runnable {
     private static final int MAX_CONCURRENT_PNG = 3;
     private final Semaphore _sem;
     private volatile boolean _isRunning = true;
-    private volatile boolean _isDisabled;
+    private boolean _isDisabled;
     private Thread _thread;
     
     public StatSummarizer() {
@@ -88,9 +88,9 @@ public class StatSummarizer implements Runnable {
         }
     }
     
-    /** @since 0.8.6 */
-    boolean isDisabled() {
-        return _isDisabled;
+    /** @since 0.8.7 */
+    static boolean isDisabled() {
+        return _instance == null || _instance._isDisabled;
     }
 
     /** list of SummaryListener instances */
@@ -305,7 +305,7 @@ public class StatSummarizer implements Runnable {
                 def.setTitle(title);
             long started = _context.router().getWhenStarted();
             if (started > start && started < end)
-                def.vrule(started / 1000, Color.BLACK, null, 4.0f);  // no room for legend
+                def.vrule(started / 1000, SummaryRenderer.RESTART_BAR_COLOR, null, 4.0f);  // no room for legend
             String sendName = SummaryListener.createName(_context, "bw.sendRate.60000");
             String recvName = SummaryListener.createName(_context, "bw.recvRate.60000");
             def.datasource(sendName, txLsnr.getData().getPath(), sendName, SummaryListener.CF, txLsnr.getBackendName());
@@ -392,25 +392,27 @@ public class StatSummarizer implements Runnable {
 
     /**
      *  Delete the old rrd dir if we are no longer persistent
-     *  @since 0.8.6
+     *  @since 0.8.7
      */
     private void deleteOldRRDs() {
         File rrdDir = new File(_context.getRouterDir(), SummaryListener.RRD_DIR);
         FileUtil.rmdir(rrdDir, false);
     }
 
+    private static final boolean IS_WIN = System.getProperty("os.name").startsWith("Win");
+
     /** translate a string */
     private String _(String s) {
         // the RRD font doesn't have zh chars, at least on my system
-        // Works on 1.5.9
-        //if ("zh".equals(Messages.getLanguage(_context)))
-        //    return s;
+        // Works on 1.5.9 except on windows
+        if (IS_WIN && "zh".equals(Messages.getLanguage(_context)))
+            return s;
         return Messages.getString(s, _context);
     }
 
     /**
      *  Make sure any persistent RRDs are closed
-     *  @since 0.8.6
+     *  @since 0.8.7
      */
     private class Shutdown implements Runnable {
         public void run() {

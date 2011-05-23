@@ -45,7 +45,7 @@ public class GraphHelper extends FormHandler {
     
     /**
      *  This must be output in the jsp since <meta> must be in the <head>
-     *  @since 0.8.6
+     *  @since 0.8.7
      */
     public String getRefreshMeta() {
         if (_refreshDelaySeconds <= 8 ||
@@ -85,11 +85,11 @@ public class GraphHelper extends FormHandler {
         } catch (NumberFormatException nfe) {}
     }
 
-    /** @since 0.8.6 */
+    /** @since 0.8.7 */
     public void setPersistent(String foo) { _persistent = true; }
     
     public String getImages() { 
-        if (StatSummarizer.instance().isDisabled())
+        if (StatSummarizer.isDisabled())
             return "";
         try {
             List listeners = StatSummarizer.instance().getListeners();
@@ -157,7 +157,7 @@ public class GraphHelper extends FormHandler {
     private static final int[] times = { 60, 2*60, 5*60, 10*60, 30*60, 60*60, -1 };
 
     public String getForm() { 
-        if (StatSummarizer.instance().isDisabled())
+        if (StatSummarizer.isDisabled())
             return "";
         String prev = System.getProperty("net.i2p.router.web.GraphHelper.nonce");
         if (prev != null) System.setProperty("net.i2p.router.web.GraphHelper.noncePrev", prev);
@@ -204,11 +204,11 @@ public class GraphHelper extends FormHandler {
 
     /**
      *  We have to do this here because processForm() isn't called unless the nonces are good
-     *  @since 0.8.6
+     *  @since 0.8.7
      */
     @Override
     public String getAllMessages() {
-        if (StatSummarizer.instance().isDisabled()) {
+        if (StatSummarizer.isDisabled()) {
             addFormError("Graphing not supported with this JVM: " +
                          System.getProperty("java.vendor") + ' ' +
                          System.getProperty("java.version") + " (" +

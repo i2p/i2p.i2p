@@ -131,7 +131,7 @@ public class SummaryBarRenderer {
            //  .append(_("Jobs"))
            //  .append("</a>\n" +
 
-            if (!StatSummarizer.instance().isDisabled()) {
+            if (!StatSummarizer.isDisabled()) {
                 buf.append("<a href=\"/graphs\" target=\"_top\" title=\"")
                .append(_("Graph router performance"))
                .append("\">")

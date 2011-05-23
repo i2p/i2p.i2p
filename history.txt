@@ -1,3 +1,10 @@
+2011-05-23 zzz
+    * Console:
+      - Disable zh translation in graphs on windows due to font issues
+      - Force news refetch after URL change
+      - Fix NPE at startup
+      - Graph tweaks
+
 2011-05-23 sponge
     * mbuild.sh fixups
     * add new jcpuid/mbuild.sh -- pedantic naming

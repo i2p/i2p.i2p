@@ -477,7 +477,7 @@ div.graphspanel img {
      text-align: center !important;
      background: #001;
      -moz-box-shadow: inset 0px 0px 1px 1px #99f;
-     opacity: 0.8;
+     opacity: 0.9;
 }
 
 div.graphspanel img:hover {

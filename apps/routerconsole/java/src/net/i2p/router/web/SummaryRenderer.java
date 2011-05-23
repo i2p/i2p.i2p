@@ -34,6 +34,7 @@ class SummaryRenderer {
     private final Log _log;
     private final SummaryListener _listener;
     private final I2PAppContext _context;
+    static final Color RESTART_BAR_COLOR = new Color(255, 144, 0, 224);
 
     public SummaryRenderer(I2PAppContext ctx, SummaryListener lsnr) { 
         _log = ctx.logManager().getLog(SummaryRenderer.class);
@@ -101,9 +102,9 @@ class SummaryRenderer {
                 String title;
                 String p;
                 // we want the formatting and translation of formatDuration2(), except not zh, and not the &nbsp;
-                //if ("zh".equals(Messages.getLanguage(_context)))
-                //    p = DataHelper.formatDuration(_listener.getRate().getPeriod());
-                //else
+                if (IS_WIN && "zh".equals(Messages.getLanguage(_context)))
+                    p = DataHelper.formatDuration(_listener.getRate().getPeriod());
+                else
                     p = DataHelper.formatDuration2(_listener.getRate().getPeriod()).replace("&nbsp;", " ");
                 if (showEvents)
                     title = name + ' ' + _("events in {0}", p);
@@ -130,7 +131,7 @@ class SummaryRenderer {
             }
             long started = ((RouterContext)_context).router().getWhenStarted();
             if (started > start && started < end)
-                def.vrule(started / 1000, Color.BLACK, _("Restart"), 4.0f);
+                def.vrule(started / 1000, RESTART_BAR_COLOR, _("Restart"), 4.0f);
             def.datasource(plotName, path, plotName, SummaryListener.CF, _listener.getBackendName());
             if (descr.length() > 0)
                 def.area(plotName, Color.BLUE, descr + "\\r");
@@ -190,12 +191,14 @@ class SummaryRenderer {
         }
     }
 
+    private static final boolean IS_WIN = System.getProperty("os.name").startsWith("Win");
+
     /** translate a string */
     private String _(String s) {
         // the RRD font doesn't have zh chars, at least on my system
-        // Works on 1.5.9
-        //if ("zh".equals(Messages.getLanguage(_context)))
-        //  return s;
+        // Works on 1.5.9 except on windows
+        if (IS_WIN && "zh".equals(Messages.getLanguage(_context)))
+            return s;
         return Messages.getString(s, _context);
     }
 
@@ -204,9 +207,9 @@ class SummaryRenderer {
      */
     private String _(String s, String o) {
         // the RRD font doesn't have zh chars, at least on my system
-        // Works on 1.5.9
-        //if ("zh".equals(Messages.getLanguage(_context)))
-        //  return s.replace("{0}", o);
+        // Works on 1.5.9 except on windows
+        if (IS_WIN && "zh".equals(Messages.getLanguage(_context)))
+            return s.replace("{0}", o);
         return Messages.getString(s, o, _context);
     }
 }
