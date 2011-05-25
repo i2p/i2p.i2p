@@ -117,9 +117,9 @@ public class NativeBigInteger extends BigInteger {
     private static final boolean _isWin = System.getProperty("os.name").startsWith("Win");
     private static final boolean _isOS2 = System.getProperty("os.name").startsWith("OS/2");
     private static final boolean _isMac = System.getProperty("os.name").startsWith("Mac");
-    private static final boolean _isLinux = System.getProperty("os.name").toLowerCase().indexOf("linux") != -1;
-    private static final boolean _isFreebsd = System.getProperty("os.name").toLowerCase().indexOf("freebsd") != -1;
-    private static final boolean _isNix = !(_isWin || _isMac || _isOS2);
+    private static final boolean _isLinux = System.getProperty("os.name").toLowerCase().contains("linux");
+    private static final boolean _isFreebsd = System.getProperty("os.name").toLowerCase().contains("freebsd");
+
     /* libjbigi.so vs jbigi.dll */
     private static final String _libPrefix = (_isWin || _isOS2 ? "" : "lib");
     private static final String _libSuffix = (_isWin || _isOS2 ? ".dll" : _isMac ? ".jnilib" : ".so");
@@ -138,7 +138,18 @@ public class NativeBigInteger extends BigInteger {
       * @return A string containing the CPU-type or null if CPU type is unknown
       */
     private static String resolveCPUType() {
-        boolean is64 = (-1 != System.getProperty("os.arch").indexOf("64"));
+        /*
+         * This isn't always correct.
+         * http://stackoverflow.com/questions/807263/how-do-i-detect-which-kind-of-jre-is-installed-32bit-vs-64bit
+         * http://mark.koli.ch/2009/10/javas-osarch-system-property-is-the-bitness-of-the-jre-not-the-operating-system.html
+         * http://mark.koli.ch/2009/10/reliably-checking-os-bitness-32-or-64-bit-on-windows-with-a-tiny-c-app.html
+         * sun.arch.data.model not on all JVMs
+         * sun.arch.data.model == 64 => 64 bit processor
+         * sun.arch.data.model == 32 => A 32 bit JVM but could be either 32 or 64 bit processor or libs
+         * os.arch contains "64" could be 32 or 64 bit libs
+         */
+        boolean is64 = "64".equals(System.getProperty("sun.arch.data.model")) ||
+                       System.getProperty("os.arch").contains("64");
         if (is64)
             return JBIGI_OPTIMIZATION_ATHLON64;
         
@@ -482,7 +493,6 @@ public class NativeBigInteger extends BigInteger {
             InputStream libStream = resource.openStream();
             outFile = new File(I2PAppContext.getGlobalContext().getTempDir(), filename);
             fos = new FileOutputStream(outFile);
-            // wtf this was 4096*1024 which is really excessive for a roughly 50KB file
             byte buf[] = new byte[4096];
             while (true) {
                 int read = libStream.read(buf);
@@ -516,37 +526,39 @@ public class NativeBigInteger extends BigInteger {
         return true;
     }
     
+    /**
+     *  @return may be null if optimized is true
+     */
     private static final String getResourceName(boolean optimized) {
-        String pref = _libPrefix;
         String middle = getMiddleName(optimized);
-        String suff = _libSuffix;
-        if(pref == null || middle == null || suff == null)
+        if (middle == null)
             return null;
-        return pref+middle+suff;
+        return _libPrefix + middle + _libSuffix;
     }
     
-    private static final String getMiddleName(boolean optimized){
-        
+    /**
+     *  @return may be null if optimized is true; returns jbigi-xxx-none if optimize is false
+     */
+    private static final String getMiddleName(boolean optimized) {
         String sAppend;
-        if(optimized)
-        {
-            if(sCPUType == null)
+        if (optimized) {
+            if (sCPUType == null)
                 return null;
-            else
-                sAppend = "-"+sCPUType;        
-        }else
-               sAppend = "-none";
+            sAppend = "-" + sCPUType;        
+        } else {
+            sAppend = "-none";
+        }
 
         if(_isWin)
              return "jbigi-windows"+sAppend; // The convention on Windows
-        if(_isLinux)
-            return "jbigi-linux"+sAppend; // The convention on linux...
         if(_isFreebsd)
             return "jbigi-freebsd"+sAppend; // The convention on freebsd...
         if(_isMac)
             return "jbigi-osx"+sAppend;
         if(_isOS2)
             return "jbigi-os2"+sAppend;
-        throw new RuntimeException("Dont know jbigi library name for os type '"+System.getProperty("os.name")+"'");
+        //throw new RuntimeException("Dont know jbigi library name for os type '"+System.getProperty("os.name")+"'");
+        // use linux as the default, don't throw exception
+        return "jbigi-linux" + sAppend;
     }
 }
