@@ -15,12 +15,12 @@
 Als je wilt helpen om de documentatie te verbeteren of vertalen, of wilt helpen
 met andere aspecten van het project, zie dan de documentatie voor 
 <a href="http://www.i2p2.i2p/getinvolved.html">vrijwilligers.</a>
-</p><p>Verdere ondersteuning is hier beschikbaar:
+</p>Verdere ondersteuning is hier beschikbaar:
 <ul class="links">
-<li class="tidylist"><a href="http://www.i2p2.i2p/faq.html">FAQ op www.i2p2.i2p</a>
+<li class="tidylist"><a href="http://www.i2p2.i2p/faq.html">FAQ op www.i2p2.i2p</a></li>
 </ul>
 <br>Je kunt ook het <a href="http://forum.i2p/">I2P forum</a>
-of IRC proberen.</p>
+of IRC proberen.
 
 <h2>Informatie over de Summary Bar</h2><p>
 Veel van de statistieken op de summary bar kunnen
@@ -32,14 +32,14 @@ Veel van de statistieken op de summary bar kunnen
 <li class="tidylist"><b>Lokale Identiteit:</b>
 De eerste vier karakters (24 bits) van je 44-karakter (256-bit) Base64 router hash.
 De volledige hash is getoond op je <a href="netdb.jsp?r=.">router info pagina</a>.
-Vertel deze aan niemand, want de router info bevat je IP.
+Vertel deze aan niemand, want de router info bevat je IP.</li>
 <li class="tidylist"><b>Versie:</b>
-De versie van de I2P software die je nu gebruikt.
+De versie van de I2P software die je nu gebruikt.</li>
 <li class="tidylist"><b>Uptime:</b>
-Hoe lang je I2P router al draait.
+Hoe lang je I2P router al draait.</li>
 <li class="tidylist"><b>Netwerk Bereikbaarheid:</b>
 De bereikbaarheid van je router door andere routers.
-Meer informatie is te vinden op de <a href="config.jsp#help">configuratie pagina</a>.
+Meer informatie is te vinden op de <a href="config.jsp#help">configuratie pagina</a>.</li>
 </ul>
 
 <h3>Peers</h3><ul>
@@ -51,21 +51,21 @@ en lokaal gegenereerd verkeer.  Het tweede nummer is het aantal peers dat je in
 het laatste uur hebt gezien.  Wees niet ongerust wanneer deze aantallen erg
 vari&euml;ren.
 
-<a href="configstats.jsp#router.activePeers">[Grafieken inschakelen]</a>.
+<a href="configstats.jsp#router.activePeers">[Grafieken inschakelen]</a>.</li>
 <li class="tidylist"><b>Snel:</b>
 Dit is het aantal peers dat je gebruikt om client tunnels mee te bouwen. Het ligt over
 het algemeen tussen 8 en 30.
 Je snelle peers worden getoond op de <a href="profiles.jsp">profielen pagina</a>.
-<a href="configstats.jsp#router.fastPeers">[Grafieken inschakelen]</a>.
+<a href="configstats.jsp#router.fastPeers">[Grafieken inschakelen]</a>.</li>
 <li class="tidylist"><b>Grote capaciteit:</b>
 Dit is het aantal peers dat je gebruikt om sommige van de onderzoekende tunnels mee te maken.
 Het ligt over het algemeen tussen de 8 en 75. De snelle peers zijn inbegrepen in de categorie grote capaciteit.
 De grote capaciteits peers worden getoond op de <a href="profiles.jsp">profielen pagina</a>.
-<a href="configstats.jsp#router.highCapacityPeers">[Grafieken inschakelen]</a>.
+<a href="configstats.jsp#router.highCapacityPeers">[Grafieken inschakelen]</a>.</li>
 <li class="tidylist"><b>Ge&iuml;ntegreerd:</b>
 Dit is het aantal peers dat je gebruikt bij het opzoeken in de network database.
 Dit zijn gebruikelijk de "floodfill" peers.
-Je goed ge&iuml;ntegreerde peers worden getoond aan de onderkant van de <a href="profiles.jsp">profielen pagina</a>.
+Je goed ge&iuml;ntegreerde peers worden getoond aan de onderkant van de <a href="profiles.jsp">profielen pagina</a>.</li>
 <li class="tidylist"><b>Bekend:</b>
 Dit is het aantal routers dat bekend is bij je router.
 Ze worden getoond op de <a href="netdb.jsp">netwerk database pagina</a>.
@@ -74,7 +74,7 @@ Dit aantal is niet de totale grootte van het netwerk;
 het kan erg vari&euml;ren afhankelijk van je totale bandbreedte,
 gedeelde bandbreedte en lokaal gegenereerd verkeer.
 Voor I2P is het niet nodig dat een router alle andere routers kent.
-</ul>
+</li></ul>
 
 <h3>Bandbreedte in/out</h3><div align="justify">
 Dit zou zichzelf moeten verklaren. Alle waarden zijn in bytes per seconde, niet in bits per seconde.
@@ -85,9 +85,9 @@ Bandbreedte wordt standaard <a href="graphs.jsp">geplot</a>.</div>
 De tunnels zelf worden getoond op de <a href="tunnels.jsp">tunnels pagina</a>.</div><ul>
 <li class="tidylist"><div align="justify"><b>Onderzoekend:</b>
 Tunnels gebouwd door je router en gebruikt om te communiceren met de floodfill peers,
-voor het bouwen van nieuwe tunnels en testen van bestaande tunnels.</div>
+voor het bouwen van nieuwe tunnels en testen van bestaande tunnels.</div></li>
 <li class="tidylist"><b>Client:</b>
-Tunnels gebouwd door je router voor het gebruik door elke client.
+Tunnels gebouwd door je router voor het gebruik door elke client.</li>
 <li class="tidylist"><b>Deelnemend:</b>
 Tunnels gebouwd door andere routers die door je eigen router heen lopen.
 Dit kan erg vari&euml;ren afhankelijk van de vraag vanuit het netwerk,
@@ -95,11 +95,11 @@ je gedeelde bandbreedte en hoeveelheid lokaal gegenereerd verkeer.
 De aanbevolen methode om het aantal deelnemende tunnels te beperken
 is door het share percentage te wijzigen op de <a href="config.jsp#help">configuratie pagina</a>.
 Je kan het totale aantal ook beperken met de instelling <tt>router.maxParticipatingTunnels=nnn</tt> op
-de <a href="configadvanced.jsp">geavanceerde configuratie pagina</a>. <a href="configstats.jsp#tunnel.participatingTunnels">[Grafieken inschakelen]</a>.
+de <a href="configadvanced.jsp">geavanceerde configuratie pagina</a>. <a href="configstats.jsp#tunnel.participatingTunnels">[Grafieken inschakelen]</a>.</li>
 <li class="tidylist"><b>Share rato:</b>
 Het aantal deelnemende tunnels dat je voor andere routeert, gedeeld door het totale aantal hops in al je onderzoekende en client tunnels.
 Een aantal groter dan 1.00 betekent dat je meer tunnels aan het netwerk bijdraagt dan je gebruikt.
-</ul>
+</li></ul>
 
 <h3>Verstopping</h3><div align="justify">
 Een aantal basis indicatoren voor een router overbelasting:</div><ul>
@@ -110,33 +110,33 @@ hun status is niet beschikbaar in de router console.
 De taak vertraging zou over het algemeen nul moeten zijn.
 Indien dit consequent hoger is dan 500ms, dan is of je computer erg traag of
 heeft de router een serieus probleem.
-<a href="configstats.jsp#jobQueue.jobLag">[Grafieken inschakelen]</a>.
+<a href="configstats.jsp#jobQueue.jobLag">[Grafieken inschakelen]</a>.</li>
 <li class="tidylist"><b>Bericht vertraging:</b>
 Hoe lang een uitgaand bericht wacht in de wachtrij.
 Dit zou over het algemeen een aantal honderd milliseconden of minder moeten zijn.
 Indien dit consequent hoger is dan 1000ms, dan is of je computer erg traag
 of moet je je bandbreedte instellingen aanpassen, of je (bittorrent?) clients
 versturen mogelijk teveel data en moeten hun transmissie bandbreedte beperkt hebben.
-<a href="configstats.jsp#transport.sendProcessingTime">[Grafieken inschakelen]</a> (transport.sendProcessingTime).
+<a href="configstats.jsp#transport.sendProcessingTime">[Grafieken inschakelen]</a> (transport.sendProcessingTime).</li>
 <li class="tidylist"><b>Tunnel vertraging:</b>
 Dit is de rondgangstijd voor een tunnel test, welke een enkel bericht verstuurt
 vanuit een client tunnel dat dan bij een onderzoekende tunnel naar binnen gaat, of omgekeerd.
 Dit zou over het algemeen minder dan 5 seconden moeten zijn.
 Indien dit consequent hoger is, dan is of je computer erg traag of
 moet je je bandbreedte instellingen aanpassen of zijn er netwerk problemen.
-<a href="configstats.jsp#tunnel.testSuccessTime">[Grafieken inschakelen]</a> (tunnel.testSuccessTime).
+<a href="configstats.jsp#tunnel.testSuccessTime">[Grafieken inschakelen]</a> (tunnel.testSuccessTime).</li>
 <li class="tidylist"><b>Achterstand:</b>
 Dit is het aantal wachtende aanvragen van andere routers om een deelnemende
 tunnel door je eigen router te bouwen.
 Dit zou over het algemeen dicht bij de nul moeten zijn.
 Indien dit consequent hoog is, dan is of je computer te traag of
-moet je je bandbreedte instellingen aanpassen.
+moet je je bandbreedte instellingen aanpassen.</li>
 <li class="tidylist"><b>Accepteren / Weigeren:</b>
 De status van de router voor het accepteren of weigeren
 van verzoeken van andere routers om een deelnemende tunnel door je router te bouwen.
 Je router kan alle aanvragen accepteren, een percentage accepteren of weigeren,
 of alle aanvragen weigeren om verschillende redenen, om de bandbreedte en CPU
-gebruik te beheren en capaciteit te houden voor lokale clients.</ul>
+gebruik te beheren en capaciteit te houden voor lokale clients.</li></ul>
 
 <h3>Lokale bestemmingen</h3><div align="justify">
 De lokale applicaties die door je router verbinden.
