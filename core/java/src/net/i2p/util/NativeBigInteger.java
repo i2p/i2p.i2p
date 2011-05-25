@@ -544,7 +544,13 @@ public class NativeBigInteger extends BigInteger {
         if (optimized) {
             if (sCPUType == null)
                 return null;
-            sAppend = "-" + sCPUType;        
+            // Add exceptions here if library files are identical,
+            // instead of adding duplicates to jbigi.jar
+            if (sCPUType.equals(JBIGI_OPTIMIZATION_K6_3) && !_isWin)
+                // k62 and k63 identical except on windows
+                sAppend = "-" + JBIGI_OPTIMIZATION_K6_2;
+            else
+                sAppend = "-" + sCPUType;        
         } else {
             sAppend = "-none";
         }
