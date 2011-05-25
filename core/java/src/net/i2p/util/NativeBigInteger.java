@@ -157,8 +157,16 @@ public class NativeBigInteger extends BigInteger {
          */
         boolean is64 = "64".equals(System.getProperty("sun.arch.data.model")) ||
                        System.getProperty("os.arch").contains("64");
-        if (is64)
+        if (is64) {
+            // Test the 64 bit libjcpuid, even though we don't use it yet
+            try {
+                CPUInfo c = CPUID.getInfo();
+                _cpuModel = c.getCPUModelString();
+            } catch (UnknownCPUException e) {
+                // log?
+            }
             return JBIGI_OPTIMIZATION_ATHLON64;
+        }
         
         try {
             CPUInfo c = CPUID.getInfo();
