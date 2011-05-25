@@ -113,6 +113,13 @@ public class NativeBigInteger extends BigInteger {
     private final static String JBIGI_OPTIMIZATION_PENTIUM3   = "pentium3";
     private final static String JBIGI_OPTIMIZATION_PENTIUM4   = "pentium4";
     private final static String JBIGI_OPTIMIZATION_VIAC3      = "viac3";
+    /** below here @since 0.8.7 */
+    private final static String JBIGI_OPTIMIZATION_ATOM       = "atom";
+    private final static String JBIGI_OPTIMIZATION_CORE2      = "core2";
+    private final static String JBIGI_OPTIMIZATION_COREI      = "corei";
+    private final static String JBIGI_OPTIMIZATION_GEODE      = "geode";
+    private final static String JBIGI_OPTIMIZATION_NANO       = "nano";
+    private final static String JBIGI_OPTIMIZATION_VIAC32     = "viac32";
 
     private static final boolean _isWin = System.getProperty("os.name").startsWith("Win");
     private static final boolean _isOS2 = System.getProperty("os.name").startsWith("OS/2");
@@ -549,6 +556,9 @@ public class NativeBigInteger extends BigInteger {
             if (sCPUType.equals(JBIGI_OPTIMIZATION_K6_3) && !_isWin)
                 // k62 and k63 identical except on windows
                 sAppend = "-" + JBIGI_OPTIMIZATION_K6_2;
+            else if (sCPUType.equals(JBIGI_OPTIMIZATION_VIAC32))
+                // viac32 and pentium3 identical
+                sAppend = "-" + JBIGI_OPTIMIZATION_PENTIUM3;
             else
                 sAppend = "-" + sCPUType;        
         } else {
