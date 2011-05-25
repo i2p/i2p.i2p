@@ -612,24 +612,37 @@ public class CPUID {
      *
      */
     private static final boolean loadFromResource() {
-        URL resource = null;
         // try 64 bit first, if getResourceName64() returns non-null
         String resourceName = getResourceName64();
-        if (resourceName != null)
-            resource = CPUID.class.getClassLoader().getResource(resourceName);
+        if (resourceName != null) {
+            boolean success = extractLoadAndCopy(resourceName);
+            if (success)
+                return true;
+        }
         
-        if (resource == null) {
-            // now try 32 bit
-            resourceName = getResourceName();
-            resource = CPUID.class.getClassLoader().getResource(resourceName);
-        }
+        // now try 32 bit
+        resourceName = getResourceName();
+        boolean success = extractLoadAndCopy(resourceName);
+        if (success)
+            return true;
 
-        if (resource == null) {
-            if (_doLog)
-                System.err.println("WARNING: Resource name [" + resourceName + "] was not found");
+        if (_doLog)
+            System.err.println("WARNING: Resource name [" + resourceName + "] was not found");
+        return false;
+    }
+
+    /**
+     * Extract a single resource, copy it to a temp location in the file system,
+     * and attempt to load it. If the load succeeds, copy it to the installation
+     * directory. Return value reflects only load success - copy will fail silently.
+     *
+     * @return true if it was loaded successfully, else false.
+     * @since 0.8.7
+     */
+    private static final boolean extractLoadAndCopy(String resourceName) {
+        URL resource = CPUID.class.getClassLoader().getResource(resourceName);
+        if (resource == null)
             return false;
-        }
-
         File outFile = null;
         FileOutputStream fos = null;
         String filename = libPrefix + "jcpuid" + libSuffix;
@@ -652,12 +665,16 @@ public class CPUID {
                                    + " was not a valid library for this platform");
                 ule.printStackTrace();
             }
+            if (outFile != null)
+                outFile.delete();
             return false;
         } catch (IOException ioe) {
             if (_doLog) {
                 System.err.println("ERROR: Problem writing out the temporary native library data");
                 ioe.printStackTrace();
             }
+            if (outFile != null)
+                outFile.delete();
             return false;
         } finally {
             if (fos != null) {
