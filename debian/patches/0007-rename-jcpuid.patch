@@ -1,0 +1,24 @@
+From: Kill Your TV <killyourtv@i2pmail.org>
+Date: Wed, 25 May 2011 00:26:10 +0300
+Subject: rename jcpuid
+
+---
+ core/c/jcpuid/build.sh |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/core/c/jcpuid/build.sh b/core/c/jcpuid/build.sh
+index 244eb07..827e14b 100755
+--- a/core/c/jcpuid/build.sh
++++ b/core/c/jcpuid/build.sh
+@@ -37,8 +37,8 @@ FreeBSD*)
+ Linux*)
+ 	COMPILEFLAGS="-fPIC -Wall"
+ 	INCLUDES="-I. -Iinclude -I$JAVA_HOME/include -I$JAVA_HOME/include/linux"
+-	LINKFLAGS="-shared -Wl,-soname,libjcpuid-x86-linux.so"
+-	LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-x86-linux.so";;
++	LINKFLAGS="-shared -Wl,-soname,libjcpuid.so"
++	LIBFILE="lib/freenet/support/CPUInformation/libjcpuid.so";;
+ esac
+ 
+ echo "Compiling C code..."
+-- 

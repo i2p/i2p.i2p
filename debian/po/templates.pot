@@ -1,0 +1,70 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: i2p@packages.debian.org\n"
+"POT-Creation-Date: 2011-05-15 19:17+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:1001
+msgid "Automatically stop I2P when there are upgrades?"
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:1001
+msgid ""
+"To update this package the I2P router will need to be restarted.  Any "
+"activity on the I2P network will be briefly interrupted during the upgrade."
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:2001
+msgid "Should the I2P router be started at boot?"
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../i2p.templates:2001
+msgid ""
+"The I2P router can be run as a daemon that starts automatically when your "
+"computer boots up. This is the recommended configuration."
+msgstr ""
+
+#. Type: string
+#. Description
+#: ../i2p.templates:3001
+msgid "I2P daemon user:"
+msgstr ""
+
+#. Type: string
+#. Description
+#: ../i2p.templates:3001
+msgid ""
+"By default I2P is configured to run under the account i2psvc when running as "
+"a daemon. To use an existing I2P profile you may enter a different account "
+"name here. For example, if your previous I2P installation is at /home/user/"
+"i2p, you may enter 'user' here."
+msgstr ""
+
+#. Type: string
+#. Description
+#: ../i2p.templates:3001
+msgid ""
+"A script to ease the transition from the manual installation to this deb "
+"package is in development."
+msgstr ""

@@ -1,0 +1,33 @@
+From: Kill Your TV <killyourtv@i2pmail.org>
+Date: Wed, 11 May 2011 00:12:04 +0000
+Subject: Update path of jbigi and add soname
+
+---
+ core/c/jbigi/mbuild_jbigi.sh |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/core/c/jbigi/mbuild_jbigi.sh b/core/c/jbigi/mbuild_jbigi.sh
+index 1e262a6..7581335 100755
+--- a/core/c/jbigi/mbuild_jbigi.sh
++++ b/core/c/jbigi/mbuild_jbigi.sh
+@@ -25,8 +25,8 @@ Darwin*)
+         LIBFILE="libjbigi.jnilib";;
+ *)
+ 	COMPILEFLAGS="-fPIC -Wall"
+-	INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/linux"
+-	LINKFLAGS="-shared -Wl,-soname,libjbigi.so"
++	INCLUDES="-I. -I./jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/linux"
++	LINKFLAGS="-shared -Wl,-soname,libjbigi.so.0"
+ 	LIBFILE="libjbigi.so";;
+ esac
+ 
+@@ -41,7 +41,7 @@ fi
+ 
+ echo "Compiling C code..."
+ rm -f jbigi.o $LIBFILE
+-$CC -c $COMPILEFLAGS $INCLUDES ../../jbigi/src/jbigi.c || exit 1
++$CC -c $COMPILEFLAGS $INCLUDES ./jbigi/src/jbigi.c || exit 1
+ $CC $LINKFLAGS $INCLUDES $INCLUDELIBS -o $LIBFILE jbigi.o $STATICLIBS || exit 1
+ 
+ exit 0
+-- 

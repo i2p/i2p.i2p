@@ -1,0 +1,22 @@
+From: Kill Your TV <killyourtv@i2pmail.org>
+Date: Mon, 18 Apr 2011 16:43:40 +0000
+Subject: disable browser launch
+
+---
+ installer/resources/clients.config |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/installer/resources/clients.config b/installer/resources/clients.config
+index 08c6c62..0506a45 100644
+--- a/installer/resources/clients.config
++++ b/installer/resources/clients.config
+@@ -51,7 +51,7 @@ clientApp.4.main=net.i2p.apps.systray.UrlLauncher
+ clientApp.4.name=Open Router Console in web browser at startup
+ clientApp.4.args=http://127.0.0.1:7657/
+ clientApp.4.delay=3
+-clientApp.4.startOnLoad=true
++clientApp.4.startOnLoad=false
+ 
+ # BOB bridge
+ clientApp.5.args=
+-- 

@@ -1,19 +1,68 @@
 Source: i2p
-Maintainer: Hungry Hobo <HungryHobo@i2pmail.org>
+Maintainer: Kill Your TV <killyourtv@i2pmail.org>
+Uploaders: zzz <zzz@i2pmail.org>
 Section: net
-Standards-Version: 3.8.4
+Standards-Version: 3.9.2
 Priority: optional
+Bugs: mailto:killyourtv@i2pmail.org
 Homepage: http://www.i2p2.de/
-Build-Depends: libc6-dev (>= 2.10), sun-java6-jdk | openjdk-6-jdk | default-jdk | java-sdk, ant, fakeroot, gettext
+Build-Depends: debhelper (>= 7.0.50~), 
+ ant,
+ debconf,
+ default-jdk,
+ libgmp3-dev, 
+ po-debconf
+Build-Depends-Indep: junit, tor-geoipdb
 
 Package: i2p
-Architecture: i386 amd64
+Architecture: all
 Section: net
 Priority: optional
-Depends: ${shlibs:Depends}, sun-java6-jre | default-jre | java-runtime
+Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends}, default-jre | java5-runtime | java6-runtime,
+ adduser, 
+ libjbigi-jni (>= ${source:Version}),
+ libjbigi-jni (<< ${source:Version}.1~),
+ lsb-base (>= 3.2-14), 
+ service-wrapper 
+Suggests: tor, 
+ i2pfox, 
+ mail-client, 
+ mail-reader, 
+ news-reader, 
+ polipo, 
+ privoxy, 
+ syndie,
+ www-browser, 
+ xul-ext-torbutton 
 Description: Load-balanced unspoofable packet switching network
  I2P is an anonymizing network, offering a simple layer that identity-sensitive
  applications can use to securely communicate. All data is wrapped with several
  layers of encryption, and the network is both distributed and dynamic, with no
  trusted parties.
-Homepage: http://www.i2p2.de/
+
+Package: libjbigi-jni
+Architecture: any
+Section: java
+Priority: optional
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Homepage: http://www.i2p2.de/jbigi
+Description: Java Big Integer library
+ This Package contains the libjbigi JNI library
+ .
+ libjbigi is a math library that is part of the I2P installation.  Use of this
+ library greatly enhances the efficiency of cryptographic algorithms, such as
+ the ones used by I2P. You can expect to see a 5-7x speed improvement on certain
+ tasks, such as elGamal encryption/decryption.
+
+Package: i2p-doc
+Architecture: all
+Section: doc
+Depends: ${misc:Depends}
+Suggests: i2p, default-jdk-doc
+Description: Documentation for I2P
+ I2P is an anonymizing network, offering a simple layer that identity-sensitive
+ applications can use to securely communicate. All data is wrapped with several
+ layers of encryption, and the network is both distributed and dynamic, with no
+ trusted parties. 
+ .
+ This package contains the Javadoc files.

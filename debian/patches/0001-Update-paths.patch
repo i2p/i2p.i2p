@@ -1,0 +1,124 @@
+From: Kill Your TV <killyourtv@i2pmail.org>
+Date: Mon, 18 Apr 2011 16:43:40 +0000
+Subject: Update-paths
+
+---
+ installer/resources/eepget         |    2 +-
+ installer/resources/i2prouter      |    8 ++++----
+ installer/resources/runplain.sh    |    6 +++---
+ installer/resources/wrapper.config |   17 ++++++++---------
+ 4 files changed, 16 insertions(+), 17 deletions(-)
+
+diff --git a/installer/resources/eepget b/installer/resources/eepget
+index 080bcc8..f2e84ba 100644
+--- a/installer/resources/eepget
++++ b/installer/resources/eepget
+@@ -1,3 +1,3 @@
+ #!/bin/sh
+-I2P="%INSTALL_PATH"
++I2P="/usr/share/i2p"
+ java -cp "$I2P/lib/i2p.jar" net.i2p.util.EepGet "$@"
+diff --git a/installer/resources/i2prouter b/installer/resources/i2prouter
+index be6ef4f..8ebe059 100644
+--- a/installer/resources/i2prouter
++++ b/installer/resources/i2prouter
+@@ -22,8 +22,8 @@
+ # Note that (percent)INSTALL_PATH and (percent)SYSTEM_java_io_tmpdir
+ # should have been replaced by the izpack installer.
+ # If you did not run the installer, replace them with the appropriate path.
+-I2P="%INSTALL_PATH"
+-I2PTEMP="%SYSTEM_java_io_tmpdir"
++I2P="/usr/share/i2p"
++I2PTEMP="/tmp"
+ # PORTABLE installation:
+ # Use the following instead.
+ #I2PTEMP="%INSTALL_PATH"
+@@ -33,8 +33,8 @@ APP_NAME="i2p"
+ APP_LONG_NAME="I2P Service"
+ 
+ # Wrapper
+-WRAPPER_CMD="$I2P/i2psvc"
+-WRAPPER_CONF="$I2P/wrapper.config"
++WRAPPER_CMD="/usr/sbin/wrapper"
++WRAPPER_CONF="/etc/i2p/wrapper.config"
+ 
+ # Priority at which to run the wrapper.  See "man nice" for valid priorities.
+ #  nice is only used if a priority is specified.
+diff --git a/installer/resources/runplain.sh b/installer/resources/runplain.sh
+index eaf2d29..e5530eb 100644
+--- a/installer/resources/runplain.sh
++++ b/installer/resources/runplain.sh
+@@ -11,12 +11,12 @@
+ # Note that (percent)INSTALL_PATH and (percent)SYSTEM_java_io_tmpdir
+ # should have been replaced by the izpack installer.
+ # If you did not run the installer, replace them with the appropriate path.
+-I2P="%INSTALL_PATH"
+-I2PTEMP="%SYSTEM_java_io_tmpdir"
++I2P="/usr/share/i2p"
++I2PTEMP="/tmp"
+ 
+ export CP="$I2P" ; for j in "$I2P/lib/*"  ; do export CP="$CP:$j" ; done;
+ JAVA=java
+ 
+-JAVAOPTS="-Djava.library.path=$I2P:$I2P/lib -Di2p.dir.base=$I2P -DloggerFilenameOverride=logs/log-router-@.txt"
++JAVAOPTS="-Djava.library.path=/usr/lib/jni:$I2P/lib -Di2p.dir.base=$I2P -DloggerFilenameOverride=logs/log-router-@.txt"
+ nohup $JAVA -cp "$CP" $JAVAOPTS net.i2p.router.RouterLaunch > /dev/null 2>&1 &
+ echo $! > "$I2PTEMP/router.pid"
+diff --git a/installer/resources/wrapper.config b/installer/resources/wrapper.config
+index 380f94b..7bda095 100644
+--- a/installer/resources/wrapper.config
++++ b/installer/resources/wrapper.config
+@@ -45,20 +45,19 @@ wrapper.java.mainclass=org.tanukisoftware.wrapper.WrapperSimpleApp
+ # classes, or all the classes of i2p.jar, are in a different directory).
+ # Be sure there are no other duplicate classes.
+ #
+-wrapper.java.classpath.1=$INSTALL_PATH/lib/*.jar
++wrapper.java.classpath.1=/usr/share/i2p/lib/*.jar
+ #  uncomment this to use the system classpath as well (e.g. to get tools.jar)
+-# wrapper.java.classpath.2=%CLASSPATH%
+-
++wrapper.java.classpath.2=/usr/share/java/wrapper.jar
+ # Java Library Path (location of Wrapper.DLL or libwrapper.so)
+-wrapper.java.library.path.1=$INSTALL_PATH
+-wrapper.java.library.path.2=$INSTALL_PATH/lib
++wrapper.java.library.path.1=/usr/lib/jni
++wrapper.java.library.path.2=/usr/share/java/lib
+ 
+ # Java Additional Parameters
+ # Numbers must be consecutive (except for stripquotes)
+ wrapper.java.additional.1=-DloggerFilenameOverride=logs/log-router-@.txt
+ wrapper.java.additional.2=-Dorg.mortbay.http.Version.paranoid=true
+ wrapper.java.additional.3=-Dorg.mortbay.xml.XmlParser.NotValidating=true
+-wrapper.java.additional.4=-Di2p.dir.base="$INSTALL_PATH"
++wrapper.java.additional.4=-Di2p.dir.base="/usr/share/i2p"
+ wrapper.java.additional.4.stripquotes=TRUE
+ # Jetty says this is a security risk
+ # Uncommenting this won't help as the router forces it to true
+@@ -116,7 +115,7 @@ wrapper.console.loglevel=INFO
+ # tell the router where to find the wrapper log
+ # (change X to the next available number)
+ # wrapper.java.additional.X=-Dwrapper.logfile=/path/to/wrapper.log
+-wrapper.logfile=$SYSTEM_java_io_tmpdir/wrapper.log
++wrapper.logfile=/tmp/wrapper.log
+ # PORTABLE installation:
+ # Use the following instead. I2P will find the logfile here,
+ # no need for a wrapper.java.additional line too.
+@@ -182,7 +181,7 @@ wrapper.use_system_time=false
+ # you should copy this file, change the location or file name,
+ # and edit the i2prouter script to change the WRAPPER_CONF setting
+ # to point to the new wrapper.config location.
+-wrapper.java.pidfile=$SYSTEM_java_io_tmpdir/routerjvm.pid
++wrapper.java.pidfile=/tmp/routerjvm.pid
+ # PORTABLE installation:
+ # Use the following instead.
+ #wrapper.java.pidfile=$INSTALL_PATH/routerjvm.pid
+@@ -196,7 +195,7 @@ wrapper.java.pidfile=$SYSTEM_java_io_tmpdir/routerjvm.pid
+ #
+ # This means i2prouter looks for './i2p.pid'.
+ # See comments above for wrapper.java.pidfile
+-wrapper.pidfile=$SYSTEM_java_io_tmpdir/i2p.pid
++wrapper.pidfile=/tmp/i2p.pid
+ # PORTABLE installation:
+ # Use the following instead.
+ #wrapper.pidfile=$INSTALL_PATH/i2p.pid
+-- 
