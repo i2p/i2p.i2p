@@ -102,6 +102,14 @@ public class NativeBigInteger extends BigInteger {
     private static boolean _doLog = System.getProperty("jbigi.dontLog") == null &&
                                     I2PAppContext.getGlobalContext().isRouterContext();
     
+    /**
+     *  The following libraries are be available in jbigi.jar in all I2P versions
+     *  originally installed as release 0.6.1.10 or later (released 2006-01-16),
+     *  for linux, freebsd, and windows, EXCEPT:
+     *   - k63 was removed for linux and freebsd in 0.8.7 (identical to k62)
+     *   - athlon64 not available for freebsd
+     *   - viac3 not available for windows
+     */
     private final static String JBIGI_OPTIMIZATION_K6         = "k6";
     private final static String JBIGI_OPTIMIZATION_K6_2       = "k62";
     private final static String JBIGI_OPTIMIZATION_K6_3       = "k63";
@@ -165,6 +173,9 @@ public class NativeBigInteger extends BigInteger {
             } catch (UnknownCPUException e) {
                 // log?
             }
+            if (_isFreebsd)
+                // athlon64 not available for freebsd
+                return JBIGI_OPTIMIZATION_ATHLON;
             return JBIGI_OPTIMIZATION_ATHLON64;
         }
         
@@ -456,6 +467,7 @@ public class NativeBigInteger extends BigInteger {
     private static final boolean loadGeneric(boolean optimized) {
         return loadGeneric(getMiddleName(optimized));
     }
+
     private static final boolean loadGeneric(String name) {
         try {
             if(name == null)
@@ -491,6 +503,7 @@ public class NativeBigInteger extends BigInteger {
         String resourceName = getResourceName(optimized);
         return loadFromResource(resourceName);
     }
+
     private static final boolean loadFromResource(String resourceName) {
         if (resourceName == null) return false;
         //URL resource = NativeBigInteger.class.getClassLoader().getResource(resourceName);
@@ -523,12 +536,16 @@ public class NativeBigInteger extends BigInteger {
                                    + " was not a valid library for this platform");
                 ule.printStackTrace();
             }
+            if (outFile != null)
+                outFile.delete();
             return false;
         } catch (IOException ioe) {
             if (_doLog) {
                 System.err.println("ERROR: Problem writing out the temporary native library data");
                 ioe.printStackTrace();
             }
+            if (outFile != null)
+                outFile.delete();
             return false;
         } finally {
             if (fos != null) {
@@ -567,6 +584,8 @@ public class NativeBigInteger extends BigInteger {
             else if (sCPUType.equals(JBIGI_OPTIMIZATION_VIAC32))
                 // viac32 and pentium3 identical
                 sAppend = "-" + JBIGI_OPTIMIZATION_PENTIUM3;
+            //else if (sCPUType.equals(JBIGI_OPTIMIZATION_VIAC3) && _isWin)
+                // FIXME no viac3 available for windows, what to use instead?
             else
                 sAppend = "-" + sCPUType;        
         } else {

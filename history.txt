@@ -1,6 +1,9 @@
 2011-05-25 zzz
     * CPUID: Load 64-bit libcpuid if available
     * HTTP Proxy: Address helper refactoring, address book add form
+    * JBigI:
+      - Start updating NativeBigInteger
+      - Remove k63 libs that are dup of k62; handle in NBI
     * Naming: B32 fixes
     * NetDB: Increase floodfills again
 
