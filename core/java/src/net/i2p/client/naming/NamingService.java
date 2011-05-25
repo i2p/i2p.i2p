@@ -422,6 +422,8 @@ public abstract class NamingService {
      * will be only one naming service instance (singleton) as well as
      * choose the implementation from the "i2p.naming.impl" system
      * property.
+     *
+     * FIXME Actually, it doesn't ensure that. Only call this once!!!
      */
     public static final synchronized NamingService createInstance(I2PAppContext context) {
         NamingService instance = null;

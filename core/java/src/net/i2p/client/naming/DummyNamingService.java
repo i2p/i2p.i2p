@@ -19,7 +19,7 @@ import net.i2p.data.Destination;
  */
 class DummyNamingService extends NamingService {
 
-    private static final int BASE32_HASH_LENGTH = 52;   // 1 + Hash.HASH_LENGTH * 8 / 5
+    protected static final int BASE32_HASH_LENGTH = 52;   // 1 + Hash.HASH_LENGTH * 8 / 5
     public final static String PROP_B32 = "i2p.naming.hostsTxt.useB32";
     protected static final int CACHE_MAX_SIZE = 32;
     public static final int DEST_SIZE = 516;                    // Std. Base64 length (no certificate)
@@ -41,6 +41,13 @@ class DummyNamingService extends NamingService {
         super(context);
     }
     
+    /**
+     *  @param hostname mixed case as it could be a key
+     *  @param lookupOptions input parameter, NamingService-specific, can be null
+     *  @param storedOptions output parameter, NamingService-specific, any stored properties will be added if non-null
+     *  @return dest or null
+     *  @since 0.8.7
+     */
     @Override
     public Destination lookup(String hostname, Properties lookupOptions, Properties storedOptions) {
         Destination d = getCache(hostname);
@@ -56,7 +63,7 @@ class DummyNamingService extends NamingService {
         }
 
         // Try Base32 decoding
-        if (hostname.length() == BASE32_HASH_LENGTH + 8 && hostname.endsWith(".b32.i2p") &&
+        if (hostname.length() == BASE32_HASH_LENGTH + 8 && hostname.toLowerCase().endsWith(".b32.i2p") &&
             _context.getBooleanPropertyDefaultTrue(PROP_B32)) {
             d = LookupDest.lookupBase32Hash(_context, hostname.substring(0, BASE32_HASH_LENGTH));
             if (d != null) {
@@ -70,6 +77,7 @@ class DummyNamingService extends NamingService {
 
     /**
      *  Provide basic static caching for all services
+     *  @param s case-sensitive, could be a hostname or a full b64 string
      */
     protected static void putCache(String s, Destination d) {
         if (d == null)
@@ -79,14 +87,20 @@ class DummyNamingService extends NamingService {
         }
     }
 
-    /** @return cached dest or null */
+    /**
+     *  @param s case-sensitive, could be a hostname or a full b64 string
+     *  @return cached dest or null
+     */
     protected static Destination getCache(String s) {
         synchronized (_cache) {
             return _cache.get(s);
         }
     }
 
-    /** @since 0.8.7 */
+    /**
+     *  @param s case-sensitive, could be a hostname or a full b64 string
+     *  @since 0.8.7
+     */
     protected static void removeCache(String s) {
         synchronized (_cache) {
             _cache.remove(s);

@@ -66,6 +66,9 @@ public class EepGetNamingService extends DummyNamingService {
             return d;
 
         hostname = hostname.toLowerCase();
+        // Base32 failed?
+        if (hostname.length() == BASE32_HASH_LENGTH + 8 && hostname.endsWith(".b32.i2p"))
+            return null;
 
         List URLs = getURLs();
         if (URLs.isEmpty())

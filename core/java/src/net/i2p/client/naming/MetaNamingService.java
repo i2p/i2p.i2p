@@ -100,6 +100,9 @@ public class MetaNamingService extends DummyNamingService {
         Destination d = super.lookup(hostname, null, null);
         if (d != null)
             return d;
+        // Base32 failed?
+        if (hostname.length() == BASE32_HASH_LENGTH + 8 && hostname.toLowerCase().endsWith(".b32.i2p"))
+            return null;
 
         for (NamingService ns : _services) { 
             d = ns.lookup(hostname, lookupOptions, storedOptions);

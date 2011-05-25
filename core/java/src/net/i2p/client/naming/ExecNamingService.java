@@ -64,6 +64,9 @@ public class ExecNamingService extends DummyNamingService {
         Destination d = super.lookup(hostname, null, null);
         if (d != null)
             return d;
+        // Base32 failed?
+        if (hostname.length() == BASE32_HASH_LENGTH + 8 && hostname.toLowerCase().endsWith(".b32.i2p"))
+            return null;
 
         hostname = hostname.toLowerCase();
 
