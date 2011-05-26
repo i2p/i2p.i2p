@@ -1,3 +1,7 @@
+usr/share/common-licenses/GPL-2 usr/share/doc/i2p/licenses/LICENSE-GPLv2.txt
+usr/share/common-licenses/LGPL-2.1 usr/share/doc/i2p/licenses/LICENSE-LGPLv2.1.txt
+usr/share/common-licenses/Apache-2.0 usr/share/doc/i2p/licenses/LICENSE-Apache2.0.txt
+usr/share/common-licenses/BSD usr/share/doc/i2p/licenses/LICENSE-BSD.txt
 var/lib/i2p/i2p-config/blocklist.txt etc/i2p/blocklist.txt
 var/lib/i2p/i2p-config/clients.config etc/i2p/clients.config
 var/lib/i2p/i2p-config/hosts.txt etc/i2p/hosts.txt
