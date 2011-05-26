@@ -354,6 +354,7 @@
         <delete dir="debian/tmp" />
         <delete dir="debian/db" />
         <delete file="debian/files" />
+	<delete file="debian/copyright" />
         <delete file="debian/build" />
         <delete file="debian/substvars"/>
     </target>
