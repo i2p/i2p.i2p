@@ -12,7 +12,7 @@ Build-Depends: debhelper (>= 7.0.50~),
  default-jdk,
  libgmp3-dev, 
  po-debconf
-Build-Depends-Indep: junit, tor-geoipdb
+Build-Depends-Indep: tor-geoipdb
 
 Package: i2p
 Architecture: all
