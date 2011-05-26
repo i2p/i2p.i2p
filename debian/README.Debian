@@ -9,15 +9,5 @@ the wrapper.log is in /tmp and the other logs are in
 - If you run i2p with the initscript in /etc/init.d/i2p, 
 all logs are written to /var/logs/i2p.
 
-- wrapper.config (in /etc/i2p) contains the settings for 
-/usr/bin/i2prouter. wrapper.service in /etc/i2p is read when
-using the initscript.
-
-- SAM and BOB default to enabled out of the box.
-
-- jbigi is compiled as a dynamic .so. Unfortunately I can't
-  get jcpuid to compile, so I just 'steal' the .so from the
-  jbigi.jar file.
-
 - runplain.sh is stored in /usr/share/doc/i2p/examples.
 
