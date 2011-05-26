@@ -53,6 +53,7 @@ build-indep:
 	#[ -r jetty/jetty-5.1.15.tgz ] && ln -sf $(CURDIR)/jetty/jetty-5.1.15.tgz $(CURDIR)/apps/jetty/jetty-5.1.15.tgz
 	ant preppkg-linux javadoc
 	mv build/javadoc build/api
+	mv $(I2P)/runplain.sh $(I2P)/i2prouter-nowrapper
 	-cp -fv /usr/share/tor/geoip $(CURDIR)/pkg-temp/geoip/geoip.txt
 	
 

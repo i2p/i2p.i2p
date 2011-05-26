@@ -7,7 +7,7 @@ pkg-temp/eepget usr/bin
 pkg-temp/eepsite usr/share/i2p
 pkg-temp/geoip usr/share/i2p
 pkg-temp/hosts.txt usr/share/i2p
-pkg-temp/i2prouter usr/bin
+pkg-temp/i2prouter* usr/bin
 pkg-temp/i2psnark.config usr/share/i2p
 pkg-temp/i2ptunnel.config usr/share/i2p
 pkg-temp/lib/*.jar usr/share/i2p/lib
