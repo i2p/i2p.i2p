@@ -3,6 +3,7 @@ i2p (0.8.6-5) UNRELEASED; urgency=low
   * Remove /etc/i2p/wrapper.service and add the changed configs to the
     initscript.
   * Create debian/copyright at build time.
+  * Don't ship the standalone jetty-i2psnark.
 
  -- Kill Your TV <killyourtv@i2pmail.org>  Wed, 25 May 2011 21:11:40 +0000
 
