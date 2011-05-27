@@ -85,7 +85,7 @@ override_dh_installchangelogs:
 	dh_installchangelogs history.txt
 
 override_dh_installdocs:
-	dh_installdocs -plibjbigi-jni --link-doc=i2p
+	dh_installdocs -pi2p -plibjbigi-jni --link-doc=i2p-router
 	dh_installdocs --remaining-packages
 
 override_dh_dhlibdeps:

@@ -1,12 +1,15 @@
-i2p (0.8.6-5) UNRELEASED; urgency=low
+i2p (0.8.6-5) stable; urgency=low
 
-  * Remove /etc/i2p/wrapper.service and add the changed configs to the
+  * Remove /etc/i2p/wrapper.service. Changes have been moved to the
     initscript.
-  * Create debian/copyright at build time.
-  * Don't ship the standalone jetty-i2psnark.
+  * Don't disable browser launch. This is handled automatically for the i2psvc
+    user.
+  * Create debian/copyright dynamically at build time
+  * Don't ship the standalone jetty-i2psnark
+  * Create split package so that the wrapper isn't required
+  * Install missing certificates directory
 
- -- Kill Your TV <killyourtv@i2pmail.org>  Wed, 25 May 2011 21:11:40 +0000
-
+ -- Kill Your TV <killyourtv@i2pmail.org>  Fri, 27 May 2011 03:48:56 +0000
 
 i2p (0.8.6-4) stable; urgency=low
 

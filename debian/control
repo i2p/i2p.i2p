@@ -1,6 +1,5 @@
 Source: i2p
 Maintainer: Kill Your TV <killyourtv@i2pmail.org>
-Uploaders: zzz <zzz@i2pmail.org>
 Section: net
 Standards-Version: 3.9.2
 Priority: optional
@@ -20,25 +19,19 @@ Section: net
 Priority: optional
 Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends}, default-jre | java5-runtime | java6-runtime,
  adduser, 
+ i2p-router (>= 0.8.6-5),
  libjbigi-jni (>= ${source:Version}),
  libjbigi-jni (<< ${source:Version}.1~),
  lsb-base (>= 3.2-14), 
  service-wrapper 
-Suggests: tor, 
- i2pfox, 
- mail-client, 
- mail-reader, 
- news-reader, 
- polipo, 
- privoxy, 
- syndie,
- www-browser, 
- xul-ext-torbutton 
 Description: Load-balanced unspoofable packet switching network
  I2P is an anonymizing network, offering a simple layer that identity-sensitive
  applications can use to securely communicate. All data is wrapped with several
  layers of encryption, and the network is both distributed and dynamic, with no
  trusted parties.
+ .
+ This package depends on the router, jbigi, the java service wrapper, and
+ includes support to run I2P as a daemon.
 
 Package: libjbigi-jni
 Architecture: any
@@ -66,3 +59,33 @@ Description: Documentation for I2P
  trusted parties. 
  .
  This package contains the Javadoc files.
+
+Package: i2p-router
+Architecture: all
+Section: net
+Priority: optional
+Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends}, default-jre | java5-runtime | java6-runtime
+Replaces: i2p ( << 0.8.6-5)
+Breaks: i2p (<< 0.8.6-5)
+Recommends: libjbigi-jni (>= ${source:Version}), libjbigi-jni (<< ${source:Version}.1~)
+Suggests: tor,
+ i2p-messenger,
+ i2p-tahoe-lafs,
+ imule,
+ i2pfox,
+ irc-client,
+ jircii,
+ mail-client,
+ mail-reader,
+ news-reader,
+ polipo,
+ privoxy,
+ robert,
+ syndie,
+ www-browser,
+ xul-ext-torbutton
+Description: Load-balanced unspoofable packet switching network
+ I2P is an anonymizing network, offering a simple layer that identity-sensitive
+ applications can use to securely communicate. All data is wrapped with several
+ layers of encryption, and the network is both distributed and dynamic, with no
+ trusted parties.

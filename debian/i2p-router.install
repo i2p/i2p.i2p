@@ -1,0 +1,16 @@
+history.txt usr/share/i2p
+pkg-temp/blocklist.txt usr/share/i2p
+pkg-temp/certificates usr/share/i2p
+pkg-temp/clients.config usr/share/i2p
+pkg-temp/docs usr/share/i2p/
+pkg-temp/eepget usr/bin
+pkg-temp/eepsite usr/share/i2p
+pkg-temp/geoip usr/share/i2p
+pkg-temp/hosts.txt usr/share/i2p
+pkg-temp/i2prouter-nowrapper usr/bin
+pkg-temp/i2psnark.config usr/share/i2p
+pkg-temp/i2ptunnel.config usr/share/i2p
+pkg-temp/lib/*.jar usr/share/i2p/lib
+pkg-temp/systray.config usr/share/i2p
+pkg-temp/webapps usr/share/i2p
+pkg-temp/*.xml usr/share/i2p
