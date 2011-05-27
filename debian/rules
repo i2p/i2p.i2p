@@ -62,7 +62,7 @@ build-arch:
 	# build jbigi
 	cd $(CURDIR)/core/c/jbigi && ./mbuild_jbigi.sh dynamic
 	# build jcpuid
-	cd $(CURDIR)/core/c/jcpuid && ./build.sh; fi
+	cd $(CURDIR)/core/c/jcpuid && ./build.sh
 
 binary: binary-arch binary-indep
 
