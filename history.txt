@@ -2,6 +2,9 @@
     * Console: Fix router.updateThroughProxy being set to false after saving
                change on /configupdate when install dir is read-only.
                (ticket #466)
+    * EepGet:
+      - Fix redirect loop (thx kytv)
+      - Reset redirect counter when retrying
     * JBigI:
       - Refactor to handle 64 bit libs and a list of fallback libs
       - Logging tweaks

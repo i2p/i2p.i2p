@@ -474,6 +474,7 @@ public class EepGet {
                 (_alreadyTransferred == 0 && _currentAttempt > MAX_COMPLETE_FAILS) ||
                 !_keepFetching) 
                 break;
+            _redirects = 0;
             try { 
                 long delay = _context.random().nextInt(60*1000);
                 Thread.sleep(5*1000+delay); 
@@ -512,22 +513,18 @@ public class EepGet {
         
         if (_redirectLocation != null) {
             //try {
-                URL oldURL = new URL(_actualURL);
-                String query = oldURL.getQuery();
-                if (query == null) query = "";
                 if (_redirectLocation.startsWith("http://")) {
-                    if ( (_redirectLocation.indexOf('?') < 0) && (query.length() > 0) )
-                        _actualURL = _redirectLocation + "?" + query;
-                    else
-                        _actualURL = _redirectLocation;
+                    _actualURL = _redirectLocation;
                 } else { 
+                    // the Location: field has been required to be an absolute URI at least since
+                    // RFC 1945 (HTTP/1.0 1996), so it isn't clear what the point of this is.
+                    // This oddly adds a ":" even if no port, but that seems to work.
                     URL url = new URL(_actualURL);
 		    if (_redirectLocation.startsWith("/"))
                         _actualURL = "http://" + url.getHost() + ":" + url.getPort() + _redirectLocation;
                     else
+                        // this blows up completely on a redirect to https://, for example
                         _actualURL = "http://" + url.getHost() + ":" + url.getPort() + "/" + _redirectLocation;
-                    if ( (_actualURL.indexOf('?') < 0) && (query.length() > 0) )
-                        _actualURL = _actualURL + "?" + query;
                 }
             // an MUE is an IOE
             //} catch (MalformedURLException mue) {
