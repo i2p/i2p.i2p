@@ -1,3 +1,11 @@
+i2p (0.8.6-6~build9) UNRELEASED; urgency=low
+
+  * Ship own router.config with router.updatesDisabled=true to prevent
+    upgrades to be performed by the router itself. Upgrades *must* take place
+    via the package manager.
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Fri, 27 May 2011 17:33:21 +0000
+
 i2p (0.8.6-5) stable; urgency=low
 
   * Remove /etc/i2p/wrapper.service. Changes have been moved to the
