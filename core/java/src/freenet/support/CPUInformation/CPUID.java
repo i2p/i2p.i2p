@@ -45,7 +45,8 @@ public class CPUID {
     private static boolean _doLog = System.getProperty("jcpuid.dontLog") == null &&
                                     I2PAppContext.getGlobalContext().isRouterContext();
 
-    private static final boolean isX86 = System.getProperty("os.arch").contains("86");
+    private static final boolean isX86 = System.getProperty("os.arch").contains("86") ||
+                                         System.getProperty("os.arch").equals("amd64");
     private static final String libPrefix = (System.getProperty("os.name").startsWith("Win") ? "" : "lib");
     private static final String libSuffix = (System.getProperty("os.name").startsWith("Win") ? ".dll" : ".so");
     private static final boolean isWindows = System.getProperty("os.name").toLowerCase().contains("windows");
@@ -499,7 +500,7 @@ public class CPUID {
         System.out.println("CPU Family: " + getCPUFamily());
         System.out.println("CPU Model: " + getCPUModel());
         System.out.println("CPU Stepping: " + getCPUStepping());
-        System.out.println("CPU Flags: " + getEDXCPUFlags());
+        System.out.println("CPU Flags: 0x" + Integer.toHexString(getEDXCPUFlags()));
         
         CPUInfo c = getInfo();
         System.out.println(" **More CPUInfo**");
@@ -540,13 +541,13 @@ public class CPUID {
             if (loaded) {
                 _nativeOk = true;
                 if (_doLog)
-                    System.err.println("INFO: Native CPUID library '"+getLibraryMiddlePart()+"' loaded from somewhere in the path");
+                    System.err.println("INFO: Native CPUID library " + getLibraryMiddlePart() + " loaded from file");
             } else {
                 loaded = loadFromResource();
                 if (loaded) {
                     _nativeOk = true;
                     if (_doLog)
-                        System.err.println("INFO: Native CPUID library '"+getResourceName()+"' loaded from resource");
+                        System.err.println("INFO: Native CPUID library " + getResourceName() + " loaded from resource");
                 } else {
                     _nativeOk = false;
                     if (_doLog)
@@ -581,16 +582,18 @@ public class CPUID {
 
         // Don't bother trying a 64 bit filename variant.
 
+        // 32 bit variant:
         // Note this is unlikely to succeed on a standard installation, since when we extract the library
         // in loadResource() below, we save it as jcpuid.dll / libcupid.so.
         // However, a distribution may put the file in, e.g., /usr/lib/jni/
         // with the libjcpuid-x86-linux.so name.
-        try {
-            System.loadLibrary(getLibraryMiddlePart());
-            return true;
-        } catch (UnsatisfiedLinkError ule) {
+        // Ubuntu packages now use libjcpuid.so
+        //try {
+        //    System.loadLibrary(getLibraryMiddlePart());
+        //    return true;
+        //} catch (UnsatisfiedLinkError ule) {
             return false;
-        }
+        //}
     }
     
     /**
