@@ -7,7 +7,7 @@ There are a few changes in this package from upstream.
 - If I2P is run using the i2prouter or i2prouter-nowrapper scripts, the
   wrapper.log is in /tmp and the other logs are in ~/.i2p/logs.
 
-- If I2P is runwith the initscript in /etc/init.d/i2p, all logs are written
+- If I2P is run with the initscript in /etc/init.d/i2p, all logs are written
   to /var/logs/i2p with the timestamps in UTC
 
 - The config file for the wrapper can be found at /etc/i2p/wrapper.config
