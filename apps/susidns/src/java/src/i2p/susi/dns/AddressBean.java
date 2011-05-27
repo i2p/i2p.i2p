@@ -107,7 +107,7 @@ public class AddressBean
 
 	/**
 	 * Ref: java.net.IDN and RFC 3940
-	 * @param name will be converted to lower case
+	 * @param host will be converted to lower case
 	 * @return name converted to lower case and punycoded if necessary
 	 * @throws IAE on various errors or if IDN is needed but not available
 	 * @since 0.8.7
