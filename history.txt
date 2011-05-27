@@ -1,3 +1,15 @@
+2011-05-27 zzz
+    * Console: Fix router.updateThroughProxy being set to false after saving
+               change on /configupdate when install dir is read-only.
+               (ticket #466)
+    * JBigI:
+      - Refactor to handle 64 bit libs and a list of fallback libs
+      - Logging tweaks
+      - Only check for one file name in library path
+    * CPUID:
+      - Recognize amd64 as x86
+      - Only check for one file name in library path
+
 2011-05-25 zzz
     * CPUID: Load 64-bit libcpuid if available
     * HTTP Proxy: Address helper refactoring, address book add form
