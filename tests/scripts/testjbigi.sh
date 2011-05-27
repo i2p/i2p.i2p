@@ -13,6 +13,22 @@ cd `dirname $0`/../../installer/lib/jbigi
 
 TMP=/tmp/testjbigi$$
 mkdir $TMP
+
+echo "Testing 32 bit libcpuid ..."
+ln -s $PWD/libjcpuid-x86-linux.so $TMP/libjcpuid.so
+java -cp ../../../build/i2p.jar -Djava.library.path=$TMP freenet.support.CPUInformation.CPUID
+rm -f $TMP/libjcpuid.so
+echo
+
+echo "Testing 64 bit libcpuid ..."
+ln -s $PWD/libjcpuid-x86_64-linux.so $TMP/libjcpuid.so
+java -cp ../../../build/i2p.jar -Djava.library.path=$TMP freenet.support.CPUInformation.CPUID
+rm -f $TMP/libjcpuid.so
+echo
+
+
+
+
 for i in libjbigi-linux-*.so
 do
 	echo "Testing $i ..."
@@ -24,7 +40,7 @@ do
 		echo "********* FAILED CHECK FOR $i *************"
 		FAIL=1
 	fi
-	rm $TMP/libjbigi.so
+	rm -f $TMP/libjbigi.so
 	echo
 done
 
