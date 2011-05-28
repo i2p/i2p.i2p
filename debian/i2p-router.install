@@ -14,4 +14,3 @@ pkg-temp/lib/*.jar usr/share/i2p/lib
 pkg-temp/router.config usr/share/i2p
 pkg-temp/systray.config usr/share/i2p
 pkg-temp/webapps usr/share/i2p
-pkg-temp/*.xml usr/share/i2p
