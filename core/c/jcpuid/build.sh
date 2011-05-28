@@ -9,6 +9,8 @@ Linux*)
 	echo "Building linux .so's";;
 FreeBSD*)
 	echo "Building freebsd .so's";;
+*kFreeBSD*)
+	echo "Building kFreebsd .so's";;
 *)
 	echo "Unsupported build environment"
 	exit;;
@@ -34,7 +36,7 @@ FreeBSD*)
 	INCLUDES="-I. -Iinclude -I$JAVA_HOME/include/ -I$JAVA_HOME/include/freebsd/"
 	LINKFLAGS="-shared -static -Wl,-soname,libjcpuid-x86-freebsd.so"
 	LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-x86-freebsd.so";;
-Linux*)
+*kFreeBSD*|Linux*)
 	COMPILEFLAGS="-fPIC -Wall"
 	INCLUDES="-I. -Iinclude -I$JAVA_HOME/include -I$JAVA_HOME/include/linux"
 	LINKFLAGS="-shared -Wl,-soname,libjcpuid-x86-linux.so"
