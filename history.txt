@@ -1,3 +1,6 @@
+2011-05-28 zzz
+    * i2psnark: Fix bug preventing Robert from connecting to snark (thx sponge)
+
 2011-05-27 zzz
     * Console: Fix router.updateThroughProxy being set to false after saving
                change on /configupdate when install dir is read-only.

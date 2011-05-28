@@ -130,7 +130,8 @@ public class PeerAcceptor
     }
   }
 
-  private static final int LOOKAHEAD_SIZE = "19".length() +
+  /** 48 */
+  private static final int LOOKAHEAD_SIZE = 1 + // chr(19)
                                             "BitTorrent protocol".length() +
                                             8 + // blank, reserved
                                             20; // infohash
@@ -144,7 +145,7 @@ public class PeerAcceptor
     if (read != buf.length)
         throw new IOException("Unable to read the hash (read " + read + ")");
     byte rv[] = new byte[20];
-    System.arraycopy(buf, buf.length-rv.length-1, rv, 0, rv.length);
+    System.arraycopy(buf, buf.length-rv.length, rv, 0, rv.length);
     return rv;
   }
 }
