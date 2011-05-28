@@ -514,7 +514,16 @@
         <copy file="apps/susidns/src/WEB-INF/lib/jstl.jar" todir="pkg-temp/lib/" />
         <copy file="apps/susidns/src/WEB-INF/lib/standard.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
-        <copy file="apps/i2psnark/jetty-i2psnark.xml" todir="pkg-temp/" />
+	<!-- 
+	     Disabling per zzz's statement on IRC: jetty-i2psnark.xml is for an obscure feature that is broken anyway, 
+	     					   you can remove the file, the link, and the patch from the package
+
+		     So I'm going one further: I'm disabling it in build.xml 
+		     +++kytv
+		     -->
+	<!--
+	<copy file="apps/i2psnark/jetty-i2psnark.xml" todir="pkg-temp/" /> 
+	-->
         <copy file="apps/i2psnark/i2psnark.config" todir="pkg-temp/" />
         <copy file="installer/resources/blocklist.txt" todir="pkg-temp/" />
         <copy file="installer/resources/clients.config" todir="pkg-temp/" />
