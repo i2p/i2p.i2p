@@ -10,6 +10,7 @@ package net.i2p.router.client;
 
 import java.util.Properties;
 
+import net.i2p.CoreVersion;
 import net.i2p.data.Payload;
 import net.i2p.data.i2cp.BandwidthLimitsMessage;
 import net.i2p.data.i2cp.CreateLeaseSetMessage;
@@ -120,22 +121,30 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         // Is this is a little drastic for an unknown message type?
         _runner.stopRunning();
     }
-    
+  
     public void disconnected(I2CPMessageReader reader) {
         if (_runner.isDead()) return;
         _runner.disconnected();
     }
     
     private void handleGetDate(I2CPMessageReader reader, GetDateMessage message) {
+        // sent by clients >= 0.8.7
+        String clientVersion = message.getVersion();
+        // TODO - save client's version string for future reference
         try {
-            _runner.doSend(new SetDateMessage());
+            // only send version if the client can handle it (0.8.7 or greater)
+            _runner.doSend(new SetDateMessage(clientVersion != null ? CoreVersion.VERSION : null));
         } catch (I2CPMessageException ime) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error writing out the setDate message", ime);
         }
     }
+
+    /**
+     *  As of 0.8.7, does nothing. Do not allow a client to set the router's clock.
+     */
     private void handleSetDate(I2CPMessageReader reader, SetDateMessage message) {
-        _context.clock().setNow(message.getDate().getTime());
+        //_context.clock().setNow(message.getDate().getTime());
     }
 	
     

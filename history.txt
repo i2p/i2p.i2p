@@ -1,3 +1,21 @@
+2011-05-30 zzz
+    * I2CP:
+      - Append I2CP Version information to the Get/Set Date Messages,
+        so that both the router and client are aware of the other side's version,
+        and future protocol changes will be easier to implement.
+        Previously, router version information was not available to the client,
+        so when router and client were in different JVMs,
+        old clients would work with new routers
+        but new clients would not work with old routers.
+        After this change, we can design future changes so that new clients
+        will work with old routers.
+        This is an enhancement to the old protocol version byte sent by the client,
+        which we have never changed and probably never will.
+      - Prevent a client from setting the router's clock
+      - Javadocs
+    * i2psnark: Restrict swarm size for small torrents
+    * netDb: Don't refetch expiring router infos if we have enough
+
 2011-05-28 zzz
     * i2psnark: Fix bug preventing Robert from connecting to snark (thx sponge)
 

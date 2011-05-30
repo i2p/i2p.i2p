@@ -130,14 +130,19 @@ public interface I2PSession {
 
     /** Receive a message that the router has notified the client about, returning
      * the payload.
+     * This may only be called once for a given msgId (until the counter wraps)
+     *
      * @param msgId message to fetch
-     * @return unencrypted body of the message
+     * @return unencrypted body of the message, or null if not found
      */
     public byte[] receiveMessage(int msgId) throws I2PSessionException;
 
     /** Instruct the router that the message received was abusive (including how
      * abusive on a 1-100 scale) in the hopes the router can do something to
      * minimize receiving abusive messages like that in the future.
+     *
+     * Unused. Not fully implemented.
+     *
      * @param msgId message that was abusive (or -1 for not message related)
      * @param severity how abusive
      */
