@@ -78,7 +78,7 @@ do_start()
         [ -r $PIDFILE ] || touch $PIDFILE
 	[ -r $JVMPIDFILE ] || touch $JVMPIDFILE
         [ -d $I2PTEMP ] || mkdir $I2PTEMP 
-	chown -Rf $I2PUSER:$I2PUSER  $I2PTEMP/*i2p* $I2PTEMP/router.ping $RUN > /dev/null
+	chown -Rf $I2PUSER:$I2PUSER  $I2PTEMP/*i2p* $I2PTEMP/router.ping $RUN > /dev/null 2>&1
 	chown -f -R $I2PUSER:adm /var/log/$NAME
 	TZ=UTC start-stop-daemon --start --quiet -c $I2PUSER --pidfile $PIDFILE --exec $DAEMON $NICE -- \
 		$I2P_ARGS || return 2
