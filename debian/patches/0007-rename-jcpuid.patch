@@ -8,7 +8,16 @@ Subject: rename jcpuid
 
 --- a/core/c/jcpuid/build.sh
 +++ b/core/c/jcpuid/build.sh
-@@ -39,8 +39,8 @@
+@@ -37,7 +37,7 @@
+         COMPILEFLAGS="-Wall"
+         INCLUDES="-I. -Iinclude -I$JAVA_HOME/include/ -I$JAVA_HOME/include/solaris/"
+         LINKFLAGS="-shared -static -Wl,-soname,libjcpuid-x86-solaris.so"
+-        LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-x86-solaris.so";;
++        LIBFILE="lib/freenet/support/CPUInformation/libjcpuid.so";;
+ FreeBSD*)
+ 	COMPILEFLAGS="-Wall"
+ 	INCLUDES="-I. -Iinclude -I$JAVA_HOME/include/ -I$JAVA_HOME/include/freebsd/"
+@@ -46,8 +46,8 @@
  *kFreeBSD*|Linux*)
  	COMPILEFLAGS="-fPIC -Wall"
  	INCLUDES="-I. -Iinclude -I$JAVA_HOME/include -I$JAVA_HOME/include/linux"

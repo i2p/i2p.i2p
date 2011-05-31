@@ -6,12 +6,18 @@ Subject: Update path of jbigi and add soname
  core/c/jbigi/mbuild_jbigi.sh |    6 +++---
  1 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/core/c/jbigi/mbuild_jbigi.sh b/core/c/jbigi/mbuild_jbigi.sh
-index 1e262a6..7581335 100755
 --- a/core/c/jbigi/mbuild_jbigi.sh
 +++ b/core/c/jbigi/mbuild_jbigi.sh
-@@ -25,8 +25,8 @@ Darwin*)
+@@ -25,14 +25,14 @@
          LIBFILE="libjbigi.jnilib";;
+ SunOS*)
+         COMPILEFLAGS="-fPIC -Wall"
+-        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/solaris"
+-        LINKFLAGS="-shared -Wl,-soname,libjbigi.so"
++        INCLUDES="-I. -I./jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/solaris"
++        LINKFLAGS="-shared -Wl,-soname,libjbigi.so.0"
+         LIBFILE="libjbigi.so";;
+ 
  *)
  	COMPILEFLAGS="-fPIC -Wall"
 -	INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/linux"
@@ -21,7 +27,7 @@ index 1e262a6..7581335 100755
  	LIBFILE="libjbigi.so";;
  esac
  
-@@ -41,7 +41,7 @@ fi
+@@ -47,7 +47,7 @@
  
  echo "Compiling C code..."
  rm -f jbigi.o $LIBFILE
@@ -30,4 +36,3 @@ index 1e262a6..7581335 100755
  $CC $LINKFLAGS $INCLUDES $INCLUDELIBS -o $LIBFILE jbigi.o $STATICLIBS || exit 1
  
  exit 0
--- 
