@@ -1,5 +1,6 @@
 2011-05-31 zzz
     * HTTP Proxy: Don't send redirect for POST (thx kytv)
+    * jbigi: Add support for solaris
 
 2011-05-30 zzz
     * I2CP:

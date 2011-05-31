@@ -137,6 +137,7 @@ public class NativeBigInteger extends BigInteger {
     private static final boolean _isMac = System.getProperty("os.name").startsWith("Mac");
     private static final boolean _isLinux = System.getProperty("os.name").toLowerCase().contains("linux");
     private static final boolean _isFreebsd = System.getProperty("os.name").toLowerCase().contains("freebsd");
+    private static final boolean _isSunos = System.getProperty("os.name").toLowerCase().contains("sunos");
 
     /*
      * This isn't always correct.
@@ -672,6 +673,8 @@ public class NativeBigInteger extends BigInteger {
             return "jbigi-osx-";
         if(_isOS2)
             return "jbigi-os2-";
+        if(_isSunos)
+            return "jbigi-solaris-";
         //throw new RuntimeException("Dont know jbigi library name for os type '"+System.getProperty("os.name")+"'");
         // use linux as the default, don't throw exception
         return "jbigi-linux-";
