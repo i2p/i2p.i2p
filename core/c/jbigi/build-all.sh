@@ -3,6 +3,8 @@
 case `uname -sr` in
 MINGW*)
 	echo "Building windows .dlls for all architectures";;
+SunOS*) 
+	echo "Building solaris .sos for all architectures";;
 Linux*)
 	echo "Building linux .sos for all architectures";;
 FreeBSD*)
@@ -32,6 +34,8 @@ do
 	case `uname -sr` in
 	MINGW*)
 		cp jbigi.dll ../../lib/net/i2p/util/jbigi-windows-$x.dll;;
+	SunOS*)
+		cp libjbigi.so ../../lib/net/i2p/util/libjbigi-solaris-$x.so;;
 	Linux*)
 		cp libjbigi.so ../../lib/net/i2p/util/libjbigi-linux-$x.so;;
 	FreeBSD*)
