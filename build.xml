@@ -38,9 +38,9 @@
         <echo message="  javadoc:   generate javadoc for the entire project into ./build/javadoc" />
         <echo message="  slackpkg:  generate Slackware packages in ./Slackware/i2p and ./Slackware/i2p-base" />
         <echo message="  debianhowto: instructions on building Debian packages" />
-        <echo message="  debian: generate Debian packages in ./debian/packages" />
-        <echo message="          (libc6-i686 and libc6-amd64 required, ant>=1.8 required)" />
-        <echo message="  debianrepo: build a Debian repository (reprepro required)" />
+	<echo message="  debian: generate Debian packages in ../" />
+	<echo message="          run &quot;ant debian&quot; for instructions" />
+	<!-- <echo message="  debianrepo: build a Debian repository (reprepro required)" /> -->
         <echo message="  poupdate: update the .po files for translators" />
         <echo message="  pkg-portable-win32:  build a minimum portable version for win32" />
    </target>
