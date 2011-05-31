@@ -811,7 +811,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             // Redirect to non-addresshelper URL to not clog the browser address bar
             // and not pass the parameter to the eepsite.
             // This also prevents the not-found error page from looking bad
-            if (ahelperPresent) {
+            // Syndie can't handle a redirect of a POST
+            if (ahelperPresent && !"POST".equals(method)) {
                 String uri = protocol + targetRequest;
                 int spc = uri.indexOf(" ");
                 if (spc >= 0)

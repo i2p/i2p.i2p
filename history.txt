@@ -1,3 +1,6 @@
+2011-05-31 zzz
+    * HTTP Proxy: Don't send redirect for POST (thx kytv)
+
 2011-05-30 zzz
     * I2CP:
       - Append I2CP Version information to the Get/Set Date Messages,
