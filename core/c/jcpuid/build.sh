@@ -3,6 +3,8 @@
 case `uname -sr` in
 MINGW*)
 	echo "Building windows .dll's";;
+SunOS*)
+	echo "Building solaris .so's";;
 CYGWIN*)
 	echo "Building windows .dll's";;
 Linux*)
@@ -31,6 +33,11 @@ MINGW*)
 	INCLUDES="-I. -Iinclude -I$JAVA_HOME/include/ -I$JAVA_HOME/include/win32/"
 	LINKFLAGS="-shared -static -static-libgcc -Wl,--kill-at"
 	LIBFILE="lib/freenet/support/CPUInformation/jcpuid-x86-windows.dll";;
+SunOS*)
+        COMPILEFLAGS="-Wall"
+        INCLUDES="-I. -Iinclude -I$JAVA_HOME/include/ -I$JAVA_HOME/include/solaris/"
+        LINKFLAGS="-shared -static -Wl,-soname,libjcpuid-x86-solaris.so"
+        LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-x86-solaris.so";;
 FreeBSD*)
 	COMPILEFLAGS="-Wall"
 	INCLUDES="-I. -Iinclude -I$JAVA_HOME/include/ -I$JAVA_HOME/include/freebsd/"

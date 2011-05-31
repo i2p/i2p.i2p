@@ -52,6 +52,7 @@ public class CPUID {
     private static final boolean isWindows = System.getProperty("os.name").toLowerCase().contains("windows");
     private static final boolean isLinux = System.getProperty("os.name").toLowerCase().contains("linux");
     private static final boolean isFreebsd = System.getProperty("os.name").toLowerCase().contains("freebsd");
+    private static final boolean isSunos = System.getProperty("os.name").toLowerCase().contains("sunos");
     
     /**
      * This isn't always correct.
@@ -719,6 +720,8 @@ public class CPUID {
              return "jcpuid-x86-windows"; // The convention on Windows
         if(isFreebsd)
             return "jcpuid-x86-freebsd"; // The convention on freebsd...
+	if(isSunos)
+	    return "jcpuid-x86-solaris"; // The convention on SunOS
         //throw new RuntimeException("Dont know jcpuid library name for os type '"+System.getProperty("os.name")+"'");
         // use linux as the default, don't throw exception
         return "jcpuid-x86-linux";
@@ -730,6 +733,8 @@ public class CPUID {
              return "jcpuid-x86_64-windows";
         if(isFreebsd)
             return "jcpuid-x86_64-freebsd";
+	if(isSunos)
+	    return "jcpuid-x86_64-solaris";
         // use linux as the default, don't throw exception
         return "jcpuid-x86_64-linux";
     }
