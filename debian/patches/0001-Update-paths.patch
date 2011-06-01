@@ -54,8 +54,8 @@ Subject: Update-paths
  export CP="${I2P}" ; for j in "${I2P}/lib/*"  ; do export CP="${CP}:${j}" ; done;
  JAVA=java
  
--JAVAOPTS="-Djava.library.path=$ {I2P}:${I2P}/lib -Di2p.dir.base=${I2P} -DloggerFilenameOverride=logs/log-router-@.txt"
-+JAVAOPTS="-Djava.library.path=/usr/lib/jni:${I2P}/lib -Di2p.dir.base=${I2P} -DloggerFilenameOverride=logs/log-router-@.txt"
+-JAVAOPTS="-Djava.net.preferIPv4Stack=true -Djava.library.path=${I2P}:${I2P}/lib -Di2p.dir.base=${I2P} -DloggerFilenameOverride=logs/log-router-@.txt"
++JAVAOPTS="-Djava.net.preferIPv4Stack=true -Djava.library.path=/usr/lib/jni:${I2P}/lib -Di2p.dir.base=${I2P} -DloggerFilenameOverride=logs/log-router-@.txt"
  nohup ${JAVA} -cp "${CP}" ${JAVAOPTS} net.i2p.router.RouterLaunch > /dev/null 2>&1 &
  echo $! > "${I2PTEMP}/router.pid"
 --- a/installer/resources/wrapper.config
@@ -84,9 +84,9 @@ Subject: Update-paths
 -wrapper.java.additional.4=-Di2p.dir.base="$INSTALL_PATH"
 +wrapper.java.additional.4=-Di2p.dir.base="/usr/share/i2p"
  wrapper.java.additional.4.stripquotes=TRUE
+ wrapper.java.additional.5=-Djava.net.preferIPv4Stack=true
  # Jetty says this is a security risk
- # Uncommenting this won't help as the router forces it to true
-@@ -116,7 +115,7 @@
+@@ -117,7 +116,7 @@
  # tell the router where to find the wrapper log
  # (change X to the next available number)
  # wrapper.java.additional.X=-Dwrapper.logfile=/path/to/wrapper.log
@@ -95,7 +95,7 @@ Subject: Update-paths
  # PORTABLE installation:
  # Use the following instead. I2P will find the logfile here,
  # no need for a wrapper.java.additional line too.
-@@ -182,7 +181,7 @@
+@@ -183,7 +182,7 @@
  # you should copy this file, change the location or file name,
  # and edit the i2prouter script to change the WRAPPER_CONF setting
  # to point to the new wrapper.config location.
@@ -104,7 +104,7 @@ Subject: Update-paths
  # PORTABLE installation:
  # Use the following instead.
  #wrapper.java.pidfile=$INSTALL_PATH/routerjvm.pid
-@@ -196,7 +195,7 @@
+@@ -197,7 +196,7 @@
  #
  # This means i2prouter looks for './i2p.pid'.
  # See comments above for wrapper.java.pidfile
