@@ -40,6 +40,7 @@
         <echo message="  debianhowto: instructions on building Debian packages" />
 	<echo message="  debian: generate Debian packages in ../" />
 	<echo message="          run &quot;ant debianhowto&quot; for instructions" />
+	<echo message="  debian-clean: rollback debian specific patches and run the &quot;distclean&quot; target (done automatically at the end of the &quot;debian&quot; target)" />
 	<!-- <echo message="  debianrepo: build a Debian repository (reprepro required)" /> -->
         <echo message="  poupdate: update the .po files for translators" />
         <echo message="  pkg-portable-win32:  build a minimum portable version for win32" />
