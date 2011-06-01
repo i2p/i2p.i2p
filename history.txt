@@ -1,3 +1,14 @@
+2011-06-01 zzz
+    * Crypto:
+      - Use java.security.MessageDigest instead of bundled GNU SHA-256 code
+        if available, which it should always be.
+        5 to 20% faster on Oracle JVM; 40 to 60% on Harmony;
+        5 to 15% on JamVM; 20x (!) on GIJ.
+      - Use java.security.MessageDigest instead of bundled Bitzi SHA-1 code
+        if available on non-Oracle JVMs, which it should always be.
+        Not faster on Oracle JVM; 30 to 60% faster on Harmony;
+        15 to 20% on JamVM; 10-15x (!) on GIJ.
+
 2011-06-01 sponge
     * ConfigClients stopClient stubbed out.
 

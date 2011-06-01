@@ -15,10 +15,17 @@ package net.i2p.crypto;
  * put("MessageDigest.SHA-1", "com.bitzi.util.SHA1");
  */
 //package com.bitzi.util;
+
 import java.security.DigestException;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
  
+import net.i2p.data.Base64;
+
 /**
+ * NOTE: As of 0.8.7, use getInstance() instead of new SHA1(), which will
+ * return the JVM's MessageDigest if it is faster.
+ *
  * <p>The FIPS PUB 180-2 standard specifies four secure hash algorithms (SHA-1,
  * SHA-256, SHA-384 and SHA-512) for computing a condensed representation of
  * electronic data (message).  When a message of any length < 2^^64 bits (for
@@ -85,8 +92,27 @@ public final class SHA1 extends MessageDigest implements Cloneable {
      */
     private int hA, hB, hC, hD, hE;
  
+    private static final boolean _useBitzi;
+    static {
+        // oddly, Bitzi is faster than Oracle - see test results below
+        boolean useBitzi = true;
+        String vendor = System.getProperty("java.vendor");
+        if (vendor.startsWith("Apache") ||                      // Harmony
+            vendor.startsWith("GNU Classpath") ||               // JamVM
+            vendor.startsWith("Free Software Foundation")) {    // gij
+            try {
+                MessageDigest.getInstance("SHA-1");
+                useBitzi = false;
+            } catch (NoSuchAlgorithmException e) {}
+        }
+        //if (useBitzi)
+        //    System.out.println("INFO: Using Bitzi SHA-1");
+        _useBitzi = useBitzi;
+    }
+
     /**
      * Creates a SHA1 object with default initial state.
+     * NOTE: Use getInstance() to get the fastest implementation.
      */
     public SHA1() {
         super("SHA-1");
@@ -94,6 +120,19 @@ public final class SHA1 extends MessageDigest implements Cloneable {
         init();
     }
  
+    /**
+     *  @return the fastest digest, either new SHA1() or MessageDigest.getInstance("SHA-1")
+     *  @since 0.8.7
+     */
+    public static MessageDigest getInstance() {
+        if (!_useBitzi) {
+            try {
+                return MessageDigest.getInstance("SHA-1");
+            } catch (NoSuchAlgorithmException e) {}
+        }
+        return new SHA1();
+    }
+
     /**
      * Clones this object.
      */
@@ -698,5 +737,64 @@ public final class SHA1 extends MessageDigest implements Cloneable {
         hE += e;
         hD += d;
         hC += /* c= */ (c << 30) | (c >>> 2);
+    }
+
+    private static final int RUNS = 100000;
+
+    /**
+     *  Test the GNU and the JVM's implementations for speed
+     *
+     *  Results: 2011-05 eeepc Atom
+     *  <pre>
+     *  JVM	strlen	GNU ms	JVM  ms 
+     *	Oracle	387	  1406	 2357
+     *	Oracle	 40	   522	  475
+     *	Harmony	387	  5504	 3474
+     *	Harmony	 40	  4396	 1593
+     *	JamVM	387	 25578	21966
+     *	JamVM	 40	  5380	 4195
+     *	gij	387	 47225	 3501
+     *	gij	 40	  9861    919
+     *  </pre>
+     *
+     *  @since 0.8.7
+     */
+    public static void main(String args[]) {
+        if (args.length <= 0) {
+            System.err.println("Usage: SHA1 string");
+            return;
+        }
+
+        byte[] data = args[0].getBytes();
+        SHA1 gnu = new SHA1();
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < RUNS; i++) {
+            gnu.update(data, 0, data.length);
+            byte[] sha = gnu.digest();
+            if (i == 0)
+                System.out.println("SHA1 [" + args[0] + "] = [" + Base64.encode(sha) + "]");
+            gnu.reset();
+        }
+        long time = System.currentTimeMillis() - start;
+        System.out.println("Time for " + RUNS + " SHA-256 computations:");
+        System.out.println("GNU time (ms): " + time);
+
+        start = System.currentTimeMillis();
+        MessageDigest md;
+        try {
+            md = MessageDigest.getInstance("SHA-1");
+        } catch (NoSuchAlgorithmException e) {
+            System.err.println("Fatal: " + e);
+            return;
+        }
+        for (int i = 0; i < RUNS; i++) {
+            md.reset();
+            byte[] sha = md.digest(data);
+            if (i == 0)
+                System.out.println("SHA1 [" + args[0] + "] = [" + Base64.encode(sha) + "]");
+        }
+        time = System.currentTimeMillis() - start;
+
+        System.out.println("JVM time (ms): " + time);
     }
 }

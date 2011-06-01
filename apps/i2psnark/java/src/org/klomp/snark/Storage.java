@@ -23,6 +23,7 @@ package org.klomp.snark;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -165,7 +166,7 @@ public class Storage
    */
   private byte[] fast_digestCreate() throws IOException {
     // Calculate piece_hashes
-    SHA1 digest = new SHA1();
+    MessageDigest digest = SHA1.getInstance();
 
     byte[] piece_hashes = new byte[20 * pieces];
 

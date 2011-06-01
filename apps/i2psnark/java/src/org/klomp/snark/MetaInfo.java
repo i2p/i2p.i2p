@@ -24,7 +24,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -401,7 +400,7 @@ public class MetaInfo
 ****/
   
   private boolean fast_checkPiece(int piece, byte[] bs, int off, int length) {
-    SHA1 sha1 = new SHA1();
+    MessageDigest sha1 = SHA1.getInstance();
 
     sha1.update(bs, off, length);
     byte[] hash = sha1.digest();
@@ -519,18 +518,11 @@ public class MetaInfo
     }
     byte[] infoBytes = BEncoder.bencode(info);
     //_log.debug("info bencoded: [" + Base64.encode(infoBytes, true) + "]");
-    try
-      {
-        MessageDigest digest = MessageDigest.getInstance("SHA");
+        MessageDigest digest = SHA1.getInstance();
         byte hash[] = digest.digest(infoBytes);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("info hash: " + I2PSnarkUtil.toHex(hash));
         return hash;
-      }
-    catch(NoSuchAlgorithmException nsa)
-      {
-        throw new InternalError(nsa.toString());
-      }
   }
 
   /** @since 0.8.5 */

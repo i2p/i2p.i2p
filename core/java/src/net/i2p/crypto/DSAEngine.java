@@ -32,6 +32,7 @@ package net.i2p.crypto;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.security.MessageDigest;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
@@ -228,25 +229,25 @@ public class DSAEngine {
     
     /** @return hash SHA-1 hash, NOT a SHA-256 hash */
     public SHA1Hash calculateHash(InputStream in) {
-        SHA1 digest = new SHA1();
+        MessageDigest digest = SHA1.getInstance();
         byte buf[] = new byte[64];
         int read = 0;
         try {
             while ( (read = in.read(buf)) != -1) {
-                digest.engineUpdate(buf, 0, read);
+                digest.update(buf, 0, read);
             }
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Unable to hash the stream", ioe);
             return null;
         }
-        return new SHA1Hash(digest.engineDigest());
+        return new SHA1Hash(digest.digest());
     }
 
     /** @return hash SHA-1 hash, NOT a SHA-256 hash */
     public static SHA1Hash calculateHash(byte[] source, int offset, int len) {
-        SHA1 h = new SHA1();
-        h.engineUpdate(source, offset, len);
+        MessageDigest h = SHA1.getInstance();
+        h.update(source, offset, len);
         byte digested[] = h.digest();
         return new SHA1Hash(digested);
     }
