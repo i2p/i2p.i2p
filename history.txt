@@ -1,4 +1,7 @@
 2011-06-01 sponge
+    * ConfigClients stopClient stubbed out.
+
+2011-06-01 sponge
     * Re the below, using better way that kytv suggested.
       There is more than one way to peel a pineapple...
 
