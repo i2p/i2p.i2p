@@ -1,3 +1,8 @@
+2011-06-01 sponge
+    * Remove the one little html file that ends up in BOB.jar.
+        The file is NOT a javadoc file, it is a package file.
+        Still, it is zapped. 
+
 2011-05-31 zzz
     * HTTP Proxy: Don't send redirect for POST (thx kytv)
     * jbigi: Add support for solaris
