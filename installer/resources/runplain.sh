@@ -17,6 +17,6 @@ I2PTEMP="%SYSTEM_java_io_tmpdir"
 export CP="${I2P}" ; for j in "${I2P}/lib/*"  ; do export CP="${CP}:${j}" ; done;
 JAVA=java
 
-JAVAOPTS="-Djava.net.preferIPv4Stack=true -Djava.library.path=$ {I2P}:${I2P}/lib -Di2p.dir.base=${I2P} -DloggerFilenameOverride=logs/log-router-@.txt"
+JAVAOPTS="-Djava.net.preferIPv4Stack=true -Djava.library.path=${I2P}:${I2P}/lib -Di2p.dir.base=${I2P} -DloggerFilenameOverride=logs/log-router-@.txt"
 nohup ${JAVA} -cp "${CP}" ${JAVAOPTS} net.i2p.router.RouterLaunch > /dev/null 2>&1 &
 echo $! > "${I2PTEMP}/router.pid"
