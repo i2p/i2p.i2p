@@ -39,7 +39,7 @@
         <echo message="  slackpkg:  generate Slackware packages in ./Slackware/i2p and ./Slackware/i2p-base" />
         <echo message="  debianhowto: instructions on building Debian packages" />
 	<echo message="  debian: generate Debian packages in ../" />
-	<echo message="          run &quot;ant debian&quot; for instructions" />
+	<echo message="          run &quot;ant debianhowto&quot; for instructions" />
 	<!-- <echo message="  debianrepo: build a Debian repository (reprepro required)" /> -->
         <echo message="  poupdate: update the .po files for translators" />
         <echo message="  pkg-portable-win32:  build a minimum portable version for win32" />
