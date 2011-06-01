@@ -71,26 +71,7 @@
     nbproject/build-impl.xml file. 
 
     -->
-    <target name="-post-jar">
-    	<!-- clean up leftover html file in final jar. -->
-    	<mkdir dir="${dist.dir}/rejar" />
-    	<unjar dest="${dist.dir}/rejar/" >
-    		<fileset dir="${dist.dir}" >
-    			<include name="**/*.jar" />
-    		</fileset>
-    	</unjar>
-    	<delete dir="${dist.dir}/rejar/" >
-    		<include name="**/*.html" />
-    	</delete>
-    	<jar jarfile="dist/BOB.jar">
-    		 <fileset dir="${dist.dir}/rejar/" />
-    	</jar>
-    	<delete dir="${dist.dir}" followsymlinks="false" includeemptydirs="true">
-    		<include name="rejar/**/*" />
-    		<include name="rejar" />
-    	</delete>
-    		 
-    </target>
+
     <target depends="jar" description="Build BOB into a SINGLE JAR." name="onejar">
 	<!-- Make needed working dirs -->
 	<mkdir dir="${dist.dir}/lib" />

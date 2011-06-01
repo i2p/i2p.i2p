@@ -1,4 +1,8 @@
 2011-06-01 sponge
+    * Re the below, using better way that kytv suggested.
+      There is more than one way to peel a pineapple...
+
+2011-06-01 sponge
     * Remove the one little html file that ends up in BOB.jar.
         The file is NOT a javadoc file, it is a package file.
         Still, it is zapped. 
