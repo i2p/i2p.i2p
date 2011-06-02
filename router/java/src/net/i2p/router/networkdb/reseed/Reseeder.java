@@ -344,6 +344,9 @@ public class Reseeder {
                     } catch (IOException e) {
                         errors++;
                     }
+                    // Give up on this one after 10 with only 0 or 1 good
+                    if (errors >= 10 && fetched <= 1)
+                        break;
                 }
                 System.err.println("Reseed got " + fetched + " router infos from " + seedURL + " with " + errors + " errors");
 
