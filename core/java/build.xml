@@ -99,7 +99,7 @@
                 <pathelement path="${classpath}" />
                 <pathelement location="./build/obj_test" />
                 <pathelement location="./build/obj" />
-                <pathelement location="../../installer/lib/jbigi/jbigi.jar" />
+                <pathelement location="../../build/jbigi.jar" />
                 <pathelement location="${with.cobertura}" />
             </classpath>
             <batchtest todir="../../reports/core/junit/">

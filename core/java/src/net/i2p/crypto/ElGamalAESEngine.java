@@ -295,7 +295,10 @@ public class ElGamalAESEngine {
         return decryptAESBlock(encrypted, 0, encrypted.length, key, iv, sentTag, foundTags, foundKey);
     }
 
-    private byte[] decryptAESBlock(byte encrypted[], int offset, int encryptedLen, SessionKey key, byte iv[], 
+    /*
+     * Note: package private for ElGamalTest.testAES()
+     */
+    byte[] decryptAESBlock(byte encrypted[], int offset, int encryptedLen, SessionKey key, byte iv[], 
                            byte sentTag[], Set foundTags, SessionKey foundKey) throws DataFormatException {
         //_log.debug("iv for decryption: " + DataHelper.toString(iv, 16));	
         //_log.debug("decrypting AES block.  encr.length = " + (encrypted == null? -1 : encrypted.length) + " sentTag: " + DataHelper.toString(sentTag, 32));
@@ -543,8 +546,9 @@ public class ElGamalAESEngine {
      *  - random bytes, padding the total size to greater than paddedSize with a mod 16 = 0
      * </pre>
      *
+     * Note: package private for ElGamalTest.testAES()
      */
-    private final byte[] encryptAESBlock(byte data[], SessionKey key, byte[] iv, Set tagsForDelivery, SessionKey newKey,
+    final byte[] encryptAESBlock(byte data[], SessionKey key, byte[] iv, Set tagsForDelivery, SessionKey newKey,
                                         long paddedSize) {
         return encryptAESBlock(data, key, iv, tagsForDelivery, newKey, paddedSize, 0);
     }
