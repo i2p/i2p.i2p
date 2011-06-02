@@ -36,3 +36,5 @@ ant install
 
 #to rebuild and reinstall to emulator:
 ant reinstall
+
+# Now click on the I2P icon on your phone!

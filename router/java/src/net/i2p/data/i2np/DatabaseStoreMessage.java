@@ -150,12 +150,15 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
         int len = Hash.HASH_LENGTH + 1 + 4; // key+type+replyToken
         if (_replyToken > 0) 
             len += 4 + Hash.HASH_LENGTH; // replyTunnel+replyGateway
-        if (_dbEntry.getType() == DatabaseEntry.KEY_TYPE_LEASESET) {
+        int type = _dbEntry.getType();
+        if (type == DatabaseEntry.KEY_TYPE_LEASESET) {
             _byteCache = _dbEntry.toByteArray();
-        } else if (_dbEntry.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
+        } else if (type == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
             byte uncompressed[] = _dbEntry.toByteArray();
             _byteCache = DataHelper.compress(uncompressed);
             len += 2;
+        } else {
+            throw new IllegalStateException("Invalid key type " + type);
         }
         len += _byteCache.length;
         return len;
@@ -166,7 +169,7 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
         if (_dbEntry == null) throw new I2NPMessageException("Missing entry");
         int type = _dbEntry.getType();
         if (type != DatabaseEntry.KEY_TYPE_LEASESET && type != DatabaseEntry.KEY_TYPE_ROUTERINFO)
-            throw new I2NPMessageException("Invalid key type");
+            throw new I2NPMessageException("Invalid key type " + type);
         
         // Use the hash of the DatabaseEntry
         System.arraycopy(getKey().getData(), 0, out, curIndex, Hash.HASH_LENGTH);
