@@ -28,7 +28,7 @@ ant debug
 ../../android-sdk-linux_86/tools/emulator -avd i2p &
 
 #then wait a couple minutes until the emulator is up
-#then install the I2P app
+#then install the I2P app (ONE TIME ONLY)
 ant install
 
 #then run the debugger
