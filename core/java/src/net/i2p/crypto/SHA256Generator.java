@@ -32,6 +32,9 @@ public final class SHA256Generator {
         _useGnu = useGnu;
     }
 
+    /**
+     *  @param context unused
+     */
     public SHA256Generator(I2PAppContext context) {
         _digests = new LinkedBlockingQueue(32);
     }

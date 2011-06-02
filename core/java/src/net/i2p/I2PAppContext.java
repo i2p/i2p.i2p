@@ -687,14 +687,14 @@ public class I2PAppContext {
         }
     }
 
-    /** @deprecated unused */
+    /** @deprecated used only by syndie */
     public HMAC256Generator hmac256() {
         if (!_hmac256Initialized)
             initializeHMAC256();
         return _hmac256;
     }
 
-    /** @deprecated unused */
+    /** @deprecated used only by syndie */
     private void initializeHMAC256() {
         synchronized (this) {
             if (_hmac256 == null) {

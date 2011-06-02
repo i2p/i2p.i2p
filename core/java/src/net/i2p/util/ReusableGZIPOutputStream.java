@@ -15,7 +15,9 @@ import net.i2p.data.DataHelper;
  */
 public class ReusableGZIPOutputStream extends ResettableGZIPOutputStream {
     // Apache Harmony 5.0M13 Deflater doesn't work after reset()
-    private static final boolean ENABLE_CACHING = !System.getProperty("java.vendor").startsWith("Apache");
+    // Neither does Android
+    private static final boolean ENABLE_CACHING = !(System.getProperty("java.vendor").startsWith("Apache") ||
+                                                    System.getProperty("java.vendor").contains("Android"));
     private static final LinkedBlockingQueue<ReusableGZIPOutputStream> _available;
     static {
         if (ENABLE_CACHING)

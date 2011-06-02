@@ -311,8 +311,11 @@ public class Router {
     }
     
     public RouterInfo getRouterInfo() { return _routerInfo; }
+
     public void setRouterInfo(RouterInfo info) { 
         _routerInfo = info; 
+        if (_log.shouldLog(Log.INFO))
+            _log.info("setRouterInfo() : " + info, new Exception("I did it"));
         if (info != null)
             _context.jobQueue().addJob(new PersistRouterInfoJob(_context));
     }
@@ -614,6 +617,10 @@ public class Router {
             }
         }
         // hard and ugly
+        if (System.getProperty("wrapper.version") != null)
+            _log.log(Log.CRIT, "Restarting with new router identity");
+        else
+            _log.log(Log.CRIT, "Shutting down because old router identity was invalid - restart I2P");
         finalShutdown(EXIT_HARD_RESTART);
     }
     
