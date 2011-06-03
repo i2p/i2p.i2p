@@ -7,7 +7,7 @@
     <!-- 3 = 1.5, 2 = 1.1, 1 = 1.0; would probably work with 1 but don't have a 1.0 SDK to test against -->
     <uses-sdk android:minSdkVersion="2" />
     <application android:label="@string/app_name">
-        <activity android:name=".I2PAndroid"
+        <activity android:name="I2PAndroid"
                   android:label="@string/app_name"
                   android:launchMode="singleTask" >
             <intent-filter>

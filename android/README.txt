@@ -1,11 +1,16 @@
 These instructions are for a recent Android SDK (1.6 or later)..
 Should also still work with a 1.5 SDK.
 The build file is not compatible with the 1.1 SDK any more.
+These instructions were last updated for SDK Tools Version 11 with
+SDK Platform-tools Version 5, June 2011.
 
 #Download the SDK from http://developer.android.com/sdk/index.html
 #Unzip the android SDK in ../../
 #So then the android tools will be in ../../android-sdk-linux_86/tools/
 #
+# Run the GUI updater, which you must do to get an SDK Platform:
+../../android-sdk-linux_86/tools/android &
+
 # now go to the available packages tab, check the box and click refresh,
 # and download an SDK Platform
 # Since I2P is configured to run on 1.1 or higher
@@ -13,11 +18,15 @@ The build file is not compatible with the 1.1 SDK any more.
 # target in default.properties from android-2 to andriod-x
 # where x is the API version.
 
-# create a file local.properties with the following line:
-# sdk-location=/path/to/your/android-sdk-linux_86
+# To run the debugger (ddms) you also need to download the
+# "Android SDK Platform-Tools" package from the GUI updater.
 
-#then build the android apk file:
-ant debug
+# create a file local.properties with the following line (without the leading # of course):
+# sdk.dir=/path/to/your/android-sdk-linux_86
+# The old property was sdk-location=/path/to/your/android-sdk-linux_86
+# but it changed in more recent tools.
+
+# DO NOT create a new project or anything. It's all set up right here for you.
 
 # Create the android 1.1 (API 2) virtual device
 # (don't make a custom hardware profile)
