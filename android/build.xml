@@ -76,6 +76,9 @@
         <mkdir dir="tmp" />
         <unjar src="../build/i2p.jar" dest="tmp/" />
         <delete file="tmp/net/i2p/util/LogWriter.class" />
+        <delete file="tmp/net/i2p/util/SecureDirectory.class" />
+        <delete file="tmp/net/i2p/util/SecureFile.class" />
+        <delete file="tmp/net/i2p/util/SecureFileOutputStream.class" />
         <!-- org.bouncycastle.crypto already in android
              but we need a little trickery because our HMac is incompatible...
              and the libs aren't in the SDK to compile against??? -->
@@ -237,6 +240,7 @@
     <target name="compile" depends="buildrouter, resource-src, aidl">
         <javac encoding="ascii" target="1.5" debug="true" extdirs=""
                 destdir="${out-classes}"
+                includeantruntime="false"
                 bootclasspathref="android.target.classpath">
             <src path="${source-folder}" />
             <src path="${gen-folder}" />
@@ -280,6 +284,12 @@
 
     <!-- Package the application and sign it with a debug key.
          This is the default target when building. It is used for debug. -->
+    <!--
+         I2P when this fails 365 days later because the key expired, delete ~/.android/debug.keystore
+         Then do 'ant uninstall' (since the new key doesn't match the old key)
+         Then do 'ant install'
+         See http://developer.android.com/guide/publishing/app-signing.html for more info
+      -->
     <target name="debug" depends="dex, package-resources">
         <apkbuilder
                 outfolder="${out-folder}"
@@ -327,12 +337,12 @@
         </exec>
     </target>
 
-    <!-- Uinstall the package from the default emulator -->
+    <!-- Uninstall the package from the default emulator -->
     <target name="uninstall">
         <echo>Uninstalling ${application-package} from the default emulator...</echo>
         <exec executable="${adb}" failonerror="true">
             <arg value="uninstall" />
-            <arg path="${application-package}" />
+            <arg value="${application-package}" />
         </exec>
     </target>
     

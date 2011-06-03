@@ -46,6 +46,7 @@ public class I2PAndroid extends Activity
     {
         System.err.println("onStart called");
         super.onStart();
+//      net.i2p.crypto.DSAEngine.main(null);
         RouterLaunch.main(null);
         System.err.println("Router.main finished");
     }

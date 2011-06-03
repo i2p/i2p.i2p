@@ -1,3 +1,15 @@
+2011-06-02 zzz
+    * Android: Build fixes
+    * Crypto:
+      - HMAC Javadocs and cleanups
+      - HMAC Use SimpleByteCache
+    * ElGamalAESEngine: Fixups required after SessionKey enforcement
+    * Reseed: Give up on a seed after 90% of fetches fail
+    * SessionKey: Enforce data size and prevent reuse
+
+2011-06-02 sponge
+    * Remove txt file in BOB.jar as per zzz's request.
+
 2011-06-01 zzz
     * Crypto:
       - Use java.security.MessageDigest instead of bundled GNU SHA-256 code

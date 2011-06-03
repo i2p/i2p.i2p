@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Queue;
 
 /**
  * bridge to android logging
@@ -56,11 +57,21 @@ class LogWriter implements Runnable {
     public void flushRecords() { flushRecords(true); }
     public void flushRecords(boolean shouldWait) {
         try {
-            List records = _manager._removeAll();
+            // zero copy, drain the manager queue directly
+            Queue<LogRecord> records = _manager.getQueue();
             if (records == null) return;
-            for (int i = 0; i < records.size(); i++) {
-                LogRecord rec = (LogRecord) records.get(i);
-                writeRecord(rec);
+            if (!records.isEmpty()) {
+                LogRecord rec;
+                while ((rec = records.poll()) != null) {
+                    writeRecord(rec);
+                }
+                try {
+                    if (_currentOut != null)
+                        _currentOut.flush();
+                } catch (IOException ioe) {
+                    //if (++_diskFullMessageCount < MAX_DISKFULL_MESSAGES)
+                        System.err.println("Error writing the router log - disk full? " + ioe);
+                }
             }
         } catch (Throwable t) {
             t.printStackTrace();

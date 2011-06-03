@@ -27,8 +27,9 @@ package org.bouncycastle.crypto.macs;
  */
 
 //import org.bouncycastle.crypto.CipherParameters;
-import java.util.ArrayList;
 import java.util.Arrays;
+
+import net.i2p.util.SimpleByteCache;
 
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.Mac;
@@ -65,6 +66,11 @@ implements Mac
     {
         this(digest, digest.getDigestSize()); 
     }
+
+    /**
+     *  @param sz override the digest's size
+     *  SEE NOTES in HMACGenerator about why this isn't compatible with standard HmacMD5
+     */
     public I2PHMac(
         Digest digest, int sz)
     {
@@ -165,28 +171,14 @@ implements Mac
         return len;
     }
     
-    /**
-     * list of buffers - index 0 is the cache for 32 byte arrays, while index 1 is the cache for 16 byte arrays
-     */
-    private static ArrayList _tmpBuf[] = new ArrayList[] { new ArrayList(), new ArrayList() };
     private static byte[] acquireTmp(int sz) {
-        byte rv[] = null;
-        synchronized (_tmpBuf[sz == 32 ? 0 : 1]) {
-            if (!_tmpBuf[sz == 32 ? 0 : 1].isEmpty())
-                rv = (byte[])_tmpBuf[sz == 32 ? 0 : 1].remove(0);
-        }
-        if (rv != null)
-            Arrays.fill(rv, (byte)0x0);
-        else
-            rv = new byte[sz];
+        byte[] rv = SimpleByteCache.acquire(sz);
+        Arrays.fill(rv, (byte)0x0);
         return rv;
     }
+
     private static void releaseTmp(byte buf[]) {
-        if (buf == null) return;
-        synchronized (_tmpBuf[buf.length == 32 ? 0 : 1]) {
-            if (_tmpBuf[buf.length == 32 ? 0 : 1].size() < 100) 
-                _tmpBuf[buf.length == 32 ? 0 : 1].add((Object)buf);
-        }
+        SimpleByteCache.release(buf);
     }
 
     /**
