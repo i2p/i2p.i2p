@@ -49,4 +49,5 @@ ant reinstall
 # Now click on the I2P icon on your phone!
 
 #other helpful commands
-../../android-sdk-linux_86/tools/adb shell
+../../android-sdk-linux_86/platform-tools/adb shell
+../../android-sdk-linux_86/platform-tools/adb pull /some/file/on/emulator some-local-dir/

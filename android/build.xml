@@ -127,10 +127,6 @@
             <arg value="jni/build.sh" />
         </exec>
         <copy file="jni/libjbigi.so" todir="${native.libs.dir}/armeabi" />
-        <exec executable="chmod" osfamily="unix" failonerror="true">
-            <arg value="+x" />
-            <arg value="${native.libs.dir}/armeabi/libjbigi.so" />
-        </exec>
     </target>
 
     <!-- install now does both -->

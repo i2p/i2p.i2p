@@ -16,6 +16,7 @@ import java.math.BigInteger;
 import java.net.URL;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -138,6 +139,7 @@ public class NativeBigInteger extends BigInteger {
     private static final boolean _isLinux = System.getProperty("os.name").toLowerCase().contains("linux");
     private static final boolean _isFreebsd = System.getProperty("os.name").toLowerCase().contains("freebsd");
     private static final boolean _isSunos = System.getProperty("os.name").toLowerCase().contains("sunos");
+    private static final boolean _isAndroid = System.getProperty("java.vendor").contains("Android");
 
     /*
      * This isn't always correct.
@@ -498,6 +500,17 @@ public class NativeBigInteger extends BigInteger {
             System.loadLibrary(name);
             return true;
         } catch (UnsatisfiedLinkError ule) {
+            if (_isAndroid) {
+                // temp debug
+                warn("jbigi loadLibrary() fail", ule);
+                try {
+                    System.load("/data/data/net.i2p.router/lib/libjbigi.so");
+                    return true;
+                } catch (Throwable t) {
+                    warn("jbigi load() fail", t);
+                }
+                warn("Is the file there? " + (new File("/data/data/net.i2p.router/lib/libjbigi.so")).exists());
+            }
             return false;
         }
     }
@@ -581,6 +594,8 @@ public class NativeBigInteger extends BigInteger {
      *  @since 0.8.7
      */
     private static List<String> getResourceList() {
+        if (_isAndroid)
+            return Collections.EMPTY_LIST;
         List<String> rv = new ArrayList(8);
         String primary = getMiddleName2(true);
         if (primary != null) {
