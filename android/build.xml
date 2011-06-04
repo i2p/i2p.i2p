@@ -129,6 +129,14 @@
         <copy file="jni/libjbigi.so" todir="${native.libs.dir}/armeabi" />
     </target>
 
+    <target name="incrementBuild">
+        <buildnumber file="scripts/build.number" />
+        <exec executable="sh" osfamily="unix" failonerror="true">
+            <arg value="-c" />
+            <arg value="scripts/setversion.sh" />
+        </exec>
+    </target>
+
     <!-- install now does both -->
     <target name="reinstall" depends="install" />
 
@@ -138,6 +146,7 @@
         <delete file="res/raw/blocklist_txt" verbose="${verbose}" />
         <delete dir="jni/build/" verbose="${verbose}" />
         <delete file="jni/libjbigi.so" verbose="${verbose}" />
+        <delete file="scripts/build.number" verbose="${verbose}" />
     </target>
 
     <!--
@@ -443,7 +452,7 @@
     <!-- empty default pre-build target. Create a similar target in
          your build.xml and it'll be called instead of this one. -->
     <!-- I2P add depends -->
-    <target name="-pre-build" depends="copy-i2p-resources" />
+    <target name="-pre-build" depends="copy-i2p-resources, incrementBuild" />
 
     <!-- Generates the R.java file for this project's resources. -->
     <target name="-resource-src" depends="-dirs">

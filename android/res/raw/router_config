@@ -7,9 +7,14 @@ prng.buffers=2
 router.decayingBloomFilterM=20
 stat.full=false
 #
+# Don't run NTP client, the phone should have a valid time
+#
+time.disabled=true
+#
 # no I2CP
 #
 i2p.dummyClientFacade=true
+i2cp.disableInterface=true
 #
 ##### Transport
 #

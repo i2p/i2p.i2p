@@ -2,6 +2,8 @@ package net.i2p.router;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.content.res.Resources.NotFoundException;
 import android.os.Bundle;
@@ -103,6 +105,20 @@ public class I2PAndroid extends Activity
         System.err.println("user.home" + ": " + System.getProperty("user.home"));
         System.err.println("user.name" + ": " + System.getProperty("user.name"));
         System.err.println("getFilesDir()" + ": " + DIR);
+        System.err.println("Package" + ": " + getPackageName());
+        System.err.println("Version" + ": " + getOurVersion());
+    }
+
+    private String getOurVersion() {
+        PackageManager pm = getPackageManager();
+        String us = getPackageName();
+        try {
+            PackageInfo pi = pm.getPackageInfo(us, 0);
+            System.err.println("VersionCode" + ": " + pi.versionCode);
+            if (pi.versionName != null)
+                return pi.versionName;
+        } catch (Exception e) {}
+        return "??";
     }
 
     private void initialize() {
