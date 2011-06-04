@@ -63,6 +63,7 @@ public class Router {
     /** full path */
     private String _configFilename;
     private RouterInfo _routerInfo;
+    public final Object routerInfoFileLock = new Object();
     private long _started;
     private boolean _higherVersionSeen;
     //private SessionKeyPersistenceHelper _sessionKeyPersistenceHelper;
@@ -312,6 +313,9 @@ public class Router {
     
     public RouterInfo getRouterInfo() { return _routerInfo; }
 
+    /**
+     *  Caller must ensure info is valid - no validation done here
+     */
     public void setRouterInfo(RouterInfo info) { 
         _routerInfo = info; 
         if (_log.shouldLog(Log.INFO))
@@ -452,6 +456,8 @@ public class Router {
             }
             ri.sign(key);
             setRouterInfo(ri);
+            if (!ri.isValid())
+                throw new DataFormatException("Our RouterInfo has a bad signature");
             Republish r = new Republish();
             if (blockingRebuild)
                 r.timeReached();
@@ -1582,13 +1588,14 @@ private static class ShutdownHook extends Thread {
 
 /** update the router.info file whenever its, er, updated */
 private static class PersistRouterInfoJob extends JobImpl {
-    private Log _log;
     public PersistRouterInfoJob(RouterContext ctx) { 
         super(ctx); 
     }
+
     public String getName() { return "Persist Updated Router Information"; }
+
     public void runJob() {
-        _log = getContext().logManager().getLog(PersistRouterInfoJob.class);
+        Log _log = getContext().logManager().getLog(PersistRouterInfoJob.class);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Persisting updated router info");
 
@@ -1598,15 +1605,17 @@ private static class PersistRouterInfoJob extends JobImpl {
         RouterInfo info = getContext().router().getRouterInfo();
 
         FileOutputStream fos = null;
-        try {
-            fos = new SecureFileOutputStream(infoFile);
-            info.writeBytes(fos);
-        } catch (DataFormatException dfe) {
-            _log.error("Error rebuilding the router information", dfe);
-        } catch (IOException ioe) {
-            _log.error("Error writing out the rebuilt router information", ioe);
-        } finally {
-            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+        synchronized (getContext().router().routerInfoFileLock) {
+            try {
+                fos = new SecureFileOutputStream(infoFile);
+                info.writeBytes(fos);
+            } catch (DataFormatException dfe) {
+                _log.error("Error rebuilding the router information", dfe);
+            } catch (IOException ioe) {
+                _log.error("Error writing out the rebuilt router information", ioe);
+            } finally {
+                if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+            }
         }
     }
 }

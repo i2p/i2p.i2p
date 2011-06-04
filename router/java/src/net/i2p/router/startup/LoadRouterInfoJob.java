@@ -24,7 +24,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 public class LoadRouterInfoJob extends JobImpl {
-    private Log _log;
+    private final Log _log;
     private boolean _keysExist;
     private boolean _infoExists;
     private RouterInfo _us;
@@ -37,7 +37,9 @@ public class LoadRouterInfoJob extends JobImpl {
     public String getName() { return "Load Router Info"; }
     
     public void runJob() {
-        loadRouterInfo();
+        synchronized (getContext().router().routerInfoFileLock) {
+            loadRouterInfo();
+        }
         if (_us == null) {
             RebuildRouterInfoJob r = new RebuildRouterInfoJob(getContext());
             r.rebuildRouterInfo(false);
@@ -78,7 +80,11 @@ public class LoadRouterInfoJob extends JobImpl {
                 fis1 = new FileInputStream(rif);
                 info = new RouterInfo();
                 info.readBytes(fis1);
-                _log.debug("Reading in routerInfo from " + rif.getAbsolutePath() + " and it has " + info.getAddresses().size() + " addresses");
+                // Catch this here before it all gets worse
+                if (!info.isValid())
+                    throw new DataFormatException("Our RouterInfo has a bad signature");
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Reading in routerInfo from " + rif.getAbsolutePath() + " and it has " + info.getAddresses().size() + " addresses");
                 _us = info;
             }
             
