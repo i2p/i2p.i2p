@@ -83,42 +83,36 @@
         <copy file="../build/router.jar" todir="${jar.libs.dir}" />
 
         <!-- core -->
-        <mkdir dir="tmp" />
-        <unjar src="../build/i2p.jar" dest="tmp/" />
-        <delete file="tmp/net/i2p/util/LogWriter.class" />
-        <delete file="tmp/net/i2p/util/SecureDirectory.class" />
-        <delete file="tmp/net/i2p/util/SecureFile.class" />
-        <delete file="tmp/net/i2p/util/SecureFileOutputStream.class" />
+
         <!-- org.bouncycastle.crypto already in android
              but we need a little trickery because our HMac is incompatible...
              and the libs aren't in the SDK to compile against??? -->
         <jar destfile="${jar.libs.dir}/crypto.jar" >
-            <fileset dir="tmp/" >
+            <zipfileset src="../build/i2p.jar" >
                 <include name="org/bouncycastle/crypto/Digest.class" />
                 <include name="org/bouncycastle/crypto/Mac.class" />
                 <include name="org/bouncycastle/crypto/digests/GeneralDigest.class" />
                 <include name="org/bouncycastle/crypto/digests/MD5Digest.class" />
-            </fileset>
+            </zipfileset >
         </jar>
-        <delete>
-            <fileset dir="tmp/" >
-                <include name="org/bouncycastle/crypto/Digest.class" />
-                <include name="org/bouncycastle/crypto/Mac.class" />
-                <include name="org/bouncycastle/crypto/digests/GeneralDigest.class" />
-                <include name="org/bouncycastle/crypto/digests/MD5Digest.class" />
-            </fileset>
-        </delete>
-<!--
-        <delete dir="tmp/org/bouncycastle/" />
-        <delete file="tmp/net/i2p/crypto/HMACGenerator.class" />
--->
-        <delete file="tmp/org/bouncycastle/" />
-        <!-- lots of unneeded stuff could be deleted here -->
-        <jar destfile="${jar.libs.dir}/i2p.jar" basedir="tmp/" />
-        <delete dir="tmp/" />
 
-        <!-- some resources -->
-        <mkdir dir="res/drawable/" />
+        <!-- lots of unneeded stuff could be deleted here -->
+        <jar destfile="${jar.libs.dir}/i2p.jar" >
+            <zipfileset src="../build/i2p.jar" >
+                <exclude name="net/i2p/util/LogWriter.class" />
+                <exclude name="net/i2p/util/SecureDirectory.class" />
+                <exclude name="net/i2p/util/SecureFile.class" />
+                <exclude name="net/i2p/util/SecureFileOutputStream.class" />
+                <exclude name="org/bouncycastle/crypto/Digest.class" />
+                <exclude name="org/bouncycastle/crypto/Mac.class" />
+                <exclude name="org/bouncycastle/crypto/digests/GeneralDigest.class" />
+                <exclude name="org/bouncycastle/crypto/digests/MD5Digest.class" />
+            </zipfileset >
+        </jar>
+    </target>
+
+    <!-- some resources -->
+    <target name="copy-i2p-resources" depends="-dirs" >
         <copy file="../installer/resources/themes/console/images/i2plogo.png" todir="res/drawable/" />
         <copy file="../installer/resources/blocklist.txt" tofile="res/raw/blocklist_txt" />
     </target>
@@ -127,14 +121,27 @@
         <delete file="${jar.libs.dir}/crypto.jar" />
     </target>
 
+    <target name="jbigi">
+        <exec executable="sh" osfamily="unix" failonerror="true">
+            <arg value="-c" />
+            <arg value="jni/build.sh" />
+        </exec>
+        <copy file="jni/libjbigi.so" todir="${native.libs.dir}/armeabi" />
+        <exec executable="chmod" osfamily="unix" failonerror="true">
+            <arg value="+x" />
+            <arg value="${native.libs.dir}/armeabi/libjbigi.so" />
+        </exec>
+    </target>
+
     <!-- install now does both -->
     <target name="reinstall" depends="install" />
 
     <target name="distclean" depends="clean">
         <delete dir="${jar.libs.dir}" verbose="${verbose}" />
-        <delete dir="tmp/" verbose="${verbose}" />
         <delete file="res/drawable/i2plogo.png" verbose="${verbose}"/>
         <delete file="res/raw/blocklist_txt" verbose="${verbose}" />
+        <delete dir="jni/build/" verbose="${verbose}" />
+        <delete file="jni/libjbigi.so" verbose="${verbose}" />
     </target>
 
     <!--
@@ -439,7 +446,8 @@
 
     <!-- empty default pre-build target. Create a similar target in
          your build.xml and it'll be called instead of this one. -->
-    <target name="-pre-build"/>
+    <!-- I2P add depends -->
+    <target name="-pre-build" depends="copy-i2p-resources" />
 
     <!-- Generates the R.java file for this project's resources. -->
     <target name="-resource-src" depends="-dirs">
@@ -522,6 +530,7 @@
                 <javac encoding="${java.encoding}"
                         source="${java.source}" target="${java.target}"
                         debug="true" extdirs=""
+                        includeantruntime="false"
                         destdir="${out.classes.absolute.dir}"
                         bootclasspathref="android.target.classpath"
                         verbose="${verbose}"
@@ -544,7 +553,7 @@
     <!-- empty default post-compile target. Create a similar target in
          your build.xml and it'll be called instead of this one. -->
     <!-- I2P add depends -->
-    <target name="-post-compile" depends="hackcleanup" />
+    <target name="-post-compile" depends="hackcleanup, jbigi" />
 
     <!-- Obfuscate target
         This is only active in release builds when proguard.config is defined

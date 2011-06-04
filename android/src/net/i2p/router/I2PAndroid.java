@@ -11,15 +11,17 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Properties;
 
+import net.i2p.data.DataHelper;
 import net.i2p.router.Router;
 import net.i2p.router.RouterLaunch;
-// import net.i2p.util.NativeBigInteger;
+import net.i2p.util.OrderedProperties;
 
 public class I2PAndroid extends Activity
 {
     static Context _context;
-    private static final String DIR = "/data/data/net.i2p.router/files";
+    private String DIR = "/data/data/net.i2p.router/files";
 
     /** Called when the activity is first created. */
     @Override
@@ -29,6 +31,7 @@ public class I2PAndroid extends Activity
         setContentView(R.layout.main);
 
         _context = this;  // Activity extends Context
+        DIR = getFilesDir().getAbsolutePath();
         debugStuff();
         initialize();
         // 300ms per run
@@ -99,17 +102,13 @@ public class I2PAndroid extends Activity
         System.err.println("user.dir" + ": " + System.getProperty("user.dir"));
         System.err.println("user.home" + ": " + System.getProperty("user.home"));
         System.err.println("user.name" + ": " + System.getProperty("user.name"));
+        System.err.println("getFilesDir()" + ": " + DIR);
     }
 
     private void initialize() {
-        // Until we can edit the router.config on the device,
-        // copy it from the resource every time.
-        // File f = new I2PFile("router.config");
-        // if (!f.exists()) {
-            copyResourceToFile(R.raw.router_config, "router.config");
-            copyResourceToFile(R.raw.logger_config, "logger.config");
-            copyResourceToFile(R.raw.blocklist_txt, "blocklist.txt");
-        // }
+        mergeResourceToFile(R.raw.router_config, "router.config");
+        mergeResourceToFile(R.raw.logger_config, "logger.config");
+        copyResourceToFile(R.raw.blocklist_txt, "blocklist.txt");
 
         // Set up the locations so Router and WorkingDir can find them
         System.setProperty("i2p.dir.base", DIR);
@@ -137,6 +136,41 @@ public class I2PAndroid extends Activity
         } finally {
             if (in != null) try { in.close(); } catch (IOException ioe) {}
             if (out != null) try { out.close(); } catch (IOException ioe) {}
+        }
+    }
+    
+    /**
+     *  Load defaults from resource,
+     *  then add props from file,
+     *  and write back
+     */
+    private void mergeResourceToFile(int resID, String f) {
+        InputStream in = null;
+        InputStream fin = null;
+
+        byte buf[] = new byte[4096];
+        try {
+            Properties props = new OrderedProperties();
+            // Context methods
+            in = getResources().openRawResource(resID);
+            DataHelper.loadProps(props,  in);
+            
+            try {
+                fin = openFileInput(f);
+                DataHelper.loadProps(props,  fin);
+                System.err.println("Merging resource into file " + f);
+            } catch (IOException ioe) {
+                System.err.println("Creating file " + f + " from resource");
+            } finally {
+                try { fin.close(); } catch (IOException ioe) {}
+            }
+
+            DataHelper.storeProps(props, getFileStreamPath(f));
+        } catch (IOException ioe) {
+        } catch (Resources.NotFoundException nfe) {
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
+            if (fin != null) try { fin.close(); } catch (IOException ioe) {}
         }
     }
     

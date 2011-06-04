@@ -28,16 +28,16 @@ SDK Platform-tools Version 5, June 2011.
 
 # DO NOT create a new project or anything. It's all set up right here for you.
 
-# Create the android 1.1 (API 2) virtual device
+# Create the android 1.5 (API 3) virtual device
 # (don't make a custom hardware profile)
 # A AVD created with the 1.5 SDK will not work with the newer tools
-../../android-sdk-linux_86/tools/android create avd --name i2p --target 2
+../../android-sdk-linux_86/tools/android create avd --name i2p --target 3
 
 #then run the emulator:
 ../../android-sdk-linux_86/tools/emulator -avd i2p &
 
 #then wait a couple minutes until the emulator is up
-#then install the I2P app (ONE TIME ONLY)
+#then install the I2P app
 ant install
 
 #then run the debugger
@@ -47,3 +47,6 @@ ant install
 ant reinstall
 
 # Now click on the I2P icon on your phone!
+
+#other helpful commands
+../../android-sdk-linux_86/tools/adb shell

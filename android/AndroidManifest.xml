@@ -5,10 +5,12 @@
       android:versionName="1.0.0">
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- 3 = 1.5, 2 = 1.1, 1 = 1.0; would probably work with 1 but don't have a 1.0 SDK to test against -->
-    <uses-sdk android:minSdkVersion="2" />
+    <!-- 3 required for NDK -->
+    <uses-sdk android:minSdkVersion="3" />
     <application android:label="@string/app_name">
         <activity android:name="I2PAndroid"
                   android:label="@string/app_name"
+                  android:icon="@drawable/ic_launcher_itoopie"
                   android:launchMode="singleTask" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
