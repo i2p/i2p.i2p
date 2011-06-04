@@ -84,7 +84,15 @@ public class KeyGenerator {
      * index 1 is a PrivateKey
      * @return pair of keys
      */
-    public SimpleDataStructure[] generatePKIKeypair() {
+    public Object[] generatePKIKeypair() {
+        return generatePKIKeys();
+    }
+
+    /**
+     *  Same as above but different return type
+     *  @since 0.8.7
+     */
+    public SimpleDataStructure[] generatePKIKeys() {
         BigInteger a = new NativeBigInteger(PUBKEY_EXPONENT_SIZE, _context.random());
         BigInteger aalpha = CryptoConstants.elgg.modPow(a, CryptoConstants.elgp);
 
@@ -120,7 +128,15 @@ public class KeyGenerator {
      * index 1 is a SigningPrivateKey
      * @return pair of keys
      */
-    public SimpleDataStructure[] generateSigningKeypair() {
+    public Object[] generateSigningKeypair() {
+        return generateSigningKeys();
+    }
+
+    /**
+     *  Same as above but different return type
+     *  @since 0.8.7
+     */
+    public SimpleDataStructure[] generateSigningKeys() {
         SimpleDataStructure[] keys = new SimpleDataStructure[2];
         BigInteger x = null;
 
