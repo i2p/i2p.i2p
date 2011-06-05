@@ -36,6 +36,11 @@ SDK Platform-tools Version 5, June 2011.
 #then run the emulator:
 ../../android-sdk-linux_86/tools/emulator -avd i2p &
 
+# or to talk to a real phone in debug mode:
+adb kill-server
+sudo adb start-server
+adb devices
+
 #then wait a couple minutes until the emulator is up
 #then install the I2P app
 ant install
@@ -43,7 +48,7 @@ ant install
 #then run the debugger
 ../../android-sdk-linux_86/tools/ddms &
 
-#to rebuild and reinstall to emulator:
+#to rebuild and reinstall to emulator or phone:
 ant reinstall
 
 # Now click on the I2P icon on your phone!

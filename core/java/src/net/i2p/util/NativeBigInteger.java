@@ -498,15 +498,10 @@ public class NativeBigInteger extends BigInteger {
             return true;
         } catch (UnsatisfiedLinkError ule) {
             if (_isAndroid) {
-                // temp debug
+                // Unfortunately,
+                // this is not interesting on Android, it says "file not found"
+                // on link errors too.
                 warn("jbigi loadLibrary() fail", ule);
-                try {
-                    System.load("/data/data/net.i2p.router/lib/libjbigi.so");
-                    return true;
-                } catch (Throwable t) {
-                    warn("jbigi load() fail", t);
-                }
-                warn("Is the file there? " + (new File("/data/data/net.i2p.router/lib/libjbigi.so")).exists());
             }
             return false;
         }

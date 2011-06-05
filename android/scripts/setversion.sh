@@ -49,6 +49,8 @@ VERSIONINT=$(( \
 	      ))
 
 echo "Android version: '$VERSIONSTRING' (${VERSIONINT})"
+echo "my.version.name=${VERSIONSTRING}" > version.properties
+echo "my.version.code=${VERSIONINT}" >> version.properties
 
 SUBST='s/android.versionCode="[0-9]"/android.versionCode="'${VERSIONINT}'"/'
 sed "$SUBST" < $MANIFEST > $TMP

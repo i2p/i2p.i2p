@@ -6,6 +6,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.content.res.Resources.NotFoundException;
+import android.os.Build;
 import android.os.Bundle;
 
 import java.io.File;
@@ -19,11 +20,12 @@ import net.i2p.data.DataHelper;
 import net.i2p.router.Router;
 import net.i2p.router.RouterLaunch;
 import net.i2p.util.OrderedProperties;
+import net.i2p.util.NativeBigInteger;
 
 public class I2PAndroid extends Activity
 {
     static Context _context;
-    private String DIR = "/data/data/net.i2p.router/files";
+    private String _myDir;
 
     /** Called when the activity is first created. */
     @Override
@@ -33,12 +35,13 @@ public class I2PAndroid extends Activity
         setContentView(R.layout.main);
 
         _context = this;  // Activity extends Context
-        DIR = getFilesDir().getAbsolutePath();
+        _myDir = getFilesDir().getAbsolutePath();
         debugStuff();
         initialize();
-        // 300ms per run
+        // 300ms per run on emulator on eeepc
         // 5x slower than java on my server and 50x slower than native on my server
-        // NativeBigInteger.main(null);
+        // 33 ms native 29 ms java moto droid 2.2.2
+        NativeBigInteger.main(null);
     }
 
     public void onRestart()
@@ -104,9 +107,13 @@ public class I2PAndroid extends Activity
         System.err.println("user.dir" + ": " + System.getProperty("user.dir"));
         System.err.println("user.home" + ": " + System.getProperty("user.home"));
         System.err.println("user.name" + ": " + System.getProperty("user.name"));
-        System.err.println("getFilesDir()" + ": " + DIR);
+        System.err.println("getFilesDir()" + ": " + _myDir);
         System.err.println("Package" + ": " + getPackageName());
         System.err.println("Version" + ": " + getOurVersion());
+        System.err.println("MODEL" + ": " + Build.MODEL);
+        System.err.println("DISPLAY" + ": " + Build.DISPLAY);
+        System.err.println("VERSION" + ": " + Build.VERSION.RELEASE);
+        System.err.println("SDK" + ": " + Build.VERSION.SDK);
     }
 
     private String getOurVersion() {
@@ -127,9 +134,9 @@ public class I2PAndroid extends Activity
         copyResourceToFile(R.raw.blocklist_txt, "blocklist.txt");
 
         // Set up the locations so Router and WorkingDir can find them
-        System.setProperty("i2p.dir.base", DIR);
-        System.setProperty("i2p.dir.config", DIR);
-        System.setProperty("wrapper.logfile", DIR + "/wrapper.log");
+        System.setProperty("i2p.dir.base", _myDir);
+        System.setProperty("i2p.dir.config", _myDir);
+        System.setProperty("wrapper.logfile", _myDir + "/wrapper.log");
     }
 
     private void copyResourceToFile(int resID, String f) {
@@ -178,7 +185,7 @@ public class I2PAndroid extends Activity
             } catch (IOException ioe) {
                 System.err.println("Creating file " + f + " from resource");
             } finally {
-                try { fin.close(); } catch (IOException ioe) {}
+                if (fin != null) try { fin.close(); } catch (IOException ioe) {}
             }
 
             DataHelper.storeProps(props, getFileStreamPath(f));
