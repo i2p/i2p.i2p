@@ -42,7 +42,7 @@ Subject: Update-paths
  #  nice is only used if a priority is specified.
 --- a/installer/resources/runplain.sh
 +++ b/installer/resources/runplain.sh
-@@ -11,12 +11,12 @@
+@@ -11,8 +11,8 @@
  # Note that (percent)INSTALL_PATH and (percent)SYSTEM_java_io_tmpdir
  # should have been replaced by the izpack installer.
  # If you did not run the installer, replace them with the appropriate path.
@@ -51,13 +51,8 @@ Subject: Update-paths
 +I2P="/usr/share/i2p"
 +I2PTEMP="/tmp"
  
- export CP="${I2P}" ; for j in "${I2P}/lib/*"  ; do export CP="${CP}:${j}" ; done;
- JAVA=java
- 
--JAVAOPTS="-Djava.net.preferIPv4Stack=true -Djava.library.path=${I2P}:${I2P}/lib -Di2p.dir.base=${I2P} -DloggerFilenameOverride=logs/log-router-@.txt"
-+JAVAOPTS="-Djava.net.preferIPv4Stack=true -Djava.library.path=/usr/lib/jni:${I2P}/lib -Di2p.dir.base=${I2P} -DloggerFilenameOverride=logs/log-router-@.txt"
- nohup ${JAVA} -cp "${CP}" ${JAVAOPTS} net.i2p.router.RouterLaunch > /dev/null 2>&1 &
- echo $! > "${I2PTEMP}/router.pid"
+ # Having IPv6 enabled can cause problems with certain configurations. Changing the
+ # next value to true may help. 
 --- a/installer/resources/wrapper.config
 +++ b/installer/resources/wrapper.config
 @@ -45,20 +45,19 @@
@@ -84,9 +79,9 @@ Subject: Update-paths
 -wrapper.java.additional.4=-Di2p.dir.base="$INSTALL_PATH"
 +wrapper.java.additional.4=-Di2p.dir.base="/usr/share/i2p"
  wrapper.java.additional.4.stripquotes=TRUE
- wrapper.java.additional.5=-Djava.net.preferIPv4Stack=true
- # Jetty says this is a security risk
-@@ -117,7 +116,7 @@
+ 
+ # On some IPv6 enabled systems, I2P and other network-enabled java applications
+@@ -125,7 +124,7 @@
  # tell the router where to find the wrapper log
  # (change X to the next available number)
  # wrapper.java.additional.X=-Dwrapper.logfile=/path/to/wrapper.log
@@ -95,7 +90,7 @@ Subject: Update-paths
  # PORTABLE installation:
  # Use the following instead. I2P will find the logfile here,
  # no need for a wrapper.java.additional line too.
-@@ -183,7 +182,7 @@
+@@ -191,7 +190,7 @@
  # you should copy this file, change the location or file name,
  # and edit the i2prouter script to change the WRAPPER_CONF setting
  # to point to the new wrapper.config location.
@@ -104,7 +99,7 @@ Subject: Update-paths
  # PORTABLE installation:
  # Use the following instead.
  #wrapper.java.pidfile=$INSTALL_PATH/routerjvm.pid
-@@ -197,7 +196,7 @@
+@@ -205,7 +204,7 @@
  #
  # This means i2prouter looks for './i2p.pid'.
  # See comments above for wrapper.java.pidfile
