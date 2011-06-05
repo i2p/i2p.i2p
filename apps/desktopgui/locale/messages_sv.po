@@ -1,0 +1,57 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the desktopgui package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+# 123hund123 <M8R-ra4r1r@mailinator.com>, 2011
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
+"POT-Creation-Date: 2011-03-03 18:29+0000\n"
+"PO-Revision-Date: 2011-03-22 15:49+0000\n"
+"Last-Translator: 123hund123 <M8R-ra4r1r@mailinator.com>\n"
+"Language-Team: Swedish (Sweden) (http://www.transifex.net/projects/p/I2P/team/sv_SE/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sv_SE\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:23
+msgid "Start I2P"
+msgstr "Starta I2P"
+
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:38
+msgid "I2P is starting!"
+msgstr "I2P startas!"
+
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:38
+msgid "Starting"
+msgstr "Startar"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:26
+msgid "Launch I2P Browser"
+msgstr "Öppna I2P browser"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:50
+msgid "Configure desktopgui"
+msgstr "Konfigurera desktopgui"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:67
+msgid "Restart I2P"
+msgstr "Starta om I2P"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:85
+msgid "Stop I2P"
+msgstr "Stoppar I2P"
+
+#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:44
+msgid "Tray icon configuration"
+msgstr "Ikonpanelskonfiguration"
+
+#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:47
+msgid "Should tray icon be enabled?"
+msgstr "Ska ikonpanelen vara aktiverad?"
+
+
