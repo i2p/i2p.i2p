@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
 "POT-Creation-Date: 2011-05-24 05:59+0000\n"
-"PO-Revision-Date: 2011-06-04 19:40+0000\n"
+"PO-Revision-Date: 2011-06-05 14:58+0000\n"
 "Last-Translator: digitalmannen <digitalmannen@gmail.com>\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.net/projects/p/I2P/team/sv_SE/)\n"
 "MIME-Version: 1.0\n"
@@ -253,7 +253,7 @@ msgstr "Peer"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:524
 msgid "The remote peer, identified by router hash"
-msgstr "Fjärr peer:en, identifierad med routerhash"
+msgstr "Fjärr peeren, identifierad med routerhash"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:525
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:738
@@ -406,7 +406,7 @@ msgstr "DUP RX"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:549
 msgid "The total number of duplicate packets received from the peer"
-msgstr "Totalt antal dupplicerade paket mottagna från peer:en"
+msgstr "Totalt antal dupplicerade paket mottagna från peeren"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:402
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:18
@@ -4753,7 +4753,7 @@ msgid ""
 "Also, <b>do not enter a private IP address</b> like 127.0.0.1 or "
 "192.168.1.1."
 msgstr ""
-"Ange <b> inte en privat IP-adress </ b> som 127.0.0.1 eller 192.168.1.1."
+"Ange <b> inte en privat IP-adress </b> som 127.0.0.1 eller 192.168.1.1."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:581
 msgid ""
@@ -4787,7 +4787,7 @@ msgid ""
 "If there is an error, the <a href=\"logs.jsp\">logs</a> may also help "
 "diagnose the problem."
 msgstr ""
-"Om det finns ett fel, kan <a href=\"logs.jsp\">loggar</ a> hjälpa till att "
+"Om det finns ett fel, kan <a href=\"logs.jsp\">loggar</a> hjälpa till att "
 "diagnostisera problemet."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:597
