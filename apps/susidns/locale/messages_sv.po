@@ -3,13 +3,14 @@
 # This file is distributed under the same license as the susidns package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 # 
+#   <ducki2p@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
 "POT-Creation-Date: 2011-05-24 06:00+0000\n"
-"PO-Revision-Date: 2011-06-04 23:22+0000\n"
-"Last-Translator: digitalmannen <digitalmannen@gmail.com>\n"
+"PO-Revision-Date: 2011-06-05 11:56+0000\n"
+"Last-Translator: ducki2p <ducki2p@gmail.com>\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.net/projects/p/I2P/team/sv_SE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -635,7 +636,7 @@ msgid ""
 "href=\"subscriptions.jsp\">subscriptions</a> file."
 msgstr ""
 "Att abonnera på ytterligare platser är enkelt, bara lägga till dem i din <a "
-"href=\"subscriptions.jsp\"> prenumerationer </ a> fil."
+"href=\"subscriptions.jsp\">prenumerationer</a> fil."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:119
 msgid ""
@@ -643,7 +644,7 @@ msgid ""
 "href=\"http://www.i2p2.i2p/naming.html\">the overview on www.i2p2.i2p</a>."
 msgstr ""
 "För mer information om namngivning i I2P, se <a "
-"href=\"http://www.i2p2.i2p/naming.html\"> översikten på www.i2p2.i2p </ a>."
+"href=\"http://www.i2p2.i2p/naming.html\">översikten på www.i2p2.i2p</a>."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:121
 msgid "How does the addressbook application work?"
