@@ -6,7 +6,7 @@ Execute the build.sh script to produce jbigi library files optimized for a numbe
 
 TODO: What is jbigi
 TODO: Document generated folder structure
-TODO: Instructions for adding the libraries to a jar
+
 
 Linux-specific information:
 ===========================
@@ -18,7 +18,7 @@ Then do 'build.sh dynamic'. This will do a quick build using your installed libg
 and then test it and the jbigi in your I2P installation to see which is faster.
 
 If the new jbigi is slower, then run 'build.sh' (without the 'dynamic'), which will download
-the 4.3.1 libgmp library, build, and test that.
+the libgmp library, build, and test that.
 
 
 Windows-specific information:

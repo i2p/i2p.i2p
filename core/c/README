@@ -1,26 +1,40 @@
+
+Dynamic library build
+=====================
+
 If you have a libgmp.so installed on your system already
 (check in /usr/lib), you can build a dynamically linked libjbigi.so as follows:
 	cd jbigi
 	build.sh dynamic
-The built library is jbigi/lib/libjbigi.so .
+You do, of course, need the gmp headers installed.
+On ubuntu, check for libgmp3 and libgmp3-dev packages.
+This is much easier and faster than building GMP from source.
 	
-Otherwise, prior to building the jbigi library, you will need to fetch the GMP source
-from http://www.swox.com/gmp/, saving it to jbigi/gmp-4.2.2.tar.bz2 (it will
-be unpacked and built as necessary).
 
-Version 4.2.2 has not been extensively tested with I2P. If you would like
-to use a well-tested version, get gmp-4.1.4.tar.bz2, and edit jbigi/build.sh
-to change the version number.
+Static library build
+=====================
+
+Otherwise, the build script build.sh will download the the GMP source,
+unpack and build it. The GMP version and download location are configured
+in jbigi/build.sh, please review it to ensure you download
+and build the desired version.
 
 To build the native jbigi and jcpuid libraries for the current host CPU,
 simply run sh build.sh and the results will be packaged up into jbigi.jar
-and the libjbigi.so library. To test, copy jbigi/lib/libjbigi.so
-and jcpuid/lib/freenet/support/CPUInformation/libjcpuid-*.so
-to your i2p/ directory. You can also copy jbigi.jar to the i2p/lib/ directory;
-it will be used only if the router fails to load the native library.
+and the libjbigi.so library.
 
 To build the native jbigi libraries for all supported CPUs (on the current OS),
 go into jbigi/ and run build-all.sh (the results will be under jbigi/lib/)
+
+
+Installation and testing
+========================
+
+To test, copy jbigi/lib/libjbigi.so
+and jcpuid/lib/freenet/support/CPUInformation/libjcpuid-*.so
+to your i2p installation directory ($I2P). You may also copy jbigi.jar to the $I2P/lib/ directory;
+it will be used only if the router fails to load the native library
+from the I2P installation directory.
 
 The build.sh script runs two speed tests, one with your existing
 I2P installation and one with the new libjbigi.
