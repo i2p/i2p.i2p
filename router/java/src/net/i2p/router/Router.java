@@ -1421,6 +1421,17 @@ public class Router {
         return Math.max(send, recv);
     }
     
+    /**
+     *  Mark a string for extraction by xgettext and translation.
+     *  Use this only in static initializers.
+     *  It does not translate!
+     *  @return s
+     *  @since 0.8.7
+     */
+    private static final String _x(String s) {
+        return s;
+    }
+
 /* following classes are now private static inner classes, didn't bother to reindent */
 
 private static final long LOW_MEMORY_THRESHOLD = 5 * 1024 * 1024;
@@ -1435,19 +1446,22 @@ private static class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
 
     public CoalesceStatsEvent(RouterContext ctx) { 
         _ctx = ctx; 
-        ctx.statManager().createRequiredRateStat("bw.receiveBps", "Message receive rate (Bytes/sec)", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
-        // used in the router watchdog
-        ctx.statManager().createRequiredRateStat("bw.sendBps", "Message send rate (Bytes/sec)", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
-        ctx.statManager().createRequiredRateStat("bw.sendRate", "Low-level send rate (Bytes/sec)", "Bandwidth", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
-        ctx.statManager().createRequiredRateStat("bw.recvRate", "Low-level receive rate (Bytes/sec)", "Bandwidth", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
-        ctx.statManager().createRequiredRateStat("router.activePeers", "How many peers we are actively talking with", "Throttle", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
+        // NOTE TO TRANSLATORS - each of these phrases is a description for a statistic
+        // to be displayed on /stats.jsp and in the graphs on /graphs.jsp.
+        // Please keep relatively short so it will fit on the graphs.
+        ctx.statManager().createRequiredRateStat("bw.receiveBps", _x("Message receive rate (bytes/sec)"), "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
+        ctx.statManager().createRequiredRateStat("bw.sendBps", _x("Message send rate (bytes/sec)"), "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
+        ctx.statManager().createRequiredRateStat("bw.sendRate", _x("Low-level send rate (bytes/sec)"), "Bandwidth", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
+        ctx.statManager().createRequiredRateStat("bw.recvRate", _x("Low-level receive rate (bytes/sec)"), "Bandwidth", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
+        ctx.statManager().createRequiredRateStat("router.activePeers", _x("How many peers we are actively talking with"), "Throttle", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         ctx.statManager().createRateStat("router.activeSendPeers", "How many peers we've sent to this minute", "Throttle", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         ctx.statManager().createRateStat("router.highCapacityPeers", "How many high capacity peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
-        ctx.statManager().createRequiredRateStat("router.fastPeers", "Known fast peers", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
+        ctx.statManager().createRequiredRateStat("router.fastPeers", _x("Known fast peers"), "Throttle", new long[] { 5*60*1000, 60*60*1000 });
         _maxMemory = Runtime.getRuntime().maxMemory();
         String legend = "(Bytes)";
         if (_maxMemory < Long.MAX_VALUE)
             legend += " Max is " + DataHelper.formatSize(_maxMemory) + 'B';
+        // router.memoryUsed currently has the max size in the description so it can't be tagged
         ctx.statManager().createRequiredRateStat("router.memoryUsed", legend, "Router", new long[] { 60*1000 });
     }
     private RouterContext getContext() { return _ctx; }
