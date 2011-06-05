@@ -188,37 +188,28 @@ public class LeaseSet extends DatabaseEntry {
      */
     @Override
     public boolean verifySignature() {
-        if (_signature == null) return false;
-        if (_destination == null) return false;
-        byte data[] = getBytes();
-        if (data == null) return false;
-        boolean signedByDest = DSAEngine.getInstance().verifySignature(_signature, data,
-                                                                       _destination.getSigningPublicKey());
-        boolean signedByRevoker = false;
-        if (!signedByDest) {
-            signedByRevoker = DSAEngine.getInstance().verifySignature(_signature, data, _signingKey);
-        }
-        return signedByDest || signedByRevoker;
+        if (super.verifySignature())
+            return true;
+
+        // Revocation unused (see above)
+        boolean signedByRevoker = DSAEngine.getInstance().verifySignature(_signature, getBytes(), _signingKey);
+        return signedByRevoker;
     }
 
     /**
      * Verify that the signature matches the lease set's destination's signing public key.
      * OR the specified revocation key.
      *
+     * @deprecated revocation unused
      * @return true only if the signature matches
      */
     public boolean verifySignature(SigningPublicKey signingKey) {
-        if (getSignature() == null) return false;
-        if (getDestination() == null) return false;
-        byte data[] = getBytes();
-        if (data == null) return false;
-        boolean signedByDest = DSAEngine.getInstance().verifySignature(_signature, data,
-                                                                       _destination.getSigningPublicKey());
-        boolean signedByRevoker = false;
-        if (!signedByDest) {
-            signedByRevoker = DSAEngine.getInstance().verifySignature(_signature, data, signingKey);
-        }
-        return signedByDest || signedByRevoker;
+        if (super.verifySignature())
+            return true;
+
+        // Revocation unused (see above)
+        boolean signedByRevoker = DSAEngine.getInstance().verifySignature(_signature, getBytes(), signingKey);
+        return signedByRevoker;
     }
 
     /**
@@ -263,6 +254,9 @@ public class LeaseSet extends DatabaseEntry {
         return rv;
     }
     
+    /**
+     *  This does NOT validate the signature
+     */
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         _destination = new Destination();
         _destination.readBytes(in);
@@ -282,6 +276,9 @@ public class LeaseSet extends DatabaseEntry {
         _signature.readBytes(in);
     }
     
+    /**
+     *  This does NOT validate the signature
+     */
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if ((_destination == null) || (_encryptionKey == null) || (_signingKey == null) || (_leases == null)
             || (_signature == null)) throw new DataFormatException("Not enough data to write out a LeaseSet");

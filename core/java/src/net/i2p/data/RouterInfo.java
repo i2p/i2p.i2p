@@ -23,7 +23,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
 
-import net.i2p.crypto.DSAEngine;
 import net.i2p.crypto.SHA256Generator;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
@@ -215,20 +214,13 @@ public class RouterInfo extends DatabaseEntry {
 
     /**
      * Configure a set of options or statistics that the router can expose
-     *
+     * @param options if null, clears current options
      */
     public void setOptions(Properties options) {
         synchronized (_options) {
             _options.clear();
-            if (options != null) {
-                for (Iterator iter = options.keySet().iterator(); iter.hasNext();) {
-                    String name = (String) iter.next();
-                    if (name == null) continue;
-                    String val = options.getProperty(name);
-                    if (val == null) continue;
-                    _options.setProperty(name, val);
-                }
-            }
+            if (options != null)
+                _options.putAll(options);
         }
         resetCache();
     }
@@ -307,6 +299,7 @@ public class RouterInfo extends DatabaseEntry {
     /**
      * which network is this routerInfo a part of.  configured through the property
      * PROP_NETWORK_ID
+     * @return -1 if unknown
      */
     public int getNetworkId() {
         if (_options == null) return -1;
@@ -445,37 +438,26 @@ public class RouterInfo extends DatabaseEntry {
      */
     private synchronized void doValidate() {
         _validated = true;
-        if (getSignature() == null) {
-            _log.error("Signature is null");
-            _isValid = false;
-            return;
-        }
-        byte data[] = null;
-        try {
-            data = getBytes();
-        } catch (DataFormatException dfe) {
-            _log.error("Error validating", dfe);
-            _isValid = false;
-            return;
-        }
-        if (data == null) {
-            _log.error("Data could not be loaded");
-            _isValid = false;
-            return;
-        }
-        _isValid = DSAEngine.getInstance().verifySignature(_signature, data, _identity.getSigningPublicKey());
+        _isValid = super.verifySignature();
+
         if (!_isValid) {
+            byte data[] = null;
+            try {
+                data = getBytes();
+            } catch (DataFormatException dfe) {
+                _log.error("Error validating", dfe);
+                return;
+            }
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Invalid [" + SHA256Generator.getInstance().calculateHash(data).toBase64()
-                           + "] w/ signing key: " + _identity.getSigningPublicKey(), 
+                           + (_log.shouldLog(Log.WARN) ? ("]\n" + toString()) : ""),
                            new Exception("Signature failed"));
-            if (_log.shouldLog(Log.DEBUG)) {
-                _log.debug("Failed data: \n" + Base64.encode(data));
-                _log.debug("Signature: " + getSignature());
-            }
         }
     }
     
+    /**
+     *  This does NOT validate the signature
+     */
     public synchronized void readBytes(InputStream in) throws DataFormatException, IOException {
         _identity = new RouterIdentity();
         _identity.readBytes(in);
@@ -510,6 +492,9 @@ public class RouterInfo extends DatabaseEntry {
         //_log.debug("Read routerInfo: " + toString());
     }
     
+    /**
+     *  This does NOT validate the signature
+     */
     public synchronized void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if (_identity == null) throw new DataFormatException("Missing identity");
         if (_published < 0) throw new DataFormatException("Invalid published date: " + _published);
