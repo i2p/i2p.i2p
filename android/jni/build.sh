@@ -1,10 +1,17 @@
 #
 # build GMP and libjbigi.so using the Android tools directly
 #
+
+# uncomment to skip
+# exit 0
+
 THISDIR=$(realpath $(dirname $(which $0)))
 cd $THISDIR
 export NDK=$(realpath ../../../android-ndk-r5b/)
 
+#
+# API level, must match that in ../AndroidManifest.xml
+#
 LEVEL=3
 ARCH=arm
 export SYSROOT=$NDK/platforms/android-$LEVEL/arch-$ARCH/
@@ -16,7 +23,7 @@ export CC="$NDK/toolchains/$AABI/prebuilt/$SYSTEM/bin/${BINPREFIX}gcc --sysroot=
 #echo "CC is $CC"
 
 JBIGI=$(realpath ../../core/c/jbigi)
-GMPVER=5.0.2
+GMPVER=4.3.2
 GMP=$JBIGI/gmp-$GMPVER
 
 if [ ! -d $GMP ]
@@ -43,7 +50,7 @@ cd build
 if [ ! -f config.status ]
 then
 	echo "Configuring GMP..."
-	$GMP/configure --with-pic --build=arm --host=x86 || exit 1
+	$GMP/configure --with-pic --build=x86-none-linux --host=armv5-eabi-linux || exit 1
 fi
 
 echo "Building GMP..."
