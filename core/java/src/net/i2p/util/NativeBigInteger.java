@@ -180,9 +180,6 @@ public class NativeBigInteger extends BigInteger {
             } catch (UnknownCPUException e) {
                 // log?
             }
-            if (_isFreebsd)
-                // athlon64 not available for freebsd
-                return JBIGI_OPTIMIZATION_ATHLON;
             return JBIGI_OPTIMIZATION_ATHLON64;
         }
         
@@ -614,6 +611,10 @@ public class NativeBigInteger extends BigInteger {
             // Add fallbacks for any 32-bit that were added 0.8.7 or later here
             if (primary.equals(JBIGI_OPTIMIZATION_ATOM))
                 rv.add(_libPrefix + getMiddleName1() + JBIGI_OPTIMIZATION_PENTIUM3 + _libSuffix);
+            // athlon is always a fallback for 64 bit, we have it for all architectures
+            // and it should be much better than "none"
+            if (_is64)
+                rv.add(_libPrefix + getMiddleName1() + JBIGI_OPTIMIZATION_ATHLON + _libSuffix);
 
         } else {
             if (_is64) {
