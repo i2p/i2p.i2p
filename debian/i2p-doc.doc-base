@@ -5,5 +5,5 @@ Abstract: This the API JavaDoc for i2p-doc
 Section: Programming/Java
 
 Format: HTML
-Index: /usr/share/doc/i2p/api
-Files: /usr/share/doc/i2p/api/*.html
+Index: /usr/share/doc/i2p-doc/api
+Files: /usr/share/doc/i2p-doc/api/*.html
