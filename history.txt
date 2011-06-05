@@ -1,3 +1,34 @@
+2011-06-05 zzz
+    * Console: Tag stat descriptions at declaration rather than in Strings.java
+    * Data: Remove duplicate signature verification code
+            in RouterInfo and LeaseSet
+    * DSAEngine: Add code for alternate implementation using Java libs;
+                 disabled by default. Add test code to verify identical results
+                 and compare speed.
+    * JBigI:
+      - Replace old non-PIC 32-bit linux libs (GMP 4.1.3 built in 2004)
+        with PIC libs built with GMP 4.3.2. License is LGPLv3.
+        Built by sponge with GCC 4.4.4, downloaded from
+        http://sponge.i2p/files/jbigi/gmp-4.3.2/
+        The 4.3.2 files are half the size of those built with GMP 5.0.2, and there was
+        little or no performance difference between the two versions for 32 bit processors.
+        See http://zzz.i2p/topics/306 for discussion and test results.
+      - Replace old non-PIC 62-bit linux libs (GMP 4.1.4 built in 2005)
+        with PIC libs built with GMP 5.0.2. License is LGPLv3.
+        Built by sponge with GCC 4.4.4, downloaded from
+        http://sponge.i2p/files/jbigi/gmp-5.0.2/
+        For 64-bit processors, both performance testing and
+        the GMP changelog led us to use 5.0.2 for both the 32- and 64-bit versions,
+        even though the files are twice as big.
+        See http://zzz.i2p/topics/306 for discussion and test results.
+        libjbigi-linux-athlon64.so was a 64 bit file; by the new naming standard
+        supported by NativeBigInteger, it is now a 32-bit file and the
+        64-bit one is libjbigi-linux-athlon64_64.so.
+        All new 64-bit libs will have _64 appended.
+      - Remove libjbigi-windows-athlon64.dll which was a duplicate of libjbigi-windows-athlon.dll;
+        NBI now tries athlon as a fallback for all 64-bit processors.
+      - Update build docs
+
 2011-06-04 zzz
     * NBigI: Recognize Android
     * KeyGenerator: Restore old return type to not break ABI (thx kytv)
