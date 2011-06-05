@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-06-02 16:13+0000\n"
-"PO-Revision-Date: 2011-06-02 23:34+0100\n"
+"PO-Revision-Date: 2011-06-05 10:36+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "MIME-Version: 1.0\n"
@@ -800,7 +800,7 @@ msgstr[1] "{0} túneles"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1663
 msgid "Completion"
-msgstr "completo"
+msgstr "Finalização"
 
 #. else unknown
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1667
