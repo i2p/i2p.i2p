@@ -60,6 +60,10 @@ Public domain except as listed below:
    Copyright 1991, 1996, 1999, 2000 Free Software Foundation, Inc.
    See licenses/LICENSE-LGPLv2.1.txt
 
+   GMP 4.3.2 / 5.0.2:
+   Copyright 1991, 1996, 1999, 2000, 2007 Free Software Foundation, Inc.
+   See licenses/LICENSE-LGPLv3.txt
+
    HashCash code:
    Copyright 2006 Gregory Rubin grrubin@gmail.com
    See licenses/LICENSE-HashCash.txt
@@ -145,7 +149,7 @@ Applications:
 
    BOB:
    Copyright (C) sponge
-   DWTFYWTPL
+   See licenses/COPYING-BOB.txt
 
    I2PSnark:
    Copyright (C) 2003 Mark J. Wielaard
