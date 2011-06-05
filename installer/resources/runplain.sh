@@ -17,8 +17,9 @@ I2PTEMP="%SYSTEM_java_io_tmpdir"
 # Having IPv6 enabled can cause problems with certain configurations. Changing the
 # next value to true may help. 
 PREFERv4="false"
+CP=
 
-export CP="${I2P}" ; for j in "${I2P}/lib/*"  ; do export CP="${CP}:${j}" ; done;
+for jars in `ls ${I2P}/lib/*.jar`; do CP=${CP}:${jars}; echo $CP; done
 JAVA=java
 
 JAVAOPTS="-Djava.net.preferIPv4Stack=${PREFERv4} -Djava.library.path=${I2P}:${I2P}/lib -Di2p.dir.base=${I2P} -DloggerFilenameOverride=logs/log-router-@.txt"
