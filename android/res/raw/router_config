@@ -16,15 +16,30 @@ time.disabled=true
 i2p.dummyClientFacade=true
 i2cp.disableInterface=true
 #
+##### Tunnels
+#
+router.inboundPool.backupQuantity=0
+router.inboundPool.length=2
+router.inboundPool.lengthVariance=0
+router.inboundPool.quantity=2
+router.outboundPool.backupQuantity=0
+router.outboundPool.length=2
+router.outboundPool.lengthVariance=0
+router.outboundPool.quantity=2
+router.maxParticipatingTunnels=0
+router.sharePercentage=10
+#
 ##### Transport
 #
+i2np.bandwidth.inboundKBytesPerSecond=100
+i2np.bandwidth.outboundKBytesPerSecond=30
 #
 # NTCP
 #
 #i2np.ntcp.enable=false
-i2np.ntcp.maxConnections=8
+i2np.ntcp.maxConnections=12
 #
-# UDP crashes the JVM, don't know why
+# UDP disabled for now
 #
 i2np.udp.enable=false
 i2np.udp.maxConnections=12
