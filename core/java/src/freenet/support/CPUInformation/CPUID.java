@@ -450,13 +450,28 @@ public class CPUID {
 		    	if (getCPUExtendedModel() == 1){
 		    		 switch(getCPUModel()){
 		    		 	case 10:
-		    		 		return "Core i7";
+		    		 		return "Core i7 (45nm)";
 		    		 	case 12:
 		    		 		return "Atom";
 		    		 	case 13:
-		    		 		return "Xeon MP";
+		    		 		return "Xeon MP (45nm)";
+					case 14:
+						return "Core i5/i7 (45nm)";
 		    		 }
-		    	}
+		    	} else if (getCPUExtendedModel() == 2){
+				switch(getCPUModel()){
+					case 5:
+						return "Core i3 or i5/i7 mobile (32nm)";
+					case 10:
+						return "Core i7 (32nm)";
+					case 12:
+						return "Core i7 (32nm)";
+					case 14:
+						return "Xeon MP (45nm)";
+					case 15:
+						return "Xeon MP (32nm)";
+				}
+			}
 		}
             }
             if(getCPUFamily() == 7){
