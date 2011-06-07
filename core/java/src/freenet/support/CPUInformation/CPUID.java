@@ -578,7 +578,7 @@ public class CPUID {
 			}
             if(getCPUFamily() == 7){
                 switch(getCPUModel()){
-                    //Itanium.. TODO
+                    //Itanium..  TODO
                 }
             }
             if(getCPUFamily() == 15){
