@@ -15,10 +15,10 @@ FreeBSD*)
 esac
 
 rm -rf lib
-mkdir lib
-mkdir lib/freenet
-mkdir lib/freenet/support
-mkdir lib/freenet/support/CPUInformation
+#mkdir lib
+#mkdir lib/freenet
+#mkdir lib/freenet/support
+mkdir -p lib/freenet/support/CPUInformation
 
 CC="gcc"
 
@@ -30,10 +30,19 @@ MINGW*)
 	LINKFLAGS="-shared -static -static-libgcc -Wl,--kill-at"
 	LIBFILE="lib/freenet/support/CPUInformation/jcpuid-x86-windows.dll";;
 FreeBSD*)
-	COMPILEFLAGS="-Wall"
-	INCLUDES="-I. -Iinclude -I$JAVA_HOME/include/ -I$JAVA_HOME/include/freebsd/"
-	LINKFLAGS="-shared -static -Wl,-soname,libjcpuid-x86-freebsd.so"
-	LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-x86-freebsd.so";;
+	case `uname -m` in
+		amd64)
+			LINKFLAGS="-shared -Wl,-soname,libjcpuid-x86_64-freebsd.so"
+			LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-x86_64-freebsd.so";;
+		i?86*)
+			LINKFLAGS="-shared -Wl,-soname,libjcpuid-x86-freebsd.so"
+			LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-x86-freebsd.so";;
+		*)
+			echo "Unknown build environment"
+			exit;;
+	esac
+	COMPILEFLAGS="-fPIC -Wall"
+	INCLUDES="-I. -Iinclude -I$JAVA_HOME/include/ -I$JAVA_HOME/include/freebsd/";;
 Linux*)
 	case `uname -m` in
 		x86_64*)
