@@ -465,16 +465,48 @@ public class CPUID {
 			// P4
         	if (getCPUFamily() >= 15){
         		return true;
+			// Core i3/i5/i7
+			// Remove when implemented isCoreiCompatible in BigInteger
+			} else if (getCPUExtendedModel() == 2 && (getCPUFamily() == 6)){				 			
 			// Xeon MP (45nm) or Core i7
-        	} else if (getCPUExtendedModel() == 1 && (getCPUFamily() == 6 && (getCPUModel() == 10 || getCPUModel() == 13))){
+			// Remove when implemented isCoreiCompatible in BigInteger
+        	} else if (getCPUExtendedModel() == 1 && (getCPUFamily() == 6 && (getCPUModel() == 10 || getCPUModel() == 13 || getCPUModel() == 14))){
         		return true;
 			// Core 2 Duo
+			// Remove when implemented isCore7Compatible in BigInteger
         	} else if (getCPUExtendedModel() == 0 && getCPUFamily() == 6 && getCPUModel() == 15){
         		return true;
         	} else {
         		return false;
         	}
         }
+		public boolean IsAtomCompatible()
+		{
+			if (getCPUExtendedModel() == 0 && getCPUFamily() == 6 && getCPUModel() == 12){
+        		return true;
+        	} else {
+				return false;
+			}
+		}
+		public boolean IsCore2Compatible()
+		{
+			if (getCPUExtendedModel() == 0 && getCPUFamily() == 6 && getCPUModel() == 15){
+        		return true;
+        	} else {
+				return false;
+			}
+		}
+		public boolean IsCoreiCompatible()
+		{
+			// Core i3/i5/i7
+			if (getCPUExtendedModel() == 2 && (getCPUFamily() == 6)){				 			
+			// Xeon MP (45nm) or Core i7
+        	} else if (getCPUExtendedModel() == 1 && (getCPUFamily() == 6 && (getCPUModel() == 10 || getCPUModel() == 13 || getCPUModel() == 14))){
+        		return true;
+        	} else {
+				return false;
+			}
+		}	
         public String getCPUModelString() throws UnknownCPUException {
         	if (getCPUExtendedModel() == 0){
 	            if(getCPUFamily() == 4){
@@ -838,8 +870,8 @@ public class CPUID {
              return "jcpuid-x86-windows"; // The convention on Windows
         if(isFreebsd)
             return "jcpuid-x86-freebsd"; // The convention on freebsd...
-	if(isSunos)
-	    return "jcpuid-x86-solaris"; // The convention on SunOS
+		if(isSunos)
+	    	return "jcpuid-x86-solaris"; // The convention on SunOS
         //throw new RuntimeException("Dont know jcpuid library name for os type '"+System.getProperty("os.name")+"'");
         // use linux as the default, don't throw exception
         return "jcpuid-x86-linux";
