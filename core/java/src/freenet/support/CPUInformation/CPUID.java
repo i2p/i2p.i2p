@@ -632,7 +632,7 @@ public class CPUID {
                 }
                 if(getCPUExtendedFamily() == 1){
                     switch(getCPUModel()){
-                        //   Itanium 2.. TODO
+                        //    Itanium 2.. TODO
                     }    
                 }
             }
