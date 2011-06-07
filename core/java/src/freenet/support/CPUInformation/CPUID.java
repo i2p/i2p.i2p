@@ -1,6 +1,7 @@
 /*
  * Created on Jul 14, 2004
- * Updated on Jan 8, 2011
+ * Updated on Jun 8, 2011
+ * 
  */
 package freenet.support.CPUInformation;
 
