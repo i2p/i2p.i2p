@@ -37,4 +37,16 @@ public interface IntelCPUInfo extends CPUInfo {
      * @return true iff the CPU implements at least a Pentium IV level instruction/feature set.
      */
     public boolean IsPentium4Compatible();
+    /**
+     * @return true iff the CPU implements at least a Atom level instruction/feature set.
+     */
+    public boolean IsAtomCompatible();
+    /**
+     * @return true iff the CPU implements at least a Core2 level instruction/feature set.
+     */
+    public boolean IsCore2Compatible();
+    /**
+     * @return true iff the CPU implements at least a Corei level instruction/feature set.
+     */
+    public boolean IsCoreiCompatible();	
 }

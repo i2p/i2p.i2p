@@ -476,25 +476,23 @@ public class CPUID {
 			// Remove when implemented isCore7Compatible in BigInteger
         	} else if (getCPUExtendedModel() == 0 && getCPUFamily() == 6 && getCPUModel() == 15){
         		return true;
-        	} else {
-        		return false;
         	}
+       		return false;
         }
 		public boolean IsAtomCompatible()
 		{
 			if (getCPUExtendedModel() == 0 && getCPUFamily() == 6 && getCPUModel() == 12){
         		return true;
-        	} else {
-				return false;
-			}
+        	}
+			return false;
+
 		}
 		public boolean IsCore2Compatible()
 		{
 			if (getCPUExtendedModel() == 0 && getCPUFamily() == 6 && getCPUModel() == 15){
         		return true;
-        	} else {
-				return false;
-			}
+        	}
+			return false;
 		}
 		public boolean IsCoreiCompatible()
 		{
@@ -503,9 +501,8 @@ public class CPUID {
 			// Xeon MP (45nm) or Core i7
         	} else if (getCPUExtendedModel() == 1 && (getCPUFamily() == 6 && (getCPUModel() == 10 || getCPUModel() == 13 || getCPUModel() == 14))){
         		return true;
-        	} else {
-				return false;
-			}
+        	}
+			return false;
 		}	
         public String getCPUModelString() throws UnknownCPUException {
         	if (getCPUExtendedModel() == 0){
@@ -668,6 +665,9 @@ public class CPUID {
             System.out.println("  Is pII-compatible: "+((IntelCPUInfo)c).IsPentium2Compatible());
             System.out.println("  Is pIII-compatible: "+((IntelCPUInfo)c).IsPentium3Compatible());
             System.out.println("  Is pIV-compatible: "+((IntelCPUInfo)c).IsPentium4Compatible());
+            System.out.println("  Is atom-compatible: "+((IntelCPUInfo)c).IsAtomCompatible());
+            System.out.println("  Is core2-compatible: "+((IntelCPUInfo)c).IsCore2Compatible());
+            System.out.println("  Is corei-compatible: "+((IntelCPUInfo)c).IsCoreiCompatible());
         }
         if(c instanceof AMDCPUInfo){
             System.out.println("  **AMD-info**");
