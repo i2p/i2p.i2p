@@ -1,7 +1,6 @@
 /*
  * Created on Jul 14, 2004
- * Updated on Jun 8, 2011
- * 
+ * Updated on Jan 8, 2011
  */
 package freenet.support.CPUInformation;
 
@@ -71,12 +70,9 @@ public class CPUID {
     static
     {
         loadNative();
-    }
-    
-    /**
-     * A class that can (amongst other things I assume) represent the state of the
-     * different CPU registers after a call to the CPUID assembly method
-     */
+    }    
+    //A class that can (amongst other things I assume) represent the state of the
+    //different CPU registers after a call to the CPUID assembly method
     protected static class CPUIDResult {
         final int EAX;
         final int EBX;
@@ -170,14 +166,12 @@ public class CPUID {
         return c.ECX;
     }
     
-    /**
-     * Returns a CPUInfo item for the current type of CPU
-     * If I could I would declare this method in a interface named
-     * CPUInfoProvider and implement that interface in this class.
-     * This would make it easier for other people to understand that there
-     * is nothing preventing them from coding up new providers, probably using
-     * other detection methods than the x86-only CPUID instruction
-     */
+    //Returns a CPUInfo item for the current type of CPU
+    //If I could I would declare this method in a interface named
+    //CPUInfoProvider and implement that interface in this class.
+    //This would make it easier for other people to understand that there
+    //is nothing preventing them from coding up new providers, probably using
+    //other detection methods than the x86-only CPUID instruction
     public static CPUInfo getInfo() throws UnknownCPUException
     {
         if(!_nativeOk)
@@ -222,38 +216,53 @@ public class CPUID {
         }
         public boolean IsC3Compatible() { return false; }
     }
+
     protected static class VIAC3Impl extends CPUIDCPUInfo implements CPUInfo {
         @Override
         public boolean IsC3Compatible() { return true; }
         public String getCPUModelString() { return "VIA C3"; }
     }
+
     protected static class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
     {
-        public boolean IsK6Compatible()
-        {
-            return getCPUFamily() >= 5 && getCPUModel() >= 6;
+	//AMD-family = getCPUFamily()+getCPUExtendedFamily()
+	//AMD-model = getCPUModel()+getCPUExtendedModel()
+        public boolean IsK6Compatible(){
+            return (getCPUFamily() + getCPUExtendedFamily()) >= 5 && (getCPUModel() + getCPUExtendedModel()) >= 6;
         }
-        public boolean IsK6_2_Compatible()
-        {
-            return getCPUFamily() >= 5 && getCPUModel() >= 8;
+		
+        public boolean IsK6_2_Compatible(){
+            return (getCPUFamily() + getCPUExtendedFamily()) >= 5 && (getCPUModel() + getCPUExtendedModel()) >= 8;
         }
-        public boolean IsK6_3_Compatible()
-        {
-            return getCPUFamily() >= 5 && getCPUModel() >= 9;
+		
+        public boolean IsK6_3_Compatible(){
+            return (getCPUFamily() + getCPUExtendedFamily()) >= 5 && (getCPUModel() + getCPUExtendedModel()) >= 9;
         }
-        public boolean IsAthlonCompatible()
-        {
-            return getCPUFamily() >= 6;
+		
+        public boolean IsAthlonCompatible(){
+            return (getCPUFamily() + getCPUExtendedFamily()) >= 6;
         }
-        public boolean IsAthlon64Compatible()
-        {
-            return getCPUFamily() == 15 && getCPUExtendedFamily() == 0;
+		
+        public boolean IsAthlon64Compatible(){	
+			//AMD64 class
+			if ((getCPUFamily() + getCPUExtendedFamily()) == 15){
+				return true;
+			//Stars (Phenom II/Athlon II/Third-Generation Opteron/Opteron 4100 & 6100/Sempron 1xx) 
+			} else if ((getCPUFamily() + getCPUExtendedFamily()) == 16){
+				return true;
+			//K8 mobile+HT3 (Turion X2/Athlon X2/Sempron)
+			} else if ((getCPUFamily() + getCPUExtendedFamily()) == 17){
+				return true;
+			} else {
+				return false;
+			}
         }
 
-        public String getCPUModelString() throws UnknownCPUException
-        {
-            if(getCPUFamily() == 4){
-                switch(getCPUModel()){
+        public String getCPUModelString() throws UnknownCPUException {
+
+		//i486 class (Am486, 5x86) 
+            if(getCPUFamily() + getCPUExtendedFamily() == 4){
+                switch(getCPUModel() + getCPUExtendedModel()){
                     case 3:
                         return "486 DX/2";
                     case 7:
@@ -268,8 +277,9 @@ public class CPUID {
                         return "Am5x86-WB";
                 }
             }
-            if(getCPUFamily() == 5){
-                switch(getCPUModel()){
+			//i586 class (K5/K6/K6-2/K6-III) 
+            if(getCPUFamily() + getCPUExtendedFamily() == 5){
+                switch(getCPUModel() + getCPUExtendedModel()){
                     case 0:
                         return "K5/SSA5";
                     case 1:
@@ -290,8 +300,9 @@ public class CPUID {
                         return "K6-2+ or K6-III+";
                 }
             }
-            if(getCPUFamily() == 6){
-                switch(getCPUModel()){
+			//i686 class (Athlon/Athlon XP/Duron/K7 Sempron) 
+            if(getCPUFamily() + getCPUExtendedFamily() == 6){
+                switch(getCPUModel() + getCPUExtendedModel()){
                     case 0:
                         return "Athlon (250 nm)";
                     case 1:
@@ -310,24 +321,125 @@ public class CPUID {
                         return "Athlon (Thoroughbred)";
                     case 10:
                         return "Athlon (Barton)";
+				}
+            }
+			//AMD64 class (A64/Opteron/A64 X2/K8 Sempron/Turion/Second-Generation Opteron/Athlon Neo) 
+		   if(getCPUFamily() + getCPUExtendedFamily() == 15){
+				switch(getCPUModel() + getCPUExtendedModel()){
+					case 4:
+						return "Athlon 64/Mobile XP-M";
+					case 5:
+						return "Athlon 64 FX Opteron";
+					case 7:
+						return "Athlon 64 FX (Sledgehammer S939, 130 nm)";
+					case 8:
+						return "Mobile A64/Sempron/XP-M";
+					case 11:
+						return "Athlon 64 (Clawhammer S939, 130 nm)";
+					case 12:
+						return "Athlon 64/Sempron (Newcastle S754, 130 nm)";
+					case 14:
+						return "Athlon 64/Sempron (Newcastle S754, 130 nm)";
+					case 15:
+						return "Athlon 64/Sempron (Clawhammer S939, 130 nm)";					
+					case 18:
+						return "Sempron (Palermo, 90 nm)";
+					case 20:
+						return "Athlon 64 (Winchester S754, 90 nm)";
+					case 23:
+						return "Athlon 64 (Winchester S939, 90 nm)";
+					case 24:
+						return "Mobile A64/Sempron/XP-M (Winchester S754, 90 nm)";
+					case 26:
+						return "Athlon 64 (Winchester S939, 90 nm)";
+					case 27:
+						return "Athlon 64/Sempron (Winchester/Palermo 90 nm)";
+					case 28:
+						return "Sempron (Palermo, 90 nm)";
+					case 31:
+						return "Athlon 64/Sempron (Winchester/Palermo, 90 nm)";
+					case 33:
+						return "Dual-Core Opteron (Italy-Egypt S940, 90 nm)";
+					case 35:
+						return "Athlon 64 X2/A64 FX/Opteron (Toledo/Denmark S939, 90 nm)";
+					case 36:
+						return "Mobile A64/Turion (Lancaster/Richmond/Newark, 90 nm)";
+					case 37:
+						return "Opteron (Troy/Athens S940, 90 nm)";
+					case 39:
+						return "Athlon 64 (San Diego, 90 nm)";
+					case 43:
+						return "Athlon 64 X2 (Manchester, 90 nm)";
+					case 44:
+						return "Sempron/mobile Sempron (Palermo/Albany/Roma S754, 90 nm)";
+					case 47:
+						return "Athlon 64/Sempron (Venice/Palermo S939, 90 nm)";
+					case 65:
+						return "Second-Generaton Opteron (Santa Rosa S1207, 90 nm)";
+					case 67:
+						return "Athlon 64 X2/2nd-gen Opteron (Windsor/Santa Rosa, 90 nm)";
+					case 72:
+						return "Athlon 64 X2/Turion 64 X2 (Windsor/Taylor/Trinidad, 90 nm)";
+					case 75:
+						return "Athlon 64 X2 (Windsor, 90 nm)";
+					case 76:
+						return "Mobile A64/mobile Sempron/Turion (Keene/Trinidad/Taylor, 90 nm)";
+					case 79:
+						return "Athlon 64/Sempron (Orleans/Manila AM2, 90 nm)";
+					case 93:
+						return "Opteron Gen 2 (Santa Rosa, 90 nm)";
+					case 95:
+						return "A64/Sempron/mobile Sempron (Orleans/Manila/Keene, 90 nm)";
+					case 104:
+						return "Turion 64 X2 (Tyler S1, 65 nm)";
+					case 107:
+						return "Athlon 64 X2/Sempron X2/Athlon Neo X2 (Brisbane/Huron, 65 nm)";
+					case 108:
+						return "A64/Athlon Neo/Sempron/Mobile Sempron (Lima/Huron/Sparta/Sherman, 65 nm)";
+					case 111:
+						return "Neo/Sempron/mobile Sempron (Huron/Sparta/Sherman, 65 nm)";
+					case 124:
+						return "Athlon/Sempron/mobile Sempron (Lima/Sparta/Sherman, 65 nm)";
+					case 127:
+						return "A64/Athlon Neo/Sempron/mobile Sempron (Lima/Huron/Sparta/Sherman, 65 nm)";
+					case 193:
+						return "Athlon 64 FX (Windsor S1207 90 nm)";
+					default: // is this safe?
+						return "Athlon 64 (unknown)";
+				}
+            }
+			//Stars (Phenom II/Athlon II/Third-Generation Opteron/Opteron 4100 & 6100/Sempron 1xx) 
+            if(getCPUFamily() + getCPUExtendedFamily() == 16){
+                switch(getCPUModel() + getCPUExtendedModel()){
+                    case 2:
+                        return "Phenom / Athlon / Opteron Gen 3 (Barcelona/Agena/Toliman/Kuma, 65 nm)";
+                    case 4:
+                        return "Phenom II / Opteron Gen 3 (Shanghai/Deneb/Heka/Callisto, 45 nm)";
+                    case 5:
+                        return "Athlon II X2/X3/X4 (Regor/Rana/Propus AM3, 45 nm)";
+                    case 6:
+                        return "Mobile Athlon II/Turion II/Phenom II/Sempron/V-series (Regor/Caspian/Champlain, 45 nm)";
+                    case 8:
+                        return "Six-Core Opteron/Opteron 4100 series (Istanbul/Lisbon, 45 nm)";
+                    case 9:
+                        return "Opteron 6100 series (Magny-Cours G34, 45 nm)";
+                    case 10:
+                        return "Phenom II X4/X6 (Zosma/Thuban AM3, 45 nm)";
                 }
             }
-            if(getCPUFamily() == 15){
-                if(getCPUExtendedFamily() == 0){
-                    switch(getCPUModel()){
-                        case 4:
-                            return "Athlon 64";
-                        case 5:
-                            return "Athlon 64 FX Opteron";
-                        case 12:
-                            return "Athlon 64";
-                        default: // is this safe?
-                            return "Athlon 64 (unknown)";
-                    }
+			//K8 mobile+HT3 (Turion X2/Athlon X2/Sempron) 
+            if(getCPUFamily() + getCPUExtendedFamily() == 17){
+                switch(getCPUModel() + getCPUExtendedModel()){
+                    case 3:
+                        return "AMD Turion X2/Athlon X2/Sempron (Lion/Sable, 65 nm)";
                 }
             }
-            throw new UnknownCPUException("Unknown AMD CPU; Family="+getCPUFamily()+", Model="+getCPUModel());
-        }
+			//Bobcat
+            if(getCPUFamily() + getCPUExtendedFamily() == 20){
+				//No known CPUIDs yet.
+            }
+            throw new UnknownCPUException("Unknown AMD CPU; Family="+(getCPUFamily() + getCPUExtendedFamily())+", Model="+(getCPUModel() + getCPUExtendedModel()));
+		}
     }
 
     protected static class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
@@ -345,26 +457,18 @@ public class CPUID {
             return getCPUFamily() > 6 || (getCPUFamily() == 6 && getCPUModel() >=3);
         }
         public boolean IsPentium3Compatible()
-        {	
-		// Atom
-		if (getCPUExtendedModel() == 1 && (getCPUFamily() == 6 && (getCPUModel() == 12))){
-			return true;
-		// ??
-		} else if (getCPUExtendedModel() == 0 && (getCPUFamily() > 6 || (getCPUFamily() == 6 && getCPUModel() >=7))){
-			return true;
-		} else {
-			return false;
-		}
+        {
+            return getCPUFamily() > 6 || (getCPUFamily() == 6 && getCPUModel() >=7);
         }
         public boolean IsPentium4Compatible()
         {	
-		// P4
+			// P4
         	if (getCPUFamily() >= 15){
         		return true;
-		// Xeon MP (45nm) or Core i7
+			// Xeon MP (45nm) or Core i7
         	} else if (getCPUExtendedModel() == 1 && (getCPUFamily() == 6 && (getCPUModel() == 10 || getCPUModel() == 13))){
         		return true;
-		// Core 2 Duo
+			// Core 2 Duo
         	} else if (getCPUExtendedModel() == 0 && getCPUFamily() == 6 && getCPUModel() == 15){
         		return true;
         	} else {
@@ -445,35 +549,33 @@ public class CPUID {
 	                        return "Mobile Core (Yonah)";
 	                    case 15:
 	                        return "Core 2 (Conroe)";
-	                }
-            	} else {
-		    	if (getCPUExtendedModel() == 1){
-		    		 switch(getCPUModel()){
+					}
+            	} else if (getCPUExtendedModel() == 1){
+					switch(getCPUModel()){
 		    		 	case 10:
 		    		 		return "Core i7 (45nm)";
 		    		 	case 12:
 		    		 		return "Atom";
 		    		 	case 13:
 		    		 		return "Xeon MP (45nm)";
-					case 14:
-						return "Core i5/i7 (45nm)";
-		    		 }
+						case 14:
+							return "Core i5/i7 (45nm)";
+		    		}
 		    	} else if (getCPUExtendedModel() == 2){
-				switch(getCPUModel()){
-					case 5:
-						return "Core i3 or i5/i7 mobile (32nm)";
-					case 10:
-						return "Core i7 (32nm)";
-					case 12:
-						return "Core i7 (32nm)";
-					case 14:
-						return "Xeon MP (45nm)";
-					case 15:
-						return "Xeon MP (32nm)";
+					switch(getCPUModel()){
+						case 5:
+							return "Core i3 or i5/i7 mobile (32nm)";
+						case 10:
+							return "Core i7/i5 (32nm)";
+						case 12:
+							return "Core i7 (32nm)";
+						case 14:
+							return "Xeon MP (45nm)";
+						case 15:
+							return "Xeon MP (32nm)";
+					}				
 				}
 			}
-		}
-            }
             if(getCPUFamily() == 7){
                 switch(getCPUModel()){
                     //Itanium.. TODO
@@ -517,7 +619,7 @@ public class CPUID {
         System.out.println("CPU Family: " + getCPUFamily());
         System.out.println("CPU Model: " + getCPUModel());
         System.out.println("CPU Stepping: " + getCPUStepping());
-        System.out.println("CPU Flags: 0x" + Integer.toHexString(getEDXCPUFlags()));
+        System.out.println("CPU Flags: " + getEDXCPUFlags());
         
         CPUInfo c = getInfo();
         System.out.println(" **More CPUInfo**");
@@ -749,8 +851,8 @@ public class CPUID {
              return "jcpuid-x86_64-windows";
         if(isFreebsd)
             return "jcpuid-x86_64-freebsd";
-	if(isSunos)
-	    return "jcpuid-x86_64-solaris";
+		if(isSunos)
+	    	return "jcpuid-x86_64-solaris";
         // use linux as the default, don't throw exception
         return "jcpuid-x86_64-linux";
     }
