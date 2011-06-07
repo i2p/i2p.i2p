@@ -29,8 +29,7 @@
             <compilerarg line="${javac.compilerargs}" />
             <classpath>
                 <pathelement location="../../core/java/build/i2p.jar" />
-                <!-- doesn't matter if we're not on win32, we just need the java classes, not the platform-dependent code -->
-                <pathelement location="../../installer/lib/wrapper/win32/wrapper.jar" />
+                <pathelement location="../../installer/lib/wrapper/all/wrapper.jar" />
             	<pathelement location="../../router/java/build/router.jar" />
             </classpath>
 		</javac>

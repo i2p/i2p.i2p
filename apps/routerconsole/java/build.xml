@@ -25,7 +25,7 @@
                 <pathelement location="../../systray/java/build/obj" />
                 <pathelement location="../../systray/java/lib/systray4j.jar" />
                 <pathelement location="../../desktopgui/build" />
-                <pathelement location="../../../installer/lib/wrapper/win32/wrapper.jar" /> <!-- we dont care if we're not on win32 -->
+                <pathelement location="../../../installer/lib/wrapper/all/wrapper.jar" />
                 <pathelement location="../../jrobin/jrobin-1.5.9.1.jar" />
             </classpath>
         </depend>
@@ -57,7 +57,7 @@
                 <pathelement location="../../systray/java/build/systray.jar" />
                 <pathelement location="../../systray/java/lib/systray4j.jar" />
                 <pathelement location="../../desktopgui/dist/desktopgui.jar" />
-                <pathelement location="../../../installer/lib/wrapper/win32/wrapper.jar" /> <!-- we dont care if we're not on win32 -->
+                <pathelement location="../../../installer/lib/wrapper/all/wrapper.jar" />
                 <pathelement location="../../jrobin/jrobin-1.5.9.1.jar" />
             </classpath>
         </javac>
@@ -211,7 +211,7 @@
                 <pathelement location="../../systray/java/build/obj" />
                 <pathelement location="../../systray/java/lib/systray4j.jar" />
                 <pathelement location="../../desktopgui/dist/desktopgui.jar" />
-                <pathelement location="../../../installer/lib/wrapper/win32/wrapper.jar" />
+                <pathelement location="../../../installer/lib/wrapper/all/wrapper.jar" />
                 <pathelement location="build/routerconsole.jar" />
                 <pathelement location="build/" />
                 <pathelement location="../../../router/java/build/router.jar" />
@@ -243,7 +243,7 @@
                 <pathelement location="../../systray/java/build/obj" />
                 <pathelement location="../../systray/java/lib/systray4j.jar" />
                 <pathelement location="../../desktopgui/dist/desktopgui.jar" />
-                <pathelement location="../../../installer/lib/wrapper/win32/wrapper.jar" />
+                <pathelement location="../../../installer/lib/wrapper/all/wrapper.jar" />
                 <pathelement location="build/routerconsole.jar" />
                 <pathelement location="build" />
                 <pathelement location="../../../router/java/build/router.jar" />

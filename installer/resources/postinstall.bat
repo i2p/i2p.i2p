@@ -21,7 +21,7 @@ set INSTALL_PATH="%1"
 
 copy "%INSTALL_PATH%lib\wrapper\win32\I2Psvc.exe" "%INSTALL_PATH%"
 copy "%INSTALL_PATH%lib\wrapper\win32\wrapper.dll" "%INSTALL_PATH%lib"
-copy "%INSTALL_PATH%lib\wrapper\win32\wrapper.jar" "%INSTALL_PATH%lib"
+copy "%INSTALL_PATH%lib\wrapper\all\wrapper.jar" "%INSTALL_PATH%lib"
 
 if "%OS%"=="Windows_NT" (
 
