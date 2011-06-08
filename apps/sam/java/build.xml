@@ -45,7 +45,7 @@
         </javac>
     </target>
 
-    <target name="jar" depends="compile, jarUpToDate" unless="jar.uptodate" >
+    <target name="listChangedFiles" depends="jarUpToDate" if="shouldListChanges" >
         <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
             <arg value="list" />
             <arg value="changed" />
@@ -57,6 +57,11 @@
             <arg value="[:space:]" />
             <arg value="," />
         </exec>
+    </target>
+
+    <target name="jar" depends="compile, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
+        <!-- set if unset -->
+        <property name="workspace.changes.tr" value="" />
         <jar destfile="./build/sam.jar" basedir="./build/obj" includes="**/*.class">
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.sam.SAMBridge" />
@@ -72,6 +77,14 @@
         <uptodate property="jar.uptodate" targetfile="build/sam.jar" >
             <srcfiles dir= "build/obj" includes="**/*.class" />
         </uptodate>
+        <condition property="shouldListChanges" >
+            <and>
+                <not>
+                    <isset property="jar.uptodate" />
+                </not>
+                <isset property="mtn.available" />
+            </and>
+        </condition>
     </target>
 
     <target name="jarTest" depends="jar, compileTest">

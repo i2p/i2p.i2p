@@ -34,10 +34,7 @@
         </javac>
     </target>
 
-    <!-- TODO: Move the web classes from the jar to the war - they are not part of the API
-      -  This will require sponge to rewrite some seedless stuff that uses it.
-     -->
-    <target name="jar" depends="builddep, compile, jarUpToDate" unless="jar.uptodate" >
+    <target name="listChangedFiles" depends="jarUpToDate" if="shouldListChanges" >
         <exec executable="mtn" outputproperty="workspace.changes.j" errorproperty="mtn.error2" failifexecutionfails="false" >
             <arg value="list" />
             <arg value="changed" />
@@ -49,6 +46,15 @@
             <arg value="[:space:]" />
             <arg value="," />
         </exec>
+    </target>
+
+
+    <!-- TODO: Move the web classes from the jar to the war - they are not part of the API
+      -  This will require sponge to rewrite some seedless stuff that uses it.
+     -->
+    <target name="jar" depends="builddep, compile, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
+        <!-- set if unset -->
+        <property name="workspace.changes.j.tr" value="" />
         <jar destfile="./build/i2ptunnel.jar" basedir="./build/obj" includes="**/*.class">
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.i2ptunnel.I2PTunnel" />
@@ -64,6 +70,14 @@
         <uptodate property="jar.uptodate" targetfile="build/i2ptunnel.jar" >
             <srcfiles dir= "build/obj" includes="**/*.class" />
         </uptodate>
+        <condition property="shouldListChanges" >
+            <and>
+                <not>
+                    <isset property="jar.uptodate" />
+                </not>
+                <isset property="mtn.available" />
+            </and>
+        </condition>
     </target>
 
     <target name="bundle" depends="compile, precompilejsp">
@@ -97,7 +111,7 @@
         </exec>
     </target>
 
-    <target name="war" depends="precompilejsp, bundle, warUpToDate" unless="war.uptodate" > 
+    <target name="listChangedFiles2" depends="warUpToDate" if="shouldListChanges2" >
         <exec executable="mtn" outputproperty="workspace.changes.w" errorproperty="mtn.error2" failifexecutionfails="false" >
             <arg value="list" />
             <arg value="changed" />
@@ -109,6 +123,11 @@
             <arg value="[:space:]" />
             <arg value="," />
         </exec>
+    </target>
+
+    <target name="war" depends="precompilejsp, bundle, warUpToDate, listChangedFiles2" unless="war.uptodate" > 
+        <!-- set if unset -->
+        <property name="workspace.changes.w.tr" value="" />
         <war destfile="build/i2ptunnel.war" webxml="../jsp/web-out.xml"
              basedir="../jsp/" excludes="web.xml, web-fragment.xml, web-out.xml, **/*.java, *.jsp">
             <manifest>
@@ -123,6 +142,14 @@
         <uptodate property="war.uptodate" targetfile="build/i2ptunnel.war" >
             <srcfiles dir= "../jsp" excludes="web.xml, web-fragment.xml, **/*.java, *.jsp" />
         </uptodate>
+        <condition property="shouldListChanges2" >
+            <and>
+                <not>
+                    <isset property="war.uptodate" />
+                </not>
+                <isset property="mtn.available" />
+            </and>
+        </condition>
     </target>
 
     <target name="precompilejsp" depends="jar" unless="precompilejsp.uptodate">

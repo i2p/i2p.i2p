@@ -1,5 +1,8 @@
 2011-06-08 zzz
-    * Build: Add standard manifest to jbigi.jar
+    * Build:
+      - Add standard manifest to jbigi.jar
+      - Don't do 'mtn list changed' if not in a workspace or not needed
+    * LogManager: Use DataHelper methods for loading and storing config
 
 2011-06-08 kytv
     * Update jbigi/jcpuid Windows dlls. As was done for FreeBSD and Linux, the 

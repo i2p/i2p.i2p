@@ -159,11 +159,20 @@
         </jar>
     </target>
 
-    <target name="buildProperties" >
+    <target name="checkForMtn" >
+        <available property="mtn.available" file="_MTN" type="dir" />
+    </target>
+
+    <target name="getMtnRev" depends="checkForMtn" if="mtn.available" >
         <exec executable="mtn" outputproperty="workspace.version" errorproperty="mtn.error1" failifexecutionfails="false" >
             <arg value="automate" />
             <arg value="get_base_revision_id" />
         </exec>
+    </target>
+
+    <target name="buildProperties" depends="getMtnRev" >
+        <!-- default if not set above -->
+        <property name="workspace.version" value="unknown" />
         <tstamp>
             <format property="build.timestamp" pattern="yyyy-MM-dd HH:mm:ss z" timezone="UTC" locale="en" />
         </tstamp>
@@ -240,7 +249,7 @@
         <copy file="apps/addressbook/dist/addressbook.war" todir="build/" />
     </target>
 
-    <target name="jbigi-list-changes">
+    <target name="jbigi-list-changes" depends="checkForMtn" if="mtn.available" >
         <exec executable="mtn" outputproperty="workspace.changes.jbigi" errorproperty="mtn.error.jbigi" failifexecutionfails="false" >
             <arg value="list" />
             <arg value="changed" />
@@ -255,6 +264,8 @@
     </target>
 
     <target name="jbigi" depends="buildProperties, jbigi-list-changes" >
+        <!-- set if unset -->
+        <property name="workspace.changes.jbigi.tr" value="" />
         <jar destfile="build/jbigi.jar" whenmanifestonly="fail" >
             <fileset dir="installer/lib/jbigi" includes="*.so *.dll *.jnilib" />
             <manifest>
@@ -266,6 +277,8 @@
     </target>
 
     <target name="jbigi-windows-only" depends="buildProperties, jbigi-list-changes" >
+        <!-- set if unset -->
+        <property name="workspace.changes.jbigi.tr" value="" />
         <jar destfile="build/jbigi.jar" whenmanifestonly="fail" >
             <fileset dir="installer/lib/jbigi" includes="*windows*.dll" />
             <manifest>
@@ -277,6 +290,8 @@
     </target>
 
     <target name="jbigi-linux-only"  depends="buildProperties, jbigi-list-changes" >
+        <!-- set if unset -->
+        <property name="workspace.changes.jbigi.tr" value="" />
         <jar destfile="build/jbigi.jar"  whenmanifestonly="fail" >
             <fileset dir="installer/lib/jbigi" includes="*linux*.so" />
             <manifest>
@@ -783,9 +798,8 @@
     <target name="prepjupdatefixes" depends="prepupdate, buildWEB">
         <copy file="build/org.mortbay.jetty.jar" todir="pkg-temp/lib/" />
     </target>
-    <target name="installer" depends="preppkg, buildProperties">
-        <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />
-        <mkdir dir="pkg-temp/installer" />
+
+    <target name="util-list-changes" depends="checkForMtn" if="mtn.available" >
         <exec executable="mtn" outputproperty="workspace.changes.util" errorproperty="mtn.error.util" failifexecutionfails="false" >
             <arg value="list" />
             <arg value="changed" />
@@ -797,6 +811,13 @@
             <arg value="[:space:]" />
             <arg value="," />
         </exec>
+    </target>
+
+    <target name="installer" depends="preppkg, buildProperties, util-list-changes" >
+        <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />
+        <mkdir dir="pkg-temp/installer" />
+        <!-- set if unset -->
+        <property name="workspace.changes.util.tr" value="" />
         <jar destfile="./pkg-temp/installer/copy.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Copy.class net/i2p/util/FileUtil.class">
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.util.Copy" />

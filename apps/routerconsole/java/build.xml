@@ -67,7 +67,7 @@
     <target name="jar" depends="jar1, war, bundle" />
 
     <!-- the jar without the latest message classes from the jsps -->
-    <target name="jar1" depends="compile, jarUpToDate" unless="jar.uptodate" >
+    <target name="listChangedFiles" depends="jarUpToDate" if="shouldListChanges" >
         <exec executable="mtn" outputproperty="workspace.changes.j" errorproperty="mtn.error2" failifexecutionfails="false" >
             <arg value="list" />
             <arg value="changed" />
@@ -80,6 +80,11 @@
             <arg value="[:space:]" />
             <arg value="," />
         </exec>
+    </target>
+
+    <target name="jar1" depends="compile, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
+        <!-- set if unset -->
+        <property name="workspace.changes.j.tr" value="" />
         <jar destfile="./build/routerconsole.jar" basedir="./build/obj" includes="**/*.class">
             <manifest>
                 <!-- top level installer will rename to jrobin.jar -->
@@ -115,6 +120,14 @@
         <uptodate property="jar.uptodate" targetfile="build/routerconsole.jar" >
             <srcfiles dir= "build/obj" includes="**/*.class" />
         </uptodate>
+        <condition property="shouldListChanges" >
+            <and>
+                <not>
+                    <isset property="jar.uptodate" />
+                </not>
+                <isset property="mtn.available" />
+            </and>
+        </condition>
     </target>
 
     <target name="poupdate" depends="precompilejsp">
@@ -134,8 +147,7 @@
         </exec>
     </target>
 
-    <!-- does NOT update the message classes, as those go in the jar -->
-    <target name="war" depends="precompilejsp, warUpToDate" unless="war.uptodate" >
+    <target name="listChangedFiles2" depends="warUpToDate" if="shouldListChanges2" >
         <exec executable="mtn" outputproperty="workspace.changes.w" errorproperty="mtn.error2" failifexecutionfails="false" >
             <arg value="list" />
             <arg value="changed" />
@@ -147,6 +159,12 @@
             <arg value="[:space:]" />
             <arg value="," />
         </exec>
+    </target>
+
+    <!-- does NOT update the message classes, as those go in the jar -->
+    <target name="war" depends="precompilejsp, warUpToDate, listChangedFiles2" unless="war.uptodate" >
+        <!-- set if unset -->
+        <property name="workspace.changes.w.tr" value="" />
         <!-- Don't include the css in the war, the main build.xml will copy it to docs/themes/console/ -->
         <war destfile="build/routerconsole.war" webxml="../jsp/web-out.xml"
              basedir="../jsp/" excludes="web.xml, *.css, **/*.java, *.jsp, *.jsi, web-fragment.xml, web-out.xml">
@@ -162,6 +180,14 @@
         <uptodate property="war.uptodate" targetfile="build/routerconsole.war" >
             <srcfiles dir= "../jsp" excludes="web.xml, web-fragment.xml, *.css, **/*.java, *.jsp, *.jsi" />
         </uptodate>
+        <condition property="shouldListChanges" >
+            <and>
+                <not>
+                    <isset property="jar.uptodate" />
+                </not>
+                <isset property="mtn.available" />
+            </and>
+        </condition>
     </target>
 
     <target name="precompilejsp" depends="jar1" unless="precompilejsp.uptodate">
