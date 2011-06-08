@@ -1,3 +1,10 @@
+2011-06-08 zzz
+    * Build: Add standard manifest to jbigi.jar
+
+2011-06-06 zzz
+    * Drop andorid/ directory; further development will happen in
+      an android-only branch.
+
 2011-06-05 zzz
     * Console: Tag stat descriptions at declaration rather than in Strings.java
     * Data: Remove duplicate signature verification code
@@ -13,7 +20,7 @@
         The 4.3.2 files are half the size of those built with GMP 5.0.2, and there was
         little or no performance difference between the two versions for 32 bit processors.
         See http://zzz.i2p/topics/306 for discussion and test results.
-      - Replace old non-PIC 62-bit linux libs (GMP 4.1.4 built in 2005)
+      - Replace old non-PIC 64-bit linux libs (GMP 4.1.4 built in 2005)
         with PIC libs built with GMP 5.0.2. License is LGPLv3.
         Built by sponge with GCC 4.4.4, downloaded from
         http://sponge.i2p/files/jbigi/gmp-5.0.2/
