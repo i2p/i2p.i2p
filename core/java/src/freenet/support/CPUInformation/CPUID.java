@@ -55,7 +55,7 @@ public class CPUID {
     private static final boolean isLinux = System.getProperty("os.name").toLowerCase().contains("linux");
     private static final boolean isFreebsd = System.getProperty("os.name").toLowerCase().contains("freebsd");
     private static final boolean isSunos = System.getProperty("os.name").toLowerCase().contains("sunos");
-    
+
 
     /**
      * This isn't always correct.
@@ -160,9 +160,9 @@ public class CPUID {
         return c.ECX;
     }
 	private static int getExtendedEBXCPUFlags()
-{
-
-
+	{
+        CPUIDResult c = doCPUID(0x80000001);
+        return c.EBX;	}
     private static int getExtendedECXCPUFlags()
     {
         CPUIDResult c = doCPUID(0x80000001);
