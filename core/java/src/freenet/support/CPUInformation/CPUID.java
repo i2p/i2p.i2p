@@ -162,7 +162,8 @@ public class CPUID {
 	private static int getExtendedEBXCPUFlags()
 	{
         CPUIDResult c = doCPUID(0x80000001);
-        return c.EBX;	}
+        return c.EBX;	
+	}
     private static int getExtendedECXCPUFlags()
     {
         CPUIDResult c = doCPUID(0x80000001);
