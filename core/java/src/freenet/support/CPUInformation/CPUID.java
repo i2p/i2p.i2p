@@ -159,11 +159,11 @@ public class CPUID {
         CPUIDResult c = doCPUID(1);
         return c.ECX;
     }
-	private static int getExtendedEBXCPUFlags()
-	{
+    private static int getExtendedEBXCPUFlags()
+    {
         CPUIDResult c = doCPUID(0x80000001);
-        return c.EBX;	
-	}
+        return c.EBX;    
+    }
     private static int getExtendedECXCPUFlags()
     {
         CPUIDResult c = doCPUID(0x80000001);
@@ -253,8 +253,8 @@ public class CPUID {
         protected static boolean isAthlon64Compatible = false;
         protected static boolean isBobcatCompatible = false;
 
-    	//AMD-family = getCPUFamily()+getCPUExtendedFamily()
-    	//AMD-model = getCPUModel()+getCPUExtendedModel()
+        //AMD-family = getCPUFamily()+getCPUExtendedFamily()
+        //AMD-model = getCPUModel()+getCPUExtendedModel()
         public boolean IsK6Compatible(){ return isK6Compatible; }
         public boolean IsK6_2_Compatible(){ return isK6_2_Compatible; }
         public boolean IsK6_3_Compatible(){ return isK6_3_Compatible; }
@@ -483,7 +483,7 @@ public class CPUID {
                 }
             }
             throw new UnknownCPUException("Unknown AMD CPU; Family="+(getCPUFamily() + getCPUExtendedFamily())+", Model="+(getCPUModel() + getCPUExtendedModel()));
-		}
+        }
     }
 
     protected static class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
@@ -504,7 +504,7 @@ public class CPUID {
         public boolean IsPentium4Compatible(){ return isPentium4Compatible; }
         public boolean IsAtomCompatible(){ return isAtomCompatible; }
         public boolean IsCore2Compatible(){ return isCore2Compatible; }
-        public boolean IsCoreiCompatible(){ return isCoreiCompatible; }	
+        public boolean IsCoreiCompatible(){ return isCoreiCompatible; }    
 
         public String getCPUModelString() throws UnknownCPUException
         {
@@ -933,8 +933,8 @@ public class CPUID {
              return "jcpuid-x86-windows"; // The convention on Windows
         if(isFreebsd)
             return "jcpuid-x86-freebsd"; // The convention on freebsd...
-		if(isSunos)
-	    	return "jcpuid-x86-solaris"; // The convention on SunOS
+        if(isSunos)
+            return "jcpuid-x86-solaris"; // The convention on SunOS
         //throw new RuntimeException("Dont know jcpuid library name for os type '"+System.getProperty("os.name")+"'");
         // use linux as the default, don't throw exception
         return "jcpuid-x86-linux";
@@ -946,8 +946,8 @@ public class CPUID {
              return "jcpuid-x86_64-windows";
         if(isFreebsd)
             return "jcpuid-x86_64-freebsd";
-		if(isSunos)
-	    	return "jcpuid-x86_64-solaris";
+        if(isSunos)
+            return "jcpuid-x86_64-solaris";
         // use linux as the default, don't throw exception
         return "jcpuid-x86_64-linux";
     }
