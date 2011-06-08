@@ -9,9 +9,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.HashMap;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.FileUtil;
+
 
 /**
  * @author Iakin
@@ -54,6 +56,8 @@ public class CPUID {
     private static final boolean isFreebsd = System.getProperty("os.name").toLowerCase().contains("freebsd");
     private static final boolean isSunos = System.getProperty("os.name").toLowerCase().contains("sunos");
     
+	private static final HashMap<Integer,CPUIDResult> cpuidCache = new HashMap<Integer,CPUIDResult>();	
+
     /**
      * This isn't always correct.
      * http://stackoverflow.com/questions/807263/how-do-i-detect-which-kind-of-jre-is-installed-32bit-vs-64bit
@@ -94,9 +98,21 @@ public class CPUID {
      */
     private static native CPUIDResult doCPUID(int iFunction);
 
+	private static CPUIDResult cachedCPUID(int iFunction)
+	{
+		CPUIDResult cachedCPUID = cpuidCache.get(iFunction);
+		if (cachedCPUID != null)
+			return cachedCPUID;
+		else {
+			CPUIDResult c = doCPUID(iFunction);
+			cpuidCache.put(iFunction,c);
+			return c;
+		}
+	}
+
     private static String getCPUVendorID()
     {
-        CPUIDResult c = doCPUID(0);
+        CPUIDResult c = cachedCPUID(0);
         StringBuilder sb= new StringBuilder(13);
         sb.append((char)( c.EBX        & 0xFF));
         sb.append((char)((c.EBX >> 8)  & 0xFF));
@@ -117,52 +133,52 @@ public class CPUID {
     }
     private static int getCPUFamily()
     {
-        CPUIDResult c = doCPUID(1);
+        CPUIDResult c = cachedCPUID(1);
         return (c.EAX >> 8) & 0xf;
     }
     private static int getCPUModel()
     {
-        CPUIDResult c = doCPUID(1);
+        CPUIDResult c = cachedCPUID(1);
         return (c.EAX >> 4) & 0xf;
     }
     private static int getCPUExtendedModel()
     {
-        CPUIDResult c = doCPUID(1);
+        CPUIDResult c = cachedCPUID(1);
         return (c.EAX >> 16) & 0xf;
     }
     private static int getCPUType()
     {
-        CPUIDResult c = doCPUID(1);
+        CPUIDResult c = cachedCPUID(1);
         return (c.EAX >> 12) & 0xf;
     }
     private static int getCPUExtendedFamily()
     {
-        CPUIDResult c = doCPUID(1);
+        CPUIDResult c = cachedCPUID(1);
         return (c.EAX >> 20) & 0xff;
     }
     private static int getCPUStepping()
     {
-        CPUIDResult c = doCPUID(1);
+        CPUIDResult c = cachedCPUID(1);
         return c.EAX & 0xf;
     }
     private static int getEDXCPUFlags()
     {
-        CPUIDResult c = doCPUID(1);
+        CPUIDResult c = cachedCPUID(1);
         return c.EDX;
     }
     private static int getECXCPUFlags()
     {
-        CPUIDResult c = doCPUID(1);
+        CPUIDResult c = cachedCPUID(1);
         return c.ECX;
     }
     private static int getExtendedEDXCPUFlags()
     {
-        CPUIDResult c = doCPUID(0x80000001);
+        CPUIDResult c = cachedCPUID(0x80000001);
         return c.EDX;
     }
     private static int getExtendedECXCPUFlags()
     {
-        CPUIDResult c = doCPUID(0x80000001);
+        CPUIDResult c = cachedCPUID(0x80000001);
         return c.ECX;
     }
     
