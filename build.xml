@@ -470,7 +470,7 @@
 
     <target name="preppkg-linux" depends="preppkg-base">
         <copy file="installer/resources/runplain.sh" todir="pkg-temp/" />
-        <copy file="apps/i2psnark/launch-i2psnark" todir="pkg-temp/" />
+	<!-- <copy file="apps/i2psnark/launch-i2psnark" todir="pkg-temp/" /> old feature that per zzz isn't used-->
         <copy file="installer/resources/eepget" todir="pkg-temp/" />
         <copy file="installer/resources/i2prouter" todir="pkg-temp/" />
         <copy file="installer/resources/osid" todir="pkg-temp/" />
