@@ -445,7 +445,13 @@ public class CPUID {
             }
 			//Bobcat
             if(getCPUFamily() + getCPUExtendedFamily() == 20){
-				//No known CPUIDs yet.
+                switch(getCPUModel() + getCPUExtendedModel()){
+                    case 1:                    
+					    return "Bobcat APU";
+					// Case 3 is uncertain but most likely a Bobcat APU
+					case 3:
+						return "Bobcat APU";
+                }
             }
             throw new UnknownCPUException("Unknown AMD CPU; Family="+(getCPUFamily() + getCPUExtendedFamily())+", Model="+(getCPUModel() + getCPUExtendedModel()));
 		}
