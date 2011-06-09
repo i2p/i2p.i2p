@@ -501,7 +501,6 @@
         <copy file="installer/resources/i2prouter.bat" todir="pkg-temp/" />
         <copy file="installer/resources/fixperms.bat" todir="pkg-temp/" />
         <copy file="installer/resources/install_i2p_service_winnt.bat" todir="pkg-temp/" />
-        <copy file="installer/resources/postinstall.bat" todir="pkg-temp/" />
         <copy file="installer/resources/set_config_dir_for_nt_service.bat" todir="pkg-temp/" />
         <copy file="installer/resources/uninstall_i2p_service_winnt.bat" todir="pkg-temp/" />
         <copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />

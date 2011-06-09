@@ -136,7 +136,7 @@
             <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\lib\wrapper\win32\wrapper.dll" /><arg value="$INSTALL_PATH\lib" /></args></executable>
             <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
-                <args><arg value="$INSTALL_PATH\lib\wrapper\win32\wrapper.jar" /><arg value="$INSTALL_PATH\lib" /></args></executable>
+                <args><arg value="$INSTALL_PATH\lib\wrapper\all\wrapper.jar" /><arg value="$INSTALL_PATH\lib" /></args></executable>
             <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\i2prouter" /></args></executable>
             <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
