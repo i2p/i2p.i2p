@@ -579,6 +579,7 @@ public class CPUID {
         protected static boolean isPentium2Compatible = false;
         protected static boolean isPentium3Compatible = false;
         protected static boolean isPentium4Compatible = false;
+        protected static boolean isPentiumMCompatible = false;
         protected static boolean isAtomCompatible = false;
         protected static boolean isCore2Compatible = false;
         protected static boolean isCoreiCompatible = false;
@@ -591,6 +592,7 @@ public class CPUID {
         public boolean IsPentium2Compatible(){ return isPentium2Compatible; }
         public boolean IsPentium3Compatible(){ return isPentium3Compatible; }
         public boolean IsPentium4Compatible(){ return isPentium4Compatible; }
+        public boolean IsPentiumMCompatible(){ return isPentiumMCompatible; }
         public boolean IsAtomCompatible(){ return isAtomCompatible; }
         public boolean IsCore2Compatible(){ return isCore2Compatible; }
         public boolean IsCoreiCompatible(){ return isCoreiCompatible; }    
@@ -708,6 +710,7 @@ public class CPUID {
                         case 9:
                             isPentium2Compatible = true;
                             isPentium3Compatible = true;
+							isPentiumMCompatible = true;
                             isX64 = true;
                             modelString = "Pentium M (Banias)";
                             break;
@@ -719,17 +722,20 @@ public class CPUID {
                         case 11:
                             isPentium2Compatible = true;
                             isPentium3Compatible = true;
+							isPentiumMCompatible = true;
                             modelString = "Pentium III (130 nm)";
                             break;
                         case 13:
                             isPentium2Compatible = true;
                             isPentium3Compatible = true;
+							isPentiumMCompatible = true;
                             isX64 = true;
                             modelString = "Core (Yonah)";
                             break;
                         case 14:
                             isPentium2Compatible = true;
                             isPentium3Compatible = true;
+							isPentiumMCompatible = true;
                             isCore2Compatible = true;
                             isX64 = true;
                             modelString = "Core 2 (Conroe)";
@@ -737,6 +743,7 @@ public class CPUID {
                         case 15:
                             isPentium2Compatible = true;
                             isPentium3Compatible = true;
+							isPentiumMCompatible = true;
                             isCore2Compatible = true;
                             isX64 = true;
                             modelString = "Core 2 (Conroe)";
@@ -748,6 +755,7 @@ public class CPUID {
                     isPentium2Compatible = true;
                     isPentium3Compatible = true;
                     isPentium4Compatible = true;
+					isPentiumMCompatible = true;
                     isCore2Compatible = true;
                     isX64 = true;
                     switch(getCPUModel()){
@@ -779,6 +787,8 @@ public class CPUID {
                     isPentiumMMXCompatible = true;
                     isPentium2Compatible = true;
                     isPentium3Compatible = true;
+                    isPentium4Compatible = true;
+					isPentiumMCompatible = true;
                     isCore2Compatible = true;
                     isCoreiCompatible = true;
                     isX64 = true;
