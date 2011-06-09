@@ -515,14 +515,14 @@ public class CPUID {
                 isAthlonCompatible = true;
                 isAthlon64Compatible = true;
                 isX64 = true;
-                switch(getCPUModel() + getCPUExtendedModel()\t\t){
+                switch(getCPUModel() + getCPUExtendedModel()){
                     case 2:
                         modelString = "Phenom / Athlon / Opteron Gen 3 (Barcelona/Agena/Toliman/Kuma, 65 nm)";
                         break;
                     case 4:
                         modelString = "Phenom II / Opteron Gen 3 (Shanghai/Deneb/Heka/Callisto, 45 nm)";
                         break;
-                    case 5:270
+                    case 5:
                         modelString = "Athlon II X2/X3/X4 (Regor/Rana/Propus AM3, 45 nm)";
                         break;
                     case 6:
