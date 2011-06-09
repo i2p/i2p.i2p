@@ -866,7 +866,7 @@ public class CPUID {
         System.out.println("CPU Family: " + getCPUFamily());
         System.out.println("CPU Model: " + getCPUModel());
         System.out.println("CPU Stepping: " + getCPUStepping());
-        System.out.println("CPU Flags: " + getEDXCPUFlags());
+        System.out.println("CPU Flags: 0x" + Integer.toHexString(getEDXCPUFlags()));
         
         CPUInfo c = getInfo();
         System.out.println(" **More CPUInfo**");
