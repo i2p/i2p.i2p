@@ -277,6 +277,7 @@ public class CPUID {
         {
             if (hasBeenIdentified)
                 return; // Don't identify twice
+			hasBeenIdentified = true;
 
         //AMD-family = getCPUFamily()+getCPUExtendedFamily()
         //AMD-model = getCPUModel()+getCPUExtendedModel()
@@ -597,6 +598,7 @@ public class CPUID {
         public boolean IsAtomCompatible(){ identifyCPU(); return isAtomCompatible; }
         public boolean IsCore2Compatible(){ identifyCPU(); return isCore2Compatible; }
         public boolean IsCoreiCompatible(){ identifyCPU(); return isCoreiCompatible; }    
+		
 
         public String getCPUModelString() throws UnknownCPUException
         {
@@ -614,6 +616,8 @@ public class CPUID {
         {
             if (hasBeenIdentified)
                 return; // Don't identify twice
+			hasBeenIdentified = true;
+
             if (getCPUExtendedModel() == 0){
                 if(getCPUFamily() == 4){
                     switch(getCPUModel()){
