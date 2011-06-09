@@ -198,7 +198,7 @@ public class CPUID {
     
     protected abstract static class CPUIDCPUInfo
     {
-        protected boolean isX64 = false;        
+        protected static boolean isX64 = false;        
                 
         public String getVendor()
         {
@@ -254,31 +254,28 @@ public class CPUID {
         protected static String modelString = null;
         protected static boolean hasBeenIdentified = false;
 
-        public boolean IsK6Compatible(){ identifyCPU(); return isK6Compatible; }
-        public boolean IsK6_2_Compatible(){ identifyCPU(); return isK6_2_Compatible; }
-        public boolean IsK6_3_Compatible(){ identifyCPU(); return isK6_3_Compatible; }
-        public boolean IsAthlonCompatible(){ identifyCPU(); return isAthlonCompatible; }
-        public boolean IsAthlon64Compatible(){ identifyCPU(); return isAthlon64Compatible; }
-        public boolean IsBobcatCompatible(){ identifyCPU(); return isBobcatCompatible; }
+        public boolean IsK6Compatible(){ return isK6Compatible; }
+        public boolean IsK6_2_Compatible(){ return isK6_2_Compatible; }
+        public boolean IsK6_3_Compatible(){ return isK6_3_Compatible; }
+        public boolean IsAthlonCompatible(){ return isAthlonCompatible; }
+        public boolean IsAthlon64Compatible(){ return isAthlon64Compatible; }
+        public boolean IsBobcatCompatible(){ return isBobcatCompatible; }
+
+		static
+		{
+			identifyCPU();
+		}	
 
         public String getCPUModelString() throws UnknownCPUException
         {
-            identifyCPU();
             if (modelString != null)
                 return modelString;
             throw new UnknownCPUException("Unknown AMD CPU; Family="+(getCPUFamily() + getCPUExtendedFamily())+", Model="+(getCPUModel() + getCPUExtendedModel()));
         }
         
-        /*
-        * Identifies CPU, can't be used in static constructor due to JNI conflicts.
-        * Has to be manually run after object initialisation.
-        */
-        private synchronized void identifyCPU()
-        {
-            if (hasBeenIdentified)
-                return; // Don't identify twice
-			hasBeenIdentified = true;
 
+        private synchronized static void identifyCPU()
+        {
         //AMD-family = getCPUFamily()+getCPUExtendedFamily()
         //AMD-model = getCPUModel()+getCPUExtendedModel()
         //i486 class (Am486, 5x86) 
@@ -588,36 +585,30 @@ public class CPUID {
         
         // If modelString != null, the cpu is considered correctly identified.
         protected static String modelString = null;
-        protected static boolean hasBeenIdentified = false;
         
-        public boolean IsPentiumCompatible(){ identifyCPU(); return isPentiumCompatible; }
-        public boolean IsPentiumMMXCompatible(){ identifyCPU(); return isPentiumMMXCompatible; }
-        public boolean IsPentium2Compatible(){ identifyCPU(); return isPentium2Compatible; }
-        public boolean IsPentium3Compatible(){ identifyCPU(); return isPentium3Compatible; }
-        public boolean IsPentium4Compatible(){ identifyCPU(); return isPentium4Compatible; }
-        public boolean IsAtomCompatible(){ identifyCPU(); return isAtomCompatible; }
-        public boolean IsCore2Compatible(){ identifyCPU(); return isCore2Compatible; }
-        public boolean IsCoreiCompatible(){ identifyCPU(); return isCoreiCompatible; }    
+        public boolean IsPentiumCompatible(){ return isPentiumCompatible; }
+        public boolean IsPentiumMMXCompatible(){ return isPentiumMMXCompatible; }
+        public boolean IsPentium2Compatible(){ return isPentium2Compatible; }
+        public boolean IsPentium3Compatible(){ return isPentium3Compatible; }
+        public boolean IsPentium4Compatible(){ return isPentium4Compatible; }
+        public boolean IsAtomCompatible(){ return isAtomCompatible; }
+        public boolean IsCore2Compatible(){ return isCore2Compatible; }
+        public boolean IsCoreiCompatible(){ return isCoreiCompatible; }    
 		
+		static
+		{
+			identifyCPU();
+		}
 
         public String getCPUModelString() throws UnknownCPUException
         {
-            identifyCPU();
             if (modelString != null)
                 return modelString;
             throw new UnknownCPUException("Unknown Intel CPU; Family="+getCPUFamily()+", Model="+getCPUModel());
         }
         
-        /*
-        * Identifies CPU, can't be used as static due to JNI conflicts.
-        * Has to be manually run after object initialisation
-        */
-        private synchronized void identifyCPU()
+        private synchronized static void identifyCPU()
         {
-            if (hasBeenIdentified)
-                return; // Don't identify twice
-			hasBeenIdentified = true;
-
             if (getCPUExtendedModel() == 0){
                 if(getCPUFamily() == 4){
                     switch(getCPUModel()){
