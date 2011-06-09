@@ -125,13 +125,19 @@ public class NativeBigInteger extends BigInteger {
     private final static String JBIGI_OPTIMIZATION_PENTIUM3   = "pentium3";
     private final static String JBIGI_OPTIMIZATION_PENTIUM4   = "pentium4";
     private final static String JBIGI_OPTIMIZATION_VIAC3      = "viac3";
-    /** below here @since 0.8.7 */
+    /**
+     * The 7 optimizations below here are since 0.8.7. Each of the 32-bit processors below
+     * needs an explicit fallback in getResourceList() or getMiddleName2().
+     * 64-bit processors will fallback to athlon64 and athlon in getResourceList().
+     * @since 0.8.7
+     */
     private final static String JBIGI_OPTIMIZATION_ATOM       = "atom";
     private final static String JBIGI_OPTIMIZATION_CORE2      = "core2";
     private final static String JBIGI_OPTIMIZATION_COREI      = "corei";
     private final static String JBIGI_OPTIMIZATION_GEODE      = "geode";
     private final static String JBIGI_OPTIMIZATION_NANO       = "nano";
     private final static String JBIGI_OPTIMIZATION_PENTIUMM   = "pentiumm";
+    /** all libjbibi builds are identical to pentium3, case handled in getMiddleName2() */
     private final static String JBIGI_OPTIMIZATION_VIAC32     = "viac32";
 
     private static final boolean _isWin = System.getProperty("os.name").startsWith("Win");
@@ -192,15 +198,20 @@ public class NativeBigInteger extends BigInteger {
             if (c instanceof VIACPUInfo){
             	VIACPUInfo viacpu = (VIACPUInfo) c;
             	if (viacpu.IsNanoCompatible())
-            		return JBIGI_OPTIMIZATION_NANO;
-            	if (viacpu.IsNanoCompatible())
-            		return JBIGI_OPTIMIZATION_VIAC3;
+            	    return JBIGI_OPTIMIZATION_NANO;
+            	return JBIGI_OPTIMIZATION_VIAC3;
             } else if(c instanceof AMDCPUInfo) {
                 AMDCPUInfo amdcpu = (AMDCPUInfo) c;
+                // Supported in CPUID, no GMP support
+                //if (amdcpu.IsBobcatCompatible())
+                //    return JBIGI_OPTIMIZATION_BOBCAT;
                 if (amdcpu.IsAthlon64Compatible())
                     return JBIGI_OPTIMIZATION_ATHLON64;
                 if (amdcpu.IsAthlonCompatible())
                     return JBIGI_OPTIMIZATION_ATHLON;
+                // FIXME lots of geodes, but GMP configures like a K6-3
+                if (amdcpu.IsGeodeCompatible())
+                    return JBIGI_OPTIMIZATION_GEODE;
                 if (amdcpu.IsK6_3_Compatible())
                     return JBIGI_OPTIMIZATION_K6_3;
                 if (amdcpu.IsK6_2_Compatible())
@@ -209,8 +220,16 @@ public class NativeBigInteger extends BigInteger {
                     return JBIGI_OPTIMIZATION_K6;
             } else if (c instanceof IntelCPUInfo) {
                 IntelCPUInfo intelcpu = (IntelCPUInfo) c;
+                if (intelcpu.IsCoreiCompatible())
+                    return JBIGI_OPTIMIZATION_COREI;
+                if (intelcpu.IsCore2Compatible())
+                    return JBIGI_OPTIMIZATION_CORE2;
                 if (intelcpu.IsPentium4Compatible())
                     return JBIGI_OPTIMIZATION_PENTIUM4;
+                if (intelcpu.IsAtomCompatible())
+                    return JBIGI_OPTIMIZATION_ATOM;
+                if (intelcpu.IsPentiumMCompatible())
+                    return JBIGI_OPTIMIZATION_PENTIUMM;
                 if (intelcpu.IsPentium3Compatible())
                     return JBIGI_OPTIMIZATION_PENTIUM3;
                 if (intelcpu.IsPentium2Compatible())
@@ -605,12 +624,18 @@ public class NativeBigInteger extends BigInteger {
             }
             // the preferred selection
             rv.add(_libPrefix + getMiddleName1() + primary + _libSuffix);
+
             // athlon64 is always a fallback for 64 bit
             if (_is64 && !primary.equals(JBIGI_OPTIMIZATION_ATHLON64))
                 rv.add(_libPrefix + getMiddleName1() + JBIGI_OPTIMIZATION_ATHLON64 + _libSuffix);
+
             // Add fallbacks for any 32-bit that were added 0.8.7 or later here
-            if (primary.equals(JBIGI_OPTIMIZATION_ATOM))
+            // FIXME lots of geodes, but GMP configures like a K6-3, so pentium3 is probably a good backup
+            if (primary.equals(JBIGI_OPTIMIZATION_ATOM) ||
+                primary.equals(JBIGI_OPTIMIZATION_PENTIUMM) ||
+                primary.equals(JBIGI_OPTIMIZATION_GEODE))
                 rv.add(_libPrefix + getMiddleName1() + JBIGI_OPTIMIZATION_PENTIUM3 + _libSuffix);
+
             // athlon is always a fallback for 64 bit, we have it for all architectures
             // and it should be much better than "none"
             if (_is64)
