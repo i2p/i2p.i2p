@@ -27,7 +27,10 @@ public interface AMDCPUInfo extends CPUInfo {
      * @return true if the CPU present in the machine is at least an 'k6-3' CPU
      */
     public boolean IsK6_3_Compatible();
-
+    /**
+     * @return true if the CPU present in the machine is at least an 'geode' CPU
+     */
+    boolean IsGeodeCompatible();
     /**
      * @return true if the CPU present in the machine is at least an 'k7' CPU (Atlhon, Duron etc. and better)
      */

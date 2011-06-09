@@ -5,6 +5,7 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
     protected static boolean isK6Compatible = false;
     protected static boolean isK6_2_Compatible = false;
     protected static boolean isK6_3_Compatible = false;
+    protected static boolean isGeodeCompatible = false;
     protected static boolean isAthlonCompatible = false;
     protected static boolean isAthlon64Compatible = false;
     protected static boolean isBobcatCompatible = false;
@@ -18,6 +19,8 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
     public boolean IsK6_2_Compatible(){ return isK6_2_Compatible; }
     @Override
     public boolean IsK6_3_Compatible(){ return isK6_3_Compatible; }
+    @Override 
+    public boolean IsGeodeCompatible(){ return isGeodeCompatible; }
     @Override
     public boolean IsAthlonCompatible(){ return isAthlonCompatible; }
     @Override
@@ -82,6 +85,16 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
                 case 3:
                     modelString = "K5";
                     break;
+                case 4:
+                	isK6Compatible = false;
+                	isGeodeCompatible = true;
+                	modelString = "Geode GX1/GXLV/GXm";
+                	break;
+                case 5:
+                	isK6Compatible = false;
+                	isGeodeCompatible = true;
+                	modelString = "Geode GX2/LX";
+                	break;
                 case 6:
                     modelString = "K6";
                     break;
