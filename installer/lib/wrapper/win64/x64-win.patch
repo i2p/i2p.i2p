@@ -1,0 +1,26 @@
+--- Makefile-windows-x86-64.nmake	2011-05-28 21:12:05.383721860 +0000
++++ Makefile-windows-x86-64.nmake	2011-06-09 19:43:59.349132461 +0000
+@@ -9,19 +9,19 @@
+ 
+ PROJ = wrapper
+ 
+-COMPILE = cl /D "WIN32" /D "NDEBUG" /FD /EHsc /MT /W3 /nologo /c /Zi /errorReport:prompt /D "_CRT_SECURE_NO_DEPRECATE" /D "UNICODE" /D "_UNICODE" /D "_WIN32_WINNT=0x0500"
+-LINK = link /NOLOGO /MANIFEST /DEBUG /MACHINE:X86 /ERRORREPORT:PROMPT DelayImp.lib
++COMPILE = cl /D "WIN32" /D "WIN64" /D "NDEBUG" /FD /EHsc /MT /W3 /nologo /c /Zi /errorReport:prompt /D "_CRT_SECURE_NO_DEPRECATE" /D "UNICODE" /D "_UNICODE" /D "_WIN32_WINNT=0x0500"
++LINK = link /NOLOGO /MANIFEST /DEBUG /MACHINE:AMD64 /ERRORREPORT:PROMPT DelayImp.lib
+ RC = rc
+ 
+ # EXE Definitions
+-EXE_OUTDIR = $(PROJ)32_VC8__Win32_Release
++EXE_OUTDIR = $(PROJ)32_VC8__Win64_Release
+ EXE_OBJS = $(EXE_OUTDIR)\wrapper_i18n.obj $(EXE_OUTDIR)\logger.obj $(EXE_OUTDIR)\property.obj $(EXE_OUTDIR)\wrapper.obj $(EXE_OUTDIR)\wrapper_win.obj $(EXE_OUTDIR)\wrappereventloop.obj $(EXE_OUTDIR)\wrapper_file.obj $(EXE_OUTDIR)\wrapperinfo.obj
+ EXE_LIBS = mpr.lib shell32.lib wsock32.lib shlwapi.lib advapi32.lib user32.lib Crypt32.lib Wintrust.lib pdh.lib
+ EXE_COMPILE_OPTS = /O2 /GL /D "_CONSOLE"
+ EXE_LINK_OPTS = /INCREMENTAL:NO /SUBSYSTEM:CONSOLE /MANIFESTFILE:"$(EXE_OUTDIR)\$(PROJ).exe.intermediate.manifest" /PDB:"$(EXE_OUTDIR)\$(PROJ).pdb" /OPT:REF /OPT:ICF /LTCG
+ 
+ # DLL Definitions
+-DLL_OUTDIR = $(PROJ)JNI32_VC8__Win32_Release
++DLL_OUTDIR = $(PROJ)JNI32_VC8__Win64_Release
+ DLL_OBJS = $(DLL_OUTDIR)\wrapper_i18n.obj $(DLL_OUTDIR)\wrapperjni.obj $(DLL_OUTDIR)\wrapperjni_win.obj $(DLL_OUTDIR)\wrapperinfo.obj
+ DLL_LIBS = shell32.lib advapi32.lib user32.lib
+ DLL_COMPILE_OPTS = /Od  /I "..\" /I ".\" /I "$(JAVA_HOME)\include" /I "$(JAVA_HOME)\include\win32" /D "_WINDOWS" /D "_USRDLL" /D "DECODERJNI_VC8_EXPORTS" /D "_WINDLL"

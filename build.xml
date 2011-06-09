@@ -507,6 +507,9 @@
         <copy todir="pkg-temp/lib/wrapper/win32/">
             <fileset dir="installer/lib/wrapper/win32/" />
         </copy>
+	<copy todir="pkg-temp/lib/wrapper/win64/">
+	    <fileset dir="installer/lib/wrapper/win64/" />
+        </copy>
     </target>
 
     <!-- only what is needed for debian, etc. -->

@@ -1,3 +1,7 @@
+2011-06-09 kytv
+   * Added an x64 wrapper for Windows. This is needed because a 32bit wrapper
+     cannot start a 64bit JVM.
+
 2011-06-08 zzz
     * Build:
       - Add standard manifest to jbigi.jar

@@ -130,11 +130,26 @@
             <parsable targetfile="$INSTALL_PATH/eepget" type="shell" os="unix|mac" />
             <parsable targetfile="$INSTALL_PATH/runplain.sh" type="shell" os="unix|mac" />
             
+	    <conditions>
+	        <condition type="variable" id="is64bit">
+	            <name>SYSTEM_sun_arch_data_model</name>
+	            <value>64</value>
+		</condition> 
+	    </conditions>
             <!-- postinstall stuff for windows -->
+	    <!-- Wrapper for 32bit Windows JVM -->
             <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\lib\wrapper\win32\I2Psvc.exe" /><arg value="$INSTALL_PATH" /></args></executable>
             <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\lib\wrapper\win32\wrapper.dll" /><arg value="$INSTALL_PATH\lib" /></args></executable>
+	    <!-- wrapper for 64bit Windows JVM -->
+	    <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"
+		condition="is64bit" > <os family="windows" />
+ 	        <args><arg value="$INSTALL_PATH\lib\wrapper\win64\I2Psvc.exe" /><arg value="$INSTALL_PATH" /></args></executable>
+	    <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"
+		condition="is64bit" > <os family="windows" />
+		<args><arg value="$INSTALL_PATH\lib\wrapper\win64\wrapper.dll" /><arg value="$INSTALL_PATH\lib" /></args></executable>
+	    <!-- Arch-indep wrapper.jar on Windows -->
             <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\lib\wrapper\all\wrapper.jar" /><arg value="$INSTALL_PATH\lib" /></args></executable>
             <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
