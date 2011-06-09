@@ -1,0 +1,16 @@
+package freenet.support.CPUInformation;
+
+public interface VIACPUInfo extends CPUInfo{
+
+    /**
+     * @return true if the CPU present in the machine is at least an 'c3' CPU
+     */
+	public boolean IsC3Compatible();
+    /**
+     * @return true if the CPU present in the machine is at least an 'nano' CPU
+     */
+	public boolean IsNanoCompatible();
+	
+	
+
+}

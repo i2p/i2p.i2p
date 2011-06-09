@@ -16,24 +16,28 @@ package freenet.support.CPUInformation;
  */
 public interface AMDCPUInfo extends CPUInfo {
     /**
-     * @return true iff the CPU present in the machine is at least an 'k6' CPU
+     * @return true if the CPU present in the machine is at least an 'k6' CPU
      */
     public boolean IsK6Compatible();
     /**
-     * @return true iff the CPU present in the machine is at least an 'k6-2' CPU
+     * @return true if the CPU present in the machine is at least an 'k6-2' CPU
      */
     public boolean IsK6_2_Compatible();
     /**
-     * @return true iff the CPU present in the machine is at least an 'k6-3' CPU
+     * @return true if the CPU present in the machine is at least an 'k6-3' CPU
      */
     public boolean IsK6_3_Compatible();
 
     /**
-     * @return true iff the CPU present in the machine is at least an 'k7' CPU (Atlhon, Duron etc. and better)
+     * @return true if the CPU present in the machine is at least an 'k7' CPU (Atlhon, Duron etc. and better)
      */
     public boolean IsAthlonCompatible();
     /**
-     * @return true iff the CPU present in the machine is at least an 'k8' CPU (Atlhon 64, Opteron etc. and better)
+     * @return true if the CPU present in the machine is at least an 'k8' CPU (Atlhon 64, Opteron etc. and better)
      */
     public boolean IsAthlon64Compatible();
+    /**
+     * @return true if the CPU present in the machine is at least an 'k8' CPU (Atlhon 64, Opteron etc. and better)
+     */
+	public boolean IsBobcatCompatible();
 }

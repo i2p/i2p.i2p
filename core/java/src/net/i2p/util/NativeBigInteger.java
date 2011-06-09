@@ -24,6 +24,7 @@ import freenet.support.CPUInformation.AMDCPUInfo;
 import freenet.support.CPUInformation.CPUID;
 import freenet.support.CPUInformation.CPUInfo;
 import freenet.support.CPUInformation.IntelCPUInfo;
+import freenet.support.CPUInformation.VIACPUInfo;
 import freenet.support.CPUInformation.UnknownCPUException;
 
 import net.i2p.I2PAppContext;
@@ -188,9 +189,13 @@ public class NativeBigInteger extends BigInteger {
             try {
                 _cpuModel = c.getCPUModelString();
             } catch (UnknownCPUException e) {}
-            if (c.IsC3Compatible())
-                return JBIGI_OPTIMIZATION_VIAC3;
-            if (c instanceof AMDCPUInfo) {
+            if (c instanceof VIACPUInfo){
+            	VIACPUInfo viacpu = (VIACPUInfo) c;
+            	if (viacpu.IsNanoCompatible())
+            		return JBIGI_OPTIMIZATION_NANO;
+            	if (viacpu.IsNanoCompatible())
+            		return JBIGI_OPTIMIZATION_VIAC3;
+            } else if(c instanceof AMDCPUInfo) {
                 AMDCPUInfo amdcpu = (AMDCPUInfo) c;
                 if (amdcpu.IsAthlon64Compatible())
                     return JBIGI_OPTIMIZATION_ATHLON64;
