@@ -61,6 +61,4 @@ public interface CPUInfo
      * @return true iff the CPU support the SSE4A instruction set.
      */
     public boolean hasSSE4A();
-
-    public boolean IsC3Compatible();
 }
