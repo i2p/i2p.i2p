@@ -1,3 +1,6 @@
+2011-06-10 kytv
+   * jcpuid & jbigi added for 64bit Windows (only used with a 64bit jvm).
+
 2011-06-09 kytv
    * Added an x64 wrapper for Windows. This is needed because a 32bit wrapper
      cannot start a 64bit JVM.
