@@ -149,9 +149,6 @@
 	    <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"
 		condition="is64bit" > <os family="windows" />
 		<args><arg value="$INSTALL_PATH\lib\wrapper\win64\wrapper.dll" /><arg value="$INSTALL_PATH\lib" /></args></executable>
-	    <!-- Arch-indep wrapper.jar on Windows -->
-            <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
-                <args><arg value="$INSTALL_PATH\lib\wrapper\all\wrapper.jar" /><arg value="$INSTALL_PATH\lib" /></args></executable>
             <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\i2prouter" /></args></executable>
             <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
