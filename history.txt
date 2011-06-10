@@ -1,3 +1,29 @@
+2011-06-10 zzz
+    * CPUID, NativeBigI: Add support for atom, core2, corei, nano, pentiumm, geode
+    * Random: Add config setting prng.bufferSize to override the default 256 KB
+    * JBigI:
+      - Add new libjbigi-linux-xxx.so files built by sponge, now that we have
+        CPUID.java support for them (thanks hottuna).
+        See http://zzz.i2p/topics/306 for discussion and test results.
+
+        64-bit processors (atom, core2, corei, nano):
+        Built with GMP 5.0.2. License is LGPLv3.
+        Built by sponge with GCC 4.4.4, downloaded from
+        http://sponge.i2p/files/jbigi/gmp-5.0.2/
+        For 64-bit processors, both performance testing and
+        the GMP changelog http://gmplib.org/gmp5.0.html led us to use 5.0.2
+        for both the 32- and 64-bit versions, even though the files are twice as big.
+        5.0.x contains specific optimizations for atom and nano.
+        All 64-bit libs have _64 appended.
+
+        32-bit processors (pentiumm, geode):
+        Built with GMP 4.3.2. License is LGPLv3.
+        Built by sponge with GCC 4.4.4, downloaded from
+        http://sponge.i2p/files/jbigi/gmp-4.3.2/
+        The 4.3.2 files are half the size of those built with GMP 5.0.2, and there was
+        little or no performance difference between the two versions for 32 bit processors.
+    * Profiles: Skip and delete a corrupt profile read from disk
+
 2011-06-10 kytv
    * jcpuid & jbigi added for 64bit Windows (only used with a 64bit jvm).
 
