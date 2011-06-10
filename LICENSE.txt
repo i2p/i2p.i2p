@@ -127,8 +127,8 @@ Installer:
 
 
 
-Wrapper 3.1.1:
-   Copyright (c) 1999, 2004 Tanuki Software
+Java Service Wrapper Community Edition 32-bit 3.5.9:
+   Copyright (C) 1999-2011 Tanuki Software, Ltd. All Rights Reserved.
    See licenses/LICENSE-Wrapper.txt
 
 

@@ -29,8 +29,7 @@
             <compilerarg line="${javac.compilerargs}" />
             <classpath>
                 <pathelement location="../../core/java/build/i2p.jar" />
-                <!-- doesn't matter if we're not on win32, we just need the java classes, not the platform-dependent code -->
-                <pathelement location="../../installer/lib/wrapper/win32/wrapper.jar" />
+                <pathelement location="../../installer/lib/wrapper/all/wrapper.jar" />
             	<pathelement location="../../router/java/build/router.jar" />
             </classpath>
 		</javac>
@@ -39,7 +38,7 @@
         </copy>
 	</target>
 
-	<target name="jar" depends="compile">
+	<target name="bundle" >
         <exec executable="sh" osfamily="unix" failifexecutionfails="true" >
             <arg value="./bundle-messages.sh" />
         </exec>
@@ -50,6 +49,9 @@
         <exec executable="sh" osfamily="windows" failifexecutionfails="false" >
             <arg value="./bundle-messages.sh" />
         </exec>
+	</target>
+
+        <target name="listChangedFiles" depends="jarUpToDate" if="shouldListChanges" >
         <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
             <arg value="list" />
             <arg value="changed" />
@@ -61,6 +63,11 @@
             <arg value="[:space:]" />
             <arg value="," />
         </exec>
+	</target>
+
+	<target name="jar" depends="compile, bundle, listChangedFiles" unless="jar.uptodate" >
+		<!-- set if unset -->
+		<property name="workspace.changes.tr" value="" />
 		<jar basedir="${build}" destfile="${dist}/${jar}">
 			<manifest>
 				<attribute name="Main-Class" value="net.i2p.desktopgui.Main"/>
@@ -70,6 +77,20 @@
 			</manifest>
 		</jar>
 	</target>
+
+    <target name="jarUpToDate">
+        <uptodate property="jar.uptodate" targetfile="${dist}/${jar}" >
+            <srcfiles dir= "." includes="build/**/*.class" />
+        </uptodate>
+        <condition property="shouldListChanges" >
+            <and>
+                <not>
+                    <isset property="jar.uptodate" />
+                </not>
+                <isset property="mtn.available" />
+            </and>
+        </condition>
+    </target>
 
     <target name="javadoc">
         <mkdir dir="${build}" />

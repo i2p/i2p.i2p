@@ -1,3 +1,33 @@
+2011-06-09 kytv
+   * Added an x64 wrapper for Windows. This is needed because a 32bit wrapper
+     cannot start a 64bit JVM.
+
+2011-06-08 zzz
+    * Build:
+      - Add standard manifest to jbigi.jar
+      - Don't do 'mtn list changed' if not in a workspace or not needed
+    * LogManager: Use DataHelper methods for loading and storing config
+
+2011-06-08 kytv
+    * Update jbigi/jcpuid Windows dlls. As was done for FreeBSD and Linux, the 
+      libraries for 32bit CPUs were linked against gmp-4.3.2 and those for the 
+      64bit CPUs were linked against gmp-5.0.2.
+
+2011-06-07 kytv
+    * Upgrade the wrapper to 3.5.9. Noticable changes include:
+      - FreeBSD amd64 is now a supported arch along with i386. To use the wrapper
+        with the most recent version of FreeBSD the port 'misc/compat6x' will need
+        to be installed.
+      - OSX: Both Intel and PPC Macs are supported. 32-bit support. If you'd like 64-bit
+        support, please file a bug in trac with the output of "uname -m".
+    * Upgrade jbigi/jcpuid for FreeBSD i386 and add support for amd64. As was done with 
+      the Linux compiles, 32bit compiles were linked with gmp 4.3.2 and 64 bit builds
+      (as well as 32bit builds for 64bit cpus) were linked against gmp 5.0.2.
+
+2011-06-06 zzz
+    * Drop andorid/ directory; further development will happen in
+      an android-only branch.
+
 2011-06-05 zzz
     * Console: Tag stat descriptions at declaration rather than in Strings.java
     * Data: Remove duplicate signature verification code
@@ -13,7 +43,7 @@
         The 4.3.2 files are half the size of those built with GMP 5.0.2, and there was
         little or no performance difference between the two versions for 32 bit processors.
         See http://zzz.i2p/topics/306 for discussion and test results.
-      - Replace old non-PIC 62-bit linux libs (GMP 4.1.4 built in 2005)
+      - Replace old non-PIC 64-bit linux libs (GMP 4.1.4 built in 2005)
         with PIC libs built with GMP 5.0.2. License is LGPLv3.
         Built by sponge with GCC 4.4.4, downloaded from
         http://sponge.i2p/files/jbigi/gmp-5.0.2/

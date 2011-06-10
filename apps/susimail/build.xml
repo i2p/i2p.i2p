@@ -22,7 +22,7 @@
     </target>
     <target name="jar" depends="compile, war" />
 
-    <target name="war" depends="compile, bundle, warUpToDate" unless="war.uptodate" >
+    <target name="listChangedFiles" depends="warUpToDate" if="shouldListChanges" >
         <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
             <arg value="list" />
             <arg value="changed" />
@@ -34,6 +34,11 @@
             <arg value="[:space:]" />
             <arg value="," />
         </exec>
+    </target>
+
+    <target name="war" depends="compile, bundle, warUpToDate, listChangedFiles" unless="war.uptodate" >
+        <!-- set if unset -->
+        <property name="workspace.changes.tr" value="" />
         <war destfile="susimail.war" webxml="src/WEB-INF/web.xml"
              basedir="src/" excludes="WEB-INF/web.xml LICENSE src/**/*">
             <manifest>
@@ -48,6 +53,14 @@
         <uptodate property="war.uptodate" targetfile="susimail.war">
             <srcfiles dir= "src" excludes="LICENSE src/**/*" />
         </uptodate>
+        <condition property="shouldListChanges" >
+            <and>
+                <not>
+                    <isset property="war.uptodate" />
+                </not>
+                <isset property="mtn.available" />
+            </and>
+        </condition>
     </target>
 
     <target name="bundle" depends="compile">
