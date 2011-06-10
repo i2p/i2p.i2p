@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.FileUtil;
+import net.i2p.util.Log;
 import net.i2p.util.SecureDirectory;
 
 import org.mortbay.http.HttpContext;
@@ -36,6 +37,12 @@ import org.mortbay.jetty.servlet.WebApplicationContext;
 public class WebAppStarter {
 
     static final Map<String, Long> warModTimes = new ConcurrentHashMap();
+    static private Log _log;
+
+    static {
+        _log = ContextHelper.getContext(null).logManager().getLog(WebAppStarter.class); ;
+    }
+
 
     /**
      *  adds and starts
@@ -43,7 +50,8 @@ public class WebAppStarter {
      */
     static void startWebApp(I2PAppContext ctx, Server server, String appName, String warPath) throws Exception {
          File tmpdir = new SecureDirectory(ctx.getTempDir(), "jetty-work-" + appName + ctx.random().nextInt());
-         WebApplicationContext wac = addWebApp(ctx, server, appName, warPath, tmpdir);
+         WebApplicationContext wac = addWebApp(ctx, server, appName, warPath, tmpdir);      
+		 _log.debug("Loading war from: " + warPath);
          wac.start();
     }
 
@@ -88,6 +96,8 @@ public class WebAppStarter {
 
         // this does the passwords...
         RouterConsoleRunner.initialize(wac);
+
+
 
         // see WebAppConfiguration for info
         String[] classNames = server.getWebApplicationConfigurationClassNames();
