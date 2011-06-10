@@ -138,9 +138,11 @@
 	    </conditions>
             <!-- postinstall stuff for windows -->
 	    <!-- Wrapper for 32bit Windows JVM -->
-            <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+	    <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"
+		    condition="!is64bit"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\lib\wrapper\win32\I2Psvc.exe" /><arg value="$INSTALL_PATH" /></args></executable>
-            <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+	    <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"
+		condition="!is64bit"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\lib\wrapper\win32\wrapper.dll" /><arg value="$INSTALL_PATH\lib" /></args></executable>
 	    <!-- wrapper for 64bit Windows JVM -->
 	    <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"
