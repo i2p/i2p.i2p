@@ -179,17 +179,6 @@ public class NativeBigInteger extends BigInteger {
       * @return A string containing the CPU-type or null if CPU type is unknown
       */
     private static String resolveCPUType() {
-        if (_is64) {
-            // Test the 64 bit libjcpuid, even though we don't use it yet
-            try {
-                CPUInfo c = CPUID.getInfo();
-                _cpuModel = c.getCPUModelString();
-            } catch (UnknownCPUException e) {
-                // log?
-            }
-            return JBIGI_OPTIMIZATION_ATHLON64;
-        }
-        
         try {
             CPUInfo c = CPUID.getInfo();
             try {
