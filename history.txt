@@ -22,6 +22,7 @@
         http://sponge.i2p/files/jbigi/gmp-4.3.2/
         The 4.3.2 files are half the size of those built with GMP 5.0.2, and there was
         little or no performance difference between the two versions for 32 bit processors.
+    * NBI: Enable 64-bit processor detection
     * Profiles: Skip and delete a corrupt profile read from disk
 
 2011-06-10 kytv
