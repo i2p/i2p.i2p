@@ -8,6 +8,7 @@ trans.fr = apps/i2ptunnel/locale/messages_fr.po
 trans.nl = apps/i2ptunnel/locale/messages_nl.po
 trans.ru = apps/i2ptunnel/locale/messages_ru.po
 trans.sv_SE = apps/i2ptunnel/locale/messages_sv.po
+trans.vi = apps/i2ptunnel/locale/messages_vi.po
 trans.zh_CN = apps/i2ptunnel/locale/messages_zh.po
 
 [I2P.routerconsole]
@@ -16,10 +17,14 @@ source_lang = en
 trans.ar = apps/routerconsole/locale/messages_ar.po
 trans.de = apps/routerconsole/locale/messages_de.po
 trans.es = apps/routerconsole/locale/messages_es.po
+trans.fi = apps/routerconsole/locale/messages_fi.po
 trans.fr = apps/routerconsole/locale/messages_fr.po
+trans.it = apps/routerconsole/locale/messages_it.po
 trans.nl = apps/routerconsole/locale/messages_nl.po
+trans.pl = apps/routerconsole/locale/messages_pl.po
 trans.ru = apps/routerconsole/locale/messages_ru.po
 trans.sv_SE = apps/routerconsole/locale/messages_sv.po
+trans.vi = apps/routerconsole/locale/messages_vi.po
 trans.zh_CN = apps/routerconsole/locale/messages_zh.po
 
 [I2P.i2psnark]
@@ -29,10 +34,13 @@ trans.ar = apps/i2psnark/locale/messages_ar.po
 trans.de = apps/i2psnark/locale/messages_de.po
 trans.es = apps/i2psnark/locale/messages_es.po
 trans.fr = apps/i2psnark/locale/messages_fr.po
+trans.it = apps/i2psnark/locale/messages_it.po
 trans.nl = apps/i2psnark/locale/messages_nl.po
+trans.pl = apps/i2psnark/locale/messages_pl.po
 trans.pt = apps/i2psnark/locale/messages_pt.po
 trans.ru = apps/i2psnark/locale/messages_ru.po
 trans.sv_SE = apps/i2psnark/locale/messages_sv.po
+trans.vi = apps/i2psnark/locale/messages_vi.po
 trans.zh_CN = apps/i2psnark/locale/messages_zh.po
 
 [I2P.susidns]
@@ -53,10 +61,14 @@ source_lang = en
 trans.ar = apps/desktopgui/locale/messages_ar.po
 trans.de = apps/desktopgui/locale/messages_de.po
 trans.es = apps/desktopgui/locale/messages_es.po
+trans.fi = apps/desktopgui/locale/messages_fi.po
 trans.fr = apps/desktopgui/locale/messages_fr.po
+trans.it = apps/desktopgui/locale/messages_it.po
 trans.nl = apps/desktopgui/locale/messages_nl.po
+trans.pl = apps/desktopgui/locale/messages_pl.po
 trans.ru = apps/desktopgui/locale/messages_ru.po
 trans.sv_SE = apps/desktopgui/locale/messages_sv.po
+trans.vi = apps/desktopgui/locale/messages_vi.po
 trans.zh_CN = apps/desktopgui/locale/messages_zh.po
 
 [I2P.susimail]
@@ -67,6 +79,9 @@ trans.es = apps/susimail/locale/messages_es.po
 trans.fr = apps/susimail/locale/messages_fr.po
 trans.nl = apps/susimail/locale/messages_nl.po
 trans.sv_SE = apps/susimail/locale/messages_sv.po
+trans.pl = apps/susimail/locale/messages_pl.po
+trans.vi = apps/susimail/locale/messages_vi.po
+trans.zh_CN = apps/susimail/locale/messages_zh.po
 
 [main]
 host = http://www.transifex.net
