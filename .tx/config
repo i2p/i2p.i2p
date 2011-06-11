@@ -51,6 +51,7 @@ trans.de = apps/susidns/locale/messages_de.po
 trans.es = apps/susidns/locale/messages_es.po
 trans.fr = apps/susidns/locale/messages_fr.po
 trans.nl = apps/susidns/locale/messages_nl.po
+trans.pl = apps/susidns/locale/messages_pl.po
 trans.ru = apps/susidns/locale/messages_ru.po
 trans.sv_SE = apps/susidns/locale/messages_sv.po
 trans.zh_CN = apps/susidns/locale/messages_zh.po
