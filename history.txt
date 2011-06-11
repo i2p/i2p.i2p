@@ -1,3 +1,6 @@
+2011-06-11 zzz
+    * i2psnark Polish translation, thanks polacco
+
 2011-06-10 zzz
     * CPUID, NativeBigI: Add support for atom, core2, corei, nano, pentiumm, geode
     * Random: Add config setting prng.bufferSize to override the default 256 KB
