@@ -9,6 +9,8 @@ Linux*)
 	echo "Building linux .so's";;
 FreeBSD*)
 	echo "Building freebsd .so's";;
+Darwin*)
+	echo "Building OSX jnilibs";;
 *)
 	echo "Unsupported build environment"
 	exit;;
@@ -29,6 +31,12 @@ MINGW*)
 	INCLUDES="-I. -Iinclude -I$JAVA_HOME/include/ -I$JAVA_HOME/include/win32/"
 	LINKFLAGS="-shared -static -static-libgcc -Wl,--kill-at"
 	LIBFILE="lib/freenet/support/CPUInformation/jcpuid-x86-windows.dll";;
+Darwin*)
+        JAVA_HOME=$(/usr/libexec/java_home)
+        COMPILEFLAGS="-fPIC -Wall -arch x86_64 -arch i386"
+        INCLUDES="-I. -Iinclude -I$JAVA_HOME/include/"
+        LINKFLAGS="-dynamiclib -framework JavaVM"
+        LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-x86-darwin.jnilib";;
 FreeBSD*)
 	case `uname -m` in
 		amd64)
