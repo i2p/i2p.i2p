@@ -802,7 +802,7 @@ msgstr "Aruba"
 
 #: ../java/build/Countries.java:20
 msgid "Åland Islands"
-msgstr ""
+msgstr "Ahvenanmaa"
 
 #: ../java/build/Countries.java:21
 msgid "Azerbaijan"
@@ -1130,7 +1130,7 @@ msgstr "Israel"
 
 #: ../java/build/Countries.java:102
 msgid "Isle of Man"
-msgstr ""
+msgstr "Mansaari"
 
 #: ../java/build/Countries.java:103
 msgid "India"
@@ -1158,7 +1158,7 @@ msgstr "Italia"
 
 #: ../java/build/Countries.java:109
 msgid "Jersey"
-msgstr ""
+msgstr "Jersey"
 
 #: ../java/build/Countries.java:110
 msgid "Jamaica"
@@ -1274,7 +1274,7 @@ msgstr ""
 
 #: ../java/build/Countries.java:138
 msgid "Saint Martin"
-msgstr ""
+msgstr "Saint-Martin"
 
 #: ../java/build/Countries.java:139
 msgid "Madagascar"
