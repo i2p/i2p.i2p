@@ -340,7 +340,7 @@ msgstr ""
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:535
 msgid "How long ago this connection was established"
-msgstr "Jak długo od czasu gdy połączenie zostało ustanowione\n"
+msgstr "Jak długo od czasu gdy połączenie zostało ustanowione"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:535
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:741
@@ -372,7 +372,7 @@ msgstr "Liczba wysłanych wiadomości oczekujących potwierdzenia"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:539
 msgid "The maximum number of concurrent messages to send"
-msgstr "Maksymalnej liczby jednoczesnych wiadomości do wysyłania\n"
+msgstr "Maksymalnej liczby jednoczesnych wiadomości do wysyłania"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:540
 msgid "The number of pending sends which exceed congestion window"
@@ -645,7 +645,7 @@ msgstr "Sortuj według odchylenia zegara"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1911
 msgid "Sort by congestion window"
-msgstr "Sortuj według okna zatłoczenia\n"
+msgstr "Sortuj według okna zatłoczenia"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1913
 msgid "Sort by slow start threshold"
