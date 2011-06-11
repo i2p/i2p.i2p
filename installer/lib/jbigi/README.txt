@@ -42,7 +42,8 @@ Updates May/June 2011:
    - 32 bit libjcpuid-freebsd-x86.so updated, compiled with -fPIC.
    - 64 bit libjcpid-freebsd-x86_64.so added, compiled with -fPIC.
    - 32 bit libjcpuid-x86-solaris.so added, compiled with -fPIC.
-   - 32 bit jcpuid-windows.dll updated (no PIC for Windows).
+   - 32 bit jcpuid-x86-windows.dll updated (no PIC for Windows).
+   - 64 bit jcpuid-x86_64-windows.dll was added.
    - See also javadoc and code in CPUID.java
   jbigi:
    - k62 and k63 are identical for all except windows; exception added to
@@ -52,11 +53,13 @@ Updates May/June 2011:
    - All 64 bit linux files updated with GMP 5.0.2.
    - All 32 bit freebsd files updated with GMP 4.3.2, compiled with -fPIC.
    - All 64 bit freebsd files are new and were linked with GMP 5.0.2.
-   - All existing windows files were updated with GMP 4.3.2. Just as was
+   - All previously existing windows files were updated with GMP 4.3.2. Just as was
      done for the non-windows architectures, files for 64 bit CPUs were 
      linked with GMP 5.0.2.
    - jbigi-windows-athlon64.dll was updated, it used to be duplicate of
      jbigi-windows-athlon.dll. 
+   - jbigi-windows-*_64.dll are new and were compiled with the x86_64-w64-mingw32-gcc
+     cross compiler 4.5.3 in Linux and linked with GMP 5.0.2.
    - Note that all new 64 bit files will use the _64 suffix. For example,
      the old libjbigi-linux-athlon64.so file was 64 bit; now it is 32 bit
      and the 64 bit file is libjbigi-linux-athlon64_64.so.
