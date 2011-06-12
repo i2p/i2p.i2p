@@ -161,6 +161,9 @@ public class NativeBigInteger extends BigInteger {
     private static final boolean _is64 = "64".equals(System.getProperty("sun.arch.data.model")) ||
                                          System.getProperty("os.arch").contains("64");
 
+    private static final boolean _isX86 = System.getProperty("os.arch").contains("86") ||
+	                                 System.getProperty("os.arch").equals("amd64");
+
     /* libjbigi.so vs jbigi.dll */
     private static final String _libPrefix = (_isWin || _isOS2 ? "" : "lib");
     private static final String _libSuffix = (_isWin || _isOS2 ? ".dll" : _isMac ? ".jnilib" : ".so");
@@ -168,10 +171,10 @@ public class NativeBigInteger extends BigInteger {
     private final static String sCPUType; //The CPU Type to optimize for (one of the above strings)
     
     static {
-        if (_isMac) // replace with osx/mac friendly jni cpu type detection when we have one
-            sCPUType = null;
-        else
+        if (_isX86) // Don't try to resolve CPU type on PPC and other non x86 hardware
             sCPUType = resolveCPUType();
+	else
+	    sCPUType = null;
         loadNative();
     }
     

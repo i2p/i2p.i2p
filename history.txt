@@ -1,3 +1,9 @@
+2011-06-12 kytv
+   * Add jcpuid files (32 & 64bit) for Intel Macs
+   * Compile jbigi-osx-none for Intel Macs. libjbigi-osx-none.jnilib
+     is now a fat binary combining the already existing PPC 
+     compile and my new x86 build.
+
 2011-06-11 zzz
     * i2psnark Polish translation, thanks polacco
 
