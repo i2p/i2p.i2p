@@ -55,6 +55,7 @@ public class CPUID {
     private static final boolean isLinux = System.getProperty("os.name").toLowerCase().contains("linux");
     private static final boolean isFreebsd = System.getProperty("os.name").toLowerCase().contains("freebsd");
     private static final boolean isSunos = System.getProperty("os.name").toLowerCase().contains("sunos");
+    private static final boolean isMac = System.getProperty("os.name").startsWith("Mac");
 
 
     /**
@@ -428,6 +429,11 @@ public class CPUID {
     private static final String getLibraryMiddlePart(){
         if(isWindows)
              return "jcpuid-x86-windows"; // The convention on Windows
+	if(isMac) {
+	    if(isX86) {
+	        return "jcpuid-x86-osx";  // The convention on Intel Macs
+	    }
+	}
         if(isFreebsd)
             return "jcpuid-x86-freebsd"; // The convention on freebsd...
         if(isSunos)
@@ -443,6 +449,8 @@ public class CPUID {
              return "jcpuid-x86_64-windows";
         if(isFreebsd)
             return "jcpuid-x86_64-freebsd";
+	if(isMac)
+	    return "jcpuid-x86_64-osx";
         if(isSunos)
             return "jcpuid-x86_64-solaris";
         // use linux as the default, don't throw exception
@@ -453,7 +461,9 @@ public class CPUID {
     {
         if(isWindows)
             return "dll";
-        else
+	if(isMac)
+	    return "jnilib";
+	else
             return "so";
     }
 }
