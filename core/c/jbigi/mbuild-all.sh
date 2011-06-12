@@ -1,6 +1,7 @@
 #/bin/bash
 
-# TO-DO: Darwin.
+#FIXME What platforms for MacOS?
+MISC_DARWIN_PLATFORMS=""
 
 # Note: You will have to add the CPU ID for the platform in the CPU ID code
 # for a new CPU. Just adding them here won't let I2P use the code!
@@ -42,8 +43,10 @@ X86_PLATFORMS="pentium pentiummmx pentium2 pentium3 pentiumm k6 k62 k63 athlon g
 MINGW_PLATFORMS="${X86_PLATFORMS} ${MISC_MINGW_PLATFORMS}"
 LINUX_PLATFORMS="${X86_PLATFORMS} ${MISC_LINUX_PLATFORMS}"
 FREEBSD_PLATFORMS="${X86_PLATFORMS} ${MISC_FREEBSD_PLATFORMS}"
+DARWIN_PLATFORMS="${X86_PLATFORMS} ${MISC_DARWIN_PLATFORMS}"
 
-VER=$(echo gmp-*.tar.bz2 | sed -re "s/(.*-)(.*)(.*.tar.bz2)$/\2/" | tail --lines=1)
+# OSX doesn't have the -r parameter as an option for sed.
+VER=$(echo gmp-*.tar.bz2 | sed -re "s/(.*-)(.*)(.*.tar.bz2)$/\2/" | tail -n 1)
 if [ "$VER" == "" ] ; then
 	echo "ERROR! Can't find gmp source tarball."
 	exit 1
@@ -57,6 +60,12 @@ MINGW*)
 	TYPE="dll"
 	TARGET="-windows-"
 	echo "Building windows .dlls for all architectures";;
+Darwin*)
+	PLATFORM_LIST=${DARWIN_PLATFORMS}"
+	NAME="libjbigi"
+	TYPE="jnilib"
+	TARGET="-osx-"
+	echo "Building ${TARGET} .jnilibs for all architectures";;
 Linux*)
 	NAME="libjbigi"
 	TYPE="so"
