@@ -42,6 +42,8 @@ case $HOST_OS in
         else
             wrapperpath="./lib/wrapper/linux64"
             cp ${wrapperpath}/libwrapper.so ./lib
+	    # the 32bit libwrapper.so will be needed if a 32 bit jvm is used
+	    cp ./lib/wrapper/linux/libwrapper.so ./lib/libwrapper-linux-x86-32.so
         fi
         ;;
     freebsd )
@@ -51,6 +53,8 @@ case $HOST_OS in
 	else
 	    wrapperpath="./lib/wrapper/freebsd64"
 	    cp ${wrapperpath}/libwrapper.so ./lib/
+	    # the 32bit libwrapper.so will be needed if a 32 bit jvm is used
+	    cp ./lib/freebsd/libwrapper.so ./lib/libwrapper-freebsd-x86-32.so
 	fi
         ;;
     osx )
@@ -67,7 +71,6 @@ case $HOST_OS in
         ;;
 esac
 
-#cp $wrapperpath/wrapper.jar ./lib/
 cp $wrapperpath/i2psvc .
 chmod 755 ./eepget
 chmod 755 ./i2psvc

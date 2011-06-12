@@ -151,6 +151,13 @@
 	    <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"
 		condition="is64bit" > <os family="windows" />
 		<args><arg value="$INSTALL_PATH\lib\wrapper\win64\wrapper.dll" /><arg value="$INSTALL_PATH\lib" /></args></executable>
+	     <!-- We still copy the 32 bit version of wrapper.dll (even with a
+		  64bit jvm) so that if a 32 bit jvm is installed in the
+		  future, nothing breaks.
+		  -->
+	     <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"
+                condition="is64bit" > <os family="windows" />
+                <args><arg value="$INSTALL_PATH\lib\wrapper\win32\wrapper.dll" /><arg value="$INSTALL_PATH\lib\wrapper-windows-x86-32.dll" /></args></executable>
             <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\i2prouter" /></args></executable>
             <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
