@@ -449,8 +449,11 @@ public class CPUID {
              return "jcpuid-x86_64-windows";
         if(isFreebsd)
             return "jcpuid-x86_64-freebsd";
-	if(isMac)
-	    return "jcpuid-x86_64-osx";
+	if(isMac){
+	    if(isX86){
+	        return "jcpuid-x86_64-osx";
+	    }
+	}
         if(isSunos)
             return "jcpuid-x86_64-solaris";
         // use linux as the default, don't throw exception
