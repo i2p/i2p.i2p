@@ -46,12 +46,15 @@ public class ConfigUIHelper extends HelperBase {
          return rv;
     }
 
-    private static final String langs[] = {"ar", "de", "en", "es", "fr", "nl", "pt", "ru", "sv", "zh"};
-    private static final String flags[] = {"lang_ar", "de", "us", "es", "fr", "nl", "pt", "ru", "se", "cn"};
+    private static final String langs[] = {"ar", "de", "en", "es", "fi", "fr", "it", "nl", "pl", "pt", "ru",
+                                           "sv", "vi", "zh"};
+    private static final String flags[] = {"lang_ar", "de", "us", "es", "fi", "fr", "it", "nl", "pl", "pt", "ru",
+                                           "se", "vn", "cn"};
     private static final String xlangs[] = {_x("Arabic"),
-                                            _x("German"), _x("English"), _x("Spanish"),_x("French"),
-                                            _x("Dutch"), _x("Portuguese"), _x("Russian"),
-                                            _x("Swedish"), _x("Chinese")};
+                                            _x("German"), _x("English"), _x("Spanish"),_x("Finnish"),
+                                            _x("French"), _x("Italian"), _x("Dutch"), _x("Polish"),
+                                            _x("Portuguese"), _x("Russian"), _x("Swedish"),
+                                            _x("Vietnamese"), _x("Chinese")};
 
     /** todo sort by translated string */
     public String getLangSettings() {

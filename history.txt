@@ -1,3 +1,6 @@
+2011-06-13 duck
+    * Finnish, Italian, Polish and Vietnamese translations, thanks Transifex teams
+
 2011-06-12 kytv
    * Add jcpuid files (32 & 64bit) for Intel Macs
    * Compile jbigi-osx-none for Intel Macs. libjbigi-osx-none.jnilib
