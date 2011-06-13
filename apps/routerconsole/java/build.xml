@@ -101,10 +101,10 @@
     <target name="bundle" depends="jar1, precompilejsp" >
         <!-- Update the messages_*.po files.
              We need to supply the bat file for windows, and then change the fail property to true -->
-        <exec executable="sh" osfamily="unix" failifexecutionfails="true" >
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >
             <arg value="./bundle-messages.sh" />
         </exec>
-        <exec executable="sh" osfamily="mac" failifexecutionfails="true" >
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="${require.gettext}" >
             <arg value="./bundle-messages.sh" />
         </exec>
 		<!-- multi-lang is optional -->
@@ -133,15 +133,15 @@
     <target name="poupdate" depends="precompilejsp">
         <!-- Update the messages_*.po files.
              We need to supply the bat file for windows, and then change the fail property to true -->
-        <exec executable="sh" osfamily="unix" failifexecutionfails="true" >
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="true" >
             <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>
-        <exec executable="sh" osfamily="mac" failifexecutionfails="true" >
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="true" >
             <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>
-        <exec executable="sh" osfamily="windows" failifexecutionfails="true" >
+        <exec executable="sh" osfamily="windows" failifexecutionfails="true" failonerror="true" >
             <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>

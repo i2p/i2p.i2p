@@ -13,6 +13,9 @@
         <property name="javac.classpath" value="/PATH/TO/pack200.jar" />
     -->
 
+    <!-- change this to false if you don't have gettext -->
+    <property name="require.gettext" value="true" />
+
     <!-- You probably don't want to change anything from here down -->
     <target name="help" depends="all" />
     <target name="all" >

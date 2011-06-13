@@ -9,6 +9,7 @@
     <property name="javadoc" value="javadoc"/>
 
 	<property name="javac.compilerargs" value=""/>
+	<property name="require.gettext" value="true" />
 
 	<target name="init">
 		<mkdir dir="${build}"/>
@@ -39,10 +40,10 @@
 	</target>
 
 	<target name="bundle" >
-        <exec executable="sh" osfamily="unix" failifexecutionfails="true" >
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >
             <arg value="./bundle-messages.sh" />
         </exec>
-        <exec executable="sh" osfamily="mac" failifexecutionfails="true" >
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="${require.gettext}" >
             <arg value="./bundle-messages.sh" />
         </exec>
 		<!-- multi-lang is optional -->
@@ -109,15 +110,15 @@
     </target>
 
     <target name="poupdate">
-        <exec executable="sh" osfamily="unix" failifexecutionfails="true" >
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="true" >
             <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>
-        <exec executable="sh" osfamily="mac" failifexecutionfails="true" >
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="true" >
             <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>
-        <exec executable="sh" osfamily="windows" failifexecutionfails="true" >
+        <exec executable="sh" osfamily="windows" failifexecutionfails="true" failonerror="true" >
             <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>
