@@ -297,7 +297,7 @@ msgstr "Ulosmenevä yhteys"
 msgid "They offered to introduce us (help other peers traverse our firewall)"
 msgstr ""
 "He tarjoutuivat esittelemään meidät  (auttamaan muita vertaissplmuja "
-"pääsemään palomuurin ohi)\n"
+"pääsemään palomuurin ohi)"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:532
 msgid ""
