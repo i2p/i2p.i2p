@@ -1,3 +1,6 @@
+2011-06-13 duck
+    * Finnish, Italian, Polish and Vietnamese translations, thanks Transifex teams.
+
 2011-06-13 zzz
    * To ensure we don't release bad packages, fail the build
      if gettext fails. Change property at top of build.xml if
