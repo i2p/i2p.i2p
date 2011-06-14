@@ -199,7 +199,7 @@
 
         </pack>
 
-        <pack name="Windows Service" required="no">
+        <pack name="Windows Service" required="no" preselected="no">
             <description>Automatically start I2P in the background</description>
             <os family="windows" />
             <executable targetfile="$INSTALL_PATH/set_config_dir_for_nt_service.bat" stage="postinstall" failure="warn" keep="false" />
