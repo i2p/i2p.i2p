@@ -12,13 +12,13 @@ import net.i2p.util.Log;
 public class RateStat {
     private final static Log _log = new Log(RateStat.class);
     /** unique name of the statistic */
-    private String _statName;
+    private final String _statName;
     /** grouping under which the stat is kept */
-    private String _groupName;
+    private final String _groupName;
     /** describe the stat */
-    private String _description;
+    private final String _description;
     /** actual rate objects for this statistic */
-    private Rate _rates[];
+    private final Rate _rates[];
     /** component we tell about events as they occur */
     private StatLog _statLog;
 

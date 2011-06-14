@@ -367,12 +367,8 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         long maxMemory = Runtime.getRuntime().maxMemory();
         if (maxMemory == Long.MAX_VALUE)
             maxMemory = 128*1024*1024l;
-        if (maxMemory < 64*1024*1024)
-            MAX_DB_BEFORE_SKIPPING_SEARCH = 600;
-        else if (maxMemory < 128*1024*1024)
-            MAX_DB_BEFORE_SKIPPING_SEARCH = 900;
-        else
-            MAX_DB_BEFORE_SKIPPING_SEARCH = 1250;
+        // 250 for every 32 MB, min of 250, max of 1250
+        MAX_DB_BEFORE_SKIPPING_SEARCH = (int) Math.max(250l, Math.min(1250l, maxMemory / ((32 * 1024 * 1024l) / 250)));
     }
 
     /** 

@@ -1,3 +1,87 @@
+2011-06-14 zzz
+  * Jbigi / NBI / wrapper / installer:
+    jbigi and wrapper files for arm.
+    Compiled on trimslice with gcc version 4.4.5 (Ubuntu/Linaro 4.4.4-14ubuntu5) 
+    Log postinstall errors to postinstall.log.
+  * RateStat: final
+
+2011-06-13 duck
+    * Finnish, Italian, Polish and Vietnamese translations, thanks Transifex teams.
+
+2011-06-13 zzz
+   * To ensure we don't release bad packages, fail the build
+     if gettext fails. Change property at top of build.xml if
+     you don't have gettext and want the build to continue.
+
+2011-06-12 kytv
+   * Add jcpuid files (32 & 64bit) for Intel Macs
+   * Compile jbigi-osx-none for Intel Macs. libjbigi-osx-none.jnilib
+     is now a fat binary combining the already existing PPC 
+     compile and my new x86 build.
+	
+2011-06-11 zzz
+    * i2psnark Polish translation, thanks polacco
+
+2011-06-10 zzz
+    * CPUID, NativeBigI: Add support for atom, core2, corei, nano, pentiumm, geode
+    * Random: Add config setting prng.bufferSize to override the default 256 KB
+    * JBigI:
+      - Add new libjbigi-linux-xxx.so files built by sponge, now that we have
+        CPUID.java support for them (thanks hottuna).
+        See http://zzz.i2p/topics/306 for discussion and test results.
+
+        64-bit processors (atom, core2, corei, nano):
+        Built with GMP 5.0.2. License is LGPLv3.
+        Built by sponge with GCC 4.4.4, downloaded from
+        http://sponge.i2p/files/jbigi/gmp-5.0.2/
+        For 64-bit processors, both performance testing and
+        the GMP changelog http://gmplib.org/gmp5.0.html led us to use 5.0.2
+        for both the 32- and 64-bit versions, even though the files are twice as big.
+        5.0.x contains specific optimizations for atom and nano.
+        All 64-bit libs have _64 appended.
+
+        32-bit processors (pentiumm, geode):
+        Built with GMP 4.3.2. License is LGPLv3.
+        Built by sponge with GCC 4.4.4, downloaded from
+        http://sponge.i2p/files/jbigi/gmp-4.3.2/
+        The 4.3.2 files are half the size of those built with GMP 5.0.2, and there was
+        little or no performance difference between the two versions for 32 bit processors.
+    * NBI: Enable 64-bit processor detection
+    * Profiles: Skip and delete a corrupt profile read from disk
+
+2011-06-10 kytv
+   * jcpuid & jbigi added for 64bit Windows (only used with a 64bit jvm).
+
+2011-06-09 kytv
+   * Added an x64 wrapper for Windows. This is needed because a 32bit wrapper
+     cannot start a 64bit JVM.
+
+2011-06-08 zzz
+    * Build:
+      - Add standard manifest to jbigi.jar
+      - Don't do 'mtn list changed' if not in a workspace or not needed
+    * LogManager: Use DataHelper methods for loading and storing config
+
+2011-06-08 kytv
+    * Update jbigi/jcpuid Windows dlls. As was done for FreeBSD and Linux, the 
+      libraries for 32bit CPUs were linked against gmp-4.3.2 and those for the 
+      64bit CPUs were linked against gmp-5.0.2.
+
+2011-06-07 kytv
+    * Upgrade the wrapper to 3.5.9. Noticable changes include:
+      - FreeBSD amd64 is now a supported arch along with i386. To use the wrapper
+        with the most recent version of FreeBSD the port 'misc/compat6x' will need
+        to be installed.
+      - OSX: Both Intel and PPC Macs are supported. 32-bit support. If you'd like 64-bit
+        support, please file a bug in trac with the output of "uname -m".
+    * Upgrade jbigi/jcpuid for FreeBSD i386 and add support for amd64. As was done with 
+      the Linux compiles, 32bit compiles were linked with gmp 4.3.2 and 64 bit builds
+      (as well as 32bit builds for 64bit cpus) were linked against gmp 5.0.2.
+
+2011-06-06 zzz
+    * Drop andorid/ directory; further development will happen in
+      an android-only branch.
+
 2011-06-05 zzz
     * Console: Tag stat descriptions at declaration rather than in Strings.java
     * Data: Remove duplicate signature verification code
@@ -13,7 +97,7 @@
         The 4.3.2 files are half the size of those built with GMP 5.0.2, and there was
         little or no performance difference between the two versions for 32 bit processors.
         See http://zzz.i2p/topics/306 for discussion and test results.
-      - Replace old non-PIC 62-bit linux libs (GMP 4.1.4 built in 2005)
+      - Replace old non-PIC 64-bit linux libs (GMP 4.1.4 built in 2005)
         with PIC libs built with GMP 5.0.2. License is LGPLv3.
         Built by sponge with GCC 4.4.4, downloaded from
         http://sponge.i2p/files/jbigi/gmp-5.0.2/

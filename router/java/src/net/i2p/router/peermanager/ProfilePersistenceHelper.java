@@ -269,8 +269,9 @@ class ProfilePersistenceHelper {
                 _log.debug("Loaded the profile for " + peer.toBase64() + " from " + file.getName());
             
             return profile;
-        } catch (IllegalArgumentException iae) {
-            _log.error("Error loading profile from " +file.getName(), iae);
+        } catch (Exception e) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Error loading properties from " + file.getAbsolutePath(), e);
             file.delete();
             return null;
         }
@@ -300,7 +301,7 @@ class ProfilePersistenceHelper {
         return 0.0;
     }
     
-    private void loadProps(Properties props, File file) {
+    private void loadProps(Properties props, File file) throws IOException {
         InputStream fin = null;
         try {
             fin = new BufferedInputStream(new FileInputStream(file), 1);
@@ -318,9 +319,6 @@ class ProfilePersistenceHelper {
                     _log.info("Loading compressed profile data from " + file.getName());
                 DataHelper.loadProps(props, new GZIPInputStream(fin));
             }
-        } catch (IOException ioe) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Error loading properties from " + file.getName(), ioe);
         } finally {
             try {
                 if (fin != null) fin.close();

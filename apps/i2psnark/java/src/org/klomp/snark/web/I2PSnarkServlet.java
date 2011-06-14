@@ -1038,6 +1038,8 @@ public class I2PSnarkServlet extends Default {
                     client = "Robert";
                 else if (ch.startsWith("LV")) // LVCS 1.0.2?; LVRS 1.0.4
                     client = "Transmission";
+                else if ("LUtU".equals(ch))
+                    client = "KTorrent";
                 else
                     client = _("Unknown") + " (" + ch + ')';
                 out.write(client + "&nbsp;&nbsp;<tt>" + peer.toString().substring(5, 9)+ "</tt>");

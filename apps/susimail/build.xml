@@ -5,7 +5,10 @@
     <target name="builddep">
         <!-- run from top level build.xml to get dependencies built -->
     </target>
+
     <property name="javac.compilerargs" value="" />
+    <property name="require.gettext" value="true" />
+
     <target name="compile">
         <javac 
             srcdir="./src/src"
@@ -22,7 +25,7 @@
     </target>
     <target name="jar" depends="compile, war" />
 
-    <target name="war" depends="compile, bundle, warUpToDate" unless="war.uptodate" >
+    <target name="listChangedFiles" depends="warUpToDate" if="shouldListChanges" >
         <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
             <arg value="list" />
             <arg value="changed" />
@@ -34,6 +37,11 @@
             <arg value="[:space:]" />
             <arg value="," />
         </exec>
+    </target>
+
+    <target name="war" depends="compile, bundle, warUpToDate, listChangedFiles" unless="war.uptodate" >
+        <!-- set if unset -->
+        <property name="workspace.changes.tr" value="" />
         <war destfile="susimail.war" webxml="src/WEB-INF/web.xml"
              basedir="src/" excludes="WEB-INF/web.xml LICENSE src/**/*">
             <manifest>
@@ -48,15 +56,23 @@
         <uptodate property="war.uptodate" targetfile="susimail.war">
             <srcfiles dir= "src" excludes="LICENSE src/**/*" />
         </uptodate>
+        <condition property="shouldListChanges" >
+            <and>
+                <not>
+                    <isset property="war.uptodate" />
+                </not>
+                <isset property="mtn.available" />
+            </and>
+        </condition>
     </target>
 
     <target name="bundle" depends="compile">
         <!-- Update the messages_*.po files.
              We need to supply the bat file for windows, and then change the fail property to true -->
-        <exec executable="sh" osfamily="unix" failifexecutionfails="true" >
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >
             <arg value="./bundle-messages.sh" />
         </exec>
-        <exec executable="sh" osfamily="mac" failifexecutionfails="true" >
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="${require.gettext}" >
             <arg value="./bundle-messages.sh" />
         </exec>
         <!-- multi-lang is optional -->
@@ -67,15 +83,15 @@
 
     <target name="poupdate" depends="builddep, compile">
         <!-- Update the messages_*.po files.  -->
-        <exec executable="sh" osfamily="unix" failifexecutionfails="true" >
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="true" >
             <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>
-        <exec executable="sh" osfamily="mac" failifexecutionfails="true" >
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="true" >
             <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>
-        <exec executable="sh" osfamily="windows" failifexecutionfails="true" >
+        <exec executable="sh" osfamily="windows" failifexecutionfails="true" failonerror="true" >
             <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>

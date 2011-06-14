@@ -22,7 +22,10 @@
             </classpath>
         </depend>
     </target>
+
     <property name="javac.compilerargs" value="" />
+    <property name="require.gettext" value="true" />
+
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
@@ -36,7 +39,7 @@
         </javac>
     </target>
 
-    <target name="jar" depends="builddep, compile, jarUpToDate" unless="jar.uptodate" >
+    <target name="listChangedFiles" depends="jarUpToDate" if="shouldListChanges" >
         <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
             <arg value="list" />
             <arg value="changed" />
@@ -48,6 +51,11 @@
             <arg value="[:space:]" />
             <arg value="," />
         </exec>
+    </target>
+
+    <target name="jar" depends="builddep, compile, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
+        <!-- set if unset -->
+        <property name="workspace.changes.tr" value="" />
         <jar destfile="./build/i2psnark.jar" basedir="./build/obj" includes="**/*.class" excludes="**/I2PSnarkServlet*.class **/messages_*.class">
             <manifest>
                 <attribute name="Main-Class" value="org.klomp.snark.Snark" />
@@ -63,6 +71,17 @@
         <uptodate property="jar.uptodate" targetfile="build/i2psnark.jar" >
             <srcfiles dir= "build/obj" includes="**/*.class" excludes="**/I2PSnarkServlet*.class **/messages_*.class" />
         </uptodate>
+        <condition property="shouldListChanges" >
+            <and>
+                <not>
+                    <isset property="jar.uptodate" />
+                </not>
+                <not>
+                    <isset property="wjar.uptodate" />
+                </not>
+                <isset property="mtn.available" />
+            </and>
+        </condition>
     </target>    
 
     <!-- Ideally we would include
@@ -72,7 +91,9 @@
       -  So we must continue to duplicate everything in the war.
           <classes dir="./build/obj" includes="**/I2PSnarkServlet*.class" />
      -->
-    <target name="war" depends="jar, bundle, warUpToDate" unless="war.uptodate" > 
+    <target name="war" depends="jar, bundle, warUpToDate, listChangedFiles" unless="war.uptodate" > 
+        <!-- set if unset -->
+        <property name="workspace.changes.tr" value="" />
         <war destfile="../i2psnark.war" webxml="../web.xml" basedir="../" includes="_icons/*" >
           <!-- include only the web stuff, as of 0.7.12 the router will add i2psnark.jar to the classpath for the war -->
           <classes dir="./build/obj" includes="**/web/*.class" />
@@ -93,10 +114,10 @@
     <target name="bundle" depends="compile">
         <!-- Update the messages_*.po files.
              We need to supply the bat file for windows, and then change the fail property to true -->
-        <exec executable="sh" osfamily="unix" failifexecutionfails="true" >
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >
             <arg value="./bundle-messages.sh" />
         </exec>
-        <exec executable="sh" osfamily="mac" failifexecutionfails="true" >
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="${require.gettext}" >
             <arg value="./bundle-messages.sh" />
         </exec>
 		<!-- multi-lang is optional -->
@@ -107,15 +128,15 @@
 
     <target name="poupdate" depends="builddep, compile">
         <!-- Update the messages_*.po files.  -->
-        <exec executable="sh" osfamily="unix" failifexecutionfails="true" >
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="true" >
             <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>
-        <exec executable="sh" osfamily="mac" failifexecutionfails="true" >
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="true" >
             <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>
-        <exec executable="sh" osfamily="windows" failifexecutionfails="true" >
+        <exec executable="sh" osfamily="windows" failifexecutionfails="true" failonerror="true" >
             <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>

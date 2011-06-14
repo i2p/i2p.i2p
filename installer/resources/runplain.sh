@@ -19,7 +19,7 @@ I2PTEMP="%SYSTEM_java_io_tmpdir"
 PREFERv4="false"
 CP=
 
-for jars in `ls ${I2P}/lib/*.jar`; do CP=${CP}:${jars}; echo $CP; done
+for jars in `ls ${I2P}/lib/*.jar`; do CP=${CP}:${jars}; done
 JAVA=java
 
 JAVAOPTS="-Djava.net.preferIPv4Stack=${PREFERv4} -Djava.library.path=${I2P}:${I2P}/lib -Di2p.dir.base=${I2P} -DloggerFilenameOverride=logs/log-router-@.txt"

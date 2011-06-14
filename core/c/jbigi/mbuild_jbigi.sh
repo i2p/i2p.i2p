@@ -1,7 +1,7 @@
 #!/bin/bash
-# When executed in Mingw: Produces an jbigi.dll
-# When executed in Linux/FreeBSD: Produces an libjbigi.so
-# What does Darwin produce? libjbigi.jnilib?
+# When executed in Mingw: Produces a jbigi.dll
+# When executed in Linux/FreeBSD: Produces a libjbigi.so
+# When executed in OSX: Produces a libjbigi.jnilib
 CC="gcc"
 
 case `uname -sr` in
@@ -18,8 +18,8 @@ CYGWIN*)
 	LINKFLAGS="-shared -Wl,--kill-at"
 	LIBFILE="jbigi.dll";;
 Darwin*)
-        JAVA_HOME="/Library/Java/Home"
-        COMPILEFLAGS="-Wall"
+	JAVA_HOME=$(/usr/libexec/java_home)
+        COMPILEFLAGS="-fPIC -Wall"
         INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include"
         LINKFLAGS="-dynamiclib -framework JavaVM"
         LIBFILE="libjbigi.jnilib";;

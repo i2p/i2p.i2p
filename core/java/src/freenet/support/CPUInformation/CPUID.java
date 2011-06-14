@@ -9,9 +9,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.HashMap;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.FileUtil;
+
 
 /**
  * @author Iakin
@@ -53,7 +55,9 @@ public class CPUID {
     private static final boolean isLinux = System.getProperty("os.name").toLowerCase().contains("linux");
     private static final boolean isFreebsd = System.getProperty("os.name").toLowerCase().contains("freebsd");
     private static final boolean isSunos = System.getProperty("os.name").toLowerCase().contains("sunos");
-    
+    private static final boolean isMac = System.getProperty("os.name").startsWith("Mac");
+
+
     /**
      * This isn't always correct.
      * http://stackoverflow.com/questions/807263/how-do-i-detect-which-kind-of-jre-is-installed-32bit-vs-64bit
@@ -70,12 +74,9 @@ public class CPUID {
     static
     {
         loadNative();
-    }
-    
-    /**
-     * A class that can (amongst other things I assume) represent the state of the
-     * different CPU registers after a call to the CPUID assembly method
-     */
+    }    
+    //A class that can (amongst other things I assume) represent the state of the
+    //different CPU registers after a call to the CPUID assembly method
     protected static class CPUIDResult {
         final int EAX;
         final int EBX;
@@ -97,7 +98,8 @@ public class CPUID {
      */
     private static native CPUIDResult doCPUID(int iFunction);
 
-    private static String getCPUVendorID()
+
+    public static String getCPUVendorID()
     {
         CPUIDResult c = doCPUID(0);
         StringBuilder sb= new StringBuilder(13);
@@ -118,71 +120,74 @@ public class CPUID {
     
         return sb.toString();
     }
-    private static int getCPUFamily()
+    public static int getCPUFamily()
     {
         CPUIDResult c = doCPUID(1);
         return (c.EAX >> 8) & 0xf;
     }
-    private static int getCPUModel()
+    public static int getCPUModel()
     {
         CPUIDResult c = doCPUID(1);
         return (c.EAX >> 4) & 0xf;
     }
-    private static int getCPUExtendedModel()
+    public static int getCPUExtendedModel()
     {
         CPUIDResult c = doCPUID(1);
         return (c.EAX >> 16) & 0xf;
     }
-    private static int getCPUType()
+    public static int getCPUType()
     {
         CPUIDResult c = doCPUID(1);
         return (c.EAX >> 12) & 0xf;
     }
-    private static int getCPUExtendedFamily()
+    public static int getCPUExtendedFamily()
     {
         CPUIDResult c = doCPUID(1);
         return (c.EAX >> 20) & 0xff;
     }
-    private static int getCPUStepping()
+    public static int getCPUStepping()
     {
         CPUIDResult c = doCPUID(1);
         return c.EAX & 0xf;
     }
-    private static int getEDXCPUFlags()
+    public static int getEDXCPUFlags()
     {
         CPUIDResult c = doCPUID(1);
         return c.EDX;
     }
-    private static int getECXCPUFlags()
+    public static int getECXCPUFlags()
     {
         CPUIDResult c = doCPUID(1);
         return c.ECX;
     }
-    private static int getExtendedEDXCPUFlags()
+    public static int getExtendedEBXCPUFlags()
     {
         CPUIDResult c = doCPUID(0x80000001);
-        return c.EDX;
+        return c.EBX;    
     }
-    private static int getExtendedECXCPUFlags()
+    public static int getExtendedECXCPUFlags()
     {
         CPUIDResult c = doCPUID(0x80000001);
         return c.ECX;
+    }
+    public static int getExtendedEDXCPUFlags()
+    {
+        CPUIDResult c = doCPUID(0x80000001);
+        return c.EDX;
     }
     
-    /**
-     * Returns a CPUInfo item for the current type of CPU
-     * If I could I would declare this method in a interface named
-     * CPUInfoProvider and implement that interface in this class.
-     * This would make it easier for other people to understand that there
-     * is nothing preventing them from coding up new providers, probably using
-     * other detection methods than the x86-only CPUID instruction
-     */
+    //Returns a CPUInfo item for the current type of CPU
+    //If I could I would declare this method in a interface named
+    //CPUInfoProvider and implement that interface in this class.
+    //This would make it easier for other people to understand that there
+    //is nothing preventing them from coding up new providers, probably using
+    //other detection methods than the x86-only CPUID instruction
     public static CPUInfo getInfo() throws UnknownCPUException
     {
         if(!_nativeOk)
             throw new UnknownCPUException("Failed to read CPU information from the system. Please verify the existence of the jcpuid dll/so.");
         if(getCPUVendorID().equals("CentaurHauls"))
-            return new VIAC3Impl();
+            return new VIAInfoImpl();
         if(!isX86)
             throw new UnknownCPUException("Failed to read CPU information from the system. The CPUID instruction exists on x86 CPU's only");
         if(getCPUVendorID().equals("AuthenticAMD"))
@@ -192,303 +197,6 @@ public class CPUID {
         throw new UnknownCPUException("Unknown CPU type: '"+getCPUVendorID()+"'");
     }
     
-    protected abstract static class CPUIDCPUInfo
-    {
-        public String getVendor()
-        {
-            return getCPUVendorID();
-        }
-        public boolean hasMMX(){
-            return (getEDXCPUFlags() & 0x800000) >0; //EDX Bit 23
-        }
-        public boolean hasSSE(){
-            return (getEDXCPUFlags() & 0x2000000) >0; //EDX Bit 25
-        }
-        public boolean hasSSE2(){
-            return (getEDXCPUFlags() & 0x4000000) >0; //EDX Bit 26
-        }
-        public boolean hasSSE3(){
-            return (getEDXCPUFlags() & 0x1) >0; //ECX Bit 0
-        }
-        public boolean hasSSE41(){
-            return (getEDXCPUFlags() & 0x80000) >0; //ECX Bit 19
-        }
-        public boolean hasSSE42(){
-            return (getEDXCPUFlags() & 0x100000) >0; //ECX Bit 20
-        }
-        public boolean hasSSE4A(){
-            return (getExtendedECXCPUFlags() & 0x40) >0; //Extended ECX Bit 6
-        }
-        public boolean IsC3Compatible() { return false; }
-    }
-    protected static class VIAC3Impl extends CPUIDCPUInfo implements CPUInfo {
-        @Override
-        public boolean IsC3Compatible() { return true; }
-        public String getCPUModelString() { return "VIA C3"; }
-    }
-    protected static class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
-    {
-        public boolean IsK6Compatible()
-        {
-            return getCPUFamily() >= 5 && getCPUModel() >= 6;
-        }
-        public boolean IsK6_2_Compatible()
-        {
-            return getCPUFamily() >= 5 && getCPUModel() >= 8;
-        }
-        public boolean IsK6_3_Compatible()
-        {
-            return getCPUFamily() >= 5 && getCPUModel() >= 9;
-        }
-        public boolean IsAthlonCompatible()
-        {
-            return getCPUFamily() >= 6;
-        }
-        public boolean IsAthlon64Compatible()
-        {
-            return getCPUFamily() == 15 && getCPUExtendedFamily() == 0;
-        }
-
-        public String getCPUModelString() throws UnknownCPUException
-        {
-            if(getCPUFamily() == 4){
-                switch(getCPUModel()){
-                    case 3:
-                        return "486 DX/2";
-                    case 7:
-                        return "486 DX/2-WB";
-                    case 8:
-                        return "486 DX/4";
-                    case 9:
-                        return "486 DX/4-WB";
-                    case 14:
-                        return "Am5x86-WT";
-                    case 15:
-                        return "Am5x86-WB";
-                }
-            }
-            if(getCPUFamily() == 5){
-                switch(getCPUModel()){
-                    case 0:
-                        return "K5/SSA5";
-                    case 1:
-                        return "K5";
-                    case 2:
-                        return "K5";
-                    case 3:
-                        return "K5";
-                    case 6:
-                        return "K6";
-                    case 7:
-                        return "K6";
-                    case 8:
-                        return "K6-2";
-                    case 9:
-                        return "K6-3";
-                    case 13:
-                        return "K6-2+ or K6-III+";
-                }
-            }
-            if(getCPUFamily() == 6){
-                switch(getCPUModel()){
-                    case 0:
-                        return "Athlon (250 nm)";
-                    case 1:
-                        return "Athlon (250 nm)";
-                    case 2:
-                        return "Athlon (180 nm)";
-                    case 3:
-                        return "Duron";
-                    case 4:
-                        return "Athlon (Thunderbird)";
-                    case 6:
-                        return "Athlon (Palamino)";
-                    case 7:
-                        return "Duron (Morgan)";
-                    case 8:
-                        return "Athlon (Thoroughbred)";
-                    case 10:
-                        return "Athlon (Barton)";
-                }
-            }
-            if(getCPUFamily() == 15){
-                if(getCPUExtendedFamily() == 0){
-                    switch(getCPUModel()){
-                        case 4:
-                            return "Athlon 64";
-                        case 5:
-                            return "Athlon 64 FX Opteron";
-                        case 12:
-                            return "Athlon 64";
-                        default: // is this safe?
-                            return "Athlon 64 (unknown)";
-                    }
-                }
-            }
-            throw new UnknownCPUException("Unknown AMD CPU; Family="+getCPUFamily()+", Model="+getCPUModel());
-        }
-    }
-
-    protected static class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
-    {
-        public boolean IsPentiumCompatible()
-        {
-            return getCPUFamily() >= 5;
-        }
-        public boolean IsPentiumMMXCompatible()
-        {
-            return IsPentium2Compatible() || (getCPUFamily() == 5 && (getCPUModel() ==4 || getCPUModel() == 8));
-        }
-        public boolean IsPentium2Compatible()
-        {
-            return getCPUFamily() > 6 || (getCPUFamily() == 6 && getCPUModel() >=3);
-        }
-        public boolean IsPentium3Compatible()
-        {	
-		// Atom
-		if (getCPUExtendedModel() == 1 && (getCPUFamily() == 6 && (getCPUModel() == 12))){
-			return true;
-		// ??
-		} else if (getCPUExtendedModel() == 0 && (getCPUFamily() > 6 || (getCPUFamily() == 6 && getCPUModel() >=7))){
-			return true;
-		} else {
-			return false;
-		}
-        }
-        public boolean IsPentium4Compatible()
-        {	
-		// P4
-        	if (getCPUFamily() >= 15){
-        		return true;
-		// Xeon MP (45nm) or Core i7
-        	} else if (getCPUExtendedModel() == 1 && (getCPUFamily() == 6 && (getCPUModel() == 10 || getCPUModel() == 13))){
-        		return true;
-		// Core 2 Duo
-        	} else if (getCPUExtendedModel() == 0 && getCPUFamily() == 6 && getCPUModel() == 15){
-        		return true;
-        	} else {
-        		return false;
-        	}
-        }
-        public String getCPUModelString() throws UnknownCPUException {
-        	if (getCPUExtendedModel() == 0){
-	            if(getCPUFamily() == 4){
-	                switch(getCPUModel()){
-	                    case 0:
-	                        return "486 DX-25/33";
-	                    case 1:
-	                        return "486 DX-50";
-	                    case 2:
-	                        return "486 SX";
-	                    case 3:
-	                        return "486 DX/2";
-	                    case 4:
-	                        return "486 SL";
-	                    case 5:
-	                        return "486 SX/2";
-	                    case 7:
-	                        return "486 DX/2-WB";
-	                    case 8:
-	                        return "486 DX/4";
-	                    case 9:
-	                        return "486 DX/4-WB";
-	                }
-	            }
-        	}
-            if (getCPUExtendedModel() == 0){
-	            if(getCPUFamily() == 5){
-	                switch(getCPUModel()){
-	                    case 0:
-	                        return "Pentium 60/66 A-step";
-	                    case 1:
-	                        return "Pentium 60/66";
-	                    case 2:
-	                        return "Pentium 75 - 200";
-	                    case 3:
-	                        return "OverDrive PODP5V83";
-	                    case 4:
-	                        return "Pentium MMX";
-	                    case 7:
-	                        return "Mobile Pentium 75 - 200";
-	                    case 8:
-	                        return "Mobile Pentium MMX";
-	                }
-	            }
-            }
-            if(getCPUFamily() == 6){
-            	if (getCPUExtendedModel() == 0){
-	                switch(getCPUModel()){
-	                    case 0:
-	                        return "Pentium Pro A-step";
-	                    case 1:
-	                        return "Pentium Pro";
-	                    case 3:
-	                        return "Pentium II (Klamath)";
-	                    case 5:
-	                        return "Pentium II (Deschutes), Celeron (Covington), Mobile Pentium II (Dixon)";
-	                    case 6:
-	                        return "Mobile Pentium II, Celeron (Mendocino)";
-	                    case 7:
-	                        return "Pentium III (Katmai)";
-	                    case 8:
-	                        return "Pentium III (Coppermine), Celeron w/SSE";
-	                    case 9:
-	                        return "Mobile Pentium III (Banias)";
-	                    case 10:
-	                        return "Pentium III Xeon (Cascades)";
-	                    case 11:
-	                        return "Pentium III (130 nm)";
-	                    case 13:
-	                        return "Mobile Pentium III (Dothan)";
-	                    case 14:
-	                        return "Mobile Core (Yonah)";
-	                    case 15:
-	                        return "Core 2 (Conroe)";
-	                }
-            	} else {
-		    	if (getCPUExtendedModel() == 1){
-		    		 switch(getCPUModel()){
-		    		 	case 10:
-		    		 		return "Core i7";
-		    		 	case 12:
-		    		 		return "Atom";
-		    		 	case 13:
-		    		 		return "Xeon MP";
-		    		 }
-		    	}
-		}
-            }
-            if(getCPUFamily() == 7){
-                switch(getCPUModel()){
-                    //Itanium.. TODO
-                }
-            }
-            if(getCPUFamily() == 15){
-                if(getCPUExtendedFamily() == 0){
-                    switch(getCPUModel()){
-                        case 0:
-                            return "Pentium IV (180 nm)";
-                        case 1:
-                            return "Pentium IV (180 nm)";
-                        case 2:
-                            return "Pentium IV (130 nm)";
-                        case 3:
-                            return "Pentium IV (90 nm)";
-                        case 4:
-                            return "Pentium IV (90 nm)";
-                        case 6:
-                            return "Pentium IV (65 nm)";
-                    }
-                }
-                if(getCPUExtendedFamily() == 1){
-                    switch(getCPUModel()){
-                        //    Itanium 2.. TODO
-                    }    
-                }
-            }
-            throw new UnknownCPUException("Unknown Intel CPU; Family="+getCPUFamily()+", Model="+getCPUModel());
-        }
-    }
 
     public static void main(String args[])
     {
@@ -518,6 +226,9 @@ public class CPUID {
             System.out.println("  Is pII-compatible: "+((IntelCPUInfo)c).IsPentium2Compatible());
             System.out.println("  Is pIII-compatible: "+((IntelCPUInfo)c).IsPentium3Compatible());
             System.out.println("  Is pIV-compatible: "+((IntelCPUInfo)c).IsPentium4Compatible());
+            System.out.println("  Is atom-compatible: "+((IntelCPUInfo)c).IsAtomCompatible());
+            System.out.println("  Is core2-compatible: "+((IntelCPUInfo)c).IsCore2Compatible());
+            System.out.println("  Is corei-compatible: "+((IntelCPUInfo)c).IsCoreiCompatible());
         }
         if(c instanceof AMDCPUInfo){
             System.out.println("  **AMD-info**");
@@ -665,9 +376,9 @@ public class CPUID {
             System.load(outFile.getAbsolutePath());//System.load requires an absolute path to the lib
         } catch (UnsatisfiedLinkError ule) {
             if (_doLog) {
-                System.err.println("ERROR: The resource " + resourceName 
-                                   + " was not a valid library for this platform");
-                ule.printStackTrace();
+                System.err.println("WARNING: The resource " + resourceName 
+                                   + " was not a valid library for this platform " + ule);
+                //ule.printStackTrace();
             }
             if (outFile != null)
                 outFile.delete();
@@ -718,10 +429,15 @@ public class CPUID {
     private static final String getLibraryMiddlePart(){
         if(isWindows)
              return "jcpuid-x86-windows"; // The convention on Windows
+	if(isMac) {
+	    if(isX86) {
+	        return "jcpuid-x86-osx";  // The convention on Intel Macs
+	    }
+	}
         if(isFreebsd)
             return "jcpuid-x86-freebsd"; // The convention on freebsd...
-	if(isSunos)
-	    return "jcpuid-x86-solaris"; // The convention on SunOS
+        if(isSunos)
+            return "jcpuid-x86-solaris"; // The convention on SunOS
         //throw new RuntimeException("Dont know jcpuid library name for os type '"+System.getProperty("os.name")+"'");
         // use linux as the default, don't throw exception
         return "jcpuid-x86-linux";
@@ -733,8 +449,13 @@ public class CPUID {
              return "jcpuid-x86_64-windows";
         if(isFreebsd)
             return "jcpuid-x86_64-freebsd";
-	if(isSunos)
-	    return "jcpuid-x86_64-solaris";
+	if(isMac){
+	    if(isX86){
+	        return "jcpuid-x86_64-osx";
+	    }
+	}
+        if(isSunos)
+            return "jcpuid-x86_64-solaris";
         // use linux as the default, don't throw exception
         return "jcpuid-x86_64-linux";
     }
@@ -743,7 +464,9 @@ public class CPUID {
     {
         if(isWindows)
             return "dll";
-        else
+	if(isMac)
+	    return "jnilib";
+	else
             return "so";
     }
 }

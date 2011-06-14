@@ -1,0 +1,57 @@
+# I2P
+# Copyright (C) 2009 The I2P Project
+# This file is distributed under the same license as the desktopgui package.
+# To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
+#   <b790979@klzlk.com>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
+"POT-Creation-Date: 2011-03-03 18:29+0000\n"
+"PO-Revision-Date: 2011-05-25 18:36+0000\n"
+"Last-Translator: PolishAnon <b790979@klzlk.com>\n"
+"Language-Team: Polish (http://www.transifex.net/projects/p/I2P/team/pl/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: pl\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:23
+msgid "Start I2P"
+msgstr "Uruchom I2P"
+
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:38
+msgid "I2P is starting!"
+msgstr "Uruchamianie I2P!"
+
+#: src/net/i2p/desktopgui/ExternalTrayManager.java:38
+msgid "Starting"
+msgstr "Uruchamianie"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:26
+msgid "Launch I2P Browser"
+msgstr "Uruchom Przeglądarke I2P"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:50
+msgid "Configure desktopgui"
+msgstr "Skonfiguruj intrefejs pulpitu (desktopgui)"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:67
+msgid "Restart I2P"
+msgstr "Zrestartuj I2P"
+
+#: src/net/i2p/desktopgui/InternalTrayManager.java:85
+msgid "Stop I2P"
+msgstr "Zatrzymaj I2P"
+
+#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:44
+msgid "Tray icon configuration"
+msgstr "Konfiguracja ikony zasobnika"
+
+#: src/net/i2p/desktopgui/gui/DesktopguiConfigurationFrame.java:47
+msgid "Should tray icon be enabled?"
+msgstr "Czy ikona zasobnika powinna być aktywna?"
+
+

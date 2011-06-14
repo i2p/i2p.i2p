@@ -8,7 +8,12 @@ package freenet.support.CPUInformation;
  *
  */
 public class UnknownCPUException extends RuntimeException {
-    public UnknownCPUException() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5166144274582583742L;
+
+	public UnknownCPUException() {
         super();
     }
 
