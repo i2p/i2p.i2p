@@ -1,3 +1,10 @@
+2011-06-14 zzz
+  * Jbigi / NBI / wrapper / installer:
+    jbigi and wrapper files for arm.
+    Compiled on trimslice with gcc version 4.4.5 (Ubuntu/Linaro 4.4.4-14ubuntu5) 
+    Log postinstall errors to postinstall.log.
+  * RateStat: final
+
 2011-06-13 duck
     * Finnish, Italian, Polish and Vietnamese translations, thanks Transifex teams.
 

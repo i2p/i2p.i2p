@@ -23,11 +23,15 @@ chmod 755 ./runplain.sh
 # chmod 755 ./uninstall_i2p_service_unix
 
 ERROR_MSG="Cannot determine operating system type. From the subdirectory in lib/wrapper matching your operating system, please move i2psvc to your base I2P directory, and move the remaining two files to the lib directory."
+LOGFILE=./postinstall.log
 
 HOST_OS=`./osid`
 
-if [ "X$HOST_OS" = "X" -o $HOST_OS = "unknown" ]; then
+if [ "X$HOST_OS" = "X" -o "X$HOST_OS" = "Xunknown" ]; then
     echo "$ERROR_MSG"
+    echo "Host OS is $HOST_OS" >> $LOGFILE
+    echo "Host architecture is $OS_ARCH" >> $LOGFILE
+    echo "$ERROR_MSG" >> $LOGFILE
     exit 1
 fi
 
@@ -36,7 +40,10 @@ X86_64=`echo "${OS_ARCH}" | grep x86_64`
 
 case $HOST_OS in
     debian | fedora | gentoo | linux | mandrake | redhat | suse )
-        if [ "X$X86_64" = "X" ]; then
+	if [ `echo $OS_ARCH |grep arm` ]; then
+            wrapperpath="./lib/wrapper/linux-arm"
+            cp ${wrapperpath}/libwrapper.so ./lib/
+        elif [ "X$X86_64" = "X" ]; then
             wrapperpath="./lib/wrapper/linux"
             cp ${wrapperpath}/libwrapper.so ./lib/
         else
@@ -47,7 +54,7 @@ case $HOST_OS in
         fi
         ;;
     freebsd )
-	if [ ! `uname -m |grep amd64` ]; then
+	if [ ! `echo $OS_ARCH | grep amd64` ]; then
 	    wrapperpath="./lib/wrapper/freebsd"
 	    cp ${wrapperpath}/libwrapper.so ./lib/
 	else
@@ -67,6 +74,9 @@ case $HOST_OS in
         ;;
     * )
         echo "${ERROR_MSG}"
+        echo "Host OS is $HOST_OS" >> $LOGFILE
+        echo "Host architecture is $OS_ARCH" >> $LOGFILE
+        echo "$ERROR_MSG" >> $LOGFILE
         exit 1
         ;;
 esac

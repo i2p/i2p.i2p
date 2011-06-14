@@ -493,6 +493,9 @@
         <copy todir="pkg-temp/lib/wrapper/solaris/">
             <fileset dir="installer/lib/wrapper/solaris/" />
         </copy>
+        <copy todir="pkg-temp/lib/wrapper/linux-arm/">
+            <fileset dir="installer/lib/wrapper/linux-arm/" />
+        </copy>
     </target>
 
     <target name="preppkg-windows" depends="preppkg-base, buildexe">
@@ -521,6 +524,7 @@
         <copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
     </target>
 
+    <!-- x86 linux only -->
     <target name="preppkg-linux" depends="preppkg-base">
         <copy file="installer/resources/runplain.sh" todir="pkg-temp/" />
 	<!-- <copy file="apps/i2psnark/launch-i2psnark" todir="pkg-temp/" /> old feature that per zzz isn't used-->

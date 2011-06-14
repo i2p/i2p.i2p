@@ -140,6 +140,15 @@ public class NativeBigInteger extends BigInteger {
     /** all libjbibi builds are identical to pentium3, case handled in getMiddleName2() */
     private final static String JBIGI_OPTIMIZATION_VIAC32     = "viac32";
 
+    /**
+     * Non-x86, no fallbacks to older libs or to "none"
+     * @since 0.8.7
+     */
+    private final static String JBIGI_OPTIMIZATION_ARM        = "arm";
+
+    /**
+     * Operating systems
+     */
     private static final boolean _isWin = System.getProperty("os.name").startsWith("Win");
     private static final boolean _isOS2 = System.getProperty("os.name").startsWith("OS/2");
     private static final boolean _isMac = System.getProperty("os.name").startsWith("Mac");
@@ -164,6 +173,8 @@ public class NativeBigInteger extends BigInteger {
     private static final boolean _isX86 = System.getProperty("os.arch").contains("86") ||
 	                                 System.getProperty("os.arch").equals("amd64");
 
+    private static final boolean _isArm = System.getProperty("os.arch").startsWith("arm");
+
     /* libjbigi.so vs jbigi.dll */
     private static final String _libPrefix = (_isWin || _isOS2 ? "" : "lib");
     private static final String _libSuffix = (_isWin || _isOS2 ? ".dll" : _isMac ? ".jnilib" : ".so");
@@ -173,12 +184,16 @@ public class NativeBigInteger extends BigInteger {
     static {
         if (_isX86) // Don't try to resolve CPU type on PPC and other non x86 hardware
             sCPUType = resolveCPUType();
+        else if (_isArm)
+            sCPUType = JBIGI_OPTIMIZATION_ARM;
 	else
 	    sCPUType = null;
         loadNative();
     }
     
-     /** Tries to resolve the best type of CPU that we have an optimized jbigi-dll/so for.
+    /**
+      * Tries to resolve the best type of CPU that we have an optimized jbigi-dll/so for.
+      * This is for x86 only.
       * @return A string containing the CPU-type or null if CPU type is unknown
       */
     private static String resolveCPUType() {
@@ -639,10 +654,13 @@ public class NativeBigInteger extends BigInteger {
                 rv.add(_libPrefix + getMiddleName1() + JBIGI_OPTIMIZATION_ATHLON64 + _libSuffix);
             }
         }
-        // add libjbigi-xxx-none.so
+        // Add libjbigi-xxx-none_64.so
         if (_is64)
             rv.add(_libPrefix + getMiddleName1() + "none_64" + _libSuffix);
-        rv.add(getResourceName(false));
+        // Add libjbigi-xxx-none.so
+        // Note that libjbigi-osx-none.jnilib is a 'fat binary' with both PPC and x86-32
+        if (!_isArm)
+            rv.add(getResourceName(false));
         return rv;
     }
 
