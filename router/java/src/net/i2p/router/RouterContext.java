@@ -403,6 +403,13 @@ public class RouterContext extends I2PAppContext {
     }
     
     /**
+     *  @since 0.8.8
+     */
+    void removeShutdownTasks() {
+        _shutdownTasks.clear();
+    }
+    
+    /**
      *  Use this instead of context instanceof RouterContext
      *  @return true
      *  @since 0.7.9

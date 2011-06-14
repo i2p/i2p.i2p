@@ -49,6 +49,7 @@ import net.i2p.util.I2PAppThread;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFileOutputStream;
+import net.i2p.util.SimpleByteCache;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
@@ -257,7 +258,7 @@ public class Router {
         _killVMOnEnd = true;
         _oomListener = new I2PThread.OOMEventListener() { 
             public void outOfMemory(OutOfMemoryError oom) { 
-                ByteCache.clearAll();
+                clearCaches();
                 _log.log(Log.CRIT, "Thread ran out of memory", oom);
                 for (int i = 0; i < 5; i++) { // try this 5 times, in case it OOMs
                     try { 
@@ -280,6 +281,12 @@ public class Router {
         
     }
     
+    /** @since 0.8.8 */
+    private static final void clearCaches() {
+        ByteCache.clearAll();
+        SimpleByteCache.clearAll();
+    }
+
     /**
      * Configure the router to kill the JVM when the router shuts down, as well
      * as whether to explicitly halt the JVM during the hard fail process.
@@ -624,6 +631,7 @@ public class Router {
                 _log.log(Log.CRIT, "Error running shutdown task", t);
             }
         }
+        _context.removeShutdownTasks();
         // hard and ugly
         if (System.getProperty("wrapper.version") != null)
             _log.log(Log.CRIT, "Restarting with new router identity");
@@ -940,12 +948,15 @@ public class Router {
         // Run the shutdown hooks first in case they want to send some goodbye messages
         // Maybe we need a delay after this too?
         for (Runnable task : _context.getShutdownTasks()) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Running shutdown task " + task.getClass());
             try {
                 task.run();
             } catch (Throwable t) {
                 _log.log(Log.CRIT, "Error running shutdown task", t);
             }
         }
+        _context.removeShutdownTasks();
         try { _context.clientManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the client manager", t); }
         try { _context.namingService().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the naming service", t); }
         try { _context.jobQueue().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the job queue", t); }
@@ -972,6 +983,7 @@ public class Router {
     private static final boolean ALLOW_DYNAMIC_KEYS = false;
 
     private void finalShutdown(int exitCode) {
+        clearCaches();
         _log.log(Log.CRIT, "Shutdown(" + exitCode + ") complete"  /* , new Exception("Shutdown") */ );
         try { _context.logManager().shutdown(); } catch (Throwable t) { }
         if (ALLOW_DYNAMIC_KEYS) {
@@ -1486,7 +1498,7 @@ private static class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
         long used = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
         getContext().statManager().addRateData("router.memoryUsed", used, 0);
         if (_maxMemory - used < LOW_MEMORY_THRESHOLD)
-            ByteCache.clearAll();
+            clearCaches();
 
         getContext().tunnelDispatcher().updateParticipatingStats(COALESCE_TIME);
 

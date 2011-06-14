@@ -1,6 +1,7 @@
 package net.i2p;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Random;
@@ -100,7 +101,7 @@ public class I2PAppContext {
     private volatile boolean _randomInitialized;
     private volatile boolean _keyGeneratorInitialized;
     protected volatile boolean _keyRingInitialized; // used in RouterContext
-    private Set<Runnable> _shutdownTasks;
+    protected final Set<Runnable> _shutdownTasks;
     private File _baseDir;
     private File _configDir;
     private File _routerDir;
@@ -185,7 +186,7 @@ public class I2PAppContext {
         _elGamalAESEngineInitialized = false;
         _logManagerInitialized = false;
         _keyRingInitialized = false;
-        _shutdownTasks = new ConcurrentHashSet(0);
+        _shutdownTasks = new ConcurrentHashSet(16);
         initializeDirs();
     }
     
@@ -843,12 +844,24 @@ public class I2PAppContext {
         }
     }
 
+    /**
+     *  WARNING - Shutdown tasks are not executed in an I2PAppContext.
+     *  You must be in a RouterContext for the tasks to be executed
+     *  at shutdown.
+     *  This method moved from Router in 0.7.1 so that clients
+     *  may use it without depending on router.jar.
+     *  @since 0.7.1
+     */
     public void addShutdownTask(Runnable task) {
         _shutdownTasks.add(task);
     }
     
+    /**
+     *  @return an unmodifiable Set
+     *  @since 0.7.1
+     */
     public Set<Runnable> getShutdownTasks() {
-        return new HashSet(_shutdownTasks);
+        return Collections.unmodifiableSet(_shutdownTasks);
     }
     
     /**
