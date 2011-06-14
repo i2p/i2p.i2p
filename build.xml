@@ -352,15 +352,16 @@
             <group title="Streaming Library" packages="net.i2p.client.streaming" />
             <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:org.cybergarage.*:org.freenetproject" />
             <group title="Router Console" packages="net.i2p.router.web" />
+            <!-- apps and bridges starting here, alphabetical please -->
             <group title="Addressbook Application" packages="net.i2p.addressbook" />
             <group title="BOB Bridge" packages="net.i2p.BOB" />
+            <group title="Desktopgui Application" packages="net.i2p.desktopgui.*" />
             <group title="I2PSnark Application" packages="org.klomp.snark:org.klomp.snark.*" />
             <group title="I2PTunnel Application" packages="net.i2p.i2ptunnel:net.i2p.i2ptunnel.*" />
             <group title="SAM Bridge" packages="net.i2p.sam:net.i2p.sam.client" />
             <group title="SusiDNS Application" packages="i2p.susi.dns" />
             <group title="SusiMail Application" packages="i2p.susi.webmail:i2p.susi.webmail.*:i2p.susi.debug:i2p.susi.util" />
             <group title="Systray Application" packages="net.i2p.apps.systray" />
-            <group title="Desktopgui Application" packages="net.i2p.desktopgui.*" />
             <sourcepath>
                 <pathelement location="core/java/src" />
                 <!--<pathelement location="core/java/test" />-->
@@ -391,7 +392,9 @@
             <link offline="true" href="http://docs.i2p2.de/jetty/javadoc/" packagelistLoc="installer/resources/package-lists/jetty/" />
             <link offline="true" href="http://docs.i2p2.de/jrobin/javadoc/" packagelistLoc="installer/resources/package-lists/jrobin/" />
         </javadoc>
+        <echo message="Warning, javadoc embeds timestamps in the output, run with 'TZ=UTC ant javadoc' if you plan to distribute" />
     </target>
+
     <target name="clean" depends="pkgclean" >
         <delete dir="./build" />
         <delete file="i2pinstall.exe" failonerror="false" quiet="true" />	
@@ -691,11 +694,13 @@
 
     <target name="updater200" depends="prepupdate, preplicenses, pack200, zipit200" />
     <target name="updater200WithJettyFixes" depends="prepjupdatefixes, preplicenses, pack200, zipit200" />
+    <target name="updater200WithJettyFixesAndJbigi" depends="prepjupdatefixes, prepjbigiupdate, preplicenses, pack200, zipit200" />
     <target name="updater" depends="prepupdate, preplicenses, zipit" />
     <target name="updaterWithJavadoc" depends="prepupdate, preplicenses, copyJavadoc, zipit" />
     <target name="updaterWithGeoIP" depends="prepupdate, prepgeoupdate, preplicenses, zipit" />
     <target name="updaterWithJetty" depends="prepjupdate, preplicenses, zipit" />
     <target name="updaterWithJettyFixes" depends="prepjupdatefixes, preplicenses, zipit" />
+    <target name="updaterWithJettyFixesAndJbigi" depends="prepjupdatefixes, prepjbigiupdate, preplicenses, zipit" />
     <target name="updaterWithJettyFixesAndGeoIP" depends="prepjupdatefixes, prepgeoupdate, preplicenses, zipit" />
     <target name="updaterSmall" depends="prepupdateSmall, zipit" />
     <target name="updaterRouter" depends="prepupdateRouter, zipit" />
@@ -785,6 +790,11 @@
     <target name="prepupdateRouter" depends="buildrouter, deletepkg-temp">
         <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
         <copy file="build/router.jar" todir="pkg-temp/lib/" />
+    </target>
+
+    <!-- jbigi.jar -->
+    <target name="prepjbigiupdate" depends="jbigi">
+        <copy file="build/jbigi.jar" todir="pkg-temp/lib/" />
     </target>
 
     <!-- GeoIP files and flag icons -->
@@ -971,7 +981,7 @@
 <!--
     <target name="release" depends="distclean, updater, updater200, preppkg, installer" >
 -->
-    <target name="release" depends="distclean, updaterWithJettyFixes, updater200WithJettyFixes, preppkg, installer" >
+    <target name="release" depends="distclean, updaterWithJettyFixesAndJbigi , updater200WithJettyFixes, preppkg, installer" >
         <echo message="================================================================" />
         <echo message="Did you update these files?" />
         <exec executable="ls" failonerror="true">
