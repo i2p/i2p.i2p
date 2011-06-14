@@ -196,6 +196,18 @@
             <executable targetfile="$INSTALL_PATH/postinstall.sh" type="bin" stage="never" keep="true" failure="warn"><os family="unix" /></executable>
             <executable targetfile="$INSTALL_PATH/postinstall.sh" type="bin" stage="postinstall" keep="true" failure="warn"><os family="unix" />
                 <args><arg value="$INSTALL_PATH" /></args></executable>
+	    <!-- 
+	     Removal of the I2P service in Windows should be done in the base pack
+	     so that even if a user installed the service manually it will still be
+	     removed when uninstalling.
+	    -->
+            <executable targetfile="$INSTALL_PATH/uninstall_i2p_service_winnt.bat" stage="uninstall" os="windows">
+                <args>
+                    <arg value="$INSTALL_PATH\wrapper.config" />
+                    <arg value="--nopause" />
+                </args>
+            </executable>
+
 
         </pack>
 
@@ -215,12 +227,6 @@
                 <args>
                     <arg value="-t" />
                     <arg value="$INSTALL_PATH\wrapper.config" />
-                </args>
-            </executable>
-            <executable targetfile="$INSTALL_PATH/uninstall_i2p_service_winnt.bat" stage="uninstall" failure="warn" keep="true">
-                <args>
-                    <arg value="$INSTALL_PATH\wrapper.config" />
-                    <arg value="--nopause" />
                 </args>
             </executable>
         </pack>
