@@ -1123,11 +1123,17 @@ public class Router {
         return true;
     }
     
+    /**
+     *  A "soft" restart, primarily of the comm system, after
+     *  a port change or large step-change in system time.
+     *  Does not stop the whole JVM, so it is safe even in the absence
+     *  of the wrapper.
+     *  This is not a graceful restart - all peer connections are dropped.
+     */
     public void restart() {
         _isAlive = false;
         
         try { _context.commSystem().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the comm system", t); }
-        //try { _context.adminManager().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the client manager", t); }
         try { _context.clientManager().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the client manager", t); }
         try { _context.tunnelManager().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the tunnel manager", t); }
         try { _context.peerManager().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the peer manager", t); }
@@ -1232,6 +1238,53 @@ public class Router {
                 // hopefully the update file got deleted or we will loop
             }
             System.exit(EXIT_HARD_RESTART);
+        } else {
+            // Remove extracted libjbigi.so and libjcpuid.so files if we have a newer jbigi.jar,
+            // so the new ones will be extracted.
+            // We do this after the restart, not after the extract, because it's safer, and
+            // because people may upgrade their jbigi.jar file manually.
+
+            // Copied from NativeBigInteger, which we can't access here or the
+            // libs will get loaded.
+            String osArch = System.getProperty("os.arch");
+            boolean isX86 = osArch.contains("86") || osArch.equals("amd64");
+            String osName = System.getProperty("os.name").toLowerCase();
+            boolean isWin = osName.startsWith("win");
+            boolean isMac = osName.startsWith("mac");
+            // only do this on these OSes
+            boolean goodOS = isWin || isMac ||
+                             osName.contains("linux") || osName.contains("freebsd");
+
+            // only do this on these x86
+            File jbigiJar = new File(_context.getBaseDir(), "lib/jbigi.jar");
+            if (isX86 && goodOS && jbigiJar.exists()) {
+                String libPrefix = (isWin ? "" : "lib");
+                String libSuffix = (isWin ? ".dll" : isMac ? ".jnilib" : ".so");
+
+                File jcpuidLib = new File(_context.getBaseDir(), libPrefix + "jcpuid" + libSuffix);
+                if (jcpuidLib.canWrite() && jbigiJar.lastModified() > jcpuidLib.lastModified()) {
+                    String path = jcpuidLib.getAbsolutePath();
+                    boolean success = FileUtil.copy(path, path + ".bak", true, true);
+                    if (success) {
+                        boolean success2 = jcpuidLib.delete();
+                        if (success2)
+                            System.out.println("New jbigi.jar detected, moved jcpuid library to " +
+                                               path + ".bak, check logs for successful installation of new library");
+                    }
+                }
+
+                File jbigiLib = new File(_context.getBaseDir(), libPrefix + "jbigi" + libSuffix);
+                if (jbigiLib.canWrite() && jbigiJar.lastModified() > jbigiLib.lastModified()) {
+                    String path = jbigiLib.getAbsolutePath();
+                    boolean success = FileUtil.copy(path, path + ".bak", true, true);
+                    if (success) {
+                        boolean success2 = jbigiLib.delete();
+                        if (success2)
+                            System.out.println("New jbigi.jar detected, moved jbigi library to " +
+                                               path + ".bak, check logs for successful installation of new library");
+                    }
+                }
+            }
         }
     }
     
