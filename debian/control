@@ -9,6 +9,7 @@ Build-Depends: debhelper (>= 7.0.50~),
  ant,
  debconf,
  default-jdk,
+ gettext,
  libgmp3-dev, 
  po-debconf
 Build-Depends-Indep: tor-geoipdb

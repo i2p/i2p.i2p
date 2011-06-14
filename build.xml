@@ -57,7 +57,7 @@
 	    <echo message="&quot;quilt&quot; and &quot;build-essential&quot;!" />
 	    <echo message="" />
 	    <echo message="The following command will install all dependencies for you:" />
-	    <echo message="apt-get install debhelper ant debconf default-jdk libgmp3-dev po-debconf fakeroot build-essential quilt" />
+	    <echo message="apt-get install debhelper ant debconf default-jdk gettext libgmp3-dev po-debconf fakeroot build-essential quilt" />
 	    <echo message=" " />
 	    <echo message="Once the dependencies are installed, run &quot;ant debian&quot;"/>
 	    <echo message="to patch the source and build the packages." />
