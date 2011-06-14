@@ -34,3 +34,4 @@ if not errorlevel 1 goto :eof
 if %2=="--nopause" goto :eof
 pause
 
+:eof
