@@ -616,6 +616,8 @@ public class Router {
     public void rebuildNewIdentity() {
         killKeys();
         for (Runnable task : _context.getShutdownTasks()) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Running shutdown task " + task.getClass());
             try {
                 task.run();
             } catch (Throwable t) {
