@@ -1,9 +1,15 @@
 2011-06-14 zzz
+  * Build: New targets for including jbigi in the updater
+  * Console: CSS tweak for flag box
+  * i2psnark: Recognize ktorrent
   * Jbigi / NBI / wrapper / installer:
     jbigi and wrapper files for arm.
     Compiled on trimslice with gcc version 4.4.5 (Ubuntu/Linaro 4.4.4-14ubuntu5) 
     Log postinstall errors to postinstall.log.
+  * NetDB: Increase floodfills and better adjustment based on available memory
   * RateStat: final
+  * Router: Delete old libjbigi.so and libjcpuid.so at startup if jbigi.jar is newer.
+            This will force a reextraction by CPUID and NBI.
 
 2011-06-13 duck
     * Finnish, Italian, Polish and Vietnamese translations, thanks Transifex teams.
