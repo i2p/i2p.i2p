@@ -53,15 +53,31 @@ public class SimpleTimer {
             executor.setDaemon(true);
             executor.start();
         }
+        _context.addShutdownTask(new Shutdown());
     }
     
+    /**
+     * @since 0.8.8
+     */
+    private class Shutdown implements Runnable {
+        public void run() {
+            removeSimpleTimer();
+        }
+    }
+
     /**
      * Removes the SimpleTimer.
      */
     public void removeSimpleTimer() {
         synchronized(_events) {
             runn.setAnswer(false);
+            _events.clear();
+            _eventTimes.clear();
             _events.notifyAll();
+        }
+        synchronized (_readyEvents) {
+            _readyEvents.clear();
+            _readyEvents.notifyAll();
         }
     }
 
