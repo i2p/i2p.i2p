@@ -47,8 +47,10 @@ public class PeerManagerFacadeImpl implements PeerManagerFacade {
     public void shutdown() {
         _log.info("Shutting down the peer manager");
         _testJob.stopTesting();
-        if (_manager != null)
+        if (_manager != null) {
             _manager.storeProfiles();
+            _manager.clearProfiles();
+        }
     }
     
     public void restart() {

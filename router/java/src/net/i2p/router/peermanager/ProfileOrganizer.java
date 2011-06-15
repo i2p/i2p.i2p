@@ -227,6 +227,19 @@ public class ProfileOrganizer {
     public boolean isWellIntegrated(Hash peer) { return isX(_wellIntegratedPeers, peer); }
     public boolean isFailing(Hash peer) { return isX(_failingPeers, peer); }
         
+    /** @since 0.8.8 */
+    void clearProfiles() {
+        getReadLock();
+        try {
+            _failingPeers.clear();
+            _fastPeers.clear();
+            _highCapacityPeers.clear();
+            _notFailingPeers.clear();
+            _notFailingPeersList.clear();
+            _wellIntegratedPeers.clear();
+        } finally { releaseReadLock(); }
+    }
+
     /** 
      * if a peer sends us more than 5 replies in a searchReply that we cannot
      * fetch, stop listening to them.

@@ -99,6 +99,11 @@ class PeerManager {
         }
     }
 
+    /** @since 0.8.8 */
+    void clearProfiles() {
+        _organizer.clearProfiles();
+    }
+
     Set selectPeers() {
         return _organizer.selectAllPeers();
     }
