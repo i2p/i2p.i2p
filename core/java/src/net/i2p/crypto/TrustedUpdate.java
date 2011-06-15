@@ -22,6 +22,7 @@ import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.util.Log;
 import net.i2p.util.VersionComparator;
+import net.i2p.util.ZipFileComment;
 
 /**
  * <p>Handles DSA signing and verification of update files.
@@ -35,6 +36,7 @@ import net.i2p.util.VersionComparator;
  * java net.i2p.crypto.TrustedUpdate sign         <i>inputFile signedFile privateKeyFile version</i>
  * java net.i2p.crypto.TrustedUpdate verifysig    <i>signedFile</i>
  * java net.i2p.crypto.TrustedUpdate verifyupdate <i>signedFile</i>
+ * java net.i2p.crypto.TrustedUpdate verifyversion <i>signedFile</i>
  * </pre>
  * 
  * @author jrandom and smeghead
@@ -242,6 +244,8 @@ JXQAnA28vDmMMMH/WPbC5ixmJeGGNUiR
                 ok = verifySigCLI(args[1]);
             } else if ("verifyupdate".equals(args[0])) {
                 ok = verifyUpdateCLI(args[1]);
+            } else if ("verifyversion".equals(args[0])) {
+                ok = verifyVersionCLI(args[1]);
             } else {
                 showUsageCLI();
             }
@@ -301,11 +305,12 @@ JXQAnA28vDmMMMH/WPbC5ixmJeGGNUiR
     }
 
     private static final void showUsageCLI() {
-        System.err.println("Usage: TrustedUpdate keygen       publicKeyFile privateKeyFile");
-        System.err.println("       TrustedUpdate showversion  signedFile");
-        System.err.println("       TrustedUpdate sign         inputFile signedFile privateKeyFile version");
-        System.err.println("       TrustedUpdate verifysig    signedFile");
-        System.err.println("       TrustedUpdate verifyupdate signedFile");
+        System.err.println("Usage: TrustedUpdate keygen        publicKeyFile privateKeyFile");
+        System.err.println("       TrustedUpdate showversion   signedFile");
+        System.err.println("       TrustedUpdate sign          inputFile signedFile privateKeyFile version");
+        System.err.println("       TrustedUpdate verifysig     signedFile");
+        System.err.println("       TrustedUpdate verifyupdate  signedFile");
+        System.err.println("       TrustedUpdate verifyversion signedFile");
     }
 
     /** @return success */
@@ -349,7 +354,27 @@ JXQAnA28vDmMMMH/WPbC5ixmJeGGNUiR
             System.out.println("File version is newer than current version.");
         else
             System.out.println("File version is older than or equal to current version.");
+
         return isUpdate;
+    }
+
+    /**
+     *  @return true if there's no version mismatch
+     *  @since 0.8.8
+     */
+    private static final boolean verifyVersionCLI(String signedFile) {
+        TrustedUpdate tu = new TrustedUpdate();
+        File file = new File(signedFile);
+        // ignore result, just used to read in version
+        tu.isUpdatedVersion("0", file);
+
+        boolean isMatch = tu.verifyVersionMatch(file);
+        if (isMatch)
+            System.out.println("Version verified");
+        else
+            System.out.println("Version mismatch, header version does not match zip comment version");
+
+        return isMatch;
     }
 
     /**
@@ -490,6 +515,13 @@ JXQAnA28vDmMMMH/WPbC5ixmJeGGNUiR
      * file's version is newer than the given current version, migrates the data
      * out of <code>signedFile</code> and into <code>outputFile</code>.
      * 
+     * As of 0.8.8, the embedded file must be a zip file with
+     * a standard zip header and a UTF-8 zip file comment
+     * matching the version in the sud header. This prevents spoofing the version,
+     * since the sud signature does NOT cover the version in the header.
+     * (We do this for sud/su2 files but not plugin xpi2p files -
+     * don't use this method for plugin files)
+     * 
      * @param currentVersion The current version to check against.
      * @param signedFile     A signed update file.
      * @param outputFile     The file to write the verified data to.
@@ -507,10 +539,30 @@ JXQAnA28vDmMMMH/WPbC5ixmJeGGNUiR
                 return "Downloaded version is not greater than current version";
         }
 
+        if (!verifyVersionMatch(signedFile))
+            return "Update file invalid - signed version mismatch";
+
         if (!verify(signedFile))
             return "Unknown signing key or corrupt file";
 
         return migrateFile(signedFile, outputFile);
+    }
+
+    /**
+     * Verify the version in the sud header matches the version in the zip comment
+     * (and that the embedded file is a zip file at all)
+     * isUpdatedVersion() must be called first to set _newVersion.
+     * 
+     * @return true if matches
+     *
+     * @since 0.8.8
+     */
+    private boolean verifyVersionMatch(File signedFile) {
+        try {
+             String zipComment = ZipFileComment.getComment(signedFile, VERSION_BYTES, HEADER_BYTES);
+             return zipComment.equals(_newVersion);
+        } catch (IOException ioe) {}
+        return false;
     }
 
     /**
