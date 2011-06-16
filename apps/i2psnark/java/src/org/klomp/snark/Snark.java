@@ -32,8 +32,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 import java.util.StringTokenizer;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PServerSocket;
