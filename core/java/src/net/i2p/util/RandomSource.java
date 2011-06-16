@@ -28,6 +28,12 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
     private final EntropyHarvester _entropyHarvester;
     protected final I2PAppContext _context;
 
+    /**
+     *  Deprecated - do not instantiate this directly, as you won't get the
+     *  good one (Fortuna). Use getInstance() or
+     *  I2PAppContext.getGlobalContext().random() to get the FortunaRandomSource
+     *  instance.
+     */
     public RandomSource(I2PAppContext context) {
         super();
         _context = context;
@@ -201,11 +207,5 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
         for (int i = 0; i < 64; i++) rs.nextBytes(buf);
         rs.saveSeed();
         }
-    }
-    
-    // noop
-    private static class DummyEntropyHarvester implements EntropyHarvester {
-        public void feedEntropy(String source, long data, int bitoffset, int bits) {}
-        public void feedEntropy(String source, byte[] data, int offset, int len) {}
     }
 }

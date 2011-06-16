@@ -45,6 +45,7 @@ import net.i2p.stat.RateStat;
 import net.i2p.stat.StatManager;
 import net.i2p.util.ByteCache;
 import net.i2p.util.FileUtil;
+import net.i2p.util.FortunaRandomSource;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
@@ -973,6 +974,13 @@ public class Router {
         //try { _sessionKeyPersistenceHelper.shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the session key manager", t); }
         _context.deleteTempDir();
         RouterContext.listContexts().remove(_context);
+
+        // shut down I2PAppContext tasks here
+        try {
+            ((FortunaRandomSource)_context.random()).shutdown();
+        } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting random()", t); }
+
+        // logManager shut down in finalShutdown()
         finalShutdown(exitCode);
     }
 
