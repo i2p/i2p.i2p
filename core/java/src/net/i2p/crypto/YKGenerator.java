@@ -42,8 +42,9 @@ class YKGenerator {
     private static final int MAX_NUM_BUILDERS;
     private static final int CALC_DELAY;
     private static final LinkedBlockingQueue<BigInteger[]> _values;
-    private static final Thread _precalcThread;
+    private static Thread _precalcThread;
     private static final I2PAppContext ctx;
+    private static volatile boolean _isRunning;
 
     public final static String PROP_YK_PRECALC_MIN = "crypto.yk.precalc.min";
     public final static String PROP_YK_PRECALC_MAX = "crypto.yk.precalc.max";
@@ -77,12 +78,41 @@ class YKGenerator {
 
         ctx.statManager().createRateStat("crypto.YKUsed", "Need a YK from the queue", "Encryption", new long[] { 60*60*1000 });
         ctx.statManager().createRateStat("crypto.YKEmpty", "YK queue empty", "Encryption", new long[] { 60*60*1000 });
+        startPrecalc();
+    }
 
-        _precalcThread = new I2PThread(new YKPrecalcRunner(MIN_NUM_BUILDERS, MAX_NUM_BUILDERS));
-        _precalcThread.setName("YK Precalc");
-        _precalcThread.setDaemon(true);
-        _precalcThread.setPriority(Thread.MIN_PRIORITY);
-        _precalcThread.start();
+    /** @since 0.8.8 */
+    private static void startPrecalc() {
+        synchronized(YKGenerator.class) {
+            _precalcThread = new I2PThread(new YKPrecalcRunner(MIN_NUM_BUILDERS, MAX_NUM_BUILDERS),
+                                       "YK Precalc", true);
+            _precalcThread.setPriority(Thread.MIN_PRIORITY);
+            _isRunning = true;
+            _precalcThread.start();
+        }
+    }
+
+    /**
+     *  Note that this stops the singleton precalc thread.
+     *  You don't want to do this if there are multiple routers in the JVM.
+     *  Fix this if you care. See Router.shutdown().
+     *  @since 0.8.8
+     */
+    public static void shutdown() {
+        _isRunning = false;
+        _precalcThread.interrupt();
+        _values.clear();
+    }
+
+    /**
+     *  Only required if shutdown() previously called.
+     *  @since 0.8.8
+     */
+    public static void restart() {
+        synchronized(YKGenerator.class) {
+            if (!_isRunning)
+                startPrecalc();
+        }
     }
 
     private static final int getSize() {
@@ -161,7 +191,7 @@ class YKGenerator {
         }
 
         public void run() {
-            while (true) {
+            while (_isRunning) {
                 int curSize = 0;
                 //long start = Clock.getInstance().now();
                 int startSize = getSize();
@@ -172,7 +202,7 @@ class YKGenerator {
                     _checkDelay += 1000;
                 curSize = startSize;
                 if (curSize < _minSize) {
-                    for (int i = curSize; i < _maxSize; i++) {
+                    for (int i = curSize; i < _maxSize && _isRunning; i++) {
                         //long begin = Clock.getInstance().now();
                         if (!addValues(generateYK()))
                             break;

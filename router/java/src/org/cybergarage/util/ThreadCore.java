@@ -65,6 +65,8 @@ public class ThreadCore implements Runnable
 			//threadObject.destroy();
 			//threadObject.stop();
 			setThreadObject(null);
+			// I2P break Disposer out of sleep()
+			threadObject.interrupt();
 		}
 	}
 	

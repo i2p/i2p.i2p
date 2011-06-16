@@ -15,14 +15,21 @@ class RouterWatchdog implements Runnable {
     private final Log _log;
     private final RouterContext _context;
     private int _consecutiveErrors;
+    private volatile boolean _isRunning;
     
     private static final long MAX_JOB_RUN_LAG = 60*1000;
     
     public RouterWatchdog(RouterContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(RouterWatchdog.class);
+        _isRunning = true;
     }
     
+    /** @since 0.8.8 */
+    public void shutdown() {
+        _isRunning = false;
+    }
+
     public boolean verifyJobQueueLiveliness() {
         long when = _context.jobQueue().getLastJobBegin();
         if (when < 0) 
@@ -109,7 +116,7 @@ class RouterWatchdog implements Runnable {
     }
     
     public void run() {
-        while (true) {
+        while (_isRunning) {
             try { Thread.sleep(60*1000); } catch (InterruptedException ie) {}
             monitorRouter();
         }

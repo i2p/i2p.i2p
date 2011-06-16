@@ -75,6 +75,8 @@ public class Router {
     private I2PThread.OOMEventListener _oomListener;
     private ShutdownHook _shutdownHook;
     private final I2PThread _gracefulShutdownDetector;
+    private final RouterWatchdog _watchdog;
+    private final Thread _watchdogThread;
     
     public final static String PROP_CONFIG_FILE = "router.configLocation";
     
@@ -277,8 +279,9 @@ public class Router {
         _gracefulShutdownDetector = new I2PAppThread(new GracefulShutdown(), "Graceful shutdown hook", true);
         _gracefulShutdownDetector.start();
         
-        Thread watchdog = new I2PAppThread(new RouterWatchdog(_context), "RouterWatchdog", true);
-        watchdog.start();
+        _watchdog = new RouterWatchdog(_context);
+        _watchdogThread = new I2PAppThread(_watchdog, "RouterWatchdog", true);
+        _watchdogThread.start();
         
     }
     
@@ -643,7 +646,10 @@ public class Router {
     
     private void warmupCrypto() {
         _context.random().nextBoolean();
-        new DHSessionKeyBuilder(); // load the class so it starts the precalc process
+        // Use restart() to refire the static refiller threads, in case
+        // we are restarting the router in the same JVM (Android)
+        DHSessionKeyBuilder.restart();
+        _context.elGamalEngine().restart();
     }
     
     private void startupQueue() {
@@ -977,11 +983,23 @@ public class Router {
         RouterContext.listContexts().remove(_context);
 
         // shut down I2PAppContext tasks here
+
+        // TODO if there are multiple routers in the JVM, we don't want to do this
+        // to the DH or YK tasks, as they are singletons.
+        // Have MultiRouter set a property or something.
+        try {
+            DHSessionKeyBuilder.shutdown();
+        } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting DH", t); }
+        try {
+            _context.elGamalEngine().shutdown();
+        } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting elGamal", t); }
         try {
             ((FortunaRandomSource)_context.random()).shutdown();
         } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting random()", t); }
 
         // logManager shut down in finalShutdown()
+        _watchdog.shutdown();
+        _watchdogThread.interrupt();
         finalShutdown(exitCode);
     }
 
