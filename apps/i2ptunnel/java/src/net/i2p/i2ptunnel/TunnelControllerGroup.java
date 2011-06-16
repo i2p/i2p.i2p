@@ -26,7 +26,7 @@ import net.i2p.util.OrderedProperties;
  * Warning - this is a singleton. Todo: fix
  */
 public class TunnelControllerGroup {
-    private final Log _log;
+    private Log _log;
     private static TunnelControllerGroup _instance;
     static final String DEFAULT_CONFIG_FILE = "i2ptunnel.config";
     
@@ -55,6 +55,7 @@ public class TunnelControllerGroup {
         _configFile = configFile;
         _sessions = new HashMap(4);
         loadControllers(_configFile);
+        I2PAppContext.getGlobalContext().addShutdownTask(new Shutdown());
     }
 
     public static void main(String args[]) {
@@ -69,6 +70,30 @@ public class TunnelControllerGroup {
                 System.err.println("Usage: TunnelControllerGroup [filename]");
                 return;
             }
+        }
+    }
+
+    /**
+     *  Warning - destroys the singleton!
+     *  @since 0.8.8
+     */
+    private static class Shutdown implements Runnable {
+        public void run() {
+            shutdown();
+        }
+    }
+
+    /**
+     *  Warning - destroys the singleton!
+     *  Caller must root a new context before calling instance() or main() again.
+     *  @since 0.8.8
+     */
+    public static void shutdown() {
+        synchronized (TunnelControllerGroup.class) {
+            if (_instance == null) return;
+            _instance.unloadControllers();
+            _instance._log = null;
+            _instance = null;
         }
     }
     
