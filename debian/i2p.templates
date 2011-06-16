@@ -1,10 +1,10 @@
-Template: i2p/stop_running_router
-Type: boolean
-Default: false
-_Description: Automatically stop I2P when there are upgrades?
- To update this package the I2P router will need to be restarted. 
- Any activity on the I2P network will be briefly interrupted
- during the upgrade.
+##Template: i2p/stop_running_router
+##Type: boolean
+##Default: false
+##_Description: Automatically stop I2P when there are upgrades?
+## To update this package the I2P router will need to be restarted. 
+## Any activity on the I2P network will be briefly interrupted
+## during the upgrade.
 
 Template: i2p/daemon
 Type: boolean
@@ -18,9 +18,8 @@ Type: string
 Default: i2psvc
 _Description: I2P daemon user:
  By default I2P is configured to run under the account i2psvc when running
- as a daemon. To use an existing I2P profile you may enter a different
+ as a daemon. To use an **existing** I2P profile you may enter a different
  account name here. For example, if your previous I2P installation is at
- /home/user/i2p, you may enter 'user' here.
+ /home/user/i2p, you may enter 'user' here. 
  .
- A script to ease the transition from the manual installation to this deb
- package is in development. 
+ Very important: The account specified here *MUST* already exist.

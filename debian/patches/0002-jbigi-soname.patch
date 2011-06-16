@@ -1,6 +1,10 @@
 From: Kill Your TV <killyourtv@i2pmail.org>
 Date: Wed, 11 May 2011 00:12:04 +0000
-Subject: Update path of jbigi and add soname
+Subject: jbigi soname
+
+The purpose of this patch is to change the path that mbuild_jbigi.sh
+expects to find the source files at. At the same time I'm specifying 
+a soname to shut lintian up.
 
 ---
  core/c/jbigi/mbuild_jbigi.sh |    6 +++---

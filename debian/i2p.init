@@ -36,7 +36,7 @@ I2PUSER="i2psvc"
 
 I2P_ARGS="/etc/i2p/wrapper.config \
  wrapper.java.additional.1=-DloggerFilenameOverride=/var/log/i2p/log-router-@.txt \
- wrapper.java.additional.5=-Dwrapper.logfile=$WRAPPERLOG \
+ wrapper.java.additional.7=-Dwrapper.logfile=$WRAPPERLOG \
  wrapper.logfile=$WRAPPERLOG \
  wrapper.pidfile=$PIDFILE \
  wrapper.anchorfile=$ANCHORFILE \

@@ -1,7 +1,12 @@
 From: Kill Your TV <killyourtv@i2pmail.org>
 Date: Mon, 18 Apr 2011 16:43:40 +0000
-Subject: Update-paths
+Subject: path substitution
 
+The purpose of this patch is the change the values handled by
+the Izpack based installer.
+
+Non-applicable sections (e.g., portable & windows) are also removed for the
+Debian wrapper.config to try to prevent confusion.
 ---
  installer/resources/eepget         |    2 +-
  installer/resources/i2prouter      |    8 ++++----
@@ -55,19 +60,48 @@ Subject: Update-paths
  # next value to true may help. 
 --- a/installer/resources/wrapper.config
 +++ b/installer/resources/wrapper.config
-@@ -45,20 +45,19 @@
+@@ -7,22 +7,16 @@
+ # click "Shutdown", wait 11 minutes, then start i2p.
+ #
+ # WARNING - The wrapper is NOT run (and this file is not used)
+-# if you start I2P with the 'no window' icon on Windows, or
+-# with the runplain.sh script on Linux. Use the 'restartable'
+-# icon on Windows or the i2prouter script on Linux to run the wrapper.
++# if you start I2P with the i2prouter-nowrapper script in Linux.
++# Use i2prouter or the initscript run the wrapper.
+ #
+ # NOTE - Directory organization:
+ # The standard I2P Installation will set up a "split" directory structure
+ # with code in the install directory, data and configuration files in the
+ # user's home directory, and temporary files in the system temporary directory.
+-# To set up a single-directory "portable" installation suitable for
+-# a USB stick, make several changes specified below (search for PORTABLE).
+ #
+-# NOTE - The izpack installer performs variable subsitiution on this
+-# file upon installation. If you did not use izpack, you must
+-# find and replace all instances of (dollar)INSTALL_PATH and
+-# (dollar)SYSTEM_java_io_tmpdir with appropriate values
+-# (perhaps . and /var/tmp, respectively)
++# Unless changed by an admin, the daemon user "i2psvc" has its home directory
++# at /var/lib/i2p.
+ #
+ #********************************************************************
+ # Java Application
+@@ -45,20 +39,21 @@
  # classes, or all the classes of i2p.jar, are in a different directory).
  # Be sure there are no other duplicate classes.
  #
 -wrapper.java.classpath.1=$INSTALL_PATH/lib/*.jar
 +wrapper.java.classpath.1=/usr/share/i2p/lib/*.jar
++wrapper.java.classpath.2=/usr/share/java/wrapper.jar
  #  uncomment this to use the system classpath as well (e.g. to get tools.jar)
 -# wrapper.java.classpath.2=%CLASSPATH%
--
-+wrapper.java.classpath.2=/usr/share/java/wrapper.jar
- # Java Library Path (location of Wrapper.DLL or libwrapper.so)
++# wrapper.java.classpath.3=%CLASSPATH%
+ 
+-# Java Library Path (location of Wrapper.DLL or libwrapper.so)
 -wrapper.java.library.path.1=$INSTALL_PATH
 -wrapper.java.library.path.2=$INSTALL_PATH/lib
++# Java Library Path (location of libjbigi/libjcpuid)
 +wrapper.java.library.path.1=/usr/lib/jni
 +wrapper.java.library.path.2=/usr/share/java/lib
  
@@ -81,30 +115,64 @@ Subject: Update-paths
  wrapper.java.additional.4.stripquotes=TRUE
  
  # On some IPv6 enabled systems, I2P and other network-enabled java applications
-@@ -125,7 +124,7 @@
+@@ -126,11 +121,7 @@
  # tell the router where to find the wrapper log
  # (change X to the next available number)
  # wrapper.java.additional.X=-Dwrapper.logfile=/path/to/wrapper.log
 -wrapper.logfile=$SYSTEM_java_io_tmpdir/wrapper.log
+-# PORTABLE installation:
+-# Use the following instead. I2P will find the logfile here,
+-# no need for a wrapper.java.additional line too.
+-#wrapper.logfile=$INSTALL_PATH/wrapper.log
 +wrapper.logfile=/tmp/wrapper.log
- # PORTABLE installation:
- # Use the following instead. I2P will find the logfile here,
- # no need for a wrapper.java.additional line too.
-@@ -191,7 +190,7 @@
+ 
+ # Format of output for the log file.
+ # The format consists of the tokens 'L' for log level, 'P' for prefix, 'D' for thread,
+@@ -192,10 +183,7 @@
  # you should copy this file, change the location or file name,
  # and edit the i2prouter script to change the WRAPPER_CONF setting
  # to point to the new wrapper.config location.
 -wrapper.java.pidfile=$SYSTEM_java_io_tmpdir/routerjvm.pid
+-# PORTABLE installation:
+-# Use the following instead.
+-#wrapper.java.pidfile=$INSTALL_PATH/routerjvm.pid
 +wrapper.java.pidfile=/tmp/routerjvm.pid
- # PORTABLE installation:
- # Use the following instead.
- #wrapper.java.pidfile=$INSTALL_PATH/routerjvm.pid
-@@ -205,7 +204,7 @@
+ # pid file for the service monitoring the JVM
+ #
+ # From i2prouter:
+@@ -206,34 +194,4 @@
  #
  # This means i2prouter looks for './i2p.pid'.
  # See comments above for wrapper.java.pidfile
 -wrapper.pidfile=$SYSTEM_java_io_tmpdir/i2p.pid
+-# PORTABLE installation:
+-# Use the following instead.
+-#wrapper.pidfile=$INSTALL_PATH/i2p.pid
+-
+-#********************************************************************
+-# Wrapper NT Service Properties
+-#********************************************************************
+-# WARNING - Do not modify any of these properties when an application
+-#  using this configuration file has been installed as a service.
+-#  Please uninstall the service before modifying this section.  The
+-#  service can then be reinstalled.
+-
+-# Name of the service
+-wrapper.ntservice.name=i2p
+-
+-# Display name of the service
+-wrapper.ntservice.displayname=I2P Service
+-
+-# Description of the service
+-wrapper.ntservice.description=The I2P router service
+-
+-# Service dependencies.  Add dependencies as needed starting from 1
+-wrapper.ntservice.dependency.1=
+-
+-# Mode in which the service is installed.  AUTO_START or DEMAND_START
+-wrapper.ntservice.starttype=AUTO_START
+-
+-# Allow the service to interact with the desktop.
+-wrapper.ntservice.interactive=true
+-
 +wrapper.pidfile=/tmp/i2p.pid
- # PORTABLE installation:
- # Use the following instead.
- #wrapper.pidfile=$INSTALL_PATH/i2p.pid

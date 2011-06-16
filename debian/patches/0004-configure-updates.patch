@@ -1,0 +1,54 @@
+From: Kill Your TV <killyourtv@i2pmail.org>
+Date: Sun, 29 May 2011 18:52:08 +0000
+Subject: configure updates
+
+My rationale here is to alter the wording of a few things that aren't applicable
+in the .deb packaging. For instance, updates must take place via the package manager,
+so I alter the text at the bottom of /configupdate to reflect that.
+
+---
+ apps/routerconsole/jsp/configupdate.jsp |   10 +++++-----
+ 1 files changed, 5 insertions(+), 5 deletions(-)
+
+--- a/apps/routerconsole/jsp/configupdate.jsp
++++ b/apps/routerconsole/jsp/configupdate.jsp
+@@ -8,7 +8,7 @@
+ </head><body>
+ 
+ <%@include file="summary.jsi" %>
+-<h1><%=intl._("I2P Update Configuration")%></h1>
++<h1><%=intl._("I2P News Update Configuration")%></h1>
+ <div class="main" id="main">
+  <%@include file="confignav.jsi" %>
+ 
+@@ -26,10 +26,10 @@
+  <input type="hidden" name="nonce" value="<jsp:getProperty name="formhandler" property="newNonce" />" >
+  <% /* set hidden default */ %>
+  <input type="submit" name="action" value="" style="display:none" >
+-      <h3><%=intl._("Check for I2P and news updates")%></h3>
++      <h3><%=intl._("Check for news updates")%></h3>
+       <div class="wideload"><table border="0" cellspacing="5">
+         <tr><td colspan="2"></tr>
+-        <tr><td class= "mediumtags" align="right"><b><%=intl._("News &amp; I2P Updates")%>:</b></td>
++        <tr><td class= "mediumtags" align="right"><b><%=intl._("News Updates")%>:</b></td>
+           <td> <% if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false"))) { %> <i><%=intl._("Update In Progress")%></i><br> <% } else { %> <input type="submit" name="action" value="<%=intl._("Check for updates")%>" />
+             <% } %></td></tr>
+         <tr><td colspan="2"><br></td></tr>
+@@ -41,7 +41,7 @@
+         <tr><td class= "mediumtags" align="right"><b><%=formhandler._("Update policy")%>:</b></td>
+           <td><jsp:getProperty name="updatehelper" property="updatePolicySelectBox" /></td></tr>
+     <% }   // if canInstall %>
+-        <tr><td class= "mediumtags" align="right"><b><%=intl._("Update through the eepProxy?")%></b></td>
++        <tr><td class= "mediumtags" align="right"><b><%=intl._("Fetch news through the eepProxy?")%></b></td>
+           <td><jsp:getProperty name="updatehelper" property="updateThroughProxy" /></td>
+         </tr><tr><td class= "mediumtags" align="right"><b><%=intl._("eepProxy host")%>:</b></td>
+           <td><input type="text" size="10" name="proxyHost" value="<jsp:getProperty name="updatehelper" property="proxyHost" />" /></td>
+@@ -57,7 +57,7 @@
+         </tr><tr><td class= "mediumtags" align="right"><b><%=intl._("Unsigned Build URL")%>:</b></td>
+           <td><input type="text" size="60" name="zipURL" value="<jsp:getProperty name="updatehelper" property="zipURL" />"></td></tr>
+     <% } else { %>
+-        <tr><td class= "mediumtags" align="center" colspan="2"><b><%=intl._("I2P updates are disabled because you do not have write permission for the install directory.")%></b></td></tr>
++        <tr><td class= "mediumtags" align="center" colspan="2"><b><%=intl._("I2P updates will be dispatched via your package manager.")%></b></td></tr>
+     <% }   // if canInstall %>
+         <tr class="tablefooter"><td colspan="2">
+         <div class="formaction">

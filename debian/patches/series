@@ -1,3 +1,5 @@
-0001-Update-paths.patch
-0004-Update-path-of-jbigi-and-add-soname.patch
-0007-rename-jcpuid.patch
+0001-path-substitution.patch
+0002-jbigi-soname.patch
+0003-renaming-jcpuid.patch
+0004-configure-updates.patch
+debian-version.patch

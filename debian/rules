@@ -37,8 +37,7 @@ clean: createcopyright
 override_dh_auto_clean:
 	dh_auto_clean
 	ant distclean
-	# The next line is used by KYTV
-	# when building from source packages
+	# The next line is used by KYTV when building from source packages
 	#rm -f apps/jetty/jetty-5.1.15.tgz
 	rm -f core/c/jbigi/*.[s]o
 	rm -rf core/c/jcpuid/lib/

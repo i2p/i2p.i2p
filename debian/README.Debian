@@ -11,3 +11,6 @@ There are a few changes in this package from upstream.
   to /var/logs/i2p with the timestamps in UTC
 
 - The config file for the wrapper can be found at /etc/i2p/wrapper.config
+
+
+To use I2P with the wrapper (recommended), the package i2p must be installed.
