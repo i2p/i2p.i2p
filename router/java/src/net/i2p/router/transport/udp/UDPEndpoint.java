@@ -147,6 +147,7 @@ class UDPEndpoint {
     
     /**
      * Blocking call to receive the next inbound UDP packet from any peer.
+     * @return null if we have shut down
      */
     public UDPPacket receive() { 
         if (_receiver == null)

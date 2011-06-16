@@ -113,6 +113,11 @@ class PacketHandler {
         return rv.toString();
     }
 
+    /** @since 0.8.8 */
+    int getHandlerCount() {
+        return _handlers.length;
+    }
+
     /** the packet is from a peer we are establishing an outbound con to, but failed validation, so fallback */
     private static final short OUTBOUND_FALLBACK = 1;
     /** the packet is from a peer we are establishing an inbound con to, but failed validation, so fallback */

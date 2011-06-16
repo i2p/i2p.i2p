@@ -29,6 +29,8 @@ public class Timestamper implements Runnable {
     private boolean _daemon;
     private boolean _initialized;
     private boolean _wellSynced;
+    private volatile boolean _isRunning;
+    private Thread _timestamperThread;
     
     private static final int MIN_QUERY_FREQUENCY = 5*60*1000;
     private static final int DEFAULT_QUERY_FREQUENCY = 5*60*1000;
@@ -106,10 +108,11 @@ public class Timestamper implements Runnable {
     }
     
     private void startTimestamper() {
-        I2PThread t = new I2PThread(this, "Timestamper");
-        t.setPriority(I2PThread.MIN_PRIORITY);
-        t.setDaemon(_daemon);
-        t.start();
+        _timestamperThread = new I2PThread(this, "Timestamper", _daemon);
+        _timestamperThread.setPriority(I2PThread.MIN_PRIORITY);
+        _isRunning = true;
+        _timestamperThread.start();
+        _context.addShutdownTask(new Shutdown());
     }
     
     public void waitForInitialization() {
@@ -121,6 +124,15 @@ public class Timestamper implements Runnable {
         } catch (InterruptedException ie) {}
     }
     
+    /** @since 0.8.8 */
+    private class Shutdown implements Runnable {
+        public void run() {
+             _isRunning = false;
+             if (_timestamperThread != null)
+                 _timestamperThread.interrupt();
+        }
+    }
+    
     public void run() {
         try { Thread.sleep(1000); } catch (InterruptedException ie) {}
         _log = _context.logManager().getLog(Timestamper.class);
@@ -128,7 +140,7 @@ public class Timestamper implements Runnable {
             _log.info("Starting timestamper");
         boolean lastFailed = false;
         try {
-            while (true) {
+            while (_isRunning) {
                 updateConfig();
                 if (!_disabled) {
                     // first the servers for our country, if we know what country we're in...

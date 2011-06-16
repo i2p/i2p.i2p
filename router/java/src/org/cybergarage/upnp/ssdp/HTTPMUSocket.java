@@ -120,7 +120,9 @@ public class HTTPMUSocket
 			return true;
 			
 		try {
-			ssdpMultiSock.leaveGroup(ssdpMultiGroup, ssdpMultiIf);
+                        // I2P close it instead of leaving group so the thread dies
+			//ssdpMultiSock.leaveGroup(ssdpMultiGroup, ssdpMultiIf);
+			ssdpMultiSock.close();
 			ssdpMultiSock = null;
 		}
 		catch (Exception e) {
