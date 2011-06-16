@@ -83,7 +83,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
      *  Extending classes may use it for other purposes.
      *  Not for use by servers, as there is no limit on threads.
      */
-    static final Executor _executor;
+    static final ThreadPoolExecutor _executor;
     private static int _executorThreadCount;
     static {
         _executor = new CustomThreadPoolExecutor();
@@ -635,7 +635,8 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
             }
             //l.log("Client closed.");
         }
-        
+        _executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
+        _executor.shutdownNow();
         return true;
     }
 
