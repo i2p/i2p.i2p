@@ -86,6 +86,9 @@ public class TunnelControllerGroup {
     /**
      *  Warning - destroys the singleton!
      *  Caller must root a new context before calling instance() or main() again.
+     *  Agressively kill and null everything to reduce memory usage in the JVM
+     *  after stopping, and to recognize what must be reinitialized on restart (Android)
+     *
      *  @since 0.8.8
      */
     public static void shutdown() {
@@ -95,6 +98,7 @@ public class TunnelControllerGroup {
             _instance._log = null;
             _instance = null;
         }
+        I2PTunnelClientBase.killClientExecutor();
     }
     
     /**
