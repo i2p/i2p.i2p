@@ -61,7 +61,7 @@ MINGW*)
 	TARGET="-windows-"
 	echo "Building windows .dlls for all architectures";;
 Darwin*)
-	PLATFORM_LIST=${DARWIN_PLATFORMS}"
+	PLATFORM_LIST="${DARWIN_PLATFORMS}"
 	NAME="libjbigi"
 	TYPE="jnilib"
 	TARGET="-osx-"
