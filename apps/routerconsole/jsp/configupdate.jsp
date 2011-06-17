@@ -26,10 +26,17 @@
  <input type="hidden" name="nonce" value="<jsp:getProperty name="formhandler" property="newNonce" />" >
  <% /* set hidden default */ %>
  <input type="submit" name="action" value="" style="display:none" >
+    <% if (updatehelper.canInstall()) { %>
       <h3><%=intl._("Check for I2P and news updates")%></h3>
       <div class="wideload"><table border="0" cellspacing="5">
         <tr><td colspan="2"></tr>
         <tr><td class= "mediumtags" align="right"><b><%=intl._("News &amp; I2P Updates")%>:</b></td>
+     <% } else { %>
+      <h3><%=intl._("Check for news updates")%></h3>
+      <div class="wideload"><table border="0" cellspacing="5">
+        <tr><td colspan="2"></tr>
+        <tr><td class= "mediumtags" align="right"><b><%=intl._("News Updates")%>:</b></td>
+     <% }   // if canInstall %>
           <td> <% if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false"))) { %> <i><%=intl._("Update In Progress")%></i><br> <% } else { %> <input type="submit" name="action" value="<%=intl._("Check for updates")%>" />
             <% } %></td></tr>
         <tr><td colspan="2"><br></td></tr>
@@ -57,7 +64,7 @@
         </tr><tr><td class= "mediumtags" align="right"><b><%=intl._("Unsigned Build URL")%>:</b></td>
           <td><input type="text" size="60" name="zipURL" value="<jsp:getProperty name="updatehelper" property="zipURL" />"></td></tr>
     <% } else { %>
-        <tr><td class= "mediumtags" align="center" colspan="2"><b><%=intl._("I2P updates are disabled because you do not have write permission for the install directory.")%></b></td></tr>
+        <tr><td class= "mediumtags" align="center" colspan="2"><b><%=intl._("Updates will be dispatched via your package manager.")%></b></td></tr>
     <% }   // if canInstall %>
         <tr class="tablefooter"><td colspan="2">
         <div class="formaction">
