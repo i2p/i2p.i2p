@@ -191,6 +191,11 @@ public class Router {
         // Save this in the context for the logger and apps that need it
         envProps.setProperty("i2p.systemTimeZone", originalTimeZoneID);
 
+        // Make darn sure we don't have a leftover I2PAppContext in the same JVM
+        // e.g. on Android - see finalShutdown() also
+        if (RouterContext.getContexts().isEmpty())
+            RouterContext.killGlobalContext();
+
         // The important thing that happens here is the directory paths are set and created
         // i2p.dir.router defaults to i2p.dir.config
         // i2p.dir.app defaults to i2p.dir.router

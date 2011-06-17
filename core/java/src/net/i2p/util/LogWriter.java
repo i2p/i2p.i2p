@@ -36,7 +36,7 @@ class LogWriter implements Runnable {
     private File _currentFile;
     private final LogManager _manager;
 
-    private boolean _write;
+    private volatile boolean _write;
     private static final int MAX_DISKFULL_MESSAGES = 8;
     private int _diskFullMessageCount;
     
@@ -55,7 +55,8 @@ class LogWriter implements Runnable {
             rotateFile();
             while (_write) {
                 flushRecords();
-                rereadConfig();
+                if (_write)
+                    rereadConfig();
             }
             //System.err.println("Done writing");
         } catch (Exception e) {

@@ -656,6 +656,9 @@ public class LogManager {
             // this could generate out-of-order messages
             _writer.flushRecords(false);
             _writer.stopWriting();
+            synchronized (_writer) {
+                _writer.notifyAll();
+            }
         }
     }
 
