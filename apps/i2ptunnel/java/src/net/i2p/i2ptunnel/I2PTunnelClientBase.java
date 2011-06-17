@@ -565,7 +565,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
      */
     static void killClientExecutor() {
         synchronized (I2PTunnelClientBase.class) {
-            if (_executor == null) {
+            if (_executor != null) {
                 _executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
                 _executor.shutdownNow();
                 _executor = null;
