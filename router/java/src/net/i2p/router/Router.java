@@ -980,19 +980,23 @@ public class Router {
         try { _context.inNetMessagePool().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the inbound net pool", t); }
         //try { _sessionKeyPersistenceHelper.shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the session key manager", t); }
         _context.deleteTempDir();
-        RouterContext.listContexts().remove(_context);
+        List<RouterContext> contexts = RouterContext.getContexts();
+        contexts.remove(_context);
 
         // shut down I2PAppContext tasks here
 
-        // TODO if there are multiple routers in the JVM, we don't want to do this
+        // If there are multiple routers in the JVM, we don't want to do this
         // to the DH or YK tasks, as they are singletons.
-        // Have MultiRouter set a property or something.
-        try {
-            DHSessionKeyBuilder.shutdown();
-        } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting DH", t); }
-        try {
-            _context.elGamalEngine().shutdown();
-        } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting elGamal", t); }
+        if (contexts.isEmpty()) {
+            try {
+                DHSessionKeyBuilder.shutdown();
+            } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting DH", t); }
+            try {
+                _context.elGamalEngine().shutdown();
+            } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting elGamal", t); }
+        } else {
+            _log.logAlways(Log.WARN, "Warning - " + contexts.size() + " routers remaining in this JVM, not releasing all resources");
+        }
         try {
             ((FortunaRandomSource)_context.random()).shutdown();
         } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting random()", t); }
@@ -1020,6 +1024,8 @@ public class Router {
 
         File f = getPingFile();
         f.delete();
+        if (RouterContext.getContexts().isEmpty())
+            RouterContext.killGlobalContext();
         if (_killVMOnEnd) {
             try { Thread.sleep(1000); } catch (InterruptedException ie) {}
             Runtime.getRuntime().halt(exitCode);

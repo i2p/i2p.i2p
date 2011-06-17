@@ -22,8 +22,8 @@ import net.i2p.util.Log;
  *
  */
 public class I2NPMessageHandler {
-    private Log _log;
-    private I2PAppContext _context;
+    private final Log _log;
+    private final I2PAppContext _context;
     private long _lastReadBegin;
     private long _lastReadEnd;
     private int _lastSize;

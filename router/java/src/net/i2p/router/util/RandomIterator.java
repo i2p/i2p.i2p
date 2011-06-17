@@ -84,7 +84,7 @@ public class RandomIterator<E> implements Iterator<E> {
     * <a href="http://www.qbrundage.com/michaelb/pubs/essays/random_number_generation" title="http://www.qbrundage.com/michaelb/pubs/essays/random_number_generation" target="_blank">http://www.qbrundage.com/michaelb/pubs/e&#8230;</a>
     * for some implementations, which are faster than java.util.Random.
     */
-    private static final Random rand = RandomSource.getInstance();
+    private final Random rand = RandomSource.getInstance();
 
     /** Used to narrow the range to take random indexes from */
     private int lower, upper;

@@ -115,6 +115,10 @@ public class I2PAppContext {
      * Pull the default context, creating a new one if necessary, else using 
      * the first one created.
      *
+     * Warning - do not save the returned value, or the value of any methods below,
+     * in a static field, or you will get the old context if a new router is
+     * started in the same JVM after the first is shut down,
+     * e.g. on Android.
      */
     public static I2PAppContext getGlobalContext() { 
         // skip the global lock - _gAC must be volatile
@@ -165,8 +169,12 @@ public class I2PAppContext {
     private I2PAppContext(boolean doInit, Properties envProps) {
         if (doInit) {
             synchronized (I2PAppContext.class) { 
-                if (_globalAppContext == null)
+                if (_globalAppContext == null) {
                     _globalAppContext = this;
+                } else {
+                    System.out.println("Warning - New context not replacing old one, you now have a second one");
+                    (new Exception("I did it")).printStackTrace();
+                }
             }
         }
         _overrideProps = new I2PProperties();
@@ -186,7 +194,7 @@ public class I2PAppContext {
         _elGamalAESEngineInitialized = false;
         _logManagerInitialized = false;
         _keyRingInitialized = false;
-        _shutdownTasks = new ConcurrentHashSet(16);
+        _shutdownTasks = new ConcurrentHashSet(32);
         initializeDirs();
     }
     

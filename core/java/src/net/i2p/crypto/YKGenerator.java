@@ -43,7 +43,7 @@ class YKGenerator {
     private static final int CALC_DELAY;
     private static final LinkedBlockingQueue<BigInteger[]> _values;
     private static Thread _precalcThread;
-    private static final I2PAppContext ctx;
+    private static I2PAppContext ctx;
     private static volatile boolean _isRunning;
 
     public final static String PROP_YK_PRECALC_MIN = "crypto.yk.precalc.min";
@@ -76,20 +76,22 @@ class YKGenerator {
         //    _log.debug("ElGamal YK Precalc (minimum: " + MIN_NUM_BUILDERS + " max: " + MAX_NUM_BUILDERS + ", delay: "
         //               + CALC_DELAY + ")");
 
-        ctx.statManager().createRateStat("crypto.YKUsed", "Need a YK from the queue", "Encryption", new long[] { 60*60*1000 });
-        ctx.statManager().createRateStat("crypto.YKEmpty", "YK queue empty", "Encryption", new long[] { 60*60*1000 });
         startPrecalc();
     }
 
-    /** @since 0.8.8 */
+    /**
+     * Caller must synch on class
+     * @since 0.8.8
+     */
     private static void startPrecalc() {
-        synchronized(YKGenerator.class) {
-            _precalcThread = new I2PThread(new YKPrecalcRunner(MIN_NUM_BUILDERS, MAX_NUM_BUILDERS),
+        ctx = I2PAppContext.getGlobalContext();
+        ctx.statManager().createRateStat("crypto.YKUsed", "Need a YK from the queue", "Encryption", new long[] { 60*60*1000 });
+        ctx.statManager().createRateStat("crypto.YKEmpty", "YK queue empty", "Encryption", new long[] { 60*60*1000 });
+        _precalcThread = new I2PThread(new YKPrecalcRunner(MIN_NUM_BUILDERS, MAX_NUM_BUILDERS),
                                        "YK Precalc", true);
-            _precalcThread.setPriority(Thread.MIN_PRIORITY);
-            _isRunning = true;
-            _precalcThread.start();
-        }
+        _precalcThread.setPriority(Thread.MIN_PRIORITY);
+        _isRunning = true;
+        _precalcThread.start();
     }
 
     /**

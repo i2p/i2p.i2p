@@ -1,6 +1,7 @@
 package net.i2p.router;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -67,6 +68,8 @@ public class RouterContext extends I2PAppContext {
         // to init everything. Caller MUST call initAll() afterwards.
         // Sorry, this breaks some main() unit tests out there.
         //initAll();
+        if (!_contexts.isEmpty())
+            System.out.println("Warning - More than one router in this JVM");
         _contexts.add(this);
     }
 
@@ -165,11 +168,37 @@ public class RouterContext extends I2PAppContext {
     /**
      * Retrieve the list of router contexts currently instantiated in this JVM.  
      * This will always contain only one item (except when a simulation per the
-     * MultiRouter is going on), and the list should only be modified when a new
+     * MultiRouter is going on).
+     *
+     * @return an unmodifiable list (as of 0.8.8). May be null or empty.
+     */
+    public static List<RouterContext> listContexts() {
+        return Collections.unmodifiableList(_contexts);
+    }
+    
+    /**
+     * Same as listContexts() but package private and modifiable.
+     * The list should only be modified when a new
      * context is created or a router is shut down.
      *
+     * @since 0.8.8
      */
-    public static List<RouterContext> listContexts() { return _contexts; }
+    static List<RouterContext> getContexts() {
+        return _contexts;
+    }
+    
+    /**
+     * Kill the global I2PAppContext, so it isn't still around
+     * when we restart in the same JVM (Android).
+     * Only do this if there are no other routers in the JVM.
+     *
+     * @since 0.8.8
+     */
+    static void killGlobalContext() {
+        synchronized (I2PAppContext.class) {
+            _globalAppContext = null;
+        }
+    }
     
     /** what router is this context working for? */
     public Router router() { return _router; }

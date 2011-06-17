@@ -47,8 +47,8 @@ import net.i2p.util.RandomSource;
  * @author jrandom
  */
 public class DHSessionKeyBuilder {
-    private static final I2PAppContext _context = I2PAppContext.getGlobalContext();
-    private static final Log _log;
+    private static I2PAppContext _context = I2PAppContext.getGlobalContext();
+    private static Log _log;
     private static final int MIN_NUM_BUILDERS;
     private static final int MAX_NUM_BUILDERS;
     private static final int CALC_DELAY;
@@ -100,15 +100,18 @@ public class DHSessionKeyBuilder {
         startPrecalc();
     }
 
-    /** @since 0.8.8 */
+    /**
+     * Caller must synch on class
+     * @since 0.8.8
+     */
     private static void startPrecalc() {
-        synchronized(DHSessionKeyBuilder.class) {
-            _precalcThread = new I2PThread(new DHSessionKeyBuilderPrecalcRunner(MIN_NUM_BUILDERS, MAX_NUM_BUILDERS),
-                                           "DH Precalc", true);
-            _precalcThread.setPriority(Thread.MIN_PRIORITY);
-            _isRunning = true;
-            _precalcThread.start();
-        }
+        _context = I2PAppContext.getGlobalContext();
+        _log = _context.logManager().getLog(DHSessionKeyBuilder.class);
+        _precalcThread = new I2PThread(new DHSessionKeyBuilderPrecalcRunner(MIN_NUM_BUILDERS, MAX_NUM_BUILDERS),
+                                       "DH Precalc", true);
+        _precalcThread.setPriority(Thread.MIN_PRIORITY);
+        _isRunning = true;
+        _precalcThread.start();
     }
 
     /**
@@ -505,7 +508,7 @@ public class DHSessionKeyBuilder {
         }
         
         public void run() {
-            while (true) {
+            while (_isRunning) {
 
                 int curSize = 0;
                 long start = System.currentTimeMillis();
