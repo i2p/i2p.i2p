@@ -63,6 +63,13 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
     public static final String PROP_HOSTNAME_DEFAULT="%f.b32.i2p";
     private static final long HEADER_TIMEOUT = 60*1000;
     
+    private final static byte[] ERR_UNAVAILABLE =
+        (":ircserver.i2p 499 you :" +
+         "This I2P IRC server is unvailable. It may be down or undergoing maintenance. " +
+         "Please try again later." +
+         "\r\n")
+         .getBytes();
+
     /**
      * @throws IllegalArgumentException if the I2PTunnel does not contain
      *                                  valid config to contact the router
@@ -125,7 +132,11 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
             Socket s = new Socket(remoteHost, remotePort);
             new I2PTunnelRunner(s, socket, slock, null, modifiedRegistration.getBytes(), null);
         } catch (SocketException ex) {
-            // TODO send the equivalent of a 503?
+            try {
+                // Send a response so the user doesn't just see a disconnect
+                // and blame his router or the network.
+                socket.getOutputStream().write(ERR_UNAVAILABLE);
+            } catch (IOException ioe) {}
             try {
                 socket.close();
             } catch (IOException ioe) {}
