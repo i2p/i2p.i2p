@@ -193,8 +193,16 @@ public class Router {
 
         // Make darn sure we don't have a leftover I2PAppContext in the same JVM
         // e.g. on Android - see finalShutdown() also
-        if (RouterContext.getContexts().isEmpty())
+        List<RouterContext> contexts = RouterContext.getContexts();
+        if (contexts.isEmpty()) {
             RouterContext.killGlobalContext();
+        } else if (System.getProperty("java.vendor").contains("Android")) {
+            System.err.println("Warning: Killing " + contexts.size() + " other routers in this JVM");
+            contexts.clear();
+            RouterContext.killGlobalContext();
+        } else {
+            System.err.println("Warning: " + contexts.size() + " other routers in this JVM");
+        }
 
         // The important thing that happens here is the directory paths are set and created
         // i2p.dir.router defaults to i2p.dir.config
@@ -1031,6 +1039,18 @@ public class Router {
         f.delete();
         if (RouterContext.getContexts().isEmpty())
             RouterContext.killGlobalContext();
+
+        // Since 0.8.8, mainly for Android
+        for (Runnable task : _context.getFinalShutdownTasks()) {
+            System.err.println("Running final shutdown task " + task.getClass());
+            try {
+                task.run();
+            } catch (Throwable t) {
+                System.err.println("Running final shutdown task " + t);
+            }
+        }
+        _context.getFinalShutdownTasks().clear();
+
         if (_killVMOnEnd) {
             try { Thread.sleep(1000); } catch (InterruptedException ie) {}
             Runtime.getRuntime().halt(exitCode);

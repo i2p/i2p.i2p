@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Hash;
@@ -56,6 +58,7 @@ public class RouterContext extends I2PAppContext {
     private MessageValidator _messageValidator;
     private MessageStateMonitor _messageStateMonitor;
     private RouterThrottle _throttle;
+    private final Set<Runnable> _finalShutdownTasks;
 
     private static List<RouterContext> _contexts = new ArrayList(1);
     
@@ -69,8 +72,9 @@ public class RouterContext extends I2PAppContext {
         // Sorry, this breaks some main() unit tests out there.
         //initAll();
         if (!_contexts.isEmpty())
-            System.out.println("Warning - More than one router in this JVM");
+            System.err.println("Warning - More than one router in this JVM");
         _contexts.add(this);
+        _finalShutdownTasks = new CopyOnWriteArraySet();
     }
 
     /**
@@ -436,6 +440,25 @@ public class RouterContext extends I2PAppContext {
      */
     void removeShutdownTasks() {
         _shutdownTasks.clear();
+    }
+    
+    /**
+     *  The last thing to be called before router shutdown.
+     *  No context resources, including logging, will be available.
+     *  Only for external threads in the same JVM needing to know when
+     *  the shutdown is complete, like Android.
+     *  @since 0.8.8
+     */
+    public void addFinalShutdownTask(Runnable task) {
+        _finalShutdownTasks.add(task);
+    }
+    
+    /**
+     *  @return the Set
+     *  @since 0.8.8
+     */
+    Set<Runnable> getFinalShutdownTasks() {
+        return _finalShutdownTasks;
     }
     
     /**
