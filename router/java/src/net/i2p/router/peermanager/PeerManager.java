@@ -117,6 +117,7 @@ class PeerManager {
     }
 
     void loadProfiles() {
+        // TODO do this in a Thread or a Job to not slow down the constructor
         Set<PeerProfile> profiles = _persistenceHelper.readProfiles();
         for (Iterator<PeerProfile> iter = profiles.iterator(); iter.hasNext();) {
             PeerProfile prof = iter.next();
