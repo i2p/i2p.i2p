@@ -83,7 +83,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
      *  Extending classes may use it for other purposes.
      *  Not for use by servers, as there is no limit on threads.
      */
-    private static ThreadPoolExecutor _executor;
+    private static volatile ThreadPoolExecutor _executor;
     private static int _executorThreadCount;
 
     public I2PTunnelClientBase(int localPort, Logging l, I2PSocketManager sktMgr,
@@ -108,6 +108,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
             if (_executor == null)
                 _executor = new CustomThreadPoolExecutor();
         }
+
         Thread t = new I2PAppThread(this, "Client " + tunnel.listenHost + ':' + localPort);
         listenerReady = false;
         t.start();
@@ -160,6 +161,11 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         _context.statManager().createRateStat("i2ptunnel.client.manageTime", "How long it takes to accept a socket and fire it into an i2ptunnel runner (or queue it for the pool)?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("i2ptunnel.client.buildRunTime", "How long it takes to run a queued socket into an i2ptunnel runner?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _log = _context.logManager().getLog(getClass());
+
+        synchronized (I2PTunnelClientBase.class) {
+            if (_executor == null)
+                _executor = new CustomThreadPoolExecutor();
+        }
 
         // normalize path so we can find it
         if (pkf != null) {
@@ -583,8 +589,16 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
      */
     protected void manageConnection(Socket s) {
         if (s == null) return;
+        ThreadPoolExecutor tpe = _executor;
+        if (tpe == null) {
+            _log.error("No executor for socket!");
+             try {
+                 s.close();
+             } catch (IOException ioe) {}
+            return;
+        }
         try {
-            _executor.execute(new BlockingRunner(s));
+            tpe.execute(new BlockingRunner(s));
         } catch (RejectedExecutionException ree) {
              // should never happen, we have an unbounded pool and never stop the executor
              try {
