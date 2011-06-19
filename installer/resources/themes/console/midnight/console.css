@@ -766,10 +766,10 @@ p {
 }
 
 .langbox {
-     margin: 4px 0px 0px 5px;
+     margin: 4px 5px 0px 5px;
      color: #eef;
      font-size: 7pt;
-     width: 240px;
+     width: auto;
      text-align: center;
      float: right;
      vertical-align: middle;
