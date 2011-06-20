@@ -842,7 +842,7 @@ public class EepGet {
             if (val.indexOf("chunked") != -1)
                 _encodingChunked = true;
         } else if (key.equalsIgnoreCase("Content-Type")) {
-            _contentType=val;
+            _contentType=val.trim();
         } else if (key.equalsIgnoreCase("Location")) {
             _redirectLocation=val.trim();
         } else {
