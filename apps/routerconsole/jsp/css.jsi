@@ -43,4 +43,13 @@
 <%
    }
 %>
+<%
+   // Use RTL theme for Arabic
+   if (intl.getLang().equals("ar")) {
+%>
+<link href="<%=intl.getTheme(request.getHeader("User-Agent"))%>console_ar.css" rel="stylesheet" type="text/css">
+<%
+   }
+%>
+
 <!--[if IE]><link href="/themes/console/classic/ieshim.css" rel="stylesheet" type="text/css" /><![endif]-->
