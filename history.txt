@@ -1,3 +1,7 @@
+2011-06-21 kytv
+  * Make the i2prouter script fail more gracefully if there's
+    a problem loading the wrapper.
+
 2011-06-14 zzz
   * Build: New targets for including jbigi in the updater
   * Console: CSS tweak for flag box
