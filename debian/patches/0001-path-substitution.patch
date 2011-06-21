@@ -34,7 +34,7 @@ Debian wrapper.config to try to prevent confusion.
  # PORTABLE installation:
  # Use the following instead.
  #I2PTEMP="%INSTALL_PATH"
-@@ -33,8 +33,8 @@
+@@ -35,8 +35,8 @@
  APP_LONG_NAME="I2P Service"
  
  # Wrapper
@@ -43,8 +43,8 @@ Debian wrapper.config to try to prevent confusion.
 +WRAPPER_CMD="/usr/sbin/wrapper"
 +WRAPPER_CONF="/etc/i2p/wrapper.config"
  
- # Priority at which to run the wrapper.  See "man nice" for valid priorities.
- #  nice is only used if a priority is specified.
+ unsupported() {
+     echo "The most likely reason is that a supported version of the java"
 --- a/installer/resources/runplain.sh
 +++ b/installer/resources/runplain.sh
 @@ -11,8 +11,8 @@
@@ -173,6 +173,6 @@ Debian wrapper.config to try to prevent confusion.
 -wrapper.ntservice.starttype=AUTO_START
 -
 -# Allow the service to interact with the desktop.
--wrapper.ntservice.interactive=true
+-wrapper.ntservice.interactive=false
 -
 +wrapper.pidfile=/tmp/i2p.pid
