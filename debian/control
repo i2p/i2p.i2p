@@ -23,7 +23,7 @@ Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends}, default-jre | java
  i2p-router (>= 0.8.6-5),
  libjbigi-jni (>= ${source:Version}),
  libjbigi-jni (<< ${source:Version}.1~),
- lsb-base (>= 3.2-14), 
+ lsb-base,
  service-wrapper 
 Description: Load-balanced unspoofable packet switching network
  I2P is an anonymizing network, offering a simple layer that identity-sensitive
