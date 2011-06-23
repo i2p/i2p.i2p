@@ -27,7 +27,6 @@ JVMPIDFILE="$RUN/routerjvm.pid"
 I2P="/usr/share/i2p"
 I2PTEMP="/tmp/"
 WRAPPERLOG="/var/log/i2p/wrapper.log"
-ANCHORFILE="$I2PTEMP/i2p.anchor"
 
 # Don't touch these, edit /etc/default/i2p
 RUN_DAEMON="False"
@@ -36,16 +35,17 @@ I2PUSER="i2psvc"
 
 I2P_ARGS="/etc/i2p/wrapper.config \
  wrapper.java.additional.1=-DloggerFilenameOverride=/var/log/i2p/log-router-@.txt \
- wrapper.java.additional.7=-Dwrapper.logfile=$WRAPPERLOG \
+ wrapper.java.additional.5=-Dwrapper.logfile=$WRAPPERLOG \
  wrapper.logfile=$WRAPPERLOG \
  wrapper.pidfile=$PIDFILE \
- wrapper.anchorfile=$ANCHORFILE \
  wrapper.java.pidfile=$JVMPIDFILE \
  wrapper.daemonize=TRUE"
 
 
 
 # this isn't really needed since we depend on lsb-base (>= 3.2-14)
+## Actually, we *do* need this since the versioned dependency has been dropped
+## the I2P packages can be installed in GnewSense.
 [ -r /lib/lsb/init-functions ] && . /lib/lsb/init-functions
 [ -r /lib/init/vars.sh ] && . /lib/init/vars.sh
 
