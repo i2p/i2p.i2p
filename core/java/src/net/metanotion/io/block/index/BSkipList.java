@@ -98,7 +98,8 @@ public class BSkipList extends SkipList {
 		}
 		if (BlockFile.log.shouldLog(Log.DEBUG))
 			BlockFile.log.debug("Loaded " + this + " cached " + levelHash.size() + " levels and " + spanHash.size() + " spans with " + total + " entries");
-		if (levelCount != levelHash.size() || spans != spanHash.size() || size != total) {
+		if (bf.file.canWrite() &&
+		    (levelCount != levelHash.size() || spans != spanHash.size() || size != total)) {
 			if (BlockFile.log.shouldLog(Log.WARN))
 				BlockFile.log.warn("On-disk counts were " + levelCount + " / " + spans + " / " +  size + ", correcting");
 			size = total;
@@ -117,6 +118,8 @@ public class BSkipList extends SkipList {
 
 	@Override
 	public void flush() {
+                if (!bf.file.canWrite())
+                    return;
 		if (isClosed) {
 			BlockFile.log.error("Already closed!! " + this, new Exception());
 			return;

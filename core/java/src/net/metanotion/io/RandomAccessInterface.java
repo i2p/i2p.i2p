@@ -39,6 +39,13 @@ public interface RandomAccessInterface {
 	public void seek(long pos) throws IOException;
 	public void setLength(long newLength) throws IOException;
 
+	/**
+	 *  I2P is the file writable?
+	 *  Only valid if the File constructor was used, not the RAF constructor
+	 *  @since 0.8.8
+	 */
+	public boolean canWrite();
+
 	// Closeable Methods
 	public void close() throws IOException;
 
