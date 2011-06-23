@@ -67,6 +67,7 @@ case $HOST_OS in
     osx )
         wrapperpath="./lib/wrapper/macosx"
         cp ${wrapperpath}/libwrapper.jnilib ./lib/
+	chmod 755 ./Start\ I2P\ Router.app/Contents/MacOS/i2prouter
         ;;
     solaris )
         wrapperpath="./lib/wrapper/solaris"
@@ -90,6 +91,12 @@ rm -f ./lib/*.dll
 rm -f ./*.bat
 rm -f ./*.exe
 rm -rf ./installer
+
+if [ ! `echo $HOST_OS  |grep osx` ]; then
+    rm -rf ./Start\ I2P\ Router.app
+    #rm -f I2P\ Router\ Console.webloc
+fi
+
 # no, let's not start the router from the install script any more
 # ./i2prouter start
 exit 0

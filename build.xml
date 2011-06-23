@@ -482,7 +482,7 @@
         </delete>
     </target>
 
-    <target name="preppkg" depends="preppkg-linux, preppkg-windows, jbigi">
+    <target name="preppkg" depends="preppkg-linux, preppkg-osx, preppkg-windows, jbigi">
         <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
         <copy todir="pkg-temp/lib/wrapper/freebsd/">
             <fileset dir="installer/lib/wrapper/freebsd/" />
@@ -544,6 +544,13 @@
         <copy todir="pkg-temp/lib/wrapper/linux64/">
             <fileset dir="installer/lib/wrapper/linux64/" />
         </copy>
+    </target>
+
+    <target name="preppkg-osx" depends="preppkg-linux">
+        <!--<copy file="installer/resources/I2P Router Console.webloc" todir="pkg-temp/" />-->
+        <copy todir="pkg-temp/Start I2P Router.app">
+	    <fileset dir="installer/resources/Start I2P Router.app" />
+	</copy>
     </target>
 
     <target name="preppkg-base" depends="build, preplicenses, prepConsoleDocs, prepthemeupdates, prepCertificates">

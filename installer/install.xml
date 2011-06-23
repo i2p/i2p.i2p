@@ -135,6 +135,7 @@
             <parsable targetfile="$INSTALL_PATH/i2prouter" type="shell" os="unix|mac" />
             <parsable targetfile="$INSTALL_PATH/eepget" type="shell" os="unix|mac" />
             <parsable targetfile="$INSTALL_PATH/runplain.sh" type="shell" os="unix|mac" />
+            <parsable targetfile="$INSTALL_PATH/Start I2P Router.app/Contents/MacOS/i2prouter" type="shell" os="mac" />
             
 	    <conditions>
 	        <condition type="variable" id="is64bit">
@@ -180,6 +181,12 @@
                 <args><arg value="$INSTALL_PATH\lib\wrapper" /></args></executable>
             <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\eepget" /></args></executable>
+	    <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+	        <args><arg value="$INSTALL_PATH/Start I2P Router.app" /></args></executable>
+	    <!-- Placeholder for an OSX 'shortcut' to the router console
+	    <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+	        <args><arg value="$INSTALL_PATH/I2P Router Console.webloc" /></args></executable>
+		-->
 
             <!-- workaround for vista permission problems - see comments above -->
             <executable targetfile="$INSTALL_PATH/fixperms.bat" type="bin" stage="postinstall" keep="true" failure="warn"
