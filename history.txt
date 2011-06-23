@@ -1,3 +1,6 @@
+2011-06-23 zzz
+  * IRC: Allow outbound INVITE
+
 2011-06-21 kytv
   * Make the i2prouter script fail more gracefully if there's
     a problem loading the wrapper.
