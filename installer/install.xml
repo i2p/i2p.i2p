@@ -110,8 +110,14 @@
         <panel classname="ShortcutPanel"><os family="windows" /></panel>
         <!-- <panel classname="ProcessPanel"><os family="windows" /></panel> -->
         <!-- unix|mac doesn't work, displays for windows too -->
-        <panel classname="XInfoPanel" ><os family="unix" /></panel>
-        <panel classname="XInfoPanel" ><os family="mac" /></panel>
+
+        <!-- Unfortunately unix is used for osx as well, so the XInfoPanel was shown *twice*
+	     on OSX. Using the condition this way, the panel is shown on everything 
+	     *but* Windows. 
+	     -->
+	<panel classname="XInfoPanel" condition="!izpack.windowsinstall" />
+	<!--<panel classname="XInfoPanel" ><os family="unix" /></panel> -->
+	<!--<panel classname="XInfoPanel" ><os family="mac" /></panel>  -->
         <panel classname="InstallPanel"/>
         <panel classname="SimpleFinishPanel"/>
     </panels>
