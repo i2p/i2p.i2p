@@ -20,7 +20,11 @@ import java.util.concurrent.CopyOnWriteArraySet;
  *
  */
 public class I2PThread extends Thread {
-    private static volatile Log _log;
+    /**
+     *  Non-static to avoid refs to old context in Android.
+     *  Probably should just remove all the logging though.
+     */
+    private volatile Log _log;
     private static final Set _listeners = new CopyOnWriteArraySet();
     private String _name;
     private Exception _createdBy;
@@ -61,8 +65,9 @@ public class I2PThread extends Thread {
             _createdBy = new Exception("Created by");
     }
 
-    private static void log(int level, String msg) { log(level, msg, null); }
-    private static void log(int level, String msg, Throwable t) {
+    private void log(int level, String msg) { log(level, msg, null); }
+
+    private void log(int level, String msg, Throwable t) {
         // we cant assume log is created
         if (_log == null) _log = new Log(I2PThread.class);
         if (_log.shouldLog(level))
@@ -85,7 +90,9 @@ public class I2PThread extends Thread {
             if (t instanceof OutOfMemoryError)
                 fireOOM((OutOfMemoryError)t);
         }
-        log(Log.INFO, "Thread finished normally: " + _name);
+        // This creates a new I2PAppContext after it was deleted
+        // in Router.finalShutdown() via RouterContext.killGlobalContext()
+        //log(Log.INFO, "Thread finished normally: " + _name);
     }
     
     @Override

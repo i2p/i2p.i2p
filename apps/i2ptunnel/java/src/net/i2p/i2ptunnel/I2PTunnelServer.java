@@ -67,6 +67,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
 
     protected I2PTunnelTask task = null;
     protected boolean bidir = false;
+    private ThreadPoolExecutor _executor;
 
     private int DEFAULT_LOCALPORT = 4488;
     protected int localPort = DEFAULT_LOCALPORT;
@@ -259,6 +260,10 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
             }
             //l.log("Server shut down.");
             open = false;
+            if (_usePool && _executor != null) {
+                _executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
+                _executor.shutdownNow();
+            }
             return true;
         }
     }
@@ -283,7 +288,6 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
      */
     public void run() {
         I2PServerSocket i2pS_S = sockMgr.getServerSocket();
-        ThreadPoolExecutor executor = null;
         if (_log.shouldLog(Log.WARN)) {
             if (_usePool)
                 _log.warn("Starting executor with " + getHandlerCount() + " threads max");
@@ -291,7 +295,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 _log.warn("Threads disabled, running blockingHandles inline");
         }
         if (_usePool) {
-            executor = new CustomThreadPoolExecutor(getHandlerCount(), "ServerHandler pool " + remoteHost + ':' + remotePort);
+            _executor = new CustomThreadPoolExecutor(getHandlerCount(), "ServerHandler pool " + remoteHost + ':' + remotePort);
         }
         while (open) {
             try {
@@ -299,7 +303,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 if (i2ps == null) throw new I2PException("I2PServerSocket closed");
                 if (_usePool) {
                     try {
-                        executor.execute(new Handler(i2ps));
+                        _executor.execute(new Handler(i2ps));
                     } catch (RejectedExecutionException ree) {
                          try {
                              i2ps.close();
@@ -328,8 +332,8 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
                 // ignored, we never set the timeout
             }
         }
-        if (executor != null)
-            executor.shutdownNow();
+        if (_executor != null)
+            _executor.shutdownNow();
     }
     
     /**

@@ -107,8 +107,18 @@ public class DecayingBloomFilter {
         context.statManager().createRateStat("router.decayingBloomFilter." + name + ".log10(falsePos)",
              "log10 of the false positive rate (must have net.i2p.util.DecayingBloomFilter=DEBUG)",
              "Router", new long[] { Math.max(60*1000, durationMs) });
+        context.addShutdownTask(new Shutdown());
     }
     
+    /**
+     * @since 0.8.8
+     */
+    private class Shutdown implements Runnable {
+        public void run() {
+           clear();
+        }
+    }
+
     public long getCurrentDuplicateCount() { return _currentDuplicates; }
 
     public int getInsertedCount() { 

@@ -21,7 +21,6 @@
 package org.klomp.snark;
 
 import java.util.Iterator;
-import java.util.TimerTask;
 
 import net.i2p.data.DataHelper;
 
@@ -29,7 +28,7 @@ import net.i2p.data.DataHelper;
  * TimerTask that monitors the peers and total up/download speeds.
  * Works together with the main Snark class to report periodical statistics.
  */
-class PeerMonitorTask extends TimerTask
+class PeerMonitorTask implements Runnable
 {
   final static long MONITOR_PERIOD = 10 * 1000; // Ten seconds.
   private static final long KILOPERSECOND = 1024 * (MONITOR_PERIOD / 1000);

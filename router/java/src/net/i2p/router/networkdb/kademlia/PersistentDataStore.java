@@ -359,6 +359,9 @@ class PersistentDataStore extends TransientDataStore {
                     if (routerInfoFiles.length > 5)
                         _alreadyWarned = false;
                     for (int i = 0; i < routerInfoFiles.length; i++) {
+                        // drop out if the router gets killed right after startup
+                        if (!_context.router().isAlive())
+                            break;
                         Hash key = getRouterInfoHash(routerInfoFiles[i].getName());
                         if ( (key != null) && (!isKnown(key)) ) {
                             // Run it inline so we don't clog up the job queue, esp. at startup

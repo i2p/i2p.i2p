@@ -52,6 +52,11 @@ class PeerManager {
     private static final long REORGANIZE_TIME_MEDIUM = 123*1000;
     private static final long REORGANIZE_TIME_LONG = 551*1000;
     
+    /**
+     *  Warning - this loads all the profiles in the constructor.
+     *  This may take a long time - 30 seconds or more.
+     *  Instantiate this in a Job or Thread.
+     */
     public PeerManager(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(PeerManager.class);
@@ -99,6 +104,14 @@ class PeerManager {
         }
     }
 
+    /** @since 0.8.8 */
+    void clearProfiles() {
+        _organizer.clearProfiles();
+        _capabilitiesByPeer.clear();
+        for (int i = 0; i < _peersByCapability.length; i++)
+            _peersByCapability[i].clear();
+    }
+
     Set selectPeers() {
         return _organizer.selectAllPeers();
     }
@@ -111,6 +124,9 @@ class PeerManager {
             _persistenceHelper.writeProfile(prof);
     }
 
+    /**
+     *  This may take a long time - 30 seconds or more
+     */
     void loadProfiles() {
         Set<PeerProfile> profiles = _persistenceHelper.readProfiles();
         for (Iterator<PeerProfile> iter = profiles.iterator(); iter.hasNext();) {

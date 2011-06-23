@@ -48,14 +48,14 @@ public class SnarkManager implements Snark.CompleteListener {
     private final Object _addSnarkLock;
     private /* FIXME final FIXME */ File _configFile;
     private Properties _config;
-    private I2PAppContext _context;
-    private Log _log;
+    private final I2PAppContext _context;
+    private final Log _log;
     private final List _messages;
-    private I2PSnarkUtil _util;
+    private final I2PSnarkUtil _util;
     private PeerCoordinatorSet _peerCoordinatorSet;
     private ConnectionAcceptor _connectionAcceptor;
     private Thread _monitor;
-    private boolean _running;
+    private volatile boolean _running;
     
     public static final String PROP_I2CP_HOST = "i2psnark.i2cpHost";
     public static final String PROP_I2CP_PORT = "i2psnark.i2cpPort";
@@ -1089,7 +1089,7 @@ public class SnarkManager implements Snark.CompleteListener {
             // although the user will see the default until then
             getBWLimit();
             boolean doMagnets = true;
-            while (true) {
+            while (_running) {
                 File dir = getDataDir();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Directory Monitor loop over " + dir.getAbsolutePath());

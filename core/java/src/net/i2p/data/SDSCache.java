@@ -83,6 +83,18 @@ public class SDSCache<V extends SimpleDataStructure> {
             _log.debug("New SDSCache for " + rvClass + " data size: " + len +
                        " max: " + size + " max mem: " + (len * size));
         I2PAppContext.getGlobalContext().statManager().createRateStat(_statName, "Hit rate", "Router", new long[] { 10*60*1000 });
+        I2PAppContext.getGlobalContext().addShutdownTask(new Shutdown());
+    }
+
+    /**
+     * @since 0.8.8
+     */
+    private class Shutdown implements Runnable {
+        public void run() {
+            synchronized(_cache) {
+                _cache.clear();
+            }
+        }
     }
 
     /**

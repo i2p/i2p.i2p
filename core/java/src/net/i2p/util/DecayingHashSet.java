@@ -93,8 +93,18 @@ public class DecayingHashSet extends DecayingBloomFilter {
              "Size", "Router", new long[] { Math.max(60*1000, durationMs) });
         context.statManager().createRateStat("router.decayingHashSet." + name + ".dups",
              "1000000 * Duplicates/Size", "Router", new long[] { Math.max(60*1000, durationMs) });
+        context.addShutdownTask(new Shutdown());
     }
     
+    /**
+     * @since 0.8.8
+     */
+    private class Shutdown implements Runnable {
+        public void run() {
+            clear();
+        }
+    }
+
     /** unsynchronized but only used for logging elsewhere */
     @Override
     public int getInsertedCount() { 

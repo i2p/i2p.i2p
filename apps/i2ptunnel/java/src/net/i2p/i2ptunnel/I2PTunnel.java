@@ -73,12 +73,12 @@ import net.i2p.util.Log;
  *  Todo: Most events are not listened to elsewhere, so error propagation is poor
  */
 public class I2PTunnel implements Logging, EventDispatcher {
-    private Log _log;
-    private EventDispatcherImpl _event;
-    private I2PAppContext _context;
+    private final Log _log;
+    private final EventDispatcherImpl _event;
+    private final I2PAppContext _context;
     private static long __tunnelId = 0;
-    private long _tunnelId;
-    private Properties _clientOptions;
+    private final long _tunnelId;
+    private final Properties _clientOptions;
     private final List<I2PSession> _sessions;
 
     public static final int PACKET_DELAY = 100;

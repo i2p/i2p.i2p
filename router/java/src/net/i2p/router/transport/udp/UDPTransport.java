@@ -1367,6 +1367,15 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             return "";
     }
 
+    /** @since 0.8.8 */
+    int getPacketHandlerCount() {
+        PacketHandler handler = _handler;
+        if (handler != null)
+            return handler.getHandlerCount();
+        else
+            return 0;
+    }
+
     private static final int DROP_INACTIVITY_TIME = 60*1000;
     
     public void failed(OutboundMessageState msg) { failed(msg, true); }

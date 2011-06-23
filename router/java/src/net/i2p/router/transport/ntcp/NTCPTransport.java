@@ -702,6 +702,7 @@ public class NTCPTransport extends TransportImpl {
             NTCPConnection con = (NTCPConnection)iter.next();
             con.close();
         }
+        NTCPConnection.releaseResources();
         // will this work?
         replaceAddress(null);
     }

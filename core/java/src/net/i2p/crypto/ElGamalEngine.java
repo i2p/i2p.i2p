@@ -78,6 +78,24 @@ public class ElGamalEngine {
     }
 
     
+    /**
+     *  Note that this stops the singleton precalc thread.
+     *  You don't want to do this if there are multiple routers in the JVM.
+     *  Fix this if you care. See Router.shutdown().
+     *  @since 0.8.8
+     */
+    public void shutdown() {
+        YKGenerator.shutdown();
+    }
+
+    /**
+     *  Only required if shutdown() previously called.
+     *  @since 0.8.8
+     */
+    public static void restart() {
+        YKGenerator.restart();
+    }
+
     private final static BigInteger _two = new NativeBigInteger(1, new byte[] { 0x02});
 
     private BigInteger[] getNextYK() {

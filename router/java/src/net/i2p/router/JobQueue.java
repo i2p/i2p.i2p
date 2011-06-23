@@ -280,14 +280,22 @@ public class JobQueue {
     
     void shutdown() { 
         _alive = false; 
-        _timedJobs.clear();
-        _readyJobs.clear();
+        synchronized (_jobLock) {
+            _timedJobs.clear();
+            _readyJobs.clear();
+            _jobLock.notifyAll();
+        }
         // The JobQueueRunners are NOT daemons,
         // so they must be stopped.
         Job poison = new PoisonJob();
-        for (int i = 0; i < _queueRunners.size(); i++)
+        for (JobQueueRunner runner : _queueRunners.values()) {
+             runner.stopRunning();
             _readyJobs.offer(poison);
-
+            // TODO interrupt thread for each runner
+        }
+        _queueRunners.clear();
+        _jobStats.clear();
+        _runnerId = 0;
 
       /********
         if (_log.shouldLog(Log.WARN)) {
