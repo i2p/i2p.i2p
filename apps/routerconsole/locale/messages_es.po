@@ -9,9 +9,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
-"Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2011-06-02 16:11+0000\n"
-"PO-Revision-Date: 2011-06-02 20:26+0100\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-06-17 20:10+0000\n"
+"PO-Revision-Date: 2011-06-24 09:24+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: Spanish (Castilian) <None>\n"
 "MIME-Version: 1.0\n"
@@ -97,6 +97,33 @@ msgstr "IP baneada"
 #, java-format
 msgid "IP banned by blocklist.txt entry {0}"
 msgstr "IP baneada por la blocklist.txt: {0}"
+
+#. NOTE TO TRANSLATORS - each of these phrases is a description for a statistic
+#. to be displayed on /stats.jsp and in the graphs on /graphs.jsp.
+#. Please keep relatively short so it will fit on the graphs.
+#: ../../../router/java/src/net/i2p/router/Router.java:1505
+msgid "Message receive rate (bytes/sec)"
+msgstr "Tasa de mensajes recibidas (bytes/seg)"
+
+#: ../../../router/java/src/net/i2p/router/Router.java:1506
+msgid "Message send rate (bytes/sec)"
+msgstr "Tasa de mensajes enviadas (bytes/seg)"
+
+#: ../../../router/java/src/net/i2p/router/Router.java:1507
+msgid "Low-level send rate (bytes/sec)"
+msgstr "Tasa de envío de de bajo nivel (bytes/seg)"
+
+#: ../../../router/java/src/net/i2p/router/Router.java:1508
+msgid "Low-level receive rate (bytes/sec)"
+msgstr "Tasa de recepción de bajo nivel (bytes/seg)"
+
+#: ../../../router/java/src/net/i2p/router/Router.java:1509
+msgid "How many peers we are actively talking with"
+msgstr "Con cuántos pares estamos hablando activamente"
+
+#: ../../../router/java/src/net/i2p/router/Router.java:1512
+msgid "Known fast peers"
+msgstr "pares rápidos conocidos"
 
 #: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:92
 msgid "Rejecting tunnels: Shutting down"
@@ -469,12 +496,12 @@ msgstr "La dirección IP externa no está disponible."
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:481
 #, java-format
 msgid "UPnP reports the maximum downstream bit rate is {0}bits/sec"
-msgstr "UPnP informa que la tasa de bits máxima de descarga es {0}bits/seg."
+msgstr "UPnP informa que la tasa máxima de bits entrantes es {0}bits/seg."
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:483
 #, java-format
 msgid "UPnP reports the maximum upstream bit rate is {0}bits/sec"
-msgstr "UPnP informa que la tasa de bits máxima de subida es {0}bits/seg."
+msgstr "UPnP informa que la tasa máxima de bits salientes es {0}bits/seg."
 
 #. {0} is TCP or UDP
 #. {1,number,#####} prevents 12345 from being output as 12,345 in the English locale.
@@ -1592,7 +1619,7 @@ msgstr "Islas Vírgenes"
 
 #: ../java/build/Countries.java:233
 msgid "Viet Nam"
-msgstr "Viet Nam"
+msgstr "Vietnam"
 
 #: ../java/build/Countries.java:234
 msgid "Vanuatu"
@@ -1880,7 +1907,7 @@ msgstr "Detener"
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:267
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:79
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:331
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:341
 msgid "Check for updates"
 msgstr "Buscar actualizaciones"
 
@@ -2477,45 +2504,61 @@ msgstr "Cambio del tema guardado."
 msgid "Refresh the page to view."
 msgstr "Actualiza la página para ver."
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:51
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:53
 msgid "Arabic"
 msgstr "Árabe"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:52
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:54
 msgid "English"
 msgstr "Inglés"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:52
-msgid "French"
-msgstr "Francés"
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:54
+msgid "Finnish"
+msgstr "Finlandés"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:52
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:54
 msgid "German"
 msgstr "Alemán"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:52
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:54
 msgid "Spanish"
 msgstr "Español"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:53
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:55
 msgid "Dutch"
 msgstr "Neerlandés"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:53
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:55
+msgid "French"
+msgstr "Francés"
+
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:55
+msgid "Italian"
+msgstr "Italiano"
+
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:55
+msgid "Polish"
+msgstr "Polaco"
+
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:56
 msgid "Portuguese"
 msgstr "Portugués"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:53
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:56
 msgid "Russian"
 msgstr "Ruso"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:54
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:56
+msgid "Swedish"
+msgstr "Sueco"
+
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:57
 msgid "Chinese"
 msgstr "Chino"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:54
-msgid "Swedish"
-msgstr "Sueco"
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:57
+msgid "Vietnamese"
+msgstr "Vietnamita"
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:86
 msgid "Update available, attempting to download now"
@@ -3691,7 +3734,7 @@ msgstr "Comprobando"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:370
 msgid "Add/remove/edit &amp; control your client and server tunnels"
-msgstr "Agregar/quitar/editar &amp; controlar sus túneles de cliente y servidor"
+msgstr "Agregar/quitar/editar &amp; controlar tus túneles de cliente y servidor"
 
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:382
 msgid "Server"
@@ -4190,22 +4233,6 @@ msgstr "itag1"
 msgid "itag2"
 msgstr "itag2"
 
-#. Descriptions for the stats that are graphed by default
-#. There are over 500 stats currently defined, we aren't going to tag them all
-#: ../java/strings/Strings.java:101
-msgid "Low-level bandwidth receive rate"
-msgstr "tasa de recepción de ancho de banda de bajo nivel"
-
-#. bw.recvRate
-#: ../java/strings/Strings.java:102
-msgid "Low-level bandwidth send rate"
-msgstr "tasa de envío de ancho de banda de bajo nivel"
-
-#. bw.sendRate
-#: ../java/strings/Strings.java:103
-msgid "How many peers we are actively talking with"
-msgstr "Con cuántos pares estamos hablando activamente"
-
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:112
 msgid "config networking"
 msgstr "configuración de red"
@@ -4357,11 +4384,11 @@ msgstr "I2P requiere al menos 12KBps para permitir el intercambio."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:365
 msgid "Please enable sharing (participating in tunnels) by configuring more bandwidth. "
-msgstr "Por favor, activa el intercambio (participación en túneles) configurando un mayor ancho de banda."
+msgstr "Por favor, ¡activa la compartición (participación en túneles) configurando un mayor ancho de banda."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:366
 msgid "It improves your anonymity by creating cover traffic, and helps the network."
-msgstr "Esto mejora tu anonimato creando tráfico de cobertura, y ayuda a la red."
+msgstr "Esto mejorará tu anonimato creando tráfico de cobertura, y ayuda a la red."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:369
 #, java-format
@@ -4383,7 +4410,7 @@ msgstr "Cuanto mayor sea el ancho de banda compartido, mayor es el anonimato y m
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:395
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:360
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:351
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:387
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:397
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -4461,7 +4488,7 @@ msgstr "Acción al cambiar de IP"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:457
 msgid "Laptop mode - Change router identity and UDP port when IP changes for enhanced anonymity"
-msgstr "Modo Portátil - Cambiar identidad del router y puerto UDP cuando cambie la IP para aumentar el anonimato"
+msgstr "Modo Portátil - cambia la identidad del router y el puerto UDP cuando cambie la IP para aumentar el anonimato"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:459
 msgid "Experimental"
@@ -4494,7 +4521,7 @@ msgstr "si no estamos bloqueados por el corta-fuegos"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:493
 msgid "Always use auto-detected IP address (Not firewalled)"
-msgstr "Siempre utilizar la dirección IP detectada automáticamente (no bloqueada por cortafuegos)"
+msgstr "Siempre utilizar la dirección IP detectada automáticamente (no bloqueado por cortafuegos)"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:503
 msgid "Disable inbound (Firewalled)"
@@ -4535,11 +4562,11 @@ msgstr "Ayuda de Configuración"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:538
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:587
 msgid "While I2P will work fine behind most firewalls, your speeds and network integration will generally improve if the I2P port is forwarded for both UDP and TCP."
-msgstr "Aunque I2P funcionrá bien aún bloqueado por la mayoría de cotrafuegos, las velocidades y la integración de la red en general mejorará si el puerto I2P está abierto tanto por UDP como por TCP."
+msgstr "Aunque I2P funcionrá bien aún bloqueado por la mayoría de cotrafuegos, las velocidades y la integración general en la red mejorará si el puerto I2P está abierto tanto por UDP como por TCP."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:540
 msgid "If you can, please poke a hole in your firewall to allow unsolicited UDP and TCP packets to reach you."
-msgstr "Si es posible, por favor permite el paso de los paquetes TCP y UDP no solicitados por el cortafuegos."
+msgstr "Si es posible, ¡por favor permite el paso de los paquetes TCP y UDP no solicitados por el cortafuegos!"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:542
 msgid "If you can't, I2P supports UPnP (Universal Plug and Play) and UDP hole punching with \"SSU introductions\" to relay traffic."
@@ -4739,7 +4766,7 @@ msgstr "ERR - Dirección TCP privada"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:659
 msgid "You must never advertise an unroutable IP address such as 127.0.0.1 or 192.168.1.1 as your external address."
-msgstr "Nunca debe anunciar una dirección IP no enrutable, como 127.0.0.1 o 192.168.1.1 como su dirección externa."
+msgstr "Nunca debes anunciar una dirección IP no enrutable, como 127.0.0.1 o 192.168.1.1 como tu dirección externa."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:661
 msgid "Correct the address or disable inbound TCP above."
@@ -4759,7 +4786,7 @@ msgstr "I2P no funciona bien detrás de este tipo de cortafuegos. Probablemente 
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:669
 msgid "ERR - UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart"
-msgstr "ERR - el puerto UDP está en uso - Establezca i2np.udp.internalPort=xxxx en configuración avanzada reinicie"
+msgstr "ERR - el puerto UDP está en uso - ¡Establece i2np.udp.internalPort=xxxx en configuración avanzada reinicia!"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:671
 msgid "I2P was unable to bind to port 8887 or other configured port."
@@ -5045,7 +5072,7 @@ msgstr "Banear / Desbanear manualmente a un par"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:331
 msgid "Banning will prevent the participation of this peer in tunnels you create."
-msgstr "Banear evitará que ese par participe en cualquiera de los túneles que vayas crear."
+msgstr "Banear evitará que este par participe en cualquiera de los túneles que vayas crear."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configpeer_jsp.java:341
 msgid "Adjust Profile Bonuses"
@@ -5216,7 +5243,7 @@ msgstr "Si estás ejecutando I2p como servicio en este momento, quitarlo hará q
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:361
 msgid "You may want to consider shutting down gracefully, as above, then running uninstall_i2p_service_winnt.bat."
-msgstr "Es posible que desees considerar el apagado controlado como se indica arriba, para ello, ejecuta uninstall_i2p_service_winnt.bat."
+msgstr "Es recomendable que consideres el apagado controlado como se indica arriba, para ello, ejecuta uninstall_i2p_service_winnt.bat."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:365
 msgid "Debugging"
@@ -5367,63 +5394,71 @@ msgstr "Actualización de la configuración"
 msgid "I2P Update Configuration"
 msgstr "Configuración de actualizaciones I2P"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:321
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:323
 msgid "Check for I2P and news updates"
 msgstr "Comprobar si hay actualizaciones de I2P o noticias"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:323
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:325
 msgid "News &amp; I2P Updates"
 msgstr "Noticias &amp; actualizaciones de I2P"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:327
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:329
+msgid "Check for news updates"
+msgstr "Buscar noticias"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:331
+msgid "News Updates"
+msgstr "Actualización de las noticias"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:337
 msgid "Update In Progress"
 msgstr "Actualizando"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:335
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:345
 msgid "News URL"
 msgstr "URL de noticias"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:339
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:349
 msgid "Refresh frequency"
 msgstr "Frecuencia de actualización"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:345
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:355
 msgid "Update policy"
 msgstr "Política de actualizaciones"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:351
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:361
 msgid "Update through the eepProxy?"
 msgstr "¿Actualizar utilizando el eepProxy?"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:355
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:365
 msgid "eepProxy host"
 msgstr "host eepProxy"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:359
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:369
 msgid "eepProxy port"
 msgstr "puerto eepProxy"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:365
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:375
 msgid "Update URLs"
 msgstr "URLs de actualizaciones"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:369
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:379
 msgid "Trusted keys"
 msgstr "Claves confiadas"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:373
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:383
 msgid "Update with unsigned development builds?"
 msgstr "Actualizar con las versiones en desarrollo no firmadas?"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:377
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:387
 msgid "Unsigned Build URL"
 msgstr "URL de versión no firmada"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:383
-msgid "I2P updates are disabled because you do not have write permission for the install directory."
-msgstr "Las actualizaciones de I2P están desactivadas porque no tienes permiso de escritura en el directorio de la instalación."
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:393
+msgid "Updates will be dispatched via your package manager."
+msgstr "Actualizaciones se distribuirán atravez de tu gestor de paquetes."
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:389
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:399
 msgid "Save"
 msgstr "Guardar"
 
@@ -5453,7 +5488,7 @@ msgstr "Por favor, informar sobre errores en {0} o {1}."
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error500_jsp.java:143
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:258
 msgid "You may use the username \"guest\" and password \"guest\" if you do not wish to register."
-msgstr "Se puede utilizar el nombre de usuario \"guest\" y contraseña \"guest\" si no desea registrarse."
+msgstr "Se puede utilizar el nombre de usuario \"guest\" y contraseña \"guest\" si no deseas registrarte."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error500_jsp.java:145
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:260
@@ -5507,7 +5542,7 @@ msgstr "Gráficos de rendimiento I2P"
 msgid "home"
 msgstr "Página de Inicio"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/index_jsp.java:331
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/index_jsp.java:339
 msgid "Welcome to I2P"
 msgstr "¡Bienvenido a I2P!"
 
@@ -5610,6 +5645,12 @@ msgstr "Perfil de pares"
 msgid "Profile for peer {0}"
 msgstr "Perfil para par {0}"
 
+#~ msgid ""
+#~ "I2P updates are disabled because you do not have write permission for the "
+#~ "install directory."
+#~ msgstr ""
+#~ "Las actualizaciones de I2P están desactivadas porque no tienes permiso de "
+#~ "escritura en el directorio de la instalación."
 #~ msgid "Failed to update the stat filter and location"
 #~ msgstr "No se pudo actualizar el filtro de estadísticas y ubicación"
 #~ msgid "Redraw"
