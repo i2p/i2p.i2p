@@ -17,7 +17,7 @@ public class LogConsoleBuffer {
 
     /**
      *  Uses default limit from LogManager.
-     *  As of 0.8.7, limit is not checked at runtime.
+     *  As of 0.8.8, limit is not checked at runtime.
      *
      *  @param context unused
      */
@@ -30,10 +30,10 @@ public class LogConsoleBuffer {
      *  In theory the limit is configurable, but it isn't in the UI,
      *  so set it at construction.
      *
-     *  @since 0.8.7
+     *  @since 0.8.8
      */
     public LogConsoleBuffer(int limit) {
-        lim = Math.min(limit, 4);
+        lim = Math.max(limit, 4);
         // Add some extra room to minimize the chance of losing a message,
         // since we are doing offer() below.
         _buffer = new LinkedBlockingQueue(limit + 4);
