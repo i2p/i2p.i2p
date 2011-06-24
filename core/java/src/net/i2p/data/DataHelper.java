@@ -1298,16 +1298,30 @@ public class DataHelper {
     private static final int MAX_UNCOMPRESSED = 40*1024;
     public static final int MAX_COMPRESSION = Deflater.BEST_COMPRESSION;
     public static final int NO_COMPRESSION = Deflater.NO_COMPRESSION;
-    /** compress the data and return a new GZIP compressed array */
+
+    /**
+     *  Compress the data and return a new GZIP compressed byte array.
+     *  @throws IllegalArgumentException if size is over 40KB
+     */
     public static byte[] compress(byte orig[]) {
         return compress(orig, 0, orig.length);
     }
+
+    /**
+     *  Compress the data and return a new GZIP compressed byte array.
+     *  @throws IllegalArgumentException if size is over 40KB
+     */
     public static byte[] compress(byte orig[], int offset, int size) {
         return compress(orig, offset, size, MAX_COMPRESSION);
     }
+
+    /**
+     *  Compress the data and return a new GZIP compressed byte array.
+     *  @throws IllegalArgumentException if size is over 40KB
+     */
     public static byte[] compress(byte orig[], int offset, int size, int level) {
         if ((orig == null) || (orig.length <= 0)) return orig;
-        if (size >= MAX_UNCOMPRESSED) 
+        if (size > MAX_UNCOMPRESSED) 
             throw new IllegalArgumentException("tell jrandom size=" + size);
         ReusableGZIPOutputStream out = ReusableGZIPOutputStream.acquire();
         out.setLevel(level);
@@ -1335,10 +1349,18 @@ public class DataHelper {
         
     }
     
-    /** decompress the GZIP compressed data (returning null on error) */
+    /**
+     *  Decompress the GZIP compressed data (returning null on error).
+     *  @throws IOE if uncompressed is over 40 KB
+     */
     public static byte[] decompress(byte orig[]) throws IOException {
         return (orig != null ? decompress(orig, 0, orig.length) : null);
     }
+
+    /**
+     *  Decompress the GZIP compressed data (returning null on error).
+     *  @throws IOE if uncompressed is over 40 KB
+     */
     public static byte[] decompress(byte orig[], int offset, int length) throws IOException {
         if ((orig == null) || (orig.length <= 0)) return orig;
         
@@ -1354,6 +1376,11 @@ public class DataHelper {
             if (read == -1)
                 break;
             written += read;
+            if (written >= MAX_UNCOMPRESSED) {
+                if (in.available() > 0)
+                    throw new IOException("Uncompressed data larger than " + MAX_UNCOMPRESSED);
+                break;
+            }
         }
         byte rv[] = new byte[written];
         System.arraycopy(outBuf.getData(), 0, rv, 0, written);
