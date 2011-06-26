@@ -1267,9 +1267,11 @@ public class Router {
                     boolean success = FileUtil.copy(path, path + ".bak", true, true);
                     if (success) {
                         boolean success2 = jcpuidLib.delete();
-                        if (success2)
+                        if (success2) {
                             System.out.println("New jbigi.jar detected, moved jcpuid library to " +
-                                               path + ".bak, check logs for successful installation of new library");
+                                               path + ".bak");
+                            System.out.println("Check logs for successful installation of new library");
+                        }
                     }
                 }
 
@@ -1279,9 +1281,11 @@ public class Router {
                     boolean success = FileUtil.copy(path, path + ".bak", true, true);
                     if (success) {
                         boolean success2 = jbigiLib.delete();
-                        if (success2)
+                        if (success2) {
                             System.out.println("New jbigi.jar detected, moved jbigi library to " +
-                                               path + ".bak, check logs for successful installation of new library");
+                                               path + ".bak");
+                            System.out.println("Check logs for successful installation of new library");
+                        }
                     }
                 }
             }

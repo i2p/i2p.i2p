@@ -46,6 +46,13 @@ public class ConfigUIHelper extends HelperBase {
          return rv;
     }
 
+    /**
+     *  Each language has the ISO code, the flag, and the name.
+     *  Alphabetical by the ISO code please.
+     *  See http://en.wikipedia.org/wiki/ISO_639-1 .
+     *  Any language-specific flag added to the icon set must be
+     *  added to the top-level build.xml for the updater.
+     */
     private static final String langs[] = {"ar", "de", "en", "es", "fi", "fr", "it", "nl", "pl", "pt", "ru",
                                            "sv", "vi", "zh"};
     private static final String flags[] = {"lang_ar", "de", "us", "es", "fi", "fr", "it", "nl", "pl", "pt", "ru",

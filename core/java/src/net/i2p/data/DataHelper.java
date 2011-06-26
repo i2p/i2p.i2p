@@ -1362,6 +1362,12 @@ public class DataHelper {
         return rv;
     }
 
+    /**
+     *  Same as orig.getBytes("UTF-8") but throws an unchecked RuntimeException
+     *  instead of an UnsupportedEncodingException if no UTF-8, for ease of use.
+     *
+     *  @throws RuntimeException
+     */
     public static byte[] getUTF8(String orig) {
         if (orig == null) return null;
         try {
@@ -1370,10 +1376,26 @@ public class DataHelper {
             throw new RuntimeException("no utf8!?");
         }
     }
+
+    /**
+     *  Same as orig.getBytes("UTF-8") but throws an unchecked RuntimeException
+     *  instead of an UnsupportedEncodingException if no UTF-8, for ease of use.
+     *
+     *  @throws RuntimeException
+     *  @deprecated unused
+     */
     public static byte[] getUTF8(StringBuffer orig) {
         if (orig == null) return null;
         return getUTF8(orig.toString());
     }
+
+    /**
+     *  Same as new String(orig, "UTF-8") but throws an unchecked RuntimeException
+     *  instead of an UnsupportedEncodingException if no UTF-8, for ease of use.
+     *
+     *  @throws RuntimeException
+     *  @deprecated unused
+     */
     public static String getUTF8(byte orig[]) {
         if (orig == null) return null;
         try {
@@ -1382,6 +1404,14 @@ public class DataHelper {
             throw new RuntimeException("no utf8!?");
         }
     }
+
+    /**
+     *  Same as new String(orig, "UTF-8") but throws an unchecked RuntimeException
+     *  instead of an UnsupportedEncodingException if no UTF-8, for ease of use.
+     *
+     *  @throws RuntimeException
+     *  @deprecated unused
+     */
     public static String getUTF8(byte orig[], int offset, int len) {
         if (orig == null) return null;
         try {

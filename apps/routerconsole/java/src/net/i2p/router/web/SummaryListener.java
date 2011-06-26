@@ -26,7 +26,7 @@ import org.jrobin.graph.RrdGraphDef;
 import org.jrobin.graph.RrdGraphDefTemplate;
 
 /**
- *  Creates and updates the in-memory RRD database,
+ *  Creates and updates the in-memory or on-disk RRD database,
  *  and provides methods to generate graphs of the data
  *
  *  @since 0.6.1.13

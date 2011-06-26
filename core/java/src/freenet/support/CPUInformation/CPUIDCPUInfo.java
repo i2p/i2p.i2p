@@ -1,5 +1,9 @@
 package freenet.support.CPUInformation;
 
+/**
+ *  Moved out of CPUID.java
+ *  @since 0.8.7
+ */
 abstract class CPUIDCPUInfo
 {
     protected static boolean isX64 = false;        

@@ -69,7 +69,7 @@ public class SingleFileNamingService extends NamingService {
     }
 
     /**
-     *  @return the base file name
+     *  @return the file's absolute path
      */
     @Override
     public String getName() {

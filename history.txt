@@ -1,3 +1,12 @@
+2011-06-26 zzz
+  * Fixes after review:
+    - Fix Polish po file
+    - Install as a service by default on Windows again
+    - Change CPUID getters to package private
+    - Split new jbigi install messages into two lines
+    - Test script updates
+    - Javadocs
+
 2011-06-23 zzz
   * IRC: Allow outbound INVITE
 

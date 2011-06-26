@@ -1,5 +1,9 @@
 package freenet.support.CPUInformation;
 
+/**
+ *  Moved out of CPUID.java
+ *  @since 0.8.7
+ */
 class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
 {
     protected static boolean isK6Compatible = false;
@@ -13,19 +17,18 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
     // If modelString != null, the cpu is considered correctly identified.
     protected static String modelString = null;
 
-    @Override
     public boolean IsK6Compatible(){ return isK6Compatible; }
-    @Override
+
     public boolean IsK6_2_Compatible(){ return isK6_2_Compatible; }
-    @Override
+
     public boolean IsK6_3_Compatible(){ return isK6_3_Compatible; }
-    @Override 
+
     public boolean IsGeodeCompatible(){ return isGeodeCompatible; }
-    @Override
+
     public boolean IsAthlonCompatible(){ return isAthlonCompatible; }
-    @Override
+
     public boolean IsAthlon64Compatible(){ return isAthlon64Compatible; }
-    @Override
+
     public boolean IsBobcatCompatible(){ return isBobcatCompatible; }
 
 	static
@@ -33,7 +36,6 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
 		identifyCPU();
 	}	
 
-	@Override
     public String getCPUModelString() throws UnknownCPUException
     {
         if (modelString != null)
@@ -348,7 +350,7 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
             }
         }
     }
-	@Override
+
 	public boolean hasX64()
 	{
 		return isX64;

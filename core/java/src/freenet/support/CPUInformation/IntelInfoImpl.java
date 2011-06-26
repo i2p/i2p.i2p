@@ -1,5 +1,9 @@
 package freenet.support.CPUInformation;
 
+/**
+ *  Moved out of CPUID.java
+ *  @since 0.8.7
+ */
 class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
 {
     protected static boolean isPentiumCompatible = false;
@@ -15,23 +19,22 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
     // If modelString != null, the cpu is considered correctly identified.
     protected static String modelString = null;
     
-    @Override
     public boolean IsPentiumCompatible(){ return isPentiumCompatible; }
-    @Override
+
     public boolean IsPentiumMMXCompatible(){ return isPentiumMMXCompatible; }
-    @Override
+
     public boolean IsPentium2Compatible(){ return isPentium2Compatible; }
-    @Override
+
     public boolean IsPentium3Compatible(){ return isPentium3Compatible; }
-    @Override
+
     public boolean IsPentium4Compatible(){ return isPentium4Compatible; }
-    @Override
+
     public boolean IsPentiumMCompatible(){ return isPentiumMCompatible; }
-    @Override
+
     public boolean IsAtomCompatible(){ return isAtomCompatible; }
-    @Override
+
     public boolean IsCore2Compatible(){ return isCore2Compatible; }
-    @Override
+
     public boolean IsCoreiCompatible(){ return isCoreiCompatible; }    
 	
 	static
@@ -290,7 +293,7 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
             }
         }
     }
-	@Override
+
 	public boolean hasX64() {
 		return isX64;
 	}

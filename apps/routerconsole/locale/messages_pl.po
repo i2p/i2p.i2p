@@ -34,9 +34,9 @@ msgstr ""
 #, java-format
 msgid "1 ms"
 msgid_plural "{0,number,####} ms"
-msgstr[0] "ms"
-msgstr[1] "ms"
-msgstr[2] "ms"
+msgstr[0] "1 ms"
+msgstr[1] "{0,number,####} ms"
+msgstr[2] "{0,number,####} ms"
 
 #. seconds
 #. Note to translators: quantity will always be greater than one.
@@ -45,9 +45,9 @@ msgstr[2] "ms"
 #, java-format
 msgid "1 sec"
 msgid_plural "{0} sec"
-msgstr[0] "sek"
-msgstr[1] "sek"
-msgstr[2] "sek"
+msgstr[0] "1 sek"
+msgstr[1] "{0} sek"
+msgstr[2] "{0} sek"
 
 #. minutes
 #. Note to translators: quantity will always be greater than one.
@@ -56,9 +56,9 @@ msgstr[2] "sek"
 #, java-format
 msgid "1 min"
 msgid_plural "{0} min"
-msgstr[0] "min"
-msgstr[1] "min"
-msgstr[2] "min"
+msgstr[0] "1 min"
+msgstr[1] "{0} min"
+msgstr[2] "{0} min"
 
 #. hours
 #. Note to translators: quantity will always be greater than one.
@@ -67,9 +67,9 @@ msgstr[2] "min"
 #, java-format
 msgid "1 hour"
 msgid_plural "{0} hours"
-msgstr[0] "godz"
-msgstr[1] "godz"
-msgstr[2] "godz"
+msgstr[0] "1 godz"
+msgstr[1] "{0} godz"
+msgstr[2] "{0} godz"
 
 #: ../../../core/java/src/net/i2p/data/DataHelper.java:1209
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:314
@@ -82,9 +82,9 @@ msgstr "nie dotyczy"
 #, java-format
 msgid "1 day"
 msgid_plural "{0} days"
-msgstr[0] "dzień"
-msgstr[1] "dni"
-msgstr[2] "dni"
+msgstr[0] "1 dzień"
+msgstr[1] "{0} dni"
+msgstr[2] "{0} dni"
 
 #: ../../../router/java/src/net/i2p/router/Blocklist.java:122
 #, java-format
@@ -222,7 +222,7 @@ msgid ""
 "Reseeding: fetching router info from seed URL ({0} successful, {1} errors)."
 msgstr ""
 "Ponowne seedowanie: pobieranie informacji o routerze z URL seeda ({0} udane,"
-" {1} błędów})"
+" {1} błędów)"
 
 #: ../../../router/java/src/net/i2p/router/transport/CommSystemFacadeImpl.java:512
 msgid "NetDb entry"

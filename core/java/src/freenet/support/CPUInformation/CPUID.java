@@ -99,7 +99,7 @@ public class CPUID {
     private static native CPUIDResult doCPUID(int iFunction);
 
 
-    public static String getCPUVendorID()
+    static String getCPUVendorID()
     {
         CPUIDResult c = doCPUID(0);
         StringBuilder sb= new StringBuilder(13);
@@ -120,68 +120,72 @@ public class CPUID {
     
         return sb.toString();
     }
-    public static int getCPUFamily()
+    static int getCPUFamily()
     {
         CPUIDResult c = doCPUID(1);
         return (c.EAX >> 8) & 0xf;
     }
-    public static int getCPUModel()
+    static int getCPUModel()
     {
         CPUIDResult c = doCPUID(1);
         return (c.EAX >> 4) & 0xf;
     }
-    public static int getCPUExtendedModel()
+    static int getCPUExtendedModel()
     {
         CPUIDResult c = doCPUID(1);
         return (c.EAX >> 16) & 0xf;
     }
-    public static int getCPUType()
+    static int getCPUType()
     {
         CPUIDResult c = doCPUID(1);
         return (c.EAX >> 12) & 0xf;
     }
-    public static int getCPUExtendedFamily()
+    static int getCPUExtendedFamily()
     {
         CPUIDResult c = doCPUID(1);
         return (c.EAX >> 20) & 0xff;
     }
-    public static int getCPUStepping()
+    static int getCPUStepping()
     {
         CPUIDResult c = doCPUID(1);
         return c.EAX & 0xf;
     }
-    public static int getEDXCPUFlags()
+    static int getEDXCPUFlags()
     {
         CPUIDResult c = doCPUID(1);
         return c.EDX;
     }
-    public static int getECXCPUFlags()
+    static int getECXCPUFlags()
     {
         CPUIDResult c = doCPUID(1);
         return c.ECX;
     }
-    public static int getExtendedEBXCPUFlags()
+    static int getExtendedEBXCPUFlags()
     {
         CPUIDResult c = doCPUID(0x80000001);
         return c.EBX;    
     }
-    public static int getExtendedECXCPUFlags()
+    static int getExtendedECXCPUFlags()
     {
         CPUIDResult c = doCPUID(0x80000001);
         return c.ECX;
     }
-    public static int getExtendedEDXCPUFlags()
+
+    /** @since 0.8.7 */
+    static int getExtendedEDXCPUFlags()
     {
         CPUIDResult c = doCPUID(0x80000001);
         return c.EDX;
     }
     
-    //Returns a CPUInfo item for the current type of CPU
-    //If I could I would declare this method in a interface named
-    //CPUInfoProvider and implement that interface in this class.
-    //This would make it easier for other people to understand that there
-    //is nothing preventing them from coding up new providers, probably using
-    //other detection methods than the x86-only CPUID instruction
+    /**
+     * Returns a CPUInfo item for the current type of CPU
+     * If I could I would declare this method in a interface named
+     * CPUInfoProvider and implement that interface in this class.
+     * This would make it easier for other people to understand that there
+     * is nothing preventing them from coding up new providers, probably using
+     * other detection methods than the x86-only CPUID instruction
+     */
     public static CPUInfo getInfo() throws UnknownCPUException
     {
         if(!_nativeOk)

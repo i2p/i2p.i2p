@@ -97,7 +97,6 @@ public class Daemon {
      * 
      * @param router
      *            The NamingService to update, generally the root NamingService from the context.
-     *            client applications.
      * @param published
      *            The published AddressBook. This address book is published on
      *            the user's eepsite so that others may subscribe to it.

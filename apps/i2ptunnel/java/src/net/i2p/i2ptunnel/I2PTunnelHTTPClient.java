@@ -1304,6 +1304,10 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         out.flush();
     }
 
+    /**
+     *  Decode %xx encoding
+     *  @since 0.8.7
+     */
     private static String decode(String s) {
         if (!s.contains("%"))
             return s;

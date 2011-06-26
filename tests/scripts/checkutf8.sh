@@ -18,6 +18,7 @@ DIRS="\
   apps/susidns/locale \
   apps/susimail/locale \
   apps/desktopgui/locale \
+  debian/po \
   installer/resources/eepsite.help/help \
   installer/resources/initialNews \
   installer/resources/proxy \

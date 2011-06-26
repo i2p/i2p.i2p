@@ -1,5 +1,9 @@
 package freenet.support.CPUInformation;
 
+/**
+ *  Moved out of CPUID.java
+ *  @since 0.8.7
+ */
 class VIAInfoImpl extends CPUIDCPUInfo implements VIACPUInfo {
 	
     protected static boolean isC3Compatible = false;
@@ -9,9 +13,8 @@ class VIAInfoImpl extends CPUIDCPUInfo implements VIACPUInfo {
     protected static String modelString = null;
 
     
-	@Override
     public boolean IsC3Compatible(){ return isC3Compatible; }
-	@Override
+
 	public boolean IsNanoCompatible(){ return isNanoCompatible; }
 	
 	static
@@ -19,7 +22,6 @@ class VIAInfoImpl extends CPUIDCPUInfo implements VIACPUInfo {
 		identifyCPU();
 	}
 	
-    @Override
     public String getCPUModelString()
     {
         if (modelString != null)
@@ -28,7 +30,6 @@ class VIAInfoImpl extends CPUIDCPUInfo implements VIACPUInfo {
     }
 
 
-	@Override
 	public boolean hasX64()
 	{
 		return false;

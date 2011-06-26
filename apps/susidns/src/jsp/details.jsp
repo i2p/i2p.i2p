@@ -1,7 +1,5 @@
 <%
 /*
- * Created on Sep 02, 2005
- * 
  *  This file is part of susidns project, see http://susi.i2p/
  *  
  *  Copyright (C) 2005 <susi23@mail.i2p>
@@ -20,7 +18,6 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *  
- * $Revision: 1.3 $
  */
 
     // http://www.crazysquirrel.com/computing/general/form-encoding.jspx
