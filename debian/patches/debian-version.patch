@@ -2,15 +2,11 @@ Add debian package vesion to the EXTRA version field
 
 --- a/router/java/src/net/i2p/router/RouterVersion.java
 +++ b/router/java/src/net/i2p/router/RouterVersion.java
-@@ -18,10 +18,10 @@
-     /** deprecated */
-     public final static String ID = "Monotone";
-     public final static String VERSION = CoreVersion.VERSION;
--    public final static long BUILD = 31;
-+    public final static long BUILD = 0;
+@@ -21,7 +21,7 @@
+     public final static long BUILD = 0;
  
      /** for example "-test" */
--    public final static String EXTRA = "-rc";
+-    public final static String EXTRA = "";
 +    public final static String EXTRA = "deb1";
      public final static String FULL_VERSION = VERSION + "-" + BUILD + EXTRA;
      public static void main(String args[]) {
