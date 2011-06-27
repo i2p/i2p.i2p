@@ -1,9 +1,0 @@
-/etc/init.d/i2p
-/etc/i2p/blocklist.txt
-/etc/i2p/clients.config
-/etc/i2p/hosts.txt
-/etc/i2p/i2psnark.config
-/etc/i2p/i2ptunnel.config
-/etc/i2p/jetty-i2psnark.xml
-/etc/i2p/systray.config
-/etc/i2p/wrapper.config

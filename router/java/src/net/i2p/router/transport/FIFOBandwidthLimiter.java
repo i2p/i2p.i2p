@@ -85,13 +85,6 @@ public class FIFOBandwidthLimiter {
         _context.statManager().createRateStat("bwLimiter.pendingInboundRequests", "How many inbound requests are ahead of the current one (ignoring ones with 0)?", "BandwidthLimiter", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
         _context.statManager().createRateStat("bwLimiter.outboundDelayedTime", "How long it takes to honor an outbound request (ignoring ones with that go instantly)?", "BandwidthLimiter", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
         _context.statManager().createRateStat("bwLimiter.inboundDelayedTime", "How long it takes to honor an inbound request (ignoring ones with that go instantly)?", "BandwidthLimiter", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
-        if (_log.shouldLog(Log.WARN)) {
-            // If you want to see these you better have the logging set at startup!
-            _context.statManager().createRateStat("bw.sendBps1s", "How fast we are transmitting for the 1s quantization (period is the number of bytes transmitted)?", "Bandwidth", new long[] { 60*1000l, 10*60*1000l });
-            _context.statManager().createRateStat("bw.recvBps1s", "How fast we are receiving for the 1s quantization (period is the number of bytes transmitted)?", "Bandwidth", new long[] { 60*1000l, 10*60*1000l });
-            _context.statManager().createRateStat("bw.sendBps15s", "How fast we are transmitting for the 15s quantization (period is the number of bytes transmitted)?", "Bandwidth", new long[] { 60*1000l, 10*60*1000l });
-            _context.statManager().createRateStat("bw.recvBps15s", "How fast we are receiving for the 15s quantization (period is the number of bytes transmitted)?", "Bandwidth", new long[] { 60*1000l, 10*60*1000l });
-        }
         _pendingInboundRequests = new ArrayList(16);
         _pendingOutboundRequests = new ArrayList(16);
         _lastTotalSent = _totalAllocatedOutboundBytes.get();

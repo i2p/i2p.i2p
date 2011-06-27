@@ -95,13 +95,22 @@ public class ConfigClientsHandler extends FormHandler {
 
         // value
         if (_action.startsWith("Stop ")) {
+            
             String app = _action.substring(5);
+            int appnum = -1;
             try {
-                PluginStarter.stopPlugin(_context, app);
-                addFormNotice(_("Stopped plugin {0}", app));
-            } catch (Throwable e) {
-                addFormError(_("Error stopping plugin {0}", app) + ": " + e);
+                appnum = Integer.parseInt(app);
+            } catch (NumberFormatException nfe) {}
+            if (appnum >= 0) {
+                stopClient(appnum);
+            } else {
+                try {
+                    PluginStarter.stopPlugin(_context, app);
+                    addFormNotice(_("Stopped plugin {0}", app));
+                } catch (Throwable e) {
+                    addFormError(_("Error stopping plugin {0}", app) + ": " + e);
                     _log.error("Error stopping plugin " + app,  e);
+                }
             }
             return;
         }
@@ -199,6 +208,20 @@ public class ConfigClientsHandler extends FormHandler {
         if (arr == null)
             return null;
         return arr[0].trim();
+    }
+
+    // STUB for stopClient, not completed yet.
+    private void stopClient(int i) {
+        List<ClientAppConfig> clients = ClientAppConfig.getClientApps(_context);
+        if (i >= clients.size()) {
+            addFormError(_("Bad client index."));
+            return;
+        }
+        ClientAppConfig ca = clients.get(i);
+        //
+        // What do we do here?
+        //
+        addFormNotice(_("Client") + ' ' + _(ca.clientName) + ' ' + _("stopped") + '.');
     }
 
     private void startClient(int i) {

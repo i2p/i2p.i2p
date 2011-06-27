@@ -24,6 +24,11 @@ Darwin*)
         INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include"
         LINKFLAGS="-dynamiclib -framework JavaVM"
         LIBFILE="libjbigi.jnilib";;
+SunOS*)
+        COMPILEFLAGS="-fPIC -Wall"
+        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/solaris"
+        LINKFLAGS="-shared -Wl,-soname,libjbigi.so"
+        LIBFILE="libjbigi.so";;
 *)
 	COMPILEFLAGS="-fPIC -Wall"
 	INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/linux"

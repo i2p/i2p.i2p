@@ -17,6 +17,7 @@ import net.i2p.I2PAppContext;
 /**
  * Simple helper for uploading files and such via HTTP POST (rfc 1867)
  *
+ * @deprecated unused
  */
 public class EepPost {
     private I2PAppContext _context;
@@ -209,10 +210,10 @@ public class EepPost {
     }
     
     private String getSeparator() {
-        if (false)
-            return "ABCDEFG"; 
-        if (false)
-            return "------------------------" + new java.util.Random().nextLong();
+        //if (false)
+        //    return "ABCDEFG"; 
+        //if (false)
+        //    return "------------------------" + new java.util.Random().nextLong();
         byte separator[] = new byte[32];  // 2^-128 chance of this being a problem
         I2PAppContext.getGlobalContext().random().nextBytes(separator);
         StringBuilder sep = new StringBuilder(48);

@@ -45,29 +45,29 @@
  <ul>
  <li>Pick a name for your eepsite (<i>something</i>.i2p). Use all lower-case.
      You may wish to check first in your own router's address book
-     <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=router&filter=none">here</a>,
+     <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=router&amp;filter=none">here</a>,
      or the file <code>i2p/hosts.txt</code> to see if your name is already taken.
      Enter the new name for your eepsite on the
      <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite i2ptunnel configuration page</a>
      where it says "Website name". This will replace the default "mysite.i2p".
      Also, check the "Auto Start" box. Your eepsite will now start every time you start your router.
-     Be sure to click "Save".
+     Be sure to click "Save".</li>
  <li>Click the start button for your eepsite on the
      <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">main i2ptunnel configuration page</a>.
      You should now see "eepsite" listed under "Local Destinations" on the left side of the
      <a href="http://127.0.0.1:7657/index.jsp">I2P Router Console</a>.
-     Your eepsite is now running.
+     Your eepsite is now running.</li>
  <li>Highlight the entire "Local destination" key on the
      <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite i2ptunnel configuration page</a>.
      and copy it for
-     later pasting. Make sure you get the whole thing - it's over 500 characters and it must end in "AAAA".
+     later pasting. Make sure you get the whole thing - it's over 500 characters and it must end in "AAAA".</li>
  <li>Enter the name and paste in the destination key into your
      <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=master">master address book</a>.
-     Click "Add" to add the destination to your address book.
+     Click "Add" to add the destination to your address book.</li>
  <li>In your browser, enter in your eepsite name (<i>something</i>.i2p) and you should
-     be right back here. Hopefully it worked.
+ be right back here. Hopefully it worked.</li>
  <li>Before you tell the world about your new eepsite, you should add some content.
-     Go to <code>~/.i2p/eepsite/docroot/</code> (Linux) or <code>%APPDATA%\I2P\eepsite\docroot\</code> (Windows) and replace the index.html redirect page with your own content. Virtual folders work, so you can host files from a sub directory without explicitly needing to provide a page with links to files. If you need a template for a basic site, feel free to borrow and adapt <a href="pagetemplate.html">this page</a> and <a href="lib/">content</a>!
+ Go to <code>~/.i2p/eepsite/docroot/</code> (Linux) or <code>%APPDATA%\I2P\eepsite\docroot\</code> (Windows) and replace the index.html redirect page with your own content. Virtual folders work, so you can host files from a sub directory without explicitly needing to provide a page with links to files. If you need a template for a basic site, feel free to borrow and adapt <a href="pagetemplate.html">this page</a> and <a href="lib/">content</a>!</li>
 </ul>
 <h2>Register your own .I2P Domain</h2><ul>
  <li>Now it's time to add your eepsite to an I2P address book hosted by a site
@@ -80,28 +80,28 @@
      Be sure you get the whole thing, ending with "AAAA".
      Don't forget to click "add a key".
      Check to see if it reports the key was added.
-     Since many routers periodically get address book updates from these sites, within several hours others will be able to find your website by simply typing <i>something</i>.i2p into their browser.
+     Since many routers periodically get address book updates from these sites, within several hours others will be able to find your website by simply typing <i>something</i>.i2p into their browser.</li>
 </ul><h2>Adding Addressbook Subscriptions</h2><ul>
  <li>Speaking of address book updates, this would be a good time to add some more addressbooks
      to your own <a href="http://127.0.0.1:7657/susidns/subscriptions.jsp">subscription list</a>. Go to your subscriptions configuration page and add a couple of these for an automatically updated list of new hosts:<ul>
-     <li><a href="http://tino.i2p/hosts.txt">http://tino.i2p/hosts.txt</a>
-     <li><a href="http://stats.i2p/cgi-bin/newhosts.txt">http://stats.i2p/cgi-bin/newhosts.txt</a>
-     <li><a href="http://i2host.i2p/cgi-bin/i2hostetag">http://i2host.i2p/cgi-bin/i2hostetag</a></ul>
+     <li><a href="http://tino.i2p/hosts.txt">http://tino.i2p/hosts.txt</a></li>
+     <li><a href="http://stats.i2p/cgi-bin/newhosts.txt">http://stats.i2p/cgi-bin/newhosts.txt</a></li>
+     <li><a href="http://i2host.i2p/cgi-bin/i2hostetag">http://i2host.i2p/cgi-bin/i2hostetag</a></li></ul>
  <li>If you are in a hurry and can't wait a few hours, you can tell people to use a "jump" address helper redirection service.
      This will work within a few minutes of your entering the key to an address book on the same site.
      Test it yourself first by entering<code>
      http://stats.i2p/cgi-bin/jump.cgi?a=<i>something</i>.i2p</code>
      or <code>http://i2host.i2p/cgi-bin/i2hostjump?<i>something</i>.i2p</code>
      into your browser.
-     Once it's working, then you can tell others to use it.
+     Once it's working, then you can tell others to use it.</li>
  <li>Some people check eepsite lists such as
-     <a href="http://inproxy.tino.i2p/status.php">inproxy.tino.i2p/status.php</a> or <a href="http://perv.i2p">perv.i2p</a> for new eepsites, so you may start getting a few visitors. But there are plenty of other ways to tell people. Here are a few ideas:
+ <a href="http://inproxy.tino.i2p/status.php">inproxy.tino.i2p/status.php</a> or <a href="http://perv.i2p">perv.i2p</a> for new eepsites, so you may start getting a few visitors. But there are plenty of other ways to tell people. Here are a few ideas:</li>
      <ul>
      <li>Post a message on the <a href="http://forum.i2p/viewforum.php?f=16">Eepsite announce forum</a>
-         on <a href="http://forum.i2p/">forum.i2p</a>.
-     <li>Tell people about it on the #i2p or #i2p-chat channels on IRC.
-     <li>Put it in a new post on <a href="http://syndie.i2p2.de/">the new Syndie</a>.
-     <li>Put it in <a href="http://ugha.i2p/EepsiteIndex">Ugha's Eepsite Index Wiki</a>
+     on <a href="http://forum.i2p/">forum.i2p</a>.</li>
+     <li>Tell people about it on the #i2p or #i2p-chat channels on IRC.</li>
+     <li>Put it in a new post on <a href="http://syndie.i2p2.de/">the new Syndie</a>.</li>
+     <li>Put it in <a href="http://ugha.i2p/EepsiteIndex">Ugha's Eepsite Index Wiki</a></li>
      </ul>
      Note that some sites recommend pasting in that really long destination key.
      You can if you want - but
@@ -109,12 +109,12 @@
      tested it using a jump service, and waited 24 hours for the
      address book update to propagate to others, that shouldn't be necessary.</ul>
 <h2>Further Assistance</h2><ul>
- <li>If you have any questions, the following places are available for support:
+	<li>If you have any questions, the following places are available for support:</li>
 <ul>
- <li>Our IRC support channel: <ul><li><a href="irc://irc.freenode.net/i2p">#i2p on Freenode</a> 
- <li>Anonymously via your resident <a href="irc://127.0.0.1:6668/i2p-help">I2P IRC tunnel</a>.</ul>
-     <li><a href="http://forum.i2p/viewforum.php?f=10">The technical problems section</a> on
-     <a href="http://forum.i2p/">forum.i2p</a>.</ul>
+<li>Our IRC support channel: <ul><li><a href="irc://irc.freenode.net/i2p">#i2p on Freenode</a></li>
+<li>Anonymously via your resident <a href="irc://127.0.0.1:6668/i2p-help">I2P IRC tunnel</a>.</li></ul>
+	<li><a href="http://forum.i2p/viewforum.php?f=10">The technical problems section</a> on
+     <a href="http://forum.i2p/">forum.i2p</a>.</li></ul>
  </ul><div class="notify">
 <b>Note:</b> This page, the website and the console all need translating into YOUR language if it's not already been done or in progress. Please consider helping the project grow by <a href="http://www.i2p2.i2p/getinvolved.html">volunteering your time</a> to translate. Contact the project via the IRC channel listed above. Thanks in advance!</div>
 <hr><div class="footnote">	

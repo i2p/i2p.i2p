@@ -34,7 +34,6 @@
  <shortcut name="Uninstall I2P"
            target="$INSTALL_PATH\uninstaller\uninstaller.jar"
            commandLine=""
-           workingDirectory="$INSTALL_PATH"
            iconFile="$INSTALL_PATH\docs\uninstall.ico"
            initialState="noShow"
            startMenu="no"

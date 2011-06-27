@@ -395,7 +395,8 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
                 "HELPME",
                 "RULES",
                 "TOPIC",
-                "ISON"    // jIRCii uses this for a ping (response is 303)
+                "ISON",    // jIRCii uses this for a ping (response is 303)
+                "INVITE"
         };
 
         if(field[0].length()==0)

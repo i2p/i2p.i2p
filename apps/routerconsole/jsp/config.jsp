@@ -165,7 +165,7 @@
     <input type="radio" class="optbox" name="ntcpAutoPort" value="1" <%=nethelper.getTcpAutoPortChecked(1) %> >
     <%=intl._("Specify Port")%>:
     <input name ="ntcpport" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="ntcpport" />" ><br>
- </p><p><b><%=intl._("Note")%>: <%=intl._("Changing these settings will restart your router.")%></b></p>
+ </p><p><b><%=intl._("Notes")%>: <%=intl._("a) Do not reveal your port numbers to anyone!   b) Changing these settings will restart your router.")%></b></p>
 <hr><div class="formaction">
 <input type="reset" value="<%=intl._("Cancel")%>" >
 <input type="submit" name="save" value="<%=intl._("Save changes")%>" >

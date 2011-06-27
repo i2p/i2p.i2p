@@ -15,12 +15,16 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.URL;
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 import freenet.support.CPUInformation.AMDCPUInfo;
 import freenet.support.CPUInformation.CPUID;
 import freenet.support.CPUInformation.CPUInfo;
 import freenet.support.CPUInformation.IntelCPUInfo;
+import freenet.support.CPUInformation.VIACPUInfo;
 import freenet.support.CPUInformation.UnknownCPUException;
 
 import net.i2p.I2PAppContext;
@@ -28,8 +32,7 @@ import net.i2p.I2PAppContext;
 /**
  * <p>BigInteger that takes advantage of the jbigi library for the modPow operation,
  * which accounts for a massive segment of the processing cost of asymmetric 
- * crypto. It also takes advantage of the jbigi library for converting a BigInteger
- * value to a double. Sun's implementation of the 'doubleValue()' method is _very_ lousy.
+ * crypto.
  * 
  * The jbigi library itself is basically just a JNI wrapper around the 
  * GMP library - a collection of insanely efficient routines for dealing with 
@@ -64,7 +67,7 @@ import net.i2p.I2PAppContext;
  * "net/i2p/util/jbigi-windows-none.dll").</p>
  *
  * <p>Running this class by itself does a basic unit test and benchmarks the
- * NativeBigInteger.modPow/doubleValue vs. the BigInteger.modPow/doubleValue by running a 2Kbit op 100
+ * NativeBigInteger.modPow vs. the BigInteger.modPow by running a 2Kbit op 100
  * times.  At the end of each test, if the native implementation is loaded this will output 
  * something like:</p>
  * <pre>
@@ -103,6 +106,14 @@ public class NativeBigInteger extends BigInteger {
     private static boolean _doLog = System.getProperty("jbigi.dontLog") == null &&
                                     I2PAppContext.getGlobalContext().isRouterContext();
     
+    /**
+     *  The following libraries are be available in jbigi.jar in all I2P versions
+     *  originally installed as release 0.6.1.10 or later (released 2006-01-16),
+     *  for linux, freebsd, and windows, EXCEPT:
+     *   - k63 was removed for linux and freebsd in 0.8.7 (identical to k62)
+     *   - athlon64 not available for freebsd
+     *   - viac3 not available for windows
+     */
     private final static String JBIGI_OPTIMIZATION_K6         = "k6";
     private final static String JBIGI_OPTIMIZATION_K6_2       = "k62";
     private final static String JBIGI_OPTIMIZATION_K6_3       = "k63";
@@ -114,13 +125,56 @@ public class NativeBigInteger extends BigInteger {
     private final static String JBIGI_OPTIMIZATION_PENTIUM3   = "pentium3";
     private final static String JBIGI_OPTIMIZATION_PENTIUM4   = "pentium4";
     private final static String JBIGI_OPTIMIZATION_VIAC3      = "viac3";
+    /**
+     * The 7 optimizations below here are since 0.8.7. Each of the 32-bit processors below
+     * needs an explicit fallback in getResourceList() or getMiddleName2().
+     * 64-bit processors will fallback to athlon64 and athlon in getResourceList().
+     * @since 0.8.7
+     */
+    private final static String JBIGI_OPTIMIZATION_ATOM       = "atom";
+    private final static String JBIGI_OPTIMIZATION_CORE2      = "core2";
+    private final static String JBIGI_OPTIMIZATION_COREI      = "corei";
+    private final static String JBIGI_OPTIMIZATION_GEODE      = "geode";
+    private final static String JBIGI_OPTIMIZATION_NANO       = "nano";
+    private final static String JBIGI_OPTIMIZATION_PENTIUMM   = "pentiumm";
+    /** all libjbibi builds are identical to pentium3, case handled in getMiddleName2() */
+    private final static String JBIGI_OPTIMIZATION_VIAC32     = "viac32";
 
+    /**
+     * Non-x86, no fallbacks to older libs or to "none"
+     * @since 0.8.7
+     */
+    private final static String JBIGI_OPTIMIZATION_ARM        = "arm";
+
+    /**
+     * Operating systems
+     */
     private static final boolean _isWin = System.getProperty("os.name").startsWith("Win");
     private static final boolean _isOS2 = System.getProperty("os.name").startsWith("OS/2");
     private static final boolean _isMac = System.getProperty("os.name").startsWith("Mac");
-    private static final boolean _isLinux = System.getProperty("os.name").toLowerCase().indexOf("linux") != -1;
-    private static final boolean _isFreebsd = System.getProperty("os.name").toLowerCase().indexOf("freebsd") != -1;
-    private static final boolean _isNix = !(_isWin || _isMac || _isOS2);
+    private static final boolean _isLinux = System.getProperty("os.name").toLowerCase().contains("linux");
+    private static final boolean _isFreebsd = System.getProperty("os.name").toLowerCase().contains("freebsd");
+    private static final boolean _isSunos = System.getProperty("os.name").toLowerCase().contains("sunos");
+    private static final boolean _isAndroid = System.getProperty("java.vendor").contains("Android");
+
+    /*
+     * This isn't always correct.
+     * http://stackoverflow.com/questions/807263/how-do-i-detect-which-kind-of-jre-is-installed-32bit-vs-64bit
+     * http://mark.koli.ch/2009/10/javas-osarch-system-property-is-the-bitness-of-the-jre-not-the-operating-system.html
+     * http://mark.koli.ch/2009/10/reliably-checking-os-bitness-32-or-64-bit-on-windows-with-a-tiny-c-app.html
+     * sun.arch.data.model not on all JVMs
+     * sun.arch.data.model == 64 => 64 bit processor
+     * sun.arch.data.model == 32 => A 32 bit JVM but could be either 32 or 64 bit processor or libs
+     * os.arch contains "64" could be 32 or 64 bit libs
+     */
+    private static final boolean _is64 = "64".equals(System.getProperty("sun.arch.data.model")) ||
+                                         System.getProperty("os.arch").contains("64");
+
+    private static final boolean _isX86 = System.getProperty("os.arch").contains("86") ||
+	                                 System.getProperty("os.arch").equals("amd64");
+
+    private static final boolean _isArm = System.getProperty("os.arch").startsWith("arm");
+
     /* libjbigi.so vs jbigi.dll */
     private static final String _libPrefix = (_isWin || _isOS2 ? "" : "lib");
     private static final String _libSuffix = (_isWin || _isOS2 ? ".dll" : _isMac ? ".jnilib" : ".so");
@@ -128,34 +182,43 @@ public class NativeBigInteger extends BigInteger {
     private final static String sCPUType; //The CPU Type to optimize for (one of the above strings)
     
     static {
-        if (_isMac) // replace with osx/mac friendly jni cpu type detection when we have one
-            sCPUType = null;
-        else
+        if (_isX86) // Don't try to resolve CPU type on PPC and other non x86 hardware
             sCPUType = resolveCPUType();
+        else if (_isArm)
+            sCPUType = JBIGI_OPTIMIZATION_ARM;
+	else
+	    sCPUType = null;
         loadNative();
     }
     
-     /** Tries to resolve the best type of CPU that we have an optimized jbigi-dll/so for.
+    /**
+      * Tries to resolve the best type of CPU that we have an optimized jbigi-dll/so for.
+      * This is for x86 only.
       * @return A string containing the CPU-type or null if CPU type is unknown
       */
     private static String resolveCPUType() {
-        boolean is64 = (-1 != System.getProperty("os.arch").indexOf("64"));
-        if (is64)
-            return JBIGI_OPTIMIZATION_ATHLON64;
-        
         try {
             CPUInfo c = CPUID.getInfo();
             try {
                 _cpuModel = c.getCPUModelString();
             } catch (UnknownCPUException e) {}
-            if (c.IsC3Compatible())
-                return JBIGI_OPTIMIZATION_VIAC3;
-            if (c instanceof AMDCPUInfo) {
+            if (c instanceof VIACPUInfo){
+            	VIACPUInfo viacpu = (VIACPUInfo) c;
+            	if (viacpu.IsNanoCompatible())
+            	    return JBIGI_OPTIMIZATION_NANO;
+            	return JBIGI_OPTIMIZATION_VIAC3;
+            } else if(c instanceof AMDCPUInfo) {
                 AMDCPUInfo amdcpu = (AMDCPUInfo) c;
+                // Supported in CPUID, no GMP support
+                //if (amdcpu.IsBobcatCompatible())
+                //    return JBIGI_OPTIMIZATION_BOBCAT;
                 if (amdcpu.IsAthlon64Compatible())
                     return JBIGI_OPTIMIZATION_ATHLON64;
                 if (amdcpu.IsAthlonCompatible())
                     return JBIGI_OPTIMIZATION_ATHLON;
+                // FIXME lots of geodes, but GMP configures like a K6-3
+                if (amdcpu.IsGeodeCompatible())
+                    return JBIGI_OPTIMIZATION_GEODE;
                 if (amdcpu.IsK6_3_Compatible())
                     return JBIGI_OPTIMIZATION_K6_3;
                 if (amdcpu.IsK6_2_Compatible())
@@ -164,8 +227,16 @@ public class NativeBigInteger extends BigInteger {
                     return JBIGI_OPTIMIZATION_K6;
             } else if (c instanceof IntelCPUInfo) {
                 IntelCPUInfo intelcpu = (IntelCPUInfo) c;
+                if (intelcpu.IsCoreiCompatible())
+                    return JBIGI_OPTIMIZATION_COREI;
+                if (intelcpu.IsCore2Compatible())
+                    return JBIGI_OPTIMIZATION_CORE2;
                 if (intelcpu.IsPentium4Compatible())
                     return JBIGI_OPTIMIZATION_PENTIUM4;
+                if (intelcpu.IsAtomCompatible())
+                    return JBIGI_OPTIMIZATION_ATOM;
+                if (intelcpu.IsPentiumMCompatible())
+                    return JBIGI_OPTIMIZATION_PENTIUMM;
                 if (intelcpu.IsPentium3Compatible())
                     return JBIGI_OPTIMIZATION_PENTIUM3;
                 if (intelcpu.IsPentium2Compatible())
@@ -194,14 +265,6 @@ public class NativeBigInteger extends BigInteger {
      */
     public native static byte[] nativeModPow(byte base[], byte exponent[], byte modulus[]);
  
-    /**
-     * Converts a BigInteger byte-array to a 'double'
-     * @param ba Big endian twos complement representation of the BigInteger to convert to a double
-     * @return The plain double-value represented by 'ba'
-     * @deprecated unused
-     */
-    public native static double nativeDoubleValue(byte ba[]);
-
     private byte[] cachedBa;
 
     public NativeBigInteger(byte[] val) {
@@ -227,6 +290,7 @@ public class NativeBigInteger extends BigInteger {
     public NativeBigInteger(String val, int radix) {
         super(val, radix);
     }
+
     /**Creates a new NativeBigInteger with the same value
     *  as the supplied BigInteger. Warning!, not very efficent
     */
@@ -250,12 +314,9 @@ public class NativeBigInteger extends BigInteger {
         return cachedBa;
     }
     
-    /** @deprecated unused */
+    /** @deprecated unused, does not call native */
     @Override
     public double doubleValue() {
-        if (_nativeOk)
-            return nativeDoubleValue(toByteArray());
-        else
             return super.doubleValue();
     }
     /**
@@ -281,7 +342,7 @@ public class NativeBigInteger extends BigInteger {
     }
  
     /**
-     * <p>Compare the BigInteger.modPow/doubleValue vs the NativeBigInteger.modPow/doubleValue of some 
+     * <p>Compare the BigInteger.modPow vs the NativeBigInteger.modPow of some 
      * really big (2Kbit) numbers 100 different times and benchmark the 
      * performance (or shit a brick if they don't match).  </p>
      *
@@ -289,8 +350,6 @@ public class NativeBigInteger extends BigInteger {
     public static void main(String args[]) {
         _doLog = true;
         runModPowTest(100);
-        // i2p doesn't care about the double values
-        //runDoubleValueTest(100);
     }
 
     /* the sample numbers are elG generator/prime so we can test with reasonable numbers */
@@ -361,122 +420,70 @@ public class NativeBigInteger extends BigInteger {
         }
     }
     
-/********
-    private static void runDoubleValueTest(int numRuns) {
-        System.out.println("DEBUG: Warming up the random number generator...");
-        SecureRandom rand = new SecureRandom();
-        rand.nextBoolean();
-        System.out.println("DEBUG: Random number generator warmed up");
-
-        BigInteger jg = new BigInteger(_sampleGenerator);
-
-        long totalTime = 0;
-        long javaTime = 0;
-
-        int MULTIPLICATOR = 50000; //Run the doubleValue() calls within a loop since they are pretty fast.. 
-        int runsProcessed = 0;
-        for (runsProcessed = 0; runsProcessed < numRuns; runsProcessed++) {
-            NativeBigInteger g = new NativeBigInteger(_sampleGenerator);
-            long beforeDoubleValue = System.currentTimeMillis();
-            double dNative=0;
-            for(int mult=0;mult<MULTIPLICATOR;mult++)
-                dNative = g.doubleValue();
-            long afterDoubleValue = System.currentTimeMillis();
-            double jval=0;
-            for(int mult=0;mult<MULTIPLICATOR;mult++)
-                jval = jg.doubleValue();
-            long afterJavaDoubleValue = System.currentTimeMillis();
-
-            totalTime += (afterDoubleValue - beforeDoubleValue);
-            javaTime += (afterJavaDoubleValue - afterDoubleValue);
-            if (dNative!=jval) {
-                System.err.println("ERROR: [" + runsProcessed + "]\tnative double != java double");
-                System.err.println("ERROR: native double value: " + dNative);
-                System.err.println("ERROR: java double value: " + jval);
-                System.err.println("ERROR: run time: " + totalTime + "ms (" + (totalTime / (runsProcessed + 1)) + "ms each)");
-                break;
-            } else {
-                System.out.println("DEBUG: current run time: " + (afterDoubleValue - beforeDoubleValue) + "ms (total: " 
-                                   + totalTime + "ms, " + (totalTime / (runsProcessed + 1)) + "ms each)");
-            }
-        }
-        System.out.println("INFO: run time: " + totalTime + "ms (" + (totalTime / (runsProcessed + 1)) + "ms each)");
-        if (numRuns == runsProcessed)
-            System.out.println("INFO: " + runsProcessed + " runs complete without any errors");
-        else
-            System.out.println("ERROR: " + runsProcessed + " runs until we got an error");
-
-        if (_nativeOk) {
-            System.out.println("native run time: \t" + totalTime + "ms (" + (totalTime / (runsProcessed + 1))
-                               + "ms each)");
-            System.out.println("java run time:   \t" + javaTime + "ms (" + (javaTime / (runsProcessed + 1)) + "ms each)");
-            System.out.println("native = " + ((totalTime * 100.0d) / (double) javaTime) + "% of pure java time");
-        } else {
-            System.out.println("java run time: \t" + javaTime + "ms (" + (javaTime / (runsProcessed + 1)) + "ms each)");
-            System.out.println("However, we couldn't load the native library, so this doesn't test much");
-        }
-    }
-*********/
-    
- 
     /**
      * <p>Do whatever we can to load up the native library backing this BigInteger's native methods.
      * If it can find a custom built jbigi.dll / libjbigi.so, it'll use that.  Otherwise
      * it'll try to look in the classpath for the correct library (see loadFromResource).
      * If the user specifies -Djbigi.enable=false it'll skip all of this.</p>
      *
+     * <pre>
+     * Load order (using linux naming with cpu type "xxx")
+     * Old order 0.8.6 and earlier:
+     *   - filesystem libjbigi.so
+     *   - jbigi.jar libjbigi.so
+     *   - jbigi.jar libjbigi-linux-xxx.so
+     *   - filesystem libjbigi-linux-xxx.so
+     *   - jbigi.jar libjbigi-linux-none.so
+     *   - filesystem libjbigi-linux-none.so
+     *
+     * New order as of 0.8.7:
+     *   - filesystem libjbigi.so
+     *   - jbigi.jar libjbigi-linux-xxx_64.so if it may be 64 bit
+     *   - jbigi.jar libjbigi-linux-athlon64_64.so if it may be 64 bit
+     *   - jbigi.jar libjbigi-linux-xxx.so
+     *   - jbigi.jar libjbigi-linux-athlon64.so if it may be 64 bit
+     *   - jbigi.jar libjbigi-linux-yyy.so 0 or more other alternates
+     *   - jbigi.jar libjbigi-linux-none_64.so if it may be 64 bit
+     *   - jbigi.jar libjbigi-linux-none.so
+     * </pre>
      */
     private static final void loadNative() {
         try{
-        String wantedProp = System.getProperty("jbigi.enable", "true");
-        boolean wantNative = "true".equalsIgnoreCase(wantedProp);
-        if (wantNative) {
-            boolean loaded = loadGeneric("jbigi");
-            if (loaded) {
-                _nativeOk = true;
-                info("Locally optimized native BigInteger library loaded from the library path");
-            } else {
-                loaded = loadFromResource("jbigi");
+            String wantedProp = System.getProperty("jbigi.enable", "true");
+            boolean wantNative = "true".equalsIgnoreCase(wantedProp);
+            if (wantNative) {
+                debug("trying loadGeneric");
+                boolean loaded = loadGeneric("jbigi");
                 if (loaded) {
                     _nativeOk = true;
-                    info("Locally optimized native BigInteger library loaded from resource");
+                    info("Locally optimized native BigInteger library loaded from file");
                 } else {
-                    loaded = loadFromResource(true);
-                    if (loaded) {
-                        _nativeOk = true;
-                        info("Optimized native BigInteger library '"+getResourceName(true)+"' loaded from resource");
-                    } else {
-                        loaded = loadGeneric(true);
-                        if (loaded) {
+                    List<String> toTry = getResourceList();
+                    debug("loadResource list to try is: " + toTry);
+                    for (String s : toTry) {
+                        debug("trying loadResource " + s);
+                        if (loadFromResource(s)) {
                             _nativeOk = true;
-                            info("Optimized native BigInteger library '"+getMiddleName(true)+"' loaded from somewhere in the path");
-                        } else {
-                            loaded = loadFromResource(false);
-                            if (loaded) {
-                                _nativeOk = true;
-                                info("Non-optimized native BigInteger library '"+getResourceName(false)+"' loaded from resource");
-                            } else {
-                                loaded = loadGeneric(false);
-                                if (loaded) {
-                                    _nativeOk = true;
-                                    info("Non-optimized native BigInteger library '"+getMiddleName(false)+"' loaded from somewhere in the path");
-                                } else {
-                                    _nativeOk = false;          
-                                }
-                            }       
+                            info("Native BigInteger library " + s + " loaded from resource");
+                            break;
                         }
                     }
                 }
             }
-        }
-        if (!_nativeOk) {
-            warn("Native BigInteger library jbigi not loaded - using pure Java - " +
-                 "poor performance may result - see http://www.i2p2.i2p/jbigi.html for help");
-        }
-        }catch(Exception e){
-            warn("Native BigInteger library jbigi not loaded, reason: '"+e.getMessage()+"' - using pure java");
+            if (!_nativeOk) {
+                warn("Native BigInteger library jbigi not loaded - using pure Java - " +
+                     "poor performance may result - see http://www.i2p2.i2p/jbigi for help");
+            }
+        } catch(Exception e) {
+            warn("Native BigInteger library jbigi not loaded, using pure java", e);
         }
     }
+    
+    /** @since 0.8.7 */
+    private static void debug(String s) {
+        I2PAppContext.getGlobalContext().logManager().getLog(NativeBigInteger.class).debug(s);
+    }
+
     
     private static void info(String s) {
         if(_doLog)
@@ -486,10 +493,21 @@ public class NativeBigInteger extends BigInteger {
     }
 
     private static void warn(String s) {
-        if(_doLog)
+        warn(s, null);
+    }
+
+    /** @since 0.8.7 */
+    private static void warn(String s, Throwable t) {
+        if(_doLog) {
             System.err.println("WARNING: " + s);
-        I2PAppContext.getGlobalContext().logManager().getLog(NativeBigInteger.class).warn(s);
-        _loadStatus = s;
+            if (t != null)
+                t.printStackTrace();
+        }
+        I2PAppContext.getGlobalContext().logManager().getLog(NativeBigInteger.class).warn(s, t);
+        if (t != null)
+            _loadStatus = s + ' ' + t;
+        else
+            _loadStatus = s;
     }
 
     /** 
@@ -502,6 +520,7 @@ public class NativeBigInteger extends BigInteger {
     private static final boolean loadGeneric(boolean optimized) {
         return loadGeneric(getMiddleName(optimized));
     }
+
     private static final boolean loadGeneric(String name) {
         try {
             if(name == null)
@@ -509,6 +528,12 @@ public class NativeBigInteger extends BigInteger {
             System.loadLibrary(name);
             return true;
         } catch (UnsatisfiedLinkError ule) {
+            if (_isAndroid) {
+                // Unfortunately,
+                // this is not interesting on Android, it says "file not found"
+                // on link errors too.
+                warn("jbigi loadLibrary() fail", ule);
+            }
             return false;
         }
     }
@@ -537,13 +562,13 @@ public class NativeBigInteger extends BigInteger {
         String resourceName = getResourceName(optimized);
         return loadFromResource(resourceName);
     }
+
     private static final boolean loadFromResource(String resourceName) {
         if (resourceName == null) return false;
         //URL resource = NativeBigInteger.class.getClassLoader().getResource(resourceName);
         URL resource = ClassLoader.getSystemResource(resourceName);
         if (resource == null) {
-            if (_doLog)
-                System.err.println("NOTICE: Resource name [" + resourceName + "] was not found");
+            info("Resource name [" + resourceName + "] was not found");
             return false;
         }
 
@@ -554,7 +579,6 @@ public class NativeBigInteger extends BigInteger {
             InputStream libStream = resource.openStream();
             outFile = new File(I2PAppContext.getGlobalContext().getTempDir(), filename);
             fos = new FileOutputStream(outFile);
-            // wtf this was 4096*1024 which is really excessive for a roughly 50KB file
             byte buf[] = new byte[4096];
             while (true) {
                 int read = libStream.read(buf);
@@ -565,17 +589,15 @@ public class NativeBigInteger extends BigInteger {
             fos = null;
             System.load(outFile.getAbsolutePath()); //System.load requires an absolute path to the lib
         } catch (UnsatisfiedLinkError ule) {
-            if (_doLog) {
-                System.err.println("ERROR: The resource " + resourceName 
-                                   + " was not a valid library for this platform");
-                ule.printStackTrace();
-            }
+            // don't include the exception in the message - too much
+            warn("Failed to load the resource " + resourceName + " - not a valid library for this platform");
+            if (outFile != null)
+                outFile.delete();
             return false;
         } catch (IOException ioe) {
-            if (_doLog) {
-                System.err.println("ERROR: Problem writing out the temporary native library data");
-                ioe.printStackTrace();
-            }
+            warn("Problem writing out the temporary native library data", ioe);
+            if (outFile != null)
+                outFile.delete();
             return false;
         } finally {
             if (fos != null) {
@@ -588,37 +610,124 @@ public class NativeBigInteger extends BigInteger {
         return true;
     }
     
+    /**
+     *  Generate a list of resources to search for, in-order.
+     *  See loadNative() comments for more info.
+     *  @return non-null
+     *  @since 0.8.7
+     */
+    private static List<String> getResourceList() {
+        if (_isAndroid)
+            return Collections.EMPTY_LIST;
+        List<String> rv = new ArrayList(8);
+        String primary = getMiddleName2(true);
+        if (primary != null) {
+            if (_is64) {
+                // add 64 bit variants at the front
+                if (!primary.equals(JBIGI_OPTIMIZATION_ATHLON64))
+                    rv.add(_libPrefix + getMiddleName1() + primary + "_64" + _libSuffix);
+                // athlon64_64 is always a fallback for 64 bit
+                rv.add(_libPrefix + getMiddleName1() + JBIGI_OPTIMIZATION_ATHLON64 + "_64" + _libSuffix);
+            }
+            // the preferred selection
+            rv.add(_libPrefix + getMiddleName1() + primary + _libSuffix);
+
+            // athlon64 is always a fallback for 64 bit
+            if (_is64 && !primary.equals(JBIGI_OPTIMIZATION_ATHLON64))
+                rv.add(_libPrefix + getMiddleName1() + JBIGI_OPTIMIZATION_ATHLON64 + _libSuffix);
+
+            // Add fallbacks for any 32-bit that were added 0.8.7 or later here
+            // FIXME lots of geodes, but GMP configures like a K6-3, so pentium3 is probably a good backup
+            if (primary.equals(JBIGI_OPTIMIZATION_ATOM) ||
+                primary.equals(JBIGI_OPTIMIZATION_PENTIUMM) ||
+                primary.equals(JBIGI_OPTIMIZATION_GEODE))
+                rv.add(_libPrefix + getMiddleName1() + JBIGI_OPTIMIZATION_PENTIUM3 + _libSuffix);
+
+            // athlon is always a fallback for 64 bit, we have it for all architectures
+            // and it should be much better than "none"
+            if (_is64)
+                rv.add(_libPrefix + getMiddleName1() + JBIGI_OPTIMIZATION_ATHLON + _libSuffix);
+
+        } else {
+            if (_is64) {
+                rv.add(_libPrefix + getMiddleName1() + JBIGI_OPTIMIZATION_ATHLON64 + "_64" + _libSuffix);
+                rv.add(_libPrefix + getMiddleName1() + JBIGI_OPTIMIZATION_ATHLON64 + _libSuffix);
+            }
+        }
+        // Add libjbigi-xxx-none_64.so
+        if (_is64)
+            rv.add(_libPrefix + getMiddleName1() + "none_64" + _libSuffix);
+        // Add libjbigi-xxx-none.so
+        // Note that libjbigi-osx-none.jnilib is a 'fat binary' with both PPC and x86-32
+        if (!_isArm)
+            rv.add(getResourceName(false));
+        return rv;
+    }
+
+    /**
+     *  @return may be null if optimized is true
+     */
     private static final String getResourceName(boolean optimized) {
-        String pref = _libPrefix;
         String middle = getMiddleName(optimized);
-        String suff = _libSuffix;
-        if(pref == null || middle == null || suff == null)
+        if (middle == null)
             return null;
-        return pref+middle+suff;
+        return _libPrefix + middle + _libSuffix;
     }
     
-    private static final String getMiddleName(boolean optimized){
-        
-        String sAppend;
-        if(optimized)
-        {
-            if(sCPUType == null)
-                return null;
-            else
-                sAppend = "-"+sCPUType;        
-        }else
-               sAppend = "-none";
+    /**
+     *  @return may be null if optimized is true; returns jbigi-xxx-none if optimize is false
+     */
+    private static final String getMiddleName(boolean optimized) {
+        String m2 = getMiddleName2(optimized);
+        if (m2 == null)
+            return null;
+        return getMiddleName1() + m2;
+    }
 
+    /**
+     *  @return may be null if optimized is true; returns "none" if optimize is false
+     *  @since 0.8.7
+     */
+    private static final String getMiddleName2(boolean optimized) {
+        String sAppend;
+        if (optimized) {
+            if (sCPUType == null)
+                return null;
+            // Add exceptions here if library files are identical,
+            // instead of adding duplicates to jbigi.jar
+            if (sCPUType.equals(JBIGI_OPTIMIZATION_K6_3) && !_isWin)
+                // k62 and k63 identical except on windows
+                sAppend = JBIGI_OPTIMIZATION_K6_2;
+            else if (sCPUType.equals(JBIGI_OPTIMIZATION_VIAC32))
+                // viac32 and pentium3 identical
+                sAppend = JBIGI_OPTIMIZATION_PENTIUM3;
+            //else if (sCPUType.equals(JBIGI_OPTIMIZATION_VIAC3) && _isWin)
+                // FIXME no viac3 available for windows, what to use instead?
+            else
+                sAppend = sCPUType;        
+        } else {
+            sAppend = "none";
+        }
+        return sAppend;
+    }
+
+    /**
+     *  @return "jbigi-xxx-"
+     *  @since 0.8.7
+     */
+    private static final String getMiddleName1() {
         if(_isWin)
-             return "jbigi-windows"+sAppend; // The convention on Windows
-        if(_isLinux)
-            return "jbigi-linux"+sAppend; // The convention on linux...
+             return "jbigi-windows-";
         if(_isFreebsd)
-            return "jbigi-freebsd"+sAppend; // The convention on freebsd...
+            return "jbigi-freebsd-";
         if(_isMac)
-            return "jbigi-osx"+sAppend;
+            return "jbigi-osx-";
         if(_isOS2)
-            return "jbigi-os2"+sAppend;
-        throw new RuntimeException("Dont know jbigi library name for os type '"+System.getProperty("os.name")+"'");
+            return "jbigi-os2-";
+        if(_isSunos)
+            return "jbigi-solaris-";
+        //throw new RuntimeException("Dont know jbigi library name for os type '"+System.getProperty("os.name")+"'");
+        // use linux as the default, don't throw exception
+        return "jbigi-linux-";
     }
 }

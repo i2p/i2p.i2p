@@ -7,6 +7,7 @@ package net.i2p.client.naming;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
@@ -25,6 +26,7 @@ import net.i2p.util.Log;
  * Should be used from MetaNamingService, after HostsTxtNamingService.
  * Cannot be used as the only NamingService! Be sure any naming service hosts
  * are in hosts.txt.
+ * Supports caching, b32, and b64.
  *
  * Sample config to put in configadvanced.jsp (restart required):
  *
@@ -33,11 +35,10 @@ import net.i2p.util.Log;
  * i2p.naming.eepget.list=http://namingservice.i2p/cgi-bin/lkup.cgi?host=,http://i2host.i2p/cgi-bin/i2hostquery?
  *
  */
-public class EepGetNamingService extends NamingService {
+public class EepGetNamingService extends DummyNamingService {
 
     private final static String PROP_EEPGET_LIST = "i2p.naming.eepget.list";
     private final static String DEFAULT_EEPGET_LIST = "http://i2host.i2p/cgi-bin/i2hostquery?";
-    private final static Log _log = new Log(EepGetNamingService.class);
 
     /** 
      * The naming service should only be constructed and accessed through the 
@@ -59,21 +60,15 @@ public class EepGetNamingService extends NamingService {
     }
     
     @Override
-    public Destination lookup(String hostname) {
-        // If it's long, assume it's a key.
-        if (hostname.length() >= DEST_SIZE)
-            return lookupBase64(hostname);
-
-        hostname = hostname.toLowerCase();
-
-        // If you want b32, chain with HostsTxtNamingService
-        if (hostname.length() == 60 && hostname.endsWith(".b32.i2p"))
-            return null;
-
-        // check the cache
-        Destination d = getCache(hostname);
+    public Destination lookup(String hostname, Properties lookupOptions, Properties storedOptions) {
+        Destination d = super.lookup(hostname, null, null);
         if (d != null)
             return d;
+
+        hostname = hostname.toLowerCase();
+        // Base32 failed?
+        if (hostname.length() == BASE32_HASH_LENGTH + 8 && hostname.endsWith(".b32.i2p"))
+            return null;
 
         List URLs = getURLs();
         if (URLs.isEmpty())
@@ -103,7 +98,6 @@ public class EepGetNamingService extends NamingService {
     }
 
     // FIXME allow larger Dests for non-null Certs
-    private static final int DEST_SIZE = 516;                    // Std. Base64 length (no certificate)
     private static final int MAX_RESPONSE = DEST_SIZE + 68 + 10; // allow for hostname= and some trailing stuff
     private String fetchAddr(String url, String hostname) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(MAX_RESPONSE);

@@ -114,9 +114,9 @@ public class FragmentHandler {
                                               "Tunnels", RATES);
         _context.statManager().createRateStat("tunnel.fragmentedComplete", "How many fragments were in a completely received message?", 
                                               "Tunnels", RATES);
-        _context.statManager().createRateStat("tunnel.fragmentedDropped", "How many fragments were in a partially received yet failed message?", 
+        _context.statManager().createRequiredRateStat("tunnel.fragmentedDropped", "Number of dropped fragments", 
                                               "Tunnels", RATES);
-        _context.statManager().createRateStat("tunnel.corruptMessage", "How many corrupted messages arrived?", 
+        _context.statManager().createRequiredRateStat("tunnel.corruptMessage", "Corrupt messages received", 
                                               "Tunnels", RATES);
     }
     

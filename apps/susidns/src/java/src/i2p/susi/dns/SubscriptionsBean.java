@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Properties;
 
+import net.i2p.I2PAppContext;
 import net.i2p.util.SecureFileOutputStream;
 
 public class SubscriptionsBean
@@ -130,15 +131,19 @@ public class SubscriptionsBean
 				if (action.equals(_("Save"))) {
 					save();
 					String nonce = System.getProperty("addressbook.nonce");
+				/*******
 					if (nonce != null) {	
 						// Yes this is a hack.
 						// No it doesn't work on a text-mode browser.
 						// Fetching from the addressbook servlet
 						// with the correct parameters will kick off a
 						// config reload and fetch.
-						message = _("Subscriptions saved, updating addressbook from subscription sources now.") +
-						          "<img height=\"1\" width=\"1\" alt=\"\" " +
-						          "src=\"/addressbook/?wakeup=1&nonce=" + nonce + "\">";
+				*******/
+					if (content != null && content.length() > 2) {
+						message = _("Subscriptions saved, updating addressbook from subscription sources now.");
+						          // + "<img height=\"1\" width=\"1\" alt=\"\" " +
+						          // "src=\"/addressbook/?wakeup=1&nonce=" + nonce + "\">";
+						I2PAppContext.getGlobalContext().namingService().requestUpdate(null);
 					} else {
 						message = _("Subscriptions saved.");
 					}

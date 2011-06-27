@@ -1,6 +1,7 @@
 #/bin/bash
 
-# TO-DO: Darwin.
+#FIXME What platforms for MacOS?
+MISC_DARWIN_PLATFORMS=""
 
 # Note: You will have to add the CPU ID for the platform in the CPU ID code
 # for a new CPU. Just adding them here won't let I2P use the code!
@@ -10,14 +11,14 @@
 # please add them here.
 # Do NOT add any X86 platforms, do that below in the x86 platform list.
 #
-MISC_LINUX_PLATFORMS="hppa2.0 alphaev56 armv5tel mips64el itanium itanium2 ultrasparc2 ultrasparc2i alphaev6 powerpc970 powerpc7455 powerpc7447 atom"
+MISC_LINUX_PLATFORMS="hppa2.0 alphaev56 armv5tel mips64el itanium itanium2 ultrasparc2 ultrasparc2i alphaev6 powerpc970 powerpc7455 powerpc7447"
 
 #
 # If you know of other platforms i2p on FREEBSD works on, 
 # please add them here.
 # Do NOT add any X86 platforms, do that below in the x86 platform list.
 #
-MISC_FREEBSD_PLATFORMS="atom alphaev56 ultrasparc2i"
+MISC_FREEBSD_PLATFORMS="alphaev56 ultrasparc2i"
 
 #
 # MINGW/Windows??
@@ -27,9 +28,12 @@ MISC_MINGW_PLATFORMS=""
 #
 # Are there any other X86 platforms that work on i2p? Add them here.
 #
-# Oddly athlon64 builds.... I wonder what others can :-)
-#
-X86_PLATFORMS="pentium pentiummmx pentium2 pentium3 pentium4 k6 k62 k63 athlon pentiumm core2 athlon64 geode"
+
+# Note! these build on 32bit as 32bit when operating as 32bit...
+X86_64_PLATFORMS="atom athlon64 core2 corei nano pentium4"
+
+# Note! these are 32bit _ONLY_
+X86_PLATFORMS="pentium pentiummmx pentium2 pentium3 pentiumm k6 k62 k63 athlon geode viac3 viac32 ${X86_64_PLATFORMS}"
 
 
 #
@@ -39,8 +43,10 @@ X86_PLATFORMS="pentium pentiummmx pentium2 pentium3 pentium4 k6 k62 k63 athlon p
 MINGW_PLATFORMS="${X86_PLATFORMS} ${MISC_MINGW_PLATFORMS}"
 LINUX_PLATFORMS="${X86_PLATFORMS} ${MISC_LINUX_PLATFORMS}"
 FREEBSD_PLATFORMS="${X86_PLATFORMS} ${MISC_FREEBSD_PLATFORMS}"
+DARWIN_PLATFORMS="${X86_PLATFORMS} ${MISC_DARWIN_PLATFORMS}"
 
-VER=$(echo gmp-*.tar.bz2 | sed -re "s/(.*-)(.*)(.*.tar.bz2)$/\2/" | tail --lines=1)
+# OSX doesn't have the -r parameter as an option for sed.
+VER=$(echo gmp-*.tar.bz2 | sed -re "s/(.*-)(.*)(.*.tar.bz2)$/\2/" | tail -n 1)
 if [ "$VER" == "" ] ; then
 	echo "ERROR! Can't find gmp source tarball."
 	exit 1
@@ -54,12 +60,36 @@ MINGW*)
 	TYPE="dll"
 	TARGET="-windows-"
 	echo "Building windows .dlls for all architectures";;
+Darwin*)
+	PLATFORM_LIST="${DARWIN_PLATFORMS}"
+	NAME="libjbigi"
+	TYPE="jnilib"
+	TARGET="-osx-"
+	echo "Building ${TARGET} .jnilibs for all architectures";;
 Linux*)
-	PLATFORM_LIST="${LINUX_PLATFORMS}"
 	NAME="libjbigi"
 	TYPE="so"
+	PLATFORM_LIST=""
 	TARGET="-linux-"
-	echo "Building linux .sos for all architectures";;
+	arch=$(uname -m | cut -f1 -d" ")
+	case ${arch} in
+		i[3-6]86)
+			arch="x86";;
+	esac
+	case ${arch} in
+		x86_64)
+			PLATFORM_LIST="${X86_64_PLATFORMS}"
+			TARGET="-linux-X86_64-";;
+		ia64)
+			PLATFORM_LIST="${X86_64_PLATFORMS}"
+			TARGET="-linux-ia64-";;
+		x86)
+			PLATFORM_LIST="${X86_PLATFORMS}"
+			TARGET="-linux-x86-";;
+		*)
+			PLATFORM_LIST="${LINUX_PLATFORMS}";;
+	esac
+	echo "Building ${TARGET} .so's for ${arch}";;
 FreeBSD*)
 	PLATFORM_LIST="${FREEBSD_PLATFORMS}"
 	NAME="libjbigi"
@@ -93,7 +123,7 @@ function configure_file {
 	echo -e "\n\n\nAttempting configure for ${3}${5}${2}\n\n\n"
 	sleep 10
 	# Nonfatal bail out on unsupported platform.
-	../../gmp-${1}/configure --build=${2} && return 0
+	../../gmp-${1}/configure --build=${2} --with-pic && return 0
 	cd ..
 	rm -R "$2"
 	echo -e "\n\nSorry, ${3}${5}${2} is not supported on your build environment.\a"

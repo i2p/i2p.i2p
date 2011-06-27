@@ -1,6 +1,5 @@
 package net.i2p.router.web;
 
-import net.i2p.I2PAppContext;
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
 import net.i2p.util.FileUtil;
@@ -50,12 +49,14 @@ public class ConfigUpdateHandler extends FormHandler {
      */
     private static final String PACK200_URLS =
     "http://echelon.i2p/i2p/i2pupdate.su2\r\n" +
+    "http://inr.i2p/i2p/i2pupdate.su2\r\n" +
     "http://stats.i2p/i2p/i2pupdate.su2\r\n" +
     "http://www.i2p2.i2p/_static/i2pupdate.su2\r\n" +
     "http://update.postman.i2p/i2pupdate.su2" ;
 
     private static final String NO_PACK200_URLS =
     "http://echelon.i2p/i2p/i2pupdate.sud\r\n" +
+    "http://inr.i2p/i2p/i2pupdate.sud\r\n" +
     "http://stats.i2p/i2p/i2pupdate.sud\r\n" +
     "http://www.i2p2.i2p/_static/i2pupdate.sud\r\n" +
     "http://update.postman.i2p/i2pupdate.sud" ;
@@ -76,7 +77,7 @@ public class ConfigUpdateHandler extends FormHandler {
         if (_action == null)
             return;
         if (_action.equals(_("Check for updates"))) {
-            NewsFetcher fetcher = NewsFetcher.getInstance(I2PAppContext.getGlobalContext());
+            NewsFetcher fetcher = NewsFetcher.getInstance(_context);
             fetcher.fetchNews();
             if (fetcher.shouldFetchUnsigned())
                 fetcher.fetchUnsignedHead();
@@ -98,6 +99,7 @@ public class ConfigUpdateHandler extends FormHandler {
             String oldURL = ConfigUpdateHelper.getNewsURL(_context);
             if ( (oldURL == null) || (!_newsURL.equals(oldURL)) ) {
                 _context.router().setConfigSetting(PROP_NEWS_URL, _newsURL);
+                NewsFetcher.getInstance(_context).invalidateNews();
                 addFormNotice(_("Updating news URL to") + " " + _newsURL);
             }
         }

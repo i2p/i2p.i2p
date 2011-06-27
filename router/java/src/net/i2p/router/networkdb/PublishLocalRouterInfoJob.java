@@ -65,7 +65,7 @@ public class PublishLocalRouterInfoJob extends JobImpl {
             try {
                 getContext().netDb().publish(ri);
             } catch (IllegalArgumentException iae) {
-                _log.log(Log.CRIT, "Error publishing our identity - corrupt?", iae);
+                _log.log(Log.CRIT, "Error publishing our identity - corrupt? Restart required", iae);
                 getContext().router().rebuildNewIdentity();
             }
         } catch (DataFormatException dfe) {

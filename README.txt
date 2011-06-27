@@ -1,9 +1,9 @@
 Prerequisites to build from source:
-	Java SDK (preferably Sun) 1.5.0 or higher (1.6 recommended)
-	The SDK must have Pack200 support (java.util.jar.Pack200)
+	Java SDK (preferably Oracle/Sun or OpenJDK) 1.6.0 or higher
+          Non-linux operating systems and JVMs: See http://trac.i2p2.de/wiki/java
 	Apache Ant 1.7.0 or higher
 	Optional, For multilanguage support: The xgettext, msgfmt, and msgmerge tools installed
-	from the GNU gettext package http://www.gnu.org/software/gettext/
+	  from the GNU gettext package http://www.gnu.org/software/gettext/
 
 To build:
 	ant pkg
@@ -11,7 +11,7 @@ To build:
 	See INSTALL.txt or http://www.i2p2.de/download.html for installation instructions.
 
 Documentation:
-	http://www.i2p2.de/
+	http://www.i2p2.de/how
 	API: run 'ant javadoc' then start at build/javadoc/index.html
 
 Latest release:

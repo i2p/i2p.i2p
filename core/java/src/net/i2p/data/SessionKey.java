@@ -41,7 +41,7 @@ public class SessionKey extends SimpleDataStructure {
      */
     @Override
     public void setData(byte[] data) {
-        _data = data;
+        super.setData(data);
         _preparedKey = null;
     }
     

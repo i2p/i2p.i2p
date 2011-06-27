@@ -51,11 +51,11 @@ import net.i2p.util.SimpleTimer;
  * @author jrandom
  */
 class ClientConnectionRunner {
-    private Log _log;
+    private final Log _log;
     protected final RouterContext _context;
-    private ClientManager _manager;
+    private final ClientManager _manager;
     /** socket for this particular peer connection */
-    private Socket _socket;
+    private final Socket _socket;
     /** output stream of the socket that I2CP messages bound to the client should be written to */
     private OutputStream _out;
     /** session ID of the current client */
@@ -63,13 +63,13 @@ class ClientConnectionRunner {
     /** user's config */
     private SessionConfig _config;
     /** static mapping of MessageId to Payload, storing messages for retrieval */
-    private Map<MessageId, Payload> _messages; 
+    private final Map<MessageId, Payload> _messages; 
     /** lease set request state, or null if there is no request pending on at the moment */
     private LeaseRequestState _leaseRequest;
     /** currently allocated leaseSet, or null if none is allocated */
     private LeaseSet _currentLeaseSet;
     /** set of messageIds created but not yet ACCEPTED */
-    private Set<MessageId> _acceptedPending;
+    private final Set<MessageId> _acceptedPending;
     /** thingy that does stuff */
     protected I2CPMessageReader _reader;
     /** just for this destination */
@@ -137,15 +137,14 @@ class ClientConnectionRunner {
         _messages.clear();
         if (_sessionKeyManager != null)
             _sessionKeyManager.shutdown();
-        if (_manager != null)
-            _manager.unregisterConnection(this);
+        _manager.unregisterConnection(this);
         if (_currentLeaseSet != null)
             _context.netDb().unpublish(_currentLeaseSet);
         _leaseRequest = null;
         synchronized (_alreadyProcessed) {
             _alreadyProcessed.clear();
         }
-        _config = null;
+        //_config = null;
         //_manager = null;
     }
     

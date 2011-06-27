@@ -75,6 +75,7 @@ public class HTTPSendData {
         }
     }
 
+/****
     public static void main(String args[]) {
         byte data[] = new byte[4096];
         for (int i = 0; i < data.length; i++)
@@ -88,4 +89,5 @@ public class HTTPSendData {
         } catch (InterruptedException ie) { // nop
         }
     }
+****/
 }

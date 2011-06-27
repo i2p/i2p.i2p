@@ -91,14 +91,12 @@ public class ElGamalAESEngine {
         SessionTag st = new SessionTag(tag);
         SessionKey key = keyManager.consumeTag(st);
         SessionKey foundKey = new SessionKey();
-        foundKey.setData(null);
         SessionKey usedKey = new SessionKey();
         Set foundTags = new HashSet();
         byte decrypted[] = null;
         boolean wasExisting = false;
         if (key != null) {
             //if (_log.shouldLog(Log.DEBUG)) _log.debug("Key is known for tag " + st);
-            usedKey.setData(key.getData());
             long id = _context.random().nextLong();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(id + ": Decrypting existing session encrypted with tag: " + st.toString() + ": key: " + key.toBase64() + ": " + data.length + " bytes: " + Base64.encode(data, 0, 64));
@@ -138,7 +136,7 @@ public class ElGamalAESEngine {
                 if (_log.shouldLog(Log.DEBUG)) 
                     _log.debug("Found key: " + foundKey.toBase64() + " tags: " + foundTags + " wasExisting? " + wasExisting);
                 keyManager.tagsReceived(foundKey, foundTags);
-            } else {
+            } else if (usedKey.getData() != null) {
                 if (_log.shouldLog(Log.DEBUG)) 
                     _log.debug("Used key: " + usedKey.toBase64() + " tags: " + foundTags + " wasExisting? " + wasExisting);
                 keyManager.tagsReceived(usedKey, foundTags);
@@ -160,11 +158,12 @@ public class ElGamalAESEngine {
      * the decryptAESBlock method & structure.
      *
      * @param foundTags set which is filled with any sessionTags found during decryption
-     * @param foundKey  session key which may be filled with a new sessionKey found during decryption
+     * @param foundKey  out parameter. Data must be unset when called; may be filled with a new sessionKey found during decryption
+     * @param usedKey out parameter. Data must be unset when called; usedKey.setData() will be called by this method on success.
      *
      * @return null if decryption fails
      */
-    byte[] decryptNewSession(byte data[], PrivateKey targetPrivateKey, Set foundTags, SessionKey usedKey,
+    private byte[] decryptNewSession(byte data[], PrivateKey targetPrivateKey, Set foundTags, SessionKey usedKey,
                                     SessionKey foundKey) throws DataFormatException {
         if (data == null) {
             //if (_log.shouldLog(Log.WARN)) _log.warn("Data is null, unable to decrypt new session");
@@ -231,19 +230,19 @@ public class ElGamalAESEngine {
      * If anything doesn't match up in decryption, it falls back to decryptNewSession
      *
      * @param foundTags set which is filled with any sessionTags found during decryption
-     * @param foundKey  session key which may be filled with a new sessionKey found during decryption
+     * @param foundKey  out parameter. Data must be unset when called; may be filled with a new sessionKey found during decryption
+     * @param usedKey out parameter. Data must be unset when called; usedKey.setData() will be called by this method on success.
+     *
      * @return decrypted data or null on failure
      *
      */
-    byte[] decryptExistingSession(byte data[], SessionKey key, PrivateKey targetPrivateKey, Set foundTags,
+    private byte[] decryptExistingSession(byte data[], SessionKey key, PrivateKey targetPrivateKey, Set foundTags,
                                          SessionKey usedKey, SessionKey foundKey) throws DataFormatException {
         byte preIV[] = new byte[32];
         System.arraycopy(data, 0, preIV, 0, preIV.length);
         Hash ivHash = _context.sha().calculateHash(preIV);
         byte iv[] = new byte[16];
         System.arraycopy(ivHash.getData(), 0, iv, 0, 16);
-        
-        usedKey.setData(key.getData());
 
         //_log.debug("Pre IV for decryptExistingSession: " + DataHelper.toString(preIV, 32));
         //_log.debug("SessionKey for decryptNewSession: " + DataHelper.toString(key.getData(), 32));
@@ -267,6 +266,7 @@ public class ElGamalAESEngine {
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("Decrypt with an EXISTING session tag successfull, # tags read: " + foundTags.size(),
         //               new Exception("Decrypted by"));
+        usedKey.setData(key.getData());
         return decrypted;
     }
 
@@ -287,13 +287,17 @@ public class ElGamalAESEngine {
      * consume it, but if it is null, record the keys, etc as part of a new session.
      *
      * @param foundTags set which is filled with any sessionTags found during decryption
-     * @param foundKey  session key which may be filled with a new sessionKey found during decryption
+     * @param foundKey  out parameter. Data must be unset when called; may be filled with a new sessionKey found during decryption
      * @return decrypted data or null on failure
      */
-    byte[] decryptAESBlock(byte encrypted[], SessionKey key, byte iv[], 
+    private byte[] decryptAESBlock(byte encrypted[], SessionKey key, byte iv[], 
                            byte sentTag[], Set foundTags, SessionKey foundKey) throws DataFormatException {
         return decryptAESBlock(encrypted, 0, encrypted.length, key, iv, sentTag, foundTags, foundKey);
     }
+
+    /*
+     * Note: package private for ElGamalTest.testAES()
+     */
     byte[] decryptAESBlock(byte encrypted[], int offset, int encryptedLen, SessionKey key, byte iv[], 
                            byte sentTag[], Set foundTags, SessionKey foundKey) throws DataFormatException {
         //_log.debug("iv for decryption: " + DataHelper.toString(iv, 16));	
@@ -448,7 +452,7 @@ public class ElGamalAESEngine {
      * </pre>
      *
      */
-    byte[] encryptNewSession(byte data[], PublicKey target, SessionKey key, Set tagsForDelivery,
+    private byte[] encryptNewSession(byte data[], PublicKey target, SessionKey key, Set tagsForDelivery,
                                     SessionKey newKey, long paddedSize) {
         //_log.debug("Encrypting to a NEW session");
         byte elgSrcData[] = new byte[SessionKey.KEYSIZE_BYTES+32+158];
@@ -511,7 +515,7 @@ public class ElGamalAESEngine {
      * </pre>
      *
      */
-    byte[] encryptExistingSession(byte data[], PublicKey target, SessionKey key, Set tagsForDelivery,
+    private byte[] encryptExistingSession(byte data[], PublicKey target, SessionKey key, Set tagsForDelivery,
                                          SessionTag currentTag, SessionKey newKey, long paddedSize) {
         //_log.debug("Encrypting to an EXISTING session");
         byte rawTag[] = currentTag.getData();
@@ -542,12 +546,14 @@ public class ElGamalAESEngine {
      *  - random bytes, padding the total size to greater than paddedSize with a mod 16 = 0
      * </pre>
      *
+     * Note: package private for ElGamalTest.testAES()
      */
     final byte[] encryptAESBlock(byte data[], SessionKey key, byte[] iv, Set tagsForDelivery, SessionKey newKey,
                                         long paddedSize) {
         return encryptAESBlock(data, key, iv, tagsForDelivery, newKey, paddedSize, 0);
     }
-    final byte[] encryptAESBlock(byte data[], SessionKey key, byte[] iv, Set tagsForDelivery, SessionKey newKey,
+
+    private final byte[] encryptAESBlock(byte data[], SessionKey key, byte[] iv, Set tagsForDelivery, SessionKey newKey,
                                         long paddedSize, int prefixBytes) {
         //_log.debug("iv for encryption: " + DataHelper.toString(iv, 16));
         //_log.debug("Encrypting AES");
@@ -616,6 +622,7 @@ public class ElGamalAESEngine {
         context.random().nextBytes(rv);
         return rv;
     }
+
     final static int getPaddingSize(int curSize, long minPaddedSize) {
         int diff = 0;
         if (curSize < minPaddedSize) {

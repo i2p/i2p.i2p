@@ -13,6 +13,7 @@
 CLASS=net.i2p.desktopgui.messages
 TMPFILE=build/javafiles.txt
 export TZ=UTC
+RC=0
 
 if [ "$1" = "-p" ]
 then
@@ -76,15 +77,17 @@ do
 		         -o ${i}t
 		if [ $? -ne 0 ]
 		then
-			echo 'Warning - xgettext failed, not updating translations'
+			echo "ERROR - xgettext failed on ${i}, not updating translations"
 			rm -f ${i}t
+			RC=1
 			break
 		fi
 		msgmerge -U --backup=none $i ${i}t
 		if [ $? -ne 0 ]
 		then
-			echo 'Warning - msgmerge failed, not updating translations'
+			echo "ERROR - msgmerge failed on ${i}, not updating translations"
 			rm -f ${i}t
+			RC=1
 			break
 		fi
 		rm -f ${i}t
@@ -101,11 +104,13 @@ do
         msgfmt --java --statistics -r $CLASS -l $LG -d build $i
         if [ $? -ne 0 ]
         then
-            echo 'Warning - msgfmt failed, not updating translations'
+            echo "ERROR - msgfmt failed on ${i}, not updating translations"
+            # msgfmt leaves the class file there so the build would work the next time
+            find build -name messages_${LG}.class -exec rm -f {} \;
+            RC=1
             break
         fi
     fi
 done
 rm -f $TMPFILE
-# todo: return failure
-exit 0
+exit $RC

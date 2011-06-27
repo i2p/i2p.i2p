@@ -57,33 +57,6 @@ JNIEXPORT jbyteArray JNICALL Java_net_i2p_util_NativeBigInteger_nativeModPow
         return jresult;
 }
 
-/******** nativeDoubleValue() */
-/*
- * Class:     net_i2p_util_NativeBigInteger
- * Method:    nativeDoubleValue
- * Signature: ([B)D
- *
- * From the Javadoc:
- *
- * Converts a BigInteger byte-array to a 'double'
- * @param ba Big endian twos complement representation of the BigInteger to convert to a double
- * @return The plain double-value represented by 'ba'
- */
-JNIEXPORT jdouble JNICALL Java_net_i2p_util_NativeBigInteger_nativeDoubleValue
-(JNIEnv * env, jclass cls, jbyteArray jba){
-	    /* 1) Convert the bytearray BigInteger value into the format libgmp understands
-         * 2) Call libgmp's mpz_get_d.
-         * 3) Convert libgmp's result into a big endian twos complement number.
-         */
-        mpz_t mval;
-		jdouble retval;
-        convert_j2mp(env, jba, &mval);
-
-		retval = mpz_get_d(mval);
-		mpz_clear(mval);
-		return retval;
-}
-
 /******************************
  *****Conversion methods*******
  ******************************/

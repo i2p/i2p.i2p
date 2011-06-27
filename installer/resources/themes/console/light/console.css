@@ -477,7 +477,7 @@ div.graphspanel img {
      text-align: center !important;
      background: #001;
      -moz-box-shadow: inset 0px 0px 1px 1px #99f;
-     opacity: 0.8;
+     opacity: 0.9;
 }
 
 div.graphspanel img:hover {
@@ -842,8 +842,8 @@ button:active{
 }
 
 .langbox {
-     margin: 7px 10px 4px 5px;
-     padding: 8px 5px;
+     margin: 3px 10px 4px 5px;
+     padding: 2px 5px;
      color: #001;
      font-size: 7pt;
      width: 260px;

@@ -13,9 +13,12 @@ import org.bouncycastle.crypto.macs.I2PHMac;
 /**
  * Calculate the HMAC-SHA256 of a key+message.  All the good stuff occurs
  * in {@link org.bouncycastle.crypto.macs.I2PHMac} and 
- * {@link org.bouncycastle.crypto.digests.MD5Digest}.
+ * {@link gnu.crypto.hash.Sha256Standalone}.
  *
- * deprecated unused
+ * This should be compatible with javax.crypto.Mac.getInstance("HmacSHA256")
+ * but that is untested.
+ *
+ * deprecated used only by syndie
  */
 public class HMAC256Generator extends HMACGenerator {
     public HMAC256Generator(I2PAppContext context) { super(context); }

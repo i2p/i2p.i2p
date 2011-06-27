@@ -29,7 +29,7 @@ POSSIBILITY OF SUCH DAMAGES.
 LICENSES
 --------
 
-Core:
+Core (i2p.jar):
 Public domain except as listed below:
 
    ElGamal and DSA code:
@@ -56,10 +56,6 @@ Public domain except as listed below:
    Copyright (C) 2001, 2002, Free Software Foundation, Inc.
    See licenses/LICENSE-LGPLv2.1.txt
 
-   GMP 4.1.3:
-   Copyright 1991, 1996, 1999, 2000 Free Software Foundation, Inc.
-   See licenses/LICENSE-LGPLv2.1.txt
-
    HashCash code:
    Copyright 2006 Gregory Rubin grrubin@gmail.com
    See licenses/LICENSE-HashCash.txt
@@ -72,8 +68,12 @@ Public domain except as listed below:
    Contains some code Copyright 2006 Sun Microsystems, Inc.
    See licenses/LICENSE-InstallCert.txt
 
+   BlockFile:
+   Copyright (c) 2006, Matthew Estes
+   See licenses/LICENSE-BlockFile.txt
 
-Router:
+
+Router (router.jar):
 Public domain except as listed below:
    UPnP.java:
    From freenet
@@ -127,10 +127,21 @@ Installer:
 
 
 
-Wrapper 3.1.1:
-   Copyright (c) 1999, 2004 Tanuki Software
+Java Service Wrapper Community Edition 32-bit 3.5.9:
+   Copyright (C) 1999-2011 Tanuki Software, Ltd. All Rights Reserved.
    See licenses/LICENSE-Wrapper.txt
 
+
+Jbigi Libraries (jbigi.jar):
+   JNI code public domain.
+
+   GMP 4.1.3 / 4.1.4:
+   Copyright 1991, 1996, 1999, 2000 Free Software Foundation, Inc.
+   See licenses/LICENSE-LGPLv2.1.txt
+
+   GMP 4.3.2 / 5.0.2:
+   Copyright 1991, 1996, 1999, 2000, 2007 Free Software Foundation, Inc.
+   See licenses/LICENSE-LGPLv3.txt
 
 
 Applications:
@@ -141,7 +152,7 @@ Applications:
 
    BOB:
    Copyright (C) sponge
-   DWTFYWTPL
+   See licenses/COPYING-BOB.txt
 
    I2PSnark:
    Copyright (C) 2003 Mark J. Wielaard
@@ -164,13 +175,13 @@ Applications:
    By welterde.
    See licenses/LICENSE-GPLv2.txt
 
-   Jetty 5.1.12:
+   Jetty 5.1.15:
    Copyright 2000-2004 Mort Bay Consulting Pty. Ltd.
    See licenses/LICENSE-Apache1.1.txt
    See licenses/LICENSE-Apache2.0.txt
    See licenses/NOTICE-Commons-Logging.txt
 
-   JRobin 1.4.0:
+   JRobin 1.5.9.1:
    See licenses/LICENSE-LGPLv2.1.txt
 
    Ministreaming Lib:
@@ -190,6 +201,10 @@ Applications:
        Copyright (c) 2003 Direct Information Pvt. Ltd. All Rights Reserved.
        See licenses/LICENSE-GeoIP.txt
 
+   Router Console and I2PSnark themes:
+   "Man with hat over face" & related images licensed under a Creative Commons 2.0 license.
+   Original photos by Florian Kuhlmann. http://www.flickr.com/photos/floriankuhlmann/3117758155
+
    SAM:
    Public domain.
 
@@ -199,6 +214,8 @@ Applications:
    SusiDNS:
    Copyright (C) 2005 <susi23@mail.i2p>
    See licenses/LICENSE-GPLv2.txt
+       Uses Apache Jakarta Standard Tag Library 1.1.2:
+       See licenses/LICENSE-Apache2.0.txt
 
    SusiMail:
    Copyright (C) 2004-2005  <susi23@mail.i2p>
@@ -223,6 +240,10 @@ distributions. See the source package for the additional license information.
    Atalk:
    Public domain
 
+   BOB Demos:
+   Copyright (C) sponge
+   DWTFYWTPL
+
    Desktopgui
    Copyright (c) Mathias De Maré
    See apps/desktopgui/LICENSE
@@ -240,7 +261,3 @@ distributions. See the source package for the additional license information.
 
    SAM Python Library:
    Public domain.
-   
-   I2PSnark/Console themes: 
-   "Man with hat over face" & related images licensed under a Creative Commons 2.0 license.
-   Original photos by Florian Kuhlmann. http://www.flickr.com/photos/floriankuhlmann/3117758155

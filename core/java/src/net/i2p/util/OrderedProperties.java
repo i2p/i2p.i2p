@@ -40,15 +40,15 @@ public class OrderedProperties extends Properties {
     }
 
     @Override
-    public Set entrySet() {
-        TreeSet rv = new TreeSet(new EntryComparator());
+    public Set<Map.Entry<Object, Object>> entrySet() {
+        TreeSet<Map.Entry<Object, Object>> rv = new TreeSet(new EntryComparator());
         rv.addAll(super.entrySet());
         return Collections.unmodifiableSortedSet(rv);
     }
 
-    private static class EntryComparator implements Comparator {
-         public int compare(Object l, Object r) {
-             return ((String)((Map.Entry)l).getKey()).compareTo(((String)((Map.Entry)r).getKey()));
+    private static class EntryComparator implements Comparator<Map.Entry> {
+         public int compare(Map.Entry l, Map.Entry r) {
+             return ((String)l.getKey()).compareTo(((String)r.getKey()));
         }
     }
 }

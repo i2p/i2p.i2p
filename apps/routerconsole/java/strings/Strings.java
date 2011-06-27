@@ -95,13 +95,5 @@ class Dummy {
         _("itag0");
         _("itag1");
         _("itag2");
-
-        // Descriptions for the stats that are graphed by default
-        // There are over 500 stats currently defined, we aren't going to tag them all
-        _("Low-level bandwidth receive rate");             // bw.recvRate
-        _("Low-level bandwidth send rate");                // bw.sendRate
-        _("How many peers we are actively talking with");  // router.activePeers
-        // router.memoryUsed currently has the max size in the description so it can't be tagged
-
     }
 }

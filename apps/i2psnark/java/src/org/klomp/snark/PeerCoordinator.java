@@ -342,6 +342,11 @@ public class PeerCoordinator implements PeerListener
   private int getMaxConnections() {
     if (metainfo == null)
         return 6;
+    int pieces = metainfo.getPieces();
+    if (pieces <= 2)
+        return 4;
+    if (pieces <= 5)
+        return 6;
     int size = metainfo.getPieceLength(0);
     int max = _util.getMaxConnections();
     if (size <= 512*1024 || completed())

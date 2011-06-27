@@ -63,6 +63,7 @@ public class Router {
     /** full path */
     private String _configFilename;
     private RouterInfo _routerInfo;
+    public final Object routerInfoFileLock = new Object();
     private long _started;
     private boolean _higherVersionSeen;
     //private SessionKeyPersistenceHelper _sessionKeyPersistenceHelper;
@@ -311,8 +312,14 @@ public class Router {
     }
     
     public RouterInfo getRouterInfo() { return _routerInfo; }
+
+    /**
+     *  Caller must ensure info is valid - no validation done here
+     */
     public void setRouterInfo(RouterInfo info) { 
         _routerInfo = info; 
+        if (_log.shouldLog(Log.INFO))
+            _log.info("setRouterInfo() : " + info, new Exception("I did it"));
         if (info != null)
             _context.jobQueue().addJob(new PersistRouterInfoJob(_context));
     }
@@ -449,6 +456,8 @@ public class Router {
             }
             ri.sign(key);
             setRouterInfo(ri);
+            if (!ri.isValid())
+                throw new DataFormatException("Our RouterInfo has a bad signature");
             Republish r = new Republish();
             if (blockingRebuild)
                 r.timeReached();
@@ -539,16 +548,14 @@ public class Router {
             return true;
         return Boolean.valueOf(_context.getProperty(PROP_HIDDEN_HIDDEN)).booleanValue();
     }
+
+    /**
+     *  @return the certificate for a new RouterInfo - probably a null cert.
+     */
     public Certificate createCertificate() {
-        Certificate cert = new Certificate();
-        if (isHidden()) {
-            cert.setCertificateType(Certificate.CERTIFICATE_TYPE_HIDDEN);
-            cert.setPayload(null);
-        } else {
-            cert.setCertificateType(Certificate.CERTIFICATE_TYPE_NULL);
-            cert.setPayload(null);
-        }
-        return cert;
+        if (isHidden())
+            return new Certificate(Certificate.CERTIFICATE_TYPE_HIDDEN, null);
+        return Certificate.NULL_CERT;
     }
     
     /**
@@ -616,6 +623,10 @@ public class Router {
             }
         }
         // hard and ugly
+        if (System.getProperty("wrapper.version") != null)
+            _log.log(Log.CRIT, "Restarting with new router identity");
+        else
+            _log.log(Log.CRIT, "Shutting down because old router identity was invalid - restart I2P");
         finalShutdown(EXIT_HARD_RESTART);
     }
     
@@ -934,6 +945,7 @@ public class Router {
             }
         }
         try { _context.clientManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the client manager", t); }
+        try { _context.namingService().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the naming service", t); }
         try { _context.jobQueue().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the job queue", t); }
         //try { _context.adminManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the admin manager", t); }        
         try { _context.statPublisher().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the stats manager", t); }
@@ -1111,11 +1123,17 @@ public class Router {
         return true;
     }
     
+    /**
+     *  A "soft" restart, primarily of the comm system, after
+     *  a port change or large step-change in system time.
+     *  Does not stop the whole JVM, so it is safe even in the absence
+     *  of the wrapper.
+     *  This is not a graceful restart - all peer connections are dropped.
+     */
     public void restart() {
         _isAlive = false;
         
         try { _context.commSystem().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the comm system", t); }
-        //try { _context.adminManager().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the client manager", t); }
         try { _context.clientManager().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the client manager", t); }
         try { _context.tunnelManager().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the tunnel manager", t); }
         try { _context.peerManager().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the peer manager", t); }
@@ -1220,6 +1238,57 @@ public class Router {
                 // hopefully the update file got deleted or we will loop
             }
             System.exit(EXIT_HARD_RESTART);
+        } else {
+            // Remove extracted libjbigi.so and libjcpuid.so files if we have a newer jbigi.jar,
+            // so the new ones will be extracted.
+            // We do this after the restart, not after the extract, because it's safer, and
+            // because people may upgrade their jbigi.jar file manually.
+
+            // Copied from NativeBigInteger, which we can't access here or the
+            // libs will get loaded.
+            String osArch = System.getProperty("os.arch");
+            boolean isX86 = osArch.contains("86") || osArch.equals("amd64");
+            String osName = System.getProperty("os.name").toLowerCase();
+            boolean isWin = osName.startsWith("win");
+            boolean isMac = osName.startsWith("mac");
+            // only do this on these OSes
+            boolean goodOS = isWin || isMac ||
+                             osName.contains("linux") || osName.contains("freebsd");
+
+            // only do this on these x86
+            File jbigiJar = new File(_context.getBaseDir(), "lib/jbigi.jar");
+            if (isX86 && goodOS && jbigiJar.exists()) {
+                String libPrefix = (isWin ? "" : "lib");
+                String libSuffix = (isWin ? ".dll" : isMac ? ".jnilib" : ".so");
+
+                File jcpuidLib = new File(_context.getBaseDir(), libPrefix + "jcpuid" + libSuffix);
+                if (jcpuidLib.canWrite() && jbigiJar.lastModified() > jcpuidLib.lastModified()) {
+                    String path = jcpuidLib.getAbsolutePath();
+                    boolean success = FileUtil.copy(path, path + ".bak", true, true);
+                    if (success) {
+                        boolean success2 = jcpuidLib.delete();
+                        if (success2) {
+                            System.out.println("New jbigi.jar detected, moved jcpuid library to " +
+                                               path + ".bak");
+                            System.out.println("Check logs for successful installation of new library");
+                        }
+                    }
+                }
+
+                File jbigiLib = new File(_context.getBaseDir(), libPrefix + "jbigi" + libSuffix);
+                if (jbigiLib.canWrite() && jbigiJar.lastModified() > jbigiLib.lastModified()) {
+                    String path = jbigiLib.getAbsolutePath();
+                    boolean success = FileUtil.copy(path, path + ".bak", true, true);
+                    if (success) {
+                        boolean success2 = jbigiLib.delete();
+                        if (success2) {
+                            System.out.println("New jbigi.jar detected, moved jbigi library to " +
+                                               path + ".bak");
+                            System.out.println("Check logs for successful installation of new library");
+                        }
+                    }
+                }
+            }
         }
     }
     
@@ -1409,6 +1478,17 @@ public class Router {
         return Math.max(send, recv);
     }
     
+    /**
+     *  Mark a string for extraction by xgettext and translation.
+     *  Use this only in static initializers.
+     *  It does not translate!
+     *  @return s
+     *  @since 0.8.7
+     */
+    private static final String _x(String s) {
+        return s;
+    }
+
 /* following classes are now private static inner classes, didn't bother to reindent */
 
 private static final long LOW_MEMORY_THRESHOLD = 5 * 1024 * 1024;
@@ -1423,19 +1503,23 @@ private static class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
 
     public CoalesceStatsEvent(RouterContext ctx) { 
         _ctx = ctx; 
-        ctx.statManager().createRateStat("bw.receiveBps", "How fast we receive data (in KBps)", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
-        ctx.statManager().createRateStat("bw.sendBps", "How fast we send data (in KBps)", "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
-        ctx.statManager().createRateStat("bw.sendRate", "Low level bandwidth send rate", "Bandwidth", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
-        ctx.statManager().createRateStat("bw.recvRate", "Low level bandwidth receive rate", "Bandwidth", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
-        ctx.statManager().createRateStat("router.activePeers", "How many peers we are actively talking with", "Throttle", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
+        // NOTE TO TRANSLATORS - each of these phrases is a description for a statistic
+        // to be displayed on /stats.jsp and in the graphs on /graphs.jsp.
+        // Please keep relatively short so it will fit on the graphs.
+        ctx.statManager().createRequiredRateStat("bw.receiveBps", _x("Message receive rate (bytes/sec)"), "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
+        ctx.statManager().createRequiredRateStat("bw.sendBps", _x("Message send rate (bytes/sec)"), "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
+        ctx.statManager().createRequiredRateStat("bw.sendRate", _x("Low-level send rate (bytes/sec)"), "Bandwidth", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
+        ctx.statManager().createRequiredRateStat("bw.recvRate", _x("Low-level receive rate (bytes/sec)"), "Bandwidth", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
+        ctx.statManager().createRequiredRateStat("router.activePeers", _x("How many peers we are actively talking with"), "Throttle", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         ctx.statManager().createRateStat("router.activeSendPeers", "How many peers we've sent to this minute", "Throttle", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         ctx.statManager().createRateStat("router.highCapacityPeers", "How many high capacity peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
-        ctx.statManager().createRateStat("router.fastPeers", "How many fast peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
+        ctx.statManager().createRequiredRateStat("router.fastPeers", _x("Known fast peers"), "Throttle", new long[] { 5*60*1000, 60*60*1000 });
         _maxMemory = Runtime.getRuntime().maxMemory();
         String legend = "(Bytes)";
         if (_maxMemory < Long.MAX_VALUE)
             legend += " Max is " + DataHelper.formatSize(_maxMemory) + 'B';
-        ctx.statManager().createRateStat("router.memoryUsed", legend, "Router", new long[] { 60*1000 });
+        // router.memoryUsed currently has the max size in the description so it can't be tagged
+        ctx.statManager().createRequiredRateStat("router.memoryUsed", legend, "Router", new long[] { 60*1000 });
     }
     private RouterContext getContext() { return _ctx; }
     public void timeReached() {
@@ -1468,8 +1552,8 @@ private static class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
             Rate rate = receiveRate.getRate(60*1000);
             if (rate != null) { 
                 double bytes = rate.getLastTotalValue();
-                double KBps = (bytes*1000.0d)/(rate.getPeriod()*1024.0d); 
-                getContext().statManager().addRateData("bw.receiveBps", (long)KBps, 60*1000);
+                double bps = (bytes*1000.0d)/rate.getPeriod(); 
+                getContext().statManager().addRateData("bw.receiveBps", (long)bps, 60*1000);
             }
         }
 
@@ -1478,8 +1562,8 @@ private static class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
             Rate rate = sendRate.getRate(60*1000);
             if (rate != null) {
                 double bytes = rate.getLastTotalValue();
-                double KBps = (bytes*1000.0d)/(rate.getPeriod()*1024.0d); 
-                getContext().statManager().addRateData("bw.sendBps", (long)KBps, 60*1000);
+                double bps = (bytes*1000.0d)/rate.getPeriod(); 
+                getContext().statManager().addRateData("bw.sendBps", (long)bps, 60*1000);
             }
         }
     }
@@ -1575,13 +1659,14 @@ private static class ShutdownHook extends Thread {
 
 /** update the router.info file whenever its, er, updated */
 private static class PersistRouterInfoJob extends JobImpl {
-    private Log _log;
     public PersistRouterInfoJob(RouterContext ctx) { 
         super(ctx); 
     }
+
     public String getName() { return "Persist Updated Router Information"; }
+
     public void runJob() {
-        _log = getContext().logManager().getLog(PersistRouterInfoJob.class);
+        Log _log = getContext().logManager().getLog(PersistRouterInfoJob.class);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Persisting updated router info");
 
@@ -1591,15 +1676,17 @@ private static class PersistRouterInfoJob extends JobImpl {
         RouterInfo info = getContext().router().getRouterInfo();
 
         FileOutputStream fos = null;
-        try {
-            fos = new SecureFileOutputStream(infoFile);
-            info.writeBytes(fos);
-        } catch (DataFormatException dfe) {
-            _log.error("Error rebuilding the router information", dfe);
-        } catch (IOException ioe) {
-            _log.error("Error writing out the rebuilt router information", ioe);
-        } finally {
-            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+        synchronized (getContext().router().routerInfoFileLock) {
+            try {
+                fos = new SecureFileOutputStream(infoFile);
+                info.writeBytes(fos);
+            } catch (DataFormatException dfe) {
+                _log.error("Error rebuilding the router information", dfe);
+            } catch (IOException ioe) {
+                _log.error("Error writing out the rebuilt router information", ioe);
+            } finally {
+                if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+            }
         }
     }
 }

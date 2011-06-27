@@ -30,7 +30,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -85,8 +84,8 @@ class ConfigParser {
      *             if the BufferedReader cannot be read.
      *  
      */
-    public static Map parse(BufferedReader input) throws IOException {
-        Map result = new HashMap();
+    public static Map<String, String>  parse(BufferedReader input) throws IOException {
+        Map<String, String>  result = new HashMap();
         String inputLine;
         inputLine = input.readLine();
         while (inputLine != null) {
@@ -111,11 +110,11 @@ class ConfigParser {
      * @throws IOException
      *             if file cannot be read.
      */
-    public static Map parse(File file) throws IOException {
+    public static Map<String, String>  parse(File file) throws IOException {
         FileInputStream fileStream = new FileInputStream(file);
         BufferedReader input = new BufferedReader(new InputStreamReader(
                 fileStream));
-        Map rv = ConfigParser.parse(input);
+        Map<String, String>  rv = ConfigParser.parse(input);
         try {
             fileStream.close();
         } catch (IOException ioe) {}
@@ -132,7 +131,7 @@ class ConfigParser {
      * @throws IOException
      *             if file cannot be read.
      */
-    public static Map parse(String string) throws IOException {
+    public static Map<String, String>  parse(String string) throws IOException {
         StringReader stringReader = new StringReader(string);
         BufferedReader input = new BufferedReader(stringReader);
         return ConfigParser.parse(input);
@@ -149,14 +148,13 @@ class ConfigParser {
      * @return A Map containing the key, value pairs from file, or if file
      *         cannot be read, map.
      */
-    public static Map parse(File file, Map map) {
-        Map result;
+    public static Map<String, String>  parse(File file, Map<String, String>  map) {
+        Map<String, String>  result;
         try {
             result = ConfigParser.parse(file);
-            for (Iterator iter = map.keySet().iterator(); iter.hasNext(); ) {
-                String key = (String) iter.next();
-                if (!result.containsKey(key))
-                    result.put(key, map.get(key));
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                if (!result.containsKey(entry.getKey()))
+                    result.put(entry.getKey(), entry.getValue());
             }
         } catch (IOException exp) {
             result = map;
@@ -177,9 +175,9 @@ class ConfigParser {
      * @throws IOException
      *             if input cannot be read.
      */
-    public static List parseSubscriptions(BufferedReader input)
+    public static List<String> parseSubscriptions(BufferedReader input)
             throws IOException {
-        List result = new LinkedList();
+        List<String> result = new LinkedList();
         String inputLine = input.readLine();
         while (inputLine != null) {
             inputLine = ConfigParser.stripComments(inputLine).trim();
@@ -201,11 +199,11 @@ class ConfigParser {
      * @throws IOException
      *             if file cannot be read.
      */
-    public static List parseSubscriptions(File file) throws IOException {
+    public static List<String> parseSubscriptions(File file) throws IOException {
         FileInputStream fileStream = new FileInputStream(file);
         BufferedReader input = new BufferedReader(new InputStreamReader(
                 fileStream));
-        List rv = ConfigParser.parseSubscriptions(input);
+        List<String> rv = ConfigParser.parseSubscriptions(input);
         try {
             fileStream.close();
         } catch (IOException ioe) {}
@@ -221,7 +219,7 @@ class ConfigParser {
      * @throws IOException
      *             if string cannot be read.
      */
-    public static List parseSubscriptions(String string) throws IOException {
+    public static List<String> parseSubscriptions(String string) throws IOException {
         StringReader stringReader = new StringReader(string);
         BufferedReader input = new BufferedReader(stringReader);
         return ConfigParser.parseSubscriptions(input);
@@ -238,8 +236,8 @@ class ConfigParser {
      * @return A List consisting of one element for each line in file, or if
      *         file cannot be read, list.
      */
-    public static List parseSubscriptions(File file, List list) {
-        List result;
+    public static List<String> parseSubscriptions(File file, List<String> list) {
+        List<String> result;
         try {
             result = ConfigParser.parseSubscriptions(file);
         } catch (IOException exp) {
@@ -263,12 +261,9 @@ class ConfigParser {
      * @throws IOException
      *             if the BufferedWriter cannot be written to.
      */
-    public static void write(Map map, BufferedWriter output) throws IOException {
-        Iterator keyIter = map.keySet().iterator();
-
-        while (keyIter.hasNext()) {
-            String key = (String) keyIter.next();
-            output.write(key + "=" + (String) map.get(key));
+    public static void write(Map<String, String>  map, BufferedWriter output) throws IOException {
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            output.write(entry.getKey() + '=' + entry.getValue());
             output.newLine();
         }
         output.close();
@@ -288,7 +283,7 @@ class ConfigParser {
      * @throws IOException
      *             if file cannot be written to.
      */
-    public static void write(Map map, File file) throws IOException {
+    public static void write(Map<String, String>  map, File file) throws IOException {
         boolean success = false;
         if (!isWindows) {
             File tmp = SecureFile.createTempFile("temp-", ".tmp", file.getAbsoluteFile().getParentFile());
@@ -318,12 +313,10 @@ class ConfigParser {
      * @throws IOException
      *             if output cannot be written to.
      */
-    public static void writeSubscriptions(List list, BufferedWriter output)
+    public static void writeSubscriptions(List<String> list, BufferedWriter output)
             throws IOException {
-        Iterator iter = list.iterator();
-
-        while (iter.hasNext()) {
-            output.write((String) iter.next());
+        for (String s : list) {
+            output.write(s);
             output.newLine();
         }
         output.close();
@@ -340,7 +333,7 @@ class ConfigParser {
      * @throws IOException
      *             if output cannot be written to.
      */
-    public static void writeSubscriptions(List list, File file)
+    public static void writeSubscriptions(List<String> list, File file)
             throws IOException {
         ConfigParser.writeSubscriptions(list, new BufferedWriter(
                 new OutputStreamWriter(new SecureFileOutputStream(file), "UTF-8")));

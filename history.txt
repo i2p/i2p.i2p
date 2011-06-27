@@ -1,3 +1,335 @@
+* 2011-06-27 0.8.7 released
+
+2011-06-26 zzz
+  * Fixes after review:
+    - Fix Polish po file
+    - Install as a service by default on Windows again
+    - Change CPUID getters to package private
+    - Split new jbigi install messages into two lines
+    - Test script updates
+    - Javadocs
+
+2011-06-23 zzz
+  * IRC: Allow outbound INVITE
+
+2011-06-21 kytv
+  * Make the i2prouter script fail more gracefully if there's
+    a problem loading the wrapper.
+
+2011-06-14 zzz
+  * Build: New targets for including jbigi in the updater
+  * Console: CSS tweak for flag box
+  * i2psnark: Recognize ktorrent
+  * Jbigi / NBI / wrapper / installer:
+    jbigi and wrapper files for arm.
+    Compiled on trimslice with gcc version 4.4.5 (Ubuntu/Linaro 4.4.4-14ubuntu5) 
+    Log postinstall errors to postinstall.log.
+  * NetDB: Increase floodfills and better adjustment based on available memory
+  * RateStat: final
+  * Router: Delete old libjbigi.so and libjcpuid.so at startup if jbigi.jar is newer.
+            This will force a reextraction by CPUID and NBI.
+
+2011-06-13 duck
+    * Finnish, Italian, Polish and Vietnamese translations, thanks Transifex teams.
+
+2011-06-13 zzz
+   * To ensure we don't release bad packages, fail the build
+     if gettext fails. Change property at top of build.xml if
+     you don't have gettext and want the build to continue.
+
+2011-06-12 kytv
+   * Add jcpuid files (32 & 64bit) for Intel Macs
+   * Compile jbigi-osx-none for Intel Macs. libjbigi-osx-none.jnilib
+     is now a fat binary combining the already existing PPC 
+     compile and my new x86 build.
+	
+2011-06-11 zzz
+    * i2psnark Polish translation, thanks polacco
+
+2011-06-10 zzz
+    * CPUID, NativeBigI: Add support for atom, core2, corei, nano, pentiumm, geode
+    * Random: Add config setting prng.bufferSize to override the default 256 KB
+    * JBigI:
+      - Add new libjbigi-linux-xxx.so files built by sponge, now that we have
+        CPUID.java support for them (thanks hottuna).
+        See http://zzz.i2p/topics/306 for discussion and test results.
+
+        64-bit processors (atom, core2, corei, nano):
+        Built with GMP 5.0.2. License is LGPLv3.
+        Built by sponge with GCC 4.4.4, downloaded from
+        http://sponge.i2p/files/jbigi/gmp-5.0.2/
+        For 64-bit processors, both performance testing and
+        the GMP changelog http://gmplib.org/gmp5.0.html led us to use 5.0.2
+        for both the 32- and 64-bit versions, even though the files are twice as big.
+        5.0.x contains specific optimizations for atom and nano.
+        All 64-bit libs have _64 appended.
+
+        32-bit processors (pentiumm, geode):
+        Built with GMP 4.3.2. License is LGPLv3.
+        Built by sponge with GCC 4.4.4, downloaded from
+        http://sponge.i2p/files/jbigi/gmp-4.3.2/
+        The 4.3.2 files are half the size of those built with GMP 5.0.2, and there was
+        little or no performance difference between the two versions for 32 bit processors.
+    * NBI: Enable 64-bit processor detection
+    * Profiles: Skip and delete a corrupt profile read from disk
+
+2011-06-10 kytv
+   * jcpuid & jbigi added for 64bit Windows (only used with a 64bit jvm).
+
+2011-06-09 kytv
+   * Added an x64 wrapper for Windows. This is needed because a 32bit wrapper
+     cannot start a 64bit JVM.
+
+2011-06-08 zzz
+    * Build:
+      - Add standard manifest to jbigi.jar
+      - Don't do 'mtn list changed' if not in a workspace or not needed
+    * LogManager: Use DataHelper methods for loading and storing config
+
+2011-06-08 kytv
+    * Update jbigi/jcpuid Windows dlls. As was done for FreeBSD and Linux, the 
+      libraries for 32bit CPUs were linked against gmp-4.3.2 and those for the 
+      64bit CPUs were linked against gmp-5.0.2.
+
+2011-06-07 kytv
+    * Upgrade the wrapper to 3.5.9. Noticable changes include:
+      - FreeBSD amd64 is now a supported arch along with i386. To use the wrapper
+        with the most recent version of FreeBSD the port 'misc/compat6x' will need
+        to be installed.
+      - OSX: Both Intel and PPC Macs are supported. 32-bit support. If you'd like 64-bit
+        support, please file a bug in trac with the output of "uname -m".
+    * Upgrade jbigi/jcpuid for FreeBSD i386 and add support for amd64. As was done with 
+      the Linux compiles, 32bit compiles were linked with gmp 4.3.2 and 64 bit builds
+      (as well as 32bit builds for 64bit cpus) were linked against gmp 5.0.2.
+
+2011-06-06 zzz
+    * Drop andorid/ directory; further development will happen in
+      an android-only branch.
+
+2011-06-05 zzz
+    * Console: Tag stat descriptions at declaration rather than in Strings.java
+    * Data: Remove duplicate signature verification code
+            in RouterInfo and LeaseSet
+    * DSAEngine: Add code for alternate implementation using Java libs;
+                 disabled by default. Add test code to verify identical results
+                 and compare speed.
+    * JBigI:
+      - Replace old non-PIC 32-bit linux libs (GMP 4.1.3 built in 2004)
+        with PIC libs built with GMP 4.3.2. License is LGPLv3.
+        Built by sponge with GCC 4.4.4, downloaded from
+        http://sponge.i2p/files/jbigi/gmp-4.3.2/
+        The 4.3.2 files are half the size of those built with GMP 5.0.2, and there was
+        little or no performance difference between the two versions for 32 bit processors.
+        See http://zzz.i2p/topics/306 for discussion and test results.
+      - Replace old non-PIC 64-bit linux libs (GMP 4.1.4 built in 2005)
+        with PIC libs built with GMP 5.0.2. License is LGPLv3.
+        Built by sponge with GCC 4.4.4, downloaded from
+        http://sponge.i2p/files/jbigi/gmp-5.0.2/
+        For 64-bit processors, both performance testing and
+        the GMP changelog led us to use 5.0.2 for both the 32- and 64-bit versions,
+        even though the files are twice as big.
+        See http://zzz.i2p/topics/306 for discussion and test results.
+        libjbigi-linux-athlon64.so was a 64 bit file; by the new naming standard
+        supported by NativeBigInteger, it is now a 32-bit file and the
+        64-bit one is libjbigi-linux-athlon64_64.so.
+        All new 64-bit libs will have _64 appended.
+      - Remove libjbigi-windows-athlon64.dll which was a duplicate of libjbigi-windows-athlon.dll;
+        NBI now tries athlon as a fallback for all 64-bit processors.
+      - Update build docs
+
+2011-06-04 zzz
+    * NBigI: Recognize Android
+    * KeyGenerator: Restore old return type to not break ABI (thx kytv)
+    * Router:
+      - Add a lock for reading/writing the router.info file
+      - Check our RouterInfo validity after reading and before saving,
+        to catch fatal errors sooner
+
+2011-06-03 zzz
+    * Android: More build updates, start working on JNI for GMP
+    * Build: Fix dependency issue cause by misspelled file name
+
+2011-06-02 zzz
+    * Android: Build fixes
+    * Crypto:
+      - HMAC Javadocs and cleanups
+      - HMAC Use SimpleByteCache
+    * ElGamalAESEngine: Fixups required after SessionKey enforcement
+    * Reseed: Give up on a seed after 90% of fetches fail
+    * SessionKey: Enforce data size and prevent reuse
+
+2011-06-02 sponge
+    * Remove txt file in BOB.jar as per zzz's request.
+
+2011-06-01 zzz
+    * Crypto:
+      - Use java.security.MessageDigest instead of bundled GNU SHA-256 code
+        if available, which it should always be.
+        5 to 20% faster on Oracle JVM; 40 to 60% on Harmony;
+        5 to 15% on JamVM; 20x (!) on GIJ.
+      - Use java.security.MessageDigest instead of bundled Bitzi SHA-1 code
+        if available on non-Oracle JVMs, which it should always be.
+        Not faster on Oracle JVM; 30 to 60% faster on Harmony;
+        15 to 20% on JamVM; 10-15x (!) on GIJ.
+
+2011-06-01 sponge
+    * ConfigClients stopClient stubbed out.
+
+2011-06-01 sponge
+    * Re the below, using better way that kytv suggested.
+      There is more than one way to peel a pineapple...
+
+2011-06-01 sponge
+    * Remove the one little html file that ends up in BOB.jar.
+        The file is NOT a javadoc file, it is a package file.
+        Still, it is zapped. 
+
+2011-05-31 zzz
+    * HTTP Proxy: Don't send redirect for POST (thx kytv)
+    * jbigi: Add support for solaris
+
+2011-05-30 zzz
+    * I2CP:
+      - Append I2CP Version information to the Get/Set Date Messages,
+        so that both the router and client are aware of the other side's version,
+        and future protocol changes will be easier to implement.
+        Previously, router version information was not available to the client,
+        so when router and client were in different JVMs,
+        old clients would work with new routers
+        but new clients would not work with old routers.
+        After this change, we can design future changes so that new clients
+        will work with old routers.
+        This is an enhancement to the old protocol version byte sent by the client,
+        which we have never changed and probably never will.
+      - Prevent a client from setting the router's clock
+      - Javadocs
+    * i2psnark: Restrict swarm size for small torrents
+    * netDb: Don't refetch expiring router infos if we have enough
+
+2011-05-28 zzz
+    * i2psnark: Fix bug preventing Robert from connecting to snark (thx sponge)
+
+2011-05-27 zzz
+    * Console: Fix router.updateThroughProxy being set to false after saving
+               change on /configupdate when install dir is read-only.
+               (ticket #466)
+    * EepGet:
+      - Fix redirect loop (thx kytv)
+      - Reset redirect counter when retrying
+    * JBigI:
+      - Refactor to handle 64 bit libs and a list of fallback libs
+      - Logging tweaks
+      - Only check for one file name in library path
+    * CPUID:
+      - Recognize amd64 as x86
+      - Only check for one file name in library path
+
+2011-05-25 zzz
+    * CPUID: Load 64-bit libcpuid if available
+    * HTTP Proxy: Address helper refactoring, address book add form
+    * JBigI:
+      - Start updating NativeBigInteger
+      - Remove k63 libs that are dup of k62; handle in NBI
+    * Naming: B32 fixes
+    * NetDB: Increase floodfills again
+
+2011-05-23 zzz
+    * Console:
+      - Disable zh translation in graphs on windows due to font issues
+      - Force news refetch after URL change
+      - Fix NPE at startup
+      - Graph tweaks
+
+2011-05-23 sponge
+    * mbuild.sh fixups
+    * add new jcpuid/mbuild.sh -- pedantic naming
+    * jbigi/mbuild-all.sh -- pedantic naming
+    * see also http://zzz.i2p/topics/306?page=1#p3341
+
+2011-05-22 zzz
+    * GeoIP: Read countries.txt in UTF-8
+    * Jetty: Fix build error that omitted local jetty patches from org.mortbay.jetty.jar;
+             affected 0.8.4 and 0.8.6 installers. Include jar in the updater for the next release.
+
+2011-05-21 sponge
+    * mbuild.sh document and fixes
+    * mbuild-all.sh add cpu types
+
+2011-05-20 zzz
+    * Certificate: Fix creation bug; improve router cert generation
+    * DataHelper:
+      - Undeprecate fromProperties() and toProperties()
+      - Undeprecate BOOLEAN_FALSE and BOOLEAN_TRUE
+      - Fix fromProperties() and toProperties() to correctly throw DataFormatExceptions
+      - Add sort option
+      - Efficiency improvements in writeProperties(), toProperties(), storeProps(), and toString()
+      - Fix encoding issues (ticket #436)
+    * i2ptunnel: Fix server-side stripping of X-Accept-encoding
+    * Jbigi / JCPUID:
+      - Remove nativeDoubleValue(), update jbigi README
+      - Unbundle jbigi.jar, create at build time
+      - Add support for new Intel family/model names.
+      - Add proper support for using Core2 machines as P4.
+      - Add support for identifying SSE 3/4.1/4.2/4A support on CPU.
+      - Rewrite cpuid.c so it builds with PIC (source only, binary not updated yet)
+    * LogManager: Try to prevent out-of-order logging at shutdown
+    * Naming Services, Addressbook, and SusiDNS:
+      - Add new API for Naming Services to support modifications
+      - Redesign HostsTxt NS as an interface to three
+        SingleFile NSs, one for each text file
+      - Add locking to SingleFile NS
+      - Redesign SusiDNS and addressbook to interface to the API
+        instead of accessing files directly
+      - SusiDNS requests addressbook update via the NS API
+      - Redesign addressbook to reduce memory usage when processing subscriptions
+      - Redesign SusiDNS to use much less memory by not loading in the whole
+        addressbook where possible
+      - Add new Blockfile NS for an on-disk database of hosts
+        Based on the BlockFile database:
+        http://www.metanotion.net/software/sandbox/block.html
+        with substantial enhancements to lower memory usage
+        and improve exception handling
+      - Remove old unused AddressDB NS, FilesystemAddress NS, and PetName NS.
+      - Restructure Dummy NS and Meta NS
+      - Redesign NS caching to use an LRU map
+      - SusiDNS checks for invalid host names
+      - SusiDNS IDN conversion and better support for non-ASCII host names
+      - Add b32 links in SusiDNS
+      - HTML fixes and cleanups in SusiDNS
+      - SusiDNS message and tagging cleanups
+      - SusiDNS new details page
+    * Stats and Graphs:
+      - Update to JRobin 1.5.9.1
+      - Major rework required for 1.5.9 API
+      - Disable graphs in JVMs that crash with 1.5.9 (gij, JamVM, Harmony)
+      - Make graph data persistent (3 month RRD on disk),
+        with option to disable
+      - Improve error handling
+      - Disable graph page refresh when appropriate
+      - Fix HTML errors
+      - Add restart marker on graphs
+      - Restore zh text on graphs
+      - Improve form save messages
+      - Add expires directive to graphs
+      - Refactor handling of required stats
+      - Clean up / shorten description for required stats
+      - Change bw.sendBps and bw.receiveBps from KBps to Bps
+
+* 2011-05-16  0.8.6 released
+
+2011-05-13 zzz
+    * Increase min floodfills; decrease min routerinfo expiration
+
+2011-05-11 zzz
+    * Use partitions of fast tier for various hops of client tunnels
+
+2011-05-06 zzz
+    * Tunnels and profiles:
+      - Increase max fast and high-cap tier sizes
+      - Slow profile eval cycle after sufficient uptime
+      - Fix bug which started a new build after a successful build
+      - Misc. cleanups
+
 2011-04-28 zzz
     * Console: Try to prevent cascaded IllegalStateExceptions in .jsp code;
       add logging for original error

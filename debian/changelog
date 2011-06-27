@@ -1,30 +1,171 @@
-i2p (0.8.1-4) all; urgency=low
-  * I2P 0.8.1-6
-  * Closes: #448638
- -- Hungry Hobo <HungryHobo@i2pmail.org>  Mon, 24 Nov 2010 17:14:57 +0000
+i2p (0.8.7-1) stable; urgency=low
 
-i2p (0.8.1-3) all; urgency=low
-  * I2P 0.8.1-3
- -- Hungry Hobo <HungryHobo@i2pmail.org>  Mon, 21 Nov 2010 17:14:57 +0000
+  * The "W00t! My debs are official!" release
+  * New upstream release. See /usr/share/doc/i2p/changelog.gz for the details.
+  * Drop from debian/patches: 0002-sync-countries, 0006-i2p-jetty,
+    0007-eepget-redirections, 0008-config-news, 0009-jetty-snark-disable and
+    re-work the existing patches.
 
-i2p (0.8.1) all; urgency=low
-  * Speedups
-  * Bugfixes
-  * I2PSnark UI redesign
-  * Debian packaging improvements
- -- Hungry Hobo <HungryHobo@i2pmail.org>  Mon, 18 Nov 2010 17:14:57 +0000
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 26 Jun 2011 18:51:31 +0000
 
-i2p (0.8.0-1) all; urgency=low
-  * I2P 0.8
-  * Debian packaging improvements
- -- Hungry Hobo <HungryHobo@i2pmail.org>  Mon, 08 Nov 2010 17:14:57 +0000
+i2p (0.8.6-7) stable; urgency=low
 
-i2p (0.7.10-0) testing; urgency=low
-  * tweaks
-    um...
- -- zzz <nobody@nowhere.invalid>  Wed, 31 Jan 2010 17:14:57 +0000
+  * Fix bug in maintainer script that caused upgrade to fail on some systems.
 
-i2p (0.7-0) testing; urgency=low
-  * just setting this debian thing up
-    um...
- -- dream <nobody@nowhere.invalid>  Wed, 01 Jan 2009 17:14:57 +0000
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 29 May 2011 15:53:04 +0000
+
+i2p (0.8.6-6) stable; urgency=low
+
+  * Remove extraneous cruft from debian/rules from back when cpuid couldn't be
+    built for i386
+  * Ship our own router.config with router.updatesDisabled=true to prevent
+    upgrades to be performed by the router itself. Per Debian policy, upgrades
+    *must* take place via the package manager.
+  * Backported eepget fix
+  * Backported news fix
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 28 May 2011 10:23:51 +0000
+
+i2p (0.8.6-5) stable; urgency=low
+
+  * Remove /etc/i2p/wrapper.service. Changes have been moved to the
+    initscript.
+  * Don't disable browser launch. This is handled automatically for the i2psvc
+    user.
+  * Create debian/copyright dynamically at build time
+  * Don't ship the standalone jetty-i2psnark
+  * Create split package so that the wrapper isn't required
+  * Install missing certificates directory
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Fri, 27 May 2011 03:48:56 +0000
+
+i2p (0.8.6-4) stable; urgency=low
+
+  * backported patch from 9a26dcaef3687ff7fa08cf3b3eb2180ebb2dedde to fix
+    missing "addWebApplications" in Jetty.
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 22 May 2011 19:00:37 +0000
+
+i2p (0.8.6-3) stable; urgency=low
+
+  [Kill Your TV]
+  * Creating libjbigi-jni packages again. Backported patch from MTN so that
+    jbigi can be built for i386
+  * Drop build-dep on unzip since jbigi can be built.
+  * Check to see if doc/libjbigi-jni is a directory and remove it. It is
+    supposed to be a symlink to doc/i2p
+  * Don't chown $I2P to i2psvc
+  * Add Build-Dep for tor-geoipdb and remove from debian/
+  * Add launch-i2psnark to doc/examples
+  * Remove obsolete build-dep on default-jdk-builddep
+   [Karl Goetz]
+  * Move adduser to depends from pre-depends
+  * Tidy postinst
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Fri, 20 May 2011 22:03:52 +0000
+
+i2p (0.8.6-2) stable; urgency=low
+
+  * Fix permissions bug for /var/run/i2p, reported by "signhere" on IRC
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 17 May 2011 16:30:29 +0000
+
+i2p (0.8.6-1) stable; urgency=low
+
+  * New upstream version
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 17 May 2011 12:30:07 +0000
+
+i2p (0.8.5-4) stable; urgency=low
+
+  * Correct lintian error
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 15 May 2011 16:20:39 +0000
+
+i2p (0.8.5-3) stable; urgency=low
+
+  * *Sigh* Set debian/i2p.default run_daemon to false
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Fri, 29 Apr 2011 09:54:39 +0000
+
+i2p (0.8.5-2) stable; urgency=low
+
+  * Change debconf priority to medium. 
+  * RUN_DAEMON defaults to false. Earlier versions defaulted to true. Since
+    the priority is changing, this should as well.
+  * Split jbigi into its own source package
+  * Update geoip.txt
+  * Update Suggests:
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 25 Apr 2011 17:00:43 +0000
+
+i2p (0.8.5-1) stable; urgency=low
+
+  * New upstream
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 18 Apr 2011 15:41:42 +0000
+
+i2p (0.8.4-4) stable; urgency=low
+
+  * Update geoip from tor-0.2.2.23-alpha
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 09 Apr 2011 23:34:11 +0000
+
+i2p (0.8.4-3) stable; urgency=low
+
+  * Back out upgrade 'do you want to reboot' logic since it's utterly borked.
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Thu, 17 Mar 2011 18:54:09 +0000
+
+i2p (0.8.4-2) stable; urgency=low
+
+  * Stop including /usr/share/i2p/lib/jbigi.jar. 
+  * Compile a dynamic jbigi and create a new package, libjbigi-jni. Since I
+    can't get jcpuid to compile I take this library from jbigi.jar.
+    Unfortunately it was not compiled with -fPIC, causing lintian to complain.
+    Additionally it is a 32bit compile, forcing libc-i386 to be installed on 
+    amd64 boxes. 
+  * Add dependency on libc-i386 because of jcpuid and a build-dep on unzip for
+    the same reason.
+  * Don't display errors generated from chowning files that don't exist.
+  * Bug fix: Somehow I missed packaging the geoip information before. Oops.
+  * Bug fix: Add history.txt to /usr/share/i2p. I didn't realize it was shown
+    in the console at /help.
+  * Since I'm packaging the missing geoip information, I use an updated
+    geoiodb from tor (taken from Debian package tor-geoipdb version
+    0.2.2.22-alpha-1)
+  * Patching countries.txt to add entries that are in Maxmind's database.
+  * Now using debconf to ask about running as a daemon.
+  * From this point forward, users will be asked to confirm that they want to
+    upgrade this package, due to it requiring a router reboot.
+  * Updated README.Debian to better explain differences compared with
+    upstream.
+  * Add history.txt to /usr/share/i2p
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 13 Mar 2011 10:45:47 +0000
+
+i2p (0.8.4-1) stable; urgency=low
+
+  * New upstream version, monotone revision
+    fea6969d789a6b85396439be9906abb9b4a4a405
+
+ -- Kill Your TV <killyourtv@mail.i2p>  Thu, 03 Mar 2011 11:37:37 +0000
+
+i2p (0.8.3-2) testing; urgency=low
+
+  * Minor changes to initscript
+
+ -- Kill Your TV <killyourtv@mail.i2p>  Wed, 26 Jan 2011 14:29:50 +0000
+
+i2p (0.8.3-1) testing; urgency=low
+
+  * New upstream
+
+ -- Kill Your TV <killyourtv@mail.i2p>  Mon, 24 Jan 2011 20:23:38 +0000
+
+i2p (0.8.2-1) testing; urgency=low
+
+  * Initial packaging
+
+ -- Kill Your TV <killyourtv@mail.i2p>  Sun, 23 Jan 2011 00:03:31 +0000
+

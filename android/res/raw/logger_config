@@ -1,3 +1,0 @@
-logger.defaultLevel=INFO
-logger.record.net.i2p.router.transport.FIFOBandwidthRefiller=ERROR
-logger.record.net.i2p.stat.Rate=ERROR

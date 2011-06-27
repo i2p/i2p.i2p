@@ -21,8 +21,8 @@ import net.i2p.util.Log;
  * 
  */
 public class StatManager {
-    private Log _log;
-    private I2PAppContext _context;
+    private final Log _log;
+    private final I2PAppContext _context;
 
     /** stat name to FrequencyStat */
     private final ConcurrentHashMap<String, FrequencyStat> _frequencyStats;
@@ -39,28 +39,8 @@ public class StatManager {
     public static final String PROP_STAT_FILTER = "stat.logFilters";
     public static final String PROP_STAT_FILE = "stat.logFile";
     public static final String DEFAULT_STAT_FILE = "stats.log";
-    /** default true */
+    /** default false */
     public static final String PROP_STAT_FULL = "stat.full";
-    public static final String PROP_STAT_REQUIRED = "stat.required";
-    /**
-     * These are all the stats published in netDb, plus those required for the operation of
-     * the router (many in RouterThrottleImpl), plus those that are on graphs.jsp by default,
-     * plus those used on the summary bar (SummaryHelper.java).
-     * Wildcard ('*') allowed at end of stat only.
-     * Ignore all the rest of the stats unless stat.full=true.
-     */
-    public static final String DEFAULT_STAT_REQUIRED =
-        "bw.recvRate,bw.sendBps,bw.sendRate,client.sendAckTime,clock.skew,crypto.elGamal.encrypt," +
-        "jobQueue.jobLag,netDb.successTime,peer.failedLookupRate,router.fastPeers," +
-        "prng.bufferFillTime,prng.bufferWaitTime,router.memoryUsed," +
-        "transport.receiveMessageSize,transport.sendMessageSize,transport.sendProcessingTime," +
-        "tunnel.acceptLoad,tunnel.buildRequestTime,tunnel.rejectOverloaded,tunnel.rejectTimeout," +
-        "tunnel.buildClientExpire,tunnel.buildClientReject,tunnel.buildClientSuccess," +
-        "tunnel.buildExploratoryExpire,tunnel.buildExploratoryReject,tunnel.buildExploratorySuccess," +
-        "tunnel.buildRatio.*,tunnel.corruptMessage,tunnel.dropLoad*," +
-        "tunnel.decryptRequestTime,tunnel.fragmentedDropped,tunnel.participatingMessageCount,"+
-        "tunnel.participatingTunnels,tunnel.testFailedTime,tunnel.testSuccessTime," +
-        "tunnel.participatingBandwidth,udp.sendPacketSize,udp.packetsRetransmitted,udp.sendException" ;
     
     /**
      * The stat manager should only be constructed and accessed through the 
@@ -89,6 +69,7 @@ public class StatManager {
 
     /**
      * Create a new statistic to monitor the frequency of some event.
+     * The stat is ONLY created if the stat.full property is true or we are not in the router context.
      *
      * @param name unique name of the statistic
      * @param description simple description of the statistic
@@ -97,12 +78,27 @@ public class StatManager {
      */
     public void createFrequencyStat(String name, String description, String group, long periods[]) {
         if (ignoreStat(name)) return;
+        createRequiredFrequencyStat(name, description, group, periods);
+    }
+
+    /**
+     * Create a new statistic to monitor the frequency of some event.
+     * The stat is always created, independent of the stat.full setting or context.
+     *
+     * @param name unique name of the statistic
+     * @param description simple description of the statistic
+     * @param group used to group statistics together
+     * @param periods array of period lengths (in milliseconds)
+     * @since 0.8.7
+     */
+    public void createRequiredFrequencyStat(String name, String description, String group, long periods[]) {
         if (_frequencyStats.containsKey(name)) return;
         _frequencyStats.putIfAbsent(name, new FrequencyStat(name, description, group, periods));
     }
 
     /**
      * Create a new statistic to monitor the average value and confidence of some action.
+     * The stat is ONLY created if the stat.full property is true or we are not in the router context.
      *
      * @param name unique name of the statistic
      * @param description simple description of the statistic
@@ -111,6 +107,20 @@ public class StatManager {
      */
     public void createRateStat(String name, String description, String group, long periods[]) {
         if (ignoreStat(name)) return;
+        createRequiredRateStat(name, description, group, periods);
+    }
+
+    /**
+     * Create a new statistic to monitor the average value and confidence of some action.
+     * The stat is always created, independent of the stat.full setting or context.
+     *
+     * @param name unique name of the statistic
+     * @param description simple description of the statistic
+     * @param group used to group statistics together
+     * @param periods array of period lengths (in milliseconds)
+     * @since 0.8.7
+     */
+    public void createRequiredRateStat(String name, String description, String group, long periods[]) {
             if (_rateStats.containsKey(name)) return;
             RateStat rs = new RateStat(name, description, group, periods);
             if (_statLog != null) rs.setStatLog(_statLog);
@@ -202,20 +212,13 @@ public class StatManager {
     public String getStatFile() { return _context.getProperty(PROP_STAT_FILE, DEFAULT_STAT_FILE); }
 
     /**
-     * Save memory by not creating stats unless they are required for router operation
+     * Save memory by not creating stats unless they are required for router operation.
+     * For backward compatibility of any external clients, always returns false if not in router context.
+     *
+     * @param statName ignored
      * @return true if the stat should be ignored.
      */
     public boolean ignoreStat(String statName) {
-        if (_context.getBooleanProperty(PROP_STAT_FULL))
-            return false;
-        String required = _context.getProperty(PROP_STAT_REQUIRED, DEFAULT_STAT_REQUIRED);
-        String req[] = required.split(",");
-        for (int i=0; i<req.length; i++) {
-             if (req[i].equals(statName))
-                 return false;
-             if (req[i].endsWith("*") && statName.startsWith(req[i].substring(0, req[i].length() - 2)))
-                 return false;
-        }
-        return true;
+        return _context.isRouterContext() && !_context.getBooleanProperty(PROP_STAT_FULL);
     }
 }

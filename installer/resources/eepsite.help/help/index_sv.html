@@ -53,27 +53,27 @@
      där det står "Website name". Detta kommer att ersätta det förinställda "mysite.i2p".
      När du är där, kryssa i "Auto Start"-rutan. Din eepsajt kommer nu att starta varje gång som du startar
      din router.
-     Tryck sedan på "Save".
+     Tryck sedan på "Save".</li>
  <li>Klicka på startknappen för din eepsajt på
      <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">huvudkonfigurationssidan för i2ptunnel</a>.
      Du borde nu kunna se "eepsite" listad under "Local Destinations" på vänster sida om
      <a href="http://127.0.0.1:7657/index.jsp">I2P Router Console</a>.
-     Din eepsajt kör nu.
+     Din eepsajt kör nu.</li>
  <li>Markera hela "Local destination"-nyckeln på
      <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">eepsitekonfigurationssidan för i2ptunnel</a>
      och kopiera den för att senare klistra in den.
-     Säkerställ att du får med hela texten - det är mer än 500 bokstäver och den måste sluta på "AAAA".
+     Säkerställ att du får med hela texten - det är mer än 500 bokstäver och den måste sluta på "AAAA".</li>
  <li>Skriv in namnet och klistra in destinationsnyckeln i din
      <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=master">huvudadressbok</a>.
      Klicka på "Add" för att lägga till destinationen i din adressbok.
- <li>I din webbläsare, skriv in ditt eepsajtnamn (<i>ettbranamn</i>.i2p) så borde du landa på den här sidan igen.
-     Förhoppningsvis fungerade det.
+     <li>I din webbläsare, skriv in ditt eepsajtnamn (<i>ettbranamn</i>.i2p) så borde du landa på den här sidan igen.
+     Förhoppningsvis fungerade det.</li>
  <li>Innan du berättar för världen om den nya eepsajt borde du lägga till lite innehåll.
      Gå till <code>~/.i2p/eepsite/docroot/</code> (på Linux eller OS X) eller <code>%APPDATA%\I2P\eepsite\docroot\</code> (på Windows)
      och ersätt omdirigeringssidan index.html med ditt eget innehåll. Virtuella mappar fungerar, så du kan serva filer från en
      underkatalog utan att behöva ge en sida med länkar till filer. Om du behöver en mall för en enkel sajt så
      varsågod och låna och anpassa
-     <a href="pagetemplate.html">denna sida</a> och <a href="lib/">det här innehållet</a>!
+     <a href="pagetemplate.html">denna sida</a> och <a href="lib/">det här innehållet</a>!</li>
 </ul>
 <h2>Registrera din egen .I2P-domän</h2><ul>
  <li>Nu är det dags att lägga till din eepsajt till en I2P-adressbok som hostas på en sajt
@@ -88,16 +88,16 @@
      Kolla att den rapporterar att nyckeln lagts till.
      Eftersom många routrar periodiskt skaffar adressboksuppdateringar från dessa sajter
      så kommer andra att kunna finna din eepsajt inom ett antal timmar, bara genom att
-     skriva <i>ettbranamn</i>.i2p i sin webbläsare.
+     skriva <i>ettbranamn</i>.i2p i sin webbläsare.</li>
 </ul><h2>Att prenumerera på adressböcker</h2><ul>
  <li>På tal adressboksuppdateringar, nu vore en bra tidpunkt att lägga till några fler adressböcker
      till din egen
      <a href="http://127.0.0.1:7657/susidns/subscriptions.jsp">prenumerationslista</a>.
      Gå till din prenumerationsinställningssida och lägg till ett par av de här för en automatiskt uppdaterad
-     lista över nya hosts:<ul>
-     <li><a href="http://tino.i2p/hosts.txt">http://tino.i2p/hosts.txt</a>
-     <li><a href="http://stats.i2p/cgi-bin/newhosts.txt">http://stats.i2p/cgi-bin/newhosts.txt</a>
-     <li><a href="http://i2host.i2p/cgi-bin/i2hostetag">http://i2host.i2p/cgi-bin/i2hostetag</a></ul>
+     lista över nya hosts:</li><ul>
+     <li><a href="http://tino.i2p/hosts.txt">http://tino.i2p/hosts.txt</a></li>
+     <li><a href="http://stats.i2p/cgi-bin/newhosts.txt">http://stats.i2p/cgi-bin/newhosts.txt</a></li>
+     <li><a href="http://i2host.i2p/cgi-bin/i2hostetag">http://i2host.i2p/cgi-bin/i2hostetag</a></li></ul>
  <li>Om du har bråttom och inte kan vänta ett par timmar så kan du säga åt folk att använda en "jump"-adresshjälpar-
      omdirigeringstjänst.
      Detta kommer att funka inom ett par minuter efter att du skrivit in nyckeln i en adressbok på samma sajt.
@@ -105,17 +105,17 @@
      <code>http://stats.i2p/cgi-bin/jump.cgi?a=<i>ettbranamn</i>.i2p</code> eller
      <code>http://i2host.i2p/cgi-bin/i2hostjump?<i>ettbranamn</i>.i2p</code>
      i din webbläsare.
-     Så snart som det funkar kan du berätta för andra att de ska använda det.
+     Så snart som det funkar kan du berätta för andra att de ska använda det.</li>
  <li>Vissa människor kolla på eepsajtlistor som
      <a href="http://inproxy.tino.i2p/status.php">inproxy.tino.i2p/status.php</a> eller <a href="http://perv.i2p">perv.i2p</a> efter nya eepsajter,
      så att du kan börja få ett par besökare. Men det finns massor av sätt att berätta för folk.
-     Här är en rad idëer:
+     Här är en rad idëer:</li>
      <ul>
      <li>Posta en meddelanden på <a href="http://forum.i2p/viewforum.php?f=16">Eepsajt-annonseringsforum</a>
-         eller på <a href="http://forum.i2p/">forum.i2p</a>.
-     <li>Berätta det för folk på chattkanalen #i2p eller #i2p-chat på IRC.
-     <li>Säg det i en ny post och lägg den på <a href="http://syndie.i2p2.de/">den nya Syndie</a>.
-     <li>Lägg det i <a href="http://ugha.i2p/EepsiteIndex">Ugha's Eepsite Index Wiki</a>
+     eller på <a href="http://forum.i2p/">forum.i2p</a>.</li>
+     <li>Berätta det för folk på chattkanalen #i2p eller #i2p-chat på IRC.</li>
+     <li>Säg det i en ny post och lägg den på <a href="http://syndie.i2p2.de/">den nya Syndie</a>.</li>
+     <li>Lägg det i <a href="http://ugha.i2p/EepsiteIndex">Ugha's Eepsite Index Wiki</a></li>
      </ul>
      Notera att vissa sajter rekommenderar att du klistrar in den verkligt
      långa destinationsnyckeln. Det kan du om vill - men om du har framgångsrikt har skickat din
@@ -127,7 +127,7 @@
 </p>
 <ul>
      <li>Vår IRC-supportkanal: <ul><li><a href="irc://irc.freenode.net/i2p">#i2p on Freenode</a></li>
-     <li><a href="irc://127.0.0.1:6668/i2p">eller anonymt via I2P-IRC-tunnel</a>.</li></ul>
+     <li><a href="irc://127.0.0.1:6668/i2p">eller anonymt via I2P-IRC-tunnel</a>.</li>
      <li><a href="http://forum.i2p/viewforum.php?f=10">Sektionen om tekniska problem</a> på
      <a href="http://forum.i2p/">forum.i2p</a>.</li>
 </ul>

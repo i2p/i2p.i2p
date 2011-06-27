@@ -1,0 +1,42 @@
+From: Kill Your TV <killyourtv@i2pmail.org>
+Date: Wed, 11 May 2011 00:12:04 +0000
+Subject: jbigi soname
+
+The purpose of this patch is to change the path that mbuild_jbigi.sh
+expects to find the source files at. At the same time I'm specifying 
+a soname to shut lintian up.
+
+---
+ core/c/jbigi/mbuild_jbigi.sh |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
+
+--- a/core/c/jbigi/mbuild_jbigi.sh
++++ b/core/c/jbigi/mbuild_jbigi.sh
+@@ -25,14 +25,14 @@
+         LIBFILE="libjbigi.jnilib";;
+ SunOS*)
+         COMPILEFLAGS="-fPIC -Wall"
+-        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/solaris"
+-        LINKFLAGS="-shared -Wl,-soname,libjbigi.so"
++        INCLUDES="-I. -I./jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/solaris"
++        LINKFLAGS="-shared -Wl,-soname,libjbigi.so.0"
+         LIBFILE="libjbigi.so";;
+ 
+ *)
+ 	COMPILEFLAGS="-fPIC -Wall"
+-	INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/linux"
+-	LINKFLAGS="-shared -Wl,-soname,libjbigi.so"
++	INCLUDES="-I. -I./jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/linux"
++	LINKFLAGS="-shared -Wl,-soname,libjbigi.so.0"
+ 	LIBFILE="libjbigi.so";;
+ esac
+ 
+@@ -47,7 +47,7 @@
+ 
+ echo "Compiling C code..."
+ rm -f jbigi.o $LIBFILE
+-$CC -c $COMPILEFLAGS $INCLUDES ../../jbigi/src/jbigi.c || exit 1
++$CC -c $COMPILEFLAGS $INCLUDES ./jbigi/src/jbigi.c || exit 1
+ $CC $LINKFLAGS $INCLUDES $INCLUDELIBS -o $LIBFILE jbigi.o $STATICLIBS || exit 1
+ 
+ exit 0

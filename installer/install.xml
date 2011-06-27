@@ -4,7 +4,7 @@
 
     <info>
         <appname>i2p</appname>
-        <appversion>0.8.5</appversion>
+        <appversion>0.8.7</appversion>
         <authors>
             <author name="I2P" email="http://forum.i2p2.de/"/>
         </authors>
@@ -110,8 +110,14 @@
         <panel classname="ShortcutPanel"><os family="windows" /></panel>
         <!-- <panel classname="ProcessPanel"><os family="windows" /></panel> -->
         <!-- unix|mac doesn't work, displays for windows too -->
-        <panel classname="XInfoPanel" ><os family="unix" /></panel>
-        <panel classname="XInfoPanel" ><os family="mac" /></panel>
+
+        <!-- Unfortunately unix is used for osx as well, so the XInfoPanel was shown *twice*
+	     on OSX. Using the condition this way, the panel is shown on everything 
+	     *but* Windows. 
+	     -->
+	<panel classname="XInfoPanel" condition="!izpack.windowsinstall" />
+	<!--<panel classname="XInfoPanel" ><os family="unix" /></panel> -->
+	<!--<panel classname="XInfoPanel" ><os family="mac" /></panel>  -->
         <panel classname="InstallPanel"/>
         <panel classname="SimpleFinishPanel"/>
     </panels>
@@ -129,14 +135,36 @@
             <parsable targetfile="$INSTALL_PATH/i2prouter" type="shell" os="unix|mac" />
             <parsable targetfile="$INSTALL_PATH/eepget" type="shell" os="unix|mac" />
             <parsable targetfile="$INSTALL_PATH/runplain.sh" type="shell" os="unix|mac" />
+            <parsable targetfile="$INSTALL_PATH/Start I2P Router.app/Contents/MacOS/i2prouter" type="shell" os="mac" />
             
+	    <conditions>
+	        <condition type="variable" id="is64bit">
+	            <name>SYSTEM_sun_arch_data_model</name>
+	            <value>64</value>
+		</condition> 
+	    </conditions>
             <!-- postinstall stuff for windows -->
-            <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+	    <!-- Wrapper for 32bit Windows JVM -->
+	    <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"
+	        condition="!is64bit"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\lib\wrapper\win32\I2Psvc.exe" /><arg value="$INSTALL_PATH" /></args></executable>
-            <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+	    <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"
+		condition="!is64bit"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\lib\wrapper\win32\wrapper.dll" /><arg value="$INSTALL_PATH\lib" /></args></executable>
-            <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
-                <args><arg value="$INSTALL_PATH\lib\wrapper\win32\wrapper.jar" /><arg value="$INSTALL_PATH\lib" /></args></executable>
+	    <!-- wrapper for 64bit Windows JVM -->
+	    <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"
+		condition="is64bit" > <os family="windows" />
+ 	        <args><arg value="$INSTALL_PATH\lib\wrapper\win64\I2Psvc.exe" /><arg value="$INSTALL_PATH" /></args></executable>
+	    <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"
+		condition="is64bit" > <os family="windows" />
+		<args><arg value="$INSTALL_PATH\lib\wrapper\win64\wrapper.dll" /><arg value="$INSTALL_PATH\lib" /></args></executable>
+	     <!-- We still copy the 32 bit version of wrapper.dll (even with a
+		  64bit jvm) so that if a 32 bit jvm is installed in the
+		  future, nothing breaks.
+		  -->
+	     <executable targetfile="$INSTALL_PATH/installer/copy.jar" type="jar" stage="postinstall" keep="true" failure="warn"
+                condition="is64bit" > <os family="windows" />
+                <args><arg value="$INSTALL_PATH\lib\wrapper\win32\wrapper.dll" /><arg value="$INSTALL_PATH\lib\wrapper-windows-x86-32.dll" /></args></executable>
             <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\i2prouter" /></args></executable>
             <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
@@ -148,13 +176,17 @@
             <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\postinstall.sh" /></args></executable>
             <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
-                <args><arg value="$INSTALL_PATH\postinstall.bat" /></args></executable>
-            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\uninstall_i2p_service_unix" /></args></executable>
             <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\lib\wrapper" /></args></executable>
             <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\eepget" /></args></executable>
+	    <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+	        <args><arg value="$INSTALL_PATH/Start I2P Router.app" /></args></executable>
+	    <!-- Placeholder for an OSX 'shortcut' to the router console
+	    <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+	        <args><arg value="$INSTALL_PATH/I2P Router Console.webloc" /></args></executable>
+		-->
 
             <!-- workaround for vista permission problems - see comments above -->
             <executable targetfile="$INSTALL_PATH/fixperms.bat" type="bin" stage="postinstall" keep="true" failure="warn"
@@ -177,9 +209,22 @@
             <executable targetfile="$INSTALL_PATH/postinstall.sh" type="bin" stage="never" keep="true" failure="warn"><os family="unix" /></executable>
             <executable targetfile="$INSTALL_PATH/postinstall.sh" type="bin" stage="postinstall" keep="true" failure="warn"><os family="unix" />
                 <args><arg value="$INSTALL_PATH" /></args></executable>
+	    <!-- 
+	     Removal of the I2P service in Windows should be done in the base pack
+	     so that even if a user installed the service manually it will still be
+	     removed when uninstalling.
+	    -->
+            <executable targetfile="$INSTALL_PATH/uninstall_i2p_service_winnt.bat" stage="uninstall" os="windows">
+                <args>
+                    <arg value="$INSTALL_PATH\wrapper.config" />
+                    <arg value="--nopause" />
+                </args>
+            </executable>
+
 
         </pack>
 
+        <!-- to disable by default, add preselected="no" -->
         <pack name="Windows Service" required="no">
             <description>Automatically start I2P in the background</description>
             <os family="windows" />
@@ -196,12 +241,6 @@
                 <args>
                     <arg value="-t" />
                     <arg value="$INSTALL_PATH\wrapper.config" />
-                </args>
-            </executable>
-            <executable targetfile="$INSTALL_PATH/uninstall_i2p_service_winnt.bat" stage="uninstall" failure="warn" keep="true">
-                <args>
-                    <arg value="$INSTALL_PATH\wrapper.config" />
-                    <arg value="--nopause" />
                 </args>
             </executable>
         </pack>

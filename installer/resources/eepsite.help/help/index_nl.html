@@ -46,28 +46,28 @@
  <ul>
  <li>Kies een naam voor je eepsite (<i>mijnsite</i>.i2p). Gebruik alleen kleine letters.
      Kijk eerst 
-     <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=router&filter=none">hier</a>,
+     <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=router&amp;filter=none">hier</a>,
      in het adresboek van je router of in het bestand <code>i2p/hosts.txt</code> of de naam nog beschikbaar is.
      Voer de nieuwe naam voor je eepsite in op de 
      <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite i2ptunnel configuratie pagina</a>
      onder "Website naam". Dit vervangt de standaard "mysite.i2p".
      Klik ook op de "Auto Start" box, hiermee zal je eepsite elke keer starten samen met je router.
-     Vergeet niet om op "Opslaan" te klikken.
+     Vergeet niet om op "Opslaan" te klikken.</li>
  <li>Klik op de start knop voor je eepsite op de
      <a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">hoofd i2ptunnel configuratie pagina</a>.
      Je zult nu "eepsite" zien onder "Lokale Destinations" aan de linker kant van je 
      <a href="http://127.0.0.1:7657/index.jsp">I2P Router Console</a>.
-     Je eepsite draait nu.
+     Je eepsite draait nu.</li>
  <li>Selecteer de gehele "Lokale destination" tekst op de 
      <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite i2ptunnel configuratie pagina</a>.
      en kopieer het op het klipbord.
      Zorg ervoor dat je het helemaal hebt - het is meer dan 500 karakters lang en eindigt met "AAAA".
- <li>Voer de naam in en plak je destination in je
+     <li>Voer de naam in en plak je destination in je
      <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=master">hoofd adresboek</a>.
-     Klik "Toevoegen" om de destination aan je adresboek toe te voegen.
- <li>In je browser, voel je eepsite naam in (<i>mijnsite</i>.i2p) en je komt hier hopelijk weer terug.
+     Klik "Toevoegen" om de destination aan je adresboek toe te voegen.</li>
+     <li>In je browser, voel je eepsite naam in (<i>mijnsite</i>.i2p) en je komt hier hopelijk weer terug.</li>
  <li>Voordat je de rest van de wereld over je nieuwe eepsite vertelt, zorg eerst voor wat content.
-     Ga naar <code>~/.i2p/eepsite/docroot/</code> (Linux) of <code>%APPDATA%\I2P\eepsite\docroot\</code> (Windows) en vervang de index.html verwijs pagina met je eigen content. Virtual folders werken, dus kan je bestanden vanuit een subdirectory hosten zonder dat je een pagina met links naar deze files moet maken. Mocht je een template nodig hebben voor een basis site, weer vrij om <a href="pagetemplate.html">deze pagina</a> en <a href="lib/">deze content</a> te gebruiken en aan te passen!
+ Ga naar <code>~/.i2p/eepsite/docroot/</code> (Linux) of <code>%APPDATA%\I2P\eepsite\docroot\</code> (Windows) en vervang de index.html verwijs pagina met je eigen content. Virtual folders werken, dus kan je bestanden vanuit een subdirectory hosten zonder dat je een pagina met links naar deze files moet maken. Mocht je een template nodig hebben voor een basis site, weer vrij om <a href="pagetemplate.html">deze pagina</a> en <a href="lib/">deze content</a> te gebruiken en aan te passen!</li>
 </ul>
 <h2>Registreer je eigen .I2P Domein</h2><ul>
   <li>Nu is het tijd om je eepsite toe te voegen aan een I2P adresboek gehost door een site
@@ -78,12 +78,12 @@
      <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=3">eepsite i2ptunnel configuratie pagina</a>.
      Zorg ervoor dat je het geheel plakt, de destination eindigt met "AAAA".
      Lees de voorwaarden en klik op de "Submit" button.
-     Het kan een aantal uren duren (afhankelijk van de voorwaarden van de gebruikte site en de subscription update instellingen van andere routers) waarna anderen je eepsite kunnen vinden door het invoeren van <i>mijnsite</i>.i2p in hun browser.
+     Het kan een aantal uren duren (afhankelijk van de voorwaarden van de gebruikte site en de subscription update instellingen van andere routers) waarna anderen je eepsite kunnen vinden door het invoeren van <i>mijnsite</i>.i2p in hun browser.</li>
 </ul><h2>Adresboek Subscriptions Toevoegen</h2><ul>
  <li>Over adresboek updates gesproken, dit zou een goed moment zijn om wat adresboek subscriptions toe te voegen aan je eigen
-     <a href="http://127.0.0.1:7657/susidns/subscriptions.jsp">subscription pagina</a>. Ga naar je subscriptions configuratie pagina en voeg een aantal van deze URLs toe om automatisch op de hoogte te blijven van nieuwe hosts:<ul>
-     <li><a href="http://tino.i2p/hosts.txt">http://tino.i2p/hosts.txt</a>
-     <li><a href="http://stats.i2p/cgi-bin/newhosts.txt">http://stats.i2p/cgi-bin/newhosts.txt</a>
+ <a href="http://127.0.0.1:7657/susidns/subscriptions.jsp">subscription pagina</a>. Ga naar je subscriptions configuratie pagina en voeg een aantal van deze URLs toe om automatisch op de hoogte te blijven van nieuwe hosts:</li><ul>
+	 <li><a href="http://tino.i2p/hosts.txt">http://tino.i2p/hosts.txt</a></li>
+	 <li><a href="http://stats.i2p/cgi-bin/newhosts.txt">http://stats.i2p/cgi-bin/newhosts.txt</a></li>
      <li><a href="http://i2host.i2p/cgi-bin/i2hostetag">http://i2host.i2p/cgi-bin/i2hostetag</a></ul>
  <li>Mocht je haast hebben en niet een aantal uren kunnen wachten, dan kan je gebruik maken van een "jump" adres helper redirection service.
      Dit dit werkt al een paar minuten nadat je de destination aan het adresboek van dezelfde site hebt toegevoegd.
@@ -91,25 +91,25 @@
      http://stats.i2p/cgi-bin/jump.cgi?a=<i>mijnsite</i>.i2p of
      http://i2host.i2p/cgi-bin/i2hostjump?<i>mijnsite</i>.i2p
      in je browser.
-     Zodra dit werkt kan je anderen hierover vertellen.
+     Zodra dit werkt kan je anderen hierover vertellen.</li>
  <li>Sommigen kijken op eepsite lijsten zoals
      <a href="http://inproxy.tino.i2p/status.php">inproxy.tino.i2p/status.php</a> of <a href="http://perv.i2p">perv.i2p</a> voor nieuwe eepsites, dus kan je zo een aantal bezoekers krijgen.
-     Maar er zijn genoeg andere manieren om je eepsite te promoten. Hier zijn er een aantal:
+     Maar er zijn genoeg andere manieren om je eepsite te promoten. Hier zijn er een aantal:</li>
      <ul>
      <li>Plaats een bericht op het <a href="http://forum.i2p/viewforum.php?f=16">Eepsite announce forum</a>
-         op <a href="http://forum.i2p/">forum.i2p</a>.
-     <li>Vertel mensen op het #i2p of #i2p-chat kanaal op IRC over je site.
-     <li>Plaats een bericht op <a href="http://syndie.i2p2.de/">het nieuwe Syndie</a>.
-     <li>Plaatst het op de <a href="http://ugha.i2p/EepsiteIndex">Ugha's Eepsite Index Wiki</a>
+     op <a href="http://forum.i2p/">forum.i2p</a>.</li>
+     <li>Vertel mensen op het #i2p of #i2p-chat kanaal op IRC over je site.</li>
+     <li>Plaats een bericht op <a href="http://syndie.i2p2.de/">het nieuwe Syndie</a>.</li>
+     <li>Plaatst het op de <a href="http://ugha.i2p/EepsiteIndex">Ugha's Eepsite Index Wiki</a></li>
      </ul>
      </ul>
 <h2>Verdere assistentie</h2><ul>
  <li>In dien je nog vragen hebt, de volgende plaatsen bieden support:
 <ul>
- <li>Ons IRC support kanaal: <ul><li><a href="irc://irc.freenode.net/i2p">#i2p op Freenode</a> 
- <li>Anoniem via onze eigen <a href="irc://127.0.0.1:6668/i2p">I2P IRC tunnel</a>.</ul>
+<li>Ons IRC support kanaal: <ul><li><a href="irc://irc.freenode.net/i2p">#i2p op Freenode</a></li>
+	<li>Anoniem via onze eigen <a href="irc://127.0.0.1:6668/i2p">I2P IRC tunnel</a>.</li></ul>
      <li>De <a href="http://forum.i2p/viewforum.php?f=10">technical problems</a> afdeling op
-     <a href="http://forum.i2p/">forum.i2p</a>.</ul>
+     <a href="http://forum.i2p/">forum.i2p</a>.</li></ul>
  </ul><div class="notify">
 <b>Noot:</b> Deze pagina, de website en console moeten allemaal vertaald worden in JOUW eigen taal, mocht dit nog niet gedaan zijn. Help de groei van dit project door <a href="http://www.i2p2.i2p/getinvolved.html">bij te dragen</a> aan de vertaling. Neem contact op met het project via het hierboven genoemde IRC kanaal. Alvast bedankt!</div>
 <hr><div class="footnote">	

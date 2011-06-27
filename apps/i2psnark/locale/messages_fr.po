@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-25 12:48+0000\n"
-"PO-Revision-Date: 2011-04-11 15:45+0100\n"
+"POT-Creation-Date: 2011-05-02 11:08+0000\n"
+"PO-Revision-Date: 2011-05-19 07:39+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "Language: \n"
@@ -187,7 +187,7 @@ msgstr "Ajout {0}"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:730
 #: ../java/src/org/klomp/snark/SnarkManager.java:753
-#: ../java/src/org/klomp/snark/SnarkManager.java:1178
+#: ../java/src/org/klomp/snark/SnarkManager.java:1180
 #, java-format
 msgid "Failed to copy torrent file to {0}"
 msgstr "Impossible de copier le torrent vers {0}"
@@ -222,53 +222,58 @@ msgstr "Les tronçons sont trop larges dans \"{0}\" ({1}B), suppression."
 msgid "Limit is {0}B"
 msgstr "La limite est de \"{0}\"octets"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:993
+#: ../java/src/org/klomp/snark/SnarkManager.java:987
+#, java-format
+msgid "Torrent \"{0}\" has no data, deleting it!"
+msgstr "Le fichier torrent \"{0}\" n'a pas de données, suppression!"
+
+#: ../java/src/org/klomp/snark/SnarkManager.java:995
 #, java-format
 msgid "Torrents larger than {0}B are not supported yet, deleting \"{1}\""
 msgstr "Les torrents dont la taille est supérieure à \"{0}\"octets ne sont pas encore supportés, suppression \"{1}\"."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1009
+#: ../java/src/org/klomp/snark/SnarkManager.java:1011
 #, java-format
 msgid "Error: Could not remove the torrent {0}"
 msgstr "Erreur: Impossible de supprimer le torrent \"{0}\""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1030
-#: ../java/src/org/klomp/snark/SnarkManager.java:1048
+#: ../java/src/org/klomp/snark/SnarkManager.java:1032
+#: ../java/src/org/klomp/snark/SnarkManager.java:1050
 #, java-format
 msgid "Torrent stopped: \"{0}\""
 msgstr "Torrent arrêté:\"{0}\""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1069
+#: ../java/src/org/klomp/snark/SnarkManager.java:1071
 #, java-format
 msgid "Torrent removed: \"{0}\""
 msgstr "Torrent supprimé:\"{0}\""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1077
+#: ../java/src/org/klomp/snark/SnarkManager.java:1079
 #, java-format
 msgid "Adding torrents in {0}"
 msgstr "Ajout des torrents dans {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1126
+#: ../java/src/org/klomp/snark/SnarkManager.java:1128
 #, java-format
 msgid "Download finished: {0}"
 msgstr "Téléchargement terminé:\"{0}\""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1174
+#: ../java/src/org/klomp/snark/SnarkManager.java:1176
 #, java-format
 msgid "Metainfo received for {0}"
 msgstr "Metainfo reçue pour {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1175
+#: ../java/src/org/klomp/snark/SnarkManager.java:1177
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:526
 #, java-format
 msgid "Starting up torrent {0}"
 msgstr "Démarrage du torrent {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1229
+#: ../java/src/org/klomp/snark/SnarkManager.java:1231
 msgid "Unable to connect to I2P!"
 msgstr "Impossible de se connecter à I2P!"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1235
+#: ../java/src/org/klomp/snark/SnarkManager.java:1237
 #, java-format
 msgid "Unable to add {0}"
 msgstr "Impossible d’ajouter {0}"
@@ -897,47 +902,66 @@ msgstr "Le torrent n’a pas été reçu de {0}"
 
 #~ msgid "Torrent file must originate from an I2P-based tracker"
 #~ msgstr "Le fichier torrent doit provenir d'un tracker I2P"
+
 #~ msgid "size: {0}B"
 #~ msgstr "Taille: {0}Octets"
+
 #~ msgid "Estimated Download Time"
 #~ msgstr "Temps estimé de téléchargement"
+
 #~ msgid "Torrent file {0} does not exist"
 #~ msgstr "Le fichier torrent {0} n'existe pas"
+
 #~ msgid "Copying torrent to {0}"
 #~ msgstr "Copie du torrent vers {0}"
+
 #~ msgid "from {0}"
 #~ msgstr "depuis {0}"
+
 #~ msgid "Downloading"
 #~ msgstr "Téléchargement en cours"
+
 #~ msgid "FileSize"
 #~ msgstr "Taille du fichier"
+
 #~ msgid "Download Status"
 #~ msgstr "État du téléchargement"
+
 #~ msgid "Details"
 #~ msgstr "Détails"
+
 #~ msgid "Depuis l'URL"
 #~ msgstr "Quell-URL"
+
 #~ msgid "Directory to store torrents and data"
 #~ msgstr "Répertoire de stockage des torrents et des données"
+
 #~ msgid "Cannot change the I2CP settings while torrents are active"
 #~ msgstr ""
 #~ "On ne peut changer les paramètres I2CP pendant que des torrents sont "
 #~ "actifs"
+
 #~ msgid "Non-i2p tracker in \"{0}\", deleting it from our list of trackers!"
 #~ msgstr ""
 #~ "Tracker non-i2p dans \"{0}\", suppression de notre liste de trackers!"
+
 #~ msgid "{0} torrents"
 #~ msgstr "{0} Torrents"
+
 #~ msgid "Uninteresting"
 #~ msgstr "Pas intéressant"
+
 #~ msgid "Choked"
 #~ msgstr "Choked"
+
 #~ msgid "Uninterested"
 #~ msgstr "Pas interessé"
+
 #~ msgid "Choking"
 #~ msgstr "Choking"
+
 #~ msgid "Custom tracker URL"
 #~ msgstr "URL tracker spécifique"
+
 #~ msgid "Configure"
 #~ msgstr "Configurer"
-

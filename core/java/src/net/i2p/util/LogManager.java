@@ -17,20 +17,18 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Queue;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
 
 /**
  * Manages the logging system, loading (and reloading) the configuration file,
@@ -286,18 +284,11 @@ public class LogManager {
         }
 
         Properties p = new Properties();
-        FileInputStream fis = null;
         try {
-            fis = new FileInputStream(cfgFile);
-            p.load(fis);
+            DataHelper.loadProps(p, cfgFile);
             _configLastRead = _context.clock().now();
         } catch (IOException ioe) {
             System.err.println("Error loading logger config from " + cfgFile.getAbsolutePath());
-        } finally {
-            if (fis != null) try {
-                fis.close();
-            } catch (IOException ioe) { // nop
-            }
         }
         parseConfig(p);
         updateLimits();
@@ -363,6 +354,7 @@ public class LogManager {
     private void parseLimits(Properties config) {
         parseLimits(config, PROP_RECORD_PREFIX);
     }
+
     private void parseLimits(Properties config, String recordPrefix) {
         _limits.clear();
         if (config != null) {
@@ -559,60 +551,47 @@ public class LogManager {
         return _rotationLimit;
     }
 
+    /** @return success */
     public boolean saveConfig() {
-        String config = createConfig();
-        FileOutputStream fos = null;
+        Properties props = createConfig();
         try {
-            fos = new FileOutputStream(_locationFile);
-            fos.write(config.getBytes());
+            DataHelper.storeProps(props, _locationFile);
             return true;
         } catch (IOException ioe) {
             getLog(LogManager.class).error("Error saving the config", ioe);
             return false;
-        } finally {
-            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
         }
     }
     
-    private String createConfig() {
-        StringBuilder buf = new StringBuilder(8*1024);
-        buf.append(PROP_FORMAT).append('=').append(new String(_format)).append('\n');
-        buf.append(PROP_DATEFORMAT).append('=').append(_dateFormatPattern).append('\n');
-        buf.append(PROP_DISPLAYONSCREEN).append('=').append((_displayOnScreen ? "TRUE" : "FALSE")).append('\n');
+    private Properties createConfig() {
+        Properties rv = new OrderedProperties();
+        rv.setProperty(PROP_FORMAT, new String(_format));
+        rv.setProperty(PROP_DATEFORMAT, _dateFormatPattern);
+        rv.setProperty(PROP_DISPLAYONSCREEN, Boolean.toString(_displayOnScreen));
         String filenameOverride = _context.getProperty(FILENAME_OVERRIDE_PROP);
         if (filenameOverride == null)
-            buf.append(PROP_FILENAME).append('=').append(_baseLogfilename).append('\n');
+            rv.setProperty(PROP_FILENAME, _baseLogfilename);
         else // this isn't technically correct - this could mess with some funky scenarios
-            buf.append(PROP_FILENAME).append('=').append(DEFAULT_FILENAME).append('\n');
+            rv.setProperty(PROP_FILENAME, DEFAULT_FILENAME);
         
         if (_fileSize >= 1024*1024)
-            buf.append(PROP_FILESIZE).append('=').append( (_fileSize / (1024*1024))).append("m\n");
+            rv.setProperty(PROP_FILESIZE,  (_fileSize / (1024*1024)) + "m");
         else if (_fileSize >= 1024)
-            buf.append(PROP_FILESIZE).append('=').append( (_fileSize / (1024))).append("k\n");
+            rv.setProperty(PROP_FILESIZE,  (_fileSize / (1024))+ "k");
         else if (_fileSize > 0)
-            buf.append(PROP_FILESIZE).append('=').append(_fileSize).append('\n');
+            rv.setProperty(PROP_FILESIZE, Integer.toString(_fileSize));
         // if <= 0, dont specify
         
-        buf.append(PROP_ROTATIONLIMIT).append('=').append(_rotationLimit).append('\n');
-        buf.append(PROP_DEFAULTLEVEL).append('=').append(Log.toLevelString(_defaultLimit)).append('\n');
-        buf.append(PROP_DISPLAYONSCREENLEVEL).append('=').append(Log.toLevelString(_onScreenLimit)).append('\n');
-        buf.append(PROP_CONSOLEBUFFERSIZE).append('=').append(_consoleBufferSize).append('\n');
+        rv.setProperty(PROP_ROTATIONLIMIT, Integer.toString(_rotationLimit));
+        rv.setProperty(PROP_DEFAULTLEVEL, Log.toLevelString(_defaultLimit));
+        rv.setProperty(PROP_DISPLAYONSCREENLEVEL, Log.toLevelString(_onScreenLimit));
+        rv.setProperty(PROP_CONSOLEBUFFERSIZE, Integer.toString(_consoleBufferSize));
 
-        buf.append("# log limit overrides:\n");
-        
-        TreeMap limits = new TreeMap();
         for (LogLimit lim : _limits) {
-            limits.put(lim.getRootName(), Log.toLevelString(lim.getLimit()));
-        }
-        for (Iterator iter = limits.entrySet().iterator(); iter.hasNext(); ) {
-            Map.Entry entry = (Map.Entry)iter.next();
-            String path = (String)entry.getKey();
-            String lim = (String)entry.getValue();
-            buf.append(PROP_RECORD_PREFIX).append(path);
-            buf.append('=').append(lim).append('\n');
+            rv.setProperty(PROP_RECORD_PREFIX + lim.getRootName(), Log.toLevelString(lim.getLimit()));
         }
         
-        return buf.toString();
+        return rv;
     }
 
     /**
@@ -664,7 +643,17 @@ public class LogManager {
 
     public void shutdown() {
         if (_writer != null) {
-            _log.log(Log.WARN, "Shutting down logger");
+            //_log.log(Log.WARN, "Shutting down logger");
+            // try to prevent out-of-order logging at shutdown
+            synchronized (_writer) {
+                _writer.notifyAll();
+            }
+            if (!_records.isEmpty()) {
+                try {
+                    Thread.sleep(250);
+                } catch (InterruptedException ie) {}
+            }
+            // this could generate out-of-order messages
             _writer.flushRecords(false);
             _writer.stopWriting();
         }

@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-03 18:28+0000\n"
-"PO-Revision-Date: 2011-02-15 22:27+0500\n"
+"POT-Creation-Date: 2011-06-18 14:07+0000\n"
+"PO-Revision-Date: 2011-06-18 20:17+0500\n"
 "Last-Translator: Hidden Z <hiddenz@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "Language: \n"
@@ -17,8 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: Russian\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:307
 #, java-format
@@ -47,9 +46,7 @@ msgstr "Задержка запуска изменена на {0}"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:386
 msgid "I2CP and tunnel changes will take effect after stopping all torrents"
-msgstr ""
-"Изменения настроек I2CP и туннелей вступят в силу после остановки всех "
-"торрентов."
+msgstr "Изменения настроек I2CP и туннелей вступят в силу после остановки всех торрентов."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:393
 msgid "Disconnecting old I2CP destination"
@@ -61,11 +58,8 @@ msgid "I2CP settings changed to {0}"
 msgstr "Новые параметры I2CP: {0}"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:402
-msgid ""
-"Unable to connect with the new settings, reverting to the old I2CP settings"
-msgstr ""
-"Не удалось соединиться с использованием новых настроек I2CP, возвращаемся к "
-"старым настройкам"
+msgid "Unable to connect with the new settings, reverting to the old I2CP settings"
+msgstr "Не удалось соединиться с использованием новых настроек I2CP, возвращаемся к старым настройкам"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:406
 msgid "Unable to reconnect with the old settings!"
@@ -90,27 +84,20 @@ msgstr "Автостарт выключен"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:437
 msgid "Enabled open trackers - torrent restart required to take effect."
-msgstr ""
-"Включено использование открытых трекеров. Требуется перезапуск торрента, "
-"чтобы изменения вступили в силу."
+msgstr "Включено использование открытых трекеров. Требуется перезапуск торрента, чтобы изменения вступили в силу."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:439
 msgid "Disabled open trackers - torrent restart required to take effect."
-msgstr ""
-"Отключено использование открытых трекеров. Требуется перезапуск торрента, "
-"чтобы изменения вступили в силу."
+msgstr "Отключено использование открытых трекеров. Требуется перезапуск торрента, чтобы изменения вступили в силу."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:447
 msgid "Open Tracker list changed - torrent restart required to take effect."
-msgstr ""
-"Изменен список открытых трекеров. Требуется перезапуск торрента, чтобы "
-"изменения вступили в силу."
+msgstr "Изменен список открытых трекеров. Требуется перезапуск торрента, чтобы изменения вступили в силу."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:454
 #, java-format
 msgid "{0} theme loaded, return to main i2psnark page to view."
-msgstr ""
-"{0} тема загружена, вернитесь на основную страницу i2psnark для просмотра."
+msgstr "{0} тема загружена, вернитесь на основную страницу i2psnark для просмотра."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:461
 msgid "Configuration unchanged."
@@ -141,161 +128,152 @@ msgid "Cannot open \"{0}\""
 msgstr "Не удалось открыть \"{0}\""
 
 #. TODO - if the existing one is a magnet, delete it and add the metainfo instead?
-#: ../java/src/org/klomp/snark/SnarkManager.java:586
-#: ../java/src/org/klomp/snark/SnarkManager.java:661
-#: ../java/src/org/klomp/snark/SnarkManager.java:716
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1976
+#: ../java/src/org/klomp/snark/SnarkManager.java:589
+#: ../java/src/org/klomp/snark/SnarkManager.java:665
+#: ../java/src/org/klomp/snark/SnarkManager.java:720
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1978
 #, java-format
 msgid "Torrent with this info hash is already running: {0}"
 msgstr "Торрент с таким info hash уже запущен: {0}"
 
 #. addMessage(_("Warning - No I2P trackers in \"{0}\", will announce to I2P open trackers and DHT only.", info.getName()));
-#: ../java/src/org/klomp/snark/SnarkManager.java:593
+#: ../java/src/org/klomp/snark/SnarkManager.java:596
 #, java-format
-msgid ""
-"Warning - No I2P trackers in \"{0}\", will announce to I2P open trackers "
-"only."
-msgstr ""
-"Внимание - в \"{0}\" не найдено I2P трекеров, анонсирование будет "
-"производиться только на открытых трекерах I2P."
+msgid "Warning - No I2P trackers in \"{0}\", will announce to I2P open trackers only."
+msgstr "Внимание - в \"{0}\" не найдено I2P трекеров, анонсирование будет производиться только на открытых трекерах I2P."
 
 #. addMessage(_("Warning - No I2P trackers in \"{0}\", and DHT and open trackers are disabled, you should enable open trackers or DHT before starting the torrent.", info.getName()));
-#: ../java/src/org/klomp/snark/SnarkManager.java:598
+#: ../java/src/org/klomp/snark/SnarkManager.java:601
 #, java-format
-msgid ""
-"Warning - No I2P Trackers found in \"{0}\". Make sure Open Tracker is "
-"enabled before starting this torrent."
-msgstr ""
-"Внимание - в \"{0}\" не найдено I2P трекеров. Перед запуском торрента "
-"убедитесь, что использование открытых трекеров включено."
+msgid "Warning - No I2P Trackers found in \"{0}\". Make sure Open Tracker is enabled before starting this torrent."
+msgstr "Внимание - в \"{0}\" не найдено I2P трекеров. Перед запуском торрента убедитесь, что использование открытых трекеров включено."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:619
+#: ../java/src/org/klomp/snark/SnarkManager.java:622
 #, java-format
 msgid "Torrent in \"{0}\" is invalid"
 msgstr "Торрент в \"{0}\" некорректен"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:624
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1999
+#: ../java/src/org/klomp/snark/SnarkManager.java:627
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2000
 #, java-format
 msgid "ERROR - Out of memory, cannot create torrent from {0}"
 msgstr "ОШИБКА - нехватка памяти, невозможно создать торрент из {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:635
+#: ../java/src/org/klomp/snark/SnarkManager.java:639
 #, java-format
 msgid "Torrent added and started: \"{0}\""
 msgstr "Торрент добавлен и запущен: \"{0}\""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:637
+#: ../java/src/org/klomp/snark/SnarkManager.java:641
 #, java-format
 msgid "Torrent added: \"{0}\""
 msgstr "Торрент добавлен: \"{0}\""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:672
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:490
+#: ../java/src/org/klomp/snark/SnarkManager.java:676
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:491
 #, java-format
 msgid "Fetching {0}"
 msgstr "Получение торрента: {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:675
-#, java-format
-msgid ""
-"We have no saved peers and no other torrents are running. Fetch of {0} will "
-"not succeed until you start another torrent."
-msgstr ""
-"Мы не имеем сохранённых пиров и нет других запущенных торрентов. Загрузка "
-"{0} не будет успешна пока вы не запустите другой торрент."
-
 #: ../java/src/org/klomp/snark/SnarkManager.java:679
+#, java-format
+msgid "We have no saved peers and no other torrents are running. Fetch of {0} will not succeed until you start another torrent."
+msgstr "Мы не имеем сохранённых пиров и нет других запущенных торрентов. Загрузка {0} не будет успешна пока вы не запустите другой торрент."
+
+#: ../java/src/org/klomp/snark/SnarkManager.java:683
 #, java-format
 msgid "Adding {0}"
 msgstr "Добавление {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:726
-#: ../java/src/org/klomp/snark/SnarkManager.java:749
-#: ../java/src/org/klomp/snark/SnarkManager.java:1174
+#: ../java/src/org/klomp/snark/SnarkManager.java:730
+#: ../java/src/org/klomp/snark/SnarkManager.java:753
+#: ../java/src/org/klomp/snark/SnarkManager.java:1180
 #, java-format
 msgid "Failed to copy torrent file to {0}"
 msgstr "Не удалось скопировать торрент в: {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:972
+#: ../java/src/org/klomp/snark/SnarkManager.java:976
 #, java-format
 msgid "Too many files in \"{0}\" ({1}), deleting it!"
 msgstr "Слишком много файлов в торренте \"{0}\" ({1}), удаляем его!"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:974
+#: ../java/src/org/klomp/snark/SnarkManager.java:978
 #, java-format
 msgid "Torrent file \"{0}\" cannot end in \".torrent\", deleting it!"
-msgstr ""
-"Торрент \"{0}\" содержит единственный файл заканчивающийся на \".torrent\", "
-"удаляем его!"
+msgstr "Торрент \"{0}\" содержит единственный файл заканчивающийся на \".torrent\", удаляем его!"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:976
+#: ../java/src/org/klomp/snark/SnarkManager.java:980
 #, java-format
 msgid "No pieces in \"{0}\",  deleting it!"
 msgstr "В торренте \"{0}\" не оказалось ни одной части, удаляем его!"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:978
+#: ../java/src/org/klomp/snark/SnarkManager.java:982
 #, java-format
 msgid "Too many pieces in \"{0}\", limit is {1}, deleting it!"
 msgstr "Слишком много частей в торренте \"{0}\" (наш предел {1}), удаляем его!"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:980
+#: ../java/src/org/klomp/snark/SnarkManager.java:984
 #, java-format
 msgid "Pieces are too large in \"{0}\" ({1}B), deleting it."
 msgstr "Слишком крупные части в торренте \"{0}\" ({1}B), удаляем его."
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:981
+#: ../java/src/org/klomp/snark/SnarkManager.java:985
 #, java-format
 msgid "Limit is {0}B"
 msgstr "Наш предел {0}B"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:989
+#: ../java/src/org/klomp/snark/SnarkManager.java:987
+#, java-format
+msgid "Torrent \"{0}\" has no data, deleting it!"
+msgstr "Торрент \"{0}\" не содержит данных, удаляем его!"
+
+#: ../java/src/org/klomp/snark/SnarkManager.java:995
 #, java-format
 msgid "Torrents larger than {0}B are not supported yet, deleting \"{1}\""
 msgstr "Торренты крупнее чем {0}B пока не поддерживается, удаляем \"{1}\""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1005
+#: ../java/src/org/klomp/snark/SnarkManager.java:1011
 #, java-format
 msgid "Error: Could not remove the torrent {0}"
 msgstr "Ошибка: Невозможно удалить торрент {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1026
-#: ../java/src/org/klomp/snark/SnarkManager.java:1044
+#: ../java/src/org/klomp/snark/SnarkManager.java:1032
+#: ../java/src/org/klomp/snark/SnarkManager.java:1050
 #, java-format
 msgid "Torrent stopped: \"{0}\""
 msgstr "Торрент остановлен: \"{0}\""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1065
+#: ../java/src/org/klomp/snark/SnarkManager.java:1071
 #, java-format
 msgid "Torrent removed: \"{0}\""
 msgstr "Торрент удален: \"{0}\""
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1073
+#: ../java/src/org/klomp/snark/SnarkManager.java:1079
 #, java-format
 msgid "Adding torrents in {0}"
 msgstr "Добавление торрентов через {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1122
+#: ../java/src/org/klomp/snark/SnarkManager.java:1128
 #, java-format
 msgid "Download finished: {0}"
 msgstr "Закачка завершена: {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1170
+#: ../java/src/org/klomp/snark/SnarkManager.java:1176
 #, java-format
 msgid "Metainfo received for {0}"
 msgstr "Метаданные получены для {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1171
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:525
+#: ../java/src/org/klomp/snark/SnarkManager.java:1177
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:526
 #, java-format
 msgid "Starting up torrent {0}"
 msgstr "Запускаем торрент: {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1225
+#: ../java/src/org/klomp/snark/SnarkManager.java:1231
 msgid "Unable to connect to I2P!"
 msgstr "Не удалось установить соединение с I2P!"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1231
+#: ../java/src/org/klomp/snark/SnarkManager.java:1237
 #, java-format
 msgid "Unable to add {0}"
 msgstr "Не удаётся добавить {0}"
@@ -323,7 +301,7 @@ msgid "Forum"
 msgstr "Форум"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:284
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1719
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1721
 msgid "Status"
 msgstr "Статус"
 
@@ -338,8 +316,8 @@ msgid "Show Peers"
 msgstr "показать список пиров"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:306
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1643
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1659
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1645
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1661
 msgid "Torrent"
 msgstr "Торрент"
 
@@ -386,31 +364,31 @@ msgstr "Скорость"
 msgid "Up Rate"
 msgstr "Скорость отдачи"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:365
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:366
 msgid "Stop all torrents and the I2P tunnel"
 msgstr "Остановить все торренты и закрыть соединение с I2P"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:367
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:368
 msgid "Stop All"
 msgstr "Остановить все"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:376
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:377
 msgid "Start all torrents and the I2P tunnel"
 msgstr "Запустить все торренты и открыть соединение с I2P"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:378
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:379
 msgid "Start All"
 msgstr "Запустить все"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:397
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:398
 msgid "No torrents loaded."
 msgstr "Нет загруженных торрентов."
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:402
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:403
 msgid "Totals"
 msgstr "Всего"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:404
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:405
 #, java-format
 msgid "1 torrent"
 msgid_plural "{0} torrents"
@@ -418,7 +396,7 @@ msgstr[0] "{0} торрент"
 msgstr[1] "{0} торрента"
 msgstr[2] "{0} торрентов"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:407
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:408
 #, java-format
 msgid "1 connected peer"
 msgid_plural "{0} connected peers"
@@ -426,42 +404,41 @@ msgstr[0] "{0} подсоединенный пир"
 msgstr[1] "{0} подсоединенных пиров"
 msgstr[2] "{0} подсоединенных пиров"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:496
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:497
 #, java-format
 msgid "Invalid URL: Must start with \"http://\", \"{0}\", or \"{1}\""
-msgstr ""
-"Некорректный URL: должен начинаться с \"http://\", \"{0}\", или \"{1}\""
+msgstr "Некорректный URL: должен начинаться с \"http://\", \"{0}\", или \"{1}\""
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:544
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:571
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:545
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:572
 #, java-format
 msgid "Magnet deleted: {0}"
 msgstr "Magnet удален: {0}"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:552
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:577
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:553
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:578
 #, java-format
 msgid "Torrent file deleted: {0}"
 msgstr "Удален торрент: {0}"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:583
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:593
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:584
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:594
 #, java-format
 msgid "Data file deleted: {0}"
 msgstr "Файл удален: {0}"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:585
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:595
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:586
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:596
 #, java-format
 msgid "Data file could not be deleted: {0}"
 msgstr "Не удалось удалить файл: {0}"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:604
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:605
 #, java-format
 msgid "Data dir deleted: {0}"
 msgstr "Директория удалена: {0}"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:637
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:638
 msgid "Error creating torrent - you must select a tracker"
 msgstr "Торрент не создан — вы должны указать трекер"
 
@@ -472,12 +449,8 @@ msgstr "Создан торрент для \"{0}\""
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:655
 #, java-format
-msgid ""
-"Many I2P trackers require you to register new torrents before seeding - "
-"please do so before starting \"{0}\""
-msgstr ""
-"Многие I2P трекеры требуют зарегистрировать на них торрент перед началом "
-"раздачи — пожалуйста проверьте требуется ли это перед запуском \"{0}\""
+msgid "Many I2P trackers require you to register new torrents before seeding - please do so before starting \"{0}\""
+msgstr "Многие I2P трекеры требуют зарегистрировать на них торрент перед началом раздачи — пожалуйста проверьте требуется ли это перед запуском \"{0}\""
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:657
 #, java-format
@@ -487,8 +460,7 @@ msgstr "Ошибка при создании торрента для: \"{0}\""
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:660
 #, java-format
 msgid "Cannot create a torrent for the nonexistent data: {0}"
-msgstr ""
-"Невозможно создать торрент для несуществующего файла или директории: {0}"
+msgstr "Невозможно создать торрент для несуществующего файла или директории: {0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:663
 msgid "Error creating torrent - you must enter a file or directory"
@@ -534,8 +506,8 @@ msgid "Seeding"
 msgstr "Раздается"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:828
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1665
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1770
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1667
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1772
 msgid "Complete"
 msgstr "Завершен"
 
@@ -563,7 +535,7 @@ msgid "Torrent details"
 msgstr "Подробная информация"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:898
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1160
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1162
 msgid "Info"
 msgstr "Информация"
 
@@ -600,12 +572,8 @@ msgstr "Удалить торрент из списка и с диска"
 #. Then the remaining single quite must be escaped
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:987
 #, java-format
-msgid ""
-"Are you sure you want to delete the file \\''{0}.torrent\\'' (downloaded "
-"data will not be deleted) ?"
-msgstr ""
-"Вы действительно хотите удалить \\''{0}.torrent\\''? (загруженные файлы "
-"удаляться НЕ будут)"
+msgid "Are you sure you want to delete the file \\''{0}.torrent\\'' (downloaded data will not be deleted) ?"
+msgstr "Вы действительно хотите удалить \\''{0}.torrent\\''? (загруженные файлы удаляться НЕ будут)"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:990
 msgid "Remove"
@@ -620,222 +588,208 @@ msgstr "Удалить торрент и стереть загруженные �
 #. Then the remaining single quite must be escaped
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1006
 #, java-format
-msgid ""
-"Are you sure you want to delete the torrent \\''{0}\\'' and all downloaded "
-"data?"
-msgstr ""
-"Вы действительно хотите удалить торрент \\''{0}\\'' и все загруженные файлы?"
+msgid "Are you sure you want to delete the torrent \\''{0}\\'' and all downloaded data?"
+msgstr "Вы действительно хотите удалить торрент \\''{0}\\'' и все загруженные файлы?"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1009
 msgid "Delete"
 msgstr "Стереть"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1042
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1044
 msgid "Unknown"
 msgstr "Неизвестный"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1054
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1056
 msgid "Seed"
 msgstr "Сид"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1077
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1079
 msgid "Uninteresting (The peer has no pieces we need)"
 msgstr "Uninteresting (У пира нет нужных нам частей торрента)"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1079
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1081
 msgid "Choked (The peer is not allowing us to request pieces)"
 msgstr "Choked (Этот пир не позволяет нам запрашивать части торрента)"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1099
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1101
 msgid "Uninterested (We have no pieces the peer needs)"
 msgstr "Uninterested (У нас нужных этому пиру частей торрента)"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1101
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1103
 msgid "Choking (We are not allowing the peer to request pieces)"
 msgstr "Choking (Мы не позволяем этому пиру запрашивать у нас части торрента)"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1159
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1161
 #, java-format
 msgid "Details at {0} tracker"
 msgstr "Детали на трекере {0}"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1188
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1190
 msgid "Add Torrent"
 msgstr "Добавить Торрент"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1190
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1192
 msgid "From URL"
 msgstr "Из URL"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1193
-msgid ""
-"Enter the torrent file download URL (I2P only), magnet link, or maggot link"
-msgstr ""
-"Введите URL (только I2P) для загрузки торрент-файла, magnet-ссылку, или "
-"maggot-ссылку"
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1195
+msgid "Enter the torrent file download URL (I2P only), magnet link, or maggot link"
+msgstr "Введите URL (только I2P) для загрузки торрент-файла, magnet-ссылку, или maggot-ссылку"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1198
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1200
 msgid "Add torrent"
 msgstr "Добавить торрент"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1201
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1203
 #, java-format
 msgid "You can also copy .torrent files to: {0}."
 msgstr "Либо вы можете просто скопировать .torrent-файлы в директорию {0}."
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1203
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1205
 msgid "Removing a .torrent will cause it to stop."
 msgstr "Удаление .torrent-файла приведёт к остановке торрента."
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1226
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1228
 msgid "Create Torrent"
 msgstr "Создать Торрент"
 
 #. out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>\n");
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1229
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1231
 msgid "Data to seed"
 msgstr "Файлы для раздачи"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1233
-msgid "File or directory to seed (must be within the specified path)"
-msgstr ""
-"Файл или директория для раздачи (вводите только название файла или "
-"директории, указание абсолютных путей не поддерживается)"
-
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1235
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1684
+msgid "File or directory to seed (must be within the specified path)"
+msgstr "Файл или директория для раздачи (вводите только название файла или директории, указание абсолютных путей не поддерживается)"
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1237
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1686
 msgid "Tracker"
 msgstr "Трекер"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1237
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1239
 msgid "Select a tracker"
 msgstr "Выбрать трекер"
 
 #. out.write(_("Open trackers and DHT only"));
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1242
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1244
 msgid "Open trackers only"
 msgstr "Только открытые трекеры"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1257
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1259
 msgid "or"
 msgstr "или"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1260
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1262
 msgid "Specify custom tracker announce URL"
 msgstr "Задать URL анонсера вручную"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1263
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1265
 msgid "Create torrent"
 msgstr "Создать торрент"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1281
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1420
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1283
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1422
 msgid "Configuration"
 msgstr "Настройки"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1285
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1287
 msgid "Data directory"
 msgstr "Директория для файлов"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1287
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1289
 msgid "Edit i2psnark.config and restart to change"
-msgstr ""
-"Для изменения отредактируйте файл i2psnark.config и перезагрузите I2PSnark"
+msgstr "Для изменения отредактируйте файл i2psnark.config и перезагрузите I2PSnark"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1291
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1293
 msgid "Auto start"
 msgstr "Автозапуск"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1295
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1297
 msgid "If checked, automatically start torrents that are added"
 msgstr "Автоматически запускать торренты после добавления"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1299
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1301
 msgid "Theme"
 msgstr "Тема"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1312
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1314
 msgid "Startup delay"
 msgstr "Задержка запуска"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1314
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1316
 msgid "minutes"
 msgstr "минут"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1338
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1340
 msgid "Total uploader limit"
 msgstr "Ограничение количества слотов отдачи"
 
 # TODO should replace "uploader limit NN peers" with "global number of upload slots: NN"
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1341
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1343
 msgid "peers"
 msgstr "пиров"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1345
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1347
 msgid "Up bandwidth limit"
 msgstr "Ограничение скорости отдачи"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1348
-msgid "Half available bandwidth recommended."
-msgstr ""
-"Рекомендуется использовать половину от доступной пропускной способности."
-
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1350
+msgid "Half available bandwidth recommended."
+msgstr "Рекомендуется использовать половину от доступной пропускной способности."
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1352
 msgid "View or change router bandwidth"
 msgstr "Посмотреть/настроить ограничения скорости в маршрутизаторе I2P"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1354
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1356
 msgid "Use open trackers also"
 msgstr "Дополнительно использовать открытые трекеры"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1358
-msgid ""
-"If checked, announce torrents to open trackers as well as the tracker listed "
-"in the torrent file"
-msgstr ""
-"Анонсировать торренты на открытых трекерах, дополнительно к тем, что указаны "
-"внутри торрента"
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1360
+msgid "If checked, announce torrents to open trackers as well as the tracker listed in the torrent file"
+msgstr "Анонсировать торренты на открытых трекерах, дополнительно к тем, что указаны внутри торрента"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1362
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1364
 msgid "Open tracker announce URLs"
 msgstr "URL открытых трекеров"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1374
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1376
 msgid "Inbound Settings"
 msgstr "Входящие туннели"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1380
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1382
 msgid "Outbound Settings"
 msgstr "Исходящие туннели"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1388
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1390
 msgid "I2CP host"
 msgstr "Адрес I2CP"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1393
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1395
 msgid "I2CP port"
 msgstr "Порт I2CP"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1406
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1408
 msgid "I2CP options"
 msgstr "Параметры I2CP"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1411
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1413
 msgid "Save configuration"
 msgstr "Сохранить настройки"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1436
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1438
 #, java-format
 msgid "Invalid magnet URL {0}"
 msgstr "Неправильный magnet URL {0}"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1470
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1472
 #, java-format
 msgid "Invalid info hash in magnet URL {0}"
 msgstr "Неправильный info hash в magnet URL {0}"
 
 #. * dummies for translation
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1500
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1502
 #, java-format
 msgid "1 hop"
 msgid_plural "{0} hops"
@@ -843,7 +797,7 @@ msgstr[0] "{0} хоп"
 msgstr[1] "{0} хопа"
 msgstr[2] "{0} хопов"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1501
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1503
 #, java-format
 msgid "1 tunnel"
 msgid_plural "{0} tunnels"
@@ -851,104 +805,104 @@ msgstr[0] "{0} туннель"
 msgstr[1] "{0} туннеля"
 msgstr[2] "{0} туннелей"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1663
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1665
 msgid "Completion"
 msgstr "Загружено"
 
 #. else unknown
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1667
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1716
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1669
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1718
 msgid "Size"
 msgstr "Размер"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1672
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1674
 msgid "Files"
 msgstr "Файлов"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1674
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1676
 msgid "Pieces"
 msgstr "Части"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1675
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1677
 msgid "Piece size"
 msgstr "Размер части"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1697
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1699
 msgid "Magnet link"
 msgstr "Magnet ссылка"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1714
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1753
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1716
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1755
 msgid "Directory"
 msgstr "Директория"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1723
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1725
 msgid "Priority"
 msgstr "Приоритет"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1728
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1730
 msgid "Up to higher level directory"
 msgstr "Перейти в директорию уровнем выше"
 
 # This debug error message intentionally left in English
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1758
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1760
 msgid "Torrent not found?"
 msgstr "Torrent not found?"
 
 # This debug error message intentionally left in English
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1767
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1769
 msgid "File not found in torrent?"
 msgstr "File not found in torrent?"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1780
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1782
 msgid "complete"
 msgstr "скачано"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1781
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1783
 msgid "bytes remaining"
 msgstr "байт осталось"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1806
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1808
 msgid "Open"
 msgstr "Открыть"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1832
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1834
 msgid "High"
 msgstr "Высокий"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1837
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1839
 msgid "Normal"
 msgstr "Нормальный"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1842
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1844
 msgid "Skip"
 msgstr "Пропустить"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1851
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1853
 msgid "Save priorities"
 msgstr "Сохранить приоритеты"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1967
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1969
 #, java-format
 msgid "Torrent fetched from {0}"
 msgstr "Получен торрент из: {0}"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1989
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1990
 #, java-format
 msgid "Torrent already running: {0}"
 msgstr "Торрент уже запущен: {0}"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1991
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1992
 #, java-format
 msgid "Torrent already in the queue: {0}"
 msgstr "Торрент уже в очереди: {0}"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1997
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1998
 #, java-format
 msgid "Torrent at {0} was not valid"
 msgstr "Торрент полученный из {0} некорректен"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2004
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2005
 #, java-format
 msgid "Torrent was not retrieved from {0}"
 msgstr "Не удалось получить торрент из: {0}"

@@ -51,6 +51,8 @@
         <!-- unused for now, as we oddly ship addressbook as a .war -->
 	<target name="jar" depends="compile, changes">
 		<jar basedir="${build}" destfile="${dist}/${jar}">
+		<!-- set if unset -->
+		<property name="workspace.changes" value="" />
 			<manifest>
 				<attribute name="Main-Class" value="addressbook.Daemon"/>
 		                <attribute name="Build-Date" value="${build.timestamp}" />
@@ -67,6 +69,8 @@
 		<copy todir="${dist}/tmp/WEB-INF/classes">
 			<fileset dir="${build}"/>
 		</copy>
+		<!-- set if unset -->
+		<property name="workspace.changes.tr" value="" />
 		<war basedir="${dist}/tmp" webxml="web.xml" destfile="${dist}/${war}">
 			<manifest>
 		                <attribute name="Build-Date" value="${build.timestamp}" />
@@ -81,9 +85,17 @@
 	        <uptodate property="war.uptodate" targetfile="${dist}/${war}">
 		            <srcfiles dir= "." includes="${build}/**/*.class, web.xml"/>
 	        </uptodate>
+                <condition property="shouldListChanges" >
+                    <and>
+                        <not>
+                            <isset property="war.uptodate" />
+                        </not>
+                        <isset property="mtn.available" />
+                    </and>
+                </condition>
 	</target>
 
-	<target name="changes">
+	<target name="changes" depends="warUpToDate" if="shouldListChanges" >
 	        <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
 	            <arg value="list" />
 	            <arg value="changed" />

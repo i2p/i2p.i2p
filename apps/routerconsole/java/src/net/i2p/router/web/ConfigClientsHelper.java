@@ -109,7 +109,12 @@ public class ConfigClientsHelper extends HelperBase {
                        //"webConsole".equals(ca.clientName) || "Web console".equals(ca.clientName),
                        false,
                        ca.className + ((ca.args != null) ? " " + ca.args : ""), (""+cur).equals(_edit),
-                       true, false, false, true, ca.disabled);
+                       true, false, 
+                       // Enable this one and comment out the false below once the stub is filled in.
+                       //!ca.disabled && !("webConsole".equals(ca.clientName) || "Web console".equals(ca.clientName)),
+                       false,
+
+                       true, ca.disabled);
         }
         
         if ("new".equals(_edit))

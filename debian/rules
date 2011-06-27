@@ -1,127 +1,98 @@
 #!/usr/bin/make -f
 
-VERSION=`grep String\ VERSION core/java/src/net/i2p/CoreVersion.java | cut -d\" -f2`
-SOURCEURL=http://mirror.i2p2.de/i2psource_${VERSION}.tar.bz2
+# Quoting Policy version 3.9.2.0, 2011-04-07 section 4.9:
 
-DEB_HOST_ARCH := $(shell dpkg-architecture -qDEB_HOST_ARCH)
-ifeq ($(DEB_HOST_ARCH),i386)
-wrapperpath = installer/lib/wrapper/linux
-else ifeq ($(DEB_HOST_ARCH),amd64)
-wrapperpath = installer/lib/wrapper/linux64
-# other architectures could be supported by using runplain.sh
-endif
+# /start quote
+# For some packages, notably ones where the same source tree is compiled in
+# different ways to produce two binary packages, the build target does not make
+# much sense. For these packages it is good enough to provide two (or more)
+# targets (build-a and build-b or whatever) for each of the ways of building the
+# package, and a build target that does nothing. The binary target will have to
+# build the package in each of the possible ways and make the binary package out
+# of each.
+# ...
+# When a package has a configuration and build routine which takes a long time,
+# or when the makefiles are poorly designed, or when build needs to run clean
+# first, it is a good idea to touch build when the build process is complete.
+# This will ensure that if debian/rules build is run again it will not rebuild
+# the whole program.
+# /end quote
+
+# Since that fits building I2P very well, we override the build target.
+#
 
 build:
-	echo Target Architecture is $(DEB_HOST_ARCH)
-ifndef wrapperpath
-	@echo "Architecture not supported: $(DEB_HOST_ARCH)"
-	exit 1
-endif
-	ant preppkg-linux-only
-	
-	mkdir -p debian/tmp/etc/init.d
-	mkdir -p debian/tmp/etc/i2p
-	mkdir -p debian/tmp/usr/share/i2p/lib
-	mkdir -p debian/tmp/usr/share/doc/i2p
-	mkdir -p debian/tmp/usr/share/man/man1
-	mkdir -p debian/tmp/usr/lib/i2p
-	mkdir -p debian/tmp/usr/bin
-	
-	cp -a debian/scripts/init debian/tmp/etc/init.d/i2p
-	
-	@# copy config templates to /etc/i2p
-	cp -a pkg-temp/blocklist.txt debian/tmp/etc/i2p/
-	cp -a pkg-temp/clients.config debian/tmp/etc/i2p/
-	cp -a pkg-temp/hosts.txt debian/tmp/etc/i2p/
-	cp -a pkg-temp/i2psnark.config debian/tmp/etc/i2p/
-	cp -a pkg-temp/i2ptunnel.config debian/tmp/etc/i2p/
-	cp -a pkg-temp/jetty-i2psnark.xml debian/tmp/etc/i2p/
-	cp -a pkg-temp/systray.config debian/tmp/etc/i2p/
-	
-	@# copy architecture independent files to /usr/share/i2p and create symlinks to /etc/i2p/
-	ln -s /etc/i2p/blocklist.txt debian/tmp/usr/share/i2p/blocklist.txt
-	ln -s /etc/i2p/clients.config debian/tmp/usr/share/i2p/clients.config
-	ln -s /etc/i2p/hosts.txt debian/tmp/usr/share/i2p/hosts.txt
-	ln -s /etc/i2p/i2psnark.config debian/tmp/usr/share/i2p/i2psnark.config
-	ln -s /etc/i2p/i2ptunnel.config debian/tmp/usr/share/i2p/i2ptunnel.config
-	ln -s /etc/i2p/jetty-i2psnark.xml debian/tmp/usr/share/i2p/jetty-i2psnark.xml
-	ln -s /etc/i2p/systray.config debian/tmp/usr/share/i2p/systray.config
-	ln -s /etc/i2p/wrapper.config debian/tmp/usr/share/i2p/wrapper.config
-	cp -a pkg-temp/docs debian/tmp/usr/share/i2p/
-	cp -a pkg-temp/eepsite debian/tmp/usr/share/i2p/
-	cp -a pkg-temp/geoip debian/tmp/usr/share/i2p/
-	cp -a pkg-temp/lib/*.jar debian/tmp/usr/share/i2p/lib/
-	cp -a pkg-temp/scripts debian/tmp/usr/share/i2p/
-	cp -a pkg-temp/webapps debian/tmp/usr/share/i2p/
-	cp -a pkg-temp/licenses debian/tmp/usr/share/doc/i2p/
-	@# Create the Debian copyright file
-	cat debian/copyright.part1 LICENSE.txt > debian/tmp/usr/share/doc/i2p/copyright
-	@# delete all license files that are already in /usr/share/common-licenses/
-	rm debian/tmp/usr/share/doc/i2p/licenses/LICENSE-Apache2.0.txt
-	rm debian/tmp/usr/share/doc/i2p/licenses/LICENSE-GPLv2.txt
-	rm debian/tmp/usr/share/doc/i2p/licenses/LICENSE-LGPLv2.1.txt
+	@echo 'The build target is disabled. Use the appropriate binary target.'
 
-	@# man pages
-	gzip -9c installer/resources/man/eepget.1 > debian/tmp/usr/share/man/man1/eepget.1.gz
-	gzip -9c installer/resources/man/i2prouter.1 > debian/tmp/usr/share/man/man1/i2prouter.1.gz
+JAVA_HOME=/usr/lib/jvm/default-java
+I2P=$(CURDIR)/pkg-temp
+export JAVA_HOME I2P
+#export DEB_HOST_ARCH_CPU := $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 
-	@# copy wrapper files to /usr/lib/i2p (including wrapper.jar because it is architecture dependent)
-	cp ${wrapperpath}/libwrapper.so debian/tmp/usr/lib/i2p/
-	cp ${wrapperpath}/wrapper.jar debian/tmp/usr/lib/i2p/
-	cp ${wrapperpath}/i2psvc debian/tmp/usr/lib/i2p/
-	chmod +x debian/tmp/usr/lib/i2p/i2psvc
-	strip debian/tmp/usr/lib/i2p/libwrapper.so
-	strip debian/tmp/usr/lib/i2p/i2psvc
+%:
+	dh $@ --with quilt
 
-	@# copy remaining executables to /usr/bin, replace INSTALL_PATH and SYSTEM_java_io_tmpdir
-	sed 's|%INSTALL_PATH|/usr/share/i2p|g' pkg-temp/eepget > debian/tmp/usr/bin/eepget
-	chmod +x debian/tmp/usr/bin/eepget
-	cat pkg-temp/i2prouter | \
-	    sed 's|$$I2P/i2psvc|/usr/lib/i2p/i2psvc|g' | \
-	    sed 's|$$I2P/wrapper.config|/etc/i2p/wrapper.config|g' | \
-	    sed 's|%INSTALL_PATH|/usr/share/i2p|g' | \
-	    sed 's|%SYSTEM_java_io_tmpdir|/tmp|g' > debian/tmp/usr/bin/i2prouter
-	chmod +x debian/tmp/usr/bin/i2prouter
-	@# The first 4 sed commands each replace the first \$INSTALL_PATH that hasn't been replaced
-	@# wrapper.java.classpath.1 --> /usr/share/i2p/lib/*.jar:/usr/lib/i2p/wrapper.jar
-	@# wrapper.java.library.path.1 --> /usr/lib/i2p
-	@# wrapper.java.library.path.2 --> /usr/lib/i2p
-	@# i2p.dir.base --> /usr/share/i2p
-	cat pkg-temp/wrapper.config | \
-	    sed '0,/$$INSTALL_PATH\/lib\/\*\.jar/s//\/usr\/share\/i2p\/lib\/*.jar\nwrapper.java.classpath.2=\/usr\/lib\/i2p\/wrapper.jar/' | \
-	    sed '0,/$$INSTALL_PATH/s//\/usr\/lib\/i2p/' | \
-	    sed '0,/$$INSTALL_PATH/s//\/usr\/lib\/i2p/' | \
-	    sed '0,/$$INSTALL_PATH/s//\/usr\/share\/i2p/' | \
-	    sed 's|$$SYSTEM_java_io_tmpdir|/tmp|g' > debian/tmp/etc/i2p/wrapper.config
-	@# now do runplain.sh
-	cat pkg-temp/runplain.sh | \
-	    sed 's|-Djava.library.path=$$I2P:$$I2P/lib|-Djava.library.path=/usr/lib/i2p|g' | \
-	    sed 's|%INSTALL_PATH|/usr/share/i2p|g' | \
-	    sed 's|%SYSTEM_java_io_tmpdir|/tmp|g' > debian/tmp/usr/share/i2p/runplain.sh
-	chmod +x debian/tmp/usr/share/i2p/runplain.sh
+clean: createcopyright
+
+override_dh_auto_clean:
+	dh_auto_clean
+	ant distclean
+	# The next line is used by KYTV when building from source packages
+	#rm -f apps/jetty/jetty-5.1.15.tgz
+	rm -f core/c/jbigi/*.[s]o
+	rm -rf core/c/jcpuid/lib/
+	debconf-updatepo
+
+override_dh_auto_build:
+
+binary-indep: build-indep
+build-indep:
+	dh_prep
+	# The next line is used by KYTV when building from source packages
+	#[ -r jetty/jetty-5.1.15.tgz ] && ln -sf $(CURDIR)/jetty/jetty-5.1.15.tgz $(CURDIR)/apps/jetty/jetty-5.1.15.tgz
+	ant preppkg-linux javadoc
+	echo router.updateDisabled=true > $(I2P)/router.config
+	mv build/javadoc build/api
+	mv $(I2P)/runplain.sh $(I2P)/i2prouter-nowrapper
+	-cp -fv /usr/share/tor/geoip $(CURDIR)/pkg-temp/geoip/geoip.txt
 	
-	dpkg-shlibdeps debian/tmp/usr/lib/i2p/libwrapper.so
-	dpkg-shlibdeps debian/tmp/usr/lib/i2p/i2psvc
-	
-	touch debian/build
-	
-	@# changelog
-	gzip -9c history.txt > debian/tmp/usr/share/doc/i2p/changelog.gz
-	gzip -9c debian/changelog > debian/tmp/usr/share/doc/i2p/changelog.Debian.gz
 
-binary: build
-	mkdir -p debian/tmp/DEBIAN
-	dpkg-gencontrol
-	cp -a debian/scripts/postinst debian/scripts/postrm debian/scripts/prerm debian/conffiles debian/tmp/DEBIAN
-	dpkg-deb -b debian/tmp ..
+binary-arch: build-arch
+build-arch:
+	# build jbigi
+	cd $(CURDIR)/core/c/jbigi && ./mbuild_jbigi.sh dynamic
+	# build jcpuid
+	cd $(CURDIR)/core/c/jcpuid && ./build.sh
 
-binary-arch:
+binary: binary-arch binary-indep
 
-binary-indep:
+createcopyright:
+	@echo " *** Creating debian/copyright*** "
+	@rm -f $(CURDIR)/debian/copyright
+	@/bin/echo -e "This package was Debianized by kytv <killyourtv@i2pmail.org>" >> $(CURDIR)/debian/copyright
+	@/bin/echo -e "Sun, 23 Jan 2011 20:26:51 +0000" >> $(CURDIR)/debian/copyright
+	@/bin/echo -e "\nIt was downloaded from http://www.i2p2.de" >> $(CURDIR)/debian/copyright
+	@/bin/echo -e "\nI2P is tracked upstream using the Monotone VCS" >> $(CURDIR)/debian/copyright
+	@/bin/echo -e "Complete information on fetching the source with monotone can be found" >> $(CURDIR)/debian/copyright
+	@/bin/echo -e "at http://www.i2p2.de/newdevelopers#getting-the-i2p-code\n\n\n" >> $(CURDIR)/debian/copyright
+	@/bin/cat $(CURDIR)/LICENSE.txt >> $(CURDIR)/debian/copyright
 
-clean:
-	ant clean
-	@exit 0
+
+override_dh_compress:
+	dh_compress -X.xsl -X.xml
+
+override_dh_installchangelogs:
+	dh_installchangelogs history.txt
+
+override_dh_installdocs:
+	dh_installdocs -pi2p -plibjbigi-jni --link-doc=i2p-router
+	dh_installdocs --remaining-packages
+
+override_dh_dhlibdeps:
+	dh_shlibdeps -llibjbigi-jni debian/libjbigi-jni/usr/lib/jni/*.so
+
+#override_dh_installinit:
+#	dh_installinit -r
 
 get-orig-source:
-	wget ${SOURCEURL}
+	uscan --verbose --rename --destdir $(CURDIR)/.. --watchfile debian/watch --force-download

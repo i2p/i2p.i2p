@@ -17,13 +17,13 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
      * The router must override this via the prng.buffers property in the router context.
      */
     private static final int DEFAULT_BUFFERS = 2;
-    private static final int BUFSIZE = 256*1024;
-    private int _bufferCount;
+    private static final int DEFAULT_BUFSIZE = 256*1024;
+    private final int _bufferCount;
     private final byte asyncBuffers[][];
     private final int status[];
     private int nextBuf = 0;
-    private I2PAppContext _context;
-    private Log _log;
+    private final I2PAppContext _context;
+    private final Log _log;
 
     private static final int STATUS_NEED_FILL = 0;
     private static final int STATUS_FILLING = 1;
@@ -33,13 +33,14 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
     public AsyncFortunaStandalone(I2PAppContext context) {
         super();
         _bufferCount = Math.max(context.getProperty("prng.buffers", DEFAULT_BUFFERS), 2);
-        asyncBuffers = new byte[_bufferCount][BUFSIZE];
+        int bufferSize = Math.max(context.getProperty("prng.bufferSize", DEFAULT_BUFSIZE), 16*1024);
+        asyncBuffers = new byte[_bufferCount][bufferSize];
         status = new int[_bufferCount];
         for (int i = 0; i < _bufferCount; i++)
             status[i] = STATUS_NEED_FILL;
         _context = context;
-        context.statManager().createRateStat("prng.bufferWaitTime", "", "Encryption", new long[] { 60*1000, 10*60*1000, 60*60*1000 } );
-        context.statManager().createRateStat("prng.bufferFillTime", "", "Encryption", new long[] { 60*1000, 10*60*1000, 60*60*1000 } );
+        context.statManager().createRequiredRateStat("prng.bufferWaitTime", "Delay for random number buffer (ms)", "Encryption", new long[] { 60*1000, 10*60*1000, 60*60*1000 } );
+        context.statManager().createRequiredRateStat("prng.bufferFillTime", "Time to fill random number buffer (ms)", "Encryption", new long[] { 60*1000, 10*60*1000, 60*60*1000 } );
         _log = context.logManager().getLog(AsyncFortunaStandalone.class);
     }
     

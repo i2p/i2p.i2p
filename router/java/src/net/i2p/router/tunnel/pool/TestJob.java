@@ -34,7 +34,6 @@ class TestJob extends JobImpl {
     
     /** base to randomize the test delay on */
     private static final int TEST_DELAY = 30*1000;
-    private static final long[] RATES = { 60*1000, 10*60*1000l, 60*60*1000l };
     
     public TestJob(RouterContext ctx, PooledTunnelCreatorConfig cfg, TunnelPool pool) {
         super(ctx);
@@ -47,20 +46,7 @@ class TestJob extends JobImpl {
         if ( (_pool == null) && (_log.shouldLog(Log.ERROR)) )
             _log.error("Invalid tunnel test configuration: no pool for " + cfg, new Exception("origin"));
         getTiming().setStartAfter(getDelay() + ctx.clock().now());
-        ctx.statManager().createRateStat("tunnel.testFailedTime", "How long did the failure take (max of 60s for full timeout)?", "Tunnels", 
-                                         RATES);
-        ctx.statManager().createRateStat("tunnel.testExploratoryFailedTime", "How long did the failure of an exploratory tunnel take (max of 60s for full timeout)?", "Tunnels", 
-                                         RATES);
-        ctx.statManager().createRateStat("tunnel.testFailedCompletelyTime", "How long did the complete failure take (max of 60s for full timeout)?", "Tunnels", 
-                                         RATES);
-        ctx.statManager().createRateStat("tunnel.testExploratoryFailedCompletelyTime", "How long did the complete failure of an exploratory tunnel take (max of 60s for full timeout)?", "Tunnels", 
-                                         RATES);
-        ctx.statManager().createRateStat("tunnel.testSuccessLength", "How long were the tunnels that passed the test?", "Tunnels", 
-                                         RATES);
-        ctx.statManager().createRateStat("tunnel.testSuccessTime", "How long did tunnel testing take?", "Tunnels", 
-                                         RATES);
-        ctx.statManager().createRateStat("tunnel.testAborted", "Tunnel test could not occur, since there weren't any tunnels to test with", "Tunnels", 
-                                         RATES);
+        // stats are created in TunnelPoolManager
     }
 
     public String getName() { return "Test tunnel"; }

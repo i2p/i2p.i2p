@@ -116,11 +116,6 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             // according to rfc2616 s14.3, this *should* force identity, even if
             // "identity;q=1, *;q=0" didn't.  
             setEntry(headers, "Accept-encoding", ""); 
-            String modifiedHeader = formatHeaders(headers, command);
-            
-            //String modifiedHeader = getModifiedHeader(socket);
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Modified header: [" + modifiedHeader + "]");
 
             socket.setReadTimeout(readTimeout);
             Socket s = new Socket(remoteHost, remotePort);
@@ -143,6 +138,10 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             // Don't pass this on, outproxies should strip so I2P traffic isn't so obvious but they probably don't
             if (alt)
                 headers.remove("X-Accept-encoding");
+
+            String modifiedHeader = formatHeaders(headers, command);
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Modified header: [" + modifiedHeader + "]");
             
             if (allowGZIP && useGZIP) {
                 I2PAppThread req = new I2PAppThread(

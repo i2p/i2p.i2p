@@ -35,6 +35,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 import java.util.zip.Deflater;
@@ -53,8 +54,16 @@ import net.i2p.util.Translate;
  * @author jrandom
  */
 public class DataHelper {
-    private final static byte EQUAL_BYTES[] = "=".getBytes(); // in UTF-8
-    private final static byte SEMICOLON_BYTES[] = ";".getBytes(); // in UTF-8
+    private static final byte EQUAL_BYTES[];
+    private static final byte SEMICOLON_BYTES[];
+    static {
+        try {
+            EQUAL_BYTES = "=".getBytes("UTF-8");
+            SEMICOLON_BYTES = ";".getBytes("UTF-8");
+        } catch (UnsupportedEncodingException uee) {
+            throw new RuntimeException("no utf8!?");
+        }
+    }
 
     /** Read a mapping from the stream, as defined by the I2P data structure spec,
      * and store it into a Properties object.
@@ -79,7 +88,7 @@ public class DataHelper {
         long size = readLong(rawStream, 2);
         byte data[] = new byte[(int) size];
         int read = read(rawStream, data);
-        if (read != size) throw new DataFormatException("Not enough data to read the properties");
+        if (read != size) throw new DataFormatException("Not enough data to read the properties, expected " + size + " but got " + read);
         ByteArrayInputStream in = new ByteArrayInputStream(data);
         byte eqBuf[] = new byte[EQUAL_BYTES.length];
         byte semiBuf[] = new byte[SEMICOLON_BYTES.length];
@@ -102,6 +111,7 @@ public class DataHelper {
     /**
      * Write a mapping to the stream, as defined by the I2P data structure spec,
      * and store it into a Properties object.  See readProperties for the format.
+     * Output is sorted by property name.
      * Property keys and values must not contain '=' or ';', this is not checked and they are not escaped
      * Keys and values must be 255 bytes or less,
      * Formatted length must not exceed 65535 bytes
@@ -131,16 +141,46 @@ public class DataHelper {
      *
      * Use utf8 = false for RouterAddress (fast, non UTF-8)
      * Use utf8 = true for SessionConfig (slow, UTF-8)
+     * @param props source may be null
      */
     public static void writeProperties(OutputStream rawStream, Properties props, boolean utf8) 
             throws DataFormatException, IOException {
+        writeProperties(rawStream, props, utf8, props != null && !(props instanceof OrderedProperties));
+    }
+
+    /**
+     * Writes the props to the stream, sorted by property name if sort == true or
+     * if props is an OrderedProperties.
+     * See readProperties() for the format.
+     * Property keys and values must not contain '=' or ';', this is not checked and they are not escaped
+     * Keys and values must be 255 bytes or less,
+     * Formatted length must not exceed 65535 bytes
+     * @throws DataFormatException if either is too long.
+     *
+     * jrandom disabled UTF-8 in mid-2004, for performance reasons,
+     * i.e. slow foo.getBytes("UTF-8")
+     * Re-enable it so we can pass UTF-8 tunnel names through the I2CP SessionConfig.
+     *
+     * Use utf8 = false for RouterAddress (fast, non UTF-8)
+     * Use utf8 = true for SessionConfig (slow, UTF-8)
+     * @param props source may be null
+     * @param sort should we sort the properties? (set to false if already sorted, e.g. OrderedProperties)
+     * @since 0.8.7
+     */
+    public static void writeProperties(OutputStream rawStream, Properties props, boolean utf8, boolean sort) 
+            throws DataFormatException, IOException {
         if (props != null) {
-            OrderedProperties p = new OrderedProperties();
-            p.putAll(props);
+            Properties p;
+            if (sort) {
+                p = new OrderedProperties();
+                p.putAll(props);
+            } else {
+                p = props;
+            }
             ByteArrayOutputStream baos = new ByteArrayOutputStream(p.size() * 64);
-            for (Iterator iter = p.keySet().iterator(); iter.hasNext();) {
-                String key = (String) iter.next();
-                String val = p.getProperty(key);
+            for (Map.Entry entry : p.entrySet()) {
+                String key = (String) entry.getKey();
+                String val = (String) entry.getValue();
                 if (utf8)
                     writeStringUTF8(baos, key);
                 else
@@ -168,36 +208,36 @@ public class DataHelper {
      * See readProperties() for the format.
      * Property keys and values must not contain '=' or ';', this is not checked and they are not escaped
      * Keys and values must be 255 bytes or less,
-     * @throws DataFormatException if too long.
      * Formatted length must not exceed 65535 bytes
-     * Should throw DataFormatException if too long but it doesn't.
+     * Strings will be UTF-8 encoded in the byte array.
      * Warning - confusing method name, Properties is the source.
      *
      * @deprecated unused
      *
      * @param target returned array as specified in data structure spec
-     * @param props source
+     * @param props source may be null
      * @return new offset
+     * @throws DataFormatException if any string is over 255 bytes long, or if the total length
+     *                             is greater than 65535 bytes.
      */
     @Deprecated
     public static int toProperties(byte target[], int offset, Properties props) throws DataFormatException, IOException {
         if (props != null) {
             OrderedProperties p = new OrderedProperties();
             p.putAll(props);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(32);
-            for (Iterator iter = p.keySet().iterator(); iter.hasNext();) {
-                String key = (String) iter.next();
-                String val = p.getProperty(key);
-                // now make sure they're in UTF-8
-                //key = new String(key.getBytes(), "UTF-8");
-                //val = new String(val.getBytes(), "UTF-8");
-                writeString(baos, key);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(p.size() * 64);
+            for (Map.Entry entry : p.entrySet()) {
+                String key = (String) entry.getKey();
+                String val = (String) entry.getValue();
+                writeStringUTF8(baos, key);
                 baos.write(EQUAL_BYTES);
-                writeString(baos, val);
+                writeStringUTF8(baos, val);
                 baos.write(SEMICOLON_BYTES);
             }
             baos.close();
             byte propBytes[] = baos.toByteArray();
+            if (propBytes.length > 65535)
+                throw new DataFormatException("Properties too big (65535 max): " + propBytes.length);
             toLong(target, offset, 2, propBytes.length);
             offset += 2;
             System.arraycopy(propBytes, 0, target, offset, propBytes.length);
@@ -213,30 +253,38 @@ public class DataHelper {
      * Reads the props from the byte array and puts them in the Properties target
      * See readProperties() for the format.
      * Warning - confusing method name, Properties is the target.
-     *
-     * @deprecated unused
+     * Strings must be UTF-8 encoded in the byte array.
      *
      * @param source source
      * @param target returned Properties
      * @return new offset
      */
-    @Deprecated
-    public static int fromProperties(byte source[], int offset, Properties target) throws DataFormatException, IOException {
+    public static int fromProperties(byte source[], int offset, Properties target) throws DataFormatException {
         int size = (int)fromLong(source, offset, 2);
         offset += 2;
         ByteArrayInputStream in = new ByteArrayInputStream(source, offset, size);
         byte eqBuf[] = new byte[EQUAL_BYTES.length];
         byte semiBuf[] = new byte[SEMICOLON_BYTES.length];
         while (in.available() > 0) {
-            String key = readString(in);
-            int read = read(in, eqBuf);
-            if ((read != eqBuf.length) || (!eq(eqBuf, EQUAL_BYTES))) {
-                break;
+            String key;
+            try {
+                key = readString(in);
+                int read = read(in, eqBuf);
+                if ((read != eqBuf.length) || (!eq(eqBuf, EQUAL_BYTES))) {
+                    throw new DataFormatException("Bad key");
+                }
+            } catch (IOException ioe) {
+                throw new DataFormatException("Bad key", ioe);
             }
-            String val = readString(in);
-            read = read(in, semiBuf);
-            if ((read != semiBuf.length) || (!eq(semiBuf, SEMICOLON_BYTES))) {
-                break;
+            String val;
+            try {
+                val = readString(in);
+                int read = read(in, semiBuf);
+                if ((read != semiBuf.length) || (!eq(semiBuf, SEMICOLON_BYTES))) {
+                    throw new DataFormatException("Bad value");
+                }
+            } catch (IOException ioe) {
+                throw new DataFormatException("Bad value", ioe);
             }
             target.put(key, val);
         }
@@ -246,24 +294,20 @@ public class DataHelper {
     /**
      * Writes the props to returned byte array, not sorted
      * (unless the opts param is an OrderedProperties)
+     * Strings will be UTF-8 encoded in the byte array.
      * See readProperties() for the format.
      * Property keys and values must not contain '=' or ';', this is not checked and they are not escaped
      * Keys and values must be 255 bytes or less,
      * Formatted length must not exceed 65535 bytes
      * Warning - confusing method name, Properties is the source.
      *
-     * @deprecated unused
-     *
-     * @throws RuntimeException if either is too long.
+     * @throws DataFormatException if key, value, or total is too long
      */
-    @Deprecated
-    public static byte[] toProperties(Properties opts) {
+    public static byte[] toProperties(Properties opts) throws DataFormatException {
         try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(2);
-            writeProperties(baos, opts);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(2 + (32 * opts.size()));
+            writeProperties(baos, opts, true, false);
             return baos.toByteArray();
-        } catch (DataFormatException dfe) {
-            throw new RuntimeException("Format error writing to memory?! " + dfe.getMessage());
         } catch (IOException ioe) {
             throw new RuntimeException("IO error writing to memory?! " + ioe.getMessage());
         }
@@ -276,9 +320,9 @@ public class DataHelper {
     public static String toString(Properties options) {
         StringBuilder buf = new StringBuilder();
         if (options != null) {
-            for (Iterator iter = options.keySet().iterator(); iter.hasNext();) {
-                String key = (String) iter.next();
-                String val = options.getProperty(key);
+            for (Map.Entry entry : options.entrySet()) {
+                String key = (String) entry.getKey();
+                String val = (String) entry.getValue();
                 buf.append("[").append(key).append("] = [").append(val).append("]");
             }
         } else {
@@ -353,9 +397,9 @@ public class DataHelper {
         try {
             out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(file), "UTF-8")));
             out.println("# NOTE: This I2P config file must use UTF-8 encoding");
-            for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
-                String name = (String)iter.next();
-                String val = props.getProperty(name);
+            for (Map.Entry entry : props.entrySet()) {
+                String name = (String) entry.getKey();
+                String val = (String) entry.getValue();
                 out.println(name + "=" + val);
             }
             out.flush();
@@ -720,10 +764,8 @@ public class DataHelper {
     }
     
     /** deprecated - used only in DatabaseLookupMessage */
-    @Deprecated
     public static final byte BOOLEAN_TRUE = 0x1;
     /** deprecated - used only in DatabaseLookupMessage */
-    @Deprecated
     public static final byte BOOLEAN_FALSE = 0x0;
     /** @deprecated unused */
     @Deprecated
@@ -814,6 +856,10 @@ public class DataHelper {
         return lhs == rhs;
     }
 
+    /**
+     *  Unlike eq(byte[], byte[]), this returns false if both lhs and rhs are null.
+     *  @throws AIOOBE if either array isn't long enough
+     */
     public final static boolean eq(byte lhs[], int offsetLeft, byte rhs[], int offsetRight, int length) {
         if ( (lhs == null) || (rhs == null) ) return false;
         if (length <= 0) return true;
@@ -962,6 +1008,7 @@ public class DataHelper {
      * the newline), or null if EOF reached before the newline was found
      * Warning - strips \n but not \r
      * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
+     * Warning - not UTF-8
      */
     public static String readLine(InputStream in) throws IOException { return readLine(in, (Sha256Standalone)null); }
 
@@ -969,6 +1016,7 @@ public class DataHelper {
      * update the hash along the way
      * Warning - strips \n but not \r
      * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
+     * Warning - not UTF-8
      */
     public static String readLine(InputStream in, Sha256Standalone hash) throws IOException {
         StringBuilder buf = new StringBuilder(128);
@@ -983,6 +1031,7 @@ public class DataHelper {
      * Read in a line, placing it into the buffer (excluding the newline).
      * Warning - strips \n but not \r
      * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
+     * Warning - not UTF-8
      * @deprecated use StringBuilder version
      *
      * @return true if the line was read, false if eof was reached before a 
@@ -1000,6 +1049,7 @@ public class DataHelper {
      * update the hash along the way
      * Warning - strips \n but not \r
      * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
+     * Warning - not UTF-8
      * @deprecated use StringBuilder version
      */
     @Deprecated
@@ -1024,6 +1074,7 @@ public class DataHelper {
      * Read in a line, placing it into the buffer (excluding the newline).
      * Warning - strips \n but not \r
      * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
+     * Warning - not UTF-8
      *
      * @return true if the line was read, false if eof was reached before a 
      *              newline was found
@@ -1036,6 +1087,7 @@ public class DataHelper {
      * update the hash along the way
      * Warning - strips \n but not \r
      * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
+     * Warning - not UTF-8
      */
     public static boolean readLine(InputStream in, StringBuilder buf, Sha256Standalone hash) throws IOException {
         int c = -1;
@@ -1310,6 +1362,12 @@ public class DataHelper {
         return rv;
     }
 
+    /**
+     *  Same as orig.getBytes("UTF-8") but throws an unchecked RuntimeException
+     *  instead of an UnsupportedEncodingException if no UTF-8, for ease of use.
+     *
+     *  @throws RuntimeException
+     */
     public static byte[] getUTF8(String orig) {
         if (orig == null) return null;
         try {
@@ -1318,10 +1376,26 @@ public class DataHelper {
             throw new RuntimeException("no utf8!?");
         }
     }
+
+    /**
+     *  Same as orig.getBytes("UTF-8") but throws an unchecked RuntimeException
+     *  instead of an UnsupportedEncodingException if no UTF-8, for ease of use.
+     *
+     *  @throws RuntimeException
+     *  @deprecated unused
+     */
     public static byte[] getUTF8(StringBuffer orig) {
         if (orig == null) return null;
         return getUTF8(orig.toString());
     }
+
+    /**
+     *  Same as new String(orig, "UTF-8") but throws an unchecked RuntimeException
+     *  instead of an UnsupportedEncodingException if no UTF-8, for ease of use.
+     *
+     *  @throws RuntimeException
+     *  @deprecated unused
+     */
     public static String getUTF8(byte orig[]) {
         if (orig == null) return null;
         try {
@@ -1330,6 +1404,14 @@ public class DataHelper {
             throw new RuntimeException("no utf8!?");
         }
     }
+
+    /**
+     *  Same as new String(orig, "UTF-8") but throws an unchecked RuntimeException
+     *  instead of an UnsupportedEncodingException if no UTF-8, for ease of use.
+     *
+     *  @throws RuntimeException
+     *  @deprecated unused
+     */
     public static String getUTF8(byte orig[], int offset, int len) {
         if (orig == null) return null;
         try {

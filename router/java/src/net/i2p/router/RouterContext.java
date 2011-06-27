@@ -121,7 +121,7 @@ public class RouterContext extends I2PAppContext {
 
     public void initAll() {
         if (getBooleanProperty("i2p.dummyClientFacade"))
-            System.err.println("i2p.dummpClientFacade currently unsupported");
+            System.err.println("i2p.dummyClientFacade currently unsupported");
         _clientManagerFacade = new ClientManagerFacadeImpl(this);
         // removed since it doesn't implement InternalClientManager for now
         //else

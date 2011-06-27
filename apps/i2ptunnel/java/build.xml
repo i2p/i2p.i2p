@@ -20,7 +20,10 @@
             </classpath>
         </depend>
     </target>
+
     <property name="javac.compilerargs" value="" />
+    <property name="require.gettext" value="true" />
+
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
@@ -34,10 +37,7 @@
         </javac>
     </target>
 
-    <!-- TODO: Move the web classes from the jar to the war - they are not part of the API
-      -  This will require sponge to rewrite some seedless stuff that uses it.
-     -->
-    <target name="jar" depends="builddep, compile, jarUpToDate" unless="jar.uptodate" >
+    <target name="listChangedFiles" depends="jarUpToDate" if="shouldListChanges" >
         <exec executable="mtn" outputproperty="workspace.changes.j" errorproperty="mtn.error2" failifexecutionfails="false" >
             <arg value="list" />
             <arg value="changed" />
@@ -49,6 +49,15 @@
             <arg value="[:space:]" />
             <arg value="," />
         </exec>
+    </target>
+
+
+    <!-- TODO: Move the web classes from the jar to the war - they are not part of the API
+      -  This will require sponge to rewrite some seedless stuff that uses it.
+     -->
+    <target name="jar" depends="builddep, compile, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
+        <!-- set if unset -->
+        <property name="workspace.changes.j.tr" value="" />
         <jar destfile="./build/i2ptunnel.jar" basedir="./build/obj" includes="**/*.class">
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.i2ptunnel.I2PTunnel" />
@@ -64,15 +73,23 @@
         <uptodate property="jar.uptodate" targetfile="build/i2ptunnel.jar" >
             <srcfiles dir= "build/obj" includes="**/*.class" />
         </uptodate>
+        <condition property="shouldListChanges" >
+            <and>
+                <not>
+                    <isset property="jar.uptodate" />
+                </not>
+                <isset property="mtn.available" />
+            </and>
+        </condition>
     </target>
 
     <target name="bundle" depends="compile, precompilejsp">
         <!-- Update the messages_*.po files.
              We need to supply the bat file for windows, and then change the fail property to true -->
-        <exec executable="sh" osfamily="unix" failifexecutionfails="true" >
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="${require.gettext}" >
             <arg value="./bundle-messages.sh" />
         </exec>
-        <exec executable="sh" osfamily="mac" failifexecutionfails="true" >
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="${require.gettext}" >
             <arg value="./bundle-messages.sh" />
         </exec>
 		<!-- multi-lang is optional -->
@@ -83,21 +100,21 @@
 
     <target name="poupdate" depends="compile, precompilejsp">
         <!-- Update the messages_*.po files. -->
-        <exec executable="sh" osfamily="unix" failifexecutionfails="true" >
+        <exec executable="sh" osfamily="unix" failifexecutionfails="true" failonerror="true" >
             <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>
-        <exec executable="sh" osfamily="mac" failifexecutionfails="true" >
+        <exec executable="sh" osfamily="mac" failifexecutionfails="true" failonerror="true" >
             <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>
-        <exec executable="sh" osfamily="windows" failifexecutionfails="true" >
+        <exec executable="sh" osfamily="windows" failifexecutionfails="true" failonerror="true" >
             <arg value="./bundle-messages.sh" />
             <arg value="-p" />
         </exec>
     </target>
 
-    <target name="war" depends="precompilejsp, bundle, warUpToDate" unless="war.uptodate" > 
+    <target name="listChangedFiles2" depends="warUpToDate" if="shouldListChanges2" >
         <exec executable="mtn" outputproperty="workspace.changes.w" errorproperty="mtn.error2" failifexecutionfails="false" >
             <arg value="list" />
             <arg value="changed" />
@@ -109,6 +126,11 @@
             <arg value="[:space:]" />
             <arg value="," />
         </exec>
+    </target>
+
+    <target name="war" depends="precompilejsp, bundle, warUpToDate, listChangedFiles2" unless="war.uptodate" > 
+        <!-- set if unset -->
+        <property name="workspace.changes.w.tr" value="" />
         <war destfile="build/i2ptunnel.war" webxml="../jsp/web-out.xml"
              basedir="../jsp/" excludes="web.xml, web-fragment.xml, web-out.xml, **/*.java, *.jsp">
             <manifest>
@@ -123,6 +145,14 @@
         <uptodate property="war.uptodate" targetfile="build/i2ptunnel.war" >
             <srcfiles dir= "../jsp" excludes="web.xml, web-fragment.xml, **/*.java, *.jsp" />
         </uptodate>
+        <condition property="shouldListChanges2" >
+            <and>
+                <not>
+                    <isset property="war.uptodate" />
+                </not>
+                <isset property="mtn.available" />
+            </and>
+        </condition>
     </target>
 
     <target name="precompilejsp" depends="jar" unless="precompilejsp.uptodate">

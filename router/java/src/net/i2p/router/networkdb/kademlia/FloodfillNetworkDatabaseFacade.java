@@ -48,7 +48,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
          _verifiesInProgress = new ConcurrentHashSet(8);
         _alwaysQuery = _context.getProperty("netDb.alwaysQuery");
 
-        _context.statManager().createRateStat("netDb.successTime", "How long a successful search takes", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRequiredRateStat("netDb.successTime", "Time for successful lookup (ms)", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("netDb.failedTime", "How long a failed search takes", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("netDb.failedAttemptedPeers", "How many peers we sent a search to when the search fails", "NetworkDatabase", new long[] { 60*1000l, 10*60*1000l });
         _context.statManager().createRateStat("netDb.successPeers", "How many peers are contacted in a successful search", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
@@ -361,6 +361,16 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
      *  a little higher than 1 or 2. */
     protected final static int MIN_ACTIVE_PEERS = 5;
 
+    /** @since 0.8.7 */
+    private static final int MAX_DB_BEFORE_SKIPPING_SEARCH;
+    static {
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        if (maxMemory == Long.MAX_VALUE)
+            maxMemory = 128*1024*1024l;
+        // 250 for every 32 MB, min of 250, max of 1250
+        MAX_DB_BEFORE_SKIPPING_SEARCH = (int) Math.max(250l, Math.min(1250l, maxMemory / ((32 * 1024 * 1024l) / 250)));
+    }
+
     /** 
       * Search for a newer router info, drop it from the db if the search fails,
       * unless just started up or have bigger problems.
@@ -380,9 +390,14 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             return;
         }
 
-        if (_context.jobQueue().getMaxLag() > 500) {
+        // should we skip the search?
+        if (_floodfillEnabled ||
+            _context.jobQueue().getMaxLag() > 500 ||
+            getKBucketSetSize() > MAX_DB_BEFORE_SKIPPING_SEARCH) {
             // don't try to overload ourselves (e.g. failing 3000 router refs at
             // once, and then firing off 3000 netDb lookup tasks)
+            // Also don't queue a search if we have plenty of routerinfos
+            // (KBucketSetSize() includes leasesets but avoids locking)
             super.lookupBeforeDropping(peer, info);
             return; 
         }

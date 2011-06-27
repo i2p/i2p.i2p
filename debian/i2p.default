@@ -1,0 +1,13 @@
+# Defaults for i2p initscript (/etc/init.d/i2p)
+# This is a posix shell fragment
+
+# [automatically edited by postinst, do not change line format ]
+# Run 'dpkg-reconfigure -plow i2p' to change these values.
+
+# I2P daemon. If set to true, i2p will start automatically when 
+# the computer boots
+RUN_DAEMON="false"
+
+# The user that runs the I2P daemon. By default this is set to i2psvc.
+# You may want to change this to use a manually installed I2P profile.
+I2PUSER="i2psvc"

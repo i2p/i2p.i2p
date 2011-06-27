@@ -23,7 +23,7 @@ public interface CPUInfo
     public String getVendor();
     /**
      * @return A string detailing what type of CPU that is present in the machine. I.e. 'Pentium IV' etc.
-     * @throws UnknownCPUException If for any reson the retrieval of the requested information
+     * @throws UnknownCPUException If for any reason the retrieval of the requested information
      * failed. The message encapsulated in the execption indicates the 
      * cause of the failure.
      */
@@ -61,6 +61,4 @@ public interface CPUInfo
      * @return true iff the CPU support the SSE4A instruction set.
      */
     public boolean hasSSE4A();
-
-    public boolean IsC3Compatible();
 }

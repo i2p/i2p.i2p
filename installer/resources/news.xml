@@ -1,12 +1,34 @@
 <!--
-<i2p.news date="$Date: 2011-04-18 00:00:00 $">
-<i2p.release version="0.8.5" date="2011/04/18" minVersion="0.6" />
+<i2p.news date="$Date: 2011-05-16 00:00:00 $">
+<i2p.release version="0.8.7" date="2011/06/27" minVersion="0.6" />
 -->
 <div lang="en">
-<h3>2011-04-18: <b>0.8.5 <a href="http://www.i2p2.i2p/release-0.8.5.html">Released</a></b></h3>
-<p>
-The 0.8.5 release contains a few bug fixes and performance improvements, and lots of translation updates.
-As usual, upgrading is recommended.
+<h3>2011-06-27: <b>0.8.7 <a href="http://www.i2p2.i2p/release-0.8.7.html">Released</a></b></h3>
+
+<p>I2P release 0.8.7 contains several upgrades to long-neglected components,
+ including the Naming Services, graphing, the native CPU ID and BigInteger
+ libraries, crypto implementations, and the wrapper.</p>
+
+<p>Thanks to new contributor KillYourTV who was instrumental in implementing
+ and testing these upgrades, with additional support from sponge and hottuna.</p>
+
+<p>CPU ID enhancements are by hottuna, generously funded by
+ <a href="http://relakks.com/">http://relakks.com/</a> and <a href="http://ipredator.se/">http://ipredator.se/</a> -
+ thanks to Peter Sunde and Jan-Erik Fiske for their support.</p>
+
+<p>Also, for the first time, we now have an official
+<a href="https://launchpad.net/~i2p-maintainers/+archive/i2p">I2P Personal Package Archive (PPA) on launchpad.net</a>.
+For those of you using Ubuntu, this offers an easy way to install I2P and keep the
+ various components up-to-date. The I2P package offers the option of installing as
+ a service, or it may be started on-demand as usual. This PPA is currently maintained
+ by KillYourTV with support by other members of the development team.
+The <a href="http://www.i2p2.i2p/debian">Ubuntu/Debian installation instructions</a> are on our website.
+</p>
+
+<p>For those updating over the network, this update is about 4 times the usual size,
+ due to the inclusion of the jbigi updates. Please be patient while downloading the update over the network.
+
+
 </p><p>
 Please help grow the network.
 Say hello to the volunteers on the <a href="irc://127.0.0.1:6668/i2p-help">#i2p-help IRC channel</a>.

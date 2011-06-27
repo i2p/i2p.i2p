@@ -1,0 +1,25 @@
+#!/bin/sh
+
+ROUTER=$(/bin/echo -ne "_")$(cat ./router/java/src/net/i2p/router/RouterVersion.java | grep -e "public final static long BUILD" | cut -f2 -d"=" | cut -f1 -d";" | sed -re "s/ //g")
+if [ "$ROUTER" = "_" ] ;  then
+	ROUTER="_0"
+fi
+
+#
+# That was the easy one, now for the tough one.
+#
+
+CORE=$(cat core/java/src/net/i2p/CoreVersion.java | grep -e "public final static String VERSION" | cut -f2 -d'"' | sed -re "s/ //g")
+CORE1=$(/bin/echo -n $CORE.x.x | sed -re "s/(.*)\.(.*)\.(.*)\.(.*)/\1/")
+CORE2=$(/bin/echo -n $CORE.x | sed -re "s/(.*)\.(.*)\.(.*)\.(.*)/\1/")
+
+if [ "$CORE.x.x" = "$CORE1" ] ; then
+	CORE=$(/bin/echo -ne $CORE".0.0")
+fi
+if [ "$CORE.x" = "$CORE2" ] ; then
+	CORE=$(/bin/echo -ne $CORE".0")
+fi
+
+VERSION=$(/bin/echo $CORE$ROUTER)
+
+echo $VERSION

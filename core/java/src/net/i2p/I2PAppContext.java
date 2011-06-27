@@ -7,7 +7,6 @@ import java.util.Random;
 import java.util.Set;
 
 import net.i2p.client.naming.NamingService;
-import net.i2p.client.naming.PetNameDB;
 import net.i2p.crypto.AESEngine;
 import net.i2p.crypto.CryptixAESEngine;
 import net.i2p.crypto.DSAEngine;
@@ -72,7 +71,6 @@ public class I2PAppContext {
     private StatManager _statManager;
     private SessionKeyManager _sessionKeyManager;
     private NamingService _namingService;
-    private PetNameDB _petnameDb;
     private ElGamalEngine _elGamalEngine;
     private ElGamalAESEngine _elGamalAESEngine;
     private AESEngine _AESEngine;
@@ -89,7 +87,6 @@ public class I2PAppContext {
     private volatile boolean _statManagerInitialized;
     private volatile boolean _sessionKeyManagerInitialized;
     private volatile boolean _namingServiceInitialized;
-    private volatile boolean _petnameDbInitialized;
     private volatile boolean _elGamalEngineInitialized;
     private volatile boolean _elGamalAESEngineInitialized;
     private volatile boolean _AESEngineInitialized;
@@ -177,7 +174,6 @@ public class I2PAppContext {
         _statManager = null;
         _sessionKeyManager = null;
         _namingService = null;
-        _petnameDb = null;
         _elGamalEngine = null;
         _elGamalAESEngine = null;
         _logManager = null;
@@ -580,23 +576,6 @@ public class I2PAppContext {
         }
     }
     
-    /** @deprecated unused */
-    public PetNameDB petnameDb() {
-        if (!_petnameDbInitialized)
-            initializePetnameDb();
-        return _petnameDb;
-    }
-
-    /** @deprecated unused */
-    private void initializePetnameDb() {
-        synchronized (this) {
-            if (_petnameDb == null) {
-                _petnameDb = new PetNameDB();
-            }
-            _petnameDbInitialized = true;
-        }
-    }
-    
     /**
      * This is the ElGamal engine used within this context.  While it doesn't
      * really have anything substantial that is context specific (the algorithm
@@ -708,14 +687,14 @@ public class I2PAppContext {
         }
     }
 
-    /** @deprecated unused */
+    /** @deprecated used only by syndie */
     public HMAC256Generator hmac256() {
         if (!_hmac256Initialized)
             initializeHMAC256();
         return _hmac256;
     }
 
-    /** @deprecated unused */
+    /** @deprecated used only by syndie */
     private void initializeHMAC256() {
         synchronized (this) {
             if (_hmac256 == null) {

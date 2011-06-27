@@ -29,8 +29,15 @@ rem
 rem Install the Wrapper as an NT service.
 rem
 :startup
+:: We remove the existing service to
+:: 1) force the service to stop
+:: 2) update service configuration in case wrapper.config was edited
+:: 3) prevent hanging the installer if 'install as service' is selected 
+::    and it's already enabled as a service.
+"%_WRAPPER_EXE%" -r %_WRAPPER_CONF%
 "%_WRAPPER_EXE%" -i %_WRAPPER_CONF%
 if not errorlevel 1 goto :eof
 if %2=="--nopause" goto :eof
 pause
 
+:eof

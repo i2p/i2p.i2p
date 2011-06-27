@@ -1,0 +1,11 @@
+var/lib/i2p/i2p-config/blocklist.txt etc/i2p/blocklist.txt
+var/lib/i2p/i2p-config/bob.config etc/i2p/bob.config
+var/lib/i2p/i2p-config/clients.config etc/i2p/clients.config
+var/lib/i2p/i2p-config/hosts.txt etc/i2p/hosts.txt
+var/lib/i2p/i2p-config/i2psnark.config etc/i2p/i2psnark.config
+var/lib/i2p/i2p-config/i2ptunnel.config etc/i2p/i2ptunnel.config
+var/lib/i2p/i2p-config/eepsite/jetty.xml etc/i2p/jetty.xml
+var/lib/i2p/i2p-config/plugins.config etc/i2p/plugins.config
+var/lib/i2p/i2p-config/router.config etc/i2p/router.config
+var/lib/i2p/i2p-config/systray.config etc/i2p/systray.config
+var/lib/i2p/i2p-config/webapps.config etc/i2p/webapps.config

@@ -31,7 +31,7 @@ import net.i2p.util.SecureFileOutputStream;
 
 public class CreateRouterInfoJob extends JobImpl {
     private static Log _log = new Log(CreateRouterInfoJob.class);
-    private Job _next;
+    private final Job _next;
     
     public CreateRouterInfoJob(RouterContext ctx, Job next) {
         super(ctx);
@@ -43,10 +43,15 @@ public class CreateRouterInfoJob extends JobImpl {
     public void runJob() {
         _log.debug("Creating the new router info");
         // create a new router info and store it where LoadRouterInfoJob looks
-        createRouterInfo();
+        synchronized (getContext().router().routerInfoFileLock) {
+            createRouterInfo();
+        }
         getContext().jobQueue().addJob(_next);
     }
     
+    /**
+     *  Caller must hold Router.routerInfoFileLock
+     */
     RouterInfo createRouterInfo() {
         RouterInfo info = new RouterInfo();
         FileOutputStream fos1 = null;
@@ -78,6 +83,9 @@ public class CreateRouterInfoJob extends JobImpl {
             info.setIdentity(ident);
             
             info.sign(signingPrivKey);
+
+            if (!info.isValid())
+                throw new DataFormatException("RouterInfo we just built is invalid: " + info);
             
             String infoFilename = getContext().getProperty(Router.PROP_INFO_FILENAME, Router.PROP_INFO_FILENAME_DEFAULT);
             File ifile = new File(getContext().getRouterDir(), infoFilename);

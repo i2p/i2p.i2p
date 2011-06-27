@@ -123,7 +123,7 @@ public class SummaryBarRenderer {
                .append(_("Health Report"))
                .append("\">")
                .append(_("Logs"))
-               .append("</a>\n" +
+               .append("</a>\n");
 
            //          "<a href=\"/jobs.jsp\" target=\"_top\" title=\"")
            //  .append(_("Show the router's workload, and how it's performing"))
@@ -131,13 +131,15 @@ public class SummaryBarRenderer {
            //  .append(_("Jobs"))
            //  .append("</a>\n" +
 
-                       "<a href=\"/graphs\" target=\"_top\" title=\"")
+            if (!StatSummarizer.isDisabled()) {
+                buf.append("<a href=\"/graphs\" target=\"_top\" title=\"")
                .append(_("Graph router performance"))
                .append("\">")
                .append(_("Graphs"))
-               .append("</a>\n" +
+               .append("</a>\n");
+            }
 
-                       "<a href=\"/stats\" target=\"_top\" title=\"")
+            buf.append("<a href=\"/stats\" target=\"_top\" title=\"")
                .append(_("Textual router performance statistics"))
                .append("\">")
                .append(_("Stats"))

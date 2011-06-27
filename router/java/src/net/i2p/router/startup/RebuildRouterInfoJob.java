@@ -45,7 +45,7 @@ import net.i2p.util.SecureFileOutputStream;
  *
  */
 public class RebuildRouterInfoJob extends JobImpl {
-    private Log _log;
+    private final Log _log;
     
     private final static long REBUILD_DELAY = 45*1000; // every 30 seconds
     
@@ -133,17 +133,24 @@ public class RebuildRouterInfoJob extends JobImpl {
                 _log.log(Log.CRIT, "Error rebuilding the new router info", dfe);
                 return;
             }
-            
+
+            if (!info.isValid()) {
+                _log.log(Log.CRIT, "RouterInfo we just built is invalid: " + info, new Exception());
+                return;
+            }
+
             FileOutputStream fos = null;
-            try {
-                fos = new SecureFileOutputStream(infoFile);
-                info.writeBytes(fos);
-            } catch (DataFormatException dfe) {
-                _log.log(Log.CRIT, "Error rebuilding the router information", dfe);
-            } catch (IOException ioe) {
-                _log.log(Log.CRIT, "Error writing out the rebuilt router information", ioe);
-            } finally {
-                if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+            synchronized (getContext().router().routerInfoFileLock) {
+                try {
+                    fos = new SecureFileOutputStream(infoFile);
+                    info.writeBytes(fos);
+                } catch (DataFormatException dfe) {
+                    _log.log(Log.CRIT, "Error rebuilding the router information", dfe);
+                } catch (IOException ioe) {
+                    _log.log(Log.CRIT, "Error writing out the rebuilt router information", ioe);
+                } finally {
+                    if (fos != null) try { fos.close(); } catch (IOException ioe) {}
+                }
             }
             
         } else {

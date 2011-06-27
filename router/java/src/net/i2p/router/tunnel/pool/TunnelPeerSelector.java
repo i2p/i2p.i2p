@@ -34,13 +34,16 @@ public abstract class TunnelPeerSelector {
      * Which peers should go into the next tunnel for the given settings?  
      * 
      * @return ordered list of Hash objects (one per peer) specifying what order
-     *         they should appear in a tunnel (endpoint first).  This includes
+     *         they should appear in a tunnel (ENDPOINT FIRST).  This includes
      *         the local router in the list.  If there are no tunnels or peers
      *         to build through, and the settings reject 0 hop tunnels, this will
      *         return null.
      */
     public abstract List<Hash> selectPeers(RouterContext ctx, TunnelPoolSettings settings);
     
+    /**
+     *  @return randomized number of hops 0-7, not including ourselves
+     */
     protected int getLength(RouterContext ctx, TunnelPoolSettings settings) {
         int length = settings.getLength();
         int override = settings.getLengthOverride();
@@ -61,8 +64,8 @@ public abstract class TunnelPeerSelector {
         }
         if (length < 0)
             length = 0;
-        if (length > 8) // as documented in tunnel.html
-            length = 8;
+        else if (length > 7) // as documented in tunnel.html
+            length = 7;
         /*
         if ( (ctx.tunnelManager().getOutboundTunnelCount() <= 0) || 
              (ctx.tunnelManager().getFreeTunnelCount() <= 0) ) {
