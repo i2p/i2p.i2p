@@ -1,10 +1,30 @@
-i2p (0.8.6-6~build9) UNRELEASED; urgency=low
+i2p (0.8.7-1) stable; urgency=low
 
-  * Ship own router.config with router.updatesDisabled=true to prevent
-    upgrades to be performed by the router itself. Upgrades *must* take place
-    via the package manager.
+  * The "W00t! My debs are official!" release
+  * New upstream release. See /usr/share/doc/i2p/changelog.gz for the details.
+  * Drop from debian/patches: 0002-sync-countries, 0006-i2p-jetty,
+    0007-eepget-redirections, 0008-config-news, 0009-jetty-snark-disable and
+    re-work the existing patches.
 
- -- Kill Your TV <killyourtv@i2pmail.org>  Fri, 27 May 2011 17:33:21 +0000
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 26 Jun 2011 18:51:31 +0000
+
+i2p (0.8.6-7) stable; urgency=low
+
+  * Fix bug in maintainer script that caused upgrade to fail on some systems.
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 29 May 2011 15:53:04 +0000
+
+i2p (0.8.6-6) stable; urgency=low
+
+  * Remove extraneous cruft from debian/rules from back when cpuid couldn't be
+    built for i386
+  * Ship our own router.config with router.updatesDisabled=true to prevent
+    upgrades to be performed by the router itself. Per Debian policy, upgrades
+    *must* take place via the package manager.
+  * Backported eepget fix
+  * Backported news fix
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Sat, 28 May 2011 10:23:51 +0000
 
 i2p (0.8.6-5) stable; urgency=low
 
