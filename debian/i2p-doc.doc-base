@@ -1,9 +1,9 @@
 Document: i2p-doc
 Title: API JavaDoc for i2p-doc
-Author: 
+Author: I2P Developers
 Abstract: This the API JavaDoc for i2p-doc
 Section: Programming/Java
 
 Format: HTML
-Index: /usr/share/doc/i2p-doc/api
+Index: /usr/share/doc/i2p-doc/api/index.html
 Files: /usr/share/doc/i2p-doc/api/*.html
