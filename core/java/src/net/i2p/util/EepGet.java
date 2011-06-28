@@ -55,6 +55,8 @@ public class EepGet {
     protected long _bytesTransferred;
     protected long _bytesRemaining;
     protected int _currentAttempt;
+    protected int _responseCode = -1;
+    protected boolean _shouldWriteErrorToOutput;
     protected String _etag;
     protected String _lastModified;
     protected boolean _encodingChunked;
@@ -245,7 +247,14 @@ public class EepGet {
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified);
         public void attemptFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt, int numRetries, Exception cause);
         public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt);
+
+        /**
+         *  Note: Headers are not processed, and this is not called, for most error response codes,
+         *  unless setWriteErrorToOutput() is called before fetch().
+         *  To be changed?
+         */
         public void headerReceived(String url, int currentAttempt, String key, String val);
+
         public void attempting(String url);
     }
     protected class CLIStatusListener implements StatusListener {
@@ -560,7 +569,7 @@ public class EepGet {
             throw new IOException("HTTP response size " + _bytesRemaining + " violates maximum of " + _maxSize + " bytes");
 
         int remaining = (int)_bytesRemaining;
-        byte buf[] = new byte[1024];
+        byte buf[] = new byte[8*1024];
         while (_keepFetching && ( (remaining > 0) || !strictSize ) && !_aborted) {
             int toRead = buf.length;
             if (strictSize && toRead > remaining)
@@ -654,13 +663,13 @@ public class EepGet {
 
         boolean read = DataHelper.readLine(_proxyIn, buf);
         if (!read) throw new IOException("Unable to read the first line");
-        int responseCode = handleStatus(buf.toString());
+        _responseCode = handleStatus(buf.toString());
         boolean redirect = false;
         
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("rc: " + responseCode + " for " + _actualURL);
+            _log.debug("rc: " + _responseCode + " for " + _actualURL);
         boolean rcOk = false;
-        switch (responseCode) {
+        switch (_responseCode) {
             case 200: // full
                 if (_outputStream != null)
                     _out = _outputStream;
@@ -693,20 +702,51 @@ public class EepGet {
             case 404: // not found
             case 409: // bad addr helper
             case 503: // no outproxy
-                _keepFetching = false;
                 _transferFailed = true;
-                // maybe we should throw instead of return to get the return code back to the user
-                return;
+                if (_alreadyTransferred == 0 && !_shouldWriteErrorToOutput) {
+                    _keepFetching = false;
+                    return;
+                }
+                // output the error data to the stream
+                rcOk = true;
+                if (_out == null) {
+                    if (_outputStream != null)
+                        _out = _outputStream;
+                    else
+                        _out = new FileOutputStream(_outputFile, true);
+                }
+                break;
             case 416: // completed (or range out of reach)
                 _bytesRemaining = 0;
-                _keepFetching = false;
-                return;
+                if (_alreadyTransferred == 0 && !_shouldWriteErrorToOutput) {
+                    _keepFetching = false;
+                    return;
+                }
+                // output the error data to the stream
+                rcOk = true;
+                if (_out == null) {
+                    if (_outputStream != null)
+                        _out = _outputStream;
+                    else
+                        _out = new FileOutputStream(_outputFile, true);
+                }
+                break;
             case 504: // gateway timeout
                 // throw out of doFetch() to fetch() and try again
                 throw new IOException("HTTP Proxy timeout");
             default:
-                rcOk = false;
-                _keepFetching = false;
+                if (_alreadyTransferred == 0 && !_shouldWriteErrorToOutput) {
+                    _keepFetching = false;
+                } else {
+                    // output the error data to the stream
+                    rcOk = true;
+                    if (_out == null) {
+                        if (_outputStream != null)
+                            _out = _outputStream;
+                        else
+                            _out = new FileOutputStream(_outputFile, true);
+                    }
+                }
                 _transferFailed = true;
         }
 
@@ -742,7 +782,7 @@ public class EepGet {
                     increment(lookahead, cur);
                     if (isEndOfHeaders(lookahead)) {
                         if (!rcOk)
-                            throw new IOException("Invalid HTTP response code: " + responseCode);
+                            throw new IOException("Invalid HTTP response code: " + _responseCode);
                         if (_encodingChunked) {
                             _bytesRemaining = readChunkLength();
                         }
@@ -990,5 +1030,35 @@ public class EepGet {
     
     public String getContentType() {
         return _contentType;
+    }
+    
+    /**
+     *  The server response (200, etc).
+     *  @return -1 if invalid, or if the proxy never responded,
+     *  or if no proxy was used and the server never responded.
+     *  If a non-proxied request partially succeeded (for example a redirect followed
+     *  by a fail, or a partial fetch followed by a fail), this will
+     *  be the last status code received.
+     *  Note that fetch() may return false even if this returns 200.
+     *
+     *  @since 0.8.8
+     */
+    public int getStatusCode() {
+        return _responseCode;
+    }
+
+    /**
+     *  If called (before calling fetch()),
+     *  data from the server or proxy will be written to the
+     *  output file or stream even on an error response code (4xx, 5xx, etc).
+     *  The error data will only be written if no previous data was written
+     *  on an earlier try.
+     *  Caller must of course check getStatusCode() or the
+     *  fetch() return value.
+     *
+     *  @since 0.8.8
+     */
+    public void setWriteErrorToOutput() {
+        _shouldWriteErrorToOutput = true;
     }
 }
