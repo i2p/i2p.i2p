@@ -58,4 +58,4 @@ fi
 echo "Compiling C code..."
 rm -f jbigi.o $LIBFILE
 $CC -c $COMPILEFLAGS $INCLUDES ../../jbigi/src/jbigi.c
-$CC $LINKFLAGS $INCLUDES $INCLUDELIBS -o $LIBFILE jbigi.o $STATICLIBS
+$CC $LINKFLAGS $INCLUDES -o $LIBFILE jbigi.o $INCLUDELIBS $STATICLIBS
