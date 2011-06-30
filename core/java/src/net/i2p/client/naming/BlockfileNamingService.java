@@ -33,6 +33,7 @@ import net.i2p.data.Hash;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFileOutputStream;
 
+import net.metanotion.io.RAIFile;
 import net.metanotion.io.Serializer;
 import net.metanotion.io.block.BlockFile;
 import net.metanotion.io.data.UTF8StringBytes;
@@ -76,10 +77,11 @@ import net.metanotion.util.skiplist.SkipList;
 public class BlockfileNamingService extends DummyNamingService {
 
     private final BlockFile _bf;
-    private final RandomAccessFile _raf;
+    private final RAIFile _raf;
     private final List<String> _lists;
     private final List<InvalidEntry> _invalid;
     private volatile boolean _isClosed;
+    private final boolean _readOnly;
 
     private static final Serializer _infoSerializer = new PropertiesSerializer();
     private static final Serializer _stringSerializer = new UTF8StringBytes();
@@ -87,6 +89,7 @@ public class BlockfileNamingService extends DummyNamingService {
 
     private static final String HOSTS_DB = "hostsdb.blockfile";
     private static final String FALLBACK_LIST = "hosts.txt";
+    private static final String PROP_FORCE = "i2p.naming.blockfile.writeInAppContext";
 
     private static final String INFO_SKIPLIST = "%%__INFO__%%";
     private static final String PROP_INFO = "info";
@@ -100,6 +103,13 @@ public class BlockfileNamingService extends DummyNamingService {
     private static final String PROP_SOURCE = "s";
     
     /**
+     *  Opens the database at hostsdb.blockfile or creates a new
+     *  one and imports entries from hosts.txt, userhosts.txt, and privatehosts.txt.
+     *
+     *  If not in router context, the database will be opened read-only
+     *  unless the property i2p.naming.blockfile.writeInAppContext is true.
+     *  Not designed for simultaneous access by multiple processes.
+     *
      *  @throws RuntimeException on fatal error
      */
     public BlockfileNamingService(I2PAppContext context) {
@@ -107,14 +117,31 @@ public class BlockfileNamingService extends DummyNamingService {
         _lists = new ArrayList();
         _invalid = new ArrayList();
         BlockFile bf = null;
-        RandomAccessFile raf = null;
+        RAIFile raf = null;
+        boolean readOnly = false;
         File f = new File(_context.getRouterDir(), HOSTS_DB);
         if (f.exists()) {
             try {
                 // closing a BlockFile does not close the underlying file,
                 // so we must create and retain a RAF so we may close it later
-                raf = new RandomAccessFile(f, "rw");
+
+                // *** Open readonly if not in router context (unless forced)
+                readOnly = (!f.canWrite()) ||
+                           ((!context.isRouterContext()) && (!context.getBooleanProperty(PROP_FORCE)));
+                raf = new RAIFile(f, true, !readOnly);
                 bf = initExisting(raf);
+                if (readOnly && context.isRouterContext())
+                    _log.logAlways(Log.WARN, "Read-only hosts database in router context");
+                if (bf.wasMounted()) {
+                    if (context.isRouterContext())
+                        _log.logAlways(Log.WARN, "The hosts database was not closed cleanly or is still open by another process");
+                    else
+                        _log.logAlways(Log.WARN, "The hosts database is possibly in use by another process, perhaps the router? " +
+                                       "The database is not designed for simultaneous access by multiple processes.\n" +
+                                       "If you are using clients outside the router JVM, consider using the hosts.txt " +
+                                       "naming service with " +
+                                       "i2p.naming.impl=net.i2p.client.naming.HostsTxtNamingService");
+                }
             } catch (IOException ioe) {
                 if (raf != null) {
                     try { raf.close(); } catch (IOException e) {}
@@ -131,7 +158,7 @@ public class BlockfileNamingService extends DummyNamingService {
             try {
                 // closing a BlockFile does not close the underlying file,
                 // so we must create and retain a RAF so we may close it later
-                raf = new RandomAccessFile(f, "rw");
+                raf = new RAIFile(f, true, true);
                 SecureFileOutputStream.setPerms(f);
                 bf = init(raf);
             } catch (IOException ioe) {
@@ -141,9 +168,11 @@ public class BlockfileNamingService extends DummyNamingService {
                 _log.log(Log.CRIT, "Failed to initialize database", ioe);
                 throw new RuntimeException(ioe);
             }
+            readOnly = false;
         }
         _bf = bf;
         _raf = raf;
+        _readOnly = readOnly;
         _context.addShutdownTask(new Shutdown());
     }
 
@@ -152,7 +181,7 @@ public class BlockfileNamingService extends DummyNamingService {
      *  privatehosts.txt, userhosts.txt, and hosts.txt,
      *  creating a skiplist in the database for each.
      */
-    private BlockFile init(RandomAccessFile f) throws IOException {
+    private BlockFile init(RAIFile f) throws IOException {
         long start = _context.clock().now();
         try {
             BlockFile rv = new BlockFile(f, true);
@@ -221,7 +250,7 @@ public class BlockfileNamingService extends DummyNamingService {
     /**
      *  Read the info block of an existing database.
      */
-    private BlockFile initExisting(RandomAccessFile raf) throws IOException {
+    private BlockFile initExisting(RAIFile raf) throws IOException {
         long start = _context.clock().now();
         try {
             BlockFile bf = new BlockFile(raf, false);
@@ -427,6 +456,10 @@ public class BlockfileNamingService extends DummyNamingService {
     }
 
     private boolean put(String hostname, Destination d, Properties options, boolean checkExisting) {
+        if (_readOnly) {
+            _log.error("Add entry failed, read-only hosts database");
+            return false;
+        }
         String key = hostname.toLowerCase();
         String listname = FALLBACK_LIST;
         Properties props = new Properties();
@@ -475,6 +508,10 @@ public class BlockfileNamingService extends DummyNamingService {
      */
     @Override
     public boolean remove(String hostname, Properties options) {
+        if (_readOnly) {
+            _log.error("Remove entry failed, read-only hosts database");
+            return false;
+        }
         String key = hostname.toLowerCase();
         String listname = FALLBACK_LIST;
         if (options != null) {
@@ -657,7 +694,7 @@ public class BlockfileNamingService extends DummyNamingService {
                      de != null &&
                      de.dest != null &&
                      de.dest.getPublicKey() != null;
-        if (!rv)
+        if ((!rv) && (!_readOnly))
             _invalid.add(new InvalidEntry(key, listname));
         return rv;
     }
@@ -731,7 +768,11 @@ public class BlockfileNamingService extends DummyNamingService {
             try {
                 _bf.close();
             } catch (IOException ioe) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Error closing", ioe);
             } catch (RuntimeException e) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Error closing", e);
             }
             try {
                 _raf.close();
@@ -870,8 +911,16 @@ public class BlockfileNamingService extends DummyNamingService {
         }
     }
 
+    /**
+     *  BlockfileNamingService [force]
+     *  force = force writable
+     */
     public static void main(String[] args) {
-        BlockfileNamingService bns = new BlockfileNamingService(I2PAppContext.getGlobalContext());
+        Properties ctxProps = new Properties();
+        if (args.length > 0 && args[0].equals("force"))
+            ctxProps.setProperty(PROP_FORCE, "true");
+        I2PAppContext ctx = new I2PAppContext(ctxProps);
+        BlockfileNamingService bns = new BlockfileNamingService(ctx);
         List<String> names = null;
         Properties props = new Properties();
         try {

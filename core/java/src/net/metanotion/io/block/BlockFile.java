@@ -90,6 +90,9 @@ public class BlockFile {
 	private int mounted = 0;
 	public int spanSize = 16;
 
+	/** I2P was the file locked when we opened it? */
+	private final boolean _wasMounted;
+
 	private BSkipList metaIndex;
 	/** cached list of free pages, only valid if freListStart > 0 */
 	private FreeListBlock flb;
@@ -258,11 +261,19 @@ public class BlockFile {
 		return curPage;
 	}
 
+	/** Use this constructor with a readonly RAI for a readonly blockfile */
 	public BlockFile(RandomAccessInterface rai) throws IOException { this(rai, false); }
+
+	/** RAF must be writable */
 	public BlockFile(RandomAccessFile raf) throws IOException { this(new RAIFile(raf), false); }
+
+	/** RAF must be writable */
 	public BlockFile(RandomAccessFile raf, boolean init) throws IOException { this(new RAIFile(raf), init); }
+
+	/** File must be writable */
 	public BlockFile(File f, boolean init) throws IOException { this(new RAIFile(f, true, true), init); }
 
+	/** Use this constructor with a readonly RAI and init = false for a readonly blockfile */
 	public BlockFile(RandomAccessInterface rai, boolean init) throws IOException {
 		if(rai==null) { throw new NullPointerException(); }
 		
@@ -283,14 +294,24 @@ public class BlockFile {
 				throw new IOException("Bad magic number");
 			}
 		}
-		if (mounted != 0)
+		_wasMounted = mounted != 0;
+		if (_wasMounted)
 			log.warn("Warning - file was not previously closed");
 		if(fileLen != file.length())
 			throw new IOException("Expected file length " + fileLen +
 		                              " but actually " + file.length());
-		mount();
+		if (rai.canWrite())
+			mount();
 
 		metaIndex = new BSkipList(spanSize, this, METAINDEX_PAGE, new StringBytes(), new IntBytes());
+	}
+
+	/**
+	 *  I2P was the file locked when we opened it?
+	 *  @since 0.8.8
+	 */
+	public boolean wasMounted() {
+		return _wasMounted;
 	}
 
 	/**
@@ -454,8 +475,10 @@ public class BlockFile {
 		}
 
 		// Unmount.
-		file.seek(BlockFile.OFFSET_MOUNTED);
-		file.writeShort(0);
+		if (file.canWrite()) {
+			file.seek(BlockFile.OFFSET_MOUNTED);
+			file.writeShort(0);
+		}
 	}
 
 	public void bfck(boolean fix) {

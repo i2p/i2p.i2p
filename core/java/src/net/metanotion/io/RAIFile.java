@@ -38,13 +38,17 @@ import java.io.RandomAccessFile;
 public class RAIFile implements RandomAccessInterface, DataInput, DataOutput {
 	private File f;
 	private RandomAccessFile delegate;
-	private boolean r=false, w=false;
+	private final boolean r, w;
 
 	public RAIFile(RandomAccessFile file) throws FileNotFoundException {
 		this.f = null;
 		this.delegate = file;
+		this.r = true;
+		// fake, we don't really know
+		this.w = true;
 	}
 
+	/** @param read must be true */
 	public RAIFile(File file, boolean read, boolean write) throws FileNotFoundException {
 		this.f = file;
 		this.r = read;
@@ -53,6 +57,15 @@ public class RAIFile implements RandomAccessInterface, DataInput, DataOutput {
 		if(this.r) { mode += "r"; }
 		if(this.w) { mode += "w"; }
 		this.delegate = new RandomAccessFile(file, mode);
+	}
+
+	/**
+	 *  I2P is the file writable?
+	 *  Only valid if the File constructor was used, not the RAF constructor
+	 *  @since 0.8.8
+	 */
+	public boolean canWrite() {
+		return this.w;
 	}
 
 	public long getFilePointer()		throws IOException { return delegate.getFilePointer(); }

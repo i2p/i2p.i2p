@@ -58,7 +58,8 @@ class DummyNamingService extends NamingService {
         if (hostname.length() >= 516) {
             d = lookupBase64(hostname);
             // What the heck, cache these too
-            putCache(hostname, d);
+            if (d != null)
+                putCache(hostname, d);
             return d;
         }
 
