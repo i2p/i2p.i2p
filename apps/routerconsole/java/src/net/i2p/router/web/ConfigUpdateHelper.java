@@ -67,11 +67,14 @@ public class ConfigUpdateHelper extends HelperBase {
             return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateUnsigned\" >";
     }
     
-    private static final long PERIODS[] = new long[] { 12*60*60*1000l, 24*60*60*1000l, 48*60*60*1000l, -1l };
+    private static final long PERIODS[] = new long[] { 12*60*60*1000l, 24*60*60*1000l,
+                                                       36*60*60*1000l, 48*60*60*1000l,
+                                                       3*24*60*60*1000l, 7*24*60*60*1000l,
+                                                       -1l };
     
     public String getRefreshFrequencySelectBox() {
-        String freq = _context.getProperty(ConfigUpdateHandler.PROP_REFRESH_FREQUENCY);
-        if (freq == null) freq = ConfigUpdateHandler.DEFAULT_REFRESH_FREQUENCY;
+        String freq = _context.getProperty(ConfigUpdateHandler.PROP_REFRESH_FREQUENCY,
+                                           ConfigUpdateHandler.DEFAULT_REFRESH_FREQUENCY);
         long ms = -1;
         try { 
             ms = Long.parseLong(freq);
