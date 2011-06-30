@@ -1002,9 +1002,9 @@
     <!-- this is the same dependency as pkg, but with updater200 in the middle,
          since preppkg puts too much stuff in pkg-temp -->
 <!--
-    <target name="release" depends="distclean, updater, updater200, preppkg, installer, getReleaseNumber" >
--->
     <target name="release" depends="distclean, updaterWithJettyFixesAndJbigi , updater200WithJettyFixes, preppkg, installer, getReleaseNumber" >
+-->
+    <target name="release" depends="distclean, updater, updater200, preppkg, installer, getReleaseNumber" >
         <echo message="================================================================" />
         <echo message="Did you update these files?" />
         <exec executable="ls" failonerror="true">
