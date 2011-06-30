@@ -1089,6 +1089,10 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     }
     
     private static final int MAX_HANDLERS = 4;
+
+    /**
+     *  FIXME static queue mixes handlers from different contexts in multirouter JVM
+     */
     private final static LinkedBlockingQueue<I2NPMessageHandler> _i2npHandlers = new LinkedBlockingQueue(MAX_HANDLERS);
 
     private final static I2NPMessageHandler acquireHandler(RouterContext ctx) {
@@ -1127,6 +1131,15 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     private static void releaseReadBuf(DataBuf buf) {
         buf.bais.reset();
         _dataReadBufs.offer(buf);
+    }
+
+    /** @since 0.8.8 */
+    static void releaseResources() {
+        _i2npHandlers.clear();
+        _dataReadBufs.clear();
+        synchronized(_bufs) {
+            _bufs.clear();
+        }
     }
 
     /**

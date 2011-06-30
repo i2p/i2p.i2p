@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-import java.util.TimerTask;
 
 import net.i2p.I2PAppContext;
 
@@ -32,7 +31,7 @@ import net.i2p.I2PAppContext;
  * TimerTask that checks for good/bad up/downloader. Works together
  * with the PeerCoordinator to select which Peers get (un)choked.
  */
-class PeerCheckerTask extends TimerTask
+class PeerCheckerTask implements Runnable
 {
   private static final long KILOPERSECOND = 1024*(PeerCoordinator.CHECK_PERIOD/1000);
 
@@ -54,8 +53,6 @@ class PeerCheckerTask extends TimerTask
         List<Peer> peerList = coordinator.peerList();
         if (peerList.isEmpty() || coordinator.halted()) {
           coordinator.setRateHistory(0, 0);
-          if (coordinator.halted())
-            cancel();
           return;
         }
 

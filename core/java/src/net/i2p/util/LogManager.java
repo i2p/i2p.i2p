@@ -129,7 +129,7 @@ public class LogManager {
         _log = getLog(LogManager.class);
         String location = context.getProperty(CONFIG_LOCATION_PROP, CONFIG_LOCATION_DEFAULT);
         setConfig(location);
-        _consoleBuffer = new LogConsoleBuffer(context);
+        _consoleBuffer = new LogConsoleBuffer(_consoleBufferSize);
         // If we aren't in the router context, delay creating the LogWriter until required,
         // so it doesn't create a log directory and log files unless there is output.
         // In the router context, we have to rotate to a new log file at startup or the logs.jsp
@@ -656,6 +656,9 @@ public class LogManager {
             // this could generate out-of-order messages
             _writer.flushRecords(false);
             _writer.stopWriting();
+            synchronized (_writer) {
+                _writer.notifyAll();
+            }
         }
     }
 

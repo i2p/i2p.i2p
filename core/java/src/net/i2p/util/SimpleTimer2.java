@@ -3,6 +3,7 @@ package net.i2p.util;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ThreadFactory;
 
@@ -48,12 +49,25 @@ public class SimpleTimer2 {
         _threads = (int) Math.max(MIN_THREADS, Math.min(MAX_THREADS, 1 + (maxMemory / (32*1024*1024))));
         _executor = new CustomScheduledThreadPoolExecutor(_threads, new CustomThreadFactory());
         _executor.prestartAllCoreThreads();
+        // don't bother saving ref to remove hook if somebody else calls stop
+        _context.addShutdownTask(new Shutdown());
     }
     
     /**
-     * Removes the SimpleTimer.
+     * @since 0.8.8
+     */
+    private class Shutdown implements Runnable {
+        public void run() {
+            stop();
+        }
+    }
+
+    /**
+     * Stops the SimpleTimer.
+     * Subsequent executions should not throw a RejectedExecutionException.
      */
     public void stop() {
+        _executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
         _executor.shutdownNow();
     }
 

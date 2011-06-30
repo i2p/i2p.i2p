@@ -342,10 +342,10 @@ public class RouterConsoleRunner {
         }
 
         NewsFetcher fetcher = NewsFetcher.getInstance(I2PAppContext.getGlobalContext());
-        Thread t = new I2PAppThread(fetcher, "NewsFetcher", true);
-        t.start();
+        Thread newsThread = new I2PAppThread(fetcher, "NewsFetcher", true);
+        newsThread.start();
         
-        t = new I2PAppThread(new StatSummarizer(), "StatSummarizer", true);
+        Thread t = new I2PAppThread(new StatSummarizer(), "StatSummarizer", true);
         t.start();
         
         List<RouterContext> contexts = RouterContext.listContexts();
@@ -356,6 +356,9 @@ public class RouterConsoleRunner {
                 t.start();
                 ctx.addShutdownTask(new PluginStopper(ctx));
             }
+            ctx.addShutdownTask(new NewsShutdown(fetcher, newsThread));
+            // stat summarizer registers its own hook
+            ctx.addShutdownTask(new ServerShutdown());
         }
     }
     
@@ -495,16 +498,31 @@ public class RouterConsoleRunner {
         }
     }
     
-/*******
-    public void stopConsole() {
-        try {
-            _server.stop();
-        } catch (InterruptedException ie) {
-            ie.printStackTrace();
+    /** @since 0.8.8 */
+    private class ServerShutdown implements Runnable {
+        public void run() {
+            try {
+                _server.stop();
+            } catch (InterruptedException ie) {}
         }
     }
-********/
     
+    /** @since 0.8.8 */
+    private static class NewsShutdown implements Runnable {
+        private final NewsFetcher _fetcher;
+        private final Thread _newsThread;
+
+        public NewsShutdown(NewsFetcher fetcher, Thread t) {
+            _fetcher = fetcher;
+            _newsThread = t;
+        }
+
+        public void run() {
+            _fetcher.shutdown();
+            _newsThread.interrupt();
+        }
+    }
+
     public static Properties webAppProperties() {
         return webAppProperties(I2PAppContext.getGlobalContext().getConfigDir().getAbsolutePath());
     }

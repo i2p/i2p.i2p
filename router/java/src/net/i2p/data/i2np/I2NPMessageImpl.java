@@ -28,8 +28,8 @@ import net.i2p.util.SimpleByteCache;
  * @author jrandom
  */
 public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPMessage {
-    private Log _log;
-    protected I2PAppContext _context;
+    private final Log _log;
+    protected final I2PAppContext _context;
     private long _expiration;
     private long _uniqueId;
     

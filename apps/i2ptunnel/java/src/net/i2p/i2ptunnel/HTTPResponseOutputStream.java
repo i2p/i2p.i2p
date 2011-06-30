@@ -233,7 +233,7 @@ class HTTPResponseOutputStream extends FilterOutputStream {
         // there after the accept().
         // Overridden in I2PTunnelHTTPServer, where it does not use the client pool.
         try {
-            I2PTunnelClientBase._executor.execute(new Pusher(pi, out));
+            I2PTunnelClientBase.getClientExecutor().execute(new Pusher(pi, out));
         } catch (RejectedExecutionException ree) {
             // shouldn't happen
             throw ree;

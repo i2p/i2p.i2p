@@ -32,7 +32,7 @@ import net.i2p.client.naming.NamingServiceUpdater;
  * @author Ragnarok
  *
  */
-class DaemonThread extends Thread implements NamingServiceUpdater {
+public class DaemonThread extends Thread implements NamingServiceUpdater {
 
     private String[] args;
 

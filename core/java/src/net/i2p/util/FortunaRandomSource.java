@@ -44,6 +44,14 @@ public class FortunaRandomSource extends RandomSource implements EntropyHarveste
         _haveNextGaussian = false;
     }
     
+    /**
+     *  Note - methods may hang or NPE or throw IllegalStateExceptions after this
+     *  @since 0.8.8
+     */
+    public void shutdown() {
+        _fortuna.shutdown();
+    }
+
     @Override
     public synchronized void setSeed(byte buf[]) {
       _fortuna.addRandomBytes(buf);

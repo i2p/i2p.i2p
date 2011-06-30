@@ -45,10 +45,12 @@ import net.i2p.stat.RateStat;
 import net.i2p.stat.StatManager;
 import net.i2p.util.ByteCache;
 import net.i2p.util.FileUtil;
+import net.i2p.util.FortunaRandomSource;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.SecureFileOutputStream;
+import net.i2p.util.SimpleByteCache;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
@@ -73,6 +75,8 @@ public class Router {
     private I2PThread.OOMEventListener _oomListener;
     private ShutdownHook _shutdownHook;
     private final I2PThread _gracefulShutdownDetector;
+    private final RouterWatchdog _watchdog;
+    private final Thread _watchdogThread;
     
     public final static String PROP_CONFIG_FILE = "router.configLocation";
     
@@ -187,6 +191,19 @@ public class Router {
         // Save this in the context for the logger and apps that need it
         envProps.setProperty("i2p.systemTimeZone", originalTimeZoneID);
 
+        // Make darn sure we don't have a leftover I2PAppContext in the same JVM
+        // e.g. on Android - see finalShutdown() also
+        List<RouterContext> contexts = RouterContext.getContexts();
+        if (contexts.isEmpty()) {
+            RouterContext.killGlobalContext();
+        } else if (System.getProperty("java.vendor").contains("Android")) {
+            System.err.println("Warning: Killing " + contexts.size() + " other routers in this JVM");
+            contexts.clear();
+            RouterContext.killGlobalContext();
+        } else {
+            System.err.println("Warning: " + contexts.size() + " other routers in this JVM");
+        }
+
         // The important thing that happens here is the directory paths are set and created
         // i2p.dir.router defaults to i2p.dir.config
         // i2p.dir.app defaults to i2p.dir.router
@@ -257,7 +274,7 @@ public class Router {
         _killVMOnEnd = true;
         _oomListener = new I2PThread.OOMEventListener() { 
             public void outOfMemory(OutOfMemoryError oom) { 
-                ByteCache.clearAll();
+                clearCaches();
                 _log.log(Log.CRIT, "Thread ran out of memory", oom);
                 for (int i = 0; i < 5; i++) { // try this 5 times, in case it OOMs
                     try { 
@@ -275,11 +292,18 @@ public class Router {
         _gracefulShutdownDetector = new I2PAppThread(new GracefulShutdown(), "Graceful shutdown hook", true);
         _gracefulShutdownDetector.start();
         
-        Thread watchdog = new I2PAppThread(new RouterWatchdog(_context), "RouterWatchdog", true);
-        watchdog.start();
+        _watchdog = new RouterWatchdog(_context);
+        _watchdogThread = new I2PAppThread(_watchdog, "RouterWatchdog", true);
+        _watchdogThread.start();
         
     }
     
+    /** @since 0.8.8 */
+    private static final void clearCaches() {
+        ByteCache.clearAll();
+        SimpleByteCache.clearAll();
+    }
+
     /**
      * Configure the router to kill the JVM when the router shuts down, as well
      * as whether to explicitly halt the JVM during the hard fail process.
@@ -616,12 +640,15 @@ public class Router {
     public void rebuildNewIdentity() {
         killKeys();
         for (Runnable task : _context.getShutdownTasks()) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Running shutdown task " + task.getClass());
             try {
                 task.run();
             } catch (Throwable t) {
                 _log.log(Log.CRIT, "Error running shutdown task", t);
             }
         }
+        _context.removeShutdownTasks();
         // hard and ugly
         if (System.getProperty("wrapper.version") != null)
             _log.log(Log.CRIT, "Restarting with new router identity");
@@ -632,7 +659,10 @@ public class Router {
     
     private void warmupCrypto() {
         _context.random().nextBoolean();
-        new DHSessionKeyBuilder(); // load the class so it starts the precalc process
+        // Use restart() to refire the static refiller threads, in case
+        // we are restarting the router in the same JVM (Android)
+        DHSessionKeyBuilder.restart();
+        _context.elGamalEngine().restart();
     }
     
     private void startupQueue() {
@@ -938,12 +968,15 @@ public class Router {
         // Run the shutdown hooks first in case they want to send some goodbye messages
         // Maybe we need a delay after this too?
         for (Runnable task : _context.getShutdownTasks()) {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Running shutdown task " + task.getClass());
             try {
                 task.run();
             } catch (Throwable t) {
                 _log.log(Log.CRIT, "Error running shutdown task", t);
             }
         }
+        _context.removeShutdownTasks();
         try { _context.clientManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the client manager", t); }
         try { _context.namingService().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the naming service", t); }
         try { _context.jobQueue().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the job queue", t); }
@@ -953,13 +986,37 @@ public class Router {
         try { _context.tunnelDispatcher().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the tunnel dispatcher", t); }
         try { _context.netDb().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the networkDb", t); }
         try { _context.commSystem().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the comm system", t); }
+        try { _context.bandwidthLimiter().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the comm system", t); }
         try { _context.peerManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the peer manager", t); }
         try { _context.messageRegistry().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the message registry", t); }
         try { _context.messageValidator().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the message validator", t); }
         try { _context.inNetMessagePool().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the inbound net pool", t); }
         //try { _sessionKeyPersistenceHelper.shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the session key manager", t); }
         _context.deleteTempDir();
-        RouterContext.listContexts().remove(_context);
+        List<RouterContext> contexts = RouterContext.getContexts();
+        contexts.remove(_context);
+
+        // shut down I2PAppContext tasks here
+
+        // If there are multiple routers in the JVM, we don't want to do this
+        // to the DH or YK tasks, as they are singletons.
+        if (contexts.isEmpty()) {
+            try {
+                DHSessionKeyBuilder.shutdown();
+            } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting DH", t); }
+            try {
+                _context.elGamalEngine().shutdown();
+            } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting elGamal", t); }
+        } else {
+            _log.logAlways(Log.WARN, "Warning - " + contexts.size() + " routers remaining in this JVM, not releasing all resources");
+        }
+        try {
+            ((FortunaRandomSource)_context.random()).shutdown();
+        } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting random()", t); }
+
+        // logManager shut down in finalShutdown()
+        _watchdog.shutdown();
+        _watchdogThread.interrupt();
         finalShutdown(exitCode);
     }
 
@@ -970,6 +1027,7 @@ public class Router {
     private static final boolean ALLOW_DYNAMIC_KEYS = false;
 
     private void finalShutdown(int exitCode) {
+        clearCaches();
         _log.log(Log.CRIT, "Shutdown(" + exitCode + ") complete"  /* , new Exception("Shutdown") */ );
         try { _context.logManager().shutdown(); } catch (Throwable t) { }
         if (ALLOW_DYNAMIC_KEYS) {
@@ -979,6 +1037,20 @@ public class Router {
 
         File f = getPingFile();
         f.delete();
+        if (RouterContext.getContexts().isEmpty())
+            RouterContext.killGlobalContext();
+
+        // Since 0.8.8, mainly for Android
+        for (Runnable task : _context.getFinalShutdownTasks()) {
+            System.err.println("Running final shutdown task " + task.getClass());
+            try {
+                task.run();
+            } catch (Throwable t) {
+                System.err.println("Running final shutdown task " + t);
+            }
+        }
+        _context.getFinalShutdownTasks().clear();
+
         if (_killVMOnEnd) {
             try { Thread.sleep(1000); } catch (InterruptedException ie) {}
             Runtime.getRuntime().halt(exitCode);
@@ -1541,7 +1613,7 @@ private static class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
         long used = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
         getContext().statManager().addRateData("router.memoryUsed", used, 0);
         if (_maxMemory - used < LOW_MEMORY_THRESHOLD)
-            ByteCache.clearAll();
+            clearCaches();
 
         getContext().tunnelDispatcher().updateParticipatingStats(COALESCE_TIME);
 

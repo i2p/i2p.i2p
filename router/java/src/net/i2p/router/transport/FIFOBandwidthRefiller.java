@@ -24,6 +24,7 @@ public class FIFOBandwidthRefiller implements Runnable {
     private long _lastCheckConfigTime;
     /** how frequently do we check the config for updates? */
     private long _configCheckPeriodMs = 60*1000;
+    private volatile boolean _isRunning;
  
     public static final String PROP_INBOUND_BANDWIDTH = "i2np.bandwidth.inboundKBytesPerSecond";
     public static final String PROP_OUTBOUND_BANDWIDTH = "i2np.bandwidth.outboundKBytesPerSecond";
@@ -67,12 +68,19 @@ public class FIFOBandwidthRefiller implements Runnable {
         _context = context;
         _log = context.logManager().getLog(FIFOBandwidthRefiller.class);
         reinitialize();
+        _isRunning = true;
     }
+
+    /** @since 0.8.8 */
+    public void shutdown() {
+        _isRunning = false;
+    }
+
     public void run() {
         // bootstrap 'em with nothing
         _lastRefillTime = _limiter.now();
         List<FIFOBandwidthLimiter.Request> buffer = new ArrayList(2);
-        while (true) {
+        while (_isRunning) {
             long now = _limiter.now();
             if (now >= _lastCheckConfigTime + _configCheckPeriodMs) {
                 checkConfig();

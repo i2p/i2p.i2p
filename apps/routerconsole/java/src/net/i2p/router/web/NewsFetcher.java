@@ -37,6 +37,8 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
     private File _newsFile;
     private File _tempFile;
     private static NewsFetcher _instance;
+    private volatile boolean _isRunning;
+
     //public static final synchronized NewsFetcher getInstance() { return _instance; }
     public static final synchronized NewsFetcher getInstance(I2PAppContext ctx) { 
         if (_instance != null)
@@ -64,8 +66,14 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         _tempFile = new File(_context.getTempDir(), TEMP_NEWS_FILE);
         updateLastFetched();
         _updateVersion = "";
+        _isRunning = true;
     }
     
+    /** @since 0.8.8 */
+    void shutdown() {
+        _isRunning = false;
+    }
+
     private void updateLastFetched() {
         if (_newsFile.exists()) {
             if (_lastUpdated == 0)
@@ -108,7 +116,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
 
     public void run() {
         try { Thread.sleep(INITIAL_DELAY + _context.random().nextLong(INITIAL_DELAY)); } catch (InterruptedException ie) {}
-        while (true) {
+        while (_isRunning) {
             if (!_updateAvailable) checkForUpdates();
             if (shouldFetchNews()) {
                 fetchNews();

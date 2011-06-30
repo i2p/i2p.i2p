@@ -64,6 +64,7 @@ public class FIFOBandwidthLimiter {
     /** lifetime counter of tokens available for use but exceeded our maxOutboundBurst size */
     private final AtomicLong _totalWastedOutboundBytes = new AtomicLong();
     private final FIFOBandwidthRefiller _refiller;
+    private final Thread _refillerThread;
     
     private long _lastTotalSent;
     private long _lastTotalReceived;
@@ -91,9 +92,9 @@ public class FIFOBandwidthLimiter {
         _lastTotalReceived = _totalAllocatedInboundBytes.get();
         _lastStatsUpdated = now();
         _refiller = new FIFOBandwidthRefiller(_context, this);
-        I2PThread t = new I2PThread(_refiller, "BWRefiller", true);
-        t.setPriority(I2PThread.NORM_PRIORITY-1);
-        t.start();
+        _refillerThread = new I2PThread(_refiller, "BWRefiller", true);
+        _refillerThread.setPriority(I2PThread.NORM_PRIORITY-1);
+        _refillerThread.start();
     }
 
     //public long getAvailableInboundBytes() { return _availableInboundBytes; }
@@ -122,6 +123,19 @@ public class FIFOBandwidthLimiter {
     public int getInboundBurstKBytesPerSecond() { return _refiller.getInboundBurstKBytesPerSecond(); } 
     
     public void reinitialize() {
+        clear();
+        _refiller.reinitialize();
+    }
+
+    /** @since 0.8.8 */
+    public void shutdown() {
+        _refiller.shutdown();
+        _refillerThread.interrupt();
+        clear();
+    }
+
+    /** @since 0.8.8 */
+    private void clear() {
         _pendingInboundRequests.clear();
         _pendingOutboundRequests.clear();
         _availableInbound.set(0);
@@ -134,7 +148,6 @@ public class FIFOBandwidthLimiter {
         _unavailableOutboundBurst.set(0);
         _inboundUnlimited = false;
         _outboundUnlimited = false;
-        _refiller.reinitialize();
     }
     
     public Request createRequest() { return new SimpleRequest(); }

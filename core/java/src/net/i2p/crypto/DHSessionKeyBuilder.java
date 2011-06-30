@@ -47,13 +47,14 @@ import net.i2p.util.RandomSource;
  * @author jrandom
  */
 public class DHSessionKeyBuilder {
-    private static final I2PAppContext _context = I2PAppContext.getGlobalContext();
-    private static final Log _log;
+    private static I2PAppContext _context = I2PAppContext.getGlobalContext();
+    private static Log _log;
     private static final int MIN_NUM_BUILDERS;
     private static final int MAX_NUM_BUILDERS;
     private static final int CALC_DELAY;
     private static final LinkedBlockingQueue<DHSessionKeyBuilder> _builders;
-    private static final Thread _precalcThread;
+    private static Thread _precalcThread;
+    private static volatile boolean _isRunning;
 
     // the data of importance
     private BigInteger _myPrivateValue;
@@ -96,12 +97,44 @@ public class DHSessionKeyBuilder {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("DH Precalc (minimum: " + MIN_NUM_BUILDERS + " max: " + MAX_NUM_BUILDERS + ", delay: "
                        + CALC_DELAY + ")");
+        startPrecalc();
+    }
 
-        _precalcThread = new I2PThread(new DHSessionKeyBuilderPrecalcRunner(MIN_NUM_BUILDERS, MAX_NUM_BUILDERS));
-        _precalcThread.setName("DH Precalc");
-        _precalcThread.setDaemon(true);
+    /**
+     * Caller must synch on class
+     * @since 0.8.8
+     */
+    private static void startPrecalc() {
+        _context = I2PAppContext.getGlobalContext();
+        _log = _context.logManager().getLog(DHSessionKeyBuilder.class);
+        _precalcThread = new I2PThread(new DHSessionKeyBuilderPrecalcRunner(MIN_NUM_BUILDERS, MAX_NUM_BUILDERS),
+                                       "DH Precalc", true);
         _precalcThread.setPriority(Thread.MIN_PRIORITY);
+        _isRunning = true;
         _precalcThread.start();
+    }
+
+    /**
+     *  Note that this stops the singleton precalc thread.
+     *  You don't want to do this if there are multiple routers in the JVM.
+     *  Fix this if you care. See Router.shutdown().
+     *  @since 0.8.8
+     */
+    public static void shutdown() {
+        _isRunning = false;
+        _precalcThread.interrupt();
+        _builders.clear();
+    }
+
+    /**
+     *  Only required if shutdown() previously called.
+     *  @since 0.8.8
+     */
+    public static void restart() {
+        synchronized(DHSessionKeyBuilder.class) {
+            if (!_isRunning)
+                startPrecalc();
+        }
     }
 
     /**
@@ -475,7 +508,7 @@ public class DHSessionKeyBuilder {
         }
         
         public void run() {
-            while (true) {
+            while (_isRunning) {
 
                 int curSize = 0;
                 long start = System.currentTimeMillis();

@@ -58,9 +58,11 @@ class UDPReceiver {
     public void shutdown() {
         _keepRunning = false;
         _inboundQueue.clear();
-        UDPPacket poison = UDPPacket.acquire(_context, false);
-        poison.setMessageType(TYPE_POISON);
-        _inboundQueue.offer(poison);
+        for (int i = 0; i < _transport.getPacketHandlerCount(); i++) {
+            UDPPacket poison = UDPPacket.acquire(_context, false);
+            poison.setMessageType(TYPE_POISON);
+            _inboundQueue.offer(poison);
+        }
         for (int i = 1; i <= 5 && !_inboundQueue.isEmpty(); i++) {
             try {
                 Thread.sleep(i * 50);
