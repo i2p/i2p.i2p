@@ -1,3 +1,51 @@
+2011-06-30 zzz
+  * BlockfileNamingService:
+    - Support readonly blockfiles
+    - Open blockfile readonly if not in router context
+    - Log warning if blockfile is locked
+    - Set as default
+  * DataHelper: Throw IOE if uncompressed data too big,
+    instead of silently truncating
+  * EepGet:
+    - Add method to get response code
+    - Add method to write error data to the output
+    - Increase buffer size to 8 KB
+    - Trim content type
+  * IRC Server: Send a message back if the tunnel is up but the server is down
+  * NewsFetcher: Change default interval to 36 hours
+  * Random: Refactor refiller for concurrent
+  * Shutdown:
+    - Register shutdown hooks for caches, in the first step of cleaning up
+      resources on shutdown, which is important in Android as the JVM
+      isn't going away.
+    - Clear profiles from memory on shutdown
+    - Add shutdown hook for AsyncFortunaRandomSource
+    - Implement and call shutdown for BandwidthRefiller
+    - Implement and register shutdown hook for i2ptunnel
+    - Implement and register shutdown hook for Jetty console server
+    - Implement and register shutdown hook for Timestamper
+    - Fix UPnP-SSDPNotifySocket thread not stopping
+    - Fix all but one UDP PacketHandler threads not stopping
+    - Fix i2psnark DirMonitor not stopping
+    - Fix UPnP-Disposer not stopping quickly
+    - Implement and call YKGenerator and DHSessionKeyBuilder shutdown
+    - Implement and call shutdown for RouterWatchdog
+    - Kill the global app context
+    - Recognize multi-router case
+    - Fix RandomIterator, YKGenerator, DHBuilder, NTCPConnection
+      hanging on to old context
+    - Fix DHBuilder thread not stopping
+    - Stop I2PThread from starting a new App context at shutdown
+    - Stop LogWriter from starting a new App context at shutdown
+    - Have router kill any leftover App context at startup
+    - Fix I2PThread hanging on to old context
+  * Updates:
+    - Add the router version to the zip file comment in the updater
+    - Add a class to extract the zip file comment
+    - Require the sud version header to match the zip file comment
+      to prevent spoofing of the version number, since the version
+      number in the header is not covered by the sud signature.
+
 * 2011-06-27 0.8.7 released
 
 2011-06-26 zzz
