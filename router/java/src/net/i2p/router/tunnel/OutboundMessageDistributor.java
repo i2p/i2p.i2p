@@ -15,9 +15,9 @@ import net.i2p.util.Log;
  * honors the instructions.
  */
 public class OutboundMessageDistributor {
-    private RouterContext _context;
-    private int _priority;
-    private Log _log;
+    private final RouterContext _context;
+    private final int _priority;
+    private final Log _log;
     
     private static final int MAX_DISTRIBUTE_TIME = 10*1000;
     
@@ -30,6 +30,7 @@ public class OutboundMessageDistributor {
     public void distribute(I2NPMessage msg, Hash target) {
         distribute(msg, target, null);
     }
+
     public void distribute(I2NPMessage msg, Hash target, TunnelId tunnel) {
         RouterInfo info = _context.netDb().lookupRouterInfoLocally(target);
         if (info == null) {
@@ -73,25 +74,31 @@ public class OutboundMessageDistributor {
     }
     
     private class DistributeJob extends JobImpl {
-        private I2NPMessage _message;
-        private Hash _target;
-        private TunnelId _tunnel;
+        private final I2NPMessage _message;
+        private final Hash _target;
+        private final TunnelId _tunnel;
+
         public DistributeJob(RouterContext ctx, I2NPMessage msg, Hash target, TunnelId id) {
             super(ctx);
             _message = msg;
             _target = target;
             _tunnel = id;
         }
+
         public String getName() { return "Distribute outbound message"; }
+
         public void runJob() {
             RouterInfo info = getContext().netDb().lookupRouterInfoLocally(_target);
             if (info != null) {
-                _log.debug("outbound distributor to " + _target.toBase64().substring(0,4)
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("outbound distributor to " + _target.toBase64().substring(0,4)
                            + "." + (_tunnel != null ? _tunnel.getTunnelId() + "" : "")
                            + ": found on search");
                 distribute(_message, info, _tunnel);
             } else {
-                _log.error("outbound distributor to " + _target.toBase64().substring(0,4)
+                // TODO add a stat here
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("outbound distributor to " + _target.toBase64().substring(0,4)
                            + "." + (_tunnel != null ? _tunnel.getTunnelId() + "" : "")
                            + ": NOT found on search");
             }

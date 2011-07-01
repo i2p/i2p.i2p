@@ -1,3 +1,9 @@
+2011-07-01 zzz
+  * EepGet:
+    - Fix error output bug
+    - Output error data for 504 too
+  * Router, console, i2psnark: Change three errors to warns (tickets #479, #482, #487)
+
 2011-06-30 zzz
   * BlockfileNamingService:
     - Support readonly blockfiles

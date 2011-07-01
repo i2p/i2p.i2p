@@ -13,9 +13,9 @@ import net.i2p.util.Log;
  *
  */
 class OutboundReceiver implements TunnelGateway.Receiver {
-    private RouterContext _context;
-    private Log _log;
-    private TunnelCreatorConfig _config;
+    private final RouterContext _context;
+    private final Log _log;
+    private final TunnelCreatorConfig _config;
     private RouterInfo _nextHopCache;
     
     public OutboundReceiver(RouterContext ctx, TunnelCreatorConfig cfg) {
@@ -40,8 +40,9 @@ class OutboundReceiver implements TunnelGateway.Receiver {
             send(msg, ri);
             return msg.getUniqueId();
         } else {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("lookup of " + _config.getPeer(1).toBase64().substring(0,4) 
+            // TODO add a stat here
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("lookup of " + _config.getPeer(1).toBase64().substring(0,4) 
                            + " required for " + msg);
             _context.netDb().lookupRouterInfo(_config.getPeer(1), new SendJob(_context, msg), new FailedJob(_context), 10*1000);
             return -1;
@@ -61,12 +62,15 @@ class OutboundReceiver implements TunnelGateway.Receiver {
     }
 
     private class SendJob extends JobImpl {
-        private TunnelDataMessage _msg;
+        private final TunnelDataMessage _msg;
+
         public SendJob(RouterContext ctx, TunnelDataMessage msg) {
             super(ctx);
             _msg = msg;
         }
+
         public String getName() { return "forward a tunnel message"; }
+
         public void runJob() {
             RouterInfo ri = _context.netDb().lookupRouterInfoLocally(_config.getPeer(1));
             if (_log.shouldLog(Log.DEBUG))
@@ -83,10 +87,13 @@ class OutboundReceiver implements TunnelGateway.Receiver {
         public FailedJob(RouterContext ctx) {
             super(ctx);
         }
+
         public String getName() { return "failed looking for our outbound gateway"; }
+
         public void runJob() {
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("lookup of " + _config.getPeer(1).toBase64().substring(0,4) 
+            // TODO add a stat here
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("lookup of " + _config.getPeer(1).toBase64().substring(0,4) 
                            + " failed for " + _config);
         }
     }

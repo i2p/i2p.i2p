@@ -42,7 +42,8 @@ if (c != null && c.length() > 0) {
         if (!response.isCommitted()) {
             response.sendError(403, ioe.toString());
         }  else {
-            net.i2p.I2PAppContext.getGlobalContext().logManager().getLog(getClass()).error("Error serving flags/" + c + ".png", ioe);
+            // not an error, happens when the browser closes the stream
+            net.i2p.I2PAppContext.getGlobalContext().logManager().getLog(getClass()).warn("Error serving flags/" + c + ".png", ioe);
             // Jetty doesn't log this
             throw ioe;
         }
