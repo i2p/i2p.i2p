@@ -703,7 +703,7 @@ public class EepGet {
             case 409: // bad addr helper
             case 503: // no outproxy
                 _transferFailed = true;
-                if (_alreadyTransferred == 0 && !_shouldWriteErrorToOutput) {
+                if (_alreadyTransferred > 0 || !_shouldWriteErrorToOutput) {
                     _keepFetching = false;
                     return;
                 }
@@ -718,7 +718,7 @@ public class EepGet {
                 break;
             case 416: // completed (or range out of reach)
                 _bytesRemaining = 0;
-                if (_alreadyTransferred == 0 && !_shouldWriteErrorToOutput) {
+                if (_alreadyTransferred > 0 || !_shouldWriteErrorToOutput) {
                     _keepFetching = false;
                     return;
                 }
@@ -732,10 +732,24 @@ public class EepGet {
                 }
                 break;
             case 504: // gateway timeout
-                // throw out of doFetch() to fetch() and try again
-                throw new IOException("HTTP Proxy timeout");
+                if (_alreadyTransferred > 0 || (!_shouldWriteErrorToOutput) ||
+                    _currentAttempt < _numRetries) {
+                    // throw out of doFetch() to fetch() and try again
+                    // why throw???
+                    throw new IOException("HTTP Proxy timeout");
+                }
+                // output the error data to the stream
+                rcOk = true;
+                if (_out == null) {
+                    if (_outputStream != null)
+                        _out = _outputStream;
+                    else
+                        _out = new FileOutputStream(_outputFile, true);
+                }
+                _transferFailed = true;
+                break;
             default:
-                if (_alreadyTransferred == 0 && !_shouldWriteErrorToOutput) {
+                if (_alreadyTransferred > 0 || !_shouldWriteErrorToOutput) {
                     _keepFetching = false;
                 } else {
                     // output the error data to the stream
