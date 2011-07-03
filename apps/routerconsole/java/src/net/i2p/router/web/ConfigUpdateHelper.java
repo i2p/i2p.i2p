@@ -117,7 +117,7 @@ public class ConfigUpdateHelper extends HelperBase {
             buf.append(" selected=\"true\"");
         buf.append('>').append(_("Download and verify only")).append("</option>");
         
-        if (System.getProperty("wrapper.version") != null) {
+        if (_context.hasWrapper()) {
             buf.append("<option value=\"install\"");
             if (_dontInstall)
                 buf.append(" disabled=\"true\"");

@@ -90,6 +90,15 @@ class KBucketSet {
         return removed;
     }
     
+    /** @since 0.8.8 */
+    public void clear() {
+        for (int i = 0; i < _buckets.length; i++) {
+            _buckets[i].setEntries(Collections.EMPTY_SET);
+        }
+        _size = 0;
+        _us.clearXorCache();
+    }
+    
     public Set<Hash> getAll() { return getAll(Collections.EMPTY_SET); };
     public Set<Hash> getAll(Set<Hash> toIgnore) {
         Set<Hash> all = new HashSet(1024);

@@ -30,21 +30,25 @@ public class ConfigRestartBean {
         if ( (nonce != null) && (systemNonce.equals(nonce)) && (action != null) ) {
             // Normal browsers send value, IE sends button label
             if ("shutdownImmediate".equals(action) || _("Shutdown immediately", ctx).equals(action)) {
-                ctx.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_HARD));
+                if (ctx.hasWrapper())
+                    ctx.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_HARD));
                 //ctx.router().shutdown(Router.EXIT_HARD); // never returns
                 ctx.router().shutdownGracefully(Router.EXIT_HARD); // give the UI time to respond
             } else if ("cancelShutdown".equals(action) || _("Cancel shutdown", ctx).equals(action) ||
                        _("Cancel restart", ctx).equals(action)) {
                 ctx.router().cancelGracefulShutdown();
             } else if ("restartImmediate".equals(action) || _("Restart immediately", ctx).equals(action)) {
-                ctx.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_HARD_RESTART));
+                if (ctx.hasWrapper())
+                    ctx.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_HARD_RESTART));
                 //ctx.router().shutdown(Router.EXIT_HARD_RESTART); // never returns
                 ctx.router().shutdownGracefully(Router.EXIT_HARD_RESTART); // give the UI time to respond
             } else if ("restart".equals(action) || _("Restart", ctx).equals(action)) {
-                ctx.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_GRACEFUL_RESTART));
+                if (ctx.hasWrapper())
+                    ctx.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_GRACEFUL_RESTART));
                 ctx.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
             } else if ("shutdown".equals(action) || _("Shutdown", ctx).equals(action)) {
-                ctx.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_GRACEFUL));
+                if (ctx.hasWrapper())
+                    ctx.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_GRACEFUL));
                 ctx.router().shutdownGracefully();
             }
         }
@@ -71,7 +75,7 @@ public class ConfigRestartBean {
             buf.append("</b></center><br>");
             buttons(ctx, buf, urlBase, systemNonce, SET2);
         } else {
-            if (System.getProperty("wrapper.version") != null)
+            if (ctx.hasWrapper())
                 buttons(ctx, buf, urlBase, systemNonce, SET3);
             else
                 buttons(ctx, buf, urlBase, systemNonce, SET4);

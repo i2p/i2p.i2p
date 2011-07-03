@@ -51,30 +51,38 @@ public class ConfigServiceHandler extends FormHandler {
         if (_action == null) return;
         
         if (_("Shutdown gracefully").equals(_action)) {
-            _context.addShutdownTask(new UpdateWrapperManagerTask(Router.EXIT_GRACEFUL));
+            if (_context.hasWrapper())
+                _context.addShutdownTask(new UpdateWrapperManagerTask(Router.EXIT_GRACEFUL));
             _context.router().shutdownGracefully();
             addFormNotice(_("Graceful shutdown initiated"));
         } else if (_("Shutdown immediately").equals(_action)) {
-            _context.addShutdownTask(new UpdateWrapperManagerTask(Router.EXIT_HARD));
+            if (_context.hasWrapper())
+                _context.addShutdownTask(new UpdateWrapperManagerTask(Router.EXIT_HARD));
             _context.router().shutdown(Router.EXIT_HARD);
             addFormNotice(_("Shutdown immediately!  boom bye bye bad bwoy"));
         } else if (_("Cancel graceful shutdown").equals(_action)) {
             _context.router().cancelGracefulShutdown();
             addFormNotice(_("Graceful shutdown cancelled"));
         } else if (_("Graceful restart").equals(_action)) {
-            _context.addShutdownTask(new UpdateWrapperManagerTask(Router.EXIT_GRACEFUL_RESTART));
+            // should have wrapper if restart button is visible
+            if (_context.hasWrapper())
+                _context.addShutdownTask(new UpdateWrapperManagerTask(Router.EXIT_GRACEFUL_RESTART));
             _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
             addFormNotice(_("Graceful restart requested"));
         } else if (_("Hard restart").equals(_action)) {
-            _context.addShutdownTask(new UpdateWrapperManagerTask(Router.EXIT_HARD_RESTART));
+            // should have wrapper if restart button is visible
+            if (_context.hasWrapper())
+                _context.addShutdownTask(new UpdateWrapperManagerTask(Router.EXIT_HARD_RESTART));
             _context.router().shutdown(Router.EXIT_HARD_RESTART);
             addFormNotice(_("Hard restart requested"));
         } else if (_("Rekey and Restart").equals(_action)) {
             addFormNotice(_("Rekeying after graceful restart"));
+            // FIXME don't call wrapper if not present, only rekey
             _context.addShutdownTask(new UpdateWrapperManagerAndRekeyTask(Router.EXIT_GRACEFUL_RESTART));
             _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
         } else if (_("Rekey and Shutdown").equals(_action)) {
             addFormNotice(_("Rekeying after graceful shutdown"));
+            // FIXME don't call wrapper if not present, only rekey
             _context.addShutdownTask(new UpdateWrapperManagerAndRekeyTask(Router.EXIT_GRACEFUL));
             _context.router().shutdownGracefully(Router.EXIT_GRACEFUL);
         } else if (_("Run I2P on startup").equals(_action)) {

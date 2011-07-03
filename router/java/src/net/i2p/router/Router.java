@@ -258,7 +258,7 @@ public class Router {
         // but this is the same method used in LogsHelper and we have no complaints.
         // (we could look for the wrapper.config file and parse it I guess...)
         // If we don't have a wrapper, RouterLaunch does this for us.
-        if (System.getProperty("wrapper.version") != null) {
+        if (_context.hasWrapper()) {
             File f = new File(System.getProperty("java.io.tmpdir"), "wrapper.log");
             if (!f.exists())
                 f = new File(_context.getBaseDir(), "wrapper.log");
@@ -650,7 +650,7 @@ public class Router {
         }
         _context.removeShutdownTasks();
         // hard and ugly
-        if (System.getProperty("wrapper.version") != null)
+        if (_context.hasWrapper())
             _log.log(Log.CRIT, "Restarting with new router identity");
         else
             _log.log(Log.CRIT, "Shutting down because old router identity was invalid - restart I2P");
@@ -981,7 +981,8 @@ public class Router {
         try { _context.namingService().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the naming service", t); }
         try { _context.jobQueue().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the job queue", t); }
         //try { _context.adminManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the admin manager", t); }        
-        try { _context.statPublisher().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the stats manager", t); }
+        try { _context.statPublisher().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the stats publisher", t); }
+        try { _context.statManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the stats manager", t); }
         try { _context.tunnelManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the tunnel manager", t); }
         try { _context.tunnelDispatcher().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the tunnel dispatcher", t); }
         try { _context.netDb().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the networkDb", t); }
@@ -991,7 +992,8 @@ public class Router {
         try { _context.messageRegistry().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the message registry", t); }
         try { _context.messageValidator().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the message validator", t); }
         try { _context.inNetMessagePool().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the inbound net pool", t); }
-        //try { _sessionKeyPersistenceHelper.shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the session key manager", t); }
+        try { _context.clientMessagePool().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the client msg pool", t); }
+        try { _context.sessionKeyManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting down the session key manager", t); }
         _context.deleteTempDir();
         List<RouterContext> contexts = RouterContext.getContexts();
         contexts.remove(_context);
@@ -1054,6 +1056,8 @@ public class Router {
         if (_killVMOnEnd) {
             try { Thread.sleep(1000); } catch (InterruptedException ie) {}
             Runtime.getRuntime().halt(exitCode);
+        } else {
+            Runtime.getRuntime().gc();
         }
     }
     
@@ -1301,7 +1305,7 @@ public class Router {
                     }
                 }
                 // exit whether ok or not
-                if (System.getProperty("wrapper.version") != null)
+                if (_context.hasWrapper())
                     System.out.println("INFO: Restarting after update");
                 else
                     System.out.println("WARNING: Exiting after update, restart I2P");

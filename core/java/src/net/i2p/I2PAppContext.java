@@ -888,4 +888,12 @@ public class I2PAppContext {
     public InternalClientManager internalClientManager() {
         return null;
     }
+
+    /**
+     *  Is the wrapper present?
+     *  @since 0.8.8
+     */
+    public boolean hasWrapper() {
+        return System.getProperty("wrapper.version") != null;
+    }
 }

@@ -193,6 +193,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     
     public void shutdown() {
         _initialized = false;
+        if (_kb != null)
+            _kb.clear();
         // don't null out _kb, it can cause NPEs in concurrent operations
         //_kb = null;
         if (_ds != null)

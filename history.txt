@@ -1,3 +1,12 @@
+2011-07-03 zzz
+  * AppContext: Add hasWrapper() method
+  * Shutdown:
+    - Clear more resources in peer manager, netdb, stat manager,
+      session key manager, naming service, tunnel dispatcher,
+      OCMOSJ (result of testing with jvisualvm)
+    - Don't call wrapper on shutdown (starting two threads) if we
+      were started with runplain
+
 2011-07-01 zzz
   * EepGet:
     - Fix error output bug

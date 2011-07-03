@@ -660,6 +660,10 @@ public class LogManager {
                 _writer.notifyAll();
             }
         }
+        _records.clear();
+        _limits.clear();
+        _logs.clear();
+        _consoleBuffer.clear();
     }
 
     private static int __id = 0;

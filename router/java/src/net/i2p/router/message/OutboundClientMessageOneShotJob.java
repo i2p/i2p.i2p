@@ -712,6 +712,22 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     }
 
     /**
+     *  @since 0.8.8
+     */
+    public static void clearAllCaches() {
+        synchronized(_leaseSetCache) {
+            _leaseSetCache.clear();
+        }
+        synchronized(_leaseCache) {
+            _leaseCache.clear();
+        }
+        synchronized(_tunnelCache) {
+            _backloggedTunnelCache.clear();
+            _tunnelCache.clear();
+        }
+    }
+
+    /**
      * Clean out old leaseSets
      * Caller must synchronize on tc.
      */

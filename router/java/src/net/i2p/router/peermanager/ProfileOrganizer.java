@@ -229,7 +229,8 @@ public class ProfileOrganizer {
         
     /** @since 0.8.8 */
     void clearProfiles() {
-        getReadLock();
+        if (!getWriteLock())
+            return;
         try {
             _failingPeers.clear();
             _fastPeers.clear();
@@ -237,7 +238,8 @@ public class ProfileOrganizer {
             _notFailingPeers.clear();
             _notFailingPeersList.clear();
             _wellIntegratedPeers.clear();
-        } finally { releaseReadLock(); }
+            _strictCapacityOrder.clear();
+        } finally { releaseWriteLock(); }
     }
 
     /** 

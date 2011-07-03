@@ -77,4 +77,12 @@ public class LogConsoleBuffer {
     public List<String> getMostRecentCriticalMessages() {
             return new ArrayList(_critBuffer);
     }
+
+    /**
+     *  @since 0.8.8
+     */
+    public void clear() {
+        _buffer.clear();
+        _critBuffer.clear();
+    }
 }

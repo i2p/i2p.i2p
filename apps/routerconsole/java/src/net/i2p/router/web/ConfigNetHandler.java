@@ -271,7 +271,7 @@ public class ConfigNetHandler extends FormHandler {
         if (switchRequired) {
             hiddenSwitch();
         } else if (restartRequired) {
-            if (System.getProperty("wrapper.version") == null) {
+            if (_context.hasWrapper()) {
                 // Wow this dumps all conns immediately and really isn't nice
                 addFormNotice("Performing a soft restart");
                 _context.router().restart();
@@ -289,7 +289,8 @@ public class ConfigNetHandler extends FormHandler {
                 // There's a few changes that don't really require restart (e.g. enabling inbound TCP)
                 // But it would be hard to get right, so just do a restart.
                 addFormError(_("Gracefully restarting I2P to change published router address"));
-                _context.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_GRACEFUL_RESTART));
+                if (_context.hasWrapper())
+                    _context.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_GRACEFUL_RESTART));
                 _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
             }
         }
@@ -297,6 +298,7 @@ public class ConfigNetHandler extends FormHandler {
 
     private void hiddenSwitch() {
         // Full restart required to generate new keys
+        // FIXME don't call wrapper if not present, only rekey
         _context.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerAndRekeyTask(Router.EXIT_GRACEFUL_RESTART));
         _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
     }

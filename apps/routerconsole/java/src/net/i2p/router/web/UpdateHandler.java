@@ -285,7 +285,7 @@ public class UpdateHandler {
                     _log.log(Log.CRIT, "Update was VERIFIED, will be installed at next restart");
                     StringBuilder buf = new StringBuilder(64);
                     buf.append("<b>").append(_("Update downloaded")).append("<br>");
-                    if (System.getProperty("wrapper.version") != null)
+                    if (_context.hasWrapper())
                         buf.append(_("Click Restart to install"));
                     else
                         buf.append(_("Click Shutdown and restart to install"));
@@ -312,7 +312,8 @@ public class UpdateHandler {
     }
     
     protected void restart() {
-        _context.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_GRACEFUL_RESTART));
+        if (_context.hasWrapper())
+            _context.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_GRACEFUL_RESTART));
         _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
     }
 

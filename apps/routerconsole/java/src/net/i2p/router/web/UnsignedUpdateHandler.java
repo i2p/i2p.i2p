@@ -115,7 +115,7 @@ public class UnsignedUpdateHandler extends UpdateHandler {
                     _log.log(Log.CRIT, "Update was downloaded, will be installed at next restart");
                     StringBuilder buf = new StringBuilder(64);
                     buf.append("<b>").append(_("Update downloaded")).append("</b><br>");
-                    if (System.getProperty("wrapper.version") != null)
+                    if (_context.hasWrapper())
                         buf.append(_("Click Restart to install"));
                     else
                         buf.append(_("Click Shutdown and restart to install"));

@@ -33,6 +33,13 @@ public class ClientMessagePool {
     }
   
     /**
+     *  @since 0.8.8
+     */
+    public void shutdown() {
+        OutboundClientMessageOneShotJob.clearAllCaches();
+    }
+
+    /**
      * Add a new message to the pool.  The message can either be locally or 
      * remotely destined.
      *

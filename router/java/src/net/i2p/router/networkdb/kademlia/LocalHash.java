@@ -107,9 +107,10 @@ class LocalHash extends Hash {
         return distance;
     }
     
-    /** @deprecated unused */
     public void clearXorCache() {
-        _xorCache = null;
+        synchronized (_xorCache) {
+            _xorCache.clear();
+        }
     }
     
 /********

@@ -722,7 +722,13 @@ public class TunnelDispatcher implements Service {
             _validator.destroy();
         _validator = null;
         _pumper.stopPumping();
+        _outboundGateways.clear();
+        _outboundEndpoints.clear();
+        _participants.clear();
+        _inboundGateways.clear();
+        _participatingConfig.clear();
     }
+
     public void restart() { 
         shutdown(); 
         startup(); 

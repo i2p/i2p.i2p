@@ -108,7 +108,7 @@ public class BlockfileNamingService extends DummyNamingService {
      *
      *  If not in router context, the database will be opened read-only
      *  unless the property i2p.naming.blockfile.writeInAppContext is true.
-     *  Not designed for simultaneous access by multiple processes.
+     *  Not designed for multiple instantiations or simultaneous use by multple JVMs.
      *
      *  @throws RuntimeException on fatal error
      */
@@ -780,6 +780,7 @@ public class BlockfileNamingService extends DummyNamingService {
             }
             _isClosed = true;
         }
+        clearCache();
     }
 
     /** for logging errors in the static serializers below */

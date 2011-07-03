@@ -57,6 +57,12 @@ public class StatManager {
             _statLog = new BufferedStatLog(context);
     }
     
+    /** @since 0.8.8 */
+    public void shutdown() {
+        _frequencyStats.clear();
+        _rateStats.clear();
+    }
+
     /** may be null */
     public StatLog getStatLog() { return _statLog; }
     public void setStatLog(StatLog log) { 
