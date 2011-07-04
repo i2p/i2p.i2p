@@ -36,6 +36,7 @@ public abstract class NamingService {
     /** what classname should be used as the naming service impl? */
     public static final String PROP_IMPL = "i2p.naming.impl";
     private static final String DEFAULT_IMPL = "net.i2p.client.naming.BlockfileNamingService";
+    private static final String BACKUP_IMPL = "net.i2p.client.naming.HostsTxtNamingService";
     
     /** 
      * The naming service should only be constructed and accessed through the 
@@ -434,8 +435,14 @@ public abstract class NamingService {
             instance = (NamingService)con.newInstance(new Object[] { context });
         } catch (Exception ex) {
             Log log = context.logManager().getLog(NamingService.class);
-            log.error("Cannot load naming service " + impl + ", only .b32.i2p lookups will succeed", ex);
-            instance = new DummyNamingService(context); // fallback
+            // Blockfile may throw RuntimeException but HostsTxt won't
+            if (!impl.equals(BACKUP_IMPL)) {
+                log.error("Cannot load naming service " + impl + ", using HostsTxtNamingService", ex);
+                instance = new HostsTxtNamingService(context);
+            } else {
+                log.error("Cannot load naming service " + impl + ", only .b32.i2p lookups will succeed", ex);
+                instance = new DummyNamingService(context);
+            }
         }
         return instance;
     }
