@@ -181,7 +181,13 @@ public class I2PSocketEepGet extends EepGet {
                    "Cache-control: no-cache\r\n" +
                    "Pragma: no-cache\r\n" +
                    "User-Agent: " + USER_AGENT + "\r\n" +
-                   "Connection: close\r\n\r\n");
+                   "Connection: close\r\n");
+        if (_extraHeaders != null) {
+            for (String hdr : _extraHeaders) {
+                buf.append(hdr).append("\r\n");
+            }
+        }
+        buf.append("\r\n");
         return buf.toString();
     }
 

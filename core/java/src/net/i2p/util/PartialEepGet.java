@@ -119,7 +119,13 @@ public class PartialEepGet extends EepGet {
         // This will be replaced if we are going through I2PTunnelHTTPClient
         buf.append("User-Agent: " + USER_AGENT + "\r\n" +
                    "Accept-Encoding: \r\n" +
-                   "Connection: close\r\n\r\n");
+                   "Connection: close\r\n");
+        if (_extraHeaders != null) {
+            for (String hdr : _extraHeaders) {
+                buf.append(hdr).append("\r\n");
+            }
+        }
+        buf.append("\r\n");
 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Request: [" + buf.toString() + "]");

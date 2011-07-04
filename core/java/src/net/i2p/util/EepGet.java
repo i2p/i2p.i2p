@@ -45,6 +45,7 @@ public class EepGet {
     private final String _postData;
     private boolean _allowCaching;
     protected final List<StatusListener> _listeners;
+    protected List<String> _extraHeaders;
     
     protected boolean _keepFetching;
     protected Socket _proxy;
@@ -1022,7 +1023,13 @@ public class EepGet {
         // This will be replaced if we are going through I2PTunnelHTTPClient
         buf.append("User-Agent: " + USER_AGENT + "\r\n" +
                    "Accept-Encoding: \r\n" +
-                   "Connection: close\r\n\r\n");
+                   "Connection: close\r\n");
+        if (_extraHeaders != null) {
+            for (String hdr : _extraHeaders) {
+                buf.append(hdr).append("\r\n");
+            }
+        }
+        buf.append("\r\n");
         if (post)
             buf.append(_postData);
         if (_log.shouldLog(Log.DEBUG))
@@ -1074,5 +1081,17 @@ public class EepGet {
      */
     public void setWriteErrorToOutput() {
         _shouldWriteErrorToOutput = true;
+    }
+
+    /**
+     *  Add an extra header to the request.
+     *  Must be called before fetch().
+     *
+     *  @since 0.8.8
+     */
+    public void addHeader(String name, String value) {
+        if (_extraHeaders == null)
+            _extraHeaders = new ArrayList();
+        _extraHeaders.add(name + ": " + value);
     }
 }
