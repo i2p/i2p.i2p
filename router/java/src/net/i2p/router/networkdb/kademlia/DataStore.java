@@ -34,4 +34,9 @@ public interface DataStore {
     public void rescan();
     public int countLeaseSets();
 
+    /**
+     *  @return total size (RI and LS)
+     *  @since 0.8.8
+     */
+    public int size();
 }

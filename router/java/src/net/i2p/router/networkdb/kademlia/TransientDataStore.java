@@ -48,6 +48,14 @@ class TransientDataStore implements DataStore {
     
     public void rescan() {}
 
+    /**
+     *  @return total size (RI and LS)
+     *  @since 0.8.8
+     */
+    public int size() {
+        return _data.size();
+    }
+
     public Set<Hash> getKeys() {
         return new HashSet(_data.keySet());
     }

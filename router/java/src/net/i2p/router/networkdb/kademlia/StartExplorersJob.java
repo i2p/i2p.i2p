@@ -9,7 +9,6 @@ package net.i2p.router.networkdb.kademlia;
  */
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import net.i2p.data.Hash;
@@ -24,15 +23,23 @@ import net.i2p.util.Log;
  *
  */
 class StartExplorersJob extends JobImpl {
-    private Log _log;
-    private KademliaNetworkDatabaseFacade _facade;
+    private final Log _log;
+    private final KademliaNetworkDatabaseFacade _facade;
     
     /** don't explore more than 1 bucket at a time */
     private static final int MAX_PER_RUN = 1;
     /** dont explore the network more often than this */
-    private static final int MIN_RERUN_DELAY_MS = 5*60*1000;
-    /** explore the network at least once every thirty minutes */
-    private static final int MAX_RERUN_DELAY_MS = 30*60*1000;
+    private static final int MIN_RERUN_DELAY_MS = 99*1000;
+    /** explore the network at least this often */
+    private static final int MAX_RERUN_DELAY_MS = 15*60*1000;
+    /** aggressively explore during this time - same as KNDF expiration grace period */
+    private static final int STARTUP_TIME = 60*60*1000;
+    /** super-aggressively explore if we have less than this many routers */
+    private static final int LOW_ROUTERS = 125;
+    /** aggressively explore if we have less than this many routers */
+    private static final int MIN_ROUTERS = 250;
+    /** explore slowly if we have more than this many routers */
+    private static final int MAX_ROUTERS = 800;
     
     public StartExplorersJob(RouterContext context, KademliaNetworkDatabaseFacade facade) {
         super(context);
@@ -44,12 +51,14 @@ class StartExplorersJob extends JobImpl {
     public void runJob() {
         if (! (((FloodfillNetworkDatabaseFacade)_facade).floodfillEnabled() ||
                getContext().router().gracefulShutdownInProgress())) {
-            Set toExplore = selectKeysToExplore();
+            int num = MAX_PER_RUN;
+            if (_facade.getDataStore().size() < LOW_ROUTERS)
+                num *= 2;
+            Set<Hash> toExplore = selectKeysToExplore(num);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Keys to explore during this run: " + toExplore);
             _facade.removeFromExploreKeys(toExplore);
-            for (Iterator iter = toExplore.iterator(); iter.hasNext(); ) {
-                Hash key = (Hash)iter.next();
+            for (Hash key : toExplore) {
                 getContext().jobQueue().addJob(new ExploreJob(getContext(), _facade, key));
             }
         }
@@ -70,8 +79,24 @@ class StartExplorersJob extends JobImpl {
         getTiming().setStartAfter(getContext().clock().now() + delay);        
     }
     
-    /** how long should we wait before exploring? */
+    /**
+     *  How long should we wait before exploring?
+     *  We wait as long as it's been since we were last successful,
+     *  with exceptions.
+     */
     private long getNextRunDelay() {
+        // we don't explore if floodfill
+        if (((FloodfillNetworkDatabaseFacade)_facade).floodfillEnabled())
+            return MAX_RERUN_DELAY_MS;
+
+        // If we don't know too many peers, or just started, explore aggressively
+        // Use DataStore.size() which includes leasesets because it's faster
+        if (getContext().router().getUptime() < STARTUP_TIME ||
+            _facade.getDataStore().size() < MIN_ROUTERS)
+            return MIN_RERUN_DELAY_MS;
+        if (_facade.getDataStore().size() > MAX_ROUTERS)
+            return MAX_RERUN_DELAY_MS;
+
         long delay = getContext().clock().now() - _facade.getLastExploreNewDate();
         if (delay < MIN_RERUN_DELAY_MS) 
             return MIN_RERUN_DELAY_MS;
@@ -87,16 +112,16 @@ class StartExplorersJob extends JobImpl {
      * Nope, ExploreKeySelectorJob is disabled, so the explore pool
      * may be empty. In that case, generate random keys.
      */
-    private Set selectKeysToExplore() {
-        Set queued = _facade.getExploreKeys();
+    private Set<Hash> selectKeysToExplore(int num) {
+        Set<Hash> queued = _facade.getExploreKeys();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Keys waiting for exploration: " + queued.size());
-        Set rv = new HashSet(MAX_PER_RUN);
-        for (Iterator iter = queued.iterator(); iter.hasNext(); ) {
-            if (rv.size() >= MAX_PER_RUN) break;
-            rv.add(iter.next());
+        Set<Hash> rv = new HashSet(num);
+        for (Hash key : queued) {
+            if (rv.size() >= num) break;
+            rv.add(key);
         }
-        for (int i = rv.size(); i < MAX_PER_RUN; i++) {
+        for (int i = rv.size(); i < num; i++) {
             byte hash[] = new byte[Hash.HASH_LENGTH];
             getContext().random().nextBytes(hash);
             Hash key = new Hash(hash);
