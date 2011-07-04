@@ -53,9 +53,8 @@ class PeerManager {
     private static final long REORGANIZE_TIME_LONG = 551*1000;
     
     /**
-     *  Warning - this loads all the profiles in the constructor.
-     *  This may take a long time - 30 seconds or more.
-     *  Instantiate this in a Job or Thread.
+     *  Profiles are now loaded in a separate thread,
+     *  so this should return quickly.
      */
     public PeerManager(RouterContext context) {
         _context = context;
@@ -67,10 +66,10 @@ class PeerManager {
         _peersByCapability = new Set[26];
         for (int i = 0; i < _peersByCapability.length; i++)
             _peersByCapability[i] = new ConcurrentHashSet();
-        loadProfiles();
+        loadProfilesInBackground();
         ////_context.jobQueue().addJob(new EvaluateProfilesJob(_context));
         //SimpleScheduler.getInstance().addPeriodicEvent(new Reorg(), 0, REORGANIZE_TIME);
-        new Reorg();
+        //new Reorg();
         //_context.jobQueue().addJob(new PersistProfilesJob(_context, this));
     }
     
@@ -122,6 +121,30 @@ class PeerManager {
         if (prof == null) return;
         if (true)
             _persistenceHelper.writeProfile(prof);
+    }
+
+    /**
+     *  Load the profiles in a separate thread, so we don't spend
+     *  forever in the constructor (slowing down the Router constructor
+     *  via RouterContext.initAll()).
+     *  This also instantiates Reorg, so only call this once
+     *
+     *  @since 0.8.8
+     */
+    private void loadProfilesInBackground() {
+        (new Thread(new ProfileLoader())).start();
+    }
+
+    /**
+     *  Load the profiles and instantiate Reorg
+     *
+     *  @since 0.8.8
+     */
+    private class ProfileLoader implements Runnable {
+        public void run() {
+            loadProfiles();
+            new Reorg();
+        }
     }
 
     /**
