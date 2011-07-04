@@ -68,15 +68,40 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
     }
     
     private static final int MIN_NONFAILING_PCT = 25;
+    private static final int MIN_ACTIVE_PEERS_STARTUP = 6;
+    private static final int MIN_ACTIVE_PEERS = 12;
+
+    /**
+     *  Should we pick from the high cap pool instead of the larger not failing pool?
+     *  This should return false most of the time, but if the not-failing pool's
+     *  build success rate is much worse, return true so that reliability
+     *  is maintained.
+     */
     private static boolean shouldPickHighCap(RouterContext ctx) {
-        if (Boolean.valueOf(ctx.getProperty("router.exploreHighCapacity", "false")).booleanValue())
+        if (ctx.getBooleanProperty("router.exploreHighCapacity"))
             return true;
-        // no need to explore too wildly at first
+
+        // If we don't have enough connected peers, use exploratory
+        // tunnel building to get us better-connected.
+        // This is a tradeoff, we could easily lose our exploratory tunnels,
+        // but with so few connected peers, anonymity suffers and reliability
+        // will decline also, as we repeatedly try to build tunnels
+        // through the same few peers.
+        int active = ctx.commSystem().countActivePeers();
+        if (active < MIN_ACTIVE_PEERS_STARTUP)
+            return false;
+
+        // no need to explore too wildly at first (if we have enough connected peers)
         if (ctx.router().getUptime() <= 5*60*1000)
             return true;
         // or at the end
         if (ctx.router().gracefulShutdownInProgress())
             return true;
+
+        // see above
+        if (active < MIN_ACTIVE_PEERS)
+            return false;
+
         // ok, if we aren't explicitly asking for it, we should try to pick peers
         // randomly from the 'not failing' pool.  However, if we are having a
         // hard time building exploratory tunnels, lets fall back again on the
