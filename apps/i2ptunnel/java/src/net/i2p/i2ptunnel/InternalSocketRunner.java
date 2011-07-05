@@ -15,11 +15,10 @@ import net.i2p.util.Log;
  * @since 0.7.9
  */
 class InternalSocketRunner implements Runnable {
-    private I2PTunnelClientBase client;
-    private int port;
+    private final I2PTunnelClientBase client;
+    private final int port;
     private ServerSocket ss;
-    private boolean open;
-    private static final Log _log = new Log(InternalSocketRunner.class);
+    private volatile boolean open;
 
     /** starts the runner */
     InternalSocketRunner(I2PTunnelClientBase client) {
@@ -33,13 +32,14 @@ class InternalSocketRunner implements Runnable {
         try {
             this.ss = new InternalServerSocket(this.port);
             this.open = true;
-            while (true) {
+            while (this.open) {
                 Socket s = this.ss.accept();
                 this.client.manageConnection(s);
             }
         } catch (IOException ex) {
             if (this.open) {
-                _log.error("Error listening for internal connections on port " + this.port, ex);
+                Log log = new Log(InternalSocketRunner.class);
+                log.error("Error listening for internal connections on port " + this.port, ex);
             }
             this.open = false;
         }
@@ -47,10 +47,10 @@ class InternalSocketRunner implements Runnable {
 
     void stopRunning() {
         if (this.open) {
+            this.open = false;
             try {
                 this.ss.close();
             } catch (IOException ex) {}
-            this.open = false;
         }
     }
 }
