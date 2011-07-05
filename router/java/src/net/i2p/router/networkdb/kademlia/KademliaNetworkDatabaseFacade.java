@@ -50,7 +50,7 @@ import net.i2p.util.Log;
  *
  */
 public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
-    protected Log _log;
+    protected final Log _log;
     private KBucketSet _kb; // peer hashes sorted into kbuckets, but within kbuckets, unsorted
     private DataStore _ds; // hash to DataStructure mapping, persisted when necessary
     /** where the data store is pushing the data */
@@ -63,8 +63,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private HarvesterJob _harvestJob;
     /** when was the last time an exploration found something new? */
     private long _lastExploreNew;
-    protected PeerSelector _peerSelector;
-    protected RouterContext _context;
+    protected final PeerSelector _peerSelector;
+    protected final RouterContext _context;
     /** 
      * Map of Hash to RepublishLeaseSetJob for leases we'realready managing.
      * This is added to when we create a new RepublishLeaseSetJob, and the values are 
@@ -132,10 +132,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     public KademliaNetworkDatabaseFacade(RouterContext context) {
         _context = context;
         _log = _context.logManager().getLog(getClass());
-        _initialized = false;
         _peerSelector = createPeerSelector();
         _publishingLeaseSets = new HashMap(8);
-        _lastExploreNew = 0;
         _activeRequests = new HashMap(8);
         _enforceNetId = DEFAULT_ENFORCE_NETID;
         context.statManager().createRateStat("netDb.lookupLeaseSetDeferred", "how many lookups are deferred for a single leaseSet lookup?", "NetworkDatabase", new long[] { 60*60*1000 });
@@ -667,12 +665,14 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     public LeaseSet store(Hash key, LeaseSet leaseSet) throws IllegalArgumentException {
         if (!_initialized) return null;
         
-        LeaseSet rv = (LeaseSet)_ds.get(key);
-        
-        if ( (rv != null) && (rv.equals(leaseSet)) ) {
-            // if it hasn't changed, no need to do anything
-            return rv;
-        }
+        LeaseSet rv = null;
+        try {
+            rv = (LeaseSet)_ds.get(key);
+            if ( (rv != null) && (rv.equals(leaseSet)) ) {
+                // if it hasn't changed, no need to do anything
+                return rv;
+            }
+        } catch (ClassCastException cce) {}
         
         String err = validate(key, leaseSet);
         if (err != null)
@@ -799,12 +799,14 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     public RouterInfo store(Hash key, RouterInfo routerInfo, boolean persist) throws IllegalArgumentException {
         if (!_initialized) return null;
         
-        RouterInfo rv = (RouterInfo)_ds.get(key, persist);
-        
-        if ( (rv != null) && (rv.equals(routerInfo)) ) {
-            // no need to validate
-            return rv;
-        }
+        RouterInfo rv = null;
+        try {
+            rv = (RouterInfo)_ds.get(key, persist);
+            if ( (rv != null) && (rv.equals(routerInfo)) ) {
+                // no need to validate
+                return rv;
+            }
+        } catch (ClassCastException cce) {}
         
         String err = validate(key, routerInfo);
         if (err != null)
