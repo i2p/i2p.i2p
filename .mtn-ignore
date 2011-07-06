@@ -22,3 +22,4 @@ _jsp\.java$
 ~$
 /build/
 /classes/
+^debian/copyright
