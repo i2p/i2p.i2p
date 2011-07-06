@@ -1,3 +1,23 @@
+2011-07-06 zzz
+  * EepGet: Add method to add extra headers to request
+  * Floodfills: Increase again
+  * HTTP Proxy: Fix error on shutdown
+  * NamingService: Use HostsTxtNamingService if default fails to initialize
+  * Netdb: Catch exception on dup netdb entries
+  * Netdb exploration:
+    - Remove floodfills from dont-include list in exploration
+      DatabaseLookupMessage, as the dont-include-floodfills flag
+      has been supported since release 0.7.9.
+      This will make exploration work better, as there is room for
+      non-floodfills in the don't-include list now.
+    - Reduce min and max exploration intervals
+    - Explore aggressively at startup and if known routers is low
+    - Explore slowly if known routers is high
+  * PeerManager: Load profiles in separate thread to avoid slowing
+                 down the context initAll()
+  * Tunnels: Use exploratory tunnels to help maintain a minimum number
+             of connected peers
+
 2011-07-03 zzz
   * AppContext: Add hasWrapper() method
   * Shutdown:
