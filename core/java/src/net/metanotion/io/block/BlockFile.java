@@ -122,6 +122,9 @@ public class BlockFile {
 		spanSize		= file.readUnsignedShort();
 	}
 
+	/**
+	 *  Run an integrity check on the blockfile and all the skiplists in it
+	 */
 	public static void main(String args[]) {
 		if (args.length != 1) {
 			System.err.println("Usage: BlockFile file");
@@ -331,12 +334,12 @@ public class BlockFile {
 				if (flb == null)
 					flb = new FreeListBlock(file, freeListStart);
 				if(!flb.isEmpty()) {
-					if (log.shouldLog(Log.INFO))
-						log.info("Alloc from " + flb);
+					if (log.shouldLog(Log.DEBUG))
+						log.debug("Alloc from " + flb);
 					return flb.takePage();
 				} else {
-					if (log.shouldLog(Log.INFO))
-						log.info("Alloc returning empty " + flb);
+					if (log.shouldLog(Log.DEBUG))
+						log.debug("Alloc returning empty " + flb);
 					freeListStart = flb.getNextPage();
 					writeSuperBlock();
 					int rv = flb.page;
@@ -370,8 +373,8 @@ public class BlockFile {
 				freeListStart = page;
 				FreeListBlock.initPage(file, page);
 				writeSuperBlock();
-				if (log.shouldLog(Log.INFO))
-					log.info("Freed page " + page + " as new FLB");
+				if (log.shouldLog(Log.DEBUG))
+					log.debug("Freed page " + page + " as new FLB");
 				return;
 			}
 			try {
@@ -379,8 +382,8 @@ public class BlockFile {
 					flb = new FreeListBlock(file, freeListStart);
 				if(flb.isFull()) {
 					// Make the free page a new FLB
-					if (log.shouldLog(Log.INFO))
-						log.info("Full: " + flb);
+					if (log.shouldLog(Log.DEBUG))
+						log.debug("Full: " + flb);
 					FreeListBlock.initPage(file, page);
 					if(flb.getNextPage() == 0) {
 						// Put it at the tail.
@@ -394,13 +397,13 @@ public class BlockFile {
 						freeListStart = page;
 						writeSuperBlock();
 					}
-					if (log.shouldLog(Log.INFO))
-						log.info("Freed page " + page + " to full " + flb);
+					if (log.shouldLog(Log.DEBUG))
+						log.debug("Freed page " + page + " to full " + flb);
 					return;
 				}
 				flb.addPage(page);
-				if (log.shouldLog(Log.INFO))
-					log.info("Freed page " + page + " to " + flb);
+				if (log.shouldLog(Log.DEBUG))
+					log.debug("Freed page " + page + " to " + flb);
 			} catch (IOException ioe) {
 				log.error("Discarding corrupt free list block page " + freeListStart, ioe);
 				freeListStart = page;
@@ -413,6 +416,10 @@ public class BlockFile {
 		}
 	}
 
+	/**
+	 *  If the file is writable, this runs an integrity check and repair
+	 *  on first open.
+	 */
 	public BSkipList getIndex(String name, Serializer key, Serializer val) throws IOException {
 		// added I2P
 		BSkipList bsl = (BSkipList) openIndices.get(name);
@@ -422,6 +429,13 @@ public class BlockFile {
 		Integer page = (Integer) metaIndex.get(name);
 		if (page == null) { return null; }
 		bsl = new BSkipList(spanSize, this, page.intValue(), key, val, true);
+		if (file.canWrite()) {
+			log.info("Checking skiplist " + name + " in blockfile " + file);
+			if (bsl.bslck(true, false))
+				log.logAlways(Log.WARN, "Repaired skiplist " + name + " in blockfile " + file);
+			else
+				log.info("No errors in skiplist " + name + " in blockfile " + file);
+		}
 		openIndices.put(name, bsl);
 		return bsl;
 	}
@@ -481,31 +495,44 @@ public class BlockFile {
 		}
 	}
 
-	public void bfck(boolean fix) {
-		log.warn("magic bytes " + magicBytes);
-		log.warn("fileLen " + fileLen);
-		log.warn("freeListStart " + freeListStart);
-		log.warn("mounted " + mounted);
-		log.warn("spanSize " + spanSize);
-		log.warn("Metaindex");
-		metaIndex.bslck(true, fix);
+	/**
+	 *  Run an integrity check on the blockfile and all the skiplists in it
+	 *  @return true if the levels were modified.
+	 */
+	public boolean bfck(boolean fix) {
+		log.info("magic bytes " + magicBytes);
+		log.info("fileLen " + fileLen);
+		log.info("freeListStart " + freeListStart);
+		log.info("mounted " + mounted);
+		log.info("spanSize " + spanSize);
+		log.info("Metaindex");
+		log.info("Checking meta index in blockfile " + file);
+		boolean rv = metaIndex.bslck(fix, true);
+		if (rv)
+			log.warn("Repaired meta index in blockfile " + file);
+		else
+			log.info("No errors in meta index in blockfile " + file);
 		int items = 0;
 		for (SkipIterator iter = metaIndex.iterator(); iter.hasNext(); ) {
 			String slname = (String) iter.nextKey();
 			Integer page = (Integer) iter.next();
-			log.warn("List " + slname + " page " + page);
+			log.info("List " + slname + " page " + page);
 			try {
+				// This uses IdentityBytes, so the value class won't be right
+				//Serializer ser = slname.equals("%%__REVERSE__%%") ? new IntBytes() : new UTF8StringBytes();
 				BSkipList bsl = getIndex(slname, new UTF8StringBytes(), new IdentityBytes());
 				if (bsl == null) {
 					log.error("Can't find list? " + slname);
 					continue;
 				}
-				bsl.bslck(false, fix);
+				// The check is now done in getIndex(), no need to do here...
+				// but we can't get the return value of the check here.
 				items++;
 			} catch (IOException ioe) {
 				log.error("Error with list " + slname, ioe);
 			}
 		}
-		log.warn("actual size " + items);
+		log.info("Checked meta index and " + items + " skiplists");
+		return rv;
 	}
 }

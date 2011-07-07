@@ -103,7 +103,8 @@ public class BSkipSpan extends SkipSpan {
 			BlockFile.log.error("Already killed!! " + this, new Exception());
 			return;
 		}
-		BlockFile.log.info("Killing " + this);
+		if (BlockFile.log.shouldLog(Log.DEBUG))
+			BlockFile.log.debug("Killing " + this);
 		isKilled = true;
 		try {
 			int curPage = overflowPage;
@@ -226,8 +227,8 @@ public class BSkipSpan extends SkipSpan {
 					this.overflowPage = 0;
 				try {
 					int freed = freeContinuationPages(curNextPage[0]);
-					if (BlockFile.log.shouldLog(Log.INFO))
-						BlockFile.log.info("Freed " + freed + " continuation pages");
+					if (BlockFile.log.shouldLog(Log.DEBUG))
+						BlockFile.log.debug("Freed " + freed + " continuation pages");
 				} catch (IOException ioe) {
 					BlockFile.log.error("Error freeing " + this, ioe);
 				}
@@ -407,12 +408,13 @@ public class BSkipSpan extends SkipSpan {
 			np = bss.nextPage;
 		}
 
+		// Go backwards to fill in the rest. This never happens.
 		bss = this;
 		np = prevPage;
 		while(np != 0) {
 			BSkipSpan temp = bsl.spanHash.get(Integer.valueOf(np));
 			if(temp != null) {
-				bss.next = temp;
+				bss.prev = temp;
 				break;
 			}
 			bss.prev = new BSkipSpan(bf, bsl);

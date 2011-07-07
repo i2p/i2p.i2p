@@ -134,13 +134,19 @@ public class SkipList {
 		return null;
 	}
 
-	/** dumps all the skip levels */
+	/**
+	 * dumps all the skip levels
+	 * @deprecated goes to System.out
+	 */
 	public void printSL() {
 		System.out.println("List size " + size);
 		System.out.println(stack.printAll());
 	}
 
-	/** dumps all the data */
+	/**
+	 * dumps all the data
+	 * @deprecated goes to System.out
+	 */
 	public void print() {
 		System.out.println("List size " + size);
 		System.out.println(first.print());

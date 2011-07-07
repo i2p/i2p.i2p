@@ -64,7 +64,8 @@ public class SkipLevels {
 
 	public String print() {
 		StringBuilder buf = new StringBuilder(128);
-		buf.append("SL: ").append(key()).append(" :: ");
+		String k = (bottom.nKeys == 0) ? "empty" : (key() != null) ? key().toString() : "null";
+		buf.append("LVLS: ").append(k).append(" :: ");
 		for(int i=0;i<levels.length;i++) {
 			buf.append(i);
 			if(levels[i] != null) {
@@ -180,6 +181,7 @@ public class SkipLevels {
 								BlockFile.log.info("not equal level " + i + ' ' + levels[i].key());
 							}
 						}
+						this.flush();
 						if (BlockFile.log.shouldLog(Log.INFO))
 							BlockFile.log.info("new Us: " + print());
 						replace.killInstance();
@@ -188,7 +190,17 @@ public class SkipLevels {
 				res[1] = null;
 			}
 		}
-		if((bottom.nKeys == 0) && (sl.first != bottom)) { this.killInstance(); }
+		if((bottom.nKeys == 0) && (sl.first != bottom)) {
+			// from debugging other problems
+			if (res == null) {
+				BlockFile.log.warn("WTF killing with no return value " + print());
+			} else if (res[1] == null) {
+				BlockFile.log.warn("WTF killing with no return value 1 " + print());
+			} else if (res[1] != this) {
+				BlockFile.log.warn("WTF killing with return value not us " + res[1] + ' ' + print());
+			}
+			this.killInstance();
+		}
 		return res;
 	}
 
@@ -219,8 +231,11 @@ public class SkipLevels {
 						return slvls;
 					}
 				}
-				if (modified)
+				if (modified) {
 					this.flush();
+					if (slvls != null)
+						slvls.flush();
+				}
 				return null;
 			}
 		}
@@ -247,6 +262,7 @@ public class SkipLevels {
 		return null;
 	}
 
-	public void blvlck(boolean fix, int depth) {}
+	public boolean blvlck(boolean fix) { return false; }
+	public boolean blvlck(boolean fix, int width, SkipLevels[] prevLevels) { return false; }
 }
 

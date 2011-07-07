@@ -224,33 +224,40 @@ public class BSkipList extends SkipList {
 		return new IBSkipIterator(ss, search[0]);
 	}
 
-	public void bslck(boolean isMeta, boolean fix) {
-		BlockFile.log.warn("    size " + this.size);
-		BlockFile.log.warn("    spans " + this.spanHash.size());
-		BlockFile.log.warn("    levels " + this.levelHash.size());
-		BlockFile.log.warn("    skipPage " + this.skipPage);
-		BlockFile.log.warn("    firstSpanPage " + this.firstSpanPage);
-		BlockFile.log.warn("    firstLevelPage " + this.firstLevelPage);
-		BlockFile.log.warn("    maxLevels " + this.maxLevels());
-		printSL();
-		print();
-		BlockFile.log.warn("*** Lvlck() ***");
-		stack.blvlck(fix, 0);
+	/**
+	 *  Run an integrity check on the skiplist and all the levels in it
+	 *  @return true if the levels were modified.
+	 */
+	public boolean bslck(boolean fix, boolean isMeta) {
+		BlockFile.log.info("    size " + this.size);
+		BlockFile.log.info("    spans " + this.spanHash.size());
+		BlockFile.log.info("    levels " + this.levelHash.size());
+		BlockFile.log.info("    skipPage " + this.skipPage);
+		BlockFile.log.info("    firstSpanPage " + this.firstSpanPage);
+		BlockFile.log.info("    firstLevelPage " + this.firstLevelPage);
+		BlockFile.log.info("    maxLevels " + this.maxLevels());
+		//printSL();
+		//print();
+		//BlockFile.log.info("*** Lvlck() ***");
+		boolean rv = stack.blvlck(fix);
+	     /****
 		int items = 0;
 		for (SkipIterator iter = this.iterator(); iter.hasNext(); ) {
 			String key = (String) iter.nextKey();
 			if (isMeta) {
 				int sz = ((Integer) iter.next()).intValue();
-				BlockFile.log.warn("        Item " + key + " page " + sz);
+				BlockFile.log.info("        Item " + key.toString() + " page " + sz);
 			} else {
 				String cls= iter.next().getClass().getSimpleName();
-				BlockFile.log.warn("        Item " + key + " class " + cls);
+				BlockFile.log.info("        Item " + key.toString() + " class " + cls);
 			}
 			items++;
 		}
 		BlockFile.log.warn("    actual size " + items);
 		if (items != this.size)
 			BlockFile.log.warn("****** size mismatch, header = " + this.size + " actual = " + items);
+              ****/
+		return rv;
 	}
 
 	@Override

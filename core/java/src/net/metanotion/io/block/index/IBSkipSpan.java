@@ -277,28 +277,49 @@ public class IBSkipSpan extends BSkipSpan {
 			bss.next = new IBSkipSpan(bf, bsl);
 			bss.next.next = null;
 			bss.next.prev = bss;
+			Comparable previousFirstKey = bss.firstKey;
 			bss = (IBSkipSpan) bss.next;
 			
 			BSkipSpan.loadInit(bss, bf, bsl, np, key, val);
 			bss.loadFirstKey();
+			Comparable nextFirstKey = bss.firstKey;
+			if (previousFirstKey.compareTo(nextFirstKey) >= 0) {
+				// TODO remove, but if we are at the bottom of a level
+				// we have to remove the level too, which is a mess
+				BlockFile.log.error("Corrupt database, span out of order " + ((BSkipSpan)bss.prev).page +
+				                    " first key " + previousFirstKey +
+				                    " next page " + bss.page +
+				                    " first key " + nextFirstKey);
+			}
 			np = bss.nextPage;
 		}
 
+		// Go backwards to fill in the rest. This never happens.
 		bss = this;
 		np = prevPage;
 		while(np != 0) {
 			temp = (IBSkipSpan) bsl.spanHash.get(Integer.valueOf(np));
 			if(temp != null) {
-				bss.next = temp;
+				bss.prev = temp;
 				break;
 			}
 			bss.prev = new IBSkipSpan(bf, bsl);
 			bss.prev.next = bss;
 			bss.prev.prev = null;
+			Comparable nextFirstKey = bss.firstKey;
 			bss = (IBSkipSpan) bss.prev;
 			
 			BSkipSpan.loadInit(bss, bf, bsl, np, key, val);
 			bss.loadFirstKey();
+			Comparable previousFirstKey = bss.firstKey;
+			if (previousFirstKey.compareTo(nextFirstKey) >= 0) {
+				// TODO remove, but if we are at the bottom of a level
+				// we have to remove the level too, which is a mess
+				BlockFile.log.error("Corrupt database, span out of order " + bss.page +
+				                    " first key " + previousFirstKey +
+				                    " next page " + ((BSkipSpan)bss.next).page +
+				                    " first key " + nextFirstKey);
+			}
 			np = bss.prevPage;
 		}
 	}

@@ -68,6 +68,16 @@ public class RAIFile implements RandomAccessInterface, DataInput, DataOutput {
 		return this.w;
 	}
 
+	/**
+	 *  @since 0.8.8
+	 */
+	@Override
+	public String toString() {
+		if (this.f != null)
+			return this.f.getAbsolutePath();
+		return this.delegate.toString();
+	}
+
 	public long getFilePointer()		throws IOException { return delegate.getFilePointer(); }
 	public long length()				throws IOException { return delegate.length(); }
 	public int read()					throws IOException { return delegate.read(); }
