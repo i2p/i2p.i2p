@@ -125,9 +125,9 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
      */
     public static class IrcInboundFilter implements Runnable {
         
-        private Socket local;
-        private I2PSocket remote;
-        private StringBuffer expectedPong;
+        private final Socket local;
+        private final I2PSocket remote;
+        private final StringBuffer expectedPong;
         private final Log _log;
                 
         public IrcInboundFilter(Socket _local, I2PSocket _remote, StringBuffer pong, Log log) {
@@ -191,7 +191,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
             } catch (RuntimeException re) {
                 _log.error("Error filtering inbound data", re);
             } finally {
-                if (local != null) try { local.close(); } catch (IOException e) {}
+                try { local.close(); } catch (IOException e) {}
             }
             if(_log.shouldLog(Log.DEBUG))
                 _log.debug("IrcInboundFilter: Done.");
@@ -204,9 +204,9 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
          */
         public static class IrcOutboundFilter implements Runnable {
                     
-            private Socket local;
-            private I2PSocket remote;
-            private StringBuffer expectedPong;
+            private final Socket local;
+            private final I2PSocket remote;
+            private final StringBuffer expectedPong;
             private final Log _log;
                 
             public IrcOutboundFilter(Socket _local, I2PSocket _remote, StringBuffer pong, Log log) {
@@ -270,7 +270,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements Runnable 
                 } catch (RuntimeException re) {
                     _log.error("Error filtering outbound data", re);
                 } finally {
-                    if (remote != null) try { remote.close(); } catch (IOException e) {}
+                    try { remote.close(); } catch (IOException e) {}
                 }
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("IrcOutboundFilter: Done.");

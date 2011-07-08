@@ -25,6 +25,8 @@ public abstract class FormatDate
 
     public static String format(long date)
     {
-    	return _dateFormat.format(new Date(date));
+	synchronized(_dateFormat) {
+		return _dateFormat.format(new Date(date));
+	}
     }
 }
