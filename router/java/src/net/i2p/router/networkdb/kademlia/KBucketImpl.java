@@ -379,7 +379,7 @@ class KBucketImpl implements KBucket {
     }
     
     private static void testRand() {
-        StringBuilder buf = new StringBuilder(2048);
+        //StringBuilder buf = new StringBuilder(2048);
         int low = 1;
         int high = 3;
         Log log = I2PAppContext.getGlobalContext().logManager().getLog(KBucketImpl.class);

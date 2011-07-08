@@ -225,7 +225,8 @@ public class UrlLauncher {
 
     private boolean validateUrlFormat(String urlString) {
         try {
-            URL url = new URL(urlString);
+            // just to check validity
+            new URL(urlString);
         } catch (MalformedURLException e) {
             return false;
         }

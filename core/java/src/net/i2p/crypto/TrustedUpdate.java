@@ -129,10 +129,10 @@ JXQAnA28vDmMMMH/WPbC5ixmJeGGNUiR
     public static final int    HEADER_BYTES        = Signature.SIGNATURE_BYTES + VERSION_BYTES;
     private static final String PROP_TRUSTED_KEYS   = "router.trustedUpdateKeys";
 
-    private static I2PAppContext _context;
+    private final I2PAppContext _context;
 
-    private Log       _log;
-    private Map<SigningPublicKey, String> _trustedKeys;
+    private final Log _log;
+    private final Map<SigningPublicKey, String> _trustedKeys;
     private String _newVersion;
     /** 172 */
     private static final int KEYSIZE_B64_BYTES = 2 + (SigningPublicKey.KEYSIZE_BYTES * 4 / 3);
@@ -155,7 +155,6 @@ JXQAnA28vDmMMMH/WPbC5ixmJeGGNUiR
         _context = context;
         _log = _context.logManager().getLog(TrustedUpdate.class);
         _trustedKeys = new HashMap(4);
-        _newVersion = null;
 
         String propertyTrustedKeys = context.getProperty(PROP_TRUSTED_KEYS);
 
@@ -273,9 +272,9 @@ JXQAnA28vDmMMMH/WPbC5ixmJeGGNUiR
     private static final boolean genKeysCLI(String publicKeyFile, String privateKeyFile) {
         FileOutputStream fileOutputStream = null;
 
-        _context = I2PAppContext.getGlobalContext();
+        I2PAppContext context = I2PAppContext.getGlobalContext();
         try {
-            Object signingKeypair[] = _context.keyGenerator().generateSigningKeypair();
+            Object signingKeypair[] = context.keyGenerator().generateSigningKeypair();
             SigningPublicKey signingPublicKey = (SigningPublicKey) signingKeypair[0];
             SigningPrivateKey signingPrivateKey = (SigningPrivateKey) signingKeypair[1];
 
