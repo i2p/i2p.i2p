@@ -1,4 +1,6 @@
 2011-07-08 zzz
+  * I2NP: Consolidate common code from TunnelBuildMessage and
+          TunnelBuildReplyMessage into a common base class
   * NetDB: Fix NPE at startup (ticket #493)
   * Sha256Standalone:
     - Use system SHA-256 MessageDigest instead of Sha256Standalone in PRNG
