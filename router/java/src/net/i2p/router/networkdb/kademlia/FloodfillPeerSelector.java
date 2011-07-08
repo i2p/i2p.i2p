@@ -22,6 +22,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.router.util.RandomIterator;
 import net.i2p.stat.Rate;
+import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 
 /**
@@ -201,9 +202,12 @@ class FloodfillPeerSelector extends PeerSelector {
             } else {
                 PeerProfile prof = _context.profileOrganizer().getProfile(entry);
                 double maxGoodRespTime = MAX_GOOD_RESP_TIME;
-                Rate tunnelTestTime = _context.statManager().getRate("tunnel.testSuccessTime").getRate(10*60*1000);
-                if (tunnelTestTime != null && tunnelTestTime.getAverageValue() > 500)
-                    maxGoodRespTime = 2 * tunnelTestTime.getAverageValue();
+                RateStat ttst = _context.statManager().getRate("tunnel.testSuccessTime");
+                if (ttst != null) {
+                    Rate tunnelTestTime = ttst.getRate(10*60*1000);
+                    if (tunnelTestTime != null && tunnelTestTime.getAverageValue() > 500)
+                        maxGoodRespTime = 2 * tunnelTestTime.getAverageValue();
+                }
                 if (prof != null && prof.getDBHistory() != null
                     && prof.getDbResponseTime().getRate(10*60*1000).getAverageValue() < maxGoodRespTime
                     && prof.getDBHistory().getLastStoreFailed() < now - NO_FAIL_STORE_GOOD
