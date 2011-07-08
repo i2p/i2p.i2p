@@ -148,23 +148,36 @@ public class I2PAppContext {
     }
     
     /**
-     * Lets root a brand new context
-     *
+     * Create a brand new context.
+     * WARNING: In almost all cases, you should use getGlobalContext() instead,
+     * to avoid creating additional contexts, which may spawn numerous
+     * additional resources and threads, and may be the cause of logging
+     * problems or hard-to-isolate bugs.
      */
     public I2PAppContext() {
         this(true, null);
     }
     
     /**
-     * Lets root a brand new context
-     *
+     * Create a brand new context.
+     * WARNING: In almost all cases, you should use getGlobalContext() instead,
+     * to avoid creating additional contexts, which may spawn numerous
+     * additional resources and threads, and may be the cause of logging
+     * problems or hard-to-isolate bugs.
      */
     public I2PAppContext(Properties envProps) {
         this(true, envProps);
     }
     
     /**
+     * Create a brand new context.
+     * WARNING: In almost all cases, you should use getGlobalContext() instead,
+     * to avoid creating additional contexts, which may spawn numerous
+     * additional resources and threads, and may be the cause of logging
+     * problems or hard-to-isolate bugs.
+     *
      * @param doInit should this context be used as the global one (if necessary)?
+     *               Will only apply if there is no global context now.
      */
     private I2PAppContext(boolean doInit, Properties envProps) {
         if (doInit) {
