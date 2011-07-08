@@ -1,7 +1,8 @@
 2011-07-08 zzz
+  * Findbugs: Several fixes and cleanups
   * I2NP: Consolidate common code from TunnelBuildMessage and
           TunnelBuildReplyMessage into a common base class
-  * NetDB: Fix NPE at startup (ticket #493)
+  * NetDB, TestJob: Fix NPEs at startup (ticket #493)
   * Sha256Standalone:
     - Use system SHA-256 MessageDigest instead of Sha256Standalone in PRNG
     - Deprecate DataHelper functions using Sha256Standalone arguments;

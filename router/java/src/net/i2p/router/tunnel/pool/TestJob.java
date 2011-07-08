@@ -19,6 +19,8 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
 import net.i2p.router.message.GarlicMessageBuilder;
 import net.i2p.router.message.PayloadGarlicConfig;
+import net.i2p.stat.Rate;
+import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 
 class TestJob extends JobImpl {
@@ -219,8 +221,15 @@ class TestJob extends JobImpl {
         //
         // Try to prevent congestion collapse (failing all our tunnels and then clogging our outbound
         // with new tunnel build requests) by adding in three times the average outbound delay.
-        int delay = 3 * (int) getContext().statManager().getRate("transport.sendProcessingTime").getRate(60*1000).getAverageValue();
-        return delay + (2500 * (_outTunnel.getLength() + _replyTunnel.getLength()));
+        RateStat tspt = getContext().statManager().getRate("transport.sendProcessingTime");
+        if (tspt != null) {
+            Rate r = tspt.getRate(60*1000);
+            if (r != null) {
+                int delay = 3 * (int) r.getAverageValue();
+                return delay + (2500 * (_outTunnel.getLength() + _replyTunnel.getLength()));
+            }
+        }
+        return 15*1000;
     }
 
     private void scheduleRetest() { scheduleRetest(false); }
