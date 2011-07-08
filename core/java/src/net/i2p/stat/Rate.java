@@ -218,8 +218,8 @@ public class Rate {
             long measuredPeriod = now - _lastCoalesceDate;
             if (measuredPeriod < _period - SLACK) {
                 // no need to coalesce (assuming we only try to do so once per minute)
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("not coalescing, measuredPeriod = " + measuredPeriod + " period = " + _period);
+                //if (_log.shouldLog(Log.DEBUG))
+                //    _log.debug("not coalescing, measuredPeriod = " + measuredPeriod + " period = " + _period);
                 return;
             }
     
