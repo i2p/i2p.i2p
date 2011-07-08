@@ -9,8 +9,8 @@ package net.i2p.client;
  *
  */
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.KeyGenerator;
@@ -38,7 +38,8 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
 
     public RequestLeaseSetMessageHandler(I2PAppContext context) {
         super(context, RequestLeaseSetMessage.MESSAGE_TYPE);
-        _existingLeaseSets = new HashMap(32);
+        // not clear why there would ever be more than one
+        _existingLeaseSets = new ConcurrentHashMap(4);
     }
     
     public void handleMessage(I2CPMessage message, I2PSessionImpl session) {
@@ -58,16 +59,10 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
         leaseSet.setDestination(session.getMyDestination());
 
         // reuse the old keys for the client
-        LeaseInfo li = null;
-        synchronized (_existingLeaseSets) {
-            if (_existingLeaseSets.containsKey(session.getMyDestination()))
-                li = (LeaseInfo) _existingLeaseSets.get(session.getMyDestination());
-        }
+        LeaseInfo li = (LeaseInfo) _existingLeaseSets.get(session.getMyDestination());
         if (li == null) {
             li = new LeaseInfo(session.getMyDestination());
-            synchronized (_existingLeaseSets) {
-                _existingLeaseSets.put(session.getMyDestination(), li);
-            }
+            _existingLeaseSets.put(session.getMyDestination(), li);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Creating new leaseInfo keys for "  
                            + session.getMyDestination().calculateHash().toBase64());
