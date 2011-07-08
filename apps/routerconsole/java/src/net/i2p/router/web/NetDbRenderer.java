@@ -407,7 +407,6 @@ public class NetDbRenderer {
      */
     private static int classifyTransports(RouterInfo info) {
         int rv = 0;
-        String hash = info.getIdentity().getHash().toBase64();
         for (RouterAddress addr : info.getAddresses()) {
             String style = addr.getTransportStyle();
             if (style.equals("NTCP")) {

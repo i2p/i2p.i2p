@@ -130,8 +130,8 @@ public class SubscriptionsBean
 			if( lastSerial != null && serial != null && serial.compareTo( lastSerial ) == 0 ) {
 				if (action.equals(_("Save"))) {
 					save();
-					String nonce = System.getProperty("addressbook.nonce");
 				/*******
+					String nonce = System.getProperty("addressbook.nonce");
 					if (nonce != null) {	
 						// Yes this is a hack.
 						// No it doesn't work on a text-mode browser.

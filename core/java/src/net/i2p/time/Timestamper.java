@@ -316,7 +316,6 @@ public class Timestamper implements Runnable {
         System.setProperty(PROP_DISABLED, "false");
         System.setProperty(PROP_QUERY_FREQUENCY, "30000");
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
-        long now = ctx.clock().now();
         for (int i = 0; i < 5*60*1000; i += 61*1000) {
             try { Thread.sleep(61*1000); } catch (InterruptedException ie) {}
         }
