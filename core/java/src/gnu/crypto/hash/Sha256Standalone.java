@@ -59,6 +59,10 @@ package gnu.crypto.hash;
  * renamed from Sha256 to avoid conflicts with JVMs using gnu-crypto as their JCE
  * provider.
  *
+ * WARNING - DEPRECATED - Use SHA256Generator.getDigestInstance() to get a
+ * MessageDigest that will be faster in almost all cases.
+ * See SHA256Generator for more information.
+ *
  * @version $Revision: 1.2 $
  */
 public class Sha256Standalone extends BaseHashStandalone {

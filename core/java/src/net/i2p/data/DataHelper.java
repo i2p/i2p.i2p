@@ -26,6 +26,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.security.MessageDigest;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1010,15 +1011,32 @@ public class DataHelper {
      * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
      * Warning - not UTF-8
      */
-    public static String readLine(InputStream in) throws IOException { return readLine(in, (Sha256Standalone)null); }
+    public static String readLine(InputStream in) throws IOException { return readLine(in, (MessageDigest) null); }
 
     /**
      * update the hash along the way
      * Warning - strips \n but not \r
      * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
      * Warning - not UTF-8
+     * @deprecated use MessageDigest version
      */
     public static String readLine(InputStream in, Sha256Standalone hash) throws IOException {
+        StringBuilder buf = new StringBuilder(128);
+        boolean ok = readLine(in, buf, hash);
+        if (ok)
+            return buf.toString();
+        else
+            return null;
+    }
+
+    /**
+     * update the hash along the way
+     * Warning - strips \n but not \r
+     * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
+     * Warning - not UTF-8
+     * @since 0.8.8
+     */
+    public static String readLine(InputStream in, MessageDigest hash) throws IOException {
         StringBuilder buf = new StringBuilder(128);
         boolean ok = readLine(in, buf, hash);
         if (ok)
@@ -1050,7 +1068,7 @@ public class DataHelper {
      * Warning - strips \n but not \r
      * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
      * Warning - not UTF-8
-     * @deprecated use StringBuilder version
+     * @deprecated use StringBuilder / MessageDigest version
      */
     @Deprecated
     public static boolean readLine(InputStream in, StringBuffer buf, Sha256Standalone hash) throws IOException {
@@ -1080,7 +1098,7 @@ public class DataHelper {
      *              newline was found
      */
     public static boolean readLine(InputStream in, StringBuilder buf) throws IOException {
-        return readLine(in, buf, null);
+        return readLine(in, buf, (MessageDigest) null);
     }
 
     /**
@@ -1088,6 +1106,7 @@ public class DataHelper {
      * Warning - strips \n but not \r
      * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
      * Warning - not UTF-8
+     * @deprecated use MessageDigest version
      */
     public static boolean readLine(InputStream in, StringBuilder buf, Sha256Standalone hash) throws IOException {
         int c = -1;
@@ -1103,7 +1122,41 @@ public class DataHelper {
         return c != -1; 
     }
     
+    /**
+     * update the hash along the way
+     * Warning - strips \n but not \r
+     * Warning - 8KB line length limit as of 0.7.13, @throws IOException if exceeded
+     * Warning - not UTF-8
+     * @since 0.8.8
+     */
+    public static boolean readLine(InputStream in, StringBuilder buf, MessageDigest hash) throws IOException {
+        int c = -1;
+        int i = 0;
+        while ( (c = in.read()) != -1) {
+            if (++i > MAX_LINE_LENGTH)
+                throw new IOException("Line too long - max " + MAX_LINE_LENGTH);
+            if (hash != null) hash.update((byte)c);
+            if (c == '\n')
+                break;
+            buf.append((char)c);
+        }
+        return c != -1; 
+    }
+    
+    /**
+     *  update the hash along the way
+     *  @deprecated use MessageDigest version
+     */
     public static void write(OutputStream out, byte data[], Sha256Standalone hash) throws IOException {
+        hash.update(data);
+        out.write(data);
+    }
+    
+    /**
+     *  update the hash along the way
+     *  @since 0.8.8
+     */
+    public static void write(OutputStream out, byte data[], MessageDigest hash) throws IOException {
         hash.update(data);
         out.write(data);
     }

@@ -90,7 +90,12 @@ public final class SHA256Generator {
         _digests.offer(digest);
     }
     
-    private static MessageDigest getDigestInstance() {
+    /**
+     *  Return a new MessageDigest from the system libs unless unavailable
+     *  in this JVM, in that case return a wrapped GNU Sha256Standalone
+     *  @since 0.8.7, public since 0.8.8 for FortunaStandalone
+     */
+    public static MessageDigest getDigestInstance() {
         if (!_useGnu) {
             try {
                 return MessageDigest.getInstance("SHA-256");

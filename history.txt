@@ -1,3 +1,11 @@
+2011-07-08 zzz
+  * NetDB: Fix NPE at startup (ticket #493)
+  * Sha256Standalone:
+    - Use system SHA-256 MessageDigest instead of Sha256Standalone in PRNG
+    - Deprecate DataHelper functions using Sha256Standalone arguments;
+      used only by Syndie
+    - Note deprecation in javadocs
+
 2011-07-07 zzz
   * Blockfile:
     - Log error on out-of-order spans

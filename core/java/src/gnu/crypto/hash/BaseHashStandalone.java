@@ -46,6 +46,10 @@ package gnu.crypto.hash;
 /**
  * <p>A base abstract class to facilitate hash implementations.</p>
  *
+ * WARNING - DEPRECATED - Use SHA256Generator.getDigestInstance() to get a
+ * MessageDigest that will be faster in almost all cases.
+ * See SHA256Generator for more information.
+ *
  * @version $Revision: 1.1 $
  */
 public abstract class BaseHashStandalone implements IMessageDigestStandalone {
