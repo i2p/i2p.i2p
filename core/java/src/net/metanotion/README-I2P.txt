@@ -2,7 +2,8 @@ Version 0.1.1 from http://www.metanotion.net/software/sandbox/block.html
 
 License: See any source file.
 
-Changes for i2p:
+This is a partial list of changes for I2P. For details, see history.txt
+and the source control logs.
 
 - BSkipList has an option to not keep everything in memory.
   When this option is enabled, we use the new IBSkipSpan instead of
@@ -27,7 +28,20 @@ Changes for i2p:
 
 - Convert Errors without message or cause to RuntimeExceptions with a message and cause
 
+- Add unique on-disk headers to each page type for robustness;
+  change blockfile magic number as these headers are required
+
+- Automatically repair some types of corruption;
+  report some other corruption types without failing
+
+- Support read-only databases
+
+- Lots and lots of bug fixes
+
 
 TODO:
 
+- More catching and repair of corruption
+
 - Change PAGESIZE from default 1024 to 4096? No, wastes too much disk.
+
