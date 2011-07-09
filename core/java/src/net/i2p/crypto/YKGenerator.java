@@ -53,9 +53,6 @@ class YKGenerator {
     public final static int DEFAULT_YK_PRECALC_MAX = 50;
     public final static int DEFAULT_YK_PRECALC_DELAY = 200;
 
-    /** check every 30 seconds whether we have less than the minimum */
-    private static long _checkDelay = 30 * 1000;
-
     static {
         ctx = I2PAppContext.getGlobalContext();
 
@@ -170,22 +167,28 @@ class YKGenerator {
         return yk;
     }
 
+    private static final int RUNS = 500;
+
     public static void main(String args[]) {
-        System.out.println("\n\n\n\nBegin test\n");
-        long negTime = 0;
-        for (int i = 0; i < 5; i++) {
-            long startNeg = Clock.getInstance().now();
+        // warmup crypto
+        ctx.random().nextInt();
+        System.out.println("Begin YK generator speed test");
+        long startNeg = Clock.getInstance().now();
+        for (int i = 0; i < RUNS; i++) {
             getNextYK();
-            long endNeg = Clock.getInstance().now();
-            negTime += endNeg - startNeg;
         }
-        // 173ms each on a 2008 netbook
-        System.out.println("YK fetch time for 5 runs: " + negTime + " @ " + negTime / 5l + "ms each");
+        long endNeg = Clock.getInstance().now();
+        long  negTime = endNeg - startNeg;
+        // 14 ms each on a 2008 netbook (with jbigi)
+        System.out.println("YK fetch time for " + RUNS + " runs: " + negTime + " @ " + (negTime / RUNS) + "ms each");
     }
 
     private static class YKPrecalcRunner implements Runnable {
         private final int _minSize;
         private final int _maxSize;
+
+        /** check every 30 seconds whether we have less than the minimum */
+        private long _checkDelay = 30 * 1000;
 
         private YKPrecalcRunner(int minSize, int maxSize) {
             _minSize = minSize;
@@ -194,7 +197,6 @@ class YKGenerator {
 
         public void run() {
             while (_isRunning) {
-                int curSize = 0;
                 //long start = Clock.getInstance().now();
                 int startSize = getSize();
                 // Adjust delay
@@ -202,9 +204,10 @@ class YKGenerator {
                     _checkDelay -= 1000;
                 else if (startSize > (_minSize * 3 / 2) && _checkDelay < 60*1000)
                     _checkDelay += 1000;
-                curSize = startSize;
-                if (curSize < _minSize) {
-                    for (int i = curSize; i < _maxSize && _isRunning; i++) {
+                if (startSize < _minSize) {
+                    // fill all the way up, do the check here so we don't
+                    // throw away one when full in addValues()
+                    while (getSize() < _maxSize && _isRunning) {
                         //long begin = Clock.getInstance().now();
                         if (!addValues(generateYK()))
                             break;
@@ -225,6 +228,8 @@ class YKGenerator {
                 //                   + (end - start - CALC_DELAY * numCalc) + "ms (not counting "
                 //                   + (CALC_DELAY * numCalc) + "ms relief).  now sleeping");
                 //}
+                if (!_isRunning)
+                    break;
                 try {
                     Thread.sleep(_checkDelay);
                 } catch (InterruptedException ie) { // nop

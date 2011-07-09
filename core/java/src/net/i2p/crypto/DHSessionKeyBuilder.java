@@ -70,9 +70,6 @@ public class DHSessionKeyBuilder {
     public final static int DEFAULT_DH_PRECALC_MAX = 40;
     public final static int DEFAULT_DH_PRECALC_DELAY = 200;
 
-    /** check every 30 seconds whether we have less than the minimum */
-    private static long _checkDelay = 30 * 1000;
-
     static {
         I2PAppContext ctx = _context;
         _log = ctx.logManager().getLog(DHSessionKeyBuilder.class);
@@ -172,6 +169,7 @@ public class DHSessionKeyBuilder {
     /**
      * Conduct a DH exchange over the streams, returning the resulting data.
      *
+     * @deprecated unused
      * @return exchanged data
      * @throws IOException if there is an error (but does not close the streams
      */
@@ -194,7 +192,10 @@ public class DHSessionKeyBuilder {
         }
     }
     
-    static BigInteger readBigI(InputStream in) throws IOException {
+    /**
+     * @deprecated unused
+     */
+    private static BigInteger readBigI(InputStream in) throws IOException {
         byte Y[] = new byte[256];
         int read = DataHelper.read(in, Y);
         if (read != 256) {
@@ -215,8 +216,10 @@ public class DHSessionKeyBuilder {
      * Write out the integer as a 256 byte value.  This left pads with 0s so 
      * to keep in 2s complement, and if it is already 257 bytes (due to
      * the sign bit) ignore that first byte.
+     *
+     * @deprecated unused
      */
-    static void writeBigI(OutputStream out, BigInteger val) throws IOException {
+    private static void writeBigI(OutputStream out, BigInteger val) throws IOException {
         byte x[] = val.toByteArray();
         for (int i = x.length; i < 256; i++) 
             out.write(0);
@@ -275,6 +278,7 @@ public class DHSessionKeyBuilder {
         if (_myPublicValue == null) _myPublicValue = generateMyValue();
         return _myPublicValue;
     }
+
     /**
      * Return a 256 byte representation of our public key, with leading 0s 
      * if necessary.
@@ -304,6 +308,7 @@ public class DHSessionKeyBuilder {
         validatePublic(peerVal);
         _peerValue = peerVal;
     }
+
     public void setPeerPublicValue(byte val[]) throws InvalidPublicParameterException {
         if (val.length != 256)
             throw new IllegalArgumentException("Peer public value must be exactly 256 bytes");
@@ -323,6 +328,7 @@ public class DHSessionKeyBuilder {
     public BigInteger getPeerPublicValue() {
         return _peerValue;
     }
+
     public byte[] getPeerPublicValueBytes() {
         return toByteArray(getPeerPublicValue());
     }
@@ -502,6 +508,9 @@ public class DHSessionKeyBuilder {
         private final int _minSize;
         private final int _maxSize;
 
+        /** check every 30 seconds whether we have less than the minimum */
+        private long _checkDelay = 30 * 1000;
+
         private DHSessionKeyBuilderPrecalcRunner(int minSize, int maxSize) {
             _minSize = minSize;
             _maxSize = maxSize;
@@ -509,18 +518,17 @@ public class DHSessionKeyBuilder {
         
         public void run() {
             while (_isRunning) {
-
-                int curSize = 0;
-                long start = System.currentTimeMillis();
+                //long start = System.currentTimeMillis();
                 int startSize = getSize();
                 // Adjust delay
                 if (startSize <= (_minSize * 2 / 3) && _checkDelay > 1000)
                     _checkDelay -= 1000;
                 else if (startSize > (_minSize * 3 / 2) && _checkDelay < 60*1000)
                     _checkDelay += 1000;
-                curSize = startSize;
-                if (curSize < _minSize) {
-                    for (int i = curSize; i < _maxSize; i++) {
+                if (startSize < _minSize) {
+                    // fill all the way up, do the check here so we don't
+                    // throw away one when full in addValues()
+                    while (getSize() < _maxSize && _isRunning) {
                         long curStart = System.currentTimeMillis();
                         if (!addBuilder(precalc()))
                             break;
@@ -532,14 +540,16 @@ public class DHSessionKeyBuilder {
                         }
                     }
                 }
-                long end = System.currentTimeMillis();
-                int numCalc = curSize - startSize;
-                if (numCalc > 0) {
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("Precalced " + numCalc + " to " + curSize + " in "
-                                   + (end - start - CALC_DELAY * numCalc) + "ms (not counting "
-                                   + (CALC_DELAY * numCalc) + "ms relief).  now sleeping");
-                }
+                //long end = System.currentTimeMillis();
+                //int numCalc = curSize - startSize;
+                //if (numCalc > 0) {
+                //    if (_log.shouldLog(Log.DEBUG))
+                //        _log.debug("Precalced " + numCalc + " to " + curSize + " in "
+                //                   + (end - start - CALC_DELAY * numCalc) + "ms (not counting "
+                //                   + (CALC_DELAY * numCalc) + "ms relief).  now sleeping");
+                //}
+                if (!_isRunning)
+                    break;
                 try {
                     Thread.sleep(_checkDelay);
                 } catch (InterruptedException ie) { // nop
