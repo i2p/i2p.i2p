@@ -300,7 +300,8 @@ public class AddressbookBean
 							} else {
 								boolean valid = true;
 								try {
-									Destination dest = new Destination(destination);
+									// just to check validity
+									new Destination(destination);
 								} catch (DataFormatException dfe) {
 									valid = false;
 								}

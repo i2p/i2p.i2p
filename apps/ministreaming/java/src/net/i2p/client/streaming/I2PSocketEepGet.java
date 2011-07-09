@@ -163,7 +163,7 @@ public class I2PSocketEepGet extends EepGet {
     protected String getRequest() throws IOException {
         StringBuilder buf = new StringBuilder(2048);
         URL url = new URL(_actualURL);
-        String host = url.getHost();
+        //String host = url.getHost();
         String path = url.getPath();
         String query = url.getQuery();
         if (query != null)

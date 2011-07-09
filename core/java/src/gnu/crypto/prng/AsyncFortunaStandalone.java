@@ -156,7 +156,7 @@ public class AsyncFortunaStandalone extends FortunaStandalone implements Runnabl
     }
     
     private void doFill(byte buf[]) {
-        long start = System.currentTimeMillis();
+        //long start = System.currentTimeMillis();
         if (pool0Count >= MIN_POOL_SIZE
             && System.currentTimeMillis() - lastReseed > 100)
           {

@@ -8,7 +8,8 @@ import net.i2p.data.DataHelper;
 
 /**
  * Transmitted from the new outbound endpoint to the creator through a
- * reply tunnel
+ * reply tunnel.
+ * Variable number of records.
  *
  * @since 0.7.12
  */
@@ -30,9 +31,9 @@ public class VariableTunnelBuildReplyMessage extends TunnelBuildReplyMessage {
     @Override
     public int getType() { return MESSAGE_TYPE; }
 
+    @Override
     public void readMessage(byte[] data, int offset, int dataSize, int type) throws I2NPMessageException, IOException {
-        if (type != MESSAGE_TYPE) 
-            throw new I2NPMessageException("Message type is incorrect for this message");
+        // message type will be checked in super()
         int r = (int)DataHelper.fromLong(data, offset, 1);
         if (r <= 0 || r > MAX_RECORD_COUNT)
             throw new I2NPMessageException("Bad record count " + r);
@@ -40,9 +41,10 @@ public class VariableTunnelBuildReplyMessage extends TunnelBuildReplyMessage {
         if (dataSize != calculateWrittenLength()) 
             throw new I2NPMessageException("Wrong length (expects " + calculateWrittenLength() + ", recv " + dataSize + ")");
         _records = new ByteArray[RECORD_COUNT];
-        super.readMessage(data, offset + 1, dataSize, TunnelBuildReplyMessage.MESSAGE_TYPE);
+        super.readMessage(data, offset + 1, dataSize, type);
     }
     
+    @Override
     protected int writeMessageBody(byte[] out, int curIndex) throws I2NPMessageException {
         int remaining = out.length - (curIndex + calculateWrittenLength());
         if (remaining < 0)

@@ -347,7 +347,7 @@ class Connection {
                 _log.debug("Resend in " + timeout + " for " + packet);
 
             // schedules itself
-            ResendPacketEvent rpe = new ResendPacketEvent(packet, timeout);
+            new ResendPacketEvent(packet, timeout);
         }
 
         // warning, getStatLog() can be null

@@ -783,7 +783,7 @@ public class SnarkManager implements Snark.CompleteListener {
             throw ioe;
         } finally {
             try {
-                if (out == null)
+                if (out != null)
                     out.close();
             } catch (IOException ioe) {}
         }

@@ -1189,7 +1189,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             String filename = null;
             try {
                 filename = targetRequest.substring(LOCAL_SERVER.length() + 8, space); // "/themes/".length
-            } catch (IndexOutOfBoundsException ioobe) {}
+            } catch (IndexOutOfBoundsException ioobe) {
+                 return;
+            }
             // theme hack
             if (filename.startsWith("console/default/"))
                 filename = filename.replaceFirst("default", I2PAppContext.getGlobalContext().getProperty("routerconsole.theme", "light"));
