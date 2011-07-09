@@ -561,8 +561,8 @@ public abstract class TransportImpl implements Transport {
             _wasUnreachableEntries.add(peer);
         else
             _wasUnreachableEntries.remove(peer);
-        if (_log.shouldLog(Log.WARN))
-            _log.warn(this.getStyle() + " setting wasUnreachable to " + yes + " for " + peer);
+        if (_log.shouldLog(Log.INFO))
+            _log.info(this.getStyle() + " setting wasUnreachable to " + yes + " for " + peer);
     }
 
     public void setIP(Hash peer, byte[] ip) {

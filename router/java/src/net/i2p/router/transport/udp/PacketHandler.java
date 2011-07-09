@@ -265,8 +265,8 @@ class PacketHandler {
                     isValid = packet.validate(state.getNextMACKey());
                 if (!isValid) {
                     _state = 19;
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Failed validation with existing con, trying as new con: " + packet);
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Failed validation with existing con, trying as new con: " + packet);
 
                     isValid = packet.validate(_transport.getIntroKey());
                     if (isValid) {
