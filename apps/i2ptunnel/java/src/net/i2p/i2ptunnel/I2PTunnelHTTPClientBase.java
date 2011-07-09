@@ -66,6 +66,12 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         _proxyList = new ArrayList(4);
     }
 
+    /**
+     *  This constructor always starts the tunnel (ignoring the i2cp.delayOpen option).
+     *  It is used to add a client to an existing socket manager.
+     *
+     *  @param sktMgr the existing socket manager
+     */
     public I2PTunnelHTTPClientBase(int localPort, Logging l, I2PSocketManager sktMgr,
             I2PTunnel tunnel, EventDispatcher notifyThis, long clientId )
             throws IllegalArgumentException {

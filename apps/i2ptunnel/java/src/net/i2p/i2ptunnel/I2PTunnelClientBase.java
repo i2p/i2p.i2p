@@ -85,7 +85,14 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
      */
     private static volatile ThreadPoolExecutor _executor;
     private static int _executorThreadCount;
+    private static final Object _executorLock = new Object();
 
+    /**
+     *  This constructor always starts the tunnel (ignoring the i2cp.delayOpen option).
+     *  It is used to add a client to an existing socket manager.
+     *
+     *  @param sktMgr the existing socket manager
+     */
     public I2PTunnelClientBase(int localPort, Logging l, I2PSocketManager sktMgr,
             I2PTunnel tunnel, EventDispatcher notifyThis, long clientId )
             throws IllegalArgumentException {
@@ -104,13 +111,12 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         _context.statManager().createRateStat("i2ptunnel.client.buildRunTime", "How long it takes to run a queued socket into an i2ptunnel runner?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _log = _context.logManager().getLog(getClass());
 
-        synchronized (I2PTunnelClientBase.class) {
+        synchronized (_executorLock) {
             if (_executor == null)
                 _executor = new CustomThreadPoolExecutor();
         }
 
         Thread t = new I2PAppThread(this, "Client " + tunnel.listenHost + ':' + localPort);
-        listenerReady = false;
         t.start();
         open = true;
         synchronized (this) {
@@ -132,6 +138,13 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         }
     }
 
+    /**
+     * The main constructor.
+     * This may take a LONG time if building and starting a new manager.
+     *
+     * @throws IllegalArgumentException if the I2CP configuration is b0rked so
+     *                                  badly that we can't create a socketManager
+     */
     public I2PTunnelClientBase(int localPort, boolean ownDest, Logging l, 
                                EventDispatcher notifyThis, String handlerName, 
                                I2PTunnel tunnel) throws IllegalArgumentException {
@@ -139,10 +152,13 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     }
 
     /**
-     * @param pkf null to generate a transient key
+     * Use this to build a client with a persistent private key.
+     * This may take a LONG time if building and starting a new manager.
+     *
+     * @param pkf Path to the private key file, or null to generate a transient key
      *
      * @throws IllegalArgumentException if the I2CP configuration is b0rked so
-     *                                  badly that we cant create a socketManager
+     *                                  badly that we can't create a socketManager
      */
     public I2PTunnelClientBase(int localPort, boolean ownDest, Logging l, 
                                EventDispatcher notifyThis, String handlerName, 
@@ -162,7 +178,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         _context.statManager().createRateStat("i2ptunnel.client.buildRunTime", "How long it takes to run a queued socket into an i2ptunnel runner?", "I2PTunnel", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _log = _context.logManager().getLog(getClass());
 
-        synchronized (I2PTunnelClientBase.class) {
+        synchronized (_executorLock) {
             if (_executor == null)
                 _executor = new CustomThreadPoolExecutor();
         }
@@ -200,7 +216,6 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         
         Thread t = new I2PAppThread(this);
         t.setName("Client " + _clientId);
-        listenerReady = false;
         t.start();
         open = true;
         synchronized (this) {
@@ -226,7 +241,8 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     }
     
     /**
-     * Sets the this.sockMgr field if it is null, or if we want a new one
+     * Sets the this.sockMgr field if it is null, or if we want a new one.
+     * This may take a LONG time if building a new manager.
      *
      * We need a socket manager before getDefaultOptions() and most other things
      * @throws IllegalArgumentException if the I2CP configuration is b0rked so
@@ -265,27 +281,33 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
 
 
     /**
-     * this is ONLY for shared clients
+     * This is ONLY for shared clients.
+     * This may take a LONG time if building a new manager.
+     *
      * @return non-null
      * @throws IllegalArgumentException if the I2CP configuration is b0rked so
      *                                  badly that we cant create a socketManager
      */
-    protected synchronized I2PSocketManager getSocketManager() {
+    protected I2PSocketManager getSocketManager() {
         return getSocketManager(getTunnel(), this.privKeyFile);
     }
 
     /**
-     * this is ONLY for shared clients
+     * This is ONLY for shared clients.
+     * This may take a LONG time if building a new manager.
+     *
      * @return non-null
      * @throws IllegalArgumentException if the I2CP configuration is b0rked so
      *                                  badly that we cant create a socketManager
      */
-    protected static synchronized I2PSocketManager getSocketManager(I2PTunnel tunnel) {
+    protected static I2PSocketManager getSocketManager(I2PTunnel tunnel) {
         return getSocketManager(tunnel, null);
     }
 
     /**
-     * this is ONLY for shared clients
+     * This is ONLY for shared clients.
+     * This may take a LONG time if building a new manager.
+     *
      * @return non-null
      * @throws IllegalArgumentException if the I2CP configuration is b0rked so
      *                                  badly that we cant create a socketManager
@@ -300,6 +322,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                     _log.info(tunnel.getClientOptions().getProperty("inbound.nickname") + ": Building a new socket manager since the old one closed [s=" + s + "]");
                 if (s != null)
                     tunnel.removeSession(s);
+                // We could be here a LONG time, holding the lock
                 socketManager = buildSocketManager(tunnel, pkf);
             } else {
                 if (_log.shouldLog(Log.INFO))
@@ -314,6 +337,8 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     }
 
     /**
+     * This may take a LONG time.
+     *
      * @return non-null
      * @throws IllegalArgumentException if the I2CP configuration is b0rked so
      *                                  badly that we cant create a socketManager
@@ -322,6 +347,8 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         return buildSocketManager(getTunnel(), this.privKeyFile, this.l);
     }
     /**
+     * This may take a LONG time.
+     *
      * @return non-null
      * @throws IllegalArgumentException if the I2CP configuration is b0rked so
      *                                  badly that we cant create a socketManager
@@ -334,6 +361,8 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     private static final int MAX_RETRIES = 4;
 
     /**
+     * This may take a LONG time.
+     *
      * @param pkf absolute path or null
      * @return non-null
      * @throws IllegalArgumentException if the I2CP configuration is b0rked so
@@ -344,6 +373,8 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     }
 
     /**
+     * This may take a LONG time.
+     *
      * @param pkf absolute path or null
      * @return non-null
      * @throws IllegalArgumentException if the I2CP configuration is b0rked so
@@ -364,7 +395,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         }
         
         I2PSocketManager sockManager = null;
-        // Todo: Can't stop a tunnel from the UI while it's in this loop (no session yet)
+        // FIXME: Can't stop a tunnel from the UI while it's in this loop (no session yet)
         int retries = 0;
         while (sockManager == null) {
             if (pkf != null) {
@@ -570,7 +601,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
      *  @since 0.8.8
      */
     static void killClientExecutor() {
-        synchronized (I2PTunnelClientBase.class) {
+        synchronized (_executorLock) {
             if (_executor != null) {
                 _executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
                 _executor.shutdownNow();

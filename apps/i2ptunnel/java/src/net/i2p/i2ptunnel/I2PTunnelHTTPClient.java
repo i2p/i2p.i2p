@@ -185,6 +185,12 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
          "This proxy is configured to require authentication.<BR>")
         .getBytes();
 
+    /**
+     *  This constructor always starts the tunnel (ignoring the i2cp.delayOpen option).
+     *  It is used to add a client to an existing socket manager.
+     *
+     *  @param sktMgr the existing socket manager
+     */
     public I2PTunnelHTTPClient(int localPort, Logging l, I2PSocketManager sockMgr, I2PTunnel tunnel, EventDispatcher notifyThis, long clientId) {
         super(localPort, l, sockMgr, tunnel, notifyThis, clientId);
         _proxyNonce = Long.toString(_context.random().nextLong());
