@@ -42,7 +42,7 @@ import net.i2p.util.SimpleByteCache;
  *  @author zzz
  */
 public class SDSCache<V extends SimpleDataStructure> {
-    private static final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(SDSCache.class);
+    //private static final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(SDSCache.class);
 
     private static final Class[] conArg = new Class[] { byte[].class };
     private static final double MIN_FACTOR = 0.25;
@@ -79,9 +79,9 @@ public class SDSCache<V extends SimpleDataStructure> {
             throw new RuntimeException("SDSCache init error", e);
         }
         _statName = "SDSCache." + rvClass.getSimpleName();
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("New SDSCache for " + rvClass + " data size: " + len +
-                       " max: " + size + " max mem: " + (len * size));
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("New SDSCache for " + rvClass + " data size: " + len +
+        //               " max: " + size + " max mem: " + (len * size));
         I2PAppContext.getGlobalContext().statManager().createRateStat(_statName, "Hit rate", "Router", new long[] { 10*60*1000 });
         I2PAppContext.getGlobalContext().addShutdownTask(new Shutdown());
     }

@@ -33,7 +33,7 @@ public class InternalServerSocket extends ServerSocket {
     private BlockingQueue<InternalSocket> _acceptQueue;
     private Integer _port;
     private boolean _running;
-    private static Log _log = I2PAppContext.getGlobalContext().logManager().getLog(InternalServerSocket.class);
+    //private static Log _log = I2PAppContext.getGlobalContext().logManager().getLog(InternalServerSocket.class);
 
     public InternalServerSocket(int port) throws IOException {
          if (port <= 0)
@@ -44,14 +44,14 @@ public class InternalServerSocket extends ServerSocket {
              throw new IOException("Internal port in use: " + port);
          _running = true;
          _acceptQueue = new LinkedBlockingQueue();
-         if (_log.shouldLog(Log.DEBUG))
-             _log.debug("Registered " + _port);
+         //if (_log.shouldLog(Log.DEBUG))
+         //    _log.debug("Registered " + _port);
     }
 
     @Override
     public void close() {
-         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Closing " + _port);
+         //if (_log.shouldLog(Log.DEBUG))
+         //   _log.debug("Closing " + _port);
         _running = false;
         _sockets.remove(_port);
         _acceptQueue.clear();
@@ -65,8 +65,8 @@ public class InternalServerSocket extends ServerSocket {
     public Socket accept() throws IOException {
         InternalSocket serverSock = null;
         while (_running) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Accepting " + _port);
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("Accepting " + _port);
             try {
                 serverSock = _acceptQueue.take();
             } catch (InterruptedException ie) {
@@ -74,8 +74,8 @@ public class InternalServerSocket extends ServerSocket {
             }
             if (serverSock.getInputStream() == null) // poison
                 throw new IOException("closed");
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Accepted " + _port);
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _log.debug("Accepted " + _port);
             break;
         }
         return serverSock;
@@ -123,8 +123,8 @@ public class InternalServerSocket extends ServerSocket {
     private void queueConnection(InternalSocket sock) throws IOException {
         if (!_running)
              throw new IOException("Server closed for port: " + _port);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Queueing " + _port);
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Queueing " + _port);
         try {
             _acceptQueue.put(sock);
         } catch (InterruptedException ie) {}

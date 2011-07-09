@@ -57,7 +57,7 @@ import net.i2p.data.ByteArray;
  */
 public final class ByteCache {
 
-    private static final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(ByteCache.class);
+    //private static final Log _log = I2PAppContext.getGlobalContext().logManager().getLog(ByteCache.class);
     private static final Map<Integer, ByteCache> _caches = new ConcurrentHashMap(16);
 
     /**
@@ -105,7 +105,7 @@ public final class ByteCache {
     public static void clearAll() {
         for (ByteCache bc : _caches.values())
             bc.clear();
-        _log.warn("WARNING: Low memory, clearing byte caches");
+        //_log.warn("WARNING: Low memory, clearing byte caches");
     }
 
     /** list of available and available entries */
@@ -199,8 +199,8 @@ public final class ByteCache {
                     int toRemove = _available.size() / 2;
                     for (int i = 0; i < toRemove; i++)
                         _available.poll();
-                    if ( (toRemove > 0) && (_log.shouldLog(Log.DEBUG)) )
-                        _log.debug("Removing " + toRemove + " cached entries of size " + _entrySize);
+                    //if ( (toRemove > 0) && (_log.shouldLog(Log.DEBUG)) )
+                    //    _log.debug("Removing " + toRemove + " cached entries of size " + _entrySize);
             }
         }
     }
