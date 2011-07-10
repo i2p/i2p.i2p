@@ -1,5 +1,9 @@
 package net.i2p.router;
 
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+
+import net.i2p.data.DataHelper;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
 
@@ -26,6 +30,7 @@ public class RouterClock extends Clock {
     private static final long MAX_SLEW = 50;
     public static final int DEFAULT_STRATUM = 8;
     private static final int WORST_STRATUM = 16;
+
     /** the max NTP Timestamper delay is 30m right now, make this longer than that */
     private static final long MIN_DELAY_FOR_WORSE_STRATUM = 45*60*1000;
     private volatile long _desiredOffset;
@@ -34,12 +39,21 @@ public class RouterClock extends Clock {
     private long _lastChanged;
     private int _lastStratum;
 
-    private final RouterContext _contextRC;
+    /**
+     *  If the system clock shifts by this much (positive or negative),
+     *  call the callback, we probably need a soft restart.
+     *  @since 0.8.8
+     */
+    private static final long MASSIVE_SHIFT = 75*1000;
+    private final Set<ClockShiftListener> _shiftListeners;
+    private volatile long _lastShiftNanos;
 
     public RouterClock(RouterContext context) {
         super(context);
-        _contextRC = context;
         _lastStratum = WORST_STRATUM;
+        _lastSlewed = System.currentTimeMillis();
+        _shiftListeners = new CopyOnWriteArraySet();
+        _lastShiftNanos = System.nanoTime();
     }
 
     /**
@@ -98,11 +112,11 @@ public class RouterClock extends Clock {
             }
             
             // If so configured, check sanity of proposed clock offset
-            if (_contextRC.getBooleanPropertyDefaultTrue("router.clockOffsetSanityCheck") &&
+            if (_context.getBooleanPropertyDefaultTrue("router.clockOffsetSanityCheck") &&
                 _alreadyChanged) {
 
                 // Try calculating peer clock skew
-                long currentPeerClockSkew = _contextRC.commSystem().getFramedAveragePeerClockSkew(50);
+                long currentPeerClockSkew = ((RouterContext)_context).commSystem().getFramedAveragePeerClockSkew(50);
 
                     // Predict the effect of applying the proposed clock offset
                     long predictedPeerClockSkew = currentPeerClockSkew + delta;
@@ -131,10 +145,10 @@ public class RouterClock extends Clock {
                 getLog().info("Updating target clock offset to " + offsetMs + "ms from " + _offset + "ms, Stratum " + stratum);
             
             if (!_statCreated) {
-                _contextRC.statManager().createRequiredRateStat("clock.skew", "Clock step adjustment (ms)", "Clock", new long[] { 10*60*1000, 3*60*60*1000, 24*60*60*60 });
+                _context.statManager().createRequiredRateStat("clock.skew", "Clock step adjustment (ms)", "Clock", new long[] { 10*60*1000, 3*60*60*1000, 24*60*60*60 });
                 _statCreated = true;
             }
-            _contextRC.statManager().addRateData("clock.skew", delta, 0);
+            _context.statManager().addRateData("clock.skew", delta, 0);
             _desiredOffset = offsetMs;
         } else {
             getLog().log(Log.INFO, "Initializing clock offset to " + offsetMs + "ms, Stratum " + stratum);
@@ -177,7 +191,12 @@ public class RouterClock extends Clock {
         long systemNow = System.currentTimeMillis();
         // copy the global, so two threads don't both increment or decrement _offset
         long offset = _offset;
-        if (systemNow >= _lastSlewed + MAX_SLEW) {
+        long sinceLastSlewed = systemNow - _lastSlewed;
+        if (sinceLastSlewed >= MASSIVE_SHIFT ||
+            sinceLastSlewed <= 0 - MASSIVE_SHIFT) {
+            _lastSlewed = systemNow;
+            notifyMassive(sinceLastSlewed);
+        } else if (sinceLastSlewed >= MAX_SLEW) {
             // copy the global
             long desiredOffset = _desiredOffset;
             if (desiredOffset > offset) {
@@ -197,6 +216,66 @@ public class RouterClock extends Clock {
     }
 
     /*
+     *  A large system clock shift happened. Tell people about it.
+     *
+     *  @since 0.8.8
+     */
+    private void notifyMassive(long shift) {
+        long nowNanos = System.nanoTime();
+        // try to prevent dups, not guaranteed
+        // nanoTime() isn't guaranteed to be monotonic either :(
+        if (nowNanos < _lastShiftNanos + MASSIVE_SHIFT)
+            return;
+        _lastShiftNanos = nowNanos;
+
+        // reset these so the offset can be reset by the timestamper again
+        _startedOn = System.currentTimeMillis();
+        _alreadyChanged = false;
+        getTimestamper().timestampNow();
+
+        if (shift > 0)
+            getLog().log(Log.CRIT, "Large clock shift forward by " + DataHelper.formatDuration(shift));
+        else
+            getLog().log(Log.CRIT, "Large clock shift backward by " + DataHelper.formatDuration(0 - shift));
+
+        for (ClockShiftListener lsnr : _shiftListeners) {
+            lsnr.clockShift(shift);
+        }
+    }
+
+    /*
+     *  Get notified of massive System clock shifts, positive or negative -
+     *  generally a minute or more.
+     *  The adjusted (offset) clock changes by the same amount.
+     *  The offset itself did not change.
+     *  Warning - duplicate notifications may occur.
+     *
+     *  @since 0.8.8
+     */
+    public void addShiftListener(ClockShiftListener lsnr) {
+            _shiftListeners.add(lsnr);
+    }
+
+    /*
+     *  @since 0.8.8
+     */
+    public void removeShiftListener(ClockShiftListener lsnr) {
+            _shiftListeners.remove(lsnr);
+    }
+
+    /*
+     *  @since 0.8.8
+     */
+    public interface ClockShiftListener {
+
+        /**
+         *  @param delta The system clock and adjusted clock just changed by this much,
+         *               in milliseconds (approximately)
+         */
+        public void clockShift(long delta);
+    }
+
+    /*
      *  How far we still have to slew, for diagnostics
      *  @since 0.7.12
      *  @deprecated for debugging only
@@ -204,5 +283,4 @@ public class RouterClock extends Clock {
     public long getDeltaOffset() {
         return _desiredOffset - _offset;
     }
-    
 }

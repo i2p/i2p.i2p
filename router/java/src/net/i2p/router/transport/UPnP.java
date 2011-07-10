@@ -91,8 +91,20 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		return super.start();
 	}
 
+	/**
+	 *  WARNING - Blocking up to 2 seconds
+	 */
 	public void terminate() {
+		// this gets spun off in a thread...
 		unregisterPortMappings();
+		// If we stop too early and we've forwarded multiple ports,
+		// the later ones don't get unregistered
+		int i = 0;
+		while (i++ < 20 && !portsForwarded.isEmpty()) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException ie) {}
+		}
 		super.stop();
 		_router = null;
 		_service = null;
@@ -672,7 +684,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
          */
 	private void unregisterPorts(Set<ForwardPort> portsToForwardNow) {
 	        Thread t = new Thread(new UnregisterPortsThread(portsToForwardNow));
-		t.setName("UPnP Port Opener " + (++__id));
+		t.setName("UPnP Port Closer " + (++__id));
 		t.setDaemon(true);
 		t.start();
 	}

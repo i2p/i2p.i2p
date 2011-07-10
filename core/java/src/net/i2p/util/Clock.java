@@ -1,6 +1,5 @@
 package net.i2p.util;
 
-import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -21,11 +20,11 @@ import net.i2p.time.Timestamper;
 public class Clock implements Timestamper.UpdateListener {
     protected final I2PAppContext _context;
     private final Timestamper _timestamper;
-    protected final long _startedOn;
+    protected long _startedOn;
     protected boolean _statCreated;
     protected volatile long _offset;
     protected boolean _alreadyChanged;
-    private final Set _listeners;
+    private final Set<ClockUpdateListener> _listeners;
     
     public Clock(I2PAppContext context) {
         _context = context;
@@ -33,6 +32,7 @@ public class Clock implements Timestamper.UpdateListener {
         _timestamper = new Timestamper(context, this);
         _startedOn = System.currentTimeMillis();
     }
+
     public static Clock getInstance() {
         return I2PAppContext.getGlobalContext().clock();
     }
@@ -151,13 +151,17 @@ public class Clock implements Timestamper.UpdateListener {
     }
 
     protected void fireOffsetChanged(long delta) {
-            for (Iterator iter = _listeners.iterator(); iter.hasNext();) {
-                ClockUpdateListener lsnr = (ClockUpdateListener) iter.next();
+            for (ClockUpdateListener lsnr : _listeners) {
                 lsnr.offsetChanged(delta);
             }
     }
 
-    public static interface ClockUpdateListener {
+    public interface ClockUpdateListener {
+
+        /**
+         *  @param delta = (new offset - old offset),
+         *         where each offset = (now() - System.currentTimeMillis())
+         */
         public void offsetChanged(long delta);
     }
 }

@@ -271,11 +271,12 @@ public class ConfigNetHandler extends FormHandler {
         if (switchRequired) {
             hiddenSwitch();
         } else if (restartRequired) {
-            if (_context.hasWrapper()) {
+            //if (_context.hasWrapper()) {
                 // Wow this dumps all conns immediately and really isn't nice
                 addFormNotice("Performing a soft restart");
                 _context.router().restart();
-                addFormNotice("Soft restart complete");
+                // restart() returns immediately now
+                //addFormNotice("Soft restart complete");
 
                 // Most of the time we aren't changing addresses, just enabling or disabling
                 // things, so let's try just a new routerInfo and see how that works.
@@ -285,14 +286,12 @@ public class ConfigNetHandler extends FormHandler {
                 // So don't do this...
                 //_context.router().rebuildRouterInfo();
                 //addFormNotice("Router Info rebuilt");
-            } else {
+            //} else {
                 // There's a few changes that don't really require restart (e.g. enabling inbound TCP)
                 // But it would be hard to get right, so just do a restart.
-                addFormError(_("Gracefully restarting I2P to change published router address"));
-                if (_context.hasWrapper())
-                    _context.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_GRACEFUL_RESTART));
-                _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
-            }
+                //addFormError(_("Gracefully restarting I2P to change published router address"));
+                //_context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
+            //}
         }
     }
 

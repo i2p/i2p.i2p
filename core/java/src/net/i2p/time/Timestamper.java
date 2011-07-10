@@ -17,7 +17,7 @@ import net.i2p.util.Log;
  * forever.
  */
 public class Timestamper implements Runnable {
-    private I2PAppContext _context;
+    private final I2PAppContext _context;
     private Log _log;
     private final List<String> _servers;
     private List<String> _priorityServers;
@@ -26,7 +26,7 @@ public class Timestamper implements Runnable {
     private int _concurringServers;
     private int _consecutiveFails;
     private volatile boolean _disabled;
-    private boolean _daemon;
+    private final boolean _daemon;
     private boolean _initialized;
     private boolean _wellSynced;
     private volatile boolean _isRunning;
@@ -60,6 +60,10 @@ public class Timestamper implements Runnable {
         // moved here to prevent problems with synchronized statements.
         _servers = new ArrayList(3);
         _listeners = new CopyOnWriteArrayList();
+        _context = ctx;
+        _daemon = daemon;
+        // DO NOT initialize _log here, stack overflow via LogManager init loop
+
         // Don't bother starting a thread if we are disabled.
         // This means we no longer check every 5 minutes to see if we got enabled,
         // so the property must be set at startup.
@@ -69,10 +73,6 @@ public class Timestamper implements Runnable {
             _initialized = true;
             return;
         }
-        _context = ctx;
-        _daemon = daemon;
-        _initialized = false;
-        _wellSynced = false;
         if (lsnr != null)
             _listeners.add(lsnr);
         updateConfig();
@@ -122,6 +122,15 @@ public class Timestamper implements Runnable {
                     wait();
             }
         } catch (InterruptedException ie) {}
+    }
+    
+    /**
+     *  Update the time immediately.
+     *  @since 0.8.8
+     */
+    public void timestampNow() {
+         if (_initialized && _isRunning && (!_disabled) && _timestamperThread != null)
+             _timestamperThread.interrupt();
     }
     
     /** @since 0.8.8 */

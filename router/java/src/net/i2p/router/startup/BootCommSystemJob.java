@@ -11,6 +11,7 @@ package net.i2p.router.startup;
 import net.i2p.router.Job;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
+import net.i2p.router.RouterClock;
 import net.i2p.util.Log;
 
 /** This actually boots almost everything */
@@ -45,6 +46,7 @@ public class BootCommSystemJob extends JobImpl {
         getContext().jobQueue().addJob(new StartAcceptingClientsJob(getContext()));
 
         getContext().jobQueue().addJob(new ReadConfigJob(getContext()));
+        ((RouterClock) getContext().clock()).addShiftListener(getContext().router());
     }
         
     private void startupDb() {

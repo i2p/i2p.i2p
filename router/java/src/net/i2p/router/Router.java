@@ -58,7 +58,7 @@ import net.i2p.util.SimpleTimer;
  * Main driver for the router.
  *
  */
-public class Router {
+public class Router implements RouterClock.ClockShiftListener {
     private Log _log;
     private RouterContext _context;
     private final Map<String, String> _config;
@@ -70,7 +70,7 @@ public class Router {
     private boolean _higherVersionSeen;
     //private SessionKeyPersistenceHelper _sessionKeyPersistenceHelper;
     private boolean _killVMOnEnd;
-    private boolean _isAlive;
+    private volatile boolean _isAlive;
     private int _gracefulExitCode;
     private I2PThread.OOMEventListener _oomListener;
     private ShutdownHook _shutdownHook;
@@ -351,9 +351,15 @@ public class Router {
     /**
      * True if the router has tried to communicate with another router who is running a higher
      * incompatible protocol version.  
-     *
+     * @deprecated unused
      */
     public boolean getHigherVersionSeen() { return _higherVersionSeen; }
+
+    /**
+     * True if the router has tried to communicate with another router who is running a higher
+     * incompatible protocol version.  
+     * @deprecated unused
+     */
     public void setHigherVersionSeen(boolean seen) { _higherVersionSeen = seen; }
     
     public long getWhenStarted() { return _started; }
@@ -361,7 +367,7 @@ public class Router {
     /** wall clock uptime */
     public long getUptime() { 
         if ( (_context == null) || (_context.clock() == null) ) return 1; // racing on startup
-        return _context.clock().now() - _context.clock().getOffset() - _started;
+        return Math.max(1, _context.clock().now() - _context.clock().getOffset() - _started);
     }
     
     public RouterContext getContext() { return _context; }
@@ -961,7 +967,11 @@ public class Router {
     public static final int EXIT_HARD_RESTART = 4;
     public static final int EXIT_GRACEFUL_RESTART = 5;
     
+    /**
+     *  Shutdown with no chance of cancellation
+     */
     public void shutdown(int exitCode) {
+        ((RouterClock) _context.clock()).removeShiftListener(this);
         _isAlive = false;
         _context.random().saveSeed();
         I2PThread.removeOOMEventListener(_oomListener);
@@ -1200,32 +1210,76 @@ public class Router {
     }
     
     /**
+     *  The clock shift listener.
+     *  Restart the router if we should.
+     *
+     *  @since 0.8.8
+     */
+    public void clockShift(long delta) {
+        if (gracefulShutdownInProgress() || !_isAlive)
+            return;
+        if (delta > -60*1000 && delta < 60*1000)
+            return;
+        if (_context.commSystem().countActivePeers() <= 0)
+            return;
+        if (delta > 0)
+            _log.error("Restarting after large clock shift forward by " + DataHelper.formatDuration(delta));
+        else
+            _log.error("Restarting after large clock shift backward by " + DataHelper.formatDuration(0 - delta));
+        restart();
+    }
+
+    /**
      *  A "soft" restart, primarily of the comm system, after
      *  a port change or large step-change in system time.
      *  Does not stop the whole JVM, so it is safe even in the absence
      *  of the wrapper.
-     *  This is not a graceful restart - all peer connections are dropped.
+     *  This is not a graceful restart - all peer connections are dropped immediately.
+     *
+     *  As of 0.8.8, this returns immediately and does the actual restart in a separate thread.
+     *  Poll isAlive() if you need to know when the restart is complete.
      */
-    public void restart() {
+    public synchronized void restart() {
+        if (gracefulShutdownInProgress() || !_isAlive)
+            return;
+        ((RouterClock) _context.clock()).removeShiftListener(this);
         _isAlive = false;
+        Thread t = new Thread(new Restarter(), "Router Restart");
+        t.start();
+    }    
+
+    /**
+     *  @since 0.8.8
+     */
+    private class Restarter implements Runnable {
+        public void run() {
+            _started = _context.clock().now();
+            _log.error("Stopping the router for a restart...");
+            _log.logAlways(Log.WARN, "Stopping the client manager");
+            try { _context.clientManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error stopping the client manager", t); }
+            _log.logAlways(Log.WARN, "Stopping the comm system");
+            try { _context.commSystem().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the comm system", t); }
+            _log.logAlways(Log.WARN, "Stopping the tunnel manager");
+            try { _context.tunnelManager().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the tunnel manager", t); }
+
+            //try { _context.peerManager().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the peer manager", t); }
+            //try { _context.netDb().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the networkDb", t); }
+            //try { _context.jobQueue().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the job queue", t); }
         
-        try { _context.commSystem().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the comm system", t); }
-        try { _context.clientManager().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the client manager", t); }
-        try { _context.tunnelManager().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the tunnel manager", t); }
-        try { _context.peerManager().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the peer manager", t); }
-        try { _context.netDb().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the networkDb", t); }
+            _log.logAlways(Log.WARN, "Router teardown complete, restarting the router...");
+            try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
         
-        //try { _context.jobQueue().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the job queue", t); }
+            _log.logAlways(Log.WARN, "Restarting the comm system");
+            _log.logAlways(Log.WARN, "Restarting the tunnel manager");
+            _log.logAlways(Log.WARN, "Restarting the client manager");
+            try { _context.clientManager().startup(); } catch (Throwable t) { _log.log(Log.CRIT, "Error stopping the client manager", t); }
         
-        _log.log(Log.CRIT, "Restart teardown complete... ");
-        try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
+            _isAlive = true;
+            rebuildRouterInfo();
         
-        _log.log(Log.CRIT, "Restarting...");
-        
-        _isAlive = true;
-        _started = _context.clock().now();
-        
-        _log.log(Log.CRIT, "Restart complete");
+            _log.logAlways(Log.WARN, "Restart complete");
+            ((RouterClock) _context.clock()).addShiftListener(Router.this);
+        }
     }
     
     public static void main(String args[]) {

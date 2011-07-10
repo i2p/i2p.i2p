@@ -91,15 +91,8 @@ class ClientManager {
         // to let the old listener die
         try { Thread.sleep(2*1000); } catch (InterruptedException ie) {}
         
-        int port = ClientManagerFacadeImpl.DEFAULT_PORT;
-        String portStr = _ctx.router().getConfigSetting(ClientManagerFacadeImpl.PROP_CLIENT_PORT);
-        if (portStr != null) {
-            try {
-                port = Integer.parseInt(portStr);
-            } catch (NumberFormatException nfe) {
-                _log.error("Error setting the port: " + portStr + " is not valid", nfe);
-            }
-        } 
+        int port = _ctx.getProperty(ClientManagerFacadeImpl.PROP_CLIENT_PORT,
+                                    ClientManagerFacadeImpl.DEFAULT_PORT);
         startListeners(port);
     }
     
