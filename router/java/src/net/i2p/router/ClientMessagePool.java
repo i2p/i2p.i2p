@@ -40,6 +40,13 @@ public class ClientMessagePool {
     }
 
     /**
+     *  @since 0.8.8
+     */
+    public void restart() {
+        shutdown();
+    }
+
+    /**
      * Add a new message to the pool.  The message can either be locally or 
      * remotely destined.
      *

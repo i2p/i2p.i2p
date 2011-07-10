@@ -88,6 +88,9 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	}
 	
 	public boolean runPlugin() {
+		synchronized(lock) {
+			portsToForward = null;
+		}
 		return super.start();
 	}
 
@@ -95,6 +98,9 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	 *  WARNING - Blocking up to 2 seconds
 	 */
 	public void terminate() {
+		synchronized(lock) {
+			portsToForward = null;
+		}
 		// this gets spun off in a thread...
 		unregisterPortMappings();
 		// If we stop too early and we've forwarded multiple ports,
@@ -621,7 +627,11 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 				}
 				portsToForward = ports;
 			}
-			if(_router == null) return; // When one is found, we will do the forwards
+			if(_router == null) {
+				if (_log.shouldLog(Log.WARN))
+					_log.warn("No UPnP router available to update");
+				return; // When one is found, we will do the forwards
+			}
 		}
 		if(portsToDumpNow != null)
 			unregisterPorts(portsToDumpNow);
@@ -645,6 +655,8 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
          *  so throw this in a thread.
          */
 	private void registerPorts(Set<ForwardPort> portsToForwardNow) {
+		if (_log.shouldLog(Log.INFO))
+			_log.info("Starting thread to forward " + portsToForwardNow.size() + " ports");
 	        Thread t = new Thread(new RegisterPortsThread(portsToForwardNow));
 		t.setName("UPnP Port Opener " + (++__id));
 		t.setDaemon(true);
@@ -683,6 +695,8 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
          *  so throw this in a thread.
          */
 	private void unregisterPorts(Set<ForwardPort> portsToForwardNow) {
+		if (_log.shouldLog(Log.INFO))
+			_log.info("Starting thread to un-forward " + portsToForwardNow.size() + " ports");
 	        Thread t = new Thread(new UnregisterPortsThread(portsToForwardNow));
 		t.setName("UPnP Port Closer " + (++__id));
 		t.setDaemon(true);

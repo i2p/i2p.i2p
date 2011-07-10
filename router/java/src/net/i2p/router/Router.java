@@ -1258,6 +1258,7 @@ public class Router implements RouterClock.ClockShiftListener {
             _log.logAlways(Log.WARN, "Stopping the client manager");
             try { _context.clientManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error stopping the client manager", t); }
             _log.logAlways(Log.WARN, "Stopping the comm system");
+            try { _context.messageRegistry().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the message registry", t); }
             try { _context.commSystem().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the comm system", t); }
             _log.logAlways(Log.WARN, "Stopping the tunnel manager");
             try { _context.tunnelManager().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the tunnel manager", t); }
@@ -1272,7 +1273,8 @@ public class Router implements RouterClock.ClockShiftListener {
             _log.logAlways(Log.WARN, "Restarting the comm system");
             _log.logAlways(Log.WARN, "Restarting the tunnel manager");
             _log.logAlways(Log.WARN, "Restarting the client manager");
-            try { _context.clientManager().startup(); } catch (Throwable t) { _log.log(Log.CRIT, "Error stopping the client manager", t); }
+            try { _context.clientMessagePool().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the CMP", t); }
+            try { _context.clientManager().startup(); } catch (Throwable t) { _log.log(Log.CRIT, "Error starting the client manager", t); }
         
             _isAlive = true;
             rebuildRouterInfo();

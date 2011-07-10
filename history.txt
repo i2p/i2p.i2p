@@ -1,3 +1,20 @@
+2011-07-10 zzz
+  * DH, YK:
+    - Improve YK speed test
+    - Shut down thread faster
+    - Refiller keeps going until full
+    - Cleanups
+  * I2PTunnel: Fix a shutdown hang
+  * Message Registry: Clear pending messages at restart / shutdown
+  * OCMOSJ: Clear caches at restart
+  * Router Clock: First cut at recognizing and reacting to large system
+    clock shifts by partially restarting the router. Also improve
+    restarts initiated from config.jsp
+    Tickets #465, #468, #494
+  * UPnP:
+    - Wait for a while to ensure port removal at shutdown or restart
+    - Fix device rediscovery and port opening after restart
+
 2011-07-08 zzz
   * Findbugs: Several fixes and cleanups
   * I2NP: Consolidate common code from TunnelBuildMessage and

@@ -60,6 +60,8 @@ class UPnPManager {
     }
     
     public synchronized void start() {
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("UPnP Start");
         if (!_isRunning)
             _isRunning = _upnp.runPlugin();
         if (!_isRunning)
@@ -83,7 +85,7 @@ class UPnPManager {
      */
     public void update(Map<String, Integer> ports) {
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("UPnP Update:");
+            _log.debug("UPnP Update with " + ports.size() + " ports");
         if (!_isRunning)
             return;
         Set<ForwardPort> forwards = new HashSet(ports.size());

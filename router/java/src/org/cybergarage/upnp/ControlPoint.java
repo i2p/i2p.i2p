@@ -914,6 +914,12 @@ public class ControlPoint implements HTTPRequestListener
 			setRenewSubscriber(null);
 		}
 		
+		// I2P so we will re-notify on restart
+		DeviceList dl = getDeviceList();
+		for (int i = 0; i < dl.size(); i++) {
+			removeDevice(dl.getDevice(i));
+		}
+
 		return true;
 	}
 

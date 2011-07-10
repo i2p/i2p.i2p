@@ -321,11 +321,15 @@ public class InNetMessagePool implements Service {
     }
     
     public void renderStatusHTML(Writer out) {}
+
+    /** does nothing since we aren't threaded */
     public void restart() { 
         shutdown(); 
         try { Thread.sleep(100); } catch (InterruptedException ie) {}
         startup(); 
     }
+
+    /** does nothing since we aren't threaded */
     public void shutdown() {
         _alive = false;
         if (!DISPATCH_DIRECT) {
@@ -337,6 +341,7 @@ public class InNetMessagePool implements Service {
         }
     }
     
+    /** does nothing since we aren't threaded */
     public void startup() {
         _alive = true;
         _dispatchThreaded = DEFAULT_DISPATCH_THREADED;

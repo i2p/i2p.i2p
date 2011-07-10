@@ -28,15 +28,15 @@ import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
 
 public class OutboundMessageRegistry {
-    private Log _log;
+    private final Log _log;
     /** list of currently active MessageSelector instances */
     private final List _selectors;
     /** map of active MessageSelector to either an OutNetMessage or a List of OutNetMessages causing it (for quick removal) */
     private final Map _selectorToMessage;
     /** set of active OutNetMessage (for quick removal and selector fetching) */
     private final Set _activeMessages;
-    private CleanupTask _cleanupTask;
-    private RouterContext _context;
+    private final CleanupTask _cleanupTask;
+    private final RouterContext _context;
     
     public OutboundMessageRegistry(RouterContext context) {
         _context = context;
@@ -47,7 +47,29 @@ public class OutboundMessageRegistry {
         _cleanupTask = new CleanupTask();
     }
     
-    public void shutdown() {}
+    /**
+     *  Does something @since 0.8.8
+     */
+    public void shutdown() {
+        synchronized (_selectors) {
+            _selectors.clear();
+        }
+        synchronized (_selectorToMessage) { 
+            _selectorToMessage.clear();
+        }
+        // Calling the fail job for every active message would
+        // be way too much at shutdown/restart, right?
+        synchronized (_activeMessages) {
+            _activeMessages.clear();
+        }
+    }
+    
+    /**
+     *  @since 0.8.8
+     */
+    public void restart() {
+        shutdown();
+    }
     
     /**
      * Retrieve all messages that are waiting for the specified message.  In
