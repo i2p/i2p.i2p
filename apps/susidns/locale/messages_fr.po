@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: I2P susidns\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-07-12 06:46+0000\n"
-"PO-Revision-Date: 2011-07-12 10:04+0100\n"
+"PO-Revision-Date: 2011-07-12 10:56+0100\n"
 "Last-Translator: magma <magma@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
 "Language: \n"
@@ -609,7 +609,7 @@ msgstr "Les hôtes du carnet privé ne sont accessibles qu'à vous et leurs adre
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:133
 msgid "The private address book can also be used for aliases of hosts in your other address books."
-msgstr "Le carnet privé peut aussi servir à stocker des alias pour des hôtes des autres carnets."
+msgstr "Le carnet privé peut aussi servir à stocker des alias pour des hôtes des autres carnets. Voir  l'<a href=\"http://127.0.0.1:7657/susidns/images/how_fr.png\">illustration traduite</a>."
 
 #: ../src/tmp/i2p/susi/dns/jsp/subscriptions_jsp.java:102
 msgid "subscriptions"
