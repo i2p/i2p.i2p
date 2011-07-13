@@ -170,10 +170,16 @@ public class StatManager {
             }
     }
 
+    /**
+     *  Misnamed, as it returns a FrequenceyStat, not a Frequency.
+     */
     public FrequencyStat getFrequency(String name) {
         return _frequencyStats.get(name);
     }
 
+    /**
+     *  Misnamed, as it returns a RateStat, not a Rate.
+     */
     public RateStat getRate(String name) {
         return _rateStats.get(name);
     }

@@ -91,6 +91,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
      *  This constructor always starts the tunnel (ignoring the i2cp.delayOpen option).
      *  It is used to add a client to an existing socket manager.
      *
+     *  @param localPort if 0, use any port, get actual port selected with getLocalPort()
      *  @param sktMgr the existing socket manager
      */
     public I2PTunnelClientBase(int localPort, Logging l, I2PSocketManager sktMgr,
@@ -142,6 +143,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
      * The main constructor.
      * This may take a LONG time if building and starting a new manager.
      *
+     * @param localPort if 0, use any port, get actual port selected with getLocalPort()
      * @throws IllegalArgumentException if the I2CP configuration is b0rked so
      *                                  badly that we can't create a socketManager
      */
@@ -155,6 +157,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
      * Use this to build a client with a persistent private key.
      * This may take a LONG time if building and starting a new manager.
      *
+     * @param localPort if 0, use any port, get actual port selected with getLocalPort()
      * @param pkf Path to the private key file, or null to generate a transient key
      *
      * @throws IllegalArgumentException if the I2CP configuration is b0rked so
