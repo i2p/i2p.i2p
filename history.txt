@@ -1,3 +1,10 @@
+2011-07-13 zzz
+  * Blocklist:
+    - Fix delayed lookup of reason from file
+    - Tag strings for translation
+    - Sort IPs on configpeer.jsp correctly
+  * SummaryHelper: Fix NPE at startup (ticket #493)
+
 2011-07-10 zzz
   * DH, YK:
     - Improve YK speed test

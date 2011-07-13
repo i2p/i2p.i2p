@@ -30,6 +30,7 @@ import net.i2p.data.RouterInfo;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
+import net.i2p.util.Translate;
 
 /**
  * Manage blocking by IP address, in a manner similar to the Shitlist,
@@ -60,7 +61,7 @@ import net.i2p.util.Log;
  */
 public class Blocklist {
     private final Log _log;
-    private RouterContext _context;
+    private final RouterContext _context;
     private long _blocklist[];
     private int _blocklistSize;
     private final Object _lock = new Object();
@@ -75,7 +76,8 @@ public class Blocklist {
     }
     
     /** only for testing with main() */
-    public Blocklist() {
+    private Blocklist() {
+        _context = null;
         _log = new Log(Blocklist.class);
     }
     
@@ -98,7 +100,7 @@ public class Blocklist {
     }
 
     private class ReadinJob extends JobImpl {
-        private String _file;
+        private final String _file;
         public ReadinJob (String f) {
             super(_context);
             _file = f;
@@ -261,10 +263,10 @@ public class Blocklist {
     }
 
     private static class Entry {
-        String comment;
-        byte ip1[];
-        byte ip2[];
-        Hash peer;
+        final String comment;
+        final byte ip1[];
+        final byte ip2[];
+        final Hash peer;
 
         public Entry(String c, Hash h, byte[] i1, byte[] i2) {
              comment = c;
@@ -428,9 +430,11 @@ public class Blocklist {
         return lines;
     }
 
-    // Maintain a simple in-memory single-IP blocklist
-    // This is used for new additions, NOT for the main list
-    // of IP ranges read in from the file.
+    /**
+     * Maintain a simple in-memory single-IP blocklist
+     * This is used for new additions, NOT for the main list
+     * of IP ranges read in from the file.
+     */
     public void add(String ip) {
         InetAddress pi;
         try {
@@ -443,6 +447,11 @@ public class Blocklist {
         add(pib);
     }
 
+    /**
+     * Maintain a simple in-memory single-IP blocklist
+     * This is used for new additions, NOT for the main list
+     * of IP ranges read in from the file.
+     */
     public void add(byte ip[]) {
         if (ip.length != 4)
             return;
@@ -513,7 +522,9 @@ public class Blocklist {
         return false;
     }
 
-    // calling this externally won't shitlist the peer, this is just an IP check
+    /**
+     * calling this externally won't shitlist the peer, this is just an IP check
+     */
     public boolean isBlocklisted(String ip) {
         InetAddress pi;
         try {
@@ -526,7 +537,9 @@ public class Blocklist {
         return isBlocklisted(pib);
     }
 
-    // calling this externally won't shitlist the peer, this is just an IP check
+    /**
+     * calling this externally won't shitlist the peer, this is just an IP check
+     */
     public boolean isBlocklisted(byte ip[]) {
         if (ip.length != 4)
             return false;
@@ -630,6 +643,7 @@ public class Blocklist {
         return rv;
     }
 
+    /** IP to string */
     public static String toStr(byte[] ip) {
         return toStr(toInt(ip));
     }
@@ -667,7 +681,7 @@ public class Blocklist {
     public void shitlist(Hash peer) {
         // Temporary reason, until the job finishes
         _context.shitlist().shitlistRouterForever(peer, _x("IP banned"));
-        if (! "true".equals( _context.getProperty(PROP_BLOCKLIST_DETAIL, "true")))
+        if (!  _context.getBooleanPropertyDefaultTrue(PROP_BLOCKLIST_DETAIL))
             return;
         boolean shouldRunJob;
         int number;
@@ -677,21 +691,24 @@ public class Blocklist {
         }
         if (!shouldRunJob)
             return;
-        Job job = new ShitlistJob(peer);
+        // get the IPs now because it won't be in the netdb by the time the job runs
+        Job job = new ShitlistJob(peer, getAddresses(peer));
         if (number > 0)
             job.getTiming().setStartAfter(_context.clock().now() + (30*1000l * number));
         _context.jobQueue().addJob(job);
     }
 
     private class ShitlistJob extends JobImpl {
-        private Hash _peer;
-        public ShitlistJob (Hash p) {
+        private final Hash _peer;
+        private final List<byte[]> _ips;
+        public ShitlistJob (Hash p, List<byte[]> ips) {
             super(_context);
             _peer = p;
+            _ips = ips;
         }
         public String getName() { return "Ban Peer by IP"; }
         public void runJob() {
-            shitlistForever(_peer);
+            shitlistForever(_peer, _ips);
             synchronized (_inProcess) {
                 _inProcess.remove(_peer);
             }
@@ -707,7 +724,7 @@ public class Blocklist {
      * So we also stagger these jobs.
      *
      */
-    private synchronized void shitlistForever(Hash peer) {
+    private synchronized void shitlistForever(Hash peer, List<byte[]> ips) {
         String file = _context.getProperty(PROP_BLOCKLIST_FILE, BLOCKLIST_FILE_DEFAULT);
         File BLFile = new File(file);
         if (!BLFile.isAbsolute())
@@ -719,7 +736,6 @@ public class Blocklist {
         }
 
         // look through the file for each address to find which one was the cause
-        List ips = getAddresses(peer);
         for (Iterator<byte[]> iter = ips.iterator(); iter.hasNext(); ) {
             byte ip[] = iter.next();
             int ipint = toInt(ip);
@@ -763,25 +779,67 @@ public class Blocklist {
 
     private static final int MAX_DISPLAY = 1000;
 
-    /** write directly to the stream so we don't OOM on a huge list */
+    /**
+     *  Write directly to the stream so we don't OOM on a huge list.
+     *  Go through each list twice since we store out-of-order.
+     */
     public void renderStatusHTML(Writer out) throws IOException {
         // move to the jsp
         //out.write("<h2>Banned IPs</h2>");
         Set<Integer> singles = new TreeSet();
         singles.addAll(_singleIPBlocklist);
         if (!singles.isEmpty()) {
-            out.write("<table><tr><td><b>Transient IPs</b></td></tr>");
-            for (Iterator<Integer> iter = singles.iterator(); iter.hasNext(); ) {
-                 int ip = iter.next().intValue();
-                 out.write("<tr><td align=right>"); out.write(toStr(ip)); out.write("</td></tr>\n");
+            out.write("<table><tr><th align=center colspan=2><b>");
+            out.write(_("IPs Banned Until Restart"));
+            out.write("</b></td></tr>");
+            // first 0 - 127
+            for (Integer ii : singles) {
+                 int ip = ii.intValue();
+                 if (ip < 0)
+                     continue;
+                 out.write("<tr><td align=center width=50%>");
+                 out.write(toStr(ip));
+                 out.write("</td><td width=50%>&nbsp;</td></tr>\n");
+            }
+            // then 128 - 255
+            for (Integer ii : singles) {
+                 int ip = ii.intValue();
+                 if (ip >= 0)
+                     break;
+                 out.write("<tr><td align=center width=50%>");
+                 out.write(toStr(ip));
+                 out.write("</td><td width=50%>&nbsp;</td></tr>\n");
             }
             out.write("</table>");
         }
         if (_blocklistSize > 0) {
-            out.write("<table><tr><th align=center colspan=2><b>IPs from Blocklist File</b></th></tr><tr><td align=center width=50%><b>From:</b></td><td align=center width=50%><b>To:</b></td></tr>");
+            out.write("<table><tr><th align=center colspan=2><b>");
+            out.write(_("IPs Permanently Banned"));
+            out.write("</b></th></tr><tr><td align=center width=50%><b>");
+            out.write(_("From"));
+            out.write("</b></td><td align=center width=50%><b>");
+            out.write(_("To"));
+            out.write("</b></td></tr>");
             int max = Math.min(_blocklistSize, MAX_DISPLAY);
+            int displayed = 0;
+            // first 0 - 127
             for (int i = 0; i < max; i++) {
                  int from = getFrom(_blocklist[i]);
+                 if (from < 0)
+                     continue;
+                 out.write("<tr><td align=center width=50%>"); out.write(toStr(from)); out.write("</td><td align=center width=50%>");
+                 int to = getTo(_blocklist[i]);
+                 if (to != from) {
+                     out.write(toStr(to)); out.write("</td></tr>\n");
+                 } else
+                     out.write("&nbsp;</td></tr>\n");
+                 displayed++;
+            }
+            // then 128 - 255
+            for (int i = 0; i < max && displayed++ < max; i++) {
+                 int from = getFrom(_blocklist[i]);
+                 if (from >= 0)
+                     break;
                  out.write("<tr><td align=center width=50%>"); out.write(toStr(from)); out.write("</td><td align=center width=50%>");
                  int to = getTo(_blocklist[i]);
                  if (to != from) {
@@ -790,11 +848,14 @@ public class Blocklist {
                      out.write("&nbsp;</td></tr>\n");
             }
             if (_blocklistSize > MAX_DISPLAY)
+                // very rare, don't bother translating
                 out.write("<tr><th colspan=2>First " + MAX_DISPLAY + " displayed, see the " +
                           BLOCKLIST_FILE_DEFAULT + " file for the full list</th></tr>");
             out.write("</table>");
         } else {
-            out.write("<br><i>No blocklist file entries.</i>");
+            out.write("<br><i>");
+            out.write(_("none"));
+            out.write("</i>");
         }
         out.flush();
     }
@@ -807,6 +868,13 @@ public class Blocklist {
      */
     private static final String _x(String s) {
         return s;
+    }
+
+    private static final String BUNDLE_NAME = "net.i2p.router.web.messages";
+
+    /** translate */
+    private String _(String key) {
+        return Translate.getString(key, _context, BUNDLE_NAME);
     }
 
     public static void main(String args[]) {
