@@ -517,7 +517,10 @@ public class SummaryHelper extends HelperBase {
         if (_context == null) 
             return "0 ms";
         
-        Rate lagRate = _context.statManager().getRate("jobQueue.jobLag").getRate(60*1000);
+        RateStat rs = _context.statManager().getRate("jobQueue.jobLag");
+        if (rs == null)
+            return "0 ms";
+        Rate lagRate = rs.getRate(60*1000);
         return DataHelper.formatDuration2((long)lagRate.getAverageValue());
     }
  
