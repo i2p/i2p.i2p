@@ -44,7 +44,9 @@ public interface I2PClient {
      * using the specified options to both connect to the router, to instruct
      * the router how to handle the new session, and to configure the end to end
      * encryption.
-     * @param destKeyStream location from which to read the Destination, PrivateKey, and SigningPrivateKey from
+     *
+     * @param destKeyStream location from which to read the Destination, PrivateKey, and SigningPrivateKey from,
+     *                      format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      * @param options set of options to configure the router with, if null will use System properties
      * @return new session allowing a Destination to recieve all of its messages and send messages to any other Destination.
      */
@@ -52,8 +54,10 @@ public interface I2PClient {
 
     /** Create a new destination with the default certificate creation properties and store
      * it, along with the private encryption and signing keys at the specified location
+     *
      * @param destKeyStream create a new destination and write out the object to the given stream, 
      *			    formatted as Destination, PrivateKey, and SigningPrivateKey
+     *                      format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      * @return new destination
      */
     public Destination createDestination(OutputStream destKeyStream) throws I2PException, IOException;
@@ -61,7 +65,8 @@ public interface I2PClient {
     /** Create a new destination with the given certificate and store it, along with the private 
      * encryption and signing keys at the specified location
      *
-     * @param destKeyStream location to write out the destination, PrivateKey, and SigningPrivateKey
+     * @param destKeyStream location to write out the destination, PrivateKey, and SigningPrivateKey,
+     *                      format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      * @param cert certificate to tie to the destination
      * @return newly created destination
      */
