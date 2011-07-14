@@ -21,24 +21,24 @@ import net.i2p.util.SimpleTimer;
  *
  */
 class ConnectionManager {
-    private I2PAppContext _context;
-    private Log _log;
-    private I2PSession _session;
-    private MessageHandler _messageHandler;
-    private PacketHandler _packetHandler;
-    private ConnectionHandler _connectionHandler;
-    private PacketQueue _outboundQueue;
-    private SchedulerChooser _schedulerChooser;
-    private ConnectionPacketHandler _conPacketHandler;
-    private TCBShare _tcbShare;
+    private final I2PAppContext _context;
+    private final Log _log;
+    private final I2PSession _session;
+    private final MessageHandler _messageHandler;
+    private final PacketHandler _packetHandler;
+    private final ConnectionHandler _connectionHandler;
+    private final PacketQueue _outboundQueue;
+    private final SchedulerChooser _schedulerChooser;
+    private final ConnectionPacketHandler _conPacketHandler;
+    private final TCBShare _tcbShare;
     /** Inbound stream ID (Long) to Connection map */
-    private ConcurrentHashMap<Long, Connection> _connectionByInboundId;
+    private final ConcurrentHashMap<Long, Connection> _connectionByInboundId;
     /** Ping ID (Long) to PingRequest */
     private final Map<Long, PingRequest> _pendingPings;
     private boolean _allowIncoming;
     private boolean _throttlersInitialized;
     private int _maxConcurrentStreams;
-    private ConnectionOptions _defaultOptions;
+    private final ConnectionOptions _defaultOptions;
     private volatile int _numWaiting;
     private long _soTimeout;
     private ConnThrottler _minuteThrottler;
@@ -59,10 +59,12 @@ class ConnectionManager {
         _schedulerChooser = new SchedulerChooser(_context);
         _conPacketHandler = new ConnectionPacketHandler(_context);
         _tcbShare = new TCBShare(_context);
-        _session.setSessionListener(_messageHandler);
+        // PROTO_ANY is for backward compatibility (pre-0.7.1)
+        // TODO change proto to PROTO_STREAMING someday.
+        // Right now we get everything, and rely on Datagram to specify PROTO_UDP.
+        // PacketQueue has sent PROTO_STREAMING since the beginning of mux support (0.7.1)
+        _session.addMuxedSessionListener(_messageHandler, I2PSession.PROTO_ANY, I2PSession.PORT_ANY);
         _outboundQueue = new PacketQueue(_context, _session, this);
-        _allowIncoming = false;
-        _numWaiting = 0;
         /** Socket timeout for accept() */
         _soTimeout = -1;
 
@@ -141,7 +143,10 @@ class ConnectionManager {
      *         it, or null if the syn's streamId was already taken
      */
     public Connection receiveConnection(Packet synPacket) {
-        Connection con = new Connection(_context, this, _schedulerChooser, _outboundQueue, _conPacketHandler, new ConnectionOptions(_defaultOptions));
+        ConnectionOptions opts = new ConnectionOptions(_defaultOptions);
+        opts.setPort(synPacket.getRemotePort());
+        opts.setLocalPort(synPacket.getLocalPort());
+        Connection con = new Connection(_context, this, _schedulerChooser, _outboundQueue, _conPacketHandler, opts);
         _tcbShare.updateOptsFromShare(con);
         con.setInbound();
         long receiveId = _context.random().nextLong(Packet.MAX_STREAM_ID-1)+1;

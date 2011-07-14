@@ -70,6 +70,21 @@ public interface I2PSocket {
     public boolean isClosed();
 
     public void setSocketErrorListener(SocketErrorListener lsnr);
+
+    /**
+     *  The remote port.
+     *  @return Default I2PSession.PORT_UNSPECIFIED (0) or PORT_ANY (0)
+     *  @since 0.8.9
+     */
+    public int getPort();
+
+    /**
+     *  The local port.
+     *  @return Default I2PSession.PORT_UNSPECIFIED (0) or PORT_ANY (0)
+     *  @since 0.8.9
+     */
+    public int getLocalPort();
+
     /**
      * Allow notification of underlying errors communicating across I2P without
      * waiting for any sort of cleanup process.  For example, if some data could

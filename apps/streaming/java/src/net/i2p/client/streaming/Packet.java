@@ -13,6 +13,13 @@ import net.i2p.data.SigningPrivateKey;
 import net.i2p.util.Log;
 
 /**
+ * This contains solely the data that goes out on the wire,
+ * including the local and remote port which is embedded in
+ * the I2CP overhead, not in the packet itself.
+ * For local state saved for outbound packets, see PacketLocal.
+ *
+ * <p>
+ *
  * Contain a single packet transferred as part of a streaming connection.  
  * The data format is as follows:<ul>
  * <li>{@link #getSendStreamId sendStreamId} [4 byte value]</li>
@@ -67,6 +74,8 @@ class Packet {
     private Destination _optionFrom;
     private int _optionDelay;
     private int _optionMaxSize;
+    private int _localPort;
+    private int _remotePort;
     
     /** 
      * The receiveStreamId will be set to this when the packet doesn't know 
@@ -148,6 +157,10 @@ class Packet {
     public static final int DEFAULT_MAX_SIZE = 32*1024;
     protected static final int MAX_DELAY_REQUEST = 65535;
 
+    /**
+     *  Does no initialization.
+     *  See readPacket() for inbound packets, and the setters for outbound packets.
+     */
     public Packet() { }
     
     private boolean _sendStreamIdSet = false;
@@ -316,6 +329,40 @@ class Packet {
         _optionMaxSize = numBytes; 
     }
     
+    /**
+     *  @return Default I2PSession.PORT_UNSPECIFIED (0) or PORT_ANY (0)
+     *  @since 0.8.9
+     */
+    public int getLocalPort() {
+        return _localPort;
+    }
+
+    /**
+     *  Must be called to change the port, not set by readPacket()
+     *  as the port is out-of-band in the I2CP header.
+     *  @since 0.8.9
+     */
+    public void setLocalPort(int port) {
+        _localPort = port;
+    }
+    
+    /**
+     *  @return Default I2PSession.PORT_UNSPECIFIED (0) or PORT_ANY (0)
+     *  @since 0.8.9
+     */
+    public int getRemotePort() {
+        return _remotePort;
+    }
+
+    /**
+     *  Must be called to change the port, not set by readPacket()
+     *  as the port is out-of-band in the I2CP header.
+     *  @since 0.8.9
+     */
+    public void setRemotePort(int port) {
+        _remotePort = port;
+    }
+
     /**
      * Write the packet to the buffer (starting at the offset) and return
      * the number of bytes written.

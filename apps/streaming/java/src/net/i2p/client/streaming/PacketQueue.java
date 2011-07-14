@@ -19,11 +19,11 @@ import net.i2p.util.Log;
  *
  */
 class PacketQueue {
-    private I2PAppContext _context;
-    private Log _log;
-    private I2PSession _session;
-    private ConnectionManager _connectionManager;
-    private ByteCache _cache = ByteCache.getInstance(64, 36*1024);
+    private final I2PAppContext _context;
+    private final Log _log;
+    private final I2PSession _session;
+    private final ConnectionManager _connectionManager;
+    private final ByteCache _cache = ByteCache.getInstance(64, 36*1024);
     
     public PacketQueue(I2PAppContext context, I2PSession session, ConnectionManager mgr) {
         _context = context;
@@ -98,7 +98,7 @@ class PacketQueue {
                 //                 I2PSession.PROTO_STREAMING, I2PSession.PORT_UNSPECIFIED, I2PSession.PORT_UNSPECIFIED);
                 // I2PSessionMuxedImpl no tags
                 sent = _session.sendMessage(packet.getTo(), buf, 0, size, null, null, expires,
-                                 I2PSession.PROTO_STREAMING, I2PSession.PORT_UNSPECIFIED, I2PSession.PORT_UNSPECIFIED);
+                                 I2PSession.PROTO_STREAMING, packet.getLocalPort(), packet.getRemotePort());
             else
                 // I2PSessionImpl2
                 //sent = _session.sendMessage(packet.getTo(), buf, 0, size, keyUsed, tagsSent, 0);
@@ -107,7 +107,7 @@ class PacketQueue {
                 //                 I2PSession.PROTO_STREAMING, I2PSession.PORT_UNSPECIFIED, I2PSession.PORT_UNSPECIFIED);
                 // I2PSessionMuxedImpl no tags
                 sent = _session.sendMessage(packet.getTo(), buf, 0, size, null, null,
-                                 I2PSession.PROTO_STREAMING, I2PSession.PORT_UNSPECIFIED, I2PSession.PORT_UNSPECIFIED);
+                                 I2PSession.PROTO_STREAMING, packet.getLocalPort(), packet.getRemotePort());
             end = _context.clock().now();
             
             if ( (end-begin > 1000) && (_log.shouldLog(Log.WARN)) ) 

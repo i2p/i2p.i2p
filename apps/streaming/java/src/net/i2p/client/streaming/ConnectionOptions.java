@@ -106,6 +106,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      *  This is based on documentation, the code, and logging, however there are still
      *  some parts that could use more research.
      *
+     *<pre>
      *  1024 Tunnel Message
      *  - 21 Header (see router/tunnel/BatchedPreprocessor.java)
      * -----
@@ -169,7 +170,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
      * Similarly:
      *   3 msgs: 2722
      *   4 msgs: 3714
-     *
+     *</pre>
      *
      * Before release 0.6.1.14 this was 4096.
      * From release 0.6.1.14 through release 0.6.4, this was 960.
@@ -205,18 +206,35 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
     public static final int DEFAULT_MAX_MESSAGE_SIZE = 1730;
     public static final int MIN_MESSAGE_SIZE = 512;
 
+    /**
+     *  Sets max buffer size, connect timeout, read timeout, and write timeout
+     *  from System properties. Does not set local port or remote port.
+     */
     public ConnectionOptions() {
         super();
     }
     
+    /**
+     *  Sets max buffer size, connect timeout, read timeout, and write timeout
+     *  from properties. Does not set local port or remote port.
+     *  @param opts may be null
+     */
     public ConnectionOptions(Properties opts) {
         super(opts);
     }
     
+    /**
+     *  Initializes from System properties then copies over all options.
+     *  @param opts may be null
+     */
     public ConnectionOptions(I2PSocketOptions opts) {
         super(opts);
     }
     
+    /**
+     *  Initializes from System properties then copies over all options.
+     *  @param opts may be null
+     */
     public ConnectionOptions(ConnectionOptions opts) {
         super(opts);
         if (opts != null) {
@@ -235,8 +253,10 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
             setInboundBufferSize(opts.getInboundBufferSize());
             setCongestionAvoidanceGrowthRateFactor(opts.getCongestionAvoidanceGrowthRateFactor());
             setSlowStartGrowthRateFactor(opts.getSlowStartGrowthRateFactor());
-            setWriteTimeout(opts.getWriteTimeout());
-            setReadTimeout(opts.getReadTimeout());
+            // handled in super()
+            // not clear why added by jr 12/22/2005
+            //setWriteTimeout(opts.getWriteTimeout());
+            //setReadTimeout(opts.getReadTimeout());
             setAnswerPings(opts.getAnswerPings());
             initLists(opts);
             _maxConnsPerMinute = opts.getMaxConnsPerMinute();
@@ -248,7 +268,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         }
     }
     
-	@Override
+    @Override
     protected void init(Properties opts) {
         super.init(opts);
         _trend = new int[TREND_COUNT];
@@ -262,12 +282,14 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         setSendAckDelay(getInt(opts, PROP_INITIAL_ACK_DELAY, DEFAULT_INITIAL_ACK_DELAY));
         setWindowSize(getInt(opts, PROP_INITIAL_WINDOW_SIZE, INITIAL_WINDOW_SIZE));
         setMaxResends(getInt(opts, PROP_MAX_RESENDS, DEFAULT_MAX_SENDS));
-        setWriteTimeout(getInt(opts, PROP_WRITE_TIMEOUT, -1));
+        // handled in super()
+        //setWriteTimeout(getInt(opts, PROP_WRITE_TIMEOUT, -1));
         setInactivityTimeout(getInt(opts, PROP_INACTIVITY_TIMEOUT, 90*1000));
         setInactivityAction(getInt(opts, PROP_INACTIVITY_ACTION, INACTIVITY_ACTION_SEND));
         setInboundBufferSize(getMaxMessageSize() * (Connection.MAX_WINDOW_SIZE + 2));
         setCongestionAvoidanceGrowthRateFactor(getInt(opts, PROP_CONGESTION_AVOIDANCE_GROWTH_RATE_FACTOR, 1));
         setSlowStartGrowthRateFactor(getInt(opts, PROP_SLOW_START_GROWTH_RATE_FACTOR, 1));
+        // overrides default in super()
         setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DISCONNECT_TIMEOUT));
         setAnswerPings(getBool(opts, PROP_ANSWER_PINGS, DEFAULT_ANSWER_PINGS));
         initLists(opts);
@@ -279,7 +301,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
         _maxTotalConnsPerDay = getInt(opts, PROP_MAX_TOTAL_CONNS_DAY, 0);
     }
     
-	@Override
+    @Override
     public void setProperties(Properties opts) {
         super.setProperties(opts);
         if (opts == null) return;
@@ -303,8 +325,9 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
             setWindowSize(getInt(opts, PROP_INITIAL_WINDOW_SIZE, INITIAL_WINDOW_SIZE));
         if (opts.containsKey(PROP_MAX_RESENDS))
             setMaxResends(getInt(opts, PROP_MAX_RESENDS, DEFAULT_MAX_SENDS));
-        if (opts.containsKey(PROP_WRITE_TIMEOUT))
-            setWriteTimeout(getInt(opts, PROP_WRITE_TIMEOUT, -1));
+        // handled in super()
+        //if (opts.containsKey(PROP_WRITE_TIMEOUT))
+        //    setWriteTimeout(getInt(opts, PROP_WRITE_TIMEOUT, -1));
         if (opts.containsKey(PROP_INACTIVITY_TIMEOUT))
             setInactivityTimeout(getInt(opts, PROP_INACTIVITY_TIMEOUT, 90*1000));
         if (opts.containsKey(PROP_INACTIVITY_ACTION))
@@ -316,6 +339,7 @@ class ConnectionOptions extends I2PSocketOptionsImpl {
             setSlowStartGrowthRateFactor(getInt(opts, PROP_SLOW_START_GROWTH_RATE_FACTOR, 2));
         if (opts.containsKey(PROP_CONNECT_TIMEOUT))
             // wow 5 minutes!!! FIXME!!
+            // overrides default in super()
             setConnectTimeout(getInt(opts, PROP_CONNECT_TIMEOUT, Connection.DISCONNECT_TIMEOUT));
         if (opts.containsKey(PROP_ANSWER_PINGS))
             setAnswerPings(getBool(opts, PROP_ANSWER_PINGS, DEFAULT_ANSWER_PINGS));

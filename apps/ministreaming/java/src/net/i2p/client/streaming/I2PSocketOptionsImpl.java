@@ -4,22 +4,32 @@ import java.util.Properties;
 
 /**
  * Define the configuration for streaming and verifying data on the socket.
- *
+ * Use I2PSocketManager.buildOptions() to get one of these.
  */
 class I2PSocketOptionsImpl implements I2PSocketOptions {
     private long _connectTimeout;
     private long _readTimeout;
     private long _writeTimeout;
     private int _maxBufferSize;
+    private int _localPort;
+    private int _remotePort;
     
     public static final int DEFAULT_BUFFER_SIZE = 1024*64;
     public static final int DEFAULT_WRITE_TIMEOUT = -1;
     public static final int DEFAULT_CONNECT_TIMEOUT = 60*1000;
     
+    /**
+     *  Sets max buffer size, connect timeout, read timeout, and write timeout
+     *  from System properties. Does not set local port or remote port.
+     */
     public I2PSocketOptionsImpl() {
         this(System.getProperties());
     }
     
+    /**
+     *  Initializes from System properties then copies over all options.
+     *  @param opts may be null
+     */
     public I2PSocketOptionsImpl(I2PSocketOptions opts) {
         this(System.getProperties());
         if (opts != null) {
@@ -27,13 +37,25 @@ class I2PSocketOptionsImpl implements I2PSocketOptions {
             _readTimeout = opts.getReadTimeout();
             _writeTimeout = opts.getWriteTimeout();
             _maxBufferSize = opts.getMaxBufferSize();
+            _localPort = opts.getLocalPort();
+            _remotePort = opts.getPort();
         }
     }
 
+    /**
+     *  Sets max buffer size, connect timeout, read timeout, and write timeout
+     *  from properties. Does not set local port or remote port.
+     *  @param opts may be null
+     */
     public I2PSocketOptionsImpl(Properties opts) {
         init(opts);
     }
     
+    /**
+     *  Sets max buffer size, connect timeout, read timeout, and write timeout
+     *  from properties. Does not set local port or remote port.
+     *  @param opts may be null
+     */
     public void setProperties(Properties opts) {
         if (opts == null) return;
         if (opts.containsKey(PROP_BUFFER_SIZE))
@@ -46,6 +68,10 @@ class I2PSocketOptionsImpl implements I2PSocketOptions {
             _writeTimeout = getInt(opts, PROP_WRITE_TIMEOUT, DEFAULT_WRITE_TIMEOUT);
     }
     
+    /**
+     *  Sets max buffer size, connect timeout, read timeout, and write timeout
+     *  from properties. Does not set local port or remote port.
+     */
     protected void init(Properties opts) {
         _maxBufferSize = getInt(opts, PROP_BUFFER_SIZE, DEFAULT_BUFFER_SIZE);
         _connectTimeout = getInt(opts, PROP_CONNECT_TIMEOUT, DEFAULT_CONNECT_TIMEOUT);
@@ -143,5 +169,41 @@ class I2PSocketOptionsImpl implements I2PSocketOptions {
      */
     public void setWriteTimeout(long ms) {
         _writeTimeout = ms;
+    }
+
+    /**
+     *  The remote port.
+     *  @return Default I2PSession.PORT_UNSPECIFIED (0) or PORT_ANY (0)
+     *  @since 0.8.9
+     */
+    public int getPort() {
+        return _remotePort;
+    }
+
+    /**
+     *  The remote port.
+     *  @param port 0 - 65535
+     *  @since 0.8.9
+     */
+    public void setPort(int port) {
+        _remotePort = port;
+    }
+
+    /**
+     *  The local port.
+     *  @return Default I2PSession.PORT_UNSPECIFIED (0) or PORT_ANY (0)
+     *  @since 0.8.9
+     */
+    public int getLocalPort() {
+        return _localPort;
+    }
+
+    /**
+     *  The local port.
+     *  @param port 0 - 65535
+     *  @since 0.8.9
+     */
+    public void setLocalPort(int port) {
+        _localPort = port;
     }
 }

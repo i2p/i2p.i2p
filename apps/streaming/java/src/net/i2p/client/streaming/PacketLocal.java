@@ -13,13 +13,13 @@ import net.i2p.util.SimpleTimer2;
  * retries, etc.
  */
 class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
-    private I2PAppContext _context;
-    private Log _log;
-    private Connection _connection;
+    private final I2PAppContext _context;
+    private final Log _log;
+    private final Connection _connection;
     private Destination _to;
     private SessionKey _keyUsed;
     private Set _tagsSent;
-    private long _createdOn;
+    private final long _createdOn;
     private int _numSends;
     private long _lastSend;
     private long _acceptedOn;
@@ -29,9 +29,11 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
     private volatile boolean _retransmitted;
     private SimpleTimer2.TimedEvent _resendEvent;
     
+    /** not bound to a connection */
     public PacketLocal(I2PAppContext ctx, Destination to) {
         this(ctx, to, null);
     }
+
     public PacketLocal(I2PAppContext ctx, Destination to, Connection con) {
         _context = ctx;
         _createdOn = ctx.clock().now();
@@ -40,8 +42,6 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
         _connection = con;
         _lastSend = -1;
         _cancelledOn = -1;
-        _nackCount = 0;
-        _retransmitted = false;
     }
     
     public Destination getTo() { return _to; }
@@ -138,6 +138,8 @@ class PacketLocal extends Packet implements MessageOutputStream.WriteStatus {
     }
     public int getNumSends() { return _numSends; }
     public long getLastSend() { return _lastSend; }
+
+    /** @return null if not bound */
     public Connection getConnection() { return _connection; }
 
     public void incrementNACKs() { 

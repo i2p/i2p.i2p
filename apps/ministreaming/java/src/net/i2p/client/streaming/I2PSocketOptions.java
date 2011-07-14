@@ -2,7 +2,7 @@ package net.i2p.client.streaming;
 
 /**
  * Define the configuration for streaming and verifying data on the socket.
- *
+ * Use I2PSocketManager.buildOptions() to get one of these.
  */
 public interface I2PSocketOptions {
     /** How much data will we accept that hasn't been written out yet. */
@@ -81,4 +81,32 @@ public interface I2PSocketOptions {
      * @param ms wait time to block on the output stream while waiting for the data to flush.
      */
     public void setWriteTimeout(long ms);
+
+    /**
+     *  The remote port.
+     *  @return Default I2PSession.PORT_UNSPECIFIED (0) or PORT_ANY (0)
+     *  @since 0.8.9
+     */
+    public int getPort();
+
+    /**
+     *  The remote port.
+     *  @param port 0 - 65535
+     *  @since 0.8.9
+     */
+    public void setPort(int port);
+
+    /**
+     *  The local port.
+     *  @return Default I2PSession.PORT_UNSPECIFIED (0) or PORT_ANY (0)
+     *  @since 0.8.9
+     */
+    public int getLocalPort();
+
+    /**
+     *  The local port.
+     *  @param port 0 - 65535
+     *  @since 0.8.9
+     */
+    public void setLocalPort(int port);
 }
