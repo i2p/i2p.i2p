@@ -173,6 +173,15 @@
                 <input value="1" type="checkbox" id="startOnLoad" name="startOnLoad" title="Start Tunnel Automatically"<%=(editBean.startAutomatically(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
                 <span class="comment"><%=intl._("(Check the Box for 'YES')")%></span>
             </div>
+         <% if ("ircclient".equals(tunnelType)) { %>
+            <div id="startupField" class="rowItem">
+                <label for="dcc" accesskey="d">
+                    <%=intl._("Enable DCC")%>:
+                </label>
+                <input value="1" type="checkbox" id="startOnLoad" name="DCC" title="Enable DCC"<%=(editBean.getDCC(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
+                <span class="comment"><%=intl._("(Check the Box for 'YES')")%></span>
+            </div>
+         <% } // ircclient %>
             
             <div class="footer">
             </div>

@@ -21,6 +21,7 @@ import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClient;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
+import net.i2p.i2ptunnel.I2PTunnelIRCClient;
 import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.i2ptunnel.TunnelControllerGroup;
 import net.i2p.util.Addresses;
@@ -170,6 +171,11 @@ public class EditBean extends IndexBean {
         return getBooleanProperty(tunnel, "i2cp.encryptLeaseSet");
     }
     
+    /** @since 0.8.9 */
+    public boolean getDCC(int tunnel) {
+        return getBooleanProperty(tunnel, I2PTunnelIRCClient.PROP_DCC);
+    }
+
     public String getEncryptKey(int tunnel) {
         return getProperty(tunnel, "i2cp.leaseSetKey", "");
     }
