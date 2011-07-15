@@ -310,8 +310,8 @@ div.sorry hr {
 }     
 
 div.main {
-     margin: 10px 10px 20px 207px;
-     padding: 0 15px 15px 15px;
+     margin: 10px 210px 0px 10px;
+     padding: 7px 0px 30px 20px;
      background: #ffe;
      text-align: right;
      color: #001;
@@ -345,8 +345,8 @@ div.main textarea {
 }
 
 div.news {
-     margin: 0px 10px 5px 207px;
-     padding: 7px 20px 7px 20px;
+     margin: 10px 210px 0px 10px;
+     padding: 7px 0px 30px 20px;
      border: 1px solid #447;
      color: #224;
      border-radius: 4px;
@@ -711,8 +711,8 @@ p {
 h1 {
      text-align: right;
      color: #115;
-     padding: 10px 15px;
-     margin: 0 10px 10px 207px;
+     margin: 10px 210px 0px 10px;
+     padding: 7px 0px 30px 20px;
      font: normal bold 16pt/120% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      letter-spacing: 0.15em;
      text-transform: uppercase;
