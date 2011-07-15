@@ -9,13 +9,13 @@ package net.i2p.util;
  *
  */
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.ListIterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * An implementation of the EventDispatcher interface.  Since Java
@@ -34,11 +34,9 @@ import java.util.Set;
  */
 public class EventDispatcherImpl implements EventDispatcher {
 
-    //private final static Log _log = new Log(EventDispatcherImpl.class);
-
     private boolean _ignore = false;
-    private final HashMap _events = new HashMap(4);
-    private final ArrayList _attached = new ArrayList();
+    private final Map<String, Object> _events = new ConcurrentHashMap(4);
+    private final List<EventDispatcher> _attached = new CopyOnWriteArrayList();
     
     public EventDispatcher getEventDispatcher() {
         return this;
@@ -46,23 +44,12 @@ public class EventDispatcherImpl implements EventDispatcher {
     
     public void attachEventDispatcher(EventDispatcher ev) {
         if (ev == null) return;
-        synchronized (_attached) {
-            //_log.debug(this.hashCode() + ": attaching EventDispatcher " + ev.hashCode());
-            _attached.add(ev);
-        }
+        _attached.add(ev);
     }
     
     public void detachEventDispatcher(EventDispatcher ev) {
         if (ev == null) return;
-        synchronized (_attached) {
-            ListIterator it = _attached.listIterator();
-            while (it.hasNext()) {
-                if (((EventDispatcher) it.next()) == ev) {
-                    it.remove();
-                    break;
-                }
-            }
-        }
+        _attached.remove(ev);
     }
     
     public void notifyEvent(String eventName, Object args) {
@@ -70,50 +57,28 @@ public class EventDispatcherImpl implements EventDispatcher {
         if (args == null) {
             args = "[null value]";
         }
-        //_log.debug(this.hashCode() + ": got notification [" + eventName + "] = [" + args + "]");
+        _events.put(eventName, args);
         synchronized (_events) {
-            _events.put(eventName, args);
             _events.notifyAll();
-            synchronized (_attached) {
-                Iterator it = _attached.iterator();
-                EventDispatcher e;
-                while (it.hasNext()) {
-                    e = (EventDispatcher) it.next();
-                    //_log.debug(this.hashCode() + ": notifying attached EventDispatcher " + e.hashCode() + ": ["
-                    //           + eventName + "] = [" + args + "]");
-                    e.notifyEvent(eventName, args);
-                }
-            }
+        }
+        for (EventDispatcher e : _attached) {
+            e.notifyEvent(eventName, args);
         }
     }
     
     public Object getEventValue(String name) {
         if (_ignore) return null;
-        Object val;
-
-        synchronized (_events) {
-            val = _events.get(name);
-        }
-
-        return val;
+        return _events.get(name);
     }
 
-    public Set getEvents() {
+    public Set<String> getEvents() {
         if (_ignore) return Collections.EMPTY_SET;
-        Set set;
-
-        synchronized (_events) {
-            set = new HashSet(_events.keySet());
-        }
-
-        return set;
+        return new HashSet(_events.keySet());
     }
     
     public void ignoreEvents() {
         _ignore = true;
-        synchronized (_events) {
-            _events.clear();
-        }
+        _events.clear();
     }
     
     public void unIgnoreEvents() {
@@ -122,22 +87,15 @@ public class EventDispatcherImpl implements EventDispatcher {
     
     public Object waitEventValue(String name) {
         if (_ignore) return null;
-        Object val;
-
-        //_log.debug(this.hashCode() + ": waiting for [" + name + "]");
         do {
             synchronized (_events) {
-                if (_events.containsKey(name)) {
-                    val = _events.get(name);
-                    break;
-                }
+                Object val = _events.get(name);
+                if (val != null)
+                    return val;
                 try {
-                    _events.wait(1 * 1000);
-                } catch (InterruptedException e) { // nop
-                }
+                    _events.wait(5 * 1000);
+                } catch (InterruptedException e) {}
             }
         } while (true);
-
-        return val;
     }
 }
