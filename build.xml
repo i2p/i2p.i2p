@@ -372,6 +372,7 @@
             <link offline="true" href="http://download.oracle.com/javase/6/docs/api/" packagelistLoc="installer/resources/package-lists/java/" />
             <link offline="true" href="http://docs.i2p2.de/jetty/javadoc/" packagelistLoc="installer/resources/package-lists/jetty/" />
             <link offline="true" href="http://docs.i2p-projekt.de/jrobin/javadoc/" packagelistLoc="installer/resources/package-lists/jrobin/" />
+            <link offline="true" href="http://wrapper.tanukisoftware.com/jdoc/" packagelistLoc="installer/resources/package-lists/wrapper/" />
         </javadoc>
         <echo message="Warning, javadoc embeds timestamps in the output, run with 'TZ=UTC ant javadoc' if you plan to distribute" />
     </target>
