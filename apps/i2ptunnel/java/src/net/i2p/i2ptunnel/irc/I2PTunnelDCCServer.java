@@ -36,6 +36,8 @@ import net.i2p.util.Log;
 public class I2PTunnelDCCServer extends I2PTunnelServer {
 
     private final ConcurrentHashMap<Integer, LocalAddress> _outgoing;
+    private final ConcurrentHashMap<Integer, I2PSocket> _active;
+
     // list of client tunnels?
     private static long _id;
 
@@ -54,6 +56,7 @@ public class I2PTunnelDCCServer extends I2PTunnelServer {
     private static final int MAX_OUTGOING_PENDING = 20;
     private static final int MAX_OUTGOING_ACTIVE = 20;
     private static final long OUTBOUND_EXPIRE = 30*60*1000;
+    private static final long ACTIVE_EXPIRE = 60*60*1000;
 
     /**
      * There's no support for unsolicited incoming I2P connections,
@@ -67,6 +70,7 @@ public class I2PTunnelDCCServer extends I2PTunnelServer {
                               EventDispatcher notifyThis, I2PTunnel tunnel) {
         super(DUMMY, 0, sktMgr, l, notifyThis, tunnel);
         _outgoing = new ConcurrentHashMap(8);
+        _active = new ConcurrentHashMap(8);
     }
 
     /**
@@ -81,11 +85,11 @@ public class I2PTunnelDCCServer extends I2PTunnelServer {
         try {
             expireOutbound();
             int myPort = socket.getLocalPort();
-            // TODO remove, add to active
-            LocalAddress local = _outgoing.get(Integer.valueOf(myPort));
+            // Port is a one-time-use only
+            LocalAddress local = _outgoing.remove(Integer.valueOf(myPort));
             if (local == null) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Incoming DCC connection for unknown port " + myPort);
+                    _log.warn("Rejecting incoming DCC connection for unknown port " + myPort);
                 try {
                     socket.close();
                 } catch (IOException ioe) {}
@@ -96,6 +100,7 @@ public class I2PTunnelDCCServer extends I2PTunnelServer {
                           " sending to " + local.ia + ':' + local.port);
             Socket s = new Socket(local.ia, local.port);
             new I2PTunnelRunner(s, socket, slock, null, null);
+            _active.put(Integer.valueOf(myPort), socket);
         } catch (SocketException ex) {
             try {
                 socket.close();
@@ -105,6 +110,13 @@ public class I2PTunnelDCCServer extends I2PTunnelServer {
         } catch (IOException ex) {
             _log.error("Error while waiting for I2PConnections", ex);
         }
+    }
+
+    @Override
+    public boolean close(boolean forced) {
+        _outgoing.clear();
+        _active.clear();
+        return super.close(forced);
     }
 
     /**
@@ -117,8 +129,10 @@ public class I2PTunnelDCCServer extends I2PTunnelServer {
      */
     public int newOutgoing(byte[] ip, int port, String type) {
         expireOutbound();
-        if (_outgoing.size() >= MAX_OUTGOING_PENDING) {
-            _log.error("Too many outgoing DCC, max is " + MAX_OUTGOING_PENDING);
+        if (_outgoing.size() >= MAX_OUTGOING_PENDING ||
+            _active.size() >= MAX_OUTGOING_ACTIVE) {
+            _log.error("Too many outgoing DCC, max is " + MAX_OUTGOING_PENDING +
+                       '/' + MAX_OUTGOING_ACTIVE + " pending/active");
             return -1;
         }
         InetAddress ia;
@@ -130,6 +144,8 @@ public class I2PTunnelDCCServer extends I2PTunnelServer {
         LocalAddress client = new LocalAddress(ia, port, getTunnel().getContext().clock().now() + OUTBOUND_EXPIRE);
         for (int i = 0; i < 10; i++) {
             int iport = MIN_I2P_PORT + getTunnel().getContext().random().nextInt(1 + MAX_I2P_PORT - MIN_I2P_PORT);
+            if (_active.containsKey(Integer.valueOf(iport)))
+                continue;
             LocalAddress old = _outgoing.putIfAbsent(Integer.valueOf(iport), client);
             if (old != null)
                 continue;
@@ -155,6 +171,11 @@ public class I2PTunnelDCCServer extends I2PTunnelServer {
         for (Iterator<LocalAddress> iter = _outgoing.values().iterator(); iter.hasNext(); ) {
             LocalAddress a = iter.next();
             if (a.expire < getTunnel().getContext().clock().now())
+                iter.remove();
+        }
+        for (Iterator<I2PSocket> iter = _active.values().iterator(); iter.hasNext(); ) {
+            I2PSocket s = iter.next();
+            if (s.isClosed())
                 iter.remove();
         }
     }

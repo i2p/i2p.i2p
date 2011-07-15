@@ -20,10 +20,10 @@ import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErrorListener {
-    private final static Log _log = new Log(I2PTunnelRunner.class);
+    private final Log _log = new Log(I2PTunnelRunner.class);
 
     private static volatile long __runnerId;
-    private long _runnerId;
+    private final long _runnerId;
     /** 
      * max bytes streamed in a packet - smaller ones might be filled
      * up to this size. Larger ones are not split (at least not on
@@ -34,20 +34,20 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
 
     static final int NETWORK_BUFFER_SIZE = MAX_PACKET_SIZE;
 
-    private Socket s;
-    private I2PSocket i2ps;
-    final Object slock, finishLock = new Object();
+    private final Socket s;
+    private final I2PSocket i2ps;
+    private final Object slock, finishLock = new Object();
     boolean finished = false;
-    HashMap ostreams, sockets;
-    byte[] initialI2PData;
-    byte[] initialSocketData;
+    private HashMap ostreams, sockets;
+    private final byte[] initialI2PData;
+    private final byte[] initialSocketData;
     /** when the last data was sent/received (or -1 if never) */
     private long lastActivityOn;
     /** when the runner started up */
-    private long startedOn;
-    private List sockList;
+    private final long startedOn;
+    private final List sockList;
     /** if we die before receiving any data, run this job */
-    private Runnable onTimeout;
+    private final Runnable onTimeout;
     private long totalSent;
     private long totalReceived;
 
@@ -56,12 +56,23 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
     public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData, List sockList) {
         this(s, i2ps, slock, initialI2PData, null, sockList, null);
     }
+
     public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData, byte[] initialSocketData, List sockList) {
         this(s, i2ps, slock, initialI2PData, initialSocketData, sockList, null);
     }
+
     public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData, List sockList, Runnable onTimeout) {
         this(s, i2ps, slock, initialI2PData, null, sockList, onTimeout);
     }
+
+    /**
+     *  Starts itself
+     *
+     *  @param initialI2PData may be null
+     *  @param initialSocketData may be null
+     *  @param sockList may be null
+     *  @param onTImeout may be null
+     */
     public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData, byte[] initialSocketData, List sockList, Runnable onTimeout) {
         this.sockList = sockList;
         this.s = s;
@@ -237,11 +248,11 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
     
     private class StreamForwarder extends I2PAppThread {
 
-        InputStream in;
-        OutputStream out;
-        String direction;
-        private boolean _toI2P;
-        private ByteCache _cache;
+        private final InputStream in;
+        private final OutputStream out;
+        private final String direction;
+        private final boolean _toI2P;
+        private final ByteCache _cache;
 
         private StreamForwarder(InputStream in, OutputStream out, boolean toI2P) {
             this.in = in;

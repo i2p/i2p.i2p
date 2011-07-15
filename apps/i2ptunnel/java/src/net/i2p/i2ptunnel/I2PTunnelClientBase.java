@@ -59,7 +59,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
 
     private boolean listenerReady = false;
 
-    private ServerSocket ss;
+    protected ServerSocket ss;
 
     private final Object startLock = new Object();
     private boolean startRunning = false;

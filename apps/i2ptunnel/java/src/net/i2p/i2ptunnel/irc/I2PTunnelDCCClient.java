@@ -29,6 +29,11 @@ public class I2PTunnelDCCClient extends I2PTunnelClientBase {
     // delay resolution until connect time
     private final String _dest;
     private final int _remotePort;
+    private final long _expires;
+
+    private static final long INBOUND_EXPIRE = 30*60*1000;
+    public static final String CONNECT_START_EVENT = "connectionStarted";
+    public static final String CONNECT_STOP_EVENT = "connectionStopped";
 
     /**
      * @param dest the target, presumably b32
@@ -41,14 +46,16 @@ public class I2PTunnelDCCClient extends I2PTunnelClientBase {
         super(0, l, sktMgr, tunnel, notifyThis, clientId);
         _dest = dest;
         _remotePort = remotePort;
+        _expires = tunnel.getContext().clock().now() + INBOUND_EXPIRE;
 
         setName("DCC send -> " + dest + ':' + remotePort);
 
         startRunning();
-
-        notifyEvent("openClientResult", "ok");
     }
 
+    /**
+     *  Accept one connection only.
+     */
     protected void clientConnectionRun(Socket s) {
         I2PSocket i2ps = null;
         if (_log.shouldLog(Log.INFO))
@@ -57,7 +64,8 @@ public class I2PTunnelDCCClient extends I2PTunnelClientBase {
         if (dest == null) {
             _log.error("Could not find leaseset for DCC connection to " + _dest + ':' + _remotePort);
             closeSocket(s);
-            // shutdown?
+            stop();
+            notifyEvent(CONNECT_STOP_EVENT, Integer.valueOf(getLocalPort()));
             return;
         }
 
@@ -65,13 +73,48 @@ public class I2PTunnelDCCClient extends I2PTunnelClientBase {
         opts.setPort(_remotePort);
         try {
             i2ps = createI2PSocket(dest, opts);
-            new I2PTunnelRunner(s, i2ps, sockLock, null, mySockets);
+            new Runner(s, i2ps);
         } catch (Exception ex) {
             _log.error("Could not make DCC connection to " + _dest + ':' + _remotePort, ex);
             closeSocket(s);
             if (i2ps != null) {
                 try { i2ps.close(); } catch (IOException ioe) {}
             }
+            notifyEvent(CONNECT_STOP_EVENT, Integer.valueOf(getLocalPort()));
+        }
+        stop();
+    }
+
+    public long getExpires() {
+        return _expires;
+    }
+
+    /**
+     *  Stop listening for new sockets.
+     *  We can't call super.close() as it kills all sockets in the sockMgr
+     */
+    public void stop() {
+        open = false;
+        try {
+            ss.close();
+        } catch (IOException ioe) {}
+    }
+
+    /**
+     *  Just so we can do the callbacks
+     */
+    private class Runner extends I2PTunnelRunner {
+
+        public Runner(Socket s, I2PSocket i2ps) {
+            // super calls start()
+            super(s, i2ps, sockLock, null, mySockets);
+        }
+
+        @Override
+        public void run() {
+            notifyEvent(CONNECT_START_EVENT, I2PTunnelDCCClient.this);
+            super.run();
+            notifyEvent(CONNECT_STOP_EVENT, Integer.valueOf(getLocalPort()));
         }
     }
 }

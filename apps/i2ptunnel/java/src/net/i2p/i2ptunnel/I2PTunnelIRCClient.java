@@ -144,6 +144,10 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements DCCHelper
                 _DCCServer.close(forced);
                 _DCCServer = null;
             }
+            if (_DCCClientManager != null) {
+                _DCCClientManager.close(forced);
+                _DCCClientManager = null;
+            }
         }
         return super.close(forced);
     }

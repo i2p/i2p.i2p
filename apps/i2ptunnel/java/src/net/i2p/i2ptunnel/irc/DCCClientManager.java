@@ -24,21 +24,22 @@ import net.i2p.util.Log;
  *
  * @since 0.8.9
  */
-public class DCCClientManager {
-
+public class DCCClientManager extends EventReceiver {
     private final I2PSocketManager sockMgr;
     private final EventDispatcher _dispatch;
     private final Logging l;
     private final I2PTunnel _tunnel;
     private final Log _log;
 
-    private final ConcurrentHashMap<Integer, I2PAddress> _incoming;
+    private final ConcurrentHashMap<Integer, I2PTunnelDCCClient> _incoming;
+    private final ConcurrentHashMap<Integer, I2PTunnelDCCClient> _active;
+
     // list of client tunnels?
     private static long _id;
 
     private static final int MAX_INCOMING_PENDING = 10;
     private static final int MAX_INCOMING_ACTIVE = 10;
-    private static final long INBOUND_EXPIRE = 30*60*1000;
+    private static final long ACTIVE_EXPIRE = 60*60*1000;
 
     public DCCClientManager(I2PSocketManager sktMgr, Logging logging,
                             EventDispatcher dispatch, I2PTunnel tunnel) {
@@ -48,6 +49,19 @@ public class DCCClientManager {
         _tunnel = tunnel;
         _log = tunnel.getContext().logManager().getLog(DCCClientManager.class);
         _incoming = new ConcurrentHashMap(8);
+        _active = new ConcurrentHashMap(8);
+    }
+
+    public boolean close(boolean forced) {
+        for (I2PTunnelDCCClient c : _incoming.values()) {
+            c.stop();
+        }
+        _incoming.clear();
+        for (I2PTunnelDCCClient c : _active.values()) {
+            c.stop();
+        }
+        _active.clear();
+        return true;
     }
 
     /**
@@ -60,21 +74,23 @@ public class DCCClientManager {
      */
     public int newIncoming(String b32, int port, String type) {
         expireInbound();
-        if (_incoming.size() >= MAX_INCOMING_PENDING) {
-            _log.error("Too many incoming DCC, max is " + MAX_INCOMING_PENDING);
+        if (_incoming.size() >= MAX_INCOMING_PENDING ||
+            _active.size() >= MAX_INCOMING_PENDING) {
+            _log.error("Too many incoming DCC, max is " + MAX_INCOMING_PENDING +
+                       '/' + MAX_INCOMING_ACTIVE + " pending/active");
             return -1;
         }
-        I2PAddress client = new I2PAddress(b32, port, _tunnel.getContext().clock().now() + INBOUND_EXPIRE);
         try {
             // Transparent tunnel used for all types...
             // Do we need to do any filtering for chat?
             I2PTunnelDCCClient cTunnel = new I2PTunnelDCCClient(b32, port, l, sockMgr,
                                                                 _dispatch, _tunnel, ++_id);
+            cTunnel.attachEventDispatcher(this);
             int lport = cTunnel.getLocalPort();
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Opened client tunnel at port " + lport +
                           " pointing to " + b32 + ':' + port);
-            _incoming.put(Integer.valueOf(lport), client);
+            _incoming.put(Integer.valueOf(lport), cTunnel);
             return lport;
         } catch (IllegalArgumentException uhe) {
             l.log("Could not find listen host to bind to [" + _tunnel.host + "]");
@@ -83,23 +99,52 @@ public class DCCClientManager {
         }
     }
 
-    private void expireInbound() {
-        for (Iterator<I2PAddress> iter = _incoming.values().iterator(); iter.hasNext(); ) {
-            I2PAddress a = iter.next();
-            if (a.expire < _tunnel.getContext().clock().now())
-                iter.remove();
+    /**
+     *  The EventReceiver callback
+     */
+    public void notifyEvent(String eventName, Object args) {
+        if (eventName.equals(I2PTunnelDCCClient.CONNECT_START_EVENT)) {
+            try {
+                I2PTunnelDCCClient client = (I2PTunnelDCCClient) args;
+                connStarted(client);
+            } catch (ClassCastException cce) {}
+        } else if (eventName.equals(I2PTunnelDCCClient.CONNECT_STOP_EVENT)) {
+            try {
+                Integer port = (Integer) args;
+                connStopped(port);
+            } catch (ClassCastException cce) {}
         }
     }
 
-    private static class I2PAddress {
-        public final String dest;
-        public final int port;
-        public final long expire;
-
-        public I2PAddress(String b32, int p, long exp) {
-            dest = b32;
-            port = p;
-            expire = exp;
+    private void connStarted(I2PTunnelDCCClient client) {
+        Integer lport = Integer.valueOf(client.getLocalPort());
+        I2PTunnelDCCClient c = _incoming.remove(lport);
+        if (c != null) {
+            _active.put(lport, client);
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Added client tunnel for port " + lport +
+                          " pending count now: " + _incoming.size() +
+                          " active count now: " + _active.size());
         }
+    }
+
+    private void connStopped(Integer lport) {
+        _incoming.remove(lport);
+        _active.remove(lport);
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Removed client tunnel for port " + lport +
+                      " pending count now: " + _incoming.size() +
+                      " active count now: " + _active.size());
+    }
+
+    private void expireInbound() {
+        for (Iterator<I2PTunnelDCCClient> iter = _incoming.values().iterator(); iter.hasNext(); ) {
+            I2PTunnelDCCClient c = iter.next();
+            if (c.getExpires() < _tunnel.getContext().clock().now()) {
+                iter.remove();
+                c.stop();
+            }
+        }
+        // shouldn't need to expire active
     }
 }
