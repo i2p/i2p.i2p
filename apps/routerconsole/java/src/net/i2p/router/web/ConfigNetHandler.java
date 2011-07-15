@@ -298,7 +298,7 @@ public class ConfigNetHandler extends FormHandler {
     private void hiddenSwitch() {
         // Full restart required to generate new keys
         // FIXME don't call wrapper if not present, only rekey
-        _context.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerAndRekeyTask(Router.EXIT_GRACEFUL_RESTART));
+        ConfigServiceHandler.registerWrapperNotifier(_context, Router.EXIT_GRACEFUL_RESTART, false);
         _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
     }
     

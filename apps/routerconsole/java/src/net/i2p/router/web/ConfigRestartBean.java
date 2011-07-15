@@ -31,7 +31,7 @@ public class ConfigRestartBean {
             // Normal browsers send value, IE sends button label
             if ("shutdownImmediate".equals(action) || _("Shutdown immediately", ctx).equals(action)) {
                 if (ctx.hasWrapper())
-                    ctx.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_HARD));
+                    ConfigServiceHandler.registerWrapperNotifier(ctx, Router.EXIT_HARD, false);
                 //ctx.router().shutdown(Router.EXIT_HARD); // never returns
                 ctx.router().shutdownGracefully(Router.EXIT_HARD); // give the UI time to respond
             } else if ("cancelShutdown".equals(action) || _("Cancel shutdown", ctx).equals(action) ||
@@ -39,16 +39,16 @@ public class ConfigRestartBean {
                 ctx.router().cancelGracefulShutdown();
             } else if ("restartImmediate".equals(action) || _("Restart immediately", ctx).equals(action)) {
                 if (ctx.hasWrapper())
-                    ctx.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_HARD_RESTART));
+                    ConfigServiceHandler.registerWrapperNotifier(ctx, Router.EXIT_HARD_RESTART, false);
                 //ctx.router().shutdown(Router.EXIT_HARD_RESTART); // never returns
                 ctx.router().shutdownGracefully(Router.EXIT_HARD_RESTART); // give the UI time to respond
             } else if ("restart".equals(action) || _("Restart", ctx).equals(action)) {
                 if (ctx.hasWrapper())
-                    ctx.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_GRACEFUL_RESTART));
+                    ConfigServiceHandler.registerWrapperNotifier(ctx, Router.EXIT_GRACEFUL_RESTART, false);
                 ctx.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
             } else if ("shutdown".equals(action) || _("Shutdown", ctx).equals(action)) {
                 if (ctx.hasWrapper())
-                    ctx.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_GRACEFUL));
+                    ConfigServiceHandler.registerWrapperNotifier(ctx, Router.EXIT_GRACEFUL, false);
                 ctx.router().shutdownGracefully();
             }
         }

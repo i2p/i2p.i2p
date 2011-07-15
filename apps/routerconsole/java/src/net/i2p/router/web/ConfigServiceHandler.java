@@ -6,6 +6,7 @@ import java.util.List;
 import net.i2p.apps.systray.SysTray;
 import net.i2p.apps.systray.UrlLauncher;
 import net.i2p.router.Router;
+import net.i2p.router.RouterContext;
 import net.i2p.router.startup.ClientAppConfig;
 
 import org.tanukisoftware.wrapper.WrapperManager;
@@ -17,47 +18,127 @@ import org.tanukisoftware.wrapper.WrapperManager;
  */
 public class ConfigServiceHandler extends FormHandler {
     
-    public static class UpdateWrapperManagerTask implements Runnable {
-        private int _exitCode;
-        public UpdateWrapperManagerTask(int exitCode) {
-            _exitCode = exitCode;
-        }
-        public void run() {
-            try {
-                WrapperManager.signalStopped(_exitCode);
-            } catch (Throwable t) {
-                t.printStackTrace();
-            }
+    /**
+     *  Register two shutdown hooks, one to rekey and/or tell the wrapper we are stopping,
+     *  and a final one to tell the wrapper we are stopped.
+     *
+     *  @since 0.8.8
+     */
+    private void registerWrapperNotifier(int code, boolean rekey) {
+        registerWrapperNotifier(_context, code, rekey);
+    }
+    
+    /**
+     *  Register two shutdown hooks, one to rekey and/or tell the wrapper we are stopping,
+     *  and a final one to tell the wrapper we are stopped.
+     *
+     *  @since 0.8.8
+     */
+    public static void registerWrapperNotifier(RouterContext ctx, int code, boolean rekey) {
+        Runnable task = new UpdateWrapperOrRekeyTask(rekey, ctx.hasWrapper());
+        ctx.addShutdownTask(task);
+        if (ctx.hasWrapper()) {
+            task = new FinalWrapperTask(code);
+            ctx.addFinalShutdownTask(task);
         }
     }
 
-    public static class UpdateWrapperManagerAndRekeyTask implements Runnable {
-        private int _exitCode;
-        public UpdateWrapperManagerAndRekeyTask(int exitCode) {
-            _exitCode = exitCode;
+    /**
+     *  Rekey and/or tell the wrapper we are stopping,
+     */
+    private static class UpdateWrapperOrRekeyTask implements Runnable {
+        private final boolean _rekey;
+        private final boolean _tellWrapper;
+        private static final int HASHCODE = -123999871;
+        private static final int WAIT = 30*1000;
+
+        public UpdateWrapperOrRekeyTask(boolean rekey, boolean tellWrapper) {
+            _rekey = rekey;
+            _tellWrapper = tellWrapper;
         }
+
         public void run() {
             try {
-                ContextHelper.getContext(null).router().killKeys();
+                if (_rekey)
+                    ContextHelper.getContext(null).router().killKeys();
+                if (_tellWrapper)
+                    WrapperManager.signalStopping(WAIT);
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        }
+
+        /**
+         *  Make them all look the same since the hooks are stored in a set
+         *  and we don't want dups
+         */
+        @Override
+        public int hashCode() {
+            return HASHCODE;
+        }
+
+        /**
+         *  Make them all look the same since the hooks are stored in a set
+         *  and we don't want dups
+         */
+        @Override
+        public boolean equals(Object o) {
+            return (o != null) && (o instanceof UpdateWrapperOrRekeyTask);
+        }
+    }
+
+    /**
+     *  Tell the wrapper we are stopped.
+     *
+     *  @since 0.8.8
+     */
+    private static class FinalWrapperTask implements Runnable {
+        private final int _exitCode;
+        private static final int HASHCODE = 123999871;
+
+        public FinalWrapperTask(int exitCode) {
+            _exitCode = exitCode;
+        }
+
+        public void run() {
+            try {
                 WrapperManager.signalStopped(_exitCode);
             } catch (Throwable t) {
                 t.printStackTrace();
             }
         }
+
+        /**
+         *  Make them all look the same since the hooks are stored in a set
+         *  and we don't want dups
+         */
+        @Override
+        public int hashCode() {
+            return HASHCODE;
+        }
+
+        /**
+         *  Make them all look the same since the hooks are stored in a set
+         *  and we don't want dups
+         */
+        @Override
+        public boolean equals(Object o) {
+            return (o != null) && (o instanceof FinalWrapperTask);
+        }
     }
-    
+
     @Override
     protected void processForm() {
         if (_action == null) return;
         
         if (_("Shutdown gracefully").equals(_action)) {
             if (_context.hasWrapper())
-                _context.addShutdownTask(new UpdateWrapperManagerTask(Router.EXIT_GRACEFUL));
+                registerWrapperNotifier(Router.EXIT_GRACEFUL, false);
             _context.router().shutdownGracefully();
             addFormNotice(_("Graceful shutdown initiated"));
         } else if (_("Shutdown immediately").equals(_action)) {
             if (_context.hasWrapper())
-                _context.addShutdownTask(new UpdateWrapperManagerTask(Router.EXIT_HARD));
+                registerWrapperNotifier(Router.EXIT_HARD, false);
             _context.router().shutdown(Router.EXIT_HARD);
             addFormNotice(_("Shutdown immediately!  boom bye bye bad bwoy"));
         } else if (_("Cancel graceful shutdown").equals(_action)) {
@@ -66,24 +147,22 @@ public class ConfigServiceHandler extends FormHandler {
         } else if (_("Graceful restart").equals(_action)) {
             // should have wrapper if restart button is visible
             if (_context.hasWrapper())
-                _context.addShutdownTask(new UpdateWrapperManagerTask(Router.EXIT_GRACEFUL_RESTART));
+                registerWrapperNotifier(Router.EXIT_GRACEFUL_RESTART, false);
             _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
             addFormNotice(_("Graceful restart requested"));
         } else if (_("Hard restart").equals(_action)) {
             // should have wrapper if restart button is visible
             if (_context.hasWrapper())
-                _context.addShutdownTask(new UpdateWrapperManagerTask(Router.EXIT_HARD_RESTART));
+                registerWrapperNotifier(Router.EXIT_HARD_RESTART, false);
             _context.router().shutdown(Router.EXIT_HARD_RESTART);
             addFormNotice(_("Hard restart requested"));
         } else if (_("Rekey and Restart").equals(_action)) {
             addFormNotice(_("Rekeying after graceful restart"));
-            // FIXME don't call wrapper if not present, only rekey
-            _context.addShutdownTask(new UpdateWrapperManagerAndRekeyTask(Router.EXIT_GRACEFUL_RESTART));
+            registerWrapperNotifier(Router.EXIT_GRACEFUL_RESTART, true);
             _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
         } else if (_("Rekey and Shutdown").equals(_action)) {
             addFormNotice(_("Rekeying after graceful shutdown"));
-            // FIXME don't call wrapper if not present, only rekey
-            _context.addShutdownTask(new UpdateWrapperManagerAndRekeyTask(Router.EXIT_GRACEFUL));
+            registerWrapperNotifier(Router.EXIT_GRACEFUL, true);
             _context.router().shutdownGracefully(Router.EXIT_GRACEFUL);
         } else if (_("Run I2P on startup").equals(_action)) {
             installService();

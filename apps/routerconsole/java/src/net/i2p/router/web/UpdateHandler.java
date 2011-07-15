@@ -313,7 +313,7 @@ public class UpdateHandler {
     
     protected void restart() {
         if (_context.hasWrapper())
-            _context.addShutdownTask(new ConfigServiceHandler.UpdateWrapperManagerTask(Router.EXIT_GRACEFUL_RESTART));
+            ConfigServiceHandler.registerWrapperNotifier(_context, Router.EXIT_GRACEFUL_RESTART, false);
         _context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
     }
 

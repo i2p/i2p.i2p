@@ -1,3 +1,11 @@
+2011-07-15 zzz
+  * Shutdown:
+    - Cancel our JVM shutdown hook when shutting down
+    - Run a spinner task so shutdown always completes
+    - exit() instead of halt() so other JVM shutdown hooks run
+    - Prevent duplicate wrapper notifier hooks
+    - Notify the wrapper twice, once for stopping and once for stopped
+
 2011-07-13 zzz
   * Blocklist:
     - Fix delayed lookup of reason from file

@@ -375,7 +375,9 @@ public class Router implements RouterClock.ClockShiftListener {
     void runRouter() {
         _isAlive = true;
         _started = _context.clock().now();
-        Runtime.getRuntime().addShutdownHook(_shutdownHook);
+        try {
+            Runtime.getRuntime().removeShutdownHook(_shutdownHook);
+        } catch (IllegalStateException ise) {}
         I2PThread.addOOMEventListener(_oomListener);
         
         _context.keyManager().startup();
@@ -644,6 +646,11 @@ public class Router implements RouterClock.ClockShiftListener {
      *
      */
     public void rebuildNewIdentity() {
+        if (_shutdownHook != null) {
+            try {
+                Runtime.getRuntime().removeShutdownHook(_shutdownHook);
+            } catch (IllegalStateException ise) {}
+        }
         killKeys();
         for (Runnable task : _context.getShutdownTasks()) {
             if (_log.shouldLog(Log.WARN))
@@ -960,6 +967,27 @@ public class Router implements RouterClock.ClockShiftListener {
         buf.setLength(0);
     }
 ******/
+
+    /**
+     *  A non-daemon thread to let
+     *  the shutdown task get all the way to the end
+     *  @since 0.8.8
+     */
+    private static class Spinner extends Thread {
+
+        public Spinner() {
+            super();
+            setName("Shutdown Spinner");
+            setDaemon(false);
+        }
+
+        @Override
+        public void run() {
+            try {
+                sleep(60*1000);
+            } catch (InterruptedException ie) {}
+        }
+    }
     
     public static final int EXIT_GRACEFUL = 2;
     public static final int EXIT_HARD = 3;
@@ -971,6 +999,25 @@ public class Router implements RouterClock.ClockShiftListener {
      *  Shutdown with no chance of cancellation
      */
     public void shutdown(int exitCode) {
+        if (_shutdownHook != null) {
+            try {
+                Runtime.getRuntime().removeShutdownHook(_shutdownHook);
+            } catch (IllegalStateException ise) {}
+        }
+        shutdown2(exitCode);
+    }
+
+    /**
+     *  Cancel the JVM runtime hook before calling this.
+     */
+    private void shutdown2(int exitCode) {
+        // So we can get all the way to the end
+        // No, you can't do Thread.currentThread.setDaemon(false)
+        if (_killVMOnEnd) {
+            try {
+                (new Spinner()).start();
+            } catch (Throwable t) {}
+        }
         ((RouterClock) _context.clock()).removeShiftListener(this);
         _isAlive = false;
         _context.random().saveSeed();
@@ -1038,6 +1085,9 @@ public class Router implements RouterClock.ClockShiftListener {
      */
     private static final boolean ALLOW_DYNAMIC_KEYS = false;
 
+    /**
+     *  Cancel the JVM runtime hook before calling this.
+     */
     private void finalShutdown(int exitCode) {
         clearCaches();
         _log.log(Log.CRIT, "Shutdown(" + exitCode + ") complete"  /* , new Exception("Shutdown") */ );
@@ -1052,9 +1102,9 @@ public class Router implements RouterClock.ClockShiftListener {
         if (RouterContext.getContexts().isEmpty())
             RouterContext.killGlobalContext();
 
-        // Since 0.8.8, mainly for Android
+        // Since 0.8.8, for Android and the wrapper
         for (Runnable task : _context.getFinalShutdownTasks()) {
-            System.err.println("Running final shutdown task " + task.getClass());
+            //System.err.println("Running final shutdown task " + task.getClass());
             try {
                 task.run();
             } catch (Throwable t) {
@@ -1065,7 +1115,9 @@ public class Router implements RouterClock.ClockShiftListener {
 
         if (_killVMOnEnd) {
             try { Thread.sleep(1000); } catch (InterruptedException ie) {}
-            Runtime.getRuntime().halt(exitCode);
+            //Runtime.getRuntime().halt(exitCode);
+            // allow the Runtime shutdown hooks to execute
+            Runtime.getRuntime().exit(exitCode);
         } else {
             Runtime.getRuntime().gc();
         }
@@ -1772,20 +1824,25 @@ private static class MarkLiveliness implements SimpleTimer.TimedEvent {
     }
 }
 
+/**
+ *  Just for failsafe. Standard shutdown should cancel this.
+ */
 private static class ShutdownHook extends Thread {
-    private RouterContext _context;
+    private final RouterContext _context;
     private static int __id = 0;
-    private int _id;
+    private final int _id;
+
     public ShutdownHook(RouterContext ctx) {
         _context = ctx;
         _id = ++__id;
     }
-        @Override
+
+    @Override
     public void run() {
         setName("Router " + _id + " shutdown");
         Log l = _context.logManager().getLog(Router.class);
         l.log(Log.CRIT, "Shutting down the router...");
-        _context.router().shutdown(Router.EXIT_HARD);
+        _context.router().shutdown2(Router.EXIT_HARD);
     }
 }
 
