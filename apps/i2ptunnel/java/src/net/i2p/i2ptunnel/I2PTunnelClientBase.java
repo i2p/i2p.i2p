@@ -59,7 +59,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
 
     private boolean listenerReady = false;
 
-    private ServerSocket ss;
+    protected ServerSocket ss;
 
     private final Object startLock = new Object();
     private boolean startRunning = false;
@@ -196,7 +196,10 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
 
         // no need to load the netDb with leaseSets for destinations that will never 
         // be looked up
-        tunnel.getClientOptions().setProperty("i2cp.dontPublishLeaseSet", "true");
+        boolean dccEnabled = (this instanceof I2PTunnelIRCClient) &&
+                      Boolean.valueOf(tunnel.getClientOptions().getProperty(I2PTunnelIRCClient.PROP_DCC)).booleanValue();
+        if (!dccEnabled)
+            tunnel.getClientOptions().setProperty("i2cp.dontPublishLeaseSet", "true");
         
         boolean openNow = !Boolean.valueOf(tunnel.getClientOptions().getProperty("i2cp.delayOpen")).booleanValue();
         if (openNow) {

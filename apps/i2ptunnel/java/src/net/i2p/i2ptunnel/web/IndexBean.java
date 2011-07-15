@@ -27,6 +27,7 @@ import net.i2p.data.PrivateKeyFile;
 import net.i2p.data.SessionKey;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClient;
 import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
+import net.i2p.i2ptunnel.I2PTunnelIRCClient;
 import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.i2ptunnel.TunnelControllerGroup;
 import net.i2p.util.ConcurrentHashSet;
@@ -675,6 +676,11 @@ public class IndexBean {
         _booleanOptions.add("i2cp.encryptLeaseSet");
     }
 
+    /** @since 0.8.9 */
+    public void setDCC(String moo) {
+        _booleanOptions.add(I2PTunnelIRCClient.PROP_DCC);
+    }
+
     protected static final String PROP_ENABLE_ACCESS_LIST = "i2cp.enableAccessList";
     protected static final String PROP_ENABLE_BLACKLIST = "i2cp.enableBlackList";
 
@@ -980,13 +986,20 @@ public class IndexBean {
             else
                 config.setProperty("interface", "");
         }
+
+        if ("ircclient".equals(_type)) {
+                config.setProperty("option." + I2PTunnelIRCClient.PROP_DCC,
+                                   "" + _booleanOptions.contains(I2PTunnelIRCClient.PROP_DCC));
+        }
+
         return config;
     }
     
     private static final String _noShowOpts[] = {
         "inbound.length", "outbound.length", "inbound.lengthVariance", "outbound.lengthVariance",
         "inbound.backupQuantity", "outbound.backupQuantity", "inbound.quantity", "outbound.quantity",
-        "inbound.nickname", "outbound.nickname", "i2p.streaming.connectDelay", "i2p.streaming.maxWindowSize"
+        "inbound.nickname", "outbound.nickname", "i2p.streaming.connectDelay", "i2p.streaming.maxWindowSize",
+        I2PTunnelIRCClient.PROP_DCC
         };
     private static final String _booleanClientOpts[] = {
         "i2cp.reduceOnIdle", "i2cp.closeOnIdle", "i2cp.newDestOnResume", "persistentClientKey", "i2cp.delayOpen"
@@ -1008,6 +1021,7 @@ public class IndexBean {
          PROP_MAX_TOTAL_CONNS_MIN, PROP_MAX_TOTAL_CONNS_HOUR, PROP_MAX_TOTAL_CONNS_DAY,
          PROP_MAX_STREAMS
         };
+
     protected static final Set _noShowSet = new HashSet(64);
     static {
         _noShowSet.addAll(Arrays.asList(_noShowOpts));

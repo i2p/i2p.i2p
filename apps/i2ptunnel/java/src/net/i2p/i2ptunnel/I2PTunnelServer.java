@@ -47,7 +47,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     protected int remotePort;
     private boolean _usePool;
 
-    private Logging l;
+    protected Logging l;
 
     private static final long DEFAULT_READ_TIMEOUT = -1; // 3*60*1000;
     /** default timeout to 3 minutes - override if desired */
@@ -69,10 +69,13 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     protected boolean bidir = false;
     private ThreadPoolExecutor _executor;
 
+    /** unused? port should always be specified */
     private int DEFAULT_LOCALPORT = 4488;
     protected int localPort = DEFAULT_LOCALPORT;
 
     /**
+     * @param privData Base64-encoded private key data,
+     *                 format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      * @throws IllegalArgumentException if the I2CP configuration is b0rked so
      *                                  badly that we cant create a socketManager
      */
@@ -84,6 +87,9 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     }
 
     /**
+     * @param privkey file containing the private key data,
+     *                format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
+     * @param privkeyname the name of the privKey file, not clear why we need this too
      * @throws IllegalArgumentException if the I2CP configuration is b0rked so
      *                                  badly that we cant create a socketManager
      */
@@ -105,6 +111,9 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
     }
 
     /**
+     * @param privData stream containing the private key data,
+     *                 format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
+     * @param privkeyname the name of the privKey file, not clear why we need this too
      * @throws IllegalArgumentException if the I2CP configuration is b0rked so
      *                                  badly that we cant create a socketManager
      */
@@ -114,10 +123,28 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         init(host, port, privData, privkeyname, l);
     }
 
+    /**
+     *  @param sktMgr the existing socket manager
+     *  @since 0.8.9
+     */
+    public I2PTunnelServer(InetAddress host, int port, I2PSocketManager sktMgr,
+                           Logging l, EventDispatcher notifyThis, I2PTunnel tunnel) {
+        super("Server at " + host + ':' + port, notifyThis, tunnel);
+        this.l = l;
+        this.remoteHost = host;
+        this.remotePort = port;
+        _log = tunnel.getContext().logManager().getLog(getClass());
+        sockMgr = sktMgr;
+        open = true;
+    }
+
     private static final int RETRY_DELAY = 20*1000;
     private static final int MAX_RETRIES = 4;
 
     /**
+     * @param privData stream containing the private key data,
+     *                 format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
+     * @param privkeyname the name of the privKey file, not clear why we need this too
      * @throws IllegalArgumentException if the I2CP configuration is b0rked so
      *                                  badly that we cant create a socketManager
      */

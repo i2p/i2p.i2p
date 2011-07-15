@@ -65,9 +65,12 @@ import net.i2p.util.SimpleScheduler;
  * @author zzz
  */
 class I2PSessionMuxedImpl extends I2PSessionImpl2 implements I2PSession {
-    private I2PSessionDemultiplexer _demultiplexer;
+
+    private final I2PSessionDemultiplexer _demultiplexer;
 
     /*
+     * @param destKeyStream stream containing the private key data,
+     *                             format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      * @param options set of options to configure the router with, if null will use System properties
      */
     public I2PSessionMuxedImpl(I2PAppContext ctx, InputStream destKeyStream, Properties options) throws I2PSessionException {
@@ -92,11 +95,11 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 implements I2PSession {
      *  An existing listener with the same proto and port is replaced.
      *  Only the listener with the best match is called back for each message.
      *
-     *  @param proto 1-254 or PROTO_ANY for all; recommended:
+     *  @param proto 1-254 or PROTO_ANY (0) for all; recommended:
      *         I2PSession.PROTO_STREAMING
      *         I2PSession.PROTO_DATAGRAM
      *         255 disallowed
-     *  @param port 1-65535 or PORT_ANY for all
+     *  @param port 1-65535 or PORT_ANY (0) for all
      */
     @Override
     public void addSessionListener(I2PSessionListener lsnr, int proto, int port) {
@@ -106,8 +109,8 @@ class I2PSessionMuxedImpl extends I2PSessionImpl2 implements I2PSession {
     /**
      *  Listen on specified protocol and port, and receive notification
      *  of proto, fromPort, and toPort for every message.
-     *  @param proto 1-254 or 0 for all; 255 disallowed
-     *  @param port 1-65535 or 0 for all
+     *  @param proto 1-254 or PROTO_ANY (0) for all; 255 disallowed
+     *  @param port 1-65535 or PORT_ANY (0) for all
      */
     @Override
     public void addMuxedSessionListener(I2PSessionMuxedListener l, int proto, int port) {

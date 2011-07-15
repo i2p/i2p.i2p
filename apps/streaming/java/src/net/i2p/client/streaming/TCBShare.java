@@ -21,10 +21,10 @@ import net.i2p.util.SimpleTimer2;
  *
  */
 class TCBShare {
-    private I2PAppContext _context;
-    private Log _log;
-    private Map<Destination, Entry> _cache;
-    private CleanEvent _cleaner;
+    private final I2PAppContext _context;
+    private final Log _log;
+    private final Map<Destination, Entry> _cache;
+    private final CleanEvent _cleaner;
 
     private static final long EXPIRE_TIME = 30*60*1000;
     private static final long CLEAN_TIME = 10*60*1000;

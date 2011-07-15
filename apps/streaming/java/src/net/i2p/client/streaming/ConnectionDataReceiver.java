@@ -13,11 +13,14 @@ import net.i2p.util.Log;
  *
  */
 class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
-    private I2PAppContext _context;
-    private Log _log;
-    private Connection _connection;
+    private final I2PAppContext _context;
+    private final Log _log;
+    private final Connection _connection;
     private static final MessageOutputStream.WriteStatus _dummyStatus = new DummyStatus();
     
+    /**
+     *  @param con non-null
+     */
     public ConnectionDataReceiver(I2PAppContext ctx, Connection con) {
         _context = ctx;
         _log = ctx.logManager().getLog(ConnectionDataReceiver.class);
@@ -41,10 +44,7 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
      * @return !flush
      */
     public boolean writeInProcess() {
-        Connection con = _connection;
-        if (con != null)
-            return con.getUnackedPacketsSent() >= con.getOptions().getWindowSize();
-        return false;
+        return _connection.getUnackedPacketsSent() >= _connection.getOptions().getWindowSize();
     }
     
     /**
@@ -60,7 +60,7 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
      */
     public MessageOutputStream.WriteStatus writeData(byte[] buf, int off, int size) {
         Connection con = _connection;
-        if (con == null) return _dummyStatus;
+        //if (con == null) return _dummyStatus;
         boolean doSend = true;
         if ( (size <= 0) && (con.getLastSendId() >= 0) ) {
             if (con.getOutputStream().getClosed()) {
@@ -121,7 +121,7 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
      */
     public PacketLocal send(byte buf[], int off, int size, boolean forceIncrement) {
         Connection con = _connection;
-        if (con == null) return null;
+        //if (con == null) return null;
         long before = System.currentTimeMillis();
         PacketLocal packet = buildPacket(con, buf, off, size, forceIncrement);
         long built = System.currentTimeMillis();
@@ -185,6 +185,8 @@ class ConnectionDataReceiver implements MessageOutputStream.DataReceiver {
             packet.setFlag(Packet.FLAG_SYNCHRONIZE);
             packet.setOptionalFrom(con.getSession().getMyDestination());
             packet.setOptionalMaxSize(con.getOptions().getMaxMessageSize());
+            packet.setLocalPort(con.getLocalPort());
+            packet.setRemotePort(con.getPort());
         }
         if (con.getSendStreamId() == Packet.STREAM_ID_UNKNOWN) {
             packet.setFlag(Packet.FLAG_NO_ACK);

@@ -7,6 +7,7 @@ import java.io.OutputStream;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
+import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
 import net.i2p.data.Destination;
 import net.i2p.util.Clock;
@@ -300,6 +301,24 @@ class I2PSocketImpl implements I2PSocket {
     public long getBytesReceived() { return _bytesRead; }
     public long getCreatedOn() { return _createdOn; }
     public long getClosedOn() { return _closedOn; }
+    
+    /**
+     * The remote port.
+     * @return 0 always
+     * @since 0.8.9
+     */
+    public int getPort() {
+        return I2PSession.PORT_UNSPECIFIED;
+    }
+
+    /**
+     * The local port.
+     * @return 0 always
+     * @since 0.8.9
+     */
+    public int getLocalPort() {
+        return I2PSession.PORT_UNSPECIFIED;
+    }
     
     
     private String getPrefix() { return "[" + _socketId + "]: "; }
@@ -671,7 +690,7 @@ class I2PSocketImpl implements I2PSocket {
             return sent;
         }
     }
-    
+
     @Override
     public String toString() { return "" + hashCode(); }
 }

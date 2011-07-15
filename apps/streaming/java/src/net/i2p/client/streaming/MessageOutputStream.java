@@ -63,14 +63,10 @@ class MessageOutputStream extends OutputStream {
         _buf = _dataCache.acquire().getData(); // new byte[bufSize];
         _dataReceiver = receiver;
         _dataLock = new Object();
-        _written = 0;
-        _closed = false;
         _writeTimeout = -1;
         _passiveFlushDelay = passiveFlushDelay;
         _nextBufferSize = -1;
         _sendPeriodBeginTime = ctx.clock().now();
-        _sendPeriodBytes = 0;
-        _sendBps = 0;
         _context.statManager().createRateStat("stream.sendBps", "How fast we pump data through the stream", "Stream", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
         _flusher = new Flusher();
         if (_log.shouldLog(Log.DEBUG))

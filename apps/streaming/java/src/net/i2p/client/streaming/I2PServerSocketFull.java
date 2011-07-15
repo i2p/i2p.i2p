@@ -8,7 +8,7 @@ import net.i2p.I2PException;
  *
  */
 class I2PServerSocketFull implements I2PServerSocket {
-    private I2PSocketManagerFull _socketManager;
+    private final I2PSocketManagerFull _socketManager;
     
     public I2PServerSocketFull(I2PSocketManagerFull mgr) {
         _socketManager = mgr;

@@ -30,8 +30,12 @@ import net.i2p.data.SigningPublicKey;
  * @author jrandom
  */
 class I2PClientImpl implements I2PClient {
+
     /**
      * Create the destination with a null payload
+     *
+     * @param destKeyStream location to write out the destination, PrivateKey, and SigningPrivateKey,
+     *                      format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      */
     public Destination createDestination(OutputStream destKeyStream) throws I2PException, IOException {
         Certificate cert = new Certificate();
@@ -44,6 +48,8 @@ class I2PClientImpl implements I2PClient {
      * Create the destination with the given payload and write it out along with
      * the PrivateKey and SigningPrivateKey to the destKeyStream
      *
+     * @param destKeyStream location to write out the destination, PrivateKey, and SigningPrivateKey,
+     *                      format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      */
     public Destination createDestination(OutputStream destKeyStream, Certificate cert) throws I2PException, IOException {
         Destination d = new Destination();
@@ -67,13 +73,20 @@ class I2PClientImpl implements I2PClient {
 
     /**
      * Create a new session (though do not connect it yet)
+     *
+     * @param destKeyStream location from which to read the Destination, PrivateKey, and SigningPrivateKey from,
+     *                      format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      * @param options set of options to configure the router with, if null will use System properties
      */
     public I2PSession createSession(InputStream destKeyStream, Properties options) throws I2PSessionException {
         return createSession(I2PAppContext.getGlobalContext(), destKeyStream, options);
     }
+
     /**
      * Create a new session (though do not connect it yet)
+     *
+     * @param destKeyStream location from which to read the Destination, PrivateKey, and SigningPrivateKey from,
+     *                      format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      * @param options set of options to configure the router with, if null will use System properties
      */
     public I2PSession createSession(I2PAppContext context, InputStream destKeyStream, Properties options) throws I2PSessionException {

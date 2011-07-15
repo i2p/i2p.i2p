@@ -16,13 +16,14 @@ import net.i2p.util.Log;
  * depending on whether they want to hear about the
  * protocol, from port, and to port for every received message.
  *
- * This only calls one listener, not all that apply.
+ * messageAvailable() only calls one listener, not all that apply.
+ * The others call all listeners.
  *
  * @author zzz
  */
 public class I2PSessionDemultiplexer implements I2PSessionMuxedListener {
-    private Log _log;
-    private Map<Integer, I2PSessionMuxedListener> _listeners;
+    private final Log _log;
+    private final Map<Integer, I2PSessionMuxedListener> _listeners;
 
     public I2PSessionDemultiplexer(I2PAppContext ctx) {
         _log = ctx.logManager().getLog(I2PSessionDemultiplexer.class);

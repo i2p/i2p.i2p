@@ -49,6 +49,8 @@ class I2PSessionImpl2 extends I2PSessionImpl {
      * Create a new session, reading the Destination, PrivateKey, and SigningPrivateKey
      * from the destKeyStream, and using the specified options to connect to the router
      *
+     * @param destKeyStream stream containing the private key data,
+     *                             format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      * @param options set of options to configure the router with, if null will use System properties
      * @throws I2PSessionException if there is a problem loading the private keys or 
      */

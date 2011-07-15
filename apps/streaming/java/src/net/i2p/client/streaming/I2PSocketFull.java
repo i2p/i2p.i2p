@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import net.i2p.client.I2PSession;
 import net.i2p.data.Destination;
 
 /**
@@ -127,7 +128,28 @@ class I2PSocketFull implements I2PSocket {
         if (c != null)
             c.disconnectComplete();
     }
-	@Override
+    
+    /**
+     * The remote port.
+     * @return the port or 0 if unknown
+     * @since 0.8.9
+     */
+    public int getPort() {
+        Connection c = _connection;
+        return c == null ? I2PSession.PORT_UNSPECIFIED : c.getPort();
+    }
+
+    /**
+     * The local port.
+     * @return the port or 0 if unknown
+     * @since 0.8.9
+     */
+    public int getLocalPort() {
+        Connection c = _connection;
+        return c == null ? I2PSession.PORT_UNSPECIFIED : c.getLocalPort();
+    }
+
+    @Override
     public String toString() {
         Connection c = _connection;
         if (c == null)

@@ -23,25 +23,25 @@ import net.i2p.util.SimpleTimer2;
  *
  */
 class Connection {
-    private I2PAppContext _context;
-    private Log _log;
-    private ConnectionManager _connectionManager;
+    private final I2PAppContext _context;
+    private final Log _log;
+    private final ConnectionManager _connectionManager;
     private Destination _remotePeer;
     private long _sendStreamId;
     private long _receiveStreamId;
     private long _lastSendTime;
-    private AtomicLong _lastSendId;
+    private final AtomicLong _lastSendId;
     private boolean _resetReceived;
     private boolean _resetSent;
     private long _resetSentOn;
     private boolean _connected;
     private boolean _hardDisconnected;
-    private MessageInputStream _inputStream;
-    private MessageOutputStream _outputStream;
-    private SchedulerChooser _chooser;
+    private final MessageInputStream _inputStream;
+    private final MessageOutputStream _outputStream;
+    private final SchedulerChooser _chooser;
     private long _nextSendTime;
     private long _ackedPackets;
-    private long _createdOn;
+    private final long _createdOn;
     private long _closeSentOn;
     private long _closeReceivedOn;
     private int _unackedPacketsReceived;
@@ -51,10 +51,10 @@ class Connection {
     private boolean _updatedShareOpts;
     /** Packet ID (Long) to PacketLocal for sent but unacked packets */
     private final Map<Long, PacketLocal> _outboundPackets;
-    private PacketQueue _outboundQueue;
-    private ConnectionPacketHandler _handler;
+    private final PacketQueue _outboundQueue;
+    private final ConnectionPacketHandler _handler;
     private ConnectionOptions _options;
-    private ConnectionDataReceiver _receiver;
+    private final ConnectionDataReceiver _receiver;
     private I2PSocketFull _socket;
     /** set to an error cause if the connection could not be established */
     private String _connectionError;
@@ -70,8 +70,10 @@ class Connection {
     private final Object _connectLock;
     /** how many messages have been resent and not yet ACKed? */
     private int _activeResends;
-    private ConEvent _connectionEvent;
-    private int _randomWait;
+    private final ConEvent _connectionEvent;
+    private final int _randomWait;
+    private int _localPort;
+    private int _remotePort;
     
     private long _lifetimeBytesSent;
     private long _lifetimeBytesReceived;
@@ -86,10 +88,13 @@ class Connection {
     
     public static final int MAX_WINDOW_SIZE = 128;
     
-    public Connection(I2PAppContext ctx, ConnectionManager manager, SchedulerChooser chooser, PacketQueue queue, ConnectionPacketHandler handler) {
+    public Connection(I2PAppContext ctx, ConnectionManager manager, SchedulerChooser chooser,
+                      PacketQueue queue, ConnectionPacketHandler handler) {
         this(ctx, manager, chooser, queue, handler, null);
     }
-    public Connection(I2PAppContext ctx, ConnectionManager manager, SchedulerChooser chooser, PacketQueue queue, ConnectionPacketHandler handler, ConnectionOptions opts) {
+
+    public Connection(I2PAppContext ctx, ConnectionManager manager, SchedulerChooser chooser,
+                      PacketQueue queue, ConnectionPacketHandler handler, ConnectionOptions opts) {
         _context = ctx;
         _connectionManager = manager;
         _chooser = chooser;
@@ -101,34 +106,31 @@ class Connection {
         // FIXME pass through a passive flush delay setting as the 4th arg
         _outputStream = new MessageOutputStream(_context, _receiver, (opts == null ? Packet.MAX_PAYLOAD_SIZE : opts.getMaxMessageSize()));
         _outboundPackets = new TreeMap();
+        if (opts != null) {
+            _localPort = opts.getLocalPort();
+            _remotePort = opts.getPort();
+        }
         _options = (opts != null ? opts : new ConnectionOptions());
         _outputStream.setWriteTimeout((int)_options.getWriteTimeout());
         _inputStream.setReadTimeout((int)_options.getReadTimeout());
         _lastSendId = new AtomicLong(-1);
         _nextSendTime = -1;
-        _ackedPackets = 0;
         _createdOn = _context.clock().now();
         _closeSentOn = -1;
         _closeReceivedOn = -1;
-        _unackedPacketsReceived = 0;
         _congestionWindowEnd = _options.getWindowSize()-1;
         _highestAckedThrough = -1;
         _lastCongestionSeenAt = MAX_WINDOW_SIZE*2; // lets allow it to grow
         _lastCongestionTime = -1;
         _lastCongestionHighestUnacked = -1;
-        _resetReceived = false;
         _connected = true;
         _disconnectScheduledOn = -1;
         _lastReceivedOn = -1;
         _activityTimer = new ActivityTimer();
         _ackSinceCongestion = true;
         _connectLock = new Object();
-        _activeResends = 0;
         _resetSentOn = -1;
-        _isInbound = false;
-        _updatedShareOpts = false;
         _connectionEvent = new ConEvent();
-        _hardDisconnected = false;
         _randomWait = _context.random().nextInt(10*1000); // just do this once to reduce usage
         _context.statManager().createRateStat("stream.con.windowSizeAtCongestion", "How large was our send window when we send a dup?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
         _context.statManager().createRateStat("stream.chokeSizeBegin", "How many messages were outstanding when we started to choke?", "Stream", new long[] { 60*1000, 10*60*1000, 60*60*1000 });
@@ -678,6 +680,23 @@ class Connection {
     public I2PSocketFull getSocket() { return _socket; }
     public void setSocket(I2PSocketFull socket) { _socket = socket; }
     
+    /**
+     * The remote port.
+     *  @return Default I2PSession.PORT_UNSPECIFIED (0) or PORT_ANY (0)
+     *  @since 0.8.9
+     */
+    public int getPort() {
+        return _remotePort;
+    }
+
+    /**
+     *  @return Default I2PSession.PORT_UNSPECIFIED (0) or PORT_ANY (0)
+     *  @since 0.8.9
+     */
+    public int getLocalPort() {
+        return _localPort;
+    }
+
     public String getConnectionError() { return _connectionError; }
     public void setConnectionError(String err) { _connectionError = err; }
     
@@ -781,7 +800,7 @@ class Connection {
     }
     
     public int getLastCongestionSeenAt() { return _lastCongestionSeenAt; }
-    
+
     void congestionOccurred() {
         // if we hit congestion and e.g. 5 packets are resent,
         // dont set the size to (winSize >> 4).  only set the
@@ -962,12 +981,13 @@ class Connection {
      * @return the inbound message stream
      */
     public MessageInputStream getInputStream() { return _inputStream; }
+
     /** stream that the local peer sends data to the remote peer on
      * @return the outbound message stream
      */
     public MessageOutputStream getOutputStream() { return _outputStream; }
-    
-	@Override
+
+    @Override
     public String toString() { 
         StringBuilder buf = new StringBuilder(128);
         buf.append("[Connection ");

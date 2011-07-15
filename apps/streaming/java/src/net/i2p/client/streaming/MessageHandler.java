@@ -7,7 +7,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import net.i2p.I2PAppContext;
 import net.i2p.client.I2PSession;
 import net.i2p.client.I2PSessionException;
-import net.i2p.client.I2PSessionListener;
+import net.i2p.client.I2PSessionMuxedListener;
 import net.i2p.util.Log;
 
 /**
@@ -15,10 +15,10 @@ import net.i2p.util.Log;
  * Packets, if we can.
  *
  */
-class MessageHandler implements I2PSessionListener {
-    private ConnectionManager _manager;
-    private I2PAppContext _context;
-    private Log _log;
+class MessageHandler implements I2PSessionMuxedListener {
+    private final ConnectionManager _manager;
+    private final I2PAppContext _context;
+    private final Log _log;
     private final Set<I2PSocketManager.DisconnectListener> _listeners;
     
     public MessageHandler(I2PAppContext ctx, ConnectionManager mgr) {
@@ -31,11 +31,23 @@ class MessageHandler implements I2PSessionListener {
         
     /** Instruct the client that the given session has received a message with
      * size # of bytes.
+     * This shouldn't be called anymore since we are registering as a muxed listener.
      * @param session session to notify
      * @param msgId message number available
      * @param size size of the message
      */
     public void messageAvailable(I2PSession session, int msgId, long size) {
+        messageAvailable(session, msgId, size, I2PSession.PROTO_UNSPECIFIED,
+                         I2PSession.PORT_UNSPECIFIED, I2PSession.PORT_UNSPECIFIED);
+    }
+
+    /** Instruct the client that the given session has received a message with
+     * size # of bytes.
+     * @param session session to notify
+     * @param msgId message number available
+     * @param size size of the message
+     */
+    public void messageAvailable(I2PSession session, int msgId, long size, int proto, int fromPort, int toPort) {
         byte data[] = null;
         try {
             data = session.receiveMessage(msgId);
@@ -49,6 +61,8 @@ class MessageHandler implements I2PSessionListener {
         Packet packet = new Packet();
         try {
             packet.readPacket(data, 0, data.length);
+            packet.setRemotePort(fromPort);
+            packet.setLocalPort(toPort);
             _manager.getPacketHandler().receivePacket(packet);
         } catch (IllegalArgumentException iae) {
             _context.statManager().addRateData("stream.packetReceiveFailure", 1, 0);
