@@ -6,8 +6,10 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
@@ -24,10 +26,14 @@ import net.i2p.util.Log;
  *
  * <pre>
  *
- *                <---  I2PTunnelDCCServer <--------------- I2PTunnelDCCClient <----
+ *                                            direct conn
+ *                <---> I2PTunnelDCCServer <--------------->I2PTunnelDCCClient <---->
  *   originating                                                                     responding
  *   chat client                                                                     chat client
- *                ---> I2PTunnelIRCClient --> IRC server --> I2TunnelIRCClient ----->
+ *        CHAT    ---> I2PTunnelIRCClient --> IRC server --> I2TunnelIRCClient ----->
+ *        SEND    ---> I2PTunnelIRCClient --> IRC server --> I2TunnelIRCClient ----->
+ *        RESUME  <--- I2PTunnelIRCClient <-- IRC server <-- I2TunnelIRCClient <-----
+ *        ACCEPT  ---> I2PTunnelIRCClient --> IRC server --> I2TunnelIRCClient ----->
  *
  * </pre>
  *
@@ -35,8 +41,13 @@ import net.i2p.util.Log;
  */
 public class I2PTunnelDCCServer extends I2PTunnelServer {
 
+    /** key is the server's local I2P port */
     private final ConcurrentHashMap<Integer, LocalAddress> _outgoing;
-    private final ConcurrentHashMap<Integer, I2PSocket> _active;
+    /** key is the server's local I2P port */
+    private final ConcurrentHashMap<Integer, LocalAddress> _active;
+    /** key is the server's local I2P port */
+    private final ConcurrentHashMap<Integer, LocalAddress> _resume;
+    private final List<I2PSocket> _sockList;
 
     // list of client tunnels?
     private static long _id;
@@ -71,6 +82,8 @@ public class I2PTunnelDCCServer extends I2PTunnelServer {
         super(DUMMY, 0, sktMgr, l, notifyThis, tunnel);
         _outgoing = new ConcurrentHashMap(8);
         _active = new ConcurrentHashMap(8);
+        _resume = new ConcurrentHashMap(8);
+        _sockList = new CopyOnWriteArrayList();
     }
 
     /**
@@ -99,8 +112,11 @@ public class I2PTunnelDCCServer extends I2PTunnelServer {
                 _log.warn("Incoming DCC connection for I2P port " + myPort +
                           " sending to " + local.ia + ':' + local.port);
             Socket s = new Socket(local.ia, local.port);
-            new I2PTunnelRunner(s, socket, slock, null, null);
-            _active.put(Integer.valueOf(myPort), socket);
+            _sockList.add(socket);
+            new I2PTunnelRunner(s, socket, slock, null, _sockList);
+            local.socket = socket;
+            local.expire = getTunnel().getContext().clock().now() + OUTBOUND_EXPIRE;
+            _active.put(Integer.valueOf(myPort), local);
         } catch (SocketException ex) {
             try {
                 socket.close();
@@ -116,6 +132,12 @@ public class I2PTunnelDCCServer extends I2PTunnelServer {
     public boolean close(boolean forced) {
         _outgoing.clear();
         _active.clear();
+        for (I2PSocket s : _sockList) {
+            try {
+                s.close();
+            } catch (IOException ioe) {}
+        }
+        _sockList.clear();
         return super.close(forced);
     }
 
@@ -128,6 +150,13 @@ public class I2PTunnelDCCServer extends I2PTunnelServer {
      *  @return i2p port or -1 on error
      */
     public int newOutgoing(byte[] ip, int port, String type) {
+        return newOutgoing(ip, port, type, 0);
+    }
+
+    /**
+     *  @param port local dcc server I2P port or 0 to pick one at random
+     */
+    private int newOutgoing(byte[] ip, int port, String type, int i2pPort) {
         expireOutbound();
         if (_outgoing.size() >= MAX_OUTGOING_PENDING ||
             _active.size() >= MAX_OUTGOING_ACTIVE) {
@@ -141,9 +170,14 @@ public class I2PTunnelDCCServer extends I2PTunnelServer {
         } catch (UnknownHostException uhe) {
             return -1;
         }
+        int limit = i2pPort > 0 ? 10 : 1;
         LocalAddress client = new LocalAddress(ia, port, getTunnel().getContext().clock().now() + OUTBOUND_EXPIRE);
-        for (int i = 0; i < 10; i++) {
-            int iport = MIN_I2P_PORT + getTunnel().getContext().random().nextInt(1 + MAX_I2P_PORT - MIN_I2P_PORT);
+        for (int i = 0; i < limit; i++) {
+            int iport;
+            if (i2pPort > 0)
+                iport = i2pPort;
+            else
+                iport = MIN_I2P_PORT + getTunnel().getContext().random().nextInt(1 + MAX_I2P_PORT - MIN_I2P_PORT);
             if (_active.containsKey(Integer.valueOf(iport)))
                 continue;
             LocalAddress old = _outgoing.putIfAbsent(Integer.valueOf(iport), client);
@@ -153,6 +187,48 @@ public class I2PTunnelDCCServer extends I2PTunnelServer {
             return iport;
         }
         // couldn't find an unused i2p port
+        return -1;
+    }
+
+    /**
+     *  An incoming RESUME request
+     *
+     *  @param port local dcc server I2P port
+     *  @return local IRC client DCC port or -1 on error
+     */
+    public int resumeIncoming(int port) {
+        Integer iport = Integer.valueOf(port);
+        LocalAddress local = _active.remove(iport);
+        if (local != null) {
+            local.expire = getTunnel().getContext().clock().now() + OUTBOUND_EXPIRE;
+            _resume.put(Integer.valueOf(local.port), local);
+            return local.port;
+        }
+        local = _outgoing.get(iport);
+        if (local != null) {
+            // shouldn't happen
+            local.expire = getTunnel().getContext().clock().now() + OUTBOUND_EXPIRE;
+            return local.port;
+        }
+        return -1;
+    }
+
+    /**
+     *  An outgoing ACCEPT response
+     *
+     *  @param port local irc client DCC port
+     *  @return local DCC server i2p port or -1 on error
+     */
+    public int acceptOutgoing(int port) {
+        // do a reverse lookup
+        for (Iterator<Map.Entry<Integer, LocalAddress>> iter = _resume.entrySet().iterator(); iter.hasNext(); ) {
+            Map.Entry<Integer, LocalAddress> e = iter.next();
+            LocalAddress local = e.getValue();
+            if (local.port == port) {
+                iter.remove();
+                return newOutgoing(local.ia.getAddress(), port, "ACCEPT", e.getKey().intValue());
+            }
+        }
         return -1;
     }
 
@@ -173,9 +249,10 @@ public class I2PTunnelDCCServer extends I2PTunnelServer {
             if (a.expire < getTunnel().getContext().clock().now())
                 iter.remove();
         }
-        for (Iterator<I2PSocket> iter = _active.values().iterator(); iter.hasNext(); ) {
-            I2PSocket s = iter.next();
-            if (s.isClosed())
+        for (Iterator<LocalAddress> iter = _active.values().iterator(); iter.hasNext(); ) {
+            LocalAddress a = iter.next();
+            I2PSocket s = a.socket;
+            if (s != null && s.isClosed())
                 iter.remove();
         }
     }
@@ -183,7 +260,8 @@ public class I2PTunnelDCCServer extends I2PTunnelServer {
     private static class LocalAddress {
         public final InetAddress ia;
         public final int port;
-        public final long expire;
+        public long expire;
+        public I2PSocket socket;
 
         public LocalAddress(InetAddress a, int p, long exp) {
             ia = a;

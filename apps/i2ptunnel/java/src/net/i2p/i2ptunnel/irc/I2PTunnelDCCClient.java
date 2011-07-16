@@ -29,21 +29,23 @@ public class I2PTunnelDCCClient extends I2PTunnelClientBase {
     // delay resolution until connect time
     private final String _dest;
     private final int _remotePort;
-    private final long _expires;
+    private long _expires;
 
     private static final long INBOUND_EXPIRE = 30*60*1000;
+    private static final long INBOUND_STOP_EXPIRE = 30*60*1000;
     public static final String CONNECT_START_EVENT = "connectionStarted";
     public static final String CONNECT_STOP_EVENT = "connectionStopped";
 
     /**
      * @param dest the target, presumably b32
+     * @param localPort if 0, use any port, get actual port selected with getLocalPort()
      * @throws IllegalArgumentException if the I2PTunnel does not contain
      *                                  valid config to contact the router
      */
-    public I2PTunnelDCCClient(String dest, int remotePort, Logging l,
+    public I2PTunnelDCCClient(String dest, int localPort, int remotePort, Logging l,
                            I2PSocketManager sktMgr, EventDispatcher notifyThis, 
                            I2PTunnel tunnel, long clientId) throws IllegalArgumentException {
-        super(0, l, sktMgr, tunnel, notifyThis, clientId);
+        super(localPort, l, sktMgr, tunnel, notifyThis, clientId);
         _dest = dest;
         _remotePort = remotePort;
         _expires = tunnel.getContext().clock().now() + INBOUND_EXPIRE;
@@ -89,6 +91,14 @@ public class I2PTunnelDCCClient extends I2PTunnelClientBase {
         return _expires;
     }
 
+    public String getDest() {
+        return _dest;
+    }
+
+    public int getRemotePort() {
+        return _remotePort;
+    }
+
     /**
      *  Stop listening for new sockets.
      *  We can't call super.close() as it kills all sockets in the sockMgr
@@ -112,8 +122,10 @@ public class I2PTunnelDCCClient extends I2PTunnelClientBase {
 
         @Override
         public void run() {
+            _expires = getTunnel().getContext().clock().now() + INBOUND_STOP_EXPIRE;
             notifyEvent(CONNECT_START_EVENT, I2PTunnelDCCClient.this);
             super.run();
+            _expires = getTunnel().getContext().clock().now() + INBOUND_STOP_EXPIRE;
             notifyEvent(CONNECT_STOP_EVENT, Integer.valueOf(getLocalPort()));
         }
     }

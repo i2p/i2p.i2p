@@ -201,18 +201,30 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements DCCHelper
     }
 
     public int resumeOutgoing(int port) {
+        DCCClientManager tracker = _DCCClientManager;
+        if (tracker != null)
+            return tracker.resumeOutgoing(port);
         return -1;
     }
 
     public int resumeIncoming(int port) {
+        I2PTunnelDCCServer server = _DCCServer;
+        if (server != null)
+            return server.resumeIncoming(port);
         return -1;
     }
 
     public int acceptOutgoing(int port) {
+        I2PTunnelDCCServer server = _DCCServer;
+        if (server != null)
+            return server.acceptOutgoing(port);
         return -1;
     }
 
     public int acceptIncoming(int port) {
+        DCCClientManager tracker = _DCCClientManager;
+        if (tracker != null)
+            return tracker.acceptIncoming(port);
         return -1;
     }
 }

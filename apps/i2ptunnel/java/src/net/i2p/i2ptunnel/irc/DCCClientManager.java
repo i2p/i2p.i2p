@@ -15,10 +15,14 @@ import net.i2p.util.Log;
  *
  * <pre>
  *
- *                <---  I2PTunnelDCCServer <--------------- I2PTunnelDCCClient <----
+ *                                            direct conn
+ *                <---> I2PTunnelDCCServer <--------------->I2PTunnelDCCClient <---->
  *   originating                                                                     responding
  *   chat client                                                                     chat client
- *                ---> I2PTunnelIRCClient --> IRC server --> I2TunnelIRCClient ----->
+ *        CHAT    ---> I2PTunnelIRCClient --> IRC server --> I2TunnelIRCClient ----->
+ *        SEND    ---> I2PTunnelIRCClient --> IRC server --> I2TunnelIRCClient ----->
+ *        RESUME  <--- I2PTunnelIRCClient <-- IRC server <-- I2TunnelIRCClient <-----
+ *        ACCEPT  ---> I2PTunnelIRCClient --> IRC server --> I2TunnelIRCClient ----->
  *
  * </pre>
  *
@@ -31,8 +35,12 @@ public class DCCClientManager extends EventReceiver {
     private final I2PTunnel _tunnel;
     private final Log _log;
 
+    /** key is the DCC client's local port */
     private final ConcurrentHashMap<Integer, I2PTunnelDCCClient> _incoming;
+    /** key is the DCC client's local port */
     private final ConcurrentHashMap<Integer, I2PTunnelDCCClient> _active;
+    /** key is the DCC client's local port */
+    private final ConcurrentHashMap<Integer, I2PTunnelDCCClient> _complete;
 
     // list of client tunnels?
     private static long _id;
@@ -50,6 +58,7 @@ public class DCCClientManager extends EventReceiver {
         _log = tunnel.getContext().logManager().getLog(DCCClientManager.class);
         _incoming = new ConcurrentHashMap(8);
         _active = new ConcurrentHashMap(8);
+        _complete = new ConcurrentHashMap(8);
     }
 
     public boolean close(boolean forced) {
@@ -61,18 +70,26 @@ public class DCCClientManager extends EventReceiver {
             c.stop();
         }
         _active.clear();
+        _complete.clear();
         return true;
     }
 
     /**
      *  An incoming DCC request
      *
-     *  @param b32 remote dcc server address
-     *  @param port remote dcc server port
+     *  @param b32 remote dcc server b32 address
+     *  @param port remote dcc server I2P port
      *  @param type ignored
-     *  @return local server port or -1 on error
+     *  @return local DCC client tunnel port or -1 on error
      */
     public int newIncoming(String b32, int port, String type) {
+        return newIncoming(b32, port, type, 0);
+    }
+
+    /**
+     *  @param localPort bind to port or 0; if nonzero it will be the rv
+     */
+    private int newIncoming(String b32, int port, String type, int localPort) {
         expireInbound();
         if (_incoming.size() >= MAX_INCOMING_PENDING ||
             _active.size() >= MAX_INCOMING_PENDING) {
@@ -83,7 +100,7 @@ public class DCCClientManager extends EventReceiver {
         try {
             // Transparent tunnel used for all types...
             // Do we need to do any filtering for chat?
-            I2PTunnelDCCClient cTunnel = new I2PTunnelDCCClient(b32, port, l, sockMgr,
+            I2PTunnelDCCClient cTunnel = new I2PTunnelDCCClient(b32, localPort, port, l, sockMgr,
                                                                 _dispatch, _tunnel, ++_id);
             cTunnel.attachEventDispatcher(this);
             int lport = cTunnel.getLocalPort();
@@ -97,6 +114,54 @@ public class DCCClientManager extends EventReceiver {
             _log.error("Error finding host to bind", uhe);
             return -1;
         }
+    }
+
+    /**
+     *  An outgoing RESUME request
+     *
+     *  @param port local DCC client tunnel port
+     *  @return remote DCC server i2p port or -1 on error
+     */
+    public int resumeOutgoing(int port) {
+        Integer lport = Integer.valueOf(port);
+        I2PTunnelDCCClient tun = _complete.get(lport);
+        if (tun == null) {
+            tun = _active.get(lport);
+            if (tun == null)
+                // shouldn't happen
+                tun = _incoming.get(lport);
+        }
+        if (tun != null) {
+            tun.stop();
+            return tun.getLocalPort();
+        }
+        return -1;
+    }
+
+    /**
+     *  An incoming ACCEPT response
+     *
+     *  @param port remote dcc server I2P port
+     *  @return local DCC client tunnel port or -1 on error
+     */
+    public int acceptIncoming(int port) {
+        // do a reverse lookup
+        for (I2PTunnelDCCClient tun : _complete.values()) {
+            if (tun.getRemotePort() == port)
+                return newIncoming(tun.getDest(), port, "ACCEPT", tun.getLocalPort());
+        }
+        for (I2PTunnelDCCClient tun : _active.values()) {
+            if (tun.getRemotePort() == port)
+                return newIncoming(tun.getDest(), port, "ACCEPT", tun.getLocalPort());
+        }
+        for (I2PTunnelDCCClient tun : _incoming.values()) {
+            if (tun.getRemotePort() == port) {
+                // shouldn't happen
+                tun.stop();
+                return newIncoming(tun.getDest(), port, "ACCEPT", tun.getLocalPort());
+            }
+        }
+        return -1;
     }
 
     /**
@@ -124,17 +189,23 @@ public class DCCClientManager extends EventReceiver {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Added client tunnel for port " + lport +
                           " pending count now: " + _incoming.size() +
-                          " active count now: " + _active.size());
+                          " active count now: " + _active.size() +
+                          " complete count now: " + _complete.size());
         }
     }
 
     private void connStopped(Integer lport) {
-        _incoming.remove(lport);
-        _active.remove(lport);
+        I2PTunnelDCCClient tun = _incoming.remove(lport);
+        if (tun != null)
+            _complete.put(lport, tun);
+        tun = _active.remove(lport);
+        if (tun != null)
+            _complete.put(lport, tun);
         if (_log.shouldLog(Log.WARN))
             _log.warn("Removed client tunnel for port " + lport +
                       " pending count now: " + _incoming.size() +
-                      " active count now: " + _active.size());
+                      " active count now: " + _active.size() +
+                      " complete count now: " + _complete.size());
     }
 
     private void expireInbound() {
@@ -146,5 +217,12 @@ public class DCCClientManager extends EventReceiver {
             }
         }
         // shouldn't need to expire active
+        for (Iterator<I2PTunnelDCCClient> iter = _complete.values().iterator(); iter.hasNext(); ) {
+            I2PTunnelDCCClient c = iter.next();
+            if (c.getExpires() < _tunnel.getContext().clock().now()) {
+                iter.remove();
+                c.stop();
+            }
+        }
     }
 }
