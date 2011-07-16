@@ -25,7 +25,8 @@ import net.i2p.util.Log;
  */
 public class I2PTunnelHTTPClientRunner extends I2PTunnelRunner {
     private Log _log;
-    public I2PTunnelHTTPClientRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData, List sockList, Runnable onTimeout) {
+    public I2PTunnelHTTPClientRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData,
+                                     List<I2PSocket> sockList, Runnable onTimeout) {
         super(s, i2ps, slock, initialI2PData, sockList, onTimeout);
         _log = I2PAppContext.getGlobalContext().logManager().getLog(I2PTunnelHTTPClientRunner.class);
     }

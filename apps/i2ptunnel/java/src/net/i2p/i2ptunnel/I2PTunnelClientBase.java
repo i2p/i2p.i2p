@@ -51,7 +51,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     protected long _clientId;
     protected final Object sockLock = new Object(); // Guards sockMgr and mySockets
     protected I2PSocketManager sockMgr; // should be final and use a factory. LINT
-    protected List mySockets = new ArrayList();
+    protected final List<I2PSocket> mySockets = new ArrayList();
     protected boolean _ownDest;
 
     protected Destination dest = null;
