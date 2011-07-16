@@ -38,14 +38,13 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
     private final I2PSocket i2ps;
     private final Object slock, finishLock = new Object();
     boolean finished = false;
-    private HashMap ostreams, sockets;
     private final byte[] initialI2PData;
     private final byte[] initialSocketData;
     /** when the last data was sent/received (or -1 if never) */
     private long lastActivityOn;
     /** when the runner started up */
     private final long startedOn;
-    private final List sockList;
+    private final List<I2PSocket> sockList;
     /** if we die before receiving any data, run this job */
     private final Runnable onTimeout;
     private long totalSent;
@@ -53,27 +52,33 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
 
     private volatile long __forwarderId;
     
-    public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData, List sockList) {
+    public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData,
+                           List<I2PSocket> sockList) {
         this(s, i2ps, slock, initialI2PData, null, sockList, null);
     }
 
-    public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData, byte[] initialSocketData, List sockList) {
+    public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData,
+                           byte[] initialSocketData, List<I2PSocket> sockList) {
         this(s, i2ps, slock, initialI2PData, initialSocketData, sockList, null);
     }
 
-    public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData, List sockList, Runnable onTimeout) {
+    public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData,
+                           List<I2PSocket> sockList, Runnable onTimeout) {
         this(s, i2ps, slock, initialI2PData, null, sockList, onTimeout);
     }
 
     /**
      *  Starts itself
      *
+     *  @param slock the socket lock, non-null
      *  @param initialI2PData may be null
      *  @param initialSocketData may be null
-     *  @param sockList may be null
+     *  @param sockList may be null. Caller must add i2ps to the list! It will be removed here on completion.
+     *                               Will synchronize on slock when removing.
      *  @param onTImeout may be null
      */
-    public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData, byte[] initialSocketData, List sockList, Runnable onTimeout) {
+    public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData,
+                           byte[] initialSocketData, List<I2PSocket> sockList, Runnable onTimeout) {
         this.sockList = sockList;
         this.s = s;
         this.i2ps = i2ps;
@@ -95,6 +100,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
      * have we closed at least one (if not both) of the streams 
      * [aka we're done running the streams]? 
      *
+     * @deprecated unused
      */
     public boolean isFinished() {
         return finished;
@@ -104,7 +110,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
      * When was the last data for this runner sent or received?  
      *
      * @return date (ms since the epoch), or -1 if no data has been transferred yet
-     *
+     * @deprecated unused
      */
     public long getLastActivityOn() {
         return lastActivityOn;
