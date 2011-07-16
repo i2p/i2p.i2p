@@ -123,6 +123,10 @@ abstract class IRCFilter {
                     buf.append(":\001DCC ");
                     return filterDCCIn(buf.toString(), msg.substring(4), helper);
                 }
+                // XDCC looks safe, ip/port happens over regular DCC
+                // http://en.wikipedia.org/wiki/XDCC
+                if (msg.toUpperCase().startsWith("XDCC ") && helper != null && helper.isEnabled())
+                    return s;
                 if (ALLOW_ALL_CTCP_IN)
                     return s;
                 return null; // Block all other ctcp
@@ -265,6 +269,10 @@ abstract class IRCFilter {
                 }
                 if (msg.startsWith("DCC "))
                     return filterDCCOut(field[0] + ' ' + field[1] + " :\001DCC ", msg.substring(4), helper);
+                // XDCC looks safe, ip/port happens over regular DCC
+                // http://en.wikipedia.org/wiki/XDCC
+                if (msg.toUpperCase().startsWith("XDCC ") && helper != null && helper.isEnabled())
+                    return s;
                 if (ALLOW_ALL_CTCP_OUT)
                     return s;
                 return null; // Block all other ctcp
@@ -295,6 +303,14 @@ abstract class IRCFilter {
     }
 
     /**
+     *<pre>
+     *  DCC CHAT chat xxx.b32.i2p i2p-port        -> DCC CHAT chat IP port
+     *  DCC SEND file xxx.b32.i2p i2p-port length -> DCC SEND file IP port length
+     *  DCC RESUME file i2p-port offset           -> DCC RESUME file port offset
+     *  DCC ACCEPT file i2p-port offset           -> DCC ACCEPT file port offset
+     *  DCC xxx                                   -> null
+     *</pre>
+     *
      *  @param pfx the message through the "DCC " part
      *  @param msg the message after the "DCC " part
      *  @param helper may be null
@@ -310,10 +326,11 @@ abstract class IRCFilter {
         if (args.length <= 0)
             return null;
         String type = args[0];
-        // no IP in these but port needs to be fixed still
-        //if (type == "RESUME" || type == "ACCEPT")
-        //    return msg;
-        if (!(type.equals("CHAT") || type.equals("SEND"))) {
+        boolean haveIP = true;
+        // no IP in these, replace port only
+        if (type == "RESUME" || type == "ACCEPT") {
+            haveIP = false;
+        } else if (!(type.equals("CHAT") || type.equals("SEND"))) {
             if (ALLOW_ALL_DCC_IN) {
                 if (ctcp > 0)
                     return pfx + msg + (char) 0x01;
@@ -323,36 +340,59 @@ abstract class IRCFilter {
         }
         if (helper == null || !helper.isEnabled())
             return null;
-        if (args.length < 4)
+        if (args.length < 3)
+            return null;
+        if (haveIP && args.length < 4)
             return null;
         String arg = args[1];
-        String b32 = args[2];
+        int nextArg = 2;
+        String b32 = null;
+        if (haveIP)
+            b32 = args[nextArg++];
         int cPort;
         try {
-            String cp = args[3];
+            String cp = args[nextArg++];
             cPort = Integer.parseInt(cp);
         } catch (NumberFormatException nfe) {
             return null;
         }
 
-        int port = helper.newIncoming(b32, cPort, type);
+        int port = -1;
+        if (haveIP) {
+            port = helper.newIncoming(b32, cPort, type);
+        } else if (type.equals("ACCEPT")) {
+            port = helper.acceptIncoming(cPort);
+        } else if (type.equals("RESUME")) {
+            port = helper.resumeIncoming(cPort);
+        }
         if (port < 0)
             return null;
         StringBuilder buf = new StringBuilder(256);
-        // fixme what is our address?
-        byte[] myIP = { 127, 0, 0, 1 };
         buf.append(pfx)
-           .append(type).append(' ').append(arg).append(' ')
-           .append(DataHelper.fromLong(myIP, 0, myIP.length)).append(' ')
-           .append(port);
-        if (args.length > 4)
-            buf.append(' ').append(args[4]);
+           .append(type).append(' ').append(arg).append(' ');
+        if (haveIP) {
+            // fixme what is our address?
+            byte[] myIP = { 127, 0, 0, 1 };
+            buf.append(DataHelper.fromLong(myIP, 0, myIP.length)).append(' ');
+        }
+        buf.append(port);
+        while (args.length > nextArg) {
+            buf.append(' ').append(args[nextArg++]);
+        }
         if (pfx.indexOf(0x01) >= 0)
             buf.append((char) 0x01);
         return buf.toString();
     }
 
     /**
+     *<pre>
+     *  DCC CHAT chat IP port        -> DCC CHAT chat xxx.b32.i2p i2p-port
+     *  DCC SEND file IP port length -> DCC SEND file xxx.b32.i2p i2p-port length
+     *  DCC RESUME file port offset  -> DCC RESUME file i2p-port offset
+     *  DCC ACCEPT file port offset  -> DCC ACCEPT file i2p-port offset
+     *  DCC xxx                      -> null
+     *</pre>
+     *
      *  @param pfx the message through the "DCC " part
      *  @param msg the message after the "DCC " part
      *  @param helper may be null
@@ -368,10 +408,11 @@ abstract class IRCFilter {
         if (args.length <= 0)
             return null;
         String type = args[0];
-        // no IP in these but port needs to be fixed still
-        //if (type == "RESUME" || type == "ACCEPT")
-        //    return msg;
-        if (!(type.equals("CHAT") || type.equals("SEND"))) {
+        boolean haveIP = true;
+        // no IP in these, replace port only
+        if (type == "RESUME" || type == "ACCEPT") {
+            haveIP = false;
+        } else if (!(type.equals("CHAT") || type.equals("SEND"))) {
             if (ALLOW_ALL_DCC_OUT) {
                 if (ctcp > 0)
                     return pfx + msg + (char) 0x01;
@@ -380,27 +421,32 @@ abstract class IRCFilter {
         }
         if (helper == null || !helper.isEnabled())
             return null;
-        if (args.length < 4)
+        if (args.length < 3)
+            return null;
+        if (haveIP && args.length < 4)
             return null;
         String arg = args[1];
-        byte[] ip;
-        try {
-            String ips = args[2];
-            long ipl = Long.parseLong(ips);
-            if (ipl < 0x01000000) {
-                // "reverse/firewall DCC"
-                // http://en.wikipedia.org/wiki/Direct_Client-to-Client
-                // xchat sends an IP of 199 and a port of 0
-                System.err.println("Reverse / Firewall DCC not supported IP = 0x" + Long.toHexString(ipl));
+        byte[] ip = null;
+        int nextArg = 2;
+        if (haveIP) {
+            try {
+                String ips = args[nextArg++];
+                long ipl = Long.parseLong(ips);
+                if (ipl < 0x01000000) {
+                    // "reverse/firewall DCC"
+                    // http://en.wikipedia.org/wiki/Direct_Client-to-Client
+                    // xchat sends an IP of 199 and a port of 0
+                    System.err.println("Reverse / Firewall DCC not supported IP = 0x" + Long.toHexString(ipl));
+                    return null;
+                }
+                ip = DataHelper.toLong(4, ipl);
+            } catch (NumberFormatException nfe) {
                 return null;
             }
-            ip = DataHelper.toLong(4, ipl);
-        } catch (NumberFormatException nfe) {
-            return null;
         }
         int cPort;
         try {
-            String cp = args[3];
+            String cp = args[nextArg++];
             cPort = Integer.parseInt(cp);
         } catch (NumberFormatException nfe) {
             return null;
@@ -411,16 +457,26 @@ abstract class IRCFilter {
             System.err.println("Reverse / Firewall DCC not supported");
             return null;
         }
-        int port = helper.newOutgoing(ip, cPort, type);
+
+        int port = -1;
+        if (haveIP) {
+            port = helper.newOutgoing(ip, cPort, type);
+        } else if (type.equals("ACCEPT")) {
+            port = helper.acceptOutgoing(cPort);
+        } else if (type.equals("RESUME")) {
+            port = helper.resumeOutgoing(cPort);
+        }
         if (port < 0)
             return null;
         StringBuilder buf = new StringBuilder(256);
         buf.append(pfx)
-           .append(type).append(' ').append(arg).append(' ')
-           .append(helper.getB32Hostname()).append(' ')
-           .append(port);
-        if (args.length > 4)
-            buf.append(' ').append(args[4]);
+           .append(type).append(' ').append(arg).append(' ');
+        if (haveIP)
+            buf.append(helper.getB32Hostname()).append(' ');
+        buf.append(port);
+        while (args.length > nextArg) {
+            buf.append(' ').append(args[nextArg++]);
+        }
         if (pfx.indexOf(0x01) >= 0)
             buf.append((char) 0x01);
         return buf.toString();

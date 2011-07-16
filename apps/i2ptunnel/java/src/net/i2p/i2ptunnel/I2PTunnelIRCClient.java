@@ -199,4 +199,20 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements DCCHelper
             _log.info("New incoming " + type + ' ' + b32 + ' ' + port + " returns " + rv);
         return rv;
     }
+
+    public int resumeOutgoing(int port) {
+        return -1;
+    }
+
+    public int resumeIncoming(int port) {
+        return -1;
+    }
+
+    public int acceptOutgoing(int port) {
+        return -1;
+    }
+
+    public int acceptIncoming(int port) {
+        return -1;
+    }
 }

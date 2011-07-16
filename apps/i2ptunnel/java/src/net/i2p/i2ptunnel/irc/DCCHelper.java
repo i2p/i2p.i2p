@@ -20,18 +20,50 @@ public interface DCCHelper {
      *  @param ip local irc client IP
      *  @param port local irc client port
      *  @param type string
-     *  @return i2p port or -1 on error
+     *  @return local DCC server i2p port or -1 on error
      */
     public int newOutgoing(byte[] ip, int port, String type);
 
     /**
      *  An incoming DCC request
      *
-     *  @param b32 remote dcc server address
-     *  @param port remote dcc server port
+     *  @param b32 remote dcc server b32 address
+     *  @param port remote dcc server I2P port
      *  @param type string
-     *  @return local server port or -1 on error
+     *  @return local DCC client tunnel port or -1 on error
      */
     public int newIncoming(String b32, int port, String type);
+
+    /**
+     *  An outgoing RESUME request
+     *
+     *  @param port local DCC client tunnel port
+     *  @return remote DCC server i2p port or -1 on error
+     */
+    public int resumeOutgoing(int port);
+
+    /**
+     *  An incoming RESUME request
+     *
+     *  @param port local dcc server I2P port
+     *  @return local IRC client DCC port or -1 on error
+     */
+    public int resumeIncoming(int port);
+
+    /**
+     *  An outgoing ACCEPT response
+     *
+     *  @param port local irc client DCC port
+     *  @return local DCC server i2p port or -1 on error
+     */
+    public int acceptOutgoing(int port);
+
+    /**
+     *  An incoming ACCEPT response
+     *
+     *  @param port remote dcc server I2P port
+     *  @return local DCC client tunnel port or -1 on error
+     */
+    public int acceptIncoming(int port);
 
 }
