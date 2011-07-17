@@ -78,7 +78,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
     private static long __tunnelId = 0;
     private final long _tunnelId;
     private final Properties _clientOptions;
-    private final List<I2PSession> _sessions;
+    private final Set<I2PSession> _sessions;
 
     public static final int PACKET_DELAY = 100;
 
@@ -120,7 +120,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
         // as of 0.8.4, include context properties
         Properties p = _context.getProperties();
         _clientOptions = p;
-        _sessions = new ArrayList(1);
+        _sessions = new CopyOnWriteArraySet();
         
         addConnectionEventListener(lsnr);
         boolean gui = true;
@@ -192,22 +192,17 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
 
     /** @return non-null */
     List<I2PSession> getSessions() { 
-        synchronized (_sessions) {
             return new ArrayList(_sessions); 
-        }
     }
+
     void addSession(I2PSession session) { 
         if (session == null) return;
-        synchronized (_sessions) {
-            if (!_sessions.contains(session))
-                _sessions.add(session);
-        }
+        _sessions.add(session);
     }
+
     void removeSession(I2PSession session) { 
         if (session == null) return;
-        synchronized (_sessions) {
-            _sessions.remove(session);
-        }
+        _sessions.remove(session);
     }
     
     public Properties getClientOptions() { return _clientOptions; }

@@ -28,10 +28,10 @@ import net.i2p.util.SecureFileOutputStream;
  *
  */
 public class TunnelController implements Logging {
-    private Log _log;
+    private final Log _log;
     private Properties _config;
-    private I2PTunnel _tunnel;
-    private List<String> _messages;
+    private final I2PTunnel _tunnel;
+    private final List<String> _messages;
     private List<I2PSession> _sessions;
     private boolean _running;
     private boolean _starting;
