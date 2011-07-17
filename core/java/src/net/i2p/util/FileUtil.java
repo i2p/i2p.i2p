@@ -400,7 +400,15 @@ public class FileUtil {
     public static boolean copy(String source, String dest, boolean overwriteExisting, boolean quiet) {
         File src = new File(source);
         File dst = new File(dest);
+        return copy(src, dst, overwriteExisting, quiet);
+    }
 
+    /**
+      * @param quiet don't log fails to wrapper log if true
+      * @return true if it was copied successfully
+      * @since 0.8.8
+      */
+    public static boolean copy(File src, File dst, boolean overwriteExisting, boolean quiet) {
 	if (dst.exists() && dst.isDirectory())
             dst = new File(dst, src.getName());
         
@@ -429,6 +437,35 @@ public class FileUtil {
         }
     }
     
+    /**
+     * Try to rename, if it doesn't work then copy and delete the old.
+     * Always overwrites any existing "to" file.
+     * Method moved from SingleFileNamingService.
+     *
+     * @return true if it was renamed / copied successfully
+     * @since 0.8.8
+     */
+    public static boolean rename(File from, File to) {
+        if (!from.exists())
+            return false;
+        boolean success = false;
+        boolean isWindows = System.getProperty("os.name").startsWith("Win");
+        // overwrite fails on windows
+        if (!isWindows)
+            success = from.renameTo(to);
+        if (!success) {
+            to.delete();
+            success = from.renameTo(to);
+            if (!success) {
+                // hard way
+                success = copy(from, to, true, true);
+                if (success)
+                    from.delete();
+            }
+        }
+        return success;
+    }
+
     /**
      * Usage: FileUtil (delete path | copy source dest | unzip path.zip)
      *

@@ -193,7 +193,7 @@ public class SingleFileNamingService extends NamingService {
             out.write(d.toBase64());
             out.newLine();
             out.close();
-            boolean success = rename(tmp, _file);
+            boolean success = FileUtil.rename(tmp, _file);
             if (success) {
                 for (NamingServiceListener nsl : _listeners) { 
                     nsl.entryChanged(this, hostname, d, options);
@@ -284,7 +284,7 @@ public class SingleFileNamingService extends NamingService {
                 tmp.delete();
                 return false;
             }
-            success = rename(tmp, _file);
+            success = FileUtil.rename(tmp, _file);
             if (success) {
                 for (NamingServiceListener nsl : _listeners) { 
                     nsl.entryRemoved(this, hostname);
@@ -440,24 +440,6 @@ public class SingleFileNamingService extends NamingService {
         } finally {
             releaseWriteLock();
         }
-    }
-
-    private static boolean rename(File from, File to) {
-        boolean success = false;
-        boolean isWindows = System.getProperty("os.name").startsWith("Win");
-        // overwrite fails on windows
-        if (!isWindows)
-            success = from.renameTo(to);
-        if (!success) {
-            to.delete();
-            success = from.renameTo(to);
-            if (!success) {
-                // hard way
-                success = FileUtil.copy(from.getAbsolutePath(), to.getAbsolutePath(), true, true);
-                from.delete();
-            }
-        }
-        return success;
     }
 
     private void getReadLock() {

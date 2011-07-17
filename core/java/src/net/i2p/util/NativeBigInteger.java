@@ -606,7 +606,7 @@ public class NativeBigInteger extends BigInteger {
         }
         // copy to install dir, ignore failure
         File newFile = new File(I2PAppContext.getGlobalContext().getBaseDir(), filename);
-        FileUtil.copy(outFile.getAbsolutePath(), newFile.getAbsolutePath(), false, true);
+        FileUtil.copy(outFile, newFile, false, true);
         return true;
     }
     

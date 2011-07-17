@@ -93,8 +93,8 @@ public class UnsignedUpdateHandler extends UpdateHandler {
                 _log.log(Log.CRIT, "Corrupt zip file from " + url);
                 return;
             }
-            String to = (new File(_context.getRouterDir(), Router.UPDATE_FILE)).getAbsolutePath();
-            boolean copied = FileUtil.copy(_updateFile, to, true);
+            File to = new File(_context.getRouterDir(), Router.UPDATE_FILE);
+            boolean copied = FileUtil.copy(updFile, to, true, false);
             if (copied) {
                 updFile.delete();
                 String policy = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_POLICY);
@@ -124,7 +124,7 @@ public class UnsignedUpdateHandler extends UpdateHandler {
                 }
             } else {
                 _log.log(Log.CRIT, "Failed copy to " + to);
-                updateStatus("<b>" + _("Failed copy to {0}", to) + "</b>");
+                updateStatus("<b>" + _("Failed copy to {0}", to.getAbsolutePath()) + "</b>");
             }
         }
     }
