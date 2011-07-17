@@ -455,9 +455,15 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                     !Boolean.valueOf(getTunnel().getClientOptions().getProperty(PROP_DISABLE_HELPER)).booleanValue()) {
                                     pos2 = fragment.indexOf("=");
                                     ahelperKey = fragment.substring(pos2 + 1);
-
                                     // Key contains data, lets not ignore it
                                     if (ahelperKey != null) {
+                                        if(ahelperKey.endsWith(".b32.i2p")) {
+                                            // allow i2paddresshelper=<b32>.b32.i2p syntax.
+                                            Destination dest = _context.namingService().lookup(ahelperKey);
+                                            if(dest==null) 
+                                                throw new RuntimeException("Could not find destination for "+ahelperKey);
+                                            ahelperKey = dest.toBase64();
+                                        }
                                         ahelperPresent = true;
                                         // ahelperKey will be validated later
                                         if (host == null || "i2p".equals(host)) {
