@@ -8,6 +8,7 @@ package net.i2p.i2ptunnel.web;
  *
  */
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +31,7 @@ import net.i2p.i2ptunnel.I2PTunnelHTTPClientBase;
 import net.i2p.i2ptunnel.TunnelController;
 import net.i2p.i2ptunnel.TunnelControllerGroup;
 import net.i2p.util.ConcurrentHashSet;
+import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 
 /**
@@ -40,9 +42,9 @@ import net.i2p.util.Log;
  * Usage by classes outside of i2ptunnel.war is deprecated.
  */
 public class IndexBean {
-    protected I2PAppContext _context;
-    protected Log _log;
-    protected TunnelControllerGroup _group;
+    protected final I2PAppContext _context;
+    protected final Log _log;
+    protected final TunnelControllerGroup _group;
     private String _action;
     private int _tunnel;
     //private long _prevNonce;
@@ -74,8 +76,8 @@ public class IndexBean {
     private boolean _sharedClient;
     private boolean _privKeyGenerate;
     private boolean _removeConfirmed;
-    private Set<String> _booleanOptions;
-    private Map<String, String> _otherOptions;
+    private final Set<String> _booleanOptions;
+    private final Map<String, String> _otherOptions;
     private int _hashCashValue;
     private int _certType;
     private String _certSigner;
@@ -198,17 +200,17 @@ public class IndexBean {
     }
     private String stopAll() {
         if (_group == null) return "";
-        List msgs = _group.stopAllControllers();
+        List<String> msgs = _group.stopAllControllers();
         return getMessages(msgs);
     }
     private String startAll() {
         if (_group == null) return "";
-        List msgs = _group.startAllControllers();
+        List<String> msgs = _group.startAllControllers();
         return getMessages(msgs);
     }
     private String restartAll() {
         if (_group == null) return "";
-        List msgs = _group.restartAllControllers();
+        List<String> msgs = _group.restartAllControllers();
         return getMessages(msgs);
     }
     private String reloadConfig() {
@@ -316,6 +318,10 @@ public class IndexBean {
         return rv;
     } 
 
+    /**
+     *  Stop the tunnel, delete from config,
+     *  rename the private key file if in the default directory
+     */
     private String deleteTunnel() {
         if (!_removeConfirmed)
             return "Please confirm removal";
@@ -324,8 +330,38 @@ public class IndexBean {
         if (cur == null)
             return "Invalid tunnel number";
         
-        List msgs = _group.removeController(cur);
+        List<String> msgs = _group.removeController(cur);
         msgs.addAll(doSave());
+
+        // Rename private key file if it was a default name in
+        // the default directory, so it doesn't get reused when a new
+        // tunnel is created.
+        // Use configured file name if available, not the one from the form.
+        String pk = cur.getPrivKeyFile();
+        if (pk == null)
+            pk = _privKeyFile;
+        if (pk != null && pk.startsWith("i2ptunnel") && pk.endsWith("-privKeys.dat")) {
+            File pkf = new File(_context.getConfigDir(), pk);
+            if (pkf.exists()) {
+                String name = cur.getName();
+                if (name == null) {
+                    name = cur.getDescription();
+                    if (name == null) {
+                        name = cur.getType();
+                        if (name == null)
+                            name = Long.toString(_context.clock().now());
+                    }
+                }
+                name = "i2ptunnel-deleted-" + name.replace(' ', '_') + "-privkeys.dat";
+                File to = new File(_context.getConfigDir(), name);
+                if (to.exists())
+                    to = new File(_context.getConfigDir(), name + '-' + _context.clock().now());
+                boolean success = FileUtil.rename(pkf, to);
+                if (success)
+                    msgs.add("Private key file " + pkf.getAbsolutePath() +
+                             " renamed to " + to.getAbsolutePath());
+            }
+        }
         return getMessages(msgs);
     }
     
