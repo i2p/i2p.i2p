@@ -72,9 +72,8 @@ import net.i2p.util.Log;
 /**
  *  Todo: Most events are not listened to elsewhere, so error propagation is poor
  */
-public class I2PTunnel implements Logging, EventDispatcher {
+public class I2PTunnel extends EventDispatcherImpl implements Logging {
     private final Log _log;
-    private final EventDispatcherImpl _event;
     private final I2PAppContext _context;
     private static long __tunnelId = 0;
     private final long _tunnelId;
@@ -114,10 +113,10 @@ public class I2PTunnel implements Logging, EventDispatcher {
     }
 
     public I2PTunnel(String[] args, ConnectionEventListener lsnr) {
+        super();
         _context = I2PAppContext.getGlobalContext(); // new I2PAppContext();
         _tunnelId = ++__tunnelId;
         _log = _context.logManager().getLog(I2PTunnel.class);
-        _event = new EventDispatcherImpl();
         // as of 0.8.4, include context properties
         Properties p = _context.getProperties();
         _clientOptions = p;
@@ -1656,42 +1655,5 @@ public class I2PTunnel implements Logging, EventDispatcher {
      */
     public interface ConnectionEventListener {
         public void routerDisconnected();
-    }
-
-    /* Required by the EventDispatcher interface */
-    public EventDispatcher getEventDispatcher() {
-        return _event;
-    }
-
-    public void attachEventDispatcher(EventDispatcher e) {
-        _event.attachEventDispatcher(e.getEventDispatcher());
-    }
-
-    public void detachEventDispatcher(EventDispatcher e) {
-        _event.detachEventDispatcher(e.getEventDispatcher());
-    }
-
-    public void notifyEvent(String e, Object a) {
-        _event.notifyEvent(e, a);
-    }
-
-    public Object getEventValue(String n) {
-        return _event.getEventValue(n);
-    }
-
-    public Set getEvents() {
-        return _event.getEvents();
-    }
-
-    public void ignoreEvents() {
-        _event.ignoreEvents();
-    }
-
-    public void unIgnoreEvents() {
-        _event.unIgnoreEvents();
-    }
-
-    public Object waitEventValue(String n) {
-        return _event.waitEventValue(n);
     }
 }
