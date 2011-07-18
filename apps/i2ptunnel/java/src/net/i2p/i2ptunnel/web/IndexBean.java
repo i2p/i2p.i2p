@@ -988,8 +988,16 @@ public class IndexBean {
         }
 
         if ("ircclient".equals(_type)) {
-                config.setProperty("option." + I2PTunnelIRCClient.PROP_DCC,
-                                   "" + _booleanOptions.contains(I2PTunnelIRCClient.PROP_DCC));
+            boolean dcc = _booleanOptions.contains(I2PTunnelIRCClient.PROP_DCC);
+            config.setProperty("option." + I2PTunnelIRCClient.PROP_DCC,
+                               "" + dcc);
+            // add some sane server options since they aren't in the GUI (yet)
+            if (dcc) {
+                config.setProperty("options." + PROP_MAX_CONNS_MIN, "3");
+                config.setProperty("options." + PROP_MAX_CONNS_HOUR, "10");
+                config.setProperty("options." + PROP_MAX_TOTAL_CONNS_MIN, "5");
+                config.setProperty("options." + PROP_MAX_TOTAL_CONNS_HOUR, "25");
+            }
         }
 
         return config;

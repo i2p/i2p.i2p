@@ -371,8 +371,7 @@ abstract class IRCFilter {
         buf.append(pfx)
            .append(type).append(' ').append(arg).append(' ');
         if (haveIP) {
-            // fixme what is our address?
-            byte[] myIP = { 127, 0, 0, 1 };
+            byte[] myIP = helper.getLocalAddress();
             buf.append(DataHelper.fromLong(myIP, 0, myIP.length)).append(' ');
         }
         buf.append(port);

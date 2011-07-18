@@ -24,7 +24,7 @@ import net.i2p.util.Log;
 /**
  * Todo: Can we extend I2PTunnelClient instead and remove some duplicated code?
  */
-public class I2PTunnelIRCClient extends I2PTunnelClientBase implements DCCHelper {
+public class I2PTunnelIRCClient extends I2PTunnelClientBase {
 
     /** used to assign unique IDs to the threads / clients.  no logic or functionality */
     private static volatile long __clientId = 0;
@@ -98,17 +98,19 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements DCCHelper
     }
     
     protected void clientConnectionRun(Socket s) {
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("got a connection.");
+        if (_log.shouldLog(Log.INFO))
+            _log.info("New connection local addr is: " + s.getLocalAddress() +
+                      " from: " + s.getInetAddress());
         Destination clientDest = pickDestination();
         I2PSocket i2ps = null;
         try {
             i2ps = createI2PSocket(clientDest);
             i2ps.setReadTimeout(readTimeout);
             StringBuffer expectedPong = new StringBuffer();
-            Thread in = new I2PAppThread(new IrcInboundFilter(s,i2ps, expectedPong, _log, this), "IRC Client " + __clientId + " in", true);
+            DCCHelper dcc = _dccEnabled ? new DCC(s.getLocalAddress().getAddress()) : null;
+            Thread in = new I2PAppThread(new IrcInboundFilter(s,i2ps, expectedPong, _log, dcc), "IRC Client " + __clientId + " in", true);
             in.start();
-            Thread out = new I2PAppThread(new IrcOutboundFilter(s,i2ps, expectedPong, _log, this), "IRC Client " + __clientId + " out", true);
+            Thread out = new I2PAppThread(new IrcOutboundFilter(s,i2ps, expectedPong, _log, dcc), "IRC Client " + __clientId + " out", true);
             out.start();
         } catch (Exception ex) {
             if (_log.shouldLog(Log.ERROR))
@@ -156,6 +158,20 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements DCCHelper
     //  Start of the DCCHelper interface
     //
 
+  private class DCC implements DCCHelper {
+
+    private final byte[] _localAddr;
+
+    /**
+     *  @param local Our IP address, from the IRC client's perspective
+     */
+    public DCC(byte[] local) {
+        if (local.length == 4)
+            _localAddr = local;
+        else
+            _localAddr = new byte[] {127, 0, 0, 1};
+    }
+
     public boolean isEnabled() {
         return _dccEnabled;
     }
@@ -164,6 +180,9 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements DCCHelper
         return Base32.encode(sockMgr.getSession().getMyDestination().calculateHash().getData()) + ".b32.i2p";
     }
 
+    public byte[] getLocalAddress() {
+        return _localAddr;
+    }
 
     public int newOutgoing(byte[] ip, int port, String type) {
         I2PTunnelDCCServer server;
@@ -171,7 +190,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements DCCHelper
             if (_DCCServer == null) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Starting DCC Server");
-                _DCCServer = new I2PTunnelDCCServer(sockMgr, l, this, getTunnel());
+                _DCCServer = new I2PTunnelDCCServer(sockMgr, l, I2PTunnelIRCClient.this, getTunnel());
                 // TODO add some prudent tunnel options (or is it too late?)
                 _DCCServer.startRunning();
             }
@@ -189,7 +208,7 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements DCCHelper
             if (_DCCClientManager == null) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Starting DCC Client");
-                _DCCClientManager = new DCCClientManager(sockMgr, l, this, getTunnel());
+                _DCCClientManager = new DCCClientManager(sockMgr, l, I2PTunnelIRCClient.this, getTunnel());
             }
             tracker = _DCCClientManager;
         }
@@ -227,4 +246,5 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase implements DCCHelper
             return tracker.acceptIncoming(port);
         return -1;
     }
+  }
 }

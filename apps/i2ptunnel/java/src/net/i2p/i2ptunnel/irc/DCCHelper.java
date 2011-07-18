@@ -15,6 +15,11 @@ public interface DCCHelper {
     public String getB32Hostname();
 
     /**
+     *  Our IP address (taken from the socket), must be IPv4
+     */
+    public byte[] getLocalAddress();
+
+    /**
      *  An outgoing DCC request
      *
      *  @param ip local irc client IP
