@@ -1,3 +1,10 @@
+2011-07-18 zzz
+  * FileUtil: Add a rename method and a new copy method
+  * I2PTunnel: Rename privkey file when deleting tunnel to prevent inadvertent reuse
+  * Netdb: Update reseed lists
+  * Streaming: Improve conn limit log message
+  * UDP: Lower max port below 31000 since wrapper uses that
+
 2011-07-15 zzz
   * Shutdown:
     - Cancel our JVM shutdown hook when shutting down
