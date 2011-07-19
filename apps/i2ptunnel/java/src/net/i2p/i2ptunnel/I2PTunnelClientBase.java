@@ -686,11 +686,11 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         synchronized (sockLock) {
             if (sockMgr != null) {
                 mySockets.retainAll(sockMgr.listSockets());
-                if (!forced && mySockets.size() != 0) {
-                    l.log("There are still active connections!");
+                if ((!forced) && (!mySockets.isEmpty())) {
+                    l.log("Not closing, there are still active connections!");
                     _log.debug("can't close: there are still active connections!");
-                    for (Iterator it = mySockets.iterator(); it.hasNext();) {
-                        l.log("->" + it.next());
+                    for (I2PSocket s : mySockets) {
+                        l.log("  -> " + s.toString());
                     }
                     return false;
                 }
@@ -706,7 +706,8 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
             try {
                 if (ss != null) ss.close();
             } catch (IOException ex) {
-                ex.printStackTrace();
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("error closing", ex);
                 return false;
             }
             //l.log("Client closed.");

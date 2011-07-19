@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.client.streaming.I2PSocketManager;
+import net.i2p.data.Base32;
 import net.i2p.i2ptunnel.I2PTunnel;
 import net.i2p.i2ptunnel.Logging;
 import net.i2p.util.EventDispatcher;
@@ -90,6 +91,13 @@ public class DCCClientManager extends EventReceiver {
      *  @param localPort bind to port or 0; if nonzero it will be the rv
      */
     private int newIncoming(String b32, int port, String type, int localPort) {
+        b32 = b32.toLowerCase();
+        // do some basic verification before starting the client
+        if (b32.length() != 60 || !b32.endsWith(".b32.i2p"))
+            return -1;
+        byte[] dec = Base32.decode(b32.substring(0, 52));
+        if (dec == null || dec.length != 32)
+            return -1;
         expireInbound();
         if (_incoming.size() >= MAX_INCOMING_PENDING ||
             _active.size() >= MAX_INCOMING_PENDING) {
