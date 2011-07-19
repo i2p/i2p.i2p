@@ -276,9 +276,9 @@ public class TunnelPoolManager implements TunnelManagerFacade {
      *  Do not use to change settings.
      */
     public void buildTunnels(Destination client, ClientTunnelSettings settings) {
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Building tunnels for the client " + client.calculateHash().toBase64() + ": " + settings);
         Hash dest = client.calculateHash();
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Building tunnels for the client " + dest + ": " + settings);
         settings.getInboundSettings().setDestination(dest);
         settings.getOutboundSettings().setDestination(dest);
         TunnelPool inbound = null;
@@ -311,7 +311,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     
     
     private static class DelayedStartup implements SimpleTimer.TimedEvent {
-        private TunnelPool pool;
+        private final TunnelPool pool;
 
         public DelayedStartup(TunnelPool p) {
             this.pool = p;
@@ -322,9 +322,14 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         }
     }
 
-    /** synch with buildTunnels() above */
+    /**
+     *  This will be called twice, once by the inbound and once by the outbound pool.
+     *  Synched with buildTunnels() above.
+     */
     public synchronized void removeTunnels(Hash destination) {
         if (destination == null) return;
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Removing tunnels for the client " + destination);
         if (_context.clientManager().isLocal(destination)) {
             if (_log.shouldLog(Log.CRIT))
                 _log.log(Log.CRIT, "wtf, why are you removing the pool for " + destination.toBase64(), new Exception("i did it"));

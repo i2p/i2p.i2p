@@ -56,14 +56,22 @@ public class Reseeder {
      *         URLs are constructed, and because SSLEepGet doesn't follow redirects.
      */
     public static final String DEFAULT_SEED_URL =
-              "http://a.netdb.i2p2.de/,http://c.netdb.i2p2.de/," +
-              "http://reseed.i2p-projekt.de/,http://forum.i2p2.de/netdb/,http://www.i2pbote.net/netDb/,http://r31453.ovh.net/static_media/files/netDb/";
+              "http://a.netdb.i2p2.de/," +
+              "http://c.netdb.i2p2.de/," +
+              "http://reseed.i2p-projekt.de/," +
+              "http://forum.i2p2.de/netdb/," +
+              "http://www.i2pbote.net/netDb/," +
+              "http://r31453.ovh.net/static_media/files/netDb/," +
+              "http://cowpuncher.drollette.com/netdb/";
 
     /** @since 0.8.2 */
     public static final String DEFAULT_SSL_SEED_URL =
-              "https://a.netdb.i2p2.de/,https://c.netdb.i2p2.de/," +
-              "https://forum.i2p2.de/netdb/,https://www.i2pbote.net/netDb/," +
-              "https://r31453.ovh.net/static_media/files/netDb/";
+         /*   "https://a.netdb.i2p2.de/," +   bad cert */
+         /*   "https://c.netdb.i2p2.de/," +   no data */
+              "https://forum.i2p2.de/netdb/," +
+              "https://www.i2pbote.net/netDb/," +
+              "https://r31453.ovh.net/static_media/files/netDb/," +
+              "https://cowpuncher.drollette.com/netdb/";
 
     private static final String PROP_INPROGRESS = "net.i2p.router.web.ReseedHandler.reseedInProgress";
     /** the console shows this message while reseedInProgress == false */

@@ -23,6 +23,7 @@ import net.i2p.util.Log;
 
 /**
  *  A group of tunnels for the router or a particular client, in a single direction.
+ *  Public only for TunnelRenderer in router console.
  */
 public class TunnelPool {
     private final List<PooledTunnelCreatorConfig> _inProgress = new ArrayList();
@@ -43,7 +44,7 @@ public class TunnelPool {
     private final String _rateName;
     private static final int TUNNEL_LIFETIME = 10*60*1000;
     
-    public TunnelPool(RouterContext ctx, TunnelPoolManager mgr, TunnelPoolSettings settings, TunnelPeerSelector sel) {
+    TunnelPool(RouterContext ctx, TunnelPoolManager mgr, TunnelPoolSettings settings, TunnelPeerSelector sel) {
         _context = ctx;
         _log = ctx.logManager().getLog(TunnelPool.class);
         _manager = mgr;
@@ -59,10 +60,18 @@ public class TunnelPool {
         refreshSettings();
     }
     
-    public void startup() {
+    /**
+     *  Warning, this may be called more than once
+     *  (without an intervening shutdown()) if the
+     *  tunnel is stopped and then restarted by the client manager with the same
+     *  Destination (i.e. for servers or clients w/ persistent key)
+     */
+    void startup() {
         synchronized (_inProgress) {
             _inProgress.clear();
         }
+        if (_log.shouldLog(Log.WARN))
+            _log.warn(toString() + ": Startup() called, was already alive? " + _alive, new Exception());
         _alive = true;
         _started = System.currentTimeMillis();
         _lastRateUpdate = _started;
@@ -84,7 +93,9 @@ public class TunnelPool {
                                new long[] { 5*60*1000l });
     }
     
-    public void shutdown() {
+    void shutdown() {
+        if (_log.shouldLog(Log.WARN))
+            _log.warn(toString() + ": Shutdown called", new Exception());
         _alive = false;
         _lastSelectionPeriod = 0;
         _lastSelected = null;
@@ -132,7 +143,8 @@ public class TunnelPool {
      * and returns it.
      *
      */
-    public TunnelInfo selectTunnel() { return selectTunnel(true); }
+    TunnelInfo selectTunnel() { return selectTunnel(true); }
+
     private TunnelInfo selectTunnel(boolean allowRecurseOnFail) {
         boolean avoidZeroHop = ((getSettings().getLength() + getSettings().getLengthVariance()) > 0);
         
@@ -239,7 +251,7 @@ public class TunnelPool {
      * Do we really need more fallbacks?
      * Used to prevent a zillion of them
      */
-    public boolean needFallback() {
+    boolean needFallback() {
         int needed = _settings.getBackupQuantity() + _settings.getQuantity();
         int fallbacks = 0;
         synchronized (_tunnels) {
@@ -259,7 +271,8 @@ public class TunnelPool {
     int getTunnelCount() { synchronized (_tunnels) { return _tunnels.size(); } }
     
     public TunnelPoolSettings getSettings() { return _settings; }
-    public void setSettings(TunnelPoolSettings settings) { 
+
+    void setSettings(TunnelPoolSettings settings) { 
         _settings = settings; 
         if (_settings != null) {
             if (_log.shouldLog(Log.INFO))
@@ -267,8 +280,19 @@ public class TunnelPool {
             _manager.getExecutor().repoll(); // in case we need more
         }
     }
-    public TunnelPeerSelector getSelector() { return _peerSelector; }
-    public boolean isAlive() { return _alive; }
+
+    /**
+     *  Is this pool running AND either exploratory, or tracked by the client manager?
+     *  A pool will be alive but not tracked after the client manager removes it
+     *  but before all the tunnels have expired.
+     */
+    public boolean isAlive() {
+        return _alive &&
+               (_settings.isExploratory() ||
+                (_settings.getDestination() != null &&
+                 _context.clientManager().isLocal(_settings.getDestination())));
+    }
+
     /** duplicate of getTunnelCount(), let's pick one */
     public int size() { 
         synchronized (_tunnels) {
@@ -336,17 +360,14 @@ public class TunnelPool {
             }
         }
     
-        boolean connected = true;
-        if ( (_settings.getDestination() != null) && (!_context.clientManager().isLocal(_settings.getDestination())) )
-            connected = false;
-        if ( (getTunnelCount() <= 0) && (!connected) ) {
+        if (getTunnelCount() <= 0 && !isAlive()) {
+            // this calls both our shutdown() and the other one (inbound/outbound)
             _manager.removeTunnels(_settings.getDestination());
-            return;
         }
     }
 
     /** This may be called multiple times from TestJob */
-    public void tunnelFailed(PooledTunnelCreatorConfig cfg) {
+    void tunnelFailed(PooledTunnelCreatorConfig cfg) {
         if (_log.shouldLog(Log.WARN))
             _log.warn(toString() + ": Tunnel failed: " + cfg);
         LeaseSet ls = null;
@@ -574,9 +595,8 @@ public class TunnelPool {
      * the countHowManyToBuild function below)
      *
      */
-    public int countHowManyToBuild() {
-        if (_settings.getDestination() != null) {
-            if (!_context.clientManager().isLocal(_settings.getDestination()))
+    int countHowManyToBuild() {
+        if (!isAlive()) {
                 return 0;
         }
         int wanted = getSettings().getBackupQuantity() + getSettings().getQuantity();

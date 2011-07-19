@@ -80,11 +80,11 @@ class UDPEndpoint {
     }
 ********/
     
-    /** 8998 is monotone, and 32000 is the wrapper, so let's stay between those */
+    /** 8998 is monotone, and 31000 is the wrapper outbound, so let's stay between those */
     public static final String PROP_MIN_PORT = "i2np.udp.minPort";
     public static final String PROP_MAX_PORT = "i2np.udp.maxPort";
     private static final int MIN_RANDOM_PORT = 9111;
-    private static final int MAX_RANDOM_PORT = 31777;
+    private static final int MAX_RANDOM_PORT = 30777;
     private static final int MAX_PORT_RETRIES = 20;
 
     /**

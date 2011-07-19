@@ -359,7 +359,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         
         long now = _context.clock().now();
         if (_tempFile.exists()) {
-            boolean copied = FileUtil.copy(_tempFile.getAbsolutePath(), _newsFile.getAbsolutePath(), true);
+            boolean copied = FileUtil.copy(_tempFile, _newsFile, true, false);
             if (copied) {
                 _lastUpdated = now;
                 _tempFile.delete();

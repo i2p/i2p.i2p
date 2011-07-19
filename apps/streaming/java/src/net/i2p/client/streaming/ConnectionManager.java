@@ -165,26 +165,22 @@ class ConnectionManager {
                     _log.warn("Refusing connection since we have exceeded our max of " 
                               + _maxConcurrentStreams + " connections");
                 reject = true;
-            } else if (shouldRejectConnection(synPacket)) {
+            } else {
                 // this may not be right if more than one is enabled
-                String why;
-                if (_defaultOptions.isAccessListEnabled())
-                    why = "not whitelisted: ";
-                else if (_defaultOptions.isBlacklistEnabled())
-                    why = "blacklisted: ";
-                else
-                    why = "throttled: ";
-                _log.error("Refusing connection since peer is " + why +
-                           (synPacket.getOptionalFrom() == null ? "null from" : synPacket.getOptionalFrom().calculateHash().toBase64()));
-                reject = true;
-            } else { 
-                while (true) {
-                    Connection oldCon = _connectionByInboundId.putIfAbsent(Long.valueOf(receiveId), con);
-                    if (oldCon == null) {
-                        break;
-                    } else { 
-                        // receiveId already taken, try another
-                        receiveId = _context.random().nextLong(Packet.MAX_STREAM_ID-1)+1;
+                String why = shouldRejectConnection(synPacket);
+                if (why != null) {
+                    _log.logAlways(Log.WARN, "Refusing connection since peer is " + why +
+                           (synPacket.getOptionalFrom() == null ? "" : ": " + synPacket.getOptionalFrom().calculateHash().toBase64()));
+                    reject = true;
+                } else { 
+                    while (true) {
+                        Connection oldCon = _connectionByInboundId.putIfAbsent(Long.valueOf(receiveId), con);
+                        if (oldCon == null) {
+                            break;
+                        } else { 
+                            // receiveId already taken, try another
+                            receiveId = _context.random().nextLong(Packet.MAX_STREAM_ID-1)+1;
+                        }
                     }
                 }
             }
@@ -308,35 +304,46 @@ class ConnectionManager {
         return (active >= _maxConcurrentStreams);
     }
     
-    private boolean shouldRejectConnection(Packet syn) {
+    /**
+     *  @return reason string or null if not rejected
+     */
+    private String shouldRejectConnection(Packet syn) {
         // unfortunately we don't have access to the router client manager here,
         // so we can't whitelist local access
         Destination from = syn.getOptionalFrom();
         if (from == null)
-            return true;
+            return "null";
         Hash h = from.calculateHash();
-        boolean throttled = false;
+        String throttled = null;
         // always call all 3 to increment all counters
         if (_minuteThrottler != null && _minuteThrottler.shouldThrottle(h)) {
             _context.statManager().addRateData("stream.con.throttledMinute", 1, 0);
-            throttled = true;
+            throttled = "throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerMinute() +
+                        " or total limit of " + _defaultOptions.getMaxTotalConnsPerMinute() +
+                        " per minute";
         }
         if (_hourThrottler != null && _hourThrottler.shouldThrottle(h)) {
             _context.statManager().addRateData("stream.con.throttledHour", 1, 0);
-            throttled = true;
+            throttled = "throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerHour() +
+                        " or total limit of " + _defaultOptions.getMaxTotalConnsPerHour() +
+                        " per hour";
         }
         if (_dayThrottler != null && _dayThrottler.shouldThrottle(h)) {
             _context.statManager().addRateData("stream.con.throttledDay", 1, 0);
-            throttled = true;
+            throttled = "throttled by per-peer limit of " + _defaultOptions.getMaxConnsPerDay() +
+                        " or total limit of " + _defaultOptions.getMaxTotalConnsPerDay() +
+                        " per day";
         }
-        if (throttled)
-            return true;
+        if (throttled != null)
+            return throttled;
         // if the sig is absent or bad it will be caught later (in CPH)
-        if (_defaultOptions.isAccessListEnabled())
-            return !_defaultOptions.getAccessList().contains(h);
-        if (_defaultOptions.isBlacklistEnabled())
-            return _defaultOptions.getBlacklist().contains(h);
-        return false;
+        if (_defaultOptions.isAccessListEnabled() &&
+            !_defaultOptions.getAccessList().contains(h))
+            return "not whitelisted";
+        if (_defaultOptions.isBlacklistEnabled() &&
+            _defaultOptions.getBlacklist().contains(h))
+            return "blacklisted";
+        return null;
     }
 
 
