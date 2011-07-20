@@ -51,9 +51,6 @@ public class RateStat {
     public void coalesceStats() {
         for (Entry<Long, Rate> e: _rates.entrySet()){
             e.getValue().coalesce();
-            if (_statName == "bw.sendRate"){
-            System.out.println("Coalescing Rate(" + e.getValue().getPeriod() + ")");
-            }
         }
     }
 
@@ -74,6 +71,7 @@ public class RateStat {
         int counter = 0;
         for (Entry<Long, Rate> e: _rates.entrySet())
             rv[counter++] = e.getValue().getPeriod();
+        Arrays.sort(rv);
         return rv;
     }
 
@@ -98,7 +96,6 @@ public class RateStat {
         } else {
         	Rate rate = new Rate(period);
         	rate.setRateStat(this);
-        	System.out.println("New Rate(" + _statName + ", " + rate.getPeriod() + ")");
         	_rates.put(period, rate);
         	return rate;
         }
