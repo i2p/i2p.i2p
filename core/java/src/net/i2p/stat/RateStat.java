@@ -8,7 +8,6 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.data.DataHelper;
-import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 
 /** coordinate a moving rate over various periods */
