@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-06-16 17:09+0000\n"
-"PO-Revision-Date: 2011-06-24 12:33+0100\n"
+"PO-Revision-Date: 2011-07-20 04:33+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: es\n"
 "Language: es\n"
@@ -38,11 +38,11 @@ msgstr "Usuario del demonio I2P:"
 #. Description
 #: ../i2p.templates:3001
 msgid "By default I2P is configured to run under the account i2psvc when running as a daemon. To use an **existing** I2P profile you may enter a different account name here. For example, if your previous I2P installation is at /home/user/i2p, you may enter 'user' here."
-msgstr "Por defecto, I2P está configurado para ejecutarse con el usuario i2psvc si el modo de demonio está activado. Para usar un perfíl **ya existente** de I2P, puedes especificar aquí un nombre de cuenta diferente. Por ejemplo, si tu anterior instalación de I2P se halla en /home/user/i2p, puedes entrar 'user' aquí."
+msgstr "Por defecto, I2P está configurado para ejecutarse con el usuario i2psvc si el modo de demonio está activado. Para usar un perfil **ya existente** de I2P, puedes especificar aquí un nombre de cuenta diferente. Por ejemplo, si tu anterior instalación de I2P se halla en /home/pepe/i2p, puedes entrar aquí 'pepe'."
 
 #. Type: string
 #. Description
 #: ../i2p.templates:3001
 msgid "Very important: The account specified here *MUST* already exist."
-msgstr "Muy importante: El usuario especificado aquí ya *TIENE QUE* existir."
+msgstr "Muy importante: El usuario especificado aquí *YA TIENE QUE* existir."
 
