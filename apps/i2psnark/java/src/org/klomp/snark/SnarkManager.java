@@ -1102,8 +1102,12 @@ public class SnarkManager implements Snark.CompleteListener {
                     _log.error("Error in the DirectoryMonitor", e);
                 }
                 if (doMagnets) {
-                    addMagnets();
-                    doMagnets = false;
+                    try {
+                        addMagnets();
+                        doMagnets = false;
+                    } catch (Exception e) {
+                        _log.error("Error in the DirectoryMonitor", e);
+                    }
                 }
                 try { Thread.sleep(60*1000); } catch (InterruptedException ie) {}
             }
