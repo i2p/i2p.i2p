@@ -42,14 +42,14 @@ public class RateStat {
      */
     public void addData(long value, long eventDuration) {
         if (_statLog != null) _statLog.addData(_groupName, _statName, value, eventDuration);
-        for (Entry<Long, Rate> e: _rates.entrySet())
-            e.getValue().addData(value, eventDuration);
+        for (Rate r: _rates.values())
+            r.addData(value, eventDuration);
     }
 
     /** coalesce all the stats */
     public void coalesceStats() {
-        for (Entry<Long, Rate> e: _rates.entrySet()){
-            e.getValue().coalesce();
+        for (Rate r: _rates.values()){
+            r.coalesce();
         }
     }
 
@@ -68,19 +68,19 @@ public class RateStat {
     public long[] getPeriods() {
         long rv[] = new long[_rates.size()];
         int counter = 0;
-        for (Entry<Long, Rate> e: _rates.entrySet())
-            rv[counter++] = e.getValue().getPeriod();
+        for (Rate r: _rates.values())
+            rv[counter++] = r.getPeriod();
         Arrays.sort(rv);
         return rv;
     }
 
     public double getLifetimeAverageValue() {
         if ( (_rates == null) || (_rates.size() <= 0) ) return 0;
-        return _rates.entrySet().iterator().next().getValue().getLifetimeAverageValue();
+        return _rates.values().iterator().next().getLifetimeAverageValue();
     }
     public long getLifetimeEventCount() {
         if ( (_rates == null) || (_rates.size() <= 0) ) return 0;
-        return _rates.entrySet().iterator().next().getValue().getLifetimeEventCount();
+        return _rates.values().iterator().next().getLifetimeEventCount();
     }
 
     /**
@@ -202,11 +202,11 @@ public class RateStat {
      * @throws IllegalArgumentException if the data was formatted incorrectly
      */
     public void load(Properties props, String prefix, boolean treatAsCurrent) throws IllegalArgumentException {
-        for (Entry<Long, Rate> e: _rates.entrySet()) {
-            long period = e.getValue().getPeriod();
+        for (Rate r : _rates.values()) {
+            long period = r.getPeriod();
             String curPrefix = prefix + "." + DataHelper.formatDuration(period);
             try {
-                e.getValue().load(props, curPrefix, treatAsCurrent);
+                r.load(props, curPrefix, treatAsCurrent);
             } catch (IllegalArgumentException iae) {
                 Rate rate = new Rate(period);
                 rate.setRateStat(this);
@@ -218,13 +218,10 @@ public class RateStat {
     }
 
 /*********
-*/
     public static void main(String args[]) {
         RateStat rs = new RateStat("moo", "moo moo moo", "cow trueisms", new long[] { 60 * 1000, 60 * 60 * 1000,
                                                                                      24 * 60 * 60 * 1000});
-        
-        rs.getRate(5500L);
-        System.out.println("Adding data..");
+
         for (int i = 0; i < 500; i++) {
             try {
                 Thread.sleep(20);
@@ -233,17 +230,7 @@ public class RateStat {
             rs.addData(i * 100, 20);
         }
         
-        Rate rate5500 = rs.getRate(5500L);
-        System.out.println("Nbr of events: " + rate5500.getCurrentEventCount());
-        System.out.println("Average :" + rate5500.getAverageValue());
-        
-        System.out.println("Coalescing stats..");
         rs.coalesceStats();
-        System.out.println("Average :" + rate5500.getAverageValue());
-        System.out.println("Coalescing this rate..");
-        rate5500.coalesce();
-        System.out.println("Average :" + rate5500.getAverageValue());
-        System.out.println("Lifetime average :" + rate5500.getLifetimeAverageValue());
 
         java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream(2048);
         try {
@@ -270,6 +257,5 @@ public class RateStat {
         } catch (InterruptedException ie) { // nop
         }
     }
- /**
 *********/
 }
