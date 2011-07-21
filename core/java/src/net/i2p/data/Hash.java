@@ -19,7 +19,6 @@ import java.io.InputStream;
  * @author jrandom
  */
 public class Hash extends SimpleDataStructure {
-    private volatile String _stringified;
     private volatile String _base64ed;
     private int _cachedHashCode;
 
@@ -71,7 +70,6 @@ public class Hash extends SimpleDataStructure {
     @Override
     public void setData(byte[] data) {
         super.setData(data);
-        _stringified = null;
         _base64ed = null;
         _cachedHashCode = super.hashCode();
     }
@@ -79,7 +77,6 @@ public class Hash extends SimpleDataStructure {
     @Override
     public void readBytes(InputStream in) throws DataFormatException, IOException {
         super.readBytes(in);
-        _stringified = null;
         _base64ed = null;
         _cachedHashCode = super.hashCode();
     }

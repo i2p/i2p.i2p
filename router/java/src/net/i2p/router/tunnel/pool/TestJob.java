@@ -23,6 +23,10 @@ import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 
+/**
+ *  Repeatedly test a single tunnel for its entire lifetime,
+ *  or until the pool is shut down or removed from the client manager.
+ */
 class TestJob extends JobImpl {
     private final Log _log;
     private final TunnelPool _pool;
@@ -35,7 +39,7 @@ class TestJob extends JobImpl {
     private SessionTag _encryptTag;
     
     /** base to randomize the test delay on */
-    private static final int TEST_DELAY = 30*1000;
+    private static final int TEST_DELAY = 40*1000;
     
     public TestJob(RouterContext ctx, PooledTunnelCreatorConfig cfg, TunnelPool pool) {
         super(ctx);
@@ -54,7 +58,7 @@ class TestJob extends JobImpl {
     public String getName() { return "Test tunnel"; }
 
     public void runJob() {
-        if (_pool == null)
+        if (_pool == null || !_pool.isAlive())
             return;
         long lag = getContext().jobQueue().getMaxLag();
         if (lag > 3000) {
@@ -155,6 +159,8 @@ class TestJob extends JobImpl {
     }
     
     public void testSuccessful(int ms) {
+        if (_pool == null || !_pool.isAlive())
+            return;
         getContext().statManager().addRateData("tunnel.testSuccessLength", _cfg.getLength(), 0);
         getContext().statManager().addRateData("tunnel.testSuccessTime", ms, 0);
     
@@ -182,6 +188,8 @@ class TestJob extends JobImpl {
     }
     
     private void testFailed(long timeToFail) {
+        if (_pool == null || !_pool.isAlive())
+            return;
         if (_found) {
             // ok, not really a /success/, but we did find it, even though slowly
             noteSuccess(timeToFail, _outTunnel);
@@ -208,7 +216,7 @@ class TestJob extends JobImpl {
     }
     
     /** randomized time we should wait before testing */
-    private int getDelay() { return TEST_DELAY + getContext().random().nextInt(TEST_DELAY); }
+    private int getDelay() { return TEST_DELAY + getContext().random().nextInt(TEST_DELAY / 3); }
 
     /** how long we allow tests to run for before failing them */
     private int getTestPeriod() {
@@ -234,8 +242,11 @@ class TestJob extends JobImpl {
 
     private void scheduleRetest() { scheduleRetest(false); }
     private void scheduleRetest(boolean asap) {
+        if (_pool == null || !_pool.isAlive())
+            return;
         if (asap) {
-            requeue(getContext().random().nextInt(TEST_DELAY));
+            if (_cfg.getExpiration() > getContext().clock().now() + (60 * 1000))
+                requeue((TEST_DELAY / 4) + getContext().random().nextInt(TEST_DELAY / 4));
         } else {
             int delay = getDelay();
             if (_cfg.getExpiration() > getContext().clock().now() + delay + (3 * getTestPeriod()))
