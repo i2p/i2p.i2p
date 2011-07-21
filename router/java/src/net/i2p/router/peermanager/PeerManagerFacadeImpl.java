@@ -10,8 +10,10 @@ package net.i2p.router.peermanager;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import net.i2p.data.Hash;
 import net.i2p.router.PeerManagerFacade;
@@ -63,10 +65,14 @@ public class PeerManagerFacadeImpl implements PeerManagerFacade {
         return _manager.selectPeers(criteria);
     }
 
+    /**
+     *  @param caps non-null
+     */
     public void setCapabilities(Hash peer, String caps) { 
         if (_manager == null) return;
         _manager.setCapabilities(peer, caps); 
     }
+
     public void removeCapabilities(Hash peer) { 
         if (_manager == null) return;
         _manager.removeCapabilities(peer); 
@@ -79,8 +85,12 @@ public class PeerManagerFacadeImpl implements PeerManagerFacade {
         return null;
     }
 
-    public List<Hash> getPeersByCapability(char capability) { 
-        if (_manager == null) return new ArrayList(0);
+    /**
+     *  @param capability case-insensitive
+     *  @return non-null unmodifiable set
+     */
+    public Set<Hash> getPeersByCapability(char capability) { 
+        if (_manager == null) return Collections.EMPTY_SET;
         return _manager.getPeersByCapability(capability); 
     }
 

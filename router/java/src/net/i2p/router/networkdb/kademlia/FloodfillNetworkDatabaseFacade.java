@@ -32,7 +32,7 @@ import net.i2p.util.Log;
  *
  */
 public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacade {
-    public static final char CAPACITY_FLOODFILL = 'f';
+    public static final char CAPABILITY_FLOODFILL = 'f';
     private final Map _activeFloodQueries;
     private boolean _floodfillEnabled;
     /** for testing, see isFloodfill() below */
@@ -223,10 +223,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             } catch (DataFormatException dfe) {}
         }
         String caps = peer.getCapabilities();
-        if ( (caps != null) && (caps.indexOf(FloodfillNetworkDatabaseFacade.CAPACITY_FLOODFILL) != -1) )
-            return true;
-        else
-            return false;
+        return caps.indexOf(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL) >= 0;
     }
 
     public List<RouterInfo> getKnownRouterData() {

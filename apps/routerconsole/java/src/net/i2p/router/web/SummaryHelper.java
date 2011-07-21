@@ -221,8 +221,8 @@ public class SummaryHelper extends HelperBase {
     public int getWellIntegratedPeers() { 
         if (_context == null) 
             return 0;
-        else
-            return _context.profileOrganizer().countWellIntegratedPeers();
+        //return _context.profileOrganizer().countWellIntegratedPeers();
+        return _context.peerManager().getPeersByCapability(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL).size();
     }
     /**
      * How many peers the router ranks as failing.

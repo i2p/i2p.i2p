@@ -183,7 +183,8 @@ class ProfileOrganizerRenderer {
         }
         buf.append("</table>");
 
-        buf.append("<h2><a name=\"flood\"></a>").append(_("Floodfill and Integrated Peers")).append("</h2>\n");
+        buf.append("<h2><a name=\"flood\"></a>").append(_("Floodfill and Integrated Peers"))
+           .append(" (").append(integratedPeers.size()).append(")</h2>\n");
         buf.append("<table>");
         buf.append("<tr>");
         buf.append("<th class=\"smallhead\">").append(_("Peer")).append("</th>");

@@ -2,6 +2,7 @@ package net.i2p.router.tunnel.pool;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -198,7 +199,7 @@ public abstract class TunnelPeerSelector {
         if (filterUnreachable(ctx, isInbound, isExploratory)) {
             // NOTE: filterUnreachable returns true for inbound, false for outbound
             // This is the only use for getPeersByCapability? And the whole set of datastructures in PeerManager?
-            List<Hash> caps = ctx.peerManager().getPeersByCapability(Router.CAPABILITY_UNREACHABLE);
+            Collection<Hash> caps = ctx.peerManager().getPeersByCapability(Router.CAPABILITY_UNREACHABLE);
             if (caps != null)
                 peers.addAll(caps);
             caps = ctx.profileOrganizer().selectPeersLocallyUnreachable();
@@ -352,7 +353,7 @@ public abstract class TunnelPeerSelector {
             }
         }
         int maxLen = 0;
-        if (cap.indexOf(FloodfillNetworkDatabaseFacade.CAPACITY_FLOODFILL) >= 0)
+        if (cap.indexOf(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL) >= 0)
             maxLen++;
         if (cap.indexOf(Router.CAPABILITY_REACHABLE) >= 0)
             maxLen++;

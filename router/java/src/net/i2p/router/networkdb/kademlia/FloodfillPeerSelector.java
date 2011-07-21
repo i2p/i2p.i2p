@@ -107,12 +107,23 @@ class FloodfillPeerSelector extends PeerSelector {
      *  List is not sorted and not shuffled.
      */
     private List<Hash> selectFloodfillParticipants(Set<Hash> toIgnore, KBucketSet kbuckets) {
+      /*****
         if (kbuckets == null) return Collections.EMPTY_LIST;
         // TODO this is very slow - use profile getPeersByCapability('f') instead
         _context.statManager().addRateData("netDb.newFSC", 0, 0);
         FloodfillSelectionCollector matches = new FloodfillSelectionCollector(null, toIgnore, 0);
         kbuckets.getAll(matches);
         return matches.getFloodfillParticipants();
+      *****/
+        Set<Hash> set = _context.peerManager().getPeersByCapability(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL);
+        List<Hash> rv = new ArrayList(set.size());
+        for (Hash h : set) {
+            if ((toIgnore != null && toIgnore.contains(h)) ||
+                _context.shitlist().isShitlistedForever(h))
+               continue;
+            rv.add(h);
+        }
+        return rv;
     }
     
     /**
@@ -251,12 +262,12 @@ class FloodfillPeerSelector extends PeerSelector {
     }
     
     private class FloodfillSelectionCollector implements SelectionCollector {
-        private TreeSet<Hash> _sorted;
-        private List<Hash>  _floodfillMatches;
-        private Hash _key;
-        private Set<Hash>  _toIgnore;
+        private final TreeSet<Hash> _sorted;
+        private final List<Hash>  _floodfillMatches;
+        private final Hash _key;
+        private final Set<Hash> _toIgnore;
         private int _matches;
-        private int _wanted;
+        private final int _wanted;
 
         /**
          *  Warning - may return our router hash - add to toIgnore if necessary
@@ -267,7 +278,6 @@ class FloodfillPeerSelector extends PeerSelector {
             _sorted = new TreeSet(new XORComparator(key));
             _floodfillMatches = new ArrayList(8);
             _toIgnore = toIgnore;
-            _matches = 0;
             _wanted = wanted;
         }
 

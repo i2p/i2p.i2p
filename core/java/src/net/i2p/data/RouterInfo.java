@@ -317,7 +317,7 @@ public class RouterInfo extends DatabaseEntry {
 
     /**
      * what special capabilities this router offers
-     *
+     * @return non-null, empty string if none
      */
     public String getCapabilities() {
         if (_options == null) return "";

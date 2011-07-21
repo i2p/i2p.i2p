@@ -11,8 +11,9 @@ package net.i2p.router.peermanager;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,6 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.PeerSelectionCriteria;
+import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.ConcurrentHashSet;
@@ -30,15 +32,7 @@ import net.i2p.util.SimpleTimer2;
 /**
  * Manage the current state of the statistics
  *
- * All the capabilities methods appear to be almost unused -
- * TunnelPeerSelector just looks for unreachables, and that's it?
- * If so, a lot of this can go away, including the array of 26 ArrayLists,
- * and a lot of synchronization on _capabilitiesByPeer.
- *
- * We don't trust any published capabilities except for 'K' and 'U'.
- * This should be cleaned up.
- *
- * setCapabilities() and removeCapabilities() can just add/remove the profile and that's it.
+ * Also maintain Sets for each of the capabilities in TRACKED_CAPS.
  *
  */
 class PeerManager {
@@ -46,12 +40,24 @@ class PeerManager {
     private final RouterContext _context;
     private final ProfileOrganizer _organizer;
     private final ProfilePersistenceHelper _persistenceHelper;
-    private final Set<Hash> _peersByCapability[];
+    private final Map<Character, Set<Hash>> _peersByCapability;
+    /** value strings are lower case */
     private final Map<Hash, String> _capabilitiesByPeer;
     private static final long REORGANIZE_TIME = 45*1000;
     private static final long REORGANIZE_TIME_MEDIUM = 123*1000;
     private static final long REORGANIZE_TIME_LONG = 551*1000;
     
+    public static final String TRACKED_CAPS = "" +
+        FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL +
+        RouterInfo.CAPABILITY_HIDDEN +
+        Router.CAPABILITY_BW12 +
+        Router.CAPABILITY_BW32 +
+        Router.CAPABILITY_BW64 +
+        Router.CAPABILITY_BW128 +
+        Router.CAPABILITY_BW256 +
+        Router.CAPABILITY_REACHABLE +
+        Router.CAPABILITY_UNREACHABLE;
+
     /**
      *  Profiles are now loaded in a separate thread,
      *  so this should return quickly.
@@ -63,9 +69,9 @@ class PeerManager {
         _organizer = context.profileOrganizer();
         _organizer.setUs(context.routerHash());
         _capabilitiesByPeer = new ConcurrentHashMap(128);
-        _peersByCapability = new Set[26];
-        for (int i = 0; i < _peersByCapability.length; i++)
-            _peersByCapability[i] = new ConcurrentHashSet();
+        _peersByCapability = new HashMap(TRACKED_CAPS.length());
+        for (int i = 0; i < TRACKED_CAPS.length(); i++)
+            _peersByCapability.put(Character.valueOf(Character.toLowerCase(TRACKED_CAPS.charAt(i))), new ConcurrentHashSet());
         loadProfilesInBackground();
         ////_context.jobQueue().addJob(new EvaluateProfilesJob(_context));
         //SimpleScheduler.getInstance().addPeriodicEvent(new Reorg(), 0, REORGANIZE_TIME);
@@ -96,9 +102,8 @@ class PeerManager {
     }
     
     void storeProfiles() {
-        Set peers = selectPeers();
-        for (Iterator<Hash> iter = peers.iterator(); iter.hasNext(); ) {
-            Hash peer = iter.next();
+        Set<Hash> peers = selectPeers();
+        for (Hash peer : peers) {
             storeProfile(peer);
         }
     }
@@ -107,11 +112,11 @@ class PeerManager {
     void clearProfiles() {
         _organizer.clearProfiles();
         _capabilitiesByPeer.clear();
-        for (int i = 0; i < _peersByCapability.length; i++)
-            _peersByCapability[i].clear();
+        for (Set p : _peersByCapability.values())
+            p.clear();
     }
 
-    Set selectPeers() {
+    Set<Hash> selectPeers() {
         return _organizer.selectAllPeers();
     }
 
@@ -152,13 +157,10 @@ class PeerManager {
      */
     void loadProfiles() {
         Set<PeerProfile> profiles = _persistenceHelper.readProfiles();
-        for (Iterator<PeerProfile> iter = profiles.iterator(); iter.hasNext();) {
-            PeerProfile prof = iter.next();
-            if (prof != null) {
+        for (PeerProfile prof : profiles) {
                 _organizer.addProfile(prof);
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("Profile for " + prof.getPeer().toBase64() + " loaded");
-            }
         }
     }
     
@@ -207,37 +209,37 @@ class PeerManager {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("We ran out of peers when looking for reachable ones after finding " 
                           + "0 with "
-                          + _organizer.countWellIntegratedPeers() + "/" 
                           + _organizer.countHighCapacityPeers() + "/" 
-                          + _organizer.countFastPeers() + " integrated/high capacity/fast peers");
+                          + _organizer.countFastPeers() + " high capacity/fast peers");
         }
         if (_log.shouldLog(Log.INFO))
             _log.info("Peers selected: " + peers);
         return new ArrayList(peers);
     }
     
+    /**
+     *  @param caps non-null, case is ignored
+     */
     public void setCapabilities(Hash peer, String caps) { 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Setting capabilities for " + peer.toBase64() + " to " + caps);
-        if (caps != null) caps = caps.toLowerCase();
+        caps = caps.toLowerCase();
 
-            String oldCaps = null;
-            if (caps != null)
-                oldCaps = _capabilitiesByPeer.put(peer, caps);
-            else
-                oldCaps = _capabilitiesByPeer.remove(peer);
+        String oldCaps = _capabilitiesByPeer.put(peer, caps);
+        if (caps.equals(oldCaps))
+            return;
             
             if (oldCaps != null) {
                 for (int i = 0; i < oldCaps.length(); i++) {
                     char c = oldCaps.charAt(i);
-                    if ( (caps == null) || (caps.indexOf(c) < 0) ) {
+                    if (caps.indexOf(c) < 0) {
                         Set<Hash> peers = locked_getPeers(c);
                         if (peers != null)
                             peers.remove(peer);
                     }
                 }
             }
-            if (caps != null) {
+
                 for (int i = 0; i < caps.length(); i++) {
                     char c = caps.charAt(i);
                     if ( (oldCaps != null) && (oldCaps.indexOf(c) >= 0) )
@@ -246,26 +248,19 @@ class PeerManager {
                     if (peers != null)
                         peers.add(peer);
                 }
-            }
     }
     
     /** locking no longer req'd */
     private Set<Hash> locked_getPeers(char c) {
         c = Character.toLowerCase(c);
-        int i = c - 'a';
-        if ( (i < 0) || (i >= _peersByCapability.length) ) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Invalid capability " + c + " (" + i + ")");
-            return null;
-        }
-        return _peersByCapability[i];
+        return _peersByCapability.get(Character.valueOf(c));
     }
     
     public void removeCapabilities(Hash peer) { 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Removing capabilities from " + peer.toBase64());
 
-            String oldCaps = (String)_capabilitiesByPeer.remove(peer);
+            String oldCaps = _capabilitiesByPeer.remove(peer);
             if (oldCaps != null) {
                 for (int i = 0; i < oldCaps.length(); i++) {
                     char c = oldCaps.charAt(i);
@@ -291,33 +286,13 @@ class PeerManager {
 ********/
 
     /**
-     *  The only user of this is TunnelPeerSelector for unreachables?
+     *  @param capability case-insensitive
+     *  @return non-null unmodifiable set
      */
-    public List<Hash> getPeersByCapability(char capability) { 
-        if (true) {
+    public Set<Hash> getPeersByCapability(char capability) { 
             Set<Hash> peers = locked_getPeers(capability);
             if (peers != null)
-                return new ArrayList(peers);
-            return null;
-        } else {
-            // Wow this looks really slow...
-            // What is the point of keeping all the data structures above
-            // if we are going to go through the whole netdb anyway?
-            // Not sure why jrandom switched to do it this way,
-            // the checkin comments aren't clear...
-            // Since the locking is gone, switch back to the above.
-            FloodfillNetworkDatabaseFacade f = (FloodfillNetworkDatabaseFacade)_context.netDb();
-            List<RouterInfo> routerInfos = f.getKnownRouterData();
-            List<Hash> rv = new ArrayList();
-            for (Iterator<RouterInfo> iter = routerInfos.iterator(); iter.hasNext(); ) {
-                RouterInfo ri = iter.next();
-                String caps = ri.getCapabilities();
-                if (caps.indexOf(capability) >= 0)
-                    rv.add(ri.getIdentity().calculateHash());
-            }
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Peers with capacity " + capability + ": " + rv.size());
-            return rv;
-        }
+                return Collections.unmodifiableSet(peers);
+            return Collections.EMPTY_SET;
     }
 }

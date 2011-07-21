@@ -46,7 +46,7 @@ public class ProfileOrganizer {
     private final Map<Hash, PeerProfile> _fastPeers;
     /** H(routerIdentity) to PeerProfile for all peers that have high capacities */
     private final Map<Hash, PeerProfile> _highCapacityPeers;
-    /** H(routerIdentity) to PeerProfile for all peers that well integrated into the network and not failing horribly */
+    /** TO BE REMOVED H(routerIdentity) to PeerProfile for all peers that well integrated into the network and not failing horribly */
     private final Map<Hash, PeerProfile> _wellIntegratedPeers;
     /** H(routerIdentity) to PeerProfile for all peers that are not failing horribly */
     private final Map<Hash, PeerProfile> _notFailingPeers;
@@ -187,6 +187,7 @@ public class ProfileOrganizer {
 
     public int countFastPeers() { return count(_fastPeers); }
     public int countHighCapacityPeers() { return count(_highCapacityPeers); }
+    /** @deprecated use ProfileManager.getPeersByCapability('f').size() */
     public int countWellIntegratedPeers() { return count(_wellIntegratedPeers); }
     public int countNotFailingPeers() { return count(_notFailingPeers); }
     public int countFailingPeers() { return count(_failingPeers); }
@@ -408,6 +409,7 @@ public class ProfileOrganizer {
     /**
      * Return a set of Hashes for peers that are well integrated into the network.
      *
+     * @deprecated unused
      */
     public void selectWellIntegratedPeers(int howMany, Set<Hash> exclude, Set<Hash> matches) {
         selectWellIntegratedPeers(howMany, exclude, matches, 0);
@@ -418,6 +420,7 @@ public class ProfileOrganizer {
      *
      * @param mask 0-4 Number of bytes to match to determine if peers in the same IP range should
      *             not be in the same tunnel. 0 = disable check; 1 = /8; 2 = /16; 3 = /24; 4 = exact IP match
+     * @deprecated unused
      */
     public void selectWellIntegratedPeers(int howMany, Set<Hash> exclude, Set<Hash> matches, int mask) {
         getReadLock();

@@ -9,6 +9,7 @@ package net.i2p.router;
  */
 
 import java.util.List;
+import java.util.Set;
 
 import net.i2p.data.Hash;
 
@@ -26,7 +27,7 @@ public interface PeerManagerFacade extends Service {
      * @return List of Hash objects of the RouterIdentity for matching peers
      */
     public List<Hash> selectPeers(PeerSelectionCriteria criteria);
-    public List<Hash> getPeersByCapability(char capability);
+    public Set<Hash> getPeersByCapability(char capability);
     public void setCapabilities(Hash peer, String caps);
     public void removeCapabilities(Hash peer);
     public Hash selectRandomByCapability(char capability);

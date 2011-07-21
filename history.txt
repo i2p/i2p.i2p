@@ -1,3 +1,15 @@
+2011-07-21 zzz
+  * Atalk: Remove this terrible example
+  * Console: Use capability method for counting integrated peers
+  * i2psnark: Don't let connection problem crash the DirMonitor (ticket #495)
+  * Netdb: Speed up collection of all the floodfill peers by using
+           PeerManager.getPeersByCapability()
+  * PeerManager: Capability cleanups
+  * Tunnel TestJob:
+    - Don't continue testing after the pool is dead
+    - Tweak test intervals
+  * TunnelPool: Make more methods package private
+
 2011-07-18 zzz
   * FileUtil: Add a rename method and a new copy method
   * I2PTunnel: Rename privkey file when deleting tunnel to prevent inadvertent reuse

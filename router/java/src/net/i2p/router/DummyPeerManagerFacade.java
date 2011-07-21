@@ -10,6 +10,7 @@ package net.i2p.router;
 
 import java.io.Writer;
 import java.util.List;
+import java.util.Set;
 
 import net.i2p.data.Hash;
 
@@ -25,7 +26,7 @@ class DummyPeerManagerFacade implements PeerManagerFacade {
     public void restart() {}
     public void renderStatusHTML(Writer out) { }    
     public List<Hash> selectPeers(PeerSelectionCriteria criteria) { return null; }
-    public List<Hash> getPeersByCapability(char capability) { return null; }
+    public Set<Hash> getPeersByCapability(char capability) { return null; }
     public void setCapabilities(Hash peer, String caps) {}
     public void removeCapabilities(Hash peer) {}
     public Hash selectRandomByCapability(char capability) { return null; }
