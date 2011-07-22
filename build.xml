@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project basedir="." default="all" name="i2p">
-   
+
     <!-- Things you might want to change -->
     <!-- This keeps gcj a lot quieter -->
     <!--
@@ -322,11 +322,11 @@
         <ant dir="apps/jetty" target="ensureJettylib" />
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc" />
-        <javadoc access="package" 
-            destdir="./build/javadoc" 
-            packagenames="*" 
-            use="true" 
-            splitindex="true" 
+        <javadoc access="package"
+            destdir="./build/javadoc"
+            packagenames="*"
+            use="true"
+            splitindex="true"
             doctitle="I2P Javadocs for Release ${release.number} Build ${build.number}"
             windowtitle="I2P Anonymous Network - Java Documentation - Version ${release.number}">
             <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.crypto:org.bouncycastle.crypto.*:gnu.crypto.*:gnu.gettext:org.xlattice.crypto.filters:com.nettgryppa.security:net.metanotion:net.metanotion.*" />
@@ -367,7 +367,7 @@
                 <pathelement location="apps/systray/java/lib/systray4j.jar" />
                 <pathelement location="apps/jrobin/jrobin-1.5.9.1.jar" />
                 <pathelement location="installer/lib/wrapper/all/wrapper.jar" />
-                <pathelement location="core/lib/junit.jar" />                
+                <pathelement location="core/lib/junit.jar" />
             </classpath>
             <link offline="true" href="http://download.oracle.com/javase/6/docs/api/" packagelistLoc="installer/resources/package-lists/java/" />
             <link offline="true" href="http://docs.i2p2.de/jetty/javadoc/" packagelistLoc="installer/resources/package-lists/jetty/" />
@@ -441,9 +441,9 @@
         <ant dir="apps/systray/java/" target="distclean" />
         <ant dir="apps/i2psnark/java/" target="distclean" />
         <ant dir="apps/jetty/" target="distclean" />
-	<!-- 
+	<!--
 		NOTE! We need to turn off the default excludes for these
-		patterns to work. 
+		patterns to work.
 		These are the defaultexcludes in Ant as seen on
 		http://ant.apache.org/manual/CoreTasks/defaultexcludes.html
 		     **/*~
@@ -468,7 +468,7 @@
 
         <delete>
             <fileset dir="." includes="**/*.class **/*.java~ **/*.txt~ **/*.xml~ **/*.sh~ **/*.SlackBuild~" />
-	    <!-- 
+	    <!--
 	    	Less common, but they pollute my workspace here, so we
             	might as well nuke these as well. Are there any others?
             	
@@ -595,15 +595,15 @@
         <copy file="apps/susidns/src/WEB-INF/lib/jstl.jar" todir="pkg-temp/lib/" />
         <copy file="apps/susidns/src/WEB-INF/lib/standard.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2psnark.war" todir="pkg-temp/webapps/" />
-	<!-- 
-	     Disabling per zzz's statement on IRC: jetty-i2psnark.xml is for an obscure feature that is broken anyway, 
+	<!--
+	     Disabling per zzz's statement on IRC: jetty-i2psnark.xml is for an obscure feature that is broken anyway,
 	     					   you can remove the file, the link, and the patch from the package
 
-		     So I'm going one further: I'm disabling it in build.xml 
+		     So I'm going one further: I'm disabling it in build.xml
 		     +++kytv
 		     -->
 	<!--
-	<copy file="apps/i2psnark/jetty-i2psnark.xml" todir="pkg-temp/" /> 
+	<copy file="apps/i2psnark/jetty-i2psnark.xml" todir="pkg-temp/" />
 	-->
         <copy file="apps/i2psnark/i2psnark.config" todir="pkg-temp/" />
         <copy file="installer/resources/blocklist.txt" todir="pkg-temp/" />
@@ -761,7 +761,7 @@
     </target>
 
     <target name="updateTest" depends="prepupdate">
-        <ant dir="core/java/" target="jarTest" />    
+        <ant dir="core/java/" target="jarTest" />
         <copy file="core/java/build/i2ptest.jar" todir="pkg-temp/lib" />
         <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
     </target>
@@ -1208,7 +1208,7 @@
         <exec dir="debian" executable="./makerepo.sh" failonerror="true"/>
     </target>
 
-<!-- the following are appened to help build barebone portable version, 
+<!-- the following are appened to help build barebone portable version,
      none of the above is modified for this purpose -->
 	<target name = "pkg-portable-clean">
 		<delete dir="build/" />
@@ -1219,7 +1219,7 @@
 	</target>
 <!-- build a portable archive -->
 
-<!-- *0* Since we simply pack all files in folder "build/" into our archieve, 
+<!-- *0* Since we simply pack all files in folder "build/" into our archieve,
 		we need to make sure its small, with NO redundent jars or wars.
 		thus cleaning is required before each build-->
 	<target name="buildSmallOnly" depends="pkg-portable-clean,buildSmall"/>
