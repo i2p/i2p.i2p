@@ -158,8 +158,8 @@ public class RateStat {
         RateStat rs = (RateStat) obj;
         if (DataHelper.eq(getGroupName(), rs.getGroupName()) && DataHelper.eq(getDescription(), rs.getDescription())
             && DataHelper.eq(getName(), rs.getName())) {
-            for (Entry<Long, Rate> e: _rates.entrySet())
-                if (!e.getValue().equals(rs.getRate(e.getValue().getPeriod()))) return false;
+            for (Rate r: _rates.values())
+                if (!r.equals(rs.getRate(r.getPeriod()))) return false;
             return true;
         } 
         
@@ -175,13 +175,13 @@ public class RateStat {
         buf.append("# ").append(NL).append(NL);
         out.write(buf.toString().getBytes());
         buf.setLength(0);
-        for (Entry<Long, Rate> e: _rates.entrySet()){
+        for (Rate r: _rates.values()){
             buf.append("#######").append(NL);
-            buf.append("# Period : ").append(DataHelper.formatDuration(e.getValue().getPeriod())).append(" for rate ")
+            buf.append("# Period : ").append(DataHelper.formatDuration(r.getPeriod())).append(" for rate ")
                 .append(_groupName).append(" - ").append(_statName).append(NL);
             buf.append(NL);
-            String curPrefix = prefix + "." + DataHelper.formatDuration(e.getValue().getPeriod());
-            e.getValue().store(curPrefix, buf);
+            String curPrefix = prefix + "." + DataHelper.formatDuration(r.getPeriod());
+            r.store(curPrefix, buf);
             out.write(buf.toString().getBytes());
             buf.setLength(0);
         }
