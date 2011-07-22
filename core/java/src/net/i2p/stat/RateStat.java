@@ -20,7 +20,7 @@ public class RateStat {
     /** describe the stat */
     private final String _description;
     /** actual rate objects for this statistic */
-    private final ConcurrentHashMap<Long, Rate> _rates;
+    protected final ConcurrentHashMap<Long, Rate> _rates;
     /** component we tell about events as they occur */
     private StatLog _statLog;
 
@@ -158,9 +158,7 @@ public class RateStat {
         RateStat rs = (RateStat) obj;
         if (DataHelper.eq(getGroupName(), rs.getGroupName()) && DataHelper.eq(getDescription(), rs.getDescription())
             && DataHelper.eq(getName(), rs.getName())) {
-            for (Rate r: _rates.values())
-                if (!r.equals(rs.getRate(r.getPeriod()))) return false;
-            return true;
+            return this._rates.equals(rs._rates);
         } 
         
         return false;
