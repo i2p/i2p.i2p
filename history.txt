@@ -1,3 +1,7 @@
+2011-07-22 kytv
+  * Add a 64bit wrapper to OSX. With 0.8.7 came a fat Mac wrapper with i386 and PPC.
+    The included wrapper is now quad-fat (i386, ppc, x86_64, and ppc64).
+
 2011-07-21 zzz
   * Atalk: Remove this terrible example
   * Console: Use capability method for counting integrated peers
