@@ -184,7 +184,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _peersByRemoteHost = new ConcurrentHashMap(128);
         _dropList = new ConcurrentHashSet(2);
         
-        // See comments in DQAT.java
+        // See comments in DummyThrottle.java
         if (USE_PRIORITY) {
             TimedWeightedPriorityMessageQueue mq = new TimedWeightedPriorityMessageQueue(ctx, PRIORITY_LIMITS, PRIORITY_WEIGHT, this);
             _outboundMessages = mq;
@@ -296,7 +296,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (_handler == null)
             _handler = new PacketHandler(_context, this, _endpoint, _establisher, _inboundFragments, _testManager, _introManager);
         
-        // See comments in DQAT.java
+        // See comments in DummyThrottle.java
         if (USE_PRIORITY && _refiller == null)
             _refiller = new OutboundRefiller(_context, _fragments, _outboundMessages);
         
@@ -1112,6 +1112,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static final int MIN_EXPIRE_TIMEOUT = 10*60*1000;
     
     public String getStyle() { return STYLE; }
+
     @Override
     public void send(OutNetMessage msg) { 
         if (msg == null) return;
@@ -1151,7 +1152,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Add to fragments for " + to.toBase64());
 
-            // See comments in DQAT.java
+            // See comments in DummyThrottle.java
             if (USE_PRIORITY)
                 _outboundMessages.add(msg);
             else  // skip the priority queue and go straight to the active pool
@@ -1163,6 +1164,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _establisher.establish(msg);
         }
     }
+
     void send(I2NPMessage msg, PeerState peer) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Injecting a data message to a new peer: " + peer);
