@@ -17,7 +17,7 @@ import net.i2p.util.Log;
  * with code to fail messages that expire.  
  *
  * WARNING - UNUSED since 0.6.1.11
- * See comments in DQAT.java and mtn history ca. 2006-02-19
+ * See comments in DummyThrottle.java and mtn history ca. 2006-02-19
  *
  */
 class TimedWeightedPriorityMessageQueue implements MessageQueue, OutboundMessageFragments.ActiveThrottle {

@@ -1581,6 +1581,8 @@ class PeerState {
         }
     }
 
+    // why removed? Some risk of dups in OutboundMessageFragments._activePeers ???
+
     /*
     public int hashCode() {
         if (_remotePeer != null) 
