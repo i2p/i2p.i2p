@@ -345,9 +345,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _refiller.shutdown();
         if (_handler != null)
             _handler.shutdown();
-        _fragments.shutdown();
         if (_pusher != null)
             _pusher.shutdown();
+        _fragments.shutdown();
         if (_establisher != null)
             _establisher.shutdown();
         _inboundFragments.shutdown();

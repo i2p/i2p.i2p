@@ -12,7 +12,7 @@ import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 
 /**
- * Maintain the outbound fragmentation for resending
+ * Maintain the outbound fragmentation for resending, for a single message.
  *
  */
 class OutboundMessageState {
