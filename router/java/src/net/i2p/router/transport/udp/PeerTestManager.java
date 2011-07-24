@@ -91,17 +91,17 @@ with either Bob or Charlie, but it is not required.</p>
 
  */
 class PeerTestManager {
-    private RouterContext _context;
-    private Log _log;
-    private UDPTransport _transport;
-    private PacketBuilder _packetBuilder;
+    private final RouterContext _context;
+    private final Log _log;
+    private final UDPTransport _transport;
+    private final PacketBuilder _packetBuilder;
     /** map of Long(nonce) to PeerTestState for tests currently in progress (as Bob/Charlie) */
     private final Map<Long, PeerTestState> _activeTests;
     /** current test we are running (as Alice), or null */
     private PeerTestState _currentTest;
     private boolean _currentTestComplete;
     /** as Alice */
-    private Queue<Long> _recentTests;
+    private final Queue<Long> _recentTests;
     
     /** longest we will keep track of a Charlie nonce for */
     private static final int MAX_CHARLIE_LIFETIME = 10*1000;

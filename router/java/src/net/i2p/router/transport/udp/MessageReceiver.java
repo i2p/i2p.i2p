@@ -20,9 +20,9 @@ import net.i2p.util.Log;
  * {@link net.i2p.router.InNetMessagePool} by way of the {@link UDPTransport}.
  */
 class MessageReceiver {
-    private RouterContext _context;
-    private Log _log;
-    private UDPTransport _transport;
+    private final RouterContext _context;
+    private final Log _log;
+    private final UDPTransport _transport;
     /** list of messages (InboundMessageState) fully received but not interpreted yet */
     private final BlockingQueue<InboundMessageState> _completeMessages;
     private boolean _alive;
