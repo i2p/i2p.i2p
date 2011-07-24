@@ -33,7 +33,8 @@ class InboundMessageState {
     private static final long MAX_RECEIVE_TIME = 10*1000;
     public static final int MAX_FRAGMENTS = 64;
     
-    private static final ByteCache _fragmentCache = ByteCache.getInstance(64, 2048);
+    private static final int MAX_FRAGMENT_SIZE = UDPPacket.MAX_PACKET_SIZE;
+    private static final ByteCache _fragmentCache = ByteCache.getInstance(64, MAX_FRAGMENT_SIZE);
     
     public InboundMessageState(RouterContext ctx, long messageId, Hash from) {
         _context = ctx;

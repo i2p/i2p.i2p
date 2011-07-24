@@ -354,7 +354,9 @@ class UDPPacketReader {
             off++; // fragment info
             return ((int)DataHelper.fromLong(_message, off, 2)) & 0x3FFF;
         }
-        public void readMessageFragment(int fragmentNum, byte target[], int targetOffset) {
+
+        public void readMessageFragment(int fragmentNum, byte target[], int targetOffset)
+                                                      throws ArrayIndexOutOfBoundsException {
             int off = getFragmentBegin(fragmentNum);
             off += 4; // messageId
             off++; // fragment info

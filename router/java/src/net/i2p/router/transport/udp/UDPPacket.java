@@ -51,7 +51,13 @@ class UDPPacket {
         _log = I2PAppContext.getGlobalContext().logManager().getLog(UDPPacket.class);
     }
     
-    static final int MAX_PACKET_SIZE = 2048;
+    /**
+     *  Actually it is one less than this, we assume
+     *  if a received packet is this big it is truncated.
+     *  This is bigger than PeerState.LARGE_MTU, as the far-end's
+     *  LARGE_MTU may be larger than ours.
+     */
+    static final int MAX_PACKET_SIZE = 1536;
     public static final int IV_SIZE = 16;
     public static final int MAC_SIZE = 16;
     
@@ -96,7 +102,12 @@ class UDPPacket {
         //_dataBuf = _dataCache.acquire();
         Arrays.fill(_data, (byte)0);
         //_packet = new DatagramPacket(_data, MAX_PACKET_SIZE);
-        //_packet.setData(_data);
+        //
+        // WARNING -
+        // Doesn't seem like we should have to do this every time,
+        // from reading the DatagramPacket javadocs,
+        // but we get massive corruption without it.
+        _packet.setData(_data);
         // _isInbound = inbound;
         _initializeTime = _context.clock().now();
         _markedType = -1;

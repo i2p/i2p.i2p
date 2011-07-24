@@ -157,7 +157,7 @@ class PeerState {
     /* how many consecutive packets at or under the min MTU have been received */
     private long _consecutiveSmall;
     /** when did we last check the MTU? */
-    private long _mtuLastChecked;
+    //private long _mtuLastChecked;
     private long _mtuIncreases;
     private long _mtuDecreases;
     /** current round trip time estimate */
@@ -224,7 +224,7 @@ class PeerState {
      * of 608
      *
      * Well, we really need to count the acks as well, especially
-     * 4 * MAX_RESEND_ACKS which can take up a significant amount of space.
+     * 1 + (4 * MAX_RESEND_ACKS_SMALL) which can take up a significant amount of space.
      * We reduce the max acks when using the small MTU but it may not be enough...
      *
      */
@@ -234,6 +234,12 @@ class PeerState {
      * based on measurements, 1350 fits nearly all reasonably small I2NP messages
      * (larger I2NP messages may be up to 1900B-4500B, which isn't going to fit
      * into a live network MTU anyway)
+     *
+     * TODO
+     * VTBM is 2646, it would be nice to fit in two large
+     * 2646 / 2 = 1323
+     * 1323 + 74 + 46 + 1 + (4 * 9) = 1480
+     * So why not make it 1492 (old ethernet is 1492, new is 1500)
      */
     private static final int LARGE_MTU = 1350;
     
@@ -261,7 +267,7 @@ class PeerState {
         _remotePort = -1;
         _mtu = getDefaultMTU();
         _mtuReceive = _mtu;
-        _mtuLastChecked = -1;
+        //_mtuLastChecked = -1;
         _lastACKSend = -1;
         _rto = MIN_RTO;
         _rtt = _rto/2;
@@ -370,13 +376,20 @@ class PeerState {
     public long getTheyRelayToUsAs() { return _theyRelayToUsAs; }
     /** what is the largest packet we can send to the peer? */
     public int getMTU() { return _mtu; }
-    /** estimate how large the other side is sending packets */
+
+    /**
+     *  Estimate how large the other side's MTU is.
+     *  This could be wrong.
+     *  It is used only for the HTML status.
+     */
     public int getReceiveMTU() { return _mtuReceive; }
+
     /** when did we last check the MTU? */
+  /****
     public long getMTULastChecked() { return _mtuLastChecked; }
     public long getMTUIncreases() { return _mtuIncreases; }
     public long getMTUDecreases() { return _mtuDecreases; }
-    
+  ****/
     
     /**
      * The peer are we talking to.  This should be set as soon as this
@@ -537,11 +550,15 @@ class PeerState {
      * we can use to publish that fact.
      */
     public void setTheyRelayToUsAs(long tag) { _theyRelayToUsAs = tag; }
+
     /** what is the largest packet we can send to the peer? */
+  /****
     public void setMTU(int mtu) { 
         _mtu = mtu; 
         _mtuLastChecked = _context.clock().now();
     }
+  ****/
+
     public int getSlowStartThreshold() { return _slowStartThreshold; }
     public int getConcurrentSends() { return _concurrentMessagesActive; }
     public int getConcurrentSendWindow() { return _concurrentMessagesAllowed; }
@@ -979,15 +996,21 @@ class PeerState {
     public long getPacketRetransmissionRate() { return _packetRetransmissionRate; }
     public long getPacketsReceived() { return _packetsReceived; }
     public long getPacketsReceivedDuplicate() { return _packetsReceivedDuplicate; }
+
+    private static final int MTU_RCV_DISPLAY_THRESHOLD = 20;
+
     public void packetReceived(int size) { 
         _packetsReceived++; 
-        if (size <= MIN_MTU)
+        if (size <= MIN_MTU) {
             _consecutiveSmall++;
-        else
+        } else {
             _consecutiveSmall = 0;
+            _mtuReceive = LARGE_MTU;
+            return;
+        }
         
-	if (_packetsReceived > 50) {
-            if (_consecutiveSmall < 50)
+	if (_packetsReceived > MTU_RCV_DISPLAY_THRESHOLD) {
+            if (_consecutiveSmall < MTU_RCV_DISPLAY_THRESHOLD)
                 _mtuReceive = LARGE_MTU;
             else
                 _mtuReceive = MIN_MTU;
@@ -1287,7 +1310,11 @@ class PeerState {
     private static final int SSU_HEADER_SIZE = 46;
     static final int UDP_HEADER_SIZE = 8;
     static final int IP_HEADER_SIZE = 20;
-    /** how much payload data can we shove in there? */
+
+    /**
+     *  how much payload data can we shove in there?
+     *  @return MTU - 74
+     */
     private static final int fragmentSize(int mtu) {
         return mtu - SSU_HEADER_SIZE - UDP_HEADER_SIZE - IP_HEADER_SIZE;
     }
@@ -1296,7 +1323,7 @@ class PeerState {
         long now = _context.clock().now();
         if (state.getNextSendTime() <= now) {
             if (!state.isFragmented()) {
-                state.fragment(fragmentSize(getMTU()));
+                state.fragment(fragmentSize(_mtu));
                 if (state.getMessage() != null)
                     state.getMessage().timestamp("fragment into " + state.getFragmentCount());
 
