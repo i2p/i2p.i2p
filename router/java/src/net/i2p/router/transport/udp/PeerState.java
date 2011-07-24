@@ -1380,14 +1380,14 @@ class PeerState {
                 _context.statManager().addRateData("udp.sendRejected", state.getPushCount(), state.getLifetime());
                 //if (state.getMessage() != null)
                 //    state.getMessage().timestamp("send rejected, available=" + getSendWindowBytesRemaining());
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Allocation of " + size + " rejected w/ wsize=" + getSendWindowBytes()
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Allocation of " + size + " rejected w/ wsize=" + getSendWindowBytes()
                               + " available=" + getSendWindowBytesRemaining()
                               + " for message " + state.getMessageId() + ": " + state);
                 state.setNextSendTime(now + (ACKSender.ACK_FREQUENCY / 2) +
                                       _context.random().nextInt(ACKSender.ACK_FREQUENCY)); //(now + 1024) & ~SECOND_MASK);
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Retransmit after choke for next send time in " + (state.getNextSendTime()-now) + "ms");
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Retransmit after choke for next send time in " + (state.getNextSendTime()-now) + "ms");
                 //_throttle.choke(peer.getRemotePeer());
 
                 //if (state.getMessage() != null)

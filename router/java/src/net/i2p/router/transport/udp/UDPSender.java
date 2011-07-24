@@ -91,7 +91,7 @@ class UDPSender {
      * available, if requested, otherwise it returns immediately
      *
      * @param blockTime how long to block IGNORED
-     * @return number of packets queued
+     * @return ZERO (used to be number of packets in the queue)
      * @deprecated use add(packet)
      */
     public int add(UDPPacket packet, int blockTime) {

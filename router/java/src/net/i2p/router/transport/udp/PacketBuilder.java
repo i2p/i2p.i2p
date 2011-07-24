@@ -656,6 +656,8 @@ class PacketBuilder {
     
     /**
      *  Build a destroy packet, which contains a header but no body.
+     *  Session must be established or this will NPE in authenticate().
+     *  Unused until 0.8.9.
      *
      *  @since 0.8.1
      */

@@ -64,6 +64,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private final IntroductionManager _introManager;
     private final ExpirePeerEvent _expireEvent;
     private final PeerTestEvent _testEvent;
+    private final PacketBuilder _destroyBuilder;
     private short _reachabilityStatus;
     private long _reachabilityStatusLastUpdated;
     private long _introducersSelectedOn;
@@ -200,6 +201,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _cachedBid[i] = new SharedBid(BID_VALUES[i]);
         }
 
+        _destroyBuilder = new PacketBuilder(_context, this);
         _fragments = new OutboundMessageFragments(_context, this, _activeThrottle);
         _inboundFragments = new InboundMessageFragments(_context, _fragments, this);
         if (SHOULD_FLOOD_PEERS)
@@ -337,6 +339,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     public void shutdown() {
+        destroyAll();
         if (_endpoint != null)
             _endpoint.shutdown();
         if (_flooder != null)
@@ -353,6 +356,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _inboundFragments.shutdown();
         _expireEvent.setIsAlive(false);
         _testEvent.setIsAlive(false);
+        _peersByRemoteHost.clear();
+        _peersByIdent.clear();
+        _dropList.clear();
+        _introManager.reset();
     }
     
     /**
@@ -1011,12 +1018,53 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
          */
     }
     
+    /**
+     *  This sends it directly out, bypassing OutboundMessageFragments
+     *  and the PacketPusher. The only queueing is for the bandwidth limiter.
+     *
+     *  @return ZERO (used to be number of packets in the queue)
+     */
     int send(UDPPacket packet) { 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending packet " + packet);
         return _endpoint.send(packet); 
     }
     
+    /**
+     *  Send a session destroy message, bypassing OMF and PacketPusher.
+     *
+     *  @since 0.8.9
+     */
+    private void sendDestroy(PeerState peer) {
+        // peer must be fully established
+        if (peer.getCurrentCipherKey() == null)
+            return;
+        UDPPacket pkt = _destroyBuilder.buildSessionDestroyPacket(peer);
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Sending destroy to : " + peer);
+        send(pkt);
+    }
+
+    /**
+     *  Send a session destroy message to everybody
+     *
+     *  @since 0.8.9
+     */
+    private void destroyAll() {
+        int howMany = _peersByIdent.size();
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Sending destroy to : " + howMany + " peers");
+        for (PeerState peer : _peersByIdent.values()) {
+            sendDestroy(peer);
+        }
+        int toSleep = Math.min(howMany / 3, 750);
+        if (toSleep > 0) {
+            try {
+                Thread.sleep(toSleep);
+            } catch (InterruptedException ie) {}
+        }
+    }
+
     /** minimum active peers to maintain IP detection, etc. */
     private static final int MIN_PEERS = 3;
     /** minimum peers volunteering to be introducers if we need that */
@@ -2236,8 +2284,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     }
                 }
 
-            for (int i = 0; i < _expireBuffer.size(); i++)
-                dropPeer(_expireBuffer.get(i), false, "idle too long");
+            for (PeerState peer : _expireBuffer) {
+                sendDestroy(peer);
+                dropPeer(peer, false, "idle too long");
+            }
             _expireBuffer.clear();
 
             if (_alive)

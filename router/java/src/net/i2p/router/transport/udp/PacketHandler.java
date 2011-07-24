@@ -372,8 +372,8 @@ class PacketHandler {
             if (state.getMACKey() != null) {
                 isValid = packet.validate(state.getMACKey());
                 if (isValid) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Valid introduction packet received for inbound con: " + packet);
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Valid introduction packet received for inbound con: " + packet);
 
                     _state = 32;
                     packet.decrypt(state.getCipherKey());
@@ -418,8 +418,8 @@ class PacketHandler {
                 _state = 36;
                 isValid = packet.validate(state.getMACKey());
                 if (isValid) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Valid introduction packet received for outbound established con: " + packet);
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Valid introduction packet received for outbound established con: " + packet);
 
                     _state = 37;
                     packet.decrypt(state.getCipherKey());
@@ -432,8 +432,8 @@ class PacketHandler {
             // keys not yet exchanged, lets try it with the peer's intro key
             isValid = packet.validate(state.getIntroKey());
             if (isValid) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Valid introduction packet received for outbound established con with old intro key: " + packet);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Valid introduction packet received for outbound established con with old intro key: " + packet);
                 _state = 39;
                 packet.decrypt(state.getIntroKey());
                 handlePacket(reader, packet, null, state, null);

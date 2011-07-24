@@ -331,6 +331,7 @@ class EstablishmentManager {
 
     /**
      * Got a SessionDestroy on an established conn
+     * @since 0.8.1
      */
     void receiveSessionDestroy(RemoteHostId from, PeerState state) {
         if (_log.shouldLog(Log.DEBUG))
@@ -340,6 +341,7 @@ class EstablishmentManager {
 
     /**
      * Got a SessionDestroy during outbound establish
+     * @since 0.8.1
      */
     void receiveSessionDestroy(RemoteHostId from, OutboundEstablishState state) {
         if (_log.shouldLog(Log.DEBUG))
@@ -351,6 +353,7 @@ class EstablishmentManager {
 
     /**
      * Got a SessionDestroy - maybe after an inbound establish
+     * @since 0.8.1
      */
     void receiveSessionDestroy(RemoteHostId from) {
         if (_log.shouldLog(Log.DEBUG))
