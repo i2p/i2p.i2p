@@ -261,7 +261,7 @@ class OutboundMessageFragments {
         // Keep track of how many we've looked at, since we don't start the iterator at the beginning.
         int peersProcessed = 0;
         while (_alive && (state == null) ) {
-            int nextSendDelay = -1;
+            int nextSendDelay = Integer.MAX_VALUE;
             // no, not every time - O(n**2) - do just before waiting below
             //finishMessages();
 
@@ -295,10 +295,10 @@ class OutboundMessageFragments {
                             // we've gone all the way around, time to sleep
                             break;
                         } else {
-                            // Update the minimum delay for all peers (getNextDelay() returns 1 for "now")
+                            // Update the minimum delay for all peers
                             // which will be used if we found nothing to send across all peers
                             int delay = peer.getNextDelay();
-                            if ( (nextSendDelay <= 0) || (delay < nextSendDelay) )
+                            if (delay < nextSendDelay)
                                 nextSendDelay = delay;
                             peer = null;
                         }
@@ -309,23 +309,22 @@ class OutboundMessageFragments {
                                    peer.getRemotePeer().toBase64());
 
                     // if we've gone all the way through the loop, wait
-                    if (state == null && peersProcessed >= _activePeers.size()) {
+                    // ... unless nextSendDelay says we have more ready now
+                    if (state == null && peersProcessed >= _activePeers.size() && nextSendDelay > 0) {
+                        _isWaiting = true;
                         peersProcessed = 0;
                         // why? we do this in the loop one at a time
                         //finishMessages();
-                        if (_log.shouldLog(Log.DEBUG))
-                            _log.debug("wait for " + nextSendDelay);
-                        // wait.. or somethin'
                         // wait a min of 10 and a max of MAX_WAIT ms no matter what peer.getNextDelay() says
-                        _isWaiting = true;
+                        // use max of 1 second so finishMessages() and/or PeerState.finishMessages()
+                        // gets called regularly
+                        int toWait = Math.min(Math.max(nextSendDelay, 10), MAX_WAIT);
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("wait for " + toWait);
+                        // wait.. or somethin'
                         synchronized (_activePeers) {
                             try {
-                                // use max of 1 second so finishMessages() and/or PeerState.finishMessages()
-                                // gets called regularly
-                                if (nextSendDelay > 0)
-                                    _activePeers.wait(Math.min(Math.max(nextSendDelay, 10), MAX_WAIT));
-                                else
-                                    _activePeers.wait(MAX_WAIT);
+                                _activePeers.wait(toWait);
                             } catch (InterruptedException ie) {
                                 // noop
                                 if (_log.shouldLog(Log.DEBUG))

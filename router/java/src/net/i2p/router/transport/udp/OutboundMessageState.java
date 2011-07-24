@@ -206,6 +206,7 @@ class OutboundMessageState {
                     sends[i] = (short)-1;
         
         boolean rv = isComplete();
+      /****
         if (!rv && false) { // don't do the fast retransmit... lets give it time to get ACKed
             long nextTime = _context.clock().now() + Math.max(_peer.getRTT(), ACKSender.ACK_FREQUENCY);
             //_nextSendTime = Math.max(now, _startedOn+PeerState.MIN_RTO);
@@ -218,6 +219,7 @@ class OutboundMessageState {
             //    _nextSendTime = now + 100;
             //_nextSendTime = now;
         }
+      ****/
         return rv;
     }
     

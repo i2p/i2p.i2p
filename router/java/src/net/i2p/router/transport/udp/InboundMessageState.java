@@ -12,20 +12,20 @@ import net.i2p.util.Log;
  *
  */
 class InboundMessageState {
-    private RouterContext _context;
-    private Log _log;
-    private long _messageId;
-    private Hash _from;
+    private final RouterContext _context;
+    private final Log _log;
+    private final long _messageId;
+    private final Hash _from;
     /** 
      * indexed array of fragments for the message, where not yet
      * received fragments are null.
      */
-    private ByteArray _fragments[];
+    private final ByteArray _fragments[];
     /**
      * what is the last fragment in the message (or -1 if not yet known)
      */
     private int _lastFragment;
-    private long _receiveBegin;
+    private final long _receiveBegin;
     private int _completeSize;
     private boolean _released;
     
@@ -153,10 +153,12 @@ class InboundMessageState {
     }
     
     public void releaseResources() {
-        if (_fragments != null)
-            for (int i = 0; i < _fragments.length; i++)
+        for (int i = 0; i < _fragments.length; i++) {
+            if (_fragments[i] != null) {
                 _fragmentCache.release(_fragments[i]);
-        //_fragments = null;
+                _fragments[i] = null;
+            }
+        }
         _released = true;
     }
     
@@ -178,7 +180,7 @@ class InboundMessageState {
             buf.append(" completely received with ");
             buf.append(getCompleteSize()).append(" bytes");
         } else {
-            for (int i = 0; (_fragments != null) && (i < _fragments.length); i++) {
+            for (int i = 0; i < _lastFragment; i++) {
                 buf.append(" fragment ").append(i);
                 if (_fragments[i] != null)
                     buf.append(": known at size ").append(_fragments[i].getValid());

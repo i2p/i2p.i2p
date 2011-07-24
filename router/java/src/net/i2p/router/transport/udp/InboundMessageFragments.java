@@ -158,7 +158,7 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
                 state.releaseResources();
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Message expired while only being partially read: " + state);
-                _context.messageHistory().droppedInboundMessage(state.getMessageId(), state.getFrom(), "expired hile partially read: " + state.toString());
+                _context.messageHistory().droppedInboundMessage(state.getMessageId(), state.getFrom(), "expired while partially read: " + state.toString());
             } else if (partialACK) {
                 // not expired but not yet complete... lets queue up a partial ACK
                 if (_log.shouldLog(Log.DEBUG))

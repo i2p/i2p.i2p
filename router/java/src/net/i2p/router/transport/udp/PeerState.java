@@ -1248,26 +1248,22 @@ class PeerState {
     }
     
     /**
-     * return how long to wait before sending, or -1 if we have nothing to send
+     * @return how long to wait before sending, or Integer.MAX_VALUE if we have nothing to send.
+     *         If ready now, will return 0 or a negative value.
      */
     public int getNextDelay() {
-        int rv = -1;
+        int rv = Integer.MAX_VALUE;
+        if (_dead) return rv;
         long now = _context.clock().now();
         List<OutboundMessageState> msgs = _outboundMessages;
-        if (_dead) return -1;
         synchronized (msgs) {
             if (_retransmitter != null) {
                 rv = (int)(_retransmitter.getNextSendTime() - now);
-                if (rv <= 0)
-                    return 1;
-                else
-                    return rv;
+                return rv;
             }
             for (OutboundMessageState state : msgs) {
                 int delay = (int)(state.getNextSendTime() - now);
-                if (delay <= 0)
-                    delay = 1;
-                if ( (rv <= 0) || (delay < rv) )
+                if (delay < rv)
                     rv = delay;
             }
         }
