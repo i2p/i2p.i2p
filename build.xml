@@ -505,8 +505,11 @@
         <copy todir="pkg-temp/lib/wrapper/solaris/">
             <fileset dir="installer/lib/wrapper/solaris/" />
         </copy>
-        <copy todir="pkg-temp/lib/wrapper/linux-arm/">
-            <fileset dir="installer/lib/wrapper/linux-arm/" />
+        <copy todir="pkg-temp/lib/wrapper/linux-armv7/">
+            <fileset dir="installer/lib/wrapper/linux-armv7/" />
+        </copy>
+        <copy todir="pkg-temp/lib/wrapper/linux-armv5/">
+            <fileset dir="installer/lib/wrapper/linux-armv5/" />
         </copy>
     </target>
 

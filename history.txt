@@ -1,5 +1,7 @@
 2011-07-26 zzz
   * Installer: The previous wrapper files only work on armv7
+  * NativeBigInteger: Move libjbigi-linux-arm.so to libjbigi-linux-armv7.so,
+                      do ARM version detection in NBI.
   * NetDB:
     - Explore even more aggressively at startup
     - Increase SingleSearchJob timeout

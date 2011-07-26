@@ -9,6 +9,7 @@ package net.i2p.util;
  */
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,6 +29,7 @@ import freenet.support.CPUInformation.VIACPUInfo;
 import freenet.support.CPUInformation.UnknownCPUException;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
 
 /**
  * <p>BigInteger that takes advantage of the jbigi library for the modPow operation,
@@ -629,6 +631,35 @@ public class NativeBigInteger extends BigInteger {
                 // athlon64_64 is always a fallback for 64 bit
                 rv.add(_libPrefix + getMiddleName1() + JBIGI_OPTIMIZATION_ATHLON64 + "_64" + _libSuffix);
             }
+
+            if (_isArm) {
+                InputStream in = null;
+                try {
+                    in = new FileInputStream("/proc/cpuinfo");
+                    while (true) {
+                        String line = DataHelper.readLine(in);
+                        if (line == null)
+                            break;
+                        if (!line.startsWith("CPU architecture"))
+                            continue;
+                        //CPU architecture: 5TEJ
+                        //CPU architecture: 7
+                        int colon = line.indexOf(": ");
+                        String sver = line.substring(colon + 2, colon + 3);
+                        int ver = Integer.parseInt(sver);
+                        // add libjbigi-linux-armv7.so, libjbigi-linux-armv6.so, ...
+                        for (int i = ver; i >= 3; i--) {
+                            rv.add(_libPrefix + getMiddleName1() + primary + 'v' + i + _libSuffix);
+                        }
+                        break;
+                    }
+                } catch (NumberFormatException nfe) {
+                } catch (IOException ioe) {
+                } finally {
+                    if (in != null) try { in.close(); } catch (IOException ioe) {}
+                }
+            }
+
             // the preferred selection
             rv.add(_libPrefix + getMiddleName1() + primary + _libSuffix);
 
