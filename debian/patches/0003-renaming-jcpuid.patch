@@ -3,8 +3,8 @@ Date: Tue, 24 May 2011 21:26:10 +0000
 Subject: rename jcpuid
 
 ---
- core/c/jcpuid/build.sh |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+ core/c/jcpuid/build.sh |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
 
 --- a/core/c/jcpuid/build.sh
 +++ b/core/c/jcpuid/build.sh
@@ -24,7 +24,7 @@ Subject: rename jcpuid
 -	LINKFLAGS="-shared -Wl,-soname,libjcpuid-x86-linux.so"
 -	LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-x86-linux.so";;
 +	LINKFLAGS="-shared -Wl,-soname,libjcpuid.so"
-+	LIBFILE="lib/freenet/support/CPUInformation/libjcpuid.so";;
++	LIBFILE="../jbigi/libjcpuid.so";;
  esac
  
  echo "Compiling C code..."
