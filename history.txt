@@ -1,4 +1,5 @@
 2011-07-26 zzz
+  * Installer: The previous wrapper files only work on armv7
   * NetDB:
     - Explore even more aggressively at startup
     - Increase SingleSearchJob timeout
