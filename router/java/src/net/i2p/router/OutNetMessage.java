@@ -49,7 +49,7 @@ public class OutNetMessage {
     private Set<String> _failedTransports;
     private long _sendBegin;
     private long _transmitBegin;
-    private Exception _createdBy;
+    //private Exception _createdBy;
     private final long _created;
     /** for debugging, contains a mapping of even name to Long (e.g. "begin sending", "handleOutbound", etc) */
     private HashMap<String, Long> _timestamps;
@@ -66,11 +66,12 @@ public class OutNetMessage {
     public OutNetMessage(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(OutNetMessage.class);
-        setPriority(-1);
-        setExpiration(-1);
+        _priority = -1;
+        _expiration = -1;
         //_createdBy = new Exception("Created by");
         _created = context.clock().now();
-        timestamp("Created");
+        if (_log.shouldLog(Log.INFO))
+            timestamp("Created");
         //_context.messageStateMonitor().outboundMessageAdded();
         //_context.statManager().createRateStat("outNetMessage.timeToDiscard", 
         //                                      "How long until we discard an outbound msg?",
@@ -78,7 +79,8 @@ public class OutNetMessage {
     }
     
     /**
-     * Stamp the message's progress
+     * Stamp the message's progress.
+     * Only useful if log level is INFO or DEBUG
      *
      * @param eventName what occurred 
      * @return how long this message has been 'in flight'
@@ -119,9 +121,9 @@ public class OutNetMessage {
                 return _timestamps.get(eventName);
             }
         }
-        return ZERO;
+        return Long.valueOf(0);
     }
-    private static final Long ZERO = Long.valueOf(0);
+
     private void locked_initTimestamps() {
         if (_timestamps == null) {
             _timestamps = new HashMap(8);
@@ -129,7 +131,11 @@ public class OutNetMessage {
         }
     }
     
-    public Exception getCreatedBy() { return _createdBy; }
+    /**
+     * @deprecated
+     * @return null always
+     */
+    public Exception getCreatedBy() { return null; }
     
     /**
      * Specifies the router to which the message should be delivered.
@@ -297,10 +303,11 @@ public class OutNetMessage {
         super.finalize();
     }
     */
+
     @Override
     public String toString() {
-        StringBuilder buf = new StringBuilder(128);
-        buf.append("[OutNetMessage contains ");
+        StringBuilder buf = new StringBuilder(256);
+        buf.append("[OutNetMessage containing ");
         if (_message == null) {
             buf.append("*no message*");
         } else {
@@ -322,15 +329,19 @@ public class OutNetMessage {
             buf.append(" with onFailedReply job: ").append(_onFailedReply);
         if (_onFailedSend != null)
             buf.append(" with onFailedSend job: ").append(_onFailedSend);
-        buf.append(" {timestamps: \n");
-        renderTimestamps(buf);
-        buf.append("}");
+        if (_log.shouldLog(Log.INFO)) {
+            buf.append(" {timestamps: \n");
+            renderTimestamps(buf);
+            buf.append("}");
+        }
         buf.append("]");
         return buf.toString();
     }
     
+    /**
+     *  Only useful if log level is INFO or DEBUG
+     */
     private void renderTimestamps(StringBuilder buf) {
-        if (_log.shouldLog(Log.INFO)) {
             synchronized (this) {
                 long lastWhen = -1;
                 for (int i = 0; i < _timestampOrder.size(); i++) {
@@ -350,7 +361,6 @@ public class OutNetMessage {
                     lastWhen = when.longValue();
                 }
             }
-        } 
     }
     
     private final static SimpleDateFormat _fmt = new SimpleDateFormat("HH:mm:ss.SSS");
@@ -361,19 +371,21 @@ public class OutNetMessage {
         }
     }
     
+/****
+
     @Override
     public int hashCode() {
-        int rv = 0;
-        rv += DataHelper.hashCode(_message);
-        rv += DataHelper.hashCode(_target);
+        int rv = DataHelper.hashCode(_message);
+        rv ^= DataHelper.hashCode(_target);
         // the others are pretty much inconsequential
         return rv;
     }
     
     @Override
     public boolean equals(Object obj) {
-        if(obj == null) return false;
-        if(!(obj instanceof OutNetMessage)) return false;
+        //if(obj == null) return false;
+        //if(!(obj instanceof OutNetMessage)) return false;
         return obj == this; // two OutNetMessages are different even if they contain the same message
     }
+****/
 }
