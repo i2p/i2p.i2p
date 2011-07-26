@@ -349,8 +349,8 @@ class BuildHandler {
             RouterInfo ri = getContext().netDb().lookupRouterInfoLocally(_nextPeer);
             if (ri != null)
                 handleReq(ri, _state, _req, _nextPeer);
-            else
-                _log.error("Deferred successfully, but we couldnt find " + _nextPeer.toBase64() + "?");
+            else if (_log.shouldLog(Log.WARN))
+                _log.warn("Deferred successfully, but we couldnt find " + _nextPeer.toBase64() + "?");
         }
     }
 
