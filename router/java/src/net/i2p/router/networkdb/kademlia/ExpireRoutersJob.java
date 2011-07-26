@@ -25,6 +25,7 @@ import net.i2p.util.Log;
  * or other criteria to minimize netdb size, but for now we just use _facade's
  * validate(), which is a sliding expriation based on netdb size.
  *
+ * @deprecated unused - see comments in KNDF
  */
 class ExpireRoutersJob extends JobImpl {
     private final Log _log;

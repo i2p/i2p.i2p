@@ -43,6 +43,7 @@ import net.i2p.router.networkdb.DatabaseLookupMessageHandler;
 import net.i2p.router.networkdb.DatabaseStoreMessageHandler;
 import net.i2p.router.networkdb.PublishLocalRouterInfoJob;
 import net.i2p.router.peermanager.PeerProfile;
+import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 
 /**
@@ -55,7 +56,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private DataStore _ds; // hash to DataStructure mapping, persisted when necessary
     /** where the data store is pushing the data */
     private String _dbDir;
-    private final Set<Hash> _exploreKeys = new HashSet(64); // set of Hash objects that we should search on (to fill up a bucket, not to get data)
+    // set of Hash objects that we should search on (to fill up a bucket, not to get data)
+    private final Set<Hash> _exploreKeys = new ConcurrentHashSet(64);
     private boolean _initialized;
     /** Clock independent time of when we started up */
     private long _started;
@@ -167,26 +169,23 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             _exploreJob.updateExploreSchedule();
     }
     
+    /** @return unmodifiable set */
     public Set<Hash> getExploreKeys() {
-        if (!_initialized) return null;
-        synchronized (_exploreKeys) {
-            return new HashSet(_exploreKeys);
-        }
+        if (!_initialized)
+            return Collections.EMPTY_SET;
+        return Collections.unmodifiableSet(_exploreKeys);
     }
     
-    public void removeFromExploreKeys(Set toRemove) {
+    public void removeFromExploreKeys(Set<Hash> toRemove) {
         if (!_initialized) return;
-        synchronized (_exploreKeys) {
-            _exploreKeys.removeAll(toRemove);
-            _context.statManager().addRateData("netDb.exploreKeySet", _exploreKeys.size(), 0);
-        }
+        _exploreKeys.removeAll(toRemove);
+        _context.statManager().addRateData("netDb.exploreKeySet", _exploreKeys.size(), 0);
     }
-    public void queueForExploration(Set keys) {
+
+    public void queueForExploration(Set<Hash> keys) {
         if (!_initialized) return;
-        synchronized (_exploreKeys) {
-            _exploreKeys.addAll(keys);
-            _context.statManager().addRateData("netDb.exploreKeySet", _exploreKeys.size(), 0);
-        }
+        _exploreKeys.addAll(keys);
+        _context.statManager().addRateData("netDb.exploreKeySet", _exploreKeys.size(), 0);
     }
     
     public void shutdown() {
@@ -215,7 +214,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         else
             _enforceNetId = DEFAULT_ENFORCE_NETID;
         _ds.restart();
-        synchronized (_exploreKeys) { _exploreKeys.clear(); }
+        _exploreKeys.clear();
 
         _initialized = true;
         
@@ -474,9 +473,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 } else {
                     fail(key);
                     // this was an interesting key, so either refetch it or simply explore with it
-                    synchronized (_exploreKeys) {
-                        _exploreKeys.add(key);
-                    }
+                    _exploreKeys.add(key);
                     return null;
                 }
             } else {
@@ -709,6 +706,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * given what we know now.
      *
      * TODO this is called several times, only check the key and signature once
+     *
+     * @return reason why the entry is not valid, or null if it is valid
      */
     String validate(Hash key, RouterInfo routerInfo) throws IllegalArgumentException {
         long now = _context.clock().now();

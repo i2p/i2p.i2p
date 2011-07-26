@@ -14,18 +14,24 @@ import net.i2p.util.Log;
  *
  */
 class SingleSearchJob extends FloodOnlySearchJob {
-    Hash _to;
-    OutNetMessage _onm;
+    private final Hash _to;
+    private OutNetMessage _onm;
+
+    private static final int TIMEOUT = 8*1000;
+
     public SingleSearchJob(RouterContext ctx, Hash key, Hash to) {
         // warning, null FloodfillNetworkDatabaseFacade ...
         // define our own failed() and success() below so _facade isn't used.
-        super(ctx, null, key, null, null, 5*1000, false);
+        super(ctx, null, key, null, null, TIMEOUT, false);
         _to = to;
     }
+
     @Override
     public String getName() { return "NetDb search key from DSRM"; }
+
     @Override
     public boolean shouldProcessDSRM() { return false; } // don't loop
+
     @Override
     public void runJob() {
         _onm = getContext().messageRegistry().registerPending(_replySelector, _onReply, _onTimeout, _timeoutMs);
@@ -46,10 +52,12 @@ class SingleSearchJob extends FloodOnlySearchJob {
         getContext().tunnelDispatcher().dispatchOutbound(dlm, outTunnel.getSendTunnelId(0), _to);
         _lookupsRemaining = 1;
     }
+
     @Override
     void failed() {
         getContext().messageRegistry().unregisterPending(_onm);
     }
+
     @Override
     void success() {}
 }

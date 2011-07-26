@@ -8,20 +8,23 @@ import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 class FloodOnlyLookupSelector implements MessageSelector {
-    private RouterContext _context;
-    private FloodOnlySearchJob _search;
+    private final RouterContext _context;
+    private final FloodOnlySearchJob _search;
     private boolean _matchFound;
-    private Log _log;
+    private final Log _log;
+
     public FloodOnlyLookupSelector(RouterContext ctx, FloodOnlySearchJob search) {
         _context = ctx;
         _search = search;
         _log = ctx.logManager().getLog(getClass());
-        _matchFound = false;
     }
+
     public boolean continueMatching() { 
         return _search.getLookupsRemaining() > 0 && !_matchFound && _context.clock().now() < getExpiration(); 
     }
+
     public long getExpiration() { return (_matchFound ? -1 : _search.getExpiration()); }
+
     public boolean isMatch(I2NPMessage message) {
         if (message == null) return false;
         if (message instanceof DatabaseStoreMessage) {

@@ -38,14 +38,14 @@ import net.i2p.util.Log;
  */
 class FloodOnlySearchJob extends FloodSearchJob {
     private volatile boolean _dead;
-    private long _created;
+    private final long _created;
     private boolean _shouldProcessDSRM;
     private final HashSet<Hash> _unheardFrom;
     
     private final List<OutNetMessage> _out;
-    protected MessageSelector _replySelector;
-    protected ReplyJob _onReply;
-    protected Job _onTimeout;
+    protected final MessageSelector _replySelector;
+    protected final ReplyJob _onReply;
+    protected final Job _onTimeout;
 
     public FloodOnlySearchJob(RouterContext ctx, FloodfillNetworkDatabaseFacade facade, Hash key, Job onFind, Job onFailed, int timeoutMs, boolean isLease) {
         super(ctx, facade, key, onFind, onFailed, timeoutMs, isLease);
@@ -61,7 +61,6 @@ class FloodOnlySearchJob extends FloodSearchJob {
         _onReply = new FloodOnlyLookupMatchJob(getContext(), this);
         _onTimeout = new FloodOnlyLookupTimeoutJob(getContext(), this);
         _created = System.currentTimeMillis();
-        _shouldProcessDSRM = false;
     }
 
     public long getCreated() { return _created; }
@@ -90,7 +89,7 @@ class FloodOnlySearchJob extends FloodSearchJob {
         // or the global network routing key just changed (which is set at statrtup,
         // so this includes the first few minutes of uptime)
         _shouldProcessDSRM = floodfillPeers.size() < MIN_FOR_NO_DSRM ||
-                             getContext().routingKeyGenerator().getLastChanged() > getContext().clock().now() - 30*60*1000;
+                             getContext().routingKeyGenerator().getLastChanged() > getContext().clock().now() - 60*60*1000;
 
         if (floodfillPeers.isEmpty()) {
             // ask anybody, they may not return the answer but they will return a few ff peers we can go look up,

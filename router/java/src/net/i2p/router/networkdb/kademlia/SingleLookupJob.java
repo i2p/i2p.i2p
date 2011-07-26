@@ -20,13 +20,15 @@ import net.i2p.util.Log;
  *
  */
 class SingleLookupJob extends JobImpl {
-    private Log _log;
-    private DatabaseSearchReplyMessage _dsrm;
+    private final Log _log;
+    private final DatabaseSearchReplyMessage _dsrm;
+
     public SingleLookupJob(RouterContext ctx, DatabaseSearchReplyMessage dsrm) {
         super(ctx);
         _log = ctx.logManager().getLog(getClass());
         _dsrm = dsrm;
     }
+
     public void runJob() { 
         Hash from = _dsrm.getFromHash();
         for (int i = 0; i < _dsrm.getNumReplies(); i++) {
@@ -43,5 +45,6 @@ class SingleLookupJob extends JobImpl {
                 getContext().jobQueue().addJob(new SingleSearchJob(getContext(), peer, peer));
         }
     }
+
     public String getName() { return "NetDb process DSRM"; }
 }

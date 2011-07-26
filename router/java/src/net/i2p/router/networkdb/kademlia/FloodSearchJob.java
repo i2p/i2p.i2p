@@ -30,14 +30,14 @@ import net.i2p.util.Log;
  */
 public class FloodSearchJob extends JobImpl {
     protected Log _log;
-    protected FloodfillNetworkDatabaseFacade _facade;
-    protected Hash _key;
+    protected final FloodfillNetworkDatabaseFacade _facade;
+    protected final Hash _key;
     protected final List<Job> _onFind;
     protected final List<Job> _onFailed;
     protected long _expiration;
     protected int _timeoutMs;
     protected long _origExpiration;
-    protected boolean _isLease;
+    protected final boolean _isLease;
     protected volatile int _lookupsRemaining;
     protected volatile boolean _dead;
 

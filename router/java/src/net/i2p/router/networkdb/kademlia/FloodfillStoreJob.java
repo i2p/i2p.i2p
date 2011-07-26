@@ -25,7 +25,8 @@ import net.i2p.util.Log;
  *
  */
 class FloodfillStoreJob extends StoreJob {    
-    private FloodfillNetworkDatabaseFacade _facade;
+    private final FloodfillNetworkDatabaseFacade _facade;
+
     /**
      * Send a data structure to the floodfills
      * 
@@ -45,6 +46,7 @@ class FloodfillStoreJob extends StoreJob {
 
     @Override
     protected int getParallelization() { return 1; }
+
     @Override
     protected int getRedundancy() { return 1; }
 

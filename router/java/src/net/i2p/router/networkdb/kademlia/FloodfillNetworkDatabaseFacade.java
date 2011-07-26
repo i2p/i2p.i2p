@@ -44,7 +44,6 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     public FloodfillNetworkDatabaseFacade(RouterContext context) {
         super(context);
         _activeFloodQueries = new HashMap();
-         _floodfillEnabled = false;
          _verifiesInProgress = new ConcurrentHashSet(8);
         _alwaysQuery = _context.getProperty("netDb.alwaysQuery");
 
@@ -406,8 +405,8 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     }
     
     private class DropLookupFailedJob extends JobImpl {
-        private Hash _peer;
-        private RouterInfo _info;
+        private final Hash _peer;
+        private final RouterInfo _info;
     
         public DropLookupFailedJob(RouterContext ctx, Hash peer, RouterInfo info) {
             super(ctx);
@@ -419,9 +418,10 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             dropAfterLookupFailed(_peer, _info);
         }
     }
+
     private class DropLookupFoundJob extends JobImpl {
-        private Hash _peer;
-        private RouterInfo _info;
+        private final Hash _peer;
+        private final RouterInfo _info;
     
         public DropLookupFoundJob(RouterContext ctx, Hash peer, RouterInfo info) {
             super(ctx);

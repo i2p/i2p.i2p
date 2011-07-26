@@ -12,15 +12,16 @@ import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 class FloodOnlyLookupMatchJob extends JobImpl implements ReplyJob {
-    private Log _log;
-    private FloodOnlySearchJob _search;
+    private final Log _log;
+    private final FloodOnlySearchJob _search;
     private DatabaseSearchReplyMessage _dsrm;
+
     public FloodOnlyLookupMatchJob(RouterContext ctx, FloodOnlySearchJob job) {
         super(ctx);
         _log = ctx.logManager().getLog(getClass());
         _search = job;
-        _dsrm = null;
     }
+
     public void runJob() { 
         if ( (getContext().netDb().lookupLeaseSetLocally(_search.getKey()) != null) ||
              (getContext().netDb().lookupRouterInfoLocally(_search.getKey()) != null) ) {
@@ -44,7 +45,9 @@ class FloodOnlyLookupMatchJob extends JobImpl implements ReplyJob {
             _search.failed();
         }
     }
+
     public String getName() { return "NetDb flood search (phase 1) match"; }
+
     public void setMessage(I2NPMessage message) {
         if (message instanceof DatabaseSearchReplyMessage) {
             // a dsrm is only passed in when there are no more lookups remaining

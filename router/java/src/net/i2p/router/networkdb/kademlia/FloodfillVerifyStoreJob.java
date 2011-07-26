@@ -25,15 +25,15 @@ import net.i2p.util.Log;
  *
  */
 public class FloodfillVerifyStoreJob extends JobImpl {
-    private Log _log;
-    private Hash _key;
+    private final Log _log;
+    private final Hash _key;
     private Hash _target;
-    private Hash _sentTo;
-    private FloodfillNetworkDatabaseFacade _facade;
+    private final Hash _sentTo;
+    private final FloodfillNetworkDatabaseFacade _facade;
     private long _expiration;
     private long _sendTime;
     private long _published;
-    private boolean _isRouterInfo;
+    private final boolean _isRouterInfo;
     private MessageWrapper.WrappedMessage _wrappedMessage;
     private final Set<Hash> _ignore;
     
@@ -64,6 +64,7 @@ public class FloodfillVerifyStoreJob extends JobImpl {
         getContext().statManager().createRateStat("netDb.floodfillVerifyFail", "How long a floodfill verify takes when it fails", "NetworkDatabase", new long[] { 60*60*1000 });
         getContext().statManager().createRateStat("netDb.floodfillVerifyTimeout", "How long a floodfill verify takes when it times out", "NetworkDatabase", new long[] { 60*60*1000 });
     }
+
     public String getName() { return "Verify netdb store"; }
 
     /**
