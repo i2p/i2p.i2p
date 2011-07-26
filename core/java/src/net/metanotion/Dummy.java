@@ -1,4 +1,4 @@
-package net.matanotion;
+package net.metanotion;
 
 /**  
  * Exists only to enable package.html to be included in javadoc.
