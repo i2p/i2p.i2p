@@ -1,3 +1,6 @@
+2011-07-27 kytv
+  * Add armel (armv5tejl) wrapper. Compiled and tested in Debian Squeeze.
+
 2011-07-26 zzz
   * Installer: The previous wrapper files only work on armv7
   * NativeBigInteger: Move libjbigi-linux-arm.so to libjbigi-linux-armv7.so,
