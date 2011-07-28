@@ -286,6 +286,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         // should we share the clientPeerSelector across both inbound and outbound?
         // or just one for all clients? why separate?
 
+        boolean delayOutbound = false;
         // synch with removeTunnels() below
         synchronized (this) {
             inbound = _clientInboundPools.get(dest);
@@ -301,12 +302,18 @@ public class TunnelPoolManager implements TunnelManagerFacade {
                 outbound = new TunnelPool(_context, this, settings.getOutboundSettings(), 
                                           new ClientPeerSelector());
                 _clientOutboundPools.put(dest, outbound);
+                delayOutbound = true;
             } else {
                 outbound.setSettings(settings.getOutboundSettings());
             }
         }
         inbound.startup();
-        SimpleScheduler.getInstance().addEvent(new DelayedStartup(outbound), 3*1000);
+        // don't delay the outbound if it already exists, as this opens up a large
+        // race window with removeTunnels() below
+        if (delayOutbound)
+            SimpleScheduler.getInstance().addEvent(new DelayedStartup(outbound), 1000);
+        else
+            outbound.startup();
     }
     
     
@@ -331,8 +338,10 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Removing tunnels for the client " + destination);
         if (_context.clientManager().isLocal(destination)) {
-            if (_log.shouldLog(Log.CRIT))
-                _log.log(Log.CRIT, "wtf, why are you removing the pool for " + destination.toBase64(), new Exception("i did it"));
+            // race with buildTunnels() on restart of a client
+            if (_log.shouldLog(Log.ERROR))
+                _log.error("Not removing pool still registered with client manager: " + destination.toBase64(), new Exception("i did it"));
+            return;
         }
         TunnelPool inbound = _clientInboundPools.remove(destination);
         TunnelPool outbound = _clientOutboundPools.remove(destination);

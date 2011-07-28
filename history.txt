@@ -1,3 +1,8 @@
+2011-07-28 zzz
+  * Context: Split up big lock to avoid deadlocks
+  * Streaming: Avoid a rare exception on race
+  * TunnelPoolManager: Reduce race window for restarting a tunnel pool
+
 2011-07-27 kytv
   * Add armel (armv5tejl) wrapper. Compiled and tested in Debian Squeeze.
 
