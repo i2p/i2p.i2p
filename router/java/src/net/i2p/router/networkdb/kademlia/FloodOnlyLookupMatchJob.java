@@ -23,8 +23,7 @@ class FloodOnlyLookupMatchJob extends JobImpl implements ReplyJob {
     }
 
     public void runJob() { 
-        if ( (getContext().netDb().lookupLeaseSetLocally(_search.getKey()) != null) ||
-             (getContext().netDb().lookupRouterInfoLocally(_search.getKey()) != null) ) {
+        if (getContext().netDb().lookupLocally(_search.getKey()) != null) {
             if (_log.shouldLog(Log.INFO))
                 _log.info(_search.getJobId() + ": search match and found locally");
             _search.success();

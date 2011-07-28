@@ -190,6 +190,7 @@ class FloodOnlySearchJob extends FloodSearchJob {
             failed();
         }
     }
+
     @Override
     public String getName() { return "NetDb flood search (phase 1)"; }
     
@@ -224,11 +225,12 @@ class FloodOnlySearchJob extends FloodSearchJob {
         getContext().statManager().addRateData("netDb.failedTime", System.currentTimeMillis()-_created, System.currentTimeMillis()-_created);
         synchronized (_onFailed) {
             for (int i = 0; i < _onFailed.size(); i++) {
-                Job j = (Job)_onFailed.remove(0);
+                Job j = _onFailed.remove(0);
                 getContext().jobQueue().addJob(j);
             }
         }
     }
+
     @Override
     void success() {
         synchronized (this) {
@@ -255,7 +257,7 @@ class FloodOnlySearchJob extends FloodSearchJob {
         getContext().statManager().addRateData("netDb.successTime", System.currentTimeMillis()-_created, System.currentTimeMillis()-_created);
         synchronized (_onFind) {
             while (!_onFind.isEmpty())
-                getContext().jobQueue().addJob((Job)_onFind.remove(0));
+                getContext().jobQueue().addJob(_onFind.remove(0));
         }
     }
 }
