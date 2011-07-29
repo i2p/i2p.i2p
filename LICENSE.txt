@@ -41,8 +41,8 @@ Public domain except as listed below:
    See licenses/LICENSE-SHA256.txt
 
    AES code:
-   Under the Cryptix (MIT) license, written by the Cryptix team
-   (That's what our website says but all our AES code looks like it is public domain)
+   Copyright (c) 1995-2005 The Cryptix Foundation Limited.
+   See licenses/LICENSE-Cryptix.txt
 
    Crypto filters:
    From the xlattice app - http://xlattice.sourceforge.net/
