@@ -78,8 +78,8 @@ public class ProfileOrganizer {
     public static final String PROP_MINIMUM_FAST_PEERS = "profileOrganizer.minFastPeers";
     public static final int DEFAULT_MINIMUM_FAST_PEERS = 8;
     /** this is misnamed, it is really the max minimum number. */
-    private static final int DEFAULT_MAXIMUM_FAST_PEERS = 18;
-    private static final int ABSOLUTE_MAX_FAST_PEERS = 60;
+    private static final int DEFAULT_MAXIMUM_FAST_PEERS = 40;
+    private static final int ABSOLUTE_MAX_FAST_PEERS = 75;
 
     /**
      * Defines the minimum number of 'high capacity' peers that the organizer should 
@@ -1406,7 +1406,7 @@ public class ProfileOrganizer {
      * This parameter should help deal with a lack of diversity in the tunnels created when some 
      * peers are particularly fast.
      *
-     * Increase default by two for every local destination, up to a max.
+     * Increase default for every local destination, up to a max.
      *
      * @return minimum number of peers to be placed in the 'fast' group
      */
