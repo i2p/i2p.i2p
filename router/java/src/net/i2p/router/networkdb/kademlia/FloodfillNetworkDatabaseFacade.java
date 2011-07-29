@@ -33,7 +33,7 @@ import net.i2p.util.Log;
  */
 public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacade {
     public static final char CAPABILITY_FLOODFILL = 'f';
-    private final Map _activeFloodQueries;
+    private final Map<Hash, FloodSearchJob> _activeFloodQueries;
     private boolean _floodfillEnabled;
     /** for testing, see isFloodfill() below */
     private static String _alwaysQuery;
@@ -250,7 +250,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         boolean isNew = false;
         FloodSearchJob searchJob = null;
         synchronized (_activeFloodQueries) {
-            searchJob = (FloodSearchJob)_activeFloodQueries.get(key);
+            searchJob = _activeFloodQueries.get(key);
             if (searchJob == null) {
                 //if (SearchJob.onlyQueryFloodfillPeers(_context)) {
                     searchJob = new FloodOnlySearchJob(_context, this, key, onFindJob, onFailedLookupJob, (int)timeoutMs, isLease);
@@ -325,6 +325,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             }
         }
     }
+
     void complete(Hash key) {
         synchronized (_activeFloodQueries) { _activeFloodQueries.remove(key); }
     }

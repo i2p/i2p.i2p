@@ -14,7 +14,6 @@ import net.i2p.util.Log;
 class FloodOnlyLookupMatchJob extends JobImpl implements ReplyJob {
     private final Log _log;
     private final FloodOnlySearchJob _search;
-    private DatabaseSearchReplyMessage _dsrm;
 
     public FloodOnlyLookupMatchJob(RouterContext ctx, FloodOnlySearchJob job) {
         super(ctx);
@@ -28,19 +27,8 @@ class FloodOnlyLookupMatchJob extends JobImpl implements ReplyJob {
                 _log.info(_search.getJobId() + ": search match and found locally");
             _search.success();
         } else {
-            int remaining = _search.getLookupsRemaining();
-            if (_log.shouldLog(Log.INFO))
-                _log.info(_search.getJobId() + ": got a DatabaseSearchReply when we were looking for " 
-                          + _search.getKey().toBase64() + ", with " + remaining + " outstanding searches");
-            // netDb reply pointing us at other people
-            // Only process if we don't know enough floodfills
-            // This only works if both reply, otherwise we aren't called - should be fixed
-            if (_search.shouldProcessDSRM() && _dsrm != null) {
-                if (_log.shouldLog(Log.INFO))
-                    _log.info(_search.getJobId() + ": Processing DatabaseSearchReply");
-                // Chase the hashes from the reply
-                getContext().jobQueue().addJob(new SingleLookupJob(getContext(), _dsrm));
-            }
+            // In practice, we always have zero remaining when this is called,
+            // because the selector only returns true when there is zero remaining
             _search.failed();
         }
     }
@@ -49,11 +37,9 @@ class FloodOnlyLookupMatchJob extends JobImpl implements ReplyJob {
 
     public void setMessage(I2NPMessage message) {
         if (message instanceof DatabaseSearchReplyMessage) {
+            // DSRM processing now in FloodOnlyLookupSelector instead of here,
             // a dsrm is only passed in when there are no more lookups remaining
-            // If more than one peer sent one, we only process the last one
-            // And sadly if the first peer sends a DRSM and the second one times out,
-            // this won't get called...
-            _dsrm = (DatabaseSearchReplyMessage) message;
+            // so that all DSRM's are processed, not just the last one.
             _search.failed();
             return;
         }

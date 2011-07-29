@@ -29,7 +29,7 @@ import net.i2p.util.Log;
  * Note that this does NOT extend SearchJob.
  */
 public class FloodSearchJob extends JobImpl {
-    protected Log _log;
+    protected final Log _log;
     protected final FloodfillNetworkDatabaseFacade _facade;
     protected final Hash _key;
     protected final List<Job> _onFind;
@@ -43,24 +43,22 @@ public class FloodSearchJob extends JobImpl {
 
     public FloodSearchJob(RouterContext ctx, FloodfillNetworkDatabaseFacade facade, Hash key, Job onFind, Job onFailed, int timeoutMs, boolean isLease) {
         super(ctx);
-        _log = ctx.logManager().getLog(FloodSearchJob.class);
+        _log = ctx.logManager().getLog(getClass());
         _facade = facade;
         _key = key;
-        _onFind = new ArrayList();
+        _onFind = new ArrayList(4);
         _onFind.add(onFind);
-        _onFailed = new ArrayList();
+        _onFailed = new ArrayList(4);
         _onFailed.add(onFailed);
-        int timeout = -1;
-        timeout = timeoutMs / FLOOD_SEARCH_TIME_FACTOR;
+        int timeout = timeoutMs / FLOOD_SEARCH_TIME_FACTOR;
         if (timeout < timeoutMs)
             timeout = timeoutMs;
         _timeoutMs = timeout;
         _expiration = timeout + ctx.clock().now();
         _origExpiration = timeoutMs + ctx.clock().now();
         _isLease = isLease;
-        _lookupsRemaining = 0;
-        _dead = false;
     }
+
     void addDeferred(Job onFind, Job onFailed, long timeoutMs, boolean isLease) {
         if (_dead) {
             getContext().jobQueue().addJob(onFailed);
@@ -69,10 +67,14 @@ public class FloodSearchJob extends JobImpl {
             if (onFailed != null) synchronized (_onFailed) { _onFailed.add(onFailed); }
         }
     }
+
+    /** using context clock */
     public long getExpiration() { return _expiration; }
-    private static final int CONCURRENT_SEARCHES = 2;
+
+    protected static final int CONCURRENT_SEARCHES = 2;
     private static final int FLOOD_SEARCH_TIME_FACTOR = 2;
     private static final int FLOOD_SEARCH_TIME_MIN = 30*1000;
+
     public void runJob() {
         // pick some floodfill peers and send out the searches
         List floodfillPeers = _facade.getFloodfillPeers();
@@ -120,10 +122,21 @@ public class FloodSearchJob extends JobImpl {
             _facade.searchFull(_key, _onFind, _onFailed, _timeoutMs*FLOOD_SEARCH_TIME_FACTOR, _isLease);
         }
     }
+
     public String getName() { return "NetDb search (phase 1)"; }
     
     protected Hash getKey() { return _key; }
-    protected void decrementRemaining() { if (_lookupsRemaining > 0) _lookupsRemaining--; }
+
+    /**
+     *  TODO AtomicInteger?
+     *  @return number remaining after decrementing
+     */
+    protected int decrementRemaining() {
+        if (_lookupsRemaining > 0)
+            return (--_lookupsRemaining);
+        return 0;
+    }
+
     protected int getLookupsRemaining() { return _lookupsRemaining; }
     
     void failed() {
@@ -144,6 +157,7 @@ public class FloodSearchJob extends JobImpl {
                 getContext().jobQueue().addJob(removed.remove(0));
         }
     }
+
     void success() {
         if (_dead) return;
         if (_log.shouldLog(Log.INFO))
@@ -166,8 +180,8 @@ public class FloodSearchJob extends JobImpl {
             _search = job;
         }
         public void runJob() {
-            _search.decrementRemaining();
-            if (_search.getLookupsRemaining() <= 0)
+            int remaining = _search.decrementRemaining();
+            if (remaining <= 0)
                 _search.failed(); 
         }
         public String getName() { return "NetDb search (phase 1) timeout"; }

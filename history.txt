@@ -1,3 +1,11 @@
+2011-07-29 zzz
+  * Netdb Search:
+    - Follow all DSRM's, not just the last one, by moving the code
+      from the match job to the selector
+    - Update peer profile after SingleSearchJob
+    - Cleanups, javadocs, log tweaks, final
+  * ProfileOrganizer: Tweak fast tier size
+
 2011-07-28 zzz
   * Context: Split up big lock to avoid deadlocks
   * Streaming: Avoid a rare exception on race

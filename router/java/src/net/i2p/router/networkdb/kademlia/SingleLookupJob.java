@@ -5,7 +5,7 @@ import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
-import net.i2p.util.Log;
+//import net.i2p.util.Log;
 
 /**
  * Ask the peer who sent us the DSRM for the RouterInfos.
@@ -20,12 +20,12 @@ import net.i2p.util.Log;
  *
  */
 class SingleLookupJob extends JobImpl {
-    private final Log _log;
+    //private final Log _log;
     private final DatabaseSearchReplyMessage _dsrm;
 
     public SingleLookupJob(RouterContext ctx, DatabaseSearchReplyMessage dsrm) {
         super(ctx);
-        _log = ctx.logManager().getLog(getClass());
+        //_log = ctx.logManager().getLog(getClass());
         _dsrm = dsrm;
     }
 

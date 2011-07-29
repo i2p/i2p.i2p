@@ -56,8 +56,11 @@ class SingleSearchJob extends FloodOnlySearchJob {
     @Override
     void failed() {
         getContext().messageRegistry().unregisterPending(_onm);
+        getContext().profileManager().dbLookupFailed(_to);
     }
 
     @Override
-    void success() {}
+    void success() {
+        getContext().profileManager().dbLookupSuccessful(_to, System.currentTimeMillis()-_created);
+    }
 }
