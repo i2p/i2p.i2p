@@ -508,6 +508,9 @@
         <copy todir="pkg-temp/lib/wrapper/linux-armv7/">
             <fileset dir="installer/lib/wrapper/linux-armv7/" />
         </copy>
+	<copy todir="pkg-temp/lib/wrapper/linux-ppc/">
+	    <fileset dir="installer/lib/wrapper/linux-ppc/" />
+	</copy>
         <copy todir="pkg-temp/lib/wrapper/linux-armv5/">
             <fileset dir="installer/lib/wrapper/linux-armv5/" />
         </copy>
