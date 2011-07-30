@@ -96,8 +96,6 @@ public class ElGamalEngine {
         YKGenerator.restart();
     }
 
-    private final static BigInteger _two = new NativeBigInteger(1, new byte[] { 0x02});
-
     private BigInteger[] getNextYK() {
         return YKGenerator.getNextYK();
     }
