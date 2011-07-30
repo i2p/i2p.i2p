@@ -46,6 +46,9 @@ case $HOST_OS in
         elif [ `echo $OS_ARCH |grep arm` ]; then
             wrapperpath="./lib/wrapper/linux-armv5"
             cp ${wrapperpath}/libwrapper.so ./lib/
+	elif [ `echo $OS_ARCH |grep ppc` ]; then
+	    wrapperpath="./lib/wrapper/linux-ppc"
+	    cp ${wrapperpath}/libwrapper.so ./lib/
         elif [ "X$X86_64" = "X" ]; then
             wrapperpath="./lib/wrapper/linux"
             cp ${wrapperpath}/libwrapper.so ./lib/

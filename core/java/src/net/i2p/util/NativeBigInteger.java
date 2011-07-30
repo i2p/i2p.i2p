@@ -147,6 +147,7 @@ public class NativeBigInteger extends BigInteger {
      * @since 0.8.7
      */
     private final static String JBIGI_OPTIMIZATION_ARM        = "arm";
+    private final static String JBIGI_OPTIMIZATION_PPC	      = "ppc";
 
     /**
      * Operating systems
@@ -177,6 +178,8 @@ public class NativeBigInteger extends BigInteger {
 
     private static final boolean _isArm = System.getProperty("os.arch").startsWith("arm");
 
+    private static final boolean _isPPC = System.getProperty("os.arch").contains("ppc");
+
     /* libjbigi.so vs jbigi.dll */
     private static final String _libPrefix = (_isWin || _isOS2 ? "" : "lib");
     private static final String _libSuffix = (_isWin || _isOS2 ? ".dll" : _isMac ? ".jnilib" : ".so");
@@ -184,10 +187,12 @@ public class NativeBigInteger extends BigInteger {
     private final static String sCPUType; //The CPU Type to optimize for (one of the above strings)
     
     static {
-        if (_isX86) // Don't try to resolve CPU type on PPC and other non x86 hardware
+        if (_isX86) // Don't try to resolve CPU type on non x86 hardware
             sCPUType = resolveCPUType();
         else if (_isArm)
             sCPUType = JBIGI_OPTIMIZATION_ARM;
+        else if (_isPPC && !_isMac)
+	    sCPUType = JBIGI_OPTIMIZATION_PPC;
 	else
 	    sCPUType = null;
         loadNative();
@@ -690,7 +695,7 @@ public class NativeBigInteger extends BigInteger {
             rv.add(_libPrefix + getMiddleName1() + "none_64" + _libSuffix);
         // Add libjbigi-xxx-none.so
         // Note that libjbigi-osx-none.jnilib is a 'fat binary' with both PPC and x86-32
-        if (!_isArm)
+        if ((!_isArm)  || (!_isPPC && !_isMac))
             rv.add(getResourceName(false));
         return rv;
     }
