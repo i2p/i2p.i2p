@@ -43,10 +43,17 @@ X86_PLATFORMS="pentium pentiummmx pentium2 pentium3 pentiumm k6 k62 k63 athlon g
 MINGW_PLATFORMS="${X86_PLATFORMS} ${MISC_MINGW_PLATFORMS}"
 LINUX_PLATFORMS="${X86_PLATFORMS} ${MISC_LINUX_PLATFORMS}"
 FREEBSD_PLATFORMS="${X86_PLATFORMS} ${MISC_FREEBSD_PLATFORMS}"
-DARWIN_PLATFORMS="${X86_PLATFORMS} ${MISC_DARWIN_PLATFORMS}"
+DARWIN_PLATFORMS="core2 corei"
 
-# OSX doesn't have the -r parameter as an option for sed.
-VER=$(echo gmp-*.tar.bz2 | sed -re "s/(.*-)(.*)(.*.tar.bz2)$/\2/" | tail -n 1)
+# Set the version to 5.0.2 for OSX because 
+# 1) it doesn't have the -r parameter as an option for sed
+# 2) AFAIK there are only 64bit capable CPUs for the Intel Macs
+if [ `uname -s |grep Darwin` ]; then
+  	VER=5.0.2
+else
+	VER=$(echo gmp-*.tar.bz2 | sed -re "s/(.*-)(.*)(.*.tar.bz2)$/\2/" | tail -n 1)
+fi
+
 if [ "$VER" == "" ] ; then
 	echo "ERROR! Can't find gmp source tarball."
 	exit 1
@@ -123,7 +130,11 @@ function configure_file {
 	echo -e "\n\n\nAttempting configure for ${3}${5}${2}\n\n\n"
 	sleep 10
 	# Nonfatal bail out on unsupported platform.
-	../../gmp-${1}/configure --build=${2} --with-pic && return 0
+	if [ `uname -s |grep Darwin` ]; then
+		../../gmp-${1}/configure --build=${2}-apple-darwin --with-pic && return 0
+	else
+		../../gmp-${1}/configure --build=${2} --with-pic && return 0
+	fi
 	cd ..
 	rm -R "$2"
 	echo -e "\n\nSorry, ${3}${5}${2} is not supported on your build environment.\a"
