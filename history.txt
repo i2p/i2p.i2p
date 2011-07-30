@@ -1,3 +1,11 @@
+2011-07-30 kytv
+ * Installer: 
+   - add libjbigi*core*jnilib, libjbigi-osx-none_64.jnilib, and
+     libjbigi-linux-ppc.so
+   - Add Linux PPC wrapper
+ * Add linux-ppc to NBI.
+ * Remove unused lock
+
 2011-07-29 zzz
   * Netdb Search:
     - Follow all DSRM's, not just the last one, by moving the code
