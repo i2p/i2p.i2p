@@ -103,7 +103,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     protected final static long DONT_FAIL_PERIOD = 10*60*1000;
     
     /** don't probe or broadcast data, just respond and search when explicitly needed */
-    private boolean _quiet = false;
+    private final boolean QUIET = false;
     
     public static final String PROP_ENFORCE_NETID = "router.networkDatabase.enforceNetId";
     private static final boolean DEFAULT_ENFORCE_NETID = false;
@@ -256,7 +256,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _started = System.currentTimeMillis();
         
         // expire old leases
-        _context.jobQueue().addJob(new ExpireLeasesJob(_context, this));
+        Job elj = new ExpireLeasesJob(_context, this);
+        elj.getTiming().setStartAfter(_context.clock().now() + 2*60*1000);
+        _context.jobQueue().addJob(elj);
         
         // the ExpireRoutersJob never fired since the tunnel pool manager lied
         // and said all peers are in use (for no good reason), but this expire
@@ -265,7 +267,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         //// expire some routers in overly full kbuckets
         ////_context.jobQueue().addJob(new ExpireRoutersJob(_context, this));
         
-        if (!_quiet) {
+        if (!QUIET) {
             // fill the search queue with random keys in buckets that are too small
             // Disabled since KBucketImpl.generateRandomKey() is b0rked,
             // and anyway, we want to search for a completely random key,
@@ -283,7 +285,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             _exploreJob.getTiming().setStartAfter(_context.clock().now() + EXPLORE_JOB_DELAY);
             _context.jobQueue().addJob(_exploreJob);
             // if configured to do so, periodically try to get newer routerInfo stats
-            if (_harvestJob == null && "true".equals(_context.getProperty(HarvesterJob.PROP_ENABLED)))
+            if (_harvestJob == null && _context.getBooleanProperty(HarvesterJob.PROP_ENABLED))
                 _harvestJob = new HarvesterJob(_context, this);
             _context.jobQueue().addJob(_harvestJob);
         } else {
