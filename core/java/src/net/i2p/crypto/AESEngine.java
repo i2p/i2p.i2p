@@ -18,8 +18,9 @@ import net.i2p.util.RandomSource;
 
 /** 
  * Dummy wrapper for AES cipher operation.
- * UNUSED unless i2p.encryption = off
- * See CryptixAESEngine for the real thing.
+ * Warning - 
+ * most methods UNUSED unless i2p.encryption = off
+ * See CryptixAESEngine overrides for the real thing.
  */
 public class AESEngine {
     protected final Log _log;
@@ -38,7 +39,7 @@ public class AESEngine {
      * @param out where to store the result
      * @param outIndex where in out to start writing
      * @param sessionKey private esession key to encrypt to
-     * @param iv IV for CBC
+     * @param iv IV for CBC, must be 16 bytes
      * @param length how much data to encrypt
      */
     public void encrypt(byte payload[], int payloadIndex, byte out[], int outIndex, SessionKey sessionKey, byte iv[], int length) {
@@ -62,6 +63,15 @@ public class AESEngine {
         _log.logAlways(Log.WARN, "AES is disabled");
     }
 
+    /**
+     * Encrypt the SHA-256 Hash of the payload, the 4 byte length, and the payload,
+     * with random padding up to the paddedSize, rounded up to the next multiple of 16.
+     *
+     * @param paddedSize minimum size of the output
+     * @param iv IV for CBC, must be 16 bytes
+     * @return null on error
+     * @deprecated unused
+     */
     public byte[] safeEncrypt(byte payload[], SessionKey sessionKey, byte iv[], int paddedSize) {
         if ((iv == null) || (payload == null) || (sessionKey == null) || (iv.length != 16)) return null;
 
@@ -88,6 +98,14 @@ public class AESEngine {
         return data;
     }
 
+    /**
+     * See safeEncrypt() for description.
+     * WARNING - no check for maximum length here, OOM DOS possible, fix it if you're going to use this.
+     *
+     * @param iv IV for CBC, must be 16 bytes
+     * @return null on error
+     * @deprecated unused
+     */
     public byte[] safeDecrypt(byte payload[], SessionKey sessionKey, byte iv[]) {
         if ((iv == null) || (payload == null) || (sessionKey == null) || (iv.length != 16)) return null;
 
