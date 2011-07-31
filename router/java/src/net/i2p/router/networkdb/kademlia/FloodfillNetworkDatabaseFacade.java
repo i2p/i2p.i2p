@@ -65,6 +65,11 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         super.startup();
         _context.jobQueue().addJob(new FloodfillMonitorJob(_context, this));
         _lookupThrottler = new LookupThrottler();
+
+        // refresh old routers
+        Job rrj = new RefreshRoutersJob(_context, this);
+        rrj.getTiming().setStartAfter(_context.clock().now() + 5*60*1000);
+        _context.jobQueue().addJob(rrj);
     }
 
     @Override

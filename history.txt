@@ -1,3 +1,10 @@
+2011-07-31 zzz
+  * Crypto: Implement and then comment out an alternate
+            AES-256/CBC implementation using the JVM crypto libs,
+            and tests, it isn't faster
+  * Netdb: Add a job to refresh all the old router infos at startup,
+           to speed integration
+
 2011-07-30 kytv
  * Installer: 
    - add libjbigi*core*jnilib, libjbigi-osx-none_64.jnilib, and
