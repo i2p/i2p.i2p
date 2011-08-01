@@ -1,3 +1,23 @@
+i2p (0.8.7-4) stable; urgency=low
+
+  * Change to allow jbigi to be built on non-x86
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 26 Jul 2011 23:13:00 +0000
+
+i2p (0.8.7-3) stable; urgency=low
+
+  * When i2p-doc package is installed, add the Javadoc link to the router
+    console.
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 28 Jun 2011 22:39:46 +0000
+
+i2p (0.8.7-2) stable; urgency=low
+
+  * Remove --with quilt from debian/rules. This is only meant for use in mtn
+    <facepalm>
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 27 Jun 2011 16:41:40 +0000
+
 i2p (0.8.7-1) stable; urgency=low
 
   * The "W00t! My debs are official!" release
@@ -6,7 +26,7 @@ i2p (0.8.7-1) stable; urgency=low
     0007-eepget-redirections, 0008-config-news, 0009-jetty-snark-disable and
     re-work the existing patches.
 
- -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 26 Jun 2011 18:51:31 +0000
+ -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 27 Jun 2011 12:38:59 +0000
 
 i2p (0.8.6-7) stable; urgency=low
 
