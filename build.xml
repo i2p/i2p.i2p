@@ -1264,7 +1264,7 @@
 			<copy file="apps/addressbook/myhosts.txt"  todir="pkg-temp/addressbook/" />
 			<!-- config.txt is in installer/resources/portable -->
 		<mkdir dir="pkg-temp/docs" />
-			<copy file="installer/resources/initialNews.xml" tofile="pkg-temp/docs/news.xml" overwrite="true" />
+			<copy file="installer/resources/initialNews/initialNews.xml" tofile="pkg-temp/docs/news.xml" overwrite="true" />
 			<copy file="installer/resources/readme/readme.html" tofile="pkg-temp/docs/readme.html" />
 			<copy file="installer/resources/startconsole.html" todir="pkg-temp/docs/" />
 			<copy file="installer/resources/start.ico" todir="pkg-temp/docs/" />
