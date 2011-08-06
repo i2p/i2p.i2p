@@ -202,6 +202,9 @@
         <condition property="noExe">
 	    <os arch="ppc" />
 	</condition>
+	<condition property="noExe">
+	    <os arch="armv5tejl" />
+        </condition>
         <condition property="noExe">
 	    <os arch="amd64" />
 	</condition>
