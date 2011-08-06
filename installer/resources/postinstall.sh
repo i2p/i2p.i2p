@@ -105,5 +105,7 @@ fi
 
 # no, let's not start the router from the install script any more
 # ./i2prouter start
+rm -f ./osid
+rm -f ./postinstall.sh
 exit 0
 
