@@ -171,6 +171,8 @@
                 <args><arg value="$INSTALL_PATH\install_i2p_service_unix" /></args></executable>
             <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\install-headless.txt" /></args></executable>
+	    <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+                <args><arg value="$INSTALL_PATH\runplain.sh" /></args></executable>
             <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\osid" /></args></executable>
             <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
@@ -183,6 +185,8 @@
                 <args><arg value="$INSTALL_PATH\eepget" /></args></executable>
 	    <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
 	        <args><arg value="$INSTALL_PATH/Start I2P Router.app" /></args></executable>
+	    <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+                <args><arg value="$INSTALL_PATH/man" /></args></executable>
 	    <!-- Placeholder for an OSX 'shortcut' to the router console
 	    <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
 	        <args><arg value="$INSTALL_PATH/I2P Router Console.webloc" /></args></executable>
@@ -221,6 +225,8 @@
                 </args>
             </executable>
 
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="false" failure="warn"> <os family="windows" />
+		    <args><arg value="$INSTALL_PATH/installer/" /></args></executable>
 
         </pack>
 
