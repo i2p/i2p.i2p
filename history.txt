@@ -1,3 +1,6 @@
+2011-08-06 kytv
+ * Fix #473 (wrapper.logfile set to the wrong path in Windows).
+
 2011-07-31 zzz
   * Crypto: Implement and then comment out an alternate
             AES-256/CBC implementation using the JVM crypto libs,

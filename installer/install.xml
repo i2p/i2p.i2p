@@ -191,6 +191,9 @@
 	    <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
 	        <args><arg value="$INSTALL_PATH/I2P Router Console.webloc" /></args></executable>
 		-->
+            <!-- workaround for bad default path for wrapper.log in Windows. -->
+            <executable targetfile="$INSTALL_PATH/fix_logfile_path.cmd" type="bin" stage="postinstall" keep="false"> <os family="windows" /> 
+            </executable>
 
             <!-- workaround for vista permission problems - see comments above -->
             <executable targetfile="$INSTALL_PATH/fixperms.bat" type="bin" stage="postinstall" keep="true" failure="warn"
