@@ -15,6 +15,9 @@
 
     <!-- change this to false if you don't have gettext -->
     <property name="require.gettext" value="true" />
+    <!-- Include property files so that values can be easily overridden. Currently just useful for javadoc hosters -->
+    <property file="override.properties"/>
+    <property file="build.properties"/>
 
     <!-- You probably don't want to change anything from here down -->
     <target name="help" depends="all" />
@@ -386,10 +389,10 @@
                 <pathelement location="installer/lib/wrapper/all/wrapper.jar" />
                 <pathelement location="core/lib/junit.jar" />
             </classpath>
-            <link offline="true" href="http://download.oracle.com/javase/6/docs/api/" packagelistLoc="installer/resources/package-lists/java/" />
-            <link offline="true" href="http://docs.i2p2.de/jetty/javadoc/" packagelistLoc="installer/resources/package-lists/jetty/" />
-            <link offline="true" href="http://docs.i2p-projekt.de/jrobin/javadoc/" packagelistLoc="installer/resources/package-lists/jrobin/" />
-            <link offline="true" href="http://wrapper.tanukisoftware.com/jdoc/" packagelistLoc="installer/resources/package-lists/wrapper/" />
+            <link offline="true" href="${javasedocs.url}" packagelistLoc="installer/resources/package-lists/java/" />
+            <link offline="true" href="${jettydocs.url}" packagelistLoc="installer/resources/package-lists/jetty/" />
+            <link offline="true" href="${jrobindocs.url}" packagelistLoc="installer/resources/package-lists/jrobin/" />
+            <link offline="true" href="${wrapperdocs.url}" packagelistLoc="installer/resources/package-lists/wrapper/" />
         </javadoc>
         <echo message="Warning, javadoc embeds timestamps in the output, run with 'TZ=UTC ant javadoc' if you plan to distribute" />
     </target>
