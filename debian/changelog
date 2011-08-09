@@ -1,3 +1,14 @@
+i2p (0.8.7-5) stable; urgency=low
+
+  * Depend on default-jre-headless | java5-runtime-headless |
+    java6-runtime-headless instead of the non-headless versions. Sure the
+    -headless packages fulfilled the dependency, but this way it should pull in
+    the headless package by default.
+  * Remove unused lock from core/java/src/net/i2p/crypto/ElGamalEngine.java to
+    fix lock-ups on arm/ppc CPUs
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 01 Aug 2011 17:51:14 +0000
+
 i2p (0.8.7-4) stable; urgency=low
 
   * Change to allow jbigi to be built on non-x86

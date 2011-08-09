@@ -18,7 +18,7 @@ Package: i2p
 Architecture: all
 Section: net
 Priority: optional
-Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends}, default-jre | java5-runtime | java6-runtime,
+Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
  adduser, 
  i2p-router (>= 0.8.6-5),
  libjbigi-jni (>= ${source:Version}),
@@ -65,12 +65,13 @@ Package: i2p-router
 Architecture: all
 Section: net
 Priority: optional
-Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends}, default-jre | java5-runtime | java6-runtime
+Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends}, default-jre-headless | java5-runtime-headless | java6-runtime-headless
 Replaces: i2p ( << 0.8.6-5)
 Breaks: i2p (<< 0.8.6-5)
 Recommends: libjbigi-jni (>= ${source:Version}), libjbigi-jni (<< ${source:Version}.1~)
 Suggests: tor,
  i2p-messenger,
+ i2phex,
  i2p-tahoe-lafs,
  imule,
  i2pfox,
