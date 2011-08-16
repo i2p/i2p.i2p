@@ -4,7 +4,9 @@
 package net.i2p.router.transport;
 
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.UnknownHostException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -12,6 +14,7 @@ import java.util.Set;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
+import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 import net.i2p.util.Translate;
 
@@ -527,7 +530,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		
 		// Just in case...
                 // this confuses my linksys? - zzz
-		removeMapping(protocol, port, fp, true);
+		//removeMapping(protocol, port, fp, true);
 		
 		Action add = _service.getAction("AddPortMapping");
 		if(add == null) {
@@ -538,7 +541,13 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 		
 		add.setArgumentValue("NewRemoteHost", "");
 		add.setArgumentValue("NewExternalPort", port);
-		add.setArgumentValue("NewInternalClient", _router.getInterfaceAddress());
+		// bugfix, see below for details
+		String intf = _router.getInterfaceAddress();
+		String us = getOurAddress(intf);
+		if (_log.shouldLog(Log.WARN) && !us.equals(intf))
+			_log.warn("Requesting port forward to " + us + ':' + port +
+			          " when cybergarage wanted " + intf);
+		add.setArgumentValue("NewInternalClient", us);
 		add.setArgumentValue("NewInternalPort", port);
 		add.setArgumentValue("NewProtocol", protocol);
 		add.setArgumentValue("NewPortMappingDescription", description);
@@ -552,7 +561,72 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 			return true;
 		} else return false;
 	}
-	
+
+	/**
+	 * Bug fix:
+	 * If the SSDP notify or search response sockets listen on more than one interface,
+	 * cybergarage can get our IP address wrong, and then we send the wrong one
+	 * to the UPnP device, which will reject it if it enforces strict addressing.
+	 *
+	 * For example, if we have interfaces 192.168.1.1 and 192.168.2.1, we could
+	 * get a response from 192.168.1.99 on the 192.168.2.1 interface, but when
+	 * we send something to 192.168.1.99 it will go out the 192.168.1.1 interface
+	 * with a request to forward to 192.168.2.1.
+	 *
+	 * So return the address of ours that is closest to his.
+	 *
+	 * @since 0.8.8
+	 */
+	private String getOurAddress(String deflt) {
+		String rv = deflt;
+		String hisIP = null;
+		// see ControlRequest.setRequestHost()
+		String him = _router.getURLBase();
+		if (him != null && him.length() > 0) {
+			try {
+				URL url = new URL(him);
+				hisIP = url.getHost();
+			} catch (MalformedURLException mue) {}
+		}
+		if (hisIP == null) {
+			him = _router.getLocation();
+			if (him != null && him.length() > 0) {
+				try {
+					URL url = new URL(him);
+					hisIP = url.getHost();
+				} catch (MalformedURLException mue) {}
+			}
+		}
+		if (hisIP == null)
+			return rv;
+		try {
+			byte[] hisBytes = InetAddress.getByName(hisIP).getAddress();
+			if (hisBytes.length != 4)
+				return deflt;
+			long hisLong = DataHelper.fromLong(hisBytes, 0, 4);
+			long distance = Long.MAX_VALUE;
+
+			// loop through all our IP addresses, including the default, and
+			// return the one closest to the router's IP
+			Set<String> myAddresses = Addresses.getAddresses(true, false);  // yes local, no IPv6
+			myAddresses.add(deflt);
+			for (String me : myAddresses) {
+				if (me.startsWith("127.") || me.equals("0.0.0.0"))
+					continue;
+				try {
+					byte[] myBytes = InetAddress.getByName(me).getAddress();
+					long myLong = DataHelper.fromLong(myBytes, 0, 4);
+					long newDistance = myLong ^ hisLong;
+					if (newDistance < distance) {
+						rv = me;
+						distance = newDistance;
+					}
+				} catch (UnknownHostException uhe) {}
+			}
+		} catch (UnknownHostException uhe) {}
+		return rv;
+	}
+
 	/** blocking */
 	private boolean removeMapping(String protocol, int port, ForwardPort fp, boolean noLog) {
 		if(isDisabled || !isNATPresent())

@@ -1,3 +1,6 @@
+2011-08-16 zzz
+  * UPnP: Fix bug causing failure when the PC has multiple interfaces
+
 2011-08-06 kytv
  * Fix #473 (wrapper.logfile set to the wrong path in Windows).
 
