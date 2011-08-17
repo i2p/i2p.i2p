@@ -1226,6 +1226,8 @@ public class SnarkManager implements Snark.CompleteListener {
         }
         
         Set<String> existingNames = listTorrentFiles();
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("DirMon found: " + DataHelper.toString(foundNames) + " existing: " + DataHelper.toString(existingNames));
         // lets find new ones first...
         for (int i = 0; i < foundNames.size(); i++) {
             if (existingNames.contains(foundNames.get(i))) {

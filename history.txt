@@ -1,3 +1,8 @@
+2011-08-16 zzz
+  * Console: Tweak logs page CSS
+  * Graphs: Delete corrupt rrd file (ticket #483)
+  * UPnP: Fix bug causing failure when the PC has multiple interfaces
+
 2011-08-06 kytv
  * Fix #473 (wrapper.logfile set to the wrong path in Windows).
 

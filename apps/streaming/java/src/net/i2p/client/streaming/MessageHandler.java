@@ -16,9 +16,9 @@ import net.i2p.util.Log;
  *
  */
 class MessageHandler implements I2PSessionListener {
-    private ConnectionManager _manager;
-    private I2PAppContext _context;
-    private Log _log;
+    private final ConnectionManager _manager;
+    private final I2PAppContext _context;
+    private final Log _log;
     private final Set<I2PSocketManager.DisconnectListener> _listeners;
     
     public MessageHandler(I2PAppContext ctx, ConnectionManager mgr) {

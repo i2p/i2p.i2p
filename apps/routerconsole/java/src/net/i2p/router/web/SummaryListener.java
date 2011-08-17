@@ -113,13 +113,14 @@ class SummaryListener implements RateSummaryListener {
         String baseName = rs.getName() + "." + period;
         _name = createName(_context, baseName);
         _eventName = createName(_context, baseName + ".events");
+        File rrdFile = null;
         try {
             RrdBackendFactory factory = RrdBackendFactory.getFactory(getBackendName());
             String rrdDefName;
             if (_isPersistent) {
                 // generate full path for persistent RRD files
                 File rrdDir = new SecureFile(_context.getRouterDir(), RRD_DIR);
-                File rrdFile = new File(rrdDir, RRD_PREFIX + _name + RRD_SUFFIX);
+                rrdFile = new File(rrdDir, RRD_PREFIX + _name + RRD_SUFFIX);
                 rrdDefName = rrdFile.getAbsolutePath();
                 if (rrdFile.exists()) {
                     _db = new RrdDb(rrdDefName, factory);
@@ -164,6 +165,9 @@ class SummaryListener implements RateSummaryListener {
             _log.error("Error starting RRD for stat " + baseName, oom);
         } catch (RrdException re) {
             _log.error("Error starting RRD for stat " + baseName, re);
+            // corrupt file?
+            if (_isPersistent && rrdFile != null)
+                rrdFile.delete();
         } catch (IOException ioe) {
             _log.error("Error starting RRD for stat " + baseName, ioe);
         }
