@@ -874,7 +874,8 @@ public class IndexBean {
         } else if (tun.getIsRunning() || tun.getIsStarting()) {
             return "Tunnel must be stopped before modifying destination";
         }
-        PrivateKeyFile pkf = new PrivateKeyFile(_privKeyFile);
+
+        PrivateKeyFile pkf = new PrivateKeyFile(new File(_context.getProperty("i2p.dir.config"), _privKeyFile));
         try {
             pkf.createIfAbsent();
         } catch (Exception e) {
