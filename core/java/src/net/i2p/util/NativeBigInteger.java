@@ -695,7 +695,7 @@ public class NativeBigInteger extends BigInteger {
             rv.add(_libPrefix + getMiddleName1() + "none_64" + _libSuffix);
         // Add libjbigi-xxx-none.so
         // Note that libjbigi-osx-none.jnilib is a 'fat binary' with both PPC and x86-32
-        if ((!_isArm)  || (!_isPPC && !_isMac))
+        if (!_isArm && !_isPPC && !_isMac)
             rv.add(getResourceName(false));
         return rv;
     }
