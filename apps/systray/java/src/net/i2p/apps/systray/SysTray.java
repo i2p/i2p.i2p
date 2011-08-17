@@ -37,6 +37,8 @@ public class SysTray implements SysTrayMenuListener {
     private static String         _portString;
     private static boolean        _showIcon;
     private static UrlLauncher    _urlLauncher    = new UrlLauncher();
+    private static final boolean _is64 = "64".equals(System.getProperty("sun.arch.data.model")) ||
+                                         System.getProperty("os.arch").contains("64");
 
     static {
         File config = new File(I2PAppContext.getGlobalContext().getConfigDir(), "systray.config");
@@ -52,7 +54,7 @@ public class SysTray implements SysTrayMenuListener {
         //if (!(new File("router.config")).exists())
         //    openRouterConsole("http://localhost:" + _portString + "/index.jsp");
 
-        if ( (System.getProperty("os.name").startsWith("Windows")) && (!Boolean.getBoolean("systray.disable")) )
+        if ( (System.getProperty("os.name").startsWith("Windows")) && (!Boolean.getBoolean("systray.disable")) && (!_is64))
             _instance = new SysTray();
     }
 

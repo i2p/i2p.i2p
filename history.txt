@@ -1,3 +1,7 @@
+2011-08-17 kytv
+  * Fix #506: Don't attempt to load systray4j when using a 64bit JVM
+    in Windows.
+
 2011-08-16 zzz
   * Console: Tweak logs page CSS
   * Graphs: Delete corrupt rrd file (ticket #483)
