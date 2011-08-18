@@ -65,7 +65,8 @@ Package: i2p-router
 Architecture: all
 Section: net
 Priority: optional
-Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends}, default-jre-headless | java5-runtime-headless | java6-runtime-headless
+Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends}, default-jre-headless | java5-runtime-headless | java6-runtime-headless,
+ ttf-dejavu-core, ttf-dejavu-extra
 Replaces: i2p ( << 0.8.6-5)
 Breaks: i2p (<< 0.8.6-5)
 Recommends: libjbigi-jni (>= ${source:Version}), libjbigi-jni (<< ${source:Version}.1~)
