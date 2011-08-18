@@ -1,3 +1,10 @@
+i2p (0.8.7-6) UNRELEASED; urgency=low
+
+  * Add ttf-dejavu-core and ttf-dejavu-extra as dependencies so that graphs on
+    headless systems can be generated.
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Thu, 18 Aug 2011 15:50:59 +0000
+
 i2p (0.8.7-5) stable; urgency=low
 
   * Depend on default-jre-headless | java5-runtime-headless |
@@ -36,6 +43,9 @@ i2p (0.8.7-1) stable; urgency=low
   * Drop from debian/patches: 0002-sync-countries, 0006-i2p-jetty,
     0007-eepget-redirections, 0008-config-news, 0009-jetty-snark-disable and
     re-work the existing patches.
+  * Debconf translations (thanks guys!)
+    - Russian (by hiddenz@mail.i2p)
+    - German & Spanish (by m1xxy@mail.i2p)
 
  -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 27 Jun 2011 12:38:59 +0000
 
