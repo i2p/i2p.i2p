@@ -1,6 +1,6 @@
 i2p (0.8.7-6) UNRELEASED; urgency=low
 
-  * Add ttf-dejavu-core and ttf-dejavu-extra as dependencies so that graphs on
+  * Add ttf-dejavu to recommends, so that graphs on
     headless systems can be generated.
 
  -- Kill Your TV <killyourtv@i2pmail.org>  Thu, 18 Aug 2011 15:50:59 +0000
