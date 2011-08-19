@@ -40,11 +40,13 @@ public class RouterClock extends Clock {
     private int _lastStratum;
 
     /**
-     *  If the system clock shifts by this much (positive or negative),
+     *  If the system clock shifts by this much,
      *  call the callback, we probably need a soft restart.
      *  @since 0.8.8
      */
-    private static final long MASSIVE_SHIFT = 75*1000;
+    private static final long MASSIVE_SHIFT_FORWARD = 150*1000;
+    private static final long MASSIVE_SHIFT_BACKWARD = 61*1000;
+
     private final Set<ClockShiftListener> _shiftListeners;
     private volatile long _lastShiftNanos;
 
@@ -137,7 +139,11 @@ public class RouterClock extends Clock {
             } // check sanity
         }
 
-        if (_alreadyChanged) {
+        // In first minute, allow a lower (better) stratum to do a step adjustment after
+        // a previous step adjustment.
+        // This allows NTP to trump a peer offset after a soft restart
+        if (_alreadyChanged &&
+            (stratum >= _lastStratum || _startedOn - System.currentTimeMillis() > 60*1000)) {
             // Update the target offset, slewing will take care of the rest
             if (delta > 15*1000)
                 getLog().error("Warning - Updating target clock offset to " + offsetMs + "ms from " + _offset + "ms, Stratum " + stratum);
@@ -192,8 +198,8 @@ public class RouterClock extends Clock {
         // copy the global, so two threads don't both increment or decrement _offset
         long offset = _offset;
         long sinceLastSlewed = systemNow - _lastSlewed;
-        if (sinceLastSlewed >= MASSIVE_SHIFT ||
-            sinceLastSlewed <= 0 - MASSIVE_SHIFT) {
+        if (sinceLastSlewed >= MASSIVE_SHIFT_FORWARD ||
+            sinceLastSlewed <= 0 - MASSIVE_SHIFT_BACKWARD) {
             _lastSlewed = systemNow;
             notifyMassive(sinceLastSlewed);
         } else if (sinceLastSlewed >= MAX_SLEW) {
@@ -224,7 +230,7 @@ public class RouterClock extends Clock {
         long nowNanos = System.nanoTime();
         // try to prevent dups, not guaranteed
         // nanoTime() isn't guaranteed to be monotonic either :(
-        if (nowNanos < _lastShiftNanos + MASSIVE_SHIFT)
+        if (nowNanos < _lastShiftNanos + MASSIVE_SHIFT_FORWARD)
             return;
         _lastShiftNanos = nowNanos;
 

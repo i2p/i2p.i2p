@@ -1308,7 +1308,8 @@ public class Router implements RouterClock.ClockShiftListener {
             _started = _context.clock().now();
             _log.error("Stopping the router for a restart...");
             _log.logAlways(Log.WARN, "Stopping the client manager");
-            try { _context.clientManager().shutdown(); } catch (Throwable t) { _log.log(Log.CRIT, "Error stopping the client manager", t); }
+            // NOTE: DisconnectMessageHandler keys off "restart"
+            try { _context.clientManager().shutdown("Router restart"); } catch (Throwable t) { _log.log(Log.CRIT, "Error stopping the client manager", t); }
             _log.logAlways(Log.WARN, "Stopping the comm system");
             try { _context.messageRegistry().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the message registry", t); }
             try { _context.commSystem().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the comm system", t); }

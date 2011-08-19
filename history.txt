@@ -1,3 +1,13 @@
+2011-08-19 zzz
+  * Soft restart:
+    - Allow NTP to reinitialize clock after the comm system
+      in the first minute of uptime
+    - Fix i2ptunnels not restarting
+    - Increase minimum forward clock shift for soft restart
+    - Reduce minimum backward clock shift for soft restart
+    - Signal the I2CP client with a different message when restarting
+    - I2CP client reconnects when receiving restart message
+
 2011-08-17 kytv
   * Fix #506: Don't attempt to load systray4j when using a 64bit JVM
     in Windows.
