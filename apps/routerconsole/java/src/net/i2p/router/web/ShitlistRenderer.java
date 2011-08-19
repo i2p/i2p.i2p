@@ -24,15 +24,15 @@ import net.i2p.router.Shitlist;
  *  Moved from Shitlist.java
  */
 public class ShitlistRenderer {
-    private RouterContext _context;
+    private final RouterContext _context;
 
     public ShitlistRenderer(RouterContext context) {
         _context = context;
     }
     
-    private static class HashComparator implements Comparator {
-         public int compare(Object l, Object r) {
-             return ((Hash)l).toBase64().compareTo(((Hash)r).toBase64());
+    private static class HashComparator implements Comparator<Hash> {
+         public int compare(Hash l, Hash r) {
+             return l.toBase64().compareTo(r.toBase64());
         }
     }
 
@@ -54,9 +54,11 @@ public class ShitlistRenderer {
         for (Map.Entry<Hash, Shitlist.Entry> e : entries.entrySet()) {
             Hash key = e.getKey();
             Shitlist.Entry entry = e.getValue();
+            long expires = entry.expireOn-_context.clock().now();
+            if (expires <= 0)
+                continue;
             buf.append("<li>").append(_context.commSystem().renderPeerHTML(key));
             buf.append(' ');
-            long expires = entry.expireOn-_context.clock().now();
             String expireString = DataHelper.formatDuration2(expires);
             if (expires < 5l*24*60*60*1000)
                 buf.append(_("Temporary ban expiring in {0}", expireString));
