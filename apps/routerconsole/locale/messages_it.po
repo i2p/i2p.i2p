@@ -303,7 +303,7 @@ msgstr "Connessione in uscita"
 msgid "They offered to introduce us (help other peers traverse our firewall)"
 msgstr ""
 "Si sono offerti di introdurci (aiutano gli altri peer ad attraversare il "
-"firewall)\n"
+"firewall)"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:532
 msgid ""
@@ -337,7 +337,7 @@ msgstr ""
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:535
 msgid "How long ago this connection was established"
-msgstr "Quanto è passato dall'inizio di questa connessione\n"
+msgstr "Quanto è passato dall'inizio di questa connessione"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:535
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:741
@@ -369,7 +369,7 @@ msgstr "Numero di messaggi inviati in attesa di conferma"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:539
 msgid "The maximum number of concurrent messages to send"
-msgstr "Numero massimo di messaggi da inviare contemporaneamente\n"
+msgstr "Numero massimo di messaggi da inviare contemporaneamente"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:540
 msgid "The number of pending sends which exceed congestion window"
@@ -528,7 +528,7 @@ msgstr ""
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:475
 #, java-format
 msgid "The current external IP address reported by UPnP is {0}"
-msgstr "L'indirizzo IP esterno corrente riportato da UPnP è {0}"
+msgstr "L''indirizzo IP esterno corrente riportato da UPnP è {0}"
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:477
 msgid "The current external IP address is not available."
@@ -551,12 +551,12 @@ msgstr "UPnP riporta che il tasso massimo di bit in uscita è {0}bit/sec"
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:492
 #, java-format
 msgid "{0} port {1,number,#####} was successfully forwarded by UPnP."
-msgstr "{0} porta {1,numero,#####} è stata inoltrata con successo da UPnP."
+msgstr "{0} porta {1,number,#####} è stata inoltrata con successo da UPnP."
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnP.java:494
 #, java-format
 msgid "{0} port {1,number,#####} was not forwarded by UPnP."
-msgstr "{0} porta{1,numero,#####} non è stata inoltrata da UPnP."
+msgstr "{0} porta{1,number,#####} non è stata inoltrata da UPnP."
 
 #: ../../../router/java/src/net/i2p/router/transport/UPnPManager.java:161
 msgid "UPnP is not enabled"
@@ -645,7 +645,7 @@ msgstr "Ordina secondo la discrepanza di clock"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1911
 msgid "Sort by congestion window"
-msgstr "Ordina per finestra di congestione\n"
+msgstr "Ordina per finestra di congestione"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1913
 msgid "Sort by slow start threshold"
@@ -2528,11 +2528,11 @@ msgstr "I tunnel client per {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:74
 msgid "ANONYMITY WARNING - Settings include 0-hop tunnels."
-msgstr "WARNING ANONIMATO - Le impostazioni includono tunnel 0-hop.\n"
+msgstr "WARNING ANONIMATO - Le impostazioni includono tunnel 0-hop."
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:79
 msgid "ANONYMITY WARNING - Settings include 1-hop tunnels."
-msgstr "WARNING ANONIMATO - Le impostazioni includono tunnel 1-hop.\n"
+msgstr "WARNING ANONIMATO - Le impostazioni includono tunnel 1-hop."
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:82
 msgid "PERFORMANCE WARNING - Settings include very long tunnels."
@@ -3085,14 +3085,14 @@ msgstr ""
 #, java-format
 msgid "Plugin update requires installed plugin version {0} or higher"
 msgstr ""
-"L'aggiornamento del plugin richiede che la versione del plugin installato "
+"L''aggiornamento del plugin richiede che la versione del plugin installato "
 "sia {0} o superiore"
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:334
 #, java-format
 msgid "Plugin update requires installed plugin version {0} or lower"
 msgstr ""
-"L'aggiornamento del plugin richiede che la versione del plugin installato "
+"L''aggiornamento del plugin richiede che la versione del plugin installato "
 "sia {0} o inferiore"
 
 #: ../java/src/net/i2p/router/web/PluginUpdateHandler.java:351
@@ -3487,7 +3487,7 @@ msgstr "Media maggiore"
 msgid "There was 1 event in this period."
 msgid_plural "There were {0} events in this period."
 msgstr[0] "C'era 1 evento in questo periodo."
-msgstr[1] "C'erano {0} eventi in questo periodo"
+msgstr[1] "C''erano {0} eventi in questo periodo"
 
 #: ../java/src/net/i2p/router/web/StatsGenerator.java:203
 #, java-format

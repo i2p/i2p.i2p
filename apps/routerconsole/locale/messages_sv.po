@@ -299,7 +299,7 @@ msgstr "Utgående anslutning"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:530
 msgid "They offered to introduce us (help other peers traverse our firewall)"
-msgstr "De erbjöd att introducera oss (hjälp andra traversera vår brandvägg)\n"
+msgstr "De erbjöd att introducera oss (hjälp andra traversera vår brandvägg)"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:532
 msgid ""
@@ -331,7 +331,7 @@ msgstr ""
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:535
 msgid "How long ago this connection was established"
-msgstr "Tiden sedan denna anslutning etablerades\n"
+msgstr "Tiden sedan denna anslutning etablerades"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:535
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:741
@@ -363,7 +363,7 @@ msgstr "Antalet skickade meddelanden som väntar på bekräftelse"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:539
 msgid "The maximum number of concurrent messages to send"
-msgstr "Maximala antalet samtidiga meddelande som ska skickas\n"
+msgstr "Maximala antalet samtidiga meddelande som ska skickas"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:540
 msgid "The number of pending sends which exceed congestion window"
@@ -640,7 +640,7 @@ msgstr "Sortera efter klockanvridning"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1911
 msgid "Sort by congestion window"
-msgstr "Sortera efter överbelastningfönster\n"
+msgstr "Sortera efter överbelastningfönster"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1913
 msgid "Sort by slow start threshold"
@@ -2514,11 +2514,11 @@ msgstr "Klienttunnlar för {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:74
 msgid "ANONYMITY WARNING - Settings include 0-hop tunnels."
-msgstr "Anonymitetsvarning - Inställningar inkluderar tunnlar med 0-hopp.\n"
+msgstr "Anonymitetsvarning - Inställningar inkluderar tunnlar med 0-hopp."
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:79
 msgid "ANONYMITY WARNING - Settings include 1-hop tunnels."
-msgstr "Anonymitetsvarning - Inställningar inkluderar tunnlar med 1-hopp.\n"
+msgstr "Anonymitetsvarning - Inställningar inkluderar tunnlar med 1-hopp."
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:82
 msgid "PERFORMANCE WARNING - Settings include very long tunnels."

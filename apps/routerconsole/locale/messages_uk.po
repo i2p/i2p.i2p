@@ -311,7 +311,7 @@ msgstr "Вихідні з'єднання"
 msgid "They offered to introduce us (help other peers traverse our firewall)"
 msgstr ""
 "Вони пропонують представити нас (допомогти іншим пірам з'єднуватись з нами в"
-" обхід нашого фаєрволу)\n"
+" обхід нашого фаєрволу)"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:532
 msgid ""
@@ -343,7 +343,7 @@ msgstr "Приблизний вхідний / вихідний трафік (KBy
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:535
 msgid "How long ago this connection was established"
-msgstr "Час який пройшов після встановлення з'єднання\n"
+msgstr "Час який пройшов після встановлення з'єднання"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:535
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:741

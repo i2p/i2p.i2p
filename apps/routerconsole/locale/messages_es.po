@@ -304,7 +304,7 @@ msgstr "Conexión saliente"
 msgid "They offered to introduce us (help other peers traverse our firewall)"
 msgstr ""
 "Se han ofrecido a introducirnos (a ayudar a otros pares a atravesar nuestro "
-"cortafuegos)\n"
+"cortafuegos)"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:532
 msgid ""
@@ -336,7 +336,7 @@ msgstr "Tasa de transferencia de entrada / salida (KBytes por segundo)"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:535
 msgid "How long ago this connection was established"
-msgstr "Cuánto tiempo hace que se estableció esta conexión\n"
+msgstr "Cuánto tiempo hace que se estableció esta conexión"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:535
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:741
@@ -368,7 +368,7 @@ msgstr "El número de mensajes enviados a la espera de confirmación"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:539
 msgid "The maximum number of concurrent messages to send"
-msgstr "El número máximo de mensajes simultáneos para enviar\n"
+msgstr "El número máximo de mensajes simultáneos para enviar"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:540
 msgid "The number of pending sends which exceed congestion window"
@@ -644,7 +644,7 @@ msgstr "Ordenar por desviación de reloj"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1911
 msgid "Sort by congestion window"
-msgstr "Ordenar por ventana de congestión\n"
+msgstr "Ordenar por ventana de congestión"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1913
 msgid "Sort by slow start threshold"
@@ -2532,12 +2532,12 @@ msgstr "Túneles de cliente para {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:74
 msgid "ANONYMITY WARNING - Settings include 0-hop tunnels."
-msgstr "ADVERTENCIA DE ANONIMATO - Los ajustes incluyen túneles de 0 saltos.\n"
+msgstr "ADVERTENCIA DE ANONIMATO - Los ajustes incluyen túneles de 0 saltos."
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:79
 msgid "ANONYMITY WARNING - Settings include 1-hop tunnels."
 msgstr ""
-"ADVERTENCIA DE ANONIMATO - Los ajustes incluyen los túneles de 1 salto.\n"
+"ADVERTENCIA DE ANONIMATO - Los ajustes incluyen los túneles de 1 salto."
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:82
 msgid "PERFORMANCE WARNING - Settings include very long tunnels."

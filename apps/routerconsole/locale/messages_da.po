@@ -34,7 +34,7 @@ msgstr ""
 msgid "1 ms"
 msgid_plural "{0,number,####} ms"
 msgstr[0] "1 ms"
-msgstr[1] "{0, antal ,####} ms"
+msgstr[1] "{0,number,####} ms"
 
 #. seconds
 #. Note to translators: quantity will always be greater than one.
@@ -298,7 +298,7 @@ msgstr "Udadgående forbindelse"
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:530
 msgid "They offered to introduce us (help other peers traverse our firewall)"
 msgstr ""
-"De har tilbudt at introducere os (hjælpe andre peers omgå vores firewall)\n"
+"De har tilbudt at introducere os (hjælpe andre peers omgå vores firewall)"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:532
 msgid ""
@@ -330,7 +330,7 @@ msgstr ""
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:535
 msgid "How long ago this connection was established"
-msgstr "Hvor længe siden denne forbindelse blev etableret\n"
+msgstr "Hvor længe siden denne forbindelse blev etableret"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:535
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:741
@@ -362,7 +362,7 @@ msgstr "Antal sendte beskeder der afventer at blive kvitteret for"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:539
 msgid "The maximum number of concurrent messages to send"
-msgstr "Det maksimale antal samtidige beskeder der kan sendes\n"
+msgstr "Det maksimale antal samtidige beskeder der kan sendes"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:540
 msgid "The number of pending sends which exceed congestion window"
@@ -642,7 +642,7 @@ msgstr "Sorter efter tidsforskel"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1911
 msgid "Sort by congestion window"
-msgstr "Sorter efter overbelastnings vindue\n"
+msgstr "Sorter efter overbelastnings vindue"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1913
 msgid "Sort by slow start threshold"
@@ -2527,11 +2527,11 @@ msgstr "Klien tunneler for {0}"
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:74
 msgid "ANONYMITY WARNING - Settings include 0-hop tunnels."
-msgstr "ANONYMITETS ADVARSEL - Indstillinger indholder 0-hop tunneler\n"
+msgstr "ANONYMITETS ADVARSEL - Indstillinger indholder 0-hop tunneler"
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:79
 msgid "ANONYMITY WARNING - Settings include 1-hop tunnels."
-msgstr "ANONYMITETS ADVARSEL - Indstillinger indholder 1-hop tunneler\n"
+msgstr "ANONYMITETS ADVARSEL - Indstillinger indholder 1-hop tunneler"
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:82
 msgid "PERFORMANCE WARNING - Settings include very long tunnels."
