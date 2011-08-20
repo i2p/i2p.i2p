@@ -237,9 +237,6 @@ distributions. See the source package for the additional license information.
    Admin Manager:
    Public domain
 
-   Atalk:
-   Public domain
-
    BOB Demos:
    Copyright (C) sponge
    DWTFYWTPL
