@@ -22,6 +22,7 @@ import net.i2p.util.Log;
  * yet full, attempting to keep a pool of keys we can explore with (at least one
  * per bucket)
  *
+ * @deprecated unused, see comments in KNDF
  */
 class ExploreKeySelectorJob extends JobImpl {
     private Log _log;

@@ -19,8 +19,8 @@ import net.i2p.util.Log;
  *
  */
 class FloodfillMonitorJob extends JobImpl {
-    private Log _log;
-    private FloodfillNetworkDatabaseFacade _facade;
+    private final Log _log;
+    private final FloodfillNetworkDatabaseFacade _facade;
     private long _lastChanged;
     
     private static final int REQUEUE_DELAY = 60*60*1000;
@@ -80,7 +80,7 @@ class FloodfillMonitorJob extends JobImpl {
             return false;
 
         // This list will not include ourselves...
-        List floodfillPeers = _facade.getFloodfillPeers();
+        List<Hash> floodfillPeers = _facade.getFloodfillPeers();
         long now = getContext().clock().now();
         // We know none at all! Must be our turn...
         if (floodfillPeers == null || floodfillPeers.isEmpty()) {
@@ -108,8 +108,7 @@ class FloodfillMonitorJob extends JobImpl {
         int ffcount = floodfillPeers.size();
         int failcount = 0;
         long before = now - 60*60*1000;
-        for (int i = 0; i < ffcount; i++) {
-            Hash peer = (Hash)floodfillPeers.get(i);
+        for (Hash peer : floodfillPeers) {
             PeerProfile profile = getContext().profileOrganizer().getProfile(peer);
             if (profile == null || profile.getLastHeardFrom() < before ||
                 profile.getIsFailing() || getContext().shitlist().isShitlisted(peer) ||

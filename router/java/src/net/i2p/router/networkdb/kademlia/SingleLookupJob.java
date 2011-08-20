@@ -5,7 +5,7 @@ import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
-import net.i2p.util.Log;
+//import net.i2p.util.Log;
 
 /**
  * Ask the peer who sent us the DSRM for the RouterInfos.
@@ -20,13 +20,15 @@ import net.i2p.util.Log;
  *
  */
 class SingleLookupJob extends JobImpl {
-    private Log _log;
-    private DatabaseSearchReplyMessage _dsrm;
+    //private final Log _log;
+    private final DatabaseSearchReplyMessage _dsrm;
+
     public SingleLookupJob(RouterContext ctx, DatabaseSearchReplyMessage dsrm) {
         super(ctx);
-        _log = ctx.logManager().getLog(getClass());
+        //_log = ctx.logManager().getLog(getClass());
         _dsrm = dsrm;
     }
+
     public void runJob() { 
         Hash from = _dsrm.getFromHash();
         for (int i = 0; i < _dsrm.getNumReplies(); i++) {
@@ -43,5 +45,6 @@ class SingleLookupJob extends JobImpl {
                 getContext().jobQueue().addJob(new SingleSearchJob(getContext(), peer, peer));
         }
     }
+
     public String getName() { return "NetDb process DSRM"; }
 }

@@ -1,3 +1,76 @@
+2011-08-20 zzz
+  * Translations:
+    - New Danish and Ukranian translations from transifex
+    - Update Italian, Chinese, Spanish, Polish, Swedish,
+      and Vietnamese translations from transifex
+    - Update .tx/config
+
+2011-08-19 zzz
+  * Soft restart:
+    - Allow NTP to reinitialize clock after the comm system
+      in the first minute of uptime
+    - Fix i2ptunnels not restarting
+    - Increase minimum forward clock shift for soft restart
+    - Reduce minimum backward clock shift for soft restart
+    - Signal the I2CP client with a different message when restarting
+    - I2CP client reconnects when receiving restart message
+
+2011-08-17 kytv
+  * Fix #506: Don't attempt to load systray4j when using a 64bit JVM
+    in Windows.
+
+2011-08-16 zzz
+  * Console: Tweak logs page CSS
+  * Graphs: Delete corrupt rrd file (ticket #483)
+  * UPnP: Fix bug causing failure when the PC has multiple interfaces
+
+2011-08-06 kytv
+ * Fix #473 (wrapper.logfile set to the wrong path in Windows).
+
+2011-07-31 zzz
+  * Crypto: Implement and then comment out an alternate
+            AES-256/CBC implementation using the JVM crypto libs,
+            and tests, it isn't faster
+  * Netdb: Add a job to refresh all the old router infos at startup,
+           to speed integration
+
+2011-07-30 kytv
+ * Installer: 
+   - add libjbigi*core*jnilib, libjbigi-osx-none_64.jnilib, and
+     libjbigi-linux-ppc.so
+   - Add Linux PPC wrapper
+ * Add linux-ppc to NBI.
+ * Remove unused lock
+
+2011-07-29 zzz
+  * Netdb Search:
+    - Follow all DSRM's, not just the last one, by moving the code
+      from the match job to the selector
+    - Update peer profile after SingleSearchJob
+    - Cleanups, javadocs, log tweaks, final
+  * ProfileOrganizer: Tweak fast tier size
+
+2011-07-28 zzz
+  * Context: Split up big lock to avoid deadlocks
+  * Streaming: Avoid a rare exception on race
+  * TunnelPoolManager: Reduce race window for restarting a tunnel pool
+
+2011-07-27 kytv
+  * Add armel (armv5tejl) wrapper. Compiled and tested in Debian Squeeze.
+
+2011-07-26 zzz
+  * Installer: The previous wrapper files only work on armv7
+  * NativeBigInteger: Move libjbigi-linux-arm.so to libjbigi-linux-armv7.so,
+                      do ARM version detection in NBI.
+  * NetDB:
+    - Explore even more aggressively at startup
+    - Increase SingleSearchJob timeout
+    - Increase time at startup for processing DSRM
+    - Cleanups, final, javadoc, concurrent
+  * OutNetMessage: Cleanups
+  * Tunnels: Change another log error to a warn
+  * Watchdog: Improve the way it calls for a thread dump
+
 2011-07-22 kytv
   * Add a 64bit wrapper to OSX. With 0.8.7 came a fat Mac wrapper with i386 and PPC.
     The included wrapper is now quad-fat (i386, ppc, x86_64, and ppc64).

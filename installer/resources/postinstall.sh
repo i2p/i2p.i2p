@@ -40,9 +40,15 @@ X86_64=`echo "${OS_ARCH}" | grep x86_64`
 
 case $HOST_OS in
     debian | fedora | gentoo | linux | mandrake | redhat | suse )
-	if [ `echo $OS_ARCH |grep arm` ]; then
-            wrapperpath="./lib/wrapper/linux-arm"
+        if [ `echo $OS_ARCH |grep armv7` ]; then
+            wrapperpath="./lib/wrapper/linux-armv7"
             cp ${wrapperpath}/libwrapper.so ./lib/
+        elif [ `echo $OS_ARCH |grep arm` ]; then
+            wrapperpath="./lib/wrapper/linux-armv5"
+            cp ${wrapperpath}/libwrapper.so ./lib/
+	elif [ `echo $OS_ARCH |grep ppc` ]; then
+	    wrapperpath="./lib/wrapper/linux-ppc"
+	    cp ${wrapperpath}/libwrapper.so ./lib/
         elif [ "X$X86_64" = "X" ]; then
             wrapperpath="./lib/wrapper/linux"
             cp ${wrapperpath}/libwrapper.so ./lib/
@@ -99,5 +105,7 @@ fi
 
 # no, let's not start the router from the install script any more
 # ./i2prouter start
+rm -f ./osid
+rm -f ./postinstall.sh
 exit 0
 

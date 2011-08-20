@@ -58,8 +58,16 @@ public class ClientManagerFacadeImpl extends ClientManagerFacade implements Inte
     }    
     
     public void shutdown() {
+        shutdown("Router shutdown");
+    }
+
+    /**
+     *  @param msg message to send to the clients
+     *  @since 0.8.8
+     */
+    public void shutdown(String msg) {
         if (_manager != null)
-            _manager.shutdown();
+            _manager.shutdown(msg);
     }
     
     public void restart() {

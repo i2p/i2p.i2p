@@ -171,6 +171,8 @@
                 <args><arg value="$INSTALL_PATH\install_i2p_service_unix" /></args></executable>
             <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\install-headless.txt" /></args></executable>
+	    <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+                <args><arg value="$INSTALL_PATH\runplain.sh" /></args></executable>
             <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH\osid" /></args></executable>
             <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
@@ -183,10 +185,15 @@
                 <args><arg value="$INSTALL_PATH\eepget" /></args></executable>
 	    <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
 	        <args><arg value="$INSTALL_PATH/Start I2P Router.app" /></args></executable>
+	    <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+                <args><arg value="$INSTALL_PATH/man" /></args></executable>
 	    <!-- Placeholder for an OSX 'shortcut' to the router console
 	    <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
 	        <args><arg value="$INSTALL_PATH/I2P Router Console.webloc" /></args></executable>
 		-->
+            <!-- workaround for bad default path for wrapper.log in Windows. -->
+            <executable targetfile="$INSTALL_PATH/fix_logfile_path.cmd" type="bin" stage="postinstall" keep="false"> <os family="windows" /> 
+            </executable>
 
             <!-- workaround for vista permission problems - see comments above -->
             <executable targetfile="$INSTALL_PATH/fixperms.bat" type="bin" stage="postinstall" keep="true" failure="warn"
@@ -221,6 +228,8 @@
                 </args>
             </executable>
 
+            <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="false" failure="warn"> <os family="windows" />
+		    <args><arg value="$INSTALL_PATH/installer/" /></args></executable>
 
         </pack>
 
@@ -228,9 +237,7 @@
         <pack name="Windows Service" required="no">
             <description>Automatically start I2P in the background</description>
             <os family="windows" />
-            <executable targetfile="$INSTALL_PATH/set_config_dir_for_nt_service.bat" stage="postinstall" failure="warn" keep="false" />
-<!--
--->
+<!--            <executable targetfile="$INSTALL_PATH/set_config_dir_for_nt_service.bat" stage="postinstall" failure="warn" keep="false" /> -->
             <executable targetfile="$INSTALL_PATH/install_i2p_service_winnt.bat" stage="postinstall" failure="warn" keep="true">
                 <args>
                     <arg value="$INSTALL_PATH\wrapper.config" />

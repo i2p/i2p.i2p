@@ -33,7 +33,7 @@ public class TunnelPool {
     private final List<TunnelInfo> _tunnels;
     private final TunnelPeerSelector _peerSelector;
     private final TunnelPoolManager _manager;
-    private boolean _alive;
+    private volatile boolean _alive;
     private long _lifetimeProcessed;
     private TunnelInfo _lastSelected;
     private long _lastSelectionPeriod;
@@ -64,7 +64,8 @@ public class TunnelPool {
      *  Warning, this may be called more than once
      *  (without an intervening shutdown()) if the
      *  tunnel is stopped and then restarted by the client manager with the same
-     *  Destination (i.e. for servers or clients w/ persistent key)
+     *  Destination (i.e. for servers or clients w/ persistent key,
+     *  or restarting close-on-idle clients)
      */
     void startup() {
         synchronized (_inProgress) {
@@ -362,6 +363,7 @@ public class TunnelPool {
     
         if (getTunnelCount() <= 0 && !isAlive()) {
             // this calls both our shutdown() and the other one (inbound/outbound)
+            // This is racy - see TunnelPoolManager
             _manager.removeTunnels(_settings.getDestination());
         }
     }

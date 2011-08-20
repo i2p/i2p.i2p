@@ -36,6 +36,7 @@ public class DummyClientManagerFacade extends ClientManagerFacade {
     public void startup() {}    
     public void stopAcceptingClients() { }
     public void shutdown() {}
+    public void shutdown(String msg) {}
     public void restart() {}
     
     public void messageDeliveryStatusUpdate(Destination fromDest, MessageId id, boolean delivered) {}

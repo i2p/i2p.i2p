@@ -29,6 +29,7 @@ import java.net.*;
 import org.cybergarage.net.*;
 import org.cybergarage.http.*;
 import org.cybergarage.upnp.*;
+import org.cybergarage.util.Debug;
 
 public class SSDPNotifySocket extends HTTPMUSocket implements Runnable
 {
@@ -47,6 +48,7 @@ public class SSDPNotifySocket extends HTTPMUSocket implements Runnable
 			useIPv6Address = true;
 		}
 		open(addr, SSDP.PORT, bindAddr);
+		Debug.warning("Opened SSDP notify socket at " + bindAddr + ':' + SSDP.PORT);
 		setControlPoint(null);
 	}
 

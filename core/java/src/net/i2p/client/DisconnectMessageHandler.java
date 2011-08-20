@@ -12,6 +12,7 @@ package net.i2p.client;
 import net.i2p.I2PAppContext;
 import net.i2p.data.i2cp.DisconnectMessage;
 import net.i2p.data.i2cp.I2CPMessage;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 /**
@@ -27,7 +28,26 @@ class DisconnectMessageHandler extends HandlerImpl {
     public void handleMessage(I2CPMessage message, I2PSessionImpl session) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Handle message " + message);
-        session.propogateError(((DisconnectMessage)message).getReason(), new I2PSessionException("Disconnect Message received"));
+        String reason = ((DisconnectMessage)message).getReason();
+        session.propogateError(reason, new I2PSessionException("Disconnect Message received"));
         session.destroySession(false);
+        if (reason.contains("restart")) {
+            Thread t = new I2PAppThread(new Reconnector(session), "Reconnect " + session, true);
+            t.start();
+        }
+    }
+
+    /** @since 0.8.8 */
+    private static class Reconnector implements Runnable {
+        private final I2PSessionImpl _session;
+
+        public Reconnector(I2PSessionImpl session) {
+             _session = session;
+        }
+
+        public void run() {
+            try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
+            _session.reconnect();
+        }
     }
 }

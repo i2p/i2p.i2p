@@ -43,6 +43,7 @@ class FloodfillPeerSelector extends PeerSelector {
      * Puts the floodfill peers that are directly connected first in the list.
      * List will not include our own hash.
      *
+     * @param key the ROUTING key (NOT the original key)
      * @param peersToIgnore can be null
      * @return List of Hash for the peers selected
      */
@@ -57,6 +58,7 @@ class FloodfillPeerSelector extends PeerSelector {
      * Does not prefer the floodfill peers that are directly connected.
      * List will not include our own hash.
      *
+     * @param key the ROUTING key (NOT the original key)
      * @param peersToIgnore can be null
      * @return List of Hash for the peers selected
      */
@@ -70,6 +72,7 @@ class FloodfillPeerSelector extends PeerSelector {
      * after they're complete, sort via kademlia.
      * List will not include our own hash.
      *
+     * @param key the ROUTING key (NOT the original key)
      * @param peersToIgnore can be null
      * @return List of Hash for the peers selected
      */
@@ -133,7 +136,7 @@ class FloodfillPeerSelector extends PeerSelector {
      *  List will not include our own hash.
      *
      *  @return floodfills closest to the key that are not shitlisted forever
-     *  @param key the routing key
+     *  @param key the ROUTING key (NOT the original key)
      *  @param maxNumRouters max to return
      *  Sorted by closest to the key if > maxNumRouters, otherwise not
      *  The list is in 3 groups - sorted by routing key within each group.
@@ -159,6 +162,7 @@ class FloodfillPeerSelector extends PeerSelector {
     /**
      *  See above for description
      *  List will not include our own hash
+     *  @param key the ROUTING key (NOT the original key)
      *  @param toIgnore can be null
      */
     List<Hash> selectFloodfillParticipants(Hash key, int howMany, Set<Hash> toIgnore, KBucketSet kbuckets) {
@@ -175,6 +179,7 @@ class FloodfillPeerSelector extends PeerSelector {
     /**
      *  See above for description
      *  List MAY CONTAIN our own hash unless included in toIgnore
+     *  @param key the ROUTING key (NOT the original key)
      *  @param toIgnore can be null
      */
     private List<Hash> selectFloodfillParticipantsIncludingUs(Hash key, int howMany, Set<Hash> toIgnore, KBucketSet kbuckets) {
@@ -271,6 +276,7 @@ class FloodfillPeerSelector extends PeerSelector {
 
         /**
          *  Warning - may return our router hash - add to toIgnore if necessary
+         *  @param key the ROUTING key (NOT the original key)
          *  @param toIgnore can be null
          */
         public FloodfillSelectionCollector(Hash key, Set<Hash> toIgnore, int wanted) {

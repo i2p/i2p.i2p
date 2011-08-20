@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P i2psnark\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-06-18 14:07+0000\n"
-"PO-Revision-Date: 2011-06-18 20:17+0500\n"
+"POT-Creation-Date: 2011-08-15 17:55+0000\n"
+"PO-Revision-Date: 2011-08-17 23:13+0500\n"
 "Last-Translator: Hidden Z <hiddenz@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "Language: \n"
@@ -187,7 +187,7 @@ msgstr "Добавление {0}"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:730
 #: ../java/src/org/klomp/snark/SnarkManager.java:753
-#: ../java/src/org/klomp/snark/SnarkManager.java:1180
+#: ../java/src/org/klomp/snark/SnarkManager.java:1184
 #, java-format
 msgid "Failed to copy torrent file to {0}"
 msgstr "Не удалось скопировать торрент в: {0}"
@@ -253,27 +253,27 @@ msgstr "Торрент удален: \"{0}\""
 msgid "Adding torrents in {0}"
 msgstr "Добавление торрентов через {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1128
+#: ../java/src/org/klomp/snark/SnarkManager.java:1132
 #, java-format
 msgid "Download finished: {0}"
 msgstr "Закачка завершена: {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1176
+#: ../java/src/org/klomp/snark/SnarkManager.java:1180
 #, java-format
 msgid "Metainfo received for {0}"
 msgstr "Метаданные получены для {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1177
+#: ../java/src/org/klomp/snark/SnarkManager.java:1181
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:526
 #, java-format
 msgid "Starting up torrent {0}"
 msgstr "Запускаем торрент: {0}"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1231
+#: ../java/src/org/klomp/snark/SnarkManager.java:1235
 msgid "Unable to connect to I2P!"
 msgstr "Не удалось установить соединение с I2P!"
 
-#: ../java/src/org/klomp/snark/SnarkManager.java:1237
+#: ../java/src/org/klomp/snark/SnarkManager.java:1241
 #, java-format
 msgid "Unable to add {0}"
 msgstr "Не удаётся добавить {0}"

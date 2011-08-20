@@ -174,6 +174,11 @@ public abstract class SimpleDataStructure extends DataStructureImpl {
         return rv;
     }
 
+    /**
+     * Warning - this returns true for two different classes with the same size
+     * and same data, e.g. SessionKey and SessionTag, but you wouldn't
+     * put them in the same Set, would you?
+     */
     @Override
     public boolean equals(Object obj) {
         if ((obj == null) || !(obj instanceof SimpleDataStructure)) return false;

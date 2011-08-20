@@ -18,7 +18,7 @@ Package: i2p
 Architecture: all
 Section: net
 Priority: optional
-Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends}, default-jre | java5-runtime | java6-runtime,
+Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
  adduser, 
  i2p-router (>= 0.8.6-5),
  libjbigi-jni (>= ${source:Version}),
@@ -41,7 +41,7 @@ Priority: optional
 Depends: ${misc:Depends}, ${shlibs:Depends}
 Homepage: http://www.i2p2.de/jbigi
 Description: Java Big Integer library
- This Package contains the libjbigi JNI library
+ This Package contains the libjbigi JNI library (and on x86 platforms, jcpuid).
  .
  libjbigi is a math library that is part of the I2P installation.  Use of this
  library greatly enhances the efficiency of cryptographic algorithms, such as
@@ -65,12 +65,13 @@ Package: i2p-router
 Architecture: all
 Section: net
 Priority: optional
-Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends}, default-jre | java5-runtime | java6-runtime
+Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends}, default-jre-headless | java5-runtime-headless | java6-runtime-headless
 Replaces: i2p ( << 0.8.6-5)
 Breaks: i2p (<< 0.8.6-5)
-Recommends: libjbigi-jni (>= ${source:Version}), libjbigi-jni (<< ${source:Version}.1~)
+Recommends: libjbigi-jni (>= ${source:Version}), libjbigi-jni (<< ${source:Version}.1~), ttf-dejavu
 Suggests: tor,
  i2p-messenger,
+ i2phex,
  i2p-tahoe-lafs,
  imule,
  i2pfox,
@@ -90,3 +91,6 @@ Description: Load-balanced unspoofable packet switching network
  applications can use to securely communicate. All data is wrapped with several
  layers of encryption, and the network is both distributed and dynamic, with no
  trusted parties.
+ .
+ TrueType fonts (such as those provided in the package ttf-dejavu) are required
+ in order to generate graphs. 

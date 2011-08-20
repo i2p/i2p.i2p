@@ -59,6 +59,8 @@ public class RouterContext extends I2PAppContext {
     private MessageStateMonitor _messageStateMonitor;
     private RouterThrottle _throttle;
     private final Set<Runnable> _finalShutdownTasks;
+    // split up big lock on this to avoid deadlocks
+    private final Object _lock1 = new Object(), _lock2 = new Object();
 
     private static List<RouterContext> _contexts = new ArrayList(1);
     
@@ -411,7 +413,7 @@ public class RouterContext extends I2PAppContext {
     
     @Override
     protected void initializeClock() {
-        synchronized (this) {
+        synchronized (_lock1) {
             if (_clock == null)
                 _clock = new RouterClock(this);
             _clockInitialized = true;
@@ -428,7 +430,7 @@ public class RouterContext extends I2PAppContext {
 
     @Override
     protected void initializeKeyRing() {
-        synchronized (this) {
+        synchronized (_lock2) {
             if (_keyRing == null)
                 _keyRing = new PersistentKeyRing(this);
             _keyRingInitialized = true;

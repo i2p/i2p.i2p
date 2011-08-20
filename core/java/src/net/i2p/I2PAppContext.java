@@ -109,8 +109,13 @@ public class I2PAppContext {
     private File _logDir;
     private File _appDir;
     private File _tmpDir;
-    
-    
+    // split up big lock on this to avoid deadlocks
+    private final Object _lock1 = new Object(), _lock2 = new Object(), _lock3 = new Object(), _lock4 = new Object(),
+                         _lock5 = new Object(), _lock6 = new Object(), _lock7 = new Object(), _lock8 = new Object(),
+                         _lock9 = new Object(), _lock10 = new Object(), _lock11 = new Object(), _lock12 = new Object(),
+                         _lock13 = new Object(), _lock14 = new Object(), _lock15 = new Object(), _lock16 = new Object(),
+                         _lock17 = new Object();
+
     /**
      * Pull the default context, creating a new one if necessary, else using 
      * the first one created.
@@ -385,7 +390,7 @@ public class I2PAppContext {
      */
     public File getTempDir() {
         // fixme don't synchronize every time
-        synchronized (this) {
+        synchronized (_lock1) {
             if (_tmpDir == null) {
                 String d = getProperty("i2p.dir.temp", System.getProperty("java.io.tmpdir"));
                 // our random() probably isn't warmed up yet
@@ -409,7 +414,7 @@ public class I2PAppContext {
 
     /** don't rely on deleteOnExit() */
     public void deleteTempDir() {
-        synchronized (this) {
+        synchronized (_lock1) {
             if (_tmpDir != null) {
                 FileUtil.rmdir(_tmpDir, false);
                 _tmpDir = null;
@@ -543,7 +548,7 @@ public class I2PAppContext {
     }
 
     private void initializeStatManager() {
-        synchronized (this) {
+        synchronized (_lock2) {
             if (_statManager == null)
                 _statManager = new StatManager(this);
             _statManagerInitialized = true;
@@ -570,7 +575,7 @@ public class I2PAppContext {
     }
 
     private void initializeSessionKeyManager() {
-        synchronized (this) {
+        synchronized (_lock3) {
             if (_sessionKeyManager == null) 
                 //_sessionKeyManager = new PersistentSessionKeyManager(this);
                 _sessionKeyManager = new TransientSessionKeyManager(this);
@@ -590,7 +595,7 @@ public class I2PAppContext {
     }
 
     private void initializeNamingService() {
-        synchronized (this) {
+        synchronized (_lock4) {
             if (_namingService == null) {
                 _namingService = NamingService.createInstance(this);
             }
@@ -613,7 +618,7 @@ public class I2PAppContext {
     }
 
     private void initializeElGamalEngine() {
-        synchronized (this) {
+        synchronized (_lock5) {
             if (_elGamalEngine == null) {
                 if ("off".equals(getProperty("i2p.encryption", "on")))
                     _elGamalEngine = new DummyElGamalEngine(this);
@@ -638,7 +643,7 @@ public class I2PAppContext {
     }
 
     private void initializeElGamalAESEngine() {
-        synchronized (this) {
+        synchronized (_lock6) {
             if (_elGamalAESEngine == null)
                 _elGamalAESEngine = new ElGamalAESEngine(this);
             _elGamalAESEngineInitialized = true;
@@ -658,7 +663,7 @@ public class I2PAppContext {
     }
 
     private void initializeAESEngine() {
-        synchronized (this) {
+        synchronized (_lock7) {
             if (_AESEngine == null) {
                 if ("off".equals(getProperty("i2p.encryption", "on")))
                     _AESEngine = new AESEngine(this);
@@ -682,7 +687,7 @@ public class I2PAppContext {
     }
 
     private void initializeLogManager() {
-        synchronized (this) {
+        synchronized (_lock8) {
             if (_logManager == null)
                 _logManager = new LogManager(this);
             _logManagerInitialized = true;
@@ -701,7 +706,7 @@ public class I2PAppContext {
     }
 
     private void initializeHMAC() {
-        synchronized (this) {
+        synchronized (_lock9) {
             if (_hmac == null) {
                 _hmac= new HMACGenerator(this);
             }
@@ -718,7 +723,7 @@ public class I2PAppContext {
 
     /** @deprecated used only by syndie */
     private void initializeHMAC256() {
-        synchronized (this) {
+        synchronized (_lock10) {
             if (_hmac256 == null) {
                 _hmac256 = new HMAC256Generator(this);
             }
@@ -737,7 +742,7 @@ public class I2PAppContext {
     }
 
     private void initializeSHA() {
-        synchronized (this) {
+        synchronized (_lock11) {
             if (_sha == null)
                 _sha= new SHA256Generator(this);
             _shaInitialized = true;
@@ -755,7 +760,7 @@ public class I2PAppContext {
     }
 
     private void initializeDSA() {
-        synchronized (this) {
+        synchronized (_lock12) {
             if (_dsa == null) {
                 if ("off".equals(getProperty("i2p.encryption", "on")))
                     _dsa = new DummyDSAEngine(this);
@@ -777,7 +782,7 @@ public class I2PAppContext {
     }
 
     private void initializeKeyGenerator() {
-        synchronized (this) {
+        synchronized (_lock13) {
             if (_keyGenerator == null)
                 _keyGenerator = new KeyGenerator(this);
             _keyGeneratorInitialized = true;
@@ -796,7 +801,7 @@ public class I2PAppContext {
     }
 
     protected void initializeClock() { // overridden in RouterContext
-        synchronized (this) {
+        synchronized (_lock14) {
             if (_clock == null)
                 _clock = new Clock(this);
             _clockInitialized = true;
@@ -817,7 +822,7 @@ public class I2PAppContext {
     }
 
     private void initializeRoutingKeyGenerator() {
-        synchronized (this) {
+        synchronized (_lock15) {
             if (_routingKeyGenerator == null)
                 _routingKeyGenerator = new RoutingKeyGenerator(this);
             _routingKeyGeneratorInitialized = true;
@@ -834,7 +839,7 @@ public class I2PAppContext {
     }
 
     protected void initializeKeyRing() {
-        synchronized (this) {
+        synchronized (_lock16) {
             if (_keyRing == null)
                 _keyRing = new KeyRing();
             _keyRingInitialized = true;
@@ -852,7 +857,7 @@ public class I2PAppContext {
     }
 
     private void initializeRandom() {
-        synchronized (this) {
+        synchronized (_lock17) {
             if (_random == null) {
                 //if (true)
                     _random = new FortunaRandomSource(this);

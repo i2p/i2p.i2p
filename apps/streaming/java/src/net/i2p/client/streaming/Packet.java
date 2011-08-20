@@ -151,26 +151,32 @@ class Packet {
     public Packet() { }
     
     private boolean _sendStreamIdSet = false;
+
     /** what stream do we send data to the peer on?
      * @return stream ID we use to send data
      */
     public long getSendStreamId() { return _sendStreamId; }
+
     public void setSendStreamId(long id) { 
-        if ( (_sendStreamIdSet) && (_sendStreamId > 0) )
+        // allow resetting to the same id (race)
+        if ( (_sendStreamIdSet) && (_sendStreamId > 0) && _sendStreamId != id)
             throw new RuntimeException("Send stream ID already set [" + _sendStreamId + ", " + id + "]");
         _sendStreamIdSet = true;
         _sendStreamId = id; 
     }
     
     private boolean _receiveStreamIdSet = false;
+
     /** 
      * stream the replies should be sent on.  this should be 0 if the
      * connection is still being built.
      * @return stream ID we use to get data, zero if the connection is still being built.
      */
     public long getReceiveStreamId() { return _receiveStreamId; }
+
     public void setReceiveStreamId(long id) { 
-        if ( (_receiveStreamIdSet) && (_receiveStreamId > 0) ) 
+        // allow resetting to the same id (race)
+        if ( (_receiveStreamIdSet) && (_receiveStreamId > 0) && _receiveStreamId != id) 
             throw new RuntimeException("Receive stream ID already set [" + _receiveStreamId + ", " + id + "]");
         _receiveStreamIdSet = true;
         _receiveStreamId = id; 

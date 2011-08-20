@@ -1008,7 +1008,6 @@ div.joblog i {
 
  div.joblog li {
      word-wrap: break-word !important;
-     text-align: justify !important;
      line-height: 115% !important;
      padding: 0;
      font-size: 9pt !important;

@@ -1,5 +1,7 @@
 package net.i2p.router;
 
+import java.io.File;
+
 import net.i2p.data.DataHelper;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
@@ -105,9 +107,13 @@ class RouterWatchdog implements Runnable {
                 // This works on linux...
                 // It won't on windows, and we can't call i2prouter.bat either, it does something
                 // completely different...
-                if (System.getProperty("wrapper.version") != null && !System.getProperty("os.name").startsWith("Win")) {
+                if (_context.hasWrapper() && !System.getProperty("os.name").startsWith("Win")) {
                     ShellCommand sc = new ShellCommand();
-                    boolean success = sc.executeSilentAndWaitTimed("./i2prouter dump", 10);
+                    File i2pr = new File(_context.getBaseDir(), "i2prouter");
+                    String[] args = new String[2];
+                    args[0] = i2pr.getAbsolutePath();
+                    args[1] = "dump";
+                    boolean success = sc.executeSilentAndWaitTimed(args, 10);
                     if (success)
                         _log.log(Log.CRIT, "Threads dumped to wrapper log");
                 }

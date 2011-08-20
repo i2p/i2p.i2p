@@ -963,7 +963,6 @@ div.main li {
  
 div.joblog li {
      word-wrap: break-word !important;
-     text-align: justify !important;
      line-height: 120% !important;
      margin: 2px 0px 2px 30px;
      padding: 2px 20px 2px 0px;

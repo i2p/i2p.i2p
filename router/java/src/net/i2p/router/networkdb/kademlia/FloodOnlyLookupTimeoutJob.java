@@ -5,17 +5,19 @@ import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 class FloodOnlyLookupTimeoutJob extends JobImpl {
-    private FloodSearchJob _search;
-    private Log _log;
+    private final FloodSearchJob _search;
+
     public FloodOnlyLookupTimeoutJob(RouterContext ctx, FloodOnlySearchJob job) {
         super(ctx);
         _search = job;
-        _log = ctx.logManager().getLog(getClass());
     }
+
     public void runJob() {
-        if (_log.shouldLog(Log.INFO))
-            _log.info(_search.getJobId() + ": search timed out");
+        Log log = getContext().logManager().getLog(getClass());
+        if (log.shouldLog(Log.INFO))
+            log.info(_search.getJobId() + ": search timed out");
         _search.failed();
     }
+
     public String getName() { return "NetDb flood search (phase 1) timeout"; }
 }

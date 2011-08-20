@@ -33,6 +33,7 @@
     <a href="/?lang=en&amp;consoleNonce=<%=consoleNonce%>"><img src="/flags.jsp?c=us" title="English" alt="English"></a> 
     <a href="/?lang=ar&amp;consoleNonce=<%=consoleNonce%>"><img src="/flags.jsp?c=lang_ar" title="عربية" alt="عربية"></a>
     <a href="/?lang=zh&amp;consoleNonce=<%=consoleNonce%>"><img src="/flags.jsp?c=cn" title="中文" alt="中文"></a> 
+    <a href="/?lang=da&amp;consoleNonce=<%=consoleNonce%>"><img src="/flags.jsp?c=dk" title="Danish" alt="Danish"></a> 
     <a href="/?lang=de&amp;consoleNonce=<%=consoleNonce%>"><img src="/flags.jsp?c=de" title="Deutsch" alt="Deutsch"></a> 
     <a href="/?lang=es&amp;consoleNonce=<%=consoleNonce%>"><img src="/flags.jsp?c=es" title="Español" alt="Español"></a> 
     <a href="/?lang=fi&amp;consoleNonce=<%=consoleNonce%>"><img src="/flags.jsp?c=fi" title="Suomi" alt="Suomi"></a> 
@@ -43,6 +44,7 @@
     <a href="/?lang=pt&amp;consoleNonce=<%=consoleNonce%>"><img src="/flags.jsp?c=pt" title="Português" alt="Português"></a> 
     <a href="/?lang=ru&amp;consoleNonce=<%=consoleNonce%>"><img src="/flags.jsp?c=ru" title="Русский" alt="Русский"></a> 
     <a href="/?lang=sv&amp;consoleNonce=<%=consoleNonce%>"><img src="/flags.jsp?c=se" title="Svenska" alt="Svenska"></a>
+    <a href="/?lang=uk&amp;consoleNonce=<%=consoleNonce%>"><img src="/flags.jsp?c=ua" title="Ukranian" alt="Ukranian"></a>
     <a href="/?lang=vi&amp;consoleNonce=<%=consoleNonce%>"><img src="/flags.jsp?c=vn" title="Tiếng Việt" alt="Tiếng Việt"></a>
   </div>
   <a name="top"></a>

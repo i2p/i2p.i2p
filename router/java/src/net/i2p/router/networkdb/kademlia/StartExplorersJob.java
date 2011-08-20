@@ -53,7 +53,9 @@ class StartExplorersJob extends JobImpl {
                getContext().router().gracefulShutdownInProgress())) {
             int num = MAX_PER_RUN;
             if (_facade.getDataStore().size() < LOW_ROUTERS)
-                num *= 2;
+                num *= 3;
+            if (getContext().router().getUptime() < STARTUP_TIME)
+                num *= 3;
             Set<Hash> toExplore = selectKeysToExplore(num);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Keys to explore during this run: " + toExplore);

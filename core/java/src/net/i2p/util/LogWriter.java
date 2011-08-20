@@ -122,7 +122,7 @@ class LogWriter implements Runnable {
         if (_manager.getDisplayOnScreenLevel() <= rec.getPriority()) {
             if (_manager.displayOnScreen()) {
                 // wrapper log already does time stamps, so reformat without the date
-                if (System.getProperty("wrapper.version") != null)
+                if (_manager.getContext().hasWrapper())
                     System.out.print(LogRecordFormatter.formatRecord(_manager, rec, false));
                 else
                     System.out.print(val);

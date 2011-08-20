@@ -230,6 +230,7 @@ public class ControlPoint implements HTTPRequestListener
 			if (rootDev == null)
 				return;
 			rootDev.setSSDPPacket(ssdpPacket);
+			Debug.warning("Add root device", new Exception("received on " + ssdpPacket.getLocalAddress()));
 			addDevice(rootNode);
 
 			// Thanks for Oliver Newell (2004/10/16)

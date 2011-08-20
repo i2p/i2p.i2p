@@ -9,6 +9,7 @@ package net.i2p.util;
  */
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,6 +29,7 @@ import freenet.support.CPUInformation.VIACPUInfo;
 import freenet.support.CPUInformation.UnknownCPUException;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
 
 /**
  * <p>BigInteger that takes advantage of the jbigi library for the modPow operation,
@@ -145,6 +147,7 @@ public class NativeBigInteger extends BigInteger {
      * @since 0.8.7
      */
     private final static String JBIGI_OPTIMIZATION_ARM        = "arm";
+    private final static String JBIGI_OPTIMIZATION_PPC	      = "ppc";
 
     /**
      * Operating systems
@@ -175,6 +178,8 @@ public class NativeBigInteger extends BigInteger {
 
     private static final boolean _isArm = System.getProperty("os.arch").startsWith("arm");
 
+    private static final boolean _isPPC = System.getProperty("os.arch").contains("ppc");
+
     /* libjbigi.so vs jbigi.dll */
     private static final String _libPrefix = (_isWin || _isOS2 ? "" : "lib");
     private static final String _libSuffix = (_isWin || _isOS2 ? ".dll" : _isMac ? ".jnilib" : ".so");
@@ -182,10 +187,12 @@ public class NativeBigInteger extends BigInteger {
     private final static String sCPUType; //The CPU Type to optimize for (one of the above strings)
     
     static {
-        if (_isX86) // Don't try to resolve CPU type on PPC and other non x86 hardware
+        if (_isX86) // Don't try to resolve CPU type on non x86 hardware
             sCPUType = resolveCPUType();
         else if (_isArm)
             sCPUType = JBIGI_OPTIMIZATION_ARM;
+        else if (_isPPC && !_isMac)
+	    sCPUType = JBIGI_OPTIMIZATION_PPC;
 	else
 	    sCPUType = null;
         loadNative();
@@ -629,6 +636,35 @@ public class NativeBigInteger extends BigInteger {
                 // athlon64_64 is always a fallback for 64 bit
                 rv.add(_libPrefix + getMiddleName1() + JBIGI_OPTIMIZATION_ATHLON64 + "_64" + _libSuffix);
             }
+
+            if (_isArm) {
+                InputStream in = null;
+                try {
+                    in = new FileInputStream("/proc/cpuinfo");
+                    while (true) {
+                        String line = DataHelper.readLine(in);
+                        if (line == null)
+                            break;
+                        if (!line.startsWith("CPU architecture"))
+                            continue;
+                        //CPU architecture: 5TEJ
+                        //CPU architecture: 7
+                        int colon = line.indexOf(": ");
+                        String sver = line.substring(colon + 2, colon + 3);
+                        int ver = Integer.parseInt(sver);
+                        // add libjbigi-linux-armv7.so, libjbigi-linux-armv6.so, ...
+                        for (int i = ver; i >= 3; i--) {
+                            rv.add(_libPrefix + getMiddleName1() + primary + 'v' + i + _libSuffix);
+                        }
+                        break;
+                    }
+                } catch (NumberFormatException nfe) {
+                } catch (IOException ioe) {
+                } finally {
+                    if (in != null) try { in.close(); } catch (IOException ioe) {}
+                }
+            }
+
             // the preferred selection
             rv.add(_libPrefix + getMiddleName1() + primary + _libSuffix);
 
@@ -659,7 +695,7 @@ public class NativeBigInteger extends BigInteger {
             rv.add(_libPrefix + getMiddleName1() + "none_64" + _libSuffix);
         // Add libjbigi-xxx-none.so
         // Note that libjbigi-osx-none.jnilib is a 'fat binary' with both PPC and x86-32
-        if (!_isArm)
+        if (!_isArm && !_isPPC && !_isMac)
             rv.add(getResourceName(false));
         return rv;
     }

@@ -143,6 +143,17 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
          "or naming one of them differently.<p>")
          .getBytes();
 
+    private final static byte[] ERR_AHELPER_NOTFOUND =
+        ("HTTP/1.1 404 Not Found\r\n"+
+         "Content-Type: text/html; charset=iso-8859-1\r\n"+
+         "Cache-control: no-cache\r\n"+
+         "\r\n"+
+         "<html><body><H1>I2P ERROR: Helper key not resolvable.</H1>"+
+         "The helper key you put for i2paddresshelper= is not resolvable. "+
+         "It seems to be garbage data, or a mistyped b32. Check your URL "+
+         "to try and fix the helper key to be either a b32 or a base64.")
+         .getBytes();
+
     private final static byte[] ERR_AHELPER_NEW =
         ("HTTP/1.1 409 New Address\r\n"+
          "Content-Type: text/html; charset=iso-8859-1\r\n"+
@@ -457,13 +468,28 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                     ahelperKey = fragment.substring(pos2 + 1);
                                     // Key contains data, lets not ignore it
                                     if (ahelperKey != null) {
-                                        if(ahelperKey.endsWith(".b32.i2p")) {
+                                        if(ahelperKey.endsWith(".i2p")) {
                                             // allow i2paddresshelper=<b32>.b32.i2p syntax.
+                                            /*
+                                              also i2paddresshelper=name.i2p for aliases
+                                              i.e. on your eepsite put 
+                                              <a href="?i2paddresshelper=name.i2p">This is the name I want to be called.</a>
+                                            */
                                             Destination dest = _context.namingService().lookup(ahelperKey);
-                                            if(dest==null) 
-                                                throw new RuntimeException("Could not find destination for "+ahelperKey);
+                                            if(dest==null) {
+                                                if (_log.shouldLog(Log.WARN))
+                                                    _log.warn(getPrefix(requestId) + "Could not find destination for "+ahelperKey);
+                                                byte[] header = getErrorPage("ahelper-notfound", ERR_AHELPER_NOTFOUND);
+                                                out.write(header);
+                                                out.write(("<p>" + _("This seems to be a bad destination:") + " " + ahelperKey + " " + _("i2paddresshelper cannot help you with a destination like that!") + "</p>").getBytes("UTF-8"));
+                                                writeFooter(out);
+                                                // XXX: should closeSocket(s) be in a finally block?
+                                                closeSocket(s);
+                                                return;
+                                            }
                                             ahelperKey = dest.toBase64();
-                                        }
+                                        } 
+
                                         ahelperPresent = true;
                                         // ahelperKey will be validated later
                                         if (host == null || "i2p".equals(host)) {
@@ -490,6 +516,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                                     if (_log.shouldLog(Log.WARN))
                                                         _log.warn(getPrefix(requestId) + "Addresshelper key conflict for site [" + destination +
                                                                   "], trusted key [" + destB64 + "], specified key [" + ahelperKey + "].");
+                                                    
                                                 }
                                             }
                                         }
@@ -524,7 +551,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                         byte[] header = getErrorPage("ahelper-conflict", ERR_AHELPER_CONFLICT);
                                         out.write(header);
                                         out.write(_("To visit the destination in your host database, click <a href=\"{0}\">here</a>. To visit the conflicting addresshelper destination, click <a href=\"{1}\">here</a>.", trustedURL, conflictURL).getBytes("UTF-8"));
-                                        out.write(("<p></div>").getBytes());
+                                        out.write(("</p></div>").getBytes());
                                         writeFooter(out);
                                     }
                                 }

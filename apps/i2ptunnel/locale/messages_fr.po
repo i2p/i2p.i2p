@@ -43,18 +43,18 @@ msgstr "Aller sur le site i2p {0} sans enregistrer dans un carnet d'adresses. "
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:892
 #, java-format
 msgid "Save {0} to router address book and continue to eepsite"
-msgstr "Ajouter au carnet d'adresse du routeur {0} et aller sur le site i2p"
+msgstr "Ajouter au carnet d''adresse du routeur {0} et aller sur le site i2p"
 
 #. only blockfile supports multiple books
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:895
 #, java-format
 msgid "Save {0} to master address book and continue to eepsite"
-msgstr "Ajouter au carnet d'adresse principal {0} et aller sur le site i2p"
+msgstr "Ajouter au carnet d''adresse principal {0} et aller sur le site i2p"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:896
 #, java-format
 msgid "Save {0} to private address book and continue to eepsite"
-msgstr "Ajouter au carnet d'adresse privé {0} et aller sur le site i2p"
+msgstr "Ajouter au carnet d''adresse privé {0} et aller sur le site i2p"
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1052
 msgid "Click a link below to look for an address helper by using a \"jump\" service:"
@@ -88,12 +88,12 @@ msgstr "Aide"
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1306
 #, java-format
 msgid "Saved {0} to the {1} addressbook, redirecting now."
-msgstr "{0} ajouté au carnet d'adresses {1}. Redirection en cours."
+msgstr "{0} ajouté au carnet d''adresses {1}. Redirection en cours."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1307
 #, java-format
 msgid "Failed to save {0} to the {1} addressbook, redirecting now."
-msgstr "{0} non ajouté au carnet d'adresses {1}. Redirection en cours."
+msgstr "{0} non ajouté au carnet d''adresses {1}. Redirection en cours."
 
 #: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1309
 msgid "Click here if you are not redirected automatically."

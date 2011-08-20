@@ -308,7 +308,7 @@ public abstract class TransportImpl implements Transport {
                     _log.warn("WTF, more than a minute slow? " + msg.getMessageType()
                               + " of id " + msg.getMessageId() + " (send begin on "
                               + new Date(msg.getSendBegin()) + " / created on "
-                              + new Date(msg.getCreated()) + "): " + msg, msg.getCreatedBy());
+                              + new Date(msg.getCreated()) + "): " + msg);
                 _context.messageHistory().messageProcessingError(msg.getMessageId(),
                                                                  msg.getMessageType(),
                                                                  "Took too long to send [" + allTime + "ms]");

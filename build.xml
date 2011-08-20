@@ -15,6 +15,9 @@
 
     <!-- change this to false if you don't have gettext -->
     <property name="require.gettext" value="true" />
+    <!-- Include property files so that values can be easily overridden. Currently just useful for javadoc hosters -->
+    <property file="override.properties"/>
+    <property file="build.properties"/>
 
     <!-- You probably don't want to change anything from here down -->
     <target name="help" depends="all" />
@@ -23,6 +26,10 @@
         <echo message="  pkg:       distclean then package everything up (installer, clean tarball, update tarball)" />
         <echo message="  dist:      pkg and javadoc" />
         <echo message="  installer: build the GUI installer" />
+        <echo message="  installer-freebsd: build the GUI installer (FreeBSD only)" />
+        <echo message="  installer-linux: build the GUI installer (Linux only)" />
+        <echo message="  installer-osx: build the GUI installer (OSX only)" />
+        <echo message="  installer-windows: build the GUI installer (Windows only)" />
         <echo message="  tarball:   tar the full install into i2p.tar.bz2 (extracts to build a new clean install)" />
         <echo message="  updater:   Package the built files in i2pupdate.zip (extracts safely over existing installs)" />
         <echo message="  updater200: Updater compressed with pack200 (creates i2pupdate200.zip, 60% smaller)" />
@@ -202,6 +209,9 @@
         <condition property="noExe">
 	    <os arch="ppc" />
 	</condition>
+	<condition property="noExe">
+	    <os arch="armv5tejl" />
+        </condition>
         <condition property="noExe">
 	    <os arch="amd64" />
 	</condition>
@@ -279,12 +289,13 @@
             </manifest>
         </jar>
     </target>
-
-    <target name="jbigi-windows-only" depends="buildProperties, jbigi-list-changes" >
+    
+    <!-- Now system-specific jbigis in alphabetical order -->
+    <target name="jbigi-freebsd-only"  depends="buildProperties, jbigi-list-changes" >
         <!-- set if unset -->
         <property name="workspace.changes.jbigi.tr" value="" />
-        <jar destfile="build/jbigi.jar" whenmanifestonly="fail" >
-            <fileset dir="installer/lib/jbigi" includes="*windows*.dll" />
+        <jar destfile="build/jbigi.jar"  whenmanifestonly="fail" >
+            <fileset dir="installer/lib/jbigi" includes="*freebsd*.so" />
             <manifest>
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
@@ -298,6 +309,45 @@
         <property name="workspace.changes.jbigi.tr" value="" />
         <jar destfile="build/jbigi.jar"  whenmanifestonly="fail" >
             <fileset dir="installer/lib/jbigi" includes="*linux*.so" />
+            <manifest>
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.jbigi.tr}" />
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="jbigi-linux-nonx86-only"  depends="buildProperties, jbigi-list-changes" >
+        <!-- set if unset -->
+        <property name="workspace.changes.jbigi.tr" value="" />
+        <jar destfile="build/jbigi.jar"  whenmanifestonly="fail" >
+            <fileset dir="installer/lib/jbigi" includes="*linux-arm*.so,*linux-ppc*.so" />
+            <manifest>
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.jbigi.tr}" />
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="jbigi-osx-only"  depends="buildProperties, jbigi-list-changes" >
+        <!-- set if unset -->
+        <property name="workspace.changes.jbigi.tr" value="" />
+        <jar destfile="build/jbigi.jar"  whenmanifestonly="fail" >
+            <fileset dir="installer/lib/jbigi" includes="*.jnilib" />
+            <manifest>
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.jbigi.tr}" />
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="jbigi-windows-only" depends="buildProperties, jbigi-list-changes" >
+        <!-- set if unset -->
+        <property name="workspace.changes.jbigi.tr" value="" />
+        <jar destfile="build/jbigi.jar" whenmanifestonly="fail" >
+            <fileset dir="installer/lib/jbigi" includes="*windows*.dll" />
             <manifest>
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
@@ -369,10 +419,12 @@
                 <pathelement location="installer/lib/wrapper/all/wrapper.jar" />
                 <pathelement location="core/lib/junit.jar" />
             </classpath>
-            <link offline="true" href="http://download.oracle.com/javase/6/docs/api/" packagelistLoc="installer/resources/package-lists/java/" />
-            <link offline="true" href="http://docs.i2p2.de/jetty/javadoc/" packagelistLoc="installer/resources/package-lists/jetty/" />
-            <link offline="true" href="http://docs.i2p-projekt.de/jrobin/javadoc/" packagelistLoc="installer/resources/package-lists/jrobin/" />
-            <link offline="true" href="http://wrapper.tanukisoftware.com/jdoc/" packagelistLoc="installer/resources/package-lists/wrapper/" />
+	    <!-- These variables are stored in build.properties. 
+		 End-users can override by creating the file override.properties -->
+            <link offline="true" href="${javasedocs.url}" packagelistLoc="installer/resources/package-lists/java/" />
+            <link offline="true" href="${jettydocs.url}" packagelistLoc="installer/resources/package-lists/jetty/" />
+            <link offline="true" href="${jrobindocs.url}" packagelistLoc="installer/resources/package-lists/jrobin/" />
+            <link offline="true" href="${wrapperdocs.url}" packagelistLoc="installer/resources/package-lists/wrapper/" />
         </javadoc>
         <echo message="Warning, javadoc embeds timestamps in the output, run with 'TZ=UTC ant javadoc' if you plan to distribute" />
     </target>
@@ -392,15 +444,19 @@
     <target name="getBuildNumber" >
         <exec executable="grep" outputproperty="buildLine" >
             <arg value="public final static long BUILD" />
-	    <arg value="router/java/src/net/i2p/router/RouterVersion.java" />
+            <arg value="router/java/src/net/i2p/router/RouterVersion.java" />
         </exec>
         <exec executable="cut" inputstring="${buildLine}" outputproperty="build.temp" failonerror="true" >
             <arg value="-f2" />
-	    <arg value="-d=" />
+            <arg value="-d=" />
         </exec>
-        <exec executable="cut" inputstring="${build.temp}" outputproperty="build.number" failonerror="true" >
+        <exec executable="tr" inputstring="${build.temp}" outputproperty="build.temp.tr" failonerror="true">
+            <arg value="-d" />
+            <arg value="[:space:]"/>
+        </exec>
+        <exec executable="cut" inputstring="${build.temp.tr}" outputproperty="build.number" failonerror="true" >
             <arg value="-f1" />
-	    <arg value="-d;" />
+            <arg value="-d;" />
         </exec>
         <echo message="Build number is ${build.number}" />
     </target>
@@ -491,25 +547,83 @@
         </delete>
     </target>
 
-    <target name="preppkg" depends="preppkg-linux, preppkg-osx, preppkg-windows, jbigi">
+    <target name="preppkg" depends="preppkg-linux, preppkg-freebsd, preppkg-osx, preppkg-windows, jbigi">
         <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
-        <copy todir="pkg-temp/lib/wrapper/freebsd/">
-            <fileset dir="installer/lib/wrapper/freebsd/" />
-        </copy>
-	<copy todir="pkg-temp/lib/wrapper/freebsd64/">
-	    <fileset dir="installer/lib/wrapper/freebsd64" />
-        </copy>
-        <copy todir="pkg-temp/lib/wrapper/macosx/">
-            <fileset dir="installer/lib/wrapper/macosx/" />
-        </copy>
         <copy todir="pkg-temp/lib/wrapper/solaris/">
             <fileset dir="installer/lib/wrapper/solaris/" />
         </copy>
-        <copy todir="pkg-temp/lib/wrapper/linux-arm/">
-            <fileset dir="installer/lib/wrapper/linux-arm/" />
+    </target>
+
+    <target name="preppkg-freebsd" depends="preppkg-unix">
+        <copy todir="pkg-temp/lib/wrapper/freebsd/">
+            <fileset dir="installer/lib/wrapper/freebsd/" />
+        </copy>
+        <copy todir="pkg-temp/lib/wrapper/freebsd64/">
+            <fileset dir="installer/lib/wrapper/freebsd64" />
         </copy>
     </target>
 
+    <target name="preppkg-freebsd-only" depends="preppkg-freebsd, jbigi-freebsd-only" >
+        <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
+        <copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
+    </target>
+
+    <!-- only what is needed for debian, etc. -->
+    <target name="preppkg-linux-only" depends="preppkg-linux, jbigi-linux-only" >
+        <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
+        <copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
+    </target>
+
+    <target name="preppkg-unix" depends="preppkg-base">
+        <copy file="installer/resources/runplain.sh" todir="pkg-temp/" />
+	<!-- <copy file="apps/i2psnark/launch-i2psnark" todir="pkg-temp/" /> old feature that per zzz isn't used-->
+        <copy file="installer/resources/eepget" todir="pkg-temp/" />
+        <copy file="installer/resources/i2prouter" todir="pkg-temp/" />
+        <copy file="installer/resources/osid" todir="pkg-temp/" />
+        <copy file="installer/resources/postinstall.sh" todir="pkg-temp/" />
+        <copy todir="pkg-temp/man/">
+            <fileset dir="installer/resources/man/" />
+        </copy>
+    </target>
+
+    <target name="preppkg-linux" depends="preppkg-linux-x86,preppkg-linux-nonx86" />
+
+    <target name="preppkg-linux-x86" depends="preppkg-unix">
+        <copy todir="pkg-temp/lib/wrapper/linux/">
+            <fileset dir="installer/lib/wrapper/linux/" />
+        </copy>
+        <copy todir="pkg-temp/lib/wrapper/linux64/">
+            <fileset dir="installer/lib/wrapper/linux64/" />
+        </copy>
+    </target>
+
+    <target name="preppkg-linux-nonx86" depends="preppkg-unix">
+        <copy todir="pkg-temp/lib/wrapper/linux-armv7/">
+            <fileset dir="installer/lib/wrapper/linux-armv7/" />
+        </copy>
+	<copy todir="pkg-temp/lib/wrapper/linux-ppc/">
+	    <fileset dir="installer/lib/wrapper/linux-ppc/" />
+	</copy>
+        <copy todir="pkg-temp/lib/wrapper/linux-armv5/">
+            <fileset dir="installer/lib/wrapper/linux-armv5/" />
+        </copy>
+    </target>
+
+    <target name="preppkg-osx" depends="preppkg-unix">
+        <!--<copy file="installer/resources/I2P Router Console.webloc" todir="pkg-temp/" />-->
+        <copy todir="pkg-temp/Start I2P Router.app">
+	    <fileset dir="installer/resources/Start I2P Router.app" />
+	</copy>
+        <copy todir="pkg-temp/lib/wrapper/macosx/">
+            <fileset dir="installer/lib/wrapper/macosx/" />
+        </copy>
+    </target>
+
+    <target name="preppkg-osx-only" depends="preppkg-osx, jbigi-osx-only" >
+        <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
+        <copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />	
+    </target>
+    
     <target name="preppkg-windows" depends="preppkg-base, buildexe">
         <copy file="i2p.exe" todir="pkg-temp/" failonerror="false" />
         <copy file="apps/systray/java/lib/systray4j.dll" todir="pkg-temp/lib" />
@@ -518,6 +632,7 @@
         <copy file="installer/resources/eepget.bat" todir="pkg-temp/" />
         <copy file="installer/resources/i2prouter.bat" todir="pkg-temp/" />
         <copy file="installer/resources/fixperms.bat" todir="pkg-temp/" />
+        <copy file="installer/resources/fix_logfile_path.cmd" todir="pkg-temp/" />
         <copy file="installer/resources/install_i2p_service_winnt.bat" todir="pkg-temp/" />
         <copy file="installer/resources/set_config_dir_for_nt_service.bat" todir="pkg-temp/" />
         <copy file="installer/resources/uninstall_i2p_service_winnt.bat" todir="pkg-temp/" />
@@ -530,38 +645,11 @@
         </copy>
     </target>
 
-    <!-- only what is needed for debian, etc. -->
-    <target name="preppkg-linux-only" depends="preppkg-linux, jbigi-linux-only" >
+    <target name="preppkg-windows-only" depends="preppkg-windows, jbigi-windows-only">
         <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
-        <copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
+	<copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
     </target>
-
-    <!-- x86 linux only -->
-    <target name="preppkg-linux" depends="preppkg-base">
-        <copy file="installer/resources/runplain.sh" todir="pkg-temp/" />
-	<!-- <copy file="apps/i2psnark/launch-i2psnark" todir="pkg-temp/" /> old feature that per zzz isn't used-->
-        <copy file="installer/resources/eepget" todir="pkg-temp/" />
-        <copy file="installer/resources/i2prouter" todir="pkg-temp/" />
-        <copy file="installer/resources/osid" todir="pkg-temp/" />
-        <copy file="installer/resources/postinstall.sh" todir="pkg-temp/" />
-        <copy todir="pkg-temp/man/">
-            <fileset dir="installer/resources/man/" />
-        </copy>
-        <copy todir="pkg-temp/lib/wrapper/linux/">
-            <fileset dir="installer/lib/wrapper/linux/" />
-        </copy>
-        <copy todir="pkg-temp/lib/wrapper/linux64/">
-            <fileset dir="installer/lib/wrapper/linux64/" />
-        </copy>
-    </target>
-
-    <target name="preppkg-osx" depends="preppkg-linux">
-        <!--<copy file="installer/resources/I2P Router Console.webloc" todir="pkg-temp/" />-->
-        <copy todir="pkg-temp/Start I2P Router.app">
-	    <fileset dir="installer/resources/Start I2P Router.app" />
-	</copy>
-    </target>
-
+    
     <target name="preppkg-base" depends="build, preplicenses, prepConsoleDocs, prepthemeupdates, prepCertificates">
         <!-- if updater200 was run previously, it left *.pack files in pkg-temp -->
         <delete>
@@ -924,6 +1012,184 @@
 	<!-- thazzit -->
     </target>
 
+    <!-- Custom installers -->
+
+    <target name="installer-freebsd" depends="clean, preppkg-freebsd-only, getReleaseNumber, getBuildNumber, buildProperties, util-list-changes" >
+        <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />
+        <mkdir dir="pkg-temp/installer" />
+        <!-- set if unset -->
+        <property name="workspace.changes.util.tr" value="" />
+        <jar destfile="./pkg-temp/installer/copy.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Copy.class net/i2p/util/FileUtil.class">
+            <manifest>
+                <attribute name="Main-Class" value="net.i2p.util.Copy" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
+            </manifest>
+        </jar>
+        <jar destfile="./pkg-temp/installer/delete.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Delete.class net/i2p/util/FileUtil.class">
+            <manifest>
+                <attribute name="Main-Class" value="net.i2p.util.Delete" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
+            </manifest>
+        </jar>
+        <jar destfile="./pkg-temp/installer/exec.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Exec.class">
+            <manifest>
+                <attribute name="Main-Class" value="net.i2p.util.Exec" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
+            </manifest>
+        </jar>
+	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${release.number}-freebsd-only.jar" installerType="standard" basedir="${basedir}" />
+    </target>
+
+    <target name="installer-linux" depends="clean, preppkg-linux-only, getReleaseNumber, getBuildNumber, buildProperties, util-list-changes" >
+        <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />
+        <mkdir dir="pkg-temp/installer" />
+        <!-- set if unset -->
+        <property name="workspace.changes.util.tr" value="" />
+        <jar destfile="./pkg-temp/installer/copy.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Copy.class net/i2p/util/FileUtil.class">
+            <manifest>
+                <attribute name="Main-Class" value="net.i2p.util.Copy" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
+            </manifest>
+        </jar>
+        <jar destfile="./pkg-temp/installer/delete.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Delete.class net/i2p/util/FileUtil.class">
+            <manifest>
+                <attribute name="Main-Class" value="net.i2p.util.Delete" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
+            </manifest>
+        </jar>
+        <jar destfile="./pkg-temp/installer/exec.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Exec.class">
+            <manifest>
+                <attribute name="Main-Class" value="net.i2p.util.Exec" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
+            </manifest>
+        </jar>
+	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${release.number}-linux-only.jar" installerType="standard" basedir="${basedir}" />
+    </target>
+
+
+    <target name="installer-osx" depends="clean, checkForIzpack2App, preppkg-osx-only, getReleaseNumber, getBuildNumber, buildProperties, util-list-changes">
+        <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />
+        <mkdir dir="pkg-temp/installer" />
+	<mkdir dir="pkg-temp/osx" />
+        <!-- set if unset -->
+        <property name="workspace.changes.util.tr" value="" />
+        <jar destfile="./pkg-temp/installer/copy.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Copy.class net/i2p/util/FileUtil.class">
+            <manifest>
+                <attribute name="Main-Class" value="net.i2p.util.Copy" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
+            </manifest>
+        </jar>
+        <jar destfile="./pkg-temp/installer/delete.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Delete.class net/i2p/util/FileUtil.class">
+            <manifest>
+                <attribute name="Main-Class" value="net.i2p.util.Delete" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
+            </manifest>
+        </jar>
+        <jar destfile="./pkg-temp/installer/exec.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Exec.class">
+            <manifest>
+                <attribute name="Main-Class" value="net.i2p.util.Exec" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
+            </manifest>
+        </jar>
+	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${release.number}-osx-only.jar" installerType="standard" basedir="${basedir}" />
+	<ant target="installer2app" />
+	<delete dir="pkg-temp/osx" />
+    </target>
+
+    <target name="checkForIzpack2App">
+        <available property="izpack2app.available" file="${user.home}/IzPack/utils/wrappers/izpack2app/izpack2app.py" />
+    </target>
+
+    <target name="installer2app" if="izpack2app.available">
+	<mkdir dir="pkg-temp/osx" />
+	<exec executable="python" failonerror="true">
+	    <arg value="${user.home}/IzPack/utils/wrappers/izpack2app/izpack2app.py" />
+	    <arg value="${basedir}/i2pinstall_${release.number}-osx-only.jar" />
+	    <arg value="${basedir}/pkg-temp/osx/i2p-${release.number}-osx-install.app" />
+	</exec>
+	<zip destfile="${basedir}/i2pinstall_${release.number}-osx.zip" level="9" 
+	    basedir="${basedir}/pkg-temp/osx" whenempty="fail" comment="${release.number}-${build.number}"/>
+    </target>
+
+    <target name="checkForIzpack2Exe">
+        <available property="izpack2exe.available" file="${user.home}/IzPack/utils/wrappers/izpack2exe/izpack2exe.py" />
+    </target>
+
+    <!-- Yes, even though this makes an installer for Windows, we still need to depend on preppkg-unix (because the installer attempts to delete these files
+     and will fail if they don't exist. Thankfully these files are so very small there's not much harm in including them.
+    -->
+    <target name="installer-windows" depends="clean, doBuildEXE, checkForIzpack2Exe, preppkg-windows-only, preppkg-unix, getReleaseNumber, getBuildNumber, buildProperties, util-list-changes" >
+        <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />
+        <mkdir dir="pkg-temp/installer" />
+        <!-- set if unset -->
+        <property name="workspace.changes.util.tr" value="" />
+        <jar destfile="./pkg-temp/installer/copy.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Copy.class net/i2p/util/FileUtil.class">
+            <manifest>
+                <attribute name="Main-Class" value="net.i2p.util.Copy" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
+            </manifest>
+        </jar>
+        <jar destfile="./pkg-temp/installer/delete.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Delete.class net/i2p/util/FileUtil.class">
+            <manifest>
+                <attribute name="Main-Class" value="net.i2p.util.Delete" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
+            </manifest>
+        </jar>
+        <jar destfile="./pkg-temp/installer/exec.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Exec.class">
+            <manifest>
+                <attribute name="Main-Class" value="net.i2p.util.Exec" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
+            </manifest>
+        </jar>
+	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${release.number}-windows-only.jar" installerType="standard" basedir="${basedir}" />
+	<ant target="installer2exe" />
+	<delete dir="pkg-temp/win" />
+
+    </target>
+
+    <target name="installer2exe" if="izpack2exe.available"> <!-- different from the launch4j exe creator -->
+        <mkdir dir="pkg-temp/win" />
+	<exec executable="python" failonerror="true">
+	    <arg value="${user.home}/IzPack/utils/wrappers/izpack2exe/izpack2exe.py" />
+            <arg value="--file=${basedir}/i2pinstall_${release.number}-windows-only.jar" />
+	    <arg value="--no-upx" />
+	    <arg value="--name=I2P" />
+	    <arg value="--output=${basedir}/i2pinstall-${release.number}-windows.exe" />
+        </exec>
+    </target>
+    <target name="installer-all" >
+    	<ant target="installer-freebsd" />
+	<ant target="installer-linux" />
+	<ant target="installer-osx" />
+	<ant target="installer-windows" />
+	<ant target="installer" />
+    </target>
+    <!-- end custom installers -->
+    
     <target name="test" depends="buildProperties, jbigi" >
         <mkdir dir="reports/core/junit/" />
         <ant dir="core/java/" target="test" />
@@ -1244,7 +1510,7 @@
 			<copy file="apps/addressbook/myhosts.txt"  todir="pkg-temp/addressbook/" />
 			<!-- config.txt is in installer/resources/portable -->
 		<mkdir dir="pkg-temp/docs" />
-			<copy file="installer/resources/initialNews.xml" tofile="pkg-temp/docs/news.xml" overwrite="true" />
+			<copy file="installer/resources/initialNews/initialNews.xml" tofile="pkg-temp/docs/news.xml" overwrite="true" />
 			<copy file="installer/resources/readme/readme.html" tofile="pkg-temp/docs/readme.html" />
 			<copy file="installer/resources/startconsole.html" todir="pkg-temp/docs/" />
 			<copy file="installer/resources/start.ico" todir="pkg-temp/docs/" />

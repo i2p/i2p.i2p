@@ -86,7 +86,7 @@ class ClientManager {
     }
     
     public void restart() {
-        shutdown();
+        shutdown("Router restart");
         
         // to let the old listener die
         try { Thread.sleep(2*1000); } catch (InterruptedException ie) {}
@@ -96,7 +96,10 @@ class ClientManager {
         startListeners(port);
     }
     
-    public void shutdown() {
+    /**
+     *  @param msg message to send to the clients
+     */
+    public void shutdown(String msg) {
         _isStarted = false;
         _log.info("Shutting down the ClientManager");
         if (_listener != null)
@@ -116,7 +119,7 @@ class ClientManager {
         }
         for (Iterator<ClientConnectionRunner> iter = runners.iterator(); iter.hasNext(); ) {
             ClientConnectionRunner runner = iter.next();
-            runner.disconnectClient("Router shutdown", Log.WARN);
+            runner.disconnectClient(msg, Log.WARN);
         }
     }
     

@@ -33,7 +33,7 @@ import net.i2p.util.Log;
  */
 public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacade {
     public static final char CAPABILITY_FLOODFILL = 'f';
-    private final Map _activeFloodQueries;
+    private final Map<Hash, FloodSearchJob> _activeFloodQueries;
     private boolean _floodfillEnabled;
     /** for testing, see isFloodfill() below */
     private static String _alwaysQuery;
@@ -44,7 +44,6 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     public FloodfillNetworkDatabaseFacade(RouterContext context) {
         super(context);
         _activeFloodQueries = new HashMap();
-         _floodfillEnabled = false;
          _verifiesInProgress = new ConcurrentHashSet(8);
         _alwaysQuery = _context.getProperty("netDb.alwaysQuery");
 
@@ -66,6 +65,11 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         super.startup();
         _context.jobQueue().addJob(new FloodfillMonitorJob(_context, this));
         _lookupThrottler = new LookupThrottler();
+
+        // refresh old routers
+        Job rrj = new RefreshRoutersJob(_context, this);
+        rrj.getTiming().setStartAfter(_context.clock().now() + 5*60*1000);
+        _context.jobQueue().addJob(rrj);
     }
 
     @Override
@@ -251,7 +255,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         boolean isNew = false;
         FloodSearchJob searchJob = null;
         synchronized (_activeFloodQueries) {
-            searchJob = (FloodSearchJob)_activeFloodQueries.get(key);
+            searchJob = _activeFloodQueries.get(key);
             if (searchJob == null) {
                 //if (SearchJob.onlyQueryFloodfillPeers(_context)) {
                     searchJob = new FloodOnlySearchJob(_context, this, key, onFindJob, onFailedLookupJob, (int)timeoutMs, isLease);
@@ -326,6 +330,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             }
         }
     }
+
     void complete(Hash key) {
         synchronized (_activeFloodQueries) { _activeFloodQueries.remove(key); }
     }
@@ -406,8 +411,8 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     }
     
     private class DropLookupFailedJob extends JobImpl {
-        private Hash _peer;
-        private RouterInfo _info;
+        private final Hash _peer;
+        private final RouterInfo _info;
     
         public DropLookupFailedJob(RouterContext ctx, Hash peer, RouterInfo info) {
             super(ctx);
@@ -419,9 +424,10 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             dropAfterLookupFailed(_peer, _info);
         }
     }
+
     private class DropLookupFoundJob extends JobImpl {
-        private Hash _peer;
-        private RouterInfo _info;
+        private final Hash _peer;
+        private final RouterInfo _info;
     
         public DropLookupFoundJob(RouterContext ctx, Hash peer, RouterInfo info) {
             super(ctx);

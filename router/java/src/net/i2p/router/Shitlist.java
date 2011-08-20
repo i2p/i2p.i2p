@@ -11,7 +11,7 @@ package net.i2p.router;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +55,7 @@ public class Shitlist {
     public Shitlist(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(Shitlist.class);
-        _entries = new ConcurrentHashMap(8);
+        _entries = new ConcurrentHashMap(16);
         _context.jobQueue().addJob(new Cleanup(_context));
     }
     
@@ -96,9 +96,12 @@ public class Shitlist {
         return _entries.size();
     }
     
-    /** for ShitlistRenderer in router console */
+    /**
+     *  For ShitlistRenderer in router console.
+     *  Note - may contain expired entries.
+     */
     public Map<Hash, Entry> getEntries() {
-        return new HashMap<Hash, Entry>(_entries);
+        return Collections.unmodifiableMap(_entries);
     }
     
     public boolean shitlistRouter(Hash peer) {

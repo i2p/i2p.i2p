@@ -43,6 +43,7 @@ import net.i2p.router.networkdb.DatabaseLookupMessageHandler;
 import net.i2p.router.networkdb.DatabaseStoreMessageHandler;
 import net.i2p.router.networkdb.PublishLocalRouterInfoJob;
 import net.i2p.router.peermanager.PeerProfile;
+import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 
 /**
@@ -55,7 +56,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private DataStore _ds; // hash to DataStructure mapping, persisted when necessary
     /** where the data store is pushing the data */
     private String _dbDir;
-    private final Set<Hash> _exploreKeys = new HashSet(64); // set of Hash objects that we should search on (to fill up a bucket, not to get data)
+    // set of Hash objects that we should search on (to fill up a bucket, not to get data)
+    private final Set<Hash> _exploreKeys = new ConcurrentHashSet(64);
     private boolean _initialized;
     /** Clock independent time of when we started up */
     private long _started;
@@ -101,7 +103,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     protected final static long DONT_FAIL_PERIOD = 10*60*1000;
     
     /** don't probe or broadcast data, just respond and search when explicitly needed */
-    private boolean _quiet = false;
+    private final boolean QUIET = false;
     
     public static final String PROP_ENFORCE_NETID = "router.networkDatabase.enforceNetId";
     private static final boolean DEFAULT_ENFORCE_NETID = false;
@@ -167,26 +169,23 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             _exploreJob.updateExploreSchedule();
     }
     
+    /** @return unmodifiable set */
     public Set<Hash> getExploreKeys() {
-        if (!_initialized) return null;
-        synchronized (_exploreKeys) {
-            return new HashSet(_exploreKeys);
-        }
+        if (!_initialized)
+            return Collections.EMPTY_SET;
+        return Collections.unmodifiableSet(_exploreKeys);
     }
     
-    public void removeFromExploreKeys(Set toRemove) {
+    public void removeFromExploreKeys(Set<Hash> toRemove) {
         if (!_initialized) return;
-        synchronized (_exploreKeys) {
-            _exploreKeys.removeAll(toRemove);
-            _context.statManager().addRateData("netDb.exploreKeySet", _exploreKeys.size(), 0);
-        }
+        _exploreKeys.removeAll(toRemove);
+        _context.statManager().addRateData("netDb.exploreKeySet", _exploreKeys.size(), 0);
     }
-    public void queueForExploration(Set keys) {
+
+    public void queueForExploration(Set<Hash> keys) {
         if (!_initialized) return;
-        synchronized (_exploreKeys) {
-            _exploreKeys.addAll(keys);
-            _context.statManager().addRateData("netDb.exploreKeySet", _exploreKeys.size(), 0);
-        }
+        _exploreKeys.addAll(keys);
+        _context.statManager().addRateData("netDb.exploreKeySet", _exploreKeys.size(), 0);
     }
     
     public void shutdown() {
@@ -215,7 +214,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         else
             _enforceNetId = DEFAULT_ENFORCE_NETID;
         _ds.restart();
-        synchronized (_exploreKeys) { _exploreKeys.clear(); }
+        _exploreKeys.clear();
 
         _initialized = true;
         
@@ -257,7 +256,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         _started = System.currentTimeMillis();
         
         // expire old leases
-        _context.jobQueue().addJob(new ExpireLeasesJob(_context, this));
+        Job elj = new ExpireLeasesJob(_context, this);
+        elj.getTiming().setStartAfter(_context.clock().now() + 2*60*1000);
+        _context.jobQueue().addJob(elj);
         
         // the ExpireRoutersJob never fired since the tunnel pool manager lied
         // and said all peers are in use (for no good reason), but this expire
@@ -266,7 +267,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         //// expire some routers in overly full kbuckets
         ////_context.jobQueue().addJob(new ExpireRoutersJob(_context, this));
         
-        if (!_quiet) {
+        if (!QUIET) {
             // fill the search queue with random keys in buckets that are too small
             // Disabled since KBucketImpl.generateRandomKey() is b0rked,
             // and anyway, we want to search for a completely random key,
@@ -284,7 +285,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             _exploreJob.getTiming().setStartAfter(_context.clock().now() + EXPLORE_JOB_DELAY);
             _context.jobQueue().addJob(_exploreJob);
             // if configured to do so, periodically try to get newer routerInfo stats
-            if (_harvestJob == null && "true".equals(_context.getProperty(HarvesterJob.PROP_ENABLED)))
+            if (_harvestJob == null && _context.getBooleanProperty(HarvesterJob.PROP_ENABLED))
                 _harvestJob = new HarvesterJob(_context, this);
             _context.jobQueue().addJob(_harvestJob);
         } else {
@@ -474,9 +475,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                 } else {
                     fail(key);
                     // this was an interesting key, so either refetch it or simply explore with it
-                    synchronized (_exploreKeys) {
-                        _exploreKeys.add(key);
-                    }
+                    _exploreKeys.add(key);
                     return null;
                 }
             } else {
@@ -709,6 +708,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * given what we know now.
      *
      * TODO this is called several times, only check the key and signature once
+     *
+     * @return reason why the entry is not valid, or null if it is valid
      */
     String validate(Hash key, RouterInfo routerInfo) throws IllegalArgumentException {
         long now = _context.clock().now();
