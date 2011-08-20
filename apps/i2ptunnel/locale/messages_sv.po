@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2011-05-24 06:00+0000\n"
-"PO-Revision-Date: 2011-06-03 17:14+0000\n"
+"POT-Creation-Date: 2011-06-11 08:23+0000\n"
+"PO-Revision-Date: 2011-06-29 08:53+0000\n"
 "Last-Translator: digitalmannen <digitalmannen@gmail.com>\n"
 "Language-Team: Swedish (Sweden) (http://www.transifex.net/projects/p/I2P/team/sv_SE/)\n"
 "MIME-Version: 1.0\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Language: sv_SE\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:474
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:514
 #, java-format
 msgid ""
 "To visit the destination in your host database, click <a "
@@ -28,13 +28,85 @@ msgstr ""
 "För att besöka de motstridiga hjälpaddresserna,<a href=\"{1}\"> klicka <a "
 "här </ a>."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:931
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:875
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:388
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:142
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:401
+msgid "Host"
+msgstr "Värd"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:876
+#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:370
+msgid "Destination"
+msgstr "Mål"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:881
+#, java-format
+msgid "Continue to {0} without saving"
+msgstr "Fortsätt till {0} utan att spara"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:886
+#, java-format
+msgid "Save {0} to router address book and continue to eepsite"
+msgstr "Spara {0} till routeradressboken och fortsätt till eepsite "
+
+#. only blockfile supports multiple books
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:889
+#, java-format
+msgid "Save {0} to master address book and continue to eepsite"
+msgstr "Spara {0} till huvudadressboken och fortsätt till eepsite "
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:890
+#, java-format
+msgid "Save {0} to private address book and continue to eepsite"
+msgstr "Spara {0} till privatadressbok och fortsätt till eepsite "
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1046
 msgid ""
 "Click a link below to look for an address helper by using a \"jump\" "
 "service:"
 msgstr ""
 "Klicka på en länk nedan för att söka efter en hjälpaddress genom att använda"
 " en \"hopp\" tjänst"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1262
+msgid "Added via address helper"
+msgstr "Tillagd via adresshjälpen "
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1286
+#, java-format
+msgid "Redirecting to {0}"
+msgstr "Om dirigerar till  {0}"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1292
+msgid "Router Console"
+msgstr "Router konsol  "
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1293
+msgid "Addressbook"
+msgstr "Adressbok"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1293
+msgid "Configuration"
+msgstr "Konfiguration"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1293
+msgid "Help"
+msgstr "Hjälp"
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1298
+#, java-format
+msgid "Saved {0} to the {1} addressbook, redirecting now."
+msgstr "Spara {0} till {1}adressboken, omdirigerar nu "
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1299
+#, java-format
+msgid "Failed to save {0} to the {1} addressbook, redirecting now."
+msgstr "Misslyckades med att spara {0} till {1}adressboken, omdirigerar nu "
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1301
+msgid "Click here if you are not redirected automatically."
+msgstr "Klicka här om du inte omdirigeras automatiskt "
 
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:326
 #: ../java/src/net/i2p/i2ptunnel/web/EditBean.java:336
@@ -414,12 +486,6 @@ msgstr "för förfrågan/svar-anslutningar"
 msgid "Router I2CP Address"
 msgstr "I2CP Routeradress"
 
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:388
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:142
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:401
-msgid "Host"
-msgstr "Värd"
-
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:396
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:148
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:409
@@ -790,10 +856,6 @@ msgstr "Standby"
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:366
 msgid "Outproxy"
 msgstr "Utproxy"
-
-#: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:370
-msgid "Destination"
-msgstr "Mål"
 
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:384
 msgid "none"

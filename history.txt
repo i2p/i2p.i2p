@@ -1,5 +1,9 @@
 2011-08-20 zzz
-  * Translations: update .tx/config, add Danish and Ukranian
+  * Translations:
+    - New Danish and Ukranian translations from transifex
+    - Update Italian, Chinese, Spanish, Polish, Swedish,
+      and Vietnamese translations from transifex
+    - Update .tx/config
 
 2011-08-19 zzz
   * Soft restart:

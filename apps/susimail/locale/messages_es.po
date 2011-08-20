@@ -2,16 +2,18 @@
 # Copyright (C) 2009 The I2P Project
 # This file is distributed under the same license as the susimail package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
+# 
 # foo <foo@bar>, 2009.
-#
+# punkibastardo <punkibastardo@gmail.com>, 2011.
+# ducki2p <ducki2p@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
-"POT-Creation-Date: 2011-03-12 20:49+0000\n"
-"PO-Revision-Date: 2011-04-18 21:35+0100\n"
-"Last-Translator: mixxy <m1xxy@mail.i2p>\n"
-"Language-Team: Spanish (Castilian) <None>\n"
+"POT-Creation-Date: 2011-06-11 08:24+0000\n"
+"PO-Revision-Date: 2011-07-20 00:53+0000\n"
+"Last-Translator: blabla <blabla@trash-mail.com>\n"
+"Language-Team: Spanish (Castilian) (http://www.transifex.net/projects/p/I2P/team/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -24,7 +26,8 @@ msgstr "desconocido"
 
 #: src/src/i2p/susi/webmail/WebMail.java:473
 msgid "Warning: no transfer encoding found, fallback to 7bit."
-msgstr "Aviso: no se encuentra codificación de transferencia, volviendo a 7 bits."
+msgstr ""
+"Aviso: no se encuentra codificación de transferencia, volviendo a 7 bits."
 
 #: src/src/i2p/susi/webmail/WebMail.java:478
 #, java-format
@@ -33,7 +36,8 @@ msgstr "No se ha encontrado codificador para la codificación \\''{0}''\\."
 
 #: src/src/i2p/susi/webmail/WebMail.java:484
 msgid "Warning: no charset found, fallback to US-ASCII."
-msgstr "Aviso: no se ha encontrado el juego de caracteres, volviendo a US-ASCII."
+msgstr ""
+"Aviso: no se ha encontrado el juego de caracteres, volviendo a US-ASCII."
 
 #: src/src/i2p/susi/webmail/WebMail.java:498
 #, java-format
@@ -51,7 +55,8 @@ msgstr "Descarga"
 
 #: src/src/i2p/susi/webmail/WebMail.java:525
 msgid "File is packed into a zipfile for security reasons."
-msgstr "El archivo está empaquetado en un archivo zip por razones de seguridad."
+msgstr ""
+"El archivo está empaquetado en un archivo zip por razones de seguridad."
 
 #: src/src/i2p/susi/webmail/WebMail.java:525
 #, java-format
@@ -150,7 +155,8 @@ msgstr "Error al analizar parámetros de descarga."
 
 #: src/src/i2p/susi/webmail/WebMail.java:1089
 msgid "Invalid pagesize number, resetting to default value."
-msgstr "Tamaño de página no válida, restableciendo a los valores predeterminados."
+msgstr ""
+"Tamaño de página no válida, restableciendo a los valores predeterminados."
 
 #: src/src/i2p/susi/webmail/WebMail.java:1113
 msgid "No messages marked for deletion."
@@ -438,4 +444,5 @@ msgstr "Fecha:"
 #: src/src/i2p/susi/webmail/WebMail.java:1705
 msgid "Could not fetch mail."
 msgstr "No se pudo descargar el correo."
+
 
