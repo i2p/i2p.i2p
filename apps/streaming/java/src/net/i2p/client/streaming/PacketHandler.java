@@ -16,9 +16,9 @@ import net.i2p.util.Log;
  *
  */
 class PacketHandler {
-    private ConnectionManager _manager;
-    private I2PAppContext _context;
-    private Log _log;
+    private final ConnectionManager _manager;
+    private final I2PAppContext _context;
+    private final Log _log;
     //private int _lastDelay;
     //private int _dropped;
     

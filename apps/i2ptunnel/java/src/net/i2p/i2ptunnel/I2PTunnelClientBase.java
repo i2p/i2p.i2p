@@ -51,7 +51,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
     protected long _clientId;
     protected final Object sockLock = new Object(); // Guards sockMgr and mySockets
     protected I2PSocketManager sockMgr; // should be final and use a factory. LINT
-    protected List mySockets = new ArrayList();
+    protected final List<I2PSocket> mySockets = new ArrayList();
     protected boolean _ownDest;
 
     protected Destination dest = null;
@@ -59,7 +59,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
 
     private boolean listenerReady = false;
 
-    private ServerSocket ss;
+    protected ServerSocket ss;
 
     private final Object startLock = new Object();
     private boolean startRunning = false;
@@ -196,7 +196,10 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
 
         // no need to load the netDb with leaseSets for destinations that will never 
         // be looked up
-        tunnel.getClientOptions().setProperty("i2cp.dontPublishLeaseSet", "true");
+        boolean dccEnabled = (this instanceof I2PTunnelIRCClient) &&
+                      Boolean.valueOf(tunnel.getClientOptions().getProperty(I2PTunnelIRCClient.PROP_DCC)).booleanValue();
+        if (!dccEnabled)
+            tunnel.getClientOptions().setProperty("i2cp.dontPublishLeaseSet", "true");
         
         boolean openNow = !Boolean.valueOf(tunnel.getClientOptions().getProperty("i2cp.delayOpen")).booleanValue();
         if (openNow) {
@@ -683,11 +686,11 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
         synchronized (sockLock) {
             if (sockMgr != null) {
                 mySockets.retainAll(sockMgr.listSockets());
-                if (!forced && mySockets.size() != 0) {
-                    l.log("There are still active connections!");
+                if ((!forced) && (!mySockets.isEmpty())) {
+                    l.log("Not closing, there are still active connections!");
                     _log.debug("can't close: there are still active connections!");
-                    for (Iterator it = mySockets.iterator(); it.hasNext();) {
-                        l.log("->" + it.next());
+                    for (I2PSocket s : mySockets) {
+                        l.log("  -> " + s.toString());
                     }
                     return false;
                 }
@@ -703,7 +706,8 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
             try {
                 if (ss != null) ss.close();
             } catch (IOException ex) {
-                ex.printStackTrace();
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("error closing", ex);
                 return false;
             }
             //l.log("Client closed.");

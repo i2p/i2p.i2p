@@ -22,16 +22,19 @@ import net.i2p.util.Log;
 import net.i2p.util.SecureFileOutputStream;
 
 /**
- * Coordinate the runtime operation and configuration of a tunnel.  
+ * Coordinate the runtime operation and configuration of a single I2PTunnel.
+ * An I2PTunnel tracks one or more I2PTunnelTasks and one or more I2PSessions.
+ * Usually one of each.
+ *
  * These objects are bundled together under a TunnelControllerGroup where the
  * entire group is stored / loaded from a single config file.
  *
  */
 public class TunnelController implements Logging {
-    private Log _log;
+    private final Log _log;
     private Properties _config;
-    private I2PTunnel _tunnel;
-    private List<String> _messages;
+    private final I2PTunnel _tunnel;
+    private final List<String> _messages;
     private List<I2PSession> _sessions;
     private boolean _running;
     private boolean _starting;

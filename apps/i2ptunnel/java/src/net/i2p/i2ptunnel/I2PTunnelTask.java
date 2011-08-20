@@ -13,9 +13,7 @@ import net.i2p.util.EventDispatcherImpl;
  * Either a Server or a Client.
  */
 
-public abstract class I2PTunnelTask implements EventDispatcher {
-
-    private final EventDispatcherImpl _event = new EventDispatcherImpl();
+public abstract class I2PTunnelTask extends EventDispatcherImpl {
 
     private int id;
     private String name;
@@ -76,42 +74,5 @@ public abstract class I2PTunnelTask implements EventDispatcher {
     @Override
     public String toString() {
         return name;
-    }
-
-    /* Required by the EventDispatcher interface */
-    public EventDispatcher getEventDispatcher() {
-        return _event;
-    }
-
-    public void attachEventDispatcher(EventDispatcher e) {
-        _event.attachEventDispatcher(e.getEventDispatcher());
-    }
-
-    public void detachEventDispatcher(EventDispatcher e) {
-        _event.detachEventDispatcher(e.getEventDispatcher());
-    }
-
-    public void notifyEvent(String e, Object a) {
-        _event.notifyEvent(e, a);
-    }
-
-    public Object getEventValue(String n) {
-        return _event.getEventValue(n);
-    }
-
-    public Set getEvents() {
-        return _event.getEvents();
-    }
-
-    public void ignoreEvents() {
-        _event.ignoreEvents();
-    }
-
-    public void unIgnoreEvents() {
-        _event.unIgnoreEvents();
-    }
-
-    public Object waitEventValue(String n) {
-        return _event.waitEventValue(n);
     }
 }

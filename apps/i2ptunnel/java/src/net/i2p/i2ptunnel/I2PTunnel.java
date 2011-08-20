@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import net.i2p.I2PAppContext;
@@ -70,16 +71,18 @@ import net.i2p.util.EventDispatcherImpl;
 import net.i2p.util.Log;
 
 /**
+ *  An I2PTunnel tracks one or more I2PTunnelTasks and one or more I2PSessions.
+ *  Usually one of each.
+ *
  *  Todo: Most events are not listened to elsewhere, so error propagation is poor
  */
-public class I2PTunnel implements Logging, EventDispatcher {
+public class I2PTunnel extends EventDispatcherImpl implements Logging {
     private final Log _log;
-    private final EventDispatcherImpl _event;
     private final I2PAppContext _context;
     private static long __tunnelId = 0;
     private final long _tunnelId;
     private final Properties _clientOptions;
-    private final List<I2PSession> _sessions;
+    private final Set<I2PSession> _sessions;
 
     public static final int PACKET_DELAY = 100;
 
@@ -96,7 +99,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
 
     private static final String nocli_args[] = { "-nocli", "-die"};
 
-    private final List tasks = new ArrayList();
+    private final List<I2PTunnelTask> tasks = new ArrayList();
     private int next_task_id = 1;
 
     private final Set listeners = new CopyOnWriteArraySet();
@@ -114,14 +117,14 @@ public class I2PTunnel implements Logging, EventDispatcher {
     }
 
     public I2PTunnel(String[] args, ConnectionEventListener lsnr) {
+        super();
         _context = I2PAppContext.getGlobalContext(); // new I2PAppContext();
         _tunnelId = ++__tunnelId;
         _log = _context.logManager().getLog(I2PTunnel.class);
-        _event = new EventDispatcherImpl();
         // as of 0.8.4, include context properties
         Properties p = _context.getProperties();
         _clientOptions = p;
-        _sessions = new ArrayList(1);
+        _sessions = new CopyOnWriteArraySet();
         
         addConnectionEventListener(lsnr);
         boolean gui = true;
@@ -193,22 +196,17 @@ public class I2PTunnel implements Logging, EventDispatcher {
 
     /** @return non-null */
     List<I2PSession> getSessions() { 
-        synchronized (_sessions) {
             return new ArrayList(_sessions); 
-        }
     }
+
     void addSession(I2PSession session) { 
         if (session == null) return;
-        synchronized (_sessions) {
-            if (!_sessions.contains(session))
-                _sessions.add(session);
-        }
+        _sessions.add(session);
     }
+
     void removeSession(I2PSession session) { 
         if (session == null) return;
-        synchronized (_sessions) {
-            _sessions.remove(session);
-        }
+        _sessions.remove(session);
     }
     
     public Properties getClientOptions() { return _clientOptions; }
@@ -218,9 +216,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
         if (tsk.isOpen()) {
             tsk.setId(next_task_id);
             next_task_id++;
-            synchronized (tasks) {
-                tasks.add(tsk);
-            }
+            tasks.add(tsk);
         }
     }
 
@@ -1261,10 +1257,8 @@ public class I2PTunnel implements Logging, EventDispatcher {
      */
     public void runQuit(Logging l) {
         purgetasks(l);
-        synchronized (tasks) {
-            if (tasks.isEmpty()) {
-                System.exit(0);
-            }
+        if (tasks.isEmpty()) {
+            System.exit(0);
         }
         l.log("There are running tasks. Try 'list'.");
         notifyEvent("quitResult", "error");
@@ -1280,11 +1274,8 @@ public class I2PTunnel implements Logging, EventDispatcher {
      */
     public void runList(Logging l) {
         purgetasks(l);
-        synchronized (tasks) {
-            for (int i = 0; i < tasks.size(); i++) {
-                I2PTunnelTask t = (I2PTunnelTask) tasks.get(i);
-                l.log("[" + t.getId() + "] " + t.toString());
-            }
+        for (I2PTunnelTask t : tasks) {
+            l.log("[" + t.getId() + "] " + t.toString());
         }
         notifyEvent("listDone", "done");
     }
@@ -1313,14 +1304,8 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 argindex++;
             }
             if (args[argindex].equalsIgnoreCase("all")) {
-                List curTasks = null;
-                synchronized (tasks) {
-                    curTasks = new LinkedList(tasks);
-                }
-
                 boolean error = false;
-                for (int i = 0; i < curTasks.size(); i++) {
-                    I2PTunnelTask t = (I2PTunnelTask) curTasks.get(i);
+                for (I2PTunnelTask t : tasks) {
                     if (!closetask(t, forced, l)) {
                         notifyEvent("closeResult", "error");
                         error = true;
@@ -1442,9 +1427,7 @@ public class I2PTunnel implements Logging, EventDispatcher {
         boolean closed = false;
 
         _log.debug(getPrefix() + "closetask(): looking for task " + num);
-        synchronized (tasks) {
-            for (Iterator it = tasks.iterator(); it.hasNext();) {
-                I2PTunnelTask t = (I2PTunnelTask) it.next();
+            for (I2PTunnelTask t : tasks) {
                 int id = t.getId();
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug(getPrefix() + "closetask(): parsing task " + id + " (" + t.toString() + ")");
@@ -1454,7 +1437,6 @@ public class I2PTunnel implements Logging, EventDispatcher {
                 } else if (id > num) {
                     break;
                 }
-            }
         }
         return closed;
     }
@@ -1482,15 +1464,14 @@ public class I2PTunnel implements Logging, EventDispatcher {
      *
      */
     private void purgetasks(Logging l) {
-        synchronized (tasks) {
-            for (Iterator it = tasks.iterator(); it.hasNext();) {
-                I2PTunnelTask t = (I2PTunnelTask) it.next();
+            List<I2PTunnelTask> removed = new ArrayList();
+            for (I2PTunnelTask t : tasks) {
                 if (!t.isOpen()) {
                     _log.debug(getPrefix() + "Purging inactive tunnel: [" + t.getId() + "] " + t.toString());
-                    it.remove();
+                    removed.add(t);
                 }
             }
-        }
+            tasks.removeAll(removed);
     }
 
     /**
@@ -1656,42 +1637,5 @@ public class I2PTunnel implements Logging, EventDispatcher {
      */
     public interface ConnectionEventListener {
         public void routerDisconnected();
-    }
-
-    /* Required by the EventDispatcher interface */
-    public EventDispatcher getEventDispatcher() {
-        return _event;
-    }
-
-    public void attachEventDispatcher(EventDispatcher e) {
-        _event.attachEventDispatcher(e.getEventDispatcher());
-    }
-
-    public void detachEventDispatcher(EventDispatcher e) {
-        _event.detachEventDispatcher(e.getEventDispatcher());
-    }
-
-    public void notifyEvent(String e, Object a) {
-        _event.notifyEvent(e, a);
-    }
-
-    public Object getEventValue(String n) {
-        return _event.getEventValue(n);
-    }
-
-    public Set getEvents() {
-        return _event.getEvents();
-    }
-
-    public void ignoreEvents() {
-        _event.ignoreEvents();
-    }
-
-    public void unIgnoreEvents() {
-        _event.unIgnoreEvents();
-    }
-
-    public Object waitEventValue(String n) {
-        return _event.waitEventValue(n);
     }
 }

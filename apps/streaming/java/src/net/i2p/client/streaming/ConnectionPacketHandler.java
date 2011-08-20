@@ -15,8 +15,8 @@ import net.i2p.util.SimpleTimer;
  *
  */
 class ConnectionPacketHandler {
-    private I2PAppContext _context;
-    private Log _log;
+    private final I2PAppContext _context;
+    private final Log _log;
     
     public ConnectionPacketHandler(I2PAppContext context) {
         _context = context;

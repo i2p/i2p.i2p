@@ -107,11 +107,11 @@ class StandardSocket extends Socket {
     }
 
     /**
-     *  @return -1 always
+     *  @return the port or 0 if unknown
      */
     @Override
     public int getLocalPort() {
-        return -1;
+        return _socket.getLocalPort();
     }
 
     /**
@@ -139,11 +139,11 @@ class StandardSocket extends Socket {
     }
 
     /**
-     *  @return 0 always
+     *  @return the port or 0 if unknown
      */
     @Override
     public int getPort() {
-        return 0;
+        return _socket.getPort();
     }
 
     @Override

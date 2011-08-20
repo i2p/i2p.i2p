@@ -11,7 +11,8 @@ import java.net.Socket;
 import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.i2ptunnel.I2PTunnel;
-import net.i2p.i2ptunnel.I2PTunnelIRCClient;
+import net.i2p.i2ptunnel.irc.IrcInboundFilter;
+import net.i2p.i2ptunnel.irc.IrcOutboundFilter;
 import net.i2p.i2ptunnel.Logging;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.I2PAppThread;
@@ -50,10 +51,10 @@ public class I2PSOCKSIRCTunnel extends I2PSOCKSTunnel {
             Socket clientSock = serv.getClientSocket();
             I2PSocket destSock = serv.getDestinationI2PSocket(this);
             StringBuffer expectedPong = new StringBuffer();
-            Thread in = new I2PAppThread(new I2PTunnelIRCClient.IrcInboundFilter(clientSock, destSock, expectedPong, _log),
+            Thread in = new I2PAppThread(new IrcInboundFilter(clientSock, destSock, expectedPong, _log),
                                          "SOCKS IRC Client " + (++__clientId) + " in", true);
             in.start();
-            Thread out = new I2PAppThread(new I2PTunnelIRCClient.IrcOutboundFilter(clientSock, destSock, expectedPong, _log),
+            Thread out = new I2PAppThread(new IrcOutboundFilter(clientSock, destSock, expectedPong, _log),
                                           "SOCKS IRC Client " + __clientId + " out", true);
             out.start();
         } catch (SOCKSException e) {

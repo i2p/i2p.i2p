@@ -18,10 +18,10 @@ import net.i2p.util.SimpleTimer;
  * @author zzz modded to use concurrent and bound queue size
  */
 class ConnectionHandler {
-    private I2PAppContext _context;
-    private Log _log;
-    private ConnectionManager _manager;
-    private LinkedBlockingQueue<Packet> _synQueue;
+    private final I2PAppContext _context;
+    private final Log _log;
+    private final ConnectionManager _manager;
+    private final LinkedBlockingQueue<Packet> _synQueue;
     private boolean _active;
     private int _acceptTimeout;
     
@@ -41,7 +41,6 @@ class ConnectionHandler {
         _log = context.logManager().getLog(ConnectionHandler.class);
         _manager = mgr;
         _synQueue = new LinkedBlockingQueue<Packet>(MAX_QUEUE_SIZE);
-        _active = false;
         _acceptTimeout = DEFAULT_ACCEPT_TIMEOUT;
     }
     

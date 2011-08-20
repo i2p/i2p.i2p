@@ -217,11 +217,34 @@ public interface I2PSession {
      */
     public int[] bandwidthLimits() throws I2PSessionException;
 
-    /** See I2PSessionMuxedImpl for details */
+    /**
+     *  Listen on specified protocol and port.
+     *
+     *  An existing listener with the same proto and port is replaced.
+     *  Only the listener with the best match is called back for each message.
+     *
+     *  @param proto 1-254 or PROTO_ANY (0) for all; recommended:
+     *         I2PSession.PROTO_STREAMING
+     *         I2PSession.PROTO_DATAGRAM
+     *         255 disallowed
+     *  @param port 1-65535 or PORT_ANY (0) for all
+     *  @since 0.7.1
+     */
     public void addSessionListener(I2PSessionListener lsnr, int proto, int port);
-    /** See I2PSessionMuxedImpl for details */
+
+    /**
+     *  Listen on specified protocol and port, and receive notification
+     *  of proto, fromPort, and toPort for every message.
+     *  @param proto 1-254 or PROTO_ANY (0) for all; 255 disallowed
+     *  @param port 1-65535 or PORT_ANY (0) for all
+     *  @since 0.7.1
+     */
     public void addMuxedSessionListener(I2PSessionMuxedListener l, int proto, int port);
-    /** See I2PSessionMuxedImpl for details */
+
+    /**
+     *  removes the specified listener (only)
+     *  @since 0.7.1
+     */
     public void removeListener(int proto, int port);
 
     public static final int PORT_ANY = 0;

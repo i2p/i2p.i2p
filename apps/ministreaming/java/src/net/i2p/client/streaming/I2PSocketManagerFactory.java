@@ -90,7 +90,7 @@ public class I2PSocketManagerFactory {
      * Create a socket manager using the destination loaded from the given private key
      * stream and connected to the default I2CP host and port.
      *
-     * @param myPrivateKeyStream private key stream
+     * @param myPrivateKeyStream private key stream, format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      * @return the newly created socket manager, or null if there were errors
      */
     public static I2PSocketManager createManager(InputStream myPrivateKeyStream) {
@@ -101,7 +101,7 @@ public class I2PSocketManagerFactory {
      * Create a socket manager using the destination loaded from the given private key
      * stream and connected to the default I2CP host and port.
      *
-     * @param myPrivateKeyStream private key stream
+     * @param myPrivateKeyStream private key stream, format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      * @param opts I2CP options
      * @return the newly created socket manager, or null if there were errors
      */
@@ -114,7 +114,7 @@ public class I2PSocketManagerFactory {
      * stream and connected to the I2CP router on the specified machine on the given
      * port
      *
-     * @param myPrivateKeyStream private key stream
+     * @param myPrivateKeyStream private key stream, format is specified in {@link net.i2p.data.PrivateKeyFile PrivateKeyFile}
      * @param i2cpHost I2CP host
      * @param i2cpPort I2CP port
      * @param opts I2CP options
