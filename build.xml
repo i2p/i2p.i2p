@@ -552,15 +552,6 @@
         <copy todir="pkg-temp/lib/wrapper/solaris/">
             <fileset dir="installer/lib/wrapper/solaris/" />
         </copy>
-        <copy todir="pkg-temp/lib/wrapper/linux-armv7/">
-            <fileset dir="installer/lib/wrapper/linux-armv7/" />
-        </copy>
-	<copy todir="pkg-temp/lib/wrapper/linux-ppc/">
-	    <fileset dir="installer/lib/wrapper/linux-ppc/" />
-	</copy>
-        <copy todir="pkg-temp/lib/wrapper/linux-armv5/">
-            <fileset dir="installer/lib/wrapper/linux-armv5/" />
-        </copy>
     </target>
 
     <target name="preppkg-freebsd" depends="preppkg-unix">
@@ -595,13 +586,26 @@
         </copy>
     </target>
 
-    <!-- x86 linux only -->
-    <target name="preppkg-linux" depends="preppkg-unix">
+    <target name="preppkg-linux" depends="preppkg-linux-x86,preppkg-linux-nonx86" />
+
+    <target name="preppkg-linux-x86" depends="preppkg-unix">
         <copy todir="pkg-temp/lib/wrapper/linux/">
             <fileset dir="installer/lib/wrapper/linux/" />
         </copy>
         <copy todir="pkg-temp/lib/wrapper/linux64/">
             <fileset dir="installer/lib/wrapper/linux64/" />
+        </copy>
+    </target>
+
+    <target name="preppkg-linux-nonx86" depends="preppkg-unix">
+        <copy todir="pkg-temp/lib/wrapper/linux-armv7/">
+            <fileset dir="installer/lib/wrapper/linux-armv7/" />
+        </copy>
+	<copy todir="pkg-temp/lib/wrapper/linux-ppc/">
+	    <fileset dir="installer/lib/wrapper/linux-ppc/" />
+	</copy>
+        <copy todir="pkg-temp/lib/wrapper/linux-armv5/">
+            <fileset dir="installer/lib/wrapper/linux-armv5/" />
         </copy>
     </target>
 
