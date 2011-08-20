@@ -21,30 +21,30 @@ msgstr ""
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:130
 #, java-format
 msgid "Host name \"{0}\" contains illegal character {1}"
-msgstr "Le nom d'hôte \"{0}\" contient le caractère illicite  \"{1}\""
+msgstr "Le nom d''hôte \"{0}\" contient le caractère illicite  \"{1}\""
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:143
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:145
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:152
 #, java-format
 msgid "Host name cannot start with \"{0}\""
-msgstr "Le nom d'hôte ne peut pas commencer par \"{0}\""
+msgstr "Le nom d''hôte ne peut pas commencer par \"{0}\""
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:147
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:149
 #, java-format
 msgid "Host name cannot end with \"{0}\""
-msgstr "Le nom d'hôte ne peut pas finir par \"{0}\""
+msgstr "Le nom d''hôte ne peut pas finir par \"{0}\""
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:154
 #, java-format
 msgid "Host name cannot contain \"{0}\""
-msgstr "Le nom d'hôte ne peut pas contenir \"{0}\""
+msgstr "Le nom d''hôte ne peut pas contenir \"{0}\""
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:157
 #, java-format
 msgid "Host name \"{0}\" requires conversion to ASCII but the conversion library is unavailable in this JVM"
-msgstr "Le nom d'hôte \"{0}\" requiert une conversion en ASCII mais la bibliothèque de conversion est indisponible dans cette JVM"
+msgstr "Le nom d''hôte \"{0}\" requiert une conversion en ASCII mais la bibliothèque de conversion est indisponible dans cette JVM"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:209
 msgid "None"

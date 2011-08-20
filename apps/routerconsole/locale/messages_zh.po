@@ -290,7 +290,7 @@ msgstr "出站连接"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:530
 msgid "They offered to introduce us (help other peers traverse our firewall)"
-msgstr "对方节点为中继帮助我方穿越防火墙\n"
+msgstr "对方节点为中继帮助我方穿越防火墙"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:532
 msgid ""
@@ -320,7 +320,7 @@ msgstr "进/出站平滑传输率(Kbyte/s)"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:535
 msgid "How long ago this connection was established"
-msgstr "连接建立时间\n"
+msgstr "连接建立时间"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:535
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:741
@@ -350,7 +350,7 @@ msgstr "等待确认的已发送数据包数量"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:539
 msgid "The maximum number of concurrent messages to send"
-msgstr "并发消息的最大发送量\n"
+msgstr "并发消息的最大发送量"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:540
 msgid "The number of pending sends which exceed congestion window"
@@ -621,7 +621,7 @@ msgstr "按时滞"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1911
 msgid "Sort by congestion window"
-msgstr "按拥塞窗口\n"
+msgstr "按拥塞窗口"
 
 #: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1913
 msgid "Sort by slow start threshold"
@@ -2483,11 +2483,11 @@ msgstr "{0} 的客户隧道"
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:74
 msgid "ANONYMITY WARNING - Settings include 0-hop tunnels."
-msgstr "匿名性警告 - 设置中包括 0-跳点 隧道\n"
+msgstr "匿名性警告 - 设置中包括 0-跳点 隧道"
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:79
 msgid "ANONYMITY WARNING - Settings include 1-hop tunnels."
-msgstr "匿名性警告 - 设置中包括 1-跳点 隧道\n"
+msgstr "匿名性警告 - 设置中包括 1-跳点 隧道"
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:82
 msgid "PERFORMANCE WARNING - Settings include very long tunnels."

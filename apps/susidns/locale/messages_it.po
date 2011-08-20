@@ -21,25 +21,25 @@ msgstr ""
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:130
 #, java-format
 msgid "Host name \"{0}\" contains illegal character {1}"
-msgstr "L'host name \"{0}\" contiene il carattere illegale {1}"
+msgstr "L''host name \"{0}\" contiene il carattere illegale {1}"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:143
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:145
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:152
 #, java-format
 msgid "Host name cannot start with \"{0}\""
-msgstr "L'host name non può iniziare con \"{0}\""
+msgstr "L''host name non può iniziare con \"{0}\""
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:147
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:149
 #, java-format
 msgid "Host name cannot end with \"{0}\""
-msgstr "L'host name non può finire con \"{0}\""
+msgstr "L''host name non può finire con \"{0}\""
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:154
 #, java-format
 msgid "Host name cannot contain \"{0}\""
-msgstr "L'host name non può contenere \"{0}\""
+msgstr "L''host name non può contenere \"{0}\""
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:157
 #, java-format
@@ -47,7 +47,7 @@ msgid ""
 "Host name \"{0}\" requires conversion to ASCII but the conversion library is"
 " unavailable in this JVM"
 msgstr ""
-"L'host name \"{0}\" richiede di essere convertito in formato ASCII ma la "
+"L''host name \"{0}\" richiede di essere convertito in formato ASCII ma la "
 "libreria di conversione non è disponibile in questa JVM"
 
 #: ../src/java/src/i2p/susi/dns/AddressBean.java:209
@@ -122,7 +122,7 @@ msgstr "Sostituisci"
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:242
 #, java-format
 msgid "Host name {0} is already in address book, unchanged."
-msgstr "L'host name {0} è già nella rubrica, immutato."
+msgstr "L''host name {0} è già nella rubrica, immutato."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:299
 #: ../src/java/src/i2p/susi/dns/NamingServiceBean.java:244
@@ -131,7 +131,7 @@ msgid ""
 "Host name {0} is already in address book with a different destination. Click"
 " \"Replace\" to overwrite."
 msgstr ""
-"L'host name {0} è già nella rubrica con una destinazione diversa. Fare click"
+"L''host name {0} è già nella rubrica con una destinazione diversa. Fare click"
 " su \"Sostituisci\" per sovrascrivere."
 
 #: ../src/java/src/i2p/susi/dns/AddressbookBean.java:311
