@@ -63,7 +63,7 @@ public class ConfigUIHelper extends HelperBase {
                                             _x("German"), _x("English"), _x("Spanish"),_x("Finnish"),
                                             _x("French"), _x("Italian"), _x("Dutch"), _x("Polish"),
                                             _x("Portuguese"), _x("Russian"), _x("Swedish"),
-                                            _x("Ukranian"), _x("Vietnamese"), _x("Chinese")};
+                                            _x("Ukrainian"), _x("Vietnamese"), _x("Chinese")};
 
     /** todo sort by translated string */
     public String getLangSettings() {
