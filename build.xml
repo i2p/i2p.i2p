@@ -434,9 +434,17 @@
             <arg value="public final static String VERSION" />
 	    <arg value="core/java/src/net/i2p/CoreVersion.java" />
         </exec>
-        <exec executable="cut" inputstring="${versionLine}" outputproperty="release.number" failonerror="true" >
+        <exec executable="cut" osfamily="unix" inputstring="${versionLine}" outputproperty="release.number" failonerror="true" >
             <arg value="-f2" />
 	    <arg value="-d&quot;" />
+        </exec>
+        <exec executable="cut" osfamily="mac" inputstring="${versionLine}" outputproperty="release.number" failonerror="true" >
+            <arg value="-f2" />
+	    <arg value="-d&quot;"/>
+        </exec>
+        <exec executable="cut" osfamily="windows" inputstring="${versionLine}" outputproperty="release.number" failonerror="true" >
+            <arg value="-f2" />
+	    <arg value="-d&quot;\&quot;&quot;"/>
         </exec>
         <echo message="Release number is ${release.number}" />
     </target>
