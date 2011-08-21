@@ -1202,6 +1202,8 @@ public class WebMail extends HttpServlet
 	private void processRequest( HttpServletRequest httpRequest, HttpServletResponse response )
 	throws IOException, ServletException
 	{
+		httpRequest.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
 		RequestWrapper request = new RequestWrapper( httpRequest );
 		
 		SessionObject sessionObject = null;
@@ -1268,13 +1270,18 @@ public class WebMail extends HttpServlet
 					subtitle = _("Show Message");
 
 				response.setContentType( "text/html" );
-				out.println( "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n<html>" );
 
 				/*
 				 * write header
 				 */
-				out.println( "<head>\n<title>susimail v0." + version + " - " + subtitle +
-						"</title>\n<link rel=\"stylesheet\" type=\"text/css\" href=\"css.css\">\n</head>\n<body>\n<div class=\"page\"><p><img src=\"susimail.png\" alt=\"Susimail\"><br>&nbsp;</p>\n<form method=\"POST\" enctype=\"multipart/form-data\" action=\"" + myself + "\">" );
+				out.println( "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n<html>\n" +
+					"<head>\n" +
+					"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n" +
+					"<title>susimail - " + subtitle + "</title>\n" +
+					"<link rel=\"stylesheet\" type=\"text/css\" href=\"css.css\">\n" +
+					"</head>\n<body>\n" +
+					"<div class=\"page\"><p><img src=\"susimail.png\" alt=\"Susimail\"><br>&nbsp;</p>\n" +
+					"<form method=\"POST\" enctype=\"multipart/form-data\" action=\"" + myself + "\">" );
 
 				if( sessionObject.error != null && sessionObject.error.length() > 0 ) {
 					out.println( "<p class=\"error\">" + sessionObject.error + "</p>" );
