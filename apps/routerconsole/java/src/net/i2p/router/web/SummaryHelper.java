@@ -515,11 +515,11 @@ public class SummaryHelper extends HelperBase {
      */
     public String getJobLag() { 
         if (_context == null) 
-            return "0 ms";
+            return "0";
         
         RateStat rs = _context.statManager().getRate("jobQueue.jobLag");
         if (rs == null)
-            return "0 ms";
+            return "0";
         Rate lagRate = rs.getRate(60*1000);
         return DataHelper.formatDuration2((long)lagRate.getAverageValue());
     }
@@ -531,7 +531,7 @@ public class SummaryHelper extends HelperBase {
      */   
     public String getMessageDelay() { 
         if (_context == null) 
-            return "0 ms";
+            return "0";
         
         return DataHelper.formatDuration2(_context.throttle().getMessageDelay());
     }
@@ -543,7 +543,7 @@ public class SummaryHelper extends HelperBase {
      */
     public String getTunnelLag() { 
         if (_context == null) 
-            return "0 ms";
+            return "0";
         
         return DataHelper.formatDuration2(_context.throttle().getTunnelLag());
     }
