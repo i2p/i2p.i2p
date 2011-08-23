@@ -26,7 +26,7 @@
 :: lameness.
 ::
 cd /d %~dp0
-find /V /I "wrapper.logfile=" wrapper.config > wrapper.new
+findstr /V /R "^wrapper.logfile=" wrapper.config > wrapper.new
 echo wrapper.logfile=%%temp%%\wrapper.log >> wrapper.new
 move wrapper.new wrapper.config
 
