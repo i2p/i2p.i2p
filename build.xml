@@ -1027,30 +1027,6 @@
         <mkdir dir="pkg-temp/installer" />
         <!-- set if unset -->
         <property name="workspace.changes.util.tr" value="" />
-        <jar destfile="./pkg-temp/installer/copy.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Copy.class net/i2p/util/FileUtil.class">
-            <manifest>
-                <attribute name="Main-Class" value="net.i2p.util.Copy" />
-                <attribute name="Build-Date" value="${build.timestamp}" />
-                <attribute name="Base-Revision" value="${workspace.version}" />
-                <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
-            </manifest>
-        </jar>
-        <jar destfile="./pkg-temp/installer/delete.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Delete.class net/i2p/util/FileUtil.class">
-            <manifest>
-                <attribute name="Main-Class" value="net.i2p.util.Delete" />
-                <attribute name="Build-Date" value="${build.timestamp}" />
-                <attribute name="Base-Revision" value="${workspace.version}" />
-                <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
-            </manifest>
-        </jar>
-        <jar destfile="./pkg-temp/installer/exec.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Exec.class">
-            <manifest>
-                <attribute name="Main-Class" value="net.i2p.util.Exec" />
-                <attribute name="Build-Date" value="${build.timestamp}" />
-                <attribute name="Base-Revision" value="${workspace.version}" />
-                <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
-            </manifest>
-        </jar>
 	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${release.number}-freebsd-only.jar" installerType="standard" basedir="${basedir}" />
     </target>
 
@@ -1059,30 +1035,6 @@
         <mkdir dir="pkg-temp/installer" />
         <!-- set if unset -->
         <property name="workspace.changes.util.tr" value="" />
-        <jar destfile="./pkg-temp/installer/copy.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Copy.class net/i2p/util/FileUtil.class">
-            <manifest>
-                <attribute name="Main-Class" value="net.i2p.util.Copy" />
-                <attribute name="Build-Date" value="${build.timestamp}" />
-                <attribute name="Base-Revision" value="${workspace.version}" />
-                <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
-            </manifest>
-        </jar>
-        <jar destfile="./pkg-temp/installer/delete.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Delete.class net/i2p/util/FileUtil.class">
-            <manifest>
-                <attribute name="Main-Class" value="net.i2p.util.Delete" />
-                <attribute name="Build-Date" value="${build.timestamp}" />
-                <attribute name="Base-Revision" value="${workspace.version}" />
-                <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
-            </manifest>
-        </jar>
-        <jar destfile="./pkg-temp/installer/exec.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Exec.class">
-            <manifest>
-                <attribute name="Main-Class" value="net.i2p.util.Exec" />
-                <attribute name="Build-Date" value="${build.timestamp}" />
-                <attribute name="Base-Revision" value="${workspace.version}" />
-                <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
-            </manifest>
-        </jar>
 	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${release.number}-linux-only.jar" installerType="standard" basedir="${basedir}" />
     </target>
 
@@ -1093,30 +1045,6 @@
 	<mkdir dir="pkg-temp/osx" />
         <!-- set if unset -->
         <property name="workspace.changes.util.tr" value="" />
-        <jar destfile="./pkg-temp/installer/copy.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Copy.class net/i2p/util/FileUtil.class">
-            <manifest>
-                <attribute name="Main-Class" value="net.i2p.util.Copy" />
-                <attribute name="Build-Date" value="${build.timestamp}" />
-                <attribute name="Base-Revision" value="${workspace.version}" />
-                <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
-            </manifest>
-        </jar>
-        <jar destfile="./pkg-temp/installer/delete.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Delete.class net/i2p/util/FileUtil.class">
-            <manifest>
-                <attribute name="Main-Class" value="net.i2p.util.Delete" />
-                <attribute name="Build-Date" value="${build.timestamp}" />
-                <attribute name="Base-Revision" value="${workspace.version}" />
-                <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
-            </manifest>
-        </jar>
-        <jar destfile="./pkg-temp/installer/exec.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Exec.class">
-            <manifest>
-                <attribute name="Main-Class" value="net.i2p.util.Exec" />
-                <attribute name="Build-Date" value="${build.timestamp}" />
-                <attribute name="Base-Revision" value="${workspace.version}" />
-                <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
-            </manifest>
-        </jar>
 	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${release.number}-osx-only.jar" installerType="standard" basedir="${basedir}" />
 	<ant target="installer2app" />
 	<delete dir="pkg-temp/osx" />
