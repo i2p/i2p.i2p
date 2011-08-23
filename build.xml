@@ -1117,15 +1117,10 @@
 	    <arg value="--output=${basedir}/i2pinstall-${release.number}-windows.exe" />
         </exec>
     </target>
-    <target name="installer-all" >
-    	<ant target="installer-freebsd" />
-	<ant target="installer-linux" />
-	<ant target="installer-osx" />
-	<ant target="installer-windows" />
-	<ant target="installer" />
+    <target name="installer-all" depends="installer-freebsd, installer-linux, installer-osx, installer-windows, installer" >
     </target>
     <!-- end custom installers -->
-    
+
     <target name="test" depends="buildProperties, jbigi" >
         <mkdir dir="reports/core/junit/" />
         <ant dir="core/java/" target="test" />
