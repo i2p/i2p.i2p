@@ -16,19 +16,19 @@ import net.i2p.util.Log;
  *
  */
 class UDPPacketReader {
-    private I2PAppContext _context;
-    private Log _log;
+    private final I2PAppContext _context;
+    private final Log _log;
     private byte _message[];
     private int _payloadBeginOffset;
     private int _payloadLength;
-    private SessionRequestReader _sessionRequestReader;
-    private SessionCreatedReader _sessionCreatedReader;
-    private SessionConfirmedReader _sessionConfirmedReader;
-    private DataReader _dataReader;
-    private PeerTestReader _peerTestReader;
-    private RelayRequestReader _relayRequestReader;
-    private RelayIntroReader _relayIntroReader;
-    private RelayResponseReader _relayResponseReader;
+    private final SessionRequestReader _sessionRequestReader;
+    private final SessionCreatedReader _sessionCreatedReader;
+    private final SessionConfirmedReader _sessionConfirmedReader;
+    private final DataReader _dataReader;
+    private final PeerTestReader _peerTestReader;
+    private final RelayRequestReader _relayRequestReader;
+    private final RelayIntroReader _relayIntroReader;
+    private final RelayResponseReader _relayResponseReader;
     
     private static final int KEYING_MATERIAL_LENGTH = 64;
     
@@ -354,7 +354,9 @@ class UDPPacketReader {
             off++; // fragment info
             return ((int)DataHelper.fromLong(_message, off, 2)) & 0x3FFF;
         }
-        public void readMessageFragment(int fragmentNum, byte target[], int targetOffset) {
+
+        public void readMessageFragment(int fragmentNum, byte target[], int targetOffset)
+                                                      throws ArrayIndexOutOfBoundsException {
             int off = getFragmentBegin(fragmentNum);
             off += 4; // messageId
             off++; // fragment info

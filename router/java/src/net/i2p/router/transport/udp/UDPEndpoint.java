@@ -137,7 +137,7 @@ class UDPEndpoint {
      * Add the packet to the outobund queue to be sent ASAP (as allowed by
      * the bandwidth limiter)
      *
-     * @return number of packets in the send queue
+     * @return ZERO (used to be number of packets in the queue)
      */
     public int send(UDPPacket packet) { 
         if (_sender == null)

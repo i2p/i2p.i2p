@@ -16,13 +16,13 @@ import net.i2p.util.Log;
  *
  */
 class UDPSender {
-    private RouterContext _context;
-    private Log _log;
+    private final RouterContext _context;
+    private final Log _log;
     private DatagramSocket _socket;
     private String _name;
     private final BlockingQueue<UDPPacket> _outboundQueue;
     private boolean _keepRunning;
-    private Runner _runner;
+    private final Runner _runner;
     private static final int TYPE_POISON = 99999;
     
     //private static final int MAX_QUEUED = 4;
@@ -91,7 +91,7 @@ class UDPSender {
      * available, if requested, otherwise it returns immediately
      *
      * @param blockTime how long to block IGNORED
-     * @return number of packets queued
+     * @return ZERO (used to be number of packets in the queue)
      * @deprecated use add(packet)
      */
     public int add(UDPPacket packet, int blockTime) {

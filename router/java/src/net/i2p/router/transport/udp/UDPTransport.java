@@ -64,6 +64,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private final IntroductionManager _introManager;
     private final ExpirePeerEvent _expireEvent;
     private final PeerTestEvent _testEvent;
+    private final PacketBuilder _destroyBuilder;
     private short _reachabilityStatus;
     private long _reachabilityStatusLastUpdated;
     private long _introducersSelectedOn;
@@ -184,7 +185,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _peersByRemoteHost = new ConcurrentHashMap(128);
         _dropList = new ConcurrentHashSet(2);
         
-        // See comments in DQAT.java
+        // See comments in DummyThrottle.java
         if (USE_PRIORITY) {
             TimedWeightedPriorityMessageQueue mq = new TimedWeightedPriorityMessageQueue(ctx, PRIORITY_LIMITS, PRIORITY_WEIGHT, this);
             _outboundMessages = mq;
@@ -200,6 +201,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _cachedBid[i] = new SharedBid(BID_VALUES[i]);
         }
 
+        _destroyBuilder = new PacketBuilder(_context, this);
         _fragments = new OutboundMessageFragments(_context, this, _activeThrottle);
         _inboundFragments = new InboundMessageFragments(_context, _fragments, this);
         if (SHOULD_FLOOD_PEERS)
@@ -296,7 +298,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (_handler == null)
             _handler = new PacketHandler(_context, this, _endpoint, _establisher, _inboundFragments, _testManager, _introManager);
         
-        // See comments in DQAT.java
+        // See comments in DummyThrottle.java
         if (USE_PRIORITY && _refiller == null)
             _refiller = new OutboundRefiller(_context, _fragments, _outboundMessages);
         
@@ -337,6 +339,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
     
     public void shutdown() {
+        destroyAll();
         if (_endpoint != null)
             _endpoint.shutdown();
         if (_flooder != null)
@@ -345,14 +348,18 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _refiller.shutdown();
         if (_handler != null)
             _handler.shutdown();
-        _fragments.shutdown();
         if (_pusher != null)
             _pusher.shutdown();
+        _fragments.shutdown();
         if (_establisher != null)
             _establisher.shutdown();
         _inboundFragments.shutdown();
         _expireEvent.setIsAlive(false);
         _testEvent.setIsAlive(false);
+        _peersByRemoteHost.clear();
+        _peersByIdent.clear();
+        _dropList.clear();
+        _introManager.reset();
     }
     
     /**
@@ -1011,12 +1018,53 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
          */
     }
     
+    /**
+     *  This sends it directly out, bypassing OutboundMessageFragments
+     *  and the PacketPusher. The only queueing is for the bandwidth limiter.
+     *
+     *  @return ZERO (used to be number of packets in the queue)
+     */
     int send(UDPPacket packet) { 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Sending packet " + packet);
         return _endpoint.send(packet); 
     }
     
+    /**
+     *  Send a session destroy message, bypassing OMF and PacketPusher.
+     *
+     *  @since 0.8.9
+     */
+    private void sendDestroy(PeerState peer) {
+        // peer must be fully established
+        if (peer.getCurrentCipherKey() == null)
+            return;
+        UDPPacket pkt = _destroyBuilder.buildSessionDestroyPacket(peer);
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Sending destroy to : " + peer);
+        send(pkt);
+    }
+
+    /**
+     *  Send a session destroy message to everybody
+     *
+     *  @since 0.8.9
+     */
+    private void destroyAll() {
+        int howMany = _peersByIdent.size();
+        if (_log.shouldLog(Log.WARN))
+            _log.warn("Sending destroy to : " + howMany + " peers");
+        for (PeerState peer : _peersByIdent.values()) {
+            sendDestroy(peer);
+        }
+        int toSleep = Math.min(howMany / 3, 750);
+        if (toSleep > 0) {
+            try {
+                Thread.sleep(toSleep);
+            } catch (InterruptedException ie) {}
+        }
+    }
+
     /** minimum active peers to maintain IP detection, etc. */
     private static final int MIN_PEERS = 3;
     /** minimum peers volunteering to be introducers if we need that */
@@ -1112,6 +1160,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private static final int MIN_EXPIRE_TIMEOUT = 10*60*1000;
     
     public String getStyle() { return STYLE; }
+
     @Override
     public void send(OutNetMessage msg) { 
         if (msg == null) return;
@@ -1151,7 +1200,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Add to fragments for " + to.toBase64());
 
-            // See comments in DQAT.java
+            // See comments in DummyThrottle.java
             if (USE_PRIORITY)
                 _outboundMessages.add(msg);
             else  // skip the priority queue and go straight to the active pool
@@ -1163,6 +1212,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _establisher.establish(msg);
         }
     }
+
     void send(I2NPMessage msg, PeerState peer) {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Injecting a data message to a new peer: " + peer);
@@ -2234,8 +2284,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     }
                 }
 
-            for (int i = 0; i < _expireBuffer.size(); i++)
-                dropPeer(_expireBuffer.get(i), false, "idle too long");
+            for (PeerState peer : _expireBuffer) {
+                sendDestroy(peer);
+                dropPeer(peer, false, "idle too long");
+            }
             _expireBuffer.clear();
 
             if (_alive)

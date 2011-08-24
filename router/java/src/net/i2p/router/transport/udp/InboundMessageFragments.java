@@ -18,14 +18,14 @@ import net.i2p.util.Log;
  *
  */
 class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
-    private RouterContext _context;
-    private Log _log;
+    private final RouterContext _context;
+    private final Log _log;
     /** list of message IDs recently received, so we can ignore in flight dups */
     private DecayingBloomFilter _recentlyCompletedMessages;
-    private OutboundMessageFragments _outbound;
-    private UDPTransport _transport;
-    private ACKSender _ackSender;
-    private MessageReceiver _messageReceiver;
+    private final OutboundMessageFragments _outbound;
+    private final UDPTransport _transport;
+    private final ACKSender _ackSender;
+    private final MessageReceiver _messageReceiver;
     private boolean _alive;
     
     /** decay the recently completed every 20 seconds */
@@ -148,8 +148,8 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
                 from.messageFullyReceived(messageId, state.getCompleteSize());
                 _ackSender.ackPeer(from);
 
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Message received completely!  " + state);
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("Message received completely!  " + state);
 
                 _context.statManager().addRateData("udp.receivedCompleteTime", state.getLifetime(), state.getLifetime());
                 if (state.getFragmentCount() > 0)
@@ -158,7 +158,7 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
                 state.releaseResources();
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Message expired while only being partially read: " + state);
-                _context.messageHistory().droppedInboundMessage(state.getMessageId(), state.getFrom(), "expired hile partially read: " + state.toString());
+                _context.messageHistory().droppedInboundMessage(state.getMessageId(), state.getFrom(), "expired while partially read: " + state.toString());
             } else if (partialACK) {
                 // not expired but not yet complete... lets queue up a partial ACK
                 if (_log.shouldLog(Log.DEBUG))
@@ -174,10 +174,13 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
         return fragments;
     }
     
+    /**
+     *  @return the number of bitfields in the ack? why?
+     */
     private int receiveACKs(PeerState from, UDPPacketReader.DataReader data) {
         int rv = 0;
+        boolean newAck = false;
         if (data.readACKsIncluded()) {
-            int fragments = 0;
             int ackCount = data.readACKCount();
             if (ackCount > 0) {
                 rv += ackCount;
@@ -186,9 +189,13 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
 
                 for (int i = 0; i < ackCount; i++) {
                     long id = data.readACK(i);
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Full ACK of message " + id + " received!");
-                    fragments += _outbound.acked(id, from.getRemotePeer());
+                    if (from.acked(id)) {
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("First full ACK of message " + id + " received from " + from.getRemotePeer());
+                        newAck = true;
+                    //} else if (_log.shouldLog(Log.DEBUG)) {
+                    //    _log.debug("Dup full ACK of message " + id + " received from " + from.getRemotePeer());
+                    }
                 }
             } else {
                 _log.error("Received ACKs with no acks?! " + data);
@@ -201,9 +208,13 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
                 //_context.statManager().getStatLog().addData(from.getRemoteHostId().toString(), "udp.peer.receivePartialACKCount", bitfields.length, 0);
 
                 for (int i = 0; i < bitfields.length; i++) {
-                    if (_log.shouldLog(Log.INFO))
-                        _log.info("Partial ACK received: " + bitfields[i]);
-                    _outbound.acked(bitfields[i], from.getRemotePeer());
+                    if (from.acked(bitfields[i])) {
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("Final partial ACK received: " + bitfields[i] + " from " + from.getRemotePeer());
+                        newAck = true;
+                    } else if (_log.shouldLog(Log.DEBUG)) {
+                        _log.debug("Partial ACK received: " + bitfields[i] + " from " + from.getRemotePeer());
+                    }
                 }
             }
         }
@@ -211,6 +222,13 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
             from.ECNReceived();
         else
             from.dataReceived();
+
+        // Wake up the packet pusher if it is sleeping.
+        // By calling add(), this also is a failsafe against possible
+        // races in OutboundMessageFragments.
+        if (newAck && from.getOutboundMessageCount() > 0)
+            _outbound.add(from);
+
         return rv;
     }
 }

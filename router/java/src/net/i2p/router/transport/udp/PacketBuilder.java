@@ -95,9 +95,9 @@ around briefly, to address packet loss and reordering.</p>
  *
  */
 class PacketBuilder {
-    private I2PAppContext _context;
-    private Log _log;
-    private UDPTransport _transport;
+    private final I2PAppContext _context;
+    private final Log _log;
+    private final UDPTransport _transport;
     
     private static final ByteCache _ivCache = ByteCache.getInstance(64, UDPPacket.IV_SIZE);
     private static final ByteCache _hmacCache = ByteCache.getInstance(64, Hash.HASH_LENGTH);
@@ -656,6 +656,8 @@ class PacketBuilder {
     
     /**
      *  Build a destroy packet, which contains a header but no body.
+     *  Session must be established or this will NPE in authenticate().
+     *  Unused until 0.8.9.
      *
      *  @since 0.8.1
      */

@@ -24,8 +24,8 @@ import net.i2p.util.ConcurrentHashSet;
  *
  */
 class PeerState {
-    private RouterContext _context;
-    private Log _log;
+    private final RouterContext _context;
+    private final Log _log;
     /**
      * The peer are we talking to.  This should be set as soon as this
      * state is created if we are initiating a connection, but if we are
@@ -157,7 +157,7 @@ class PeerState {
     /* how many consecutive packets at or under the min MTU have been received */
     private long _consecutiveSmall;
     /** when did we last check the MTU? */
-    private long _mtuLastChecked;
+    //private long _mtuLastChecked;
     private long _mtuIncreases;
     private long _mtuDecreases;
     /** current round trip time estimate */
@@ -192,7 +192,7 @@ class PeerState {
     /** which outbound message is currently being retransmitted */
     private OutboundMessageState _retransmitter;
     
-    private UDPTransport _transport;
+    private final UDPTransport _transport;
     
     /** have we migrated away from this peer to another newer one? */
     private volatile boolean _dead;
@@ -224,7 +224,7 @@ class PeerState {
      * of 608
      *
      * Well, we really need to count the acks as well, especially
-     * 4 * MAX_RESEND_ACKS which can take up a significant amount of space.
+     * 1 + (4 * MAX_RESEND_ACKS_SMALL) which can take up a significant amount of space.
      * We reduce the max acks when using the small MTU but it may not be enough...
      *
      */
@@ -234,8 +234,14 @@ class PeerState {
      * based on measurements, 1350 fits nearly all reasonably small I2NP messages
      * (larger I2NP messages may be up to 1900B-4500B, which isn't going to fit
      * into a live network MTU anyway)
+     *
+     * TODO
+     * VTBM is 2646, it would be nice to fit in two large
+     * 2646 / 2 = 1323
+     * 1323 + 74 + 46 + 1 + (4 * 9) = 1480
+     * So why not make it 1492 (old ethernet is 1492, new is 1500)
      */
-    private static final int LARGE_MTU = 1350;
+    private static final int LARGE_MTU = 1492;
     
     private static final int MIN_RTO = 100 + ACKSender.ACK_FREQUENCY;
     private static final int MAX_RTO = 3000; // 5000;
@@ -261,25 +267,14 @@ class PeerState {
         _remotePort = -1;
         _mtu = getDefaultMTU();
         _mtuReceive = _mtu;
-        _mtuLastChecked = -1;
+        //_mtuLastChecked = -1;
         _lastACKSend = -1;
         _rto = MIN_RTO;
         _rtt = _rto/2;
         _rttDeviation = _rtt;
         _inboundMessages = new HashMap(8);
         _outboundMessages = new ArrayList(32);
-        _context.statManager().createRateStat("udp.congestionOccurred", "How large the cwin was when congestion occurred (duration == sendBps)", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.congestedRTO", "retransmission timeout after congestion (duration == rtt dev)", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.sendACKPartial", "Number of partial ACKs sent (duration == number of full ACKs in that ack packet)", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.sendBps", "How fast we are transmitting when a packet is acked", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.receiveBps", "How fast we are receiving when a packet is fully received (at most one per second)", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.mtuIncrease", "How many retransmissions have there been to the peer when the MTU was increased (period is total packets transmitted)", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.mtuDecrease", "How many retransmissions have there been to the peer when the MTU was decreased (period is total packets transmitted)", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.rejectConcurrentActive", "How many messages are currently being sent to the peer when we reject it (period is how many concurrent packets we allow)", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.allowConcurrentActive", "How many messages are currently being sent to the peer when we accept it (period is how many concurrent packets we allow)", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.rejectConcurrentSequence", "How many consecutive concurrency rejections have we had when we stop rejecting (period is how many concurrent packets we are on)", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.queueDropSize", "How many messages were queued up when it was considered full, causing a tail drop?", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.queueAllowTotalLifetime", "When a peer is retransmitting and we probabalistically allow a new message, what is the sum of the pending message lifetimes? (period is the new message's lifetime)?", "udp", UDPTransport.RATES);
+        // all createRateStat() moved to EstablishmentManager
     }
     
     private int getDefaultMTU() {
@@ -381,13 +376,20 @@ class PeerState {
     public long getTheyRelayToUsAs() { return _theyRelayToUsAs; }
     /** what is the largest packet we can send to the peer? */
     public int getMTU() { return _mtu; }
-    /** estimate how large the other side is sending packets */
+
+    /**
+     *  Estimate how large the other side's MTU is.
+     *  This could be wrong.
+     *  It is used only for the HTML status.
+     */
     public int getReceiveMTU() { return _mtuReceive; }
+
     /** when did we last check the MTU? */
+  /****
     public long getMTULastChecked() { return _mtuLastChecked; }
     public long getMTUIncreases() { return _mtuIncreases; }
     public long getMTUDecreases() { return _mtuDecreases; }
-    
+  ****/
     
     /**
      * The peer are we talking to.  This should be set as soon as this
@@ -548,11 +550,15 @@ class PeerState {
      * we can use to publish that fact.
      */
     public void setTheyRelayToUsAs(long tag) { _theyRelayToUsAs = tag; }
+
     /** what is the largest packet we can send to the peer? */
+  /****
     public void setMTU(int mtu) { 
         _mtu = mtu; 
         _mtuLastChecked = _context.clock().now();
     }
+  ****/
+
     public int getSlowStartThreshold() { return _slowStartThreshold; }
     public int getConcurrentSends() { return _concurrentMessagesActive; }
     public int getConcurrentSendWindow() { return _concurrentMessagesAllowed; }
@@ -990,15 +996,21 @@ class PeerState {
     public long getPacketRetransmissionRate() { return _packetRetransmissionRate; }
     public long getPacketsReceived() { return _packetsReceived; }
     public long getPacketsReceivedDuplicate() { return _packetsReceivedDuplicate; }
+
+    private static final int MTU_RCV_DISPLAY_THRESHOLD = 20;
+
     public void packetReceived(int size) { 
         _packetsReceived++; 
-        if (size <= MIN_MTU)
+        if (size <= MIN_MTU) {
             _consecutiveSmall++;
-        else
+        } else {
             _consecutiveSmall = 0;
+            _mtuReceive = LARGE_MTU;
+            return;
+        }
         
-	if (_packetsReceived > 50) {
-            if (_consecutiveSmall < 50)
+	if (_packetsReceived > MTU_RCV_DISPLAY_THRESHOLD) {
+            if (_consecutiveSmall < MTU_RCV_DISPLAY_THRESHOLD)
                 _mtuReceive = LARGE_MTU;
             else
                 _mtuReceive = MIN_MTU;
@@ -1061,7 +1073,6 @@ class PeerState {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Adding to " + _remotePeer.toBase64() + ": " + state.getMessageId());
         List<OutboundMessageState> msgs = _outboundMessages;
-        if (msgs == null) return 0;
         int rv = 0;
         boolean fail = false;
         synchronized (msgs) {
@@ -1070,11 +1081,14 @@ class PeerState {
                 // 32 queued messages?  to *one* peer?  nuh uh.
                 fail = true;
                 rv--;
+
+         /******* proactive tail drop disabled by jr 2006-04-19 so all this is pointless
+
             } else if (_retransmitter != null) {
                 long lifetime = _retransmitter.getLifetime();
                 long totalLifetime = lifetime;
                 for (int i = 1; i < msgs.size(); i++) { // skip the first, as thats the retransmitter
-                    OutboundMessageState cur = (OutboundMessageState)msgs.get(i);
+                    OutboundMessageState cur = msgs.get(i);
                     totalLifetime += cur.getLifetime();
                 }
                 long remaining = -1;
@@ -1103,6 +1117,9 @@ class PeerState {
                     _context.statManager().addRateData("udp.queueAllowTotalLifetime", totalLifetime, lifetime);
                     msgs.add(state);
                 }
+
+             *******/
+
             } else {
                 msgs.add(state);
             }
@@ -1111,6 +1128,7 @@ class PeerState {
             _transport.failed(state, false);
         return rv;
     }
+
     /** drop all outbound messages */
     public void dropOutbound() {
         //if (_dead) return;
@@ -1118,7 +1136,7 @@ class PeerState {
         List<OutboundMessageState> msgs = _outboundMessages;
         //_outboundMessages = null;
         _retransmitter = null;
-        if (msgs != null) {
+
             int sz = 0;
             List<OutboundMessageState> tempList = null;
             synchronized (msgs) {
@@ -1130,21 +1148,17 @@ class PeerState {
             }
             for (int i = 0; i < sz; i++)
                 _transport.failed(tempList.get(i), false);
-        }
+
         // so the ACKSender will drop this peer from its queue
         _wantACKSendSince = -1;
     }
     
+    /**
+     * @return number of active outbound messages remaining (unsynchronized)
+     */
     public int getOutboundMessageCount() {
-        List<OutboundMessageState> msgs = _outboundMessages;
         if (_dead) return 0;
-        if (msgs != null) {
-            synchronized (msgs) {
-                return msgs.size();
-            }
-        } else {
-            return 0;
-        }
+        return _outboundMessages.size();
     }
     
     /**
@@ -1152,39 +1166,37 @@ class PeerState {
      * @return number of active outbound messages remaining
      */
     public int finishMessages() {
-        int rv = 0;
         List<OutboundMessageState> msgs = _outboundMessages;
+        // short circuit, unsynchronized
+        if (msgs.isEmpty())
+            return 0;
+
         if (_dead) {
             dropOutbound();
             return 0;
 	}
+
+        int rv = 0;
         List<OutboundMessageState> succeeded = null;
         List<OutboundMessageState> failed = null;
         synchronized (msgs) {
-            int size = msgs.size();
-            for (int i = 0; i < size; i++) {
-                OutboundMessageState state = msgs.get(i);
+            for (Iterator<OutboundMessageState> iter = msgs.iterator(); iter.hasNext(); ) {
+                OutboundMessageState state = iter.next();
                 if (state.isComplete()) {
-                    msgs.remove(i);
-                    i--;
-                    size--;
+                    iter.remove();
                     if (_retransmitter == state)
                         _retransmitter = null;
                     if (succeeded == null) succeeded = new ArrayList(4);
                     succeeded.add(state);
                 } else if (state.isExpired()) {
-                    msgs.remove(i);
-                    i--;
-                    size--;
+                    iter.remove();
                     if (_retransmitter == state)
                         _retransmitter = null;
                     _context.statManager().addRateData("udp.sendFailed", state.getPushCount(), state.getLifetime());
                     if (failed == null) failed = new ArrayList(4);
                     failed.add(state);
                 } else if (state.getPushCount() > OutboundMessageFragments.MAX_VOLLEYS) {
-                    msgs.remove(i);
-                    i--;
-                    size--;
+                    iter.remove();
                     if (state == _retransmitter)
                         _retransmitter = null;
                     _context.statManager().addRateData("udp.sendAggressiveFailed", state.getPushCount(), state.getLifetime());
@@ -1232,9 +1244,7 @@ class PeerState {
         List<OutboundMessageState> msgs = _outboundMessages;
         if (_dead) return null;
         synchronized (msgs) {
-            int size = msgs.size();
-            for (int i = 0; i < size; i++) {
-                OutboundMessageState state = msgs.get(i);
+            for (OutboundMessageState state : msgs) {
                 if (locked_shouldSend(state)) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Allocate sending to " + _remotePeer.toBase64() + ": " + state.getMessageId());
@@ -1261,28 +1271,22 @@ class PeerState {
     }
     
     /**
-     * return how long to wait before sending, or -1 if we have nothing to send
+     * @return how long to wait before sending, or Integer.MAX_VALUE if we have nothing to send.
+     *         If ready now, will return 0 or a negative value.
      */
     public int getNextDelay() {
-        int rv = -1;
+        int rv = Integer.MAX_VALUE;
+        if (_dead) return rv;
         long now = _context.clock().now();
         List<OutboundMessageState> msgs = _outboundMessages;
-        if (_dead) return -1;
         synchronized (msgs) {
             if (_retransmitter != null) {
                 rv = (int)(_retransmitter.getNextSendTime() - now);
-                if (rv <= 0)
-                    return 1;
-                else
-                    return rv;
+                return rv;
             }
-            int size = msgs.size();
-            for (int i = 0; i < size; i++) {
-                OutboundMessageState state = msgs.get(i);
+            for (OutboundMessageState state : msgs) {
                 int delay = (int)(state.getNextSendTime() - now);
-                if (delay <= 0)
-                    delay = 1;
-                if ( (rv <= 0) || (delay < rv) )
+                if (delay < rv)
                     rv = delay;
             }
         }
@@ -1306,7 +1310,11 @@ class PeerState {
     private static final int SSU_HEADER_SIZE = 46;
     static final int UDP_HEADER_SIZE = 8;
     static final int IP_HEADER_SIZE = 20;
-    /** how much payload data can we shove in there? */
+
+    /**
+     *  how much payload data can we shove in there?
+     *  @return MTU - 74
+     */
     private static final int fragmentSize(int mtu) {
         return mtu - SSU_HEADER_SIZE - UDP_HEADER_SIZE - IP_HEADER_SIZE;
     }
@@ -1315,7 +1323,7 @@ class PeerState {
         long now = _context.clock().now();
         if (state.getNextSendTime() <= now) {
             if (!state.isFragmented()) {
-                state.fragment(fragmentSize(getMTU()));
+                state.fragment(fragmentSize(_mtu));
                 if (state.getMessage() != null)
                     state.getMessage().timestamp("fragment into " + state.getFragmentCount());
 
@@ -1372,14 +1380,14 @@ class PeerState {
                 _context.statManager().addRateData("udp.sendRejected", state.getPushCount(), state.getLifetime());
                 //if (state.getMessage() != null)
                 //    state.getMessage().timestamp("send rejected, available=" + getSendWindowBytesRemaining());
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Allocation of " + size + " rejected w/ wsize=" + getSendWindowBytes()
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Allocation of " + size + " rejected w/ wsize=" + getSendWindowBytes()
                               + " available=" + getSendWindowBytesRemaining()
                               + " for message " + state.getMessageId() + ": " + state);
                 state.setNextSendTime(now + (ACKSender.ACK_FREQUENCY / 2) +
                                       _context.random().nextInt(ACKSender.ACK_FREQUENCY)); //(now + 1024) & ~SECOND_MASK);
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Retransmit after choke for next send time in " + (state.getNextSendTime()-now) + "ms");
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Retransmit after choke for next send time in " + (state.getNextSendTime()-now) + "ms");
                 //_throttle.choke(peer.getRemotePeer());
 
                 //if (state.getMessage() != null)
@@ -1393,16 +1401,20 @@ class PeerState {
         return false;
     }
     
-    public int acked(long messageId) {
+    /**
+     *  A full ACK was received.
+     *
+     *  @return true if the message was acked for the first time
+     */
+    public boolean acked(long messageId) {
+        if (_dead) return false;
         OutboundMessageState state = null;
         List<OutboundMessageState> msgs = _outboundMessages;
-        if (_dead) return 0;
         synchronized (msgs) {
-            int sz = msgs.size();
-            for (int i = 0; i < sz; i++) {
-                state = msgs.get(i);
+            for (Iterator<OutboundMessageState> iter = msgs.iterator(); iter.hasNext(); ) {
+                state = iter.next();
                 if (state.getMessageId() == messageId) {
-                    msgs.remove(i);
+                    iter.remove();
                     break;
                 } else {
                     state = null;
@@ -1438,22 +1450,25 @@ class PeerState {
             //    _throttle.unchoke(peer.getRemotePeer());
             
             state.releaseResources();
-            return numFragments;
         } else {
             // dupack, likely
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Received an ACK for a message not pending: " + messageId);
-            return 0;
         }
+        return state != null;
     }
     
-    public void acked(ACKBitfield bitfield) {
+    /**
+     *  A partial ACK was received. This is much less common than full ACKs.
+     *
+     *  @return true if the message was completely acked for the first time
+     */
+    public boolean acked(ACKBitfield bitfield) {
         if (_dead)
-            return;
+            return false;
         
         if (bitfield.receivedComplete()) {
-            acked(bitfield.getMessageId());
-            return;
+            return acked(bitfield.getMessageId());
         }
     
         List<OutboundMessageState> msgs = _outboundMessages;
@@ -1461,13 +1476,13 @@ class PeerState {
         OutboundMessageState state = null;
         boolean isComplete = false;
         synchronized (msgs) {
-            for (int i = 0; i < msgs.size(); i++) {
-                state = msgs.get(i);
+            for (Iterator<OutboundMessageState> iter = msgs.iterator(); iter.hasNext(); ) {
+                state = iter.next();
                 if (state.getMessageId() == bitfield.getMessageId()) {
                     boolean complete = state.acked(bitfield);
                     if (complete) {
                         isComplete = true;
-                        msgs.remove(i);
+                        iter.remove();
                         if (state == _retransmitter)
                             _retransmitter = null;
                     }
@@ -1514,12 +1529,12 @@ class PeerState {
                 //if (state.getMessage() != null)
                 //    state.getMessage().timestamp("partial ack after " + numSends + ": " + bitfield.toString());
             }
-            return;
+            return isComplete;
         } else {
             // dupack
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Received an ACK for a message not pending: " + bitfield);
-            return;
+            return false;
         }
     }
     
@@ -1580,6 +1595,8 @@ class PeerState {
             }
         }
     }
+
+    // why removed? Some risk of dups in OutboundMessageFragments._activePeers ???
 
     /*
     public int hashCode() {

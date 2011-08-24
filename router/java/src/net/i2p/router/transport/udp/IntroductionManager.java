@@ -21,10 +21,10 @@ import net.i2p.util.Log;
  *
  */
 class IntroductionManager {
-    private RouterContext _context;
-    private Log _log;
-    private UDPTransport _transport;
-    private PacketBuilder _builder;
+    private final RouterContext _context;
+    private final Log _log;
+    private final UDPTransport _transport;
+    private final PacketBuilder _builder;
     /** map of relay tag to PeerState that should receive the introduction */
     private final Map<Long, PeerState> _outbound;
     /** list of peers (PeerState) who have given us introduction tags */

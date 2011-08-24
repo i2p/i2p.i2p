@@ -19,13 +19,13 @@ import net.i2p.util.Log;
 class UDPPacket {
     private I2PAppContext _context;
     private static Log _log;
-    private volatile DatagramPacket _packet;
+    private final DatagramPacket _packet;
     private volatile short _priority;
     private volatile long _initializeTime;
     private volatile long _expiration;
-    private byte[] _data;
-    private byte[] _validateBuf;
-    private byte[] _ivBuf;
+    private final byte[] _data;
+    private final byte[] _validateBuf;
+    private final byte[] _ivBuf;
     private volatile int _markedType;
     private volatile RemoteHostId _remoteHost;
     private volatile boolean _released;
@@ -51,7 +51,13 @@ class UDPPacket {
         _log = I2PAppContext.getGlobalContext().logManager().getLog(UDPPacket.class);
     }
     
-    static final int MAX_PACKET_SIZE = 2048;
+    /**
+     *  Actually it is one less than this, we assume
+     *  if a received packet is this big it is truncated.
+     *  This is bigger than PeerState.LARGE_MTU, as the far-end's
+     *  LARGE_MTU may be larger than ours.
+     */
+    static final int MAX_PACKET_SIZE = 1536;
     public static final int IV_SIZE = 16;
     public static final int MAC_SIZE = 16;
     
@@ -81,21 +87,26 @@ class UDPPacket {
     
     private static final int MAX_VALIDATE_SIZE = MAX_PACKET_SIZE;
 
-    private UDPPacket(I2PAppContext ctx, boolean inbound) {
+    private UDPPacket(I2PAppContext ctx) {
         ctx.statManager().createRateStat("udp.fetchRemoteSlow", "How long it takes to grab the remote ip info", "udp", UDPTransport.RATES);
         // the data buffer is clobbered on init(..), but we need it to bootstrap
         _data = new byte[MAX_PACKET_SIZE];
         _packet = new DatagramPacket(_data, MAX_PACKET_SIZE);
         _validateBuf = new byte[MAX_VALIDATE_SIZE];
         _ivBuf = new byte[IV_SIZE];
-        init(ctx, inbound);
+        init(ctx);
     }
-    // FIXME optimization, remove the inbound parameter, as it is unused. FIXME
-    private void init(I2PAppContext ctx, boolean inbound) {
+
+    private void init(I2PAppContext ctx) {
         _context = ctx;
         //_dataBuf = _dataCache.acquire();
         Arrays.fill(_data, (byte)0);
         //_packet = new DatagramPacket(_data, MAX_PACKET_SIZE);
+        //
+        // WARNING -
+        // Doesn't seem like we should have to do this every time,
+        // from reading the DatagramPacket javadocs,
+        // but we get massive corruption without it.
         _packet.setData(_data);
         // _isInbound = inbound;
         _initializeTime = _context.clock().now();
@@ -262,15 +273,18 @@ class UDPPacket {
         return buf.toString();
     }
     
+    /**
+     *  @param inbound unused
+     */
     public static UDPPacket acquire(I2PAppContext ctx, boolean inbound) {
         UDPPacket rv = null;
         if (CACHE) {
             rv = _packetCache.poll();
             if (rv != null)
-                rv.init(ctx, inbound);
+                rv.init(ctx);
         }
         if (rv == null)
-            rv = new UDPPacket(ctx, inbound);
+            rv = new UDPPacket(ctx);
         //if (rv._acquiredBy != null) {
         //    _log.log(Log.CRIT, "Already acquired!  current stack trace is:", new Exception());
         //    _log.log(Log.CRIT, "Earlier acquired:", rv._acquiredBy);

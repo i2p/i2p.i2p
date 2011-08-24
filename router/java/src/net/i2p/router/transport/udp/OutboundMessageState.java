@@ -12,12 +12,12 @@ import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 
 /**
- * Maintain the outbound fragmentation for resending
+ * Maintain the outbound fragmentation for resending, for a single message.
  *
  */
 class OutboundMessageState {
-    private I2PAppContext _context;
-    private Log _log;
+    private final I2PAppContext _context;
+    private final Log _log;
     /** may be null if we are part of the establishment */
     private OutNetMessage _message;
     private long _messageId;
@@ -49,6 +49,7 @@ class OutboundMessageState {
         _log = _context.logManager().getLog(OutboundMessageState.class);
     }
     
+/****
     public boolean initialize(OutNetMessage msg) {
         if (msg == null) return false;
         try {
@@ -60,7 +61,11 @@ class OutboundMessageState {
             return false;
         }
     }
+****/
     
+    /**
+     *  Called from UDPTransport
+     */
     public boolean initialize(I2NPMessage msg, PeerState peer) {
         if (msg == null) 
             return false;
@@ -75,6 +80,9 @@ class OutboundMessageState {
         }
     }
     
+    /**
+     *  Called from OutboundMessageFragments
+     */
     public boolean initialize(OutNetMessage m, I2NPMessage msg) {
         if ( (m == null) || (msg == null) ) 
             return false;
@@ -198,6 +206,7 @@ class OutboundMessageState {
                     sends[i] = (short)-1;
         
         boolean rv = isComplete();
+      /****
         if (!rv && false) { // don't do the fast retransmit... lets give it time to get ACKed
             long nextTime = _context.clock().now() + Math.max(_peer.getRTT(), ACKSender.ACK_FREQUENCY);
             //_nextSendTime = Math.max(now, _startedOn+PeerState.MIN_RTO);
@@ -210,6 +219,7 @@ class OutboundMessageState {
             //    _nextSendTime = now + 100;
             //_nextSendTime = now;
         }
+      ****/
         return rv;
     }
     

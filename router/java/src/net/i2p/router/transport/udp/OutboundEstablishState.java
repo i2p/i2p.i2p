@@ -50,7 +50,7 @@ class OutboundEstablishState {
     private long _nextSend;
     private RemoteHostId _remoteHostId;
     private final RouterIdentity _remotePeer;
-    private SessionKey _introKey;
+    private final SessionKey _introKey;
     private final Queue<OutNetMessage> _queuedMessages;
     private int _currentState;
     private long _introductionNonce;

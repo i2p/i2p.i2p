@@ -11,10 +11,10 @@ import net.i2p.util.Log;
  */
 class PacketPusher implements Runnable {
     // private RouterContext _context;
-    private Log _log;
-    private OutboundMessageFragments _fragments;
-    private UDPSender _sender;
-    private boolean _alive;
+    private final Log _log;
+    private final OutboundMessageFragments _fragments;
+    private final UDPSender _sender;
+    private volatile boolean _alive;
     
     public PacketPusher(RouterContext ctx, OutboundMessageFragments fragments, UDPSender sender) {
         // _context = ctx;

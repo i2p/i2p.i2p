@@ -14,13 +14,14 @@ import net.i2p.util.Log;
 /**
  * Blocking thread that is given peers by the inboundFragment pool, sending out
  * any outstanding ACKs.  
- *
+ * The ACKs are sent directly to UDPSender,
+ * bypassing OutboundMessageFragments and PacketPusher.
  */
 class ACKSender implements Runnable {
-    private RouterContext _context;
-    private Log _log;
-    private UDPTransport _transport;
-    private PacketBuilder _builder;
+    private final RouterContext _context;
+    private final Log _log;
+    private final UDPTransport _transport;
+    private final PacketBuilder _builder;
     /** list of peers (PeerState) who we have received data from but not yet ACKed to */
     private final BlockingQueue<PeerState> _peersToACK;
     private boolean _alive;

@@ -8,8 +8,6 @@ package net.i2p.router;
  *
  */
 
-import java.util.Comparator;
-
 import net.i2p.util.Log;
 
 /**
