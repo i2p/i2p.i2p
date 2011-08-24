@@ -201,7 +201,7 @@ public class Daemon {
                     }
                 } catch (DataFormatException dfe) {
                     if (log != null)
-                        log.append("Invalid b64 for" + key + " From: " + sub.getLocation());
+                        log.append("Invalid b64 for " + key + " From: " + sub.getLocation());
                     invalid++;
                 }
                 total++;

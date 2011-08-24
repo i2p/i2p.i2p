@@ -95,6 +95,7 @@ rm -rf ./icons
 rm -rf ./lib/wrapper
 rm -f ./lib/*.dll
 rm -f ./*.bat
+rm -f ./fix_logfile_path.cmd
 rm -f ./*.exe
 rm -rf ./installer
 

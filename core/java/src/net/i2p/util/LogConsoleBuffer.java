@@ -36,8 +36,8 @@ public class LogConsoleBuffer {
         lim = Math.max(limit, 4);
         // Add some extra room to minimize the chance of losing a message,
         // since we are doing offer() below.
-        _buffer = new LinkedBlockingQueue(limit + 4);
-        _critBuffer = new LinkedBlockingQueue(limit + 4);
+        _buffer = new LinkedBlockingQueue(lim + 4);
+        _critBuffer = new LinkedBlockingQueue(lim + 4);
     }
 
     void add(String msg) {

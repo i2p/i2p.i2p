@@ -44,7 +44,7 @@
     <a href="/?lang=pt&amp;consoleNonce=<%=consoleNonce%>"><img src="/flags.jsp?c=pt" title="Português" alt="Português"></a> 
     <a href="/?lang=ru&amp;consoleNonce=<%=consoleNonce%>"><img src="/flags.jsp?c=ru" title="Русский" alt="Русский"></a> 
     <a href="/?lang=sv&amp;consoleNonce=<%=consoleNonce%>"><img src="/flags.jsp?c=se" title="Svenska" alt="Svenska"></a>
-    <a href="/?lang=uk&amp;consoleNonce=<%=consoleNonce%>"><img src="/flags.jsp?c=ua" title="Ukranian" alt="Ukranian"></a>
+    <a href="/?lang=uk&amp;consoleNonce=<%=consoleNonce%>"><img src="/flags.jsp?c=ua" title="Ukrainian" alt="Ukrainian"></a>
     <a href="/?lang=vi&amp;consoleNonce=<%=consoleNonce%>"><img src="/flags.jsp?c=vn" title="Tiếng Việt" alt="Tiếng Việt"></a>
   </div>
   <a name="top"></a>

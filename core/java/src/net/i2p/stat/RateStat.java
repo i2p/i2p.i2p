@@ -32,7 +32,7 @@ public class RateStat {
         for (int i = 0; i < periods.length; i++) {
             Rate rate = new Rate(periods[i]);
             rate.setRateStat(this);
-            _rates.put(rate.getPeriod(),rate);;
+            _rates.put(rate.getPeriod(),rate);
         }
     }
     public void setStatLog(StatLog sl) { _statLog = sl; }
@@ -75,19 +75,19 @@ public class RateStat {
     }
 
     public double getLifetimeAverageValue() {
-        if ( (_rates == null) || (_rates.size() <= 0) ) return 0;
+        if (_rates.isEmpty()) return 0;
         return _rates.values().iterator().next().getLifetimeAverageValue();
     }
     public long getLifetimeEventCount() {
-        if ( (_rates == null) || (_rates.size() <= 0) ) return 0;
+        if (_rates.isEmpty()) return 0;
         return _rates.values().iterator().next().getLifetimeEventCount();
     }
 
     /**
      * Returns rate with requested period if it exists, 
      * otherwise creates new rate with requested period, adds it to  list of rates and returns it.
-     * @param period
-     * @return
+     * @param period ms
+     * @return the Rate
      */
     public Rate getRate(long period) {
         if (_rates.containsKey(period)){
@@ -103,7 +103,8 @@ public class RateStat {
     /**
      * Adds a new rate with the requested period, provided that 
      * a rate with that period does not already exist.
-     * @param period
+     * @param period ms
+     * @since 0.8.8
      */
     public void addRate(long period) {
     	if (!_rates.containsKey(period)){
@@ -115,7 +116,8 @@ public class RateStat {
     
     /**
      * If a rate with the provided period exists, remove it.
-     * @param period
+     * @param period ms
+     * @since 0.8.8
      */
     public void removeRate(long period) {
     	_rates.remove(period);
@@ -123,8 +125,9 @@ public class RateStat {
     
     /**
      * Tests if a rate with the provided period exists within this RateStat.
-     * @param period
-     * @return
+     * @param period ms
+     * @return true if exists
+     * @since 0.8.8
      */
     public boolean containsRate(long period) {
     	return _rates.containsKey(period);
