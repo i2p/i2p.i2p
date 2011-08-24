@@ -1,6 +1,7 @@
 package net.i2p.i2ptunnel.irc;
 
 import net.i2p.data.DataHelper;
+import net.i2p.util.Log;
 
 
 /**
@@ -356,10 +357,16 @@ abstract class IRCFilter {
         } catch (NumberFormatException nfe) {
             return null;
         }
+        if (cPort < 0 || cPort > 65535)
+            return null;
 
         int port = -1;
         if (haveIP) {
-            port = helper.newIncoming(b32, cPort, type);
+            if (cPort > 0)
+                port = helper.newIncoming(b32, cPort, type);
+            else
+                // "reverse/firewall DCC" - send it through without tracking
+                port = cPort;
         } else if (type.equals("ACCEPT")) {
             port = helper.acceptIncoming(cPort);
         } else if (type.equals("RESUME")) {
@@ -371,8 +378,13 @@ abstract class IRCFilter {
         buf.append(pfx)
            .append(type).append(' ').append(arg).append(' ');
         if (haveIP) {
-            byte[] myIP = helper.getLocalAddress();
-            buf.append(DataHelper.fromLong(myIP, 0, myIP.length)).append(' ');
+            if (port > 0) {
+                byte[] myIP = helper.getLocalAddress();
+                buf.append(DataHelper.fromLong(myIP, 0, myIP.length)).append(' ');
+            } else {
+                // "reverse/firewall DCC" - set dummy IP and send it through
+                buf.append("0 ");
+            }
         }
         buf.append(port);
         while (args.length > nextArg) {
@@ -435,8 +447,9 @@ abstract class IRCFilter {
                     // "reverse/firewall DCC"
                     // http://en.wikipedia.org/wiki/Direct_Client-to-Client
                     // xchat sends an IP of 199 and a port of 0
-                    System.err.println("Reverse / Firewall DCC not supported IP = 0x" + Long.toHexString(ipl));
-                    return null;
+                    Log log = new Log(IRCFilter.class);
+                    log.logAlways(Log.WARN, "Reverse / Firewall DCC, IP = 0x" + Long.toHexString(ipl));
+                    //return null;
                 }
                 ip = DataHelper.toLong(4, ipl);
             } catch (NumberFormatException nfe) {
@@ -450,16 +463,22 @@ abstract class IRCFilter {
         } catch (NumberFormatException nfe) {
             return null;
         }
-        if (cPort <= 0) {
-            // "reverse/firewall DCC"
-            // http://en.wikipedia.org/wiki/Direct_Client-to-Client
-            System.err.println("Reverse / Firewall DCC not supported");
+        if (cPort < 0 || cPort > 65535)
             return null;
-        }
 
         int port = -1;
         if (haveIP) {
-            port = helper.newOutgoing(ip, cPort, type);
+            if (cPort > 0) {
+                // nonzero port but bogus IP? hmm. Fix IP and hope.
+                if (ip[0] == 0)
+                    ip = new byte[] {127, 0, 0, 1};
+                port = helper.newOutgoing(ip, cPort, type);
+            } else {
+                // "reverse/firewall DCC" - send it through without tracking
+                Log log = new Log(IRCFilter.class);
+                log.logAlways(Log.WARN, "Reverse / Firewall DCC, port = 0");
+                port = cPort;
+            }
         } else if (type.equals("ACCEPT")) {
             port = helper.acceptOutgoing(cPort);
         } else if (type.equals("RESUME")) {
@@ -470,8 +489,13 @@ abstract class IRCFilter {
         StringBuilder buf = new StringBuilder(256);
         buf.append(pfx)
            .append(type).append(' ').append(arg).append(' ');
-        if (haveIP)
-            buf.append(helper.getB32Hostname()).append(' ');
+        if (haveIP) {
+            if (port > 0)
+                buf.append(helper.getB32Hostname()).append(' ');
+            else
+                // "reverse/firewall DCC" - set dummy IP and send it through
+                buf.append("0 ");
+        }
         buf.append(port);
         while (args.length > nextArg) {
             buf.append(' ').append(args[nextArg++]);
