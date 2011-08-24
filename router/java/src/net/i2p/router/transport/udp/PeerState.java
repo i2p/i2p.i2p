@@ -241,7 +241,7 @@ class PeerState {
      * 1323 + 74 + 46 + 1 + (4 * 9) = 1480
      * So why not make it 1492 (old ethernet is 1492, new is 1500)
      */
-    private static final int LARGE_MTU = 1350;
+    private static final int LARGE_MTU = 1492;
     
     private static final int MIN_RTO = 100 + ACKSender.ACK_FREQUENCY;
     private static final int MAX_RTO = 3000; // 5000;
