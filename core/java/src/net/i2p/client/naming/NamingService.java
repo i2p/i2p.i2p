@@ -61,7 +61,8 @@ public abstract class NamingService {
     }
 
     /**
-     * Reverse look up a destination
+     * Reverse lookup a destination
+     * @param dest non-null
      * @return a host name for this Destination, or <code>null</code>
      * if none is known. It is safe for subclasses to always return
      * <code>null</code> if no reverse lookup is possible.
@@ -70,7 +71,13 @@ public abstract class NamingService {
         return reverseLookup(dest, null);
     }
 
-    /** @deprecated unused */
+    /**
+     * Reverse lookup a hash
+     * @param h non-null
+     * @return a host name for this hash, or <code>null</code>
+     * if none is known. It is safe for subclasses to always return
+     * <code>null</code> if no reverse lookup is possible.
+     */
     public String reverseLookup(Hash h) { return null; }
 
     /**
@@ -370,6 +377,7 @@ public abstract class NamingService {
 
     /**
      *  Same as reverseLookup(dest) but with options
+     *  @param d non-null
      *  @param options NamingService-specific, can be null
      *  @return host name or null
      *  @since 0.8.7
