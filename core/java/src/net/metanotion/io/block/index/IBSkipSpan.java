@@ -283,7 +283,8 @@ public class IBSkipSpan extends BSkipSpan {
 			BSkipSpan.loadInit(bss, bf, bsl, np, key, val);
 			bss.loadFirstKey();
 			Comparable nextFirstKey = bss.firstKey;
-			if (previousFirstKey.compareTo(nextFirstKey) >= 0) {
+			if (previousFirstKey == null || nextFirstKey == null ||
+			    previousFirstKey.compareTo(nextFirstKey) >= 0) {
 				// TODO remove, but if we are at the bottom of a level
 				// we have to remove the level too, which is a mess
 				BlockFile.log.error("Corrupt database, span out of order " + ((BSkipSpan)bss.prev).page +
@@ -312,7 +313,8 @@ public class IBSkipSpan extends BSkipSpan {
 			BSkipSpan.loadInit(bss, bf, bsl, np, key, val);
 			bss.loadFirstKey();
 			Comparable previousFirstKey = bss.firstKey;
-			if (previousFirstKey.compareTo(nextFirstKey) >= 0) {
+			if (previousFirstKey == null || nextFirstKey == null ||
+			    previousFirstKey.compareTo(nextFirstKey) >= 0) {
 				// TODO remove, but if we are at the bottom of a level
 				// we have to remove the level too, which is a mess
 				BlockFile.log.error("Corrupt database, span out of order " + bss.page +
