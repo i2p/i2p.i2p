@@ -1,3 +1,25 @@
+2011-08-25 zzz
+  * Blockfile:
+    - Avoid NPE after corruption (ticket #515)
+    - Add reverse lookup table; bump DB rev to 2
+  * I2PTunnelIRCClient:
+    - Big refactoring into multiple class files
+    - Allow AWAY and CAP messages
+    - First cut at DCC support - not for SOCKS (yet)
+  * Streaming:
+    - Hook I2CP ports through to I2PSocket
+    - Javadocs, init cleanups, final
+  * UDP:
+    - Complete rewrite of OutboundMessageFragments for
+      concurrent and for efficiency to avoid O(n**2) behavior
+    - Don't delay in OutboundMessageFragments at the end
+      of the loop if we have more to send now, this should
+      speed things up
+    - Queue a new send immediately after a packet is acked
+    - Send session destroy message when dropping connection
+    - Increase large MTU to 1492 (was 1350)
+    - Cleanups, log tweaks, javadocs, final
+
 * 2011-08-23 0.8.8 released
 
 2011-08-23 zzz

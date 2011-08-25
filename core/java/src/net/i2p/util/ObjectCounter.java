@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *  @author zzz, welterde
  */
 public class ObjectCounter<K> {
-    private ConcurrentHashMap<K, AtomicInteger> map;
+    private final ConcurrentHashMap<K, AtomicInteger> map;
 
     public ObjectCounter() {
         this.map = new ConcurrentHashMap<K, AtomicInteger>();
