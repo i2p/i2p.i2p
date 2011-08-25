@@ -52,6 +52,11 @@ I2P_ARGS="/etc/i2p/wrapper.config \
 # read config file
 [ -r /etc/default/$NAME ] && . /etc/default/$NAME
 
+if [ -z "$RUN_DAEMON" ]; then
+	echo "/etc/default/$NAME is not set. Aborting."
+	exit 1
+fi
+
 case "$RUN_DAEMON" in
         [NnFf]*)
                 log_action_msg "$DESC daemon disabled in /etc/default/$NAME".

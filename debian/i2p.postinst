@@ -1,28 +1,9 @@
 #!/bin/sh  -e
 
 I2PHOME=/var/lib/i2p
-I2P=/usr/share/i2p
-I2PUSER=i2psvc
+I2PSYSUSER=i2psvc
 
 conffile="/etc/default/i2p"
-
-update_config_file()
-{
-        db_field=$1
-        config_field=$2
-  
-        RET=false
-        db_get $db_field
-        if [ -n "$RET" ] ; then
-                if grep -q "^$config_field" $conffile ; then 
-                        # keep any admin changes, while replacing the variable content
-                        sed "s/^[ ]*$config_field=\".*\"/$config_field=\"$RET\"/" < $conffile > $conffile.new &&  
-                        mv $conffile.new $conffile
-                else
-                        echo "$config_field=\"$RET\"" >> $conffile
-                fi  
-        fi  
-}
 
 # Source debconf library -- we have a Depends line
 # to make sure it is there...
@@ -32,67 +13,61 @@ db_version 2.0
 
 case "$1" in
 	configure|reconfigure)
-		if [ -f $conffile ] ; then
-			sed -i -e 's/^[ ]*STARTI2P/RUN_DAEMON/g' $conffile
-			if ! grep -q RUN_DAEMON $conffile ; then
-				cat << EOF >> $conffile
-# I2P daemon. If set to true, I2P will start automatically
-# when your computer boots.
-RUN_DAEMON="false"
-EOF
-			fi
-			if ! grep -q I2PUSER $conffile ; then
-				cat << EOF >> $conffile
-# The user that runs the I2P daemon. By default this is set to i2psvc.
-# You may want to change this to use a manually installed I2P profile.
-I2PUSER="i2psvc"
-EOF
-			fi
-		else
-			cat << EOF >> $conffile
-# Defaults for i2p initscript (/etc/init.d/i2p)
-# This is a posix shell fragment
-
-# [automatically edited by postinst, do not change line format ]
-# Run 'dpkg-reconfigure -plow i2p' to change these values.
-
-# I2P daemon. If set to true, i2p will start automatically when 
-# the computer boots
-RUN_DAEMON="false"
-
-# The user that runs the I2P daemon. By default this is set to i2psvc.
-# You may want to change this to use a manually installed I2P profile.
-I2PUSER="i2psvc"
-EOF
+		if [ ! -e $conffile ]; then
+			echo "# Defaults for i2p initscript (/etc/init.d/i2p" >> $conffile
+			echo "# This is a posix shell fragment" >> $conffile
+			echo >> $conffile
+			echo "# [automatically edited by postinst, do not change line format ]" >> $conffile
+			echo "# Run 'dpkg-reconfigure -plow i2p' to change these values." >> $conffile
+			echo >> $conffile
+			echo "RUN_DAEMON=" >> $conffile
+			echo "I2PUSER=" >> $conffile
 		fi
-	update_config_file i2p/daemon	RUN_DAEMON
-	update_config_file i2p/user	I2PUSER
+
+		db_get i2p/daemon
+		RUN_DAEMON="$RET"
+		db_get i2p/user
+		I2PUSER="$RET"
+
+		cp -a -f $conffile $conffile.tmp
+
+		# If the admin deleted or commented some variables but then set them via debconf,
+		# (re-)add them to the conffile.
+		test -z "$RUN_DAEMON" || grep -Eq '^ *RUN_DAEMON=' $conffile || \
+			echo "RUN_DAEMON=" >> $conffile
+		test -z "$I2PUSER" || grep -Eq '^ *I2PUSER=' $conffile || \
+			echo "I2PUSER=" >> $conffile
+
+		if [ -z $RUN_DAEMON ]; then
+			RUN_DAEMON="false"
+			I2PUSER="i2psvc"
+		fi
+
+		sed -e "s/^ *RUN_DAEMON=.*/RUN_DAEMON=\"$RUN_DAEMON\"/" \
+			-e "s/^ *I2PUSER=.*/I2PUSER=\"$I2PUSER\"/" \
+			< $conffile > $conffile.tmp
+		mv -f $conffile.tmp $conffile
 
 	migrate_existing_user(){
 		# Adjust the user/group in /etc/passwd, mainly for upgrades from old packages that didn't
-		# create $I2PUSER as a system group/user
-		usermod -c "I2P Router Daemon" -m -d $I2PHOME -g $I2PUSER -s "/bin/false" \
-			-l $I2PUSER -e 1 > /dev/null 2>&1
+		# create $I2PSYSUSER as a system group/user
+		usermod -c "I2P Router Daemon" -m -d $I2PHOME -g $I2PSYSUSER -s "/bin/false" \
+			-l $I2PSYSUSER -e 1 > /dev/null 2>&1
 		echo "Existing user migrated, home directory moved to $I2PHOME"
 	}
 
 	# Create user and group as a system user.
-	adduser --system --quiet --group --home $I2PHOME $I2PUSER || migrate_existing_user
+	adduser --system --quiet --group --home $I2PHOME $I2PSYSUSER || migrate_existing_user
 
 	[ -d /var/log/i2p ] || mkdir -m0750 /var/log/i2p
-	chown -f -R $I2PUSER:adm /var/log/i2p
+	chown -f -R $I2PSYSUSER:adm /var/log/i2p
 
 	# Has someone set the permissions with dpkg-statoverride? If so, obey them.
 	if ! dpkg-statoverride --list $I2PHOME > /dev/null 2>&1
 	then
-		chown -f -R $I2PUSER:$I2PUSER $I2PHOME
+		chown -f -R $I2PSYSUSER:$I2PSYSUSER $I2PHOME
 		chmod -f u=rwx,g=rxs,o= $I2PHOME
 	fi
-
-	##if ! dpkg-statoverride --list $I2P > /dev/null
-	##then
-	##	chown -f -R $I2PUSER:$I2PUSER $I2P
-	##fi  
 
 	db_stop
 ;;
