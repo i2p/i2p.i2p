@@ -128,8 +128,8 @@ public class SummaryHelper extends HelperBase {
                     return _("WARN-Firewalled with Inbound TCP Enabled");
                 if (((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled())
                     return _("WARN-Firewalled and Floodfill");
-                if (_context.router().getRouterInfo().getCapabilities().indexOf('O') >= 0)
-                    return _("WARN-Firewalled and Fast");
+                //if (_context.router().getRouterInfo().getCapabilities().indexOf('O') >= 0)
+                //    return _("WARN-Firewalled and Fast");
                 return _("Firewalled");
             case CommSystemFacade.STATUS_HOSED:
                 return _("ERR-UDP Port In Use - Set i2np.udp.internalPort=xxxx in advanced config and restart");
