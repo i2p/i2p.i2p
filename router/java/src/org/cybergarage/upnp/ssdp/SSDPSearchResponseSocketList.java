@@ -69,7 +69,7 @@ public class SSDPSearchResponseSocketList extends Vector
 			for (int n=0; n<nHostAddrs; n++) {
 				String bindAddr = HostInterface.getHostAddress(n);
 				SSDPSearchResponseSocket socket = new SSDPSearchResponseSocket(bindAddr, port);
-				Debug.warning("Opened SSDP search response socket at " + bindAddr + ':' + port);
+				Debug.message("Opened SSDP search response socket at " + bindAddr + ':' + port);
 				add(socket);
 			}
 		}

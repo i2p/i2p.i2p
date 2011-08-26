@@ -37,7 +37,7 @@ public class SSDPSearchSocket extends HTTPMUSocket implements Runnable
 	public SSDPSearchSocket(String bindAddr)
 	{
 		open(bindAddr);
-		Debug.warning("Opened SSDP search socket at " + bindAddr + ':' + SSDP.PORT);
+		Debug.message("Opened SSDP search socket at " + bindAddr + ':' + SSDP.PORT);
 	}
 
 	////////////////////////////////////////////////

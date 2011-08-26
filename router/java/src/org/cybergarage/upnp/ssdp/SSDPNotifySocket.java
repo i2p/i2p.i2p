@@ -48,7 +48,7 @@ public class SSDPNotifySocket extends HTTPMUSocket implements Runnable
 			useIPv6Address = true;
 		}
 		open(addr, SSDP.PORT, bindAddr);
-		Debug.warning("Opened SSDP notify socket at " + bindAddr + ':' + SSDP.PORT);
+		Debug.message("Opened SSDP notify socket at " + bindAddr + ':' + SSDP.PORT);
 		setControlPoint(null);
 	}
 

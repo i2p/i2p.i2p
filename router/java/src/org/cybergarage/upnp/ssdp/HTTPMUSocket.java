@@ -191,7 +191,7 @@ public class HTTPMUSocket
  		try {
 			ssdpMultiSock.receive(recvPacket.getDatagramPacket());
 			recvPacket.setTimeStamp(System.currentTimeMillis());
-			Debug.warning("Received SSDP multicast packet on " + getLocalAddress() + " from " + recvPacket.getRemoteAddress());
+			Debug.message("Received SSDP multicast packet on " + getLocalAddress() + " from " + recvPacket.getRemoteAddress());
 		}
 		catch (Exception e) {
 			//Debug.warning(e);
