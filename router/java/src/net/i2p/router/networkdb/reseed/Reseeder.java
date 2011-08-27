@@ -70,7 +70,8 @@ public class Reseeder {
          /*   "https://c.netdb.i2p2.de/," +   no data */
               "https://forum.i2p2.de/netdb/," +
               "https://www.i2pbote.net/netDb/," +
-              "https://r31453.ovh.net/static_media/files/netDb/," +
+              "https://reseed.i2p-projekt.de/," +
+	      "https://r31453.ovh.net/static_media/files/netDb/," +
               "https://cowpuncher.drollette.com/netdb/";
 
     private static final String PROP_INPROGRESS = "net.i2p.router.web.ReseedHandler.reseedInProgress";
