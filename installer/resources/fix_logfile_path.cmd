@@ -7,7 +7,7 @@
 ::
 :: On every *NIX-like system, $SYSTEM_java_io_tmpdir/wrapper.log points to a system-level
 :: temp directory (/tmp on Linux, /var/tmp on BSD, etc.), but in Windows the value of %temp%
-:: depends on whose account a process is running under. If the same user that installs I2P 
+:: depends on whose account a process is running under. If the same user that installs I2P
 :: is the only one that will run I2P, this isn't a problem.
 ::
 :: The problem comes from trying to run the process as a service, or trying to run under an
@@ -29,5 +29,3 @@ cd /d %~dp0
 findstr /V /R "^wrapper.logfile=" wrapper.config > wrapper.new
 echo wrapper.logfile=%%temp%%\wrapper.log >> wrapper.new
 move wrapper.new wrapper.config
-
-:: As an added bonus, wrapper.config now has DOS line endings in Windows.
