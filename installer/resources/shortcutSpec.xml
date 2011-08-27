@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <shortcuts>
  <programGroup defaultName="I2P" location="startMenu" />
- <shortcut name="Start I2P (no window)" 
-           target="$INSTALL_PATH\I2P.exe" 
+ <shortcut name="Start I2P (no window)"
+           target="$INSTALL_PATH\I2P.exe"
            commandLine=""
            workingDirectory="$INSTALL_PATH"
            iconFile="$INSTALL_PATH\docs\start.ico"
@@ -11,8 +11,8 @@
 	   startMenu="no"
 	   desktop="yes"
            startup="no" />
- <shortcut name="Start I2P (restartable)" 
-           target="$INSTALL_PATH\I2Psvc.exe" 
+ <shortcut name="Start I2P (restartable)"
+           target="$INSTALL_PATH\I2Psvc.exe"
            commandLine="-c wrapper.config"
            workingDirectory="$INSTALL_PATH"
            iconFile="$INSTALL_PATH\docs\start.ico"
@@ -26,7 +26,7 @@
            commandLine=""
            workingDirectory="$INSTALL_PATH"
            iconFile="$INSTALL_PATH\docs\console.ico"
-           initialState="noShow"
+           initialState="normal"
            programGroup="yes"
            startMenu="no"
 	   desktop="yes"
