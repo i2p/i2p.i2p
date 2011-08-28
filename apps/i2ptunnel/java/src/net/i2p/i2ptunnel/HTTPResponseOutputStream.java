@@ -272,8 +272,8 @@ class HTTPResponseOutputStream extends FilterOutputStream {
             } catch (OutOfMemoryError oom) {
                 _log.error("OOM in HTTP Decompressor", oom);
             } finally {
-                if (_log.shouldLog(Log.WARN) && (_in != null))
-                    _log.warn("After decompression, written=" + written + 
+                if (_log.shouldLog(Log.INFO) && (_in != null))
+                    _log.info("After decompression, written=" + written + 
                               (_in != null ?
                                 " read=" + _in.getTotalRead() 
                                 + ", expanded=" + _in.getTotalExpanded() + ", remaining=" + _in.getRemaining() 
