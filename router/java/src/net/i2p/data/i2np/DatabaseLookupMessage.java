@@ -46,6 +46,8 @@ public class DatabaseLookupMessage extends I2NPMessageImpl {
     public DatabaseLookupMessage(I2PAppContext context) {
         this(context, false);
     }
+
+    /** @param locallyCreated ignored */
     public DatabaseLookupMessage(I2PAppContext context, boolean locallyCreated) {
         super(context);
         //setSearchKey(null);
