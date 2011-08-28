@@ -179,10 +179,17 @@ public class LogManager {
         return new ArrayList(_logs.values());
     }
 
+    /**
+     *  If the log already exists, its priority is set here but cannot
+     *  be changed later, as it becomes an "orphan" not tracked by the manager.
+     */
     void addLog(Log log) {
         Log old = _logs.putIfAbsent(log.getScope(), log);
-        if (old == null)
-            updateLimit(log);
+        updateLimit(log);
+        if (old != null) {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Duplicate log for " + log.getName());
+        }
     }
     
     public LogConsoleBuffer getBuffer() { return _consoleBuffer; }

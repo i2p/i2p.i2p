@@ -23,12 +23,12 @@ import net.i2p.I2PAppContext;
  * @author jrandom
  */
 public class Log {
-    private Class _class;
-    private String _className;
-    private String _name;
+    private final Class _class;
+    private final String _className;
+    private final String _name;
     private int _minPriority;
-    private LogScope _scope;
-    private LogManager _manager;
+    private final LogScope _scope;
+    private final LogManager _manager;
 
     public final static int DEBUG = 10;
     public final static int INFO = 20;
@@ -69,11 +69,19 @@ public class Log {
         return (level > CRIT ? STR_CRIT : STR_DEBUG);
     }
 
+    /**
+     *  Warning - not recommended.
+     *  Use I2PAppContext.getGlobalContext().logManager().getLog(cls)
+     */
     public Log(Class cls) {
         this(I2PAppContext.getGlobalContext().logManager(), cls, null);
         _manager.addLog(this);
     }
 
+    /**
+     *  Warning - not recommended.
+     *  Use I2PAppContext.getGlobalContext().logManager().getLog(name)
+     */
     public Log(String name) {
         this(I2PAppContext.getGlobalContext().logManager(), null, name);
         _manager.addLog(this);
@@ -190,19 +198,23 @@ public class Log {
         if (name == null) return cls.getName();
         return name + "" + cls.getName();
     }
+
     private static final class LogScope {
-        private String _scopeName;
-        private Class _scopeClass;
-        private String _scopeCache;
+        private final String _scopeName;
+        private final Class _scopeClass;
+        private final String _scopeCache;
+
         public LogScope(String name, Class cls) {
             _scopeName = name;
             _scopeClass = cls;
             _scopeCache = getScope(name, cls);
         }
+
         @Override
         public int hashCode() {
             return _scopeCache.hashCode();
         }
+
         @Override
         public boolean equals(Object obj) {
             if (obj == null)
