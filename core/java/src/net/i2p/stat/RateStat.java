@@ -28,7 +28,7 @@ public class RateStat {
         _statName = name;
         _description = description;
         _groupName = group;
-        _rates = new ConcurrentHashMap<Long, Rate>();
+        _rates = new ConcurrentHashMap<Long, Rate>(4);
         for (int i = 0; i < periods.length; i++) {
             Rate rate = new Rate(periods[i]);
             rate.setRateStat(this);
@@ -85,19 +85,19 @@ public class RateStat {
 
     /**
      * Returns rate with requested period if it exists, 
-     * otherwise creates new rate with requested period, adds it to  list of rates and returns it.
+     * otherwise null
      * @param period ms
      * @return the Rate
      */
     public Rate getRate(long period) {
-        if (_rates.containsKey(period)){
-        	return _rates.get(period);
-        } else {
-        	Rate rate = new Rate(period);
-        	rate.setRateStat(this);
-        	_rates.put(period, rate);
-        	return rate;
-        }
+        //if (_rates.containsKey(period)){
+        	return _rates.get(Long.valueOf(period));
+        //} else {
+        //	Rate rate = new Rate(period);
+        //	rate.setRateStat(this);
+        //	_rates.put(period, rate);
+        //	return rate;
+        //}
     }
     
     /**
