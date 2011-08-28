@@ -1,3 +1,13 @@
+2011-08-28 zzz
+  * checkcerts.sh: New test
+  * Console: Remove 'firewalled and fast' message, just say 'firewalled'
+  * I2PTunnelRunner: Fix logging
+  * Log: Fix level stuck at DEBUG when using public constructor
+  * OutboundMessageRegistry: Cleanups
+  * Stats: Restore pre-0.8.8 API to not create a new Rate if it does not
+           exist in RateStat.getRate()
+  * UPnP: Lower some log levels
+
 2011-08-26 kytv
   * Debian: Bugfix: Avoid overwriting preseeded debconf values
     upon package installation (ticket #514).
