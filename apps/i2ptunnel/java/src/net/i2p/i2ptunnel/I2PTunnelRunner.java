@@ -12,6 +12,7 @@ import java.net.SocketException;
 import java.util.HashMap;
 import java.util.List;
 
+import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.data.ByteArray;
 import net.i2p.util.ByteCache;
@@ -20,7 +21,7 @@ import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 
 public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErrorListener {
-    private final Log _log = new Log(I2PTunnelRunner.class);
+    private final Log _log;
 
     private static volatile long __runnerId;
     private final long _runnerId;
@@ -88,6 +89,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
         this.onTimeout = onTimeout;
         lastActivityOn = -1;
         startedOn = Clock.getInstance().now();
+        _log = I2PAppContext.getGlobalContext().logManager().getLog(I2PTunnelRunner.class);
         if (_log.shouldLog(Log.INFO))
             _log.info("I2PTunnelRunner started");
         _runnerId = ++__runnerId;
