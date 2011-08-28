@@ -1,3 +1,9 @@
+2011-08-26 kytv
+  * Debian: Bugfix: Avoid overwriting preseeded debconf values
+    upon package installation (ticket #514).
+  * Windows: Fix bug in fixperms.bat that occurred when installing on
+    non-English versions of Windows 7 and Vista.
+
 2011-08-25 zzz
   * Blockfile:
     - Avoid NPE after corruption (ticket #515)
@@ -66,7 +72,7 @@
            to speed integration
 
 2011-07-30 kytv
- * Installer: 
+ * Installer:
    - add libjbigi*core*jnilib, libjbigi-osx-none_64.jnilib, and
      libjbigi-linux-ppc.so
    - Add Linux PPC wrapper

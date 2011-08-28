@@ -8,4 +8,12 @@
 :: /q : quiet
 :: /t : recursive
 ::
-echo Y|icacls %1 /grant Users:F /c /t > %1%\fixperms.log
+:: Note: We should not use the group name "Users" since this group will not
+:: exist on non-English versions of Windows.
+::
+:: S-1-5-32-545 = Users (en). Benutzer (de), etc.
+::
+:: Specifying the SID will work on ALL versions of Windows.
+:: List of well-known SIDs at http://support.microsoft.com/kb/243330/en-us
+::
+echo Y|icacls %1 /grant  *S-1-5-32-545:F /c /t > %1%\fixperms.log

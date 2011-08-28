@@ -60,7 +60,7 @@ Debian wrapper.config to try to prevent confusion.
  # next value to true may help. 
 --- a/installer/resources/wrapper.config
 +++ b/installer/resources/wrapper.config
-@@ -7,22 +7,16 @@
+@@ -8,22 +8,13 @@
  # click "Shutdown", wait 11 minutes, then start i2p.
  #
  # WARNING - The wrapper is NOT run (and this file is not used)
@@ -68,7 +68,7 @@ Debian wrapper.config to try to prevent confusion.
 -# with the runplain.sh script on Linux. Use the 'restartable'
 -# icon on Windows or the i2prouter script on Linux to run the wrapper.
 +# if you start I2P with the i2prouter-nowrapper script in Linux.
-+# Use i2prouter or the initscript run the wrapper.
++# Use i2prouter or the initscript to run the wrapper.
  #
  # NOTE - Directory organization:
  # The standard I2P Installation will set up a "split" directory structure
@@ -76,18 +76,16 @@ Debian wrapper.config to try to prevent confusion.
  # user's home directory, and temporary files in the system temporary directory.
 -# To set up a single-directory "portable" installation suitable for
 -# a USB stick, make several changes specified below (search for PORTABLE).
- #
+-#
 -# NOTE - The izpack installer performs variable subsitiution on this
 -# file upon installation. If you did not use izpack, you must
 -# find and replace all instances of (dollar)INSTALL_PATH and
 -# (dollar)SYSTEM_java_io_tmpdir with appropriate values
 -# (perhaps . and /var/tmp, respectively)
-+# Unless changed by an admin, the daemon user "i2psvc" has its home directory
-+# at /var/lib/i2p.
  #
  #********************************************************************
  # Java Application
-@@ -45,20 +39,21 @@
+@@ -51,13 +42,14 @@
  # classes, or all the classes of i2p.jar, are in a different directory).
  # Be sure there are no other duplicate classes.
  #
@@ -105,17 +103,18 @@ Debian wrapper.config to try to prevent confusion.
 +wrapper.java.library.path.1=/usr/lib/jni
 +wrapper.java.library.path.2=/usr/share/java/lib
  
- # Java Additional Parameters
- # Numbers must be consecutive (except for stripquotes)
+ # Java Bits.  On applicable platforms, tells the JVM to run in 32 or 64-bit mode.
+ wrapper.java.additional.auto_bits=TRUE
+@@ -67,7 +59,7 @@
  wrapper.java.additional.1=-DloggerFilenameOverride=logs/log-router-@.txt
  wrapper.java.additional.2=-Dorg.mortbay.http.Version.paranoid=true
  wrapper.java.additional.3=-Dorg.mortbay.xml.XmlParser.NotValidating=true
 -wrapper.java.additional.4=-Di2p.dir.base="$INSTALL_PATH"
-+wrapper.java.additional.4=-Di2p.dir.base="/usr/share/i2p"
++wrapper.java.additional.4=-Di2p.dir.base=/usr/share/i2p
  wrapper.java.additional.4.stripquotes=TRUE
  
  # On some IPv6 enabled systems, I2P and other network-enabled java applications
-@@ -126,11 +121,7 @@
+@@ -137,11 +129,7 @@
  # tell the router where to find the wrapper log
  # (change X to the next available number)
  # wrapper.java.additional.X=-Dwrapper.logfile=/path/to/wrapper.log
@@ -128,7 +127,7 @@ Debian wrapper.config to try to prevent confusion.
  
  # Format of output for the log file.
  # The format consists of the tokens 'L' for log level, 'P' for prefix, 'D' for thread,
-@@ -192,10 +183,7 @@
+@@ -203,10 +191,7 @@
  # you should copy this file, change the location or file name,
  # and edit the i2prouter script to change the WRAPPER_CONF setting
  # to point to the new wrapper.config location.
@@ -140,7 +139,7 @@ Debian wrapper.config to try to prevent confusion.
  # pid file for the service monitoring the JVM
  #
  # From i2prouter:
-@@ -206,34 +194,4 @@
+@@ -217,10 +202,7 @@
  #
  # This means i2prouter looks for './i2p.pid'.
  # See comments above for wrapper.java.pidfile
@@ -148,6 +147,14 @@ Debian wrapper.config to try to prevent confusion.
 -# PORTABLE installation:
 -# Use the following instead.
 -#wrapper.pidfile=$INSTALL_PATH/i2p.pid
++wrapper.pidfile=/tmp/i2p.pid
+ 
+ #********************************************************************
+ # Wrapper General Properties
+@@ -230,30 +212,3 @@
+ 
+ # Title to use when running as a console
+ wrapper.console.title=I2P Service
 -
 -#********************************************************************
 -# Wrapper NT Service Properties
@@ -175,4 +182,3 @@ Debian wrapper.config to try to prevent confusion.
 -# Allow the service to interact with the desktop.
 -wrapper.ntservice.interactive=false
 -
-+wrapper.pidfile=/tmp/i2p.pid
