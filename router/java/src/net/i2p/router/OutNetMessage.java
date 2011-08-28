@@ -143,22 +143,28 @@ public class OutNetMessage {
      */
     public RouterInfo getTarget() { return _target; }
     public void setTarget(RouterInfo target) { _target = target; }
+
     /**
      * Specifies the message to be sent
      *
      */
     public I2NPMessage getMessage() { return _message; }
+
     public void setMessage(I2NPMessage msg) {
         _message = msg;
         if (msg != null) {
-            _messageType = msg.getClass().getName();
+            _messageType = msg.getClass().getSimpleName();
             _messageTypeId = msg.getType();
             _messageId = msg.getUniqueId();
             _messageSize = _message.getMessageSize();
         }
     }
     
+    /**
+     *  @return the simple class name
+     */
     public String getMessageType() { return _messageType; }
+
     public int getMessageTypeId() { return _messageTypeId; }
     public long getMessageId() { return _messageId; }
     
@@ -273,12 +279,13 @@ public class OutNetMessage {
      * we may keep the object around for a while to use its ID, jobs, etc.
      */
     public void discardData() {
-        long timeToDiscard = _context.clock().now() - _created;
         if ( (_message != null) && (_messageSize <= 0) )
             _messageSize = _message.getMessageSize();
-        if (_log.shouldLog(Log.DEBUG))
+        if (_log.shouldLog(Log.DEBUG)) {
+            long timeToDiscard = _context.clock().now() - _created;
             _log.debug("Discard " + _messageSize + "byte " + _messageType + " message after " 
                        + timeToDiscard);
+        }
         _message = null;
         //_context.statManager().addRateData("outNetMessage.timeToDiscard", timeToDiscard, timeToDiscard);
         //_context.messageStateMonitor().outboundMessageDiscarded();
@@ -312,7 +319,7 @@ public class OutNetMessage {
             buf.append("*no message*");
         } else {
             buf.append("a ").append(_messageSize).append(" byte ");
-            buf.append(_message.getClass().getName());
+            buf.append(_messageType);
         }
         buf.append(" expiring on ").append(new Date(_expiration));
         if (_failedTransports != null)

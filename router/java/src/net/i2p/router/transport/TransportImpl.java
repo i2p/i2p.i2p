@@ -204,7 +204,7 @@ public abstract class TransportImpl implements Transport {
 
         if (msToSend > 1000) {
             if (_log.shouldLog(Log.WARN))
-                _log.warn("afterSend slow: [success=" + sendSuccessful + "] " + msg.getMessageSize() + "byte "
+                _log.warn("afterSend slow: [success=" + sendSuccessful + "] " + msg.getMessageSize() + " byte "
                           + msg.getMessageType() + " " + msg.getMessageId() + " to "
                           + msg.getTarget().getIdentity().calculateHash().toBase64().substring(0,6) + " took " + msToSend
                           + "/" + msg.getTransmissionTime());
@@ -218,12 +218,12 @@ public abstract class TransportImpl implements Transport {
             if (!sendSuccessful)
                 level = Log.INFO;
             if (_log.shouldLog(level))
-                _log.log(level, "afterSend slow (" + lifetime + "/" + msToSend + "/" + msg.getTransmissionTime() + "): [success=" + sendSuccessful + "]" + msg.getMessageSize() + "byte "
+                _log.log(level, "afterSend slow (" + lifetime + "/" + msToSend + "/" + msg.getTransmissionTime() + "): [success=" + sendSuccessful + "] " + msg.getMessageSize() + " byte "
                           + msg.getMessageType() + " " + msg.getMessageId() + " from " + _context.routerHash().toBase64().substring(0,6)
                           + " to " + msg.getTarget().getIdentity().calculateHash().toBase64().substring(0,6) + ": " + msg.toString());
         } else {
             if (_log.shouldLog(Log.INFO))
-                _log.info("afterSend: [success=" + sendSuccessful + "]" + msg.getMessageSize() + "byte "
+                _log.info("afterSend: [success=" + sendSuccessful + "] " + msg.getMessageSize() + " byte "
                           + msg.getMessageType() + " " + msg.getMessageId() + " from " + _context.routerHash().toBase64().substring(0,6)
                           + " to " + msg.getTarget().getIdentity().calculateHash().toBase64().substring(0,6) + "\n" + msg.toString());
         }
