@@ -90,6 +90,7 @@ class BuildHandler {
         _context.statManager().createRateStat("tunnel.receiveRejectionCritical", "How often we are rejected due to critical failure?", "Tunnels", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
 
         _context.statManager().createRateStat("tunnel.corruptBuildReply", "", "Tunnels", new long[] { 24*60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.buildLookupSuccess", "Was a deferred lookup successful?", "Tunnels", new long[] { 60*60*1000 });
         
         _processor = new BuildMessageProcessor(ctx);
         _throttler = new ParticipatingThrottler(ctx);
@@ -104,7 +105,7 @@ class BuildHandler {
     }
     
     private static final int MAX_HANDLE_AT_ONCE = 2;
-    private static final int NEXT_HOP_LOOKUP_TIMEOUT = 5*1000;
+    private static final int NEXT_HOP_LOOKUP_TIMEOUT = 15*1000;
     
     /**
      * Blocking call to handle a few of the pending inbound requests, returning how many
@@ -197,7 +198,7 @@ class BuildHandler {
                         _context.statManager().addRateData("tunnel.tierReject" + bwTier, 1, 0);
                     }
                     if (_log.shouldLog(Log.INFO))
-                        _log.info(msg.getUniqueId() + ": Peer " + peer.toBase64() + " replied with status " + howBad);
+                        _log.info(msg.getUniqueId() + ": Peer " + peer + " replied with status " + howBad);
 
                 if (howBad == 0) {
                     // w3wt
@@ -300,8 +301,9 @@ class BuildHandler {
         if (nextPeerInfo == null) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Request " + state.msg.getUniqueId() + "/" + req.readReceiveTunnelId() + "/" + req.readNextTunnelId() 
-                           + " handled, looking for the next peer " + nextPeer.toBase64());
-            _context.netDb().lookupRouterInfo(nextPeer, new HandleReq(_context, state, req, nextPeer), new TimeoutReq(_context, state, req, nextPeer), NEXT_HOP_LOOKUP_TIMEOUT);
+                           + " handled, looking for the next peer " + nextPeer);
+            _context.netDb().lookupRouterInfo(nextPeer, new HandleReq(_context, state, req, nextPeer),
+                                              new TimeoutReq(_context, state, req, nextPeer), NEXT_HOP_LOOKUP_TIMEOUT);
             return -1;
         } else {
             long beforeHandle = System.currentTimeMillis();
@@ -309,7 +311,7 @@ class BuildHandler {
             long handleTime = System.currentTimeMillis() - beforeHandle;
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Request " + state.msg.getUniqueId() + " handled and we know the next peer " 
-                           + nextPeer.toBase64() + " after " + handleTime
+                           + nextPeer + " after " + handleTime
                            + "/" + decryptTime + "/" + lookupTime + "/" + timeSinceReceived);
             return handleTime;
         }
@@ -344,13 +346,17 @@ class BuildHandler {
         public String getName() { return "Deferred tunnel join processing"; }
         public void runJob() {
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Request " + _state.msg.getUniqueId() + " handled with a successful deferred lookup for the next peer " + _nextPeer.toBase64());
+                _log.debug("Request " + _state.msg.getUniqueId() + " handled with a successful deferred lookup for the next peer " + _nextPeer);
 
             RouterInfo ri = getContext().netDb().lookupRouterInfoLocally(_nextPeer);
-            if (ri != null)
+            if (ri != null) {
                 handleReq(ri, _state, _req, _nextPeer);
-            else if (_log.shouldLog(Log.WARN))
-                _log.warn("Deferred successfully, but we couldnt find " + _nextPeer.toBase64() + "?");
+                getContext().statManager().addRateData("tunnel.buildLookupSuccess", 1, 0);
+            } else {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Deferred successfully, but we couldnt find " + _nextPeer);
+                getContext().statManager().addRateData("tunnel.buildLookupSuccess", 0, 0);
+            }
         }
     }
 
@@ -367,6 +373,7 @@ class BuildHandler {
         public String getName() { return "Timeout looking for next peer for tunnel join"; }
         public void runJob() {
             getContext().statManager().addRateData("tunnel.rejectTimeout", 1, 0);
+            getContext().statManager().addRateData("tunnel.buildLookupSuccess", 0, 0);
             // logging commented out so class can be static
             //if (_log.shouldLog(Log.WARN))
             //    _log.warn("Request " + _state.msg.getUniqueId() 
@@ -374,7 +381,7 @@ class BuildHandler {
 
             // ???  should we blame the peer here?   getContext().profileManager().tunnelTimedOut(_nextPeer);
             getContext().messageHistory().tunnelRejected(_state.fromHash, new TunnelId(_req.readReceiveTunnelId()), _nextPeer, 
-                                                         "rejected because we couldn't find " + _nextPeer.toBase64() + ": " +
+                                                         "rejected because we couldn't find " + _nextPeer + ": " +
                                                          _state.msg.getUniqueId() + "/" + _req.readNextTunnelId());
         }
     }
@@ -524,8 +531,8 @@ class BuildHandler {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Responding to " + state.msg.getUniqueId() + "/" + ourId
                        + " after " + recvDelay + "/" + proactiveDrops + " with " + response 
-                       + " from " + (state.fromHash != null ? state.fromHash.toBase64() : 
-                                     state.from != null ? state.from.calculateHash().toBase64() : "tunnel"));
+                       + " from " + (state.fromHash != null ? state.fromHash : 
+                                     state.from != null ? state.from.calculateHash() : "tunnel"));
 
         HopConfig cfg = null;
         if (response == 0) {
@@ -600,13 +607,13 @@ class BuildHandler {
         }
 
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Read slot " + ourSlot + " containing our hop @ " + _context.routerHash().toBase64()
+            _log.debug("Read slot " + ourSlot + " containing our hop @ " + _context.routerHash()
                       + " accepted? " + response + " receiving on " + ourId 
                       + " sending to " + nextId
-                      + " on " + nextPeer.toBase64()
+                      + " on " + nextPeer
                       + " inGW? " + isInGW + " outEnd? " + isOutEnd + " time difference " + (now-time)
                       + " recvDelay " + recvDelay + " replyMessage " + req.readReplyMessageId()
-                      + " replyKey " + req.readReplyKey().toBase64() + " replyIV " + Base64.encode(req.readReplyIV()));
+                      + " replyKey " + req.readReplyKey() + " replyIV " + Base64.encode(req.readReplyIV()));
 
         // now actually send the response
         if (!isOutEnd) {
@@ -672,7 +679,7 @@ class BuildHandler {
             PooledTunnelCreatorConfig cfg = _exec.removeFromBuilding(reqId);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Receive tunnel build message " + reqId + " from " 
-                           + (from != null ? from.calculateHash().toBase64() : fromHash != null ? fromHash.toBase64() : "tunnels") 
+                           + (from != null ? from.calculateHash() : fromHash != null ? fromHash : "tunnels") 
                            + ", found matching tunnel? " + (cfg != null));
             if (cfg != null) {
                 if (!cfg.isInbound()) {
@@ -762,7 +769,7 @@ class BuildHandler {
         public Job createJob(I2NPMessage receivedMessage, RouterIdentity from, Hash fromHash) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Receive tunnel build reply message " + receivedMessage.getUniqueId() + " from "
-                           + (fromHash != null ? fromHash.toBase64() : from != null ? from.calculateHash().toBase64() : "a tunnel"));
+                           + (fromHash != null ? fromHash : from != null ? from.calculateHash() : "a tunnel"));
             handleReply(new BuildReplyMessageState(receivedMessage));
             return _buildReplyMessageHandlerJob;
         }

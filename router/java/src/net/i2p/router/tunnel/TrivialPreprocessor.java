@@ -20,8 +20,8 @@ import net.i2p.util.Log;
  * See FragmentHandler Javadoc for tunnel message fragment format
  */
 public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
-    protected RouterContext _context;
-    protected Log _log;
+    protected final RouterContext _context;
+    protected final Log _log;
     
     public static final int PREPROCESSED_SIZE = 1024;
     protected static final int IV_SIZE = HopProcessor.IV_LENGTH;
@@ -39,7 +39,7 @@ public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
     
     public TrivialPreprocessor(RouterContext ctx) {
         _context = ctx;
-        _log = ctx.logManager().getLog(TrivialPreprocessor.class);
+        _log = ctx.logManager().getLog(getClass());
     }
   
     /** how long do we want to wait before flushing */

@@ -52,9 +52,6 @@ public class TunnelDispatcher implements Service {
         _participants = new ConcurrentHashMap();
         _inboundGateways = new ConcurrentHashMap();
         _participatingConfig = new ConcurrentHashMap();
-        _lastParticipatingExpiration = 0;
-        _lastDropTime = 0;
-        _validator = null;
         _pumper = new TunnelGatewayPumper(ctx);
         _leaveJob = new LeaveTunnel(ctx);
         ctx.statManager().createRequiredRateStat("tunnel.participatingTunnels", 
@@ -107,7 +104,7 @@ public class TunnelDispatcher implements Service {
                                          new long[] { 60*1000l, 60*60*1000l });
         ctx.statManager().createRateStat("tunnel.dispatchOutboundZeroHopTime", 
                                          "How long it takes to dispatch an outbound message through a zero hop tunnel", "Tunnels", 
-                                         new long[] { 60*1000l, 60*60*1000l });
+                                         new long[] { 60*60*1000l });
         ctx.statManager().createRequiredRateStat("tunnel.participatingBandwidth", 
                                          "Participating traffic received (Bytes/sec)", "Tunnels", 
                                          new long[] { 60*1000l, 60*10*1000l });
@@ -129,6 +126,27 @@ public class TunnelDispatcher implements Service {
         ctx.statManager().createRateStat("tunnel.failedPartially", 
                                          "How many messages are sent through a tunnel that only failed partially (period == failures)?", "Tunnels", 
                                          new long[] { 60*1000l, 10*60*1000l, 60*60*1000l });
+        // following are for BatchedPreprocessor
+        ctx.statManager().createRateStat("tunnel.batchMultipleCount", "How many messages are batched into a tunnel message", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        ctx.statManager().createRateStat("tunnel.batchDelay", "How many messages were pending when the batching waited", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        ctx.statManager().createRateStat("tunnel.batchDelaySent", "How many messages were flushed when the batching delay completed", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        ctx.statManager().createRateStat("tunnel.batchCount", "How many groups of messages were flushed together", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        ctx.statManager().createRateStat("tunnel.batchDelayAmount", "How long we should wait before flushing the batch", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        ctx.statManager().createRateStat("tunnel.batchFlushRemaining", "How many messages remain after flushing", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        ctx.statManager().createRateStat("tunnel.writeDelay", "How long after a message reaches the gateway is it processed (lifetime is size)", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        ctx.statManager().createRateStat("tunnel.batchSmallFragments", "How many outgoing pad bytes are in small fragments?", 
+                                         "Tunnels", new long[] { 10*60*1000l, 60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.batchFullFragments", "How many outgoing tunnel messages use the full data area?", 
+                                         "Tunnels", new long[] { 10*60*1000l, 60*60*1000l });
+        ctx.statManager().createRateStat("tunnel.batchFragmentation", "Avg. number of fragments per msg", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        // following is for OutboundMessageDistributor
+        ctx.statManager().createRateStat("tunnel.distributeLookupSuccess", "Was a deferred lookup successful?", "Tunnels", new long[] { 60*60*1000 });
+        // following is for OutboundReceiver
+        ctx.statManager().createRateStat("tunnel.outboundLookupSuccess", "Was a deferred lookup successful?", "Tunnels", new long[] { 60*60*1000 });
+        // following is for InboundGatewayReceiver
+        ctx.statManager().createRateStat("tunnel.inboundLookupSuccess", "Was a deferred lookup successful?", "Tunnels", new long[] { 60*60*1000 });
+        // following is for TunnelParticipant
+        ctx.statManager().createRateStat("tunnel.participantLookupSuccess", "Was a deferred lookup successful?", "Tunnels", new long[] { 60*60*1000 });
     }
 
     /** for IBGW */
@@ -171,6 +189,7 @@ public class TunnelDispatcher implements Service {
             _context.messageHistory().tunnelJoined("outboundZeroHop", cfg);
         }
     }
+
     /** 
      * We are the inbound endpoint - we created this tunnel
      */
@@ -210,6 +229,7 @@ public class TunnelDispatcher implements Service {
             _lastParticipatingExpiration = cfg.getExpiration();
         _leaveJob.add(cfg);
     }
+
     /**
      * We are the outbound endpoint in this tunnel, and did not create it
      *

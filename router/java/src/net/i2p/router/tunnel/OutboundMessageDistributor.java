@@ -19,12 +19,13 @@ public class OutboundMessageDistributor {
     private final int _priority;
     private final Log _log;
     
-    private static final int MAX_DISTRIBUTE_TIME = 10*1000;
+    private static final long MAX_DISTRIBUTE_TIME = 15*1000;
     
     public OutboundMessageDistributor(RouterContext ctx, int priority) {
         _context = ctx;
         _priority = priority;
         _log = ctx.logManager().getLog(OutboundMessageDistributor.class);
+        // all createRateStat() in TunnelDispatcher
     }
     
     public void distribute(I2NPMessage msg, Hash target) {
@@ -34,10 +35,12 @@ public class OutboundMessageDistributor {
     public void distribute(I2NPMessage msg, Hash target, TunnelId tunnel) {
         RouterInfo info = _context.netDb().lookupRouterInfoLocally(target);
         if (info == null) {
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("outbound distributor to " + target.toBase64().substring(0,4)
+            if (_log.shouldLog(Log.INFO))
+                _log.info("outbound distributor to " + target
                            + "." + (tunnel != null ? tunnel.getTunnelId() + "" : "")
                            + ": no info locally, searching...");
+            // TODO - should we set the search timeout based on the message timeout,
+            // or is that a bad idea due to clock skews?
             _context.netDb().lookupRouterInfo(target, new DistributeJob(_context, msg, target, tunnel), null, MAX_DISTRIBUTE_TIME);
             return;
         } else {
@@ -68,7 +71,7 @@ public class OutboundMessageDistributor {
             out.setPriority(_priority);
 
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("queueing outbound message to " + target.getIdentity().calculateHash().toBase64().substring(0,4));
+                _log.debug("queueing outbound message to " + target.getIdentity().calculateHash());
             _context.outNetMessagePool().add(out);
         }
     }
@@ -85,24 +88,26 @@ public class OutboundMessageDistributor {
             _tunnel = id;
         }
 
-        public String getName() { return "Distribute outbound message"; }
+        public String getName() { return "OBEP distribute after lookup"; }
 
         public void runJob() {
             RouterInfo info = getContext().netDb().lookupRouterInfoLocally(_target);
+            int stat;
             if (info != null) {
                 if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("outbound distributor to " + _target.toBase64().substring(0,4)
+                    _log.debug("outbound distributor to " + _target
                            + "." + (_tunnel != null ? _tunnel.getTunnelId() + "" : "")
                            + ": found on search");
                 distribute(_message, info, _tunnel);
+                stat = 1;
             } else {
-                // TODO add a stat here
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("outbound distributor to " + _target.toBase64().substring(0,4)
+                    _log.warn("outbound distributor to " + _target
                            + "." + (_tunnel != null ? _tunnel.getTunnelId() + "" : "")
                            + ": NOT found on search");
+                stat = 0;
             }
+            _context.statManager().addRateData("tunnel.distributeLookupSuccess", stat, 0);
         }
-        
     }
 }

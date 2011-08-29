@@ -46,25 +46,12 @@ import net.i2p.util.Log;
  */
 public class BatchedPreprocessor extends TrivialPreprocessor {
     private long _pendingSince;
-    private String _name;
+    private final String _name;
     
     public BatchedPreprocessor(RouterContext ctx, String name) {
         super(ctx);
-        _log = ctx.logManager().getLog(BatchedPreprocessor.class);
         _name = name;
-        _pendingSince = 0;
-        ctx.statManager().createRateStat("tunnel.batchMultipleCount", "How many messages are batched into a tunnel message", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
-        ctx.statManager().createRateStat("tunnel.batchDelay", "How many messages were pending when the batching waited", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
-        ctx.statManager().createRateStat("tunnel.batchDelaySent", "How many messages were flushed when the batching delay completed", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
-        ctx.statManager().createRateStat("tunnel.batchCount", "How many groups of messages were flushed together", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
-        ctx.statManager().createRateStat("tunnel.batchDelayAmount", "How long we should wait before flushing the batch", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
-        ctx.statManager().createRateStat("tunnel.batchFlushRemaining", "How many messages remain after flushing", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
-        ctx.statManager().createRateStat("tunnel.writeDelay", "How long after a message reaches the gateway is it processed (lifetime is size)", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
-        ctx.statManager().createRateStat("tunnel.batchSmallFragments", "How many outgoing pad bytes are in small fragments?", 
-                                         "Tunnels", new long[] { 10*60*1000l, 60*60*1000l });
-        ctx.statManager().createRateStat("tunnel.batchFullFragments", "How many outgoing tunnel messages use the full data area?", 
-                                         "Tunnels", new long[] { 10*60*1000l, 60*60*1000l });
-        ctx.statManager().createRateStat("tunnel.batchFragmentation", "Avg. number of fragments per msg", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
+        // all createRateStat() moved to TunnelDispatcher
     }
     
     /** 1003 */
@@ -426,7 +413,8 @@ public class BatchedPreprocessor extends TrivialPreprocessor {
                     int later = msg.getData().length - msg.getOffset();
                     if (later > 0)
                         frag--;
-                    _log.debug("writing " + msg.getMessageId() + " fragment " + frag
+                    if (_log.shouldLog(Log.DEBUG))
+                        _log.debug("writing " + msg.getMessageId() + " fragment " + frag
                                + ", ending at " + offset + " prev " + prevOffset
                                + " leaving " + later + " bytes for later");
                 }
