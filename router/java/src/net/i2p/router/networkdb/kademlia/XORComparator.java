@@ -10,13 +10,15 @@ import net.i2p.data.Hash;
  *
  */
 class XORComparator implements Comparator<Hash> {
-    private Hash _base;
+    private final Hash _base;
+
     /**
      * @param target key to compare distances with
      */
     public XORComparator(Hash target) {
         _base = target;
     }
+
     public int compare(Hash lhs, Hash rhs) {
         if (lhs == null) throw new NullPointerException("LHS is null");
         if (rhs == null) throw new NullPointerException("RHS is null");

@@ -47,8 +47,8 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
     }
     
     public void runJob() {
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Handling database store message");
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Handling database store message");
 
         long recvBegin = System.currentTimeMillis();
         

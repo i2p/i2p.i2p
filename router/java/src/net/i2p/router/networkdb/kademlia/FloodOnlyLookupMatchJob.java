@@ -13,9 +13,9 @@ import net.i2p.util.Log;
 
 class FloodOnlyLookupMatchJob extends JobImpl implements ReplyJob {
     private final Log _log;
-    private final FloodOnlySearchJob _search;
+    private final FloodSearchJob _search;
 
-    public FloodOnlyLookupMatchJob(RouterContext ctx, FloodOnlySearchJob job) {
+    public FloodOnlyLookupMatchJob(RouterContext ctx, FloodSearchJob job) {
         super(ctx);
         _log = ctx.logManager().getLog(getClass());
         _search = job;
@@ -33,7 +33,7 @@ class FloodOnlyLookupMatchJob extends JobImpl implements ReplyJob {
         }
     }
 
-    public String getName() { return "NetDb flood search (phase 1) match"; }
+    public String getName() { return "NetDb flood search match"; }
 
     public void setMessage(I2NPMessage message) {
         if (message instanceof DatabaseSearchReplyMessage) {

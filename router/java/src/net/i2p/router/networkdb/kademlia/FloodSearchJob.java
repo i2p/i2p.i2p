@@ -36,10 +36,10 @@ public class FloodSearchJob extends JobImpl {
     protected final List<Job> _onFailed;
     protected long _expiration;
     protected int _timeoutMs;
-    protected long _origExpiration;
     protected final boolean _isLease;
     protected volatile int _lookupsRemaining;
     protected volatile boolean _dead;
+    protected final long _created;
 
     public FloodSearchJob(RouterContext ctx, FloodfillNetworkDatabaseFacade facade, Hash key, Job onFind, Job onFailed, int timeoutMs, boolean isLease) {
         super(ctx);
@@ -55,10 +55,16 @@ public class FloodSearchJob extends JobImpl {
             timeout = timeoutMs;
         _timeoutMs = timeout;
         _expiration = timeout + ctx.clock().now();
-        _origExpiration = timeoutMs + ctx.clock().now();
         _isLease = isLease;
+        _created = System.currentTimeMillis();
     }
 
+    /** System time, NOT context time */
+    public long getCreated() { return _created; }
+
+    /**
+     *  Add jobs to an existing search
+     */
     void addDeferred(Job onFind, Job onFailed, long timeoutMs, boolean isLease) {
         if (_dead) {
             getContext().jobQueue().addJob(onFailed);
@@ -75,7 +81,12 @@ public class FloodSearchJob extends JobImpl {
     private static final int FLOOD_SEARCH_TIME_FACTOR = 2;
     private static final int FLOOD_SEARCH_TIME_MIN = 30*1000;
 
+    /**
+     *  Deprecated, unused, see FOSJ override
+     */
     public void runJob() {
+        throw new UnsupportedOperationException("use override");
+/****
         // pick some floodfill peers and send out the searches
         List floodfillPeers = _facade.getFloodfillPeers();
         FloodLookupSelector replySelector = new FloodLookupSelector(getContext(), this);
@@ -121,8 +132,12 @@ public class FloodSearchJob extends JobImpl {
             getContext().messageRegistry().unregisterPending(out);
             _facade.searchFull(_key, _onFind, _onFailed, _timeoutMs*FLOOD_SEARCH_TIME_FACTOR, _isLease);
         }
+****/
     }
 
+    /**
+     *  Deprecated, unused, see FOSJ override
+     */
     public String getName() { return "NetDb search (phase 1)"; }
     
     protected Hash getKey() { return _key; }
@@ -139,10 +154,15 @@ public class FloodSearchJob extends JobImpl {
 
     protected int getLookupsRemaining() { return _lookupsRemaining; }
     
+    /**
+     *  Deprecated, unused, see FOSJ override
+     */
     void failed() {
+        throw new UnsupportedOperationException("use override");
+/****
         if (_dead) return;
         _dead = true;
-        int timeRemaining = (int)(_origExpiration - getContext().clock().now());
+        int timeRemaining = (int)(_expiration - getContext().clock().now());
         if (_log.shouldLog(Log.INFO))
             _log.info(getJobId() + ": Floodfill search for " + _key.toBase64() + " failed with " + timeRemaining);
         if (timeRemaining > 0) {
@@ -156,9 +176,15 @@ public class FloodSearchJob extends JobImpl {
             while (!removed.isEmpty())
                 getContext().jobQueue().addJob(removed.remove(0));
         }
+****/
     }
 
+    /**
+     *  Deprecated, unused, see FOSJ override
+     */
     void success() {
+        throw new UnsupportedOperationException("use override");
+/****
         if (_dead) return;
         if (_log.shouldLog(Log.INFO))
             _log.info(getJobId() + ": Floodfill search for " + _key.toBase64() + " successful");
@@ -171,8 +197,13 @@ public class FloodSearchJob extends JobImpl {
         }
         while (!removed.isEmpty())
             getContext().jobQueue().addJob(removed.remove(0));
+****/
     }
 
+    /**
+     *  Deprecated, unused, see FOSJ override
+     */
+/****
     private static class FloodLookupTimeoutJob extends JobImpl {
         private FloodSearchJob _search;
         public FloodLookupTimeoutJob(RouterContext ctx, FloodSearchJob job) {
@@ -186,7 +217,12 @@ public class FloodSearchJob extends JobImpl {
         }
         public String getName() { return "NetDb search (phase 1) timeout"; }
     }
+****/
 
+    /**
+     *  Deprecated, unused, see FOSJ override
+     */
+/****
     private static class FloodLookupMatchJob extends JobImpl implements ReplyJob {
         private Log _log;
         private FloodSearchJob _search;
@@ -211,7 +247,12 @@ public class FloodSearchJob extends JobImpl {
         public String getName() { return "NetDb search (phase 1) match"; }
         public void setMessage(I2NPMessage message) {}
     }
+****/
 
+    /**
+     *  Deprecated, unused, see FOSJ override
+     */
+/****
     private static class FloodLookupSelector implements MessageSelector {
         private RouterContext _context;
         private FloodSearchJob _search;
@@ -240,4 +281,5 @@ public class FloodSearchJob extends JobImpl {
             return false;
         }   
     }
+****/
 }

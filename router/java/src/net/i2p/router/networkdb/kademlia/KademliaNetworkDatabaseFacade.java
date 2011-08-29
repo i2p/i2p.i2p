@@ -643,13 +643,14 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
                           + " expires on " + new Date(leaseSet.getEarliestLeaseDate()), new Exception("Rejecting store"));
             return "Expired leaseSet for " + leaseSet.getDestination().calculateHash().toBase64() 
                    + " expired " + DataHelper.formatDuration(age) + " ago";
-        } else if (leaseSet.getEarliestLeaseDate() > _context.clock().now() + Router.CLOCK_FUDGE_FACTOR + MAX_LEASE_FUTURE) {
+        } else if (leaseSet.getEarliestLeaseDate() > _context.clock().now() + (Router.CLOCK_FUDGE_FACTOR + MAX_LEASE_FUTURE)) {
             long age = leaseSet.getEarliestLeaseDate() - _context.clock().now();
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("LeaseSet to expire too far in the future: " 
+            // let's not make this an error, it happens when peers have bad clocks
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("LeaseSet expires too far in the future: " 
                           + leaseSet.getDestination().calculateHash().toBase64() 
-                          + " expires on " + new Date(leaseSet.getEarliestLeaseDate()), new Exception("Rejecting store"));
-            return "Future expiring leaseSet for " + leaseSet.getDestination().calculateHash().toBase64() 
+                          + " expires " + DataHelper.formatDuration(age) + " from now");
+            return "Future expiring leaseSet for " + leaseSet.getDestination().calculateHash()
                    + " expiring in " + DataHelper.formatDuration(age);
         }
         return null;

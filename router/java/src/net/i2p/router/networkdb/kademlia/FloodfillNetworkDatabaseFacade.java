@@ -49,7 +49,8 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
 
         _context.statManager().createRequiredRateStat("netDb.successTime", "Time for successful lookup (ms)", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("netDb.failedTime", "How long a failed search takes", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
-        _context.statManager().createRateStat("netDb.failedAttemptedPeers", "How many peers we sent a search to when the search fails", "NetworkDatabase", new long[] { 60*1000l, 10*60*1000l });
+        _context.statManager().createRateStat("netDb.retries", "How many additional queries for an iterative search", "NetworkDatabase", new long[] { 60*60*1000l });
+        _context.statManager().createRateStat("netDb.failedAttemptedPeers", "How many peers we sent a search to when the search fails", "NetworkDatabase", new long[] { 10*60*1000l });
         _context.statManager().createRateStat("netDb.successPeers", "How many peers are contacted in a successful search", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("netDb.failedPeers", "How many peers fail to respond to a lookup?", "NetworkDatabase", new long[] { 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("netDb.searchCount", "Overall number of searches sent", "NetworkDatabase", new long[] { 5*60*1000l, 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
@@ -211,6 +212,9 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
         return ((FloodfillNetworkDatabaseFacade)ctx.netDb()).floodfillEnabled();
     }
     
+    /**
+     *  @param may be null, returns false if null
+     */
     public static boolean isFloodfill(RouterInfo peer) {
         if (peer == null) return false;
         // For testing or local networks... we will
@@ -247,6 +251,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
      * will fire the appropriate jobs on success or timeout (or if the kademlia search completes
      * without any match)
      *
+     * @return null always
      */
     @Override
     SearchJob search(Hash key, Job onFindJob, Job onFailedLookupJob, long timeoutMs, boolean isLease) {
@@ -258,7 +263,8 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             searchJob = _activeFloodQueries.get(key);
             if (searchJob == null) {
                 //if (SearchJob.onlyQueryFloodfillPeers(_context)) {
-                    searchJob = new FloodOnlySearchJob(_context, this, key, onFindJob, onFailedLookupJob, (int)timeoutMs, isLease);
+                    //searchJob = new FloodOnlySearchJob(_context, this, key, onFindJob, onFailedLookupJob, (int)timeoutMs, isLease);
+                    searchJob = new IterativeSearchJob(_context, this, key, onFindJob, onFailedLookupJob, (int)timeoutMs, isLease);
                 //} else {
                 //    searchJob = new FloodSearchJob(_context, this, key, onFindJob, onFailedLookupJob, (int)timeoutMs, isLease);
                 //}
@@ -286,6 +292,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
      *
      * Unused - called only by FloodSearchJob which is overridden - don't use this.
      */
+/*****
     void searchFull(Hash key, List<Job> onFind, List<Job> onFailed, long timeoutMs, boolean isLease) {
         synchronized (_activeFloodQueries) { _activeFloodQueries.remove(key); }
         
@@ -330,7 +337,11 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
             }
         }
     }
+*****/
 
+    /**
+     *  Must be called by the search job queued by search() on success or failure
+     */
     void complete(Hash key) {
         synchronized (_activeFloodQueries) { _activeFloodQueries.remove(key); }
     }

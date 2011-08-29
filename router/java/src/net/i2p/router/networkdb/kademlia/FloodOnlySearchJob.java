@@ -14,10 +14,12 @@ import net.i2p.router.OutNetMessage;
 import net.i2p.router.ReplyJob;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelInfo;
-import net.i2p.router.peermanager.PeerProfile;
 import net.i2p.util.Log;
 
 /**
+ * Uunused directly, replaced by IterativeSearchJob, but still extended by
+ * SingleSearchJob.
+ *
  * Try sending a search to some floodfill peers, failing completely if we don't get
  * a match from one of those peers, with no fallback to the kademlia search
  *
@@ -34,11 +36,8 @@ import net.i2p.util.Log;
  * These enhancements allow the router to bootstrap back into the network
  * after it loses (or never had) floodfill references, as long as it
  * knows one peer that is up.
- *
  */
 class FloodOnlySearchJob extends FloodSearchJob {
-    private volatile boolean _dead;
-    protected final long _created;
     private boolean _shouldProcessDSRM;
     private final HashSet<Hash> _unheardFrom;
     
@@ -49,22 +48,18 @@ class FloodOnlySearchJob extends FloodSearchJob {
     protected final Job _onTimeout;
 
     private static final int MIN_FOR_NO_DSRM = 4;
+    private static final long SINGLE_SEARCH_MSG_TIME = 10*1000;
 
     public FloodOnlySearchJob(RouterContext ctx, FloodfillNetworkDatabaseFacade facade, Hash key, Job onFind, Job onFailed, int timeoutMs, boolean isLease) {
         super(ctx, facade, key, onFind, onFailed, timeoutMs, isLease);
         // these override the settings in super
         _timeoutMs = Math.min(timeoutMs, SearchJob.PER_FLOODFILL_PEER_TIMEOUT);
         _expiration = _timeoutMs + ctx.clock().now();
-        _origExpiration = _timeoutMs + ctx.clock().now();
         _unheardFrom = new HashSet(CONCURRENT_SEARCHES);
         _replySelector = new FloodOnlyLookupSelector(getContext(), this);
         _onReply = new FloodOnlyLookupMatchJob(getContext(), this);
         _onTimeout = new FloodOnlyLookupTimeoutJob(getContext(), this);
-        _created = System.currentTimeMillis();
     }
-
-    /** System time, NOT context time */
-    public long getCreated() { return _created; }
 
     public boolean shouldProcessDSRM() { return _shouldProcessDSRM; }
 
@@ -174,12 +169,12 @@ class FloodOnlySearchJob extends FloodSearchJob {
                 _unheardFrom.add(peer);
             }
             dlm.setFrom(replyTunnel.getPeer(0));
-            dlm.setMessageExpiration(getContext().clock().now()+10*1000);
+            dlm.setMessageExpiration(getContext().clock().now() + SINGLE_SEARCH_MSG_TIME);
             dlm.setReplyTunnel(replyTunnel.getReceiveTunnelId(0));
             dlm.setSearchKey(_key);
             
             if (_log.shouldLog(Log.INFO))
-                _log.info(getJobId() + ": Floodfill search for " + _key.toBase64() + " to " + peer.toBase64());
+                _log.info(getJobId() + ": Floodfill search for " + _key + " to " + peer);
             getContext().tunnelDispatcher().dispatchOutbound(dlm, outTunnel.getSendTunnelId(0), peer);
             count++;
             _lookupsRemaining++;
@@ -187,14 +182,14 @@ class FloodOnlySearchJob extends FloodSearchJob {
         
         if (count <= 0) {
             if (_log.shouldLog(Log.INFO))
-                _log.info(getJobId() + ": Floodfill search for " + _key.toBase64() + " had no peers to send to");
+                _log.info(getJobId() + ": Floodfill search for " + _key + " had no peers to send to");
             // no floodfill peers, fail
             failed();
         }
     }
 
     @Override
-    public String getName() { return "NetDb flood search (phase 1)"; }
+    public String getName() { return "NetDb flood search"; }
     
     /**
      *  Note that we heard from the peer
@@ -215,15 +210,17 @@ class FloodOnlySearchJob extends FloodSearchJob {
             _dead = true;
         }
         getContext().messageRegistry().unregisterPending(_out);
-        int timeRemaining = (int)(_origExpiration - getContext().clock().now());
-        if (_log.shouldLog(Log.INFO))
-            _log.info(getJobId() + ": Floodfill search for " + _key.toBase64() + " failed with " + timeRemaining + " remaining after " + (System.currentTimeMillis()-_created));
+        long time = System.currentTimeMillis() - _created;
+        if (_log.shouldLog(Log.INFO)) {
+             int timeRemaining = (int)(_expiration - getContext().clock().now());
+            _log.info(getJobId() + ": Floodfill search for " + _key + " failed with " + timeRemaining + " remaining after " + time);
+        }
         synchronized(_unheardFrom) {
             for (Iterator<Hash> iter = _unheardFrom.iterator(); iter.hasNext(); ) 
                 getContext().profileManager().dbLookupFailed(iter.next());
         }
         _facade.complete(_key);
-        getContext().statManager().addRateData("netDb.failedTime", System.currentTimeMillis()-_created, System.currentTimeMillis()-_created);
+        getContext().statManager().addRateData("netDb.failedTime", time, 0);
         synchronized (_onFailed) {
             for (int i = 0; i < _onFailed.size(); i++) {
                 Job j = _onFailed.remove(0);
@@ -239,7 +236,7 @@ class FloodOnlySearchJob extends FloodSearchJob {
             _dead = true;
         }
         if (_log.shouldLog(Log.INFO))
-            _log.info(getJobId() + ": Floodfill search for " + _key.toBase64() + " successful");
+            _log.info(getJobId() + ": Floodfill search for " + _key + " successful");
         // Sadly, we don't know which of the two replied, unless the first one sent a DSRM
         // before the second one sent the answer, which isn't that likely.
         // Would be really nice to fix this, but it isn't clear how unless CONCURRENT_SEARCHES == 1.
@@ -248,14 +245,15 @@ class FloodOnlySearchJob extends FloodSearchJob {
         // We'll have to rely primarily on other searches (ExploreJob which calls SearchJob,
         // and FloodfillVerifyStoreJob) to record successful searches for now.
         // StoreJob also calls dbStoreSent() which updates the lastHeardFrom timer - this also helps.
+        long time = System.currentTimeMillis() - _created;
         synchronized(_unheardFrom) {
             if (_unheardFrom.size() == 1) {
                 Hash peer = _unheardFrom.iterator().next();
-                getContext().profileManager().dbLookupSuccessful(peer, System.currentTimeMillis()-_created);
+                getContext().profileManager().dbLookupSuccessful(peer, time);
             }
         }
         _facade.complete(_key);
-        getContext().statManager().addRateData("netDb.successTime", System.currentTimeMillis()-_created, System.currentTimeMillis()-_created);
+        getContext().statManager().addRateData("netDb.successTime", time, 0);
         synchronized (_onFind) {
             while (!_onFind.isEmpty())
                 getContext().jobQueue().addJob(_onFind.remove(0));

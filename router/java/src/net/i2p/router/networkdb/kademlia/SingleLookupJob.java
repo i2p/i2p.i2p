@@ -8,9 +8,9 @@ import net.i2p.router.RouterContext;
 //import net.i2p.util.Log;
 
 /**
- * Ask the peer who sent us the DSRM for the RouterInfos.
+ * Ask the peer who sent us the DSRM for the RouterInfos...
  *
- * If we have the routerInfo already, try to refetch it from that router itself,
+ * ... but If we have the routerInfo already, try to refetch it from that router itself,
  * (if the info is old or we don't think it is floodfill)
  * which will help us establish that router as a good floodfill and speed our
  * integration into the network.
@@ -23,6 +23,12 @@ class SingleLookupJob extends JobImpl {
     //private final Log _log;
     private final DatabaseSearchReplyMessage _dsrm;
 
+    /**
+     *  I2NP spec allows 255, max actually sent (in ../HDLMJ) is 3,
+     *  so just to prevent trouble, we don't want to queue 255 jobs at once
+     */
+    public static final int MAX_TO_FOLLOW = 8;
+
     public SingleLookupJob(RouterContext ctx, DatabaseSearchReplyMessage dsrm) {
         super(ctx);
         //_log = ctx.logManager().getLog(getClass());
@@ -31,7 +37,8 @@ class SingleLookupJob extends JobImpl {
 
     public void runJob() { 
         Hash from = _dsrm.getFromHash();
-        for (int i = 0; i < _dsrm.getNumReplies(); i++) {
+        int limit = Math.min(_dsrm.getNumReplies(), MAX_TO_FOLLOW);
+        for (int i = 0; i < limit; i++) {
             Hash peer = _dsrm.getReply(i);
             if (peer.equals(getContext().routerHash())) // us
                 continue;

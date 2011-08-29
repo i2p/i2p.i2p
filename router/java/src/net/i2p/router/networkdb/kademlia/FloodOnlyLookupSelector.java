@@ -7,6 +7,9 @@ import net.i2p.router.MessageSelector;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
+/**
+ * Mostly replaced by IterativeLookupSelector
+ */
 class FloodOnlyLookupSelector implements MessageSelector {
     private final RouterContext _context;
     private final FloodOnlySearchJob _search;
