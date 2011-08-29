@@ -93,10 +93,11 @@ public class OutboundMessageRegistry {
         List<MessageSelector> removedSelectors = null;
 
         synchronized (_selectors) {
-            for (Iterator<MessageSelector> iter = _selectors.iterator(); iter.hasNext(); ) {
-                MessageSelector sel = iter.next();
-                if (sel == null)
-                    continue;
+            // ConcurrentModificationException - why?
+            //for (Iterator<MessageSelector> iter = _selectors.iterator(); iter.hasNext(); ) {
+            //    MessageSelector sel = iter.next();
+            for (int i = 0; i < _selectors.size(); i++) {
+                MessageSelector sel = (MessageSelector)_selectors.get(i);
                 boolean isMatch = sel.isMatch(message);
                 if (isMatch) {
                     if (matchedSelectors == null) matchedSelectors = new ArrayList(1);
@@ -104,7 +105,9 @@ public class OutboundMessageRegistry {
                     if (!sel.continueMatching()) {
                         if (removedSelectors == null) removedSelectors = new ArrayList(1);
                         removedSelectors.add(sel);
-                        iter.remove();
+                        //iter.remove();
+                        _selectors.remove(i);
+                        i--;
                     }
                 }
             }  
@@ -258,14 +261,19 @@ public class OutboundMessageRegistry {
 
         public void timeReached() {
             long now = _context.clock().now();
-            List<MessageSelector> removing = new ArrayList(1);
+            List<MessageSelector> removing = new ArrayList(8);
             synchronized (_selectors) {
-                for (Iterator<MessageSelector> iter = _selectors.iterator(); iter.hasNext(); ) {
-                    MessageSelector sel = iter.next();
+                // CME?
+                //for (Iterator<MessageSelector> iter = _selectors.iterator(); iter.hasNext(); ) {
+                //    MessageSelector sel = iter.next();
+                for (int i = 0; i < _selectors.size(); i++) {
+                    MessageSelector sel = (MessageSelector)_selectors.get(i);
                     long expiration = sel.getExpiration();
                     if (expiration <= now) {
                         removing.add(sel);
-                        iter.remove();
+                        //iter.remove();
+                        _selectors.remove(i);
+                        i--;
                     } else if (expiration < _nextExpire || _nextExpire < now) {
                         _nextExpire = expiration;
                     }
