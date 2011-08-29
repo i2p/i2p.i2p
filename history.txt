@@ -1,3 +1,17 @@
+2011-08-29 zzz
+  * NetDB:
+    - Replace the old parallel lookup method with a true
+      Kademlia lookup that iteratively queries additional floodfill
+      peers returned in DatabaseSearchReplyMessages. This is a more
+      efficient and reliable lookup that will work much better
+      when not all floodfill peers are known, and it removes a serious
+      limitation to network growth.
+    - Limit max number of DSRM entries to look up
+    - Cleanups, javadocs, log tweaks
+  * Tunnels:
+    - Increase timeouts on all deferred netdb lookups to 15s; add lookup stats
+    - Cleanups, javadocs, log tweaks
+
 2011-08-28 zzz
   * checkcerts.sh: New test
   * Console: Remove 'firewalled and fast' message, just say 'firewalled'

@@ -60,7 +60,7 @@ public interface I2NPMessage extends DataStructure {
     public int getType();
     
     /**
-     * Replay resistent message Id
+     * Replay resistant message ID
      */
     public long getUniqueId(); 
     public void setUniqueId(long id);

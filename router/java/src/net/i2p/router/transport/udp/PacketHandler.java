@@ -126,11 +126,12 @@ class PacketHandler {
     private static final short NEW_PEER = 3;
     
     private class Handler implements Runnable { 
-        private UDPPacketReader _reader;
-        public volatile int _state;
+        private final UDPPacketReader _reader;
+        // TODO comment out all uses of _state
+        public /* volatile */ int _state;
+
         public Handler() {
             _reader = new UDPPacketReader(_context);
-            _state = 0;
         }
         
         public void run() {
@@ -382,7 +383,6 @@ class PacketHandler {
                 } else {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Invalid introduction packet received for inbound con, falling back: " + packet);
-
                     _state = 33;
                 }
             }
@@ -420,7 +420,6 @@ class PacketHandler {
                 if (isValid) {
                     if (_log.shouldLog(Log.INFO))
                         _log.info("Valid introduction packet received for outbound established con: " + packet);
-
                     _state = 37;
                     packet.decrypt(state.getCipherKey());
                     handlePacket(reader, packet, null, state, null);

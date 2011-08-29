@@ -186,13 +186,11 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             return;
         }
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug(getJobId() + ": Send outbound client message job beginning");
+            _log.debug(getJobId() + ": Send outbound client message job beginning" +
+                       ": preparing to search for the leaseSet for " + _toString);
         long timeoutMs = _overallExpiration - now;
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug(getJobId() + ": preparing to search for the leaseSet for " + _toString);
         Hash key = _to.calculateHash();
         SendJob success = new SendJob(getContext());
-        LookupLeaseSetFailedJob failed = new LookupLeaseSetFailedJob(getContext());
         LeaseSet ls = getContext().netDb().lookupLeaseSetLocally(key);
         if (ls != null) {
             getContext().statManager().addRateData("client.leaseSetFoundLocally", 1, 0);
@@ -204,6 +202,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             _leaseSetLookupBegin = getContext().clock().now();
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug(getJobId() + ": Send outbound client message - sending off leaseSet lookup job for " + _toString);
+            LookupLeaseSetFailedJob failed = new LookupLeaseSetFailedJob(getContext());
             getContext().netDb().lookupLeaseSet(key, success, failed, timeoutMs);
         }
     }
@@ -588,11 +587,12 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
     }
 
     private class DispatchJob extends JobImpl {
-        private GarlicMessage _msg;
-        private ReplySelector _selector;
-        private SendSuccessJob _replyFound;
-        private SendTimeoutJob _replyTimeout;
-        private int _timeoutMs;
+        private final GarlicMessage _msg;
+        private final ReplySelector _selector;
+        private final SendSuccessJob _replyFound;
+        private final SendTimeoutJob _replyTimeout;
+        private final int _timeoutMs;
+
         public DispatchJob(RouterContext ctx, GarlicMessage msg, ReplySelector sel, SendSuccessJob success, SendTimeoutJob timeout, int timeoutMs) {
             super(ctx);
             _msg = msg;
@@ -601,7 +601,9 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
             _replyTimeout = timeout;
             _timeoutMs = timeoutMs;
         }
+
         public String getName() { return "Dispatch outbound client message"; }
+
         public void runJob() {
             if (_selector != null)
                 getContext().messageRegistry().registerPending(_selector, _replyFound, _replyTimeout, _timeoutMs);
@@ -658,7 +660,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         }
 
         public int hashCode() {
-            return sh.hashCode() + dh.hashCode();
+            return sh.hashCode() ^ dh.hashCode();
         }
 
         public boolean equals(Object o) {
@@ -949,7 +951,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      *
      */
     private class ReplySelector implements MessageSelector {
-        private long _pendingToken;
+        private final long _pendingToken;
+
         public ReplySelector(long token) {
             _pendingToken = token;
             if (_log.shouldLog(Log.INFO))
@@ -989,8 +992,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      *
      */
     private class SendSuccessJob extends JobImpl implements ReplyJob {
-        private SessionKey _key;
-        private TagSetHandle _tags;
+        private final SessionKey _key;
+        private final TagSetHandle _tags;
         
         /**
          * Create a new success job that will be fired when the message encrypted with
@@ -1004,6 +1007,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         }
         
         public String getName() { return "Send client message successful"; }
+
         public void runJob() {
             // do we leak tags here?
             if (_finished) return;
@@ -1054,8 +1058,8 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      *
      */
     private class SendTimeoutJob extends JobImpl {
-        private SessionKey _key;
-        private TagSetHandle _tags;
+        private final SessionKey _key;
+        private final TagSetHandle _tags;
 
         public SendTimeoutJob(RouterContext enclosingContext, SessionKey key, TagSetHandle tags) {
             super(enclosingContext);
@@ -1064,6 +1068,7 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         }
         
         public String getName() { return "Send client message timed out"; }
+
         public void runJob() {
             if (_log.shouldLog(Log.INFO))
                 _log.info(OutboundClientMessageOneShotJob.this.getJobId()
