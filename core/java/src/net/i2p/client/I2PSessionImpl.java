@@ -18,6 +18,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -139,6 +140,11 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
 
     private long _lastActivity;
     private boolean _isReduced;
+
+    /**
+     *  @since 0.8.9
+     */
+    private static final LookupCache _lookupCache = new LookupCache(16);
 
     /** SSL interface (only) @since 0.8.3 */
     protected static final String PROP_ENABLE_SSL = "i2cp.SSL";
@@ -809,6 +815,9 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
     /** called by the message handler */
     void destReceived(Destination d) {
         Hash h = d.calculateHash();
+        synchronized (_lookupCache) {
+            _lookupCache.put(h, d);
+        }
         for (LookupWaiter w : _pendingLookups) {
             if (w.hash.equals(h)) {
                 w.destination = d;
@@ -872,6 +881,11 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
      *  @return null on failure
      */
     public Destination lookupDest(Hash h, long maxWait) throws I2PSessionException {
+        synchronized (_lookupCache) {
+            Destination rv = _lookupCache.get(h);
+            if (rv != null)
+                return rv;
+        }
         if (_closed)
             return null;
         LookupWaiter waiter = new LookupWaiter(h);
@@ -951,5 +965,22 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
             buf.append("[null dest]");
         buf.append(getPrefix());
         return buf.toString();
+    }
+
+    /**
+     *  @since 0.8.9
+     */
+    private static class LookupCache extends LinkedHashMap<Hash, Destination> {
+        private final int _max;
+
+        public LookupCache(int max) {
+            super(max, 0.75f, true);
+            _max = max;
+        }
+
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<Hash, Destination> eldest) {
+            return size() > _max;
+        }
     }
 }

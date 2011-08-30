@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
+import net.i2p.client.I2PSession;
 import net.i2p.client.naming.NamingService;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
@@ -34,6 +35,7 @@ import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Destination;
+import net.i2p.data.Hash;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
@@ -799,7 +801,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             // If the host is "i2p", the getHostName() lookup failed, don't try to
             // look it up again as the naming service does not do negative caching
             // so it will be slow.
-            Destination clientDest;
+            Destination clientDest = null;
             String addressHelper = addressHelpers.get(destination.toLowerCase());
             if (addressHelper != null) {
                 clientDest = _context.namingService().lookup(addressHelper);
@@ -808,6 +810,21 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     addressHelpers.remove(destination.toLowerCase());
             } else if ("i2p".equals(host)) {
                 clientDest = null;
+            } else if (destination.length() == 60 && destination.toLowerCase().endsWith(".b32.i2p")) {
+                // use existing session to look up for efficiency
+                verifySocketManager();
+                I2PSession sess = sockMgr.getSession();
+                if (sess != null && !sess.isClosed()) {
+                    byte[] hData = Base32.decode(destination.substring(0, 52));
+                    if (hData != null) {
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("lookup in-session " + destination);
+                        Hash hash = Hash.create(hData);
+                        clientDest = sess.lookupDest(hash, 20*1000);
+                    }
+                } else {
+                    clientDest = _context.namingService().lookup(destination);
+                }
             } else {
                 clientDest = _context.namingService().lookup(destination);
             }
@@ -822,7 +839,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     header = getErrorPage("dnfp", ERR_DESTINATION_UNKNOWN);
                 else if (ahelperPresent)
                     header = getErrorPage("dnfb", ERR_DESTINATION_UNKNOWN);
-                else if (destination.length() == 60 && destination.endsWith(".b32.i2p"))
+                else if (destination.length() == 60 && destination.toLowerCase().endsWith(".b32.i2p"))
                     header = getErrorPage("dnf", ERR_DESTINATION_UNKNOWN);
                 else {
                     header = getErrorPage("dnfh", ERR_DESTINATION_UNKNOWN);

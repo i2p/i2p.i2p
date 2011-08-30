@@ -1,3 +1,9 @@
+2011-08-30 zzz
+  * I2CP: Cache b32 lookups client-side
+  * I2PTunnelHTTPClient: Use existing session for b32 lookups
+                         rather than a new SimpleSession
+  * Naming: Increase b32 lookup timeout to 15 sec.
+
 2011-08-29 zzz
   * NetDB:
     - Replace the old parallel lookup method with a true

@@ -21,7 +21,8 @@ import net.i2p.data.Hash;
  * Obviously this can take a while.
  *
  * All calls are blocking and return null on failure.
- * Timeout is set to 10 seconds in I2PSimpleSession.
+ * Timeout is 15 seconds.
+ * To do: Add methods that allow specifying the timeout.
  *
  * As of 0.8.3, standard I2PSessions support lookups,
  * including multiple lookups in parallel, and overriding
@@ -31,6 +32,8 @@ import net.i2p.data.Hash;
  *
  */
 class LookupDest {
+
+    private static final long DEFAULT_TIMEOUT = 15*1000;
 
     protected LookupDest(I2PAppContext context) {}
 
@@ -67,7 +70,7 @@ class LookupDest {
                 opts.put(I2PClient.PROP_TCP_PORT, s);
             I2PSession session = client.createSession(null, opts);
             session.connect();
-            rv = session.lookupDest(key);
+            rv = session.lookupDest(key, DEFAULT_TIMEOUT);
             session.destroySession();
         } catch (I2PSessionException ise) {}
         return rv;
