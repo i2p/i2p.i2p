@@ -213,7 +213,7 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     }
     
     /**
-     *  @param may be null, returns false if null
+     *  @param peer may be null, returns false if null
      */
     public static boolean isFloodfill(RouterInfo peer) {
         if (peer == null) return false;

@@ -76,7 +76,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
      *  @param initialSocketData may be null
      *  @param sockList may be null. Caller must add i2ps to the list! It will be removed here on completion.
      *                               Will synchronize on slock when removing.
-     *  @param onTImeout may be null
+     *  @param onTimeout may be null
      */
     public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData,
                            byte[] initialSocketData, List<I2PSocket> sockList, Runnable onTimeout) {
