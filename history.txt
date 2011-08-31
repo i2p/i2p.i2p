@@ -1,3 +1,6 @@
+2011-08-31 zzz
+  * OCMOSJ: Remove some global cache locks, other cleanups
+
 2011-08-30 zzz
   * I2CP: Cache b32 lookups client-side
   * I2PTunnelHTTPClient: Use existing session for b32 lookups
