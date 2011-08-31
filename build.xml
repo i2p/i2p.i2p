@@ -1061,18 +1061,14 @@
 	    <arg value="${basedir}/i2pinstall_${release.number}-osx-only.jar" />
 	    <arg value="${basedir}/pkg-temp/osx/i2p-${release.number}-osx-install.app" />
 	</exec>
-	<zip destfile="${basedir}/i2pinstall_${release.number}-osx.zip" level="9" 
+	<zip destfile="${basedir}/i2pinstall_${release.number}-osx.zip" level="9"
 	    basedir="${basedir}/pkg-temp/osx" whenempty="fail" comment="${release.number}-${build.number}"/>
-    </target>
-
-    <target name="checkForIzpack2Exe">
-        <available property="izpack2exe.available" file="${user.home}/IzPack/utils/wrappers/izpack2exe/izpack2exe.py" />
     </target>
 
     <!-- Yes, even though this makes an installer for Windows, we still need to depend on preppkg-unix (because the installer attempts to delete these files
      and will fail if they don't exist. Thankfully these files are so very small there's not much harm in including them.
     -->
-    <target name="installer-windows" depends="clean, doBuildEXE, checkForIzpack2Exe, preppkg-windows-only, preppkg-unix, getReleaseNumber, getBuildNumber, buildProperties, util-list-changes" >
+    <target name="installer-windows" depends="clean, doBuildEXE, preppkg-windows-only, preppkg-unix, getReleaseNumber, getBuildNumber, buildProperties, util-list-changes" >
         <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />
         <mkdir dir="pkg-temp/installer" />
         <!-- set if unset -->
@@ -1102,21 +1098,9 @@
             </manifest>
         </jar>
 	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${release.number}-windows-only.jar" installerType="standard" basedir="${basedir}" />
-	<ant target="installer2exe" />
 	<delete dir="pkg-temp/win" />
-
     </target>
 
-    <target name="installer2exe" if="izpack2exe.available"> <!-- different from the launch4j exe creator -->
-        <mkdir dir="pkg-temp/win" />
-	<exec executable="python" failonerror="true">
-	    <arg value="${user.home}/IzPack/utils/wrappers/izpack2exe/izpack2exe.py" />
-            <arg value="--file=${basedir}/i2pinstall_${release.number}-windows-only.jar" />
-	    <arg value="--no-upx" />
-	    <arg value="--name=I2P" />
-	    <arg value="--output=${basedir}/i2pinstall-${release.number}-windows.exe" />
-        </exec>
-    </target>
     <target name="installer-all" depends="installer-freebsd, installer-linux, installer-osx, installer-windows, installer" >
     </target>
     <!-- end custom installers -->
