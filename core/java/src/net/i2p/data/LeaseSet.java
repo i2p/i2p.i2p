@@ -61,7 +61,7 @@ public class LeaseSet extends DatabaseEntry {
     private PublicKey _encryptionKey;
     private SigningPublicKey _signingKey;
     // Keep leases in the order received, or else signature verification will fail!
-    private List<Lease> _leases;
+    private final List<Lease> _leases;
     private boolean _receivedAsPublished;
     private boolean _receivedAsReply;
     // Store these since isCurrent() and getEarliestLeaseDate() are called frequently
@@ -225,7 +225,7 @@ public class LeaseSet extends DatabaseEntry {
     }
 
     protected byte[] getBytes() {
-        if ((_destination == null) || (_encryptionKey == null) || (_signingKey == null) || (_leases == null))
+        if ((_destination == null) || (_encryptionKey == null) || (_signingKey == null))
             return null;
         int len = PublicKey.KEYSIZE_BYTES  // dest
                 + SigningPublicKey.KEYSIZE_BYTES // dest
@@ -280,7 +280,7 @@ public class LeaseSet extends DatabaseEntry {
      *  This does NOT validate the signature
      */
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
-        if ((_destination == null) || (_encryptionKey == null) || (_signingKey == null) || (_leases == null)
+        if ((_destination == null) || (_encryptionKey == null) || (_signingKey == null)
             || (_signature == null)) throw new DataFormatException("Not enough data to write out a LeaseSet");
 
         _destination.writeBytes(out);
