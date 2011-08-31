@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <shortcuts>
  <programGroup defaultName="I2P" location="startMenu" />
+ <shortcut name="Open I2P Profile Folder (service)"
+          target="explorer"
+          commandLine="&quot;%allusersprofile%\Application Data\i2p&quot;"
+          iconFile="%systemroot%\system32\shell32.dll"
+          iconIndex="3"
+          initialState="normal"
+          startMenu="no"
+          programGroup="yes"
+          desktop="no"
+          startup="no" />
  <shortcut name="Start I2P (no window)"
            target="$INSTALL_PATH\I2P.exe"
            commandLine=""

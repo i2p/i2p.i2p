@@ -141,7 +141,7 @@
 	        <condition type="variable" id="is64bit">
 	            <name>SYSTEM_sun_arch_data_model</name>
 	            <value>64</value>
-		</condition> 
+		</condition>
 	    </conditions>
             <!-- postinstall stuff for windows -->
 	    <!-- Wrapper for 32bit Windows JVM -->
@@ -237,7 +237,7 @@
         <pack name="Windows Service" required="no">
             <description>Automatically start I2P in the background</description>
             <os family="windows" />
-<!--            <executable targetfile="$INSTALL_PATH/set_config_dir_for_nt_service.bat" stage="postinstall" failure="warn" keep="false" /> -->
+            <executable targetfile="$INSTALL_PATH/set_config_dir_for_nt_service.bat" stage="postinstall" failure="warn" keep="true" />
             <executable targetfile="$INSTALL_PATH/install_i2p_service_winnt.bat" stage="postinstall" failure="warn" keep="true">
                 <args>
                     <arg value="$INSTALL_PATH\wrapper.config" />

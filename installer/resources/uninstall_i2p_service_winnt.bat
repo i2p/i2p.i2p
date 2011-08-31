@@ -16,6 +16,7 @@ rem
 rem %~dp0 is location of current script under NT
 set _REALPATH=%~dp0
 set _WRAPPER_EXE=%_REALPATH%I2Psvc.exe
+call "%_REALPATH%"\set_config_dir_for_nt_service.bat uninstall
 
 rem
 rem Find the wrapper.conf

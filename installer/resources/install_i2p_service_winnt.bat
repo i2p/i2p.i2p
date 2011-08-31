@@ -25,6 +25,8 @@ set _WRAPPER_CONF="%~f1"
 if not %_WRAPPER_CONF%=="" goto startup
 set _WRAPPER_CONF="%_REALPATH%wrapper.config"
 
+call "%_REALPATH%"\set_config_dir_for_nt_service.bat install
+
 rem
 rem Install the Wrapper as an NT service.
 rem
@@ -32,7 +34,7 @@ rem
 :: We remove the existing service to
 :: 1) force the service to stop
 :: 2) update service configuration in case wrapper.config was edited
-:: 3) prevent hanging the installer if 'install as service' is selected 
+:: 3) prevent hanging the installer if 'install as service' is selected
 ::    and it's already enabled as a service.
 "%_WRAPPER_EXE%" -r %_WRAPPER_CONF%
 "%_WRAPPER_EXE%" -i %_WRAPPER_CONF%
