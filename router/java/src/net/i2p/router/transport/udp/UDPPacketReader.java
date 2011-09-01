@@ -189,7 +189,7 @@ class UDPPacketReader {
             return (int)DataHelper.fromLong(_message, offset, 2);
         }
         
-        /** write out the 4 byte relayAs tag */
+        /** read in the 4 byte relayAs tag */
         public long readRelayTag() {
             int offset = readBodyOffset() + Y_LENGTH + 1 + readIPSize() + 2;
             return DataHelper.fromLong(_message, offset, 4);

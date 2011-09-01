@@ -634,8 +634,7 @@ class PacketBuilder {
             
             // BUG: NPE here if null signature
             System.arraycopy(state.getSentSignature().getData(), 0, data, off, Signature.SIGNATURE_BYTES);
-            packet.getPacket().setLength(off + Signature.SIGNATURE_BYTES);
-            authenticate(packet, state.getCipherKey(), state.getMACKey());
+            off += Signature.SIGNATURE_BYTES;
         } else {
             // nothing more to add beyond the identity fragment, though we can
             // pad here if we want.  maybe randomized?
@@ -644,9 +643,9 @@ class PacketBuilder {
             // TODO: why not random data?
             if ( (off % 16) != 0)
                 off += 16 - (off % 16);
-            packet.getPacket().setLength(off);
-            authenticate(packet, state.getCipherKey(), state.getMACKey());
         } 
+        packet.getPacket().setLength(off);
+        authenticate(packet, state.getCipherKey(), state.getMACKey());
         
         setTo(packet, to, state.getSentPort());
         packet.setMessageType(TYPE_CONF);

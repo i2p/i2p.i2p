@@ -285,7 +285,8 @@ class EstablishmentManager {
             // count as connections, we have to keep the connection to this peer up longer if
             // we are offering introductions.
             if ((!_context.router().isHidden()) && (!_transport.introducersRequired()) && _transport.haveCapacity()) {
-                long tag = _context.random().nextLong(MAX_TAG_VALUE);
+                // ensure > 0
+                long tag = 1 + _context.random().nextLong(MAX_TAG_VALUE);
                 state.setSentRelayTag(tag);
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Received session request from " + from + ", sending relay tag " + tag);
@@ -460,18 +461,13 @@ class EstablishmentManager {
         
         long now = _context.clock().now();
         RouterIdentity remote = state.getConfirmedIdentity();
-        PeerState peer = new PeerState(_context, _transport);
+        PeerState peer = new PeerState(_context, _transport,
+                                       state.getSentIP(), state.getSentPort(), remote.calculateHash(), true);
         peer.setCurrentCipherKey(state.getCipherKey());
         peer.setCurrentMACKey(state.getMACKey());
-        peer.setCurrentReceiveSecond(now - (now % 1000));
-        peer.setKeyEstablishedTime(now);
-        peer.setLastReceiveTime(now);
-        peer.setLastSendTime(now);
-        peer.setRemoteAddress(state.getSentIP(), state.getSentPort());
-        peer.setRemotePeer(remote.calculateHash());
         peer.setWeRelayToThemAs(state.getSentRelayTag());
-        peer.setTheyRelayToUsAs(0);
-        peer.setInbound();
+        // 0 is the default
+        //peer.setTheyRelayToUsAs(0);
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Handle completely established (inbound): " + state.getRemoteHostId().toString() 
@@ -547,17 +543,13 @@ class EstablishmentManager {
         
         long now = _context.clock().now();
         RouterIdentity remote = state.getRemoteIdentity();
-        PeerState peer = new PeerState(_context, _transport);
+        PeerState peer = new PeerState(_context, _transport,
+                                       state.getSentIP(), state.getSentPort(), remote.calculateHash(), false);
         peer.setCurrentCipherKey(state.getCipherKey());
         peer.setCurrentMACKey(state.getMACKey());
-        peer.setCurrentReceiveSecond(now - (now % 1000));
-        peer.setKeyEstablishedTime(now);
-        peer.setLastReceiveTime(now);
-        peer.setLastSendTime(now);
-        peer.setRemoteAddress(state.getSentIP(), state.getSentPort());
-        peer.setRemotePeer(remote.calculateHash());
         peer.setTheyRelayToUsAs(state.getReceivedRelayTag());
-        peer.setWeRelayToThemAs(0);
+        // 0 is the default
+        //peer.setWeRelayToThemAs(0);
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Handle completely established (outbound): " + state.getRemoteHostId().toString() 
@@ -598,6 +590,7 @@ class EstablishmentManager {
         _transport.send(m, peer);
     }
     
+    /** the relay tag is a 4-byte field in the protocol */
     public static final long MAX_TAG_VALUE = 0xFFFFFFFFl;
     
     private void sendCreated(InboundEstablishState state) {
@@ -610,8 +603,9 @@ class EstablishmentManager {
             // offer to relay
             // (perhaps we should check our bw usage and/or how many peers we are 
             //  already offering introducing?)
-            if (state.getSentRelayTag() < 0) {
-                state.setSentRelayTag(_context.random().nextLong(MAX_TAG_VALUE));
+            if (state.getSentRelayTag() == 0) {
+                // ensure > 0
+                state.setSentRelayTag(1 + _context.random().nextLong(MAX_TAG_VALUE));
             } else {
                 // don't change it, since we've already prepared our sig
             }
