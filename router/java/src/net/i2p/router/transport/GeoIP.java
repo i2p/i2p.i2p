@@ -42,6 +42,8 @@ class GeoIP {
     private final Log _log;
     private final RouterContext _context;
     private final Map<String, String> _codeToName;
+    /** code to itself to prevent String proliferation */
+    private final Map<String, String> _codeCache;
     private final Map<Long, String> _IPToCountry;
     private final Set<Long> _pendingSearch;
     private final Set<Long> _notFound;
@@ -51,7 +53,8 @@ class GeoIP {
     public GeoIP(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(GeoIP.class);
-        _codeToName = new ConcurrentHashMap();
+        _codeToName = new ConcurrentHashMap(256);
+        _codeCache = new ConcurrentHashMap(256);
         _IPToCountry = new ConcurrentHashMap();
         _pendingSearch = new ConcurrentHashSet();
         _notFound = new ConcurrentHashSet();
@@ -160,7 +163,9 @@ class GeoIP {
                         continue;
                     }
                     String[] s = line.split(",");
-                    _codeToName.put(s[0].toLowerCase(), s[1]);
+                    String lc = s[0].toLowerCase();
+                    _codeToName.put(lc, s[1]);
+                    _codeCache.put(lc, lc);
                 } catch (IndexOutOfBoundsException ioobe) {
                 }
             }
@@ -201,7 +206,7 @@ class GeoIP {
     private String[] readGeoIPFile(Long[] search) {
         File GeoFile = new File(_context.getBaseDir(), GEOIP_DIR_DEFAULT);
         GeoFile = new File(GeoFile, GEOIP_FILE_DEFAULT);
-        if (GeoFile == null || (!GeoFile.exists())) {
+        if (!GeoFile.exists()) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("GeoIP file not found: " + GeoFile.getAbsolutePath());
             return new String[0];
@@ -226,7 +231,12 @@ class GeoIP {
                         idx++;
                     }
                     while (idx < search.length && search[idx].longValue() >= ip1 && search[idx].longValue() <= ip2) {
-                        rv[idx++] = s[2].toLowerCase();
+                        String lc = s[2].toLowerCase();
+                        // replace the new string with the identical one from the cache
+                        String cached = _codeCache.get(lc);
+                        if (cached == null)
+                            cached = lc;
+                        rv[idx++] = cached;
                     }
                 } catch (IndexOutOfBoundsException ioobe) {
                 } catch (NumberFormatException nfe) {
@@ -240,8 +250,8 @@ class GeoIP {
             if (in != null) try { in.close(); } catch (IOException ioe) {}
         }
 
-        if (_log.shouldLog(Log.WARN)) {
-            _log.warn("GeoIP processing finished, time: " + (_context.clock().now() - start));
+        if (_log.shouldLog(Log.INFO)) {
+            _log.info("GeoIP processing finished, time: " + (_context.clock().now() - start));
         }
         return rv;
     }
@@ -291,8 +301,8 @@ class GeoIP {
     }
 
     /**
-     * Get the country for an IP
-     * @return lower-case code, generally two letters.
+     * Get the country for an IP from the cache.
+     * @return lower-case code, generally two letters, or null.
      */
     public String get(String ip) {
         InetAddress pi;
@@ -306,6 +316,10 @@ class GeoIP {
         return get(pib);
     }
 
+    /**
+     * Get the country for an IP from the cache.
+     * @return lower-case code, generally two letters, or null.
+     */
     public String get(byte ip[]) {
         if (ip.length != 4)
             return null;
@@ -323,6 +337,11 @@ class GeoIP {
         return ((long) rv) & 0xffffffffl;
     }
 
+    /**
+     * Get the country for a country code
+     * @param two-letter lower case code
+     * @return untranslated name or null
+     */
     public String fullName(String code) {
         return _codeToName.get(code);
     }
