@@ -531,6 +531,10 @@ public class DataHelper {
         }
     }
     
+    /**
+     * @param numBytes 1-8
+     * @param value non-negative
+     */
     public static byte[] toLong(int numBytes, long value) throws IllegalArgumentException {
         if (value < 0) throw new IllegalArgumentException("Negative value not allowed");
         byte val[] = new byte[numBytes];
@@ -538,6 +542,10 @@ public class DataHelper {
         return val;
     }
     
+    /**
+     * @param numBytes 1-8
+     * @param value non-negative
+     */
     public static void toLong(byte target[], int offset, int numBytes, long value) throws IllegalArgumentException {
         if (numBytes <= 0) throw new IllegalArgumentException("Invalid number of bytes");
         if (value < 0) throw new IllegalArgumentException("Negative value not allowed");
@@ -545,6 +553,10 @@ public class DataHelper {
             target[offset+numBytes-i-1] = (byte)(value >>> (i*8));
     }
     
+    /**
+     * @param numBytes 1-8
+     * @return non-negative
+     */
     public static long fromLong(byte src[], int offset, int numBytes) {
         if ( (src == null) || (src.length == 0) )
             return 0;
