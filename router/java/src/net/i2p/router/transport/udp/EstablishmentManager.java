@@ -284,7 +284,8 @@ class EstablishmentManager {
             // Don't offer if we are approaching max connections. While Relay Intros do not
             // count as connections, we have to keep the connection to this peer up longer if
             // we are offering introductions.
-            if ((!_context.router().isHidden()) && (!_transport.introducersRequired()) && _transport.haveCapacity()) {
+            if ((!_context.router().isHidden()) && (!_transport.introducersRequired()) && _transport.haveCapacity() &&
+                !((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled()) {
                 // ensure > 0
                 long tag = 1 + _context.random().nextLong(MAX_TAG_VALUE);
                 state.setSentRelayTag(tag);
@@ -595,10 +596,12 @@ class EstablishmentManager {
     
     private void sendCreated(InboundEstablishState state) {
         long now = _context.clock().now();
-        // don't offer if we are approaching max connections (see comments above)
+        // This is usually handled in receiveSessionRequest() above, except, I guess,
+        // if the session isn't new and we are going through again.
+        // Don't offer if we are approaching max connections (see comments above)
         // Also don't offer if we are floodfill, as this extends the max idle time
         // and we will have lots of incoming conns
-        if ((!_transport.introducersRequired()) && _transport.haveCapacity() &&
+        if ((!_context.router().isHidden()) && (!_transport.introducersRequired()) && _transport.haveCapacity() &&
             !((FloodfillNetworkDatabaseFacade)_context.netDb()).floodfillEnabled()) {
             // offer to relay
             // (perhaps we should check our bw usage and/or how many peers we are 
