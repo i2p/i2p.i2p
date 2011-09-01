@@ -50,11 +50,11 @@ public class LogsHelper extends HelperBase {
     private String formatMessages(List<String> msgs) {
         if (msgs.isEmpty())
             return "<p><i>" + _("No log messages") + "</i></p>";
-        boolean colorize = Boolean.valueOf(_context.getProperty("routerconsole.logs.color")).booleanValue();
+        boolean colorize = _context.getBooleanPropertyDefaultTrue("routerconsole.logs.color");
         StringBuilder buf = new StringBuilder(16*1024); 
         buf.append("<ul>");
-        for (int i = msgs.size(); i > 0; i--) { 
-            String msg = msgs.get(i - 1);
+        for (int i = msgs.size() - 1; i >= 0; i--) { 
+            String msg = msgs.get(i);
             msg = msg.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
             // remove  last \n that LogRecordFormatter added
             if (msg.endsWith(NL))
@@ -63,18 +63,18 @@ public class LogsHelper extends HelperBase {
             msg = msg.replace("\n", "<br>&nbsp;&nbsp;&nbsp;&nbsp;\n");
             buf.append("<li>");
             if (colorize) {
+                // TODO this would be a lot easier if LogConsoleBuffer stored LogRecords instead of formatted strings
                 String color;
                 // Homeland Security Advisory System
                 // http://www.dhs.gov/xinfoshare/programs/Copy_of_press_release_0046.shtm
                 // but pink instead of yellow for WARN
-                // FIXME doesnt work for translated levels
-                if (msg.contains("CRIT"))
+                if (msg.contains(_("CRIT")))
                     color = "#cc0000";
-                else if (msg.contains("ERROR"))
+                else if (msg.contains(_("ERROR")))
                     color = "#ff3300";
-                else if (msg.contains("WARN"))
+                else if (msg.contains(_("WARN")))
                     color = "#ff00cc";
-                else if (msg.contains("INFO"))
+                else if (msg.contains(_("INFO")))
                     color = "#000099";
                 else
                     color = "#006600";
