@@ -12,7 +12,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.i2p.data.Hash;
+import net.i2p.data.RouterInfo;
 import net.i2p.router.JobImpl;
+import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
@@ -92,9 +94,14 @@ class StartExplorersJob extends JobImpl {
             return MAX_RERUN_DELAY_MS;
 
         // If we don't know too many peers, or just started, explore aggressively
+        // Also if hidden or K, as nobody will be connecting to us
         // Use DataStore.size() which includes leasesets because it's faster
         if (getContext().router().getUptime() < STARTUP_TIME ||
-            _facade.getDataStore().size() < MIN_ROUTERS)
+            _facade.getDataStore().size() < MIN_ROUTERS ||
+            getContext().router().isHidden())
+            return MIN_RERUN_DELAY_MS;
+        RouterInfo ri = getContext().router().getRouterInfo();
+        if (ri != null && ri.getCapabilities().contains("" + Router.CAPABILITY_BW12))
             return MIN_RERUN_DELAY_MS;
         if (_facade.getDataStore().size() > MAX_ROUTERS)
             return MAX_RERUN_DELAY_MS;
