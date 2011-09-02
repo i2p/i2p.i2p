@@ -1,10 +1,16 @@
 package net.i2p.router.web;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * Copied and modded from I2PTunnel IndexBean (GPL)
  * @author zzz
  */
 public class CSSHelper extends HelperBase {
+
+    private static final Map<String, Boolean> _UACache = new ConcurrentHashMap();
+
     public CSSHelper() {}
     
     public static final String PROP_THEME_NAME = "routerconsole.theme";
@@ -69,7 +75,18 @@ public class CSSHelper extends HelperBase {
      *  @since 0.8.5
      */
     public boolean allowIFrame(String ua) {
-        return ua == null ||
+        if (ua == null)
+            return true;
+        Boolean brv = _UACache.get(ua);
+        if (brv != null)
+            return brv.booleanValue();
+        boolean rv = shouldAllowIFrame(ua);
+        _UACache.put(ua, Boolean.valueOf(rv));
+        return rv;
+    }
+
+    private static boolean shouldAllowIFrame(String ua) {
+        return
                                // text
                              !(ua.startsWith("Lynx") || ua.startsWith("w3m") ||
                                ua.startsWith("ELinks") || ua.startsWith("Links") ||
