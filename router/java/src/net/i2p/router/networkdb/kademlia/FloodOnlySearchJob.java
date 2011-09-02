@@ -221,12 +221,10 @@ class FloodOnlySearchJob extends FloodSearchJob {
         }
         _facade.complete(_key);
         getContext().statManager().addRateData("netDb.failedTime", time, 0);
-        synchronized (_onFailed) {
-            for (int i = 0; i < _onFailed.size(); i++) {
-                Job j = _onFailed.remove(0);
-                getContext().jobQueue().addJob(j);
-            }
+        for (Job j : _onFailed) {
+            getContext().jobQueue().addJob(j);
         }
+        _onFailed.clear();
     }
 
     @Override
@@ -254,9 +252,8 @@ class FloodOnlySearchJob extends FloodSearchJob {
         }
         _facade.complete(_key);
         getContext().statManager().addRateData("netDb.successTime", time, 0);
-        synchronized (_onFind) {
-            while (!_onFind.isEmpty())
-                getContext().jobQueue().addJob(_onFind.remove(0));
+        for (Job j : _onFind) {
+            getContext().jobQueue().addJob(j);
         }
     }
 }

@@ -1,7 +1,7 @@
 package net.i2p.router.networkdb.kademlia;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.i2p.data.Hash;
 import net.i2p.data.i2np.DatabaseLookupMessage;
@@ -41,15 +41,21 @@ public class FloodSearchJob extends JobImpl {
     protected volatile boolean _dead;
     protected final long _created;
 
+    /**
+     *  @param onFind may be null
+     *  @param onFailed may be null
+     */
     public FloodSearchJob(RouterContext ctx, FloodfillNetworkDatabaseFacade facade, Hash key, Job onFind, Job onFailed, int timeoutMs, boolean isLease) {
         super(ctx);
         _log = ctx.logManager().getLog(getClass());
         _facade = facade;
         _key = key;
-        _onFind = new ArrayList(4);
-        _onFind.add(onFind);
-        _onFailed = new ArrayList(4);
-        _onFailed.add(onFailed);
+        _onFind = new CopyOnWriteArrayList();
+        if (onFind != null)
+            _onFind.add(onFind);
+        _onFailed = new CopyOnWriteArrayList();
+        if (onFailed != null)
+            _onFailed.add(onFailed);
         int timeout = timeoutMs / FLOOD_SEARCH_TIME_FACTOR;
         if (timeout < timeoutMs)
             timeout = timeoutMs;
@@ -64,14 +70,23 @@ public class FloodSearchJob extends JobImpl {
 
     /**
      *  Add jobs to an existing search
+     *  @param onFind may be null
+     *  @param onFailed may be null
+     *  @param timeoutMs ignored
+     *  @param isLease ignored
      */
     void addDeferred(Job onFind, Job onFailed, long timeoutMs, boolean isLease) {
-        if (_dead) {
-            getContext().jobQueue().addJob(onFailed);
-        } else {
-            if (onFind != null) synchronized (_onFind) { _onFind.add(onFind); }
-            if (onFailed != null) synchronized (_onFailed) { _onFailed.add(onFailed); }
+        synchronized (this) {
+            if (!_dead) {
+                if (onFind != null)
+                    _onFind.add(onFind);
+                if (onFailed != null)
+                    _onFailed.add(onFailed);
+                return;
+            }
         }
+        // outside synch to avoid deadlock with job queue
+        getContext().jobQueue().addJob(onFailed);
     }
 
     /** using context clock */
