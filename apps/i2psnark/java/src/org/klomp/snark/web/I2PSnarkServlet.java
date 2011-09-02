@@ -1191,7 +1191,7 @@ public class I2PSnarkServlet extends Default {
         out.write("</span><hr>\n<table border=\"0\"><tr><td>");
         out.write(_("From URL"));
         out.write(":<td><input type=\"text\" name=\"newURL\" size=\"85\" value=\"" + newURL + "\"");
-        out.write("title=\"");
+        out.write(" title=\"");
         out.write(_("Enter the torrent file download URL (I2P only), magnet link, or maggot link"));
         out.write("\"> \n");
         // not supporting from file at the moment, since the file name passed isn't always absolute (so it may not resolve)
