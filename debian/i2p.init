@@ -41,7 +41,19 @@ I2P_ARGS="/etc/i2p/wrapper.config \
  wrapper.java.pidfile=$JVMPIDFILE \
  wrapper.daemonize=TRUE"
 
+for ENV_FILE in /etc/environment /etc/default/locale; do
+[ -r "$ENV_FILE" ] || continue
+[ -s "$ENV_FILE" ] || continue
 
+ for var in LANG LANGUAGE LC_ALL LC_CTYPE; do
+     value=`egrep "^${var}=" "$ENV_FILE" | tail -n1 | cut -d= -f2`
+     [ -n "$value" ] && eval export $var=$value
+
+     if [ -n "$value" ] && [ "$ENV_FILE" = /etc/environment ]; then
+         log_warning_msg "/etc/environment has been deprecated for locale information; use /etc/default/locale for $var=$value instead"
+     fi
+ done
+done
 
 # this isn't really needed since we depend on lsb-base (>= 3.2-14)
 ## Actually, we *do* need this since the versioned dependency has been dropped
