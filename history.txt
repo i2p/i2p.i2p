@@ -1,3 +1,9 @@
+2011-09-01 zzz
+  * Console: Enable color logs
+  * GeoIP: Cache country codes
+  * NetDB: Explore more aggressively if hidden or K
+  * UDP: Cleanups and introduction fixes
+
 2011-08-31 zzz
   * OCMOSJ: Remove some global cache locks, other cleanups
 
