@@ -978,7 +978,7 @@ public class I2PSnarkServlet extends Default {
                 if (noThinsp)
                     out.write("<a href=\"/i2psnark/?action=Remove_" + b64 + "&amp;nonce=" + _nonce + "\"><img title=\"");
                 else
-                    out.write("<input type=\"image\" name=\"action\" value=\"Remove_" + b64 + "\" title=\"");
+                    out.write("<input type=\"image\" name=\"action_Remove_" + b64 + "\" value=\"foo\" title=\"");
                 out.write(_("Remove the torrent from the active list, deleting the .torrent file"));
                 out.write("\" onclick=\"if (!confirm('");
                 // Can't figure out how to escape double quotes inside the onclick string.
