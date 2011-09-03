@@ -27,16 +27,18 @@ Many of the stats on the summary bar may be
 <a href="configstats.jsp">configured</a> to be
 <a href="graphs.jsp">graphed</a> for further analysis.
 </p><h3>General</h3><ul>
-<li class="tidylist"><b>Ident:</b>
+<li class="tidylist"><b>Local Identity:</b>
 The first four characters (24 bits) of your 44-character (256-bit) Base64 router hash.
 The full hash is shown on your <a href="netdb.jsp?r=.">router info page</a>.
 Never reveal this to anyone, as your router info contains your IP.</li>
 <li class="tidylist"><b>Version:</b>
 The version of the I2P software you are running.</li>
-<li class="tidylist"><b>Now:</b>
+<%
+/* <li class="tidylist"><b>Now:</b>
 The current time (UTC) and the skew, if any. I2P requires your computer's time be accurate.
 If the skew is more than a few seconds, please correct the problem by adjusting
-your computer's time.</li>
+your computer's time.</li> */
+%>
 <li class="tidylist"><b>Reachability:</b>
 The router's view of whether it can be contacted by other routers.
 Further information is on the <a href="config.jsp#help">configuration page</a>.
