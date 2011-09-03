@@ -963,8 +963,8 @@ class EstablishmentManager {
     
     private void processExpired(OutboundEstablishState outboundState) {
         if (outboundState.getState() != OutboundEstablishState.STATE_CONFIRMED_COMPLETELY) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Lifetime of expired outbound establish: " + outboundState.getLifetime());
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Lifetime of expired outbound establish: " + outboundState.getLifetime());
             while (true) {
                 OutNetMessage msg = outboundState.getNextQueuedMessage();
                 if (msg == null)

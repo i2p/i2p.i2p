@@ -27,8 +27,8 @@ import net.i2p.util.Log;
  *
  */
 class EventPumper implements Runnable {
-    private RouterContext _context;
-    private Log _log;
+    private final RouterContext _context;
+    private final Log _log;
     private volatile boolean _alive;
     private Selector _selector;
     private final LinkedBlockingQueue<ByteBuffer> _bufCache;
@@ -36,7 +36,7 @@ class EventPumper implements Runnable {
     private final LinkedBlockingQueue<NTCPConnection> _wantsWrite = new LinkedBlockingQueue<NTCPConnection>();
     private final LinkedBlockingQueue<ServerSocketChannel> _wantsRegister = new LinkedBlockingQueue<ServerSocketChannel>();
     private final LinkedBlockingQueue<NTCPConnection> _wantsConRegister = new LinkedBlockingQueue<NTCPConnection>();
-    private NTCPTransport _transport;
+    private final NTCPTransport _transport;
     private long _expireIdleWriteTime;
     
     private static final int BUF_SIZE = 8*1024;

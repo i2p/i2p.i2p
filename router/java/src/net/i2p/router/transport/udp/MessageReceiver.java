@@ -89,6 +89,10 @@ class MessageReceiver {
         _completeMessages.clear();
     }
     
+    /**
+     *  This queues the message for processing.
+     *  Processing will call state.releaseResources(), do not access state after calling this.
+     */
     public void receiveMessage(InboundMessageState state) {
         //int total = 0;
         //long lag = -1;
@@ -120,6 +124,7 @@ class MessageReceiver {
                         }
                         if ( (message != null) && (message.isExpired()) ) {
                             expiredLifetime += message.getLifetime();
+                            // message.releaseResources() ??
                             message = null;
                             expired++;
                         }
@@ -160,6 +165,11 @@ class MessageReceiver {
         //_cache.release(buf, false); 
     }
     
+    /**
+     *  Assemble all the fragments into an I2NP message.
+     *  This calls state.releaseResources(), do not access state after calling this.
+     *  @return null on error
+     */
     private I2NPMessage readMessage(ByteArray buf, InboundMessageState state, I2NPMessageHandler handler) {
         try {
             //byte buf[] = new byte[state.getCompleteSize()];

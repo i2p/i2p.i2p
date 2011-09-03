@@ -122,29 +122,33 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
             boolean partialACK = false;
          
             synchronized (messages) {
+                boolean isNew = false;
                 state = messages.get(messageId);
                 if (state == null) {
                     state = new InboundMessageState(_context, mid, fromPeer);
-                    messages.put(messageId, state);
+                    isNew = true;
+                    // we will add to messages shortly if it isn't complete
                 }
                 
                 fragmentOK = state.receiveFragment(data, i);
              
                 if (state.isComplete()) {
                     messageComplete = true;
-                    messages.remove(messageId);
+                    if (!isNew)
+                        messages.remove(messageId);
                 } else if (state.isExpired()) {
                     messageExpired = true;
-                    messages.remove(messageId);
+                    if (!isNew)
+                        messages.remove(messageId);
                 } else {
                     partialACK = true;
+                    if (isNew)
+                        messages.put(messageId, state);
                 }
             }
 
             if (messageComplete) {
                 _recentlyCompletedMessages.add(mid);
-                _messageReceiver.receiveMessage(state);
-
                 from.messageFullyReceived(messageId, state.getCompleteSize());
                 _ackSender.ackPeer(from);
 
@@ -154,11 +158,15 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
                 _context.statManager().addRateData("udp.receivedCompleteTime", state.getLifetime(), state.getLifetime());
                 if (state.getFragmentCount() > 0)
                     _context.statManager().addRateData("udp.receivedCompleteFragments", state.getFragmentCount(), state.getLifetime());
+
+                // this calls state.releaseResources(), all state access must be before this
+                _messageReceiver.receiveMessage(state);
             } else if (messageExpired) {
-                state.releaseResources();
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Message expired while only being partially read: " + state);
                 _context.messageHistory().droppedInboundMessage(state.getMessageId(), state.getFrom(), "expired while partially read: " + state.toString());
+                // all state access must be before this
+                state.releaseResources();
             } else if (partialACK) {
                 // not expired but not yet complete... lets queue up a partial ACK
                 if (_log.shouldLog(Log.DEBUG))
@@ -167,6 +175,7 @@ class InboundMessageFragments /*implements UDPTransport.PartialACKSource */{
                 _ackSender.ackPeer(from);
             }
 
+            // TODO: Why give up on other fragments if one is bad?
             if (!fragmentOK)
                 break;
         }

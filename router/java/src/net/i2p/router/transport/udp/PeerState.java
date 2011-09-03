@@ -649,15 +649,16 @@ class PeerState {
         int rv = 0;
         
         synchronized (_inboundMessages) {
-            int remaining = _inboundMessages.size();
-            for (Iterator iter = _inboundMessages.values().iterator(); remaining > 0; remaining--) {
-                InboundMessageState state = (InboundMessageState)iter.next();
+            for (Iterator<InboundMessageState> iter = _inboundMessages.values().iterator(); iter.hasNext(); ) {
+                InboundMessageState state = iter.next();
                 if (state.isExpired() || _dead) {
                     iter.remove();
+                    // state.releaseResources() ??
                 } else {
                     if (state.isComplete()) {
                         _log.error("inbound message is complete, but wasn't handled inline? " + state + " with " + this);
                         iter.remove();
+                        // state.releaseResources() ??
                     } else {
                         rv++;
                     }
@@ -841,6 +842,7 @@ class PeerState {
                     //if (_context instanceof RouterContext)
                     //    ((RouterContext)_context).messageHistory().droppedInboundMessage(state.getMessageId(), state.getFrom(), "expired partially received: " + state.toString());
                     iter.remove();
+                    // state.releaseResources() ??
                 } else {
                     if (!state.isComplete()) {
                         if (states == null)

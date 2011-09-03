@@ -425,4 +425,10 @@ class OutboundEstablishState {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Got a packet, nextSend == now");
     }
+
+    /** @since 0.8.9 */
+    @Override
+    public String toString() {
+        return "OES " + _remoteHostId;
+    }
 }

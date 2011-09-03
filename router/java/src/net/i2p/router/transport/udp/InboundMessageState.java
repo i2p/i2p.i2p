@@ -8,8 +8,10 @@ import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 
 /**
- * Hold the raw data fragments of an inbound message
+ * Hold the raw data fragments of an inbound message.
  *
+ * Warning - there is no synchronization in this class, take care in
+ * InboundMessageFragments to avoid use-after-release, etc.
  */
 class InboundMessageState {
     private final RouterContext _context;
@@ -21,8 +23,10 @@ class InboundMessageState {
      * received fragments are null.
      */
     private final ByteArray _fragments[];
+
     /**
      * what is the last fragment in the message (or -1 if not yet known)
+     * Fragment count is _lastFragment + 1
      */
     private int _lastFragment;
     private final long _receiveBegin;
@@ -49,13 +53,14 @@ class InboundMessageState {
     
     /**
      * Read in the data from the fragment.
+     * Caller should synchronize.
      *
      * @return true if the data was ok, false if it was corrupt
      */
     public boolean receiveFragment(UDPPacketReader.DataReader data, int dataFragment) {
         int fragmentNum = data.readMessageFragmentNum(dataFragment);
-        if ( (fragmentNum < 0) || (fragmentNum > _fragments.length)) {
-            _log.warn("Invalid fragment " + fragmentNum + "/" + _fragments.length);
+        if ( (fragmentNum < 0) || (fragmentNum >= MAX_FRAGMENTS)) {
+            _log.warn("Invalid fragment " + fragmentNum + '/' + MAX_FRAGMENTS);
             return false;
         }
         if (_fragments[fragmentNum] == null) {
@@ -67,8 +72,21 @@ class InboundMessageState {
                 message.setValid(size);
                 _fragments[fragmentNum] = message;
                 boolean isLast = data.readMessageIsLast(dataFragment);
-                if (isLast)
+                if (isLast) {
+                    // don't allow _lastFragment to be set twice
+                    if (_lastFragment >= 0) {
+                        if (_log.shouldLog(Log.ERROR))
+                            _log.error("Multiple last fragments for message " + _messageId + " from " + _from);
+                        return false;
+                    }
+                    // TODO - check for non-last fragments after this one?
                     _lastFragment = fragmentNum;
+                } else if (_lastFragment >= 0 && fragmentNum >= _lastFragment) {
+                    // don't allow non-last after last
+                    if (_log.shouldLog(Log.ERROR))
+                        _log.error("Non-last fragment " + fragmentNum + " when last is " + _lastFragment + " for message " + _messageId + " from " + _from);
+                    return false;
+                }
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("New fragment " + fragmentNum + " for message " + _messageId 
                                + ", size=" + size
@@ -87,6 +105,9 @@ class InboundMessageState {
         return true;
     }
     
+    /**
+     *  May not be valid after released
+     */
     public boolean isComplete() {
         if (_lastFragment < 0) return false;
         for (int i = 0; i <= _lastFragment; i++)
@@ -94,23 +115,40 @@ class InboundMessageState {
                 return false;
         return true;
     }
+
     public boolean isExpired() { 
         return _context.clock().now() > _receiveBegin + MAX_RECEIVE_TIME;
     }
+
     public long getLifetime() {
         return _context.clock().now() - _receiveBegin;
     }
+
     public Hash getFrom() { return _from; }
+
     public long getMessageId() { return _messageId; }
+
+    /**
+     *  @throws IllegalStateException if released or not isComplete()
+     */
     public int getCompleteSize() {
         if (_completeSize < 0) {
+            if (_lastFragment < 0)
+                throw new IllegalStateException("last fragment not set");
+            if (_released)
+                throw new IllegalStateException("SSU IMS 2 Use after free");
             int size = 0;
-            for (int i = 0; i <= _lastFragment; i++)
-                size += _fragments[i].getValid();
+            for (int i = 0; i <= _lastFragment; i++) {
+                ByteArray frag = _fragments[i];
+                if (frag == null)
+                    throw new IllegalStateException("null fragment " + i + '/' + _lastFragment);
+                size += frag.getValid();
+            }
             _completeSize = size;
         }
         return _completeSize;
     }
+
     public ACKBitfield createACKBitfield() {
         return new PartialBitfield(_messageId, _fragments);
     }
@@ -154,34 +192,44 @@ class InboundMessageState {
     }
     
     public void releaseResources() {
-        for (int i = 0; i < _fragments.length; i++) {
+        _released = true;
+        for (int i = 0; i < MAX_FRAGMENTS; i++) {
             if (_fragments[i] != null) {
                 _fragmentCache.release(_fragments[i]);
                 _fragments[i] = null;
             }
         }
-        _released = true;
     }
     
+    /**
+     *  @throws IllegalStateException if released
+     */
     public ByteArray[] getFragments() {
         if (_released) {
-            RuntimeException e = new RuntimeException("Use after free: " + toString());
+            RuntimeException e = new IllegalStateException("Use after free: " + _messageId);
             _log.error("SSU IMS", e);
             throw e;
         }
         return _fragments;
     }
+
     public int getFragmentCount() { return _lastFragment+1; }
     
+    /**
+     *  May not be valid if released, or may NPE on race with release, use with care in exception text
+     */
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder(256);
         buf.append("IB Message: ").append(_messageId);
+        buf.append(" from ").append(_from.toString());
         if (isComplete()) {
             buf.append(" completely received with ");
-            buf.append(getCompleteSize()).append(" bytes");
+            //buf.append(getCompleteSize()).append(" bytes");
+            // may display -1 but avoid cascaded exceptions after release
+            buf.append(_completeSize).append(" bytes");
         } else {
-            for (int i = 0; i < _lastFragment; i++) {
+            for (int i = 0; i <= _lastFragment; i++) {
                 buf.append(" fragment ").append(i);
                 if (_fragments[i] != null)
                     buf.append(": known at size ").append(_fragments[i].getValid());
