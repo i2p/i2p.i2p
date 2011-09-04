@@ -87,6 +87,7 @@ source_lang = en
 trans.de = apps/susimail/locale/messages_de.po
 trans.es = apps/susimail/locale/messages_es.po
 trans.fr = apps/susimail/locale/messages_fr.po
+trans.it = apps/susimail/locale/messages_it.po
 trans.nl = apps/susimail/locale/messages_nl.po
 trans.sv_SE = apps/susimail/locale/messages_sv.po
 trans.pl = apps/susimail/locale/messages_pl.po
