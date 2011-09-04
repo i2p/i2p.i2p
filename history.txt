@@ -1,14 +1,18 @@
+2011-09-04 zzz
+  * NetDB: Try again to fix ISJ deadlock, thx devzero
+  * Transport: Remove one global lock in OutboundMessageRegistry.
+
 2011-09-03 zzz
   * i2psnark: Fix "eject" button in certain browsers (ticket #511)
   * UDP Inbound:
-    - Hopefully fix race NPE, thx dream
+    - Hopefully fix race NPE, thx devzero
     - Catch some more fragment errors
     - Exception and log tweaks
     - Cleanups and javadocs
 
 2011-09-02 zzz
   * Console: Cache user-agent processing
-  * NetDB: Hopefully fix ISJ deadlock, thx dream
+  * NetDB: Hopefully fix ISJ deadlock, thx devzero
 
 2011-09-02 sponge
   * I2PSnark: Fix GUI html tag for adding a torrent, it was missing a space.

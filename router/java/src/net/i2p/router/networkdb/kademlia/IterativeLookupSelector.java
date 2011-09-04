@@ -1,7 +1,6 @@
 package net.i2p.router.networkdb.kademlia;
 
 import net.i2p.data.Hash;
-import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.DatabaseSearchReplyMessage;
 import net.i2p.data.i2np.DatabaseStoreMessage;
 import net.i2p.data.i2np.I2NPMessage;
@@ -10,8 +9,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 /**
- *  Slightly modified version of FloodOnlyLookupSelector,
- *  plus it incorporates the functions of SingleLookupJob inline.
+ *  Slightly modified version of FloodOnlyLookupSelector.
  *  Always follows the DSRM entries.
  *
  *  @since 0.8.9
@@ -50,62 +48,15 @@ class IterativeLookupSelector implements MessageSelector {
         } else if (message instanceof DatabaseSearchReplyMessage) {
             DatabaseSearchReplyMessage dsrm = (DatabaseSearchReplyMessage)message;
             if (_search.getKey().equals(dsrm.getSearchKey())) {
-
-                // TODO - dsrm.getFromHash() can't be trusted - check against the list of
-                // those we sent the search to in _search ?
-                Hash from = dsrm.getFromHash();
-
-                // Moved from FloodOnlyLookupMatchJob so it is called for all replies
-                // rather than just the last one
                 // Got a netDb reply pointing us at other floodfills...
-                if (_log.shouldLog(Log.INFO))
-                    _log.info(_search.getJobId() + ": Processing DSRM via IterativeLookupJobs, apparently from " + from);
-
-                // Chase the hashes from the reply
-                // 255 max, see comments in SingleLookupJob
-                int limit = Math.min(dsrm.getNumReplies(), SingleLookupJob.MAX_TO_FOLLOW);
-                int newPeers = 0;
-                int oldPeers = 0;
-                int invalidPeers = 0;
-                for (int i = 0; i < limit; i++) {
-                    Hash peer = dsrm.getReply(i);
-                    if (peer.equals(_context.routerHash())) {
-                        // us
-                        oldPeers++;
-                        continue;
-                    }
-                    if (peer.equals(from)) {
-                        // wtf
-                        invalidPeers++;
-                        continue;
-                    }
-                    RouterInfo ri = _context.netDb().lookupRouterInfoLocally(peer);
-                    if (ri == null) {
-                        // get the RI from the peer that told us about it
-                        _context.jobQueue().addJob(new IterativeFollowupJob(_context, peer, from, _search));
-                        newPeers++;
-                    } else if (ri.getPublished() < _context.clock().now() - 60*60*1000 ||
-                             !FloodfillNetworkDatabaseFacade.isFloodfill(ri)) {
-                        // get an updated RI from the (now ff?) peer
-                        _context.jobQueue().addJob(new IterativeFollowupJob(_context, peer, peer, _search));
-                        oldPeers++;
-                    } else {
-                        // add it to the sorted queue
-                        // this will check if we have already tried it
-                        // should we really add? if we know about it but skipped it,
-                        // it was for some reason?
-                        _search.newPeerToTry(peer);
-                        oldPeers++;
-                    }
-                }
-                long timeSent = _search.timeSent(from);
-                // assume 0 dup
-                if (timeSent > 0) {
-                    _context.profileManager().dbLookupReply(from,  newPeers, oldPeers, invalidPeers, 0,
-                                                            _context.clock().now() - timeSent);
+                if (_log.shouldLog(Log.INFO)) {
+                    Hash from = dsrm.getFromHash();
+                    _log.info(_search.getJobId() + ": Processing DSRM via IterativeLookupJob, apparently from " + from);
                 }
 
-                _search.failed(dsrm.getFromHash(), false);
+                // was inline, now in IterativeLookupJob due to deadlocks
+                _context.jobQueue().addJob(new IterativeLookupJob(_context, dsrm, _search));
+
                 // fall through, always return false, we do not wish the match job to be called
             }
         }
