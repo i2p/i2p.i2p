@@ -5804,10 +5804,10 @@ msgstr "Router Konsol Sprog"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:349
 msgid ""
 "Please contribute to the router console translation project! Contact the "
-"developers on IRC #i2p to help."
+"developers on IRC #i2p-dev to help."
 msgstr ""
 "Hjælp til med oversættelse af router konsol projektet! Kontakt udviklerne on"
-" IRC #i2p for at hjælpe til"
+" IRC #i2p-dev for at hjælpe til"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:353
 msgid "Apply"

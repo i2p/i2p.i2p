@@ -5820,10 +5820,10 @@ msgstr "Linguaggio Console del Router"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:349
 msgid ""
 "Please contribute to the router console translation project! Contact the "
-"developers on IRC #i2p to help."
+"developers on IRC #i2p-dev to help."
 msgstr ""
 "Per cortesia contribuisci al progetto di traduzione della console del "
-"router! Contatta gli sviluppatori sul canale IRC #i2p per contribuire."
+"router! Contatta gli sviluppatori sul canale IRC #i2p-dev per contribuire."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:353
 msgid "Apply"

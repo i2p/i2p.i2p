@@ -5837,10 +5837,10 @@ msgstr "Idioma de la Consola del Router"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:349
 msgid ""
 "Please contribute to the router console translation project! Contact the "
-"developers on IRC #i2p to help."
+"developers on IRC #i2p-dev to help."
 msgstr ""
 "Por favor, contribuye al proyecto de traducción de la consola del router. "
-"Ponte en contacto con los desarrolladores en el IRC #I2P o #I2P-ES para "
+"Ponte en contacto con los desarrolladores en el IRC #I2P-dev o #I2P-ES para "
 "ayudar."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:353

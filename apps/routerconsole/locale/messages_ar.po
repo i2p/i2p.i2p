@@ -5161,8 +5161,8 @@ msgid "Router Console Language"
 msgstr "لغة لوحة التحكم"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:320
-msgid "Please contribute to the router console translation project! Contact the developers on IRC #i2p to help."
-msgstr "ساهم في ترجمة واجهة الاستخدام بالاتصال بالمطورين على IRC #i2p لطلب المساعدة."
+msgid "Please contribute to the router console translation project! Contact the developers on IRC #i2p-dev to help."
+msgstr "ساهم في ترجمة واجهة الاستخدام بالاتصال بالمطورين على IRC #i2p-dev لطلب المساعدة."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:324
 msgid "Apply"

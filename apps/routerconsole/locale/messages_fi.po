@@ -5633,10 +5633,10 @@ msgstr "Reitittimen ohjauspaneelin kieli"
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:349
 msgid ""
 "Please contribute to the router console translation project! Contact the "
-"developers on IRC #i2p to help."
+"developers on IRC #i2p-dev to help."
 msgstr ""
 "Osallistu reitittimen ohjauspaneelin käännöstyöhön! Ota kehittäjiin yhteyttä"
-" IRC -kanavalla #i2p."
+" IRC -kanavalla #i2p-dev."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:353
 msgid "Apply"

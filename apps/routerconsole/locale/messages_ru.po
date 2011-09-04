@@ -5443,8 +5443,8 @@ msgid "Router Console Language"
 msgstr "Язык консоли маршрутизатора"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:356
-msgid "Please contribute to the router console translation project! Contact the developers on IRC #i2p to help."
-msgstr "Пожалуйста, помогите проекту перевода консоли маршрутизатора! Разработчики доступны для связи на IRC-канале #i2p"
+msgid "Please contribute to the router console translation project! Contact the developers on IRC #i2p-dev to help."
+msgstr "Пожалуйста, помогите проекту перевода консоли маршрутизатора! Разработчики доступны для связи на IRC-канале #i2p-dev"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:360
 msgid "Apply"
