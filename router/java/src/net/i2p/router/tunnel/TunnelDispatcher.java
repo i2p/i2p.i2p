@@ -339,8 +339,8 @@ public class TunnelDispatcher implements Service {
         
         boolean removed = (null != _participatingConfig.remove(recvId));
         if (!removed) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Participating tunnel, but no longer listed in participatingConfig? " + cfg);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Participating tunnel, but no longer listed in participatingConfig? " + cfg);
         }
         
         removed = (null != _participants.remove(recvId));
