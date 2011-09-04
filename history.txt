@@ -1,5 +1,8 @@
 2011-09-04 zzz
-  * NetDB: Try again to fix ISJ deadlock, thx devzero
+  * NetDB:
+    - Try again to fix ISJ deadlock, thx devzero
+    - Lower RI expiration again
+    - Expire RIs with SSU only and no introducers sooner
   * Transport: Remove one global lock in OutboundMessageRegistry.
 
 2011-09-03 zzz

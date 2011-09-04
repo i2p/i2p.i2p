@@ -121,9 +121,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * limits for accepting a dbDtore of a router (unless we dont 
      * know anyone or just started up) -- see validate() below
      */
-    private final static long ROUTER_INFO_EXPIRATION = 3*24*60*60*1000l;
-    private final static long ROUTER_INFO_EXPIRATION_MIN = 120*60*1000l;
-    private final static long ROUTER_INFO_EXPIRATION_SHORT = 90*60*1000l;
+    private final static long ROUTER_INFO_EXPIRATION = 2*24*60*60*1000l;
+    private final static long ROUTER_INFO_EXPIRATION_MIN = 90*60*1000l;
+    private final static long ROUTER_INFO_EXPIRATION_SHORT = 75*60*1000l;
     private final static long ROUTER_INFO_EXPIRATION_FLOODFILL = 60*60*1000l;
     
     private final static long EXPLORE_JOB_DELAY = 10*60*1000l;
@@ -772,17 +772,19 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             return "Peer " + key.toBase64() + " published " + DataHelper.formatDuration(age) + " ago";
         } else if (upLongEnough && !routerInfo.isCurrent(ROUTER_INFO_EXPIRATION_SHORT)) {
             if (routerInfo.getAddresses().isEmpty())
-                return "Peer " + key.toBase64() + " published > 90m ago with no addresses";
+                return "Peer " + key.toBase64() + " published > 75m ago with no addresses";
             // This should cover the introducers case below too
             // And even better, catches the case where the router is unreachable but knows no introducers
             if (routerInfo.getCapabilities().indexOf(Router.CAPABILITY_UNREACHABLE) >= 0)
-                return "Peer " + key.toBase64() + " published > 90m ago and thinks it is unreachable";
+                return "Peer " + key.toBase64() + " published > 75m ago and thinks it is unreachable";
             RouterAddress ra = routerInfo.getTargetAddress("SSU");
             if (ra != null) {
                 // Introducers change often, introducee will ping introducer for 2 hours
                 Properties props = ra.getOptions();
                 if (props != null && props.getProperty("ihost0") != null)
-                    return "Peer " + key.toBase64() + " published > 90m ago with SSU Introducers";
+                    return "Peer " + key.toBase64() + " published > 75m ago with SSU Introducers";
+                if (routerInfo.getTargetAddress("NTCP") == null)
+                    return "Peer " + key.toBase64() + " published > 75m ago, SSU only without introducers";
             }
         }
         return null;
