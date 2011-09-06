@@ -1,3 +1,15 @@
+2011-09-06 zzz
+  * Crypto: Rework use of SHA256 for efficiency and
+    to avoid clogging the Hash cache with one-time hashes,
+    and avoiding the global cache lock.
+    This also greatly increases Hash cache hit rates.
+    Also use SimpleByteCache for temporary byte buffers.
+  * I2PTunnel: Save keys to privkey file when enabling
+    persistent key after tunnel creation (ticket #480)
+  * JobQueue: Change queue from a List to a Set for efficiency
+  * PrivateKeyFile: Add more constructors
+  * SDSCache: Use weak refs; increase size for pub keys
+
 2011-09-04 zzz
   * NetDB:
     - Try again to fix ISJ deadlock, thx devzero

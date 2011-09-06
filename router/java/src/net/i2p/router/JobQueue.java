@@ -13,11 +13,13 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -44,7 +46,7 @@ public class JobQueue {
     /** list of jobs that are ready to run ASAP */
     private final BlockingQueue<Job> _readyJobs;
     /** list of jobs that are scheduled for running in the future */
-    private final List<Job> _timedJobs;
+    private final Set<Job> _timedJobs;
     /** job name to JobStat for that job */
     private final Map<String, JobStats> _jobStats;
     /** how many job queue runners can go concurrently */
@@ -135,7 +137,7 @@ public class JobQueue {
 
         _alive = true;
         _readyJobs = new LinkedBlockingQueue();
-        _timedJobs = new ArrayList(64);
+        _timedJobs = new HashSet(64);
         _jobLock = new Object();
         _queueRunners = new ConcurrentHashMap(RUNNERS);
         _jobStats = new ConcurrentHashMap();
@@ -454,8 +456,8 @@ public class JobQueue {
                     List<Job> toAdd = null;
                     try {
                         synchronized (_jobLock) {
-                            for (int i = 0; i < _timedJobs.size(); i++) {
-                                Job j = _timedJobs.get(i);
+                            for (Iterator<Job> iter = _timedJobs.iterator(); iter.hasNext(); ) {
+                                Job j = iter.next();
                                 // find jobs due to start before now
                                 long timeLeft = j.getTiming().getStartAfter() - now;
                                 if (timeLeft <= 0) {
@@ -464,8 +466,7 @@ public class JobQueue {
 
                                     if (toAdd == null) toAdd = new ArrayList(4);
                                     toAdd.add(j);
-                                    _timedJobs.remove(i);
-                                    i--; // so the index stays consistent
+                                    iter.remove();
                                 } else {
                                     if ( (timeToWait <= 0) || (timeLeft < timeToWait) )
                                         timeToWait = timeLeft;
@@ -519,8 +520,7 @@ public class JobQueue {
      */
     private void updateJobTimings(long delta) {
         synchronized (_jobLock) {
-            for (int i = 0; i < _timedJobs.size(); i++) {
-                Job j = _timedJobs.get(i);
+            for (Job j : _timedJobs) {
                 j.getTiming().offsetChanged(delta);
             }
             for (Job j : _readyJobs) {
