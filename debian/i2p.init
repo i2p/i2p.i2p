@@ -77,7 +77,7 @@ case "$RUN_DAEMON" in
 esac
 
 
-# is the wrapper from the service-wrapper package even installed? 
+# is the wrapper from the service-wrapper package even installed?
 # if not, bail NOW
 
 [ -x $DAEMON ] || exit 0
@@ -94,7 +94,7 @@ do_start()
 	[ -d $RUN ] || mkdir $RUN
         [ -r $PIDFILE ] || touch $PIDFILE
 	[ -r $JVMPIDFILE ] || touch $JVMPIDFILE
-        [ -d $I2PTEMP ] || mkdir $I2PTEMP 
+        [ -d $I2PTEMP ] || mkdir $I2PTEMP
 	chown -Rf $I2PUSER:$I2PUSER  $I2PTEMP/*i2p* $I2PTEMP/router.ping $RUN > /dev/null 2>&1
 	chown -f -R $I2PUSER:adm /var/log/$NAME
 	TZ=UTC start-stop-daemon --start --quiet -c $I2PUSER --pidfile $PIDFILE --exec $DAEMON $NICE -- \
@@ -115,6 +115,12 @@ do_stop()
 	[ -d $RUN ] && rmdir $RUN
 }
 
+do_dump()
+{
+	start-stop-daemon --stop --quiet -s 3 --pidfile $PIDFILE -u $I2PUSER
+	RETVAL="$?"
+	[ "$RETVAL" = 2 ] && return 2
+}
 
 case "$1" in
   start)
@@ -124,7 +130,15 @@ case "$1" in
                 0|1) log_end_msg 0 ;;
                 2) log_end_msg 1 ;;
         esac
-        ;;  
+        ;;
+  dump)
+        log_daemon_msg "Dumping $DESC" "$NAME"
+        do_dump
+        case "$?" in
+                0|1) log_end_msg 0 ;;
+                2) log_end_msg 1 ;;
+        esac
+        ;;
   stop)
 	log_daemon_msg "Stopping $DESC" "$NAME"
         do_stop
@@ -132,7 +146,7 @@ case "$1" in
                 0|1) log_end_msg 0 ;;
                 2) log_end_msg 1 ;;
         esac
-        ;;  
+        ;;
   status)
        status_of_proc -p $PIDFILE "$DAEMON" "$NAME" && exit 0 || exit $?
 	;;
@@ -156,7 +170,7 @@ case "$1" in
         ;;
 *)
 	N=/etc/init.d/$NAME
-	echo "Usage: $N {start|stop|status|restart|force-reload}" >&2
+	echo "Usage: $N {start|stop|dump|status|restart|force-reload}" >&2
 	exit 3
 	;;
 
