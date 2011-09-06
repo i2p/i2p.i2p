@@ -789,8 +789,8 @@
         <copy todir="pkg-temp/docs/" >
           <fileset dir="installer/resources/readme/" includes="readme*.html" />
           <fileset dir="installer/resources/proxy/" includes="*.ht" />
-          <!-- lang_ar.png added in 0.8.4 -->
-          <fileset dir="installer/resources/" includes="icons/flags/lang_ar.png" />
+          <!-- lang_ar.png added in 0.8.4, je.png and eu.png added in 0.8.9 -->
+          <fileset dir="installer/resources/icons/flags/" includes="lang_ar.png,je.png,eu.png" />
         </copy>
     </target>
 
