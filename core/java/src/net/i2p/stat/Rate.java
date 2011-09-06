@@ -14,7 +14,7 @@ import net.i2p.util.Log;
  * If value is always a constant, you should be using Frequency instead.
  */
 public class Rate {
-    private final static Log _log = new Log(Rate.class);
+    //private final static Log _log = new Log(Rate.class);
     private volatile double _currentTotalValue;
     private volatile long _currentEventCount;
     private volatile long _currentTotalEventTime;
@@ -35,7 +35,7 @@ public class Rate {
     private long _period;
 
     /** locked during coalesce and addData */
-    private final Object _lock = new Object();
+    // private final Object _lock = new Object();
 
     /** in the current (partial) period, what is the total value acrued through all events? */
     public double getCurrentTotalValue() {
@@ -157,7 +157,7 @@ public class Rate {
      * and the various get*Saturation*() and get*EventTime() methods will return zero.
      */
     public void addData(long value) {
-        synchronized (_lock) {
+        synchronized (this) {
             _currentTotalValue += value;
             _currentEventCount++;
             _lifetimeTotalValue += value;
@@ -199,7 +199,7 @@ public class Rate {
      * @param eventDuration how long it took to accrue this data (set to 0 if it was instantaneous)
      */
     public void addData(long value, long eventDuration) {
-        synchronized (_lock) {
+        synchronized (this) {
             _currentTotalValue += value;
             _currentEventCount++;
             _currentTotalEventTime += eventDuration;
@@ -215,7 +215,7 @@ public class Rate {
     public void coalesce() {
         long now = now();
         double correctedTotalValue; // for summaryListener which divides by rounded EventCount
-        synchronized (_lock) {
+        synchronized (this) {
             long measuredPeriod = now - _lastCoalesceDate;
             if (measuredPeriod < _period - SLACK) {
                 // no need to coalesce (assuming we only try to do so once per minute)
