@@ -3,6 +3,7 @@ package net.i2p.data;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashMap;
@@ -56,7 +57,7 @@ public class SDSCache<V extends SimpleDataStructure> {
     }
 
     /** the LRU cache */
-    private final Map<Integer, V> _cache;
+    private final Map<Integer, WeakReference<V>> _cache;
     /** the byte array length for the class we are caching */
     private final int _datalen;
     /** the constructor for the class we are caching */
@@ -111,7 +112,11 @@ public class SDSCache<V extends SimpleDataStructure> {
         V rv;
         Integer key = hashCodeOf(data);
         synchronized(_cache) {
-            rv = _cache.get(key);
+            WeakReference<V> ref = _cache.get(key);
+            if (ref != null)
+                rv = ref.get();
+            else
+                rv = null;
             if (rv != null && DataHelper.eq(data, rv.getData())) {
                 // found it, we don't need the data passed in any more
                 SimpleByteCache.release(data);
@@ -127,7 +132,7 @@ public class SDSCache<V extends SimpleDataStructure> {
                 } catch (InvocationTargetException e) {
                     throw new RuntimeException("SDSCache error", e);
                 }
-                _cache.put(key, rv);
+                _cache.put(key, new WeakReference(rv));
                found = 0;
             }
         }
