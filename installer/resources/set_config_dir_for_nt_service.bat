@@ -14,5 +14,5 @@ if "%1"=="uninstall" (
     echo wrapper.java.additional.5=-Di2p.dir.config="%ALLUSERSPROFILE%\Application Data\i2p" >> %_WRAPPER_CONF%
     goto end
 )
- 
+
 :end
