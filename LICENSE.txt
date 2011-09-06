@@ -194,7 +194,10 @@ Applications:
 
    Router console:
    Public domain.
-       Flag icons: public domain, courtesy mjames@gmail.com http://www.famfamfam.com/
+       Flag icons:
+         - Jersey and EU flag icons: public domain, courtesy Xrmap flag
+           collection http://www.arvernes.com/wiki/index.php/Xrmap
+         - All other flag icons: public domain, courtesy mjames@gmail.com http://www.famfamfam.com/
        Silk icons: See licenses/LICENSE-SilkIcons.txt
 
        GeoIP Data:
