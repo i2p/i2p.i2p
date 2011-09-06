@@ -26,6 +26,7 @@ import net.i2p.data.PublicKey;
 import net.i2p.data.SessionKey;
 import net.i2p.data.SessionTag;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleByteCache;
 
 /**
  * Handles the actual ElGamal+AES encryption and decryption scenarios using the
@@ -87,7 +88,7 @@ public class ElGamalAESEngine {
         }
 
         byte tag[] = new byte[32];
-        System.arraycopy(data, 0, tag, 0, tag.length);
+        System.arraycopy(data, 0, tag, 0, 32);
         SessionTag st = new SessionTag(tag);
         SessionKey key = keyManager.consumeTag(st);
         SessionKey foundKey = new SessionKey();
@@ -185,27 +186,30 @@ public class ElGamalAESEngine {
             return null;
         }
 
-        byte preIV[] = null;
-        
         int offset = 0;
         byte key[] = new byte[SessionKey.KEYSIZE_BYTES];
         System.arraycopy(elgDecr, offset, key, 0, SessionKey.KEYSIZE_BYTES);
         offset += SessionKey.KEYSIZE_BYTES;
         usedKey.setData(key);
-        preIV = new byte[32];
+        byte[] preIV = SimpleByteCache.acquire(32);
         System.arraycopy(elgDecr, offset, preIV, 0, 32);
         offset += 32;
 
         //_log.debug("Pre IV for decryptNewSession: " + DataHelper.toString(preIV, 32));
         //_log.debug("SessionKey for decryptNewSession: " + DataHelper.toString(key.getData(), 32));
-        Hash ivHash = _context.sha().calculateHash(preIV);
-        byte iv[] = new byte[16];
-        System.arraycopy(ivHash.getData(), 0, iv, 0, 16);
+
+        // use alternate calculateHash() method to avoid object churn and caching
+        //Hash ivHash = _context.sha().calculateHash(preIV);
+        //byte iv[] = new byte[16];
+        //System.arraycopy(ivHash.getData(), 0, iv, 0, 16);
+        byte[] iv = halfHash(preIV);
+        SimpleByteCache.release(preIV);
 
         // feed the extra bytes into the PRNG
         _context.random().harvester().feedEntropy("ElG/AES", elgDecr, offset, elgDecr.length - offset); 
 
         byte aesDecr[] = decryptAESBlock(data, 514, data.length-514, usedKey, iv, null, foundTags, foundKey);
+        SimpleByteCache.release(iv);
 
         //if (_log.shouldLog(Log.DEBUG))
         //    _log.debug("Decrypt with a NEW session successfull: # tags read = " + foundTags.size(),
@@ -238,15 +242,19 @@ public class ElGamalAESEngine {
      */
     private byte[] decryptExistingSession(byte data[], SessionKey key, PrivateKey targetPrivateKey, Set foundTags,
                                          SessionKey usedKey, SessionKey foundKey) throws DataFormatException {
-        byte preIV[] = new byte[32];
-        System.arraycopy(data, 0, preIV, 0, preIV.length);
-        Hash ivHash = _context.sha().calculateHash(preIV);
-        byte iv[] = new byte[16];
-        System.arraycopy(ivHash.getData(), 0, iv, 0, 16);
+        byte preIV[] = SimpleByteCache.acquire(32);
+        System.arraycopy(data, 0, preIV, 0, 32);
+        // use alternate calculateHash() method to avoid object churn and caching
+        //Hash ivHash = _context.sha().calculateHash(preIV);
+        //byte iv[] = new byte[16];
+        //System.arraycopy(ivHash.getData(), 0, iv, 0, 16);
+        byte[] iv = halfHash(preIV);
+        SimpleByteCache.release(preIV);
 
         //_log.debug("Pre IV for decryptExistingSession: " + DataHelper.toString(preIV, 32));
         //_log.debug("SessionKey for decryptNewSession: " + DataHelper.toString(key.getData(), 32));
         byte decrypted[] = decryptAESBlock(data, 32, data.length-32, key, iv, preIV, foundTags, foundKey);
+        SimpleByteCache.release(iv);
         if (decrypted == null) {
             // it begins with a valid session tag, but thats just a coincidence.
             //if (_log.shouldLog(Log.DEBUG))
@@ -336,7 +344,8 @@ public class ElGamalAESEngine {
             //System.arraycopy(decrypted, cur, hashval, 0, Hash.HASH_LENGTH);
             //readHash = new Hash();
             //readHash.setData(hashval);
-            readHash = Hash.create(decrypted, cur);
+            //readHash = Hash.create(decrypted, cur);
+            int hashIndex = cur;
             cur += Hash.HASH_LENGTH;
             byte flag = decrypted[cur++];
             if (flag == 0x01) {
@@ -348,9 +357,14 @@ public class ElGamalAESEngine {
             }
             byte unencrData[] = new byte[(int) len];
             System.arraycopy(decrypted, cur, unencrData, 0, (int)len);
-            cur += len;
-            Hash calcHash = _context.sha().calculateHash(unencrData);
-            boolean eq = calcHash.equals(readHash);
+            cur += (int) len;
+            // use alternate calculateHash() method to avoid object churn and caching
+            //Hash calcHash = _context.sha().calculateHash(unencrData);
+            //boolean eq = calcHash.equals(readHash);
+            byte[] calcHash = SimpleByteCache.acquire(32);
+            _context.sha().calculateHash(unencrData, 0, (int) len, calcHash, 0);
+            boolean eq = DataHelper.eq(decrypted, hashIndex, calcHash, 0, 32);
+            SimpleByteCache.release(calcHash);
             
             if (eq) {
                 // everything matches.  w00t.
@@ -457,7 +471,7 @@ public class ElGamalAESEngine {
         //_log.debug("Encrypting to a NEW session");
         byte elgSrcData[] = new byte[SessionKey.KEYSIZE_BYTES+32+158];
         System.arraycopy(key.getData(), 0, elgSrcData, 0, SessionKey.KEYSIZE_BYTES);
-        byte preIV[] = new byte[32];
+        byte preIV[] = SimpleByteCache.acquire(32);
         _context.random().nextBytes(preIV);
         System.arraycopy(preIV, 0, elgSrcData, SessionKey.KEYSIZE_BYTES, 32);
         byte rnd[] = new byte[158];
@@ -484,10 +498,15 @@ public class ElGamalAESEngine {
         
         // should we also feed the encrypted elG block into the harvester?
 
-        Hash ivHash = _context.sha().calculateHash(preIV);
-        byte iv[] = new byte[16];
-        System.arraycopy(ivHash.getData(), 0, iv, 0, 16);
+        // use alternate calculateHash() method to avoid object churn and caching
+        //Hash ivHash = _context.sha().calculateHash(preIV);
+        //byte iv[] = new byte[16];
+        //System.arraycopy(ivHash.getData(), 0, iv, 0, 16);
+        byte[] iv = halfHash(preIV);
+        SimpleByteCache.release(preIV);
+
         byte aesEncr[] = encryptAESBlock(data, key, iv, tagsForDelivery, newKey, paddedSize);
+        SimpleByteCache.release(iv);
         //_log.debug("AES encrypted length: " + aesEncr.length);
 
         byte rv[] = new byte[elgEncr.length + aesEncr.length];
@@ -522,14 +541,36 @@ public class ElGamalAESEngine {
 
         //_log.debug("Pre IV for encryptExistingSession (aka tag): " + currentTag.toString());
         //_log.debug("SessionKey for encryptNewSession: " + DataHelper.toString(key.getData(), 32));
-        Hash ivHash = _context.sha().calculateHash(rawTag);
-        byte iv[] = new byte[16];
-        System.arraycopy(ivHash.getData(), 0, iv, 0, 16);
+        // use alternate calculateHash() method to avoid object churn and caching
+        //Hash ivHash = _context.sha().calculateHash(rawTag);
+        //byte iv[] = new byte[16];
+        //System.arraycopy(ivHash.getData(), 0, iv, 0, 16);
+        byte[] iv = halfHash(rawTag);
         
         byte aesEncr[] = encryptAESBlock(data, key, iv, tagsForDelivery, newKey, paddedSize, SessionTag.BYTE_LENGTH);
+        SimpleByteCache.release(iv);
         // that prepended SessionTag.BYTE_LENGTH bytes at the beginning of the buffer
         System.arraycopy(rawTag, 0, aesEncr, 0, rawTag.length);
         return aesEncr;
+    }
+
+    /**
+     *  Generate the first 16 bytes of the SHA-256 hash of the data.
+     *
+     *  Here we are careful to use the SHA256Generator method that does not
+     *  generate a Hash object or cache the result.
+     *
+     *  @param preIV the 32 byte pre-IV. Caller should call SimpleByteCache.release(data) after use.
+     *  @return a 16 byte array. Caller should call SimpleByteCache.release(rv) after use.
+     *  @since 0.8.9
+     */
+    private byte[] halfHash(byte[] preIV) {
+        byte[] ivHash = SimpleByteCache.acquire(32);
+        _context.sha().calculateHash(preIV, 0, 32, ivHash, 0);
+        byte iv[] = SimpleByteCache.acquire(16);
+        System.arraycopy(ivHash, 0, iv, 0, 16);
+        SimpleByteCache.release(ivHash);
+        return iv;
     }
 
     /**
@@ -581,8 +622,10 @@ public class ElGamalAESEngine {
         DataHelper.toLong(aesData, cur, 4, data.length);
         cur += 4;
         //_log.debug("data length: " + data.length);
-        Hash hash = _context.sha().calculateHash(data);
-        System.arraycopy(hash.getData(), 0, aesData, cur, Hash.HASH_LENGTH);
+        // use alternate calculateHash() method to avoid object churn and caching
+        //Hash hash = _context.sha().calculateHash(data);
+        //System.arraycopy(hash.getData(), 0, aesData, cur, Hash.HASH_LENGTH);
+        _context.sha().calculateHash(data, 0, data.length, aesData, cur);
         cur += Hash.HASH_LENGTH;
         
         //_log.debug("hash of data: " + DataHelper.toString(hash.getData(), 32));
