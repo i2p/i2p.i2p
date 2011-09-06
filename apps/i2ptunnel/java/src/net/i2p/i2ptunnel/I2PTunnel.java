@@ -689,7 +689,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 notifyEvent("clientTaskId", Integer.valueOf(task.getId()));
             } catch (IllegalArgumentException iae) {
                 String msg = "Invalid I2PTunnel configuration to create an HTTP Proxy connecting to the router at " + host + ':'+ port +
-                             " and listening on " + listenHost + ':' + port;
+                             " and listening on " + listenHost + ':' + portNum;
                 _log.error(getPrefix() + msg, iae);
                 l.log(msg);
                 notifyEvent("clientTaskId", Integer.valueOf(-1));
@@ -765,7 +765,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 notifyEvent("httpclientTaskId", Integer.valueOf(task.getId()));
             } catch (IllegalArgumentException iae) {
                 String msg = "Invalid I2PTunnel configuration to create an HTTP Proxy connecting to the router at " + host + ':'+ port +
-                             " and listening on " + listenHost + ':' + port;
+                             " and listening on " + listenHost + ':' + clientPort;
                 _log.error(getPrefix() + msg, iae);
                 l.log(msg);
                 notifyEvent("httpclientTaskId", Integer.valueOf(-1));
@@ -833,7 +833,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 addtask(task);
             } catch (IllegalArgumentException iae) {
                 String msg = "Invalid I2PTunnel configuration to create a CONNECT client connecting to the router at " + host + ':'+ port +
-                             " and listening on " + listenHost + ':' + port;
+                             " and listening on " + listenHost + ':' + _port;
                 _log.error(getPrefix() + msg, iae);
                 l.log(msg);
                 // Since nothing listens to TaskID events, use this to propagate the error to TunnelController
@@ -899,7 +899,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 notifyEvent("ircclientTaskId", Integer.valueOf(task.getId()));
             } catch (IllegalArgumentException iae) {
                 String msg = "Invalid I2PTunnel configuration to create an IRC client connecting to the router at " + host + ':'+ port +
-                             " and listening on " + listenHost + ':' + port;
+                             " and listening on " + listenHost + ':' + _port;
                 _log.error(getPrefix() + msg, iae);
                 l.log(msg);
                 notifyEvent("ircclientTaskId", Integer.valueOf(-1));
@@ -953,7 +953,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 notifyEvent("sockstunnelTaskId", Integer.valueOf(task.getId()));
             } catch (IllegalArgumentException iae) {
                 String msg = "Invalid I2PTunnel configuration to create a SOCKS Proxy connecting to the router at " + host + ':'+ port +
-                             " and listening on " + listenHost + ':' + port;
+                             " and listening on " + listenHost + ':' + _port;
                 _log.error(getPrefix() + msg, iae);
                 l.log(msg);
                 notifyEvent("sockstunnelTaskId", Integer.valueOf(-1));
@@ -1000,7 +1000,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 notifyEvent("sockstunnelTaskId", Integer.valueOf(task.getId()));
             } catch (IllegalArgumentException iae) {
                 String msg = "Invalid I2PTunnel configuration to create a SOCKS IRC Proxy connecting to the router at " + host + ':'+ port +
-                             " and listening on " + listenHost + ':' + port;
+                             " and listening on " + listenHost + ':' + _port;
                 _log.error(getPrefix() + msg, iae);
                 l.log(msg);
                 notifyEvent("sockstunnelTaskId", Integer.valueOf(-1));
@@ -1050,7 +1050,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
                 notifyEvent("streamrtunnelTaskId", Integer.valueOf(task.getId()));
             } catch (IllegalArgumentException iae) {
                 String msg = "Invalid I2PTunnel configuration to create a Streamr Client connecting to the router at " + host + ':'+ port +
-                             " and sending to " + _host + ':' + port;
+                             " and sending to " + _host + ':' + _port;
                 _log.error(getPrefix() + msg, iae);
                 l.log(msg);
                 notifyEvent("streamrtunnnelTaskId", Integer.valueOf(-1));

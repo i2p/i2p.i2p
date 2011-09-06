@@ -15,6 +15,7 @@ import net.i2p.data.Hash;
 import net.i2p.data.SessionKey;
 import net.i2p.util.Log;
 import net.i2p.util.RandomSource;
+import net.i2p.util.SimpleByteCache;
 
 /** 
  * Dummy wrapper for AES cipher operation.
@@ -64,7 +65,7 @@ public class AESEngine {
     }
 
     /**
-     * Encrypt the SHA-256 Hash of the payload, the 4 byte length, and the payload,
+     * Encrypt the SHA-256 Hash of the IV, the 4 byte length, and the payload,
      * with random padding up to the paddedSize, rounded up to the next multiple of 16.
      *
      * @param paddedSize minimum size of the output
@@ -81,11 +82,8 @@ public class AESEngine {
         int padding = ElGamalAESEngine.getPaddingSize(size, paddedSize);
         
         byte data[] = new byte[size + padding];
-        Hash h = _context.sha().calculateHash(iv);
-        
-        int cur = 0;
-        System.arraycopy(h.getData(), 0, data, cur, Hash.HASH_LENGTH);
-        cur += Hash.HASH_LENGTH;
+        _context.sha().calculateHash(iv, 0, 16, data, 0);
+        int cur = Hash.HASH_LENGTH;
         
         DataHelper.toLong(data, cur, 4, payload.length);
         cur += 4;
@@ -116,16 +114,16 @@ public class AESEngine {
             return null;
         }
 
-        int cur = 0;
-        byte h[] = _context.sha().calculateHash(iv).getData();
-        for (int i = 0; i < Hash.HASH_LENGTH; i++) {
-            if (decr[i] != h[i]) {
+        byte h[] = SimpleByteCache.acquire(Hash.HASH_LENGTH);
+        _context.sha().calculateHash(iv, 0, 16, h, 0);
+        boolean eq = DataHelper.eq(decr, 0, h, 0, Hash.HASH_LENGTH);
+        SimpleByteCache.release(h);
+        if (!eq) {
                 _log.error("Hash does not match [key=" + sessionKey + " / iv =" + DataHelper.toString(iv, iv.length)
                            + "]", new Exception("Hash error"));
                 return null;
-            }
         }
-        cur += Hash.HASH_LENGTH;
+        int cur = Hash.HASH_LENGTH;
         
         long len = DataHelper.fromLong(decr, cur, 4);
         cur += 4;

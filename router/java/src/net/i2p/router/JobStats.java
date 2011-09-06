@@ -2,8 +2,11 @@ package net.i2p.router;
 
 import net.i2p.data.DataHelper;
 
-/** glorified struct to contain basic job stats */
-class JobStats {
+/**
+ *  Glorified struct to contain basic job stats.
+ *  Public for router console only.
+ */
+public class JobStats {
     private final String _job;
     private volatile long _numRuns;
     private volatile long _totalTime;

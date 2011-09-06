@@ -41,6 +41,7 @@ import net.i2p.util.Clock;
 import net.i2p.util.Log;
 import net.i2p.util.NativeBigInteger;
 import net.i2p.util.RandomSource;
+import net.i2p.util.SimpleByteCache;
 
 /** 
  * Wrapper for ElGamal encryption/signature schemes.
@@ -123,8 +124,7 @@ public class ElGamalEngine {
         byte d2[] = new byte[1+Hash.HASH_LENGTH+data.length];
         // FIXME this isn't a random nonzero byte!
         d2[0] = (byte)0xFF;
-        Hash hash = _context.sha().calculateHash(data);
-        System.arraycopy(hash.getData(), 0, d2, 1, Hash.HASH_LENGTH);
+        _context.sha().calculateHash(data, 0, data.length, d2, 1);
         System.arraycopy(data, 0, d2, 1+Hash.HASH_LENGTH, data.length);
         
         //long t0 = _context.clock().now();
@@ -221,12 +221,14 @@ public class ElGamalEngine {
         //byte hashData[] = new byte[Hash.HASH_LENGTH];
         //System.arraycopy(val, i + 1, hashData, 0, Hash.HASH_LENGTH);
         //Hash hash = new Hash(hashData);
-        Hash hash = Hash.create(val, i + 1);
+        //Hash hash = Hash.create(val, i + 1);
         byte rv[] = new byte[payloadLen];
         System.arraycopy(val, i + 1 + Hash.HASH_LENGTH, rv, 0, rv.length);
 
-        Hash calcHash = _context.sha().calculateHash(rv);
-        boolean ok = calcHash.equals(hash);
+        byte[] calcHash = SimpleByteCache.acquire(Hash.HASH_LENGTH);
+        _context.sha().calculateHash(rv, 0, payloadLen, calcHash, 0);
+        boolean ok = DataHelper.eq(calcHash, 0, val, i + 1, Hash.HASH_LENGTH);
+        SimpleByteCache.release(calcHash);
         
         long end = _context.clock().now();
 
@@ -243,7 +245,7 @@ public class ElGamalEngine {
             return rv;
         }
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Doesn't match hash [sent hash=" + hash + "]\ndata = "
+            _log.debug("Doesn't match hash data = "
                        + Base64.encode(rv), new Exception("Doesn't match"));
         return null;
     }

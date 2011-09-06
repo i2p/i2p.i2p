@@ -156,6 +156,15 @@ public class TunnelController implements Logging {
                 _log.warn("Cannot start the tunnel - no type specified");
             return;
         }
+        // Config options may have changed since instantiation, so do this again.
+        // Or should we take it out of the constructor completely?
+        if (type.endsWith("server") || getPersistentClientKey()) {
+            boolean ok = createPrivateKey();
+            if (!ok) {
+                log("Failed to start tunnel " + getName() + " as the private key file could not be created");
+                return;
+            }
+        }
         setI2CPOptions();
         setSessionOptions();
         if ("httpclient".equals(type)) {

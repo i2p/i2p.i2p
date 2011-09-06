@@ -21,7 +21,7 @@ import java.io.IOException;
  */
 public class PublicKey extends SimpleDataStructure {
     public final static int KEYSIZE_BYTES = 256;
-    private static final int CACHE_SIZE = 256;
+    private static final int CACHE_SIZE = 1024;
 
     private static final SDSCache<PublicKey> _cache = new SDSCache(PublicKey.class, KEYSIZE_BYTES, CACHE_SIZE);
 

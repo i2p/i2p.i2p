@@ -17,7 +17,7 @@ public abstract class JobImpl implements Job {
     private final JobTiming _timing;
     private static long _idSrc = 0;
     private final long _id;
-    private Exception _addedBy;
+    //private Exception _addedBy;
     private long _madeReadyOn;
     
     public JobImpl(RouterContext context) {
@@ -34,7 +34,7 @@ public abstract class JobImpl implements Job {
     @Override
     public String toString() { 
         StringBuilder buf = new StringBuilder(128);
-        buf.append(super.toString());
+        buf.append(getClass().getSimpleName());
         buf.append(": Job ").append(_id).append(": ").append(getName());
         return buf.toString();
     }
@@ -54,7 +54,7 @@ public abstract class JobImpl implements Job {
      *  @deprecated
      *  @return null always
      */
-    public Exception getAddedBy() { return _addedBy; }
+    public Exception getAddedBy() { return null; }
     public long getMadeReadyOn() { return _madeReadyOn; }
     public void madeReady() { _madeReadyOn = _context.clock().now(); }
     public void dropped() {}

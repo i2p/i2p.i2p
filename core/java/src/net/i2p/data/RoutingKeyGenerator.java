@@ -120,6 +120,7 @@ public class RoutingKeyGenerator {
         return SHA256Generator.getInstance().calculateHash(modVal);
     }
 
+/****
     public static void main(String args[]) {
         Hash k1 = new Hash();
         byte k1d[] = new byte[Hash.HASH_LENGTH];
@@ -137,4 +138,5 @@ public class RoutingKeyGenerator {
         } catch (Throwable t) { // nop
         }
     }
+****/
 }

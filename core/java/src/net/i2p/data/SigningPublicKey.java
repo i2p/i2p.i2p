@@ -22,7 +22,7 @@ import java.io.IOException;
  */
 public class SigningPublicKey extends SimpleDataStructure {
     public final static int KEYSIZE_BYTES = 128;
-    private static final int CACHE_SIZE = 256;
+    private static final int CACHE_SIZE = 1024;
 
     private static final SDSCache<SigningPublicKey> _cache = new SDSCache(SigningPublicKey.class, KEYSIZE_BYTES, CACHE_SIZE);
 
