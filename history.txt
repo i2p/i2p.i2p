@@ -1,4 +1,6 @@
 2011-09-06 zzz
+  * Console: Move configservice.jsp rendering code from
+    the router to the console
   * Crypto: Rework use of SHA256 for efficiency and
     to avoid clogging the Hash cache with one-time hashes,
     and avoiding the global cache lock.
