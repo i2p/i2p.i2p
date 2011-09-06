@@ -127,6 +127,32 @@ public class PrivateKeyFile {
         this.signingPrivKey = null;
     }
     
+    /** @since 0.8.9 */
+    public PrivateKeyFile(File file, I2PSession session) {
+        this(file, session.getMyDestination(), session.getDecryptionKey(), session.getPrivateKey());
+    }
+    
+    /** @since 0.8.9 */
+    public PrivateKeyFile(File file, Destination dest, PrivateKey pk, SigningPrivateKey spk) {
+        this.file = file;
+        this.client = null;
+        this.dest = dest;
+        this.privKey = pk;
+        this.signingPrivKey = spk;
+    }
+    
+    /** @since 0.8.9 */
+    public PrivateKeyFile(File file, PublicKey pubkey, SigningPublicKey spubkey, Certificate cert,
+                          PrivateKey pk, SigningPrivateKey spk) {
+        this.file = file;
+        this.client = null;
+        this.dest = new Destination();
+        this.dest.setPublicKey(pubkey);
+        this.dest.setSigningPublicKey(spubkey);
+        this.dest.setCertificate(cert);
+        this.privKey = pk;
+        this.signingPrivKey = spk;
+    }
     
     /** Also reads in the file to get the privKey and signingPrivKey, 
      *  which aren't available from I2PClient.
@@ -136,7 +162,10 @@ public class PrivateKeyFile {
             FileOutputStream out = null;
             try {
                 out = new FileOutputStream(this.file);
-                this.client.createDestination(out);
+                if (this.client != null)
+                    this.client.createDestination(out);
+                else
+                    write();
             } finally {
                 if (out != null) {
                     try { out.close(); } catch (IOException ioe) {}
@@ -411,8 +440,8 @@ public class PrivateKeyFile {
     
     
     
-    private File file;
-    private I2PClient client;
+    private final File file;
+    private final I2PClient client;
     private Destination dest;
     private PrivateKey privKey;
     private SigningPrivateKey signingPrivKey; 
