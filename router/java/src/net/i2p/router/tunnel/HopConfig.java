@@ -35,19 +35,8 @@ public class HopConfig {
     public static final int REPLY_IV_LENGTH = 16;
     
     public HopConfig() {
-        _receiveTunnelId = null;
-        _receiveFrom = null;
-        _sendTunnelId = null;
-        _sendTo = null;
-        _layerKey = null;
-        _ivKey = null;
         _creation = -1;
         _expiration = -1;
-        _options = null;
-        _messagesProcessed = 0;
-        _oldMessagesProcessed = 0;
-        _messagesSent = 0;
-        _oldMessagesSent = 0;
     }
     
     /** what tunnel ID are we receiving on? */
