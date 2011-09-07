@@ -13,12 +13,13 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.BlockingQueue;
@@ -45,7 +46,7 @@ public class JobQueue {
     private volatile static int _runnerId = 0;
     /** list of jobs that are ready to run ASAP */
     private final BlockingQueue<Job> _readyJobs;
-    /** list of jobs that are scheduled for running in the future */
+    /** SortedSet of jobs that are scheduled for running in the future, earliest first */
     private final Set<Job> _timedJobs;
     /** job name to JobStat for that job */
     private final Map<String, JobStats> _jobStats;
@@ -137,11 +138,10 @@ public class JobQueue {
 
         _alive = true;
         _readyJobs = new LinkedBlockingQueue();
-        _timedJobs = new HashSet(64);
+        _timedJobs = new TreeSet(new JobComparator());
         _jobLock = new Object();
         _queueRunners = new ConcurrentHashMap(RUNNERS);
         _jobStats = new ConcurrentHashMap();
-        _allowParallelOperation = false;
         _pumper = new QueuePumper();
         I2PThread pumperThread = new I2PThread(_pumper, "Job Queue Pumper", true);
         //pumperThread.setPriority(I2PThread.NORM_PRIORITY+1);
@@ -168,8 +168,11 @@ public class JobQueue {
                 alreadyExists = true;
             numReady = _readyJobs.size();
             if (!alreadyExists) {
-                if (_timedJobs.contains(job))
-                    alreadyExists = true;
+                //if (_timedJobs.contains(job))
+                //    alreadyExists = true;
+                // Always remove and re-add, since it needs to be
+                // re-sorted in the TreeSet.
+                _timedJobs.remove(job);
             }
 
             if (shouldDrop(job, numReady)) {
@@ -185,10 +188,11 @@ public class JobQueue {
                         _readyJobs.offer(job);
                     } else {
                         _timedJobs.add(job);
+                        // only notify for _timedJobs, as _readyJobs does not use that lock
+                        _jobLock.notifyAll();
                     }
                 }
             }
-            _jobLock.notifyAll();
         }
         
         _context.statManager().addRateData("jobQueue.readyJobs", numReady, 0);
@@ -468,8 +472,11 @@ public class JobQueue {
                                     toAdd.add(j);
                                     iter.remove();
                                 } else {
-                                    if ( (timeToWait <= 0) || (timeLeft < timeToWait) )
+                                    //if ( (timeToWait <= 0) || (timeLeft < timeToWait) )
+                                    // _timedJobs is now a TreeSet, so once we hit one that is
+                                    // not ready yet, we can break
                                         timeToWait = timeLeft;
+                                        break;
                                 }
                             }
 
@@ -607,6 +614,32 @@ public class JobQueue {
         public void runJob() {}
         public Exception getAddedBy() { return null; }
         public void dropped() {}
+    }
+
+    /**
+     *  Comparator for the _timedJobs TreeSet.
+     *  Ensure different jobs with the same timing are different so they aren't removed.
+     *  @since 0.8.9
+     */
+    private static class JobComparator implements Comparator<Job> {
+         public int compare(Job l, Job r) {
+             // equals first, Jobs generally don't override so this should be fast
+             if (l.equals(r))
+                 return 0;
+             // This is for _timedJobs, which always have a JobTiming.
+             // PoisonJob only goes in _readyJobs.
+             long ld = l.getTiming().getStartAfter() - r.getTiming().getStartAfter();
+             if (ld < 0)
+                 return -1;
+             if (ld > 0)
+                 return 1;
+             ld = l.getJobId() - r.getJobId();
+             if (ld < 0)
+                 return -1;
+             if (ld > 0)
+                 return 1;
+             return l.hashCode() - r.hashCode();
+        }
     }
 
     /**

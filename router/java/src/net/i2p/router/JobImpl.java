@@ -8,14 +8,17 @@ package net.i2p.router;
  *
  */
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import net.i2p.util.Log;
+
 /**
  * Base implementation of a Job
  */
 public abstract class JobImpl implements Job {
     private final RouterContext _context;
     private final JobTiming _timing;
-    private static long _idSrc = 0;
+    private static AtomicLong _idSrc = new AtomicLong();
     private final long _id;
     //private Exception _addedBy;
     private long _madeReadyOn;
@@ -23,7 +26,7 @@ public abstract class JobImpl implements Job {
     public JobImpl(RouterContext context) {
         _context = context;
         _timing = new JobTiming(context);
-        _id = ++_idSrc;
+        _id = _idSrc.incrementAndGet();
     }
     
     public long getJobId() { return _id; }
