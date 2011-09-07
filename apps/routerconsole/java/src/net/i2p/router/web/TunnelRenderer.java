@@ -32,6 +32,8 @@ import net.i2p.util.ObjectCounter;
  */
 public class TunnelRenderer {
     private RouterContext _context;
+
+    private static final int DISPLAY_LIMIT = 200;
     
     public TunnelRenderer(RouterContext ctx) {
         _context = ctx;
@@ -77,12 +79,17 @@ public class TunnelRenderer {
         if (rs != null)
             processed = (long)rs.getRate(10*60*1000).getLifetimeTotalValue();
         int inactive = 0;
+        int displayed = 0;
         for (int i = 0; i < participating.size(); i++) {
             HopConfig cfg = (HopConfig)participating.get(i);
-            if (cfg.getProcessedMessagesCount() <= 0) {
+            long count = cfg.getProcessedMessagesCount();
+            if (count <= 0) {
                 inactive++;
                 continue;
             }
+            processed += count;
+            if (++displayed > DISPLAY_LIMIT)
+                continue;
             out.write("<tr>");
             if (cfg.getReceiveTunnel() != null)
                 out.write("<td class=\"cells\" align=\"center\">" + cfg.getReceiveTunnel().getTunnelId() +"</td>");
@@ -120,9 +127,10 @@ public class TunnelRenderer {
             else
                 out.write("<td class=\"cells\" align=\"center\">" + _("Participant") + "</td>");
             out.write("</tr>\n");
-            processed += cfg.getProcessedMessagesCount();
         }
         out.write("</table>\n");
+        if (displayed > DISPLAY_LIMIT)
+            out.write("<div class=\"statusnotes\"><b>" + _("Limited display to the {0} tunnels with the highest usage", DISPLAY_LIMIT)  + "</b></div>\n");
         out.write("<div class=\"statusnotes\"><b>" + _("Inactive participating tunnels") + ": " + inactive + "</b></div>\n");
         out.write("<div class=\"statusnotes\"><b>" + _("Lifetime bandwidth usage") + ": " + DataHelper.formatSize2(processed*1024) + "B</b></div>\n");
         renderPeers(out);
@@ -338,5 +346,10 @@ public class TunnelRenderer {
     /** translate a string */
     private String _(String s) {
         return Messages.getString(s, _context);
+    }
+
+    /** translate a string */
+    public String _(String s, Object o) {
+        return Messages.getString(s, o, _context);
     }
 }
