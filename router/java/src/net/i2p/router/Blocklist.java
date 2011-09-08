@@ -472,7 +472,7 @@ public class Blocklist {
      * this tries to not return duplicates
      * but I suppose it could.
      */
-    public List<byte[]> getAddresses(Hash peer) {
+    private List<byte[]> getAddresses(Hash peer) {
         List<byte[]> rv = new ArrayList(1);
         RouterInfo pinfo = _context.netDb().lookupRouterInfoLocally(peer);
         if (pinfo == null) return rv;
@@ -515,7 +515,7 @@ public class Blocklist {
             if (isBlocklisted(ip)) {
                 if (! _context.shitlist().isShitlisted(peer))
                     // nice knowing you...
-                    shitlist(peer);
+                    shitlist(peer, ip);
                 return true;
             }
         }
@@ -678,9 +678,10 @@ public class Blocklist {
      * actual line in the blocklist file, this could take a while.
      *
      */
-    public void shitlist(Hash peer) {
+    private void shitlist(Hash peer, byte[] ip) {
         // Temporary reason, until the job finishes
-        _context.shitlist().shitlistRouterForever(peer, _x("IP banned"));
+        String reason = _x("IP banned by blocklist.txt entry {0}");
+        _context.shitlist().shitlistRouterForever(peer, reason, toStr(ip));
         if (!  _context.getBooleanPropertyDefaultTrue(PROP_BLOCKLIST_DETAIL))
             return;
         boolean shouldRunJob;
