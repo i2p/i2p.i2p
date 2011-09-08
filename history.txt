@@ -1,3 +1,10 @@
+2011-09-08 zzz
+  * Blocklist: Include IP in shitlist reason
+  * Ministreaming: Drop old classes replaced by streaming
+    years ago.
+  * NTCP: Hopefully fix race NPE, thx devzero
+  * Tunnels: Limit Bloom filter size based on max memory
+
 2011-09-07 zzz
   * Console: Limit max displayed participating tunnels
   * JobQueue: Change queue from a Set to a TreeSet for more efficiency
@@ -6,7 +13,7 @@
     time List for space savings.
 
 2011-09-06 zzz
-  * Console: Move configservice.jsp rendering code from
+  * Console: Move jobs.jsp rendering code from
     the router to the console
   * Crypto: Rework use of SHA256 for efficiency and
     to avoid clogging the Hash cache with one-time hashes,

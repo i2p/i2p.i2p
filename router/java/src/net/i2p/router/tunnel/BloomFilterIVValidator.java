@@ -13,9 +13,9 @@ import net.i2p.util.DecayingHashSet;
  *
  */
 public class BloomFilterIVValidator implements IVValidator {
-    private RouterContext _context;
-    private DecayingBloomFilter _filter;
-    private ByteCache _ivXorCache = ByteCache.getInstance(32, HopProcessor.IV_LENGTH);
+    private final RouterContext _context;
+    private final DecayingBloomFilter _filter;
+    private final ByteCache _ivXorCache = ByteCache.getInstance(32, HopProcessor.IV_LENGTH);
     
     /**
      * After 2*halflife, an entry is completely forgotten from the bloom filter.
@@ -27,18 +27,24 @@ public class BloomFilterIVValidator implements IVValidator {
     private static final int MIN_SHARE_KBPS_TO_USE_BLOOM = 64;
     private static final int MIN_SHARE_KBPS_FOR_BIG_BLOOM = 512;
     private static final int MIN_SHARE_KBPS_FOR_HUGE_BLOOM = 1536;
+    private static final long MIN_MEM_TO_USE_BLOOM = 64*1024*1024l;
+    private static final long MIN_MEM_FOR_BIG_BLOOM = 128*1024*1024l;
+    private static final long MIN_MEM_FOR_HUGE_BLOOM = 256*1024*1024l;
 
     public BloomFilterIVValidator(RouterContext ctx, int KBps) {
         _context = ctx;
-        // Select the filter based on share bandwidth.
+        // Select the filter based on share bandwidth and memory.
         // Note that at rates above 512KB, we increase the filter size
         // to keep acceptable false positive rates.
         // See DBF, BloomSHA1, and KeySelector for details.
-        if (KBps < MIN_SHARE_KBPS_TO_USE_BLOOM)
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        if (maxMemory == Long.MAX_VALUE)
+            maxMemory = 96*1024*1024l;
+        if (KBps < MIN_SHARE_KBPS_TO_USE_BLOOM || maxMemory < MIN_MEM_TO_USE_BLOOM)
             _filter = new DecayingHashSet(ctx, HALFLIFE_MS, 16, "TunnelIVV"); // appx. 4MB max
-        else if (KBps >= MIN_SHARE_KBPS_FOR_HUGE_BLOOM)
+        else if (KBps >= MIN_SHARE_KBPS_FOR_HUGE_BLOOM && maxMemory >= MIN_MEM_FOR_HUGE_BLOOM)
             _filter = new DecayingBloomFilter(ctx, HALFLIFE_MS, 16, "TunnelIVV", 25);  // 8MB fixed
-        else if (KBps >= MIN_SHARE_KBPS_FOR_BIG_BLOOM)
+        else if (KBps >= MIN_SHARE_KBPS_FOR_BIG_BLOOM && maxMemory >= MIN_MEM_FOR_BIG_BLOOM)
             _filter = new DecayingBloomFilter(ctx, HALFLIFE_MS, 16, "TunnelIVV", 24);  // 4MB fixed
         else
             _filter = new DecayingBloomFilter(ctx, HALFLIFE_MS, 16, "TunnelIVV");  // 2MB fixed
