@@ -162,6 +162,9 @@ class Reader {
             if (est.isComplete() && est.getExtraBytes() != null)
                 con.recvEncryptedI2NP(ByteBuffer.wrap(est.getExtraBytes()));
         }
+        // catch race?
+        if (!con.isEstablished())
+            return;
         while (!con.isClosed() && (buf = con.getNextReadBuf()) != null) {
             // decrypt the data and push it into an i2np message
             if (_log.shouldLog(Log.DEBUG))
