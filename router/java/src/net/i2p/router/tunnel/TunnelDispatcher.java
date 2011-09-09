@@ -792,8 +792,9 @@ public class TunnelDispatcher implements Service {
                 if (exp < now) {
                     _configs.poll();
                     remove(cur);
-                } else if (exp < nextTime) {
-                    nextTime = exp;
+                } else {
+                    if (exp < nextTime)
+                        nextTime = exp;
                     break;
                 }
             }

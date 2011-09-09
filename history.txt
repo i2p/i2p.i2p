@@ -1,3 +1,7 @@
+2011-09-09 zzz
+  * TunnelDispatcher: Fix bug in -13 preventing participating
+    tunnels from being expired and causing high CPU usage
+
 2011-09-08 zzz
   * Blocklist: Include IP in shitlist reason
   * Ministreaming: Drop old classes replaced by streaming
