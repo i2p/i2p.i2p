@@ -1117,6 +1117,10 @@ installdaemon() {
                         /sbin/chkconfig "$APP_NAME" on
                     fi
                 fi
+            elif [ -f /etc/arch-release ]; then
+                eval echo `gettext 'Detected Arch Linux:'`
+                eval echo `gettext 'Installing as a daemon is not yet supported in Arch Linux.'`
+                exit 1
             elif [ -f /etc/SuSE-release ] ; then
                 eval echo `gettext 'Detected SuSE or SLES:'`
                 if [ -f "/etc/init.d/$APP_NAME" ] ; then
