@@ -13,6 +13,8 @@ import net.i2p.data.RouterInfo;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.tunnel.TunnelCreatorConfig;
+import net.i2p.stat.Rate;
+import net.i2p.stat.RateStat;
 import net.i2p.stat.StatManager;
 import net.i2p.util.Log;
 
@@ -79,13 +81,31 @@ class BuildExecutor implements Runnable {
         statMgr.createRateStat("tunnel.tierRejectUnknown", "Rejected joins from unknown", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         statMgr.createRateStat("tunnel.tierExpireUnknown", "Expired joins from unknown", "Tunnels", new long[] { 60*1000, 10*60*1000 });
 
-        _repoll = false;
         _handler = new BuildHandler(ctx, this);
     }
     
     private int allowed() {
         int maxKBps = _context.bandwidthLimiter().getOutboundKBytesPerSecond();
         int allowed = maxKBps / 6; // Max. 1 concurrent build per 6 KB/s outbound
+        RateStat rs = _context.statManager().getRate("tunnel.buildRequestTime");
+        if (rs != null) {
+            Rate r = rs.getRate(60*1000);
+            double avg = 0;
+            if (r != null)
+                avg = r.getAverageValue();
+            if (avg <= 0)
+                avg = rs.getLifetimeAverageValue();
+            if (avg > 1) {
+                // If builds take more than 75 ms, start throttling
+                int throttle = (int) (75 * MAX_CONCURRENT_BUILDS / avg);
+                if (throttle < allowed) {
+                    allowed = throttle;
+                    if (allowed < MAX_CONCURRENT_BUILDS && _log.shouldLog(Log.INFO))
+                        _log.info("Throttling max builds to " + allowed +
+                                  " due to avg build time of " + ((int) avg) + " ms");
+                }
+            }
+        }
         if (allowed < 2) allowed = 2; // Never choke below 2 builds (but congestion may)
         if (allowed > MAX_CONCURRENT_BUILDS) allowed = MAX_CONCURRENT_BUILDS; // Never go beyond 10, that is uncharted territory (old limit was 5)
         allowed = _context.getProperty("router.tunnelConcurrentBuilds", allowed);
@@ -279,7 +299,7 @@ class BuildExecutor implements Runnable {
                 //if (_log.shouldLog(Log.DEBUG))
                 //    _log.debug("Zero hops built, Allowed: " + allowed + " wanted: " + wanted);
 
-                int realBuilt = 0;
+                //int realBuilt = 0;
                 TunnelManagerFacade mgr = _context.tunnelManager();
                 if ( (mgr == null) || (mgr.selectInboundTunnel() == null) || (mgr.selectOutboundTunnel() == null) ) {
                     // we don't have either inbound or outbound tunnels, so don't bother trying to build
@@ -320,7 +340,7 @@ class BuildExecutor implements Runnable {
                                 if (_log.shouldLog(Log.DEBUG))
                                     _log.debug("Configuring new tunnel " + i + " for " + pool + ": " + cfg);
                                 buildTunnel(pool, cfg);
-                                realBuilt++;
+                                //realBuilt++;
                             } else {
                                 i--;
                             }
@@ -439,9 +459,9 @@ class BuildExecutor implements Runnable {
         BuildRequestor.request(_context, pool, cfg, this);
         long buildTime = System.currentTimeMillis() - beforeBuild;
         if (cfg.getLength() <= 1)
-            _context.statManager().addRateData("tunnel.buildRequestZeroHopTime", buildTime, buildTime);
+            _context.statManager().addRateData("tunnel.buildRequestZeroHopTime", buildTime, 0);
         else
-            _context.statManager().addRateData("tunnel.buildRequestTime", buildTime, buildTime);
+            _context.statManager().addRateData("tunnel.buildRequestTime", buildTime, 0);
         long id = cfg.getReplyMessageId();
         if (id > 0) {
             synchronized (_recentBuildIds) { 
@@ -465,8 +485,17 @@ class BuildExecutor implements Runnable {
         pool.buildComplete(cfg);
         if (cfg.getLength() > 1)
             removeFromBuilding(cfg.getReplyMessageId());
-        synchronized (_currentlyBuilding) { 
-            _currentlyBuilding.notifyAll();
+        // Only wake up the build thread if it took a reasonable amount of time -
+        // this prevents high CPU usage when there is no network connection
+        // (via BuildRequestor.TunnelBuildFirstHopFailJob)
+        long buildTime = _context.clock().now() + 10*60*1000- cfg.getExpiration();
+        if (buildTime > 250) {
+            synchronized (_currentlyBuilding) { 
+                _currentlyBuilding.notifyAll();
+            }
+        } else {
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Build complete really fast (" + buildTime + " ms) for tunnel: " + cfg);
         }
         
         long expireBefore = _context.clock().now() + 10*60*1000 - BuildRequestor.REQUEST_TIMEOUT;

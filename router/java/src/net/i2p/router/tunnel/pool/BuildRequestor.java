@@ -146,6 +146,8 @@ abstract class BuildRequestor {
                           + cfg.getPeer(0).toBase64() + " for " + cfg + " waiting for the reply of "
                           + cfg.getReplyMessageId());
             // send it out a tunnel targetting the first hop
+            // TODO - would be nice to have a TunnelBuildFirstHopFailJob queued if the
+            // pairedTunnel is zero-hop, but no way to do that?
             ctx.tunnelDispatcher().dispatchOutbound(msg, pairedTunnel.getSendTunnelId(0), cfg.getPeer(0));
         } else {
             if (log.shouldLog(Log.INFO))
