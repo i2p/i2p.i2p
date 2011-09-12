@@ -1,4 +1,5 @@
 2011-09-12 zzz
+  * build.xml: Run test scripts at release time
   * Build Executor:
     - Limit max parallel builds on really slow machines (ticket #519)
     - Slow down build loop when network is apparently disconnected (ticket #519)

@@ -1125,6 +1125,14 @@
 		<ant dir="router/java/" target="fullclovertest" />
     </target>
 
+    <target name="testscripts" >
+        <exec executable="tests/scripts/checkcerts.sh" failonerror="true" />
+        <exec executable="tests/scripts/checkpo.sh" failonerror="true" />
+        <exec executable="tests/scripts/checkutf8.sh" failonerror="true" />
+        <exec executable="tests/scripts/checkxml.sh" failonerror="true" />
+    </target>
+
+
     <!-- <target name="syndie" >
         <ant dir="apps/syndie/java/" target="standalone" />
         <copy file="apps/syndie/java/syndie-standalone.zip" todir="." />
@@ -1185,7 +1193,7 @@
 <!--
     <target name="release" depends="distclean, updaterWithJettyFixesAndJbigi , updater200WithJettyFixes, preppkg, installer, getReleaseNumber" >
 -->
-    <target name="release" depends="distclean, updater, updater200, preppkg, installer, getReleaseNumber" >
+    <target name="release" depends="distclean, testscripts, updater, updater200, preppkg, installer, getReleaseNumber" >
         <echo message="================================================================" />
         <echo message="Did you update these files?" />
         <exec executable="ls" failonerror="true">

@@ -11,10 +11,6 @@
 cd `dirname $0`/../..
 
 XMLFILES="\
-./android/AndroidManifest.xml \
-./android/build.xml \
-./android/res/layout/main.xml \
-./android/res/values/strings.xml \
 ./apps/addressbook/build.xml \
 ./apps/addressbook/web.xml \
 ./apps/BOB/build.xml \
