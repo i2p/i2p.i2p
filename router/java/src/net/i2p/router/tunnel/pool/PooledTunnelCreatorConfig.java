@@ -10,7 +10,7 @@ import net.i2p.router.tunnel.TunnelCreatorConfig;
 import net.i2p.util.Log;
 
 /**
- *
+ *  Data about a tunnel we created
  */
 class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
     private TunnelPool _pool;
@@ -28,7 +28,7 @@ class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
         super(ctx, length, isInbound, destination);
     }
     
-    // calls TestJob
+    /** calls TestJob */
     @Override
     public void testSuccessful(int ms) {
         if (_testJob != null)
@@ -37,7 +37,7 @@ class PooledTunnelCreatorConfig extends TunnelCreatorConfig {
         _live = true;
     }
     
-    // called from TestJob
+    /** called from TestJob */
     public void testJobSuccessful(int ms) {
         super.testSuccessful(ms);
         _live = true;

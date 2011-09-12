@@ -26,7 +26,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.data.DataHelper;
-import net.i2p.router.networkdb.HandleDatabaseLookupMessageJob;
+import net.i2p.router.networkdb.kademlia.HandleFloodfillDatabaseLookupMessageJob;
 import net.i2p.util.Clock;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
@@ -175,7 +175,7 @@ public class JobQueue {
                 _timedJobs.remove(job);
             }
 
-            if (shouldDrop(job, numReady)) {
+            if ((!alreadyExists) && shouldDrop(job, numReady)) {
                 job.dropped();
                 dropped = true;
             } else {
@@ -256,14 +256,16 @@ public class JobQueue {
     private boolean shouldDrop(Job job, long numReady) {
         if (_maxWaitingJobs <= 0) return false; // dont ever drop jobs
         if (!_allowParallelOperation) return false; // dont drop during startup [duh]
-        Class cls = job.getClass();
         if (numReady > _maxWaitingJobs) {
+            Class cls = job.getClass();
             // lets not try to drop too many tunnel messages...
             //if (cls == HandleTunnelMessageJob.class)
             //    return true;
                 
             // we don't really *need* to answer DB lookup messages
-            if (cls == HandleDatabaseLookupMessageJob.class)
+            // This is pretty lame, there's actually a ton of different jobs we
+            // could drop, but is it worth making a list?
+            if (cls == HandleFloodfillDatabaseLookupMessageJob.class)
                 return true;
 
         }
@@ -475,6 +477,11 @@ public class JobQueue {
                                     //if ( (timeToWait <= 0) || (timeLeft < timeToWait) )
                                     // _timedJobs is now a TreeSet, so once we hit one that is
                                     // not ready yet, we can break
+                                    // NOTE: By not going through the whole thing, a single job changing
+                                    // setStartAfter() to some far-away time, without
+                                    // calling addJob(), could clog the whole queue forever.
+                                    // Hopefully nobody does that, and as a backup, we hope
+                                    // that the TreeSet will eventually resort it from other addJob() calls.
                                         timeToWait = timeLeft;
                                         break;
                                 }
@@ -654,7 +661,7 @@ public class JobQueue {
      *  @since 0.8.9
      */
     public int getJobs(Collection<Job> readyJobs, Collection<Job> timedJobs,
-                        Collection<Job> activeJobs, Collection<Job> justFinishedJobs) {
+                       Collection<Job> activeJobs, Collection<Job> justFinishedJobs) {
         for (JobQueueRunner runner :_queueRunners.values()) {
             Job job = runner.getCurrentJob();
             if (job != null) {

@@ -1,3 +1,9 @@
+2011-09-12 zzz
+  * Build Executor:
+    - Limit max parallel builds on really slow machines (ticket #519)
+    - Slow down build loop when network is apparently disconnected (ticket #519)
+  * NetDB: Disable floodfill at shutdown time if enabled
+
 2011-09-09 zzz
   * TunnelDispatcher: Fix bug in -13 preventing participating
     tunnels from being expired and causing high CPU usage
