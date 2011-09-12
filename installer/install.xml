@@ -134,6 +134,7 @@
             <parsable targetfile="$INSTALL_PATH/wrapper.config" type="plain" />
             <parsable targetfile="$INSTALL_PATH/i2prouter" type="shell" os="unix|mac" />
             <parsable targetfile="$INSTALL_PATH/eepget" type="shell" os="unix|mac" />
+            <parsable targetfile="$INSTALL_PATH/eepget.bat" type="shell" osfamily="windows" />
             <parsable targetfile="$INSTALL_PATH/runplain.sh" type="shell" os="unix|mac" />
             <parsable targetfile="$INSTALL_PATH/Start I2P Router.app/Contents/MacOS/i2prouter" type="shell" os="mac" />
             
