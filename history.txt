@@ -2,6 +2,7 @@
   * Build Executor:
     - Limit max parallel builds on really slow machines (ticket #519)
     - Slow down build loop when network is apparently disconnected (ticket #519)
+  * i2psnark: Fix inaccuracy in the completed bytes display
   * NetDB: Disable floodfill at shutdown time if enabled
 
 2011-09-09 zzz

@@ -780,6 +780,26 @@ public class Snark
     }
 
     /**
+     *  @return exact value. or -1 if no storage yet.
+     *          getNeeded() * pieceLength(0) isn't accurate if last piece
+     *          is still needed.
+     *  @since 0.8.9
+     */
+    public long getRemainingLength() {
+        if (meta != null && storage != null) {
+            long needed = storage.needed();
+            long length0 = meta.getPieceLength(0);
+            long remaining = needed * length0;
+            // fixup if last piece is needed
+            int last = meta.getPieces() - 1;
+            if (last != 0 && !storage.getBitField().get(last))
+                remaining -= length0 - meta.getPieceLength(last);
+            return remaining;
+        }
+        return -1;
+    }
+
+    /**
      *  @return number of pieces still needed (magnet mode or not), or -1 if unknown
      *  @since 0.8.4
      */

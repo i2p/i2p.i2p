@@ -765,8 +765,7 @@ public class I2PSnarkServlet extends Default {
             }
         }
         long total = snark.getTotalLength();
-        // Early typecast, avoid possibly overflowing a temp integer
-        long remaining = (long) snark.getNeeded() * (long) snark.getPieceLength(0); 
+        long remaining = snark.getRemainingLength(); 
         if (remaining > total)
             remaining = total;
         long downBps = snark.getDownloadRate();
