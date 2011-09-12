@@ -80,6 +80,31 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     }
     
     /**
+     *  If we are floodfill, turn it off and tell everybody.
+     *  @since 0.8.9
+     */
+    @Override
+    public void shutdown() {
+        if (_floodfillEnabled) {
+            // turn off to build a new RI...
+            _floodfillEnabled = false;
+            // true -> publish inline
+            // but job queue is already shut down, so sendStore() called by rebuildRouterInfo() won't work...
+            _context.router().rebuildRouterInfo(true);
+            // ...so force a flood here
+            RouterInfo local = _context.router().getRouterInfo();
+            if (local != null && _context.router().getUptime() > PUBLISH_JOB_DELAY) {
+                flood(local);
+                // let the messages get out...
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException ie) {}
+            }
+        }
+        super.shutdown();
+    }
+
+    /**
      *  This maybe could be shorter than RepublishLeaseSetJob.REPUBLISH_LEASESET_TIMEOUT,
      *  because we are sending direct, but unresponsive floodfills may take a while due to timeouts.
      */
