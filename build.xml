@@ -1061,8 +1061,19 @@
 	    <arg value="${basedir}/i2pinstall_${release.number}-osx-only.jar" />
 	    <arg value="${basedir}/pkg-temp/osx/i2p-${release.number}-osx-install.app" />
 	</exec>
-	<zip destfile="${basedir}/i2pinstall_${release.number}-osx.zip" level="9"
-	    basedir="${basedir}/pkg-temp/osx" whenempty="fail" comment="${release.number}-${build.number}"/>
+	<exec executable="chmod" failonerror="true" osfamily="unix">
+		<arg value="755" />
+		<arg value="${basedir}/pkg-temp/osx/i2p-${release.number}-osx-install.app/Contents/MacOS/JavaApplicationStub" />
+	</exec>
+	<exec executable="tar" osfamily="unix" failonerror="true">
+		<arg value="--owner=root" />
+		<arg value="--group=root" />
+		<arg value="-cjvf" />
+		<arg value="${basedir}/i2pinstall_${release.number}-osx.tar.bz2" />
+		<arg value="-C" />
+		<arg value="${basedir}/pkg-temp/osx" />
+		<arg value="i2p-${release.number}-osx-install.app" />
+	</exec>
     </target>
 
     <!-- Yes, even though this makes an installer for Windows, we still need to depend on preppkg-unix (because the installer attempts to delete these files
