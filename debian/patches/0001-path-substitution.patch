@@ -23,7 +23,7 @@ Debian wrapper.config to try to prevent confusion.
  java -cp "$I2P/lib/i2p.jar" net.i2p.util.EepGet "$@"
 --- a/installer/resources/i2prouter
 +++ b/installer/resources/i2prouter
-@@ -22,8 +22,8 @@
+@@ -28,8 +28,8 @@
  # Note that (percent)INSTALL_PATH and (percent)SYSTEM_java_io_tmpdir
  # should have been replaced by the izpack installer.
  # If you did not run the installer, replace them with the appropriate path.
@@ -34,8 +34,8 @@ Debian wrapper.config to try to prevent confusion.
  # PORTABLE installation:
  # Use the following instead.
  #I2PTEMP="%INSTALL_PATH"
-@@ -35,8 +35,8 @@
- APP_LONG_NAME="I2P Service"
+@@ -49,8 +49,8 @@
+ #RUN_AS_USER=
  
  # Wrapper
 -WRAPPER_CMD="$I2P/i2psvc"
@@ -43,8 +43,8 @@ Debian wrapper.config to try to prevent confusion.
 +WRAPPER_CMD="/usr/sbin/wrapper"
 +WRAPPER_CONF="/etc/i2p/wrapper.config"
  
- unsupported() {
-     echo "The most likely reason is that a supported version of the java"
+ # Priority at which to run the wrapper.  See "man nice" for valid priorities.
+ #  nice is only used if a priority is specified.
 --- a/installer/resources/runplain.sh
 +++ b/installer/resources/runplain.sh
 @@ -11,8 +11,8 @@
