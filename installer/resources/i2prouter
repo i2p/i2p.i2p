@@ -59,6 +59,10 @@ PRIORITY=
 # Location of the pid file.
 PIDDIR="$I2PTEMP"
 
+# If you'd like to run I2P as root (not recommended), uncomment the
+# following line
+#ALLOW_ROOT=true
+
 # FIXED_COMMAND tells the script to use a hard coded action rather than
 # expecting the first parameter of the command line to be the command.
 # By default the command will will be expected to be the first parameter.
@@ -1543,9 +1547,20 @@ showsetusermesg()  {
     echo "Please edit $0 and set the variable RUN_AS_USER."
 }
 
+checkifstartingasroot() {
+    if [ ! `grep ^RUN_AS_USER $0` ] && [ ! `grep ^ALLOW_ROOT $0` ] && [ `id -ur` = '0' ]; then
+        echo "Running I2P as the root user is *not* recommended."
+        showsetusermesg
+        echo
+        echo "If you'd like to run as root anyway you can edit"
+        echo "$0 and set ALLOW_ROOT=true instead."
+        exit 1
+    fi
+    }
 docommand() {
     case "$COMMAND" in
         'console')
+            checkifstartingasroot
             checkUser touchlock "$@"
             if [ ! -n "$FIXED_COMMAND" ] ; then
                 shift
@@ -1554,6 +1569,7 @@ docommand() {
             ;;
 
         'start')
+            checkifstartingasroot
             if [ "$DIST_OS" = "macosx" -a -f "/Library/LaunchDaemons/${APP_PLIST}" ] ; then
                 macosxstart
             elif [ "$DIST_OS" = "linux" -a -f "/etc/init/${APP_NAME}.conf" ] ; then
