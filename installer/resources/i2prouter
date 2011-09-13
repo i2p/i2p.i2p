@@ -1136,8 +1136,8 @@ installdaemon() {
                     sed -i "s/Default-Start: 2 3 4 5/Default-Start: 5/" $0
                     insserv "/etc/init.d/$APP_NAME"
                 fi
-            elif [ -f /etc/lsb-release ] ; then
-                eval echo `gettext 'Detected Ubuntu:'`
+            elif [ -f /etc/lsb-release -o -f /etc/debian_version ] ; then
+                eval echo `gettext 'Detected Debian-based distribution:'`
                 if [ -f "/etc/init.d/$APP_NAME" -o -f "/etc/init/${APP_NAME}.conf" ] ; then
                     eval echo `gettext ' The $APP_LONG_NAME daemon is already installed.'`
                     exit 1
@@ -1328,8 +1328,8 @@ removedaemon() {
                     eval echo `gettext ' The $APP_LONG_NAME daemon is not currently installed.'`
                     exit 1
                 fi
-            elif [ -f /etc/lsb-release ] ; then
-                eval echo `gettext 'Detected Ubuntu:'`
+            elif [ -f /etc/lsb-release -o -f /etc/debian_version ] ; then
+                eval echo `gettext 'Detected Debian-based distribution:'`
                 if [ -f "/etc/init.d/$APP_NAME" ] ; then
                     eval echo `gettext ' Removing $APP_LONG_NAME daemon from init.d...'`
                     update-rc.d -f "$APP_NAME" remove
