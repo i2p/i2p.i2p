@@ -830,7 +830,7 @@ console() {
     getpid
     if [ "X$pid" = "X" ]
     then
-        trap '' 3
+        trap '' 3 2
 
         prepAdditionalParams "$@"
 
