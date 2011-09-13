@@ -1539,6 +1539,10 @@ showUsage() {
     exit 1
 }
 
+showsetusermesg()  {
+    echo "Please edit $0 and set the variable RUN_AS_USER."
+}
+
 docommand() {
     case "$COMMAND" in
         'console')
@@ -1612,6 +1616,10 @@ docommand() {
 
         'install')
             installdaemon
+            if [ ! `grep ^RUN_AS_USER $0` ]; then
+                 showsetusermesg
+            fi
+
             ;;
 
         'remove')
