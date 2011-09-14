@@ -1033,10 +1033,10 @@ public class IndexBean {
                                "" + dcc);
             // add some sane server options since they aren't in the GUI (yet)
             if (dcc) {
-                config.setProperty("options." + PROP_MAX_CONNS_MIN, "3");
-                config.setProperty("options." + PROP_MAX_CONNS_HOUR, "10");
-                config.setProperty("options." + PROP_MAX_TOTAL_CONNS_MIN, "5");
-                config.setProperty("options." + PROP_MAX_TOTAL_CONNS_HOUR, "25");
+                config.setProperty("option." + PROP_MAX_CONNS_MIN, "3");
+                config.setProperty("option." + PROP_MAX_CONNS_HOUR, "10");
+                config.setProperty("option." + PROP_MAX_TOTAL_CONNS_MIN, "5");
+                config.setProperty("option." + PROP_MAX_TOTAL_CONNS_HOUR, "25");
             }
         }
 
