@@ -1814,7 +1814,7 @@ private static class MarkLiveliness implements SimpleTimer.TimedEvent {
     private void ping() {
         FileOutputStream fos = null;
         try { 
-            fos = new FileOutputStream(_pingFile);
+            fos = new SecureFileOutputStream(_pingFile);
             fos.write(("" + System.currentTimeMillis()).getBytes());
         } catch (IOException ioe) {
             System.err.println("Error writing to ping file");
