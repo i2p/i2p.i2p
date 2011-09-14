@@ -1,7 +1,11 @@
 package net.i2p.router.web;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import net.i2p.router.Router;
 import net.i2p.router.transport.FIFOBandwidthRefiller;
+import net.i2p.router.transport.TransportImpl;
 import net.i2p.router.transport.TransportManager;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.router.web.ConfigServiceHandler;
@@ -144,12 +148,16 @@ public class ConfigNetHandler extends FormHandler {
                         _udpAutoIP = UDPTransport.DEFAULT_SOURCES;
                 }
                 _context.router().setConfigSetting(UDPTransport.PROP_SOURCES, _udpAutoIP);
-                // Todo: Catch local IPs right here rather than complaining later
-                if (uhost.length() > 0)
-                    _context.router().setConfigSetting(UDPTransport.PROP_EXTERNAL_HOST, uhost);
-                else
+                boolean valid = true;
+                if (uhost.length() > 0) {
+                    valid = verifyAddress(uhost);
+                    if (valid) {
+                        _context.router().setConfigSetting(UDPTransport.PROP_EXTERNAL_HOST, uhost);
+                    }
+                } else {
                     _context.router().removeConfigSetting(UDPTransport.PROP_EXTERNAL_HOST);
-                if ((!oldUdp.equals(_udpAutoIP)) || (!oldUHost.equals(uhost))) {
+                }
+                if (valid && ((!oldUdp.equals(_udpAutoIP)) || (!oldUHost.equals(uhost)))) {
                    addFormNotice(_("Updating IP address"));
                    restartRequired = true;
                 }
@@ -167,12 +175,15 @@ public class ConfigNetHandler extends FormHandler {
             if (_ntcpAutoIP == null) _ntcpAutoIP = "true";
 
             if ((!oldAutoHost.equals(_ntcpAutoIP)) || ! oldNHost.equalsIgnoreCase(_ntcpHostname)) {
+                boolean valid = true;
                 if ("disabled".equals(_ntcpAutoIP)) {
                     addFormNotice(_("Disabling TCP completely"));
                 } else if ("false".equals(_ntcpAutoIP) && _ntcpHostname.length() > 0) {
-                    // Todo: Catch local IPs right here rather than complaining later
-                    _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME, _ntcpHostname);
-                    addFormNotice(_("Updating inbound TCP address to") + " " + _ntcpHostname);
+                    valid = verifyAddress(_ntcpHostname);
+                    if (valid) {
+                        _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME, _ntcpHostname);
+                        addFormNotice(_("Updating inbound TCP address to") + " " + _ntcpHostname);
+                    }
                 } else {
                     _context.router().removeConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME);
                     if ("false".equals(_ntcpAutoIP))
@@ -180,9 +191,11 @@ public class ConfigNetHandler extends FormHandler {
                     else
                         addFormNotice(_("Updating inbound TCP address to auto")); // true or always
                 }
-                _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_IP, _ntcpAutoIP);
-                _context.router().setConfigSetting(TransportManager.PROP_ENABLE_NTCP, "" + !"disabled".equals(_ntcpAutoIP));
-                restartRequired = true;
+                if (valid) {
+                    _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_IP, _ntcpAutoIP);
+                    _context.router().setConfigSetting(TransportManager.PROP_ENABLE_NTCP, "" + !"disabled".equals(_ntcpAutoIP));
+                    restartRequired = true;
+                }
             }
             if (oldAutoPort != _ntcpAutoPort || ! oldNPort.equals(_ntcpPort)) {
                 if (_ntcpPort.length() > 0 && !_ntcpAutoPort) {
@@ -292,6 +305,27 @@ public class ConfigNetHandler extends FormHandler {
                 //addFormError(_("Gracefully restarting I2P to change published router address"));
                 //_context.router().shutdownGracefully(Router.EXIT_GRACEFUL_RESTART);
             //}
+        }
+    }
+
+    /**
+     *  Do basic verification of address here to prevent problems later
+     *  @return valid
+     *  @since 0.8.9
+     */
+    private boolean verifyAddress(String addr) {
+        if (addr == null || addr.length() <= 0)
+            return false;
+        try {
+            InetAddress ia = InetAddress.getByName(addr);
+            byte[] iab = ia.getAddress();
+            boolean rv = TransportImpl.isPubliclyRoutable(iab);
+            if (!rv)
+                addFormError(_("The hostname or IP {0} is not publicly routable", addr));
+            return rv;
+        } catch (UnknownHostException uhe) {
+            addFormError(_("The hostname or IP {0} is invalid", addr) + ": " + uhe);
+            return false;
         }
     }
 
