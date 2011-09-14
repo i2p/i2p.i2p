@@ -339,7 +339,7 @@ class GeoIP {
 
     /**
      * Get the country for a country code
-     * @param two-letter lower case code
+     * @param code two-letter lower case code
      * @return untranslated name or null
      */
     public String fullName(String code) {
