@@ -3,6 +3,7 @@ package org.klomp.snark;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -71,17 +72,23 @@ public class SnarkManager implements Snark.CompleteListener {
     public static final String PROP_META_MAGNET_PREFIX = "i2psnark.magnet.";
 
     private static final String CONFIG_FILE = "i2psnark.config";
+    public static final String PROP_FILES_PUBLIC = "i2psnark.filesPublic";
     public static final String PROP_AUTO_START = "i2snark.autoStart";   // oops
     public static final String DEFAULT_AUTO_START = "false";
-    public static final String PROP_LINK_PREFIX = "i2psnark.linkPrefix";
-    public static final String DEFAULT_LINK_PREFIX = "file:///";
+    //public static final String PROP_LINK_PREFIX = "i2psnark.linkPrefix";
+    //public static final String DEFAULT_LINK_PREFIX = "file:///";
     public static final String PROP_STARTUP_DELAY = "i2psnark.startupDelay";
+    public static final String PROP_REFRESH_DELAY = "i2psnark.refreshSeconds";
     public static final String PROP_THEME = "i2psnark.theme";
     public static final String DEFAULT_THEME = "ubergine";
+    private static final String PROP_USE_OPENTRACKERS = "i2psnark.useOpentrackers";
+    public static final String PROP_OPENTRACKERS = "i2psnark.opentrackers";
 
     public static final int MIN_UP_BW = 2;
     public static final int DEFAULT_MAX_UP_BW = 10;
     public static final int DEFAULT_STARTUP_DELAY = 3; 
+    public static final int DEFAULT_REFRESH_DELAY_SECS = 60;
+
     private SnarkManager() {
         _snarks = new ConcurrentHashMap();
         _magnets = new ConcurrentHashSet();
@@ -136,20 +143,57 @@ public class SnarkManager implements Snark.CompleteListener {
         }
     }
     
-    public boolean shouldAutoStart() {
-        return Boolean.valueOf(_config.getProperty(PROP_AUTO_START, DEFAULT_AUTO_START+"")).booleanValue();
+    /**
+     *  @return default false
+     *  @since 0.8.9
+     */
+    public boolean areFilesPublic() {
+        return Boolean.valueOf(_config.getProperty(PROP_FILES_PUBLIC)).booleanValue();
     }
+
+    public boolean shouldAutoStart() {
+        return Boolean.valueOf(_config.getProperty(PROP_AUTO_START, DEFAULT_AUTO_START)).booleanValue();
+    }
+
+/****
     public String linkPrefix() {
         return _config.getProperty(PROP_LINK_PREFIX, DEFAULT_LINK_PREFIX + getDataDir().getAbsolutePath() + File.separatorChar);
     }
-    private int getStartupDelayMinutes() { 
-	return Integer.valueOf(_config.getProperty(PROP_STARTUP_DELAY)).intValue(); 
+****/
+
+    /**
+     *  @return -1 for never
+     *  @since 0.8.9
+     */
+    public int getRefreshDelaySeconds() { 
+        try {
+	    return Integer.parseInt(_config.getProperty(PROP_REFRESH_DELAY));
+        } catch (NumberFormatException nfe) {
+            return DEFAULT_REFRESH_DELAY_SECS;
+        }
     }
+
+    private int getStartupDelayMinutes() { 
+        try {
+	    return Integer.parseInt(_config.getProperty(PROP_STARTUP_DELAY));
+        } catch (NumberFormatException nfe) {
+            return DEFAULT_STARTUP_DELAY;
+        }
+    }
+
     public File getDataDir() { 
         String dir = _config.getProperty(PROP_DIR, "i2psnark");
-        File f = new SecureDirectory(dir);
-        if (!f.isAbsolute())
-            f = new SecureDirectory(_context.getAppDir(), dir);
+        File f;
+        if (areFilesPublic())
+            f = new File(dir);
+        else
+            f = new SecureDirectory(dir);
+        if (!f.isAbsolute()) {
+            if (areFilesPublic())
+                f = new File(_context.getAppDir(), dir);
+            else
+                f = new SecureDirectory(_context.getAppDir(), dir);
+        }
         return f; 
     }
 
@@ -187,8 +231,10 @@ public class SnarkManager implements Snark.CompleteListener {
             _config.setProperty(PROP_DIR, "i2psnark");
         if (!_config.containsKey(PROP_AUTO_START))
             _config.setProperty(PROP_AUTO_START, DEFAULT_AUTO_START);
+        if (!_config.containsKey(PROP_REFRESH_DELAY))
+            _config.setProperty(PROP_REFRESH_DELAY, Integer.toString(DEFAULT_REFRESH_DELAY_SECS));
         if (!_config.containsKey(PROP_STARTUP_DELAY))
-            _config.setProperty(PROP_STARTUP_DELAY, "" + DEFAULT_STARTUP_DELAY);
+            _config.setProperty(PROP_STARTUP_DELAY, Integer.toString(DEFAULT_STARTUP_DELAY));
         if (!_config.containsKey(PROP_THEME))
             _config.setProperty(PROP_THEME, DEFAULT_THEME);
         updateConfig();
@@ -258,10 +304,11 @@ public class SnarkManager implements Snark.CompleteListener {
         _util.setMaxUploaders(getInt(PROP_UPLOADERS_TOTAL, Snark.MAX_TOTAL_UPLOADERS));
         _util.setMaxUpBW(getInt(PROP_UPBW_MAX, DEFAULT_MAX_UP_BW));
         _util.setStartupDelay(getInt(PROP_STARTUP_DELAY, DEFAULT_STARTUP_DELAY));
-        String ot = _config.getProperty(I2PSnarkUtil.PROP_OPENTRACKERS);
+        _util.setFilesPublic(areFilesPublic());
+        String ot = _config.getProperty(PROP_OPENTRACKERS);
         if (ot != null)
             _util.setOpenTrackerString(ot);
-        String useOT = _config.getProperty(I2PSnarkUtil.PROP_USE_OPENTRACKERS);
+        String useOT = _config.getProperty(PROP_USE_OPENTRACKERS);
         boolean bOT = useOT == null || Boolean.valueOf(useOT).booleanValue();
         _util.setUseOpenTrackers(bOT);
         getDataDir().mkdirs();
@@ -278,7 +325,8 @@ public class SnarkManager implements Snark.CompleteListener {
         return defaultVal;
     }
     
-    public void updateConfig(String dataDir, boolean autoStart, String startDelay, String seedPct, String eepHost, 
+    public void updateConfig(String dataDir, boolean filesPublic, boolean autoStart, String refreshDelay,
+                             String startDelay, String seedPct, String eepHost, 
                              String eepPort, String i2cpHost, String i2cpPort, String i2cpOpts,
                              String upLimit, String upBW, boolean useOpenTrackers, String openTrackers, String theme) {
         boolean changed = false;
@@ -333,19 +381,34 @@ public class SnarkManager implements Snark.CompleteListener {
 	                    changed = true;
         	            _config.setProperty(PROP_STARTUP_DELAY, "" + minutes);
                 	    addMessage(_("Startup delay changed to {0}", DataHelper.formatDuration2(minutes * 60 * 1000)));
-                	}
-
+                }
 	}
-        // FIXME do this even if == null
-	if (i2cpHost != null) {
+
+	if (refreshDelay != null) {
+	    try {
+                int secs = Integer.parseInt(refreshDelay);
+	        if (secs != getRefreshDelaySeconds()) {
+	            changed = true;
+	            _config.setProperty(PROP_REFRESH_DELAY, refreshDelay);
+                    if (secs >= 0)
+	                addMessage(_("Refresh time changed to {0}", DataHelper.formatDuration2(secs * 1000)));
+	            else
+	                addMessage(_("Refresh disabled"));
+	        }
+	    } catch (NumberFormatException nfe) {}
+	}
+
+	// Start of I2CP stuff.
+	// i2cpHost will generally be null since it is hidden from the form if in router context.
+
             int oldI2CPPort = _util.getI2CPPort();
             String oldI2CPHost = _util.getI2CPHost();
             int port = oldI2CPPort;
             if (i2cpPort != null) {
                 try { port = Integer.parseInt(i2cpPort); } catch (NumberFormatException nfe) {}
             }
-            String host = oldI2CPHost;
-            Map opts = new HashMap();
+
+            Map<String, String> opts = new HashMap();
             if (i2cpOpts == null) i2cpOpts = "";
             StringTokenizer tok = new StringTokenizer(i2cpOpts, " \t\n");
             while (tok.hasMoreTokens()) {
@@ -354,7 +417,7 @@ public class SnarkManager implements Snark.CompleteListener {
                 if (split > 0)
                     opts.put(pair.substring(0, split), pair.substring(split+1));
             }
-            Map oldOpts = new HashMap();
+            Map<String, String> oldOpts = new HashMap();
             String oldI2CPOpts = _config.getProperty(PROP_I2CP_OPTS);
             if (oldI2CPOpts == null) oldI2CPOpts = "";
             tok = new StringTokenizer(oldI2CPOpts, " \t\n");
@@ -365,37 +428,39 @@ public class SnarkManager implements Snark.CompleteListener {
                     oldOpts.put(pair.substring(0, split), pair.substring(split+1));
             }
             
-            if ( (i2cpHost.trim().length() > 0) && (port > 0) &&
-                 ((!host.equals(i2cpHost) || 
-                  (port != _util.getI2CPPort()) ||
-                  (!oldOpts.equals(opts)))) ) {
+            boolean reconnect = i2cpHost != null && i2cpHost.trim().length() > 0 && port > 0 &&
+                                (port != _util.getI2CPPort() || !oldI2CPHost.equals(i2cpHost));
+            if (reconnect || !oldOpts.equals(opts)) {
                 boolean snarksActive = false;
-                Set names = listTorrentFiles();
-                for (Iterator iter = names.iterator(); iter.hasNext(); ) {
-                    Snark snark = getTorrent((String)iter.next());
-                    if ( (snark != null) && (!snark.isStopped()) ) {
-                        snarksActive = true;
-                        break;
+                if (reconnect) {
+                    for (Snark snark : _snarks.values()) {
+                        if (!snark.isStopped()) {
+                            snarksActive = true;
+                            break;
+                        }
                     }
                 }
+                if (_log.shouldLog(Log.DEBUG))
+                    _log.debug("i2cp host [" + i2cpHost + "] i2cp port " + port + " opts [" + opts 
+                               + "] oldOpts [" + oldOpts + "]");
                 if (snarksActive) {
                     Properties p = new Properties();
                     p.putAll(opts);
                     _util.setI2CPConfig(i2cpHost, port, p);
                     _util.setMaxUpBW(getInt(PROP_UPBW_MAX, DEFAULT_MAX_UP_BW));
                     addMessage(_("I2CP and tunnel changes will take effect after stopping all torrents"));
-                    if (_log.shouldLog(Log.DEBUG))
-                        _log.debug("i2cp host [" + i2cpHost + "] i2cp port " + port + " opts [" + opts 
-                                   + "] oldOpts [" + oldOpts + "]");
+                } else if (!reconnect) {
+                    // The usual case, the other two are if not in router context
+                    _config.setProperty(PROP_I2CP_OPTS, i2cpOpts.trim());
+                    addMessage(_("I2CP options changed to {0}", i2cpOpts));
+                    _util.setI2CPConfig(oldI2CPHost, oldI2CPPort, opts);
                 } else {
                     if (_util.connected()) {
                         _util.disconnect();
                         addMessage(_("Disconnecting old I2CP destination"));
                     }
-                    Properties p = new Properties();
-                    p.putAll(opts);
-                    addMessage(_("I2CP settings changed to {0}", i2cpHost + ":" + port + " (" + i2cpOpts.trim() + ")"));
-                    _util.setI2CPConfig(i2cpHost, port, p);
+                    addMessage(_("I2CP settings changed to {0}", i2cpHost + ':' + port + ' ' + i2cpOpts));
+                    _util.setI2CPConfig(i2cpHost, port, opts);
                     _util.setMaxUpBW(getInt(PROP_UPBW_MAX, DEFAULT_MAX_UP_BW));
                     boolean ok = _util.connect();
                     if (!ok) {
@@ -409,22 +474,29 @@ public class SnarkManager implements Snark.CompleteListener {
                         _config.setProperty(PROP_I2CP_HOST, i2cpHost.trim());
                         _config.setProperty(PROP_I2CP_PORT, "" + port);
                         _config.setProperty(PROP_I2CP_OPTS, i2cpOpts.trim());
-                        changed = true;
                         // no PeerAcceptors/I2PServerSockets to deal with, since all snarks are inactive
-                        for (Iterator iter = names.iterator(); iter.hasNext(); ) {
-                            String name = (String)iter.next();
-                            Snark snark = getTorrent(name);
-                            if (snark != null && snark.restartAcceptor()) {
+                        for (Snark snark : _snarks.values()) {
+                            if (snark.restartAcceptor()) {
                                 addMessage(_("I2CP listener restarted for \"{0}\"", snark.getBaseName()));
                             }
                         }
                     }
                 }
                 changed = true;
-            }
+            }  // reconnect || changed options
+
+        if (areFilesPublic() != filesPublic) {
+            _config.setProperty(PROP_FILES_PUBLIC, Boolean.toString(filesPublic));
+            _util.setFilesPublic(filesPublic);
+            if (filesPublic)
+                addMessage(_("New files will be publicly readable"));
+            else
+                addMessage(_("New files will not be publicly readable"));
+            changed = true;
         }
+
         if (shouldAutoStart() != autoStart) {
-            _config.setProperty(PROP_AUTO_START, autoStart + "");
+            _config.setProperty(PROP_AUTO_START, Boolean.toString(autoStart));
             if (autoStart)
                 addMessage(_("Enabled autostart"));
             else
@@ -432,7 +504,7 @@ public class SnarkManager implements Snark.CompleteListener {
             changed = true;
         }
         if (_util.shouldUseOpenTrackers() != useOpenTrackers) {
-            _config.setProperty(I2PSnarkUtil.PROP_USE_OPENTRACKERS, useOpenTrackers + "");
+            _config.setProperty(PROP_USE_OPENTRACKERS, useOpenTrackers + "");
             if (useOpenTrackers)
                 addMessage(_("Enabled open trackers - torrent restart required to take effect."));
             else
@@ -442,7 +514,7 @@ public class SnarkManager implements Snark.CompleteListener {
         }
         if (openTrackers != null) {
             if (openTrackers.trim().length() > 0 && !openTrackers.trim().equals(_util.getOpenTrackerString())) {
-                _config.setProperty(I2PSnarkUtil.PROP_OPENTRACKERS, openTrackers.trim());
+                _config.setProperty(PROP_OPENTRACKERS, openTrackers.trim());
                 _util.setOpenTrackerString(openTrackers);
                 addMessage(_("Open Tracker list changed - torrent restart required to take effect."));
                 changed = true;
@@ -489,7 +561,7 @@ public class SnarkManager implements Snark.CompleteListener {
      * Grab the torrent given the (canonical) filename of the .torrent file
      * @return Snark or null
      */
-    public Snark getTorrent(String filename) { synchronized (_snarks) { return (Snark)_snarks.get(filename); } }
+    public Snark getTorrent(String filename) { synchronized (_snarks) { return _snarks.get(filename); } }
 
     /**
      * Grab the torrent given the base name of the storage
@@ -723,7 +795,7 @@ public class SnarkManager implements Snark.CompleteListener {
             // so addTorrent won't recheck
             saveTorrentStatus(metainfo, bitfield, null); // no file priorities
             try {
-                locked_writeMetaInfo(metainfo, filename);
+                locked_writeMetaInfo(metainfo, filename, areFilesPublic());
                 // hold the lock for a long time
                 addTorrent(filename, dontAutoStart);
             } catch (IOException ioe) {
@@ -754,7 +826,8 @@ public class SnarkManager implements Snark.CompleteListener {
                 _log.error("Failed to write torrent file to " + filename);
                 return;
             }
-            SecureFileOutputStream.setPerms(new File(filename));
+            if (!areFilesPublic())
+                SecureFileOutputStream.setPerms(new File(filename));
             // hold the lock for a long time
             addTorrent(filename);
          }
@@ -769,13 +842,16 @@ public class SnarkManager implements Snark.CompleteListener {
      *                 Must be a filesystem-safe name.
      * @since 0.8.4
      */
-    private static void locked_writeMetaInfo(MetaInfo metainfo, String filename) throws IOException {
+    private static void locked_writeMetaInfo(MetaInfo metainfo, String filename, boolean areFilesPublic) throws IOException {
         File file = new File(filename);
         if (file.exists())
             throw new IOException("Cannot overwrite an existing .torrent file: " + file.getPath());
         OutputStream out = null;
         try {
-            out = new SecureFileOutputStream(filename);
+            if (areFilesPublic)
+                out = new FileOutputStream(filename);
+            else
+                out = new SecureFileOutputStream(filename);
             out.write(metainfo.getTorrentData());
         } catch (IOException ioe) {
             // remove any partial
@@ -1170,7 +1246,7 @@ public class SnarkManager implements Snark.CompleteListener {
                 if (announce != null)
                     meta = meta.reannounce(announce);
                 synchronized (_snarks) {
-                    locked_writeMetaInfo(meta, name);
+                    locked_writeMetaInfo(meta, name, areFilesPublic());
                     // put it in the list under the new name
                     _snarks.remove(snark.getName());
                     _snarks.put(name, snark);

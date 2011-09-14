@@ -1,3 +1,15 @@
+2011-09-14 zzz
+  * Console: Verify valid host/IP before saving on net config form
+  * i2psnark:
+    - Add refresh time option
+    - Add public file permissions option (ticket #501)
+    - Fix configuration of tunnel parameters (ticket #524)
+    - Allow changing I2CP parameters while tunnel is open
+    - Remove duplicated options in I2CP options string
+    - Don't open tunnel when saving config
+  * IRC DCC: Fix conn limit options
+  * Router: Set permissions on router.ping file
+
 2011-09-13 kytv
   * Update i2prouter script
 

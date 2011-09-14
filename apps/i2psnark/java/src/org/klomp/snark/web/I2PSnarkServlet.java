@@ -33,7 +33,6 @@ import net.i2p.data.DataHelper;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
-import net.i2p.util.SecureFileOutputStream;
 
 import org.klomp.snark.I2PSnarkUtil;
 import org.klomp.snark.MetaInfo;
@@ -208,8 +207,11 @@ public class I2PSnarkServlet extends Default {
         out.write("</title>\n");
                                          
         // we want it to go to the base URI so we don't refresh with some funky action= value
-        if (!isConfigure)
-            out.write("<meta http-equiv=\"refresh\" content=\"60;/i2psnark/" + peerString + "\">\n");
+        if (!isConfigure) {
+            int delay = _manager.getRefreshDelaySeconds();
+            if (delay > 0)
+                out.write("<meta http-equiv=\"refresh\" content=\"" + delay + ";/i2psnark/" + peerString + "\">\n");
+        }
         out.write(HEADER_A + _themePath + HEADER_B);
         out.write("</head><body>");
         out.write("<center>");
@@ -611,6 +613,7 @@ public class I2PSnarkServlet extends Default {
             }
         } else if ("Save".equals(action)) {
             String dataDir = req.getParameter("dataDir");
+            boolean filesPublic = req.getParameter("filesPublic") != null;
             boolean autoStart = req.getParameter("autoStart") != null;
             String seedPct = req.getParameter("seedPct");
             String eepHost = req.getParameter("eepHost");
@@ -620,11 +623,14 @@ public class I2PSnarkServlet extends Default {
             String i2cpOpts = buildI2CPOpts(req);
             String upLimit = req.getParameter("upLimit");
             String upBW = req.getParameter("upBW");
+            String refreshDel = req.getParameter("refreshDelay");
             String startupDel = req.getParameter("startupDelay");
             boolean useOpenTrackers = req.getParameter("useOpenTrackers") != null;
             String openTrackers = req.getParameter("openTrackers");
             String theme = req.getParameter("theme");
-            _manager.updateConfig(dataDir, autoStart, startupDel, seedPct, eepHost, eepPort, i2cpHost, i2cpPort, i2cpOpts, upLimit, upBW, useOpenTrackers, openTrackers, theme);
+            _manager.updateConfig(dataDir, filesPublic, autoStart, refreshDel, startupDel,
+                                  seedPct, eepHost, eepPort, i2cpHost, i2cpPort, i2cpOpts,
+                                  upLimit, upBW, useOpenTrackers, openTrackers, theme);
         } else if ("Create".equals(action)) {
             String baseData = req.getParameter("baseFile");
             if (baseData != null && baseData.trim().length() > 0) {
@@ -1259,44 +1265,55 @@ public class I2PSnarkServlet extends Default {
         out.write("&nbsp;<input type=\"text\" name=\"announceURLOther\" size=\"57\" value=\"http://\" " +
                   "title=\"");
         out.write(_("Specify custom tracker announce URL"));
-        out.write("\" > ");
-        out.write("<input type=\"submit\" value=\"");
+        out.write("\" > " +
+                  "<input type=\"submit\" value=\"");
         out.write(_("Create torrent"));
-        out.write("\" name=\"foo\" ></table>\n");
-        out.write("</form></div></div>");        
+        out.write("\" name=\"foo\" ></table>\n" +
+                  "</form></div></div>");        
     }
     
+    private static final int[] times = { 30, 60, 2*60, 5*60, 10*60, 30*60, -1 };
+
     private void writeConfigForm(PrintWriter out, HttpServletRequest req) throws IOException {
         String dataDir = _manager.getDataDir().getAbsolutePath();
+        boolean filesPublic = _manager.areFilesPublic();
         boolean autoStart = _manager.shouldAutoStart();
         boolean useOpenTrackers = _manager.util().shouldUseOpenTrackers();
         String openTrackers = _manager.util().getOpenTrackerString();
         //int seedPct = 0;
        
-        out.write("<form action=\"/i2psnark/configure\" method=\"POST\">\n");
-        out.write("<div class=\"configsectionpanel\"><div class=\"snarkConfig\">\n");
-        out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n");
-        out.write("<input type=\"hidden\" name=\"action\" value=\"Save\" >\n");
-        out.write("<span class=\"snarkConfigTitle\">");
-        out.write("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "config.png\"> ");
+        out.write("<form action=\"/i2psnark/configure\" method=\"POST\">\n" +
+                  "<div class=\"configsectionpanel\"><div class=\"snarkConfig\">\n" +
+                  "<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n" +
+                  "<input type=\"hidden\" name=\"action\" value=\"Save\" >\n" +
+                  "<span class=\"snarkConfigTitle\">" +
+                  "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "config.png\"> ");
         out.write(_("Configuration"));
-        out.write("</span><hr>\n");
-        out.write("<table border=\"0\"><tr><td>");
+        out.write("</span><hr>\n"   +
+                  "<table border=\"0\"><tr><td>");
 
         out.write(_("Data directory"));
         out.write(": <td><code>" + dataDir + "</code> <i>(");
         out.write(_("Edit i2psnark.config and restart to change"));
-        out.write(")</i><br>\n");
+        out.write(")</i><br>\n" +
 
-        out.write("<tr><td>");
+                  "<tr><td>");
+        out.write(_("Files readable by all"));
+        out.write(": <td><input type=\"checkbox\" class=\"optbox\" name=\"filesPublic\" value=\"true\" " 
+                  + (filesPublic ? "checked " : "") 
+                  + "title=\"");
+        out.write(_("If checked, other users may access the downloaded files"));
+        out.write("\" >" +
+
+                  "<tr><td>");
         out.write(_("Auto start"));
         out.write(": <td><input type=\"checkbox\" class=\"optbox\" name=\"autoStart\" value=\"true\" " 
                   + (autoStart ? "checked " : "") 
                   + "title=\"");
         out.write(_("If checked, automatically start torrents that are added"));
-        out.write("\" >");
+        out.write("\" >" +
 
-        out.write("<tr><td>");
+                  "<tr><td>");
         out.write(_("Theme"));
         out.write(": <td><select name='theme'>");
         String theme = _manager.getTheme();
@@ -1307,9 +1324,28 @@ public class I2PSnarkServlet extends Default {
             else
                 out.write("\n<OPTION value=\"" + themes[i] + "\">" + themes[i]);
         }
-        out.write("</select>\n");
+        out.write("</select>\n" +
 
-        out.write("<tr><td>");
+                  "<tr><td>");
+        out.write(_("Refresh time"));
+        out.write(": <td><select name=\"refreshDelay\">");
+        int delay = _manager.getRefreshDelaySeconds();
+        for (int i = 0; i < times.length; i++) {
+            out.write("<option value=\"");
+            out.write(Integer.toString(times[i]));
+            out.write("\"");
+            if (times[i] == delay)
+                out.write(" selected=\"true\"");
+            out.write(">");
+            if (times[i] > 0)
+                out.write(DataHelper.formatDuration2(times[i] * 1000));
+            else
+                out.write(_("Never"));
+            out.write("</option>\n");
+        }
+        out.write("</select><br>" +
+
+                  "<tr><td>");
         out.write(_("Startup delay"));
         out.write(": <td><input name=\"startupDelay\" size=\"3\" class=\"r\" value=\"" + _manager.util().getStartupDelay() + "\"> ");
         out.write(_("minutes"));
@@ -1340,26 +1376,26 @@ public class I2PSnarkServlet extends Default {
         out.write(": <td><input type=\"text\" name=\"upLimit\" class=\"r\" value=\""
                   + _manager.util().getMaxUploaders() + "\" size=\"3\" maxlength=\"3\" > ");
         out.write(_("peers"));
-        out.write("<br>\n");
+        out.write("<br>\n" +
 
-        out.write("<tr><td>");
+                  "<tr><td>");
         out.write(_("Up bandwidth limit"));
         out.write(": <td><input type=\"text\" name=\"upBW\" class=\"r\" value=\""
                   + _manager.util().getMaxUpBW() + "\" size=\"3\" maxlength=\"3\" > KBps <i>(");
         out.write(_("Half available bandwidth recommended."));
         out.write(" <a href=\"/config.jsp\" target=\"blank\">");
         out.write(_("View or change router bandwidth"));
-        out.write("</a>)</i><br>\n");
+        out.write("</a>)</i><br>\n" +
         
-        out.write("<tr><td>");
+                  "<tr><td>");
         out.write(_("Use open trackers also"));
         out.write(": <td><input type=\"checkbox\" class=\"optbox\" name=\"useOpenTrackers\" value=\"true\" " 
                   + (useOpenTrackers ? "checked " : "") 
                   + "title=\"");
         out.write(_("If checked, announce torrents to open trackers as well as the tracker listed in the torrent file"));
-        out.write("\" > ");
+        out.write("\" > " +
 
-        out.write("<tr><td>");
+                  "<tr><td>");
         out.write(_("Open tracker announce URLs"));
         out.write(": <td><input type=\"text\" name=\"openTrackers\" value=\""
                   + openTrackers + "\" size=\"50\" ><br>\n");
@@ -1388,36 +1424,38 @@ public class I2PSnarkServlet extends Default {
             out.write("<tr><td>");
             out.write(_("I2CP host"));
             out.write(": <td><input type=\"text\" name=\"i2cpHost\" value=\"" 
-                      + _manager.util().getI2CPHost() + "\" size=\"15\" > ");
+                      + _manager.util().getI2CPHost() + "\" size=\"15\" > " +
 
-            out.write("<tr><td>");
+                      "<tr><td>");
             out.write(_("I2CP port"));
             out.write(": <td><input type=\"text\" name=\"i2cpPort\" class=\"r\" value=\"" +
                       + _manager.util().getI2CPPort() + "\" size=\"5\" maxlength=\"5\" > <br>\n");
         }
 
+        options.remove(I2PSnarkUtil.PROP_MAX_BW);
+        // was accidentally in the I2CP options prior to 0.8.9 so it will be in old config files
+        options.remove(SnarkManager.PROP_OPENTRACKERS);
         StringBuilder opts = new StringBuilder(64);
-        for (Iterator iter = options.entrySet().iterator(); iter.hasNext(); ) {
-            Map.Entry entry = (Map.Entry)iter.next();
-            String key = (String)entry.getKey();
-            String val = (String)entry.getValue();
+        for (Map.Entry<String, String> e : options.entrySet()) {
+            String key = e.getKey();
+            String val = e.getValue();
             opts.append(key).append('=').append(val).append(' ');
         }
         out.write("<tr><td>");
         out.write(_("I2CP options"));
         out.write(": <td><textarea name=\"i2cpOpts\" cols=\"60\" rows=\"1\" wrap=\"off\" spellcheck=\"false\" >"
-                  + opts.toString() + "</textarea><br>\n");
+                  + opts.toString() + "</textarea><br>\n" +
 
-        out.write("<tr><td>&nbsp;<td><input type=\"submit\" value=\"");
+                  "<tr><td>&nbsp;<td><input type=\"submit\" value=\"");
         out.write(_("Save configuration"));
-        out.write("\" name=\"foo\" >\n");
-        out.write("</table></div></div></form>");
+        out.write("\" name=\"foo\" >\n" +
+                  "</table></div></div></form>");
     }
     
     private void writeConfigLink(PrintWriter out) throws IOException {
-        out.write("<div class=\"configsection\"><span class=\"snarkConfig\">\n");
-        out.write("<span class=\"snarkConfigTitle\"><a href=\"configure\">");
-        out.write("<img alt=\"\" border=\"0\" src=\"" + _imgPath + "config.png\"> ");
+        out.write("<div class=\"configsection\"><span class=\"snarkConfig\">\n" +
+                  "<span class=\"snarkConfigTitle\"><a href=\"configure\">" +
+                  "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "config.png\"> ");
         out.write(_("Configuration"));
         out.write("</a></span></span></div>\n");
     }

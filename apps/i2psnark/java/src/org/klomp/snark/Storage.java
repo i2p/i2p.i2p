@@ -48,7 +48,7 @@ public class Storage
   private int[] priorities;
 
   private final StorageListener listener;
-  private I2PSnarkUtil _util;
+  private final I2PSnarkUtil _util;
 
   private /* FIXME final FIXME */ BitField bitfield; // BitField to represent the pieces
   private int needed; // Number of pieces needed
@@ -433,7 +433,12 @@ public class Storage
   /** use a saved bitfield and timestamp from a config file */
   public void check(String rootDir, long savedTime, BitField savedBitField) throws IOException
   {
-    File base = new SecureFile(rootDir, filterName(metainfo.getName()));
+    File base;
+    boolean areFilesPublic = _util.getFilesPublic();
+    if (areFilesPublic)
+        base = new File(rootDir, filterName(metainfo.getName()));
+    else
+        base = new SecureFile(rootDir, filterName(metainfo.getName()));
     boolean useSavedBitField = savedTime > 0 && savedBitField != null;
 
     List<List<String>> files = metainfo.getFiles();
@@ -479,7 +484,7 @@ public class Storage
         for (int i = 0; i < size; i++)
           {
             List<String> path = files.get(i);
-            File f = createFileFromNames(base, path);
+            File f = createFileFromNames(base, path, areFilesPublic);
             // dup file name check after filtering
             for (int j = 0; j < i; j++) {
                 if (f.equals(RAFfile[j])) {
@@ -495,7 +500,7 @@ public class Storage
                     else
                         lastPath = '_' + lastPath;
                     path.set(last, lastPath);
-                    f = createFileFromNames(base, path);
+                    f = createFileFromNames(base, path, areFilesPublic);
                     j = 0;
                 }
             }
@@ -585,7 +590,7 @@ public class Storage
    *  things going in the wrong place if there are duplicates
    *  in intermediate path elements after filtering.
    */
-  private static File createFileFromNames(File base, List<String> names) throws IOException
+  private static File createFileFromNames(File base, List<String> names, boolean areFilesPublic) throws IOException
   {
     File f = null;
     Iterator<String> it = names.iterator();
@@ -595,7 +600,10 @@ public class Storage
         if (it.hasNext())
           {
             // Another dir in the hierarchy.
-            f = new File(base, name);
+            if (areFilesPublic)
+                f = new File(base, name);
+            else
+                f = new SecureFile(base, name);
             if (!f.mkdir() && !f.isDirectory())
               throw new IOException("Could not create directory " + f);
             base = f;
@@ -603,7 +611,10 @@ public class Storage
         else
           {
             // The final element (file) in the hierarchy.
-            f = new SecureFile(base, name);
+            if (areFilesPublic)
+                f = new File(base, name);
+            else
+                f = new SecureFile(base, name);
             if (!f.createNewFile() && !f.exists())
               throw new IOException("Could not create file " + f);
           }

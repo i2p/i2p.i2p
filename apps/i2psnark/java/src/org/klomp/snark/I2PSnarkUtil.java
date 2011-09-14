@@ -44,34 +44,34 @@ import org.klomp.snark.dht.DHT;
  * (but not multiple SnarkManagers, it is still static)
  */
 public class I2PSnarkUtil {
-    private I2PAppContext _context;
-    private Log _log;
+    private final I2PAppContext _context;
+    private final Log _log;
     
     private boolean _shouldProxy;
     private String _proxyHost;
     private int _proxyPort;
     private String _i2cpHost;
     private int _i2cpPort;
-    private Map<String, String> _opts;
+    private final Map<String, String> _opts;
     private I2PSocketManager _manager;
     private boolean _configured;
     private final Set<Hash> _shitlist;
     private int _maxUploaders;
     private int _maxUpBW;
     private int _maxConnections;
-    private File _tmpDir;
+    private final File _tmpDir;
     private int _startupDelay;
     private boolean _shouldUseOT;
+    private boolean _areFilesPublic;
+    private String _openTrackerString;
     private DHT _dht;
 
     public static final int DEFAULT_STARTUP_DELAY = 3;
-    public static final String PROP_USE_OPENTRACKERS = "i2psnark.useOpentrackers";
     public static final boolean DEFAULT_USE_OPENTRACKERS = true;
-    public static final String PROP_OPENTRACKERS = "i2psnark.opentrackers";
     public static final String DEFAULT_OPENTRACKERS = "http://tracker.welterde.i2p/a";
     public static final int DEFAULT_MAX_UP_BW = 8;  //KBps
     public static final int MAX_CONNECTIONS = 16; // per torrent
-    private static final String PROP_MAX_BW = "i2cp.outboundBytesPerSecond";
+    public static final String PROP_MAX_BW = "i2cp.outboundBytesPerSecond";
     //private static final boolean ENABLE_DHT = true;
 
     public I2PSnarkUtil(I2PAppContext ctx) {
@@ -125,6 +125,8 @@ public class I2PSnarkUtil {
         // can't remove any options this way...
         if (opts != null)
             _opts.putAll(opts);
+        // this updates the session options and tells the router
+        setMaxUpBW(_maxUpBW);
         _configured = true;
     }
     
@@ -134,6 +136,7 @@ public class I2PSnarkUtil {
     }
     
     /**
+     *  This updates the session options and tells the router
      *  @param limit KBps
      */
     public void setMaxUpBW(int limit) {
@@ -175,6 +178,12 @@ public class I2PSnarkUtil {
     public int getMaxConnections() { return _maxConnections; }
     public int getStartupDelay() { return _startupDelay; }  
   
+    /** @since 0.8.9 */
+    public boolean getFilesPublic() { return _areFilesPublic; }
+  
+    /** @since 0.8.9 */
+    public void setFilesPublic(boolean yes) { _areFilesPublic = yes; }
+
     /**
      * Connect to the router, if we aren't already
      */
@@ -433,14 +442,13 @@ public class I2PSnarkUtil {
     
     /** @param ot non-null */
     public void setOpenTrackerString(String ot) { 
-        _opts.put(PROP_OPENTRACKERS, ot);
+        _openTrackerString = ot;
     }
 
     public String getOpenTrackerString() { 
-        String rv = (String) _opts.get(PROP_OPENTRACKERS);
-        if (rv == null)
+        if (_openTrackerString == null)
             return DEFAULT_OPENTRACKERS;
-        return rv;
+        return _openTrackerString;
     }
 
     /** comma delimited list open trackers to use as backups */
