@@ -20,6 +20,36 @@ public class ConfigReseedHelper extends HelperBase {
         return _context.getProperty(Reseeder.PROP_PROXY_HOST, "");
     }
 
+    /** @since 0.8.9 */
+    public String getUsername() {
+        return _context.getProperty(Reseeder.PROP_PROXY_USERNAME, "");
+    }
+
+    /** @since 0.8.9 */
+    public String getPassword() {
+        return _context.getProperty(Reseeder.PROP_PROXY_PASSWORD, "");
+    }
+
+    /** @since 0.8.9 */
+    public String getSport() {
+        return _context.getProperty(Reseeder.PROP_SPROXY_PORT, "");
+    }
+
+    /** @since 0.8.9 */
+    public String getShost() {
+        return _context.getProperty(Reseeder.PROP_SPROXY_HOST, "");
+    }
+
+    /** @since 0.8.9 */
+    public String getSusername() {
+        return _context.getProperty(Reseeder.PROP_SPROXY_USERNAME, "");
+    }
+
+    /** @since 0.8.9 */
+    public String getSpassword() {
+        return _context.getProperty(Reseeder.PROP_SPROXY_PASSWORD, "");
+    }
+
     public String modeChecked(int mode) {
         boolean required =  _context.getBooleanProperty(Reseeder.PROP_SSL_REQUIRED);
         boolean disabled =  _context.getBooleanPropertyDefaultTrue(Reseeder.PROP_SSL_DISABLE);
@@ -31,7 +61,26 @@ public class ConfigReseedHelper extends HelperBase {
     }
 
     public String getEnable() {
-        boolean enabled =  _context.getBooleanProperty(Reseeder.PROP_PROXY_ENABLE);
+        return checked(Reseeder.PROP_PROXY_ENABLE);
+    }
+
+    /** @since 0.8.9 */
+    public String getAuth() {
+        return checked(Reseeder.PROP_PROXY_AUTH_ENABLE);
+    }
+
+    public String getSenable() {
+        return checked(Reseeder.PROP_SPROXY_ENABLE);
+    }
+
+    /** @since 0.8.9 */
+    public String getSauth() {
+        return checked(Reseeder.PROP_SPROXY_AUTH_ENABLE);
+    }
+
+    /** @since 0.8.9 */
+    private String checked(String prop) {
+        boolean enabled =  _context.getBooleanProperty(prop);
         if (enabled)
             return "checked=\"true\"";
         return "";

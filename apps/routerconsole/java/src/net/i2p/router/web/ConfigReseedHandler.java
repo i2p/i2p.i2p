@@ -43,13 +43,32 @@ public class ConfigReseedHandler extends FormHandler {
         return arr[0].trim();
     }
 
+    /** @since 0.8.9 */
+    private void saveString(String config, String param) {
+        String val = getJettyString(param);
+        if (val != null && val.length() > 0)
+            _context.router().setConfigSetting(config, val);
+        else
+            _context.router().removeConfigSetting(config);
+    }
+
+    /** @since 0.8.9 */
+    private void saveBoolean(String config, String param) {
+        boolean val = getJettyString(param) != null;
+        _context.router().setConfigSetting(config, Boolean.toString(val));
+    }
+
     private void saveChanges() {
-        String port = getJettyString("port");
-        if (port != null)
-            _context.router().setConfigSetting(Reseeder.PROP_PROXY_PORT, port);
-        String host = getJettyString("host");
-        if (host != null)
-            _context.router().setConfigSetting(Reseeder.PROP_PROXY_HOST, host);
+        saveString(Reseeder.PROP_PROXY_PORT, "port");
+        saveString(Reseeder.PROP_PROXY_HOST, "host");
+        saveString(Reseeder.PROP_PROXY_USERNAME, "username");
+        saveString(Reseeder.PROP_PROXY_PASSWORD, "password");
+        saveBoolean(Reseeder.PROP_PROXY_AUTH_ENABLE, "auth");
+        saveString(Reseeder.PROP_SPROXY_PORT, "sport");
+        saveString(Reseeder.PROP_SPROXY_HOST, "shost");
+        saveString(Reseeder.PROP_SPROXY_USERNAME, "susername");
+        saveString(Reseeder.PROP_SPROXY_PASSWORD, "spassword");
+        saveBoolean(Reseeder.PROP_SPROXY_AUTH_ENABLE, "sauth");
         String url = getJettyString("reseedURL");
         if (url != null)
             _context.router().setConfigSetting(Reseeder.PROP_RESEED_URL, url.trim().replace("\r\n", ",").replace("\n", ","));
@@ -60,8 +79,8 @@ public class ConfigReseedHandler extends FormHandler {
                                            Boolean.toString(req));
         _context.router().setConfigSetting(Reseeder.PROP_SSL_DISABLE,
                                            Boolean.toString(disabled));
-        boolean proxy = getJettyString("enable") != null;
-        _context.router().setConfigSetting(Reseeder.PROP_PROXY_ENABLE, Boolean.toString(proxy));
+        saveBoolean(Reseeder.PROP_PROXY_ENABLE, "enable");
+        saveBoolean(Reseeder.PROP_SPROXY_ENABLE, "senable");
         _context.router().saveConfig();
         addFormNotice(_("Configuration saved successfully."));
     }

@@ -60,7 +60,7 @@ public class Reseeder {
               "http://c.netdb.i2p2.de/," +
               "http://reseed.i2p-projekt.de/," +
               "http://forum.i2p2.de/netdb/," +
-              "http://www.i2pbote.net/netDb/," +
+         /*   "http://www.i2pbote.net/netDb/," +   NO DATA */
               "http://r31453.ovh.net/static_media/files/netDb/," +
               "http://cowpuncher.drollette.com/netdb/";
 
@@ -69,7 +69,7 @@ public class Reseeder {
          /*   "https://a.netdb.i2p2.de/," +   bad cert */
          /*   "https://c.netdb.i2p2.de/," +   no data */
               "https://forum.i2p2.de/netdb/," +
-              "https://www.i2pbote.net/netDb/," +
+         /*   "https://www.i2pbote.net/netDb/," +   NO DATA */
               "https://reseed.i2p-projekt.de/," +
 	      "https://r31453.ovh.net/static_media/files/netDb/," +
               "https://cowpuncher.drollette.com/netdb/";
@@ -89,6 +89,16 @@ public class Reseeder {
     public static final String PROP_SSL_REQUIRED = "router.reseedSSLRequired";
     /** @since 0.8.3 */
     public static final String PROP_RESEED_URL = "i2p.reseedURL";
+    /** all these @since 0.8.9 */
+    public static final String PROP_PROXY_USERNAME = "router.reseedProxy.username";
+    public static final String PROP_PROXY_PASSWORD = "router.reseedProxy.password";
+    public static final String PROP_PROXY_AUTH_ENABLE = "router.reseedProxy.authEnable";
+    public static final String PROP_SPROXY_HOST = "router.reseedSSLProxyHost";
+    public static final String PROP_SPROXY_PORT = "router.reseedSSLProxyPort";
+    public static final String PROP_SPROXY_ENABLE = "router.reseedSSLProxyEnable";
+    public static final String PROP_SPROXY_USERNAME = "router.reseedSSLProxy.username";
+    public static final String PROP_SPROXY_PASSWORD = "router.reseedSSLProxy.password";
+    public static final String PROP_SPROXY_AUTH_ENABLE = "router.reseedSSLProxy.authEnable";
 
     public Reseeder(RouterContext ctx) {
         _context = ctx;
@@ -393,6 +403,7 @@ public class Reseeder {
             boolean ssl = url.toString().startsWith("https");
             if (ssl) {
                 SSLEepGet sslget;
+                // TODO SSL PROXY
                 if (_sslState == null) {
                     sslget = new SSLEepGet(I2PAppContext.getGlobalContext(), baos, url.toString());
                     // save state for next time
@@ -401,11 +412,19 @@ public class Reseeder {
                     sslget = new SSLEepGet(I2PAppContext.getGlobalContext(), baos, url.toString(), _sslState);
                 }
                 get = sslget;
+                // TODO SSL PROXY AUTH
             } else {
                 // Do a (probably) non-proxied eepget into our ByteArrayOutputStream with 0 retries
                 boolean shouldProxy = _proxyHost != null && _proxyHost.length() > 0 && _proxyPort > 0;
                 get = new EepGet(I2PAppContext.getGlobalContext(), shouldProxy, _proxyHost, _proxyPort, 0, 0, MAX_RESEED_RESPONSE_SIZE,
                                  null, baos, url.toString(), false, null, null);
+                if (shouldProxy && _context.getBooleanProperty(PROP_PROXY_AUTH_ENABLE)) {
+                    String user = _context.getProperty(PROP_PROXY_USERNAME);
+                    String pass = _context.getProperty(PROP_PROXY_PASSWORD);
+                    if (user != null && user.length() > 0 &&
+                        pass != null && pass.length() > 0)
+                        get.addAuthorization(user, pass);
+                }
             }
             get.addStatusListener(ReseedRunner.this);
             if (get.fetch())

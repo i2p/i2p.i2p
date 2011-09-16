@@ -33,21 +33,46 @@
 </p>
 <div class="wideload">
 <table border="0" cellspacing="5">
-<tr><td class="mediumtags" align="right"><b><%=intl._("Reseed URL Selection")%></b></td>
+<tr><td class="mediumtags" align="right"><b><%=intl._("Reseed URL Selection")%>:</b></td>
 <td><input type="radio" class="optbox" name="mode" value="0" <%=reseedHelper.modeChecked(0) %> >
-<%=intl._("Try SSL first then non-SSL")%>
+<b><%=intl._("Try SSL first then non-SSL")%></b><br>
 <input type="radio" class="optbox" name="mode" value="1" <%=reseedHelper.modeChecked(1) %> >
-<%=intl._("Use SSL only")%>
+<b><%=intl._("Use SSL only")%></b><br>
 <input type="radio" class="optbox" name="mode" value="2" <%=reseedHelper.modeChecked(2) %> >
-<%=intl._("Use non-SSL only")%></td></tr>
-<tr><td class="mediumtags" align="right"><b><%=intl._("Reseed URLs")%></b></td>
+<b><%=intl._("Use non-SSL only")%></b></td></tr>
+<tr><td class="mediumtags" align="right"><b><%=intl._("Reseed URLs")%>:</b></td>
 <td><textarea name="reseedURL" wrap="off" spellcheck="false"><jsp:getProperty name="reseedHelper" property="reseedURL" /></textarea></td></tr>
-<tr><td class="mediumtags" align="right"><b><%=intl._("Enable HTTP proxy (not used for SSL)")%></b></td>
+
+<tr><td class="mediumtags" align="right"><b><%=intl._("Enable HTTP Proxy?")%></b></td>
 <td><input type="checkbox" class="optbox" name="enable" value="true" <jsp:getProperty name="reseedHelper" property="enable" /> ></td></tr>
 <tr><td class="mediumtags" align="right"><b><%=intl._("HTTP Proxy Host")%>:</b></td>
 <td><input name="host" type="text" value="<jsp:getProperty name="reseedHelper" property="host" />" ></td></tr>
 <tr><td class="mediumtags" align="right"><b><%=intl._("HTTP Proxy Port")%>:</b></td>
-<td><input name="port" type="text" value="<jsp:getProperty name="reseedHelper" property="port" />" ></td></tr>
+<td><input name="port" type="text" size="5" maxlength="5" value="<jsp:getProperty name="reseedHelper" property="port" />" ></td></tr>
+
+<tr><td class="mediumtags" align="right"><b><%=intl._("Use HTTP Proxy Authorization?")%></b></td>
+<td><input type="checkbox" class="optbox" name="auth" value="true" <jsp:getProperty name="reseedHelper" property="auth" /> ></td></tr>
+<tr><td class="mediumtags" align="right"><b><%=intl._("HTTP Proxy Username")%>:</b></td>
+<td><input name="username" type="text" value="<jsp:getProperty name="reseedHelper" property="username" />" ></td></tr>
+<tr><td class="mediumtags" align="right"><b><%=intl._("HTTP Proxy Password")%>:</b></td>
+<td><input name="password" type="password" value="<jsp:getProperty name="reseedHelper" property="password" />" ></td></tr>
+
+<!-- TODO Need SSLEepGet support
+<tr><td class="mediumtags" align="right"><b><%=intl._("Enable HTTPS Proxy?")%></b></td>
+<td><input type="checkbox" class="optbox" name="senable" value="true" <jsp:getProperty name="reseedHelper" property="senable" /> ></td></tr>
+<tr><td class="mediumtags" align="right"><b><%=intl._("HTTPS Proxy Host")%>:</b></td>
+<td><input name="shost" type="text" value="<jsp:getProperty name="reseedHelper" property="shost" />" ></td></tr>
+<tr><td class="mediumtags" align="right"><b><%=intl._("HTTPS Proxy Port")%>:</b></td>
+<td><input name="sport" type="text" size="5" maxlength="5" value="<jsp:getProperty name="reseedHelper" property="sport" />" ></td></tr>
+
+<tr><td class="mediumtags" align="right"><b><%=intl._("Use HTTPS Proxy Authorization?")%></b></td>
+<td><input type="checkbox" class="optbox" name="sauth" value="true" <jsp:getProperty name="reseedHelper" property="sauth" /> ></td></tr>
+<tr><td class="mediumtags" align="right"><b><%=intl._("HTTPS Proxy Username")%>:</b></td>
+<td><input name="susername" type="text" value="<jsp:getProperty name="reseedHelper" property="susername" />" ></td></tr>
+<tr><td class="mediumtags" align="right"><b><%=intl._("HTTPS Proxy Password")%>:</b></td>
+<td><input name="spassword" type="password" value="<jsp:getProperty name="reseedHelper" property="spassword" />" ></td></tr>
+-->
+
 </table></div>
 <hr><div class="formaction">
 <input type="submit" name="foo" value="<%=intl._("Cancel")%>" />

@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
 import net.i2p.util.InternalSocket;
 
@@ -142,6 +143,9 @@ public class EepGet {
         String etag = null;
         String saveAs = null;
         String url = null;
+        List<String> extra = null;
+        String username = null;
+        String password = null;
         try {
             for (int i = 0; i < args.length; i++) {
                 if (args[i].equals("-p")) {
@@ -162,9 +166,16 @@ public class EepGet {
                     saveAs = args[i+1];
                     i++;
                 } else if (args[i].equals("-m")) {
-                    markSize = Integer.parseInt(args[i+1]);
-                    lineLen = Integer.parseInt(args[i+2]);
-                    i += 2;
+                    markSize = Integer.parseInt(args[++i]);
+                    lineLen = Integer.parseInt(args[++i]);
+                } else if (args[i].equals("-h")) {
+                    if (extra == null)
+                        extra = new ArrayList(2);
+                    extra.add(args[++i]);
+                    extra.add(args[++i]);
+                } else if (args[i].equals("-u")) {
+                    username = args[++i];
+                    password = args[++i];
                 } else if (args[i].startsWith("-")) {
                     usage();
                     return;
@@ -186,6 +197,13 @@ public class EepGet {
             saveAs = suggestName(url);
 
         EepGet get = new EepGet(I2PAppContext.getGlobalContext(), true, proxyHost, proxyPort, numRetries, saveAs, url, true, etag);
+        if (extra != null) {
+            for (int i = 0; i < extra.size(); i += 2) {
+                get.addHeader(extra.get(i), extra.get(i + 1));
+            }
+        }
+        if (username != null && password != null)
+            get.addAuthorization(username, password);
         get.addStatusListener(get.new CLIStatusListener(markSize, lineLen));
         get.fetch(CONNECT_TIMEOUT, -1, inactivityTimeout);
     }
@@ -221,7 +239,9 @@ public class EepGet {
     }
     
     private static void usage() {
-        System.err.println("EepGet [-p 127.0.0.1:4444] [-n #retries] [-o outputFile] [-m markSize lineLen] [-t timeout] url");
+        System.err.println("EepGet [-p 127.0.0.1:4444] [-n #retries] [-o outputFile] " +
+                           "[-m markSize lineLen] [-t timeout] [-h headerKey headerValue] " +
+                           "[-u username password] url");
     }
     
     public static interface StatusListener {
@@ -1093,5 +1113,18 @@ public class EepGet {
         if (_extraHeaders == null)
             _extraHeaders = new ArrayList();
         _extraHeaders.add(name + ": " + value);
+    }
+
+    /**
+     *  Add basic authorization header for the proxy.
+     *  Only added if the request is going through a proxy.
+     *  Must be called before fetch().
+     *
+     *  @since 0.8.9
+     */
+    public void addAuthorization(String userName, String password) {
+        if (_shouldProxy)
+            addHeader("Proxy-Authorization", 
+                      "Basic " + Base64.encode((userName + ':' + password).getBytes(), true));  // true = use standard alphabet
     }
 }
