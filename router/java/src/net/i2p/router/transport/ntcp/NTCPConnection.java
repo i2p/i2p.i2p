@@ -977,12 +977,14 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     }
         
     /**
-     * the contents of the buffer include some fraction of one or more
+     * Connection must be established!
+     *
+     * The contents of the buffer include some fraction of one or more
      * encrypted and encoded I2NP messages.  individual i2np messages are
      * encoded as "sizeof(data)+data+pad+crc", and those are encrypted
      * with the session key and the last 16 bytes of the previous encrypted
      * i2np message.  the contents of the buffer is owned by the EventPumper,
-     * so data should be copied out
+     * so data should be copied out.
      */
     synchronized void recvEncryptedI2NP(ByteBuffer buf) {
         //if (_log.shouldLog(Log.DEBUG))

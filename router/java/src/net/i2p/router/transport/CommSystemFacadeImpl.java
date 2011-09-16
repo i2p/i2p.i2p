@@ -295,7 +295,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         String cport = _context.getProperty(PROP_I2NP_NTCP_PORT);
         if (cport != null && cport.length() > 0) {
             nport = cport;
-        } else if (Boolean.valueOf(_context.getProperty(PROP_I2NP_NTCP_AUTO_PORT, "true")).booleanValue()) {
+        } else if (_context.getBooleanPropertyDefaultTrue(PROP_I2NP_NTCP_AUTO_PORT)) {
             nport = UDPProps.getProperty(UDPAddress.PROP_PORT);
         }
         if (_log.shouldLog(Log.INFO))

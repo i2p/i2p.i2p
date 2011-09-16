@@ -143,7 +143,7 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                         if ((!getContext().shitlist().isShitlistedForever(key)) &&
                             getContext().blocklist().isBlocklisted(key) &&
                             _log.shouldLog(Log.WARN))
-                                _log.warn("Blocklisting new peer " + key);
+                                _log.warn("Blocklisting new peer " + key + ' ' + ri);
                     } else {
                         Set oldAddr = prevNetDb.getAddresses();
                         Set newAddr = ri.getAddresses();
@@ -151,7 +151,7 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                             (!getContext().shitlist().isShitlistedForever(key)) &&
                             getContext().blocklist().isBlocklisted(key) &&
                             _log.shouldLog(Log.WARN))
-                                _log.warn("New address received, Blocklisting old peer " + key);
+                                _log.warn("New address received, Blocklisting old peer " + key + ' ' + ri);
                     }
                 }
                 getContext().profileManager().heardAbout(key);

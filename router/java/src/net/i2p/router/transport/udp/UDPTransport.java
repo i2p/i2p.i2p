@@ -1405,8 +1405,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     
     /** default true */
     private boolean allowDirectUDP() {
-        String allowDirect = _context.getProperty(PROP_ALLOW_DIRECT);
-        return ( (allowDirect == null) || (Boolean.valueOf(allowDirect).booleanValue()) );
+        return _context.getBooleanPropertyDefaultTrue(PROP_ALLOW_DIRECT);
     }
 
     String getPacketHandlerStatus() {
