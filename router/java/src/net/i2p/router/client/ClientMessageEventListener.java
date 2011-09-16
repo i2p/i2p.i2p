@@ -29,6 +29,7 @@ import net.i2p.data.i2cp.ReceiveMessageEndMessage;
 import net.i2p.data.i2cp.ReconfigureSessionMessage;
 import net.i2p.data.i2cp.SendMessageMessage;
 import net.i2p.data.i2cp.SendMessageExpiresMessage;
+import net.i2p.data.i2cp.SessionConfig;
 import net.i2p.data.i2cp.SessionId;
 import net.i2p.data.i2cp.SessionStatusMessage;
 import net.i2p.data.i2cp.SetDateMessage;
@@ -156,7 +157,8 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
      * So keep it simple.
      */
     private void handleCreateSession(I2CPMessageReader reader, CreateSessionMessage message) {
-        if (message.getSessionConfig().verifySignature()) {
+        SessionConfig in = message.getSessionConfig();
+        if (in.verifySignature()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Signature verified correctly on create session message");
         } else {
@@ -171,7 +173,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
             String configUser = _context.getProperty("i2cp.username");
             String configPW = _context.getProperty("i2cp.password");
             if (configUser != null && configPW != null) {
-                Properties props = message.getSessionConfig().getOptions();
+                Properties props = in.getOptions();
                 String user = props.getProperty("i2cp.username");
                 String pw = props.getProperty("i2cp.password");
                 if (user == null || pw == null) {
@@ -193,7 +195,17 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
         sessionId.setSessionId(getNextSessionId()); 
         _runner.setSessionId(sessionId);
         sendStatusMessage(SessionStatusMessage.STATUS_CREATED);
-        _runner.sessionEstablished(message.getSessionConfig());
+
+        // Copy over the whole config structure so we don't later corrupt it on
+        // the client side if we change settings or later get a
+        // ReconfigureSessionMessage
+        SessionConfig cfg = new SessionConfig(in.getDestination());
+        cfg.setSignature(in.getSignature());
+        Properties props = new Properties();
+        props.putAll(in.getOptions());
+        cfg.setOptions(props);
+        _runner.sessionEstablished(cfg);
+
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("after sessionEstablished for " + message.getSessionConfig().getDestination().calculateHash().toBase64());
 
@@ -285,7 +297,7 @@ class ClientMessageEventListener implements I2CPMessageReader.I2CPMessageEventLi
     /**
      * Message's Session ID ignored. This doesn't support removing previously set options.
      * Nor do we bother with message.getSessionConfig().verifySignature() ... should we?
-     *
+     * Nor is the Date checked.
      */
     private void handleReconfigureSession(I2CPMessageReader reader, ReconfigureSessionMessage message) {
         if (_log.shouldLog(Log.INFO))
