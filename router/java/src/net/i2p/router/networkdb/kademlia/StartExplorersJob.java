@@ -80,7 +80,7 @@ class StartExplorersJob extends JobImpl {
         long delay = getNextRunDelay();
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Updating exploration schedule with a delay of " + delay);
-        getTiming().setStartAfter(getContext().clock().now() + delay);        
+        requeue(delay);        
     }
     
     /**

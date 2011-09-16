@@ -1,3 +1,19 @@
+2011-09-16 zzz
+  * Console: Home page flag spacing
+  * EepGet: Add some new command line options
+  * JobQueue:
+    - Add warning to setStartAfter() as queue is no longer
+      continuously sorted
+    - Fix StartExplorerJob not calling requeue()
+    - More pumper cleanups
+  * Reseed:
+    - Add HTTP proxy authorization support
+    - Stub out SSL proxy support
+    - Disable i2pbote reseed
+  * Router: Fix router changing client-side tunnel options,
+    causing original tunnel quantity to not be restored
+    (ticket #513)
+
 2011-09-14 zzz
   * Console: Verify valid host/IP before saving on net config form
   * i2psnark:

@@ -459,7 +459,6 @@ public class JobQueue {
                 while (_alive) {
                     long now = _context.clock().now();
                     long timeToWait = -1;
-                    List<Job> toAdd = null;
                     try {
                         synchronized (_jobLock) {
                             for (Iterator<Job> iter = _timedJobs.iterator(); iter.hasNext(); ) {
@@ -470,8 +469,7 @@ public class JobQueue {
                                     if (j instanceof JobImpl)
                                         ((JobImpl)j).madeReady();
 
-                                    if (toAdd == null) toAdd = new ArrayList(4);
-                                    toAdd.add(j);
+                                    _readyJobs.offer(j);
                                     iter.remove();
                                 } else {
                                     //if ( (timeToWait <= 0) || (timeLeft < timeToWait) )
@@ -486,21 +484,8 @@ public class JobQueue {
                                         break;
                                 }
                             }
-
-                            if (toAdd != null) {
-                                if (_log.shouldLog(Log.DEBUG))
-                                    _log.debug("Not waiting - we have " + toAdd.size() + " newly ready jobs");
-                                // rather than addAll, which allocs a byte array rv before adding, 
-                                // we iterate, since toAdd is usually going to only be 1 or 2 entries
-                                // and since readyJobs will often have the space, we can avoid the
-                                // extra alloc.  (no, i'm not just being insane - i'm updating this based
-                                // on some profiling data ;)
-                                for (int i = 0; i < toAdd.size(); i++)
-                                    _readyJobs.offer(toAdd.get(i));
-                                _jobLock.notifyAll();
-                            } else {
                                 if (timeToWait < 0)
-                                    timeToWait = 30*1000;
+                                    timeToWait = 1000;
                                 else if (timeToWait < 10)
                                     timeToWait = 10;
                                 else if (timeToWait > 10*1000)
@@ -508,7 +493,6 @@ public class JobQueue {
                                 //if (_log.shouldLog(Log.DEBUG))
                                 //    _log.debug("Waiting " + timeToWait + " before rechecking the timed queue");
                                 _jobLock.wait(timeToWait);
-                            }
                         } // synchronize (_jobLock)
                     } catch (InterruptedException ie) {}
                 } // while (_alive)
@@ -631,6 +615,7 @@ public class JobQueue {
     private static class JobComparator implements Comparator<Job> {
          public int compare(Job l, Job r) {
              // equals first, Jobs generally don't override so this should be fast
+             // And this MUST be first so we can remove a job even if its timing has changed.
              if (l.equals(r))
                  return 0;
              // This is for _timedJobs, which always have a JobTiming.
