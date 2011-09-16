@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 
 import net.i2p.crypto.DSAEngine;
@@ -26,6 +27,7 @@ import net.i2p.data.Signature;
 import net.i2p.data.SigningPrivateKey;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
+import net.i2p.util.OrderedProperties;
 
 /**
  * Defines the information a client must provide to create a session
@@ -221,10 +223,12 @@ public class SessionConfig extends DataStructureImpl {
         buf.append("\n\tDestination: ").append(getDestination());
         buf.append("\n\tSignature: ").append(getSignature());
         buf.append("\n\tCreation Date: ").append(getCreationDate());
-        buf.append("\n\tOptions: #: ").append(getOptions().size());
-        for (Iterator iter = getOptions().keySet().iterator(); iter.hasNext();) {
-            String key = (String) iter.next();
-            String val = getOptions().getProperty(key);
+        buf.append("\n\tOptions: #: ").append(_options.size());
+        Properties sorted = new OrderedProperties();
+        sorted.putAll(_options);
+        for (Map.Entry e : sorted.entrySet()) {
+            String key = (String) e.getKey();
+            String val = (String) e.getValue();
             buf.append("\n\t\t[").append(key).append("] = [").append(val).append("]");
         }
         buf.append("]");
