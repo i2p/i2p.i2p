@@ -1,5 +1,5 @@
 @echo off
-:: fix_logfile_path.cmd
+:: fixpaths.cmd
 ::
 :: This is a simple (and/or stupid) script whose sole purpose is to set the
 :: correct path for wrapper.logfile, by explicitly setting it to use the
