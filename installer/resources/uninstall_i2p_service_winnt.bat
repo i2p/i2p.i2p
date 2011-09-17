@@ -82,6 +82,16 @@ if not [%_WRAPPER_CONF%]==[""] (
 )
 set _WRAPPER_CONF="%_WRAPPER_CONF_DEFAULT%"
 
+:: check status of the service. If %errorlevel% is 0
+:: the service is not installed. If the service
+:: isn't installed there isn't anything for us to do
+:: other than exit.
+"%_WRAPPER_EXE%" -qs %_WRAPPER_CONF%
+if %errorlevel%==0 (
+     echo The I2P Service service was not installed.
+     goto eof
+)
+
 call "%_REALPATH%"\set_config_dir_for_nt_service.bat uninstall
 rem
 rem Uninstall the Wrapper as an NT service.

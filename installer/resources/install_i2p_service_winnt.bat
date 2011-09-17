@@ -83,6 +83,20 @@ if not [%_WRAPPER_CONF%]==[""] (
 )
 set _WRAPPER_CONF="%_WRAPPER_CONF_DEFAULT%"
 
+:: Query status of service.
+:: We remove an existing service to
+:: 1) force the service to stop (this will stop the "can't upgrade
+::    because file is in use" forum posts from people re-running the
+::    installer to get the new version.
+:: 2) update service configuration in case wrapper.config was edited
+:: 3) prevent hanging the installer if 'install as service' is selected
+::    and it's already enabled as a service.
+"%_WRAPPER_EXE%" -qs %_WRAPPER_CONF%
+ if not %errorlevel%==0 (
+     "%_WRAPPER_EXE%" -r %_WRAPPER_CONF%
+     call "%~dp0set_config_dir_for_nt_service.bat" uninstall
+)
+
 :: Add service path to wrapper.config
 call "%_REALPATH%"\set_config_dir_for_nt_service.bat install
 
@@ -97,20 +111,12 @@ set _PARAMETERS=%_PARAMETERS% %1
 shift
 if not [%1]==[] goto :parameters
 
-:: We remove the existing service to
-:: 1) force the service to stop
-:: 2) update service configuration in case wrapper.config was edited
-:: 3) prevent hanging the installer if 'install as service' is selected
-::    and it's already enabled as a service.
 if [%_PASS_THROUGH%]==[] (
-    "%_WRAPPER_EXE%" -r %_WRAPPER_CONF%
     "%_WRAPPER_EXE%" -i %_WRAPPER_CONF%
 ) else (
-    "%_WRAPPER_EXE%" -r %_WRAPPER_CONF% -- %_PARAMETERS%
     "%_WRAPPER_EXE%" -i %_WRAPPER_CONF% -- %_PARAMETERS%
 )
 if not errorlevel 1 goto :eof
-if "%2"=="--nopause" goto :eof
 pause
 
 :eof
