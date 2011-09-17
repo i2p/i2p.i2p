@@ -6,7 +6,7 @@ set _WRAPPER_CONF="%_REALPATH%wrapper.config"
 cd /d %~dp0
 if "%1"=="uninstall" (
     FINDSTR /I /v "^wrapper.java.additional.5=-Di2p.dir.config=" %_WRAPPER_CONF% >> %_WRAPPER_CONF%.new
-    move %_WRAPPER_CONF%.new %_WRAPPER_CONF%
+    move %_WRAPPER_CONF%.new %_WRAPPER_CONF% >nul
     goto end
 ) else (
     FINDSTR /I "^wrapper.java.additional.5=-Di2p.dir.config=" %_WRAPPER_CONF%
