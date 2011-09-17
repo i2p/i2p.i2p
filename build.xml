@@ -640,7 +640,7 @@
         <copy file="installer/resources/eepget.bat" todir="pkg-temp/" />
         <copy file="installer/resources/i2prouter.bat" todir="pkg-temp/" />
         <copy file="installer/resources/fixperms.bat" todir="pkg-temp/" />
-        <copy file="installer/resources/fix_logfile_path.cmd" todir="pkg-temp/" />
+        <copy file="installer/resources/fixpaths.cmd" todir="pkg-temp/" />
         <copy file="installer/resources/install_i2p_service_winnt.bat" todir="pkg-temp/" />
         <copy file="installer/resources/set_config_dir_for_nt_service.bat" todir="pkg-temp/" />
         <copy file="installer/resources/uninstall_i2p_service_winnt.bat" todir="pkg-temp/" />
