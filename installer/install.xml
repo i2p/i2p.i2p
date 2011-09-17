@@ -193,7 +193,7 @@
 	        <args><arg value="$INSTALL_PATH/I2P Router Console.webloc" /></args></executable>
 		-->
             <!-- workaround for bad default path for wrapper.log in Windows. -->
-            <executable targetfile="$INSTALL_PATH/fix_logfile_path.cmd" type="bin" stage="postinstall" keep="false"> <os family="windows" /> 
+            <executable targetfile="$INSTALL_PATH/fixpaths.cmd" type="bin" stage="postinstall" keep="false"> <os family="windows" /> 
             </executable>
 
             <!-- workaround for vista permission problems - see comments above -->
