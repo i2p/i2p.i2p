@@ -239,12 +239,7 @@
             <description>Automatically start I2P in the background</description>
             <os family="windows" />
             <executable targetfile="$INSTALL_PATH/set_config_dir_for_nt_service.bat" stage="postinstall" failure="warn" keep="true" />
-            <executable targetfile="$INSTALL_PATH/install_i2p_service_winnt.bat" stage="postinstall" failure="warn" keep="true">
-                <args>
-                    <arg value="$INSTALL_PATH\wrapper.config" />
-                    <arg value="--nopause" />
-                </args>
-            </executable>
+	    <executable targetfile="$INSTALL_PATH/install_i2p_service_winnt.bat" stage="postinstall" failure="warn" keep="true" />
             <executable targetfile="$INSTALL_PATH/I2Psvc.exe" stage="postinstall" failure="warn" keep="true">
                 <args>
                     <arg value="-t" />
