@@ -32,4 +32,5 @@ findstr /V /R "^wrapper.pidfile=" wrapper.tmp2 > wrapper.new
 del /F /Q wrapper.tmp*
 echo wrapper.logfile=%%temp%%\wrapper.log >> wrapper.new
 echo wrapper.java.pidfile=%%temp%%\routerjvm.pid >> wrapper.new
+echo wrapper.pidfile=%%temp%%\i2p.pid >> wrapper.new
 move /Y wrapper.new wrapper.config
