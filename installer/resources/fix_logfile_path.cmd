@@ -26,6 +26,10 @@
 :: lameness.
 ::
 cd /d %~dp0
-findstr /V /R "^wrapper.logfile=" wrapper.config > wrapper.new
+findstr /V /R "^wrapper.logfile=" wrapper.config > wrapper.tmp1
+findstr /V /R "^wrapper.java.pidfile=" wrapper.tmp1 > wrapper.tmp2
+findstr /V /R "^wrapper.pidfile=" wrapper.tmp2 > wrapper.new
+del /F /Q wrapper.tmp*
 echo wrapper.logfile=%%temp%%\wrapper.log >> wrapper.new
-move wrapper.new wrapper.config
+echo wrapper.java.pidfile=%%temp%%\routerjvm.pid >> wrapper.new
+move /Y wrapper.new wrapper.config
