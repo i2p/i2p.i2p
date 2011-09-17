@@ -790,7 +790,7 @@
           <fileset dir="installer/resources/readme/" includes="readme*.html" />
           <fileset dir="installer/resources/proxy/" includes="*.ht" />
           <!-- lang_ar.png added in 0.8.4, je.png and eu.png added in 0.8.9 -->
-          <fileset dir="installer/resources/icons/flags/" includes="lang_ar.png,je.png,eu.png" />
+	  <fileset dir="installer/resources/" includes="icons/flags/lang_ar.png icons/flags/je.png icons/flags/eu.png" />
         </copy>
     </target>
 
