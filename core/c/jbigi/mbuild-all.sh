@@ -1,4 +1,4 @@
-#/bin/bash
+#!/usr/bin/env bash
 
 #FIXME What platforms for MacOS?
 MISC_DARWIN_PLATFORMS=""
@@ -7,18 +7,19 @@ MISC_DARWIN_PLATFORMS=""
 # for a new CPU. Just adding them here won't let I2P use the code!
 
 #
-# If you know of other platforms i2p on linux works on, 
+# If you know of other platforms i2p on linux works on,
 # please add them here.
 # Do NOT add any X86 platforms, do that below in the x86 platform list.
 #
 MISC_LINUX_PLATFORMS="hppa2.0 alphaev56 armv5tel mips64el itanium itanium2 ultrasparc2 ultrasparc2i alphaev6 powerpc970 powerpc7455 powerpc7447"
 
 #
-# If you know of other platforms i2p on FREEBSD works on, 
+# If you know of other platforms i2p on FREEBSD works on,
 # please add them here.
 # Do NOT add any X86 platforms, do that below in the x86 platform list.
 #
 MISC_FREEBSD_PLATFORMS="alphaev56 ultrasparc2i"
+MISC_NETBSD_PLATFORMS="powerpc powerpc64 powerpc64le powerpcle m68k-atari amiga m68knommu"
 
 #
 # MINGW/Windows??
@@ -43,9 +44,10 @@ X86_PLATFORMS="pentium pentiummmx pentium2 pentium3 pentiumm k6 k62 k63 athlon g
 MINGW_PLATFORMS="${X86_PLATFORMS} ${MISC_MINGW_PLATFORMS}"
 LINUX_PLATFORMS="${X86_PLATFORMS} ${MISC_LINUX_PLATFORMS}"
 FREEBSD_PLATFORMS="${X86_PLATFORMS} ${MISC_FREEBSD_PLATFORMS}"
+NETBSD_PLATFORMS="${FREEBSD_PLATFORMS} ${LINUX_PLATFORMS} ${MISC_NETBSD_PLATFORMS}"
 DARWIN_PLATFORMS="core2 corei"
 
-# Set the version to 5.0.2 for OSX because 
+# Set the version to 5.0.2 for OSX because
 # 1) it doesn't have the -r parameter as an option for sed
 # 2) AFAIK there are only 64bit capable CPUs for the Intel Macs
 if [ `uname -s |grep Darwin` ]; then
@@ -54,7 +56,7 @@ else
 	VER=$(echo gmp-*.tar.bz2 | sed -re "s/(.*-)(.*)(.*.tar.bz2)$/\2/" | tail -n 1)
 fi
 
-if [ "$VER" == "" ] ; then
+if [ "$VER" = "" ] ; then
 	echo "ERROR! Can't find gmp source tarball."
 	exit 1
 fi
@@ -97,6 +99,12 @@ Linux*)
 			PLATFORM_LIST="${LINUX_PLATFORMS}";;
 	esac
 	echo "Building ${TARGET} .so's for ${arch}";;
+NetBSD*)
+	PLATFORM_LIST="${NETBSD_PLATFORMS}"
+	NAME="libjbigi"
+	TYPE="so"
+	TARGET="-netbsd-"
+	echo "Building netbsd .sos for all architectures";;
 FreeBSD*)
 	PLATFORM_LIST="${FREEBSD_PLATFORMS}"
 	NAME="libjbigi"
@@ -120,7 +128,7 @@ function make_file {
 	echo "Attempting build for ${3}${5}${2}"
 	make && return 0
 	cd ..
-	rm -R "$2" 
+	rm -R "$2"
 	echo -e "\n\nFAILED! ${3}${5}${2} not made.\a"
 	sleep 10
 	return 1
@@ -150,7 +158,7 @@ function build_file {
 }
 
 echo "Extracting GMP Version $VER ..."
-tar -xf gmp-$VER.tar.bz2 || ( echo "Error in tarball file!" ; exit 1 )
+tar -xjf gmp-$VER.tar.bz2 || ( echo "Error in tarball file!" ; exit 1 )
 
 if [ ! -d bin ]; then
 	mkdir bin

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # When executed in Mingw: Produces a jbigi.dll
 # When executed in Linux/FreeBSD: Produces a libjbigi.so
 # When executed in OSX: Produces a libjbigi.jnilib
