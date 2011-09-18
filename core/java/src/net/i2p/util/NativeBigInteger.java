@@ -147,7 +147,7 @@ public class NativeBigInteger extends BigInteger {
      * @since 0.8.7
      */
     private final static String JBIGI_OPTIMIZATION_ARM        = "arm";
-    private final static String JBIGI_OPTIMIZATION_PPC	      = "ppc";
+    private final static String JBIGI_OPTIMIZATION_PPC        = "ppc";
 
     /**
      * Operating systems
@@ -157,6 +157,7 @@ public class NativeBigInteger extends BigInteger {
     private static final boolean _isMac = System.getProperty("os.name").startsWith("Mac");
     private static final boolean _isLinux = System.getProperty("os.name").toLowerCase().contains("linux");
     private static final boolean _isFreebsd = System.getProperty("os.name").toLowerCase().contains("freebsd");
+    private static final boolean _isNetbsd = System.getProperty("os.name").toLowerCase().contains("netbsd");
     private static final boolean _isSunos = System.getProperty("os.name").toLowerCase().contains("sunos");
     private static final boolean _isAndroid = System.getProperty("java.vendor").contains("Android");
 
@@ -756,6 +757,8 @@ public class NativeBigInteger extends BigInteger {
              return "jbigi-windows-";
         if(_isFreebsd)
             return "jbigi-freebsd-";
+        if(_isNetbsd)
+            return "jbigi-netbsd-";
         if(_isMac)
             return "jbigi-osx-";
         if(_isOS2)

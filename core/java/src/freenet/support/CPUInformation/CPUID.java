@@ -20,11 +20,11 @@ import net.i2p.util.FileUtil;
  * A class for retrieveing details about the CPU using the CPUID assembly instruction.
  * A good resource for information about the CPUID instruction can be found here:
  * http://www.paradicesoftware.com/specs/cpuid/index.htm
- * 
+ *
  * free (adj.): unencumbered; not under the control of others
- * Written by Iakin in 2004 and released into the public domain 
- * with no warranty of any kind, either expressed or implied.  
- * It probably won't make your computer catch on fire, or eat 
+ * Written by Iakin in 2004 and released into the public domain
+ * with no warranty of any kind, either expressed or implied.
+ * It probably won't make your computer catch on fire, or eat
  * your children, but it might. Use at your own risk.
 */
 
@@ -32,9 +32,9 @@ public class CPUID {
 
     /** did we load the native lib correctly? */
     private static boolean _nativeOk = false;
-    
-    /** 
-     * do we want to dump some basic success/failure info to stderr during 
+
+    /**
+     * do we want to dump some basic success/failure info to stderr during
      * initialization?  this would otherwise use the Log component, but this makes
      * it easier for other systems to reuse this class
      *
@@ -54,6 +54,7 @@ public class CPUID {
     private static final boolean isWindows = System.getProperty("os.name").toLowerCase().contains("windows");
     private static final boolean isLinux = System.getProperty("os.name").toLowerCase().contains("linux");
     private static final boolean isFreebsd = System.getProperty("os.name").toLowerCase().contains("freebsd");
+    private static final boolean isNetbsd = System.getProperty("os.name").toLowerCase().contains("netbsd");
     private static final boolean isSunos = System.getProperty("os.name").toLowerCase().contains("sunos");
     private static final boolean isMac = System.getProperty("os.name").startsWith("Mac");
 
@@ -74,7 +75,7 @@ public class CPUID {
     static
     {
         loadNative();
-    }    
+    }
     //A class that can (amongst other things I assume) represent the state of the
     //different CPU registers after a call to the CPUID assembly method
     protected static class CPUIDResult {
@@ -90,9 +91,9 @@ public class CPUID {
             this.EDX = EDX;
         }
     }
-    
+
     /**Calls the indicated CPUID function and returns the result of the execution
-     * 
+     *
      * @param iFunction The CPUID function to call, should be 0 or larger
      * @return The contents of the CPU registers after the call to the CPUID function
      */
@@ -107,17 +108,17 @@ public class CPUID {
         sb.append((char)((c.EBX >> 8)  & 0xFF));
         sb.append((char)((c.EBX >> 16) & 0xFF));
         sb.append((char)((c.EBX >> 24) & 0xFF));
-        
+
         sb.append((char)( c.EDX        & 0xFF));
         sb.append((char)((c.EDX >> 8)  & 0xFF));
         sb.append((char)((c.EDX >> 16) & 0xFF));
         sb.append((char)((c.EDX >> 24) & 0xFF));
-        
+
         sb.append((char)( c.ECX        & 0xFF));
         sb.append((char)((c.ECX >> 8)  & 0xFF));
         sb.append((char)((c.ECX >> 16) & 0xFF));
         sb.append((char)((c.ECX >> 24) & 0xFF));
-    
+
         return sb.toString();
     }
     static int getCPUFamily()
@@ -163,7 +164,7 @@ public class CPUID {
     static int getExtendedEBXCPUFlags()
     {
         CPUIDResult c = doCPUID(0x80000001);
-        return c.EBX;    
+        return c.EBX;
     }
     static int getExtendedECXCPUFlags()
     {
@@ -177,7 +178,7 @@ public class CPUID {
         CPUIDResult c = doCPUID(0x80000001);
         return c.EDX;
     }
-    
+
     /**
      * Returns a CPUInfo item for the current type of CPU
      * If I could I would declare this method in a interface named
@@ -200,7 +201,7 @@ public class CPUID {
             return new IntelInfoImpl();
         throw new UnknownCPUException("Unknown CPU type: '"+getCPUVendorID()+"'");
     }
-    
+
 
     public static void main(String args[])
     {
@@ -214,7 +215,7 @@ public class CPUID {
         System.out.println("CPU Model: " + getCPUModel());
         System.out.println("CPU Stepping: " + getCPUStepping());
         System.out.println("CPU Flags: 0x" + Integer.toHexString(getEDXCPUFlags()));
-        
+
         CPUInfo c = getInfo();
         System.out.println(" **More CPUInfo**");
         System.out.println(" CPU model string: " + c.getCPUModelString());
@@ -238,9 +239,9 @@ public class CPUID {
             System.out.println("  **AMD-info**");
             System.out.println("  Is Athlon-compatible: "+((AMDCPUInfo)c).IsAthlonCompatible());
         }
-        
+
     }
-    
+
     /**
      * <p>Do whatever we can to load up the native library.
      * If it can find a custom built jcpuid.dll / libjcpuid.so, it'll use that.  Otherwise
@@ -279,8 +280,8 @@ public class CPUID {
                 System.err.println("INFO: Native CPUID library jcpuid not loaded, reason: '"+e.getMessage()+"' - will not be able to read CPU information using CPUID");
         }
     }
-    
-    /** 
+
+    /**
      * <p>Try loading it from an explictly built jcpuid.dll / libjcpuid.so</p>
      * The file name must be (e.g. on linux) either libjcpuid.so or libjcpuid-x86-linux.so.
      * This method does not search for a filename with "_64" in it.
@@ -311,13 +312,13 @@ public class CPUID {
             return false;
         //}
     }
-    
+
     /**
      * <p>Check all of the jars in the classpath for the jcpuid dll/so.
      * This file should be stored in the resource in the same package as this class.
-     * 
+     *
      * <p>This is a pretty ugly hack, using the general technique illustrated by the
-     * onion FEC libraries.  It works by pulling the resource, writing out the 
+     * onion FEC libraries.  It works by pulling the resource, writing out the
      * byte stream to a temporary file, loading the native library from that file.
      * We then attempt to copy the file from the temporary dir to the base install dir,
      * so we don't have to do this next time - but we don't complain if it fails,
@@ -338,7 +339,7 @@ public class CPUID {
             if (success)
                 return true;
         }
-        
+
         // now try 32 bit
         resourceName = getResourceName();
         boolean success = extractLoadAndCopy(resourceName);
@@ -405,13 +406,13 @@ public class CPUID {
         FileUtil.copy(outFile, newFile, false, true);
         return true;
     }
-    
+
     /** @return non-null */
     private static final String getResourceName()
     {
         return getLibraryPrefix()+getLibraryMiddlePart()+"."+getLibrarySuffix();
     }
-    
+
     /**
      * @return null if not on a 64 bit platform
      * @since 0.8.7
@@ -421,7 +422,7 @@ public class CPUID {
             return null;
         return getLibraryPrefix() + get64LibraryMiddlePart() + "." + getLibrarySuffix();
     }
-    
+
     private static final String getLibraryPrefix()
     {
         if(isWindows)
@@ -429,7 +430,7 @@ public class CPUID {
         else
             return "lib";
     }
-    
+
     private static final String getLibraryMiddlePart(){
         if(isWindows)
              return "jcpuid-x86-windows"; // The convention on Windows
@@ -440,19 +441,23 @@ public class CPUID {
 	}
         if(isFreebsd)
             return "jcpuid-x86-freebsd"; // The convention on freebsd...
+        if(isNetbsd)
+            return "jcpuid-x86-netbsd"; // The convention on netbsd...
         if(isSunos)
             return "jcpuid-x86-solaris"; // The convention on SunOS
         //throw new RuntimeException("Dont know jcpuid library name for os type '"+System.getProperty("os.name")+"'");
         // use linux as the default, don't throw exception
         return "jcpuid-x86-linux";
     }
-    
+
     /** @since 0.8.7 */
     private static final String get64LibraryMiddlePart() {
         if(isWindows)
              return "jcpuid-x86_64-windows";
         if(isFreebsd)
             return "jcpuid-x86_64-freebsd";
+        if(isNetbsd)
+            return "jcpuid-x86_64-netbsd";
 	if(isMac){
 	    if(isX86){
 	        return "jcpuid-x86_64-osx";
@@ -463,7 +468,7 @@ public class CPUID {
         // use linux as the default, don't throw exception
         return "jcpuid-x86_64-linux";
     }
-    
+
     private static final String getLibrarySuffix()
     {
         if(isWindows)
