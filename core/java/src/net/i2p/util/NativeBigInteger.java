@@ -158,6 +158,7 @@ public class NativeBigInteger extends BigInteger {
     private static final boolean _isLinux = System.getProperty("os.name").toLowerCase().contains("linux");
     private static final boolean _isFreebsd = System.getProperty("os.name").toLowerCase().contains("freebsd");
     private static final boolean _isNetbsd = System.getProperty("os.name").toLowerCase().contains("netbsd");
+    private static final boolean _isOpenbsd = System.getProperty("os.name").toLowerCase().contains("openbsd");
     private static final boolean _isSunos = System.getProperty("os.name").toLowerCase().contains("sunos");
     private static final boolean _isAndroid = System.getProperty("java.vendor").contains("Android");
 
@@ -759,6 +760,8 @@ public class NativeBigInteger extends BigInteger {
             return "jbigi-freebsd-";
         if(_isNetbsd)
             return "jbigi-netbsd-";
+        if(_isOpenbsd)
+            return "jbigi-openbsd-";
         if(_isMac)
             return "jbigi-osx-";
         if(_isOS2)

@@ -55,6 +55,7 @@ public class CPUID {
     private static final boolean isLinux = System.getProperty("os.name").toLowerCase().contains("linux");
     private static final boolean isFreebsd = System.getProperty("os.name").toLowerCase().contains("freebsd");
     private static final boolean isNetbsd = System.getProperty("os.name").toLowerCase().contains("netbsd");
+    private static final boolean isOpenbsd = System.getProperty("os.name").toLowerCase().contains("openbsd");
     private static final boolean isSunos = System.getProperty("os.name").toLowerCase().contains("sunos");
     private static final boolean isMac = System.getProperty("os.name").startsWith("Mac");
 
@@ -443,6 +444,8 @@ public class CPUID {
             return "jcpuid-x86-freebsd"; // The convention on freebsd...
         if(isNetbsd)
             return "jcpuid-x86-netbsd"; // The convention on netbsd...
+        if(isOpenbsd)
+            return "jcpuid-x86-openbsd"; // The convention on openbsd...
         if(isSunos)
             return "jcpuid-x86-solaris"; // The convention on SunOS
         //throw new RuntimeException("Dont know jcpuid library name for os type '"+System.getProperty("os.name")+"'");
@@ -458,6 +461,8 @@ public class CPUID {
             return "jcpuid-x86_64-freebsd";
         if(isNetbsd)
             return "jcpuid-x86_64-netbsd";
+        if(isOpenbsd)
+            return "jcpuid-x86_64-openbsd";
 	if(isMac){
 	    if(isX86){
 	        return "jcpuid-x86_64-osx";

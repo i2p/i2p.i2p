@@ -1,5 +1,5 @@
 2011-09-18 kytv
- * Add NetBSD to NBI and CPUID
+ * Add OpenBSD & NetBSD to NBI and CPUID
 
 2011-09-16 zzz
   * Console: Home page flag spacing
