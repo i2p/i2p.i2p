@@ -1638,7 +1638,7 @@ docommand() {
 
             ;;
 
-        'remove')
+        'remove' | 'uninstall')
             removedaemon
             ;;
 
