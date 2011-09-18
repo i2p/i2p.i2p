@@ -1,4 +1,4 @@
-#/bin/bash
+#/usr/bin/env bash
 # Automatic build of so files, ignores failed builds.
 # Place latest gmp tarball in the jbigi dir, and exec this script.
 

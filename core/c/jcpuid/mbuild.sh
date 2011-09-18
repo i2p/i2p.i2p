@@ -2,13 +2,15 @@
 
 case `uname -sr` in
 MINGW*)
-	echo "Building windows .dll's";;
+	echo "Building windows .dlls";;
 CYGWIN*)
-	echo "Building windows .dll's";;
+	echo "Building windows .dlls";;
 Linux*)
-	echo "Building linux .so's";;
+	echo "Building linux .sos";;
+NetBSD*)
+	echo "Building netbsd .sos";;
 FreeBSD*)
-	echo "Building freebsd .so's";;
+	echo "Building freebsd .sos";;
 Darwin*)
 	echo "Building OSX jnilibs";;
 *)
@@ -37,6 +39,20 @@ Darwin*)
         INCLUDES="-I. -Iinclude -I$JAVA_HOME/include/"
         LINKFLAGS="-dynamiclib -framework JavaVM"
         LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-x86-darwin.jnilib";;
+NetBSD*)
+	case `uname -m` in
+		amd64)
+			LINKFLAGS="-shared -Wl,-soname,libjcpuid-x86_64-netbsd.so"
+			LIBFILE="lib/netnet/support/CPUInformation/libjcpuid-x86_64-netbsd.so";;
+		i?86*)
+			LINKFLAGS="-shared -Wl,-soname,libjcpuid-x86-netbsd.so"
+			LIBFILE="lib/netnet/support/CPUInformation/libjcpuid-x86-netbsd.so";;
+		*)
+			echo "Unknown build environment"
+			exit;;
+	esac
+	COMPILEFLAGS="-fPIC -Wall"
+	INCLUDES="-I. -Iinclude -I$JAVA_HOME/include/ -I$JAVA_HOME/include/netbsd/";;
 FreeBSD*)
 	case `uname -m` in
 		amd64)
