@@ -19,7 +19,7 @@ MISC_LINUX_PLATFORMS="hppa2.0 alphaev56 armv5tel mips64el itanium itanium2 ultra
 # Do NOT add any X86 platforms, do that below in the x86 platform list.
 #
 MISC_FREEBSD_PLATFORMS="alphaev56 ultrasparc2i"
-MISC_NETBSD_PLATFORMS="powerpc powerpc64 powerpc64le powerpcle m68k-atari amiga m68knommu"
+MISC_NETBSD_PLATFORMS="powerpc powerpc64 powerpc64le powerpcle atari amiga m68knommu"
 
 #
 # MINGW/Windows??
