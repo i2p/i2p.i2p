@@ -23,21 +23,40 @@ Darwin*)
         INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include"
         LINKFLAGS="-dynamiclib -framework JavaVM"
         LIBFILE="libjbigi.jnilib";;
-SunOS*)
+SunOS*|OpenBSD*|NetBSD*|FreeBSD*|Linux*)
+        UNIXTYPE="`uname -s | tr [A-Z] [a-z]`"
+        if [ $UNIXTYPE = "sunos" ]; then
+                UNIXTYPE="solaris"
+        elif [ $UNIXTYPE = "freebsd" ]; then
+                if [ -d /usr/local/openjdk6 ]; then
+                        JAVA_HOME="/usr/local/openjdk6"
+                elif [ -d /usr/local/openjdk7 ]; then
+                        JAVA_HOME="/usr/local/openjdk7"
+                fi
+        elif [ $UNIXTYPE = "openbsd" ]; then
+                if [ -d /usr/local/jdk-1.7.0 ]; then
+                        JAVA_HOME="/usr/local/jdk-1.7.0"
+                fi
+	elif [ $UNIXTYPE = "netbsd" ]; then
+		if [ -d /usr/pkg/java/openjdk7 ]; then
+			JAVA_HOME="/usr/pkg/java/openjdk7"
+		fi
+	elif [ $UNIXTYPE = "linux" -a -e /etc/debian_version ]; then
+		if [ -d /usr/lib/jvm/default-java ]; then
+			JAVA_HOME="/usr/lib/jvm/default-java"
+		fi
+        fi
         COMPILEFLAGS="-fPIC -Wall"
-        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/solaris"
+        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/${UNIXTYPE}"
         LINKFLAGS="-shared -Wl,-soname,libjbigi.so"
         LIBFILE="libjbigi.so";;
-
 *)
-	COMPILEFLAGS="-fPIC -Wall"
-	INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/linux"
-	LINKFLAGS="-shared -Wl,-soname,libjbigi.so"
-	LIBFILE="libjbigi.so";;
+	echo "Unsupported system type."
+	exit 1;;
 esac
 
 if [ "$1" = "dynamic" ] ; then
-	echo "Building a jbigi lib that is dynamically linked to GMP" 
+	echo "Building a jbigi lib that is dynamically linked to GMP"
 	LIBPATH="-L.libs"
 	INCLUDELIBS="-lgmp"
 else
