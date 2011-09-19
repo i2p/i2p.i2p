@@ -91,7 +91,7 @@ Linux*)
 			arch="x86";;
 	esac
 	case ${arch} in
-		x86_64)
+		x86_64 | amd64)
 			PLATFORM_LIST="${X86_64_PLATFORMS}"
 			TARGET="-linux-X86_64-";;
 		ia64)
@@ -115,7 +115,7 @@ NetBSD*|FreeBSD*|OpenBSD*)
 			arch="x86";;
 	esac
 	case ${arch} in
-		x86_64)
+		x86_64|amd64)
 			PLATFORM_LIST="${X86_64_PLATFORMS}"
 			TARGET="-${BSDTYPE}-X86_64-";;
 		ia64)

@@ -61,7 +61,7 @@ Linux*|OpenBSD*|NetBSD*|FreeBSD*|SunOS*)
 		fi
         fi
 	case `uname -m` in
-		x86_64*)
+		x86_64*|amd64)
 			LINKFLAGS="-shared -Wl,-soname,libjcpuid-x86_64-${UNIXTYPE}.so"
 			LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-x86_64-${UNIXTYPE}.so";;
 		ia64*)
