@@ -28,8 +28,16 @@ Or move the i2pupdate.zip file into an existing installation directory and resta
 
 To start I2P:
    (*nix): sh i2prouter start
-   (win*): I2P.exe
+   (win*): I2P.exe or i2prouter.bat
    (non-x86 platforms PPC, ARM, etc): sh runplain.sh
+
+To install I2P as a system service:
+   (*nix) sh i2prouter install
+   (win*) install_i2p_service_winnt.bat
+
+To uninstall I2P as a system service:
+   (*nix) sh i2prouter remove
+   (win*) uninstall_i2p-service_winnt.bat
 
 To stop I2P (gracefully):
    lynx http://localhost:7657/summaryframe (click "Shutdown")
