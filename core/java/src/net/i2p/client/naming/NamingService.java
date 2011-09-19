@@ -84,6 +84,11 @@ public abstract class NamingService {
      * Check if host name is valid Base64 encoded dest and return this
      * dest in that case. Useful as a "fallback" in custom naming
      * implementations.
+     * This is misnamed as it isn't a "lookup" at all, but
+     * a simple conversion from a Base64 string to a Destination.
+     *
+     * @param hostname 516+ character Base 64
+     * @return Destination or null on error
      */
     protected Destination lookupBase64(String hostname) {
         try {
@@ -112,6 +117,8 @@ public abstract class NamingService {
     }
 
     /**
+     *  Warning - unimplemented in any subclass.
+     *
      *  @return NamingService-specific options or null
      *  @since 0.8.7
      */
@@ -120,6 +127,8 @@ public abstract class NamingService {
     }
 
     /**
+     *  Warning - unimplemented in any subclass.
+     *
      *  @return success
      *  @since 0.8.7
      */
@@ -194,6 +203,9 @@ public abstract class NamingService {
     }
 
     /**
+     *  Warning - This obviously brings the whole database into memory,
+     *  so use is discouraged.
+     *
      *  @return all mappings
      *          or empty Map if none;
      *          Returned Map is not necessarily sorted, implementation dependent
@@ -204,6 +216,9 @@ public abstract class NamingService {
     }
 
     /**
+     *  Warning - This will bring the whole database into memory
+     *  if options is null, empty, or unsupported, use with caution.
+     *
      *  @param options NamingService-specific, can be null
      *  @return all mappings (matching the options if non-null)
      *          or empty Map if none;
@@ -215,7 +230,11 @@ public abstract class NamingService {
     }
 
     /**
-     *  This may be more or less efficient than getEntries()
+     *  This may be more or less efficient than getEntries(),
+     *  depending on the implementation.
+     *  Warning - This will bring the whole database into memory
+     *  if options is null, empty, or unsupported, use with caution.
+     *
      *  @param options NamingService-specific, can be null
      *  @return all mappings (matching the options if non-null)
      *          or empty Map if none;
@@ -298,7 +317,9 @@ public abstract class NamingService {
     }
 
     /**
-     *  Fails if entry did not previously exist
+     *  Fails if entry did not previously exist.
+     *  Warning - unimplemented in any subclass.
+     *
      *  @param d may be null if only options are changing
      *  @param options NamingService-specific, can be null
      *  @return success
