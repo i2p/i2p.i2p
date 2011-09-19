@@ -14,6 +14,7 @@ import net.i2p.data.TunnelId;
 /**
  * Wrap up the details of how a ClientMessage was received from the network
  *
+ * @deprecated unused
  */
 public class MessageReceptionInfo {
     private Hash _fromPeer;

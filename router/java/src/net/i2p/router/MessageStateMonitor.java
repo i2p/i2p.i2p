@@ -5,6 +5,7 @@ import net.i2p.util.Log;
 /**
  * Keep track of the inbound and outbound messages in memory.
  *
+ * @deprecated unused
  */
 public class MessageStateMonitor {
     private Log _log;

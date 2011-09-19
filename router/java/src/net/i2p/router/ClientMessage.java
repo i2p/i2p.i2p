@@ -23,7 +23,7 @@ public class ClientMessage {
     private Payload _payload;
     private Destination _destination;
     private Destination _fromDestination;
-    private MessageReceptionInfo _receptionInfo;
+    //private MessageReceptionInfo _receptionInfo;
     private SessionConfig _senderConfig;
     private Hash _destinationHash;
     private MessageId _messageId;
@@ -77,8 +77,8 @@ public class ClientMessage {
      * originated ones.
      *
      */
-    public MessageReceptionInfo getReceptionInfo() { return _receptionInfo; }
-    public void setReceptionInfo(MessageReceptionInfo info) { _receptionInfo = info; }
+    //public MessageReceptionInfo getReceptionInfo() { return _receptionInfo; }
+    //public void setReceptionInfo(MessageReceptionInfo info) { _receptionInfo = info; }
 
     /**
      * Retrieve the session config of the client that sent the message.  This will only be available
