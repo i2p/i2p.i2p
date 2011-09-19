@@ -151,6 +151,7 @@ public final class SHA256Generator {
      *	gij	 40	 22417    988
      *  </pre>
      */
+/****
     public static void main(String args[]) {
         if (args.length <= 0) {
             System.err.println("Usage: SHA256Generator string");
@@ -189,4 +190,5 @@ public final class SHA256Generator {
 
         System.out.println("JVM time (ms): " + time);
     }
+****/
 }

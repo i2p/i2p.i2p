@@ -460,6 +460,7 @@ public class DSAEngine {
      *
      *  TheCrypto is about 5-15% faster than java.security.
      */
+/****
     public static void main(String args[]) {
         I2PAppContext ctx = I2PAppContext.getGlobalContext();
         byte data[] = new byte[1024];
@@ -532,7 +533,7 @@ public class DSAEngine {
         }
         time = System.currentTimeMillis() - start;
         System.err.println("JavaLib time (ms): " + time);
-
+****/
 /****  yes, arraycopy is slower for 20 bytes
         start = System.currentTimeMillis();
 	byte b[] = new byte[20];
@@ -553,5 +554,7 @@ public class DSAEngine {
         time = System.currentTimeMillis() - start;
         System.err.println("loop time (ms): " + time);
 ****/
+/****
      }
+****/
 }

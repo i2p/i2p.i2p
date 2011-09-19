@@ -167,6 +167,7 @@ class YKGenerator {
         return yk;
     }
 
+/****
     private static final int RUNS = 500;
 
     public static void main(String args[]) {
@@ -182,7 +183,9 @@ class YKGenerator {
         // 14 ms each on a 2008 netbook (with jbigi)
         System.out.println("YK fetch time for " + RUNS + " runs: " + negTime + " @ " + (negTime / RUNS) + "ms each");
     }
+****/
 
+    /** the thread */
     private static class YKPrecalcRunner implements Runnable {
         private final int _minSize;
         private final int _maxSize;

@@ -55,8 +55,8 @@ import net.i2p.util.SimpleByteCache;
  */
 
 public class ElGamalEngine {
-    private Log _log;
-    private I2PAppContext _context;
+    private final Log _log;
+    private final I2PAppContext _context;
     
     /** 
      * The ElGamal engine should only be constructed and accessed through the 
@@ -75,10 +75,6 @@ public class ElGamalEngine {
         _log = context.logManager().getLog(ElGamalEngine.class);
     }
 
-    private ElGamalEngine() { // nop
-    }
-
-    
     /**
      *  Note that this stops the singleton precalc thread.
      *  You don't want to do this if there are multiple routers in the JVM.
@@ -176,7 +172,7 @@ public class ElGamalEngine {
             if (_log.shouldLog(Log.WARN)) _log.warn("Took too long to encrypt ElGamal block (" + diff + "ms)");
         }
 
-        _context.statManager().addRateData("crypto.elGamal.encrypt", diff, diff);
+        _context.statManager().addRateData("crypto.elGamal.encrypt", diff, 0);
         return out;
     }
 
@@ -238,7 +234,7 @@ public class ElGamalEngine {
                 _log.warn("Took too long to decrypt and verify ElGamal block (" + diff + "ms)");
         }
 
-        _context.statManager().addRateData("crypto.elGamal.decrypt", diff, diff);
+        _context.statManager().addRateData("crypto.elGamal.decrypt", diff, 0);
 
         if (ok) {
             //_log.debug("Hash matches: " + DataHelper.toString(hash.getData(), hash.getData().length));
@@ -250,6 +246,7 @@ public class ElGamalEngine {
         return null;
     }
 
+/****
     public static void main(String args[]) {
         long eTime = 0;
         long dTime = 0;
@@ -306,4 +303,5 @@ public class ElGamalEngine {
                            + " average decryption time: " + (dTime / numRuns) + " average key generation time: "
                            + (gTime / numRuns));
     }
+****/
 }
