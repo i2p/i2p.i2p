@@ -24,11 +24,9 @@ import net.i2p.util.Log;
  *
  */
 public class I2PTunnelHTTPClientRunner extends I2PTunnelRunner {
-    private Log _log;
     public I2PTunnelHTTPClientRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData,
                                      List<I2PSocket> sockList, Runnable onTimeout) {
         super(s, i2ps, slock, initialI2PData, sockList, onTimeout);
-        _log = I2PAppContext.getGlobalContext().logManager().getLog(I2PTunnelHTTPClientRunner.class);
     }
 
     @Override
@@ -37,10 +35,22 @@ public class I2PTunnelHTTPClientRunner extends I2PTunnelRunner {
         return new HTTPResponseOutputStream(raw);
     }
         
+    /**
+     *  Why is this overridden?
+     *  Why flush in super but not here?
+     *  Why do things in different order than in super?
+     */
     @Override
-    protected void close(OutputStream out, InputStream in, OutputStream i2pout, InputStream i2pin, Socket s, I2PSocket i2ps, Thread t1, Thread t2) throws InterruptedException, IOException {
+    protected void close(OutputStream out, InputStream in, OutputStream i2pout, InputStream i2pin,
+                         Socket s, I2PSocket i2ps, Thread t1, Thread t2) throws InterruptedException, IOException {
         try { 
             i2pin.close();
+        } catch (IOException ioe) {
+            // ignore
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Unable to close the i2p socket input stream: " + i2pin, ioe);
+        }
+        try { 
             i2pout.close();
         } catch (IOException ioe) {
             // ignore
@@ -49,14 +59,28 @@ public class I2PTunnelHTTPClientRunner extends I2PTunnelRunner {
         }
         try { 
             in.close();
+        } catch (IOException ioe) { 
+            // ignore
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Unable to close the browser input stream: " + in, ioe);
+        }
+        try { 
             out.close(); 
         } catch (IOException ioe) { 
             // ignore
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Unable to close the browser output stream: " + out, ioe);
         }
-        i2ps.close();
-        s.close();
+        try { 
+            i2ps.close();
+        } catch (IOException ioe) { 
+            // ignore
+        }
+        try { 
+            s.close();
+        } catch (IOException ioe) { 
+            // ignore
+        }
         t1.join(30*1000);
         t2.join(30*1000);
     }
