@@ -99,25 +99,13 @@ public class InternalServerSocket extends ServerSocket {
         InternalServerSocket iss = _sockets.get(Integer.valueOf(port));
         if (iss == null)
              throw new IOException("No server for port: " + port);
-        PipedInputStream cis = new BigPipedInputStream();
-        PipedInputStream sis = new BigPipedInputStream();
+        PipedInputStream cis = BigPipedInputStream.getInstance();
+        PipedInputStream sis = BigPipedInputStream.getInstance();
         PipedOutputStream cos = new PipedOutputStream(sis);
         PipedOutputStream sos = new PipedOutputStream(cis);
         clientSock.setInputStream(cis);
         clientSock.setOutputStream(cos);
         iss.queueConnection(new InternalSocket(sis, sos));
-    }
-
-    /**
-     *  Until we switch to Java 1.6
-     *  http://javatechniques.com/blog/low-memory-deep-copy-technique-for-java-objects/
-     */
-    private static class BigPipedInputStream extends PipedInputStream {
-        protected static int PIPE_SIZE = 64*1024;
-        public BigPipedInputStream() {
-             super();
-             buffer = new byte[PIPE_SIZE];
-        }
     }
 
     private void queueConnection(InternalSocket sock) throws IOException {

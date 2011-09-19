@@ -14,17 +14,17 @@ import java.util.Arrays;
  */
 public class LookaheadInputStream extends FilterInputStream {
     private boolean _eofReached;
-    private byte[] _footerLookahead;
+    private final byte[] _footerLookahead;
     private static final InputStream _fakeInputStream = new ByteArrayInputStream(new byte[0]);
     
     public LookaheadInputStream(int lookaheadSize) {
         super(_fakeInputStream);
-        _eofReached = false;
         _footerLookahead = new byte[lookaheadSize];
     }
     
     public boolean getEOFReached() { return _eofReached; }
         
+    /** blocking! */
     public void initialize(InputStream src) throws IOException {
         in = src;
         _eofReached = false;
@@ -35,7 +35,6 @@ public class LookaheadInputStream extends FilterInputStream {
             if (read == -1) throw new IOException("EOF reading the footer lookahead");
             footerRead += read;
         }
-        boolean f = true;
     }
     
     @Override
@@ -53,10 +52,12 @@ public class LookaheadInputStream extends FilterInputStream {
         if (rv < 0) rv += 256;
         return rv;
     }
+
     @Override
     public int read(byte buf[]) throws IOException {
         return read(buf, 0, buf.length);
     }
+
     @Override
     public int read(byte buf[], int off, int len) throws IOException {
         if (_eofReached) 

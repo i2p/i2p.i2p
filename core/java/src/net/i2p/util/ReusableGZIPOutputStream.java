@@ -1,6 +1,6 @@
 package net.i2p.util;
 
-import java.io.ByteArrayInputStream;
+//import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
@@ -9,9 +9,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 import net.i2p.data.DataHelper;
 
 /**
- * Provide a cache of reusable GZIP streams, each handling up to 32KB without
+ * Provide a cache of reusable GZIP streams, each handling up to 40 KB output without
  * expansion.
  *
+ * This compresses to memory only. Retrieve the compressed data with getData().
+ * There is no facility to compress to an output stream.
  */
 public class ReusableGZIPOutputStream extends ResettableGZIPOutputStream {
     // Apache Harmony 5.0M13 Deflater doesn't work after reset()
@@ -50,10 +52,12 @@ public class ReusableGZIPOutputStream extends ResettableGZIPOutputStream {
     }
     
     private ByteArrayOutputStream _buffer = null;
+
     private ReusableGZIPOutputStream() {
         super(new ByteArrayOutputStream(40*1024));
         _buffer = (ByteArrayOutputStream)out;
     }
+
     /** clear the data so we can start again afresh */
     @Override
     public void reset() { 
@@ -61,9 +65,11 @@ public class ReusableGZIPOutputStream extends ResettableGZIPOutputStream {
         _buffer.reset();
         def.setLevel(Deflater.BEST_COMPRESSION);
     }
+
     public void setLevel(int level) { 
         def.setLevel(level);
     }
+
     /** pull the contents of the stream written */
     public byte[] getData() { return _buffer.toByteArray(); }
     

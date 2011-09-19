@@ -20,9 +20,11 @@ import java.util.concurrent.RejectedExecutionException;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
+import net.i2p.util.BigPipedInputStream;
 import net.i2p.util.ByteCache;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
+import net.i2p.util.ReusableGZIPInputStream;
 
 /**
  * This does the transparent gzip decompression on the client side.
@@ -44,7 +46,6 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     private final byte _buf1[];
     protected boolean _gzip;
     private long _dataWritten;
-    private InternalGZIPInputStream _in;
     private static final int CACHE_SIZE = 8*1024;
     private static final ByteCache _cache = ByteCache.getInstance(8, CACHE_SIZE);
     // OOM DOS prevention
@@ -227,7 +228,7 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     
     protected void beginProcessing() throws IOException {
         //out.flush();
-        PipedInputStream pi = new PipedInputStream();
+        PipedInputStream pi = BigPipedInputStream.getInstance();
         PipedOutputStream po = new PipedOutputStream(pi);
         // Run in the client thread pool, as there should be an unused thread
         // there after the accept().
@@ -242,25 +243,29 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     }
     
     private class Pusher implements Runnable {
-        private InputStream _inRaw;
-        private OutputStream _out;
+        private final InputStream _inRaw;
+        private final OutputStream _out;
+
         public Pusher(InputStream in, OutputStream out) {
             _inRaw = in;
             _out = out;
         }
+
         public void run() {
-            _in = null;
+            ReusableGZIPInputStream _in = null;
             long written = 0;
             ByteArray ba = null;
             try {
-                _in = new InternalGZIPInputStream(_inRaw);
+                _in = ReusableGZIPInputStream.acquire();
+                // blocking
+                _in.initialize(_inRaw);
                 ba = _cache.acquire();
                 byte buf[] = ba.getData();
                 int read = -1;
                 while ( (read = _in.read(buf)) != -1) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Read " + read + " and writing it to the browser/streams");
-                    _out.write(buf, 0, read);
+;                   _out.write(buf, 0, read);
                     _out.flush();
                     written += read;
                 }
@@ -286,68 +291,21 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                 } catch (IOException ioe) {}
             }
 
-            double compressed = (_in != null ? _in.getTotalRead() : 0);
-            double expanded = (_in != null ? _in.getTotalExpanded() : 0);
-            if (compressed > 0 && expanded > 0) {
-                // only update the stats if we did something
-                double ratio = compressed/expanded;
-                _context.statManager().addRateData("i2ptunnel.httpCompressionRatio", (int)(100d*ratio), 0);
-                _context.statManager().addRateData("i2ptunnel.httpCompressed", (long)compressed, 0);
-                _context.statManager().addRateData("i2ptunnel.httpExpanded", (long)expanded, 0);
+            if (_in != null) {
+                double compressed = _in.getTotalRead();
+                double expanded = _in.getTotalExpanded();
+                ReusableGZIPInputStream.release(_in);
+                if (compressed > 0 && expanded > 0) {
+                    // only update the stats if we did something
+                    double ratio = compressed/expanded;
+                    _context.statManager().addRateData("i2ptunnel.httpCompressionRatio", (int)(100d*ratio), 0);
+                    _context.statManager().addRateData("i2ptunnel.httpCompressed", (long)compressed, 0);
+                    _context.statManager().addRateData("i2ptunnel.httpExpanded", (long)expanded, 0);
+                }
             }
         }
     }
 
-    /** just a wrapper to provide stats for debugging */
-    private static class InternalGZIPInputStream extends GZIPInputStream {
-        public InternalGZIPInputStream(InputStream in) throws IOException {
-            super(in);
-        }
-        public long getTotalRead() { 
-            try {
-                return super.inf.getTotalIn(); 
-            } catch (Exception e) { 
-                return 0; 
-            }
-        }
-        public long getTotalExpanded() { 
-            try {
-                return super.inf.getTotalOut(); 
-            } catch (Exception e) {
-                return 0;
-            }
-        }
-
-        /**
-         *  From Inflater javadoc:
-         *  Returns the total number of bytes remaining in the input buffer. This can be used to find out
-         *  what bytes still remain in the input buffer after decompression has finished.
-         */
-        public long getRemaining() { 
-            try {
-                return super.inf.getRemaining(); 
-            } catch (Exception e) {
-                return 0;
-            }
-        }
-        public boolean getFinished() { 
-            try {
-                return super.inf.finished(); 
-            } catch (Exception e) {
-                return true;
-            }
-        }
-        @Override
-        public String toString() { 
-            return "Read: " + getTotalRead() + " expanded: " + getTotalExpanded() + " remaining: " + getRemaining() + " finished: " + getFinished();
-        }
-    }
-    
-    @Override
-    public String toString() {
-        return super.toString() + ": " + _in;
-    }
-    
 /*******
     public static void main(String args[]) {
         String simple   = "HTTP/1.1 200 OK\n" +

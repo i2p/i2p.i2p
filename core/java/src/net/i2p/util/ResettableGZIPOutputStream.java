@@ -26,14 +26,14 @@ public class ResettableGZIPOutputStream extends DeflaterOutputStream {
     private boolean _headerWritten;
     /** how much data is in the uncompressed stream? */
     private long _writtenSize;
-    private CRC32 _crc32;
+    private final CRC32 _crc32;
     private static final boolean DEBUG = false;
     
     public ResettableGZIPOutputStream(OutputStream o) {
         super(o, new Deflater(9, true));
-        _headerWritten = false;
         _crc32 = new CRC32();
     }
+
     /**
      * Reinitialze everything so we can write a brand new gzip output stream
      * again.

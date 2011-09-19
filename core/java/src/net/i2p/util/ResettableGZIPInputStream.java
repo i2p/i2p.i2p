@@ -20,9 +20,9 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
     private static final int FOOTER_SIZE = 8; // CRC32 + ISIZE
     private static final boolean DEBUG = false;
     /** keep a typesafe copy of (LookaheadInputStream)in */
-    private LookaheadInputStream _lookaheadStream;
-    private CRC32 _crc32;
-    private byte _buf1[] = new byte[1];
+    private final LookaheadInputStream _lookaheadStream;
+    private final CRC32 _crc32;
+    private final byte _buf1[] = new byte[1];
     private boolean _complete;
     
     /**
@@ -34,8 +34,11 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
         super(new LookaheadInputStream(FOOTER_SIZE), new Inflater(true));
         _lookaheadStream = (LookaheadInputStream)in;
         _crc32 = new CRC32();
-        _complete = false;
     }
+
+    /**
+     * Warning - blocking!
+     */
     public ResettableGZIPInputStream(InputStream compressedStream) throws IOException {
         this();
         initialize(compressedStream);
@@ -78,6 +81,7 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
     public int read(byte buf[]) throws IOException {
         return read(buf, 0, buf.length);
     }
+
     @Override
     public int read(byte buf[], int off, int len) throws IOException {
         if (_complete) {
@@ -100,9 +104,69 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
         }
     }
     
-    long getCurrentCRCVal() { return _crc32.getValue(); }
+    /**
+     *  Moved from i2ptunnel HTTPResponseOutputStream.InternalGZIPInputStream
+     *  @since 0.8.9
+     */
+    public long getTotalRead() {
+        try {
+            return inf.getBytesRead(); 
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    /**
+     *  Moved from i2ptunnel HTTPResponseOutputStream.InternalGZIPInputStream
+     *  @since 0.8.9
+     */
+    public long getTotalExpanded() { 
+        try {
+            return inf.getBytesWritten(); 
+        } catch (Exception e) {
+            // possible NPE in some implementations
+            return 0;
+        }
+    }
+
+    /**
+     *  Moved from i2ptunnel HTTPResponseOutputStream.InternalGZIPInputStream
+     *  @since 0.8.9
+     */
+    public long getRemaining() { 
+        try {
+            return inf.getRemaining(); 
+        } catch (Exception e) {
+            // possible NPE in some implementations
+            return 0;
+        }
+    }
+
+    /**
+     *  Moved from i2ptunnel HTTPResponseOutputStream.InternalGZIPInputStream
+     *  @since 0.8.9
+     */
+    public boolean getFinished() { 
+        try {
+            return inf.finished(); 
+        } catch (Exception e) {
+            // possible NPE in some implementations
+            return true;
+        }
+    }
+
+    /**
+     *  Moved from i2ptunnel HTTPResponseOutputStream.InternalGZIPInputStream
+     *  @since 0.8.9
+     */
+    @Override
+    public String toString() { 
+        return "Read: " + getTotalRead() + " expanded: " + getTotalExpanded() + " remaining: " + getRemaining() + " finished: " + getFinished();
+    }
+
+    private long getCurrentCRCVal() { return _crc32.getValue(); }
     
-    void verifyFooter() throws IOException {
+    private void verifyFooter() throws IOException {
         byte footer[] = _lookaheadStream.getFooter();
         
         long expectedCRCVal = _crc32.getValue();
