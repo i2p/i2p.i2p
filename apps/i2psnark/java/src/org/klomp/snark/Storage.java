@@ -762,27 +762,19 @@ public class Storage
     openRAF(nr, false);  // RW
     // XXX - Is this the best way to make sure we have enough space for
     // the whole file?
+    long remaining = lengths[nr];
     if (listener != null)
-        listener.storageCreateFile(this, names[nr], lengths[nr]);
-    final int ZEROBLOCKSIZE = piece_size;
-    byte[] zeros;
-    try {
-        zeros = new byte[ZEROBLOCKSIZE];
-    } catch (OutOfMemoryError oom) {
-        throw new IOException(oom.toString());
+        listener.storageCreateFile(this, names[nr], remaining);
+    final int ZEROBLOCKSIZE = (int) Math.min(remaining, 32*1024);
+    byte[] zeros = new byte[ZEROBLOCKSIZE];
+    while (remaining > 0) {
+        int size = (int) Math.min(remaining, ZEROBLOCKSIZE);
+        rafs[nr].write(zeros, 0, size);
+        remaining -= size;
     }
-    int i;
-    for (i = 0; i < lengths[nr]/ZEROBLOCKSIZE; i++)
-      {
-        rafs[nr].write(zeros);
-        if (listener != null)
-          listener.storageAllocated(this, ZEROBLOCKSIZE);
-      }
-    int size = (int)(lengths[nr] - i*ZEROBLOCKSIZE);
-    rafs[nr].write(zeros, 0, size);
     // caller will close rafs[nr]
     if (listener != null)
-      listener.storageAllocated(this, size);
+      listener.storageAllocated(this, lengths[nr]);
   }
 
 
