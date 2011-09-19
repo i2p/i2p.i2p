@@ -46,6 +46,9 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     private final byte _buf1[];
     protected boolean _gzip;
     private long _dataWritten;
+    protected long _dataExpected;
+    protected String _contentType;
+
     private static final int CACHE_SIZE = 8*1024;
     private static final ByteCache _cache = ByteCache.getInstance(8, CACHE_SIZE);
     // OOM DOS prevention
@@ -130,10 +133,11 @@ class HTTPResponseOutputStream extends FilterOutputStream {
     }
     
     /**
-     * Tweak that first HTTP response line (HTTP 200 OK, etc)
+     * Possibly tweak that first HTTP response line (HTTP/1.0 200 OK, etc).
+     * Overridden on server side.
      *
      */
-    protected static String filterResponseLine(String line) {
+    protected String filterResponseLine(String line) {
         return line;
     }
     
@@ -184,6 +188,15 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                             } else if ("Proxy-Authenticate".equalsIgnoreCase(key)) {
                                 // filter this hop-by-hop header; outproxy authentication must be configured in I2PTunnelHTTPClient
                             } else {
+                                if ("Content-Length".equalsIgnoreCase(key)) {
+                                    // save for compress decision on server side
+                                    try {
+                                        _dataExpected = Long.parseLong(val);
+                                    } catch (NumberFormatException nfe) {}
+                                } else if ("Content-Type".equalsIgnoreCase(key)) {
+                                    // save for compress decision on server side
+                                    _contentType = val;
+                                }
                                 out.write((key.trim() + ": " + val.trim() + "\r\n").getBytes());
                             }
                             break;

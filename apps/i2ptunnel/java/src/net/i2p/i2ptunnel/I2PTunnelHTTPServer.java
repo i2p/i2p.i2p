@@ -303,19 +303,48 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         }
     }
 
+    /**
+     *  This plus a typ. HTTP response header will fit into a 1730-byte streaming message.
+     */
+    private static final int MIN_TO_COMPRESS = 1300;
+
     private static class CompressedResponseOutputStream extends HTTPResponseOutputStream {
         private InternalGZIPOutputStream _gzipOut;
+
         public CompressedResponseOutputStream(OutputStream o) {
             super(o);
+            _dataExpected = -1;
         }
         
+        /**
+         * Overridden to peek at response code. Always returns line.
+         */
         @Override
-        protected boolean shouldCompress() { return true; }
+        protected String filterResponseLine(String line) {
+            String[] s = line.split(" ", 3);
+            if (s.length > 1 &&
+                (s[1].startsWith("3") || s[1].startsWith("5")))
+                _dataExpected = 0;
+            return line;
+        }
+    
+        /**
+         *  Don't compress small responses or images.
+         *  Compression is inline but decompression on the client side
+         *  creates a new thread.
+         */
+        @Override
+        protected boolean shouldCompress() {
+            return (_dataExpected < 0 || _dataExpected >= MIN_TO_COMPRESS) &&
+                   (_contentType == null || !_contentType.startsWith("image/"));
+        }
+
         @Override
         protected void finishHeaders() throws IOException {
             //if (_log.shouldLog(Log.INFO))
             //    _log.info("Including x-i2p-gzip as the content encoding in the response");
-            out.write("Content-encoding: x-i2p-gzip\r\n".getBytes());
+            if (shouldCompress())
+                out.write("Content-encoding: x-i2p-gzip\r\n".getBytes());
             super.finishHeaders();
         }
 
@@ -324,9 +353,12 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             //if (_log.shouldLog(Log.INFO))
             //    _log.info("Beginning compression processing");
             //out.flush();
-            _gzipOut = new InternalGZIPOutputStream(out);
-            out = _gzipOut;
+            if (shouldCompress()) {
+                _gzipOut = new InternalGZIPOutputStream(out);
+                out = _gzipOut;
+            }
         }
+
         public long getTotalRead() { 
             InternalGZIPOutputStream gzipOut = _gzipOut;
             if (gzipOut != null)
@@ -334,6 +366,7 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             else
                 return 0;
         }
+
         public long getTotalCompressed() { 
             InternalGZIPOutputStream gzipOut = _gzipOut;
             if (gzipOut != null)
