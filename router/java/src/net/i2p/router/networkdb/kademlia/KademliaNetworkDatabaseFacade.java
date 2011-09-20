@@ -131,6 +131,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         but less than 20m (when we start accepting tunnels and could be a IBGW) */
     protected final static long PUBLISH_JOB_DELAY = 5*60*1000l;
 
+    private static final int MAX_EXPLORE_QUEUE = 128;
+
     public KademliaNetworkDatabaseFacade(RouterContext context) {
         _context = context;
         _log = _context.logManager().getLog(getClass());
@@ -184,7 +186,9 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
 
     public void queueForExploration(Set<Hash> keys) {
         if (!_initialized) return;
-        _exploreKeys.addAll(keys);
+        for (Iterator<Hash> iter = keys.iterator(); iter.hasNext() && _exploreKeys.size() < MAX_EXPLORE_QUEUE; ) {
+            _exploreKeys.add(iter.next());
+        }
         _context.statManager().addRateData("netDb.exploreKeySet", _exploreKeys.size(), 0);
     }
     
