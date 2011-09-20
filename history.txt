@@ -1,3 +1,18 @@
+2011-09-20 zzz
+  * Crypto: Comment out some main()
+  * ClientMessage: Remove unused MessageReceptionInfo
+  * i2psnark: File allocation cleanup to use less heap
+  * i2ptunnel HTTPResponseOutputStream:
+    - Use reusable gunzipper and a larger pipe for efficiency
+    - Close output stream in StreamForwarder to prevent lost data,
+      existing bug but made worse by larger pipe
+  * I2PTunnelHTTPServer: Don't compress small responses or images
+  * I2PTunnel, NTCP: Catch unchecked exceptions from GNU NIO (ticket # 519)
+  * JobQueue, RepublishLeaseSetJob, StartExplorerJob:
+    Out-of-order JobQueue 2nd try to fix
+  * NetDB: Limit max explore queue
+  * RouterContext: Remove unused MessageStateMonitor
+
 2011-09-18 kytv
  * Add OpenBSD & NetBSD to NBI and CPUID
 
