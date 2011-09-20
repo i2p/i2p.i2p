@@ -77,10 +77,13 @@ class StartExplorersJob extends JobImpl {
      * we'll explore appropriately.
      */
     public void updateExploreSchedule() {
-        long delay = getNextRunDelay();
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Updating exploration schedule with a delay of " + delay);
-        requeue(delay);        
+        // This is playing havoc with the JobQueue and putting this job out-of-order
+        // since we switched to a TreeSet,
+        // so just let runJob() above do the scheduling.
+        //long delay = getNextRunDelay();
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Updating exploration schedule with a delay of " + delay);
+        //requeue(delay);        
     }
     
     /**
