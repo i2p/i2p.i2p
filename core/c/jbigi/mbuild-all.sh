@@ -19,8 +19,8 @@ MISC_LINUX_PLATFORMS="hppa2.0 alphaev56 armv5tel mips64el itanium itanium2 ultra
 # Do NOT add any X86 platforms, do that below in the x86 platform list.
 #
 MISC_FREEBSD_PLATFORMS="alphaev56 ultrasparc2i"
-MISC_NETBSD_PLATFORMS="powerpc powerpc64 powerpc64le powerpcle atari amiga m68knommu" # and many, many more
-MISC_OPENBSD_PLATFORMS=""
+MISC_NETBSD_PLATFORMS="armv5tel mips64el ultrasparc2i sgi hppa2.0 alphaev56 powerpc powerpc64 powerpc64le powerpcle atari amiga m68knommu" # and many, many more
+MISC_OPENBSD_PLATFORMS="alphaev56 ultrasparc2i sgi powerpc powerpc64 hppa2.0 alphaev56 armv5tel mips64el"
 
 #
 # MINGW/Windows??
@@ -47,7 +47,7 @@ LINUX_PLATFORMS="${X86_PLATFORMS} ${MISC_LINUX_PLATFORMS}"
 FREEBSD_PLATFORMS="${X86_PLATFORMS} ${MISC_FREEBSD_PLATFORMS}"
 # As they say, "Of course it runs NetBSD!"
 NETBSD_PLATFORMS="${FREEBSD_PLATFORMS} ${MISC_LINUX_PLATFORMS} ${MISC_NETBSD_PLATFORMS}"
-OPENBSD_PLATFORM="${X86_PLATFORMS}"
+OPENBSD_PLATFORM="${X86_PLATFORMS} ${MISC_OPENBSD_PLATFORMS}"
 
 # FIXME Is this all?
 DARWIN_PLATFORMS="core2 corei"
