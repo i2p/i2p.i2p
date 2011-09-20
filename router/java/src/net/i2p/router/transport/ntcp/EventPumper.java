@@ -213,7 +213,7 @@ class EventPumper implements Runnable {
                     }
                 }
             } catch (RuntimeException re) {
-                _log.log(Log.CRIT, "Error in the event pumper", re);
+                _log.error("Error in the event pumper", re);
             }
         }
         try {
@@ -571,6 +571,22 @@ class EventPumper implements Runnable {
                 key.interestOps(key.interestOps() | SelectionKey.OP_READ);
             } catch (CancelledKeyException cke) {
                 // ignore, we remove/etc elsewhere
+            } catch (IllegalArgumentException iae) {
+                // JamVM (Gentoo: jamvm-1.5.4, gnu-classpath-0.98+gmp)
+                // throws
+		//java.lang.IllegalArgumentException: java.io.IOException: Bad file descriptor
+		//   at gnu.java.nio.EpollSelectionKeyImpl.interestOps(EpollSelectionKeyImpl.java:102)
+		//   at net.i2p.router.transport.ntcp.EventPumper.runDelayedEvents(EventPumper.java:580)
+		//   at net.i2p.router.transport.ntcp.EventPumper.run(EventPumper.java:109)
+		//   at java.lang.Thread.run(Thread.java:745)
+		//   at net.i2p.util.I2PThread.run(I2PThread.java:85)
+		//Caused by: java.io.IOException: Bad file descriptor
+		//   at gnu.java.nio.EpollSelectorImpl.epoll_modify(Native Method)
+		//   at gnu.java.nio.EpollSelectorImpl.epoll_modify(EpollSelectorImpl.java:313)
+		//   at gnu.java.nio.EpollSelectionKeyImpl.interestOps(EpollSelectionKeyImpl.java:97)
+		//   ...4 more
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("gnu?", iae);
             }
         }
 
@@ -580,6 +596,10 @@ class EventPumper implements Runnable {
                 key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
             } catch (CancelledKeyException cke) {
                 // ignore
+            } catch (IllegalArgumentException iae) {
+                // see above
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("gnu?", iae);
             }
         }
         

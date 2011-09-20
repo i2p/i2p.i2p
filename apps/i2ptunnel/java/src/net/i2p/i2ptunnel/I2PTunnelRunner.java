@@ -194,6 +194,20 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
         } catch (IOException ex) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Error forwarding", ex);
+        } catch (IllegalStateException ise) {
+            // JamVM (Gentoo: jamvm-1.5.4, gnu-classpath-0.98+gmp)
+		//java.nio.channels.NotYetConnectedException
+		//   at gnu.java.nio.SocketChannelImpl.write(SocketChannelImpl.java:240)
+		//   at gnu.java.net.PlainSocketImpl$SocketOutputStream.write(PlainSocketImpl.java:668)
+		//   at java.io.OutputStream.write(OutputStream.java:86)
+		//   at net.i2p.i2ptunnel.I2PTunnelHTTPClient.writeFooter(I2PTunnelHTTPClient.java:1029)
+		//   at net.i2p.i2ptunnel.I2PTunnelHTTPClient.writeErrorMessage(I2PTunnelHTTPClient.java:1114)
+		//   at net.i2p.i2ptunnel.I2PTunnelHTTPClient.handleHTTPClientException(I2PTunnelHTTPClient.java:1131)
+		//   at net.i2p.i2ptunnel.I2PTunnelHTTPClient.access$000(I2PTunnelHTTPClient.java:67)
+		//   at net.i2p.i2ptunnel.I2PTunnelHTTPClient$OnTimeout.run(I2PTunnelHTTPClient.java:1052)
+		//   at net.i2p.i2ptunnel.I2PTunnelRunner.run(I2PTunnelRunner.java:167)
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("gnu?", ise);
         } catch (Exception e) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Internal error", e);
