@@ -561,6 +561,8 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         // Don't spam the floodfills. In addition, always delay a few seconds since there may
         // be another leaseset change coming along momentarily.
         long nextTime = Math.max(j.lastPublished() + RepublishLeaseSetJob.REPUBLISH_LEASESET_TIMEOUT, _context.clock().now() + PUBLISH_DELAY);
+        // remove first since queue is a TreeSet now...
+        _context.jobQueue().removeJob(j);
         j.getTiming().setStartAfter(nextTime);
         _context.jobQueue().addJob(j);
     }
