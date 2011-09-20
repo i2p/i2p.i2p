@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #FIXME What platforms for MacOS?
-MISC_DARWIN_PLATFORMS=""
+MISC_DARWIN_PLATFORMS="powerpc powerpc64 powerpc64le powerpcle"
 
 # Note: You will have to add the CPU ID for the platform in the CPU ID code
 # for a new CPU. Just adding them here won't let I2P use the code!
@@ -14,12 +14,13 @@ MISC_DARWIN_PLATFORMS=""
 MISC_LINUX_PLATFORMS="hppa2.0 alphaev56 armv5tel mips64el itanium itanium2 ultrasparc2 ultrasparc2i alphaev6 powerpc970 powerpc7455 powerpc7447"
 
 #
-# If you know of other platforms i2p on FREEBSD works on,
+# If you know of other platforms i2p on *BSD works on,
 # please add them here.
 # Do NOT add any X86 platforms, do that below in the x86 platform list.
 #
 MISC_FREEBSD_PLATFORMS="alphaev56 ultrasparc2i"
-MISC_NETBSD_PLATFORMS="powerpc powerpc64 powerpc64le powerpcle atari amiga m68knommu"
+MISC_NETBSD_PLATFORMS="armv5tel mips64el ultrasparc2i sgi hppa2.0 alphaev56 powerpc powerpc64 powerpc64le powerpcle atari amiga m68knommu" # and many, many more
+MISC_OPENBSD_PLATFORMS="alphaev56 ultrasparc2i sgi powerpc powerpc64 hppa2.0 alphaev56 armv5tel mips64el"
 
 #
 # MINGW/Windows??
@@ -44,7 +45,11 @@ X86_PLATFORMS="pentium pentiummmx pentium2 pentium3 pentiumm k6 k62 k63 athlon g
 MINGW_PLATFORMS="${X86_PLATFORMS} ${MISC_MINGW_PLATFORMS}"
 LINUX_PLATFORMS="${X86_PLATFORMS} ${MISC_LINUX_PLATFORMS}"
 FREEBSD_PLATFORMS="${X86_PLATFORMS} ${MISC_FREEBSD_PLATFORMS}"
-NETBSD_PLATFORMS="${FREEBSD_PLATFORMS} ${LINUX_PLATFORMS} ${MISC_NETBSD_PLATFORMS}"
+# As they say, "Of course it runs NetBSD!"
+NETBSD_PLATFORMS="${FREEBSD_PLATFORMS} ${MISC_LINUX_PLATFORMS} ${MISC_NETBSD_PLATFORMS}"
+OPENBSD_PLATFORM="${X86_PLATFORMS} ${MISC_OPENBSD_PLATFORMS}"
+
+# FIXME Is this all?
 DARWIN_PLATFORMS="core2 corei"
 
 # Set the version to 5.0.2 for OSX because
@@ -86,7 +91,7 @@ Linux*)
 			arch="x86";;
 	esac
 	case ${arch} in
-		x86_64)
+		x86_64 | amd64)
 			PLATFORM_LIST="${X86_64_PLATFORMS}"
 			TARGET="-linux-X86_64-";;
 		ia64)
@@ -99,18 +104,40 @@ Linux*)
 			PLATFORM_LIST="${LINUX_PLATFORMS}";;
 	esac
 	echo "Building ${TARGET} .so's for ${arch}";;
-NetBSD*)
-	PLATFORM_LIST="${NETBSD_PLATFORMS}"
+NetBSD*|FreeBSD*|OpenBSD*)
 	NAME="libjbigi"
 	TYPE="so"
-	TARGET="-netbsd-"
-	echo "Building netbsd .sos for all architectures";;
-FreeBSD*)
-	PLATFORM_LIST="${FREEBSD_PLATFORMS}"
-	NAME="libjbigi"
-	TYPE="so"
-	TARGET="-freebsd-"
-	echo "Building freebsd .sos for all architectures";;
+	PLATFORM_LIST=""
+	BSDTYPE="`uname -s | tr [A-Z] [a-z]`"
+	arch=$(uname -m | cut -f1 -d" ")
+	case ${arch} in
+		i[3-6]86)
+			arch="x86";;
+	esac
+	case ${arch} in
+		x86_64|amd64)
+			PLATFORM_LIST="${X86_64_PLATFORMS}"
+			TARGET="-${BSDTYPE}-X86_64-";;
+		ia64)
+			PLATFORM_LIST="${X86_64_PLATFORMS}"
+			TARGET="-${BSDTYPE}-ia64-";;
+		x86)
+			PLATFORM_LIST="${X86_PLATFORMS}"
+			TARGET="-${BSDTYPE}-x86-";;
+		*)
+			case ${BSDTYPE} in
+				netbsd)
+					PLATFORM_LIST="${NETBSD_PLATFORMS}";;
+				openbsd)
+					PLATFORM_LIST="${OPENBSD_PLATFORMS}";;
+				freebsd)
+					PLATFORM_LIST="${FREEBSD_PLATFORMS}";;
+				*)
+					echo "Unsupported build environment"
+					exit 1;;
+			esac
+	esac
+	echo "Building ${BSDTYPE} .so's for ${arch}";;
 *)
 	echo "Unsupported build environment"
 	exit;;

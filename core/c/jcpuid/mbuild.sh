@@ -7,10 +7,8 @@ CYGWIN*)
 	echo "Building windows .dlls";;
 Linux*)
 	echo "Building linux .sos";;
-NetBSD*)
-	echo "Building netbsd .sos";;
-FreeBSD*)
-	echo "Building freebsd .sos";;
+NetBSD*|OpenBSD*|FreeBSD*)
+	echo "Building `uname -s |tr [A-Z] [a-z]` .sos";;
 Darwin*)
 	echo "Building OSX jnilibs";;
 *)
@@ -39,51 +37,45 @@ Darwin*)
         INCLUDES="-I. -Iinclude -I$JAVA_HOME/include/"
         LINKFLAGS="-dynamiclib -framework JavaVM"
         LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-x86-darwin.jnilib";;
-NetBSD*)
+Linux*|OpenBSD*|NetBSD*|FreeBSD*|SunOS*)
+        UNIXTYPE="`uname -s | tr [A-Z] [a-z]`"
+        if [ $UNIXTYPE = "sunos" ]; then
+                UNIXTYPE="solaris"
+        elif [ $UNIXTYPE = "freebsd" ]; then
+                if [ -d /usr/local/openjdk6 ]; then
+                        JAVA_HOME="/usr/local/openjdk6"
+                elif [ -d /usr/local/openjdk7 ]; then
+                        JAVA_HOME="/usr/local/openjdk7"
+                fi
+	elif [ $UNIXTYPE = "openbsd" ]; then
+		if [ -d /usr/local/jdk-1.7.0 ]; then
+			JAVA_HOME="/usr/local/jdk-1.7.0"
+		fi
+	elif [ $UNIXTYPE = "netbsd" ]; then
+		if [ -d /usr/pkg/java/openjdk7 ]; then
+			JAVA_HOME="/usr/pkg/java/openjdk7"
+		fi
+	elif [ $UNIXTYPE = "linux" -a -e /etc/debian_version ]; then
+		if [ -d /usr/lib/jvm/default-java ]; then
+			JAVA_HOME="/usr/lib/jvm/default-java"
+		fi
+        fi
 	case `uname -m` in
-		amd64)
-			LINKFLAGS="-shared -Wl,-soname,libjcpuid-x86_64-netbsd.so"
-			LIBFILE="lib/netnet/support/CPUInformation/libjcpuid-x86_64-netbsd.so";;
-		i?86*)
-			LINKFLAGS="-shared -Wl,-soname,libjcpuid-x86-netbsd.so"
-			LIBFILE="lib/netnet/support/CPUInformation/libjcpuid-x86-netbsd.so";;
-		*)
-			echo "Unknown build environment"
-			exit;;
-	esac
-	COMPILEFLAGS="-fPIC -Wall"
-	INCLUDES="-I. -Iinclude -I$JAVA_HOME/include/ -I$JAVA_HOME/include/netbsd/";;
-FreeBSD*)
-	case `uname -m` in
-		amd64)
-			LINKFLAGS="-shared -Wl,-soname,libjcpuid-x86_64-freebsd.so"
-			LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-x86_64-freebsd.so";;
-		i?86*)
-			LINKFLAGS="-shared -Wl,-soname,libjcpuid-x86-freebsd.so"
-			LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-x86-freebsd.so";;
-		*)
-			echo "Unknown build environment"
-			exit;;
-	esac
-	COMPILEFLAGS="-fPIC -Wall"
-	INCLUDES="-I. -Iinclude -I$JAVA_HOME/include/ -I$JAVA_HOME/include/freebsd/";;
-Linux*)
-	case `uname -m` in
-		x86_64*)
-			LINKFLAGS="-shared -Wl,-soname,libjcpuid-x86_64-linux.so"
-			LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-x86_64-linux.so";;
+		x86_64*|amd64)
+			LINKFLAGS="-shared -Wl,-soname,libjcpuid-x86_64-${UNIXTYPE}.so"
+			LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-x86_64-${UNIXTYPE}.so";;
 		ia64*)
-			LINKFLAGS="-shared -Wl,-soname,libjcpuid-x86-linux.so"
-			LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-ia64-linux.so";;
+			LINKFLAGS="-shared -Wl,-soname,libjcpuid-x86-${UNIXTYPE}.so"
+			LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-ia64-${UNIXTYPE}.so";;
 		i?86*)
-			LINKFLAGS="-shared -Wl,-soname,libjcpuid-x86-linux.so"
-			LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-x86-linux.so";;
+			LINKFLAGS="-shared -Wl,-soname,libjcpuid-x86-${UNIXTYPE}.so"
+			LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-x86-${UNIXTYPE}.so";;
 		*)
 			echo "Unsupported build environment"
 			exit;;
 	esac
 	COMPILEFLAGS="-fPIC -Wall"
-	INCLUDES="-I. -Iinclude -I$JAVA_HOME/include -I$JAVA_HOME/include/linux";;
+	INCLUDES="-I. -Iinclude -I$JAVA_HOME/include -I$JAVA_HOME/include/${UNIXTYPE}";;
 
 esac
 
