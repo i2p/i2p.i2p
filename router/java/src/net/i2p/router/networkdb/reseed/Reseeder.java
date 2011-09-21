@@ -68,6 +68,7 @@ public class Reseeder {
     public static final String DEFAULT_SSL_SEED_URL =
          /*   "https://a.netdb.i2p2.de/," +   bad cert */
          /*   "https://c.netdb.i2p2.de/," +   no data */
+              "https://netdb.i2p2.de/," +
               "https://forum.i2p2.de/netdb/," +
          /*   "https://www.i2pbote.net/netDb/," +   NO DATA */
               "https://reseed.i2p-projekt.de/," +
