@@ -150,7 +150,7 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                     case 9:
                         isPentium2Compatible = true;
                         isPentium3Compatible = true;
-						isPentiumMCompatible = true;
+			isPentiumMCompatible = true;
                         isX64 = true;
                         modelString = "Pentium M (Banias)";
                         break;
@@ -162,20 +162,19 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                     case 11:
                         isPentium2Compatible = true;
                         isPentium3Compatible = true;
-						isPentiumMCompatible = true;
                         modelString = "Pentium III (130 nm)";
                         break;
                     case 13:
                         isPentium2Compatible = true;
                         isPentium3Compatible = true;
-						isPentiumMCompatible = true;
+			isPentiumMCompatible = true;
                         isX64 = true;
                         modelString = "Core (Yonah)";
                         break;
                     case 14:
                         isPentium2Compatible = true;
                         isPentium3Compatible = true;
-						isPentiumMCompatible = true;
+			isPentiumMCompatible = true;
                         isCore2Compatible = true;
                         isX64 = true;
                         modelString = "Core 2 (Conroe)";
@@ -183,7 +182,7 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                     case 15:
                         isPentium2Compatible = true;
                         isPentium3Compatible = true;
-						isPentiumMCompatible = true;
+			isPentiumMCompatible = true;
                         isCore2Compatible = true;
                         isX64 = true;
                         modelString = "Core 2 (Conroe)";
@@ -195,7 +194,7 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                 isPentium2Compatible = true;
                 isPentium3Compatible = true;
                 isPentium4Compatible = true;
-				isPentiumMCompatible = true;
+		isPentiumMCompatible = true;
                 isCore2Compatible = true;
                 isX64 = true;
                 switch(CPUID.getCPUModel()){
@@ -228,7 +227,7 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                 isPentium2Compatible = true;
                 isPentium3Compatible = true;
                 isPentium4Compatible = true;
-				isPentiumMCompatible = true;
+		isPentiumMCompatible = true;
                 isCore2Compatible = true;
                 isCoreiCompatible = true;
                 isX64 = true;

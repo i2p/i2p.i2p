@@ -210,7 +210,7 @@ public class CPUID {
         if(!_nativeOk){
             System.out.println("**Failed to retrieve CPUInfo. Please verify the existence of jcpuid dll/so**");
         }
-        System.out.println("**CPUInfo**");
+        System.out.println(" **CPUInfo**");
         System.out.println("CPU Vendor: " + getCPUVendorID());
         System.out.println("CPU Family: " + getCPUFamily());
         System.out.println("CPU Model: " + getCPUModel());
@@ -218,29 +218,35 @@ public class CPUID {
         System.out.println("CPU Flags: 0x" + Integer.toHexString(getEDXCPUFlags()));
 
         CPUInfo c = getInfo();
-        System.out.println(" **More CPUInfo**");
-        System.out.println(" CPU model string: " + c.getCPUModelString());
-        System.out.println(" CPU has MMX: " + c.hasMMX());
-        System.out.println(" CPU has SSE: " + c.hasSSE());
-        System.out.println(" CPU has SSE2: " + c.hasSSE2());
-        System.out.println(" CPU has SSE3: " + c.hasSSE3());
-        System.out.println(" CPU has SSE4.1: " + c.hasSSE41());
-        System.out.println(" CPU has SSE4.2: " + c.hasSSE42());
-        System.out.println(" CPU has SSE4A: " + c.hasSSE4A());
+        System.out.println("\n **More CPUInfo**");
+        System.out.println("CPU model string: " + c.getCPUModelString());
+        System.out.println("CPU has MMX: " + c.hasMMX());
+        System.out.println("CPU has SSE: " + c.hasSSE());
+        System.out.println("CPU has SSE2: " + c.hasSSE2());
+        System.out.println("CPU has SSE3: " + c.hasSSE3());
+        System.out.println("CPU has SSE4.1: " + c.hasSSE41());
+        System.out.println("CPU has SSE4.2: " + c.hasSSE42());
+        System.out.println("CPU has SSE4A: " + c.hasSSE4A());
         if(c instanceof IntelCPUInfo){
-            System.out.println("  **Intel-info**");
-            System.out.println("  Is pII-compatible: "+((IntelCPUInfo)c).IsPentium2Compatible());
-            System.out.println("  Is pIII-compatible: "+((IntelCPUInfo)c).IsPentium3Compatible());
-            System.out.println("  Is pIV-compatible: "+((IntelCPUInfo)c).IsPentium4Compatible());
-            System.out.println("  Is atom-compatible: "+((IntelCPUInfo)c).IsAtomCompatible());
-            System.out.println("  Is core2-compatible: "+((IntelCPUInfo)c).IsCore2Compatible());
-            System.out.println("  Is corei-compatible: "+((IntelCPUInfo)c).IsCoreiCompatible());
+            System.out.println("\n **Intel-info**");
+            System.out.println("Is PII-compatible: "+((IntelCPUInfo)c).IsPentium2Compatible());
+            System.out.println("Is PIII-compatible: "+((IntelCPUInfo)c).IsPentium3Compatible());
+            System.out.println("Is PIV-compatible: "+((IntelCPUInfo)c).IsPentium4Compatible());
+            System.out.println("Is Atom-compatible: "+((IntelCPUInfo)c).IsAtomCompatible());
+            System.out.println("Is Pentium M compatible: "+((IntelCPUInfo)c).IsPentiumMCompatible());
+            System.out.println("Is Core2-compatible: "+((IntelCPUInfo)c).IsCore2Compatible());
+            System.out.println("Is Corei-compatible: "+((IntelCPUInfo)c).IsCoreiCompatible());
         }
         if(c instanceof AMDCPUInfo){
-            System.out.println("  **AMD-info**");
-            System.out.println("  Is Athlon-compatible: "+((AMDCPUInfo)c).IsAthlonCompatible());
+            System.out.println("\n **AMD-info**");
+            System.out.println("Is K6-compatible: "+((AMDCPUInfo)c).IsK6Compatible());
+            System.out.println("Is K6_2-compatible: "+((AMDCPUInfo)c).IsK6_2_Compatible());
+            System.out.println("Is K6_3-compatible: "+((AMDCPUInfo)c).IsK6_3_Compatible());
+            System.out.println("Is K6-compatible: "+((AMDCPUInfo)c).IsGeodeCompatible());
+            System.out.println("Is Athlon-compatible: "+((AMDCPUInfo)c).IsAthlonCompatible());
+            System.out.println("Is Athlon64-compatible: "+((AMDCPUInfo)c).IsAthlon64Compatible());
+            System.out.println("Is Bobcat-compatible: "+((AMDCPUInfo)c).IsBobcatCompatible());
         }
-
     }
 
     /**
