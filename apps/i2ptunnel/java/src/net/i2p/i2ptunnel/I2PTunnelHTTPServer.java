@@ -336,7 +336,17 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         @Override
         protected boolean shouldCompress() {
             return (_dataExpected < 0 || _dataExpected >= MIN_TO_COMPRESS) &&
-                   (_contentType == null || !_contentType.startsWith("image/"));
+                   (_contentType == null ||
+                    ((!_contentType.startsWith("audio/")) &&
+                     (!_contentType.startsWith("image/")) &&
+                     (!_contentType.startsWith("video/")) &&
+                     (!_contentType.equals("application/compress")) &&
+                     (!_contentType.equals("application/bzip2")) &&
+                     (!_contentType.equals("application/gzip")) &&
+                     (!_contentType.equals("application/x-bzip")) &&
+                     (!_contentType.equals("application/x-bzip2")) &&
+                     (!_contentType.equals("application/x-gzip")) &&
+                     (!_contentType.equals("application/zip"))));
         }
 
         @Override
