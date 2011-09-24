@@ -55,16 +55,8 @@ import net.i2p.util.Translate;
  * @author jrandom
  */
 public class DataHelper {
-    private static final byte EQUAL_BYTES[];
-    private static final byte SEMICOLON_BYTES[];
-    static {
-        try {
-            EQUAL_BYTES = "=".getBytes("UTF-8");
-            SEMICOLON_BYTES = ";".getBytes("UTF-8");
-        } catch (UnsupportedEncodingException uee) {
-            throw new RuntimeException("no utf8!?");
-        }
-    }
+    private static final byte[] EQUAL_BYTES = getUTF8("=");
+    private static final byte[] SEMICOLON_BYTES = getUTF8(";");
 
     /** Read a mapping from the stream, as defined by the I2P data structure spec,
      * and store it into a Properties object.
