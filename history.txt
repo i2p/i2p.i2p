@@ -1,3 +1,8 @@
+2011-09-24 zzz
+  * HTTPClient: Fix error page not appearing, broken by
+                StreamForwarder change
+  * HTTPServer: More mime types not to compress
+
 2011-09-23 kytv
   * Update Italian, Spanish, and Swedish translations
     from Transifex
