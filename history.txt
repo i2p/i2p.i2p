@@ -1,3 +1,6 @@
+2011-09-27 kytv
+  * Remove exotrack.i2p from i2psnark
+
 2011-09-24 zzz
   * HTTPClient: Fix error page not appearing, broken by
                 StreamForwarder change
