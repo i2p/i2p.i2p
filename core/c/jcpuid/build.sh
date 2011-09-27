@@ -2,7 +2,7 @@
 
 cd `dirname $0`
 
-case `uname -sr` in
+case `uname -s` in
     MINGW*|CYGWIN*)
         echo "Building windows .dlls";;
     SunOS*)
@@ -21,7 +21,7 @@ mkdir -p lib/freenet/support/CPUInformation
 
 CC="gcc"
 
-case `uname -sr` in
+case `uname -s` in
     MINGW*|CYGWIN*)
         JAVA_HOME="/c/software/j2sdk1.4.2_05"
         COMPILEFLAGS="-Wall"
