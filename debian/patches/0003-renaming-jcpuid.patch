@@ -8,23 +8,14 @@ Subject: rename jcpuid
 
 --- a/core/c/jcpuid/build.sh
 +++ b/core/c/jcpuid/build.sh
-@@ -37,7 +37,7 @@
-         COMPILEFLAGS="-Wall"
-         INCLUDES="-I. -Iinclude -I$JAVA_HOME/include/ -I$JAVA_HOME/include/solaris/"
-         LINKFLAGS="-shared -static -Wl,-soname,libjcpuid-x86-solaris.so"
--        LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-x86-solaris.so";;
-+        LIBFILE="lib/freenet/support/CPUInformation/libjcpuid.so";;
- FreeBSD*)
- 	COMPILEFLAGS="-Wall"
- 	INCLUDES="-I. -Iinclude -I$JAVA_HOME/include/ -I$JAVA_HOME/include/freebsd/"
-@@ -46,8 +46,8 @@
- *kFreeBSD*|Linux*)
- 	COMPILEFLAGS="-fPIC -Wall"
- 	INCLUDES="-I. -Iinclude -I$JAVA_HOME/include -I$JAVA_HOME/include/linux"
--	LINKFLAGS="-shared -Wl,-soname,libjcpuid-x86-linux.so"
--	LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-x86-linux.so";;
-+	LINKFLAGS="-shared -Wl,-soname,libjcpuid.so"
-+	LIBFILE="../jbigi/libjcpuid.so";;
+@@ -83,8 +83,8 @@
+             echo "and/or set JAVA_HOME then re-run this script."
+             exit 1
+         fi
+-        LINKFLAGS="-shared -Wl,-soname,libjcpuid-${ARCH}-${UNIXTYPE}.so"
+-        LIBFILE="lib/freenet/support/CPUInformation/libjcpuid-${ARCH}-${UNIXTYPE}.so"
++        LINKFLAGS="-shared -Wl,-soname,libjcpuid.so"
++        LIBFILE="../jbigi/libjcpuid.so"
+         COMPILEFLAGS="-fPIC -Wall"
+         INCLUDES="-I. -Iinclude -I${JAVA_HOME}/include -I${JAVA_HOME}/include/${UNIXTYPE}";;
  esac
- 
- echo "Compiling C code..."
