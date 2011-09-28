@@ -432,6 +432,7 @@ public class BlockfileNamingService extends DummyNamingService {
      *  @param source may be null
      *  @throws RuntimeException
      */
+/****
     private void addEntry(SkipList sl, String key, Destination dest, String source) {
         Properties props = new Properties();
         props.setProperty(PROP_ADDED, Long.toString(_context.clock().now()));
@@ -439,6 +440,7 @@ public class BlockfileNamingService extends DummyNamingService {
             props.setProperty(PROP_SOURCE, source);
         addEntry(sl, key, dest, props);
     }
+****/
 
     /**
      *  Caller must synchronize
@@ -476,9 +478,11 @@ public class BlockfileNamingService extends DummyNamingService {
      *  @return null without exception on error (logs only)
      *  @since 0.8.9
      */
+/****
     private String getReverseEntry(Destination dest) {
         return getReverseEntry(dest.calculateHash());
     }
+****/
 
     /**
      *  Caller must synchronize.

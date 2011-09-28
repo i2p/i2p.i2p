@@ -103,7 +103,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     protected final static long DONT_FAIL_PERIOD = 10*60*1000;
     
     /** don't probe or broadcast data, just respond and search when explicitly needed */
-    private final boolean QUIET = false;
+    private static final boolean QUIET = false;
     
     public static final String PROP_ENFORCE_NETID = "router.networkDatabase.enforceNetId";
     private static final boolean DEFAULT_ENFORCE_NETID = false;

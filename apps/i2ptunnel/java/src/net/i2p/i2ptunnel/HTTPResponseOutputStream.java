@@ -292,11 +292,9 @@ class HTTPResponseOutputStream extends FilterOutputStream {
             } finally {
                 if (_log.shouldLog(Log.INFO) && (_in != null))
                     _log.info("After decompression, written=" + written + 
-                              (_in != null ?
                                 " read=" + _in.getTotalRead() 
                                 + ", expanded=" + _in.getTotalExpanded() + ", remaining=" + _in.getRemaining() 
-                                + ", finished=" + _in.getFinished()
-                               : ""));
+                                + ", finished=" + _in.getFinished());
                 if (ba != null)
                     _cache.release(ba);
                 if (_out != null) try { 

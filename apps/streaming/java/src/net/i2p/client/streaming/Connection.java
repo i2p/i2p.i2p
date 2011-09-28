@@ -311,7 +311,7 @@ class Connection {
             int windowSize;
             int remaining;
             synchronized (_outboundPackets) {
-                _outboundPackets.put(new Long(packet.getSequenceNum()), packet);
+                _outboundPackets.put(Long.valueOf(packet.getSequenceNum()), packet);
                 windowSize = _options.getWindowSize();
                 remaining = windowSize - _outboundPackets.size() ;
                 _outboundPackets.notifyAll();
@@ -441,7 +441,7 @@ class Connection {
             if (acked != null) {
                 for (int i = 0; i < acked.size(); i++) {
                     PacketLocal p = acked.get(i);
-                    _outboundPackets.remove(new Long(p.getSequenceNum()));
+                    _outboundPackets.remove(Long.valueOf(p.getSequenceNum()));
                     _ackedPackets++;
                     if (p.getNumSends() > 1) {
                         _activeResends--;
@@ -1129,7 +1129,7 @@ class Connection {
             synchronized (_outboundPackets) {
                 if (_packet.getSequenceNum() == _highestAckedThrough + 1)
                     isLowest = true;
-                if (_outboundPackets.containsKey(new Long(_packet.getSequenceNum())))
+                if (_outboundPackets.containsKey(Long.valueOf(_packet.getSequenceNum())))
                     resend = true;
             }
             if ( (resend) && (_packet.getAckTime() <= 0) ) {

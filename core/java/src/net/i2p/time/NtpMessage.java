@@ -33,6 +33,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import net.i2p.util.RandomSource;
 
 /**
  * This class represents a NTP message, as specified in RFC 2030.  The message
@@ -399,7 +400,7 @@ public class NtpMessage {
         // low order bits of the timestamp with a random, unbiased
         // bitstring, both to avoid systematic roundoff errors and as
         // a means of loop detection and replay detection.
-        array[7+pointer] = (byte) (Math.random()*255.0);
+        array[7+pointer] = (byte) (RandomSource.getInstance().nextInt());
     }
     
     
