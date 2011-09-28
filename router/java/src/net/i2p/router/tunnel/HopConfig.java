@@ -26,10 +26,12 @@ public class HopConfig {
     private long _creation;
     private long _expiration;
     private Map _options;
-    private long _messagesProcessed;
-    private long _oldMessagesProcessed;
-    private long _messagesSent;
-    private long _oldMessagesSent;
+    // these 4 were longs, let's save some space
+    // 2 billion * 1KB / 10 minutes = 3 GBps in a single tunnel
+    private int _messagesProcessed;
+    private int _oldMessagesProcessed;
+    private int _messagesSent;
+    private int _oldMessagesSent;
     
     /** IV length for {@link #getReplyIV} */
     public static final int REPLY_IV_LENGTH = 16;
@@ -110,16 +112,21 @@ public class HopConfig {
     /** take note of a message being pumped through this tunnel */
     /** "processed" is for incoming and "sent" is for outgoing (could be dropped in between) */
     public void incrementProcessedMessages() { _messagesProcessed++; }
-    public long getProcessedMessagesCount() { return _messagesProcessed; }
-    public long getRecentMessagesCount() {
-        long rv = _messagesProcessed - _oldMessagesProcessed;
+
+    public int getProcessedMessagesCount() { return _messagesProcessed; }
+
+    public int getRecentMessagesCount() {
+        int rv = _messagesProcessed - _oldMessagesProcessed;
         _oldMessagesProcessed = _messagesProcessed;
         return rv;
     }
+
     public void incrementSentMessages() { _messagesSent++; }
-    public long getSentMessagesCount() { return _messagesSent; }
-    public long getRecentSentMessagesCount() {
-        long rv = _messagesSent - _oldMessagesSent;
+
+    public int getSentMessagesCount() { return _messagesSent; }
+
+    public int getRecentSentMessagesCount() {
+        int rv = _messagesSent - _oldMessagesSent;
         _oldMessagesSent = _messagesSent;
         return rv;
     }
