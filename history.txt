@@ -1,3 +1,15 @@
+2011-09-29 zzz
+  * Bandwidth refiller: Reinitialize at restart, avoid
+    issues from clock skews
+
+2011-09-27 kytv
+  * Remove exotrack.i2p from i2psnark
+
+2011-09-24 zzz
+  * HTTPClient: Fix error page not appearing, broken by
+                StreamForwarder change
+  * HTTPServer: More mime types not to compress
+
 2011-09-23 kytv
   * Update Italian, Spanish, and Swedish translations
     from Transifex

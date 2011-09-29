@@ -34,7 +34,7 @@ public class HMAC256Generator extends HMACGenerator {
         return new I2PHMac(new Sha256ForMAC());
     }
     
-    private class Sha256ForMAC extends Sha256Standalone implements Digest {
+    private static class Sha256ForMAC extends Sha256Standalone implements Digest {
         public String getAlgorithmName() { return "sha256 for hmac"; }
         public int getDigestSize() { return 32; }
         public int doFinal(byte[] out, int outOff) {

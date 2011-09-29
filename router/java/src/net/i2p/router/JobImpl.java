@@ -62,6 +62,10 @@ public abstract class JobImpl implements Job {
     public void madeReady() { _madeReadyOn = _context.clock().now(); }
     public void dropped() {}
     
+    /**
+     *  Warning - only call this from runJob() or if Job is not already queued,
+     *  or else it gets the job queue out of order.
+     */
     protected void requeue(long delayMs) { 
         getTiming().setStartAfter(_context.clock().now() + delayMs);
         _context.jobQueue().addJob(this);

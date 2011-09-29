@@ -212,10 +212,11 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
                     try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
                 }
             }
-            if (sockMgr == null) {
-                l.log("Invalid I2CP configuration");
-                throw new IllegalArgumentException("Socket manager could not be created");
-            }
+            // can't be null unless we limit the loop above
+            //if (sockMgr == null) {
+            //    l.log("Invalid I2CP configuration");
+            //    throw new IllegalArgumentException("Socket manager could not be created");
+            //}
             l.log("Tunnels ready for client: " + handlerName);
 
         } // else delay creating session until createI2PSocket() is called
@@ -556,7 +557,7 @@ public abstract class I2PTunnelClientBase extends I2PTunnelTask implements Runna
             if (localPort == 0) {
                 localPort = ss.getLocalPort();
             }
-            notifyEvent("clientLocalPort", new Integer(ss.getLocalPort()));
+            notifyEvent("clientLocalPort", Integer.valueOf(ss.getLocalPort()));
             // duplicates message in constructor
             //l.log("Listening for clients on port " + localPort + " of " + getTunnel().listenHost);
 

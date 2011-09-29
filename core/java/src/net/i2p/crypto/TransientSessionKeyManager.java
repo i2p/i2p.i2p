@@ -596,10 +596,10 @@ public class TransientSessionKeyManager extends SessionKeyManager {
         }
         int total = 0;
         long now = _context.clock().now();
-        for (Iterator<SessionKey> iter = inboundSets.keySet().iterator(); iter.hasNext();) {
-            SessionKey skey = iter.next();
+        for (Map.Entry<SessionKey, Set<TagSet>> e : inboundSets.entrySet()) {
+            SessionKey skey = e.getKey();
             Set<TagSet> sets = new TreeSet(new TagSetComparator());
-            sets.addAll(inboundSets.get(skey));
+            sets.addAll(e.getValue());
             buf.append("<tr><td><b>Session key</b>: ").append(skey.toBase64()).append("</td>" +
                        "<td><b># Sets:</b> ").append(sets.size()).append("</td></tr>" +
                        "<tr><td colspan=\"2\"><ul>");
@@ -653,9 +653,9 @@ public class TransientSessionKeyManager extends SessionKeyManager {
      *  Just for the HTML method above so we can see what's going on easier
      *  Earliest first
      */
-    private static class TagSetComparator implements Comparator {
-         public int compare(Object l, Object r) {
-             return (int) (((TagSet)l).getDate() - ((TagSet)r).getDate());
+    private static class TagSetComparator implements Comparator<TagSet> {
+         public int compare(TagSet l, TagSet r) {
+             return (int) (l.getDate() - r.getDate());
         }
     }
 

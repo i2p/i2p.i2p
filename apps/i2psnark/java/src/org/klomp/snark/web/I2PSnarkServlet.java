@@ -1886,7 +1886,7 @@ public class I2PSnarkServlet extends Default {
             buf.append("</TR>\n");
         }
         if (showSaveButton) {
-            buf.append("<thead><tr><th colspan=\"3\">&nbsp;</th><th align=\"center\"><input type=\"submit\" value=\"");
+            buf.append("<thead><tr><th colspan=\"3\">&nbsp;</th><th class=\"headerpriority\"><input type=\"submit\" value=\"");
             buf.append(_("Save priorities"));
             buf.append("\" name=\"foo\" ></th></tr></thead>\n");
         }

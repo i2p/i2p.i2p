@@ -40,13 +40,14 @@ import net.i2p.util.RandomSource;
  *
  */
 public class RoutingKeyGenerator {
-    private Log _log;
-    private I2PAppContext _context;
+    private final Log _log;
+    private final I2PAppContext _context;
 
     public RoutingKeyGenerator(I2PAppContext context) {
         _log = context.logManager().getLog(RoutingKeyGenerator.class);
         _context = context;
     }
+
     public static RoutingKeyGenerator getInstance() {
         return I2PAppContext.getGlobalContext().routingKeyGenerator();
     }

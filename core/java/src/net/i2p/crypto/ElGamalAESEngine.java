@@ -298,10 +298,12 @@ public class ElGamalAESEngine {
      * @param foundKey  out parameter. Data must be unset when called; may be filled with a new sessionKey found during decryption
      * @return decrypted data or null on failure
      */
+/****
     private byte[] decryptAESBlock(byte encrypted[], SessionKey key, byte iv[], 
                            byte sentTag[], Set foundTags, SessionKey foundKey) throws DataFormatException {
         return decryptAESBlock(encrypted, 0, encrypted.length, key, iv, sentTag, foundTags, foundKey);
     }
+****/
 
     /*
      * Note: package private for ElGamalTest.testAES()

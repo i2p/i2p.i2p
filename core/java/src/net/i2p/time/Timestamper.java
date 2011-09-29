@@ -321,14 +321,16 @@ public class Timestamper implements Runnable {
                               _context.getProperty(PROP_CONCURRING_SERVERS, DEFAULT_CONCURRING_SERVERS)));
     }
     
+/****
     public static void main(String args[]) {
         System.setProperty(PROP_DISABLED, "false");
         System.setProperty(PROP_QUERY_FREQUENCY, "30000");
-        I2PAppContext ctx = I2PAppContext.getGlobalContext();
+        I2PAppContext.getGlobalContext();
         for (int i = 0; i < 5*60*1000; i += 61*1000) {
             try { Thread.sleep(61*1000); } catch (InterruptedException ie) {}
         }
     }
+****/
     
     /**
      * Interface to receive update notifications for when we query the time
