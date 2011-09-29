@@ -1,3 +1,13 @@
+2011-09-30 kytv
+  * fix umask bug by upgrading to wrapper v3.5.12. Binaries are from Tanuki's
+    delta pack for the community edition, except:
+    - Win64: not available from Tanuki--compiled with VS2010
+    - FreeBSD: Tanuki's binaries are compiled in FBSD v6.  I compiled the
+      wrapper in FreeBSD 7.4 to eliminate the dependency on the compat6x port.
+    - Linux ARM: not available from Tanuki
+    - OSX: Tanuki offers separate binaries for 32bit VS 64bit. Our
+      wrapper is quad-fat supporting PPC32/PPC64 and x86/x86_64.
+
 2011-09-29 zzz
   * Bandwidth refiller: Reinitialize at restart, avoid
     issues from clock skews
