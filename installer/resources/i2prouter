@@ -149,20 +149,8 @@ failed() {
         case `uname -s` in
              FreeBSD)
                 echo
-                echo "In an attempt to ensure that I2P will run on as many systems"
-                echo "as possible, included in the installation package is a"
-                echo "version of the wrapper that was compiled for FreeBSD 6."
-                echo "Necessary compatibility libraries may not be on your"
-                echo "system. These libraries are included in the misc/compat6x port."
-                echo
-                echo "Additionally, the wrapper requires libiconv to be on your system."
+                echo "The wrapper requires libiconv to be on your system."
                 echo "It can be installed with pkg_add -r libiconv"
-                echo
-                echo "If you cannot (or choose not to) install these libraries,"
-                echo "I2P may be started with the 'runplain.sh' script. Another"
-                echo "option would be to compile the java wrapper for your system."
-                echo "Hints to accomplish this can be found at"
-                echo "${WRAPPER_URL}."
                 echo
                 exit 1
                 ;;
