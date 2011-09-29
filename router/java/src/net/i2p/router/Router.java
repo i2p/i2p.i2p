@@ -1311,6 +1311,7 @@ public class Router implements RouterClock.ClockShiftListener {
             // NOTE: DisconnectMessageHandler keys off "restart"
             try { _context.clientManager().shutdown("Router restart"); } catch (Throwable t) { _log.log(Log.CRIT, "Error stopping the client manager", t); }
             _log.logAlways(Log.WARN, "Stopping the comm system");
+            _context.bandwidthLimiter().reinitialize();
             try { _context.messageRegistry().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the message registry", t); }
             try { _context.commSystem().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the comm system", t); }
             _log.logAlways(Log.WARN, "Stopping the tunnel manager");

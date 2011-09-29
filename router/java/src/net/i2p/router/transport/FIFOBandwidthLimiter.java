@@ -253,6 +253,7 @@ public class FIFOBandwidthLimiter {
         // it changes out from under us
         // This never had locks before concurrent, anyway
 
+        // FIXME wrap - change to AtomicLong or detect
         int avi = _availableInbound.addAndGet((int) bytesInbound);
         if (avi > _maxInbound) {
             if (_log.shouldLog(Log.DEBUG))
