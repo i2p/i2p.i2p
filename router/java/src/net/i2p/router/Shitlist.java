@@ -46,7 +46,11 @@ public class Shitlist {
         public Set<String> transports;
     }
     
-    public final static long SHITLIST_DURATION_MS = 20*60*1000;
+    /**
+     *  Don't make this too long as the failure may be transient
+     *  due to connection limits.
+     */
+    public final static long SHITLIST_DURATION_MS = 7*60*1000;
     public final static long SHITLIST_DURATION_MAX = 30*60*1000;
     public final static long SHITLIST_DURATION_PARTIAL = 10*60*1000;
     public final static long SHITLIST_DURATION_FOREVER = 181l*24*60*60*1000; // will get rounded down to 180d on console
@@ -107,23 +111,30 @@ public class Shitlist {
     public boolean shitlistRouter(Hash peer) {
         return shitlistRouter(peer, null);
     }
+
     public boolean shitlistRouter(Hash peer, String reason) { return shitlistRouter(peer, reason, null); }
+
     /** ick have to put the reasonCode in the front to avoid ambiguity */
     public boolean shitlistRouter(String reasonCode, Hash peer, String reason) {
         return shitlistRouter(peer, reason, reasonCode, null, false);
     }
+
     public boolean shitlistRouter(Hash peer, String reason, String transport) {
         return shitlistRouter(peer, reason, transport, false);
     }
+
     public boolean shitlistRouterForever(Hash peer, String reason) {
         return shitlistRouter(peer, reason, null, true);
     }
+
     public boolean shitlistRouterForever(Hash peer, String reason, String reasonCode) {
         return shitlistRouter(peer, reason, reasonCode, null, true);
     }
+
     public boolean shitlistRouter(Hash peer, String reason, String transport, boolean forever) {
         return shitlistRouter(peer, reason, null, transport, forever);
     }
+
     private boolean shitlistRouter(Hash peer, String reason, String reasonCode, String transport, boolean forever) {
         if (peer == null) {
             _log.error("wtf, why did we try to shitlist null?", new Exception("shitfaced"));
@@ -144,7 +155,7 @@ public class Shitlist {
         } else if (transport != null) {
             e.expireOn = _context.clock().now() + SHITLIST_DURATION_PARTIAL;
         } else {
-            long period = SHITLIST_DURATION_MS + _context.random().nextLong(SHITLIST_DURATION_MS);
+            long period = SHITLIST_DURATION_MS + _context.random().nextLong(SHITLIST_DURATION_MS / 4);
             PeerProfile prof = _context.profileOrganizer().getProfile(peer);
             if (prof != null) {
                 period = SHITLIST_DURATION_MS << prof.incrementShitlists();
@@ -198,8 +209,11 @@ public class Shitlist {
     public void unshitlistRouter(Hash peer) {
         unshitlistRouter(peer, true);
     }
+
     private void unshitlistRouter(Hash peer, boolean realUnshitlist) { unshitlistRouter(peer, realUnshitlist, null); }
+
     public void unshitlistRouter(Hash peer, String transport) { unshitlistRouter(peer, true, transport); }
+
     private void unshitlistRouter(Hash peer, boolean realUnshitlist, String transport) {
         if (peer == null) return;
         if (_log.shouldLog(Log.DEBUG))
@@ -233,6 +247,7 @@ public class Shitlist {
     }
     
     public boolean isShitlisted(Hash peer) { return isShitlisted(peer, null); }
+
     public boolean isShitlisted(Hash peer, String transport) {
         boolean rv = false;
         boolean unshitlist = false;
