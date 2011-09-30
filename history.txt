@@ -1,3 +1,8 @@
+2011-09-30 zzz
+  * logs.jsp: Add wrapper version
+  * Shitlist: Shorten time
+  * Wrapper: Update armv7 to 3.5.12
+
 2011-09-30 kytv
   * fix umask bug by upgrading to wrapper v3.5.12. Binaries are from Tanuki's
     delta pack for the community edition, except:
