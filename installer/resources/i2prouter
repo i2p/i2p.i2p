@@ -22,7 +22,7 @@
 #
 #-----------------------------------------------------------------------------
 # These settings can be modified to fit the needs of your application
-# Optimized for use with version 3.5.9 of the Wrapper.
+# Optimized for use with version 3.5.12 of the Wrapper.
 
 # Paths
 # Note that (percent)INSTALL_PATH and (percent)SYSTEM_java_io_tmpdir
@@ -232,7 +232,7 @@ done
 # Get the location of the script.
 REALDIR=`dirname "$REALPATH"`
 # Normalize the path
-REALDIR=`cd ${REALDIR}; pwd`
+REALDIR=`cd "${REALDIR}"; pwd`
 
 # If the PIDDIR is relative, set its value relative to the full REALPATH to avoid problems if
 #  the working directory is later changed.
@@ -281,8 +281,21 @@ PSEXE="/usr/ucb/ps"
         fi
     fi
 
+TREXE="/usr/bin/tr"
+if [ ! -x "$TREXE" ]
+then
+    TREXE="/bin/tr"
+    if [ ! -x "$TREXE" ]
+    then
+        eval echo `gettext 'Unable to locate "tr".'`
+        eval echo `gettext 'Please report this message along with the location of the command on your system.'`
+        exit 1
+    fi
+fi
+
+
 # Resolve the os
-DIST_OS=`uname -s | tr "[A-Z]" "[a-z]" | tr -d ' '`
+DIST_OS=`uname -s | $TREXE "[A-Z]" "[a-z]" | $TREXE -d ' '`
 case "$DIST_OS" in
     'sunos')
         DIST_OS="solaris"
@@ -319,14 +332,14 @@ then
     APP_PLIST=${APP_PLIST_BASE}.plist
 else
     DIST_ARCH=
-    DIST_ARCH=`uname -p 2>/dev/null | tr "[A-Z]" "[a-z]" | tr -d ' '`
+    DIST_ARCH=`uname -p 2>/dev/null | $TREXE "[A-Z]" "[a-z]" | $TREXE -d ' '`
     if [ "X$DIST_ARCH" = "X" ]
     then
         DIST_ARCH="unknown"
     fi
     if [ "$DIST_ARCH" = "unknown" ]
     then
-        DIST_ARCH=`uname -m 2>/dev/null | tr "[A-Z]" "[a-z]" | tr -d ' '`
+        DIST_ARCH=`uname -m 2>/dev/null | $TREXE "[A-Z]" "[a-z]" | $TREXE -d ' '`
     fi
     case "$DIST_ARCH" in
         'athlon' | 'i386' | 'i486' | 'i586' | 'i686')
@@ -1081,7 +1094,7 @@ installdaemon() {
         eval echo `gettext 'Must be root to perform this action.'`
         exit 1
     else
-        APP_NAME_LOWER=`echo "$APP_NAME" | tr "[A-Z]" "[a-z]"`
+        APP_NAME_LOWER=`echo "$APP_NAME" | $TREXE "[A-Z]" "[a-z]"`
         if [ "$DIST_OS" = "solaris" ] ; then
             eval echo `gettext 'Detected Solaris:'`
             if [ -f /etc/init.d/$APP_NAME ] ; then
@@ -1278,7 +1291,7 @@ removedaemon() {
         exit 1
     else
         stopit "0"
-        APP_NAME_LOWER=`echo "$APP_NAME" | tr "[A-Z]" "[a-z]"`
+        APP_NAME_LOWER=`echo "$APP_NAME" | $TREXE "[A-Z]" "[a-z]"`
         if [ "$DIST_OS" = "solaris" ] ; then
             eval echo `gettext 'Detected Solaris:'`
             if [ -f "/etc/init.d/$APP_NAME" ] ; then
