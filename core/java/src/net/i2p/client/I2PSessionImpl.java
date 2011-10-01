@@ -355,10 +355,8 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                     _socket = new Socket(_hostname, _portNum);
                 // _socket.setSoTimeout(1000000); // Uhmmm we could really-really use a real timeout, and handle it.
                 _out = _socket.getOutputStream();
-                synchronized (_out) {
-                    _out.write(I2PClient.PROTOCOL_BYTE);
-                    _out.flush();
-                }
+                _out.write(I2PClient.PROTOCOL_BYTE);
+                _out.flush();
                 _writer = new ClientWriterRunner(_out, this);
                 InputStream in = _socket.getInputStream();
                 _reader = new I2CPMessageReader(in, this);

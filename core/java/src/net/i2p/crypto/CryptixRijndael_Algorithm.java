@@ -519,9 +519,11 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
     }
 
     /** A basic symmetric encryption/decryption test. */
+/****
     public static boolean self_test() {
         return self_test(_BLOCK_SIZE);
     }
+****/
 
     // Rijndael own methods
     //...........................................................................
@@ -745,6 +747,7 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
     }
 
     /** A basic symmetric encryption/decryption test for a given key size. */
+/****
     private static boolean self_test(int keysize) {
         if (_RDEBUG) trace(_IN, "self_test(" + keysize + ")");
         boolean ok = false;
@@ -795,6 +798,7 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
         if (_RDEBUG) trace(_OUT, "self_test()");
         return ok;
     }
+****/
 
     /**
      * Return The number of rounds for a given Rijndael's key and block sizes.
@@ -894,9 +898,11 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
     // main(): use to generate the Intermediate Values KAT
     //...........................................................................
 
+/****
     public static void main(String[] args) {
         self_test(16);
         self_test(24);
         self_test(32);
     }
+****/
 }

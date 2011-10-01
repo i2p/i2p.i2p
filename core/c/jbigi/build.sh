@@ -1,4 +1,4 @@
-#/bin/sh
+#!/bin/sh
 #
 #  Build the jbigi library for i2p
 #

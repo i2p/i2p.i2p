@@ -34,6 +34,27 @@ public interface TunnelInfo {
     /** retrieve the peer at the given hop.  the gateway is hop 0 */
     public Hash getPeer(int hop);
 
+    /**
+     *  For convenience
+     *  @return getPeer(0)
+     *  @since 0.8.9
+     */
+    public Hash getGateway();
+
+    /**
+     *  For convenience
+     *  @return getPeer(getLength() - 1)
+     *  @since 0.8.9
+     */
+    public Hash getEndpoint();
+
+    /**
+     *  For convenience
+     *  @return isInbound() ? getGateway() : getEndpoint()
+     *  @since 0.8.9
+     */
+    public Hash getFarEnd();
+
     /** is this an inbound tunnel? */
     public boolean isInbound();
 

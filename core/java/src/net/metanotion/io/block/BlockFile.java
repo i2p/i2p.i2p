@@ -443,7 +443,7 @@ public class BlockFile {
 	public BSkipList makeIndex(String name, Serializer key, Serializer val) throws IOException {
 		if(metaIndex.get(name) != null) { throw new IOException("Index already exists"); }
 		int page = allocPage();
-		metaIndex.put(name, new Integer(page));
+		metaIndex.put(name, Integer.valueOf(page));
 		BSkipList.init(this, page, spanSize);
 		BSkipList bsl = new BSkipList(spanSize, this, page, key, val, true);
 		openIndices.put(name, bsl);

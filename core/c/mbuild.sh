@@ -1,6 +1,14 @@
-#/usr/bin/env bash
+#!/usr/bin/env bash
 # Automatic build of so files, ignores failed builds.
 # Place latest gmp tarball in the jbigi dir, and exec this script.
+
+if [ -z "$BASH_VERSION" ]; then
+	echo "This script needs to be run with Bash."
+	echo
+	echo "Please install bash and then run this script with"
+	echo "bash $0"
+	exit 1
+fi
 
 #JBIGI=../../../installer/lib/jbigi/jbigi.jar
 
@@ -10,7 +18,7 @@
 
 rm -f t/* jcpuid/lib/freenet/support/CPUInformation/* jbigi/lib/net/i2p/util/*
 
-( cd jcpuid ; ./mbuild.sh )
+( cd jcpuid ; ./build.sh )
 ( cd jbigi ; ./mbuild-all.sh )
 
 rm -Rf t

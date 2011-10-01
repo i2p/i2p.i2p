@@ -10,20 +10,18 @@ import net.i2p.data.Hash;
  *
  */
 class XORComparator implements Comparator<Hash> {
-    private final Hash _base;
+    private final byte[] _base;
 
     /**
      * @param target key to compare distances with
      */
     public XORComparator(Hash target) {
-        _base = target;
+        _base = target.getData();
     }
 
     public int compare(Hash lhs, Hash rhs) {
-        if (lhs == null) throw new NullPointerException("LHS is null");
-        if (rhs == null) throw new NullPointerException("RHS is null");
-        byte lhsDelta[] = DataHelper.xor(lhs.getData(), _base.getData());
-        byte rhsDelta[] = DataHelper.xor(rhs.getData(), _base.getData());
+        byte lhsDelta[] = DataHelper.xor(lhs.getData(), _base);
+        byte rhsDelta[] = DataHelper.xor(rhs.getData(), _base);
         return DataHelper.compareTo(lhsDelta, rhsDelta);
     }
 }

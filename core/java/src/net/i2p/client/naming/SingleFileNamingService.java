@@ -126,6 +126,7 @@ public class SingleFileNamingService extends NamingService {
                 _log.warn("Error loading hosts file " + _file, ioe);
             return null;
         } finally {
+            if (in != null) try { in.close(); } catch (IOException ioe) {}
             releaseReadLock();
         }
     }

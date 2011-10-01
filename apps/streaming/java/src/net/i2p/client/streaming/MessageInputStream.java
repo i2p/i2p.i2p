@@ -229,8 +229,8 @@ class MessageInputStream extends InputStream {
                 _highestReadyBlockId = messageId;
                 long cur = _highestReadyBlockId + 1;
                 // now pull in any previously pending blocks
-                while (_notYetReadyBlocks.containsKey(new Long(cur))) {
-                    ByteArray ba = _notYetReadyBlocks.remove(new Long(cur));
+                while (_notYetReadyBlocks.containsKey(Long.valueOf(cur))) {
+                    ByteArray ba = _notYetReadyBlocks.remove(Long.valueOf(cur));
                     if ( (ba != null) && (ba.getData() != null) && (ba.getValid() > 0) ) {
                         _readyDataBlocks.add(ba);
                     }
@@ -245,9 +245,9 @@ class MessageInputStream extends InputStream {
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("message is out of order: " + messageId);
                 if (_locallyClosed) // dont need the payload, just the msgId in order
-                    _notYetReadyBlocks.put(new Long(messageId), new ByteArray(null));
+                    _notYetReadyBlocks.put(Long.valueOf(messageId), new ByteArray(null));
                 else
-                    _notYetReadyBlocks.put(new Long(messageId), payload);
+                    _notYetReadyBlocks.put(Long.valueOf(messageId), payload);
                 _dataLock.notifyAll();
             }
         }

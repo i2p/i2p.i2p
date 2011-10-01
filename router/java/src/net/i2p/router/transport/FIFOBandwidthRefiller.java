@@ -110,6 +110,9 @@ public class FIFOBandwidthRefiller implements Runnable {
                        + " rate in=" 
                        + _inboundKBytesPerSecond + ", out=" 
                        + _outboundKBytesPerSecond  +")");
+        // clock skew
+        if (numMs >= REPLENISH_FREQUENCY * 50 || numMs <= 0)
+            numMs = REPLENISH_FREQUENCY;
         if (numMs >= REPLENISH_FREQUENCY) {
             long inboundToAdd = (1024*_inboundKBytesPerSecond * numMs)/1000;
             long outboundToAdd = (1024*_outboundKBytesPerSecond * numMs)/1000;

@@ -198,20 +198,6 @@ public class I2PAppContext {
         _overrideProps = new I2PProperties();
         if (envProps != null)
             _overrideProps.putAll(envProps);
-        _statManager = null;
-        _sessionKeyManager = null;
-        _namingService = null;
-        _elGamalEngine = null;
-        _elGamalAESEngine = null;
-        _logManager = null;
-        _keyRing = null;
-        _statManagerInitialized = false;
-        _sessionKeyManagerInitialized = false;
-        _namingServiceInitialized = false;
-        _elGamalEngineInitialized = false;
-        _elGamalAESEngineInitialized = false;
-        _logManagerInitialized = false;
-        _keyRingInitialized = false;
         _shutdownTasks = new ConcurrentHashSet(32);
         initializeDirs();
     }

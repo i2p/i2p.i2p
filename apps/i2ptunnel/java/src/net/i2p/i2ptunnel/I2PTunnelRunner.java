@@ -76,7 +76,8 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
      *  @param initialSocketData may be null
      *  @param sockList may be null. Caller must add i2ps to the list! It will be removed here on completion.
      *                               Will synchronize on slock when removing.
-     *  @param onTimeout may be null
+     *  @param onTimeout May be null. If non-null and no data (except initial data) was sent or received,
+                         it will be run before closing s.
      */
     public I2PTunnelRunner(Socket s, I2PSocket i2ps, Object slock, byte[] initialI2PData,
                            byte[] initialSocketData, List<I2PSocket> sockList, Runnable onTimeout) {
@@ -384,7 +385,13 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
                     // or else input end gives up and we have data loss.
                     // http://techtavern.wordpress.com/2008/07/16/whats-this-ioexception-write-end-dead/
                     //out.flush();
-                    out.close();
+                    // DON'T close if we have a timeout job and we haven't received anything,
+                    // or else the timeout job can't write the error message to the stream.
+                    // close() above will close it after the timeout job is run.
+                    if (!(onTimeout != null && (!_toI2P) && totalReceived <= 0))
+                        out.close();
+                    else if (_log.shouldLog(Log.INFO))
+                        _log.info(direction + ": not closing so we can write the error message");
                 } catch (IOException ioe) {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn(direction + ": Error flushing to close", ioe);

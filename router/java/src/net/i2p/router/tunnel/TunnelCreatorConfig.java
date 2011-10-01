@@ -81,6 +81,33 @@ public class TunnelCreatorConfig implements TunnelInfo {
     public Hash getPeer(int hop) { return _peers[hop]; }
     public void setPeer(int hop, Hash peer) { _peers[hop] = peer; }
     
+    /**
+     *  For convenience
+     *  @return getPeer(0)
+     *  @since 0.8.9
+     */
+    public Hash getGateway() {
+        return _peers[0];
+    }
+
+    /**
+     *  For convenience
+     *  @return getPeer(getLength() - 1)
+     *  @since 0.8.9
+     */
+    public Hash getEndpoint() {
+        return _peers[_peers.length - 1];
+    }
+
+    /**
+     *  For convenience
+     *  @return isInbound() ? getGateway() : getEndpoint()
+     *  @since 0.8.9
+     */
+    public Hash getFarEnd() {
+        return _peers[_isInbound ? 0 : _peers.length - 1];
+    }
+
     /** is this an inbound tunnel? */
     public boolean isInbound() { return _isInbound; }
 
