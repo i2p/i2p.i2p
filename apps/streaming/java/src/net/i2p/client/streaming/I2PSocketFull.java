@@ -3,6 +3,7 @@ package net.i2p.client.streaming;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.channels.SelectableChannel;
 
 import net.i2p.client.I2PSession;
 import net.i2p.data.Destination;
@@ -65,6 +66,10 @@ class I2PSocketFull implements I2PSocket {
             return c.getOptions();
         else
             return null;
+    }
+
+    public SelectableChannel getChannel() {
+        return new MessageChannel(this);
     }
     
     /**

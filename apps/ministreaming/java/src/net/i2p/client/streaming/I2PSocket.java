@@ -3,6 +3,7 @@ package net.i2p.client.streaming;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.channels.SelectableChannel;
 
 import net.i2p.data.Destination;
 
@@ -33,6 +34,8 @@ public interface I2PSocket {
      * @throws IOException on failure
      */
     public OutputStream getOutputStream() throws IOException;
+
+    public SelectableChannel getChannel() throws IOException;
 
     /** 
      * @return socket's configuration

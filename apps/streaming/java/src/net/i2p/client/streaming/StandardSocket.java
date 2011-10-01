@@ -71,7 +71,7 @@ class StandardSocket extends Socket {
      */
     @Override
     public SocketChannel getChannel() {
-        return null;
+        return _socket.getChannel();
     }
 
     /**
