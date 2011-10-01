@@ -108,6 +108,7 @@
         <panel classname="PacksPanel"><os family="windows" /></panel>
         <panel classname="TargetPanel"/>
         <panel classname="ShortcutPanel"><os family="windows" /></panel>
+        <panel classname="InstallPanel"/>
         <!-- <panel classname="ProcessPanel"><os family="windows" /></panel> -->
         <!-- unix|mac doesn't work, displays for windows too -->
 
@@ -118,7 +119,6 @@
 	<panel classname="XInfoPanel" condition="!izpack.windowsinstall" />
 	<!--<panel classname="XInfoPanel" ><os family="unix" /></panel> -->
 	<!--<panel classname="XInfoPanel" ><os family="mac" /></panel>  -->
-        <panel classname="InstallPanel"/>
         <panel classname="SimpleFinishPanel"/>
     </panels>
 
