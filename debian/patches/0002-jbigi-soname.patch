@@ -12,7 +12,7 @@ a soname to shut lintian up.
 
 --- a/core/c/jbigi/mbuild_jbigi.sh
 +++ b/core/c/jbigi/mbuild_jbigi.sh
-@@ -48,7 +48,7 @@
+@@ -47,7 +47,7 @@
  		fi
          fi
          COMPILEFLAGS="-fPIC -Wall"
@@ -21,7 +21,7 @@ a soname to shut lintian up.
          LINKFLAGS="-shared -Wl,-soname,libjbigi.so"
          LIBFILE="libjbigi.so";;
  *)
-@@ -67,7 +67,7 @@
+@@ -66,7 +66,7 @@
  
  echo "Compiling C code..."
  rm -f jbigi.o $LIBFILE
