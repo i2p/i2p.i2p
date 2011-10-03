@@ -95,6 +95,13 @@ trans.pl = apps/susimail/locale/messages_pl.po
 trans.vi = apps/susimail/locale/messages_vi.po
 trans.zh_CN = apps/susimail/locale/messages_zh.po
 
+[I2P.debconf]
+source_file = debian/po/templates.pot
+source_lang = en
+trans.de = debian/po/de.po
+trans.es = debian/po/es.po
+trans.ru = debian/po/ru.po
+
 [main]
 host = http://www.transifex.net
 
