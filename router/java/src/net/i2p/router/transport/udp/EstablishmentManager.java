@@ -182,9 +182,24 @@ class EstablishmentManager {
                     }
                     deferred = _queuedOutbound.size();
                 } else {
+                    // must have a valid session key
+                    byte[] keyBytes = addr.getIntroKey();
+                    if (keyBytes == null) {
+                        _transport.markUnreachable(msg.getTarget().getIdentity().calculateHash());
+                        _transport.failed(msg, "Peer has no key, cannot establish");
+                        return;
+                    }
+                    SessionKey sessionKey;
+                    try {
+                        sessionKey = new SessionKey(keyBytes);
+                    } catch (IllegalArgumentException iae) {
+                        _transport.markUnreachable(msg.getTarget().getIdentity().calculateHash());
+                        _transport.failed(msg, "Peer has bad key, cannot establish");
+                        return;
+                    }
                     state = new OutboundEstablishState(_context, remAddr, port, 
                                                        msg.getTarget().getIdentity(), 
-                                                       new SessionKey(addr.getIntroKey()), addr);
+                                                       sessionKey, addr);
                     OutboundEstablishState oldState = _outboundStates.putIfAbsent(to, state);
                     boolean isNew = oldState == null;
                     if (!isNew)

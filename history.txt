@@ -1,3 +1,7 @@
+2011-10-05 zzz
+  * Streaming: Fix build
+  * UDP: Catch address without key sooner
+
 2011-09-30 zzz
   * logs.jsp: Add wrapper version
   * Shitlist: Shorten time
