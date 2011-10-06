@@ -179,7 +179,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
     public UDPTransport(RouterContext ctx) {
         super(ctx);
-        _context = ctx;
         _log = ctx.logManager().getLog(UDPTransport.class);
         _peersByIdent = new ConcurrentHashMap(128);
         _peersByRemoteHost = new ConcurrentHashMap(128);
