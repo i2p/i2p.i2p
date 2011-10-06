@@ -44,16 +44,16 @@ import net.i2p.util.SimpleTimer;
  *
  */
 public abstract class TransportImpl implements Transport {
-    private Log _log;
+    private final Log _log;
     private TransportEventListener _listener;
     private RouterAddress _currentAddress;
     private final List _sendPool;
-    protected RouterContext _context;
+    protected final RouterContext _context;
     /** map from routerIdentHash to timestamp (Long) that the peer was last unreachable */
     private final Map<Hash, Long>  _unreachableEntries;
-    private Set<Hash> _wasUnreachableEntries;
+    private final Set<Hash> _wasUnreachableEntries;
     /** global router ident -> IP */
-    private static Map<Hash, byte[]> _IPMap = new ConcurrentHashMap(128);
+    private static final Map<Hash, byte[]> _IPMap = new ConcurrentHashMap(128);
 
     /**
      * Initialize the new transport
@@ -69,11 +69,11 @@ public abstract class TransportImpl implements Transport {
         _context.statManager().createRateStat("transport.receiveMessageTime", "How long it takes to read a message?", "Transport", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRateStat("transport.receiveMessageTimeSlow", "How long it takes to read a message (when it takes more than a second)?", "Transport", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
         _context.statManager().createRequiredRateStat("transport.sendProcessingTime", "Time to process and send a message (ms)", "Transport", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
+        _context.statManager().createRateStat("transport.sendProcessingTime." + getStyle(), "Time to process and send a message (ms)", "Transport", new long[] { 60*1000l });
         _context.statManager().createRateStat("transport.expiredOnQueueLifetime", "How long a message that expires on our outbound queue is processed", "Transport", new long[] { 60*1000l, 10*60*1000l, 60*60*1000l, 24*60*60*1000l } );
         _sendPool = new ArrayList(16);
         _unreachableEntries = new HashMap(16);
         _wasUnreachableEntries = new ConcurrentHashSet(16);
-        _currentAddress = null;
         SimpleScheduler.getInstance().addPeriodicEvent(new CleanupUnreachable(), 2 * UNREACHABLE_PERIOD, UNREACHABLE_PERIOD / 2);
     }
 
@@ -318,6 +318,7 @@ public abstract class TransportImpl implements Transport {
 
         if (sendSuccessful) {
             _context.statManager().addRateData("transport.sendProcessingTime", lifetime, lifetime);
+            _context.statManager().addRateData("transport.sendProcessingTime." + getStyle(), lifetime, 0);
             _context.profileManager().messageSent(msg.getTarget().getIdentity().getHash(), getStyle(), sendTime, msg.getMessageSize());
             _context.statManager().addRateData("transport.sendMessageSize", msg.getMessageSize(), sendTime);
         } else {
