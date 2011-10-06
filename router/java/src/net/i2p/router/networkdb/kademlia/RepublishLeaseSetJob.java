@@ -21,11 +21,12 @@ import net.i2p.util.Log;
  *
  */
 public class RepublishLeaseSetJob extends JobImpl {
-    private Log _log;
+    private final Log _log;
     private final static long REPUBLISH_LEASESET_DELAY = 5*60*1000;
-    public final static long REPUBLISH_LEASESET_TIMEOUT = 90*1000;
-    private Hash _dest;
-    private KademliaNetworkDatabaseFacade _facade;
+    public final static long REPUBLISH_LEASESET_TIMEOUT = 60*1000;
+    private final static int RETRY_DELAY = 20*1000;
+    private final Hash _dest;
+    private final KademliaNetworkDatabaseFacade _facade;
     /** this is actually last attempted publish */
     private long _lastPublished;
     
@@ -34,10 +35,11 @@ public class RepublishLeaseSetJob extends JobImpl {
         _log = ctx.logManager().getLog(RepublishLeaseSetJob.class);
         _facade = facade;
         _dest = destHash;
-        _lastPublished = 0;
         //getTiming().setStartAfter(ctx.clock().now()+REPUBLISH_LEASESET_DELAY);
     }
+
     public String getName() { return "Republish a local leaseSet"; }
+
     public void runJob() {
         if (!getContext().clientManager().shouldPublishLeaseSet(_dest))
             return;
@@ -61,10 +63,10 @@ public class RepublishLeaseSetJob extends JobImpl {
                     if (_log.shouldLog(Log.WARN))
                         _log.warn("Client " + _dest + " is local, but we can't find a valid LeaseSet?  perhaps its being rebuilt?");
                 }
-                if (false) { // floodfill doesnt require republishing
-                    long republishDelay = getContext().random().nextLong(2*REPUBLISH_LEASESET_DELAY);
-                    requeue(republishDelay);
-                }
+                //if (false) { // floodfill doesnt require republishing
+                //    long republishDelay = getContext().random().nextLong(2*REPUBLISH_LEASESET_DELAY);
+                //    requeue(republishDelay);
+                //}
                 return;
             } else {
                 if (_log.shouldLog(Log.INFO))
@@ -81,14 +83,16 @@ public class RepublishLeaseSetJob extends JobImpl {
     
     void requeueRepublish() {
         if (_log.shouldLog(Log.WARN))
-            _log.warn("FAILED publishing of the leaseSet for " + _dest.toBase64());
-        requeue(getContext().random().nextInt(60*1000));
+            _log.warn("FAILED publishing of the leaseSet for " + _dest);
+        getContext().jobQueue().removeJob(this);
+        requeue(RETRY_DELAY + getContext().random().nextInt(RETRY_DELAY));
     }
 
     public long lastPublished() {
         return _lastPublished;
     }
 
+    /** TODO - does nothing, remove */
     private static class OnRepublishSuccess extends JobImpl {
         public OnRepublishSuccess(RouterContext ctx) { super(ctx); }
         public String getName() { return "Publish leaseSet successful"; }
