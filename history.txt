@@ -1,3 +1,15 @@
+2011-10-06 zzz
+  * RepublishLeaseSetJob:
+    - Out-of-order JobQueue 3nd try to fix
+    - Lower timeouts
+  * Reseed:
+    - Update host lists
+    - Switch back to https by default
+  * Throttle: Increase max message delay
+  * Transport:
+    - Add per-style send processing time stat
+    - Increase default SSU conn limit
+
 2011-10-05 zzz
   * Streaming: Fix build
   * UDP: Catch address without key sooner
