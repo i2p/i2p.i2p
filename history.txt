@@ -1,3 +1,6 @@
+2011-10-06 kytv
+  * Add diftracker.i2p to I2PSnark
+
 2011-10-06 zzz
   * RepublishLeaseSetJob:
     - Out-of-order JobQueue 3nd try to fix
