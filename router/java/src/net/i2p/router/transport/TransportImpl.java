@@ -83,19 +83,23 @@ public abstract class TransportImpl implements Transport {
      * but SSU actually looks at idle time for countActivePeers()
      */
     public int countPeers() { return countActivePeers(); }
+
     /**
      * How many peers active in the last few minutes?
      */
     public int countActivePeers() { return 0; }
+
     /**
      * How many peers are we actively sending messages to (this minute)
      */
     public int countActiveSendPeers() { return 0; }
 
-    /** Default is 500 for floodfills... */
+    /** Default for floodfills... */
     private static final int DEFAULT_MAX_CONNECTIONS = 425;
+
     /** ...and 50/100/150/200/250 for BW Tiers K/L/M/N/O */
     private static final int MAX_CONNECTION_FACTOR = 50;
+
     /** Per-transport connection limit */
     public int getMaxConnections() {
         String style = getStyle();
@@ -113,11 +117,13 @@ public abstract class TransportImpl implements Transport {
         }
         // increase limit for SSU, for now
         if (style.equals("udp"))
-            def = def * 3 / 2;
+            //def = def * 3 / 2;
+            def *= 2;
         return _context.getProperty("i2np." + style + ".maxConnections", def);
     }
 
     private static final int DEFAULT_CAPACITY_PCT = 75;
+
     /**
      * Can we initiate or accept a connection to another peer, saving some margin
      */
@@ -138,6 +144,7 @@ public abstract class TransportImpl implements Transport {
     public Vector getClockSkews() { return new Vector(); }
 
     public List getMostRecentErrorMessages() { return Collections.EMPTY_LIST; }
+
     /**
      * Nonblocking call to pull the next outbound message
      * off the queue.
