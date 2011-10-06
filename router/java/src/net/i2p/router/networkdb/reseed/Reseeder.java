@@ -56,22 +56,21 @@ public class Reseeder {
      *         URLs are constructed, and because SSLEepGet doesn't follow redirects.
      */
     public static final String DEFAULT_SEED_URL =
-              "http://netdb.i2p2.de/," +
-              "http://reseed.i2p-projekt.de/," +
-              "http://forum.i2p2.de/netdb/," +
+              "http://netdb.i2p2.de/" + "," +
+              "http://reseed.i2p-projekt.de/" + "," +
+              "http://forum.i2p2.de/netdb/" + "," +
          /*   "http://www.i2pbote.net/netDb/," +   NO DATA */
-              "http://r31453.ovh.net/static_media/files/netDb/," +
-              "http://cowpuncher.drollette.com/netdb/";
+         /*   "http://r31453.ovh.net/static_media/files/netDb/," +   DOWN */
+              "http://cowpuncher.drollette.com/netdb/" + "," +
+              "http://75.145.125.59/netDb/";
 
     /** @since 0.8.2 */
     public static final String DEFAULT_SSL_SEED_URL =
-         /*   "https://a.netdb.i2p2.de/," +   bad cert */
-         /*   "https://c.netdb.i2p2.de/," +   no data */
-              "https://netdb.i2p2.de/," +
-              "https://forum.i2p2.de/netdb/," +
+              "https://netdb.i2p2.de/" + "," +
+              "https://forum.i2p2.de/netdb/" + "," +
          /*   "https://www.i2pbote.net/netDb/," +   NO DATA */
-              "https://reseed.i2p-projekt.de/," +
-	      "https://r31453.ovh.net/static_media/files/netDb/," +
+              "https://reseed.i2p-projekt.de/" + "," +
+	 /*   "https://r31453.ovh.net/static_media/files/netDb/," + DOWN */
               "https://cowpuncher.drollette.com/netdb/";
 
     private static final String PROP_INPROGRESS = "net.i2p.router.web.ReseedHandler.reseedInProgress";
@@ -245,7 +244,7 @@ public class Reseeder {
             List<String> URLList = new ArrayList();
             String URLs = _context.getProperty(PROP_RESEED_URL);
             boolean defaulted = URLs == null;
-            boolean SSLDisable = _context.getBooleanPropertyDefaultTrue(PROP_SSL_DISABLE);
+            boolean SSLDisable = _context.getBooleanProperty(PROP_SSL_DISABLE);
             if (defaulted) {
                 if (SSLDisable)
                     URLs = DEFAULT_SEED_URL;
