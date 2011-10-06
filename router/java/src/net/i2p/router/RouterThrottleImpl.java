@@ -34,7 +34,11 @@ class RouterThrottleImpl implements RouterThrottle {
     private static final int DEFAULT_MAX_TUNNELS = 2500;
     private static final String PROP_DEFAULT_KBPS_THROTTLE = "router.defaultKBpsThrottle";
     private static final String PROP_MAX_PROCESSINGTIME = "router.defaultProcessingTimeThrottle";
-    private static final int DEFAULT_MAX_PROCESSINGTIME = 1250;
+
+    /**
+     *  TO BE FIXED - SEE COMMENTS BELOW
+     */
+    private static final int DEFAULT_MAX_PROCESSINGTIME = 1750;
 
     /** tunnel acceptance */
     public static final int TUNNEL_ACCEPT = 0;
@@ -101,6 +105,13 @@ class RouterThrottleImpl implements RouterThrottle {
         //long lag = _context.jobQueue().getMaxLag();
         // reject here if lag too high???
         
+        // TODO
+        // This stat is highly dependent on transport mix.
+        // For NTCP, it is queueing delay only, ~25ms
+        // For SSU it is queueing + ack time, ~1000 ms.
+        // (SSU acks may be delayed so it is much more than just RTT... and the delay may
+        // counterintuitively be more when there is low traffic)
+        // Change the stat or pick a better stat.
         RateStat rs = _context.statManager().getRate("transport.sendProcessingTime");
         Rate r = rs.getRate(60*1000);
 
