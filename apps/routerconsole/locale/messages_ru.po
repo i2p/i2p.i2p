@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-08-15 17:54+0000\n"
-"PO-Revision-Date: 2011-08-18 01:32+0500\n"
+"POT-Creation-Date: 2011-10-07 16:05+0000\n"
+"PO-Revision-Date: 2011-10-07 23:29+0500\n"
 "Last-Translator: Hidden Z <hiddenz@mail.i2p>\n"
 "Language-Team: \n"
 "Language: \n"
@@ -28,7 +28,7 @@ msgstr ""
 #. {0,number,####} prevents 1234 from being output as 1,234 in the English locale.
 #. If you want the digit separator in your locale, translate as {0}.
 #. alternates: msec, msecs
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1245
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1249
 #, java-format
 msgid "1 ms"
 msgid_plural "{0,number,####} ms"
@@ -39,7 +39,7 @@ msgstr[2] "{0,number,####} мс"
 #. seconds
 #. Note to translators: quantity will always be greater than one.
 #. alternates: secs, sec. 'seconds' is probably too long.
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1250
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1254
 #, java-format
 msgid "1 sec"
 msgid_plural "{0} sec"
@@ -50,7 +50,7 @@ msgstr[2] "{0} с."
 #. minutes
 #. Note to translators: quantity will always be greater than one.
 #. alternates: mins, min. 'minutes' is probably too long.
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1255
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1259
 #, java-format
 msgid "1 min"
 msgid_plural "{0} min"
@@ -61,7 +61,7 @@ msgstr[2] "{0} мин."
 #. hours
 #. Note to translators: quantity will always be greater than one.
 #. alternates: hrs, hr., hrs.
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1260
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1264
 #, java-format
 msgid "1 hour"
 msgid_plural "{0} hours"
@@ -69,14 +69,14 @@ msgstr[0] "{0} час"
 msgstr[1] "{0} часа"
 msgstr[2] "{0} часов"
 
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1262
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1266
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:315
 msgid "n/a"
 msgstr "нет данных"
 
 #. days
 #. Note to translators: quantity will always be greater than one.
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1266
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1270
 #, java-format
 msgid "1 day"
 msgid_plural "{0} days"
@@ -95,33 +95,30 @@ msgstr "Забанен по хэшу маршрутизатора"
 
 #. Temporary reason, until the job finishes
 #: ../../../router/java/src/net/i2p/router/Blocklist.java:683
-msgid "IP banned"
-msgstr "IP заблокирован"
-
-#: ../../../router/java/src/net/i2p/router/Blocklist.java:755
+#: ../../../router/java/src/net/i2p/router/Blocklist.java:756
 #, java-format
 msgid "IP banned by blocklist.txt entry {0}"
 msgstr "IP заблокирован по записи в blocklist.txt: {0}"
 
-#: ../../../router/java/src/net/i2p/router/Blocklist.java:793
+#: ../../../router/java/src/net/i2p/router/Blocklist.java:794
 msgid "IPs Banned Until Restart"
 msgstr "IP-адреса, забаненные до перезапуска"
 
-#: ../../../router/java/src/net/i2p/router/Blocklist.java:817
+#: ../../../router/java/src/net/i2p/router/Blocklist.java:818
 msgid "IPs Permanently Banned"
 msgstr "Перманентно забаненные IP-адреса"
 
-#: ../../../router/java/src/net/i2p/router/Blocklist.java:819
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:72
+#: ../../../router/java/src/net/i2p/router/Blocklist.java:820
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:74
 msgid "From"
 msgstr "От кого"
 
-#: ../../../router/java/src/net/i2p/router/Blocklist.java:821
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:73
+#: ../../../router/java/src/net/i2p/router/Blocklist.java:822
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:75
 msgid "To"
 msgstr "Кому"
 
-#: ../../../router/java/src/net/i2p/router/Blocklist.java:857
+#: ../../../router/java/src/net/i2p/router/Blocklist.java:858
 #: ../java/src/net/i2p/router/web/ShitlistRenderer.java:47
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:410
 msgid "none"
@@ -130,68 +127,68 @@ msgstr "нет"
 #. NOTE TO TRANSLATORS - each of these phrases is a description for a statistic
 #. to be displayed on /stats.jsp and in the graphs on /graphs.jsp.
 #. Please keep relatively short so it will fit on the graphs.
-#: ../../../router/java/src/net/i2p/router/Router.java:1693
+#: ../../../router/java/src/net/i2p/router/Router.java:1695
 msgid "Message receive rate (bytes/sec)"
 msgstr "Скорость приёма сообщений (байт/сек)"
 
-#: ../../../router/java/src/net/i2p/router/Router.java:1694
+#: ../../../router/java/src/net/i2p/router/Router.java:1696
 msgid "Message send rate (bytes/sec)"
 msgstr "Скорость отправки сообщений (байт/сек)"
 
-#: ../../../router/java/src/net/i2p/router/Router.java:1695
+#: ../../../router/java/src/net/i2p/router/Router.java:1697
 msgid "Low-level send rate (bytes/sec)"
 msgstr "Низкоуровневая скорость передачи (байт/сек)"
 
-#: ../../../router/java/src/net/i2p/router/Router.java:1696
+#: ../../../router/java/src/net/i2p/router/Router.java:1698
 msgid "Low-level receive rate (bytes/sec)"
 msgstr "Низкоуровневая скорость приёма (байт/сек)"
 
-#: ../../../router/java/src/net/i2p/router/Router.java:1697
+#: ../../../router/java/src/net/i2p/router/Router.java:1699
 msgid "How many peers we are actively talking with"
 msgstr "Количество пиров, с которыми мы активно общаемся"
 
-#: ../../../router/java/src/net/i2p/router/Router.java:1700
+#: ../../../router/java/src/net/i2p/router/Router.java:1702
 msgid "Known fast peers"
 msgstr "Известные быстрые пиры"
 
-#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:92
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:96
 msgid "Rejecting tunnels: Shutting down"
 msgstr "Не принимаем туннели: Маршрутизатор в процессе остановки"
 
-#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:141
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:152
 msgid "Rejecting tunnels: High message delay"
 msgstr "Не принимаем туннели: Слишком большая задержка сообщений"
 
 #. hard to do {0} from here
 #. setTunnelStatus("Rejecting " + (100 - (int) probAccept*100) + "% of tunnels: High number of requests");
-#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:177
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:188
 msgid "Rejecting most tunnels: High number of requests"
 msgstr "Не принимаем большую часть туннелей: Слишком много запросов"
 
-#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:233
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:244
 msgid "Rejecting tunnels: Limit reached"
 msgstr "Не принимаем туннели: Достигнут предел количества туннелей"
 
 #. .067KBps
 #. * also limited to 90% - see below
 #. always leave at least 4KBps free when allowing
-#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:301
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:312
 msgid "Rejecting tunnels: Bandwidth limit"
 msgstr "Не принимаем туннели: Достигнут предел пропускной способности"
 
 #. hard to do {0} from here
 #. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels: Bandwidth limit");
-#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:371
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:382
 msgid "Rejecting most tunnels: Bandwidth limit"
 msgstr "Не принимаем большую часть туннелей: Достигнут предел пропускной способности"
 
 #. hard to do {0} from here
 #. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of tunnels");
-#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:375
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:386
 msgid "Accepting most tunnels"
 msgstr "Принимаем большую часть туннелей"
 
-#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:377
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:388
 msgid "Accepting tunnels"
 msgstr "Принимаем туннели"
 
@@ -199,16 +196,16 @@ msgstr "Принимаем туннели"
 #. if (_context.router().getRouterInfo().getBandwidthTier().equals("K"))
 #. setTunnelStatus("Not expecting tunnel requests: Advertised bandwidth too low");
 #. else
-#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:488
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:499
 msgid "Rejecting tunnels"
 msgstr "Не принимаем туннели"
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:133
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:144
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:20
 msgid "Reseeding"
 msgstr "Начальная загрузка"
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:149
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:160
 #, java-format
 msgid "Reseed fetched only 1 router."
 msgid_plural "Reseed fetched only {0} routers."
@@ -216,24 +213,24 @@ msgstr[0] "При начальной загрузке получены данн�
 msgstr[1] "При начальной загрузке получены данные только о {0} роутерах."
 msgstr[2] "При начальной загрузке получены данные только о {0} роутерах."
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:156
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:167
 msgid "Reseed failed."
 msgstr "Попытка начальной загрузки провалилась."
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:157
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:168
 #, java-format
 msgid "See {0} for help."
 msgstr "Смотрите {0} для помощи."
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:158
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:169
 msgid "reseed configuration page"
 msgstr "страница настройки начальной загрузки"
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:301
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:312
 msgid "Reseeding: fetching seed URL."
 msgstr "Производится начальная загрузка: загружается URL каталога маршрутизаторов."
 
-#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:343
+#: ../../../router/java/src/net/i2p/router/networkdb/reseed/Reseeder.java:354
 #, java-format
 msgid "Reseeding: fetching router info from seed URL ({0} successful, {1} errors)."
 msgstr "Производится начальная загрузка: получение информации о маршрутизаторах ({0} удачно, {1} ошибок)."
@@ -280,13 +277,13 @@ msgstr "Условные обозначения"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:524
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:738
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1899
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1947
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:24
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:33
 #: ../java/src/net/i2p/router/web/ConfigPeerHandler.java:35
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:81
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:190
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:238
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:246
 msgid "Peer"
 msgstr "Пир"
 
@@ -296,7 +293,7 @@ msgstr "Уникальный идентификатор пира (несколь
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:525
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:739
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1903
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1951
 msgid "Dir"
 msgstr "Направление"
 
@@ -322,14 +319,14 @@ msgstr "Сколько прошло времени после приёма/пе�
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:533
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:740
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1904
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1952
 msgid "Idle"
 msgstr "Неактивен"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:534
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:741
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1909
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:156
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1957
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:164
 msgid "In/Out"
 msgstr "Приём/Передача"
 
@@ -343,13 +340,13 @@ msgstr "Время жизни соединения"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:535
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:742
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1914
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1962
 msgid "Up"
 msgstr "Подключен"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:536
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:743
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1916
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1964
 msgid "Skew"
 msgstr "Сдвиг"
 
@@ -382,7 +379,7 @@ msgid "The round trip time in milliseconds"
 msgstr "<i>Round-Trip Time.</i> Время между отправкой запроса и получением ответа (миллисекунды)"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:543
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1926
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1974
 msgid "Dev"
 msgstr "Отклонение"
 
@@ -400,7 +397,7 @@ msgstr "<i>Maximum Transfer Unit.</i> Текущий максимальный р
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:546
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:744
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1933
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1981
 msgid "TX"
 msgstr "Передано"
 
@@ -410,7 +407,7 @@ msgstr "Общее количество посланных пиру пакето
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:547
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:745
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1935
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1983
 msgid "RX"
 msgstr "Принято"
 
@@ -419,7 +416,7 @@ msgid "The total number of packets received from the peer"
 msgstr "Общее количество принятых от пира пакетов"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:548
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1938
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1986
 msgid "Dup TX"
 msgstr "Повт. принято"
 
@@ -428,7 +425,7 @@ msgid "The total number of packets retransmitted to the peer"
 msgstr "Общее количество повторно посланных пиру пакетов"
 
 #: ../../../router/java/src/net/i2p/router/transport/TransportManager.java:549
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1940
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1988
 msgid "Dup RX"
 msgstr "Повт. передано"
 
@@ -436,102 +433,102 @@ msgstr "Повт. передано"
 msgid "The total number of duplicate packets received from the peer"
 msgstr "Общее количество повторно принятых от пира пакетов"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:420
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:423
 #: ../java/src/net/i2p/router/web/ConfigNavHelper.java:18
 msgid "Service"
 msgstr "Служба"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:422
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:425
 msgid "WAN Common Interface Configuration"
 msgstr "Общие настройки WAN интерфейсов"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:423
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:429
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:439
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:444
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:426
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:432
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:442
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:447
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:86
 msgid "Status"
 msgstr "Статус"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:424
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:430
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:440
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:427
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:433
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:443
 msgid "Type"
 msgstr "Тип"
 
 # This term intentionally left in English
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:425
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:431
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:428
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:434
 msgid "Upstream"
 msgstr "Upstream"
 
 # This term intentionally left in English
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:426
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:432
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:429
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:435
 msgid "Downstream"
 msgstr "Downstream"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:428
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:431
 msgid "WAN PPP Connection"
 msgstr "Соединение WAN PPP"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:433
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:441
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:436
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:444
 msgid "External IP"
 msgstr "Внешний IP"
 
 # kept untranslated in case of lack of russian
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:435
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:438
 msgid "Layer 3 Forwarding"
 msgstr "Layer 3 Forwarding"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:436
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:439
 msgid "Default Connection Service"
 msgstr "Служба соединения по умолчанию"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:438
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:441
 msgid "WAN IP Connection"
 msgstr "Соединение WAN IP"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:443
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:446
 msgid "WAN Ethernet Link Configuration"
 msgstr "Настройки соединения WAN Ethernet"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:456
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:459
 msgid "Found Device"
 msgstr "Найдено устройство"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:458
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:461
 msgid "Subdevice"
 msgstr "Суб-устройство"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:479
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:482
 msgid "UPnP Status"
 msgstr "Статус UPnP"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:482
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:485
 msgid "UPnP has been disabled; Do you have more than one UPnP Internet Gateway Device on your LAN ?"
 msgstr "UPnP был отключен; есть ли у вас более одного шлюза с поддержкой UPnP в локальной сети?"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:485
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:488
 msgid "UPnP has not found any UPnP-aware, compatible device on your LAN."
 msgstr "В локальной сети не найдено ни одного поддерживающего UPnP устройства."
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:493
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:496
 #, java-format
 msgid "The current external IP address reported by UPnP is {0}"
 msgstr "Текущий внешний IP-адрес полученный через UPnP - {0}"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:495
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:498
 msgid "The current external IP address is not available."
 msgstr "Текущий внешний IP-адрес не доступен."
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:499
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:502
 #, java-format
 msgid "UPnP reports the maximum downstream bit rate is {0}bits/sec"
 msgstr "UPnP сообщает максимальную скорость потока к нам (downstream) {0}bits/sec"
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:501
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:504
 #, java-format
 msgid "UPnP reports the maximum upstream bit rate is {0}bits/sec"
 msgstr "UPnP сообщает максимальную скорость потока от нас (upstream) {0}bits/sec"
@@ -539,12 +536,12 @@ msgstr "UPnP сообщает максимальную скорость пото
 #. {0} is TCP or UDP
 #. {1,number,#####} prevents 12345 from being output as 12,345 in the English locale.
 #. If you want the digit separator in your locale, translate as {1}.
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:510
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:513
 #, java-format
 msgid "{0} port {1,number,#####} was successfully forwarded by UPnP."
 msgstr "{0} порт {1,number,#####} был успешно проброшен с помощью UPnP."
 
-#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:512
+#: ../../../router/java/src/net/i2p/router/transport/UPnP.java:515
 #, java-format
 msgid "{0} port {1,number,#####} was not forwarded by UPnP."
 msgstr "{0} порт {1,number,#####} не был проброшен с помощью UPnP."
@@ -564,12 +561,12 @@ msgid "NTCP connections"
 msgstr "NTCP соединения"
 
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:734
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1895
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1943
 msgid "Limit"
 msgstr "Ограничение"
 
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:735
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1896
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1944
 msgid "Timeout"
 msgstr "Таймаут"
 
@@ -582,13 +579,13 @@ msgid "Backlogged?"
 msgstr "В очереди?"
 
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:761
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1958
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2006
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:87
 msgid "Inbound"
 msgstr "Входящие"
 
 #: ../../../router/java/src/net/i2p/router/transport/ntcp/NTCPTransport.java:763
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1960
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2008
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:87
 msgid "Outbound"
 msgstr "Исходящие"
@@ -598,136 +595,136 @@ msgstr "Исходящие"
 msgid "peers"
 msgstr "пиров"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1894
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1942
 msgid "UDP connections"
 msgstr "UDP соединения"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1901
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1949
 msgid "Sort by peer hash"
 msgstr "Сортировать по идентификатору пира"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1903
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1951
 msgid "Direction/Introduction"
 msgstr "Направление / Посредничество"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1905
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1953
 msgid "Sort by idle inbound"
 msgstr "Сортировать по неактивности приёма"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1907
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1955
 msgid "Sort by idle outbound"
 msgstr "Сортировать по неактивности передачи"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1910
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1958
 msgid "Sort by inbound rate"
 msgstr "Сортировать по скорости приёма"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1912
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1960
 msgid "Sort by outbound rate"
 msgstr "Сортировать по скорости передачи"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1915
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1963
 msgid "Sort by connection uptime"
 msgstr "Сортировать по времени жизни соединения"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1917
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1965
 msgid "Sort by clock skew"
 msgstr "Сортировать по расхождению часов"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1920
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1968
 msgid "Sort by congestion window"
 msgstr "Сортировать по размеру окна насыщения"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1922
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1970
 msgid "Sort by slow start threshold"
 msgstr "Сортировать по размеру порога медленного старта"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1925
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1973
 msgid "Sort by round trip time"
 msgstr "Сортировать по времени прохождения сигнала"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1927
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1975
 msgid "Sort by round trip time deviation"
 msgstr "Сортировать по отклонению времени прохождения сигнала"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1929
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1977
 msgid "Sort by retransmission timeout"
 msgstr "Сортировать по таймауту передачи"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1932
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1980
 msgid "Sort by outbound maximum transmit unit"
 msgstr "Сортировать по размеру исходящего MTU"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1934
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1982
 msgid "Sort by packets sent"
 msgstr "Сортировать по количеству посланных пакетов"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1936
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1984
 msgid "Sort by packets received"
 msgstr "Сортировать по количеству принятых пакетов"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1939
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1987
 msgid "Sort by packets retransmitted"
 msgstr "Сортировать по количеству повторно посланных пакетов"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1941
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1989
 msgid "Sort by packets received more than once"
 msgstr "Сортировать по количеству повторно принятых пакетов"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1962
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2010
 msgid "We offered to introduce them"
 msgstr "Мы предлагаем себя в качестве посредника для этого пира"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1964
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2012
 msgid "They offered to introduce us"
 msgstr "Этот пир предлагает себя в качестве нашего посредника"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1968
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2016
 msgid "Choked"
 msgstr "Дросселирован"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1976
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2024
 msgid "1 fail"
 msgstr "1 сбой"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1978
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2026
 #, java-format
 msgid "{0} fails"
 msgstr "{0} сбоя(-ев)"
 
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:1984
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2032
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:162
 msgid "Banned"
 msgstr "Забанен"
 
 #. buf.append("<tr><td colspan=\"16\"><hr></td></tr>\n");
-#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2115
+#: ../../../router/java/src/net/i2p/router/transport/udp/UDPTransport.java:2163
 msgid "SUMMARY"
 msgstr "ИТОГО"
 
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:124
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:125
 msgid "Dropping tunnel requests: Too slow"
 msgstr "Игнорируем запросы туннелей: Время выполнения превысило ожидаемое"
 
 #. don't even bother, since we are so overloaded locally
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:270
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:271
 msgid "Dropping tunnel requests: Overloaded"
 msgstr "Игнорируем запросы туннелей: Слишком высокая нагрузка"
 
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:473
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:480
 msgid "Rejecting tunnels: Request overload"
 msgstr "Не принимаем туннели: Слишком много запросов"
 
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:498
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:505
 msgid "Rejecting tunnels: Connection limit"
 msgstr "Не принимаем туннели: Достигнут предел количества соединений"
 
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:698
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:719
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:705
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:726
 msgid "Dropping tunnel requests: High load"
 msgstr "Игнорируем запросы туннелей: Высокая нагрузка"
 
-#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:711
+#: ../../../router/java/src/net/i2p/router/tunnel/pool/BuildHandler.java:718
 msgid "Dropping tunnel requests: Queue time"
 msgstr "Игнорируем запросы туннелей: Слишком большое время пребывания в очереди"
 
@@ -1002,691 +999,695 @@ msgid "Ethiopia"
 msgstr "Эфиопия"
 
 #: ../java/build/Countries.java:70
+msgid "European Union"
+msgstr "Европейский союз"
+
+#: ../java/build/Countries.java:71
 msgid "Finland"
 msgstr "Финляндия"
 
-#: ../java/build/Countries.java:71
+#: ../java/build/Countries.java:72
 msgid "Fiji"
 msgstr "Фиджи"
 
-#: ../java/build/Countries.java:72
+#: ../java/build/Countries.java:73
 msgid "Falkland Islands (Malvinas)"
 msgstr "Фолклендские (Мальвинские) острова"
 
-#: ../java/build/Countries.java:73
+#: ../java/build/Countries.java:74
 msgid "Federated States of Micronesia"
 msgstr "Федеративные Штаты Микронезии"
 
-#: ../java/build/Countries.java:74
+#: ../java/build/Countries.java:75
 msgid "Faroe Islands"
 msgstr "Фарерские острова"
 
-#: ../java/build/Countries.java:75
+#: ../java/build/Countries.java:76
 msgid "France"
 msgstr "Франция"
 
-#: ../java/build/Countries.java:76
+#: ../java/build/Countries.java:77
 msgid "Gabon"
 msgstr "Габон"
 
-#: ../java/build/Countries.java:77
+#: ../java/build/Countries.java:78
 msgid "United Kingdom"
 msgstr "Великобритания"
 
-#: ../java/build/Countries.java:78
+#: ../java/build/Countries.java:79
 msgid "Grenada"
 msgstr "Гренада"
 
-#: ../java/build/Countries.java:79
+#: ../java/build/Countries.java:80
 msgid "Georgia"
 msgstr "Грузия"
 
-#: ../java/build/Countries.java:80
+#: ../java/build/Countries.java:81
 msgid "French Guiana"
 msgstr "Французская Гвиана"
 
-#: ../java/build/Countries.java:81
+#: ../java/build/Countries.java:82
 msgid "Ghana"
 msgstr "Гана"
 
-#: ../java/build/Countries.java:82
+#: ../java/build/Countries.java:83
 msgid "Gibraltar"
 msgstr "Гибралтар"
 
-#: ../java/build/Countries.java:83
+#: ../java/build/Countries.java:84
 msgid "Greenland"
 msgstr "Гренландия"
 
-#: ../java/build/Countries.java:84
+#: ../java/build/Countries.java:85
 msgid "Gambia"
 msgstr "Гамбия"
 
-#: ../java/build/Countries.java:85
+#: ../java/build/Countries.java:86
 msgid "Guinea"
 msgstr "Гвинея"
 
-#: ../java/build/Countries.java:86
+#: ../java/build/Countries.java:87
 msgid "Guadeloupe"
 msgstr "Гваделупа"
 
-#: ../java/build/Countries.java:87
+#: ../java/build/Countries.java:88
 msgid "Equatorial Guinea"
 msgstr "Экваториальная Гвинея"
 
-#: ../java/build/Countries.java:88
+#: ../java/build/Countries.java:89
 msgid "Greece"
 msgstr "Греция"
 
-#: ../java/build/Countries.java:89
+#: ../java/build/Countries.java:90
 msgid "South Georgia and the South Sandwich Islands"
 msgstr "Южная Джорджия и Южные Сандвичевы Острова"
 
-#: ../java/build/Countries.java:90
+#: ../java/build/Countries.java:91
 msgid "Guatemala"
 msgstr "Гватемала"
 
-#: ../java/build/Countries.java:91
+#: ../java/build/Countries.java:92
 msgid "Guam"
 msgstr "Гуам"
 
-#: ../java/build/Countries.java:92
+#: ../java/build/Countries.java:93
 msgid "Guinea-Bissau"
 msgstr "Гвинея-Бисау"
 
-#: ../java/build/Countries.java:93
+#: ../java/build/Countries.java:94
 msgid "Guyana"
 msgstr "Гайана"
 
-#: ../java/build/Countries.java:94
+#: ../java/build/Countries.java:95
 msgid "Hong Kong"
 msgstr "Гонконг"
 
-#: ../java/build/Countries.java:95
+#: ../java/build/Countries.java:96
 msgid "Honduras"
 msgstr "Гондурас"
 
-#: ../java/build/Countries.java:96
+#: ../java/build/Countries.java:97
 msgid "Croatia"
 msgstr "Хорватия"
 
-#: ../java/build/Countries.java:97
+#: ../java/build/Countries.java:98
 msgid "Haiti"
 msgstr "Гаити"
 
-#: ../java/build/Countries.java:98
+#: ../java/build/Countries.java:99
 msgid "Hungary"
 msgstr "Венгрия"
 
-#: ../java/build/Countries.java:99
+#: ../java/build/Countries.java:100
 msgid "Indonesia"
 msgstr "Индонезия"
 
-#: ../java/build/Countries.java:100
+#: ../java/build/Countries.java:101
 msgid "Ireland"
 msgstr "Ирландия"
 
-#: ../java/build/Countries.java:101
+#: ../java/build/Countries.java:102
 msgid "Israel"
 msgstr "Израиль"
 
-#: ../java/build/Countries.java:102
+#: ../java/build/Countries.java:103
 msgid "Isle of Man"
 msgstr "Остров Мэн"
 
-#: ../java/build/Countries.java:103
+#: ../java/build/Countries.java:104
 msgid "India"
 msgstr "Индия"
 
-#: ../java/build/Countries.java:104
+#: ../java/build/Countries.java:105
 msgid "British Indian Ocean Territory"
 msgstr "Британская территория в Индийском океане"
 
-#: ../java/build/Countries.java:105
+#: ../java/build/Countries.java:106
 msgid "Iraq"
 msgstr "Ирак"
 
-#: ../java/build/Countries.java:106
+#: ../java/build/Countries.java:107
 msgid "Islamic Republic of Iran"
 msgstr "Исламская Республика Иран"
 
-#: ../java/build/Countries.java:107
+#: ../java/build/Countries.java:108
 msgid "Iceland"
 msgstr "Исландия"
 
-#: ../java/build/Countries.java:108
+#: ../java/build/Countries.java:109
 msgid "Italy"
 msgstr "Италия"
 
-#: ../java/build/Countries.java:109
+#: ../java/build/Countries.java:110
 msgid "Jersey"
 msgstr "Джерси"
 
-#: ../java/build/Countries.java:110
+#: ../java/build/Countries.java:111
 msgid "Jamaica"
 msgstr "Ямайка"
 
-#: ../java/build/Countries.java:111
+#: ../java/build/Countries.java:112
 msgid "Jordan"
 msgstr "Иордания"
 
-#: ../java/build/Countries.java:112
+#: ../java/build/Countries.java:113
 msgid "Japan"
 msgstr "Япония"
 
-#: ../java/build/Countries.java:113
+#: ../java/build/Countries.java:114
 msgid "Kenya"
 msgstr "Кения"
 
-#: ../java/build/Countries.java:114
+#: ../java/build/Countries.java:115
 msgid "Kyrgyzstan"
 msgstr "Кыргызстан"
 
-#: ../java/build/Countries.java:115
+#: ../java/build/Countries.java:116
 msgid "Cambodia"
 msgstr "Камбоджа"
 
-#: ../java/build/Countries.java:116
+#: ../java/build/Countries.java:117
 msgid "Kiribati"
 msgstr "Кирибати"
 
-#: ../java/build/Countries.java:117
+#: ../java/build/Countries.java:118
 msgid "Comoros"
 msgstr "Коморские Острова"
 
-#: ../java/build/Countries.java:118
+#: ../java/build/Countries.java:119
 msgid "Saint Kitts and Nevis"
 msgstr "Сент-Китс и Невис"
 
-#: ../java/build/Countries.java:119
+#: ../java/build/Countries.java:120
 msgid "Republic of Korea"
 msgstr "Республика Корея"
 
-#: ../java/build/Countries.java:120
+#: ../java/build/Countries.java:121
 msgid "Kuwait"
 msgstr "Кувейт"
 
-#: ../java/build/Countries.java:121
+#: ../java/build/Countries.java:122
 msgid "Cayman Islands"
 msgstr "Каймановы острова"
 
-#: ../java/build/Countries.java:122
+#: ../java/build/Countries.java:123
 msgid "Kazakhstan"
 msgstr "Казахстан"
 
-#: ../java/build/Countries.java:123
+#: ../java/build/Countries.java:124
 msgid "Lao People's Democratic Republic"
 msgstr "Лаосская Народно-Демократическая Республика"
 
-#: ../java/build/Countries.java:124
+#: ../java/build/Countries.java:125
 msgid "Lebanon"
 msgstr "Ливан"
 
-#: ../java/build/Countries.java:125
+#: ../java/build/Countries.java:126
 msgid "Saint Lucia"
 msgstr "Сент-Люсия"
 
-#: ../java/build/Countries.java:126
+#: ../java/build/Countries.java:127
 msgid "Liechtenstein"
 msgstr "Лихтенштейн"
 
-#: ../java/build/Countries.java:127
+#: ../java/build/Countries.java:128
 msgid "Sri Lanka"
 msgstr "Шри-Ланка"
 
-#: ../java/build/Countries.java:128
+#: ../java/build/Countries.java:129
 msgid "Liberia"
 msgstr "Либерия"
 
-#: ../java/build/Countries.java:129
+#: ../java/build/Countries.java:130
 msgid "Lesotho"
 msgstr "Лесото"
 
-#: ../java/build/Countries.java:130
+#: ../java/build/Countries.java:131
 msgid "Lithuania"
 msgstr "Литва"
 
-#: ../java/build/Countries.java:131
+#: ../java/build/Countries.java:132
 msgid "Luxembourg"
 msgstr "Люксембург"
 
-#: ../java/build/Countries.java:132
+#: ../java/build/Countries.java:133
 msgid "Latvia"
 msgstr "Латвия"
 
-#: ../java/build/Countries.java:133
+#: ../java/build/Countries.java:134
 msgid "Libyan Arab Jamahiriya"
 msgstr "Ливийская Арабская Джамахирия"
 
-#: ../java/build/Countries.java:134
+#: ../java/build/Countries.java:135
 msgid "Morocco"
 msgstr "Марокко"
 
-#: ../java/build/Countries.java:135
+#: ../java/build/Countries.java:136
 msgid "Monaco"
 msgstr "Монако"
 
-#: ../java/build/Countries.java:136
+#: ../java/build/Countries.java:137
 msgid "Republic of Moldova"
 msgstr "Республика Молдова"
 
-#: ../java/build/Countries.java:137
+#: ../java/build/Countries.java:138
 msgid "Montenegro"
 msgstr "Черногория"
 
-#: ../java/build/Countries.java:138
+#: ../java/build/Countries.java:139
 msgid "Saint Martin"
 msgstr "Остров святого Мартина"
 
-#: ../java/build/Countries.java:139
+#: ../java/build/Countries.java:140
 msgid "Madagascar"
 msgstr "Мадагаскар"
 
-#: ../java/build/Countries.java:140
+#: ../java/build/Countries.java:141
 msgid "Marshall Islands"
 msgstr "Маршалловы Острова"
 
-#: ../java/build/Countries.java:141
+#: ../java/build/Countries.java:142
 msgid "The Former Yugoslav Republic of Macedonia"
 msgstr "Бывшая югославская Республика Македония"
 
-#: ../java/build/Countries.java:142
+#: ../java/build/Countries.java:143
 msgid "Mali"
 msgstr "Мали"
 
-#: ../java/build/Countries.java:143
+#: ../java/build/Countries.java:144
 msgid "Myanmar"
 msgstr "Мьянма"
 
-#: ../java/build/Countries.java:144
+#: ../java/build/Countries.java:145
 msgid "Mongolia"
 msgstr "Монголия"
 
-#: ../java/build/Countries.java:145
+#: ../java/build/Countries.java:146
 msgid "Macao"
 msgstr "Макао"
 
-#: ../java/build/Countries.java:146
+#: ../java/build/Countries.java:147
 msgid "Northern Mariana Islands"
 msgstr "Северные Марианские острова"
 
-#: ../java/build/Countries.java:147
+#: ../java/build/Countries.java:148
 msgid "Martinique"
 msgstr "Мартиника"
 
-#: ../java/build/Countries.java:148
+#: ../java/build/Countries.java:149
 msgid "Mauritania"
 msgstr "Мавритания"
 
-#: ../java/build/Countries.java:149
+#: ../java/build/Countries.java:150
 msgid "Montserrat"
 msgstr "Монтсеррат"
 
-#: ../java/build/Countries.java:150
+#: ../java/build/Countries.java:151
 msgid "Malta"
 msgstr "Мальта"
 
-#: ../java/build/Countries.java:151
+#: ../java/build/Countries.java:152
 msgid "Mauritius"
 msgstr "Маврикий"
 
-#: ../java/build/Countries.java:152
+#: ../java/build/Countries.java:153
 msgid "Maldives"
 msgstr "Мальдивы"
 
-#: ../java/build/Countries.java:153
+#: ../java/build/Countries.java:154
 msgid "Malawi"
 msgstr "Малави"
 
-#: ../java/build/Countries.java:154
+#: ../java/build/Countries.java:155
 msgid "Mexico"
 msgstr "Мексика"
 
-#: ../java/build/Countries.java:155
+#: ../java/build/Countries.java:156
 msgid "Malaysia"
 msgstr "Малайзия"
 
-#: ../java/build/Countries.java:156
+#: ../java/build/Countries.java:157
 msgid "Mozambique"
 msgstr "Мозамбик"
 
-#: ../java/build/Countries.java:157
+#: ../java/build/Countries.java:158
 msgid "Namibia"
 msgstr "Намибия"
 
-#: ../java/build/Countries.java:158
+#: ../java/build/Countries.java:159
 msgid "New Caledonia"
 msgstr "Новая Каледония"
 
-#: ../java/build/Countries.java:159
+#: ../java/build/Countries.java:160
 msgid "Niger"
 msgstr "Нигер"
 
-#: ../java/build/Countries.java:160
+#: ../java/build/Countries.java:161
 msgid "Norfolk Island"
 msgstr "Остров Норфолк"
 
-#: ../java/build/Countries.java:161
+#: ../java/build/Countries.java:162
 msgid "Nigeria"
 msgstr "Нигерия"
 
-#: ../java/build/Countries.java:162
+#: ../java/build/Countries.java:163
 msgid "Nicaragua"
 msgstr "Никарагуа"
 
-#: ../java/build/Countries.java:163
+#: ../java/build/Countries.java:164
 msgid "Netherlands"
 msgstr "Нидерланды"
 
-#: ../java/build/Countries.java:164
+#: ../java/build/Countries.java:165
 msgid "Norway"
 msgstr "Норвегия"
 
-#: ../java/build/Countries.java:165
+#: ../java/build/Countries.java:166
 msgid "Nepal"
 msgstr "Непал"
 
-#: ../java/build/Countries.java:166
+#: ../java/build/Countries.java:167
 msgid "Nauru"
 msgstr "Науру"
 
-#: ../java/build/Countries.java:167
+#: ../java/build/Countries.java:168
 msgid "Niue"
 msgstr "Ниуэ"
 
-#: ../java/build/Countries.java:168
+#: ../java/build/Countries.java:169
 msgid "New Zealand"
 msgstr "Новая Зеландия"
 
-#: ../java/build/Countries.java:169
+#: ../java/build/Countries.java:170
 msgid "Oman"
 msgstr "Оман"
 
-#: ../java/build/Countries.java:170
+#: ../java/build/Countries.java:171
 msgid "Panama"
 msgstr "Панама"
 
-#: ../java/build/Countries.java:171
+#: ../java/build/Countries.java:172
 msgid "Peru"
 msgstr "Перу"
 
-#: ../java/build/Countries.java:172
+#: ../java/build/Countries.java:173
 msgid "French Polynesia"
 msgstr "Французская Полинезия"
 
-#: ../java/build/Countries.java:173
+#: ../java/build/Countries.java:174
 msgid "Papua New Guinea"
 msgstr "Папуа - Новая Гвинея"
 
-#: ../java/build/Countries.java:174
+#: ../java/build/Countries.java:175
 msgid "Philippines"
 msgstr "Филиппины"
 
-#: ../java/build/Countries.java:175
+#: ../java/build/Countries.java:176
 msgid "Pakistan"
 msgstr "Пакистан"
 
-#: ../java/build/Countries.java:176
+#: ../java/build/Countries.java:177
 msgid "Poland"
 msgstr "Польша"
 
-#: ../java/build/Countries.java:177
+#: ../java/build/Countries.java:178
 msgid "Saint Pierre and Miquelon"
 msgstr "Сен-Пьер и Микелон"
 
-#: ../java/build/Countries.java:178
+#: ../java/build/Countries.java:179
 msgid "Puerto Rico"
 msgstr "Пуэрто-Рико"
 
-#: ../java/build/Countries.java:179
+#: ../java/build/Countries.java:180
 msgid "Palestinian Territory"
 msgstr "Палестинская автономия"
 
-#: ../java/build/Countries.java:180
+#: ../java/build/Countries.java:181
 msgid "Portugal"
 msgstr "Португалия"
 
-#: ../java/build/Countries.java:181
+#: ../java/build/Countries.java:182
 msgid "Palau"
 msgstr "Палау"
 
-#: ../java/build/Countries.java:182
+#: ../java/build/Countries.java:183
 msgid "Paraguay"
 msgstr "Парагвай"
 
-#: ../java/build/Countries.java:183
+#: ../java/build/Countries.java:184
 msgid "Qatar"
 msgstr "Катар"
 
-#: ../java/build/Countries.java:184
+#: ../java/build/Countries.java:185
 msgid "Reunion"
 msgstr "Реюньон"
 
-#: ../java/build/Countries.java:185
+#: ../java/build/Countries.java:186
 msgid "Romania"
 msgstr "Румыния"
 
-#: ../java/build/Countries.java:186
+#: ../java/build/Countries.java:187
 msgid "Serbia"
 msgstr "Сербия"
 
-#: ../java/build/Countries.java:187
+#: ../java/build/Countries.java:188
 msgid "Russian Federation"
 msgstr "Российская Федерация"
 
-#: ../java/build/Countries.java:188
+#: ../java/build/Countries.java:189
 msgid "Rwanda"
 msgstr "Руанда"
 
-#: ../java/build/Countries.java:189
+#: ../java/build/Countries.java:190
 msgid "Saudi Arabia"
 msgstr "Саудовская Аравия"
 
-#: ../java/build/Countries.java:190
+#: ../java/build/Countries.java:191
 msgid "Solomon Islands"
 msgstr "Соломоновы Острова"
 
-#: ../java/build/Countries.java:191
+#: ../java/build/Countries.java:192
 msgid "Seychelles"
 msgstr "Сейшельские Острова"
 
-#: ../java/build/Countries.java:192
+#: ../java/build/Countries.java:193
 msgid "Sudan"
 msgstr "Судан"
 
-#: ../java/build/Countries.java:193
+#: ../java/build/Countries.java:194
 msgid "Sweden"
 msgstr "Швеция"
 
-#: ../java/build/Countries.java:194
+#: ../java/build/Countries.java:195
 msgid "Singapore"
 msgstr "Сингапур"
 
-#: ../java/build/Countries.java:195
+#: ../java/build/Countries.java:196
 msgid "Slovenia"
 msgstr "Словения"
 
-#: ../java/build/Countries.java:196
+#: ../java/build/Countries.java:197
 msgid "Slovakia"
 msgstr "Словакия"
 
-#: ../java/build/Countries.java:197
+#: ../java/build/Countries.java:198
 msgid "Sierra Leone"
 msgstr "Сьерра-Леоне"
 
-#: ../java/build/Countries.java:198
+#: ../java/build/Countries.java:199
 msgid "San Marino"
 msgstr "Сан-Марино"
 
-#: ../java/build/Countries.java:199
+#: ../java/build/Countries.java:200
 msgid "Senegal"
 msgstr "Сенегал"
 
-#: ../java/build/Countries.java:200
+#: ../java/build/Countries.java:201
 msgid "Somalia"
 msgstr "Сомали"
 
-#: ../java/build/Countries.java:201
+#: ../java/build/Countries.java:202
 msgid "Suriname"
 msgstr "Суринам"
 
-#: ../java/build/Countries.java:202
+#: ../java/build/Countries.java:203
 msgid "Sao Tome and Principe"
 msgstr "Сан-Томе и Принсипи"
 
-#: ../java/build/Countries.java:203
+#: ../java/build/Countries.java:204
 msgid "El Salvador"
 msgstr "Сальвадор"
 
-#: ../java/build/Countries.java:204
+#: ../java/build/Countries.java:205
 msgid "Syrian Arab Republic"
 msgstr "Сирийская Арабская Республика"
 
-#: ../java/build/Countries.java:205
+#: ../java/build/Countries.java:206
 msgid "Swaziland"
 msgstr "Свазиленд"
 
-#: ../java/build/Countries.java:206
+#: ../java/build/Countries.java:207
 msgid "Turks and Caicos Islands"
 msgstr "Острова Теркс и Кайкос"
 
-#: ../java/build/Countries.java:207
+#: ../java/build/Countries.java:208
 msgid "Chad"
 msgstr "Чад"
 
-#: ../java/build/Countries.java:208
+#: ../java/build/Countries.java:209
 msgid "French Southern Territories"
 msgstr "Французские Южные Территории"
 
-#: ../java/build/Countries.java:209
+#: ../java/build/Countries.java:210
 msgid "Togo"
 msgstr "Того"
 
-#: ../java/build/Countries.java:210
+#: ../java/build/Countries.java:211
 msgid "Thailand"
 msgstr "Таиланд"
 
-#: ../java/build/Countries.java:211
+#: ../java/build/Countries.java:212
 msgid "Tajikistan"
 msgstr "Таджикистан"
 
-#: ../java/build/Countries.java:212
+#: ../java/build/Countries.java:213
 msgid "Tokelau"
 msgstr "Токелау"
 
-#: ../java/build/Countries.java:213
+#: ../java/build/Countries.java:214
 msgid "Timor-Leste"
 msgstr "Восточный Тимор"
 
-#: ../java/build/Countries.java:214
+#: ../java/build/Countries.java:215
 msgid "Turkmenistan"
 msgstr "Туркменистан"
 
-#: ../java/build/Countries.java:215
+#: ../java/build/Countries.java:216
 msgid "Tunisia"
 msgstr "Тунис"
 
-#: ../java/build/Countries.java:216
+#: ../java/build/Countries.java:217
 msgid "Tonga"
 msgstr "Тонга"
 
-#: ../java/build/Countries.java:217
+#: ../java/build/Countries.java:218
 msgid "Turkey"
 msgstr "Турция"
 
-#: ../java/build/Countries.java:218
+#: ../java/build/Countries.java:219
 msgid "Trinidad and Tobago"
 msgstr "Тринидад и Тобаго"
 
-#: ../java/build/Countries.java:219
+#: ../java/build/Countries.java:220
 msgid "Tuvalu"
 msgstr "Тувалу"
 
-#: ../java/build/Countries.java:220
+#: ../java/build/Countries.java:221
 msgid "Taiwan"
 msgstr "Тайвань"
 
-#: ../java/build/Countries.java:221
+#: ../java/build/Countries.java:222
 msgid "United Republic of Tanzania"
 msgstr "Объединённая Республика Танзания"
 
-#: ../java/build/Countries.java:222
+#: ../java/build/Countries.java:223
 msgid "Ukraine"
 msgstr "Украина"
 
-#: ../java/build/Countries.java:223
+#: ../java/build/Countries.java:224
 msgid "Uganda"
 msgstr "Уганда"
 
-#: ../java/build/Countries.java:224
+#: ../java/build/Countries.java:225
 msgid "United States Minor Outlying Islands"
 msgstr "Внешние малые острова (США)"
 
-#: ../java/build/Countries.java:225
+#: ../java/build/Countries.java:226
 msgid "United States"
 msgstr "Соединённые Штаты Америки"
 
-#: ../java/build/Countries.java:226
+#: ../java/build/Countries.java:227
 msgid "Uruguay"
 msgstr "Уругвай"
 
-#: ../java/build/Countries.java:227
+#: ../java/build/Countries.java:228
 msgid "Uzbekistan"
 msgstr "Узбекистан"
 
-#: ../java/build/Countries.java:228
+#: ../java/build/Countries.java:229
 msgid "Holy See (Vatican City State)"
 msgstr "Святой Престол (Ватикан)"
 
-#: ../java/build/Countries.java:229
+#: ../java/build/Countries.java:230
 msgid "Saint Vincent and the Grenadines"
 msgstr "Сент-Винсент и Гренадины"
 
-#: ../java/build/Countries.java:230
+#: ../java/build/Countries.java:231
 msgid "Venezuela"
 msgstr "Венесуэла"
 
-#: ../java/build/Countries.java:231
 #: ../java/build/Countries.java:232
+#: ../java/build/Countries.java:233
 msgid "Virgin Islands"
 msgstr "Виргинские острова"
 
-#: ../java/build/Countries.java:233
+#: ../java/build/Countries.java:234
 msgid "Viet Nam"
 msgstr "Вьетнам"
 
-#: ../java/build/Countries.java:234
+#: ../java/build/Countries.java:235
 msgid "Vanuatu"
 msgstr "Вануату"
 
-#: ../java/build/Countries.java:235
+#: ../java/build/Countries.java:236
 msgid "Wallis and Futuna"
 msgstr "Уоллис и Футуна"
 
-#: ../java/build/Countries.java:236
+#: ../java/build/Countries.java:237
 msgid "Samoa"
 msgstr "Самоа"
 
-#: ../java/build/Countries.java:237
+#: ../java/build/Countries.java:238
 msgid "Yemen"
 msgstr "Йемен"
 
-#: ../java/build/Countries.java:238
+#: ../java/build/Countries.java:239
 msgid "Mayotte"
 msgstr "Майотта"
 
-#: ../java/build/Countries.java:239
+#: ../java/build/Countries.java:240
 msgid "South Africa"
 msgstr "Южная Африка"
 
-#: ../java/build/Countries.java:240
+#: ../java/build/Countries.java:241
 msgid "Zambia"
 msgstr "Замбия"
 
-#: ../java/build/Countries.java:241
+#: ../java/build/Countries.java:242
 msgid "Zimbabwe"
 msgstr "Зимбабве"
 
-#: ../java/src/net/i2p/router/web/CSSHelper.java:60
+#: ../java/src/net/i2p/router/web/CSSHelper.java:66
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:35
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:37
 #: ../java/strings/Strings.java:29
@@ -1700,12 +1701,12 @@ msgid "Error updating the configuration - please see the error logs"
 msgstr "Не удалось обновить настройки — загляните в логи ошибок"
 
 #: ../java/src/net/i2p/router/web/ConfigAdvancedHandler.java:69
-#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:266
+#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:279
 msgid "Configuration saved successfully"
 msgstr "Настройки сохранены"
 
 #: ../java/src/net/i2p/router/web/ConfigAdvancedHandler.java:71
-#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:268
+#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:281
 msgid "Error saving the configuration (applied but not saved) - please see the error logs"
 msgstr "Не удалось сохранить настройки (применены, но не сохранены) — загляните в логи ошибок"
 
@@ -2023,7 +2024,11 @@ msgid "Valid levels are DEBUG, INFO, WARN, ERROR, CRIT"
 msgstr "Поддерживаемые уровни: DEBUG, INFO, WARN, ERROR, CRIT"
 
 # This term intentionally left in English
+#. Homeland Security Advisory System
+#. http://www.dhs.gov/xinfoshare/programs/Copy_of_press_release_0046.shtm
+#. but pink instead of yellow for WARN
 #: ../java/src/net/i2p/router/web/ConfigLoggingHelper.java:68
+#: ../java/src/net/i2p/router/web/LogsHelper.java:71
 msgid "CRIT"
 msgstr "CRIT"
 
@@ -2034,16 +2039,19 @@ msgstr "DEBUG"
 
 # This term intentionally left in English
 #: ../java/src/net/i2p/router/web/ConfigLoggingHelper.java:68
+#: ../java/src/net/i2p/router/web/LogsHelper.java:73
 msgid "ERROR"
 msgstr "ERROR"
 
 # This term intentionally left in English
 #: ../java/src/net/i2p/router/web/ConfigLoggingHelper.java:68
+#: ../java/src/net/i2p/router/web/LogsHelper.java:77
 msgid "INFO"
 msgstr "INFO"
 
 # This term intentionally left in English
 #: ../java/src/net/i2p/router/web/ConfigLoggingHelper.java:68
+#: ../java/src/net/i2p/router/web/LogsHelper.java:75
 msgid "WARN"
 msgstr "WARN"
 
@@ -2101,93 +2109,103 @@ msgstr "Статистика"
 msgid "Advanced"
 msgstr "Расширенные"
 
-#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:48
-#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:264
+#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:52
+#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:277
 #: ../java/src/net/i2p/router/web/ConfigReseedHandler.java:29
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHandler.java:34
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:385
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:541
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configadvanced_jsp.java:332
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:366
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:377
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:407
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:404
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:369
 msgid "Save changes"
 msgstr "Сохранить настройки"
 
-#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:121
+#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:125
 msgid "Rechecking router reachability..."
 msgstr "Перепроверяем доступность маршрутизатора..."
 
-#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:153
+#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:161
 msgid "Updating IP address"
 msgstr "Обновляем IP-адрес"
 
-#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:171
+#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:180
 msgid "Disabling TCP completely"
 msgstr "Полностью отключаем использование TCP"
 
-#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:175
+#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:185
 msgid "Updating inbound TCP address to"
 msgstr "Адрес для входящих TCP соединений изменен на"
 
-#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:179
+#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:190
 msgid "Disabling inbound TCP"
 msgstr "Отключаем использование TCP на вход"
 
-#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:181
+#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:192
 msgid "Updating inbound TCP address to auto"
 msgstr "Адрес для входящих TCP соединений будет определяться автоматически"
 
-#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:190
+#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:203
 msgid "Updating inbound TCP port to"
 msgstr "Порт для входящих TCP соединений изменен на"
 
-#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:193
+#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:206
 msgid "Updating inbound TCP port to auto"
 msgstr "Порт для входящих TCP соединений будет выбираться автоматически"
 
-#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:205
+#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:218
 msgid "Updating UDP port from"
 msgstr "Порт для UDP соединений изменен с"
 
-#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:205
+#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:218
 msgid "to"
 msgstr "на"
 
-#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:221
+#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:234
 msgid "Gracefully restarting into Hidden Router Mode"
 msgstr "Плавный перезапуск для перехода в скрытый режим"
 
-#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:223
+#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:236
 msgid "Gracefully restarting to exit Hidden Router Mode"
 msgstr "Плавный перезапуск для выхода из скрытого режима"
 
-#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:232
+#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:245
 msgid "Enabling UPnP, restart required to take effect"
 msgstr "UPnP включен, необходим перезапуск маршрутизатора"
 
-#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:234
+#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:247
 msgid "Disabling UPnP, restart required to take effect"
 msgstr "UPnP выключен, необходим перезапуск маршрутизатора"
 
-#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:242
+#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:255
 msgid "Enabling laptop mode"
 msgstr "Включение laptop mode"
 
-#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:244
+#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:257
 msgid "Disabling laptop mode"
 msgstr "Выключение laptop mode"
 
-#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:250
+#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:263
 msgid "Requiring SSU introducers"
 msgstr "Запрашиваем SSU-посредников"
 
-#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:315
+#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:324
+#, java-format
+msgid "The hostname or IP {0} is not publicly routable"
+msgstr "Имя хоста или IP {0} не является публично маршрутизируемым"
+
+#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:327
+#, java-format
+msgid "The hostname or IP {0} is invalid"
+msgstr "Имя хоста или IP {0} некорректно"
+
+#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:349
 msgid "Updating bandwidth share percentage"
 msgstr "Обновление доли транзитного трафика"
 
-#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:398
+#: ../java/src/net/i2p/router/web/ConfigNetHandler.java:432
 msgid "Updated bandwidth limits"
 msgstr "Настройки ограничений скорости сохранены"
 
@@ -2255,7 +2273,7 @@ msgid "Bad capacity value"
 msgstr "Некорректное значение ёмкости"
 
 #: ../java/src/net/i2p/router/web/ConfigReseedHandler.java:17
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:375
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:405
 msgid "Save changes and reseed now"
 msgstr "Сохранить настройки и выполнить начальную загрузку"
 
@@ -2268,7 +2286,7 @@ msgstr "Загрузка начального списка узлов (reseeding
 msgid "Starting reseed process"
 msgstr "Запускается процесс загрузки начального списка узлов (reseed)"
 
-#: ../java/src/net/i2p/router/web/ConfigReseedHandler.java:66
+#: ../java/src/net/i2p/router/web/ConfigReseedHandler.java:85
 msgid "Configuration saved successfully."
 msgstr "Настройки успешно сохранены."
 
@@ -2476,7 +2494,7 @@ msgstr[1] "{0} туннеля"
 msgstr[2] "{0} туннелей"
 
 #: ../java/src/net/i2p/router/web/ConfigTunnelsHelper.java:35
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:41
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:43
 msgid "Exploratory tunnels"
 msgstr "Зондирующие туннели"
 
@@ -2538,59 +2556,67 @@ msgstr "Изменение темы оформления сохранено."
 msgid "Refresh the page to view."
 msgstr "Обновите страницу для просмотра."
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:60
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:62
 msgid "Arabic"
 msgstr "Арабский"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:61
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:62
+msgid "Danish"
+msgstr "Датский"
+
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:63
 msgid "English"
 msgstr "English"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:61
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:63
 msgid "Finnish"
 msgstr "Финский"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:61
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:63
 msgid "German"
 msgstr "Deutsch"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:61
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:63
 msgid "Spanish"
 msgstr "Испанский"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:62
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:64
 msgid "Dutch"
 msgstr "Nederlands"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:62
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:64
 msgid "French"
 msgstr "Français"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:62
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:64
 msgid "Italian"
 msgstr "Итальянский"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:62
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:64
 msgid "Polish"
 msgstr "Польский"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:63
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:65
 msgid "Portuguese"
 msgstr "Португальский"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:63
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:65
 msgid "Russian"
 msgstr "Русский"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:63
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:65
 msgid "Swedish"
 msgstr "Svenska"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:64
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:66
 msgid "Chinese"
 msgstr "中文"
 
-#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:64
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:66
+msgid "Ukrainian"
+msgstr "Украинский"
+
+#: ../java/src/net/i2p/router/web/ConfigUIHelper.java:66
 msgid "Vietnamese"
 msgstr "Вьетнамский"
 
@@ -2805,7 +2831,7 @@ msgid "Expired {0} ago"
 msgstr "Истек {0} назад"
 
 #: ../java/src/net/i2p/router/web/NetDbRenderer.java:166
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:156
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:164
 msgid "Gateway"
 msgstr "Шлюз"
 
@@ -3309,17 +3335,17 @@ msgstr "забанен ли этот пир, недоступен, дает ош
 msgid "status"
 msgstr "статус"
 
-#: ../java/src/net/i2p/router/web/ShitlistRenderer.java:62
+#: ../java/src/net/i2p/router/web/ShitlistRenderer.java:64
 #, java-format
 msgid "Temporary ban expiring in {0}"
 msgstr "Временный бан истекает через {0}"
 
-#: ../java/src/net/i2p/router/web/ShitlistRenderer.java:64
+#: ../java/src/net/i2p/router/web/ShitlistRenderer.java:66
 #, java-format
 msgid "Banned until restart or in {0}"
 msgstr "Забанен до перезапуска или истечения {0}"
 
-#: ../java/src/net/i2p/router/web/ShitlistRenderer.java:76
+#: ../java/src/net/i2p/router/web/ShitlistRenderer.java:78
 msgid "unban now"
 msgstr "разбанить"
 
@@ -3742,10 +3768,8 @@ msgstr "ПРЕДУПРЕЖДЕНИЕ - Заблокирован извне пр�
 msgid "WARN-Firewalled and Floodfill"
 msgstr "ПРЕДУПРЕЖДЕНИЕ - Заблокирован извне и Floodfill"
 
-#: ../java/src/net/i2p/router/web/SummaryHelper.java:132
-msgid "WARN-Firewalled and Fast"
-msgstr "ПРЕДУПРЕЖДЕНИЕ - Заблокирован извне и Быстрый"
-
+#. if (_context.router().getRouterInfo().getCapabilities().indexOf('O') >= 0)
+#. return _("WARN-Firewalled and Fast");
 #: ../java/src/net/i2p/router/web/SummaryHelper.java:133
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/config_jsp.java:606
 msgid "Firewalled"
@@ -3843,129 +3867,134 @@ msgstr "сред."
 msgid "now"
 msgstr "текущ."
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:41
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:63
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:316
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:43
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:65
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:318
 msgid "configure"
 msgstr "настроить"
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:61
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:63
 msgid "Client tunnels for"
 msgstr "Клиентские туннели для:"
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:65
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:67
 msgid "dead"
 msgstr "мертв"
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:71
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:73
 msgid "Participating tunnels"
 msgstr "Транзитные туннели"
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:72
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:74
 msgid "Receive on"
 msgstr "ID принимающего туннеля"
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:73
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:75
 msgid "Expiration"
 msgstr "Истечение срока работы"
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:73
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:75
 msgid "Send on"
 msgstr "ID передающего туннеля"
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:74
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:76
 msgid "Rate"
 msgstr "Скорость"
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:74
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:76
 msgid "Role"
 msgstr "Роль"
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:74
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:156
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:76
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:164
 msgid "Usage"
 msgstr "Трафик"
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:107
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:114
 msgid "grace period"
 msgstr "резервный период"
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:117
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:124
 msgid "Outbound Endpoint"
 msgstr "Выходная конечная точка"
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:119
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:126
 msgid "Inbound Gateway"
 msgstr "Входной шлюз"
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:121
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:162
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:128
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:170
 msgid "Participant"
 msgstr "Участник"
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:126
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:133
+#, java-format
+msgid "Limited display to the {0} tunnels with the highest usage"
+msgstr "Отображение ограничено до {0} туннелей с наибольшим использованием"
+
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:134
 msgid "Inactive participating tunnels"
 msgstr "Неактивных транзитных туннелей"
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:127
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:218
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:135
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:226
 msgid "Lifetime bandwidth usage"
 msgstr "Трафик за время существования"
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:156
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:164
 msgid "Expiry"
 msgstr "Истечение срока работы"
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:159
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:167
 msgid "Participants"
 msgstr "Участники"
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:165
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:173
 msgid "Endpoint"
 msgstr "Конечная точка"
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:205
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:212
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:213
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:220
 msgid "Build in progress"
 msgstr "В процессе построения"
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:205
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:213
 msgid "inbound"
 msgstr "входящий"
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:212
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:220
 msgid "outbound"
 msgstr "исходящий"
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:217
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:225
 msgid "No tunnels; waiting for the grace period to end."
 msgstr "Нет туннелей. Ожидаем окончания резервного периода."
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:219
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:227
 msgid "in"
 msgstr "(входящий)"
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:220
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:228
 msgid "out"
 msgstr "(исходящий)"
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:237
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:245
 msgid "Tunnel Counts By Peer"
 msgstr "Статистика участия пиров в туннелях"
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:238
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:246
 msgid "% of total"
 msgstr "% от всех"
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:238
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:246
 msgid "Our Tunnels"
 msgstr "Наших туннелей"
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:238
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:246
 msgid "Participating Tunnels"
 msgstr "Транзитных туннелей"
 
-#: ../java/src/net/i2p/router/web/TunnelRenderer.java:256
+#: ../java/src/net/i2p/router/web/TunnelRenderer.java:264
 msgid "Totals"
 msgstr "Всего"
 
@@ -4463,7 +4492,7 @@ msgstr "Чем выше доля транзитного трафика, тем �
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configclients_jsp.java:432
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configkeyring_jsp.java:346
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:364
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:373
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:403
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configstats_jsp.java:402
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configtunnels_jsp.java:367
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:358
@@ -5192,33 +5221,69 @@ msgstr "FAQ"
 msgid "Reseed URL Selection"
 msgstr "Выбор URL для начальной загрузки"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:343
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:341
 msgid "Try SSL first then non-SSL"
 msgstr "Сперва пробовать SSL, потом не-SSL"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:349
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:345
 msgid "Use SSL only"
 msgstr "Использовать только SSL"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:355
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:349
 msgid "Use non-SSL only"
 msgstr "Использовать только не-SSL"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:357
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:351
 msgid "Reseed URLs"
 msgstr "Адреса reseed-узлов"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:361
-msgid "Enable HTTP proxy (not used for SSL)"
-msgstr "Использовать HTTP-прокси (не используется для SSL)"
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:355
+msgid "Enable HTTP Proxy?"
+msgstr "Включить HTTP-прокси?"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:365
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:359
 msgid "HTTP Proxy Host"
 msgstr "Хост HTTP-прокси"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:369
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:363
 msgid "HTTP Proxy Port"
 msgstr "Порт HTTP-прокси"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:367
+msgid "Use HTTP Proxy Authorization?"
+msgstr "Использовать авторизацию на HTTP-прокси?"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:371
+msgid "HTTP Proxy Username"
+msgstr "Имя пользователя HTTP-прокси"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:375
+msgid "HTTP Proxy Password"
+msgstr "Пароль HTTP-прокси"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:379
+msgid "Enable HTTPS Proxy?"
+msgstr "Включить HTTPS-прокси?"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:383
+msgid "HTTPS Proxy Host"
+msgstr "Хост HTTPS-прокси"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:387
+msgid "HTTPS Proxy Port"
+msgstr "Порт HTTPS-прокси"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:391
+msgid "Use HTTPS Proxy Authorization?"
+msgstr "Использовать авторизацию на HTTPS-прокси?"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:395
+msgid "HTTPS Proxy Username"
+msgstr "Имя пользователя HTTPS-прокси"
+
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configreseed_jsp.java:399
+msgid "HTTPS Proxy Password"
+msgstr "Пароль HTTPS-прокси"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configservice_jsp.java:119
 msgid "config service"
@@ -5443,8 +5508,8 @@ msgid "Router Console Language"
 msgstr "Язык консоли маршрутизатора"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:356
-msgid "Please contribute to the router console translation project! Contact the developers on IRC #i2p-dev to help."
-msgstr "Пожалуйста, помогите проекту перевода консоли маршрутизатора! Разработчики доступны для связи на IRC-канале #i2p-dev"
+msgid "Please contribute to the router console translation project! Contact the developers in #i2p-dev on IRC to help."
+msgstr "Пожалуйста, помогите проекту перевода консоли маршрутизатора! Разработчики доступны для связи на IRC-канале #i2p-dev."
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configui_jsp.java:360
 msgid "Apply"
@@ -5574,7 +5639,7 @@ msgid "I2P Version and Running Environment"
 msgstr "Версия I2P и информация о среде выполнения"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/error500_jsp.java:204
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:295
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:297
 msgid "Note that system information, log timestamps, and log messages may provide clues to your location; please review everything you include in a bug report."
 msgstr "Имейте в виду, что информация о системе, временные метки в логах, и сами логи могут помочь выявить ваше местоположение; пожалуйста проверьте всё, что вы включаете в сообщение об ошибке."
 
@@ -5606,7 +5671,7 @@ msgstr "Графики производительности I2P"
 msgid "home"
 msgstr "Домашняя страница"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/index_jsp.java:346
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/index_jsp.java:350
 msgid "Welcome to I2P"
 msgstr "Добро пожаловать в I2P"
 
@@ -5626,15 +5691,15 @@ msgstr "логи"
 msgid "I2P Router Logs"
 msgstr "Логи маршрутизатора I2P"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:310
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:312
 msgid "Critical Logs"
 msgstr "Логи критических ошибок"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:314
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:316
 msgid "Router Logs"
 msgstr "Логи маршрутизатора"
 
-#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:320
+#: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/logs_jsp.java:322
 msgid "Service (Wrapper) Logs"
 msgstr "Логи службы (wrapper)"
 
@@ -5708,6 +5773,15 @@ msgstr "Профиль пира"
 #, java-format
 msgid "Profile for peer {0}"
 msgstr "Профиль пира {0}"
+
+#~ msgid "IP banned"
+#~ msgstr "IP заблокирован"
+
+#~ msgid "WARN-Firewalled and Fast"
+#~ msgstr "ПРЕДУПРЕЖДЕНИЕ - Заблокирован извне и Быстрый"
+
+#~ msgid "Enable HTTP proxy (not used for SSL)"
+#~ msgstr "Использовать HTTP-прокси (не используется для SSL)"
 
 #~ msgid "Gracefully restarting I2P to change published router address"
 #~ msgstr "Плавный перезапуск для изменения публикуемого адреса"
