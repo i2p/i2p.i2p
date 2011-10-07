@@ -71,7 +71,8 @@ public class Reseeder {
          /*   "https://www.i2pbote.net/netDb/," +   NO DATA */
               "https://reseed.i2p-projekt.de/" + "," +
 	 /*   "https://r31453.ovh.net/static_media/files/netDb/," + DOWN */
-              "https://cowpuncher.drollette.com/netdb/";
+              "https://cowpuncher.drollette.com/netdb/" + ";" +
+              "https://75.145.125.59/netDb/";
 
     private static final String PROP_INPROGRESS = "net.i2p.router.web.ReseedHandler.reseedInProgress";
     /** the console shows this message while reseedInProgress == false */

@@ -1,3 +1,6 @@
+2011-10-07 zzz
+  * Add https reseed thx h2ik
+
 2011-10-06 kytv
   * Add diftracker.i2p to I2PSnark
 
