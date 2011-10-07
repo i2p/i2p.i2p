@@ -83,7 +83,7 @@ Public domain except as listed below:
    Copyright (C) 2003-2006 Satoshi Konno
    See licenses/LICENSE-UPnP.txt
 
-   GeoIP data free to use, courtesy http://ip-to-country.webhosting.info/
+   GeoIP data free to use, courtesy http://www.maxmind.com/
 
 
 Installer:
@@ -201,7 +201,7 @@ Applications:
        Silk icons: See licenses/LICENSE-SilkIcons.txt
 
        GeoIP Data:
-       Copyright (c) 2003 Direct Information Pvt. Ltd. All Rights Reserved.
+       Copyright (c) 2008 MaxMind, Inc.  All Rights Reserved.
        See licenses/LICENSE-GeoIP.txt
 
    Router Console and I2PSnark themes:

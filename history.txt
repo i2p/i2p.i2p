@@ -1,3 +1,9 @@
+2011-10-07 kytv
+  * GeoIP:
+    - Switch to Maxmind's GeoIP service (it's better maintained
+      than our old provider)
+    - Update based on Maxmind GeoLite Country database from 2011-10-07
+
 2011-10-07 zzz
   * Add https reseed thx h2ik
 
