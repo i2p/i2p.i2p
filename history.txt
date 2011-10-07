@@ -11,7 +11,12 @@
     - SusiMail: de and es
 
 2011-10-07 zzz
-  * Add https reseed thx h2ik
+  * Reseed:
+    - Add an https reseed, thx h2ik
+    - Restore ovh reseeds, thx mathiasdm
+  * Tunnels:
+    - For expl. tunnels, fall back to high cap sooner
+    - Tweak build rejections for class N
 
 2011-10-06 kytv
   * Add diftracker.i2p to I2PSnark

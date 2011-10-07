@@ -60,7 +60,7 @@ public class Reseeder {
               "http://reseed.i2p-projekt.de/" + "," +
               "http://forum.i2p2.de/netdb/" + "," +
          /*   "http://www.i2pbote.net/netDb/," +   NO DATA */
-         /*   "http://r31453.ovh.net/static_media/files/netDb/," +   DOWN */
+              "http://r31453.ovh.net/static_media/files/netDb/" + "," +
               "http://cowpuncher.drollette.com/netdb/" + "," +
               "http://75.145.125.59/netDb/";
 
@@ -70,8 +70,8 @@ public class Reseeder {
               "https://forum.i2p2.de/netdb/" + "," +
          /*   "https://www.i2pbote.net/netDb/," +   NO DATA */
               "https://reseed.i2p-projekt.de/" + "," +
-	 /*   "https://r31453.ovh.net/static_media/files/netDb/," + DOWN */
-              "https://cowpuncher.drollette.com/netdb/" + ";" +
+              "https://r31453.ovh.net/static_media/files/netDb/" + "," +
+              "https://cowpuncher.drollette.com/netdb/" + "," +
               "https://75.145.125.59/netDb/";
 
     private static final String PROP_INPROGRESS = "net.i2p.router.web.ReseedHandler.reseedInProgress";

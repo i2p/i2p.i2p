@@ -67,7 +67,7 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         return rv;
     }
     
-    private static final int MIN_NONFAILING_PCT = 25;
+    private static final int MIN_NONFAILING_PCT = 15;
     private static final int MIN_ACTIVE_PEERS_STARTUP = 6;
     private static final int MIN_ACTIVE_PEERS = 12;
 
@@ -141,7 +141,8 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         //    l.debug("Client, Expl. Fail pct: " + c + ", " + e);
         if (e <= c || e <= 25) // doing very well (unlikely)
             return 0;
-        if (c >= 90) // doing very badly
+        // Doing very badly? This is important to prevent network congestion collapse
+        if (c >= 70 || e >= 75)
             return 100 - MIN_NONFAILING_PCT;
         return (100 * (e-c)) / (100-c);
     }

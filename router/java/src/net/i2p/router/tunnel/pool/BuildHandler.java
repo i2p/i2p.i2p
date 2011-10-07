@@ -492,18 +492,25 @@ class BuildHandler {
          * approaching our connection limit (i.e. !haveCapacity()),
          * reject this request.
          *
-         * Don't do this for class O, under the assumption that they are already talking
+         * Don't do this for class N or O, under the assumption that they are already talking
          * to most of the routers, so there's no reason to reject. This may drive them
          * to their conn. limits, but it's hopefully a temporary solution to the
          * tunnel build congestion. As the net grows this will have to be revisited.
          */
         RouterInfo ri = _context.router().getRouterInfo();
-        if (response == 0 &&
-            (ri == null || ri.getBandwidthTier().charAt(0) != 'O') &&
-            ((isInGW && ! _context.commSystem().haveInboundCapacity(87)) ||
-             (isOutEnd && ! _context.commSystem().haveOutboundCapacity(87)))) {
-                _context.throttle().setTunnelStatus(_x("Rejecting tunnels: Connection limit"));
+        if (response == 0) {
+            if (ri == null) {
+                // ?? We should always have a RI
                 response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
+            } else {
+                char bw = ri.getBandwidthTier().charAt(0);
+                if (bw != 'O' && bw != 'N' &&
+                    ((isInGW && ! _context.commSystem().haveInboundCapacity(87)) ||
+                     (isOutEnd && ! _context.commSystem().haveOutboundCapacity(87)))) {
+                        _context.throttle().setTunnelStatus(_x("Rejecting tunnels: Connection limit"));
+                        response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
+                }
+            }
         }
         
         // Check participating throttle counters for previous and next hops
