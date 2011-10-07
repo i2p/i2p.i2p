@@ -3,15 +3,18 @@
 # This file is distributed under the same license as the susimail package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 #
-# foo <foo@bar>, 2009.
-# punkibastardo <punkibastardo@gmail.com>, 2011.
+# Translators:
+# "blabla", 2011.
 # ducki2p <ducki2p@gmail.com>, 2011.
+# foo <foo@bar>, 2009.
+# mixy, 2011.
+# punkibastardo <punkibastardo@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-09-16 21:54+0000\n"
-"PO-Revision-Date: 2011-07-20 00:53+0000\n"
+"POT-Creation-Date: 2011-10-07 13:58+0000\n"
+"PO-Revision-Date: 2011-10-07 01:33+0000\n"
 "Last-Translator: blabla <blabla@trash-mail.com>\n"
 "Language-Team: Spanish (Castilian) (http://www.transifex.net/projects/p/I2P/"
 "team/es/)\n"
@@ -28,7 +31,7 @@ msgstr "desconocido"
 #: src/src/i2p/susi/webmail/WebMail.java:473
 msgid "Warning: no transfer encoding found, fallback to 7bit."
 msgstr ""
-"Aviso: no se encuentra codificación de transferencia, volviendo a 7 bits."
+"Aviso: No se encuentra codificación de transferencia, volviendo a 7 bits."
 
 #: src/src/i2p/susi/webmail/WebMail.java:478
 #, java-format
@@ -124,7 +127,7 @@ msgstr "comenzar correo reenviado"
 
 #: src/src/i2p/susi/webmail/WebMail.java:840
 msgid "end forwarded mail"
-msgstr "terminar correo reenviado"
+msgstr "final del correo reenviado"
 
 #: src/src/i2p/susi/webmail/WebMail.java:847
 #: src/src/i2p/susi/webmail/WebMail.java:1708
@@ -157,7 +160,7 @@ msgstr "Error al analizar parámetros de descarga."
 #: src/src/i2p/susi/webmail/WebMail.java:1089
 msgid "Invalid pagesize number, resetting to default value."
 msgstr ""
-"Tamaño de página no válida, restableciendo a los valores predeterminados."
+"Tamaño de página no válida, restableciendo los valores predeterminados."
 
 #: src/src/i2p/susi/webmail/WebMail.java:1113
 msgid "No messages marked for deletion."
@@ -194,11 +197,11 @@ msgstr "Mostrar mensaje"
 #: src/src/i2p/susi/webmail/WebMail.java:1332
 #, java-format
 msgid "Error decoding content: {0}"
-msgstr "Error al descifrar el contenido: {0}"
+msgstr "Error al descodificar el contenido: {0}"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1337
 msgid "Error decoding content: No encoder found."
-msgstr "Error al descifrar el contenido: No se ha encontrado codificador."
+msgstr "Error al descodificar el contenido: No se ha encontrado codificador."
 
 #: src/src/i2p/susi/webmail/WebMail.java:1384
 msgid "no subject"
@@ -219,7 +222,7 @@ msgstr "No se han encontrado destinatarios."
 
 #: src/src/i2p/susi/webmail/WebMail.java:1433
 msgid "Quoted printable encoder not available."
-msgstr "El codificador imprimible citado no se encuentra disponible."
+msgstr "El codificador imprimible citado no está disponible."
 
 #: src/src/i2p/susi/webmail/WebMail.java:1438
 msgid "Header line encoder not available."
@@ -245,7 +248,7 @@ msgstr "Eliminar datos adjuntos"
 #: src/src/i2p/susi/webmail/WebMail.java:1614
 #: src/src/i2p/susi/webmail/WebMail.java:1695
 msgid "Reload Config"
-msgstr "Actualizar configuración"
+msgstr "Recargar la configuración"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1530
 #: src/src/i2p/susi/webmail/WebMail.java:1615
@@ -277,7 +280,7 @@ msgstr "Asunto:"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1558
 msgid "Bcc to self"
-msgstr "CCO a mí mismo"
+msgstr "CCO a mí mism@"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1561
 msgid "New Attachment:"
@@ -424,7 +427,7 @@ msgstr "Tamaño de página:"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1665
 msgid "Set"
-msgstr "Set"
+msgstr "Establecer"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1675
 msgid "Really delete this message?"
@@ -432,7 +435,7 @@ msgstr "¿Realmente deseas borrar este mensaje?"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1675
 msgid "Yes, really delete it!"
-msgstr "Sí, realmente eliminarlo!"
+msgstr "Sí, ¡bórralo!"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1694
 msgid "Back to Folder"

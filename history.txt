@@ -3,6 +3,12 @@
     - Switch to Maxmind's GeoIP service (it's better maintained
       than our old provider)
     - Update based on Maxmind GeoLite Country database from 2011-10-07
+  * Translation updates from Transifex:
+    - I2PSnark: de, es, and pt
+    - I2PTunnel: de and es
+    - RouterConsole: de and es
+    - SusiDNS: de and es
+    - SusiMail: de and es
 
 2011-10-07 zzz
   * Add https reseed thx h2ik
