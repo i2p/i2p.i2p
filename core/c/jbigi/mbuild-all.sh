@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 
+if [ -z "$BASH_VERSION" ]; then
+	echo "This script needs to be run with Bash."
+	echo
+	echo "Please install bash and then run this script with"
+	echo "bash $0"
+	exit 1
+fi
+
 #FIXME What platforms for MacOS?
 MISC_DARWIN_PLATFORMS="powerpc powerpc64 powerpc64le powerpcle"
 
