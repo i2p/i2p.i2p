@@ -5,26 +5,26 @@ Standards-Version: 3.9.2
 Priority: optional
 Bugs: mailto:killyourtv@i2pmail.org
 Homepage: http://www.i2p2.de/
-Build-Depends: debhelper (>= 7.0.50~), 
+Build-Depends: debhelper (>= 7.0.50~),
  ant,
  debconf,
  default-jdk,
  gettext,
- libgmp3-dev, 
+ libgmp3-dev,
  po-debconf
-Build-Depends-Indep: tor-geoipdb
+##Build-Depends-Indep: tor-geoipdb
 
 Package: i2p
 Architecture: all
 Section: net
 Priority: optional
 Depends: ${misc:Depends}, ${java:Depends}, ${shlibs:Depends},
- adduser, 
+ adduser,
  i2p-router (>= 0.8.6-5),
  libjbigi-jni (>= ${source:Version}),
  libjbigi-jni (<< ${source:Version}.1~),
  lsb-base,
- service-wrapper 
+ service-wrapper
 Description: Load-balanced unspoofable packet switching network
  I2P is an anonymizing network, offering a simple layer that identity-sensitive
  applications can use to securely communicate. All data is wrapped with several
@@ -57,7 +57,7 @@ Description: Documentation for I2P
  I2P is an anonymizing network, offering a simple layer that identity-sensitive
  applications can use to securely communicate. All data is wrapped with several
  layers of encryption, and the network is both distributed and dynamic, with no
- trusted parties. 
+ trusted parties.
  .
  This package contains the Javadoc files.
 
@@ -93,4 +93,4 @@ Description: Load-balanced unspoofable packet switching network
  trusted parties.
  .
  TrueType fonts (such as those provided in the package ttf-dejavu) are required
- in order to generate graphs. 
+ in order to generate graphs.

@@ -53,7 +53,7 @@ build-indep:
 	ant preppkg-unix javadoc
 	echo router.updateDisabled=true > $(I2P)/router.config
 	mv $(I2P)/runplain.sh $(I2P)/i2prouter-nowrapper
-	-cp -fv /usr/share/tor/geoip $(CURDIR)/pkg-temp/geoip/geoip.txt
+	#-cp -fv /usr/share/tor/geoip $(CURDIR)/pkg-temp/geoip/geoip.txt
 	
 
 binary-arch: build-arch
