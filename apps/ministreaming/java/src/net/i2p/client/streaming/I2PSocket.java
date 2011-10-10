@@ -35,6 +35,9 @@ public interface I2PSocket {
      */
     public OutputStream getOutputStream() throws IOException;
 
+    /**
+     *  @since 0.8.9
+     */
     public SelectableChannel getChannel() throws IOException;
 
     /** 

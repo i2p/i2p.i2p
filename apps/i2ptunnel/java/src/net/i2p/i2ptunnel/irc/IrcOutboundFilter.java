@@ -10,7 +10,7 @@ import net.i2p.client.streaming.I2PSocket;
 import net.i2p.util.Log;
 
 /**
- *  Thread to do inbound filtering.
+ *  Thread to do outbound filtering.
  *  Moved from I2PTunnelIRCClient.java
  *
  *  @since 0.8.9

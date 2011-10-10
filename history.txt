@@ -1,3 +1,9 @@
+2011-10-10 zzz
+  * Lower max netdb RI expiration again
+  * Increase default max tunnels
+  * Cleanups after review
+  * Exorcism (ticket #476)
+
 2011-10-07 kytv
   * GeoIP:
     - Switch to Maxmind's GeoIP service (it's better maintained

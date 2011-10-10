@@ -68,6 +68,9 @@ class I2PSocketFull implements I2PSocket {
             return null;
     }
 
+    /**
+     *  @since 0.8.9
+     */
     public SelectableChannel getChannel() {
         return new MessageChannel(this);
     }

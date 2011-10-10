@@ -391,7 +391,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     // pos is the start of the path
                     pos = request.indexOf("/");
                     if (pos == -1) {
-                        pos = request.length();
+                        //pos = request.length();
+                        method = null;
+                        break;
                     }
                     host = request.substring(0, pos);
 

@@ -14,6 +14,9 @@ import java.nio.channels.spi.SelectorProvider;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ *  @since 0.8.9
+ */
 public class MessageChannel extends SelectableChannel implements ReadableByteChannel, WritableByteChannel {
 
     final MessageInputStream in;

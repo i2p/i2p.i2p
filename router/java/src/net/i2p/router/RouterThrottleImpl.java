@@ -31,7 +31,7 @@ class RouterThrottleImpl implements RouterThrottle {
     private static int THROTTLE_EVENT_LIMIT = 30;
     
     private static final String PROP_MAX_TUNNELS = "router.maxParticipatingTunnels";
-    private static final int DEFAULT_MAX_TUNNELS = 2500;
+    private static final int DEFAULT_MAX_TUNNELS = 3500;
     private static final String PROP_DEFAULT_KBPS_THROTTLE = "router.defaultKBpsThrottle";
     private static final String PROP_MAX_PROCESSINGTIME = "router.defaultProcessingTimeThrottle";
 

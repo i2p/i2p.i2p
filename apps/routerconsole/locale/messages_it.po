@@ -3565,7 +3565,7 @@ msgstr "Aiuto &amp Router I2P; FAQ"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:43
 msgid "Help &amp; FAQ"
-msgstr "Aiuto &amo; FAQ"
+msgstr "Aiuto &amp; FAQ"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:55
 msgid ""

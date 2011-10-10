@@ -206,10 +206,9 @@ public class StatisticsManager implements Service {
         }
         long numPeriods = rate.getLifetimePeriods();
         if (fudgeQuantity) {
-            buf.append("666").append(';');
+            buf.append("555;");
             if (numPeriods > 0) {
-                buf.append("666").append(';');
-                buf.append("666").append(';');
+                buf.append("555;555;");
             }
         } else {
             buf.append(num(rate.getLastEventCount())).append(';');
