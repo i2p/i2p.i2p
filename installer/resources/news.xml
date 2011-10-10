@@ -1,22 +1,23 @@
 <!--
-<i2p.news date="$Date: 2011-05-16 00:00:00 $">
-<i2p.release version="0.8.8" date="2011/08/23" minVersion="0.6" />
+<i2p.news date="$Date: 2011-10-11 00:00:00 $">
+<i2p.release version="0.8.9" date="2011/10/11" minVersion="0.6" />
 -->
 <div lang="en">
-<h3>2011-08-23: <b>0.8.8 <a href="http://www.i2p2.i2p/release-0.8.8.html">Released</a></b></h3>
+<h3>2011-10-11: <b>0.8.9 <a href="http://www.i2p2.i2p/release-0.8.9.html">Released</a></b></h3>
 
-<p>I2P release 0.8.8 enables the new hosts.txt database to speed hostname lookups
- and store additional information on hostname entries.
- It also includes improvements to speed a router's integration on startup.
- There is new code to detect and react to large clock shifts that should help
- a router recover after suspend/resume of the computer.
+<p>
+The 0.8.9 release has several performance improvements, and many changes to handle
+the continued rapid growth of the network. It uses a new iterative method for
+Kademlia network database lookups that should be more reliable and efficient.
+There are also several improvements to our SSU (UDP) transport protocol that
+should help reliability and efficiency. We have made several changes to
+improve tunnel build success rates. And, of course, there are lots of bug
+fixes and translation updates.
 </p><p>
- There are new translations for Danish and Ukranian and lots of updates in other languages.
- Also included are, of course, a large collection of bug fixes, performance improvements,
- and updates to deal with the continued rapid expansion of the network.
-
+The network has grown quite rapidly in recent weeks, and that's great news,
+but it has caused some instability. We welcome all our new users and we
+ask you to be patient as we make improvements to the software.
 </p><p>
-Please help grow the network.
 Say hello to the volunteers on the <a href="irc://127.0.0.1:6668/i2p-help">#i2p-help IRC channel</a>.
 <a href="http://www.i2p2.i2p/getinvolved.html">Get involved</a>,
 spread the word,
