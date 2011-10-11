@@ -20,7 +20,7 @@ DIRS="\
 for i in `find $DIRS -maxdepth 1 -type f -name *.po`
 do
 	echo "Checking $i ..."
-	msgfmt -c $i
+	msgfmt -c $i -o /dev/null
         if [ $? -ne 0 ]
 	then
 		echo "********* FAILED CHECK FOR $i *************"
