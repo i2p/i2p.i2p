@@ -103,7 +103,7 @@ public class ConfigNetHelper extends HelperBase {
         boolean enabled = TransportManager.isNTCPEnabled(_context);
         String hostname = _context.getProperty(PROP_I2NP_NTCP_HOSTNAME); 
         boolean specified = hostname != null && hostname.length() > 0;
-        String auto = _context.getProperty(PROP_I2NP_NTCP_AUTO_IP, "false");
+        String auto = _context.getProperty(PROP_I2NP_NTCP_AUTO_IP, "true");
         if ((mode == 0 && (!specified) && auto.equals("false") && enabled) ||
             (mode == 1 && specified && auto.equals("false") && enabled) ||
             (mode == 2 && auto.equals("true") && enabled) ||
