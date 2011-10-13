@@ -102,6 +102,7 @@ trans.de = debian/po/de.po
 trans.es = debian/po/es.po
 trans.pl = debian/po/pl.po
 trans.ru = debian/po/ru.po
+trans.sv_SE = debian/po/sv.po
 trans.uk_UA = debian/po/uk.po
 
 [main]
