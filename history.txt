@@ -1,3 +1,8 @@
+* 2011-10-13 kytv
+  * Updated translations from Transifex
+    - Swedish: debconf and i2psnark
+    - Finnish: router console
+
 * 2011-10-11 0.8.9 released
 
 2011-10-10 zzz
