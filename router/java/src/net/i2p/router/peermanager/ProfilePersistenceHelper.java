@@ -216,8 +216,8 @@ class ProfilePersistenceHelper {
             
             long lastSentToSuccessfully = getLong(props, "lastSentToSuccessfully");
             if (isExpired(lastSentToSuccessfully)) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Dropping old profile for " + file.getName() + 
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Dropping old profile " + file.getName() + 
                               ", since we haven't heard from them in a long time");
                 file.delete();
                 return null;

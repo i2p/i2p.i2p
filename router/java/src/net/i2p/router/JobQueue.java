@@ -172,7 +172,9 @@ public class JobQueue {
                 //    alreadyExists = true;
                 // Always remove and re-add, since it needs to be
                 // re-sorted in the TreeSet.
-                _timedJobs.remove(job);
+                boolean removed = _timedJobs.remove(job);
+                if (removed && _log.shouldLog(Log.WARN))
+                    _log.warn("Rescheduling job: " + job);
             }
 
             if ((!alreadyExists) && shouldDrop(job, numReady)) {
@@ -197,9 +199,8 @@ public class JobQueue {
         
         _context.statManager().addRateData("jobQueue.readyJobs", numReady, 0);
         if (dropped) {
-            _context.statManager().addRateData("jobQueue.droppedJobs", 1, 1);
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Dropping job due to overload!  # ready jobs: " 
+            _context.statManager().addRateData("jobQueue.droppedJobs", 1, 0);
+            _log.logAlways(Log.WARN, "Dropping job due to overload!  # ready jobs: " 
                           + numReady + ": job = " + job);
         }
     }
@@ -461,10 +462,18 @@ public class JobQueue {
                     long timeToWait = -1;
                     try {
                         synchronized (_jobLock) {
+                            Job lastJob = null;
+                            long lastTime = Long.MIN_VALUE;
                             for (Iterator<Job> iter = _timedJobs.iterator(); iter.hasNext(); ) {
                                 Job j = iter.next();
                                 // find jobs due to start before now
                                 long timeLeft = j.getTiming().getStartAfter() - now;
+                                if (lastJob != null && lastTime > j.getTiming().getStartAfter()) {
+                                    _log.error("Job " + lastJob + " out of order with job " + j +
+                                             " difference of " + DataHelper.formatDuration(lastTime - j.getTiming().getStartAfter()));
+                                }
+                                lastJob = j;
+                                lastTime = lastJob.getTiming().getStartAfter();
                                 if (timeLeft <= 0) {
                                     if (j instanceof JobImpl)
                                         ((JobImpl)j).madeReady();

@@ -74,6 +74,8 @@ public class Router implements RouterClock.ClockShiftListener {
     private int _gracefulExitCode;
     private I2PThread.OOMEventListener _oomListener;
     private ShutdownHook _shutdownHook;
+    /** non-cancellable shutdown has begun */
+    private volatile boolean _shutdownInProgress;
     private final I2PThread _gracefulShutdownDetector;
     private final RouterWatchdog _watchdog;
     private final Thread _watchdogThread;
@@ -275,7 +277,10 @@ public class Router implements RouterClock.ClockShiftListener {
         _oomListener = new I2PThread.OOMEventListener() { 
             public void outOfMemory(OutOfMemoryError oom) { 
                 clearCaches();
-                _log.log(Log.CRIT, "Thread ran out of memory", oom);
+                _log.log(Log.CRIT, "Thread ran out of memory, shutting down I2P", oom);
+                // prevent multiple parallel shutdowns (when you OOM, you OOM a lot...)
+                if (_shutdownInProgress)
+                    return;
                 for (int i = 0; i < 5; i++) { // try this 5 times, in case it OOMs
                     try { 
                         _log.log(Log.CRIT, "free mem: " + Runtime.getRuntime().freeMemory() + 
@@ -285,6 +290,7 @@ public class Router implements RouterClock.ClockShiftListener {
                         // gobble
                     }
                 }
+                _log.log(Log.CRIT, "To prevent future shutdowns, increase wrapper.java.maxmemory in $I2P/wrapper.config");
                 shutdown(EXIT_OOM); 
             }
         };
@@ -999,6 +1005,9 @@ public class Router implements RouterClock.ClockShiftListener {
      *  Shutdown with no chance of cancellation
      */
     public void shutdown(int exitCode) {
+        if (_shutdownInProgress)
+            return;
+        _shutdownInProgress = true;
         if (_shutdownHook != null) {
             try {
                 Runtime.getRuntime().removeShutdownHook(_shutdownHook);

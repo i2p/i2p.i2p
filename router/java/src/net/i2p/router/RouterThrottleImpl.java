@@ -31,14 +31,14 @@ class RouterThrottleImpl implements RouterThrottle {
     private static int THROTTLE_EVENT_LIMIT = 30;
     
     private static final String PROP_MAX_TUNNELS = "router.maxParticipatingTunnels";
-    private static final int DEFAULT_MAX_TUNNELS = 3500;
+    private static final int DEFAULT_MAX_TUNNELS = 5000;
     private static final String PROP_DEFAULT_KBPS_THROTTLE = "router.defaultKBpsThrottle";
     private static final String PROP_MAX_PROCESSINGTIME = "router.defaultProcessingTimeThrottle";
 
     /**
      *  TO BE FIXED - SEE COMMENTS BELOW
      */
-    private static final int DEFAULT_MAX_PROCESSINGTIME = 1750;
+    private static final int DEFAULT_MAX_PROCESSINGTIME = 2250;
 
     /** tunnel acceptance */
     public static final int TUNNEL_ACCEPT = 0;
@@ -113,7 +113,9 @@ class RouterThrottleImpl implements RouterThrottle {
         // counterintuitively be more when there is low traffic)
         // Change the stat or pick a better stat.
         RateStat rs = _context.statManager().getRate("transport.sendProcessingTime");
-        Rate r = rs.getRate(60*1000);
+        Rate r = null;
+        if (rs != null)
+            r = rs.getRate(60*1000);
 
         //Reject tunnels if the time to process messages and send them is too large. Too much time implies congestion.
         if(r != null) {

@@ -193,12 +193,16 @@ class FloodfillPeerSelector extends PeerSelector {
         int found = 0;
         long now = _context.clock().now();
 
-        double maxFailRate;
+        double maxFailRate = 100;
         if (_context.router().getUptime() > 60*60*1000) {
-            double currentFailRate = _context.statManager().getRate("peer.failedLookupRate").getRate(60*60*1000).getAverageValue();
-            maxFailRate = Math.max(0.20d, 1.5d * currentFailRate);
-        } else {
-            maxFailRate = 100d; // disable
+            RateStat rs = _context.statManager().getRate("peer.failedLookupRate");
+            if (rs != null) {
+                Rate r = rs.getRate(60*60*1000);
+                if (r != null) {
+                    double currentFailRate = r.getAverageValue();
+                    maxFailRate = Math.max(0.20d, 1.5d * currentFailRate);
+                }
+            }
         }
 
         // 8 == FNDF.MAX_TO_FLOOD + 1

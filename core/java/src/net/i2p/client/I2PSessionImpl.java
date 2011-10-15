@@ -395,7 +395,7 @@ abstract class I2PSessionImpl implements I2PSession, I2CPMessageReader.I2CPMessa
                         _producer.disconnect(this);
                     } catch (I2PSessionException ipe) {}
                     closeSocket();
-                    throw new IOException("No tunnels built after waiting 5 minutes... are there network problems?");
+                    throw new IOException("No tunnels built after waiting 5 minutes. Your network connection may be down, or there is severe network congestion.");
                 }
                 synchronized (_leaseSetWait) {
                     try {

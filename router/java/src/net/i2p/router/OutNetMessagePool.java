@@ -66,11 +66,12 @@ public class OutNetMessagePool {
             return false;
         }
         if (msg.getPriority() < 0) {
-            _log.warn("Priority less than 0?  sounds like nonsense to me... " + msg, new Exception("Negative priority"));
+            _log.error("Priority less than 0?  sounds like nonsense to me... " + msg, new Exception());
             return false;
         }
         if (msg.getExpiration() <= _context.clock().now()) {
-            _log.error("Already expired!  wtf: " + msg, new Exception("Expired message"));
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Dropping expired outbound msg: " + msg, new Exception());
             return false;
         }
         return true;

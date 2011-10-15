@@ -144,8 +144,7 @@ class FloodfillMonitorJob extends JobImpl {
         if (good < MIN_FF && happy) {
             if (!wasFF) {
                 _lastChanged = now;
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Only " + good + " ff peers and we want " + MIN_FF + " so we are becoming floodfill");
+                _log.logAlways(Log.INFO, "Only " + good + " ff peers and we want " + MIN_FF + " so we are becoming floodfill");
             }
             return true;
         }
@@ -154,8 +153,7 @@ class FloodfillMonitorJob extends JobImpl {
         if (good > MAX_FF || (good > MIN_FF && !happy)) {
             if (wasFF) {
                 _lastChanged = now;
-                if (_log.shouldLog(Log.ERROR))
-                    _log.error("Have " + good + " ff peers and we need only " + MIN_FF + " to " + MAX_FF +
+                _log.logAlways(Log.INFO, "Have " + good + " ff peers and we need only " + MIN_FF + " to " + MAX_FF +
                                " so we are disabling floodfill; reachable? " + happy);
             }
             return false;

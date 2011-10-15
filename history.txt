@@ -1,3 +1,31 @@
+* 2011-10-15 zzz
+  * BuildExecutor: Add tunnel.buildConfigTime stat
+  * configupdate.jsp:
+    - Fix setting to 'never' (ticket #523)
+    - Fix always saying trusted keys changed
+    - Parameterize tags
+  * EepGet:
+    - Add gunzip support (nonproxied only)
+    - Clean up progress formatting
+  * FloodfillMonitorJob: Log tweak (ticket #533)
+  * I2CP: Improve error message (ticket #533)
+  * JobQueue:
+    - Log error when queue is out of order
+    - Log tweaks
+  * FloodfillPeerSelector: Fix stat NPE (tickets #534,535)
+  * RouterThrottle:
+    - Fix stat NPE (tickets #534,535)
+    - Increase max tunnels and max delay again
+  * OutNetMessagePool: Log tweak (ticket #533)
+  * Router:
+    - Add OOM help (ticket #533)
+    - Prevent parallel shutdowns after multiple OOMs (tickets #534,535)
+  * Stats: Add API methods for zero duration
+  * SSLEepGet:
+    - Add gunzip support
+    - Increase buffer size
+  * SSU: Fix concurrency errors (ticket #536)
+
 * 2011-10-13 kytv
   * Updated translations from Transifex
     - Swedish: debconf and i2psnark

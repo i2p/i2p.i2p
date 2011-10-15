@@ -61,6 +61,7 @@ class BuildExecutor implements Runnable {
         _context.statManager().createRequiredRateStat("tunnel.buildExploratoryReject", "Response time for rejection (ms)", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
         _context.statManager().createRequiredRateStat("tunnel.buildClientReject", "Response time for rejection (ms)", "Tunnels", new long[] { 10*60*1000, 60*60*1000 });
         _context.statManager().createRequiredRateStat("tunnel.buildRequestTime", "Time to build a tunnel request (ms)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("tunnel.buildConfigTime", "Time to build a tunnel request (ms)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.buildRequestZeroHopTime", "How long it takes to build a zero hop tunnel", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.pendingRemaining", "How many inbound requests are pending after a pass (period is how long the pass takes)?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.buildFailFirstHop", "How often we fail to build a OB tunnel because we can't contact the first hop", "Tunnels", new long[] { 60*1000, 10*60*1000 });
@@ -327,6 +328,7 @@ class BuildExecutor implements Runnable {
                             TunnelPool pool = wanted.remove(0);
                             //if (pool.countWantedTunnels() <= 0)
                             //    continue;
+                            long bef = System.currentTimeMillis();
                             PooledTunnelCreatorConfig cfg = pool.configureNewTunnel();
                             if (cfg != null) {
                                 // 0hops are taken care of above, these are nonstandard 0hops
@@ -337,6 +339,8 @@ class BuildExecutor implements Runnable {
                                     pool.buildComplete(cfg);
                                     continue;
                                 }
+                                long pTime = System.currentTimeMillis() - bef;
+                                _context.statManager().addRateData("tunnel.buildConfigTime", pTime, 0);
                                 if (_log.shouldLog(Log.DEBUG))
                                     _log.debug("Configuring new tunnel " + i + " for " + pool + ": " + cfg);
                                 buildTunnel(pool, cfg);
