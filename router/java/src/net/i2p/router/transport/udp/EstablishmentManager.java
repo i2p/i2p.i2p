@@ -172,15 +172,20 @@ class EstablishmentManager {
                     if (_queuedOutbound.size() > MAX_QUEUED_OUTBOUND) {
                         rejected = true;
                     } else {
-                        List<OutNetMessage> newQueued = new ArrayList(1);
+                        List<OutNetMessage> newQueued = new ArrayList(MAX_QUEUED_PER_PEER);
                         List<OutNetMessage> queued = _queuedOutbound.putIfAbsent(to, newQueued);
                         if (queued == null)
                             queued = newQueued;
-                        queueCount = queued.size();
-                        if (queueCount < MAX_QUEUED_PER_PEER)
-                            queued.add(msg);
+                        // this used to be inside a synchronized (_outboundStates) block,
+                        // but that's now a CHM, so protect the ArrayList
+                        // There are still races possible but this should prevent AIOOBE and NPE
+                        synchronized (queued) {
+                            queueCount = queued.size();
+                            if (queueCount < MAX_QUEUED_PER_PEER)
+                                queued.add(msg);
+                            deferred = _queuedOutbound.size();
+                        }
                     }
-                    deferred = _queuedOutbound.size();
                 } else {
                     // must have a valid session key
                     byte[] keyBytes = addr.getIntroKey();
@@ -212,9 +217,14 @@ class EstablishmentManager {
             if (state != null) {
                 state.addMessage(msg);
                 List<OutNetMessage> queued = _queuedOutbound.remove(to);
-                if (queued != null)
-                    for (int i = 0; i < queued.size(); i++)
-                        state.addMessage(queued.get(i));
+                if (queued != null) {
+                    // see comments above
+                    synchronized (queued) {
+                        for (OutNetMessage m : queued) {
+                            state.addMessage(m);
+                        }
+                    }
+                }
             }
         
         if (rejected) {
@@ -399,8 +409,12 @@ class EstablishmentManager {
                 // there shouldn't have been queued messages for this active state, but just in case...
                 List<OutNetMessage> queued = _queuedOutbound.remove(state.getRemoteHostId());
                 if (queued != null) {
-                    for (int i = 0; i < queued.size(); i++) 
-                        state.addMessage(queued.get(i));
+                    // see comments above
+                    synchronized (queued) {
+                        for (OutNetMessage m : queued) {
+                            state.addMessage(m);
+                        }
+                    }
                 }
                 
                 //admitted = locked_admitQueued();
