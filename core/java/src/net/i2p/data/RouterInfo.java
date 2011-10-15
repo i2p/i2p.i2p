@@ -237,7 +237,7 @@ public class RouterInfo extends DatabaseEntry {
         if (_addresses == null) throw new DataFormatException("Router addressess isn't set? wtf!");
         if (_options == null) throw new DataFormatException("Router options isn't set? wtf!");
 
-        long before = Clock.getInstance().now();
+        //long before = Clock.getInstance().now();
         ByteArrayOutputStream out = new ByteArrayOutputStream(6*1024);
         try {
             _identity.writeBytes(out);
@@ -280,8 +280,10 @@ public class RouterInfo extends DatabaseEntry {
             throw new DataFormatException("IO Error getting bytes", ioe);
         }
         byte data[] = out.toByteArray();
-        long after = Clock.getInstance().now();
-        _log.debug("getBytes()  took " + (after - before) + "ms");
+        //if (_log.shouldLog(Log.DEBUG)) {
+        //    long after = Clock.getInstance().now();
+        //    _log.debug("getBytes()  took " + (after - before) + "ms");
+        //}
         if (CACHE_ALL || _shouldCache)
             _byteified = data;
         return data;
