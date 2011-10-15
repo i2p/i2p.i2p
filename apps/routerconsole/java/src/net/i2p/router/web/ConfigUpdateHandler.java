@@ -24,7 +24,8 @@ public class ConfigUpdateHandler extends FormHandler {
     public static final String OLD_DEFAULT_NEWS_URL = "http://complication.i2p/news.xml";
     public static final String DEFAULT_NEWS_URL = "http://echelon.i2p/i2p/news.xml";
     public static final String PROP_REFRESH_FREQUENCY = "router.newsRefreshFrequency";
-    public static final String DEFAULT_REFRESH_FREQUENCY = 36*60*60*1000 + "";
+    public static final long DEFAULT_REFRESH_FREQ = 36*60*60*1000l;
+    public static final String DEFAULT_REFRESH_FREQUENCY = Long.toString(DEFAULT_REFRESH_FREQ);
     public static final String PROP_UPDATE_POLICY = "router.updatePolicy";
     public static final String DEFAULT_UPDATE_POLICY = "download";
     public static final String PROP_SHOULD_PROXY = "router.updateThroughProxy";
@@ -100,7 +101,7 @@ public class ConfigUpdateHandler extends FormHandler {
             if ( (oldURL == null) || (!_newsURL.equals(oldURL)) ) {
                 _context.router().setConfigSetting(PROP_NEWS_URL, _newsURL);
                 NewsFetcher.getInstance(_context).invalidateNews();
-                addFormNotice(_("Updating news URL to") + " " + _newsURL);
+                addFormNotice(_("Updating news URL to {0}", _newsURL));
             }
         }
         
@@ -108,7 +109,7 @@ public class ConfigUpdateHandler extends FormHandler {
             String oldHost = _context.router().getConfigSetting(PROP_PROXY_HOST);
             if ( (oldHost == null) || (!_proxyHost.equals(oldHost)) ) {
                 _context.router().setConfigSetting(PROP_PROXY_HOST, _proxyHost);
-                addFormNotice(_("Updating proxy host to") + " " + _proxyHost);
+                addFormNotice(_("Updating proxy host to {0}", _proxyHost));
             }
         }
         
@@ -116,27 +117,27 @@ public class ConfigUpdateHandler extends FormHandler {
             String oldPort = _context.router().getConfigSetting(PROP_PROXY_PORT);
             if ( (oldPort == null) || (!_proxyPort.equals(oldPort)) ) {
                 _context.router().setConfigSetting(PROP_PROXY_PORT, _proxyPort);
-                addFormNotice(_("Updating proxy port to") + " " + _proxyPort);
+                addFormNotice(_("Updating proxy port to {0}", _proxyPort));
             }
         }
         
         _context.router().setConfigSetting(PROP_SHOULD_PROXY, "" + _updateThroughProxy);
         _context.router().setConfigSetting(PROP_UPDATE_UNSIGNED, "" + _updateUnsigned);
         
-        String oldFreqStr = _context.router().getConfigSetting(PROP_REFRESH_FREQUENCY);
-        long oldFreq = -1;
-        if (oldFreqStr != null) 
-            try { oldFreq = Long.parseLong(oldFreqStr); } catch (NumberFormatException nfe) {}
+        String oldFreqStr = _context.getProperty(PROP_REFRESH_FREQUENCY, DEFAULT_REFRESH_FREQUENCY);
+        long oldFreq = DEFAULT_REFRESH_FREQ;
+        try { oldFreq = Long.parseLong(oldFreqStr); } catch (NumberFormatException nfe) {}
         if (_refreshFrequency != oldFreq) {
             _context.router().setConfigSetting(PROP_REFRESH_FREQUENCY, ""+_refreshFrequency);
-            addFormNotice(_("Updating refresh frequency to") + " " + DataHelper.formatDuration2(_refreshFrequency));
+            addFormNotice(_("Updating refresh frequency to {0}",
+                            _refreshFrequency <= 0 ? _("Never") : DataHelper.formatDuration2(_refreshFrequency)));
         }
 
         if ( (_updatePolicy != null) && (_updatePolicy.length() > 0) ) {
             String oldPolicy = _context.router().getConfigSetting(PROP_UPDATE_POLICY);
             if ( (oldPolicy == null) || (!_updatePolicy.equals(oldPolicy)) ) {
                 _context.router().setConfigSetting(PROP_UPDATE_POLICY, _updatePolicy);
-                addFormNotice(_("Updating update policy to") + " " + _updatePolicy);
+                addFormNotice(_("Updating update policy to {0}", _updatePolicy));
             }
         }
 
@@ -152,7 +153,9 @@ public class ConfigUpdateHandler extends FormHandler {
         if ( (_trustedKeys != null) && (_trustedKeys.length() > 0) ) {
             _trustedKeys = _trustedKeys.replace("\r\n", ",").replace("\n", ",");
             String oldKeys = new TrustedUpdate(_context).getTrustedKeysString();
-            if ( (oldKeys == null) || (!_trustedKeys.equals(oldKeys)) ) {
+            oldKeys = oldKeys.replace("\r\n", ",");
+            if (!_trustedKeys.equals(oldKeys)) {
+                // note that keys are not validated here and no console error message will be generated
                 _context.router().setConfigSetting(PROP_TRUSTED_KEYS, _trustedKeys);
                 addFormNotice(_("Updating trusted keys."));
             }
@@ -162,7 +165,7 @@ public class ConfigUpdateHandler extends FormHandler {
             String oldURL = _context.router().getConfigSetting(PROP_ZIP_URL);
             if ( (oldURL == null) || (!_zipURL.equals(oldURL)) ) {
                 _context.router().setConfigSetting(PROP_ZIP_URL, _zipURL);
-                addFormNotice(_("Updating unsigned update URL to") + " " + _zipURL);
+                addFormNotice(_("Updating unsigned update URL to {0}", _zipURL));
             }
         }
         

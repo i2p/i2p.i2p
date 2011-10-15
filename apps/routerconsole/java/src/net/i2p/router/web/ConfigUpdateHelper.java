@@ -75,7 +75,7 @@ public class ConfigUpdateHelper extends HelperBase {
     public String getRefreshFrequencySelectBox() {
         String freq = _context.getProperty(ConfigUpdateHandler.PROP_REFRESH_FREQUENCY,
                                            ConfigUpdateHandler.DEFAULT_REFRESH_FREQUENCY);
-        long ms = -1;
+        long ms = ConfigUpdateHandler.DEFAULT_REFRESH_FREQ;
         try { 
             ms = Long.parseLong(freq);
         } catch (NumberFormatException nfe) {}
