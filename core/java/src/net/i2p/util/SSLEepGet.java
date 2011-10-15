@@ -43,6 +43,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -499,8 +501,18 @@ public class SSLEepGet extends EepGet {
         
         boolean strictSize = (_bytesRemaining >= 0);
 
+        Thread pusher = null;
+        _decompressException = null;
+        if (_isGzippedResponse) {
+            PipedInputStream pi = BigPipedInputStream.getInstance();
+            PipedOutputStream po = new PipedOutputStream(pi);
+            pusher = new I2PAppThread(new Gunzipper(pi, _out), "EepGet Decompressor");
+            _out = po;
+            pusher.start();
+        }
+
         int remaining = (int)_bytesRemaining;
-        byte buf[] = new byte[1024];
+        byte buf[] = new byte[16*1024];
         while (_keepFetching && ( (remaining > 0) || !strictSize ) && !_aborted) {
             int toRead = buf.length;
             if (strictSize && toRead > remaining)
@@ -557,6 +569,18 @@ public class SSLEepGet extends EepGet {
             _out.close();
         _out = null;
         
+        if (_isGzippedResponse) {
+            try {
+                pusher.join();
+            } catch (InterruptedException ie) {}
+            pusher = null;
+            if (_decompressException != null) {
+                // we can't resume from here
+                _keepFetching = false;
+                throw _decompressException;
+            }
+        }
+
         if (_aborted)
             throw new IOException("Timed out reading the HTTP data");
         

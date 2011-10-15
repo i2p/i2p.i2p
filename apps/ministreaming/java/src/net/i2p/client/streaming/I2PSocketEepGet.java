@@ -77,6 +77,19 @@ public class I2PSocketEepGet extends EepGet {
     }
 
     /**
+     *  Overridden to disable inline gunzipping
+     *  @since 0.8.10
+     */
+    @Override
+    protected void readHeaders() throws IOException {
+        try {
+            super.readHeaders();
+        } finally {
+            _isGzippedResponse = false;
+        }
+    }
+
+    /**
      *  Look up the address, get a socket from the I2PSocketManager supplied in the constructor,
      *  and send the request.
      *
