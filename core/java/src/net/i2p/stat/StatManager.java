@@ -150,6 +150,16 @@ public class StatManager {
         if (stat != null) stat.addData(data, eventDuration);
     }
 
+    /**
+     * Update the given rate statistic, taking note that the given data point was received (and recalculating all rates).
+     * Zero duration.
+     * @since 0.8.10
+     */
+    public void addRateData(String name, long data) {
+        RateStat stat = _rateStats.get(name); // unsynchronized
+        if (stat != null) stat.addData(data);
+    }
+
     private int coalesceCounter;
     /** every this many minutes for frequencies */
     private static final int FREQ_COALESCE_RATE = 9;

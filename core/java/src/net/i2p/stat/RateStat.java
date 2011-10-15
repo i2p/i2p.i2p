@@ -46,6 +46,17 @@ public class RateStat {
             r.addData(value, eventDuration);
     }
 
+    /** 
+     * Update all of the rates for the various periods with the given value.  
+     * Zero duration.
+     * @since 0.8.10
+     */
+    public void addData(long value) {
+        if (_statLog != null) _statLog.addData(_groupName, _statName, value, 0);
+        for (Rate r: _rates.values())
+            r.addData(value);
+    }
+
     /** coalesce all the stats */
     public void coalesceStats() {
         for (Rate r: _rates.values()){
