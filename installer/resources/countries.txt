@@ -49,6 +49,7 @@ CM,Cameroon
 CN,China
 CO,Colombia
 CR,Costa Rica
+CS,Serbia and Montenegro
 CU,Cuba
 CV,Cape Verde
 CX,Christmas Island
