@@ -302,7 +302,7 @@ class BuildExecutor implements Runnable {
 
                 //int realBuilt = 0;
                 TunnelManagerFacade mgr = _context.tunnelManager();
-                if ( (mgr == null) || (mgr.selectInboundTunnel() == null) || (mgr.selectOutboundTunnel() == null) ) {
+                if ( (mgr == null) || (mgr.getFreeTunnelCount() <= 0) || (mgr.getOutboundTunnelCount() <= 0) ) {
                     // we don't have either inbound or outbound tunnels, so don't bother trying to build
                     // non-zero-hop tunnels
                     synchronized (_currentlyBuilding) {
