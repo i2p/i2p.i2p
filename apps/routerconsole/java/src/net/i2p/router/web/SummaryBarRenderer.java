@@ -12,8 +12,8 @@ import net.i2p.router.RouterContext;
  *
  */
 public class SummaryBarRenderer {
-    private RouterContext _context;
-    private SummaryHelper _helper;
+    private final RouterContext _context;
+    private final SummaryHelper _helper;
 
     public SummaryBarRenderer(RouterContext context, SummaryHelper helper) {
         _context = context;
@@ -425,15 +425,17 @@ public class SummaryBarRenderer {
            .append(_("Message delay"))
            .append(":</b></td><td align=\"right\">")
            .append(_helper.getMessageDelay())
-           .append("</td></tr>\n" +
+           .append("</td></tr>\n");
 
-                   "<tr><td align=\"left\"><b>")
+        if (!_context.getBooleanPropertyDefaultTrue("router.disableTunnelTesting")) {
+            buf.append("<tr><td align=\"left\"><b>")
            .append(_("Tunnel lag"))
            .append(":</b></td><td align=\"right\">")
            .append(_helper.getTunnelLag())
-           .append("</td></tr>\n" +
+           .append("</td></tr>\n");
+        }
 
-                   "<tr><td align=\"left\"><b>")
+        buf.append("<tr><td align=\"left\"><b>")
            .append(_("Backlog"))
            .append(":</b></td><td align=\"right\">")
            .append(_helper.getInboundBacklog())
