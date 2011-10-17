@@ -928,24 +928,19 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
     public Set<LeaseSet> getLeases() {
         if (!_initialized) return null;
         Set leases = new HashSet();
-        Set keys = getDataStore().getKeys();
-        for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
-            Hash key = (Hash)iter.next();
-            DatabaseEntry o = getDataStore().get(key);
+        for (DatabaseEntry o : getDataStore().getEntries()) {
             if (o.getType() == DatabaseEntry.KEY_TYPE_LEASESET)
                 leases.add(o);
         }
         return leases;
     }
+
     /** public for NetDbRenderer in routerconsole */
     @Override
     public Set<RouterInfo> getRouters() {
         if (!_initialized) return null;
         Set routers = new HashSet();
-        Set keys = getDataStore().getKeys();
-        for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
-            Hash key = (Hash)iter.next();
-            DatabaseEntry o = getDataStore().get(key);
+        for (DatabaseEntry o : getDataStore().getEntries()) {
             if (o.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO)
                 routers.add(o);
         }
