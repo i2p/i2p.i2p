@@ -466,7 +466,7 @@ public class DataHelper {
     /** Read the stream for an integer as defined by the I2P data structure specification.
      * Integers are a fixed number of bytes (numBytes), stored as unsigned integers in network byte order.
      * @param rawStream stream to read from
-     * @param numBytes number of bytes to read and format into a number
+     * @param numBytes number of bytes to read and format into a number, 1 to 8
      * @throws DataFormatException if the stream doesn't contain a validly formatted number of that many bytes
      * @throws EOFException since 0.8.2, if there aren't enough bytes to read the number
      * @throws IOException if there is an IO error reading the number
@@ -508,10 +508,10 @@ public class DataHelper {
     
     /** Write an integer as defined by the I2P data structure specification to the stream.
      * Integers are a fixed number of bytes (numBytes), stored as unsigned integers in network byte order.
-     * @param value value to write out
+     * @param value value to write out, non-negative
      * @param rawStream stream to write to
      * @param numBytes number of bytes to write the number into (padding as necessary)
-     * @throws DataFormatException if the stream doesn't contain a validly formatted number of that many bytes
+     * @throws DataFormatException if value is negative
      * @throws IOException if there is an IO error writing to the stream
      */
     public static void writeLong(OutputStream rawStream, int numBytes, long value) 
@@ -862,7 +862,7 @@ public class DataHelper {
     }
 
     /**
-     *  Unlike eq(byte[], byte[]), this returns false if both lhs and rhs are null.
+     *  Unlike eq(byte[], byte[]), this returns false if either lhs or rhs is null.
      *  @throws AIOOBE if either array isn't long enough
      */
     public final static boolean eq(byte lhs[], int offsetLeft, byte rhs[], int offsetRight, int length) {
@@ -875,7 +875,11 @@ public class DataHelper {
         return true;
     }
     
-    /** treat bytes as unsigned */
+    /**
+     *  Big endian compare, treats bytes as unsigned.
+     *  Shorter arg is lesser.
+     *  Args may be null, null is less than non-null.
+     */
     public final static int compareTo(byte lhs[], byte rhs[]) {
         if ((rhs == null) && (lhs == null)) return 0;
         if (lhs == null) return -1;
@@ -890,6 +894,9 @@ public class DataHelper {
         return 0;
     }
 
+    /**
+     *  @return null if either arg is null or the args are not equal length
+     */
     public final static byte[] xor(byte lhs[], byte rhs[]) {
         if ((lhs == null) || (rhs == null) || (lhs.length != rhs.length)) return null;
         byte diff[] = new byte[lhs.length];
