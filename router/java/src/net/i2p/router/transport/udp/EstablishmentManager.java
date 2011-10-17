@@ -50,8 +50,16 @@ class EstablishmentManager {
     private final Object _activityLock;
     private int _activity;
     
-    private static final int DEFAULT_MAX_CONCURRENT_ESTABLISH = 10;
-    public static final String PROP_MAX_CONCURRENT_ESTABLISH = "i2np.udp.maxConcurrentEstablish";
+    /** max outbound in progress */
+    private static final int DEFAULT_MAX_CONCURRENT_ESTABLISH = 20;
+    private static final String PROP_MAX_CONCURRENT_ESTABLISH = "i2np.udp.maxConcurrentEstablish";
+
+    /** max pending outbound connections (waiting because we are at MAX_CONCURRENT_ESTABLISH) */
+    private static final int MAX_QUEUED_OUTBOUND = 50;
+
+    /** max queued msgs per peer while the peer connection is queued */
+    private static final int MAX_QUEUED_PER_PEER = 3;
+  
     
     public EstablishmentManager(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
@@ -118,9 +126,6 @@ class EstablishmentManager {
         return _context.getProperty(PROP_MAX_CONCURRENT_ESTABLISH, DEFAULT_MAX_CONCURRENT_ESTABLISH);
     }
     
-    private static final int MAX_QUEUED_OUTBOUND = 10*1000;
-    private static final int MAX_QUEUED_PER_PEER = 3;
-  
     /**
      * Send the message to its specified recipient by establishing a connection
      * with them and sending it off.  This call does not block, and on failure,
@@ -181,8 +186,11 @@ class EstablishmentManager {
                         // There are still races possible but this should prevent AIOOBE and NPE
                         synchronized (queued) {
                             queueCount = queued.size();
-                            if (queueCount < MAX_QUEUED_PER_PEER)
+                            if (queueCount < MAX_QUEUED_PER_PEER) {
                                 queued.add(msg);
+                                // increment for the stat below
+                                queueCount++;
+                            }
                             deferred = _queuedOutbound.size();
                         }
                     }
