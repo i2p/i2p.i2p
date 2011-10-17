@@ -1,3 +1,13 @@
+* 2011-10-17 zzz
+  * BuildExecutor: Efficiency tweak
+  * Console: Hide tunnel lag if tunnel testing is disabled
+  * NetDB: Fix rare NPE from netdb.jsp (ticket #539)
+  * Router: Change all shutdown CRITs to ERRORs; shutdown
+    the stat manager last to reduce chance of NPEs
+    (similar to that in tickets #534,535)
+  * SSU: Increase max concurrent outbound attempts;
+    fix udp.establishRejected stat
+
 * 2011-10-15 zzz
   * BuildExecutor: Add tunnel.buildConfigTime stat
   * configupdate.jsp:
