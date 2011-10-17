@@ -9,6 +9,7 @@ package net.i2p.router.networkdb.kademlia;
  */
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.HashSet;
@@ -56,24 +57,27 @@ class TransientDataStore implements DataStore {
         return _data.size();
     }
 
+    /**
+     *  @return Unmodifiable view, not a copy
+     */
     public Set<Hash> getKeys() {
-        return new HashSet(_data.keySet());
+        return Collections.unmodifiableSet(_data.keySet());
     }
     
     /**
-     *  @return not a copy
+     *  @return Unmodifiable view, not a copy
      *  @since 0.8.3
      */
     public Collection<DatabaseEntry> getEntries() {
-        return _data.values();
+        return Collections.unmodifiableCollection(_data.values());
     }
 
     /**
-     *  @return not a copy
+     *  @return Unmodifiable view, not a copy
      *  @since 0.8.3
      */
     public Set<Map.Entry<Hash, DatabaseEntry>> getMapEntries() {
-        return _data.entrySet();
+        return Collections.unmodifiableSet(_data.entrySet());
     }
 
     /** for PersistentDataStore only - don't use here @throws IAE always */
