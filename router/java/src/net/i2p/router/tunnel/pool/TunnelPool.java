@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.TreeSet;
 
+import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.Lease;
 import net.i2p.data.LeaseSet;
@@ -58,6 +59,8 @@ public class TunnelPool {
                     (_settings.isExploratory() ? "exploratory" : _settings.getDestinationNickname()) +
                     (_settings.isInbound() ? ".in" : ".out");
         refreshSettings();
+        ctx.statManager().createRateStat("tunnel.matchLease", "How often does our OBEP match their IBGW?", "Tunnels", 
+                                         new long[] {60*60*1000});
     }
     
     /**
@@ -143,6 +146,7 @@ public class TunnelPool {
      * the pool is configured to allow 0hop tunnels, this builds a fake one
      * and returns it.
      *
+     * @return null on failure, but it should always build and return a fallback
      */
     TunnelInfo selectTunnel() { return selectTunnel(true); }
 
@@ -219,6 +223,41 @@ public class TunnelPool {
             return selectTunnel(false); 
         else
             return null;
+    }
+    
+    /**
+     * Return the tunnel from the pool that is XOR-closet to the target.
+     * By using this instead of the random selectTunnel(),
+     * we force some locality in OBEP-IBGW connections to minimize
+     * those connections network-wide.
+     *
+     * Does not check for backlogged next peer.
+     * Does not return an expired tunnel.
+     *
+     * @return null on failure
+     * @since 0.8.10
+     */
+    TunnelInfo selectTunnel(Hash closestTo) {
+        boolean avoidZeroHop = ((getSettings().getLength() + getSettings().getLengthVariance()) > 0);
+        TunnelInfo rv = null;
+        synchronized (_tunnels) {
+            if (!_tunnels.isEmpty()) {
+                Collections.sort(_tunnels, new TunnelInfoComparator(closestTo, avoidZeroHop));
+                for (TunnelInfo info : _tunnels) {
+                    if (info.getExpiration() > _context.clock().now()) {
+                        rv = info;
+                        break;
+                    }
+                }
+            }
+        }
+        if (rv != null) {
+            _context.statManager().addRateData("tunnel.matchLease", closestTo.equals(rv) ? 1 : 0);
+        } else {
+            if (_log.shouldLog(Log.WARN))
+                _log.warn(toString() + ": No tunnels to select from");
+        }
+        return rv;
     }
     
     public TunnelInfo getTunnel(TunnelId gatewayId) {
@@ -492,6 +531,44 @@ public class TunnelPool {
     private static class LeaseComparator implements Comparator<Lease> {
          public int compare(Lease l, Lease r) {
              return r.getEndDate().compareTo(l.getEndDate());
+        }
+    }
+
+    /**
+     * Find the tunnel with the far-end that is XOR-closest to a given hash
+     *
+     * @since 0.8.10
+     */
+    private static class TunnelInfoComparator implements Comparator<TunnelInfo> {
+        private final byte[] _base;
+        private final boolean _avoidZero;
+
+        /**
+         * @param target key to compare distances with
+         * @param avoidZeroHop if true, zero-hop tunnels will be put last
+         */
+        public TunnelInfoComparator(Hash target, boolean avoidZeroHop) {
+            _base = target.getData();
+            _avoidZero = avoidZeroHop;
+        }
+
+        public int compare(TunnelInfo lhs, TunnelInfo rhs) {
+            if (_avoidZero) {
+                // put the zero-hops last
+                int llen = lhs.getLength();
+                int rlen = rhs.getLength();
+                if (llen > 1 && rlen <= 1)
+                    return -1;
+                if (rlen > 1 && llen <= 1)
+                    return 1;
+            }
+            byte lhsDelta[] = DataHelper.xor(lhs.getFarEnd().getData(), _base);
+            byte rhsDelta[] = DataHelper.xor(rhs.getFarEnd().getData(), _base);
+            int rv = DataHelper.compareTo(lhsDelta, rhsDelta);
+            if (rv != 0)
+                return rv;
+            // latest-expiring first as a tie-breaker
+            return (int) (rhs.getExpiration() - lhs.getExpiration());
         }
     }
 

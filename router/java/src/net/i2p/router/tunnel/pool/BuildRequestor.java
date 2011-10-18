@@ -55,6 +55,7 @@ abstract class BuildRequestor {
      *  to send an inbound build request.
      *  This is more secure than using the router's exploratory tunnels, as it
      *  makes correlation of multiple clients more difficult.
+     *  @return true always
      */
     private static boolean usePairedTunnels(RouterContext ctx) {
         return true;
@@ -100,25 +101,26 @@ abstract class BuildRequestor {
         cfg.setTunnelPool(pool);
         
         TunnelInfo pairedTunnel = null;
+        Hash farEnd = cfg.getFarEnd();
         if (pool.getSettings().isExploratory() || !usePairedTunnels(ctx)) {
             if (pool.getSettings().isInbound())
-                pairedTunnel = ctx.tunnelManager().selectOutboundTunnel();
+                pairedTunnel = ctx.tunnelManager().selectOutboundExploratoryTunnel(farEnd);
             else
-                pairedTunnel = ctx.tunnelManager().selectInboundTunnel();
+                pairedTunnel = ctx.tunnelManager().selectInboundExploratoryTunnel(farEnd);
         } else {
             if (pool.getSettings().isInbound())
-                pairedTunnel = ctx.tunnelManager().selectOutboundTunnel(pool.getSettings().getDestination());
+                pairedTunnel = ctx.tunnelManager().selectOutboundTunnel(pool.getSettings().getDestination(), farEnd);
             else
-                pairedTunnel = ctx.tunnelManager().selectInboundTunnel(pool.getSettings().getDestination());
+                pairedTunnel = ctx.tunnelManager().selectInboundTunnel(pool.getSettings().getDestination(), farEnd);
         }
         if (pairedTunnel == null) {   
             if (log.shouldLog(Log.WARN))
                 log.warn("Couldn't find a paired tunnel for " + cfg + ", fall back on exploratory tunnels for pairing");
             if (!pool.getSettings().isExploratory() && usePairedTunnels(ctx))
                 if (pool.getSettings().isInbound())
-                    pairedTunnel = ctx.tunnelManager().selectOutboundTunnel();
+                    pairedTunnel = ctx.tunnelManager().selectOutboundExploratoryTunnel(farEnd);
                 else
-                    pairedTunnel = ctx.tunnelManager().selectInboundTunnel();
+                    pairedTunnel = ctx.tunnelManager().selectInboundExploratoryTunnel(farEnd);
         }
         if (pairedTunnel == null) {
             if (log.shouldLog(Log.ERROR))

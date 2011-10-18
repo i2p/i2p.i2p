@@ -19,7 +19,7 @@ import net.i2p.router.TunnelInfo;
 import net.i2p.util.Log;
 
 /**
- * send a netDb lookup to a random floodfill peer - if it is found, great,
+ * Send a netDb lookup to a floodfill peer - If it is found, great,
  * but if they reply back saying they dont know it, queue up a store of the
  * key to a random floodfill peer again (via FloodfillStoreJob)
  *
@@ -92,9 +92,9 @@ public class FloodfillVerifyStoreJob extends JobImpl {
         // Unless it is an encrypted leaseset.
         TunnelInfo outTunnel;
         if (_isRouterInfo || getContext().keyRing().get(_key) != null)
-            outTunnel = getContext().tunnelManager().selectOutboundTunnel();
+            outTunnel = getContext().tunnelManager().selectOutboundExploratoryTunnel(_target);
         else
-            outTunnel = getContext().tunnelManager().selectOutboundTunnel(_key);
+            outTunnel = getContext().tunnelManager().selectOutboundTunnel(_key, _target);
         if (outTunnel == null) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("No outbound tunnels to verify a store");
@@ -153,9 +153,9 @@ public class FloodfillVerifyStoreJob extends JobImpl {
         // Unless it is an encrypted leaseset.
         TunnelInfo replyTunnelInfo;
         if (_isRouterInfo || getContext().keyRing().get(_key) != null)
-            replyTunnelInfo = getContext().tunnelManager().selectInboundTunnel();
+            replyTunnelInfo = getContext().tunnelManager().selectInboundExploratoryTunnel(_target);
         else
-            replyTunnelInfo = getContext().tunnelManager().selectInboundTunnel(_key);
+            replyTunnelInfo = getContext().tunnelManager().selectInboundTunnel(_key, _target);
         if (replyTunnelInfo == null) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("No inbound tunnels to get a reply from!");

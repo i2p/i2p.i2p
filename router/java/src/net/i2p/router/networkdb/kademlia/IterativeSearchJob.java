@@ -191,8 +191,8 @@ class IterativeSearchJob extends FloodSearchJob {
      */
     private void sendQuery(Hash peer) {
             DatabaseLookupMessage dlm = new DatabaseLookupMessage(getContext(), true);
-            TunnelInfo replyTunnel = getContext().tunnelManager().selectInboundTunnel();
-            TunnelInfo outTunnel = getContext().tunnelManager().selectOutboundTunnel();
+            TunnelInfo replyTunnel = getContext().tunnelManager().selectInboundExploratoryTunnel(peer);
+            TunnelInfo outTunnel = getContext().tunnelManager().selectOutboundExploratoryTunnel(peer);
             if ( (replyTunnel == null) || (outTunnel == null) ) {
                 failed();
                 return;

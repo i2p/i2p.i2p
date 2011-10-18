@@ -32,15 +32,18 @@ import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 import net.i2p.util.VersionComparator;
 
+/**
+ *  Unused directly - see FloodfillStoreJob
+ */
 class StoreJob extends JobImpl {
-    protected Log _log;
+    protected final Log _log;
     private KademliaNetworkDatabaseFacade _facade;
-    protected StoreState _state;
-    private Job _onSuccess;
-    private Job _onFailure;
+    protected final StoreState _state;
+    private final Job _onSuccess;
+    private final Job _onFailure;
     private long _timeoutMs;
-    private long _expiration;
-    private PeerSelector _peerSelector;
+    private final long _expiration;
+    private final PeerSelector _peerSelector;
 
     private final static int PARALLELIZATION = 4; // how many sent at a time
     private final static int REDUNDANCY = 4; // we want the data sent to 6 peers
@@ -308,7 +311,7 @@ class StoreJob extends JobImpl {
      *
      */
     private void sendDirect(DatabaseStoreMessage msg, RouterInfo peer, long expiration) {
-        long token = getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE);
+        long token = 1 + getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE);
         msg.setReplyToken(token);
         msg.setReplyGateway(getContext().routerHash());
 
@@ -343,9 +346,10 @@ class StoreJob extends JobImpl {
      *
      */
     private void sendStoreThroughGarlic(DatabaseStoreMessage msg, RouterInfo peer, long expiration) {
-        long token = getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE);
+        long token = 1 + getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE);
         
-        TunnelInfo replyTunnel = selectInboundTunnel();
+        Hash to = peer.getIdentity().getHash();
+        TunnelInfo replyTunnel = getContext().tunnelManager().selectInboundExploratoryTunnel(to);
         if (replyTunnel == null) {
             _log.warn("No reply inbound tunnels available!");
             return;
@@ -358,9 +362,9 @@ class StoreJob extends JobImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": send(dbStore) w/ token expected " + token);
         
-        _state.addPending(peer.getIdentity().getHash());
+        _state.addPending(to);
         
-        TunnelInfo outTunnel = selectOutboundTunnel();
+        TunnelInfo outTunnel = getContext().tunnelManager().selectOutboundExploratoryTunnel(to);
         if (outTunnel != null) {
             //if (_log.shouldLog(Log.DEBUG))
             //    _log.debug(getJobId() + ": Sending tunnel message out " + outTunnelId + " to " 
@@ -375,7 +379,7 @@ class StoreJob extends JobImpl {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("sending store to " + peer.getIdentity().getHash() + " through " + outTunnel + ": " + msg);
             getContext().messageRegistry().registerPending(selector, onReply, onFail, (int)(expiration - getContext().clock().now()));
-            getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnel.getSendTunnelId(0), null, peer.getIdentity().getHash());
+            getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnel.getSendTunnelId(0), null, to);
         } else {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("No outbound tunnels to send a dbStore out!");
@@ -383,14 +387,6 @@ class StoreJob extends JobImpl {
         }
     }
     
-    private TunnelInfo selectOutboundTunnel() {
-        return getContext().tunnelManager().selectOutboundTunnel();
-    }
- 
-    private TunnelInfo selectInboundTunnel() {
-        return getContext().tunnelManager().selectInboundTunnel();
-    }
- 
     /**
      * Send a leaseset store message out the client tunnel,
      * with the reply to come back through a client tunnel.
@@ -408,10 +404,11 @@ class StoreJob extends JobImpl {
      * @since 0.7.10
      */
     private void sendStoreThroughClient(DatabaseStoreMessage msg, RouterInfo peer, long expiration) {
-        long token = getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE);
+        long token = 1 + getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE);
         Hash client = msg.getKey();
 
-        TunnelInfo replyTunnel = getContext().tunnelManager().selectInboundTunnel(client);
+        Hash to = peer.getIdentity().getHash();
+        TunnelInfo replyTunnel = getContext().tunnelManager().selectInboundTunnel(client, to);
         if (replyTunnel == null) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("No reply inbound tunnels available!");
@@ -426,8 +423,7 @@ class StoreJob extends JobImpl {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug(getJobId() + ": send(dbStore) w/ token expected " + token);
 
-        Hash to = peer.getIdentity().getHash();
-        TunnelInfo outTunnel = getContext().tunnelManager().selectOutboundTunnel(client);
+        TunnelInfo outTunnel = getContext().tunnelManager().selectOutboundTunnel(client, to);
         if (outTunnel != null) {
             I2NPMessage sent;
             boolean shouldEncrypt = supportsEncryption(peer);

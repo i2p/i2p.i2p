@@ -84,7 +84,11 @@ public class TunnelPoolManager implements TunnelManagerFacade {
                                          RATES);
     }
     
-    /** pick an inbound tunnel not bound to a particular destination */
+    /**
+     * Pick a random inbound exploratory tunnel
+     *
+     * @return null if none
+     */
     public TunnelInfo selectInboundTunnel() { 
         TunnelPool pool = _inboundExploratory;
         if (pool == null) return null;
@@ -97,7 +101,12 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         return info;
     }
     
-    /** pick an inbound tunnel bound to the given destination */
+    /**
+     * Pick a random inbound tunnel from the given destination's pool
+     *
+     * @param destination if null, returns inbound exploratory tunnel
+     * @return null if none
+     */
     public TunnelInfo selectInboundTunnel(Hash destination) { 
         if (destination == null) return selectInboundTunnel();
         TunnelPool pool = _clientInboundPools.get(destination);
@@ -105,12 +114,16 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             return pool.selectTunnel();
         }
         if (_log.shouldLog(Log.ERROR))
-            _log.error("Want the inbound tunnel for " + destination.calculateHash().toBase64() +
+            _log.error("Want the inbound tunnel for " + destination.calculateHash() +
                      " but there isn't a pool?");
         return null;
     }
     
-    /** pick an outbound tunnel not bound to a particular destination */
+    /**
+     * Pick a random outbound exploratory tunnel
+     *
+     * @return null if none
+     */
     public TunnelInfo selectOutboundTunnel() { 
         TunnelPool pool = _outboundExploratory;
         if (pool == null) return null;
@@ -123,12 +136,106 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         return info;
     }
     
-    /** pick an outbound tunnel bound to the given destination */
+    /**
+     * Pick a random outbound tunnel from the given destination's pool
+     *
+     * @param destination if null, returns outbound exploratory tunnel
+     * @return null if none
+     */
     public TunnelInfo selectOutboundTunnel(Hash destination)  {
         if (destination == null) return selectOutboundTunnel();
         TunnelPool pool = _clientOutboundPools.get(destination);
         if (pool != null) {
             return pool.selectTunnel();
+        }
+        return null;
+    }
+    
+    /**
+     * Pick the inbound exploratory tunnel with the gateway closest to the given hash.
+     * By using this instead of the random selectTunnel(),
+     * we force some locality in OBEP-IBGW connections to minimize
+     * those connections network-wide.
+     *
+     * @param closestTo non-null
+     * @return null if none
+     * @since 0.8.10
+     */
+    public TunnelInfo selectInboundExploratoryTunnel(Hash closestTo) { 
+        TunnelPool pool = _inboundExploratory;
+        if (pool == null) return null;
+        TunnelInfo info = pool.selectTunnel(); 
+        if (info == null) {
+            _inboundExploratory.buildFallback();
+            // still can be null, but probably not
+            info = _inboundExploratory.selectTunnel(closestTo);
+        }
+        return info;
+    }
+    
+    /**
+     * Pick the inbound tunnel with the gateway closest to the given hash
+     * from the given destination's pool.
+     * By using this instead of the random selectTunnel(),
+     * we force some locality in OBEP-IBGW connections to minimize
+     * those connections network-wide.
+     *
+     * @param destination if null, returns inbound exploratory tunnel
+     * @param closestTo non-null
+     * @return null if none
+     * @since 0.8.10
+     */
+    public TunnelInfo selectInboundTunnel(Hash destination, Hash closestTo) { 
+        if (destination == null) return selectInboundExploratoryTunnel(closestTo);
+        TunnelPool pool = _clientInboundPools.get(destination);
+        if (pool != null) {
+            return pool.selectTunnel(closestTo);
+        }
+        if (_log.shouldLog(Log.ERROR))
+            _log.error("Want the inbound tunnel for " + destination.calculateHash() +
+                     " but there isn't a pool?");
+        return null;
+    }
+    
+    /**
+     * Pick the outbound exploratory tunnel with the endpoint closest to the given hash.
+     * By using this instead of the random selectTunnel(),
+     * we force some locality in OBEP-IBGW connections to minimize
+     * those connections network-wide.
+     *
+     * @param closestTo non-null
+     * @return null if none
+     * @since 0.8.10
+     */
+    public TunnelInfo selectOutboundExploratoryTunnel(Hash closestTo) { 
+        TunnelPool pool = _outboundExploratory;
+        if (pool == null) return null;
+        TunnelInfo info = pool.selectTunnel();
+        if (info == null) {
+            pool.buildFallback();
+            // still can be null, but probably not
+            info = pool.selectTunnel(closestTo);
+        }
+        return info;
+    }
+    
+    /**
+     * Pick the outbound tunnel with the endpoint closest to the given hash
+     * from the given destination's pool.
+     * By using this instead of the random selectTunnel(),
+     * we force some locality in OBEP-IBGW connections to minimize
+     * those connections network-wide.
+     *
+     * @param destination if null, returns outbound exploratory tunnel
+     * @param closestTo non-null
+     * @return null if none
+     * @since 0.8.10
+     */
+    public TunnelInfo selectOutboundTunnel(Hash destination, Hash closestTo) {
+        if (destination == null) return selectOutboundExploratoryTunnel(closestTo);
+        TunnelPool pool = _clientOutboundPools.get(destination);
+        if (pool != null) {
+            return pool.selectTunnel(closestTo);
         }
         return null;
     }
@@ -151,12 +258,15 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         return null;
     }
     
+    /** @return number of inbound exploratory tunnels */
     public int getFreeTunnelCount() { 
         if (_inboundExploratory == null)
             return 0;
         else
             return _inboundExploratory.size(); 
     }
+
+    /** @return number of outbound exploratory tunnels */
     public int getOutboundTunnelCount() { 
         if (_outboundExploratory == null)
             return 0;
@@ -355,7 +465,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     void buildComplete(PooledTunnelCreatorConfig cfg) {
         if (cfg.getLength() > 1 &&
             (!_context.router().gracefulShutdownInProgress()) &&
-            !Boolean.valueOf(_context.getProperty("router.disableTunnelTesting")).booleanValue()) {
+            !_context.getBooleanPropertyDefaultTrue("router.disableTunnelTesting")) {
             TunnelPool pool = cfg.getTunnelPool();
             if (pool == null) {
                 // never seen this before, do we reallly need to bother

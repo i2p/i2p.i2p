@@ -38,17 +38,17 @@ import net.i2p.util.Log;
  * It also does not update peer profile stats.
  */
 class SearchJob extends JobImpl {
-    protected Log _log;
-    protected KademliaNetworkDatabaseFacade _facade;
-    private SearchState _state;
-    private Job _onSuccess;
-    private Job _onFailure;
-    private long _expiration;
-    private long _timeoutMs;
-    private boolean _keepStats;
-    private boolean _isLease;
+    protected final Log _log;
+    protected final KademliaNetworkDatabaseFacade _facade;
+    private final SearchState _state;
+    private final Job _onSuccess;
+    private final Job _onFailure;
+    private final long _expiration;
+    private final long _timeoutMs;
+    private final boolean _keepStats;
+    private final boolean _isLease;
     private Job _pendingRequeueJob;
-    private PeerSelector _peerSelector;
+    private final PeerSelector _peerSelector;
     private final List _deferredSearches;
     private boolean _deferredCleared;
     private long _startedOn;
@@ -89,7 +89,7 @@ class SearchJob extends JobImpl {
         super(context);
         if ( (key == null) || (key.getData() == null) ) 
             throw new IllegalArgumentException("Search for null key?  wtf");
-        _log = getContext().logManager().getLog(SearchJob.class);
+        _log = getContext().logManager().getLog(getClass());
         _facade = facade;
         _state = new SearchState(getContext(), key);
         _onSuccess = onSuccess;
@@ -98,11 +98,8 @@ class SearchJob extends JobImpl {
         _keepStats = keepStats;
         _isLease = isLease;
         _deferredSearches = new ArrayList(0);
-        _deferredCleared = false;
         _peerSelector = facade.getPeerSelector();
         _startedOn = -1;
-        _floodfillPeersExhausted = false;
-        _floodfillSearchesOutstanding = 0;
         _expiration = getContext().clock().now() + timeoutMs;
         getContext().statManager().addRateData("netDb.searchCount", 1, 0);
         if (_log.shouldLog(Log.DEBUG))
@@ -405,7 +402,8 @@ class SearchJob extends JobImpl {
      *
      */
     protected void sendLeaseSearch(RouterInfo router) {
-        TunnelInfo inTunnel = getInboundTunnelId(); 
+        Hash to = router.getIdentity().getHash();
+        TunnelInfo inTunnel = getContext().tunnelManager().selectInboundExploratoryTunnel(to);
         if (inTunnel == null) {
             _log.warn("No tunnels to get search replies through!  wtf!");
             getContext().jobQueue().addJob(new FailedJob(getContext(), router));
@@ -423,12 +421,12 @@ class SearchJob extends JobImpl {
         //    return;
         //}
 	
-        int timeout = getPerPeerTimeoutMs(router.getIdentity().getHash());
+        int timeout = getPerPeerTimeoutMs(to);
         long expiration = getContext().clock().now() + timeout;
 
         DatabaseLookupMessage msg = buildMessage(inTunnelId, inTunnel.getPeer(0), expiration);	
 	
-        TunnelInfo outTunnel = getOutboundTunnelId();
+        TunnelInfo outTunnel = getContext().tunnelManager().selectOutboundExploratoryTunnel(to);
         if (outTunnel == null) {
             _log.warn("No tunnels to send search out through!  wtf!");
             getContext().jobQueue().addJob(new FailedJob(getContext(), router));
@@ -438,7 +436,7 @@ class SearchJob extends JobImpl {
 
 	
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug(getJobId() + ": Sending search to " + router.getIdentity().getHash().toBase64() 
+            _log.debug(getJobId() + ": Sending search to " + to
                        + " for " + msg.getSearchKey().toBase64() + " w/ replies through [" 
                        + msg.getFrom().toBase64() + "] via tunnel [" 
                        + msg.getReplyTunnel() + "]");
@@ -450,7 +448,7 @@ class SearchJob extends JobImpl {
         if (FloodfillNetworkDatabaseFacade.isFloodfill(router))
             _floodfillSearchesOutstanding++;
         getContext().messageRegistry().registerPending(sel, reply, new FailedJob(getContext(), router), timeout);
-        getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnelId, router.getIdentity().getHash());
+        getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnelId, to);
     }
     
     /** we're searching for a router, so we can just send direct */
@@ -476,23 +474,6 @@ class SearchJob extends JobImpl {
     }
 **********/
     
-    /** 
-     * what tunnel will we send the search out through? 
-     *
-     * @return tunnel id (or null if none are found)
-     */
-    private TunnelInfo getOutboundTunnelId() {
-        return getContext().tunnelManager().selectOutboundTunnel();
-    }
-    
-    /**
-     * what tunnel will we get replies through?
-     *
-     * @return tunnel id (or null if none are found)
-     */
-    private TunnelInfo getInboundTunnelId() {
-        return getContext().tunnelManager().selectInboundTunnel();
-    }
 
     /**
      * Build the database search message 
@@ -664,19 +645,20 @@ class SearchJob extends JobImpl {
      * provide us with the data when we asked them.  
      */
     private boolean resend(RouterInfo toPeer, LeaseSet ls) {
+        Hash to = toPeer.getIdentity().getHash();
         DatabaseStoreMessage msg = new DatabaseStoreMessage(getContext());
         msg.setEntry(ls);
         msg.setMessageExpiration(getContext().clock().now() + RESEND_TIMEOUT);
 
-        TunnelInfo outTunnel = getContext().tunnelManager().selectOutboundTunnel();
+        TunnelInfo outTunnel = getContext().tunnelManager().selectOutboundExploratoryTunnel(to);
 
         if (outTunnel != null) {
             TunnelId targetTunnelId = null; // not needed
             Job onSend = null; // not wanted
             
             if (_log.shouldLog(Log.DEBUG))
-                _log.debug("resending leaseSet out to " + toPeer.getIdentity().getHash() + " through " + outTunnel + ": " + msg);
-            getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnel.getSendTunnelId(0), null, toPeer.getIdentity().getHash());
+                _log.debug("resending leaseSet out to " + to + " through " + outTunnel + ": " + msg);
+            getContext().tunnelDispatcher().dispatchOutbound(msg, outTunnel.getSendTunnelId(0), null, to);
             return true;
         } else {
             if (_log.shouldLog(Log.WARN))

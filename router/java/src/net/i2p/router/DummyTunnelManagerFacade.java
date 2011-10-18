@@ -30,6 +30,11 @@ class DummyTunnelManagerFacade implements TunnelManagerFacade {
     public TunnelInfo selectInboundTunnel(Hash destination) { return null; } 
     public TunnelInfo selectOutboundTunnel() { return null; }
     public TunnelInfo selectOutboundTunnel(Hash destination) { return null; }
+    public TunnelInfo selectInboundExploratoryTunnel(Hash closestTo) { return null; }
+    public TunnelInfo selectInboundTunnel(Hash destination, Hash closestTo) { return null; } 
+    public TunnelInfo selectOutboundExploratoryTunnel(Hash closestTo) { return null; }
+    public TunnelInfo selectOutboundTunnel(Hash destination, Hash closestTo) { return null; }
+
     public boolean isValidTunnel(Hash client, TunnelInfo tunnel) { return false; }
     public int getParticipatingCount() { return 0; }
     public int getFreeTunnelCount() { return 0; }

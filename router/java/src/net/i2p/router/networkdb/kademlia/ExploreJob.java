@@ -53,7 +53,6 @@ class ExploreJob extends SearchJob {
         // if this collides with an actual leaseSet's key, neat, but that wouldn't imply we're actually
         // attempting to send that lease a message!
         super(context, facade, key, null, null, MAX_EXPLORE_TIME, false, false);
-        _log = context.logManager().getLog(ExploreJob.class);
         _peerSelector = (FloodfillPeerSelector) (_facade.getPeerSelector());
     }
     

@@ -22,6 +22,7 @@ import net.i2p.router.tunnel.pool.TunnelPool;
  *
  */ 
 public interface TunnelManagerFacade extends Service {
+
     /**
      * Retrieve the information related to a particular tunnel
      *
@@ -29,15 +30,89 @@ public interface TunnelManagerFacade extends Service {
      *
      */
     TunnelInfo getTunnelInfo(TunnelId id);
-    /** pick an inbound tunnel not bound to a particular destination */
+
+    /**
+     * Pick a random inbound exploratory tunnel
+     *
+     * @return null if none
+     */
     TunnelInfo selectInboundTunnel();
-    /** pick an inbound tunnel bound to the given destination */
+
+    /**
+     * Pick a random inbound tunnel from the given destination's pool
+     *
+     * @param destination if null, returns inbound exploratory tunnel
+     * @return null if none
+     */
     TunnelInfo selectInboundTunnel(Hash destination);
-    /** pick an outbound tunnel not bound to a particular destination */
+
+    /**
+     * Pick a random outbound exploratory tunnel
+     *
+     * @return null if none
+     */
     TunnelInfo selectOutboundTunnel();
-    /** pick an outbound tunnel bound to the given destination */
+
+    /**
+     * Pick a random outbound tunnel from the given destination's pool
+     *
+     * @param destination if null, returns outbound exploratory tunnel
+     * @return null if none
+     */
     TunnelInfo selectOutboundTunnel(Hash destination);
     
+    /**
+     * Pick the inbound exploratory tunnel with the gateway closest to the given hash.
+     * By using this instead of the random selectTunnel(),
+     * we force some locality in OBEP-IBGW connections to minimize
+     * those connections network-wide.
+     *
+     * @param closestTo non-null
+     * @return null if none
+     * @since 0.8.10
+     */
+    public TunnelInfo selectInboundExploratoryTunnel(Hash closestTo); 
+    
+    /**
+     * Pick the inbound tunnel with the gateway closest to the given hash
+     * from the given destination's pool.
+     * By using this instead of the random selectTunnel(),
+     * we force some locality in OBEP-IBGW connections to minimize
+     * those connections network-wide.
+     *
+     * @param destination if null, returns inbound exploratory tunnel
+     * @param closestTo non-null
+     * @return null if none
+     * @since 0.8.10
+     */
+    public TunnelInfo selectInboundTunnel(Hash destination, Hash closestTo);
+    
+    /**
+     * Pick the outbound exploratory tunnel with the endpoint closest to the given hash.
+     * By using this instead of the random selectTunnel(),
+     * we force some locality in OBEP-IBGW connections to minimize
+     * those connections network-wide.
+     *
+     * @param closestTo non-null
+     * @return null if none
+     * @since 0.8.10
+     */
+    public TunnelInfo selectOutboundExploratoryTunnel(Hash closestTo);
+    
+    /**
+     * Pick the outbound tunnel with the endpoint closest to the given hash
+     * from the given destination's pool.
+     * By using this instead of the random selectTunnel(),
+     * we force some locality in OBEP-IBGW connections to minimize
+     * those connections network-wide.
+     *
+     * @param destination if null, returns outbound exploratory tunnel
+     * @param closestTo non-null
+     * @return null if none
+     * @since 0.8.10
+     */
+    public TunnelInfo selectOutboundTunnel(Hash destination, Hash closestTo);
+
     /** Is a tunnel a valid member of the pool? */
     public boolean isValidTunnel(Hash client, TunnelInfo tunnel);
     

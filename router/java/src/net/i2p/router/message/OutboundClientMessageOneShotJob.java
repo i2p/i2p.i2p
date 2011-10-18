@@ -835,13 +835,14 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
      * Pick an arbitrary outbound tunnel to send the message through, or null if
      * there aren't any around
      *
-     * TODO - rather than pick one at random, pick the "closest" to the lease,
+     * Rather than pick one at random, pick the "closest" to the lease,
      * to minimize network OBEP - IBGW connections?
      * This would also eliminate a connection when OBEP == IBGW.
      * Anonymity issues?
      */
     private TunnelInfo selectOutboundTunnel() {
-        return getContext().tunnelManager().selectOutboundTunnel(_from.calculateHash());
+        Hash gw = _lease.getGateway();
+        return getContext().tunnelManager().selectOutboundTunnel(_from.calculateHash(), gw);
     }
 
     /**
