@@ -121,7 +121,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
      * limits for accepting a dbDtore of a router (unless we dont 
      * know anyone or just started up) -- see validate() below
      */
-    private final static long ROUTER_INFO_EXPIRATION = 36*60*60*1000l;
+    private final static long ROUTER_INFO_EXPIRATION = 27*60*60*1000l;
     private final static long ROUTER_INFO_EXPIRATION_MIN = 90*60*1000l;
     private final static long ROUTER_INFO_EXPIRATION_SHORT = 75*60*1000l;
     private final static long ROUTER_INFO_EXPIRATION_FLOODFILL = 60*60*1000l;

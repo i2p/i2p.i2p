@@ -1,3 +1,6 @@
+* 2011-10-19 zzz
+  * NetDB: Reduce RI max expiration again
+
 * 2011-10-18 zzz
   * StoreJob: Ensure nonzero token
   * Tunnels: Connection limit mitigation:
