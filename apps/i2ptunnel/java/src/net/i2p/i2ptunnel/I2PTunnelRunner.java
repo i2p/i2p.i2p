@@ -143,6 +143,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
             InputStream i2pin = i2ps.getInputStream();
             OutputStream i2pout = i2ps.getOutputStream(); //new BufferedOutputStream(i2ps.getOutputStream(), MAX_PACKET_SIZE);
             if (initialI2PData != null) {
+                // why synchronize this? we could be in here a LONG time for large initial data
                 synchronized (slock) {
                     // this does not increment totalSent
                     i2pout.write(initialI2PData);
@@ -182,8 +183,11 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug("runner has a timeout job, totalReceived = " + totalReceived
                                + " totalSent = " + totalSent + " job = " + onTimeout);
-                // should we only look at totalReceived?
-                if ( (totalSent <= 0) && (totalReceived <= 0) )
+                // Run even if totalSent > 0, as that's probably POST data.
+                // This will be run even if initialSocketData != null, it's the timeout job's
+                // responsibility to know that and decide whether or not to write to the socket.
+                // HTTPClient never sets initialSocketData.
+                if (totalReceived <= 0)
                     onTimeout.run();
             }
             
@@ -234,7 +238,7 @@ public class I2PTunnelRunner extends I2PAppThread implements I2PSocket.SocketErr
     }
     
     protected void close(OutputStream out, InputStream in, OutputStream i2pout, InputStream i2pin,
-                         Socket s, I2PSocket i2ps, Thread t1, Thread t2) throws InterruptedException, IOException {
+                         Socket s, I2PSocket i2ps, Thread t1, Thread t2) throws InterruptedException {
         try { 
             out.flush(); 
         } catch (IOException ioe) { 

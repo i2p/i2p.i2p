@@ -1,4 +1,5 @@
 * 2011-10-19 zzz
+  * I2PTunnel: Fix timeout message on POST (ticket #   )
   * NetDB: Reduce RI max expiration again
 
 * 2011-10-18 zzz
