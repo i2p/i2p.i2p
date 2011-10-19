@@ -1,18 +1,14 @@
 <!--
-<i2p.news date="$Date: 2011-10-11 00:00:00 $">
-<i2p.release version="0.8.9" date="2011/10/11" minVersion="0.6" />
+<i2p.news date="$Date: 2011-10-20 00:00:00 $">
+<i2p.release version="0.8.10" date="2011/10/20" minVersion="0.6" />
 -->
 <div lang="en">
-<h3>2011-10-11: <b>0.8.9 <a href="http://www.i2p2.i2p/release-0.8.9.html">Released</a></b></h3>
+<h3>2011-10-20: <b>0.8.10 <a href="http://www.i2p2.i2p/release-0.8.10.html">Released</a></b></h3>
 
 <p>
-The 0.8.9 release has several performance improvements, and many changes to handle
-the continued rapid growth of the network. It uses a new iterative method for
-Kademlia network database lookups that should be more reliable and efficient.
-There are also several improvements to our SSU (UDP) transport protocol that
-should help reliability and efficiency. We have made several changes to
-improve tunnel build success rates. And, of course, there are lots of bug
-fixes and translation updates.
+Release 0.8.10 includes two changes intended to reduce the number of router-to-router connections,
+and therefore improve tunnel build success rates and general reliability.
+Of course, there's also a few bug fixes and translation updates.
 </p><p>
 The network has grown quite rapidly in recent weeks, and that's great news,
 but it has caused some instability. We welcome all our new users and we

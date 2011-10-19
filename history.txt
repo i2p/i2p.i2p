@@ -1,11 +1,13 @@
-* 2011-10-19 kytv
+* 2011-10-20 0.8.10 released
+
+2011-10-19 kytv
   * Update Italian translation from Transifex (thanks danimoth)
 
-* 2011-10-19 zzz
-  * I2PTunnel: Fix timeout message on POST (ticket #   )
+2011-10-19 zzz
+  * I2PTunnel: Fix timeout message on POST (ticket #531)
   * NetDB: Reduce RI max expiration again
 
-* 2011-10-18 zzz
+2011-10-18 zzz
   * StoreJob: Ensure nonzero token
   * Tunnels: Connection limit mitigation:
     - Disable tunnel testing
@@ -13,7 +15,7 @@
     - Use closest-selection in NetDB lookups, stores, and verifies;
       OCMOSJ; and in BuildRequestor
 
-* 2011-10-17 zzz
+2011-10-17 zzz
   * BuildExecutor: Efficiency tweak
   * Console: Hide tunnel lag if tunnel testing is disabled
   * NetDB: Fix rare NPE from netdb.jsp (ticket #539)
@@ -23,7 +25,7 @@
   * SSU: Increase max concurrent outbound attempts;
     fix udp.establishRejected stat
 
-* 2011-10-15 zzz
+2011-10-15 zzz
   * BuildExecutor: Add tunnel.buildConfigTime stat
   * configupdate.jsp:
     - Fix setting to 'never' (ticket #523)
@@ -49,9 +51,9 @@
   * SSLEepGet:
     - Add gunzip support
     - Increase buffer size
-  * SSU: Fix concurrency errors (ticket #536)
+  * SSU: Fix concurrency errors (ticket #536)          \
 
-* 2011-10-13 kytv
+2011-10-13 kytv
   * Updated translations from Transifex
     - Swedish: debconf and i2psnark
     - Finnish: router console
