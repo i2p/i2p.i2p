@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P i2ptunnel\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-07 16:06+0000\n"
-"PO-Revision-Date: 2011-10-07 23:21+0500\n"
+"POT-Creation-Date: 2011-10-19 16:40+0000\n"
+"PO-Revision-Date: 2011-10-20 00:56+0500\n"
 "Last-Translator: Hidden Z <hiddenz@mail.i2p>\n"
 "Language-Team: foo <foo@bar>\n"
 "Language: \n"
@@ -18,92 +18,92 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: Russian\n"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:485
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:487
 msgid "This seems to be a bad destination:"
-msgstr "Это плохой адрес:"
+msgstr "Кажется это плохой адрес назначения:"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:485
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:487
 msgid "i2paddresshelper cannot help you with a destination like that!"
 msgstr "С таким адресом назначения i2paddresshelper вам не поможет!"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:554
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:556
 #, java-format
 msgid "To visit the destination in your host database, click <a href=\"{0}\">here</a>. To visit the conflicting addresshelper destination, click <a href=\"{1}\">here</a>."
 msgstr "Для перехода по ссылке из локальной адресной книги, нажмите <a href=\"{0}\">здесь</a>. Для перехода по новой addresshelper-ссылке, нажмите <a href=\"{1}\">здесь</a>."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:930
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:932
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editClient_jsp.java:398
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:142
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/editServer_jsp.java:401
 msgid "Host"
 msgstr "Адрес"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:931
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:933
 #: ../jsp/WEB-INF/classes/net/i2p/i2ptunnel/jsp/index_jsp.java:370
 msgid "Destination"
 msgstr "Адрес назначения"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:936
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:938
 #, java-format
 msgid "Continue to {0} without saving"
 msgstr "Продолжить переход к {0} без сохранения"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:941
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:943
 #, java-format
 msgid "Save {0} to router address book and continue to eepsite"
 msgstr "Сохранить {0} в адресную книгу роутера (router address book) и продолжить переход к eep-сайту"
 
 #. only blockfile supports multiple books
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:944
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:946
 #, java-format
 msgid "Save {0} to master address book and continue to eepsite"
 msgstr "Сохранить {0} в основную (master) адресную книгу и продолжить переход к eep-сайту"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:945
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:947
 #, java-format
 msgid "Save {0} to private address book and continue to eepsite"
 msgstr "Сохранить {0} в приватную адресную книгу и продолжить переход к eep-сайту"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1101
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1103
 msgid "Click a link below to look for an address helper by using a \"jump\" service:"
 msgstr "Jump-сервисы, которые, возможно, знают нужную Вам addresshelper-ссылку:"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1319
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1321
 msgid "Added via address helper"
 msgstr "Добавлен через address helper"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1343
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1345
 #, java-format
 msgid "Redirecting to {0}"
 msgstr "Перенаправляем к {0}"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1349
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1351
 msgid "Router Console"
 msgstr "Консоль маршрутизатора I2P"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1350
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1352
 msgid "Addressbook"
 msgstr "Адресная книга"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1350
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1352
 msgid "Configuration"
 msgstr "Настройки"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1350
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1352
 msgid "Help"
 msgstr "Помощь"
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1355
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1357
 #, java-format
 msgid "Saved {0} to the {1} addressbook, redirecting now."
 msgstr "{0} сохранён в {1}, перенаправляем."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1356
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1358
 #, java-format
 msgid "Failed to save {0} to the {1} addressbook, redirecting now."
 msgstr "Не удалось сохранить {0} в {1} адресную книгу, перенаправляем."
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1358
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1360
 msgid "Click here if you are not redirected automatically."
 msgstr "Нажмите сюда если автоматическое перенаправление не сработало"
 
