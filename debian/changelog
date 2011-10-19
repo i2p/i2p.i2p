@@ -1,12 +1,34 @@
+i2p (0.8.9-1) stable; urgency=medium
+
+  * New upstream version
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 11 Oct 2011 19:55:08 +0000
+
+i2p (0.8.8-3) UNRELEASED; urgency=low
+
+  * Add dump option to initscript
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 06 Sep 2011 12:42:22 +0000
+
+i2p (0.8.8-2) stable; urgency=medium
+
+  * Backport patch from mtn 04ec606 to fix trac #515
+  * Fix trac ticket #514 ("debconf values are overwritten upon
+    installation")
+  * Fix initscript bug that caused the encoding to be ANSI when the router
+    started at boot.
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Fri, 02 Sep 2011 23:32:32 +0000
+
 i2p (0.8.8-1) stable; urgency=low
 
-  * New upstream release.
+  * New Upstream Version
 
- -- Kill Your TV <killyourtv@i2pmail.org>  Sun, 21 Aug 2011 12:00:00 +0000
+ -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 23 Aug 2011 20:24:22 +0000
 
 i2p (0.8.7-6) UNRELEASED; urgency=low
 
-  * Add ttf-dejavu to recommends, so that graphs on
+  * Add ttf-dejavu-core and ttf-dejavu-extra as dependencies so that graphs on
     headless systems can be generated.
 
  -- Kill Your TV <killyourtv@i2pmail.org>  Thu, 18 Aug 2011 15:50:59 +0000
