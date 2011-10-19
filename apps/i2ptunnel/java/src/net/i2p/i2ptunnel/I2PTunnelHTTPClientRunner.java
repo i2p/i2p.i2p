@@ -42,7 +42,7 @@ public class I2PTunnelHTTPClientRunner extends I2PTunnelRunner {
      */
     @Override
     protected void close(OutputStream out, InputStream in, OutputStream i2pout, InputStream i2pin,
-                         Socket s, I2PSocket i2ps, Thread t1, Thread t2) throws InterruptedException, IOException {
+                         Socket s, I2PSocket i2ps, Thread t1, Thread t2) throws InterruptedException {
         try { 
             i2pin.close();
         } catch (IOException ioe) {
