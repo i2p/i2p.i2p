@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P routerconsole\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-12 23:45+0000\n"
+"POT-Creation-Date: 2011-10-19 19:35+0000\n"
 "PO-Revision-Date: 2010-06-15 14:09+0100\n"
 "Last-Translator: duck <duck@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
@@ -26,7 +26,7 @@ msgstr ""
 #. {0,number,####} prevents 1234 from being output as 1,234 in the English locale.
 #. If you want the digit separator in your locale, translate as {0}.
 #. alternates: msec, msecs
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1249
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1256
 #, java-format
 msgid "1 ms"
 msgid_plural "{0,number,####} ms"
@@ -36,7 +36,7 @@ msgstr[1] ""
 #. seconds
 #. Note to translators: quantity will always be greater than one.
 #. alternates: secs, sec. 'seconds' is probably too long.
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1254
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1261
 #, java-format
 msgid "1 sec"
 msgid_plural "{0} sec"
@@ -46,7 +46,7 @@ msgstr[1] ""
 #. minutes
 #. Note to translators: quantity will always be greater than one.
 #. alternates: mins, min. 'minutes' is probably too long.
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1259
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1266
 #, java-format
 msgid "1 min"
 msgid_plural "{0} min"
@@ -56,21 +56,21 @@ msgstr[1] ""
 #. hours
 #. Note to translators: quantity will always be greater than one.
 #. alternates: hrs, hr., hrs.
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1264
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1271
 #, java-format
 msgid "1 hour"
 msgid_plural "{0} hours"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1266
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1273
 #: ../java/src/net/i2p/router/web/ProfileOrganizerRenderer.java:315
 msgid "n/a"
 msgstr ""
 
 #. days
 #. Note to translators: quantity will always be greater than one.
-#: ../../../core/java/src/net/i2p/data/DataHelper.java:1270
+#: ../../../core/java/src/net/i2p/data/DataHelper.java:1277
 #, java-format
 msgid "1 day"
 msgid_plural "{0} days"
@@ -120,27 +120,27 @@ msgstr ""
 #. NOTE TO TRANSLATORS - each of these phrases is a description for a statistic
 #. to be displayed on /stats.jsp and in the graphs on /graphs.jsp.
 #. Please keep relatively short so it will fit on the graphs.
-#: ../../../router/java/src/net/i2p/router/Router.java:1695
+#: ../../../router/java/src/net/i2p/router/Router.java:1704
 msgid "Message receive rate (bytes/sec)"
 msgstr ""
 
-#: ../../../router/java/src/net/i2p/router/Router.java:1696
+#: ../../../router/java/src/net/i2p/router/Router.java:1705
 msgid "Message send rate (bytes/sec)"
 msgstr ""
 
-#: ../../../router/java/src/net/i2p/router/Router.java:1697
+#: ../../../router/java/src/net/i2p/router/Router.java:1706
 msgid "Low-level send rate (bytes/sec)"
 msgstr ""
 
-#: ../../../router/java/src/net/i2p/router/Router.java:1698
+#: ../../../router/java/src/net/i2p/router/Router.java:1707
 msgid "Low-level receive rate (bytes/sec)"
 msgstr ""
 
-#: ../../../router/java/src/net/i2p/router/Router.java:1699
+#: ../../../router/java/src/net/i2p/router/Router.java:1708
 msgid "How many peers we are actively talking with"
 msgstr ""
 
-#: ../../../router/java/src/net/i2p/router/Router.java:1702
+#: ../../../router/java/src/net/i2p/router/Router.java:1711
 msgid "Known fast peers"
 msgstr ""
 
@@ -148,40 +148,40 @@ msgstr ""
 msgid "Rejecting tunnels: Shutting down"
 msgstr ""
 
-#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:152
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:154
 msgid "Rejecting tunnels: High message delay"
 msgstr ""
 
 #. hard to do {0} from here
 #. setTunnelStatus("Rejecting " + (100 - (int) probAccept*100) + "% of tunnels: High number of requests");
-#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:188
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:190
 msgid "Rejecting most tunnels: High number of requests"
 msgstr ""
 
-#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:244
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:246
 msgid "Rejecting tunnels: Limit reached"
 msgstr ""
 
 #. .067KBps
 #. * also limited to 90% - see below
 #. always leave at least 4KBps free when allowing
-#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:312
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:314
 msgid "Rejecting tunnels: Bandwidth limit"
 msgstr ""
 
 #. hard to do {0} from here
 #. setTunnelStatus("Rejecting " + ((int)(100.0*probReject)) + "% of tunnels: Bandwidth limit");
-#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:382
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:384
 msgid "Rejecting most tunnels: Bandwidth limit"
 msgstr ""
 
 #. hard to do {0} from here
 #. setTunnelStatus("Accepting " + (100-(int)(100.0*probReject)) + "% of tunnels");
-#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:386
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:388
 msgid "Accepting most tunnels"
 msgstr ""
 
-#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:388
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:390
 msgid "Accepting tunnels"
 msgstr ""
 
@@ -189,7 +189,7 @@ msgstr ""
 #. if (_context.router().getRouterInfo().getBandwidthTier().equals("K"))
 #. setTunnelStatus("Not expecting tunnel requests: Advertised bandwidth too low");
 #. else
-#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:499
+#: ../../../router/java/src/net/i2p/router/RouterThrottleImpl.java:501
 msgid "Rejecting tunnels"
 msgstr ""
 
@@ -935,778 +935,782 @@ msgid "Costa Rica"
 msgstr ""
 
 #: ../java/build/Countries.java:54
-msgid "Cuba"
+msgid "Serbia and Montenegro"
 msgstr ""
 
 #: ../java/build/Countries.java:55
-msgid "Cape Verde"
+msgid "Cuba"
 msgstr ""
 
 #: ../java/build/Countries.java:56
-msgid "Christmas Island"
+msgid "Cape Verde"
 msgstr ""
 
 #: ../java/build/Countries.java:57
-msgid "Cyprus"
+msgid "Christmas Island"
 msgstr ""
 
 #: ../java/build/Countries.java:58
-msgid "Czech Republic"
+msgid "Cyprus"
 msgstr ""
 
 #: ../java/build/Countries.java:59
-msgid "Germany"
+msgid "Czech Republic"
 msgstr ""
 
 #: ../java/build/Countries.java:60
-msgid "Djibouti"
+msgid "Germany"
 msgstr ""
 
 #: ../java/build/Countries.java:61
-msgid "Denmark"
+msgid "Djibouti"
 msgstr ""
 
 #: ../java/build/Countries.java:62
-msgid "Dominica"
+msgid "Denmark"
 msgstr ""
 
 #: ../java/build/Countries.java:63
-msgid "Dominican Republic"
+msgid "Dominica"
 msgstr ""
 
 #: ../java/build/Countries.java:64
-msgid "Algeria"
+msgid "Dominican Republic"
 msgstr ""
 
 #: ../java/build/Countries.java:65
-msgid "Ecuador"
+msgid "Algeria"
 msgstr ""
 
 #: ../java/build/Countries.java:66
-msgid "Estonia"
+msgid "Ecuador"
 msgstr ""
 
 #: ../java/build/Countries.java:67
-msgid "Egypt"
+msgid "Estonia"
 msgstr ""
 
 #: ../java/build/Countries.java:68
-msgid "Western Sahara"
+msgid "Egypt"
 msgstr ""
 
 #: ../java/build/Countries.java:69
-msgid "Eritrea"
+msgid "Western Sahara"
 msgstr ""
 
 #: ../java/build/Countries.java:70
-msgid "Spain"
+msgid "Eritrea"
 msgstr ""
 
 #: ../java/build/Countries.java:71
-msgid "Ethiopia"
+msgid "Spain"
 msgstr ""
 
 #: ../java/build/Countries.java:72
-msgid "European Union"
+msgid "Ethiopia"
 msgstr ""
 
 #: ../java/build/Countries.java:73
-msgid "Finland"
+msgid "European Union"
 msgstr ""
 
 #: ../java/build/Countries.java:74
-msgid "Fiji"
+msgid "Finland"
 msgstr ""
 
 #: ../java/build/Countries.java:75
-msgid "Falkland Islands (Malvinas)"
+msgid "Fiji"
 msgstr ""
 
 #: ../java/build/Countries.java:76
-msgid "Federated States of Micronesia"
+msgid "Falkland Islands (Malvinas)"
 msgstr ""
 
 #: ../java/build/Countries.java:77
-msgid "Faroe Islands"
+msgid "Federated States of Micronesia"
 msgstr ""
 
 #: ../java/build/Countries.java:78
-msgid "France"
+msgid "Faroe Islands"
 msgstr ""
 
 #: ../java/build/Countries.java:79
-msgid "Gabon"
+msgid "France"
 msgstr ""
 
 #: ../java/build/Countries.java:80
-msgid "United Kingdom"
+msgid "Gabon"
 msgstr ""
 
 #: ../java/build/Countries.java:81
-msgid "Grenada"
+msgid "United Kingdom"
 msgstr ""
 
 #: ../java/build/Countries.java:82
-msgid "Georgia"
+msgid "Grenada"
 msgstr ""
 
 #: ../java/build/Countries.java:83
-msgid "French Guiana"
+msgid "Georgia"
 msgstr ""
 
 #: ../java/build/Countries.java:84
-msgid "Guernsey"
+msgid "French Guiana"
 msgstr ""
 
 #: ../java/build/Countries.java:85
-msgid "Ghana"
+msgid "Guernsey"
 msgstr ""
 
 #: ../java/build/Countries.java:86
-msgid "Gibraltar"
+msgid "Ghana"
 msgstr ""
 
 #: ../java/build/Countries.java:87
-msgid "Greenland"
+msgid "Gibraltar"
 msgstr ""
 
 #: ../java/build/Countries.java:88
-msgid "Gambia"
+msgid "Greenland"
 msgstr ""
 
 #: ../java/build/Countries.java:89
-msgid "Guinea"
+msgid "Gambia"
 msgstr ""
 
 #: ../java/build/Countries.java:90
-msgid "Guadeloupe"
+msgid "Guinea"
 msgstr ""
 
 #: ../java/build/Countries.java:91
-msgid "Equatorial Guinea"
+msgid "Guadeloupe"
 msgstr ""
 
 #: ../java/build/Countries.java:92
-msgid "Greece"
+msgid "Equatorial Guinea"
 msgstr ""
 
 #: ../java/build/Countries.java:93
-msgid "South Georgia and the South Sandwich Islands"
+msgid "Greece"
 msgstr ""
 
 #: ../java/build/Countries.java:94
-msgid "Guatemala"
+msgid "South Georgia and the South Sandwich Islands"
 msgstr ""
 
 #: ../java/build/Countries.java:95
-msgid "Guam"
+msgid "Guatemala"
 msgstr ""
 
 #: ../java/build/Countries.java:96
-msgid "Guinea-Bissau"
+msgid "Guam"
 msgstr ""
 
 #: ../java/build/Countries.java:97
-msgid "Guyana"
+msgid "Guinea-Bissau"
 msgstr ""
 
 #: ../java/build/Countries.java:98
-msgid "Hong Kong"
+msgid "Guyana"
 msgstr ""
 
 #: ../java/build/Countries.java:99
-msgid "Honduras"
+msgid "Hong Kong"
 msgstr ""
 
 #: ../java/build/Countries.java:100
-msgid "Croatia"
+msgid "Honduras"
 msgstr ""
 
 #: ../java/build/Countries.java:101
-msgid "Haiti"
+msgid "Croatia"
 msgstr ""
 
 #: ../java/build/Countries.java:102
-msgid "Hungary"
+msgid "Haiti"
 msgstr ""
 
 #: ../java/build/Countries.java:103
-msgid "Indonesia"
+msgid "Hungary"
 msgstr ""
 
 #: ../java/build/Countries.java:104
-msgid "Ireland"
+msgid "Indonesia"
 msgstr ""
 
 #: ../java/build/Countries.java:105
-msgid "Israel"
+msgid "Ireland"
 msgstr ""
 
 #: ../java/build/Countries.java:106
-msgid "Isle of Man"
+msgid "Israel"
 msgstr ""
 
 #: ../java/build/Countries.java:107
-msgid "India"
+msgid "Isle of Man"
 msgstr ""
 
 #: ../java/build/Countries.java:108
-msgid "British Indian Ocean Territory"
+msgid "India"
 msgstr ""
 
 #: ../java/build/Countries.java:109
-msgid "Iraq"
+msgid "British Indian Ocean Territory"
 msgstr ""
 
 #: ../java/build/Countries.java:110
-msgid "Islamic Republic of Iran"
+msgid "Iraq"
 msgstr ""
 
 #: ../java/build/Countries.java:111
-msgid "Iceland"
+msgid "Islamic Republic of Iran"
 msgstr ""
 
 #: ../java/build/Countries.java:112
-msgid "Italy"
+msgid "Iceland"
 msgstr ""
 
 #: ../java/build/Countries.java:113
-msgid "Jersey"
+msgid "Italy"
 msgstr ""
 
 #: ../java/build/Countries.java:114
-msgid "Jamaica"
+msgid "Jersey"
 msgstr ""
 
 #: ../java/build/Countries.java:115
-msgid "Jordan"
+msgid "Jamaica"
 msgstr ""
 
 #: ../java/build/Countries.java:116
-msgid "Japan"
+msgid "Jordan"
 msgstr ""
 
 #: ../java/build/Countries.java:117
-msgid "Kenya"
+msgid "Japan"
 msgstr ""
 
 #: ../java/build/Countries.java:118
-msgid "Kyrgyzstan"
+msgid "Kenya"
 msgstr ""
 
 #: ../java/build/Countries.java:119
-msgid "Cambodia"
+msgid "Kyrgyzstan"
 msgstr ""
 
 #: ../java/build/Countries.java:120
-msgid "Kiribati"
+msgid "Cambodia"
 msgstr ""
 
 #: ../java/build/Countries.java:121
-msgid "Comoros"
+msgid "Kiribati"
 msgstr ""
 
 #: ../java/build/Countries.java:122
-msgid "Saint Kitts and Nevis"
+msgid "Comoros"
 msgstr ""
 
 #: ../java/build/Countries.java:123
-msgid "The Democratic People's Republic of Korea"
+msgid "Saint Kitts and Nevis"
 msgstr ""
 
 #: ../java/build/Countries.java:124
-msgid "Republic of Korea"
+msgid "The Democratic People's Republic of Korea"
 msgstr ""
 
 #: ../java/build/Countries.java:125
-msgid "Kuwait"
+msgid "Republic of Korea"
 msgstr ""
 
 #: ../java/build/Countries.java:126
-msgid "Cayman Islands"
+msgid "Kuwait"
 msgstr ""
 
 #: ../java/build/Countries.java:127
-msgid "Kazakhstan"
+msgid "Cayman Islands"
 msgstr ""
 
 #: ../java/build/Countries.java:128
-msgid "Lao People's Democratic Republic"
+msgid "Kazakhstan"
 msgstr ""
 
 #: ../java/build/Countries.java:129
-msgid "Lebanon"
+msgid "Lao People's Democratic Republic"
 msgstr ""
 
 #: ../java/build/Countries.java:130
-msgid "Saint Lucia"
+msgid "Lebanon"
 msgstr ""
 
 #: ../java/build/Countries.java:131
-msgid "Liechtenstein"
+msgid "Saint Lucia"
 msgstr ""
 
 #: ../java/build/Countries.java:132
-msgid "Sri Lanka"
+msgid "Liechtenstein"
 msgstr ""
 
 #: ../java/build/Countries.java:133
-msgid "Liberia"
+msgid "Sri Lanka"
 msgstr ""
 
 #: ../java/build/Countries.java:134
-msgid "Lesotho"
+msgid "Liberia"
 msgstr ""
 
 #: ../java/build/Countries.java:135
-msgid "Lithuania"
+msgid "Lesotho"
 msgstr ""
 
 #: ../java/build/Countries.java:136
-msgid "Luxembourg"
+msgid "Lithuania"
 msgstr ""
 
 #: ../java/build/Countries.java:137
-msgid "Latvia"
+msgid "Luxembourg"
 msgstr ""
 
 #: ../java/build/Countries.java:138
-msgid "Libyan Arab Jamahiriya"
+msgid "Latvia"
 msgstr ""
 
 #: ../java/build/Countries.java:139
-msgid "Morocco"
+msgid "Libyan Arab Jamahiriya"
 msgstr ""
 
 #: ../java/build/Countries.java:140
-msgid "Monaco"
+msgid "Morocco"
 msgstr ""
 
 #: ../java/build/Countries.java:141
-msgid "Republic of Moldova"
+msgid "Monaco"
 msgstr ""
 
 #: ../java/build/Countries.java:142
-msgid "Montenegro"
+msgid "Republic of Moldova"
 msgstr ""
 
 #: ../java/build/Countries.java:143
-msgid "Saint Martin"
+msgid "Montenegro"
 msgstr ""
 
 #: ../java/build/Countries.java:144
-msgid "Madagascar"
+msgid "Saint Martin"
 msgstr ""
 
 #: ../java/build/Countries.java:145
-msgid "Marshall Islands"
+msgid "Madagascar"
 msgstr ""
 
 #: ../java/build/Countries.java:146
-msgid "The Former Yugoslav Republic of Macedonia"
+msgid "Marshall Islands"
 msgstr ""
 
 #: ../java/build/Countries.java:147
-msgid "Mali"
+msgid "The Former Yugoslav Republic of Macedonia"
 msgstr ""
 
 #: ../java/build/Countries.java:148
-msgid "Myanmar"
+msgid "Mali"
 msgstr ""
 
 #: ../java/build/Countries.java:149
-msgid "Mongolia"
+msgid "Myanmar"
 msgstr ""
 
 #: ../java/build/Countries.java:150
-msgid "Macao"
+msgid "Mongolia"
 msgstr ""
 
 #: ../java/build/Countries.java:151
-msgid "Northern Mariana Islands"
+msgid "Macao"
 msgstr ""
 
 #: ../java/build/Countries.java:152
-msgid "Martinique"
+msgid "Northern Mariana Islands"
 msgstr ""
 
 #: ../java/build/Countries.java:153
-msgid "Mauritania"
+msgid "Martinique"
 msgstr ""
 
 #: ../java/build/Countries.java:154
-msgid "Montserrat"
+msgid "Mauritania"
 msgstr ""
 
 #: ../java/build/Countries.java:155
-msgid "Malta"
+msgid "Montserrat"
 msgstr ""
 
 #: ../java/build/Countries.java:156
-msgid "Mauritius"
+msgid "Malta"
 msgstr ""
 
 #: ../java/build/Countries.java:157
-msgid "Maldives"
+msgid "Mauritius"
 msgstr ""
 
 #: ../java/build/Countries.java:158
-msgid "Malawi"
+msgid "Maldives"
 msgstr ""
 
 #: ../java/build/Countries.java:159
-msgid "Mexico"
+msgid "Malawi"
 msgstr ""
 
 #: ../java/build/Countries.java:160
-msgid "Malaysia"
+msgid "Mexico"
 msgstr ""
 
 #: ../java/build/Countries.java:161
-msgid "Mozambique"
+msgid "Malaysia"
 msgstr ""
 
 #: ../java/build/Countries.java:162
-msgid "Namibia"
+msgid "Mozambique"
 msgstr ""
 
 #: ../java/build/Countries.java:163
-msgid "New Caledonia"
+msgid "Namibia"
 msgstr ""
 
 #: ../java/build/Countries.java:164
-msgid "Niger"
+msgid "New Caledonia"
 msgstr ""
 
 #: ../java/build/Countries.java:165
-msgid "Norfolk Island"
+msgid "Niger"
 msgstr ""
 
 #: ../java/build/Countries.java:166
-msgid "Nigeria"
+msgid "Norfolk Island"
 msgstr ""
 
 #: ../java/build/Countries.java:167
-msgid "Nicaragua"
+msgid "Nigeria"
 msgstr ""
 
 #: ../java/build/Countries.java:168
-msgid "Netherlands"
+msgid "Nicaragua"
 msgstr ""
 
 #: ../java/build/Countries.java:169
-msgid "Norway"
+msgid "Netherlands"
 msgstr ""
 
 #: ../java/build/Countries.java:170
-msgid "Nepal"
+msgid "Norway"
 msgstr ""
 
 #: ../java/build/Countries.java:171
-msgid "Nauru"
+msgid "Nepal"
 msgstr ""
 
 #: ../java/build/Countries.java:172
-msgid "Niue"
+msgid "Nauru"
 msgstr ""
 
 #: ../java/build/Countries.java:173
-msgid "New Zealand"
+msgid "Niue"
 msgstr ""
 
 #: ../java/build/Countries.java:174
-msgid "Oman"
+msgid "New Zealand"
 msgstr ""
 
 #: ../java/build/Countries.java:175
-msgid "Panama"
+msgid "Oman"
 msgstr ""
 
 #: ../java/build/Countries.java:176
-msgid "Peru"
+msgid "Panama"
 msgstr ""
 
 #: ../java/build/Countries.java:177
-msgid "French Polynesia"
+msgid "Peru"
 msgstr ""
 
 #: ../java/build/Countries.java:178
-msgid "Papua New Guinea"
+msgid "French Polynesia"
 msgstr ""
 
 #: ../java/build/Countries.java:179
-msgid "Philippines"
+msgid "Papua New Guinea"
 msgstr ""
 
 #: ../java/build/Countries.java:180
-msgid "Pakistan"
+msgid "Philippines"
 msgstr ""
 
 #: ../java/build/Countries.java:181
-msgid "Poland"
+msgid "Pakistan"
 msgstr ""
 
 #: ../java/build/Countries.java:182
-msgid "Saint Pierre and Miquelon"
+msgid "Poland"
 msgstr ""
 
 #: ../java/build/Countries.java:183
-msgid "Puerto Rico"
+msgid "Saint Pierre and Miquelon"
 msgstr ""
 
 #: ../java/build/Countries.java:184
-msgid "Palestinian Territory"
+msgid "Puerto Rico"
 msgstr ""
 
 #: ../java/build/Countries.java:185
-msgid "Portugal"
+msgid "Palestinian Territory"
 msgstr ""
 
 #: ../java/build/Countries.java:186
-msgid "Palau"
+msgid "Portugal"
 msgstr ""
 
 #: ../java/build/Countries.java:187
-msgid "Paraguay"
+msgid "Palau"
 msgstr ""
 
 #: ../java/build/Countries.java:188
-msgid "Qatar"
+msgid "Paraguay"
 msgstr ""
 
 #: ../java/build/Countries.java:189
-msgid "Reunion"
+msgid "Qatar"
 msgstr ""
 
 #: ../java/build/Countries.java:190
-msgid "Romania"
+msgid "Reunion"
 msgstr ""
 
 #: ../java/build/Countries.java:191
-msgid "Serbia"
+msgid "Romania"
 msgstr ""
 
 #: ../java/build/Countries.java:192
-msgid "Russian Federation"
+msgid "Serbia"
 msgstr ""
 
 #: ../java/build/Countries.java:193
-msgid "Rwanda"
+msgid "Russian Federation"
 msgstr ""
 
 #: ../java/build/Countries.java:194
-msgid "Saudi Arabia"
+msgid "Rwanda"
 msgstr ""
 
 #: ../java/build/Countries.java:195
-msgid "Solomon Islands"
+msgid "Saudi Arabia"
 msgstr ""
 
 #: ../java/build/Countries.java:196
-msgid "Seychelles"
+msgid "Solomon Islands"
 msgstr ""
 
 #: ../java/build/Countries.java:197
-msgid "Sudan"
+msgid "Seychelles"
 msgstr ""
 
 #: ../java/build/Countries.java:198
-msgid "Sweden"
+msgid "Sudan"
 msgstr ""
 
 #: ../java/build/Countries.java:199
-msgid "Singapore"
+msgid "Sweden"
 msgstr ""
 
 #: ../java/build/Countries.java:200
-msgid "Saint Helena"
+msgid "Singapore"
 msgstr ""
 
 #: ../java/build/Countries.java:201
-msgid "Slovenia"
+msgid "Saint Helena"
 msgstr ""
 
 #: ../java/build/Countries.java:202
-msgid "Svalbard and Jan Mayen"
+msgid "Slovenia"
 msgstr ""
 
 #: ../java/build/Countries.java:203
-msgid "Slovakia"
+msgid "Svalbard and Jan Mayen"
 msgstr ""
 
 #: ../java/build/Countries.java:204
-msgid "Sierra Leone"
+msgid "Slovakia"
 msgstr ""
 
 #: ../java/build/Countries.java:205
-msgid "San Marino"
+msgid "Sierra Leone"
 msgstr ""
 
 #: ../java/build/Countries.java:206
-msgid "Senegal"
+msgid "San Marino"
 msgstr ""
 
 #: ../java/build/Countries.java:207
-msgid "Somalia"
+msgid "Senegal"
 msgstr ""
 
 #: ../java/build/Countries.java:208
-msgid "Suriname"
+msgid "Somalia"
 msgstr ""
 
 #: ../java/build/Countries.java:209
-msgid "Sao Tome and Principe"
+msgid "Suriname"
 msgstr ""
 
 #: ../java/build/Countries.java:210
-msgid "El Salvador"
+msgid "Sao Tome and Principe"
 msgstr ""
 
 #: ../java/build/Countries.java:211
-msgid "Syrian Arab Republic"
+msgid "El Salvador"
 msgstr ""
 
 #: ../java/build/Countries.java:212
-msgid "Swaziland"
+msgid "Syrian Arab Republic"
 msgstr ""
 
 #: ../java/build/Countries.java:213
-msgid "Turks and Caicos Islands"
+msgid "Swaziland"
 msgstr ""
 
 #: ../java/build/Countries.java:214
-msgid "Chad"
+msgid "Turks and Caicos Islands"
 msgstr ""
 
 #: ../java/build/Countries.java:215
-msgid "French Southern Territories"
+msgid "Chad"
 msgstr ""
 
 #: ../java/build/Countries.java:216
-msgid "Togo"
+msgid "French Southern Territories"
 msgstr ""
 
 #: ../java/build/Countries.java:217
-msgid "Thailand"
+msgid "Togo"
 msgstr ""
 
 #: ../java/build/Countries.java:218
-msgid "Tajikistan"
+msgid "Thailand"
 msgstr ""
 
 #: ../java/build/Countries.java:219
-msgid "Tokelau"
+msgid "Tajikistan"
 msgstr ""
 
 #: ../java/build/Countries.java:220
-msgid "Timor-Leste"
+msgid "Tokelau"
 msgstr ""
 
 #: ../java/build/Countries.java:221
-msgid "Turkmenistan"
+msgid "Timor-Leste"
 msgstr ""
 
 #: ../java/build/Countries.java:222
-msgid "Tunisia"
+msgid "Turkmenistan"
 msgstr ""
 
 #: ../java/build/Countries.java:223
-msgid "Tonga"
+msgid "Tunisia"
 msgstr ""
 
 #: ../java/build/Countries.java:224
-msgid "Turkey"
+msgid "Tonga"
 msgstr ""
 
 #: ../java/build/Countries.java:225
-msgid "Trinidad and Tobago"
+msgid "Turkey"
 msgstr ""
 
 #: ../java/build/Countries.java:226
-msgid "Tuvalu"
+msgid "Trinidad and Tobago"
 msgstr ""
 
 #: ../java/build/Countries.java:227
-msgid "Taiwan"
+msgid "Tuvalu"
 msgstr ""
 
 #: ../java/build/Countries.java:228
-msgid "United Republic of Tanzania"
+msgid "Taiwan"
 msgstr ""
 
 #: ../java/build/Countries.java:229
-msgid "Ukraine"
+msgid "United Republic of Tanzania"
 msgstr ""
 
 #: ../java/build/Countries.java:230
-msgid "Uganda"
+msgid "Ukraine"
 msgstr ""
 
 #: ../java/build/Countries.java:231
-msgid "United States Minor Outlying Islands"
+msgid "Uganda"
 msgstr ""
 
 #: ../java/build/Countries.java:232
-msgid "United States"
+msgid "United States Minor Outlying Islands"
 msgstr ""
 
 #: ../java/build/Countries.java:233
-msgid "Uruguay"
+msgid "United States"
 msgstr ""
 
 #: ../java/build/Countries.java:234
-msgid "Uzbekistan"
+msgid "Uruguay"
 msgstr ""
 
 #: ../java/build/Countries.java:235
-msgid "Holy See (Vatican City State)"
+msgid "Uzbekistan"
 msgstr ""
 
 #: ../java/build/Countries.java:236
-msgid "Saint Vincent and the Grenadines"
+msgid "Holy See (Vatican City State)"
 msgstr ""
 
 #: ../java/build/Countries.java:237
+msgid "Saint Vincent and the Grenadines"
+msgstr ""
+
+#: ../java/build/Countries.java:238
 msgid "Venezuela"
 msgstr ""
 
-#: ../java/build/Countries.java:238 ../java/build/Countries.java:239
+#: ../java/build/Countries.java:239 ../java/build/Countries.java:240
 msgid "Virgin Islands"
 msgstr ""
 
-#: ../java/build/Countries.java:240
+#: ../java/build/Countries.java:241
 msgid "Viet Nam"
 msgstr ""
 
-#: ../java/build/Countries.java:241
+#: ../java/build/Countries.java:242
 msgid "Vanuatu"
 msgstr ""
 
-#: ../java/build/Countries.java:242
+#: ../java/build/Countries.java:243
 msgid "Wallis and Futuna"
 msgstr ""
 
-#: ../java/build/Countries.java:243
+#: ../java/build/Countries.java:244
 msgid "Samoa"
 msgstr ""
 
-#: ../java/build/Countries.java:244
+#: ../java/build/Countries.java:245
 msgid "Yemen"
 msgstr ""
 
-#: ../java/build/Countries.java:245
+#: ../java/build/Countries.java:246
 msgid "Mayotte"
 msgstr ""
 
-#: ../java/build/Countries.java:246
+#: ../java/build/Countries.java:247
 msgid "South Africa"
 msgstr ""
 
-#: ../java/build/Countries.java:247
+#: ../java/build/Countries.java:248
 msgid "Zambia"
 msgstr ""
 
-#: ../java/build/Countries.java:248
+#: ../java/build/Countries.java:249
 msgid "Zimbabwe"
 msgstr ""
 
@@ -1967,7 +1971,7 @@ msgid "Stop"
 msgstr ""
 
 #: ../java/src/net/i2p/router/web/ConfigClientsHelper.java:267
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:79
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:80
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configupdate_jsp.java:348
 msgid "Check for updates"
 msgstr ""
@@ -2647,53 +2651,60 @@ msgstr ""
 msgid "Vietnamese"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:86
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:87
 msgid "Update available, attempting to download now"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:88
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:89
 msgid "Update available, click button on left to download"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:94
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:95
 msgid "No update available"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:103
-msgid "Updating news URL to"
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:104
+#, java-format
+msgid "Updating news URL to {0}"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:111
-msgid "Updating proxy host to"
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:112
+#, java-format
+msgid "Updating proxy host to {0}"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:119
-msgid "Updating proxy port to"
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:120
+#, java-format
+msgid "Updating proxy port to {0}"
 msgstr ""
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:132
-msgid "Updating refresh frequency to"
+#, java-format
+msgid "Updating refresh frequency to {0}"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:139
-msgid "Updating update policy to"
-msgstr ""
-
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:148
-msgid "Updating update URLs."
-msgstr ""
-
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:157
-msgid "Updating trusted keys."
-msgstr ""
-
-#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:165
-msgid "Updating unsigned update URL to"
-msgstr ""
-
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:133
 #: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:91
 #: ../java/src/net/i2p/router/web/GraphHelper.java:188
 msgid "Never"
+msgstr ""
+
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:140
+#, java-format
+msgid "Updating update policy to {0}"
+msgstr ""
+
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:149
+msgid "Updating update URLs."
+msgstr ""
+
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:160
+msgid "Updating trusted keys."
+msgstr ""
+
+#: ../java/src/net/i2p/router/web/ConfigUpdateHandler.java:168
+#, java-format
+msgid "Updating unsigned update URL to {0}"
 msgstr ""
 
 #: ../java/src/net/i2p/router/web/ConfigUpdateHelper.java:93
@@ -3757,11 +3768,11 @@ msgstr ""
 msgid "Message delay"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:431
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:432
 msgid "Tunnel lag"
 msgstr ""
 
-#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:437
+#: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:439
 msgid "Backlog"
 msgstr ""
 
