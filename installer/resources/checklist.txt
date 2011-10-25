@@ -1,6 +1,7 @@
 Release checklist
 -----------------
 
+Ensure all translation updates are imported from Transifex
 Sync with mtn.i2p2.i2p
 Start with a clean checkout mtn -d i2p.mtn co --branch=i2p.i2p
 Double-check trust list
@@ -10,60 +11,68 @@ Change revision in:
 	history.txt
 	installer/install.xml
 	installer/resources/news.xml
+	core/java/src/net/i2p/CoreVersion.java
 	router/java/src/net/i2p/router/RouterVersion.java
 		(change to BUILD = 0 and EXTRA = "")
-	core/java/src/net/i2p/CoreVersion.java
 
 Review the complete diff from the last release:
-        mtn diff -r t:i2p-0.7.(xx-1) > out.diff
+        mtn diff -r t:i2p-0.x.(xx-1) > out.diff
         vi out.diff
 
 Verify that no untrusted revisions were inadvertently
 blessed by a trusted party:
         mtn log --brief --no-graph --to t:i2p-0.8.(xx-1) | cut -d ' ' -f 2 | sort | uniq -c
 
-NOTE: Most tasks below here are now automated by 'ant release'
+=========================================
+NOTE: These tasks are now automated by 'ant release'
 
 Build and tag:
 	ant pkg
 	mtn ci
-	mtn tag h: i2p-0.7.xx
-	mtn cert t:i2p-0.7.xx branch i2p.i2p.release
+	mtn tag h: i2p-0.x.xx
+	mtn cert t:i2p-0.x.xx branch i2p.i2p.release
 	Sync with mtn.i2p2.i2p
 
-Create a signed update file with:
+Create signed update files with:
 	export I2P=~/i2p
-	java -cp $I2P/lib/i2p.jar net.i2p.crypto.TrustedUpdate sign i2pupdate.zip i2pupdate.sud /path/to/private.key 0.7.xx
+	java -cp $I2P/lib/i2p.jar net.i2p.crypto.TrustedUpdate sign i2pupdate.zip i2pupdate.sud /path/to/private.key 0.x.xx
+	java -cp $I2P/lib/i2p.jar net.i2p.crypto.TrustedUpdate sign i2pupdate200.zip i2pupdate.su2 /path/to/private.key 0.x.xx
 
-Verify signed update file with:
+Verify signed update files with:
 	java -cp $I2P/lib/i2p.jar net.i2p.crypto.TrustedUpdate showversion i2pupdate.sud
 	java -cp $I2P/lib/i2p.jar net.i2p.crypto.TrustedUpdate verifysig i2pupdate.sud
 
 Make the source tarball:
-	Start with a clean checkout mtn -d i2p.mtn co --branch=i2p.i2p i2p-0.7.xx
+	Start with a clean checkout mtn -d i2p.mtn co --branch=i2p.i2p i2p-0.x.xx
         Double-check trust list
-	tar cjf i2psource-0.7.xx.tar.bz2 --exclude i2p-0.7.xx/_MTN i2p-0.7.xx	
-	mv i2p-0.7.xx.tar.bz2 i2p.i2p
+	tar cjf i2psource-0.x.xx.tar.bz2 --exclude i2p-0.x.xx/_MTN i2p-0.x.xx	
+	mv i2p-0.x.xx.tar.bz2 i2p.i2p
 
-Until the build script gets this ability, you need to rename some files:
-	mv i2pinstall.exe i2pinstall-0.7.xx.exe
-	mv i2pupdate.zip i2pupdate-0.7.xx.zip
-	you probably don't need to rename i2pupdate.sud
+Rename some files:
+	mv i2pinstall.exe i2pinstall-0.x.xx.exe
+	mv i2pupdate.zip i2pupdate-0.x.xx.zip
 
 Generate hashes:
-	sha256sum i2p*0.7.xx.*
+	sha256sum i2p*0.x.xx.*
 	sha256sum i2pupdate.sud
-	now GPG-sign an announcement with the hashes
+	sha256sum i2pupdate.su2
 
 Generate PGP signatures:
-	gpg -b i2pinstall-0.7.xx.exe
-	gpg -b i2psource-0.7.xx.tar.bz2
-	gpg -b i2pupdate-0.7.xx.zip
+	gpg -b i2pinstall-0..x xx.exe
+	gpg -b i2psource-0.x.xx.tar.bz2
+	gpg -b i2pupdate-0.x.xx.zip
 	gpg -b i2pupdate.sud
+	gpg -b i2pupdate.su2
 
 (end of tasks automated by 'ant release')
+=========================================
 
-Distribute files to download locations and to www.i2p2.i2p
+
+Notify the following people:
+	All in-network update hosts
+	PPA maintainer
+	Google code maintainer
+	news.xml maintainer
 
 Website files to change:
 	Sync with mtn.i2p2.i2p
@@ -73,13 +82,18 @@ Website files to change:
 	download_*.html (change version numbers and SHA256s)
 	index.html
 	index_*.html
-	hosts.txt (copy from mtn)
+	hosts.txt if it changed (copy from i2p.i2p mtn branch)
         release-x.y.z.html (new)
 	Sync with mtn.i2p2.i2p
 
 Announce on:
-         #i2p
+         #i2p, #i2p-dev (also on freenode side)
          forum.i2p
+         twitter
          freshmeat.net
          launchpad.net
          alt.privacy.anon-server
+
+Update Trac:
+	Add milestone and version dates
+	Increment milestone and version defaults
