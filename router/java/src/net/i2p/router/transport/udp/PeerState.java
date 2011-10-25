@@ -602,12 +602,12 @@ class PeerState {
             //if (isForACK)
             //    _receiveACKBytes += bytes;
         } else {
-            if (true || _retransmissionPeriodStart + 1000 < _context.clock().now()) {
+            //if (true || _retransmissionPeriodStart + 1000 < _context.clock().now()) {
                 _packetsReceivedDuplicate++;
-            } else {
-                _retransmissionPeriodStart = _context.clock().now();
-                _packetsReceivedDuplicate = 1;
-            }
+            //} else {
+            //    _retransmissionPeriodStart = _context.clock().now();
+            //    _packetsReceivedDuplicate = 1;
+            //}
         }
         
         long now = _context.clock().now();
