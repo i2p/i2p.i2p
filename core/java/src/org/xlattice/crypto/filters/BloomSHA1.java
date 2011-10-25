@@ -1,5 +1,8 @@
-/* BloomSHA1.java */
 package org.xlattice.crypto.filters;
+
+import java.util.Arrays;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * A Bloom filter for sets of SHA1 digests.  A Bloom filter uses a set
@@ -31,6 +34,13 @@ package org.xlattice.crypto.filters;
  * 
  * minor tweaks by jrandom, exposing unsynchronized access and 
  * allowing larger M and K.  changes released into the public domain.
+ * 
+ * Note that this is used only by DecayingBloomFilter, which uses only
+ * the unsynchronized locked_foo() methods.
+ * 
+ * As of 0.8.11, the locked_foo() methods are thread-safe, in that they work,
+ * but there is a minor risk of false-negatives if two threads are
+ * accessing the same bloom filter integer.
  */
 
 public class BloomSHA1 {
@@ -39,14 +49,14 @@ public class BloomSHA1 {
     protected int count;
    
     protected final int[] filter;
-    protected KeySelector ks;
-    protected final int[] wordOffset;
-    protected final int[] bitOffset;
+    protected final KeySelector ks;
     
     // convenience variables
     protected final int filterBits;
     protected final int filterWords;
     
+    private final BlockingQueue<int[]> buf;
+
 /* (24,11) too big - see KeySelector
 
     public static void main(String args[]) {
@@ -80,15 +90,11 @@ public class BloomSHA1 {
         //}
         this.m = m;
         this.k = k;
-        count = 0;
         filterBits = 1 << m;
         filterWords = (filterBits + 31)/32;     // round up 
         filter = new int[filterWords];
-        doClear();
-        // offsets into the filter
-        wordOffset = new int[k];
-        bitOffset  = new int[k];
-        ks = new KeySelector(m, k, bitOffset, wordOffset);
+        ks = new KeySelector(m, k);
+        buf = new LinkedBlockingQueue(16);
 
         // DEBUG
         //System.out.println("Bloom constructor: m = " + m + ", k = " + k
@@ -114,9 +120,7 @@ public class BloomSHA1 {
     }
     /** Clear the filter, unsynchronized */
     protected void doClear() {
-        for (int i = 0; i < filterWords; i++) {
-            filter[i] = 0;
-        }
+        Arrays.fill(filter, 0);
         count = 0;
     }
     /** Synchronized version */
@@ -154,19 +158,25 @@ public class BloomSHA1 {
      * @param b byte array representing a key (SHA1 digest)
      */
     public void insert (byte[]b) { insert(b, 0, b.length); }
+
     public void insert (byte[]b, int offset, int len) {
         synchronized(this) {
-            locked_insert(b);
+            locked_insert(b, offset, len);
         }
     }
 
     public final void locked_insert(byte[]b) { locked_insert(b, 0, b.length); }
+
     public final void locked_insert(byte[]b, int offset, int len) { 
-        ks.getOffsets(b, offset, len);
+        int[] bitOffset = acquire();
+        int[] wordOffset = acquire();
+        ks.getOffsets(b, offset, len, bitOffset, wordOffset);
         for (int i = 0; i < k; i++) {
             filter[wordOffset[i]] |=  1 << bitOffset[i];
         }
         count++;
+        buf.offer(bitOffset);
+        buf.offer(wordOffset);
     }
     
     /**
@@ -176,13 +186,20 @@ public class BloomSHA1 {
      * @return true if b is in the filter 
      */
     protected final boolean isMember(byte[] b) { return isMember(b, 0, b.length); }
+
     protected final boolean isMember(byte[] b, int offset, int len) {
-        ks.getOffsets(b, offset, len);
+        int[] bitOffset = acquire();
+        int[] wordOffset = acquire();
+        ks.getOffsets(b, offset, len, bitOffset, wordOffset);
         for (int i = 0; i < k; i++) {
             if (! ((filter[wordOffset[i]] & (1 << bitOffset[i])) != 0) ) {
+                buf.offer(bitOffset);
+                buf.offer(wordOffset);
                 return false;
             }
         }
+        buf.offer(bitOffset);
+        buf.offer(wordOffset);
         return true;
     }
     
@@ -202,6 +219,75 @@ public class BloomSHA1 {
         }
     }
 
+    /**
+     * Get the bloom filter offsets for reuse.
+     * Caller should call rv.release() when done.
+     * @since 0.8.11
+     */
+    public FilterKey getFilterKey(byte[] b, int offset, int len) {
+        int[] bitOffset = acquire();
+        int[] wordOffset = acquire();
+        ks.getOffsets(b, offset, len, bitOffset, wordOffset);
+        return new FilterKey(bitOffset, wordOffset);
+    }
+
+    /**
+     * Add the key to the filter.
+     * @since 0.8.11
+     */
+    public void locked_insert(FilterKey fk) {
+        for (int i = 0; i < k; i++) {
+            filter[fk.wordOffset[i]] |=  1 << fk.bitOffset[i];
+        }
+        count++;
+    }
+
+
+    /**
+     * Is the key in the filter.
+     * @since 0.8.11
+     */
+    public boolean locked_member(FilterKey fk) {
+        for (int i = 0; i < k; i++) {
+            if (! ((filter[fk.wordOffset[i]] & (1 << fk.bitOffset[i])) != 0) )
+                return false;
+        }
+        return true;
+    }
+
+    /**
+     * @since 0.8.11
+     */
+    private int[] acquire() {
+        int[] rv = buf.poll();
+        if (rv != null)
+            return rv;
+        return new int[k];
+    }
+
+    /**
+     * @since 0.8.11
+     */
+    public void release(FilterKey fk) {
+        buf.offer(fk.bitOffset);
+        buf.offer(fk.wordOffset);
+    }
+
+    /**
+     * Store the (opaque) bloom filter offsets for reuse.
+     * @since 0.8.11
+     */
+    public static class FilterKey {
+
+        private final int[] bitOffset;
+        private final int[] wordOffset;
+
+        private FilterKey(int[] bitOffset, int[] wordOffset) {
+            this.bitOffset = bitOffset;
+            this.wordOffset = wordOffset;
+        }
+    }
+
     /** 
      * @param n number of set members
      * @return approximate false positive rate
@@ -215,6 +301,8 @@ public class BloomSHA1 {
     public final double falsePositives() {
         return falsePositives(count);
     }
+
+/*****
     // DEBUG METHODS
     public static String keyToString(byte[] key) {
         StringBuilder sb = new StringBuilder().append(key[0]);
@@ -223,23 +311,32 @@ public class BloomSHA1 {
         }
         return sb.toString();
     }
+*****/
+
     /** convert 64-bit integer to hex String */
+/*****
     public static String ltoh (long i) {
         StringBuilder sb = new StringBuilder().append("#")
                                 .append(Long.toString(i, 16));
         return sb.toString();
     }
+*****/
 
     /** convert 32-bit integer to String */
+/*****
     public static String itoh (int i) {
         StringBuilder sb = new StringBuilder().append("#")
                                 .append(Integer.toString(i, 16));
         return sb.toString();
     }
+*****/
+
     /** convert single byte to String */
+/*****
     public static String btoh (byte b) {
         int i = 0xff & b;
         return itoh(i);
     }
+*****/
 }
 

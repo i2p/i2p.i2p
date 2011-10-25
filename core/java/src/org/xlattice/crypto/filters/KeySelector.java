@@ -1,4 +1,3 @@
-/* KeySelector.java */
 package org.xlattice.crypto.filters;
 
 /**
@@ -12,25 +11,34 @@ package org.xlattice.crypto.filters;
  * 
  * minor tweaks by jrandom, exposing unsynchronized access and 
  * allowing larger M and K.  changes released into the public domain.
+ *
+ * As of 0.8.11, bitoffset and wordoffset out parameters moved from fields
+ * to selector arguments, to allow concurrency.
+ * ALl methods are now thread-safe.
  */
 public class KeySelector {
    
-    private int m;
-    private int k;
-    private byte[] b;
-    private int offset; // index into b to select
-    private int length; // length into b to select
-    private int[] bitOffset;
-    private int[] wordOffset;
-    private BitSelector  bitSel;
-    private WordSelector wordSel;
+    private final int m;
+    private final int k;
+    private final BitSelector  bitSel;
+    private final WordSelector wordSel;
     
     public interface BitSelector {
-        public void getBitSelectors();
+        /**
+         *  @param bitOffset Out parameter of length k
+         *  @since 0.8.11 out parameter added
+         */
+        public void getBitSelectors(byte[] b, int offset, int length, int[] bitOffset);
     }
+
     public interface WordSelector {
-        public void getWordSelectors();
+        /**
+         *  @param wordOffset Out parameter of length k
+         *  @since 0.8.11 out parameter added
+         */
+        public void getWordSelectors(byte[] b, int offset, int length, int[] wordOffset);
     }
+
     /** AND with byte to expose index-many bits */
     public final static int[] UNMASK = { 
  // 0  1  2  3   4   5   6    7    8   9     10   11     12    13     14     15
@@ -49,8 +57,6 @@ public class KeySelector {
      *
      * @param m    size of the filter as a power of 2
      * @param k    number of 'hash functions'
-     * @param bitOffset array of k bit offsets (offset of flag bit in word)
-     * @param wordOffset array of k word offsets (offset of word flag is in)
      *
      * Note that if k and m are too big, the GenericWordSelector blows up -
      * The max for 32-byte keys is m=23 and k=11.
@@ -59,15 +65,13 @@ public class KeySelector {
      *
      * It isn't clear how to fix this.
      */
-    public KeySelector (int m, int k, int[] bitOffset, int [] wordOffset) {
+    public KeySelector (int m, int k) {
         //if ( (m < 2) || (m > 20)|| (k < 1) 
         //             || (bitOffset == null) || (wordOffset == null)) {
         //    throw new IllegalArgumentException();
         //}
         this.m = m;
         this.k = k;
-        this.bitOffset = bitOffset;
-        this.wordOffset = wordOffset;
         bitSel  = new GenericBitSelector();
         wordSel = new GenericWordSelector();
     }
@@ -78,7 +82,7 @@ public class KeySelector {
      */
     public class GenericBitSelector implements BitSelector {
         /** Do the extraction */
-        public void getBitSelectors() {
+        public void getBitSelectors(byte[] b, int offset, int length, int[] bitOffset) {
             int curBit = 8 * offset; 
             int curByte;
             for (int j = 0; j < k; j++) {
@@ -132,7 +136,7 @@ public class KeySelector {
      */
     public class GenericWordSelector implements WordSelector {
         /** Extract the k offsets into the word offset array */
-        public void getWordSelectors() {
+        public void getWordSelectors(byte[] b, int offset, int length, int[] wordOffset) {
             int stride = m - 5;
             //assert true: stride<16;
             int curBit = (k * 5) + (offset * 8); 
@@ -221,32 +225,47 @@ public class KeySelector {
             }
         } 
     }
+
     /**
      * Given a key, populate the word and bit offset arrays, each
      * of which has k elements.
      * 
      * @param key cryptographic key used in populating the arrays
+     * @param bitOffset Out parameter of length k
+     * @param wordOffset Out parameter of length k
+     * @since 0.8.11 out parameters added
      */
-    public void getOffsets (byte[] key) { getOffsets(key, 0, key.length); }
-    public void getOffsets (byte[] key, int off, int len) {
-        if (key == null) {
-            throw new IllegalArgumentException("null key");
-        }
-        if (len < 20) {
-            throw new IllegalArgumentException(
-                "key must be at least 20 bytes long");
-        }
-        b = key;
-        offset = off;
-        length = len;
+    public void getOffsets (byte[] key, int[] bitOffset, int[] wordOffset) {
+        getOffsets(key, 0, key.length, bitOffset, wordOffset);
+    }
+
+    /**
+     * Given a key, populate the word and bit offset arrays, each
+     * of which has k elements.
+     * 
+     * @param key cryptographic key used in populating the arrays
+     * @param bitOffset Out parameter of length k
+     * @param wordOffset Out parameter of length k
+     * @since 0.8.11 out parameters added
+     */
+    public void getOffsets (byte[] key, int off, int len, int[] bitOffset, int[] wordOffset) {
+        // skip these checks for speed
+        //if (key == null) {
+        //    throw new IllegalArgumentException("null key");
+        //}
+        //if (len < 20) {
+        //    throw new IllegalArgumentException(
+        //        "key must be at least 20 bytes long");
+        //}
 //      // DEBUG
 //      System.out.println("KeySelector.getOffsets for " 
 //                                          + BloomSHA1.keyToString(b));
 //      // END
-        bitSel.getBitSelectors();
-        wordSel.getWordSelectors();
+        bitSel.getBitSelectors(key, off, len, bitOffset);
+        wordSel.getWordSelectors(key, off, len, wordOffset);
     }
 
+/*****
     // DEBUG METHODS ////////////////////////////////////////////////
     String itoh(int i) {
         return BloomSHA1.itoh(i);
@@ -254,6 +273,7 @@ public class KeySelector {
     String btoh(byte b) {
         return BloomSHA1.btoh(b);
     }
+*****/
 }
 
 

@@ -1,8 +1,6 @@
 package net.i2p.util;
 
 import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.Random;
 
 import net.i2p.I2PAppContext;
@@ -62,8 +60,6 @@ import net.i2p.data.DataHelper;
 public class DecayingHashSet extends DecayingBloomFilter {
     private ConcurrentHashSet<ArrayWrapper> _current;
     private ConcurrentHashSet<ArrayWrapper> _previous;
-    /** synchronize against this lock when switching double buffers */
-    private final ReentrantReadWriteLock _reorganizeLock = new ReentrantReadWriteLock(true);
    
     /**
      * Create a double-buffered hash set that will decay its entries over time.  
@@ -82,35 +78,16 @@ public class DecayingHashSet extends DecayingBloomFilter {
             throw new IllegalArgumentException("Bad size");
         _current = new ConcurrentHashSet(128);
         _previous = new ConcurrentHashSet(128);
-        _decayEvent = new DecayEvent();
-        _keepDecaying = true;
-        SimpleScheduler.getInstance().addEvent(_decayEvent, _durationMs);
         if (_log.shouldLog(Log.WARN))
            _log.warn("New DHS " + name + " entryBytes = " + entryBytes +
                      " cycle (s) = " + (durationMs / 1000));
         // try to get a handle on memory usage vs. false positives
         context.statManager().createRateStat("router.decayingHashSet." + name + ".size",
-             "Size", "Router", new long[] { Math.max(60*1000, durationMs) });
+             "Size", "Router", new long[] { 10 * Math.max(60*1000, durationMs) });
         context.statManager().createRateStat("router.decayingHashSet." + name + ".dups",
-             "1000000 * Duplicates/Size", "Router", new long[] { Math.max(60*1000, durationMs) });
-        context.addShutdownTask(new Shutdown());
+             "1000000 * Duplicates/Size", "Router", new long[] { 10 * Math.max(60*1000, durationMs) });
     }
     
-    /**
-     * @since 0.8.8
-     */
-    private class Shutdown implements Runnable {
-        public void run() {
-            clear();
-        }
-    }
-
-    /** unsynchronized but only used for logging elsewhere */
-    @Override
-    public int getInsertedCount() { 
-        return _current.size() + _previous.size(); 
-    }
-
     /** pointless, only used for logging elsewhere */
     @Override
     public double getFalsePositiveRate() { 
@@ -166,19 +143,19 @@ public class DecayingHashSet extends DecayingBloomFilter {
     }
     
     /**
-     *  @param addIfNew if true, add the element to current if it is not already there;
+     *  @param addIfNew if true, add the element to current if it is not already there or in previous;
      *                  if false, only check
      *  @return if the element is in either the current or previous set
      */
     private boolean locked_add(ArrayWrapper w, boolean addIfNew) {
-        boolean seen;
-        // only access _current once. This adds to _current even if seen in _previous.
-        if (addIfNew)
-            seen = !_current.add(w);
-        else
-            seen = _current.contains(w);
-        if (!seen)
-            seen = _previous.contains(w);
+        boolean seen = _previous.contains(w);
+        // only access _current once.
+        if (!seen) {
+            if (addIfNew)
+                seen = !_current.add(w);
+            else
+                seen = _current.contains(w);
+        }
         if (seen) {
             // why increment if addIfNew == false? Only used for stats...
             _currentDuplicates++;
@@ -200,7 +177,8 @@ public class DecayingHashSet extends DecayingBloomFilter {
         clear();
     }
     
-    private void decay() {
+    @Override
+    protected void decay() {
         int currentCount = 0;
         long dups = 0;
         if (!getWriteLock())
@@ -219,45 +197,12 @@ public class DecayingHashSet extends DecayingBloomFilter {
             _log.debug("Decaying the filter " + _name + " after inserting " + currentCount 
                        + " elements and " + dups + " false positives");
         _context.statManager().addRateData("router.decayingHashSet." + _name + ".size",
-                                           currentCount, 0);
+                                           currentCount);
         if (currentCount > 0)
             _context.statManager().addRateData("router.decayingHashSet." + _name + ".dups",
-                                               1000l*1000*dups/currentCount, 0);
+                                               1000l*1000*dups/currentCount);
     }
     
-    /** if decay() ever blows up, we won't reschedule, and will grow unbounded, but it seems unlikely */
-    private class DecayEvent implements SimpleTimer.TimedEvent {
-        public void timeReached() {
-            if (_keepDecaying) {
-                decay();
-                SimpleScheduler.getInstance().addEvent(DecayEvent.this, _durationMs);
-            }
-        }
-    }
-
-    private void getReadLock() {
-        _reorganizeLock.readLock().lock();
-    }
-
-    private void releaseReadLock() {
-        _reorganizeLock.readLock().unlock();
-    }
-
-    /** @return true if the lock was acquired */
-    private boolean getWriteLock() {
-        try {
-            boolean rv = _reorganizeLock.writeLock().tryLock(5000, TimeUnit.MILLISECONDS);
-            if (!rv)
-                _log.error("no lock, size is: " + _reorganizeLock.getQueueLength(), new Exception("rats"));
-            return rv;
-        } catch (InterruptedException ie) {}
-        return false;
-    }
-
-    private void releaseWriteLock() {
-        _reorganizeLock.writeLock().unlock();
-    }
-
     /**
      *  This saves the data as-is if the length is <= 8 bytes,
      *  otherwise it stores an 8-byte hash.
