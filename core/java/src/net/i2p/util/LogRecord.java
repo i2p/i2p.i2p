@@ -10,17 +10,17 @@ package net.i2p.util;
  */
 
 /**
- * Frisbee
+ * Keep track of a log entry, unformatted.
  *
  */
 class LogRecord {
-    private long _date;
-    private Class _source;
-    private String _name;
-    private String _threadName;
-    private int _priority;
-    private String _message;
-    private Throwable _throwable;
+    private final long _date;
+    private final Class _source;
+    private final String _name;
+    private final String _threadName;
+    private final int _priority;
+    private final String _message;
+    private final Throwable _throwable;
 
     public LogRecord(Class src, String name, String threadName, int priority, String msg, Throwable t) {
         _date = Clock.getInstance().now();
