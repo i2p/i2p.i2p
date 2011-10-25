@@ -16,7 +16,7 @@ import net.i2p.util.Log;
  * hops agreed to participate in the tunnel, or if not, why not.
  *
  */
-public class BuildReplyHandler {
+public abstract class BuildReplyHandler {
 
     /**
      * Decrypt the tunnel build reply records.  This overwrites the contents of the reply

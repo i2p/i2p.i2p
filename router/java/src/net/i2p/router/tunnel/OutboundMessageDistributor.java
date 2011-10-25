@@ -14,7 +14,7 @@ import net.i2p.util.Log;
  * When a message arrives at the outbound tunnel endpoint, this distributor
  * honors the instructions.
  */
-public class OutboundMessageDistributor {
+class OutboundMessageDistributor {
     private final RouterContext _context;
     private final int _priority;
     private final Log _log;

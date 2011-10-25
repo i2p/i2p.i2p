@@ -43,6 +43,9 @@ class RouterThrottleImpl implements RouterThrottle {
     /** tunnel acceptance */
     public static final int TUNNEL_ACCEPT = 0;
     
+    /** = TrivialPreprocessor.PREPROCESSED_SIZE */
+    private static final int PREPROCESSED_SIZE = 1024;
+
     public RouterThrottleImpl(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(RouterThrottleImpl.class);
@@ -265,7 +268,7 @@ class RouterThrottleImpl implements RouterThrottle {
         if (messagesPerTunnel < DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE)
             messagesPerTunnel = DEFAULT_MESSAGES_PER_TUNNEL_ESTIMATE;
 
-        double bytesAllocated = messagesPerTunnel * numTunnels * net.i2p.router.tunnel.TrivialPreprocessor.PREPROCESSED_SIZE;
+        double bytesAllocated = messagesPerTunnel * numTunnels * PREPROCESSED_SIZE;
         
         if (!allowTunnel(bytesAllocated, numTunnels)) {
             _context.statManager().addRateData("router.throttleTunnelBandwidthExceeded", (long)bytesAllocated, 0);

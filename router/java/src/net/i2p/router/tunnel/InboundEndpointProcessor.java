@@ -14,7 +14,7 @@ import net.i2p.util.Log;
  * same thing in both instances.
  *
  */
-public class InboundEndpointProcessor {
+class InboundEndpointProcessor {
     private final RouterContext _context;
     private final Log _log;
     private final TunnelCreatorConfig _config;
@@ -90,15 +90,15 @@ public class InboundEndpointProcessor {
      * Iteratively undo the crypto that the various layers in the tunnel added.
      */
     private void decrypt(RouterContext ctx, TunnelCreatorConfig cfg, byte iv[], byte orig[], int offset, int length) {
-        Log log = ctx.logManager().getLog(OutboundGatewayProcessor.class);
+        //Log log = ctx.logManager().getLog(OutboundGatewayProcessor.class);
         ByteArray ba = _cache.acquire();
         byte cur[] = ba.getData(); // new byte[HopProcessor.IV_LENGTH]; // so we dont malloc
         for (int i = cfg.getLength()-2; i >= 0; i--) { // dont include the endpoint, since that is the creator
             OutboundGatewayProcessor.decrypt(ctx, iv, orig, offset, length, cur, cfg.getConfig(i));
-            if (log.shouldLog(Log.DEBUG)) {
+            //if (log.shouldLog(Log.DEBUG)) {
                 //log.debug("IV at hop " + i + ": " + Base64.encode(orig, offset, HopProcessor.IV_LENGTH));
                 //log.debug("hop " + i + ": " + Base64.encode(orig, offset + HopProcessor.IV_LENGTH, length - HopProcessor.IV_LENGTH));
-            }
+            //}
         }
         _cache.release(ba);
     }

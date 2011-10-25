@@ -24,16 +24,16 @@ import net.i2p.util.SimpleTimer;
  * Warning - this is all unsynchronized here - receivers must implement synchronization
  *
  */
-public class FragmentedMessage {
-    private I2PAppContext _context;
-    private Log _log;
+class FragmentedMessage {
+    private final I2PAppContext _context;
+    private final Log _log;
     private long _messageId;
     private Hash _toRouter;
     private TunnelId _toTunnel;
     private ByteArray _fragments[];
     private boolean _lastReceived;
     private int _highFragmentNum;
-    private long _createdOn;
+    private final long _createdOn;
     private boolean _completed;
     private long _releasedAfter;
     private SimpleTimer.TimedEvent _expireEvent;
@@ -46,15 +46,10 @@ public class FragmentedMessage {
         _context = ctx;
         _log = ctx.logManager().getLog(FragmentedMessage.class);
         _messageId = -1;
-        _toRouter = null;
-        _toTunnel = null;
         _fragments = new ByteArray[MAX_FRAGMENTS];
-        _lastReceived = false;
         _highFragmentNum = -1;
         _releasedAfter = -1;
         _createdOn = ctx.clock().now();
-        _expireEvent = null;
-        _completed = false;
     }
     
     /**

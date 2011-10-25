@@ -12,7 +12,7 @@ import net.i2p.util.DecayingHashSet;
  * decaying bloom filter.  
  *
  */
-public class BloomFilterIVValidator implements IVValidator {
+class BloomFilterIVValidator implements IVValidator {
     private final RouterContext _context;
     private final DecayingBloomFilter _filter;
     private final ByteCache _ivXorCache = ByteCache.getInstance(32, HopProcessor.IV_LENGTH);
@@ -30,6 +30,8 @@ public class BloomFilterIVValidator implements IVValidator {
     private static final long MIN_MEM_TO_USE_BLOOM = 64*1024*1024l;
     private static final long MIN_MEM_FOR_BIG_BLOOM = 128*1024*1024l;
     private static final long MIN_MEM_FOR_HUGE_BLOOM = 256*1024*1024l;
+    /** for testing */
+    private static final String PROP_FORCE = "router.forceDecayingBloomFilter";
 
     public BloomFilterIVValidator(RouterContext ctx, int KBps) {
         _context = ctx;
@@ -40,7 +42,9 @@ public class BloomFilterIVValidator implements IVValidator {
         long maxMemory = Runtime.getRuntime().maxMemory();
         if (maxMemory == Long.MAX_VALUE)
             maxMemory = 96*1024*1024l;
-        if (KBps < MIN_SHARE_KBPS_TO_USE_BLOOM || maxMemory < MIN_MEM_TO_USE_BLOOM)
+        if (_context.getBooleanProperty(PROP_FORCE))
+            _filter = new DecayingBloomFilter(ctx, HALFLIFE_MS, 16, "TunnelIVV");  // 2MB fixed
+        else if (KBps < MIN_SHARE_KBPS_TO_USE_BLOOM || maxMemory < MIN_MEM_TO_USE_BLOOM)
             _filter = new DecayingHashSet(ctx, HALFLIFE_MS, 16, "TunnelIVV"); // appx. 4MB max
         else if (KBps >= MIN_SHARE_KBPS_FOR_HUGE_BLOOM && maxMemory >= MIN_MEM_FOR_HUGE_BLOOM)
             _filter = new DecayingBloomFilter(ctx, HALFLIFE_MS, 16, "TunnelIVV", 25);  // 8MB fixed
@@ -49,7 +53,7 @@ public class BloomFilterIVValidator implements IVValidator {
         else
             _filter = new DecayingBloomFilter(ctx, HALFLIFE_MS, 16, "TunnelIVV");  // 2MB fixed
         ctx.statManager().createRateStat("tunnel.duplicateIV", "Note that a duplicate IV was received", "Tunnels", 
-                                         new long[] { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000l });
+                                         new long[] { 60*60*1000l });
     }
     
     public boolean receiveIV(byte ivData[], int ivOffset, byte payload[], int payloadOffset) {
@@ -57,8 +61,9 @@ public class BloomFilterIVValidator implements IVValidator {
         DataHelper.xor(ivData, ivOffset, payload, payloadOffset, buf.getData(), 0, HopProcessor.IV_LENGTH);
         boolean dup = _filter.add(buf.getData()); 
         _ivXorCache.release(buf);
-        if (dup) _context.statManager().addRateData("tunnel.duplicateIV", 1, 1);
+        if (dup) _context.statManager().addRateData("tunnel.duplicateIV", 1);
         return !dup; // return true if it is OK, false if it isn't
     }
+
     public void destroy() { _filter.stopDecaying(); }
 }

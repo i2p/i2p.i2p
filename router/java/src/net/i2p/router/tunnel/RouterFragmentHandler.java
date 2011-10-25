@@ -6,7 +6,7 @@ import net.i2p.util.Log;
 /**
  * Minor extension to allow message history integration
  */
-public class RouterFragmentHandler extends FragmentHandler {
+class RouterFragmentHandler extends FragmentHandler {
     
     public RouterFragmentHandler(RouterContext context, DefragmentedReceiver receiver) {
         super(context, receiver);

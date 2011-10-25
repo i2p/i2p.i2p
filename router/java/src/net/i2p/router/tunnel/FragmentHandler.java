@@ -90,14 +90,13 @@ The total size, including the tunnel ID and IV, is 1028 bytes.
 
  *
  */
-public class FragmentHandler {
-    protected RouterContext _context;
-    protected Log _log;
+class FragmentHandler {
+    protected final RouterContext _context;
+    protected final Log _log;
     private final Map<Long, FragmentedMessage> _fragmentedMessages;
-    private DefragmentedReceiver _receiver;
+    private final DefragmentedReceiver _receiver;
     private int _completed;
     private int _failed;
-    private static final long[] RATES = { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000 };
     
     /** don't wait more than 60s to defragment the partial message */
     static long MAX_DEFRAGMENT_TIME = 60*1000;
@@ -108,16 +107,7 @@ public class FragmentHandler {
         _log = context.logManager().getLog(FragmentHandler.class);
         _fragmentedMessages = new HashMap(8);
         _receiver = receiver;
-        _context.statManager().createRateStat("tunnel.smallFragments", "How many pad bytes are in small fragments?", 
-                                              "Tunnels", RATES);
-        _context.statManager().createRateStat("tunnel.fullFragments", "How many tunnel messages use the full data area?", 
-                                              "Tunnels", RATES);
-        _context.statManager().createRateStat("tunnel.fragmentedComplete", "How many fragments were in a completely received message?", 
-                                              "Tunnels", RATES);
-        _context.statManager().createRequiredRateStat("tunnel.fragmentedDropped", "Number of dropped fragments", 
-                                              "Tunnels", RATES);
-        _context.statManager().createRequiredRateStat("tunnel.corruptMessage", "Corrupt messages received", 
-                                              "Tunnels", RATES);
+        // all createRateStat in TunnelDispatcher
     }
     
     /**

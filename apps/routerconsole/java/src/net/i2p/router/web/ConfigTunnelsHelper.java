@@ -63,6 +63,7 @@ public class ConfigTunnelsHelper extends HelperBase {
     private static final int MAX_BACKUP_QUANTITY = 3;
     private static final int MAX_VARIANCE = 2;
     private static final int MIN_NEG_VARIANCE = -1;
+
     private void renderForm(StringBuilder buf, int index, String prefix, String name, TunnelPoolSettings in, TunnelPoolSettings out) {
 
         buf.append("<tr><th colspan=\"3\"><a name=\"").append(prefix).append("\">");
@@ -80,8 +81,8 @@ public class ConfigTunnelsHelper extends HelperBase {
         if (in.getLength() + Math.abs(in.getLengthVariance()) >= WARN_LENGTH ||
             out.getLength() + Math.abs(out.getLengthVariance()) >= WARN_LENGTH)
             buf.append("<tr><th colspan=\"3\"><font color=\"red\">" + _("PERFORMANCE WARNING - Settings include very long tunnels.") + "</font></th></tr>");
-        if (in.getQuantity() + in.getBackupQuantity() >= WARN_QUANTITY ||
-            out.getQuantity() + out.getBackupQuantity() >= WARN_QUANTITY)
+        if (in.getTotalQuantity() >= WARN_QUANTITY ||
+            out.getTotalQuantity() >= WARN_QUANTITY)
             buf.append("<tr><th colspan=\"3\"><font color=\"red\">" + _("PERFORMANCE WARNING - Settings include high tunnel quantities.") + "</font></th></tr>");
 
         buf.append("<tr><th></th><th><img src=\"/themes/console/images/inbound.png\" alt=\"Inbound\" title=\"Inbound Tunnels\">&nbsp;&nbsp;" + _("Inbound") + "</th><th><img src=\"/themes/console/images/outbound.png\" alt=\"Outbound Tunnels\" title=\"Outbound\">&nbsp;&nbsp;" + _("Outbound") + "</th></tr>\n");

@@ -12,8 +12,8 @@ import net.i2p.util.I2PThread;
  * run through the tunnel gateways that have had messages added to them and push
  * those messages through the preprocessing and sending process
  */
-public class TunnelGatewayPumper implements Runnable {
-    private RouterContext _context;
+class TunnelGatewayPumper implements Runnable {
+    private final RouterContext _context;
     private final BlockingQueue<PumpedTunnelGateway> _wantsPumping;
     private boolean _stop;
     private static final int MIN_PUMPERS = 1;
@@ -24,7 +24,6 @@ public class TunnelGatewayPumper implements Runnable {
     public TunnelGatewayPumper(RouterContext ctx) {
         _context = ctx;
         _wantsPumping = new LinkedBlockingQueue();
-        _stop = false;
         long maxMemory = Runtime.getRuntime().maxMemory();
         if (maxMemory == Long.MAX_VALUE)
             maxMemory = 96*1024*1024l;

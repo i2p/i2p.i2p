@@ -7,8 +7,8 @@ import net.i2p.I2PAppContext;
  * it on to the first hop.
  *
  */
-public class InboundSender implements TunnelGateway.Sender {
-    private InboundGatewayProcessor _processor;
+class InboundSender implements TunnelGateway.Sender {
+    private final InboundGatewayProcessor _processor;
     
     static final boolean USE_ENCRYPTION = HopProcessor.USE_ENCRYPTION;
     

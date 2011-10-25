@@ -17,7 +17,7 @@ import net.i2p.util.Log;
  * InboundMessageDistributor to receive defragmented and decrypted messages,
  * which it will then selectively forward.
  */
-public class TunnelParticipant {
+class TunnelParticipant {
     private final RouterContext _context;
     private final Log _log;
     private final HopConfig _config;

@@ -7,7 +7,7 @@ import net.i2p.data.Hash;
 import net.i2p.util.RandomSource;
 
 /**
- * Wrap up the settings for a pool of tunnels (duh)
+ * Wrap up the settings for a pool of tunnels.
  *
  */
 public class TunnelPoolSettings {
@@ -19,7 +19,7 @@ public class TunnelPoolSettings {
     //private int _duration;
     private int _length;
     private int _lengthVariance;
-    private int _lengthOverride;
+    //private int _lengthOverride;
     private boolean _isInbound;
     private boolean _isExploratory;
     private boolean _allowZeroHop;
@@ -74,6 +74,15 @@ public class TunnelPoolSettings {
     public int getBackupQuantity() { return _backupQuantity; }
     public void setBackupQuantity(int quantity) { _backupQuantity = quantity; }
     
+    /**
+     *  Convenience
+     *  @return getQuantity() + getBackupQuantity()
+     *  @since 0.8.11
+     */
+    public int getTotalQuantity() {
+        return _quantity + _backupQuantity;
+    }
+
     /** how long before tunnel expiration should new tunnels be built */
     // public int getRebuildPeriod() { return _rebuildPeriod; }
     // public void setRebuildPeriod(int periodMs) { _rebuildPeriod = periodMs; }
@@ -95,9 +104,9 @@ public class TunnelPoolSettings {
     public int getLengthVariance() { return _lengthVariance; }
     public void setLengthVariance(int variance) { _lengthVariance = variance; }
 
-    /* Set to a nonzero value to override the length setting */
-    public int getLengthOverride() { return _lengthOverride; }
-    public void setLengthOverride(int variance) { _lengthOverride = variance; }
+    /* UNUSED Set to a nonzero value to override the length setting */
+    //public int getLengthOverride() { return _lengthOverride; }
+    //public void setLengthOverride(int variance) { _lengthOverride = variance; }
     
     /** is this an inbound tunnel? */
     public boolean isInbound() { return _isInbound; }
@@ -200,7 +209,7 @@ public class TunnelPoolSettings {
     }
     
     // used for strict peer ordering
-    private Hash generateRandomKey() {
+    private static Hash generateRandomKey() {
         byte hash[] = new byte[Hash.HASH_LENGTH];
         RandomSource.getInstance().nextBytes(hash);
         return new Hash(hash);
@@ -211,7 +220,9 @@ public class TunnelPoolSettings {
         boolean v = "TRUE".equalsIgnoreCase(str) || "YES".equalsIgnoreCase(str);
         return v;
     }
+
     private static final int getInt(String str, int defaultValue) { return (int)getLong(str, defaultValue); }
+
     private static final long getLong(String str, long defaultValue) {
         if (str == null) return defaultValue;
         try {

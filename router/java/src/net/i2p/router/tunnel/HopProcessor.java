@@ -15,11 +15,11 @@ import net.i2p.util.Log;
  * InbuondGatewayProcessor).  
  *
  */
-public class HopProcessor {
-    protected I2PAppContext _context;
-    private Log _log;
-    protected HopConfig _config;
-    private IVValidator _validator;
+class HopProcessor {
+    protected final I2PAppContext _context;
+    private final Log _log;
+    protected final HopConfig _config;
+    private final IVValidator _validator;
         
     /** helpful flag for debugging */
     static final boolean USE_ENCRYPTION = true;

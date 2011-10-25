@@ -2,6 +2,8 @@ package net.i2p.router.tunnel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
@@ -33,9 +35,9 @@ import net.i2p.util.Log;
  * </ol>
  *
  */
-public class PumpedTunnelGateway extends TunnelGateway {
-    private final List<Pending> _prequeue;
-    private TunnelGatewayPumper _pumper;
+class PumpedTunnelGateway extends TunnelGateway {
+    private final BlockingQueue<Pending> _prequeue;
+    private final TunnelGatewayPumper _pumper;
     
     /**
      * @param preprocessor this pulls Pending messages off a list, builds some
@@ -47,7 +49,7 @@ public class PumpedTunnelGateway extends TunnelGateway {
      */
     public PumpedTunnelGateway(RouterContext context, QueuePreprocessor preprocessor, Sender sender, Receiver receiver, TunnelGatewayPumper pumper) {
         super(context, preprocessor, sender, receiver);
-        _prequeue = new ArrayList(4);
+        _prequeue = new LinkedBlockingQueue();
         _pumper = pumper;
     }
     
@@ -64,13 +66,8 @@ public class PumpedTunnelGateway extends TunnelGateway {
     public void add(I2NPMessage msg, Hash toRouter, TunnelId toTunnel) {
         _messagesSent++;
         Pending cur = new PendingImpl(msg, toRouter, toTunnel);
-        long beforeLock = System.currentTimeMillis();
-        synchronized (_prequeue) {
-            _prequeue.add(cur);
-        }
+        _prequeue.offer(cur);
         _pumper.wantsPumping(this);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("GW prequeue time: " + (System.currentTimeMillis()-beforeLock) + " for " + msg.getUniqueId() + " on " + toString());
     }
 
     /**
@@ -84,14 +81,10 @@ public class PumpedTunnelGateway extends TunnelGateway {
      *                 Must be empty when called; will always be emptied before return.
      */
     void pump(List<Pending> queueBuf) {
-        synchronized (_prequeue) {
-            if (!_prequeue.isEmpty()) {
-                queueBuf.addAll(_prequeue);
-                _prequeue.clear();
-            } else {
-                return;
-            }
-        }
+        _prequeue.drainTo(queueBuf);
+        if (queueBuf.isEmpty())
+            return;
+
         long startAdd = System.currentTimeMillis();
         long beforeLock = startAdd;
         long afterAdded = -1;

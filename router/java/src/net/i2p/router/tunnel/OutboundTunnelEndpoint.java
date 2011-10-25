@@ -12,13 +12,13 @@ import net.i2p.util.Log;
  * and honor the instructions as received.
  *
  */
-public class OutboundTunnelEndpoint {
-    private RouterContext _context;
-    private Log _log;
-    private HopConfig _config;
-    private HopProcessor _processor;
-    private FragmentHandler _handler;
-    private OutboundMessageDistributor _outDistributor;
+class OutboundTunnelEndpoint {
+    private final RouterContext _context;
+    private final Log _log;
+    private final HopConfig _config;
+    private final HopProcessor _processor;
+    private final FragmentHandler _handler;
+    private final OutboundMessageDistributor _outDistributor;
 
     public OutboundTunnelEndpoint(RouterContext ctx, HopConfig config, HopProcessor processor) {
         _context = ctx;

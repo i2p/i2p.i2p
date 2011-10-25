@@ -13,7 +13,7 @@ import net.i2p.util.Log;
  * InboundEndpointProcessor, as its the same 'undo' function of the tunnel crypto.
  *
  */
-public class OutboundGatewayProcessor {
+class OutboundGatewayProcessor {
     private final I2PAppContext _context;
     private final Log _log;
     private final TunnelCreatorConfig _config;

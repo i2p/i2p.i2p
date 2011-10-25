@@ -79,9 +79,11 @@ class TestJob extends JobImpl {
         _outTunnel = null;
         if (_cfg.isInbound()) {
             _replyTunnel = _cfg;
+            // TODO if testing is re-enabled, pick closest to far end
             _outTunnel = getContext().tunnelManager().selectOutboundTunnel();
             _otherTunnel = (PooledTunnelCreatorConfig) _outTunnel;
         } else {
+            // TODO if testing is re-enabled, pick closest to far end
             _replyTunnel = getContext().tunnelManager().selectInboundTunnel();
             _outTunnel = _cfg;
             _otherTunnel = (PooledTunnelCreatorConfig) _replyTunnel;
@@ -117,7 +119,7 @@ class TestJob extends JobImpl {
         instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_LOCAL);
 
         PayloadGarlicConfig payload = new PayloadGarlicConfig();
-        payload.setCertificate(new Certificate(Certificate.CERTIFICATE_TYPE_NULL, null));
+        payload.setCertificate(Certificate.NULL_CERT);
         payload.setId(getContext().random().nextLong(I2NPMessage.MAX_ID_VALUE));
         payload.setPayload(m);
         payload.setRecipient(getContext().router().getRouterInfo());

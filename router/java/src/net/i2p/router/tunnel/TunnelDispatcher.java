@@ -43,6 +43,8 @@ public class TunnelDispatcher implements Service {
     /** what is the date/time we last deliberately dropped a tunnel? **/
     private long _lastDropTime;
     private final TunnelGatewayPumper _pumper;
+
+    private static final long[] RATES = { 10*60*1000l, 60*60*1000l, 3*60*60*1000l, 24*60*60*1000 };
     
     /** Creates a new instance of TunnelDispatcher */
     public TunnelDispatcher(RouterContext ctx) {
@@ -148,6 +150,22 @@ public class TunnelDispatcher implements Service {
         ctx.statManager().createRateStat("tunnel.inboundLookupSuccess", "Was a deferred lookup successful?", "Tunnels", new long[] { 60*60*1000 });
         // following is for TunnelParticipant
         ctx.statManager().createRateStat("tunnel.participantLookupSuccess", "Was a deferred lookup successful?", "Tunnels", new long[] { 60*60*1000 });
+        // following is for BuildMessageProcessor
+        ctx.statManager().createRateStat("tunnel.buildRequestDup", "How frequently we get dup build request messages", "Tunnels", new long[] { 60*60*1000 });
+        // following are for FragmentHandler
+        ctx.statManager().createRateStat("tunnel.smallFragments", "How many pad bytes are in small fragments?", 
+                                              "Tunnels", RATES);
+        ctx.statManager().createRateStat("tunnel.fullFragments", "How many tunnel messages use the full data area?", 
+                                              "Tunnels", RATES);
+        ctx.statManager().createRateStat("tunnel.fragmentedComplete", "How many fragments were in a completely received message?", 
+                                              "Tunnels", RATES);
+        ctx.statManager().createRequiredRateStat("tunnel.fragmentedDropped", "Number of dropped fragments", 
+                                              "Tunnels", RATES);
+        ctx.statManager().createRequiredRateStat("tunnel.corruptMessage", "Corrupt messages received", 
+                                              "Tunnels", RATES);
+        // following are for InboundMessageDistributor
+        ctx.statManager().createRateStat("tunnel.dropDangerousClientTunnelMessage", "How many tunnel messages come down a client tunnel that we shouldn't expect (lifetime is the 'I2NP type')", "Tunnels", new long[] { 60*60*1000 });
+        ctx.statManager().createRateStat("tunnel.handleLoadClove", "When do we receive load test cloves", "Tunnels", new long[] { 60*60*1000 });
     }
 
     /** for IBGW */

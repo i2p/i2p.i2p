@@ -75,7 +75,8 @@ class BuildHandler {
 
         _context.statManager().createRequiredRateStat("tunnel.rejectOverloaded", "Delay to process rejected request (ms)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRequiredRateStat("tunnel.acceptLoad", "Delay to process accepted request (ms)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.dropConnLimits", "Drop instead of reject due to conn limits", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        _context.statManager().createRateStat("tunnel.dropConnLimits", "Drop instead of reject due to conn limits", "Tunnels", new long[] { 10*60*1000 });
+        _context.statManager().createRateStat("tunnel.rejectConnLimits", "Reject due to conn limits", "Tunnels", new long[] { 10*60*1000 });
         _context.statManager().createRequiredRateStat("tunnel.dropLoad", "Delay before dropping request (ms)?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRequiredRateStat("tunnel.dropLoadDelay", "Delay before abandoning request (ms)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRequiredRateStat("tunnel.dropLoadBacklog", "Pending request count when dropped", "Tunnels", new long[] { 60*1000, 10*60*1000 });
@@ -507,6 +508,7 @@ class BuildHandler {
                 if (bw != 'O' && bw != 'N' &&
                     ((isInGW && ! _context.commSystem().haveInboundCapacity(87)) ||
                      (isOutEnd && ! _context.commSystem().haveOutboundCapacity(87)))) {
+                        _context.statManager().addRateData("tunnel.rejectConnLimits", 1);
                         _context.throttle().setTunnelStatus(_x("Rejecting tunnels: Connection limit"));
                         response = TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
                 }

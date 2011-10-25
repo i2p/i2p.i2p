@@ -8,11 +8,11 @@ import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 /**
- * Serve as the gatekeeper for a tunnel with no hops.
+ * Serve as the gatekeeper for a tunnel with no hops, either inbound or outbound.
  *
  */
-public class TunnelGatewayZeroHop extends TunnelGateway {
-    private TunnelCreatorConfig _config;
+class TunnelGatewayZeroHop extends TunnelGateway {
+    private final TunnelCreatorConfig _config;
     private OutboundMessageDistributor _outDistributor;
     private InboundMessageDistributor _inDistributor;
     

@@ -50,7 +50,7 @@ public class TunnelPool {
         _log = ctx.logManager().getLog(TunnelPool.class);
         _manager = mgr;
         _settings = settings;
-        _tunnels = new ArrayList(settings.getLength() + settings.getBackupQuantity());
+        _tunnels = new ArrayList(settings.getTotalQuantity());
         _peerSelector = sel;
         _expireSkew = _context.random().nextInt(90*1000);
         _started = System.currentTimeMillis();
@@ -292,7 +292,7 @@ public class TunnelPool {
      * Used to prevent a zillion of them
      */
     boolean needFallback() {
-        int needed = _settings.getBackupQuantity() + _settings.getQuantity();
+        int needed = _settings.getTotalQuantity();
         int fallbacks = 0;
         synchronized (_tunnels) {
             for (int i = 0; i < _tunnels.size(); i++) {
@@ -495,7 +495,7 @@ public class TunnelPool {
      *
      */
     boolean buildFallback() {
-        int quantity = _settings.getBackupQuantity() + _settings.getQuantity();
+        int quantity = _settings.getTotalQuantity();
         int usable = 0;
         synchronized (_tunnels) {
             usable = _tunnels.size();
@@ -678,7 +678,7 @@ public class TunnelPool {
         if (!isAlive()) {
                 return 0;
         }
-        int wanted = getSettings().getBackupQuantity() + getSettings().getQuantity();
+        int wanted = getSettings().getTotalQuantity();
         
         boolean allowZeroHop = ((getSettings().getLength() + getSettings().getLengthVariance()) <= 0);
           

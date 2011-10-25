@@ -10,8 +10,7 @@ import net.i2p.router.RouterContext;
  * router config setting, and track fragmentation.
  *
  */
-public class BatchedRouterPreprocessor extends BatchedPreprocessor {
-    protected RouterContext _routerContext;
+class BatchedRouterPreprocessor extends BatchedPreprocessor {
     private TunnelCreatorConfig _config;
     protected HopConfig _hopConfig;
     private final long _sendDelay;
@@ -34,7 +33,6 @@ public class BatchedRouterPreprocessor extends BatchedPreprocessor {
     /** for OBGWs */
     public BatchedRouterPreprocessor(RouterContext ctx, TunnelCreatorConfig cfg) {
         super(ctx, getName(cfg));
-        _routerContext = ctx;
         _config = cfg;
         _sendDelay = initialSendDelay();
     }
@@ -42,7 +40,6 @@ public class BatchedRouterPreprocessor extends BatchedPreprocessor {
     /** for IBGWs */
     public BatchedRouterPreprocessor(RouterContext ctx, HopConfig cfg) {
         super(ctx, getName(cfg));
-        _routerContext = ctx;
         _hopConfig = cfg;
         _sendDelay = initialSendDelay();
     }
@@ -103,14 +100,14 @@ public class BatchedRouterPreprocessor extends BatchedPreprocessor {
         } else {
             def = DEFAULT_BATCH_FREQUENCY;
         }
-        return _routerContext.getProperty(PROP_ROUTER_BATCH_FREQUENCY, def);
+        return _context.getProperty(PROP_ROUTER_BATCH_FREQUENCY, def);
     }
     
     @Override
     protected void notePreprocessing(long messageId, int numFragments, int totalLength, List<Long> messageIds, String msg) {
         if (_config != null)
-            _routerContext.messageHistory().fragmentMessage(messageId, numFragments, totalLength, messageIds, _config, msg);
+            _context.messageHistory().fragmentMessage(messageId, numFragments, totalLength, messageIds, _config, msg);
         else
-            _routerContext.messageHistory().fragmentMessage(messageId, numFragments, totalLength, messageIds, _hopConfig, msg);
+            _context.messageHistory().fragmentMessage(messageId, numFragments, totalLength, messageIds, _hopConfig, msg);
     }
 }

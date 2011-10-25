@@ -26,11 +26,11 @@ import net.i2p.util.Log;
  * When a message arrives at the inbound tunnel endpoint, this distributor
  * honors the instructions (safely)
  */
-public class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
-    private RouterContext _context;
-    private Log _log;
-    private Hash _client;
-    private GarlicMessageReceiver _receiver;
+class InboundMessageDistributor implements GarlicMessageReceiver.CloveReceiver {
+    private final RouterContext _context;
+    private final Log _log;
+    private final Hash _client;
+    private final GarlicMessageReceiver _receiver;
     
     private static final int MAX_DISTRIBUTE_TIME = 10*1000;
     
@@ -39,8 +39,7 @@ public class InboundMessageDistributor implements GarlicMessageReceiver.CloveRec
         _client = client;
         _log = ctx.logManager().getLog(InboundMessageDistributor.class);
         _receiver = new GarlicMessageReceiver(ctx, this, client);
-        _context.statManager().createRateStat("tunnel.dropDangerousClientTunnelMessage", "How many tunnel messages come down a client tunnel that we shouldn't expect (lifetime is the 'I2NP type')", "Tunnels", new long[] { 60*60*1000 });
-        _context.statManager().createRateStat("tunnel.handleLoadClove", "When do we receive load test cloves", "Tunnels", new long[] { 60*60*1000 });
+        // all createRateStat in TunnelDispatcher
     }
     
     public void distribute(I2NPMessage msg, Hash target) {

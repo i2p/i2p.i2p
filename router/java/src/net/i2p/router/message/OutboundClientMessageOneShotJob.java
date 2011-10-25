@@ -891,9 +891,10 @@ public class OutboundClientMessageOneShotJob extends JobImpl {
         instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_DESTINATION);
         instructions.setDestination(_to.calculateHash());
         
-        instructions.setDelayRequested(false);
-        instructions.setDelaySeconds(0);
-        instructions.setEncrypted(false);
+        // defaults
+        //instructions.setDelayRequested(false);
+        //instructions.setDelaySeconds(0);
+        //instructions.setEncrypted(false);
         
         clove.setCertificate(Certificate.NULL_CERT);
         clove.setDeliveryInstructions(instructions);

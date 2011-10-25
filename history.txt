@@ -1,3 +1,15 @@
+2011-10-25 zzz
+  * BloomSHA1, DecayingBloomFilter:
+    - Refactor for concurrent, at some small risk of false negatives
+    - Optimizations to cache objects and reuse offsets
+  * Tunnels:
+    - Make most classes package private
+    - Final, static, logs, cleanups
+    - Consolideate createRateStat calls
+    - Add getTotalLength()
+    - Remove unused lengthOverride()
+  * UDP: Mark only first fragment as a duplicate
+
 * 2011-10-20 0.8.10 released
 
 2011-10-19 kytv

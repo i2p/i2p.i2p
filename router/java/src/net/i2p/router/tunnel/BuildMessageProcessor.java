@@ -20,11 +20,11 @@ import net.i2p.util.Log;
  * the next hop
  */
 public class BuildMessageProcessor {
-    private DecayingBloomFilter _filter;
+    private final DecayingBloomFilter _filter;
     
     public BuildMessageProcessor(I2PAppContext ctx) {
         _filter = new DecayingHashSet(ctx, 60*1000, 32, "TunnelBMP");
-        ctx.statManager().createRateStat("tunnel.buildRequestDup", "How frequently we get dup build request messages", "Tunnels", new long[] { 60*60*1000 });
+        // all createRateStat in TunnelDispatcher
     }
     /**
      * Decrypt the record targetting us, encrypting all of the other records with the included 

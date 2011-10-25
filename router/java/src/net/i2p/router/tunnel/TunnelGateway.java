@@ -33,16 +33,16 @@ import net.i2p.util.SimpleTimer;
  * </ol>
  *
  */
-public class TunnelGateway {
-    protected RouterContext _context;
-    protected Log _log;
+class TunnelGateway {
+    protected final RouterContext _context;
+    protected final Log _log;
     protected final List<Pending> _queue;
-    protected QueuePreprocessor _preprocessor;
-    protected Sender _sender;
-    protected Receiver _receiver;
+    protected final QueuePreprocessor _preprocessor;
+    protected final Sender _sender;
+    protected final Receiver _receiver;
     protected long _lastFlush;
-    protected int _flushFrequency;
-    protected DelayedFlush _delayedFlush;// FIXME Exporting non-public type through public API FIXME
+    //protected int _flushFrequency;
+    protected final DelayedFlush _delayedFlush;// FIXME Exporting non-public type through public API FIXME
     protected int _messagesSent;
     
     /**
@@ -60,7 +60,7 @@ public class TunnelGateway {
         _preprocessor = preprocessor;
         _sender = sender;
         _receiver = receiver;
-        _flushFrequency = 500;
+        //_flushFrequency = 500;
         _delayedFlush = new DelayedFlush();
         _lastFlush = _context.clock().now();
         _context.statManager().createRateStat("tunnel.lockedGatewayAdd", "How long do we block when adding a message to a tunnel gateway's queue", "Tunnels", new long[] { 60*1000, 10*60*1000 });
@@ -183,14 +183,14 @@ public class TunnelGateway {
      *  Stores all the state for an unsent or partially-sent message
      */
     public static class Pending {
-        protected Hash _toRouter;
-        protected TunnelId _toTunnel;
-        protected long _messageId;
-        protected long _expiration;
-        protected byte _remaining[];
+        protected final Hash _toRouter;
+        protected final TunnelId _toTunnel;
+        protected final long _messageId;
+        protected final long _expiration;
+        protected final byte _remaining[];
         protected int _offset;
         protected int _fragmentNumber;
-        protected long _created;
+        protected final long _created;
         private List<Long> _messageIds;
         
         public Pending(I2NPMessage message, Hash toRouter, TunnelId toTunnel) { 

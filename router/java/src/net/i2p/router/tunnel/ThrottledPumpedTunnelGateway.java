@@ -14,9 +14,9 @@ import net.i2p.router.RouterContext;
  *
  * @since 0.7.9
  */
-public class ThrottledPumpedTunnelGateway extends PumpedTunnelGateway {
+class ThrottledPumpedTunnelGateway extends PumpedTunnelGateway {
     /** saved so we can note messages that get dropped */
-    private HopConfig _config;
+    private final HopConfig _config;
     
     public ThrottledPumpedTunnelGateway(RouterContext context, QueuePreprocessor preprocessor, Sender sender,
                                         Receiver receiver, TunnelGatewayPumper pumper, HopConfig config) {

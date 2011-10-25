@@ -44,7 +44,7 @@ import net.i2p.util.Log;
  *       }
  *   }
  */
-public class BatchedPreprocessor extends TrivialPreprocessor {
+class BatchedPreprocessor extends TrivialPreprocessor {
     private long _pendingSince;
     private final String _name;
     

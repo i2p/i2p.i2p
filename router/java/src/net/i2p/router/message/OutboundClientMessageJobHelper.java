@@ -108,12 +108,13 @@ class OutboundClientMessageJobHelper {
         
         DeliveryInstructions instructions = new DeliveryInstructions();
         instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_LOCAL);
-        instructions.setDelayRequested(false);
-        instructions.setDelaySeconds(0);
-        instructions.setEncrypted(false);
-        instructions.setEncryptionKey(null);
-        instructions.setRouter(null);
-        instructions.setTunnelId(null);
+        // defaults
+        //instructions.setDelayRequested(false);
+        //instructions.setDelaySeconds(0);
+        //instructions.setEncrypted(false);
+        //instructions.setEncryptionKey(null);
+        //instructions.setRouter(null);
+        //instructions.setTunnelId(null);
         
         config.setCertificate(Certificate.NULL_CERT);
         config.setDeliveryInstructions(instructions);
@@ -155,9 +156,10 @@ class OutboundClientMessageJobHelper {
         ackInstructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_TUNNEL);
         ackInstructions.setRouter(replyToTunnelRouter);
         ackInstructions.setTunnelId(replyToTunnelId);
-        ackInstructions.setDelayRequested(false);
-        ackInstructions.setDelaySeconds(0);
-        ackInstructions.setEncrypted(false);
+        // defaults
+        //ackInstructions.setDelayRequested(false);
+        //ackInstructions.setDelaySeconds(0);
+        //ackInstructions.setEncrypted(false);
         
         DeliveryStatusMessage msg = new DeliveryStatusMessage(ctx);
         msg.setArrival(ctx.clock().now());
@@ -192,9 +194,10 @@ class OutboundClientMessageJobHelper {
         instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_DESTINATION);
         instructions.setDestination(dest.calculateHash());
         
-        instructions.setDelayRequested(false);
-        instructions.setDelaySeconds(0);
-        instructions.setEncrypted(false);
+        // defaults
+        //instructions.setDelayRequested(false);
+        //instructions.setDelaySeconds(0);
+        //instructions.setEncrypted(false);
         
         clove.setCertificate(Certificate.NULL_CERT);
         clove.setDeliveryInstructions(instructions);
@@ -218,9 +221,10 @@ class OutboundClientMessageJobHelper {
         
         DeliveryInstructions instructions = new DeliveryInstructions();
         instructions.setDeliveryMode(DeliveryInstructions.DELIVERY_MODE_LOCAL);
-        instructions.setDelayRequested(false);
-        instructions.setDelaySeconds(0);
-        instructions.setEncrypted(false);
+        // defaults
+        //instructions.setDelayRequested(false);
+        //instructions.setDelaySeconds(0);
+        //instructions.setEncrypted(false);
         
         clove.setCertificate(Certificate.NULL_CERT);
         clove.setDeliveryInstructions(instructions);

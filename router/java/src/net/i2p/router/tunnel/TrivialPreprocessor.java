@@ -19,7 +19,7 @@ import net.i2p.util.Log;
  *
  * See FragmentHandler Javadoc for tunnel message fragment format
  */
-public class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
+class TrivialPreprocessor implements TunnelGateway.QueuePreprocessor {
     protected final RouterContext _context;
     protected final Log _log;
     
