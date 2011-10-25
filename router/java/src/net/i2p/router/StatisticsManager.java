@@ -22,16 +22,14 @@ import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
 
 /**
- * Maintain the statistics about the router
+ * Publishes some statistics about the router in the netDB.
  *
  */
 public class StatisticsManager implements Service {
-    private Log _log;
-    private RouterContext _context;
-    private boolean _includePeerRankings;
+    private final Log _log;
+    private final RouterContext _context;
     
     public final static String PROP_PUBLISH_RANKINGS = "router.publishPeerRankings";
-    public final static String DEFAULT_PROP_PUBLISH_RANKINGS = "true";
 
     private final DecimalFormat _fmt;
     private final DecimalFormat _pct;
@@ -41,17 +39,16 @@ public class StatisticsManager implements Service {
         _fmt = new DecimalFormat("###,##0.00", new DecimalFormatSymbols(Locale.UK));
         _pct = new DecimalFormat("#0.00%", new DecimalFormatSymbols(Locale.UK));
         _log = context.logManager().getLog(StatisticsManager.class);
-        _includePeerRankings = false;
     }
         
+    /** noop */
     public void shutdown() {}
-    public void restart() { 
-        startup();
-    }
-    public void startup() {
-        String val = _context.getProperty(PROP_PUBLISH_RANKINGS, DEFAULT_PROP_PUBLISH_RANKINGS);
-        _includePeerRankings = Boolean.valueOf(val);
-    }
+
+    /** noop */
+    public void restart() {}
+
+    /** noop */
+    public void startup() {}
     
     /** Retrieve a snapshot of the statistics that should be published */
     public Properties publishStatistics() { 
@@ -85,7 +82,7 @@ public class StatisticsManager implements Service {
             stats.setProperty("stat_identities", newlines+"");
 ***/
         
-        if (_includePeerRankings) {
+        if (_context.getBooleanPropertyDefaultTrue(PROP_PUBLISH_RANKINGS)) {
             long publishedUptime = _context.router().getUptime();
             // Don't publish these for first hour
             if (publishedUptime > 62*60*1000)
@@ -287,6 +284,7 @@ public class StatisticsManager implements Service {
         if (num < 0) num = 0;
         synchronized (_fmt) { return _fmt.format(num); } 
     }
+
     private final String pct(double num) { 
         if (num < 0) num = 0;
         synchronized (_pct) { return _pct.format(num); } 
