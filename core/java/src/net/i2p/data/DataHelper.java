@@ -1242,9 +1242,10 @@ public class DataHelper {
      */
     public static String formatDuration2(long ms) {
         String t;
+        long ams = ms >= 0 ? ms : 0 - ms;
         if (ms == 0) {
             return "0";
-        } else if (ms < 3 * 1000) {
+        } else if (ams < 3 * 1000) {
             // NOTE TO TRANSLATORS: Feel free to translate all these as you see fit, there are several options...
             // spaces or not, '.' or not, plural or not. Try not to make it too long, it is used in
             // a lot of tables.
@@ -1254,22 +1255,22 @@ public class DataHelper {
             // If you want the digit separator in your locale, translate as {0}.
             // alternates: msec, msecs
             t = ngettext("1 ms", "{0,number,####} ms", (int) ms);
-        } else if (ms < 2 * 60 * 1000) {
+        } else if (ams < 2 * 60 * 1000) {
             // seconds
             // Note to translators: quantity will always be greater than one.
             // alternates: secs, sec. 'seconds' is probably too long.
             t = ngettext("1 sec", "{0} sec", (int) (ms / 1000));
-        } else if (ms < 120 * 60 * 1000) {
+        } else if (ams < 120 * 60 * 1000) {
             // minutes
             // Note to translators: quantity will always be greater than one.
             // alternates: mins, min. 'minutes' is probably too long.
             t = ngettext("1 min", "{0} min", (int) (ms / (60 * 1000)));
-        } else if (ms < 2 * 24 * 60 * 60 * 1000) {
+        } else if (ams < 2 * 24 * 60 * 60 * 1000) {
             // hours
             // Note to translators: quantity will always be greater than one.
             // alternates: hrs, hr., hrs.
             t = ngettext("1 hour", "{0} hours", (int) (ms / (60 * 60 * 1000)));
-        } else if (ms > 1000l * 24l * 60l * 60l * 1000l) {
+        } else if (ams > 1000l * 24l * 60l * 60l * 1000l) {
             return _("n/a");
         } else {
             // days
