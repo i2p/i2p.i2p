@@ -144,11 +144,19 @@ class IntroductionManager {
 
         // FIXME failsafe if found == 0, relax inactivityCutoff and try again?
 
+        pingIntroducers();
+        return found;
+    }
+
+    /**
+     *  Was part of pickInbound(), moved out so we can call it more often
+     *  @since 0.8.11
+     */
+    public void pingIntroducers() {
         // Try to keep the connection up for two hours after we made anybody an introducer
-        long pingCutoff = _context.clock().now() - (2 * 60 * 60 * 1000);
-        inactivityCutoff = _context.clock().now() - (UDPTransport.EXPIRE_TIMEOUT / 4);
-        for (int i = 0; i < sz; i++) {
-            PeerState cur = peers.get(i);
+        long pingCutoff = _context.clock().now() - (105 * 60 * 1000);
+        long inactivityCutoff = _context.clock().now() - UDPTransport.MIN_EXPIRE_TIMEOUT;
+        for (PeerState cur : _inbound) {
             if (cur.getIntroducerTime() > pingCutoff &&
                 cur.getLastSendTime() < inactivityCutoff) {
                 if (_log.shouldLog(Log.INFO))
@@ -157,8 +165,6 @@ class IntroductionManager {
                 _transport.send(_builder.buildPing(cur));
             }
         }
-
-        return found;
     }
     
     /**

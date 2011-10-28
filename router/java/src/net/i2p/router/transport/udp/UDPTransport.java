@@ -227,6 +227,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _context.statManager().createRateStat("udp.dropPeerDroplist", "How many peers currently have their packets dropped outright when a new peer is added to the list?", "udp", RATES);
         _context.statManager().createRateStat("udp.dropPeerConsecutiveFailures", "How many consecutive failed sends to a peer did we attempt before giving up and reestablishing a new session (lifetime is inactivity perood)", "udp", RATES);
         __instance = this;
+
+        SimpleScheduler.getInstance().addPeriodicEvent(new PingIntroducers(), MIN_EXPIRE_TIMEOUT * 3 / 4);
     }
     
     public void startup() {
@@ -1154,9 +1156,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     // and lose the old introducer tags, causing introduction fails,
     // so we keep the max time long to give the introducer keepalive code
     // in the IntroductionManager a chance to work.
-    public static final int EXPIRE_TIMEOUT = 30*60*1000;
+    public static final int EXPIRE_TIMEOUT = 20*60*1000;
     private static final int MAX_IDLE_TIME = EXPIRE_TIMEOUT;
-    private static final int MIN_EXPIRE_TIMEOUT = 10*60*1000;
+    public static final int MIN_EXPIRE_TIMEOUT = 6*60*1000;
     
     public String getStyle() { return STYLE; }
 
@@ -1253,8 +1255,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return getCurrentAddress();
     }
 
-    void rebuildExternalAddress() { rebuildExternalAddress(true); }
-    void rebuildExternalAddress(boolean allowRebuildRouterInfo) {
+    private void rebuildExternalAddress() { rebuildExternalAddress(true); }
+
+    private void rebuildExternalAddress(boolean allowRebuildRouterInfo) {
         // if the external port is specified, we want to use that to bind to even
         // if we don't know the external host.
         _externalListenPort = _context.getProperty(PROP_EXTERNAL_PORT, -1);
@@ -2459,6 +2462,18 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         }
     }
     
+    /**
+     *  Periodically ping the introducers, split out since we need to
+     *  do it faster than we rebuild our address.
+     *  @since 0.8.11
+     */
+    private class PingIntroducers implements SimpleTimer.TimedEvent {
+        public void timeReached() {
+            if (introducersRequired())
+                _introManager.pingIntroducers();
+        }
+    }
+
 /*******
     private static final String BADIPS[] = new String[] { "192.168.0.1", "127.0.0.1", "10.3.4.5", "172.16.3.4", "224.5.6.7" };
     private static final String GOODIPS[] = new String[] { "192.167.0.1", "126.0.0.1", "11.3.4.5", "172.15.3.4", "223.5.6.7" };
