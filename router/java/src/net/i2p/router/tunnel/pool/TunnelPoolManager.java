@@ -26,6 +26,7 @@ import net.i2p.router.TunnelInfo;
 import net.i2p.router.TunnelManagerFacade;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.tunnel.HopConfig;
+import net.i2p.router.tunnel.TunnelDispatcher;
 import net.i2p.stat.RateStat;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
@@ -34,7 +35,8 @@ import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 
 /**
- * 
+ * Manage all the exploratory and client tunnel pools.
+ * Run the tunnel builder and handler threads.
  */
 public class TunnelPoolManager implements TunnelManagerFacade {
     private final RouterContext _context;
@@ -46,8 +48,12 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     private TunnelPool _inboundExploratory;
     private TunnelPool _outboundExploratory;
     private final BuildExecutor _executor;
+    private final BuildHandler _handler;
     private boolean _isShutdown;
     private static final long[] RATES = { 60*1000, 10*60*1000l, 60*60*1000l };
+
+    private static final int MIN_KBPS_TWO_HANDLERS = 512;
+    private static final int MIN_KBPS_THREE_HANDLERS = 1024;
     
     public TunnelPoolManager(RouterContext ctx) {
         _context = ctx;
@@ -63,9 +69,21 @@ public class TunnelPoolManager implements TunnelManagerFacade {
         _clientOutboundPools = new ConcurrentHashMap(4);
         
         _executor = new BuildExecutor(ctx, this);
-        I2PThread execThread = new I2PThread(_executor, "BuildExecutor");
-        execThread.setDaemon(true);
+        I2PThread execThread = new I2PThread(_executor, "BuildExecutor", true);
         execThread.start();
+        _handler = new BuildHandler(ctx, this, _executor);
+        int numHandlerThreads;
+        int share = TunnelDispatcher.getShareBandwidth(ctx);
+        if (share >= MIN_KBPS_THREE_HANDLERS)
+            numHandlerThreads = 3;
+        else if (share >= MIN_KBPS_TWO_HANDLERS)
+            numHandlerThreads = 2;
+        else
+            numHandlerThreads = 1;
+        for (int i = 1; i <= numHandlerThreads; i++) {
+            I2PThread hThread = new I2PThread(_handler, "BuildHandler " + i + '/' + numHandlerThreads, true);
+            hThread.start();
+        }
         
         // The following are for TestJob
         ctx.statManager().createRequiredRateStat("tunnel.testFailedTime", "Time for tunnel test failure (ms)", "Tunnels", 
@@ -550,7 +568,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     BuildExecutor getExecutor() { return _executor; }
     boolean isShutdown() { return _isShutdown; }
 
-    public int getInboundBuildQueueSize() { return _executor.getInboundBuildQueueSize(); }
+    public int getInboundBuildQueueSize() { return _handler.getInboundBuildQueueSize(); }
     
     /** @deprecated moved to routerconsole */
     public void renderStatusHTML(Writer out) throws IOException {

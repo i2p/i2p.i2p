@@ -26,20 +26,21 @@ import net.i2p.util.Log;
  * changed, such as a tunnel failed, new client started up, or tunnel creation was aborted).
  *
  * Note that 10 minute tunnel expiration is hardcoded in here.
+ *
+ * As of 0.8.11, inbound request handling is done in a separate thread.
  */
 class BuildExecutor implements Runnable {
     private final ArrayList<Long> _recentBuildIds = new ArrayList(100);
     private final RouterContext _context;
     private final Log _log;
     private final TunnelPoolManager _manager;
-    /** list of TunnelCreatorConfig elements of tunnels currently being built */
+    /** Notify lock */
     private final Object _currentlyBuilding;
     /** indexed by ptcc.getReplyMessageId() */
     private final ConcurrentHashMap<Long, PooledTunnelCreatorConfig> _currentlyBuildingMap;
     /** indexed by ptcc.getReplyMessageId() */
     private final ConcurrentHashMap<Long, PooledTunnelCreatorConfig> _recentlyBuildingMap;
     private boolean _isRunning;
-    private final BuildHandler _handler;
     private boolean _repoll;
     private static final int MAX_CONCURRENT_BUILDS = 10;
     /** accept replies up to a minute after we gave up on them */
@@ -63,7 +64,7 @@ class BuildExecutor implements Runnable {
         _context.statManager().createRequiredRateStat("tunnel.buildRequestTime", "Time to build a tunnel request (ms)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.buildConfigTime", "Time to build a tunnel request (ms)", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.buildRequestZeroHopTime", "How long it takes to build a zero hop tunnel", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-        _context.statManager().createRateStat("tunnel.pendingRemaining", "How many inbound requests are pending after a pass (period is how long the pass takes)?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
+        //_context.statManager().createRateStat("tunnel.pendingRemaining", "How many inbound requests are pending after a pass (period is how long the pass takes)?", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.buildFailFirstHop", "How often we fail to build a OB tunnel because we can't contact the first hop", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         _context.statManager().createRateStat("tunnel.buildReplySlow", "Build reply late, but not too late", "Tunnels", new long[] { 10*60*1000 });
 
@@ -81,8 +82,6 @@ class BuildExecutor implements Runnable {
         statMgr.createRateStat("tunnel.tierAgreeUnknown", "Agreed joins from unknown", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         statMgr.createRateStat("tunnel.tierRejectUnknown", "Rejected joins from unknown", "Tunnels", new long[] { 60*1000, 10*60*1000 });
         statMgr.createRateStat("tunnel.tierExpireUnknown", "Expired joins from unknown", "Tunnels", new long[] { 60*1000, 10*60*1000 });
-
-        _handler = new BuildHandler(ctx, this);
     }
     
     private int allowed() {
@@ -266,8 +265,6 @@ class BuildExecutor implements Runnable {
         List<TunnelPool> wanted = new ArrayList(MAX_CONCURRENT_BUILDS);
         List<TunnelPool> pools = new ArrayList(8);
         
-        int pendingRemaining = 0;
-        
         //long loopBegin = 0;
         //long afterBuildZeroHop = 0;
         long afterBuildReal = 0;
@@ -276,7 +273,7 @@ class BuildExecutor implements Runnable {
         while (!_manager.isShutdown()){
             //loopBegin = System.currentTimeMillis();
             try {
-                _repoll = pendingRemaining > 0; // resets repoll to false unless there are inbound requeusts pending
+                _repoll = false; // resets repoll to false unless there are inbound requeusts pending
                 _manager.listPools(pools);
                 for (int i = 0; i < pools.size(); i++) {
                     TunnelPool pool = pools.get(i);
@@ -308,7 +305,7 @@ class BuildExecutor implements Runnable {
                     synchronized (_currentlyBuilding) {
                         if (!_repoll) {
                             if (_log.shouldLog(Log.DEBUG))
-                                _log.debug("No tunnel to build with (allowed=" + allowed + ", wanted=" + wanted.size() + ", pending=" + pendingRemaining + "), wait for a while");
+                                _log.debug("No tunnel to build with (allowed=" + allowed + ", wanted=" + wanted.size() + "), wait for a while");
                             try {
                                 _currentlyBuilding.wait(1*1000+_context.random().nextInt(1*1000));
                             } catch (InterruptedException ie) {}
@@ -369,12 +366,6 @@ class BuildExecutor implements Runnable {
                 
                 afterBuildReal = System.currentTimeMillis();
                 
-                pendingRemaining = _handler.handleInboundRequests();
-                afterHandleInbound = System.currentTimeMillis();
-                
-                if (pendingRemaining > 0)
-                    _context.statManager().addRateData("tunnel.pendingRemaining", pendingRemaining, afterHandleInbound-afterBuildReal);
-
                 //if (_log.shouldLog(Log.DEBUG))
                 //    _log.debug("build loop complete, tot=" + (afterHandleInbound-loopBegin) + 
                 //              " inReply=" + (afterHandleInboundReplies-beforeHandleInboundReplies) +
@@ -387,7 +378,6 @@ class BuildExecutor implements Runnable {
                 wanted.clear();
                 pools.clear();
             } catch (RuntimeException e) {
-                if (_log.shouldLog(Log.CRIT))
                     _log.log(Log.CRIT, "B0rked in the tunnel builder", e);
             }
         }
@@ -568,6 +558,4 @@ class BuildExecutor implements Runnable {
         }
         return rv;
     }
-
-    public int getInboundBuildQueueSize() { return _handler.getInboundBuildQueueSize(); }
 }
