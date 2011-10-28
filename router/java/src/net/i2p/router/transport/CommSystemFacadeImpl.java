@@ -448,6 +448,15 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     }
 
     /**
+     *  @return two-letter lower-case country code or null
+     *  @since 0.8.11
+     */
+    @Override
+    public String getOurCountry() {
+        return _context.getProperty(GeoIP.PROP_IP_COUNTRY);
+    }
+
+    /**
      *  Uses the transport IP first because that lookup is fast,
      *  then the SSU IP from the netDb.
      *

@@ -15,6 +15,13 @@ class CapacityCalculator {
     
     /** the calculator estimates over a 1 hour period */
     private static long ESTIMATE_PERIOD = 60*60*1000;
+
+    // total of all possible bonuses should be less than 4, since
+    // crappy peers start at 1 and the base is 5.
+    private static final double BONUS_NEW = 1.25;
+    private static final double BONUS_ESTABLISHED = 1;
+    private static final double BONUS_SAME_COUNTRY = .85;
+    private static final double PENALTY_UNREACHABLE = 2;
     
     public static double calc(PeerProfile profile) {
         double capacity;
@@ -49,7 +56,20 @@ class CapacityCalculator {
             capacity = 1;
         else if (profile.getTunnelHistory().getLastRejectedProbabalistic() > now - 5*60*1000)
             capacity -= _context.random().nextInt(5);
-        
+
+        // boost new profiles
+        if (now - profile.getFirstHeardAbout() < 45*60*1000)
+            capacity += BONUS_NEW;
+        // boost connected peers
+        if (profile.isEstablished())
+            capacity += BONUS_ESTABLISHED;
+        // boost same country
+        if (profile.isSameCountry())
+            capacity += BONUS_SAME_COUNTRY;
+        // penalize unreachable peers
+        if (profile.wasUnreachable())
+            capacity -= PENALTY_UNREACHABLE;
+
         capacity += profile.getCapacityBonus();
         if (capacity < 0)
             capacity = 0;

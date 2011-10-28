@@ -99,6 +99,22 @@ public class PeerProfile {
         return getIsActive(5*60*1000);
     }
     
+    /** @since 0.8.11 */
+    public boolean isEstablished() {
+        return _context.commSystem().isEstablished(_peer);
+    }
+
+    /** @since 0.8.11 */
+    public boolean wasUnreachable() {
+        return _context.commSystem().wasUnreachable(_peer);
+    }
+
+    /** @since 0.8.11 */
+    public boolean isSameCountry() {
+        String us = _context.commSystem().getOurCountry();
+        return us != null && us.equals(_context.commSystem().getCountry(_peer));
+    }
+
     /**
      * Is this peer active at the moment (sending/receiving messages within the 
      * given period?)
