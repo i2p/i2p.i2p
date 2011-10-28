@@ -118,7 +118,7 @@ public abstract class TransportImpl implements Transport {
         // increase limit for SSU, for now
         if (style.equals("udp"))
             //def = def * 3 / 2;
-            def *= 2;
+            def *= 3;
         return _context.getProperty("i2np." + style + ".maxConnections", def);
     }
 
