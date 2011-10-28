@@ -88,6 +88,12 @@ public class DecayingHashSet extends DecayingBloomFilter {
              "1000000 * Duplicates/Size", "Router", new long[] { 10 * Math.max(60*1000, durationMs) });
     }
     
+    /** unsynchronized but only used for logging elsewhere */
+    @Override
+    public int getInsertedCount() { 
+        return _current.size() + _previous.size(); 
+    }
+
     /** pointless, only used for logging elsewhere */
     @Override
     public double getFalsePositiveRate() { 
