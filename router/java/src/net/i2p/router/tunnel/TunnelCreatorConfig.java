@@ -33,6 +33,7 @@ public class TunnelCreatorConfig implements TunnelInfo {
     private volatile long _verifiedBytesTransferred;
     private boolean _failed;
     private int _failures;
+    private boolean _reused;
     
     public TunnelCreatorConfig(RouterContext ctx, int length, boolean isInbound) {
         this(ctx, length, isInbound, null);
@@ -190,6 +191,18 @@ public class TunnelCreatorConfig implements TunnelInfo {
             _failures = 0;
     }
     
+    /**
+     *  Did we reuse this tunnel?
+     *  @since 0.8.11
+     */
+    public boolean wasReused() { return _reused; }
+
+    /**
+     *  Note that we reused this tunnel
+     *  @since 0.8.11
+     */
+    public void setReused() { _reused = true; }
+
     @Override
     public String toString() {
         // H0:1235-->H1:2345-->H2:2345

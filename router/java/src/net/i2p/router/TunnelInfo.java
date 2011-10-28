@@ -74,4 +74,16 @@ public interface TunnelInfo {
     public long getVerifiedBytesTransferred();
     /** we know for sure that the given number of bytes were sent down the tunnel fully */
     public void incrementVerifiedBytesTransferred(int numBytes);
+
+    /**
+     *  Did we reuse this tunnel?
+     *  @since 0.8.11
+     */
+    public boolean wasReused();
+
+    /**
+     *  Note that we reused this tunnel
+     *  @since 0.8.11
+     */
+    public void setReused();
 }

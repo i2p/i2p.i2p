@@ -292,7 +292,7 @@ public class TunnelPool {
      * Used to prevent a zillion of them
      */
     boolean needFallback() {
-        int needed = _settings.getTotalQuantity();
+        int needed = getAdjustedTotalQuantity();
         int fallbacks = 0;
         synchronized (_tunnels) {
             for (int i = 0; i < _tunnels.size(); i++) {
@@ -304,6 +304,45 @@ public class TunnelPool {
         return true;
     }
     
+    /**
+     *  Return settings.getTotalQuantity, unless this is an exploratory tunnel
+     *  AND exploratory build success rate is less than 1/10, AND total settings
+     *  is greater than 1. Otherwise subtract 1 to help prevent congestion collapse,
+     *  and prevent really unintegrated routers from working too hard.
+     *  We only do this for exploratory as different clients could have different
+     *  length settings. Although I guess inbound and outbound exploratory
+     *  could be different too, and inbound is harder...
+     *
+     *  @since 0.8.11
+     */
+    private int getAdjustedTotalQuantity() {
+        int rv = _settings.getTotalQuantity();
+        if (_settings.isExploratory() && rv > 1) {
+            RateStat e = _context.statManager().getRate("tunnel.buildExploratoryExpire");
+            RateStat r = _context.statManager().getRate("tunnel.buildExploratoryReject");
+            RateStat s = _context.statManager().getRate("tunnel.buildExploratorySuccess");
+            if (e != null && r != null && s != null) {
+                // 60 min was too long - is 10 min too short?
+                // By not adding in previous period, this gives us a burst every
+                // 10 min - is that good or bad?
+                Rate er = e.getRate(10*60*1000);
+                Rate rr = r.getRate(10*60*1000);
+                Rate sr = s.getRate(10*60*1000);
+                if (er != null && rr != null && sr != null) {
+                    long ec = er.getCurrentEventCount();
+                    long rc = rr.getCurrentEventCount();
+                    long sc = sr.getCurrentEventCount();
+                    long tot = ec + rc + sc;
+                    if (tot >= 10) {
+                        if (1000 * sc / tot <=  1000 / 10)
+                            rv--;
+                    }
+                }
+            }
+        }
+        return rv;
+    }
+
     /** list of tunnelInfo instances of tunnels currently being built */
     public List listPending() { synchronized (_inProgress) { return new ArrayList(_inProgress); } }
     
@@ -475,7 +514,7 @@ public class TunnelPool {
         }
     }
 
-    /** noop for outbound */
+    /** noop for outbound and exploratory */
     void refreshLeaseSet() {
         if (_settings.isInbound() && (_settings.getDestination() != null) ) {
             if (_log.shouldLog(Log.DEBUG))
@@ -495,7 +534,7 @@ public class TunnelPool {
      *
      */
     boolean buildFallback() {
-        int quantity = _settings.getTotalQuantity();
+        int quantity = getAdjustedTotalQuantity();
         int usable = 0;
         synchronized (_tunnels) {
             usable = _tunnels.size();
@@ -678,7 +717,7 @@ public class TunnelPool {
         if (!isAlive()) {
                 return 0;
         }
-        int wanted = getSettings().getTotalQuantity();
+        int wanted = getAdjustedTotalQuantity();
         
         boolean allowZeroHop = ((getSettings().getLength() + getSettings().getLengthVariance()) <= 0);
           
@@ -965,10 +1004,30 @@ public class TunnelPool {
         TunnelPoolSettings settings = getSettings();
         // peers for new tunnel, including us, ENDPOINT FIRST
         List<Hash> peers = null;
-        long expiration = _context.clock().now() + TunnelPoolSettings.DEFAULT_DURATION;
+        long now = _context.clock().now();
+        long expiration = now + TunnelPoolSettings.DEFAULT_DURATION;
 
         if (!forceZeroHop) {
-            peers = _peerSelector.selectPeers(_context, settings);
+            int len = settings.getLength();
+            if (len > 0 && _context.random().nextBoolean()) {
+                // look for a tunnel to reuse, if the right length and expiring soon
+                // ignore variance for now.
+                len++;   // us
+                synchronized (_tunnels) {
+                    for (TunnelInfo ti : _tunnels) {
+                        if (ti.getLength() == len && ti.getExpiration() < now + 3*60*1000 && !ti.wasReused()) {
+                            ti.setReused();
+                            peers = new ArrayList(len);
+                            // peers list is ordered endpoint first, but cfg.getPeer() is ordered gateway first
+                            for (int i = len - 1; i >= 0; i--) {
+                                peers.add(ti.getPeer(i));
+                            }
+                        }
+                    }
+                }
+            }
+            if (peers == null)
+                peers = _peerSelector.selectPeers(_context, settings);
 
             if ( (peers == null) || (peers.isEmpty()) ) {
                 // no peers to build the tunnel with, and 

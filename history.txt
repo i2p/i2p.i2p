@@ -1,3 +1,21 @@
+2011-10-28 zzz
+  * BuildHandler: Move inbound request handling to its own thread(s)
+    (ticket #542, see also http://zzz.i2p/topics/996)
+  * CapacityCalculator: Small boost for connected peers, new peers, and
+    same-country peers; deduct for recently-unreachable peers
+  * DecayingBloomFilter: Whups fix NPE from previous checkin if log=INFO
+  * NTCP: Reduce min idle time
+  * SSU:
+    - Increase default max connections again
+    - Reduce min idle time
+    - Separate out introducer pinger from introducer selection
+      so it can be run separately and more often
+    - Only ping introducers if we need them
+  * Tunnels:
+     - Reduce exploratory tunnel quantity if build success rate
+       is very low, but may disable this later
+     - Try rebuilding same tunnel (some of the time)
+
 2011-10-25 zzz
   * BloomSHA1, DecayingBloomFilter:
     - Refactor for concurrent, at some small risk of false negatives
