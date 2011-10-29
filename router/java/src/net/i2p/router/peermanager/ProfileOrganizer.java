@@ -701,7 +701,7 @@ public class ProfileOrganizer {
         } finally { releaseReadLock(); }
     }
     
-    private static final long MIN_EXPIRE_TIME = 3*60*60*1000;
+    private static final long MIN_EXPIRE_TIME = 2*60*60*1000;
     private static final long MAX_EXPIRE_TIME = 6*60*60*1000;
     private static final long ADJUST_EXPIRE_TIME = 60*1000;
     private static final int ENOUGH_PROFILES = 600;
