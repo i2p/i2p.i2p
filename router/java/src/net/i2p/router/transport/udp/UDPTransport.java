@@ -2071,7 +2071,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             
             buf.append("<td class=\"cells\" align=\"right\">");
             long skew = peer.getClockSkew();
-            buf.append(formatDuration3(peer.getClockSkew()));
+            buf.append(DataHelper.formatDuration2(peer.getClockSkew()));
             buf.append("</td>");
             offsetTotal = offsetTotal + peer.getClockSkew();
 
@@ -2170,7 +2170,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         buf.append("</b></td>" +
                    "<td align=\"center\"><b>").append(DataHelper.formatDuration2(x));
         x = numPeers > 0 ? offsetTotal/numPeers : 0;
-        buf.append("</b></td><td align=\"center\"><b>").append(formatDuration3(x)).append("</b></td>\n" +
+        buf.append("</b></td><td align=\"center\"><b>").append(DataHelper.formatDuration2(x)).append("</b></td>\n" +
                    "<td align=\"center\"><b>");
         buf.append(numPeers > 0 ? cwinTotal/(numPeers*1024) + "K" : "0K");
         buf.append("</b></td><td>&nbsp;</td>\n" +
@@ -2198,17 +2198,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
         out.write(buf.toString());
         buf.setLength(0);
-    }
-    
-    /**
-     *  @return e.g. 3 sec or -3 sec
-     *  formatDuration2() always prints negative numbers in ms
-     *  @since 0.8.2
-     */
-    private static String formatDuration3(long x) {
-        if (x >= 0)
-            return DataHelper.formatDuration2(x);
-        return "-" + DataHelper.formatDuration2(0 - x);
     }
 
     private static final DecimalFormat _fmt = new DecimalFormat("#,##0.00");
