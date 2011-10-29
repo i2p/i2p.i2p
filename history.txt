@@ -1,5 +1,7 @@
 2011-10-29 zzz
   * BuildHandler: Add router.buildHandlerThreads config setting
+  * CapacityCalculator: Small adjustment for XOR distance to
+    break ties and encourage closeness
   * ProfileOrganizer: Reduce min expire time
   * SSU: Limit max peers to use as introducers
 

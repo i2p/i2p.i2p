@@ -21,6 +21,7 @@ class CapacityCalculator {
     private static final double BONUS_NEW = 1.25;
     private static final double BONUS_ESTABLISHED = 1;
     private static final double BONUS_SAME_COUNTRY = .85;
+    private static final double BONUS_XOR = .25;
     private static final double PENALTY_UNREACHABLE = 2;
     
     public static double calc(PeerProfile profile) {
@@ -69,6 +70,8 @@ class CapacityCalculator {
         // penalize unreachable peers
         if (profile.wasUnreachable())
             capacity -= PENALTY_UNREACHABLE;
+        // a tiny tweak to break ties and encourage closeness, -.25 to +.25
+            capacity -= profile.getXORDistance() * (BONUS_XOR / 128);
 
         capacity += profile.getCapacityBonus();
         if (capacity < 0)

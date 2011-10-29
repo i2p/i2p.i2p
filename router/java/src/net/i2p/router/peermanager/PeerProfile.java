@@ -58,6 +58,7 @@ public class PeerProfile {
     private boolean _expanded;
     private boolean _expandedDB;
     private int _consecutiveShitlists;
+    private final int _distance;
     
     public PeerProfile(RouterContext context, Hash peer) {
         this(context, peer, true);
@@ -74,6 +75,11 @@ public class PeerProfile {
         // if it is false, so all need to be fixed before we can have non-expanded profiles
         if (expand)
             expandProfile();
+        Hash us = _context.routerHash();
+        if (us != null)
+            _distance = ((_peer.getData()[0] & 0xff) ^ (us.getData()[0] & 0xff)) - 127;
+        else
+            _distance = 0;
     }
     
     /** what peer is being profiled */
@@ -113,6 +119,15 @@ public class PeerProfile {
     public boolean isSameCountry() {
         String us = _context.commSystem().getOurCountry();
         return us != null && us.equals(_context.commSystem().getCountry(_peer));
+    }
+
+    /**
+     *  For now, just a one-byte comparison
+     *  @return -127 to +128, lower is closer
+     *  @since 0.8.11
+     */
+    public int getXORDistance() {
+        return _distance;
     }
 
     /**
