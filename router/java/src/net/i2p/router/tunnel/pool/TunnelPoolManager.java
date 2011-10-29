@@ -80,6 +80,7 @@ public class TunnelPoolManager implements TunnelManagerFacade {
             numHandlerThreads = 2;
         else
             numHandlerThreads = 1;
+        numHandlerThreads = ctx.getProperty("router.buildHandlerThreads", numHandlerThreads);
         for (int i = 1; i <= numHandlerThreads; i++) {
             I2PThread hThread = new I2PThread(_handler, "BuildHandler " + i + '/' + numHandlerThreads, true);
             hThread.start();
