@@ -30,13 +30,25 @@ class IntroductionManager {
     /** list of peers (PeerState) who have given us introduction tags */
     private final Set<PeerState> _inbound;
 
+    /**
+     * Limit since we ping to keep the conn open
+     * @since 0.8.11
+     */
+    private static final int MAX_INBOUND = 20;
+
+    /**
+     * TODO this should be enforced in EstablishmentManager, it isn't now.
+     * @since 0.8.11
+     */
+    private static final int MAX_OUTBOUND = 100;
+
     public IntroductionManager(RouterContext ctx, UDPTransport transport) {
         _context = ctx;
         _log = ctx.logManager().getLog(IntroductionManager.class);
         _transport = transport;
         _builder = new PacketBuilder(ctx, transport);
-        _outbound = new ConcurrentHashMap(128);
-        _inbound = new ConcurrentHashSet(128);
+        _outbound = new ConcurrentHashMap(MAX_OUTBOUND);
+        _inbound = new ConcurrentHashSet(MAX_INBOUND);
         ctx.statManager().createRateStat("udp.receiveRelayIntro", "How often we get a relayed request for us to talk to someone?", "udp", UDPTransport.RATES);
         ctx.statManager().createRateStat("udp.receiveRelayRequest", "How often we receive a good request to relay to someone else?", "udp", UDPTransport.RATES);
         ctx.statManager().createRateStat("udp.receiveRelayRequestBadTag", "Received relay requests with bad/expired tag", "udp", UDPTransport.RATES);
@@ -54,8 +66,8 @@ class IntroductionManager {
                        + peer.getWeRelayToThemAs() + ", theyRelayToUsAs " + peer.getTheyRelayToUsAs());
         if (peer.getWeRelayToThemAs() > 0) 
             _outbound.put(Long.valueOf(peer.getWeRelayToThemAs()), peer);
-        if (peer.getTheyRelayToUsAs() > 0) {
-                    _inbound.add(peer);
+        if (peer.getTheyRelayToUsAs() > 0 && _inbound.size() < MAX_INBOUND) {
+            _inbound.add(peer);
         }
     }
     
