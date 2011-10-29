@@ -1,3 +1,8 @@
+2011-10-29 zzz
+  * BuildHandler: Add router.buildHandlerThreads config setting
+  * ProfileOrganizer: Reduce min expire time
+  * SSU: Limit max peers to use as introducers
+
 2011-10-28 zzz
   * BuildHandler: Move inbound request handling to its own thread(s)
     (ticket #542, see also http://zzz.i2p/topics/996)
