@@ -894,7 +894,7 @@ public class ProfileOrganizer {
             Set<PeerProfile> sorted = new TreeSet(new SpeedComparator());
             sorted.addAll(_fastPeers.values());
             Iterator<PeerProfile> iter = sorted.iterator();
-            for (int i = 0; i < numToDemote; i++) {
+            for (int i = 0; i < numToDemote && iter.hasNext(); i++) {
                 _fastPeers.remove(iter.next().getPeer());
             }
         }
