@@ -72,7 +72,7 @@ public class PublishLocalRouterInfoJob extends JobImpl {
             _log.error("Error signing the updated local router info!", dfe);
         }
         if (_notFirstTime) {
-            requeue((PUBLISH_DELAY/2) + getContext().random().nextInt((int)PUBLISH_DELAY));
+            requeue((PUBLISH_DELAY * 3 / 4) + getContext().random().nextInt((int)PUBLISH_DELAY / 2));
         } else {
             requeue(FIRST_TIME_DELAY);
             _notFirstTime = true;
