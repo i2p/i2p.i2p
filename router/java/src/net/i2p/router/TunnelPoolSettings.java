@@ -19,7 +19,7 @@ public class TunnelPoolSettings {
     //private int _duration;
     private int _length;
     private int _lengthVariance;
-    //private int _lengthOverride;
+    private int _lengthOverride;
     private boolean _isInbound;
     private boolean _isExploratory;
     private boolean _allowZeroHop;
@@ -60,6 +60,7 @@ public class TunnelPoolSettings {
         //_duration = DEFAULT_DURATION;
         _length = DEFAULT_LENGTH;
         _lengthVariance = DEFAULT_LENGTH_VARIANCE;
+        _lengthOverride = -1;
         _allowZeroHop = DEFAULT_ALLOW_ZERO_HOP;
         _IPRestriction = DEFAULT_IP_RESTRICTION;
         _unknownOptions = new Properties();
@@ -87,8 +88,16 @@ public class TunnelPoolSettings {
     // public int getRebuildPeriod() { return _rebuildPeriod; }
     // public void setRebuildPeriod(int periodMs) { _rebuildPeriod = periodMs; }
     
-    /** how many remote hops should be in the tunnel */
+    /**
+     *  How many remote hops should be in the tunnel NOT including us
+     *  @return 0 to 7
+     */
     public int getLength() { return _length; }
+
+    /**
+     *  How many remote hops should be in the tunnel NOT including us
+     *  @param length 0 to 7 (not enforced here)
+     */
     public void setLength(int length) { _length = length; }
     
     /** if there are no tunnels to build with, will this pool allow 0 hop tunnels? */
@@ -104,10 +113,20 @@ public class TunnelPoolSettings {
     public int getLengthVariance() { return _lengthVariance; }
     public void setLengthVariance(int variance) { _lengthVariance = variance; }
 
-    /* UNUSED Set to a nonzero value to override the length setting */
-    //public int getLengthOverride() { return _lengthOverride; }
-    //public void setLengthOverride(int variance) { _lengthOverride = variance; }
-    
+    /** 
+     * A temporary length to be used due to network conditions.
+     * If less than zero, the standard length should be used.
+     * Unused until 0.8.11
+     */
+    public int getLengthOverride() { return _lengthOverride; }
+
+    /** 
+     * A temporary length to be used due to network conditions.
+     * If less than zero, the standard length will be used.
+     * Unused until 0.8.11
+     */
+    public void setLengthOverride(int length) { _lengthOverride = length; }
+
     /** is this an inbound tunnel? */
     public boolean isInbound() { return _isInbound; }
     public void setIsInbound(boolean isInbound) { _isInbound = isInbound; }

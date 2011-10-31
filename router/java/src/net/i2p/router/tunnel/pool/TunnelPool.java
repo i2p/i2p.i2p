@@ -43,7 +43,12 @@ public class TunnelPool {
     private long _lastRateUpdate;
     private long _lastLifetimeProcessed;
     private final String _rateName;
+
     private static final int TUNNEL_LIFETIME = 10*60*1000;
+    /** if less than one success in this many, reduce quantity (exploratory only) */
+    private static final int BUILD_TRIES_QUANTITY_OVERRIDE = 12;
+    /** if less than one success in this many, reduce length (exploratory only) */
+    private static final int BUILD_TRIES_LENGTH_OVERRIDE = 18;
     
     TunnelPool(RouterContext ctx, TunnelPoolManager mgr, TunnelPoolSettings settings, TunnelPeerSelector sel) {
         _context = ctx;
@@ -322,25 +327,59 @@ public class TunnelPool {
             RateStat r = _context.statManager().getRate("tunnel.buildExploratoryReject");
             RateStat s = _context.statManager().getRate("tunnel.buildExploratorySuccess");
             if (e != null && r != null && s != null) {
-                // 60 min was too long - is 10 min too short?
-                // By not adding in previous period, this gives us a burst every
-                // 10 min - is that good or bad?
                 Rate er = e.getRate(10*60*1000);
                 Rate rr = r.getRate(10*60*1000);
                 Rate sr = s.getRate(10*60*1000);
                 if (er != null && rr != null && sr != null) {
-                    long ec = er.getCurrentEventCount();
-                    long rc = rr.getCurrentEventCount();
-                    long sc = sr.getCurrentEventCount();
+                    long ec = er.getCurrentEventCount() + er.getLastEventCount();
+                    long rc = rr.getCurrentEventCount() + rr.getLastEventCount();
+                    long sc = sr.getCurrentEventCount() + sr.getLastEventCount();
                     long tot = ec + rc + sc;
-                    if (tot >= 10) {
-                        if (1000 * sc / tot <=  1000 / 10)
+                    if (tot >= BUILD_TRIES_QUANTITY_OVERRIDE) {
+                        if (1000 * sc / tot <=  1000 / BUILD_TRIES_QUANTITY_OVERRIDE)
                             rv--;
                     }
                 }
             }
         }
         return rv;
+    }
+
+    
+    /**
+     *  Shorten the length when under extreme stress, else clear the override.
+     *  We only do this for exploratory tunnels, since we have to build a fallback
+     *  if we run out. It's much better to have a shorter tunnel than a fallback.
+     *
+     *  @since 0.8.11
+     */
+    private void setLengthOverride() {
+        if (!_settings.isExploratory())
+            return;
+        int len = _settings.getLength();
+        if (len > 1) {
+            RateStat e = _context.statManager().getRate("tunnel.buildExploratoryExpire");
+            RateStat r = _context.statManager().getRate("tunnel.buildExploratoryReject");
+            RateStat s = _context.statManager().getRate("tunnel.buildExploratorySuccess");
+            if (e != null && r != null && s != null) {
+                Rate er = e.getRate(10*60*1000);
+                Rate rr = r.getRate(10*60*1000);
+                Rate sr = s.getRate(10*60*1000);
+                if (er != null && rr != null && sr != null) {
+                    long ec = er.getCurrentEventCount() + er.getLastEventCount();
+                    long rc = rr.getCurrentEventCount() + rr.getLastEventCount();
+                    long sc = sr.getCurrentEventCount() + sr.getLastEventCount();
+                    long tot = ec + rc + sc;
+                    if (tot >= BUILD_TRIES_LENGTH_OVERRIDE) {
+                        if (1000 * sc / tot <=  1000 / BUILD_TRIES_LENGTH_OVERRIDE)
+                            _settings.setLengthOverride(len - 1);
+                            return;
+                    }
+                }
+            }
+        }
+        // disable
+        _settings.setLengthOverride(-1);
     }
 
     /** list of tunnelInfo instances of tunnels currently being built */
@@ -1008,15 +1047,18 @@ public class TunnelPool {
         long expiration = now + TunnelPoolSettings.DEFAULT_DURATION;
 
         if (!forceZeroHop) {
-            int len = settings.getLength();
+            int len = settings.getLengthOverride();
+            if (len < 0)
+                len = settings.getLength();
             if (len > 0 && _context.random().nextBoolean()) {
                 // look for a tunnel to reuse, if the right length and expiring soon
                 // ignore variance for now.
                 len++;   // us
                 synchronized (_tunnels) {
                     for (TunnelInfo ti : _tunnels) {
-                        if (ti.getLength() == len && ti.getExpiration() < now + 3*60*1000 && !ti.wasReused()) {
+                        if (ti.getLength() >= len && ti.getExpiration() < now + 3*60*1000 && !ti.wasReused()) {
                             ti.setReused();
+                            len = ti.getLength();
                             peers = new ArrayList(len);
                             // peers list is ordered endpoint first, but cfg.getPeer() is ordered gateway first
                             for (int i = len - 1; i >= 0; i--) {
@@ -1026,8 +1068,10 @@ public class TunnelPool {
                     }
                 }
             }
-            if (peers == null)
+            if (peers == null) {
+                setLengthOverride();
                 peers = _peerSelector.selectPeers(_context, settings);
+            }
 
             if ( (peers == null) || (peers.isEmpty()) ) {
                 // no peers to build the tunnel with, and 

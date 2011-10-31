@@ -5,7 +5,11 @@
     - Don't exceed high cap limit between reorgs
     - Reduce max reorg cycle time
     - Reduce new bonus values
+    - Fix rare NSEE thx sponge
   * SSU: Increase threshold for incremented cost
+  * Tunnels:
+    - Restore and implement lengthOverride()
+    - Adjust quantity override
 
 2011-10-29 zzz
   * BuildHandler: Add router.buildHandlerThreads config setting
