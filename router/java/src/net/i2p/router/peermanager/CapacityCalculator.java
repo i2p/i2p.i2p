@@ -18,9 +18,9 @@ class CapacityCalculator {
 
     // total of all possible bonuses should be less than 4, since
     // crappy peers start at 1 and the base is 5.
-    private static final double BONUS_NEW = 1.25;
-    private static final double BONUS_ESTABLISHED = 1;
-    private static final double BONUS_SAME_COUNTRY = .85;
+    private static final double BONUS_NEW = 0.85;
+    private static final double BONUS_ESTABLISHED = 0.65;
+    private static final double BONUS_SAME_COUNTRY = 0.45;
     private static final double BONUS_XOR = .25;
     private static final double PENALTY_UNREACHABLE = 2;
     

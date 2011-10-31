@@ -1,3 +1,12 @@
+2011-10-31 zzz
+  * NetDB: Reduce max RI publish interval
+  * ProfileOrganizer:
+    - Fix expiration of old profiles
+    - Don't exceed high cap limit between reorgs
+    - Reduce max reorg cycle time
+    - Reduce new bonus values
+  * SSU: Increase threshold for incremented cost
+
 2011-10-29 zzz
   * BuildHandler: Add router.buildHandlerThreads config setting
   * CapacityCalculator: Small adjustment for XOR distance to

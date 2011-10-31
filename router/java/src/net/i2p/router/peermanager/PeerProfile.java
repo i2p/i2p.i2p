@@ -106,17 +106,17 @@ public class PeerProfile {
     }
     
     /** @since 0.8.11 */
-    public boolean isEstablished() {
+    boolean isEstablished() {
         return _context.commSystem().isEstablished(_peer);
     }
 
     /** @since 0.8.11 */
-    public boolean wasUnreachable() {
+    boolean wasUnreachable() {
         return _context.commSystem().wasUnreachable(_peer);
     }
 
     /** @since 0.8.11 */
-    public boolean isSameCountry() {
+    boolean isSameCountry() {
         String us = _context.commSystem().getOurCountry();
         return us != null && us.equals(_context.commSystem().getCountry(_peer));
     }
@@ -126,7 +126,7 @@ public class PeerProfile {
      *  @return -127 to +128, lower is closer
      *  @since 0.8.11
      */
-    public int getXORDistance() {
+    int getXORDistance() {
         return _distance;
     }
 
@@ -271,7 +271,7 @@ public class PeerProfile {
         else
             _tunnelTestResponseTimeAvg = 0.75*_tunnelTestResponseTimeAvg + .25*(double)ms;
         
-        if ( (_peer != null) && (_log.shouldLog(Log.INFO)) )
+        if (_log.shouldLog(Log.INFO))
             _log.info("Updating tunnel test time for " + _peer.toBase64().substring(0,6) 
                       + " to " + _tunnelTestResponseTimeAvg + " via " + ms);
     }
@@ -513,20 +513,19 @@ public class PeerProfile {
     void setIsFailing(boolean val) { _isFailing = val; }
     
     @Override
-    public int hashCode() { return (_peer == null ? 0 : _peer.hashCode()); }
+    public int hashCode() { return _peer.hashCode(); }
 
     @Override
     public boolean equals(Object obj) {
         if (obj == null ||
-            (!(obj instanceof PeerProfile)) ||
-            _peer == null)
+            !(obj instanceof PeerProfile))
             return false;
         PeerProfile prof = (PeerProfile)obj;
-        return _peer.equals(prof.getPeer());
+        return _peer.equals(prof._peer);
     }
 
     @Override
-    public String toString() { return "Profile: " + getPeer().toBase64(); }
+    public String toString() { return "Profile: " + _peer; }
     
     /**
      * New measurement is 12KB per expanded profile. (2009-03 zzz)

@@ -92,26 +92,26 @@ public class ProfileOrganizer {
     private static final int ABSOLUTE_MAX_HIGHCAP_PEERS = 150;
     
     /** synchronized against this lock when updating the tier that peers are located in (and when fetching them from a peer) */
-    private final ReentrantReadWriteLock _reorganizeLock = new ReentrantReadWriteLock(true);
+    private final ReentrantReadWriteLock _reorganizeLock = new ReentrantReadWriteLock(false);
     
     public ProfileOrganizer(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(ProfileOrganizer.class);
         _comp = new InverseCapacityComparator();
-        _fastPeers = new HashMap(16);
-        _highCapacityPeers = new HashMap(32);
-        _wellIntegratedPeers = new HashMap(16);
+        _fastPeers = new HashMap(32);
+        _highCapacityPeers = new HashMap(64);
+        _wellIntegratedPeers = new HashMap(128);
         _notFailingPeers = new HashMap(256);
         _notFailingPeersList = new ArrayList(256);
         _failingPeers = new HashMap(16);
         _strictCapacityOrder = new TreeSet(_comp);
         _persistenceHelper = new ProfilePersistenceHelper(_context);
         
-        _context.statManager().createRateStat("peer.profileSortTime", "How long the reorg takes sorting peers", "Peers", new long[] { 10*60*1000 });
-        _context.statManager().createRateStat("peer.profileCoalesceTime", "How long the reorg takes coalescing peer stats", "Peers", new long[] { 10*60*1000 });
-        _context.statManager().createRateStat("peer.profileThresholdTime", "How long the reorg takes determining the tier thresholds", "Peers", new long[] { 10*60*1000 });
-        _context.statManager().createRateStat("peer.profilePlaceTime", "How long the reorg takes placing peers in the tiers", "Peers", new long[] { 10*60*1000 });
-        _context.statManager().createRateStat("peer.profileReorgTime", "How long the reorg takes overall", "Peers", new long[] { 10*60*1000 });
+        _context.statManager().createRateStat("peer.profileSortTime", "How long the reorg takes sorting peers", "Peers", new long[] { 60*60*1000 });
+        _context.statManager().createRateStat("peer.profileCoalesceTime", "How long the reorg takes coalescing peer stats", "Peers", new long[] { 60*60*1000 });
+        _context.statManager().createRateStat("peer.profileThresholdTime", "How long the reorg takes determining the tier thresholds", "Peers", new long[] { 60*60*1000 });
+        _context.statManager().createRateStat("peer.profilePlaceTime", "How long the reorg takes placing peers in the tiers", "Peers", new long[] { 60*60*1000 });
+        _context.statManager().createRateStat("peer.profileReorgTime", "How long the reorg takes overall", "Peers", new long[] { 60*60*1000 });
         // used in DBHistory
         _context.statManager().createRequiredRateStat("peer.failedLookupRate", "Net DB Lookup fail rate", "Peers", new long[] { 10*60*1000l, 60*60*1000l, 24*60*60*1000l });
     }
@@ -162,17 +162,34 @@ public class ProfileOrganizer {
      *
      */
     public PeerProfile addProfile(PeerProfile profile) {
-        if ( (profile == null) || (profile.getPeer() == null) ) return null;
+        Hash peer = profile.getPeer();
+        if (profile == null || peer == null) return null;
         
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("New profile created for " + profile.getPeer().toBase64());
+            _log.debug("New profile created for " + peer);
         
-        PeerProfile old = getProfile(profile.getPeer());
+        PeerProfile old = getProfile(peer);
         profile.coalesceStats();
         if (!getWriteLock())
             return old;
         try {
-            locked_placeProfile(profile);
+            // Don't do this, as it may substantially exceed
+            // the high cap and fast limits in-between reorganizations.
+            // just add to the not-failing tier, and maybe the high cap tier,
+            // it will get promoted in the next reorganization
+            // if appropriate. This lessens high-cap churn.
+            // The downside is that new peers don't become high cap until the next reorg
+            // if we are at our limit.
+            //locked_placeProfile(profile);
+            _notFailingPeers.put(peer, profile);
+            if (old == null)
+                _notFailingPeersList.add(peer);
+            // Add to high cap only if we have room. Don't add to Fast; wait for reorg.
+            if (_thresholdCapacityValue <= profile.getCapacityValue() &&
+                isSelectable(peer) &&
+                _highCapacityPeers.size() < getMaximumHighCapPeers()) {
+                _highCapacityPeers.put(peer, profile);
+            }
             _strictCapacityOrder.add(profile);
         } finally { releaseWriteLock(); }
         return old;
@@ -721,6 +738,7 @@ public class ProfileOrganizer {
         long thresholdTime = 0;
         long placeTime = 0;
         int profileCount = 0;
+        int expiredCount = 0;
         
         long uptime = _context.router().getUptime();
         long expireOlderThan = -1;
@@ -748,8 +766,11 @@ public class ProfileOrganizer {
             long sortStart = System.currentTimeMillis();
             for (Iterator<PeerProfile> iter = _strictCapacityOrder.iterator(); iter.hasNext(); ) {
                 PeerProfile prof = iter.next();
-                if ( (expireOlderThan > 0) && (prof.getLastSendSuccessful() <= expireOlderThan) )
+                if ( (expireOlderThan > 0) && (prof.getLastSendSuccessful() <= expireOlderThan) ) {
+                    expiredCount++;
                     continue; // drop, but no need to delete, since we don't periodically reread
+                    // TODO maybe we should delete files, otherwise they are only deleted at restart
+                }
                 
                 if (shouldCoalesce) {
                     long coalesceStart = System.currentTimeMillis();
@@ -775,8 +796,7 @@ public class ProfileOrganizer {
 
             long placeStart = System.currentTimeMillis();
 
-            for (Iterator<PeerProfile> iter = allPeers.iterator(); iter.hasNext(); ) {
-                PeerProfile profile = iter.next();
+            for (PeerProfile profile : _strictCapacityOrder) {
                 locked_placeProfile(profile);
             }
 
@@ -792,7 +812,8 @@ public class ProfileOrganizer {
 
 
         if (_log.shouldLog(Log.INFO))
-            _log.info("Profiles reorganized.  averages: [integration: " + _thresholdIntegrationValue 
+            _log.info("Profiles reorganized. Expired: " + expiredCount
+                       + " Averages: [integration: " + _thresholdIntegrationValue 
                        + ", capacity: " + _thresholdCapacityValue + ", speed: " + _thresholdSpeedValue + "]");
             /*****
             if (_log.shouldLog(Log.DEBUG)) {
@@ -889,8 +910,6 @@ public class ProfileOrganizer {
         int maxHighCapPeers = getMaximumHighCapPeers();
         int numToDemote = _highCapacityPeers.size() - maxHighCapPeers;
         if (numToDemote > 0) {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Need to explicitly demote " + numToDemote + " peers from the high cap group");
             // sorted by capacity, highest-first
             Iterator<PeerProfile> iter = _strictCapacityOrder.iterator();
             for (int i = 0; iter.hasNext() && i < maxHighCapPeers; ) {
@@ -904,11 +923,14 @@ public class ProfileOrganizer {
                     i++;
                 }
             }
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Demoted " + numToDemote + " peers from high cap, size now " + _highCapacityPeers.size());
         }
     }
     
     /** how many not failing/active peers must we have? */
     private final static int MIN_NOT_FAILING_ACTIVE = 3;
+
     /**
      * I'm not sure how much I dislike the following - if there aren't enough
      * active and not-failing peers, pick the most reliable active peers and
@@ -917,9 +939,7 @@ public class ProfileOrganizer {
      */
     private void locked_unfailAsNecessary() {
         int notFailingActive = 0;
-        for (Iterator<Hash> iter = _notFailingPeers.keySet().iterator(); iter.hasNext(); ) {
-            Hash key = iter.next();
-            PeerProfile peer = _notFailingPeers.get(key);
+        for (PeerProfile peer : _notFailingPeers.values()) {
             if (peer.getIsActive())
                 notFailingActive++;
             if (notFailingActive >= MIN_NOT_FAILING_ACTIVE) {

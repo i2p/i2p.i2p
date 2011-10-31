@@ -45,7 +45,13 @@ class PeerManager {
     private final Map<Hash, String> _capabilitiesByPeer;
     private static final long REORGANIZE_TIME = 45*1000;
     private static final long REORGANIZE_TIME_MEDIUM = 123*1000;
-    private static final long REORGANIZE_TIME_LONG = 551*1000;
+    /**
+     *  We don't want this much longer than the average connect time,
+     *  as the CapacityCalculator now includes connection as a factor.
+     *  This must also be less than 10 minutes, which is the shortest
+     *  Rate contained in the profile, as the Rates must be coalesced.
+     */
+    private static final long REORGANIZE_TIME_LONG = 351*1000;
     
     public static final String TRACKED_CAPS = "" +
         FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL +
@@ -68,7 +74,7 @@ class PeerManager {
         _persistenceHelper = new ProfilePersistenceHelper(context);
         _organizer = context.profileOrganizer();
         _organizer.setUs(context.routerHash());
-        _capabilitiesByPeer = new ConcurrentHashMap(128);
+        _capabilitiesByPeer = new ConcurrentHashMap(256);
         _peersByCapability = new HashMap(TRACKED_CAPS.length());
         for (int i = 0; i < TRACKED_CAPS.length(); i++)
             _peersByCapability.put(Character.valueOf(Character.toLowerCase(TRACKED_CAPS.charAt(i))), new ConcurrentHashSet());
