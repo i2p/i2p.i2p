@@ -852,7 +852,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     }
 
     void dropPeer(PeerState peer, boolean shouldShitlist, String why) {
-        if (_log.shouldLog(Log.WARN)) {
+        if (_log.shouldLog(Log.INFO)) {
             long now = _context.clock().now();
             StringBuilder buf = new StringBuilder(4096);
             long timeSinceSend = now - peer.getLastSendTime();
@@ -896,7 +896,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 }
             }
              */
-            _log.warn(buf.toString(), new Exception("Dropped by"));
+            _log.info(buf.toString(), new Exception("Dropped by"));
         }
         
         peer.dropOutbound();
@@ -1312,7 +1312,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 options.setProperty(UDPAddress.PROP_INTRO_KEY, _introKey.toBase64());
 
             RouterAddress addr = new RouterAddress();
-            if (ADJUST_COST && !haveCapacity())
+            // SSU seems to regulate at about 85%, so make it a little higher.
+            // If this is too low, both NTCP and SSU always have incremented cost and
+            // the whole mechanism is not helpful.
+            if (ADJUST_COST && !haveCapacity(91))
                 addr.setCost(DEFAULT_COST + 1);
             else
                 addr.setCost(DEFAULT_COST);
