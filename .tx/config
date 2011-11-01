@@ -10,6 +10,7 @@ trans.it = apps/i2ptunnel/locale/messages_it.po
 trans.nl = apps/i2ptunnel/locale/messages_nl.po
 trans.ru = apps/i2ptunnel/locale/messages_ru.po
 trans.sv_SE = apps/i2ptunnel/locale/messages_sv.po
+trans.uk_UA = apps/i2ptunnel/locale/messages_uk.po
 trans.vi = apps/i2ptunnel/locale/messages_vi.po
 trans.zh_CN = apps/i2ptunnel/locale/messages_zh.po
 
@@ -92,6 +93,7 @@ trans.nl = apps/susimail/locale/messages_nl.po
 trans.ru = apps/susimail/locale/messages_ru.po
 trans.sv_SE = apps/susimail/locale/messages_sv.po
 trans.pl = apps/susimail/locale/messages_pl.po
+trans.uk_UA = apps/susimail/locale/messages_uk.po
 trans.vi = apps/susimail/locale/messages_vi.po
 trans.zh_CN = apps/susimail/locale/messages_zh.po
 
