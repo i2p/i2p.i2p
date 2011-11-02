@@ -4,6 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,7 +16,9 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.Base64;
 import net.i2p.data.DataHelper;
+import net.i2p.data.Hash;
 import net.i2p.router.RouterClock;
 import net.i2p.router.RouterContext;
 import net.i2p.router.util.RFC822Date;
@@ -43,12 +47,12 @@ public class Reseeder {
     private final Log _log;
 
     // Reject unreasonably big files, because we download into a ByteArrayOutputStream.
-    private static final long MAX_RESEED_RESPONSE_SIZE = 1024 * 1024;
+    private static final long MAX_RESEED_RESPONSE_SIZE = 2 * 1024 * 1024;
     /** limit to spend on a single host, to avoid getting stuck on one that is seriously overloaded */
     private static final int MAX_TIME_PER_HOST = 7 * 60 * 1000;
 
     /**
-     *  NOTE - URLs in both the standard and SSL groups should use the same hostname and path,
+     *  NOTE - URLs that are in both the standard and SSL groups must use the same hostname and path,
      *         so the reseed process will not download from both.
      *
      *  NOTE - Each seedURL must be a directory, it must end with a '/',
@@ -62,7 +66,8 @@ public class Reseeder {
          /*   "http://www.i2pbote.net/netDb/," +   NO DATA */
               "http://r31453.ovh.net/static_media/files/netDb/" + "," +
               "http://cowpuncher.drollette.com/netdb/" + "," +
-              "http://75.145.125.59/netDb/";
+              "http://75.145.125.59/netDb/" + "," +
+              "http://i2p.mooo.com/netDb/";
 
     /** @since 0.8.2 */
     public static final String DEFAULT_SSL_SEED_URL =
@@ -72,7 +77,8 @@ public class Reseeder {
               "https://reseed.i2p-projekt.de/" + "," +
               "https://r31453.ovh.net/static_media/files/netDb/" + "," +
               "https://cowpuncher.drollette.com/netdb/" + "," +
-              "https://75.145.125.59/netDb/";
+              "https://75.145.125.59/netDb/" + "," +
+              "https://i2p.mooo.com/netDb/";
 
     private static final String PROP_INPROGRESS = "net.i2p.router.web.ReseedHandler.reseedInProgress";
     /** the console shows this message while reseedInProgress == false */
@@ -99,6 +105,10 @@ public class Reseeder {
     public static final String PROP_SPROXY_USERNAME = "router.reseedSSLProxy.username";
     public static final String PROP_SPROXY_PASSWORD = "router.reseedSSLProxy.password";
     public static final String PROP_SPROXY_AUTH_ENABLE = "router.reseedSSLProxy.authEnable";
+
+    // from PersistentDataStore
+    private static final String ROUTERINFO_PREFIX = "routerInfo-";
+    private static final String ROUTERINFO_SUFFIX = ".dat";
 
     public Reseeder(RouterContext ctx) {
         _context = ctx;
@@ -320,19 +330,27 @@ public class Reseeder {
                     return 0;
                 }
                 String content = new String(contentRaw);
+                // This isn't really URLs, but Base64 hashes
+                // but they may include % encoding
                 Set<String> urls = new HashSet(1024);
                 int cur = 0;
                 int total = 0;
                 while (total++ < 1000) {
-                    int start = content.indexOf("href=\"routerInfo-", cur);
+                    int start = content.indexOf("href=\"" + ROUTERINFO_PREFIX, cur);
                     if (start < 0) {
-                        start = content.indexOf("HREF=\"routerInfo-", cur);
+                        start = content.indexOf("HREF=\"" + ROUTERINFO_PREFIX, cur);
                         if (start < 0)
                             break;
                     }
 
-                    int end = content.indexOf(".dat\">", start);
-                    String name = content.substring(start+"href=\"routerInfo-".length(), end);
+                    int end = content.indexOf(ROUTERINFO_SUFFIX + "\">", start);
+                    if (end < 0)
+                        break;
+                    if (start - end > 200) {  // 17 + 3*44 for % encoding + just to be sure
+                        cur = end + 1;
+                        continue;
+                    }
+                    String name = content.substring(start + ("href=\"" + ROUTERINFO_PREFIX).length(), end);
                     urls.add(name);
                     cur = end + 1;
                 }
@@ -360,11 +378,13 @@ public class Reseeder {
                             if (fetched % 60 == 0)
                                 System.out.println();
                         }
-                    } catch (IOException e) {
+                    } catch (Exception e) {
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Failed fetch", e);
                         errors++;
                     }
-                    // Give up on this one after 10 with only 0 or 1 good
-                    if (errors >= 10 && fetched <= 1)
+                    // Give up on this host after lots of errors, or 10 with only 0 or 1 good
+                    if (errors >= 50 || (errors >= 10 && fetched <= 1))
                         break;
                 }
                 System.err.println("Reseed got " + fetched + " router infos from " + seedURL + " with " + errors + " errors");
@@ -382,20 +402,33 @@ public class Reseeder {
             }
         }
     
-        /* Since we don't return a value, we should always throw an exception if something fails. */
-        private void fetchSeed(String seedURL, String peer) throws IOException {
-            URL url = new URL(seedURL + (seedURL.endsWith("/") ? "" : "/") + "routerInfo-" + peer + ".dat");
+        /**
+         *  Always throws an exception if something fails.
+         *  We do NOT validate the received data here - that is done in PersistentDataStore
+         *
+         *  @param peer The Base64 hash, may include % encoding. It is decoded and validated here.
+         */
+        private void fetchSeed(String seedURL, String peer) throws IOException, URISyntaxException {
+            // Use URI to do % decoding of the B64 hash (some servers escape ~ and =)
+            // Also do basic hash validation. This prevents stuff like
+            // .. or / in the file name
+            URI uri = new URI(peer);
+            String b64 = uri.getPath();
+            if (b64 == null)
+                throw new IOException("bad hash " + peer);
+            byte[] hash = Base64.decode(b64);
+            if (hash == null || hash.length != Hash.HASH_LENGTH)
+                throw new IOException("bad hash " + peer);
+
+            URL url = new URL(seedURL + (seedURL.endsWith("/") ? "" : "/") + ROUTERINFO_PREFIX + peer + ROUTERINFO_SUFFIX);
 
             byte data[] = readURL(url);
-            if (data == null) {
-                // Logging deprecated here since attemptFailed() provides better info
-                _log.debug("Failed fetching seed: " + url.toString());
-                throw new IOException("Failed fetching seed.");
-            }
-            //System.out.println("read: " + (data != null ? data.length : -1));
-            writeSeed(peer, data);
+            if (data == null || data.length <= 0)
+                throw new IOException("Failed fetch of " + url);
+            writeSeed(b64, data);
         }
 
+        /** @return null on error */
         private byte[] readURL(URL url) throws IOException {
             ByteArrayOutputStream baos = new ByteArrayOutputStream(4*1024);
 
@@ -432,6 +465,9 @@ public class Reseeder {
             return null;
         }
     
+        /**
+         *  @param name valid Base64 hash
+         */
         private void writeSeed(String name, byte data[]) throws IOException {
             String dirName = "netDb"; // _context.getProperty("router.networkDatabase.dbDir", "netDb");
             File netDbDir = new SecureDirectory(_context.getRouterDir(), dirName);
@@ -440,8 +476,11 @@ public class Reseeder {
             }
             FileOutputStream fos = null;
             try {
-                fos = new SecureFileOutputStream(new File(netDbDir, "routerInfo-" + name + ".dat"));
+                File file = new File(netDbDir, ROUTERINFO_PREFIX + name + ROUTERINFO_SUFFIX);
+                fos = new SecureFileOutputStream(file);
                 fos.write(data);
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Saved RI (" + data.length + " bytes) to " + file);
             } finally {
                 try {
                     if (fos != null) fos.close();
