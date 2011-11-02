@@ -15,8 +15,8 @@ Proxy-Connection: close
  <a href="http://127.0.0.1:7657/config.jsp">Configuration</a> <a href="http://127.0.0.1:7657/help.jsp">Help</a> <a href="http://127.0.0.1:7657/susidns/">Addressbook</a>
 </div>
 <div class=warning id=warning>
-<h3>Warning: I2P Proxy Not Found</h3>
-The WWW Outproxy was not found. 
+<h3>Warning: Outproxy Not Found</h3>
+The HTTP Outproxy was not found. 
 It is offline, there is network congestion,
 or your router is not yet well-integrated with peers.
 You may want to 

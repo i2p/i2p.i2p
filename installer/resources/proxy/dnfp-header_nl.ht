@@ -15,8 +15,8 @@ Proxy-Connection: close
  <a href="http://127.0.0.1:7657/config.jsp">Configuratie</a> <a href="http://127.0.0.1:7657/help.jsp">Help</a> <a href="http://127.0.0.1:7657/susidns/">Adresboek</a>
 </div>
 <div class=warning id=warning>
-<h3>Waarschuwing: I2P Proxy Niet Gevonden</h3>
-De WWW Outproxy was niet gevonden.
+<h3>Waarschuwing: Outproxy Niet Gevonden</h3>
+De HTTP Outproxy was niet gevonden.
 Het is offline, er is een netwerk verstopping,
 of je router is niet goed geïntegreerd met peers.
 Probeer <a href="javascript: parent.window.location.reload()">opnieuw</a>

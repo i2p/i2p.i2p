@@ -16,7 +16,7 @@ Proxy-Connection: close
 </div>
 <div class=warning id=warning>
 <h3>Warnung: I2P-Proxy nicht gefunden</h3>
-Der WWW-Outproxy wurde nicht gefunden.
+Der HTTP-Outproxy wurde nicht gefunden.
 Er ist offline, das Netz überlastet oder verstopft,
 oder Ihr Router ist noch nicht gut ins Netzwerk integriert.
 Laden Sie die Seite <a href="javascript: parent.window.location.reload()">neu</a>! 

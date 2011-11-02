@@ -1,3 +1,11 @@
+2011-11-02 zzz
+  * HTTP Proxy: Error page tweak
+  * Reseed:
+    - Add new host
+    - Handle % escaping in file URLs
+    - Do basic validation of router hash
+    - Add some more sanity checks
+
 2011-11-01 kytv
   * Update Ukrainian translations from Transifex
   * Update i2prouter script for better compatibility with Gentoo

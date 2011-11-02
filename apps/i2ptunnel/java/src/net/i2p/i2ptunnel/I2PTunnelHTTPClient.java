@@ -1097,7 +1097,11 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 out.write("\">http://".getBytes());
                 out.write(uri.getBytes());
                 out.write("</a>".getBytes());
-                if (usingWWWProxy) out.write(("<br>WWW proxy: " + wwwProxy).getBytes());
+                if (usingWWWProxy) {
+                    out.write(("<br><br><b>").getBytes());
+                    out.write(_("HTTP Outproxy").getBytes("UTF-8"));
+                    out.write((":</b> " + wwwProxy).getBytes());
+                }
                 if (jumpServers != null && jumpServers.length() > 0) {
                     out.write("<br><br>".getBytes());
                     out.write(_("Click a link below to look for an address helper by using a \"jump\" service:").getBytes("UTF-8"));
