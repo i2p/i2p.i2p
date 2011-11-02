@@ -147,7 +147,7 @@ public class DecayingBloomFilter {
             return _current.size() + _previous.size(); 
     }
 
-    /** unshyncronized, only used for logging elsewhere */
+    /** unsynchronized, only used for logging elsewhere */
     public double getFalsePositiveRate() { 
             return _current.falsePositives(); 
     }
