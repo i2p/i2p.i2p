@@ -131,6 +131,20 @@ PLIST_DOMAIN=org.tanukisoftware.wrapper
 
 # Do not modify anything beyond this point
 #-----------------------------------------------------------------------------
+# Workaround for Gentoo
+JAVABINARY=`grep ^wrapper\.java\.command $I2P/wrapper.config | cut -f2 -d=`
+
+if [ -e /etc/gentoo-release ]; then
+    if [ $JAVABINARY = java ]; then
+        if [ -x /etc/java-config-2/current-system-vm/bin/java ]; then
+            JAVABINARY="/etc/java-config-2/current-system-vm/bin/java"
+        else
+            echo "Please set wrapper.java.command in $I2P/wrapper.config"
+            exit 1
+        fi
+    fi
+fi
+
 WRAPPER_URL="http://www.i2p2.de/manualwrapper"
 unsupported() {
     echo "The most likely reason is that a supported version of the java"
@@ -840,7 +854,7 @@ console() {
         prepAdditionalParams "$@"
 
         # The string passed to eval must handles spaces in paths correctly.
-        COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=\"$APP_NAME\" wrapper.pidfile=\"$PIDFILE\" wrapper.name=\"$APP_NAME\" wrapper.displayname=\"$APP_LONG_NAME\" $ANCHORPROP $STATUSPROP $COMMANDPROP $LOCKPROP $ADDITIONAL_PARA"
+        COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=\"$APP_NAME\" wrapper.java.command=\"$JAVABINARY\" wrapper.pidfile=\"$PIDFILE\" wrapper.name=\"$APP_NAME\" wrapper.displayname=\"$APP_LONG_NAME\" $ANCHORPROP $STATUSPROP $COMMANDPROP $LOCKPROP $ADDITIONAL_PARA"
         eval $COMMAND_LINE
         if [ "$?" -ne "0" ]; then
                 failed
@@ -965,7 +979,7 @@ start() {
         prepAdditionalParams "$@"
 
         # The string passed to eval must handles spaces in paths correctly.
-        COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=\"$APP_NAME\" wrapper.pidfile=\"$PIDFILE\" wrapper.name=\"$APP_NAME\" wrapper.displayname=\"$APP_LONG_NAME\" wrapper.daemonize=TRUE $ANCHORPROP $IGNOREPROP $STATUSPROP $COMMANDPROP $LOCKPROP $ADDITIONAL_PARA"
+        COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=\"$APP_NAME\" wrapper.java.command=\"$JAVABINARY\" wrapper.pidfile=\"$PIDFILE\" wrapper.name=\"$APP_NAME\" wrapper.displayname=\"$APP_LONG_NAME\" wrapper.daemonize=TRUE $ANCHORPROP $IGNOREPROP $STATUSPROP $COMMANDPROP $LOCKPROP $ADDITIONAL_PARA"
         eval $COMMAND_LINE
         if [ "$?" -ne "0" ]; then
                 failed

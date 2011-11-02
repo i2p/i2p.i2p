@@ -1,3 +1,7 @@
+2011-11-01 kytv
+  * Update Ukrainian translations from Transifex
+  * Update i2prouter script for better compatibility with Gentoo
+
 2011-10-31 zzz
   * NetDB: Reduce max RI publish interval
   * ProfileOrganizer:
