@@ -31,6 +31,8 @@ public interface I2PServerSocket {
      */
     public I2PSocket accept() throws I2PException, ConnectException, SocketTimeoutException;
 
+    public AcceptingChannel getChannel();
+
     /**
      * Set Sock Option accept timeout
      * @param x timeout in ms
