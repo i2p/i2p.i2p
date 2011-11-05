@@ -1,3 +1,7 @@
+2011-11-05 kytv
+  * Update geoip.txt based on Maxmind GeoLite Country
+    database from 2011-11-02
+
 2011-11-02 zzz
   * HTTP Proxy: Error page tweak
   * Reseed:
