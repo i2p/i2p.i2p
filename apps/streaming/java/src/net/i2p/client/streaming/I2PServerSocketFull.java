@@ -24,6 +24,10 @@ class I2PServerSocketFull implements I2PServerSocket {
     public I2PSocket accept() throws I2PException, SocketTimeoutException {
         return _socketManager.receiveSocket();
     }
+
+    public AcceptingChannel getChannel() {
+        return new AcceptingChannelImpl(_socketManager);
+    }
     
     public long getSoTimeout() {
         return _socketManager.getConnectionManager().getSoTimeout();
