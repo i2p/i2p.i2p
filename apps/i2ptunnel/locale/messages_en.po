@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P i2ptunnel\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-12 23:26+0000\n"
+"POT-Creation-Date: 2011-11-05 00:26+0000\n"
 "PO-Revision-Date: 2010-06-15 14:09+0100\n"
 "Last-Translator: duck <duck@mail.i2p>\n"
 "Language-Team: duck <duck@mail.i2p>\n"
@@ -67,47 +67,51 @@ msgstr ""
 msgid "Save {0} to private address book and continue to eepsite"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1103
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1102
+msgid "HTTP Outproxy"
+msgstr ""
+
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1107
 msgid ""
 "Click a link below to look for an address helper by using a \"jump\" service:"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1321
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1325
 msgid "Added via address helper"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1345
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1349
 #, java-format
 msgid "Redirecting to {0}"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1351
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1355
 msgid "Router Console"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1352
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1356
 msgid "Addressbook"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1352
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1356
 msgid "Configuration"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1352
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1356
 msgid "Help"
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1357
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1361
 #, java-format
 msgid "Saved {0} to the {1} addressbook, redirecting now."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1358
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1362
 #, java-format
 msgid "Failed to save {0} to the {1} addressbook, redirecting now."
 msgstr ""
 
-#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1360
+#: ../java/src/net/i2p/i2ptunnel/I2PTunnelHTTPClient.java:1364
 msgid "Click here if you are not redirected automatically."
 msgstr ""
 
