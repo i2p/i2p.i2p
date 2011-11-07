@@ -1,25 +1,38 @@
 <!--
-<i2p.news date="$Date: 2011-10-20 00:00:00 $">
-<i2p.release version="0.8.10" date="2011/10/20" minVersion="0.6" />
+<i2p.news date="$Date: 2011-11-08 00:00:00 $">
+<i2p.release version="0.8.11" date="2011/11/08" minVersion="0.6" />
 -->
 <div lang="en">
-<h3>2011-10-20: <b>0.8.10 <a href="http://www.i2p2.i2p/release-0.8.10.html">Released</a></b></h3>
+<h3>2011-11-08: <b>0.8.11 <a href="http://www.i2p2.i2p/release-0.8.11.html">Released</a></b></h3>
 
 <p>
-Release 0.8.10 includes two changes intended to reduce the number of router-to-router connections,
-and therefore improve tunnel build success rates and general reliability.
-Of course, there's also a few bug fixes and translation updates.
+The unprecedented network growth starting October 5th
+has dramatically increased network congestion, especially on evenings (UTC)
+and weekends. The last two releases contained a few changes that we hoped
+would relieve the pressure, but unfortunately these measures have been only
+modest successes. The primary issue is to limit the number of direct router
+to-router connections in the network. This isn't a new problem; we've been
+working on it for several years, usually with good results. However, the recent
+growth pushed us over the edge once again.
 </p><p>
-The network has grown quite rapidly in recent weeks, and that's great news,
-but it has caused some instability. We welcome all our new users and we
-ask you to be patient as we make improvements to the software.
+Release 0.8.11 includes several more changes to reduce the number of router-to-router
+connections and increase connection and tunnel build capacity. The goal, of course,
+is to improve tunnel build success rates and general reliability. As always, there's
+a few bug fixes and translation updates.
+</p><p>
+We welcome all our new users. Please be patient as we work to improve network
+performance. Debugging congestion problems in a distributed anonymous network
+is a continuing challenge. Please help improve the network
+by restarting your router once the upgrade is downloaded.
+
 </p><p>
 Say hello to the volunteers on the <a href="irc://127.0.0.1:6668/i2p-help">#i2p-help IRC channel</a>.
 <a href="http://www.i2p2.i2p/getinvolved.html">Get involved</a>,
 spread the word,
 and <a href="http://www.i2p2.i2p/donate.html">donate</a>!
 If you find a bug, please enter a report on <a href="http://trac.i2p2.i2p/report/1">trac</a>.
-We are still looking for volunteers to work on new and existing translations.
-Please volunteer on <a href="irc://127.0.0.1:6668/i2p">IRC #i2p-dev</a>.
+To help on translations,
+volunteer on <a href="irc://127.0.0.1:6668/i2p">IRC #i2p-dev</a>
+or sign up on <a href="https://www.transifex.net/projects/p/I2P/">Transifex</a>.
 </p>
 </div>
