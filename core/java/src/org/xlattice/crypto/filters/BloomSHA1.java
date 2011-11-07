@@ -221,7 +221,7 @@ public class BloomSHA1 {
 
     /**
      * Get the bloom filter offsets for reuse.
-     * Caller should call rv.release() when done.
+     * Caller should call release(rv) when done with it.
      * @since 0.8.11
      */
     public FilterKey getFilterKey(byte[] b, int offset, int len) {

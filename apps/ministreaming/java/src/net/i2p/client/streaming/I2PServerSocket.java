@@ -31,6 +31,9 @@ public interface I2PServerSocket {
      */
     public I2PSocket accept() throws I2PException, ConnectException, SocketTimeoutException;
 
+    /**
+     *  @since 0.8.11
+     */
     public AcceptingChannel getChannel();
 
     /**

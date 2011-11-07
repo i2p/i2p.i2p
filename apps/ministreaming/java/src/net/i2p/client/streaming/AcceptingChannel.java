@@ -6,6 +6,9 @@ import net.i2p.I2PException;
 import java.net.ConnectException;
 import java.nio.channels.SelectableChannel;
 
+/**
+ *  @since 0.8.11
+ */
 public abstract class AcceptingChannel extends SelectableChannel {
     abstract I2PSocket accept() throws I2PException, ConnectException;
     I2PSocketManager _socketManager;

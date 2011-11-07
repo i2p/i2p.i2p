@@ -25,6 +25,9 @@ class I2PServerSocketFull implements I2PServerSocket {
         return _socketManager.receiveSocket();
     }
 
+    /**
+     *  @since 0.8.11
+     */
     public AcceptingChannel getChannel() {
         return new AcceptingChannelImpl(_socketManager);
     }

@@ -12,6 +12,9 @@ import java.nio.channels.Selector;
 import java.nio.channels.spi.AbstractSelectionKey;
 import java.nio.channels.spi.SelectorProvider;
 
+/**
+ *  @since 0.8.11
+ */
 public class AcceptingChannelImpl extends AcceptingChannel {
     boolean _isRegistered = false;
     SelectionKey whichKey = null;
