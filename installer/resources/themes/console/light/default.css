@@ -1,7 +1,7 @@
 /* I2P Tunnel Manager Theme: Light */
 /* Description: Light blue highlights. */
 /* Author: dr|z3d */
-    
+
 body {
      margin: 0px;
      padding: 0px;
@@ -11,11 +11,11 @@ body {
      color: #001;
      font-size: 10pt;
 /* we've avoided Tantek Hacks so far,
-    ** but we can't avoid using the non-w3c method of 
+    ** but we can't avoid using the non-w3c method of
     ** box rendering. (and therefore one of mozilla's
     ** proprietry -moz properties (which hopefully they'll
     ** drop soon).
- */  
+ */
      -moz-box-sizing: border-box;
      box-sizing: border-box;
     background: #99f url(images/magic.png);
@@ -93,7 +93,7 @@ textarea {
 textarea:active {
      -moz-box-shadow: inset 0px 0px 0px 1px #f60;
      -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
-     box-shadow: inset 0px 0px 0px 1px #f60;     
+     box-shadow: inset 0px 0px 0px 1px #f60;
 }
 
 br {
@@ -173,7 +173,7 @@ hr {
 .freetext:active {
      -moz-box-shadow: inset 0px 0px 0px 1px #f60;
      -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
-     box-shadow: inset 0px 0px 0px 1px #f60;     
+     box-shadow: inset 0px 0px 0px 1px #f60;
 }
 
 .control, control:link, control:visited {
@@ -272,7 +272,7 @@ hr {
 
 .comment {
      font-weight: bold;
-     display: block; 
+     display: block;
      padding: 2px 10px 0 20px;
      text-align: left;
 }
@@ -392,29 +392,29 @@ select {
 select:active {
      -moz-box-shadow: inset 0px 0px 0px 1px #f60;
      -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
-     box-shadow: inset 0px 0px 0px 1px #f60;     
+     box-shadow: inset 0px 0px 0px 1px #f60;
 }
 
-a:link{
+a:link {
      color: #359;
      text-decoration: none;
      font-weight: bold;
      word-wrap: break-word;
 }
 
-a:visited{
+a:visited {
      color: #218;
      text-decoration: none;
      font-weight: bold;
 }
 
-a:hover{
+a:hover {
      color: #f60;
      text-decoration: underline;
      font-weight: bold;
 }
 
-a:active{
+a:active {
      color: #f93;
      text-decoration: underline;
      font-weight: bold;

@@ -74,7 +74,7 @@ div.confignav {
 
 div.messages {
      border-left: 0;
-     border-right: 0;     
+     border-right: 0;
      margin: -10px -15px 0px -15px;
 }
 
@@ -114,7 +114,7 @@ div.news hr {
      height: 3px;
      border: 0px;
      margin: 0 -10px 0 -13px !important;
-}     
+}
 
 div.routersummary {
      color: #001;
@@ -197,7 +197,7 @@ div.routersummary form {
 
 div.routersummary p {
      padding: 0;
-}     
+}
 
 div.routersummary a:link, div.routersummary a:visited {
      line-height: 120%;
@@ -214,7 +214,7 @@ div.routersummary td {
 }
 
 div.routersummary form {
-     margin: -20px 0 !important; 
+     margin: -20px 0 !important;
 }
 
 div.news li {
@@ -241,7 +241,7 @@ td {
 
 th {
      text-align: left;
-     padding-left: 3px; 
+     padding-left: 3px;
      padding-right: 1px;
 }
 
@@ -299,4 +299,4 @@ h1, h2, h3 {
 }
 
 .routersummary h2, .routersummary h3 {
-     background: #fff url(images/tinytitle.png) center right tile-x !important;     
+     background: #fff url(images/tinytitle.png) center right tile-x !important;

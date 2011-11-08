@@ -67,7 +67,7 @@ div.confignav {
 
 div.messages {
      border-left: 0;
-     border-right: 0;     
+     border-right: 0;
      margin: -10px -15px 0px -15px;
 }
 
@@ -77,7 +77,7 @@ div.main, div.news {
 }
 
 div.main hr, div.news hr {
-     margin: 0;	
+     margin: 0;
 }
 
 div.main {
@@ -96,7 +96,7 @@ div.news hr {
      height: 1px;
      border: 0px;
      margin: 0 -10px 0 -13px !important;
-}     
+}
 
 div.routersummary {
      color: #001;
@@ -172,7 +172,7 @@ div.routersummary form {
 
 div.routersummary p {
      padding: 0;
-}     
+}
 
 div.routersummary td {
      padding: 2px 4px;
@@ -204,7 +204,7 @@ td {
 
 th {
      text-align: left;
-     padding-left: 3px; 
+     padding-left: 3px;
      padding-right: 1px;
 }
 

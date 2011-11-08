@@ -68,13 +68,13 @@ div.toolbar a:visited {
      background: #ffe;
 }
 
-div.toolbar a:hover{
+div.toolbar a:hover {
      border: 1px solid #eeffef;
      background: #003;
      color: #f60;
 }
 
-a:active{
+a:active {
      color: #900;
 }
 
@@ -220,7 +220,7 @@ div.tunnels img, div.tunnels img:hover {
      opacity: 1 !important;
 }
 
-div.routersummary img:first-child  { 
+div.routersummary img:first-child  {
      margin-bottom: -2px !important;
      opacity: 0.7;
 }
@@ -252,7 +252,7 @@ div.tunnels td, div.tunnels img:first-child {
 
 div.routersummary p {
      padding: 0;
-}     
+}
 
 div.refresh {
      margin-top: 10px !important;
@@ -273,7 +273,7 @@ div.warning {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      text-align: justify;
-     background-image:url("../images/itoopie_sm.png");     
+     background-image:url("../images/itoopie_sm.png");
      background-position:10px center;
      background-repeat:no-repeat;
      -moz-box-shadow: inset 0px 0px 1px 0px #d00;
@@ -307,7 +307,7 @@ div.sorry hr {
      height: 1px;
      border: 1px solid #531;
      margin: 10px 0 15px 0;
-}     
+}
 
 div.main {
      margin: 10px 10px 20px 207px;
@@ -370,7 +370,7 @@ div.news p {
      padding: 0 15px;
 }
 
-div.news hr{
+div.news hr {
      color: #225;
      background: #225;
      height: 1px;
@@ -575,7 +575,7 @@ td {
      color: #000;
      vertical-align: middle;
      border-top: 1px inset #447;
-     border-bottom: 1px outset #99f;     
+     border-bottom: 1px outset #99f;
 }
 
 tt {
@@ -658,26 +658,26 @@ code {
      font-weight: bold;
 }
 
-a:link{
+a:link {
      color: #359;
      text-decoration: none;
      font-weight: bold;
      word-wrap: break-word;
 }
 
-a:visited{
+a:visited {
      color: #218;
      text-decoration: none;
      font-weight: bold;
 }
 
-a:hover{
+a:hover {
      color: #f60;
      text-decoration: underline;
      font-weight: bold;
 }
 
-a:active{
+a:active {
      color: #f93;
      text-decoration: underline;
      font-weight: bold;
@@ -797,7 +797,7 @@ h4 {
      font-size: 11pt;
 }
 
-button, button:visited{
+button, button:visited {
      font: bold 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      border: 1px outset #66a;
      padding: 1px 3px;
@@ -817,7 +817,7 @@ button, button:visited{
      color: #316;
 }
 
-button:hover{
+button:hover {
      border: 1px solid #f60;
      background: #f60 !important;
      color: #fff;
@@ -826,7 +826,7 @@ button:hover{
      box-shadow: inset 0px 0px 0px 1px #fff;
 }
 
-button:active{
+button:active {
      border: 1px solid #f60;
      background: #202 !important;
      color: #f60;
@@ -939,7 +939,7 @@ select {
 select:active {
      -moz-box-shadow: inset 0px 0px 0px 1px #f60;
      -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
-     box-shadow: inset 0px 0px 0px 1px #f60;     
+     box-shadow: inset 0px 0px 0px 1px #f60;
 }
 
 textarea {
@@ -959,7 +959,7 @@ textarea {
 textarea:active {
      -moz-box-shadow: inset 0px 0px 0px 1px #f60;
      -khtml-box-shadow: inset 0px 0px 0px 1px #f60;
-     box-shadow: inset 0px 0px 0px 1px #f60;     
+     box-shadow: inset 0px 0px 0px 1px #f60;
 }
 
 .proxyfooter {
@@ -973,7 +973,7 @@ textarea:active {
      -khtml-border-radius: 4px;
      border: 1px solid #447;
      display: none;
-}    
+}
 
 .statusnotes {
      font-style: normal;
@@ -982,7 +982,7 @@ textarea:active {
      text-align: center;
      border: 1px solid #447 !important;
      border-top: 0 !important;
-     margin: -5px 0 5px 0; 
+     margin: -5px 0 5px 0;
      padding: 7px;
      background: url("images/header.png") repeat scroll center center #eef;
      letter-spacing: 0em !important;
@@ -998,15 +998,15 @@ div.joblog i {
      color: #050;
      font-weight: bold;
 }
- 
- div.joblog ul {
+
+div.joblog ul {
      word-wrap: break-word !important;
      text-align: justify;
      line-height: 100% !important;
      margin-top: -5px !important;
 }
 
- div.joblog li {
+div.joblog li {
      word-wrap: break-word !important;
      line-height: 115% !important;
      padding: 0;
@@ -1053,10 +1053,10 @@ div.joblog h3 {
 
 .optbox {
      min-width: 16px !important;
-     max-width: 16px !important;     
+     max-width: 16px !important;
      width: 16px !important;
      min-height: 16px;
-     max-height: 16px;     
+     max-height: 16px;
      height: 16px;
      opacity: 1.0;
      border: 0;
@@ -1066,10 +1066,10 @@ div.joblog h3 {
 
 .optbox:hover {
      min-width: 16px !important;
-     max-width: 16px !important;     
+     max-width: 16px !important;
      width: 16px !important;
      min-height: 16px;
-     max-height: 16px;     
+     max-height: 16px;
      height: 16px;
      opacity: 1.0;
      border: 0;
@@ -1090,7 +1090,7 @@ div.joblog h3 {
 .tablefooter tr, .tablefooter td {
      background: #ffe url('images/header.png') center center repeat-x;
      border-top: 1px solid #447;
-     border-bottom: 1px solid #447 !important;     
+     border-bottom: 1px solid #447 !important;
      padding: 8px 2px !important;
      font-size: 7pt;
      line-height: 110%;

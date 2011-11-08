@@ -73,7 +73,7 @@ div.warning {
      border: 1px solid #99f;
      text-align: left;
      color: inherit;
-     background-image:url("../images/itoopie_sm.png");     
+     background-image:url("../images/itoopie_sm.png");
      background-position: 12px center;
      background-repeat:no-repeat;
      -moz-box-shadow: inset 0px 0px 0px 1px #f60;
@@ -85,16 +85,16 @@ div.warning a:link {
      text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.3);
 }
 
-div.warning a:visited{
+div.warning a:visited {
      color: #f90;
 }
 
-div.warning a:hover{
+div.warning a:hover {
      color: #f90;
   text-shadow: 0px 0px 1px rgba(255, 128, 0, 0.5);
 }
 
-div.warning a:active{
+div.warning a:active {
      color: #900;
 }
 
@@ -111,8 +111,8 @@ div.warning h3 {
      border-bottom: 1px solid #fb7;
      padding-bottom: 10px;
      padding-left: 0;
-     font-variant: small-caps; 
-     text-transform: capitalize; 
+     font-variant: small-caps;
+     text-transform: capitalize;
      font-size: 12.5pt;
      background: none !important;
 }
@@ -150,7 +150,7 @@ div.toolbar {
 }
 
 div.routersummaryouter {
-     float: left; 
+     float: left;
      width: 200px;
      margin: 0 0 5px 0px;
      padding: 0;
@@ -158,17 +158,17 @@ div.routersummaryouter {
      clear: left; /* fixes a bug in Opera */
 }
 
-div.routersummary { 
-     background: #00000A; 
-     width: 190px; 
-     color: inherit; 
-     margin: 0; 
-     padding: 8px 1px 4px 1px; 
-     text-align: center !important; 
-     border: 1px solid #99f; 
-     font-size: 9pt; 
-     word-wrap: break-word; 
-     font: 9pt/125%; 
+div.routersummary {
+     background: #00000A;
+     width: 190px;
+     color: inherit;
+     margin: 0;
+     padding: 8px 1px 4px 1px;
+     text-align: center !important;
+     border: 1px solid #99f;
+     font-size: 9pt;
+     word-wrap: break-word;
+     font: 9pt/125%;
      -moz-box-shadow: inset 0px 0px 0px 1px #00000A;
 }
 
@@ -196,7 +196,7 @@ div.routersummary h3 {
      padding: 3px 0;
      background: #002;
      text-transform: uppercase;
-     background: #002 url("images/titles.png") repeat-x !important; 
+     background: #002 url("images/titles.png") repeat-x !important;
      background-position: center center !important;
 }
 
@@ -278,8 +278,8 @@ div.tunnels table{
      text-align: right;
      margin-right: -2px;
      padding-right: 0;
-}     
-     
+}
+
 div.refresh {
      margin-top: 10px !important;
      margin-bottom: 10px !important;
@@ -288,7 +288,7 @@ div.refresh {
 
 div.routersummary p {
      padding: 0;
-}     
+}
 
 div.routersummary a {
 }
@@ -340,7 +340,7 @@ div.main hr:last-child {
 }
 
 div.main textarea {
-     width: 98% !important; 
+     width: 98% !important;
      margin: 2px 0 2px 5px;
      min-height: 96px;
      background: #001;
@@ -362,7 +362,7 @@ div.welcome {
 }
 
 div.main h2:first-child, div.main h3:first-child {
-     margin-top: 0px; 
+     margin-top: 0px;
      margin-bottom: -5px;
 }
 
@@ -375,7 +375,7 @@ div.wideload h3:first-child {
 }
 
 div.wideload h3 {
-     margin-top: 15px !important;      
+     margin-top: 15px !important;
      margin-bottom: 0px !important;
 }
 
@@ -407,7 +407,7 @@ div.news li {
      margin: 15px 15px -10px -20px;
      padding: 0px 0 15px 0;
      border-bottom: 1px dotted #99f;
-     border-top: 0px solid #99f;     
+     border-top: 0px solid #99f;
      padding: 3px 5px 5px 0;
      font-size: 10pt;
      color: #eef;
@@ -507,7 +507,7 @@ div.configure h2:first-child {
 .topshimten {
      margin-top: 15px;
      margin-bottom: 15px;
-} 
+}
 
 div.messages {
      padding: 0px 10px;
@@ -564,7 +564,7 @@ h2 {
      border-top: 1px solid #99f;
      border-left: 1px solid #99f;
      background: #000008;
-     text-transform: uppercase; 
+     text-transform: uppercase;
      letter-spacing: 0.07em;
 }
 
@@ -577,7 +577,7 @@ h3 {
      letter-spacing: 0.05em;
      margin-bottom: 10px;
      font-weight: bold !important;
-     text-transform: uppercase; 
+     text-transform: uppercase;
 }
 
 h3 a {
@@ -585,20 +585,20 @@ h3 a {
 }
 
 h2, h3, .confignav {
-     background: #002 url("images/tinytitles.png") center center repeat-x !important; 
+     background: #002 url("images/tinytitles.png") center center repeat-x !important;
 }
 
 thead, tfoot, th {
-     background: #002 url("images/titles.png") repeat-x center center !important; 
+     background: #002 url("images/titles.png") repeat-x center center !important;
 }
 
 .proxyfooter{
      font-size: 7pt;
-     display: none !important; 
+     display: none !important;
 }
 
 table {
-     border-collapse: collapse; 
+     border-collapse: collapse;
      border: 1px solid #99f;
      margin: 0 0 5px 0;
      cell-padding: 1px;
@@ -635,7 +635,7 @@ tt {
 tt, pre {
      font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
 }
-     
+
 td {
      padding: 4px;
 }
@@ -661,7 +661,7 @@ hr {
      font-size: 8pt;
      color: #eef;
      text-align: center;
-     margin: -5px 0 5px 0; 
+     margin: -5px 0 5px 0;
      background: #000;
      border: 1px solid #99f;
      border-top: 0;
@@ -728,7 +728,7 @@ div.joblog hr {
 div.joblog ol {
      margin-bottom: 0px;
 }
- 
+
 input {
      margin: 3px 5px 3px 0;
      vertical-align: middle;
@@ -804,26 +804,26 @@ p {
      letter-spacing: 0.12em !important;
 }
 
-a:link{
+a:link {
      color: #bbf;
      text-decoration: none;
      font-weight: bold;
      word-wrap: break-word;
 }
 
-a:visited{
+a:visited {
      color: #99f;
      text-decoration: none;
      font-weight: bold;
 }
 
-a:hover{
+a:hover {
      color: #f60;
      text-decoration: underline;
      font-weight: bold;
 }
 
-a:active{
+a:active {
      color: #f93;
      text-decoration: underline;
      font-weight: bold;
@@ -868,7 +868,7 @@ div.graphspanel {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      border: 1px solid #99f;
-     text-align: center !important;   
+     text-align: center !important;
 }
 
 div.graphspanel img {
@@ -906,7 +906,7 @@ table code {
      font-size: 8.5pt;
 }
 
-table li:last-child{
+table li:last-child {
      margin-bottom: 15px;
 }
 

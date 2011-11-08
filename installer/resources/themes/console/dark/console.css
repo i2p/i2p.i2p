@@ -10,7 +10,6 @@ body {
      background: #010 url('images/camotile.png') center bottom;
      color: #EE9;
      font: 9pt/130% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
-     
 }
 
 .hide {
@@ -39,7 +38,7 @@ div.logo {
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
- background: #000; /*url("images/camotile2.png");*/
+     background: #000; /*url("images/camotile2.png");*/
      width: 185px;
      -moz-box-shadow: inset 0px 0px 1px 0px #009;
      -khtml-box-shadow: inset 0px 0px 1px 0px #009;
@@ -78,13 +77,13 @@ div.toolbar a:visited {
      background: #ddf;
 }
 
-div.toolbar a:hover, button:hover{
+div.toolbar a:hover, button:hover {
      border: 1px solid #f60;
      background: #030;
      color: #f60;
 }
 
-a:active{
+a:active {
      color: #900;
 }
 
@@ -120,8 +119,8 @@ div.routersummary {
 div.routersummary input[type=text] {
      text-align: right !important;
      -moz-box-shadow: inset 1px 1px 1px 0px #000;
-     -khtml-box-shadow: inset 1px 1px 1px 0px #000;     
-     box-shadow: inset 1px 1px 1px 0px #000;     
+     -khtml-box-shadow: inset 1px 1px 1px 0px #000;
+     box-shadow: inset 1px 1px 1px 0px #000;
 }
 
 div.routersummary hr {
@@ -184,7 +183,7 @@ div.routersummary tr {
 
 div.routersummary p {
      padding: 0;
-}     
+}
 
 div.refresh {
      margin-top: 10px !important;
@@ -258,7 +257,7 @@ div.warning {
      background-repeat:no-repeat;
      -moz-box-shadow: inset 0px 0px 0px 1px #f00;
      -khtml-box-shadow: inset 0px 0px 0px 1px #f00;
-     box-shadow: inset 0px 0px 0px 1px #f00;          
+     box-shadow: inset 0px 0px 0px 1px #f00;
      word-wrap: break-word;
 }
 
@@ -288,7 +287,7 @@ div.sorry hr {
      height: 1px;
      border: 1px solid #EE9;
      margin: 10px 0;
-}     
+}
 
 div.main {
      margin: -1px 5px 5px 205px;
@@ -366,7 +365,7 @@ div.news h4 {
 div.news h4:first-child {
      background: url('../images/itoopbullet.png');
      background-repeat: no-repeat;
-     background-position: right;   
+     background-position: right;
 }
 
 div.news p {
@@ -382,7 +381,7 @@ div.news p:nth-child(n+1) {
 
 div.news hr {
      margin: 8px 0 3px 0;
-}     
+}
 
 div.confignav {
      padding: 15px 10px !important;
@@ -512,7 +511,7 @@ th {
      background: #000; /*url('images/tabletitledark.png') repeat-x;*/
      background: #000 url('images/header.png') center center repeat-x ;
      border-top: 1px solid #494;
-     border-bottom: 1px solid #494 !important;     
+     border-bottom: 1px solid #494 !important;
      line-height: 110%;
 }
 
@@ -541,7 +540,7 @@ td {
      color: #EE9;
      vertical-align: middle;
      border-top: 1px inset #494;
-     border-bottom: 1px outset #494;   
+     border-bottom: 1px outset #494;
 }
 
 td img {
@@ -612,24 +611,24 @@ code {
 /*     padding: 1px 2px;*/
 }
 
-a:link, h2 a:link{
+a:link, h2 a:link {
      color: #494;
      text-decoration: none;
-     font-weight: bold;     
+     font-weight: bold;
      word-wrap: break-word;
 }
 
-a:visited{
+a:visited {
      color: #7b7;
      text-decoration: none;
-     font-weight: bold;     
+     font-weight: bold;
      word-wrap: break-word;
 }
 
-a:hover{
+a:hover {
      color: #f60;
      text-decoration: underline;
-     font-weight: bold;     
+     font-weight: bold;
      word-wrap: break-word;
 }
 
@@ -764,8 +763,8 @@ button:hover {
      box-shadow: inset 0px 1px 1px 0px #EE9;
      background: #000;
      color: #f60;
-}     
-          
+}
+
 button:active {
      border: 1px inset #f60;
      background: #f60;
@@ -920,7 +919,7 @@ textarea {
      -khtml-border-radius: 4px;
      border: 1px solid #000;
      display: none;
-}        
+}
 
 .statusnotes {
      font-style: italic;
@@ -929,7 +928,7 @@ textarea {
      text-align: center;
      border: 1px solid #494 !important;
 /*     border-top: 0px !important;*/
-     margin: -3px 0 5px 0; 
+     margin: -3px 0 5px 0;
      padding: 7px;
      background: #010;
      -moz-box-shadow: inset 0px 0px 0px 1px #090;
@@ -939,7 +938,7 @@ textarea {
 }
 
 div.joblog {
-/*     margin: 	15px 0 15px 0;
+/*     margin:15px 0 15px 0;
      padding: 5px 20px 10px 20px !important;
      border: 1px solid #494;
      background-color: #000;
@@ -960,7 +959,7 @@ div.main li {
 /*     line-height: 150%;*/
      word-wrap: break-word;
 }
- 
+
 div.joblog li {
      word-wrap: break-word !important;
      line-height: 120% !important;
@@ -1004,10 +1003,10 @@ div.joblog p {
 
 .optbox {
      min-width: 16px !important;
-     max-width: 16px !important;     
+     max-width: 16px !important;
      width: 16px !important;
      min-height: 16px;
-     max-height: 16px;     
+     max-height: 16px;
      height: 16px;
      opacity: 1.0;
      border: 0;
@@ -1019,10 +1018,10 @@ div.joblog p {
 
 .optbox:hover {
      min-width: 16px !important;
-     max-width: 16px !important;     
+     max-width: 16px !important;
      width: 16px !important;
      min-height: 16px;
-     max-height: 16px;     
+     max-height: 16px;
      height: 16px;
      opacity: 1.0;
      border: 0;
@@ -1032,13 +1031,13 @@ div.joblog p {
 
 .cells {
      border: 1px inset #494;
-     border-left: 1px outset #494;     
+     border-left: 1px outset #494;
 }
 
 .tablefooter tr, .tablefooter td {
      background: #000 url('images/header.png') repeat-x center center !important;
      border-top: 1px solid #494;
-     border-bottom: 1px solid #494 !important;     
+     border-bottom: 1px solid #494 !important;
      font-size: 7pt;
      line-height: 110%;
 }
@@ -1051,7 +1050,7 @@ div.footnote {
      text-align: right;
      color: #494;
      font-size: 7pt;
-     margin-bottom: -8px !important; 
+     margin-bottom: -8px !important;
 }
 
 div.footnote hr{

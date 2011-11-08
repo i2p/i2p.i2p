@@ -45,7 +45,7 @@ h4 {
      white-space: nowrap;
      width: 782px;
      letter-spacing: 0.09em;
-     background: #001 url("/themes/console/midnight/images/tinytitles.png") repeat-x center center !important; 
+     background: #001 url("/themes/console/midnight/images/tinytitles.png") repeat-x center center !important;
 }
 
 label {
@@ -210,30 +210,30 @@ hr {
 
 #globalOperationsPanel .control {
      width: 100px !important;
-     margin-top: 3px; 
+     margin-top: 3px;
      float: right;
 }
 
-a:link{
+a:link {
      color: #bbf;
      text-decoration: none;
      font-weight: bold;
      word-wrap: break-word;
 }
 
-a:visited{
+a:visited {
      color: #aaf;
      text-decoration: none;
      font-weight: bold;
 }
 
-a:hover{
+a:hover {
      color: #f60;
      text-decoration: underline;
      font-weight: bold;
 }
 
-a:active{
+a:active {
      color: #f93;
      text-decoration: underline;
      font-weight: bold;

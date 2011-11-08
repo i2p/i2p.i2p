@@ -9,7 +9,7 @@ body {
      color: #000000;
      font-size: 9pt;
 /* we've avoided Tantek Hacks so far,
-    ** but we can't avoid using the non-w3c method of 
+    ** but we can't avoid using the non-w3c method of
     ** box rendering. (and therefore one of mozilla's
     ** proprietry -moz properties (which hopefully they'll
     ** drop soon).
@@ -28,7 +28,7 @@ label {
      padding: 5px 4px 4px 4px;
      float: left;
      width: 120px;
-/*    height :  24px; */
+/*    height:  24px; */
      font-weight: normal;
      text-align: right;
      font-size: 8pt;
@@ -137,7 +137,7 @@ hr {
 
 .freetext {
      width: 150px;
-     height : 22px; 
+     height: 22px;
      border: 1px solid #494;
      padding: 2px;
      margin: 4px 0 2px 4px;
@@ -266,22 +266,22 @@ hr {
      border: 0;
 }
 
-a:link{
+a:link {
      color: #494;
      text-decoration: none;
 }
 
-a:visited{
+a:visited {
      color: #7b7;
      text-decoration: none;
 }
 
-a:hover{
+a:hover {
      color: #ff6600;
      text-decoration: underline;
 }
 
-a:active{
+a:active {
      color: #900;
      text-decoration: underline;
 }

@@ -73,7 +73,7 @@ div.warning {
      border: 5px solid #fb7;
      text-align: left;
      color: inherit;
-     background-image:url("../images/itoopie_sm.png");     
+     background-image:url("../images/itoopie_sm.png");
      background-position: 12px center;
      background-repeat:no-repeat;
      -moz-box-shadow: inset 0px 0px 0px 2px #f60;
@@ -85,16 +85,16 @@ div.warning a:link {
      text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.5);
 }
 
-div.warning a:visited{
+div.warning a:visited {
      color: #f90;
 }
 
-div.warning a:hover{
+div.warning a:hover {
      color: #d30;
      text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.7);
 }
 
-div.warning a:active{
+div.warning a:active {
      color: #900;
 }
 
@@ -144,7 +144,7 @@ div.toolbar {
 /* Side panel */
 
 div.routersummaryouter {
-     float: left; 
+     float: left;
      width: 193px;
      margin: 0;
      padding: 0;
@@ -223,7 +223,7 @@ div.routersummary table {
 
 div.routersummary tr {
      background-image: none !important;
-     background-color: transparent !important; 
+     background-color: transparent !important;
      border: 0 !important;
 }
 
@@ -232,7 +232,7 @@ div.tunnels table {
      width: 193px;
 }
 
-div.tunnels table{
+div.tunnels table {
      margin: -2px 0px -4px 0px !important;
      text-align: center !important;
      width: 190px;
@@ -256,8 +256,8 @@ div.tunnels table{
      width: 12px;
      text-align: right;
      margin-right: -2px;
-}    
-     
+}
+
 div.refresh {
      margin-top: 10px !important;
      margin-bottom: 10px !important;
@@ -266,7 +266,7 @@ div.refresh {
 
 div.routersummary p {
      padding: 0;
-}     
+}
 
 div.routersummary a:link, div.routersummary a:visited {
      text-shadow: 0px 0px 1px rgba(0, 0, 32, 0.3);
@@ -327,7 +327,7 @@ div.main hr:last-child {
 }
 
 div.main textarea {
-     width: 98% !important; 
+     width: 98% !important;
      margin: 2px 0 2px 5px;
      min-height: 96px;
 }
@@ -345,7 +345,7 @@ div.welcome {
 }
 
 div.main h2:first-child, div.main h3:first-child {
-     margin-top: 0px; 
+     margin-top: 0px;
      margin-bottom: -5px;
 }
 
@@ -358,7 +358,7 @@ div.wideload h3:first-child {
 }
 
 div.wideload h3 {
-     margin-top: 15px !important;      
+     margin-top: 15px !important;
      margin-bottom: 0px !important;
 }
 
@@ -390,7 +390,7 @@ div.news li {
      margin: 15px 15px -10px -20px;
      padding: 0px 0 15px 0;
      border-bottom: 2px dotted #cc7;
-     border-top: 0px solid #cc7;     
+     border-top: 0px solid #cc7;
      padding: 3px 5px 5px 0;
      font-size: 10pt;
      color: #540;
@@ -423,7 +423,7 @@ div.news p:first-child {
      padding-top: 15px !important;
 }
 
- 
+
 div.news p:nth-child(2n) {
      padding-top: 15px !important;
 }
@@ -497,7 +497,7 @@ div.configure h2:first-child {
 .topshimten {
      margin-top: 15px;
      margin-bottom: 15px;
-} 
+}
 
 div.messages {
      padding: 0px 10px;
@@ -549,7 +549,7 @@ h2 {
      border: 1px solid #89f;
      letter-spacing: 0.04em;
 /*     font-variant: small-caps; */
-     text-transform: uppercase; 
+     text-transform: uppercase;
      background: #fff;
      text-shadow: 0px 1px 1px #99f;
 }
@@ -566,8 +566,8 @@ h3 {
 }
 
 h2, h3 {
-     background-image: url("images/titlebg.png") !important; 
-     background-repeat: no-repeat; 
+     background-image: url("images/titlebg.png") !important;
+     background-repeat: no-repeat;
      background-position: center right;
      -moz-border-radius: 0 3px 0 0;
      -khtml-border-radius: 0 3px 0 0;
@@ -575,8 +575,8 @@ h2, h3 {
 }
 
 .routersummary h2, .routersummary h3, div.confignav, th {
-     background-image: url("images/tinytitle.png") !important; 
-     background-repeat: repeat-x; 
+     background-image: url("images/tinytitle.png") !important;
+     background-repeat: repeat-x;
      background-position: center right;
 }
 
@@ -587,7 +587,7 @@ h2, h3 {
 }
 
 table {
-     border-collapse: collapse; 
+     border-collapse: collapse;
      border: 1px solid #89f;
      margin: 0 0 5px 0;
      cell-padding: 1px;
@@ -627,7 +627,7 @@ tt {
 tt, pre {
      font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
 }
-     
+
 td {
      padding: 4px;
 }
@@ -653,13 +653,13 @@ hr {
      font-size: 8pt;
      color: #001;
      text-align: center;
-     margin: -5px 0 7px 0; 
+     margin: -5px 0 7px 0;
      background: #fff;
      border: 1px solid #bbf;
      border-top: 0;
      padding: 4px 0 2px 0;
-     background-image: url("images/tinytitle.png") !important; 
-     background-repeat: repeat-x; 
+     background-image: url("images/tinytitle.png") !important;
+     background-repeat: repeat-x;
      background-position: center right;
 }
 
@@ -713,7 +713,7 @@ div.joblog hr {
 div.joblog ol {
      margin-bottom: 0px;
 }
- 
+
 input {
      margin: 3px 5px 3px 0;
      vertical-align: middle;
@@ -784,27 +784,27 @@ p {
      letter-spacing: 0.02em;
 }
 
-a:link{
+a:link {
      color: #006;
      text-decoration: none;
      font-weight: bold;
      word-wrap: break-word;
 }
 
-a:visited{
+a:visited {
      color: #448;
      text-decoration: none;
      font-weight: bold;
 }
 
-a:hover{
+a:hover {
      color: #f60;
      text-decoration: underline;
      font-weight: bold;
      text-shadow: 0px 0px 1px rgba(255, 96, 0, 0.7);
 }
 
-a:active{
+a:active {
      color: #f93;
      text-decoration: underline;
      font-weight: bold;
@@ -820,15 +820,15 @@ tt {
      font-weight: bold;
      color: darkgreen;
 }
- 
+
 .tablefooter {
      border: 1px solid #a8f;
 }
 
 .tablefooter tr, .tablefooter td {
      background: #fff;
-     background-image: url("images/tinytitle.png") !important; 
-     background-repeat: repeat-x; 
+     background-image: url("images/tinytitle.png") !important;
+     background-repeat: repeat-x;
      background-position: center right;
      font-size: 8pt;
      font-weight: bold;
@@ -858,7 +858,7 @@ div.graphspanel {
      padding: 10px 5px 20px 5px;
      margin: -16px -16px -11px -16px;
 /*     border: 1px solid #89f;*/
-     text-align: center !important;   
+     text-align: center !important;
 }
 
 div.graphspanel img {

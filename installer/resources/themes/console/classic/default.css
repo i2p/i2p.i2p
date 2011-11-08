@@ -41,7 +41,7 @@ h4 {
      white-space: nowrap;
      width: 782px;
      letter-spacing: 0.09em;
-     background: #fff url("/themes/console/classic/images/titlebg.png") no-repeat right center !important; 
+     background: #fff url("/themes/console/classic/images/titlebg.png") no-repeat right center !important;
 }
 
 label {
@@ -201,6 +201,6 @@ hr {
 
 #globalOperationsPanel .control {
      width: 100px !important;
-     margin-top: 3px; 
+     margin-top: 3px;
      float: right;
 }
