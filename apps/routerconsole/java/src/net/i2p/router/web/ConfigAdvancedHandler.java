@@ -1,11 +1,13 @@
 package net.i2p.router.web;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
+import net.i2p.data.DataHelper;
 
 /**
  * Handler to deal with form submissions from the advanced config form and act
@@ -39,28 +41,26 @@ public class ConfigAdvancedHandler extends FormHandler {
      *
      */
     private void saveChanges() {
-        HashSet unsetKeys = new HashSet(_context.router().getConfigMap().keySet());
+        Set<String> unsetKeys = new HashSet(_context.router().getConfigSettings());
         if (_config != null) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(_config.getBytes())));
-            String line = null;
+            Properties props = new Properties();
             try {
-                while ( (line = reader.readLine()) != null) {
-                    int eq = line.indexOf('=');
-                    if (eq == -1) continue;
-                    if (eq >= line.length() - 1) continue;
-                    String key = line.substring(0, eq).trim();
-                    String val = line.substring(eq + 1).trim();
-                    _context.router().setConfigSetting(key, val);
-                    unsetKeys.remove(key);
-                }
+                DataHelper.loadProps(props, new ByteArrayInputStream(_config.getBytes()));
             } catch (IOException ioe) {
+                _log.error("Config error", ioe);
+                addFormError(ioe.toString());
                 addFormError(_("Error updating the configuration - please see the error logs"));
                 return;
             }
 
-            Iterator cleaner = unsetKeys.iterator();
-            while (cleaner.hasNext()) {
-                String unsetKey = (String)cleaner.next();
+            for (Map.Entry e : props.entrySet()) {
+                String key = (String) e.getKey();
+                String val = (String) e.getValue();
+                _context.router().setConfigSetting(key, val);
+                unsetKeys.remove(key);
+            }
+
+            for (String unsetKey : unsetKeys) {
                 _context.router().removeConfigSetting(unsetKey);
             }
 

@@ -1,6 +1,6 @@
 package net.i2p.router;
 
-import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 
 import net.i2p.data.Hash;
@@ -161,10 +161,10 @@ public class TunnelPoolSettings {
     
     public Properties getUnknownOptions() { return _unknownOptions; }
     
-    public void readFromProperties(String prefix, Properties props) {
-        for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
-            String name = (String)iter.next();
-            String value = props.getProperty(name);
+    public void readFromProperties(String prefix, Map<Object, Object> props) {
+        for (Map.Entry e : props.entrySet()) {
+            String name = (String) e.getKey();
+            String value = (String) e.getValue();
             if (name.startsWith(prefix)) {
                 if (name.equalsIgnoreCase(prefix + PROP_ALLOW_ZERO_HOP))
                     _allowZeroHop = getBoolean(value, DEFAULT_ALLOW_ZERO_HOP);
@@ -202,9 +202,9 @@ public class TunnelPoolSettings {
         props.setProperty(prefix + PROP_QUANTITY, ""+_quantity);
         // props.setProperty(prefix + PROP_REBUILD_PERIOD, ""+_rebuildPeriod);
         props.setProperty(prefix + PROP_IP_RESTRICTION, ""+_IPRestriction);
-        for (Iterator iter = _unknownOptions.keySet().iterator(); iter.hasNext(); ) {
-            String name = (String)iter.next();
-            String val = _unknownOptions.getProperty(name);
+        for (Map.Entry e : _unknownOptions.entrySet()) {
+            String name = (String) e.getKey();
+            String val = (String) e.getValue();
             props.setProperty(prefix + name, val);
         }
     }
@@ -216,9 +216,9 @@ public class TunnelPoolSettings {
         writeToProperties("", p);
         buf.append("Tunnel pool settings:\n");
         buf.append("====================================\n");
-        for (Iterator iter = p.keySet().iterator(); iter.hasNext(); ) {
-            String name = (String)iter.next();
-            String val  = p.getProperty(name);
+        for (Map.Entry e : p.entrySet()) {
+            String name = (String) e.getKey();
+            String val = (String) e.getValue();
             buf.append(name).append(" = [").append(val).append("]\n");
         }
         buf.append("is inbound? ").append(_isInbound).append("\n");

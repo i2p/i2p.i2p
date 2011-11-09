@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.text.DecimalFormat;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
@@ -59,8 +60,8 @@ import net.i2p.util.SimpleTimer;
  *
  */
 public class Router implements RouterClock.ClockShiftListener {
-    private Log _log;
-    private RouterContext _context;
+    private final Log _log;
+    private final RouterContext _context;
     private final Map<String, String> _config;
     /** full path */
     private String _configFilename;
@@ -320,7 +321,10 @@ public class Router implements RouterClock.ClockShiftListener {
     /** @deprecated unused */
     public boolean getKillVMOnEnd() { return _killVMOnEnd; }
     
+    /** @return absolute path */
     public String getConfigFilename() { return _configFilename; }
+
+    /** @deprecated unused */
     public void setConfigFilename(String filename) { _configFilename = filename; }
     
     public String getConfigSetting(String name) { 
@@ -332,13 +336,19 @@ public class Router implements RouterClock.ClockShiftListener {
     public void removeConfigSetting(String name) { 
             _config.remove(name); 
     }
-    public Set getConfigSettings() { 
-            return new HashSet(_config.keySet()); 
+
+    /**
+     *  @return unmodifiable Set, unsorted
+     */
+    public Set<String> getConfigSettings() { 
+        return Collections.unmodifiableSet(_config.keySet()); 
     }
-    public Properties getConfigMap() { 
-        Properties rv = new Properties();
-        rv.putAll(_config); 
-        return rv;
+
+    /**
+     *  @return unmodifiable Map, unsorted
+     */
+    public Map<String, String> getConfigMap() { 
+        return Collections.unmodifiableMap(_config); 
     }
     
     public RouterInfo getRouterInfo() { return _routerInfo; }

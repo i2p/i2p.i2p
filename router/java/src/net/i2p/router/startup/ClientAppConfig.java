@@ -115,7 +115,8 @@ public class ClientAppConfig {
         // fall back to use router.config's clientApp.* lines
         if (!cfgFile.exists()) {
             System.out.println("Warning - No client config file " + cfgFile.getAbsolutePath());
-            return ctx.router().getConfigMap();
+            rv.putAll(ctx.router().getConfigMap());
+            return rv;
         }
         
         try {

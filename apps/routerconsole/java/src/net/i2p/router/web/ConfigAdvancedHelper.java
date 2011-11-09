@@ -1,8 +1,7 @@
 package net.i2p.router.web;
 
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.Map;
+import java.util.TreeMap;
 
 
 public class ConfigAdvancedHelper extends HelperBase {
@@ -10,11 +9,11 @@ public class ConfigAdvancedHelper extends HelperBase {
     
     public String getSettings() {
         StringBuilder buf = new StringBuilder(4*1024);
-        Set names = _context.router().getConfigSettings();
-        TreeSet sortedNames = new TreeSet(names);
-        for (Iterator iter = sortedNames.iterator(); iter.hasNext(); ) {
-            String name = (String)iter.next();
-            String val = _context.router().getConfigSetting(name);
+        TreeMap<String, String> sorted = new TreeMap();
+        sorted.putAll(_context.router().getConfigMap());
+        for (Map.Entry<String, String> e : sorted.entrySet()) {
+            String name = e.getKey();
+            String val = e.getValue();
             buf.append(name).append('=').append(val).append('\n');
         }
         return buf.toString();
