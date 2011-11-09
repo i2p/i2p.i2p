@@ -1,3 +1,10 @@
+2011-11-09 zzz
+  * Console: Add ability to hide news
+  * I2PTunnel IRC Client: Don't filter PASS (ticket #549)
+  * Licenses: Update information
+  * Router: Clean up config map methods and uses
+  * wrapper.config: Increase shutdown timeout
+
 * 2011-11-08 0.8.11 released
 
 2011-11-05 kytv
