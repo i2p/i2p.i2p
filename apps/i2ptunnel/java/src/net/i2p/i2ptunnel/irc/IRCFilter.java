@@ -160,7 +160,7 @@ abstract class IRCFilter {
                 "WHOIS",
                 "LIST",
                 "NAMES",
-                "NICK",
+                "PASS",
                 // "QUIT", // replace with a filtered QUIT to hide client quit messages
                 "SILENCE",
                 "MAP", // seems safe enough, the ircd should protect themselves though
