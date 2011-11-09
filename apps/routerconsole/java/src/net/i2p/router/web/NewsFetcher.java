@@ -24,8 +24,8 @@ import net.i2p.util.Log;
  * track of whether that has an announcement for a new version.
  */
 public class NewsFetcher implements Runnable, EepGet.StatusListener {
-    private I2PAppContext _context;
-    private Log _log;
+    private final RouterContext _context;
+    private final Log _log;
     private boolean _updateAvailable;
     private boolean _unsignedUpdateAvailable;
     private long _lastFetch;
@@ -34,13 +34,13 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
     private String _unsignedUpdateVersion;
     private String _lastModified;
     private boolean _invalidated;
-    private File _newsFile;
-    private File _tempFile;
+    private final File _newsFile;
+    private final File _tempFile;
     private static NewsFetcher _instance;
     private volatile boolean _isRunning;
 
     //public static final synchronized NewsFetcher getInstance() { return _instance; }
-    public static final synchronized NewsFetcher getInstance(I2PAppContext ctx) { 
+    public static final synchronized NewsFetcher getInstance(RouterContext ctx) { 
         if (_instance != null)
             return _instance;
         _instance = new NewsFetcher(ctx);
@@ -52,8 +52,10 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
     /** @since 0.7.14 not configurable */
     private static final String BACKUP_NEWS_URL = "http://www.i2p2.i2p/_static/news/news.xml";
     private static final String PROP_LAST_CHECKED = "router.newsLastChecked";
+    /** @since 0.8.12 */
+    private static final String PROP_LAST_HIDDEN = "routerconsole.newsLastHidden";
     
-    private NewsFetcher(I2PAppContext ctx) {
+    private NewsFetcher(RouterContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(NewsFetcher.class);
         _instance = this;
@@ -94,9 +96,40 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
     public boolean unsignedUpdateAvailable() { return _unsignedUpdateAvailable; }
     public String unsignedUpdateVersion() { return _unsignedUpdateVersion; }
 
+    /**
+     *  Is the news newer than the last time it was hidden?
+     *  @since 0.8.12
+     */
+    public boolean shouldShowNews() {
+        if (_lastUpdated <= 0)
+            return true;
+        String h = _context.getProperty(PROP_LAST_HIDDEN);
+        if (h == null)
+            return true;
+        long last = 0;
+        try {
+            last = Long.parseLong(h);
+        } catch (NumberFormatException nfe) {}
+        return _lastUpdated > last;
+    }
+
+    /**
+     *  Save config with the timestamp of the current news to hide, or 0 to show
+     *  @since 0.8.12
+     */
+    public void showNews(boolean yes) {
+        long stamp = yes ? 0 : _lastUpdated;
+        _context.router().setConfigSetting(PROP_LAST_HIDDEN, Long.toString(stamp));
+        _context.router().saveConfig();
+    }
+
+    /**
+     *  @return HTML
+     */
     public String status() {
          StringBuilder buf = new StringBuilder(128);
          long now = _context.clock().now();
+         buf.append("<i>");
          if (_lastUpdated > 0) {
              buf.append(Messages.getString("News last updated {0} ago.",
                                            DataHelper.formatDuration2(now - _lastUpdated),
@@ -107,6 +140,18 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
              buf.append(Messages.getString("News last checked {0} ago.",
                                            DataHelper.formatDuration2(now - _lastFetch),
                                            _context));
+         }
+         buf.append("</i>");
+         String consoleNonce = System.getProperty("router.consoleNonce");
+         if (_lastUpdated > 0 && consoleNonce != null) {
+             if (shouldShowNews()) {
+                 buf.append(" <a href=\"/?news=0&amp;consoleNonce=").append(consoleNonce).append("\">")
+                    .append(Messages.getString("Hide news", _context));
+             } else {
+                 buf.append(" <a href=\"/?news=1&amp;consoleNonce=").append(consoleNonce).append("\">")
+                    .append(Messages.getString("Show news", _context));
+             }
+             buf.append("</a>");
          }
          return buf.toString();
     }
@@ -232,16 +277,15 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
             if (get.fetch()) {
                 String lastmod = get.getLastModified();
                 if (lastmod != null) {
-                    if (!(_context.isRouterContext())) return;
                     long modtime = RFC822Date.parse822Date(lastmod);
                     if (modtime <= 0) return;
                     String lastUpdate = _context.getProperty(UpdateHandler.PROP_LAST_UPDATE_TIME);
                     if (lastUpdate == null) {
                         // we don't know what version you have, so stamp it with the current time,
                         // and we'll look for something newer next time around.
-                        ((RouterContext)_context).router().setConfigSetting(UpdateHandler.PROP_LAST_UPDATE_TIME,
-                                                                            "" + _context.clock().now());
-                        ((RouterContext)_context).router().saveConfig();
+                        _context.router().setConfigSetting(UpdateHandler.PROP_LAST_UPDATE_TIME,
+                                                           Long.toString(_context.clock().now()));
+                        _context.router().saveConfig();
                         return;
                     }
                     long ms = 0;
@@ -267,7 +311,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         String url = _context.getProperty(ConfigUpdateHandler.PROP_ZIP_URL);
         if (url == null || url.length() <= 0)
             return;
-        UpdateHandler handler = new UnsignedUpdateHandler((RouterContext)_context, url,
+        UpdateHandler handler = new UnsignedUpdateHandler(_context, url,
                                                           _unsignedUpdateVersion);
         handler.update();
     }
@@ -329,18 +373,8 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         if (shouldInstall()) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Policy requests update, so we update");
-            UpdateHandler handler = null;
-            if (_context.isRouterContext()) {
-                handler = new UpdateHandler((RouterContext)_context);
-            } else {
-                List contexts = RouterContext.listContexts();
-                if (!contexts.isEmpty())
-                    handler = new UpdateHandler((RouterContext)contexts.get(0));
-                else
-                    _log.log(Log.CRIT, "No router context to update with?");
-            }
-            if (handler != null)
-                handler.update();
+            UpdateHandler handler = new UpdateHandler(_context);
+            handler.update();
         } else {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Policy requests manual update, so we do nothing");
@@ -373,10 +407,8 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
                 _log.warn("Transfer complete, but no file? - probably 304 Not Modified");
         }
         _lastFetch = now;
-        if (_context.isRouterContext()) {
-            ((RouterContext)_context).router().setConfigSetting(PROP_LAST_CHECKED, "" + now);
-            ((RouterContext)_context).router().saveConfig();
-        }
+        _context.router().setConfigSetting(PROP_LAST_CHECKED, Long.toString(now));
+        _context.router().saveConfig();
     }
     
     public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {

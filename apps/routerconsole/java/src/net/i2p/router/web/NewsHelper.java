@@ -17,4 +17,9 @@ public class NewsHelper extends ContentHelper {
             _page = (new File(_context.getBaseDir(), "docs/initialNews/initialNews.xml")).getAbsolutePath();
         return super.getContent();
     } 
+
+    /** @since 0.8.12 */
+    public boolean shouldShowNews() {
+        return NewsFetcher.getInstance(_context).shouldShowNews();
+    }
 }

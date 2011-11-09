@@ -32,6 +32,7 @@
    String conNonceParam = request.getParameter("consoleNonce");
    if (conNonceParam != null && conNonceParam.equals(System.getProperty("router.consoleNonce"))) {
        intl.setLang(request.getParameter("lang"));
+       intl.setNews(request.getParameter("news"));
    }
 %>
 <link href="<%=intl.getTheme(request.getHeader("User-Agent"))%>console.css" rel="stylesheet" type="text/css">

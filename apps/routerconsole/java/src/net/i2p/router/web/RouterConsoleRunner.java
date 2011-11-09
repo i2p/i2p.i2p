@@ -341,16 +341,17 @@ public class RouterConsoleRunner {
             }
         }
 
-        NewsFetcher fetcher = NewsFetcher.getInstance(I2PAppContext.getGlobalContext());
-        Thread newsThread = new I2PAppThread(fetcher, "NewsFetcher", true);
-        newsThread.start();
-        
         Thread t = new I2PAppThread(new StatSummarizer(), "StatSummarizer", true);
         t.start();
         
         List<RouterContext> contexts = RouterContext.listContexts();
         if (contexts != null) {
             RouterContext ctx = contexts.get(0);
+
+            NewsFetcher fetcher = NewsFetcher.getInstance(ctx);
+            Thread newsThread = new I2PAppThread(fetcher, "NewsFetcher", true);
+            newsThread.start();
+        
             if (PluginStarter.pluginsEnabled(ctx)) {
                 t = new I2PAppThread(new PluginStarter(ctx), "PluginStarter", true);
                 t.start();
@@ -359,7 +360,7 @@ public class RouterConsoleRunner {
             ctx.addShutdownTask(new NewsShutdown(fetcher, newsThread));
             // stat summarizer registers its own hook
             ctx.addShutdownTask(new ServerShutdown());
-        }
+        } // else log CRIT ?
     }
     
     /**

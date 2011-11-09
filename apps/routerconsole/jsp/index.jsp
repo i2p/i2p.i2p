@@ -18,14 +18,20 @@
 <div class="news" id="news">
  <jsp:useBean class="net.i2p.router.web.NewsHelper" id="newshelper" scope="request" />
  <jsp:setProperty name="newshelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
- <% java.io.File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getRouterDir(), "docs/news.xml"); %>
+<%
+   if (newshelper.shouldShowNews()) {
+       java.io.File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getRouterDir(), "docs/news.xml");
+%>
  <jsp:setProperty name="newshelper" property="page" value="<%=fpath.getAbsolutePath()%>" />
  <jsp:setProperty name="newshelper" property="maxLines" value="300" />
  <jsp:getProperty name="newshelper" property="content" />
-
+ <hr>
+<%
+   }  // shouldShowNews()
+%>
  <jsp:useBean class="net.i2p.router.web.ConfigUpdateHelper" id="updatehelper" scope="request" />
  <jsp:setProperty name="updatehelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
- <hr><i><jsp:getProperty name="updatehelper" property="newsStatus" /></i><br>
+ <jsp:getProperty name="updatehelper" property="newsStatus" /><br>
 </div><div class="main" id="main">
  <jsp:useBean class="net.i2p.router.web.ContentHelper" id="contenthelper" scope="request" />
  <div class="welcome">
@@ -50,7 +56,7 @@
   <a name="top"></a>
   <h2><%=intl._("Welcome to I2P")%></h2>
  </div>
- <% fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getBaseDir(), "docs/readme.html"); %>
+ <% java.io.File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getBaseDir(), "docs/readme.html"); %>
  <jsp:setProperty name="contenthelper" property="page" value="<%=fpath.getAbsolutePath()%>" />
  <jsp:setProperty name="contenthelper" property="maxLines" value="300" />
  <jsp:setProperty name="contenthelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />

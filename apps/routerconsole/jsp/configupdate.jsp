@@ -20,7 +20,7 @@
  <jsp:useBean class="net.i2p.router.web.ConfigUpdateHelper" id="updatehelper" scope="request" />
  <jsp:setProperty name="updatehelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
 <div class="messages">
-<i><jsp:getProperty name="updatehelper" property="newsStatus" /></i></div>
+ <jsp:getProperty name="updatehelper" property="newsStatus" /></div>
 <div class="configure">
  <form action="" method="POST">
  <input type="hidden" name="nonce" value="<jsp:getProperty name="formhandler" property="newNonce" />" >

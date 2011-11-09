@@ -48,6 +48,17 @@ public class CSSHelper extends HelperBase {
         return Messages.getLanguage(_context);
     }
 
+    /**
+     *  Show / hide news on home page
+     *  @param val if non-null, "1" to show, else hide
+     *  @since 0.8.12
+     */
+    public void setNews(String val) {
+        // Protected with nonce in css.jsi
+        if (val != null)
+            NewsFetcher.getInstance(_context).showNews(val.equals("1"));
+    }
+
     /** change refresh and save it */
     public void setRefresh(String r) {
         _context.router().setConfigSetting(PROP_REFRESH, r);
