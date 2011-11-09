@@ -97,7 +97,7 @@ Installer:
 	Commons BeanUtils (http://jakarta.apache.org/commons/beanutils/)
 
  	Commons Logging (http://jakarta.apache.org/commons/logging/)
-        See licenses/LICENSE-Apache1.1.txt
+        See licenses/LICENSE-Apache2.0.txt
         See licenses/NOTICE-Commons-Logging.txt
 
 	XStream (http://xstream.codehaus.org/)
@@ -156,18 +156,19 @@ Applications:
 
    I2PSnark:
    Copyright (C) 2003 Mark J. Wielaard
+   GPLv2 (or any later version)
    See licenses/LICENSE-GPLv2.txt
        Silk icons: See licenses/LICENSE-SilkIcons.txt
 
    I2PTunnel:
    (c) 2003 - 2004 mihi
-   GPLv2 with exception.
+   GPLv2 (or any later version) with exception.
    See licenses/LICENSE-I2PTunnel.txt
    See licenses/LICENSE-GPLv2.txt
 
    I2PTunnel SOCKS Proxy:
    Copyright (c) 2004 by human
-   GPLv2 with exception.
+   GPLv2 (or any later version) with exception.
    See licenses/LICENSE-I2PTunnel.txt
    See licenses/LICENSE-GPLv2.txt
 
@@ -177,7 +178,6 @@ Applications:
 
    Jetty 5.1.15:
    Copyright 2000-2004 Mort Bay Consulting Pty. Ltd.
-   See licenses/LICENSE-Apache1.1.txt
    See licenses/LICENSE-Apache2.0.txt
    See licenses/NOTICE-Commons-Logging.txt
 
@@ -217,18 +217,20 @@ Applications:
 
    SusiDNS:
    Copyright (C) 2005 <susi23@mail.i2p>
+   GPLv2 (or any later version)
    See licenses/LICENSE-GPLv2.txt
        Uses Apache Jakarta Standard Tag Library 1.1.2:
        See licenses/LICENSE-Apache2.0.txt
 
    SusiMail:
    Copyright (C) 2004-2005  <susi23@mail.i2p>
+   GPLv2 (or any later version)
    See licenses/LICENSE-GPLv2.txt
 
    Systray:
    Public domain.
-      Bundles systray4j code:
-      See licenses/LICENSE-GPLv2.txt
+      Bundles systray4j-2.4.1:
+      See licenses/LICENSE-LGPLv2.1.txt
 
 
 

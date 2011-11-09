@@ -9,7 +9,9 @@ SHA1Sums:
 	947bd91c483494256cf48ad87c211e8701b4f85b  systray4j.jar
 
 
-systray4j is GPLv2, see LICENSE.systray4j.txt.
+systray4j.dll is LGPLv2.1, see ../../../licenses/LICENSE-LGPLv2.1.txt
+systray4j.jar for Windows is LGPLv2.1, see ../../../licenses/LICENSE-LGPLv2.1.txt
+Reference: http://systray.sourceforge.net/
 I2P systray code in ../java/src is public domain.
 
 SysTray is really obsolete. It supports Windows and kde3 only.
