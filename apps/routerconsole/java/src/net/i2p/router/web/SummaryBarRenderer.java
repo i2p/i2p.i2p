@@ -28,14 +28,18 @@ public class SummaryBarRenderer {
         StringBuilder buf = new StringBuilder(8*1024);
         String theme = _context.getProperty(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
         
-        buf.append("<a href=\"/\" target=\"_top\"><img src=\"")
+        // TODO - the bar would render more cleanly if we specified the img height and width here,
+        // but unfortunately the images in the different themes are different sizes.
+        // They range in height from 37 to 43 px. But there's a -2 bottom margin...
+        // So put it in a div.
+        buf.append("<div style=\"height: 36px;\"><a href=\"/\" target=\"_top\"><img src=\"")
            .append(CSSHelper.BASE_THEME_PATH)
            .append(theme)
            .append("/images/i2plogo.png\" alt=\"")
            .append(_("I2P Router Console"))
            .append("\" title=\"")
            .append(_("I2P Router Console"))
-           .append("\"></a><hr>")
+           .append("\"></a></div><hr>")
            
            .append("<h3><a href=\"/help\" target=\"_top\" title=\"")
            .append(_("I2P Router Help &amp; FAQ"))

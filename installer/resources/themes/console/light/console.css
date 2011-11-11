@@ -5,10 +5,9 @@
 body {
      margin: 10px 0px -10px 10px;
      text-align: center;
-     background: #ffe url('images/snowcamo.png');
      color: #000;
      font: 10pt/130% "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
-     background: #99f url('images/magic.png') center bottom;
+     background: #9696ff url('images/snowcamo.png');
 }
 
 .hide {
@@ -97,10 +96,10 @@ div.routersummary {
      color: #000;
      font-size: 8pt;
      clear: left;/* fixes a bug in Opera */
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
-     border-radius: 4px;
-     background: #ffe url('images/magic.png') center bottom;
+     -moz-border-radius: 8px;
+     -khtml-border-radius: 8px;
+     border-radius: 8px;
+     background: #f0f0f0;
      -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
      -khtml-box-shadow: inset 0px 0px 1px 1px #bbf;
      box-shadow: inset 0px 0px 1px 1px #bbf;
@@ -162,7 +161,7 @@ div.routersummary h4 {
      letter-spacing: 0.02em;
      margin: -6px -6px -7px !important;
      padding: 3px 3px 5px 3px;
-     background: #ddf url(images/magic.png);
+     background: #dbdbf5;
      text-transform: capitalize;
      text-decoration: none !important;
      color: #2b2;
@@ -312,7 +311,6 @@ div.sorry hr {
 div.main {
      margin: 10px 10px 20px 207px;
      padding: 0 15px 15px 15px;
-     background: #ffe;
      text-align: left;
      color: #001;
      width: auto;
@@ -324,7 +322,8 @@ div.main {
      -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
      -khtml-box-shadow: inset 0px 0px 1px 1px #bbf;
      box-shadow: inset 0px 0px 1px 1px #bbf;
-     background: #ffe url('images/magic.png') center bottom;}
+     background: #f0f0f0;
+}
 
 div.main hr, hr {
      color: #113;
@@ -358,7 +357,7 @@ div.news {
      -moz-box-shadow: inset 0px 0px 1px 1px #bbf;
      -khtml-box-shadow: inset 0px 0px 1px 1px #bbf;
      box-shadow: inset 0px 0px 1px 1px #bbf;
-     background: #ffe url('images/magic.png') center bottom;
+     background: #f0f0f0;
      min-width: 490px;
 }
 
@@ -716,11 +715,11 @@ h1 {
      -khtml-box-shadow: inset 0px 0px 1px 1px #bbf;
      box-shadow: inset 0px 0px 1px 1px #bbf;
      white-space: normal;
-     background: #ffe url('images/magic.png') center center repeat;
+     background: #f0f0f0;
      border: 1px solid #447;
-     border-radius: 4px;
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
+     border-radius: 8px 8px 4px 4px;
+     -moz-border-radius: 8px 8px 4px 4px;
+     -khtml-border-radius: 8px 8px 4px 4px;
      min-width: 500px;
 }
 
