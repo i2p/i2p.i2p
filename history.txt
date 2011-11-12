@@ -1,3 +1,11 @@
+2011-11-12 zzz
+  * Installer: Fix Ukrainian translation (ticket #550) thx rndnick
+
+2011-11-11 zzz
+  * Console:
+    - Less magic and fix img sizes, for speed and less artifacts while rendering
+    - CSS tweaks
+
 2011-11-09 zzz
   * Console: Add ability to hide news
   * I2PTunnel IRC Client: Don't filter PASS (ticket #549)

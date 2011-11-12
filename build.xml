@@ -225,6 +225,11 @@
 	</condition>
 	<ant target="doBuildEXE" />
     </target>
+
+    <taskdef name="launch4j"
+             classname="net.sf.launch4j.ant.Launch4jTask"
+             classpath="${basedir}/installer/lib/launch4j/launch4j.jar:${basedir}/installer/lib/launch4j/lib/xstream.jar" />
+
     <target name="doBuildEXE" depends="buildProperties" unless="noExe">
         <jar destfile="./build/launchi2p.jar">
             <manifest>
@@ -235,9 +240,6 @@
 	    </manifest>
         </jar>
 	<!-- now the standalone launcher exe -->
-	<taskdef name="launch4j"
-                 classname="net.sf.launch4j.ant.Launch4jTask"
-                 classpath="${basedir}/installer/lib/launch4j/launch4j.jar:${basedir}/installer/lib/launch4j/lib/xstream.jar" />
         <launch4j configFile="./installer/i2pstandalone.xml" />
 	<!-- thazzit -->
     </target>
@@ -471,6 +473,7 @@
 
     <target name="clean" depends="pkgclean" >
         <delete dir="./build" />
+        <delete file="installer/lib/izpack/patches.jar" failonerror="false" quiet="true" />	
         <delete file="i2pinstall.exe" failonerror="false" quiet="true" />	
         <delete file="i2p.exe" failonerror="false" quiet="true" />
         <delete file="syndie-standalone.zip" failonerror="false" quiet="true" />
@@ -485,6 +488,7 @@
         <delete file="debian/build" />
         <delete file="debian/substvars"/>
     </target>
+
     <target name="distclean" depends="clean">
         <delete includeemptydirs="true" failonerror="false" >
             <fileset dir="debian/packages" followSymlinks="false" />
@@ -951,8 +955,16 @@
         </exec>
     </target>
 
-    <target name="installer" depends="preppkg, buildProperties, util-list-changes" >
-        <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />
+    <taskdef name="izpack"
+             classpath="${basedir}/installer/lib/izpack/patches.jar:${basedir}/installer/lib/izpack/standalone-compiler.jar"
+             classname="com.izforge.izpack.ant.IzPackTask" />
+
+    <target name="izpack-patches" >
+        <jar destfile="${basedir}/installer/lib/izpack/patches.jar"
+             basedir="${basedir}/installer/lib/izpack/patches" />
+    </target>
+
+    <target name="installer" depends="preppkg, buildProperties, util-list-changes, izpack-patches" >
         <mkdir dir="pkg-temp/installer" />
         <!-- set if unset -->
         <property name="workspace.changes.util.tr" value="" />
@@ -993,6 +1005,7 @@
 
         <ant target="installerexe" />
     </target>
+
     <target name="installerexe">
         <condition property="noExe">
 	    <os arch="x86_64" />
@@ -1010,11 +1023,9 @@
 	</condition>
 	<ant target="doInstallerEXE" />
     </target>
+
     <target name="doInstallerEXE" unless="noExe">
 	<!-- now the installer exe -->
-	<taskdef name="launch4j"
-                 classname="net.sf.launch4j.ant.Launch4jTask"
-                 classpath="${basedir}/installer/lib/launch4j/launch4j.jar:${basedir}/installer/lib/launch4j/lib/xstream.jar" />
         <launch4j configFile="./installer/i2pinstaller.xml" />
         <launch4j configFile="./installer/i2pstandalone.xml" />
 	<!-- thazzit -->
@@ -1022,16 +1033,14 @@
 
     <!-- Custom installers -->
 
-    <target name="installer-freebsd" depends="clean, preppkg-freebsd-only, getReleaseNumber, getBuildNumber, buildProperties, util-list-changes" >
-        <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />
+    <target name="installer-freebsd" depends="clean, preppkg-freebsd-only, getReleaseNumber, getBuildNumber, buildProperties, util-list-changes, izpack-patches" >
         <mkdir dir="pkg-temp/installer" />
         <!-- set if unset -->
         <property name="workspace.changes.util.tr" value="" />
 	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${release.number}-freebsd-only.jar" installerType="standard" basedir="${basedir}" />
     </target>
 
-    <target name="installer-linux" depends="clean, preppkg-linux-only, getReleaseNumber, getBuildNumber, buildProperties, util-list-changes" >
-        <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />
+    <target name="installer-linux" depends="clean, preppkg-linux-only, getReleaseNumber, getBuildNumber, buildProperties, util-list-changes, izpack-patches" >
         <mkdir dir="pkg-temp/installer" />
         <!-- set if unset -->
         <property name="workspace.changes.util.tr" value="" />
@@ -1039,8 +1048,7 @@
     </target>
 
 
-    <target name="installer-osx" depends="clean, checkForIzpack2App, preppkg-osx-only, getReleaseNumber, getBuildNumber, buildProperties, util-list-changes">
-        <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />
+    <target name="installer-osx" depends="clean, checkForIzpack2App, preppkg-osx-only, getReleaseNumber, getBuildNumber, buildProperties, util-list-changes, izpack-patches">
         <mkdir dir="pkg-temp/installer" />
 	<mkdir dir="pkg-temp/osx" />
         <!-- set if unset -->
@@ -1079,8 +1087,7 @@
     <!-- Yes, even though this makes an installer for Windows, we still need to depend on preppkg-unix (because the installer attempts to delete these files
      and will fail if they don't exist. Thankfully these files are so very small there's not much harm in including them.
     -->
-    <target name="installer-windows" depends="clean, doBuildEXE, preppkg-windows-only, preppkg-unix, getReleaseNumber, getBuildNumber, buildProperties, util-list-changes" >
-        <taskdef name="izpack" classpath="${basedir}/installer/lib/izpack/standalone-compiler.jar" classname="com.izforge.izpack.ant.IzPackTask" />
+    <target name="installer-windows" depends="clean, doBuildEXE, preppkg-windows-only, preppkg-unix, getReleaseNumber, getBuildNumber, buildProperties, util-list-changes, izpack-patches" >
         <mkdir dir="pkg-temp/installer" />
         <!-- set if unset -->
         <property name="workspace.changes.util.tr" value="" />
