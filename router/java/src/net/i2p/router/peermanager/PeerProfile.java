@@ -2,6 +2,9 @@ package net.i2p.router.peermanager;
 
 import java.io.File;
 import java.text.DecimalFormat;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
@@ -60,6 +63,18 @@ public class PeerProfile {
     private int _consecutiveShitlists;
     private final int _distance;
     
+    /**
+     *  Countries with more than about a 2% share of the netdb.
+     *  Only routers in these countries will use a same-country metric.
+     *  Yes this is an arbitrary cutoff.
+     */
+    private static final Set<String> _bigCountries = new HashSet();
+
+    static {
+        String[] big = new String[] {"ca", "fi", "fr", "de", "ru", "se", "ua", "gb", "us" };
+        _bigCountries.addAll(Arrays.asList(big));
+    }
+
     public PeerProfile(RouterContext context, Hash peer) {
         this(context, peer, true);
     }
@@ -118,7 +133,9 @@ public class PeerProfile {
     /** @since 0.8.11 */
     boolean isSameCountry() {
         String us = _context.commSystem().getOurCountry();
-        return us != null && us.equals(_context.commSystem().getCountry(_peer));
+        return us != null &&
+               _bigCountries.contains(us) &&
+               us.equals(_context.commSystem().getCountry(_peer));
     }
 
     /**
