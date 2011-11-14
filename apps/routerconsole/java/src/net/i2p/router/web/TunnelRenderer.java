@@ -28,7 +28,7 @@ import net.i2p.stat.RateStat;
 import net.i2p.util.ObjectCounter;
 
 /**
- * 
+ *  tunnels.jsp
  */
 public class TunnelRenderer {
     private RouterContext _context;
@@ -133,12 +133,12 @@ public class TunnelRenderer {
             out.write("<div class=\"statusnotes\"><b>" + _("Limited display to the {0} tunnels with the highest usage", DISPLAY_LIMIT)  + "</b></div>\n");
         out.write("<div class=\"statusnotes\"><b>" + _("Inactive participating tunnels") + ": " + inactive + "</b></div>\n");
         out.write("<div class=\"statusnotes\"><b>" + _("Lifetime bandwidth usage") + ": " + DataHelper.formatSize2(processed*1024) + "B</b></div>\n");
-        renderPeers(out);
+        //renderPeers(out);
     }
     
-    private static class TunnelComparator implements Comparator {
-         public int compare(Object l, Object r) {
-             return (int) (((HopConfig)r).getProcessedMessagesCount() - ((HopConfig)l).getProcessedMessagesCount());
+    private static class TunnelComparator implements Comparator<HopConfig> {
+         public int compare(HopConfig l, HopConfig r) {
+             return (int) (r.getProcessedMessagesCount() - l.getProcessedMessagesCount());
         }
     }
 
@@ -228,6 +228,7 @@ public class TunnelRenderer {
                   DataHelper.formatSize2(processedOut*1024) + "B " + _("out") + "</b></center></div>");
     }
     
+/****
     private void renderPeers(Writer out) throws IOException {
         // count up the peers in the local pools
         ObjectCounter<Hash> lc = new ObjectCounter();
@@ -265,9 +266,11 @@ public class TunnelRenderer {
         out.write("</b> <td>&nbsp;</td> <td align=\"center\"><b>" + partCount);
         out.write("</b> <td>&nbsp;</td></tr></table></div>\n");
     }
+****/
 
     /* duplicate of that in tunnelPoolManager for now */
     /** @return total number of non-fallback expl. + client tunnels */
+/****
     private int countTunnelsPerPeer(ObjectCounter<Hash> lc) {
         List<TunnelPool> pools = new ArrayList();
         _context.tunnelManager().listPools(pools);
@@ -286,8 +289,10 @@ public class TunnelRenderer {
         }
         return tunnelCount;
     }
+****/
 
     /** @return total number of part. tunnels */
+/****
     private int countParticipatingPerPeer(ObjectCounter<Hash> pc) {
         List<HopConfig> participating = _context.tunnelDispatcher().listParticipatingTunnels();
         for (HopConfig cfg : participating) {
@@ -301,12 +306,6 @@ public class TunnelRenderer {
         return participating.size();
     }
 
-    private static class HashComparator implements Comparator {
-         public int compare(Object l, Object r) {
-             return ((Hash)l).toBase64().compareTo(((Hash)r).toBase64());
-        }
-    }
-    
     private static class CountryComparator implements Comparator<Hash> {
         public CountryComparator(CommSystemFacade comm) {
             this.comm = comm;
@@ -326,7 +325,9 @@ public class TunnelRenderer {
         
         private CommSystemFacade comm;
     }
+****/
 
+    /** cap string */
     private String getCapacity(Hash peer) {
         RouterInfo info = _context.netDb().lookupRouterInfoLocally(peer);
         if (info != null) {
