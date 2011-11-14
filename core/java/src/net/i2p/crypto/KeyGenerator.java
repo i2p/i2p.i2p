@@ -30,11 +30,11 @@ import net.i2p.util.RandomSource;
  * @author jrandom
  */
 public class KeyGenerator {
-    private final Log _log;
+    //private final Log _log;
     private final I2PAppContext _context;
 
     public KeyGenerator(I2PAppContext context) {
-        _log = context.logManager().getLog(KeyGenerator.class);
+        //_log = context.logManager().getLog(KeyGenerator.class);
         _context = context;
     }
 
@@ -55,7 +55,12 @@ public class KeyGenerator {
     }
     
     private static final int PBE_ROUNDS = 1000;
-    /** PBE the passphrase with the salt */
+
+    /**
+     *  PBE the passphrase with the salt.
+     *  Warning - SLOW
+     *  @deprecated unused
+     */
     public SessionKey generateSessionKey(byte salt[], byte passphrase[]) {
         byte salted[] = new byte[16+passphrase.length];
         System.arraycopy(salt, 0, salted, 0, Math.min(salt.length, 16));
@@ -68,6 +73,7 @@ public class KeyGenerator {
     
     /** standard exponent size */
     private static final int PUBKEY_EXPONENT_SIZE_FULL = 2048;
+
     /** 
      * short exponent size, which should be safe for use with the Oakley primes,
      * per "On Diffie-Hellman Key Agreement with Short Exponents" - van Oorschot, Weiner

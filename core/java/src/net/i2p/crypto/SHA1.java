@@ -759,6 +759,7 @@ public final class SHA1 extends MessageDigest implements Cloneable {
      *
      *  @since 0.8.7
      */
+/****
     public static void main(String args[]) {
         if (args.length <= 0) {
             System.err.println("Usage: SHA1 string");
@@ -797,4 +798,5 @@ public final class SHA1 extends MessageDigest implements Cloneable {
 
         System.out.println("JVM time (ms): " + time);
     }
+****/
 }
