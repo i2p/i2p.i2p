@@ -14,4 +14,32 @@
         <welcome-file>index.html</welcome-file>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
+
+    <!-- non-.jsp URLs -->
+
+    <servlet-mapping>
+        <servlet-name>i2p.susi.dns.jsp.config_jsp</servlet-name>
+        <url-pattern>/config</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>i2p.susi.dns.jsp.subscriptions_jsp</servlet-name>
+        <url-pattern>/subscriptions</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>i2p.susi.dns.jsp.addressbook_jsp</servlet-name>
+        <url-pattern>/addressbook</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>i2p.susi.dns.jsp.details_jsp</servlet-name>
+        <url-pattern>/details</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>i2p.susi.dns.jsp.index_jsp</servlet-name>
+        <url-pattern>/index</url-pattern>
+    </servlet-mapping>
+
 </web-app>

@@ -49,19 +49,19 @@
 <body>
 <div class="page">
 <div id="logo">
-<a href="index.jsp"><img src="images/logo.png" alt="" title="<%=intl._("Overview")%>" border="0"/></a>
+<a href="index"><img src="images/logo.png" alt="" title="<%=intl._("Overview")%>" border="0"/></a>
 </div>
 <hr>
 <div id="navi">
 <p>
 <%=intl._("Address books")%>:
-<a href="addressbook.jsp?book=private&amp;filter=none&amp;begin=0&amp;end=99"><%=intl._("private")%></a> |
-<a href="addressbook.jsp?book=master&amp;filter=none&amp;begin=0&amp;end=99"><%=intl._("master")%></a> |
-<a href="addressbook.jsp?book=router&amp;filter=none&amp;begin=0&amp;end=99"><%=intl._("router")%></a> |
-<a href="addressbook.jsp?book=published&amp;filter=none&amp;begin=0&amp;end=99"><%=intl._("published")%></a> *
-<a href="subscriptions.jsp"><%=intl._("Subscriptions")%></a> *
-<a href="config.jsp"><%=intl._("Configuration")%></a> *
-<a href="index.jsp"><%=intl._("Overview")%></a>
+<a href="addressbook?book=private&amp;filter=none&amp;begin=0&amp;end=99"><%=intl._("private")%></a> |
+<a href="addressbook?book=master&amp;filter=none&amp;begin=0&amp;end=99"><%=intl._("master")%></a> |
+<a href="addressbook?book=router&amp;filter=none&amp;begin=0&amp;end=99"><%=intl._("router")%></a> |
+<a href="addressbook?book=published&amp;filter=none&amp;begin=0&amp;end=99"><%=intl._("published")%></a> *
+<a href="subscriptions"><%=intl._("Subscriptions")%></a> *
+<a href="config"><%=intl._("Configuration")%></a> *
+<a href="index"><%=intl._("Overview")%></a>
 </p>
 </div>
 <hr>
@@ -77,43 +77,43 @@ ${book.loadBookMessages}
 <c:if test="${book.notEmpty}">
 <div id="filter">
 <p><%=intl._("Filter")%>:
-<a href="addressbook.jsp?filter=a&amp;begin=0&amp;end=99">a</a>
-<a href="addressbook.jsp?filter=b&amp;begin=0&amp;end=99">b</a>
-<a href="addressbook.jsp?filter=c&amp;begin=0&amp;end=99">c</a> 
-<a href="addressbook.jsp?filter=d&amp;begin=0&amp;end=99">d</a>
-<a href="addressbook.jsp?filter=e&amp;begin=0&amp;end=99">e</a>
-<a href="addressbook.jsp?filter=f&amp;begin=0&amp;end=99">f</a>
-<a href="addressbook.jsp?filter=g&amp;begin=0&amp;end=99">g</a>
-<a href="addressbook.jsp?filter=h&amp;begin=0&amp;end=99">h</a>
-<a href="addressbook.jsp?filter=i&amp;begin=0&amp;end=99">i</a>
-<a href="addressbook.jsp?filter=j&amp;begin=0&amp;end=99">j</a>
-<a href="addressbook.jsp?filter=k&amp;begin=0&amp;end=99">k</a>
-<a href="addressbook.jsp?filter=l&amp;begin=0&amp;end=99">l</a>
-<a href="addressbook.jsp?filter=m&amp;begin=0&amp;end=99">m</a>
-<a href="addressbook.jsp?filter=n&amp;begin=0&amp;end=99">n</a>
-<a href="addressbook.jsp?filter=o&amp;begin=0&amp;end=99">o</a>
-<a href="addressbook.jsp?filter=p&amp;begin=0&amp;end=99">p</a>
-<a href="addressbook.jsp?filter=q&amp;begin=0&amp;end=99">q</a>
-<a href="addressbook.jsp?filter=r&amp;begin=0&amp;end=99">r</a>
-<a href="addressbook.jsp?filter=s&amp;begin=0&amp;end=99">s</a>
-<a href="addressbook.jsp?filter=t&amp;begin=0&amp;end=99">t</a>
-<a href="addressbook.jsp?filter=u&amp;begin=0&amp;end=99">u</a>
-<a href="addressbook.jsp?filter=v&amp;begin=0&amp;end=99">v</a>
-<a href="addressbook.jsp?filter=w&amp;begin=0&amp;end=99">w</a>
-<a href="addressbook.jsp?filter=x&amp;begin=0&amp;end=99">x</a>
-<a href="addressbook.jsp?filter=y&amp;begin=0&amp;end=99">y</a>
-<a href="addressbook.jsp?filter=z&amp;begin=0&amp;end=99">z</a>
-<a href="addressbook.jsp?filter=0-9&amp;begin=0&amp;end=99">0-9</a>
-<a href="addressbook.jsp?filter=xn--&amp;begin=0&amp;end=99"><%=intl._("other")%></a>
-<a href="addressbook.jsp?filter=none&amp;begin=0&amp;end=99"><%=intl._("all")%></a></p>
+<a href="addressbook?filter=a&amp;begin=0&amp;end=99">a</a>
+<a href="addressbook?filter=b&amp;begin=0&amp;end=99">b</a>
+<a href="addressbook?filter=c&amp;begin=0&amp;end=99">c</a> 
+<a href="addressbook?filter=d&amp;begin=0&amp;end=99">d</a>
+<a href="addressbook?filter=e&amp;begin=0&amp;end=99">e</a>
+<a href="addressbook?filter=f&amp;begin=0&amp;end=99">f</a>
+<a href="addressbook?filter=g&amp;begin=0&amp;end=99">g</a>
+<a href="addressbook?filter=h&amp;begin=0&amp;end=99">h</a>
+<a href="addressbook?filter=i&amp;begin=0&amp;end=99">i</a>
+<a href="addressbook?filter=j&amp;begin=0&amp;end=99">j</a>
+<a href="addressbook?filter=k&amp;begin=0&amp;end=99">k</a>
+<a href="addressbook?filter=l&amp;begin=0&amp;end=99">l</a>
+<a href="addressbook?filter=m&amp;begin=0&amp;end=99">m</a>
+<a href="addressbook?filter=n&amp;begin=0&amp;end=99">n</a>
+<a href="addressbook?filter=o&amp;begin=0&amp;end=99">o</a>
+<a href="addressbook?filter=p&amp;begin=0&amp;end=99">p</a>
+<a href="addressbook?filter=q&amp;begin=0&amp;end=99">q</a>
+<a href="addressbook?filter=r&amp;begin=0&amp;end=99">r</a>
+<a href="addressbook?filter=s&amp;begin=0&amp;end=99">s</a>
+<a href="addressbook?filter=t&amp;begin=0&amp;end=99">t</a>
+<a href="addressbook?filter=u&amp;begin=0&amp;end=99">u</a>
+<a href="addressbook?filter=v&amp;begin=0&amp;end=99">v</a>
+<a href="addressbook?filter=w&amp;begin=0&amp;end=99">w</a>
+<a href="addressbook?filter=x&amp;begin=0&amp;end=99">x</a>
+<a href="addressbook?filter=y&amp;begin=0&amp;end=99">y</a>
+<a href="addressbook?filter=z&amp;begin=0&amp;end=99">z</a>
+<a href="addressbook?filter=0-9&amp;begin=0&amp;end=99">0-9</a>
+<a href="addressbook?filter=xn--&amp;begin=0&amp;end=99"><%=intl._("other")%></a>
+<a href="addressbook?filter=none&amp;begin=0&amp;end=99"><%=intl._("all")%></a></p>
 <c:if test="${book.hasFilter}">
 <p><%=intl._("Current filter")%>: ${book.filter}
-(<a href="addressbook.jsp?filter=none&amp;begin=0&amp;end=99"><%=intl._("clear filter")%></a>)</p>
+(<a href="addressbook?filter=none&amp;begin=0&amp;end=99"><%=intl._("clear filter")%></a>)</p>
 </c:if>
 </div>
 
 <div id="search">
-<form method="POST" action="addressbook.jsp">
+<form method="POST" action="addressbook">
 <input type="hidden" name="begin" value="0">
 <input type="hidden" name="end" value="99">
 <table><tr>
@@ -129,7 +129,7 @@ ${book.loadBookMessages}
     String susiNonce = book.getSerial();
 %>
 <c:if test="${book.notEmpty}">
-<form method="POST" action="addressbook.jsp">
+<form method="POST" action="addressbook">
 <input type="hidden" name="serial" value="<%=susiNonce%>">
 <input type="hidden" name="begin" value="0">
 <input type="hidden" name="end" value="99">
@@ -156,7 +156,7 @@ ${book.loadBookMessages}
 </td><td class="names">
 <span class="addrhlpr"><a href="http://${addr.b32}/" title="<%=intl._("Base 32 address")%>">b32</a></span>
 </td><td class="names">
-<span class="addrhlpr"><a href="details.jsp?h=${addr.name}" title="<%=intl._("More information on this entry")%>"><%=intl._("details")%></a></span>
+<span class="addrhlpr"><a href="details?h=${addr.name}" title="<%=intl._("More information on this entry")%>"><%=intl._("details")%></a></span>
 </td>
 <td class="destinations"><textarea rows="1" style="height: 3em;" cols="40" wrap="off" readonly="readonly" name="dest_${addr.name}" >${addr.destination}</textarea></td>
 </tr>
@@ -181,7 +181,7 @@ ${book.loadBookMessages}
 </div>
 </c:if>
 
-<form method="POST" action="addressbook.jsp">
+<form method="POST" action="addressbook">
 <input type="hidden" name="serial" value="<%=susiNonce%>">
 <input type="hidden" name="begin" value="0">
 <input type="hidden" name="end" value="99">

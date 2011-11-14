@@ -1,3 +1,9 @@
+2011-11-14 zzz
+  * Console: Remove % chart at bottom of tunnels.jsp
+  * Profiles: Only use same-country metric for countries with
+    lots of I2P users
+  * SusiDNS: Remove .jsp suffixes
+
 2011-11-12 zzz
   * Installer: Fix Ukrainian translation (ticket #550) thx rndnick
 

@@ -12,7 +12,7 @@ Proxy-Connection: close
 <body>
 <div class=logo>
  <a href="http://127.0.0.1:7657/index.jsp" title="Router Console"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="I2P Router Console" border="0"></a><hr>
- <a href="http://127.0.0.1:7657/config.jsp">Configuratie</a> <a href="http://127.0.0.1:7657/help.jsp">Help</a> <a href="http://127.0.0.1:7657/susidns/index.jsp">Adresboek</a>
+ <a href="http://127.0.0.1:7657/config.jsp">Configuratie</a> <a href="http://127.0.0.1:7657/help.jsp">Help</a> <a href="http://127.0.0.1:7657/susidns/index">Adresboek</a>
 </div>
 <div class=warning id=warning>
 <h3>Waarschuwing: Eepsite Niet Gevonden in Adresboek</h3>

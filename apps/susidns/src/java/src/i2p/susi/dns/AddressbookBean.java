@@ -259,7 +259,7 @@ public class AddressbookBean
 			if (getBeginInt() > 0) {
 				int newBegin = Math.max(0, getBeginInt() - DISPLAY_SIZE);
 				int newEnd = Math.max(0, getBeginInt() - 1);
-		       		message += " <a href=\"addressbook.jsp?book=" + getBook() + filterArg +
+		       		message += " <a href=\"addressbook?book=" + getBook() + filterArg +
 				           "&amp;begin=" + newBegin + "&amp;end=" + newEnd + "\">" + newBegin +
 				           '-' + newEnd + "</a> | ";
 	       		}
@@ -267,7 +267,7 @@ public class AddressbookBean
 			if (getEndInt() < resultCount - 1) {
 				int newBegin = Math.min(resultCount - 1, getEndInt() + 1);
 				int newEnd = Math.min(resultCount, getEndInt() + DISPLAY_SIZE);
-		       		message += " | <a href=\"addressbook.jsp?book=" + getBook() + filterArg +
+		       		message += " | <a href=\"addressbook?book=" + getBook() + filterArg +
 				           "&amp;begin=" + newBegin + "&amp;end=" + newEnd + "\">" + newBegin +
 				           '-' + newEnd + "</a>";
 			}

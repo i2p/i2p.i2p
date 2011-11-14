@@ -45,25 +45,25 @@
 <body>
 <div class="page">
 <div id="logo">
-<a href="index.jsp"><img src="images/logo.png" alt="" title="<%=intl._("Overview")%>" border="0"/></a>
+<a href="index"><img src="images/logo.png" alt="" title="<%=intl._("Overview")%>" border="0"/></a>
 </div><hr>
 <div id="navi">
 <p>
 <%=intl._("Address books")%>:
-<a href="addressbook.jsp?book=private"><%=intl._("private")%></a> |
-<a href="addressbook.jsp?book=master"><%=intl._("master")%></a> |
-<a href="addressbook.jsp?book=router"><%=intl._("router")%></a> |
-<a href="addressbook.jsp?book=published"><%=intl._("published")%></a> *
-<a href="subscriptions.jsp"><%=intl._("Subscriptions")%></a> *
+<a href="addressbook?book=private"><%=intl._("private")%></a> |
+<a href="addressbook?book=master"><%=intl._("master")%></a> |
+<a href="addressbook?book=router"><%=intl._("router")%></a> |
+<a href="addressbook?book=published"><%=intl._("published")%></a> *
+<a href="subscriptions"><%=intl._("Subscriptions")%></a> *
 <%=intl._("Configuration")%> *
-<a href="index.jsp"><%=intl._("Overview")%></a>
+<a href="index"><%=intl._("Overview")%></a>
 </p>
 </div><hr>
 <div id="headline">
 <h3>${cfg.fileName}</h3>
 </div>
 <div id="messages">${cfg.messages}</div>
-<form method="POST" action="config.jsp">
+<form method="POST" action="config">
 <div id="config">
 <input type="hidden" name="serial" value="${cfg.serial}" >
 <textarea name="config" rows="10" cols="80">${cfg.config}</textarea>

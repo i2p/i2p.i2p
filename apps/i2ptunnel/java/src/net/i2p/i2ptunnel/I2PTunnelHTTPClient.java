@@ -1353,7 +1353,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                   "</head><body>\n" +
                   "<div class=logo>\n" +
                   "<a href=\"http://127.0.0.1:7657/\" title=\"" + _("Router Console") + "\"><img src=\"http://proxy.i2p/themes/console/images/i2plogo.png\" alt=\"I2P Router Console\" border=\"0\"></a><hr>\n" +
-                  "<a href=\"http://127.0.0.1:7657/config\">" + _("Configuration") + "</a> <a href=\"http://127.0.0.1:7657/help.jsp\">" + _("Help") + "</a> <a href=\"http://127.0.0.1:7657/susidns/index.jsp\">" + _("Addressbook") + "</a>\n" +
+                  "<a href=\"http://127.0.0.1:7657/config\">" + _("Configuration") + "</a> <a href=\"http://127.0.0.1:7657/help.jsp\">" + _("Help") + "</a> <a href=\"http://127.0.0.1:7657/susidns/index\">" + _("Addressbook") + "</a>\n" +
                   "</div>" +
                   "<div class=warning id=warning>\n" +
                   "<h3>" +

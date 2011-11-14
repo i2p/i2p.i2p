@@ -14,14 +14,14 @@ import org.mortbay.jetty.servlet.WebApplicationHandler;
  * Convert foo.jsp to foo_xx.jsp for language xx.
  * This is appropriate for jsps with large amounts of text.
  *
- * Also, as of 0.8.2, rewrite "/" and "/index.html" to "/index.jsp",x
+ * Also, as of 0.8.2, rewrite "/" and "/index.html" to "/index.jsp",
  * and "/foo" to "/foo.jsp".
  *
  * @author zzz
  */
 public class LocaleWebAppHandler extends WebApplicationHandler
 {
-    private I2PAppContext _context;
+    private final I2PAppContext _context;
 
     public LocaleWebAppHandler(I2PAppContext ctx) {
         super();
@@ -32,7 +32,7 @@ public class LocaleWebAppHandler extends WebApplicationHandler
      *  Handle foo.jsp by converting to foo_xx.jsp
      *  for language xx, where xx is the language for the default locale,
      *  or as specified in the routerconsole.lang property.
-     *  Unless language==="en".
+     *  Unless language == "en".
      */
     @Override
     public void handle(String pathInContext,

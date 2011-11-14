@@ -63,7 +63,7 @@ public class SummaryBarRenderer {
 
                        "<hr><table>" +
 
-                       "<tr><td><a href=\"/susidns/index.jsp\" target=\"_blank\" title=\"")
+                       "<tr><td><a href=\"/susidns/index\" target=\"_blank\" title=\"")
                .append(_("Manage your I2P hosts file here (I2P domain name resolution)"))
                .append("\">")
                .append(_("Addressbook"))

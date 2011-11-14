@@ -43,19 +43,19 @@
 <body>
 <div class="page">
 <div id="logo">
-<a href="index.jsp"><img src="images/logo.png" alt="" title="<%=intl._("Overview")%>" border="0"/></a>
+<a href="index"><img src="images/logo.png" alt="" title="<%=intl._("Overview")%>" border="0"/></a>
 </div>
 <hr>
 <div id="navi">
 <p>
 <%=intl._("Address books")%>:
-<a href="addressbook.jsp?book=private&amp;filter=none&amp;begin=0&amp;end=99"><%=intl._("private")%></a> |
-<a href="addressbook.jsp?book=master&amp;filter=none&amp;begin=0&amp;end=99"><%=intl._("master")%></a> |
-<a href="addressbook.jsp?book=router&amp;filter=none&amp;begin=0&amp;end=99"><%=intl._("router")%></a> |
-<a href="addressbook.jsp?book=published&amp;filter=none&amp;begin=0&amp;end=99"><%=intl._("published")%></a> *
-<a href="subscriptions.jsp"><%=intl._("Subscriptions")%></a> *
-<a href="config.jsp"><%=intl._("Configuration")%></a> *
-<a href="index.jsp"><%=intl._("Overview")%></a>
+<a href="addressbook?book=private&amp;filter=none&amp;begin=0&amp;end=99"><%=intl._("private")%></a> |
+<a href="addressbook?book=master&amp;filter=none&amp;begin=0&amp;end=99"><%=intl._("master")%></a> |
+<a href="addressbook?book=router&amp;filter=none&amp;begin=0&amp;end=99"><%=intl._("router")%></a> |
+<a href="addressbook?book=published&amp;filter=none&amp;begin=0&amp;end=99"><%=intl._("published")%></a> *
+<a href="subscriptions"><%=intl._("Subscriptions")%></a> *
+<a href="config"><%=intl._("Configuration")%></a> *
+<a href="index"><%=intl._("Overview")%></a>
 </p>
 </div>
 <hr>
@@ -123,7 +123,7 @@
 </tr></table>
 </div>
 <div id="buttons">
-<form method="POST" action="addressbook.jsp">
+<form method="POST" action="addressbook">
 <p class="buttons">
 <input type="hidden" name="serial" value="${book.serial}">
 <input type="hidden" name="begin" value="0">

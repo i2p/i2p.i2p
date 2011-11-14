@@ -49,12 +49,12 @@
 <div id="navi">
 <p>
 <%=intl._("Address books")%>:
-<a href="addressbook.jsp?book=private"><%=intl._("private")%></a> |
-<a href="addressbook.jsp?book=master"><%=intl._("master")%></a> |
-<a href="addressbook.jsp?book=router"><%=intl._("router")%></a> |
-<a href="addressbook.jsp?book=published"><%=intl._("published")%></a> *
-<a href="subscriptions.jsp"><%=intl._("Subscriptions")%></a> *
-<a href="config.jsp"><%=intl._("Configuration")%></a> *
+<a href="addressbook?book=private"><%=intl._("private")%></a> |
+<a href="addressbook?book=master"><%=intl._("master")%></a> |
+<a href="addressbook?book=router"><%=intl._("router")%></a> |
+<a href="addressbook?book=published"><%=intl._("published")%></a> *
+<a href="subscriptions"><%=intl._("Subscriptions")%></a> *
+<a href="config"><%=intl._("Configuration")%></a> *
 <%=intl._("Overview")%>
 </p>
 </div>
@@ -67,7 +67,7 @@
 </p>
 <p>
 <%=intl._("In the default configuration, the address book is only subscribed to www.i2p2.i2p.")%>
-<%=intl._("Subscribing to additional sites is easy, just add them to your <a href=\"subscriptions.jsp\">subscriptions</a> file.")%>
+<%=intl._("Subscribing to additional sites is easy, just add them to your <a href=\"subscriptions\">subscriptions</a> file.")%>
 </p>
 <p>
 <%=intl._("For more information on naming in I2P, see <a href=\"http://www.i2p2.i2p/naming.html\">the overview on www.i2p2.i2p</a>.")%>
