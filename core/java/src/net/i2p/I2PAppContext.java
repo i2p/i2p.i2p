@@ -85,7 +85,6 @@ public class I2PAppContext {
     private RandomSource _random;
     private KeyGenerator _keyGenerator;
     protected KeyRing _keyRing; // overridden in RouterContext
-    private final ServiceDirectory _serviceDir;
     private volatile boolean _statManagerInitialized;
     private volatile boolean _sessionKeyManagerInitialized;
     private volatile boolean _namingServiceInitialized;
@@ -200,7 +199,6 @@ public class I2PAppContext {
         if (envProps != null)
             _overrideProps.putAll(envProps);
         _shutdownTasks = new ConcurrentHashSet(32);
-        _serviceDir = new ServiceDirectory();
         initializeDirs();
     }
     
