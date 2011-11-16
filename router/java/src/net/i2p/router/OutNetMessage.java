@@ -48,7 +48,6 @@ public class OutNetMessage {
     private MessageSelector _replySelector;
     private Set<String> _failedTransports;
     private long _sendBegin;
-    private long _transmitBegin;
     //private Exception _createdBy;
     private final long _created;
     /** for debugging, contains a mapping of even name to Long (e.g. "begin sending", "handleOutbound", etc) */
@@ -58,9 +57,6 @@ public class OutNetMessage {
      * (some JVMs have less than 10ms resolution, so the Long above doesn't guarantee order)
      */
     private List<String> _timestampOrder;
-    private int _queueSize;
-    private long _prepareBegin;
-    private long _prepareEnd;
     private Object _preparationBuf;
     
     public OutNetMessage(RouterContext context) {
@@ -247,14 +243,13 @@ public class OutNetMessage {
     
     /** when did the sending process begin */
     public long getSendBegin() { return _sendBegin; }
+
     public void beginSend() { _sendBegin = _context.clock().now(); }
-    public void beginTransmission() { _transmitBegin = _context.clock().now(); }
-    public void beginPrepare() { _prepareBegin = _context.clock().now(); }
-    public void prepared() { prepared(null); }
+
     public void prepared(Object buf) { 
-        _prepareEnd = _context.clock().now();
         _preparationBuf = buf;
     }
+
     public Object releasePreparationBuffer() { 
         Object rv = _preparationBuf;
         _preparationBuf = null;
@@ -262,18 +257,13 @@ public class OutNetMessage {
     }
     
     public long getCreated() { return _created; }
+
     /** time since the message was created */
     public long getLifetime() { return _context.clock().now() - _created; }
+
     /** time the transport tries to send the message (including any queueing) */
     public long getSendTime() { return _context.clock().now() - _sendBegin; }
-    /** time during which the i2np message is actually in flight */
-    public long getTransmissionTime() { return _context.clock().now() - _transmitBegin; }
-    /** how long it took to prepare the i2np message for transmission (including serialization and transport layer encryption) */
-    public long getPreparationTime() { return _prepareEnd - _prepareBegin; }
-    /** number of messages ahead of this one going to the targetted peer when it is first enqueued */
-    public int getQueueSize() { return _queueSize; }
-    public void setQueueSize(int size) { _queueSize = size; }
-    
+
     /** 
      * We've done what we need to do with the data from this message, though
      * we may keep the object around for a while to use its ID, jobs, etc.

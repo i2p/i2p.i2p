@@ -73,7 +73,6 @@ public class NTCPTransport extends TransportImpl {
         _log = ctx.logManager().getLog(getClass());
 
         _context.statManager().createRateStat("ntcp.sendTime", "Total message lifetime when sent completely", "ntcp", RATES);
-        _context.statManager().createRateStat("ntcp.transmitTime", "How long after message preparation before the message was fully sent", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.sendQueueSize", "How many messages were ahead of the current one on the connection's queue when it was first added", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.receiveTime", "How long it takes to receive an inbound message", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.receiveSize", "How large the received message was", "ntcp", RATES);
@@ -122,7 +121,6 @@ public class NTCPTransport extends TransportImpl {
         _context.statManager().createRateStat("ntcp.outboundFailedIOEImmediate", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.invalidOutboundSkew", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.noBidTooLargeI2NP", "send size", "ntcp", RATES);
-        _context.statManager().createRateStat("ntcp.prepBufCache", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.queuedRecv", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.read", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.readEOF", "", "ntcp", RATES);

@@ -1,3 +1,10 @@
+2011-11-16 zzz
+  * Console: Add Jetty version to logs page
+  * NTCP: Reduce log level for race (ticket #392)
+  * NTCPConnection: Concurrent PrepBufs
+  * OutNetMessage: Remove some fields and methods used only in NTCP debugging
+  * Router: Move router.ping file from temp directory to config directory
+
 2011-11-14 zzz
   * Console: Remove % chart at bottom of tunnels.jsp
   * Profiles: Only use same-country metric for countries with
