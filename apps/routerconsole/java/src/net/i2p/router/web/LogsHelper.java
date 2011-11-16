@@ -5,9 +5,16 @@ import java.util.List;
 
 import net.i2p.util.FileUtil;
 
+import org.mortbay.http.Version;
+
 public class LogsHelper extends HelperBase {
     public LogsHelper() {}
     
+    /** @since 0.8.11 */
+    public String getJettyVersion() {
+        return Version.getImplVersion();
+    }
+
     public String getLogs() {
         String str = formatMessages(_context.logManager().getBuffer().getMostRecentMessages());
         return _("File location") + ": <b><code>" + _context.logManager().currentFile() + "</code></b><br><br>" + str;
