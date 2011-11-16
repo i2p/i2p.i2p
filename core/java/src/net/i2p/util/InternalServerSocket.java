@@ -30,11 +30,14 @@ import net.i2p.I2PAppContext;
  */
 public class InternalServerSocket extends ServerSocket {
     private static final ConcurrentHashMap<Integer, InternalServerSocket> _sockets = new ConcurrentHashMap(4);
-    private BlockingQueue<InternalSocket> _acceptQueue;
-    private Integer _port;
+    private final BlockingQueue<InternalSocket> _acceptQueue;
+    private final Integer _port;
     private boolean _running;
     //private static Log _log = I2PAppContext.getGlobalContext().logManager().getLog(InternalServerSocket.class);
 
+    /**
+     *  @param port > 0
+     */
     public InternalServerSocket(int port) throws IOException {
          if (port <= 0)
              throw new IOException("Bad port: " + port);
@@ -89,11 +92,7 @@ public class InternalServerSocket extends ServerSocket {
     /**
      *  This is how the client connects.
      *
-     *  Todo: Java 1.5 PipedInputStream buffers are only 1024 bytes; our I2CP messages are typically 1730 bytes,
-     *  thus causing thread blockage before the whole message is transferred.
-     *  We can specify buffer size in 1.6 but not in 1.5.
-     *  Does wrapping the PipedOutputStreams in BufferedOutputStreams gain capacity?
-     *  No?
+     *  @param port > 0
      */
     static void internalConnect(int port, InternalSocket clientSock) throws IOException {
         InternalServerSocket iss = _sockets.get(Integer.valueOf(port));

@@ -24,7 +24,10 @@ public class InternalSocket extends Socket {
         _os = os;
     }
 
-    /** client side */
+    /**
+     *  client side
+     *  @param port > 0
+     */
     public InternalSocket(int port) throws IOException {
          if (port <= 0)
              throw new IOException("bad port number");
@@ -33,6 +36,7 @@ public class InternalSocket extends Socket {
 
     /**
      *  Convenience method to return either a Socket or an InternalSocket
+     *  @param port > 0
      */
     public static Socket getSocket(String host, int port) throws IOException {
         if (System.getProperty("router.version") != null &&
