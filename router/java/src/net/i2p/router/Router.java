@@ -1555,7 +1555,7 @@ public class Router implements RouterClock.ClockShiftListener {
      */
     private void beginMarkingLiveliness() {
         File f = getPingFile();
-        SimpleScheduler.getInstance().addPeriodicEvent(new MarkLiveliness(this, f), 0, LIVELINESS_DELAY);
+        SimpleScheduler.getInstance().addPeriodicEvent(new MarkLiveliness(this, f), 0, LIVELINESS_DELAY - (5*1000));
     }
     
     public static final String PROP_BANDWIDTH_SHARE_PERCENTAGE = "router.sharePercentage";
@@ -1812,11 +1812,12 @@ private static class UpdateRoutingKeyModifierJob extends JobImpl {
 }
 
 /**
- *  Write a timestamp to the ping file where the wrapper can see it
+ *  Write a timestamp to the ping file where
+ *  other routers trying to use the same configuration can see it
  */
 private static class MarkLiveliness implements SimpleTimer.TimedEvent {
-    private Router _router;
-    private File _pingFile;
+    private final Router _router;
+    private final File _pingFile;
 
     public MarkLiveliness(Router router, File pingFile) {
         _router = router;

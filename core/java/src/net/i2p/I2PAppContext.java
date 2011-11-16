@@ -67,7 +67,7 @@ public class I2PAppContext {
     /** the context that components without explicit root are bound */
     protected static volatile I2PAppContext _globalAppContext;
     
-    protected I2PProperties _overrideProps;
+    protected final I2PProperties _overrideProps;
     
     private StatManager _statManager;
     private SessionKeyManager _sessionKeyManager;
@@ -85,6 +85,7 @@ public class I2PAppContext {
     private RandomSource _random;
     private KeyGenerator _keyGenerator;
     protected KeyRing _keyRing; // overridden in RouterContext
+    private final ServiceDirectory _serviceDir;
     private volatile boolean _statManagerInitialized;
     private volatile boolean _sessionKeyManagerInitialized;
     private volatile boolean _namingServiceInitialized;
@@ -199,6 +200,7 @@ public class I2PAppContext {
         if (envProps != null)
             _overrideProps.putAll(envProps);
         _shutdownTasks = new ConcurrentHashSet(32);
+        _serviceDir = new ServiceDirectory();
         initializeDirs();
     }
     
@@ -212,10 +214,10 @@ public class I2PAppContext {
     *  Base	i2p.dir.base	getBaseDir()	lib/, webapps/, docs/, geoip/, licenses/, ...
     *  Temp	i2p.dir.temp	getTempDir()	Temporary files
     *  Config	i2p.dir.config	getConfigDir()	*.config, hosts.txt, addressbook/, ...
-    *  PID	i2p.dir.pid	getPIDDir()	router.ping
     *
     *  (the following all default to the same as Config)
     *
+    *  PID	i2p.dir.pid	getPIDDir()	router.ping
     *  Router	i2p.dir.router	getRouterDir()	netDb/, peerProfiles/, router.*, keyBackup/, ...
     *  Log	i2p.dir.log	getLogDir()	logs/
     *  App	i2p.dir.app	getAppDir()	eepsite/, ...
@@ -250,6 +252,7 @@ public class I2PAppContext {
     private void initializeDirs() {
         String s = getProperty("i2p.dir.base", System.getProperty("user.dir"));
         _baseDir = new File(s);
+
         // config defaults to base
         s = getProperty("i2p.dir.config");
         if (s != null) {
@@ -259,6 +262,7 @@ public class I2PAppContext {
         } else {
             _configDir = _baseDir;
         }
+
         // router defaults to config
         s = getProperty("i2p.dir.router");
         if (s != null) {
@@ -268,11 +272,17 @@ public class I2PAppContext {
         } else {
             _routerDir = _configDir;
         }
-        // pid defaults to system temp directory
-        s = getProperty("i2p.dir.pid", System.getProperty("java.io.tmpdir"));
-        _pidDir = new File(s);
-        if (!_pidDir.exists())
-            _pidDir.mkdir();
+
+        // pid defaults to router directory (as of 0.8.12, was system temp dir previously)
+        s = getProperty("i2p.dir.pid");
+        if (s != null) {
+            _pidDir = new SecureDirectory(s);
+            if (!_pidDir.exists())
+                _pidDir.mkdir();
+        } else {
+            _pidDir = _routerDir;
+        }
+
         // these all default to router
         s = getProperty("i2p.dir.log");
         if (s != null) {
@@ -282,6 +292,7 @@ public class I2PAppContext {
         } else {
             _logDir = _routerDir;
         }
+
         s = getProperty("i2p.dir.app");
         if (s != null) {
             _appDir = new SecureDirectory(s);
@@ -339,8 +350,9 @@ public class I2PAppContext {
     /**
      *  Where router.ping goes.
      *  Applications should not use this.
-     *  The same as the system temp dir for now.
-     *  Which is a problem for multi-user installations.
+     *  The same as the router dir by default as of 0.8.12
+     *  Was the same as the system temp dir prior to that.
+     *  Which was a problem for multi-user installations.
      *  @since 0.7.6
      *  @return dir constant for the life of the context
      */

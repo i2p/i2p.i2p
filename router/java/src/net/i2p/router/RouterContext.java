@@ -117,9 +117,7 @@ public class RouterContext extends I2PAppContext {
      * @param value The new value for the property.
      */
     public void setProperty(String propName, String value) {
-    	if(_overrideProps != null) {
     		_overrideProps.setProperty(propName, value);
-    	}
     }
 
     
