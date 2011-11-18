@@ -5,15 +5,6 @@
 <web-app>
   <display-name>susidns</display-name>
     <!-- precompiled servlets -->
-    <session-config>
-        <session-timeout>
-            30
-        </session-timeout>
-    </session-config>
-    <welcome-file-list>
-        <welcome-file>index.html</welcome-file>
-        <welcome-file>index.jsp</welcome-file>
-    </welcome-file-list>
 
     <!-- non-.jsp URLs -->
 
@@ -41,5 +32,15 @@
         <servlet-name>i2p.susi.dns.jsp.index_jsp</servlet-name>
         <url-pattern>/index</url-pattern>
     </servlet-mapping>
+
+    <session-config>
+        <session-timeout>
+            30
+        </session-timeout>
+    </session-config>
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
 
 </web-app>
