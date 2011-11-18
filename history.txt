@@ -1,3 +1,11 @@
+2011-11-18 zzz
+  * NTCP:
+    - First cut at improving EventPumper performance (ticket #551)
+    - Establishment timeout cleanup/concurrent
+    - Remove some logging and stats
+    - Switch some Queues from LBQ to CLQ
+    - Static ByteBuffer cache
+
 2011-11-16 zzz
   * Console: Add Jetty version to logs page
   * NTCP: Reduce log level for race (ticket #392)

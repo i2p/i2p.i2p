@@ -67,6 +67,7 @@ class Reader {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("wantsRead: " + con + " already live? " + already);
     }
+
     public void connectionClosed(NTCPConnection con) {
         synchronized (_pendingConnections) {
             _readAfterLive.remove(con);
@@ -135,14 +136,12 @@ class Reader {
                 } else {
                     // hmm, there shouldn't be a race here - only one reader should 
                     // be running on a con at a time...
-                    if (_log.shouldLog(Log.ERROR))
-                        _log.error("no establishment state but " + con + " is established... race?");
+                    _log.error("no establishment state but " + con + " is established... race?");
                     break;
                 }
             }
             if (est.isComplete()) {
                 // why is it complete yet !con.isEstablished?
-                if (_log.shouldLog(Log.ERROR))
                     _log.error("establishment state [" + est + "] is complete, yet the connection isn't established? " 
                                + con.isEstablished() + " (inbound? " + con.isInbound() + " " + con + ")");
                 break;
@@ -152,7 +151,7 @@ class Reader {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("closing connection on establishment because: " +est.getError(), est.getException());
                 if (!est.getFailedBySkew())
-                    _context.statManager().addRateData("ntcp.receiveCorruptEstablishment", 1, 0);
+                    _context.statManager().addRateData("ntcp.receiveCorruptEstablishment", 1);
                 con.close();
                 return;
             } else if (buf.remaining() <= 0) {
