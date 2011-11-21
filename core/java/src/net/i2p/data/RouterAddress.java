@@ -126,9 +126,11 @@ public class RouterAddress extends DataStructureImpl {
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof RouterAddress)) return false;
         RouterAddress addr = (RouterAddress) object;
-        return _cost == addr.getCost() && DataHelper.eq(_expiration, addr.getExpiration())
-               && DataHelper.eq(_options, addr.getOptions())
-               && DataHelper.eq(_transportStyle, addr.getTransportStyle());
+        return
+               _cost == addr._cost &&
+               DataHelper.eq(_transportStyle, addr._transportStyle) &&
+               DataHelper.eq(_options, addr._options) &&
+               DataHelper.eq(_expiration, addr._expiration);
     }
     
     /**
