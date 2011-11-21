@@ -214,6 +214,7 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
         for (t = 1; t < 30;)
             _rcon[t++] = (byte) (r = mul(2, r));
 
+/****
         time = Clock.getInstance().now() - time;
 
         if (_RDEBUG && _debuglevel > 8) {
@@ -341,6 +342,7 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
             System.out.println("Total initialization time: " + time + " ms.");
             System.out.println();
         }
+****/
     }
 
     // multiply two elements of GF(2^m)
