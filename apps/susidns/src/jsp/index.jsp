@@ -1,9 +1,9 @@
 <%
 /*
  * Created on Sep 02, 2005
- * 
+ *
  *  This file is part of susidns project, see http://susi.i2p/
- *  
+ *
  *  Copyright (C) 2005 <susi23@mail.i2p>
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -19,7 +19,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *  
+ *
  * $Revision: 1.2 $
  */
 
@@ -36,14 +36,14 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title><%=intl._("Introduction")%> - SusiDNS</title>
 <link rel="stylesheet" type="text/css" href="css.css">
 </head>
 <body>
 <div class="page">
 <div id="logo">
-<img src="images/logo.png" alt="susidns logo" border="0"/>
+<img src="images/logo.png" alt="susidns logo" border="0">
 </div>
 <hr>
 <div id="navi">
@@ -83,7 +83,7 @@
 <%=intl._("The private address book can also be used for aliases of hosts in your other address books.")%>
 </p>
 <center><img src="images/how.png" border="0" alt="address book working scheme" title="How the address book works" class="illustrate" /></center>
-</div>	
+</div>
 <hr>
 <div id="footer">
 <p class="footer">susidns v${version.version} &copy; <a href="${version.url}">susi</a> 2005</p>
