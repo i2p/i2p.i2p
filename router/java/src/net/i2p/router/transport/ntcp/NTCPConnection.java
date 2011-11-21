@@ -165,7 +165,7 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         _remAddr = remAddr;
         _readBufs = new ConcurrentLinkedQueue();
         _writeBufs = new ConcurrentLinkedQueue();
-        _bwRequests = new ConcurrentHashSet(2);
+        _bwRequests = new ConcurrentHashSet(8);
         // TODO possible switch to CLQ but beware non-constant size() - see below
         _outbound = new LinkedBlockingQueue();
         _isInbound = false;
@@ -257,8 +257,16 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
 
         for (Iterator<FIFOBandwidthLimiter.Request> iter = _bwRequests.iterator(); iter.hasNext(); ) {
             iter.next().abort();
+            // we would like to return read ByteBuffers via EventPumper.releaseBuf(),
+            // but we can't risk releasing it twice
         }
         _bwRequests.clear();
+
+        _writeBufs.clear();
+        ByteBuffer bb;
+        while ((bb = _readBufs.poll()) != null) {
+            EventPumper.releaseBuf(bb);
+        }
 
         OutNetMessage msg;
         while ((msg = _outbound.poll()) != null) {
@@ -789,10 +797,18 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         _transport.getWriter().wantsWrite(this, "outbound connected");
     }
 
+    /**
+     *  The FifoBandwidthLimiter.CompleteListener callback.
+     *  Does the delayed read or write.
+     */
     public void complete(FIFOBandwidthLimiter.Request req) {
         removeRequest(req);
         ByteBuffer buf = (ByteBuffer)req.attachment();
         if (req.getTotalInboundRequested() > 0) {
+            if (_closed) {
+                EventPumper.releaseBuf(buf);
+                return;
+            }
             _context.statManager().addRateData("ntcp.throttledReadComplete", (System.currentTimeMillis()-req.getRequestTime()));
             recv(buf);
             // our reads used to be bw throttled (during which time we were no
@@ -800,7 +816,7 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
             // throttled anymore, so we should resume being interested in reading
             _transport.getPumper().wantsRead(this);
             //_transport.getReader().wantsRead(this);
-        } else if (req.getTotalOutboundRequested() > 0) {
+        } else if (req.getTotalOutboundRequested() > 0 && !_closed) {
             _context.statManager().addRateData("ntcp.throttledWriteComplete", (System.currentTimeMillis()-req.getRequestTime()));
             write(buf);
         }
@@ -836,7 +852,8 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     /**
      * The contents of the buffer have been read and can be processed asap.
      * This should not block, and the NTCP connection now owns the buffer
-     * to do with as it pleases.
+     * to do with as it pleases BUT it should eventually copy out the data
+     * and call EventPumper.releaseBuf().
      */
     public void recv(ByteBuffer buf) {
         _bytesReceived += buf.remaining();
@@ -977,8 +994,11 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
      * encrypted and encoded I2NP messages.  individual i2np messages are
      * encoded as "sizeof(data)+data+pad+crc", and those are encrypted
      * with the session key and the last 16 bytes of the previous encrypted
-     * i2np message.  the contents of the buffer is owned by the EventPumper,
-     * so data should be copied out.
+     * i2np message.
+     *
+     * The NTCP connection now owns the buffer
+     * BUT it must copy out the data
+     * as reader will call EventPumper.releaseBuf().
      */
     synchronized void recvEncryptedI2NP(ByteBuffer buf) {
         //if (_log.shouldLog(Log.DEBUG))
@@ -1010,7 +1030,12 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
         }
     }
     
-    /** _decryptBlockBuf contains another cleartext block of I2NP to parse */
+    /**
+     *  Append the next 16 bytes of cleartext to the read state.
+     *  _decryptBlockBuf contains another cleartext block of I2NP to parse.
+     *  Caller must synchronize!
+     *  @return success
+     */
     private boolean recvUnencryptedI2NP() {
         _curReadState.receiveBlock(_decryptBlockBuf);
         if (_curReadState.getSize() > BUFFER_SIZE) {

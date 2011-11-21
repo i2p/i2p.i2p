@@ -2,7 +2,9 @@ package net.i2p.router.transport.ntcp;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.i2p.router.RouterContext;
 import net.i2p.util.I2PThread;
@@ -19,17 +21,17 @@ class Reader {
     private final Log _log;
     // TODO change to LBQ ??
     private final List<NTCPConnection> _pendingConnections;
-    private final List<NTCPConnection> _liveReads;
-    private final List<NTCPConnection> _readAfterLive;
+    private final Set<NTCPConnection> _liveReads;
+    private final Set<NTCPConnection> _readAfterLive;
     private final List<Runner> _runners;
     
     public Reader(RouterContext ctx) {
         _context = ctx;
         _log = ctx.logManager().getLog(getClass());
         _pendingConnections = new ArrayList(16);
-        _runners = new ArrayList(5);
-        _liveReads = new ArrayList(5);
-        _readAfterLive = new ArrayList();
+        _runners = new ArrayList(8);
+        _liveReads = new HashSet(8);
+        _readAfterLive = new HashSet(8);
     }
     
     public void startReading(int numReaders) {
@@ -40,6 +42,7 @@ class Reader {
             t.start();
         }
     }
+
     public void stopReading() {
         while (!_runners.isEmpty()) {
             Runner r = _runners.remove(0);
@@ -55,9 +58,7 @@ class Reader {
         boolean already = false;
         synchronized (_pendingConnections) {
             if (_liveReads.contains(con)) {
-                if (!_readAfterLive.contains(con)) {
-                    _readAfterLive.add(con);
-                }
+                _readAfterLive.add(con);
                 already = true;
             } else if (!_pendingConnections.contains(con)) {
                 _pendingConnections.add(con);
@@ -78,8 +79,11 @@ class Reader {
     
     private class Runner implements Runnable {
         private boolean _stop;
-        public Runner() { _stop = false; }
+
+        public Runner() {}
+
         public void stop() { _stop = true; }
+
         public void run() {
             if (_log.shouldLog(Log.INFO)) _log.info("Starting reader");
             NTCPConnection con = null;
@@ -118,7 +122,8 @@ class Reader {
     }
     
     /**
-     * process everything read
+     * Process everything read.
+     * Return read buffers back to the pool as we process them.
      */
     private void processRead(NTCPConnection con) {
         if (con.isClosed())
@@ -129,6 +134,7 @@ class Reader {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Processing read buffer as an establishment for " + con + " with [" + est + "]");
             if (est == null) {
+                EventPumper.releaseBuf(buf);
                 if (!con.isEstablished()) {
                     // establish state is only removed when the connection is fully established,
                     // yet if that happens, con.isEstablished() should return true...
@@ -144,9 +150,11 @@ class Reader {
                 // why is it complete yet !con.isEstablished?
                     _log.error("establishment state [" + est + "] is complete, yet the connection isn't established? " 
                                + con.isEstablished() + " (inbound? " + con.isInbound() + " " + con + ")");
+                EventPumper.releaseBuf(buf);
                 break;
             }
             est.receive(buf);
+            EventPumper.releaseBuf(buf);
             if (est.isCorrupt()) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("closing connection on establishment because: " +est.getError(), est.getException());
@@ -154,9 +162,6 @@ class Reader {
                     _context.statManager().addRateData("ntcp.receiveCorruptEstablishment", 1);
                 con.close();
                 return;
-            } else if (buf.remaining() <= 0) {
-                // not necessary, getNextReadBuf() removes
-                //con.removeReadBuf(buf);
             }
             if (est.isComplete() && est.getExtraBytes() != null)
                 con.recvEncryptedI2NP(ByteBuffer.wrap(est.getExtraBytes()));
@@ -169,8 +174,7 @@ class Reader {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Processing read buffer as part of an i2np message (" + buf.remaining() + " bytes)");
             con.recvEncryptedI2NP(buf);
-            // not necessary, getNextReadBuf() removes
-            //con.removeReadBuf(buf);
+            EventPumper.releaseBuf(buf);
         }
     }
 }

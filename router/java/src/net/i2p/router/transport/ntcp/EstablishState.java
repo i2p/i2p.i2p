@@ -147,9 +147,12 @@ class EstablishState {
 
     /**
      * parse the contents of the buffer as part of the handshake.  if the
-     * handshake is completed and there is more data remaining, the buffer is
-     * updated so that the next read will be the (still encrypted) remaining
+     * handshake is completed and there is more data remaining, the data are
+     * copieed out so that the next read will be the (still encrypted) remaining
      * data (available from getExtraBytes)
+     *
+     * All data must be copied out of the buffer as Reader.processRead()
+     * will return it to the pool.
      */
     public void receive(ByteBuffer src) {
         if (_corrupt || _verified)
@@ -176,6 +179,9 @@ class EstablishState {
     /**
      *  we are Bob, so receive these bytes as part of an inbound connection
      *  This method receives messages 1 and 3, and sends messages 2 and 4.
+     *
+     *  All data must be copied out of the buffer as Reader.processRead()
+     *  will return it to the pool.
      */
     private void receiveInbound(ByteBuffer src) {
         if (_log.shouldLog(Log.DEBUG))
@@ -340,6 +346,9 @@ class EstablishState {
     /**
      *  We are Alice, so receive these bytes as part of an outbound connection.
      *  This method receives messages 2 and 4, and sends message 3.
+     *
+     *  All data must be copied out of the buffer as Reader.processRead()
+     *  will return it to the pool.
      */
     private void receiveOutbound(ByteBuffer src) {
         if (_log.shouldLog(Log.DEBUG)) _log.debug(prefix()+"Receive outbound " + src + " received=" + _received);
@@ -684,7 +693,11 @@ class EstablishState {
         _transport.getPumper().wantsWrite(_con, _e_bobSig);
     }
 
-    /** anything left over in the byte buffer after verification is extra */
+    /** Anything left over in the byte buffer after verification is extra
+     *
+     *  All data must be copied out of the buffer as Reader.processRead()
+     *  will return it to the pool.
+     */
     private void prepareExtra(ByteBuffer buf) {
         int remaining = buf.remaining();
         if (remaining > 0) {

@@ -89,7 +89,7 @@ public class NTCPTransport extends TransportImpl {
         _context.statManager().createRateStat("ntcp.connectFailedIOE", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.connectFailedInvalidPort", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.bidRejectedLocalAddress", "", "ntcp", RATES);
-        _context.statManager().createRateStat("ntcp.bidRejectedNoNTCPAddress", "", "ntcp", RATES);
+        //_context.statManager().createRateStat("ntcp.bidRejectedNoNTCPAddress", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.connectFailedTimeout", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.connectFailedTimeoutIOE", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.connectFailedUnresolved", "", "ntcp", RATES);
@@ -124,8 +124,8 @@ public class NTCPTransport extends TransportImpl {
         _context.statManager().createRateStat("ntcp.invalidOutboundSkew", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.noBidTooLargeI2NP", "send size", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.queuedRecv", "", "ntcp", RATES);
-        //_context.statManager().createRateStat("ntcp.read", "", "ntcp", RATES);
-        _context.statManager().createRateStat("ntcp.readEOF", "", "ntcp", RATES);
+        _context.statManager().createRateStat("ntcp.read", "", "ntcp", RATES);
+        //_context.statManager().createRateStat("ntcp.readEOF", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.readError", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.receiveCorruptEstablishment", "", "ntcp", RATES);
         _context.statManager().createRateStat("ntcp.receiveMeta", "", "ntcp", RATES);
@@ -289,7 +289,7 @@ public class NTCPTransport extends TransportImpl {
 
         if (addr == null) {
             markUnreachable(peer);
-            _context.statManager().addRateData("ntcp.bidRejectedNoNTCPAddress", 1);
+            //_context.statManager().addRateData("ntcp.bidRejectedNoNTCPAddress", 1);
             //_context.shitlist().shitlistRouter(toAddress.getIdentity().calculateHash(), "No NTCP address", STYLE);
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("no bid when trying to send to " + peer.toBase64() + " as they don't have an ntcp address");

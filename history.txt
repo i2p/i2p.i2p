@@ -1,3 +1,13 @@
+2011-11-21 zzz
+  * NTCP Pumper:
+    - Ensure failsafe pumper code gets run on schedule
+    - Don't copy the read buffers
+    - Adjust minimum read buffers based on memory
+    - New i2np.ntcp.useDirectBuffer option (default false)
+    - Mark peer unreachable when read failure is during establishment
+    - Change some Reader Lists to Sets to avoid linear search
+    - Log tweaks, debugging, new loop stats
+
 2011-11-18 zzz
   * NTCP:
     - First cut at improving EventPumper performance (ticket #551)
