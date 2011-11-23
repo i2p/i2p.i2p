@@ -59,6 +59,7 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
      * WTF.  Ok, so we're going to have it return between 0 and n (including 0, excluding n), since 
      * thats what it has been used for.
      *
+     * This code unused, see FortunaRandomSource override
      */
     @Override
     public int nextInt(int n) {
@@ -72,12 +73,32 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
     /**
      * Like the modified nextInt, nextLong(n) returns a random number from 0 through n,
      * including 0, excluding n.
+     *
+     * This code unused, see FortunaRandomSource override
      */
     public long nextLong(long n) {
         long v = super.nextLong();
         if (v < 0) v = 0 - v;
         if (v >= n) v = v % n;
         return v;
+    }
+
+    /**
+     * Not part of java.util.SecureRandom, but added since Fortuna supports it.
+     *
+     * This code unused, see FortunaRandomSource override
+     *
+     * @since 0.8.12
+     */
+    public void nextBytes(byte buf[], int offset, int length) {
+        // inefficient, just in case anybody actually instantiates this
+        if (offset == 0 && buf.length == length) {
+            nextBytes(buf);
+        } else {
+            byte[] tmp = new byte[length];
+            nextBytes(tmp);
+            System.arraycopy(tmp, 0, buf, offset, length);
+        }
     }
 
     /**
@@ -188,6 +209,7 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
         return false;
     }
 
+/****
     public static void main(String args[]) {
         for (int j = 0; j < 2; j++) {
         RandomSource rs = new RandomSource(I2PAppContext.getGlobalContext());
@@ -208,4 +230,5 @@ public class RandomSource extends SecureRandom implements EntropyHarvester {
         rs.saveSeed();
         }
     }
+****/
 }
