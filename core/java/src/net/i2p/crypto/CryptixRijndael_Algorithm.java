@@ -455,8 +455,8 @@ public final class CryptixRijndael_Algorithm // implicit no-argument constructor
      * @param  sessionKey The session key to use for decryption.
      */
     public static final void blockDecrypt(byte[] in, byte[] result, int inOffset, int outOffset, Object sessionKey) {
-        if (in.length - inOffset > result.length - outOffset)
-            throw new IllegalArgumentException("result too small: in.len=" + in.length + " in.offset=" + inOffset
+        if (result.length - outOffset <= 15)
+            throw new IllegalArgumentException("result too small:"
                                                + " result.len=" + result.length + " result.offset=" + outOffset);
         if (in.length - inOffset <= 15)
             throw new IllegalArgumentException("data too small: " + in.length + " inOffset: " + inOffset);

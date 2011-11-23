@@ -194,7 +194,11 @@ public class CryptixAESEngine extends AESEngine {
         _prevCache.release(curA);
     }
     
-    /** encrypt exactly 16 bytes using the session key */
+    /** encrypt exactly 16 bytes using the session key
+     * @param payload plaintext data, 16 bytes starting at inIndex
+     * @param sessionKey private session key
+     * @param out out parameter, 16 bytes starting at outIndex
+     */
     @Override
     public final void encryptBlock(byte payload[], int inIndex, SessionKey sessionKey, byte out[], int outIndex) {
         if (sessionKey.getPreparedKey() == null) {
@@ -207,21 +211,23 @@ public class CryptixAESEngine extends AESEngine {
             }
         }
         
-        CryptixRijndael_Algorithm.blockEncrypt(payload, out, inIndex, outIndex, sessionKey.getPreparedKey(), 16);
+        CryptixRijndael_Algorithm.blockEncrypt(payload, out, inIndex, outIndex, sessionKey.getPreparedKey());
     }
 
     /** decrypt exactly 16 bytes of data with the session key provided
-     * @param payload encrypted data
+     * @param payload encrypted data, 16 bytes starting at inIndex
      * @param sessionKey private session key
+     * @param rv out parameter, 16 bytes starting at outIndex
      */
     @Override
     public final void decryptBlock(byte payload[], int inIndex, SessionKey sessionKey, byte rv[], int outIndex) {
-        if ( (payload == null) || (rv == null) )
-            throw new IllegalArgumentException("null block args");
-        if (payload.length - inIndex > rv.length - outIndex)
-            throw new IllegalArgumentException("bad block args [payload.len=" + payload.length 
-                                               + " inIndex=" + inIndex + " rv.len=" + rv.length 
-                                               + " outIndex="+outIndex);
+        // just let it throw NPE or IAE later for speed, you'll figure it out
+        //if ( (payload == null) || (rv == null) )
+        //    throw new IllegalArgumentException("null block args");
+        //if (payload.length - inIndex > rv.length - outIndex)
+        //    throw new IllegalArgumentException("bad block args [payload.len=" + payload.length 
+        //                                       + " inIndex=" + inIndex + " rv.len=" + rv.length 
+        //                                       + " outIndex="+outIndex);
         if (sessionKey.getPreparedKey() == null) {
             try {
                 Object key = CryptixRijndael_Algorithm.makeKey(sessionKey.getData(), 16);
@@ -232,7 +238,7 @@ public class CryptixAESEngine extends AESEngine {
             }
         }
 
-        CryptixRijndael_Algorithm.blockDecrypt(payload, rv, inIndex, outIndex, sessionKey.getPreparedKey(), 16);
+        CryptixRijndael_Algorithm.blockDecrypt(payload, rv, inIndex, outIndex, sessionKey.getPreparedKey());
     }
     
 /******
