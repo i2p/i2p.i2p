@@ -101,6 +101,8 @@ class EventPumper implements Runnable {
         _context.statManager().createRateStat("ntcp.pumperKeySetSize", "", "ntcp", new long[] {10*60*1000} );
         _context.statManager().createRateStat("ntcp.pumperKeysPerLoop", "", "ntcp", new long[] {10*60*1000} );
         _context.statManager().createRateStat("ntcp.pumperLoopsPerSecond", "", "ntcp", new long[] {10*60*1000} );
+        _context.statManager().createRateStat("ntcp.zeroRead", "", "ntcp", new long[] {10*60*1000} );
+        _context.statManager().createRateStat("ntcp.zeroReadDrop", "", "ntcp", new long[] {10*60*1000} );
     }
     
     public synchronized void startPumping() {
@@ -561,7 +563,21 @@ class EventPumper implements Runnable {
                 // stay interested
                 //key.interestOps(key.interestOps() | SelectionKey.OP_READ);
                 releaseBuf(buf);
+                // workaround for channel stuck returning 0 all the time, causing 100% CPU
+                int consec = con.gotZeroRead();
+                if (consec >= 5) {
+                    _context.statManager().addRateData("ntcp.zeroReadDrop", 1);
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Fail safe zero read close " + con);
+                    con.close();
+                } else {
+                    _context.statManager().addRateData("ntcp.zeroRead", consec);
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("nothing to read for " + con + ", but stay interested");
+                }
             } else if (read > 0) {
+                // clear counter for workaround above
+                con.clearZeroRead();
                 // ZERO COPY. The buffer will be returned in Reader.processRead()
                 buf.flip();
                 FIFOBandwidthLimiter.Request req = _context.bandwidthLimiter().requestInbound(read, "NTCP read"); //con, buf);

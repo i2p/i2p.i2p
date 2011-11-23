@@ -1,3 +1,13 @@
+2011-11-23 zzz
+  * CryptixAESEngine: Fix bogus bounds checks
+  * NTCP:
+    - More optimizations in recvEncrypted()
+    - More efficient XOR
+    - Reduce bandwidth stat update frequency
+    - Check for repeated zero-length reads
+  * RandomSource: Add new method getBytes(buf, offset, length)
+  * Tunnel encryption: More efficient XOR
+
 2011-11-21 zzz
   * NTCP Pumper:
     - Ensure failsafe pumper code gets run on schedule

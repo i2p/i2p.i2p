@@ -756,16 +756,18 @@ public class NTCPTransport extends TransportImpl {
             buf.append(DataHelper.formatDuration2(con.getTimeSinceReceive()));
             buf.append(THINSP).append(DataHelper.formatDuration2(con.getTimeSinceSend()));
             buf.append("</td><td class=\"cells\" align=\"right\">");
-            if (con.getTimeSinceReceive() < 10*1000) {
-                buf.append(formatRate(con.getRecvRate()/1024));
-                bpsRecv += con.getRecvRate();
+            if (con.getTimeSinceReceive() < 2*60*1000) {
+                float r = con.getRecvRate();
+                buf.append(formatRate(r / 1024));
+                bpsRecv += r;
             } else {
                 buf.append(formatRate(0));
             }
             buf.append(THINSP);
-            if (con.getTimeSinceSend() < 10*1000) {
-                buf.append(formatRate(con.getSendRate()/1024));
-                bpsSend += con.getSendRate();
+            if (con.getTimeSinceSend() < 2*60*1000) {
+                float r = con.getSendRate();
+                buf.append(formatRate(r / 1024));
+                bpsSend += r;
             } else {
                 buf.append(formatRate(0));
             }
