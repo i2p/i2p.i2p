@@ -100,7 +100,10 @@ class HopProcessor {
     
     private final void encrypt(byte data[], int offset, int length) {
         for (int off = offset + IV_LENGTH; off < length; off += IV_LENGTH) {
-            DataHelper.xor(data, off - IV_LENGTH, data, off, data, off, IV_LENGTH);
+            //DataHelper.xor(data, off - IV_LENGTH, data, off, data, off, IV_LENGTH);
+            for (int j = 0; j < IV_LENGTH; j++) {
+                data[off + j] ^= data[(off - IV_LENGTH) + j];
+            }
             _context.aes().encryptBlock(data, off, _config.getLayerKey(), data, off);
         }
     }

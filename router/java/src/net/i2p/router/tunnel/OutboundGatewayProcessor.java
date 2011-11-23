@@ -93,7 +93,10 @@ class OutboundGatewayProcessor {
         
             System.arraycopy(orig, off, cur, 0, HopProcessor.IV_LENGTH);
             ctx.aes().decryptBlock(orig, off, config.getLayerKey(), orig, off);
-            DataHelper.xor(prev, 0, orig, off, orig, off, HopProcessor.IV_LENGTH);
+            //DataHelper.xor(prev, 0, orig, off, orig, off, HopProcessor.IV_LENGTH);
+            for (int j = 0; j < HopProcessor.IV_LENGTH; j++) {
+                orig[off + j] ^= prev[j];
+            }
             byte xf[] = prev;
             prev = cur;
             cur = xf;
