@@ -166,10 +166,18 @@ abstract class IRCFilter {
                 "MAP", // seems safe enough, the ircd should protect themselves though
                 // "PART", // replace with filtered PART to hide client part messages
                 "OPER",
-                // "PONG", // replaced with a filtered PING/PONG since some clients send the server IP (thanks aardvax!) 
-                // "PING", 
+                // "PONG", // replaced with a filtered PING/PONG since some clients send the server IP (thanks aardvax!)
+                // "PING",
+                "NICKSERV", "NS", // the next few are default aliases on unreal (+ anope)
+                "CHANSERV", "CS",
+                "MEMOSERV", "MS",
+                "OPERSERV", "OS",
+                "HELPSERV",
+                "HOSTSERV", "HS",
+                "BOTSERV", "BS",
+                "STATSERV",
                 "KICK",
-                "HELPME",
+                "HELPME", "HELPOP",  // helpop is what unrealircd uses by default
                 "RULES",
                 "TOPIC",
                 "ISON",    // jIRCii uses this for a ping (response is 303)
