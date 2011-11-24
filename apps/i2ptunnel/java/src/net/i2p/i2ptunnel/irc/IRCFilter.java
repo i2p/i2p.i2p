@@ -147,7 +147,7 @@ abstract class IRCFilter {
      *  @return the original or modified line, or null if it should be dropped.
      */
     public static String outboundFilter(String s, StringBuffer expectedPong, DCCHelper helper) {
-        
+
         String field[]=s.split(" ",3);
         String command;
         final String[] allowedCommands =
@@ -160,6 +160,8 @@ abstract class IRCFilter {
                 "WHOIS",
                 "LIST",
                 "NAMES",
+                "ADMIN",
+                "MOTD",
                 "PASS",
                 // "QUIT", // replace with a filtered QUIT to hide client quit messages
                 "SILENCE",
