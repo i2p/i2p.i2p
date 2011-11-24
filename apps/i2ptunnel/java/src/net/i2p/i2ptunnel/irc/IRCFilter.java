@@ -180,6 +180,10 @@ abstract class IRCFilter {
                 "STATSERV",
                 "KICK",
                 "HELPME", "HELPOP",  // helpop is what unrealircd uses by default
+                // IRCop commands
+                "ADCHAT", "ADDMOTD", "ADDOMOTD", "CHATOPS", "CHGHOST", "CHGIDENT", "CHGNAME", "DCCDENY", "DIE",
+                "GLOBOPS", "GZLINE", "KILL", "KLINE", "LOCOPS", "NACHAT", "OPERMOTD", "REHASH", "RESTART", "SAJOIN",
+                "SAMODE", "SAPART", "SDESC", "SETHOST", "SETIDENT", "SHUN", "SPAMFILTER", "TEMPSHUN", "UNDCCDENY",
                 "RULES",
                 "TOPIC",
                 "ISON",    // jIRCii uses this for a ping (response is 303)
