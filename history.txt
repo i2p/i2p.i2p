@@ -1,3 +1,6 @@
+2011-11-26 zzz
+  * DCCServer: Socket error log fix
+
 2011-11-23 zzz
   * CryptixAESEngine: Fix bogus bounds checks
   * NTCP:

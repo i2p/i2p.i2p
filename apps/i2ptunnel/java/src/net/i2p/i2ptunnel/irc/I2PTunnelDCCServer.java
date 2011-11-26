@@ -111,18 +111,19 @@ public class I2PTunnelDCCServer extends I2PTunnelServer {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Incoming DCC connection for I2P port " + myPort +
                           " sending to " + local.ia + ':' + local.port);
-            Socket s = new Socket(local.ia, local.port);
-            _sockList.add(socket);
-            new I2PTunnelRunner(s, socket, slock, null, _sockList);
-            local.socket = socket;
-            local.expire = getTunnel().getContext().clock().now() + OUTBOUND_EXPIRE;
-            _active.put(Integer.valueOf(myPort), local);
-        } catch (SocketException ex) {
             try {
-                socket.close();
-            } catch (IOException ioe) {}
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Error connecting to server " + remoteHost + ':' + remotePort, ex);
+                Socket s = new Socket(local.ia, local.port);
+                _sockList.add(socket);
+                new I2PTunnelRunner(s, socket, slock, null, _sockList);
+                local.socket = socket;
+                local.expire = getTunnel().getContext().clock().now() + OUTBOUND_EXPIRE;
+                _active.put(Integer.valueOf(myPort), local);
+            } catch (SocketException ex) {
+                try {
+                    socket.close();
+                } catch (IOException ioe) {}
+                _log.error("Error relaying incoming DCC connection to IRC client at " + local.ia + ':' + local.port, ex);
+            }
         } catch (IOException ex) {
             _log.error("Error while waiting for I2PConnections", ex);
         }
