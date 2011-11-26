@@ -616,7 +616,7 @@ class EventPumper implements Runnable {
                 // Same stat as in processConnect()
                 _context.statManager().addRateData("ntcp.connectFailedTimeoutIOE", 1);
                 RouterIdentity rem = con.getRemotePeer();
-                if (rem != null)
+                if (rem != null && !con.isInbound())
                     _transport.markUnreachable(rem.calculateHash());
             }
             con.close();
