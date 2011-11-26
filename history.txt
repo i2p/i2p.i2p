@@ -1,5 +1,6 @@
 2011-11-26 zzz
   * DCCServer: Socket error log fix
+  * NTCP: Fix pumper NPE (ticket #555)
 
 2011-11-23 zzz
   * CryptixAESEngine: Fix bogus bounds checks

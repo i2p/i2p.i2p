@@ -615,7 +615,9 @@ class EventPumper implements Runnable {
                 // although it could be a read failure during the DH handshake
                 // Same stat as in processConnect()
                 _context.statManager().addRateData("ntcp.connectFailedTimeoutIOE", 1);
-                _transport.markUnreachable(con.getRemotePeer().calculateHash());
+                RouterIdentity rem = con.getRemotePeer();
+                if (rem != null)
+                    _transport.markUnreachable(rem.calculateHash());
             }
             con.close();
         } catch (NotYetConnectedException nyce) {
