@@ -131,7 +131,7 @@ PLIST_DOMAIN=org.tanukisoftware.wrapper
 
 # Do not modify anything beyond this point
 #-----------------------------------------------------------------------------
-if [ -e $WRAPPER_CONF ]; then
+if [ ! -e $WRAPPER_CONF ]; then
        echo "Starting I2P Failed: Unable to find $WRAPPER_CONF"
        exit 1
 fi
@@ -341,12 +341,7 @@ if [ "$DIST_OS" = "macosx" ]
 then
     OS_VER=`sw_vers | grep 'ProductVersion:' | grep -o '[0-9]*\.[0-9]*\.[0-9]*'`
     DIST_ARCH="universal"
-    if [ "$OS_VER" -lt "10.5.0" ]
-    then
-        DIST_BITS="32"
-    else
-        DIST_BITS="64"
-    fi
+    DIST_BITS="64"
     APP_PLIST_BASE=${PLIST_DOMAIN}.${APP_NAME}
     APP_PLIST=${APP_PLIST_BASE}.plist
 else

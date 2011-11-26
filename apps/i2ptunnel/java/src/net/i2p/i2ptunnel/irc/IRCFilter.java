@@ -147,7 +147,7 @@ abstract class IRCFilter {
      *  @return the original or modified line, or null if it should be dropped.
      */
     public static String outboundFilter(String s, StringBuffer expectedPong, DCCHelper helper) {
-        
+
         String field[]=s.split(" ",3);
         String command;
         final String[] allowedCommands =
@@ -160,16 +160,30 @@ abstract class IRCFilter {
                 "WHOIS",
                 "LIST",
                 "NAMES",
+                "ADMIN",
+                "MOTD",
                 "PASS",
                 // "QUIT", // replace with a filtered QUIT to hide client quit messages
                 "SILENCE",
                 "MAP", // seems safe enough, the ircd should protect themselves though
                 // "PART", // replace with filtered PART to hide client part messages
                 "OPER",
-                // "PONG", // replaced with a filtered PING/PONG since some clients send the server IP (thanks aardvax!) 
-                // "PING", 
+                // "PONG", // replaced with a filtered PING/PONG since some clients send the server IP (thanks aardvax!)
+                // "PING",
+                "NICKSERV", "NS", // the next few are default aliases on unreal (+ anope)
+                "CHANSERV", "CS",
+                "MEMOSERV", "MS",
+                "OPERSERV", "OS",
+                "HELPSERV",
+                "HOSTSERV", "HS",
+                "BOTSERV", "BS",
+                "STATSERV",
                 "KICK",
-                "HELPME",
+                "HELPME", "HELPOP",  // helpop is what unrealircd uses by default
+                // IRCop commands
+                "ADCHAT", "ADDMOTD", "ADDOMOTD", "CHATOPS", "CHGHOST", "CHGIDENT", "CHGNAME", "DCCDENY", "DIE",
+                "GLOBOPS", "GZLINE", "KILL", "KLINE", "LOCOPS", "NACHAT", "OPERMOTD", "REHASH", "RESTART", "SAJOIN",
+                "SAMODE", "SAPART", "SDESC", "SETHOST", "SETIDENT", "SHUN", "SPAMFILTER", "TEMPSHUN", "UNDCCDENY",
                 "RULES",
                 "TOPIC",
                 "ISON",    // jIRCii uses this for a ping (response is 303)
