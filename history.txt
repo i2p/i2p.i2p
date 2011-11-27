@@ -1,3 +1,9 @@
+2011-11-27 zzz
+  * IRCClient: Outbound whitelist optimization
+  * Reseed:
+    - Restore i2pbote (ticket #516)
+    - Remove r31453 (cert expiring, host soon to be shut down permanently)
+
 2011-11-26 zzz
   * DCCServer: Socket error log fix
   * NTCP: Fix pumper NPE (ticket #555)

@@ -63,8 +63,8 @@ public class Reseeder {
               "http://netdb.i2p2.de/" + "," +
               "http://reseed.i2p-projekt.de/" + "," +
               "http://forum.i2p2.de/netdb/" + "," +
-         /*   "http://www.i2pbote.net/netDb/," +   NO DATA */
-              "http://r31453.ovh.net/static_media/files/netDb/" + "," +
+              "http://www.i2pbote.net/netDb/" +  "," +
+          //  "http://r31453.ovh.net/static_media/files/netDb/" + "," +
               "http://cowpuncher.drollette.com/netdb/" + "," +
               "http://75.145.125.59/netDb/" + "," +
               "http://i2p.mooo.com/netDb/";
@@ -73,9 +73,9 @@ public class Reseeder {
     public static final String DEFAULT_SSL_SEED_URL =
               "https://netdb.i2p2.de/" + "," +
               "https://forum.i2p2.de/netdb/" + "," +
-         /*   "https://www.i2pbote.net/netDb/," +   NO DATA */
+              "https://www.i2pbote.net/netDb/" + "," +
               "https://reseed.i2p-projekt.de/" + "," +
-              "https://r31453.ovh.net/static_media/files/netDb/" + "," +
+          //  "https://r31453.ovh.net/static_media/files/netDb/" + "," +
               "https://cowpuncher.drollette.com/netdb/" + "," +
               "https://75.145.125.59/netDb/" + "," +
               "https://i2p.mooo.com/netDb/";
