@@ -1,5 +1,9 @@
 package net.i2p.i2ptunnel.irc;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
@@ -139,17 +143,8 @@ abstract class IRCFilter {
         return null;
     }
     
-    /*************************************************************************
-     *
-     *  Modify or filter a single outbound line.
-     *
-     *  @param helper may be null
-     *  @return the original or modified line, or null if it should be dropped.
-     */
-    public static String outboundFilter(String s, StringBuffer expectedPong, DCCHelper helper) {
-
-        String field[]=s.split(" ",3);
-        String command;
+    private static final Set<String> _allowedOutbound;
+    static {
         final String[] allowedCommands =
         {
                 // "NOTICE", // can contain CTCP
@@ -192,6 +187,20 @@ abstract class IRCFilter {
                 // http://tools.ietf.org/html/draft-mitchell-irc-capabilities-01
                 "CAP"
         };
+        _allowedOutbound = new HashSet(64);
+        _allowedOutbound.addAll(Arrays.asList(allowedCommands));
+    }
+
+    /*************************************************************************
+     *
+     *  Modify or filter a single outbound line.
+     *
+     *  @param helper may be null
+     *  @return the original or modified line, or null if it should be dropped.
+     */
+    public static String outboundFilter(String s, StringBuffer expectedPong, DCCHelper helper) {
+
+        String field[]=s.split(" ",3);
 
         if(field[0].length()==0)
 	    return null; // W T F?
@@ -200,7 +209,7 @@ abstract class IRCFilter {
         if(field[0].charAt(0)==':')
             return null; // wtf
         
-        command = field[0].toUpperCase();
+        String command = field[0].toUpperCase();
 
 	if ("PING".equals(command)) {
             // Most clients just send a PING and are happy with any old PONG.  Others,
@@ -242,11 +251,8 @@ abstract class IRCFilter {
             return "PONG 127.0.0.1"; // no way to know what the ircd to i2ptunnel server con is, so localhost works
 
         // Allow all allowedCommands
-        for(int i=0;i<allowedCommands.length;i++)
-        {
-            if(allowedCommands[i].equals(command))
-                return s;
-        }
+        if (_allowedOutbound.contains(command))
+            return s;
         
         // mIRC sends "NOTICE user :DCC Send file (IP)"
         // in addition to the CTCP version
