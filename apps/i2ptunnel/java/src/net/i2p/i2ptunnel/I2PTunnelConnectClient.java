@@ -262,7 +262,7 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                 }
             }
 
-            if (destination == null || !"CONNECT".equalsIgnoreCase(method)) {
+            if (destination == null || method == null || !"CONNECT".equals(method.toUpperCase(Locale.US))) {
                 writeErrorMessage(ERR_BAD_PROTOCOL, out);
                 s.close();
                 return;

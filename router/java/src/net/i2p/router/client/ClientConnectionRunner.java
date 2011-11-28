@@ -15,6 +15,7 @@ import java.net.Socket;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -192,7 +193,7 @@ class ClientConnectionRunner {
         _config = config;
         // This is the only option that is interpreted here, not at the tunnel manager
         if (config.getOptions() != null)
-            _dontSendMSM = "none".equalsIgnoreCase(config.getOptions().getProperty(I2PClient.PROP_RELIABILITY));
+            _dontSendMSM = "none".equals(config.getOptions().getProperty(I2PClient.PROP_RELIABILITY, "").toLowerCase(Locale.US));
         // per-destination session key manager to prevent rather easy correlation
         if (_sessionKeyManager == null)
             _sessionKeyManager = new TransientSessionKeyManager(_context);

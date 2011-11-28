@@ -58,7 +58,7 @@ abstract class IRCFilter {
         if(field[0].charAt(0)==':')
             idx++;
 
-        try { command = field[idx++]; }
+        try { command = field[idx++].toUpperCase(Locale.US); }
          catch (IndexOutOfBoundsException ioobe) // wtf, server sent borked command?
         {
            //_log.warn("Dropping defective message: index out of bounds while extracting command.");
@@ -74,9 +74,9 @@ abstract class IRCFilter {
         } catch(NumberFormatException nfe){}
 
         
-	if ("PING".equalsIgnoreCase(command))
+	if ("PING".equals(command))
             return "PING 127.0.0.1"; // no way to know what the ircd to i2ptunnel server con is, so localhost works
-	if ("PONG".equalsIgnoreCase(command)) {
+	if ("PONG".equals(command)) {
             // Turn the received ":irc.freshcoffee.i2p PONG irc.freshcoffee.i2p :127.0.0.1"
             // into ":127.0.0.1 PONG 127.0.0.1 " so that the caller can append the client's extra parameter
             // though, does 127.0.0.1 work for irc clients connecting remotely?  and for all of them?  sure would
@@ -93,12 +93,12 @@ abstract class IRCFilter {
         
         // Allow all allowedCommands
         for(int i=0;i<allowedCommands.length;i++) {
-            if(allowedCommands[i].equalsIgnoreCase(command))
+            if(allowedCommands[i].equals(command))
                 return s;
         }
         
         // Allow PRIVMSG, but block CTCP.
-        if("PRIVMSG".equalsIgnoreCase(command) || "NOTICE".equalsIgnoreCase(command))
+        if("PRIVMSG".equals(command) || "NOTICE".equals(command))
         {
             String msg;
             msg = field[idx++];

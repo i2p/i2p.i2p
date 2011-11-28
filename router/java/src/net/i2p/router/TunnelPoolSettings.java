@@ -1,5 +1,6 @@
 package net.i2p.router;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
@@ -236,7 +237,8 @@ public class TunnelPoolSettings {
     
     private static final boolean getBoolean(String str, boolean defaultValue) { 
         if (str == null) return defaultValue;
-        boolean v = Boolean.valueOf(str).booleanValue() || "YES".equalsIgnoreCase(str);
+        boolean v = Boolean.valueOf(str).booleanValue() ||
+                    (str != null && "YES".equals(str.toUpperCase(Locale.US)));
         return v;
     }
 

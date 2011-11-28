@@ -32,7 +32,8 @@
             // doesn't work for restart or shutdown with no expl. tunnels,
             // since the call to ConfigRestartBean.renderStatus() hasn't happened yet...
             // So we delay slightly
-            if ("restart".equalsIgnoreCase(action) || "shutdown".equalsIgnoreCase(action)) {
+            if (action != null &&
+                ("restart".equals(action.toLowerCase(java.util.Locale.US)) || "shutdown".equals(action.toLowerCase(java.util.Locale.US)))) {
                 synchronized(this) {
                     try {
                         wait(1000);

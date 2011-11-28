@@ -317,7 +317,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         //                          And new "always" setting ignores reachability status, like
         //                          "true" was in 0.7.3
         String ohost = newProps.getProperty(NTCPAddress.PROP_HOST);
-        String enabled = _context.getProperty(PROP_I2NP_NTCP_AUTO_IP, "true");
+        String enabled = _context.getProperty(PROP_I2NP_NTCP_AUTO_IP, "true").toLowerCase(Locale.US);
         String name = _context.getProperty(PROP_I2NP_NTCP_HOSTNAME);
         // hostname config trumps auto config
         if (name != null && name.length() > 0)
@@ -328,7 +328,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
             status = udp.getReachabilityStatus();
         if (_log.shouldLog(Log.INFO))
             _log.info("old: " + ohost + " config: " + name + " auto: " + enabled + " status: " + status);
-        if (enabled.equalsIgnoreCase("always") ||
+        if (enabled.equals("always") ||
             (Boolean.valueOf(enabled).booleanValue() && status == STATUS_OK)) {
             String nhost = UDPProps.getProperty(UDPAddress.PROP_HOST);
             if (_log.shouldLog(Log.INFO))
@@ -339,7 +339,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
                 newProps.setProperty(NTCPAddress.PROP_HOST, nhost);
                 changed = true;
             }
-        } else if (enabled.equalsIgnoreCase("false") &&
+        } else if (enabled.equals("false") &&
                    name != null && name.length() > 0 &&
                    !name.equals(ohost) &&
                    nport != null) {

@@ -939,27 +939,28 @@ public class EepGet {
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Header line: [" + key + "] = [" + val + "]");
-        if (key.equalsIgnoreCase("Content-length")) {
+        key = key.toLowerCase(Locale.US);
+        if (key.equals("content-length")) {
             try {
                 _bytesRemaining = Long.parseLong(val);
             } catch (NumberFormatException nfe) {
                 nfe.printStackTrace();
             }
-        } else if (key.equalsIgnoreCase("ETag")) {
+        } else if (key.equals("etag")) {
             _etag = val;
-        } else if (key.equalsIgnoreCase("Last-Modified")) {
+        } else if (key.equals("last-modified")) {
             _lastModified = val;
-        } else if (key.equalsIgnoreCase("Transfer-encoding")) {
+        } else if (key.equals("transfer-encoding")) {
             _encodingChunked = val.toLowerCase(Locale.US).contains("chunked");
-        } else if (key.equalsIgnoreCase("Content-encoding")) {
+        } else if (key.equals("content-encoding")) {
             // This is kindof a hack, but if we are downloading a gzip file
             // we don't want to transparently gunzip it and save it as a .gz file.
             // A query string will also mess this up
             if ((!_actualURL.endsWith(".gz")) && (!_actualURL.endsWith(".tgz")))
                 _isGzippedResponse = val.toLowerCase(Locale.US).contains("gzip");
-        } else if (key.equalsIgnoreCase("Content-Type")) {
+        } else if (key.equals("content-type")) {
             _contentType=val;
-        } else if (key.equalsIgnoreCase("Location")) {
+        } else if (key.equals("location")) {
             _redirectLocation=val;
         } else {
             // ignore the rest

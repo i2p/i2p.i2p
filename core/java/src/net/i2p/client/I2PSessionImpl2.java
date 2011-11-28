@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
 
@@ -59,7 +60,7 @@ class I2PSessionImpl2 extends I2PSessionImpl {
         _log = ctx.logManager().getLog(I2PSessionImpl2.class);
         _sendingStates = new HashSet(32);
         // default is BestEffort
-        _noEffort = "none".equalsIgnoreCase(getOptions().getProperty(I2PClient.PROP_RELIABILITY));
+        _noEffort = "none".equals(getOptions().getProperty(I2PClient.PROP_RELIABILITY, "").toLowerCase(Locale.US));
 
         ctx.statManager().createRateStat("i2cp.sendBestEffortTotalTime", "how long to do the full sendBestEffort call?", "i2cp", new long[] { 10*60*1000 } );
         //ctx.statManager().createRateStat("i2cp.sendBestEffortStage0", "first part of sendBestEffort?", "i2cp", new long[] { 10*60*1000 } );

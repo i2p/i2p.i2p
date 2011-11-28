@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.Locale;
 import java.util.Properties;
 
 import net.i2p.client.streaming.I2PSocket;
@@ -202,13 +203,13 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
                 idx++;
 
             try {
-                command = field[idx++];
+                command = field[idx++].toUpperCase(Locale.US);
             } catch (IndexOutOfBoundsException ioobe) {
                 // wtf, server sent borked command?
                throw new IOException("Dropping defective message: index out of bounds while extracting command.");
             }
 
-            if ("USER".equalsIgnoreCase(command)) {
+            if ("USER".equals(command)) {
                 if (field.length < idx + 4)
                     throw new IOException("Too few parameters in USER message: " + s);
                 // USER zzz1 hostname localhost :zzz
@@ -221,7 +222,7 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
                 break;
             }
             buf.append(s).append("\r\n");
-            if ("SERVER".equalsIgnoreCase(command))
+            if ("SERVER".equals(command))
                 break;
         }
         //if (_log.shouldLog(Log.DEBUG))

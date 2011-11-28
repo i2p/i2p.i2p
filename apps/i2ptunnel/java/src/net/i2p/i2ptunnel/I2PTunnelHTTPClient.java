@@ -758,7 +758,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             if (method == null || destination == null) {
                 //l.log("No HTTP method found in the request.");
                 if (out != null) {
-                    if ("http://".equalsIgnoreCase(protocol))
+                    if (protocol != null && "http://".equals(protocol.toLowerCase(Locale.US)))
                         out.write(getErrorPage("denied", ERR_REQUEST_DENIED));
                     else
                         out.write(getErrorPage("protocol", ERR_BAD_PROTOCOL));
@@ -1188,7 +1188,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             }
         }
       ****/
-        return protocol.equalsIgnoreCase("http://");
+        return protocol.toLowerCase(Locale.US).equals("http://");
     }
 
     private final static byte[] ERR_404 =

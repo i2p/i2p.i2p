@@ -16,6 +16,7 @@ import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.zip.GZIPInputStream;
+import java.util.Locale;
 import java.util.concurrent.RejectedExecutionException;
 
 import net.i2p.I2PAppContext;
@@ -177,23 +178,24 @@ class HTTPResponseOutputStream extends FilterOutputStream {
                             if (_log.shouldLog(Log.INFO))
                                 _log.info("Response header [" + key + "] = [" + val + "]");
                             
-                            if ("Connection".equalsIgnoreCase(key)) {
+                            String lcKey = key.toLowerCase(Locale.US);
+                            if ("connection".equals(lcKey)) {
                                 out.write("Connection: close\r\n".getBytes());
                                 connectionSent = true;
-                            } else if ("Proxy-Connection".equalsIgnoreCase(key)) {
+                            } else if ("proxy-connection".equals(lcKey)) {
                                 out.write("Proxy-Connection: close\r\n".getBytes());
                                 proxyConnectionSent = true;
-                            } else if ( ("Content-encoding".equalsIgnoreCase(key)) && ("x-i2p-gzip".equalsIgnoreCase(val)) ) {
+                            } else if ("content-encoding".equals(lcKey) && "x-i2p-gzip".equals(val.toLowerCase(Locale.US))) {
                                 _gzip = true;
-                            } else if ("Proxy-Authenticate".equalsIgnoreCase(key)) {
+                            } else if ("proxy-authenticate".equals(lcKey)) {
                                 // filter this hop-by-hop header; outproxy authentication must be configured in I2PTunnelHTTPClient
                             } else {
-                                if ("Content-Length".equalsIgnoreCase(key)) {
+                                if ("content-length".equals(lcKey)) {
                                     // save for compress decision on server side
                                     try {
                                         _dataExpected = Long.parseLong(val);
                                     } catch (NumberFormatException nfe) {}
-                                } else if ("Content-Type".equalsIgnoreCase(key)) {
+                                } else if ("content-type".equals(lcKey)) {
                                     // save for compress decision on server side
                                     _contentType = val;
                                 }

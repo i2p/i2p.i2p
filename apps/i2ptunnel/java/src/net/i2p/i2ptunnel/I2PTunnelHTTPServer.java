@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.zip.GZIPOutputStream;
@@ -507,16 +508,17 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
                 else
                     value = "";
 
-                if ("Accept-encoding".equalsIgnoreCase(name))
+                if ("accept-encoding".equals(name.toLowerCase(Locale.US)))
                     name = "Accept-encoding";
-                else if ("X-Accept-encoding".equalsIgnoreCase(name))
+                else if ("x-accept-encoding".equals(name.toLowerCase(Locale.US)))
                     name = "X-Accept-encoding";
 
                 // For incoming, we remove certain headers to prevent spoofing.
                 // For outgoing, we remove certain headers to improve anonymity.
                 boolean skip = false;
+                String lcName = name.toLowerCase(Locale.US);
                 for (String skipHeader: skipHeaders) {
-                    if (skipHeader.equalsIgnoreCase(name)) {
+                    if (skipHeader.toLowerCase(Locale.US).equals(lcName)) {
                         skip = true;
                         break;
                     }

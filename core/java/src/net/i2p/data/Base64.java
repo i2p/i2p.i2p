@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Locale;
 
 import net.i2p.util.Log;
 
@@ -178,7 +179,8 @@ public class Base64 {
     }
 
     private static void runApp(String args[]) {
-        if ("encodestring".equalsIgnoreCase(args[0])) {
+        String cmd = args[0].toLowerCase(Locale.US);
+        if ("encodestring".equals(cmd)) {
             System.out.println(encode(args[1].getBytes()));
             return;
         }
@@ -191,11 +193,11 @@ public class Base64 {
             if (args.length >= 2) {
                 in = new FileInputStream(args[1]);
             }
-            if ("encode".equalsIgnoreCase(args[0])) {
+            if ("encode".equals(cmd)) {
                 encode(in, out);
                 return;
             }
-            if ("decode".equalsIgnoreCase(args[0])) {
+            if ("decode".equals(cmd)) {
                 decode(in, out);
                 return;
             }

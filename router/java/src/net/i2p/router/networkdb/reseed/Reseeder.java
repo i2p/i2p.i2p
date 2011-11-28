@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -202,7 +203,7 @@ public class Reseeder {
             // We do this more than once, because
             // the first SSL handshake may take a while, and it may take the server
             // a while to render the index page.
-            if (_gotDate < MAX_DATE_SETS && "date".equalsIgnoreCase(key) && _attemptStarted > 0) {
+            if (_gotDate < MAX_DATE_SETS && "date".equals(key.toLowerCase(Locale.US)) && _attemptStarted > 0) {
                 long timeRcvd = System.currentTimeMillis();
                 long serverTime = RFC822Date.parse822Date(val);
                 if (serverTime > 0) {

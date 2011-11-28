@@ -344,7 +344,7 @@ public class ConfigNetHandler extends FormHandler {
 
         if (_sharePct != null) {
             String old = _context.router().getConfigSetting(Router.PROP_BANDWIDTH_SHARE_PERCENTAGE);
-            if ( (old == null) || (!old.equalsIgnoreCase(_sharePct)) ) {
+            if ( (old == null) || (!old.equals(_sharePct)) ) {
                 _context.router().setConfigSetting(Router.PROP_BANDWIDTH_SHARE_PERCENTAGE, _sharePct);
                 addFormNotice(_("Updating bandwidth share percentage"));
                 updated = true;

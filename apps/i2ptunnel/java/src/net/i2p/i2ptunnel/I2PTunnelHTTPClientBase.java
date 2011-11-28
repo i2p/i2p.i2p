@@ -10,6 +10,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.io.File;
 import java.util.List;
+import java.util.Locale;
 
 import net.i2p.I2PAppContext;
 import net.i2p.client.streaming.I2PSocketManager;
@@ -101,7 +102,8 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         // Ref: RFC 2617
         // If the socket is an InternalSocket, no auth required.
         String authRequired = getTunnel().getClientOptions().getProperty(PROP_AUTH);
-        if (Boolean.valueOf(authRequired).booleanValue() || "basic".equalsIgnoreCase(authRequired)) {
+        if (Boolean.valueOf(authRequired).booleanValue() ||
+            (authRequired != null && "basic".equals(authRequired.toLowerCase(Locale.US)))) {
             if (s instanceof InternalSocket) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info(getPrefix(requestId) + "Internal access, no auth required");
