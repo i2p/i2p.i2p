@@ -1,3 +1,9 @@
+2011-11-28 zzz
+  * Specify locale in all toLowerCase() and toUpperCase() calls to
+    avoid the "Turkish four i problem";
+    replace most equalsIgnoreCase() calls too.
+  * Update: Files listed in deletelist.txt will be deleted
+
 2011-11-28 kytv
   * IRCClient: Add IRCop commands (and other safe commands) to the whitelist
 
