@@ -236,7 +236,7 @@ public class TunnelPoolSettings {
     
     private static final boolean getBoolean(String str, boolean defaultValue) { 
         if (str == null) return defaultValue;
-        boolean v = "TRUE".equalsIgnoreCase(str) || "YES".equalsIgnoreCase(str);
+        boolean v = Boolean.valueOf(str).booleanValue() || "YES".equalsIgnoreCase(str);
         return v;
     }
 

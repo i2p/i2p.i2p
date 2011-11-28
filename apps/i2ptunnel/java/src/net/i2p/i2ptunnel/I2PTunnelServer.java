@@ -177,7 +177,7 @@ public class I2PTunnelServer extends I2PTunnelTask implements Runnable {
         if (_usePool) {
             String usePool = getTunnel().getClientOptions().getProperty(PROP_USE_POOL);
             if (usePool != null)
-                _usePool = "true".equalsIgnoreCase(usePool);
+                _usePool = Boolean.valueOf(usePool).booleanValue();
             else
                 _usePool = DEFAULT_USE_POOL;
         }

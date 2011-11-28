@@ -266,7 +266,7 @@ public class IndexBean {
         }
         // Only modify other shared tunnels
         // if the current tunnel is shared, and of supported type
-        if ("true".equalsIgnoreCase(cur.getSharedClient()) && isClient(cur.getType())) {
+        if (Boolean.valueOf(cur.getSharedClient()).booleanValue() && isClient(cur.getType())) {
             // all clients use the same I2CP session, and as such, use the same I2CP options
             List controllers = _group.getControllers();
 
@@ -278,7 +278,7 @@ public class IndexBean {
 
                 // Only modify this non-current tunnel
                 // if it belongs to a shared destination, and is of supported type
-                if ("true".equalsIgnoreCase(c.getSharedClient()) && isClient(c.getType())) {
+                if (Boolean.valueOf(c.getSharedClient()).booleanValue() && isClient(c.getType())) {
                     Properties cOpt = c.getConfig("");
                     if (_tunnelQuantity != null) {
                         cOpt.setProperty("option.inbound.quantity", _tunnelQuantity);

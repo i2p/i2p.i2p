@@ -1116,7 +1116,7 @@ public class Router implements RouterClock.ClockShiftListener {
         _log.log(Log.CRIT, "Shutdown(" + exitCode + ") complete"  /* , new Exception("Shutdown") */ );
         try { _context.logManager().shutdown(); } catch (Throwable t) { }
         if (ALLOW_DYNAMIC_KEYS) {
-            if (Boolean.valueOf(_context.getProperty(PROP_DYNAMIC_KEYS)).booleanValue())
+            if (_context.getBooleanProperty(PROP_DYNAMIC_KEYS))
                 killKeys();
         }
 

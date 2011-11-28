@@ -738,7 +738,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             String proxy = "";
             boolean isShared = true;
             if (args.length > 1) {
-                if ("true".equalsIgnoreCase(args[1].trim())) {
+                if (Boolean.valueOf(args[1].trim()).booleanValue()) {
                     isShared = true;
                     if (args.length == 3)
                         proxy = args[2];
@@ -807,7 +807,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             String proxy = "";
             boolean isShared = true;
             if (args.length > 1) {
-                if ("true".equalsIgnoreCase(args[1].trim())) {
+                if (Boolean.valueOf(args[1].trim()).booleanValue()) {
                     isShared = true;
                     if (args.length == 3)
                         proxy = args[2];
@@ -878,7 +878,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
             
             boolean isShared = true;
             if (args.length > 2) {
-                if ("true".equalsIgnoreCase(args[2].trim())) {
+                if (Boolean.valueOf(args[2].trim()).booleanValue()) {
                     isShared = true;
                 } else if ("false".equalsIgnoreCase(args[2].trim())) {
                     _log.warn("args[2] == [" + args[2] + "] and rejected explicitly");
@@ -945,7 +945,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
 
             boolean isShared = false;
             if (args.length > 1)
-                isShared = "true".equalsIgnoreCase(args[1].trim());
+                isShared = Boolean.valueOf(args[1].trim()).booleanValue();
 
             ownDest = !isShared;
             try {
@@ -989,7 +989,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
 
             boolean isShared = false;
             if (args.length == 2)
-                isShared = "true".equalsIgnoreCase(args[1].trim());
+                isShared = Boolean.valueOf(args[1].trim()).booleanValue();
 
             ownDest = !isShared;
             String privateKeyFile = null;

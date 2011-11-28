@@ -101,7 +101,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         // Ref: RFC 2617
         // If the socket is an InternalSocket, no auth required.
         String authRequired = getTunnel().getClientOptions().getProperty(PROP_AUTH);
-        if (authRequired != null && (authRequired.equalsIgnoreCase("true") || authRequired.equalsIgnoreCase("basic"))) {
+        if (Boolean.valueOf(authRequired).booleanValue() || "basic".equalsIgnoreCase(authRequired)) {
             if (s instanceof InternalSocket) {
                 if (_log.shouldLog(Log.INFO))
                     _log.info(getPrefix(requestId) + "Internal access, no auth required");

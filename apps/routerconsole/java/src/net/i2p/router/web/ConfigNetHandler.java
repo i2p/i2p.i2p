@@ -169,7 +169,7 @@ public class ConfigNetHandler extends FormHandler {
             String oldNPort = _context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_PORT, "");
             String oldAutoHost = _context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_IP, "true");
             String sAutoPort = _context.getProperty(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_PORT, "true");
-            boolean oldAutoPort = "true".equalsIgnoreCase(sAutoPort);
+            boolean oldAutoPort = Boolean.valueOf(sAutoPort).booleanValue();
             if (_ntcpHostname == null) _ntcpHostname = "";
             if (_ntcpPort == null) _ntcpPort = "";
             if (_ntcpAutoIP == null) _ntcpAutoIP = "true";

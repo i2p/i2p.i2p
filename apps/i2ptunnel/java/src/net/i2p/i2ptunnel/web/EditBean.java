@@ -114,7 +114,7 @@ public class EditBean extends IndexBean {
     public boolean isSharedClient(int tunnel) {
         TunnelController tun = getController(tunnel);
         if (tun != null)
-            return "true".equalsIgnoreCase(tun.getSharedClient());
+            return Boolean.valueOf(tun.getSharedClient()).booleanValue();
         else
             return false;
     }

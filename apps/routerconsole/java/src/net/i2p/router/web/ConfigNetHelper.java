@@ -68,8 +68,8 @@ public class ConfigNetHelper extends HelperBase {
     }
 
     public String getEnableTimeSyncChecked() {
-        String disabled = _context.getProperty(Timestamper.PROP_DISABLED, "false");
-        if ( (disabled != null) && ("true".equalsIgnoreCase(disabled)) )
+        boolean disabled = _context.getBooleanProperty(Timestamper.PROP_DISABLED);
+        if (disabled)
             return "";
         else
             return CHECKED;
@@ -77,7 +77,7 @@ public class ConfigNetHelper extends HelperBase {
     
     /** @param prop must default to false */
     public String getChecked(String prop) {
-        if (Boolean.valueOf(_context.getProperty(prop)).booleanValue())
+        if (_context.getBooleanProperty(prop))
             return CHECKED;
         return "";
     }
@@ -130,7 +130,7 @@ public class ConfigNetHelper extends HelperBase {
 
     /** default true */
     public String getUpnpChecked() {
-        if (Boolean.valueOf(_context.getProperty(TransportManager.PROP_ENABLE_UPNP, "true")).booleanValue())
+        if (_context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UPNP))
             return CHECKED;
         return "";
     }

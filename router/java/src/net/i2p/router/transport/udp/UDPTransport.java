@@ -584,7 +584,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 // For now, only do this at startup
                 if (oldIP != null &&
                     System.getProperty("wrapper.version") != null &&
-                    Boolean.valueOf(_context.getProperty(PROP_LAPTOP_MODE)).booleanValue() &&
+                    _context.getBooleanProperty(PROP_LAPTOP_MODE) &&
                     now - lastChanged > 10*60*1000 &&
                     _context.router().getUptime() < 10*60*1000) {
                     _log.log(Log.CRIT, "IP changed, restarting with a new identity and port");
@@ -613,7 +613,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (addr.length < 4) return false;
         if (isPubliclyRoutable(addr)) 
             return true;
-        return Boolean.valueOf(_context.getProperty("i2np.udp.allowLocal")).booleanValue();
+        return _context.getBooleanProperty("i2np.udp.allowLocal");
     }
     
     private boolean getIsPortFixed() {
@@ -1364,7 +1364,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                 if ( (old.getPort() != newAddr.getPort()) || (!oldHost.equals(newHost)) ) {
                     // substantial data has changed, so if we are in 'dynamic keys' mode, restart the 
                     // router hard and regenerate a new identity
-                    if ("true".equalsIgnoreCase(_context.getProperty(Router.PROP_DYNAMIC_KEYS, "false"))) {
+                    if (_context.getBooleanProperty(Router.PROP_DYNAMIC_KEYS)) {
                         if (_log.shouldLog(Log.ERROR))
                             _log.error("SSU address updated. new address: " 
                                        + newAddr.getHostAddress() + ":" + newAddr.getPort() + ", old address: " 

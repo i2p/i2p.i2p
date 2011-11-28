@@ -482,7 +482,7 @@ public class TunnelController implements Logging {
     /** default true */
     public String getSharedClient() { return _config.getProperty("sharedClient", "true"); }
     /** default true */
-    public boolean getStartOnLoad() { return "true".equalsIgnoreCase(_config.getProperty("startOnLoad", "true")); }
+    public boolean getStartOnLoad() { return Boolean.valueOf(_config.getProperty("startOnLoad", "true")).booleanValue(); }
     public boolean getPersistentClientKey() { return Boolean.valueOf(_config.getProperty("option.persistentClientKey")).booleanValue(); }
     public String getMyDestination() {
         if (_tunnel != null) {
