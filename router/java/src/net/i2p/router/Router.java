@@ -8,8 +8,11 @@ package net.i2p.router;
  *
  */
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.Writer;
 import java.text.DecimalFormat;
@@ -1371,6 +1374,7 @@ public class Router implements RouterClock.ClockShiftListener {
     }
     
     public static final String UPDATE_FILE = "i2pupdate.zip";
+    private static final String DELETE_FILE = "deletelist.txt";
     
     /**
      * Unzip update file found in the router dir OR base dir, to the base dir
@@ -1411,6 +1415,7 @@ public class Router implements RouterClock.ClockShiftListener {
             // and we will die with NCDFE.
             // Ideally, do not use I2P classes at all, new or not.
             try {
+                // TODO move deleteListedFiles() here after a few releases
                 if (ok)
                     System.out.println("INFO: Update installed");
                 else
@@ -1444,13 +1449,23 @@ public class Router implements RouterClock.ClockShiftListener {
             }
             System.exit(EXIT_HARD_RESTART);
         } else {
-            // Remove extracted libjbigi.so and libjcpuid.so files if we have a newer jbigi.jar,
-            // so the new ones will be extracted.
-            // We do this after the restart, not after the extract, because it's safer, and
-            // because people may upgrade their jbigi.jar file manually.
+            deleteJbigiFiles();
+            // Here so it may be used in the 0.8.12 update
+            // TODO move up in a few releases so it is only run after an update
+            deleteListedFiles();
+        }
+    }
 
-            // Copied from NativeBigInteger, which we can't access here or the
-            // libs will get loaded.
+    /**
+     *  Remove extracted libjbigi.so and libjcpuid.so files if we have a newer jbigi.jar,
+     *  so the new ones will be extracted.
+     *  We do this after the restart, not after the extract, because it's safer, and
+     *  because people may upgrade their jbigi.jar file manually.
+     *
+     *  Copied from NativeBigInteger, which we can't access here or the
+     *  libs will get loaded.
+     */
+    private void deleteJbigiFiles() {
             String osArch = System.getProperty("os.arch");
             boolean isX86 = osArch.contains("86") || osArch.equals("amd64");
             String osName = System.getProperty("os.name").toLowerCase();
@@ -1494,9 +1509,50 @@ public class Router implements RouterClock.ClockShiftListener {
                     }
                 }
             }
-        }
     }
     
+    /**
+     *  Delete all files listed in the delete file.
+     *  Format: One file name per line, comment lines start with '#'.
+     *  All file names must be relative to $I2P, absolute file names not allowed.
+     *  We probably can't remove old jars this way.
+     *  Fails silently.
+     *  Use no new I2P classes here so it may be called after zip extraction.
+     *  @since 0.8.12
+     */
+    private void deleteListedFiles() {
+        File deleteFile = new File(_context.getBaseDir(), DELETE_FILE);
+        if (!deleteFile.exists())
+            return;
+        // this is similar to FileUtil.readTextFile() but we can't use any I2P classes here
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(deleteFile);
+            BufferedReader in = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
+            String line;
+            while ( (line = in.readLine()) != null) {
+                String fl = line.trim();
+                if (fl.startsWith("..") || fl.startsWith("#") || fl.length() == 0)
+                    continue;
+                File df = new File(fl);
+                if (df.isAbsolute())
+                    continue;
+                df = new File(_context.getBaseDir(), fl);
+                if (df.exists() && !df.isDirectory()) {
+                    if (df.delete())
+                        System.out.println("INFO: File [" + fl + "] deleted");
+                }
+            }
+            fis.close();
+            fis = null;
+            if (deleteFile.delete())
+                System.out.println("INFO: File [" + DELETE_FILE + "] deleted");
+        } catch (IOException ioe) {
+        } finally {
+            if (fis != null) try { fis.close(); } catch (IOException ioe) {}
+        }
+    }
+
 /*******
     private static void verifyWrapperConfig() {
         File cfgUpdated = new File("wrapper.config.updated");

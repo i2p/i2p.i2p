@@ -664,8 +664,9 @@
     
     <target name="preppkg-base" depends="build, preplicenses, prepConsoleDocs, prepthemeupdates, prepCertificates">
         <!-- if updater200 was run previously, it left *.pack files in pkg-temp -->
+        <!-- Also remove deletelist.txt used for updater only -->
         <delete>
-            <fileset dir="pkg-temp" includes="**/*.jar.pack **/*.war.pack" />
+            <fileset dir="pkg-temp" includes="**/*.jar.pack **/*.war.pack deletelist.txt" />
         </delete>
         <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
@@ -889,6 +890,7 @@
         <exec executable="echo" osfamily="unix" failifexecutionfails="true" output="pkg-temp/history.txt" append="true">
             <arg value="EARLIER HISTORY IS AVAILABLE IN THE SOURCE PACKAGE" />
         </exec>
+        <copy file="installer/resources/deletelist.txt" todir="pkg-temp/" />
       <!-- May be pointless now, people with split directories will never see this,
            and for flat installs we don't want to overwrite news more recent than the update package.
         <copy file="installer/resources/news.xml" todir="pkg-temp/docs/" />
