@@ -1,3 +1,6 @@
+2011-11-28 kytv
+  * IRCClient: Add IRCop commands (and other safe commands) to the whitelist
+
 2011-11-27 zzz
   * IRCClient: Outbound whitelist optimization
   * Reseed:

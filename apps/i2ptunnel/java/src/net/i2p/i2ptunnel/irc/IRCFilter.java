@@ -102,7 +102,7 @@ abstract class IRCFilter {
         {
             String msg;
             msg = field[idx++];
-        
+
             if(msg.indexOf(0x01) >= 0) // CTCP marker ^A can be anywhere, not just immediately after the ':'
             {
                 // CTCP
@@ -139,52 +139,94 @@ abstract class IRCFilter {
             }
             return s;
         }
-        
+
         // Block the rest
         return null;
     }
-    
+
     private static final Set<String> _allowedOutbound;
     static {
         final String[] allowedCommands =
         {
-                // "NOTICE", // can contain CTCP
-                "MODE",
+                // Commands that regular users might use
+                "ADMIN",
+                "AWAY",    // should be harmless
+                "CYCLE",
+                "DCCALLOW",
+                "HELPME", "HELPOP",  // helpop is what unrealircd uses by default
+                "INVITE",
+                "ISON",    // jIRCii uses this for a ping (response is 303)
                 "JOIN",
+                "KICK",
+                "KNOCK",
+                "LIST",
+                "LUSERS",
+                "MAP", // seems safe enough, the ircd should protect themselves though
+                "MODE",
+                "MOTD",
+                "NAMES",
                 "NICK",
+                // "NOTICE", // can contain CTCP
+                "OPER",
+                // "PART", // replace with filtered PART to hide client part messages
+                "PASS",
+                // "PING",
+                // "PONG", // replaced with a filtered PING/PONG since some clients send the server IP (thanks aardvax!)
+                // "QUIT", // replace with a filtered QUIT to hide client quit messages
+                "RULES",
+                "SETNAME",
+                "SILENCE",
+                "STATS",
+                "TOPIC",
+                "USERHOST",
+                "VHOST",
+                "WATCH",
                 "WHO",
                 "WHOIS",
-                "LIST",
-                "NAMES",
-                "ADMIN",
-                "MOTD",
-                "PASS",
-                // "QUIT", // replace with a filtered QUIT to hide client quit messages
-                "SILENCE",
-                "MAP", // seems safe enough, the ircd should protect themselves though
-                // "PART", // replace with filtered PART to hide client part messages
-                "OPER",
-                // "PONG", // replaced with a filtered PING/PONG since some clients send the server IP (thanks aardvax!)
-                // "PING",
-                "NICKSERV", "NS", // the next few are default aliases on unreal (+ anope)
+                "WHOWAS",
+                // the next few are default aliases on unreal (+ anope)
+                "BOTSERV", "BS",
                 "CHANSERV", "CS",
-                "MEMOSERV", "MS",
-                "OPERSERV", "OS",
                 "HELPSERV",
                 "HOSTSERV", "HS",
-                "BOTSERV", "BS",
+                "MEMOSERV", "MS",
+                "NICKSERV", "NS",
+                "OPERSERV", "OS",
                 "STATSERV",
-                "KICK",
-                "HELPME", "HELPOP",  // helpop is what unrealircd uses by default
                 // IRCop commands
-                "ADCHAT", "ADDMOTD", "ADDOMOTD", "CHATOPS", "CHGHOST", "CHGIDENT", "CHGNAME", "DCCDENY", "DIE",
-                "GLOBOPS", "GZLINE", "KILL", "KLINE", "LOCOPS", "NACHAT", "OPERMOTD", "REHASH", "RESTART", "SAJOIN",
-                "SAMODE", "SAPART", "SDESC", "SETHOST", "SETIDENT", "SHUN", "SPAMFILTER", "TEMPSHUN", "UNDCCDENY",
-                "RULES",
-                "TOPIC",
-                "ISON",    // jIRCii uses this for a ping (response is 303)
-                "INVITE",
-                "AWAY",    // should be harmless
+                "ADCHAT",
+                "ADDMOTD",
+                "ADDOMOTD",
+                "CHATOPS",
+                "CHGHOST",
+                "CHGIDENT",
+                "CHGNAME",
+                "CLOSE",
+                "DCCDENY",
+                "DIE",
+                "GLOBOPS",
+                "GZLINE",
+                "HTM", // "High Traffic Mode"
+                "KILL",
+                "KLINE",
+                "LOCOPS",
+                "NACHAT",
+                "OPERMOTD",
+                "REHASH",
+                "RESTART",
+                "SAJOIN",
+                "SAMODE",
+                "SAPART",
+                "SDESC",
+                "SETHOST",
+                "SETIDENT",
+                "SHUN",
+                "SPAMFILTER",
+                "SQUIT",
+                "TEMPSHUN",
+                "UNDCCDENY",
+                "WALLOPS",
+                "ZLINE",
                 // http://tools.ietf.org/html/draft-mitchell-irc-capabilities-01
                 "CAP"
         };
