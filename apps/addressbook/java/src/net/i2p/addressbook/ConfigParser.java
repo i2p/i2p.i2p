@@ -32,6 +32,7 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import net.i2p.util.SecureFile;
@@ -92,7 +93,7 @@ class ConfigParser {
             inputLine = ConfigParser.stripComments(inputLine);
             String[] splitLine = inputLine.split("=");
             if (splitLine.length == 2) {
-                result.put(splitLine[0].trim().toLowerCase(), splitLine[1].trim());
+                result.put(splitLine[0].trim().toLowerCase(Locale.US), splitLine[1].trim());
             }
             inputLine = input.readLine();
         }

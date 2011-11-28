@@ -9,6 +9,8 @@ package net.i2p.util;
  *
  */
 
+import java.util.Locale;
+
 import net.i2p.I2PAppContext;
 
 /**
@@ -44,7 +46,7 @@ public class Log {
 
     public static int getLevel(String level) {
         if (level == null) return Log.CRIT;
-        level = level.toUpperCase();
+        level = level.toUpperCase(Locale.US);
         if (STR_DEBUG.startsWith(level)) return DEBUG;
         if (STR_INFO.startsWith(level)) return INFO;
         if (STR_WARN.startsWith(level)) return WARN;

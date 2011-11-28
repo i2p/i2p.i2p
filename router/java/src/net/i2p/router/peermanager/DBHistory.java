@@ -2,6 +2,7 @@ package net.i2p.router.peermanager;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Locale;
 import java.util.Properties;
 
 import net.i2p.router.RouterContext;
@@ -233,7 +234,7 @@ public class DBHistory {
     }
     
     private static void add(StringBuilder buf, String name, long val, String description) {
-        buf.append("# ").append(name.toUpperCase()).append(NL).append("# ").append(description).append(NL);
+        buf.append("# ").append(name.toUpperCase(Locale.US)).append(NL).append("# ").append(description).append(NL);
         buf.append("dbHistory.").append(name).append('=').append(val).append(NL).append(NL);
     }
     

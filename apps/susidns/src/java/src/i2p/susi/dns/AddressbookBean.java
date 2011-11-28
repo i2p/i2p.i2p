@@ -33,6 +33,7 @@ import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Locale;
 import java.util.Properties;
 
 import net.i2p.data.DataFormatException;
@@ -191,7 +192,7 @@ public class AddressbookBean
 						if( first < '0' || first > '9' )
 							continue;
 					}
-					else if( ! name.toLowerCase().startsWith( filter.toLowerCase() ) ) {
+					else if( ! name.toLowerCase(Locale.US).startsWith( filter.toLowerCase(Locale.US) ) ) {
 						continue;
 					}
 				}

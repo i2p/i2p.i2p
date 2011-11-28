@@ -10,6 +10,7 @@ package net.i2p.client.naming;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -62,22 +63,22 @@ public class HostsTxtNamingService extends MetaNamingService {
         // If it's long, assume it's a key.
         if (hostname.length() >= DEST_SIZE)
             return lookupBase64(hostname);
-        return super.lookup(hostname.toLowerCase(), lookupOptions, storedOptions);
+        return super.lookup(hostname.toLowerCase(Locale.US), lookupOptions, storedOptions);
     }
 
     @Override
     public boolean put(String hostname, Destination d, Properties options) {
-        return super.put(hostname.toLowerCase(), d, options);
+        return super.put(hostname.toLowerCase(Locale.US), d, options);
     }
 
     @Override
     public boolean putIfAbsent(String hostname, Destination d, Properties options) {
-        return super.putIfAbsent(hostname.toLowerCase(), d, options);
+        return super.putIfAbsent(hostname.toLowerCase(Locale.US), d, options);
     }
 
     @Override
     public boolean remove(String hostname, Properties options) {
-        return super.remove(hostname.toLowerCase(), options);
+        return super.remove(hostname.toLowerCase(Locale.US), options);
     }
 
     /**

@@ -19,6 +19,7 @@
 package org.cybergarage.http;
 
 import java.io.*;
+import java.util.Locale;
 
 import org.cybergarage.util.*;
 
@@ -85,7 +86,7 @@ public class HTTPHeader
 	
 	public final static String getValue(LineNumberReader reader, String name)
 	{
-		String bigName = name.toUpperCase();
+		String bigName = name.toUpperCase(Locale.US);
 		try {
 			String lineStr = reader.readLine();
 			while (lineStr != null && 0 < lineStr.length()) {
@@ -94,7 +95,7 @@ public class HTTPHeader
 					 lineStr = reader.readLine();
 					continue;
 				}
-				String bigLineHeaderName = header.getName().toUpperCase();
+				String bigLineHeaderName = header.getName().toUpperCase(Locale.US);
 				// Thanks for Jan Newmarch <jan.newmarch@infotech.monash.edu.au> (05/26/04)
 				if (bigLineHeaderName.equals(bigName) == false) {
 					 lineStr = reader.readLine();

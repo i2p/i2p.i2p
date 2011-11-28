@@ -13,6 +13,7 @@ import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Locale;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -129,7 +130,7 @@ class I2CPSSLSocketFactory {
                     if (!f.isFile())
                         continue;
                     // use file name as alias
-                    String alias = f.getName().toLowerCase();
+                    String alias = f.getName().toLowerCase(Locale.US);
                     boolean success = addCert(f, alias, ks);
                     if (success)
                         added++;

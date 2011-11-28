@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Locale;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.FileUtil;
@@ -51,12 +52,12 @@ public class CPUID {
                                          System.getProperty("os.arch").equals("amd64");
     private static final String libPrefix = (System.getProperty("os.name").startsWith("Win") ? "" : "lib");
     private static final String libSuffix = (System.getProperty("os.name").startsWith("Win") ? ".dll" : ".so");
-    private static final boolean isWindows = System.getProperty("os.name").toLowerCase().contains("windows");
-    private static final boolean isLinux = System.getProperty("os.name").toLowerCase().contains("linux");
-    private static final boolean isFreebsd = System.getProperty("os.name").toLowerCase().contains("freebsd");
-    private static final boolean isNetbsd = System.getProperty("os.name").toLowerCase().contains("netbsd");
-    private static final boolean isOpenbsd = System.getProperty("os.name").toLowerCase().contains("openbsd");
-    private static final boolean isSunos = System.getProperty("os.name").toLowerCase().contains("sunos");
+    private static final boolean isWindows = System.getProperty("os.name").toLowerCase(Locale.US).contains("windows");
+    private static final boolean isLinux = System.getProperty("os.name").toLowerCase(Locale.US).contains("linux");
+    private static final boolean isFreebsd = System.getProperty("os.name").toLowerCase(Locale.US).contains("freebsd");
+    private static final boolean isNetbsd = System.getProperty("os.name").toLowerCase(Locale.US).contains("netbsd");
+    private static final boolean isOpenbsd = System.getProperty("os.name").toLowerCase(Locale.US).contains("openbsd");
+    private static final boolean isSunos = System.getProperty("os.name").toLowerCase(Locale.US).contains("sunos");
     private static final boolean isMac = System.getProperty("os.name").startsWith("Mac");
 
 

@@ -14,6 +14,7 @@ import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -727,10 +728,10 @@ public class I2PSnarkServlet extends Default {
                 l = l.substring(skip.length());
             if (r.startsWith(skip))
                 r = r.substring(skip.length());
-            String llc = l.toLowerCase();
+            String llc = l.toLowerCase(Locale.US);
             if (llc.startsWith("the ") || llc.startsWith("the.") || llc.startsWith("the_"))
                 l = l.substring(4);
-            String rlc = r.toLowerCase();
+            String rlc = r.toLowerCase(Locale.US);
             if (rlc.startsWith("the ") || rlc.startsWith("the.") || rlc.startsWith("the_"))
                 r = r.substring(4);
             return collator.compare(l, r);
@@ -1836,7 +1837,7 @@ public class I2PSnarkServlet extends Default {
             if (complete) {
                 buf.append("<a href=\"").append(path).append("\">");
                 // thumbnail ?
-                String plc = item.toString().toLowerCase();
+                String plc = item.toString().toLowerCase(Locale.US);
                 if (plc.endsWith(".jpg") || plc.endsWith(".jpeg") || plc.endsWith(".png") ||
                     plc.endsWith(".gif") || plc.endsWith(".ico")) {
                     buf.append("<img alt=\"\" border=\"0\" class=\"thumb\" src=\"")
@@ -1916,7 +1917,7 @@ public class I2PSnarkServlet extends Default {
         // instead of this mishmash. We can't get to HttpContext.setMimeMapping()
         // from here? We could do it from a web.xml perhaps.
         // Or could we put our own org/mortbay/http/mime.properties file in the war?
-        String plc = path.toLowerCase();
+        String plc = path.toLowerCase(Locale.US);
         String mime = getServletContext().getMimeType(path);
         if (mime == null)
             mime = "";

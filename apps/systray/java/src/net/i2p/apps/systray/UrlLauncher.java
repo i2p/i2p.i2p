@@ -19,6 +19,7 @@ import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.URL;
+import java.util.Locale;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.ShellCommand;
@@ -105,8 +106,8 @@ public class UrlLauncher {
 
         waitForServer(url);
         if (validateUrlFormat(url)) {
-            if (osName.toLowerCase().indexOf("mac") > -1) {
-                if (osName.toLowerCase().startsWith("mac os x")) {
+            if (osName.toLowerCase(Locale.US).indexOf("mac") > -1) {
+                if (osName.toLowerCase(Locale.US).startsWith("mac os x")) {
 
                     if (_shellCommand.executeSilentAndWaitTimed("safari " + url, 5))
                         return true;
@@ -131,7 +132,7 @@ public class UrlLauncher {
                     for (String line; (line = bufferedReader.readLine()) != null; ) {
                         if (line.startsWith("@=")) {
                             // we should really use the whole line and replace %1 with the url
-                            browserString = line.substring(3, line.toLowerCase().indexOf(".exe") + 4);
+                            browserString = line.substring(3, line.toLowerCase(Locale.US).indexOf(".exe") + 4);
                             if (browserString.startsWith("\\\""))
                                 browserString = browserString.substring(2);
                             browserString = "\"" + browserString + "\"";

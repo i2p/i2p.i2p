@@ -30,6 +30,7 @@ import java.io.OutputStream;
 import java.net.ConnectException;
 import java.net.NoRouteToHostException;
 import java.net.Socket;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
@@ -144,7 +145,7 @@ public class TCPtoI2P implements Runnable {
 				in = sock.getInputStream();
 				out = sock.getOutputStream();
 				line = lnRead(in);
-				input = line.toLowerCase();
+				input = line.toLowerCase(Locale.US);
 				Destination dest = null;
 				if (input.endsWith(".i2p")) {
 					//dest = I2PTunnel.destFromName(input);

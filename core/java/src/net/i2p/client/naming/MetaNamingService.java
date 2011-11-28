@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -101,7 +102,7 @@ public class MetaNamingService extends DummyNamingService {
         if (d != null)
             return d;
         // Base32 failed?
-        if (hostname.length() == BASE32_HASH_LENGTH + 8 && hostname.toLowerCase().endsWith(".b32.i2p"))
+        if (hostname.length() == BASE32_HASH_LENGTH + 8 && hostname.toLowerCase(Locale.US).endsWith(".b32.i2p"))
             return null;
 
         for (NamingService ns : _services) { 

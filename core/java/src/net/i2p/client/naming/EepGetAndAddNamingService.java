@@ -7,6 +7,7 @@ package net.i2p.client.naming;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Locale;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.Destination;
@@ -46,7 +47,7 @@ public class EepGetAndAddNamingService extends EepGetNamingService {
     public Destination lookup(String hostname) {
         Destination rv = super.lookup(hostname);
         if (rv != null) {
-            hostname = hostname.toLowerCase();
+            hostname = hostname.toLowerCase(Locale.US);
             // If it's long, assume it's a key.
             if (hostname.length() < 516 && hostname.endsWith(".i2p") && ! hostname.endsWith(".b32.i2p")) {
                 File f = new File(_context.getRouterDir(), DEFAULT_HOSTS_FILE);

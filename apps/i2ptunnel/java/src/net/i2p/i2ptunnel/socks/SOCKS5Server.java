@@ -16,6 +16,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
@@ -355,7 +356,7 @@ public class SOCKS5Server extends SOCKSServer {
         I2PSocket destSock;
 
         try {
-            if (connHostName.toLowerCase().endsWith(".i2p")) {
+            if (connHostName.toLowerCase(Locale.US).endsWith(".i2p")) {
                 _log.debug("connecting to " + connHostName + "...");
                 // Let's not due a new Dest for every request, huh?
                 //I2PSocketManager sm = I2PSocketManagerFactory.createManager();

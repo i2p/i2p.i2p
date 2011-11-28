@@ -36,6 +36,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
@@ -371,7 +372,7 @@ public class DataHelper {
                 //val = val.replaceAll("\\\\n","\n");
                 if ( (key.length() > 0) && (val.length() > 0) )
                     if (forceLowerCase)
-                        props.setProperty(key.toLowerCase(), val);
+                        props.setProperty(key.toLowerCase(Locale.US), val);
                     else
                         props.setProperty(key, val);
             }

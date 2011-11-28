@@ -58,6 +58,7 @@ import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
+import java.util.Locale;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLHandshakeException;
 import javax.net.ssl.SSLSocketFactory;
@@ -302,7 +303,7 @@ public class SSLEepGet extends EepGet {
                     // use file name as alias
                     // https://www.sslshopper.com/ssl-converter.html
                     // No idea if all these formats can actually be read by CertificateFactory
-                    String alias = f.getName().toLowerCase();
+                    String alias = f.getName().toLowerCase(Locale.US);
                     if (alias.endsWith(".crt") || alias.endsWith(".pem") || alias.endsWith(".key") ||
                         alias.endsWith(".der") || alias.endsWith(".key") || alias.endsWith(".p7b") ||
                         alias.endsWith(".p7c") || alias.endsWith(".pfx") || alias.endsWith(".p12"))

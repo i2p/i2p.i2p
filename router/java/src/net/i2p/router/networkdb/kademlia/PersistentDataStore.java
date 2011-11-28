@@ -14,6 +14,7 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -522,8 +523,8 @@ class PersistentDataStore extends TransientDataStore {
         public static final FilenameFilter getInstance() { return _instance; }
         public boolean accept(File dir, String name) {
             if (name == null) return false;
-            name = name.toUpperCase();
-            return (name.startsWith(ROUTERINFO_PREFIX.toUpperCase()) && name.endsWith(ROUTERINFO_SUFFIX.toUpperCase()));
+            name = name.toUpperCase(Locale.US);
+            return (name.startsWith(ROUTERINFO_PREFIX.toUpperCase(Locale.US)) && name.endsWith(ROUTERINFO_SUFFIX.toUpperCase(Locale.US)));
         }
     }
 }

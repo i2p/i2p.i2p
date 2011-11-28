@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -511,7 +512,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
             String countryName = getCountryName(c);
             if (countryName.length() > 2)
                 countryName = Translate.getString(countryName, _context, BUNDLE_NAME);
-            buf.append("<img height=\"11\" width=\"16\" alt=\"").append(c.toUpperCase()).append("\" title=\"");
+            buf.append("<img height=\"11\" width=\"16\" alt=\"").append(c.toUpperCase(Locale.US)).append("\" title=\"");
             buf.append(countryName);
             buf.append("\" src=\"/flags.jsp?c=").append(c).append("\"> ");
         }

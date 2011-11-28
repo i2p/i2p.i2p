@@ -336,7 +336,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 if (_log.shouldLog(Log.DEBUG))
                     _log.debug(getPrefix(requestId) + "Line=[" + line + "]");
 
-                String lowercaseLine = line.toLowerCase();
+                String lowercaseLine = line.toLowerCase(Locale.US);
                 if (lowercaseLine.startsWith("connection: ") ||
                     lowercaseLine.startsWith("keep-alive: ") ||
                     lowercaseLine.startsWith("proxy-connection: "))
@@ -365,7 +365,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         }
                         // "http://" + "foo.i2p/bar/baz.html" + " HTTP/1.0"
                         request = "http://" + uri + subRequest.substring(protopos);
-                    } else if (request.toLowerCase().startsWith("http://i2p/")) {
+                    } else if (request.toLowerCase(Locale.US).startsWith("http://i2p/")) {
                         // http://i2p/b64key/bar/baz.html HTTP/1.0
                         String subRequest = request.substring("http://i2p/".length());
                         int protopos = subRequest.indexOf(" ");
@@ -433,11 +433,11 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         destination = host;
                         host = getHostName(destination);
                         line = method + ' ' + request.substring(pos);
-                    } else if (host.toLowerCase().equals(LOCAL_SERVER)) {
+                    } else if (host.toLowerCase(Locale.US).equals(LOCAL_SERVER)) {
                         // so we don't do any naming service lookups
                         destination = host;
                         usingInternalServer = true;
-                    } else if (host.toLowerCase().endsWith(".i2p")) {
+                    } else if (host.toLowerCase(Locale.US).endsWith(".i2p")) {
                         // Destination gets the host name
                         destination = host;
                         // Host becomes the destination's "{b32}.b32.i2p" string, or "i2p" on lookup failure
@@ -498,7 +498,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                         if (host == null || "i2p".equals(host)) {
                                             // Host lookup failed - resolvable only with addresshelper
                                             // Store in local HashMap unless there is conflict
-                                            String old = addressHelpers.putIfAbsent(destination.toLowerCase(), ahelperKey);
+                                            String old = addressHelpers.putIfAbsent(destination.toLowerCase(Locale.US), ahelperKey);
                                             ahelperNew = old == null;
                                             if ((!ahelperNew) && !old.equals(ahelperKey)) {
                                                 // Conflict: handle when URL reconstruction done
@@ -570,7 +570,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         line = method + " " + request.substring(pos);
                         // end of (host endsWith(".i2p"))
 
-                    } else if (host.toLowerCase().equals("localhost") || host.equals("127.0.0.1") ||
+                    } else if (host.toLowerCase(Locale.US).equals("localhost") || host.equals("127.0.0.1") ||
                                host.startsWith("192.168.")) {
                         // if somebody is trying to get to 192.168.example.com, oh well
                         if (out != null) {
@@ -804,15 +804,15 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             // look it up again as the naming service does not do negative caching
             // so it will be slow.
             Destination clientDest = null;
-            String addressHelper = addressHelpers.get(destination.toLowerCase());
+            String addressHelper = addressHelpers.get(destination.toLowerCase(Locale.US));
             if (addressHelper != null) {
                 clientDest = _context.namingService().lookup(addressHelper);
                 // remove bad entries
                 if (clientDest == null)
-                    addressHelpers.remove(destination.toLowerCase());
+                    addressHelpers.remove(destination.toLowerCase(Locale.US));
             } else if ("i2p".equals(host)) {
                 clientDest = null;
-            } else if (destination.length() == 60 && destination.toLowerCase().endsWith(".b32.i2p")) {
+            } else if (destination.length() == 60 && destination.toLowerCase(Locale.US).endsWith(".b32.i2p")) {
                 // use existing session to look up for efficiency
                 verifySocketManager();
                 I2PSession sess = sockMgr.getSession();
@@ -841,7 +841,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     header = getErrorPage("dnfp", ERR_DESTINATION_UNKNOWN);
                 else if (ahelperPresent)
                     header = getErrorPage("dnfb", ERR_DESTINATION_UNKNOWN);
-                else if (destination.length() == 60 && destination.toLowerCase().endsWith(".b32.i2p"))
+                else if (destination.length() == 60 && destination.toLowerCase(Locale.US).endsWith(".b32.i2p"))
                     header = getErrorPage("dnf", ERR_DESTINATION_UNKNOWN);
                 else {
                     header = getErrorPage("dnfh", ERR_DESTINATION_UNKNOWN);
@@ -984,7 +984,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
      */
     private final String getHostName(String host) {
         if (host == null) return null;
-        if (host.length() == 60 && host.toLowerCase().endsWith(".b32.i2p"))
+        if (host.length() == 60 && host.toLowerCase(Locale.US).endsWith(".b32.i2p"))
             return host;
         Destination dest = _context.namingService().lookup(host);
         if (dest == null) return "i2p";

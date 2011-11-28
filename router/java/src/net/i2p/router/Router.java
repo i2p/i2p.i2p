@@ -23,6 +23,7 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -1468,7 +1469,7 @@ public class Router implements RouterClock.ClockShiftListener {
     private void deleteJbigiFiles() {
             String osArch = System.getProperty("os.arch");
             boolean isX86 = osArch.contains("86") || osArch.equals("amd64");
-            String osName = System.getProperty("os.name").toLowerCase();
+            String osName = System.getProperty("os.name").toLowerCase(Locale.US);
             boolean isWin = osName.startsWith("win");
             boolean isMac = osName.startsWith("mac");
             // only do this on these OSes

@@ -305,7 +305,7 @@ public class NetDbRenderer {
             buf.append("<tr><th align=\"left\">" + _("Country") + "</th><th>" + _("Count") + "</th></tr>\n");
             for (String country : countryList) {
                 int num = countries.count(country);
-                buf.append("<tr><td><img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase()).append("\"");
+                buf.append("<tr><td><img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase(Locale.US)).append("\"");
                 buf.append(" src=\"/flags.jsp?c=").append(country).append("\"> ");
                 buf.append(_(_context.commSystem().getCountryName(country)));
                 buf.append("</td><td align=\"center\">").append(num).append("</td></tr>\n");
@@ -365,7 +365,7 @@ public class NetDbRenderer {
         buf.append("<b>" + _("Address(es)") + ":</b> ");
         String country = _context.commSystem().getCountry(info.getIdentity().getHash());
         if(country != null) {
-            buf.append("<img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase()).append('\"');
+            buf.append("<img height=\"11\" width=\"16\" alt=\"").append(country.toUpperCase(Locale.US)).append('\"');
             buf.append(" title=\"").append(_(_context.commSystem().getCountryName(country))).append('\"');
             buf.append(" src=\"/flags.jsp?c=").append(country).append("\"> ");
         }

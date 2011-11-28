@@ -7,6 +7,7 @@ package net.i2p.client.naming;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -65,7 +66,7 @@ public class EepGetNamingService extends DummyNamingService {
         if (d != null)
             return d;
 
-        hostname = hostname.toLowerCase();
+        hostname = hostname.toLowerCase(Locale.US);
         // Base32 failed?
         if (hostname.length() == BASE32_HASH_LENGTH + 8 && hostname.endsWith(".b32.i2p"))
             return null;

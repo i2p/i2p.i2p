@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
 
@@ -325,7 +326,7 @@ public class TrackerClient extends I2PAppThread
                     // don't show secondary tracker problems to the user
                     if (tr.isPrimary)
                       snark.setTrackerProblems(tr.trackerProblems);
-                    if (tr.trackerProblems.toLowerCase().startsWith(NOT_REGISTERED)) {
+                    if (tr.trackerProblems.toLowerCase(Locale.US).startsWith(NOT_REGISTERED)) {
                       // Give a guy some time to register it if using opentrackers too
                       if (trackers.size() == 1) {
                         stop = true;

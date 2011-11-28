@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -229,7 +230,7 @@ public class BlockfileNamingService extends DummyNamingService {
                         int split = line.indexOf('=');
                         if (split <= 0)
                             continue;
-                        String key = line.substring(0, split).toLowerCase();
+                        String key = line.substring(0, split).toLowerCase(Locale.US);
                         if (line.indexOf('#') > 0)  { // trim off any end of line comment
                             line = line.substring(0, line.indexOf('#')).trim();
                             if (line.length() < split + 1)
@@ -622,11 +623,11 @@ public class BlockfileNamingService extends DummyNamingService {
             if (d != null)
                 return d;
             // Base32 failed?
-            if (hostname.length() == BASE32_HASH_LENGTH + 8 && hostname.toLowerCase().endsWith(".b32.i2p"))
+            if (hostname.length() == BASE32_HASH_LENGTH + 8 && hostname.toLowerCase(Locale.US).endsWith(".b32.i2p"))
                 return null;
         }
 
-        String key = hostname.toLowerCase();
+        String key = hostname.toLowerCase(Locale.US);
         synchronized(_bf) {
             if (_isClosed)
                 return null;
@@ -681,7 +682,7 @@ public class BlockfileNamingService extends DummyNamingService {
             _log.error("Add entry failed, read-only hosts database");
             return false;
         }
-        String key = hostname.toLowerCase();
+        String key = hostname.toLowerCase(Locale.US);
         String listname = FALLBACK_LIST;
         Properties props = new Properties();
         props.setProperty(PROP_ADDED, Long.toString(_context.clock().now()));
@@ -735,7 +736,7 @@ public class BlockfileNamingService extends DummyNamingService {
             _log.error("Remove entry failed, read-only hosts database");
             return false;
         }
-        String key = hostname.toLowerCase();
+        String key = hostname.toLowerCase(Locale.US);
         String listname = FALLBACK_LIST;
         if (options != null) {
             String list = options.getProperty("list");

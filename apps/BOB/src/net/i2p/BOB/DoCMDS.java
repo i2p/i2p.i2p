@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -434,7 +435,7 @@ public class DoCMDS implements Runnable {
 							if (token.countTokens() != 0) {
 								Command = token.nextToken();
 								Command =
-									Command.toLowerCase();
+									Command.toLowerCase(Locale.US);
 								if (token.countTokens() != 0) {
 									Arg = token.nextToken();
 								} else {

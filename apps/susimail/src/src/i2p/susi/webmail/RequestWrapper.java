@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -55,7 +56,7 @@ public class RequestWrapper {
 		cache = new Hashtable();
 		this.httpRequest = httpRequest;
 		String contentType = httpRequest.getContentType();
-		if( contentType != null && contentType.toLowerCase().startsWith( "multipart/form-data" ) ) {
+		if( contentType != null && contentType.toLowerCase(Locale.US).startsWith( "multipart/form-data" ) ) {
 			try {
 				multiPartRequest = new MultiPartRequest( httpRequest );
 			} catch (IOException e) {
@@ -122,7 +123,7 @@ public class RequestWrapper {
 			Hashtable params = multiPartRequest.getParams( partName );
 			for( Enumeration e = params.keys(); e.hasMoreElements(); ) {
 				String key = (String)e.nextElement();
-				if( key.toLowerCase().compareToIgnoreCase( "content-type") == 0 ) {
+				if( key.toLowerCase(Locale.US).compareToIgnoreCase( "content-type") == 0 ) {
 					String value = (String)params.get( key );
 					int i = value.indexOf( ";" );
 					if( i != -1 )

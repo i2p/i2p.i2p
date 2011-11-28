@@ -290,7 +290,7 @@ public class Timestamper implements Runnable {
             if (country == null) {
                 country = Locale.getDefault().getCountry();
                 if (country != null)
-                    country = country.toLowerCase();
+                    country = country.toLowerCase(Locale.US);
             }
             if (country != null &&  country.length() > 0) {
                 _priorityServers = new ArrayList(3);

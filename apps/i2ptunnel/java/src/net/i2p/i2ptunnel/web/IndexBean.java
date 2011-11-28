@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -185,10 +186,10 @@ public class IndexBean {
         else if ("start".equals(_action))
             return start();
         else if ("Save changes".equals(_action) || // IE workaround:
-                (_action.toLowerCase().indexOf("s</span>ave") >= 0))
+                (_action.toLowerCase(Locale.US).indexOf("s</span>ave") >= 0))
             return saveChanges();
         else if ("Delete this proxy".equals(_action) || // IE workaround:
-                (_action.toLowerCase().indexOf("d</span>elete") >= 0))
+                (_action.toLowerCase(Locale.US).indexOf("d</span>elete") >= 0))
             return deleteTunnel();
         else if ("Estimate".equals(_action))
             return PrivateKeyFile.estimateHashCashTime(_hashCashValue);

@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -233,7 +234,7 @@ public class I2PTunnel extends EventDispatcherImpl implements Logging {
     public void runCommand(String cmd, Logging l) {
         if (cmd.indexOf(" ") == -1) cmd += " ";
         int iii = cmd.indexOf(" ");
-        String cmdname = cmd.substring(0, iii).toLowerCase();
+        String cmdname = cmd.substring(0, iii).toLowerCase(Locale.US);
         String allargs = cmd.substring(iii + 1);
         String[] args = split(allargs, " "); // .split(" "); // java 1.4
 

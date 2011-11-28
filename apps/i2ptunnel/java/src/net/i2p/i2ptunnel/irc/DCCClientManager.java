@@ -1,6 +1,7 @@
 package net.i2p.i2ptunnel.irc;
 
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -91,7 +92,7 @@ public class DCCClientManager extends EventReceiver {
      *  @param localPort bind to port or 0; if nonzero it will be the rv
      */
     private int newIncoming(String b32, int port, String type, int localPort) {
-        b32 = b32.toLowerCase();
+        b32 = b32.toLowerCase(Locale.US);
         // do some basic verification before starting the client
         if (b32.length() != 60 || !b32.endsWith(".b32.i2p"))
             return -1;

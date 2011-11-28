@@ -12,6 +12,7 @@ import java.net.InetAddress;
 import java.io.InputStreamReader;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -163,7 +164,7 @@ class GeoIP {
                         continue;
                     }
                     String[] s = line.split(",");
-                    String lc = s[0].toLowerCase();
+                    String lc = s[0].toLowerCase(Locale.US);
                     _codeToName.put(lc, s[1]);
                     _codeCache.put(lc, lc);
                 } catch (IndexOutOfBoundsException ioobe) {
@@ -231,7 +232,7 @@ class GeoIP {
                         idx++;
                     }
                     while (idx < search.length && search[idx].longValue() >= ip1 && search[idx].longValue() <= ip2) {
-                        String lc = s[2].toLowerCase();
+                        String lc = s[2].toLowerCase(Locale.US);
                         // replace the new string with the identical one from the cache
                         String cached = _codeCache.get(lc);
                         if (cached == null)

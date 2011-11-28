@@ -14,6 +14,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.List;
+import java.util.Locale;
 
 import net.i2p.I2PAppContext;
 import net.i2p.I2PException;
@@ -198,8 +199,8 @@ public class SOCKS4aServer extends SOCKSServer {
         I2PSocket destSock;
 
         try {
-            if (connHostName.toLowerCase().endsWith(".i2p") ||
-                connHostName.toLowerCase().endsWith(".onion")) {
+            if (connHostName.toLowerCase(Locale.US).endsWith(".i2p") ||
+                connHostName.toLowerCase(Locale.US).endsWith(".onion")) {
                 _log.debug("connecting to " + connHostName + "...");
                 // Let's not due a new Dest for every request, huh?
                 //I2PSocketManager sm = I2PSocketManagerFactory.createManager();

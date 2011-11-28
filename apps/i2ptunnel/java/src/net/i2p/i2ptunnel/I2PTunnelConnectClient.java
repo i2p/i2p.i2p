@@ -11,6 +11,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -193,7 +194,7 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                         restofline = request.substring(pos); // ":80 HTTP/1.1" or " HTTP/1.1"
                     }
 
-                    if (host.toLowerCase().endsWith(".i2p")) {
+                    if (host.toLowerCase(Locale.US).endsWith(".i2p")) {
                         // Destination gets the host name
                         destination = host;
                     } else if (host.indexOf(".") != -1) {
@@ -209,7 +210,7 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                         destination = currentProxy;
                         usingWWWProxy = true;
                         newRequest.append("CONNECT ").append(host).append(restofline).append("\r\n"); // HTTP spec
-                    } else if (host.toLowerCase().equals("localhost")) {
+                    } else if (host.toLowerCase(Locale.US).equals("localhost")) {
                         writeErrorMessage(ERR_LOCALHOST, out);
                         s.close();
                         return;
@@ -224,7 +225,7 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
                         _log.debug(getPrefix(requestId) + "REST  :" + restofline + ":");
                         _log.debug(getPrefix(requestId) + "DEST  :" + destination + ":");
                     }
-                } else if (line.toLowerCase().startsWith("proxy-authorization: basic ")) {
+                } else if (line.toLowerCase(Locale.US).startsWith("proxy-authorization: basic ")) {
                     // strip Proxy-Authenticate from the response in HTTPResponseOutputStream
                     // save for auth check below
                     authorization = line.substring(27);  // "proxy-authorization: basic ".length()

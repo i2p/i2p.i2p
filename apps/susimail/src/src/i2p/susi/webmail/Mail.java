@@ -213,7 +213,7 @@ public class Mail {
 								shortSubject = formattedSubject.substring( 0, 57 ).trim() + "...";
 							shortSubject = html.encode( shortSubject );
 						}
-						else if( line.toLowerCase().startsWith( "Reply-To:" ) ) {
+						else if( line.toLowerCase(Locale.US).startsWith( "reply-to:" ) ) {
 							reply = Mail.getAddress( line.substring( 9 ).trim() );
 						}
 						else if( line.startsWith( "To:" ) ) {

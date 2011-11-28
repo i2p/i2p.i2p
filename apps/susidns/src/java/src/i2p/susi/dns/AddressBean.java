@@ -26,6 +26,7 @@ package i2p.susi.dns;
 
 import java.net.IDN;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
@@ -113,7 +114,7 @@ public class AddressBean
 	 * @since 0.8.7
 	 */
 	static String toASCII(String host) throws IllegalArgumentException {
-		host = host.toLowerCase();
+		host = host.toLowerCase(Locale.US);
 
 		boolean needsIDN = false;
 		// Here we do easy checks and throw translated exceptions.

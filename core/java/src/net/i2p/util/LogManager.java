@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.Queue;
 import java.util.Set;
@@ -312,9 +313,9 @@ public class LogManager {
         if (disp == null)
             _displayOnScreen = DEFAULT_DISPLAYONSCREEN;
         else {
-            if ("TRUE".equals(disp.toUpperCase().trim()))
+            if ("TRUE".equals(disp.toUpperCase(Locale.US).trim()))
                 _displayOnScreen = true;
-            else if ("YES".equals(disp.toUpperCase().trim()))
+            else if ("YES".equals(disp.toUpperCase(Locale.US).trim()))
                 _displayOnScreen = true;
             else
                 _displayOnScreen = false;
@@ -463,7 +464,7 @@ public class LogManager {
      */
     public static int getFileSize(String size) {
         try {
-            String v = size.trim().toUpperCase();
+            String v = size.trim().toUpperCase(Locale.US);
             if (v.length() < 2)
                 return -1;
             if (v.endsWith("B"))

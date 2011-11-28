@@ -48,6 +48,7 @@ import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.ListIterator;
+import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -940,7 +941,7 @@ public class WebMail extends HttpServlet
 						String contentType = request.getContentType( NEW_FILENAME );
 						Encoding encoding;
 						String encodeTo;
-						if( contentType.toLowerCase().startsWith( "text/" ) )
+						if( contentType.toLowerCase(Locale.US).startsWith( "text/" ) )
 							encodeTo = "quoted-printable";
 						else
 							encodeTo = "base64";

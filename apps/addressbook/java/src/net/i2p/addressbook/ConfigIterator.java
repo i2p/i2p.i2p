@@ -27,6 +27,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -71,7 +72,7 @@ class ConfigIterator implements Iterator<Map.Entry<String, String>> {
                 inputLine = ConfigParser.stripComments(inputLine);
                 String[] splitLine = inputLine.split("=");
                 if (splitLine.length == 2) {
-                    next = new ConfigEntry(splitLine[0].trim().toLowerCase(), splitLine[1].trim());
+                    next = new ConfigEntry(splitLine[0].trim().toLowerCase(Locale.US), splitLine[1].trim());
                     return true;
                 }
                 inputLine = input.readLine();

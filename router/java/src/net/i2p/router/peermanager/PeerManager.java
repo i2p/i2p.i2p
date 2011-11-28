@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -229,7 +230,7 @@ class PeerManager {
     public void setCapabilities(Hash peer, String caps) { 
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Setting capabilities for " + peer.toBase64() + " to " + caps);
-        caps = caps.toLowerCase();
+        caps = caps.toLowerCase(Locale.US);
 
         String oldCaps = _capabilitiesByPeer.put(peer, caps);
         if (caps.equals(oldCaps))

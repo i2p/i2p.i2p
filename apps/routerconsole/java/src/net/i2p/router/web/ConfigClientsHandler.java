@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -131,8 +132,8 @@ public class ConfigClientsHandler extends FormHandler {
 
         // label (IE)
         String xStart = _("Start");
-        if (_action.toLowerCase().startsWith(xStart + "<span class=hide> ") &&
-                   _action.toLowerCase().endsWith("</span>")) {
+        if (_action.toLowerCase(Locale.US).startsWith(xStart + "<span class=hide> ") &&
+                   _action.toLowerCase(Locale.US).endsWith("</span>")) {
             // IE sucks
             String app = _action.substring(xStart.length() + 18, _action.length() - 7);
             int appnum = -1;

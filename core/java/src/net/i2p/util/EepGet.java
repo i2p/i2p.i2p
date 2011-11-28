@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Formatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
@@ -949,13 +950,13 @@ public class EepGet {
         } else if (key.equalsIgnoreCase("Last-Modified")) {
             _lastModified = val;
         } else if (key.equalsIgnoreCase("Transfer-encoding")) {
-            _encodingChunked = val.toLowerCase().contains("chunked");
+            _encodingChunked = val.toLowerCase(Locale.US).contains("chunked");
         } else if (key.equalsIgnoreCase("Content-encoding")) {
             // This is kindof a hack, but if we are downloading a gzip file
             // we don't want to transparently gunzip it and save it as a .gz file.
             // A query string will also mess this up
             if ((!_actualURL.endsWith(".gz")) && (!_actualURL.endsWith(".tgz")))
-                _isGzippedResponse = val.toLowerCase().contains("gzip");
+                _isGzippedResponse = val.toLowerCase(Locale.US).contains("gzip");
         } else if (key.equalsIgnoreCase("Content-Type")) {
             _contentType=val;
         } else if (key.equalsIgnoreCase("Location")) {

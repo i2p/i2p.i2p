@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
@@ -106,7 +107,7 @@ public abstract class TransportImpl implements Transport {
         if (style.equals("SSU"))
             style = "udp";
         else
-            style = style.toLowerCase();
+            style = style.toLowerCase(Locale.US);
         int def = DEFAULT_MAX_CONNECTIONS;
         RouterInfo ri = _context.router().getRouterInfo();
         if (ri != null) {

@@ -5,6 +5,7 @@
 package net.i2p.client.naming;
 
 import java.io.InputStream;
+import java.util.Locale;
 import java.util.Properties;
 
 import net.i2p.I2PAppContext;
@@ -65,10 +66,10 @@ public class ExecNamingService extends DummyNamingService {
         if (d != null)
             return d;
         // Base32 failed?
-        if (hostname.length() == BASE32_HASH_LENGTH + 8 && hostname.toLowerCase().endsWith(".b32.i2p"))
+        if (hostname.length() == BASE32_HASH_LENGTH + 8 && hostname.toLowerCase(Locale.US).endsWith(".b32.i2p"))
             return null;
 
-        hostname = hostname.toLowerCase();
+        hostname = hostname.toLowerCase(Locale.US);
 
         // lookup
         String key = fetchAddr(hostname);	  	

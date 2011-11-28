@@ -19,6 +19,7 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 import freenet.support.CPUInformation.AMDCPUInfo;
@@ -155,11 +156,11 @@ public class NativeBigInteger extends BigInteger {
     private static final boolean _isWin = System.getProperty("os.name").startsWith("Win");
     private static final boolean _isOS2 = System.getProperty("os.name").startsWith("OS/2");
     private static final boolean _isMac = System.getProperty("os.name").startsWith("Mac");
-    private static final boolean _isLinux = System.getProperty("os.name").toLowerCase().contains("linux");
-    private static final boolean _isFreebsd = System.getProperty("os.name").toLowerCase().contains("freebsd");
-    private static final boolean _isNetbsd = System.getProperty("os.name").toLowerCase().contains("netbsd");
-    private static final boolean _isOpenbsd = System.getProperty("os.name").toLowerCase().contains("openbsd");
-    private static final boolean _isSunos = System.getProperty("os.name").toLowerCase().contains("sunos");
+    private static final boolean _isLinux = System.getProperty("os.name").toLowerCase(Locale.US).contains("linux");
+    private static final boolean _isFreebsd = System.getProperty("os.name").toLowerCase(Locale.US).contains("freebsd");
+    private static final boolean _isNetbsd = System.getProperty("os.name").toLowerCase(Locale.US).contains("netbsd");
+    private static final boolean _isOpenbsd = System.getProperty("os.name").toLowerCase(Locale.US).contains("openbsd");
+    private static final boolean _isSunos = System.getProperty("os.name").toLowerCase(Locale.US).contains("sunos");
     private static final boolean _isAndroid = System.getProperty("java.vendor").contains("Android");
 
     /*

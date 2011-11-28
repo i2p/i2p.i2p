@@ -1,5 +1,7 @@
 package net.i2p.util;
 
+import java.util.Locale;
+
 import net.i2p.I2PAppContext;
 import net.i2p.data.Base32;
 import net.i2p.data.DataFormatException;
@@ -29,7 +31,7 @@ public class ConvertToHash {
         if (peer == null)
             return null;
         Hash h = new Hash();
-        String peerLC = peer.toLowerCase();
+        String peerLC = peer.toLowerCase(Locale.US);
         // b64 hash
         if (peer.length() == 44 && !peerLC.endsWith(".i2p")) {
             try {

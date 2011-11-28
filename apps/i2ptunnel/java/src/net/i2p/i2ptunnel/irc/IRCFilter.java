@@ -2,6 +2,7 @@ package net.i2p.i2ptunnel.irc;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import net.i2p.data.DataHelper;
@@ -130,7 +131,7 @@ abstract class IRCFilter {
                 }
                 // XDCC looks safe, ip/port happens over regular DCC
                 // http://en.wikipedia.org/wiki/XDCC
-                if (msg.toUpperCase().startsWith("XDCC ") && helper != null && helper.isEnabled())
+                if (msg.toUpperCase(Locale.US).startsWith("XDCC ") && helper != null && helper.isEnabled())
                     return s;
                 if (ALLOW_ALL_CTCP_IN)
                     return s;
@@ -209,7 +210,7 @@ abstract class IRCFilter {
         if(field[0].charAt(0)==':')
             return null; // wtf
         
-        String command = field[0].toUpperCase();
+        String command = field[0].toUpperCase(Locale.US);
 
 	if ("PING".equals(command)) {
             // Most clients just send a PING and are happy with any old PONG.  Others,
@@ -292,7 +293,7 @@ abstract class IRCFilter {
                     return filterDCCOut(field[0] + ' ' + field[1] + " :\001DCC ", msg.substring(4), helper);
                 // XDCC looks safe, ip/port happens over regular DCC
                 // http://en.wikipedia.org/wiki/XDCC
-                if (msg.toUpperCase().startsWith("XDCC ") && helper != null && helper.isEnabled())
+                if (msg.toUpperCase(Locale.US).startsWith("XDCC ") && helper != null && helper.isEnabled())
                     return s;
                 if (ALLOW_ALL_CTCP_OUT)
                     return s;

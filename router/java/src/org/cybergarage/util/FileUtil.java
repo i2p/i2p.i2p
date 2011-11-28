@@ -16,6 +16,7 @@
 package org.cybergarage.util;
 
 import java.io.*;
+import java.util.Locale;
 
 public final class FileUtil
 {
@@ -70,7 +71,7 @@ public final class FileUtil
 	{
 		if (StringUtil.hasData(name) == false)
 			return false;
-		String lowerName = name.toLowerCase();
+		String lowerName = name.toLowerCase(Locale.US);
 		return lowerName.endsWith("xml");
 	}
 }

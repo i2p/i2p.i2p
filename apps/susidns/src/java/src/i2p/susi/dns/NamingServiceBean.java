@@ -27,6 +27,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
@@ -169,7 +170,7 @@ public class NamingServiceBean extends AddressbookBean
 					searchProps.setProperty("limit", Integer.toString(limit));
 			}
 			if (search != null && search.length() > 0)
-				searchProps.setProperty("search", search.toLowerCase());
+				searchProps.setProperty("search", search.toLowerCase(Locale.US));
 			results = service.getEntries(searchProps);
 
 			Debug.debug("Result count: " + results.size());
@@ -181,7 +182,7 @@ public class NamingServiceBean extends AddressbookBean
 						if( first < '0' || first > '9' )
 							continue;
 					}
-					else if( ! name.toLowerCase().startsWith( filter.toLowerCase() ) ) {
+					else if( ! name.toLowerCase(Locale.US).startsWith( filter.toLowerCase(Locale.US) ) ) {
 						continue;
 					}
 				}
