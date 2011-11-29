@@ -1,3 +1,7 @@
+2011-11-29 zzz
+  * Random: Use new nextBytes(buf, off, len) for efficiency
+  * Router: Refactor periodic tasks to their own files
+
 2011-11-28 zzz
   * Specify locale in all toLowerCase() and toUpperCase() calls to
     avoid the "Turkish four i problem";
