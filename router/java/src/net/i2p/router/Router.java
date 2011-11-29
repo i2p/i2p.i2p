@@ -15,11 +15,8 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.Writer;
-import java.text.DecimalFormat;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -43,9 +40,9 @@ import net.i2p.router.message.GarlicMessageHandler;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.router.startup.StartupJob;
 import net.i2p.router.startup.WorkingDir;
+import net.i2p.router.tasks.*;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.router.transport.udp.UDPTransport;
-import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.stat.StatManager;
 import net.i2p.util.ByteCache;
@@ -57,7 +54,6 @@ import net.i2p.util.Log;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.SimpleByteCache;
 import net.i2p.util.SimpleScheduler;
-import net.i2p.util.SimpleTimer;
 
 /**
  * Main driver for the router.
@@ -94,7 +90,7 @@ public class Router implements RouterClock.ClockShiftListener {
     public static final int NETWORK_ID = 2;
     
     /** coalesce stats this often - should be a little less than one minute, so the graphs get updated */
-    private static final int COALESCE_TIME = 50*1000;
+    public static final int COALESCE_TIME = 50*1000;
 
     /** this puts an 'H' in your routerInfo **/
     public final static String PROP_HIDDEN = "router.hiddenMode";
@@ -310,7 +306,7 @@ public class Router implements RouterClock.ClockShiftListener {
     }
     
     /** @since 0.8.8 */
-    private static final void clearCaches() {
+    public static final void clearCaches() {
         ByteCache.clearAll();
         SimpleByteCache.clearAll();
     }
@@ -510,7 +506,7 @@ public class Router implements RouterClock.ClockShiftListener {
             setRouterInfo(ri);
             if (!ri.isValid())
                 throw new DataFormatException("Our RouterInfo has a bad signature");
-            Republish r = new Republish();
+            Republish r = new Republish(_context);
             if (blockingRebuild)
                 r.timeReached();
             else
@@ -519,18 +515,7 @@ public class Router implements RouterClock.ClockShiftListener {
             _log.log(Log.CRIT, "Internal error - unable to sign our own address?!", dfe);
         }
     }
-    
-    private class Republish implements SimpleTimer.TimedEvent {
-        public void timeReached() {
-            try {
-                _context.netDb().publish(getRouterInfo());
-            } catch (IllegalArgumentException iae) {
-                _log.log(Log.CRIT, "Local router info is invalid?  rebuilding a new identity", iae);
-                rebuildNewIdentity();
-            }
-        }
-    }
-    
+
     // publicize our ballpark capacity
     public static final char CAPABILITY_BW12 = 'K';
     public static final char CAPABILITY_BW32 = 'L';
@@ -1032,8 +1017,9 @@ public class Router implements RouterClock.ClockShiftListener {
 
     /**
      *  Cancel the JVM runtime hook before calling this.
+     *  NOT to be called by others, use shutdown().
      */
-    private void shutdown2(int exitCode) {
+    public void shutdown2(int exitCode) {
         // So we can get all the way to the end
         // No, you can't do Thread.currentThread.setDaemon(false)
         if (_killVMOnEnd) {
@@ -1739,224 +1725,4 @@ public class Router implements RouterClock.ClockShiftListener {
             recv = (int)rs.getRate(5*60*1000).getAverageValue();
         return Math.max(send, recv);
     }
-    
-    /**
-     *  Mark a string for extraction by xgettext and translation.
-     *  Use this only in static initializers.
-     *  It does not translate!
-     *  @return s
-     *  @since 0.8.7
-     */
-    private static final String _x(String s) {
-        return s;
-    }
-
-/* following classes are now private static inner classes, didn't bother to reindent */
-
-private static final long LOW_MEMORY_THRESHOLD = 5 * 1024 * 1024;
-
-/**
- * coalesce the stats framework every minute
- *
- */
-private static class CoalesceStatsEvent implements SimpleTimer.TimedEvent {
-    private RouterContext _ctx;
-    private long _maxMemory;
-
-    public CoalesceStatsEvent(RouterContext ctx) { 
-        _ctx = ctx; 
-        // NOTE TO TRANSLATORS - each of these phrases is a description for a statistic
-        // to be displayed on /stats.jsp and in the graphs on /graphs.jsp.
-        // Please keep relatively short so it will fit on the graphs.
-        ctx.statManager().createRequiredRateStat("bw.receiveBps", _x("Message receive rate (bytes/sec)"), "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
-        ctx.statManager().createRequiredRateStat("bw.sendBps", _x("Message send rate (bytes/sec)"), "Bandwidth", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
-        ctx.statManager().createRequiredRateStat("bw.sendRate", _x("Low-level send rate (bytes/sec)"), "Bandwidth", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
-        ctx.statManager().createRequiredRateStat("bw.recvRate", _x("Low-level receive rate (bytes/sec)"), "Bandwidth", new long[] { 60*1000l, 5*60*1000l, 10*60*1000l, 60*60*1000l });
-        ctx.statManager().createRequiredRateStat("router.activePeers", _x("How many peers we are actively talking with"), "Throttle", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
-        ctx.statManager().createRateStat("router.activeSendPeers", "How many peers we've sent to this minute", "Throttle", new long[] { 60*1000, 5*60*1000, 60*60*1000 });
-        ctx.statManager().createRateStat("router.highCapacityPeers", "How many high capacity peers we know", "Throttle", new long[] { 5*60*1000, 60*60*1000 });
-        ctx.statManager().createRequiredRateStat("router.fastPeers", _x("Known fast peers"), "Throttle", new long[] { 5*60*1000, 60*60*1000 });
-        _maxMemory = Runtime.getRuntime().maxMemory();
-        String legend = "(Bytes)";
-        if (_maxMemory < Long.MAX_VALUE)
-            legend += " Max is " + DataHelper.formatSize(_maxMemory) + 'B';
-        // router.memoryUsed currently has the max size in the description so it can't be tagged
-        ctx.statManager().createRequiredRateStat("router.memoryUsed", legend, "Router", new long[] { 60*1000 });
-    }
-    private RouterContext getContext() { return _ctx; }
-    public void timeReached() {
-        int active = getContext().commSystem().countActivePeers();
-        getContext().statManager().addRateData("router.activePeers", active, 60*1000);
-
-        int activeSend = getContext().commSystem().countActiveSendPeers();
-        getContext().statManager().addRateData("router.activeSendPeers", activeSend, 60*1000);
-
-        int fast = getContext().profileOrganizer().countFastPeers();
-        getContext().statManager().addRateData("router.fastPeers", fast, 60*1000);
-
-        int highCap = getContext().profileOrganizer().countHighCapacityPeers();
-        getContext().statManager().addRateData("router.highCapacityPeers", highCap, 60*1000);
-
-        getContext().statManager().addRateData("bw.sendRate", (long)getContext().bandwidthLimiter().getSendBps(), 0);
-        getContext().statManager().addRateData("bw.recvRate", (long)getContext().bandwidthLimiter().getReceiveBps(), 0);
-        
-        long used = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-        getContext().statManager().addRateData("router.memoryUsed", used, 0);
-        if (_maxMemory - used < LOW_MEMORY_THRESHOLD)
-            clearCaches();
-
-        getContext().tunnelDispatcher().updateParticipatingStats(COALESCE_TIME);
-
-        getContext().statManager().coalesceStats();
-
-        RateStat receiveRate = getContext().statManager().getRate("transport.receiveMessageSize");
-        if (receiveRate != null) {
-            Rate rate = receiveRate.getRate(60*1000);
-            if (rate != null) { 
-                double bytes = rate.getLastTotalValue();
-                double bps = (bytes*1000.0d)/rate.getPeriod(); 
-                getContext().statManager().addRateData("bw.receiveBps", (long)bps, 60*1000);
-            }
-        }
-
-        RateStat sendRate = getContext().statManager().getRate("transport.sendMessageSize");
-        if (sendRate != null) {
-            Rate rate = sendRate.getRate(60*1000);
-            if (rate != null) {
-                double bytes = rate.getLastTotalValue();
-                double bps = (bytes*1000.0d)/rate.getPeriod(); 
-                getContext().statManager().addRateData("bw.sendBps", (long)bps, 60*1000);
-            }
-        }
-    }
-}
-
-/**
- * Update the routing Key modifier every day at midnight (plus on startup).
- * This is done here because we want to make sure the key is updated before anyone
- * uses it.
- */
-private static class UpdateRoutingKeyModifierJob extends JobImpl {
-    private Log _log;
-    private Calendar _cal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
-    public UpdateRoutingKeyModifierJob(RouterContext ctx) { 
-        super(ctx);
-    }
-    public String getName() { return "Update Routing Key Modifier"; }
-    public void runJob() {
-        _log = getContext().logManager().getLog(getClass());
-        getContext().routingKeyGenerator().generateDateBasedModData();
-        requeue(getTimeTillMidnight());
-    }
-    private long getTimeTillMidnight() {
-        long now = getContext().clock().now();
-        _cal.setTime(new Date(now));
-        _cal.set(Calendar.YEAR, _cal.get(Calendar.YEAR));               // gcj <= 4.0 workaround
-        _cal.set(Calendar.DAY_OF_YEAR, _cal.get(Calendar.DAY_OF_YEAR)); // gcj <= 4.0 workaround
-        _cal.add(Calendar.DATE, 1);
-        _cal.set(Calendar.HOUR_OF_DAY, 0);
-        _cal.set(Calendar.MINUTE, 0);
-        _cal.set(Calendar.SECOND, 0);
-        _cal.set(Calendar.MILLISECOND, 0);
-        long then = _cal.getTime().getTime();
-        long howLong = then - now;
-        if (howLong < 0) // hi kaffe
-            howLong = 24*60*60*1000l + howLong;
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Time till midnight: " + howLong + "ms");
-        return howLong;
-    }
-}
-
-/**
- *  Write a timestamp to the ping file where
- *  other routers trying to use the same configuration can see it
- */
-private static class MarkLiveliness implements SimpleTimer.TimedEvent {
-    private final Router _router;
-    private final File _pingFile;
-
-    public MarkLiveliness(Router router, File pingFile) {
-        _router = router;
-        _pingFile = pingFile;
-        _pingFile.deleteOnExit();
-    }
-
-    public void timeReached() {
-        if (_router.isAlive())
-            ping();
-        else
-            _pingFile.delete();
-    }
-
-    private void ping() {
-        FileOutputStream fos = null;
-        try { 
-            fos = new SecureFileOutputStream(_pingFile);
-            fos.write(("" + System.currentTimeMillis()).getBytes());
-        } catch (IOException ioe) {
-            System.err.println("Error writing to ping file");
-            ioe.printStackTrace();
-        } finally {
-            if (fos != null) try { fos.close(); } catch (IOException ioe) {}
-        }
-    }
-}
-
-/**
- *  Just for failsafe. Standard shutdown should cancel this.
- */
-private static class ShutdownHook extends Thread {
-    private final RouterContext _context;
-    private static int __id = 0;
-    private final int _id;
-
-    public ShutdownHook(RouterContext ctx) {
-        _context = ctx;
-        _id = ++__id;
-    }
-
-    @Override
-    public void run() {
-        setName("Router " + _id + " shutdown");
-        Log l = _context.logManager().getLog(Router.class);
-        l.log(Log.CRIT, "Shutting down the router...");
-        _context.router().shutdown2(Router.EXIT_HARD);
-    }
-}
-
-/** update the router.info file whenever its, er, updated */
-private static class PersistRouterInfoJob extends JobImpl {
-    public PersistRouterInfoJob(RouterContext ctx) { 
-        super(ctx); 
-    }
-
-    public String getName() { return "Persist Updated Router Information"; }
-
-    public void runJob() {
-        Log _log = getContext().logManager().getLog(PersistRouterInfoJob.class);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Persisting updated router info");
-
-        String infoFilename = getContext().getProperty(PROP_INFO_FILENAME, PROP_INFO_FILENAME_DEFAULT);
-        File infoFile = new File(getContext().getRouterDir(), infoFilename);
-
-        RouterInfo info = getContext().router().getRouterInfo();
-
-        FileOutputStream fos = null;
-        synchronized (getContext().router().routerInfoFileLock) {
-            try {
-                fos = new SecureFileOutputStream(infoFile);
-                info.writeBytes(fos);
-            } catch (DataFormatException dfe) {
-                _log.error("Error rebuilding the router information", dfe);
-            } catch (IOException ioe) {
-                _log.error("Error writing out the rebuilt router information", ioe);
-            } finally {
-                if (fos != null) try { fos.close(); } catch (IOException ioe) {}
-            }
-        }
-    }
-}
-
 }

@@ -1,8 +1,11 @@
-package net.i2p.router;
+package net.i2p.router.tasks;
 
 import java.io.File;
 
 import net.i2p.data.DataHelper;
+import net.i2p.router.Job;
+import net.i2p.router.Router;
+import net.i2p.router.RouterContext;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.util.ShellCommand;
@@ -13,7 +16,7 @@ import net.i2p.util.Log;
  * they have, restart the JVM)
  *
  */
-class RouterWatchdog implements Runnable {
+public class RouterWatchdog implements Runnable {
     private final Log _log;
     private final RouterContext _context;
     private int _consecutiveErrors;
