@@ -1,4 +1,4 @@
-package net.i2p.router;
+package net.i2p.router.dummy;
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -14,6 +14,11 @@ import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.i2cp.MessageId;
 import net.i2p.data.i2cp.SessionConfig;
+import net.i2p.router.ClientManagerFacade;
+import net.i2p.router.ClientMessage;
+import net.i2p.router.Job;
+import net.i2p.router.RouterContext;
+import net.i2p.router.TunnelInfo;
 
 /**
  * Manage all interactions with clients 

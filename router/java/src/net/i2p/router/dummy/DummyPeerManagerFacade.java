@@ -1,4 +1,4 @@
-package net.i2p.router;
+package net.i2p.router.dummy;
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Set;
 
 import net.i2p.data.Hash;
+import net.i2p.router.PeerManagerFacade;
+import net.i2p.router.PeerSelectionCriteria;
 
 /**
  * Manage peer references and keep them up to date so that when asked for peers,
@@ -20,7 +22,7 @@ import net.i2p.data.Hash;
  * includes periodically queueing up outbound messages to the peers to test them.
  *
  */
-class DummyPeerManagerFacade implements PeerManagerFacade {
+public class DummyPeerManagerFacade implements PeerManagerFacade {
     public void shutdown() {}    
     public void startup() {}
     public void restart() {}

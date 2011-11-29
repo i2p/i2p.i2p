@@ -1,4 +1,4 @@
-package net.i2p.router;
+package net.i2p.router.dummy;
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -17,13 +17,17 @@ import java.util.Set;
 import net.i2p.data.Destination;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
+import net.i2p.router.ClientTunnelSettings;
+import net.i2p.router.TunnelInfo;
+import net.i2p.router.TunnelManagerFacade;
+import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.tunnel.pool.TunnelPool;
 
 /**
  * Build and maintain tunnels throughout the network.
  *
  */ 
-class DummyTunnelManagerFacade implements TunnelManagerFacade {
+public class DummyTunnelManagerFacade implements TunnelManagerFacade {
     
     public TunnelInfo getTunnelInfo(TunnelId id) { return null; }
     public TunnelInfo selectInboundTunnel() { return null; }

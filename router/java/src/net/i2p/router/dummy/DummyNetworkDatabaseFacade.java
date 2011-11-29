@@ -1,4 +1,4 @@
-package net.i2p.router;
+package net.i2p.router.dummy;
 /*
  * free (adj.): unencumbered; not under the control of others
  * Written by jrandom in 2003 and released into the public domain 
@@ -20,8 +20,11 @@ import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
 import net.i2p.data.RouterInfo;
+import net.i2p.router.Job;
+import net.i2p.router.NetworkDatabaseFacade;
+import net.i2p.router.RouterContext;
 
-class DummyNetworkDatabaseFacade extends NetworkDatabaseFacade {
+public class DummyNetworkDatabaseFacade extends NetworkDatabaseFacade {
     private Map _routers;
     private RouterContext _context;
     
