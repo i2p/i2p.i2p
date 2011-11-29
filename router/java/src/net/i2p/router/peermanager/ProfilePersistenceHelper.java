@@ -356,6 +356,7 @@ class ProfilePersistenceHelper {
     }
     
     /** generate 1000 profiles */
+/****
     public static void main(String args[]) {
         System.out.println("Generating 1000 profiles");
         File dir = new File("profiles");
@@ -373,4 +374,5 @@ class ProfilePersistenceHelper {
         }
         System.out.println("1000 peers created in " + dir.getAbsolutePath());
     }
+****/
 }

@@ -101,7 +101,6 @@ class PacketBuilder {
     
     private static final ByteCache _ivCache = ByteCache.getInstance(64, UDPPacket.IV_SIZE);
     private static final ByteCache _hmacCache = ByteCache.getInstance(64, Hash.HASH_LENGTH);
-    private static final ByteCache _blockCache = ByteCache.getInstance(64, 16);
 
     /**
      *  For debugging and stats only - does not go out on the wire.
@@ -280,10 +279,7 @@ class PacketBuilder {
         // pad up so we're on the encryption boundary
         int padSize = 16 - (off % 16);
         if (padSize > 0) {
-            ByteArray block = _blockCache.acquire();
-            _context.random().nextBytes(block.getData());
-            System.arraycopy(block.getData(), 0, data, off, padSize);
-            _blockCache.release(block);
+            _context.random().nextBytes(data, off, padSize);
             off += padSize;
         }
         packet.getPacket().setLength(off);

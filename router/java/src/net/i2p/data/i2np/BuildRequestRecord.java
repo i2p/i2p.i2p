@@ -253,9 +253,7 @@ public class BuildRequestRecord {
         truncatedHour /= (60l*60l*1000l);
         DataHelper.toLong(buf, OFF_REQ_TIME, 4, truncatedHour);
         DataHelper.toLong(buf, OFF_SEND_MSG_ID, 4, nextMsgId);
-        byte rnd[] = new byte[PADDING_SIZE];
-        ctx.random().nextBytes(rnd);
-        System.arraycopy(rnd, 0, buf, OFF_SEND_MSG_ID+4, rnd.length);
+        ctx.random().nextBytes(buf, OFF_SEND_MSG_ID+4, PADDING_SIZE);
         
         byte wroteIV[] = readReplyIV();
         if (!DataHelper.eq(iv, wroteIV))

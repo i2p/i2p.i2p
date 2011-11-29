@@ -241,14 +241,12 @@ class EstablishState {
                     System.arraycopy(_Y, 0, xy, _X.length, _Y.length);
                     Hash hxy = _context.sha().calculateHash(xy);
                     _tsB = (_context.clock().now() + 500) / 1000l; // our (Bob's) timestamp in seconds
-                    byte padding[] = new byte[12]; // the encrypted data needs an extra 12 bytes
-                    _context.random().nextBytes(padding);
-                    byte toEncrypt[] = new byte[hxy.getData().length+4+padding.length];
+                    byte toEncrypt[] = new byte[hxy.getData().length + (4 + 12)];
                     System.arraycopy(hxy.getData(), 0, toEncrypt, 0, hxy.getData().length);
                     byte tsB[] = DataHelper.toLong(4, _tsB);
                     System.arraycopy(tsB, 0, toEncrypt, hxy.getData().length, tsB.length);
                     //DataHelper.toLong(toEncrypt, hxy.getData().length, 4, _tsB);
-                    System.arraycopy(padding, 0,toEncrypt, hxy.getData().length+4, padding.length);
+                    _context.random().nextBytes(toEncrypt, hxy.getData().length + 4, 12);
                     if (_log.shouldLog(Log.DEBUG)) {
                         //_log.debug(prefix()+"Y="+Base64.encode(_Y));
                         //_log.debug(prefix()+"x+y="+Base64.encode(xy));
@@ -453,9 +451,8 @@ class EstablishState {
                 DataHelper.toLong(preEncrypt, 0, 2, ident.length);
                 System.arraycopy(ident, 0, preEncrypt, 2, ident.length);
                 DataHelper.toLong(preEncrypt, 2+ident.length, 4, _tsA);
-                byte pad[] = new byte[padding];
-                _context.random().nextBytes(pad);
-                System.arraycopy(pad, 0, preEncrypt, 2+ident.length+4, padding);
+                if (padding > 0)
+                    _context.random().nextBytes(preEncrypt, 2 + ident.length + 4, padding);
                 System.arraycopy(sig.getData(), 0, preEncrypt, 2+ident.length+4+padding, Signature.SIGNATURE_BYTES);
 
                 _prevEncrypted = new byte[preEncrypt.length];
@@ -681,10 +678,8 @@ class EstablishState {
 
         Signature sig = _context.dsa().sign(toSign, _context.keyManager().getSigningPrivateKey());
         byte preSig[] = new byte[Signature.SIGNATURE_BYTES+8];
-        byte pad[] = new byte[8];
-        _context.random().nextBytes(pad);
         System.arraycopy(sig.getData(), 0, preSig, 0, Signature.SIGNATURE_BYTES);
-        System.arraycopy(pad, 0, preSig, Signature.SIGNATURE_BYTES, pad.length);
+        _context.random().nextBytes(preSig, Signature.SIGNATURE_BYTES, 8);
         _e_bobSig = new byte[preSig.length];
         _context.aes().encrypt(preSig, 0, _e_bobSig, 0, _dh.getSessionKey(), _e_hXY_tsB, _e_hXY_tsB.length-16, _e_bobSig.length);
 

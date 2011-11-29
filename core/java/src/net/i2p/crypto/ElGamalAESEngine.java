@@ -473,12 +473,10 @@ public class ElGamalAESEngine {
         //_log.debug("Encrypting to a NEW session");
         byte elgSrcData[] = new byte[SessionKey.KEYSIZE_BYTES+32+158];
         System.arraycopy(key.getData(), 0, elgSrcData, 0, SessionKey.KEYSIZE_BYTES);
+        // get both the preIV and the padding at once, then copy to the preIV array
+        _context.random().nextBytes(elgSrcData, SessionKey.KEYSIZE_BYTES, 32 + 158);
         byte preIV[] = SimpleByteCache.acquire(32);
-        _context.random().nextBytes(preIV);
-        System.arraycopy(preIV, 0, elgSrcData, SessionKey.KEYSIZE_BYTES, 32);
-        byte rnd[] = new byte[158];
-        _context.random().nextBytes(rnd);
-        System.arraycopy(rnd, 0, elgSrcData, SessionKey.KEYSIZE_BYTES+32, 158);
+        System.arraycopy(elgSrcData, SessionKey.KEYSIZE_BYTES, preIV, 0, 32);
 
         //_log.debug("Pre IV for encryptNewSession: " + DataHelper.toString(preIV, 32));
         //_log.debug("SessionKey for encryptNewSession: " + DataHelper.toString(key.getData(), 32));

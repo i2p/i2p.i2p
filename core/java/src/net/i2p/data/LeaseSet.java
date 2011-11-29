@@ -393,9 +393,7 @@ public class LeaseSet extends DatabaseEntry {
         // pad out to multiple of 36 with random data after encryption
         // (even for 4 leases, where 36*4 is a multiple of 16, we add another, just to be consistent)
         padlen = enc.length - datalen;
-        pad = new byte[padlen];
-        RandomSource.getInstance().nextBytes(pad);
-        System.arraycopy(pad, 0, enc, datalen, padlen);
+        RandomSource.getInstance().nextBytes(enc, datalen, padlen);
         // add the padded lease...
         Lease padLease = new Lease();
         padLease.setEndDate(((Lease)_leases.get(0)).getEndDate());
