@@ -95,15 +95,15 @@ body {
      color: #26f;
      height: 70px;
      width: auto;
-     background: #101 url('/themes/snark/ubergine/images/hat.png') no-repeat scroll right center;
+     background: #2a192a url('/themes/snark/ubergine/images/hat.png') no-repeat scroll right center;
 }
 
 .snarkMessages a:link, .snarkMessages a:visited {
-     color: #37f !important;
+     color: #69f !important;
 }
 
 .snarkMessages a:hover {
-     color: #59f !important;
+     color: #f90 !important;
 }
 
 .logshim {
@@ -116,7 +116,7 @@ pre {
      padding: 0;
      text-align: left !important;
      height: 8px;
-     color: #13f;
+     color: #35f;
      font-weight: bold !important; 
 }
 
@@ -515,7 +515,7 @@ input[type=image]:hover, thead img:hover {
 }
 
 input[type=text]:active, input[type=text]:hover, input.r:hover {
-     background: #f60;
+     background: #d60;
      color: #fff;
 }
 

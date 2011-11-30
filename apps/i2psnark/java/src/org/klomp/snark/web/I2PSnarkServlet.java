@@ -246,6 +246,9 @@ public class I2PSnarkServlet extends Default {
             }
         }
         out.write("</div>\n");
+        String newURL = req.getParameter("newURL");
+        if (newURL != null && newURL.trim().length() > 0 && req.getMethod().equals("GET"))
+            _manager.addMessage(_("Click \"Add torrent\" button to fetch torrent"));
         out.write("<div class=\"page\"><div class=\"mainsection\"><div class=\"snarkMessages\"><table><tr><td align=\"left\"><pre>");
         List msgs = _manager.getMessages();
         for (int i = msgs.size()-1; i >= 0; i--) {
@@ -491,6 +494,8 @@ public class I2PSnarkServlet extends Default {
           *****/
             if (newURL != null) {
                 if (newURL.startsWith("http://")) {
+                    if (!_manager.util().connected())
+                        _manager.addMessage(_("Opening the I2P tunnel"));
                     _manager.addMessage(_("Fetching {0}", urlify(newURL)));
                     I2PAppThread fetch = new I2PAppThread(new FetchAndAdd(_manager, newURL), "Fetch and add", true);
                     fetch.start();
@@ -1174,8 +1179,9 @@ public class I2PSnarkServlet extends Default {
     }
 
     private void writeAddForm(PrintWriter out, HttpServletRequest req) throws IOException {
+        // display incoming parameter if a GET so links will work
         String newURL = req.getParameter("newURL");
-        if ( (newURL == null) || (newURL.trim().length() <= 0) )
+        if (newURL == null || newURL.trim().length() <= 0 || req.getMethod().equals("POST"))
             newURL = "";
         else
             newURL = DataHelper.stripHTML(newURL);    // XSS
@@ -1220,7 +1226,7 @@ public class I2PSnarkServlet extends Default {
         else
             baseFile = DataHelper.stripHTML(baseFile);    // XSS
         
-        out.write("<div class=\"newtorrentsection\"><div class=\"snarkNewTorrent\">\n");
+        out.write("<a name=\"add\"></a><div class=\"newtorrentsection\"><div class=\"snarkNewTorrent\">\n");
         // *not* enctype="multipart/form-data", so that the input type=file sends the filename, not the file
         out.write("<form action=\"_post\" method=\"POST\">\n");
         out.write("<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n");
@@ -2040,11 +2046,27 @@ private static class FetchAndAdd implements Runnable {
                     try { if (in != null) in.close(); } catch (IOException ioe) {}
                 }
             } else {
-                _manager.addMessage(_("Torrent was not retrieved from {0}", urlify(_url)));
+                // Generate a retry link, but sadly can't have a form inside a table
+                // So make this an ugly GET
+                StringBuilder buf = new StringBuilder(1024);
+                // FIXME don't lose peer setting
+                //String peerParam = req.getParameter("p");
+                //if (peerParam != null)
+                //    buf.append("<input type=\"hidden\" name=\"p\" value=\"").append(peerParam).append("\" >\n");
+                buf.append(_("Torrent was not retrieved from {0}", urlify(_url)));
+                String link = _url.replace("&", "&amp;").replace(" ", "%20").replace(":", "%3A").replace("/", "%2F");
+                buf.append(" - [<a href=\"/i2psnark/?newURL=").append(link).append("#add\" >");
+                buf.append(_("Retry"));
+                buf.append("</a>]");
+                _manager.addMessage(buf.toString());
             }
         } finally {
             if (file != null) file.delete();
         }
+    }
+
+    private String _(String s) {
+        return _manager.util().getString(s);
     }
 
     private String _(String s, String o) {
