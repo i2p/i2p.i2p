@@ -1007,6 +1007,7 @@ public class Router implements RouterClock.ClockShiftListener {
         if (_shutdownInProgress)
             return;
         _shutdownInProgress = true;
+        _context.throttle().setShutdownStatus();
         if (_shutdownHook != null) {
             try {
                 Runtime.getRuntime().removeShutdownHook(_shutdownHook);
@@ -1151,6 +1152,7 @@ public class Router implements RouterClock.ClockShiftListener {
     public void shutdownGracefully(int exitCode) {
         _gracefulExitCode = exitCode;
         _config.put(PROP_SHUTDOWN_IN_PROGRESS, "true");
+        _context.throttle().setShutdownStatus();
         synchronized (_gracefulShutdownDetector) {
             _gracefulShutdownDetector.notifyAll();
         }
@@ -1163,6 +1165,7 @@ public class Router implements RouterClock.ClockShiftListener {
     public void cancelGracefulShutdown() {
         _gracefulExitCode = -1;
         _config.remove(PROP_SHUTDOWN_IN_PROGRESS);
+        _context.throttle().cancelShutdownStatus();
         synchronized (_gracefulShutdownDetector) {
             _gracefulShutdownDetector.notifyAll();
         }        

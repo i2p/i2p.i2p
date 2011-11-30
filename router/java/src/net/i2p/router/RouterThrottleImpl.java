@@ -5,6 +5,8 @@ import net.i2p.router.peermanager.TunnelHistory;
 import net.i2p.stat.Rate;
 import net.i2p.stat.RateStat;
 import net.i2p.util.Log;
+import net.i2p.util.SimpleScheduler;
+import net.i2p.util.SimpleTimer;
 
 /**
  * Simple throttle that basically stops accepting messages or nontrivial 
@@ -46,10 +48,13 @@ class RouterThrottleImpl implements RouterThrottle {
     /** = TrivialPreprocessor.PREPROCESSED_SIZE */
     private static final int PREPROCESSED_SIZE = 1024;
 
+    private static final long REJECT_STARTUP_TIME = 20*60*1000;
+
     public RouterThrottleImpl(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(RouterThrottleImpl.class);
         setTunnelStatus();
+        SimpleScheduler.getInstance().addEvent(new ResetStatus(), REJECT_STARTUP_TIME + 120*1000);
         _context.statManager().createRateStat("router.throttleNetworkCause", "How lagged the jobQueue was when an I2NP was throttled", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         //_context.statManager().createRateStat("router.throttleNetDbCause", "How lagged the jobQueue was when a networkDb request was throttled", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
         //_context.statManager().createRateStat("router.throttleTunnelCause", "How lagged the jobQueue was when a tunnel request was throttled", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000, 24*60*60*1000 });
@@ -66,6 +71,19 @@ class RouterThrottleImpl implements RouterThrottle {
         //_context.statManager().createRateStat("router.throttleTunnelQueueOverload", "How many pending tunnel request messages have we received when we reject them due to overload (period = time to process each)?", "Throttle", new long[] { 60*1000, 10*60*1000, 60*60*1000});
     }
     
+    /**
+     *  Reset status from starting up to not-starting up,
+     *  in case we don't get a tunnel request soon after the 20 minutes is up.
+     *
+     *  @since 0.8.12
+     */
+    private class ResetStatus implements SimpleTimer.TimedEvent {
+        public void timeReached() {
+            if (_tunnelStatus.equals(_x("Rejecting tunnels: Starting up")))
+                cancelShutdownStatus();
+        }
+    }
+
     public boolean acceptNetworkMessage() {
         //if (true) return true;
         long lag = _context.jobQueue().getMaxLag();
@@ -96,14 +114,16 @@ class RouterThrottleImpl implements RouterThrottle {
         if (_context.getProperty(Router.PROP_SHUTDOWN_IN_PROGRESS) != null) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Refusing tunnel request since we are shutting down ASAP");
-            setTunnelStatus(_x("Rejecting tunnels: Shutting down"));
+            setShutdownStatus();
             // Don't use CRIT because this tells everybody we are shutting down
             return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
         }
         
         // Don't use CRIT because we don't want peers to think we're failing
-        if (_context.router().getUptime() < 20*60*1000)
+        if (_context.router().getUptime() < REJECT_STARTUP_TIME) {
+            setTunnelStatus(_x("Rejecting tunnels: Starting up"));
             return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
+        }
 
         //long lag = _context.jobQueue().getMaxLag();
         // reject here if lag too high???
@@ -501,7 +521,17 @@ class RouterThrottleImpl implements RouterThrottle {
 //        if (_context.router().getRouterInfo().getBandwidthTier().equals("K"))
 //            setTunnelStatus("Not expecting tunnel requests: Advertised bandwidth too low");
 //        else
-            setTunnelStatus(_x("Rejecting tunnels"));
+            setTunnelStatus(_x("Rejecting tunnels: Starting up"));
+    }
+
+    /** @since 0.8.12 */
+    public void setShutdownStatus() {
+        setTunnelStatus(_x("Rejecting tunnels: Shutting down"));
+    }
+
+    /** @since 0.8.12 */
+    public void cancelShutdownStatus() {
+        setTunnelStatus(_x("Rejecting tunnels"));
     }
 
     public void setTunnelStatus(String msg) {

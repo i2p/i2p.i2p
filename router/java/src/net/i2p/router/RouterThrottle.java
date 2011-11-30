@@ -47,4 +47,10 @@ public interface RouterThrottle {
      */
     public String getTunnelStatus();
     public void setTunnelStatus(String msg);
+
+    /** @since 0.8.12 */
+    public void setShutdownStatus();
+
+    /** @since 0.8.12 */
+    public void cancelShutdownStatus();
 }
