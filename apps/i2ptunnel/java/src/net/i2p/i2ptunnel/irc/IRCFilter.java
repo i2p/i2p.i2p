@@ -55,12 +55,13 @@ abstract class IRCFilter {
                 "CAP"
         };
         
-        if(field[0].charAt(0)==':')
-            idx++;
 
-        try { command = field[idx++].toUpperCase(Locale.US); }
-         catch (IndexOutOfBoundsException ioobe) // wtf, server sent borked command?
-        {
+        try {
+            if (field[0].charAt(0) == ':')
+                idx++;
+            command = field[idx++].toUpperCase(Locale.US);
+        } catch (IndexOutOfBoundsException ioobe) {
+            // wtf, server sent borked command?
            //_log.warn("Dropping defective message: index out of bounds while extracting command.");
            return null;
         }
@@ -151,6 +152,7 @@ abstract class IRCFilter {
                 // Commands that regular users might use
                 "ADMIN",
                 "AWAY",    // should be harmless
+                "CAP",     // http://tools.ietf.org/html/draft-mitchell-irc-capabilities-01
                 "CYCLE",
                 "DCCALLOW",
                 "HELPME", "HELPOP",  // helpop is what unrealircd uses by default
@@ -226,12 +228,9 @@ abstract class IRCFilter {
                 "TEMPSHUN",
                 "UNDCCDENY",
                 "WALLOPS",
-                "ZLINE",
-                // http://tools.ietf.org/html/draft-mitchell-irc-capabilities-01
-                "CAP"
+                "ZLINE"
         };
-        _allowedOutbound = new HashSet(64);
-        _allowedOutbound.addAll(Arrays.asList(allowedCommands));
+        _allowedOutbound = new HashSet(Arrays.asList(allowedCommands));
     }
 
     /*************************************************************************

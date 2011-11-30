@@ -198,15 +198,13 @@ public class I2PTunnelIRCServer extends I2PTunnelServer implements Runnable {
             String field[]=s.split(" ",5);
             String command;
             int idx=0;
-        
-            if(field[0].charAt(0)==':')
-                idx++;
 
             try {
+                if (field[0].charAt(0) == ':')
+                    idx++;
                 command = field[idx++].toUpperCase(Locale.US);
             } catch (IndexOutOfBoundsException ioobe) {
-                // wtf, server sent borked command?
-               throw new IOException("Dropping defective message: index out of bounds while extracting command.");
+                throw new IOException("Dropping defective message: [" + s + ']');
             }
 
             if ("USER".equals(command)) {
