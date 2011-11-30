@@ -33,7 +33,7 @@ public class ConfigUIHandler extends FormHandler {
                               _("Refresh the page to view.") +
                               "</a>");
         } else {
-            addFormNotice(_("Error saving the configuration (applied but not saved) - please see the error logs."));
+            addFormError(_("Error saving the configuration (applied but not saved) - please see the error logs."));
         }
     }
 }

@@ -44,7 +44,7 @@ public class ConfigNetHandler extends FormHandler {
     private String _reseedFrom;
     private boolean _enableLoadTesting;
     private String _sharePct;
-    private static final boolean _ratesOnly = false; // always false - delete me
+    private boolean _ratesOnly;
     private static final String PROP_HIDDEN = Router.PROP_HIDDEN_HIDDEN; // see Router for other choice
     
     @Override
@@ -118,6 +118,11 @@ public class ConfigNetHandler extends FormHandler {
     }
     public void setSharePercentage(String pct) {
         _sharePct = (pct != null ? pct.trim() : null);
+    }
+    
+    /** @since 0.8.12 */
+    public void setRatesOnly(String foo) {
+        _ratesOnly = true;
     }
     
     private void recheckReachability() {
@@ -274,12 +279,10 @@ public class ConfigNetHandler extends FormHandler {
         }
         
         boolean saved = _context.router().saveConfig();
-        if ( (_action != null) && (_("Save changes").equals(_action)) ) {
-            if (saved) 
-                addFormNotice(_("Configuration saved successfully"));
-            else
-                addFormNotice(_("Error saving the configuration (applied but not saved) - please see the error logs"));
-        }
+        if (saved) 
+            addFormNotice(_("Configuration saved successfully"));
+        else
+            addFormError(_("Error saving the configuration (applied but not saved) - please see the error logs"));
         
         if (switchRequired) {
             hiddenSwitch();
@@ -341,6 +344,7 @@ public class ConfigNetHandler extends FormHandler {
 
     private void updateRates() {
         boolean updated = false;
+        boolean bwUpdated = false;
 
         if (_sharePct != null) {
             String old = _context.router().getConfigSetting(Router.PROP_BANDWIDTH_SHARE_PERCENTAGE);
@@ -361,7 +365,7 @@ public class ConfigNetHandler extends FormHandler {
                 _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_INBOUND_BURST_BANDWIDTH, "" + rate);
                 _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_INBOUND_BANDWIDTH_PEAK, "" + kb);
             } catch (NumberFormatException nfe) {}
-            updated = true;
+            bwUpdated = true;
         }
         if ( (_outboundRate != null) && (_outboundRate.length() > 0) &&
             !_outboundRate.equals(_context.getProperty(FIFOBandwidthRefiller.PROP_OUTBOUND_BANDWIDTH, "" + FIFOBandwidthRefiller.DEFAULT_OUTBOUND_BANDWIDTH))) {
@@ -372,6 +376,11 @@ public class ConfigNetHandler extends FormHandler {
                 _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_OUTBOUND_BURST_BANDWIDTH, "" + rate);
                 _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_OUTBOUND_BANDWIDTH_PEAK, "" + kb);
             } catch (NumberFormatException nfe) {}
+            bwUpdated = true;
+        }
+
+        if (bwUpdated) {
+            addFormNotice(_("Updated bandwidth limits"));
             updated = true;
         }
 
@@ -427,9 +436,7 @@ public class ConfigNetHandler extends FormHandler {
 ***********/
 
         
-        if (updated && !_ratesOnly) {
+        if (updated)
             _context.bandwidthLimiter().reinitialize();
-            addFormNotice(_("Updated bandwidth limits"));
-        }
     }
 }

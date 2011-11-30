@@ -111,7 +111,7 @@ function toggleAll(category)
      <td colspan="2"><%=intl._("Advanced filter")%>:
      <input type="text" name="explicitFilterValue" value="<%=statshelper.getExplicitFilter()%>" size="40" ></td></tr>
      <tr class="tablefooter"><td colspan="3" align="right">
-<input type="reset" value="<%=intl._("Cancel")%>" >
-<input type="submit" name="shouldsave" value="<%=intl._("Save changes")%>" >
+<input type="reset" class="cancel" value="<%=intl._("Cancel")%>" >
+<input type="submit" name="shouldsave" class="accept" value="<%=intl._("Save changes")%>" >
 </td></tr>
 </table></div></form></div></div></body></html>

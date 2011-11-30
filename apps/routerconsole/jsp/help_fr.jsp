@@ -37,7 +37,7 @@ La version d'I2P qui vous affiche actuellement cette page.</li>
 Indique depuis combien de temps le routeur tourne.</li>
 <li class="tidylist"><b>Réseau:</b>
 Statut de joignabilité du routeur par les autres routeurs.
-Plus d'infos sur la page de <a href="config.jsp#help">configuration</a>.
+Plus d'infos sur la page de <a href="confignet#help">configuration</a>.
 </li></ul><h3>Pairs</h3><ul>
 <li class="tidylist"><b>Actifs:</b>
 le premier nombre est celui des routeurs avec qui le votre a communiqué dans les dernières minutes. Ça peut varier de 
@@ -65,7 +65,7 @@ taille totale du réseau; il varie en fonction de votre bande passante totale et
 local. I2P n'a pas besoin que chaque routeur connaisse tous les autres.
 </li></ul><h3>Bande passante entrée/sortie</h3><div align="justify"> 
 Ça parle tout seul. Toutes les valeurs sont en octets par seconde (o/s), pas en bits par seconde (b/s). Modifiez vos 
-limites de bande passante sur la page de <a href="config.jsp#help">configuration</a>.
+limites de bande passante sur la page de <a href="confignet#help">configuration</a>.
 Le <a href="graphs.jsp">graphique de bande passante</a> est activé par défaut.</div>
 
 <h3>Destinations locales</h3><div align="justify">
@@ -80,7 +80,7 @@ pairs diffuseurs pour la création des nouveaux tunnels et le test des tunnels e
 <li class="tidylist"><b>Participants:</b> les tunnels créés par d'autres routeurs et qui passent par le votre. Leur 
 nombre dépend largement de la demande du réseau, de votre part de bande passante partagée, et du trafic local. 
 La méthode recommandée pour limiter leur nombre est de diminuer le rapport de bande passante partagée dans la 
-<a href="config.jsp#help">configuration</a>. Vous pouvez également limiter ce nombre en définissant la variable 
+<a href="confignet#help">configuration</a>. Vous pouvez également limiter ce nombre en définissant la variable 
 <tt>router.maxParticipatingTunnels=nnn</tt> dans la <a href="configadvanced.jsp">configuration avancée</a>. 
 <a href="configstats.jsp#tunnel.participatingTunnels">[Activer le graphique]</a>.</li>
 <li class="tidylist"><b>Rapport de partage:</b> le nombre de tunnels participants que vous routez pour les autres, 

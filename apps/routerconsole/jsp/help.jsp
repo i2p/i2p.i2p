@@ -41,7 +41,7 @@ your computer's time.</li> */
 %>
 <li class="tidylist"><b>Reachability:</b>
 The router's view of whether it can be contacted by other routers.
-Further information is on the <a href="config.jsp#help">configuration page</a>.
+Further information is on the <a href="confignet#help">configuration page</a>.
 </li></ul><h3>Peers</h3><ul>
 <li class="tidylist"><b>Active:</b>
 The first number is the number of peers you've sent or received a message from in the last few minutes.
@@ -73,7 +73,7 @@ shared bandwidth, and locally-generated traffic.
 I2P does not require a router to know every other router.</li>
 </ul><h3>Bandwidth in/out</h3><div align="justify">
 Should be self-explanatory. All values are in bytes per second, not bits per second.
-Change your bandwidth limits on the <a href="config.jsp#help">configuration page</a>.
+Change your bandwidth limits on the <a href="confignet#help">configuration page</a>.
 Bandwidth is <a href="graphs.jsp">graphed</a> by default.</div>
 
 <h3>Local destinations</h3><div align="justify">
@@ -92,7 +92,7 @@ Tunnels built by other routers through your router.
 This may vary widely depending on network demand, your
 shared bandwidth, and amount of locally-generated traffic.
 The recommended method for limiting participating tunnels is
-to change your share percentage on the <a href="config.jsp#help">configuration page</a>.
+to change your share percentage on the <a href="confignet#help">configuration page</a>.
 You may also limit the total number by setting <tt>router.maxParticipatingTunnels=nnn</tt> on
 the <a href="configadvanced.jsp">advanced configuration page</a>. <a href="configstats.jsp#tunnel.participatingTunnels">[Enable graphing]</a>.</li>
 <li class="tidylist"><b>Share ratio:</b>

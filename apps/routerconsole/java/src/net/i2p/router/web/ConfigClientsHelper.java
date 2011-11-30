@@ -257,18 +257,18 @@ public class ConfigClientsHelper extends HelperBase {
         }
         buf.append("></td><td align=\"center\" width=\"15%\">");
         if (showStartButton && (!ro) && !edit) {
-            buf.append("<button type=\"submit\" name=\"action\" value=\"Start ").append(index).append("\" >" + _("Start") + "<span class=hide> ").append(index).append("</span></button>");
+            buf.append("<button type=\"submit\" class=\"accept\" name=\"action\" value=\"Start ").append(index).append("\" >" + _("Start") + "<span class=hide> ").append(index).append("</span></button>");
         }
         if (showEditButton && (!edit) && !ro)
-            buf.append("<button type=\"submit\" name=\"edit\" value=\"Edit ").append(index).append("\" >" + _("Edit") + "<span class=hide> ").append(index).append("</span></button>");
+            buf.append("<button type=\"submit\" class=\"add\" name=\"edit\" value=\"Edit ").append(index).append("\" >" + _("Edit") + "<span class=hide> ").append(index).append("</span></button>");
         if (showStopButton && (!edit))
-            buf.append("<button type=\"submit\" name=\"action\" value=\"Stop ").append(index).append("\" >" + _("Stop") + "<span class=hide> ").append(index).append("</span></button>");
+            buf.append("<button type=\"submit\" class=\"stop\" name=\"action\" value=\"Stop ").append(index).append("\" >" + _("Stop") + "<span class=hide> ").append(index).append("</span></button>");
         if (showUpdateButton && (!edit) && !ro) {
-            buf.append("<button type=\"submit\" name=\"action\" value=\"Check ").append(index).append("\" >" + _("Check for updates") + "<span class=hide> ").append(index).append("</span></button>");
-            buf.append("<button type=\"submit\" name=\"action\" value=\"Update ").append(index).append("\" >" + _("Update") + "<span class=hide> ").append(index).append("</span></button>");
+            buf.append("<button type=\"submit\" class=\"check\" name=\"action\" value=\"Check ").append(index).append("\" >" + _("Check for updates") + "<span class=hide> ").append(index).append("</span></button>");
+            buf.append("<button type=\"submit\" class=\"download\" name=\"action\" value=\"Update ").append(index).append("\" >" + _("Update") + "<span class=hide> ").append(index).append("</span></button>");
         }
         if (showDeleteButton && (!edit) && !ro) {
-            buf.append("<button type=\"submit\" name=\"action\" value=\"Delete ").append(index)
+            buf.append("<button type=\"submit\" class=\"delete\" name=\"action\" value=\"Delete ").append(index)
                .append("\" onclick=\"if (!confirm('")
                .append(_("Are you sure you want to delete {0}?", _(name)))
                .append("')) { return false; }\">")

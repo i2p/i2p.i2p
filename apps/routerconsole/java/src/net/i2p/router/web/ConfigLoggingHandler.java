@@ -159,7 +159,7 @@ public class ConfigLoggingHandler extends FormHandler {
             if (saved) 
                 addFormNotice(_("Log configuration saved"));
             else
-                addFormNotice("Error saving the configuration (applied but not saved) - please see the error logs");
+                addFormError("Error saving the configuration (applied but not saved) - please see the error logs");
         }
     }
 }

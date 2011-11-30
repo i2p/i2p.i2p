@@ -41,7 +41,7 @@
           <td><input type="text" size="55" name="key" ></td>
         </tr><tr>
           <td align="right" colspan="2">
-<input type="reset" value="<%=intl._("Cancel")%>" >
-<input type="submit" name="action" value="<%=intl._("Delete key")%>" >
-<input type="submit" name="action" value="<%=intl._("Add key")%>" >
+<input type="reset" class="cancel" value="<%=intl._("Cancel")%>" >
+<input type="submit" name="action" class="delete" value="<%=intl._("Delete key")%>" >
+<input type="submit" name="action" class="add" value="<%=intl._("Add key")%>" >
 </td></tr></table></p></div></form></div></div></body></html>

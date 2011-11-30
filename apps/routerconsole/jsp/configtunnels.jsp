@@ -38,7 +38,7 @@
  <%=intl._("Client tunnel changes are temporary and are not saved.")%>
 <%=intl._("To make permanent client tunnel changes see the")%> <a href="i2ptunnel/index.jsp"><%=intl._("i2ptunnel page")%></a>.
  <hr><div class="formaction">
-<input type="reset" value="<%=intl._("Cancel")%>" >
-<input type="submit" name="shouldsave" value="<%=intl._("Save changes")%>" >
+<input type="reset" class="cancel" value="<%=intl._("Cancel")%>" >
+<input type="submit" name="shouldsave" class="accept" value="<%=intl._("Save changes")%>" >
 </div>
  </form></div></div></div></body></html>

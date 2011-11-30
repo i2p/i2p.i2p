@@ -39,7 +39,7 @@ De versie van de I2P software die je nu gebruikt.</li>
 Hoe lang je I2P router al draait.</li>
 <li class="tidylist"><b>Netwerk Bereikbaarheid:</b>
 De bereikbaarheid van je router door andere routers.
-Meer informatie is te vinden op de <a href="config.jsp#help">configuratie pagina</a>.</li>
+Meer informatie is te vinden op de <a href="confignet#help">configuratie pagina</a>.</li>
 </ul>
 
 <h3>Peers</h3><ul>
@@ -78,7 +78,7 @@ Voor I2P is het niet nodig dat een router alle andere routers kent.
 
 <h3>Bandbreedte in/out</h3><div align="justify">
 Dit zou zichzelf moeten verklaren. Alle waarden zijn in bytes per seconde, niet in bits per seconde.
-Wijzig je bandbreedte limieten op de <a href="config.jsp#help">configuratie pagina</a>.
+Wijzig je bandbreedte limieten op de <a href="confignet#help">configuratie pagina</a>.
 Bandbreedte wordt standaard <a href="graphs.jsp">geplot</a>.</div>
 
 <h3>Tunnels</h3><div align="justify">
@@ -93,7 +93,7 @@ Tunnels gebouwd door andere routers die door je eigen router heen lopen.
 Dit kan erg vari&euml;ren afhankelijk van de vraag vanuit het netwerk,
 je gedeelde bandbreedte en hoeveelheid lokaal gegenereerd verkeer.
 De aanbevolen methode om het aantal deelnemende tunnels te beperken
-is door het share percentage te wijzigen op de <a href="config.jsp#help">configuratie pagina</a>.
+is door het share percentage te wijzigen op de <a href="confignet#help">configuratie pagina</a>.
 Je kan het totale aantal ook beperken met de instelling <tt>router.maxParticipatingTunnels=nnn</tt> op
 de <a href="configadvanced.jsp">geavanceerde configuratie pagina</a>. <a href="configstats.jsp#tunnel.participatingTunnels">[Grafieken inschakelen]</a>.</li>
 <li class="tidylist"><b>Share rato:</b>

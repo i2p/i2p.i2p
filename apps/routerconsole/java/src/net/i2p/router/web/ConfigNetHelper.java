@@ -228,7 +228,7 @@ public class ConfigNetHelper extends HelperBase {
     public String getSharePercentageBox() {
         int pct = (int) (100 * _context.router().getSharePercentage());
         StringBuilder buf = new StringBuilder(256);
-        buf.append("<select style=\"text-align: right;\" name=\"sharePercentage\">\n");
+        buf.append("<select style=\"text-align: right !important;\" name=\"sharePercentage\">\n");
         boolean found = false;
         for (int i = 30; i <= 110; i += 10) {
             int val = i;

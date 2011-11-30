@@ -37,7 +37,7 @@
         <tr><td colspan="2"></tr>
         <tr><td class= "mediumtags" align="right"><b><%=intl._("News Updates")%>:</b></td>
      <% }   // if canInstall %>
-          <td> <% if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false"))) { %> <i><%=intl._("Update In Progress")%></i><br> <% } else { %> <input type="submit" name="action" value="<%=intl._("Check for updates")%>" />
+          <td> <% if ("true".equals(System.getProperty("net.i2p.router.web.UpdateHandler.updateInProgress", "false"))) { %> <i><%=intl._("Update In Progress")%></i><br> <% } else { %> <input type="submit" name="action" class="check" value="<%=intl._("Check for updates")%>" />
             <% } %></td></tr>
         <tr><td colspan="2"><br></td></tr>
         <tr><td class= "mediumtags" align="right"><b><%=intl._("News URL")%>:</b></td>
@@ -68,6 +68,6 @@
     <% }   // if canInstall %>
         <tr class="tablefooter"><td colspan="2">
         <div class="formaction">
-            <input type="reset" value="<%=intl._("Cancel")%>" >
-            <input type="submit" name="action" value="<%=intl._("Save")%>" >
+            <input type="reset" class="cancel" value="<%=intl._("Cancel")%>" >
+            <input type="submit" name="action" class="accept" value="<%=intl._("Save")%>" >
         </div></td></tr></table></div></form></div></div></body></html>

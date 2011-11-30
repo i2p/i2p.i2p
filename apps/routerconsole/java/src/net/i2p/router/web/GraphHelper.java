@@ -195,7 +195,7 @@ public class GraphHelper extends FormHandler {
             if (persistent)
                 _out.write(" checked=\"true\"");
             _out.write(">" +
-                       "<hr><div class=\"formaction\"><input type=\"submit\" value=\"" + _("Save settings and redraw graphs") + "\"></div></form>");
+                       "<hr><div class=\"formaction\"><input type=\"submit\" class=\"acceot\" value=\"" + _("Save settings and redraw graphs") + "\"></div></form>");
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }

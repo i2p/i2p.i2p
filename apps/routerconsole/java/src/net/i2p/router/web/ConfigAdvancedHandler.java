@@ -68,7 +68,7 @@ public class ConfigAdvancedHandler extends FormHandler {
             if (saved) 
                 addFormNotice(_("Configuration saved successfully"));
             else
-                addFormNotice(_("Error saving the configuration (applied but not saved) - please see the error logs"));
+                addFormError(_("Error saving the configuration (applied but not saved) - please see the error logs"));
             
             //if (_forceRestart) {
             //    addFormNotice("Performing a soft restart");

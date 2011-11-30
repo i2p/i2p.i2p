@@ -204,7 +204,7 @@ public class SummaryBarRenderer {
            .append(_helper.getUptime())
            .append("</td></tr></table>\n" +
 
-                   "<hr><h4><a href=\"/config#help\" target=\"_top\" title=\"")
+                   "<hr><h4><a href=\"/confignet#help\" target=\"_top\" title=\"")
            .append(_("Help with configuring your firewall and router for optimal I2P performance"))
            .append("\">")
            .append(_("Network"))
@@ -214,7 +214,10 @@ public class SummaryBarRenderer {
 
 
         // display all the time so we display the final failure message, and plugin update messages too
-        buf.append(UpdateHandler.getStatus());
+        String status = UpdateHandler.getStatus();
+        if (status.length() > 0) {
+            buf.append("<h4>").append(status).append("</h4><hr>\n");
+        }
         if (_helper.updateAvailable() || _helper.unsignedUpdateAvailable()) {
             if ("true".equals(System.getProperty(UpdateHandler.PROP_UPDATE_IN_PROGRESS))) {
                 // nothing
@@ -233,13 +236,13 @@ public class SummaryBarRenderer {
                 buf.append("<form action=\"").append(uri).append("\" method=\"POST\">\n");
                 buf.append("<input type=\"hidden\" name=\"updateNonce\" value=\"").append(nonce).append("\" >\n");
                 if (_helper.updateAvailable()) {
-                    buf.append("<button type=\"submit\" name=\"updateAction\" value=\"signed\" >")
+                    buf.append("<button type=\"submit\" class=\"download\" name=\"updateAction\" value=\"signed\" >")
                        // Note to translators: parameter is a version, e.g. "0.8.4"
                        .append(_("Download {0} Update", _helper.getUpdateVersion()))
                        .append("</button><br>\n");
                 }
                 if (_helper.unsignedUpdateAvailable()) {
-                    buf.append("<button type=\"submit\" name=\"updateAction\" value=\"Unsigned\" >")
+                    buf.append("<button type=\"submit\" class=\"download\" name=\"updateAction\" value=\"Unsigned\" >")
                        // Note to translators: parameter is a date and time, e.g. "02-Mar 20:34 UTC"
                        // <br> is optional, to help the browser make the lines even in the button
                        // If the translation is shorter than the English, you should probably not include <br>
@@ -305,7 +308,7 @@ public class SummaryBarRenderer {
 
         boolean anotherLine = false;
         if (_helper.showFirewallWarning()) {
-            buf.append("<h4><a href=\"/config\" target=\"_top\" title=\"")
+            buf.append("<h4><a href=\"/confignet\" target=\"_top\" title=\"")
                .append(_("Help with firewall configuration"))
                .append("\">")
                .append(_("Check NAT/firewall"))
@@ -328,7 +331,7 @@ public class SummaryBarRenderer {
                 String uri = _helper.getRequestURI();
                 buf.append("<p><form action=\"").append(uri).append("\" method=\"POST\">\n");
                 buf.append("<input type=\"hidden\" name=\"reseedNonce\" value=\"").append(nonce).append("\" >\n");
-                buf.append("<button type=\"submit\" value=\"Reseed\" >").append(_("Reseed")).append("</button></form></p>\n");
+                buf.append("<button type=\"submit\" class=\"reload\" value=\"Reseed\" >").append(_("Reseed")).append("</button></form></p>\n");
             }
             anotherLine = true;
         }

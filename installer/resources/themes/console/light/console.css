@@ -160,15 +160,15 @@ div.routersummary h4 {
      font-size: 8.5pt;
      letter-spacing: 0.02em;
      margin: -6px -6px -7px !important;
-     padding: 3px 3px 5px 3px;
-     background: #dbdbf5;
-     text-transform: capitalize;
+     padding: 6px 3px 6px 27px;
+     background: #e0e0f5 url('../images/itoopie_xsm.png') no-repeat left center;
+     min-height: 26px;
      text-decoration: none !important;
-     color: #2b2;
+     color: #359;
      line-height: 105%;
-     -moz-box-shadow: inset 0px 0px 1px 30px #dfd;
-     -khtml-box-shadow: 0px 0px 1px 1px #dfd;
-     box-shadow: 0px 0px 1px 1px #fdf;
+     -moz-box-shadow: inset 0px 0px 1px 30px #bdf;
+     -khtml-box-shadow: 0px 0px 1px 1px #bdf;
+     box-shadow: 0px 0px 1px 1px #bdf;
 }
 
 div.routersummary table {
@@ -558,7 +558,7 @@ tr {
 }
 
 tr:nth-child(even) {
-     background: #eef url(images/magic.png);
+     background: #f7f7ff url(images/magic.png);
 }
 
 tr:nth-child(odd) {
@@ -577,15 +577,6 @@ tt {
      font: bold 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
      color: #008000;
      padding: 1px 5px;
-}
-
-div.main li {
-     text-align: left;
-     list-style: square;
-     margin: 2px 5px 0px 20px;
-     padding: 1px 10px 1px 10px;
-     line-height: 150%;
-     word-wrap: break-word;
 }
 
 div.main li {
@@ -639,12 +630,6 @@ ul {
      margin: 0;
      padding: 0;
 }
-
-code {
-     text-align: left;
-     font: 8pt "Lucida Console", "DejaVu Sans Mono", Courier, mono;
-}
-
 
 code {
      text-align: left;
@@ -796,20 +781,68 @@ button, button:visited {
      font: bold 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      border: 1px outset #66a;
      padding: 1px 3px;
-     background: #ffe !important;
+     background: #ffe;
      text-decoration: none;
      border-radius: 4px;
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      font-size: 8pt;
      font-weight: bold;
-     margin: 0 1px;
+     margin: 2px;
      text-align: center;
-     min-width: 80px;
+     min-width: 60px;
      -moz-box-shadow: inset 0px 0px 2px 1px #fff;
      -khtml-box-shadow: inset 0px 2px 8px 0px #fff;
      box-shadow: inset 0px 2px 8px 0px #fff;
      color: #316;
+}
+
+button.accept {
+     background: #ffe url('../images/accept.png') no-repeat left center;
+     padding: 1px 3px 1px 18px;
+     min-height: 22px;
+}
+
+button.add {
+     background: #ffe url('../images/add.png') no-repeat left center;
+     padding: 1px 3px 1px 18px;
+     min-height: 22px;
+}
+
+button.cancel {
+     background: #ffe url('../images/cancel.png') no-repeat left center;
+     padding: 1px 3px 1px 18px;
+     min-height: 22px;
+}
+
+button.check {
+     background: #ffe url('../images/tick.png') no-repeat left center;
+     padding: 1px 3px 1px 18px;
+     min-height: 22px;
+}
+
+button.delete {
+     background: #ffe url('../images/delete.png') no-repeat left center;
+     padding: 1px 3px 1px 18px;
+     min-height: 22px;
+}
+
+button.download {
+     background: #ffe url('../images/arrow_down.png') no-repeat left center;
+     padding: 1px 3px 1px 18px;
+     min-height: 22px;
+}
+
+button.reload {
+     background: #ffe url('../images/arrow_refresh.png') no-repeat left center;
+     padding: 1px 3px 1px 18px;
+     min-height: 22px;
+}
+
+button.stop {
+     background: #ffe url('../images/stop.png') no-repeat left center;
+     padding: 1px 3px 1px 18px;
+     min-height: 22px;
 }
 
 button:hover {
@@ -862,7 +895,7 @@ input, input:visited {
      color: #316;
      margin: 5px;
      font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
-     padding: 1px 2px;
+     padding: 1px 3px;
      text-decoration: none;
      border-radius: 4px;
      -moz-border-radius: 4px;
@@ -872,6 +905,53 @@ input, input:visited {
      opacity: 1;
 }
 
+input.accept {
+     background: #ffe url('../images/accept.png') no-repeat left center;
+     padding: 1px 3px 1px 18px;
+     min-height: 22px;
+}
+
+input.add {
+     background: #ffe url('../images/add.png') no-repeat left center;
+     padding: 1px 3px 1px 18px;
+     min-height: 22px;
+}
+
+input.cancel {
+     background: #ffe url('../images/cancel.png') no-repeat left center;
+     padding: 1px 3px 1px 18px;
+     min-height: 22px;
+}
+
+input.check {
+     background: #ffe url('../images/tick.png') no-repeat left center;
+     padding: 1px 3px 1px 18px;
+     min-height: 22px;
+}
+
+input.delete {
+     background: #ffe url('../images/delete.png') no-repeat left center;
+     padding: 1px 3px 1px 18px;
+     min-height: 22px;
+}
+
+input.download {
+     background: #ffe url('../images/arrow_down.png') no-repeat left center;
+     padding: 1px 3px 1px 18px;
+     min-height: 22px;
+}
+
+input.reload {
+     background: #ffe url('../images/arrow_refresh.png') no-repeat left center;
+     padding: 1px 3px 1px 18px;
+     min-height: 22px;
+}
+
+input.stop {
+     background: #ffe url('../images/stop.png') no-repeat left center;
+     padding: 1px 3px 1px 18px;
+     min-height: 22px;
+}
 
 input:hover {
      background: #f60;
@@ -896,7 +976,7 @@ input[type=text], input[type=password] {
      background: #ffe;
      color: #001;
      margin: 5px 10px 5px 10px;
-     padding: 4px 2px;
+     padding: 4px;
      font: bold 8pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      border: 1px solid #447;
      text-decoration: none;
@@ -923,7 +1003,7 @@ select {
      margin: 5px 10px 5px 10px;
      padding: 4px;
      border: 1px solid #447;
-     min-width: 110px;
+     min-width: 80px;
      font: 9pt "Lucida Sans Unicode", "Bitstream Vera Sans", Verdana, Tahoma, Helvetica, sans-serif;
      border-radius: 4px;
      -moz-border-radius: 4px;

@@ -41,11 +41,11 @@ button span.hide{
  <%=net.i2p.router.startup.ClientAppConfig.configFile(net.i2p.I2PAppContext.getGlobalContext()).getAbsolutePath()%>.
  <%=intl._("All changes require restart to take effect.")%></i>
  </p><hr><div class="formaction">
- <input type="submit" name="foo" value="<%=intl._("Cancel")%>" />
+ <input type="submit" class="cancel" name="foo" value="<%=intl._("Cancel")%>" />
 <% if (request.getParameter("edit") == null) { %>
- <input type="submit" name="edit" value="<%=intl._("Add Client")%>" />
+ <input type="submit" name="edit" class="add" value="<%=intl._("Add Client")%>" />
 <% } %>
- <input type="submit" name="action" value="<%=intl._("Save Client Configuration")%>" />
+ <input type="submit" class="accept" name="action" value="<%=intl._("Save Client Configuration")%>" />
 </div></form></div>
 
 <h3><a name="i2cp"></a><%=intl._("Advanced Client Interface Configuration")%></h3>
@@ -89,8 +89,8 @@ button span.hide{
 <%=intl._("Many clients do not support SSL or authorization.")%>
 <i><%=intl._("All changes require restart to take effect.")%></i>
 </p><hr><div class="formaction">
-<input type="submit" name="foo" value="<%=intl._("Cancel")%>" />
-<input type="submit" name="action" value="<%=intl._("Save Interface Configuration")%>" />
+<input type="submit" class="cancel" name="foo" value="<%=intl._("Cancel")%>" />
+<input type="submit" class="accept" name="action" value="<%=intl._("Save Interface Configuration")%>" />
 </div></form>
 
 <h3><a name="webapp"></a><%=intl._("WebApp Configuration")%></h3><p>
@@ -103,7 +103,7 @@ button span.hide{
  <jsp:getProperty name="clientshelper" property="form2" />
  <p><i><%=intl._("All changes require restart to take effect.")%></i>
  </p><hr><div class="formaction">
- <input type="submit" name="action" value="<%=intl._("Save WebApp Configuration")%>" />
+ <input type="submit" name="action" class="accept" value="<%=intl._("Save WebApp Configuration")%>" />
 </div></form></div>
 
 <% if (clientshelper.showPlugins()) { %>
@@ -114,7 +114,7 @@ button span.hide{
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <jsp:getProperty name="clientshelper" property="form3" />
 <hr><div class="formaction">
- <input type="submit" name="action" value="<%=intl._("Save Plugin Configuration")%>" />
+ <input type="submit" name="action" class="accept" value="<%=intl._("Save Plugin Configuration")%>" />
 </div></form></div>
 
 <h3><a name="plugin"></a><%=intl._("Plugin Installation")%></h3><p>
@@ -125,7 +125,7 @@ button span.hide{
 <p>
  <input type="text" size="60" name="pluginURL" >
  </p><hr><div class="formaction">
- <input type="submit" name="action" value="<%=intl._("Install Plugin")%>" />
+ <input type="submit" name="action" class="download" value="<%=intl._("Install Plugin")%>" />
  </div></form></div>
 <% } %>
 </div></div></body></html>

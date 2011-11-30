@@ -24,9 +24,9 @@
  <p><%=intl._("Graceful shutdown lets the router satisfy the agreements it has already made before shutting down, but may take a few minutes.")%> 
     <%=intl._("If you need to kill the router immediately, that option is available as well.")%></p>
   <hr><div class="formaction">
- <input type="submit" name="action" value="<%=intl._("Shutdown gracefully")%>" >
- <input type="submit" name="action" value="<%=intl._("Shutdown immediately")%>" >
- <input type="submit" name="action" value="<%=intl._("Cancel graceful shutdown")%>" >
+ <input type="submit" class="stop" name="action" value="<%=intl._("Shutdown gracefully")%>" >
+ <input type="submit" class="stop" name="action" value="<%=intl._("Shutdown immediately")%>" >
+ <input type="submit" class="cancel" name="action" value="<%=intl._("Cancel graceful shutdown")%>" >
  </div>
  <% if (System.getProperty("wrapper.version") != null) { %>
  <p><%=intl._("If you want the router to restart itself after shutting down, you can choose one of the following.")%> 
@@ -34,8 +34,8 @@
     <%=intl._("A graceful restart will take a few minutes (but your peers will appreciate your patience), while a hard restart does so immediately.")%> 
     <%=intl._("After tearing down the router, it will wait 1 minute before starting back up again.")%></p>
  <hr><div class="formaction">
- <input type="submit" name="action" value="<%=intl._("Graceful restart")%>" >
- <input type="submit" name="action" value="<%=intl._("Hard restart")%>" >
+ <input type="submit" class="reload" name="action" value="<%=intl._("Graceful restart")%>" >
+ <input type="submit" class="reload" name="action" value="<%=intl._("Hard restart")%>" >
  <% } %></div>
 
  <% if ( (System.getProperty("os.name") != null) && (System.getProperty("os.name").startsWith("Win")) ) { %>

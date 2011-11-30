@@ -139,7 +139,7 @@ public class ConfigTunnelsHandler extends FormHandler {
             if (saved) 
                 addFormNotice(_("Exploratory tunnel configuration saved successfully."));
             else
-                addFormNotice(_("Error saving the configuration (applied but not saved) - please see the error logs."));
+                addFormError(_("Error saving the configuration (applied but not saved) - please see the error logs."));
         }
     }
     private static final int getInt(Object val) { 

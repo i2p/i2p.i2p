@@ -9,11 +9,13 @@ import net.i2p.router.RouterContext;
  *
  */
 public class ConfigRestartBean {
-    /** all these are tagged below so no need to _x them here */
-    static final String[] SET1 = {"shutdownImmediate", "Shutdown immediately", "cancelShutdown", "Cancel shutdown"};
-    static final String[] SET2 = {"restartImmediate", "Restart immediately", "cancelShutdown", "Cancel restart"};
-    static final String[] SET3 = {"restart", "Restart", "shutdown", "Shutdown"};
-    static final String[] SET4 = {"shutdown", "Shutdown"};
+    /** all these are tagged below so no need to _x them here.
+     *  order is: form value, form class, display text.
+     */
+    static final String[] SET1 = {"shutdownImmediate", "stop", "Shutdown immediately", "cancelShutdown", "cancel", "Cancel shutdown"};
+    static final String[] SET2 = {"restartImmediate", "reload", "Restart immediately", "cancelShutdown", "cancel", "Cancel restart"};
+    static final String[] SET3 = {"restart", "reload", "Restart", "shutdown", "stop", "Shutdown"};
+    static final String[] SET4 = {"shutdown", "stop", "Shutdown"};
 
     public static String getNonce() { 
         RouterContext ctx = ContextHelper.getContext(null);
@@ -58,21 +60,21 @@ public class ConfigRestartBean {
         long timeRemaining = ctx.router().getShutdownTimeRemaining();
         StringBuilder buf = new StringBuilder(128);
         if ((shuttingDown || restarting) && timeRemaining <= 0) {
-            buf.append("<center><b>");
+            buf.append("<h4>");
             if (restarting)
                 buf.append(_("Restart imminent", ctx));
             else
                 buf.append(_("Shutdown imminent", ctx));
-            buf.append("</b></center>");
+            buf.append("</h4>");
         } else if (shuttingDown) {
-            buf.append("<center><b>");
+            buf.append("<h4>");
             buf.append(_("Shutdown in {0}", DataHelper.formatDuration2(timeRemaining), ctx));
-            buf.append("</b></center><br>");
+            buf.append("</h4><hr>");
             buttons(ctx, buf, urlBase, systemNonce, SET1);
         } else if (restarting) {
-            buf.append("<center><b>");
+            buf.append("<h4>");
             buf.append(_("Restart in {0}", DataHelper.formatDuration2(timeRemaining), ctx));
-            buf.append("</b></center><br>");
+            buf.append("</h4><hr>");
             buttons(ctx, buf, urlBase, systemNonce, SET2);
         } else {
             if (ctx.hasWrapper())
@@ -83,12 +85,16 @@ public class ConfigRestartBean {
         return buf.toString();
     }
     
-    /** @param s value,label,... pairs */
+    /** @param s value,class,label,... triplets */
     private static void buttons(RouterContext ctx, StringBuilder buf, String url, String nonce, String[] s) {
         buf.append("<form action=\"").append(url).append("\" method=\"POST\">\n");
         buf.append("<input type=\"hidden\" name=\"consoleNonce\" value=\"").append(nonce).append("\" >\n");
-        for (int i = 0; i < s.length; i+= 2)
-            buf.append("<button type=\"submit\" name=\"action\" value=\"").append(s[i]).append("\" >").append(_(s[i+1], ctx)).append("</button>\n");
+        for (int i = 0; i < s.length; i+= 3) {
+            buf.append("<button type=\"submit\" name=\"action\" value=\"")
+               .append(s[i]).append("\" class=\"")
+               .append(s[i+1]).append("\" >")
+               .append(_(s[i+2], ctx)).append("</button>\n");
+        }
         buf.append("</form>\n");
     }
 
