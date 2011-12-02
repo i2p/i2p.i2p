@@ -292,8 +292,8 @@ msgid "User"
 msgstr "Użytkownik"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1583
-msgid "Pass"
-msgstr "Pass"
+msgid "Password"
+msgstr "Password"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1584
 msgid "Host"

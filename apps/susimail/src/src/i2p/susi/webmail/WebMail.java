@@ -181,7 +181,7 @@ public class WebMail extends HttpServlet
 	 * 
 	 * @author susi
 	 */
-	class IDSorter implements Comparator {
+	private static class IDSorter implements Comparator<String> {
 		private MailCache mailCache;
 		
 		/**
@@ -196,9 +196,9 @@ public class WebMail extends HttpServlet
 		/* (non-Javadoc)
 		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 		 */
-		public int compare(Object arg0, Object arg1) {
-			Mail a = mailCache.getMail( (String)arg0, MailCache.FETCH_HEADER );
-			Mail b = mailCache.getMail( (String)arg1, MailCache.FETCH_HEADER );
+		public int compare(String arg0, String arg1) {
+			Mail a = mailCache.getMail( arg0, MailCache.FETCH_HEADER );
+			Mail b = mailCache.getMail( arg1, MailCache.FETCH_HEADER );
 			return a.id - b.id;
 		}		
 	}
@@ -208,7 +208,7 @@ public class WebMail extends HttpServlet
 	 * 
 	 * @author susi
 	 */
-	class SenderSorter implements Comparator {
+	private static class SenderSorter implements Comparator<String> {
 		private MailCache mailCache;
 		
 		/**
@@ -223,9 +223,9 @@ public class WebMail extends HttpServlet
 		/* (non-Javadoc)
 		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 		 */
-		public int compare(Object arg0, Object arg1) {
-			Mail a = mailCache.getMail( (String)arg0, MailCache.FETCH_HEADER );
-			Mail b = mailCache.getMail( (String)arg1, MailCache.FETCH_HEADER );
+		public int compare(String arg0, String arg1) {
+			Mail a = mailCache.getMail( arg0, MailCache.FETCH_HEADER );
+			Mail b = mailCache.getMail( arg1, MailCache.FETCH_HEADER );
 			return a.formattedSender.compareToIgnoreCase( b.formattedSender );
 		}		
 	}
@@ -234,7 +234,7 @@ public class WebMail extends HttpServlet
 	 * sorts Mail objects by subject field
 	 * @author susi
 	 */
-	class SubjectSorter implements Comparator {
+	private static class SubjectSorter implements Comparator<String> {
 
 		private MailCache mailCache;
 		/**
@@ -249,9 +249,9 @@ public class WebMail extends HttpServlet
 		/* (non-Javadoc)
 		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 		 */
-		public int compare(Object arg0, Object arg1) {
-			Mail a = mailCache.getMail( (String)arg0, MailCache.FETCH_HEADER );
-			Mail b = mailCache.getMail( (String)arg1, MailCache.FETCH_HEADER );
+		public int compare(String arg0, String arg1) {
+			Mail a = mailCache.getMail( arg0, MailCache.FETCH_HEADER );
+			Mail b = mailCache.getMail( arg1, MailCache.FETCH_HEADER );
 			return a.formattedSubject.compareToIgnoreCase( b.formattedSubject );
 		}		
 	}
@@ -260,7 +260,7 @@ public class WebMail extends HttpServlet
 	 * sorts Mail objects by date field
 	 * @author susi
 	 */
-	class DateSorter implements Comparator {
+	private static class DateSorter implements Comparator<String> {
 
 		private MailCache mailCache;
 		/**
@@ -275,9 +275,9 @@ public class WebMail extends HttpServlet
 		/* (non-Javadoc)
 		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 		 */
-		public int compare(Object arg0, Object arg1) {
-			Mail a = mailCache.getMail( (String)arg0, MailCache.FETCH_HEADER );
-			Mail b = mailCache.getMail( (String)arg1, MailCache.FETCH_HEADER );
+		public int compare(String arg0, String arg1) {
+			Mail a = mailCache.getMail( arg0, MailCache.FETCH_HEADER );
+			Mail b = mailCache.getMail( arg1, MailCache.FETCH_HEADER );
 			return a.date != null ? ( b.date != null ? a.date.compareTo( b.date ) : -1 ) : ( b.date != null ? 1 : 0 );
 		}		
 	}
@@ -285,7 +285,7 @@ public class WebMail extends HttpServlet
 	 * sorts Mail objects by message size
 	 * @author susi
 	 */
-	class SizeSorter implements Comparator {
+	private static class SizeSorter implements Comparator<String> {
 
 		private MailCache mailCache;
 		/**
@@ -300,9 +300,9 @@ public class WebMail extends HttpServlet
 		/* (non-Javadoc)
 		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 		 */
-		public int compare(Object arg0, Object arg1) {
-			Mail a = mailCache.getMail( (String)arg0, MailCache.FETCH_HEADER );
-			Mail b = mailCache.getMail( (String)arg1, MailCache.FETCH_HEADER );
+		public int compare(String arg0, String arg1) {
+			Mail a = mailCache.getMail( arg0, MailCache.FETCH_HEADER );
+			Mail b = mailCache.getMail( arg1, MailCache.FETCH_HEADER );
 			return a.size - b.size;
 		}		
 	}
@@ -311,7 +311,7 @@ public class WebMail extends HttpServlet
 	 * data structure to hold any persistent data (to store them in session dictionary)
 	 * @author susi
 	 */
-	class SessionObject {
+	private static class SessionObject {
 		boolean pageChanged, markAll, clear, invert;;
 		int state, smtpPort;
 		POP3MailBox mailbox;
@@ -344,7 +344,7 @@ public class WebMail extends HttpServlet
 	 * @param label
 	 * @return html string
 	 */
-	private String button( String name, String label )
+	private static String button( String name, String label )
 	{
 		return "<input type=\"submit\" name=\"" + name + "\" value=\"" + label + "\">";
 	}
@@ -355,7 +355,7 @@ public class WebMail extends HttpServlet
 	 * @param label
 	 * @return html string
 	 */
-	private String button2( String name, String label )
+	private static String button2( String name, String label )
 	{
 		return "<input type=\"submit\" name=\"" + name + "\" value=\"" + label + "\" disabled>";
 	}
@@ -367,7 +367,7 @@ public class WebMail extends HttpServlet
 	 * @param label
 	 * @return
 	 */
-	private String sortHeader( String name, String label )
+	private static String sortHeader( String name, String label )
 	{
 		return "" + label + "&nbsp;<a href=\"" + myself + "?" + name + "=up\"><img src=\"3up.png\" border=\"0\" alt=\"^\"></a><a href=\"" + myself + "?" + name + "=down\"><img src=\"3down.png\" border=\"0\" alt=\"v\"></a>";
 	}
@@ -377,7 +377,7 @@ public class WebMail extends HttpServlet
 	 * @param out
 	 * @param msg
 	 */
-	private void debug( PrintWriter out, String msg )
+	private static void debug( PrintWriter out, String msg )
 	{
 		out.println( "<!-- DEBUG: " + msg + " -->" );
 	}
@@ -388,7 +388,7 @@ public class WebMail extends HttpServlet
 	 * @param key
 	 * @return
 	 */
-	private boolean buttonPressed( RequestWrapper request, String key )
+	private static boolean buttonPressed( RequestWrapper request, String key )
 	{
 		String value = request.getParameter( key );
 		return value != null && value.length() > 0;
@@ -405,7 +405,7 @@ public class WebMail extends HttpServlet
 	 * @param mailPart
 	 * @param level is increased by recursively calling sub parts
 	 */
-	private void showPart( PrintWriter out, MailPart mailPart, int level, boolean html )
+	private static void showPart( PrintWriter out, MailPart mailPart, int level, boolean html )
 	{
 		String br = html ? "<br>\r\n" : "\r\n";
 		
@@ -542,7 +542,7 @@ public class WebMail extends HttpServlet
 	 * @param line
 	 * @return
 	 */
-	private String quoteHTML( String line )
+	private static String quoteHTML( String line )
 	{
 		if( line != null )
 			line = line.replaceAll( "<", "&lt;" ).replaceAll( ">", "&gt;" );
@@ -555,7 +555,7 @@ public class WebMail extends HttpServlet
 	 * @param sessionObject
 	 * @param request
 	 */
-	private void processLogin( SessionObject sessionObject, RequestWrapper request )
+	private static void processLogin( SessionObject sessionObject, RequestWrapper request )
 	{
 		if( sessionObject.state == STATE_AUTH ) {
 			String user = request.getParameter( USER );
@@ -659,7 +659,7 @@ public class WebMail extends HttpServlet
 	 * @param sessionObject
 	 * @param request
 	 */
-	private void processLogout( SessionObject sessionObject, RequestWrapper request )
+	private static void processLogout( SessionObject sessionObject, RequestWrapper request )
 	{
 		if( buttonPressed( request, LOGOUT ) ) {
 			HttpSession session = request.getSession();
@@ -683,7 +683,7 @@ public class WebMail extends HttpServlet
 	 * @param sessionObject
 	 * @param request
 	 */
-	private void processStateChangeButtons(SessionObject sessionObject, RequestWrapper request )
+	private static void processStateChangeButtons(SessionObject sessionObject, RequestWrapper request )
 	{
 		/*
 		 * LOGIN/LOGOUT
@@ -882,7 +882,7 @@ public class WebMail extends HttpServlet
 	 * @param request
 	 * @return
 	 */
-	private int getCheckedMessage(RequestWrapper request) {
+	private static int getCheckedMessage(RequestWrapper request) {
 		for( Enumeration e = request.getParameterNames(); e.hasMoreElements(); ) {
 			String parameter = (String)e.nextElement();
 			if( parameter.startsWith( "check" ) && request.getParameter( parameter ).compareTo( "1" ) == 0 ) {
@@ -902,7 +902,7 @@ public class WebMail extends HttpServlet
 	 * @param sessionObject
 	 * @param request
 	 */
-	private void processGenericButtons(SessionObject sessionObject, RequestWrapper request)
+	private static void processGenericButtons(SessionObject sessionObject, RequestWrapper request)
 	{
 		if( buttonPressed( request, RELOAD ) ) {
 			Config.reloadConfiguration();
@@ -918,7 +918,7 @@ public class WebMail extends HttpServlet
 	 * @param sessionObject
 	 * @param request
 	 */
-	private void processComposeButtons(SessionObject sessionObject, RequestWrapper request)
+	private static void processComposeButtons(SessionObject sessionObject, RequestWrapper request)
 	{
 		if( buttonPressed( request, NEW_UPLOAD ) ) {
 			String filename = request.getFilename( NEW_FILENAME );
@@ -996,7 +996,7 @@ public class WebMail extends HttpServlet
 	 * @param sessionObject
 	 * @param request
 	 */
-	private void processMessageButtons(SessionObject sessionObject, RequestWrapper request)
+	private static void processMessageButtons(SessionObject sessionObject, RequestWrapper request)
 	{
 		if( buttonPressed( request, PREV ) ) {
 			String uidl = (String)sessionObject.folder.getPreviousElement( sessionObject.showUIDL );
@@ -1051,7 +1051,7 @@ public class WebMail extends HttpServlet
 	 * @param hashCode
 	 * @return
 	 */
-	private MailPart getMailPartFromHashCode( MailPart part, int hashCode )
+	private static MailPart getMailPartFromHashCode( MailPart part, int hashCode )
 	{
 		if( part == null )
 			return null;
@@ -1073,7 +1073,7 @@ public class WebMail extends HttpServlet
 	 * @param sessionObject
 	 * @param request
 	 */
-	private void processFolderButtons(SessionObject sessionObject, RequestWrapper request)
+	private static void processFolderButtons(SessionObject sessionObject, RequestWrapper request)
 	{
 		/*
 		 * process paging buttons
@@ -1165,7 +1165,7 @@ public class WebMail extends HttpServlet
 	 * @param request
 	 * @param sort_id
 	 */
-	private void processSortingButton(SessionObject sessionObject, RequestWrapper request, String sort_id )
+	private static void processSortingButton(SessionObject sessionObject, RequestWrapper request, String sort_id )
 	{
 		String str = request.getParameter( sort_id );
 		if( str != null ) {
@@ -1315,7 +1315,7 @@ public class WebMail extends HttpServlet
 	 * @param response
 	 * @return
 	 */
-	private boolean sendAttachment(SessionObject sessionObject, HttpServletResponse response)
+	private static boolean sendAttachment(SessionObject sessionObject, HttpServletResponse response)
 	{
 		boolean shown = false;
 		if( sessionObject.showAttachment != null ) {
@@ -1374,7 +1374,7 @@ public class WebMail extends HttpServlet
 	 * @param request
 	 * @return
 	 */
-	private boolean sendMail( SessionObject sessionObject, RequestWrapper request )
+	private static boolean sendMail( SessionObject sessionObject, RequestWrapper request )
 	{
 		boolean ok = true;
 		
@@ -1503,6 +1503,7 @@ public class WebMail extends HttpServlet
 	/**
 	 * 
 	 */
+	@Override
 	public void doGet( HttpServletRequest request, HttpServletResponse response )
 	throws IOException, ServletException
 	{
@@ -1511,6 +1512,7 @@ public class WebMail extends HttpServlet
 	/**
 	 * 
 	 */
+	@Override
 	public void doPost( HttpServletRequest request, HttpServletResponse response )
 	throws IOException, ServletException
 	{
@@ -1522,7 +1524,7 @@ public class WebMail extends HttpServlet
 	 * @param sessionObject
 	 * @param request
 	 */
-	private void showCompose( PrintWriter out, SessionObject sessionObject, RequestWrapper request )
+	private static void showCompose( PrintWriter out, SessionObject sessionObject, RequestWrapper request )
 	{
 		out.println( button( SEND, _("Send") ) +
 				button( CANCEL, _("Cancel") ) + spacer +
@@ -1578,7 +1580,7 @@ public class WebMail extends HttpServlet
 	 * 
 	 * @param out
 	 */
-	private void showLogin( PrintWriter out )
+	private static void showLogin( PrintWriter out )
 	{
 		String fixedPorts = Config.getProperty( CONFIG_PORTS_FIXED, "true" );
 		boolean fixed = fixedPorts.compareToIgnoreCase( "false" ) != 0;
@@ -1587,12 +1589,20 @@ public class WebMail extends HttpServlet
 		String smtp = Config.getProperty( CONFIG_PORTS_SMTP, "" + DEFAULT_SMTPPORT );
 		
 		out.println( "<table cellspacing=\"0\" cellpadding=\"5\">\n" +
-			"<tr><td align=\"right\" width=\"30%\">" + _("User") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"32\" name=\"" + USER + "\" value=\"" + ( RELEASE ? "" : "test") + "\"></td></tr>\n" +
-			"<tr><td align=\"right\" width=\"30%\">" + _("Pass") + "</td><td width=\"40%\" align=\"left\"><input type=\"password\" size=\"32\" name=\"pass\" value=\"" + ( RELEASE ? "" : "test") + "\"></td></tr>\n" +
-			"<tr><td align=\"right\" width=\"30%\">" + _("Host") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"32\" name=\"" + HOST +"\" value=\"" + host + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n" +
-			"<tr><td align=\"right\" width=\"30%\">" + _("POP3-Port") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"32\" name=\"" + POP3 +"\" value=\"" + pop3 + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n" +
-			"<tr><td align=\"right\" width=\"30%\">" + _("SMTP-Port") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"32\" name=\"" + SMTP +"\" value=\"" + smtp + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n" +
-			"<tr><td align=\"center\" colspan=\"2\"><a href=\"http://hq.postman.i2p/?page_id=16\">" + _("Create Account") + "</a> " + button( LOGIN, _("Login") ) + " <input type=\"reset\" value=\"" + _("Reset") + "\"></td></tr>\n" +
+			"<tr><td align=\"right\" width=\"30%\">" + _("User") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"22\" name=\"" + USER + "\" value=\"" + ( RELEASE ? "" : "test") + "\"> @mail.i2p</td></tr>\n" +
+			"<tr><td align=\"right\" width=\"30%\">" + _("Password") + "</td><td width=\"40%\" align=\"left\"><input type=\"password\" size=\"32\" name=\"pass\" value=\"" + ( RELEASE ? "" : "test") + "\"></td></tr>\n");
+		// which is better?
+		//if (!fixed) {
+		if (true) {
+		    out.println(
+			"<tr><td align=\"right\" width=\"30%\">" + _("Host") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"22\" name=\"" + HOST +"\" value=\"" + host + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n" +
+			"<tr><td align=\"right\" width=\"30%\">" + _("POP3-Port") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"5\" name=\"" + POP3 +"\" value=\"" + pop3 + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n" +
+			"<tr><td align=\"right\" width=\"30%\">" + _("SMTP-Port") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"5\" name=\"" + SMTP +"\" value=\"" + smtp + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n");
+		}
+		out.println(
+			"<tr><td></td><td align=\"left\">" + button( LOGIN, _("Login") ) + " <input type=\"reset\" value=\"" + _("Reset") + "\"></td></tr>\n" +
+			"<tr><td></td><td align=\"left\"><a href=\"http://hq.postman.i2p/?page_id=14\">" + _("Learn about I2P mail") + "</a></td></tr>\n" +
+			"<tr><td></td><td align=\"left\"><a href=\"http://hq.postman.i2p/?page_id=16\">" + _("Create Account") + "</a></td></tr>\n" +
 			"</table>");
 	}
 	/**
@@ -1601,7 +1611,7 @@ public class WebMail extends HttpServlet
 	 * @param sessionObject
 	 * @param request
 	 */
-	private void showFolder( PrintWriter out, SessionObject sessionObject, RequestWrapper request )
+	private static void showFolder( PrintWriter out, SessionObject sessionObject, RequestWrapper request )
 	{
 		if( sessionObject.reallyDelete ) {
 			out.println( "<p class=\"error\">" + _("Really delete the marked messages?") + " " + button( REALLYDELETE, _("Yes, really delete them!") ) + "</p>" );
@@ -1670,7 +1680,7 @@ public class WebMail extends HttpServlet
 	 * @param out
 	 * @param sessionObject
 	 */
-	private void showMessage( PrintWriter out, SessionObject sessionObject )
+	private static void showMessage( PrintWriter out, SessionObject sessionObject )
 	{
 		if( sessionObject.reallyDelete ) {
 			out.println( "<p class=\"error\">" + _("Really delete this message?") + " " + button( REALLYDELETE, _("Yes, really delete it!") ) + "</p>" );
@@ -1731,7 +1741,7 @@ public class WebMail extends HttpServlet
 	}
 	
 	/** translate */
-    private String ngettext(String s, String p, int n) {
+    private static String ngettext(String s, String p, int n) {
         return Messages.getString(n, s, p);
     }
 }

@@ -287,7 +287,7 @@ msgid "User"
 msgstr "用户"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1583
-msgid "Pass"
+msgid "Password"
 msgstr "通过"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1584

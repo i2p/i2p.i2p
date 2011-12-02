@@ -299,7 +299,7 @@ msgid "User"
 msgstr "Usuario"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1590
-msgid "Pass"
+msgid "Password"
 msgstr "Contraseña"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1591
