@@ -26,7 +26,7 @@
  <h3><%=intl._("Configure I2P Logging Options")%></h3>
  <div class="wideload">
       <table border="0" cellspacing="5">
-        <tr><td class="mediumtags" align="right"><b><%=intl._("Logging filename")%>:</b></td>
+        <tr><td class="mediumtags" align="right"><b><%=intl._("Log file")%>:</b></td>
           <td><input type="text" name="logfilename" size="40" value="<jsp:getProperty name="logginghelper" property="logFilePattern" />" >
             <br> <i><%=intl._("(the symbol '@' will be replaced during log rotation)")%></i></td>
         </tr><tr><td class="mediumtags" align="right"><b><%=intl._("Log record format")%>:</b></td>

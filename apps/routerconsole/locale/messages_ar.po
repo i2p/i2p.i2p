@@ -3279,7 +3279,7 @@ msgid "Anonymous webmail client"
 msgstr "بريد الكتروني مجهول"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:77
-msgid "Webmail"
+msgid "Email"
 msgstr "بريد الكتروني"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:81
@@ -3419,7 +3419,7 @@ msgid "Help with firewall configuration"
 msgstr "مساعدة خول اعدادات الجدار الناري"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:310
-msgid "Check NAT/firewall"
+msgid "Check network connection and NAT/firewall"
 msgstr "تأكد من NAT/جدار ناري"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:330
@@ -4794,7 +4794,7 @@ msgid "Configure I2P Logging Options"
 msgstr "اعدادت السجلات I2P"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:303
-msgid "Logging filename"
+msgid "Log file"
 msgstr "ملف السجل"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:307

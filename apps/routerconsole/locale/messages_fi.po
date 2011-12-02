@@ -3585,7 +3585,7 @@ msgid "Anonymous webmail client"
 msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:77
-msgid "Webmail"
+msgid "Email"
 msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:81
@@ -3732,7 +3732,7 @@ msgid "Help with firewall configuration"
 msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:307
-msgid "Check NAT/firewall"
+msgid "Check network connection and NAT/firewall"
 msgstr ""
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:327
@@ -5255,7 +5255,7 @@ msgid "Configure I2P Logging Options"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:328
-msgid "Logging filename"
+msgid "Log file"
 msgstr ""
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:332

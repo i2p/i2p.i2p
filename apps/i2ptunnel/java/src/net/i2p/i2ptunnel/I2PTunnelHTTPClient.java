@@ -935,15 +935,15 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                    ahelperKey + "</textarea></td></tr></table>\n" +
                    "<hr><div class=\"formaction\">"+
                    "<form method=\"GET\" action=\"" + targetRequest + "\">" +
-                   "<button type=\"submit\">" + _("Continue to {0} without saving", destination) + "</button>" +
+                   "<button type=\"submit\" class=\"go\">" + _("Continue to {0} without saving", destination) + "</button>" +
                    "</form>\n<form method=\"GET\" action=\"http://" + LOCAL_SERVER + "/add\">" +
                    "<input type=\"hidden\" name=\"host\" value=\"" + destination + "\">\n" +
                    "<input type=\"hidden\" name=\"dest\" value=\"" + ahelperKey + "\">\n" +
                    "<input type=\"hidden\" name=\"nonce\" value=\"" + _proxyNonce + "\">\n" +
-                   "<button type=\"submit\" name=\"router\" value=\"router\">" + _("Save {0} to router address book and continue to eepsite", destination) + "</button><br>\n").getBytes("UTF-8"));
+                   "<button type=\"submit\" class=\"accept\" name=\"router\" value=\"router\">" + _("Save {0} to router address book and continue to eepsite", destination) + "</button><br>\n").getBytes("UTF-8"));
         if (_context.namingService().getName().equals("BlockfileNamingService")) {
             // only blockfile supports multiple books
-            out.write(("<button type=\"submit\" name=\"master\" value=\"master\">" + _("Save {0} to master address book and continue to eepsite", destination) + "</button><br>\n").getBytes("UTF-8"));
+            out.write(("<br><button type=\"submit\" name=\"master\" value=\"master\">" + _("Save {0} to master address book and continue to eepsite", destination) + "</button><br>\n").getBytes("UTF-8"));
             out.write(("<button type=\"submit\" name=\"private\" value=\"private\">" + _("Save {0} to private address book and continue to eepsite", destination) + "</button>\n").getBytes("UTF-8"));
         }
         out.write(("<input type=\"hidden\" name=\"url\" value=\"" + targetRequest + "\">\n" +

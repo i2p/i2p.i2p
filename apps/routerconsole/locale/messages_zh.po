@@ -3490,7 +3490,7 @@ msgid "Anonymous webmail client"
 msgstr "匿名Web邮件客户端"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:77
-msgid "Webmail"
+msgid "Email"
 msgstr "匿名邮箱"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:81
@@ -3638,7 +3638,7 @@ msgid "Help with firewall configuration"
 msgstr "如何配置防火墙"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:307
-msgid "Check NAT/firewall"
+msgid "Check network connection and NAT/firewall"
 msgstr "检查NAT/防火墙"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:327
@@ -5137,7 +5137,7 @@ msgid "Configure I2P Logging Options"
 msgstr "设置 I2P 记录选项"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:321
-msgid "Logging filename"
+msgid "Log file"
 msgstr "日志文件名称"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:325

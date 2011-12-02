@@ -3546,7 +3546,7 @@ msgid "Anonymous webmail client"
 msgstr "Client webmail anonyme"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:77
-msgid "Webmail"
+msgid "Email"
 msgstr "Messagerie web"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:81
@@ -3695,7 +3695,7 @@ msgid "Help with firewall configuration"
 msgstr "Aide à la configuration du pare-feu"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:307
-msgid "Check NAT/firewall"
+msgid "Check network connection and NAT/firewall"
 msgstr "Vérifier NAT/pare-feu"
 
 #: ../java/src/net/i2p/router/web/SummaryBarRenderer.java:327
@@ -5310,7 +5310,7 @@ msgid "Configure I2P Logging Options"
 msgstr "Configuration des options d'historiques"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:328
-msgid "Logging filename"
+msgid "Log file"
 msgstr "Nom du fichier des historiques"
 
 #: ../jsp/WEB-INF/classes/net/i2p/router/web/jsp/configlogging_jsp.java:332

@@ -120,6 +120,12 @@ div.routersummary hr {
      box-shadow: inset 0px 1px 1px 1px #fff;
 }
 
+div.routersummary hr.b {
+     color: #f0f0f0;
+     background: #f0f0f0;
+     border-bottom: 1px solid #f0f0f0;
+}
+
 div routersummary hr:last-child {
 }
 
@@ -161,8 +167,8 @@ div.routersummary h4 {
      letter-spacing: 0.02em;
      margin: -6px -6px -7px !important;
      padding: 6px 3px 6px 27px;
-     background: #e0e0f5 url('../images/itoopie_xsm.png') no-repeat left center;
-     min-height: 26px;
+     background: #e0e0f5 url('../images/itoopie_xsm.png') no-repeat 1px center;
+     min-height: 16px;
      text-decoration: none !important;
      color: #359;
      line-height: 105%;
@@ -174,7 +180,7 @@ div.routersummary h4 {
 div.routersummary table {
      border: 0;
      text-align: center !important;
-     margin: -7px -5px -6px -5px;
+     margin: -6px -5px -4px -5px;
      width: 190px !important;
      overflow: hidden;
      font-size: 8pt;
@@ -426,21 +432,42 @@ div.news h4 {
 }
 
 div.confignav {
-     padding: 15px 10px !important;
-     margin: 15px 0 15px 0;
-     background: url('images/header.png') center center repeat-x;
-     -moz-border-radius: 4px;
-     -khtml-border-radius: 4px;
-     border-radius: 4px;
-     border: 1px solid #115;
+     padding: 16px 10px !important;
+     margin: 10px 0 0 0;
      font-size: 9.5pt !important;
      font-weight: bold !important;
      line-height: 160% !important;
-     -moz-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
-     -khtml-box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
-     box-shadow: 0 2px 1px 1px rgba(176, 176, 216, 0.4);
      opacity: 1;
      min-width: 400px;
+}
+
+span.tab {
+     padding: 2px 18px 4px 6px;
+     margin: -5px -3px 0 0;
+     background: #d8d8ff;
+     -moz-border-radius: 6px 32px 2px 0;
+     -khtml-border-radius: 6px 32px 2px 0;
+     border-radius: 6px 32px 2px 0;
+     border: 1px solid #111;
+     border-left: 2px solid #115;
+     min-width: 40px;
+     display: inline-block;
+     word-wrap: break-word;
+     vertical-align: bottom;
+}
+
+span.tab2 {
+     padding: 6px 18px 6px 6px;
+     margin: -11px -3px 0 0;
+     background: #e8e8ff;
+     -moz-border-radius: 6px 32px 2px 0;
+     -khtml-border-radius: 6px 32px 2px 0;
+     border-radius: 6px 32px 2px 0;
+     border: 2px solid #111;
+     min-width: 40px;
+     display: inline-block;
+     word-wrap: break-word;
+     vertical-align: bottom;
 }
 
 div.configure {
@@ -714,7 +741,6 @@ h2 {
      letter-spacing: 0.07em;
      background: url('images/header.png') center center repeat-x;
      padding: 10px;
-     wordwrap: none;
      border: 1px solid #115;
      border-radius: 4px;
      -moz-border-radius: 4px;
@@ -798,50 +824,56 @@ button, button:visited {
 }
 
 button.accept {
-     background: #ffe url('../images/accept.png') no-repeat left center;
-     padding: 1px 3px 1px 18px;
+     background: #ffe url('../images/accept.png') no-repeat 2px center;
+     padding: 1px 3px 1px 20px;
      min-height: 22px;
 }
 
 button.add {
-     background: #ffe url('../images/add.png') no-repeat left center;
-     padding: 1px 3px 1px 18px;
+     background: #ffe url('../images/add.png') no-repeat 2px center;
+     padding: 1px 3px 1px 20px;
      min-height: 22px;
 }
 
 button.cancel {
-     background: #ffe url('../images/cancel.png') no-repeat left center;
-     padding: 1px 3px 1px 18px;
+     background: #ffe url('../images/cancel.png') no-repeat 2px center;
+     padding: 1px 3px 1px 20px;
      min-height: 22px;
 }
 
 button.check {
-     background: #ffe url('../images/tick.png') no-repeat left center;
-     padding: 1px 3px 1px 18px;
+     background: #ffe url('../images/tick.png') no-repeat 2px center;
+     padding: 1px 3px 1px 20px;
      min-height: 22px;
 }
 
 button.delete {
-     background: #ffe url('../images/delete.png') no-repeat left center;
-     padding: 1px 3px 1px 18px;
+     background: #ffe url('../images/delete.png') no-repeat 2px center;
+     padding: 1px 3px 1px 20px;
      min-height: 22px;
 }
 
 button.download {
-     background: #ffe url('../images/arrow_down.png') no-repeat left center;
-     padding: 1px 3px 1px 18px;
+     background: #ffe url('../images/arrow_down.png') no-repeat 2px center;
+     padding: 1px 3px 1px 20px;
+     min-height: 22px;
+}
+
+button.go {
+     background: #ffe url('../images/arrow_right.png') no-repeat 2px center;
+     padding: 1px 3px 1px 20px;
      min-height: 22px;
 }
 
 button.reload {
-     background: #ffe url('../images/arrow_refresh.png') no-repeat left center;
-     padding: 1px 3px 1px 18px;
+     background: #ffe url('../images/arrow_refresh.png') no-repeat 2px center;
+     padding: 1px 3px 1px 20px;
      min-height: 22px;
 }
 
 button.stop {
-     background: #ffe url('../images/stop.png') no-repeat left center;
-     padding: 1px 3px 1px 18px;
+     background: #ffe url('../images/stop.png') no-repeat 2px center;
+     padding: 1px 3px 1px 20px;
      min-height: 22px;
 }
 
@@ -906,50 +938,56 @@ input, input:visited {
 }
 
 input.accept {
-     background: #ffe url('../images/accept.png') no-repeat left center;
-     padding: 1px 3px 1px 18px;
+     background: #ffe url('../images/accept.png') no-repeat 2px center;
+     padding: 1px 3px 1px 20px;
      min-height: 22px;
 }
 
 input.add {
-     background: #ffe url('../images/add.png') no-repeat left center;
-     padding: 1px 3px 1px 18px;
+     background: #ffe url('../images/add.png') no-repeat 2px center;
+     padding: 1px 3px 1px 20px;
      min-height: 22px;
 }
 
 input.cancel {
-     background: #ffe url('../images/cancel.png') no-repeat left center;
-     padding: 1px 3px 1px 18px;
+     background: #ffe url('../images/cancel.png') no-repeat 2px center;
+     padding: 1px 3px 1px 20px;
      min-height: 22px;
 }
 
 input.check {
-     background: #ffe url('../images/tick.png') no-repeat left center;
-     padding: 1px 3px 1px 18px;
+     background: #ffe url('../images/tick.png') no-repeat 2px center;
+     padding: 1px 3px 1px 20px;
      min-height: 22px;
 }
 
 input.delete {
-     background: #ffe url('../images/delete.png') no-repeat left center;
-     padding: 1px 3px 1px 18px;
+     background: #ffe url('../images/delete.png') no-repeat 2px center;
+     padding: 1px 3px 1px 20px;
      min-height: 22px;
 }
 
 input.download {
-     background: #ffe url('../images/arrow_down.png') no-repeat left center;
-     padding: 1px 3px 1px 18px;
+     background: #ffe url('../images/arrow_down.png') no-repeat 2px center;
+     padding: 1px 3px 1px 20px;
+     min-height: 22px;
+}
+
+input.go {
+     background: #ffe url('../images/arrow_right.png') no-repeat 2px center;
+     padding: 1px 3px 1px 20px;
      min-height: 22px;
 }
 
 input.reload {
-     background: #ffe url('../images/arrow_refresh.png') no-repeat left center;
-     padding: 1px 3px 1px 18px;
+     background: #ffe url('../images/arrow_refresh.png') no-repeat 2px center;
+     padding: 1px 3px 1px 20px;
      min-height: 22px;
 }
 
 input.stop {
-     background: #ffe url('../images/stop.png') no-repeat left center;
-     padding: 1px 3px 1px 18px;
+     background: #ffe url('../images/stop.png') no-repeat 2px center;
+     padding: 1px 3px 1px 20px;
      min-height: 22px;
 }
 

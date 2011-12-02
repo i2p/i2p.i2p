@@ -61,12 +61,12 @@ public class SummaryBarRenderer {
                .append(_("I2P Services"))
                .append("</a></h3>\n" +
 
-                       "<hr><table>" +
+                       "<hr class=\"b\"><table><tr><td>" +
 
-                       "<tr><td><a href=\"/susidns/index\" target=\"_blank\" title=\"")
-               .append(_("Manage your I2P hosts file here (I2P domain name resolution)"))
+                       "<a href=\"/susimail/susimail\" target=\"blank\" title=\"")
+               .append(_("Anonymous webmail client"))
                .append("\">")
-               .append(_("Addressbook"))
+               .append(_("Email"))
                .append("</a>\n" +
 
                        "<a href=\"/i2psnark/\" target=\"_blank\" title=\"")
@@ -75,17 +75,11 @@ public class SummaryBarRenderer {
                .append(_("Torrents"))
                .append("</a>\n" +
 
-                       "<a href=\"/susimail/susimail\" target=\"blank\" title=\"")
-               .append(_("Anonymous webmail client"))
-               .append("\">")
-               .append(_("Webmail"))
-               .append("</a>\n" +
-
                        "<a href=\"http://127.0.0.1:7658/\" target=\"_blank\" title=\"")
-               .append(_("Anonymous resident webserver"))
+               .append(_("Local web server"))
                .append("\">")
-               .append(_("Webserver"))
-               .append("</a>")
+               .append(_("Website"))
+               .append("</a>\n")
 
                .append(NavHelper.getClientAppLinks(_context))
 
@@ -95,7 +89,7 @@ public class SummaryBarRenderer {
                .append(_("Configure I2P Router"))
                .append("\">")
                .append(_("I2P Internals"))
-               .append("</a></h3><hr>\n" +
+               .append("</a></h3><hr class=\"b\">\n" +
 
                        "<table><tr><td>\n" +
 
@@ -153,6 +147,12 @@ public class SummaryBarRenderer {
                .append(_("Local Destinations"))
                .append("\">")
                .append(_("I2PTunnel"))
+               .append("</a>\n" +
+
+                       "<a href=\"/susidns/index\" target=\"_blank\" title=\"")
+               .append(_("Manage your I2P hosts file here (I2P domain name resolution)"))
+               .append("\">")
+               .append(_("Addressbook"))
                .append("</a>\n");
 
             File javadoc = new File(_context.getBaseDir(), "docs/javadoc/index.html");
@@ -170,7 +170,7 @@ public class SummaryBarRenderer {
            .append(_("I2P Router Help"))
            .append("\">")
            .append(_("General"))
-           .append("</a></h3><hr>\n" +
+           .append("</a></h3><hr class=\"b\">\n" +
 
                    "<table><tr>" +
                    "<td align=\"left\"><b>")
@@ -262,7 +262,7 @@ public class SummaryBarRenderer {
            .append(_("Show all current peer connections"))
            .append("\">")
            .append(_("Peers"))
-           .append("</a></h3><hr>\n" +
+           .append("</a></h3><hr class=\"b\">\n" +
 
                    "<table>\n" +
 
@@ -311,7 +311,7 @@ public class SummaryBarRenderer {
             buf.append("<h4><a href=\"/confignet\" target=\"_top\" title=\"")
                .append(_("Help with firewall configuration"))
                .append("\">")
-               .append(_("Check NAT/firewall"))
+               .append(_("Check network connection and NAT/firewall"))
                .append("</a></h4>");
             anotherLine = true;
         }
@@ -351,7 +351,7 @@ public class SummaryBarRenderer {
            .append(_("Configure router bandwidth allocation"))
            .append("\" target=\"_top\">")
            .append(_("Bandwidth in/out"))
-           .append("</a></h3><hr>" +
+           .append("</a></h3><hr class=\"b\">" +
                    "<table>\n" +
 
                    "<tr><td align=\"left\"><b>")
@@ -388,7 +388,7 @@ public class SummaryBarRenderer {
            .append(_("View existing tunnels and tunnel build status"))
            .append("\">")
            .append(_("Tunnels"))
-           .append("</a></h3><hr>" +
+           .append("</a></h3><hr class=\"b\">" +
                    "<table>\n" +
 
                    "<tr><td align=\"left\"><b>")
@@ -419,7 +419,7 @@ public class SummaryBarRenderer {
            .append(_("What's in the router's job queue?"))
            .append("\">")
            .append(_("Congestion"))
-           .append("</a></h3><hr>" +
+           .append("</a></h3><hr class=\"b\">" +
                    "<table>\n" +
 
                    "<tr><td align=\"left\"><b>")
