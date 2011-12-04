@@ -584,7 +584,7 @@ public class I2PSnarkServlet extends Default {
                             File f = new File(name);
                             f.delete();
                             _manager.addMessage(_("Torrent file deleted: {0}", f.getAbsolutePath()));
-                            List files = meta.getFiles();
+                            List<List<String>> files = meta.getFiles();
                             String dataFile = snark.getBaseName();
                             f = new File(_manager.getDataDir(), dataFile);
                             if (files == null) { // single file torrent
@@ -594,23 +594,36 @@ public class I2PSnarkServlet extends Default {
                                     _manager.addMessage(_("Data file could not be deleted: {0}", f.getAbsolutePath()));
                                 break;
                             }
-                            for (int i = 0; i < files.size(); i++) { // pass 1 delete files
+                            // step 1 delete files
+                            for (int i = 0; i < files.size(); i++) {
                                 // multifile torrents have the getFiles() return lists of lists of filenames, but
                                 // each of those lists just contain a single file afaict...
-                                File df = Storage.getFileFromNames(f, (List) files.get(i));
+                                File df = Storage.getFileFromNames(f, files.get(i));
                                 if (df.delete())
                                     _manager.addMessage(_("Data file deleted: {0}", df.getAbsolutePath()));
                                 else
                                     _manager.addMessage(_("Data file could not be deleted: {0}", df.getAbsolutePath()));
                             }
-                            for (int i = files.size() - 1; i >= 0; i--) { // pass 2 delete dirs - not foolproof,
-                                                                          // we could sort and do a strict bottom-up
-                                File df = Storage.getFileFromNames(f, (List) files.get(i));
-                                df = df.getParentFile();
-                                if (df == null || !df.exists())
-                                    continue;
-                                if(df.delete())
+                            // step 2 make Set of dirs with reverse sort
+                            Set<File> dirs = new TreeSet(Collections.reverseOrder());
+                            for (List<String> list : files) {
+                                for (int i = 1; i < list.size(); i++) {
+                                    dirs.add(Storage.getFileFromNames(f, list.subList(0, i)));
+                                }
+                            }
+                            // step 3 delete dirs bottom-up
+                            for (File df : dirs) {
+                                if (df.delete()) {
                                     _manager.addMessage(_("Data dir deleted: {0}", df.getAbsolutePath()));
+                                } else if (_log.shouldLog(Log.WARN)) {
+                                    _log.warn("Could not delete dir " + df);
+                                }
+                            }
+                            // step 4 delete base
+                            if (f.delete()) {
+                                _manager.addMessage(_("Data dir deleted: {0}", f.getAbsolutePath()));
+                            } else if (_log.shouldLog(Log.WARN)) {
+                                _log.warn("Could not delete dir " + f);
                             }
                             break;
                         }
