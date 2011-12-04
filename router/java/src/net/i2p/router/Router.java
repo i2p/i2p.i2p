@@ -1614,9 +1614,7 @@ public class Router implements RouterClock.ClockShiftListener {
      *
      */
     public double getSharePercentage() {
-        RouterContext ctx = _context;
-        if (ctx == null) return 0;
-        String pct = ctx.getProperty(PROP_BANDWIDTH_SHARE_PERCENTAGE);
+        String pct = _context.getProperty(PROP_BANDWIDTH_SHARE_PERCENTAGE);
         if (pct != null) {
             try {
                 double d = Double.parseDouble(pct);
@@ -1633,62 +1631,40 @@ public class Router implements RouterClock.ClockShiftListener {
     }
 
     public int get1sRate() { return get1sRate(false); }
+
     public int get1sRate(boolean outboundOnly) {
-        RouterContext ctx = _context;
-        if (ctx != null) {
-            FIFOBandwidthLimiter bw = ctx.bandwidthLimiter();
-            if (bw != null) {
+            FIFOBandwidthLimiter bw = _context.bandwidthLimiter();
                 int out = (int)bw.getSendBps();
                 if (outboundOnly)
                     return out;
                 return (int)Math.max(out, bw.getReceiveBps());
-            }
-        }
-        return 0;
     }
+
     public int get1sRateIn() {
-        RouterContext ctx = _context;
-        if (ctx != null) {
-            FIFOBandwidthLimiter bw = ctx.bandwidthLimiter();
-            if (bw != null)
+            FIFOBandwidthLimiter bw = _context.bandwidthLimiter();
                 return (int) bw.getReceiveBps();
-        }
-        return 0;
     }
 
     public int get15sRate() { return get15sRate(false); }
+
     public int get15sRate(boolean outboundOnly) {
-        RouterContext ctx = _context;
-        if (ctx != null) {
-            FIFOBandwidthLimiter bw = ctx.bandwidthLimiter();
-            if (bw != null) {
+            FIFOBandwidthLimiter bw = _context.bandwidthLimiter();
                 int out = (int)bw.getSendBps15s();
                 if (outboundOnly)
                     return out;
                 return (int)Math.max(out, bw.getReceiveBps15s());
-            }
-        }
-        return 0;
     }
+
     public int get15sRateIn() {
-        RouterContext ctx = _context;
-        if (ctx != null) {
-            FIFOBandwidthLimiter bw = ctx.bandwidthLimiter();
-            if (bw != null)
+            FIFOBandwidthLimiter bw = _context.bandwidthLimiter();
                 return (int) bw.getReceiveBps15s();
-        }
-        return 0;
     }
 
     public int get1mRate() { return get1mRate(false); }
+
     public int get1mRate(boolean outboundOnly) {
         int send = 0;
-        RouterContext ctx = _context;
-        if (ctx == null)
-            return 0;
-        StatManager mgr = ctx.statManager();
-        if (mgr == null)
-            return 0;
+        StatManager mgr = _context.statManager();
         RateStat rs = mgr.getRate("bw.sendRate");
         if (rs != null)
             send = (int)rs.getRate(1*60*1000).getAverageValue();
@@ -1700,13 +1676,9 @@ public class Router implements RouterClock.ClockShiftListener {
             recv = (int)rs.getRate(1*60*1000).getAverageValue();
         return Math.max(send, recv);
     }
+
     public int get1mRateIn() {
-        RouterContext ctx = _context;
-        if (ctx == null)
-            return 0;
-        StatManager mgr = ctx.statManager();
-        if (mgr == null)
-            return 0;
+        StatManager mgr = _context.statManager();
         RateStat rs = mgr.getRate("bw.recvRate");
         int recv = 0;
         if (rs != null)
@@ -1715,6 +1687,7 @@ public class Router implements RouterClock.ClockShiftListener {
     }
 
     public int get5mRate() { return get5mRate(false); }
+
     public int get5mRate(boolean outboundOnly) {
         int send = 0;
         RateStat rs = _context.statManager().getRate("bw.sendRate");
