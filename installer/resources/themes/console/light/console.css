@@ -433,7 +433,7 @@ div.news h4 {
 
 div.confignav {
      padding: 16px 10px !important;
-     margin: 10px 0 0 0;
+     margin: 10px 0 0 -10px;
      font-size: 9.5pt !important;
      font-weight: bold !important;
      line-height: 160% !important;
@@ -443,13 +443,14 @@ div.confignav {
 
 span.tab {
      padding: 2px 18px 4px 6px;
-     margin: -5px -3px 0 0;
+     margin: -5px -7px 0 0;
      background: #d8d8ff;
      -moz-border-radius: 6px 32px 2px 0;
      -khtml-border-radius: 6px 32px 2px 0;
      border-radius: 6px 32px 2px 0;
-     border: 1px solid #111;
-     border-left: 2px solid #115;
+     border: 1px outset #00f;
+     border-width: 2px 1px 1px 2px;
+     border-bottom-style: dashed;
      min-width: 40px;
      display: inline-block;
      word-wrap: break-word;
@@ -457,13 +458,16 @@ span.tab {
 }
 
 span.tab2 {
-     padding: 6px 18px 6px 6px;
+     color: #008;
+     padding: 7px 18px 6px 6px;
      margin: -11px -3px 0 0;
      background: #e8e8ff;
      -moz-border-radius: 6px 32px 2px 0;
      -khtml-border-radius: 6px 32px 2px 0;
      border-radius: 6px 32px 2px 0;
-     border: 2px solid #111;
+     border: outset #00f;
+     border-width: 3px 1px 0 4px;
+     border-bottom-style: none;
      min-width: 40px;
      display: inline-block;
      word-wrap: break-word;

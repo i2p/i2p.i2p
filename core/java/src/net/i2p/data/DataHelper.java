@@ -1239,6 +1239,9 @@ public class DataHelper {
      * Use only in HTML.
      * Thresholds are a little lower than in formatDuration() also,
      * as precision is less important in the GUI than in logging.
+     *
+     * Negative numbers handled correctly.
+     *
      * @since 0.8.2
      */
     public static String formatDuration2(long ms) {
@@ -1258,26 +1261,30 @@ public class DataHelper {
             t = ngettext("1 ms", "{0,number,####} ms", (int) ms);
         } else if (ams < 2 * 60 * 1000) {
             // seconds
-            // Note to translators: quantity will always be greater than one.
             // alternates: secs, sec. 'seconds' is probably too long.
             t = ngettext("1 sec", "{0} sec", (int) (ms / 1000));
         } else if (ams < 120 * 60 * 1000) {
             // minutes
-            // Note to translators: quantity will always be greater than one.
             // alternates: mins, min. 'minutes' is probably too long.
             t = ngettext("1 min", "{0} min", (int) (ms / (60 * 1000)));
         } else if (ams < 2 * 24 * 60 * 60 * 1000) {
             // hours
-            // Note to translators: quantity will always be greater than one.
             // alternates: hrs, hr., hrs.
             t = ngettext("1 hour", "{0} hours", (int) (ms / (60 * 60 * 1000)));
         } else if (ams > 1000l * 24l * 60l * 60l * 1000l) {
             return _("n/a");
         } else {
             // days
-            // Note to translators: quantity will always be greater than one.
             t = ngettext("1 day", "{0} days", (int) (ms / (24 * 60 * 60 * 1000)));
         }
+        // Replace minus sign to work around
+        // bug in Chrome (and IE?), line breaks at the minus sign
+        // http://code.google.com/p/chromium/issues/detail?id=46683
+        // &minus; seems to work on text browsers OK
+        // Although it's longer than a standard '-' on graphical browsers
+        // http://www.cs.tut.fi/~jkorpela/dashes.html
+        if (ms < 0)
+            t = t.replace("-", "&minus;");
         // do it here to keep &nbsp; out of the tags for translator sanity
         return t.replace(" ", "&nbsp;");
     }
