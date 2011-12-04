@@ -27,13 +27,13 @@ class RouterDoSThrottle extends RouterThrottleImpl {
         if (!shouldAccept) return false;
         
         // now lets check for DoS
-        long now = getContext().clock().now();
+        long now = _context.clock().now();
         if (_currentLookupPeriod + LOOKUP_THROTTLE_PERIOD > now) {
             // same period, check for DoS
             _currentLookupCount++;
             if (_currentLookupCount >= LOOKUP_THROTTLE_MAX) {
-                getContext().statManager().addRateData("router.throttleNetDbDoS", _currentLookupCount, 0);
-                int rand = getContext().random().nextInt(_currentLookupCount);
+                _context.statManager().addRateData("router.throttleNetDbDoS", _currentLookupCount, 0);
+                int rand = _context.random().nextInt(_currentLookupCount);
                 if (rand > LOOKUP_THROTTLE_MAX) {
                     return false;
                 } else {

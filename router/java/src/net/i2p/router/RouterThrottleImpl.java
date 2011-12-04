@@ -14,7 +14,7 @@ import net.i2p.util.SimpleTimer;
  *
  */
 class RouterThrottleImpl implements RouterThrottle {
-    private final RouterContext _context;
+    protected final RouterContext _context;
     private final Log _log;
     private String _tunnelStatus;
     
@@ -537,8 +537,6 @@ class RouterThrottleImpl implements RouterThrottle {
     public void setTunnelStatus(String msg) {
         _tunnelStatus = msg;
     }
-
-    protected RouterContext getContext() { return _context; }
 
     /**
      *  Mark a string for extraction by xgettext and translation.
