@@ -1,8 +1,5 @@
 package net.i2p.router.tunnel;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
@@ -38,13 +35,13 @@ class ThrottledPumpedTunnelGateway extends PumpedTunnelGateway {
         // for the purpose of estimating outgoing size.
         // We assume that it's the outbound bandwidth that is the issue...
         int size = Math.max(msg.getMessageSize(), 1024/2);
-        if (_context.tunnelDispatcher().shouldDropParticipatingMessage("IBGW " + msg.getType(), size)) {
+        if (_context.tunnelDispatcher().shouldDropParticipatingMessage(TunnelDispatcher.Location.IBGW, msg.getType(), size)) {
             // this overstates the stat somewhat, but ok for now
             int kb = (size + 1023) / 1024;
             for (int i = 0; i < kb; i++)
                 _config.incrementProcessedMessages();
             return;
         }
-        super.add(msg, toRouter,toTunnel);
+        super.add(msg, toRouter, toTunnel);
     }
 }

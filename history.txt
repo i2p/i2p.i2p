@@ -1,3 +1,19 @@
+2011-12-04 zzz
+  * Console:
+    - Less icons on configclients.jsp
+    - Fix some browsers breaking line on negative numbers
+    - Tab CSS tweaks
+  * i2psnark: Fix directories not always deleted when torrent is deleted
+  * IRC Client: Lower log level for connect error to warn (thx echelon/sponge)
+  * Tunnel RED:
+    - Complete rework of participating traffic RED.
+      Implement an accurate bandwidth tracker in FIFOBandwidthRefiller.
+    - Fix drop priority of VTBM at OBEP
+    - Lower drop priority of VTBRM at IBGW
+    - Raise threshold from 95% to 120%
+    - Remove unused things in HopConfig
+  * UDP: Fix i2np.udp.allowLocal operation (thx Quizzers)
+
 2011-12-02 zzz
   * Console:
     - Summary bar tweaks

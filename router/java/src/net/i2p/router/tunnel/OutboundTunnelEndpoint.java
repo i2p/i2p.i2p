@@ -50,11 +50,18 @@ class OutboundTunnelEndpoint {
                            + " to be forwarded on to "
                            + (toRouter != null ? toRouter.toBase64().substring(0,4) : "")
                            + (toTunnel != null ? ":" + toTunnel.getTunnelId() : ""));
+            int size = msg.getMessageSize();
             // don't drop it if we are the target
-            if ((!_context.routerHash().equals(toRouter)) &&
-                _context.tunnelDispatcher().shouldDropParticipatingMessage("OBEP " + msg.getType(), msg.getMessageSize()))
+            boolean toUs = _context.routerHash().equals(toRouter);
+            if ((!toUs) &&
+                _context.tunnelDispatcher().shouldDropParticipatingMessage(TunnelDispatcher.Location.OBEP, msg.getType(), size))
                 return;
-            _config.incrementSentMessages();
+            // this overstates the stat somewhat, but ok for now
+            //int kb = (size + 1023) / 1024;
+            //for (int i = 0; i < kb; i++)
+            //    _config.incrementSentMessages();
+            if (!toUs)
+                _context.bandwidthLimiter().sentParticipatingMessage(size);
             _outDistributor.distribute(msg, toRouter, toTunnel);
         }
     }

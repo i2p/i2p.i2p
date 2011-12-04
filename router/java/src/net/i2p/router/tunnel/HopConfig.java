@@ -25,13 +25,14 @@ public class HopConfig {
     private ByteArray _replyIV;
     private long _creation;
     private long _expiration;
-    private Map _options;
+    //private Map _options;
+
     // these 4 were longs, let's save some space
     // 2 billion * 1KB / 10 minutes = 3 GBps in a single tunnel
     private int _messagesProcessed;
     private int _oldMessagesProcessed;
-    private int _messagesSent;
-    private int _oldMessagesSent;
+    //private int _messagesSent;
+    //private int _oldMessagesSent;
     
     /** IV length for {@link #getReplyIV} */
     public static final int REPLY_IV_LENGTH = 16;
@@ -48,6 +49,7 @@ public class HopConfig {
             _receiveTunnel = getTunnel(_receiveTunnelId); 
         return _receiveTunnel;
     }
+
     public void setReceiveTunnelId(byte id[]) { _receiveTunnelId = id; }
     public void setReceiveTunnelId(TunnelId id) { _receiveTunnelId = DataHelper.toLong(4, id.getTunnelId()); }
     
@@ -106,11 +108,13 @@ public class HopConfig {
      * would be a Boolean, etc).
      *
      */
-    public Map getOptions() { return _options; }
-    public void setOptions(Map options) { _options = options; }
+    //public Map getOptions() { return _options; }
+    //public void setOptions(Map options) { _options = options; }
     
-    /** take note of a message being pumped through this tunnel */
-    /** "processed" is for incoming and "sent" is for outgoing (could be dropped in between) */
+    /**
+     *  Take note of a message being pumped through this tunnel.
+     *  "processed" is for incoming and "sent" is for outgoing (could be dropped in between)
+     */
     public void incrementProcessedMessages() { _messagesProcessed++; }
 
     public int getProcessedMessagesCount() { return _messagesProcessed; }
@@ -121,6 +125,11 @@ public class HopConfig {
         return rv;
     }
 
+    /**
+     *  Take note of a message being pumped through this tunnel.
+     *  "processed" is for incoming and "sent" is for outgoing (could be dropped in between)
+     */
+  /****
     public void incrementSentMessages() { _messagesSent++; }
 
     public int getSentMessagesCount() { return _messagesSent; }
@@ -130,7 +139,9 @@ public class HopConfig {
         _oldMessagesSent = _messagesSent;
         return rv;
     }
+  ****/
     
+    /** */
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder(64);

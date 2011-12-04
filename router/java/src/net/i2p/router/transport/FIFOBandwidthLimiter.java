@@ -51,18 +51,20 @@ public class FIFOBandwidthLimiter {
     private int _maxInbound;
     /** how large _availableOutbound can get - aka our outbound rate during a burst */
     private int _maxOutbound;
-    /** shortcut of whether our outbound rate is unlimited */
+    /** shortcut of whether our outbound rate is unlimited - UNUSED always false for now */
     private boolean _outboundUnlimited;
-    /** shortcut of whether our inbound rate is unlimited */
+    /** shortcut of whether our inbound rate is unlimited - UNUSED always false for now */
     private boolean _inboundUnlimited;
     /** lifetime counter of bytes received */
     private final AtomicLong _totalAllocatedInboundBytes = new AtomicLong();
     /** lifetime counter of bytes sent */
     private final AtomicLong _totalAllocatedOutboundBytes = new AtomicLong();
+
     /** lifetime counter of tokens available for use but exceeded our maxInboundBurst size */
-    private final AtomicLong _totalWastedInboundBytes = new AtomicLong();
+    //private final AtomicLong _totalWastedInboundBytes = new AtomicLong();
     /** lifetime counter of tokens available for use but exceeded our maxOutboundBurst size */
-    private final AtomicLong _totalWastedOutboundBytes = new AtomicLong();
+    //private final AtomicLong _totalWastedOutboundBytes = new AtomicLong();
+
     private final FIFOBandwidthRefiller _refiller;
     private final Thread _refillerThread;
     
@@ -101,25 +103,41 @@ public class FIFOBandwidthLimiter {
     //public long getAvailableOutboundBytes() { return _availableOutboundBytes; }
     public long getTotalAllocatedInboundBytes() { return _totalAllocatedInboundBytes.get(); }
     public long getTotalAllocatedOutboundBytes() { return _totalAllocatedOutboundBytes.get(); }
-    public long getTotalWastedInboundBytes() { return _totalWastedInboundBytes.get(); }
-    public long getTotalWastedOutboundBytes() { return _totalWastedOutboundBytes.get(); }
+    //public long getTotalWastedInboundBytes() { return _totalWastedInboundBytes.get(); }
+    //public long getTotalWastedOutboundBytes() { return _totalWastedOutboundBytes.get(); }
     //public long getMaxInboundBytes() { return _maxInboundBytes; }
     //public void setMaxInboundBytes(int numBytes) { _maxInboundBytes = numBytes; }
     //public long getMaxOutboundBytes() { return _maxOutboundBytes; }
     //public void setMaxOutboundBytes(int numBytes) { _maxOutboundBytes = numBytes; }
-    public boolean getInboundUnlimited() { return _inboundUnlimited; }
-    public void setInboundUnlimited(boolean isUnlimited) { _inboundUnlimited = isUnlimited; }
-    public boolean getOutboundUnlimited() { return _outboundUnlimited; }
-    public void setOutboundUnlimited(boolean isUnlimited) { _outboundUnlimited = isUnlimited; }
+
+    /** @deprecated unused for now, we are always limited */
+    void setInboundUnlimited(boolean isUnlimited) { _inboundUnlimited = isUnlimited; }
+
+    /** @deprecated unused for now, we are always limited */
+    void setOutboundUnlimited(boolean isUnlimited) { _outboundUnlimited = isUnlimited; }
+
+    /** @return smoothed one second rate */
     public float getSendBps() { return _sendBps; }
+
+    /** @return smoothed one second rate */
     public float getReceiveBps() { return _recvBps; }
+
+    /** @return smoothed 15 second rate */
     public float getSendBps15s() { return _sendBps15s; }
+
+    /** @return smoothed 15 second rate */
     public float getReceiveBps15s() { return _recvBps15s; }
     
-    /** These are the configured maximums, not the current rate */
+    /** The configured maximum, not the current rate */
     public int getOutboundKBytesPerSecond() { return _refiller.getOutboundKBytesPerSecond(); } 
+    
+    /** The configured maximum, not the current rate */
     public int getInboundKBytesPerSecond() { return _refiller.getInboundKBytesPerSecond(); } 
+    
+    /** The configured maximum, not the current rate */
     public int getOutboundBurstKBytesPerSecond() { return _refiller.getOutboundBurstKBytesPerSecond(); } 
+    
+    /** The configured maximum, not the current rate */
     public int getInboundBurstKBytesPerSecond() { return _refiller.getInboundBurstKBytesPerSecond(); } 
     
     public void reinitialize() {
@@ -146,10 +164,31 @@ public class FIFOBandwidthLimiter {
         _maxOutboundBurst = 0;
         _unavailableInboundBurst.set(0);
         _unavailableOutboundBurst.set(0);
-        _inboundUnlimited = false;
-        _outboundUnlimited = false;
+        // always limited for now
+        //_inboundUnlimited = false;
+        //_outboundUnlimited = false;
     }
     
+    /**
+     *  We sent a message.
+     *
+     *  @param size bytes
+     *  @since 0.8.12
+     */
+    public void sentParticipatingMessage(int size) {
+        _refiller.incrementParticipatingMessageBytes(size);
+    }
+
+    /**
+     *  Out bandwidth. Actual bandwidth, not smoothed, not bucketed.
+     *
+     *  @return Bps in recent period (a few seconds)
+     *  @since 0.8.12
+     */
+    public int getCurrentParticipatingBandwidth() {
+        return _refiller.getCurrentParticipatingBandwidth();
+    }
+
     public Request createRequest() { return new SimpleRequest(); }
 
     /**
@@ -241,6 +280,7 @@ public class FIFOBandwidthLimiter {
      * More bytes are available - add them to the queue and satisfy any requests
      * we can
      *
+     * @param buf contains satisfied outbound requests, really just to avoid object thrash, not really used
      * @param maxBurstIn allow up to this many bytes in from the burst section for this time period (may be negative)
      * @param maxBurstOut allow up to this many bytes in from the burst section for this time period (may be negative)
      */
@@ -261,7 +301,7 @@ public class FIFOBandwidthLimiter {
             int uib = _unavailableInboundBurst.addAndGet(avi - _maxInbound);
             _availableInbound.set(_maxInbound);
             if (uib > _maxInboundBurst) {
-                _totalWastedInboundBytes.addAndGet(uib - _maxInboundBurst);
+                //_totalWastedInboundBytes.addAndGet(uib - _maxInboundBurst);
                 _unavailableInboundBurst.set(_maxInboundBurst);
             }
         } else {
@@ -292,7 +332,7 @@ public class FIFOBandwidthLimiter {
             _availableOutbound.set(_maxOutbound);
 
             if (uob > _maxOutboundBurst) {
-                _totalWastedOutboundBytes.getAndAdd(uob - _maxOutboundBurst);
+                //_totalWastedOutboundBytes.getAndAdd(uob - _maxOutboundBurst);
                 _unavailableOutboundBurst.set(_maxOutboundBurst);
             }
         } else {
@@ -376,7 +416,7 @@ public class FIFOBandwidthLimiter {
      * Go through the queue, satisfying as many requests as possible (notifying
      * each one satisfied that the request has been granted).  
      *
-     * @param buffer returned with the satisfied outbound requests only
+     * @param buffer Out parameter, returned with the satisfied outbound requests only
      */
     private final void satisfyRequests(List<Request> buffer) {
         buffer.clear();
@@ -385,6 +425,9 @@ public class FIFOBandwidthLimiter {
         satisfyOutboundRequests(buffer);
     }
     
+    /**
+     * @param satisfied Out parameter, returned with the satisfied requests added
+     */
     private final void satisfyInboundRequests(List<Request> satisfied) {
         synchronized (_pendingInboundRequests) {
             if (_inboundUnlimited) {
@@ -529,6 +572,9 @@ public class FIFOBandwidthLimiter {
         }
     }
     
+    /**
+     * @param satisfied Out parameter, returned with the satisfied requests added
+     */
     private final void satisfyOutboundRequests(List<Request> satisfied) {
         synchronized (_pendingOutboundRequests) {
             if (_outboundUnlimited) {
@@ -895,6 +941,7 @@ public class FIFOBandwidthLimiter {
         /** thar be dragons */
         public void init(int in, int out, String target);
         public void setCompleteListener(CompleteListener lsnr);
+        /** Only supported if the request is not satisfied */
         public void attach(Object obj);
         public Object attachment();
         public CompleteListener getCompleteListener();
@@ -905,9 +952,8 @@ public class FIFOBandwidthLimiter {
     }
 
     private static final NoopRequest _noop = new NoopRequest();
+
     private static class NoopRequest implements Request {
-        private CompleteListener _lsnr;
-        private Object _attachment;
         public void abort() {}
         public boolean getAborted() { return false; }
         public int getPendingInboundRequested() { return 0; }
@@ -918,12 +964,13 @@ public class FIFOBandwidthLimiter {
         public int getTotalOutboundRequested() { return 0; } 
         public void waitForNextAllocation() {}
         public void init(int in, int out, String target) {}
-        public CompleteListener getCompleteListener() { return _lsnr; }
+        public CompleteListener getCompleteListener() { return null; }
         public void setCompleteListener(CompleteListener lsnr) {
-            _lsnr = lsnr;
             lsnr.complete(NoopRequest.this);
         }
-        public void attach(Object obj) { _attachment = obj; }
-        public Object attachment() { return _attachment; }
+        public void attach(Object obj) {
+            throw new UnsupportedOperationException("Don't attach to a satisfied request");
+        }
+        public Object attachment() { return null; }
     }
 }

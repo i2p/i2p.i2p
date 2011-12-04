@@ -2,10 +2,22 @@ package net.i2p.router.transport;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.i2p.I2PAppContext;
+import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
+/**
+ *  Thread that runs every 100 ms to "give" bandwidth to
+ *  FIFOBandwidthLimiter.
+ *  Instantiated by FIFOBandwidthLimiter.
+ *
+ *  As of 0.8.12, this also contains a counter for outbound participating bandwidth.
+ *  This was a good place for it since we needed a 100ms thread for it.
+ *
+ *  Public only for the properties and defaults.
+ */
 public class FIFOBandwidthRefiller implements Runnable {
     private final Log _log;
     private final I2PAppContext _context;
@@ -63,7 +75,7 @@ public class FIFOBandwidthRefiller implements Runnable {
      */
     private static final long REPLENISH_FREQUENCY = 100;
     
-    public FIFOBandwidthRefiller(I2PAppContext context, FIFOBandwidthLimiter limiter) {
+    FIFOBandwidthRefiller(I2PAppContext context, FIFOBandwidthLimiter limiter) {
         _limiter = limiter;
         _context = context;
         _log = context.logManager().getLog(FIFOBandwidthRefiller.class);
@@ -72,7 +84,7 @@ public class FIFOBandwidthRefiller implements Runnable {
     }
 
     /** @since 0.8.8 */
-    public void shutdown() {
+    void shutdown() {
         _isRunning = false;
     }
 
@@ -88,6 +100,7 @@ public class FIFOBandwidthRefiller implements Runnable {
                 _lastCheckConfigTime = now;
             }
             
+            updateParticipating(now);
             boolean updated = updateQueues(buffer, now);
             if (updated) {
                 _lastRefillTime = now;
@@ -97,7 +110,7 @@ public class FIFOBandwidthRefiller implements Runnable {
         }
     }
     
-    public void reinitialize() {
+    void reinitialize() {
         _lastRefillTime = _limiter.now();
         checkConfig();
         _lastCheckConfigTime = _lastRefillTime;
@@ -105,8 +118,8 @@ public class FIFOBandwidthRefiller implements Runnable {
     
     private boolean updateQueues(List<FIFOBandwidthLimiter.Request> buffer, long now) {
         long numMs = (now - _lastRefillTime);
-        if (_log.shouldLog(Log.INFO))
-            _log.info("Updating bandwidth after " + numMs + " (status: " + _limiter.getStatus().toString()
+        if (_log.shouldLog(Log.DEBUG))
+            _log.debug("Updating bandwidth after " + numMs + " (status: " + _limiter.getStatus().toString()
                        + " rate in=" 
                        + _inboundKBytesPerSecond + ", out=" 
                        + _outboundKBytesPerSecond  +")");
@@ -120,6 +133,7 @@ public class FIFOBandwidthRefiller implements Runnable {
             if (inboundToAdd < 0) inboundToAdd = 0;
             if (outboundToAdd < 0) outboundToAdd = 0;
 
+         /**** Always limited for now
             if (_inboundKBytesPerSecond <= 0) {
                 _limiter.setInboundUnlimited(true);
                 inboundToAdd = 0;
@@ -132,15 +146,16 @@ public class FIFOBandwidthRefiller implements Runnable {
             } else {
                 _limiter.setOutboundUnlimited(false);
             }
+         ****/
             
             long maxBurstIn = ((_inboundBurstKBytesPerSecond-_inboundKBytesPerSecond)*1024*numMs)/1000;
             long maxBurstOut = ((_outboundBurstKBytesPerSecond-_outboundKBytesPerSecond)*1024*numMs)/1000;
             _limiter.refillBandwidthQueues(buffer, inboundToAdd, outboundToAdd, maxBurstIn, maxBurstOut);
             
-            if (_log.shouldLog(Log.DEBUG)) {
-                _log.debug("Adding " + inboundToAdd + " bytes to inboundAvailable");
-                _log.debug("Adding " + outboundToAdd + " bytes to outboundAvailable");
-            }
+            //if (_log.shouldLog(Log.DEBUG)) {
+            //    _log.debug("Adding " + inboundToAdd + " bytes to inboundAvailable");
+            //    _log.debug("Adding " + outboundToAdd + " bytes to outboundAvailable");
+            //}
             return true;
         } else {
             if (_log.shouldLog(Log.DEBUG))
@@ -157,17 +172,9 @@ public class FIFOBandwidthRefiller implements Runnable {
         updateInboundPeak();
         updateOutboundPeak();
         
-        if (_inboundKBytesPerSecond <= 0) {
-            _limiter.setInboundUnlimited(true);
-        } else {
-            _limiter.setInboundUnlimited(false);
-        }
-        if (_outboundKBytesPerSecond <= 0) {
-            _limiter.setOutboundUnlimited(true);
-        } else {
-            _limiter.setOutboundUnlimited(false);
-        }
-
+        // We are always limited for now
+        //_limiter.setInboundUnlimited(_inboundKBytesPerSecond <= 0);
+        //_limiter.setOutboundUnlimited(_outboundKBytesPerSecond <= 0);
     }
     
     private void updateInboundRate() {
@@ -185,6 +192,7 @@ public class FIFOBandwidthRefiller implements Runnable {
         if (_inboundKBytesPerSecond <= 0)
             _inboundKBytesPerSecond = DEFAULT_INBOUND_BANDWIDTH;
     }
+
     private void updateOutboundRate() {
         int out = _context.getProperty(PROP_OUTBOUND_BANDWIDTH, DEFAULT_OUTBOUND_BANDWIDTH);
         if (out != _outboundKBytesPerSecond) {
@@ -276,4 +284,87 @@ public class FIFOBandwidthRefiller implements Runnable {
     int getInboundKBytesPerSecond() { return _inboundKBytesPerSecond; } 
     int getOutboundBurstKBytesPerSecond() { return _outboundBurstKBytesPerSecond; } 
     int getInboundBurstKBytesPerSecond() { return _inboundBurstKBytesPerSecond; } 
+
+    /**
+     *  Participating counter stuff below here
+     *  TOTAL_TIME needs to be high enough to get a burst without dropping
+     *  @since 0.8.12
+     */
+    private static final int TOTAL_TIME = 4000;
+    private static final int PERIODS = TOTAL_TIME / (int) REPLENISH_FREQUENCY;
+    /** count in current 100 ms period */
+    private final AtomicInteger _currentParticipating = new AtomicInteger();
+    private long _lastPartUpdateTime;
+    private int _lastTotal;
+    /** the actual length of last total period as coalesced (nominally TOTAL_TIME) */
+    private long _lastTotalTime;
+    private int _lastIndex;
+    /** buffer of count per 100 ms period, last is at _lastIndex, older at higher indexes (wraps) */
+    private final int[] _counts = new int[PERIODS];
+    /** the actual length of the period (nominally REPLENISH_FREQUENCY) */
+    private final long[] _times = new long[PERIODS];
+
+    /**
+     *  We sent a message.
+     *
+     *  @param size bytes
+     *  @since 0.8.12
+     */
+    void incrementParticipatingMessageBytes(int size) {
+        _currentParticipating.addAndGet(size);
+    }
+
+    /**
+     *  Out bandwidth. Actual bandwidth, not smoothed, not bucketed.
+     *
+     *  @return Bps in recent period (a few seconds)
+     *  @since 0.8.12
+     */
+    synchronized int getCurrentParticipatingBandwidth() {
+        int current = _currentParticipating.get();
+        long totalTime = (_limiter.now() - _lastPartUpdateTime) + _lastTotalTime;
+        if (totalTime <= 0)
+            return 0;
+        // 1000 for ms->seconds in denominator
+        long bw = 1000l * (current + _lastTotal) / totalTime;
+        if (bw > Integer.MAX_VALUE)
+            return 0;
+        return (int) bw;
+    }
+
+    /**
+     *  Run once every 100 ms
+     *
+     *  @since 0.8.12
+     */
+    private synchronized void updateParticipating(long now) {
+        long elapsed = now - _lastPartUpdateTime;
+        if (elapsed <= 0) {
+            // glitch in the matrix
+            _lastPartUpdateTime = now;
+            return;
+        }
+        _lastPartUpdateTime = now;
+        if (--_lastIndex < 0)
+            _lastIndex = PERIODS - 1;
+        _counts[_lastIndex] = _currentParticipating.getAndSet(0);
+        _times[_lastIndex] = elapsed;
+        _lastTotal = 0;
+        _lastTotalTime = 0;
+        // add up total counts and times
+        for (int i = 0; i < PERIODS; i++) {
+            int idx = (_lastIndex + i) % PERIODS;
+             _lastTotal += _counts[idx];
+             _lastTotalTime += _times[idx];
+             if (_lastTotalTime >= TOTAL_TIME)
+                 break;
+        }
+        if (_lastIndex == 0 && _lastTotalTime > 0) {
+            long bw = 1000l * _lastTotal / _lastTotalTime;
+            _context.statManager().addRateData("tunnel.participatingBandwidthOut", bw);
+            if (_lastTotal > 0 && _log.shouldLog(Log.INFO))
+                _log.info(DataHelper.formatSize(_lastTotal) + " bytes out part. tunnels in last " + _lastTotalTime + " ms: " +
+                          DataHelper.formatSize(bw) + " Bps");
+        }
+    }
 }
