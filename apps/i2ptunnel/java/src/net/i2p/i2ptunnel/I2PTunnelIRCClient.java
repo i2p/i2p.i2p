@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import net.i2p.I2PException;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.data.Base32;
 import net.i2p.data.Destination;
@@ -112,9 +113,20 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase {
             in.start();
             Thread out = new I2PAppThread(new IrcOutboundFilter(s,i2ps, expectedPong, _log, dcc), "IRC Client " + __clientId + " out", true);
             out.start();
-        } catch (Exception ex) {
+        } catch (I2PException ex) {
             if (_log.shouldLog(Log.ERROR))
                 _log.error("Error connecting", ex);
+            //l.log("Error connecting: " + ex.getMessage());
+            closeSocket(s);
+            if (i2ps != null) {
+                synchronized (sockLock) {
+                    mySockets.remove(sockLock);
+                }
+            }
+        } catch (Exception ex) {
+            // generally NoRouteToHostException
+            if (_log.shouldLog(Log.WARN))
+                _log.warn("Error connecting", ex);
             //l.log("Error connecting: " + ex.getMessage());
             closeSocket(s);
             if (i2ps != null) {
