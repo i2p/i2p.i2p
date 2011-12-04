@@ -1105,7 +1105,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             }
             if (ua.getIntroducerCount() <= 0) {
                 InetAddress ia = ua.getHostAddress();
-                if (ua.getPort() <= 0 || ia == null || !isPubliclyRoutable(ia.getAddress())) {
+                if (ua.getPort() <= 0 || ia == null || !isValid(ia.getAddress())) {
                     markUnreachable(to);
                     return null;
                 }
