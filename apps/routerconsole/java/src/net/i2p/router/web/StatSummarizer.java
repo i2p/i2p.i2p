@@ -52,7 +52,7 @@ public class StatSummarizer implements Runnable {
     private Thread _thread;
     
     public StatSummarizer() {
-        _context = (RouterContext)RouterContext.listContexts().get(0); // fuck it, only summarize one per jvm
+        _context = RouterContext.listContexts().get(0); // fuck it, only summarize one per jvm
         _log = _context.logManager().getLog(getClass());
         _listeners = new CopyOnWriteArrayList();
         _instance = this;
