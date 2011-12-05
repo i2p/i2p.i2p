@@ -342,6 +342,7 @@ public class RouterConsoleRunner {
         }
 
         Thread t = new I2PAppThread(new StatSummarizer(), "StatSummarizer", true);
+        t.setPriority(Thread.NORM_PRIORITY - 1);
         t.start();
         
         List<RouterContext> contexts = RouterContext.listContexts();
@@ -350,10 +351,12 @@ public class RouterConsoleRunner {
 
             NewsFetcher fetcher = NewsFetcher.getInstance(ctx);
             Thread newsThread = new I2PAppThread(fetcher, "NewsFetcher", true);
+            newsThread.setPriority(Thread.NORM_PRIORITY - 1);
             newsThread.start();
         
             if (PluginStarter.pluginsEnabled(ctx)) {
                 t = new I2PAppThread(new PluginStarter(ctx), "PluginStarter", true);
+                t.setPriority(Thread.NORM_PRIORITY - 1);
                 t.start();
                 ctx.addShutdownTask(new PluginStopper(ctx));
             }

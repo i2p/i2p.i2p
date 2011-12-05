@@ -275,32 +275,16 @@ public class Router implements RouterClock.ClockShiftListener {
         _log.info("New router created with config file " + _configFilename);
         //_sessionKeyPersistenceHelper = new SessionKeyPersistenceHelper(_context);
         _killVMOnEnd = true;
-        _oomListener = new I2PThread.OOMEventListener() { 
-            public void outOfMemory(OutOfMemoryError oom) { 
-                clearCaches();
-                _log.log(Log.CRIT, "Thread ran out of memory, shutting down I2P", oom);
-                // prevent multiple parallel shutdowns (when you OOM, you OOM a lot...)
-                if (_shutdownInProgress)
-                    return;
-                for (int i = 0; i < 5; i++) { // try this 5 times, in case it OOMs
-                    try { 
-                        _log.log(Log.CRIT, "free mem: " + Runtime.getRuntime().freeMemory() + 
-                                           " total mem: " + Runtime.getRuntime().totalMemory());
-                        break; // w00t
-                    } catch (OutOfMemoryError oome) {
-                        // gobble
-                    }
-                }
-                _log.log(Log.CRIT, "To prevent future shutdowns, increase wrapper.java.maxmemory in $I2P/wrapper.config");
-                shutdown(EXIT_OOM); 
-            }
-        };
+        _oomListener = new OOMListener(_context);
+
         _shutdownHook = new ShutdownHook(_context);
-        _gracefulShutdownDetector = new I2PAppThread(new GracefulShutdown(), "Graceful shutdown hook", true);
+        _gracefulShutdownDetector = new I2PAppThread(new GracefulShutdown(_context), "Graceful shutdown hook", true);
+        _gracefulShutdownDetector.setPriority(Thread.NORM_PRIORITY + 1);
         _gracefulShutdownDetector.start();
         
         _watchdog = new RouterWatchdog(_context);
         _watchdogThread = new I2PAppThread(_watchdog, "RouterWatchdog", true);
+        _watchdogThread.setPriority(Thread.NORM_PRIORITY + 1);
         _watchdogThread.start();
         
     }
@@ -973,27 +957,6 @@ public class Router implements RouterClock.ClockShiftListener {
     }
 ******/
 
-    /**
-     *  A non-daemon thread to let
-     *  the shutdown task get all the way to the end
-     *  @since 0.8.8
-     */
-    private static class Spinner extends Thread {
-
-        public Spinner() {
-            super();
-            setName("Shutdown Spinner");
-            setDaemon(false);
-        }
-
-        @Override
-        public void run() {
-            try {
-                sleep(60*1000);
-            } catch (InterruptedException ie) {}
-        }
-    }
-    
     public static final int EXIT_GRACEFUL = 2;
     public static final int EXIT_HARD = 3;
     public static final int EXIT_OOM = 10;
@@ -1170,13 +1133,27 @@ public class Router implements RouterClock.ClockShiftListener {
             _gracefulShutdownDetector.notifyAll();
         }        
     }
+
     /**
      * What exit code do we plan on using when we shut down (or -1, if there isn't a graceful shutdown planned)
      */
     public int scheduledGracefulExitCode() { return _gracefulExitCode; }
+
+    /**
+     * Is a graceful shutdown in progress? This may be cancelled.
+     */
     public boolean gracefulShutdownInProgress() {
         return (null != _config.get(PROP_SHUTDOWN_IN_PROGRESS));
     }
+
+    /**
+     * Is a final shutdown in progress? This may not be cancelled.
+     * @since 0.8.12
+     */
+    public boolean isFinalShutdownInProgress() {
+        return _shutdownInProgress;
+    }
+
     /** How long until the graceful shutdown will kill us?  */
     public long getShutdownTimeRemaining() {
         if (_gracefulExitCode <= 0) return -1; // maybe Long.MAX_VALUE would be better?
@@ -1187,51 +1164,6 @@ public class Router implements RouterClock.ClockShiftListener {
             return -1;
         else
             return exp + 2*CLOCK_FUDGE_FACTOR - _context.clock().now();
-    }
-    
-    /**
-     * Simple thread that sits and waits forever, managing the
-     * graceful shutdown "process" (describing it would take more text
-     * than just reading the code...)
-     *
-     */
-    private class GracefulShutdown implements Runnable {
-        public void run() {
-            while (true) {
-                boolean shutdown = (null != _config.get(PROP_SHUTDOWN_IN_PROGRESS));
-                if (shutdown) {
-                    if (_gracefulExitCode == EXIT_HARD || _gracefulExitCode == EXIT_HARD_RESTART ||
-                        _context.tunnelManager().getParticipatingCount() <= 0) {
-                        if (_gracefulExitCode == EXIT_HARD)
-                            _log.log(Log.CRIT, "Shutting down after a brief delay");
-                        else if (_gracefulExitCode == EXIT_HARD_RESTART)
-                            _log.log(Log.CRIT, "Restarting after a brief delay");
-                        else
-                            _log.log(Log.CRIT, "Graceful shutdown progress - no more tunnels, safe to die");
-                        // Allow time for a UI reponse
-                        try {
-                            synchronized (Thread.currentThread()) {
-                                Thread.currentThread().wait(2*1000);
-                            }
-                        } catch (InterruptedException ie) {}
-                        shutdown(_gracefulExitCode);
-                        return;
-                    } else {
-                        try {
-                            synchronized (Thread.currentThread()) {
-                                Thread.currentThread().wait(10*1000);
-                            }
-                        } catch (InterruptedException ie) {}
-                    }
-                } else {
-                    try {
-                        synchronized (Thread.currentThread()) {
-                            Thread.currentThread().wait();
-                        }
-                    } catch (InterruptedException ie) {}
-                }
-            }
-        }
     }
     
     /**
@@ -1308,48 +1240,20 @@ public class Router implements RouterClock.ClockShiftListener {
             return;
         ((RouterClock) _context.clock()).removeShiftListener(this);
         _isAlive = false;
-        Thread t = new Thread(new Restarter(), "Router Restart");
+        _started = _context.clock().now();
+        Thread t = new Thread(new Restarter(_context), "Router Restart");
+        t.setPriority(Thread.NORM_PRIORITY + 1);
         t.start();
     }    
 
     /**
-     *  @since 0.8.8
+     *  Only for Restarter
+     *  @since 0.8.12
      */
-    private class Restarter implements Runnable {
-        public void run() {
-            _started = _context.clock().now();
-            _log.error("Stopping the router for a restart...");
-            _log.logAlways(Log.WARN, "Stopping the client manager");
-            // NOTE: DisconnectMessageHandler keys off "restart"
-            try { _context.clientManager().shutdown("Router restart"); } catch (Throwable t) { _log.log(Log.CRIT, "Error stopping the client manager", t); }
-            _log.logAlways(Log.WARN, "Stopping the comm system");
-            _context.bandwidthLimiter().reinitialize();
-            try { _context.messageRegistry().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the message registry", t); }
-            try { _context.commSystem().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the comm system", t); }
-            _log.logAlways(Log.WARN, "Stopping the tunnel manager");
-            try { _context.tunnelManager().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the tunnel manager", t); }
-
-            //try { _context.peerManager().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the peer manager", t); }
-            //try { _context.netDb().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the networkDb", t); }
-            //try { _context.jobQueue().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the job queue", t); }
-        
-            _log.logAlways(Log.WARN, "Router teardown complete, restarting the router...");
-            try { Thread.sleep(10*1000); } catch (InterruptedException ie) {}
-        
-            _log.logAlways(Log.WARN, "Restarting the comm system");
-            _log.logAlways(Log.WARN, "Restarting the tunnel manager");
-            _log.logAlways(Log.WARN, "Restarting the client manager");
-            try { _context.clientMessagePool().restart(); } catch (Throwable t) { _log.log(Log.CRIT, "Error restarting the CMP", t); }
-            try { _context.clientManager().startup(); } catch (Throwable t) { _log.log(Log.CRIT, "Error starting the client manager", t); }
-        
-            _isAlive = true;
-            rebuildRouterInfo();
-        
-            _log.logAlways(Log.WARN, "Restart complete");
-            ((RouterClock) _context.clock()).addShiftListener(Router.this);
-        }
+    public void setIsAlive() {
+        _isAlive = true;
     }
-    
+
     public static void main(String args[]) {
         System.out.println("Starting I2P " + RouterVersion.FULL_VERSION);
         // installUpdates() moved to constructor so we can get file locations from the context
