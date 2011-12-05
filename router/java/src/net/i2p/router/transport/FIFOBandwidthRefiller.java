@@ -3,6 +3,7 @@ package net.i2p.router.transport;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
@@ -303,6 +304,7 @@ public class FIFOBandwidthRefiller implements Runnable {
     private final int[] _counts = new int[PERIODS];
     /** the actual length of the period (nominally REPLENISH_FREQUENCY) */
     private final long[] _times = new long[PERIODS];
+    private final ReentrantReadWriteLock _updateLock = new ReentrantReadWriteLock(false);
 
     /**
      *  We sent a message.
@@ -320,7 +322,16 @@ public class FIFOBandwidthRefiller implements Runnable {
      *  @return Bps in recent period (a few seconds)
      *  @since 0.8.12
      */
-    synchronized int getCurrentParticipatingBandwidth() {
+    int getCurrentParticipatingBandwidth() {
+        _updateLock.readLock().lock();
+        try {
+            return locked_getCurrentParticipatingBandwidth();
+        } finally {
+            _updateLock.readLock().unlock();
+        }
+    }
+
+    private int locked_getCurrentParticipatingBandwidth() {
         int current = _currentParticipating.get();
         long totalTime = (_limiter.now() - _lastPartUpdateTime) + _lastTotalTime;
         if (totalTime <= 0)
@@ -337,7 +348,16 @@ public class FIFOBandwidthRefiller implements Runnable {
      *
      *  @since 0.8.12
      */
-    private synchronized void updateParticipating(long now) {
+    private void updateParticipating(long now) {
+        _updateLock.writeLock().lock();
+        try {
+            locked_updateParticipating(now);
+        } finally {
+            _updateLock.writeLock().unlock();
+        }
+    }
+
+    private void locked_updateParticipating(long now) {
         long elapsed = now - _lastPartUpdateTime;
         if (elapsed <= 0) {
             // glitch in the matrix
