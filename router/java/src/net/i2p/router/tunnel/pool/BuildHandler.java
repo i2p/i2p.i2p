@@ -60,6 +60,17 @@ class BuildHandler implements Runnable {
     private static final int MIN_QUEUE = 18;
     private static final int MAX_QUEUE = 192;
 
+    private static final int NEXT_HOP_LOOKUP_TIMEOUT = 15*1000;
+    
+    /**
+     *  This must be high, as if we timeout the send we remove the tunnel from
+     *  participating via OnFailedSendJob.
+     *  If them msg actually got through then we will be dropping
+     *  all the traffic in TunnelDispatcher.dispatch(TunnelDataMessage msg, Hash recvFrom).
+     *  10s was not enough.
+     */
+    private static final int NEXT_HOP_SEND_TIMEOUT = 15*1000;
+
     public BuildHandler(RouterContext ctx, TunnelPoolManager manager, BuildExecutor exec) {
         _context = ctx;
         _log = ctx.logManager().getLog(getClass());
@@ -109,8 +120,6 @@ class BuildHandler implements Runnable {
         ctx.inNetMessagePool().registerHandlerJobBuilder(VariableTunnelBuildMessage.MESSAGE_TYPE, tbmhjb);
         ctx.inNetMessagePool().registerHandlerJobBuilder(VariableTunnelBuildReplyMessage.MESSAGE_TYPE, tbrmhjb);
     }
-    
-    private static final int NEXT_HOP_LOOKUP_TIMEOUT = 15*1000;
     
     /**
      * Thread to handle inbound requests
@@ -650,7 +659,7 @@ class BuildHandler implements Runnable {
         // now actually send the response
         if (!isOutEnd) {
             state.msg.setUniqueId(req.readReplyMessageId());
-            state.msg.setMessageExpiration(_context.clock().now() + 10*1000);
+            state.msg.setMessageExpiration(_context.clock().now() + NEXT_HOP_SEND_TIMEOUT);
             OutNetMessage msg = new OutNetMessage(_context);
             msg.setMessage(state.msg);
             msg.setExpiration(state.msg.getMessageExpiration());
@@ -660,6 +669,7 @@ class BuildHandler implements Runnable {
                 msg.setOnFailedSendJob(new TunnelBuildNextHopFailJob(_context, cfg));
             _context.outNetMessagePool().add(msg);
         } else {
+            // We are the OBEP.
             // send it to the reply tunnel on the reply peer within a new TunnelBuildReplyMessage
             // (enough layers jrandom?)
             TunnelBuildReplyMessage replyMsg;
@@ -670,7 +680,7 @@ class BuildHandler implements Runnable {
             for (int i = 0; i < records; i++)
                 replyMsg.setRecord(i, state.msg.getRecord(i));
             replyMsg.setUniqueId(req.readReplyMessageId());
-            replyMsg.setMessageExpiration(_context.clock().now() + 10*1000);
+            replyMsg.setMessageExpiration(_context.clock().now() + NEXT_HOP_SEND_TIMEOUT);
             TunnelGatewayMessage m = new TunnelGatewayMessage(_context);
             m.setMessage(replyMsg);
             m.setMessageExpiration(replyMsg.getMessageExpiration());
@@ -863,17 +873,21 @@ class BuildHandler implements Runnable {
      *  but it affects capacity calculations
      */
     private static class TunnelBuildNextHopFailJob extends JobImpl {
-        final HopConfig _cfg;
+        private final HopConfig _cfg;
+
         private TunnelBuildNextHopFailJob(RouterContext ctx, HopConfig cfg) {
             super(ctx);
             _cfg = cfg;
         }
+
         public String getName() { return "Timeout contacting next peer for tunnel join"; }
+
         public void runJob() {
             getContext().tunnelDispatcher().remove(_cfg);
             getContext().statManager().addRateData("tunnel.rejectTimeout2", 1, 0);
-            // static, no _log
-            //_log.error("Cant contact next hop for " + _cfg);
+            Log log = getContext().logManager().getLog(BuildHandler.class);
+            if (log.shouldLog(Log.WARN))
+                log.warn("Timeout contacting next hop for " + _cfg);
         }
     }
 

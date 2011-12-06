@@ -148,7 +148,7 @@ public class HopConfig {
         if (_receiveTunnelId != null) {
             buf.append("recv on ");
             buf.append(DataHelper.fromLong(_receiveTunnelId, 0, 4));
-            buf.append(" ");
+            buf.append(' ');
         }
         
         if (_sendTo != null) {
@@ -157,8 +157,9 @@ public class HopConfig {
                 buf.append(DataHelper.fromLong(_sendTunnelId, 0, 4));
         }
         
-        buf.append(" expiring on ").append(TunnelCreatorConfig.format(_expiration));
-        buf.append(" having transferred ").append(_messagesProcessed).append("KB");
+        buf.append(" exp. ").append(TunnelCreatorConfig.format(_expiration));
+        if (_messagesProcessed > 0)
+            buf.append(" used ").append(_messagesProcessed).append("KB");
         return buf.toString();
     }
 }

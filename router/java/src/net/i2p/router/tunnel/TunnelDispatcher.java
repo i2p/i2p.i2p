@@ -265,7 +265,7 @@ public class TunnelDispatcher implements Service {
      */
     public void joinOutboundEndpoint(HopConfig cfg) {
         if (_log.shouldLog(Log.INFO))
-            _log.info("Joining as outbound endpoint: " + cfg);
+            _log.info("Joining as OBEP: " + cfg);
         TunnelId recvId = cfg.getReceiveTunnel();
         OutboundTunnelEndpoint endpoint = new OutboundTunnelEndpoint(_context, cfg, new HopProcessor(_context, cfg, _validator));
         _outboundEndpoints.put(recvId, endpoint);
@@ -284,7 +284,7 @@ public class TunnelDispatcher implements Service {
      */
     public void joinInboundGateway(HopConfig cfg) {
         if (_log.shouldLog(Log.INFO))
-            _log.info("Joining as inbound gateway: " + cfg);
+            _log.info("Joining as IBGW: " + cfg);
         TunnelGateway.QueuePreprocessor preproc = createPreprocessor(cfg);
         TunnelGateway.Sender sender = new InboundSender(_context, cfg);
         TunnelGateway.Receiver receiver = new InboundGatewayReceiver(_context, cfg);
@@ -363,13 +363,15 @@ public class TunnelDispatcher implements Service {
      */
     public void remove(HopConfig cfg) {
         TunnelId recvId = cfg.getReceiveTunnel();
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("removing " + cfg);
         
         boolean removed = (null != _participatingConfig.remove(recvId));
-        if (!removed) {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Participating tunnel, but no longer listed in participatingConfig? " + cfg);
+        if (removed) {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("removing " + cfg, new Exception());
+        } else {
+            // this is normal, this can get called twice
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Participating tunnel, but no longer listed in participatingConfig? " + cfg, new Exception());
         }
         
         removed = (null != _participants.remove(recvId));
@@ -837,6 +839,8 @@ public class TunnelDispatcher implements Service {
                 long exp = cur.getExpiration() + (2 * Router.CLOCK_FUDGE_FACTOR) + LEAVE_BATCH_TIME;
                 if (exp < now) {
                     _configs.poll();
+                    if (_log.shouldLog(Log.INFO))
+                        _log.info("Expiring " + cur);
                     remove(cur);
                 } else {
                     if (exp < nextTime)

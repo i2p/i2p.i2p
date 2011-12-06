@@ -208,36 +208,38 @@ public class TunnelCreatorConfig implements TunnelInfo {
         // H0:1235-->H1:2345-->H2:2345
         StringBuilder buf = new StringBuilder(128);
         if (_isInbound)
-            buf.append("inbound");
+            buf.append("IB");
         else
-            buf.append("outbound");
+            buf.append("OB");
         if (_destination == null)
-            buf.append(" exploratory");
-        buf.append(": ");
+            buf.append(" expl");
+        else
+            buf.append(" client ").append(Base64.encode(_destination.getData(), 0, 3));
+        buf.append(": GW ");
         for (int i = 0; i < _peers.length; i++) {
             buf.append(_peers[i].toBase64().substring(0,4));
             buf.append(':');
             if (_config[i].getReceiveTunnel() != null)
                 buf.append(_config[i].getReceiveTunnel());
             else
-                buf.append('x');
+                buf.append("me");
             buf.append('.');
             if (_config[i].getSendTunnel() != null)
                 buf.append(_config[i].getSendTunnel());
             else
-                buf.append('x');
+                buf.append("me");
             if (i + 1 < _peers.length)
-                buf.append("...");
+                buf.append("-->");
         }
         
-        buf.append(" expiring on ").append(getExpirationString());
-        if (_destination != null)
-            buf.append(" for ").append(Base64.encode(_destination.getData(), 0, 3));
+        buf.append(" exp. ").append(getExpirationString());
         if (_replyMessageId > 0)
-            buf.append(" replyMessageId ").append(_replyMessageId);
-        buf.append(" with ").append(_messagesProcessed).append("/").append(_verifiedBytesTransferred).append(" msgs/bytes");
+            buf.append(" replyMsgID ").append(_replyMessageId);
+        if (_messagesProcessed > 0)
+            buf.append(" with ").append(_messagesProcessed).append("/").append(_verifiedBytesTransferred).append(" msgs/bytes");
     
-        buf.append(" with ").append(_failures).append(" failures");
+        if (_failures > 0)
+            buf.append(" with ").append(_failures).append(" failures");
         return buf.toString();
     }
     
