@@ -1589,13 +1589,14 @@ public class WebMail extends HttpServlet
 		String smtp = Config.getProperty( CONFIG_PORTS_SMTP, "" + DEFAULT_SMTPPORT );
 		
 		out.println( "<table cellspacing=\"0\" cellpadding=\"5\">\n" +
-			"<tr><td align=\"right\" width=\"30%\">" + _("User") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"22\" name=\"" + USER + "\" value=\"" + ( RELEASE ? "" : "test") + "\"> @mail.i2p</td></tr>\n" +
+			// current postman hq length limits 16/12, new postman version 32/32
+			"<tr><td align=\"right\" width=\"30%\">" + _("User") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"32\" name=\"" + USER + "\" value=\"" + ( RELEASE ? "" : "test") + "\"> @mail.i2p</td></tr>\n" +
 			"<tr><td align=\"right\" width=\"30%\">" + _("Password") + "</td><td width=\"40%\" align=\"left\"><input type=\"password\" size=\"32\" name=\"pass\" value=\"" + ( RELEASE ? "" : "test") + "\"></td></tr>\n");
 		// which is better?
 		//if (!fixed) {
 		if (true) {
 		    out.println(
-			"<tr><td align=\"right\" width=\"30%\">" + _("Host") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"22\" name=\"" + HOST +"\" value=\"" + host + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n" +
+			"<tr><td align=\"right\" width=\"30%\">" + _("Host") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"32\" name=\"" + HOST +"\" value=\"" + host + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n" +
 			"<tr><td align=\"right\" width=\"30%\">" + _("POP3-Port") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"5\" name=\"" + POP3 +"\" value=\"" + pop3 + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n" +
 			"<tr><td align=\"right\" width=\"30%\">" + _("SMTP-Port") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"5\" name=\"" + SMTP +"\" value=\"" + smtp + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n");
 		}
