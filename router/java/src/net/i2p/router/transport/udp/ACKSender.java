@@ -161,7 +161,7 @@ class ACKSender implements Runnable {
                     continue;
                 }
                 
-                if ( (ackBitfields != null) && (!ackBitfields.isEmpty()) ) {
+                if (!ackBitfields.isEmpty()) {
                     _context.statManager().addRateData("udp.sendACKCount", ackBitfields.size(), 0);
                     if (remaining > 0)
                         _context.statManager().addRateData("udp.sendACKRemaining", remaining, 0);

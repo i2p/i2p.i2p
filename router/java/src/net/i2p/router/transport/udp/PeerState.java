@@ -216,6 +216,7 @@ class PeerState {
     private static final int DEFAULT_SEND_WINDOW_BYTES = 8*1024;
     private static final int MINIMUM_WINDOW_BYTES = DEFAULT_SEND_WINDOW_BYTES;
     private static final int MAX_SEND_WINDOW_BYTES = 1024*1024;
+
     /*
      * 596 gives us 588 IP byes, 568 UDP bytes, and with an SSU data message, 
      * 522 fragment bytes, which is enough to send a tunnel data message in 2 
@@ -228,9 +229,15 @@ class PeerState {
      * 1 + (4 * MAX_RESEND_ACKS_SMALL) which can take up a significant amount of space.
      * We reduce the max acks when using the small MTU but it may not be enough...
      *
+     * Goal: VTBM msg fragments 2646 / (620 - 87) fits nicely.
+     *
+     * Assuming that we can enforce an MTU correctly, this % 16 should be 12,
+     * as the IP/UDP header is 28 bytes and data max should be mulitple of 16 for padding efficiency,
+     * and so PacketBuilder.buildPacket() works correctly.
      */
-    private static final int MIN_MTU = 608;//600; //1500;
+    public static final int MIN_MTU = 620;
     private static final int DEFAULT_MTU = MIN_MTU;
+
     /* 
      * based on measurements, 1350 fits nearly all reasonably small I2NP messages
      * (larger I2NP messages may be up to 1900B-4500B, which isn't going to fit
@@ -241,8 +248,16 @@ class PeerState {
      * 2646 / 2 = 1323
      * 1323 + 74 + 46 + 1 + (4 * 9) = 1480
      * So why not make it 1492 (old ethernet is 1492, new is 1500)
+     * Changed to 1492 in 0.8.9
+     *
+     * BUT through 0.8.11,
+     * size estimate was bad, actual packet was up to 48 bytes bigger
+     * To be figured out. Curse the ACKs.
+     * Assuming that we can enforce an MTU correctly, this % 16 should be 12,
+     * as the IP/UDP header is 28 bytes and data max should be mulitple of 16 for padding efficiency,
+     * and so PacketBuilder.buildPacket() works correctly.
      */
-    private static final int LARGE_MTU = 1492;
+    public static final int LARGE_MTU = 1484;
     
     private static final int MIN_RTO = 100 + ACKSender.ACK_FREQUENCY;
     private static final int MAX_RTO = 3000; // 5000;
@@ -699,21 +714,41 @@ class PeerState {
      * "want to send" list.  If the message id is transmitted to the peer,
      * removeACKMessage(Long) should be called.
      *
+     * The returned list contains acks not yet sent, followed by
+     * a random assortment of acks already sent.
+     * The caller should NOT transmit all of them all the time,
+     * even if there is room,
+     * or the packets will have way too much overhead.
+     *
+     * @return a new list, do as you like with it
      */
     public List<Long> getCurrentFullACKs() {
             // no such element exception seen here
-            ArrayList<Long> rv = new ArrayList(_currentACKs);
+            List<Long> rv = new ArrayList(_currentACKs);
             // include some for retransmission
-            rv.addAll(_currentACKsResend);
+            List<Long> randomResends = new ArrayList(_currentACKsResend);
+            Collections.shuffle(randomResends, _context.random());
+            rv.addAll(randomResends);
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Returning " + _currentACKs.size() + " current and " + randomResends.size() + " resend acks");
             return rv;
     }
 
+    /** the ack was sent */
     public void removeACKMessage(Long messageId) {
-            _currentACKs.remove(messageId);
-            _currentACKsResend.offer(messageId);
-            // trim down the resends
-            while (_currentACKsResend.size() > MAX_RESEND_ACKS)
-                _currentACKsResend.poll();
+            boolean removed = _currentACKs.remove(messageId);
+            if (removed) {
+                // only add if reoved from current, as this may be called for
+                // acks already in _currentACKsResend.
+                _currentACKsResend.offer(messageId);
+                // trim down the resends
+                while (_currentACKsResend.size() > MAX_RESEND_ACKS)
+                    _currentACKsResend.poll();
+                if (_log.shouldLog(Log.INFO))
+                    _log.info("Sent ack " + messageId + " now " + _currentACKs.size() + " current and " +
+                              _currentACKsResend.size() + " resend acks");
+            }
+            // should we only do this if removed?
             _lastACKSend = _context.clock().now();
     }
     
@@ -722,15 +757,13 @@ class PeerState {
      */
     private static final int MAX_RESEND_ACKS = 16;
     /**
-     *  The number of duplicate acks sent in each messge -
-     *  Warning, this directly affects network overhead
-     *  Was 16 but that's too much (64 bytes in a max 608 byte packet,
-     *  and often much smaller)
+     *  The max number of duplicate acks sent in each ack-only messge.
+     *  Doesn't really matter, we have plenty of room...
      *  @since 0.7.13
      */
-    private static final int MAX_RESEND_ACKS_LARGE = 9;
+    private static final int MAX_RESEND_ACKS_LARGE = MAX_RESEND_ACKS;
     /** for small MTU */
-    private static final int MAX_RESEND_ACKS_SMALL = 4;
+    private static final int MAX_RESEND_ACKS_SMALL = MAX_RESEND_ACKS;
     
     /** 
      * grab a list of ACKBitfield instances, some of which may fully 
@@ -740,9 +773,18 @@ class PeerState {
      * ACKed with this call.  Be sure to check getWantedACKSendSince() which
      * will be unchanged if there are ACKs remaining.
      *
+     * @return non-null, possibly empty
+     * @deprecated unused
      */
     public List<ACKBitfield> retrieveACKBitfields() { return retrieveACKBitfields(true); }
 
+    /**
+     * See above. Only called by ACKSender with alwaysIncludeRetransmissions = false.
+     * So this is only for ACK-only packets, so all the size limiting is useless.
+     * FIXME.
+     *
+     * @return non-null, possibly empty
+     */
     public List<ACKBitfield> retrieveACKBitfields(boolean alwaysIncludeRetransmissions) {
         List<ACKBitfield> rv = new ArrayList(MAX_RESEND_ACKS);
         int bytesRemaining = countMaxACKData();
@@ -821,13 +863,17 @@ class PeerState {
         }
 
         _lastACKSend = _context.clock().now();
-        if (rv == null)
-            rv = Collections.EMPTY_LIST;
+        //if (rv == null)
+        //    rv = Collections.EMPTY_LIST;
         if (partialIncluded > 0)
             _context.statManager().addRateData("udp.sendACKPartial", partialIncluded, rv.size() - partialIncluded);
         return rv;
     }
     
+    /**
+     *  @param rv out parameter, populated with true partial ACKBitfields.
+     *            no full bitfields are included.
+     */
     void fetchPartialACKs(List<ACKBitfield> rv) {
         InboundMessageState states[] = null;
         int curState = 0;
@@ -853,6 +899,7 @@ class PeerState {
             }
         }
         if (states != null) {
+            // _inboundMessages is a Map (unordered), so why bother going backwards?
             for (int i = curState-1; i >= 0; i--) {
                 if (states[i] != null)
                     rv.add(states[i].createACKBitfield());
@@ -860,10 +907,14 @@ class PeerState {
         }
     }
     
-    /** represent a full ACK of a message */
+    /**
+     *  A dummy "partial" ack which represents a full ACK of a message
+     */
     private static class FullACKBitfield implements ACKBitfield {
-        private long _msgId;
+        private final long _msgId;
+
         public FullACKBitfield(long id) { _msgId = id; }
+
         public int fragmentCount() { return 0; }
         public long getMessageId() { return _msgId; }
         public boolean received(int fragmentNum) { return true; }
@@ -1062,6 +1113,7 @@ class PeerState {
     public long getLastACKSend() { return _lastACKSend; }
     public void setLastACKSend(long when) { _lastACKSend = when; }
     public long getWantedACKSendSince() { return _wantACKSendSince; }
+
     public boolean unsentACKThresholdReached() {
         int threshold = countMaxACKData() / 4;
         return _currentACKs.size() >= threshold;
@@ -1070,8 +1122,8 @@ class PeerState {
     /** @return MTU - 83 */
     private int countMaxACKData() {
         return _mtu 
-                - IP_HEADER_SIZE
-                - UDP_HEADER_SIZE
+                - PacketBuilder.IP_HEADER_SIZE
+                - PacketBuilder.UDP_HEADER_SIZE
                 - UDPPacket.IV_SIZE 
                 - UDPPacket.MAC_SIZE
                 - 1 // type flag
@@ -1335,16 +1387,22 @@ class PeerState {
      */
     private static final boolean THROTTLE_INITIAL_SEND = true;
     
-    private static final int SSU_HEADER_SIZE = 46;
-    static final int UDP_HEADER_SIZE = 8;
-    static final int IP_HEADER_SIZE = 20;
+    /**
+     *  Always leave room for this many explicit acks.
+     *  Only for data packets. Does not affect ack-only packets.
+     *  This directly affects data packet overhead, adjust with care.
+     */
+    private static final int MIN_EXPLICIT_ACKS = 3;
+    /** this is room for three explicit acks or two partial acks or one of each = 13 */
+    private static final int MIN_ACK_SIZE = 1 + (4 * MIN_EXPLICIT_ACKS);
 
     /**
      *  how much payload data can we shove in there?
-     *  @return MTU - 74
+     *  @return MTU - 87, i.e. 521 or 1401
      */
     private static final int fragmentSize(int mtu) {
-        return mtu - SSU_HEADER_SIZE - UDP_HEADER_SIZE - IP_HEADER_SIZE;
+        // 46 + 20 + 8 + 13 = 74 + 13 = 87
+        return mtu - (PacketBuilder.MIN_DATA_PACKET_OVERHEAD + MIN_ACK_SIZE);
     }
     
     private boolean locked_shouldSend(OutboundMessageState state) {

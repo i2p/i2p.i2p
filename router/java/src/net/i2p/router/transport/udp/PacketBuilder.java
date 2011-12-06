@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import net.i2p.I2PAppContext;
@@ -124,6 +125,31 @@ class PacketBuilder {
     /** we only talk to people of the right version */
     static final int PROTOCOL_VERSION = 0;
     
+    /** if no extended options or rekey data, which we don't support  = 37 */
+    public static final int HEADER_SIZE = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE + 1 + 4;
+
+    /** not including acks. 46 */
+    public static final int DATA_HEADER_SIZE = HEADER_SIZE + 9;
+
+    /** IPv4 only */
+    public static final int IP_HEADER_SIZE = 20;
+    public static final int UDP_HEADER_SIZE = 8;
+
+    /** 74 */
+    public static final int MIN_DATA_PACKET_OVERHEAD = IP_HEADER_SIZE + UDP_HEADER_SIZE + DATA_HEADER_SIZE;
+
+    /**
+     *  Only for data packets. No limit in ack-only packets.
+     *  This directly affects data packet overhead.
+     */
+    private static final int MAX_EXPLICIT_ACKS_LARGE = 9;
+
+    /**
+     *  Only for data packets. No limit in ack-only packets.
+     *  This directly affects data packet overhead.
+     */
+    private static final int MAX_EXPLICIT_ACKS_SMALL = 4;
+
     public PacketBuilder(I2PAppContext ctx, UDPTransport transport) {
         _context = ctx;
         _transport = transport;
@@ -142,18 +168,51 @@ class PacketBuilder {
      * This builds a data packet (PAYLOAD_TYPE_DATA).
      * See the methods below for the other message types.
      *
+     * Note that while the UDP message spec allows for more than one fragment in a message,
+     * this method writes exactly one fragment.
+     * For no fragments use buildAck().
+     * Multiple fragments in a single packet is not supported.
+     * Rekeying and extended options are not supported.
+     *
+     * Packet format:
+     *<pre>
+     *    16 byte MAC
+     *    16 byte IV
+     *     1 byte flag
+     *     4 byte date
+     *     1 byte flag
+     *     1 byte explicit ack count IF included
+     *   4*n byte explict acks IF included
+     *     1 byte ack bitfield count IF included
+     *   4*n + ?? ack bitfields IF included
+     *     1 byte fragment count (always 1)
+     *     4 byte message ID
+     *     3 byte fragment info
+     *     n byte fragment
+     *  0-15 bytes padding
+     *</pre>
+     *
+     * So ignoring the ack bitfields, and assuming we have explicit acks,
+     * it's (47 + 4*explict acks + padding) added to the
+     * fragment length.
+     *
      * @param ackIdsRemaining list of messageIds (Long) that should be acked by this packet.  
      *                        The list itself is passed by reference, and if a messageId is
-     *                        transmitted and the sender does not want the ID to be included
-     *                        in subsequent acks, it should be removed from the list.  NOTE:
-     *                        right now this does NOT remove the IDs, which means it assumes
-     *                        that the IDs will be transmitted potentially multiple times,
-     *                        and should otherwise be removed from the list.
+     *                        transmitted it will be removed from the list.
+     *                        Not all message IDs will necessarily be sent, there may not be room.
+     *                        non-null.
+     *
      * @param partialACKsRemaining list of messageIds (ACKBitfield) that should be acked by this packet.  
      *                        The list itself is passed by reference, and if a messageId is
      *                        included, it should be removed from the list.
+     *                        Full acks in this list are skipped, they are NOT transmitted.
+     *                        non-null.
+     *                        Not all acks will necessarily be sent, there may not be room.
+     *
+     * @return null on error
      */
-    public UDPPacket buildPacket(OutboundMessageState state, int fragment, PeerState peer, List<Long> ackIdsRemaining, List<ACKBitfield> partialACKsRemaining) {
+    public UDPPacket buildPacket(OutboundMessageState state, int fragment, PeerState peer,
+                                 List<Long> ackIdsRemaining, List<ACKBitfield> partialACKsRemaining) {
         UDPPacket packet = buildPacketHeader((byte)(UDPPacket.PAYLOAD_TYPE_DATA << 4));
         byte data[] = packet.getPacket().getData();
         int off = HEADER_SIZE;
@@ -162,48 +221,93 @@ class PacketBuilder {
         boolean acksIncluded = false;
         if (_log.shouldLog(Log.INFO)) {
             msg = new StringBuilder(128);
-            msg.append("Send to ").append(peer.getRemotePeer().toBase64());
-            msg.append(" msg ").append(state.getMessageId()).append(":").append(fragment);
-            if (fragment == state.getFragmentCount() - 1)
-                msg.append("*");
+            msg.append("Data pkt to ").append(peer.getRemotePeer().toBase64());
+            msg.append(" msg ").append(state.getMessageId()).append(" frag:").append(fragment);
+            msg.append('/').append(state.getFragmentCount());
         }
         
+        int dataSize = state.fragmentSize(fragment);
+        if (dataSize < 0) {
+            packet.release();
+            return null;
+        }
+        int currentMTU = peer.getMTU();
+        int availableForAcks = currentMTU - MIN_DATA_PACKET_OVERHEAD - dataSize;
+        int availableForExplicitAcks = availableForAcks;
+
         // ok, now for the body...
         
         // just always ask for an ACK for now...
         data[off] |= UDPPacket.DATA_FLAG_WANT_REPLY;
-        // we should in theory only include explicit ACKs if the expected packet size
-        // is under the MTU, but for now, since the # of packets acked is so few (usually
-        // just one or two), and since the packets are so small anyway, an additional five
-        // or ten bytes doesn't hurt.
-        if ( (ackIdsRemaining != null) && (!ackIdsRemaining.isEmpty()) )
+
+        // partial acks have priority but they are after explicit acks in the packet
+        // so we have to compute the space in advance
+        int partialAcksToSend = 0;
+        if (availableForExplicitAcks >= 6 && !partialACKsRemaining.isEmpty()) {
+            for (ACKBitfield bf : partialACKsRemaining) {
+                if (bf.receivedComplete())
+                    continue;
+                int acksz = 4 + (bf.fragmentCount() / 7) + 1;
+                if (partialAcksToSend == 0)
+                    acksz++;  // ack count
+                if (availableForExplicitAcks >= acksz) {
+                    availableForExplicitAcks -= acksz;
+                    partialAcksToSend++;
+                } else {
+                    break;
+                }
+            }
+            if (partialAcksToSend > 0)
+                data[off] |= UDPPacket.DATA_FLAG_ACK_BITFIELDS;
+        }
+
+
+        // Only include acks if we have at least 5 bytes available and at least
+        // one ack is requested.
+        if (availableForExplicitAcks >= 5 && !ackIdsRemaining.isEmpty()) {
             data[off] |= UDPPacket.DATA_FLAG_EXPLICIT_ACK;
-        if ( (partialACKsRemaining != null) && (!partialACKsRemaining.isEmpty()) )
-            data[off] |= UDPPacket.DATA_FLAG_ACK_BITFIELDS;
+        }
         off++;
 
-        if ( (ackIdsRemaining != null) && (!ackIdsRemaining.isEmpty()) ) {
-            DataHelper.toLong(data, off, 1, ackIdsRemaining.size());
+        if (msg != null) {
+            msg.append(" data: ").append(dataSize).append(" bytes, mtu: ")
+               .append(currentMTU).append(", ")
+               .append(ackIdsRemaining.size()).append(" full acks requested, ")
+               .append(partialACKsRemaining.size()).append(" partial acks requested, ")
+               .append(availableForAcks).append(" avail. for all acks, ")
+               .append(availableForExplicitAcks).append(" for full acks, ");
+        }
+
+        int explicitToSend = Math.min(currentMTU > PeerState.MIN_MTU ? MAX_EXPLICIT_ACKS_LARGE : MAX_EXPLICIT_ACKS_SMALL,
+                                      Math.min((availableForExplicitAcks - 1) / 4, ackIdsRemaining.size()));
+        if (explicitToSend > 0) {
+            if (msg != null)
+                msg.append(explicitToSend).append(" full acks included:");
+            DataHelper.toLong(data, off, 1, explicitToSend);
             off++;
-            for (int i = 0; i < ackIdsRemaining.size(); i++) {
-            //while (ackIdsRemaining.size() > 0) {
-                Long ackId = ackIdsRemaining.get(i);//(Long)ackIdsRemaining.remove(0);
+            Iterator<Long> iter = ackIdsRemaining.iterator();
+            for (int i = 0; i < explicitToSend && iter.hasNext(); i++) {
+                Long ackId = iter.next();
+                iter.remove();
                 // NPE here, how did a null get in the List?
                 DataHelper.toLong(data, off, 4, ackId.longValue());
                 off += 4;        
                 if (msg != null) // logging it
                     msg.append(" full ack: ").append(ackId.longValue());
-                acksIncluded = true;
             }
+            //acksIncluded = true;
         }
 
-        if ( (partialACKsRemaining != null) && (!partialACKsRemaining.isEmpty()) ) {
+        if (partialAcksToSend > 0) {
+            if (msg != null)
+                msg.append(partialAcksToSend).append(" partial acks included:");
             int origNumRemaining = partialACKsRemaining.size();
             int numPartialOffset = off;
             // leave it blank for now, since we could skip some
             off++;
-            for (int i = 0; i < partialACKsRemaining.size(); i++) {
-                ACKBitfield bitfield = partialACKsRemaining.get(i);
+            Iterator<ACKBitfield> iter = partialACKsRemaining.iterator();
+            for (int i = 0; i < partialAcksToSend && iter.hasNext(); i++) {
+                ACKBitfield bitfield = iter.next();
                 if (bitfield.receivedComplete()) continue;
                 DataHelper.toLong(data, off, 4, bitfield.getMessageId());
                 off += 4;
@@ -219,18 +323,17 @@ class PacketBuilder {
                     }
                     off++;
                 }
-                partialACKsRemaining.remove(i);
+                iter.remove();
                 if (msg != null) // logging it
                     msg.append(" partial ack: ").append(bitfield);
-                acksIncluded = true;
-                i--;
             }
+            //acksIncluded = true;
             // now jump back and fill in the number of bitfields *actually* included
             DataHelper.toLong(data, numPartialOffset, 1, origNumRemaining - partialACKsRemaining.size());
         }
         
-        if ( (msg != null) && (acksIncluded) )
-            _log.debug(msg.toString());
+        //if ( (msg != null) && (acksIncluded) )
+        //  _log.debug(msg.toString());
         
         DataHelper.toLong(data, off, 1, 1); // only one fragment in this message
         off++;
@@ -243,57 +346,66 @@ class PacketBuilder {
             data[off] |= 1; // isLast
         off++;
         
-        int size = state.fragmentSize(fragment);
-        if (size < 0) {
-            packet.release();
-            return null;
-        }
-        DataHelper.toLong(data, off, 2, size);
+        DataHelper.toLong(data, off, 2, dataSize);
         data[off] &= (byte)0x3F; // 2 highest bits are reserved
         off += 2;
         
         int sizeWritten = state.writeFragment(data, off, fragment);
-        if (sizeWritten != size) {
+        if (sizeWritten != dataSize) {
             if (sizeWritten < 0) {
                 // probably already freed from OutboundMessageState
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Write failed for fragment " + fragment + " of " + state.getMessageId());
             } else {
-                _log.error("Size written: " + sizeWritten + " but size: " + size 
+                _log.error("Size written: " + sizeWritten + " but size: " + dataSize 
                            + " for fragment " + fragment + " of " + state.getMessageId());
             }
             packet.release();
             return null;
-        } else if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Size written: " + sizeWritten + " for fragment " + fragment 
-                       + " of " + state.getMessageId());
-        size = sizeWritten;
-        if (size < 0) {
-            packet.release();
-            return null;
+        //} else if (_log.shouldLog(Log.DEBUG)) {
+        //    _log.debug("Size written: " + sizeWritten + " for fragment " + fragment 
+        //               + " of " + state.getMessageId());
         }
-        off += size;
+        off += dataSize;
 
-        // we can pad here if we want, maybe randomized?
         
         // pad up so we're on the encryption boundary
-        int padSize = 16 - (off % 16);
-        if (padSize > 0) {
+        // we could do additional random padding here if desired
+        int mod = off % 16;
+        if (mod > 0) {
+            int padSize = 16 - mod;
             _context.random().nextBytes(data, off, padSize);
             off += padSize;
         }
         packet.getPacket().setLength(off);
+
         authenticate(packet, peer.getCurrentCipherKey(), peer.getCurrentMACKey());
         setTo(packet, peer.getRemoteIPAddress(), peer.getRemotePort());
         
         if (_log.shouldLog(Log.INFO)) {
+            msg.append(" pkt size ").append(off + (IP_HEADER_SIZE + UDP_HEADER_SIZE));
             _log.info(msg.toString());
+        }
+        // the packet could have been built before the current mtu got lowered, so
+        // compare to LARGE_MTU
+        if (off + (IP_HEADER_SIZE + UDP_HEADER_SIZE) > PeerState.LARGE_MTU) {
+            _log.error("Size is " + off + " for " + packet +
+                       " fragment " + fragment +
+                       " data size " + dataSize +
+                       " pkt size " + (off + (IP_HEADER_SIZE + UDP_HEADER_SIZE)) +
+                       " MTU " + currentMTU +
+                       ' ' + availableForAcks + " for all acks " +
+                       availableForExplicitAcks + " for full acks " + 
+                       explicitToSend + " full acks included " +
+                       partialAcksToSend + " partial acks included " +
+                       " OMS " + state, new Exception());
         }
         
         return packet;
     }
     
     /**
+     * An ACK packet with no acks.
      * We use this for keepalive purposes.
      * It doesn't generate a reply, but that's ok.
      */
@@ -307,6 +419,7 @@ class PacketBuilder {
      *  Build the ack packet. The list need not be sorted into full and partial;
      *  this method will put all fulls before the partials in the outgoing packet.
      *  An ack packet is just a data packet with no data.
+     *  See buildPacket() for format.
      *
      * @param ackBitfields list of ACKBitfield instances to either fully or partially ACK
      */
@@ -903,7 +1016,7 @@ class PacketBuilder {
         // challenge...
         DataHelper.toLong(data, off, 1, 0);
         off++;
-        off += 0; // *cough*
+        //off += 0; // *cough*
         
         System.arraycopy(ourIntroKey.getData(), 0, data, off, SessionKey.KEYSIZE_BYTES);
         off += SessionKey.KEYSIZE_BYTES;
@@ -1059,9 +1172,6 @@ class PacketBuilder {
         return packet;
     }
     
-    /** if no extended options or rekey data, which we don't support */
-    private static final int HEADER_SIZE = UDPPacket.MAC_SIZE + UDPPacket.IV_SIZE + 1 + 4;
-
     /**
      *  Create a new packet and add the flag byte and the time stamp.
      *  Caller should add data starting at HEADER_SIZE.

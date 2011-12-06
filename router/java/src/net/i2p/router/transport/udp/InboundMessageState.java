@@ -153,29 +153,43 @@ class InboundMessageState {
         return new PartialBitfield(_messageId, _fragments);
     }
     
+    /**
+     *  A true partial bitfield that is not complete.
+     */
     private static final class PartialBitfield implements ACKBitfield {
-        private long _bitfieldMessageId;
-        private boolean _fragmentsReceived[];
+        private final long _bitfieldMessageId;
+        private final boolean _fragmentsReceived[];
         
+        /**
+         *  @param data each element is non-null or null for received or not
+         */
         public PartialBitfield(long messageId, Object data[]) {
             _bitfieldMessageId = messageId;
+            boolean fragmentsRcvd[] = null;
             for (int i = data.length - 1; i >= 0; i--) {
                 if (data[i] != null) {
-                    if (_fragmentsReceived == null)
-                        _fragmentsReceived = new boolean[i+1];
-                    _fragmentsReceived[i] = true;
+                    if (fragmentsRcvd == null)
+                        fragmentsRcvd = new boolean[i+1];
+                    fragmentsRcvd[i] = true;
                 }
             }
-            if (_fragmentsReceived == null)
+            if (fragmentsRcvd == null)
                 _fragmentsReceived = new boolean[0];
+            else
+                _fragmentsReceived = fragmentsRcvd;
         }
+
         public int fragmentCount() { return _fragmentsReceived.length; }
+
         public long getMessageId() { return _bitfieldMessageId; }
+
         public boolean received(int fragmentNum) { 
             if ( (fragmentNum < 0) || (fragmentNum >= _fragmentsReceived.length) )
                 return false;
             return _fragmentsReceived[fragmentNum];
         }
+
+        /** @return false always */
         public boolean receivedComplete() { return false; }
         
         @Override

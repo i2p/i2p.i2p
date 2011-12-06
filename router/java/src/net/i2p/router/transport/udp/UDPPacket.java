@@ -56,8 +56,14 @@ class UDPPacket {
      *  if a received packet is this big it is truncated.
      *  This is bigger than PeerState.LARGE_MTU, as the far-end's
      *  LARGE_MTU may be larger than ours.
+     *
+     *  Due to longstanding bugs, a packet may be larger than LARGE_MTU
+     *  (acks and padding). Together with an increase in the LARGE_MTU to
+     *  1492 in release 0.8.9, routers from 0.8.9 - 0.8.11 can generate
+     *  packets up to 1536. Data packets are always a multiple of 16,
+     *  so make this 4 + a multiple of 16.
      */
-    static final int MAX_PACKET_SIZE = 1536;
+    static final int MAX_PACKET_SIZE = 1572;
     public static final int IV_SIZE = 16;
     public static final int MAC_SIZE = 16;
     
@@ -116,12 +122,16 @@ class UDPPacket {
         _released = false;
     }
     
+  /****
     public void writeData(byte src[], int offset, int len) { 
         verifyNotReleased();
         System.arraycopy(src, offset, _data, 0, len);
         _packet.setLength(len);
         resetBegin();
     }
+  ****/
+
+    /** */
     public DatagramPacket getPacket() { verifyNotReleased(); return _packet; }
     public short getPriority() { verifyNotReleased(); return _priority; }
     public long getExpiration() { verifyNotReleased(); return _expiration; }
@@ -263,7 +273,10 @@ class UDPPacket {
         buf.append(" byte packet with ");
         buf.append(_packet.getAddress().getHostAddress()).append(":");
         buf.append(_packet.getPort());
-        buf.append(" id=").append(System.identityHashCode(this));
+        //buf.append(" id=").append(System.identityHashCode(this));
+        buf.append(" msg type=").append(_messageType);
+        buf.append(" mark type=").append(_markedType);
+        buf.append(" frag count=").append(_fragmentCount);
 
         buf.append(" sinceEnqueued=").append((_enqueueTime > 0 ? _context.clock().now()-_enqueueTime : -1));
         buf.append(" sinceReceived=").append((_receivedTime > 0 ? _context.clock().now()-_receivedTime : -1));

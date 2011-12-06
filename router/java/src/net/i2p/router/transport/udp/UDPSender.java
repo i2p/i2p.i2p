@@ -158,6 +158,9 @@ class UDPSender {
     public int add(UDPPacket packet) {
         if (packet == null || !_keepRunning) return 0;
         int size = 0;
+        int psz = packet.getPacket().getLength();
+        if (psz > PeerState.LARGE_MTU)
+            _log.error("Sending large UDP packet " + psz + " bytes: " + packet);
         _outboundQueue.offer(packet);
         //size = _outboundQueue.size();
         //_context.statManager().addRateData("udp.sendQueueSize", size, lifetime);
@@ -187,7 +190,7 @@ class UDPSender {
                         _log.debug("Packet to send known: " + packet);
                     long acquireTime = _context.clock().now();
                     int size = packet.getPacket().getLength();
-                    int size2 = packet.getPacket().getLength();
+                    // ?? int size2 = packet.getPacket().getLength();
                     if (size > 0) {
                         //_context.bandwidthLimiter().requestOutbound(req, size, "UDP sender");
                         req = _context.bandwidthLimiter().requestOutbound(size, "UDP sender");

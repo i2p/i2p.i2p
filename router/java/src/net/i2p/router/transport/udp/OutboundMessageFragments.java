@@ -372,11 +372,11 @@ class OutboundMessageFragments {
 
             // ok, simplest possible thing is to always tack on the bitfields if
             List<Long> msgIds = peer.getCurrentFullACKs();
-            if (msgIds == null) msgIds = new ArrayList();
             List<ACKBitfield> partialACKBitfields = new ArrayList();
             peer.fetchPartialACKs(partialACKBitfields);
             int piggybackedPartialACK = partialACKBitfields.size();
             // getCurrentFullACKs() already makes a copy, do we need to copy again?
+            // YES because buildPacket() now removes them (maybe)
             List<Long> remaining = new ArrayList(msgIds);
             int sparseCount = 0;
             UDPPacket rv[] = new UDPPacket[fragments]; //sparse

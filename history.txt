@@ -1,3 +1,23 @@
+2011-12-06 zzz
+  * Router:
+    - More refactoring tasks to their own files
+    - Adjust some thread priorities
+  * Susimail: Adjust login form sizes
+  * Tunnels: Increase next hop send timeout
+  * UDP: Fix major MTU bug introduced in 0.8.9.
+    - Change large MTU from 1492 to 1484 and small from 608 to 620
+      for encryption padding efficiency
+    - Enforce sent MTU limit
+    - Increase receive buffer size from 1536 to 1572 so that excessive-sized
+      packets sent by 0.8.9-0.8.11 routers aren't dropped
+    - Limit the max acks in a data packet
+    - Limit the duplicate acks in successive data packets
+    - Only include acks that will fit in the mtu in a data packet
+    - Correctly remove acks from the pending set after they are sent,
+      so they aren't sent repeatedly
+    - Don't pad data packets unless necessary
+    - Debug logging and javadocs
+
 2011-12-04 zzz
   * Console:
     - Less icons on configclients.jsp
