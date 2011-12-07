@@ -138,17 +138,20 @@ class PacketBuilder {
     /** 74 */
     public static final int MIN_DATA_PACKET_OVERHEAD = IP_HEADER_SIZE + UDP_HEADER_SIZE + DATA_HEADER_SIZE;
 
-    /**
-     *  Only for data packets. No limit in ack-only packets.
-     *  This directly affects data packet overhead.
-     */
-    private static final int MAX_EXPLICIT_ACKS_LARGE = 9;
+    /** one byte field */
+    public static final int ABSOLUTE_MAX_ACKS = 255;
 
     /**
      *  Only for data packets. No limit in ack-only packets.
      *  This directly affects data packet overhead.
      */
-    private static final int MAX_EXPLICIT_ACKS_SMALL = 4;
+    private static final int MAX_RESEND_ACKS_LARGE = 9;
+
+    /**
+     *  Only for data packets. No limit in ack-only packets.
+     *  This directly affects data packet overhead.
+     */
+    private static final int MAX_RESEND_ACKS_SMALL = 4;
 
     public PacketBuilder(I2PAppContext ctx, UDPTransport transport) {
         _context = ctx;
@@ -202,6 +205,9 @@ class PacketBuilder {
      *                        Not all message IDs will necessarily be sent, there may not be room.
      *                        non-null.
      *
+     * @param newAckCount the number of ackIdsRemaining entries that are new. These must be the first
+     *                    ones in the list
+     *
      * @param partialACKsRemaining list of messageIds (ACKBitfield) that should be acked by this packet.  
      *                        The list itself is passed by reference, and if a messageId is
      *                        included, it should be removed from the list.
@@ -212,7 +218,8 @@ class PacketBuilder {
      * @return null on error
      */
     public UDPPacket buildPacket(OutboundMessageState state, int fragment, PeerState peer,
-                                 List<Long> ackIdsRemaining, List<ACKBitfield> partialACKsRemaining) {
+                                 List<Long> ackIdsRemaining, int newAckCount,
+                                 List<ACKBitfield> partialACKsRemaining) {
         UDPPacket packet = buildPacketHeader((byte)(UDPPacket.PAYLOAD_TYPE_DATA << 4));
         byte data[] = packet.getPacket().getData();
         int off = HEADER_SIZE;
@@ -245,6 +252,8 @@ class PacketBuilder {
         int partialAcksToSend = 0;
         if (availableForExplicitAcks >= 6 && !partialACKsRemaining.isEmpty()) {
             for (ACKBitfield bf : partialACKsRemaining) {
+                if (partialAcksToSend >= ABSOLUTE_MAX_ACKS)
+                    break;  // ack count
                 if (bf.receivedComplete())
                     continue;
                 int acksz = 4 + (bf.fragmentCount() / 7) + 1;
@@ -272,14 +281,17 @@ class PacketBuilder {
         if (msg != null) {
             msg.append(" data: ").append(dataSize).append(" bytes, mtu: ")
                .append(currentMTU).append(", ")
-               .append(ackIdsRemaining.size()).append(" full acks requested, ")
+               .append(newAckCount).append(" new full acks requested, ")
+               .append(ackIdsRemaining.size() - newAckCount).append(" resend acks requested, ")
                .append(partialACKsRemaining.size()).append(" partial acks requested, ")
                .append(availableForAcks).append(" avail. for all acks, ")
                .append(availableForExplicitAcks).append(" for full acks, ");
         }
 
-        int explicitToSend = Math.min(currentMTU > PeerState.MIN_MTU ? MAX_EXPLICIT_ACKS_LARGE : MAX_EXPLICIT_ACKS_SMALL,
-                                      Math.min((availableForExplicitAcks - 1) / 4, ackIdsRemaining.size()));
+        // always send all the new acks if we have room
+        int explicitToSend = Math.min(ABSOLUTE_MAX_ACKS,
+                                      Math.min(newAckCount + (currentMTU > PeerState.MIN_MTU ? MAX_RESEND_ACKS_LARGE : MAX_RESEND_ACKS_SMALL),
+                                               Math.min((availableForExplicitAcks - 1) / 4, ackIdsRemaining.size())));
         if (explicitToSend > 0) {
             if (msg != null)
                 msg.append(explicitToSend).append(" full acks included:");
@@ -421,6 +433,9 @@ class PacketBuilder {
      *  An ack packet is just a data packet with no data.
      *  See buildPacket() for format.
      *
+     *  TODO MTU not enforced.
+     *  TODO handle huge number of acks better
+     *
      * @param ackBitfields list of ACKBitfield instances to either fully or partially ACK
      */
     public UDPPacket buildACK(PeerState peer, List<ACKBitfield> ackBitfields) {
@@ -442,6 +457,12 @@ class PacketBuilder {
             else
                 partialACKCount++;
         }
+        // FIXME do better than this, we could still exceed MTU
+        if (fullACKCount > ABSOLUTE_MAX_ACKS ||
+            partialACKCount > ABSOLUTE_MAX_ACKS)
+            throw new IllegalArgumentException("Too many acks full/partial " + fullACKCount +
+                                               '/' + partialACKCount);
+
         // ok, now for the body...
         if (fullACKCount > 0)
             data[off] |= UDPPacket.DATA_FLAG_EXPLICIT_ACK;

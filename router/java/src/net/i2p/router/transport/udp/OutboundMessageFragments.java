@@ -372,6 +372,8 @@ class OutboundMessageFragments {
 
             // ok, simplest possible thing is to always tack on the bitfields if
             List<Long> msgIds = peer.getCurrentFullACKs();
+            int newFullAckCount = msgIds.size();
+            msgIds.addAll(peer.getCurrentResendACKs());
             List<ACKBitfield> partialACKBitfields = new ArrayList();
             peer.fetchPartialACKs(partialACKBitfields);
             int piggybackedPartialACK = partialACKBitfields.size();
@@ -382,14 +384,17 @@ class OutboundMessageFragments {
             UDPPacket rv[] = new UDPPacket[fragments]; //sparse
             for (int i = 0; i < fragments; i++) {
                 if (state.needsSending(i)) {
+                    int before = remaining.size();
                     try {
-                        rv[i] = _builder.buildPacket(state, i, peer, remaining, partialACKBitfields);
+                        rv[i] = _builder.buildPacket(state, i, peer, remaining, newFullAckCount, partialACKBitfields);
                     } catch (ArrayIndexOutOfBoundsException aioobe) {
                         _log.log(Log.CRIT, "Corrupt trying to build a packet - please tell jrandom: " +
                                  partialACKBitfields + " / " + remaining + " / " + msgIds);
                         sparseCount++;
                         continue;
                     }
+                    int after = remaining.size();
+                    newFullAckCount = Math.max(0, newFullAckCount - (before - after));
                     if (rv[i] == null) {
                         sparseCount++;
                         continue;

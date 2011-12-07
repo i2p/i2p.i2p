@@ -714,8 +714,7 @@ class PeerState {
      * "want to send" list.  If the message id is transmitted to the peer,
      * removeACKMessage(Long) should be called.
      *
-     * The returned list contains acks not yet sent, followed by
-     * a random assortment of acks already sent.
+     * The returned list contains acks not yet sent only.
      * The caller should NOT transmit all of them all the time,
      * even if there is room,
      * or the packets will have way too much overhead.
@@ -725,13 +724,31 @@ class PeerState {
     public List<Long> getCurrentFullACKs() {
             // no such element exception seen here
             List<Long> rv = new ArrayList(_currentACKs);
-            // include some for retransmission
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Returning " + _currentACKs.size() + " current acks");
+            return rv;
+    }
+
+    /**
+     * Grab a list of message ids (Long) that we want to send to the remote
+     * peer, regardless of the packet size, but don't remove it from our 
+     * "want to send" list.
+     *
+     * The returned list contains
+     * a random assortment of acks already sent.
+     * The caller should NOT transmit all of them all the time,
+     * even if there is room,
+     * or the packets will have way too much overhead.
+     *
+     * @return a new list, do as you like with it
+     * @since 0.8.12 was included in getCurrentFullACKs()
+     */
+    public List<Long> getCurrentResendACKs() {
             List<Long> randomResends = new ArrayList(_currentACKsResend);
             Collections.shuffle(randomResends, _context.random());
-            rv.addAll(randomResends);
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Returning " + _currentACKs.size() + " current and " + randomResends.size() + " resend acks");
-            return rv;
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("Returning " + randomResends.size() + " resend acks");
+            return randomResends;
     }
 
     /** the ack was sent */
