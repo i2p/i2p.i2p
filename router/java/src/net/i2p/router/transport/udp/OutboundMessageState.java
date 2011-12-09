@@ -148,9 +148,11 @@ class OutboundMessageState {
     public long getMessageId() { return _messageId; }
     public PeerState getPeer() { return _peer; }
     public void setPeer(PeerState peer) { _peer = peer; }
+
     public boolean isExpired() {
         return _expiration < _context.clock().now(); 
     }
+
     public boolean isComplete() {
         short sends[] = _fragmentSends;
         if (sends == null) return false;
@@ -160,6 +162,7 @@ class OutboundMessageState {
         // nothing else pending ack
         return true;
     }
+
     public int getUnackedSize() {
         short fragmentSends[] = _fragmentSends;
         ByteArray messageBuf = _messageBuf;
@@ -180,6 +183,7 @@ class OutboundMessageState {
         }
         return rv;
     }
+
     public boolean needsSending(int fragment) {
         
         short sends[] = _fragmentSends;
@@ -187,6 +191,7 @@ class OutboundMessageState {
             return false;
         return (sends[fragment] >= (short)0);
     }
+
     public long getLifetime() { return _context.clock().now() - _startedOn; }
     
     /**
@@ -227,6 +232,7 @@ class OutboundMessageState {
     public void setNextSendTime(long when) { _nextSendTime = when; }
     public int getMaxSends() { return _maxSends; }
     public int getPushCount() { return _pushCount; }
+
     /** note that we have pushed the message fragments */
     public void push() { 
         _pushCount++; 
@@ -238,7 +244,9 @@ class OutboundMessageState {
                     _fragmentSends[i] = (short)(1 + _fragmentSends[i]);
         
     }
+
     public boolean isFragmented() { return _fragmentSends != null; }
+
     /**
      * Prepare the message for fragmented delivery, using no more than
      * fragmentSize bytes per fragment.
@@ -258,10 +266,11 @@ class OutboundMessageState {
         //_fragmentEnd = new int[numFragments];
         _fragmentSends = new short[numFragments];
         //Arrays.fill(_fragmentEnd, -1);
-        Arrays.fill(_fragmentSends, (short)0);
+        //Arrays.fill(_fragmentSends, (short)0);
         
         _fragmentSize = fragmentSize;
     }
+
     /** how many fragments in the message */
     public int getFragmentCount() { 
         if (_fragmentSends == null) 
@@ -269,17 +278,21 @@ class OutboundMessageState {
         else
             return _fragmentSends.length; 
     }
+
     public int getFragmentSize() { return _fragmentSize; }
+
     /** should we continue sending this fragment? */
     public boolean shouldSend(int fragmentNum) { return _fragmentSends[fragmentNum] >= (short)0; }
+
     public int fragmentSize(int fragmentNum) {
         if (_messageBuf == null) return -1;
         if (fragmentNum + 1 == _fragmentSends.length) {
             int valid = _messageBuf.getValid();
             if (valid <= _fragmentSize)
                 return valid;
-            else
-                return valid % _fragmentSize;
+            // bugfix 0.8.12
+            int mod = valid % _fragmentSize;
+            return mod == 0 ? _fragmentSize : mod;
         } else {
             return _fragmentSize;
         }
