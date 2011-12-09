@@ -1169,11 +1169,10 @@ class PeerState {
         state.setPeer(this);
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Adding to " + _remotePeer.toBase64() + ": " + state.getMessageId());
-        List<OutboundMessageState> msgs = _outboundMessages;
         int rv = 0;
         boolean fail = false;
-        synchronized (msgs) {
-            rv = msgs.size() + 1;
+        synchronized (_outboundMessages) {
+            rv = _outboundMessages.size() + 1;
             if (rv > 32) { 
                 // 32 queued messages?  to *one* peer?  nuh uh.
                 fail = true;
@@ -1218,7 +1217,7 @@ class PeerState {
              *******/
 
             } else {
-                msgs.add(state);
+                _outboundMessages.add(state);
             }
         }
         if (fail)
@@ -1230,17 +1229,16 @@ class PeerState {
     public void dropOutbound() {
         //if (_dead) return;
         _dead = true;
-        List<OutboundMessageState> msgs = _outboundMessages;
         //_outboundMessages = null;
         _retransmitter = null;
 
             int sz = 0;
             List<OutboundMessageState> tempList = null;
-            synchronized (msgs) {
-                sz = msgs.size();
+            synchronized (_outboundMessages) {
+                sz = _outboundMessages.size();
                 if (sz > 0) {
-                    tempList = new ArrayList(msgs);
-                    msgs.clear();
+                    tempList = new ArrayList(_outboundMessages);
+                    _outboundMessages.clear();
 		}
             }
             for (int i = 0; i < sz; i++)
@@ -1263,9 +1261,8 @@ class PeerState {
      * @return number of active outbound messages remaining
      */
     public int finishMessages() {
-        List<OutboundMessageState> msgs = _outboundMessages;
         // short circuit, unsynchronized
-        if (msgs.isEmpty())
+        if (_outboundMessages.isEmpty())
             return 0;
 
         if (_dead) {
@@ -1276,8 +1273,8 @@ class PeerState {
         int rv = 0;
         List<OutboundMessageState> succeeded = null;
         List<OutboundMessageState> failed = null;
-        synchronized (msgs) {
-            for (Iterator<OutboundMessageState> iter = msgs.iterator(); iter.hasNext(); ) {
+        synchronized (_outboundMessages) {
+            for (Iterator<OutboundMessageState> iter = _outboundMessages.iterator(); iter.hasNext(); ) {
                 OutboundMessageState state = iter.next();
                 if (state.isComplete()) {
                     iter.remove();
@@ -1301,7 +1298,7 @@ class PeerState {
                     failed.add(state);
                 } // end (pushCount > maxVolleys)
             } // end iterating over outbound messages
-            rv = msgs.size();
+            rv = _outboundMessages.size();
         }
         
         for (int i = 0; succeeded != null && i < succeeded.size(); i++) {
@@ -1337,11 +1334,9 @@ class PeerState {
      *
      */
     public OutboundMessageState allocateSend() {
-        int total = 0;
-        List<OutboundMessageState> msgs = _outboundMessages;
         if (_dead) return null;
-        synchronized (msgs) {
-            for (OutboundMessageState state : msgs) {
+        synchronized (_outboundMessages) {
+            for (OutboundMessageState state : _outboundMessages) {
                 if (locked_shouldSend(state)) {
                     if (_log.shouldLog(Log.DEBUG))
                         _log.debug("Allocate sending to " + _remotePeer.toBase64() + ": " + state.getMessageId());
@@ -1360,10 +1355,9 @@ class PeerState {
                         msg.timestamp("passed over for allocation with " + msgs.size() + " peers");
                 } */
             }
-            total = msgs.size();
         }
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Nothing to send to " + _remotePeer.toBase64() + ", with " + total + " remaining");
+            _log.debug("Nothing to send to " + _remotePeer.toBase64() + ", with " + _outboundMessages.size() + " remaining");
         return null;
     }
     
@@ -1375,13 +1369,12 @@ class PeerState {
         int rv = Integer.MAX_VALUE;
         if (_dead) return rv;
         long now = _context.clock().now();
-        List<OutboundMessageState> msgs = _outboundMessages;
-        synchronized (msgs) {
+        synchronized (_outboundMessages) {
             if (_retransmitter != null) {
                 rv = (int)(_retransmitter.getNextSendTime() - now);
                 return rv;
             }
-            for (OutboundMessageState state : msgs) {
+            for (OutboundMessageState state : _outboundMessages) {
                 int delay = (int)(state.getNextSendTime() - now);
                 if (delay < rv)
                     rv = delay;
@@ -1512,9 +1505,8 @@ class PeerState {
     public boolean acked(long messageId) {
         if (_dead) return false;
         OutboundMessageState state = null;
-        List<OutboundMessageState> msgs = _outboundMessages;
-        synchronized (msgs) {
-            for (Iterator<OutboundMessageState> iter = msgs.iterator(); iter.hasNext(); ) {
+        synchronized (_outboundMessages) {
+            for (Iterator<OutboundMessageState> iter = _outboundMessages.iterator(); iter.hasNext(); ) {
                 state = iter.next();
                 if (state.getMessageId() == messageId) {
                     iter.remove();
@@ -1574,12 +1566,10 @@ class PeerState {
             return acked(bitfield.getMessageId());
         }
     
-        List<OutboundMessageState> msgs = _outboundMessages;
-        
         OutboundMessageState state = null;
         boolean isComplete = false;
-        synchronized (msgs) {
-            for (Iterator<OutboundMessageState> iter = msgs.iterator(); iter.hasNext(); ) {
+        synchronized (_outboundMessages) {
+            for (Iterator<OutboundMessageState> iter = _outboundMessages.iterator(); iter.hasNext(); ) {
                 state = iter.next();
                 if (state.getMessageId() == bitfield.getMessageId()) {
                     boolean complete = state.acked(bitfield);

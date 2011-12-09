@@ -11,6 +11,7 @@ import net.i2p.data.i2np.I2NPMessageHandler;
 import net.i2p.data.i2np.I2NPMessageImpl;
 import net.i2p.router.RouterContext;
 //import net.i2p.util.ByteCache;
+import net.i2p.util.HexDump;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 
@@ -53,8 +54,8 @@ class MessageReceiver {
         _context.statManager().createRateStat("udp.inboundExpired", "How many messages were expired before reception?", "udp", UDPTransport.RATES);
         //_context.statManager().createRateStat("udp.inboundRemaining", "How many messages were remaining when a message is pulled off the complete queue?", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.inboundReady", "How many messages were ready when a message is added to the complete queue?", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.inboundReadTime", "How long it takes to parse in the completed fragments into a message?", "udp", UDPTransport.RATES);
-        _context.statManager().createRateStat("udp.inboundReceiveProcessTime", "How long it takes to add the message to the transport?", "udp", UDPTransport.RATES);
+        //_context.statManager().createRateStat("udp.inboundReadTime", "How long it takes to parse in the completed fragments into a message?", "udp", UDPTransport.RATES);
+        //_context.statManager().createRateStat("udp.inboundReceiveProcessTime", "How long it takes to add the message to the transport?", "udp", UDPTransport.RATES);
         _context.statManager().createRateStat("udp.inboundLag", "How long the olded ready message has been sitting on the queue (period is the queue size)?", "udp", UDPTransport.RATES);
         
         _alive = true;
@@ -136,16 +137,16 @@ class MessageReceiver {
                 _context.statManager().addRateData("udp.inboundExpired", expired, expiredLifetime);
             
             if (message != null) {
-                long before = System.currentTimeMillis();
+                //long before = System.currentTimeMillis();
                 //if (remaining > 0)
                 //    _context.statManager().addRateData("udp.inboundRemaining", remaining, 0);
                 int size = message.getCompleteSize();
-                if (_log.shouldLog(Log.INFO))
-                    _log.info("Full message received (" + message.getMessageId() + ") after " + message.getLifetime());
-                long afterRead = -1;
+                //if (_log.shouldLog(Log.DEBUG))
+                //    _log.debug("Full message received (" + message.getMessageId() + ") after " + message.getLifetime());
+                //long afterRead = -1;
                 try {
                     I2NPMessage msg = readMessage(buf, message, handler);
-                    afterRead = System.currentTimeMillis();
+                    //afterRead = System.currentTimeMillis();
                     if (msg != null)
                         _transport.messageReceived(msg, null, message.getFrom(), message.getLifetime(), size);
                 } catch (RuntimeException re) {
@@ -153,11 +154,11 @@ class MessageReceiver {
                     continue;
                 }
                 message = null;
-                long after = System.currentTimeMillis();
-                if (afterRead - before > 100)
-                    _context.statManager().addRateData("udp.inboundReadTime", afterRead - before, remaining);
-                if (after - afterRead > 100)
-                    _context.statManager().addRateData("udp.inboundReceiveProcessTime", after - afterRead, remaining);
+                //long after = System.currentTimeMillis();
+                //if (afterRead - before > 100)
+                //    _context.statManager().addRateData("udp.inboundReadTime", afterRead - before, remaining);
+                //if (after - afterRead > 100)
+                //    _context.statManager().addRateData("udp.inboundReceiveProcessTime", after - afterRead, remaining);
             }
         }
         
@@ -168,36 +169,50 @@ class MessageReceiver {
     /**
      *  Assemble all the fragments into an I2NP message.
      *  This calls state.releaseResources(), do not access state after calling this.
+     *
+     *  @param buf temp buffer for convenience
      *  @return null on error
      */
     private I2NPMessage readMessage(ByteArray buf, InboundMessageState state, I2NPMessageHandler handler) {
         try {
             //byte buf[] = new byte[state.getCompleteSize()];
-            ByteArray fragments[] = state.getFragments();
+            I2NPMessage m;
             int numFragments = state.getFragmentCount();
-            int off = 0;
-            for (int i = 0; i < numFragments; i++) {
-                System.arraycopy(fragments[i].getData(), 0, buf.getData(), off, fragments[i].getValid());
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Raw fragment[" + i + "] for " + state.getMessageId() + ": " 
-                               + Base64.encode(fragments[i].getData(), 0, fragments[i].getValid())
-                               + " (valid: " + fragments[i].getValid() 
-                               + " raw: " + Base64.encode(fragments[i].getData()) + ")");
-                off += fragments[i].getValid();
+            if (numFragments > 1) {
+                ByteArray fragments[] = state.getFragments();
+                int off = 0;
+                for (int i = 0; i < numFragments; i++) {
+                    System.arraycopy(fragments[i].getData(), 0, buf.getData(), off, fragments[i].getValid());
+                    //if (_log.shouldLog(Log.DEBUG))
+                    //    _log.debug("Raw fragment[" + i + "] for " + state.getMessageId() + ": " 
+                    //               + Base64.encode(fragments[i].getData(), 0, fragments[i].getValid())
+                    //               + " (valid: " + fragments[i].getValid() 
+                    //               + " raw: " + Base64.encode(fragments[i].getData()) + ")");
+                    off += fragments[i].getValid();
+                }
+                if (off != state.getCompleteSize()) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Hmm, offset of the fragments = " + off + " while the state says " + state.getCompleteSize());
+                    return null;
+                }
+                //if (_log.shouldLog(Log.DEBUG))
+                //    _log.debug("Raw byte array for " + state.getMessageId() + ": " + HexDump.dump(buf.getData(), 0, state.getCompleteSize()));
+                m = I2NPMessageImpl.fromRawByteArray(_context, buf.getData(), 0, state.getCompleteSize(), handler);
+            } else {
+                // zero copy for single fragment
+                m = I2NPMessageImpl.fromRawByteArray(_context, state.getFragments()[0].getData(), 0, state.getCompleteSize(), handler);
             }
-            if (off != state.getCompleteSize()) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Hmm, offset of the fragments = " + off + " while the state says " + state.getCompleteSize());
-                return null;
+            if (state.getCompleteSize() == 534 && _log.shouldLog(Log.INFO)) {
+                _log.info(HexDump.dump(buf.getData(), 0, state.getCompleteSize()));
             }
-            if (_log.shouldLog(Log.DEBUG))
-                _log.debug("Raw byte array for " + state.getMessageId() + ": " + Base64.encode(buf.getData(), 0, state.getCompleteSize()));
-            I2NPMessage m = I2NPMessageImpl.fromRawByteArray(_context, buf.getData(), 0, state.getCompleteSize(), handler);
             m.setUniqueId(state.getMessageId());
             return m;
         } catch (I2NPMessageException ime) {
-            if (_log.shouldLog(Log.WARN))
+            if (_log.shouldLog(Log.WARN)) {
                 _log.warn("Message invalid: " + state, ime);
+                _log.warn(HexDump.dump(buf.getData(), 0, state.getCompleteSize()));
+                _log.warn("RAW: " + Base64.encode(buf.getData(), 0, state.getCompleteSize()));
+            }
             _context.messageHistory().droppedInboundMessage(state.getMessageId(), state.getFrom(), "error: " + ime.toString() + ": " + state.toString());
             return null;
         } catch (Exception e) {

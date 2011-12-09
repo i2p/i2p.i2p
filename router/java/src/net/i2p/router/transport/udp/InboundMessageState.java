@@ -69,6 +69,17 @@ class InboundMessageState {
             try {
                 data.readMessageFragment(dataFragment, message.getData(), 0);
                 int size = data.readMessageFragmentSize(dataFragment);
+                if (size <= 0) {
+                    // Bug in routers prior to 0.8.12
+                    // If the msg size was an exact multiple of the fragment size,
+                    // it would send a zero-length last fragment.
+                    // This message is almost certainly doomed.
+                    // We might as well ack it, keep going, and pass it along to I2NP where it
+                    // will get dropped as corrupted.
+                    // If we don't ack the fragment he will just send a zero-length fragment again.
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Zero-length fragment " + fragmentNum + " for message " + _messageId + " from " + _from);
+                }
                 message.setValid(size);
                 _fragments[fragmentNum] = message;
                 boolean isLast = data.readMessageIsLast(dataFragment);
@@ -91,7 +102,7 @@ class InboundMessageState {
                     _log.debug("New fragment " + fragmentNum + " for message " + _messageId 
                                + ", size=" + size
                                + ", isLast=" + isLast
-                               + ", data=" + Base64.encode(message.getData(), 0, size));
+                          /*   + ", data=" + Base64.encode(message.getData(), 0, size)   */  );
             } catch (ArrayIndexOutOfBoundsException aioobe) {
                 _log.warn("Corrupt SSU fragment " + fragmentNum, aioobe);
                 return false;
@@ -106,11 +117,15 @@ class InboundMessageState {
     }
     
     /**
-     *  May not be valid after released
+     *  May not be valid after released.
+     *  Probably doesn't need to be synced by caller, given the order of
+     *  events in receiveFragment() above, but you might want to anyway
+     *  to be safe.
      */
     public boolean isComplete() {
-        if (_lastFragment < 0) return false;
-        for (int i = 0; i <= _lastFragment; i++)
+        int last = _lastFragment;
+        if (last < 0) return false;
+        for (int i = 0; i <= last; i++)
             if (_fragments[i] == null)
                 return false;
         return true;

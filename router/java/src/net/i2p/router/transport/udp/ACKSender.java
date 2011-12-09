@@ -138,8 +138,8 @@ class ACKSender implements Runnable {
                             // bulk operations may throw an exception
                             _peersToACK.addAll(notYet);
                         } catch (Exception e) {}
-                        if (_log.shouldLog(Log.INFO))
-                            _log.info("sleeping, pending size = " + notYet.size());
+                        if (_log.shouldLog(Log.DEBUG))
+                            _log.debug("sleeping, pending size = " + notYet.size());
                         notYet.clear();
                         try {
                             // sleep a little longer than the divided frequency,

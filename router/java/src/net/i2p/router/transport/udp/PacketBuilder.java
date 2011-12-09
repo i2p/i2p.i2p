@@ -238,6 +238,10 @@ class PacketBuilder {
             packet.release();
             return null;
         }
+        if (dataSize == 0) {
+            // OK according to the protocol but if we send it, it's a bug
+            _log.error("Sending zero-size fragment " + fragment + " of " + state + " for " + peer);
+        }
         int currentMTU = peer.getMTU();
         int availableForAcks = currentMTU - MIN_DATA_PACKET_OVERHEAD - dataSize;
         int availableForExplicitAcks = availableForAcks;
