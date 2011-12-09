@@ -1436,6 +1436,8 @@ public class DataHelper {
      */
     public static byte[] decompress(byte orig[], int offset, int length) throws IOException {
         if ((orig == null) || (orig.length <= 0)) return orig;
+        if (offset + length > orig.length)
+            throw new IOException("Bad params arrlen " + orig.length + " off " + offset + " len " + length);
         
         ReusableGZIPInputStream in = ReusableGZIPInputStream.acquire();
         in.initialize(new ByteArrayInputStream(orig, offset, length));
@@ -1458,6 +1460,7 @@ public class DataHelper {
         byte rv[] = new byte[written];
         System.arraycopy(outBuf.getData(), 0, rv, 0, written);
         cache.release(outBuf);
+        // TODO release in finally block
         ReusableGZIPInputStream.release(in);
         return rv;
     }
