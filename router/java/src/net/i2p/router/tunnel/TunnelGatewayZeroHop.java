@@ -3,7 +3,9 @@ package net.i2p.router.tunnel;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
 import net.i2p.data.i2np.I2NPMessage;
+import net.i2p.data.i2np.I2NPMessageException;
 import net.i2p.data.i2np.TunnelGatewayMessage;
+import net.i2p.data.i2np.UnknownI2NPMessage;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
@@ -30,12 +32,29 @@ class TunnelGatewayZeroHop extends TunnelGateway {
     
     /**
      * Add a message to be sent down the tunnel, where we are the inbound gateway.
+     * This requires converting the message included in the TGM from an
+     * UnknownI2NPMessage to the correct message class.
+     * See TunnelGatewayMessage for details.
      *
      * @param msg message received to be sent through the tunnel
      */
     @Override
     public void add(TunnelGatewayMessage msg) {
-        add(msg.getMessage(), null, null);
+        I2NPMessage imsg = msg.getMessage();
+        if (_config.isInbound()) {
+            if (imsg instanceof UnknownI2NPMessage) {
+                // Do the delayed deserializing - convert to a standard message class
+                try {
+                    UnknownI2NPMessage umsg = (UnknownI2NPMessage) imsg;
+                    imsg = umsg.convert();
+                } catch (I2NPMessageException ime) {
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Unable to convert to std. msg. class at zero-hop IBGW", ime);
+                    return;
+                }
+            }
+        }
+        add(imsg, null, null);
     }
     
     /**
@@ -50,7 +69,7 @@ class TunnelGatewayZeroHop extends TunnelGateway {
     @Override
     public void add(I2NPMessage msg, Hash toRouter, TunnelId toTunnel) {
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("zero hop gateway: distribute " + (_config.isInbound() ? "inbound " : " outbound ")
+            _log.debug("zero hop gateway: distribute " + (_config.isInbound() ? "inbound" : " outbound")
                        + " to " + (toRouter != null ? toRouter.toBase64().substring(0,4) : "" )
                        + "." + (toTunnel != null ? toTunnel.getTunnelId() + "" : "")
                        + ": " + msg);

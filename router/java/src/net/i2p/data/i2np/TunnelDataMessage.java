@@ -22,7 +22,6 @@ import net.i2p.util.Log;
  *
  */
 public class TunnelDataMessage extends I2NPMessageImpl {
-    private Log _log;
     private long _tunnelId;
     private TunnelId _tunnelIdObj;
     private byte[] _data;
@@ -101,7 +100,6 @@ public class TunnelDataMessage extends I2NPMessageImpl {
 
     public TunnelDataMessage(I2PAppContext context) {
         super(context);
-        _log = context.logManager().getLog(TunnelDataMessage.class);
         setMessageExpiration(context.clock().now() + EXPIRATION_PERIOD);
     }
     

@@ -477,6 +477,13 @@ class FragmentHandler {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("RECV(" + data.length + "): "); // + Base64.encode(data)  
                            //+ " " + _context.sha().calculateHash(data).toBase64());
+
+            // TODO read in as unknown message for outbound tunnels,
+            // since this will just be packaged in a TunnelGatewayMessage.
+            // Not a big savings since most everything is a GarlicMessage
+            // and so the readMessage() call is fast.
+            // The unencrypted messages at the OBEP are (V)TBMs
+            // and perhaps an occasional DatabaseLookupMessage
             I2NPMessage m = new I2NPMessageHandler(_context).readMessage(data);
             noteReception(m.getUniqueId(), fragmentCount-1, "complete: ");// + msg.toString());
             noteCompletion(m.getUniqueId());

@@ -24,6 +24,9 @@ import net.i2p.data.TunnelId;
  * Defines the message a router sends to another router to test the network
  * database reachability, as well as the reply message sent back.
  *
+ * TODO: Don't decompress and recompress RouterInfos at the OBEP and IBGW.
+ * Could this even change the message length or corrupt things?
+ *
  * @author jrandom
  */
 public class DatabaseStoreMessage extends I2NPMessageImpl {
@@ -128,14 +131,22 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
             _dbEntry = new RouterInfo();
             int compressedSize = (int)DataHelper.fromLong(data, curIndex, 2);
             curIndex += 2;
+            if (compressedSize <= 0 || curIndex + compressedSize > data.length || (curIndex - offset) + compressedSize > dataSize)
+                throw new I2NPMessageException("Compressed RI length: " + compressedSize +
+                                               " but remaining bytes: " + Math.min(data.length - curIndex, dataSize - (curIndex - offset)));
             
             try {
+                // TODO we could delay decompression, just copy to a new byte array and store in _byteCache
+                // May not be necessary since the IBGW now uses UnknownI2NPMessage.
+                // DSMs at the OBEP are generally garlic wrapped, so the OBEP won't see it.
+                // If we do delay it, getEntry() will have to check if _dbEntry is null and _byteCache
+                // is non-null, and then decompress.
                 byte decompressed[] = DataHelper.decompress(data, curIndex, compressedSize);
                 _dbEntry.readBytes(new ByteArrayInputStream(decompressed));
             } catch (DataFormatException dfe) {
                 throw new I2NPMessageException("Error reading the routerInfo", dfe);
             } catch (IOException ioe) {
-                throw new I2NPMessageException("Compressed routerInfo was corrupt", ioe);
+                throw new I2NPMessageException("Corrupt compressed routerInfo size = " + compressedSize, ioe);
             }
         } else {
             throw new I2NPMessageException("Invalid type of key read from the structure - " + type);
@@ -145,17 +156,29 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
     }
     
     
-    /** calculate the message body's length (not including the header and footer */
+    /**
+     *  calculate the message body's length (not including the header and footer)
+     *
+     *  @throws IllegalStateException
+     */
     protected int calculateWrittenLength() { 
+        // TODO if _byteCache is non-null, don't check _dbEntry
+        if (_dbEntry == null)
+            throw new IllegalStateException("Missing entry");
         int len = Hash.HASH_LENGTH + 1 + 4; // key+type+replyToken
         if (_replyToken > 0) 
             len += 4 + Hash.HASH_LENGTH; // replyTunnel+replyGateway
         int type = _dbEntry.getType();
         if (type == DatabaseEntry.KEY_TYPE_LEASESET) {
-            _byteCache = _dbEntry.toByteArray();
+            if (_byteCache == null) {
+                _byteCache = _dbEntry.toByteArray();
+            }
         } else if (type == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
-            byte uncompressed[] = _dbEntry.toByteArray();
-            _byteCache = DataHelper.compress(uncompressed);
+            // only decompress once
+            if (_byteCache == null) {
+                byte uncompressed[] = _dbEntry.toByteArray();
+                _byteCache = DataHelper.compress(uncompressed);
+            }
             len += 2;
         } else {
             throw new IllegalStateException("Invalid key type " + type);

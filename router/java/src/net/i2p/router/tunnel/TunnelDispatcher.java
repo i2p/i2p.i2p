@@ -452,7 +452,7 @@ public class TunnelDispatcher implements Service {
                                + " as the wrapper's expiration is in " + DataHelper.formatDuration(msg.getMessageExpiration()-before)
                                + " and/or the content's expiration is in " + DataHelper.formatDuration(msg.getMessage().getMessageExpiration()-before)
                                + " with messageId " + msg.getUniqueId() + "/" + msg.getMessage().getUniqueId() + " and message type "
-                               + msg.getMessage().getClass().getName());
+                               + msg.getMessage().getClass().getSimpleName());
                 return;
             }
             //_context.messageHistory().tunnelDispatched("message " + msg.getUniqueId() + "/" + msg.getMessage().getUniqueId() + " on tunnel " 
@@ -471,7 +471,7 @@ public class TunnelDispatcher implements Service {
                            + DataHelper.formatDuration(msg.getMessage().getMessageExpiration()-_context.clock().now())
                            + " messageId " + msg.getUniqueId()
                            + "/" + msg.getMessage().getUniqueId()
-                           + " messageType: " + msg.getMessage().getClass().getName()
+                           + " messageType: " + msg.getMessage().getClass().getSimpleName()
                            + " existing = " + _inboundGateways.size(), new Exception("source"));
         }
         

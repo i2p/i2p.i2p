@@ -49,8 +49,9 @@ public class I2NPMessageHandler {
             int type = (int)DataHelper.readLong(in, 1);
             _lastReadBegin = System.currentTimeMillis();
             I2NPMessage msg = I2NPMessageImpl.createMessage(_context, type);
-            if (msg == null)
-                throw new I2NPMessageException("The type "+ type + " is an unknown I2NP message");
+            // can't be null
+            //if (msg == null)
+            //    throw new I2NPMessageException("The type "+ type + " is an unknown I2NP message");
             try {
                 _lastSize = msg.readBytes(in, type, _messageBuffer);
             } catch (IOException ioe) {
@@ -88,24 +89,26 @@ public class I2NPMessageHandler {
         readMessage(data, 0);
         return lastRead();
     }
+
     public int readMessage(byte data[], int offset) throws IOException, I2NPMessageException {
         int cur = offset;
         int type = (int)DataHelper.fromLong(data, cur, 1);
         cur++;
         _lastReadBegin = System.currentTimeMillis();
         I2NPMessage msg = I2NPMessageImpl.createMessage(_context, type);
-        if (msg == null) {
-            int sz = data.length-offset;
-            boolean allZero = false;
-            for (int i = offset; i < data.length; i++) {
-                if (data[i] != 0) {
-                    allZero = false;
-                    break;
-                }
-            }
-            throw new I2NPMessageException("The type "+ type + " is an unknown I2NP message (remaining sz=" 
-                                           + sz + " all zeros? " + allZero + ")");
-        }
+        // can't be null
+        //if (msg == null) {
+        //    int sz = data.length-offset;
+        //   boolean allZero = false;
+        //    for (int i = offset; i < data.length; i++) {
+        //        if (data[i] != 0) {
+        //            allZero = false;
+        //            break;
+        //        }
+        //    }
+        //    throw new I2NPMessageException("The type "+ type + " is an unknown I2NP message (remaining sz=" 
+        //                                   + sz + " all zeros? " + allZero + ")");
+        //}
         try {
             _lastSize = msg.readBytes(data, type, cur);
             cur += _lastSize;
@@ -127,6 +130,7 @@ public class I2NPMessageHandler {
     public long getLastReadTime() { return _lastReadEnd - _lastReadBegin; }
     public int getLastSize() { return _lastSize; }
     
+/****
     public static void main(String args[]) {
         try {
             I2NPMessage msg = new I2NPMessageHandler(I2PAppContext.getGlobalContext()).readMessage(new FileInputStream(args[0]));
@@ -135,4 +139,5 @@ public class I2NPMessageHandler {
             e.printStackTrace();
         }
     }
+****/
 }

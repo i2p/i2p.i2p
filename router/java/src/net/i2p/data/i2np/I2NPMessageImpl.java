@@ -28,7 +28,7 @@ import net.i2p.util.SimpleByteCache;
  * @author jrandom
  */
 public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPMessage {
-    private final Log _log;
+    protected final Log _log;
     protected final I2PAppContext _context;
     private long _expiration;
     private long _uniqueId;
@@ -36,12 +36,16 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     public final static long DEFAULT_EXPIRATION_MS = 1*60*1000; // 1 minute by default
     public final static int CHECKSUM_LENGTH = 1; //Hash.HASH_LENGTH;
     
-    private static final boolean RAW_FULL_SIZE = false;
+    // Whether SSU used the full header or a truncated header.
+    // We are stuck with the short header, can't change it now.
+    //private static final boolean RAW_FULL_SIZE = false;
     
     /** unused */
     private static final Map<Integer, Builder> _builders = new ConcurrentHashMap(1);
+
     /** @deprecated unused */
     public static final void registerBuilder(Builder builder, int type) { _builders.put(Integer.valueOf(type), builder); }
+
     /** interface for extending the types of messages handled - unused */
     public interface Builder {
         /** instantiate a new I2NPMessage to be populated shortly */
@@ -120,7 +124,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
             boolean eq = DataHelper.eq(checksum, 0, calc, 0, CHECKSUM_LENGTH);
             SimpleByteCache.release(calc);
             if (!eq)
-                throw new I2NPMessageException("Hash does not match for " + getClass().getName());
+                throw new I2NPMessageException("Bad checksum on " + size + " byte I2NP " + getClass().getSimpleName());
 
             //long start = _context.clock().now();
             if (_log.shouldLog(Log.DEBUG))
@@ -182,7 +186,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
         boolean eq = DataHelper.eq(hdata, 0, calc, 0, CHECKSUM_LENGTH);
         SimpleByteCache.release(calc);
         if (!eq)
-            throw new I2NPMessageException("Hash does not match for " + getClass().getName());
+            throw new I2NPMessageException("Bad checksum on " + size + " byte I2NP " + getClass().getSimpleName());
 
         //long start = _context.clock().now();
         if (_log.shouldLog(Log.DEBUG))
@@ -220,10 +224,15 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     public synchronized int getMessageSize() { 
         return calculateWrittenLength()+15 + CHECKSUM_LENGTH; // 16 bytes in the header
     }
+
+    /**
+     *  The raw header consists of a one-byte type and a 4-byte expiration in seconds only.
+     *  Used by SSU only!
+     */
     public synchronized int getRawMessageSize() { 
-        if (RAW_FULL_SIZE) 
-            return getMessageSize();
-        else
+        //if (RAW_FULL_SIZE) 
+        //    return getMessageSize();
+        //else
             return calculateWrittenLength()+5;
     }
     
@@ -310,15 +319,21 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
      */
 
     
-    /** used by SSU only */
+    /**
+     *  Write the message with a short 5-byte header.
+     *  THe header consists of a one-byte type and a 4-byte expiration in seconds only.
+     *  Used by SSU only!
+     */
     public int toRawByteArray(byte buffer[]) {
-        if (RAW_FULL_SIZE)
-            return toByteArray(buffer);
+        //if (RAW_FULL_SIZE)
+        //    return toByteArray(buffer);
         try {
             int off = 0;
             DataHelper.toLong(buffer, off, 1, getType());
             off += 1;
-            DataHelper.toLong(buffer, off, 4, _expiration/1000); // seconds
+            // January 19 2038? No, unsigned, good until Feb. 7 2106
+            // in seconds, round up so we don't lose time every hop
+            DataHelper.toLong(buffer, off, 4, (_expiration + 500) / 1000);
             off += 4;
             return writeMessageBody(buffer, off);
         } catch (I2NPMessageException ime) {
@@ -344,24 +359,30 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     }
 *****/
 
-    /** used by SSU only */
+    /**
+     *  Read the message with a short 5-byte header.
+     *  THe header consists of a one-byte type and a 4-byte expiration in seconds only.
+     *  Used by SSU only!
+     */
     public static I2NPMessage fromRawByteArray(I2PAppContext ctx, byte buffer[], int offset, int len, I2NPMessageHandler handler) throws I2NPMessageException {
         int type = (int)DataHelper.fromLong(buffer, offset, 1);
         offset++;
         I2NPMessageImpl msg = (I2NPMessageImpl)createMessage(ctx, type);
         if (msg == null) 
             throw new I2NPMessageException("Unknown message type: " + type);
-        if (RAW_FULL_SIZE) {
-            try {
-                msg.readBytes(buffer, type, offset);
-            } catch (IOException ioe) {
-                throw new I2NPMessageException("Error reading the " + msg, ioe);
-            }
-            return msg;
-        }
+        //if (RAW_FULL_SIZE) {
+        //    try {
+        //        msg.readBytes(buffer, type, offset);
+        //    } catch (IOException ioe) {
+        //        throw new I2NPMessageException("Error reading the " + msg, ioe);
+        //    }
+        //    return msg;
+        //}
 
         try {
-            long expiration = DataHelper.fromLong(buffer, offset, 4) * 1000; // seconds
+            // January 19 2038? No, unsigned, good until Feb. 7 2106
+            // in seconds, round up so we don't lose time every hop
+            long expiration = (DataHelper.fromLong(buffer, offset, 4) * 1000) + 500;
             offset += 4;
             int dataSize = len - 1 - 4;
             msg.readMessage(buffer, offset, dataSize, type, handler);
@@ -377,6 +398,7 @@ public abstract class I2NPMessageImpl extends DataStructureImpl implements I2NPM
     /**
      * Yes, this is fairly ugly, but its the only place it ever happens.
      *
+     * @return non-null, returns an UnknownI2NPMessage if unknown type
      */
     public static I2NPMessage createMessage(I2PAppContext context, int type) throws I2NPMessageException {
         switch (type) {

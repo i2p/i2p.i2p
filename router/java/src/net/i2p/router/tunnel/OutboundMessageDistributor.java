@@ -61,6 +61,8 @@ class OutboundMessageDistributor {
         if (_context.routerHash().equals(target.getIdentity().calculateHash())) {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("queueing inbound message to ourselves: " + m);
+            // TODO if UnknownI2NPMessage, convert it.
+            // See FragmentHandler.receiveComplete()
             _context.inNetMessagePool().add(m, null, null); 
             return;
         } else {

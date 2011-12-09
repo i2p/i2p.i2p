@@ -1,3 +1,23 @@
+2011-12-09 zzz
+  * Base64: Add decodestring command in main()
+  * Console, i2psnark: More button CSS tweaks
+  * I2NP:
+    - Earlier detection and better logging of
+      truncated TunnelGatewayMessage and DatabaseStoreMessage
+    - Fix and enhance UnknownI2NPMessage implementation
+    - Don't deserialize or verify the checksum of the
+      embeddedI2NP message in the TunnelGatewayMessage
+      at the IBGW, just use UnknownI2NPMessage and pass it along,
+      except if zero hop; Still to do: similar thing at OBEP
+    - Cleanups and javadoc
+  * LeaseSet: Fix size calculations
+  * UDP:
+    - Fix major bug from 2005 that corrupted outbound messages
+      that were an exact multiple of the fragment size.
+    - Round expiration times when converting to seconds
+    - Zero-copy of single-fragment messages in MessageReceiver
+    - Optimizations, log tweaks, comments
+
 2011-12-06 zzz
   * Router:
     - More refactoring tasks to their own files

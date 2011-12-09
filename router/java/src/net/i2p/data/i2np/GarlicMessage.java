@@ -12,7 +12,6 @@ import java.io.IOException;
 
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
-import net.i2p.util.Log;
 
 /**
  * Defines the wrapped garlic message
@@ -20,7 +19,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class GarlicMessage extends I2NPMessageImpl {
-    private final static Log _log = new Log(GarlicMessage.class);
     public final static int MESSAGE_TYPE = 11;
     private byte[] _data;
     
