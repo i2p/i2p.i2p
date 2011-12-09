@@ -229,7 +229,7 @@ public class LeaseSet extends DatabaseEntry {
             return null;
         int len = PublicKey.KEYSIZE_BYTES  // dest
                 + SigningPublicKey.KEYSIZE_BYTES // dest
-                + 4 // cert
+                + 3 // cert minimum, could be more, only used to size the BAOS
                 + PublicKey.KEYSIZE_BYTES // encryptionKey
                 + SigningPublicKey.KEYSIZE_BYTES // signingKey
                 + 1
@@ -295,13 +295,16 @@ public class LeaseSet extends DatabaseEntry {
         _signature.writeBytes(out);
     }
     
+    /**
+     *  Number of bytes, NOT including signature
+     */
     public int size() {
         return PublicKey.KEYSIZE_BYTES //destination.pubKey
              + SigningPublicKey.KEYSIZE_BYTES // destination.signPubKey
-             + 2 // destination.certificate
+             + _destination.getCertificate().size() // destination.certificate, usually 3
              + PublicKey.KEYSIZE_BYTES // encryptionKey
              + SigningPublicKey.KEYSIZE_BYTES // signingKey
-             + 1
+             + 1 // number of leases
              + _leases.size() * (Hash.HASH_LENGTH + 4 + 8);
     }
     
