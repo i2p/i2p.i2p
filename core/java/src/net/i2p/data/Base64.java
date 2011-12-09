@@ -184,6 +184,19 @@ public class Base64 {
             System.out.println(encode(args[1].getBytes()));
             return;
         }
+        if ("decodestring".equals(cmd)) {
+            byte[] dec = decode(args[1]);
+            if (dec != null) {
+                try {
+                    System.out.write(dec);
+                } catch (IOException ioe) {
+                    System.err.println("output error " + ioe);
+                }
+            } else {
+                System.err.println("decode error");
+            }
+            return;
+        }
         InputStream in = System.in;
         OutputStream out = System.out;
         try {
@@ -238,6 +251,8 @@ public class Base64 {
         System.out.println("or    : Base64 decode <inFile> <outFile>");
         System.out.println("or    : Base64 decode <inFile>");
         System.out.println("or    : Base64 decode");
+        System.out.println("or    : Base64 encodestring 'string to encode'");
+        System.out.println("or    : Base64 decodestring 'string to decode'");
         System.out.println("or    : Base64 test");
     }
 
@@ -684,6 +699,7 @@ public class Base64 {
      * returns it as a string.
      * Equivlaent to calling
      * <code>new String( decode( s ) )</code>
+     * WARNING this uses the locale's encoding, it may not be what you want.
      *
      * @param s the strind to decode
      * @return The data as a string
