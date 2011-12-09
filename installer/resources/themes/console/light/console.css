@@ -829,61 +829,61 @@ button, button:visited {
 
 button.accept {
      background: #ffe url('../images/accept.png') no-repeat 2px center;
-     padding: 2px 3px 1px 20px;
+     padding: 2px 3px 2px 20px;
      min-height: 22px;
 }
 
 button.add {
      background: #ffe url('../images/add.png') no-repeat 2px center;
-     padding: 2px 3px 1px 20px;
+     padding: 2px 3px 2px 20px;
      min-height: 22px;
 }
 
 button.cancel {
      background: #ffe url('../images/cancel.png') no-repeat 2px center;
-     padding: 2px 3px 1px 20px;
+     padding: 2px 3px 2px 20px;
      min-height: 22px;
 }
 
 button.check {
      background: #ffe url('../images/tick.png') no-repeat 2px center;
-     padding: 2px 3px 1px 20px;
+     padding: 2px 3px 2px 20px;
      min-height: 22px;
 }
 
 button.delete {
      background: #ffe url('../images/delete.png') no-repeat 2px center;
-     padding: 2px 3px 1px 20px;
+     padding: 2px 3px 2px 20px;
      min-height: 22px;
 }
 
 button.download {
      background: #ffe url('../images/arrow_down.png') no-repeat 2px center;
-     padding: 2px 3px 1px 20px;
+     padding: 2px 3px 2px 20px;
      min-height: 22px;
 }
 
 button.go {
      background: #ffe url('../images/arrow_right.png') no-repeat 2px center;
-     padding: 2px 3px 1px 20px;
+     padding: 2px 3px 2px 20px;
      min-height: 22px;
 }
 
 button.reload {
      background: #ffe url('../images/arrow_refresh.png') no-repeat 2px center;
-     padding: 2px 3px 1px 20px;
+     padding: 2px 3px 2px 20px;
      min-height: 22px;
 }
 
 button.stop {
      background: #ffe url('../images/stop.png') no-repeat 2px center;
-     padding: 2px 3px 1px 20px;
+     padding: 2px 3px 2px 20px;
      min-height: 22px;
 }
 
 button:hover {
      border: 1px solid #f60;
-     background: #f60 !important;
+     background-color: #f60 !important;
      color: #fff;
      -moz-box-shadow: inset 0px 0px 0px 1px #fff;
      -khtml-box-shadow: inset 0px 0px 0px 1px #fff;
@@ -943,60 +943,60 @@ input, input:visited {
 
 input.accept {
      background: #ffe url('../images/accept.png') no-repeat 2px center;
-     padding: 2px 3px 1px 20px;
+     padding: 2px 3px 2px 20px;
      min-height: 22px;
 }
 
 input.add {
      background: #ffe url('../images/add.png') no-repeat 2px center;
-     padding: 2px 3px 1px 20px;
+     padding: 2px 3px 2px 20px;
      min-height: 22px;
 }
 
 input.cancel {
      background: #ffe url('../images/cancel.png') no-repeat 2px center;
-     padding: 2px 3px 1px 20px;
+     padding: 2px 3px 2px 20px;
      min-height: 22px;
 }
 
 input.check {
      background: #ffe url('../images/tick.png') no-repeat 2px center;
-     padding: 2px 3px 1px 20px;
+     padding: 2px 3px 2px 20px;
      min-height: 22px;
 }
 
 input.delete {
      background: #ffe url('../images/delete.png') no-repeat 2px center;
-     padding: 2px 3px 1px 20px;
+     padding: 2px 3px 2px 20px;
      min-height: 22px;
 }
 
 input.download {
      background: #ffe url('../images/arrow_down.png') no-repeat 2px center;
-     padding: 2px 3px 1px 20px;
+     padding: 2px 3px 2px 20px;
      min-height: 22px;
 }
 
 input.go {
      background: #ffe url('../images/arrow_right.png') no-repeat 2px center;
-     padding: 2px 3px 1px 20px;
+     padding: 2px 3px 2px 20px;
      min-height: 22px;
 }
 
 input.reload {
      background: #ffe url('../images/arrow_refresh.png') no-repeat 2px center;
-     padding: 2px 3px 1px 20px;
+     padding: 2px 3px 2px 20px;
      min-height: 22px;
 }
 
 input.stop {
      background: #ffe url('../images/stop.png') no-repeat 2px center;
-     padding: 2px 3px 1px 20px;
+     padding: 2px 3px 2px 20px;
      min-height: 22px;
 }
 
 input:hover {
-     background: #f60;
+     background-color: #f60;
      color: #fff;
      border: 1px solid #f60;
      opacity: 1.0;

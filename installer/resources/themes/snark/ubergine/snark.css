@@ -489,7 +489,7 @@ input[type=submit] {
 input[type=submit]:hover {
      border: 1px outset #bbb;
      text-shadow: 0 0;	 
-     background: #f60;
+     background-color: #f60;
      color: #fff;
      text-shadow: 0px 1px 5px #f00;
 }

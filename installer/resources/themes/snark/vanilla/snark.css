@@ -512,7 +512,7 @@ input[type=submit] {
 input[type=submit]:hover {
      border: 1px inset #bbb;
      text-shadow: 0 0;	 
-     background: #fef;
+     background-color: #fef;
      color: #f60;
      background: #fef url('images/bling2.png') repeat-x scroll center center;
 
