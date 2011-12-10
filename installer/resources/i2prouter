@@ -137,7 +137,7 @@ if [ ! -e $WRAPPER_CONF ]; then
 fi
 
 # Workaround for Gentoo
-JAVABINARY=`grep ^wrapper\.java\.command $WRAPPER_CONF | cut -f2 -d=`
+JAVABINARY=$(awk -F'=' '/^ *wrapper\.java\.command/{print $2}' $WRAPPER_CONF)
 
 if [ -e /etc/gentoo-release ]; then
     if [ $JAVABINARY = java ]; then
