@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: i2p 0.8.9-1\n"
-"Report-Msgid-Bugs-To: killyourtv@mail.i2p\n"
-"POT-Creation-Date: 2011-06-16 17:09+0000\n"
+"Report-Msgid-Bugs-To: i2p@packages.debian.org\n"
+"POT-Creation-Date: 2011-12-10 04:00+0000\n"
 "PO-Revision-Date: 2011-07-20 04:33+0100\n"
 "Last-Translator: mixxy <m1xxy@mail.i2p>\n"
 "Language-Team: es\n"
@@ -25,8 +25,12 @@ msgstr "Iniciar I2P automáticamente en el arranque?"
 #. Type: boolean
 #. Description
 #: ../i2p.templates:2001
-msgid "The I2P router can be run as a daemon that starts automatically when your computer boots up. This is the recommended configuration."
-msgstr "El router I2P se puede ejecutar como demonio que inicia automaticamente al arrancar la computadora. Ésta es la opción recomendada."
+msgid ""
+"The I2P router can be run as a daemon that starts automatically when your "
+"computer boots up. This is the recommended configuration."
+msgstr ""
+"El router I2P se puede ejecutar como demonio que inicia automaticamente al "
+"arrancar la computadora. Ésta es la opción recomendada."
 
 #. Type: string
 #. Description
@@ -37,8 +41,17 @@ msgstr "Usuario del demonio I2P:"
 #. Type: string
 #. Description
 #: ../i2p.templates:3001
-msgid "By default I2P is configured to run under the account i2psvc when running as a daemon. To use an **existing** I2P profile you may enter a different account name here. For example, if your previous I2P installation is at /home/user/i2p, you may enter 'user' here."
-msgstr "Por defecto, I2P está configurado para ejecutarse con el usuario i2psvc si el modo de demonio está activado. Para usar un perfil **ya existente** de I2P, puedes especificar aquí un nombre de cuenta diferente. Por ejemplo, si tu anterior instalación de I2P se halla en /home/pepe/i2p, puedes entrar aquí 'pepe'."
+msgid ""
+"By default I2P is configured to run under the account i2psvc when running as "
+"a daemon. To use an **existing** I2P profile you may enter a different "
+"account name here. For example, if your previous I2P installation is at /"
+"home/user/i2p, you may enter 'user' here."
+msgstr ""
+"Por defecto, I2P está configurado para ejecutarse con el usuario i2psvc si "
+"el modo de demonio está activado. Para usar un perfil **ya existente** de "
+"I2P, puedes especificar aquí un nombre de cuenta diferente. Por ejemplo, si "
+"tu anterior instalación de I2P se halla en /home/pepe/i2p, puedes entrar "
+"aquí 'pepe'."
 
 #. Type: string
 #. Description
@@ -46,3 +59,22 @@ msgstr "Por defecto, I2P está configurado para ejecutarse con el usuario i2psvc
 msgid "Very important: The account specified here *MUST* already exist."
 msgstr "Muy importante: El usuario especificado aquí *YA TIENE QUE* existir."
 
+#. Type: string
+#. Description
+#: ../i2p.templates:4001
+msgid "Memory that can be allocated to I2P:"
+msgstr ""
+
+#. Type: string
+#. Description
+#: ../i2p.templates:4001
+msgid "By default, I2P will only be allowed to use up to 128MB of RAM."
+msgstr ""
+
+#. Type: string
+#. Description
+#: ../i2p.templates:4001
+msgid ""
+"High bandwidth routers, as well as routers with a lot of active torrents / "
+"plugins, may need to have this value increased."
+msgstr ""

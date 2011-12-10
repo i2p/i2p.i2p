@@ -7,8 +7,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
-"Report-Msgid-Bugs-To: killyourtv@mail.i2p\n"
-"POT-Creation-Date: 2011-06-16 17:09+0000\n"
+"Report-Msgid-Bugs-To: i2p@packages.debian.org\n"
+"POT-Creation-Date: 2011-12-10 04:00+0000\n"
 "PO-Revision-Date: 2011-10-08 12:41+0000\n"
 "Last-Translator: PolishAnon <b790979@klzlk.com>\n"
 "Language-Team: Polish (http://www.transifex.net/projects/p/I2P/team/pl/)\n"
@@ -60,3 +60,23 @@ msgstr ""
 #: ../i2p.templates:3001
 msgid "Very important: The account specified here *MUST* already exist."
 msgstr "Bardzo ważne: Podane tutaj konto *MUSI* istnieć."
+
+#. Type: string
+#. Description
+#: ../i2p.templates:4001
+msgid "Memory that can be allocated to I2P:"
+msgstr ""
+
+#. Type: string
+#. Description
+#: ../i2p.templates:4001
+msgid "By default, I2P will only be allowed to use up to 128MB of RAM."
+msgstr ""
+
+#. Type: string
+#. Description
+#: ../i2p.templates:4001
+msgid ""
+"High bandwidth routers, as well as routers with a lot of active torrents / "
+"plugins, may need to have this value increased."
+msgstr ""
