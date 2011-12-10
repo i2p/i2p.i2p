@@ -2,7 +2,7 @@
 ##Type: boolean
 ##Default: false
 ##_Description: Automatically stop I2P when there are upgrades?
-## To update this package the I2P router will need to be restarted. 
+## To update this package the I2P router will need to be restarted.
 ## Any activity on the I2P network will be briefly interrupted
 ## during the upgrade.
 
@@ -20,6 +20,15 @@ _Description: I2P daemon user:
  By default I2P is configured to run under the account i2psvc when running
  as a daemon. To use an **existing** I2P profile you may enter a different
  account name here. For example, if your previous I2P installation is at
- /home/user/i2p, you may enter 'user' here. 
+ /home/user/i2p, you may enter 'user' here.
  .
  Very important: The account specified here *MUST* already exist.
+
+Template: i2p/memory
+Type: string
+Default: 128
+_Description: Memory that can be allocated to I2P:
+ By default, I2P will only be allowed to use up to 128MB of RAM.
+ .
+ High bandwidth routers, as well as routers with a lot of active torrents / plugins, may
+ need to have this value increased.

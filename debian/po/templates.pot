@@ -1,14 +1,14 @@
-# debconf translation
-# Copyright (C) 2011 The I2P Project
-# This file is distributed under the same license as the i2p package.
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: killyourtv@mail.i2p\n"
-"POT-Creation-Date: 2011-06-16 17:09+0000\n"
+"Report-Msgid-Bugs-To: i2p@packages.debian.org\n"
+"POT-Creation-Date: 2011-12-10 04:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -51,4 +51,24 @@ msgstr ""
 #. Description
 #: ../i2p.templates:3001
 msgid "Very important: The account specified here *MUST* already exist."
+msgstr ""
+
+#. Type: string
+#. Description
+#: ../i2p.templates:4001
+msgid "Memory that can be allocated to I2P:"
+msgstr ""
+
+#. Type: string
+#. Description
+#: ../i2p.templates:4001
+msgid "By default, I2P will only be allowed to use up to 128MB of RAM."
+msgstr ""
+
+#. Type: string
+#. Description
+#: ../i2p.templates:4001
+msgid ""
+"High bandwidth routers, as well as routers with a lot of active torrents / "
+"plugins, may need to have this value increased."
 msgstr ""
