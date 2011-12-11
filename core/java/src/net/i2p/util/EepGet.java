@@ -24,9 +24,9 @@ import net.i2p.data.DataHelper;
 import net.i2p.util.InternalSocket;
 
 /**
- * EepGet [-p 127.0.0.1:4444] 
- *        [-n #retries] 
- *        [-o outputFile] 
+ * EepGet [-p 127.0.0.1:4444]
+ *        [-n #retries]
+ *        [-o outputFile]
  *        [-m markSize lineLen]
  *        url
  *
@@ -51,7 +51,7 @@ public class EepGet {
     private boolean _allowCaching;
     protected final List<StatusListener> _listeners;
     protected List<String> _extraHeaders;
-    
+
     protected boolean _keepFetching;
     protected Socket _proxy;
     protected OutputStream _proxyOut;
@@ -85,7 +85,7 @@ public class EepGet {
     protected static final long INACTIVITY_TIMEOUT = 60*1000;
     /** maximum times to try without getting any data at all, even if numRetries is higher @since 0.7.14 */
     protected static final int MAX_COMPLETE_FAILS = 5;
-    
+
     public EepGet(I2PAppContext ctx, String proxyHost, int proxyPort, int numRetries, String outputFile, String url) {
         this(ctx, true, proxyHost, proxyPort, numRetries, outputFile, url);
     }
@@ -144,11 +144,11 @@ public class EepGet {
         _etag = etag;
         _lastModified = lastModified;
     }
-   
+
     /**
      * EepGet [-p 127.0.0.1:4444] [-n #retries] [-e etag] [-o outputFile] [-m markSize lineLen] url
      *
-     */ 
+     */
     public static void main(String args[]) {
         String proxyHost = "127.0.0.1";
         int proxyPort = 4444;
@@ -203,7 +203,7 @@ public class EepGet {
             usage();
             return;
         }
-        
+
         if (url == null) {
             usage();
             return;
@@ -222,7 +222,7 @@ public class EepGet {
         get.addStatusListener(get.new CLIStatusListener(markSize, lineLen));
         get.fetch(CONNECT_TIMEOUT, -1, inactivityTimeout);
     }
-    
+
     public static String suggestName(String url) {
         int last = url.lastIndexOf('/');
         if ((last < 0) || (url.lastIndexOf('#') > last))
@@ -231,7 +231,7 @@ public class EepGet {
             last = url.lastIndexOf('?');
         if ((last < 0) || (url.lastIndexOf('=') > last))
             last = url.lastIndexOf('=');
-        
+
         String name = null;
         if (last >= 0)
             name = sanitize(url.substring(last+1));
@@ -240,19 +240,37 @@ public class EepGet {
         else
             return sanitize(url);
     }
-    
-    private static final String _safeChars = "abcdefghijklmnopqrstuvwxyz" +
-                                             "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-                                             "01234567890.,_=@#:";
+
+
+/* Blacklist borrowed from snark */
+
+  private static final char[] ILLEGAL = new char[] {
+        '<', '>', ':', '"', '/', '\\', '|', '?', '*',
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+        16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+        0x7f };
+
+  /**
+   * Removes 'suspicious' characters from the given file name.
+   * http://msdn.microsoft.com/en-us/library/aa365247%28VS.85%29.aspx
+   */
+
+
     private static String sanitize(String name) {
-        name = name.replace('/', '_');
-        StringBuilder buf = new StringBuilder(name);
-        for (int i = 0; i < name.length(); i++)
-            if (_safeChars.indexOf(buf.charAt(i)) == -1)
-                buf.setCharAt(i, '_');
-        return buf.toString();
+    if (name.equals(".") || name.equals(" "))
+        return "_";
+    String rv = name;
+    if (rv.startsWith("."))
+        rv = '_' + rv.substring(1);
+    if (rv.endsWith(".") || rv.endsWith(" "))
+        rv = rv.substring(0, rv.length() - 1) + '_';
+    for (int i = 0; i < ILLEGAL.length; i++) {
+        if (rv.indexOf(ILLEGAL[i]) >= 0)
+            rv = rv.replace(ILLEGAL[i], '_');
     }
-    
+    return rv;
+    }
+
     private static void usage() {
         System.err.println("EepGet [-p 127.0.0.1:4444] [-n #retries] [-o outputFile]\n" +
                            "       [-m markSize lineLen] [-t timeout] [-h headerKey headerValue]\n" +
