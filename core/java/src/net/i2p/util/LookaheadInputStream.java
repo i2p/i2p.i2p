@@ -17,6 +17,15 @@ public class LookaheadInputStream extends FilterInputStream {
     private final byte[] _footerLookahead;
     private static final InputStream _fakeInputStream = new ByteArrayInputStream(new byte[0]);
     
+    /**
+     *  Configure a stream that hides a number of bytes from the reader.
+     *  The last n bytes will never be available from read(),
+     *  they can only be obtained from getFooter().
+     *
+     *  initialize() MUST be called before doing any read() calls.
+     *
+     *  @param lookaheadSize how many bytes to hide
+     */
     public LookaheadInputStream(int lookaheadSize) {
         super(_fakeInputStream);
         _footerLookahead = new byte[lookaheadSize];
@@ -24,7 +33,11 @@ public class LookaheadInputStream extends FilterInputStream {
     
     public boolean getEOFReached() { return _eofReached; }
         
-    /** blocking! */
+    /**
+     *  Start the LookaheadInputStream with the given input stream.
+     *  Resets everything if the LookaheadInputStream was previously used.
+     *  WARNING - blocking until lookaheadSize bytes are read!
+     */
     public void initialize(InputStream src) throws IOException {
         in = src;
         _eofReached = false;
@@ -47,6 +60,7 @@ public class LookaheadInputStream extends FilterInputStream {
             return -1;
         }
         int rv = _footerLookahead[0];
+        // FIXME use an index!!!!!!!!!!!!
         System.arraycopy(_footerLookahead, 1, _footerLookahead, 0, _footerLookahead.length-1);
         _footerLookahead[_footerLookahead.length-1] = (byte)c;
         if (rv < 0) rv += 256;

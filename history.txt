@@ -1,3 +1,28 @@
+2011-12-12 zzz
+  * ExploreJob: Tweaks to handle DatabaseLookupMessage changes
+  * I2NP:
+    - Deprecate unused stream methods and I2NPMessageReader since
+      all transports provide encapsulation.
+    - Don't throw IOE from byte array methods
+    - Use cached null cert in GarlicClove
+    - Add method to limit size of buffer to read
+    - Don't check checksum at input, in most cases
+    - Reuse checksum at output, for unomodified pass-through messages
+      (but recalculating it now and logging on a mismatch for testing)
+    - Fix DatabaseLookupMessage to internally store the don't include peers as
+      a List, not a Set, so it doesn't get reordered and break the checksum
+    - Log cleanup
+  * NTCP:
+    - Zero-copy and limit size when handing buffer to I2NP
+    - Log hex dump message on I2NPMessageException, like in SSU
+    - Don't close connection on I2NPMessageException
+  * PortMapper: New service for registering application ports in the context
+  * ReusableGZIPInputStream: Fix 3 major bugs, all present since 2005:
+    - Payloads an exact multiple of 512 bytes failed to decompress
+    - Data at the end of the stream could be lost
+    - read() returned -1 when the data was 0xff
+  * SearchState: generics and cleanups
+
 2011-12-11 sponge
   * HTTP server tunnel, use log.WARN for 3 first minutes. (closes #460)
 
