@@ -114,7 +114,7 @@ NetBSD*|FreeBSD*|OpenBSD*)
 	NAME="libjbigi"
 	TYPE="so"
 	PLATFORM_LIST=""
-	BSDTYPE="`uname -s | tr [A-Z] [a-z]`"
+	BSDTYPE=$(uname -s | tr "[A-Z]" "[a-z]")
 	arch=$(uname -m | cut -f1 -d" ")
 	case ${arch} in
 		i[3-6]86)

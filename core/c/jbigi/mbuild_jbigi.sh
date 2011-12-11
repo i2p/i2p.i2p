@@ -24,7 +24,7 @@ Darwin*)
         LINKFLAGS="-dynamiclib -framework JavaVM"
         LIBFILE="libjbigi.jnilib";;
 SunOS*|OpenBSD*|NetBSD*|FreeBSD*|Linux*)
-        UNIXTYPE="`uname -s | tr [A-Z] [a-z]`"
+        UNIXTYPE=$(uname -s | tr "[A-Z]" "[a-z]")
         if [ $UNIXTYPE = "sunos" ]; then
                 UNIXTYPE="solaris"
         elif [ $UNIXTYPE = "freebsd" ]; then
