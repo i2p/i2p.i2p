@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 # When executed in Mingw: Produces a jbigi.dll
 # When executed in Linux/FreeBSD: Produces a libjbigi.so
 # When executed in OSX: Produces a libjbigi.jnilib
@@ -6,17 +6,17 @@ CC="gcc"
 
 case `uname -sr` in
 MINGW*)
-	JAVA_HOME="c:/software/j2sdk1.4.2_05"
-	COMPILEFLAGS="-Wall"
-	INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include/win32/ -I$JAVA_HOME/include/"
-	LINKFLAGS="-shared -Wl,--kill-at"
-	LIBFILE="jbigi.dll";;
+        JAVA_HOME="c:/software/j2sdk1.4.2_05"
+        COMPILEFLAGS="-Wall"
+        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include/win32/ -I$JAVA_HOME/include/"
+        LINKFLAGS="-shared -Wl,--kill-at"
+        LIBFILE="jbigi.dll";;
 CYGWIN*)
-	JAVA_HOME="c:/software/j2sdk1.4.2_05"
-	COMPILEFLAGS="-Wall -mno-cygwin"
-	INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include/win32/ -I$JAVA_HOME/include/"
-	LINKFLAGS="-shared -Wl,--kill-at"
-	LIBFILE="jbigi.dll";;
+        JAVA_HOME="c:/software/j2sdk1.4.2_05"
+        COMPILEFLAGS="-Wall -mno-cygwin"
+        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include/win32/ -I$JAVA_HOME/include/"
+        LINKFLAGS="-shared -Wl,--kill-at"
+        LIBFILE="jbigi.dll";;
 Darwin*)
         JAVA_HOME=$(/usr/libexec/java_home)
         COMPILEFLAGS="-fPIC -Wall"
@@ -56,12 +56,12 @@ SunOS*|OpenBSD*|NetBSD*|FreeBSD*|Linux*)
 esac
 
 if [ "$1" = "dynamic" ] ; then
-	echo "Building a jbigi lib that is dynamically linked to GMP"
-	LIBPATH="-L.libs"
-	INCLUDELIBS="-lgmp"
+        echo "Building a jbigi lib that is dynamically linked to GMP"
+        LIBPATH="-L.libs"
+        INCLUDELIBS="-lgmp"
 else
-	echo "Building a jbigi lib that is statically linked to GMP"
-	STATICLIBS=".libs/libgmp.a"
+        echo "Building a jbigi lib that is statically linked to GMP"
+        STATICLIBS=".libs/libgmp.a"
 fi
 
 echo "Compiling C code..."
