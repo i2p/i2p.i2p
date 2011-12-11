@@ -23,6 +23,15 @@ import net.i2p.util.Log;
  * thrown, or the connection being closed.  Routers should use this rather
  * than read from the stream themselves.
  *
+ * Deprecated - unused.
+ * This was used by the old TCP transport.
+ * Both the NTCP and SSU transports provide encapsulation
+ * of I2NP messages, so they use I2NPMessageHandlers directly.
+ * If we ever add a transport that does not provide encapsulation,
+ * this will be useful again.
+ *
+ * @deprecated unused
+ *
  * @author jrandom
  */
 public class I2NPMessageReader {

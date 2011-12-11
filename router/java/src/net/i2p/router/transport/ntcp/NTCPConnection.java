@@ -28,6 +28,7 @@ import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.util.ConcurrentHashSet;
+import net.i2p.util.HexDump;
 import net.i2p.util.Log;
 
 /**
@@ -1226,13 +1227,15 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     
     //public long getReadTime() { return _curReadState.getReadTime(); }
     
+    /**
+     *  Just a byte array now (used to have a BAIS in it too,
+     *  but that required an extra copy in the message handler)
+     */
     private static class DataBuf {
         final byte data[];
-        final ByteArrayInputStream bais;
 
         public DataBuf() {
             data = new byte[BUFFER_SIZE];
-            bais = new ByteArrayInputStream(data);
         }
     }
     
@@ -1247,7 +1250,6 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
     }
 
     private static void releaseReadBuf(DataBuf buf) {
-        buf.bais.reset();
         _dataReadBufs.offer(buf);
     }
 
@@ -1387,15 +1389,14 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
             if (val == _expectedCrc) {
                 try {
                     I2NPMessageHandler h = acquireHandler(_context);
-                    //I2NPMessage read = h.readMessage(new ByteArrayInputStream(_data, 0, _size));
-                    // the _bais is mark()ed at 0 on construction, and on init() we
-                    // reset() it back to that position, so this read always starts
-                    // at the beginning of the _data buffer.  the I2NPMessageHandler
-                    // also only reads the first I2NP message found, and does not
-                    // depend upon EOF to stop reading, so its ok that the _bais could
-                    // in theory return more data than _size bytes, since h.readMessage
-                    // stops when it should.
-                    I2NPMessage read = h.readMessage(_dataBuf.bais);
+
+                    // Don't do readMessage(InputStream). I2NPMessageImpl.readBytes() copies the data
+                    // from a stream to a temp buffer.
+                    // We could extend BAIS to adjust the protected count variable to _size
+                    // so that readBytes() doesn't read too far, but it could still read too far.
+                    // So use the new handler method that limits the size.
+                    h.readMessage(_dataBuf.data, 0, _size);
+                    I2NPMessage read = h.lastRead();
                     long timeToRecv = System.currentTimeMillis() - _stateBegin;
                     releaseHandler(h);
                     if (_log.shouldLog(Log.INFO))
@@ -1414,33 +1415,31 @@ class NTCPConnection implements FIFOBandwidthLimiter.CompleteListener {
                         _lastReceiveTime = System.currentTimeMillis();
                         _messagesRead++;
                     }
-                    // get it ready for the next I2NP message
-                    init();
-                } catch (IOException ioe) {
-                    if (_log.shouldLog(Log.WARN))
-                        _log.warn("Error parsing I2NP message", ioe);
-                    _context.statManager().addRateData("ntcp.corruptI2NPIOE", 1);
-                    close();
-                    // handler and databuf are lost
-                    return;
                 } catch (I2NPMessageException ime) {
-                    if (_log.shouldLog(Log.WARN))
+                    if (_log.shouldLog(Log.WARN)) {
                         _log.warn("Error parsing I2NP message", ime);
+                        _log.warn("DUMP:\n" + HexDump.dump(_dataBuf.data, 0, _size));
+                        _log.warn("RAW:\n" + Base64.encode(_dataBuf.data, 0, _size));
+                    }
                     _context.statManager().addRateData("ntcp.corruptI2NPIME", 1);
-                    // FIXME don't close the con, possible attack vector?
-                    close();
-                    // handler and databuf are lost
-                    return;
+                    // Don't close the con, possible attack vector, not necessarily the peer's fault,
+                    // and should be recoverable
+                    // handler and databuf are lost if we do this
+                    //close();
+                    //return;
                 }
             } else {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("CRC incorrect for message " + _messagesRead + " (calc=" + val + " expected=" + _expectedCrc + ") size=" + _size + " blocks " + _blocks);
                     _context.statManager().addRateData("ntcp.corruptI2NPCRC", 1);
-                // FIXME don't close the con, possible attack vector?
-                close();
-                // databuf is lost
-                return;
+                // This probably can't be spoofed from somebody else, but do we really need to close it?
+                // This is rare.
+                //close();
+                // databuf is lost if we do this
+                //return;
             }
+            // get it ready for the next I2NP message
+            init();
         }
     }
 

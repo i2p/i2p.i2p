@@ -8,7 +8,6 @@ package net.i2p.data.i2np;
  *
  */
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +22,7 @@ import net.i2p.data.Hash;
  *
  * @author jrandom
  */
-public class DatabaseSearchReplyMessage extends I2NPMessageImpl {
+public class DatabaseSearchReplyMessage extends FastI2NPMessageImpl {
     public final static int MESSAGE_TYPE = 3;
     private Hash _key;
     private List<Hash> _peerHashes;
@@ -41,7 +40,15 @@ public class DatabaseSearchReplyMessage extends I2NPMessageImpl {
      * Defines the key being searched for
      */
     public Hash getSearchKey() { return _key; }
-    public void setSearchKey(Hash key) { _key = key; }
+
+    /**
+     * @throws IllegalStateException if key previously set, to protect saved checksum
+     */
+    public void setSearchKey(Hash key) {
+        if (_key != null)
+            throw new IllegalStateException();
+        _key = key;
+    }
     
     public int getNumReplies() { return _peerHashes.size(); }
     public Hash getReply(int index) { return _peerHashes.get(index); }
@@ -51,7 +58,7 @@ public class DatabaseSearchReplyMessage extends I2NPMessageImpl {
     public Hash getFromHash() { return _from; }
     public void setFromHash(Hash from) { _from = from; }
     
-    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException, IOException {
+    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
         int curIndex = offset;
         
@@ -114,8 +121,8 @@ public class DatabaseSearchReplyMessage extends I2NPMessageImpl {
     public boolean equals(Object object) {
         if ( (object != null) && (object instanceof DatabaseSearchReplyMessage) ) {
             DatabaseSearchReplyMessage msg = (DatabaseSearchReplyMessage)object;
-            return DataHelper.eq(getSearchKey(),msg.getSearchKey()) &&
-            DataHelper.eq(getFromHash(),msg.getFromHash()) &&
+            return DataHelper.eq(_key,msg._key) &&
+            DataHelper.eq(_from,msg._from) &&
             DataHelper.eq(_peerHashes,msg._peerHashes);
         } else {
             return false;
@@ -124,8 +131,8 @@ public class DatabaseSearchReplyMessage extends I2NPMessageImpl {
     
     @Override
     public int hashCode() {
-        return DataHelper.hashCode(getSearchKey()) +
-        DataHelper.hashCode(getFromHash()) +
+        return DataHelper.hashCode(_key) +
+        DataHelper.hashCode(_from) +
         DataHelper.hashCode(_peerHashes);
     }
     
@@ -133,12 +140,12 @@ public class DatabaseSearchReplyMessage extends I2NPMessageImpl {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("[DatabaseSearchReplyMessage: ");
-        buf.append("\n\tSearch Key: ").append(getSearchKey());
+        buf.append("\n\tSearch Key: ").append(_key);
         buf.append("\n\tReplies: # = ").append(getNumReplies());
         for (int i = 0; i < getNumReplies(); i++) {
             buf.append("\n\t\tReply [").append(i).append("]: ").append(getReply(i));
         }
-        buf.append("\n\tFrom: ").append(getFromHash());
+        buf.append("\n\tFrom: ").append(_from);
         buf.append("]");
         return buf.toString();
     }

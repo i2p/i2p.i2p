@@ -8,8 +8,6 @@ package net.i2p.data.i2np;
  *
  */
 
-import java.io.IOException;
-
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
@@ -32,11 +30,9 @@ import net.i2p.util.SimpleByteCache;
  *
  * @since 0.7.12 but broken before 0.8.12
  */
-public class UnknownI2NPMessage extends I2NPMessageImpl {
+public class UnknownI2NPMessage extends FastI2NPMessageImpl {
     private byte _data[];
     private final int _type;
-    // we assume CHECKSUM_LENGTH = 1
-    private byte _checksum;
     
     /** @param type 0-255 */
     public UnknownI2NPMessage(I2PAppContext context, int type) {
@@ -44,7 +40,12 @@ public class UnknownI2NPMessage extends I2NPMessageImpl {
         _type = type;
     }
     
-    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException, IOException {
+    /**
+     *  @throws IllegalStateException if data previously set, to protect saved checksum
+     */
+    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException {
+        if (_data != null)
+            throw new IllegalStateException();
         if (type != _type) throw new I2NPMessageException("Message type is incorrect for this message");
         if (dataSize > MAX_SIZE)
             throw new I2NPMessageException("wtf, size=" + dataSize);
@@ -77,51 +78,9 @@ public class UnknownI2NPMessage extends I2NPMessageImpl {
      */
     public int getType() { return _type; }
     
-
-    /**
-     *  Read the full message including the header.
-     *  This is the same as I2NPMessageImpl.readBytes(), except
-     *  start after the type field, and
-     *  do NOT verify the checksum, but simply save it for later
-     *  so it can be verified in convert() if required.
-     *
-     *<pre>
-     *  Standard message format AFTER the type field
-     *    4 byte ID
-     *    8 byte expiration
-     *    2 byte size
-     *    1 byte checksum (saved in case we need to check later)
-     *    size bytes of payload, read by readMessage()
-     *</pre>
-     *
-     *  @param offset starting at the ID (must skip the type)
-     *  @since 0.8.12
-     */
-    public void readBytesIgnoreChecksum(byte data[], int offset) throws I2NPMessageException, IOException {
-        int cur = offset;
-        setUniqueId(DataHelper.fromLong(data, cur, 4));
-        cur += 4;
-        setMessageExpiration(DataHelper.fromLong(data, cur, DataHelper.DATE_LENGTH));
-        cur += DataHelper.DATE_LENGTH;
-        int size = (int)DataHelper.fromLong(data, cur, 2);
-        cur += 2;
-        _checksum = data[cur];
-        cur++;
-
-        if (cur + size > data.length)
-            throw new I2NPMessageException("Payload is too short [" 
-                                           + "data.len=" + data.length
-                                           + " offset=" + offset
-                                           + " cur=" + cur 
-                                           + " wanted=" + size + ']');
-
-        readMessage(data, cur, size, _type);
-    }
-    
     /**
      *  Attempt to convert this message to a known message class.
-     *  Must have been created with readBytesIgnoreChecksum previously,
-     *  as this does the delayed verification using the saved checksum.
+     *  This does the delayed verification using the saved checksum.
      *
      *  Used by TunnelGatewayZeroHop.
      *
@@ -129,6 +88,8 @@ public class UnknownI2NPMessage extends I2NPMessageImpl {
      *  @since 0.8.12
      */
     public I2NPMessage convert() throws I2NPMessageException {
+        if (_data == null || !_hasChecksum)
+            throw new I2NPMessageException("Illegal state");
         I2NPMessage msg = I2NPMessageImpl.createMessage(_context, _type);
         if (msg instanceof UnknownI2NPMessage)
             throw new I2NPMessageException("Unable to convert unknown type " + _type);
@@ -138,13 +99,9 @@ public class UnknownI2NPMessage extends I2NPMessageImpl {
         SimpleByteCache.release(calc);
         if (!eq)
             throw new I2NPMessageException("Bad checksum on " + _data.length + " byte msg type " + _type);
-        try {
-            msg.readMessage(_data, 0, _data.length, _type);
-        } catch (IOException ioe) {
-            throw new I2NPMessageException("Unable to convert type " + _type, ioe);
-        }
-        msg.setUniqueId(getUniqueId());
-        msg.setMessageExpiration(getMessageExpiration());
+        msg.readMessage(_data, 0, _data.length, _type);
+        msg.setUniqueId(_uniqueId);
+        msg.setMessageExpiration(_expiration);
         return msg;
     }
 

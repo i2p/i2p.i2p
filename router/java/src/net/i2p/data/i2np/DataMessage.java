@@ -8,17 +8,17 @@ package net.i2p.data.i2np;
  *
  */
 
-import java.io.IOException;
-
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 
 /**
  * Defines a message containing arbitrary bytes of data
+ * This is what goes in a GarlicClove.
+ * It was also previously used for generating test messages.
  *
  * @author jrandom
  */
-public class DataMessage extends I2NPMessageImpl {
+public class DataMessage extends FastI2NPMessageImpl {
     public final static int MESSAGE_TYPE = 20;
     private byte _data[];
     
@@ -29,7 +29,13 @@ public class DataMessage extends I2NPMessageImpl {
     public byte[] getData() { 
         return _data; 
     }
+
+    /**
+     *  @throws IllegalStateException if data previously set, to protect saved checksum
+     */
     public void setData(byte[] data) { 
+        if (_data != null)
+            throw new IllegalStateException();
         _data = data; 
     }
     
@@ -37,7 +43,7 @@ public class DataMessage extends I2NPMessageImpl {
         return _data.length;
     }
     
-    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException, IOException {
+    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
         int curIndex = offset;
         long size = DataHelper.fromLong(data, curIndex, 4);
@@ -55,6 +61,7 @@ public class DataMessage extends I2NPMessageImpl {
         else
             return 4 + _data.length;
     }
+
     /** write the message body to the output array, starting at the given index */
     protected int writeMessageBody(byte out[], int curIndex) {
         if (_data == null) {
@@ -76,14 +83,14 @@ public class DataMessage extends I2NPMessageImpl {
     
     @Override
     public int hashCode() {
-        return DataHelper.hashCode(getData());
+        return DataHelper.hashCode(_data);
     }
     
     @Override
     public boolean equals(Object object) {
         if ( (object != null) && (object instanceof DataMessage) ) {
             DataMessage msg = (DataMessage)object;
-            return DataHelper.eq(getData(),msg.getData());
+            return DataHelper.eq(_data, msg._data);
         } else {
             return false;
         }
@@ -93,7 +100,7 @@ public class DataMessage extends I2NPMessageImpl {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("[DataMessage: ");
-        buf.append("\n\tData: ").append(DataHelper.toString(getData(), 64));
+        buf.append("\n\tData: ").append(DataHelper.toString(_data, 64));
         buf.append("]");
         return buf.toString();
     }

@@ -1,7 +1,5 @@
 package net.i2p.data.i2np;
 
-import java.io.IOException;
-
 import net.i2p.I2PAppContext;
 
 /**

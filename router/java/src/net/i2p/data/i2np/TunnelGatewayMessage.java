@@ -8,8 +8,6 @@ package net.i2p.data.i2np;
  *
  */
 
-import java.io.IOException;
-
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.TunnelId;
@@ -20,7 +18,7 @@ import net.i2p.util.Log;
  * format: { tunnelId, sizeof(i2npMessage.toByteArray()), i2npMessage.toByteArray() }
  *
  */
-public class TunnelGatewayMessage extends I2NPMessageImpl {
+public class TunnelGatewayMessage extends FastI2NPMessageImpl {
     private TunnelId _tunnelId;
     private I2NPMessage _msg;
     private byte _msgData[];
@@ -37,16 +35,32 @@ public class TunnelGatewayMessage extends I2NPMessageImpl {
     }
     
     public TunnelId getTunnelId() { return _tunnelId; }
-    public void setTunnelId(TunnelId id) { _tunnelId = id; }
+
+    /**
+     *  @throws IllegalStateException if id previously set, to protect saved checksum
+     */
+    public void setTunnelId(TunnelId id) {
+        if (_tunnelId != null)
+            throw new IllegalStateException();
+        _tunnelId = id;
+    }
     
     /**
      *  Warning, at the IBGW, where the message was read in,
      *  this will be an UnknownI2NPMessage.
      *  If you need a real message class, use UnknownI2NPMessage.convert().
+     *
+     *  Note that if you change the expiration on the embedded message it will
+     *  mess up the checksum of this message, so don't do that.
      */
     public I2NPMessage getMessage() { return _msg; }
 
+    /**
+     *  @throws IllegalStateException if msg previously set, to protect saved checksum
+     */
     public void setMessage(I2NPMessage msg) { 
+        if (_msg != null)
+            throw new IllegalStateException();
         if (msg == null)
             throw new IllegalArgumentException("wtf, dont set me to null");
         _msg = msg; 
@@ -90,7 +104,7 @@ public class TunnelGatewayMessage extends I2NPMessageImpl {
     }
     
 
-    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException, IOException {
+    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException {
         //I2NPMessageHandler h = new I2NPMessageHandler(_context);
         //readMessage(data, offset, dataSize, type, h);
         readMessage(data, offset, dataSize, type, null);
@@ -103,7 +117,7 @@ public class TunnelGatewayMessage extends I2NPMessageImpl {
      *  @param handler unused, may be null
      */
     @Override
-    public void readMessage(byte data[], int offset, int dataSize, int type, I2NPMessageHandler handler) throws I2NPMessageException, IOException {
+    public void readMessage(byte data[], int offset, int dataSize, int type, I2NPMessageHandler handler) throws I2NPMessageException {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
         int curIndex = offset;
         
@@ -137,7 +151,7 @@ public class TunnelGatewayMessage extends I2NPMessageImpl {
         // If a zero-hop, the checksum will be verified in convert().
         int utype = data[curIndex++] & 0xff;
         UnknownI2NPMessage umsg = new UnknownI2NPMessage(_context, utype);
-        umsg.readBytesIgnoreChecksum(data, curIndex);
+        umsg.readBytes(data, utype, curIndex);
         _msg = umsg;
     }
     

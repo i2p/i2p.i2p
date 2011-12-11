@@ -1,7 +1,5 @@
 package net.i2p.data.i2np;
 
-import java.io.IOException;
-
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
@@ -32,7 +30,7 @@ public class VariableTunnelBuildReplyMessage extends TunnelBuildReplyMessage {
     public int getType() { return MESSAGE_TYPE; }
 
     @Override
-    public void readMessage(byte[] data, int offset, int dataSize, int type) throws I2NPMessageException, IOException {
+    public void readMessage(byte[] data, int offset, int dataSize, int type) throws I2NPMessageException {
         // message type will be checked in super()
         int r = (int)DataHelper.fromLong(data, offset, 1);
         if (r <= 0 || r > MAX_RECORD_COUNT)

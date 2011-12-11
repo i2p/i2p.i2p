@@ -29,7 +29,7 @@ import net.i2p.data.TunnelId;
  *
  * @author jrandom
  */
-public class DatabaseStoreMessage extends I2NPMessageImpl {
+public class DatabaseStoreMessage extends FastI2NPMessageImpl {
     public final static int MESSAGE_TYPE = 1;
     private Hash _key;
     private DatabaseEntry _dbEntry;
@@ -61,8 +61,11 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
 
     /**
      * This also sets the key
+     * @throws IllegalStateException if data previously set, to protect saved checksum
      */
     public void setEntry(DatabaseEntry entry) {
+        if (_dbEntry != null)
+            throw new IllegalStateException();
         _dbEntry = entry;
     }
     
@@ -94,7 +97,7 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
     public Hash getReplyGateway() { return _replyGateway; }
     public void setReplyGateway(Hash peer) { _replyGateway = peer; }
     
-    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException, IOException {
+    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
         int curIndex = offset;
         
@@ -126,14 +129,16 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
                 _dbEntry.readBytes(new ByteArrayInputStream(data, curIndex, data.length-curIndex));
             } catch (DataFormatException dfe) {
                 throw new I2NPMessageException("Error reading the leaseSet", dfe);
+            } catch (IOException ioe) {
+                throw new I2NPMessageException("Error reading the leaseSet", ioe);
             }
         } else if (type == DatabaseEntry.KEY_TYPE_ROUTERINFO) {
             _dbEntry = new RouterInfo();
             int compressedSize = (int)DataHelper.fromLong(data, curIndex, 2);
             curIndex += 2;
-            if (compressedSize <= 0 || curIndex + compressedSize > data.length || (curIndex - offset) + compressedSize > dataSize)
+            if (compressedSize <= 0 || curIndex + compressedSize > data.length || curIndex + compressedSize > dataSize + offset)
                 throw new I2NPMessageException("Compressed RI length: " + compressedSize +
-                                               " but remaining bytes: " + Math.min(data.length - curIndex, dataSize - (curIndex - offset)));
+                                               " but remaining bytes: " + Math.min(data.length - curIndex, dataSize + offset -curIndex));
             
             try {
                 // TODO we could delay decompression, just copy to a new byte array and store in _byteCache
@@ -230,9 +235,9 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
     public int hashCode() {
         return DataHelper.hashCode(getKey()) +
                DataHelper.hashCode(_dbEntry) +
-               (int)getReplyToken() +
-               DataHelper.hashCode(getReplyTunnel()) +
-               DataHelper.hashCode(getReplyGateway());
+               (int) _replyToken +
+               DataHelper.hashCode(_replyTunnel) +
+               DataHelper.hashCode(_replyGateway);
     }
     
     @Override
@@ -241,9 +246,9 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
             DatabaseStoreMessage msg = (DatabaseStoreMessage)object;
             return DataHelper.eq(getKey(),msg.getKey()) &&
                    DataHelper.eq(_dbEntry,msg.getEntry()) &&
-                   getReplyToken() == msg.getReplyToken() &&
-                   DataHelper.eq(getReplyTunnel(), msg.getReplyTunnel()) &&
-                   DataHelper.eq(getReplyGateway(), msg.getReplyGateway());
+                   _replyToken == msg._replyToken &&
+                   DataHelper.eq(_replyTunnel, msg._replyTunnel) &&
+                   DataHelper.eq(_replyGateway, msg._replyGateway);
         } else {
             return false;
         }
@@ -253,13 +258,13 @@ public class DatabaseStoreMessage extends I2NPMessageImpl {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("[DatabaseStoreMessage: ");
-        buf.append("\n\tExpiration: ").append(getMessageExpiration());
-        buf.append("\n\tUnique ID: ").append(getUniqueId());
+        buf.append("\n\tExpiration: ").append(_expiration);
+        buf.append("\n\tUnique ID: ").append(_uniqueId);
         buf.append("\n\tKey: ").append(getKey());
         buf.append("\n\tEntry: ").append(_dbEntry);
-        buf.append("\n\tReply token: ").append(getReplyToken());
-        buf.append("\n\tReply tunnel: ").append(getReplyTunnel());
-        buf.append("\n\tReply gateway: ").append(getReplyGateway());
+        buf.append("\n\tReply token: ").append(_replyToken);
+        buf.append("\n\tReply tunnel: ").append(_replyTunnel);
+        buf.append("\n\tReply gateway: ").append(_replyGateway);
         buf.append("]");
         return buf.toString();
     }

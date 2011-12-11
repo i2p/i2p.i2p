@@ -8,8 +8,6 @@ package net.i2p.data.i2np;
  *
  */
 
-import java.io.IOException;
-
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
@@ -20,15 +18,20 @@ import net.i2p.util.Log;
 /**
  * Defines the message sent between routers as part of the tunnel delivery
  *
+ * The tunnel ID is changed in-place by TunnelParticipant.send(), so
+ * we can't reuse the checksum on output, but we still subclass
+ * FastI2NPMessageImpl so we don't verify the checksum on input...
+ * because this is a high-usage class.
+ *
  */
-public class TunnelDataMessage extends I2NPMessageImpl {
+public class TunnelDataMessage extends FastI2NPMessageImpl {
     private long _tunnelId;
     private TunnelId _tunnelIdObj;
     private byte[] _data;
     private ByteArray _dataBuf;
     
     public final static int MESSAGE_TYPE = 18;
-    private static final int DATA_SIZE = 1024;
+    public static final int DATA_SIZE = 1024;
     /** if we can't deliver a tunnel message in 10s, fuck it */
     private static final int EXPIRATION_PERIOD = 10*1000;
     
@@ -104,13 +107,26 @@ public class TunnelDataMessage extends I2NPMessageImpl {
     }
     
     public long getTunnelId() { return _tunnelId; }
-    public void setTunnelId(long id) { _tunnelId = id; }
+
+    /**
+     *  (correctly) Invalidates stored checksum
+     */
+    public void setTunnelId(long id) {
+        _hasChecksum = false;
+        _tunnelId = id;
+    }
+
     public TunnelId getTunnelIdObj() { 
         if (_tunnelIdObj == null)
             _tunnelIdObj = new TunnelId(_tunnelId); // not thread safe, but immutable, so who cares
         return _tunnelIdObj;
     }
+
+    /**
+     *  (correctly) Invalidates stored checksum
+     */
     public void setTunnelId(TunnelId id) {
+        _hasChecksum = false;
         _tunnelIdObj = id;
         _tunnelId = id.getTunnelId();
     }
@@ -124,13 +140,18 @@ public class TunnelDataMessage extends I2NPMessageImpl {
         return _data;
     }
 
+    /**
+     *  @throws IllegalStateException if data previously set, to protect saved checksum
+     */
     public void setData(byte data[]) { 
+        if (_data != null)
+            throw new IllegalStateException();
         if ( (data == null) || (data.length <= 0) )
             throw new IllegalArgumentException("Empty tunnel payload?");
         _data = data; 
     }
     
-    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException, IOException {
+    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException {
         if (type != MESSAGE_TYPE) throw new I2NPMessageException("Message type is incorrect for this message");
         int curIndex = offset;
         
@@ -214,8 +235,8 @@ public class TunnelDataMessage extends I2NPMessageImpl {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("[TunnelDataMessage:");
-        buf.append(" MessageId: ").append(getUniqueId());
-        buf.append(" Tunnel ID: ").append(getTunnelId());
+        buf.append(" MessageId: ").append(_uniqueId);
+        buf.append(" Tunnel ID: ").append(_tunnelId);
         buf.append("]");
         return buf.toString();
     }

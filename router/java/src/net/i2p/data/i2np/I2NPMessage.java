@@ -26,16 +26,53 @@ public interface I2NPMessage extends DataStructure {
      * Read the body into the data structures, after the initial type byte, using
      * the current class's format as defined by the I2NP specification
      *
+     * Unused - All transports provide encapsulation and so we have byte arrays available.
+     *
      * @param in stream to read from
-     * @param type I2NP message type
+     *           starting at type if type is < 0 (16 byte header)
+     *           starting at ID if type is >= 0 (15 byte header)
+     * @param type I2NP message type. If less than zero, read the type from data
      * @param buffer scratch buffer to be used when reading and parsing
      * @return size of the message read (including headers)
      * @throws I2NPMessageException if the stream doesn't contain a valid message
      *          that this class can read.
      * @throws IOException if there is a problem reading from the stream
+     * @deprecated unused
      */
     public int readBytes(InputStream in, int type, byte buffer[]) throws I2NPMessageException, IOException;
-    public int readBytes(byte data[], int type, int offset) throws I2NPMessageException, IOException;
+
+    /**
+     * Read the body into the data structures, after the initial type byte, using
+     * the current class's format as defined by the I2NP specification
+     *
+     * @param data the data
+     * @param type I2NP message type. If less than zero, read the type from data
+     * @param offset where to start
+     *           starting at type if type is < 0 (16 byte header)
+     *           starting at ID if type is >= 0 (15 byte header)
+     * @return size of the message read (including headers)
+     * @throws I2NPMessageException if there is no valid message
+     * @throws IOException if there is a problem reading from the stream
+     */
+    public int readBytes(byte data[], int type, int offset) throws I2NPMessageException;
+
+    /**
+     * Read the body into the data structures, after the initial type byte, using
+     * the current class's format as defined by the I2NP specification
+     *
+     * @param data the data, may or may not include the type
+     * @param type I2NP message type. If less than zero, read the type from data
+     * @param offset where to start
+     *           starting at type if type is < 0 (16 byte header)
+     *           starting at ID if type is >= 0 (15 byte header)
+     * @param maxLen read no more than this many bytes from data starting at offset, even if it is longer
+     *               This includes the type byte only if type < 0
+     * @return size of the message read (including headers)
+     * @throws I2NPMessageException if there is no valid message
+     * @throws IOException if there is a problem reading from the stream
+     * @since 0.8.12
+     */
+    public int readBytes(byte data[], int type, int offset, int maxLen) throws I2NPMessageException;
 
     /**
      * Read the body into the data structures, after the initial type byte and
@@ -50,8 +87,8 @@ public interface I2NPMessage extends DataStructure {
      *          that this class can read.
      * @throws IOException if there is a problem reading from the stream
      */
-    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException, IOException;
-    public void readMessage(byte data[], int offset, int dataSize, int type, I2NPMessageHandler handler) throws I2NPMessageException, IOException;
+    public void readMessage(byte data[], int offset, int dataSize, int type) throws I2NPMessageException;
+    public void readMessage(byte data[], int offset, int dataSize, int type, I2NPMessageHandler handler) throws I2NPMessageException;
     
     /**
      * Return the unique identifier for this type of I2NP message, as defined in
@@ -73,22 +110,25 @@ public interface I2NPMessage extends DataStructure {
     public void setMessageExpiration(long exp);
 
     
-    /** How large the message is, including any checksums */
+    /** How large the message is, including any checksums, i.e. full 16 byte header */
     public int getMessageSize();
-    /** How large the raw message is */
+
+    /** How large the raw message is with the short 5 byte header */
     public int getRawMessageSize();
 
-    
     /** 
      * write the message to the buffer, returning the number of bytes written.
      * the data is formatted so as to be self contained, with the type, size,
      * expiration, unique id, as well as a checksum bundled along.  
+     * Full 16 byte header.
      */
     public int toByteArray(byte buffer[]);
+
     /**
      * write the message to the buffer, returning the number of bytes written.
      * the data is is not self contained - it does not include the size,
      * unique id, or any checksum, but does include the type and expiration.
+     * Short 5 byte header.
      */
     public int toRawByteArray(byte buffer[]);
 }

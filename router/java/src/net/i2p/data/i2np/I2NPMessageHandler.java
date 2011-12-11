@@ -39,7 +39,11 @@ public class I2NPMessageHandler {
     /**
      * Read an I2NPMessage from the stream and return the fully populated object.
      *
-     * @throws IOException if there is an IO problem reading from the stream
+     * This is only called by I2NPMessageReader which is unused.
+     * All transports provide encapsulation and so we have byte arrays available.
+     *
+     * @deprecated use the byte array method to avoid an extra copy if you have it
+     *
      * @throws I2NPMessageException if there is a problem handling the particular
      *          message - if it is an unknown type or has improper formatting, etc.
      */
@@ -54,15 +58,12 @@ public class I2NPMessageHandler {
             //    throw new I2NPMessageException("The type "+ type + " is an unknown I2NP message");
             try {
                 _lastSize = msg.readBytes(in, type, _messageBuffer);
-            } catch (IOException ioe) {
-                throw ioe;
             } catch (I2NPMessageException ime) {
                 throw ime;
             } catch (Exception e) {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Error reading the stream", e);
-                throw new IOException("Unknown error reading the " + msg.getClass().getName() 
-                                      + ": " + e.getMessage());
+                throw new I2NPMessageException("Unknown error reading the " + msg.getClass().getSimpleName(), e); 
             }
             _lastReadEnd = System.currentTimeMillis();
             return msg;
@@ -79,19 +80,31 @@ public class I2NPMessageHandler {
     }
     
     /**
-     * Read an I2NPMessage from the stream and return the fully populated object.
+     * Read an I2NPMessage from the byte array and return the fully populated object.
      *
-     * @throws IOException if there is an IO problem reading from the stream
      * @throws I2NPMessageException if there is a problem handling the particular
      *          message - if it is an unknown type or has improper formatting, etc.
      */
-    public I2NPMessage readMessage(byte data[]) throws IOException, I2NPMessageException {
-        readMessage(data, 0);
+    public I2NPMessage readMessage(byte data[]) throws I2NPMessageException {
+        readMessage(data, 0, data.length);
         return lastRead();
     }
 
-    public int readMessage(byte data[], int offset) throws IOException, I2NPMessageException {
+    public int readMessage(byte data[], int offset) throws I2NPMessageException {
+        return readMessage(data, offset, data.length - offset);
+    }
+
+    /**
+     *  Set a limit on the max to read from the data buffer, so that
+     *  we can use a large buffer but prevent the reader from reading off the end.
+     *
+     *  @param maxLen read no more than this many bytes from data starting at offset, even if it is longer
+     *                must be at least 16
+     *  @since 0.8.12
+     */
+    public int readMessage(byte data[], int offset, int maxLen) throws I2NPMessageException {
         int cur = offset;
+        // we will assume that maxLen is >= 1 here. It's checked to be >= 16 in readBytes()
         int type = (int)DataHelper.fromLong(data, cur, 1);
         cur++;
         _lastReadBegin = System.currentTimeMillis();
@@ -110,17 +123,14 @@ public class I2NPMessageHandler {
         //                                   + sz + " all zeros? " + allZero + ")");
         //}
         try {
-            _lastSize = msg.readBytes(data, type, cur);
+            _lastSize = msg.readBytes(data, type, cur, maxLen - 1);
             cur += _lastSize;
-        } catch (IOException ioe) {
-            throw ioe;
         } catch (I2NPMessageException ime) {
             throw ime;
         } catch (Exception e) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Error reading the stream", e);
-            throw new IOException("Unknown error reading the " + msg.getClass().getName() 
-                                  + ": " + e.getMessage());
+            throw new I2NPMessageException("Unknown error reading the " + msg.getClass().getSimpleName(), e); 
         }
         _lastReadEnd = System.currentTimeMillis();
         _lastRead = msg;

@@ -1,7 +1,5 @@
 package net.i2p.data.i2np;
 
-import java.io.IOException;
-
 import net.i2p.I2PAppContext;
 import net.i2p.data.ByteArray;
 
@@ -9,6 +7,14 @@ import net.i2p.data.ByteArray;
  *  Base for TBM, TBRM, VTBM, VTBRM
  *  Retrofitted over them.
  *  There's really no difference between the build and build reply.
+ *
+ *  TBM and VBTM (but not TBRM and VTBRM?) messages are modified
+ *  in-place by doing a single setRecord(), and retransmitted.
+ *  Therefore they are NOT good candidates to use FastI2NPMessageImpl;
+ *  the checksum would have to be invalidated with every setRecord().
+ *  Which we could do in TBM and VTBM but not TBRM and VTBRM,
+ *  but keep it simple for now.
+ *
  *  @since 0.8.8
  */
 public abstract class TunnelBuildMessageBase extends I2NPMessageImpl {
@@ -41,7 +47,7 @@ public abstract class TunnelBuildMessageBase extends I2NPMessageImpl {
     
     protected int calculateWrittenLength() { return RECORD_SIZE * RECORD_COUNT; }
 
-    public void readMessage(byte[] data, int offset, int dataSize, int type) throws I2NPMessageException, IOException {
+    public void readMessage(byte[] data, int offset, int dataSize, int type) throws I2NPMessageException {
         if (type != getType()) 
             throw new I2NPMessageException("Message type is incorrect for this message");
         if (dataSize != calculateWrittenLength()) 
