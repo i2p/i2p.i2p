@@ -14,6 +14,7 @@ import net.i2p.data.i2np.I2NPMessageException;
 import net.i2p.data.i2np.I2NPMessageHandler;
 import net.i2p.router.RouterContext;
 import net.i2p.util.ByteCache;
+import net.i2p.util.HexDump;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleByteCache;
 import net.i2p.util.SimpleTimer;
@@ -468,10 +469,11 @@ class FragmentHandler {
         String stringified = null;
         if (_log.shouldLog(Log.DEBUG))
             stringified = msg.toString();
+        byte data[] = null;
         try {
             int fragmentCount = msg.getFragmentCount();
             // toByteArray destroys the contents of the message completely
-            byte data[] = msg.toByteArray();
+            data = msg.toByteArray();
             if (data == null)
                 throw new I2NPMessageException("null data");   // fragments already released???
             if (_log.shouldLog(Log.DEBUG))
@@ -488,14 +490,13 @@ class FragmentHandler {
             noteReception(m.getUniqueId(), fragmentCount-1, "complete: ");// + msg.toString());
             noteCompletion(m.getUniqueId());
             _receiver.receiveComplete(m, msg.getTargetRouter(), msg.getTargetTunnel());
-        } catch (IOException ioe) {
-            if (stringified == null) stringified = msg.toString();
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Error receiving fragmented message (corrupt?): " + stringified, ioe);
         } catch (I2NPMessageException ime) {
             if (stringified == null) stringified = msg.toString();
-            if (_log.shouldLog(Log.WARN))
+            if (_log.shouldLog(Log.WARN)) {
                 _log.warn("Error receiving fragmented message (corrupt?): " + stringified, ime);
+                _log.warn("DUMP:\n" + HexDump.dump(data));
+                _log.warn("RAW:\n" + Base64.encode(data));
+            }
         }
     }
 

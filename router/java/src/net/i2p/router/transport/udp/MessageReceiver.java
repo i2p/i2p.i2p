@@ -202,16 +202,13 @@ class MessageReceiver {
                 // zero copy for single fragment
                 m = I2NPMessageImpl.fromRawByteArray(_context, state.getFragments()[0].getData(), 0, state.getCompleteSize(), handler);
             }
-            if (state.getCompleteSize() == 534 && _log.shouldLog(Log.INFO)) {
-                _log.info(HexDump.dump(buf.getData(), 0, state.getCompleteSize()));
-            }
             m.setUniqueId(state.getMessageId());
             return m;
         } catch (I2NPMessageException ime) {
             if (_log.shouldLog(Log.WARN)) {
                 _log.warn("Message invalid: " + state, ime);
-                _log.warn(HexDump.dump(buf.getData(), 0, state.getCompleteSize()));
-                _log.warn("RAW: " + Base64.encode(buf.getData(), 0, state.getCompleteSize()));
+                _log.warn("DUMP:\n" + HexDump.dump(buf.getData(), 0, state.getCompleteSize()));
+                _log.warn("RAW:\n" + Base64.encode(buf.getData(), 0, state.getCompleteSize()));
             }
             _context.messageHistory().droppedInboundMessage(state.getMessageId(), state.getFrom(), "error: " + ime.toString() + ": " + state.toString());
             return null;
