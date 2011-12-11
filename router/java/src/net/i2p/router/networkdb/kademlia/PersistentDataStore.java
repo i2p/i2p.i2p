@@ -251,8 +251,8 @@ class PersistentDataStore extends TransientDataStore {
                 if (count == 0) {
                     if (lastCount > 0) {
                         long time = _context.clock().now() - startTime;
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn("Wrote " + lastCount + " entries to disk in " + time);
+                        if (_log.shouldLog(Log.INFO))
+                            _log.info("Wrote " + lastCount + " entries to disk in " + time);
                          _context.statManager().addRateData("netDb.writeOut", lastCount, 0);
                          _context.statManager().addRateData("netDb.writeTime", time, 0);
                     }
