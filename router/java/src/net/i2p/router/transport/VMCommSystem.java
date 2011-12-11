@@ -1,6 +1,5 @@
 package net.i2p.router.transport;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
@@ -110,7 +109,7 @@ public class VMCommSystem extends CommSystemFacade {
         public void runJob() {
             I2NPMessageHandler handler = new I2NPMessageHandler(_ctx);
             try {
-                I2NPMessage msg = handler.readMessage(new ByteArrayInputStream(_msg));
+                I2NPMessage msg = handler.readMessage(_msg);
                 int size = _msg.length;
                 _ctx.profileManager().messageReceived(_from, "vm", 1, size);
                 _ctx.statManager().addRateData("transport.receiveMessageSize", size, 1);
