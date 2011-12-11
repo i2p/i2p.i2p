@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -16,14 +17,14 @@ import net.i2p.router.RouterContext;
  *
  */
 class SearchState {
-    private RouterContext _context;
-    private final HashSet _pendingPeers;
-    private HashMap _pendingPeerTimes;
-    private final HashSet _attemptedPeers;
-    private final HashSet _failedPeers;
-    private final HashSet _successfulPeers;
-    private final HashSet _repliedPeers;
-    private Hash _searchKey;
+    private final RouterContext _context;
+    private final HashSet<Hash> _pendingPeers;
+    private final Map<Hash, Long> _pendingPeerTimes;
+    private final HashSet<Hash> _attemptedPeers;
+    private final HashSet<Hash> _failedPeers;
+    private final HashSet<Hash> _successfulPeers;
+    private final HashSet<Hash> _repliedPeers;
+    private final Hash _searchKey;
     private volatile long _completed;
     private volatile long _started;
     
@@ -41,30 +42,30 @@ class SearchState {
     }
     
     public Hash getTarget() { return _searchKey; }
-    public Set getPending() {
+    public Set<Hash> getPending() {
         synchronized (_pendingPeers) {
             return (Set)_pendingPeers.clone();
         }
     }
-    public Set getAttempted() {
+    public Set<Hash> getAttempted() {
         synchronized (_attemptedPeers) {
             return (Set)_attemptedPeers.clone();
         }
     }
-    public Set getClosestAttempted(int max) {
+    public Set<Hash> getClosestAttempted(int max) {
         synchronized (_attemptedPeers) {
             return locked_getClosest(_attemptedPeers, max, _searchKey);
         }
     }
     
-    private Set locked_getClosest(Set peers, int max, Hash target) {
+    private Set<Hash> locked_getClosest(Set<Hash> peers, int max, Hash target) {
         if (_attemptedPeers.size() <= max)
             return new HashSet(_attemptedPeers);
         TreeSet closest = new TreeSet(new XORComparator(target));
         closest.addAll(_attemptedPeers);
-        HashSet rv = new HashSet(max);
+        Set<Hash> rv = new HashSet(max);
         int i = 0;
-        for (Iterator iter = closest.iterator(); iter.hasNext() && i < max; i++) {
+        for (Iterator<Hash> iter = closest.iterator(); iter.hasNext() && i < max; i++) {
             rv.add(iter.next());
         }
         return rv;
@@ -75,12 +76,12 @@ class SearchState {
             return _attemptedPeers.contains(peer);
         }
     }
-    public Set getSuccessful() {
+    public Set<Hash> getSuccessful() {
         synchronized (_successfulPeers) {
             return (Set)_successfulPeers.clone();
         }
     }
-    public Set getFailed() {
+    public Set<Hash> getFailed() {
         synchronized (_failedPeers) {
             return (Set)_failedPeers.clone();
         }
@@ -94,11 +95,11 @@ class SearchState {
     public long getWhenStarted() { return _started; }
     public long getWhenCompleted() { return _completed; }
     
-    public void addPending(Collection pending) {
+    public void addPending(Collection<Hash> pending) {
         synchronized (_pendingPeers) {
             _pendingPeers.addAll(pending);
-            for (Iterator iter = pending.iterator(); iter.hasNext(); )
-                _pendingPeerTimes.put(iter.next(), Long.valueOf(_context.clock().now()));
+            for (Hash peer : pending)
+                _pendingPeerTimes.put(peer, Long.valueOf(_context.clock().now()));
         }
         synchronized (_attemptedPeers) {
             _attemptedPeers.addAll(pending);
@@ -129,7 +130,7 @@ class SearchState {
         long rv = -1;
         synchronized (_pendingPeers) {
             _pendingPeers.remove(peer);
-            Long when = (Long)_pendingPeerTimes.remove(peer);
+            Long when = _pendingPeerTimes.remove(peer);
             if (when != null)
                 rv = _context.clock().now() - when.longValue();
         }
@@ -146,7 +147,7 @@ class SearchState {
         }
         synchronized (_pendingPeers) {
             _pendingPeers.remove(peer);
-            Long when = (Long)_pendingPeerTimes.remove(peer);
+            Long when = _pendingPeerTimes.remove(peer);
             if (when != null)
                 return _context.clock().now() - when.longValue();
             else
@@ -178,32 +179,28 @@ class SearchState {
         buf.append("\n\tAttempted: ");
         synchronized (_attemptedPeers) {
             buf.append(_attemptedPeers.size()).append(' ');
-            for (Iterator iter = _attemptedPeers.iterator(); iter.hasNext(); ) {
-                Hash peer = (Hash)iter.next();
+            for (Hash peer : _attemptedPeers) {
                 buf.append(peer.toBase64()).append(" ");
             }
         }
         buf.append("\n\tPending: ");
         synchronized (_pendingPeers) {
             buf.append(_pendingPeers.size()).append(' ');
-            for (Iterator iter = _pendingPeers.iterator(); iter.hasNext(); ) {
-                Hash peer = (Hash)iter.next();
+            for (Hash peer : _pendingPeers) {
                 buf.append(peer.toBase64()).append(" ");
             }
         }
         buf.append("\n\tFailed: ");
         synchronized (_failedPeers) {
             buf.append(_failedPeers.size()).append(' ');
-            for (Iterator iter = _failedPeers.iterator(); iter.hasNext(); ) {
-                Hash peer = (Hash)iter.next();
+            for (Hash peer : _failedPeers) {
                 buf.append(peer.toBase64()).append(" ");
             }
         }
         buf.append("\n\tSuccessful: ");
         synchronized (_successfulPeers) {
             buf.append(_successfulPeers.size()).append(' ');
-            for (Iterator iter = _successfulPeers.iterator(); iter.hasNext(); ) {
-                Hash peer = (Hash)iter.next();
+            for (Hash peer : _successfulPeers) {
                 buf.append(peer.toBase64()).append(" ");
             }
         }

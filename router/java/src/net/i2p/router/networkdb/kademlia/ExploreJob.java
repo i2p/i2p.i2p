@@ -70,6 +70,9 @@ class ExploreJob extends SearchJob {
      * and PeerSelector doesn't include the floodfill peers,
      * so we add the ff peers ourselves and then use the regular PeerSelector.
      *
+     * TODO should we encrypt this also like we do for normal lookups?
+     * Could the OBEP capture it and reply with a reference to a hostile peer?
+     *
      * @param replyTunnelId tunnel to receive replies through
      * @param replyGateway gateway for the reply tunnel
      * @param expiration when the search should stop
@@ -79,16 +82,18 @@ class ExploreJob extends SearchJob {
         DatabaseLookupMessage msg = new DatabaseLookupMessage(getContext(), true);
         msg.setSearchKey(getState().getTarget());
         msg.setFrom(replyGateway);
-        msg.setDontIncludePeers(getState().getClosestAttempted(MAX_CLOSEST));
+        // Moved below now that DLM makes a copy
+        //msg.setDontIncludePeers(getState().getClosestAttempted(MAX_CLOSEST));
+        Set<Hash> dontIncludePeers = getState().getClosestAttempted(MAX_CLOSEST);
         msg.setMessageExpiration(expiration);
         msg.setReplyTunnel(replyTunnelId);
         
-        int available = MAX_CLOSEST - msg.getDontIncludePeers().size();
+        int available = MAX_CLOSEST - dontIncludePeers.size();
         if (available > 0) {
             // Add a flag to say this is an exploration and we don't want floodfills in the responses.
             // Doing it this way is of course backwards-compatible.
             // Supported as of 0.7.9
-            if (msg.getDontIncludePeers().add(Hash.FAKE_HASH))
+            if (dontIncludePeers.add(Hash.FAKE_HASH))
                 available--;
         }
 
@@ -105,21 +110,22 @@ class ExploreJob extends SearchJob {
         //        msg.getDontIncludePeers().addAll(peers);
         //}
         
-        available = MAX_CLOSEST - msg.getDontIncludePeers().size();
+        available = MAX_CLOSEST - dontIncludePeers.size();
         if (available > 0) {
             // selectNearestExplicit adds our hash to the dontInclude set (3rd param) ...
             // And we end up with MAX_CLOSEST+1 entries.
             // We don't want our hash in the message's don't-include list though.
             // We're just exploring, but this could give things away, and tie our exploratory tunnels to our router,
             // so let's not put our hash in there.
-            Set dontInclude = new HashSet(msg.getDontIncludePeers());
-            List peers = _peerSelector.selectNearestExplicit(rkey, available, dontInclude, ks);
-            msg.getDontIncludePeers().addAll(peers);
+            Set<Hash> dontInclude = new HashSet(dontIncludePeers);
+            List<Hash> peers = _peerSelector.selectNearestExplicit(rkey, available, dontInclude, ks);
+            dontIncludePeers.addAll(peers);
         }
         
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Peers we don't want to hear about: " + msg.getDontIncludePeers());
+            _log.debug("Peers we don't want to hear about: " + dontIncludePeers);
         
+        msg.setDontIncludePeers(dontIncludePeers);
         return msg;
     }
     
