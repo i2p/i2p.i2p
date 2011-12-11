@@ -1,3 +1,6 @@
+2011-12-11 sponge
+  * HTTP server tunnel, use log.WARN for 3 first minutes. (closes #460)
+
 2011-12-10 kytv
   * Replace eepget's whitelist of accepted characters with the
     blacklist from i2psnark. (closes #562)

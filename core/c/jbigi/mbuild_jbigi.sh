@@ -1,30 +1,30 @@
-#!/usr/bin/env bash
+#!/bin/sh
 # When executed in Mingw: Produces a jbigi.dll
 # When executed in Linux/FreeBSD: Produces a libjbigi.so
 # When executed in OSX: Produces a libjbigi.jnilib
 CC="gcc"
 
-case `uname -sr` in
+case `uname -s` in
 MINGW*)
-	JAVA_HOME="c:/software/j2sdk1.4.2_05"
-	COMPILEFLAGS="-Wall"
-	INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include/win32/ -I$JAVA_HOME/include/"
-	LINKFLAGS="-shared -Wl,--kill-at"
-	LIBFILE="jbigi.dll";;
+        JAVA_HOME="c:/software/j2sdk1.4.2_05"
+        COMPILEFLAGS="-Wall"
+        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include/win32/ -I$JAVA_HOME/include/"
+        LINKFLAGS="-shared -Wl,--kill-at"
+        LIBFILE="jbigi.dll";;
 CYGWIN*)
-	JAVA_HOME="c:/software/j2sdk1.4.2_05"
-	COMPILEFLAGS="-Wall -mno-cygwin"
-	INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include/win32/ -I$JAVA_HOME/include/"
-	LINKFLAGS="-shared -Wl,--kill-at"
-	LIBFILE="jbigi.dll";;
+        JAVA_HOME="c:/software/j2sdk1.4.2_05"
+        COMPILEFLAGS="-Wall -mno-cygwin"
+        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include/win32/ -I$JAVA_HOME/include/"
+        LINKFLAGS="-shared -Wl,--kill-at"
+        LIBFILE="jbigi.dll";;
 Darwin*)
-	JAVA_HOME=$(/usr/libexec/java_home)
+        JAVA_HOME=$(/usr/libexec/java_home)
         COMPILEFLAGS="-fPIC -Wall"
         INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include"
         LINKFLAGS="-dynamiclib -framework JavaVM"
         LIBFILE="libjbigi.jnilib";;
 SunOS*|OpenBSD*|NetBSD*|FreeBSD*|Linux*)
-        UNIXTYPE="`uname -s | tr [A-Z] [a-z]`"
+        UNIXTYPE=$(uname -s | tr "[A-Z]" "[a-z]")
         if [ $UNIXTYPE = "sunos" ]; then
                 UNIXTYPE="solaris"
         elif [ $UNIXTYPE = "freebsd" ]; then
@@ -37,31 +37,31 @@ SunOS*|OpenBSD*|NetBSD*|FreeBSD*|Linux*)
                 if [ -d /usr/local/jdk-1.7.0 ]; then
                         JAVA_HOME="/usr/local/jdk-1.7.0"
                 fi
-	elif [ $UNIXTYPE = "netbsd" ]; then
-		if [ -d /usr/pkg/java/openjdk7 ]; then
-			JAVA_HOME="/usr/pkg/java/openjdk7"
-		fi
-	elif [ $UNIXTYPE = "linux" -a -e /etc/debian_version ]; then
-		if [ -d /usr/lib/jvm/default-java ]; then
-			JAVA_HOME="/usr/lib/jvm/default-java"
-		fi
+        elif [ $UNIXTYPE = "netbsd" ]; then
+                if [ -d /usr/pkg/java/openjdk7 ]; then
+                        JAVA_HOME="/usr/pkg/java/openjdk7"
+                fi
+        elif [ $UNIXTYPE = "linux" ] && [ -e /etc/debian_version ]; then
+                if [ -d /usr/lib/jvm/default-java ]; then
+                        JAVA_HOME="/usr/lib/jvm/default-java"
+                fi
         fi
         COMPILEFLAGS="-fPIC -Wall"
         INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/${UNIXTYPE}"
         LINKFLAGS="-shared -Wl,-soname,libjbigi.so"
         LIBFILE="libjbigi.so";;
 *)
-	echo "Unsupported system type."
-	exit 1;;
+        echo "Unsupported system type."
+        exit 1;;
 esac
 
 if [ "$1" = "dynamic" ] ; then
-	echo "Building a jbigi lib that is dynamically linked to GMP"
-	LIBPATH="-L.libs"
-	INCLUDELIBS="-lgmp"
+        echo "Building a jbigi lib that is dynamically linked to GMP"
+        LIBPATH="-L.libs"
+        INCLUDELIBS="-lgmp"
 else
-	echo "Building a jbigi lib that is statically linked to GMP"
-	STATICLIBS=".libs/libgmp.a"
+        echo "Building a jbigi lib that is statically linked to GMP"
+        STATICLIBS=".libs/libgmp.a"
 fi
 
 echo "Compiling C code..."

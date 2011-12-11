@@ -274,7 +274,7 @@
         <!-- \n in an attribute value generates an invalid manifest -->
         <exec executable="tr" inputstring="${workspace.changes.jbigi}" outputproperty="workspace.changes.jbigi.tr" errorproperty="mtn.error2" failifexecutionfails="false" >
             <arg value="-s" />
-            <arg value="[:space:]" />
+            <arg value="&quot;[:space:]&quot;" />
             <arg value="," />
         </exec>
     </target>
@@ -462,7 +462,7 @@
         </exec>
         <exec executable="tr" inputstring="${build.temp}" outputproperty="build.temp.tr" failonerror="true">
             <arg value="-d" />
-            <arg value="[:space:]"/>
+            <arg value="&quot;[:space:]&quot;"/>
         </exec>
         <exec executable="cut" inputstring="${build.temp.tr}" outputproperty="build.number" failonerror="true" >
             <arg value="-f1" />

@@ -46,6 +46,8 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
     private static final String SERVER_HEADER = "Server";
     private static final String[] SERVER_SKIPHEADERS = {SERVER_HEADER};
     private static final long HEADER_TIMEOUT = 60*1000;
+    private static final long START_INTERVAL = (60 * 1000) * 3;
+    private long _startedOn = 0L;
 
     private final static byte[] ERR_UNAVAILABLE =
         ("HTTP/1.1 503 Service Unavailable\r\n"+
@@ -80,6 +82,14 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
         getTunnel().getContext().statManager().createRateStat("i2ptunnel.httpserver.blockingHandleTime", "how long the blocking handle takes to complete", "I2PTunnel.HTTPServer", new long[] { 60*1000, 10*60*1000, 3*60*60*1000 });
         getTunnel().getContext().statManager().createRateStat("i2ptunnel.httpNullWorkaround", "How often an http server works around a streaming lib or i2ptunnel bug", "I2PTunnel.HTTPServer", new long[] { 60*1000, 10*60*1000 });
     }
+
+    @Override
+    public void startRunning() {
+        super.startRunning();
+        _startedOn = getTunnel().getContext().clock().now();
+        // Would be better if this was set when the inbound tunnel becomes alive.
+    }
+
 
     /**
      * Called by the thread pool of I2PSocket handlers
@@ -168,8 +178,10 @@ public class I2PTunnelHTTPServer extends I2PTunnelServer {
             try {
                 socket.close();
             } catch (IOException ioe) {}
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Error connecting to HTTP server " + remoteHost + ':' + remotePort, ex);
+            // Don't complain too early, Jetty may not be ready.
+            int level = getTunnel().getContext().clock().now() - _startedOn > START_INTERVAL ? Log.ERROR : Log.WARN;
+            if (_log.shouldLog(level))
+                _log.log(level, "Error connecting to HTTP server " + remoteHost + ':' + remotePort, ex);
         } catch (IOException ex) {
             try {
                 socket.close();
