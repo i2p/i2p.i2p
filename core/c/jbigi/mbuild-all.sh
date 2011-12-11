@@ -60,13 +60,11 @@ OPENBSD_PLATFORM="${X86_PLATFORMS} ${MISC_OPENBSD_PLATFORMS}"
 # FIXME Is this all?
 DARWIN_PLATFORMS="core2 corei"
 
-# Set the version to 5.0.2 for OSX because
-# 1) it doesn't have the -r parameter as an option for sed
-# 2) AFAIK there are only 64bit capable CPUs for the Intel Macs
+# Set the version to 5.0.2 for OSX because AFAIK there are only 64bit capable CPUs for the Intel Macs
 if [ `uname -s |grep Darwin` ]; then
   	VER=5.0.2
 else
-	VER=$(echo gmp-*.tar.bz2 | sed -re "s/(.*-)(.*)(.*.tar.bz2)$/\2/" | tail -n 1)
+	VER=$(echo gmp-*.tar.bz2 | sed -e "s/\(.*-\)\(.*\)\(.*.tar.bz2\)$/\2/" | tail -n 1)
 fi
 
 if [ "$VER" = "" ] ; then
