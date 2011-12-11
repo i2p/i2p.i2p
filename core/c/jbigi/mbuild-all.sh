@@ -76,7 +76,7 @@ if [ "$VER" = "" ] ; then
 fi
 
 
-case `uname -sr` in
+case `uname -s` in
 MINGW*)
         PLATFORM_LIST="${MINGW_PLATFORMS}"
         NAME="jbigi"

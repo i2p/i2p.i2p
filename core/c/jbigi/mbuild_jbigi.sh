@@ -4,7 +4,7 @@
 # When executed in OSX: Produces a libjbigi.jnilib
 CC="gcc"
 
-case `uname -sr` in
+case `uname -s` in
 MINGW*)
         JAVA_HOME="c:/software/j2sdk1.4.2_05"
         COMPILEFLAGS="-Wall"
