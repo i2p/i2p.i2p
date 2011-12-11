@@ -34,6 +34,7 @@ import net.i2p.util.I2PProperties;
 import net.i2p.util.KeyRing;
 import net.i2p.util.LogManager;
 //import net.i2p.util.PooledRandomSource;
+import net.i2p.util.PortMapper;
 import net.i2p.util.RandomSource;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.I2PProperties.I2PPropertyCallback;
@@ -85,6 +86,7 @@ public class I2PAppContext {
     private RandomSource _random;
     private KeyGenerator _keyGenerator;
     protected KeyRing _keyRing; // overridden in RouterContext
+    private final PortMapper _portMapper;
     private volatile boolean _statManagerInitialized;
     private volatile boolean _sessionKeyManagerInitialized;
     private volatile boolean _namingServiceInitialized;
@@ -200,6 +202,7 @@ public class I2PAppContext {
             _overrideProps.putAll(envProps);
         _shutdownTasks = new ConcurrentHashSet(32);
         initializeDirs();
+        _portMapper = new PortMapper(this);
     }
     
    /**
@@ -909,5 +912,13 @@ public class I2PAppContext {
      */
     public boolean hasWrapper() {
         return System.getProperty("wrapper.version") != null;
+    }
+
+    /**
+     *  Basic mapping from service names to ports
+     *  @since 0.8.12
+     */
+    public PortMapper portMapper() {
+        return _portMapper;
     }
 }
