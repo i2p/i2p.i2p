@@ -18,7 +18,7 @@ CYGWIN*)
 	LINKFLAGS="-shared -Wl,--kill-at"
 	LIBFILE="jbigi.dll";;
 Darwin*)
-	JAVA_HOME=$(/usr/libexec/java_home)
+        JAVA_HOME=$(/usr/libexec/java_home)
         COMPILEFLAGS="-fPIC -Wall"
         INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include"
         LINKFLAGS="-dynamiclib -framework JavaVM"
@@ -37,22 +37,22 @@ SunOS*|OpenBSD*|NetBSD*|FreeBSD*|Linux*)
                 if [ -d /usr/local/jdk-1.7.0 ]; then
                         JAVA_HOME="/usr/local/jdk-1.7.0"
                 fi
-	elif [ $UNIXTYPE = "netbsd" ]; then
-		if [ -d /usr/pkg/java/openjdk7 ]; then
-			JAVA_HOME="/usr/pkg/java/openjdk7"
-		fi
-	elif [ $UNIXTYPE = "linux" -a -e /etc/debian_version ]; then
-		if [ -d /usr/lib/jvm/default-java ]; then
-			JAVA_HOME="/usr/lib/jvm/default-java"
-		fi
+        elif [ $UNIXTYPE = "netbsd" ]; then
+                if [ -d /usr/pkg/java/openjdk7 ]; then
+                        JAVA_HOME="/usr/pkg/java/openjdk7"
+                fi
+        elif [ $UNIXTYPE = "linux" ] && [ -e /etc/debian_version ]; then
+                if [ -d /usr/lib/jvm/default-java ]; then
+                        JAVA_HOME="/usr/lib/jvm/default-java"
+                fi
         fi
         COMPILEFLAGS="-fPIC -Wall"
         INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/${UNIXTYPE}"
         LINKFLAGS="-shared -Wl,-soname,libjbigi.so"
         LIBFILE="libjbigi.so";;
 *)
-	echo "Unsupported system type."
-	exit 1;;
+        echo "Unsupported system type."
+        exit 1;;
 esac
 
 if [ "$1" = "dynamic" ] ; then
