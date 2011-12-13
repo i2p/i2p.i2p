@@ -130,7 +130,7 @@ public abstract class FastI2NPMessageImpl extends I2NPMessageImpl {
      *  and a few DatabaseLookupMessages that get reused.
      *  The last two are tiny, but the savings at the gateway should help.
      */
-    private static final boolean VERIFY_TEST = true;
+    private static final boolean VERIFY_TEST = false;
 
     /**
      *  If available, use the previously-computed or previously-read checksum for speed
