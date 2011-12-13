@@ -43,8 +43,7 @@ Plus d'infos sur la page de <a href="confignet#help">configuration</a>.
 le premier nombre est celui des routeurs avec qui le votre a communiqué dans les dernières minutes. Ça peut varier de 
 8-10 à plusieurs centaines, selon votre bande passante et son rapport de partage, et le trafic généré localement. Le 
 second est celui des pairs vus dans les dernières heures. Ces nombres penvent varier sensiblement sans conséquence.
-<a href="configstats.jsp#router.activePeers">[Activer le graphique]</a> (activer auparavant "toutes 
-les statistiques").</li>
+<a href="configstats.jsp#router.activePeers">[Activer le graphique]</a></li>
 <li class="tidylist"><b>Rapides:</b>
 le nombre de pairs que vous mettez à contribution pour construire vos tunnels clients. En général dans une tranche de 
 8 à 30. Vos pairs rapides sont détaillés sur la page <a href="profiles.jsp">profils</a>.
@@ -53,8 +52,7 @@ le nombre de pairs que vous mettez à contribution pour construire vos tunnels c
 nombre des pairs que vous utilisez pour construire quelques uns de vos tunnels exploratoires. Habituellement de 8 à 75. 
 Les pairs rapides font partie du groupe des "Hautes capacités". Vos pairs à hautes capacités sont aussi listés sur 
 la page <a href="profiles.jsp">profils</a>.
-<a href="configstats.jsp#router.highCapacityPeers">[Activer le graphique]</a>  (activer auparavant "toutes les 
-statistiques").</li>
+<a href="configstats.jsp#router.highCapacityPeers">[Activer le graphique]</a></li>
 <li class="tidylist"><b>Bien intégrés:</b>
 vous utilisez ce groupe pour vos requêtes à la base de données du réseau. Ils sont souvent des pairs de remplissage par 
 diffusion ("floodfill"). Vos pairs "bien intégrés" sont affichés en bas de la même page 
