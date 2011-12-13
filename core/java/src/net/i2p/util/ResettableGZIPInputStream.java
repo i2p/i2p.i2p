@@ -8,6 +8,8 @@ import java.util.zip.CRC32;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
+import net.i2p.data.DataHelper;
+
 /**
  * GZIP implementation per 
  * <a href="http://www.faqs.org/rfcs/rfc1952.html">RFC 1952</a>, reusing 
@@ -184,36 +186,16 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
     private void verifyFooter() throws IOException {
         byte footer[] = _lookaheadStream.getFooter();
         
-        long expectedCRCVal = _crc32.getValue();
+        long actualSize = inf.getTotalOut();
+        long expectedSize = DataHelper.fromLongLE(footer, 4, 4);
+        if (expectedSize != actualSize)
+            throw new IOException("gunzip expected " + expectedSize + " bytes, got " + actualSize);
         
-        // damn RFC writing their bytes backwards...
-        if (!(footer[0] == (byte)(expectedCRCVal & 0xFF)))
-            throw new IOException("footer[0]=" + footer[0] + " expectedCRC[0]="
-                                  + (expectedCRCVal & 0xFF));
-        if (!(footer[1] == (byte)(expectedCRCVal >>> 8)))
-            throw new IOException("footer[1]=" + footer[1] + " expectedCRC[1]="
-                                  + ((expectedCRCVal >>> 8) & 0xFF));
-        if (!(footer[2] == (byte)(expectedCRCVal >>> 16)))
-            throw new IOException("footer[2]=" + footer[2] + " expectedCRC[2]="
-                                  + ((expectedCRCVal >>> 16) & 0xFF));
-        if (!(footer[3] == (byte)(expectedCRCVal >>> 24)))
-            throw new IOException("footer[3]=" + footer[3] + " expectedCRC[3]="
-                                  + ((expectedCRCVal >>> 24) & 0xFF));
-        
-        int expectedSizeVal = inf.getTotalOut();
-        
-        if (!(footer[4] == (byte)expectedSizeVal))
-            throw new IOException("footer[4]=" + footer[4] + " expectedSize[0]="
-                                  + (expectedSizeVal & 0xFF));
-        if (!(footer[5] == (byte)(expectedSizeVal >>> 8)))
-            throw new IOException("footer[5]=" + footer[5] + " expectedSize[1]="
-                                  + ((expectedSizeVal >>> 8) & 0xFF));
-        if (!(footer[6] == (byte)(expectedSizeVal >>> 16)))
-            throw new IOException("footer[6]=" + footer[6] + " expectedSize[2]="
-                                  + ((expectedSizeVal >>> 16) & 0xFF));
-        if (!(footer[7] == (byte)(expectedSizeVal >>> 24)))
-            throw new IOException("footer[7]=" + footer[7] + " expectedSize[3]="
-                                  + ((expectedSizeVal >>> 24) & 0xFF));
+        long actualCRC = _crc32.getValue();
+        long expectedCRC = DataHelper.fromLongLE(footer, 0, 4);
+        if (expectedCRC != actualCRC)
+            throw new IOException("gunzip CRC fail expected 0x" + Long.toHexString(expectedCRC) +
+                                  " bytes, got 0x" + Long.toHexString(actualCRC));
     }
     
     /**
