@@ -36,7 +36,7 @@ import net.i2p.util.I2PProperties.I2PPropertyCallback;
  *
  */
 public class RouterContext extends I2PAppContext {
-    private Router _router;
+    private final Router _router;
     private ClientManagerFacadeImpl _clientManagerFacade;
     private ClientMessagePool _clientMessagePool;
     private JobQueue _jobQueue;
