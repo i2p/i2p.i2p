@@ -69,7 +69,7 @@ class BuildHandler implements Runnable {
      *  all the traffic in TunnelDispatcher.dispatch(TunnelDataMessage msg, Hash recvFrom).
      *  10s was not enough.
      */
-    private static final int NEXT_HOP_SEND_TIMEOUT = 15*1000;
+    private static final int NEXT_HOP_SEND_TIMEOUT = 25*1000;
 
     public BuildHandler(RouterContext ctx, TunnelPoolManager manager, BuildExecutor exec) {
         _context = ctx;
