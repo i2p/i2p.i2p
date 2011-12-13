@@ -110,6 +110,11 @@ public class RouterAddress extends DataStructureImpl {
         _cost = (int) DataHelper.readLong(in, 1);
         _expiration = DataHelper.readDate(in);
         _transportStyle = DataHelper.readString(in);
+        // reduce Object proliferation
+        if (_transportStyle.equals("SSU"))
+            _transportStyle = "SSU";
+        else if (_transportStyle.equals("NTCP"))
+            _transportStyle = "NTCP";
         _options = DataHelper.readProperties(in);
     }
     

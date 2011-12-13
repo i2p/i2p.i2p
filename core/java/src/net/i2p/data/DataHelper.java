@@ -34,6 +34,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -59,6 +60,44 @@ public class DataHelper {
     private static final byte[] EQUAL_BYTES = getUTF8("=");
     private static final byte[] SEMICOLON_BYTES = getUTF8(";");
 
+    /**
+     *  Map of String to itself to cache common
+     *  keys in RouterInfo, RouterAddress, and BlockfileNamingService properties.
+     *  Reduces Object proliferation caused by frequent deserialization.
+     *  @since 0.8.12
+     */
+    private static final Map<String, String> _propertiesKeyCache;
+    static {
+        String keys[] = {
+            // NTCP/SSU RouterAddress options
+            "cost", "host", "port",
+            // SSU RouterAddress options
+            "key",
+            "ihost0", "iport0", "ikey0", "itag0",
+            "ihost1", "iport1", "ikey1", "itag1",
+            "ihost2", "iport2", "ikey2", "itag2",
+            // RouterInfo options
+            "caps", "coreVersion", "netId", "router.version",
+            "stat_bandwidthReceiveBps.60m",
+            "stat_bandwidthSendBps.60m",
+            "stat_tunnel.buildClientExpire.60m",
+            "stat_tunnel.buildClientReject.60m",
+            "stat_tunnel.buildClientSuccess.60m",
+            "stat_tunnel.buildExploratoryExpire.60m",
+            "stat_tunnel.buildExploratoryReject.60m",
+            "stat_tunnel.buildExploratorySuccess.60m",
+            "stat_tunnel.participatingTunnels.60m",
+            "stat_uptime",
+            // BlockfileNamingService
+            "version", "created", "upgraded", "lists",
+            "a", "s",
+        };
+        _propertiesKeyCache = new HashMap(keys.length);
+        for (int i = 0; i < keys.length; i++) {
+            _propertiesKeyCache.put(keys[i], keys[i]);
+        }
+    }
+
     /** Read a mapping from the stream, as defined by the I2P data structure spec,
      * and store it into a Properties object.
      *
@@ -74,7 +113,7 @@ public class DataHelper {
      * @param rawStream stream to read the mapping from
      * @throws DataFormatException if the format is invalid
      * @throws IOException if there is a problem reading the data
-     * @return mapping
+     * @return an OrderedProperties
      */
     public static Properties readProperties(InputStream rawStream) 
         throws DataFormatException, IOException {
@@ -88,14 +127,17 @@ public class DataHelper {
         byte semiBuf[] = new byte[SEMICOLON_BYTES.length];
         while (in.available() > 0) {
             String key = readString(in);
+            String cached = _propertiesKeyCache.get(key);
+            if (cached != null)
+                key = cached;
             read = read(in, eqBuf);
             if ((read != eqBuf.length) || (!eq(eqBuf, EQUAL_BYTES))) {
-                break;
+                throw new DataFormatException("Bad key");
             }
             String val = readString(in);
             read = read(in, semiBuf);
             if ((read != semiBuf.length) || (!eq(semiBuf, SEMICOLON_BYTES))) {
-                break;
+                throw new DataFormatException("Bad value");
             }
             props.put(key, val);
         }
@@ -149,7 +191,6 @@ public class DataHelper {
      * Property keys and values must not contain '=' or ';', this is not checked and they are not escaped
      * Keys and values must be 255 bytes or less,
      * Formatted length must not exceed 65535 bytes
-     * @throws DataFormatException if either is too long.
      *
      * jrandom disabled UTF-8 in mid-2004, for performance reasons,
      * i.e. slow foo.getBytes("UTF-8")
@@ -159,6 +200,8 @@ public class DataHelper {
      * Use utf8 = true for SessionConfig (slow, UTF-8)
      * @param props source may be null
      * @param sort should we sort the properties? (set to false if already sorted, e.g. OrderedProperties)
+     * @throws DataFormatException if any string is over 255 bytes long, or if the total length
+     *                             (not including the two length bytes) is greater than 65535 bytes.
      * @since 0.8.7
      */
     public static void writeProperties(OutputStream rawStream, Properties props, boolean utf8, boolean sort) 
@@ -186,10 +229,9 @@ public class DataHelper {
                     writeString(baos, val);
                 baos.write(SEMICOLON_BYTES);
             }
-            baos.close();
+            if (baos.size() > 65535)
+                throw new DataFormatException("Properties too big (65535 max): " + baos.size());
             byte propBytes[] = baos.toByteArray();
-            if (propBytes.length > 65535)
-                throw new DataFormatException("Properties too big (65535 max): " + propBytes.length);
             writeLong(rawStream, 2, propBytes.length);
             rawStream.write(propBytes);
         } else {
@@ -212,7 +254,7 @@ public class DataHelper {
      * @param props source may be null
      * @return new offset
      * @throws DataFormatException if any string is over 255 bytes long, or if the total length
-     *                             is greater than 65535 bytes.
+     *                             (not including the two length bytes) is greater than 65535 bytes.
      */
     @Deprecated
     public static int toProperties(byte target[], int offset, Properties props) throws DataFormatException, IOException {
@@ -228,10 +270,9 @@ public class DataHelper {
                 writeStringUTF8(baos, val);
                 baos.write(SEMICOLON_BYTES);
             }
-            baos.close();
+            if (baos.size() > 65535)
+                throw new DataFormatException("Properties too big (65535 max): " + baos.size());
             byte propBytes[] = baos.toByteArray();
-            if (propBytes.length > 65535)
-                throw new DataFormatException("Properties too big (65535 max): " + propBytes.length);
             toLong(target, offset, 2, propBytes.length);
             offset += 2;
             System.arraycopy(propBytes, 0, target, offset, propBytes.length);
@@ -263,6 +304,9 @@ public class DataHelper {
             String key;
             try {
                 key = readString(in);
+                String cached = _propertiesKeyCache.get(key);
+                if (cached != null)
+                    key = cached;
                 int read = read(in, eqBuf);
                 if ((read != eqBuf.length) || (!eq(eqBuf, EQUAL_BYTES))) {
                     throw new DataFormatException("Bad key");
@@ -468,7 +512,7 @@ public class DataHelper {
      * Integers are a fixed number of bytes (numBytes), stored as unsigned integers in network byte order.
      * @param rawStream stream to read from
      * @param numBytes number of bytes to read and format into a number, 1 to 8
-     * @throws DataFormatException if the stream doesn't contain a validly formatted number of that many bytes
+     * @throws DataFormatException if negative (only possible if numBytes = 8) (since 0.8.12)
      * @throws EOFException since 0.8.2, if there aren't enough bytes to read the number
      * @throws IOException if there is an IO error reading the number
      * @return number
@@ -480,30 +524,27 @@ public class DataHelper {
 
         long rv = 0;
         for (int i = 0; i < numBytes; i++) {
-            long cur = rawStream.read();
+            int cur = rawStream.read();
             // was DataFormatException
             if (cur == -1) throw new EOFException("EOF reading " + numBytes + " byte value");
-            cur &= 0xFF;
             // we loop until we find a nonzero byte (or we reach the end)
             if (cur != 0) {
                 // ok, data found, now iterate through it to fill the rv
-                long remaining = numBytes - i;
-                for (int j = 0; j < remaining; j++) {
-                    long shiftAmount = 8 * (remaining-j-1);
-                    cur = cur << shiftAmount;
-                    rv += cur;
-                    if (j + 1 < remaining) {
-                        cur = rawStream.read();
-                        // was DataFormatException
-                        if (cur == -1)
-                            throw new EOFException("EOF reading " + numBytes + " byte value");
-                        cur &= 0xFF;
-                    }
+                rv = cur & 0xff;
+                for (int j = i + 1; j < numBytes; j++) {
+                    rv <<= 8;
+                    cur = rawStream.read();
+                    // was DataFormatException
+                    if (cur == -1)
+                        throw new EOFException("EOF reading " + numBytes + " byte value");
+                    rv |= cur & 0xff;
                 }
                 break;
             }
         }
         
+        if (rv < 0)
+            throw new DataFormatException("wtf, fromLong got a negative? " + rv + " numBytes=" + numBytes);
         return rv;
     }
     
@@ -518,8 +559,8 @@ public class DataHelper {
     public static void writeLong(OutputStream rawStream, int numBytes, long value) 
         throws DataFormatException, IOException {
         if (value < 0) throw new DataFormatException("Value is negative (" + value + ")");
-        for (int i = numBytes - 1; i >= 0; i--) {
-            byte cur = (byte)( (value >>> (i*8) ) & 0xFF);
+        for (int i = (numBytes - 1) * 8; i >= 0; i -= 8) {
+            byte cur = (byte) (value >> i);
             rawStream.write(cur);
         }
     }
@@ -542,24 +583,65 @@ public class DataHelper {
     public static void toLong(byte target[], int offset, int numBytes, long value) throws IllegalArgumentException {
         if (numBytes <= 0) throw new IllegalArgumentException("Invalid number of bytes");
         if (value < 0) throw new IllegalArgumentException("Negative value not allowed");
-        for (int i = 0; i < numBytes; i++)
-            target[offset+numBytes-i-1] = (byte)(value >>> (i*8));
+
+        for (int i = offset + numBytes - 1; i >= offset; i--) {
+            target[i] = (byte) value;
+            value >>= 8;
+        }
     }
     
     /**
+     * Little endian, i.e. backwards. Not for use in I2P protocols.
+     *
+     * @param numBytes 1-8
+     * @param value non-negative
+     * @since 0.8.12
+     */
+    public static void toLongLE(byte target[], int offset, int numBytes, long value) {
+        if (value < 0) throw new IllegalArgumentException("Negative value not allowed");
+        int limit = offset + numBytes;
+        for (int i = offset; i < limit; i++) {
+            target[i] = (byte) value;
+            value >>= 8;
+        }
+    }
+    
+    /**
+     * @param src if null returns 0
      * @param numBytes 1-8
      * @return non-negative
+     * @throws AIOOBE
+     * @throws IllegalArgumentException if negative (only possible if numBytes = 8)
      */
     public static long fromLong(byte src[], int offset, int numBytes) {
         if ( (src == null) || (src.length == 0) )
             return 0;
         
         long rv = 0;
-        for (int i = 0; i < numBytes; i++) {
-            long cur = src[offset+i] & 0xFF;
-            if (cur < 0) cur = cur+256;
-            cur = (cur << (8*(numBytes-i-1)));
-            rv += cur;
+        int limit = offset + numBytes;
+        for (int i = offset; i < limit; i++) {
+            rv <<= 8;
+            rv |= src[i] & 0xFF;
+        }
+        if (rv < 0)
+            throw new IllegalArgumentException("wtf, fromLong got a negative? " + rv + ": offset="+ offset +" numBytes="+numBytes);
+        return rv;
+    }
+    
+    /**
+     * Little endian, i.e. backwards. Not for use in I2P protocols.
+     *
+     * @param numBytes 1-8
+     * @return non-negative
+     * @throws AIOOBE
+     * @throws IllegalArgumentException if negative (only possible if numBytes = 8)
+     * @since 0.8.12
+     */
+    public static long fromLongLE(byte src[], int offset, int numBytes) {
+        long rv = 0;
+        for (int i = offset + numBytes - 1; i >= offset; i--) {
+            rv <<= 8;
+            rv |= src[i] & 0xFF;
         }
         if (rv < 0)
             throw new IllegalArgumentException("wtf, fromLong got a negative? " + rv + ": offset="+ offset +" numBytes="+numBytes);
@@ -636,7 +718,12 @@ public class DataHelper {
      * @return UTF-8 string
      */
     public static String readString(InputStream in) throws DataFormatException, IOException {
-        int size = (int) readLong(in, 1);
+        int size = in.read();
+        if (size == -1)
+            throw new EOFException("EOF reading string");
+        if (size == 0)
+            return "";   // reduce object proliferation
+        size &= 0xff;
         byte raw[] = new byte[size];
         int read = read(in, raw);
         // was DataFormatException
@@ -661,13 +748,13 @@ public class DataHelper {
     public static void writeString(OutputStream out, String string) 
         throws DataFormatException, IOException {
         if (string == null) {
-            writeLong(out, 1, 0);
+            out.write((byte) 0);
         } else {
             int len = string.length();
             if (len > 255)
                 throw new DataFormatException("The I2P data spec limits strings to 255 bytes or less, but this is "
                                               + len + " [" + string + "]");
-            writeLong(out, 1, len);
+            out.write((byte) len);
             for (int i = 0; i < len; i++)
                 out.write((byte)(string.charAt(i) & 0xFF));
         }
@@ -687,7 +774,7 @@ public class DataHelper {
     private static void writeStringUTF8(OutputStream out, String string) 
         throws DataFormatException, IOException {
         if (string == null) {
-            writeLong(out, 1, 0);
+            out.write((byte) 0);
         } else {
             // the following method throws an UnsupportedEncodingException which is an IOException,
             // but that's only if UTF-8 is not supported. Other encoding errors are not thrown.
@@ -696,7 +783,7 @@ public class DataHelper {
             if (len > 255)
                 throw new DataFormatException("The I2P data spec limits strings to 255 bytes or less, but this is "
                                               + len + " [" + string + "]");
-            writeLong(out, 1, len);
+            out.write((byte) len);
             out.write(raw);
         }
     }
@@ -710,8 +797,10 @@ public class DataHelper {
      * @deprecated unused
      */
     public static Boolean readBoolean(InputStream in) throws DataFormatException, IOException {
-        int val = (int) readLong(in, 1);
+        int val = in.read();
         switch (val) {
+        case -1:
+            throw new EOFException("EOF reading boolean");
         case 0:
             return Boolean.FALSE;
         case 1:
@@ -1469,6 +1558,7 @@ public class DataHelper {
      *  Same as orig.getBytes("UTF-8") but throws an unchecked RuntimeException
      *  instead of an UnsupportedEncodingException if no UTF-8, for ease of use.
      *
+     *  @return null if orig is null
      *  @throws RuntimeException
      */
     public static byte[] getUTF8(String orig) {
@@ -1484,6 +1574,7 @@ public class DataHelper {
      *  Same as orig.getBytes("UTF-8") but throws an unchecked RuntimeException
      *  instead of an UnsupportedEncodingException if no UTF-8, for ease of use.
      *
+     *  @return null if orig is null
      *  @throws RuntimeException
      *  @deprecated unused
      */
@@ -1496,6 +1587,7 @@ public class DataHelper {
      *  Same as new String(orig, "UTF-8") but throws an unchecked RuntimeException
      *  instead of an UnsupportedEncodingException if no UTF-8, for ease of use.
      *
+     *  @return null if orig is null
      *  @throws RuntimeException
      *  @deprecated unused
      */
@@ -1512,6 +1604,7 @@ public class DataHelper {
      *  Same as new String(orig, "UTF-8") but throws an unchecked RuntimeException
      *  instead of an UnsupportedEncodingException if no UTF-8, for ease of use.
      *
+     *  @return null if orig is null
      *  @throws RuntimeException
      *  @deprecated unused
      */
