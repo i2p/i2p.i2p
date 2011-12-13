@@ -37,6 +37,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * 
  * Note that this is used only by DecayingBloomFilter, which uses only
  * the unsynchronized locked_foo() methods.
+ * Deprecated for use outside of the router; to be moved to router.jar.
  * 
  * As of 0.8.11, the locked_foo() methods are thread-safe, in that they work,
  * but there is a minor risk of false-negatives if two threads are

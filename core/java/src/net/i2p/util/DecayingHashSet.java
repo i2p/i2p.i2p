@@ -55,6 +55,8 @@ import net.i2p.data.DataHelper;
  *
  * This performs about twice as fast as DBF in the test below.
  *
+ * Deprecated for use outside of the router; to be moved to router.jar.
+ *
  * @author zzz
  */
 public class DecayingHashSet extends DecayingBloomFilter {

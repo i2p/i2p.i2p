@@ -17,6 +17,8 @@ import org.xlattice.crypto.filters.BloomSHA1;
  * this may be refactored to allow tighter control of the size necessary for the
  * contained bloom filters.
  *
+ * Deprecated for use outside of the router; to be moved to router.jar.
+ *
  * See main() for an analysis of false positive rate.
  * See BloomFilterIVValidator for instantiation parameters.
  * See DecayingHashSet for a smaller and simpler version.
