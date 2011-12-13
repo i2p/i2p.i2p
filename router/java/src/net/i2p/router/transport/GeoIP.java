@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
@@ -41,6 +42,8 @@ import net.i2p.util.Log;
  */
 class GeoIP {
     private final Log _log;
+    // change to test with main()
+    //private final I2PAppContext _context;
     private final RouterContext _context;
     private final Map<String, String> _codeToName;
     /** code to itself to prevent String proliferation */
@@ -51,6 +54,7 @@ class GeoIP {
     private final AtomicBoolean _lock;
     private int _lookupRunCount;
     
+    //public GeoIP(I2PAppContext context) {
     public GeoIP(RouterContext context) {
         _context = context;
         _log = context.logManager().getLog(GeoIP.class);
@@ -218,14 +222,14 @@ class GeoIP {
         FileInputStream in = null;
         try {
             in = new FileInputStream(GeoFile);
-            StringBuilder buf = new StringBuilder(128);
-            while (DataHelper.readLine(in, buf) && idx < search.length) {
+            String buf = null;
+            BufferedReader br = new BufferedReader(new InputStreamReader(in, "ISO-8859-1"));
+            while ((buf = br.readLine()) != null && idx < search.length) {
                 try {
                     if (buf.charAt(0) == '#') {
-                        buf.setLength(0);
                         continue;
                     }
-                    String[] s = buf.toString().split(",");
+                    String[] s = buf.split(",");
                     long ip1 = Long.parseLong(s[0]);
                     long ip2 = Long.parseLong(s[1]);
                     while (idx < search.length && search[idx].longValue() < ip1) {
@@ -242,7 +246,6 @@ class GeoIP {
                 } catch (IndexOutOfBoundsException ioobe) {
                 } catch (NumberFormatException nfe) {
                 }
-                buf.setLength(0);
             }
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.ERROR))
@@ -262,6 +265,7 @@ class GeoIP {
      *  and it will be there next time at startup.
      */
     private void updateOurCountry() {
+        /**** comment out to test with main() */
         String oldCountry = _context.router().getConfigSetting(PROP_IP_COUNTRY);
         Hash ourHash = _context.routerHash();
         // we should always have a RouterInfo by now, but we had one report of an NPE here
@@ -272,6 +276,7 @@ class GeoIP {
             _context.router().setConfigSetting(PROP_IP_COUNTRY, country);
             _context.router().saveConfig();
         }
+        /****/
     }
 
     /**
@@ -356,7 +361,9 @@ class GeoIP {
                                         "129.1.2.3", "255.255.255.254", "255.255.255.255"};
         for (int i = 0; i < tests.length; i++)
             g.add(tests[i]);
+        long start = System.currentTimeMillis();
         g.blockingLookup();
+        System.out.println("Lookup took " + (System.currentTimeMillis() - start));
         for (int i = 0; i < tests.length; i++)
             System.out.println(tests[i] + " : " + g.get(tests[i]));
 
