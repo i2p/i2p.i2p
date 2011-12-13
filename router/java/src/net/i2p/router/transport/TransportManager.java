@@ -403,7 +403,6 @@ public class TransportManager implements TransportEventListener {
         return rv;
     }
     
-    @SuppressWarnings("static-access")
     public TransportBid getNextBid(OutNetMessage msg) {
         int unreachableTransports = 0;
         Hash peer = msg.getTarget().getIdentity().calculateHash();
@@ -427,8 +426,7 @@ public class TransportManager implements TransportEventListener {
             // to us via TCP, send via TCP)
             TransportBid bid = t.bid(msg.getTarget(), msg.getMessageSize());
             if (bid != null) {
-                /* FIXME Accessing static field "TRANSIENT_FAIL" FIXME */
-                if (bid.getLatencyMs() == bid.TRANSIENT_FAIL)
+                if (bid.getLatencyMs() == TransportBid.TRANSIENT_FAIL)
                     // this keeps GetBids() from shitlisting for "no common transports"
                     msg.transportFailed(t.getStyle());
                 else if ( (rv == null) || (rv.getLatencyMs() > bid.getLatencyMs()) )

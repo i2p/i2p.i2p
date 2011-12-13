@@ -17,25 +17,24 @@ import net.i2p.data.RouterInfo;
  */
 public class TransportBid {
     private int _latencyMs;
-    private int _bandwidthBytes;
-    private int _msgSize;
-    private RouterInfo _router;
-    private long _bidExpiration;
+    //private int _bandwidthBytes;
+    //private int _msgSize;
+    //private RouterInfo _router;
+    //private long _bidExpiration;
     private Transport _transport;
     
     public static final int TRANSIENT_FAIL = 999999;
 
     public TransportBid() {
-        setLatencyMs(-1);
-        setBandwidthBytes(-1);
-        setMessageSize(-1);
-        setRouter(null);
-        setExpiration(0);
-        setTransport(null);
+        _latencyMs = -1;
+        //_bandwidthBytes = -1;
+        //_msgSize = -1;
     }
     
     /**
      * How long this transport thinks it would take to send the message
+     * This is the actual bid value, lower is better, and it doesn't really have
+     * anything to do with latency.
      */
     public int getLatencyMs() { return _latencyMs; }
     public void setLatencyMs(int milliseconds) { _latencyMs = milliseconds; }
@@ -45,28 +44,28 @@ public class TransportBid {
      * message successfully
      *
      */
-    public int getBandwidthBytes() { return _bandwidthBytes; }
-    public void setBandwidthBytes(int numBytes) { _bandwidthBytes = numBytes; }
+    //public int getBandwidthBytes() { return _bandwidthBytes; }
+    //public void setBandwidthBytes(int numBytes) { _bandwidthBytes = numBytes; }
     
     /** 
      * How large the message in question is, in bytes
      *
      */
-    public int getMessageSize() { return _msgSize; }
-    public void setMessageSize(int numBytes) { _msgSize = numBytes; }
+    //public int getMessageSize() { return _msgSize; }
+    //public void setMessageSize(int numBytes) { _msgSize = numBytes; }
     
     /**
      * Router to which the message is to be sent
      *
      */
-    public RouterInfo getRouter() { return _router; }
-    public void setRouter(RouterInfo router) { _router = router; }
+    //public RouterInfo getRouter() { return _router; }
+    //public void setRouter(RouterInfo router) { _router = router; }
     
     /**
      * Specifies how long this bid is "good for"
      */
-    public long getExpiration() { return _bidExpiration; }
-    public void setExpiration(long expirationDate) { _bidExpiration = expirationDate; }
+    //public long getExpiration() { return _bidExpiration; }
+    //public void setExpiration(long expirationDate) { _bidExpiration = expirationDate; }
     //public void setExpiration(long expirationDate) { setExpiration(new Date(expirationDate)); }
     
     /**
