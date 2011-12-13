@@ -27,7 +27,8 @@
 <b>Platform:</b> <%=System.getProperty("os.name")%> <%=System.getProperty("os.arch")%> <%=System.getProperty("os.version")%><br>
 <b>Processor:</b> <%=net.i2p.util.NativeBigInteger.cpuModel()%> (<%=net.i2p.util.NativeBigInteger.cpuType()%>)<br>
 <b>Jbigi:</b> <%=net.i2p.util.NativeBigInteger.loadStatus()%><br>
-<b>Encoding:</b> <%=System.getProperty("file.encoding")%></p>
+<b>Encoding:</b> <%=System.getProperty("file.encoding")%><br>
+<b>Charset:</b> <%=java.nio.charset.Charset.defaultCharset().name()%></p>
 <p><%=intl._("Note that system information, log timestamps, and log messages may provide clues to your location; please review everything you include in a bug report.")%></p>
 <h3><%=intl._("Critical Logs")%></h3><a name="criticallogs"> </a>
  <jsp:getProperty name="logsHelper" property="criticalLogs" />
