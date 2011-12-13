@@ -1,18 +1,19 @@
 /*
  * Created on Jul 14, 2004
  * Updated on Jan 8, 2011
- */
-package freenet.support.CPUInformation;
-
-/**
- * @author Iakin
- * An interface for classes that provide lowlevel information about CPU's
  *
  * free (adj.): unencumbered; not under the control of others
  * Written by Iakin in 2004 and released into the public domain 
  * with no warranty of any kind, either expressed or implied.  
  * It probably won't make your computer catch on fire, or eat 
  * your children, but it might. Use at your own risk.
+ */
+package freenet.support.CPUInformation;
+
+/**
+ * An interface for classes that provide lowlevel information about CPU's
+ *
+ * @author Iakin
  */
 
 public interface CPUInfo
