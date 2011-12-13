@@ -46,8 +46,9 @@ class GarlicMessageParser {
                 _log.warn("Error decrypting", dfe);
         }
         if (decrData == null) {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Decryption of garlic message failed", new Exception("Decrypt fail"));
+            // This is the usual error path and it's logged at WARN level in GarlicMessageReceiver
+            if (_log.shouldLog(Log.INFO))
+                _log.info("Decryption of garlic message failed", new Exception("Decrypt fail"));
             return null;
         } else {
             try {
@@ -78,12 +79,13 @@ class GarlicMessageParser {
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("After reading clove " + i);
         }
-        Certificate cert = new Certificate();
-        offset += cert.readBytes(data, offset);
+        //Certificate cert = new Certificate();
+        //offset += cert.readBytes(data, offset);
+        Certificate cert = Certificate.create(data, offset);
+        offset += cert.size();
         long msgId = DataHelper.fromLong(data, offset, 4);
         offset += 4;
         Date expiration = DataHelper.fromDate(data, offset);
-        offset += DataHelper.DATE_LENGTH;
 
         set.setCertificate(cert);
         set.setMessageId(msgId);

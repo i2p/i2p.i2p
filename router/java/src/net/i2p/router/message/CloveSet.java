@@ -19,7 +19,7 @@ import net.i2p.data.i2np.GarlicClove;
  *
  */
 class CloveSet {
-    private final List _cloves;
+    private final List<GarlicClove> _cloves;
     private Certificate _cert;
     private long _msgId;
     private long _expiration;
@@ -32,7 +32,7 @@ class CloveSet {
     
     public int getCloveCount() { return _cloves.size(); }
     public void addClove(GarlicClove clove) { _cloves.add(clove); }
-    public GarlicClove getClove(int index) { return (GarlicClove)_cloves.get(index); }
+    public GarlicClove getClove(int index) { return _cloves.get(index); }
     
     public Certificate getCertificate() { return _cert; }
     public void setCertificate(Certificate cert) { _cert = cert; }
@@ -46,7 +46,7 @@ class CloveSet {
 	StringBuilder buf = new StringBuilder(128);
 	buf.append("{");
 	for (int i = 0; i < _cloves.size(); i++) {
-	    GarlicClove clove = (GarlicClove)_cloves.get(i);
+	    GarlicClove clove = _cloves.get(i);
 	    if (clove.getData() != null)
 		buf.append(clove.getData().getClass().getName()).append(", ");
 	    else

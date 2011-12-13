@@ -27,7 +27,7 @@ class GarlicConfig {
     private Certificate _cert;
     private long _id;
     private long _expiration;
-    private final List _cloveConfigs;
+    private final List<GarlicConfig> _cloveConfigs;
     private DeliveryInstructions _instructions;
     private boolean _requestAck;
     private RouterInfo _replyThroughRouter; // router through which any replies will be sent before delivery to us
@@ -142,7 +142,7 @@ class GarlicConfig {
 	}
     }
     public int getCloveCount() { return _cloveConfigs.size(); }
-    public GarlicConfig getClove(int index) { return (GarlicConfig)_cloveConfigs.get(index); }
+    public GarlicConfig getClove(int index) { return _cloveConfigs.get(index); }
     public void clearCloves() { _cloveConfigs.clear(); }
     
     
