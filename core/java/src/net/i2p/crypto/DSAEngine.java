@@ -89,17 +89,17 @@ public class DSAEngine {
             try {
                 rv = altVerifySigSHA1(signature, signedData, verifyingKey);
                 if ((!rv) && _log.shouldLog(Log.WARN))
-                    _log.warn("Lib Verify Fail, sig =\n" + signature + "\npubkey =\n" + verifyingKey);
+                    _log.warn("Lib DSA Sig Verify Fail");
                 return rv;
             } catch (GeneralSecurityException gse) {
                 if (_log.shouldLog(Log.WARN))
-                    _log.warn("Lib Verify Fail, sig =\n" + signature + "\npubkey =\n" + verifyingKey, gse);
+                    _log.warn("Lib DSA Sig Verify Fail");
                 // now try TheCrypto
             }
         }
         rv = verifySignature(signature, signedData, 0, signedData.length, verifyingKey);
         if ((!rv) && _log.shouldLog(Log.WARN))
-            _log.warn("TheCrypto Verify Fail, sig =\n" + signature + "\npubkey =\n" + verifyingKey);
+            _log.warn("TheCrypto DSA Sig Verify Fail");
         return rv;
     }
 
