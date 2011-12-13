@@ -14,6 +14,9 @@ import net.i2p.data.DataHelper;
  *
  * This compresses to memory only. Retrieve the compressed data with getData().
  * There is no facility to compress to an output stream.
+ *
+ * Do NOT use this for compression of unlimited-size data, as it will
+ * expand, but never release, the BAOS memory buffer.
  */
 public class ReusableGZIPOutputStream extends ResettableGZIPOutputStream {
     // Apache Harmony 5.0M13 Deflater doesn't work after reset()
@@ -51,10 +54,10 @@ public class ReusableGZIPOutputStream extends ResettableGZIPOutputStream {
             _available.offer(out);
     }
     
-    private ByteArrayOutputStream _buffer = null;
+    private final ByteArrayOutputStream _buffer;
 
     private ReusableGZIPOutputStream() {
-        super(new ByteArrayOutputStream(40*1024));
+        super(new ByteArrayOutputStream(DataHelper.MAX_UNCOMPRESSED));
         _buffer = (ByteArrayOutputStream)out;
     }
 
