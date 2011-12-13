@@ -1457,7 +1457,7 @@ public class DataHelper {
         return rv;
     }
 
-    private static final int MAX_UNCOMPRESSED = 40*1024;
+    public static final int MAX_UNCOMPRESSED = 40*1024;
     public static final int MAX_COMPRESSION = Deflater.BEST_COMPRESSION;
     public static final int NO_COMPRESSION = Deflater.NO_COMPRESSION;
 
