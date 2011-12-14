@@ -1,3 +1,7 @@
+2011-12-13 kytv
+  * Don't require that full stats are enabled to be able to graph
+    router.highCapacityPeers. (closes #450)
+
 2011-12-12 kytv
   * German and Spanish translation updates from Transifex
 

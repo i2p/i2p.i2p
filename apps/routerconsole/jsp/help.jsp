@@ -49,16 +49,16 @@ This may range from 8-10 to several hundred, depending on your total bandwidth,
 shared bandwidth, and locally-generated traffic.
 The second number is the number of peers seen in the last hour or so.
 Do not be concerned if these numbers vary widely.
-First enable all stats to <a href="configstats.jsp#router.activePeers">[Enable graphing]</a>.</li>
+<a href="configstats.jsp#router.activePeers">[Enable graphing]</a>.</li>
 <li class="tidylist"><b>Fast:</b>
 This is the number of peers you use for building client tunnels. It is generally in the
 range 8-30. Your fast peers are shown on the <a href="profiles.jsp">profiles page</a>.
-<a href="configstats.jsp#router.fastPeers">[Enable graphing]</a>.</li>
+<a href="configstats.jsp#router.fastPeers">[Enable graphing]</a></li>
 <li class="tidylist"><b>High Capacity:</b>
 This is the number of peers you use for building some of your exploratory tunnels. It is generally in the
 range 8-75. The fast peers are included in the high capacity tier.
 Your high capacity peers are shown on the <a href="profiles.jsp">profiles page</a>.
-First enable all stats to <a href="configstats.jsp#router.highCapacityPeers">[Enable graphing]</a>.</li>
+<a href="configstats.jsp#router.highCapacityPeers">[Enable graphing]</a></li>
 <li class="tidylist"><b>Well Integrated:</b>
 This is the number of peers you use for network database inquiries.
 These are usually the "floodfill" peers.
