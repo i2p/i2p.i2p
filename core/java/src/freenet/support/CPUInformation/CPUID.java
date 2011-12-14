@@ -1,6 +1,12 @@
 /*
  * Created on Jul 14, 2004
  * Updated on Jan 8, 2011
+ *
+ * free (adj.): unencumbered; not under the control of others
+ * Written by Iakin in 2004 and released into the public domain
+ * with no warranty of any kind, either expressed or implied.
+ * It probably won't make your computer catch on fire, or eat
+ * your children, but it might. Use at your own risk.
  */
 package freenet.support.CPUInformation;
 
@@ -17,16 +23,11 @@ import net.i2p.util.FileUtil;
 
 
 /**
- * @author Iakin
  * A class for retrieveing details about the CPU using the CPUID assembly instruction.
  * A good resource for information about the CPUID instruction can be found here:
  * http://www.paradicesoftware.com/specs/cpuid/index.htm
  *
- * free (adj.): unencumbered; not under the control of others
- * Written by Iakin in 2004 and released into the public domain
- * with no warranty of any kind, either expressed or implied.
- * It probably won't make your computer catch on fire, or eat
- * your children, but it might. Use at your own risk.
+ * @author Iakin
 */
 
 public class CPUID {
