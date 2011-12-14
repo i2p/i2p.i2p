@@ -1,3 +1,20 @@
+2011-12-14 zzz
+  * BuildHandler: Increase next hop timeout again
+  * DataHelper:
+    - Speed up heavily used long/byte[] converters
+    - Add little endian versions of the converters
+    - Cache common properties keys
+  * GarlicMessageParser: Use cached cert
+  * GeoIP: Buffer input to speed lookup by 10x
+  * I2NP: Disable pass-through checksum debugging
+  * MessageHistory:
+    - Flush at shutdown
+    - Fix file location, only delete if enabled
+    - Cleanups, concurrent
+  * ResettableGZIPInputStream: Better footer log errors
+  * RouterAddress: Cache transport names
+  * TransportBid: Remove unused stuff
+
 2011-12-13 kytv
   * Don't require that full stats are enabled to be able to graph
     router.highCapacityPeers. (closes #450)
@@ -14,7 +31,7 @@
     - Use cached null cert in GarlicClove
     - Add method to limit size of buffer to read
     - Don't check checksum at input, in most cases
-    - Reuse checksum at output, for unomodified pass-through messages
+    - Reuse checksum at output, for unmodified pass-through messages
       (but recalculating it now and logging on a mismatch for testing)
     - Fix DatabaseLookupMessage to internally store the don't include peers as
       a List, not a Set, so it doesn't get reordered and break the checksum
