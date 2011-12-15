@@ -58,7 +58,10 @@ public class PortMapper {
      *  @return -1 if not registered
      */
     public int getPort(String service) {
-        return getPort(service, -1);
+        int port = getPort(service, -1);
+        if(-1==port)
+            throw new RuntimeException("No port registered for service "+service);
+        return port;
     }
 
     /**
