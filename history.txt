@@ -1,3 +1,6 @@
+2011-12-15 kytv
+  * Swedish translation updates from Transifex
+
 2011-12-14 zzz
   * BuildHandler: Increase next hop timeout again
   * DataHelper:
