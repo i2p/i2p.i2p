@@ -18,6 +18,7 @@ import net.i2p.desktopgui.Main;
 import net.i2p.router.RouterContext;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
+import net.i2p.util.PortMapper;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SecureFileOutputStream;
 import net.i2p.util.ShellCommand;
@@ -207,6 +208,7 @@ public class RouterConsoleRunner {
 
             // add standard listeners
             if (_listenPort != null) {
+                Integer lport = Integer.parseInt(_listenPort);
                 StringTokenizer tok = new StringTokenizer(_listenHost, " ,");
                 while (tok.hasMoreTokens()) {
                     String host = tok.nextToken().trim();
@@ -215,7 +217,6 @@ public class RouterConsoleRunner {
                         //    _server.addListener('[' + host + "]:" + _listenPort);
                         //else
                         //    _server.addListener(host + ':' + _listenPort);
-                        Integer lport = Integer.parseInt(_listenPort);
                         InetAddrPort iap = new InetAddrPort(host, lport);
                         SocketListener lsnr = new SocketListener(iap);
                         lsnr.setMinThreads(1);           // default 2
@@ -230,6 +231,8 @@ public class RouterConsoleRunner {
                         System.err.println("Unable to bind routerconsole to " + host + " port " + _listenPort + ' ' + ioe);
                     }
                 }
+                // XXX: what if listenhosts do not include 127.0.0.1? (Should that ever even happen?)
+                I2PAppContext.getGlobalContext().portMapper().register(PortMapper.SVC_CONSOLE,lport);
             }
 
             // add SSL listeners
@@ -267,6 +270,7 @@ public class RouterConsoleRunner {
                             System.err.println("Unable to bind routerconsole to " + host + " port " + sslPort + " for SSL: " + e);
                         }
                     }
+                    I2PAppContext.getGlobalContext().portMapper().register(PortMapper.SVC_HTTPS_CONSOLE,sslPort);
                 } else {
                     System.err.println("Unable to create or access keystore for SSL: " + keyStore.getAbsolutePath());
                 }

@@ -12,6 +12,7 @@ import net.i2p.I2PAppContext;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 import net.i2p.util.SecureDirectory;
+import net.i2p.util.PortMapper;
 
 import org.mortbay.http.HttpContext;
 import org.mortbay.http.HttpListener;
@@ -141,7 +142,7 @@ public class WebAppStarter {
             Server s = (Server) c.toArray()[i];
             HttpListener[] hl = s.getListeners();
             for (int j = 0; j < hl.length; j++) {
-                if (hl[j].getPort() == 7657)
+                if (hl[j].getPort() == I2PAppContext.getGlobalContext().portMapper().getPort(PortMapper.SVC_CONSOLE))
                     return s;
             }
         }
