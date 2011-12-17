@@ -235,7 +235,7 @@ public class SimpleTimer2 {
             if (_log.shouldLog(Log.WARN) && delay > 100)
                 _log.warn(_pool + " wtf, early execution " + delay + ": " + this);
             else if (_log.shouldLog(Log.WARN) && delay < -1000)
-                _log.warn(" wtf, late execution " + delay + ": " + this + _pool.debug());
+                _log.warn(" wtf, late execution " + (0 - delay) + ": " + this + _pool.debug());
             try {
                 timeReached();
             } catch (Throwable t) {

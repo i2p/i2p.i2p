@@ -112,7 +112,7 @@ public class GarlicMessageReceiver {
                 _log.warn("Clove is NOT valid: id=" + clove.getCloveId() 
                            + " expiration " + howLongAgo + " ago: " + invalidReason + ": " + clove);
             _context.messageHistory().messageProcessingError(clove.getCloveId(), 
-                                                             clove.getData().getClass().getName(), 
+                                                             clove.getData().getClass().getSimpleName(), 
                                                              "Clove is not valid (expiration " + howLongAgo + " ago)");
         }
         return (invalidReason == null);

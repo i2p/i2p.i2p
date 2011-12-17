@@ -146,14 +146,15 @@ public class InNetMessagePool implements Service {
             //if (messageBody instanceof TunnelCreateMessage)
             //    level = Log.INFO;
             if (_log.shouldLog(level))
-                _log.log(level, "Duplicate message received [" + messageBody.getUniqueId() 
-                          + " expiring on " + exp + "]: " + messageBody.getClass().getName() + ": " + invalidReason 
+                _log.log(level, "Dropping message [" + messageBody.getUniqueId() 
+                          + " expiring on " + exp + "]: " + messageBody.getClass().getSimpleName() + ": " + invalidReason 
                           + ": " + messageBody);
             _context.statManager().addRateData("inNetPool.dropped", 1, 0);
+            // FIXME not necessarily a duplicate, could be expired too long ago / too far in future
             _context.statManager().addRateData("inNetPool.duplicate", 1, 0);
             _context.messageHistory().droppedOtherMessage(messageBody, (fromRouter != null ? fromRouter.calculateHash() : fromRouterHash));
             _context.messageHistory().messageProcessingError(messageBody.getUniqueId(), 
-                                                                messageBody.getClass().getName(), 
+                                                                messageBody.getClass().getSimpleName(), 
                                                                 "Duplicate/expired");
             return -1;
         } else {

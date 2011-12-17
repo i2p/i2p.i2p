@@ -63,7 +63,7 @@ class InboundEndpointProcessor {
         boolean ok = _validator.receiveIV(iv, 0, orig, offset + HopProcessor.IV_LENGTH);
         if (!ok) {
             if (_log.shouldLog(Log.WARN)) 
-                _log.warn("Invalid IV received");
+                _log.warn("Invalid IV, dropping at IBEP " + _config);
             _cache.release(ba);
             return false;
         }
