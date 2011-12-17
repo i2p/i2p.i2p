@@ -1759,6 +1759,7 @@ public class I2PSnarkServlet extends Default {
             // We don't have the hash of the torrent file
             //buf.append("<br>").append(_("Maggot link")).append(": <a href=\"").append(MAGGOT).append(hex).append(':').append(hex).append("\">")
             //   .append(MAGGOT).append(hex).append(':').append(hex).append("</a>");
+            buf.append("<br>").append(_("Torrent file")).append(": ").append(snark.getName());
             buf.append("</div></th></tr>");
         }
         if (ls == null) {

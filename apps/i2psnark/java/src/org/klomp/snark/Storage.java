@@ -23,11 +23,15 @@ package org.klomp.snark;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.crypto.SHA1;
 import net.i2p.util.SecureFile;
@@ -66,6 +70,8 @@ public class Storage
   /** The maximum number of pieces in a torrent. */
   public static final int MAX_PIECES = 10*1024;
   public static final long MAX_TOTAL_SIZE = MAX_PIECE_SIZE * (long) MAX_PIECES;
+
+  private static final Map<String, String> _filterNameCache = new ConcurrentHashMap();
 
   /**
    * Creates a new storage based on the supplied MetaInfo.  This will
@@ -568,20 +574,48 @@ public class Storage
   /**
    * Removes 'suspicious' characters from the given file name.
    * http://msdn.microsoft.com/en-us/library/aa365247%28VS.85%29.aspx
+   * Then replace chars not supported in the charset.
+   *
+   * This is called frequently and it can be pretty slow so cache the result.
+   *
+   * TODO: If multiple files in the same torrent map to the same filter name,
+   * the whole torrent will blow up. Check at torrent creation?
    */
   public static String filterName(String name)
   {
-    if (name.equals(".") || name.equals(" "))
-        return "_";
-    String rv = name;
-    if (rv.startsWith("."))
-        rv = '_' + rv.substring(1);
-    if (rv.endsWith(".") || rv.endsWith(" "))
-        rv = rv.substring(0, rv.length() - 1) + '_';
-    for (int i = 0; i < ILLEGAL.length; i++) {
-        if (rv.indexOf(ILLEGAL[i]) >= 0)
-            rv = rv.replace(ILLEGAL[i], '_');
-    }
+    String rv = _filterNameCache.get(name);
+    if (rv != null)
+        return rv;
+    if (name.equals(".") || name.equals(" ")) {
+        rv = "_";
+    } else {
+        rv = name;
+        if (rv.startsWith("."))
+            rv = '_' + rv.substring(1);
+        if (rv.endsWith(".") || rv.endsWith(" "))
+            rv = rv.substring(0, rv.length() - 1) + '_';
+        for (int i = 0; i < ILLEGAL.length; i++) {
+            if (rv.indexOf(ILLEGAL[i]) >= 0)
+                rv = rv.replace(ILLEGAL[i], '_');
+        }
+        // Replace characters not supported in the charset
+        if (!Charset.defaultCharset().name().equals("UTF-8")) {
+            try {
+                CharsetEncoder enc = Charset.defaultCharset().newEncoder();
+                if (!enc.canEncode(rv)) {
+                    String repl = rv;
+                    for (int i = 0; i < rv.length(); i++) {
+                        char c = rv.charAt(i);
+                        if (!enc.canEncode(c))
+                            repl = repl.replace(c, '_');
+                    }
+                    rv = repl;
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+    }   }
+    _filterNameCache.put(name, rv);
     return rv;
   }
 
