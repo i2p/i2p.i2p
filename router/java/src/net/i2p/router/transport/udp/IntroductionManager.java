@@ -126,7 +126,7 @@ class IntroductionManager {
                     _log.info("Picked peer has no SSU address: " + ri);
                 continue;
             }
-            if (_context.profileOrganizer().isFailing(cur.getRemotePeer()) ||
+            if ( /* _context.profileOrganizer().isFailing(cur.getRemotePeer()) || */
                 _context.shitlist().isShitlisted(cur.getRemotePeer()) ||
                 _transport.wasUnreachable(cur.getRemotePeer())) {
                 if (_log.shouldLog(Log.INFO))

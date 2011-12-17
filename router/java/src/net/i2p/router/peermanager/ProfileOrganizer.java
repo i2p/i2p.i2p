@@ -52,7 +52,7 @@ public class ProfileOrganizer {
     private final Map<Hash, PeerProfile> _notFailingPeers;
     /** H(routerIdnetity), containing elements in _notFailingPeers */
     private final List<Hash> _notFailingPeersList;
-    /** H(routerIdentity) to PeerProfile for all peers that ARE failing horribly (but that we haven't dropped reference to yet) */
+    /** TO BE REMOVED H(routerIdentity) to PeerProfile for all peers that ARE failing horribly (but that we haven't dropped reference to yet) */
     private final Map<Hash, PeerProfile> _failingPeers;
     /** who are we? */
     private Hash _us;
@@ -120,6 +120,15 @@ public class ProfileOrganizer {
         _reorganizeLock.readLock().lock();
     }
 
+    /**
+     *  Get the lock if we can. Non-blocking.
+     *  @return true if the lock was acquired
+     *  @since 0.8.12
+     */
+    private boolean tryReadLock() {
+        return _reorganizeLock.readLock().tryLock();
+    }
+
     private void releaseReadLock() {
         _reorganizeLock.readLock().unlock();
     }
@@ -147,14 +156,28 @@ public class ProfileOrganizer {
     public double getIntegrationThreshold() { return _thresholdIntegrationValue; }
     
     /**
-     * Retrieve the profile for the given peer, if one exists (else null)
-     *
+     * Retrieve the profile for the given peer, if one exists (else null).
+     * Blocking if a reorganize is happening.
      */
     public PeerProfile getProfile(Hash peer) {
         getReadLock();
         try {
             return locked_getProfile(peer);
         } finally { releaseReadLock(); }
+    }
+    
+    /**
+     * Retrieve the profile for the given peer, if one exists (else null).
+     * Non-blocking. Returns null if a reorganize is happening.
+     * @since 0.8.12
+     */
+    public PeerProfile getProfileNonblocking(Hash peer) {
+        if (tryReadLock()) {
+            try {
+                return locked_getProfile(peer);
+            } finally { releaseReadLock(); }
+        }
+        return null;
     }
     
     /**
@@ -243,7 +266,15 @@ public class ProfileOrganizer {
     public boolean isFast(Hash peer) { return isX(_fastPeers, peer); }
     public boolean isHighCapacity(Hash peer) { return isX(_highCapacityPeers, peer); }
     public boolean isWellIntegrated(Hash peer) { return isX(_wellIntegratedPeers, peer); }
-    public boolean isFailing(Hash peer) { return isX(_failingPeers, peer); }
+
+    /**
+     *  Deprecated for now, always false
+     */
+    public boolean isFailing(Hash peer) {
+        // Always false so skip the lock
+        //return isX(_failingPeers, peer);
+        return false;
+    }
         
     /** @since 0.8.8 */
     void clearProfiles() {
