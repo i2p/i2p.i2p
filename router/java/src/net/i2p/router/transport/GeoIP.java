@@ -98,9 +98,17 @@ class GeoIP {
             _pendingSearch.clear();
             return;
         }
-        LookupJob j = new LookupJob();
-        j.run();
-        updateOurCountry();
+        int pri = Thread.currentThread().getPriority();
+        if (pri > Thread.MIN_PRIORITY)
+            Thread.currentThread().setPriority(pri - 1);
+        try {
+            LookupJob j = new LookupJob();
+            j.run();
+            updateOurCountry();
+        } finally {
+            if (pri > Thread.MIN_PRIORITY)
+                Thread.currentThread().setPriority(pri);
+        }
     }
 
     private class LookupJob implements Runnable {
