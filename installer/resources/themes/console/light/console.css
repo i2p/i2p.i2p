@@ -581,7 +581,6 @@ th {
 
 tr {
      vertical-align: middle !important;
-     text-align: center;
 }
 
 tr:nth-child(even) {
