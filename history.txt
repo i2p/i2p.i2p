@@ -1,3 +1,11 @@
+2011-12-17 zzz
+  * i2psnark:
+    - Replace file name characters not supported in default charset
+    - Add torrent file name to local details page
+  * GeoIP: Reduce thread priority during lookup
+  * ProfileManager: Make some methods non-blocking to reduce
+                    lock contention in transports
+
 2011-12-15 kytv
   * Swedish translation updates from Transifex
 

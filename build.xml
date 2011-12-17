@@ -888,7 +888,7 @@
             <arg value="history.txt" />
         </exec>
         <exec executable="echo" osfamily="unix" failifexecutionfails="true" output="pkg-temp/history.txt" append="true">
-            <arg value="EARLIER HISTORY IS AVAILABLE IN THE SOURCE PACKAGE" />
+            <arg value="&#10;&#10;----------------&#10;&#10;EARLIER HISTORY IS AVAILABLE IN THE SOURCE PACKAGE" />
         </exec>
         <copy file="installer/resources/deletelist.txt" todir="pkg-temp/" />
       <!-- May be pointless now, people with split directories will never see this,

@@ -12,7 +12,7 @@ import net.i2p.util.Log;
  * want.  The hop processor works the same on all peers -
  * inbound and outbound participants, outbound endpoints,
  * and inbound gateways (with a small modification per 
- * InbuondGatewayProcessor).  
+ * InboundGatewayProcessor).  
  *
  */
 class HopProcessor {
@@ -77,7 +77,7 @@ class HopProcessor {
         boolean okIV = _validator.receiveIV(orig, offset, orig, offset + IV_LENGTH);
         if (!okIV) {
             if (_log.shouldLog(Log.WARN)) 
-                _log.warn("Invalid IV received on tunnel " + _config.getReceiveTunnel());
+                _log.warn("Invalid IV, dropping at hop " + _config);
             return false;
         }
         
@@ -110,5 +110,13 @@ class HopProcessor {
     
     private final void updateIV(byte orig[], int offset) {
         _context.aes().encryptBlock(orig, offset, _config.getIVKey(), orig, offset);
+    }
+
+    /**
+     *  @since 0.8.12
+     */
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + " for " + _config;
     }
 }

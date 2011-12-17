@@ -80,8 +80,8 @@ public class TunnelPool {
         synchronized (_inProgress) {
             _inProgress.clear();
         }
-        if (_log.shouldLog(Log.WARN))
-            _log.warn(toString() + ": Startup() called, was already alive? " + _alive, new Exception());
+        if (_log.shouldLog(Log.INFO))
+            _log.info(toString() + ": Startup() called, was already alive? " + _alive, new Exception());
         _alive = true;
         _started = System.currentTimeMillis();
         _lastRateUpdate = _started;

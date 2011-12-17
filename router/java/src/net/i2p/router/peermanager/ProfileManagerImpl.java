@@ -21,6 +21,10 @@ import net.i2p.router.ProfileManager;
 import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
+/**
+ *  Methods to update profiles.
+ *  Unless otherwise noted, methods are blocking on the reorganize lock.
+ */
 public class ProfileManagerImpl implements ProfileManager {
     private final Log _log;
     private final RouterContext _context;
@@ -33,31 +37,31 @@ public class ProfileManagerImpl implements ProfileManager {
     /**
      * Note that it took msToSend to send a message of size bytesSent to the peer over the transport.
      * This should only be called if the transport considered the send successful.
-     *
+     * Non-blocking. Will not update the profile if we can't get the lock.
      */
     public void messageSent(Hash peer, String transport, long msToSend, long bytesSent) {
-        PeerProfile data = getProfile(peer);
+        PeerProfile data = getProfileNonblocking(peer);
         if (data == null) return;
         data.setLastSendSuccessful(_context.clock().now());
         //data.getSendSuccessSize().addData(bytesSent, msToSend);
     }
     
     /**
-     * Note that the router failed to send a message to the peer over the transport specified
-     *
+     * Note that the router failed to send a message to the peer over the transport specified.
+     * Non-blocking. Will not update the profile if we can't get the lock.
      */
     public void messageFailed(Hash peer, String transport) {
-        PeerProfile data = getProfile(peer);
+        PeerProfile data = getProfileNonblocking(peer);
         if (data == null) return;
         data.setLastSendFailed(_context.clock().now());
     }
     
     /**
-     * Note that the router failed to send a message to the peer over any transport
-     *
+     * Note that the router failed to send a message to the peer over any transport.
+     * Non-blocking. Will not update the profile if we can't get the lock.
      */
     public void messageFailed(Hash peer) {
-        PeerProfile data = getProfile(peer);
+        PeerProfile data = getProfileNonblocking(peer);
         if (data == null) return;
         data.setLastSendFailed(_context.clock().now());
     }
@@ -70,7 +74,7 @@ public class ProfileManagerImpl implements ProfileManager {
         if (_log.shouldLog(Log.INFO))
             _log.info("Comm error occurred for peer " + peer.toBase64(), new Exception("Comm error"));
         PeerProfile data = getProfile(peer);
-        if (data == null) return;
+        //if (data == null) return;
         data.setLastSendFailed(_context.clock().now());
     }
     
@@ -80,7 +84,7 @@ public class ProfileManagerImpl implements ProfileManager {
      */
     public void tunnelJoined(Hash peer, long responseTimeMs) {
         PeerProfile data = getProfile(peer);
-        if (data == null) return;
+        //if (data == null) return;
         data.getTunnelCreateResponseTime().addData(responseTimeMs, responseTimeMs);
         data.setLastHeardFrom(_context.clock().now());
         data.getTunnelHistory().incrementAgreedTo();
@@ -95,7 +99,7 @@ public class ProfileManagerImpl implements ProfileManager {
      */
     public void tunnelRejected(Hash peer, long responseTimeMs, int severity) {
         PeerProfile data = getProfile(peer);
-        if (data == null) return;
+        //if (data == null) return;
         data.setLastHeardFrom(_context.clock().now());
         data.getTunnelHistory().incrementRejected(severity);
     }
@@ -108,7 +112,7 @@ public class ProfileManagerImpl implements ProfileManager {
      */
     public void tunnelTimedOut(Hash peer) {
         PeerProfile data = getProfile(peer);
-        if (data == null) return;
+        //if (data == null) return;
         data.getTunnelHistory().incrementRejected(TunnelHistory.TUNNEL_REJECT_BANDWIDTH);
     }
     
@@ -119,7 +123,7 @@ public class ProfileManagerImpl implements ProfileManager {
      */
     public void tunnelTestSucceeded(Hash peer, long responseTimeMs) {
         PeerProfile data = getProfile(peer);
-        if (data == null) return;
+        //if (data == null) return;
         data.updateTunnelTestTimeAverage(responseTimeMs);
         data.getTunnelTestResponseTime().addData(responseTimeMs, responseTimeMs);
     }
@@ -128,14 +132,15 @@ public class ProfileManagerImpl implements ProfileManager {
         if (_context.routerHash().equals(peer))
             return;
         PeerProfile data = getProfile(peer);
-        if (data != null)
+        //if (data != null)
             data.dataPushed(size); // ignore rtt, as we are averaging over a minute
     }
+
     public void tunnelDataPushed1m(Hash peer, int size) {
         if (_context.routerHash().equals(peer))
             return;
         PeerProfile data = getProfile(peer);
-        if (data != null)
+        //if (data != null)
             data.dataPushed1m(size);
     }
 
@@ -144,7 +149,7 @@ public class ProfileManagerImpl implements ProfileManager {
         if (_context.routerHash().equals(peer))
             return;
         PeerProfile data = getProfile(peer);
-        if (data != null)
+        //if (data != null)
             data.tunnelDataTransferred(size);
     }
     
@@ -162,7 +167,7 @@ public class ProfileManagerImpl implements ProfileManager {
      */
     public void tunnelFailed(Hash peer, int pct) {
         PeerProfile data = getProfile(peer);
-        if (data == null) return;
+        //if (data == null) return;
         data.setLastHeardFrom(_context.clock().now());
         data.getTunnelHistory().incrementFailed(pct);
     }
@@ -174,7 +179,7 @@ public class ProfileManagerImpl implements ProfileManager {
      */
     public void dbLookupSuccessful(Hash peer, long responseTimeMs) {
         PeerProfile data = getProfile(peer);
-        if (data == null) return;
+        //if (data == null) return;
         data.setLastHeardFrom(_context.clock().now());
         if (!data.getIsExpandedDB())
             data.expandDBProfile();
@@ -191,7 +196,7 @@ public class ProfileManagerImpl implements ProfileManager {
      */
     public void dbLookupFailed(Hash peer) {
         PeerProfile data = getProfile(peer);
-        if (data == null) return;
+        //if (data == null) return;
         if (!data.getIsExpandedDB())
             data.expandDBProfile();
         DBHistory hist = data.getDBHistory();
@@ -208,7 +213,7 @@ public class ProfileManagerImpl implements ProfileManager {
      */
     public void dbLookupReply(Hash peer, int newPeers, int oldPeers, int invalid, int duplicate, long responseTimeMs) {
         PeerProfile data = getProfile(peer);
-        if (data == null) return;
+        //if (data == null) return;
         data.setLastHeardFrom(_context.clock().now());
         if (!data.getIsExpandedDB())
             return;
@@ -224,7 +229,7 @@ public class ProfileManagerImpl implements ProfileManager {
      */
     public void dbLookupReceived(Hash peer) {
         PeerProfile data = getProfile(peer);
-        if (data == null) return;
+        //if (data == null) return;
         data.setLastHeardFrom(_context.clock().now());
         if (!data.getIsExpandedDB())
             return;
@@ -238,7 +243,7 @@ public class ProfileManagerImpl implements ProfileManager {
      */
     public void dbStoreReceived(Hash peer, boolean wasNewKey) {
         PeerProfile data = getProfile(peer);
-        if (data == null) return;
+        //if (data == null) return;
         data.setLastHeardFrom(_context.clock().now());
         if (!data.getIsExpandedDB())
             return;
@@ -257,7 +262,7 @@ public class ProfileManagerImpl implements ProfileManager {
      */
     public void dbStoreSent(Hash peer, long responseTimeMs) {
         PeerProfile data = getProfile(peer);
-        if (data == null) return;
+        //if (data == null) return;
         long now = _context.clock().now();
         data.setLastHeardFrom(now);
         data.setLastSendSuccessful(now);
@@ -275,7 +280,7 @@ public class ProfileManagerImpl implements ProfileManager {
      */
     public void dbStoreSuccessful(Hash peer) {
         PeerProfile data = getProfile(peer);
-        if (data == null) return;
+        //if (data == null) return;
         long now = _context.clock().now();
         data.setLastHeardFrom(now);
         data.setLastSendSuccessful(now);
@@ -293,7 +298,7 @@ public class ProfileManagerImpl implements ProfileManager {
      */
     public void dbStoreFailed(Hash peer) {
         PeerProfile data = getProfile(peer);
-        if (data == null) return;
+        //if (data == null) return;
         if (!data.getIsExpandedDB())
             data.expandDBProfile();
         DBHistory hist = data.getDBHistory();
@@ -308,7 +313,7 @@ public class ProfileManagerImpl implements ProfileManager {
      */
     public void heardAbout(Hash peer) {
         PeerProfile data = getProfile(peer);
-        if (data == null) return;
+        //if (data == null) return;
         data.setLastHeardAbout(_context.clock().now());
     }
 
@@ -318,7 +323,7 @@ public class ProfileManagerImpl implements ProfileManager {
      */
     public void heardAbout(Hash peer, long when) {
         PeerProfile data = getProfile(peer);
-        if (data == null) return;
+        //if (data == null) return;
         if (when > data.getLastHeardAbout())
             data.setLastHeardAbout(when);
     }
@@ -327,16 +332,21 @@ public class ProfileManagerImpl implements ProfileManager {
      * Note that the router received a message from the given peer on the specified
      * transport.  Messages received without any "from" information aren't recorded
      * through this metric.  If msToReceive is negative, there was no timing information
-     * available
-     *
+     * available.
+     * Non-blocking. Will not update the profile if we can't get the lock.
      */
     public void messageReceived(Hash peer, String style, long msToReceive, int bytesRead) {
-        PeerProfile data = getProfile(peer);
+        PeerProfile data = getProfileNonblocking(peer);
         if (data == null) return;
         data.setLastHeardFrom(_context.clock().now());
         //data.getReceiveSize().addData(bytesRead, msToReceive);
     }
     
+    /**
+     *   Blocking.
+     *   Creates a new profile if it didn't exist.
+     *   @return non-null
+     */
     private PeerProfile getProfile(Hash peer) {
         PeerProfile prof = _context.profileOrganizer().getProfile(peer);
         if (prof == null) {
@@ -347,14 +357,28 @@ public class ProfileManagerImpl implements ProfileManager {
         return prof;
     }
     
+    /**
+     *  Non-blocking.
+     *  @return null if the profile doesn't exist, or the fetch would have blocked
+     *  @since 0.8.12
+     */
+    private PeerProfile getProfileNonblocking(Hash peer) {
+        return _context.profileOrganizer().getProfileNonblocking(peer);
+    }
     
-    /** provide a simple summary of a number of peers, suitable for publication in the netDb */
+    /**
+     *  provide a simple summary of a number of peers, suitable for publication in the netDb
+     *  @deprecated unused
+     */
     public Properties summarizePeers(int numPeers) {
+/****
         Set peers = new HashSet(numPeers);
         // lets get the fastest ones we've got (this fails over to include just plain reliable,
         // or even notFailing peers if there aren't enough fast ones)
         _context.profileOrganizer().selectFastPeers(numPeers, null, peers);
+****/
         Properties props = new Properties();
+/****
         for (Iterator iter  = peers.iterator(); iter.hasNext(); ) {
             Hash peer = (Hash)iter.next();
             PeerProfile prof = getProfile(peer);
@@ -384,11 +408,14 @@ public class ProfileManagerImpl implements ProfileManager {
             
             props.setProperty("profile." + peer.toBase64().replace('=', '_'), buf.toString());
         }
+****/
         return props;
     }
     
+/****
     private final static DecimalFormat _fmt = new DecimalFormat("##0.00", new DecimalFormatSymbols(Locale.UK));
     private final static String num(double val) {
         synchronized (_fmt) { return _fmt.format(val); }
     }
+****/
 }
