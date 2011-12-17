@@ -7,7 +7,6 @@ body {
      padding: 0px;
      text-align: center;
      font-family: "Lucida Sans Unicode", Verdana, Helvetica, sans-serif;
-     background: #eef url('images/snowcamo.png');
      color: #001;
      font-size: 10pt;
 /* we've avoided Tantek Hacks so far,
@@ -17,13 +16,13 @@ body {
     ** drop soon).
  */
      -moz-box-sizing: border-box;
-     box-sizing: border-box;
-    background: #99f url(images/magic.png);
+     -webkit-box-sizing: border-box;
+    background: #99f url(images/snowcamo.png);
 }
 
 div {
      -moz-box-sizing: border-box;
-     box-sizing: border-box;
+     -webkit-box-sizing: border-box;
 }
 
 label {
@@ -37,7 +36,7 @@ label {
      font-size: 8pt;
      font-style: italic;
      -moz-box-sizing: border-box;
-     box-sizing: border-box;
+     -webkit-box-sizing: border-box;
      line-height: 120%;
      color: #101;
 }
@@ -70,7 +69,7 @@ form {
 
 textarea, input, select, button, a {
      -moz-box-sizing: border-box;
-     box-sizing: border-box;
+     -webkit-box-sizing: border-box;
      font-size: 8.5pt;
      float: left;
      vertical-align: middle;
@@ -229,7 +228,7 @@ hr {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      margin-top: 8px;
-     background: #ffe url(images/header.png) center center repeat:x !important;
+     background: #ffe url(images/header.png) center center repeat-x !important;
      text-decoration: none;
 }
 
@@ -240,7 +239,6 @@ hr {
      text-align: left !important;
      font-size: 7pt;
      background-color: #fff;
-     background: url(images/magic.png);
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      border-radius: 4px;
@@ -328,7 +326,7 @@ globalOperationsPanel .control:link {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      margin-top: 8px;
-     background: #ffe url(images/header.png) 0 0 repeat: x !important;
+     background: #ffe url(images/header.png) 0 0 repeat-x !important;
 }
 
 
@@ -347,7 +345,7 @@ globalOperationsPanel .control:visited {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      margin-top: 8px;
-     background: url(images/header.png) 0 0 repeat: x !important;
+     background: url(images/header.png) 0 0 repeat-x !important;
 }
 
 globalOperationsPanel .control:hover {
@@ -365,7 +363,7 @@ globalOperationsPanel .control:hover {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      margin-top: 8px;
-     background: url(images/header_on.png) 0 0 repeat: x !important;
+     background: url(images/header_on.png) 0 0 repeat-x !important;
 }
 .header {
      -moz-border-radius: 4px;

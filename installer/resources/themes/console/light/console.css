@@ -31,7 +31,7 @@ div.logo {
      float: left;
      padding: 10px;
      text-align: center;
-     font-color: #fff;
+     color: #fff;
      margin: 0 10px;
      border: 1px solid #447;
      -moz-border-radius: 4px;
@@ -143,9 +143,7 @@ div.routersummary h3 {
      -khtml-border-radius: 3px;
      border-radius: 3px;
      -moz-box-shadow: 0px 1px 5px #bbf;
-     -moz-box-shadow: outset 0px 0px 2px 1px #bbf;
      -khtml-box-shadow: outset 0px 0px 2px 1px #bbf;
-     box-shadow: outset 0px 0px 2px 1px #bbf;
 }
 
 div.routersummary h3 a {
@@ -184,7 +182,6 @@ div.routersummary table {
      width: 190px !important;
      overflow: hidden;
      font-size: 8pt;
-     padding: 0px -10px;
      background-image: none !important;
      background-color: transparent !important;
 }
@@ -556,7 +553,6 @@ table {
      width: 100%;
      border: 1px solid #447;
      margin: 1px -15px 5px 0px;
-     cell-padding: 1px;
      font-size: 7pt;
      background: #b4c8ff url('images/tabletitlelight.png') repeat-x;
      font: 7pt/130% "Lucida Sans Unicode", Verdana, "Bitstream Vera Sans", Tahoma, Helvetica, sans-serif;
@@ -585,7 +581,7 @@ th {
 
 tr {
      vertical-align: middle !important;
-     align: center;
+     text-align: center;
 }
 
 tr:nth-child(even) {
@@ -696,18 +692,12 @@ a:active {
 
 .links li {
      list-style: url(images/link.png) !important;
-     padding-bottom: -2px;
      text-align: justify;
      line-height: 120% !important;
-     padding-right: -100px !important;
 }
 
 .links li:first-child {
      padding-top: 0 !important;
-}
-
-.links li:last-child {
-     padding-bottom: -15px !important;
 }
 
 .links ul {
@@ -937,7 +927,7 @@ input, input:visited {
      -moz-border-radius: 4px;
      -khtml-border-radius: 4px;
      -moz-box-shadow: inset 0px 2px 8px 0px #fff;
-     color: #813
+     color: #813;
      opacity: 1;
 }
 
@@ -1082,7 +1072,7 @@ textarea:active {
 .proxyfooter {
      margin: 0 20px 10px 240px;
      padding: 20px 25px 20px 75px;
-     font-color: #f00;
+     color: #f00;
      font-size: 7pt;
      text-align: right !important;
      border-radius: 4px;
@@ -1095,7 +1085,7 @@ textarea:active {
 .statusnotes {
      font-style: normal;
      font-size: 8pt;
-     font-color: #225 !important;
+     color: #225 !important;
      text-align: center;
      border: 1px solid #447 !important;
      border-top: 0 !important;
