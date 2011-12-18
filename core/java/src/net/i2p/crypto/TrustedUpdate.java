@@ -192,6 +192,7 @@ riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
             addKey(DEFAULT_TRUSTED_KEY2, "zzz@mail.i2p");
             //addKey(DEFAULT_TRUSTED_KEY3, "complication@mail.i2p");
             addKey(DEFAULT_TRUSTED_KEY4, "HungryHobo@mail.i2p");
+            addKey(DEFAULT_TRUSTED_KEY5, "killyourtv@mail.i2p");
         }
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("TrustedUpdate created, trusting " + _trustedKeys.size() + " keys.");
