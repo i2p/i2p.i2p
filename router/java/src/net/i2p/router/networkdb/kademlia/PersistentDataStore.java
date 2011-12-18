@@ -8,11 +8,15 @@ package net.i2p.router.networkdb.kademlia;
  *
  */
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
@@ -63,6 +67,7 @@ class PersistentDataStore extends TransientDataStore {
         ctx.statManager().createRateStat("netDb.writePending", "How many pending writes are there", "NetworkDatabase", new long[] { 60*1000 });
         ctx.statManager().createRateStat("netDb.writeOut", "How many we wrote", "NetworkDatabase", new long[] { 20*60*1000 });
         ctx.statManager().createRateStat("netDb.writeTime", "How long it took", "NetworkDatabase", new long[] { 20*60*1000 });
+        //ctx.statManager().createRateStat("netDb.readTime", "How long one took", "NetworkDatabase", new long[] { 20*60*1000 });
         _writer = new Writer();
         I2PThread writer = new I2PThread(_writer, "DBWriter");
         // stop() must be called to flush data to disk
@@ -198,8 +203,8 @@ class PersistentDataStore extends TransientDataStore {
             int pending = _keys.size();
             boolean exists = (null != _keys.put(key, data));
             if (exists)
-                _context.statManager().addRateData("netDb.writeClobber", pending, 0);
-            _context.statManager().addRateData("netDb.writePending", pending, 0);
+                _context.statManager().addRateData("netDb.writeClobber", pending);
+            _context.statManager().addRateData("netDb.writePending", pending);
         }
 
         /** check to see if it's in the write queue */
@@ -253,8 +258,8 @@ class PersistentDataStore extends TransientDataStore {
                         long time = _context.clock().now() - startTime;
                         if (_log.shouldLog(Log.INFO))
                             _log.info("Wrote " + lastCount + " entries to disk in " + time);
-                         _context.statManager().addRateData("netDb.writeOut", lastCount, 0);
-                         _context.statManager().addRateData("netDb.writeTime", time, 0);
+                         _context.statManager().addRateData("netDb.writeOut", lastCount);
+                         _context.statManager().addRateData("netDb.writeTime", time);
                     }
                     if (_quit)
                         break;
@@ -279,7 +284,7 @@ class PersistentDataStore extends TransientDataStore {
     private void write(Hash key, DatabaseEntry data) {
         if (_log.shouldLog(Log.INFO))
             _log.info("Writing key " + key);
-        FileOutputStream fos = null;
+        OutputStream fos = null;
         File dbFile = null;
         try {
             String filename = null;
@@ -296,6 +301,7 @@ class PersistentDataStore extends TransientDataStore {
             if (dbFile.lastModified() < dataPublishDate) {
                 // our filesystem is out of date, lets replace it
                 fos = new SecureFileOutputStream(dbFile);
+                fos = new BufferedOutputStream(fos);
                 try {
                     data.writeBytes(fos);
                     fos.close();
@@ -368,7 +374,9 @@ class PersistentDataStore extends TransientDataStore {
                             // Run it inline so we don't clog up the job queue, esp. at startup
                             // Also this allows us to wait until it is really done to call checkReseed() and set _initialized
                             //PersistentDataStore.this._context.jobQueue().addJob(new ReadRouterJob(routerInfoFiles[i], key));
+                            //long start = System.currentTimeMillis();
                             (new ReadRouterJob(routerInfoFiles[i], key)).runJob();
+                            //_context.statManager().addRateData("netDb.readTime", System.currentTimeMillis() - start);
                         }
                     }
                 }
@@ -382,8 +390,9 @@ class PersistentDataStore extends TransientDataStore {
     }
     
     private class ReadRouterJob extends JobImpl {
-        private File _routerFile;
-        private Hash _key;
+        private final File _routerFile;
+        private final Hash _key;
+
         public ReadRouterJob(File routerFile, Hash key) {
             super(PersistentDataStore.this._context);
             _routerFile = routerFile;
@@ -410,10 +419,11 @@ class PersistentDataStore extends TransientDataStore {
         public void runJob() {
             if (!shouldRead()) return;
             try {
-                FileInputStream fis = null;
+                InputStream fis = null;
                 boolean corrupt = false;
                 try {
                     fis = new FileInputStream(_routerFile);
+                    fis = new BufferedInputStream(fis);
                     RouterInfo ri = new RouterInfo();
                     ri.readBytes(fis);
                     if (ri.getNetworkId() != Router.NETWORK_ID) {

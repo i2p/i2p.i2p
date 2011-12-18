@@ -5,9 +5,11 @@ package net.i2p.router;
  * zzz 2008-06
  */
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.io.Writer;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -23,11 +25,11 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.i2p.data.Base64;
-import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterInfo;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
+import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 import net.i2p.util.Translate;
@@ -47,9 +49,11 @@ import net.i2p.util.Translate;
  * And the on-disk blocklist can also contain router hashes to be shitlisted.
  *
  * So, this class maintains three separate lists:
+ *<pre>
  *   1) The list of IP ranges, read in from a file at startup
  *   2) The list of hashes, read in from the same file
  *   3) A list of single IPs, initially empty, added to as needed
+ *</pre>
  *
  * Read in the IP blocklist from a file, store it in-memory as efficiently
  * as we can, and perform tests against it as requested.
@@ -197,10 +201,10 @@ public class Blocklist {
         FileInputStream in = null;
         try {
             in = new FileInputStream(BLFile);
-            StringBuilder buf = new StringBuilder(128);
-            while (DataHelper.readLine(in, buf) && count < maxSize) {
+            BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+            String buf = null;
+            while ((buf = br.readLine()) != null && count < maxSize) {
                 Entry e = parse(buf, true);
-                buf.setLength(0);
                 if (e == null) {
                     badcount++;
                     continue;
@@ -276,17 +280,17 @@ public class Blocklist {
         }
     }
 
-    private Entry parse(StringBuilder buf, boolean bitch) {
+    private Entry parse(String buf, boolean bitch) {
         byte[] ip1;
         byte[] ip2;
         int start1 = 0;
         int end1 = buf.length();
         if (end1 <= 0)
             return null;  // blank
-        if (buf.charAt(end1 - 1) == '\r') {  // DataHelper.readLine leaves the \r on there
-            buf.deleteCharAt(end1 - 1);
-            end1--;
-        }
+        //if (buf.charAt(end1 - 1) == '\r') {  // DataHelper.readLine leaves the \r on there
+        //    buf.deleteCharAt(end1 - 1);
+        //    end1--;
+        //}
         if (end1 <= 0)
             return null;  // blank
         int start2 = -1;
@@ -387,10 +391,9 @@ public class Blocklist {
         FileInputStream in = null;
         try {
             in = new FileInputStream(BLFile);
-            StringBuilder buf = new StringBuilder(128);
-            while (DataHelper.readLine(in, buf)) {
+            BufferedReader br = new BufferedReader(new InputStreamReader(in, "ISO-8859-1"));
+            while (br.readLine() != null) {
                 lines++;
-                buf.setLength(0);
             }
         } catch (IOException ioe) {
             if (_log.shouldLog(Log.WARN))
@@ -457,7 +460,7 @@ public class Blocklist {
             return;
         if (add(toInt(ip)))
             if (_log.shouldLog(Log.WARN))
-                _log.warn("Adding IP to blocklist: " + (ip[0]&0xff) + '.' + (ip[1]&0xff) + '.' + (ip[2]&0xff) + '.' + (ip[3]&0xff));
+                _log.warn("Adding IP to blocklist: " + Addresses.toString(ip));
     }
 
     private boolean add(int ip) {
@@ -643,11 +646,6 @@ public class Blocklist {
         return rv;
     }
 
-    /** IP to string */
-    public static String toStr(byte[] ip) {
-        return toStr(toInt(ip));
-    }
-
     private static String toStr(long entry) {
         StringBuilder buf = new StringBuilder(32);
         for (int i = 7; i >= 0; i--) {
@@ -681,7 +679,7 @@ public class Blocklist {
     private void shitlist(Hash peer, byte[] ip) {
         // Temporary reason, until the job finishes
         String reason = _x("IP banned by blocklist.txt entry {0}");
-        _context.shitlist().shitlistRouterForever(peer, reason, toStr(ip));
+        _context.shitlist().shitlistRouterForever(peer, reason, Addresses.toString(ip));
         if (!  _context.getBooleanPropertyDefaultTrue(PROP_BLOCKLIST_DETAIL))
             return;
         boolean shouldRunJob;
@@ -743,12 +741,12 @@ public class Blocklist {
             FileInputStream in = null;
             try {
                 in = new FileInputStream(BLFile);
-                StringBuilder buf = new StringBuilder(128);
+                BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+                String buf = null;
                 // assume the file is unsorted, so go through the whole thing
-                while (DataHelper.readLine(in, buf)) {
+                while ((buf = br.readLine()) != null) {
                     Entry e = parse(buf, false);
                     if (e == null || e.peer != null) {
-                        buf.setLength(0);
                         continue;
                     }
                     if (match(ipint, toEntry(e.ip1, e.ip2))) {
@@ -766,7 +764,6 @@ public class Blocklist {
                         _context.shitlist().shitlistRouterForever(peer, reason, buf.toString());
                         return;
                     }
-                    buf.setLength(0);
                 }
             } catch (IOException ioe) {
                 if (_log.shouldLog(Log.WARN))
@@ -783,6 +780,8 @@ public class Blocklist {
     /**
      *  Write directly to the stream so we don't OOM on a huge list.
      *  Go through each list twice since we store out-of-order.
+     *
+     *  TODO move to routerconsole, but that would require exposing the _blocklist array.
      */
     public void renderStatusHTML(Writer out) throws IOException {
         // move to the jsp
