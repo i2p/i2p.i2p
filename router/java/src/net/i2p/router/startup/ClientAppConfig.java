@@ -72,29 +72,30 @@ public class ClientAppConfig {
     private static final String PREFIX = "clientApp.";
 
     // let's keep this really simple
+    // Following 4 may be edited in router console
     public String className;
     public String clientName;
     public String args;
-    public long delay;
     public boolean disabled;
+    public final long delay;
     /** @since 0.7.12 */
-    public String classpath;
+    public final String classpath;
     /** @since 0.7.12 */
-    public String stopargs;
+    public final String stopargs;
     /** @since 0.7.12 */
-    public String uninstallargs;
+    public final String uninstallargs;
 
     public ClientAppConfig(String cl, String client, String a, long d, boolean dis) {
+        this(cl, client, a, d, dis, null, null, null);
+    }
+
+    /** @since 0.7.12 */
+    public ClientAppConfig(String cl, String client, String a, long d, boolean dis, String cp, String sa, String ua) {
         className = cl;
         clientName = client;
         args = a;
         delay = d;
         disabled = dis;
-    }
-
-    /** @since 0.7.12 */
-    public ClientAppConfig(String cl, String client, String a, long d, boolean dis, String cp, String sa, String ua) {
-        this(cl, client, a, d, dis);
         classpath = cp;
         stopargs = sa;
         uninstallargs = ua;

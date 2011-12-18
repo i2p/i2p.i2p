@@ -1,3 +1,10 @@
+2011-12-18 zzz
+  * Addresses: Add utility toString() methods
+  * Blocklist: Buffer input to speed lookup
+  * PersistentDataStore: Buffer file writes and reads
+  * Router: Cleanup startup jobs and router.config reading; javadocs
+  * Transport: Log tweaks
+
 2011-12-17 kytv
   * Ukrainian translation updates from Transifex
   * Add my key to TrustedUpdate.java

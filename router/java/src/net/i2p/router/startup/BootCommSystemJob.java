@@ -45,7 +45,9 @@ public class BootCommSystemJob extends JobImpl {
         // start I2CP
         getContext().jobQueue().addJob(new StartAcceptingClientsJob(getContext()));
 
-        getContext().jobQueue().addJob(new ReadConfigJob(getContext()));
+        Job j = new ReadConfigJob(getContext());
+        j.getTiming().setStartAfter(getContext().clock().now() + 60*1000);
+        getContext().jobQueue().addJob(j);
         ((RouterClock) getContext().clock()).addShiftListener(getContext().router());
     }
         

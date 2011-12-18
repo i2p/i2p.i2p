@@ -30,12 +30,13 @@ import net.i2p.util.Log;
 import net.i2p.util.SecureFileOutputStream;
 
 public class CreateRouterInfoJob extends JobImpl {
-    private static Log _log = new Log(CreateRouterInfoJob.class);
+    private final Log _log;
     private final Job _next;
     
     public CreateRouterInfoJob(RouterContext ctx, Job next) {
         super(ctx);
         _next = next;
+        _log = ctx.logManager().getLog(CreateRouterInfoJob.class);
     }
     
     public String getName() { return "Create New Router Info"; }
@@ -124,7 +125,7 @@ public class CreateRouterInfoJob extends JobImpl {
      *
      */
     static long getCurrentPublishDate(RouterContext context) {
-        _log.info("Setting published date to /now/");
+        //_log.info("Setting published date to /now/");
         return context.clock().now();
     }
 }

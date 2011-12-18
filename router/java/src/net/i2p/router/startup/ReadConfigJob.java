@@ -12,30 +12,45 @@ import java.io.File;
 
 import net.i2p.router.JobImpl;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Log;
 
 /**
- * Simply read the router config
+ * Simply read the router config periodically,
+ * so that the user may make config changes externally.
+ * This isn't advertised as a feature,
+ * but it could be used, for example, to change bandwidth limits
+ * at certain times of day.
+ *
+ * Unfortunately it will also read the file back in every time the
+ * router writes it.
+ *
+ * So maybe this should just be disabled.
  */
 public class ReadConfigJob extends JobImpl {
     private final static long DELAY = 30*1000; // reread every 30 seconds
-    private long _lastRead = -1;
+    private long _lastRead;
 
     public ReadConfigJob(RouterContext ctx) {
         super(ctx);
+        _lastRead = ctx.clock().now();
     }
     
     public String getName() { return "Read Router Configuration"; }
+
     public void runJob() {
-        if (shouldReread()) {
+        File configFile = new File(getContext().router().getConfigFilename());
+        if (shouldReread(configFile)) {
             getContext().router().readConfig();
             _lastRead = getContext().clock().now();
+            Log log = getContext().logManager().getLog(ReadConfigJob.class);
+            if (log.shouldLog(Log.WARN))
+                log.warn("Reloaded " + configFile);
         }
         getTiming().setStartAfter(getContext().clock().now() + DELAY);
         getContext().jobQueue().addJob(this);
     }
     
-    private boolean shouldReread() {
-        File configFile = new File(getContext().router().getConfigFilename());
+    private boolean shouldReread(File configFile) {
         if (!configFile.exists()) return false;
         if (configFile.lastModified() > _lastRead) 
             return true;

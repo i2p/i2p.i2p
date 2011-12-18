@@ -6,5 +6,31 @@
         <p>
             The startup consists of a number of different jobs, like loading data from files for the network database, creating new router information (keypairs), and so on.
         </p>
+<p><pre>
+
+Calling order:
+
+StartupJob
+	LoadClientAppsJob
+		starts clients and queues delayed client jobs
+	start stats publisher
+	LoadRouterInfoJob
+		RebuildRouterInfoJob if necessary
+			CreateRouterInfoJob if necessary
+		BootCommSystemJob
+			allow parallel operation in job queue
+			BootNetworkDbJob
+				starts netdb
+			BuildTrustedLinksJob (never used)
+			BootPeerManagerJob
+				starts peer manager
+			start comm system
+			start tunnel manager
+			StartAcceptingClientsJob
+				starts client manager
+			ReadConfigJob
+				loops every 30 seconds
+
+</pre></p>
     </body>
 </html>

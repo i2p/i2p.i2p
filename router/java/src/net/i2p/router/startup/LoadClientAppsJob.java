@@ -17,7 +17,7 @@ import net.i2p.util.Log;
  *
  */
 public class LoadClientAppsJob extends JobImpl {
-    private Log _log;
+    private final Log _log;
     private static boolean _loaded = false;
     
     public LoadClientAppsJob(RouterContext ctx) {
@@ -51,12 +51,12 @@ public class LoadClientAppsJob extends JobImpl {
     }
 
     public static class DelayedRunClient extends JobImpl {
-        private String _className;
-        private String _clientName;
-        private String _args[];
-        private Log _log;
-        private ThreadGroup _threadGroup;
-        private ClassLoader _cl;
+        private final String _className;
+        private final String _clientName;
+        private final String _args[];
+        private final Log _log;
+        private final ThreadGroup _threadGroup;
+        private final ClassLoader _cl;
 
         public DelayedRunClient(RouterContext enclosingContext, String className, String clientName, String args[], long delay) {
             this(enclosingContext, className, clientName, args, delay, null, null);
@@ -211,11 +211,11 @@ public class LoadClientAppsJob extends JobImpl {
     }
 
     private final static class RunApp implements Runnable {
-        private String _className;
-        private String _appName;
-        private String _args[];
-        private Log _log;
-        private ClassLoader _cl;
+        private final String _className;
+        private final String _appName;
+        private final String _args[];
+        private final Log _log;
+        private final ClassLoader _cl;
 
         public RunApp(String className, String appName, String args[], Log log, ClassLoader cl) { 
             _className = className; 
@@ -246,6 +246,7 @@ public class LoadClientAppsJob extends JobImpl {
 
     public String getName() { return "Load up any client applications"; }
     
+/****
     public static void main(String args[]) {
         test(null);
         test("hi how are you?");
@@ -262,4 +263,5 @@ public class LoadClientAppsJob extends JobImpl {
             System.out.print("[" + parsed[i] + "] ");
         System.out.println();
     }
+****/
 }

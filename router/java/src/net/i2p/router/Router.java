@@ -382,9 +382,6 @@ public class Router implements RouterClock.ClockShiftListener {
         
         _context.keyManager().startup();
         
-        // why are we reading this again, it's read in the constructor
-        readConfig();
-        
         setupHandlers();
         //if (ALLOW_DYNAMIC_KEYS) {
         //    if ("true".equalsIgnoreCase(_context.getProperty(Router.PROP_HIDDEN, "false")))
