@@ -122,17 +122,20 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	public DetectedIP[] getAddress() {
 		_log.info("UP&P.getAddress() is called \\o/");
 		if(isDisabled) {
-			_log.warn("Plugin has been disabled previously, ignoring request.");
+			if (_log.shouldLog(Log.WARN))
+				_log.warn("Plugin has been disabled previously, ignoring request.");
 			return null;
 		} else if(!isNATPresent()) {
-			_log.warn("No UP&P device found, detection of the external ip address using the plugin has failed");
+			if (_log.shouldLog(Log.WARN))
+				_log.warn("No UP&P device found, detection of the external ip address using the plugin has failed");
 			return null;
 		}
 		
 		DetectedIP result = null;
 		final String natAddress = getNATAddress();
                 if (natAddress == null || natAddress.length() <= 0) {
-			_log.warn("No external address returned");
+			if (_log.shouldLog(Log.WARN))
+				_log.warn("No external address returned");
 			return null;
 		}
 		try {
@@ -141,13 +144,15 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 			short status = DetectedIP.NOT_SUPPORTED;
 			thinksWeAreDoubleNatted = !TransportImpl.isPubliclyRoutable(detectedIP.getAddress());
 			// If we have forwarded a port AND we don't have a private address
-			_log.warn("NATAddress: \"" + natAddress + "\" detectedIP: " + detectedIP + " double? " + thinksWeAreDoubleNatted);
+			if (_log.shouldLog(Log.WARN))
+				_log.warn("NATAddress: \"" + natAddress + "\" detectedIP: " + detectedIP + " double? " + thinksWeAreDoubleNatted);
 			if((portsForwarded.size() > 1) && (!thinksWeAreDoubleNatted))
 				status = DetectedIP.FULL_INTERNET;
 			
 			result = new DetectedIP(detectedIP, status);
 			
-			_log.warn("Successful UP&P discovery :" + result);
+			if (_log.shouldLog(Log.WARN))
+				_log.warn("Successful UP&P discovery :" + result);
 			
 			return new DetectedIP[] { result };
 		} catch (UnknownHostException e) {
@@ -159,16 +164,19 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	public void deviceAdded(Device dev) {
 		synchronized (lock) {
 			if(isDisabled) {
-				_log.warn("Plugin has been disabled previously, ignoring new device.");
+				if (_log.shouldLog(Log.WARN))
+					_log.warn("Plugin has been disabled previously, ignoring new device.");
 				return;
 			}
 		}
 		if(!ROUTER_DEVICE.equals(dev.getDeviceType()) || !dev.isRootDevice()) {
-			_log.warn("UP&P non-IGD device found, ignoring : " + dev.getFriendlyName());
+			if (_log.shouldLog(Log.WARN))
+				_log.warn("UP&P non-IGD device found, ignoring : " + dev.getFriendlyName());
 			return; // ignore non-IGD devices
 		} else if(isNATPresent()) {
                         // maybe we should see if the old one went away before ignoring the new one?
-			_log.warn("UP&P ignoring additional IGD device found: " + dev.getFriendlyName() + " UDN: " + dev.getUDN());
+			if (_log.shouldLog(Log.WARN))
+				_log.warn("UP&P ignoring additional IGD device found: " + dev.getFriendlyName() + " UDN: " + dev.getUDN());
 			/********** seems a little drastic
 			isDisabled = true;
 			
@@ -182,7 +190,8 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 			return;
 		}
 		
-		_log.warn("UP&P IGD found : " + dev.getFriendlyName() + " UDN: " + dev.getUDN() + " lease time: " + dev.getLeaseTime());
+		if (_log.shouldLog(Log.WARN))
+			_log.warn("UP&P IGD found : " + dev.getFriendlyName() + " UDN: " + dev.getUDN() + " lease time: " + dev.getLeaseTime());
 		synchronized(lock) {
 			_router = dev;
 		}
@@ -231,7 +240,8 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 					
 					_service = current2.getService(WAN_PPP_CONNECTION);
 					if(_service == null) {
-						_log.warn(_router.getFriendlyName()+ " doesn't seems to be using PPP; we won't be able to extract bandwidth-related informations out of it.");
+						if (_log.shouldLog(Log.WARN))
+							_log.warn(_router.getFriendlyName()+ " doesn't seems to be using PPP; we won't be able to extract bandwidth-related informations out of it.");
 						_service = current2.getService(WAN_IP_CONNECTION);
 						if(_service == null)
 							_log.error(_router.getFriendlyName()+ " doesn't export WAN_IP_CONNECTION either: we won't be able to use it!");
@@ -244,7 +254,8 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	}
 	
 	public boolean tryAddMapping(String protocol, int port, String description, ForwardPort fp) {
-		_log.warn("Registering a port mapping for " + port + "/" + protocol);
+		if (_log.shouldLog(Log.WARN))
+			_log.warn("Registering a port mapping for " + port + "/" + protocol);
 		int nbOfTries = 0;
 		boolean isPortForwarded = false;
 		while(nbOfTries++ < 5) {
@@ -255,7 +266,8 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 				Thread.sleep(5000);	
 			} catch (InterruptedException e) {}
 		}
-		_log.warn((isPortForwarded ? "Mapping is successful!" : "Mapping has failed!") + " ("+ nbOfTries + " tries)");
+		if (_log.shouldLog(Log.WARN))
+			_log.warn((isPortForwarded ? "Mapping is successful!" : "Mapping has failed!") + " ("+ nbOfTries + " tries)");
 		return isPortForwarded;
 	}
 	
@@ -268,7 +280,8 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	}
 	
 	public void deviceRemoved(Device dev ){
-		_log.warn("UP&P device removed : " + dev.getFriendlyName() + " UDN: " + dev.getUDN());
+		if (_log.shouldLog(Log.WARN))
+			_log.warn("UP&P device removed : " + dev.getFriendlyName() + " UDN: " + dev.getUDN());
 		synchronized (lock) {
 			if(_router == null) return;
 			// I2P this wasn't working
@@ -277,7 +290,8 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 			   dev.isRootDevice() &&
 			   stringEquals(_router.getFriendlyName(), dev.getFriendlyName()) &&
 			   stringEquals(_router.getUDN(), dev.getUDN())) {
-				_log.warn("UP&P IGD device removed : " + dev.getFriendlyName());
+				if (_log.shouldLog(Log.WARN))
+					_log.warn("UP&P IGD device removed : " + dev.getFriendlyName());
 				_router = null;
 				_service = null;
 			}
@@ -287,7 +301,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	/** event callback - unused for now - how many devices support events? */
 	public void eventNotifyReceived(String uuid, long seq, String varName, String value) {
 		if (_log.shouldLog(Log.WARN))
-			_log.error("Event: " + uuid + ' ' + seq + ' ' + varName + '=' + value);
+			_log.warn("Event: " + uuid + ' ' + seq + ' ' + varName + '=' + value);
 	}
 
 	/** compare two strings, either of which could be null */
@@ -647,7 +661,7 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 			portsForwarded.remove(fp);
 		}
 		
-		if(!noLog)
+		if(_log.shouldLog(Log.WARN) && !noLog)
 			_log.warn("UPnP: Removed mapping for "+fp.name+" "+port+" / "+protocol);
 		return retval;
 	}
@@ -659,7 +673,8 @@ class UPnP extends ControlPoint implements DeviceChangeListener, EventListener {
 	public void onChangePublicPorts(Set<ForwardPort> ports, ForwardPortCallback cb) {
 		Set<ForwardPort> portsToDumpNow = null;
 		Set<ForwardPort> portsToForwardNow = null;
-		_log.warn("UP&P Forwarding "+ports.size()+" ports...");
+		if (_log.shouldLog(Log.WARN))
+			_log.warn("UP&P Forwarding "+ports.size()+" ports...");
 		synchronized(lock) {
 			if(forwardCallback != null && forwardCallback != cb && cb != null) {
 				_log.error("ForwardPortCallback changed from "+forwardCallback+" to "+cb+" - using new value, but this is very strange!");

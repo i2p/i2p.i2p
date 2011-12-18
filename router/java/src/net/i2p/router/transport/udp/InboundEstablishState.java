@@ -12,6 +12,7 @@ import net.i2p.data.RouterIdentity;
 import net.i2p.data.SessionKey;
 import net.i2p.data.Signature;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 
 /**
@@ -93,7 +94,7 @@ class InboundEstablishState {
             _bobIP = new byte[req.readIPSize()];
         req.readIP(_bobIP, 0);
         if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Receive sessionRequest, BobIP = " + Base64.encode(_bobIP));
+            _log.debug("Receive sessionRequest, BobIP = " + Addresses.toString(_bobIP));
         if (_currentState == STATE_UNKNOWN)
             _currentState = STATE_REQUEST_RECEIVED;
         packetReceived();
@@ -186,10 +187,8 @@ class InboundEstablishState {
             buf.append("Signing sessionCreated:");
             buf.append(" ReceivedX: ").append(Base64.encode(_receivedX));
             buf.append(" SentY: ").append(Base64.encode(_sentY));
-            buf.append(" AliceIP: ").append(Base64.encode(_aliceIP));
-            buf.append(" AlicePort: ").append(_alicePort);
-            buf.append(" BobIP: ").append(Base64.encode(_bobIP));
-            buf.append(" BobPort: ").append(_bobPort);
+            buf.append(" Alice: ").append(Addresses.toString(_aliceIP, _alicePort));
+            buf.append(" Bob: ").append(Addresses.toString(_bobIP, _bobPort));
             buf.append(" RelayTag: ").append(_sentRelayTag);
             buf.append(" SignedOn: ").append(_sentSignedOnTime);
             buf.append(" signature: ").append(Base64.encode(_sentSignature.getData()));
@@ -346,12 +345,8 @@ class InboundEstablishState {
             buf.append(" ReceivedX: ").append(Base64.encode(_receivedX, 0, 4));
         if (_sentY != null)
             buf.append(" SentY: ").append(Base64.encode(_sentY, 0, 4));
-        if (_aliceIP != null)
-            buf.append(" AliceIP: ").append(Base64.encode(_aliceIP));
-        buf.append(" AlicePort: ").append(_alicePort);
-        if (_bobIP != null)
-            buf.append(" BobIP: ").append(Base64.encode(_bobIP));
-        buf.append(" BobPort: ").append(_bobPort);
+        buf.append(" Alice: ").append(Addresses.toString(_aliceIP, _alicePort));
+        buf.append(" Bob: ").append(Addresses.toString(_bobIP, _bobPort));
         buf.append(" RelayTag: ").append(_sentRelayTag);
         buf.append(" SignedOn: ").append(_sentSignedOnTime);
         buf.append(" state: ").append(_currentState);

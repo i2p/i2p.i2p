@@ -16,6 +16,7 @@ import net.i2p.data.RouterIdentity;
 import net.i2p.data.SessionKey;
 import net.i2p.data.Signature;
 import net.i2p.util.ByteCache;
+import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 
 /**
@@ -596,10 +597,8 @@ class PacketBuilder {
         if (_log.shouldLog(Log.DEBUG)) {
             StringBuilder buf = new StringBuilder(128);
             buf.append("Sending sessionCreated:");
-            buf.append(" AliceIP: ").append(Base64.encode(sentIP));
-            buf.append(" AlicePort: ").append(state.getSentPort());
-            buf.append(" BobIP: ").append(Base64.encode(state.getReceivedOurIP()));
-            buf.append(" BobPort: ").append(externalPort);
+            buf.append(" Alice: ").append(Addresses.toString(sentIP, state.getSentPort()));
+            buf.append(" Bob: ").append(Addresses.toString(state.getReceivedOurIP(), externalPort));
             buf.append(" RelayTag: ").append(state.getSentRelayTag());
             buf.append(" SignedOn: ").append(state.getSentSignedOnTime());
             buf.append(" signature: ").append(Base64.encode(state.getSentSignature().getData()));

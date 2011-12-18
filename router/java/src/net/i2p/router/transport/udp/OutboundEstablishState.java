@@ -13,6 +13,7 @@ import net.i2p.data.SessionKey;
 import net.i2p.data.Signature;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 
 /**
@@ -165,7 +166,7 @@ class OutboundEstablishState {
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Receive session created:\neSig: " + Base64.encode(_receivedEncryptedSignature)
                        + "\nreceivedIV: " + Base64.encode(_receivedIV)
-                       + "\nAliceIP: " + Base64.encode(_aliceIP)
+                       + "\nAliceIP: " + Addresses.toString(_aliceIP)
                        + " RelayTag: " + _receivedRelayTag
                        + " SignedOn: " + _receivedSignedOnTime
                        + "\nthis: " + this.toString());
@@ -290,10 +291,8 @@ class OutboundEstablishState {
         if (!valid || _log.shouldLog(Log.DEBUG)) {
             StringBuilder buf = new StringBuilder(128);
             buf.append("Signed sessionCreated:");
-            buf.append(" AliceIP: ").append(Base64.encode(_aliceIP));
-            buf.append(" AlicePort: ").append(_alicePort);
-            buf.append(" BobIP: ").append(Base64.encode(_bobIP));
-            buf.append(" BobPort: ").append(_bobPort);
+            buf.append(" Alice: ").append(Addresses.toString(_aliceIP, _alicePort));
+            buf.append(" Bob: ").append(Addresses.toString(_bobIP, _bobPort));
             buf.append(" RelayTag: ").append(_receivedRelayTag);
             buf.append(" SignedOn: ").append(_receivedSignedOnTime);
             buf.append(" signature: ").append(Base64.encode(_receivedSignature.getData()));

@@ -16,9 +16,9 @@ import java.util.TreeSet;
 
 
 /**
- * Get the local addresses
+ * Methods to get the local addresses, and other IP utilities
  *
- * @since 0.8.3 moved to core
+ * @since 0.8.3 moved to core from router/transport
  * @author zzz
  */
 public abstract class Addresses {
@@ -114,6 +114,44 @@ public abstract class Addresses {
              (ia instanceof Inet4Address));
     }
 
+    /**
+     *  Convenience method to convert an IP address to a String
+     *  without throwing an exception.
+     *  @return "null" for null, and "bad IP length x" if length is invalid
+     *  @since 0.8.12
+     */
+    public static String toString(byte[] addr) {
+        if (addr == null)
+            return "null";
+        try {
+            return InetAddress.getByAddress(addr).getHostAddress();
+        } catch (UnknownHostException uhe) {
+            return "bad IP length " + addr.length;
+        }
+    }
+
+    /**
+     *  Convenience method to convert an IP address and port to a String
+     *  without throwing an exception.
+     *  @return "ip:port"
+     *  @since 0.8.12
+     */
+    public static String toString(byte[] addr, int port) {
+        if (addr == null)
+            return "null:" + port;
+        try {
+            String ip = InetAddress.getByAddress(addr).getHostAddress();
+            if (addr.length != 16)
+                return ip + ':' + port;
+            return '[' + ip + "]:" + port;
+        } catch (UnknownHostException uhe) {
+            return "(bad IP length " + addr.length + "):" + port;
+        }
+    }
+
+    /**
+     *  Print out the local addresses
+     */
     public static void main(String[] args) {
         System.err.println("External Addresses:");
         Set<String> a = getAddresses(false, false);
