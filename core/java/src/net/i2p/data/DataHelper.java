@@ -440,8 +440,6 @@ public class DataHelper {
                 String val = (String) entry.getValue();
                 out.println(name + "=" + val);
             }
-            out.flush();
-            out.close();
         } finally {
             if (out != null) out.close();
         }

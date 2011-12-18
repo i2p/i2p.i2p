@@ -372,7 +372,7 @@ public class FileUtil {
         String rootDirStr = rootDir.getCanonicalPath();
         if (!targetStr.startsWith(rootDirStr)) throw new FileNotFoundException("Requested file is outside the root dir: " + path);
 
-        byte buf[] = new byte[1024];
+        byte buf[] = new byte[4*1024];
         FileInputStream in = null;
         try {
             in = new FileInputStream(target);
