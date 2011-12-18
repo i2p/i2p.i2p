@@ -1,5 +1,6 @@
 2011-12-17 kytv
   * Ukrainian translation updates from Transifex
+  * Add my key to TrustedUpdate.java
 
 2011-12-17 zzz
   * i2psnark:
