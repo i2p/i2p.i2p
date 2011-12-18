@@ -124,6 +124,29 @@ JXQAnA28vDmMMMH/WPbC5ixmJeGGNUiR
 =3oMC
 -----END PGP SIGNATURE-----
 */
+/*
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+*/
+    /* KillYourTV's key */
+    private static final String DEFAULT_TRUSTED_KEY5 =
+        "DAVvT6zMcRuzJi3V8DKKV6o0GjXoQsEwnJsFMaVG1Se-KPQjfP8PbgKJD" +
+        "crFe0zNJfh3yPdsocA~A~s9U6pvimlCXH2pnJGlNNojtFCZC3DleROl5-" +
+        "4EkYw~UKAg940o5yg1OCBVlRZBSrRAQIIjFGkxxPQc12dA~cfpryNk7Dc=";
+/*
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQEcBAEBAgAGBQJO7TSnAAoJEKvgwxnfCgoaJVIIAJbJNdwgqCHkmgPeBEWZbtaM
+EkmIL4UC75wVD8yiYReKreX7tJCL7NaeJvnNMNItgy4qJpr+bY0TkJ/LcFoq9ugE
+ABBRJD2XDPFjPWYQ0nTiFj3IpWdbxLZAAXXFttyFLDdw52aWUH7nd6TdxFHh1Ssi
+pU0yyu77FP5iq3dSTPZUEpA8NB/T6ImbqKQqRltst+TdnbzEwwFB23cihA286cJX
+rcoh8CyklYiT3wr46epmHEetseEffxktvn+iCbtRpkA0oLXdVQ0d8cNuB00YUEyB
+riCe6OlAEiNpcc6mMyIYYWFICbrDFTrDR3wXqwc/Jkcx6L5VVWoagpSzbo3yGhc=
+=8ix/
+-----END PGP SIGNATURE-----
+*/
 
     private static final int    VERSION_BYTES       = 16;
     public static final int    HEADER_BYTES        = Signature.SIGNATURE_BYTES + VERSION_BYTES;
