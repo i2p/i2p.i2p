@@ -201,7 +201,6 @@
     <!-- Normally only one type of deployer need be used.            -->
     <!--                                                             -->
     <!-- =========================================================== -->
-  <!-- UNCOMMENT TO ACTIVATE
     <Call name="addLifeCycle">
       <Arg>
         <New class="org.mortbay.jetty.deployer.WebAppDeployer">
@@ -214,7 +213,6 @@
         </New>
       </Arg>
     </Call>
-  -->
 
     <!-- =========================================================== -->
     <!-- Configure Authentication Realms                             -->
