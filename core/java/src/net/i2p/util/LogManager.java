@@ -260,21 +260,24 @@ public class LogManager {
     
     /**
      * Called periodically by the log writer's thread
-     *
+     * Do not log here, deadlock of LogWriter
      */
     void rereadConfig() {
         // perhaps check modification time
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Rereading configuration file");
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Rereading configuration file");
         loadConfig();
     }
 
+    /**
+     * Do not log here, deadlock of LogWriter via rereadConfig().
+     */
     private void loadConfig() {
         File cfgFile = _locationFile;
         if (!cfgFile.exists()) {
             if (!_alreadyNoticedMissingConfig) {
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Log file " + _locationFile.getAbsolutePath() + " does not exist");
+                //if (_log.shouldLog(Log.WARN))
+                //    _log.warn("Log file " + _locationFile.getAbsolutePath() + " does not exist");
                 _alreadyNoticedMissingConfig = true;
             }
             parseConfig(new Properties());
@@ -284,10 +287,10 @@ public class LogManager {
         _alreadyNoticedMissingConfig = false;
         
         if ((_configLastRead > 0) && (_configLastRead >= cfgFile.lastModified())) {
-            if (_log.shouldLog(Log.INFO))
-                _log.info("Short circuiting config read (last read: " 
-                           + (_context.clock().now() - _configLastRead) + "ms ago, config file modified "
-                           + (_context.clock().now() - cfgFile.lastModified()) + "ms ago");
+            //if (_log.shouldLog(Log.INFO))
+            //    _log.info("Short circuiting config read (last read: " 
+            //               + (_context.clock().now() - _configLastRead) + "ms ago, config file modified "
+            //               + (_context.clock().now() - cfgFile.lastModified()) + "ms ago");
             return;
         }
 
@@ -302,6 +305,9 @@ public class LogManager {
         updateLimits();
     }
 
+    /**
+     * Do not log here, deadlock of LogWriter via rereadConfig().
+     */
     private void parseConfig(Properties config) {
         String fmt = config.getProperty(PROP_FORMAT, DEFAULT_FORMAT);
         _format = fmt.toCharArray();
@@ -353,16 +359,22 @@ public class LogManager {
             _consoleBufferSize = DEFAULT_CONSOLEBUFFERSIZE;
         }
 
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Log set to use the base log file as " + _baseLogfilename);
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Log set to use the base log file as " + _baseLogfilename);
         
         parseLimits(config);
     }
 
+    /**
+     * Do not log here, deadlock of LogWriter via rereadConfig().
+     */
     private void parseLimits(Properties config) {
         parseLimits(config, PROP_RECORD_PREFIX);
     }
 
+    /**
+     * Do not log here, deadlock of LogWriter via rereadConfig().
+     */
     private void parseLimits(Properties config, String recordPrefix) {
         _limits.clear();
         if (config != null) {
@@ -400,6 +412,7 @@ public class LogManager {
     
     /**
      * Update the date format
+     * Do not log here, deadlock of LogWriter via rereadConfig().
      *
      * @param format null or empty string means use default format for the locale
      *               (with a SHORT date and a MEDIUM time - see DateFormat)
@@ -423,7 +436,7 @@ public class LogManager {
             _dateFormat = fmt;
             return true;
         } catch (IllegalArgumentException iae) {
-            getLog(LogManager.class).error("Date format is invalid [" + format + "]", iae);
+            //getLog(LogManager.class).error("Date format is invalid [" + format + "]", iae);
             return false;
         }
     }
@@ -496,12 +509,18 @@ public class LogManager {
         }
     }
 
+    /**
+     * Do not log here, deadlock of LogWriter via rereadConfig().
+     */
     private void updateLimits() {
         for (Log log : _logs.values()) {
             updateLimit(log);
         }
     }
 
+    /**
+     * Do not log here, deadlock of LogWriter via rereadConfig().
+     */
     private void updateLimit(Log log) {
         List<LogLimit> limits = getLimits(log);
         LogLimit max = null;
@@ -527,7 +546,10 @@ public class LogManager {
         }
     }
 
-    /** @return null if no matches */
+    /**
+     * Do not log here, deadlock of LogWriter via rereadConfig().
+     * @return null if no matches
+     */
     private List<LogLimit> getLimits(Log log) {
         ArrayList<LogLimit> limits = null; // new ArrayList(4);
         for (LogLimit limit : _limits) {
