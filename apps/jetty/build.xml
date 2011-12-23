@@ -149,7 +149,7 @@
     </target>    
 
     <target name="jarUpToDate">
-        <uptodate property="jar.uptodate" targetfile="jettylib/org.mortbay.jetty.jar" >
+        <uptodate property="jar.uptodate" targetfile="jettylib/jetty-i2p.jar" >
             <srcfiles dir= "build/obj" includes="**/*.class" />
         </uptodate>
         <condition property="shouldListChanges" >
