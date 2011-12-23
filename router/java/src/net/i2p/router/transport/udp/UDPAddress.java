@@ -64,31 +64,30 @@ public class UDPAddress {
     
     private void parse(RouterAddress addr) {
         if (addr == null) return;
-        Properties opts = addr.getOptions();
-        _host = opts.getProperty(PROP_HOST);
+        _host = addr.getOption(PROP_HOST);
         if (_host != null) _host = _host.trim();
         try { 
-            String port = opts.getProperty(PROP_PORT);
+            String port = addr.getOption(PROP_PORT);
             if (port != null)
                 _port = Integer.parseInt(port);
         } catch (NumberFormatException nfe) {
             _port = -1;
         }
-        String key = opts.getProperty(PROP_INTRO_KEY);
+        String key = addr.getOption(PROP_INTRO_KEY);
         if (key != null)
             _introKey = Base64.decode(key.trim());
         
         for (int i = MAX_INTRODUCERS; i >= 0; i--) {
-            String host = opts.getProperty(PROP_INTRO_HOST_PREFIX + i);
+            String host = addr.getOption(PROP_INTRO_HOST_PREFIX + i);
             if (host == null) continue;
-            String port = opts.getProperty(PROP_INTRO_PORT_PREFIX + i);
+            String port = addr.getOption(PROP_INTRO_PORT_PREFIX + i);
             if (port == null) continue;
-            String k = opts.getProperty(PROP_INTRO_KEY_PREFIX + i);
+            String k = addr.getOption(PROP_INTRO_KEY_PREFIX + i);
             if (k == null) continue;
             byte ikey[] = Base64.decode(k);
             if ( (ikey == null) || (ikey.length != SessionKey.KEYSIZE_BYTES) )
                 continue;
-            String t = opts.getProperty(PROP_INTRO_TAG_PREFIX + i);
+            String t = addr.getOption(PROP_INTRO_TAG_PREFIX + i);
             if (t == null) continue;
             int p = -1;
             try { 

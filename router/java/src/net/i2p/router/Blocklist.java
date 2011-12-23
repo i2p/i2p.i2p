@@ -488,9 +488,7 @@ public class Blocklist {
         for (int j = 0; j < paddr.size(); j++) {
             RouterAddress pa = (RouterAddress) pladdr.get(j);
             if (pa == null) continue;
-            Properties pprops = pa.getOptions();
-            if (pprops == null) continue;
-            String phost = pprops.getProperty("host");
+            String phost = pa.getOption("host");
             if (phost == null) continue;
             if (oldphost != null && oldphost.equals(phost)) continue;
             oldphost = phost;

@@ -57,13 +57,13 @@ public class NTCPAddress {
             _port = -1;
             return;
         }
-        String host = addr.getOptions().getProperty(PROP_HOST);
+        String host = addr.getOption(PROP_HOST);
         if (host == null) {
             _host = null;
             _port = -1;
         } else { 
             _host = host.trim();
-            String port = addr.getOptions().getProperty(PROP_PORT);
+            String port = addr.getOption(PROP_PORT);
             if ( (port != null) && (port.trim().length() > 0) && !("null".equals(port)) ) {
                 try {
                     _port = Integer.parseInt(port.trim());
@@ -156,9 +156,7 @@ public class NTCPAddress {
     
     public boolean equals(RouterAddress addr) {
         if (addr == null) return false;
-        Properties opts = addr.getOptions();
-        if (opts == null) return false;
-        return ( (_host.equals(opts.getProperty(PROP_HOST))) &&
-                 (Integer.toString(_port).equals(opts.getProperty(PROP_PORT))) );
+        return ( (_host.equals(addr.getOption(PROP_HOST))) &&
+                 (Integer.toString(_port).equals(addr.getOption(PROP_PORT))) );
     }
 }

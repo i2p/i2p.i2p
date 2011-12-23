@@ -12,6 +12,7 @@ package net.i2p.data;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
@@ -22,16 +23,24 @@ import net.i2p.util.OrderedProperties;
 /**
  * Defines a method of communicating with a router
  *
+ * For efficiency, the options methods and structures here are unsynchronized.
+ * Initialize the structure with readBytes(), or call the setOptions().
+ * Don't change it after that.
+ *
+ * To ensure integrity of the RouterInfo, methods that change an element of the
+ * RouterInfo will throw an IllegalStateException after the RouterInfo is signed.
+ *
  * @author jrandom
  */
 public class RouterAddress extends DataStructureImpl {
     private int _cost;
     private Date _expiration;
     private String _transportStyle;
-    private Properties _options;
+    private final Properties _options;
 
     public RouterAddress() {
         _cost = -1;
+        _options = new OrderedProperties();
     }
 
     /**
@@ -85,28 +94,59 @@ public class RouterAddress extends DataStructureImpl {
     /**
      * Configure the type of transport that must be used to communicate on this address
      *
+     * @throws IllegalStateException if was already set
      */
     public void setTransportStyle(String transportStyle) {
+        if (_transportStyle != null)
+            throw new IllegalStateException();
         _transportStyle = transportStyle;
     }
 
     /**
      * Retrieve the transport specific options necessary for communication 
      *
+     * @deprecated use getOptionsMap()
+     * @return sorted, non-null, NOT a copy, do not modify
      */
     public Properties getOptions() {
         return _options;
     }
 
     /**
-     * Specify the transport specific options necessary for communication 
+     * Retrieve the transport specific options necessary for communication 
      *
+     * @return an unmodifiable view, non-null, sorted
+     * @since 0.8.13
+     */
+    public Map getOptionsMap() {
+        return Collections.unmodifiableMap(_options);
+    }
+
+    /**
+     * @since 0.8.13
+     */
+    public String getOption(String opt) {
+        return _options.getProperty(opt);
+    }
+
+    /**
+     * Specify the transport specific options necessary for communication.
+     * Makes a copy.
+     * @param options non-null
+     * @throws IllegalStateException if was already set
      */
     public void setOptions(Properties options) {
-        _options = options;
+        if (!_options.isEmpty())
+            throw new IllegalStateException();
+        _options.putAll(options);
     }
     
+    /**
+     *  @throws IllegalStateException if was already read in
+     */
     public void readBytes(InputStream in) throws DataFormatException, IOException {
+        if (_transportStyle != null)
+            throw new IllegalStateException();
         _cost = (int) DataHelper.readLong(in, 1);
         _expiration = DataHelper.readDate(in);
         _transportStyle = DataHelper.readString(in);
@@ -115,11 +155,11 @@ public class RouterAddress extends DataStructureImpl {
             _transportStyle = "SSU";
         else if (_transportStyle.equals("NTCP"))
             _transportStyle = "NTCP";
-        _options = DataHelper.readProperties(in);
+        DataHelper.readProperties(in, _options);
     }
     
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
-        if ((_cost < 0) || (_transportStyle == null) || (_options == null))
+        if ((_cost < 0) || (_transportStyle == null))
             throw new DataFormatException("Not enough data to write a router address");
         DataHelper.writeLong(out, 1, _cost);
         DataHelper.writeDate(out, _expiration);
@@ -131,11 +171,12 @@ public class RouterAddress extends DataStructureImpl {
     public boolean equals(Object object) {
         if ((object == null) || !(object instanceof RouterAddress)) return false;
         RouterAddress addr = (RouterAddress) object;
+        // let's keep this fast as we are putting an address into the RouterInfo set frequently
         return
                _cost == addr._cost &&
-               DataHelper.eq(_transportStyle, addr._transportStyle) &&
-               DataHelper.eq(_options, addr._options) &&
-               DataHelper.eq(_expiration, addr._expiration);
+               DataHelper.eq(_transportStyle, addr._transportStyle);
+               //DataHelper.eq(_options, addr._options) &&
+               //DataHelper.eq(_expiration, addr._expiration);
     }
     
     /**
@@ -161,9 +202,7 @@ public class RouterAddress extends DataStructureImpl {
         buf.append("\n\tExpiration: ").append(_expiration);
         if (_options != null) {
             buf.append("\n\tOptions: #: ").append(_options.size());
-            Properties p = new OrderedProperties();
-            p.putAll(_options);
-            for (Map.Entry e : p.entrySet()) {
+            for (Map.Entry e : _options.entrySet()) {
                 String key = (String) e.getKey();
                 String val = (String) e.getValue();
                 buf.append("\n\t\t[").append(key).append("] = [").append(val).append("]");
