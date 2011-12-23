@@ -27,9 +27,9 @@ import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.logging.Log;
-import org.mortbay.log.LogFactory;
-import org.mortbay.http.HttpFields;
+//import org.apache.commons.logging.Log;
+//import org.mortbay.log.LogFactory;
+import org.mortbay.jetty.HttpHeaders;
 import org.mortbay.util.LineInput;
 import org.mortbay.util.MultiMap;
 import org.mortbay.util.StringUtil;
@@ -48,13 +48,15 @@ import org.mortbay.util.StringUtil;
  * <pre>
  * </pre>
  *
+ * Modded to compile with Jetty 6 for I2P
+ *
  * @version $Id: MultiPartRequest.java,v 1.16 2005/12/02 20:13:52 gregwilkins Exp $
  * @author  Greg Wilkins
  * @author  Jim Crossley
  */
 public class MultiPartRequest
 {
-    private static Log log = LogFactory.getLog(MultiPartRequest.class);
+    //private static Log log = LogFactory.getLog(MultiPartRequest.class);
 
     /* ------------------------------------------------------------ */
     HttpServletRequest _request;
@@ -76,11 +78,11 @@ public class MultiPartRequest
         throws IOException
     {
         _request=request;
-        String content_type = request.getHeader(HttpFields.__ContentType);
+        String content_type = request.getHeader(HttpHeaders.CONTENT_TYPE);
         if (!content_type.startsWith("multipart/form-data"))
             throw new IOException("Not multipart/form-data request");
 
-        if(log.isDebugEnabled())log.debug("Multipart content type = "+content_type);
+        //if(log.isDebugEnabled())log.debug("Multipart content type = "+content_type);
         _encoding = request.getCharacterEncoding();
         if (_encoding != null)
             _in = new LineInput(request.getInputStream(), 2048, _encoding);
@@ -91,7 +93,7 @@ public class MultiPartRequest
         _boundary="--"+
             value(content_type.substring(content_type.indexOf("boundary=")));
         
-        if(log.isDebugEnabled())log.debug("Boundary="+_boundary);
+        //if(log.isDebugEnabled())log.debug("Boundary="+_boundary);
         _byteBoundary= (_boundary+"--").getBytes(StringUtil.__ISO_8859_1);
         
         loadAllParts();
@@ -136,7 +138,7 @@ public class MultiPartRequest
             } 
             catch (UnsupportedEncodingException uee) 
             {
-                if (log.isDebugEnabled())log.debug("Invalid character set: " + uee);
+                //if (log.isDebugEnabled())log.debug("Invalid character set: " + uee);
                 return null;
             }
         }
@@ -170,7 +172,7 @@ public class MultiPartRequest
             }
             catch (UnsupportedEncodingException uee) 
             {
-                if (log.isDebugEnabled())log.debug("Invalid character set: " + uee);
+                //if (log.isDebugEnabled())log.debug("Invalid character set: " + uee);
                 return null;
             }
         }
@@ -264,7 +266,7 @@ public class MultiPartRequest
         String line = _in.readLine();
         if (!line.equals(_boundary))
         {
-            log.warn(line);
+            //log.warn(line);
             throw new IOException("Missing initial multi part boundary");
         }
         
@@ -281,7 +283,7 @@ public class MultiPartRequest
                 if (line.length()==0)
                     break;
 
-                if(log.isDebugEnabled())log.debug("LINE="+line);
+                //if(log.isDebugEnabled())log.debug("LINE="+line);
                 
                 // place part header key and value in map
                 int c = line.indexOf(':',0);
@@ -291,7 +293,7 @@ public class MultiPartRequest
                     String value = line.substring(c+1,line.length()).trim();
                     String ev = (String) part._headers.get(key);
                     part._headers.put(key,(ev!=null)?(ev+';'+value):value);
-                    if(log.isDebugEnabled())log.debug(key+": "+value);
+                    //if(log.isDebugEnabled())log.debug(key+": "+value);
                     if (key.equals("content-disposition"))
                         content_disposition=value;
                 }
@@ -321,16 +323,16 @@ public class MultiPartRequest
             // Check disposition
             if (!form_data)
             {
-                log.warn("Non form-data part in multipart/form-data");
+                //log.warn("Non form-data part in multipart/form-data");
                 continue;
             }
             if (part._name==null || part._name.length()==0)
             {
-                log.warn("Part with no name in multipart/form-data");
+                //log.warn("Part with no name in multipart/form-data");
                 continue;
             }
-            if(log.isDebugEnabled())log.debug("name="+part._name);
-            if(log.isDebugEnabled())log.debug("filename="+part._filename);
+            //if(log.isDebugEnabled())log.debug("name="+part._name);
+            //if(log.isDebugEnabled())log.debug("filename="+part._filename);
             _partMap.add(part._name,part);
             part._data=readBytes();
         }       
@@ -406,7 +408,7 @@ public class MultiPartRequest
             lf=(c==10 || _char==10);
             if (_char==10) _char=-2;  
         }
-        if(log.isTraceEnabled())log.trace(baos.toString());
+        //if(log.isTraceEnabled())log.trace(baos.toString());
         return baos.toByteArray();
     }
     

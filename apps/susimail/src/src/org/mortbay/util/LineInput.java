@@ -22,8 +22,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 
-import org.apache.commons.logging.Log;
-import org.mortbay.log.LogFactory;
+//import org.apache.commons.logging.Log;
+//import org.mortbay.log.LogFactory;
 
 
 /* ------------------------------------------------------------ */
@@ -51,7 +51,7 @@ import org.mortbay.log.LogFactory;
  */
 public class LineInput extends FilterInputStream                           
 {
-    private static Log log = LogFactory.getLog(LineInput.class);
+    //private static Log log = LogFactory.getLog(LineInput.class);
 
     /* ------------------------------------------------------------ */
     private byte _buf[];
@@ -201,7 +201,7 @@ public class LineInput extends FilterInputStream
             }
             catch(UnsupportedEncodingException e)
             {
-                log.warn(LogSupport.EXCEPTION,e);
+                //log.warn(LogSupport.EXCEPTION,e);
             }
         }
         _mark=-1;
