@@ -169,6 +169,7 @@
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="../../jetty/jettylib/commons-logging.jar" />
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
+                <pathelement location="../../jetty/jettylib/jsp-api.jar" />
                 <pathelement location="../../jetty/jettylib/ant.jar" />
                 <pathelement location="build/i2ptunnel.jar" />
             </classpath>
@@ -190,6 +191,7 @@
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="../../jetty/jettylib/commons-logging.jar" />
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
+                <pathelement location="../../jetty/jettylib/jsp-api.jar" />
                 <pathelement location="build/i2ptunnel.jar" />
             </classpath>
         </javac>

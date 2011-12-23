@@ -5,14 +5,14 @@ import java.util.List;
 
 import net.i2p.util.FileUtil;
 
-import org.mortbay.http.Version;
+import org.mortbay.jetty.Server;
 
 public class LogsHelper extends HelperBase {
     public LogsHelper() {}
     
     /** @since 0.8.11 */
     public String getJettyVersion() {
-        return Version.getImplVersion();
+        return Server.getVersion();
     }
 
     public String getLogs() {

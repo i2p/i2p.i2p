@@ -194,12 +194,9 @@
     <target name="buildWEB" depends="buildRouterConsole" >
         <copy file="apps/routerconsole/java/build/routerconsole.jar" todir="build/" />
         <copy file="apps/routerconsole/java/build/routerconsole.war" todir="build/" />
-        <copy file="apps/jetty/jettylib/org.mortbay.jetty.jar" todir="build/" />
-        <copy file="apps/jetty/jettylib/jasper-compiler.jar" todir="build/" />
-        <copy file="apps/jetty/jettylib/jasper-runtime.jar" todir="build/" />
-        <copy file="apps/jetty/jettylib/commons-logging.jar" todir="build/" />
-        <copy file="apps/jetty/jettylib/commons-el.jar" todir="build/" />
-        <copy file="apps/jetty/jettylib/javax.servlet.jar" todir="build/" />
+        <copy todir="build/" >
+            <fileset dir="apps/jetty/jettylib" excludes="ant.jar" />
+        </copy>
     </target>
 
     <target name="buildexe">
@@ -391,9 +388,10 @@
             <group title="Desktopgui Application" packages="net.i2p.desktopgui.*" />
             <group title="I2PSnark Application" packages="org.klomp.snark:org.klomp.snark.*" />
             <group title="I2PTunnel Application" packages="net.i2p.i2ptunnel:net.i2p.i2ptunnel.*" />
+            <group title="Jetty Logging" packages="org.mortbay.http" />
             <group title="SAM Bridge" packages="net.i2p.sam:net.i2p.sam.client" />
             <group title="SusiDNS Application" packages="i2p.susi.dns" />
-            <group title="SusiMail Application" packages="i2p.susi.webmail:i2p.susi.webmail.*:i2p.susi.debug:i2p.susi.util" />
+            <group title="SusiMail Application" packages="i2p.susi.webmail:i2p.susi.webmail.*:i2p.susi.debug:i2p.susi.util:org.mortbay.servlet:org.mortbay.util" />
             <group title="Systray Application" packages="net.i2p.apps.systray" />
             <sourcepath>
                 <pathelement location="core/java/src" />
@@ -412,10 +410,16 @@
                 <pathelement location="apps/BOB/src" />
                 <pathelement location="apps/susidns/src/java/src" />
                 <pathelement location="apps/susimail/src/src" />
+                <pathelement location="apps/jetty/java/src" />
             </sourcepath>
             <classpath>
                 <pathelement location="apps/jetty/jettylib/org.mortbay.jetty.jar" />
                 <pathelement location="apps/jetty/jettylib/javax.servlet.jar" />
+                <pathelement location="apps/jetty/jettylib/jetty-sslengine.jar" />
+                <pathelement location="apps/jetty/jettylib/jetty-start.jar" />
+                <pathelement location="apps/jetty/jettylib/jetty-threadpool.jar" />
+                <pathelement location="apps/jetty/jettylib/jetty-util.jar" />
+                <pathelement location="apps/jetty/jettylib/jsp-api.jar" />
                 <pathelement location="apps/systray/java/lib/systray4j.jar" />
                 <pathelement location="apps/jrobin/jrobin-1.5.9.1.jar" />
                 <pathelement location="installer/lib/wrapper/all/wrapper.jar" />
@@ -670,14 +674,12 @@
         </delete>
         <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
-        <copy file="build/jasper-compiler.jar" todir="pkg-temp/lib/" />
-        <copy file="build/jasper-runtime.jar" todir="pkg-temp/lib/" />
-        <copy file="build/commons-logging.jar" todir="pkg-temp/lib/" />
-        <copy file="build/commons-el.jar" todir="pkg-temp/lib/" />
-        <copy file="build/javax.servlet.jar" todir="pkg-temp/lib/" />
+        <!-- all jetty stuff -->
+        <copy todir="pkg-temp/lib" >
+            <fileset dir="build" includes="commons*.jar jasper*.jar javax*.jar jetty*.jar jsp*.jar org.mortbay.jetty.jar" />
+        </copy>
         <copy file="build/mstreaming.jar" todir="pkg-temp/lib/" />
         <copy file="build/streaming.jar" todir="pkg-temp/lib/" />
-        <copy file="build/org.mortbay.jetty.jar" todir="pkg-temp/lib/" />
         <copy file="build/router.jar" todir="pkg-temp/lib/" />
         <copy file="build/desktopgui.jar" todir="pkg-temp/lib/" />
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
@@ -724,20 +726,13 @@
         <copy file="installer/resources/uninstall.ico" todir="pkg-temp/docs/" />
         <!-- Eepsite stuff here -->
         <mkdir dir="pkg-temp/eepsite" />
-        <mkdir dir="pkg-temp/eepsite/webapps" />
-        <mkdir dir="pkg-temp/eepsite/logs" />
-        <mkdir dir="pkg-temp/eepsite/cgi-bin" />
-        <mkdir dir="pkg-temp/eepsite/docroot" />
-        <mkdir dir="pkg-temp/eepsite/docroot/help" />
-        <mkdir dir="pkg-temp/eepsite/docroot/help/lib" />
-        <copy todir="pkg-temp/eepsite/docroot/" >
-            <fileset dir="installer/resources/eepsite.help/" />
+        <copy todir="pkg-temp/eepsite/" >
+            <fileset dir="installer/resources/eepsite/" />
         </copy>
         <copy todir="pkg-temp/eepsite/docroot/help/lib/" >
             <fileset dir="installer/resources/icons/flags/" includes="cn.png de.png es.png fr.png ir.png it.png jp.png nl.png ru.png se.png us.png" />
         </copy>
         <copy file="installer/resources/themes/console/images/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />
-        <copy file="installer/resources/jetty.xml" tofile="pkg-temp/eepsite/jetty.xml" />
     </target>
 
     <target name="preplicenses">
@@ -931,14 +926,18 @@
         </copy>
     </target>
 
+    <!-- All jetty jars required for update.
+         We don't need commons-el or commons-logging, they haven't changed.
+         TODO do we need to bother updating jasper?
+         TODO where is JMX? We don't need it I hope.
+      -->
     <target name="prepjupdate" depends="prepupdate, buildWEB">
-        <copy file="build/jasper-compiler.jar" todir="pkg-temp/lib/" />
-        <copy file="build/jasper-runtime.jar" todir="pkg-temp/lib/" />
-        <copy file="build/commons-logging.jar" todir="pkg-temp/lib/" />
-        <copy file="build/commons-el.jar" todir="pkg-temp/lib/" />
-        <copy file="build/javax.servlet.jar" todir="pkg-temp/lib/" />
-        <copy file="build/org.mortbay.jetty.jar" todir="pkg-temp/lib/" />
+        <copy todir="pkg-temp" >
+            <fileset dir="build/lib" includes="jasper*.jar javax*.jar jetty*.jar jsp*.jar org.mortbay.jetty.jar" />
+        </copy>
     </target>
+
+    <!-- just our jetty 5 fixes, not for jetty 6 -->
     <target name="prepjupdatefixes" depends="prepupdate, buildWEB">
         <copy file="build/org.mortbay.jetty.jar" todir="pkg-temp/lib/" />
     </target>

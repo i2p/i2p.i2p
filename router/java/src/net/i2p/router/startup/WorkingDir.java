@@ -147,7 +147,9 @@ public class WorkingDir {
             System.err.println("Setting up new user directory " + rv);
         boolean success = migrate(MIGRATE_BASE, oldDirf, dirf);
         // this one must be after MIGRATE_BASE
-        success &= migrateJettyXml(oldDirf, dirf);
+        success &= migrateJettyXml(oldDirf, dirf, "jetty.xml");
+        success &= migrateJettyXml(oldDirf, dirf, "contexts/base-context.xml");
+        success &= migrateJettyXml(oldDirf, dirf, "contexts/cgi-context.xml");
         success &= migrateClientsConfig(oldDirf, dirf);
         // for later news.xml updates (we don't copy initialNews.xml over anymore)
         success &= (new SecureDirectory(dirf, "docs")).mkdir();
@@ -258,11 +260,11 @@ public class WorkingDir {
      *  It was already copied over once in migrate(), throw that out and
      *  do it again with modifications.
      */
-    private static boolean migrateJettyXml(File olddir, File todir) {
+    private static boolean migrateJettyXml(File olddir, File todir, String filename) {
         File eepsite1 = new File(olddir, "eepsite");
-        File oldFile = new File(eepsite1, "jetty.xml");
+        File oldFile = new File(eepsite1, filename);
         File eepsite2 = new File(todir, "eepsite");
-        File newFile = new File(eepsite2, "jetty.xml");
+        File newFile = new File(eepsite2, filename);
         FileInputStream in = null;
         PrintWriter out = null;
         try {
@@ -276,11 +278,11 @@ public class WorkingDir {
                 out.println(s);
             }
             out.println("<!-- Modified by I2P User dir migration script -->");
-            System.err.println("Copied jetty.xml with modifications");
+            System.err.println("Copied " + filename + " with modifications");
             return true;
         } catch (IOException ioe) {
             if (in != null) {
-                System.err.println("FAILED copy jetty.xml");
+                System.err.println("FAILED copy " + filename);
                 return false;
             }
             return false;

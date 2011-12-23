@@ -21,7 +21,11 @@
                 <pathelement location="../../../core/java/build/obj" />
                 <pathelement location="../../../router/java/build/obj" />
                 <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-util.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-sslengine.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-threadpool.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
+                <pathelement location="../../jetty/jettylib/jsp-api.jar" />
                 <pathelement location="../../systray/java/build/obj" />
                 <pathelement location="../../systray/java/lib/systray4j.jar" />
                 <pathelement location="../../desktopgui/build" />
@@ -53,7 +57,11 @@
                 <pathelement location="../../../core/java/build/i2p.jar" />
                 <pathelement location="../../../router/java/build/router.jar" />
                 <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-util.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-sslengine.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-threadpool.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
+                <pathelement location="../../jetty/jettylib/jsp-api.jar" />
                 <pathelement location="../../systray/java/build/systray.jar" />
                 <pathelement location="../../systray/java/lib/systray4j.jar" />
                 <pathelement location="../../desktopgui/dist/desktopgui.jar" />
@@ -233,6 +241,7 @@
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="../../jetty/jettylib/commons-logging.jar" />
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
+                <pathelement location="../../jetty/jettylib/jsp-api.jar" />
                 <pathelement location="../../jetty/jettylib/ant.jar" />
                 <pathelement location="../../systray/java/build/obj" />
                 <pathelement location="../../systray/java/lib/systray4j.jar" />
@@ -266,6 +275,10 @@
                 <pathelement location="../../jetty/jettylib/commons-logging.jar" />
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
                 <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-util.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-sslengine.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-threadpool.jar" />
+                <pathelement location="../../jetty/jettylib/jsp-api.jar" />
                 <pathelement location="../../systray/java/build/obj" />
                 <pathelement location="../../systray/java/lib/systray4j.jar" />
                 <pathelement location="../../desktopgui/dist/desktopgui.jar" />
