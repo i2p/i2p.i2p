@@ -12,7 +12,7 @@
 //limitations under the License.
 //========================================================================
 
-package org.mortbay.jetty; 
+package org.mortbay.http; 
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -25,6 +25,10 @@ import java.util.TimeZone;
 import javax.servlet.http.Cookie;
 
 import org.mortbay.component.AbstractLifeCycle;
+import org.mortbay.jetty.HttpHeaders;
+import org.mortbay.jetty.Request;
+import org.mortbay.jetty.RequestLog;
+import org.mortbay.jetty.Response;
 import org.mortbay.jetty.servlet.PathMap;
 import org.mortbay.log.Log;
 import org.mortbay.util.DateCache;
@@ -39,12 +43,27 @@ import org.mortbay.util.Utf8StringBuffer;
  * and the Combined Log Format (single log format).
  * This log format can be output by most web servers, and almost all web log analysis software can understand
  *  these formats.
+ *
+ * ** I2P Mods **
+ *
+ * For Jetty 5, this extended NCSARequestLog to
+ * override log() to put in the requestor's destination hash,
+ * instead of 127.0.0.1,
+ * which is placed in the X-I2P-DestHash field in the request headers
+ * by I2PTunnelHTTPServer.
+ * But we also had to modify NCSARequestLog to do so, to change private
+ * fields to protected.
+ *
+ * So that we will work with system Jetty 6 packages, we just copy the whole thing
+ * and modify log() as required.
+ * We leave the package as org.mortbay.http for compatibility with old
+ * jetty.xml files.
+ *
  * @author Greg Wilkins
  * @author Nigel Canonizado
  * 
- * @org.apache.xbean.XBean element="ncsaLog"
  */
-public class NCSARequestLog extends AbstractLifeCycle implements RequestLog
+public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
 {
     private String _filename;
     private boolean _extended;
@@ -70,7 +89,7 @@ public class NCSARequestLog extends AbstractLifeCycle implements RequestLog
     private transient char[] _copy;
 
     
-    public NCSARequestLog()
+    public I2PRequestLog()
     {
         _extended = true;
         _append = true;
@@ -81,7 +100,7 @@ public class NCSARequestLog extends AbstractLifeCycle implements RequestLog
     /**
      * @param filename The filename for the request log. This may be in the format expected by {@link RolloverFileOutputStream}
      */
-    public NCSARequestLog(String filename)
+    public I2PRequestLog(String filename)
     {
         _extended = true;
         _append = true;
@@ -263,8 +282,14 @@ public class NCSARequestLog extends AbstractLifeCycle implements RequestLog
                     addr = request.getHeader(HttpHeaders.X_FORWARDED_FOR);
                 }
 
-                if (addr == null) 
-                    addr = request.getRemoteAddr();
+                if (addr == null) {
+                    // TODO offer B32 option
+                    addr = request.getHeader("X-I2P-DestHash");
+                    if(addr != null)
+                        addr += ".i2p";
+                    else
+                        addr = request.getRemoteAddr();
+                }
 
                 buf.append(addr);
                 buf.append(" - ");
