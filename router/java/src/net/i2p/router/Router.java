@@ -60,7 +60,7 @@ import net.i2p.util.SimpleScheduler;
  *
  */
 public class Router implements RouterClock.ClockShiftListener {
-    private final Log _log;
+    private Log _log;
     private final RouterContext _context;
     private final Map<String, String> _config;
     /** full path */
@@ -77,9 +77,9 @@ public class Router implements RouterClock.ClockShiftListener {
     private ShutdownHook _shutdownHook;
     /** non-cancellable shutdown has begun */
     private volatile boolean _shutdownInProgress;
-    private final I2PThread _gracefulShutdownDetector;
-    private final RouterWatchdog _watchdog;
-    private final Thread _watchdogThread;
+    private I2PThread _gracefulShutdownDetector;
+    private RouterWatchdog _watchdog;
+    private Thread _watchdogThread;
     
     public final static String PROP_CONFIG_FILE = "router.configLocation";
     
@@ -128,9 +128,17 @@ public class Router implements RouterClock.ClockShiftListener {
         System.setProperty("Dorg.mortbay.util.FileResource.checkAliases", "true");
     }
     
+    /**
+     *  Instantiation only. Starts no threads. Does not install updates.
+     *  RouterContext is created but not initialized.
+     *  You must call runRouter() after any constructor to start things up.
+     */
     public Router() { this(null, null); }
+
     public Router(Properties envProps) { this(null, envProps); }
+
     public Router(String configFilename) { this(configFilename, null); }
+
     public Router(String configFilename, Properties envProps) {
         _gracefulExitCode = -1;
         _config = new ConcurrentHashMap();
@@ -235,14 +243,16 @@ public class Router implements RouterClock.ClockShiftListener {
             _config.put("router.updateLastInstalled", now);
             saveConfig();
         }
+        // *********  Start no threads before here ********* //
+    }
 
-        // This is here so that we can get the directory location from the context
-        // for the zip file and the base location to unzip to.
-        // If it does an update, it never returns.
-        // I guess it's better to have the other-router check above this, we don't want to
-        // overwrite an existing running router's jar files. Other than ours.
-        installUpdates();
-
+    /**
+     *  Initializes the RouterContext.
+     *  Starts some threads. Does not install updates.
+     *  All this was in the constructor.
+     *  @since 0.8.12
+     */
+    private void startupStuff() {
         // *********  Start no threads before here ********* //
         //
         // NOW we can start the ping file thread.
@@ -372,7 +382,14 @@ public class Router implements RouterClock.ClockShiftListener {
     
     public RouterContext getContext() { return _context; }
     
+    /**
+     *  Initializes the RouterContext.
+     *  Starts the threads. Does not install updates.
+     */
     void runRouter() {
+        if (_isAlive)
+            throw new IllegalStateException();
+        startupStuff();
         _isAlive = true;
         _started = _context.clock().now();
         try {
@@ -1254,13 +1271,18 @@ public class Router implements RouterClock.ClockShiftListener {
 
     public static void main(String args[]) {
         System.out.println("Starting I2P " + RouterVersion.FULL_VERSION);
-        // installUpdates() moved to constructor so we can get file locations from the context
-        // installUpdates();
         //verifyWrapperConfig();
         Router r = new Router();
         if ( (args != null) && (args.length == 1) && ("rebuild".equals(args[0])) ) {
             r.rebuildNewIdentity();
         } else {
+            // This is here so that we can get the directory location from the context
+            // for the zip file and the base location to unzip to.
+            // If it does an update, it never returns.
+            // I guess it's better to have the other-router check above this, we don't want to
+            // overwrite an existing running router's jar files. Other than ours.
+            r.installUpdates();
+            // *********  Start no threads before here ********* //
             r.runRouter();
         }
     }
@@ -1269,6 +1291,7 @@ public class Router implements RouterClock.ClockShiftListener {
     private static final String DELETE_FILE = "deletelist.txt";
     
     /**
+     * Context must be available.
      * Unzip update file found in the router dir OR base dir, to the base dir
      *
      * If we can't write to the base dir, complain.
