@@ -389,7 +389,7 @@
             <!-- apps and bridges starting here, alphabetical please -->
             <group title="Addressbook Application" packages="net.i2p.addressbook" />
             <group title="BOB Bridge" packages="net.i2p.BOB" />
-            <group title="Desktopgui Application" packages="net.i2p.desktopgui.*" />
+            <group title="Desktopgui Application" packages="net.i2p.desktopgui:net.i2p.desktopgui.*" />
             <group title="I2PSnark Application" packages="org.klomp.snark:org.klomp.snark.*" />
             <group title="I2PTunnel Application" packages="net.i2p.i2ptunnel:net.i2p.i2ptunnel.*" />
             <group title="SAM Bridge" packages="net.i2p.sam:net.i2p.sam.client" />
