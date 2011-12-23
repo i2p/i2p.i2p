@@ -822,10 +822,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         if (err != null)
             throw new IllegalArgumentException("Invalid store attempt - " + err);
         
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("RouterInfo " + key.toBase64() + " is stored with "
-                       + routerInfo.getOptions().size() + " options on "
-                       + new Date(routerInfo.getPublished()));
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("RouterInfo " + key.toBase64() + " is stored with "
+        //               + routerInfo.getOptions().size() + " options on "
+        //               + new Date(routerInfo.getPublished()));
     
         _context.peerManager().setCapabilities(key, routerInfo.getCapabilities());
         _ds.put(key, routerInfo, persist);

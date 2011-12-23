@@ -25,6 +25,7 @@ import net.i2p.util.Log;
  * selection to the peer manager and tests the peer by sending it a useless
  * database store message
  *
+ * TODO - What's the point? Disable this? See also notes in PeerManager.selectPeers()
  */
 public class PeerTestJob extends JobImpl {
     private final Log _log;
@@ -65,7 +66,8 @@ public class PeerTestJob extends JobImpl {
             _log.info("Stop testing peers");
     }
     
-    public String getName() { return "Initiate some peer tests"; }
+    public String getName() { return "Peer test start"; }
+
     public void runJob() {
         if (!_keepTesting) return;
         Set peers = selectPeersToTest();
