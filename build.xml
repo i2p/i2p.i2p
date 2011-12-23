@@ -932,8 +932,11 @@
          TODO where is JMX? We don't need it I hope.
       -->
     <target name="prepjupdate" depends="prepupdate, buildWEB">
-        <copy todir="pkg-temp" >
-            <fileset dir="build/lib" includes="jasper*.jar javax*.jar jetty*.jar jsp*.jar org.mortbay.jetty.jar" />
+        <copy todir="pkg-temp/lib" >
+            <fileset dir="build" includes="jasper*.jar javax*.jar jetty*.jar jsp*.jar org.mortbay.jetty.jar" />
+        </copy>
+        <copy todir="pkg-temp/eepsite" >
+            <fileset dir="installer/resources/eepsite" includes="jetty.xml contexts/* etc/*" />
         </copy>
     </target>
 

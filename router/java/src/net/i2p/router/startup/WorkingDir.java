@@ -147,9 +147,12 @@ public class WorkingDir {
             System.err.println("Setting up new user directory " + rv);
         boolean success = migrate(MIGRATE_BASE, oldDirf, dirf);
         // this one must be after MIGRATE_BASE
-        success &= migrateJettyXml(oldDirf, dirf, "jetty.xml");
-        success &= migrateJettyXml(oldDirf, dirf, "contexts/base-context.xml");
-        success &= migrateJettyXml(oldDirf, dirf, "contexts/cgi-context.xml");
+        File oldEep = new File(oldDirf, "eepsite");
+        File newEep = new File(oldDirf, "eepsite");
+        String newPath = newEep.getAbsolutePath() + File.separatorChar;
+        success &= migrateJettyXml(oldEep, newEep, "jetty.xml", "./eepsite/", newPath);
+        success &= migrateJettyXml(oldEep, newEep, "contexts/base-context.xml", "./eepsite/", newPath);
+        success &= migrateJettyXml(oldEep, newEep, "contexts/cgi-context.xml", "./eepsite/", newPath);
         success &= migrateClientsConfig(oldDirf, dirf);
         // for later news.xml updates (we don't copy initialNews.xml over anymore)
         success &= (new SecureDirectory(dirf, "docs")).mkdir();
@@ -260,11 +263,9 @@ public class WorkingDir {
      *  It was already copied over once in migrate(), throw that out and
      *  do it again with modifications.
      */
-    private static boolean migrateJettyXml(File olddir, File todir, String filename) {
-        File eepsite1 = new File(olddir, "eepsite");
-        File oldFile = new File(eepsite1, filename);
-        File eepsite2 = new File(todir, "eepsite");
-        File newFile = new File(eepsite2, filename);
+    static boolean migrateJettyXml(File olddir, File todir, String filename, String oldString, String newString) {
+        File oldFile = new File(olddir, filename);
+        File newFile = new File(todir, filename);
         FileInputStream in = null;
         PrintWriter out = null;
         try {
@@ -272,8 +273,8 @@ public class WorkingDir {
             out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(newFile), "UTF-8")));
             String s = null;
             while ((s = DataHelper.readLine(in)) != null) {
-                if (s.indexOf("./eepsite/") >= 0) {
-                    s = s.replace("./eepsite/", todir.getAbsolutePath() + File.separatorChar + "eepsite" + File.separatorChar);
+                if (s.indexOf(oldString) >= 0) {
+                    s = s.replace(oldString, newString);
                 }
                 out.println(s);
             }
@@ -338,7 +339,7 @@ public class WorkingDir {
      * @param dst not a directory, will be overwritten if existing, will be mode 600
      * @return true if it was copied successfully
      */
-    private static boolean copyFile(File src, File dst) {
+    static boolean copyFile(File src, File dst) {
         if (!src.exists()) return false;
         boolean rv = true;
 
