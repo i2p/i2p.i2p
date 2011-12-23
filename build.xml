@@ -35,6 +35,7 @@
         <echo message="  updater200: Updater compressed with pack200 (creates i2pupdate200.zip, 60% smaller)" />
         <echo message="  updaterWithJavadoc: updater including the javadocs, for display in the console" />
         <echo message="  updaterWithJetty: Updater including Jetty" />
+        <echo message="  updater200withJetty: Updater including Jetty" />
         <echo message="  updaterWithJettyFixes: updater including local jetty patches" />
         <echo message="  updaterWithGeoIP: updater including GeoIP Files" />
         <echo message="  updaterWithJettyFixesAndGeoIP" />
@@ -811,6 +812,7 @@
     <target name="updaterWithJavadoc" depends="prepupdate, preplicenses, copyJavadoc, zipit" />
     <target name="updaterWithGeoIP" depends="prepupdate, prepgeoupdate, preplicenses, zipit" />
     <target name="updaterWithJetty" depends="prepjupdate, preplicenses, zipit" />
+    <target name="updater200WithJetty" depends="prepjupdate, preplicenses, pack200, zipit200" />
     <target name="updaterWithJettyFixes" depends="prepjupdatefixes, preplicenses, zipit" />
     <target name="updaterWithJettyFixesAndJbigi" depends="prepjupdatefixes, prepjbigiupdate, preplicenses, zipit" />
     <target name="updaterWithJettyFixesAndGeoIP" depends="prepjupdatefixes, prepgeoupdate, preplicenses, zipit" />
