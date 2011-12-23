@@ -155,7 +155,7 @@ public class WebAppStarter {
         String path = '/'+ appName;
         for (int i = 0; i < handlers.length; i++) {
             ContextHandler ch = (ContextHandler) handlers[i];
-            if (appName.equals(ch.getContextPath()))
+            if (path.equals(ch.getContextPath()))
                 return ch;
         }
         return null;
