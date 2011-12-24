@@ -42,6 +42,7 @@ import org.mortbay.jetty.security.ConstraintMapping;
 import org.mortbay.jetty.security.SecurityHandler;
 import org.mortbay.jetty.security.SslSelectChannelConnector;
 import org.mortbay.jetty.servlet.ServletHandler;
+import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.jetty.servlet.SessionHandler;
 import org.mortbay.jetty.webapp.WebAppContext;
 import org.mortbay.thread.QueuedThreadPool;
@@ -197,6 +198,7 @@ public class RouterConsoleRunner {
      *					SessionHandler
      *					SecurityHandler
      *					ServletHandler
+     *						servlets...
      *				WebAppContext
      *				...
      *			DefaultHandler
@@ -267,7 +269,8 @@ public class RouterConsoleRunner {
             _webAppsDir += '/';
 
         List<String> notStarted = new ArrayList();
-        WebAppContext baseHandler = null;
+        WebAppContext rootWebApp = null;
+        ServletHandler rootServletHandler = null;
         try {
             int boundAddresses = 0;
 
@@ -347,16 +350,17 @@ public class RouterConsoleRunner {
                 return;
             }
 
-            baseHandler = new LocaleWebAppHandler(I2PAppContext.getGlobalContext(),
+            rootWebApp = new LocaleWebAppHandler(I2PAppContext.getGlobalContext(),
                                                   "/", _webAppsDir + ROUTERCONSOLE + ".war");
             File tmpdir = new SecureDirectory(workDir, ROUTERCONSOLE + "-" +
                                                        (_listenPort != null ? _listenPort : _sslListenPort));
             tmpdir.mkdir();
-            baseHandler.setTempDirectory(tmpdir);
-            baseHandler.setSessionHandler(new SessionHandler());
-            baseHandler.setServletHandler(new ServletHandler());
-            initialize(baseHandler);
-            chColl.addHandler(baseHandler);
+            rootWebApp.setTempDirectory(tmpdir);
+            rootWebApp.setSessionHandler(new SessionHandler());
+            rootServletHandler = new ServletHandler();
+            rootWebApp.setServletHandler(rootServletHandler);
+            initialize(rootWebApp);
+            chColl.addHandler(rootWebApp);
 
             File dir = new File(_webAppsDir);
             String fileNames[] = dir.list(WarFilenameFilter.instance());
@@ -404,15 +408,23 @@ public class RouterConsoleRunner {
             me.printStackTrace();
         }
 
-        if (baseHandler != null) {
+        if (rootServletHandler != null && notStarted.size() > 0) {
             // map each not-started webapp to the error page
+            ServletHolder noWebApp = rootServletHandler.getServlet("net.i2p.router.web.jsp.nowebapp_jsp");
             for (int i = 0; i < notStarted.size(); i++) {
+                // we want a new handler for each one since if the webapp is started we remove the handler???
                 try {
-/////////////////////////////////////////////////
-                     //baseHandler.mapPathToServlet('/' + notStarted.get(i) + "/*",
-                     //                             "net.i2p.router.web.jsp.nowebapp_jsp");
+                    if (noWebApp != null) {
+                        String path = '/' + notStarted.get(i);
+                        // LocaleWebAppsHandler adds a .jsp
+                        rootServletHandler.addServletWithMapping(noWebApp, path + ".jsp");
+                        rootServletHandler.addServletWithMapping(noWebApp, path + "/*");
+                    } else {
+                        System.err.println("Can't find nowebapp.jsp?");
+                    }
                 } catch (Throwable me) {
                      System.err.println(me);
+                     me.printStackTrace();
                 }
             }
         }

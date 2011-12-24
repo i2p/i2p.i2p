@@ -76,9 +76,7 @@ public class LocaleWebAppHandler extends WebAppContext
                 if (lang != null && lang.length() > 0 && !lang.equals("en")) {
                     String testPath = pathInContext.substring(0, len - 4) + '_' + lang + ".jsp";
                     // Do we have a servlet for the new path that isn't the catchall *.jsp?
-                    //Map.Entry servlet = getHolderEntry(testPath);
-///////////////////////////////
-                    Map.Entry servlet = null;
+                    Map.Entry servlet = getServletHandler().getHolderEntry(testPath);
                     if (servlet != null) {
                         String servletPath = (String) servlet.getKey();
                         if (servletPath != null && !servletPath.startsWith("*")) {
