@@ -12,7 +12,16 @@ public class LogsHelper extends HelperBase {
     
     /** @since 0.8.11 */
     public String getJettyVersion() {
-        return Version.getImplVersion();
+        return jettyVersion();
+    }
+    
+    /** @since 0.8.13 */
+    static String jettyVersion() {
+        try {
+            return Version.getImplVersion();
+        } catch (Throwable t) {
+            return "unknown";
+        }
     }
 
     public String getLogs() {
