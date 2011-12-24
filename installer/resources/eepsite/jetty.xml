@@ -54,20 +54,32 @@
     <!-- =========================================================== -->
     <Set name="ThreadPool">
 
-      <!-- If you don't have threadpool
+      <!-- PICK ONE -->
+
+      <!-- If you don't have or want threadpool
+           Requests above the max will be queued
+       -->
+     <!--
       <New class="org.mortbay.thread.QueuedThreadPool">
         <Set name="minThreads">1</Set>
         <Set name="maxThreads">16</Set>
         <Set name="lowThreads">2</Set>
       </New>
-      -->
+     -->
 
       <!-- Optional Java 5 bounded threadpool with job queue 
+           Requests above the max will be rejected
+           TODO: would be nice to use the 5-arg constructor but
+                 how do you use an Enum as the TimeUnit argument?
+           Alternatively, make a custom class where we can
+           set the thread name, set daemon, etc.
+           See RouterConsoleRunner.
+       -->
       <New class="org.mortbay.thread.concurrent.ThreadPool">
+        <Arg type="int">0</Arg>
         <Set name="corePoolSize">1</Set>
         <Set name="maximumPoolSize">16</Set>
       </New>
-      -->
     </Set>
 
 
@@ -87,7 +99,7 @@
             <Set name="host">127.0.0.1</Set>
             <Set name="port">7658</Set>
             <Set name="maxIdleTime">60000</Set>
-            <Set name="Acceptors">2</Set>
+            <Set name="Acceptors">1</Set>
             <Set name="statsOn">false</Set>
             <Set name="confidentialPort">8443</Set>
 	    <Set name="lowResourcesConnections">5000</Set>
@@ -96,22 +108,12 @@
       </Arg>
     </Call>
 
-    <!-- Use this connector if NIO is not available. 
-    <Call name="addConnector">
-      <Arg>
-          <New class="org.mortbay.jetty.bio.SocketConnector">
-            <Set name="port">7658</Set>
-            <Set name="maxIdleTime">50000</Set>
-            <Set name="lowResourceMaxIdleTime">1500</Set>
-          </New>
-      </Arg>
-    </Call>
-    -->
-
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- To add a HTTPS SSL listener                                     -->
     <!-- see jetty-ssl.xml to add an ssl connector. use                  -->
-    <!-- java -jar start.jar etc/jetty.xml etc/jetty-ssl.xml             -->
+    <!-- To enable this change clients.config args to be:                -->
+    <!--                                                                 -->
+    <!--   clientApp3.args=etc/jetty.xml etc/jetty-ssl.xml               -->
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
   <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
   <!-- Add a HTTPS SSL listener on port 8443                               -->
@@ -120,21 +122,13 @@
   <!-- You would need to generate a selfsigned certificate in a keystore   -->
   <!-- in ~/.i2p/eepsite/keystore.ks, for example with the command line:   -->
   <!--
-       keytool -genkey -storetype JKS -keystore ~/.i2p/eepsite/keystore.ks -storepass changeit -alias console -dname CN=xyz123.eepsite.i2p.net,OU=Eepsite,O=I2P Anonymous Network,L=XX,ST=XX,C=XX -validity 3650 -keyalg DSA -keysize 1024 -keypass myKeyPassword 
+       keytool -genkey -storetype JKS -keystore ~/.i2p/eepsite/etc/keystore.ks -storepass changeit -alias console -dname CN=xyz123.eepsite.i2p.net,OU=Eepsite,O=I2P Anonymous Network,L=XX,ST=XX,C=XX -validity 3650 -keyalg DSA -keysize 1024 -keypass myKeyPassword 
    -->
   <!-- Change the CN and key password in the example, of course.           -->
   <!-- You wouldn't want to open this up to the regular internet,          -->
   <!-- would you?? Untested and not recommended.                           -->
   <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-    <!-- To allow Jetty to be started from xinetd                        -->
-    <!-- mixin jetty-xinetd.xml:                                         -->
-    <!--   java -jar start.jar etc/jetty.xml etc/jetty-xinetd.xml        -->
-    <!--                                                                 -->
-    <!-- See jetty-xinetd.xml for further instructions.                  -->
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-    
     <!-- =========================================================== -->
     <!-- Set up global session ID manager                            -->
     <!-- =========================================================== -->

@@ -9,7 +9,11 @@ import java.security.KeyStore;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.concurrent.Executors;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import net.i2p.I2PAppContext;
 import net.i2p.apps.systray.SysTray;
@@ -77,6 +81,7 @@ public class RouterConsoleRunner {
     private static final int MIN_THREADS = 1;
     private static final int MAX_THREADS = 24;
     private static final int MAX_IDLE_TIME = 90*1000;
+    private static final String THREAD_NAME = "RouterConsole Jetty";
     
     static {
         System.setProperty("org.mortbay.http.Version.paranoid", "true");
@@ -217,10 +222,12 @@ public class RouterConsoleRunner {
         // so Jetty can find WebAppConfiguration
         System.setProperty("jetty.class.path", I2PAppContext.getGlobalContext().getBaseDir() + "/lib/routerconsole.jar");
         _server = new Server();
+        _server.setGracefulShutdown(1000);
 
-    /**** this doesn't work with NIO maybe?
         try {
-            _server.setThreadPool(new ThreadPool(MIN_THREADS, MAX_THREADS, MAX_IDLE_TIME, TimeUnit.MILLISECONDS));
+            ThreadPool ctp = new CustomThreadPoolExecutor();
+            ctp.prestartAllCoreThreads();
+            _server.setThreadPool(ctp);
         } catch (Throwable t) {
             // class not found...
             System.out.println("INFO: Jetty concurrent ThreadPool unavailable, using QueuedThreadPool");
@@ -229,7 +236,7 @@ public class RouterConsoleRunner {
             qtp.setMaxIdleTimeMs(MAX_IDLE_TIME);
             _server.setThreadPool(qtp);
         }
-     ****/
+
         HandlerCollection hColl = new HandlerCollection();
         ContextHandlerCollection chColl = new ContextHandlerCollection();
         _server.addHandler(hColl);
@@ -670,6 +677,33 @@ public class RouterConsoleRunner {
         public static WarFilenameFilter instance() { return _filter; }
         public boolean accept(File dir, String name) {
             return (name != null) && (name.endsWith(".war") && !name.equals(ROUTERCONSOLE + ".war"));
+        }
+    }
+
+    
+    /**
+     * Just to set the name and set Daemon
+     * @since Jetty 6
+     */
+    private static class CustomThreadPoolExecutor extends ThreadPool {
+        public CustomThreadPoolExecutor() {
+             super(MIN_THREADS, MAX_THREADS, MAX_IDLE_TIME, TimeUnit.MILLISECONDS,
+                   new SynchronousQueue(), new CustomThreadFactory(),
+                   new ThreadPoolExecutor.CallerRunsPolicy());
+        }
+    }
+
+    /**
+     * Just to set the name and set Daemon
+     * @since Jetty 6
+     */
+    private static class CustomThreadFactory implements ThreadFactory {
+
+        public Thread newThread(Runnable r) {
+            Thread rv = Executors.defaultThreadFactory().newThread(r);
+            rv.setName(THREAD_NAME);
+            rv.setDaemon(true);
+            return rv;
         }
     }
 
