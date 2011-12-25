@@ -64,11 +64,11 @@ function toggleAll(category)
  <jsp:useBean class="net.i2p.router.web.ConfigStatsHandler" id="formhandler" scope="request" />
  <% formhandler.storeMethod(request.getMethod()); %>
  <jsp:setProperty name="formhandler" property="*" />
- <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
+ <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
  <jsp:getProperty name="formhandler" property="allMessages" />
 
  <jsp:useBean class="net.i2p.router.web.ConfigStatsHelper" id="statshelper" scope="request" />
- <jsp:setProperty name="statshelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
+ <jsp:setProperty name="statshelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
  <div class="configure">
  <form id="statsForm" name="statsForm" action="" method="POST">
  <input type="hidden" name="action" value="foo" >

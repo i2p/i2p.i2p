@@ -7,7 +7,7 @@
 <%=intl.title("config logging")%>
 </head><body>
 <jsp:useBean class="net.i2p.router.web.ConfigLoggingHelper" id="logginghelper" scope="request" />
-<jsp:setProperty name="logginghelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
+<jsp:setProperty name="logginghelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 
 <%@include file="summary.jsi" %>
 <h1><%=intl._("I2P Logging Configuration")%></h1>
@@ -17,7 +17,7 @@
  <jsp:useBean class="net.i2p.router.web.ConfigLoggingHandler" id="formhandler" scope="request" />
  <% formhandler.storeMethod(request.getMethod()); %>
  <jsp:setProperty name="formhandler" property="*" />
- <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
+ <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
  <jsp:getProperty name="formhandler" property="allMessages" />
 <div class="configure">
  <form action="" method="POST">

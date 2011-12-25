@@ -15,13 +15,13 @@
  <jsp:useBean class="net.i2p.router.web.ConfigPeerHandler" id="formhandler" scope="request" />
  <% formhandler.storeMethod(request.getMethod()); %>
  <jsp:setProperty name="formhandler" property="*" />
- <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
+ <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
  <jsp:getProperty name="formhandler" property="allMessages" />
 
 
 
  <jsp:useBean class="net.i2p.router.web.ConfigPeerHelper" id="peerhelper" scope="request" />
- <jsp:setProperty name="peerhelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
+ <jsp:setProperty name="peerhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 
  <% String peer = "";
     if (request.getParameter("peer") != null)
@@ -61,7 +61,7 @@
  </form>
  <a name="shitlist"> </a><h2><%=intl._("Banned Peers")%></h2>
  <jsp:useBean class="net.i2p.router.web.ProfilesHelper" id="profilesHelper" scope="request" />
- <jsp:setProperty name="profilesHelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
+ <jsp:setProperty name="profilesHelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
  <% profilesHelper.storeWriter(out); %>
  <jsp:getProperty name="profilesHelper" property="shitlistSummary" />
  <div class="wideload"><h2><%=intl._("Banned IPs")%></h2>
