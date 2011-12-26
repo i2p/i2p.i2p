@@ -61,16 +61,13 @@ case "$1" in
             < /etc/i2p/wrapper.config > /etc/i2p/wrapper.config.tmp
         mv -f /etc/i2p/wrapper.config.tmp /etc/i2p/wrapper.config
 
-    migrate_existing_user(){
-        # Adjust the user/group in /etc/passwd, mainly for upgrades from old packages that didn't
-        # create $I2PSYSUSER as a system group/user
-        usermod -c "I2P Router Daemon" -m -d $I2PHOME -g $I2PSYSUSER -s "/bin/false" \
-            -l $I2PSYSUSER -e 1 > /dev/null 2>&1
-        echo "Existing user migrated, home directory moved to $I2PHOME"
-    }
-
     # Create user and group as a system user.
-    adduser --system --quiet --group --home $I2PHOME $I2PSYSUSER || migrate_existing_user
+    if getent passwd i2psvc > /dev/null 2>&1 ; then
+        usermod -c "I2P Router Daemon" -d $I2PHOME -g $I2PSYSUSER -s "/bin/false" \
+            $I2PSYSUSER -e 1 > /dev/null 2>&1
+    else
+        adduser --system --quiet --group --home $I2PHOME $I2PSYSUSER
+    fi
 
     [ -d /var/log/i2p ] || mkdir -m0750 /var/log/i2p
     chown -f -R $I2PSYSUSER:adm /var/log/i2p
@@ -93,7 +90,7 @@ abort-upgrade|abort-remove|abort-deconfigure)
                 exit 0
                 ;;
 esac
-    
+
 #DEBHELPER#
 
 exit 0
