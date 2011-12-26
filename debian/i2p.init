@@ -1,18 +1,18 @@
 #!/bin/sh
 
 ### BEGIN INIT INFO
-# Provides:		i2p i2p-router
-# Required-Start:	$remote_fs $syslog $named $network $time
-# Required-Stop:	$remote_fs $syslog $named $network
-# Default-Start:	2 3 4 5
-# Default-Stop:		0 1 6
-# Short-Description:	start and stop the i2p router
-# Description:		i2p is a load-balanced unspoofable packet switching network
+# Provides: i2p i2p-router
+# Required-Start: $remote_fs $syslog $named $network $time
+# Required-Stop: $remote_fs $syslog $named $network
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: start and stop the i2p router
+# Description: i2p is a load-balanced unspoofable packet switching network
 ### END INIT INFO
 
 # Check permissions
 if [ "`id -ur`" != '0' ]; then
-   echo 'Error: you must be root.'
+   echo 'ERROR: You must be root to start this service.' >&2
    echo
    exit 1
 fi
@@ -25,17 +25,19 @@ DAEMON="/usr/sbin/wrapper"
 PIDFILE="$RUN/$NAME.pid"
 JVMPIDFILE="$RUN/routerjvm.pid"
 I2P="/usr/share/i2p"
-I2PTEMP="/tmp/"
+I2PTEMP="/var/tmp/$NAME"
 WRAPPERLOG="/var/log/i2p/wrapper.log"
 
 # Don't touch these, edit /etc/default/i2p
 RUN_DAEMON="False"
-NICE=
+NICE=0
 I2PUSER="i2psvc"
 
 I2P_ARGS="/etc/i2p/wrapper.config \
  wrapper.java.additional.1=-DloggerFilenameOverride=/var/log/i2p/log-router-@.txt \
- wrapper.java.additional.5=-Dwrapper.logfile=$WRAPPERLOG \
+ wrapper.java.additional.10=-Dwrapper.logfile=$WRAPPERLOG \
+ wrapper.java.additional.11=-Di2p.dir.pid=$RUN \
+ wrapper.java.additional.12=-Di2p.dir.temp=$I2PTEMP \
  wrapper.logfile=$WRAPPERLOG \
  wrapper.pidfile=$PIDFILE \
  wrapper.java.pidfile=$JVMPIDFILE \
@@ -65,8 +67,8 @@ done
 [ -r /etc/default/$NAME ] && . /etc/default/$NAME
 
 if [ -z "$RUN_DAEMON" ]; then
-	echo "/etc/default/$NAME is not set. Aborting."
-	exit 1
+    echo "/etc/default/$NAME is not properly configured. Aborting." >&2
+    exit 1
 fi
 
 case "$RUN_DAEMON" in
@@ -76,50 +78,52 @@ case "$RUN_DAEMON" in
                 ;;
 esac
 
+# We need the wrapper. If it's not found, abort.
+[ -x $DAEMON ] || exit 1
 
-# is the wrapper from the service-wrapper package even installed?
-# if not, bail NOW
-
-[ -x $DAEMON ] || exit 0
-
-# Ditto for i2prouter. Even though this script doesn't call it,
-# if it's not found the package probably hasn't been installed.
-
-[ -r /usr/bin/i2prouter ] || exit 0
+# Even though this script doesn't call it, check for i2prouter.  If it's not
+# found, it probably means that the package isn't installed anymore.
+[ -x /usr/bin/i2prouter ] || exit 1
 
 do_start()
 {
-	start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON --test > /dev/null\
-		|| return 1
-	[ -d $RUN ] || mkdir $RUN
-        [ -r $PIDFILE ] || touch $PIDFILE
-	[ -r $JVMPIDFILE ] || touch $JVMPIDFILE
-        [ -d $I2PTEMP ] || mkdir $I2PTEMP
-	chown -Rf $I2PUSER:$I2PUSER  $I2PTEMP/*i2p* $I2PTEMP/router.ping $RUN > /dev/null 2>&1
-	chown -f -R $I2PUSER:adm /var/log/$NAME
-	TZ=UTC start-stop-daemon --start --quiet -c $I2PUSER --pidfile $PIDFILE --exec $DAEMON $NICE -- \
-		$I2P_ARGS || return 2
+    start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON --test > /dev/null 2>&1 \
+        || return 1
+    [ -d $RUN ] || mkdir $RUN > /dev/null 2>&1
+    [ -d $I2PTEMP ] || mkdir $I2PTEMP > /dev/null 2>&1
+    if [ -r $PIDFILE ]; then
+        PID="$(cat ${PIDFILE})"
+        if ! kill -0 $PID > /dev/null 2>&1; then
+                rm "$PIDFILE" "$JVMPIDFILE"
+        else
+                # we shouldn't get here, but...
+                echo "ERROR: Another instance of $DESC is already running." >&2
+                return 1
+        fi
+    fi
+    chown -Rf $I2PUSER:$I2PUSER  $I2PTEMP $RUN > /dev/null 2>&1
+    chown -f -R $I2PUSER:adm /var/log/$NAME > /dev/null 2>&1
+    TZ=UTC start-stop-daemon --start --quiet -c $I2PUSER --pidfile $PIDFILE --exec $DAEMON -n $NICE -- \
+        $I2P_ARGS || return 2
 }
 
 do_stop()
 {
-	start-stop-daemon --stop --quiet --retry=TERM/15/KILL/5 --pidfile $PIDFILE -u $I2PUSER
-	RETVAL="$?"
-	[ "$RETVAL" = 2 ] && return 2
+    start-stop-daemon --stop --quiet --retry=TERM/60/KILL/20 --pidfile $PIDFILE -u $I2PUSER
+    RETVAL="$?"
+    [ "$RETVAL" = 2 ] && return 2
 
-#	start-stop-daemon --stop --quiet --oknodo --retry=TERM/15/KILL/5 -u $I2PUSER
+    start-stop-daemon --stop --quiet --oknodo --retry=0/60/KILL/20 --exec $DAEMON
 
-	start-stop-daemon --stop --quiet --oknodo --retry=0/30/KILL/5 --exec $DAEMON
-
-	rm -f "$PIDFILE" "$JVMPIDFILE"
-	[ -d $RUN ] && rmdir $RUN
+    rm -rf "$I2PTEMP" > /dev/null 2>&1
+    [ -d "$RUN" ] && rmdir "$RUN" 2>&1
 }
 
 do_dump()
 {
-	start-stop-daemon --stop --quiet -s 3 --pidfile $PIDFILE -u $I2PUSER
-	RETVAL="$?"
-	[ "$RETVAL" = 2 ] && return 2
+    start-stop-daemon --stop --quiet -s 3 --pidfile $PIDFILE -u $I2PUSER
+    RETVAL="$?"
+    [ "$RETVAL" = 2 ] && return 2
 }
 
 case "$1" in
@@ -140,7 +144,7 @@ case "$1" in
         esac
         ;;
   stop)
-	log_daemon_msg "Stopping $DESC" "$NAME"
+    log_daemon_msg "Stopping $DESC" "$NAME"
         do_stop
         case "$?" in
                 0|1) log_end_msg 0 ;;
@@ -149,7 +153,7 @@ case "$1" in
         ;;
   status)
        status_of_proc -p $PIDFILE "$DAEMON" "$NAME" && exit 0 || exit $?
-	;;
+    ;;
  restart|force-reload)
         log_daemon_msg "Restarting $DESC" "$NAME"
         do_stop
@@ -169,10 +173,10 @@ case "$1" in
         esac
         ;;
 *)
-	N=/etc/init.d/$NAME
-	echo "Usage: $N {start|stop|dump|status|restart|force-reload}" >&2
-	exit 3
-	;;
+    N=/etc/init.d/$NAME
+    echo "Usage: $N {start|stop|dump|status|restart|force-reload}" >&2
+    exit 3
+    ;;
 
 
 esac
