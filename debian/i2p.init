@@ -79,11 +79,11 @@ case "$RUN_DAEMON" in
 esac
 
 # We need the wrapper. If it's not found, abort.
-[ -x $DAEMON ] || exit 1
+[ -x $DAEMON ] || exit 0
 
 # Even though this script doesn't call it, check for i2prouter.  If it's not
 # found, it probably means that the package isn't installed anymore.
-[ -x /usr/bin/i2prouter ] || exit 1
+[ -x /usr/bin/i2prouter ] || exit 0
 
 do_start()
 {
