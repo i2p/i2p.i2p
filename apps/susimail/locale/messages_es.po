@@ -8,14 +8,15 @@
 # ducki2p <ducki2p@gmail.com>, 2011.
 # foo <foo@bar>, 2009.
 # mixy, 2011.
+#   <punkibastardo@gmail.com>, 2011.
 # punkibastardo <punkibastardo@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-12-12 11:15+0000\n"
-"PO-Revision-Date: 2011-10-07 01:33+0000\n"
-"Last-Translator: blabla <blabla@trash-mail.com>\n"
+"POT-Creation-Date: 2011-12-27 22:38+0000\n"
+"PO-Revision-Date: 2011-12-18 10:48+0000\n"
+"Last-Translator: punkibastardo <punkibastardo@gmail.com>\n"
 "Language-Team: Spanish (Castilian) (http://www.transifex.net/projects/p/I2P/"
 "team/es/)\n"
 "Language: es\n"
@@ -321,7 +322,7 @@ msgstr "Cancelar"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1605
 msgid "Learn about I2P mail"
-msgstr ""
+msgstr "Aprende sobre I2P mail"
 
 #: src/src/i2p/susi/webmail/WebMail.java:1606
 msgid "Create Account"

@@ -1,3 +1,6 @@
+2011-12-27 kytv
+ * Spanish and Swedish translation updates from Transifex
+
 2011-12-23 zzz
   * Logging: Eliminate LogWriter/LogManager deadlock
 
