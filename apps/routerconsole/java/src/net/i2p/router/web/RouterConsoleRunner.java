@@ -275,7 +275,6 @@ public class RouterConsoleRunner {
         if (!_webAppsDir.endsWith("/"))
             _webAppsDir += '/';
 
-        List<String> notStarted = new ArrayList();
         WebAppContext rootWebApp = null;
         ServletHandler rootServletHandler = null;
         try {
@@ -369,38 +368,10 @@ public class RouterConsoleRunner {
             initialize(rootWebApp);
             chColl.addHandler(rootWebApp);
 
-            File dir = new File(_webAppsDir);
-            String fileNames[] = dir.list(WarFilenameFilter.instance());
-            if (fileNames != null) {
-                for (int i = 0; i < fileNames.length; i++) {
-                    try {
-                        String appName = fileNames[i].substring(0, fileNames[i].lastIndexOf(".war"));
-                        String enabled = props.getProperty(PREFIX + appName + ENABLED);
-                        if (! "false".equals(enabled)) {
-                            String path = new File(dir, fileNames[i]).getCanonicalPath();
-                            tmpdir = new SecureDirectory(workDir, appName + "-" +
-                                                                  (_listenPort != null ? _listenPort : _sslListenPort));
-                            WebAppStarter.addWebApp(I2PAppContext.getGlobalContext(), chColl, appName, path, tmpdir);
-
-                            if (enabled == null) {
-                                // do this so configclients.jsp knows about all apps from reading the config
-                                props.setProperty(PREFIX + appName + ENABLED, "true");
-                                rewrite = true;
-                            }
-                        } else {
-                            notStarted.add(appName);
-                        }
-                    } catch (IOException ioe) {
-                        System.err.println("Error resolving '" + fileNames[i] + "' in '" + dir);
-                    }
-                }
-            }
         } catch (Exception ioe) {
             ioe.printStackTrace();
         }
 
-        if (rewrite)
-            storeWebAppProperties(props);
         try {
             // start does a mapContexts()
             _server.start();
@@ -414,6 +385,44 @@ public class RouterConsoleRunner {
                                "Exception: " + me);
             me.printStackTrace();
         }
+
+        // Start all the other webapps after the server is up,
+        // so things start faster.
+        // Jetty 6 starts the connector before the router console is ready
+        // This also prevents one webapp from breaking the whole thing
+        List<String> notStarted = new ArrayList();
+        if (_server.isRunning()) {
+            File dir = new File(_webAppsDir);
+            String fileNames[] = dir.list(WarFilenameFilter.instance());
+            if (fileNames != null) {
+                for (int i = 0; i < fileNames.length; i++) {
+                    String appName = fileNames[i].substring(0, fileNames[i].lastIndexOf(".war"));
+                    String enabled = props.getProperty(PREFIX + appName + ENABLED);
+                    if (! "false".equals(enabled)) {
+                        try {
+                            String path = new File(dir, fileNames[i]).getCanonicalPath();
+                            WebAppStarter.startWebApp(I2PAppContext.getGlobalContext(), chColl, appName, path);
+                            if (enabled == null) {
+                                // do this so configclients.jsp knows about all apps from reading the config
+                                props.setProperty(PREFIX + appName + ENABLED, "true");
+                                rewrite = true;
+                            }
+                        } catch (Throwable t) {
+                            System.err.println("ERROR: Failed to start " + appName + ' ' + t);
+                            t.printStackTrace();
+                            notStarted.add(appName);
+                        }
+                    } else {
+                        notStarted.add(appName);
+                    }
+                }
+            }
+        } else {
+            System.err.println("ERROR: Router console did not start, not starting webapps");
+        }
+
+        if (rewrite)
+            storeWebAppProperties(props);
 
         if (rootServletHandler != null && notStarted.size() > 0) {
             // map each not-started webapp to the error page

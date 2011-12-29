@@ -238,7 +238,7 @@
     <!-- =========================================================== -->
     <Ref id="RequestLog">
       <Set name="requestLog">
-        <New id="RequestLogImpl" class="org.mortbay.http.I2PRequestLog">
+        <New id="RequestLogImpl" class="net.i2p.jetty.I2PRequestLog">
           <Set name="filename">./eepsite/logs/yyyy_mm_dd.request.log</Set>
           <Set name="filenameDateFormat">yyyy_MM_dd</Set>
           <Set name="retainDays">90</Set>

@@ -12,7 +12,7 @@
 //limitations under the License.
 //========================================================================
 
-package org.mortbay.http; 
+package net.i2p.jetty; 
 
 import java.io.IOException;
 import java.io.OutputStream;
