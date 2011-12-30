@@ -139,7 +139,8 @@
     <target name="jar" depends="compile, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
         <!-- set if unset -->
         <property name="workspace.changes.tr" value="" />
-        <jar destfile="./jettylib/jetty-i2p.jar" basedir="./build/obj" includes="**/*.class" >
+        <copy todir="build/obj" file="resources/log4j.properties" />
+        <jar destfile="./jettylib/jetty-i2p.jar" basedir="./build/obj" includes="**/*.class log4j.properties" >
             <manifest>
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
