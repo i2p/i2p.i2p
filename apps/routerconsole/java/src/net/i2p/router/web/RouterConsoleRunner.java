@@ -20,6 +20,7 @@ import net.i2p.apps.systray.SysTray;
 import net.i2p.data.Base32;
 import net.i2p.data.DataHelper;
 import net.i2p.desktopgui.Main;
+import net.i2p.jetty.I2PLogger;
 import net.i2p.router.RouterContext;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
@@ -49,6 +50,7 @@ import org.mortbay.jetty.servlet.ServletHandler;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.jetty.servlet.SessionHandler;
 import org.mortbay.jetty.webapp.WebAppContext;
+import org.mortbay.log.Log;
 import org.mortbay.thread.QueuedThreadPool;
 import org.mortbay.thread.concurrent.ThreadPool;
 
@@ -219,6 +221,7 @@ public class RouterConsoleRunner {
         if (!workDirCreated)
             System.err.println("ERROR: Unable to create Jetty temporary work directory");
         
+        Log.setLog(new I2PLogger(I2PAppContext.getGlobalContext()));
         // so Jetty can find WebAppConfiguration
         System.setProperty("jetty.class.path", I2PAppContext.getGlobalContext().getBaseDir() + "/lib/routerconsole.jar");
         _server = new Server();

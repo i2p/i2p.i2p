@@ -132,7 +132,7 @@
         <ant dir="apps/routerconsole/java/" target="jar" />
     </target>
 
-    <target name="buildJetty" depends="buildProperties" >
+    <target name="buildJetty" depends="buildCore" >
         <ant dir="apps/jetty" target="build" />
     </target>
 

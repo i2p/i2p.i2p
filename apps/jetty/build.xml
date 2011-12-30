@@ -114,7 +114,7 @@
             debug="true" source="1.5" target="1.5" 
             destdir="./build/obj" 
             includeAntRuntime="false"
-            classpath="./jettylib/commons-logging.jar:./jettylib/javax.servlet.jar:./jettylib/org.mortbay.jetty.jar:./jettylib/jetty-util.jar" >
+            classpath="../../core/java/build/i2p.jar:./jettylib/commons-logging.jar:./jettylib/javax.servlet.jar:./jettylib/org.mortbay.jetty.jar:./jettylib/jetty-util.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>

@@ -26,6 +26,7 @@
                 <pathelement location="../../jetty/jettylib/jetty-threadpool.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="../../jetty/jettylib/jsp-api.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-i2p.jar" />
                 <pathelement location="../../systray/java/build/obj" />
                 <pathelement location="../../systray/java/lib/systray4j.jar" />
                 <pathelement location="../../desktopgui/build" />
@@ -62,6 +63,7 @@
                 <pathelement location="../../jetty/jettylib/jetty-threadpool.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="../../jetty/jettylib/jsp-api.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-i2p.jar" />
                 <pathelement location="../../systray/java/build/systray.jar" />
                 <pathelement location="../../systray/java/lib/systray4j.jar" />
                 <pathelement location="../../desktopgui/dist/desktopgui.jar" />
@@ -243,6 +245,7 @@
                 <pathelement location="../../jetty/jettylib/commons-el.jar" />
                 <pathelement location="../../jetty/jettylib/jsp-api.jar" />
                 <pathelement location="../../jetty/jettylib/ant.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-i2p.jar" />
                 <pathelement location="../../systray/java/build/obj" />
                 <pathelement location="../../systray/java/lib/systray4j.jar" />
                 <pathelement location="../../desktopgui/dist/desktopgui.jar" />
@@ -279,6 +282,7 @@
                 <pathelement location="../../jetty/jettylib/jetty-sslengine.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-threadpool.jar" />
                 <pathelement location="../../jetty/jettylib/jsp-api.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-i2p.jar" />
                 <pathelement location="../../systray/java/build/obj" />
                 <pathelement location="../../systray/java/lib/systray4j.jar" />
                 <pathelement location="../../desktopgui/dist/desktopgui.jar" />
