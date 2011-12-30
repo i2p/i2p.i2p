@@ -18,7 +18,10 @@ public class LogsHelper extends HelperBase {
     /** @since 0.8.13 */
     static String jettyVersion() {
         try {
-            return Version.getImplVersion();
+            String rv = Version.getImplVersion();
+            if (rv.startsWith("Jetty/"))
+                rv = rv.substring(6);
+            return rv;
         } catch (Throwable t) {
             return "unknown";
         }
