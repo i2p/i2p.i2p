@@ -942,9 +942,9 @@
         </copy>
     </target>
 
-    <!-- just our jetty 5 fixes, not for jetty 6 -->
+    <!-- Jetty 6 I2P logging addons, not really fixes -->
     <target name="prepjupdatefixes" depends="prepupdate, buildWEB">
-        <copy file="build/org.mortbay.jetty.jar" todir="pkg-temp/lib/" />
+        <copy file="build/jetty-i2p.jar" todir="pkg-temp/lib/" />
     </target>
 
     <target name="util-list-changes" depends="checkForMtn" if="mtn.available" >
