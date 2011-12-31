@@ -148,7 +148,7 @@ public class WorkingDir {
         boolean success = migrate(MIGRATE_BASE, oldDirf, dirf);
         // this one must be after MIGRATE_BASE
         File oldEep = new File(oldDirf, "eepsite");
-        File newEep = new File(oldDirf, "eepsite");
+        File newEep = new File(dirf, "eepsite");
         String newPath = newEep.getAbsolutePath() + File.separatorChar;
         success &= migrateJettyXml(oldEep, newEep, "jetty.xml", "./eepsite/", newPath);
         success &= migrateJettyXml(oldEep, newEep, "jetty-ssl.xml", "./eepsite/", newPath);
@@ -245,11 +245,11 @@ public class WorkingDir {
                 }
                 out.println(s);
             }
-            System.err.println("Copied clients.config with modifications");
+            System.err.println("Copied " + oldFile + " with modifications");
             return true;
         } catch (IOException ioe) {
             if (in != null) {
-                System.err.println("FAILED copy clients.config");
+                System.err.println("FAILED copy " + oldFile + ": " + ioe);
                 return false;
             }
             return false;
@@ -280,11 +280,11 @@ public class WorkingDir {
                 out.println(s);
             }
             out.println("<!-- Modified by I2P User dir migration script -->");
-            System.err.println("Copied " + filename + " with modifications");
+            System.err.println("Copied " + oldFile + " with modifications");
             return true;
         } catch (IOException ioe) {
             if (in != null) {
-                System.err.println("FAILED copy " + filename);
+                System.err.println("FAILED copy " + oldFile + ": " + ioe);
                 return false;
             }
             return false;
@@ -357,7 +357,7 @@ public class WorkingDir {
             
             System.err.println("Copied " + src.getPath());
         } catch (IOException ioe) {
-            System.err.println("FAILED copy " + src.getPath());
+            System.err.println("FAILED copy " + src.getPath() + ": " + ioe);
             rv = false;
         } finally {
             if (in != null) try { in.close(); } catch (IOException ioe) {}

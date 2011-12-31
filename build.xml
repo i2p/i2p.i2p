@@ -937,7 +937,10 @@
         <copy todir="pkg-temp/lib" >
             <fileset dir="build" includes="jasper*.jar javax*.jar jetty*.jar jsp*.jar org.mortbay.jetty.jar" />
         </copy>
-        <copy todir="pkg-temp/eepsite" >
+        <!--  We have to package the new eepsite files for MigrateJetty.java, but we
+              can't overwrite an existing eepsite dir in a non-split configuration.
+          -->
+        <copy todir="pkg-temp/eepsite-jetty6" >
             <fileset dir="installer/resources/eepsite" includes="jetty.xml jetty-ssl.xml contexts/* etc/*" />
         </copy>
     </target>
