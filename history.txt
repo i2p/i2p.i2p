@@ -1,3 +1,10 @@
+2011-12-31 zzz
+ * Fix log NPE when saveConfig() fails at startup, thx kytv
+   (backport from jetty6 branch)
+
+2011-12-30 zzz
+ * New Estonian translation thanks ajutine
+
 2011-12-27 kytv
  * Spanish and Swedish translation updates from Transifex
 

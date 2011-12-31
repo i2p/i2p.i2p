@@ -426,7 +426,11 @@ public class Router implements RouterClock.ClockShiftListener {
         foo.putAll(config);
     }
     
-    /** this does not use ctx.getConfigDir(), must provide a full path in filename */
+    /**
+     *  this does not use ctx.getConfigDir(), must provide a full path in filename
+     *
+     *  @param ctx will be null at startup when called from constructor
+     */
     private static Properties getConfig(RouterContext ctx, String filename) {
         Log log = null;
         if (ctx != null) {
@@ -444,10 +448,15 @@ public class Router implements RouterClock.ClockShiftListener {
             } else {
                 if (log != null)
                     log.warn("Configuration file " + filename + " does not exist");
+                // normal not to exist at first install
+                //else
+                //    System.err.println("WARNING: Configuration file " + filename + " does not exist");
             }
         } catch (Exception ioe) {
             if (log != null)
                 log.error("Error loading the router configuration from " + filename, ioe);
+            else
+                System.err.println("Error loading the router configuration from " + filename + ": " + ioe);
         }
         return props;
     }
@@ -1193,8 +1202,11 @@ public class Router implements RouterClock.ClockShiftListener {
             }
             fos.write(buf.toString().getBytes("UTF-8"));
         } catch (IOException ioe) {
-            if (_log.shouldLog(Log.ERROR))
+            // warning, _log will be null when called from constructor
+            if (_log != null)
                 _log.error("Error saving the config to " + _configFilename, ioe);
+            else
+                System.err.println("Error saving the config to " + _configFilename + ": " + ioe);
             return false;
         } finally {
             if (fos != null) try { fos.close(); } catch (IOException ioe) {}
