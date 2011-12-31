@@ -8,7 +8,7 @@ From the delta pack, copy lib/wrapper.jar to all/
 
 From the delta pack, strip the binaries in lib/
 (if you have the tools to do so for that architecture) and copy
-to xxx/librapper.so, libwrapper.jnilib, or libwrapper.dll for the following directories.
+to xxx/librapper.so, libwrapper.jnilib, or wrapper.dll for the following directories.
 Don't forget to disable the execute bit.
 	linux (x86-32)
 	linux64 (x86-64)
