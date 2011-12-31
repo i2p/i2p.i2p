@@ -33,6 +33,11 @@ public class I2PLogger implements Logger
     
     StringBuilder _buffer = new StringBuilder();
     
+    public I2PLogger()
+    {
+        this(I2PAppContext.getGlobalContext());
+    }
+    
     public I2PLogger(I2PAppContext ctx)
     {
         _log = ctx.logManager().getLog(Server.class);
@@ -105,6 +110,7 @@ public class I2PLogger implements Logger
     
     private void format(String msg, Object arg0, Object arg1)
     {
+        _buffer.setLength(0);
         int i0=msg==null?-1:msg.indexOf("{}");
         int i1=i0<0?-1:msg.indexOf("{}",i0+2);
         

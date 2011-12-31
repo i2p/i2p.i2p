@@ -221,11 +221,14 @@ public class RouterConsoleRunner {
         if (!workDirCreated)
             System.err.println("ERROR: Unable to create Jetty temporary work directory");
         
-        try {
-            Log.setLog(new I2PLogger(I2PAppContext.getGlobalContext()));
-        } catch (Throwable t) {
-            System.err.println("INFO: I2P Jetty logging class not found, logging to wrapper log");
-        }
+        //try {
+        //    Log.setLog(new I2PLogger(I2PAppContext.getGlobalContext()));
+        //} catch (Throwable t) {
+        //    System.err.println("INFO: I2P Jetty logging class not found, logging to wrapper log");
+        //}
+        // This way it doesn't try to load Slf4jLog first
+        System.setProperty("org.mortbay.log.class", "net.i2p.jetty.I2PLogger");
+
         // so Jetty can find WebAppConfiguration
         System.setProperty("jetty.class.path", I2PAppContext.getGlobalContext().getBaseDir() + "/lib/routerconsole.jar");
         _server = new Server();
