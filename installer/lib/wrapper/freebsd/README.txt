@@ -16,7 +16,7 @@ Omit "compile-c-unix" from the command-lines if you want to compile
 wrapper.jar too.
 
 Then strip the binaries:
-	strip --stip-unneeded bin/wrapper lib/libwrapper.so
+	strip --strip-unneeded bin/wrapper lib/libwrapper.so
 
 ...and turn off the executable bit:
 	chmod 644 bin/wrapper lib/libwrapper.so
