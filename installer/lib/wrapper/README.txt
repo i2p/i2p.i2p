@@ -12,7 +12,6 @@ to xxx/librapper.so, libwrapper.jnilib, or libwrapper.dll for the following dire
 Don't forget to disable the execute bit.
 	linux (x86-32)
 	linux64 (x86-64)
-	linux-ppc (ppc-32)
 	solaris (sparc-32)
 	win32
 
@@ -29,6 +28,11 @@ For freebsd and freebsd64, we don't use the Tanuki binaries
 because they are compiled in FBSD v6.  Compile from source in
 FreeBSD 7.4 to eliminate the dependency on the compat6x port.
 Don't forget to strip the binaries and disable the execute bit.
+A walkthrough can be found in freebsd/README.txt.
+
+For linux-ppc, we don't use the Tanuki binaires because they're (mistakenly)
+ppc64 compiles (TODO: File bug with Tanuki). Compile the arch-dependent bits
+with "ant -Dbits=32 compile-c-unix".
 
 For macosx, combine the universal-32 and universal-64 files
 from the delta pack (each a 2-architecture fat file)
