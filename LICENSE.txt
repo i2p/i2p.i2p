@@ -176,8 +176,9 @@ Applications:
    By welterde.
    See licenses/LICENSE-GPLv2.txt
 
-   Jetty 5.1.15:
-   Copyright 2000-2004 Mort Bay Consulting Pty. Ltd.
+   Jetty 6.1.26:
+   Copyright 1995-2009 Mort Bay Consulting Pty Ltd
+   See licenses/LICENSE-Jetty.txt
    See licenses/LICENSE-Apache2.0.txt
    See licenses/NOTICE-Commons-Logging.txt
 
