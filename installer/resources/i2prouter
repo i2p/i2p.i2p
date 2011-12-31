@@ -357,7 +357,11 @@ if [ "$DIST_OS" = "macosx" ]
 then
     OS_VER=`sw_vers | grep 'ProductVersion:' | grep -o '[0-9]*\.[0-9]*\.[0-9]*'`
     DIST_ARCH="universal"
-    DIST_BITS="64"
+    if [ $(sysctl -n hw.cpu64bit_capable) -eq 1 ]; then
+        DIST_BITS="64"
+    else
+        DIST_BITS="32"
+    fi
     APP_PLIST_BASE=${PLIST_DOMAIN}.${APP_NAME}
     APP_PLIST=${APP_PLIST_BASE}.plist
 else
