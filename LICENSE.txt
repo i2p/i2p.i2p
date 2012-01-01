@@ -135,10 +135,6 @@ Java Service Wrapper Community Edition 32-bit 3.5.9:
 Jbigi Libraries (jbigi.jar):
    JNI code public domain.
 
-   GMP 4.1.3 / 4.1.4:
-   Copyright 1991, 1996, 1999, 2000 Free Software Foundation, Inc.
-   See licenses/LICENSE-LGPLv2.1.txt
-
    GMP 4.3.2 / 5.0.2:
    Copyright 1991, 1996, 1999, 2000, 2007 Free Software Foundation, Inc.
    See licenses/LICENSE-LGPLv3.txt
