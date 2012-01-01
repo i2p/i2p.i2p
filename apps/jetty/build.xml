@@ -82,7 +82,6 @@
               jetty-sslengine-xxx.jar: SSL NIO Connector for console
               jetty-java5-threadpool-xxx.jar: Concurrent thread pool for eepsite
               commons-logging.jar: JspC compiler
-              TODO which of these are available in the Ubuntu packages?
         -->
         <copy preservelastmodified="true" file="${jetty.base}/lib/${jetty.base}.jar" tofile="jettylib/org.mortbay.jetty.jar" />
         <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-util-${jetty.ver}.jar" tofile="jettylib/jetty-util.jar" />

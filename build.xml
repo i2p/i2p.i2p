@@ -50,26 +50,28 @@
         <echo message="  javadoc:   generate javadoc for the entire project into ./build/javadoc" />
         <echo message="  slackpkg:  generate Slackware packages in ./Slackware/i2p and ./Slackware/i2p-base" />
         <echo message="  debianhowto: instructions on building Debian packages" />
-	<echo message="  debian: generate Debian packages in ../" />
-	<echo message="          run &quot;ant debianhowto&quot; for instructions" />
-	<echo message="  debian-clean: rollback debian specific patches and run the &quot;distclean&quot; target (done automatically at the end of the &quot;debian&quot; target)" />
-	<!-- <echo message="  debianrepo: build a Debian repository (reprepro required)" /> -->
+        <echo message="  debian: generate Debian packages in ../" />
+        <echo message="          run &quot;ant debianhowto&quot; for instructions" />
+        <echo message="  debian-clean: rollback debian specific patches and run the &quot;distclean&quot; target (done automatically at the end of the &quot;debian&quot; target)" />
+        <!-- <echo message="  debianrepo: build a Debian repository (reprepro required)" /> -->
         <echo message="  poupdate: update the .po files for translators" />
         <echo message="  pkg-portable-win32:  build a minimum portable version for win32" />
    </target>
     <target name="debianhowto">
-	    <echo message="To build debian packages, you must make sure that you have" />
-	    <echo message="the necessary build-dependencies installed." />
-	    <echo message="The packages required to build can be found in the file "/>
-	    <echo message="&quot;debian/control&quot; in both the Build-Depends and Build-Depends-Indep fields."/>
-	    <echo message="In addition to those packages, be sure to install &quot;fakeroot&quot;,"/>
-	    <echo message="&quot;quilt&quot; and &quot;build-essential&quot;!" />
-	    <echo message="" />
-	    <echo message="The following command will install all dependencies for you:" />
-	    <echo message="apt-get install debhelper ant debconf default-jdk gettext libgmp3-dev po-debconf fakeroot build-essential quilt" />
-	    <echo message=" " />
-	    <echo message="Once the dependencies are installed, run &quot;ant debian&quot;"/>
-	    <echo message="to patch the source and build the packages." />
+            <echo message="To build debian packages, you must make sure that you have" />
+            <echo message="the necessary build-dependencies installed." />
+            <echo message="The packages required to build can be found in the file "/>
+            <echo message="&quot;debian/control&quot; in the &quot;Build-Depends&quot; field."/>
+            <echo message="In addition to those packages, be sure to install &quot;fakeroot&quot;,"/>
+            <echo message="&quot;quilt&quot; and &quot;build-essential&quot;!" />
+            <echo message="" />
+            <echo message="The following command will install all of the dependencies for you:" />
+            <echo message=" " />
+            <echo message="apt-get install debhelper ant debconf default-jdk gettext libgmp3-dev po-debconf fakeroot build-essential \" />
+            <echo message="                   quilt libcommons-el-java libcommons-logging-java libjetty-extra-java libjetty-java" />
+            <echo message=" " />
+            <echo message="Once the dependencies are installed, run &quot;ant debian&quot;"/>
+            <echo message="to patch the source and build the packages." />
     </target>
     <target name="dist" depends="pkg, javadoc">
     </target>
@@ -1379,33 +1381,33 @@
 
     <target name="debian-binary" >
         <echo message="Did you update the version using dch -i?" />
-	<echo message=" " />
-	<echo message="If the changelog was not updated with dch -i, press" />
-	<echo message="press CTRL+C to abort building this Debian package." />
-	<echo message="" />
-	<echo message="Pausing build for ten seconds to give enough time to read this notice." />
-	<exec executable="sleep" failonerror="true">
-		<arg value="10" />
-	</exec>
-        <echo message="====================" />
-        <!-- bundle the jetty 5 lib since there isn't a deb for it -->
-        <ant dir="apps/jetty" target="ensureJettylib" />
-	
-	<exec executable="fakeroot" failonerror="true">
-	    <arg value="debian/rules" />
-	    <arg value="patch" />
-	    <arg value="binary" />
-	    <arg value="clean" />
+        <echo message=" " />
+        <echo message="If the changelog was not updated with dch -i, press" />
+        <echo message="press CTRL+C to abort building this Debian package." />
+        <echo message="" />
+        <echo message="Pausing build for ten seconds to give enough time to read this notice." />
+        <exec executable="sleep" failonerror="true">
+                <arg value="10" />
         </exec>
-	<delete dir=".pc" />
+        <echo message="====================" />
+
+        <exec executable="fakeroot" failonerror="true">
+            <arg value="debian/rules" />
+            <arg value="patch" />
+            <arg value="binary" />
+            <arg value="clean" />
+        </exec>
+        <delete dir=".pc" />
     </target>
+
     <target name="debian-clean" depends="buildProperties" >
         <exec executable="fakeroot" failonerror="true">
-	    <arg value="debian/rules" />
-	    <arg value="clean" />
+            <arg value="debian/rules" />
+            <arg value="clean" />
         </exec>
-	<delete dir="./.pc" />
+        <delete dir="./.pc" />
     </target>
+
     <target name="debian-patch" depends="buildProperties" >
         <exec executable="quilt" failonerror="true">
             <arg value="-a" />
@@ -1415,8 +1417,8 @@
     </target>
     <target name="debian-unpatch" depends="buildProperties">
         <exec executable="quilt" failonerror="false">
-	    <arg value="-a" />
-	    <arg value="pop" />
+            <arg value="-a" />
+            <arg value="pop" />
         </exec>
     </target>
 

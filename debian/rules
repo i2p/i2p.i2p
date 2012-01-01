@@ -37,10 +37,9 @@ clean: createcopyright
 override_dh_auto_clean:
 	dh_auto_clean
 	ant distclean
-	# The next line is used by KYTV when building from source packages
-	#rm -f apps/jetty/jetty-5.1.15.tgz
 	rm -f core/c/jbigi/*.[s]o
 	rm -rf core/c/jcpuid/lib/
+	#rm -f $(CURDIR)/installer/lib/wrapper/all/wrapper.jar
 	debconf-updatepo
 
 override_dh_auto_build:
@@ -48,12 +47,11 @@ override_dh_auto_build:
 binary-indep: build-indep
 build-indep:
 	dh_prep
-	# The next line is used by KYTV when building from source packages
-	#[ -r jetty/jetty-5.1.15.tgz ] && ln -sf $(CURDIR)/jetty/jetty-5.1.15.tgz $(CURDIR)/apps/jetty/jetty-5.1.15.tgz
+	#mkdir -p $(CURDIR)/installer/lib/wrapper/all
+	#ln -sf /usr/share/java/wrapper.jar $(CURDIR)/installer/lib/wrapper/all/wrapper.jar
 	ant preppkg-unix javadoc
 	echo router.updateDisabled=true > $(I2P)/router.config
 	mv $(I2P)/runplain.sh $(I2P)/i2prouter-nowrapper
-	#-cp -fv /usr/share/tor/geoip $(CURDIR)/pkg-temp/geoip/geoip.txt
 	
 
 binary-arch: build-arch
