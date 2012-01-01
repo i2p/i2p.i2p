@@ -25,7 +25,7 @@ DAEMON="/usr/sbin/wrapper"
 PIDFILE="$RUN/$NAME.pid"
 JVMPIDFILE="$RUN/routerjvm.pid"
 I2P="/usr/share/i2p"
-I2PTEMP="/var/tmp/$NAME"
+I2PTEMP="/tmp/${NAME}-daemon"
 WRAPPERLOG="/var/log/i2p/wrapper.log"
 
 # Don't touch these, edit /etc/default/i2p
