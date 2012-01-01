@@ -127,7 +127,7 @@ Installer:
 
 
 
-Java Service Wrapper Community Edition 32-bit 3.5.9:
+Java Service Wrapper Community Edition 32-bit 3.5.13:
    Copyright (C) 1999-2011 Tanuki Software, Ltd. All Rights Reserved.
    See licenses/LICENSE-Wrapper.txt
 
