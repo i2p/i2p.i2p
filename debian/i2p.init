@@ -102,7 +102,7 @@ do_start()
         fi
     fi
     chown -Rf $I2PUSER:$I2PUSER  $I2PTEMP $RUN > /dev/null 2>&1
-    chown -f -R $I2PUSER:adm /var/log/$NAME > /dev/null 2>&1
+    chown -f -R $I2PUSER:i2psvc /var/log/$NAME > /dev/null 2>&1
     TZ=UTC start-stop-daemon --start --quiet -c $I2PUSER --pidfile $PIDFILE --exec $DAEMON -n $NICE -- \
         $I2P_ARGS || return 2
 }
