@@ -2,7 +2,7 @@ This product includes both public domain code and licensed code as described bel
 For all code, unless otherwise stated in the appropriate license, the following applies:
 
 
-			    NO WARRANTY
+                            NO WARRANTY
 
   BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
 FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW.  EXCEPT WHEN
@@ -92,34 +92,34 @@ Installer:
    See licenses/LICENSE-Launch4j.txt (in binary packages)
    See installer/lib/launch4j/LICENSE.txt (in source packages)
    The following projects are used by Launch4j...
-	MinGW binutils (http://www.mingw.org/)
+        MinGW binutils (http://www.mingw.org/)
 
-	Commons BeanUtils (http://jakarta.apache.org/commons/beanutils/)
+        Commons BeanUtils (http://jakarta.apache.org/commons/beanutils/)
 
- 	Commons Logging (http://jakarta.apache.org/commons/logging/)
+        Commons Logging (http://jakarta.apache.org/commons/logging/)
         See licenses/LICENSE-Apache2.0.txt
         See licenses/NOTICE-Commons-Logging.txt
 
-	XStream (http://xstream.codehaus.org/)
+        XStream (http://xstream.codehaus.org/)
         Copyright (c) 2003-2004, Joe Walnes
         See licenses/LICENSE-XStream.txt
 
-	JGoodies Forms (http://www.jgoodies.com/freeware/forms/)
+        JGoodies Forms (http://www.jgoodies.com/freeware/forms/)
         Copyright (c) 2002-2004 JGoodies Karsten Lentzsch. All rights reserved.
         See licenses/LICENSE-JGoodies-Forms.txt
 
-	JGoodies Looks (http://www.jgoodies.com/freeware/looks/)
+        JGoodies Looks (http://www.jgoodies.com/freeware/looks/)
         Copyright (c) 2003 JGoodies Karsten Lentzsch. All rights reserved.
         See licenses/LICENSE-JGoodies-Looks.txt
 
-	Foxtrot (http://foxtrot.sourceforge.net/)
+        Foxtrot (http://foxtrot.sourceforge.net/)
         Copyright (c) 2002, Simone Bordet & Marco Cravero. All rights reserved.
         See licenses/LICENSE-Foxtrot.txt
 
-	Nuvola Icon Theme (http://www.icon-king.com)
+        Nuvola Icon Theme (http://www.icon-king.com)
         See licenses/LICENSE-LGPLv2.1.txt
 
-	Forms were created using Abeille Forms Designer (https://abeille.dev.java.net/)
+        Forms were created using Abeille Forms Designer (https://abeille.dev.java.net/)
 
    Izpack 4.3.0:
    Copyright (c) 2001-2008 Julien Ponge
