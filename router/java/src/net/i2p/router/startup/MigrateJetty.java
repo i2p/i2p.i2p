@@ -20,6 +20,7 @@ import net.i2p.router.RouterContext;
  *  Saves $D/jetty.xml to $D/jetty5.xml
  *  Copies $I2P/eepsite-jetty6/jetty.xml to $D/jetty.xml, edited for $D
  *  Copies $I2P/eepsite-jetty6/jetty-ssl.xml to $D/jetty-ssl.xml, edited for $D
+ *  Copies $I2P/eepsite-jetty6/jetty-rewrite.xml to $D/jetty-rewrite.xml
  *  Copies $I2P/eepsite-jetty6/context/base-context.xml to $D/jetty.xml, edited for $D
  *  Copies $I2P/eepsite-jetty6/context/cgi-context.xml to $D/jetty.xml, edited for $D
  *  Copies $I2P/eepsite-jetty6/etc/* to $D/etc
@@ -56,9 +57,13 @@ abstract class MigrateJetty {
                 System.err.println("WARNING: Jetty 6 unavailable, cannot migrate " + client);
                 continue;
             }
-            String xml = app.args;
-            if (xml == null)
+            if (app.args == null)
                 continue;
+            // remove quotes
+            String args[] = LoadClientAppsJob.parseArgs(app.args);
+            if (args.length == 0)
+                continue;
+            String xml = args[0];
             File xmlFile = new File(xml);
             if (!xmlFile.isAbsolute())
                 xmlFile = new File(ctx.getAppDir(), xml);
@@ -98,6 +103,7 @@ abstract class MigrateJetty {
             (new File(eepsite, "contexts")).mkdir();
             WorkingDir.migrateJettyXml(baseEep, eepsite, BASE_CONTEXT, "./eepsite/", newPath);
             WorkingDir.migrateJettyXml(baseEep, eepsite, CGI_CONTEXT, "./eepsite/", newPath);
+            WorkingDir.copyFile(new File(baseEep, "jetty-rewrite.xml"), new File(eepsite, "jetty-rewrite.xml"));
             (new File(eepsite, "etc")).mkdir();
             File to = new File(eepsite, "etc/realm.properties");
             if (!to.exists())

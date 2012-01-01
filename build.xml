@@ -418,7 +418,7 @@
                 <pathelement location="apps/jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="apps/jetty/jettylib/jetty-sslengine.jar" />
                 <pathelement location="apps/jetty/jettylib/jetty-start.jar" />
-                <pathelement location="apps/jetty/jettylib/jetty-threadpool.jar" />
+                <pathelement location="apps/jetty/jettylib/jetty-java5-threadpool.jar" />
                 <pathelement location="apps/jetty/jettylib/jetty-util.jar" />
                 <pathelement location="apps/jetty/jettylib/jsp-api.jar" />
                 <pathelement location="apps/systray/java/lib/systray4j.jar" />
@@ -941,7 +941,7 @@
               can't overwrite an existing eepsite dir in a non-split configuration.
           -->
         <copy todir="pkg-temp/eepsite-jetty6" >
-            <fileset dir="installer/resources/eepsite" includes="jetty.xml jetty-ssl.xml contexts/* etc/*" />
+            <fileset dir="installer/resources/eepsite" includes="*.xml contexts/* etc/*" />
         </copy>
     </target>
 

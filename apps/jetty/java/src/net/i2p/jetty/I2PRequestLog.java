@@ -502,8 +502,8 @@ public class I2PRequestLog extends AbstractLifeCycle implements RequestLog
 
     /* ------------------------------------------------------------ */
     /** Set the log file date format.
-     * @see {@link RolloverFileOutputStream#RolloverFileOutputStream(String, boolean, int, TimeZone, String, String)}
-     * @param logFileDateFormat the logFileDateFormat to pass to {@link RolloverFileOutputStream}
+     * see RolloverFileOutputStream(String, boolean, int, TimeZone, String, String)
+     * @param logFileDateFormat the logFileDateFormat to pass to RolloverFileOutputStream
      */
     public void setFilenameDateFormat(String logFileDateFormat)
     {
