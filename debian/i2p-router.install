@@ -37,7 +37,8 @@ pkg-temp/lib/streaming.jar usr/share/i2p/lib
 pkg-temp/lib/systray.jar usr/share/i2p/lib
 pkg-temp/lib/systray4j.jar usr/share/i2p/lib
 
-# These two are copied over to avoid depending on libjetty-extra-java
+# These are copied over to avoid depending on libjetty-extra-java
 # and pulling in dependencies that we don't care about
 pkg-temp/lib/commons-el.jar usr/share/i2p/lib
-pkg-temp/lib/jetty-threadpool.jar usr/share/i2p/lib
+pkg-temp/lib/jetty-java5-threadpool.jar usr/share/i2p/lib
+pkg-temp/lib/jetty-rewrite-handler.jar usr/share/i2p/lib

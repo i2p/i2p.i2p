@@ -92,21 +92,22 @@ so that I2P can be built using Jetty packages from Debian/Ubuntu
          <mkdir dir="jettylib" />
        <!-- We copy everything to names without the version numbers so we
             can update them later. Where there was something similar in Jetty 5,
-@@ -83,29 +25,26 @@
-               jetty-java5-threadpool-xxx.jar: Concurrent thread pool for eepsite
-               commons-logging.jar: JspC compiler
+@@ -86,30 +28,27 @@
+               jetty-rewrite-handler: Not used by I2P, but only 20KB and could be useful for eepsites
+               All of these are available in the Ubuntu packages libjetty-java and libjetty-extra-java
          -->
+-        <copy preservelastmodified="true" file="${jetty.base}/start.jar" tofile="jettylib/jetty-start.jar" />
 -        <copy preservelastmodified="true" file="${jetty.base}/lib/${jetty.base}.jar" tofile="jettylib/org.mortbay.jetty.jar" />
 -        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-util-${jetty.ver}.jar" tofile="jettylib/jetty-util.jar" />
--        <copy preservelastmodified="true" file="${jetty.base}/lib/servlet-api-2.5-20081211.jar" tofile="jettylib/javax.servlet.jar" />
+-        <copy preservelastmodified="true" file="${jetty.base}/lib/ext/jetty-java5-threadpool-${jetty.ver}.jar" tofile="jettylib/jetty-java5-threadpool.jar" />
+-        <copy preservelastmodified="true" file="${jetty.base}/lib/ext/jetty-rewrite-handler-${jetty.ver}.jar" tofile="jettylib/jetty-rewrite-handler.jar" />
 -        <copy preservelastmodified="true" file="${jetty.base}/lib/ext/jetty-sslengine-${jetty.ver}.jar" tofile="jettylib/jetty-sslengine.jar" />
--        <copy preservelastmodified="true" file="${jetty.base}/lib/ext/jetty-java5-threadpool-${jetty.ver}.jar" tofile="jettylib/jetty-threadpool.jar" />
 -        <copy preservelastmodified="true" file="${jetty.base}/lib/jsp-2.0/ant-1.6.5.jar" tofile="jettylib/ant.jar" />
 -        <copy preservelastmodified="true" file="${jetty.base}/lib/jsp-2.0/commons-el-1.0.jar" tofile="jettylib/commons-el.jar" />
 -        <copy preservelastmodified="true" file="${jetty.base}/lib/jsp-2.0/jasper-compiler-5.5.15.jar" tofile="jettylib/jasper-compiler.jar" />
 -        <copy preservelastmodified="true" file="${jetty.base}/lib/jsp-2.0/jasper-runtime-5.5.15.jar" tofile="jettylib/jasper-runtime.jar" />
 -        <copy preservelastmodified="true" file="${jetty.base}/lib/jsp-2.0/jsp-api-2.0.jar" tofile="jettylib/jsp-api.jar" />
--        <copy preservelastmodified="true" file="${jetty.base}/start.jar" tofile="jettylib/jetty-start.jar" />
+-        <copy preservelastmodified="true" file="${jetty.base}/lib/servlet-api-2.5-20081211.jar" tofile="jettylib/javax.servlet.jar" />
 -        <delete file="jetty.tar" />
 -        <delete dir="${jetty.base}" />
 -        <!-- commons-logging.jar not in Jetty 6 but we have it in launch4j so copy it over, we need it
@@ -117,7 +118,8 @@ so that I2P can be built using Jetty packages from Debian/Ubuntu
 +        <copy preservelastmodified="true" file="/usr/share/java/commons-logging.jar" todir="jettylib/" />
 +        <copy preservelastmodified="true" file="/usr/share/java/el-api-2.1.jar" tofile="jettylib/el-api.jar" />
 +        <copy preservelastmodified="true" file="/usr/share/java/jasper-el.jar" todir="jettylib/" />
-+        <copy preservelastmodified="true" file="/usr/share/java/jetty-java5-threadpool.jar" tofile="jettylib/jetty-threadpool.jar" />
++        <copy preservelastmodified="true" file="/usr/share/java/jetty-java5-threadpool.jar" tofile="jettylib/jetty-java5-threadpool.jar" />
++        <copy preservelastmodified="true" file="/usr/share/java/jetty-rewrite-handler.jar" tofile="jettylib/jetty-rewrite-handler.jar" />
 +        <copy preservelastmodified="true" file="/usr/share/java/jetty-sslengine.jar" tofile="jettylib/jetty-sslengine.jar" />
 +        <copy preservelastmodified="true" file="/usr/share/java/jetty-start.jar" tofile="jettylib/jetty-start.jar" />
 +        <copy preservelastmodified="true" file="/usr/share/java/jetty-util.jar" tofile="jettylib/jetty-util.jar" />
@@ -133,11 +135,11 @@ so that I2P can be built using Jetty packages from Debian/Ubuntu
  
      <target name="builddep" />
 -    <target name="compile" depends="builddep, ensureJettylib" >
-+    <target name="compile" depends="builddep,extractJettylib" >
++    <target name="compile" depends="builddep, extractJettylib" >
          <mkdir dir="./build" />
          <mkdir dir="./build/obj" />
          <javac 
-@@ -169,7 +108,6 @@
+@@ -173,7 +112,6 @@
      <target name="cleandep" depends="clean" />
      <target name="distclean" depends="clean">
          <delete dir="./jettylib" />
@@ -145,7 +147,7 @@ so that I2P can be built using Jetty packages from Debian/Ubuntu
      </target>
      <target name="reallyclean" depends="distclean">
      </target>
-@@ -177,22 +115,10 @@
+@@ -181,22 +119,10 @@
          <delete dir="./jettylib" />
          <delete file="${jetty.filename}" />
      </target>
