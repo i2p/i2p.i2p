@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
@@ -32,6 +33,13 @@ import net.i2p.util.OrderedProperties;
  * Defines the data that a router either publishes to the global routing table or
  * provides to trusted peers.  
  *
+ * For efficiency, the methods and structures here are now unsynchronized.
+ * Initialize the RI with readBytes(), or call the setters and then sign() in a single thread.
+ * Don't change it after that.
+ *
+ * To ensure integrity of the RouterInfo, methods that change an element of the
+ * RouterInfo will throw an IllegalStateException after the RouterInfo is signed.
+ *
  * @author jrandom
  */
 public class RouterInfo extends DatabaseEntry {
@@ -41,7 +49,7 @@ public class RouterInfo extends DatabaseEntry {
     private final Set<RouterAddress> _addresses;
     /** may be null to save memory, no longer final */
     private Set<Hash> _peers;
-    private /* FIXME final FIXME */ Properties _options;
+    private final Properties _options;
     private volatile boolean _validated;
     private volatile boolean _isValid;
     private volatile String _stringified;
@@ -67,14 +75,19 @@ public class RouterInfo extends DatabaseEntry {
         _options = new OrderedProperties();
     }
 
+    /**
+     *  Used only by Router and PublishLocalRouterInfoJob.
+     *  Copies ONLY the identity and peers.
+     *  Does not copy published, addresses, options, or signature.
+     */
     public RouterInfo(RouterInfo old) {
         this();
         setIdentity(old.getIdentity());
-        setPublished(old.getPublished());
-        setAddresses(old.getAddresses());
+        //setPublished(old.getPublished());
+        //setAddresses(old.getAddresses());
         setPeers(old.getPeers());
-        setOptions(old.getOptions());
-        setSignature(old.getSignature());
+        //setOptions(old.getOptions());
+        //setSignature(old.getSignature());
         // copy over _byteified?
     }
 
@@ -90,12 +103,6 @@ public class RouterInfo extends DatabaseEntry {
         return KEY_TYPE_ROUTERINFO;
     }
 
-    private void resetCache() {
-        _stringified = null;
-        _byteified = null;
-        _hashCodeInitialized = false;
-    }
-
     /**
      * Retrieve the identity of the router represented
      *
@@ -107,10 +114,12 @@ public class RouterInfo extends DatabaseEntry {
     /**
      * Configure the identity of the router represented
      * 
+     * @throws IllegalStateException if RouterInfo is already signed
      */
     public void setIdentity(RouterIdentity ident) {
+        if (_signature != null)
+            throw new IllegalStateException();
         _identity = ident;
-        resetCache();
         // We only want to cache the bytes for our own RI, which is frequently written.
         // To cache for all RIs doubles the RI memory usage.
         // setIdentity() is only called when we are creating our own RI.
@@ -133,34 +142,35 @@ public class RouterInfo extends DatabaseEntry {
     /**
      * Date on which it was published, in milliseconds since Midnight GMT on Jan 01, 1970
      *
+     * @throws IllegalStateException if RouterInfo is already signed
      */
     public void setPublished(long published) {
+        if (_signature != null)
+            throw new IllegalStateException();
         _published = published;
-        resetCache();
     }
 
     /**
      * Retrieve the set of RouterAddress structures at which this
      * router can be contacted.
      *
+     * @return unmodifiable view, non-null
      */
     public Set<RouterAddress> getAddresses() {
-        synchronized (_addresses) {
-            return new HashSet(_addresses);
-        }
+            return Collections.unmodifiableSet(_addresses);
     }
 
     /**
      * Specify a set of RouterAddress structures at which this router
      * can be contacted.
      *
+     * @throws IllegalStateException if RouterInfo is already signed
      */
     public void setAddresses(Set<RouterAddress> addresses) {
-        synchronized (_addresses) {
-            _addresses.clear();
-            if (addresses != null) _addresses.addAll(addresses);
-        }
-        resetCache();
+        if (_signature != null)
+            throw new IllegalStateException();
+        _addresses.clear();
+        if (addresses != null) _addresses.addAll(addresses);
     }
 
     /**
@@ -180,8 +190,11 @@ public class RouterInfo extends DatabaseEntry {
      * this router can be reached through.
      *
      * @deprecated Implemented here but unused elsewhere
+     * @throws IllegalStateException if RouterInfo is already signed
      */
     public void setPeers(Set<Hash> peers) {
+        if (_signature != null)
+            throw new IllegalStateException();
         if (peers == null || peers.isEmpty()) {
             _peers = null;
             return;
@@ -192,37 +205,46 @@ public class RouterInfo extends DatabaseEntry {
             _peers.clear();
             _peers.addAll(peers);
         }
-        resetCache();
     }
 
     /**
-     * Retrieve a set of options or statistics that the router can expose
+     * Retrieve a set of options or statistics that the router can expose.
      *
+     * @deprecated use getOptionsMap()
+     * @return sorted, non-null, NOT a copy, do not modify!!!
      */
     public Properties getOptions() {
-        if (_options == null) return new Properties();
-        synchronized (_options) {
-            return (Properties) _options.clone();
-        }
-    }
-    public String getOption(String opt) {
-        if (_options == null) return null;
-        synchronized (_options) {
-            return _options.getProperty(opt);
-        }
+        return _options;
     }
 
     /**
-     * Configure a set of options or statistics that the router can expose
+     * Retrieve a set of options or statistics that the router can expose.
+     *
+     * @return an unmodifiable view, non-null, sorted
+     * @since 0.8.13
+     */
+    public Map getOptionsMap() {
+        return Collections.unmodifiableMap(_options);
+    }
+
+    public String getOption(String opt) {
+        return _options.getProperty(opt);
+    }
+
+    /**
+     * Configure a set of options or statistics that the router can expose.
+     * Makes a copy.
+     *
      * @param options if null, clears current options
+     * @throws IllegalStateException if RouterInfo is already signed
      */
     public void setOptions(Properties options) {
-        synchronized (_options) {
-            _options.clear();
-            if (options != null)
-                _options.putAll(options);
-        }
-        resetCache();
+        if (_signature != null)
+            throw new IllegalStateException();
+
+        _options.clear();
+        if (options != null)
+            _options.putAll(options);
     }
 
     /** 
@@ -234,14 +256,14 @@ public class RouterInfo extends DatabaseEntry {
     protected byte[] getBytes() throws DataFormatException {
         if (_byteified != null) return _byteified;
         if (_identity == null) throw new DataFormatException("Router identity isn't set? wtf!");
-        if (_addresses == null) throw new DataFormatException("Router addressess isn't set? wtf!");
-        if (_options == null) throw new DataFormatException("Router options isn't set? wtf!");
 
         //long before = Clock.getInstance().now();
-        ByteArrayOutputStream out = new ByteArrayOutputStream(6*1024);
+        ByteArrayOutputStream out = new ByteArrayOutputStream(2*1024);
         try {
             _identity.writeBytes(out);
-            DataHelper.writeDate(out, new Date(_published));
+            // avoid thrashing objects
+            //DataHelper.writeDate(out, new Date(_published));
+            DataHelper.writeLong(out, 8, _published);
             int sz = _addresses.size();
             if (sz <= 0 || isHidden()) {
                 // Do not send IP address to peers in hidden mode
@@ -249,11 +271,12 @@ public class RouterInfo extends DatabaseEntry {
             } else {
                 DataHelper.writeLong(out, 1, sz);
                 Collection<RouterAddress> addresses = _addresses;
-                if (sz > 1)
+                if (sz > 1) {
                     // WARNING this sort algorithm cannot be changed, as it must be consistent
                     // network-wide. The signature is not checked at readin time, but only
                     // later, and the addresses are stored in a Set, not a List.
                     addresses = (Collection<RouterAddress>) DataHelper.sortStructures(addresses);
+                }
                 for (RouterAddress addr : addresses) {
                     addr.writeBytes(out);
                 }
@@ -293,7 +316,7 @@ public class RouterInfo extends DatabaseEntry {
      * Determine whether this router info is authorized with a valid signature
      *
      */
-    public synchronized boolean isValid() {
+    public boolean isValid() {
         if (!_validated) doValidate();
         return _isValid;
     }
@@ -304,11 +327,7 @@ public class RouterInfo extends DatabaseEntry {
      * @return -1 if unknown
      */
     public int getNetworkId() {
-        if (_options == null) return -1;
-        String id = null;
-        synchronized (_options) {
-            id = _options.getProperty(PROP_NETWORK_ID);
-        }
+        String id = _options.getProperty(PROP_NETWORK_ID);
         if (id != null) {
             try {
                 return Integer.parseInt(id);
@@ -322,11 +341,7 @@ public class RouterInfo extends DatabaseEntry {
      * @return non-null, empty string if none
      */
     public String getCapabilities() {
-        if (_options == null) return "";
-        String capabilities = null;
-        synchronized (_options) {
-            capabilities = _options.getProperty(PROP_CAPABILITIES);
-        }
+        String capabilities = _options.getProperty(PROP_CAPABILITIES);
         if (capabilities != null)
             return capabilities;
         else
@@ -358,20 +373,27 @@ public class RouterInfo extends DatabaseEntry {
         return (bwTier);
     }
 
+    /**
+     * @throws IllegalStateException if RouterInfo is already signed
+     */
     public void addCapability(char cap) {
-        if (_options == null) _options = new OrderedProperties();
-        synchronized (_options) {
+        if (_signature != null)
+            throw new IllegalStateException();
+
             String caps = _options.getProperty(PROP_CAPABILITIES);
             if (caps == null)
                 _options.setProperty(PROP_CAPABILITIES, ""+cap);
             else if (caps.indexOf(cap) == -1)
                 _options.setProperty(PROP_CAPABILITIES, caps + cap);
-        }
     }
 
+    /**
+     * @throws IllegalStateException if RouterInfo is already signed
+     */
     public void delCapability(char cap) {
-        if (_options == null) return;
-        synchronized (_options) {
+        if (_signature != null)
+            throw new IllegalStateException();
+
             String caps = _options.getProperty(PROP_CAPABILITIES);
             int idx;
             if (caps == null) {
@@ -384,7 +406,6 @@ public class RouterInfo extends DatabaseEntry {
                     buf.deleteCharAt(idx);
                 _options.setProperty(PROP_CAPABILITIES, buf.toString());
             }
-        }
     }
 
     /**
@@ -409,12 +430,9 @@ public class RouterInfo extends DatabaseEntry {
      *
      */
     public RouterAddress getTargetAddress(String transportStyle) {
-        synchronized (_addresses) {
-            for (Iterator iter = _addresses.iterator(); iter.hasNext(); ) {
-                RouterAddress addr = (RouterAddress)iter.next();
-                if (addr.getTransportStyle().equals(transportStyle)) 
-                    return addr;
-            }
+        for (RouterAddress addr :  _addresses) {
+            if (addr.getTransportStyle().equals(transportStyle)) 
+                return addr;
         }
         return null;
     }
@@ -425,12 +443,9 @@ public class RouterInfo extends DatabaseEntry {
      */
     public List<RouterAddress> getTargetAddresses(String transportStyle) {
         List<RouterAddress> ret = new Vector<RouterAddress>();
-        synchronized(this._addresses) {
-            for(Object o : this._addresses) {
-                RouterAddress addr = (RouterAddress)o;
-                if(addr.getTransportStyle().equals(transportStyle))
-                    ret.add(addr);
-            }
+        for (RouterAddress addr :  _addresses) {
+            if(addr.getTransportStyle().equals(transportStyle))
+                ret.add(addr);
         }
         return ret;
     }
@@ -438,9 +453,9 @@ public class RouterInfo extends DatabaseEntry {
     /**
      * Actually validate the signature
      */
-    private synchronized void doValidate() {
-        _validated = true;
+    private void doValidate() {
         _isValid = super.verifySignature();
+        _validated = true;
 
         if (!_isValid) {
             byte data[] = null;
@@ -459,15 +474,21 @@ public class RouterInfo extends DatabaseEntry {
     
     /**
      *  This does NOT validate the signature
+     *
+     *  @throws IllegalStateException if RouterInfo was already read in
      */
-    public synchronized void readBytes(InputStream in) throws DataFormatException, IOException {
+    public void readBytes(InputStream in) throws DataFormatException, IOException {
+        if (_signature != null)
+            throw new IllegalStateException();
         _identity = new RouterIdentity();
         _identity.readBytes(in);
-        Date when = DataHelper.readDate(in);
-        if (when == null)
-            _published = 0;
-        else
-            _published = when.getTime();
+        // avoid thrashing objects
+        //Date when = DataHelper.readDate(in);
+        //if (when == null)
+        //    _published = 0;
+        //else
+        //    _published = when.getTime();
+        _published = DataHelper.readLong(in, 8);
         int numAddresses = (int) DataHelper.readLong(in, 1);
         for (int i = 0; i < numAddresses; i++) {
             RouterAddress address = new RouterAddress();
@@ -485,11 +506,10 @@ public class RouterInfo extends DatabaseEntry {
                 _peers.add(peerIdentityHash);
             }
         }
-        _options = DataHelper.readProperties(in);
+        DataHelper.readProperties(in, _options);
         _signature = new Signature();
         _signature.readBytes(in);
 
-        resetCache();
 
         //_log.debug("Read routerInfo: " + toString());
     }
@@ -497,13 +517,13 @@ public class RouterInfo extends DatabaseEntry {
     /**
      *  This does NOT validate the signature
      */
-    public synchronized void writeBytes(OutputStream out) throws DataFormatException, IOException {
+    public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if (_identity == null) throw new DataFormatException("Missing identity");
         if (_published < 0) throw new DataFormatException("Invalid published date: " + _published);
         if (_signature == null) throw new DataFormatException("Signature is null");
         //if (!isValid())
         //    throw new DataFormatException("Data is not valid");
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(2048);
         baos.write(getBytes());
         _signature.writeBytes(baos);
 
@@ -518,10 +538,11 @@ public class RouterInfo extends DatabaseEntry {
         RouterInfo info = (RouterInfo) object;
         return DataHelper.eq(_identity, info.getIdentity())
                && DataHelper.eq(_signature, info.getSignature())
-               && _published == info.getPublished()
-               && DataHelper.eq(_addresses, info.getAddresses())
-               && DataHelper.eq(_options, info.getOptions()) 
-               && DataHelper.eq(getPeers(), info.getPeers());
+               && _published == info.getPublished();
+               // Let's speed up the NetDB
+               //&& DataHelper.eq(_addresses, info.getAddresses())
+               //&& DataHelper.eq(_options, info.getOptions()) 
+               //&& DataHelper.eq(getPeers(), info.getPeers());
     }
     
     @Override
@@ -541,23 +562,19 @@ public class RouterInfo extends DatabaseEntry {
         buf.append("\n\tIdentity: ").append(_identity);
         buf.append("\n\tSignature: ").append(_signature);
         buf.append("\n\tPublished on: ").append(new Date(_published));
-        Set addresses = _addresses; // getAddresses()
-        buf.append("\n\tAddresses: #: ").append(addresses.size());
-        for (Iterator iter = addresses.iterator(); iter.hasNext();) {
-            RouterAddress addr = (RouterAddress) iter.next();
+        buf.append("\n\tAddresses: #: ").append(_addresses.size());
+        for (RouterAddress addr : _addresses) {
             buf.append("\n\t\tAddress: ").append(addr);
         }
-        Set peers = getPeers();
+        Set<Hash> peers = getPeers();
         buf.append("\n\tPeers: #: ").append(peers.size());
-        for (Iterator iter = peers.iterator(); iter.hasNext();) {
-            Hash hash = (Hash) iter.next();
+        for (Hash hash : peers) {
             buf.append("\n\t\tPeer hash: ").append(hash);
         }
-        Properties options = _options; // getOptions();
-        buf.append("\n\tOptions: #: ").append(options.size());
-        for (Iterator iter = options.keySet().iterator(); iter.hasNext();) {
-            String key = (String) iter.next();
-            String val = options.getProperty(key);
+        buf.append("\n\tOptions: #: ").append(_options.size());
+        for (Map.Entry e : _options.entrySet()) {
+            String key = (String) e.getKey();
+            String val = (String) e.getValue();
             buf.append("\n\t\t[").append(key).append("] = [").append(val).append("]");
         }
         buf.append("]");

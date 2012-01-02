@@ -701,8 +701,7 @@ public class ProfileOrganizer {
                             continue;
                         }
                         // This is the quick way of doing UDPAddress.getIntroducerCount() > 0
-                        Properties props = ra.getOptions();
-                        if (props != null && props.getProperty("ihost0") != null)
+                        if (ra.getOption("ihost0") != null)
                             l.add(peer);
                     }
                 }
@@ -1263,9 +1262,7 @@ public class ProfileOrganizer {
         if (paddr == null)
             return rv;
         for (RouterAddress pa : paddr) {
-            Properties pprops = pa.getOptions();
-            if (pprops == null) continue;
-            String phost = pprops.getProperty("host");
+            String phost = pa.getOption("host");
             if (phost == null) continue;
             InetAddress pi;
             try {
