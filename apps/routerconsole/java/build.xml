@@ -23,7 +23,7 @@
                 <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-util.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-sslengine.jar" />
-                <pathelement location="../../jetty/jettylib/jetty-threadpool.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-java5-threadpool.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="../../jetty/jettylib/jsp-api.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-i2p.jar" />
@@ -60,7 +60,7 @@
                 <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-util.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-sslengine.jar" />
-                <pathelement location="../../jetty/jettylib/jetty-threadpool.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-java5-threadpool.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="../../jetty/jettylib/jsp-api.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-i2p.jar" />
@@ -280,7 +280,7 @@
                 <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-util.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-sslengine.jar" />
-                <pathelement location="../../jetty/jettylib/jetty-threadpool.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-java5-threadpool.jar" />
                 <pathelement location="../../jetty/jettylib/jsp-api.jar" />
                 <pathelement location="../../jetty/jettylib/jetty-i2p.jar" />
                 <pathelement location="../../systray/java/build/obj" />
