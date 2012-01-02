@@ -137,12 +137,16 @@ public class WebAppStarter {
     
     /** see comments in ConfigClientsHandler */
     static Server getConsoleServer() {
+        PortMapper pm = I2PAppContext.getGlobalContext().portMapper();
+        int p1 = pm.getPort(PortMapper.SVC_CONSOLE);
+        int p2 = pm.getPort(PortMapper.SVC_HTTPS_CONSOLE);
         Collection c = Server.getHttpServers();
         for (int i = 0; i < c.size(); i++) {
             Server s = (Server) c.toArray()[i];
             HttpListener[] hl = s.getListeners();
             for (int j = 0; j < hl.length; j++) {
-                if (hl[j].getPort() == I2PAppContext.getGlobalContext().portMapper().getPort(PortMapper.SVC_CONSOLE))
+                int port = hl[j].getPort();
+                if (port == p1 || port == p2)
                     return s;
             }
         }

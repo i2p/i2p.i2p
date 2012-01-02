@@ -1,3 +1,7 @@
+2012-01-02 zzz
+ * Fix webapp PortMapper lookup for SSL-only console
+ * Wrapper 3.5.13 for arm v7
+
 2011-12-31 zzz
  * Fix log NPE when saveConfig() fails at startup, thx kytv
    (backport from jetty6 branch)
