@@ -36,7 +36,8 @@ with "ant -Dbits=32 compile-c-unix".
 
 For macosx, combine the universal-32 and universal-64 files
 from the delta pack (each a 2-architecture fat file)
-into a "quad-fat" binary.
+into a "quad-fat" binary. Instructions can be found in
+macos/README.txt
 
 For win64, build from source following the instructions
 in win64/README-x64-win.txt.
