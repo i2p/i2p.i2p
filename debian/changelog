@@ -1,3 +1,46 @@
+i2p (0.8.12-1) stable; urgency=medium
+
+  * New upstream I2P release
+  * Debconf:
+    - add wrapper.java.maxmemory from wrapper.config
+    - The warning about the daemon user needing to exist was confusing to some
+      that assumed this meant that i2psvc had to exit. This warning has been
+      clarified.
+    - Spanish, Swedish, Ukrainian translation updates
+  * Initscript changes/fixes:
+    - increase shutdown wait-time in initscript
+    - renumber "wrapper.additional" lines (since gaps are allowed with newer
+      wrapper versions)
+    - move I2PTEMP to /tmp/i2p-daemon
+    - move router.ping to /var/run/i2p
+    - chown /var/log/i2p to i2psvc:i2psvc instead of i2psvc:adm
+    - various other clean-ups
+    - explicity redirect errors to stderr
+  * maintainer scripts:
+    - postinst: rewrite the handling of an existing i2psvc account
+    - postrm: remove /etc/default/i2p if the package is purged
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Thu, 05 Jan 2012 00:00:00 +0000
+
+i2p (0.8.11-2) stable; urgency=medium
+
+  * Fix STUPID bug running I2P with i2prouter. Thanks soundwave.
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Tue, 08 Nov 2011 20:02:05 +0000
+
+i2p (0.8.11-1) stable; urgency=low
+
+  * New Upstream Version
+  * sv and uk debconf translation updates
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 07 Nov 2011 19:20:15 +0000
+
+i2p (0.8.10-1) stable; urgency=medium
+
+  * New upstream version
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Thu, 20 Oct 2011 05:25:04 +0000
+
 i2p (0.8.9-1) stable; urgency=medium
 
   * New upstream version
