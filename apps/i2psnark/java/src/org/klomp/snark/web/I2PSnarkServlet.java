@@ -2069,9 +2069,11 @@ private static class FetchAndAdd implements Runnable {
                 //    buf.append("<input type=\"hidden\" name=\"p\" value=\"").append(peerParam).append("\" >\n");
                 buf.append(_("Torrent was not retrieved from {0}", urlify(_url)));
                 String link = _url.replace("&", "&amp;").replace(" ", "%20").replace(":", "%3A").replace("/", "%2F");
+             /**** FIXME ticket #575
                 buf.append(" - [<a href=\"/i2psnark/?newURL=").append(link).append("#add\" >");
                 buf.append(_("Retry"));
                 buf.append("</a>]");
+              ****/
                 _manager.addMessage(buf.toString());
             }
         } finally {
