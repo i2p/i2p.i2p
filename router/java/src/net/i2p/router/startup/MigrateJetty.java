@@ -41,6 +41,7 @@ abstract class MigrateJetty {
     private static final String NEW_CLASS = "org.mortbay.start.Main";
     private static final String BACKUP = "jetty5.xml";
     private static final String JETTY6_TEMPLATE_DIR = "eepsite-jetty6";
+    private static final String JETTY6_TEMPLATE_PKGDIR = "eepsite";
     private static final String BASE_CONTEXT = "contexts/base-context.xml";
     private static final String CGI_CONTEXT = "contexts/cgi-context.xml";
     
@@ -83,6 +84,15 @@ abstract class MigrateJetty {
                 continue;
             }
             File baseEep = new File(ctx.getBaseDir(), JETTY6_TEMPLATE_DIR);
+            // in packages, or perhaps on an uninstall/reinstall, the files are in eepsite/
+            if (!baseEep.exists())
+                baseEep = new File(ctx.getBaseDir(), JETTY6_TEMPLATE_PKGDIR);
+            if (baseEep.equals(eepsite)) {
+                // non-split directory yet not an upgrade? shouldn't happen
+                System.err.println("Eepsite in non-split directory " + eepsite +
+                               ", cannot migrate " + client);
+                continue;
+            }
             // jetty.xml existed before in jetty 5 version, so check this new file
             // and if it doesn't exist we can't continue
             File baseContext = new File(baseEep, BASE_CONTEXT);
