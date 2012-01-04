@@ -1,3 +1,6 @@
+2012-01-04 kytv
+* Update geoip.txt based on Maxmind GeoLite Country database from 2011-12-08
+
 2012-01-02 kytv
 * Wrapper 3.5.13 for everything other than armv7.
 
