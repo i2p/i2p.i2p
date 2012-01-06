@@ -4,7 +4,7 @@ i2p (0.8.12-1) stable; urgency=medium
   * Debconf:
     - add wrapper.java.maxmemory from wrapper.config
     - The warning about the daemon user needing to exist was confusing to some
-      that assumed this meant that i2psvc had to exit. This warning has been
+      that assumed this meant that i2psvc had to exist. This warning has been
       clarified.
     - Spanish, Swedish, Ukrainian translation updates
   * Initscript changes/fixes:
