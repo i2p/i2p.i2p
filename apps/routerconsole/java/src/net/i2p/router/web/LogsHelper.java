@@ -15,6 +15,11 @@ public class LogsHelper extends HelperBase {
         return Server.getVersion();
     }
 
+    /** @since 0.8.13 */
+    static String jettyVersion() {
+        return Server.getVersion();
+    }
+
     public String getLogs() {
         String str = formatMessages(_context.logManager().getBuffer().getMostRecentMessages());
         return _("File location") + ": <b><code>" + _context.logManager().currentFile() + "</code></b><br><br>" + str;
