@@ -1099,7 +1099,7 @@ graceful() {
             # Running so try to stop it.
             # This sends HUP. router.gracefulHUP must be set in router.config,
             # or else this will do the same as stop.
-            kill $pid
+            kill -HUP $pid
             if [ $? -ne 0 ]
             then
                 # An explanation for the failure should have been given
