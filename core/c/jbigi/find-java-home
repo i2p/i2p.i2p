@@ -1,0 +1,24 @@
+UNIXTYPE=$(uname -s | tr "[A-Z]" "[a-z]")
+if [ $UNIXTYPE = "freebsd" ]; then
+    if [ -d /usr/local/openjdk6 ]; then
+        JAVA_HOME="/usr/local/openjdk6"
+    elif [ -d /usr/local/openjdk7 ]; then
+        JAVA_HOME="/usr/local/openjdk7"
+    fi
+elif [ $UNIXTYPE = "openbsd" ]; then
+    if [ -d /usr/local/jdk-1.7.0 ]; then
+        JAVA_HOME="/usr/local/jdk-1.7.0"
+    fi
+elif [ $UNIXTYPE = "netbsd" ]; then
+    if [ -d /usr/pkg/java/openjdk7 ]; then
+        JAVA_HOME="/usr/pkg/java/openjdk7"
+    fi
+elif [ $UNIXTYPE = "linux" ] && [ -e /etc/debian_version ]; then
+    if [ -d /usr/lib/jvm/default-java ]; then
+       JAVA_HOME="/usr/lib/jvm/default-java"
+    fi
+elif [ $UNIXTYPE = "darwin" ]; then
+    JAVA_HOME=$(/usr/libexec/java_home)
+fi
+
+export JAVA_HOME

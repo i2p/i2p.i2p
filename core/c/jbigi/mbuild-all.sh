@@ -154,7 +154,7 @@ esac
 
 make_static () {
         $ECHO "Attempting .${4} creation for ${3}${5}${2}"
-        ../../mbuild_jbigi.sh static || return 1
+        ../../build_jbigi.sh static || return 1
         cp ${3}.${4} ../../lib/net/i2p/util/${3}${5}${2}.${4}
         return 0
 }

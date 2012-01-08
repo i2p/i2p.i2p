@@ -10,9 +10,10 @@ TODO: Document generated folder structure
 
 Linux-specific information:
 ===========================
-Some linux distributions comes bundled with GMP.
+Some linux distributions come bundled with GMP.
 Try 'locate lib/libgmp.so' to see.
-If so, install the the libgmp3-dev debian package to get the libgmp headers.
+
+In Debian/Ubuntu, install the the libgmp3-dev package to get the libgmp headers.
 Then export I2P=/path/to/your/i2p/install.
 Then do 'build.sh dynamic'. This will do a quick build using your installed libgmp library
 and then test it and the jbigi in your I2P installation to see which is faster.
