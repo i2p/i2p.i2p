@@ -266,24 +266,17 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         NTCPTransport t = (NTCPTransport) _manager.getTransport(NTCPTransport.STYLE);
         if (t == null)
             return;
-        Properties UDPProps = UDPAddr.getOptions();
-        if (UDPProps == null)
-            return;
-        Properties newProps;
         RouterAddress oldAddr = t.getCurrentAddress();
         if (_log.shouldLog(Log.INFO))
             _log.info("Changing NTCP Address? was " + oldAddr);
-        RouterAddress newAddr = oldAddr;
-        if (newAddr == null) {
-            newAddr = new RouterAddress();
+        RouterAddress newAddr = new RouterAddress();
+        newAddr.setTransportStyle(NTCPTransport.STYLE);
+        Properties newProps = new Properties();
+        if (oldAddr == null) {
             newAddr.setCost(NTCPAddress.DEFAULT_COST);
-            newAddr.setExpiration(null);
-            newAddr.setTransportStyle(NTCPTransport.STYLE);
-            newProps = new Properties();
         } else {
-            newProps = newAddr.getOptions();
-            if (newProps == null)
-                newProps = new Properties();
+            newAddr.setCost(oldAddr.getCost());
+            newProps.putAll(oldAddr.getOptionsMap());
         }
 
         boolean changed = false;
@@ -297,7 +290,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         if (cport != null && cport.length() > 0) {
             nport = cport;
         } else if (_context.getBooleanPropertyDefaultTrue(PROP_I2NP_NTCP_AUTO_PORT)) {
-            nport = UDPProps.getProperty(UDPAddress.PROP_PORT);
+            nport = UDPAddr.getOption(UDPAddress.PROP_PORT);
         }
         if (_log.shouldLog(Log.INFO))
             _log.info("old: " + oport + " config: " + cport + " new: " + nport);
@@ -330,7 +323,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
             _log.info("old: " + ohost + " config: " + name + " auto: " + enabled + " status: " + status);
         if (enabled.equals("always") ||
             (Boolean.valueOf(enabled).booleanValue() && status == STATUS_OK)) {
-            String nhost = UDPProps.getProperty(UDPAddress.PROP_HOST);
+            String nhost = UDPAddr.getOption(UDPAddress.PROP_HOST);
             if (_log.shouldLog(Log.INFO))
                 _log.info("old: " + ohost + " config: " + name + " new: " + nhost);
             if (nhost == null || nhost.length() <= 0)
@@ -483,10 +476,7 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         RouterAddress ra = ri.getTargetAddress("SSU");
         if (ra == null)
             return null;
-        Properties props = ra.getOptions();
-        if (props == null)
-            return null;
-        return props.getProperty("host");
+        return ra.getOption("host");
     }
 
     /** full name for a country code, or the code if we don't know the name */

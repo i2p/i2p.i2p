@@ -14,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-12-12 11:15+0000\n"
-"PO-Revision-Date: 2011-10-07 01:47+0000\n"
-"Last-Translator: blabla <blabla@trash-mail.com>\n"
+"POT-Creation-Date: 2011-12-27 22:38+0000\n"
+"PO-Revision-Date: 2011-12-18 10:52+0000\n"
+"Last-Translator: punkibastardo <punkibastardo@gmail.com>\n"
 "Language-Team: Spanish (Castilian) (http://www.transifex.net/projects/p/I2P/"
 "team/es/)\n"
 "Language: es\n"
@@ -171,7 +171,7 @@ msgstr "No se puede abrir \"{0}\""
 #: ../java/src/org/klomp/snark/SnarkManager.java:661
 #: ../java/src/org/klomp/snark/SnarkManager.java:737
 #: ../java/src/org/klomp/snark/SnarkManager.java:792
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2035
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2036
 #, java-format
 msgid "Torrent with this info hash is already running: {0}"
 msgstr "Ya hay un Torrent con este hash: {0}."
@@ -202,7 +202,7 @@ msgid "Torrent in \"{0}\" is invalid"
 msgstr "El archivo .torrent en \"{0}\" no es válido."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:699
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2057
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2058
 #, java-format
 msgid "ERROR - Out of memory, cannot create torrent from {0}"
 msgstr "ERROR - Falta de memoria, no se puede crear un torrent de {0}."
@@ -357,10 +357,10 @@ msgstr "Foro"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:251
 msgid "Click \"Add torrent\" button to fetch torrent"
-msgstr ""
+msgstr "Click en el botón \"Añadir torrent\" para cargar un torrent"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:290
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1778
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1779
 msgid "Status"
 msgstr "Estado"
 
@@ -462,9 +462,8 @@ msgstr[0] "1 par conectado"
 msgstr[1] "{0} pares conectados"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:498
-#, fuzzy
 msgid "Opening the I2P tunnel"
-msgstr "Detener todos los torrents y el túnel I2P"
+msgstr "Abriendo el túnel I2P"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:505
 #, java-format
@@ -573,7 +572,7 @@ msgstr "sembrando"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:852
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1724
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1829
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1830
 msgid "Complete"
 msgstr "completo"
 
@@ -911,7 +910,7 @@ msgstr "Finalización"
 
 #. else unknown
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1726
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1775
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1776
 msgid "Size"
 msgstr "Tamaño"
 
@@ -931,71 +930,79 @@ msgstr "Tamaño de las partes"
 msgid "Magnet link"
 msgstr "Enlace de magnet"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1773
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1812
+#. We don't have the hash of the torrent file
+#. buf.append("<br>").append(_("Maggot link")).append(": <a href=\"").append(MAGGOT).append(hex).append(':').append(hex).append("\">")
+#. .append(MAGGOT).append(hex).append(':').append(hex).append("</a>");
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1762
+#, fuzzy
+msgid "Torrent file"
+msgstr "Detalles del torrent"
+
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1774
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1813
 msgid "Directory"
 msgstr "Carpeta"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1782
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1783
 msgid "Priority"
 msgstr "Prioridad"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1787
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1788
 msgid "Up to higher level directory"
 msgstr "Subir una herarquía"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1817
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1818
 msgid "Torrent not found?"
 msgstr "¿No se encotró el archivo torrent?"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1826
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1827
 msgid "File not found in torrent?"
 msgstr "¿Archivo no encontrado en el torrent?"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1839
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1840
 msgid "complete"
 msgstr "completo"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1840
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1841
 msgid "bytes remaining"
 msgstr "Bytes faltando"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1865
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1866
 msgid "Open"
 msgstr "abrir"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1891
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1892
 msgid "High"
 msgstr "alta"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1896
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1897
 msgid "Normal"
 msgstr "normal"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1901
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1902
 msgid "Skip"
 msgstr "dejar de lado"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1910
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1911
 msgid "Save priorities"
 msgstr "Guardar prioridades"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2026
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2027
 #, java-format
 msgid "Torrent fetched from {0}"
 msgstr "Torrent obtenido desde {0}"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2047
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2048
 #, java-format
 msgid "Torrent already running: {0}"
 msgstr "Torrent ya en marcha: {0}"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2049
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2050
 #, java-format
 msgid "Torrent already in the queue: {0}"
 msgstr "Torrent ya encolado: {0}"
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2055
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2056
 #, java-format
 msgid "Torrent at {0} was not valid"
 msgstr "Torrent en {0} no era válido"
@@ -1004,11 +1011,11 @@ msgstr "Torrent en {0} no era válido"
 #. String peerParam = req.getParameter("p");
 #. if (peerParam != null)
 #. buf.append("<input type=\"hidden\" name=\"p\" value=\"").append(peerParam).append("\" >\n");
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2069
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2070
 #, java-format
 msgid "Torrent was not retrieved from {0}"
 msgstr "El torrent no se ha podido obtener de {0}."
 
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2072
+#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2073
 msgid "Retry"
-msgstr ""
+msgstr "Reintentar"

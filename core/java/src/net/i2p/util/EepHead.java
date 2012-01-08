@@ -92,6 +92,7 @@ public class EepHead extends EepGet {
             System.err.println("Etag: " + get.getETag());
         } else {
             System.err.println("Failed " + url);
+            System.exit(1);
         }
     }
     

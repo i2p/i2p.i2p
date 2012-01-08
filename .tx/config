@@ -20,6 +20,7 @@ source_lang = en
 trans.ar = apps/routerconsole/locale/messages_ar.po
 trans.da = apps/routerconsole/locale/messages_da.po
 trans.de = apps/routerconsole/locale/messages_de.po
+trans.et_EE = apps/routerconsole/locale/messages_ee.po
 trans.es = apps/routerconsole/locale/messages_es.po
 trans.fi = apps/routerconsole/locale/messages_fi.po
 trans.fr = apps/routerconsole/locale/messages_fr.po

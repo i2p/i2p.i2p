@@ -22,7 +22,8 @@ _Description: I2P daemon user:
  account name here. For example, if your previous I2P installation is at
  /home/user/i2p, you may enter 'user' here.
  .
- Very important: The account specified here *MUST* already exist.
+ Very important: If a user other than the default of 'i2psvc' is entered
+ here, the chosen username *MUST* already exist.
 
 Template: i2p/memory
 Type: string

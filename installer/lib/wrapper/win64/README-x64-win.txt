@@ -1,4 +1,4 @@
-Changes will probably be needed for newer versions than 3.5.12.
+Changes may be needed for newer versions than 3.5.13.
 
 To use the patch in this directory, copy Makefile-windows-x86-32.nmake to
 Makefile-windows-x86-64.nmake then "patch < x64-win.patch".

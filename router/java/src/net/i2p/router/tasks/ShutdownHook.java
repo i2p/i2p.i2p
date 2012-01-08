@@ -32,6 +32,10 @@ public class ShutdownHook extends Thread {
         setName("Router " + _id + " shutdown");
         Log l = _context.logManager().getLog(Router.class);
         l.log(Log.CRIT, "Shutting down the router...");
+        // Needed to make the wrapper happy, otherwise it gets confused
+        // and thinks we haven't shut down, possibly because it
+        // prevents other shutdown hooks from running
+        _context.router().setKillVMOnEnd(false);
         _context.router().shutdown2(Router.EXIT_HARD);
     }
 }

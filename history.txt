@@ -1,3 +1,58 @@
+2012-01-08 zzz
+  * Plugins:
+    - Enforce min and max Jetty versions at plugin installation
+    - Enforce I2P, Java, and Jetty versions at plugin startup too
+  * Router:
+    - No longer check for updates or start any threads in the Router constructor,
+    - for ease in building multiple routers in the JVM,
+    - and also because starting threads in a constructor is bad practice.
+    - All threads now start in runRouter().
+    - Installation of updates now only happens via Router.main().
+  * RouterInfo, RouterAddress: Optimizations and integrity checks
+    - Remove synchronization
+    - Do not allow contents to change after being set, throw IllegalStateException
+    - Do not copy contents out in getters
+    - Make options final
+    - Add getOption() and getOptionsMap() methods
+  * Router shutdown:
+    - Fix failsafe shutdown hook broken in 0.8.8;
+      HUP, INT, and TERM signals should now shut down cleanly.
+    - Shutdown hook no longer prevents other hooks from running
+    - Trap HUP, if router.gracefulHUP=true, and do graceful shutdown.
+      Only under wrapper, non-Windows.
+    - i2prouter stop now uses SIGTERM
+    - Implement i2prouter graceful using SIGHUP (ticket #580)
+    - Configure wrapper to ignore SIGUSR1 and SIGUSR2 as they will shut down
+      or crash the JVM
+
+2012-01-06 kytv
+  * EepGet: If transfer fails, exit with status 1 (fixes #576)
+
+* 2012-01-06 0.8.12 released
+
+2012-01-04 kytv
+  * Update geoip.txt based on Maxmind GeoLite Country database from 2011-12-08
+
+2012-01-02 kytv
+  * Wrapper 3.5.13 for everything other than armv7.
+
+2012-01-02 zzz
+  * Fix webapp PortMapper lookup for SSL-only console
+  * Wrapper 3.5.13 for arm v7
+
+2011-12-31 zzz
+  * Fix log NPE when saveConfig() fails at startup, thx kytv
+   (backport from jetty6 branch)
+
+2011-12-30 zzz
+  * New Estonian translation thanks ajutine
+
+2011-12-27 kytv
+  * Spanish and Swedish translation updates from Transifex
+
+2011-12-23 zzz
+  * Logging: Eliminate LogWriter/LogManager deadlock
+
 2011-12-18 zzz
   * Addresses: Add utility toString() methods
   * Blocklist: Buffer input to speed lookup

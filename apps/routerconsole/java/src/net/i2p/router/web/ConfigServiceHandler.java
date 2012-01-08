@@ -8,8 +8,12 @@ import net.i2p.apps.systray.UrlLauncher;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.startup.ClientAppConfig;
+import net.i2p.util.Log;
 
 import org.tanukisoftware.wrapper.WrapperManager;
+import org.tanukisoftware.wrapper.event.WrapperControlEvent;
+import org.tanukisoftware.wrapper.event.WrapperEvent;
+import org.tanukisoftware.wrapper.event.WrapperEventListener;
 
 /**
  * Handler to deal with form submissions from the service config form and act
@@ -18,6 +22,10 @@ import org.tanukisoftware.wrapper.WrapperManager;
  */
 public class ConfigServiceHandler extends FormHandler {
     
+    private static WrapperEventListener _signalHandler;
+
+    private static final String PROP_GRACEFUL_HUP = "router.gracefulHUP";
+
     /**
      *  Register two shutdown hooks, one to rekey and/or tell the wrapper we are stopping,
      *  and a final one to tell the wrapper we are stopped.
@@ -127,6 +135,79 @@ public class ConfigServiceHandler extends FormHandler {
         }
     }
 
+    /**
+     *  Register a handler for signals,
+     *  so we can handle HUP from the wrapper (non-Windows only)
+     *
+     *  @since 0.8.13
+     */
+    synchronized static void registerSignalHandler(RouterContext ctx) {
+        if (ctx.hasWrapper() && _signalHandler == null &&
+            !System.getProperty("os.name").startsWith("Win")) {
+           _signalHandler = new SignalHandler(ctx);
+           long mask = WrapperEventListener.EVENT_FLAG_CONTROL;
+           WrapperManager.addWrapperEventListener(_signalHandler, mask);
+        }
+    }
+
+    /**
+     *  Unregister the handler for signals
+     *
+     *  @since 0.8.13
+     */
+    public synchronized static void unregisterSignalHandler() {
+        if (_signalHandler != null) {
+           WrapperManager.removeWrapperEventListener(_signalHandler);
+           _signalHandler = null;
+        }
+    }
+
+    /**
+     *  Catch signals.
+     *  The wrapper will potentially forward HUP, USR1, and USR2.
+     *  But USR1 and USR2 are used by the JVM GC and cannot be trapped.
+     *  So we will only get HUP.
+     *
+     *  @since 0.8.13
+     */
+    private static class SignalHandler implements WrapperEventListener {
+        private final RouterContext _ctxt;
+
+        public SignalHandler(RouterContext ctx) {
+            _ctxt = ctx;
+        }
+
+        public void fired(WrapperEvent event) {
+            if (!(event instanceof WrapperControlEvent))
+                return;
+            WrapperControlEvent wce = (WrapperControlEvent) event;
+            Log log = _ctxt.logManager().getLog(ConfigServiceHandler.class);
+            if (log.shouldLog(Log.WARN))
+                log.warn("Got signal: " + wce.getControlEventName());
+            int sig = wce.getControlEvent();
+            switch (sig) {
+              case WrapperManager.WRAPPER_CTRL_HUP_EVENT:
+                if (_ctxt.getBooleanProperty(PROP_GRACEFUL_HUP)) {
+                    wce.consume();
+                    if (!(_ctxt.router().gracefulShutdownInProgress() ||
+                          _ctxt.router().isFinalShutdownInProgress())) {
+                        System.err.println("WARN: Graceful shutdown initiated by SIGHUP");
+                        log.logAlways(Log.WARN, "Graceful shutdown initiated by SIGHUP");
+                        registerWrapperNotifier(_ctxt, Router.EXIT_GRACEFUL, false);
+                        _ctxt.router().shutdownGracefully();
+                    }
+                } else {
+                    log.log(Log.CRIT, "Hard shutdown initiated by SIGHUP");
+                    // JVM will call ShutdownHook if we don't do it ourselves
+                    //wce.consume();
+                    //registerWrapperNotifier(_ctxt, Router.EXIT_HARD, false);
+                    //_ctxt.router().shutdown(Router.EXIT_HARD);
+                }
+                break;
+            }
+        }
+    }
+
     @Override
     protected void processForm() {
         if (_action == null) return;
@@ -194,6 +275,7 @@ public class ConfigServiceHandler extends FormHandler {
             addFormError(_("Warning: unable to install the service") + " - " + ioe.getMessage());
         }
     }
+
     private void uninstallService() {
         try { 
             Runtime.getRuntime().exec("uninstall_i2p_service_winnt.bat");

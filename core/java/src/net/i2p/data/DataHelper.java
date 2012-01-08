@@ -118,6 +118,17 @@ public class DataHelper {
     public static Properties readProperties(InputStream rawStream) 
         throws DataFormatException, IOException {
         Properties props = new OrderedProperties();
+        readProperties(rawStream, props);
+        return props;
+    }
+
+    /**
+     *  Ditto, load into an existing properties
+     *  @param props the Properties to load into
+     *  @since 0.8.13
+     */
+    public static Properties readProperties(InputStream rawStream, Properties props) 
+        throws DataFormatException, IOException {
         long size = readLong(rawStream, 2);
         byte data[] = new byte[(int) size];
         int read = read(rawStream, data);
@@ -1268,6 +1279,8 @@ public class DataHelper {
      *  Why? Just because it has to be consistent so signing will work.
      *  How to spec as returning the same type as the param?
      *  DEPRECATED - Only used by RouterInfo.
+     *
+     *  @return a new list
      */
     public static List<? extends DataStructure> sortStructures(Collection<? extends DataStructure> dataStructures) {
         if (dataStructures == null) return Collections.EMPTY_LIST;

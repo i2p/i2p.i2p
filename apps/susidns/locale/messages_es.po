@@ -14,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-12-12 11:15+0000\n"
-"PO-Revision-Date: 2011-10-07 01:38+0000\n"
-"Last-Translator: blabla <blabla@trash-mail.com>\n"
+"POT-Creation-Date: 2011-12-27 22:38+0000\n"
+"PO-Revision-Date: 2011-12-18 10:54+0000\n"
+"Last-Translator: punkibastardo <punkibastardo@gmail.com>\n"
 "Language-Team: Spanish (Castilian) (http://www.transifex.net/projects/p/I2P/"
 "team/es/)\n"
 "Language: es\n"
@@ -653,13 +653,12 @@ msgstr ""
 "suscrita a www.i2p2.i2p."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:117
-#, fuzzy
 msgid ""
 "Subscribing to additional sites is easy, just add them to your <a href="
 "\"subscriptions\">subscriptions</a> file."
 msgstr ""
-"Suscribirse a otros sitios es fácil, sólo tienes que añadirlos a tu archivo "
-"de <a href=\"subscriptions.jsp\">suscripciones</a>."
+"Suscribirse a otras páginas es fácil, sólo añádelas a tu archivo de <a href="
+"\"subscriptions\">subscripciones</a>."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:119
 msgid ""

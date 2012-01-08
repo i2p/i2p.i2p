@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: i2p 0.8.9-1\n"
-"Report-Msgid-Bugs-To: i2p@packages.debian.org\n"
-"POT-Creation-Date: 2011-12-10 04:00+0000\n"
+"Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
+"POT-Creation-Date: 2011-12-27 22:25+0000\n"
 "PO-Revision-Date: 2011-06-21 20:59+0500\n"
 "Last-Translator: Hidden Z <hiddenz@mail.i2p>\n"
 "Language-Team: ru\n"
@@ -55,7 +55,11 @@ msgstr ""
 #. Type: string
 #. Description
 #: ../i2p.templates:3001
-msgid "Very important: The account specified here *MUST* already exist."
+#, fuzzy
+#| msgid "Very important: The account specified here *MUST* already exist."
+msgid ""
+"Very important: If a user other than the default of 'i2psvc' is entered "
+"here, the chosen username *MUST* already exist."
 msgstr ""
 "Очень важно: аккаунт, указанный здесь, обязательно должен существовать."
 

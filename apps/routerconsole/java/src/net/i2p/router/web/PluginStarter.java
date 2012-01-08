@@ -17,6 +17,7 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.i2p.CoreVersion;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.router.Job;
@@ -27,6 +28,7 @@ import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
 import net.i2p.util.Translate;
+import net.i2p.util.VersionComparator;
 
 import org.mortbay.jetty.handler.ContextHandlerCollection;
 
@@ -95,6 +97,41 @@ public class PluginStarter implements Runnable {
             log.error("Cannot start nonexistent plugin: " + appName);
             return false;
         }
+
+        Properties props = pluginProperties(ctx, appName);
+        String minVersion = ConfigClientsHelper.stripHTML(props, "min-i2p-version");
+        if (minVersion != null &&
+            (new VersionComparator()).compare(CoreVersion.VERSION, minVersion) < 0) {
+            String foo = "Plugin " + appName + " requires I2P version " + minVersion + " or higher";
+            log.error(foo);
+            throw new Exception(foo);
+        }
+
+        minVersion = ConfigClientsHelper.stripHTML(props, "min-java-version");
+        if (minVersion != null &&
+            (new VersionComparator()).compare(System.getProperty("java.version"), minVersion) < 0) {
+            String foo = "Plugin " + appName + " requires Java version " + minVersion + " or higher";
+            log.error(foo);
+            throw new Exception(foo);
+        }
+
+        String jVersion = LogsHelper.jettyVersion();
+        minVersion = ConfigClientsHelper.stripHTML(props, "min-jetty-version");
+        if (minVersion != null &&
+            (new VersionComparator()).compare(minVersion, jVersion) > 0) {
+            String foo = "Plugin " + appName + " requires Jetty version " + minVersion + " or higher";
+            log.error(foo);
+            throw new Exception(foo);
+        }
+
+        String maxVersion = ConfigClientsHelper.stripHTML(props, "max-jetty-version");
+        if (maxVersion != null &&
+            (new VersionComparator()).compare(maxVersion, jVersion) < 0) {
+            String foo = "Plugin " + appName + " requires Jetty version " + maxVersion + " or lower";
+            log.error(foo);
+            throw new Exception(foo);
+        }
+
         if (log.shouldLog(Log.INFO))
             log.info("Starting plugin: " + appName);
 
@@ -113,8 +150,8 @@ public class PluginStarter implements Runnable {
         // load and start things in clients.config
         File clientConfig = new File(pluginDir, "clients.config");
         if (clientConfig.exists()) {
-            Properties props = new Properties();
-            DataHelper.loadProps(props, clientConfig);
+            Properties cprops = new Properties();
+            DataHelper.loadProps(cprops, clientConfig);
             List<ClientAppConfig> clients = ClientAppConfig.getClientApps(clientConfig);
             runClientApps(ctx, pluginDir, clients, "start");
         }
@@ -123,7 +160,7 @@ public class PluginStarter implements Runnable {
         ContextHandlerCollection server = WebAppStarter.getConsoleServer();
         if (server != null) {
             File consoleDir = new File(pluginDir, "console");
-            Properties props = RouterConsoleRunner.webAppProperties(consoleDir.getAbsolutePath());
+            Properties wprops = RouterConsoleRunner.webAppProperties(consoleDir.getAbsolutePath());
             File webappDir = new File(consoleDir, "webapps");
             String fileNames[] = webappDir.list(RouterConsoleRunner.WarFilenameFilter.instance());
             if (fileNames != null) {
@@ -138,7 +175,7 @@ public class PluginStarter implements Runnable {
                             log.error("Skipping duplicate webapp " + warName + " in plugin " + appName);
                             continue;
                         }
-                        String enabled = props.getProperty(RouterConsoleRunner.PREFIX + warName + ENABLED);
+                        String enabled = wprops.getProperty(RouterConsoleRunner.PREFIX + warName + ENABLED);
                         if (! "false".equals(enabled)) {
                             if (log.shouldLog(Log.INFO))
                                 log.info("Starting webapp: " + warName);
@@ -181,7 +218,6 @@ public class PluginStarter implements Runnable {
         }
 
         // add summary bar link
-        Properties props = pluginProperties(ctx, appName);
         String name = ConfigClientsHelper.stripHTML(props, "consoleLinkName_" + Messages.getLanguage(ctx));
         if (name == null)
             name = ConfigClientsHelper.stripHTML(props, "consoleLinkName");

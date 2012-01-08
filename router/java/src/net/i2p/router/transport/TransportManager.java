@@ -343,15 +343,12 @@ public class TransportManager implements TransportEventListener {
         for (Transport t : _transports.values()) {
             int port = t.getRequestedPort();
             if (t.getCurrentAddress() != null) {
-                Properties opts = t.getCurrentAddress().getOptions();
-                if (opts != null) {
-                    String s = opts.getProperty("port");
+                    String s = t.getCurrentAddress().getOption("port");
                     if (s != null) {
                         try {
                             port = Integer.parseInt(s);
                         } catch (NumberFormatException nfe) {}
                     }
-                }
             }
             // Use UDP port for NTCP too - see comment in NTCPTransport.getRequestedPort() for why this is here
             if (t.getStyle().equals(NTCPTransport.STYLE) && port <= 0 &&

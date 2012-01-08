@@ -1,3 +1,10 @@
+# Last updated based on Maxmind GeoLite Country
+# dated 2011-12-08
+# Script borrowed from Tor
+#
+# wget http://geolite.maxmind.com/download/geoip/database/GeoIPCountryCSV.zip
+# cut -d, -f3-5 < GeoIPCountryWhois.csv|sed 's/"//g' > geoip.txt
+# cut -d, -f5,6 < GeoIPCountryWhois.csv |sed 's/"//g' | sort | uniq > countries.txt
 A1,Anonymous Proxy
 A2,Satellite Provider
 AD,Andorra
@@ -179,6 +186,7 @@ PH,Philippines
 PK,Pakistan
 PL,Poland
 PM,Saint Pierre and Miquelon
+PN,Pitcairn Islands
 PR,Puerto Rico
 PS,Palestinian Territory
 PT,Portugal

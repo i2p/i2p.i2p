@@ -334,6 +334,21 @@ public class PluginUpdateHandler extends UpdateHandler {
                     statusDone("<b>" + _("Plugin update requires installed plugin version {0} or lower", maxVersion) + "</b>");
                     return;
                 }
+                oldVersion = LogsHelper.jettyVersion();
+                minVersion = ConfigClientsHelper.stripHTML(props, "min-jetty-version");
+                if (minVersion != null &&
+                    (new VersionComparator()).compare(minVersion, oldVersion) > 0) {
+                    to.delete();
+                    statusDone("<b>" + _("Plugin requires Jetty version {0} or higher", minVersion) + "</b>");
+                    return;
+                }
+                maxVersion = ConfigClientsHelper.stripHTML(props, "max-jetty-version");
+                if (maxVersion != null &&
+                    (new VersionComparator()).compare(maxVersion, oldVersion) < 0) {
+                    to.delete();
+                    statusDone("<b>" + _("Plugin requires Jetty version {0} or lower", maxVersion) + "</b>");
+                    return;
+                }
 
                 // check if it is running first?
                 try {

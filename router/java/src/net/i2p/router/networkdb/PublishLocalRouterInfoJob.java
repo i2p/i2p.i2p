@@ -41,7 +41,7 @@ public class PublishLocalRouterInfoJob extends JobImpl {
         RouterInfo ri = new RouterInfo(getContext().router().getRouterInfo());
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Old routerInfo contains " + ri.getAddresses().size() 
-                       + " addresses and " + ri.getOptions().size() + " options");
+                       + " addresses and " + ri.getOptionsMap().size() + " options");
         Properties stats = getContext().statPublisher().publishStatistics();
         stats.setProperty(RouterInfo.PROP_NETWORK_ID, ""+Router.NETWORK_ID);
         try {
@@ -60,7 +60,7 @@ public class PublishLocalRouterInfoJob extends JobImpl {
             getContext().router().setRouterInfo(ri);
             if (_log.shouldLog(Log.INFO))
                 _log.info("Newly updated routerInfo is published with " + stats.size() 
-                          + "/" + ri.getOptions().size() + " options on " 
+                          + "/" + ri.getOptionsMap().size() + " options on " 
                           + new Date(ri.getPublished()));
             try {
                 getContext().netDb().publish(ri);

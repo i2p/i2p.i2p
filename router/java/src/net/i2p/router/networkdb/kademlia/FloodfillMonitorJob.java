@@ -133,8 +133,7 @@ class FloodfillMonitorJob extends JobImpl {
             if (ra == null)
                 happy = false;
             else {
-                Properties props = ra.getOptions();
-                if (props == null || props.getProperty("ihost0") != null)
+                if (ra.getOption("ihost0") != null)
                    happy = false;
             }
         }

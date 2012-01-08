@@ -13,7 +13,7 @@ a soname to shut lintian up.
 --- a/core/c/jbigi/mbuild_jbigi.sh
 +++ b/core/c/jbigi/mbuild_jbigi.sh
 @@ -47,7 +47,7 @@
- 		fi
+                 fi
          fi
          COMPILEFLAGS="-fPIC -Wall"
 -        INCLUDES="-I. -I../../jbigi/include -I$JAVA_HOME/include -I$JAVA_HOME/include/${UNIXTYPE}"

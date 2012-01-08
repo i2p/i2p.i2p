@@ -2,7 +2,7 @@ This product includes both public domain code and licensed code as described bel
 For all code, unless otherwise stated in the appropriate license, the following applies:
 
 
-			    NO WARRANTY
+                            NO WARRANTY
 
   BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
 FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW.  EXCEPT WHEN
@@ -92,34 +92,34 @@ Installer:
    See licenses/LICENSE-Launch4j.txt (in binary packages)
    See installer/lib/launch4j/LICENSE.txt (in source packages)
    The following projects are used by Launch4j...
-	MinGW binutils (http://www.mingw.org/)
+        MinGW binutils (http://www.mingw.org/)
 
-	Commons BeanUtils (http://jakarta.apache.org/commons/beanutils/)
+        Commons BeanUtils (http://jakarta.apache.org/commons/beanutils/)
 
- 	Commons Logging (http://jakarta.apache.org/commons/logging/)
+        Commons Logging (http://jakarta.apache.org/commons/logging/)
         See licenses/LICENSE-Apache2.0.txt
         See licenses/NOTICE-Commons-Logging.txt
 
-	XStream (http://xstream.codehaus.org/)
+        XStream (http://xstream.codehaus.org/)
         Copyright (c) 2003-2004, Joe Walnes
         See licenses/LICENSE-XStream.txt
 
-	JGoodies Forms (http://www.jgoodies.com/freeware/forms/)
+        JGoodies Forms (http://www.jgoodies.com/freeware/forms/)
         Copyright (c) 2002-2004 JGoodies Karsten Lentzsch. All rights reserved.
         See licenses/LICENSE-JGoodies-Forms.txt
 
-	JGoodies Looks (http://www.jgoodies.com/freeware/looks/)
+        JGoodies Looks (http://www.jgoodies.com/freeware/looks/)
         Copyright (c) 2003 JGoodies Karsten Lentzsch. All rights reserved.
         See licenses/LICENSE-JGoodies-Looks.txt
 
-	Foxtrot (http://foxtrot.sourceforge.net/)
+        Foxtrot (http://foxtrot.sourceforge.net/)
         Copyright (c) 2002, Simone Bordet & Marco Cravero. All rights reserved.
         See licenses/LICENSE-Foxtrot.txt
 
-	Nuvola Icon Theme (http://www.icon-king.com)
+        Nuvola Icon Theme (http://www.icon-king.com)
         See licenses/LICENSE-LGPLv2.1.txt
 
-	Forms were created using Abeille Forms Designer (https://abeille.dev.java.net/)
+        Forms were created using Abeille Forms Designer (https://abeille.dev.java.net/)
 
    Izpack 4.3.0:
    Copyright (c) 2001-2008 Julien Ponge
@@ -127,17 +127,13 @@ Installer:
 
 
 
-Java Service Wrapper Community Edition 32-bit 3.5.9:
+Java Service Wrapper Community Edition 32-bit 3.5.13:
    Copyright (C) 1999-2011 Tanuki Software, Ltd. All Rights Reserved.
    See licenses/LICENSE-Wrapper.txt
 
 
 Jbigi Libraries (jbigi.jar):
    JNI code public domain.
-
-   GMP 4.1.3 / 4.1.4:
-   Copyright 1991, 1996, 1999, 2000 Free Software Foundation, Inc.
-   See licenses/LICENSE-LGPLv2.1.txt
 
    GMP 4.3.2 / 5.0.2:
    Copyright 1991, 1996, 1999, 2000, 2007 Free Software Foundation, Inc.
@@ -198,7 +194,7 @@ Applications:
        Flag icons:
          - Jersey and EU flag icons: public domain, courtesy Xrmap flag
            collection http://www.arvernes.com/wiki/index.php/Xrmap
-         - Guernsey flag from the Open Clip Art Library, released into the public domain
+         - Guernsey and Isle of Man flags from the Open Clip Art Library, released into the public domain
          - All other flag icons: public domain, courtesy mjames@gmail.com http://www.famfamfam.com/
        Silk icons: See licenses/LICENSE-SilkIcons.txt
 

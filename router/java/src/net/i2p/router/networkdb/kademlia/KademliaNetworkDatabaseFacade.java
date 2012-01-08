@@ -786,8 +786,7 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
             RouterAddress ra = routerInfo.getTargetAddress("SSU");
             if (ra != null) {
                 // Introducers change often, introducee will ping introducer for 2 hours
-                Properties props = ra.getOptions();
-                if (props != null && props.getProperty("ihost0") != null)
+                if (ra.getOption("ihost0") != null)
                     return "Peer " + key.toBase64() + " published > 75m ago with SSU Introducers";
                 if (routerInfo.getTargetAddress("NTCP") == null)
                     return "Peer " + key.toBase64() + " published > 75m ago, SSU only without introducers";
@@ -822,10 +821,10 @@ public class KademliaNetworkDatabaseFacade extends NetworkDatabaseFacade {
         if (err != null)
             throw new IllegalArgumentException("Invalid store attempt - " + err);
         
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("RouterInfo " + key.toBase64() + " is stored with "
-                       + routerInfo.getOptions().size() + " options on "
-                       + new Date(routerInfo.getPublished()));
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("RouterInfo " + key.toBase64() + " is stored with "
+        //               + routerInfo.getOptionsMap().size() + " options on "
+        //               + new Date(routerInfo.getPublished()));
     
         _context.peerManager().setCapabilities(key, routerInfo.getCapabilities());
         _ds.put(key, routerInfo, persist);

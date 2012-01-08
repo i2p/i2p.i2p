@@ -161,7 +161,8 @@ public class SSLEepGet extends EepGet {
             get._saveCerts = true;
         get._commandLine = true;
         get.addStatusListener(get.new CLIStatusListener(1024, 40));
-        get.fetch(45*1000, -1, 60*1000);
+        if(!get.fetch(45*1000, -1, 60*1000))
+            System.exit(1);
     }
     
     private static void usage() {

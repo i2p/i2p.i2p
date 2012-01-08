@@ -124,16 +124,22 @@ public abstract class DatabaseEntry extends DataStructureImpl {
     /**
      * Configure the proof that the entity stands behind the info here
      *
+     * @throws IllegalStateException if already signed
      */
     public void setSignature(Signature signature) {
+        if (_signature != null)
+            throw new IllegalStateException();
         _signature = signature;
     }
 
     /**
      * Sign the structure using the supplied signing key
      *
+     * @throws IllegalStateException if already signed
      */
     public void sign(SigningPrivateKey key) throws DataFormatException {
+        if (_signature != null)
+            throw new IllegalStateException();
         byte[] bytes = getBytes();
         if (bytes == null) throw new DataFormatException("Not enough data to sign");
         // now sign with the key 

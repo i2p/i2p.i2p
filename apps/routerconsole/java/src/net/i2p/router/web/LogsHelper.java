@@ -10,7 +10,7 @@ import org.mortbay.jetty.Server;
 public class LogsHelper extends HelperBase {
     public LogsHelper() {}
     
-    /** @since 0.8.11 */
+    /** @since 0.8.12 */
     public String getJettyVersion() {
         return Server.getVersion();
     }

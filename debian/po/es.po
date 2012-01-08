@@ -1,20 +1,24 @@
 # Spanish debconf translation
 # Copyright (C) 2011 The I2P Project
 # This file is distributed under the same license as the i2p package.
-# mixxy <m1xxy@mail.i2p>, 2011
-#
+
+# Translators:
+# mixxy <m1xxy@mail.i2p>, 2011.
+#   <punkibastardo@gmail.com>, 2011.
 msgid ""
 msgstr ""
-"Project-Id-Version: i2p 0.8.9-1\n"
-"Report-Msgid-Bugs-To: i2p@packages.debian.org\n"
-"POT-Creation-Date: 2011-12-10 04:00+0000\n"
-"PO-Revision-Date: 2011-07-20 04:33+0100\n"
-"Last-Translator: mixxy <m1xxy@mail.i2p>\n"
-"Language-Team: es\n"
+"Project-Id-Version: I2P\n"
+"Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
+"POT-Creation-Date: 2011-12-27 22:25+0000\n"
+"PO-Revision-Date: 2011-12-21 21:22+0000\n"
+"Last-Translator: punkibastardo <punkibastardo@gmail.com>\n"
+"Language-Team: Spanish (Castilian) (http://www.transifex.net/projects/p/I2P/"
+"team/es/)\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #. Type: boolean
 #. Description
@@ -56,20 +60,24 @@ msgstr ""
 #. Type: string
 #. Description
 #: ../i2p.templates:3001
-msgid "Very important: The account specified here *MUST* already exist."
-msgstr "Muy importante: El usuario especificado aquí *YA TIENE QUE* existir."
+msgid ""
+"Very important: If a user other than the default of 'i2psvc' is entered "
+"here, the chosen username *MUST* already exist."
+msgstr ""
+"Muy importante: Si se introduce un nombre de usuario en este campo distinto "
+"a 'i2psvc', el nombre elegido *DEBE* existir de antemano."
 
 #. Type: string
 #. Description
 #: ../i2p.templates:4001
 msgid "Memory that can be allocated to I2P:"
-msgstr ""
+msgstr "La memoria que puede ser asignada a I2P:"
 
 #. Type: string
 #. Description
 #: ../i2p.templates:4001
 msgid "By default, I2P will only be allowed to use up to 128MB of RAM."
-msgstr ""
+msgstr "Por defecto, a I2P sólo se le permitirá utilizar 128MB de RAM"
 
 #. Type: string
 #. Description
@@ -78,3 +86,5 @@ msgid ""
 "High bandwidth routers, as well as routers with a lot of active torrents / "
 "plugins, may need to have this value increased."
 msgstr ""
+"Los routers con un alto ancho de banda, así como los routers con muchos "
+"torrents activos / plugins, podrían necesitar un aumento este valor."

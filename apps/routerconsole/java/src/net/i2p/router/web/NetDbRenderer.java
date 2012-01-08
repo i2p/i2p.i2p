@@ -376,9 +376,8 @@ public class NetDbRenderer {
             int cost = addr.getCost();
             if (!((style.equals("SSU") && cost == 5) || (style.equals("NTCP") && cost == 10)))
                 buf.append('[').append(_("cost")).append('=').append("" + cost).append("] ");
-            Properties p = new OrderedProperties();
-            p.putAll(addr.getOptions());
-            for (Map.Entry e : p.entrySet()) {
+            Map p = addr.getOptionsMap();
+            for (Map.Entry e : (Set<Map.Entry>) p.entrySet()) {
                 String name = (String) e.getKey();
                 String val = (String) e.getValue();
                 buf.append('[').append(_(DataHelper.stripHTML(name))).append('=').append(DataHelper.stripHTML(val)).append("] ");
@@ -387,9 +386,10 @@ public class NetDbRenderer {
         buf.append("</td></tr>\n");
         if (full) {
             buf.append("<tr><td>" + _("Stats") + ": <br><code>");
-            for (Iterator iter = info.getOptions().keySet().iterator(); iter.hasNext(); ) {
-                String key = (String)iter.next();
-                String val = info.getOption(key);
+            Map p = info.getOptionsMap();
+            for (Map.Entry e : (Set<Map.Entry>) p.entrySet()) {
+                String key = (String) e.getKey();
+                String val = (String) e.getValue();
                 buf.append(DataHelper.stripHTML(key)).append(" = ").append(DataHelper.stripHTML(val)).append("<br>\n");
             }
             buf.append("</code></td></tr>\n");
@@ -412,7 +412,7 @@ public class NetDbRenderer {
             if (style.equals("NTCP")) {
                 rv |= NTCP;
             } else if (style.equals("SSU")) {
-                if (addr.getOptions().getProperty("iport0") != null)
+                if (addr.getOption("iport0") != null)
                     rv |= SSUI;
                 else
                     rv |= SSU;
