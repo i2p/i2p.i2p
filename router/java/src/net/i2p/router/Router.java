@@ -233,6 +233,8 @@ public class Router implements RouterClock.ClockShiftListener {
             String now = Long.toString(System.currentTimeMillis());
             _config.put("router.firstInstalled", now);
             _config.put("router.updateLastInstalled", now);
+            // only compatible with new i2prouter script
+            _config.put("router.gracefulHUP", "true");
             saveConfig();
         }
 
@@ -376,7 +378,7 @@ public class Router implements RouterClock.ClockShiftListener {
         _isAlive = true;
         _started = _context.clock().now();
         try {
-            Runtime.getRuntime().removeShutdownHook(_shutdownHook);
+            Runtime.getRuntime().addShutdownHook(_shutdownHook);
         } catch (IllegalStateException ise) {}
         I2PThread.addOOMEventListener(_oomListener);
         
@@ -987,9 +989,12 @@ public class Router implements RouterClock.ClockShiftListener {
 
     /**
      *  Cancel the JVM runtime hook before calling this.
+     *  Called by the ShutdownHook.
      *  NOT to be called by others, use shutdown().
      */
     public void shutdown2(int exitCode) {
+        _shutdownInProgress = true;
+        _log.log(Log.CRIT, "Starting final shutdown(" + exitCode + ')');
         // So we can get all the way to the end
         // No, you can't do Thread.currentThread.setDaemon(false)
         if (_killVMOnEnd) {
@@ -1004,6 +1009,7 @@ public class Router implements RouterClock.ClockShiftListener {
         // Run the shutdown hooks first in case they want to send some goodbye messages
         // Maybe we need a delay after this too?
         for (Runnable task : _context.getShutdownTasks()) {
+            //System.err.println("Running shutdown task " + task.getClass());
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Running shutdown task " + task.getClass());
             try {
@@ -1098,7 +1104,7 @@ public class Router implements RouterClock.ClockShiftListener {
             //Runtime.getRuntime().halt(exitCode);
             // allow the Runtime shutdown hooks to execute
             Runtime.getRuntime().exit(exitCode);
-        } else {
+        } else if (System.getProperty("java.vendor").contains("Android")) {
             Runtime.getRuntime().gc();
         }
     }
