@@ -244,7 +244,7 @@ class IntelInfoImpl extends CPUIDCPUInfo implements IntelCPUInfo
                     case 12:
                         modelString = "Core i7 (32nm)";
                         break;
-                    case 12:
+                    case 13:
                         modelString = "Core i7 Extreme Edition (32nm)";
                         break;
                     case 14:

@@ -13,6 +13,7 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
     protected static boolean isAthlonCompatible = false;
     protected static boolean isAthlon64Compatible = false;
     protected static boolean isBobcatCompatible = false;
+    protected static boolean isBulldozerCompatible = false;
 
     // If modelString != null, the cpu is considered correctly identified.
     protected static String modelString = null;
@@ -30,6 +31,8 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
     public boolean IsAthlon64Compatible(){ return isAthlon64Compatible; }
 
     public boolean IsBobcatCompatible(){ return isBobcatCompatible; }
+
+	public boolean IsBulldozerCompatible(){ return isBulldozerCompatible; }
 
 	static
 	{
@@ -346,6 +349,22 @@ class AMDInfoImpl extends CPUIDCPUInfo implements AMDCPUInfo
                 // Case 3 is uncertain but most likely a Bobcat APU
                 case 3:
                     modelString = "Bobcat APU";
+                    break;
+            }
+        }
+        //Bulldozer
+        if(CPUID.getCPUFamily() + CPUID.getCPUExtendedFamily() == 21){
+            isK6Compatible = true;
+            isK6_2_Compatible = true;
+            isK6_3_Compatible = true;
+            isAthlonCompatible = true;
+            isAthlon64Compatible = true;
+            isBobcatCompatible = true;
+			isBulldozerCompatible = true;
+            isX64 = true;
+            switch(CPUID.getCPUModel() + CPUID.getCPUExtendedModel()){
+                case 1:                    
+                    modelString = "Bulldozer FX-6***/FX-8***";
                     break;
             }
         }
