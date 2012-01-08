@@ -220,7 +220,8 @@ public class EepGet {
         if (username != null && password != null)
             get.addAuthorization(username, password);
         get.addStatusListener(get.new CLIStatusListener(markSize, lineLen));
-        get.fetch(CONNECT_TIMEOUT, -1, inactivityTimeout);
+        if (!get.fetch(CONNECT_TIMEOUT, -1, inactivityTimeout))
+            System.exit(1);
     }
 
     public static String suggestName(String url) {

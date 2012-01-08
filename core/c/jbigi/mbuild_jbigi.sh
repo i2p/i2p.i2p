@@ -67,6 +67,6 @@ fi
 echo "Compiling C code..."
 rm -f jbigi.o $LIBFILE
 $CC -c $COMPILEFLAGS $INCLUDES ../../jbigi/src/jbigi.c || exit 1
-$CC $LINKFLAGS $INCLUDES $INCLUDELIBS -o $LIBFILE jbigi.o $STATICLIBS || exit 1
+$CC $LINKFLAGS $INCLUDES -o $LIBFILE jbigi.o $INCLUDELIBS $STATICLIBS || exit 1
 
 exit 0

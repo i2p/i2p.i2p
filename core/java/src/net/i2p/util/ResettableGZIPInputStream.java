@@ -26,7 +26,6 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
     private final ExtraByteInputStream _extraByteInputStream;
     /** keep a typesafe copy of this */
     private final LookaheadInputStream _lookaheadStream;
-    private static final byte[] _oneDummyByte = new byte[1];
     private final InputStream _sequenceStream = null;
     private final CRC32 _crc32;
     private final byte _buf1[] = new byte[1];
@@ -312,6 +311,7 @@ public class ResettableGZIPInputStream extends InflaterInputStream {
      *
      *     http://code.google.com/p/google-apps-sso-sample/issues/detail?id=8
      *
+     *  @since 0.8.12
      */
     private static class ExtraByteInputStream extends FilterInputStream {
         private static final byte DUMMY = 0;

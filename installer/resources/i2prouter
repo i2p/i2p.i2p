@@ -1012,6 +1012,7 @@ start() {
     startwait
 }
 
+
 stopit() {
     # $1 exit if down flag
 
@@ -1028,7 +1029,7 @@ stopit() {
         if [ "X$IGNORE_SIGNALS" = "X" ]
         then
             # Running so try to stop it.
-            kill $pid
+            kill -TERM $pid
             if [ $? -ne 0 ]
             then
                 # An explanation for the failure should have been given
@@ -1076,6 +1077,43 @@ stopit() {
             exit 1
         else
             eval echo `gettext 'Stopped $APP_LONG_NAME.'`
+        fi
+    fi
+}
+
+graceful() {
+    # $1 exit if down flag
+
+    eval echo `gettext 'Stopping $APP_LONG_NAME gracefully...'`
+    getpid
+    if [ "X$pid" = "X" ]
+    then
+        eval echo `gettext '$APP_LONG_NAME was not running.'`
+        if [ "X$1" = "X1" ]
+        then
+            exit 1
+        fi
+    else
+        if [ "X$IGNORE_SIGNALS" = "X" ]
+        then
+            # Running so try to stop it.
+            # This sends HUP. router.gracefulHUP must be set in router.config,
+            # or else this will do the same as stop.
+            kill $pid
+            if [ $? -ne 0 ]
+            then
+                # An explanation for the failure should have been given
+                eval echo `gettext 'Unable to stop $APP_LONG_NAME.'`
+                exit 1
+            fi
+        else
+            rm -f "$ANCHORFILE"
+            if [ -f "$ANCHORFILE" ]
+            then
+                # An explanation for the failure should have been given
+                eval echo `gettext 'Unable to stop $APP_LONG_NAME.'`
+                exit 1
+            fi
         fi
     fi
 }
@@ -1557,6 +1595,7 @@ showUsage() {
             echo "`gettext '  console      Launch in the current console.'`"
             echo "`gettext '  start        Start in the background as a daemon process.'`"
             echo "`gettext '  stop         Stop if running as a daemon or in another console.'`"
+            echo "`gettext '  graceful     Stop gracefully, may take up to 11 minutes.'`"
             echo "`gettext '  restart      Stop if running and then start.'`"
             echo "`gettext '  condrestart  Restart only if already running.'`"
             if [ -n "$PAUSABLE" ] ; then
@@ -1622,6 +1661,11 @@ docommand() {
         'stop')
             checkUser "" "$COMMAND"
             stopit "0"
+            ;;
+
+        'graceful')
+            checkUser "" "$COMMAND"
+            graceful "0"
             ;;
 
         'restart')

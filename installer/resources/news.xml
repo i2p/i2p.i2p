@@ -1,30 +1,15 @@
 <!--
-<i2p.news date="$Date: 2011-11-08 00:00:00 $">
-<i2p.release version="0.8.11" date="2011/11/08" minVersion="0.6" />
+<i2p.news date="$Date: 2012-01-06 00:00:00 $">
+<i2p.release version="0.8.12" date="2012/01/06" minVersion="0.6" />
 -->
 <div lang="en">
-<h3>2011-11-08: <b>0.8.11 <a href="http://www.i2p2.i2p/release-0.8.11.html">Released</a></b></h3>
+<h3>2012-01-06: <b>0.8.12 <a href="http://www.i2p2.i2p/release-0.8.12.html">Released</a></b></h3>
 
 <p>
-The unprecedented network growth starting October 5th
-has dramatically increased network congestion, especially on evenings (UTC)
-and weekends. The last two releases contained a few changes that we hoped
-would relieve the pressure, but unfortunately these measures have been only
-modest successes. The primary issue is to limit the number of direct router
-to-router connections in the network. This isn't a new problem; we've been
-working on it for several years, usually with good results. However, the recent
-growth pushed us over the edge once again.
-</p><p>
-Release 0.8.11 includes several more changes to reduce the number of router-to-router
-connections and increase connection and tunnel build capacity. The goal, of course,
-is to improve tunnel build success rates and general reliability. As always, there's
-a few bug fixes and translation updates.
-</p><p>
-We welcome all our new users. Please be patient as we work to improve network
-performance. Debugging congestion problems in a distributed anonymous network
-is a continuing challenge. Please help improve the network
-by restarting your router once the upgrade is downloaded.
-
+The 0.8.12 release fixes several serious message corruption bugs.
+It also contains a redesign of the router's congestion control, and continued
+optimization of CPU and memory usage. We are hopeful that these changes will
+improve network performance. Upgrading is recommended.
 </p><p>
 Say hello to the volunteers on the <a href="irc://127.0.0.1:6668/i2p-help">#i2p-help IRC channel</a>.
 <a href="http://www.i2p2.i2p/getinvolved.html">Get involved</a>,

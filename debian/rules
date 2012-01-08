@@ -26,7 +26,12 @@ build:
 
 JAVA_HOME=/usr/lib/jvm/default-java
 I2P=$(CURDIR)/pkg-temp
+ROUTERVERSION=$(CURDIR)/router/java/src/net/i2p/router/RouterVersion.java
+
+# I2P's version will be displayed in the router console as "$I2PVERSION-$EXTRAPREFIX$DEBIANVERSION", eg. 0.8.12-0-deb1
+export EXTRAPREFIX := deb
 export JAVA_HOME I2P
+export DEBIANVERSION := $(shell dpkg-parsechangelog |awk -F' ' '/Version/{print $$2}' |sed 's/.*-\([[:digit:]]\{1,\}\).*$$/\1/')
 #export DEB_HOST_ARCH_CPU := $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 
 %:
@@ -35,6 +40,7 @@ export JAVA_HOME I2P
 clean: createcopyright
 
 override_dh_auto_clean:
+	-[ -r $(CURDIR)/debian/routerversion.java.bak ] && mv -f $(CURDIR)/debian/routerversion.java.bak $(ROUTERVERSION)
 	dh_auto_clean
 	ant distclean
 	# The next line is used by KYTV when building from source packages
@@ -48,6 +54,9 @@ override_dh_auto_build:
 binary-indep: build-indep
 build-indep:
 	dh_prep
+	cp -f $(ROUTERVERSION) $(CURDIR)/debian/routerversion.java.bak
+	sed -e "s/\(.*EXTRA\ =\ \)[^ ]*\"\(.*\)\"/\1\"\2-$$EXTRAPREFIX$$DEBIANVERSION\"/" < $(ROUTERVERSION) > $(ROUTERVERSION).tmp
+	mv -f $(ROUTERVERSION).tmp $(ROUTERVERSION)
 	# The next line is used by KYTV when building from source packages
 	#[ -r jetty/jetty-5.1.15.tgz ] && ln -sf $(CURDIR)/jetty/jetty-5.1.15.tgz $(CURDIR)/apps/jetty/jetty-5.1.15.tgz
 	ant preppkg-unix javadoc
@@ -75,7 +84,6 @@ createcopyright:
 	@/bin/echo -e "Complete information on fetching the source with monotone can be found" >> $(CURDIR)/debian/copyright
 	@/bin/echo -e "at http://www.i2p2.de/newdevelopers#getting-the-i2p-code\n\n\n" >> $(CURDIR)/debian/copyright
 	@/bin/cat $(CURDIR)/LICENSE.txt >> $(CURDIR)/debian/copyright
-
 
 override_dh_compress:
 	dh_compress -X.xsl -X.xml

@@ -367,6 +367,7 @@ public class RouterConsoleRunner {
             ctx.addShutdownTask(new NewsShutdown(fetcher, newsThread));
             // stat summarizer registers its own hook
             ctx.addShutdownTask(new ServerShutdown());
+            ConfigServiceHandler.registerSignalHandler(ctx);
         } // else log CRIT ?
     }
     
