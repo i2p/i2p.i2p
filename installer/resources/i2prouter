@@ -461,10 +461,13 @@ fi
 
 
 gettext() {
-    "$WRAPPER_CMD" --translate "$1" "$WRAPPER_CONF" 2>/dev/null
-    if [ $? != 0 ] ; then
+    # TODO provide translations and call external gettext.
+    # For now, don't attempt to translate via the wrapper,
+    # it probably isn't supported in the community edition.
+    #"$WRAPPER_CMD" --translate "$1" "$WRAPPER_CONF" 2>/dev/null
+    #if [ $? != 0 ] ; then
         echo "$1"
-    fi
+    #fi
 }
 
 outputFile() {
