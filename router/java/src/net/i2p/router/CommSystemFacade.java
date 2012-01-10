@@ -61,14 +61,22 @@ public abstract class CommSystemFacade implements Service {
     public boolean isEstablished(Hash dest) { return false; }
     public byte[] getIP(Hash dest) { return null; }
     public void queueLookup(byte[] ip) {}
+
     /** @since 0.8.11 */
     public String getOurCountry() { return null; }
+
+    /** @since 0.8.13 */
+    public boolean isInBadCountry() { return false; }
+
     public String getCountry(Hash peer) { return null; }
     public String getCountryName(String code) { return code; }
     public String renderPeerHTML(Hash peer) {
         return peer.toBase64().substring(0, 4);
     }
     
+    /** @since 0.8.13 */
+    public boolean isDummy() { return true; }
+
     /** 
      * Tell other transports our address changed
      */

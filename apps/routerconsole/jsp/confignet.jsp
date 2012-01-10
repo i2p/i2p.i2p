@@ -157,6 +157,7 @@
      <%=intl._("The router is currently testing whether your UDP port is firewalled.")%>
 <li class="tidylist"><b><%=intl._("Hidden")%></b> - 
      <%=intl._("The router is not configured to publish its address, therefore it does not expect incoming connections.")%>
+     <%=intl._("Hidden mode is automatically enabled for added protection in certain countries.")%>
 <li class="tidylist"><b><%=intl._("WARN - Firewalled and Fast")%></b> - 
      <%=intl._("You have configured I2P to share more than 128KBps of bandwidth, but you are firewalled.")%>
      <%=intl._("While I2P will work fine in this configuration, if you really have over 128KBps of bandwidth to share, it will be much more helpful to the network if you open your firewall.")%>

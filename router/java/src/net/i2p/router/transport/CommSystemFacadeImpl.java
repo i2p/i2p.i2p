@@ -176,8 +176,11 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         _manager.renderStatusHTML(out, urlBase, sortFlags); 
     }
     
+    /** @return non-null, possibly empty */
     @Override
     public Set<RouterAddress> createAddresses() {
+        if (_context.router().isHidden())
+            return Collections.EMPTY_SET;
         Map<String, RouterAddress> addresses = null;
         boolean newCreated = false;
         
@@ -451,6 +454,15 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     }
 
     /**
+     *  Are we in a bad place
+     *  @since 0.8.13
+     */
+    public boolean isInBadCountry() {
+        String us = getOurCountry();
+        return us != null && (BadCountries.contains(us) || _context.getBooleanProperty("router.forceBadCountry"));
+    }
+
+    /**
      *  Uses the transport IP first because that lookup is fast,
      *  then the SSU IP from the netDb.
      *
@@ -516,6 +528,10 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         buf.append("</tt>");
         return buf.toString();
     }
+
+    /** @since 0.8.13 */
+    @Override
+    public boolean isDummy() { return false; }
 
     /**
      *  Translate

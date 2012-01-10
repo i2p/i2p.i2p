@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
+import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
@@ -283,6 +284,14 @@ class GeoIP {
         if (country != null && !country.equals(oldCountry)) {
             _context.router().setConfigSetting(PROP_IP_COUNTRY, country);
             _context.router().saveConfig();
+            if (_context.commSystem().isInBadCountry() && _context.getProperty(Router.PROP_HIDDEN_HIDDEN) == null) {
+                String name = fullName(country);
+                if (name == null)
+                    name = country;
+                _log.logAlways(Log.WARN, "Setting hidden mode to protect you in " + name +
+                                         ", you may override on the network configuration page");
+                _context.router().rebuildRouterInfo();
+            }
         }
         /****/
     }
