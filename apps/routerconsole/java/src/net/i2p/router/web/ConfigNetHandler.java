@@ -140,7 +140,8 @@ public class ConfigNetHandler extends FormHandler {
         
         if (!_ratesOnly) {
             // IP Settings
-            String oldUdp = _context.getProperty(UDPTransport.PROP_SOURCES, UDPTransport.DEFAULT_SOURCES);
+            String oldUdp = _context.getProperty(UDPTransport.PROP_SOURCES,
+                                                 _context.router().isHidden() ? "hidden" : UDPTransport.DEFAULT_SOURCES);
             String oldUHost = _context.getProperty(UDPTransport.PROP_EXTERNAL_HOST, "");
             if (_udpAutoIP != null) {
                 String uhost = "";

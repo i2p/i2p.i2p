@@ -43,4 +43,8 @@ public interface AMDCPUInfo extends CPUInfo {
      * @return true if the CPU present in the machine is at least an 'k8' CPU (Atlhon 64, Opteron etc. and better)
      */
 	public boolean IsBobcatCompatible();
+    /**
+     * @return true if the CPU present in the machine is at least a 'bulldozer' CPU
+     */
+	public boolean IsBulldozerCompatible();
 }

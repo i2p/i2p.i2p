@@ -241,8 +241,6 @@ public class Router implements RouterClock.ClockShiftListener {
             String now = Long.toString(System.currentTimeMillis());
             _config.put("router.firstInstalled", now);
             _config.put("router.updateLastInstalled", now);
-            // only compatible with new i2prouter script
-            _config.put("router.gracefulHUP", "true");
             saveConfig();
         }
         // *********  Start no threads before here ********* //
@@ -592,14 +590,22 @@ public class Router implements RouterClock.ClockShiftListener {
         RouterInfo ri = _routerInfo;
         if ( (ri != null) && (ri.isHidden()) )
             return true;
-        return _context.getBooleanProperty(PROP_HIDDEN_HIDDEN);
+        String h = _context.getProperty(PROP_HIDDEN_HIDDEN);
+        if (h != null)
+            return Boolean.valueOf(h).booleanValue();
+        return _context.commSystem().isInBadCountry();
     }
 
     /**
+     *  Only called at startup via LoadRouterInfoJob and RebuildRouterInfoJob.
+     *  Not called by periodic RepublishLocalRouterInfoJob.
+     *  We don't want to change the cert on the fly as it changes the router hash.
+     *  RouterInfo.isHidden() checks the capability, but RouterIdentity.isHidden() checks the cert.
+     *  There's no reason to ever add a hidden cert?
      *  @return the certificate for a new RouterInfo - probably a null cert.
      */
     public Certificate createCertificate() {
-        if (isHidden())
+        if (_context.getBooleanProperty(PROP_HIDDEN))
             return new Certificate(Certificate.CERTIFICATE_TYPE_HIDDEN, null);
         return Certificate.NULL_CERT;
     }

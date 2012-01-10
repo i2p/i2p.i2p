@@ -1,0 +1,11 @@
+--- a/router/java/src/net/i2p/router/tasks/OOMListener.java
++++ b/router/java/src/net/i2p/router/tasks/OOMListener.java
+@@ -33,7 +33,7 @@
+                 // gobble
+             }
+         }
+-        log.log(Log.CRIT, "To prevent future shutdowns, increase wrapper.java.maxmemory in $I2P/wrapper.config");
++        log.log(Log.CRIT, "To prevent future shutdowns, increase wrapper.java.maxmemory in /etc/i2p/wrapper.config");
+         _context.router().shutdown(Router.EXIT_OOM); 
+     }
+ }

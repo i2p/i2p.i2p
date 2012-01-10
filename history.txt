@@ -1,3 +1,14 @@
+2012-01-10 zzz
+  * Console:
+    - Add info to error 500 page
+    - Add indication on summary bar when in VM comm system
+    - Make graceful the default for HUP (ticket #580)
+    - Fix class error on wrapper 3.1.1
+  * i2prouter: Don't attempt to translate strings from script
+  * Router:
+    - Auto-hidden mode for bad countries
+    - Don't put addresses in our RouterInfo when hidden
+
 2012-01-08 zzz
   * Plugins:
     - Enforce min and max Jetty versions at plugin installation
