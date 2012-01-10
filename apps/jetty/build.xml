@@ -112,18 +112,23 @@
          servlet-api.jar + jsp-api.jar : javax.servlet.jar
          tomcat-juli.jar : commons-logging.jar
          empty jar : jasper-compiler.jar
+         Also, take NOTICE and LICENSE out of each one, we bundle those separately.
      -->
     <target name="copyTomcatLib" >
-        <copy file="${tomcat.lib}/jasper.jar" tofile="jettylib/jasper-runtime.jar" />
-        <copy file="${tomcat.lib}/jasper-el.jar" tofile="jettylib/commons-el.jar" />
-        <jar destfile="jettylib/commons-el.jar" duplicate="preserve" update="true" >
+        <jar destfile="jettylib/jasper-runtime.jar" >
+            <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/jasper.jar" />
+        </jar>
+        <jar destfile="jettylib/commons-el.jar" duplicate="preserve" >
+            <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/jasper-el.jar" />
             <zipfileset excludes="META-INF/**/*" src="${tomcat.lib}/el-api.jar" />
         </jar>
-        <copy file="${tomcat.lib}/servlet-api.jar" tofile="jettylib/javax.servlet.jar" />
-        <jar destfile="jettylib/javax.servlet.jar" duplicate="preserve" update="true" >
+        <jar destfile="jettylib/javax.servlet.jar" duplicate="preserve" >
+            <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/servlet-api.jar" />
             <zipfileset excludes="META-INF/**/*" src="${tomcat.lib}/jsp-api.jar" />
         </jar>
-        <copy file="${tomcat.lib}/tomcat-juli.jar" tofile="jettylib/commons-logging.jar" />
+        <jar destfile="jettylib/commons-logging.jar" >
+            <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/tomcat-juli.jar" />
+        </jar>
         <jar destfile="jettylib/jasper-compiler.jar" />
     </target>
 
