@@ -102,10 +102,11 @@ public class I2PLogger implements Logger
     
     public void warn(String msg, Throwable th)
     {
-        if (th instanceof RuntimeException || th instanceof Error)
+        // This doesn't cover ClassNotFoundException, etc.
+        //if (th instanceof RuntimeException || th instanceof Error)
             _log.error(msg, th);
-        else
-            _log.warn(msg,th);
+        //else
+        //    _log.warn(msg,th);
     }
     
     private void format(String msg, Object arg0, Object arg1)
