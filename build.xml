@@ -567,6 +567,15 @@
 	<defaultexcludes default="true"/>
     </target>
 
+    <target name="webappDistclean">
+        <ant dir="apps/i2ptunnel/java/" target="distclean" />
+        <ant dir="apps/routerconsole/java/" target="distclean" />
+        <ant dir="apps/addressbook/" target="distclean" />
+        <ant dir="apps/susimail/" target="distclean" />
+        <ant dir="apps/susidns/src/" target="distclean" />
+        <ant dir="apps/i2psnark/java/" target="distclean" />
+    </target>
+
     <target name="pkg" depends="distclean, updater, preppkg, installer" />
 
     <target name="pkgclean" depends="deletepkg-temp">
@@ -758,6 +767,7 @@
               So we include the MIT one in our binary package
          -->
         <copy file="installer/lib/launch4j/head/LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-Launch4j.txt" />
+        <copy file="apps/jetty/apache-tomcat-deployer/NOTICE" tofile="pkg-temp/licenses/NOTICE-Tomcat.txt" />
         <!--  Not sure if these are used or should be included -->
         <copy file="installer/lib/launch4j/lib/foxtrot.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-Foxtrot.txt" />
         <copy file="installer/lib/launch4j/lib/JGoodies.Forms.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-JGoodies-Forms.txt" />
@@ -947,7 +957,7 @@
       -->
     <target name="prepjupdate" depends="prepupdate, buildWEB">
         <copy todir="pkg-temp/lib" >
-            <fileset dir="build" includes="jasper*.jar javax*.jar jetty*.jar jsp*.jar org.mortbay.jetty.jar" />
+            <fileset dir="build" includes="commons*.jar jasper*.jar javax*.jar jetty*.jar jsp*.jar org.mortbay.jetty.jar" />
         </copy>
         <!--  We have to package the new eepsite files for MigrateJetty.java, but we
               can't overwrite an existing eepsite dir in a non-split configuration.

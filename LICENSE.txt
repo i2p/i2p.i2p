@@ -216,8 +216,10 @@ Applications:
    Copyright (C) 2005 <susi23@mail.i2p>
    GPLv2 (or any later version)
    See licenses/LICENSE-GPLv2.txt
-       Uses Apache Jakarta Standard Tag Library 1.1.2:
-       See licenses/LICENSE-Apache2.0.txt
+       Uses Glassfish Standard Tag Library (JSTL) 1.2:
+       Common Development and Distribution License (CDDL) version 1.0 + GNU General Public License (GPL) version 2
+       See https://glassfish.dev.java.net/public/CDDL+GPL.html
+       See licenses/LICENSE-GPLv2.txt
 
    SusiMail:
    Copyright (C) 2004-2005  <susi23@mail.i2p>
@@ -229,6 +231,10 @@ Applications:
       Bundles systray4j-2.4.1:
       See licenses/LICENSE-LGPLv2.1.txt
 
+   Tomcat 6.0.35:
+   Copyright 1999-2011 The Apache Software Foundation
+   See licenses/LICENSE-Apache2.0.txt
+   See licenses/NOTICE-Tomcat.txt
 
 
 Other Applications and Libraries
