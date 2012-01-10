@@ -101,6 +101,8 @@ public class SummaryHelper extends HelperBase {
     }
 
     private String reachability() {
+        if (_context.commSystem().isDummy())
+            return "VM Comm System";
         if (_context.router().getUptime() > 60*1000 && (!_context.router().gracefulShutdownInProgress()) &&
             !_context.clientManager().isAlive())
             return _("ERR-Client Manager I2CP Error - check logs");  // not a router problem but the user should know
@@ -180,6 +182,7 @@ public class SummaryHelper extends HelperBase {
         return _context != null && 
                _context.netDb().isInitialized() &&
                _context.router().getUptime() > 2*60*1000 &&
+               (!_context.commSystem().isDummy()) &&
                _context.commSystem().countActivePeers() <= 0 &&
                _context.netDb().getKnownRouters() > 5;
     }
