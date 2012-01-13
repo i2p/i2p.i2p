@@ -188,6 +188,8 @@
 	        <args><arg value="$INSTALL_PATH/Start I2P Router.app" /></args></executable>
 	    <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
                 <args><arg value="$INSTALL_PATH/man" /></args></executable>
+	    <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
+                <args><arg value="$INSTALL_PATH/locale" /></args></executable>
 	    <!-- Placeholder for an OSX 'shortcut' to the router console
 	    <executable targetfile="$INSTALL_PATH/installer/delete.jar" type="jar" stage="postinstall" keep="true" failure="warn"> <os family="windows" />
 	        <args><arg value="$INSTALL_PATH/I2P Router Console.webloc" /></args></executable>

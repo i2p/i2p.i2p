@@ -38,6 +38,10 @@ I2PTEMP="%SYSTEM_java_io_tmpdir"
 APP_NAME="i2p"
 APP_LONG_NAME="I2P Service"
 
+# gettext - todo find it in the path, default to /bin/false?
+# fallback to echo is below, we can't set it to echo here.
+GETTEXT=/usr/bin/gettext
+
 # If specified, the Wrapper will be run as the specified user.
 # IMPORTANT - Make sure that the user has the required privileges to write
 #  the PID file and wrapper.log files.  Failure to be able to write the log
@@ -461,13 +465,17 @@ fi
 
 
 gettext() {
-    # TODO provide translations and call external gettext.
-    # For now, don't attempt to translate via the wrapper,
+    # Call external gettext using our own translation files.
+    # Don't attempt to translate via the wrapper,
     # it probably isn't supported in the community edition.
-    #"$WRAPPER_CMD" --translate "$1" "$WRAPPER_CONF" 2>/dev/null
-    #if [ $? != 0 ] ; then
+    if [ "X${LANG#en}" = "X$LANG" ] ; then
+        TEXTDOMAINDIR=$I2P/locale $GETTEXT -d i2prouter "$1"
+        if [ $? != 0 ] ; then
+            echo "$1"
+        fi
+    else
         echo "$1"
-    #fi
+    fi
 }
 
 outputFile() {

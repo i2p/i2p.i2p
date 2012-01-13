@@ -369,6 +369,14 @@
         <ant dir="apps/susidns/src/" target="poupdate" />
         <ant dir="apps/susimail/" target="poupdate" />
         <ant dir="apps/desktopgui" target="poupdate" />
+        <ant dir="installer/resources/locale" target="poupdate" />
+    </target>
+
+    <target name="prep-script-translation" >
+        <ant dir="installer/resources/locale" target="bundle" />
+        <copy todir="pkg-temp/locale/">
+            <fileset dir="installer/resources/locale/mo/" />
+        </copy>
     </target>
 
     <target name="javadoc" depends="getReleaseNumber, getBuildNumber" >
@@ -518,6 +526,7 @@
         <ant dir="apps/systray/java/" target="distclean" />
         <ant dir="apps/i2psnark/java/" target="distclean" />
         <ant dir="apps/jetty/" target="distclean" />
+        <ant dir="installer/resources/locale" target="distclean" />
 	<!--
 		NOTE! We need to turn off the default excludes for these
 		patterns to work.
@@ -595,7 +604,7 @@
         <copy file="installer/lib/wrapper/all/wrapper.jar" todir="pkg-temp/lib" />
     </target>
 
-    <target name="preppkg-unix" depends="preppkg-base">
+    <target name="preppkg-unix" depends="preppkg-base, prep-script-translation" >
         <copy file="installer/resources/runplain.sh" todir="pkg-temp/" />
 	<!-- <copy file="apps/i2psnark/launch-i2psnark" todir="pkg-temp/" /> old feature that per zzz isn't used-->
         <copy file="installer/resources/eepget" todir="pkg-temp/" />
@@ -877,7 +886,8 @@
         <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
     </target>
 
-    <target name="prepupdate" depends="build2, prepupdateSmall, prepConsoleDocUpdates, prepCertificates">
+    <!-- script translation added in 0.8.13, so don't need updates until .14, but put it in now so we don't forget -->
+    <target name="prepupdate" depends="build2, prepupdateSmall, prepConsoleDocUpdates, prepCertificates, prep-script-translation">
         <copy file="build/BOB.jar" todir="pkg-temp/lib/" />
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2psnark.jar" todir="pkg-temp/lib" />
