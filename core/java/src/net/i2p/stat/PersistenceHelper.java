@@ -3,6 +3,7 @@ package net.i2p.stat;
 import java.util.Date;
 import java.util.Properties;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
@@ -12,7 +13,6 @@ import net.i2p.util.Log;
  *  must be compatible.
  */
 class PersistenceHelper {
-    private final static Log _log = new Log(PersistenceHelper.class);
     private final static String NL = System.getProperty("line.separator");
 
     public final static void add(StringBuilder buf, String prefix, String name, String description, double value) {
@@ -33,37 +33,62 @@ class PersistenceHelper {
         add(buf, prefix, name, description + ' ' + when, value);
     }
 
+    /** @param value non-negative */
     public final static void add(StringBuilder buf, String prefix, String name, String description, long value) {
         buf.append("# ").append(prefix).append(name).append(NL);
         buf.append("# ").append(description).append(NL);
         buf.append(prefix).append(name).append('=').append(value).append(NL).append(NL);
     }
 
+    /**
+     *  @return non-negative, returns 0 on error
+     */
     public final static long getLong(Properties props, String prefix, String name) {
         String val = props.getProperty(prefix + name);
         if (val != null) {
             try {
-                return Long.parseLong(val);
+                long rv = Long.parseLong(val);
+                return rv >= 0 ? rv : 0;
             } catch (NumberFormatException nfe) {
-                _log.warn("Error formatting " + val + " into a long", nfe);
+                Log log = I2PAppContext.getGlobalContext().logManager().getLog(PersistenceHelper.class);
+                log.warn("Error formatting " + val, nfe);
             }
-        } else {
-            _log.warn("Key " + prefix + name + " does not exist");
         }
         return 0;
     }
 
+    /**
+     *  @return 0 on error
+     */
     public final static double getDouble(Properties props, String prefix, String name) {
         String val = props.getProperty(prefix + name);
         if (val != null) {
             try {
                 return Double.parseDouble(val);
             } catch (NumberFormatException nfe) {
-                _log.warn("Error formatting " + val + " into a double", nfe);
+                Log log = I2PAppContext.getGlobalContext().logManager().getLog(PersistenceHelper.class);
+                log.warn("Error formatting " + val, nfe);
             }
-        } else {
-            _log.warn("Key " + prefix + name + " does not exist");
         }
         return 0;
     }
+
+    /**
+     *  @return non-negative, returns 0 on error
+     *  @since 0.8.13
+     */
+    public final static int getInt(Properties props, String prefix, String name) {
+        String val = props.getProperty(prefix + name);
+        if (val != null) {
+            try {
+                int rv = Integer.parseInt(val);
+                return rv >= 0 ? rv : 0;
+            } catch (NumberFormatException nfe) {
+                Log log = I2PAppContext.getGlobalContext().logManager().getLog(PersistenceHelper.class);
+                log.warn("Error formatting " + val, nfe);
+            }
+        }
+        return 0;
+    }
+
 }

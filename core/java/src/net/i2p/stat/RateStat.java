@@ -7,12 +7,12 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.util.Log;
 
 /** coordinate a moving rate over various periods */
 public class RateStat {
-    private final static Log _log = new Log(RateStat.class);
     /** unique name of the statistic */
     private final String _statName;
     /** grouping under which the stat is kept */
@@ -223,8 +223,9 @@ public class RateStat {
                 Rate rate = new Rate(period);
                 rate.setRateStat(this);
                 _rates.put(rate.getPeriod(), rate);
-                if (_log.shouldLog(Log.WARN))
-                    _log.warn("Rate for " + prefix + " is corrupt, reinitializing that period");
+                Log log = I2PAppContext.getGlobalContext().logManager().getLog(RateStat.class);
+                if (log.shouldLog(Log.WARN))
+                    log.warn("Rate for " + prefix + " is corrupt, reinitializing that period");
             }
         }
     }

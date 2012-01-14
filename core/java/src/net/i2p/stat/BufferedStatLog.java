@@ -19,8 +19,8 @@ import net.i2p.util.Log;
  * be instantiated - see StatManager.
  */
 public class BufferedStatLog implements StatLog {
-    private I2PAppContext _context;
-    private Log _log;
+    private final I2PAppContext _context;
+    private final Log _log;
     private final StatEvent _events[];
     private int _eventNext;
     private int _lastWrite;

@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
@@ -213,18 +214,18 @@ public class StatManager {
     }
 
     /** Group name (String) to a Set of stat names, ordered alphabetically */
-    public Map getStatsByGroup() {
-        Map groups = new TreeMap(Collator.getInstance());
+    public Map<String, SortedSet<String>> getStatsByGroup() {
+        Map<String, SortedSet<String>> groups = new TreeMap(Collator.getInstance());
         for (Iterator<FrequencyStat> iter = _frequencyStats.values().iterator(); iter.hasNext();) {
             FrequencyStat stat = iter.next();
             if (!groups.containsKey(stat.getGroupName())) groups.put(stat.getGroupName(), new TreeSet());
-            Set names = (Set) groups.get(stat.getGroupName());
+            Set<String> names = groups.get(stat.getGroupName());
             names.add(stat.getName());
         }
         for (Iterator<RateStat> iter = _rateStats.values().iterator(); iter.hasNext();) {
             RateStat stat = iter.next();
             if (!groups.containsKey(stat.getGroupName())) groups.put(stat.getGroupName(), new TreeSet());
-            Set names = (Set) groups.get(stat.getGroupName());
+            Set<String> names = groups.get(stat.getGroupName());
             names.add(stat.getName());
         }
         return groups;
