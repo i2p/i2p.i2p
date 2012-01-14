@@ -38,9 +38,9 @@ I2PTEMP="%SYSTEM_java_io_tmpdir"
 APP_NAME="i2p"
 APP_LONG_NAME="I2P Service"
 
-# gettext - todo find it in the path, default to /bin/false?
+# gettext - we look for it in the path
 # fallback to echo is below, we can't set it to echo here.
-GETTEXT=/usr/bin/gettext
+GETTEXT=$(which gettext)
 
 # If specified, the Wrapper will be run as the specified user.
 # IMPORTANT - Make sure that the user has the required privileges to write
@@ -468,14 +468,14 @@ gettext() {
     # Call external gettext using our own translation files.
     # Don't attempt to translate via the wrapper,
     # it probably isn't supported in the community edition.
-    if [ "X${LANG#en}" = "X$LANG" ] ; then
-        TEXTDOMAINDIR=$I2P/locale $GETTEXT -d i2prouter "$1"
-        if [ $? != 0 ] ; then
+    if [ "X${LANG#en}" = "X$LANG" ] && [ $(which $GETTEXT) ] ; then
+            TEXTDOMAINDIR=$I2P/locale $GETTEXT -d i2prouter "$1"
+            if [ $? != 0 ] ; then
+                echo "$1"
+            fi
+        else
             echo "$1"
         fi
-    else
-        echo "$1"
-    fi
 }
 
 outputFile() {
