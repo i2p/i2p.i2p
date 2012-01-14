@@ -400,7 +400,7 @@
             <group title="Desktopgui Application" packages="net.i2p.desktopgui:net.i2p.desktopgui.*" />
             <group title="I2PSnark Application" packages="org.klomp.snark:org.klomp.snark.*" />
             <group title="I2PTunnel Application" packages="net.i2p.i2ptunnel:net.i2p.i2ptunnel.*" />
-            <group title="Jetty Logging" packages="org.mortbay.http" />
+            <group title="Jetty Logging" packages="net.i2p.jetty" />
             <group title="SAM Bridge" packages="net.i2p.sam:net.i2p.sam.client" />
             <group title="SusiDNS Application" packages="i2p.susi.dns" />
             <group title="SusiMail Application" packages="i2p.susi.webmail:i2p.susi.webmail.*:i2p.susi.debug:i2p.susi.util:org.mortbay.servlet:org.mortbay.util" />
@@ -706,7 +706,7 @@
         <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
         <!-- all jetty stuff -->
         <copy todir="pkg-temp/lib" >
-            <fileset dir="build" includes="commons*.jar jasper*.jar javax*.jar jetty*.jar jsp*.jar org.mortbay.jetty.jar" />
+            <fileset dir="build" includes="commons*.jar jasper*.jar javax*.jar jetty*.jar jsp*.jar org.mortbay.*.jar" />
         </copy>
         <copy file="build/mstreaming.jar" todir="pkg-temp/lib/" />
         <copy file="build/streaming.jar" todir="pkg-temp/lib/" />
@@ -967,7 +967,7 @@
       -->
     <target name="prepjupdate" depends="prepupdate, buildWEB">
         <copy todir="pkg-temp/lib" >
-            <fileset dir="build" includes="commons*.jar jasper*.jar javax*.jar jetty*.jar jsp*.jar org.mortbay.jetty.jar" />
+            <fileset dir="build" includes="commons*.jar jasper*.jar javax*.jar jetty*.jar jsp*.jar org.mortbay.*.jar" />
         </copy>
         <!--  We have to package the new eepsite files for MigrateJetty.java, but we
               can't overwrite an existing eepsite dir in a non-split configuration.

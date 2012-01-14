@@ -85,6 +85,7 @@
               jetty-java5-threadpool-xxx.jar: Concurrent thread pool for eepsite
               glassfish 2.1: Not used, too old, see Tomcat below.
               jetty-rewrite-handler: Not used by I2P, but only 20KB and could be useful for eepsites
+              jetty-management: Not used by I2P, but only 34KB and could be useful for eepsites, and we bundled it with Jetty 5
               All of these are available in the Ubuntu packages libjetty-java and libjetty-extra-java
         -->
         <copy preservelastmodified="true" file="${jetty.base}/start.jar" tofile="jettylib/jetty-start.jar" />
@@ -93,6 +94,7 @@
         <copy preservelastmodified="true" file="${jetty.base}/lib/ext/jetty-java5-threadpool-${jetty.ver}.jar" tofile="jettylib/jetty-java5-threadpool.jar" />
         <copy preservelastmodified="true" file="${jetty.base}/lib/ext/jetty-rewrite-handler-${jetty.ver}.jar" tofile="jettylib/jetty-rewrite-handler.jar" />
         <copy preservelastmodified="true" file="${jetty.base}/lib/ext/jetty-sslengine-${jetty.ver}.jar" tofile="jettylib/jetty-sslengine.jar" />
+        <copy preservelastmodified="true" file="${jetty.base}/lib/management/jetty-management-${jetty.ver}.jar" tofile="jettylib/org.mortbay.jmx.jar" />
         <copy file="${jetty.base}/lib/jsp-2.1/ant-1.6.5.jar" tofile="jettylib/ant.jar" />
         <delete file="jetty.tar" />
         <delete dir="${jetty.base}" />
