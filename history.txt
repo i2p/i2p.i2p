@@ -1,3 +1,16 @@
+2012-01-14 zzz
+  * i2ptunnel: Partial fix for dest formatting (ticket #581)
+  * jars.jsp: New debug page
+  * logs.jsp: Use wrapper method to find wrapper log if available
+  * Stats:
+    - Cleanups
+    - Remove some locking
+    - Change some longs to ints to save space
+    - Remove static logs
+
+2012-01-13 zzz
+  * i2prouter: Add translation infrastructure
+
 2012-01-10 zzz
   * Console:
     - Add info to error 500 page
