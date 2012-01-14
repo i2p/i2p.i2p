@@ -167,7 +167,7 @@
 }
 
 #tunnelListPage .descriptionField .text,
-#tunnelListPage .destinationField input {
+#tunnelListPage .destinationField .text {
     width: 450px;
 }
 
