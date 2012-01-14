@@ -7,7 +7,6 @@ import net.i2p.util.FileUtil;
 import net.i2p.util.VersionComparator;
 
 import org.mortbay.jetty.Server;
-import org.mortbay.http.Version;
 import org.tanukisoftware.wrapper.WrapperManager;
 
 public class LogsHelper extends HelperBase {
