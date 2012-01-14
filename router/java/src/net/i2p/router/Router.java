@@ -1354,11 +1354,13 @@ public class Router implements RouterClock.ClockShiftListener {
             // and we will die with NCDFE.
             // Ideally, do not use I2P classes at all, new or not.
             try {
-                // TODO move deleteListedFiles() here after a few releases
-                if (ok)
+                if (ok) {
+                    // We do this here so we may delete old jars before we restart
+                    deleteListedFiles();
                     System.out.println("INFO: Update installed");
-                else
+                } else {
                     System.out.println("ERROR: Update failed!");
+                }
                 if (!ok) {
                     // we can't leave the file in place or we'll continually restart, so rename it
                     File bad = new File(_context.getRouterDir(), "BAD-" + UPDATE_FILE);
@@ -1389,8 +1391,10 @@ public class Router implements RouterClock.ClockShiftListener {
             System.exit(EXIT_HARD_RESTART);
         } else {
             deleteJbigiFiles();
-            // Here so it may be used in the 0.8.12 update
-            // TODO move up in a few releases so it is only run after an update
+            // It was here starting in 0.8.12 so it could be used the very first time
+            // Now moved up so it is usually run only after an update
+            // But the first time before jetty 6 it will run here...
+            // Here we can't remove jars
             deleteListedFiles();
         }
     }

@@ -6,6 +6,7 @@ import java.util.List;
 import net.i2p.util.FileUtil;
 import net.i2p.util.VersionComparator;
 
+import org.mortbay.jetty.Server;
 import org.mortbay.http.Version;
 import org.tanukisoftware.wrapper.WrapperManager;
 
@@ -15,19 +16,12 @@ public class LogsHelper extends HelperBase {
     
     /** @since 0.8.12 */
     public String getJettyVersion() {
-        return jettyVersion();
+        return Server.getVersion();
     }
-    
+
     /** @since 0.8.13 */
     static String jettyVersion() {
-        try {
-            String rv = Version.getImplVersion();
-            if (rv.startsWith("Jetty/"))
-                rv = rv.substring(6);
-            return rv;
-        } catch (Throwable t) {
-            return "unknown";
-        }
+        return Server.getVersion();
     }
 
     public String getLogs() {

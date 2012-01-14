@@ -131,14 +131,18 @@ public class ClientAppConfig {
     
     /*
      * Go through the properties, and return a List of ClientAppConfig structures
+     * This is for the router.
      */
     public static List<ClientAppConfig> getClientApps(RouterContext ctx) {
         Properties clientApps = getClientAppProps(ctx);
-        return getClientApps(clientApps);
+        List<ClientAppConfig> rv = getClientApps(clientApps);
+        MigrateJetty.migrate(ctx, rv);
+        return rv;
     }
 
     /*
      * Go through the properties, and return a List of ClientAppConfig structures
+     * This is for plugins.
      *
      * @since 0.7.12
      */
@@ -190,14 +194,14 @@ public class ClientAppConfig {
     }
 
     /** classpath and stopargs not supported */
-    public static void writeClientAppConfig(RouterContext ctx, List apps) {
+    public static void writeClientAppConfig(RouterContext ctx, List<ClientAppConfig> apps) {
         File cfgFile = configFile(ctx);
         FileOutputStream fos = null;
         try {
             fos = new SecureFileOutputStream(cfgFile);
             StringBuilder buf = new StringBuilder(2048);
             for(int i = 0; i < apps.size(); i++) {
-                ClientAppConfig app = (ClientAppConfig) apps.get(i);
+                ClientAppConfig app = apps.get(i);
                 buf.append(PREFIX).append(i).append(".main=").append(app.className).append("\n");
                 buf.append(PREFIX).append(i).append(".name=").append(app.clientName).append("\n");
                 if (app.args != null)

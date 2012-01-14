@@ -30,7 +30,7 @@ import net.i2p.util.Log;
 import net.i2p.util.Translate;
 import net.i2p.util.VersionComparator;
 
-import org.mortbay.jetty.Server;
+import org.mortbay.jetty.handler.ContextHandlerCollection;
 
 
 /**
@@ -157,7 +157,7 @@ public class PluginStarter implements Runnable {
         }
 
         // start console webapps in console/webapps
-        Server server = WebAppStarter.getConsoleServer();
+        ContextHandlerCollection server = WebAppStarter.getConsoleServer();
         if (server != null) {
             File consoleDir = new File(pluginDir, "console");
             Properties wprops = RouterConsoleRunner.webAppProperties(consoleDir.getAbsolutePath());
@@ -257,8 +257,8 @@ public class PluginStarter implements Runnable {
         }
 
         // stop console webapps in console/webapps
-        Server server = WebAppStarter.getConsoleServer();
-        if (server != null) {
+        //ContextHandlerCollection server = WebAppStarter.getConsoleServer();
+        //if (server != null) {
         /*
             File consoleDir = new File(pluginDir, "console");
             Properties props = RouterConsoleRunner.webAppProperties(consoleDir.getAbsolutePath());
@@ -278,11 +278,11 @@ public class PluginStarter implements Runnable {
                 Iterator <String> wars = pluginWars.get(appName).iterator();
                 while (wars.hasNext()) {
                     String warName = wars.next();
-                    WebAppStarter.stopWebApp(server, warName);
+                    WebAppStarter.stopWebApp(warName);
                 }
                 pluginWars.get(appName).clear();
             }
-        }
+        //}
 
         // remove summary bar link
         Properties props = pluginProperties(ctx, appName);

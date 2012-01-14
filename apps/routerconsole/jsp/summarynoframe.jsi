@@ -6,10 +6,10 @@
  */
 %>
 <jsp:useBean class="net.i2p.router.web.SummaryHelper" id="helper" scope="request" />
-<jsp:setProperty name="helper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
-<jsp:setProperty name="helper" property="action" value="<%=request.getParameter("action")%>" />
-<jsp:setProperty name="helper" property="updateNonce" value="<%=request.getParameter("updateNonce")%>" />
-<jsp:setProperty name="helper" property="consoleNonce" value="<%=request.getParameter("consoleNonce")%>" />
+<jsp:setProperty name="helper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+<jsp:setProperty name="helper" property="action" value="<%=request.getParameter(\"action\")%>" />
+<jsp:setProperty name="helper" property="updateNonce" value="<%=request.getParameter(\"updateNonce\")%>" />
+<jsp:setProperty name="helper" property="consoleNonce" value="<%=request.getParameter(\"consoleNonce\")%>" />
 <jsp:setProperty name="helper" property="requestURI" value="<%=request.getRequestURI()%>" />
 <% helper.storeWriter(out); %>
 <%
@@ -28,7 +28,7 @@
 %>
 <jsp:useBean class="net.i2p.router.web.UpdateHandler" id="update" scope="request" />
 <jsp:setProperty name="update" property="*" />
-<jsp:setProperty name="update" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
+<jsp:setProperty name="update" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <%
     // moved to java for ease of translation and to avoid 30 copies
     helper.renderSummaryBar();

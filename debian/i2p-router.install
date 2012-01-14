@@ -1,4 +1,8 @@
+# history.txt is installed to /usr/share/i2p because
+# it's shown in the router console at http://127.0.0.1:7657
+# (this is also why I don't use dh_installchangelogs -k for it)
 history.txt usr/share/i2p
+
 pkg-temp/blocklist.txt usr/share/i2p
 pkg-temp/certificates usr/share/i2p
 pkg-temp/clients.config usr/share/i2p
@@ -10,7 +14,31 @@ pkg-temp/hosts.txt usr/share/i2p
 pkg-temp/i2prouter-nowrapper usr/bin
 pkg-temp/i2psnark.config usr/share/i2p
 pkg-temp/i2ptunnel.config usr/share/i2p
-pkg-temp/lib/*.jar usr/share/i2p/lib
 pkg-temp/router.config usr/share/i2p
 pkg-temp/systray.config usr/share/i2p
 pkg-temp/webapps usr/share/i2p
+
+# We'll selectively copy things from pkg-temp
+# to ensure that potential Jetty jars aren't
+# duplicated
+pkg-temp/lib/BOB.jar usr/share/i2p/lib
+pkg-temp/lib/desktopgui.jar usr/share/i2p/lib
+pkg-temp/lib/i2p.jar usr/share/i2p/lib
+pkg-temp/lib/i2psnark.jar usr/share/i2p/lib
+pkg-temp/lib/i2ptunnel.jar usr/share/i2p/lib
+pkg-temp/lib/jetty-i2p.jar usr/share/i2p/lib
+pkg-temp/lib/jrobin.jar usr/share/i2p/lib
+pkg-temp/lib/mstreaming.jar usr/share/i2p/lib
+pkg-temp/lib/router.jar usr/share/i2p/lib
+pkg-temp/lib/routerconsole.jar usr/share/i2p/lib
+pkg-temp/lib/sam.jar usr/share/i2p/lib
+pkg-temp/lib/standard.jar usr/share/i2p/lib
+pkg-temp/lib/streaming.jar usr/share/i2p/lib
+pkg-temp/lib/systray.jar usr/share/i2p/lib
+pkg-temp/lib/systray4j.jar usr/share/i2p/lib
+
+# These are copied over to avoid depending on libjetty-extra-java
+# and pulling in dependencies that we don't care about
+pkg-temp/lib/commons-el.jar usr/share/i2p/lib
+pkg-temp/lib/jetty-java5-threadpool.jar usr/share/i2p/lib
+pkg-temp/lib/jetty-rewrite-handler.jar usr/share/i2p/lib
