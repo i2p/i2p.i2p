@@ -1624,7 +1624,7 @@ public class DataHelper {
         try {
             return new String(orig, offset, len, "UTF-8");
         } catch (UnsupportedEncodingException uee) {
-            throw new RuntimeException("No utf8!?");
+            throw new RuntimeException("no utf8!?");
         }
     }
     
