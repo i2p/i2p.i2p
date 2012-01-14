@@ -4,11 +4,14 @@ import java.io.File;
 import java.util.List;
 
 import net.i2p.util.FileUtil;
+import net.i2p.util.VersionComparator;
 
 import org.mortbay.http.Version;
+import org.tanukisoftware.wrapper.WrapperManager;
 
 public class LogsHelper extends HelperBase {
-    public LogsHelper() {}
+
+    private static final String LOCATION_AVAILABLE = "3.3.7";
     
     /** @since 0.8.12 */
     public String getJettyVersion() {
@@ -37,16 +40,26 @@ public class LogsHelper extends HelperBase {
     }
     
     public String getServiceLogs() {
-        // RouterLaunch puts the location here if no wrapper
-        String path = System.getProperty("wrapper.logfile");
-        File f;
-        if (path != null) {
-            f = new File(path);
-        } else {
-            // look in new and old places
-            f = new File(System.getProperty("java.io.tmpdir"), "wrapper.log");
-            if (!f.exists())
-                f = new File(_context.getBaseDir(), "wrapper.log");
+        File f = null;
+        if (_context.hasWrapper()) {
+            String wv = System.getProperty("wrapper.version");
+            if (wv != null && (new VersionComparator()).compare(wv, LOCATION_AVAILABLE) >= 0) {
+                try {
+                   f = WrapperManager.getWrapperLogFile();
+                } catch (Throwable t) {}
+            }
+        }
+        if (f == null || !f.exists()) {
+            // RouterLaunch puts the location here if no wrapper
+            String path = System.getProperty("wrapper.logfile");
+            if (path != null) {
+                f = new File(path);
+            } else {
+                // look in new and old places
+                f = new File(System.getProperty("java.io.tmpdir"), "wrapper.log");
+                if (!f.exists())
+                    f = new File(_context.getBaseDir(), "wrapper.log");
+            }
         }
         String str = FileUtil.readTextFile(f.getAbsolutePath(), 250, false);
         if (str == null) 
