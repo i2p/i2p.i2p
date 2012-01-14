@@ -34,7 +34,7 @@ Debian wrapper.config to try to prevent confusion.
  # PORTABLE installation:
  # Use the following instead.
  #I2PTEMP="%INSTALL_PATH"
-@@ -49,8 +49,8 @@
+@@ -53,8 +53,8 @@
  #RUN_AS_USER=
  
  # Wrapper
@@ -105,7 +105,7 @@ Debian wrapper.config to try to prevent confusion.
  
  # Java Bits.  On applicable platforms, tells the JVM to run in 32 or 64-bit mode.
  wrapper.java.additional.auto_bits=TRUE
-@@ -71,7 +63,7 @@
+@@ -69,7 +61,7 @@
  wrapper.java.additional.1=-DloggerFilenameOverride=logs/log-router-@.txt
  wrapper.java.additional.2=-Dorg.mortbay.http.Version.paranoid=true
  wrapper.java.additional.3=-Dorg.mortbay.xml.XmlParser.NotValidating=true
@@ -114,10 +114,12 @@ Debian wrapper.config to try to prevent confusion.
  wrapper.java.additional.4.stripquotes=TRUE
  
  # On some IPv6 enabled systems, I2P and other network-enabled java applications
-@@ -141,11 +133,7 @@
- # tell the router where to find the wrapper log
- # (change X to the next available number)
- # wrapper.java.additional.X=-Dwrapper.logfile=/path/to/wrapper.log
+@@ -133,13 +125,7 @@
+ wrapper.console.loglevel=INFO
+ 
+ # Log file to use for wrapper output logging.
+-# You may wish to change this on linux so the log is
+-# preserved across OS restarts.
 -wrapper.logfile=$SYSTEM_java_io_tmpdir/wrapper.log
 -# PORTABLE installation:
 -# Use the following instead. I2P will find the logfile here,
@@ -127,7 +129,7 @@ Debian wrapper.config to try to prevent confusion.
  
  # Format of output for the log file.
  # The format consists of the tokens 'L' for log level, 'P' for prefix, 'D' for thread,
-@@ -211,10 +199,7 @@
+@@ -205,10 +191,7 @@
  # you should copy this file, change the location or file name,
  # and edit the i2prouter script to change the WRAPPER_CONF setting
  # to point to the new wrapper.config location.
@@ -139,7 +141,7 @@ Debian wrapper.config to try to prevent confusion.
  # pid file for the service monitoring the JVM
  #
  # From i2prouter:
-@@ -225,10 +210,7 @@
+@@ -219,10 +202,7 @@
  #
  # This means i2prouter looks for './i2p.pid'.
  # See comments above for wrapper.java.pidfile
@@ -151,7 +153,7 @@ Debian wrapper.config to try to prevent confusion.
  
  #********************************************************************
  # Wrapper General Properties
-@@ -245,30 +227,3 @@
+@@ -239,30 +219,3 @@
  wrapper.umask=0022
  wrapper.java.umask=0022
  wrapper.logfile.umask=077
