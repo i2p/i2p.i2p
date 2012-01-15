@@ -189,7 +189,7 @@
             <format property="build.timestamp" pattern="yyyy-MM-dd HH:mm:ss z" timezone="UTC" locale="en" />
         </tstamp>
         <property name="full.version" value="${release.number}-${build.number}${build.extra}" />
-        <echo message="Building version ${full.version}" />
+        <echo message="Building version ${full.version} (mtn rev ${workspace.version})" />
     </target>
 
     <!-- end of sub-build.xml targets -->
