@@ -103,6 +103,7 @@ button span.hide{
  <jsp:getProperty name="clientshelper" property="form2" />
  <p><i><%=intl._("All changes require restart to take effect.")%></i>
  </p><hr><div class="formaction">
+ <input type="submit" class="cancel" name="foo" value="<%=intl._("Cancel")%>" />
  <input type="submit" name="action" class="accept" value="<%=intl._("Save WebApp Configuration")%>" />
 </div></form></div>
 
@@ -114,6 +115,7 @@ button span.hide{
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <jsp:getProperty name="clientshelper" property="form3" />
 <hr><div class="formaction">
+ <input type="submit" class="cancel" name="foo" value="<%=intl._("Cancel")%>" />
  <input type="submit" name="action" class="accept" value="<%=intl._("Save Plugin Configuration")%>" />
 </div></form></div>
 
@@ -125,7 +127,9 @@ button span.hide{
 <p>
  <input type="text" size="60" name="pluginURL" >
  </p><hr><div class="formaction">
+ <input type="submit" class="cancel" name="foo" value="<%=intl._("Cancel")%>" />
  <input type="submit" name="action" class="download" value="<%=intl._("Install Plugin")%>" />
+ <input type="submit" name="action" class="reload" value="<%=intl._("Update All Installed Plugins")%>" />
  </div></form></div>
 <% } %>
 </div></div></body></html>

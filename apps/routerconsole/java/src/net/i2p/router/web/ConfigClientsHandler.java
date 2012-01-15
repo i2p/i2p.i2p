@@ -53,6 +53,10 @@ public class ConfigClientsHandler extends FormHandler {
             installPlugin();
             return;
         }
+        if (_action.equals(_("Update All Installed Plugins"))) {
+            updateAllPlugins();
+            return;
+        }
         // value
         if (_action.startsWith("Start ")) {
             String app = _action.substring(6);
@@ -319,6 +323,16 @@ public class ConfigClientsHandler extends FormHandler {
             return;
         }
         installPlugin(url);
+    }
+
+    /** @since 0.8.13 */
+    private void updateAllPlugins() {
+        addFormNotice(_("Updating all plugins"));
+        PluginStarter.updateAll(_context);
+        // So that update() will post a status to the summary bar before we reload
+        try {
+           Thread.sleep(1000);
+        } catch (InterruptedException ie) {}
     }
 
     private void installPlugin(String url) {

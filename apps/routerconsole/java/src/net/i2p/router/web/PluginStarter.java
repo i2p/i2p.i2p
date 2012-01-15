@@ -22,10 +22,12 @@ import net.i2p.I2PAppContext;
 import net.i2p.data.DataHelper;
 import net.i2p.router.Job;
 import net.i2p.router.RouterContext;
+import net.i2p.router.RouterVersion;
 import net.i2p.router.startup.ClientAppConfig;
 import net.i2p.router.startup.LoadClientAppsJob;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.FileUtil;
+import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
 import net.i2p.util.Translate;
 import net.i2p.util.VersionComparator;
@@ -63,7 +65,94 @@ public class PluginStarter implements Runnable {
     }
 
     public void run() {
+        if (_context.getBooleanPropertyDefaultTrue("plugins.autoUpdate") &&
+            (!Boolean.valueOf(System.getProperty(UpdateHandler.PROP_UPDATE_IN_PROGRESS)).booleanValue()) &&
+            (!RouterVersion.VERSION.equals(_context.getProperty("router.previousVersion"))))
+            updateAll(_context, true);
         startPlugins(_context);
+    }
+
+    /**
+     *  threaded
+     *  @since 0.8.13
+     */
+    static void updateAll(RouterContext ctx) {
+        Thread t = new I2PAppThread(new PluginUpdater(ctx), "PluginUpdater", true);
+        t.start();
+    }
+
+    /**
+     *  thread
+     *  @since 0.8.13
+     */
+    private static class PluginUpdater implements Runnable {
+        private final RouterContext _ctx;
+
+        public PluginUpdater(RouterContext ctx) {
+            _ctx = ctx;
+        }
+
+        public void run() {
+            updateAll(_ctx, false);
+        }
+    }
+
+    /**
+     *  inline
+     *  @since 0.8.13
+     */
+    private static void updateAll(RouterContext ctx, boolean delay) {
+        List<String> plugins = getPlugins();
+        Map<String, String> toUpdate = new HashMap();
+        for (String appName : plugins) {
+            Properties props = pluginProperties(ctx, appName);
+            String url = props.getProperty("updateURL");
+            if (url != null)
+                toUpdate.put(appName, url);
+        }
+        if (toUpdate.isEmpty())
+            return;
+        PluginUpdateChecker puc = PluginUpdateChecker.getInstance(ctx);
+        if (puc.isRunning())
+            return;
+
+        if (delay) {
+            // wait for proxy
+            System.setProperty(UpdateHandler.PROP_UPDATE_IN_PROGRESS, "true");
+            puc.setAppStatus(Messages.getString("Checking for plugin updates", ctx));
+            try {
+                Thread.sleep(3*60*1000);
+            } catch (InterruptedException ie) {}
+            System.setProperty(UpdateHandler.PROP_UPDATE_IN_PROGRESS, "false");
+        }
+
+        Log log = ctx.logManager().getLog(PluginStarter.class);
+        for (Map.Entry<String, String> entry : toUpdate.entrySet()) {
+            String appName = entry.getKey();
+            if (log.shouldLog(Log.WARN))
+                log.warn("Checking for update plugin: " + appName);
+            puc.update(appName);
+            do {
+                try {
+                    Thread.sleep(5*1000);
+                } catch (InterruptedException ie) {}
+            } while (puc.isRunning());
+            if (!puc.isNewerAvailable()) {
+                if (log.shouldLog(Log.WARN))
+                    log.warn("No update available for plugin: " + appName);
+                continue;
+            }
+            PluginUpdateHandler puh = PluginUpdateHandler.getInstance(ctx);
+            String url = entry.getValue();
+            if (log.shouldLog(Log.WARN))
+                log.warn("Updating plugin: " + appName);
+            puh.update(url);
+            do {
+                try {
+                    Thread.sleep(5*1000);
+                } catch (InterruptedException ie) {}
+            } while (puh.isRunning());
+        }
     }
 
     /** this shouldn't throw anything */
@@ -75,6 +164,9 @@ public class PluginStarter implements Runnable {
             if (name.startsWith(PREFIX) && name.endsWith(ENABLED)) {
                 if (Boolean.valueOf(props.getProperty(name)).booleanValue()) {
                     String app = name.substring(PREFIX.length(), name.lastIndexOf(ENABLED));
+                    // plugins could have been started after update
+                    if (isPluginRunning(app, ctx))
+                        continue;
                     try {
                         if (!startPlugin(ctx, app))
                             log.error("Failed to start plugin: " + app);
