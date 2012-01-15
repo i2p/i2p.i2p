@@ -97,7 +97,7 @@ public class PluginUpdateHandler extends UpdateHandler {
     }
 
     private class Cleaner implements SimpleTimer.TimedEvent {
-        private String _msg;
+        private final String _msg;
         public Cleaner(String msg) {
             _msg = msg;
         }
