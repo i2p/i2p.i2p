@@ -95,6 +95,7 @@ public class PluginStarter implements Runnable {
         File pluginDir = new File(ctx.getConfigDir(), PluginUpdateHandler.PLUGIN_DIR + '/' + appName);
         if ((!pluginDir.exists()) || (!pluginDir.isDirectory())) {
             log.error("Cannot start nonexistent plugin: " + appName);
+            disablePlugin(appName);
             return false;
         }
 
@@ -104,6 +105,7 @@ public class PluginStarter implements Runnable {
             (new VersionComparator()).compare(CoreVersion.VERSION, minVersion) < 0) {
             String foo = "Plugin " + appName + " requires I2P version " + minVersion + " or higher";
             log.error(foo);
+            disablePlugin(appName);
             throw new Exception(foo);
         }
 
@@ -112,6 +114,7 @@ public class PluginStarter implements Runnable {
             (new VersionComparator()).compare(System.getProperty("java.version"), minVersion) < 0) {
             String foo = "Plugin " + appName + " requires Java version " + minVersion + " or higher";
             log.error(foo);
+            disablePlugin(appName);
             throw new Exception(foo);
         }
 
@@ -121,6 +124,7 @@ public class PluginStarter implements Runnable {
             (new VersionComparator()).compare(minVersion, jVersion) > 0) {
             String foo = "Plugin " + appName + " requires Jetty version " + minVersion + " or higher";
             log.error(foo);
+            disablePlugin(appName);
             throw new Exception(foo);
         }
 
@@ -129,6 +133,7 @@ public class PluginStarter implements Runnable {
             (new VersionComparator()).compare(maxVersion, jVersion) < 0) {
             String foo = "Plugin " + appName + " requires Jetty version " + maxVersion + " or lower";
             log.error(foo);
+            disablePlugin(appName);
             throw new Exception(foo);
         }
 
@@ -334,7 +339,7 @@ public class PluginStarter implements Runnable {
         Properties props = pluginProperties();
         for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
             String name = (String)iter.next();
-            if (name.startsWith(PREFIX + appName))
+            if (name.startsWith(PREFIX + appName + '.'))
                 iter.remove();
         }
         storePluginProperties(props);
@@ -371,6 +376,32 @@ public class PluginStarter implements Runnable {
                 rv.setProperty(prop, "true");
         }
         return rv;
+    }
+
+    /**
+     *  Is the plugin enabled in plugins.config?
+     *  Default true
+     *
+     *  @since 0.8.13
+     */
+    public static boolean isPluginEnabled(String appName) {
+        Properties props = pluginProperties();
+        String prop = PREFIX + appName + ENABLED;
+        return Boolean.valueOf(props.getProperty(prop, "true")).booleanValue();
+    }
+
+    /**
+     *  Disable in plugins.config
+     *
+     *  @since 0.8.13
+     */
+    public static void disablePlugin(String appName) {
+        Properties props = pluginProperties();
+        String prop = PREFIX + appName + ENABLED;
+        if (Boolean.valueOf(props.getProperty(prop, "true")).booleanValue()) {
+            props.setProperty(prop, "false");
+            storePluginProperties(props);
+        }
     }
 
     /**
