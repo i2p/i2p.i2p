@@ -90,6 +90,7 @@
                 <!-- top level installer will rename to jrobin.jar -->
                 <!-- DTG added in 0.8.4, not in the classpath for very old installs, before we changed wrapper.config to specify * -->
                 <attribute name="Class-Path" value="i2p.jar router.jar jrobin.jar desktopgui.jar" />
+                <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.j.tr}" />
@@ -169,6 +170,7 @@
         <war destfile="build/routerconsole.war" webxml="../jsp/web-out.xml"
              basedir="../jsp/" excludes="web.xml, *.css, **/*.java, *.jsp, *.jsi, web-fragment.xml, web-out.xml">
             <manifest>
+                <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.w.tr}" />

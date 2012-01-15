@@ -60,6 +60,7 @@
             <manifest>
                 <attribute name="Main-Class" value="org.klomp.snark.Snark" />
                 <attribute name="Class-Path" value="i2p.jar mstreaming.jar streaming.jar" />
+                <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
@@ -98,6 +99,7 @@
           <!-- include only the web stuff, as of 0.7.12 the router will add i2psnark.jar to the classpath for the war -->
           <classes dir="./build/obj" includes="**/web/*.class" />
             <manifest>
+                <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />

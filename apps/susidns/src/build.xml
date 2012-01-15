@@ -97,6 +97,7 @@
         		<include name="WEB-INF/classes/${project}.properties"/>
         	</fileset>
             <manifest>
+                <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />

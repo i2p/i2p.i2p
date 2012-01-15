@@ -113,17 +113,18 @@ public class FileDumpHelper extends HelperBase {
         if (att == null)
             att = new Attributes();
         buf.append("<td align=\"center\">");
+        String iv = getAtt(att, "Implementation-Version");
+        if (iv != null)
+            buf.append("<b>").append(iv).append("</b>");
         String s = getAtt(att, "Base-Revision");
         if (s != null && s.length() > 20) {
+            if (iv != null)
+                buf.append("<br>");
             buf.append("<a href=\"http://stats.i2p/cgi-bin/viewmtn/revision/info/").append(s)
                .append("\">" +
                        "<tt>").append(s.substring(0, 20)).append("</tt>" +
                        "<br>" +
                        "<tt>").append(s.substring(20)).append("</tt></a>");
-        } else {
-            s = getAtt(att, "Implementation-Version");
-            if (s != null)
-                buf.append("<b>").append(s).append("</b>");
         }
         buf.append("</td><td>");
         s = getAtt(att, "Created-By");

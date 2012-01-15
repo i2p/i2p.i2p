@@ -45,6 +45,7 @@
         <war destfile="susimail.war" webxml="src/WEB-INF/web.xml"
              basedir="src/" excludes="WEB-INF/web.xml LICENSE src/**/*">
             <manifest>
+                <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
