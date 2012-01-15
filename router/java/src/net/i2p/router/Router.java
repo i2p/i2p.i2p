@@ -241,6 +241,8 @@ public class Router implements RouterClock.ClockShiftListener {
             String now = Long.toString(System.currentTimeMillis());
             _config.put("router.firstInstalled", now);
             _config.put("router.updateLastInstalled", now);
+            // First added in 0.8.13
+            _config.put("router.previousVersion", RouterVersion.VERSION);
             saveConfig();
         }
         // *********  Start no threads before here ********* //
@@ -1041,6 +1043,13 @@ public class Router implements RouterClock.ClockShiftListener {
                 _log.log(Log.CRIT, "Error running shutdown task", t);
             }
         }
+
+        // Set the last version to the current version, since 0.8.13
+        if (!RouterVersion.VERSION.equals(_config.get("router.previousVersion"))) {
+            _config.put("router.previousVersion", RouterVersion.VERSION);
+            saveConfig();
+        }
+
         _context.removeShutdownTasks();
         try { _context.clientManager().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the client manager", t); }
         try { _context.namingService().shutdown(); } catch (Throwable t) { _log.error("Error shutting down the naming service", t); }
@@ -1345,6 +1354,8 @@ public class Router implements RouterClock.ClockShiftListener {
                 // This may be useful someday. First added in 0.8.2
                 // Moved above the extract so we don't NCDFE
                 _config.put("router.updateLastInstalled", "" + System.currentTimeMillis());
+                // Set the last version to the current version, since 0.8.13
+                _config.put("router.previousVersion", RouterVersion.VERSION);
                 saveConfig();
                 ok = FileUtil.extractZip(updateFile, _context.getBaseDir());
             }
