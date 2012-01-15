@@ -15,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -326,9 +327,23 @@ public class Router implements RouterClock.ClockShiftListener {
     public String getConfigSetting(String name) { 
             return _config.get(name); 
     }
+
+    /**
+     *  Warning, race between here and saveConfig(),
+     *  saveConfig(String name, String value) or saveConfig(Map toAdd, Set toRemove) is recommended.
+     *
+     *  @since 0.8.13
+     */
     public void setConfigSetting(String name, String value) { 
             _config.put(name, value); 
     }
+
+    /**
+     *  Warning, race between here and saveConfig(),
+     *  saveConfig(String name, String value) or saveConfig(Map toAdd, Set toRemove) is recommended.
+     *
+     *  @since 0.8.13
+     */
     public void removeConfigSetting(String name) { 
             _config.remove(name); 
     }
@@ -1253,6 +1268,45 @@ public class Router implements RouterClock.ClockShiftListener {
         return true;
     }
     
+    /**
+     * Updates the current config and then saves it.
+     * Prevents a race in the interval between setConfigSetting() / removeConfigSetting() and saveConfig(),
+     * Synchronized with getConfig() / saveConfig()
+     *
+     * @param name setting to add/change/remove before saving
+     * @param value if non-null, updated value; if null, setting will be removed
+     * @return success
+     * @since 0.8.13
+     */
+    public synchronized boolean saveConfig(String name, String value) {
+        if (value != null)
+            _config.put(name, value);
+        else
+            _config.remove(name);
+        return saveConfig();
+    }
+
+    /**
+     * Updates the current config and then saves it.
+     * Prevents a race in the interval between setConfigSetting() / removeConfigSetting() and saveConfig(),
+     * Synchronized with getConfig() / saveConfig()
+     *
+     * @param toAdd settings to add/change before saving, may be null or empty
+     * @param toRemove settings to remove before saving, may be null or empty
+     * @return success
+     * @since 0.8.13
+     */
+    public synchronized boolean saveConfig(Map toAdd, Collection<String> toRemove) {
+        if (toAdd != null)
+            _config.putAll(toAdd);
+        if (toRemove != null) {
+            for (String s : toRemove) {
+                _config.remove(toRemove);
+            }
+        }
+        return saveConfig();
+    }
+
     /**
      *  The clock shift listener.
      *  Restart the router if we should.
