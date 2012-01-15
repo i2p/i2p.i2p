@@ -4,7 +4,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 /**
- *  Stop all plugins that are installed
+ *  Stop all plugins that are installed and running
  *
  *  @since 0.7.13
  *  @author zzz
@@ -21,19 +21,20 @@ public class PluginStopper extends PluginStarter {
     }
 
     /**
-     *  Stop all plugins
-     *  (whether or not they were ever started)
+     *  Stop all running plugins
      *
      *  this shouldn't throw anything
      */
-    static void stopPlugins(RouterContext ctx) {
+    private static void stopPlugins(RouterContext ctx) {
         Log log = ctx.logManager().getLog(PluginStopper.class);
         for (String app : getPlugins()) {
-            try {
-               stopPlugin(ctx, app);
-            } catch (Throwable e) {
-               if (log.shouldLog(Log.WARN))
-                   log.warn("Failed to stop plugin: " + app, e);
+            if (isPluginRunning(app, ctx)) {
+                try {
+                   stopPlugin(ctx, app);
+                } catch (Throwable e) {
+                   if (log.shouldLog(Log.WARN))
+                       log.warn("Failed to stop plugin: " + app, e);
+                }
             }
         }
     }
