@@ -35,6 +35,7 @@
         <dependset>
              <srcfilelist dir="." files="../../../router/java/build/obj/net/i2p/router/RouterVersion.class" />
              <targetfilelist dir="." files="build/obj/net/i2p/router/web/NewsFetcher.class" />
+             <targetfilelist dir="." files="build/obj/net/i2p/router/web/PluginStarter.class" />
              <targetfilelist dir="." files="build/obj/net/i2p/router/web/SummaryHelper.class" />
              <targetfilelist dir="." files="build/obj/net/i2p/router/web/UpdateHandler.class" />
         </dependset>
@@ -294,6 +295,8 @@
 
     <uptodate property="precompilejsp.uptodate" targetfile="../jsp/web-out.xml">
         <srcfiles dir= "../jsp" includes="**/*.jsp, *.jsi, **/*.html, *.css, susimail/susimail, web.xml"/>
+        <!-- so the version is right on logs.jsp -->
+        <srcfiles dir= "../../../router/java/src/net/i2p/router" includes="RouterVersion.java"/>
     </uptodate>
 
     <target name="javadoc">
