@@ -1,3 +1,8 @@
+2012-01-16 hottuna
+  * Router:
+    - Don't throttle tunnel creation if using a higher
+    - than default router.maxParticipatingTunnels setting.
+
 2012-01-14 zzz
   * i2ptunnel: Partial fix for dest formatting (ticket #581)
   * jars.jsp: New debug page
