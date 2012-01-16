@@ -29,7 +29,7 @@
  <img src="/themes/console/images/itoopie_xsm.png" alt="">
  <b><%=intl._("I2P will work best if you configure your rates to match the speed of your internet connection.")%></b>
  </p>
-   <div class="wideload"><p><table><tr><td><input style="text-align: right; width: 5em;" name="inboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="inboundRate" />" >
+   <div class="wideload"><table><tr><td><input style="text-align: right; width: 5em;" name="inboundrate" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="inboundRate" />" >
           <%=intl._("KBps In")%>
         </td><td>(<jsp:getProperty name="nethelper" property="inboundRateBits" />)</td>
 <% /********
@@ -55,8 +55,8 @@
     </tr><tr>
         <td><jsp:getProperty name="nethelper" property="sharePercentageBox" /> <%=intl._("Share")%></td>
         <td>(<jsp:getProperty name="nethelper" property="shareRateBits" />)
-</td></tr></table></p></div></p><p>
- <% int share = nethelper.getShareBandwidth();
+</td></tr></table></div>
+<p><% int share = nethelper.getShareBandwidth();
     if (share < 12) {
         out.print("<b>");
         out.print(intl._("NOTE"));
@@ -73,11 +73,11 @@
 
         out.print(intl._("The higher the share bandwidth the more you improve your anonymity and help the network."));
     }
- %>
+ %></p>
 <p><a href="confignet"><%=intl._("Advanced network configuration page")%></a></p><hr>
 <div class="formaction">
 <input type="reset" class="cancel" value="<%=intl._("Cancel")%>" >
 <input type="submit" class="accept" name="save" value="<%=intl._("Save changes")%>" >
 </div>
-</div></form>
+</form>
 </div></div></body></html>

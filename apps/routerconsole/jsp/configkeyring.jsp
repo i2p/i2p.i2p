@@ -22,9 +22,9 @@
 <div class="configure"><h2><%=intl._("Keyring")%></h2><p>
  <%=intl._("The router keyring is used to decrypt encrypted leaseSets.")%>
  <%=intl._("The keyring may contain keys for local or remote encrypted destinations.")%></p>
- <div class="wideload"><p>
+ <div class="wideload">
  <jsp:getProperty name="keyringhelper" property="summary" />
-</p></div>
+</div>
 
  <form action="" method="POST">
  <input type="hidden" name="nonce" value="<jsp:getProperty name="formhandler" property="newNonce" />" >
@@ -33,7 +33,7 @@
  <%=intl._("Keys for local destinations must be entered on the")%> <a href="i2ptunnel/"><%=intl._("I2PTunnel page")%></a>.
 </p>
   <div class="wideload">
-      <p><table><tr>
+      <table><tr>
           <td class="mediumtags" align="right"><%=intl._("Dest. name, hash, or full key")%>:</td>
           <td><textarea name="peer" cols="44" rows="1" style="height: 3em;" wrap="off" spellcheck="false"></textarea></td>
         </tr><tr>
@@ -44,4 +44,4 @@
 <input type="reset" class="cancel" value="<%=intl._("Cancel")%>" >
 <input type="submit" name="action" class="delete" value="<%=intl._("Delete key")%>" >
 <input type="submit" name="action" class="add" value="<%=intl._("Add key")%>" >
-</td></tr></table></p></div></form></div></div></body></html>
+</td></tr></table></div></form></div></div></body></html>

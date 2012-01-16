@@ -122,6 +122,7 @@
 <p>
  <%=intl._("UPnP is used to communicate with Internet Gateway Devices (IGDs) to detect the external IP address and forward ports.")%>
    <%=intl._("UPnP support is beta, and may not work for any number of reasons")%>:
+</p>
 <ul>
 <li class="tidylist"><%=intl._("No UPnP-compatible device present")%>
 <li class="tidylist"><%=intl._("UPnP disabled on the device")%>
@@ -129,8 +130,8 @@
 <li class="tidylist"><%=intl._("Bugs in the device's UPnP implementation")%>
 <li class="tidylist"><%=intl._("Multiple firewall/routers in the internet connection path")%>
 <li class="tidylist"><%=intl._("UPnP device change, reset, or address change")%>
-</ul></p><p>
-<a href="peers#upnp"><%=intl._("Review the UPnP status here.")%></a>
+</ul>
+<p><a href="peers#upnp"><%=intl._("Review the UPnP status here.")%></a>
 <%=intl._("UPnP may be enabled or disabled above, but a change requires a router restart to take effect.")%></p>
 <p><%=intl._("Hostnames entered above will be published in the network database.")%>
     <%=intl._("They are <b>not private</b>.")%>
@@ -142,6 +143,7 @@
  <%=intl._("While I2P will work fine behind most firewalls, your speeds and network integration will generally improve if the I2P port is forwarded for both UDP and TCP.")%>
  <%=intl._("If you think you have opened up your firewall and I2P still thinks you are firewalled, remember that you may have multiple firewalls, for example both software packages and external hardware routers.")%>
  <%=intl._("If there is an error, the <a href=\"logs.jsp\">logs</a> may also help diagnose the problem.")%>
+</p>
  <ul>
 <li class="tidylist"><b><%=intl._("OK")%></b> - 
      <%=intl._("Your UDP port does not appear to be firewalled.")%>
@@ -193,7 +195,7 @@
 <li class="tidylist"><b><%=intl._("ERR - Client Manager I2CP Error - check logs")%></b> -
      <%=intl._("This is usually due to a port 7654 conflict. Check the logs to verify.")%> 
      <%=intl._("Do you have another I2P instance running? Stop the conflicting program and restart I2P.")%>
- </ul></p><hr>
+ </ul><hr>
 <% /********
       <!--
  <b>Dynamic Router Keys: </b>
