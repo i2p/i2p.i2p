@@ -25,10 +25,10 @@ import net.i2p.util.Log;
  *
  */
 class KBucketSet {
-    private Log _log;
-    private I2PAppContext _context;
-    private LocalHash _us;
-    private KBucket _buckets[];
+    private final Log _log;
+    private final I2PAppContext _context;
+    private final LocalHash _us;
+    private final KBucket _buckets[];
     private volatile int _size;
     
     public final static int BASE = 8; // must go into KEYSIZE_BITS evenly
@@ -41,7 +41,7 @@ class KBucketSet {
         _us = new LocalHash(us);
         _context = context;
         _log = context.logManager().getLog(KBucketSet.class);
-        createBuckets();
+        _buckets = createBuckets();
         context.statManager().createRateStat("netDb.KBSGetAllTime", "Time to add all Hashes to the Collector", "NetworkDatabase", new long[] { 60*60*1000 });
     }
     
@@ -132,12 +132,13 @@ class KBucketSet {
     
     public KBucket getBucket(int bucket) { return _buckets[bucket]; }
     
-    protected void createBuckets() {
-        _buckets = new KBucket[NUM_BUCKETS];
+    protected KBucket[] createBuckets() {
+        KBucket[] buckets = new KBucket[NUM_BUCKETS];
         for (int i = 0; i < NUM_BUCKETS-1; i++) {
-            _buckets[i] = createBucket(i*BASE, (i+1)*BASE);
+            buckets[i] = createBucket(i*BASE, (i+1)*BASE);
         }
-        _buckets[NUM_BUCKETS-1] = createBucket(BASE*(NUM_BUCKETS-1), BASE*(NUM_BUCKETS) + 1);
+        buckets[NUM_BUCKETS-1] = createBucket(BASE*(NUM_BUCKETS-1), BASE*(NUM_BUCKETS) + 1);
+        return buckets;
     }
     
     protected KBucket createBucket(int start, int end) {
