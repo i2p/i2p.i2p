@@ -31,6 +31,8 @@ public class RunStandalone {
         if (!workDirCreated)
             System.err.println("ERROR: Unable to create Jetty temporary work directory");
         
+        throw new RuntimeException("unsupported");
+/****
         try {
             _server = new Server("jetty-i2psnark.xml");
             // just blow up NPE if we don't have a context
@@ -39,13 +41,17 @@ public class RunStandalone {
         } catch (Exception e) {
             e.printStackTrace();
         }
+****/
     }
     
     public void stop() {
+        throw new RuntimeException("unsupported");
+/****
         try {
             _server.stop();
         } catch (InterruptedException ie) {
             ie.printStackTrace();
         }
+****/
     }
 }
