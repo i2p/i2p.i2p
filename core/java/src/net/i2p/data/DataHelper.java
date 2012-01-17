@@ -1476,11 +1476,10 @@ public class DataHelper {
     public static String escapeHTML(String unescaped) {
         if (unescaped == null) return "";
         Map<String, String> map = new HashMap<String, String>();
-        map.put("&","&amp;");
         map.put("\"","&quot;");
         map.put("<","&lt;");
         map.put(">","&gt;");
-        String escaped = unescaped;
+        String escaped = unescaped.replaceAll("&","&amp;");
         for (Map.Entry<String, String> entry : map.entrySet()) {
             String k = entry.getKey();
             String v = entry.getValue();
