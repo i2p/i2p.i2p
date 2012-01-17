@@ -1476,8 +1476,8 @@ public class DataHelper {
     public static String escapeHTML(String unescaped) {
         if (unescaped == null) return "";
         Map<String, String> map = new HashMap<String, String>();
-        map.put("\"","&quot;");
         map.put("&","&amp;");
+        map.put("\"","&quot;");
         map.put("<","&lt;");
         map.put(">","&gt;");
         String escaped = unescaped;
@@ -1497,8 +1497,8 @@ public class DataHelper {
     public static String unescapeHTML(String escaped) {
         if (escaped == null) return "";
         Map<String, String> map = new HashMap<String, String>();
-        map.put("&quot;","\"");
         map.put("&amp;","&");
+        map.put("&quot;","\"");
         map.put("&lt;","<");
         map.put("&gt;",">");
         String unescaped = escaped;
