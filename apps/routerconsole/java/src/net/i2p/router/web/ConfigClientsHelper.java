@@ -284,7 +284,7 @@ public class ConfigClientsHelper extends HelperBase {
             buf.append(escapeddesc);
             buf.append("\" >");
         } else {
-            buf.append(escapeddesc);
+            buf.append(desc);
         }
         buf.append("</td></tr>\n");
     }
