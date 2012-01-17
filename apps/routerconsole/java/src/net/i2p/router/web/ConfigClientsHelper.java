@@ -3,8 +3,10 @@ package net.i2p.router.web;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
@@ -234,6 +236,7 @@ public class ConfigClientsHelper extends HelperBase {
                             boolean enabled, boolean ro, String desc, boolean edit,
                             boolean showEditButton, boolean showUpdateButton, boolean showStopButton,
                             boolean showDeleteButton, boolean showStartButton) {
+        String escapeddesc = escapeHTML(desc);
         buf.append("<tr><td class=\"mediumtags\" align=\"right\" width=\"25%\">");
         if (urlify && enabled) {
             String link = "/";
@@ -279,10 +282,10 @@ public class ConfigClientsHelper extends HelperBase {
         buf.append("</td><td align=\"left\" width=\"50%\">");
         if (edit && !ro) {
             buf.append("<input type=\"text\" size=\"80\" name=\"desc").append(index).append("\" value=\"");
-            buf.append(desc);
+            buf.append(escapeddesc);
             buf.append("\" >");
         } else {
-            buf.append(desc);
+            buf.append(escapeddesc);
         }
         buf.append("</td></tr>\n");
     }
@@ -297,5 +300,23 @@ public class ConfigClientsHelper extends HelperBase {
         String t1 = orig.replace('<', ' ');
         String rv = t1.replace('>', ' ');
         return rv;
+    }
+
+    /**
+     *  Escapes a string for inclusion in HTML
+     */
+    private String escapeHTML(String unescaped) {
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("\"","&quot;");
+        map.put("&","&amp;");
+        map.put("<","&lt;");
+        map.put(">","&gt;");
+        String escaped = unescaped;
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            String k = entry.getKey();
+            String v = entry.getValue();
+            escaped = escaped.replaceAll(k, v);
+        }
+        return escaped;
     }
 }
