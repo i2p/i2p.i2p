@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import net.i2p.data.DataHelper;
 import net.i2p.router.client.ClientManagerFacadeImpl;
 import net.i2p.router.startup.ClientAppConfig;
 import net.i2p.router.startup.LoadClientAppsJob;
@@ -165,7 +166,7 @@ public class ConfigClientsHandler extends FormHandler {
             if (! ("webConsole".equals(ca.clientName) || "Web console".equals(ca.clientName)))
                 ca.disabled = val == null;
             // edit of an existing entry
-            String desc = unescapeHTML(getJettyString("desc" + cur));
+            String desc = DataHelper.unescapeHTML(getJettyString("desc" + cur));
             if (desc != null) {
                 int spc = desc.indexOf(" ");
                 String clss = desc;
@@ -181,7 +182,7 @@ public class ConfigClientsHandler extends FormHandler {
         }
 
         int newClient = clients.size();
-        String newDesc = unescapeHTML(getJettyString("desc" + newClient));
+        String newDesc = DataHelper.unescapeHTML(getJettyString("desc" + newClient));
         if (newDesc != null && newDesc.trim().length() > 0) {
             // new entry
             int spc = newDesc.indexOf(" ");
@@ -398,23 +399,5 @@ public class ConfigClientsHandler extends FormHandler {
         _context.router().setConfigSetting(ConfigClientsHelper.BIND_ALL_INTERFACES, Boolean.toString(all));
         _context.router().saveConfig();
         addFormNotice(_("Interface configuration saved successfully - restart required to take effect."));
-    }
-
-    /**
-     *  Unescapes a string taken from HTML
-     */
-    private String unescapeHTML(String escaped) {
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("&quot;","\"");
-        map.put("&amp;","&");
-        map.put("&lt;","<");
-        map.put("&gt;",">");
-        String unescaped = escaped;
-        for (Map.Entry<String, String> entry : map.entrySet()) {
-            String k = entry.getKey();
-            String v = entry.getValue();
-            unescaped = unescaped.replaceAll(k, v);
-        }
-        return unescaped;
     }
 }

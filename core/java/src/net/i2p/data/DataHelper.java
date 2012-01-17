@@ -1468,6 +1468,48 @@ public class DataHelper {
         return rv;
     }
 
+    /**
+     * Escape a string for inclusion in HTML
+     * @param unescaped the unescaped string, may be null
+     * @return the escaped string, or an empty string if null is passed in
+     */
+    public static String escapeHTML(String unescaped) {
+        if (unescaped == null) return "";
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("\"","&quot;");
+        map.put("&","&amp;");
+        map.put("<","&lt;");
+        map.put(">","&gt;");
+        String escaped = unescaped;
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            String k = entry.getKey();
+            String v = entry.getValue();
+            escaped = escaped.replaceAll(k, v);
+        }
+        return escaped;
+    }
+
+    /**
+     * Unescape a string taken from HTML
+     * @param escaped the escaped string, may be null
+     * @return the unescaped string, or an empty string if null is passed in
+     */
+    public static String unescapeHTML(String escaped) {
+        if (escaped == null) return "";
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("&quot;","\"");
+        map.put("&amp;","&");
+        map.put("&lt;","<");
+        map.put("&gt;",">");
+        String unescaped = escaped;
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            String k = entry.getKey();
+            String v = entry.getValue();
+            unescaped = unescaped.replaceAll(k, v);
+        }
+        return unescaped;
+    }
+
     public static final int MAX_UNCOMPRESSED = 40*1024;
     public static final int MAX_COMPRESSION = Deflater.BEST_COMPRESSION;
     public static final int NO_COMPRESSION = Deflater.NO_COMPRESSION;
