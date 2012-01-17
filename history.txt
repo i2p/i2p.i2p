@@ -1,3 +1,8 @@
+2012-01-16 hottuna
+  * Router:
+    - Don't throttle tunnel creation if using a higher
+    - than default router.maxParticipatingTunnels setting.
+
 2012-01-16 zzz
   * Build: Put Implementation-Version in manifests
   * NetDB: Hopefully fix rare NPE (ticket #589)

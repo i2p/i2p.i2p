@@ -178,10 +178,13 @@ class RouterThrottleImpl implements RouterThrottle {
                 return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
             }
         }
+
         
         int numTunnels = _context.tunnelManager().getParticipatingCount();
+        int maxTunnels = _context.getProperty(PROP_MAX_TUNNELS, DEFAULT_MAX_TUNNELS);
 
-        if (numTunnels > getMinThrottleTunnels()) {
+	// Throttle tunnels if min. throttle level is exceeded and default max participating tunnels (or fewer) is used.
+        if ((numTunnels > getMinThrottleTunnels()) && (DEFAULT_MAX_TUNNELS <= maxTunnels)) {
             double tunnelGrowthFactor = getTunnelGrowthFactor();
             Rate avgTunnels = _context.statManager().getRate("tunnel.participatingTunnels").getRate(10*60*1000);
             if (avgTunnels != null) {
@@ -260,11 +263,10 @@ class RouterThrottleImpl implements RouterThrottle {
             }
         }
         
-        int max = _context.getProperty(PROP_MAX_TUNNELS, DEFAULT_MAX_TUNNELS);
-        if (numTunnels >= max) {
+        if (numTunnels >= maxTunnels) {
             if (_log.shouldLog(Log.WARN))
                 _log.warn("Refusing tunnel request since we are already participating in " 
-                          + numTunnels + " (our max is " + max + ")");
+                          + numTunnels + " (our max is " + maxTunnels + ")");
             _context.statManager().addRateData("router.throttleTunnelMaxExceeded", numTunnels, 0);
             setTunnelStatus(_x("Rejecting tunnels: Limit reached"));
             return TunnelHistory.TUNNEL_REJECT_BANDWIDTH;
