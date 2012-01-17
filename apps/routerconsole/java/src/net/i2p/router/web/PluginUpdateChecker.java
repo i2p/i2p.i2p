@@ -36,6 +36,7 @@ public class PluginUpdateChecker extends UpdateHandler {
     private String _appName;
     private String _oldVersion;
     private String _xpi2pURL;
+    private volatile boolean _isNewerAvailable;
 
     private static PluginUpdateChecker _instance;
     public static final synchronized PluginUpdateChecker getInstance(RouterContext ctx) { 
@@ -49,12 +50,19 @@ public class PluginUpdateChecker extends UpdateHandler {
         super(ctx);
     }
     
-    /** check all plugins */
+    /**
+     *  check all plugins
+     *  @deprecated not finished
+     */
     public void update() {
         Thread t = new I2PAppThread(new AllCheckerRunner(), "AllAppChecker", true);
         t.start();
     }
 
+    /**
+     *  check all plugins
+     *  @deprecated not finished
+     */
     public class AllCheckerRunner implements Runnable {
         public void run() {
             List<String> plugins = PluginStarter.getPlugins();
@@ -85,12 +93,18 @@ public class PluginUpdateChecker extends UpdateHandler {
             _xpi2pURL = xpi2pURL;
             _appName = appName;
             _oldVersion = oldVersion;
+            _isNewerAvailable = false;
             System.setProperty(PROP_UPDATE_IN_PROGRESS, "true");
             I2PAppThread update = new I2PAppThread(_pluginUpdateCheckerRunner, "AppChecker", true);
             update.start();
         }
     }
     
+    /** @since 0.8.13 */
+    public void setAppStatus(String status) {
+        updateStatus(status);
+    }
+
     public boolean isRunning() {
         return _pluginUpdateCheckerRunner != null && _pluginUpdateCheckerRunner.isRunning();
     }
@@ -101,12 +115,17 @@ public class PluginUpdateChecker extends UpdateHandler {
         return false;
     }
     
+    /** @since 0.8.13 */
+    public boolean isNewerAvailable() {
+        return _isNewerAvailable;
+    }
+
     private void scheduleStatusClean(String msg) {
-        SimpleScheduler.getInstance().addEvent(new Cleaner(msg), 60*60*1000);
+        SimpleScheduler.getInstance().addEvent(new Cleaner(msg), 20*60*1000);
     }
 
     private class Cleaner implements SimpleTimer.TimedEvent {
-        private String _msg;
+        private final String _msg;
         public Cleaner(String msg) {
             _msg = msg;
         }
@@ -126,6 +145,7 @@ public class PluginUpdateChecker extends UpdateHandler {
 
         @Override
         protected void update() {
+            _isNewerAvailable = false;
             updateStatus("<b>" + _("Checking for update of plugin {0}", _appName) + "</b>");
             // use the same settings as for updater
             // always proxy, or else FIXME
@@ -142,6 +162,10 @@ public class PluginUpdateChecker extends UpdateHandler {
             }
         }
         
+        public boolean isNewerAvailable() {
+            return _isNewerAvailable;
+        }
+
         @Override
         public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {
         }
@@ -151,10 +175,12 @@ public class PluginUpdateChecker extends UpdateHandler {
             String newVersion = TrustedUpdate.getVersionString(new ByteArrayInputStream(_baos.toByteArray()));
             boolean newer = (new VersionComparator()).compare(newVersion, _oldVersion) > 0;
             String msg;
-            if (newer)
+            if (newer) {
                 msg = "<b>" + _("New plugin version {0} is available", newVersion) + "</b>";
-            else
+                _isNewerAvailable = true;
+            } else {
                 msg = "<b>" + _("No new version is available for plugin {0}", _appName) + "</b>";
+            }
             updateStatus(msg);
             scheduleStatusClean(msg);
         }

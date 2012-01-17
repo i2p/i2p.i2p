@@ -62,6 +62,7 @@
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.i2ptunnel.I2PTunnel" />
                 <attribute name="Class-Path" value="i2p.jar mstreaming.jar" />
+                <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.j.tr}" />
@@ -134,6 +135,7 @@
         <war destfile="build/i2ptunnel.war" webxml="../jsp/web-out.xml"
              basedir="../jsp/" excludes="web.xml, web-fragment.xml, web-out.xml, **/*.java, *.jsp">
             <manifest>
+                <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.w.tr}" />

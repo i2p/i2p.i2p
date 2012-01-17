@@ -1,3 +1,19 @@
+2012-01-16 zzz
+  * Build: Put Implementation-Version in manifests
+  * NetDB: Hopefully fix rare NPE (ticket #589)
+  * Plugins:
+    - Only stop a plugin before update if it was running
+    - Only stop a plugin at shutdown if it was running
+    - Don't start a plugin after update if it was disabled
+    - Disable plugin if it fails version checks at startup
+    - Auto-update plugins after a router update
+    - Add update-all button and more cancel buttons
+  * Router:
+    - Add synchronized change-and-save-config methods to avoid races
+    - Save previous version in config so we know when we updated
+  * Transport: Revert change from -2, put addresses back in RouterInfo
+               when hidden, broke inbound tunnel building
+
 2012-01-14 zzz
   * i2ptunnel: Partial fix for dest formatting (ticket #581)
   * jars.jsp: New debug page

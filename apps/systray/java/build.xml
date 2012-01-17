@@ -44,6 +44,7 @@
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.apps.systray.SysTray" />
                 <attribute name="Class-Path" value="systray4j.jar" />
+                <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />

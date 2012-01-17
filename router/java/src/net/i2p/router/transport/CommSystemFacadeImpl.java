@@ -179,8 +179,9 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
     /** @return non-null, possibly empty */
     @Override
     public Set<RouterAddress> createAddresses() {
-        if (_context.router().isHidden())
-            return Collections.EMPTY_SET;
+        // No, don't do this, it makes it almost impossible to build inbound tunnels
+        //if (_context.router().isHidden())
+        //    return Collections.EMPTY_SET;
         Map<String, RouterAddress> addresses = null;
         boolean newCreated = false;
         

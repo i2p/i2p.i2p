@@ -127,7 +127,7 @@ public class UpdateHandler {
     }
     
     public class UpdateRunner implements Runnable, EepGet.StatusListener {
-        protected boolean _isRunning;
+        protected volatile boolean _isRunning;
         protected boolean done;
         protected EepGet _get;
         protected final DecimalFormat _pct = new DecimalFormat("0.0%");

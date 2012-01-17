@@ -93,11 +93,11 @@ public class PluginUpdateHandler extends UpdateHandler {
     }
     
     private void scheduleStatusClean(String msg) {
-        SimpleScheduler.getInstance().addEvent(new Cleaner(msg), 60*60*1000);
+        SimpleScheduler.getInstance().addEvent(new Cleaner(msg), 20*60*1000);
     }
 
     private class Cleaner implements SimpleTimer.TimedEvent {
-        private String _msg;
+        private final String _msg;
         public Cleaner(String msg) {
             _msg = msg;
         }
@@ -286,6 +286,7 @@ public class PluginUpdateHandler extends UpdateHandler {
                 return;
             }
 
+            boolean wasRunning = false;
             File destDir = new SecureDirectory(appDir, appName);
             if (destDir.exists()) {
                 if (Boolean.valueOf(props.getProperty("install-only")).booleanValue()) {
@@ -350,14 +351,16 @@ public class PluginUpdateHandler extends UpdateHandler {
                     return;
                 }
 
-                // check if it is running first?
-                try {
-                    if (!PluginStarter.stopPlugin(_context, appName)) {
-                        // failed, ignore
+                if (PluginStarter.isPluginRunning(appName, _context)) {
+                    wasRunning = true;
+                    try {
+                        if (!PluginStarter.stopPlugin(_context, appName)) {
+                            // failed, ignore
+                        }
+                    } catch (Throwable e) {
+                        // no updateStatus() for this one
+                        _log.error("Error stopping plugin " + appName, e);
                     }
-                } catch (Throwable e) {
-                    // no updateStatus() for this one
-                    _log.error("Error stopping plugin " + appName, e);
                 }
 
             } else {
@@ -390,8 +393,8 @@ public class PluginUpdateHandler extends UpdateHandler {
                     pluginProps.setProperty(PluginStarter.PREFIX + appName + PluginStarter.ENABLED, "false");
                     PluginStarter.storePluginProperties(pluginProps);
                 }
-            } else {
-                // start everything
+            } else if (wasRunning || PluginStarter.isPluginEnabled(appName)) {
+                // start everything unless it was disabled and not running before
                 try {
                     if (PluginStarter.startPlugin(_context, appName)) {
                         String linkName = ConfigClientsHelper.stripHTML(props, "consoleLinkName_" + Messages.getLanguage(_context));
@@ -411,6 +414,8 @@ public class PluginUpdateHandler extends UpdateHandler {
                     statusDone("<b>" + _("Plugin {0} installed but failed to start", appName) + ": " + e + "</b>");
                     _log.error("Error starting plugin " + appName, e);
                 }
+            } else {
+                statusDone("<b>" + _("Plugin {0} installed", appName) + "</b>");
             }
         }
 
