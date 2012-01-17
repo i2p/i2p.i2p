@@ -1471,10 +1471,10 @@ public class DataHelper {
     /**
      * Escape a string for inclusion in HTML
      * @param unescaped the unescaped string, may be null
-     * @return the escaped string, or an empty string if null is passed in
+     * @return the escaped string, or null if null is passed in
      */
     public static String escapeHTML(String unescaped) {
-        if (unescaped == null) return "";
+        if (unescaped == null) return null;
         Map<String, String> map = new HashMap<String, String>();
         map.put("\"","&quot;");
         map.put("<","&lt;");
@@ -1491,10 +1491,10 @@ public class DataHelper {
     /**
      * Unescape a string taken from HTML
      * @param escaped the escaped string, may be null
-     * @return the unescaped string, or an empty string if null is passed in
+     * @return the unescaped string, or null if null is passed in
      */
     public static String unescapeHTML(String escaped) {
-        if (escaped == null) return "";
+        if (escaped == null) return null;
         Map<String, String> map = new HashMap<String, String>();
         map.put("&amp;","&");
         map.put("&quot;","\"");
