@@ -25,6 +25,7 @@ import net.i2p.data.Destination;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
+import net.i2p.util.PortMapper;
 
 /**
  * Supports the following:
@@ -152,6 +153,20 @@ public class I2PTunnelConnectClient extends I2PTunnelHTTPClientBase implements R
         return opts;
     }
     
+    @Override
+    public void startRunning() {
+        super.startRunning();
+        _context.portMapper().register(PortMapper.SVC_HTTPS_PROXY, getLocalPort());
+    }
+
+    @Override
+    public boolean close(boolean forced) {
+        int reg = _context.portMapper().getPort(PortMapper.SVC_HTTPS_PROXY);
+        if (reg == getLocalPort())
+            _context.portMapper().unregister(PortMapper.SVC_HTTPS_PROXY);
+        return super.close(forced);
+    }
+
     protected void clientConnectionRun(Socket s) {
         InputStream in = null;
         OutputStream out = null;

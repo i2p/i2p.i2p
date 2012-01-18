@@ -3,6 +3,7 @@ package net.i2p.router.web;
 import net.i2p.I2PAppContext;
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
+import net.i2p.util.PortMapper;
 
 public class ConfigUpdateHelper extends HelperBase {
     private boolean _dontInstall;
@@ -37,6 +38,7 @@ public class ConfigUpdateHelper extends HelperBase {
         else
             return ConfigUpdateHandler.DEFAULT_NEWS_URL;
     }
+
     public String getUpdateURL() {
         String url = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_URL);
         if (url != null)
@@ -44,11 +46,30 @@ public class ConfigUpdateHelper extends HelperBase {
         else
             return ConfigUpdateHandler.DEFAULT_UPDATE_URL;
     }
+
     public String getProxyHost() {
+        if (isInternal())
+            return _("internal") + "\" readonly=\"readonly";
         return _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
     }
+
     public String getProxyPort() {
-        return _context.getProperty(ConfigUpdateHandler.PROP_PROXY_PORT, ConfigUpdateHandler.DEFAULT_PROXY_PORT);
+        if (isInternal())
+            return _("internal") + "\" readonly=\"readonly";
+        return Integer.toString(ConfigUpdateHandler.proxyPort(_context));
+    }
+
+    /**
+     *  This should almost always be true.
+     *  @return true if settings are at defaults and proxy is registered
+     *  @since 0.8.13
+     */
+    private boolean isInternal() {
+        String host = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST);
+        String port = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_PORT);
+        return (host == null || host.equals(ConfigUpdateHandler.DEFAULT_PROXY_HOST)) &&
+               (port == null || port.equals(ConfigUpdateHandler.DEFAULT_PROXY_PORT)) &&
+               _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY) == ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT;
     }
     
     public String getUpdateThroughProxy() {

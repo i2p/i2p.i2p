@@ -70,7 +70,7 @@ public class UnsignedUpdateHandler extends UpdateHandler {
             // always proxy for now
             //boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
             String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
-            int proxyPort = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_PORT, ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT);
+            int proxyPort = ConfigUpdateHandler.proxyPort(_context);
             try {
                 // 40 retries!!
                 _get = new EepGet(_context, proxyHost, proxyPort, 40, _updateFile, _zipURL, false);

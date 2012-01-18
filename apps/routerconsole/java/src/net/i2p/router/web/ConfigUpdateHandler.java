@@ -3,9 +3,11 @@ package net.i2p.router.web;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.i2p.I2PAppContext;
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
 import net.i2p.util.FileUtil;
+import net.i2p.util.PortMapper;
 
 /**
  *
@@ -77,7 +79,16 @@ public class ConfigUpdateHandler extends FormHandler {
 
     public static final String PROP_TRUSTED_KEYS = "router.trustedUpdateKeys";
     
-    
+    /**
+     *  Convenience method for updaters
+     *  @return the configured value, else the registered HTTP proxy, else the default
+     *  @since 0.8.13
+     */
+    static int proxyPort(I2PAppContext ctx) {
+        return ctx.getProperty(PROP_PROXY_PORT,
+                               ctx.portMapper().getPort(PortMapper.SVC_HTTP_PROXY, DEFAULT_PROXY_PORT_INT));
+    }
+
     @Override
     protected void processForm() {
         if (_action == null)
@@ -112,7 +123,7 @@ public class ConfigUpdateHandler extends FormHandler {
             }
         }
         
-        if ( (_proxyHost != null) && (_proxyHost.length() > 0) ) {
+        if (_proxyHost != null && _proxyHost.length() > 0 && !_proxyHost.equals(_("internal"))) {
             String oldHost = _context.router().getConfigSetting(PROP_PROXY_HOST);
             if ( (oldHost == null) || (!_proxyHost.equals(oldHost)) ) {
                 changes.put(PROP_PROXY_HOST, _proxyHost);
@@ -120,7 +131,7 @@ public class ConfigUpdateHandler extends FormHandler {
             }
         }
         
-        if ( (_proxyPort != null) && (_proxyPort.length() > 0) ) {
+        if (_proxyPort != null && _proxyPort.length() > 0 && !_proxyPort.equals(_("internal"))) {
             String oldPort = _context.router().getConfigSetting(PROP_PROXY_PORT);
             if ( (oldPort == null) || (!_proxyPort.equals(oldPort)) ) {
                 changes.put(PROP_PROXY_PORT, _proxyPort);

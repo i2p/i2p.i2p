@@ -39,6 +39,7 @@ import net.i2p.data.Hash;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.FileUtil;
 import net.i2p.util.Log;
+import net.i2p.util.PortMapper;
 import net.i2p.util.Translate;
 
 /**
@@ -291,6 +292,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
     public void startRunning() {
         super.startRunning();
         this.isr = new InternalSocketRunner(this);
+        _context.portMapper().register(PortMapper.SVC_HTTP_PROXY, getLocalPort());
     }
 
     /**
@@ -298,6 +300,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
      */
     @Override
     public boolean close(boolean forced) {
+        int reg = _context.portMapper().getPort(PortMapper.SVC_HTTP_PROXY);
+        if (reg == getLocalPort())
+            _context.portMapper().unregister(PortMapper.SVC_HTTP_PROXY);
         boolean rv = super.close(forced);
         if (this.isr != null)
             this.isr.stopRunning();

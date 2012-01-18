@@ -21,6 +21,7 @@ import net.i2p.i2ptunnel.irc.IrcOutboundFilter;
 import net.i2p.util.EventDispatcher;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.Log;
+import net.i2p.util.PortMapper;
 
 /**
  * Todo: Can we extend I2PTunnelClient instead and remove some duplicated code?
@@ -152,7 +153,16 @@ public class I2PTunnelIRCClient extends I2PTunnelClientBase {
     }
 
     @Override
+    public void startRunning() {
+        super.startRunning();
+        _context.portMapper().register(PortMapper.SVC_IRC, getLocalPort());
+    }
+
+    @Override
     public boolean close(boolean forced) {
+        int reg = _context.portMapper().getPort(PortMapper.SVC_IRC);
+        if (reg == getLocalPort())
+            _context.portMapper().unregister(PortMapper.SVC_IRC);
         synchronized(this) {
             if (_DCCServer != null) {
                 _DCCServer.close(forced);

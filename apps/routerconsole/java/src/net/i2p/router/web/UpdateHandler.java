@@ -160,16 +160,15 @@ public class UpdateHandler {
          *  If it is, get the whole thing.
          */
         protected void update() {
-            // TODO:
             // Do a PartialEepGet on the selected URL, check for version we expect,
             // and loop if it isn't what we want.
-            // This will allow us to do a release without waiting for the last host to install the update.
+            // This will allows us to do a release without waiting for the last host to install the update.
             // Alternative: In bytesTransferred(), Check the data in the output file after
             // we've received at least 56 bytes. Need a cancel() method in EepGet ?
 
             boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
             String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
-            int proxyPort = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_PORT, ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT);
+            int proxyPort = ConfigUpdateHandler.proxyPort(_context);
 
             List<String> urls = getUpdateURLs();
             if (urls.isEmpty()) {

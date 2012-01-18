@@ -224,7 +224,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
         String newsURL = ConfigUpdateHelper.getNewsURL(_context);
         boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
         String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
-        int proxyPort = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_PORT, ConfigUpdateHandler.DEFAULT_PROXY_PORT_INT);
+        int proxyPort = ConfigUpdateHandler.proxyPort(_context);
         if (_tempFile.exists())
             _tempFile.delete();
         

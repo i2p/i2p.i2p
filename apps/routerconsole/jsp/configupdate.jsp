@@ -53,7 +53,7 @@
         </tr><tr><td class= "mediumtags" align="right"><b><%=intl._("eepProxy host")%>:</b></td>
           <td><input type="text" size="10" name="proxyHost" value="<jsp:getProperty name="updatehelper" property="proxyHost" />" /></td>
         </tr><tr><td class= "mediumtags" align="right"><b><%=intl._("eepProxy port")%>:</b></td>
-          <td><input type="text" size="4" name="proxyPort" value="<jsp:getProperty name="updatehelper" property="proxyPort" />" /></td></tr>
+          <td><input type="text" size="10" name="proxyPort" value="<jsp:getProperty name="updatehelper" property="proxyPort" />" /></td></tr>
     <% if (updatehelper.canInstall()) { %>
         <tr><td class= "mediumtags" align="right"><b><%=intl._("Update URLs")%>:</b></td>
           <td><textarea name="updateURL" wrap="off" spellcheck="false"><jsp:getProperty name="updatehelper" property="updateURL" /></textarea></td>
