@@ -15,6 +15,8 @@ import java.security.GeneralSecurityException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLServerSocketFactory;
@@ -112,9 +114,10 @@ class SSLClientListenerRunner extends ClientListenerRunner {
             success = ks.exists();
             if (success) {
                 SecureFileOutputStream.setPerms(ks);
-                _context.router().setConfigSetting(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD);
-                _context.router().setConfigSetting(PROP_KEY_PASSWORD, keyPassword);
-                _context.router().saveConfig();
+                Map<String, String> changes = new HashMap();
+                changes.put(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD);
+                changes.put(PROP_KEY_PASSWORD, keyPassword);
+                _context.router().saveConfig(changes, null);
             }
         }
         if (success) {

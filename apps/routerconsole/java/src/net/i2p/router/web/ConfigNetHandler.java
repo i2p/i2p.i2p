@@ -2,6 +2,10 @@ package net.i2p.router.web;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import net.i2p.router.Router;
 import net.i2p.router.transport.FIFOBandwidthRefiller;
@@ -45,6 +49,7 @@ public class ConfigNetHandler extends FormHandler {
     private boolean _enableLoadTesting;
     private String _sharePct;
     private boolean _ratesOnly;
+    private final Map<String, String> changes = new HashMap();
     private static final String PROP_HIDDEN = Router.PROP_HIDDEN_HIDDEN; // see Router for other choice
     
     @Override
@@ -137,6 +142,7 @@ public class ConfigNetHandler extends FormHandler {
      */
     private void saveChanges() {
         boolean restartRequired = false;
+        List<String> removes = new ArrayList();
         
         if (!_ratesOnly) {
             // IP Settings
@@ -153,15 +159,15 @@ public class ConfigNetHandler extends FormHandler {
                     else
                         _udpAutoIP = UDPTransport.DEFAULT_SOURCES;
                 }
-                _context.router().setConfigSetting(UDPTransport.PROP_SOURCES, _udpAutoIP);
+                changes.put(UDPTransport.PROP_SOURCES, _udpAutoIP);
                 boolean valid = true;
                 if (uhost.length() > 0) {
                     valid = verifyAddress(uhost);
                     if (valid) {
-                        _context.router().setConfigSetting(UDPTransport.PROP_EXTERNAL_HOST, uhost);
+                        changes.put(UDPTransport.PROP_EXTERNAL_HOST, uhost);
                     }
                 } else {
-                    _context.router().removeConfigSetting(UDPTransport.PROP_EXTERNAL_HOST);
+                    removes.add(UDPTransport.PROP_EXTERNAL_HOST);
                 }
                 if (valid && ((!oldUdp.equals(_udpAutoIP)) || (!oldUHost.equals(uhost)))) {
                    addFormNotice(_("Updating IP address"));
@@ -187,31 +193,31 @@ public class ConfigNetHandler extends FormHandler {
                 } else if ("false".equals(_ntcpAutoIP) && _ntcpHostname.length() > 0) {
                     valid = verifyAddress(_ntcpHostname);
                     if (valid) {
-                        _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME, _ntcpHostname);
+                        changes.put(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME, _ntcpHostname);
                         addFormNotice(_("Updating inbound TCP address to") + " " + _ntcpHostname);
                     }
                 } else {
-                    _context.router().removeConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME);
+                    removes.add(ConfigNetHelper.PROP_I2NP_NTCP_HOSTNAME);
                     if ("false".equals(_ntcpAutoIP))
                         addFormNotice(_("Disabling inbound TCP"));
                     else
                         addFormNotice(_("Updating inbound TCP address to auto")); // true or always
                 }
                 if (valid) {
-                    _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_IP, _ntcpAutoIP);
-                    _context.router().setConfigSetting(TransportManager.PROP_ENABLE_NTCP, "" + !"disabled".equals(_ntcpAutoIP));
+                    changes.put(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_IP, _ntcpAutoIP);
+                    changes.put(TransportManager.PROP_ENABLE_NTCP, "" + !"disabled".equals(_ntcpAutoIP));
                     restartRequired = true;
                 }
             }
             if (oldAutoPort != _ntcpAutoPort || ! oldNPort.equals(_ntcpPort)) {
                 if (_ntcpPort.length() > 0 && !_ntcpAutoPort) {
-                    _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_PORT, _ntcpPort);
+                    changes.put(ConfigNetHelper.PROP_I2NP_NTCP_PORT, _ntcpPort);
                     addFormNotice(_("Updating inbound TCP port to") + " " + _ntcpPort);
                 } else {
-                    _context.router().removeConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_PORT);
+                    removes.add(ConfigNetHelper.PROP_I2NP_NTCP_PORT);
                     addFormNotice(_("Updating inbound TCP port to auto"));
                 }
-                _context.router().setConfigSetting(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_PORT, "" + _ntcpAutoPort);
+                changes.put(ConfigNetHelper.PROP_I2NP_NTCP_AUTO_PORT, "" + _ntcpAutoPort);
                 restartRequired = true;
             }
 
@@ -219,8 +225,8 @@ public class ConfigNetHandler extends FormHandler {
             if ( (_udpPort != null) && (_udpPort.length() > 0) ) {
                 String oldPort = "" + _context.getProperty(UDPTransport.PROP_INTERNAL_PORT, UDPTransport.DEFAULT_INTERNAL_PORT);
                 if (!oldPort.equals(_udpPort)) {
-                    _context.router().setConfigSetting(UDPTransport.PROP_INTERNAL_PORT, _udpPort);
-                    _context.router().setConfigSetting(UDPTransport.PROP_EXTERNAL_PORT, _udpPort);
+                    changes.put(UDPTransport.PROP_INTERNAL_PORT, _udpPort);
+                    changes.put(UDPTransport.PROP_EXTERNAL_PORT, _udpPort);
                     addFormNotice(_("Updating UDP port from") + " " + oldPort + " " + _("to") + " " + _udpPort);
                     restartRequired = true;
                 }
@@ -228,21 +234,21 @@ public class ConfigNetHandler extends FormHandler {
 
         }
         
-        updateRates();
+        boolean ratesUpdated = updateRates();
         
         boolean switchRequired = false;
         if (!_ratesOnly) {
             // If hidden mode value changes, restart is required
             switchRequired = _hiddenMode != _context.router().isHidden();
             if (switchRequired) {
-                _context.router().setConfigSetting(PROP_HIDDEN, "" + _hiddenMode);
+                changes.put(PROP_HIDDEN, "" + _hiddenMode);
                 if (_hiddenMode)
                     addFormError(_("Gracefully restarting into Hidden Router Mode"));
                 else
                     addFormError(_("Gracefully restarting to exit Hidden Router Mode"));
             }
 
-            _context.router().setConfigSetting(Router.PROP_DYNAMIC_KEYS, "" + _dynamicKeys);
+            changes.put(Router.PROP_DYNAMIC_KEYS, "" + _dynamicKeys);
 
             if (Boolean.valueOf(_context.getProperty(TransportManager.PROP_ENABLE_UPNP)).booleanValue() !=
                 _upnp) {
@@ -252,7 +258,7 @@ public class ConfigNetHandler extends FormHandler {
                 else
                     addFormNotice(_("Disabling UPnP, restart required to take effect"));
             }
-            _context.router().setConfigSetting(TransportManager.PROP_ENABLE_UPNP, "" + _upnp);
+            changes.put(TransportManager.PROP_ENABLE_UPNP, "" + _upnp);
 
             if (Boolean.valueOf(_context.getProperty(UDPTransport.PROP_LAPTOP_MODE)).booleanValue() !=
                 _laptop) {
@@ -262,28 +268,32 @@ public class ConfigNetHandler extends FormHandler {
                 else
                     addFormNotice(_("Disabling laptop mode"));
             }
-            _context.router().setConfigSetting(UDPTransport.PROP_LAPTOP_MODE, "" + _laptop);
+            changes.put(UDPTransport.PROP_LAPTOP_MODE, "" + _laptop);
 
             if (_requireIntroductions) {
-                _context.router().setConfigSetting(UDPTransport.PROP_FORCE_INTRODUCERS, "true");
+                changes.put(UDPTransport.PROP_FORCE_INTRODUCERS, "true");
                 addFormNotice(_("Requiring SSU introducers"));
             } else {
-                _context.router().removeConfigSetting(UDPTransport.PROP_FORCE_INTRODUCERS);
+                removes.add(UDPTransport.PROP_FORCE_INTRODUCERS);
             }
 
             // Time sync enable, means NOT disabled 
             // Hmm router sets this at startup, not required here
-            //_context.router().setConfigSetting(Timestamper.PROP_DISABLED, "false");
+            //changes.put(Timestamper.PROP_DISABLED, "false");
             
             // Hidden in the GUI
             //LoadTestManager.setEnableLoadTesting(_context, _enableLoadTesting);
         }
         
-        boolean saved = _context.router().saveConfig();
+        boolean saved = _context.router().saveConfig(changes, removes);
         if (saved) 
             addFormNotice(_("Configuration saved successfully"));
         else
             addFormError(_("Error saving the configuration (applied but not saved) - please see the error logs"));
+
+        // this has to be after the save
+        if (ratesUpdated)
+            _context.bandwidthLimiter().reinitialize();
         
         if (switchRequired) {
             hiddenSwitch();
@@ -343,14 +353,17 @@ public class ConfigNetHandler extends FormHandler {
     private static final int DEF_BURST_PCT = 10;
     private static final int DEF_BURST_TIME = 20;
 
-    private void updateRates() {
+    /**
+     *  @return changed
+     */
+    private boolean updateRates() {
         boolean updated = false;
         boolean bwUpdated = false;
 
         if (_sharePct != null) {
             String old = _context.router().getConfigSetting(Router.PROP_BANDWIDTH_SHARE_PERCENTAGE);
             if ( (old == null) || (!old.equals(_sharePct)) ) {
-                _context.router().setConfigSetting(Router.PROP_BANDWIDTH_SHARE_PERCENTAGE, _sharePct);
+                changes.put(Router.PROP_BANDWIDTH_SHARE_PERCENTAGE, _sharePct);
                 addFormNotice(_("Updating bandwidth share percentage"));
                 updated = true;
             }
@@ -359,23 +372,23 @@ public class ConfigNetHandler extends FormHandler {
         // Since burst is now hidden in the gui, set burst to +10% for 20 seconds
         if ( (_inboundRate != null) && (_inboundRate.length() > 0) &&
             !_inboundRate.equals(_context.getProperty(FIFOBandwidthRefiller.PROP_INBOUND_BANDWIDTH, "" + FIFOBandwidthRefiller.DEFAULT_INBOUND_BANDWIDTH))) {
-            _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_INBOUND_BANDWIDTH, _inboundRate);
+            changes.put(FIFOBandwidthRefiller.PROP_INBOUND_BANDWIDTH, _inboundRate);
             try {
                 int rate = Integer.parseInt(_inboundRate) * (100 + DEF_BURST_PCT) / 100;
                 int kb = DEF_BURST_TIME * rate;
-                _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_INBOUND_BURST_BANDWIDTH, "" + rate);
-                _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_INBOUND_BANDWIDTH_PEAK, "" + kb);
+                changes.put(FIFOBandwidthRefiller.PROP_INBOUND_BURST_BANDWIDTH, "" + rate);
+                changes.put(FIFOBandwidthRefiller.PROP_INBOUND_BANDWIDTH_PEAK, "" + kb);
             } catch (NumberFormatException nfe) {}
             bwUpdated = true;
         }
         if ( (_outboundRate != null) && (_outboundRate.length() > 0) &&
             !_outboundRate.equals(_context.getProperty(FIFOBandwidthRefiller.PROP_OUTBOUND_BANDWIDTH, "" + FIFOBandwidthRefiller.DEFAULT_OUTBOUND_BANDWIDTH))) {
-            _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_OUTBOUND_BANDWIDTH, _outboundRate);
+            changes.put(FIFOBandwidthRefiller.PROP_OUTBOUND_BANDWIDTH, _outboundRate);
             try {
                 int rate = Integer.parseInt(_outboundRate) * (100 + DEF_BURST_PCT) / 100;
                 int kb = DEF_BURST_TIME * rate;
-                _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_OUTBOUND_BURST_BANDWIDTH, "" + rate);
-                _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_OUTBOUND_BANDWIDTH_PEAK, "" + kb);
+                changes.put(FIFOBandwidthRefiller.PROP_OUTBOUND_BURST_BANDWIDTH, "" + rate);
+                changes.put(FIFOBandwidthRefiller.PROP_OUTBOUND_BANDWIDTH_PEAK, "" + kb);
             } catch (NumberFormatException nfe) {}
             bwUpdated = true;
         }
@@ -389,12 +402,12 @@ public class ConfigNetHandler extends FormHandler {
 
         if ( (_inboundBurstRate != null) && (_inboundBurstRate.length() > 0) &&
             !_inboundBurstRate.equals(_context.getProperty(FIFOBandwidthRefiller.PROP_INBOUND_BURST_BANDWIDTH, "" + FIFOBandwidthRefiller.DEFAULT_INBOUND_BURST_BANDWIDTH))) {
-            _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_INBOUND_BURST_BANDWIDTH, _inboundBurstRate);
+            changes.put(FIFOBandwidthRefiller.PROP_INBOUND_BURST_BANDWIDTH, _inboundBurstRate);
             updated = true;
         }
         if ( (_outboundBurstRate != null) && (_outboundBurstRate.length() > 0) &&
             !_outboundBurstRate.equals(_context.getProperty(FIFOBandwidthRefiller.PROP_OUTBOUND_BURST_BANDWIDTH, "" + FIFOBandwidthRefiller.DEFAULT_OUTBOUND_BURST_BANDWIDTH))) {
-            _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_OUTBOUND_BURST_BANDWIDTH, _outboundBurstRate);
+            changes.put(FIFOBandwidthRefiller.PROP_OUTBOUND_BURST_BANDWIDTH, _outboundBurstRate);
             updated = true;
         }
         
@@ -411,7 +424,7 @@ public class ConfigNetHandler extends FormHandler {
             }
             if ( (rateKBps > 0) && (burstSeconds > 0) ) {
                 int kb = rateKBps * burstSeconds;
-                _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_INBOUND_BANDWIDTH_PEAK, "" + kb);
+                changes.put(FIFOBandwidthRefiller.PROP_INBOUND_BANDWIDTH_PEAK, "" + kb);
                 updated = true;
             }
         }
@@ -429,15 +442,13 @@ public class ConfigNetHandler extends FormHandler {
             }
             if ( (rateKBps > 0) && (burstSeconds > 0) ) {
                 int kb = rateKBps * burstSeconds;
-                _context.router().setConfigSetting(FIFOBandwidthRefiller.PROP_OUTBOUND_BANDWIDTH_PEAK, "" + kb);
+                changes.put(FIFOBandwidthRefiller.PROP_OUTBOUND_BANDWIDTH_PEAK, "" + kb);
                 updated = true;
             }
         }
 
 ***********/
 
-        
-        if (updated)
-            _context.bandwidthLimiter().reinitialize();
+        return updated; 
     }
 }

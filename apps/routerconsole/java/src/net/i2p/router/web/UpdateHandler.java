@@ -275,8 +275,7 @@ public class UpdateHandler {
                     modtime = RFC822Date.parse822Date(lastmod);
                 if (modtime <= 0)
                     modtime = _context.clock().now();
-                _context.router().setConfigSetting(PROP_LAST_UPDATE_TIME, "" + modtime);
-                _context.router().saveConfig();
+                _context.router().saveConfig(PROP_LAST_UPDATE_TIME, "" + modtime);
                 if ("install".equals(policy)) {
                     _log.log(Log.CRIT, "Update was VERIFIED, restarting to install it");
                     updateStatus("<b>" + _("Update verified") + "</b><br>" + _("Restarting"));

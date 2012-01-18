@@ -31,16 +31,14 @@ public class PersistentKeyRing extends KeyRing {
     public SessionKey put(Hash h, SessionKey sk) {
         SessionKey old = super.put(h, sk);
         if (!sk.equals(old)) {
-            _ctx.router().setConfigSetting(PROP_PFX + h.toBase64().replace("=", "$"),
+            _ctx.router().saveConfig(PROP_PFX + h.toBase64().replace("=", "$"),
                                            sk.toBase64());
-            _ctx.router().saveConfig();
         }
         return old;
     }
 
     public SessionKey remove(Hash h) {
-        _ctx.router().removeConfigSetting(PROP_PFX + h.toBase64().replace("=", "$"));
-        _ctx.router().saveConfig();
+        _ctx.router().saveConfig(PROP_PFX + h.toBase64().replace("=", "$"), null);
         return super.remove(h);
     }
 

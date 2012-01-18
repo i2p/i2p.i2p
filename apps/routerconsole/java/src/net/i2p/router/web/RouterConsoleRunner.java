@@ -6,7 +6,9 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.security.KeyStore;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -431,9 +433,10 @@ public class RouterConsoleRunner {
                 SecureFileOutputStream.setPerms(ks);
                 try {
                     RouterContext rctx = (RouterContext) ctx;
-                    rctx.router().setConfigSetting(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD);
-                    rctx.router().setConfigSetting(PROP_KEY_PASSWORD, keyPassword);
-                    rctx.router().saveConfig();
+                    Map<String, String> changes = new HashMap();
+                    changes.put(PROP_KEYSTORE_PASSWORD, DEFAULT_KEYSTORE_PASSWORD);
+                    changes.put(PROP_KEY_PASSWORD, keyPassword);
+                    rctx.router().saveConfig(changes, null);
                 } catch (Exception e) {}  // class cast exception
             }
         }

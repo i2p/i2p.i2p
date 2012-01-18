@@ -282,8 +282,7 @@ class GeoIP {
             return;
         String country = _context.commSystem().getCountry(ourHash);
         if (country != null && !country.equals(oldCountry)) {
-            _context.router().setConfigSetting(PROP_IP_COUNTRY, country);
-            _context.router().saveConfig();
+            _context.router().saveConfig(PROP_IP_COUNTRY, country);
             if (_context.commSystem().isInBadCountry() && _context.getProperty(Router.PROP_HIDDEN_HIDDEN) == null) {
                 String name = fullName(country);
                 if (name == null)

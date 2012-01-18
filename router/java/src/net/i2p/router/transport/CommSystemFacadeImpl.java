@@ -252,9 +252,10 @@ public class CommSystemFacadeImpl extends CommSystemFacade {
         addr.setTransportStyle(NTCPTransport.STYLE);
         //if (isNew) {
             // why save the same thing?
-            ctx.router().setConfigSetting(PROP_I2NP_NTCP_HOSTNAME, name);
-            ctx.router().setConfigSetting(PROP_I2NP_NTCP_PORT, port);
-            ctx.router().saveConfig();
+            Map<String, String> changes = new HashMap();
+            changes.put(PROP_I2NP_NTCP_HOSTNAME, name);
+            changes.put(PROP_I2NP_NTCP_PORT, port);
+            ctx.router().saveConfig(changes, null);
         //}
         return addr;
     }

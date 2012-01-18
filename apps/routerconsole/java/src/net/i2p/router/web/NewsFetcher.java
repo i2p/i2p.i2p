@@ -119,8 +119,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
      */
     public void showNews(boolean yes) {
         long stamp = yes ? 0 : _lastUpdated;
-        _context.router().setConfigSetting(PROP_LAST_HIDDEN, Long.toString(stamp));
-        _context.router().saveConfig();
+        _context.router().saveConfig(PROP_LAST_HIDDEN, Long.toString(stamp));
     }
 
     /**
@@ -283,9 +282,8 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
                     if (lastUpdate == null) {
                         // we don't know what version you have, so stamp it with the current time,
                         // and we'll look for something newer next time around.
-                        _context.router().setConfigSetting(UpdateHandler.PROP_LAST_UPDATE_TIME,
+                        _context.router().saveConfig(UpdateHandler.PROP_LAST_UPDATE_TIME,
                                                            Long.toString(_context.clock().now()));
-                        _context.router().saveConfig();
                         return;
                     }
                     long ms = 0;
@@ -407,8 +405,7 @@ public class NewsFetcher implements Runnable, EepGet.StatusListener {
                 _log.warn("Transfer complete, but no file? - probably 304 Not Modified");
         }
         _lastFetch = now;
-        _context.router().setConfigSetting(PROP_LAST_CHECKED, Long.toString(now));
-        _context.router().saveConfig();
+        _context.router().saveConfig(PROP_LAST_CHECKED, Long.toString(now));
     }
     
     public void transferFailed(String url, long bytesTransferred, long bytesRemaining, int currentAttempt) {

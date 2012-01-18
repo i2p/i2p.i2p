@@ -1,6 +1,8 @@
 package net.i2p.router.web;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.i2p.router.networkdb.reseed.Reseeder;
@@ -10,6 +12,8 @@ import net.i2p.router.networkdb.reseed.Reseeder;
  */
 public class ConfigReseedHandler extends FormHandler {
     private Map _settings;
+    private final Map<String, String> changes = new HashMap();
+    private final List<String> removes = new ArrayList();
     
     @Override
     protected void processForm() {
@@ -47,15 +51,15 @@ public class ConfigReseedHandler extends FormHandler {
     private void saveString(String config, String param) {
         String val = getJettyString(param);
         if (val != null && val.length() > 0)
-            _context.router().setConfigSetting(config, val);
+            changes.put(config, val);
         else
-            _context.router().removeConfigSetting(config);
+            removes.add(config);
     }
 
     /** @since 0.8.9 */
     private void saveBoolean(String config, String param) {
         boolean val = getJettyString(param) != null;
-        _context.router().setConfigSetting(config, Boolean.toString(val));
+        changes.put(config, Boolean.toString(val));
     }
 
     private void saveChanges() {
@@ -71,17 +75,19 @@ public class ConfigReseedHandler extends FormHandler {
         saveBoolean(Reseeder.PROP_SPROXY_AUTH_ENABLE, "sauth");
         String url = getJettyString("reseedURL");
         if (url != null)
-            _context.router().setConfigSetting(Reseeder.PROP_RESEED_URL, url.trim().replace("\r\n", ",").replace("\n", ","));
+            changes.put(Reseeder.PROP_RESEED_URL, url.trim().replace("\r\n", ",").replace("\n", ","));
         String mode = getJettyString("mode");
         boolean req = "1".equals(mode);
         boolean disabled = "2".equals(mode);
-        _context.router().setConfigSetting(Reseeder.PROP_SSL_REQUIRED,
+        changes.put(Reseeder.PROP_SSL_REQUIRED,
                                            Boolean.toString(req));
-        _context.router().setConfigSetting(Reseeder.PROP_SSL_DISABLE,
+        changes.put(Reseeder.PROP_SSL_DISABLE,
                                            Boolean.toString(disabled));
         saveBoolean(Reseeder.PROP_PROXY_ENABLE, "enable");
         saveBoolean(Reseeder.PROP_SPROXY_ENABLE, "senable");
-        _context.router().saveConfig();
-        addFormNotice(_("Configuration saved successfully."));
+        if (_context.router().saveConfig(changes, removes))
+            addFormNotice(_("Configuration saved successfully."));
+        else
+            addFormError(_("Error saving the configuration (applied but not saved) - please see the error logs"));
     }
 }

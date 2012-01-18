@@ -1,7 +1,9 @@
 package net.i2p.router.web;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import net.i2p.stat.StatManager;
@@ -73,9 +75,10 @@ public class ConfigStatsHandler extends FormHandler {
      *
      */
     private void saveChanges() {
+        Map<String, String> changes = new HashMap();
         if (_filename == null)
             _filename = StatManager.DEFAULT_STAT_FILE;
-        _context.router().setConfigSetting(StatManager.PROP_STAT_FILE, _filename);
+        changes.put(StatManager.PROP_STAT_FILE, _filename);
         
         if (_explicitFilter) {
             _stats.clear();
@@ -103,12 +106,12 @@ public class ConfigStatsHandler extends FormHandler {
                 stats.append(',');
         }
             
-        _context.router().setConfigSetting(StatManager.PROP_STAT_FILTER, stats.toString());
+        changes.put(StatManager.PROP_STAT_FILTER, stats.toString());
         boolean graphsChanged = !_graphs.equals(_context.getProperty("stat.summaries"));
-        _context.router().setConfigSetting("stat.summaries", _graphs);
+        changes.put("stat.summaries", _graphs);
         boolean fullChanged = _context.getBooleanProperty(StatManager.PROP_STAT_FULL) != _isFull;
-        _context.router().setConfigSetting(StatManager.PROP_STAT_FULL, "" + _isFull);
-        _context.router().saveConfig();
+        changes.put(StatManager.PROP_STAT_FULL, "" + _isFull);
+        _context.router().saveConfig(changes, null);
         if (!_stats.isEmpty())
             addFormNotice(_("Stat filter and location updated successfully to") + ": " + stats.toString());
         if (fullChanged) {

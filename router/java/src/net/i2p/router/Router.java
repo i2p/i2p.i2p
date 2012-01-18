@@ -660,9 +660,11 @@ public class Router implements RouterClock.ClockShiftListener {
         }
 
         // now that we have random ports, keeping the same port would be bad
-        removeConfigSetting(UDPTransport.PROP_INTERNAL_PORT);
-        removeConfigSetting(UDPTransport.PROP_EXTERNAL_PORT);
-        saveConfig();
+        synchronized(this) {
+            removeConfigSetting(UDPTransport.PROP_INTERNAL_PORT);
+            removeConfigSetting(UDPTransport.PROP_EXTERNAL_PORT);
+            saveConfig();
+        }
 
         if (remCount > 0) {
             FileOutputStream log = null;
@@ -1061,8 +1063,7 @@ public class Router implements RouterClock.ClockShiftListener {
 
         // Set the last version to the current version, since 0.8.13
         if (!RouterVersion.VERSION.equals(_config.get("router.previousVersion"))) {
-            _config.put("router.previousVersion", RouterVersion.VERSION);
-            saveConfig();
+            saveConfig("router.previousVersion", RouterVersion.VERSION);
         }
 
         _context.removeShutdownTasks();
@@ -1301,7 +1302,7 @@ public class Router implements RouterClock.ClockShiftListener {
             _config.putAll(toAdd);
         if (toRemove != null) {
             for (String s : toRemove) {
-                _config.remove(toRemove);
+                _config.remove(s);
             }
         }
         return saveConfig();

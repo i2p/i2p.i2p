@@ -44,6 +44,7 @@ public class ConfigTunnelsHandler extends FormHandler {
      */
     private void saveChanges() {
         boolean saveRequired = false;
+        Map<String, String> changes = new HashMap();
         
         if (_log.shouldLog(Log.DEBUG))
             _log.debug("Saving changes, with props = " + _settings + ".");
@@ -90,21 +91,21 @@ public class ConfigTunnelsHandler extends FormHandler {
             out.setBackupQuantity(getInt(_settings.get(index + ".backupOutbound")));
             
             if ("exploratory".equals(poolName)) {
-                _context.router().setConfigSetting(TunnelPoolSettings.PREFIX_INBOUND_EXPLORATORY + 
+                changes.put(TunnelPoolSettings.PREFIX_INBOUND_EXPLORATORY + 
                                                    TunnelPoolSettings.PROP_LENGTH, in.getLength()+"");
-                _context.router().setConfigSetting(TunnelPoolSettings.PREFIX_OUTBOUND_EXPLORATORY + 
+                changes.put(TunnelPoolSettings.PREFIX_OUTBOUND_EXPLORATORY + 
                                                    TunnelPoolSettings.PROP_LENGTH, out.getLength()+"");
-                _context.router().setConfigSetting(TunnelPoolSettings.PREFIX_INBOUND_EXPLORATORY + 
+                changes.put(TunnelPoolSettings.PREFIX_INBOUND_EXPLORATORY + 
                                                    TunnelPoolSettings.PROP_LENGTH_VARIANCE, in.getLengthVariance()+"");
-                _context.router().setConfigSetting(TunnelPoolSettings.PREFIX_OUTBOUND_EXPLORATORY + 
+                changes.put(TunnelPoolSettings.PREFIX_OUTBOUND_EXPLORATORY + 
                                                    TunnelPoolSettings.PROP_LENGTH_VARIANCE, out.getLengthVariance()+"");
-                _context.router().setConfigSetting(TunnelPoolSettings.PREFIX_INBOUND_EXPLORATORY + 
+                changes.put(TunnelPoolSettings.PREFIX_INBOUND_EXPLORATORY + 
                                                    TunnelPoolSettings.PROP_QUANTITY, in.getQuantity()+"");
-                _context.router().setConfigSetting(TunnelPoolSettings.PREFIX_OUTBOUND_EXPLORATORY + 
+                changes.put(TunnelPoolSettings.PREFIX_OUTBOUND_EXPLORATORY + 
                                                    TunnelPoolSettings.PROP_QUANTITY, out.getQuantity()+"");
-                _context.router().setConfigSetting(TunnelPoolSettings.PREFIX_INBOUND_EXPLORATORY + 
+                changes.put(TunnelPoolSettings.PREFIX_INBOUND_EXPLORATORY + 
                                                    TunnelPoolSettings.PROP_BACKUP_QUANTITY, in.getBackupQuantity()+"");
-                _context.router().setConfigSetting(TunnelPoolSettings.PREFIX_OUTBOUND_EXPLORATORY + 
+                changes.put(TunnelPoolSettings.PREFIX_OUTBOUND_EXPLORATORY + 
                                                    TunnelPoolSettings.PROP_BACKUP_QUANTITY, out.getBackupQuantity()+"");
             }
             
@@ -135,7 +136,7 @@ public class ConfigTunnelsHandler extends FormHandler {
             addFormNotice(_("Updated settings for all pools."));
         
         if (saveRequired) {
-            boolean saved = _context.router().saveConfig();
+            boolean saved = _context.router().saveConfig(changes, null);
             if (saved) 
                 addFormNotice(_("Exploratory tunnel configuration saved successfully."));
             else

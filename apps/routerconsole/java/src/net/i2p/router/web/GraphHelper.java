@@ -3,8 +3,10 @@ package net.i2p.router.web;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 
 import net.i2p.data.DataHelper;
@@ -216,8 +218,7 @@ public class GraphHelper extends FormHandler {
                          System.getProperty("java.runtime.version") + ')');
             if (_context.getProperty(PROP_REFRESH, 0) >= 0) {
                 // force no refresh, save silently
-                _context.router().setConfigSetting(PROP_REFRESH, "-1");
-                _context.router().saveConfig();
+                _context.router().saveConfig(PROP_REFRESH, "-1");
             }
         }
         return super.getAllMessages();
@@ -243,13 +244,14 @@ public class GraphHelper extends FormHandler {
             _refreshDelaySeconds != _context.getProperty(PROP_REFRESH, DEFAULT_REFRESH) ||
             _showEvents != _context.getBooleanProperty(PROP_EVENTS) ||
             _persistent != _context.getBooleanPropertyDefaultTrue(SummaryListener.PROP_PERSISTENT)) {
-            _context.router().setConfigSetting(PROP_X, "" + _width);
-            _context.router().setConfigSetting(PROP_Y, "" + _height);
-            _context.router().setConfigSetting(PROP_PERIODS, "" + _periodCount);
-            _context.router().setConfigSetting(PROP_REFRESH, "" + _refreshDelaySeconds);
-            _context.router().setConfigSetting(PROP_EVENTS, "" + _showEvents);
-            _context.router().setConfigSetting(SummaryListener.PROP_PERSISTENT, "" + _persistent);
-            _context.router().saveConfig();
+            Map<String, String> changes = new HashMap();
+            changes.put(PROP_X, "" + _width);
+            changes.put(PROP_Y, "" + _height);
+            changes.put(PROP_PERIODS, "" + _periodCount);
+            changes.put(PROP_REFRESH, "" + _refreshDelaySeconds);
+            changes.put(PROP_EVENTS, "" + _showEvents);
+            changes.put(SummaryListener.PROP_PERSISTENT, "" + _persistent);
+            _context.router().saveConfig(changes, null);
             addFormNotice(_("Graph settings saved"));
         }
     }

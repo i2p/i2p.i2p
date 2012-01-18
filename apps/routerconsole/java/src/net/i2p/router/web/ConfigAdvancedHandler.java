@@ -53,18 +53,11 @@ public class ConfigAdvancedHandler extends FormHandler {
                 return;
             }
 
-            for (Map.Entry e : props.entrySet()) {
-                String key = (String) e.getKey();
-                String val = (String) e.getValue();
-                _context.router().setConfigSetting(key, val);
+            for (Object key : props.keySet()) {
                 unsetKeys.remove(key);
             }
 
-            for (String unsetKey : unsetKeys) {
-                _context.router().removeConfigSetting(unsetKey);
-            }
-
-            boolean saved = _context.router().saveConfig();
+            boolean saved = _context.router().saveConfig(props, unsetKeys);
             if (saved) 
                 addFormNotice(_("Configuration saved successfully"));
             else

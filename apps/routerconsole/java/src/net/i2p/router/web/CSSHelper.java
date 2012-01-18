@@ -38,8 +38,7 @@ public class CSSHelper extends HelperBase {
     public void setLang(String lang) {
         // Protected with nonce in css.jsi
         if (lang != null && lang.length() == 2 && !lang.equals(_context.getProperty(Messages.PROP_LANG))) {
-            _context.router().setConfigSetting(Messages.PROP_LANG, lang);
-            _context.router().saveConfig();
+            _context.router().saveConfig(Messages.PROP_LANG, lang);
         }
     }
 
@@ -61,8 +60,7 @@ public class CSSHelper extends HelperBase {
 
     /** change refresh and save it */
     public void setRefresh(String r) {
-        _context.router().setConfigSetting(PROP_REFRESH, r);
-        _context.router().saveConfig();
+        _context.router().saveConfig(PROP_REFRESH, r);
     }
 
     /** @return refresh time in seconds, as a string */

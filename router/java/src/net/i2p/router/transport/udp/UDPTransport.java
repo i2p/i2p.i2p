@@ -319,9 +319,10 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         if (newPort != port || newPort != oldIPort || newPort != oldEPort) {
             // attempt to use it as our external port - this will be overridden by
             // externalAddressReceived(...)
-            _context.router().setConfigSetting(PROP_INTERNAL_PORT, newPort+"");
-            _context.router().setConfigSetting(PROP_EXTERNAL_PORT, newPort+"");
-            _context.router().saveConfig();
+            Map<String, String> changes = new HashMap();
+            changes.put(PROP_INTERNAL_PORT, newPort+"");
+            changes.put(PROP_EXTERNAL_PORT, newPort+"");
+            _context.router().saveConfig(changes, null);
         }
 
         _establisher.startup();
@@ -560,8 +561,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _context.statManager().addRateData("udp.addressTestInsteadOfUpdate", 1, 0);
         } else if (updated) {
             _context.statManager().addRateData("udp.addressUpdated", 1, 0);
+            Map<String, String> changes = new HashMap();
             if (!fixedPort)
-                _context.router().setConfigSetting(PROP_EXTERNAL_PORT, ourPort+"");
+                changes.put(PROP_EXTERNAL_PORT, ourPort+"");
             // queue a country code lookup of the new IP
             _context.commSystem().queueLookup(ourIP);
             // store these for laptop-mode (change ident on restart... or every time... when IP changes)
@@ -576,9 +578,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     } catch (NumberFormatException nfe) {}
                 }
 
-                _context.router().setConfigSetting(PROP_IP, _externalListenHost.getHostAddress());
-                _context.router().setConfigSetting(PROP_IP_CHANGE, "" + now);
-                _context.router().saveConfig();
+                changes.put(PROP_IP, _externalListenHost.getHostAddress());
+                changes.put(PROP_IP_CHANGE, "" + now);
+                _context.router().saveConfig(changes, null);
 
                 // laptop mode
                 // For now, only do this at startup
@@ -596,6 +598,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     _context.router().shutdown(Router.EXIT_HARD_RESTART);
                     // doesn't return
                 }
+            } else if (!fixedPort) {
+                // save PROP_EXTERNAL_PORT
+                _context.router().saveConfig(changes, null);
             }
             _context.router().rebuildRouterInfo();
         }

@@ -22,11 +22,12 @@ public class ConfigUIHandler extends FormHandler {
         if (_config == null)
             return;
         String oldTheme = _context.getProperty(CSSHelper.PROP_THEME_NAME, CSSHelper.DEFAULT_THEME);
+        boolean ok;
         if (_config.equals("default")) // obsolete
-            _context.router().removeConfigSetting(CSSHelper.PROP_THEME_NAME);
+            ok = _context.router().saveConfig(CSSHelper.PROP_THEME_NAME, null);
         else
-            _context.router().setConfigSetting(CSSHelper.PROP_THEME_NAME, _config);
-        if (_context.router().saveConfig()) {
+            ok = _context.router().saveConfig(CSSHelper.PROP_THEME_NAME, _config);
+        if (ok) {
             if (!oldTheme.equals(_config))
                 addFormNotice(_("Theme change saved.") +
                               " <a href=\"configui\">" +
