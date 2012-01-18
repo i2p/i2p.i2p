@@ -1,3 +1,15 @@
+2012-01-18 zzz
+  * I2PTunnel: Register ports with the PortMapper
+  * Router:
+    - Use new synchronized change-and-save-config methods
+      to eliminate races with ReadConfigJob
+  * Tunnels:
+    - When a peer is shitlisted, fail all our tunnels where
+      that peer is the adjacent hop. In particular this
+      will remove outbound tunnels when we can't contact
+      the first hop, and enable quicker recovery.
+  * Update: Find the proxy port in the PortMapper
+
 2012-01-16 hottuna
   * Router:
     - Don't throttle tunnel creation if using a higher
