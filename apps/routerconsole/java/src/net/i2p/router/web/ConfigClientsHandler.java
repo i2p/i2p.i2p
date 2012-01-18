@@ -328,6 +328,10 @@ public class ConfigClientsHandler extends FormHandler {
 
     /** @since 0.8.13 */
     private void updateAllPlugins() {
+        if ("true".equals(System.getProperty(UpdateHandler.PROP_UPDATE_IN_PROGRESS))) {
+            addFormError(_("Plugin or update download already in progress."));
+            return;
+        }
         addFormNotice(_("Updating all plugins"));
         PluginStarter.updateAll(_context);
         // So that update() will post a status to the summary bar before we reload
@@ -387,31 +391,34 @@ public class ConfigClientsHandler extends FormHandler {
      *  @since 0.8.3
      */
     private void saveInterfaceChanges() {
+        Map<String, String> changes = new HashMap();
         String port = getJettyString("port");
         if (port != null)
-            _context.router().setConfigSetting(ClientManagerFacadeImpl.PROP_CLIENT_PORT, port);
+            changes.put(ClientManagerFacadeImpl.PROP_CLIENT_PORT, port);
         String intfc = getJettyString("interface");
         if (intfc != null)
-            _context.router().setConfigSetting(ClientManagerFacadeImpl.PROP_CLIENT_HOST, intfc);
+            changes.put(ClientManagerFacadeImpl.PROP_CLIENT_HOST, intfc);
         String user = getJettyString("user");
         if (user != null)
-            _context.router().setConfigSetting(ConfigClientsHelper.PROP_USER, user);
+            changes.put(ConfigClientsHelper.PROP_USER, user);
         String pw = getJettyString("pw");
         if (pw != null)
-            _context.router().setConfigSetting(ConfigClientsHelper.PROP_PW, pw);
+            changes.put(ConfigClientsHelper.PROP_PW, pw);
         String mode = getJettyString("mode");
         boolean disabled = "0".equals(mode);
         boolean ssl = "2".equals(mode);
-        _context.router().setConfigSetting(ConfigClientsHelper.PROP_DISABLE_EXTERNAL,
+        changes.put(ConfigClientsHelper.PROP_DISABLE_EXTERNAL,
                                            Boolean.toString(disabled));
-        _context.router().setConfigSetting(ConfigClientsHelper.PROP_ENABLE_SSL,
+        changes.put(ConfigClientsHelper.PROP_ENABLE_SSL,
                                            Boolean.toString(ssl));
-        _context.router().setConfigSetting(ConfigClientsHelper.PROP_AUTH,
+        changes.put(ConfigClientsHelper.PROP_AUTH,
                                            Boolean.toString((_settings.get("auth") != null)));
         boolean all = "0.0.0.0".equals(intfc) || "0:0:0:0:0:0:0:0".equals(intfc) ||
                       "::".equals(intfc);
-        _context.router().setConfigSetting(ConfigClientsHelper.BIND_ALL_INTERFACES, Boolean.toString(all));
-        _context.router().saveConfig();
-        addFormNotice(_("Interface configuration saved successfully - restart required to take effect."));
+        changes.put(ConfigClientsHelper.BIND_ALL_INTERFACES, Boolean.toString(all));
+        if (_context.router().saveConfig(changes, null))
+            addFormNotice(_("Interface configuration saved successfully - restart required to take effect."));
+        else
+            addFormError(_("Error saving the configuration (applied but not saved) - please see the error logs"));
     }
 }
