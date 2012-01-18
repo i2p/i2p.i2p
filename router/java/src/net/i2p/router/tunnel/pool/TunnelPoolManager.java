@@ -644,4 +644,57 @@ public class TunnelPoolManager implements TunnelManagerFacade {
     public TunnelPool getOutboundExploratoryPool() {
         return _outboundExploratory;
     }
+
+    /**
+     *  Fail all outbound tunnels with this peer as first hop,
+     *  and all inbound tunnels with this peer as the last hop,
+     *  baecause we can't contact it any more.
+     *  This is most likely to be triggered by an outbound tunnel.
+     *
+     *  @since 0.8.13
+     */
+    public void fail(Hash peer) {
+        if (_outboundExploratory != null)
+            failTunnelsWithFirstHop(_outboundExploratory, peer);
+        for (TunnelPool pool : _clientOutboundPools.values()) {
+            failTunnelsWithFirstHop(pool, peer);
+        }
+        if (_inboundExploratory != null)
+            failTunnelsWithLastHop(_inboundExploratory, peer);
+        for (TunnelPool pool : _clientInboundPools.values()) {
+            failTunnelsWithLastHop(pool, peer);
+        }
+    }
+
+    /**
+     *  Fail all (outbound) tunnels with this peer as first hop (not counting us)
+     *
+     *  @since 0.8.13
+     */
+    private void failTunnelsWithFirstHop(TunnelPool pool, Hash peer) {
+        for (TunnelInfo tun : pool.listTunnels()) {
+            int len = tun.getLength();
+            if (len > 1 && tun.getPeer(1).equals(peer)) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Removing OB tunnel, first hop shitlisted: " + tun);
+                pool.tunnelFailed(tun, peer);
+            }
+        }
+    }
+
+    /**
+     *  Fail all (inbound) tunnels with this peer as last hop (not counting us)
+     *
+     *  @since 0.8.13
+     */
+    private void failTunnelsWithLastHop(TunnelPool pool, Hash peer) {
+        for (TunnelInfo tun : pool.listTunnels()) {
+            int len = tun.getLength();
+            if (len > 1 && tun.getPeer(len - 2).equals(peer)) {
+                if (_log.shouldLog(Log.WARN))
+                    _log.warn("Removing IB tunnel, prev. hop shitlisted: " + tun);
+                pool.tunnelFailed(tun, peer);
+            }
+        }
+    }
 }

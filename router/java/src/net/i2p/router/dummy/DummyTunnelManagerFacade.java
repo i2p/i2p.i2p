@@ -70,4 +70,5 @@ public class DummyTunnelManagerFacade implements TunnelManagerFacade {
     public Map<Hash, TunnelPool> getOutboundClientPools() { return null; }
     public TunnelPool getInboundExploratoryPool() { return null; }
     public TunnelPool getOutboundExploratoryPool() { return null; }
+    public void fail(Hash peer) {}
 }

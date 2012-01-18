@@ -165,4 +165,7 @@ public interface TunnelManagerFacade extends Service {
     public TunnelPool getInboundExploratoryPool();
     /** for TunnelRenderer in router console */
     public TunnelPool getOutboundExploratoryPool();
+
+    /** @since 0.8.13 */
+    public void fail(Hash peer);
 }

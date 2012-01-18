@@ -198,6 +198,7 @@ public class Shitlist {
         if (transport == null) {
             // we hate the peer on *any* transport
             _context.netDb().fail(peer);
+            _context.tunnelManager().fail(peer);
         }
         //_context.tunnelManager().peerFailed(peer);
         //_context.messageRegistry().peerFailed(peer);

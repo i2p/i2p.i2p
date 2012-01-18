@@ -486,8 +486,30 @@ public class TunnelPool {
         }
     }
 
-    /** This may be called multiple times from TestJob */
-    void tunnelFailed(PooledTunnelCreatorConfig cfg) {
+    /**
+     *  Remove the tunnel and blame all the peers (not necessarily equally).
+     *  This may be called multiple times from TestJob.
+     */
+    void tunnelFailed(TunnelInfo cfg) {
+        fail(cfg);
+        tellProfileFailed(cfg);
+    }
+
+    /**
+     *  Remove the tunnel and blame only one peer.
+     *  This may be called multiple times.
+     *
+     *  @since 0.8.13
+     */
+    void tunnelFailed(TunnelInfo cfg, Hash blamePeer) {
+        fail(cfg);
+        _context.profileManager().tunnelFailed(blamePeer, 100);
+    }
+
+    /**
+     *  Remove the tunnel.
+     */
+    private void fail(TunnelInfo cfg) {
         if (_log.shouldLog(Log.WARN))
             _log.warn(toString() + ": Tunnel failed: " + cfg);
         LeaseSet ls = null;
@@ -504,7 +526,6 @@ public class TunnelPool {
         }
         
         _manager.tunnelFailed();
-        tellProfileFailed(cfg);
         
         _lifetimeProcessed += cfg.getProcessedMessagesCount();
         updateRate();
@@ -516,9 +537,11 @@ public class TunnelPool {
         }
     }
 
-    // Blame all the other peers in the tunnel, with a probability
-    // inversely related to the tunnel length
-    private void tellProfileFailed(PooledTunnelCreatorConfig cfg) {
+    /**
+     *  Blame all the other peers in the tunnel, with a probability
+     *  inversely related to the tunnel length
+     */
+    private void tellProfileFailed(TunnelInfo cfg) {
         int len = cfg.getLength();
         if (len < 2)
             return;
@@ -543,7 +566,7 @@ public class TunnelPool {
         }
     }
 
-    void updateRate() {
+    private void updateRate() {
         long now = _context.clock().now();
         long et = now - _lastRateUpdate;
         if (et > 2*60*1000) {
