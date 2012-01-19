@@ -1468,6 +1468,9 @@ public class DataHelper {
         return rv;
     }
 
+    private static final String escapeChars[] = {"&", "\"", "<", ">"};
+    private static final String escapeCodes[] = {"&amp;", "&quot;", "&lt;", "&gt;"};
+
     /**
      * Escape a string for inclusion in HTML
      * @param unescaped the unescaped string, may be null
@@ -1475,15 +1478,9 @@ public class DataHelper {
      */
     public static String escapeHTML(String unescaped) {
         if (unescaped == null) return null;
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("\"","&quot;");
-        map.put("<","&lt;");
-        map.put(">","&gt;");
-        String escaped = unescaped.replaceAll("&","&amp;");
-        for (Map.Entry<String, String> entry : map.entrySet()) {
-            String k = entry.getKey();
-            String v = entry.getValue();
-            escaped = escaped.replaceAll(k, v);
+        String escaped = unescaped;
+        for (int i = 0; i < escapeChars.length; i++) {
+            escaped = escaped.replaceAll(escapeChars[i], escapeCodes[i]);
         }
         return escaped;
     }
@@ -1495,16 +1492,9 @@ public class DataHelper {
      */
     public static String unescapeHTML(String escaped) {
         if (escaped == null) return null;
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("&amp;","&");
-        map.put("&quot;","\"");
-        map.put("&lt;","<");
-        map.put("&gt;",">");
         String unescaped = escaped;
-        for (Map.Entry<String, String> entry : map.entrySet()) {
-            String k = entry.getKey();
-            String v = entry.getValue();
-            unescaped = unescaped.replaceAll(k, v);
+        for (int i = 0; i < escapeChars.length; i++) {
+            unescaped = unescaped.replaceAll(escapeCodes[i], escapeChars[i]);
         }
         return unescaped;
     }
