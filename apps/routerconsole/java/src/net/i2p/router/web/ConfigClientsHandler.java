@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import net.i2p.data.DataHelper;
 import net.i2p.router.client.ClientManagerFacadeImpl;
 import net.i2p.router.startup.ClientAppConfig;
 import net.i2p.router.startup.LoadClientAppsJob;
@@ -170,7 +169,7 @@ public class ConfigClientsHandler extends FormHandler {
             if (! ("webConsole".equals(ca.clientName) || "Web console".equals(ca.clientName)))
                 ca.disabled = val == null;
             // edit of an existing entry
-            String desc = DataHelper.unescapeHTML(getJettyString("desc" + cur));
+            String desc = getJettyString("desc" + cur);
             if (desc != null) {
                 int spc = desc.indexOf(" ");
                 String clss = desc;
@@ -186,7 +185,7 @@ public class ConfigClientsHandler extends FormHandler {
         }
 
         int newClient = clients.size();
-        String newDesc = DataHelper.unescapeHTML(getJettyString("desc" + newClient));
+        String newDesc = getJettyString("desc" + newClient);
         if (newDesc != null && newDesc.trim().length() > 0) {
             // new entry
             int spc = newDesc.indexOf(" ");
