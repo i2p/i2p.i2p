@@ -1,3 +1,9 @@
+2012-01-20 sponge
+  * Fix too short of delay for http. It is up to the browser to time out
+    in a shorter time, not the proxy. This is wreaking havoc on large
+    downloads, similar to the issues that we had in the distant past with
+    jetty's default timeout being too short.
+
 2012-01-18 zzz
   * I2PTunnel: Register ports with the PortMapper
   * Router:

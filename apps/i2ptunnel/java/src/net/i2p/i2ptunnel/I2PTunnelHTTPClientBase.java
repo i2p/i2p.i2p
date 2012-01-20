@@ -56,7 +56,7 @@ public abstract class I2PTunnelHTTPClientBase extends I2PTunnelClientBase implem
         }
     }
 
-    protected static final int DEFAULT_READ_TIMEOUT = 60*1000;
+    protected static final int DEFAULT_READ_TIMEOUT = 5*60*1000;
     
     protected static long __requestId = 0;
 
