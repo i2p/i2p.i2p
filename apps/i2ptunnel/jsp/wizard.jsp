@@ -1,0 +1,89 @@
+<%
+    // NOTE: Do the header carefully so there is no whitespace before the <?xml... line
+
+%><%@page pageEncoding="UTF-8"
+%><%@page contentType="text/html" import="net.i2p.i2ptunnel.web.WizardBean"
+%><?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<jsp:useBean class="net.i2p.i2ptunnel.web.WizardBean" id="wizardBean" scope="request" />
+<jsp:useBean class="net.i2p.i2ptunnel.web.Messages" id="intl" scope="request" />
+<% String pageStr = request.getParameter("page");
+   int curPage = 1;
+   if (pageStr != null) {
+     try {
+       curPage = Integer.parseInt(pageStr);
+       if (curPage > 7 || curPage <= 0) {
+         curPage = 1;
+       }
+     } catch (NumberFormatException nfe) {
+       curPage = 1;
+     }
+   }
+%>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title><%=intl._("I2P Tunnel Manager - Tunnel Creation Wizard")%></title>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+    <link href="/themes/console/images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
+    
+    <% if (wizardBean.allowCSS()) {
+  %><link href="<%=wizardBean.getTheme()%>default.css" rel="stylesheet" type="text/css" /> 
+    <link href="<%=wizardBean.getTheme()%>i2ptunnel.css" rel="stylesheet" type="text/css" />
+    <% }
+  %>
+</head>
+<body id="tunnelWizardPage">
+    <div id="pageHeader">
+    </div>
+
+    <form method="post" action="wizard">
+
+        <div id="wizardPanel" class="panel">
+            <div class="header">
+                <%
+                if (curPage == 1) {
+                  %><h4><%=intl._("Page 1")%></h4><%
+                } %>
+                <input type="hidden" name="page" value="<%=request.getParameter("page")%>" />
+                <input type="hidden" name="nonce" value="<%=wizardBean.getNextNonce()%>" />
+            </div>
+
+            <div class="separator">
+                <hr />
+            </div>
+
+            <%
+            if (curPage == 1) {
+            %><div id="typeField" class="rowItem">
+                <label for="type">
+                    <%=intl._("Tunnel Type")%>:
+                </label>
+                <label><%=intl._("Server Tunnel")%></label>
+                <input value="0" type="radio" id="baseType" name="isClient" class="tickbox" />
+                <label><%=intl._("Client Tunnel")%></label>
+                <input value="1" type="radio" id="baseType" name="isClient" class="tickbox" />
+            </div><%
+            } else {
+            %><input type="hidden" name="isClient" value="<%=wizardBean.getIsClient()%>" /><%
+            } %>
+        </div>
+
+        <div id="globalOperationsPanel" class="panel">
+            <div class="header"></div>
+            <div class="footer">
+                <div class=toolbox">
+                    <button id="controlCancel" class="control" type="submit" name="action" value="" title="Cancel"><%=intl._("Cancel")%></button>
+                    <button id="controlNext" accesskey="N" class="control" type="submit" name="action" value="Next page" title="Next Page"><%=intl._("Next")%>(<span class="accessKey">N</span>)</button>
+                    <button id="controlFinish" accesskey="F" class="control" type="submit" name="action" value="Finish wizard" title="Finish Wizard"><%=intl._("Finish")%>(<span class="accessKey">F</span>)</button>
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+    <div id="pageFooter">
+    </div>
+</body>
+</html>
