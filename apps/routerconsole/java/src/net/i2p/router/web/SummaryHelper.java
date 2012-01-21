@@ -27,6 +27,8 @@ import net.i2p.stat.RateStat;
 /**
  * Simple helper to query the appropriate router for data necessary to render
  * the summary sections on the router console.  
+ *
+ * For the full summary bar use renderSummaryBar()
  */
 public class SummaryHelper extends HelperBase {
 
@@ -602,6 +604,62 @@ public class SummaryHelper extends HelperBase {
 
     public String getUnsignedUpdateVersion() { 
         return NewsFetcher.getInstance(_context).unsignedUpdateVersion();
+    }
+
+    /**
+     *  The update status and buttons
+     *  @since 0.8.13 moved from SummaryBarRenderer
+     */
+    public String getUpdateStatus() {
+        StringBuilder buf = new StringBuilder(512);
+        // display all the time so we display the final failure message, and plugin update messages too
+        String status = UpdateHandler.getStatus();
+        if (status.length() > 0) {
+            buf.append("<h4>").append(status).append("</h4><hr>\n");
+        }
+        if (updateAvailable() || unsignedUpdateAvailable()) {
+            if ("true".equals(System.getProperty(UpdateHandler.PROP_UPDATE_IN_PROGRESS))) {
+                // nothing
+            } else if(
+                      // isDone() is always false for now, see UpdateHandler
+                      // ((!update.isDone()) &&
+                      getAction() == null &&
+                      getUpdateNonce() == null &&
+                      ConfigRestartBean.getRestartTimeRemaining() > 12*60*1000) {
+                long nonce = _context.random().nextLong();
+                String prev = System.getProperty("net.i2p.router.web.UpdateHandler.nonce");
+                if (prev != null)
+                    System.setProperty("net.i2p.router.web.UpdateHandler.noncePrev", prev);
+                System.setProperty("net.i2p.router.web.UpdateHandler.nonce", nonce+"");
+                String uri = getRequestURI();
+                buf.append("<form action=\"").append(uri).append("\" method=\"POST\">\n");
+                buf.append("<input type=\"hidden\" name=\"updateNonce\" value=\"").append(nonce).append("\" >\n");
+                if (updateAvailable()) {
+                    buf.append("<button type=\"submit\" class=\"download\" name=\"updateAction\" value=\"signed\" >")
+                       // Note to translators: parameter is a version, e.g. "0.8.4"
+                       .append(_("Download {0} Update", getUpdateVersion()))
+                       .append("</button><br>\n");
+                }
+                if (unsignedUpdateAvailable()) {
+                    buf.append("<button type=\"submit\" class=\"download\" name=\"updateAction\" value=\"Unsigned\" >")
+                       // Note to translators: parameter is a date and time, e.g. "02-Mar 20:34 UTC"
+                       // <br> is optional, to help the browser make the lines even in the button
+                       // If the translation is shorter than the English, you should probably not include <br>
+                       .append(_("Download Unsigned<br>Update {0}", getUnsignedUpdateVersion()))
+                       .append("</button><br>\n");
+                }
+                buf.append("</form>\n");
+            }
+        }
+        return buf.toString();
+    }
+
+    /**
+     *  The restart status and buttons
+     *  @since 0.8.13 moved from SummaryBarRenderer
+     */
+    public String getRestartStatus() {
+        return ConfigRestartBean.renderStatus(getRequestURI(), getAction(), getConsoleNonce());
     }
 
     /** output the summary bar to _out */
