@@ -1,4 +1,5 @@
 <%@page contentType="text/html"%>
+<%@page trimDirectiveWhitespaces="true"%>
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <%
@@ -11,7 +12,7 @@
 </head><body>
 <%@include file="summary.jsi" %>
 <jsp:useBean class="net.i2p.router.web.OldConsoleHelper" id="conhelper" scope="request" />
-<jsp:setProperty name="conhelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
+<jsp:setProperty name="conhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <% conhelper.storeWriter(out); %>
  <h1>I2P Router &raquo; Old Console</h1>
 <div class="main" id="main">

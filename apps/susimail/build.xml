@@ -19,6 +19,7 @@
             <classpath>
                 <pathelement location="../jetty/jettylib/javax.servlet.jar" />
                 <pathelement location="../jetty/jettylib/org.mortbay.jetty.jar" />
+                <pathelement location="../jetty/jettylib/jetty-util.jar" />
                 <pathelement location="../../core/java/build/i2p.jar" />
             </classpath>
         </javac>

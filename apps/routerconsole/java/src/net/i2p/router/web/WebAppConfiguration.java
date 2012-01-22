@@ -6,7 +6,8 @@ import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
 
-import org.mortbay.jetty.servlet.WebApplicationContext;
+import org.mortbay.jetty.webapp.Configuration;
+import org.mortbay.jetty.webapp.WebAppContext;
 
 
 /**
@@ -31,16 +32,16 @@ import org.mortbay.jetty.servlet.WebApplicationContext;
  *  @since 0.7.12
  *  @author zzz
  */
-public class WebAppConfiguration implements WebApplicationContext.Configuration {
-    private WebApplicationContext _wac;
+public class WebAppConfiguration implements Configuration {
+    private WebAppContext _wac;
 
     private static final String CLASSPATH = ".classpath";
 
-    public void setWebApplicationContext(WebApplicationContext context) {
+    public void setWebAppContext(WebAppContext context) {
        _wac = context;
     }
 
-    public WebApplicationContext getWebApplicationContext() {
+    public WebAppContext getWebAppContext() {
         return _wac;
     }
 
@@ -87,10 +88,16 @@ public class WebAppConfiguration implements WebApplicationContext.Configuration 
             else
                 path = dir.getAbsolutePath() + '/' + elem;
             System.err.println("Adding " + path + " to classpath for " + appName);
-            _wac.addClassPath(path);
+            _wac.setExtraClasspath(path);
         }
     }
 
     public void configureDefaults() {}
     public void configureWebApp() {}
+
+    /** @since Jetty 6 */
+    public void deconfigureWebApp() {}
+
+    /** @since Jetty 6 */
+    public void configureClassLoader() {}
 }

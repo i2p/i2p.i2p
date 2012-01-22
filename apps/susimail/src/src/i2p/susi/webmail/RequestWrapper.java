@@ -35,6 +35,19 @@ import javax.servlet.http.HttpSession;
 import org.mortbay.servlet.MultiPartRequest;
 
 /**
+ *  Required major changes for Jetty 6
+ *  to support change from MultiPartRequest to MultiPartFilter.
+ *  See http://docs.codehaus.org/display/JETTY/File+Upload+in+jetty6
+ *  Unfortunately, Content-type not available until Jetty 8
+ *  See https://bugs.eclipse.org/bugs/show_bug.cgi?id=349110
+ *
+ *  So we could either extend and fix MultiPartFilter, and rewrite everything here,
+ *  or copy MultiParRequest into our war and fix it so it compiles with Jetty 6.
+ *  We do the latter.
+ *
+ *  The filter would have been added in web.xml,
+ *  see that file, where it's commented out.
+ *
  * @author user
  */
 public class RequestWrapper {

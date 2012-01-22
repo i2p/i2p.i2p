@@ -36,6 +36,7 @@
         <echo message="  updaterWithJavadoc: updater including the javadocs, for display in the console" />
         <echo message="  updater200WithJavadoc: updater including the javadocs, for display in the console (creates i2pupdate200.zip)" />
         <echo message="  updaterWithJetty: Updater including Jetty" />
+        <echo message="  updater200withJetty: Updater including Jetty" />
         <echo message="  updaterWithJettyFixes: updater including local jetty patches" />
         <echo message="  updaterWithGeoIP: updater including GeoIP Files" />
         <echo message="  updaterWithJettyFixesAndGeoIP" />
@@ -50,26 +51,28 @@
         <echo message="  javadoc:   generate javadoc for the entire project into ./build/javadoc" />
         <echo message="  slackpkg:  generate Slackware packages in ./Slackware/i2p and ./Slackware/i2p-base" />
         <echo message="  debianhowto: instructions on building Debian packages" />
-	<echo message="  debian: generate Debian packages in ../" />
-	<echo message="          run &quot;ant debianhowto&quot; for instructions" />
-	<echo message="  debian-clean: rollback debian specific patches and run the &quot;distclean&quot; target (done automatically at the end of the &quot;debian&quot; target)" />
-	<!-- <echo message="  debianrepo: build a Debian repository (reprepro required)" /> -->
+        <echo message="  debian: generate Debian packages in ../" />
+        <echo message="          run &quot;ant debianhowto&quot; for instructions" />
+        <echo message="  debian-clean: rollback debian specific patches and run the &quot;distclean&quot; target (done automatically at the end of the &quot;debian&quot; target)" />
+        <!-- <echo message="  debianrepo: build a Debian repository (reprepro required)" /> -->
         <echo message="  poupdate: update the .po files for translators" />
         <echo message="  pkg-portable-win32:  build a minimum portable version for win32" />
    </target>
     <target name="debianhowto">
-	    <echo message="To build debian packages, you must make sure that you have" />
-	    <echo message="the necessary build-dependencies installed." />
-	    <echo message="The packages required to build can be found in the file "/>
-	    <echo message="&quot;debian/control&quot; in both the Build-Depends and Build-Depends-Indep fields."/>
-	    <echo message="In addition to those packages, be sure to install &quot;fakeroot&quot;,"/>
-	    <echo message="&quot;quilt&quot; and &quot;build-essential&quot;!" />
-	    <echo message="" />
-	    <echo message="The following command will install all dependencies for you:" />
-	    <echo message="apt-get install debhelper ant debconf default-jdk gettext libgmp3-dev po-debconf fakeroot build-essential quilt" />
-	    <echo message=" " />
-	    <echo message="Once the dependencies are installed, run &quot;ant debian&quot;"/>
-	    <echo message="to patch the source and build the packages." />
+            <echo message="To build debian packages, you must make sure that you have" />
+            <echo message="the necessary build-dependencies installed." />
+            <echo message="The packages required to build can be found in the file "/>
+            <echo message="&quot;debian/control&quot; in the &quot;Build-Depends&quot; field."/>
+            <echo message="In addition to those packages, be sure to install &quot;fakeroot&quot;,"/>
+            <echo message="&quot;quilt&quot; and &quot;build-essential&quot;!" />
+            <echo message="" />
+            <echo message="The following command will install all of the dependencies for you:" />
+            <echo message=" " />
+            <echo message="apt-get install debhelper ant debconf default-jdk gettext libgmp3-dev po-debconf fakeroot build-essential \" />
+            <echo message="                   quilt libcommons-el-java libcommons-logging-java libjetty-extra-java libjetty-java" />
+            <echo message=" " />
+            <echo message="Once the dependencies are installed, run &quot;ant debian&quot;"/>
+            <echo message="to patch the source and build the packages." />
     </target>
     <target name="dist" depends="pkg, javadoc">
     </target>
@@ -132,7 +135,7 @@
         <ant dir="apps/routerconsole/java/" target="jar" />
     </target>
 
-    <target name="buildJetty" depends="buildProperties" >
+    <target name="buildJetty" depends="buildCore" >
         <ant dir="apps/jetty" target="build" />
     </target>
 
@@ -197,12 +200,9 @@
     <target name="buildWEB" depends="buildRouterConsole" >
         <copy file="apps/routerconsole/java/build/routerconsole.jar" todir="build/" />
         <copy file="apps/routerconsole/java/build/routerconsole.war" todir="build/" />
-        <copy file="apps/jetty/jettylib/org.mortbay.jetty.jar" todir="build/" />
-        <copy file="apps/jetty/jettylib/jasper-compiler.jar" todir="build/" />
-        <copy file="apps/jetty/jettylib/jasper-runtime.jar" todir="build/" />
-        <copy file="apps/jetty/jettylib/commons-logging.jar" todir="build/" />
-        <copy file="apps/jetty/jettylib/commons-el.jar" todir="build/" />
-        <copy file="apps/jetty/jettylib/javax.servlet.jar" todir="build/" />
+        <copy todir="build/" >
+            <fileset dir="apps/jetty/jettylib" excludes="ant.jar" />
+        </copy>
     </target>
 
     <target name="buildexe">
@@ -402,9 +402,10 @@
             <group title="Desktopgui Application" packages="net.i2p.desktopgui:net.i2p.desktopgui.*" />
             <group title="I2PSnark Application" packages="org.klomp.snark:org.klomp.snark.*" />
             <group title="I2PTunnel Application" packages="net.i2p.i2ptunnel:net.i2p.i2ptunnel.*" />
+            <group title="Jetty Logging" packages="net.i2p.jetty" />
             <group title="SAM Bridge" packages="net.i2p.sam:net.i2p.sam.client" />
             <group title="SusiDNS Application" packages="i2p.susi.dns" />
-            <group title="SusiMail Application" packages="i2p.susi.webmail:i2p.susi.webmail.*:i2p.susi.debug:i2p.susi.util" />
+            <group title="SusiMail Application" packages="i2p.susi.webmail:i2p.susi.webmail.*:i2p.susi.debug:i2p.susi.util:org.mortbay.servlet:org.mortbay.util" />
             <group title="Systray Application" packages="net.i2p.apps.systray" />
             <sourcepath>
                 <pathelement location="core/java/src" />
@@ -423,10 +424,16 @@
                 <pathelement location="apps/BOB/src" />
                 <pathelement location="apps/susidns/src/java/src" />
                 <pathelement location="apps/susimail/src/src" />
+                <pathelement location="apps/jetty/java/src" />
             </sourcepath>
             <classpath>
                 <pathelement location="apps/jetty/jettylib/org.mortbay.jetty.jar" />
                 <pathelement location="apps/jetty/jettylib/javax.servlet.jar" />
+                <pathelement location="apps/jetty/jettylib/jetty-sslengine.jar" />
+                <pathelement location="apps/jetty/jettylib/jetty-start.jar" />
+                <pathelement location="apps/jetty/jettylib/jetty-java5-threadpool.jar" />
+                <pathelement location="apps/jetty/jettylib/jetty-util.jar" />
+                <pathelement location="apps/jetty/jettylib/jsp-api.jar" />
                 <pathelement location="apps/systray/java/lib/systray4j.jar" />
                 <pathelement location="apps/jrobin/jrobin-1.5.9.1.jar" />
                 <pathelement location="installer/lib/wrapper/all/wrapper.jar" />
@@ -603,6 +610,15 @@
 	<defaultexcludes default="true"/>
     </target>
 
+    <target name="webappDistclean">
+        <ant dir="apps/i2ptunnel/java/" target="distclean" />
+        <ant dir="apps/routerconsole/java/" target="distclean" />
+        <ant dir="apps/addressbook/" target="distclean" />
+        <ant dir="apps/susimail/" target="distclean" />
+        <ant dir="apps/susidns/src/" target="distclean" />
+        <ant dir="apps/i2psnark/java/" target="distclean" />
+    </target>
+
     <target name="pkg" depends="distclean, updater, preppkg, installer" />
 
     <target name="pkgclean" depends="deletepkg-temp">
@@ -722,14 +738,12 @@
         </delete>
         <copy file="build/i2p.jar" todir="pkg-temp/lib/" />
         <copy file="build/i2ptunnel.jar" todir="pkg-temp/lib/" />
-        <copy file="build/jasper-compiler.jar" todir="pkg-temp/lib/" />
-        <copy file="build/jasper-runtime.jar" todir="pkg-temp/lib/" />
-        <copy file="build/commons-logging.jar" todir="pkg-temp/lib/" />
-        <copy file="build/commons-el.jar" todir="pkg-temp/lib/" />
-        <copy file="build/javax.servlet.jar" todir="pkg-temp/lib/" />
+        <!-- all jetty stuff -->
+        <copy todir="pkg-temp/lib" >
+            <fileset dir="build" includes="commons*.jar jasper*.jar javax*.jar jetty*.jar jsp*.jar org.mortbay.*.jar" />
+        </copy>
         <copy file="build/mstreaming.jar" todir="pkg-temp/lib/" />
         <copy file="build/streaming.jar" todir="pkg-temp/lib/" />
-        <copy file="build/org.mortbay.jetty.jar" todir="pkg-temp/lib/" />
         <copy file="build/router.jar" todir="pkg-temp/lib/" />
         <copy file="build/desktopgui.jar" todir="pkg-temp/lib/" />
         <copy file="build/routerconsole.jar" todir="pkg-temp/lib/" />
@@ -776,20 +790,13 @@
         <copy file="installer/resources/uninstall.ico" todir="pkg-temp/docs/" />
         <!-- Eepsite stuff here -->
         <mkdir dir="pkg-temp/eepsite" />
-        <mkdir dir="pkg-temp/eepsite/webapps" />
-        <mkdir dir="pkg-temp/eepsite/logs" />
-        <mkdir dir="pkg-temp/eepsite/cgi-bin" />
-        <mkdir dir="pkg-temp/eepsite/docroot" />
-        <mkdir dir="pkg-temp/eepsite/docroot/help" />
-        <mkdir dir="pkg-temp/eepsite/docroot/help/lib" />
-        <copy todir="pkg-temp/eepsite/docroot/" >
-            <fileset dir="installer/resources/eepsite.help/" />
+        <copy todir="pkg-temp/eepsite/" >
+            <fileset dir="installer/resources/eepsite/" />
         </copy>
         <copy todir="pkg-temp/eepsite/docroot/help/lib/" >
             <fileset dir="installer/resources/icons/flags/" includes="cn.png de.png es.png fr.png ir.png it.png jp.png nl.png ru.png se.png us.png" />
         </copy>
         <copy file="installer/resources/themes/console/images/favicon.ico" tofile="pkg-temp/eepsite/docroot/favicon.ico" />
-        <copy file="installer/resources/jetty.xml" tofile="pkg-temp/eepsite/jetty.xml" />
     </target>
 
     <target name="preplicenses">
@@ -803,6 +810,7 @@
               So we include the MIT one in our binary package
          -->
         <copy file="installer/lib/launch4j/head/LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-Launch4j.txt" />
+        <copy file="apps/jetty/apache-tomcat-deployer/NOTICE" tofile="pkg-temp/licenses/NOTICE-Tomcat.txt" />
         <!--  Not sure if these are used or should be included -->
         <copy file="installer/lib/launch4j/lib/foxtrot.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-Foxtrot.txt" />
         <copy file="installer/lib/launch4j/lib/JGoodies.Forms.LICENSE.txt" tofile="pkg-temp/licenses/LICENSE-JGoodies-Forms.txt" />
@@ -869,6 +877,7 @@
     <target name="updater200WithJavadoc" depends="prepupdate, preplicenses, copyJavadoc, pack200, zipit200" />
     <target name="updaterWithGeoIP" depends="prepupdate, prepgeoupdate, preplicenses, zipit" />
     <target name="updaterWithJetty" depends="prepjupdate, preplicenses, zipit" />
+    <target name="updater200WithJetty" depends="prepjupdate, preplicenses, pack200, zipit200" />
     <target name="updaterWithJettyFixes" depends="prepjupdatefixes, preplicenses, zipit" />
     <target name="updaterWithJettyFixesAndJbigi" depends="prepjupdatefixes, prepjbigiupdate, preplicenses, zipit" />
     <target name="updaterWithJettyFixesAndGeoIP" depends="prepjupdatefixes, prepgeoupdate, preplicenses, zipit" />
@@ -985,16 +994,26 @@
         </copy>
     </target>
 
+    <!-- All jetty jars required for update.
+         We don't need commons-el or commons-logging, they haven't changed.
+         TODO do we need to bother updating jasper?
+         TODO where is JMX? We don't need it I hope.
+      -->
     <target name="prepjupdate" depends="prepupdate, buildWEB">
-        <copy file="build/jasper-compiler.jar" todir="pkg-temp/lib/" />
-        <copy file="build/jasper-runtime.jar" todir="pkg-temp/lib/" />
-        <copy file="build/commons-logging.jar" todir="pkg-temp/lib/" />
-        <copy file="build/commons-el.jar" todir="pkg-temp/lib/" />
-        <copy file="build/javax.servlet.jar" todir="pkg-temp/lib/" />
-        <copy file="build/org.mortbay.jetty.jar" todir="pkg-temp/lib/" />
+        <copy todir="pkg-temp/lib" >
+            <fileset dir="build" includes="commons*.jar jasper*.jar javax*.jar jetty*.jar jsp*.jar org.mortbay.*.jar" />
+        </copy>
+        <!--  We have to package the new eepsite files for MigrateJetty.java, but we
+              can't overwrite an existing eepsite dir in a non-split configuration.
+          -->
+        <copy todir="pkg-temp/eepsite-jetty6" >
+            <fileset dir="installer/resources/eepsite" includes="*.xml contexts/* etc/*" />
+        </copy>
     </target>
+
+    <!-- Jetty 6 I2P logging addons, not really fixes -->
     <target name="prepjupdatefixes" depends="prepupdate, buildWEB">
-        <copy file="build/org.mortbay.jetty.jar" todir="pkg-temp/lib/" />
+        <copy file="build/jetty-i2p.jar" todir="pkg-temp/lib/" />
     </target>
 
     <target name="util-list-changes" depends="checkForMtn" if="mtn.available" >
@@ -1426,33 +1445,33 @@
 
     <target name="debian-binary" >
         <echo message="Did you update the version using dch -i?" />
-	<echo message=" " />
-	<echo message="If the changelog was not updated with dch -i, press" />
-	<echo message="press CTRL+C to abort building this Debian package." />
-	<echo message="" />
-	<echo message="Pausing build for ten seconds to give enough time to read this notice." />
-	<exec executable="sleep" failonerror="true">
-		<arg value="10" />
-	</exec>
-        <echo message="====================" />
-        <!-- bundle the jetty 5 lib since there isn't a deb for it -->
-        <ant dir="apps/jetty" target="ensureJettylib" />
-	
-	<exec executable="fakeroot" failonerror="true">
-	    <arg value="debian/rules" />
-	    <arg value="patch" />
-	    <arg value="binary" />
-	    <arg value="clean" />
+        <echo message=" " />
+        <echo message="If the changelog was not updated with dch -i, press" />
+        <echo message="press CTRL+C to abort building this Debian package." />
+        <echo message="" />
+        <echo message="Pausing build for ten seconds to give enough time to read this notice." />
+        <exec executable="sleep" failonerror="true">
+                <arg value="10" />
         </exec>
-	<delete dir=".pc" />
+        <echo message="====================" />
+
+        <exec executable="fakeroot" failonerror="true">
+            <arg value="debian/rules" />
+            <arg value="patch" />
+            <arg value="binary" />
+            <arg value="clean" />
+        </exec>
+        <delete dir=".pc" />
     </target>
+
     <target name="debian-clean" depends="buildProperties" >
         <exec executable="fakeroot" failonerror="true">
-	    <arg value="debian/rules" />
-	    <arg value="clean" />
+            <arg value="debian/rules" />
+            <arg value="clean" />
         </exec>
-	<delete dir="./.pc" />
+        <delete dir="./.pc" />
     </target>
+
     <target name="debian-patch" depends="buildProperties" >
         <exec executable="quilt" failonerror="true">
             <arg value="-a" />
@@ -1462,8 +1481,8 @@
     </target>
     <target name="debian-unpatch" depends="buildProperties">
         <exec executable="quilt" failonerror="false">
-	    <arg value="-a" />
-	    <arg value="pop" />
+            <arg value="-a" />
+            <arg value="pop" />
         </exec>
     </target>
 
