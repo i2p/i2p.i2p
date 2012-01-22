@@ -604,7 +604,7 @@ public class IndexBean {
     public void setType(String type) { 
         _type = (type != null ? type.trim() : null);   
     }
-    String getType() { return _type; }
+    public String getType() { return _type; }
     
     /** Short name of the tunnel */
     public void setName(String name) { 
