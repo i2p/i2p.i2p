@@ -19,6 +19,7 @@
        curPage = 1;
      }
    }
+   boolean tunnelIsClient = wizardBean.getIsClient();
 %>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
@@ -38,13 +39,25 @@
     <div id="pageHeader">
     </div>
 
-    <form method="post" action="wizard">
+    <form method="post" action="<%=(curPage == 7 ? "list" : "wizard") %>">
 
         <div id="wizardPanel" class="panel">
             <div class="header">
                 <%
                 if (curPage == 1) {
-                  %><h4><%=intl._("Page 1")%></h4><%
+                  %><h4><%=intl._("Server or client tunnel?")%></h4><%
+                } else if (curPage == 2) {
+                  %><h4><%=intl._("Tunnel type")%></h4><%
+                } else if (curPage == 3) {
+                  %><h4><%=intl._("Tunnel name and description")%></h4><%
+                } else if (curPage == 4 && tunnelIsClient) {
+                  %><h4><%=intl._("Tunnel destination")%></h4><%
+                } else if (curPage == 5) {
+                  %><h4><%=intl._("Binding address and port")%></h4><%
+                } else if (curPage == 6) {
+                  %><h4><%=intl._("Tunnel auto-start")%></h4><%
+                } else if (curPage == 7) {
+                  %><h4><%=intl._("Wizard completed")%></h4><%
                 } %>
                 <input type="hidden" name="page" value="<%=request.getParameter("page")%>" />
                 <input type="hidden" name="nonce" value="<%=wizardBean.getNextNonce()%>" />
@@ -57,16 +70,39 @@
             <%
             if (curPage == 1) {
             %><div id="typeField" class="rowItem">
-                <label for="type">
-                    <%=intl._("Tunnel Type")%>:
-                </label>
                 <label><%=intl._("Server Tunnel")%></label>
                 <input value="0" type="radio" id="baseType" name="isClient" class="tickbox" />
                 <label><%=intl._("Client Tunnel")%></label>
                 <input value="1" type="radio" id="baseType" name="isClient" class="tickbox" />
             </div><%
             } else {
-            %><input type="hidden" name="isClient" value="<%=wizardBean.getIsClient()%>" /><%
+            %><input type="hidden" name="isClient" value="<%=tunnelIsClient%>" /><%
+            } %>
+
+            <% if (curPage == 2) {
+            %><div id="typeField" class="rowItem">
+                <% if (tunnelIsClient) {
+                %><select name="type">
+                    <option value="client"><%=intl._("Standard")%></option>
+                    <option value="httpclient">HTTP</option>
+                    <option value="ircclient">IRC</option>
+                    <option value="sockstunnel">SOCKS 4/4a/5</option>
+                    <option value="socksirctunnel">SOCKS IRC</option>
+                    <option value="connectclient">CONNECT</option>
+                    <option value="streamrclient">Streamr</option>
+                </select><%
+                } else {
+                %><select name="type">
+                    <option value="server"><%=intl._("Standard")%></option>
+                    <option value="httpserver">HTTP</option>
+                    <option value="httpbidirserver">HTTP bidir</option>
+                    <option value="ircserver">IRC</option>
+                    <option value="streamrserver">Streamr</option>
+                </select><%
+                } %>
+            </div><%
+            } else {
+            %><input type="hidden" name="type" value="<%=wizardBean.getType()%>" /><%
             } %>
         </div>
 
@@ -75,8 +111,11 @@
             <div class="footer">
                 <div class=toolbox">
                     <button id="controlCancel" class="control" type="submit" name="action" value="" title="Cancel"><%=intl._("Cancel")%></button>
-                    <button id="controlNext" accesskey="N" class="control" type="submit" name="action" value="Next page" title="Next Page"><%=intl._("Next")%>(<span class="accessKey">N</span>)</button>
-                    <button id="controlFinish" accesskey="F" class="control" type="submit" name="action" value="Finish wizard" title="Finish Wizard"><%=intl._("Finish")%>(<span class="accessKey">F</span>)</button>
+                    <% if (curPage == 7) {
+                    %><button id="controlNext" accesskey="N" class="control" type="submit" name="action" value="Next page" title="Next Page"><%=intl._("Next")%>(<span class="accessKey">N</span>)</button><%
+                    } else {
+                    %><button id="controlFinish" accesskey="F" class="control" type="submit" name="action" value="Finish wizard" title="Finish Wizard"><%=intl._("Finish")%>(<span class="accessKey">F</span>)</button><%
+                    } %>
                 </div>
             </div>
         </div>
