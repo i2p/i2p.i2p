@@ -20,6 +20,7 @@
      }
    }
    boolean tunnelIsClient = wizardBean.getIsClient();
+   String tunnelType = wizardBean.getType();
 %>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
@@ -105,7 +106,7 @@
                 } /* tunnelIsClient */ %>
             </div><%
             } else {
-            %><input type="hidden" name="type" value="<%=wizardBean.getType()%>" /><%
+            %><input type="hidden" name="type" value="<%=tunnelType%>" /><%
             } /* curPage 2 */ %>
 
             <%
@@ -126,6 +127,34 @@
             %><input type="hidden" name="name" value="<%=wizardBean.getName()%>" />
             <input type="hidden" name="description" value="<%=wizardBean.getDescription()%>" /><%
             } /* curPage 3 */ %>
+        </div>
+
+            <%
+            if (tunnelIsClient) {
+              if (curPage == 4) {
+                if ("httpclient".equals(tunnelType) || "connectclient".equals(tunnelType) || "sockstunnel".equals(tunnelType) || "socksirctunnel".equals(tunnelType)) {
+          %><div id="destinationField" class="rowItem">
+                <label for="proxyList" accesskey="x">
+                    <%=intl._("Outproxies")%>(<span class="accessKey">x</span>):
+                </label>
+                <input type="text" size="30" id="proxyList" name="proxyList" title="List of Outproxy I2P destinations" value="" class="freetext" />                
+            </div><%
+                } else if ("client".equals(tunnelType) || "ircclient".equals(tunnelType) || "streamrclient".equals(tunnelType)) {
+          %><div id="destinationField" class="rowItem">
+                <label for="targetDestination" accesskey="T">
+                    <%=intl._("Tunnel Destination")%>(<span class="accessKey">T</span>):
+                </label>
+                <input type="text" size="30" id="targetDestination" name="targetDestination" title="Destination of the Tunnel" value="" class="freetext" />                
+                <span class="comment">(<%=intl._("name or destination")%>; <%=intl._("b32 not recommended")%>)</span>
+            </div><%
+                }
+              } else {
+                if ("httpclient".equals(tunnelType) || "connectclient".equals(tunnelType) || "sockstunnel".equals(tunnelType) || "socksirctunnel".equals(tunnelType)) {
+            %><input type="hidden" name="proxyList" value="<%=wizardBean.getProxyList()%>" /><%
+                } else if ("client".equals(tunnelType) || "ircclient".equals(tunnelType) || "streamrclient".equals(tunnelType)) {
+            %><input type="hidden" name="targetDestination" value="<%=wizardBean.getTargetDestination()%>" /><%
+              } /* curPage 4 */
+            } /* tunnelIsClient */ %>
         </div>
 
         <div id="globalOperationsPanel" class="panel">
