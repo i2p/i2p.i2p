@@ -20,7 +20,6 @@ import net.i2p.router.peermanager.ProfileOrganizer;
 import net.i2p.router.transport.CommSystemFacadeImpl;
 import net.i2p.router.transport.FIFOBandwidthLimiter;
 import net.i2p.router.transport.OutboundMessageRegistry;
-import net.i2p.router.transport.VMCommSystem;
 import net.i2p.router.tunnel.TunnelDispatcher;
 import net.i2p.router.tunnel.pool.TunnelPoolManager;
 import net.i2p.util.Clock;

@@ -1,4 +1,4 @@
-package net.i2p.router.transport;
+package net.i2p.router.dummy;
 
 import java.io.IOException;
 import java.io.OutputStream;
