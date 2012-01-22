@@ -60,6 +60,7 @@
                   %><h4><%=intl._("Wizard completed")%></h4><%
                 } %>
                 <input type="hidden" name="page" value="<%=request.getParameter("page")%>" />
+                <input type="hidden" name="tunnel" value="null" />
                 <input type="hidden" name="nonce" value="<%=wizardBean.getNextNonce()%>" />
             </div>
 
