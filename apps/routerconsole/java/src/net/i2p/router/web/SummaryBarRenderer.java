@@ -412,7 +412,9 @@ public class SummaryBarRenderer {
                    "</table><hr><h4>")
            .append(_(_helper.getTunnelStatus()))
            .append("</h4><hr>\n")
-           .append(_helper.getDestinations());
+
+           .append(_helper.getDestinations())
+           .append("<hr>\n");
 
 
 

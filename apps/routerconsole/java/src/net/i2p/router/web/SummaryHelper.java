@@ -414,7 +414,7 @@ public class SummaryHelper extends HelperBase {
         } else {
             buf.append("<center><i>").append(_("none")).append("</i></center>");
         }
-        buf.append("</div><hr>\n");
+        buf.append("</div>\n");
         return buf.toString();
     }
     
