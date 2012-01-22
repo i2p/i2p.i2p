@@ -78,11 +78,13 @@
             </div><%
             } else {
             %><input type="hidden" name="isClient" value="<%=tunnelIsClient%>" /><%
-            } %>
+            } /* curPage 1 */ %>
 
-            <% if (curPage == 2) {
+            <%
+            if (curPage == 2) {
             %><div id="typeField" class="rowItem">
-                <% if (tunnelIsClient) {
+                <%
+                if (tunnelIsClient) {
                 %><select name="type">
                     <option value="client"><%=intl._("Standard")%></option>
                     <option value="httpclient">HTTP</option>
@@ -100,13 +102,14 @@
                     <option value="ircserver">IRC</option>
                     <option value="streamrserver">Streamr</option>
                 </select><%
-                } %>
+                } /* tunnelIsClient */ %>
             </div><%
             } else {
             %><input type="hidden" name="type" value="<%=wizardBean.getType()%>" /><%
-            } %>
+            } /* curPage 2 */ %>
 
-            <% if (curPage == 3) {
+            <%
+            if (curPage == 3) {
             %><div id="nameField" class="rowItem">
                 <label for="name" accesskey="N">
                     <%=intl._("Name")%>:(<span class="accessKey">N</span>)
@@ -122,7 +125,7 @@
             } else {
             %><input type="hidden" name="name" value="<%=wizardBean.getName()%>" />
             <input type="hidden" name="description" value="<%=wizardBean.getDescription()%>" /><%
-            } %>
+            } /* curPage 3 */ %>
         </div>
 
         <div id="globalOperationsPanel" class="panel">
