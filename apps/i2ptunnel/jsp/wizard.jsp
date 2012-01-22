@@ -105,6 +105,24 @@
             } else {
             %><input type="hidden" name="type" value="<%=wizardBean.getType()%>" /><%
             } %>
+
+            <% if (curPage == 3) {
+            %><div id="nameField" class="rowItem">
+                <label for="name" accesskey="N">
+                    <%=intl._("Name")%>:(<span class="accessKey">N</span>)
+                </label>
+                <input type="text" size="30" maxlength="50" name="name" id="name" title="Tunnel Name" value="" class="freetext" />
+            </div>
+            <div id="descriptionField" class="rowItem">
+                <label for="description" accesskey="e">
+                    <%=intl._("Description")%>:(<span class="accessKey">E</span>)
+                </label>
+                <input type="text" size="60" maxlength="80" name="description"  id="description" title="Tunnel Description" value="" class="freetext" />
+            </div><%
+            } else {
+            %><input type="hidden" name="name" value="<%=wizardBean.getName()%>" />
+            <input type="hidden" name="description" value="<%=wizardBean.getDescription()%>" /><%
+            } %>
         </div>
 
         <div id="globalOperationsPanel" class="panel">
