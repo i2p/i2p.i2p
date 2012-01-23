@@ -95,7 +95,6 @@
         <copy preservelastmodified="true" file="${jetty.base}/lib/ext/jetty-rewrite-handler-${jetty.ver}.jar" tofile="jettylib/jetty-rewrite-handler.jar" />
         <copy preservelastmodified="true" file="${jetty.base}/lib/ext/jetty-sslengine-${jetty.ver}.jar" tofile="jettylib/jetty-sslengine.jar" />
         <copy preservelastmodified="true" file="${jetty.base}/lib/management/jetty-management-${jetty.ver}.jar" tofile="jettylib/org.mortbay.jmx.jar" />
-        <copy file="${jetty.base}/lib/jsp-2.1/ant-1.6.5.jar" tofile="jettylib/ant.jar" />
         <delete file="jetty.tar" />
         <delete dir="${jetty.base}" />
         <!-- commons-logging.jar not in Jetty 6 but we have it in launch4j so copy it over, we need it

@@ -20,7 +20,7 @@
         <pathelement location="${lib}/jsp-api.jar" />
         <pathelement location="${lib}/commons-logging.jar" />
         <pathelement location="${lib}/commons-el.jar" />
-        <pathelement location="${lib}/ant.jar" />
+        <pathelement location="${ant.home}/lib/ant.jar" />
         <pathelement location="../../../core/java/build/i2p.jar" />
  	</path>
 	<property name="javac.compilerargs" value="" />
