@@ -156,6 +156,72 @@
                 } /* curPage 4 */
               }
             } /* tunnelIsClient */ %>
+
+            <% /* Page 5 - Binding ports and addresses*/
+
+            if ((tunnelIsClient && "streamrclient".equals(tunnelType)) || !"streamrserver".equals(tunnelType)) {
+              if (curPage == 5) {
+            %><div id="hostField" class="rowItem">
+                <label for="targetHost" accesskey="H">
+                    <%=intl._("Host")%>(<span class="accessKey">H</span>):
+                </label>
+                <input type="text" size="20" id="targetHost" name="targetHost" title="Target Hostname or IP" value="" class="freetext" />
+            </div><%
+              } else {
+            %><input type="hidden" name="targetHost" value="<%=wizardBean.getTargetHost()%>" /><%
+              } /* curPage 5 */
+            } /* streamrclient or !streamrserver */ %>
+            <%
+            if (!tunnelIsClient) {
+              if (curPage == 5) {
+            %><div id="portField" class="rowItem">
+                <label for="targetPort" accesskey="P">
+                </label>
+                <input type="text" size="6" maxlength="5" id="targetPort" name="targetPort" title="Target Port Number" value="" class="freetext" />
+            </div><%
+              } else {
+            %><input type="hidden" name="targetPort" value="<%=wizardBean.getTargetPort()%>" /><%
+              } /* curPage 5 */
+            } /* !tunnelIsClient */ %>
+            <%
+            if (tunnelIsClient || "httpbidirserver".equals(tunnelType)) {
+              if (curPage == 5) {
+            %><div id="portField" class="rowItem">
+                <label for="port" accesskey="P">
+                    <span class="accessKey">P</span>ort:
+                </label>
+                <input type="text" size="6" maxlength="5" id="port" name="port" title="Access Port Number" value="" class="freetext" />
+            </div><%
+              } else {
+            %><input type="hidden" name="port" value="<%=wizardBean.getPort()%>" /><%
+              } /* curPage 5 */
+            } /* tunnelIsClient or httpbidirserver */ %>
+            <%
+            if ((tunnelIsClient && !"streamrclient".equals(tunnelType)) || "httpbidirserver".equals(tunnelType) || "streamrserver".equals(tunnelType)) {
+              if (curPage == 5) {
+            %><div id="reachField" class="rowItem">
+                <label for="reachableBy" accesskey="r">
+                    <%=intl._("Reachable by")%>(<span class="accessKey">R</span>):
+                </label>
+                <select id="reachableBy" name="reachableBy" title="IP for Client Access" class="selectbox">
+              <%
+                    for (String ifc : wizardBean.interfaceSet()) {
+                        out.write("<option value=\"");
+                        out.write(ifc);
+                        out.write('\"');
+                        if (ifc.equals("127.0.0.1"))
+                            out.write(" selected=\"selected\"");
+                        out.write('>');
+                        out.write(ifc);
+                        out.write("</option>\n");
+                    }
+              %>
+                </select>                
+            </div><%
+              } else {
+            %><input type="hidden" name="reachableBy" value="<%=wizardBean.getReachableBy()%>" /><%
+              } /* curPage 5 */
+            } /* (tunnelIsClient && !streamrclient) ||  httpbidirserver || streamrserver */ %>
         </div>
 
         <div id="globalOperationsPanel" class="panel">
