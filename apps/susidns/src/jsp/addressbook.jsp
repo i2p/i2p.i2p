@@ -117,8 +117,8 @@ ${book.loadBookMessages}
 <input type="hidden" name="begin" value="0">
 <input type="hidden" name="end" value="99">
 <table><tr>
-<td class="search"><%=intl._("Search")%>: <input type="text" name="search" value="${book.search}" size="20" ></td>
-<td class="search"><input type="submit" name="submitsearch" value="<%=intl._("Search")%>" ></td>
+<td class="search"><%=intl._("Search")%>: <input class="search" type="text" name="search" value="${book.search}" size="20" ></td>
+<td class="search"><input class="search" type="submit" name="submitsearch" value="<%=intl._("Search")%>" ></td>
 </tr>
 </table>
 </form></div>
@@ -167,8 +167,8 @@ ${book.loadBookMessages}
 <c:if test="${book.master || book.router || book.published || book.private}">
 <div id="buttons">
 <p class="buttons">
-<input type="reset" value="<%=intl._("Cancel")%>" >
-<input type="submit" name="action" value="<%=intl._("Delete Selected")%>" >
+<input class="cancel" type="reset" value="<%=intl._("Cancel")%>" >
+<input class="delete" type="submit" name="action" value="<%=intl._("Delete Selected")%>" >
 </p>
 </div></form>
 </c:if>
@@ -193,9 +193,9 @@ ${book.loadBookMessages}
 <b><%=intl._("Destination")%></b></td><td><textarea name="destination" rows="1" style="height: 3em;" cols="70" wrap="off" spellcheck="false">${book.destination}</textarea>
 </td></tr></table>
 <p class="buttons">
-<input type="reset" value="<%=intl._("Cancel")%>" >
-<input type="submit" name="action" value="<%=intl._("Replace")%>" >
-<input type="submit" name="action" value="<%=intl._("Add")%>" >
+<input class="cancel" type="reset" value="<%=intl._("Cancel")%>" >
+<input class="accept" type="submit" name="action" value="<%=intl._("Replace")%>" >
+<input class="add" type="submit" name="action" value="<%=intl._("Add")%>" >
 </p>
 </div></form>
 
