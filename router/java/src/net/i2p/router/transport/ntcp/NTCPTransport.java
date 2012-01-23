@@ -13,6 +13,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -30,6 +31,7 @@ import net.i2p.router.transport.CommSystemFacadeImpl;
 import net.i2p.router.transport.Transport;
 import net.i2p.router.transport.TransportBid;
 import net.i2p.router.transport.TransportImpl;
+import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 import net.i2p.util.Translate;
@@ -515,6 +517,23 @@ public class NTCPTransport extends TransportImpl {
         if (_myAddress != null) {
             InetAddress bindToAddr = null;
             String bindTo = _context.getProperty(PROP_BIND_INTERFACE);
+
+            if (bindTo == null) {
+                // If we are configured with a fixed IP address,
+                // AND it's one of our local interfaces,
+                // bind only to that.
+                boolean isFixed = _context.getProperty(CommSystemFacadeImpl.PROP_I2NP_NTCP_AUTO_IP, "true")
+                                  .toLowerCase(Locale.US).equals("false");
+                String fixedHost = _context.getProperty(CommSystemFacadeImpl.PROP_I2NP_NTCP_HOSTNAME);
+                if (isFixed && fixedHost != null) {
+                    try {
+                        String testAddr = InetAddress.getByName(fixedHost).getHostAddress();
+                        if (Addresses.getAddresses().contains(testAddr))
+                            bindTo = testAddr;
+                    } catch (UnknownHostException uhe) {}
+                }
+            }
+
             if (bindTo != null) {
                 try {
                     bindToAddr = InetAddress.getByName(bindTo);
@@ -532,10 +551,13 @@ public class NTCPTransport extends TransportImpl {
                 chan.configureBlocking(false);
 
                 InetSocketAddress addr = null;
-                if(bindToAddr==null)
+                if(bindToAddr==null) {
                     addr = new InetSocketAddress(_myAddress.getPort());
-                else
+                } else {
                     addr = new InetSocketAddress(bindToAddr, _myAddress.getPort());
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn("Binding only to " + bindToAddr);
+                }
                 chan.socket().bind(addr);
                 if (_log.shouldLog(Log.INFO))
                     _log.info("Listening on " + addr);

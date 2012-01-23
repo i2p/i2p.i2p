@@ -443,48 +443,80 @@
     </target>
 
     <target name="getReleaseNumber" >
-        <exec executable="grep" outputproperty="versionLine" failonerror="true" >
+        <exec executable="grep" outputproperty="versionLine" failifexecutionfails="false" >
             <arg value="public final static String VERSION" />
 	    <arg value="core/java/src/net/i2p/CoreVersion.java" />
         </exec>
-        <exec executable="cut" osfamily="unix" inputstring="${versionLine}" outputproperty="release.number" failonerror="true" >
+        <property name="versionLine" value="unknown" />
+        <exec executable="cut" osfamily="unix" inputstring="${versionLine}" outputproperty="release.number" failifexecutionfails="false" >
             <arg value="-f2" />
 	    <arg value="-d&quot;" />
         </exec>
-        <exec executable="cut" osfamily="mac" inputstring="${versionLine}" outputproperty="release.number" failonerror="true" >
+        <exec executable="cut" osfamily="mac" inputstring="${versionLine}" outputproperty="release.number" failifexecutionfails="false" >
             <arg value="-f2" />
 	    <arg value="-d&quot;"/>
         </exec>
-        <exec executable="cut" osfamily="windows" inputstring="${versionLine}" outputproperty="release.number" failonerror="true" >
+        <exec executable="cut" osfamily="windows" inputstring="${versionLine}" outputproperty="release.number" failifexecutionfails="false" >
             <arg value="-f2" />
 	    <arg value="-d&quot;\&quot;&quot;"/>
         </exec>
+        <property name="release.number" value="unknown" />
         <echo message="Release number is ${release.number}" />
     </target>
 
     <target name="getBuildNumber" >
-        <exec executable="grep" outputproperty="buildLine" >
+        <exec executable="grep" outputproperty="buildLine" failifexecutionfails="false" >
             <arg value="public final static long BUILD" />
             <arg value="router/java/src/net/i2p/router/RouterVersion.java" />
         </exec>
-        <exec executable="cut" inputstring="${buildLine}" outputproperty="build.temp" failonerror="true" >
+        <property name="buildLine" value="??" />
+        <exec executable="cut" inputstring="${buildLine}" outputproperty="build.temp" failifexecutionfails="false" >
             <arg value="-f2" />
             <arg value="-d=" />
         </exec>
-        <exec executable="tr" inputstring="${build.temp}" outputproperty="build.temp.tr" failonerror="true">
+        <property name="build.temp" value="??" />
+        <exec executable="tr" inputstring="${build.temp}" outputproperty="build.temp.tr" failifexecutionfails="false">
             <arg value="-d" />
             <arg value="&quot;[:space:]&quot;"/>
         </exec>
-        <exec executable="cut" inputstring="${build.temp.tr}" outputproperty="build.number" failonerror="true" >
+        <property name="build.temp.tr" value="??" />
+        <exec executable="cut" inputstring="${build.temp.tr}" outputproperty="build.number" failifexecutionfails="false" >
             <arg value="-f1" />
             <arg value="-d;" />
         </exec>
-        <exec executable="awk" outputproperty="build.extra" failonerror="false">
+        <exec executable="awk" outputproperty="build.extra" failifexecutionfails="false">
             <arg value="-F&quot;" />
             <arg value="/public final static String EXTRA/{print $2}" />
             <arg value="router/java/src/net/i2p/router/RouterVersion.java" />
         </exec>
+        <property name="build.number" value="??" />
+        <property name="build.extra" value="" />
         <echo message="Build number is ${build.number}${build.extra}" />
+    </target>
+
+    <target name="verifyReleaseBuildNumbers" depends="getReleaseNumber, getBuildNumber" >
+        <fail message="Bad release number: ${release.number}" >
+            <condition>
+                <or>
+                    <equals arg1="${release.number}" arg2="unknown"/>
+                    <equals arg1="${release.number}" arg2=""/>
+                </or>
+            </condition>
+        </fail>
+        <fail message="Non-zero build number: ${build.number}" >
+            <condition>
+                <not>
+                    <equals arg1="${build.number}" arg2="0"/>
+                </not>
+            </condition>
+        </fail>
+        <fail message="Non-empty extra build: ${build.extra}" >
+            <condition>
+                <not>
+                    <equals arg1="${build.extra}" arg2=""/>
+                </not>
+            </condition>
+        </fail>
     </target>
 
     <target name="clean" depends="pkgclean" >
@@ -1235,7 +1267,7 @@
 <!--
     <target name="release" depends="distclean, updaterWithJettyFixesAndJbigi , updater200WithJettyFixes, preppkg, installer, getReleaseNumber" >
 -->
-    <target name="release" depends="distclean, testscripts, updater, updater200, preppkg, installer, getReleaseNumber" >
+    <target name="release" depends="verifyReleaseBuildNumbers, distclean, testscripts, updater, updater200, preppkg, installer" >
         <echo message="================================================================" />
         <echo message="Did you update these files?" />
         <exec executable="ls" failonerror="true">

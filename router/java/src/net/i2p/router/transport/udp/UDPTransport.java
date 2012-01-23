@@ -35,6 +35,7 @@ import net.i2p.router.transport.Transport;
 import net.i2p.router.transport.TransportBid;
 import net.i2p.router.transport.TransportImpl;
 import net.i2p.router.util.RandomIterator;
+import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
@@ -255,6 +256,21 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
 
         // bind host
         String bindTo = _context.getProperty(PROP_BIND_INTERFACE);
+
+        if (bindTo == null) {
+            // If we are configured with a fixed IP address,
+            // AND it's one of our local interfaces,
+            // bind only to that.
+            String fixedHost = _context.getProperty(PROP_EXTERNAL_HOST);
+            if (fixedHost != null && fixedHost.length() > 0) {
+                try {
+                    String testAddr = InetAddress.getByName(fixedHost).getHostAddress();
+                    if (Addresses.getAddresses().contains(testAddr))
+                        bindTo = testAddr;
+                } catch (UnknownHostException uhe) {}
+            }
+        }
+
         InetAddress bindToAddr = null;
         if (bindTo != null) {
             try {
@@ -281,6 +297,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         } else {
             port = _externalListenPort;
         }
+        if (bindToAddr != null && _log.shouldLog(Log.WARN))
+            _log.warn("Binding only to " + bindToAddr);
         if (_log.shouldLog(Log.INFO))
             _log.info("Binding to the port: " + port);
         if (_endpoint == null) {

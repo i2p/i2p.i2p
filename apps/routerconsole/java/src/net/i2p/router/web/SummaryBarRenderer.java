@@ -210,53 +210,14 @@ public class SummaryBarRenderer {
            .append(_("Network"))
            .append(": ")
            .append(_helper.getReachability())
-           .append("</a></h4><hr>\n");
+           .append("</a></h4><hr>\n")
 
 
-        // display all the time so we display the final failure message, and plugin update messages too
-        String status = UpdateHandler.getStatus();
-        if (status.length() > 0) {
-            buf.append("<h4>").append(status).append("</h4><hr>\n");
-        }
-        if (_helper.updateAvailable() || _helper.unsignedUpdateAvailable()) {
-            if ("true".equals(System.getProperty(UpdateHandler.PROP_UPDATE_IN_PROGRESS))) {
-                // nothing
-            } else if(
-                      // isDone() is always false for now, see UpdateHandler
-                      // ((!update.isDone()) &&
-                      _helper.getAction() == null &&
-                      _helper.getUpdateNonce() == null &&
-                      ConfigRestartBean.getRestartTimeRemaining() > 12*60*1000) {
-                long nonce = _context.random().nextLong();
-                String prev = System.getProperty("net.i2p.router.web.UpdateHandler.nonce");
-                if (prev != null)
-                    System.setProperty("net.i2p.router.web.UpdateHandler.noncePrev", prev);
-                System.setProperty("net.i2p.router.web.UpdateHandler.nonce", nonce+"");
-                String uri = _helper.getRequestURI();
-                buf.append("<form action=\"").append(uri).append("\" method=\"POST\">\n");
-                buf.append("<input type=\"hidden\" name=\"updateNonce\" value=\"").append(nonce).append("\" >\n");
-                if (_helper.updateAvailable()) {
-                    buf.append("<button type=\"submit\" class=\"download\" name=\"updateAction\" value=\"signed\" >")
-                       // Note to translators: parameter is a version, e.g. "0.8.4"
-                       .append(_("Download {0} Update", _helper.getUpdateVersion()))
-                       .append("</button><br>\n");
-                }
-                if (_helper.unsignedUpdateAvailable()) {
-                    buf.append("<button type=\"submit\" class=\"download\" name=\"updateAction\" value=\"Unsigned\" >")
-                       // Note to translators: parameter is a date and time, e.g. "02-Mar 20:34 UTC"
-                       // <br> is optional, to help the browser make the lines even in the button
-                       // If the translation is shorter than the English, you should probably not include <br>
-                       .append(_("Download Unsigned<br>Update {0}", _helper.getUnsignedUpdateVersion()))
-                       .append("</button><br>\n");
-                }
-                buf.append("</form>\n");
-            }
-        }
+           .append(_helper.getUpdateStatus())
 
 
+           .append(_helper.getRestartStatus())
 
-
-        buf.append(ConfigRestartBean.renderStatus(_helper.getRequestURI(), _helper.getAction(), _helper.getConsoleNonce()))
 
            .append("<hr><h3><a href=\"/peers\" target=\"_top\" title=\"")
            .append(_("Show all current peer connections"))
@@ -451,7 +412,9 @@ public class SummaryBarRenderer {
                    "</table><hr><h4>")
            .append(_(_helper.getTunnelStatus()))
            .append("</h4><hr>\n")
-           .append(_helper.getDestinations());
+
+           .append(_helper.getDestinations())
+           .append("<hr>\n");
 
 
 
