@@ -346,7 +346,7 @@ public class WebMail extends HttpServlet
 	 */
 	private static String button( String name, String label )
 	{
-		return "<input type=\"submit\" name=\"" + name + "\" value=\"" + label + "\">";
+		return "<input type=\"submit\" class=\"" + name + "\" name=\"" + name + "\" value=\"" + label + "\">";
 	}
 	/**
 	 * returns html string of a disabled form button with name and label
@@ -1601,7 +1601,7 @@ public class WebMail extends HttpServlet
 			"<tr><td align=\"right\" width=\"30%\">" + _("SMTP-Port") + "</td><td width=\"40%\" align=\"left\"><input type=\"text\" size=\"5\" name=\"" + SMTP +"\" value=\"" + smtp + "\"" + ( fixed ? " disabled" : "" ) + "></td></tr>\n");
 		}
 		out.println(
-			"<tr><td></td><td align=\"left\">" + button( LOGIN, _("Login") ) + " <input type=\"reset\" value=\"" + _("Reset") + "\"></td></tr>\n" +
+			"<tr><td></td><td align=\"left\">" + button( LOGIN, _("Login") ) + " <input class=\"cancel\" type=\"reset\" value=\"" + _("Reset") + "\"></td></tr>\n" +
 			"<tr><td></td><td align=\"left\"><a href=\"http://hq.postman.i2p/?page_id=14\">" + _("Learn about I2P mail") + "</a></td></tr>\n" +
 			"<tr><td></td><td align=\"left\"><a href=\"http://hq.postman.i2p/?page_id=16\">" + _("Create Account") + "</a></td></tr>\n" +
 			"</table>");
