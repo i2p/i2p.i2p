@@ -228,7 +228,7 @@ hr {
      -khtml-border-radius: 4px;
      border-radius: 4px;
      margin-top: 8px;
-     background: #ffe url(images/header.png) center center repeat-x !important;
+     background: #ffe url(images/header.png) center center repeat-x;
      text-decoration: none;
 }
 

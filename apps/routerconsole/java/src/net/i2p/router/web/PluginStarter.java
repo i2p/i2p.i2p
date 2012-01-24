@@ -127,6 +127,7 @@ public class PluginStarter implements Runnable {
         }
 
         Log log = ctx.logManager().getLog(PluginStarter.class);
+        int updated = 0;
         for (Map.Entry<String, String> entry : toUpdate.entrySet()) {
             String appName = entry.getKey();
             if (log.shouldLog(Log.WARN))
@@ -152,7 +153,13 @@ public class PluginStarter implements Runnable {
                     Thread.sleep(5*1000);
                 } catch (InterruptedException ie) {}
             } while (puh.isRunning());
+            if (puh.wasUpdateSuccessful())
+                updated++;
         }
+        if (updated > 0)
+            puc.setDoneStatus(ngettext("1 plugin updated", "{0} plugins updated", updated, ctx));
+        else
+            puc.setDoneStatus(Messages.getString("Plugin update check complete", ctx));
     }
 
     /** this shouldn't throw anything */
@@ -763,5 +770,10 @@ public class PluginStarter implements Runnable {
         Method method = urlClass.getDeclaredMethod("addURL", new Class[]{URL.class});
         method.setAccessible(true);
         method.invoke(urlClassLoader, new Object[]{u});
+    }
+
+    /** translate a string */
+    private static String ngettext(String s, String p, int n, I2PAppContext ctx) {
+        return Messages.getString(n, s, p, ctx);
     }
 }

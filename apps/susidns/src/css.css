@@ -172,3 +172,43 @@ input[type=reset]:hover {
      opacity: 1.0;
      -moz-box-shadow: inset 0px 0px 0px 1px #fff;
 }
+
+input.accept {
+     background: #ddf url('/themes/console/images/accept.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.add {
+     background: #ddf url('/themes/console/images/add.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.cancel {
+     background: #ddf url('/themes/console/images/cancel.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.delete {
+     background: #ddf url('/themes/console/images/delete.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.reload {
+     background: #ddf url('/themes/console/images/arrow_refresh.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.search {
+     background: #ddf url('/themes/console/images/magnifier.png') no-repeat 2px center;
+     padding: 2px 3px 2px 24px;
+     min-height: 22px;
+}
+
+input.search[type="text"] {
+     background: #eef url('/themes/console/images/magnifier.png') no-repeat 2px center;
+}

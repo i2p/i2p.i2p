@@ -69,8 +69,8 @@
 <textarea name="content" rows="10" cols="80">${subs.content}</textarea>
 </div>
 <div id="buttons">
-<input type="submit" name="action" value="<%=intl._("Reload")%>" >
-<input type="submit" name="action" value="<%=intl._("Save")%>" >
+<input class="reload" type="submit" name="action" value="<%=intl._("Reload")%>" >
+<input class="accept" type="submit" name="action" value="<%=intl._("Save")%>" >
 </div>
 </form>
 <div id="help">

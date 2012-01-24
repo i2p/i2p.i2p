@@ -129,7 +129,7 @@
 <input type="hidden" name="begin" value="0">
 <input type="hidden" name="end" value="99">
 <input type="hidden" name="checked" value="<%=detail%>">
-<input type="submit" name="action" value="<%=intl._("Delete Entry")%>" >
+<input class="delete" type="submit" name="action" value="<%=intl._("Delete Entry")%>" >
 </p>
 </form>
 </div>

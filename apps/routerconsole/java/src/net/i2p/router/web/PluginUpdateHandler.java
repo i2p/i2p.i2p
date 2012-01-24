@@ -42,6 +42,8 @@ public class PluginUpdateHandler extends UpdateHandler {
     private static PluginUpdateRunner _pluginUpdateRunner;
     private String _xpi2pURL;
     private String _appStatus;
+    private volatile boolean _updated;
+
     private static final String XPI2P = "app.xpi2p";
     private static final String ZIP = XPI2P + ".zip";
     public static final String PLUGIN_DIR = "plugins";
@@ -92,6 +94,11 @@ public class PluginUpdateHandler extends UpdateHandler {
         return false;
     }
     
+    /** @since 0.8.13 */
+    public boolean wasUpdateSuccessful() {
+        return _updated;
+    }
+
     private void scheduleStatusClean(String msg) {
         SimpleScheduler.getInstance().addEvent(new Cleaner(msg), 20*60*1000);
     }
@@ -108,6 +115,7 @@ public class PluginUpdateHandler extends UpdateHandler {
     }
 
     public class PluginUpdateRunner extends UpdateRunner implements Runnable, EepGet.StatusListener {
+        private boolean _updated;
 
         public PluginUpdateRunner(String url) { 
             super();
@@ -115,6 +123,7 @@ public class PluginUpdateHandler extends UpdateHandler {
 
         @Override
         protected void update() {
+            _updated = false;
             updateStatus("<b>" + _("Downloading plugin from {0}", _xpi2pURL) + "</b>");
             // use the same settings as for updater
             boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
@@ -383,6 +392,7 @@ public class PluginUpdateHandler extends UpdateHandler {
                 return;
             }
 
+            _updated = true;
             to.delete();
             if (Boolean.valueOf(props.getProperty("dont-start-at-install")).booleanValue()) {
                 if (Boolean.valueOf(props.getProperty("router-restart-required")).booleanValue())

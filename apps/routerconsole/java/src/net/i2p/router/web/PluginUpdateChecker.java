@@ -104,6 +104,12 @@ public class PluginUpdateChecker extends UpdateHandler {
     public void setAppStatus(String status) {
         updateStatus(status);
     }
+    
+    /** @since 0.8.13 */
+    public void setDoneStatus(String status) {
+        updateStatus(status);
+        scheduleStatusClean(status);
+    }
 
     public boolean isRunning() {
         return _pluginUpdateCheckerRunner != null && _pluginUpdateCheckerRunner.isRunning();
