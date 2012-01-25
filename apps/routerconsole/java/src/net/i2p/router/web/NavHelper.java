@@ -36,6 +36,7 @@ public class NavHelper {
     
     /**
      *  Translated string is loaded by PluginStarter
+     *  @param ctx unused
      */
     public static String getClientAppLinks(I2PAppContext ctx) {
         if (_apps.isEmpty())
@@ -54,5 +55,35 @@ public class NavHelper {
             buf.append('>').append(name).append("</a>");
         }
         return buf.toString();
+    }
+    
+    /**
+     *  For HomeHelper
+     *  @param ctx unused
+     *  @return non-null, possibly empty
+     *  @since 0.9
+     */
+    static List<HomeHelper.App> getClientApps(I2PAppContext ctx) {
+        if (_apps.isEmpty())
+            return Collections.EMPTY_LIST;
+        List<HomeHelper.App> rv = new ArrayList(_apps.size());
+        for (Map.Entry<String, String> e : _apps.entrySet()) {
+            String name = e.getKey();
+            String path = e.getValue();
+            if (path == null)
+                continue;
+            String tip = _tooltips.get(name);
+            if (tip == null)
+                tip = "";
+            // hardcoded hack
+            String icon;
+            if (path.equals("/i2pbote/index.jsp"))
+                icon = "/themes/console/images/email.png";
+            else
+                icon = "/themes/console/images/plugin.png";
+            HomeHelper.App app = new HomeHelper.App(name, tip, path, icon);
+            rv.add(app);
+        }
+        return rv;
     }
 }
