@@ -20,4 +20,5 @@
 <jsp:getProperty name="helper" property="updateStatus" />
 <jsp:getProperty name="helper" property="restartStatus" />
 <hr>
+<jsp:getProperty name="helper" property="firewallAndReseedStatus" />
 <jsp:getProperty name="helper" property="destinations" />
