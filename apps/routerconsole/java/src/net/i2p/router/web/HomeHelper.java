@@ -18,7 +18,7 @@ import net.i2p.util.PortMapper;
  */
 public class HomeHelper extends HelperBase {
     
-    private static final char S = ';';
+    private static final char S = ',';
     private static final String I = "/themes/console/images/";
     static final String PROP_SERVICES = "routerconsole.services";
     static final String PROP_FAVORITES = "routerconsole.favorites";
@@ -150,14 +150,14 @@ public class HomeHelper extends HelperBase {
         buf.append("<div class=\"appgroup\">");
         for (App app : apps) {
             buf.append("<div class=\"app\">" +
-                       "<a href=\"").append(app.url).append("\" alt=\"\" title=\"").append(app.desc).append("\">" +
+                       "<a href=\"").append(app.url).append("\">" +
                        "<img class=\"");
             // toopie is 54x68, not 16x16, needs special alignment and sizing
             if (app.icon.endsWith("/itoopie_sm.png"))
                 buf.append("app2p");
             else
                 buf.append("app");
-            buf.append("\" alt=\"\" src=\"").append(app.icon).append("\"></a><br>\n" +
+            buf.append("\" alt=\"\" title=\"").append(app.desc).append("\" src=\"").append(app.icon).append("\"></a><br>\n" +
                        "<table class=\"app\"><tr class=\"app\"><td class=\"app\">" +
                        "<div class=\"applabel\">" +
                        "<a href=\"").append(app.url).append("\" title=\"").append(app.desc).append("\">").append(app.name).append("</a>" +

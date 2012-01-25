@@ -5,6 +5,11 @@
 <html><head>
 <%@include file="css.jsi" %>
 <%=intl.title("config home")%>
+<style type='text/css'>
+button span.hide{
+    display:none;
+}
+</style>
 </head><body>
 
 <%@include file="summary.jsi" %>
@@ -39,6 +44,7 @@
  <input type="hidden" name="group" value="3">
  <jsp:getProperty name="homehelper" property="configSearch" />
  <div class="formaction">
+  <input type="submit" name="action" class="hide" value="<%=intl._("Add item")%>" >
   <input type="submit" name="action" class="delete" value="<%=intl._("Delete selected")%>" >
   <input type="reset" class="cancel" value="<%=intl._("Cancel")%>" >
   <input type="submit" name="action" class="reload" value="<%=intl._("Restore defaults")%>" >
@@ -52,6 +58,7 @@
  <input type="hidden" name="group" value="1">
  <jsp:getProperty name="homehelper" property="configFavorites" />
  <div class="formaction">
+  <input type="submit" name="action" class="hide" value="<%=intl._("Add item")%>" >
   <input type="submit" name="action" class="delete" value="<%=intl._("Delete selected")%>" >
   <input type="reset" class="cancel" value="<%=intl._("Cancel")%>" >
   <input type="submit" name="action" class="reload" value="<%=intl._("Restore defaults")%>" >
@@ -65,6 +72,7 @@
  <input type="hidden" name="group" value="2">
  <jsp:getProperty name="homehelper" property="configServices" />
  <div class="formaction">
+  <input type="submit" name="action" class="hide" value="<%=intl._("Add item")%>" >
   <input type="submit" name="action" class="delete" value="<%=intl._("Delete selected")%>" >
   <input type="reset" class="cancel" value="<%=intl._("Cancel")%>" >
   <input type="submit" name="action" class="reload" value="<%=intl._("Restore defaults")%>" >

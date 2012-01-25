@@ -7,6 +7,8 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Map;
 
+import net.i2p.data.DataHelper;
+
 /**
  *  Simple home page configuration.
  *
@@ -68,8 +70,8 @@ public class ConfigHomeHandler extends FormHandler {
                     addFormError(_("No URL entered"));
                     return;
                 }
-                name = name.replace(";", "");
-                url = url.replace(";", "");
+                name = DataHelper.escapeHTML(name).replace(",", "&#44;");   // HomeHelper.S
+                url = DataHelper.escapeHTML(url).replace(",", "&#44;");
                 HomeHelper.App app = new HomeHelper.App(name, "", url, "/themes/console/images/itoopie_sm.png");
                 apps.add(app);
                 addFormNotice(_("Added") + ": " + app.name);

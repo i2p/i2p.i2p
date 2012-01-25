@@ -3,6 +3,7 @@ package net.i2p.router.web;
 import java.util.Map;
 import java.util.TreeMap;
 
+import net.i2p.data.DataHelper;
 import net.i2p.util.PortMapper;
 
 /**
@@ -16,7 +17,7 @@ public class SearchHelper extends HelperBase {
     private String _query;
     private Map<String, String> _engines = new TreeMap();
     
-    private static final char S = ';';
+    private static final char S = ',';
     static final String PROP_ENGINES = "routerconsole.searchEngines";
     private static final String PROP_DEFAULT = "routerconsole.searchEngine";
 
@@ -84,14 +85,13 @@ public class SearchHelper extends HelperBase {
     public String getURL() {
         if (_engine == null || _query == null)
             return null;
-        _query = _query.trim();
+        _query = DataHelper.escapeHTML(_query).trim();
         if (_query.length() <= 0)
             return null;
         buildEngineMap();
         String url = _engines.get(_engine);
         if (url == null)
             return null;
-        // _query = escape query
         if (url.contains("%s"))
             url = url.replace("%s", _query);
         else
