@@ -33,6 +33,19 @@
  <input type="submit" name="action" class="accept" value="<%=intl._("Save")%>" >
 </form>
 
+<h3><%=intl._("Search Engines")%></h3>
+<form action="" method="POST">
+ <input type="hidden" name="nonce" value="<%=pageNonce%>" >
+ <input type="hidden" name="group" value="3">
+ <jsp:getProperty name="homehelper" property="configSearch" />
+ <div class="formaction">
+  <input type="submit" name="action" class="delete" value="<%=intl._("Delete selected")%>" >
+  <input type="reset" class="cancel" value="<%=intl._("Cancel")%>" >
+  <input type="submit" name="action" class="reload" value="<%=intl._("Restore defaults")%>" >
+  <input type="submit" name="action" class="add" value="<%=intl._("Add item")%>" >
+ </div>
+</form>
+
 <h3><%=intl._("Recommended Eepsites")%></h3>
 <form action="" method="POST">
  <input type="hidden" name="nonce" value="<%=pageNonce%>" >
@@ -41,6 +54,7 @@
  <div class="formaction">
   <input type="submit" name="action" class="delete" value="<%=intl._("Delete selected")%>" >
   <input type="reset" class="cancel" value="<%=intl._("Cancel")%>" >
+  <input type="submit" name="action" class="reload" value="<%=intl._("Restore defaults")%>" >
   <input type="submit" name="action" class="add" value="<%=intl._("Add item")%>" >
  </div>
 </form>
@@ -53,6 +67,7 @@
  <div class="formaction">
   <input type="submit" name="action" class="delete" value="<%=intl._("Delete selected")%>" >
   <input type="reset" class="cancel" value="<%=intl._("Cancel")%>" >
+  <input type="submit" name="action" class="reload" value="<%=intl._("Restore defaults")%>" >
   <input type="submit" name="action" class="add" value="<%=intl._("Add item")%>" >
  </div>
 </form>

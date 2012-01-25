@@ -22,6 +22,7 @@ public class ConfigHomeHandler extends FormHandler {
         String group = getJettyString("group");
         boolean deleting = _action.equals(_("Delete selected"));
         boolean adding = _action.equals(_("Add item"));
+        boolean restoring = _action.equals(_("Restore defaults"));
         if (_action.equals(_("Save")) && "0".equals(group)) {
             boolean old = _context.getBooleanProperty(HomeHelper.PROP_OLDHOME);
             boolean nnew = getJettyString("oldHome") != null;
@@ -29,7 +30,7 @@ public class ConfigHomeHandler extends FormHandler {
                 _context.router().saveConfig(HomeHelper.PROP_OLDHOME, "" + nnew);
                 addFormNotice(_("Home page changed"));
             }
-        } else if (adding || deleting) {
+        } else if (adding || deleting || restoring) {
             String prop;
             String dflt;
             if ("1".equals(group)) {
@@ -38,12 +39,24 @@ public class ConfigHomeHandler extends FormHandler {
             } else if ("2".equals(group)) {
                 prop = HomeHelper.PROP_SERVICES;
                 dflt = HomeHelper.DEFAULT_SERVICES;
+            } else if ("3".equals(group)) {
+                prop = SearchHelper.PROP_ENGINES;
+                dflt = SearchHelper.ENGINES_DEFAULT;
             } else {
                 addFormError("Bad group");
                 return;
             }
+            if (restoring) {
+                _context.router().saveConfig(prop, dflt);
+                addFormNotice(_("Restored default settings"));
+                return;
+            }
             String config = _context.getProperty(prop, dflt);
-            Collection<HomeHelper.App> apps = HomeHelper.buildApps(_context, config);
+            Collection<HomeHelper.App> apps;
+            if ("3".equals(group))
+                apps = HomeHelper.buildSearchApps(config);
+            else
+                apps = HomeHelper.buildApps(_context, config);
             if (adding) {
                 String name = getJettyString("name");
                 if (name == null || name.length() <= 0) {
@@ -80,7 +93,7 @@ public class ConfigHomeHandler extends FormHandler {
                     }
                 }
             }
-            HomeHelper.saveApps(_context, prop, apps);
+            HomeHelper.saveApps(_context, prop, apps, !("3".equals(group)));
         } else {
             addFormError(_("Unsupported"));
         }

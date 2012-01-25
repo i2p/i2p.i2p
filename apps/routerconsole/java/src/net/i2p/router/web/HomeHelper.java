@@ -71,6 +71,10 @@ public class HomeHelper extends HelperBase {
         return configTable(PROP_FAVORITES, DEFAULT_FAVORITES);
     }
 
+    public String getConfigSearch() {
+        return configTable(SearchHelper.PROP_ENGINES, SearchHelper.ENGINES_DEFAULT);
+    }
+
     public String getConfigHome() {
         boolean oldHome = _context.getBooleanProperty(PROP_OLDHOME);
         return oldHome ? "checked=\"true\"" : "";
@@ -96,7 +100,11 @@ public class HomeHelper extends HelperBase {
 
     private String configTable(String prop, String dflt) {
         String config = _context.getProperty(prop, dflt);
-        Collection<App> apps = buildApps(_context, config);
+        Collection<App> apps;
+        if (prop.equals(SearchHelper.PROP_ENGINES))
+            apps = buildSearchApps(config);
+        else
+            apps = buildApps(_context, config);
         return renderConfig(apps);
     }
 
@@ -113,13 +121,26 @@ public class HomeHelper extends HelperBase {
         return apps;
     }
 
-    static void saveApps(RouterContext ctx, String prop, Collection<App> apps) {
+    static Collection<App> buildSearchApps(String config) {
+        String[] args = config.split("" + S);
+        Set<App> apps = new TreeSet(new AppComparator());
+        for (int i = 0; i < args.length - 1; i += 2) {
+            String name = args[i];
+            String url = args[i+1];
+            apps.add(new App(name, null, url, null));
+        }
+        return apps;
+    }
+
+    static void saveApps(RouterContext ctx, String prop, Collection<App> apps, boolean full) {
         StringBuilder buf = new StringBuilder(1024);
         for (App app : apps) {
-            buf.append(app.name).append(S)
-               .append(app.desc).append(S)
-               .append(app.url).append(S)
-               .append(app.icon).append(S);
+            buf.append(app.name).append(S);
+            if (full)
+                buf.append(app.desc).append(S);
+            buf.append(app.url).append(S);
+            if (full)
+                buf.append(app.icon).append(S);
         }
         ctx.router().saveConfig(prop, buf.toString());
     }
@@ -152,7 +173,7 @@ public class HomeHelper extends HelperBase {
         StringBuilder buf = new StringBuilder(1024);
         buf.append("<table><tr><th>")
            .append(_("Remove"))
-           .append("</th><th>")
+           .append("</th><th colspan=\"2\">")
            .append(_("Name"))
            .append("</th><th>")
            .append(_("URL"))
@@ -160,7 +181,11 @@ public class HomeHelper extends HelperBase {
         for (App app : apps) {
             buf.append("<tr><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
                .append(app.name)
-               .append("\"></td><td align=\"left\">")
+               .append("\"></td><td align=\"center\">");
+            if (app.icon != null) {
+                buf.append("<img height=\"16\" src=\"").append(app.icon).append("\">");
+            }
+            buf.append("</td><td align=\"left\">")
                .append(app.name)
                .append("</td><td align=\"left\"><a href=\"")
                .append(app.url)
@@ -168,7 +193,7 @@ public class HomeHelper extends HelperBase {
                .append(app.url)
                .append("</a></td></tr>\n");
         }
-        buf.append("<tr><td align=\"center\"><b>")
+        buf.append("<tr><td colspan=\"2\" align=\"center\"><b>")
            .append(_("Add")).append(":</b>" +
                    "</td><td align=\"left\"><input type=\"text\" name=\"name\"></td>" +
                    "<td align=\"left\"><input type=\"text\" size=\"40\" name=\"url\"></td></tr>");

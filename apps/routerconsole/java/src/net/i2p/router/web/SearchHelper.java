@@ -17,10 +17,10 @@ public class SearchHelper extends HelperBase {
     private Map<String, String> _engines = new TreeMap();
     
     private static final char S = ';';
-    private static final String PROP_ENGINES = "routerconsole.searchEngines";
+    static final String PROP_ENGINES = "routerconsole.searchEngines";
     private static final String PROP_DEFAULT = "routerconsole.searchEngine";
 
-    private static final String PROP_DEFAULTS =
+    static final String ENGINES_DEFAULT =
         "eepsites.i2p" + S + "http://eepsites.i2p/Content/Search/SearchResults.aspx?inpQuery=%s" + S +
         "epsilon.i2p" + S + "http://epsilon.i2p/search.jsp?q=%s" + S +
         "sprongle.i2p" + S + "http://sprongle.i2p/sprongle.php?q=%s" + S +
@@ -40,7 +40,7 @@ public class SearchHelper extends HelperBase {
     }
 
     private void buildEngineMap() {
-        String config = _context.getProperty(PROP_ENGINES, PROP_DEFAULTS);
+        String config = _context.getProperty(PROP_ENGINES, ENGINES_DEFAULT);
         String[] args = config.split("" + S);
         for (int i = 0; i < args.length - 1; i += 2) {
             String name = args[i];
