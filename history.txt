@@ -1,3 +1,9 @@
+2012-01-24 zzz
+  * Addresses: Fix NPE if no interfaces found http://forum.i2p/viewtopic.php?t=6365
+  * i2ptunnel: Fix white-on-white buttons on hover
+  * Plugins: Add completion message after all-update check
+  * susidns, susimail: Add icons to buttons
+
 2012-01-22 zzz
   * Transports: Bind only to a single interface if specified
                 as the host address and it's available (ticket #591)
