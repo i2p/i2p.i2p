@@ -69,7 +69,8 @@
                 <hr />
             </div>
 
-            <%
+            <% /* Page 1 - Whether to make a client or server tunnel */
+
             if (curPage == 1) {
             %><div id="typeField" class="rowItem">
                 <label><%=intl._("Server Tunnel")%></label>
@@ -79,9 +80,12 @@
             </div><%
             } else {
             %><input type="hidden" name="isClient" value="<%=tunnelIsClient%>" /><%
-            } /* curPage 1 */ %>
+            } /* curPage 1 */
 
-            <%
+               /* End page 1 */ %>
+
+            <% /* Page 2 - Tunnel type */
+
             if (curPage == 2) {
             %><div id="typeField" class="rowItem">
                 <%
@@ -107,9 +111,12 @@
             </div><%
             } else {
             %><input type="hidden" name="type" value="<%=tunnelType%>" /><%
-            } /* curPage 2 */ %>
+            } /* curPage 2 */
 
-            <%
+               /* End page 2 */ %>
+
+            <% /* Page 3 - Name and description */
+
             if (curPage == 3) {
             %><div id="nameField" class="rowItem">
                 <label for="name" accesskey="N">
@@ -126,10 +133,12 @@
             } else {
             %><input type="hidden" name="name" value="<%=wizardBean.getName()%>" />
             <input type="hidden" name="description" value="<%=wizardBean.getDescription()%>" /><%
-            } /* curPage 3 */ %>
-        </div>
+            } /* curPage 3 */
 
-            <%
+               /* End page 3 */ %>
+
+            <% /* Page 4 - Target destination or proxy list */
+
             if (tunnelIsClient) {
               if ("httpclient".equals(tunnelType) || "connectclient".equals(tunnelType) || "sockstunnel".equals(tunnelType) || "socksirctunnel".equals(tunnelType)) {
                 if (curPage == 4) {
@@ -155,7 +164,9 @@
             %><input type="hidden" name="targetDestination" value="<%=wizardBean.getTargetDestination()%>" /><%
                 } /* curPage 4 */
               }
-            } /* tunnelIsClient */ %>
+            } /* tunnelIsClient */
+
+               /* End page 4 */ %>
 
             <% /* Page 5 - Binding ports and addresses*/
 
@@ -221,7 +232,9 @@
               } else {
             %><input type="hidden" name="reachableBy" value="<%=wizardBean.getReachableBy()%>" /><%
               } /* curPage 5 */
-            } /* (tunnelIsClient && !streamrclient) ||  httpbidirserver || streamrserver */ %>
+            } /* (tunnelIsClient && !streamrclient) ||  httpbidirserver || streamrserver */
+
+               /* End page 5 */ %>
         </div>
 
         <div id="globalOperationsPanel" class="panel">
