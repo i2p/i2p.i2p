@@ -75,16 +75,19 @@ public abstract class Addresses {
         } catch (UnknownHostException e) {}
 
         try {
-            for(Enumeration<NetworkInterface> ifcs = NetworkInterface.getNetworkInterfaces(); ifcs.hasMoreElements();) {
-                NetworkInterface ifc = ifcs.nextElement();
-                for(Enumeration<InetAddress> addrs =  ifc.getInetAddresses(); addrs.hasMoreElements();) {
-                    InetAddress addr = addrs.nextElement();
-                    if (addr instanceof Inet4Address)
-                        haveIPv4 = true;
-                    else
-                        haveIPv6 = true;
-                    if (shouldInclude(addr, includeLocal, includeIPv6))
-                        rv.add(addr.getHostAddress());
+            Enumeration<NetworkInterface> ifcs = NetworkInterface.getNetworkInterfaces();
+            if (ifcs != null) {
+                while (ifcs.hasMoreElements()) {
+                    NetworkInterface ifc = ifcs.nextElement();
+                    for(Enumeration<InetAddress> addrs =  ifc.getInetAddresses(); addrs.hasMoreElements();) {
+                        InetAddress addr = addrs.nextElement();
+                        if (addr instanceof Inet4Address)
+                            haveIPv4 = true;
+                        else
+                            haveIPv6 = true;
+                        if (shouldInclude(addr, includeLocal, includeIPv6))
+                            rv.add(addr.getHostAddress());
+                    }
                 }
             }
         } catch (SocketException e) {}
