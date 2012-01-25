@@ -235,6 +235,22 @@
             } /* (tunnelIsClient && !streamrclient) ||  httpbidirserver || streamrserver */
 
                /* End page 5 */ %>
+
+            <% /* Page 6 - Automatic start */
+
+            if (curPage == 6) {
+            %><div id="startupField" class="rowItem">
+                <label for="startOnLoad" accesskey="a">
+                    <%=intl._("Auto Start")%>(<span class="accessKey">A</span>):
+                </label>
+                <input value="1" type="checkbox" id="startOnLoad" name="startOnLoad" title="Start Tunnel Automatically" class="tickbox" />
+                <span class="comment"><%=intl._("(Check the Box for 'YES')")%></span>
+            </div><%
+            } else {
+            %><input type="hidden" name="startOnLoad" value="<%=wizardBean.getStartOnLoad()%>" /><%
+            } /* curPage 6 */
+
+               /* End page 6 */ %>
         </div>
 
         <div id="globalOperationsPanel" class="panel">
