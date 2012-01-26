@@ -7,7 +7,7 @@ package net.i2p.i2ptunnel.web;
  * it will be moved from the jar to the war.
  * Usage by classes outside of i2ptunnel.war is deprecated.
  */
-public class WizardBean extends IndexBean {
+public class WizardBean extends EditBean {
     private boolean _isClient;
     public WizardBean() { super(); }
 
