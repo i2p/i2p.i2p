@@ -1,3 +1,9 @@
+2012-01-26 zzz
+  * configclients: Fix form action default
+  * NetDB: Increase min ff to 200
+  * Plugins: Fix updated count
+  * SusiDNS: Make UI 1-based
+
 2012-01-24 zzz
   * Addresses: Fix NPE if no interfaces found http://forum.i2p/viewtopic.php?t=6365
   * i2ptunnel: Fix white-on-white buttons on hover

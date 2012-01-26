@@ -1490,6 +1490,7 @@ public class DataHelper {
      * @param escaped the escaped string, may be null
      * @return the unescaped string, or null if null is passed in
      */
+/**** unused, uncomment if you need it
     public static String unescapeHTML(String escaped) {
         if (escaped == null) return null;
         String unescaped = escaped;
@@ -1498,7 +1499,9 @@ public class DataHelper {
         }
         return unescaped;
     }
+****/
 
+    /** */
     public static final int MAX_UNCOMPRESSED = 40*1024;
     public static final int MAX_COMPRESSION = Deflater.BEST_COMPRESSION;
     public static final int NO_COMPRESSION = Deflater.NO_COMPRESSION;
