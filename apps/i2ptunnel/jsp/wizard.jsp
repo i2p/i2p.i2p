@@ -259,9 +259,9 @@
                 <div class=toolbox">
                     <button id="controlCancel" class="control" type="submit" name="action" value="" title="Cancel"><%=intl._("Cancel")%></button>
                     <% if (curPage == 7) {
-                    %><button id="controlNext" accesskey="N" class="control" type="submit" name="action" value="Next page" title="Next Page"><%=intl._("Next")%>(<span class="accessKey">N</span>)</button><%
-                    } else {
                     %><button id="controlFinish" accesskey="F" class="control" type="submit" name="action" value="Finish wizard" title="Finish Wizard"><%=intl._("Finish")%>(<span class="accessKey">F</span>)</button><%
+                    } else {
+                    %><button id="controlNext" accesskey="N" class="control" type="submit" name="action" value="Next page" title="Next Page"><%=intl._("Next")%>(<span class="accessKey">N</span>)</button><%
                     } %>
                 </div>
             </div>
