@@ -40,7 +40,7 @@
     <div id="pageHeader">
     </div>
 
-    <form method="post" action="<%=(curPage == 7 ? "list" : "wizard") %>">
+    <form method="post" action="<%=(curPage == 7 ? "list" : "wizard?page="+(curPage+1)) %>">
 
         <div id="wizardPanel" class="panel">
             <div class="header">
