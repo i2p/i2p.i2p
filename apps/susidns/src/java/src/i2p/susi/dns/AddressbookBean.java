@@ -261,16 +261,16 @@ public class AddressbookBean
 				int newBegin = Math.max(0, getBeginInt() - DISPLAY_SIZE);
 				int newEnd = Math.max(0, getBeginInt() - 1);
 		       		message += " <a href=\"addressbook?book=" + getBook() + filterArg +
-				           "&amp;begin=" + newBegin + "&amp;end=" + newEnd + "\">" + newBegin +
-				           '-' + newEnd + "</a> | ";
+				           "&amp;begin=" + newBegin + "&amp;end=" + newEnd + "\">" + (newBegin+1) +
+				           '-' + (newEnd+1) + "</a> | ";
 	       		}
-			message += ' ' + _("Showing {0} of {1}", getBegin() + '-' + getEnd(), Integer.valueOf(resultCount));
+			message += ' ' + _("Showing {0} of {1}", "" + (getBeginInt()+1) + '-' + (getEndInt()+1), Integer.valueOf(resultCount));
 			if (getEndInt() < resultCount - 1) {
 				int newBegin = Math.min(resultCount - 1, getEndInt() + 1);
 				int newEnd = Math.min(resultCount, getEndInt() + DISPLAY_SIZE);
 		       		message += " | <a href=\"addressbook?book=" + getBook() + filterArg +
-				           "&amp;begin=" + newBegin + "&amp;end=" + newEnd + "\">" + newBegin +
-				           '-' + newEnd + "</a>";
+				           "&amp;begin=" + newBegin + "&amp;end=" + newEnd + "\">" + (newBegin+1) +
+				           '-' + (newEnd+1) + "</a>";
 			}
 		}
 		return message;
