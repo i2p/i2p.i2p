@@ -115,7 +115,6 @@ public class PluginUpdateHandler extends UpdateHandler {
     }
 
     public class PluginUpdateRunner extends UpdateRunner implements Runnable, EepGet.StatusListener {
-        private boolean _updated;
 
         public PluginUpdateRunner(String url) { 
             super();
