@@ -20,7 +20,7 @@
      }
    }
    boolean tunnelIsClient = wizardBean.getIsClient();
-   String tunnelType = wizardBean.getType();
+   String tunnelType = request.getParameter("type");
 %>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
@@ -131,8 +131,8 @@
                 <input type="text" size="60" maxlength="80" name="description"  id="description" title="Tunnel Description" value="" class="freetext" />
             </div><%
             } else {
-            %><input type="hidden" name="name" value="<%=wizardBean.getName()%>" />
-            <input type="hidden" name="description" value="<%=wizardBean.getDescription()%>" /><%
+            %><input type="hidden" name="name" value="<%=request.getParameter("name")%>" />
+            <input type="hidden" name="description" value="<%=request.getParameter("description")%>" /><%
             } /* curPage 3 */
 
                /* End page 3 */ %>
@@ -149,7 +149,7 @@
                 <input type="text" size="30" id="proxyList" name="proxyList" title="List of Outproxy I2P destinations" value="" class="freetext" />                
             </div><%
                 } else {
-            %><input type="hidden" name="proxyList" value="<%=wizardBean.getProxyList()%>" /><%
+            %><input type="hidden" name="proxyList" value="<%=request.getParameter("proxyList")%>" /><%
                 } /* curPage 4 */
               } else if ("client".equals(tunnelType) || "ircclient".equals(tunnelType) || "streamrclient".equals(tunnelType)) {
                 if (curPage == 4) {
@@ -161,7 +161,7 @@
                 <span class="comment">(<%=intl._("name or destination")%>; <%=intl._("b32 not recommended")%>)</span>
             </div><%
                 } else {
-            %><input type="hidden" name="targetDestination" value="<%=wizardBean.getTargetDestination()%>" /><%
+            %><input type="hidden" name="targetDestination" value="<%=request.getParameter("targetDestination")%>" /><%
                 } /* curPage 4 */
               }
             } /* tunnelIsClient */
@@ -179,7 +179,7 @@
                 <input type="text" size="20" id="targetHost" name="targetHost" title="Target Hostname or IP" value="" class="freetext" />
             </div><%
               } else {
-            %><input type="hidden" name="targetHost" value="<%=wizardBean.getTargetHost()%>" /><%
+            %><input type="hidden" name="targetHost" value="<%=request.getParameter("targetHost")%>" /><%
               } /* curPage 5 */
             } /* streamrclient or !streamrserver */ %>
             <%
@@ -191,7 +191,7 @@
                 <input type="text" size="6" maxlength="5" id="targetPort" name="targetPort" title="Target Port Number" value="" class="freetext" />
             </div><%
               } else {
-            %><input type="hidden" name="targetPort" value="<%=wizardBean.getTargetPort()%>" /><%
+            %><input type="hidden" name="targetPort" value="<%=request.getParameter("targetPort")%>" /><%
               } /* curPage 5 */
             } /* !tunnelIsClient */ %>
             <%
@@ -204,7 +204,7 @@
                 <input type="text" size="6" maxlength="5" id="port" name="port" title="Access Port Number" value="" class="freetext" />
             </div><%
               } else {
-            %><input type="hidden" name="port" value="<%=wizardBean.getPort()%>" /><%
+            %><input type="hidden" name="port" value="<%=request.getParameter("port")%>" /><%
               } /* curPage 5 */
             } /* tunnelIsClient or httpbidirserver */ %>
             <%
@@ -230,7 +230,7 @@
                 </select>                
             </div><%
               } else {
-            %><input type="hidden" name="reachableBy" value="<%=wizardBean.getReachableBy()%>" /><%
+            %><input type="hidden" name="reachableBy" value="<%=request.getParameter("reachableBy")%>" /><%
               } /* curPage 5 */
             } /* (tunnelIsClient && !streamrclient) ||  httpbidirserver || streamrserver */
 
@@ -247,7 +247,7 @@
                 <span class="comment"><%=intl._("(Check the Box for 'YES')")%></span>
             </div><%
             } else {
-            %><input type="hidden" name="startOnLoad" value="<%=wizardBean.getStartOnLoad()%>" /><%
+            %><input type="hidden" name="startOnLoad" value="<%=request.getParameter("startOnLoad")%>" /><%
             } /* curPage 6 */
 
                /* End page 6 */ %>
