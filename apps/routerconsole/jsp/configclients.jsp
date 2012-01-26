@@ -9,6 +9,7 @@
 button span.hide{
     display:none;
 }
+input.default { width: 1px; height: 1px; visibility: hidden; }
 </style></head><body>
 
 <%@include file="summary.jsi" %>
@@ -89,6 +90,7 @@ button span.hide{
 <%=intl._("Many clients do not support SSL or authorization.")%>
 <i><%=intl._("All changes require restart to take effect.")%></i>
 </p><hr><div class="formaction">
+<input type="submit" class="default" name="action" value="<%=intl._("Save Interface Configuration")%>" />
 <input type="submit" class="cancel" name="foo" value="<%=intl._("Cancel")%>" />
 <input type="submit" class="accept" name="action" value="<%=intl._("Save Interface Configuration")%>" />
 </div></form>
@@ -127,6 +129,7 @@ button span.hide{
 <p>
  <input type="text" size="60" name="pluginURL" >
  </p><hr><div class="formaction">
+ <input type="submit" name="action" class="default" value="<%=intl._("Install Plugin")%>" />
  <input type="submit" class="cancel" name="foo" value="<%=intl._("Cancel")%>" />
  <input type="submit" name="action" class="download" value="<%=intl._("Install Plugin")%>" />
  <input type="submit" name="action" class="reload" value="<%=intl._("Update All Installed Plugins")%>" />
