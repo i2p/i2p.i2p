@@ -170,7 +170,7 @@
 
             <% /* Page 5 - Binding ports and addresses*/
 
-            if ((tunnelIsClient && "streamrclient".equals(tunnelType)) || !"streamrserver".equals(tunnelType)) {
+            if ((tunnelIsClient && "streamrclient".equals(tunnelType)) || (!tunnelIsClient && !"streamrserver".equals(tunnelType))) {
               if (curPage == 5) {
             %><div id="hostField" class="rowItem">
                 <label for="targetHost" accesskey="H">
