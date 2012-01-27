@@ -21,7 +21,10 @@
             </classpath>
         </depend>
     </target>
+
     <property name="javac.compilerargs" value="" />
+
+    <!-- compile everything including client classes -->
     <target name="compile" depends="depend">
         <mkdir dir="./build" />
         <mkdir dir="./build/obj" />
@@ -34,6 +37,7 @@
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
+
     <target name="compileTest" depends="compile">
         <javac 
             srcdir="./test" 
@@ -59,10 +63,26 @@
         </exec>
     </target>
 
+    <!-- does not include client classes, moved to samclient.jar -->
     <target name="jar" depends="compile, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
         <!-- set if unset -->
         <property name="workspace.changes.tr" value="" />
-        <jar destfile="./build/sam.jar" basedir="./build/obj" includes="**/*.class">
+        <jar destfile="./build/sam.jar" basedir="./build/obj" includes="**/*.class" excludes="net/i2p/sam/client/*">
+            <manifest>
+                <attribute name="Main-Class" value="net.i2p.sam.SAMBridge" />
+                <attribute name="Class-Path" value="i2p.jar mstreaming.jar streaming.jar" />
+                <attribute name="Implementation-Version" value="${full.version}" />
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.tr}" />
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="clientjar" depends="compile, listChangedFiles" >
+        <!-- set if unset -->
+        <property name="workspace.changes.tr" value="" />
+        <jar destfile="./build/samclient.jar" basedir="./build/obj" includes="net/i2p/sam/client/*.class">
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.sam.SAMBridge" />
                 <attribute name="Class-Path" value="i2p.jar mstreaming.jar streaming.jar" />
