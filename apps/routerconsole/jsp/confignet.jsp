@@ -68,6 +68,8 @@
  </p><p><b><%=intl._("UDP Configuration:")%></b><br>
  <%=intl._("UDP port:")%>
  <input name ="udpPort" type="text" size="5" maxlength="5" value="<jsp:getProperty name="nethelper" property="configuredUdpPort" />" ><br>
+ <input type="checkbox" class="optbox" name="disableUDP" value="disabled" <%=nethelper.getUdpDisabledChecked() %> >
+ <%=intl._("Completely disable")%> <i><%=intl._("(select only if behind a firewall that blocks outbound UDP)")%></i><br>
 <% /********
 <!-- let's keep this simple...
 <input type="checkbox" class="optbox" name="requireIntroductions" value="true" <jsp:getProperty name="nethelper" property="requireIntroductionsChecked" /> />
