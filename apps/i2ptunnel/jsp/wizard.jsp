@@ -248,7 +248,9 @@
                 <span class="comment"><%=intl._("(Check the Box for 'YES')")%></span>
             </div><%
             } else {
+              if ("1".equals(request.getParameter("startOnLoad"))) {
             %><input type="hidden" name="startOnLoad" value="<%=request.getParameter("startOnLoad")%>" /><%
+              }
             } /* curPage 6 */
 
                /* End page 6 */ %>
