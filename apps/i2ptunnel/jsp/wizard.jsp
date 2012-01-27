@@ -19,7 +19,7 @@
        curPage = 1;
      }
    }
-   boolean tunnelIsClient = wizardBean.getIsClient();
+   boolean tunnelIsClient = Boolean.valueOf(request.getParameter("isClient"));
    String tunnelType = request.getParameter("type");
 %>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -74,9 +74,9 @@
             if (curPage == 1) {
             %><div id="typeField" class="rowItem">
                 <label><%=intl._("Server Tunnel")%></label>
-                <input value="0" type="radio" id="baseType" name="isClient" class="tickbox" />
+                <input value="false" type="radio" id="baseType" name="isClient" class="tickbox" />
                 <label><%=intl._("Client Tunnel")%></label>
-                <input value="1" type="radio" id="baseType" name="isClient" class="tickbox" />
+                <input value="true" type="radio" id="baseType" name="isClient" class="tickbox" />
             </div><%
             } else {
             %><input type="hidden" name="isClient" value="<%=tunnelIsClient%>" /><%
