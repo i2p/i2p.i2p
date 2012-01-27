@@ -618,6 +618,15 @@
         </copy>
     </target>
 
+    <target name="preppkgRepack" depends="preppkg-linux, preppkg-freebsd, preppkg-osx, preppkg-windows, jbigi">
+        <ant target="repack200" />
+        <!-- no use doing repack200 on jbigi.jar -->
+        <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
+        <copy todir="pkg-temp/lib/wrapper/solaris/">
+            <fileset dir="installer/lib/wrapper/solaris/" />
+        </copy>
+    </target>
+
     <target name="preppkg-freebsd" depends="preppkg-unix">
         <copy todir="pkg-temp/lib/wrapper/freebsd/">
             <fileset dir="installer/lib/wrapper/freebsd/" />
@@ -865,10 +874,12 @@
     <target name="updater200WithJettyFixes" depends="prepjupdatefixes, preplicenses, pack200, zipit200" />
     <target name="updater200WithJettyFixesAndJbigi" depends="prepjupdatefixes, prepjbigiupdate, preplicenses, pack200, zipit200" />
     <target name="updater" depends="prepupdate, preplicenses, zipit" />
+    <target name="updaterRepack" depends="prepupdate, preplicenses, repack200, zipit" />
     <target name="updaterWithJavadoc" depends="prepupdate, preplicenses, copyJavadoc, zipit" />
     <target name="updater200WithJavadoc" depends="prepupdate, preplicenses, copyJavadoc, pack200, zipit200" />
     <target name="updaterWithGeoIP" depends="prepupdate, prepgeoupdate, preplicenses, zipit" />
     <target name="updaterWithJetty" depends="prepjupdate, preplicenses, zipit" />
+    <target name="updaterWithJettyRepack" depends="prepjupdate, preplicenses, repack200, zipit" />
     <target name="updaterWithJettyFixes" depends="prepjupdatefixes, preplicenses, zipit" />
     <target name="updaterWithJettyFixesAndJbigi" depends="prepjupdatefixes, prepjbigiupdate, preplicenses, zipit" />
     <target name="updaterWithJettyFixesAndGeoIP" depends="prepjupdatefixes, prepgeoupdate, preplicenses, zipit" />
@@ -893,24 +904,47 @@
     </target>
 
     <target name="pack200">
-<!-- *nix here -->
+        <!-- pack200 will only pack to a .pack file, and only from a .jar file, so we put another .jar on the end -->
+        <!-- *nix here -->
         <exec executable="sh" osfamily="unix" failonerror="true">
             <arg value="-c" />
             <arg value="for i in pkg-temp/lib/*.jar pkg-temp/webapps/*war; do echo pack200 $i; mv $i $i.jar; pack200 -g $i.pack $i.jar; rm -f $i.jar; done" />
         </exec>
         <exec executable="sh" osfamily="mac" failonerror="true">
             <arg value="-c" />
-            <!-- pack200 will only pack to a .pack file, and only from a .jar file, so we put another .jar on the end -->
             <arg value="for i in pkg-temp/lib/*.jar pkg-temp/webapps/*war; do echo pack200 $i; mv $i $i.jar; pack200 -g $i.pack $i.jar; rm -f $i.jar; done" />
         </exec>
-<!-- windoz here : i admit, i hate escaped symbols in xml, indeed = =! -->
-		<exec executable="cmd" osfamily="windows" failonerror="true">
-			<arg value="/c" />
-			<arg value="for %i in (pkg-temp\webapps\*.war) do move %i %i.jar &amp;&amp; pack200 -g pkg-temp\webapps\%~ni.war.pack %i.jar &amp;&amp; del %i.jar" />
+        <!-- windoz here : i admit, i hate escaped symbols in xml, indeed = =! -->
+        <exec executable="cmd" osfamily="windows" failonerror="true">
+            <arg value="/c" />
+            <arg value="for %i in (pkg-temp\webapps\*.war) do move %i %i.jar &amp;&amp; pack200 -g pkg-temp\webapps\%~ni.war.pack %i.jar &amp;&amp; del %i.jar" />
         </exec>
-		<exec executable="cmd" osfamily="windows" failonerror="true">
-			<arg value="/c" />
-			<arg value="for %i in (pkg-temp\lib\*.jar) do move %i %i.jar &amp;&amp; pack200 -g pkg-temp\lib\%~ni.jar.pack %i.jar &amp;&amp; del %i.jar" />
+        <exec executable="cmd" osfamily="windows" failonerror="true">
+                <arg value="/c" />
+                <arg value="for %i in (pkg-temp\lib\*.jar) do pack200 -g %i.pack %i &amp;&amp; del %i" />
+        </exec>
+    </target>
+
+    <!-- saves about 1% on average (more on jars with multiple compiled po files since they have lots of common strings) -->
+    <target name="repack200">
+        <!-- pack200 will only repack a .jar file, so we put another .jar on the end -->
+        <!-- *nix here -->
+        <exec executable="sh" osfamily="unix" failonerror="true">
+            <arg value="-c" />
+            <arg value="for i in pkg-temp/lib/*.jar pkg-temp/webapps/*war; do echo pack200 -r $i; mv $i $i.jar; pack200 -r $i.jar; mv $i.jar $i; done" />
+        </exec>
+        <exec executable="sh" osfamily="mac" failonerror="true">
+            <arg value="-c" />
+            <arg value="for i in pkg-temp/lib/*.jar pkg-temp/webapps/*war; do echo pack200 -r $i; mv $i $i.jar; pack200 -r $i.jar; mv $i.jar $i; done" />
+        </exec>
+        <!-- windoz here : i admit, i hate escaped symbols in xml, indeed = =! -->
+        <exec executable="cmd" osfamily="windows" failonerror="true">
+            <arg value="/c" />
+            <arg value="for %i in (pkg-temp\webapps\*.war) do move %i %i.jar &amp;&amp; pack200 -r %i.jar &amp;&amp; move %i.jar %i" />
+        </exec>
+        <exec executable="cmd" osfamily="windows" failonerror="true">
+                <arg value="/c" />
+                <arg value="for %i in (pkg-temp\lib\*.jar) do pack200 -r %i" />
         </exec>
     </target>
 
@@ -1267,7 +1301,7 @@
 <!--
     <target name="release" depends="distclean, updaterWithJettyFixesAndJbigi , updater200WithJettyFixes, preppkg, installer, getReleaseNumber" >
 -->
-    <target name="release" depends="verifyReleaseBuildNumbers, distclean, testscripts, updater, updater200, preppkg, installer" >
+    <target name="release" depends="verifyReleaseBuildNumbers, distclean, testscripts, updaterRepack, updater200, preppkgRepack, installer" >
         <echo message="================================================================" />
         <echo message="Did you update these files?" />
         <exec executable="ls" failonerror="true">
