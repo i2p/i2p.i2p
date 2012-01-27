@@ -187,6 +187,7 @@
               if (curPage == 5) {
             %><div id="portField" class="rowItem">
                 <label for="targetPort" accesskey="P">
+                    <%=intl._("Port")%>(<span class="accessKey">P</span>):
                 </label>
                 <input type="text" size="6" maxlength="5" id="targetPort" name="targetPort" title="Target Port Number" value="" class="freetext" />
             </div><%
