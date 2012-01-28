@@ -298,7 +298,11 @@ ANCHORFILE="$PIDDIR/$APP_NAME.anchor"
 COMMANDFILE="$PIDDIR/$APP_NAME.command"
 STATUSFILE="$PIDDIR/$APP_NAME.status"
 JAVASTATUSFILE="$PIDDIR/$APP_NAME.java.status"
-PIDFILE="$PIDDIR/$APP_NAME.pid"
+if [ $(which awk) ]; then
+    PIDFILE="$(awk -F'=' '/^ *wrapper\.pidfile/{print $2}' "$WRAPPER_CONF")"
+else
+    PIDFILE="$PIDDIR/$APP_NAME.pid"
+fi
 LOCKDIR="/var/lock/subsys"
 LOCKFILE="$LOCKDIR/$APP_NAME"
 pid=""
