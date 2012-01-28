@@ -151,13 +151,13 @@ PLIST_DOMAIN=org.tanukisoftware.wrapper
 
 # Do not modify anything beyond this point
 #-----------------------------------------------------------------------------
-if [ ! -e $WRAPPER_CONF ]; then
+if [ ! -e "$WRAPPER_CONF" ]; then
        echo "Starting I2P Failed: Unable to find $WRAPPER_CONF"
        exit 1
 fi
 
 # Workaround for Gentoo
-JAVABINARY=$(awk -F'=' '/^ *wrapper\.java\.command/{print $2}' $WRAPPER_CONF)
+JAVABINARY=$(awk -F'=' '/^ *wrapper\.java\.command/{print $2}' "$WRAPPER_CONF")
 
 if [ -e /etc/gentoo-release ]; then
     if [ $JAVABINARY = java ]; then
@@ -201,7 +201,7 @@ failed() {
         esac
 }
 
-if [ ! -r ${WRAPPER_CMD} ]; then
+if [ ! -r "${WRAPPER_CMD}" ]; then
     echo "Unable to locate i2psvc in ${I2P}!"
     echo
     unsupported
