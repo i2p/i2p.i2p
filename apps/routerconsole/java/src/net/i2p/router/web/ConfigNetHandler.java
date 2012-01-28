@@ -49,6 +49,7 @@ public class ConfigNetHandler extends FormHandler {
     private boolean _enableLoadTesting;
     private String _sharePct;
     private boolean _ratesOnly;
+    private boolean _udpDisabled;
     private final Map<String, String> changes = new HashMap();
     private static final String PROP_HIDDEN = Router.PROP_HIDDEN_HIDDEN; // see Router for other choice
     
@@ -128,6 +129,11 @@ public class ConfigNetHandler extends FormHandler {
     /** @since 0.8.12 */
     public void setRatesOnly(String foo) {
         _ratesOnly = true;
+    }
+    
+    /** @since 0.8.13 */
+    public void setDisableUDP(String foo) {
+        _udpDisabled = true;
     }
     
     private void recheckReachability() {
@@ -269,6 +275,16 @@ public class ConfigNetHandler extends FormHandler {
                     addFormNotice(_("Disabling laptop mode"));
             }
             changes.put(UDPTransport.PROP_LAPTOP_MODE, "" + _laptop);
+
+            if (_context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP) !=
+                !_udpDisabled) {
+                if (_udpDisabled)
+                    addFormNotice(_("Disabling UDP"));
+                else
+                    addFormNotice(_("Enabling UDP"));
+                restartRequired = true;
+            }
+            changes.put(TransportManager.PROP_ENABLE_UDP, "" + (!_udpDisabled));
 
             if (_requireIntroductions) {
                 changes.put(UDPTransport.PROP_FORCE_INTRODUCERS, "true");

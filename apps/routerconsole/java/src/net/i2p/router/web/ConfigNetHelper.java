@@ -135,6 +135,16 @@ public class ConfigNetHelper extends HelperBase {
         return "";
     }
 
+    /**
+     * default false, inverse of default true property
+     * @since 0.8.13
+     */
+    public String getUdpDisabledChecked() {
+        if (!_context.getBooleanPropertyDefaultTrue(TransportManager.PROP_ENABLE_UDP))
+            return CHECKED;
+        return "";
+    }
+
     public String getRequireIntroductionsChecked() {
         short status = _context.commSystem().getReachabilityStatus();
         switch (status) {

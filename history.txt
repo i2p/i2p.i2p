@@ -1,3 +1,9 @@
+2012-01-27 zzz
+  * Build: Repack release jars with pack200 -r, saves about 1% and
+           might save a little memory at runtime too
+  * confignet: Add UDP disable option
+  * SAM: Remove client demo classes from sam.jar
+
 2012-01-26 zzz
   * configclients: Fix form action default
   * NetDB: Increase min ff to 200
