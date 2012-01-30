@@ -55,10 +55,10 @@
 <div id="navi">
 <p>
 <%=intl._("Address books")%>:
-<a href="addressbook?book=private&amp;filter=none&amp;begin=0&amp;end=99"><%=intl._("private")%></a> |
-<a href="addressbook?book=master&amp;filter=none&amp;begin=0&amp;end=99"><%=intl._("master")%></a> |
-<a href="addressbook?book=router&amp;filter=none&amp;begin=0&amp;end=99"><%=intl._("router")%></a> |
-<a href="addressbook?book=published&amp;filter=none&amp;begin=0&amp;end=99"><%=intl._("published")%></a> *
+<a href="addressbook?book=private&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._("private")%></a> |
+<a href="addressbook?book=master&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._("master")%></a> |
+<a href="addressbook?book=router&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._("router")%></a> |
+<a href="addressbook?book=published&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._("published")%></a> *
 <a href="subscriptions"><%=intl._("Subscriptions")%></a> *
 <a href="config"><%=intl._("Configuration")%></a> *
 <a href="index"><%=intl._("Overview")%></a>
@@ -77,45 +77,45 @@ ${book.loadBookMessages}
 <c:if test="${book.notEmpty}">
 <div id="filter">
 <p><%=intl._("Filter")%>:
-<a href="addressbook?filter=a&amp;begin=0&amp;end=99">a</a>
-<a href="addressbook?filter=b&amp;begin=0&amp;end=99">b</a>
-<a href="addressbook?filter=c&amp;begin=0&amp;end=99">c</a> 
-<a href="addressbook?filter=d&amp;begin=0&amp;end=99">d</a>
-<a href="addressbook?filter=e&amp;begin=0&amp;end=99">e</a>
-<a href="addressbook?filter=f&amp;begin=0&amp;end=99">f</a>
-<a href="addressbook?filter=g&amp;begin=0&amp;end=99">g</a>
-<a href="addressbook?filter=h&amp;begin=0&amp;end=99">h</a>
-<a href="addressbook?filter=i&amp;begin=0&amp;end=99">i</a>
-<a href="addressbook?filter=j&amp;begin=0&amp;end=99">j</a>
-<a href="addressbook?filter=k&amp;begin=0&amp;end=99">k</a>
-<a href="addressbook?filter=l&amp;begin=0&amp;end=99">l</a>
-<a href="addressbook?filter=m&amp;begin=0&amp;end=99">m</a>
-<a href="addressbook?filter=n&amp;begin=0&amp;end=99">n</a>
-<a href="addressbook?filter=o&amp;begin=0&amp;end=99">o</a>
-<a href="addressbook?filter=p&amp;begin=0&amp;end=99">p</a>
-<a href="addressbook?filter=q&amp;begin=0&amp;end=99">q</a>
-<a href="addressbook?filter=r&amp;begin=0&amp;end=99">r</a>
-<a href="addressbook?filter=s&amp;begin=0&amp;end=99">s</a>
-<a href="addressbook?filter=t&amp;begin=0&amp;end=99">t</a>
-<a href="addressbook?filter=u&amp;begin=0&amp;end=99">u</a>
-<a href="addressbook?filter=v&amp;begin=0&amp;end=99">v</a>
-<a href="addressbook?filter=w&amp;begin=0&amp;end=99">w</a>
-<a href="addressbook?filter=x&amp;begin=0&amp;end=99">x</a>
-<a href="addressbook?filter=y&amp;begin=0&amp;end=99">y</a>
-<a href="addressbook?filter=z&amp;begin=0&amp;end=99">z</a>
-<a href="addressbook?filter=0-9&amp;begin=0&amp;end=99">0-9</a>
-<a href="addressbook?filter=xn--&amp;begin=0&amp;end=99"><%=intl._("other")%></a>
-<a href="addressbook?filter=none&amp;begin=0&amp;end=99"><%=intl._("all")%></a></p>
+<a href="addressbook?filter=a&amp;begin=0&amp;end=49">a</a>
+<a href="addressbook?filter=b&amp;begin=0&amp;end=49">b</a>
+<a href="addressbook?filter=c&amp;begin=0&amp;end=49">c</a> 
+<a href="addressbook?filter=d&amp;begin=0&amp;end=49">d</a>
+<a href="addressbook?filter=e&amp;begin=0&amp;end=49">e</a>
+<a href="addressbook?filter=f&amp;begin=0&amp;end=49">f</a>
+<a href="addressbook?filter=g&amp;begin=0&amp;end=49">g</a>
+<a href="addressbook?filter=h&amp;begin=0&amp;end=49">h</a>
+<a href="addressbook?filter=i&amp;begin=0&amp;end=49">i</a>
+<a href="addressbook?filter=j&amp;begin=0&amp;end=49">j</a>
+<a href="addressbook?filter=k&amp;begin=0&amp;end=49">k</a>
+<a href="addressbook?filter=l&amp;begin=0&amp;end=49">l</a>
+<a href="addressbook?filter=m&amp;begin=0&amp;end=49">m</a>
+<a href="addressbook?filter=n&amp;begin=0&amp;end=49">n</a>
+<a href="addressbook?filter=o&amp;begin=0&amp;end=49">o</a>
+<a href="addressbook?filter=p&amp;begin=0&amp;end=49">p</a>
+<a href="addressbook?filter=q&amp;begin=0&amp;end=49">q</a>
+<a href="addressbook?filter=r&amp;begin=0&amp;end=49">r</a>
+<a href="addressbook?filter=s&amp;begin=0&amp;end=49">s</a>
+<a href="addressbook?filter=t&amp;begin=0&amp;end=49">t</a>
+<a href="addressbook?filter=u&amp;begin=0&amp;end=49">u</a>
+<a href="addressbook?filter=v&amp;begin=0&amp;end=49">v</a>
+<a href="addressbook?filter=w&amp;begin=0&amp;end=49">w</a>
+<a href="addressbook?filter=x&amp;begin=0&amp;end=49">x</a>
+<a href="addressbook?filter=y&amp;begin=0&amp;end=49">y</a>
+<a href="addressbook?filter=z&amp;begin=0&amp;end=49">z</a>
+<a href="addressbook?filter=0-9&amp;begin=0&amp;end=49">0-9</a>
+<a href="addressbook?filter=xn--&amp;begin=0&amp;end=49"><%=intl._("other")%></a>
+<a href="addressbook?filter=none&amp;begin=0&amp;end=49"><%=intl._("all")%></a></p>
 <c:if test="${book.hasFilter}">
 <p><%=intl._("Current filter")%>: ${book.filter}
-(<a href="addressbook?filter=none&amp;begin=0&amp;end=99"><%=intl._("clear filter")%></a>)</p>
+(<a href="addressbook?filter=none&amp;begin=0&amp;end=49"><%=intl._("clear filter")%></a>)</p>
 </c:if>
 </div>
 
 <div id="search">
 <form method="POST" action="addressbook">
 <input type="hidden" name="begin" value="0">
-<input type="hidden" name="end" value="99">
+<input type="hidden" name="end" value="49">
 <table><tr>
 <td class="search"><%=intl._("Search")%>: <input class="search" type="text" name="search" value="${book.search}" size="20" ></td>
 <td class="search"><input class="search" type="submit" name="submitsearch" value="<%=intl._("Search")%>" ></td>
@@ -132,7 +132,7 @@ ${book.loadBookMessages}
 <form method="POST" action="addressbook">
 <input type="hidden" name="serial" value="<%=susiNonce%>">
 <input type="hidden" name="begin" value="0">
-<input type="hidden" name="end" value="99">
+<input type="hidden" name="end" value="49">
 <jsp:setProperty name="book" property="trClass"	value="0" />
 <div id="book">
 <table class="book" cellspacing="0" cellpadding="5">
@@ -184,7 +184,7 @@ ${book.loadBookMessages}
 <form method="POST" action="addressbook">
 <input type="hidden" name="serial" value="<%=susiNonce%>">
 <input type="hidden" name="begin" value="0">
-<input type="hidden" name="end" value="99">
+<input type="hidden" name="end" value="49">
 <div id="add">
 <h3><%=intl._("Add new destination")%>:</h3>
 <table><tr><td>

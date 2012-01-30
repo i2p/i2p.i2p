@@ -49,10 +49,10 @@
 <div id="navi">
 <p>
 <%=intl._("Address books")%>:
-<a href="addressbook?book=private&amp;filter=none&amp;begin=0&amp;end=99"><%=intl._("private")%></a> |
-<a href="addressbook?book=master&amp;filter=none&amp;begin=0&amp;end=99"><%=intl._("master")%></a> |
-<a href="addressbook?book=router&amp;filter=none&amp;begin=0&amp;end=99"><%=intl._("router")%></a> |
-<a href="addressbook?book=published&amp;filter=none&amp;begin=0&amp;end=99"><%=intl._("published")%></a> *
+<a href="addressbook?book=private&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._("private")%></a> |
+<a href="addressbook?book=master&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._("master")%></a> |
+<a href="addressbook?book=router&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._("router")%></a> |
+<a href="addressbook?book=published&amp;filter=none&amp;begin=0&amp;end=49"><%=intl._("published")%></a> *
 <a href="subscriptions"><%=intl._("Subscriptions")%></a> *
 <a href="config"><%=intl._("Configuration")%></a> *
 <a href="index"><%=intl._("Overview")%></a>
@@ -127,7 +127,7 @@
 <p class="buttons">
 <input type="hidden" name="serial" value="${book.serial}">
 <input type="hidden" name="begin" value="0">
-<input type="hidden" name="end" value="99">
+<input type="hidden" name="end" value="49">
 <input type="hidden" name="checked" value="<%=detail%>">
 <input class="delete" type="submit" name="action" value="<%=intl._("Delete Entry")%>" >
 </p>

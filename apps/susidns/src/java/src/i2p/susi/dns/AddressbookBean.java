@@ -50,7 +50,7 @@ public class AddressbookBean
 	private int trClass;
 	protected final LinkedList<String> deletionMarks;
 	protected static final Comparator<AddressBean> sorter;
-	private static final int DISPLAY_SIZE=100;
+	private static final int DISPLAY_SIZE = 50;
 
 	static {
 		sorter = new AddressByNameSorter();
