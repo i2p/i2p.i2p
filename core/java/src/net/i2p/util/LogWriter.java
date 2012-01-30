@@ -52,7 +52,8 @@ class LogWriter implements Runnable {
     public void run() {
         _write = true;
         try {
-            rotateFile();
+            // Don't rotate and open until needed
+            //rotateFile();
             while (_write) {
                 flushRecords();
                 if (_write)
