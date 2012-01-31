@@ -48,6 +48,7 @@
         <echo message="  i2psnark:  generate a standalone i2psnark install" />
         <echo message="  justBOB:  generate a standalone BOB-one.jar" />
         <echo message="  javadoc:   generate javadoc for the entire project into ./build/javadoc" />
+        <echo message="  javadoc-test: Javadocs for unit test classes (build/javadoc-test)" />
         <echo message="  slackpkg:  generate Slackware packages in ./Slackware/i2p and ./Slackware/i2p-base" />
         <echo message="  debianhowto: instructions on building Debian packages" />
 	<echo message="  debian: generate Debian packages in ../" />
@@ -399,18 +400,18 @@
             <!-- apps and bridges starting here, alphabetical please -->
             <group title="Addressbook Application" packages="net.i2p.addressbook" />
             <group title="BOB Bridge" packages="net.i2p.BOB" />
+            <group title="BOB Demos" packages="net.i2p.BOB.Demos.echo.echoclient:net.i2p.BOB.Demos.echo.echoserver" />
             <group title="Desktopgui Application" packages="net.i2p.desktopgui:net.i2p.desktopgui.*" />
             <group title="I2PSnark Application" packages="org.klomp.snark:org.klomp.snark.*" />
             <group title="I2PTunnel Application" packages="net.i2p.i2ptunnel:net.i2p.i2ptunnel.*" />
             <group title="SAM Bridge" packages="net.i2p.sam" />
+            <group title="SAM Demos" packages="net.i2p.sam.client" />
             <group title="SusiDNS Application" packages="i2p.susi.dns" />
             <group title="SusiMail Application" packages="i2p.susi.webmail:i2p.susi.webmail.*:i2p.susi.debug:i2p.susi.util" />
             <group title="Systray Application" packages="net.i2p.apps.systray" />
             <sourcepath>
                 <pathelement location="core/java/src" />
-                <!--<pathelement location="core/java/test" />-->
                 <pathelement location="router/java/src" />
-                <!--<pathelement location="router/java/test" />-->
                 <pathelement location="apps/ministreaming/java/src" />
                 <pathelement location="apps/streaming/java/src" />
                 <pathelement location="apps/i2ptunnel/java/src" />
@@ -421,6 +422,8 @@
                 <pathelement location="apps/i2psnark/java/src" />
                 <pathelement location="apps/sam/java/src" />
                 <pathelement location="apps/BOB/src" />
+                <pathelement location="apps/BOB/Demos/echo/echoclient/src" />
+                <pathelement location="apps/BOB/Demos/echo/echoserver/src" />
                 <pathelement location="apps/susidns/src/java/src" />
                 <pathelement location="apps/susimail/src/src" />
             </sourcepath>
@@ -430,7 +433,6 @@
                 <pathelement location="apps/systray/java/lib/systray4j.jar" />
                 <pathelement location="apps/jrobin/jrobin-1.5.9.1.jar" />
                 <pathelement location="installer/lib/wrapper/all/wrapper.jar" />
-                <pathelement location="core/lib/junit.jar" />
             </classpath>
 	    <!-- These variables are stored in build.properties. 
 		 End-users can override by creating the file override.properties -->
@@ -438,6 +440,36 @@
             <link offline="true" href="${jettydocs.url}" packagelistLoc="installer/resources/package-lists/jetty/" />
             <link offline="true" href="${jrobindocs.url}" packagelistLoc="installer/resources/package-lists/jrobin/" />
             <link offline="true" href="${wrapperdocs.url}" packagelistLoc="installer/resources/package-lists/wrapper/" />
+        </javadoc>
+        <echo message="Warning, javadoc embeds timestamps in the output, run with 'TZ=UTC ant javadoc' if you plan to distribute" />
+    </target>
+
+    <target name="javadoc-test" depends="buildRouter, javadoc" >
+        <mkdir dir="./build" />
+        <mkdir dir="./build/javadoc-test" />
+        <javadoc access="package"
+            destdir="./build/javadoc-test"
+            packagenames="*"
+            use="true"
+            splitindex="true"
+            doctitle="I2P Unit Test Javadocs for Release ${release.number} Build ${build.number}${build.extra}"
+            windowtitle="I2P Anonymous Network - Java Documentation - Version ${release.number}">
+            <group title="Core SDK" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.crypto:org.bouncycastle.crypto.*:gnu.crypto.*:gnu.gettext:org.xlattice.crypto.filters:com.nettgryppa.security:net.metanotion:net.metanotion.*" />
+            <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:org.cybergarage.*:org.freenetproject" />
+            <sourcepath>
+                <pathelement location="core/java/test" />
+                <pathelement location="router/java/test" />
+            </sourcepath>
+            <classpath>
+                <pathelement location="build/i2p.jar" />
+                <pathelement location="build/router.jar" />
+                <pathelement location="${ant.home}/lib/junit.jar" />
+            </classpath>
+	    <!-- These variables are stored in build.properties. 
+		 End-users can override by creating the file override.properties -->
+            <link offline="true" href="${javasedocs.url}" packagelistLoc="installer/resources/package-lists/java/" />
+            <link offline="true" href="${junitdocs.url}" packagelistLoc="installer/resources/package-lists/junit/" />
+            <link offline="true" href="${i2pdocs.url}" packagelistLoc="build/javadoc/" />
         </javadoc>
         <echo message="Warning, javadoc embeds timestamps in the output, run with 'TZ=UTC ant javadoc' if you plan to distribute" />
     </target>

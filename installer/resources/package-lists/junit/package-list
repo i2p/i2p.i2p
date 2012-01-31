@@ -1,0 +1,11 @@
+junit.extensions
+junit.framework
+junit.runner
+junit.textui
+org.hamcrest.core
+org.junit
+org.junit.matchers
+org.junit.runner
+org.junit.runner.manipulation
+org.junit.runner.notification
+org.junit.runners
