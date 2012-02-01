@@ -8,22 +8,25 @@
 <jsp:useBean class="net.i2p.i2ptunnel.web.WizardBean" id="wizardBean" scope="request" />
 <jsp:useBean class="net.i2p.i2ptunnel.web.Messages" id="intl" scope="request" />
 <% String pageStr = request.getParameter("page");
-   int curPage = 1;
+   int lastPage = 0;
    if (pageStr != null) {
      try {
-       curPage = Integer.parseInt(pageStr);
-       if (curPage > 7 || curPage <= 0) {
-         curPage = 1;
+       lastPage = Integer.parseInt(pageStr);
+       if (lastPage > 7 || lastPage < 0) {
+         lastPage = 0;
        }
      } catch (NumberFormatException nfe) {
-       curPage = 1;
+       lastPage = 0;
      }
    }
+   int curPage = 1;
    if ("Previous page".equals(request.getParameter("action"))) {
-     curPage = curPage - 2;
-     if (curPage <= 0) {
-       curPage = 1;
-     }
+     curPage = lastPage - 1;
+   } else {
+     curPage = lastPage + 1;
+   }
+   if (curPage > 7 || curPage <= 0) {
+     curPage = 1;
    }
    boolean tunnelIsClient = Boolean.valueOf(request.getParameter("isClient"));
    String tunnelType = request.getParameter("type");
@@ -46,7 +49,7 @@
     <div id="pageHeader">
     </div>
 
-    <form method="post" action="<%=(curPage == 7 ? "list" : "wizard?page="+(curPage+1)) %>">
+    <form method="post" action="<%=(curPage == 7 ? "list" : "wizard") %>">
 
         <div id="wizardPanel" class="panel">
             <div class="header">
@@ -66,7 +69,7 @@
                 } else if (curPage == 7) {
                   %><h4><%=intl._("Wizard completed")%></h4><%
                 } %>
-                <input type="hidden" name="page" value="<%=request.getParameter("page")%>" />
+                <input type="hidden" name="page" value="<%=curPage%>" />
                 <input type="hidden" name="tunnel" value="null" />
                 <input type="hidden" name="nonce" value="<%=wizardBean.getNextNonce()%>" />
             </div>
