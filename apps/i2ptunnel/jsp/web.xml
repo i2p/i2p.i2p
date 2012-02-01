@@ -18,6 +18,11 @@
         <url-pattern>/edit</url-pattern>
     </servlet-mapping>
 
+    <servlet-mapping>
+        <servlet-name>net.i2p.i2ptunnel.jsp.wizard_jsp</servlet-name>
+        <url-pattern>/wizard</url-pattern>
+    </servlet-mapping>
+
     <session-config>
         <session-timeout>
             30
