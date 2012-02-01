@@ -321,7 +321,7 @@ http://i2jump.i2p/" /><%
             <div class="header"></div>
             <div class="footer">
                 <div class=toolbox">
-                    <button id="controlCancel" class="control" type="submit" name="action" value="" title="Cancel"><%=intl._("Cancel")%></button>
+                    <a class="control" href="list"><%=intl._("Cancel")%></a>
                     <% if (curPage != 1) {
                     %><button id="controlPrevious" accesskey="P" class="control" type="submit" name="action" value="Previous page" title="Previous Page"><%=intl._("Previous")%>(<span class="accessKey">P</span>)</button><%
                     } %>
