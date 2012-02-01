@@ -19,6 +19,12 @@
        curPage = 1;
      }
    }
+   if ("Previous page".equals(request.getParameter("action") {
+     curPage = curPage - 2;
+     if (curPage <= 0) {
+       curPage = 1;
+     }
+   }
    boolean tunnelIsClient = Boolean.valueOf(request.getParameter("isClient"));
    String tunnelType = request.getParameter("type");
 %>
@@ -316,6 +322,9 @@ http://i2jump.i2p/" /><%
             <div class="footer">
                 <div class=toolbox">
                     <button id="controlCancel" class="control" type="submit" name="action" value="" title="Cancel"><%=intl._("Cancel")%></button>
+                    <% if (curPage != 1) {
+                    %><button id="controlPrevious" accesskey="P" class="control" type="submit" name="action" value="Previous page" title="Previous Page"><%=intl._("Previous")%>(<span class="accessKey">P</span>)</button><%
+                    } %>
                     <% if (curPage == 7) {
                     %><button id="controlFinish" accesskey="F" class="control" type="submit" name="action" value="Save changes" title="Finish Wizard"><%=intl._("Finish")%>(<span class="accessKey">F</span>)</button><%
                     } else {
