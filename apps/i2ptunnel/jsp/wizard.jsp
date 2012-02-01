@@ -19,7 +19,7 @@
        curPage = 1;
      }
    }
-   if ("Previous page".equals(request.getParameter("action") {
+   if ("Previous page".equals(request.getParameter("action"))) {
      curPage = curPage - 2;
      if (curPage <= 0) {
        curPage = 1;
