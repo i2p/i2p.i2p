@@ -254,6 +254,61 @@
             } /* curPage 6 */
 
                /* End page 6 */ %>
+
+            <% /* Page 7 - Wizard complete */
+
+            if (curPage == 7) {
+            %>
+
+            <input type="hidden" name="tunnelDepth" value="2" />
+            <input type="hidden" name="tunnelVariance" value="0" />
+            <input type="hidden" name="tunnelQuantity" value="2" />
+            <input type="hidden" name="tunnelBackupQuantity" value="0" />
+            <input type="hidden" name="clientHost" value="internal" />
+            <input type="hidden" name="clientport" value="internal" />
+            <input type="hidden" name="customOptions" value="" />
+
+            <%
+              if (!"streamrclient".equals(tunnelType)) {
+            %><input type="hidden" name="profile" value="bulk" />
+            <input type="hidden" name="reduceCount" value="1" />
+            <input type="hidden" name="reduceTime" value="20" /><%
+              } /* !streamrclient */ %>
+
+            <%
+              if (tunnelIsClient) { /* Client-only defaults */
+                if (!"streamrclient".equals(tunnelType)) {
+            %><input type="hidden" name="newDest" value="0" />
+            <input type="hidden" name="closeTime" value="30" /><%
+                }
+                if ("httpclient".equals(tunnelType) || "connectclient".equals(tunnelType) || "sockstunnel".equals(tunnelType) || "socksirctunnel".equals(tunnelType)) {
+            %><input type="hidden" name="proxyUsername" value="" />
+            <input type="hidden" name="proxyPassword" value="" />
+            <input type="hidden" name="outproxyUsername" value="" />
+            <input type="hidden" name="outproxyPassword" value="" /><%
+                }
+                if ("httpclient".equals(tunnelType)) {
+            %><input type="hidden" name="jumpList" value="http://i2host.i2p/cgi-bin/i2hostjump?
+http://stats.i2p/cgi-bin/jump.cgi?a=
+http://i2jump.i2p/" /><%
+                } /* httpclient */
+              } else { /* Server-only defaults */
+            %><input type="hidden" name="encrypt" value="" />
+            <input type="hidden" name="encryptKey" value="" />
+            <input type="hidden" name="accessMode" value="0" />
+            <input type="hidden" name="accessList" value="" />
+            <input type="hidden" name="limitMinute" value="0" />
+            <input type="hidden" name="limitHour" value="0" />
+            <input type="hidden" name="limitDay" value="0" />
+            <input type="hidden" name="totalMinute" value="0" />
+            <input type="hidden" name="totalHour" value="0" />
+            <input type="hidden" name="totalDay" value="0" />
+            <input type="hidden" name="maxStreams" value="0" />
+            <input type="hidden" name="cert" value="0" /><%
+              } /* tunnelIsClient */
+            } /* curPage 7 */
+
+               /* End page 7 */ %>
         </div>
 
         <div id="globalOperationsPanel" class="panel">
