@@ -131,13 +131,13 @@
                 <label for="name" accesskey="N">
                     <%=intl._("Name")%>:(<span class="accessKey">N</span>)
                 </label>
-                <input type="text" size="30" maxlength="50" name="name" id="name" title="Tunnel Name" value="" class="freetext" />
+                <input type="text" size="30" maxlength="50" name="name" id="name" title="Tunnel Name" value="<%=(!"null".equals(request.getParameter("name")) ? request.getParameter("name") : "" ) %>" class="freetext" />
             </div>
             <div id="descriptionField" class="rowItem">
                 <label for="description" accesskey="e">
                     <%=intl._("Description")%>:(<span class="accessKey">E</span>)
                 </label>
-                <input type="text" size="60" maxlength="80" name="description"  id="description" title="Tunnel Description" value="" class="freetext" />
+                <input type="text" size="60" maxlength="80" name="description"  id="description" title="Tunnel Description" value="<%=(!"null".equals(request.getParameter("description")) ? request.getParameter("description") : "" ) %>" class="freetext" />
             </div><%
             } else {
             %><input type="hidden" name="name" value="<%=request.getParameter("name")%>" />
@@ -155,7 +155,7 @@
                 <label for="proxyList" accesskey="x">
                     <%=intl._("Outproxies")%>(<span class="accessKey">x</span>):
                 </label>
-                <input type="text" size="30" id="proxyList" name="proxyList" title="List of Outproxy I2P destinations" value="" class="freetext" />                
+                <input type="text" size="30" id="proxyList" name="proxyList" title="List of Outproxy I2P destinations" value="<%=(!"null".equals(request.getParameter("proxyList")) ? request.getParameter("proxyList") : "" ) %>" class="freetext" />
             </div><%
                 } else {
             %><input type="hidden" name="proxyList" value="<%=request.getParameter("proxyList")%>" /><%
@@ -166,7 +166,7 @@
                 <label for="targetDestination" accesskey="T">
                     <%=intl._("Tunnel Destination")%>(<span class="accessKey">T</span>):
                 </label>
-                <input type="text" size="30" id="targetDestination" name="targetDestination" title="Destination of the Tunnel" value="" class="freetext" />                
+                <input type="text" size="30" id="targetDestination" name="targetDestination" title="Destination of the Tunnel" value="<%=(!"null".equals(request.getParameter("targetDestination")) ? request.getParameter("targetDestination") : "" ) %>" class="freetext" />
                 <span class="comment">(<%=intl._("name or destination")%>; <%=intl._("b32 not recommended")%>)</span>
             </div><%
                 } else {
@@ -185,7 +185,7 @@
                 <label for="targetHost" accesskey="H">
                     <%=intl._("Host")%>(<span class="accessKey">H</span>):
                 </label>
-                <input type="text" size="20" id="targetHost" name="targetHost" title="Target Hostname or IP" value="" class="freetext" />
+                <input type="text" size="20" id="targetHost" name="targetHost" title="Target Hostname or IP" value="<%=(!"null".equals(request.getParameter("targetHost")) ? request.getParameter("targetHost") : "" ) %>" class="freetext" />
             </div><%
               } else {
             %><input type="hidden" name="targetHost" value="<%=request.getParameter("targetHost")%>" /><%
@@ -198,7 +198,7 @@
                 <label for="targetPort" accesskey="P">
                     <%=intl._("Port")%>(<span class="accessKey">P</span>):
                 </label>
-                <input type="text" size="6" maxlength="5" id="targetPort" name="targetPort" title="Target Port Number" value="" class="freetext" />
+                <input type="text" size="6" maxlength="5" id="targetPort" name="targetPort" title="Target Port Number" value="<%=(!"null".equals(request.getParameter("targetPort")) ? request.getParameter("targetPort") : "" ) %>" class="freetext" />
             </div><%
               } else {
             %><input type="hidden" name="targetPort" value="<%=request.getParameter("targetPort")%>" /><%
@@ -211,7 +211,7 @@
                 <label for="port" accesskey="P">
                     <span class="accessKey">P</span>ort:
                 </label>
-                <input type="text" size="6" maxlength="5" id="port" name="port" title="Access Port Number" value="" class="freetext" />
+                <input type="text" size="6" maxlength="5" id="port" name="port" title="Access Port Number" value="<%=(!"null".equals(request.getParameter("port")) ? request.getParameter("port") : "" ) %>" class="freetext" />
             </div><%
               } else {
             %><input type="hidden" name="port" value="<%=request.getParameter("port")%>" /><%
