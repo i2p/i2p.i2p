@@ -1,16 +1,17 @@
 # Ukrainian debconf translation
-# Copyright (C) 2011 The I2P Project
+# Copyright (C) 2012 The I2P Project
 # This file is distributed under the same license as the i2p package.
 #
 # Translators:
 # Denis  <gribua@gmail.com>, 2011.
+# Денис Лысенко <gribua@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
 "POT-Creation-Date: 2011-12-27 22:25+0000\n"
-"PO-Revision-Date: 2011-12-16 22:13+0000\n"
-"Last-Translator: Denis <gribua@gmail.com>\n"
+"PO-Revision-Date: 2012-01-10 18:09+0000\n"
+"Last-Translator: Denis Lysenko <gribua@gmail.com>\n"
 "Language-Team: Ukrainian (Ukraine) (http://www.transifex.net/projects/p/I2P/"
 "team/uk_UA/)\n"
 "Language: uk_UA\n"
@@ -59,12 +60,12 @@ msgstr ""
 #. Type: string
 #. Description
 #: ../i2p.templates:3001
-#, fuzzy
-#| msgid "Very important: The account specified here *MUST* already exist."
 msgid ""
 "Very important: If a user other than the default of 'i2psvc' is entered "
 "here, the chosen username *MUST* already exist."
-msgstr "Дуже важливо: Аккаунт, вказаний тут * ПОВИНЕН * вже існувати."
+msgstr ""
+"Дуже важливо: Якщо користувач відмінний від стандартний 'i2psvc' введений "
+"тут, обраний нікнейм *ПОВИНЕН* вже існувати."
 
 #. Type: string
 #. Description

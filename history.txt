@@ -1,3 +1,6 @@
+2012-02-02 kytv
+ * Ukrainian and Polish translation updates from Transifex
+
 2012-01-30 zzz
   * i2psnark: More illegal chars
   * LogWriter: Don't rotate and open file until first message

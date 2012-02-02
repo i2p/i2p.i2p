@@ -3,15 +3,17 @@
 # This file is distributed under the same license as the i2psnark package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 #
-# foo <foo@bar>, 2009.
+# Translators:
 #   <b790979@klzlk.com>, 2011.
+#   <businesshehe@yahoo.com>, 2012.
+# foo <foo@bar>, 2009.
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-12-27 22:38+0000\n"
-"PO-Revision-Date: 2011-06-26 15:17+0000\n"
-"Last-Translator: PolishAnon <b790979@klzlk.com>\n"
+"POT-Creation-Date: 2012-02-02 22:40+0000\n"
+"PO-Revision-Date: 2012-01-20 23:39+0000\n"
+"Last-Translator: Warton <businesshehe@yahoo.com>\n"
 "Language-Team: Polish (http://www.transifex.net/projects/p/I2P/team/pl/)\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -46,14 +48,13 @@ msgid "Startup delay changed to {0}"
 msgstr "Opóźnienia startu zmieniono na {0}"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:394
-#, fuzzy, java-format
+#, java-format
 msgid "Refresh time changed to {0}"
-msgstr "Ograniczenie liczby uploaderów zmieniono do {0}"
+msgstr ""
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:396
-#, fuzzy
 msgid "Refresh disabled"
-msgstr "Odśwież stronę"
+msgstr "Odświeżanie wyłączone"
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:451
 msgid "I2CP and tunnel changes will take effect after stopping all torrents"
@@ -62,9 +63,9 @@ msgstr ""
 "torrentów."
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:455
-#, fuzzy, java-format
+#, java-format
 msgid "I2CP options changed to {0}"
-msgstr "Ustawienia I2CP zmienione do: {0}"
+msgstr ""
 
 #: ../java/src/org/klomp/snark/SnarkManager.java:460
 msgid "Disconnecting old I2CP destination"
@@ -378,7 +379,7 @@ msgstr "Pobrano"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:326
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:340
 msgid "RX"
-msgstr ""
+msgstr "RX"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:330
 msgid "Uploaded"
@@ -388,7 +389,7 @@ msgstr "Wysłano"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:333
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:350
 msgid "TX"
-msgstr ""
+msgstr "TX"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:338
 msgid "Down Rate"
@@ -445,9 +446,8 @@ msgstr[1] "{0} podłączone peery"
 msgstr[2] "{0} podłączonych peerów"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:498
-#, fuzzy
 msgid "Opening the I2P tunnel"
-msgstr "Zatrzymaj wszystkie torrenty i tunel I2P"
+msgstr ""
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:505
 #, java-format
@@ -699,11 +699,11 @@ msgstr "Dodaj torrent"
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1228
 #, java-format
 msgid "You can also copy .torrent files to: {0}."
-msgstr ""
+msgstr "Możesz także skopiować pliki .torrent do: {0}"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1230
 msgid "Removing a .torrent will cause it to stop."
-msgstr ""
+msgstr "Usunięcie pliku .torrent spowoduje jego zatrzymanie."
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1253
 msgid "Create Torrent"
@@ -777,16 +777,15 @@ msgstr "Jeśli zaznaczone - automatycznie uruchamiaj dodane torrenty"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1337
 msgid "Theme"
-msgstr ""
+msgstr "Motyw"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1350
-#, fuzzy
 msgid "Refresh time"
-msgstr "Odśwież stronę"
+msgstr ""
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1363
 msgid "Never"
-msgstr ""
+msgstr "Nigdy"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1369
 msgid "Startup delay"
@@ -895,7 +894,7 @@ msgstr "Rozmiar"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1731
 msgid "Files"
-msgstr ""
+msgstr "Pliki"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1733
 msgid "Pieces"
@@ -924,7 +923,7 @@ msgstr "Katalog"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1783
 msgid "Priority"
-msgstr ""
+msgstr "Priorytet"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1788
 msgid "Up to higher level directory"
@@ -952,19 +951,19 @@ msgstr ""
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1892
 msgid "High"
-msgstr ""
+msgstr "Wysoki"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1897
 msgid "Normal"
-msgstr ""
+msgstr "Normalny"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1902
 msgid "Skip"
-msgstr ""
+msgstr "Pomiń"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:1911
 msgid "Save priorities"
-msgstr ""
+msgstr "Zapisz priorytety"
 
 #: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2027
 #, java-format
@@ -994,7 +993,3 @@ msgstr "Torrent pobrany z {0} jest niepoprawny"
 #, java-format
 msgid "Torrent was not retrieved from {0}"
 msgstr "Torrent nie był pobrany z: {0}"
-
-#: ../java/src/org/klomp/snark/web/I2PSnarkServlet.java:2073
-msgid "Retry"
-msgstr ""

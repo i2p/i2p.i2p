@@ -1,15 +1,15 @@
 # Polish debconf translation
-# Copyright (C) 2011 The I2P Project
+# Copyright (C) 2012 The I2P Project
 # This file is distributed under the same license as the i2p package.
 #
 # Translators:
-#   <b790979@klzlk.com>, 2011.
+#   <b790979@klzlk.com>, 2011, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
 "POT-Creation-Date: 2011-12-27 22:25+0000\n"
-"PO-Revision-Date: 2011-10-08 12:41+0000\n"
+"PO-Revision-Date: 2012-01-07 13:15+0000\n"
 "Last-Translator: PolishAnon <b790979@klzlk.com>\n"
 "Language-Team: Polish (http://www.transifex.net/projects/p/I2P/team/pl/)\n"
 "Language: pl\n"
@@ -58,24 +58,24 @@ msgstr ""
 #. Type: string
 #. Description
 #: ../i2p.templates:3001
-#, fuzzy
-#| msgid "Very important: The account specified here *MUST* already exist."
 msgid ""
 "Very important: If a user other than the default of 'i2psvc' is entered "
 "here, the chosen username *MUST* already exist."
-msgstr "Bardzo ważne: Podane tutaj konto *MUSI* istnieć."
+msgstr ""
+"Bardzo ważne: Jeżeli użytkownik inni niż domyślny 'i2psvc' jest tutaj "
+"wprowadzony, wybrane imię *MUSI* już istniec."
 
 #. Type: string
 #. Description
 #: ../i2p.templates:4001
 msgid "Memory that can be allocated to I2P:"
-msgstr ""
+msgstr "Pamięć, która może być przydzielona do I2P:"
 
 #. Type: string
 #. Description
 #: ../i2p.templates:4001
 msgid "By default, I2P will only be allowed to use up to 128MB of RAM."
-msgstr ""
+msgstr "Domyślnie, I2P może użyc tylko 128MB RAMu."
 
 #. Type: string
 #. Description
@@ -84,3 +84,5 @@ msgid ""
 "High bandwidth routers, as well as routers with a lot of active torrents / "
 "plugins, may need to have this value increased."
 msgstr ""
+"Rutery z wysoka przepustowościa oraz rutery z wieloma aktywnymi torrentami/"
+"wtyczkami mogą wymagać zwiększenia tej wartości."

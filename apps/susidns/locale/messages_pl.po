@@ -3,13 +3,14 @@
 # This file is distributed under the same license as the susidns package.
 # To contribute translations, see http://www.i2p2.de/newdevelopers
 #
-#   <b790979@klzlk.com>, 2011.
+# Translators:
+#   <b790979@klzlk.com>, 2011, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-12-27 22:38+0000\n"
-"PO-Revision-Date: 2011-06-05 16:26+0000\n"
+"POT-Creation-Date: 2012-02-02 22:40+0000\n"
+"PO-Revision-Date: 2012-01-07 12:58+0000\n"
 "Last-Translator: PolishAnon <b790979@klzlk.com>\n"
 "Language-Team: Polish (http://www.transifex.net/projects/p/I2P/team/pl/)\n"
 "Language: pl\n"
@@ -643,13 +644,12 @@ msgstr ""
 "i2p."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:117
-#, fuzzy
 msgid ""
 "Subscribing to additional sites is easy, just add them to your <a href="
 "\"subscriptions\">subscriptions</a> file."
 msgstr ""
-"Zapisywanie się do innych witryn jest proste, wystarczy dodać je do pliku <a "
-"href=\"subscriptions.jsp\">subskrypcje</a>."
+"Zapisywanie się do innych witryn jest proste, wystarczy dodać je do pliku "
+"&lt;a href=\"subscriptions.jsp\"&gt;subskrypcje&lt;/a&gt;."
 
 #: ../src/tmp/i2p/susi/dns/jsp/index_jsp.java:119
 msgid ""
