@@ -226,11 +226,15 @@
                 </label>
                 <select id="reachableBy" name="reachableBy" title="IP for Client Access" class="selectbox">
               <%
+                    String clientInterface = request.getParameter("reachableBy");
+                    if ("null".equals(clientInterface)) {
+                      clientInterface = "127.0.0.1";
+                    }
                     for (String ifc : wizardBean.interfaceSet()) {
                         out.write("<option value=\"");
                         out.write(ifc);
                         out.write('\"');
-                        if (ifc.equals("127.0.0.1"))
+                        if (ifc.equals(clientInterface))
                             out.write(" selected=\"selected\"");
                         out.write('>');
                         out.write(ifc);
