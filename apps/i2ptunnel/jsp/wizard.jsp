@@ -8,6 +8,7 @@
 <jsp:useBean class="net.i2p.i2ptunnel.web.WizardBean" id="wizardBean" scope="request" />
 <jsp:useBean class="net.i2p.i2ptunnel.web.Messages" id="intl" scope="request" />
 <% String pageStr = request.getParameter("page");
+   /* Get the number of the page we came from */
    int lastPage = 0;
    if (pageStr != null) {
      try {
@@ -19,6 +20,7 @@
        lastPage = 0;
      }
    }
+   /* Determine what page to display now */
    int curPage = 1;
    if ("Previous page".equals(request.getParameter("action"))) {
      curPage = lastPage - 1;
@@ -28,8 +30,17 @@
    if (curPage > 7 || curPage <= 0) {
      curPage = 1;
    }
+   /* Fetch and format a couple of regularly-used values */
    boolean tunnelIsClient = Boolean.valueOf(request.getParameter("isClient"));
    String tunnelType = request.getParameter("type");
+   /* Special case - don't display page 4 for server tunnels */
+   if (curPage == 4 && !tunnelIsClient) {
+     if ("Previous page".equals(request.getParameter("action"))) {
+       curPage = curPage - 1;
+     } else {
+       curPage = curPage + 1;
+     }
+   }
 %>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
