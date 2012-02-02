@@ -257,7 +257,7 @@
                 <label for="startOnLoad" accesskey="a">
                     <%=intl._("Auto Start")%>(<span class="accessKey">A</span>):
                 </label>
-                <input value="1" type="checkbox" id="startOnLoad" name="startOnLoad" title="Start Tunnel Automatically" class="tickbox" />
+                <input value="1" type="checkbox" id="startOnLoad" name="startOnLoad" title="Start Tunnel Automatically"<%=("1".equals(request.getParameter("startOnLoad")) ? " checked=\"checked\"" : "")%> class="tickbox" />
                 <span class="comment"><%=intl._("(Check the Box for 'YES')")%></span>
             </div><%
             } else {
