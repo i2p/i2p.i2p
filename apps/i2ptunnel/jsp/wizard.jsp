@@ -92,7 +92,10 @@
             <% /* Page 1 - Whether to make a client or server tunnel */
 
             if (curPage == 1) {
-            %><div id="typeField" class="rowItem">
+            %><p>
+                <%=intl._("The first thing to decide is whether you want to create a client or server tunnel.")%>
+            </p>
+            <div id="typeField" class="rowItem">
                 <label><%=intl._("Server Tunnel")%></label>
                 <input value="false" type="radio" id="baseType" name="isClient" class="tickbox" />
                 <label><%=intl._("Client Tunnel")%></label>
@@ -107,7 +110,33 @@
             <% /* Page 2 - Tunnel type */
 
             if (curPage == 2) {
-            %><div id="typeField" class="rowItem">
+            %><p>
+                <%=intl._("There are several types of tunnels to choose from:")%>
+            </p>
+            <ul><%
+                if (tunnelIsClient) {
+                %>
+                <li><%=intl._("Standard")%></li>
+                <li>HTTP</li>
+                <li>IRC</li>
+                <li>SOCKS 4/4a/5</li>
+                <li>SOCKS IRC</li>
+                <li>CONNECT</li>
+                <li>Streamr</li><%
+                } else {
+                %>
+                <li><%=intl._("Standard")%></li>
+                <li>HTTP</li>
+                <li>HTTP bidir</li>
+                <li>IRC</li>
+                <li>Streamr</li><%
+                }
+                %>
+            </ul>
+            <p>
+                <%=intl._("The above might look better as a table, possibly.")%>
+            </p>
+            <div id="typeField" class="rowItem">
                 <%
                 if (tunnelIsClient) {
                 %><select name="type">
@@ -138,7 +167,11 @@
             <% /* Page 3 - Name and description */
 
             if (curPage == 3) {
-            %><div id="nameField" class="rowItem">
+            %><p>
+                <%=intl._("Choose a name and description for your tunnel.")%>
+                <%=intl._("These can be anything you want - they are just for ease of identifying the tunnel in the routerconsole.")%>
+            </p>
+            <div id="nameField" class="rowItem">
                 <label for="name" accesskey="N">
                     <%=intl._("Name")%>:(<span class="accessKey">N</span>)
                 </label>
@@ -162,7 +195,10 @@
             if (tunnelIsClient) {
               if ("httpclient".equals(tunnelType) || "connectclient".equals(tunnelType) || "sockstunnel".equals(tunnelType) || "socksirctunnel".equals(tunnelType)) {
                 if (curPage == 4) {
-          %><div id="destinationField" class="rowItem">
+          %><p>
+                <%=intl._("Some blurb explaining that this is the list of proxies that the client tunnel should try if the requested URL is not an I2P URL.")%>
+            </p>
+            <div id="destinationField" class="rowItem">
                 <label for="proxyList" accesskey="x">
                     <%=intl._("Outproxies")%>(<span class="accessKey">x</span>):
                 </label>
@@ -173,7 +209,10 @@
                 } /* curPage 4 */
               } else if ("client".equals(tunnelType) || "ircclient".equals(tunnelType) || "streamrclient".equals(tunnelType)) {
                 if (curPage == 4) {
-          %><div id="destinationField" class="rowItem">
+          %><p>
+                <%=intl._("Some blurb explaining that this is the I2P destination that the client tunnel should point to.")%>
+            </p>
+            <div id="destinationField" class="rowItem">
                 <label for="targetDestination" accesskey="T">
                     <%=intl._("Tunnel Destination")%>(<span class="accessKey">T</span>):
                 </label>
@@ -192,7 +231,11 @@
 
             if ((tunnelIsClient && "streamrclient".equals(tunnelType)) || (!tunnelIsClient && !"streamrserver".equals(tunnelType))) {
               if (curPage == 5) {
-            %><div id="hostField" class="rowItem">
+            %><p>
+                <%=intl._("Some blurb explaining that this is the IP that the service is running on, and that the tunnel should direct requests to.")%>
+                <%=intl._("For some reason streamrclient also uses this.")%>
+            </p>
+            <div id="hostField" class="rowItem">
                 <label for="targetHost" accesskey="H">
                     <%=intl._("Host")%>(<span class="accessKey">H</span>):
                 </label>
@@ -205,7 +248,10 @@
             <%
             if (!tunnelIsClient) {
               if (curPage == 5) {
-            %><div id="portField" class="rowItem">
+            %><p>
+                <%=intl._("Some blurb explaining that this is the port that the service is running on, and that the tunnel should direct requests to.")%>
+            </p>
+            <div id="portField" class="rowItem">
                 <label for="targetPort" accesskey="P">
                     <%=intl._("Port")%>(<span class="accessKey">P</span>):
                 </label>
@@ -218,7 +264,11 @@
             <%
             if (tunnelIsClient || "httpbidirserver".equals(tunnelType)) {
               if (curPage == 5) {
-            %><div id="portField" class="rowItem">
+            %><p>
+                <%=intl._("Some blurb explaining that this is the port that the client tunnel will be accessed from locally.")%>
+                <%=intl._("This is also the client port for the httpbidirserver tunnel.")%>
+            </p>
+            <div id="portField" class="rowItem">
                 <label for="port" accesskey="P">
                     <span class="accessKey">P</span>ort:
                 </label>
@@ -231,7 +281,12 @@
             <%
             if ((tunnelIsClient && !"streamrclient".equals(tunnelType)) || "httpbidirserver".equals(tunnelType) || "streamrserver".equals(tunnelType)) {
               if (curPage == 5) {
-            %><div id="reachField" class="rowItem">
+            %><p>
+                <%=intl._("Some blurb explaining what Reachable By is.")%>
+                <%=intl._("Note that it is relevant to most Client tunnels, and httpbidirserver and streamrserver tunnels.")%>
+                <%=intl._("So the wording may need to change slightly for the client vs. server tunnels.")%>
+            </p>
+            <div id="reachField" class="rowItem">
                 <label for="reachableBy" accesskey="r">
                     <%=intl._("Reachable by")%>(<span class="accessKey">R</span>):
                 </label>
@@ -264,7 +319,10 @@
             <% /* Page 6 - Automatic start */
 
             if (curPage == 6) {
-            %><div id="startupField" class="rowItem">
+            %><p>
+                <%=intl._("Some blurb that explains what Auto Start does.")%>
+            </p>
+            <div id="startupField" class="rowItem">
                 <label for="startOnLoad" accesskey="a">
                     <%=intl._("Auto Start")%>(<span class="accessKey">A</span>):
                 </label>
@@ -282,7 +340,10 @@
             <% /* Page 7 - Wizard complete */
 
             if (curPage == 7) {
-            %>
+            %><p>
+                <%=intl._("Some blurb explaining that the wizard is finished, and that the tunnel will now be created and possibly started.")%>
+                <%=intl._("There should also be a blurb about the fact that the tunnel will be created with default values, and that these may require tuning.")%>
+            </p>
 
             <input type="hidden" name="tunnelDepth" value="2" />
             <input type="hidden" name="tunnelVariance" value="0" />
