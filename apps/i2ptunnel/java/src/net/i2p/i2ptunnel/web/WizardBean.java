@@ -13,11 +13,12 @@ public class WizardBean extends EditBean {
 
     /**
      * Whether the tunnel being set up is a client tunnel or not.
-     *
+     * @since 0.8.13
      */
     public void setIsClient(String isClient) { 
         _isClient = Boolean.valueOf(isClient);   
     }
+    /** @since 0.8.13 */
     public boolean getIsClient() {
         return _isClient;
     }
