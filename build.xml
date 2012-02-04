@@ -405,7 +405,8 @@
             <group title="I2PSnark Application" packages="org.klomp.snark:org.klomp.snark.*" />
             <group title="I2PTunnel Application" packages="net.i2p.i2ptunnel:net.i2p.i2ptunnel.*" />
             <group title="Jetty Logging" packages="net.i2p.jetty" />
-            <group title="SAM Bridge" packages="net.i2p.sam:net.i2p.sam.client" />
+            <group title="SAM Bridge" packages="net.i2p.sam" />
+            <group title="SAM Demos" packages="net.i2p.sam.client" />
             <group title="SusiDNS Application" packages="i2p.susi.dns" />
             <group title="SusiMail Application" packages="i2p.susi.webmail:i2p.susi.webmail.*:i2p.susi.debug:i2p.susi.util:org.mortbay.servlet:org.mortbay.util" />
             <group title="Systray Application" packages="net.i2p.apps.systray" />
