@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.Properties;
 
@@ -52,10 +53,14 @@ public class WorkingDir {
     private final static String WORKING_DIR_DEFAULT_DAEMON = "i2p-config";
     /** we do a couple of things differently if this is the username */
     private final static String DAEMON_USER = "i2psvc";
+    private static final String PROP_WRAPPER_LOG = "wrapper.logfile";
+    private static final String DEFAULT_WRAPPER_LOG = "wrapper.log";
 
     /**
      * Only call this once on router invocation.
      * Caller should store the return value for future reference.
+     *
+     * This also redirects stdout and stderr to a wrapper.log file if there is no wrapper present.
      */
     public static String getWorkingDir(Properties envProps, boolean migrateOldConfig) {
         String dir = null;
@@ -96,27 +101,32 @@ public class WorkingDir {
         File oldDirf = new File(cwd);
         File test = new File(oldDirf, "hosts.txt");
         if (!test.exists()) {
+            setupSystemOut(cwd);
             System.err.println("ERROR - Cannot find I2P installation in " + cwd +
                   " - Will probably be just a router with no apps or console at all!");
-            // until we move reseeding from the console to the router, we
-            // won't be able to reseed, so we are probably doomed
+            // we are probably doomed...
             return cwd;
         }
 
         // apparently configured for "portable" ?
         try {
-            if (oldDirf.getCanonicalPath().equals(dirf.getCanonicalPath()))
+            if (oldDirf.getCanonicalPath().equals(dirf.getCanonicalPath())) {
+                setupSystemOut(cwd);
                 return cwd;
+            }
         } catch (IOException ioe) {}
 
         // where we want to go
         String rv = dirf.getAbsolutePath();
         if (dirf.exists()) {
             if (dirf.isDirectory()) {
-                if (isSetup(dirf))
+                if (isSetup(dirf)) {
+                    setupSystemOut(rv);
                     return rv; // all is good, we found the user directory
+                }
             }
             else {
+                setupSystemOut(null);
                 System.err.println("Wanted to use " + rv + " for a working directory but it is not a directory");
                 return cwd;
             }
@@ -131,15 +141,19 @@ public class WorkingDir {
             oldInstall = test.exists();
         }
         // keep everything where it is, in one place...
-        if (oldInstall && !migrateOldConfig)
+        if (oldInstall && !migrateOldConfig) {
+            setupSystemOut(cwd);
             return cwd;
+        }
         boolean migrateOldData = false; // this is a terrible idea
 
         if (!dirf.exists() && !dirf.mkdir()) {
+            setupSystemOut(null);
             System.err.println("Wanted to use " + rv + " for a working directory but could not create it");
             return cwd;
         }
 
+        setupSystemOut(dirf.getAbsolutePath());
         // Do the copying
         if (migrateOldData)
             System.err.println("Migrating data files to new user directory " + rv);
@@ -182,6 +196,44 @@ public class WorkingDir {
                     return true;
         }
         return false;
+    }
+
+    /**
+     *  Redirect stdout and stderr to a wrapper.log file if there is no wrapper.
+     *
+     *  If there is no -Dwrapper.log=/path/to/wrapper.log on the java command line
+     *  to specify a log file, check for existence of wrapper.log in CWD,
+     *  for backward compatibility in old installations (don't move it).
+     *  Otherwise, use (system temp dir)/wrapper.log.
+     *  Create if it doesn't exist, and append to it if it does.
+     *  Put the location in the environment as an absolute path, so logs.jsp can find it.
+     *
+     *  @param dir if null, use Java temp dir; System property wrapper.logfile overrides
+     *  @since 0.8.13
+     */
+    private static void setupSystemOut(String dir) {
+        if (System.getProperty("wrapper.version") != null)
+            return;
+        String path = System.getProperty(PROP_WRAPPER_LOG);
+        File logfile;
+        if (path != null) {
+            logfile = new File(path);
+        } else {
+            logfile = new File(DEFAULT_WRAPPER_LOG);
+            if (!logfile.exists()) {
+                if (dir == null)
+                    dir = System.getProperty("java.io.tmpdir");
+                logfile = new File(dir, DEFAULT_WRAPPER_LOG);
+            }
+        }
+        System.setProperty(PROP_WRAPPER_LOG, logfile.getAbsolutePath());
+        try {
+            PrintStream ps = new PrintStream(new SecureFileOutputStream(logfile, true));
+            System.setOut(ps);
+            System.setErr(ps);
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
     }
 
     /**

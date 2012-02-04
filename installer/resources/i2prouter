@@ -29,6 +29,7 @@
 # should have been replaced by the izpack installer.
 # If you did not run the installer, replace them with the appropriate path.
 I2P="%INSTALL_PATH"
+I2P_CONFIG_DIR="$HOME/.i2p"
 I2PTEMP="%SYSTEM_java_io_tmpdir"
 # PORTABLE installation:
 # Use the following instead.
@@ -44,9 +45,10 @@ GETTEXT=$(which gettext)
 
 # If specified, the Wrapper will be run as the specified user.
 # IMPORTANT - Make sure that the user has the required privileges to write
-#  the PID file and wrapper.log files.  Failure to be able to write the log
-#  file will cause the Wrapper to exit without any way to write out an error
-#  message.
+#  the PID file and wrapper.log files and that the directories exist.
+#  Failure to write the pid file will cause the Wrapper to exit.
+#  Failure to write the log file will cause the Wrapper to use CWD for the log file location.
+#
 # NOTE - This will set the user which is used to run the Wrapper as well as
 #  the JVM and is not useful in situations where a privileged resource or
 #  port needs to be allocated prior to the user being changed.
@@ -60,8 +62,14 @@ WRAPPER_CONF="$I2P/wrapper.config"
 #  nice is only used if a priority is specified.
 PRIORITY=
 
-# Location of the pid file.
-PIDDIR="$I2PTEMP"
+# Location of the pid and status files.
+PIDDIR="$I2P_CONFIG_DIR"
+#PIDDIR="$I2PTEMP"
+
+# Location of the wrapper.log file
+LOGDIR="$I2P_CONFIG_DIR"
+#LOGDIR="$I2PTEMP"
+LOGFILE="$LOGDIR/wrapper.log"
 
 # If you'd like to run I2P as root (not recommended), uncomment the
 # following line
@@ -590,6 +598,9 @@ else
    COMMANDPROP=
 fi
 
+# Build the log file clause.
+LOGPROP="wrapper.logfile=\"$LOGFILE\""
+
 if [ ! -n "$WAIT_FOR_STARTED_STATUS" ]
 then
     WAIT_FOR_STARTED_STATUS=true
@@ -864,9 +875,10 @@ launchdinternal() {
     if [ "X$pid" = "X" ]
     then
         prepAdditionalParams "$@"
+        mkdir -p "$PIDDIR" "$LOGDIR"
 
         # The string passed to eval must handles spaces in paths correctly.
-        COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=\"$APP_NAME\" wrapper.pidfile=\"$PIDFILE\" wrapper.name=\"$APP_NAME\" wrapper.displayname=\"$APP_LONG_NAME\" wrapper.daemonize=TRUE $ANCHORPROP $IGNOREPROP $STATUSPROP $COMMANDPROP $LOCKPROP $ADDITIONAL_PARA"
+        COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=\"$APP_NAME\" wrapper.pidfile=\"$PIDFILE\" wrapper.name=\"$APP_NAME\" wrapper.displayname=\"$APP_LONG_NAME\" wrapper.daemonize=TRUE $ANCHORPROP $IGNOREPROP $STATUSPROP $COMMANDPROP $LOCKPROP $LOGPROP $ADDITIONAL_PARA"
         eval $COMMAND_LINE
     else
         eval echo `gettext '$APP_LONG_NAME is already running.'`
@@ -887,9 +899,10 @@ console() {
         trap '' 3 2
 
         prepAdditionalParams "$@"
+        mkdir -p "$PIDDIR" "$LOGDIR"
 
         # The string passed to eval must handles spaces in paths correctly.
-        COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=\"$APP_NAME\" wrapper.java.command=\"$JAVABINARY\" wrapper.pidfile=\"$PIDFILE\" wrapper.name=\"$APP_NAME\" wrapper.displayname=\"$APP_LONG_NAME\" $ANCHORPROP $STATUSPROP $COMMANDPROP $LOCKPROP $ADDITIONAL_PARA"
+        COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=\"$APP_NAME\" wrapper.java.command=\"$JAVABINARY\" wrapper.pidfile=\"$PIDFILE\" wrapper.name=\"$APP_NAME\" wrapper.displayname=\"$APP_LONG_NAME\" $ANCHORPROP $STATUSPROP $COMMANDPROP $LOCKPROP $LOGPROP $ADDITIONAL_PARA"
         eval $COMMAND_LINE
         if [ "$?" -ne "0" ]; then
                 failed
@@ -1012,9 +1025,10 @@ start() {
     if [ "X$pid" = "X" ]
     then
         prepAdditionalParams "$@"
+        mkdir -p "$PIDDIR" "$LOGDIR"
 
         # The string passed to eval must handles spaces in paths correctly.
-        COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=\"$APP_NAME\" wrapper.java.command=\"$JAVABINARY\" wrapper.pidfile=\"$PIDFILE\" wrapper.name=\"$APP_NAME\" wrapper.displayname=\"$APP_LONG_NAME\" wrapper.daemonize=TRUE $ANCHORPROP $IGNOREPROP $STATUSPROP $COMMANDPROP $LOCKPROP $ADDITIONAL_PARA"
+        COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=\"$APP_NAME\" wrapper.java.command=\"$JAVABINARY\" wrapper.pidfile=\"$PIDFILE\" wrapper.name=\"$APP_NAME\" wrapper.displayname=\"$APP_LONG_NAME\" wrapper.daemonize=TRUE $ANCHORPROP $IGNOREPROP $STATUSPROP $COMMANDPROP $LOCKPROP $LOGPROP $ADDITIONAL_PARA"
         eval $COMMAND_LINE
         if [ "$?" -ne "0" ]; then
                 failed
