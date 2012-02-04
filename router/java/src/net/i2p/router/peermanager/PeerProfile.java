@@ -134,7 +134,8 @@ public class PeerProfile {
     boolean isSameCountry() {
         String us = _context.commSystem().getOurCountry();
         return us != null &&
-               _bigCountries.contains(us) &&
+               (_bigCountries.contains(us) ||
+                _context.getProperty(CapacityCalculator.PROP_COUNTRY_BONUS) != null) &&
                us.equals(_context.commSystem().getCountry(_peer));
     }
 
