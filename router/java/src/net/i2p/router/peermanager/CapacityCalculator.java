@@ -10,6 +10,8 @@ import net.i2p.stat.RateStat;
 class CapacityCalculator {
     private static final I2PAppContext _context = I2PAppContext.getGlobalContext();
     
+    public static final String PROP_COUNTRY_BONUS = "profileOrganizer.sameCountryBonus";
+
     /** used to adjust each period so that we keep trying to expand the peer's capacity */
     static final long GROWTH_FACTOR = 5;
     
@@ -65,8 +67,16 @@ class CapacityCalculator {
         if (profile.isEstablished())
             capacity += BONUS_ESTABLISHED;
         // boost same country
-        if (profile.isSameCountry())
-            capacity += BONUS_SAME_COUNTRY;
+        if (profile.isSameCountry()) {
+            double bonus = BONUS_SAME_COUNTRY;
+            String b = _context.getProperty(PROP_COUNTRY_BONUS);
+            if (b != null) {
+                try {
+                    bonus = Double.parseDouble(b);
+                } catch (NumberFormatException nfe) {}
+            }
+            capacity += bonus;
+        }
         // penalize unreachable peers
         if (profile.wasUnreachable())
             capacity -= PENALTY_UNREACHABLE;

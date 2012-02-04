@@ -1,3 +1,20 @@
+2012-02-04 zzz
+  * Deprecate util classes used only by installer
+  * ProfileOrganizer: Add profileOrganizer.sameCountryBonus config
+  * WorkingDir: Reset dates of eepsite files while migrating
+                to avoid exposing install time (thx Z6)
+  * Wrapper files:
+    - Move PID and status files to config dir in i2prouter
+    - Don't set PID files in wrapper.config as Windows doesn't need them
+      and the wrapper won't start if the dir doesn't exist
+    - Move wrapper.log to config dir using override in i2prouter,
+      Windows stays in system temp dir
+    - Move wrapper.log to config dir for no wrapper
+    - Move wrapper.log setup for no wrapper from RouterLaunch
+      to WorkingDir
+    - Redirect stderr too when no wrapper
+    - Create config dir in i2prouter for Linux/Mac
+
 2012-02-02 kytv
  * Ukrainian and Polish translation updates from Transifex
 
