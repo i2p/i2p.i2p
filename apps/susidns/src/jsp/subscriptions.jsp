@@ -29,6 +29,7 @@
 
 %>
 <%@page pageEncoding="UTF-8"%>
+<%@page trimDirectiveWhitespaces="true"%>
 <%@ page contentType="text/html"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <jsp:useBean id="version" class="i2p.susi.dns.VersionBean" scope="application" />

@@ -163,7 +163,13 @@ public class WorkingDir {
             System.err.println("Setting up new user directory " + rv);
         boolean success = migrate(MIGRATE_BASE, oldDirf, dirf);
         // this one must be after MIGRATE_BASE
-        success &= migrateJettyXml(oldDirf, dirf);
+        File oldEep = new File(oldDirf, "eepsite");
+        File newEep = new File(dirf, "eepsite");
+        String newPath = newEep.getAbsolutePath() + File.separatorChar;
+        success &= migrateJettyXml(oldEep, newEep, "jetty.xml", "./eepsite/", newPath);
+        success &= migrateJettyXml(oldEep, newEep, "jetty-ssl.xml", "./eepsite/", newPath);
+        success &= migrateJettyXml(oldEep, newEep, "contexts/base-context.xml", "./eepsite/", newPath);
+        success &= migrateJettyXml(oldEep, newEep, "contexts/cgi-context.xml", "./eepsite/", newPath);
         success &= migrateClientsConfig(oldDirf, dirf);
         // for later news.xml updates (we don't copy initialNews.xml over anymore)
         success &= (new SecureDirectory(dirf, "docs")).mkdir();
@@ -295,11 +301,11 @@ public class WorkingDir {
                 }
                 out.println(s);
             }
-            System.err.println("Copied clients.config with modifications");
+            System.err.println("Copied " + oldFile + " with modifications");
             return true;
         } catch (IOException ioe) {
             if (in != null) {
-                System.err.println("FAILED copy clients.config");
+                System.err.println("FAILED copy " + oldFile + ": " + ioe);
                 return false;
             }
             return false;
@@ -314,11 +320,9 @@ public class WorkingDir {
      *  It was already copied over once in migrate(), throw that out and
      *  do it again with modifications.
      */
-    private static boolean migrateJettyXml(File olddir, File todir) {
-        File eepsite1 = new File(olddir, "eepsite");
-        File oldFile = new File(eepsite1, "jetty.xml");
-        File eepsite2 = new File(todir, "eepsite");
-        File newFile = new File(eepsite2, "jetty.xml");
+    static boolean migrateJettyXml(File olddir, File todir, String filename, String oldString, String newString) {
+        File oldFile = new File(olddir, filename);
+        File newFile = new File(todir, filename);
         FileInputStream in = null;
         PrintWriter out = null;
         try {
@@ -326,17 +330,17 @@ public class WorkingDir {
             out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new SecureFileOutputStream(newFile), "UTF-8")));
             String s = null;
             while ((s = DataHelper.readLine(in)) != null) {
-                if (s.indexOf("./eepsite/") >= 0) {
-                    s = s.replace("./eepsite/", todir.getAbsolutePath() + File.separatorChar + "eepsite" + File.separatorChar);
+                if (s.indexOf(oldString) >= 0) {
+                    s = s.replace(oldString, newString);
                 }
                 out.println(s);
             }
             out.println("<!-- Modified by I2P User dir migration script -->");
-            System.err.println("Copied jetty.xml with modifications");
+            System.err.println("Copied " + oldFile + " with modifications");
             return true;
         } catch (IOException ioe) {
             if (in != null) {
-                System.err.println("FAILED copy jetty.xml");
+                System.err.println("FAILED copy " + oldFile + ": " + ioe);
                 return false;
             }
             return false;
@@ -392,7 +396,7 @@ public class WorkingDir {
      * @param dst not a directory, will be overwritten if existing, will be mode 600
      * @return true if it was copied successfully
      */
-    private static boolean copyFile(File src, File dst) {
+    static boolean copyFile(File src, File dst) {
         if (!src.exists()) return false;
         boolean rv = true;
 
@@ -409,7 +413,7 @@ public class WorkingDir {
             
             System.err.println("Copied " + src.getPath());
         } catch (IOException ioe) {
-            System.err.println("FAILED copy " + src.getPath());
+            System.err.println("FAILED copy " + src.getPath() + ": " + ioe);
             rv = false;
         } finally {
             if (in != null) try { in.close(); } catch (IOException ioe) {}
