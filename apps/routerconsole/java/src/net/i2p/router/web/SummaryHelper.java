@@ -662,6 +662,51 @@ public class SummaryHelper extends HelperBase {
         return ConfigRestartBean.renderStatus(getRequestURI(), getAction(), getConsoleNonce());
     }
 
+    /**
+     *  The firewall status and reseed status/buttons
+     *  @since 0.9 moved from SummaryBarRenderer
+     */
+    public String getFirewallAndReseedStatus() {
+        StringBuilder buf = new StringBuilder(256);
+        if (showFirewallWarning()) {
+            buf.append("<h4><a href=\"/confignet\" target=\"_top\" title=\"")
+               .append(_("Help with firewall configuration"))
+               .append("\">")
+               .append(_("Check network connection and NAT/firewall"))
+               .append("</a></h4>");
+        }
+
+        boolean reseedInProgress = Boolean.valueOf(System.getProperty("net.i2p.router.web.ReseedHandler.reseedInProgress")).booleanValue();
+        // If showing the reseed link is allowed
+        if (allowReseed()) {
+            if (reseedInProgress) {
+                // While reseed occurring, show status message instead
+                buf.append("<i>").append(System.getProperty("net.i2p.router.web.ReseedHandler.statusMessage","")).append("</i><br>");
+            } else {
+                // While no reseed occurring, show reseed link
+                long nonce = _context.random().nextLong();
+                String prev = System.getProperty("net.i2p.router.web.ReseedHandler.nonce");
+                if (prev != null) System.setProperty("net.i2p.router.web.ReseedHandler.noncePrev", prev);
+                System.setProperty("net.i2p.router.web.ReseedHandler.nonce", nonce+"");
+                String uri = getRequestURI();
+                buf.append("<p><form action=\"").append(uri).append("\" method=\"POST\">\n");
+                buf.append("<input type=\"hidden\" name=\"reseedNonce\" value=\"").append(nonce).append("\" >\n");
+                buf.append("<button type=\"submit\" class=\"reload\" value=\"Reseed\" >").append(_("Reseed")).append("</button></form></p>\n");
+            }
+        }
+        // If a new reseed ain't running, and the last reseed had errors, show error message
+        if (!reseedInProgress) {
+            String reseedErrorMessage = System.getProperty("net.i2p.router.web.ReseedHandler.errorMessage","");
+            if (reseedErrorMessage.length() > 0) {
+                buf.append("<i>").append(reseedErrorMessage).append("</i><br>");
+            }
+        }
+        if (buf.length() <= 0)
+            return "";
+        buf.append("<hr>");
+        return buf.toString();
+    }
+
     /** output the summary bar to _out */
     public void renderSummaryBar() throws IOException {
         SummaryBarRenderer renderer = new SummaryBarRenderer(_context, this);

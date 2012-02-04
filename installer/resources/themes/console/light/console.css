@@ -635,10 +635,22 @@ div.search {
      width: auto;
 }
 
-img.app {
-     height: 48px;
-     width: 48px;
+div.search table {
+     background: none;
+     margin: 20px;
      padding: 8px;
+     width: auto;
+}
+
+img.app {
+     height: 40px;
+     width: 40px;
+     padding: 8px;
+}
+
+img.app2p {
+     height: 48px;
+     padding: 3px 8px;
 }
 
 table.app {
