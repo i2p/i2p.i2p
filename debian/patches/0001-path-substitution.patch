@@ -23,18 +23,7 @@ Debian wrapper.config to try to prevent confusion.
  java -cp "$I2P/lib/i2p.jar" net.i2p.util.EepGet "$@"
 --- a/installer/resources/i2prouter
 +++ b/installer/resources/i2prouter
-@@ -28,8 +28,8 @@
- # Note that (percent)INSTALL_PATH and (percent)SYSTEM_java_io_tmpdir
- # should have been replaced by the izpack installer.
- # If you did not run the installer, replace them with the appropriate path.
--I2P="%INSTALL_PATH"
--I2PTEMP="%SYSTEM_java_io_tmpdir"
-+I2P="/usr/share/i2p"
-+I2PTEMP="/tmp"
- # PORTABLE installation:
- # Use the following instead.
- #I2PTEMP="%INSTALL_PATH"
-@@ -53,8 +53,8 @@
+@@ -55,8 +55,8 @@
  #RUN_AS_USER=
  
  # Wrapper
@@ -114,46 +103,45 @@ Debian wrapper.config to try to prevent confusion.
  wrapper.java.additional.4.stripquotes=TRUE
  
  # On some IPv6 enabled systems, I2P and other network-enabled java applications
-@@ -133,13 +125,7 @@
- wrapper.console.loglevel=INFO
- 
- # Log file to use for wrapper output logging.
--# You may wish to change this on linux so the log is
--# preserved across OS restarts.
+@@ -137,11 +129,7 @@
+ # NOTE: On Linux/Mac this is overridden in the i2prouter script; changes here will have no effect.
+ # Windows users may wish to change this to %APPDATA%\I2P\wrapper.log
+ # System temp directory:
 -wrapper.logfile=$SYSTEM_java_io_tmpdir/wrapper.log
 -# PORTABLE installation:
 -# Use the following instead. I2P will find the logfile here,
 -# no need for a wrapper.java.additional line too.
 -#wrapper.logfile=$INSTALL_PATH/wrapper.log
-+wrapper.logfile=/tmp/wrapper.log
++#wrapper.logfile=/tmp/wrapper.log
  
  # Format of output for the log file.
  # The format consists of the tokens 'L' for log level, 'P' for prefix, 'D' for thread,
-@@ -205,10 +191,7 @@
- # you should copy this file, change the location or file name,
- # and edit the i2prouter script to change the WRAPPER_CONF setting
- # to point to the new wrapper.config location.
--wrapper.java.pidfile=$SYSTEM_java_io_tmpdir/routerjvm.pid
+@@ -211,11 +199,7 @@
+ # Linux/Mac users, do not set here, see settings in the i2prouter script.
+ # Directory must exist or the wrapper will fail to start.
+ # System temp directory:
+-#wrapper.java.pidfile=$SYSTEM_java_io_tmpdir/routerjvm.pid
 -# PORTABLE installation:
 -# Use the following instead.
 -#wrapper.java.pidfile=$INSTALL_PATH/routerjvm.pid
-+wrapper.java.pidfile=/tmp/routerjvm.pid
- # pid file for the service monitoring the JVM
+-# pid file for the service monitoring the JVM
++#wrapper.java.pidfile=/tmp/routerjvm.pid
  #
  # From i2prouter:
-@@ -219,10 +202,7 @@
  #
- # This means i2prouter looks for './i2p.pid'.
- # See comments above for wrapper.java.pidfile
--wrapper.pidfile=$SYSTEM_java_io_tmpdir/i2p.pid
+@@ -229,10 +213,7 @@
+ # Linux/Mac users, do not set here, see settings in the i2prouter script.
+ # Directory must exist or the wrapper will fail to start.
+ # System temp directory:
+-#wrapper.pidfile=$SYSTEM_java_io_tmpdir/i2p.pid
 -# PORTABLE installation:
 -# Use the following instead.
 -#wrapper.pidfile=$INSTALL_PATH/i2p.pid
-+wrapper.pidfile=/tmp/i2p.pid
++#wrapper.pidfile=/tmp/i2p.pid
  
  #********************************************************************
  # Wrapper General Properties
-@@ -239,30 +219,3 @@
+@@ -249,30 +230,3 @@
  wrapper.umask=0022
  wrapper.java.umask=0022
  wrapper.logfile.umask=077
