@@ -55,6 +55,8 @@ public class WorkingDir {
     private final static String DAEMON_USER = "i2psvc";
     private static final String PROP_WRAPPER_LOG = "wrapper.logfile";
     private static final String DEFAULT_WRAPPER_LOG = "wrapper.log";
+    /** Feb 16 2006 */
+    private static final long EEPSITE_TIMESTAMP = 1140048000000l;
 
     /**
      * Only call this once on router invocation.
@@ -165,6 +167,8 @@ public class WorkingDir {
         success &= migrateClientsConfig(oldDirf, dirf);
         // for later news.xml updates (we don't copy initialNews.xml over anymore)
         success &= (new SecureDirectory(dirf, "docs")).mkdir();
+        // prevent correlation of eepsite timestamps with router first-seen time
+        touchRecursive(new File(dirf, "eepsite/docroot"), EEPSITE_TIMESTAMP);
 
         // Report success or failure
         if (success) {
@@ -415,4 +419,29 @@ public class WorkingDir {
             dst.setLastModified(src.lastModified());
         return rv;
     }
+
+    /**
+     * Recursive touch all files in a dir to a given time
+     * 
+     * @param target the directory or file to touch, must exist
+     * @param time the timestamp
+     * @since 0.8.13
+     */
+    private static void touchRecursive(File target, long time) {
+        if (!target.exists())
+            return;
+        if (target.isFile()) {
+            target.setLastModified(time);
+            return;
+        }
+        if (!target.isDirectory())
+            return;
+        File children[] = target.listFiles();
+        if (children == null)
+            return;
+        for (int i = 0; i < children.length; i++) {
+            touchRecursive(children[i], time);
+        }
+    }
+    
 }
