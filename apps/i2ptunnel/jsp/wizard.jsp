@@ -401,11 +401,13 @@ http://i2jump.i2p/" /><%
             <div class="footer">
                 <div class=toolbox">
                     <a class="control" href="list"><%=intl._("Cancel")%></a>
-                    <% if (curPage != 1) {
+                    <% if (curPage != 1 && curPage != 7) {
                     %><button id="controlPrevious" accesskey="P" class="control" type="submit" name="action" value="Previous page" title="Previous Page"><%=intl._("Previous")%>(<span class="accessKey">P</span>)</button><%
                     } %>
                     <% if (curPage == 7) {
-                    %><button id="controlFinish" accesskey="F" class="control" type="submit" name="action" value="Save changes" title="Finish Wizard"><%=intl._("Finish")%>(<span class="accessKey">F</span>)</button><%
+                    %><button id="controlSave" accesskey="S" class="control" type="submit" name="action" value="Save changes" title="Save Tunnel"><%=intl._("Save Tunnel")%>(<span class="accessKey">S</span>)</button><%
+                    } else if (curPage == 6) {
+                    %><button id="controlFinish" accesskey="F" class="control" type="submit" name="action" value="Next page" title="Finish Wizard"><%=intl._("Finish")%>(<span class="accessKey">F</span>)</button><%
                     } else {
                     %><button id="controlNext" accesskey="N" class="control" type="submit" name="action" value="Next page" title="Next Page"><%=intl._("Next")%>(<span class="accessKey">N</span>)</button><%
                     } %>
