@@ -41,7 +41,7 @@ APP_LONG_NAME="I2P Service"
 
 # gettext - we look for it in the path
 # fallback to echo is below, we can't set it to echo here.
-GETTEXT=$(which gettext)
+GETTEXT=$(which gettext > /dev/null 2>&1)
 
 # If specified, the Wrapper will be run as the specified user.
 # IMPORTANT - Make sure that the user has the required privileges to write
@@ -476,7 +476,7 @@ gettext() {
     # Call external gettext using our own translation files.
     # Don't attempt to translate via the wrapper,
     # it probably isn't supported in the community edition.
-    if [ "X${LANG#en}" = "X$LANG" ] && [ $(which $GETTEXT) ] ; then
+    if [ "X${LANG#en}" = "X$LANG" ] && [ $(which $GETTEXT > /dev/null 2>&1) ] ; then
             TEXTDOMAINDIR=$I2P/locale $GETTEXT -d i2prouter "$1"
             if [ $? != 0 ] ; then
                 echo "$1"
