@@ -184,20 +184,23 @@ public class WorkingDir {
 
     /**
      * Tests if <code>dir</code> has been set up as a I2P working directory.<br/>
-     * Returns <code>false</code> if a directory is empty, or contains nothing besides
-     * subdirectories named <code>plugins</code> and/or <code>logs</code>.<br/>
-     * Returns <code>true</code> if the directory contains something not named
-     * <code>plugins</code> or <code>logs</code>.</br>
+     * Returns <code>false</code> if a directory is empty, or contains nothing that
+     * is usually migrated from the base install.
      * This allows to pre-install plugins before the first router start.
+     * @return true if already set up
      */
     private static boolean isSetup(File dir) {
         if (dir.isDirectory()) {
             String[] files = dir.list();
             if (files == null)
                 return false;
-            for (String file: files)
-                if (!"plugins".equals(file) && !"logs".equals(file))
-                    return true;
+            String migrated[] = MIGRATE_BASE.split(",");
+            for (String file: files) {
+                for (int i = 0; i < migrated.length; i++) {
+                    if (file.equals(migrated[i]))
+                        return true;
+                }
+            }
         }
         return false;
     }

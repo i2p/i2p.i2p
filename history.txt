@@ -1,3 +1,9 @@
+2012-02-10 zzz
+  * WorkingDir: Fix detection of migrated directory
+
+2012-02-09 zzz
+  * i2psnark: Escape semicolons
+
 2012-02-04 zzz
   * Deprecate util classes used only by installer
   * ProfileOrganizer: Add profileOrganizer.sameCountryBonus config
