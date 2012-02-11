@@ -118,29 +118,66 @@
             %><p>
                 <%=intl._("There are several types of tunnels to choose from:")%>
             </p>
-            <ul><%
+            <table><%
                 if (tunnelIsClient) {
                 %>
-                <li><%=intl._("Standard")%></li>
-                <li>HTTP</li>
-                <li>IRC</li>
-                <li>SOCKS 4/4a/5</li>
-                <li>SOCKS IRC</li>
-                <li>CONNECT</li>
-                <li>Streamr</li><%
+                <tr><td><%=intl._("Standard")%></td><td>
+                    <%=intl._("A basic client tunnel for connecting to a single service inside I2P.")%>
+                    <%=intl._("If none of the tunnel types below seem to fit your requirements, or you don't know what type of tunnel you need, try this one.")%>
+                </td></tr>
+                <tr><td>HTTP</td><td>
+                    <%=intl._("A client tunnel that acts as an HTTP proxy.")%>
+                    <%=intl._("With this tunnel type, you can connect to eepsites inside I2P by setting your browser to use the tunnel as a proxy, or setting the http_proxy environment variable for command-line applications in GNU/Linux.")%>
+                    <%=intl._("Websites outside I2P can also be reached if an HTTP proxy within I2P is known.")%>
+                </td></tr>
+                <tr><td>IRC</td><td>
+                    <%=intl._("A customised client tunnel for connecting to a single IRC network inside I2P.")%>
+                    <%=intl._("With this tunnel type, you would configure your IRC client to connect to a local port on your computer.")%>
+                    <%=intl._("Each IRC network in I2P that you wish to connect to requires a separate tunnel.")%>
+                </td></tr>
+                <tr><td>SOCKS 4/4a/5</td><td>
+                    <%=intl._("A client tunnel that implements the SOCKS protocol.")%>
+                    <%=intl._("This enables both TCP and UDP connections to be made through a SOCKS outproxy within I2P.")%>
+                </td></tr>
+                <tr><td>SOCKS IRC</td><td>
+                    <%=intl._("A client tunnel implementing the SOCKS protocol, which is customised for connecting to IRC networks.")%>
+                    <%=intl._("With this tunnel type, IRC networks in I2P can be reached by typing the I2P address into your IRC client, and configuring the IRC client to use this SOCKS tunnel.")%>
+                    <%=intl._("This means that only one I2P tunnel is required rather than a separate tunnel per IRC network.")%>
+                    <%=intl._("IRC networks outside I2P can also be reached if a SOCKS outproxy within I2P is known, though it depends on whether or not the outproxy has been blocked by the IRC network.")%>
+                </td></tr>
+                <tr><td>CONNECT</td><td>
+                    <%=intl._("A client tunnel that implements the HTTP CONNECT command.")%>
+                    <%=intl._("This enables TCP connections to be made through an HTTP outproxy, assuming the proxy supports the CONNECT command.")%>
+                </td></tr>
+                <tr><td>Streamr</td><td>
+                    <%=intl._("A customised client tunnel for Streamr.")%>
+                    <%=intl._("I have no idea what this is.")%>
+                </td></tr><%
                 } else {
                 %>
-                <li><%=intl._("Standard")%></li>
-                <li>HTTP</li>
-                <li>HTTP bidir</li>
-                <li>IRC</li>
-                <li>Streamr</li><%
+                <tr><td><%=intl._("Standard")%></td><td>
+                    <%=intl._("A basic server tunnel for hosting a generic service inside I2P.")%>
+                    <%=intl._("If none of the tunnel types below seem to fit your requirements, or you don't know what type of tunnel you need, try this one.")%>
+                </td></tr>
+                <tr><td>HTTP</td><td>
+                    <%=intl._("A server tunnel that is customised for HTTP connections.")%>
+                    <%=intl._("Use this tunnel type if you want to host an eepsite.")%>
+                </td></tr>
+                <tr><td>HTTP bidir</td><td>
+                    <%=intl._("A customised server tunnel that can both serve HTTP data and connect to other server tunnels.")%>
+                    <%=intl._("This tunnel type is predominantly used when running a Seedless server.")%>
+                </td></tr>
+                <tr><td>IRC</td><td>
+                    <%=intl._("A customised server tunnel for hosting IRC networks inside I2P.")%>
+                    <%=intl._("Usually, a separate tunnel needs to be created for each IRC server that is to be accessible inside I2P.")%>
+                </td></tr>
+                <tr><td>Streamr</td><td>
+                    <%=intl._("A customised server tunnel for Streamr.")%>
+                    <%=intl._("I have no idea what this is.")%>
+                </td></tr><%
                 }
                 %>
-            </ul>
-            <p>
-                <%=intl._("The above might look better as a table, possibly.")%>
-            </p>
+            </table>
             <div id="typeField" class="rowItem">
                 <%
                 if (tunnelIsClient) {
