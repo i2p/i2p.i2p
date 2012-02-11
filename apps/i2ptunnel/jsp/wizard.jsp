@@ -98,7 +98,7 @@
             <p>
                 <%=intl._("The first thing to decide is whether you want to create a client or server tunnel.")%>
                 <%=intl._("If you are trying to connect to a remote service (such as an IRC server inside I2P, or a code repository) then you will require a client tunnel.")%>
-                <%=intl._("Server tunnels are what client tunnels will connect to, and you will need to create one if you want to host a service - e.g. more eepsites, an outproxy, .")%>
+                <%=intl._("Server tunnels are what client tunnels will connect to, and you will need to create one if you want to host a service - e.g. more eepsites, or an outproxy.")%>
             </p>
             <div id="typeField" class="rowItem">
                 <label><%=intl._("Server Tunnel")%></label>
