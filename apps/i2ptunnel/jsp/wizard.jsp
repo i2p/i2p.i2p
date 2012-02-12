@@ -238,7 +238,8 @@
               if ("httpclient".equals(tunnelType) || "connectclient".equals(tunnelType) || "sockstunnel".equals(tunnelType) || "socksirctunnel".equals(tunnelType)) {
                 if (curPage == 4) {
           %><p>
-                <%=intl._("Some blurb explaining that this is the list of proxies that the client tunnel should try if the requested URL is not an I2P URL.")%>
+                <%=intl._("If you know of any outproxies for this type of tunnel (either HTTP or SOCKS), fill them in below.")%>
+                <%=intl._("Separate multiple proxies with commas.")%>
             </p>
             <div id="destinationField" class="rowItem">
                 <label for="proxyList" accesskey="x">
@@ -252,7 +253,8 @@
               } else if ("client".equals(tunnelType) || "ircclient".equals(tunnelType) || "streamrclient".equals(tunnelType)) {
                 if (curPage == 4) {
           %><p>
-                <%=intl._("Some blurb explaining that this is the I2P destination that the client tunnel should point to.")%>
+                <%=intl._("Type in the I2P destination of the service that this client tunnel should connect to.")%>
+                <%=intl._("This could be the full base 64 destination key, or an I2P URL from your address book.")%>
             </p>
             <div id="destinationField" class="rowItem">
                 <label for="targetDestination" accesskey="T">
