@@ -364,7 +364,8 @@
 
             if (curPage == 6) {
             %><p>
-                <%=intl._("Some blurb that explains what Auto Start does.")%>
+                <%=intl._("The I2P router can optionally start the tunnel for you automatically when the router is started.")%>
+                <%=intl._("This can be useful for frequently-used tunnels (especially server tunnels), but for tunnels that are only used occassionally it would mean that the I2P router is creating and maintaining unnecessary tunnels.")%>
             </p>
             <div id="startupField" class="rowItem">
                 <label for="startOnLoad" accesskey="a">
