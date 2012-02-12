@@ -283,7 +283,7 @@
                 <label for="targetHost" accesskey="H">
                     <%=intl._("Host")%>(<span class="accessKey">H</span>):
                 </label>
-                <input type="text" size="20" id="targetHost" name="targetHost" title="Target Hostname or IP" value="<%=(!"null".equals(request.getParameter("targetHost")) ? request.getParameter("targetHost") : "" ) %>" class="freetext" />
+                <input type="text" size="20" id="targetHost" name="targetHost" title="Target Hostname or IP" value="<%=(!"null".equals(request.getParameter("targetHost")) ? request.getParameter("targetHost") : "127.0.0.1" ) %>" class="freetext" />
             </div><%
               } else {
             %><input type="hidden" name="targetHost" value="<%=request.getParameter("targetHost")%>" /><%
