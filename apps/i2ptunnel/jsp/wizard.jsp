@@ -386,8 +386,20 @@
 
             if (curPage == 7) {
             %><p>
-                <%=intl._("Some blurb explaining that the wizard is finished, and that the tunnel will now be created and possibly started.")%>
-                <%=intl._("There should also be a blurb about the fact that the tunnel will be created with default values, and that these may require tuning.")%>
+                <%=intl._("The wizard has now collected enough information to create your tunnel.")%>
+                <%=intl._("Upon clicking the Save button below, the wizard will set up the tunnel, and take you back to the main I2PTunnel page.")%>
+                <%
+                if ("1".equals(request.getParameter("startOnLoad"))) {
+                %><%=intl._("Because you chose to automatically start the tunnel when the router starts, you don't have to do anything further.")%>
+                <%=intl._("The router will start the tunnel once it has been set up.")%><%
+                } else {
+                %><%=intl._("Because you chose not to automatically start the tunnel, you will have to manually start it.")%>
+                <%=intl._("You can do this by clicking the Start button on the main page which corresponds to the new tunnel.")%><%
+                } %>
+            </p>
+            <p>
+                <%=intl._("Alongside these basic settings, there are a number of advanced options for tunnel configuration.")%>
+                <%=intl._("The wizard will set reasonably sensible default values for these, but you can view and/or edit these by clicking on the tunnel's name in the main I2PTunnel page.")%>
             </p>
 
             <input type="hidden" name="tunnelDepth" value="2" />
