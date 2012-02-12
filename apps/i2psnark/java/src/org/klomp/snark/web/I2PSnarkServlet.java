@@ -900,13 +900,14 @@ public class I2PSnarkServlet extends Default {
                 out.write(trackerLink);
         }
 
+        String encodedBaseName = urlEncode(snark.getBaseName());
         // File type icon column
         out.write("</td>\n<td class=\"" + rowClass + "\">");
         if (isValid) {
             // Link to local details page - note that trailing slash on a single-file torrent
             // gets us to the details page instead of the file.
             StringBuilder buf = new StringBuilder(128);
-            buf.append("<a href=\"").append(snark.getBaseName())
+            buf.append("<a href=\"").append(encodedBaseName)
                .append("/\" title=\"").append(_("Torrent details"))
                .append("\">");
             out.write(buf.toString());
@@ -929,7 +930,7 @@ public class I2PSnarkServlet extends Default {
         out.write("</td><td class=\"snarkTorrentName " + rowClass + "\">");
         if (remaining == 0 || isMultiFile) {
             StringBuilder buf = new StringBuilder(128);
-            buf.append("<a href=\"").append(snark.getBaseName());
+            buf.append("<a href=\"").append(encodedBaseName);
             if (isMultiFile)
                 buf.append('/');
             buf.append("\" title=\"");
@@ -1623,9 +1624,14 @@ public class I2PSnarkServlet extends Default {
     private static String urlify(String s) {
         StringBuilder buf = new StringBuilder(256);
         // browsers seem to work without doing this but let's be strict
-        String link = s.replace("&", "&amp;").replace(" ", "%20");
+        String link = urlEncode(s);
         buf.append("<a href=\"").append(link).append("\">").append(link).append("</a>");
         return buf.toString();
+    }
+    
+    /** @since 0.8.13 */
+    private static String urlEncode(String s) {
+        return s.replace("&", "&amp;").replace(" ", "%20").replace(":", "%3A").replace("/", "%2F").replace(";", "%3B");
     }
 
     private static final String DOCTYPE = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n";
@@ -1761,6 +1767,12 @@ public class I2PSnarkServlet extends Default {
             //   .append(MAGGOT).append(hex).append(':').append(hex).append("</a>");
             buf.append("<br>").append(_("Torrent file")).append(": ").append(snark.getName());
             buf.append("</div></th></tr>");
+        } else {
+            // shouldn't happen
+            buf.append("<tr><th>Not found<br>resource=\"").append(r.toString())
+               .append("\"<br>base=\"").append(base)
+               .append("\"<br>torrent=\"").append(torrentName)
+               .append("\"</th></tr>");
         }
         if (ls == null) {
             // We are only showing the torrent info section
@@ -2068,7 +2080,7 @@ private static class FetchAndAdd implements Runnable {
                 //if (peerParam != null)
                 //    buf.append("<input type=\"hidden\" name=\"p\" value=\"").append(peerParam).append("\" >\n");
                 buf.append(_("Torrent was not retrieved from {0}", urlify(_url)));
-                String link = _url.replace("&", "&amp;").replace(" ", "%20").replace(":", "%3A").replace("/", "%2F");
+                String link = urlEncode(_url);
              /**** FIXME ticket #575
                 buf.append(" - [<a href=\"/i2psnark/?newURL=").append(link).append("#add\" >");
                 buf.append(_("Retry"));
