@@ -1,3 +1,6 @@
+2012-02-12 str4d
+  * i2ptunnel: Tunnel creation wizard
+
 2012-02-10 zzz
   * WorkingDir: Fix detection of migrated directory
 
