@@ -5,9 +5,6 @@
     <target name="builddep">
         <!-- run from top level build.xml to get dependencies built -->
     </target>
-    <target name="builddeptest">
-        <ant dir="../../core/java/" target="jarTest" />
-    </target>
     <condition property="depend.available">
         <typefound name="depend" />
     </condition>
@@ -38,17 +35,6 @@
         <javac srcdir="./src" debug="true" source="1.5" target="1.5" deprecation="on"
                includeAntRuntime="false"
                destdir="./build/obj" classpath="../../core/java/build/i2p.jar" >
-            <compilerarg line="${javac.compilerargs}" />
-        </javac>
-    </target>
-
-    <target name="compileTest" depends="builddeptest">
-        <mkdir dir="./build" />
-        <mkdir dir="./build/obj" />
-        <!-- junit classes are in ant runtime -->
-        <javac srcdir="./src:./test" debug="true" source="1.5" target="1.5" deprecation="on"
-               includeAntRuntime="true"
-               destdir="./build/obj" classpath="../../core/java/build/i2ptest.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
@@ -86,9 +72,6 @@
         </uptodate>
     </target>
 
-    <target name="jarTest" depends="compileTest">
-        <jar destfile="./build/routertest.jar" basedir="./build/obj" includes="**/*.class" />
-    </target>
     <target name="javadoc">
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc" />
@@ -98,6 +81,24 @@
             use="true" 
             splitindex="true" 
             windowtitle="I2P Router" />
+    </target>
+
+    <!-- unit tests -->
+    <target name="builddeptest">
+        <ant dir="../../core/java/" target="jarTest" />
+    </target>
+    <target name="compileTest" depends="builddeptest">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/obj" />
+        <!-- junit classes are in ant runtime -->
+        <javac srcdir="./src:./test" debug="true" source="1.5" target="1.5" deprecation="on"
+               includeAntRuntime="true"
+               destdir="./build/obj" classpath="../../core/java/build/i2ptest.jar" >
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
+    </target>
+    <target name="jarTest" depends="compileTest">
+        <jar destfile="./build/routertest.jar" basedir="./build/obj" includes="**/*.class" />
     </target>
     <target name="test" depends="compileTest">
         <junit printsummary="on" fork="yes">
@@ -164,6 +165,8 @@
     </target>
     <target name="fulltest" depends="cleandep, builddeptest, jarTest, test, junit.report" />
     <target name="fullclovertest" depends="cleandep, builddeptest, useclover, jarTest, test, test.report" />
+    <!-- end unit tests -->
+
     <target name="clean">
         <delete dir="./build" />
     </target>

@@ -980,12 +980,6 @@
         </exec>
     </target>
 
-    <target name="updateTest" depends="prepupdate">
-        <ant dir="core/java/" target="jarTest" />
-        <copy file="core/java/build/i2ptest.jar" todir="pkg-temp/lib" />
-        <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
-    </target>
-
     <!-- script translation added in 0.8.13, so don't need updates until .14, but put it in now so we don't forget -->
     <target name="prepupdate" depends="build2, prepupdateSmall, prepConsoleDocUpdates, prepCertificates, prep-script-translation">
         <copy file="build/BOB.jar" todir="pkg-temp/lib/" />
@@ -1245,6 +1239,12 @@
     </target>
     <!-- end custom installers -->
 
+    <!-- unit tests -->
+    <target name="updateTest" depends="prepupdate">
+        <ant dir="core/java/" target="jarTest" />
+        <copy file="core/java/build/i2ptest.jar" todir="pkg-temp/lib" />
+        <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
+    </target>
     <target name="test" depends="buildProperties, jbigi" >
         <mkdir dir="reports/core/junit/" />
         <ant dir="core/java/" target="test" />
@@ -1264,6 +1264,7 @@
 		<ant dir="core/java/" target="fullclovertest" />
 		<ant dir="router/java/" target="fullclovertest" />
     </target>
+    <!-- end unit tests -->
 
     <target name="testscripts" >
         <exec executable="tests/scripts/checkcerts.sh" failonerror="true" />

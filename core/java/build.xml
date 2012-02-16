@@ -28,17 +28,6 @@
         </javac>
     </target>
 
-    <target name="compileTest">
-        <mkdir dir="./build" />
-        <mkdir dir="./build/obj" />
-        <!-- junit classes are in ant runtime -->
-        <javac srcdir="./src:./test" debug="true" source="1.5" target="1.5" deprecation="on"
-               includeAntRuntime="true"
-               destdir="./build/obj" >
-            <compilerarg line="${javac.compilerargs}" />
-        </javac>
-    </target>
-
     <target name="listChangedFiles" if="mtn.available" >
         <exec executable="mtn" outputproperty="workspace.changes" errorproperty="mtn.error2" failifexecutionfails="false" >
             <arg value="list" />
@@ -72,13 +61,25 @@
         </uptodate>
     </target>
 
-    <target name="jarTest" depends="compileTest">
-        <jar destfile="./build/i2ptest.jar" basedir="./build/obj" includes="**/*.class" />
-    </target>
     <target name="javadoc">
         <mkdir dir="./build" />
         <mkdir dir="./build/javadoc" />
         <javadoc sourcepath="./src:./test" destdir="./build/javadoc" packagenames="*" use="true" splitindex="true" windowtitle="I2P SDK" />
+    </target>
+
+    <!-- unit tests -->
+    <target name="compileTest">
+        <mkdir dir="./build" />
+        <mkdir dir="./build/obj" />
+        <!-- junit classes are in ant runtime -->
+        <javac srcdir="./src:./test" debug="true" source="1.5" target="1.5" deprecation="on"
+               includeAntRuntime="true"
+               destdir="./build/obj" >
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
+    </target>
+    <target name="jarTest" depends="compileTest">
+        <jar destfile="./build/i2ptest.jar" basedir="./build/obj" includes="**/*.class" />
     </target>
     <target name="prepareTest" depends="compileTest" if="with.cobertura">
         <taskdef classpath="${with.cobertura}" resource="tasks.properties" onerror="report" />
@@ -133,6 +134,8 @@
     </target>
     <target name="test.report" depends="junit.report"/>
     <target name="fulltest" depends="test, junit.report" />
+    <!-- end unit tests -->
+
     <target name="clean">
         <delete dir="./build" />
     </target>
