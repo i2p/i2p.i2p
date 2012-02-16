@@ -1246,7 +1246,6 @@
         <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
     </target>
     <target name="test" depends="buildProperties, jbigi" >
-        <mkdir dir="reports/core/junit/" />
         <ant dir="core/java/" target="test" />
     </target>
     <target name="junit.report" depends="buildProperties" >

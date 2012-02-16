@@ -92,14 +92,12 @@
         </cobertura-instrument>
     </target>
     <target name="test" depends="clean, compileTest, prepareTest">
+        <mkdir dir="../../reports/core/junit/" />
         <delete>
             <fileset dir="../../reports/core/junit">
                 <include name="TEST-*.xml"/>
             </fileset>
         </delete>
-        <mkdir dir="../../reports/" />
-        <mkdir dir="../../reports/core/" />
-        <mkdir dir="../../reports/core/junit/" />
         <junit printsummary="on" fork="yes" maxmemory="384m">
             <sysproperty key="net.sourceforge.cobertura.datafile" file="./cobertura.ser" />
             <classpath>
