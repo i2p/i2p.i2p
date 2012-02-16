@@ -126,7 +126,7 @@
                     <%=intl._("Try this if none of the tunnel types below fit your requirements, or you don't know what type of tunnel you need.")%>
                 </td></tr>
                 <tr><td>HTTP</td><td>
-                    <%=intl._("Tunnel that acts as an HTTP proxy for reaching eepsites inside I2P")%>
+                    <%=intl._("Tunnel that acts as an HTTP proxy for reaching eepsites inside I2P.")%>
                     <%=intl._("Set your browser to use this tunnel as an http proxy, or set your \"http_proxy\" environment variable for command-line applications in GNU/Linux.")%>
                     <%=intl._("Websites outside I2P can also be reached if an HTTP proxy within I2P is known.")%>
                 </td></tr>
@@ -150,7 +150,7 @@
                     <%=intl._("This enables TCP connections to be made through an HTTP outproxy, assuming the proxy supports the CONNECT command.")%>
                 </td></tr>
                 <tr><td>Streamr</td><td>
-                    <%=intl._("A customised client tunnel for Streamr.")%>
+                    <%=intl._("A customised client tunnel for Streamr.")%><%
                     //XXX TODO<%=intl._("I have no idea what this is.")%>
                 </td></tr><%
                 } else {
@@ -172,7 +172,7 @@
                     <%=intl._("Usually, a separate tunnel needs to be created for each IRC server that is to be accessible inside I2P.")%>
                 </td></tr>
                 <tr><td>Streamr</td><td>
-                    <%=intl._("A customised server tunnel for Streamr.")%>
+                    <%=intl._("A customised server tunnel for Streamr.")%><%
                     //XXX TODO<%=intl._("I have no idea what this is.")%>
                 </td></tr><%
                 }
@@ -276,7 +276,7 @@
             if ((tunnelIsClient && "streamrclient".equals(tunnelType)) || (!tunnelIsClient && !"streamrserver".equals(tunnelType))) {
               if (curPage == 5) {
             %><p>
-                <%=intl._("This is the IP that your service is running on, this is usually on the same machine so 127.0.0.1 is autofilled.")%>
+                <%=intl._("This is the IP that your service is running on, this is usually on the same machine so 127.0.0.1 is autofilled.")%><%
                 //XXX TODO<%=intl._("For some reason streamrclient also uses this.")%>
             </p>
             <div id="hostField" class="rowItem">
@@ -310,7 +310,7 @@
               if (curPage == 5) {
             %><p>
                 <%=intl._("This is the port that the client tunnel will be accessed from locally.")%>
-                <%=intl._("This is also the client port for the httpbidirserver tunnel.")%>
+                <%=intl._("This is also the client port for the HTTPBidir server tunnel.")%>
             </p>
             <div id="portField" class="rowItem">
                 <label for="port" accesskey="P">
@@ -327,8 +327,8 @@
               if (curPage == 5) {
             %><p>
                 <%=intl._("How do you want this tunnel to be accessed? By just this machine, your entire subnet, or external internet?")%>
-                <%=intl._("You will most likely want to just allow 127.0.0.1")%>
-                //XXX TODO<%=intl._("Note that it is relevant to most Client tunnels, and httpbidirserver and streamrserver tunnels.")%>
+                <%=intl._("You will most likely want to just allow 127.0.0.1")%><%
+                //XXX TODO<%=intl._("Note that it is relevant to most Client tunnels, and httpbidirserver and streamrserver tunnels.")%><%
                 //XXX TODO<%=intl._("So the wording may need to change slightly for the client vs. server tunnels.")%>
             </p>
             <div id="reachField" class="rowItem">
@@ -397,12 +397,12 @@
                 %><%=intl._("Because you chose not to automatically start the tunnel, you will have to manually start it.")%>
                 <%=intl._("You can do this by clicking the Start button on the main page which corresponds to the new tunnel.")%><%
                 } %>
-            </p>
+            </p><%
           /*XXX TODO
             <p>
                 Show a summary of what we picked.
             </p>
-          */
+          */%>
             <p>
                 <%=intl._("Alongside these basic settings, there are a number of advanced options for tunnel configuration.")%>
                 <%=intl._("The wizard will set reasonably sensible default values for these, but you can view and/or edit these by clicking on the tunnel's name in the main I2PTunnel page.")%>
