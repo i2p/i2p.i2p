@@ -1,28 +1,29 @@
-# German debconf translation
-# Copyright (C) 2011 The I2P Project
+# Czech debconf translation
+# Copyright (C) 2012 The I2P Project
 # This file is distributed under the same license as the i2p package.
 #
 # Translators:
-# mixxy <m1xxy@mail.i2p>, 2011
-#
+# Waseihou Watashi <waseihou@gmail.com>, 2012
+
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
 "POT-Creation-Date: 2011-12-27 22:25+0000\n"
-"PO-Revision-Date: 2011-07-20 04:30+0100\n"
-"Last-Translator: mixxy <m1xxy@mail.i2p>\n"
-"Language-Team: de\n"
-"Language: de\n"
+"PO-Revision-Date: 2012-02-12 19:43+0000\n"
+"Last-Translator: Waseihou Watashi <waseihou@gmail.com>\n"
+"Language-Team: Czech (http://www.transifex.net/projects/p/I2P/language/cs/)\n"
+"Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2\n"
 
 #. Type: boolean
 #. Description
 #: ../i2p.templates:2001
 msgid "Should the I2P router be started at boot?"
-msgstr "Soll der I2P-Router beim Hochfahren mitgestartet werden?"
+msgstr "Spustit I2P routr při spuštění počítače?"
 
 #. Type: boolean
 #. Description
@@ -31,14 +32,14 @@ msgid ""
 "The I2P router can be run as a daemon that starts automatically when your "
 "computer boots up. This is the recommended configuration."
 msgstr ""
-"Der I2P-Router kann als Dämon laufen und beim Hochfahren des Betriebssystems "
-"mitgestartet werden. Diese Option wird empfohlen."
+"I2P routr bude spuštěn při startu počítače jako služba na pozadí (démon). "
+"Toto je doporučené nastavení."
 
 #. Type: string
 #. Description
 #: ../i2p.templates:3001
 msgid "I2P daemon user:"
-msgstr "Benutzer für den I2P-Dämon"
+msgstr "Jméno uživatele I2P démona (daemon user):"
 
 #. Type: string
 #. Description
@@ -49,32 +50,33 @@ msgid ""
 "account name here. For example, if your previous I2P installation is at /"
 "home/user/i2p, you may enter 'user' here."
 msgstr ""
-"Standardmäßig ist I2P so eingestellt, dass es im Dämonmodus der unter dem "
-"Benutzer i2psvc läuft. Um ein bereits **vorhandenes** I2P-Profil zu "
-"benutzen, kannst du hier einen anderen Benutzer angeben. Beispiel: Wenn "
-"deine alte I2P-Installation in /home/ich/i2p residiert, gib hier 'ich' ein."
+"I2P démon je ve výchozím stavu nakonfigurován aby běžel pod uživatelským "
+"účtem i2psvc. Pokud chcete použít **existující** I2P profil zadejte "
+"přihlašovací jméno (login) jiného uživatelského účtu. Například pokud se "
+"Vaše předchozí instalace I2P nachází v adresáři /home/franta/i2p, zadejte "
+"sem franta."
 
 #. Type: string
 #. Description
 #: ../i2p.templates:3001
-#, fuzzy
-#| msgid "Very important: The account specified here *MUST* already exist."
 msgid ""
 "Very important: If a user other than the default of 'i2psvc' is entered "
 "here, the chosen username *MUST* already exist."
-msgstr "WICHTIG; Der hier angegebene Benutzer *MUSS* bereits existieren!"
+msgstr ""
+"Důležité: pokud zadáte jiné jméno uživatele než je výchozí i2psvc, jeho účet "
+"už musí předem existovat."
 
 #. Type: string
 #. Description
 #: ../i2p.templates:4001
 msgid "Memory that can be allocated to I2P:"
-msgstr ""
+msgstr "Kolik paměti může I2P použít:"
 
 #. Type: string
 #. Description
 #: ../i2p.templates:4001
 msgid "By default, I2P will only be allowed to use up to 128MB of RAM."
-msgstr ""
+msgstr "Standardně I2P použije nanejvýš 128MB RAM."
 
 #. Type: string
 #. Description
@@ -83,3 +85,5 @@ msgid ""
 "High bandwidth routers, as well as routers with a lot of active torrents / "
 "plugins, may need to have this value increased."
 msgstr ""
+"Pokud máte velmi rychlé připojení, používáte hodně pluginů a nebo stahujete "
+"velké množství torrentů, zvyšte tuto hodnotu."

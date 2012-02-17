@@ -1,11 +1,13 @@
 # Russian debconf translation
 # Copyright (C) 2011 The I2P Project
 # This file is distributed under the same license as the i2p package.
+#
+# Translators:
 # Hidden Z <hiddenz@mail.i2p>, 2011
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: i2p 0.8.9-1\n"
+"Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
 "POT-Creation-Date: 2011-12-27 22:25+0000\n"
 "PO-Revision-Date: 2011-06-21 20:59+0500\n"
