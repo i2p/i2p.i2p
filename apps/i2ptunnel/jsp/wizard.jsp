@@ -397,12 +397,68 @@
                 %><%=intl._("Because you chose not to automatically start the tunnel, you will have to manually start it.")%>
                 <%=intl._("You can do this by clicking the Start button on the main page which corresponds to the new tunnel.")%><%
                 } %>
-            </p><%
-          /*XXX TODO
-            <p>
-                Show a summary of what we picked.
             </p>
-          */%>
+            <p>
+                <%=intl._("Below is a summary of the options you chose:")%>
+            </p>
+            <table>
+                <tr><td><%=intl._("Server or client tunnel?")%></td><td>
+                    <%=(tunnelIsClient ? "Client" : "Server")%>
+                </td></tr>
+                <tr><td><%=intl._("Tunnel type")%></td><td><%
+                if ("client".equals(tunnelType) || "server".equals(tunnelType)) { %>
+                    <%=intl._("Standard")%><%
+                } else if ("httpclient".equals(tunnelType) || "httpserver".equals(tunnelType)) { %>
+                    HTTP<%
+                } else if ("httpbidirserver".equals(tunnelType)) { %>
+                    HTTP bidir<%
+                } else if ("ircclient".equals(tunnelType) || "ircserver".equals(tunnelType)) { %>
+                    IRC<%
+                } else if ("sockstunnel".equals(tunnelType)) { %>
+                    SOCKS 4/4a/5<%
+                } else if ("socksirctunnel".equals(tunnelType)) { %>
+                    SOCKS IRC<%
+                } else if ("connectclient".equals(tunnelType)) { %>
+                    CONNECT<%
+                } else if ("streamrclient".equals(tunnelType) || "streamrserver".equals(tunnelType)) { %>
+                    Streamr<%
+                } %>
+                </td></tr>
+                <tr><td><%=intl._("Tunnel name and description")%></td><td>
+                    <%=request.getParameter("name")%><br>
+                    <%=request.getParameter("description")%>
+                </td></tr><%
+                if (tunnelIsClient) { %>
+                <tr><td><%=intl._("Tunnel destination")%></td><td><%
+                  if ("httpclient".equals(tunnelType) || "connectclient".equals(tunnelType) || "sockstunnel".equals(tunnelType) || "socksirctunnel".equals(tunnelType)) { %>
+                    <%=request.getParameter("proxyList")%><%
+                  } else if ("client".equals(tunnelType) || "ircclient".equals(tunnelType) || "streamrclient".equals(tunnelType)) { %>
+                    <%=request.getParameter("targetDestination")%><%
+                  } %>
+                </td></tr><%
+                } %>
+                <tr><td><%=intl._("Binding address and port")%></td><td><%
+                if ((tunnelIsClient && "streamrclient".equals(tunnelType)) || (!tunnelIsClient && !"streamrserver".equals(tunnelType))) { %>
+                    <%=request.getParameter("targetHost")%><br><%
+                }
+                if (!tunnelIsClient) { %>
+                    <%=request.getParameter("targetPort")%><br><%
+                }
+                if (tunnelIsClient || "httpbidirserver".equals(tunnelType)) { %>
+                    <br><%=request.getParameter("port")%><%
+                }
+                if ((tunnelIsClient && !"streamrclient".equals(tunnelType)) || "httpbidirserver".equals(tunnelType) || "streamrserver".equals(tunnelType)) { %>
+                    <br><%=request.getParameter("reachableBy")%><%
+                } %>
+                </td></tr>
+                <tr><td><%=intl._("Tunnel auto-start")%></td><td><%
+                if ("1".equals(request.getParameter("startOnLoad"))) { %>
+                    Yes<%
+                } else { %>
+                    No<%
+                } %>
+                </td></tr>
+            </table>
             <p>
                 <%=intl._("Alongside these basic settings, there are a number of advanced options for tunnel configuration.")%>
                 <%=intl._("The wizard will set reasonably sensible default values for these, but you can view and/or edit these by clicking on the tunnel's name in the main I2PTunnel page.")%>
