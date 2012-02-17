@@ -1631,7 +1631,7 @@ public class I2PSnarkServlet extends Default {
     
     /** @since 0.8.13 */
     private static String urlEncode(String s) {
-        return s.replace("&", "&amp;").replace(" ", "%20").replace(":", "%3A").replace("/", "%2F").replace(";", "%3B");
+        return s.replace(";", "%3B").replace("&", "&amp;").replace(" ", "%20");
     }
 
     private static final String DOCTYPE = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n";
@@ -2080,8 +2080,8 @@ private static class FetchAndAdd implements Runnable {
                 //if (peerParam != null)
                 //    buf.append("<input type=\"hidden\" name=\"p\" value=\"").append(peerParam).append("\" >\n");
                 buf.append(_("Torrent was not retrieved from {0}", urlify(_url)));
-                String link = urlEncode(_url);
              /**** FIXME ticket #575
+                String link = urlEncode(_url).replace(":", "%3A").replace("/", "%2F");
                 buf.append(" - [<a href=\"/i2psnark/?newURL=").append(link).append("#add\" >");
                 buf.append(_("Retry"));
                 buf.append("</a>]");
