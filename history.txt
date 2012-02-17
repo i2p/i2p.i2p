@@ -1,3 +1,6 @@
+20112-02-17 kytv
+  * Add Czech language from Transifex (thanks Waseihou)
+
 2012-02-12 str4d
   * i2ptunnel: Tunnel creation wizard
 
