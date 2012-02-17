@@ -1,3 +1,7 @@
+2012-02-17 zzz
+  * i2psnark: Escape fixes
+  * netdb.jsp: Fix debug median calculation
+
 20112-02-17 kytv
   * Add Czech language from Transifex (thanks Waseihou)
 

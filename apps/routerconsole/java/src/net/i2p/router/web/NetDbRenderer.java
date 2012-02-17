@@ -39,7 +39,7 @@ import net.i2p.util.OrderedProperties;
 import net.i2p.util.VersionComparator;
 
 public class NetDbRenderer {
-    private RouterContext _context;
+    private final RouterContext _context;
 
     public NetDbRenderer (RouterContext ctx) {
         _context = ctx;
@@ -119,12 +119,19 @@ public class NetDbRenderer {
             fmt = null;
         }
         leases.addAll(_context.netDb().getLeases());
-        int medianCount = leases.size() / 2;
+        int medianCount = 0;
         BigInteger median = null;
         int c = 0;
+        if (debug) {
+            // Find the center of the RAP leasesets
+            for (LeaseSet ls : leases) {
+                if (ls.getReceivedAsPublished())
+                    medianCount++;
+            }
+            medianCount /= 2;
+        }
         long now = _context.clock().now();
-        for (Iterator iter = leases.iterator(); iter.hasNext(); ) {
-            LeaseSet ls = (LeaseSet)iter.next();
+        for (LeaseSet ls : leases) {
             Destination dest = ls.getDestination();
             Hash key = dest.calculateHash();
             buf.append("<b>").append(_("LeaseSet")).append(": ").append(key.toBase64());
@@ -153,13 +160,15 @@ public class NetDbRenderer {
             else
                 buf.append(_("Expired {0} ago", DataHelper.formatDuration2(0-exp))).append("<br>\n");
             if (debug) {
-                buf.append("RAP? " + ls.getReceivedAsPublished() + ' ');
-                buf.append("RAR? " + ls.getReceivedAsReply() + ' ');
+                buf.append("RAP? " + ls.getReceivedAsPublished());
+                buf.append(" RAR? " + ls.getReceivedAsReply());
                 BigInteger dist = HashDistance.getDistance(ourRKey, ls.getRoutingKey());
-                if (c++ == medianCount)
-                    median = dist;
-                buf.append("Dist: <b>" + fmt.format(biLog2(dist)) + "</b> ");
-                buf.append("RKey: " + ls.getRoutingKey().toBase64() + ' ');
+                if (ls.getReceivedAsPublished()) {
+                    if (c++ == medianCount)
+                        median = dist;
+                }
+                buf.append(" Dist: <b>").append(fmt.format(biLog2(dist))).append("</b>");
+                buf.append(" RKey: ").append(ls.getRoutingKey().toBase64());
                 buf.append("<br>");
             }
             for (int i = 0; i < ls.getLeaseCount(); i++) {
@@ -174,9 +183,9 @@ public class NetDbRenderer {
         if (debug) {
             buf.append("<p><b>Total Leasesets: " + leases.size());
             buf.append("</b></p><p><b>Published (RAP) Leasesets: " + _context.netDb().getKnownLeaseSets());
-            buf.append("</b></p><p><b>Mod Data: " + HexDump.dump(_context.routingKeyGenerator().getModData()));
+            //buf.append("</b></p><p><b>Mod Data: " + HexDump.dump(_context.routingKeyGenerator().getModData()));
             buf.append("</b></p><p><b>Network data (only valid if floodfill):");
-            buf.append("</b></p><p><b>Center of Key Space (router hash): " + ourRKey.toBase64());
+            //buf.append("</b></p><p><b>Center of Key Space (router hash): " + ourRKey.toBase64());
             if (median != null) {
                 double log2 = biLog2(median);
                 buf.append("</b></p><p><b>Median distance (bits): " + fmt.format(log2));
