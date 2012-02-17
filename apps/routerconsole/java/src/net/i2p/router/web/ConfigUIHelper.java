@@ -53,13 +53,13 @@ public class ConfigUIHelper extends HelperBase {
      *  Any language-specific flag added to the icon set must be
      *  added to the top-level build.xml for the updater.
      */
-    private static final String langs[] = {"ar", "da", "de", "ee", "en", "es", "fi",
+    private static final String langs[] = {"ar", "cs", "da", "de", "ee", "en", "es", "fi",
                                            "fr", "it", "nl", "pl", "pt", "ru",
                                            "sv", "uk", "vi", "zh"};
-    private static final String flags[] = {"lang_ar", "dk", "de", "ee", "us", "es", "fi",
+    private static final String flags[] = {"lang_ar", "cs", "dk", "de", "ee", "us", "es", "fi",
                                            "fr", "it", "nl", "pl", "pt", "ru",
                                            "se", "ua", "vn", "cn"};
-    private static final String xlangs[] = {_x("Arabic"), _x("Danish"),
+    private static final String xlangs[] = {_x("Arabic"), _x("Czech"), _x("Danish"),
                                             _x("German"), _x("Estonian"), _x("English"), _x("Spanish"), _x("Finnish"),
                                             _x("French"), _x("Italian"), _x("Dutch"), _x("Polish"),
                                             _x("Portuguese"), _x("Russian"), _x("Swedish"),
