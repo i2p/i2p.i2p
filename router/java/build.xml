@@ -101,6 +101,12 @@
         <jar destfile="./build/routertest.jar" basedir="./build/obj" includes="**/*.class" />
     </target>
     <target name="test" depends="compileTest">
+        <mkdir dir="../../reports/router/junit/" />
+        <delete>
+            <fileset dir="../../reports/router/junit">
+                <include name="TEST-*.xml"/>
+            </fileset>
+        </delete>
         <junit printsummary="on" fork="yes">
             <classpath>
                 <pathelement path="${classpath}" />
@@ -109,31 +115,13 @@
                 <pathelement location="../../installer/lib/jbigi/jbigi.jar" />
                 <pathelement path="${ant.home}/lib/clover.jar"/>
             </classpath>
-            <batchtest>
+            <batchtest todir="../../reports/router/junit/">
                 <fileset dir="./test/">
                     <include name="**/*Test.java" />
                 </fileset>
             </batchtest>
             <formatter type="xml"/>
         </junit>
-        <mkdir dir="../../reports/" />
-        <mkdir dir="../../reports/router/" />
-        <mkdir dir="../../reports/router/junit/" />
-        <delete>
-            <fileset dir="../../reports/router/junit">
-                <include name="TEST-*.xml"/>
-            </fileset>
-        </delete>
-        <copy todir="../../reports/router/junit">
-            <fileset dir=".">
-                <include name="TEST-*.xml"/>
-            </fileset>
-        </copy>
-        <delete>
-            <fileset dir=".">
-                <include name="TEST-*.xml"/>
-            </fileset>
-        </delete>
     </target>
     <target name="junit.report">
         <junitreport todir="../../reports/router/junit">
