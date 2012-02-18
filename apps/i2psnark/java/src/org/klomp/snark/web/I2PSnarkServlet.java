@@ -1292,7 +1292,9 @@ public class I2PSnarkServlet extends Default {
         out.write("\" name=\"foo\" >\n" +
                   "</td></tr><tr><td>");
         out.write(_("Private?"));
-        out.write(" </td><td> <input type=\"checkbox\" class=\"optbox\" name=\"private\" value=\"true\"");
+        out.write(" </td><td> <input type=\"checkbox\" class=\"optbox\" name=\"private\" value=\"true\" title=\"");
+            out.write(_("Use for private trackers"));
+        out.write("\"");
         if (req.getParameter("private") != null)
             out.write(" checked");
         out.write("></td></tr>" +
