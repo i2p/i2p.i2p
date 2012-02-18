@@ -156,7 +156,7 @@ public class TrackerClient extends I2PAppThread
         primary = "";
     }
     List tlist = _util.getOpenTrackers();
-    if (tlist != null) {
+    if (tlist != null && !meta.isPrivate()) {
         for (int i = 0; i < tlist.size(); i++) {
              String url = (String)tlist.get(i);
              if (!isValidAnnounce(url)) {
@@ -348,7 +348,7 @@ public class TrackerClient extends I2PAppThread
             }  // *** end of trackers loop here
 
             // Get peers from PEX
-            if (left > 0 && coordinator.needPeers() && !stop) {
+            if (left > 0 && coordinator.needPeers() && (!meta.isPrivate()) && !stop) {
                 Set<PeerID> pids = coordinator.getPEXPeers();
                 if (!pids.isEmpty()) {
                     _util.debug("Got " + pids.size() + " from PEX", Snark.INFO);
@@ -370,7 +370,7 @@ public class TrackerClient extends I2PAppThread
 
             // Get peers from DHT
             // FIXME this needs to be in its own thread
-            if (_util.getDHT() != null && !stop) {
+            if (_util.getDHT() != null && (!meta.isPrivate()) && !stop) {
                 int numwant;
                 if (left == 0 || event.equals(STOPPED_EVENT) || !coordinator.needPeers())
                     numwant = 1;
@@ -444,22 +444,33 @@ public class TrackerClient extends I2PAppThread
                                 long downloaded, long left, String event)
     throws IOException
   {
-    // What do we send for left in magnet mode? Can we omit it?
-    long tleft = left >= 0 ? left : 1;
-    String s = tr.announce
-      + "?info_hash=" + infoHash
-      + "&peer_id=" + peerID
-      + "&port=" + port
-      + "&ip=" + _util.getOurIPString() + ".i2p"
-      + "&uploaded=" + uploaded
-      + "&downloaded=" + downloaded
-      + "&left=" + tleft
-      + "&compact=1"   // NOTE: opentracker will return 400 for &compact alone
-      + ((! event.equals(NO_EVENT)) ? ("&event=" + event) : "");
-    if (left == 0 || event.equals(STOPPED_EVENT) || !coordinator.needPeers())
-        s += "&numwant=0";
+    StringBuilder buf = new StringBuilder(512);
+    buf.append(tr.announce);
+    if (tr.announce.contains("?"))
+        buf.append('&');
     else
-        s += "&numwant=" + _util.getMaxConnections();
+        buf.append('?');
+    buf.append("info_hash=").append(infoHash)
+       .append("&peer_id=").append(peerID)
+       .append("&port=").append(port)
+       .append("&ip=" ).append(_util.getOurIPString()).append(".i2p")
+       .append("&uploaded=").append(uploaded)
+       .append("&downloaded=").append(downloaded)
+       .append("&left=");
+    // What do we send for left in magnet mode? Can we omit it?
+    if (left >= 0)
+        buf.append(left);
+    else
+        buf.append('1');
+    buf.append("&compact=1");  // NOTE: opentracker will return 400 for &compact alone
+    if (! event.equals(NO_EVENT))
+        buf.append("&event=").append(event);
+    buf.append("&numwant=");
+    if (left == 0 || event.equals(STOPPED_EVENT) || !coordinator.needPeers())
+        buf.append('0');
+    else
+        buf.append(_util.getMaxConnections());
+    String s = buf.toString();
     _util.debug("Sending TrackerClient request: " + s, Snark.INFO);
       
     tr.lastRequestTime = System.currentTimeMillis();

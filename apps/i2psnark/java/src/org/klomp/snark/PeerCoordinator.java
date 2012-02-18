@@ -1186,6 +1186,8 @@ public class PeerCoordinator implements PeerListener
    *  @since 0.8.4
    */
   void sendPeers(Peer peer) {
+      if (metainfo != null && metainfo.isPrivate())
+          return;
       Map<String, BEValue> handshake = peer.getHandshakeMap();
       if (handshake == null)
           return;

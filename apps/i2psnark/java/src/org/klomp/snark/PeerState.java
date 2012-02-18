@@ -489,6 +489,13 @@ class PeerState implements DataLoader
   /** @since 0.8.2 */
   void extensionMessage(int id, byte[] bs)
   {
+      if (metainfo != null && metainfo.isPrivate() &&
+          (id == ExtensionHandler.ID_METADATA || id == ExtensionHandler.ID_PEX)) {
+          // shouldn't get this since we didn't advertise it but they could send it anyway
+          if (_log.shouldLog(Log.WARN))
+              _log.warn("Private torrent, ignoring ext msg " + id);
+          return;
+      }
       ExtensionHandler.handleMessage(peer, listener, id, bs);
       // Peer coord will get metadata from MagnetState,
       // verify, and then call gotMetaInfo()

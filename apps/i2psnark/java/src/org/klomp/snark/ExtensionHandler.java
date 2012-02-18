@@ -39,15 +39,19 @@ abstract class ExtensionHandler {
 
   /**
    *  @param metasize -1 if unknown
+   *  @param pexAndMetadata advertise these capabilities
    *  @return bencoded outgoing handshake message
    */
-    public static byte[] getHandshake(int metasize) {
+    public static byte[] getHandshake(int metasize, boolean pexAndMetadata) {
         Map<String, Object> handshake = new HashMap();
         Map<String, Integer> m = new HashMap();
-        m.put(TYPE_METADATA, Integer.valueOf(ID_METADATA));
-        m.put(TYPE_PEX, Integer.valueOf(ID_PEX));
-        if (metasize >= 0)
-            handshake.put("metadata_size", Integer.valueOf(metasize));
+        if (pexAndMetadata) {
+            m.put(TYPE_METADATA, Integer.valueOf(ID_METADATA));
+            m.put(TYPE_PEX, Integer.valueOf(ID_PEX));
+            if (metasize >= 0)
+                handshake.put("metadata_size", Integer.valueOf(metasize));
+        }
+        // include the map even if empty so the far-end doesn't NPE
         handshake.put("m", m);
         handshake.put("p", Integer.valueOf(6881));
         handshake.put("v", "I2PSnark");
