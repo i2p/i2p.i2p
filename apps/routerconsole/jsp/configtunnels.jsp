@@ -1,4 +1,5 @@
 <%@page contentType="text/html"%>
+<%@page trimDirectiveWhitespaces="true"%>
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
@@ -10,16 +11,16 @@
 <%@include file="summary.jsi" %>
 
 <jsp:useBean class="net.i2p.router.web.ConfigTunnelsHelper" id="tunnelshelper" scope="request" />
-<jsp:setProperty name="tunnelshelper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
+<jsp:setProperty name="tunnelshelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <h1><%=intl._("I2P Tunnel Configuration")%></h1>
 <div class="main" id="main">
  <%@include file="confignav.jsi" %>
  <jsp:useBean class="net.i2p.router.web.ConfigTunnelsHandler" id="formhandler" scope="request" />
  <% formhandler.storeMethod(request.getMethod()); %>
- <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
- <jsp:setProperty name="formhandler" property="shouldsave" value="<%=request.getParameter("shouldsave")%>" />
- <jsp:setProperty name="formhandler" property="action" value="<%=request.getParameter("action")%>" />
- <jsp:setProperty name="formhandler" property="nonce" value="<%=request.getParameter("nonce")%>" />
+ <jsp:setProperty name="formhandler" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+ <jsp:setProperty name="formhandler" property="shouldsave" value="<%=request.getParameter(\"shouldsave\")%>" />
+ <jsp:setProperty name="formhandler" property="action" value="<%=request.getParameter(\"action\")%>" />
+ <jsp:setProperty name="formhandler" property="nonce" value="<%=request.getParameter(\"nonce\")%>" />
  <jsp:setProperty name="formhandler" property="settings" value="<%=request.getParameterMap()%>" />
  <jsp:getProperty name="formhandler" property="allMessages" />
  <div class="configure"><p>

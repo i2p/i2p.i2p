@@ -2,6 +2,7 @@
     // NOTE: Do the header carefully so there is no whitespace before the <?xml... line
 
 %><%@page pageEncoding="UTF-8"
+%><%@page trimDirectiveWhitespaces="true"
 %><%@page contentType="text/html" import="net.i2p.i2ptunnel.web.EditBean"
 %><% 
 String tun = request.getParameter("tunnel");

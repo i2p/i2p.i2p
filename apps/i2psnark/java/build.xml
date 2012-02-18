@@ -19,6 +19,7 @@
                 <pathelement location="../../ministreaming/java/build/obj" />
                 <pathelement location="../../jetty/jettylib/org.mortbay.jetty.jar" />
                 <pathelement location="../../jetty/jettylib/javax.servlet.jar" />
+                <pathelement location="../../jetty/jettylib/jetty-util.jar" />
             </classpath>
         </depend>
     </target>
@@ -34,7 +35,7 @@
             debug="true" deprecation="on" source="1.5" target="1.5" 
             destdir="./build/obj" 
             includeAntRuntime="false"
-            classpath="../../../core/java/build/i2p.jar:../../jetty/jettylib/org.mortbay.jetty.jar:../../jetty/jettylib/javax.servlet.jar:../../ministreaming/java/build/mstreaming.jar" >
+            classpath="../../../core/java/build/i2p.jar:../../jetty/jettylib/org.mortbay.jetty.jar:../../jetty/jettylib/javax.servlet.jar:../../jetty/jettylib/jetty-util.jar:../../ministreaming/java/build/mstreaming.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>

@@ -1,0 +1,25 @@
+<?xml version="1.0"  encoding="ISO-8859-1"?>
+<!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
+
+<!--
+Configure a custom context for the eepsite.
+
+This context contains only a ServletHandler with a default servlet
+to serve static html files and images.
+-->
+
+<Configure class="org.mortbay.jetty.handler.ContextHandler">
+  <Set name="contextPath">/</Set>
+  <Set name="resourceBase">./eepsite/docroot/</Set>
+  <Set name="handler">
+    <New class="org.mortbay.jetty.handler.ResourceHandler">
+      <Set name="welcomeFiles">
+        <Array type="String">
+          <Item>index.html</Item>
+        </Array>
+      </Set>
+      <Set name="cacheControl">max-age=3600,public</Set>
+    </New>
+  </Set>
+</Configure>
+

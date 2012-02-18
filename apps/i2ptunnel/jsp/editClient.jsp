@@ -1,4 +1,6 @@
-<%@page contentType="text/html" import="net.i2p.i2ptunnel.web.EditBean"%><?xml version="1.0" encoding="UTF-8"?>
+<%@page contentType="text/html" import="net.i2p.i2ptunnel.web.EditBean"
+%><%@page trimDirectiveWhitespaces="true"
+%><?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <jsp:useBean class="net.i2p.i2ptunnel.web.EditBean" id="editBean" scope="request" />
 <jsp:useBean class="net.i2p.i2ptunnel.web.Messages" id="intl" scope="request" />
