@@ -1289,7 +1289,14 @@ public class I2PSnarkServlet extends Default {
         out.write("\" > " +
                   "<input type=\"submit\" value=\"");
         out.write(_("Create torrent"));
-        out.write("\" name=\"foo\" ></table>\n" +
+        out.write("\" name=\"foo\" >\n" +
+                  "</td></tr><tr><td>");
+        out.write(_("Private?"));
+        out.write(" </td><td> <input type=\"checkbox\" class=\"optbox\" name=\"private\" value=\"true\"");
+        if (req.getParameter("private") != null)
+            out.write(" checked");
+        out.write("></td></tr>" +
+                  "</table>\n" +
                   "</form></div></div>");        
     }
     
