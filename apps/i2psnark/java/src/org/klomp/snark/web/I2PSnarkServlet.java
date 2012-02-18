@@ -668,7 +668,7 @@ public class I2PSnarkServlet extends Default {
                     try {
                         // This may take a long time to check the storage, but since it already exists,
                         // it shouldn't be THAT bad, so keep it in this thread.
-                        Storage s = new Storage(_manager.util(), baseFile, announceURL, null);
+                        Storage s = new Storage(_manager.util(), baseFile, announceURL, req.getParameter("private") != null, null);
                         s.close(); // close the files... maybe need a way to pass this Storage to addTorrent rather than starting over
                         MetaInfo info = s.getMetaInfo();
                         File torrentFile = new File(_manager.getDataDir(), s.getBaseName() + ".torrent");

@@ -101,7 +101,8 @@ public class Storage
    * @param announce may be null
    * @param listener may be null
    */
-  public Storage(I2PSnarkUtil util, File baseFile, String announce, StorageListener listener)
+  public Storage(I2PSnarkUtil util, File baseFile, String announce,
+                 boolean privateTorrent, StorageListener listener)
     throws IOException
   {
     _util = util;
@@ -157,7 +158,7 @@ public class Storage
 
     byte[] piece_hashes = fast_digestCreate();
     metainfo = new MetaInfo(announce, baseFile.getName(), null, files,
-                            lengthsList, piece_size, piece_hashes, total);
+                            lengthsList, piece_size, piece_hashes, total, privateTorrent);
 
   }
 
