@@ -61,6 +61,7 @@ public class MetaInfo
   private final int piece_length;
   private final byte[] piece_hashes;
   private final long length;
+  private final boolean privateTorrent;
   private Map<String, BEValue> infoMap;
 
   /**
@@ -71,7 +72,7 @@ public class MetaInfo
    *  @param lengths null for single-file torrent
    */
   MetaInfo(String announce, String name, String name_utf8, List<List<String>> files, List<Long> lengths,
-           int piece_length, byte[] piece_hashes, long length)
+           int piece_length, byte[] piece_hashes, long length, boolean privateTorrent)
   {
     this.announce = announce;
     this.name = name;
@@ -82,6 +83,7 @@ public class MetaInfo
     this.piece_length = piece_length;
     this.piece_hashes = piece_hashes;
     this.length = length;
+    this.privateTorrent = privateTorrent;
 
     // TODO if we add a parameter for other keys
     //if (other != null) {
@@ -159,6 +161,10 @@ public class MetaInfo
         name_utf8 = val.getString();
     else
         name_utf8 = null;
+
+    // BEP 27
+    val = info.get("private");
+    privateTorrent = val != null && val.getString().equals("1");
 
     val = info.get("piece length");
     if (val == null)
@@ -319,6 +325,14 @@ public class MetaInfo
   }
 
   /**
+   * Is it a private torrent?
+   * @since 0.9
+   */
+  public boolean isPrivate() {
+    return privateTorrent;
+  }
+
+  /**
    * Returns a list of lists of file name hierarchies or null if it is
    * a single name. It has the same size as the list returned by
    * getLengths().
@@ -439,7 +453,7 @@ public class MetaInfo
   {
     return new MetaInfo(announce, name, name_utf8, files,
                         lengths, piece_length,
-                        piece_hashes, length);
+                        piece_hashes, length, privateTorrent);
   }
 
   /**
@@ -475,6 +489,10 @@ public class MetaInfo
     info.put("name", name);
     if (name_utf8 != null)
         info.put("name.utf-8", name_utf8);
+    // BEP 27
+    if (privateTorrent)
+        info.put("private", "1");
+
     info.put("piece length", Integer.valueOf(piece_length));
     info.put("pieces", piece_hashes);
     if (files == null)
