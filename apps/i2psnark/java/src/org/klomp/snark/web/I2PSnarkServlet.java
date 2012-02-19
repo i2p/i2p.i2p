@@ -260,6 +260,7 @@ public class I2PSnarkServlet extends Default {
         if (isConfigure) {
             out.write("<div class=\"logshim\"></div></div>\n");
             writeConfigForm(out, req);
+            writeTrackerForm(out, req);
         } else {
             writeTorrents(out, req);
             out.write("</div>\n");
@@ -650,14 +651,19 @@ public class I2PSnarkServlet extends Default {
             _manager.updateConfig(dataDir, filesPublic, autoStart, refreshDel, startupDel,
                                   seedPct, eepHost, eepPort, i2cpHost, i2cpPort, i2cpOpts,
                                   upLimit, upBW, useOpenTrackers, openTrackers, theme);
+        } else if ("Save2".equals(action)) {
+            String taction = req.getParameter("taction");
+            if (taction != null)
+                processTrackerForm(taction, req);
         } else if ("Create".equals(action)) {
             String baseData = req.getParameter("baseFile");
             if (baseData != null && baseData.trim().length() > 0) {
                 File baseFile = new File(_manager.getDataDir(), baseData);
                 String announceURL = req.getParameter("announceURL");
-                String announceURLOther = req.getParameter("announceURLOther");
-                if ( (announceURLOther != null) && (announceURLOther.trim().length() > "http://.i2p/announce".length()) )
-                    announceURL = announceURLOther;
+                // make the user add a tracker on the config form now
+                //String announceURLOther = req.getParameter("announceURLOther");
+                //if ( (announceURLOther != null) && (announceURLOther.trim().length() > "http://.i2p/announce".length()) )
+                //    announceURL = announceURLOther;
 
                 if (announceURL == null || announceURL.length() <= 0)
                     _manager.addMessage(_("Error creating torrent - you must select a tracker"));
@@ -709,6 +715,54 @@ public class I2PSnarkServlet extends Default {
                 if (snark.isStopped())
                     snark.startTorrent();
             }
+        } else {
+            _manager.addMessage("Unknown POST action: \"" + action + '\"');
+        }
+    }
+
+    /** @since 0.9 */
+    private void processTrackerForm(String action, HttpServletRequest req) {
+        if (action.equals(_("Delete selected"))) {
+            boolean changed = false;
+            Map<String, String> trackers = _manager.getTrackers();
+            Enumeration e = req.getParameterNames();
+            while (e.hasMoreElements()) {
+                 Object o = e.nextElement();
+                 if (!(o instanceof String))
+                     continue;
+                 String k = (String) o;
+                 if (!k.startsWith("delete_"))
+                     continue;
+                 k = k.substring(7);
+                 if (trackers.remove(k) != null) {
+                    _manager.addMessage(_("Removed") + ": " + k);
+                    changed = true;
+                }
+            }
+            if (changed) {
+                _manager.saveTrackerMap();
+            }
+        } else if (action.equals(_("Add tracker"))) {
+            String name = req.getParameter("tname");
+            String hurl = req.getParameter("thurl");
+            String aurl = req.getParameter("taurl");
+            if (name != null && hurl != null && aurl != null) {
+                name = name.trim();
+                hurl = hurl.trim();
+                aurl = aurl.trim().replace("=", "&#61;");
+                if (name.length() > 0 && hurl.startsWith("http://") && aurl.startsWith("http://")) {
+                    Map<String, String> trackers = _manager.getTrackers();
+                    trackers.put(name, aurl + '=' + hurl);
+                    _manager.saveTrackerMap();
+                } else {
+                    _manager.addMessage(_("Enter valid tracker name and URLs"));
+                }
+            } else {
+                _manager.addMessage(_("Enter valid tracker name and URLs"));
+            }
+        } else if (action.equals(_("Restore defaults"))) {
+            _manager.setDefaultTrackerMap();
+            _manager.addMessage(_("Restored default trackers"));
         } else {
             _manager.addMessage("Unknown POST action: \"" + action + '\"');
         }
@@ -1222,7 +1276,7 @@ public class I2PSnarkServlet extends Default {
         out.write("\"> \n");
         // not supporting from file at the moment, since the file name passed isn't always absolute (so it may not resolve)
         //out.write("From file: <input type=\"file\" name=\"newFile\" size=\"50\" value=\"" + newFile + "\" /><br>");
-        out.write("<input type=\"submit\" value=\"");
+        out.write("<input type=\"submit\" class=\"add\" value=\"");
         out.write(_("Add torrent"));
         out.write("\" name=\"foo\" ><br>\n");
         out.write("<tr><td>&nbsp;<td><span class=\"snarkAddInfo\">");
@@ -1269,25 +1323,25 @@ public class I2PSnarkServlet extends Default {
         //out.write(_("Open trackers and DHT only"));
         out.write(_("Open trackers only"));
         out.write("</option>\n");
-        Map trackers = _manager.getTrackers();
-        for (Iterator iter = trackers.entrySet().iterator(); iter.hasNext(); ) {
-            Map.Entry entry = (Map.Entry)iter.next();
-            String name = (String)entry.getKey();
-            String announceURL = (String)entry.getValue();
+        Map<String, String> trackers = _manager.getTrackers();
+        for (Map.Entry<String, String> entry : trackers.entrySet()) {
+            String name = entry.getKey();
+            String announceURL = entry.getValue();
             int e = announceURL.indexOf('=');
             if (e > 0)
-                announceURL = announceURL.substring(0, e);
+                announceURL = announceURL.substring(0, e).replace("&#61;", "=");
             if (announceURL.equals(_lastAnnounceURL))
                 announceURL += "\" selected=\"selected";
             out.write("\t<option value=\"" + announceURL + "\">" + name + "</option>\n");
         }
         out.write("</select>\n");
-        out.write(_("or"));
-        out.write("&nbsp;<input type=\"text\" name=\"announceURLOther\" size=\"57\" value=\"http://\" " +
-                  "title=\"");
-        out.write(_("Specify custom tracker announce URL"));
-        out.write("\" > " +
-                  "<input type=\"submit\" value=\"");
+        // make the user add a tracker on the config form now
+        //out.write(_("or"));
+        //out.write("&nbsp;<input type=\"text\" name=\"announceURLOther\" size=\"57\" value=\"http://\" " +
+        //          "title=\"");
+        //out.write(_("Specify custom tracker announce URL"));
+        //out.write("\" > " +
+        out.write(" <input type=\"submit\" class=\"create\" value=\"");
         out.write(_("Create torrent"));
         out.write("\" name=\"foo\" >\n" +
                   "</td></tr><tr><td>");
@@ -1482,6 +1536,57 @@ public class I2PSnarkServlet extends Default {
                   "</table></div></div></form>");
     }
     
+    /** @since 0.9 */
+    private void writeTrackerForm(PrintWriter out, HttpServletRequest req) throws IOException {
+        StringBuilder buf = new StringBuilder(1024);
+        buf.append("<form action=\"/i2psnark/configure\" method=\"POST\">\n" +
+                  "<div class=\"configsectionpanel\"><div class=\"snarkConfig\">\n" +
+                  "<input type=\"hidden\" name=\"nonce\" value=\"" + _nonce + "\" >\n" +
+                  "<input type=\"hidden\" name=\"action\" value=\"Save2\" >\n" +
+                  "<span class=\"snarkConfigTitle\">" +
+                  "<img alt=\"\" border=\"0\" src=\"" + _imgPath + "config.png\"> ");
+        buf.append(_("Trackers"));
+        buf.append("</span><hr>\n"   +
+                   "<table><tr><th>")
+           //.append(_("Remove"))
+           .append("</th><th>")
+           .append(_("Name"))
+           .append("</th><th>")
+           .append(_("Website URL"))
+           .append("</th><th>")
+           .append(_("Announce URL"))
+           .append("</th></tr>\n");
+        Map<String, String> trackers = _manager.getTrackers();
+        for (Map.Entry<String, String> entry : trackers.entrySet()) {
+            String name = entry.getKey();
+            String announceURL = entry.getValue();
+            int e = announceURL.indexOf('=');
+            if (e <= 0)
+                continue;
+            String homeURL = announceURL.substring(e + 1);
+            announceURL = announceURL.substring(0, e).replace("&#61;", "=");
+            buf.append("<tr><td align=\"center\"><input type=\"checkbox\" class=\"optbox\" name=\"delete_")
+               .append(name).append("\">" +
+                       "</td><td align=\"left\">").append(name)
+               .append("</td><td align=\"left\">").append(urlify(homeURL, 35))
+               .append("</td><td align=\"left\">").append(urlify(announceURL, 35))
+               .append("</td></tr>\n");
+        }
+        buf.append("<tr><td align=\"center\"><b>")
+           .append(_("Add")).append(":</b></td>" +
+                   "<td align=\"left\"><input type=\"text\" size=\"16\" name=\"tname\"></td>" +
+                   "<td align=\"left\"><input type=\"text\" size=\"40\" name=\"thurl\"></td>" +
+                   "<td align=\"left\"><input type=\"text\" size=\"40\" name=\"taurl\"></td></tr>\n" +
+                   "<td colspan=\"2\"></td><td colspan=\"2\" align=\"left\">\n" +
+                   "<input type=\"submit\" name=\"taction\" class=\"default\" value=\"").append(_("Add tracker")).append("\">\n" +
+                   "<input type=\"submit\" name=\"taction\" class=\"delete\" value=\"").append(_("Delete selected")).append("\">\n" +
+                   // "<input type=\"reset\" class=\"cancel\" value=\"").append(_("Cancel")).append("\">\n" +
+                   "<input type=\"submit\" name=\"taction\" class=\"reload\" value=\"").append(_("Restore defaults")).append("\">\n" +
+                   "<input type=\"submit\" name=\"taction\" class=\"add\" value=\"").append(_("Add tracker")).append("\">\n" +
+                   "</td></tr></table></div></div></form>\n");
+        out.write(buf.toString());
+    }
+
     private void writeConfigLink(PrintWriter out) throws IOException {
         out.write("<div class=\"configsection\"><span class=\"snarkConfig\">\n" +
                   "<span class=\"snarkConfigTitle\"><a href=\"configure\">" +
@@ -1631,10 +1736,20 @@ public class I2PSnarkServlet extends Default {
     
     /** @since 0.7.14 */
     private static String urlify(String s) {
+        return urlify(s, 100);
+    }
+    
+    /** @since 0.9 */
+    private static String urlify(String s, int max) {
         StringBuilder buf = new StringBuilder(256);
         // browsers seem to work without doing this but let's be strict
         String link = urlEncode(s);
-        buf.append("<a href=\"").append(link).append("\">").append(link).append("</a>");
+        String display;
+        if (s.length() <= max)
+            display = link;
+        else
+            display = urlEncode(s.substring(0, max)) + "&hellip;";
+        buf.append("<a href=\"").append(link).append("\">").append(display).append("</a>");
         return buf.toString();
     }
     
