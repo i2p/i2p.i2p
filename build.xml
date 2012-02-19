@@ -295,7 +295,20 @@
             </manifest>
         </jar>
     </target>
-    
+
+    <target name="jbigi-nowindows" depends="buildProperties, jbigi-list-changes" >
+        <!-- set if unset -->
+        <property name="workspace.changes.jbigi.tr" value="" />
+        <jar destfile="build/jbigi.jar" whenmanifestonly="fail" >
+            <fileset dir="installer/lib/jbigi" includes="*.so *.jnilib" />
+            <manifest>
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.jbigi.tr}" />
+            </manifest>
+        </jar>
+    </target>
+
     <!-- Now system-specific jbigis in alphabetical order -->
     <target name="jbigi-freebsd-only"  depends="buildProperties, jbigi-list-changes" >
         <!-- set if unset -->
@@ -650,6 +663,13 @@
         </copy>
     </target>
 
+    <target name="preppkg-nowindows" depends="preppkg-linux, preppkg-freebsd, preppkg-osx, jbigi-nowindows">
+        <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
+        <copy todir="pkg-temp/lib/wrapper/solaris/">
+            <fileset dir="installer/lib/wrapper/solaris/" />
+        </copy>
+    </target>
+
     <target name="preppkgRepack" depends="preppkg-linux, preppkg-freebsd, preppkg-osx, preppkg-windows, jbigi">
         <ant target="repack200" />
         <!-- no use doing repack200 on jbigi.jar -->
@@ -887,8 +907,8 @@
         <copy todir="pkg-temp/docs/" >
           <fileset dir="installer/resources/readme/" includes="readme*.html" />
           <fileset dir="installer/resources/proxy/" includes="*.ht" />
-          <!-- lang_ar.png added in 0.8.4; a1,a2,je, and eu.png added in 0.8.9; gg.png added in 0.8.10; im.png added in 0.8.12 -->
-	  <fileset dir="installer/resources/" includes="icons/flags/lang_ar.png icons/flags/gg.png icons/flags/je.png icons/flags/eu.png icons/flags/im.png icons/flags/a1.png icons/flags/a2.png" />
+          <!-- lang_ar.png added in 0.8.4; a1,a2,je, and eu.png added in 0.8.9; gg.png added in 0.8.10; im.png added in 0.8.12; cs updated in 0.8.13 -->
+          <fileset dir="installer/resources/" includes="icons/flags/lang_ar.png icons/flags/cs.png icons/flags/gg.png icons/flags/je.png icons/flags/eu.png icons/flags/im.png icons/flags/a1.png icons/flags/a2.png" />
         </copy>
     </target>
 
@@ -1154,6 +1174,13 @@
     </target>
 
     <!-- Custom installers -->
+    <target name="installer-nowindows" depends="clean, preppkg-nowindows, getReleaseNumber, getBuildNumber, buildProperties, util-list-changes, izpack-patches" >
+        <mkdir dir="pkg-temp/installer" />
+        <!-- set if unset -->
+        <property name="workspace.changes.util.tr" value="" />
+	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${release.number}-${build.number}${build.extra}.jar" installerType="standard" basedir="${basedir}" />
+    </target>
+
 
     <target name="installer-freebsd" depends="clean, preppkg-freebsd-only, getReleaseNumber, getBuildNumber, buildProperties, util-list-changes, izpack-patches" >
         <mkdir dir="pkg-temp/installer" />
