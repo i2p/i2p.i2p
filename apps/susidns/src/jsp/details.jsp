@@ -94,6 +94,9 @@
 <td><%=intl._("Base 32 Address")%></td>
 <td><a href="http://<%=b32%>/"><%=b32%></a></td>
 </tr><tr class="list${book.trClass}">
+<td><%=intl._("Base 64 Hash")%></td>
+<td><%=addr.getB64()%></td>
+</tr><tr class="list${book.trClass}">
 <td><%=intl._("Address Helper")%></td>
 <td><a href="http://<%=addr.getName()%>/?i2paddresshelper=<%=addr.getDestination()%>"><%=intl._("link")%></a></td>
 </tr><tr class="list${book.trClass}">

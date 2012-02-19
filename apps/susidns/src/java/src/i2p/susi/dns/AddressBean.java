@@ -170,6 +170,15 @@ public class AddressBean
 		return Base32.encode(hash) + ".b32.i2p";
 	}
 
+	/** @since 0.9 */
+	public String getB64() 
+	{
+		byte[] dest = Base64.decode(destination);
+		if (dest == null)
+			return "";
+		return I2PAppContext.getGlobalContext().sha().calculateHash(dest).toBase64();
+	}
+
 	/** @since 0.8.7 */
 	public void setProperties(Properties p) {
 		props = p;
