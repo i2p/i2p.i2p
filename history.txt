@@ -1,6 +1,3 @@
-2012-02-19 kytv
-  * console: Add correct flag for the Czech Republic
-
 2012-02-17 zzz
   * i2psnark: Escape fixes
   * netdb.jsp: Fix debug median calculation
