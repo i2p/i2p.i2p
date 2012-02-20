@@ -1,4 +1,5 @@
 2012-02-20 zzz
+  * i2ptunnel: Fix streamr session registration
   * Streaming: Fix race NPE (thx echelon)
 
 2012-02-17 zzz
