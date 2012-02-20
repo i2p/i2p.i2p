@@ -138,7 +138,7 @@ function initAjax() { setInterval(requestAjax1, 15000);  }
   <jsp:useBean class="net.i2p.router.web.HomeHelper" id="homehelper" scope="request" />
   <jsp:setProperty name="homehelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
   <div class="ag2">
-    <h4 class="app"><%=intl._("Recommended Eepsites")%></h4>
+    <h4 class="app"><%=intl._("Eepsites of Interest")%></h4>
     <jsp:getProperty name="homehelper" property="favorites" /><br>
   </div>
   <div class="ag2">
