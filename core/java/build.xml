@@ -81,16 +81,20 @@
     <target name="jarTest" depends="compileTest">
         <jar destfile="./build/i2ptest.jar" basedir="./build/obj" includes="**/*.class" />
     </target>
-    <target name="prepareTest" depends="compileTest" if="with.cobertura">
+    <!-- preparation of code coverage tool of choice -->
+    <target name="prepareCobertura" depends="compileTest" if="with.cobertura">
         <taskdef classpath="${with.cobertura}" resource="tasks.properties" onerror="report" />
-        <mkdir dir="./build/obj_test" />
-        <cobertura-instrument todir="./build/obj_test">
+        <mkdir dir="./build/obj_cobertura" />
+        <delete file="./cobertura.ser" />
+        <cobertura-instrument todir="./build/obj_cobertura">
             <fileset dir="./build/obj">
                 <include name="**/*.class"/>
                 <exclude name="**/*Test.class" />
             </fileset>
         </cobertura-instrument>
     </target>
+    <target name="prepareTest" depends="prepareCobertura" />
+    <!-- end preparation of code coverage tool -->
     <target name="test" depends="clean, compileTest, prepareTest">
         <mkdir dir="../../reports/core/junit/" />
         <delete>
@@ -102,7 +106,7 @@
             <sysproperty key="net.sourceforge.cobertura.datafile" file="./cobertura.ser" />
             <classpath>
                 <pathelement path="${classpath}" />
-                <pathelement location="./build/obj_test" />
+                <pathelement location="./build/obj_cobertura" />
                 <pathelement location="./build/obj" />
                 <pathelement location="../../build/jbigi.jar" />
                 <pathelement location="${with.cobertura}" />
@@ -117,11 +121,7 @@
             <formatter type="xml"/>
         </junit>
     </target>
-    <target name="cobertura" depends="test" if="with.cobertura">
-        <mkdir dir="../../reports/core/cobertura" />
-        <cobertura-report format="xml" srcdir="./src" destdir="../../reports/core/cobertura" />
-        <delete file="./cobertura.ser" />
-    </target>
+    <!-- test reports -->
     <target name="junit.report">
         <junitreport todir="../../reports/core/junit">
             <fileset dir="../../reports/core/junit">
@@ -130,7 +130,15 @@
             <report format="frames" todir="../../reports/core/html/junit"/>
         </junitreport>
     </target>
-    <target name="test.report" depends="junit.report"/>
+    <target name="cobertura.report" depends="test" if="with.cobertura">
+        <mkdir dir="../../reports/core/cobertura" />
+        <cobertura-report format="xml" srcdir="./src" destdir="../../reports/core/cobertura" />
+        <mkdir dir="../../reports/core/html/cobertura" />
+        <cobertura-report format="html" srcdir="./src" destdir="../../reports/core/html/cobertura" />
+        <delete file="./cobertura.ser" />
+    </target>
+    <target name="test.report" depends="junit.report, cobertura.report"/>
+    <!-- end test reports -->
     <target name="fulltest" depends="test, junit.report" />
     <!-- end unit tests -->
 
