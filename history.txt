@@ -1,3 +1,6 @@
+2012-02-20 zzz
+  * Streaming: Fix race NPE (thx echelon)
+
 2012-02-17 zzz
   * i2psnark: Escape fixes
   * netdb.jsp: Fix debug median calculation
