@@ -82,6 +82,11 @@
         <jar destfile="./build/i2ptest.jar" basedir="./build/obj" includes="**/*.class" />
     </target>
     <!-- preparation of code coverage tool of choice -->
+    <target name="prepareClover" depends="compileTest" if="with.clover">
+        <taskdef resource="clovertasks"/>
+        <mkdir dir="../../reports/core/clover" />
+        <clover-setup initString="../../reports/core/clover/coverage.db"/>
+    </target>
     <target name="prepareCobertura" depends="compileTest" if="with.cobertura">
         <taskdef classpath="${with.cobertura}" resource="tasks.properties" onerror="report" />
         <mkdir dir="./build/obj_cobertura" />
@@ -93,7 +98,7 @@
             </fileset>
         </cobertura-instrument>
     </target>
-    <target name="prepareTest" depends="prepareCobertura" />
+    <target name="prepareTest" depends="prepareClover, prepareCobertura" />
     <!-- end preparation of code coverage tool -->
     <target name="test" depends="clean, compileTest, prepareTest">
         <mkdir dir="../../reports/core/junit/" />
@@ -109,6 +114,7 @@
                 <pathelement location="./build/obj_cobertura" />
                 <pathelement location="./build/obj" />
                 <pathelement location="../../build/jbigi.jar" />
+                <pathelement location="${with.clover}" />
                 <pathelement location="${with.cobertura}" />
             </classpath>
             <batchtest todir="../../reports/core/junit/">
@@ -130,6 +136,13 @@
             <report format="frames" todir="../../reports/core/html/junit"/>
         </junitreport>
     </target>
+    <target name="clover.report" depends="test" if="with.clover">
+        <clover-report>
+            <current outfile="../../reports/core/html/clover">
+                <format type="html"/>
+            </current>
+        </clover-report>
+    </target>
     <target name="cobertura.report" depends="test" if="with.cobertura">
         <mkdir dir="../../reports/core/cobertura" />
         <cobertura-report format="xml" srcdir="./src" destdir="../../reports/core/cobertura" />
@@ -137,7 +150,7 @@
         <cobertura-report format="html" srcdir="./src" destdir="../../reports/core/html/cobertura" />
         <delete file="./cobertura.ser" />
     </target>
-    <target name="test.report" depends="junit.report, cobertura.report"/>
+    <target name="test.report" depends="junit.report, clover.report, cobertura.report"/>
     <!-- end test reports -->
     <target name="fulltest" depends="test, junit.report" />
     <!-- end unit tests -->
