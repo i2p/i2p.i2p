@@ -29,7 +29,7 @@ import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 
 /**
- *
+ *  The network database
  */
 public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacade {
     public static final char CAPABILITY_FLOODFILL = 'f';
@@ -111,14 +111,25 @@ public class FloodfillNetworkDatabaseFacade extends KademliaNetworkDatabaseFacad
     static final long PUBLISH_TIMEOUT = 90*1000;
     
     /**
+     * Send our RI to the closest floodfill.
      * @throws IllegalArgumentException if the local router info is invalid
      */
     @Override
     public void publish(RouterInfo localRouterInfo) throws IllegalArgumentException {
         if (localRouterInfo == null) throw new IllegalArgumentException("wtf, null localRouterInfo?");
+        // should this be after super? why not publish locally?
         if (_context.router().isHidden()) return; // DE-nied!
         super.publish(localRouterInfo);
-        if (_context.router().getUptime() > PUBLISH_JOB_DELAY)
+        // wait until we've read in the RI's so we can find the closest floodfill
+        if (!isInitialized())
+            return;
+        // no use sending if we have no addresses
+        // (unless maybe we used to have addresses? not worth it
+        if (localRouterInfo.getAddresses().isEmpty())
+            return;
+        _log.info("Publishing our RI");
+        // Don't delay, helps IB tunnel builds
+        //if (_context.router().getUptime() > PUBLISH_JOB_DELAY)
             sendStore(localRouterInfo.getIdentity().calculateHash(), localRouterInfo, null, null, PUBLISH_TIMEOUT, null);
     }
     

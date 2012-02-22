@@ -43,10 +43,17 @@ class ExploratoryPeerSelector extends TunnelPeerSelector {
         // exclude.addAll(fac.getFloodfillPeers());
         HashSet matches = new HashSet(length);
         boolean exploreHighCap = shouldPickHighCap(ctx);
+
         //
         // We don't honor IP Restriction here, to be fixed
         //
-        if (exploreHighCap) 
+
+        // If hidden and inbound, use fast peers - that we probably have recently
+        // connected to and so they have our real RI - to maximize the chance
+        // that the adjacent hop can connect to us.
+        if (settings.isInbound() && ctx.router().isHidden())
+            ctx.profileOrganizer().selectFastPeers(length, exclude, matches);
+        else if (exploreHighCap) 
             ctx.profileOrganizer().selectHighCapacityPeers(length, exclude, matches);
         else if (ctx.commSystem().haveHighOutboundCapacity())
             ctx.profileOrganizer().selectNotFailingPeers(length, exclude, matches, false);

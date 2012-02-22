@@ -20,15 +20,21 @@ import net.i2p.router.RouterContext;
 import net.i2p.util.Log;
 
 /**
- * Publish the local router's RouterInfo periodically
- * NOTE - this also creates and signs the RI
+ * Publish the local router's RouterInfo periodically.
+ * NOTE - this also creates and signs the RI.
+ * This is run immediately at startup... but doesn't really
+ * send to the floodfills until the second time it runs.
  */
 public class PublishLocalRouterInfoJob extends JobImpl {
     private Log _log;
     final static long PUBLISH_DELAY = 20*60*1000;
     /** this needs to be long enough to give us time to start up,
-        but less than 20m (when we start accepting tunnels and could be a IBGW) */
-    final static long FIRST_TIME_DELAY = 8*60*1000;
+        but less than 20m (when we start accepting tunnels and could be a IBGW)
+        Actually no, we need this soon if we are a new router or
+        other routers have forgotten about us, else
+        we can't build IB exploratory tunnels.
+     */
+    final static long FIRST_TIME_DELAY = 90*1000;
     boolean _notFirstTime;
     
     public PublishLocalRouterInfoJob(RouterContext ctx) {
@@ -63,6 +69,7 @@ public class PublishLocalRouterInfoJob extends JobImpl {
                           + "/" + ri.getOptionsMap().size() + " options on " 
                           + new Date(ri.getPublished()));
             try {
+                // This won't really publish until the netdb is initialized.
                 getContext().netDb().publish(ri);
             } catch (IllegalArgumentException iae) {
                 _log.log(Log.CRIT, "Error publishing our identity - corrupt? Restart required", iae);

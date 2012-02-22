@@ -1,3 +1,11 @@
+2012-02-22 zzz
+  * ExploratoryPeerSelector: Use fast peers if hidden for
+    inbound tunnels to improve success
+  * NetDB:
+    - Don't publish our RI if it has no addresses
+    - Publish our RI sooner after startup
+      to facilitate our IB tunnel builds
+
 2012-02-20 zzz
   * i2ptunnel:
     - Fix streamr session registration
