@@ -1,3 +1,7 @@
+2012-02-22 kytv
+  * Updated German, Italian, Spanish, Swedish, and Ukrainian translations
+    from Transifex.
+
 2012-02-22 zzz
   * ExploratoryPeerSelector: Use fast peers if hidden for
     inbound tunnels to improve success
