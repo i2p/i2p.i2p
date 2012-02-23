@@ -389,10 +389,14 @@
     </target>
 
     <target name="prep-script-translation" >
+        <!-- script translation added in 0.8.13, disable for now -->
+        <echo message="i2prouter script translations disabled" />
+<!--
         <ant dir="installer/resources/locale" target="bundle" />
         <copy todir="pkg-temp/locale/">
             <fileset dir="installer/resources/locale/mo/" />
         </copy>
+-->
     </target>
 
     <target name="javadoc" depends="getReleaseNumber, getBuildNumber" >
@@ -1006,7 +1010,6 @@
         <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
     </target>
 
-    <!-- script translation added in 0.8.13, so don't need updates until .14, but put it in now so we don't forget -->
     <target name="prepupdate" depends="build2, prepupdateSmall, prepConsoleDocUpdates, prepCertificates, prep-script-translation">
         <copy file="build/BOB.jar" todir="pkg-temp/lib/" />
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
