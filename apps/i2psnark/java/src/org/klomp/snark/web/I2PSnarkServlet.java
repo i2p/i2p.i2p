@@ -102,7 +102,7 @@ public class I2PSnarkServlet extends Default {
     protected Resource getResource(String pathInContext) throws IOException
     {
         if (pathInContext == null || pathInContext.equals("/") || pathInContext.equals("/index.jsp") ||
-            pathInContext.equals("/index.html") || pathInContext.startsWith("/_icons/"))
+            pathInContext.equals("/index.html") || pathInContext.startsWith("/.icons/"))
             return super.getResource(pathInContext);
         // files in the i2psnark/ directory
         return _resourceBase.addPath(pathInContext);
@@ -2115,12 +2115,12 @@ public class I2PSnarkServlet extends Default {
     
     /** @since 0.7.14 */
     private static String toImg(String icon) {
-        return "<img alt=\"\" height=\"16\" width=\"16\" src=\"/i2psnark/_icons/" + icon + ".png\">";
+        return "<img alt=\"\" height=\"16\" width=\"16\" src=\"/i2psnark/.icons/" + icon + ".png\">";
     }
 
     /** @since 0.8.2 */
     private static String toImg(String icon, String altText) {
-        return "<img alt=\"" + altText + "\" height=\"16\" width=\"16\" src=\"/i2psnark/_icons/" + icon + ".png\">";
+        return "<img alt=\"" + altText + "\" height=\"16\" width=\"16\" src=\"/i2psnark/.icons/" + icon + ".png\">";
     }
 
     /** @since 0.8.1 */

@@ -95,9 +95,13 @@
     <target name="war" depends="jar, bundle, warUpToDate, listChangedFiles" unless="war.uptodate" > 
         <!-- set if unset -->
         <property name="workspace.changes.tr" value="" />
-        <war destfile="../i2psnark.war" webxml="../web.xml" basedir="../" includes="_icons/*" >
+        <copy todir="build/icons/.icons" >
+            <fileset dir="../icons/" />
+        </copy>
+        <war destfile="../i2psnark.war" webxml="../web.xml" >
           <!-- include only the web stuff, as of 0.7.12 the router will add i2psnark.jar to the classpath for the war -->
           <classes dir="./build/obj" includes="**/web/*.class" />
+            <fileset dir="build/icons/" />
             <manifest>
                 <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
@@ -109,7 +113,7 @@
     
     <target name="warUpToDate">
         <uptodate property="war.uptodate" targetfile="../i2psnark.war" >
-            <srcfiles dir= "." includes="build/obj/org/klomp/snark/web/*.class ../_icons/* ../web.xml" />
+            <srcfiles dir= "." includes="build/obj/org/klomp/snark/web/*.class ../icons/* ../web.xml" />
         </uptodate>
     </target>
     
