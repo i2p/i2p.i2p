@@ -92,6 +92,7 @@ public class BlockfileNamingService extends DummyNamingService {
     private final RAIFile _raf;
     private final List<String> _lists;
     private final List<InvalidEntry> _invalid;
+    private final Map<String, String> _negativeCache;
     private volatile boolean _isClosed;
     private final boolean _readOnly;
     private boolean _needsUpgrade;
@@ -118,6 +119,9 @@ public class BlockfileNamingService extends DummyNamingService {
     private static final String PROP_ADDED = "a";
     private static final String PROP_SOURCE = "s";
     
+    private static final String DUMMY = "";
+    private static final int NEGATIVE_CACHE_SIZE = 32;
+
     /**
      *  Opens the database at hostsdb.blockfile or creates a new
      *  one and imports entries from hosts.txt, userhosts.txt, and privatehosts.txt.
@@ -132,6 +136,7 @@ public class BlockfileNamingService extends DummyNamingService {
         super(context);
         _lists = new ArrayList();
         _invalid = new ArrayList();
+        _negativeCache = new LHM(NEGATIVE_CACHE_SIZE);
         BlockFile bf = null;
         RAIFile raf = null;
         boolean readOnly = false;
@@ -628,6 +633,10 @@ public class BlockfileNamingService extends DummyNamingService {
         }
 
         String key = hostname.toLowerCase(Locale.US);
+        synchronized(_negativeCache) {
+            if (_negativeCache.get(key) != null)
+                return null;
+        }
         synchronized(_bf) {
             if (_isClosed)
                 return null;
@@ -650,8 +659,13 @@ public class BlockfileNamingService extends DummyNamingService {
             }
             deleteInvalid();
         }
-        if (d != null)
+        if (d != null) {
             putCache(hostname, d);
+        } else {
+            synchronized(_negativeCache) {
+                _negativeCache.put(key, DUMMY);
+            }
+        }
         return d;
     }
 
@@ -683,6 +697,9 @@ public class BlockfileNamingService extends DummyNamingService {
             return false;
         }
         String key = hostname.toLowerCase(Locale.US);
+        synchronized(_negativeCache) {
+            _negativeCache.remove(key);
+        }
         String listname = FALLBACK_LIST;
         Properties props = new Properties();
         props.setProperty(PROP_ADDED, Long.toString(_context.clock().now()));
@@ -1030,6 +1047,9 @@ public class BlockfileNamingService extends DummyNamingService {
             } catch (IOException ioe) {
             }
             _isClosed = true;
+        }
+        synchronized(_negativeCache) {
+            _negativeCache.clear();
         }
         clearCache();
     }
