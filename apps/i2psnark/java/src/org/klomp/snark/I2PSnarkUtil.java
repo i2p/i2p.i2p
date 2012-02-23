@@ -219,6 +219,10 @@ public class I2PSnarkUtil {
             //    opts.setProperty("i2p.streaming.writeTimeout", "90000");
             //if (opts.getProperty("i2p.streaming.readTimeout") == null)
             //    opts.setProperty("i2p.streaming.readTimeout", "120000");
+            if (opts.getProperty("i2p.streaming.maxConnsPerMinute") == null)
+                opts.setProperty("i2p.streaming.maxConnsPerMinute", "2");
+            if (opts.getProperty("i2p.streaming.maxTotalConnsPerMinute") == null)
+                opts.setProperty("i2p.streaming.maxTotalConnsPerMinute", "6");
             _manager = I2PSocketManagerFactory.createManager(_i2cpHost, _i2cpPort, opts);
         }
         // FIXME this only instantiates krpc once, left stuck with old manager
