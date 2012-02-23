@@ -518,7 +518,7 @@ http://i2jump.i2p/" /><%
         <div id="globalOperationsPanel" class="panel">
             <div class="header"></div>
             <div class="footer">
-                <div class=toolbox">
+                <div class="toolbox">
                     <a class="control" href="list"><%=intl._("Cancel")%></a>
                     <% if (curPage != 1 && curPage != 7) {
                     %><button id="controlPrevious" accesskey="P" class="control" type="submit" name="action" value="Previous page" title="Previous Page"><%=intl._("Previous")%>(<span class="accessKey">P</span>)</button><%
