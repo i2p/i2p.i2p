@@ -102,7 +102,8 @@ public class I2PSnarkServlet extends Default {
     protected Resource getResource(String pathInContext) throws IOException
     {
         if (pathInContext == null || pathInContext.equals("/") || pathInContext.equals("/index.jsp") ||
-            pathInContext.equals("/index.html") || pathInContext.startsWith("/.icons/"))
+            pathInContext.equals("/index.html") || pathInContext.startsWith("/.icons/") ||
+            pathInContext.startsWith("/.js/") || pathInContext.startsWith("/.ajax/"))
             return super.getResource(pathInContext);
         // files in the i2psnark/ directory
         return _resourceBase.addPath(pathInContext);
@@ -151,6 +152,17 @@ public class I2PSnarkServlet extends Default {
         _imgPath = _themePath + "images/";
         // this is the part after /i2psnark
         String path = req.getServletPath();
+
+        // AJAX for mainsection
+        if ("/.ajax/xhr1.html".equals(path)) {
+            resp.setCharacterEncoding("UTF-8");
+            resp.setContentType("text/html; charset=UTF-8");
+            PrintWriter out = resp.getWriter();
+            writeMessages(out);
+            writeTorrents(out, req);
+            return;
+        }
+
         boolean isConfigure = "/configure".equals(path);
         // index.jsp doesn't work, it is grabbed by the war handler before here
         if (!(path == null || path.equals("/") || path.equals("/index.jsp") || path.equals("/index.html") || path.equals("/_post") || isConfigure)) {
@@ -208,13 +220,18 @@ public class I2PSnarkServlet extends Default {
         out.write("</title>\n");
                                          
         // we want it to go to the base URI so we don't refresh with some funky action= value
+        int delay = 0;
         if (!isConfigure) {
-            int delay = _manager.getRefreshDelaySeconds();
+            delay = _manager.getRefreshDelaySeconds();
             if (delay > 0)
-                out.write("<meta http-equiv=\"refresh\" content=\"" + delay + ";/i2psnark/" + peerString + "\">\n");
+                //out.write("<meta http-equiv=\"refresh\" content=\"" + delay + ";/i2psnark/" + peerString + "\">\n");
+                out.write("<script src=\"/i2psnark/.js/i2psnark.js\" type=\"text/javascript\"></script>\n");
         }
-        out.write(HEADER_A + _themePath + HEADER_B);
-        out.write("</head><body>");
+        out.write(HEADER_A + _themePath + HEADER_B + "</head>\n");
+        if (isConfigure || delay <= 0)
+            out.write("<body>");
+        else
+            out.write("<body onload=\"initAjax(" + (delay * 1000) + ")\">");
         out.write("<center>");
         if (isConfigure) {
             out.write("<div class=\"snarknavbar\"><a href=\"/i2psnark/\" title=\"");
@@ -249,26 +266,36 @@ public class I2PSnarkServlet extends Default {
         String newURL = req.getParameter("newURL");
         if (newURL != null && newURL.trim().length() > 0 && req.getMethod().equals("GET"))
             _manager.addMessage(_("Click \"Add torrent\" button to fetch torrent"));
-        out.write("<div class=\"page\"><div class=\"mainsection\"><div class=\"snarkMessages\"><table><tr><td align=\"left\"><pre>");
+        out.write("<div class=\"page\"><div id=\"mainsection\" class=\"mainsection\">");
+
+        writeMessages(out);
+
+        if (isConfigure) {
+            // end of mainsection div
+            out.write("<div class=\"logshim\"></div></div>\n");
+            writeConfigForm(out, req);
+            writeTrackerForm(out, req);
+        } else {
+            writeTorrents(out, req);
+            // end of mainsection div
+            out.write("</div><div id=\"lowersection\">\n");
+            writeAddForm(out, req);
+            writeSeedForm(out, req);
+            writeConfigLink(out);
+            // end of lowersection div
+            out.write("</div>\n");
+        }
+        out.write(FOOTER);
+    }
+
+    private void writeMessages(PrintWriter out) throws IOException {
+        out.write("<div class=\"snarkMessages\"><table><tr><td align=\"left\"><pre>");
         List msgs = _manager.getMessages();
         for (int i = msgs.size()-1; i >= 0; i--) {
             String msg = (String)msgs.get(i);
             out.write(msg + "\n");
         }
         out.write("</pre></td></tr></table></div>");
-
-        if (isConfigure) {
-            out.write("<div class=\"logshim\"></div></div>\n");
-            writeConfigForm(out, req);
-            writeTrackerForm(out, req);
-        } else {
-            writeTorrents(out, req);
-            out.write("</div>\n");
-            writeAddForm(out, req);
-            writeSeedForm(out, req);
-            writeConfigLink(out);
-        }
-        out.write(FOOTER);
     }
 
     private void writeTorrents(PrintWriter out, HttpServletRequest req) throws IOException {
@@ -1356,7 +1383,7 @@ public class I2PSnarkServlet extends Default {
                   "</form></div></div>");        
     }
     
-    private static final int[] times = { 30, 60, 2*60, 5*60, 10*60, 30*60, -1 };
+    private static final int[] times = { 5, 15, 30, 60, 2*60, 5*60, 10*60, 30*60, -1 };
 
     private void writeConfigForm(PrintWriter out, HttpServletRequest req) throws IOException {
         String dataDir = _manager.getDataDir().getAbsolutePath();
