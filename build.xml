@@ -1259,10 +1259,6 @@
 		<ant dir="core/java/" target="fulltest" />
 		<ant dir="router/java/" target="fulltest" />
     </target>
-    <target name="fullclovertest" depends="buildProperties" >
-		<ant dir="core/java/" target="fullclovertest" />
-		<ant dir="router/java/" target="fullclovertest" />
-    </target>
     <!-- end unit tests -->
 
     <target name="testscripts" >
