@@ -152,7 +152,7 @@
     </target>
     <target name="test.report" depends="junit.report, clover.report, cobertura.report"/>
     <!-- end test reports -->
-    <target name="fulltest" depends="test, junit.report" />
+    <target name="fulltest" depends="test, test.report" />
     <!-- end unit tests -->
 
     <target name="clean">
