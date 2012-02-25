@@ -112,7 +112,7 @@
                 <pathelement path="${classpath}" />
                 <pathelement location="./build/obj" />
                 <pathelement location="../../core/java/build/i2ptest.jar" />
-                <pathelement location="../../installer/lib/jbigi/jbigi.jar" />
+                <pathelement location="../../build/jbigi.jar" />
                 <pathelement path="${ant.home}/lib/clover.jar"/>
             </classpath>
             <batchtest todir="../../reports/router/junit/">
