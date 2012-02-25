@@ -33,6 +33,7 @@ import net.i2p.data.RouterInfo;
 import net.i2p.router.RouterContext;
 import net.i2p.router.TunnelPoolSettings;
 import net.i2p.router.networkdb.kademlia.HashDistance;   // debug
+import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
 import net.i2p.util.HexDump;                             // debug
 import net.i2p.util.ObjectCounter;
 import net.i2p.util.OrderedProperties;
@@ -120,15 +121,16 @@ public class NetDbRenderer {
         }
         leases.addAll(_context.netDb().getLeases());
         int medianCount = 0;
+        int rapCount = 0;
         BigInteger median = null;
         int c = 0;
         if (debug) {
             // Find the center of the RAP leasesets
             for (LeaseSet ls : leases) {
                 if (ls.getReceivedAsPublished())
-                    medianCount++;
+                    rapCount++;
             }
-            medianCount /= 2;
+            medianCount = rapCount / 2;
         }
         long now = _context.clock().now();
         for (LeaseSet ls : leases) {
@@ -181,18 +183,23 @@ public class NetDbRenderer {
             buf.setLength(0);
         }
         if (debug) {
-            buf.append("<p><b>Total Leasesets: " + leases.size());
-            buf.append("</b></p><p><b>Published (RAP) Leasesets: " + _context.netDb().getKnownLeaseSets());
+            FloodfillNetworkDatabaseFacade netdb = (FloodfillNetworkDatabaseFacade)_context.netDb();
+            buf.append("<p><b>Total Leasesets: ").append(leases.size());
+            buf.append("</b></p><p><b>Published (RAP) Leasesets: ").append(netdb.getKnownLeaseSets());
             //buf.append("</b></p><p><b>Mod Data: " + HexDump.dump(_context.routingKeyGenerator().getModData()));
+            int ff = _context.peerManager().getPeersByCapability(FloodfillNetworkDatabaseFacade.CAPABILITY_FLOODFILL).size();
+            buf.append("</b></p><p><b>Known Floodfills: ").append(ff);
+            buf.append("</b></p><p><b>Currently Floodfill? ");
+            buf.append(netdb.floodfillEnabled() ? "yes" : "no");
             buf.append("</b></p><p><b>Network data (only valid if floodfill):");
             //buf.append("</b></p><p><b>Center of Key Space (router hash): " + ourRKey.toBase64());
             if (median != null) {
                 double log2 = biLog2(median);
-                buf.append("</b></p><p><b>Median distance (bits): " + fmt.format(log2));
+                buf.append("</b></p><p><b>Median distance (bits): ").append(fmt.format(log2));
                 // 3 for 8 floodfills... -1 for median
                 int total = (int) Math.round(Math.pow(2, 3 + 256 - 1 - log2));
-                buf.append("</b></p><p><b>Estimated total floodfills: " + total);
-                buf.append("</b></p><p><b>Estimated network total leasesets: " + (total * leases.size() / 8));
+                buf.append("</b></p><p><b>Estimated total floodfills: ").append(total);
+                buf.append("</b></p><p><b>Estimated total leasesets: ").append(total * rapCount / 8);
             }
             buf.append("</b></p>");
         }
