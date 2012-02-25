@@ -1251,10 +1251,13 @@
     <target name="junit.report" depends="buildProperties" >
         <ant dir="core/java/" target="junit.report" />
     </target>
-    <target name="clover.report" depends="buildProperties" >
+    <target name="clover.report" depends="buildProperties" if="with.clover">
         <ant dir="core/java/" target="clover.report" />
     </target>
-    <target name="test.report" depends="junit.report, clover.report"/>
+    <target name="cobertura.report" depends="buildProperties" if="with.cobertura">
+        <ant dir="core/java/" target="cobertura.report" />
+    </target>
+    <target name="test.report" depends="junit.report, clover.report, cobertura.report"/>
     <target name="fulltest" depends="buildProperties" >
 		<ant dir="core/java/" target="fulltest" />
 		<ant dir="router/java/" target="fulltest" />
