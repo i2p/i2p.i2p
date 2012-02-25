@@ -119,7 +119,7 @@
     </target>
     <target name="prepareTest" depends="prepareClover, prepareCobertura" />
     <!-- end preparation of code coverage tool -->
-    <target name="test" depends="compileTest">
+    <target name="test" depends="clean, compileTest, prepareTest">
         <mkdir dir="../../reports/router/junit/" />
         <delete>
             <fileset dir="../../reports/router/junit">
