@@ -425,7 +425,7 @@
                 } %>
                 </td></tr>
                 <tr><td><%=intl._("Tunnel name and description")%></td><td>
-                    <%=request.getParameter("name")%><br>
+                    <%=request.getParameter("name")%><br />
                     <%=request.getParameter("description")%>
                 </td></tr><%
                 if (tunnelIsClient) { %>
@@ -439,16 +439,16 @@
                 } %>
                 <tr><td><%=intl._("Binding address and port")%></td><td><%
                 if ((tunnelIsClient && "streamrclient".equals(tunnelType)) || (!tunnelIsClient && !"streamrserver".equals(tunnelType))) { %>
-                    <%=request.getParameter("targetHost")%><br><%
+                    <%=request.getParameter("targetHost")%><br /><%
                 }
                 if (!tunnelIsClient) { %>
-                    <%=request.getParameter("targetPort")%><br><%
+                    <%=request.getParameter("targetPort")%><br /><%
                 }
                 if (tunnelIsClient || "httpbidirserver".equals(tunnelType)) { %>
-                    <br><%=request.getParameter("port")%><%
+                    <br /><%=request.getParameter("port")%><%
                 }
                 if ((tunnelIsClient && !"streamrclient".equals(tunnelType)) || "httpbidirserver".equals(tunnelType) || "streamrserver".equals(tunnelType)) { %>
-                    <br><%=request.getParameter("reachableBy")%><%
+                    <br /><%=request.getParameter("reachableBy")%><%
                 } %>
                 </td></tr>
                 <tr><td><%=intl._("Tunnel auto-start")%></td><td><%
