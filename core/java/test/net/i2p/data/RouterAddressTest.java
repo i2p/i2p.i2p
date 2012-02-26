@@ -100,8 +100,7 @@ public class RouterAddressTest extends StructureTest {
         options.setProperty("portnum", "1234");
         addr.setOptions(options);
         addr.setTransportStyle("Blah");
-        addr.toString();
-        addr.setOptions(null);
-        addr.toString();
+        String ret = addr.toString();
+        assertEquals(ret, "[RouterAddress: \n\tTransportStyle: Blah\n\tCost: 42\n\tExpiration: Fri Jan 02 00:00:00 UTC 1970\n\tOptions: #: 2\n\t\t[hostname] = [localhost]\n\t\t[portnum] = [1234]]");
     }
 }
