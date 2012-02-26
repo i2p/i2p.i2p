@@ -106,7 +106,10 @@ public class NetDbRenderer {
         StringBuilder buf = new StringBuilder(4*1024);
         buf.append("<h2>" + _("Network Database Contents") + "</h2>\n");
         buf.append("<a href=\"netdb\">" + _("View RouterInfo") + "</a>");
-        buf.append("<h3>").append(_("LeaseSets")).append("</h3>\n");
+        buf.append("<h3>").append(_("LeaseSets"));
+        if (debug)
+            buf.append(" - Debug mode - Sorted by hash distance, closest first");
+        buf.append("</h3>\n");
         Hash ourRKey;
         Set<LeaseSet> leases;
         DecimalFormat fmt;
@@ -169,9 +172,10 @@ public class NetDbRenderer {
                     if (c++ == medianCount)
                         median = dist;
                 }
-                buf.append(" Dist: <b>").append(fmt.format(biLog2(dist))).append("</b>");
-                buf.append(" RKey: ").append(ls.getRoutingKey().toBase64());
+                buf.append(" Dist: <b>").append(fmt.format(biLog2(dist))).append("</b><br>");
+                buf.append("Routing Key: ").append(ls.getRoutingKey().toBase64());
                 buf.append("<br>");
+                buf.append("Encryption Key: ").append(ls.getEncryptionKey().toBase64().substring(0, 20)).append("...<br>");
             }
             for (int i = 0; i < ls.getLeaseCount(); i++) {
                 buf.append(_("Lease")).append(' ').append(i + 1).append(": " + _("Gateway") + ' ');
