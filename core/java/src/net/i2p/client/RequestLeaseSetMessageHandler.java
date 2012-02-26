@@ -34,7 +34,7 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 class RequestLeaseSetMessageHandler extends HandlerImpl {
-    private final Map _existingLeaseSets;
+    private final Map<Destination, LeaseInfo> _existingLeaseSets;
 
     public RequestLeaseSetMessageHandler(I2PAppContext context) {
         super(context, RequestLeaseSetMessage.MESSAGE_TYPE);
@@ -59,7 +59,7 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
         leaseSet.setDestination(session.getMyDestination());
 
         // reuse the old keys for the client
-        LeaseInfo li = (LeaseInfo) _existingLeaseSets.get(session.getMyDestination());
+        LeaseInfo li = _existingLeaseSets.get(session.getMyDestination());
         if (li == null) {
             li = new LeaseInfo(session.getMyDestination());
             _existingLeaseSets.put(session.getMyDestination(), li);
@@ -98,11 +98,11 @@ class RequestLeaseSetMessageHandler extends HandlerImpl {
     }
 
     private static class LeaseInfo {
-        private PublicKey _pubKey;
-        private PrivateKey _privKey;
-        private SigningPublicKey _signingPubKey;
-        private SigningPrivateKey _signingPrivKey;
-        private Destination _dest;
+        private final PublicKey _pubKey;
+        private final PrivateKey _privKey;
+        private final SigningPublicKey _signingPubKey;
+        private final SigningPrivateKey _signingPrivKey;
+        private final Destination _dest;
 
         public LeaseInfo(Destination dest) {
             _dest = dest;
