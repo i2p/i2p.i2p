@@ -36,7 +36,7 @@ public class RouterAddressTest extends StructureTest {
     
     public void testBadWrite() throws Exception{
         RouterAddress addr = new RouterAddress();
-        boolean error = true;
+        boolean error = false;
         try{
             addr.writeBytes(new ByteArrayOutputStream());
         }catch(DataFormatException dfe){
