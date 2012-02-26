@@ -206,6 +206,7 @@
         <copy file="apps/jetty/jettylib/javax.servlet.jar" todir="build/" />
     </target>
 
+    <!-- this makes an empty build/launchi2p.jar and the build/i2p.exe for the no-wrapper windows startup, if possible -->
     <target name="buildexe">
         <condition property="noExe">
 	    <os arch="x86_64" />
@@ -234,6 +235,7 @@
              classname="net.sf.launch4j.ant.Launch4jTask"
              classpath="${basedir}/installer/lib/launch4j/launch4j.jar:${basedir}/installer/lib/launch4j/lib/xstream.jar" />
 
+    <!-- this makes an empty build/launchi2p.jar and the build/i2p.exe for the no-wrapper windows startup -->
     <target name="doBuildEXE" depends="buildProperties" unless="noExe">
         <jar destfile="./build/launchi2p.jar">
             <manifest>
@@ -572,7 +574,6 @@
         <delete dir="./build" />
         <delete file="installer/lib/izpack/patches.jar" failonerror="false" quiet="true" />	
         <delete file="i2pinstall.exe" failonerror="false" quiet="true" />	
-        <delete file="i2p.exe" failonerror="false" quiet="true" />
         <delete file="syndie-standalone.zip" failonerror="false" quiet="true" />
         <delete>
             <fileset dir="." includes="i2pinstall*jar i2pinstall*bz2" />
@@ -754,7 +755,7 @@
     </target>
     
     <target name="preppkg-windows" depends="preppkg-base, buildexe">
-        <copy file="i2p.exe" todir="pkg-temp/" failonerror="false" />
+        <copy file="build/i2p.exe" todir="pkg-temp/" failonerror="false" />
         <copy file="apps/systray/java/lib/systray4j.dll" todir="pkg-temp/lib" />
         <copy file="apps/systray/java/resources/iggy.ico" todir="pkg-temp/icons" />
         <copy file="apps/systray/java/resources/iggy.xpm" todir="pkg-temp/icons" />
@@ -1169,43 +1170,31 @@
 	<ant target="doInstallerEXE" />
     </target>
 
+    <!-- this makes i2pinstall.exe from install.jar -->
     <target name="doInstallerEXE" unless="noExe">
 	<!-- now the installer exe -->
         <launch4j configFile="./installer/i2pinstaller.xml" />
-        <launch4j configFile="./installer/i2pstandalone.xml" />
 	<!-- thazzit -->
     </target>
 
     <!-- Custom installers -->
-    <target name="installer-nowindows" depends="clean, preppkg-nowindows, getReleaseNumber, getBuildNumber, buildProperties, util-list-changes, izpack-patches" >
-        <mkdir dir="pkg-temp/installer" />
-        <!-- set if unset -->
-        <property name="workspace.changes.util.tr" value="" />
-	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${release.number}-${i2p.build.number}${build.extra}.jar" installerType="standard" basedir="${basedir}" />
+    <target name="installer-nowindows" depends="clean, preppkg-nowindows, izpack-patches" >
+	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${full.version}.jar" installerType="standard" basedir="${basedir}" />
     </target>
 
 
-    <target name="installer-freebsd" depends="clean, preppkg-freebsd-only, getReleaseNumber, getBuildNumber, buildProperties, util-list-changes, izpack-patches" >
-        <mkdir dir="pkg-temp/installer" />
-        <!-- set if unset -->
-        <property name="workspace.changes.util.tr" value="" />
-	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${release.number}-${i2p.build.number}${build.extra}_freebsd-only.jar" installerType="standard" basedir="${basedir}" />
+    <target name="installer-freebsd" depends="clean, preppkg-freebsd-only, izpack-patches" >
+	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${full.version}_freebsd-only.jar" installerType="standard" basedir="${basedir}" />
     </target>
 
-    <target name="installer-linux" depends="clean, preppkg-linux-only, getReleaseNumber, getBuildNumber, buildProperties, util-list-changes, izpack-patches" >
-        <mkdir dir="pkg-temp/installer" />
-        <!-- set if unset -->
-        <property name="workspace.changes.util.tr" value="" />
-	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${release.number}-${i2p.build.number}${build.extra}_linux-only.jar" installerType="standard" basedir="${basedir}" />
+    <target name="installer-linux" depends="clean, preppkg-linux-only, izpack-patches" >
+	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${full.version}_linux-only.jar" installerType="standard" basedir="${basedir}" />
     </target>
 
 
-    <target name="installer-osx" depends="clean, checkForIzpack2App, preppkg-osx-only, getReleaseNumber, getBuildNumber, buildProperties, util-list-changes, izpack-patches">
-        <mkdir dir="pkg-temp/installer" />
+    <target name="installer-osx" depends="clean, checkForIzpack2App, preppkg-osx-only, izpack-patches">
 	<mkdir dir="pkg-temp/osx" />
-        <!-- set if unset -->
-        <property name="workspace.changes.util.tr" value="" />
-	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${release.number}-${i2p.build.number}${build.extra}_osx-only.jar" installerType="standard" basedir="${basedir}" />
+	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${full.version}_osx-only.jar" installerType="standard" basedir="${basedir}" />
 	<ant target="installer2app" />
 	<delete dir="pkg-temp/osx" />
     </target>
@@ -1218,28 +1207,25 @@
 	<mkdir dir="pkg-temp/osx" />
 	<exec executable="python" failonerror="true">
 	    <arg value="${user.home}/IzPack/utils/wrappers/izpack2app/izpack2app.py" />
-	    <arg value="${basedir}/i2pinstall_${release.number}-${i2p.build.number}${build.extra}_osx-only.jar" />
-	    <arg value="${basedir}/pkg-temp/osx/i2p-${release.number}-${i2p.build.number}${build.extra}_osx-install.app" />
+	    <arg value="${basedir}/i2pinstall_${full.version}_osx-only.jar" />
+	    <arg value="${basedir}/pkg-temp/osx/i2p-${full.version}_osx-install.app" />
 	</exec>
 	<exec executable="chmod" failonerror="true" osfamily="unix">
 		<arg value="755" />
-		<arg value="${basedir}/pkg-temp/osx/i2p-${release.number}-${i2p.build.number}${build.extra}_osx-install.app/Contents/MacOS/JavaApplicationStub" />
+		<arg value="${basedir}/pkg-temp/osx/i2p-${full.version}_osx-install.app/Contents/MacOS/JavaApplicationStub" />
 	</exec>
 	<exec executable="tar" osfamily="unix" failonerror="true">
 		<arg value="--owner=root" />
 		<arg value="--group=root" />
 		<arg value="-cjvf" />
-		<arg value="${basedir}/i2pinstall_${release.number}-${i2p.build.number}${build.extra}_osx.tar.bz2" />
+		<arg value="${basedir}/i2pinstall_${full.version}_osx.tar.bz2" />
 		<arg value="-C" />
 		<arg value="${basedir}/pkg-temp/osx" />
-		<arg value="i2p-${release.number}-${i2p.build.number}${build.extra}_osx-install.app" />
+		<arg value="i2p-${full.version}_osx-install.app" />
 	</exec>
     </target>
 
-    <!-- Yes, even though this makes an installer for Windows, we still need to depend on preppkg-unix (because the installer attempts to delete these files
-     and will fail if they don't exist. Thankfully these files are so very small there's not much harm in including them.
-    -->
-    <target name="installer-windows" depends="clean, doBuildEXE, preppkg-windows-only, preppkg-unix, getReleaseNumber, getBuildNumber, buildProperties, util-list-changes, izpack-patches" >
+    <target name="installer-windows" depends="clean, preppkg-windows-only, util-list-changes, izpack-patches" >
         <mkdir dir="pkg-temp/installer" />
         <!-- set if unset -->
         <property name="workspace.changes.util.tr" value="" />
@@ -1267,8 +1253,10 @@
                 <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
             </manifest>
         </jar>
-	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${release.number}-${i2p.build.number}${build.extra}_windows-only.jar" installerType="standard" basedir="${basedir}" />
-	<delete dir="pkg-temp/win" />
+	<izpack input="${basedir}/installer/install.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
+        <ant target="installerexe" />
+        <delete file="${basedir}/install.jar" />
+        <move file="${basedir}/i2pinstall.exe" tofile="${basedir}/i2pinstall_${full.version}_windows-only.exe" />
     </target>
 
     <target name="installer-all" depends="installer-freebsd, installer-linux, installer-osx, installer-windows, installer" >
