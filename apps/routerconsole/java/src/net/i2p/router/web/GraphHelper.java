@@ -20,6 +20,8 @@ public class GraphHelper extends FormHandler {
     private int _height;
     private int _refreshDelaySeconds;
     private boolean _persistent;
+    private String _stat;
+    private int _end;
 
     private static final String PROP_X = "routerconsole.graphX";
     private static final String PROP_Y = "routerconsole.graphY";
@@ -32,6 +34,10 @@ public class GraphHelper extends FormHandler {
     private static final int DEFAULT_PERIODS = 60;
     static final int MAX_X = 2048;
     static final int MAX_Y = 1024;
+    private static final int MIN_X = 200;
+    private static final int MIN_Y = 60;
+    private static final int MIN_C = 20;
+    private static final int MAX_C = SummaryListener.MAX_ROWS;
     private static final int MIN_REFRESH = 15;
     
     /** set the defaults after we have a context */
@@ -64,17 +70,45 @@ public class GraphHelper extends FormHandler {
     public void storeWriter(Writer out) { _out = out; }
 
     public void setPeriodCount(String str) { 
-        try { _periodCount = Integer.parseInt(str); } catch (NumberFormatException nfe) {}
+        setC(str);
     }
 
-    public void setShowEvents(boolean b) { _showEvents = b; }
+    /** @since 0.9 */
+    public void setE(String str) { 
+        try {
+            _end = Math.max(0, Integer.parseInt(str));
+        } catch (NumberFormatException nfe) {}
+    }
+
+    /** @since 0.9 shorter parameter */
+    public void setC(String str) { 
+        try {
+            _periodCount = Math.max(MIN_C, Math.min(Integer.parseInt(str), MAX_C));
+        } catch (NumberFormatException nfe) {}
+    }
+
+    public void setShowEvents(String b) { _showEvents = !"false".equals(b); }
 
     public void setHeight(String str) {
-        try { _height = Math.min(Integer.parseInt(str), MAX_Y); } catch (NumberFormatException nfe) {}
+        setH(str);
+    }
+
+    /** @since 0.9 shorter parameter */
+    public void setH(String str) { 
+        try {
+            _height = Math.max(MIN_Y, Math.min(Integer.parseInt(str), MAX_Y));
+        } catch (NumberFormatException nfe) {}
     }
 
     public void setWidth(String str) {
-        try { _width = Math.min(Integer.parseInt(str), MAX_X); } catch (NumberFormatException nfe) {}
+        setW(str);
+    }
+
+    /** @since 0.9 shorter parameter */
+    public void setW(String str) { 
+        try {
+            _width = Math.max(MIN_X, Math.min(Integer.parseInt(str), MAX_X));
+        } catch (NumberFormatException nfe) {}
     }
 
     public void setRefreshDelay(String str) {
@@ -89,6 +123,14 @@ public class GraphHelper extends FormHandler {
 
     /** @since 0.8.7 */
     public void setPersistent(String foo) { _persistent = true; }
+
+    /**
+     *  For single stat page
+     *  @since 0.9
+     */
+    public void setStat(String stat) {
+        _stat = stat;
+    }
     
     public String getImages() { 
         if (StatSummarizer.isDisabled())
@@ -109,11 +151,11 @@ public class GraphHelper extends FormHandler {
             }
 
             if (hasTx && hasRx && !_showEvents) {
-                _out.write("<a href=\"viewstat.jsp?stat=bw.combined"
+                _out.write("<a href=\"viewstat?stat=bw.combined"
                            + "&amp;periodCount=" + (3 * _periodCount )
                            + "&amp;width=" + (3 * _width)
                            + "&amp;height=" + (3 * _height)
-                           + "\" target=\"_blank\">");
+                           + "\">");
                 String title = _("Combined bandwidth graph");
                 _out.write("<img class=\"statimage\""
                            + " src=\"viewstat.jsp?stat=bw.combined"
@@ -128,14 +170,14 @@ public class GraphHelper extends FormHandler {
                 Rate r = lsnr.getRate();
                 // e.g. "statname for 60m"
                 String title = _("{0} for {1}", r.getRateStat().getName(), DataHelper.formatDuration2(_periodCount * r.getPeriod()));
-                _out.write("<a href=\"viewstat.jsp?stat="
+                _out.write("<a href=\"graph?stat="
                            + r.getRateStat().getName() 
-                           + "&amp;showEvents=" + _showEvents
-                           + "&amp;period=" + r.getPeriod() 
-                           + "&amp;periodCount=" + (3 * _periodCount)
-                           + "&amp;width=" + (3 * _width)
-                           + "&amp;height=" + (3 * _height)
-                           + "\" target=\"_blank\">");
+                           + '.' + r.getPeriod() 
+                           + "&amp;c=" + (3 * _periodCount)
+                           + "&amp;w=" + (3 * _width)
+                           + "&amp;h=" + (3 * _height)
+                           + (_showEvents ? "&amp;showEvents=1" : "")
+                           + "\">");
                 _out.write("<img class=\"statimage\" border=\"0\""
                            + " src=\"viewstat.jsp?stat="
                            + r.getRateStat().getName() 
@@ -154,6 +196,134 @@ public class GraphHelper extends FormHandler {
             ioe.printStackTrace();
         }
         return ""; 
+    }
+
+    /**
+     *  For single stat page
+     *  @since 0.9
+     */
+    public String getSingleStat() {
+        try {
+            if (StatSummarizer.isDisabled())
+                return "";
+            if (_stat == null) {
+                _out.write("No stat");
+                return "";
+            }
+            List<Rate> rates = StatSummarizer.instance().parseSpecs(_stat);
+            if (rates.size() != 1) {
+                _out.write("Graphs not enabled for " + _stat);
+                return "";
+            }
+            Rate r = rates.get(0);
+            _out.write("<h3>");
+            _out.write(_("{0} for {1}", r.getRateStat().getName(), DataHelper.formatDuration2(_periodCount * r.getPeriod())));
+            if (_end > 0)
+                _out.write(' ' + _("ending {0} ago", DataHelper.formatDuration2(_end * r.getPeriod())));
+
+            _out.write("</h3><p><img class=\"statimage\" border=\"0\""
+                       + " src=\"viewstat.jsp?stat="
+                       + r.getRateStat().getName() 
+                       + "&amp;showEvents=" + _showEvents
+                       + "&amp;period=" + r.getPeriod() 
+                       + "&amp;periodCount=" + _periodCount 
+                       + "&amp;end=" + _end 
+                       + "&amp;width=" + _width
+                       + "&amp;height=" + _height
+                       + "\"></p><p>\n");
+
+            if (_width < MAX_X && _height < MAX_Y) {
+                _out.write(link(_stat, _showEvents, _periodCount, _end, _width * 3 / 2, _height * 3 / 2));
+                _out.write(_("Larger"));
+                _out.write("</a> - ");
+            }
+
+            if (_width > MIN_X && _height > MIN_Y) {
+                _out.write(link(_stat, _showEvents, _periodCount, _end, _width * 2 / 3, _height * 2 / 3));
+                _out.write(_("Smaller"));
+                _out.write("</a> - ");
+            }
+
+            if (_height < MAX_Y) {
+                _out.write(link(_stat, _showEvents, _periodCount, _end, _width, _height * 3 / 2));
+                _out.write(_("Taller"));
+                _out.write("</a> - ");
+            }
+
+            if (_height > MIN_Y) {
+                _out.write(link(_stat, _showEvents, _periodCount, _end, _width, _height * 2 / 3));
+                _out.write(_("Shorter"));
+                _out.write("</a> - ");
+            }
+
+            if (_width < MAX_X) {
+                _out.write(link(_stat, _showEvents, _periodCount, _end, _width * 3 / 2, _height));
+                _out.write(_("Wider"));
+                _out.write("</a> - ");
+            }
+
+            if (_width > MIN_X) {
+                _out.write(link(_stat, _showEvents, _periodCount, _end, _width * 2 / 3, _height));
+                _out.write(_("Narrower"));
+                _out.write("</a>");
+            }
+
+            _out.write("<br>");
+            if (_periodCount < MAX_C) {
+                _out.write(link(_stat, _showEvents, _periodCount * 2, _end, _width, _height));
+                _out.write(_("Larger interval"));
+                _out.write("</a> - ");
+            }
+
+            if (_periodCount > MIN_C) {
+                _out.write(link(_stat, _showEvents, _periodCount / 2, _end, _width, _height));
+                _out.write(_("Smaller interval"));
+                _out.write("</a>");
+            }
+
+            _out.write("<br>");
+            if (_periodCount < MAX_C) {
+                _out.write(link(_stat, _showEvents, _periodCount, _end + _periodCount, _width, _height));
+                _out.write(_("Previous interval"));
+                _out.write("</a>");
+            }
+
+            if (_end > 0) {
+                int end = _end - _periodCount;
+                if (end <= 0)
+                    end = 0;
+                if (_periodCount < MAX_C)
+                    _out.write(" - ");
+                _out.write(link(_stat, _showEvents, _periodCount, end, _width, _height));
+                _out.write(_("Next interval"));
+                _out.write("</a> ");
+            }
+
+            _out.write("<br>");
+            _out.write(link(_stat, !_showEvents, _periodCount, _end, _width, _height));
+            _out.write(_showEvents ? _("Plot averages") : _("plot events"));
+            _out.write("</a>");
+
+            _out.write("</p><p><i>" + _("All times are UTC.") + "</i></p>\n");
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+        return ""; 
+    }
+
+    /** @since 0.9 */
+    private static String link(String stat, boolean showEvents,
+                               int periodCount, int end,
+                               int width, int height) {
+        return
+               "<a href=\"graph?stat="
+               + stat
+               + "&amp;c=" + periodCount
+               + "&amp;w=" + width
+               + "&amp;h=" + height
+               + (end > 0 ? "&amp;e=" + end : "")
+               + (showEvents ? "&amp;showEvents=1" : "")
+               + "\">";
     }
 
     private static final int[] times = { 60, 2*60, 5*60, 10*60, 30*60, 60*60, -1 };
