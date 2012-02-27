@@ -129,6 +129,12 @@
                     <include name="**/*Test.java" />
                     <exclude name="**/ElGamalAESEngineTest.java" />
                     <exclude name="**/StructureTest.java" />
+                    <!-- temporarily  exclude slow tests -->
+                    <exclude name="**/HMACSHA256Test.java" />
+                    <exclude name="**/SHA1HashTest.java" />
+                    <exclude name="**/SHA256Test.java" />
+                    <exclude name="**/DataHelperTest.java" />
+                    <!-- end of slow tests -->
                 </fileset>
             </batchtest>
             <formatter type="xml"/>
