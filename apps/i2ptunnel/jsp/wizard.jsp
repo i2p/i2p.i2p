@@ -2,10 +2,10 @@
     // NOTE: Do the header carefully so there is no whitespace before the <?xml... line
 
 %><%@page pageEncoding="UTF-8"
-%><%@page contentType="text/html" import="net.i2p.i2ptunnel.web.WizardBean"
+%><%@page contentType="text/html" import="net.i2p.i2ptunnel.web.EditBean"
 %><?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<jsp:useBean class="net.i2p.i2ptunnel.web.WizardBean" id="wizardBean" scope="request" />
+<jsp:useBean class="net.i2p.i2ptunnel.web.EditBean" id="editBean" scope="request" />
 <jsp:useBean class="net.i2p.i2ptunnel.web.Messages" id="intl" scope="request" />
 <% String pageStr = request.getParameter("page");
    /* Get the number of the page we came from */
@@ -50,9 +50,9 @@
     <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
     <link href="/themes/console/images/favicon.ico" type="image/x-icon" rel="shortcut icon" />
 
-    <% if (wizardBean.allowCSS()) {
-  %><link href="<%=wizardBean.getTheme()%>default.css" rel="stylesheet" type="text/css" />
-    <link href="<%=wizardBean.getTheme()%>i2ptunnel.css" rel="stylesheet" type="text/css" />
+    <% if (editBean.allowCSS()) {
+  %><link href="<%=editBean.getTheme()%>default.css" rel="stylesheet" type="text/css" />
+    <link href="<%=editBean.getTheme()%>i2ptunnel.css" rel="stylesheet" type="text/css" />
     <% }
   %>
 </head>
@@ -82,7 +82,7 @@
                 } %>
                 <input type="hidden" name="page" value="<%=curPage%>" />
                 <input type="hidden" name="tunnel" value="null" />
-                <input type="hidden" name="nonce" value="<%=wizardBean.getNextNonce()%>" />
+                <input type="hidden" name="nonce" value="<%=editBean.getNextNonce()%>" />
             </div>
 
             <div class="separator">
@@ -341,7 +341,7 @@
                     if ("null".equals(clientInterface)) {
                       clientInterface = "127.0.0.1";
                     }
-                    for (String ifc : wizardBean.interfaceSet()) {
+                    for (String ifc : editBean.interfaceSet()) {
                         out.write("<option value=\"");
                         out.write(ifc);
                         out.write('\"');
@@ -425,7 +425,7 @@
                 } %>
                 </td></tr>
                 <tr><td><%=intl._("Tunnel name and description")%></td><td>
-                    <%=request.getParameter("name")%><br>
+                    <%=request.getParameter("name")%><br />
                     <%=request.getParameter("description")%>
                 </td></tr><%
                 if (tunnelIsClient) { %>
@@ -439,16 +439,16 @@
                 } %>
                 <tr><td><%=intl._("Binding address and port")%></td><td><%
                 if ((tunnelIsClient && "streamrclient".equals(tunnelType)) || (!tunnelIsClient && !"streamrserver".equals(tunnelType))) { %>
-                    <%=request.getParameter("targetHost")%><br><%
+                    <%=request.getParameter("targetHost")%><br /><%
                 }
                 if (!tunnelIsClient) { %>
-                    <%=request.getParameter("targetPort")%><br><%
+                    <%=request.getParameter("targetPort")%><br /><%
                 }
                 if (tunnelIsClient || "httpbidirserver".equals(tunnelType)) { %>
-                    <br><%=request.getParameter("port")%><%
+                    <br /><%=request.getParameter("port")%><%
                 }
                 if ((tunnelIsClient && !"streamrclient".equals(tunnelType)) || "httpbidirserver".equals(tunnelType) || "streamrserver".equals(tunnelType)) { %>
-                    <br><%=request.getParameter("reachableBy")%><%
+                    <br /><%=request.getParameter("reachableBy")%><%
                 } %>
                 </td></tr>
                 <tr><td><%=intl._("Tunnel auto-start")%></td><td><%
