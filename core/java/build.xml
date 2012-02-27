@@ -95,6 +95,13 @@
             <fileset dir="./build/obj">
                 <include name="**/*.class"/>
                 <exclude name="**/*Test.class" />
+                <exclude name="**/AllCoreTests.class" />
+                <exclude name="com/nettgryppa/**/*.class" />
+                <exclude name="freenet/**/*.class" />
+                <exclude name="gnu/**/*.class" />
+                <exclude name="net/metanotion/**/*.class" />
+                <exclude name="org/bouncycastle/**/*.class" />
+                <exclude name="org/xlattice/**/*.class" />
             </fileset>
         </cobertura-instrument>
     </target>
