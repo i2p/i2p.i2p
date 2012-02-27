@@ -68,7 +68,7 @@ build-indep:
 binary-arch: build-arch
 build-arch:
 	# build jbigi
-	cd $(CURDIR)/core/c/jbigi && ./mbuild_jbigi.sh dynamic
+	cd $(CURDIR)/core/c/jbigi && ./build_jbigi.sh dynamic
 	# build jcpuid
 	cd $(CURDIR)/core/c/jcpuid && ./build.sh
 
