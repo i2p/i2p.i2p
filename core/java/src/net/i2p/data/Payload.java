@@ -26,7 +26,7 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public class Payload extends DataStructureImpl {
-    private final static Log _log = new Log(Payload.class);
+    //private final static Log _log = new Log(Payload.class);
     private byte[] _encryptedData;
     private byte[] _unencryptedData;
 
@@ -82,16 +82,16 @@ public class Payload extends DataStructureImpl {
         _encryptedData = new byte[size];
         int read = read(in, _encryptedData);
         if (read != size) throw new DataFormatException("Incorrect number of bytes read in the payload structure");
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("read payload: " + read + " bytes");
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("read payload: " + read + " bytes");
     }
     
     public void writeBytes(OutputStream out) throws DataFormatException, IOException {
         if (_encryptedData == null) throw new DataFormatException("Not yet encrypted.  Please set the encrypted data");
         DataHelper.writeLong(out, 4, _encryptedData.length);
         out.write(_encryptedData);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("wrote payload: " + _encryptedData.length);
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("wrote payload: " + _encryptedData.length);
     }
 
     /**
