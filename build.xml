@@ -1017,7 +1017,9 @@
         <copy file="build/i2psnark.jar" todir="pkg-temp/lib" />
         <!-- include systray changes in 0.7.5 -->
         <copy file="build/systray.jar" todir="pkg-temp/lib/" />
+       <!-- removed from updater in 0.9
         <copy file="build/desktopgui.jar" todir="pkg-temp/lib/" />
+       -->
         <copy file="build/susimail.war" todir="pkg-temp/webapps/" />
         <copy file="build/susidns.war" todir="pkg-temp/webapps/" />
         <!-- as of 0.7.12; someday, we can remove these from the updater -->
