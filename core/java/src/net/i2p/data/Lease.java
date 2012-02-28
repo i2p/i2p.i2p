@@ -26,8 +26,8 @@ public class Lease extends DataStructureImpl {
     private Hash _gateway;
     private TunnelId _tunnelId;
     private Date _end;
-    private int _numSuccess;
-    private int _numFailure;
+    //private int _numSuccess;
+    //private int _numFailure;
 
     public Lease() {
     }
@@ -74,14 +74,18 @@ public class Lease extends DataStructureImpl {
      *
      * @deprecated unused
      */
+/****
     public int getNumSuccess() {
         return _numSuccess;
     }
+****/
 
     /** @deprecated unused */
+/****
     public void setNumSuccess(int num) {
         _numSuccess = num;
     }
+****/
 
     /**
      * Transient attribute of the lease, used to note how many times messages sent
@@ -89,14 +93,18 @@ public class Lease extends DataStructureImpl {
      *
      * @deprecated unused
      */
+/****
     public int getNumFailure() {
         return _numFailure;
     }
+****/
 
     /** @deprecated unused */
+/****
     public void setNumFailure(int num) {
         _numFailure = num;
     }
+****/
 
     /** has this lease already expired? */
     public boolean isExpired() {
