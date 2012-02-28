@@ -18,7 +18,6 @@ import net.i2p.util.Log;
  */
 class UDPPacket {
     private I2PAppContext _context;
-    private static Log _log;
     private final DatagramPacket _packet;
     private volatile short _priority;
     private volatile long _initializeTime;
@@ -48,7 +47,6 @@ class UDPPacket {
             _packetCache = new LinkedBlockingQueue(CACHE_SIZE);
         else
             _packetCache = null;
-        _log = I2PAppContext.getGlobalContext().logManager().getLog(UDPPacket.class);
     }
     
     /**
@@ -214,8 +212,8 @@ class UDPPacket {
             eq = DataHelper.eq(hmac.getData(), 0, _data, _packet.getOffset(), MAC_SIZE);
              */
         } else {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("Payload length is " + payloadLength);
+            //if (_log.shouldLog(Log.WARN))
+            //    _log.warn("Payload length is " + payloadLength);
         }
         
         _afterValidate = _context.clock().now();
@@ -321,9 +319,10 @@ class UDPPacket {
     private void verifyNotReleased() {
         if (CACHE) return;
         if (_released) {
-            _log.log(Log.CRIT, "Already released.  current stack trace is:", new Exception());
-            _log.log(Log.CRIT, "Released by: ", _releasedBy);
-            _log.log(Log.CRIT, "Acquired by: ", _acquiredBy);
+            Log log = I2PAppContext.getGlobalContext().logManager().getLog(UDPPacket.class);
+            log.log(Log.CRIT, "Already released.  current stack trace is:", new Exception());
+            log.log(Log.CRIT, "Released by: ", _releasedBy);
+            log.log(Log.CRIT, "Acquired by: ", _acquiredBy);
         }
     }
 }
