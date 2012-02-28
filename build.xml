@@ -1371,8 +1371,9 @@
         <echo message="New version number is ${release.number}" />
         <copy file="i2pupdate.zip" tofile="i2pupdate_${release.number}.zip" />
         <copy file="i2pinstall.exe" tofile="i2pinstall_${release.number}.exe" />
-        <delete file="i2pupdate.sud" failonerror="false" />
-        <delete file="i2pupdate.su2" failonerror="false" />
+        <delete file="i2pupdate.sud" />
+        <delete file="i2pupdate.su2" />
+        <!-- make this a lot easier by putting release.privkey=/path/to/privkey in override.properties -->
         <input message="Enter private signing key file:" addproperty="release.privkey" />
         <fail message="You must enter a path." >
             <condition>
@@ -1481,6 +1482,17 @@
         <exec executable="gpg" failonerror="true">
             <arg value="-b" />
             <arg value="i2pupdate_${release.number}.zip" />
+        </exec>
+        <exec executable="chmod" failonerror="true">
+            <arg value="444" />
+            <arg value="i2pinstall_${release.number}.exe" />
+            <arg value="i2psource_${release.number}.tar.bz2" />
+            <arg value="i2pupdate_${release.number}.zip" />
+            <arg value="i2pupdate.su2" />
+            <arg value="i2pupdate.sud" />
+            <arg value="i2pinstall_${release.number}.exe.sig" />
+            <arg value="i2psource_${release.number}.tar.bz2.sig" />
+            <arg value="i2pupdate_${release.number}.zip.sig" />
         </exec>
         <echo message="File sizes:" />
         <exec executable="ls" failonerror="true">
