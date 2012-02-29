@@ -68,10 +68,7 @@ class FloodfillStoreJob extends StoreJob {
             DatabaseEntry data = _state.getData();
             boolean isRouterInfo = data.getType() == DatabaseEntry.KEY_TYPE_ROUTERINFO;
             long published = data.getDate();
-            if (isRouterInfo) {
-                // Temporarily disable
-                return;
-            }
+
             // we should always have exactly one successful entry
             Hash sentTo = null;
             try {
