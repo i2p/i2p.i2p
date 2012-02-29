@@ -42,15 +42,17 @@ public class HomeHelper extends HelperBase {
         "echelon.i2p" + S + _x("I2P Applications") + S + "http://echelon.i2p/" + S + I + "itoopie_sm.png" + S +
         _x("FAQ") + S + _x("Frequently Asked Questions") + S + "http://www.i2p2.i2p/faq" + S + I + "help.png" + S +
         _x("Forum") + S + _x("Community forum") + S + "http://forum.i2p/" + S + I + "itoopie_sm.png" + S +
-        "i2plugins.i2p" + S + _x("I2P Plugins") + S + "http://i2plugins.i2p/" + S + I + "itoopie_sm.png" + S +
-        "ident.i2p" + S + _x("Short message service") + S + "http://ident.i2p/" + S + I + "itoopie_sm.png" + S +
+        //"ident.i2p" + S + _x("Short message service") + S + "http://ident.i2p/" + S + I + "itoopie_sm.png" + S +
         _x("Javadocs") + S + _x("Technical documentation") + S + "http://docs.i2p-projekt.i2p/javadoc/" + S + I + "book.png" + S +
+        _x("Key Server") + S + _x("OpenPGP Keyserver") + S + "http://keys.i2p/" + S + I + "book.png" + S +
         _x("Pastebin") + S + _x("I2P Pastebin") + S + "http://pastethis.i2p/" + S + I + "itoopie_sm.png" + S +
         "Planet I2P" + S + _x("I2P News") + S + "http://planet.i2p/" + S + I + "itoopie_sm.png" + S +
         _x("Postman's Tracker") + S + _x("Bittorrent tracker") + S + "http://tracker2.postman.i2p/" + S + I + "itoopie_sm.png" + S +
         _x("Project Website") + S + _x("I2P home page") + S + "http://www.i2p2.i2p/" + S + I + "help.png" + S +
         "stats.i2p" + S + _x("I2P Netowrk Statistics") + S + "http://stats.i2p/cgi-bin/dashboard.cgi" + S + I + "itoopie_sm.png" + S +
         _x("Technical Docs") + S + _x("Technical documentation") + S + "http://www.i2p2.i2p/how" + S + I + "book.png" + S +
+        _x("Trac Wiki") + S + S + "http://trac.i2p2.i2p/" + S + I + "itoopie_sm.png" + S +
+        _x("Ugha's Wiki") + S + S + "http://ugha.i2p/" + S + I + "itoopie_sm.png" + S +
         "";
 
 

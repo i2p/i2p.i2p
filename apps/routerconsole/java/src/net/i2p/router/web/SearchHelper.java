@@ -18,13 +18,17 @@ public class SearchHelper extends HelperBase {
     private Map<String, String> _engines = new TreeMap();
     
     private static final char S = ',';
+    // in case engines need to know where it came from
+    private static final String SOURCE = "&amp;ref=console";
     static final String PROP_ENGINES = "routerconsole.searchEngines";
     private static final String PROP_DEFAULT = "routerconsole.searchEngine";
 
     static final String ENGINES_DEFAULT =
-        "eepsites.i2p" + S + "http://eepsites.i2p/Content/Search/SearchResults.aspx?inpQuery=%s" + S +
-        "epsilon.i2p" + S + "http://epsilon.i2p/search.jsp?q=%s" + S +
-        "sprongle.i2p" + S + "http://sprongle.i2p/sprongle.php?q=%s" + S +
+        "eepsites.i2p" + S + "http://eepsites.i2p/Content/Search/SearchResults.aspx?inpQuery=%s" + SOURCE + S +
+        "epsilon.i2p" + S + "http://epsilon.i2p/search.jsp?q=%s" + SOURCE + S +
+        //"searchthis.i2p" + S + "http://searchthis.i2p/cgi-bin/search.cgi?q=%s" + SOURCE + S +
+        //"simple-search.i2p" + S + "http://simple-search.i2p/search.sh?search=%s" + SOURCE + S +
+        //"sprongle.i2p" + S + "http://sprongle.i2p/sprongle.php?q=%s" + SOURCE + S +
         "";
 
     public void setEngine(String s) {
