@@ -13,7 +13,7 @@ Proxy-Connection: close
 <!-----------------------------
   Let's not infinite loop here....
 <div class=logo>
- <a href="http://127.0.0.1:7657/index.jsp" title="Router Console"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="I2P Router Console" border="0"></a><hr>
+ <a href="http://127.0.0.1:7657/" title="Router Console"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="I2P Router Console" border="0"></a><hr>
  <a href="http://127.0.0.1:7657/config.jsp">设置</a> <a href="http://127.0.0.1:7657/help.jsp">帮助</a> <a href="http://127.0.0.1:7657/susidns/">地址簿</a>
 </div>
 ------------------------------>

@@ -11,7 +11,7 @@ Proxy-Connection: close
 </head>
 <body>
 <div class=logo>
- <a href="http://127.0.0.1:7657/index.jsp" title="Console routeur I2P"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="Console routeur I2P" border="0"></a><hr>
+ <a href="http://127.0.0.1:7657/" title="Console routeur I2P"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="Console routeur I2P" border="0"></a><hr>
  <a href="http://127.0.0.1:7657/config.jsp">Configuration</a> <a href="http://127.0.0.1:7657/help.jsp">Aide</a> <a href="http://127.0.0.1:7657/susidns/index">Carnet d'adresse</a>
 </div>
 <div class=warning id=warning>
