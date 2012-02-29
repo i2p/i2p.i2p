@@ -479,15 +479,9 @@ public class Blocklist {
         List<byte[]> rv = new ArrayList(1);
         RouterInfo pinfo = _context.netDb().lookupRouterInfoLocally(peer);
         if (pinfo == null) return rv;
-        Set<RouterAddress> paddr = pinfo.getAddresses();
-        if (paddr == null || paddr.isEmpty())
-            return rv;
         String oldphost = null;
-        List<RouterAddress> pladdr = new ArrayList(paddr);
         // for each peer address
-        for (int j = 0; j < paddr.size(); j++) {
-            RouterAddress pa = (RouterAddress) pladdr.get(j);
-            if (pa == null) continue;
+        for (RouterAddress pa : pinfo.getAddresses()) {
             String phost = pa.getOption("host");
             if (phost == null) continue;
             if (oldphost != null && oldphost.equals(phost)) continue;

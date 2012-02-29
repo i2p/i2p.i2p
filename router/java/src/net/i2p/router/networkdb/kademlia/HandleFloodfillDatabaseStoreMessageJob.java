@@ -8,12 +8,13 @@ package net.i2p.router.networkdb.kademlia;
  *
  */
 
+import java.util.Collection;
 import java.util.Date;
-import java.util.Set;
 
 import net.i2p.data.DatabaseEntry;
 import net.i2p.data.Hash;
 import net.i2p.data.LeaseSet;
+import net.i2p.data.RouterAddress;
 import net.i2p.data.RouterIdentity;
 import net.i2p.data.RouterInfo;
 import net.i2p.data.i2np.DatabaseStoreMessage;
@@ -145,9 +146,9 @@ public class HandleFloodfillDatabaseStoreMessageJob extends JobImpl {
                             _log.shouldLog(Log.WARN))
                                 _log.warn("Blocklisting new peer " + key + ' ' + ri);
                     } else {
-                        Set oldAddr = prevNetDb.getAddresses();
-                        Set newAddr = ri.getAddresses();
-                        if (newAddr != null && (!newAddr.equals(oldAddr)) &&
+                        Collection<RouterAddress> oldAddr = prevNetDb.getAddresses();
+                        Collection<RouterAddress> newAddr = ri.getAddresses();
+                        if ((!newAddr.equals(oldAddr)) &&
                             (!getContext().shitlist().isShitlistedForever(key)) &&
                             getContext().blocklist().isBlocklisted(key) &&
                             _log.shouldLog(Log.WARN))

@@ -216,7 +216,7 @@ public class FloodfillVerifyStoreJob extends JobImpl {
                 if (_log.shouldLog(Log.WARN))
                     _log.warn("Verify failed (older) for " + _key);
                 if (_log.shouldLog(Log.INFO))
-                    _log.info("Rcvd older lease: " + dsm.getEntry());
+                    _log.info("Rcvd older data: " + dsm.getEntry());
             } else if (_message instanceof DatabaseSearchReplyMessage) {
                 // assume 0 old, all new, 0 invalid, 0 dup
                 getContext().profileManager().dbLookupReply(_target,  0,

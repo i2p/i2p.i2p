@@ -7,6 +7,7 @@ import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1258,7 +1259,7 @@ public class ProfileOrganizer {
         RouterInfo pinfo = _context.netDb().lookupRouterInfoLocally(peer);
         if (pinfo == null)
             return rv;
-        Set<RouterAddress> paddr = pinfo.getAddresses();
+        Collection<RouterAddress> paddr = pinfo.getAddresses();
         if (paddr == null)
             return rv;
         for (RouterAddress pa : paddr) {

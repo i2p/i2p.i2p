@@ -1299,8 +1299,18 @@ public class DataHelper {
         //    rv.add(struct);
         //}
         ArrayList<DataStructure> rv = new ArrayList(dataStructures);
-        Collections.sort(rv, new DataStructureComparator());
+        sortStructureList(rv);
         return rv;
+    }
+
+    /**
+     *  See above.
+     *  DEPRECATED - Only used by RouterInfo.
+     *
+     *  @since 0.9
+     */
+    static void sortStructureList(List<? extends DataStructure> dataStructures) {
+        Collections.sort(dataStructures, new DataStructureComparator());
     }
 
     /**
