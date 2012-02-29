@@ -98,6 +98,8 @@ class StoreJob extends JobImpl {
 
     /**
      * send the key to the next batch of peers
+     *
+     * Synchronized to enforce parallelization limits and prevent dups
      */
     private void sendNext() {
         if (_state.completed()) {
@@ -130,8 +132,9 @@ class StoreJob extends JobImpl {
      * the routing table, but making sure no more than PARALLELIZATION are outstanding
      * at any time
      *
+     * Caller should synchronize to enforce parallelization limits and prevent dups
      */
-    private void continueSending() { 
+    private synchronized void continueSending() { 
         if (_state.completed()) return;
         int toCheck = getParallelization() - _state.getPending().size();
         if (toCheck <= 0) {
