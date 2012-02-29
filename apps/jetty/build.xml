@@ -12,6 +12,7 @@
 
     <target name="all" depends="build" />
 
+  <!--
     <target name="ensureJettylib" >
         <available property="jetty.zip.available" file="${jetty.filename}" type="file" />
         <available property="jetty.zip.extracted" file="jettylib" type="dir" />
@@ -19,6 +20,8 @@
         <ant target="verifyJettylib" />
         <ant target="extractJettylib" />
     </target>
+   -->
+    <target name="ensureJettylib" depends="extractJettylib" />
 
     <target name="fetchJettylib" unless="jetty.zip.available" >
         <echo message="It seems that you don't have '${jetty.filename}' deployed." />
@@ -65,14 +68,19 @@
         <touch file="${verified.filename}" />
     </target>
 
+  <!--
     <target name="extractJettylib" unless="jetty.zip.extracted" >
+   -->
+    <target name="extractJettylib" >
       <!-- for .tgz -->
       <!--
         <gunzip src="${jetty.filename}" dest="jetty.tar" />
         <untar src="jetty.tar" dest="." />
       -->
       <!-- for .zip -->
+      <!--
         <unzip src="${jetty.filename}" dest="." />
+      -->
         <mkdir dir="jettylib" />
       <!-- We copy everything to names without the version numbers so we
            can update them later. Where there was something similar in Jetty 5,
@@ -96,7 +104,9 @@
         <copy preservelastmodified="true" file="${jetty.base}/lib/ext/jetty-sslengine-${jetty.ver}.jar" tofile="jettylib/jetty-sslengine.jar" />
         <copy preservelastmodified="true" file="${jetty.base}/lib/management/jetty-management-${jetty.ver}.jar" tofile="jettylib/org.mortbay.jmx.jar" />
         <delete file="jetty.tar" />
+      <!--
         <delete dir="${jetty.base}" />
+      -->
         <!-- commons-logging.jar not in Jetty 6 but we have it in launch4j so copy it over, we need it
              for org.apache.jasper.JspC compiler
           -->
@@ -200,7 +210,9 @@
     <target name="cleandep" depends="clean" />
     <target name="distclean" depends="clean">
         <delete dir="./jettylib" />
+      <!--
         <echo message="Not actually deleting the jetty libs (since they're so large)" />
+       -->
     </target>
     <target name="reallyclean" depends="distclean">
     </target>
