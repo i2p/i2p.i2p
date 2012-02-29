@@ -107,6 +107,7 @@ import net.i2p.util.Log;
         try {
             ByteArrayInputStream in = new ByteArrayInputStream(key);
             _session = client.createSession(in, tunnel.getClientOptions());
+            connected(_session);
         } catch(Exception exc) {
             throw new RuntimeException("failed to create session", exc);
         }

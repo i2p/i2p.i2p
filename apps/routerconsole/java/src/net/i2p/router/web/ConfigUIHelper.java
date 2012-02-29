@@ -56,7 +56,7 @@ public class ConfigUIHelper extends HelperBase {
     private static final String langs[] = {"ar", "cs", "da", "de", "ee", "en", "es", "fi",
                                            "fr", "it", "nl", "pl", "pt", "ru",
                                            "sv", "uk", "vi", "zh"};
-    private static final String flags[] = {"lang_ar", "cs", "dk", "de", "ee", "us", "es", "fi",
+    private static final String flags[] = {"lang_ar", "cz", "dk", "de", "ee", "us", "es", "fi",
                                            "fr", "it", "nl", "pl", "pt", "ru",
                                            "se", "ua", "vn", "cn"};
     private static final String xlangs[] = {_x("Arabic"), _x("Czech"), _x("Danish"),

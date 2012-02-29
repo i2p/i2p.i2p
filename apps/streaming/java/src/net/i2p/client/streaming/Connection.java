@@ -548,9 +548,11 @@ class Connection {
     
     void disconnectComplete() {
         _connected = false;
-        if (_socket != null)
-            _socket.destroy();
-        _socket = null;
+        I2PSocketFull s = _socket;
+        if (s != null) {
+            s.destroy2();
+            _socket = null;
+        }
         if (_outputStream != null)
             _outputStream.destroy();
         if (_receiver != null)
