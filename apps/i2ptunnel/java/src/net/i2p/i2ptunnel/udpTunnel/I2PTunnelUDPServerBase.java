@@ -103,6 +103,7 @@ public class I2PTunnelUDPServerBase extends I2PTunnelTask implements Source, Sin
 
         try {
             _session = client.createSession(privData, getTunnel().getClientOptions());
+            connected(_session);
         } catch(I2PSessionException exc) {
             throw new RuntimeException("failed to create session", exc);
         }

@@ -192,7 +192,7 @@
         <tstamp>
             <format property="build.timestamp" pattern="yyyy-MM-dd HH:mm:ss z" timezone="UTC" locale="en" />
         </tstamp>
-        <property name="full.version" value="${release.number}-${build.number}${build.extra}" />
+        <property name="full.version" value="${release.number}-${i2p.build.number}${build.extra}" />
         <echo message="Building version ${full.version} (mtn rev ${workspace.version})" />
     </target>
 
@@ -295,7 +295,20 @@
             </manifest>
         </jar>
     </target>
-    
+
+    <target name="jbigi-nowindows" depends="buildProperties, jbigi-list-changes" >
+        <!-- set if unset -->
+        <property name="workspace.changes.jbigi.tr" value="" />
+        <jar destfile="build/jbigi.jar" whenmanifestonly="fail" >
+            <fileset dir="installer/lib/jbigi" includes="*.so *.jnilib" />
+            <manifest>
+                <attribute name="Build-Date" value="${build.timestamp}" />
+                <attribute name="Base-Revision" value="${workspace.version}" />
+                <attribute name="Workspace-Changes" value="${workspace.changes.jbigi.tr}" />
+            </manifest>
+        </jar>
+    </target>
+
     <!-- Now system-specific jbigis in alphabetical order -->
     <target name="jbigi-freebsd-only"  depends="buildProperties, jbigi-list-changes" >
         <!-- set if unset -->
@@ -376,10 +389,14 @@
     </target>
 
     <target name="prep-script-translation" >
+        <!-- script translation added in 0.8.13, disable for now -->
+        <echo message="i2prouter script translations disabled" />
+<!--
         <ant dir="installer/resources/locale" target="bundle" />
         <copy todir="pkg-temp/locale/">
             <fileset dir="installer/resources/locale/mo/" />
         </copy>
+-->
     </target>
 
     <target name="javadoc" depends="getReleaseNumber, getBuildNumber" >
@@ -391,7 +408,7 @@
             packagenames="*"
             use="true"
             splitindex="true"
-            doctitle="I2P Javadocs for Release ${release.number} Build ${build.number}${build.extra}"
+            doctitle="I2P Javadocs for Release ${release.number} Build ${i2p.build.number}${build.extra}"
             windowtitle="I2P Anonymous Network - Java Documentation - Version ${release.number}">
             <group title="Core SDK (i2p.jar)" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.crypto:org.bouncycastle.crypto.*:gnu.crypto.*:gnu.gettext:org.xlattice.crypto.filters:com.nettgryppa.security:net.metanotion:net.metanotion.*" />
             <group title="Streaming Library" packages="net.i2p.client.streaming" />
@@ -459,7 +476,7 @@
             packagenames="*"
             use="true"
             splitindex="true"
-            doctitle="I2P Unit Test Javadocs for Release ${release.number} Build ${build.number}${build.extra}"
+            doctitle="I2P Unit Test Javadocs for Release ${release.number} Build ${i2p.build.number}${build.extra}"
             windowtitle="I2P Anonymous Network - Java Documentation - Version ${release.number}">
             <group title="Core SDK" packages="net.i2p:net.i2p.*:net.i2p.client:net.i2p.client.*:net.i2p.internal:net.i2p.internal.*:freenet.support.CPUInformation:org.bouncycastle.crypto:org.bouncycastle.crypto.*:gnu.crypto.*:gnu.gettext:org.xlattice.crypto.filters:com.nettgryppa.security:net.metanotion:net.metanotion.*" />
             <group title="Router" packages="net.i2p.router:net.i2p.router.*:net.i2p.data.i2np:org.cybergarage.*:org.freenetproject" />
@@ -519,7 +536,7 @@
             <arg value="&quot;[:space:]&quot;"/>
         </exec>
         <property name="build.temp.tr" value="??" />
-        <exec executable="cut" inputstring="${build.temp.tr}" outputproperty="build.number" failifexecutionfails="false" >
+        <exec executable="cut" inputstring="${build.temp.tr}" outputproperty="i2p.build.number" failifexecutionfails="false" >
             <arg value="-f1" />
             <arg value="-d;" />
         </exec>
@@ -528,9 +545,9 @@
             <arg value="/public final static String EXTRA/{print $2}" />
             <arg value="router/java/src/net/i2p/router/RouterVersion.java" />
         </exec>
-        <property name="build.number" value="??" />
+        <property name="i2p.build.number" value="??" />
         <property name="build.extra" value="" />
-        <echo message="Build number is ${build.number}${build.extra}" />
+        <echo message="Build number is ${i2p.build.number}${build.extra}" />
     </target>
 
     <target name="verifyReleaseBuildNumbers" depends="getReleaseNumber, getBuildNumber" >
@@ -542,10 +559,10 @@
                 </or>
             </condition>
         </fail>
-        <fail message="Non-zero build number: ${build.number}" >
+        <fail message="Non-zero build number: ${i2p.build.number}" >
             <condition>
                 <not>
-                    <equals arg1="${build.number}" arg2="0"/>
+                    <equals arg1="${i2p.build.number}" arg2="0"/>
                 </not>
             </condition>
         </fail>
@@ -660,6 +677,13 @@
     </target>
 
     <target name="preppkg" depends="preppkg-linux, preppkg-freebsd, preppkg-osx, preppkg-windows, jbigi">
+        <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
+        <copy todir="pkg-temp/lib/wrapper/solaris/">
+            <fileset dir="installer/lib/wrapper/solaris/" />
+        </copy>
+    </target>
+
+    <target name="preppkg-nowindows" depends="preppkg-linux, preppkg-freebsd, preppkg-osx, jbigi-nowindows">
         <copy file="build/jbigi.jar" todir="pkg-temp/lib" />
         <copy todir="pkg-temp/lib/wrapper/solaris/">
             <fileset dir="installer/lib/wrapper/solaris/" />
@@ -895,8 +919,8 @@
         <copy todir="pkg-temp/docs/" >
           <fileset dir="installer/resources/readme/" includes="readme*.html" />
           <fileset dir="installer/resources/proxy/" includes="*.ht" />
-          <!-- lang_ar.png added in 0.8.4; a1,a2,je, and eu.png added in 0.8.9; gg.png added in 0.8.10; im.png added in 0.8.12 -->
-	  <fileset dir="installer/resources/" includes="icons/flags/lang_ar.png icons/flags/gg.png icons/flags/je.png icons/flags/eu.png icons/flags/im.png icons/flags/a1.png icons/flags/a2.png" />
+          <!-- lang_ar.png added in 0.8.4; a1,a2,je, and eu.png added in 0.8.9; gg.png added in 0.8.10; im.png added in 0.8.12; -->
+          <fileset dir="installer/resources/" includes="icons/flags/lang_ar.png icons/flags/gg.png icons/flags/je.png icons/flags/eu.png icons/flags/im.png icons/flags/a1.png icons/flags/a2.png" />
         </copy>
     </target>
 
@@ -995,7 +1019,6 @@
         <zip destfile="i2pupdate.zip" basedir="pkg-temp" />
     </target>
 
-    <!-- script translation added in 0.8.13, so don't need updates until .14, but put it in now so we don't forget -->
     <target name="prepupdate" depends="build2, prepupdateSmall, prepConsoleDocUpdates, prepCertificates, prep-script-translation">
         <copy file="build/BOB.jar" todir="pkg-temp/lib/" />
         <copy file="build/sam.jar" todir="pkg-temp/lib/" />
@@ -1173,19 +1196,26 @@
     </target>
 
     <!-- Custom installers -->
+    <target name="installer-nowindows" depends="clean, preppkg-nowindows, getReleaseNumber, getBuildNumber, buildProperties, util-list-changes, izpack-patches" >
+        <mkdir dir="pkg-temp/installer" />
+        <!-- set if unset -->
+        <property name="workspace.changes.util.tr" value="" />
+	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${release.number}-${i2p.build.number}${build.extra}.jar" installerType="standard" basedir="${basedir}" />
+    </target>
+
 
     <target name="installer-freebsd" depends="clean, preppkg-freebsd-only, getReleaseNumber, getBuildNumber, buildProperties, util-list-changes, izpack-patches" >
         <mkdir dir="pkg-temp/installer" />
         <!-- set if unset -->
         <property name="workspace.changes.util.tr" value="" />
-	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${release.number}-${build.number}${build.extra}_freebsd-only.jar" installerType="standard" basedir="${basedir}" />
+	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${release.number}-${i2p.build.number}${build.extra}_freebsd-only.jar" installerType="standard" basedir="${basedir}" />
     </target>
 
     <target name="installer-linux" depends="clean, preppkg-linux-only, getReleaseNumber, getBuildNumber, buildProperties, util-list-changes, izpack-patches" >
         <mkdir dir="pkg-temp/installer" />
         <!-- set if unset -->
         <property name="workspace.changes.util.tr" value="" />
-	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${release.number}-${build.number}${build.extra}_linux-only.jar" installerType="standard" basedir="${basedir}" />
+	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${release.number}-${i2p.build.number}${build.extra}_linux-only.jar" installerType="standard" basedir="${basedir}" />
     </target>
 
 
@@ -1194,7 +1224,7 @@
 	<mkdir dir="pkg-temp/osx" />
         <!-- set if unset -->
         <property name="workspace.changes.util.tr" value="" />
-	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${release.number}-${build.number}${build.extra}_osx-only.jar" installerType="standard" basedir="${basedir}" />
+	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${release.number}-${i2p.build.number}${build.extra}_osx-only.jar" installerType="standard" basedir="${basedir}" />
 	<ant target="installer2app" />
 	<delete dir="pkg-temp/osx" />
     </target>
@@ -1207,21 +1237,21 @@
 	<mkdir dir="pkg-temp/osx" />
 	<exec executable="python" failonerror="true">
 	    <arg value="${user.home}/IzPack/utils/wrappers/izpack2app/izpack2app.py" />
-	    <arg value="${basedir}/i2pinstall_${release.number}-${build.number}${build.extra}_osx-only.jar" />
-	    <arg value="${basedir}/pkg-temp/osx/i2p-${release.number}-${build.number}${build.extra}_osx-install.app" />
+	    <arg value="${basedir}/i2pinstall_${release.number}-${i2p.build.number}${build.extra}_osx-only.jar" />
+	    <arg value="${basedir}/pkg-temp/osx/i2p-${release.number}-${i2p.build.number}${build.extra}_osx-install.app" />
 	</exec>
 	<exec executable="chmod" failonerror="true" osfamily="unix">
 		<arg value="755" />
-		<arg value="${basedir}/pkg-temp/osx/i2p-${release.number}-${build.number}${build.extra}_osx-install.app/Contents/MacOS/JavaApplicationStub" />
+		<arg value="${basedir}/pkg-temp/osx/i2p-${release.number}-${i2p.build.number}${build.extra}_osx-install.app/Contents/MacOS/JavaApplicationStub" />
 	</exec>
 	<exec executable="tar" osfamily="unix" failonerror="true">
 		<arg value="--owner=root" />
 		<arg value="--group=root" />
 		<arg value="-cjvf" />
-		<arg value="${basedir}/i2pinstall_${release.number}-${build.number}${build.extra}_osx.tar.bz2" />
+		<arg value="${basedir}/i2pinstall_${release.number}-${i2p.build.number}${build.extra}_osx.tar.bz2" />
 		<arg value="-C" />
 		<arg value="${basedir}/pkg-temp/osx" />
-		<arg value="i2p-${release.number}-${build.number}${build.extra}_osx-install.app" />
+		<arg value="i2p-${release.number}-${i2p.build.number}${build.extra}_osx-install.app" />
 	</exec>
     </target>
 
@@ -1256,7 +1286,7 @@
                 <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
             </manifest>
         </jar>
-	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${release.number}-${build.number}${build.extra}_windows-only.jar" installerType="standard" basedir="${basedir}" />
+	<izpack input="${basedir}/installer/install.xml" output="${basedir}/i2pinstall_${release.number}-${i2p.build.number}${build.extra}_windows-only.jar" installerType="standard" basedir="${basedir}" />
 	<delete dir="pkg-temp/win" />
     </target>
 

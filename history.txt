@@ -1,3 +1,24 @@
+* 2012-02-27 0.8.13 released
+
+2012-02-22 kytv
+  * Updated German, Italian, Spanish, Swedish, and Ukrainian translations
+    from Transifex.
+
+2012-02-22 zzz
+  * ExploratoryPeerSelector: Use fast peers if hidden for
+    inbound tunnels to improve success
+  * NetDB:
+    - Don't publish our RI if it has no addresses
+    - Publish our RI sooner after startup
+      to facilitate our IB tunnel builds
+
+2012-02-20 zzz
+  * i2ptunnel:
+    - Fix streamr session registration
+    - Don't delete privkey file for a non-persistent client tunnel
+      (ticket #599)
+  * Streaming: Fix race NPE (thx echelon)
+
 2012-02-17 zzz
   * i2psnark: Escape fixes
   * netdb.jsp: Fix debug median calculation

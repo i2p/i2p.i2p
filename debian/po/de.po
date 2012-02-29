@@ -3,20 +3,22 @@
 # This file is distributed under the same license as the i2p package.
 #
 # Translators:
-# mixxy <m1xxy@mail.i2p>, 2011
-#
+# D.A. Loader <>, 2012.
+# mixxy <m1xxy@mail.i2p>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: I2P\n"
 "Report-Msgid-Bugs-To: https://trac.i2p2.de/\n"
 "POT-Creation-Date: 2011-12-27 22:25+0000\n"
-"PO-Revision-Date: 2011-07-20 04:30+0100\n"
-"Last-Translator: mixxy <m1xxy@mail.i2p>\n"
-"Language-Team: de\n"
+"PO-Revision-Date: 2012-02-19 11:22+0000\n"
+"Last-Translator: D.A. Loader <>\n"
+"Language-Team: German (http://www.transifex.net/projects/p/I2P/language/"
+"de/)\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 #. Type: boolean
 #. Description
@@ -57,24 +59,24 @@ msgstr ""
 #. Type: string
 #. Description
 #: ../i2p.templates:3001
-#, fuzzy
-#| msgid "Very important: The account specified here *MUST* already exist."
 msgid ""
 "Very important: If a user other than the default of 'i2psvc' is entered "
 "here, the chosen username *MUST* already exist."
-msgstr "WICHTIG; Der hier angegebene Benutzer *MUSS* bereits existieren!"
+msgstr ""
+"Achtung: Wenn etwas anderes als das Standartmäßige 'i2psvc' hier "
+"eingetrangen ist, musst du einen Benutzernamen angeben der schon existiert !"
 
 #. Type: string
 #. Description
 #: ../i2p.templates:4001
 msgid "Memory that can be allocated to I2P:"
-msgstr ""
+msgstr "Arbeitsspeicher der I2P zugewiesen werden darf:"
 
 #. Type: string
 #. Description
 #: ../i2p.templates:4001
 msgid "By default, I2P will only be allowed to use up to 128MB of RAM."
-msgstr ""
+msgstr "Standartmäßig kann I2P bist zu 128 MB RAM belegen."
 
 #. Type: string
 #. Description
@@ -83,3 +85,5 @@ msgid ""
 "High bandwidth routers, as well as routers with a lot of active torrents / "
 "plugins, may need to have this value increased."
 msgstr ""
+"Router mit hoher Bandbreite, sowie vielen aktiven Torrents oder Plugins, "
+"müssen gegebenenfalls diesen Wert erhöhen."

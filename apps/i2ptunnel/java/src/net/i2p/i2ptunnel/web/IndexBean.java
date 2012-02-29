@@ -342,7 +342,8 @@ public class IndexBean {
         String pk = cur.getPrivKeyFile();
         if (pk == null)
             pk = _privKeyFile;
-        if (pk != null && pk.startsWith("i2ptunnel") && pk.endsWith("-privKeys.dat")) {
+        if (pk != null && pk.startsWith("i2ptunnel") && pk.endsWith("-privKeys.dat") &&
+            ((!isClient(cur.getType())) || cur.getPersistentClientKey())) {
             File pkf = new File(_context.getConfigDir(), pk);
             if (pkf.exists()) {
                 String name = cur.getName();
