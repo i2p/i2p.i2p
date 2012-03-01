@@ -108,7 +108,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
          "That I2P Destination was not found. Perhaps you pasted in the "+
          "wrong BASE64 I2P Destination or the link you are following is "+
          "bad. The host (or the WWW proxy, if you're using one) could also "+
-     "be temporarily offline.  You may want to <b>retry</b>.  "+
+         "be temporarily offline.  You may want to <b>retry</b>.  "+
          "Could not find the following Destination:<BR><BR><div>")
         .getBytes();
 
@@ -438,7 +438,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                     protocol = requestURI.getScheme();
                     host = requestURI.getHost();
                     if (protocol == null || host == null) {
-                        _log.warn(request);
+                        _log.warn("Null protocol or host: " + request);
                         method = null;
                         break;
                     }
@@ -475,8 +475,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                             destination = dest;
                             host = getHostName(destination);
                             targetRequest = requestURI.toASCIIString();
-                            String newPath = dest.substring(slash);
-                            String newURI = requestURI.getRawPath();
+                            String newURI = oldPath.substring(slash);
                             String query = requestURI.getRawQuery();
                             if (query != null)
                                 newURI += '?' + query;
@@ -489,7 +488,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                                 break;
                             }
                         } else {
-                            _log.warn(request);
+                            _log.warn("Bad http://i2p/b64dest " + request);
                             host = null;
                             break;
                         }
@@ -501,6 +500,8 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
 
                         if (requestURI.getPort() >= 0) {
                             // TODO support I2P ports someday
+                            //if (port >= 0)
+                            //    host = host + ':' + port;
                             if (_log.shouldLog(Log.WARN))
                                 _log.warn(getPrefix(requestId) + "Removing port from [" + request + "]");
                             try {
@@ -651,8 +652,9 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         }
                         s.close();
                         return;
-                    } else if (host.indexOf(".") != -1) {
-                        host = host + ":" + port;
+                    } else if (host.contains(".") || host.startsWith("[")) {
+                        if (port >= 0)
+                            host = host + ':' + port;
                         // The request must be forwarded to a WWW proxy
                         if (_log.shouldLog(Log.DEBUG))
                             _log.debug("Before selecting outproxy for " + host);
@@ -679,12 +681,15 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         // what is left for here? a hostname with no dots, and != "i2p"
                         // and not a destination ???
                         // Perhaps something in privatehosts.txt ...
+                        // Rather than look it up, just bail out.
                         if (_log.shouldLog(Log.WARN))
                             _log.warn("NODOTS, NOI2P: " + request);
-                        destination = requestURI.getHost();
-                        host = getHostName(destination);
-                        targetRequest = requestURI.toASCIIString();
-                        // FIXME treat as I2P or not???
+                        if (out != null) {
+                            out.write(getErrorPage("denied", ERR_REQUEST_DENIED));
+                            writeFooter(out);
+                        }
+                        s.close();
+                        return;
                     }   // end host name processing
 
                     boolean isValid = usingWWWProxy || usingInternalServer || isSupportedAddress(host, protocol);
@@ -854,9 +859,16 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             String addressHelper = addressHelpers.get(destination.toLowerCase(Locale.US));
             if (addressHelper != null) {
                 clientDest = _context.namingService().lookup(addressHelper);
-                // remove bad entries
-                if (clientDest == null)
+                if (clientDest == null) {
+                    // remove bad entries
                     addressHelpers.remove(destination.toLowerCase(Locale.US));
+                    if (_log.shouldLog(Log.WARN))
+                        _log.warn(getPrefix(requestId) + "Could not find destination for " + addressHelper);
+                    byte[] header = getErrorPage("ahelper-notfound", ERR_AHELPER_NOTFOUND);
+                    writeErrorMessage(header, out, targetRequest, false, destination, null);
+                    s.close();
+                    return;
+                }
             } else if ("i2p".equals(host)) {
                 clientDest = null;
             } else if (destination.length() == 60 && destination.toLowerCase(Locale.US).endsWith(".b32.i2p")) {
