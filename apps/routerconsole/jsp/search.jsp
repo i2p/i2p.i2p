@@ -1,5 +1,10 @@
 <%@page contentType="text/html"%>
 <%@page pageEncoding="UTF-8"%>
+<%
+   // http://www.crazysquirrel.com/computing/general/form-encoding.jspx
+   if (request.getCharacterEncoding() == null)
+       request.setCharacterEncoding("UTF-8");
+%>
 <jsp:useBean class="net.i2p.router.web.SearchHelper" id="searchhelper" scope="request" />
 <jsp:setProperty name="searchhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <jsp:setProperty name="searchhelper" property="engine" value="<%=request.getParameter("engine")%>" />
