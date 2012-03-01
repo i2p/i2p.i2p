@@ -46,7 +46,7 @@
     <input name ="udpHost1" type="text" size="16" value="<jsp:getProperty name="nethelper" property="udphostname" />" >
     <% String[] ips = nethelper.getAddresses();
        if (ips.length > 0) {
-           out.print(intl._("or") + " <select name=\"udpHost2\"><option value=\"\" selected=\"true\">"+intl._("Select Interface")+"</option>\n");
+           out.print(intl._("or") + " <select name=\"udpHost2\"><option value=\"\" selected=\"selected\">"+intl._("Select Interface")+"</option>\n");
            for (int i = 0; i < ips.length; i++) {
                out.print("<option value=\"");
                out.print(ips[i]);

@@ -1,3 +1,15 @@
+i2p (0.8.13-1) stable; urgency=low
+
+  * New upstream version 0.8.13
+  * Packages are compressed with bzip2
+  * Remove debian/patches/0005-EepGet_correct_status.patch
+  * Bump standards version to 3.9.3 (no changes to source needed)
+  * Debconf:
+    - New Czech language translation
+    - Updated German, Polish, Russian, and Ukrainian translations
+
+ -- Kill Your TV <killyourtv@i2pmail.org>  Mon, 27 Feb 2012 21:06:56 +0000
+
 i2p (0.8.12-2) stable; urgency=low
 
   * postinst: Don't fail if the i2psvc group doesn't exist
