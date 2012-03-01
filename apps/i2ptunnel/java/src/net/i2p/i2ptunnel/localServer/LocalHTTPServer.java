@@ -67,12 +67,13 @@ public abstract class LocalHTTPServer {
      *  uncaught vulnerabilities.
      *  Restrict to the /themes/ directory for now.
      *
-     *  @param targetRequest "proxy.i2p/themes/foo.png HTTP/1.1"
+     *  @param targetRequest decoded path only, non-null
+     *  @param query raw (encoded), may be null
      */
-    public static void serveLocalFile(OutputStream out, String method, String targetRequest, String proxyNonce) {
+    public static void serveLocalFile(OutputStream out, String method, String targetRequest, String query, String proxyNonce) {
         //System.err.println("targetRequest: \"" + targetRequest + "\"");
         // a home page message for the curious...
-        if (targetRequest.startsWith(I2PTunnelHTTPClient.LOCAL_SERVER + "/ ")) {
+        if (targetRequest.equals("/")) {
             try {
                 out.write(("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nCache-Control: max-age=86400\r\n\r\nI2P HTTP proxy OK").getBytes());
                 out.flush();
@@ -80,12 +81,11 @@ public abstract class LocalHTTPServer {
             return;
         }
         if ((method.equals("GET") || method.equals("HEAD")) &&
-            targetRequest.startsWith(I2PTunnelHTTPClient.LOCAL_SERVER + "/themes/") &&
+            targetRequest.startsWith("/themes/") &&
             !targetRequest.contains("..")) {
-            int space = targetRequest.indexOf(' ');
             String filename = null;
             try {
-                filename = targetRequest.substring(I2PTunnelHTTPClient.LOCAL_SERVER.length() + 8, space); // "/themes/".length
+                filename = targetRequest.substring(8); // "/themes/".length
             } catch (IndexOutOfBoundsException ioobe) {
                  return;
             }
@@ -118,10 +118,9 @@ public abstract class LocalHTTPServer {
         // Add to addressbook (form submit)
         // Parameters are url, host, dest, nonce, and master | router | private.
         // Do the add and redirect.
-        if (targetRequest.startsWith(I2PTunnelHTTPClient.LOCAL_SERVER + "/add?")) {
-            int spc = targetRequest.indexOf(' ');
-            String query = targetRequest.substring(I2PTunnelHTTPClient.LOCAL_SERVER.length() + 5, spc);   // "/add?".length()
+        if (targetRequest.equals("/add")) {
             Map<String, String> opts = new HashMap(8);
+            // this only works if all keys are followed by =value
             StringTokenizer tok = new StringTokenizer(query, "=&;");
             while (tok.hasMoreTokens()) {
                 String k = tok.nextToken();
@@ -207,7 +206,7 @@ public abstract class LocalHTTPServer {
      *  Decode %xx encoding
      *  @since 0.8.7
      */
-    private static String decode(String s) {
+    public static String decode(String s) {
         if (!s.contains("%"))
             return s;
         StringBuilder buf = new StringBuilder(s.length());
