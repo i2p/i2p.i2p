@@ -1,6 +1,10 @@
 <%
     // NOTE: Do the header carefully so there is no whitespace before the <?xml... line
 
+    // http://www.crazysquirrel.com/computing/general/form-encoding.jspx
+    if (request.getCharacterEncoding() == null)
+        request.setCharacterEncoding("UTF-8");
+
 %><%@page pageEncoding="UTF-8"
 %><%@page contentType="text/html" import="net.i2p.i2ptunnel.web.EditBean"
 %><?xml version="1.0" encoding="UTF-8"?>
