@@ -546,6 +546,7 @@
     </target>
 
     <target name="verifyReleaseBuildNumbers" depends="getReleaseNumber, getBuildNumber" >
+        <echo message="SDK: ${java.vendor} ${java.version} (${java.runtime.name} ${java.runtime.version})" />
         <fail message="Bad release number: ${release.number}" >
             <condition>
                 <or>
