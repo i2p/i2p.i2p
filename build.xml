@@ -166,6 +166,7 @@
             <zipfileset src="apps/jrobin/jrobin-1.5.9.1.jar"
                         excludes="org/jrobin/cmd/ org/jrobin/convertor/ org/jrobin/inspector/" />
             <manifest>
+                <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
 	    </manifest>
@@ -241,6 +242,7 @@
             <manifest>
 	     <attribute name="Main-Class" value="net.i2p.router.RouterLaunch" />
 	     <attribute name="Class-Path" value="lib/i2p.jar lib/router.jar lib/jbigi.jar lib/BOB.jar lib/sam.jar lib/mstreaming.jar lib/streaming.jar lib/routerconsole.jar lib/i2ptunnel.jar lib/org.mortbay.jetty.jar lib/javax.servlet.jar lib/jasper-compiler.jar lib/jasper-runtime.jar lib/commons-logging.jar lib/commons-el.jar lib/wrapper.jar lib/systray.jar lib/systray4j.jar lib/desktopgui.jar" />
+             <attribute name="Built-By" value="${build.built-by}" />
              <attribute name="Build-Date" value="${build.timestamp}" />
              <attribute name="Base-Revision" value="${workspace.version}" />
 	    </manifest>
@@ -291,6 +293,7 @@
         <jar destfile="build/jbigi.jar" whenmanifestonly="fail" >
             <fileset dir="installer/lib/jbigi" includes="*.so *.dll *.jnilib" />
             <manifest>
+                <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.jbigi.tr}" />
@@ -304,6 +307,7 @@
         <jar destfile="build/jbigi.jar" whenmanifestonly="fail" >
             <fileset dir="installer/lib/jbigi" includes="*.so *.jnilib" />
             <manifest>
+                <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.jbigi.tr}" />
@@ -318,6 +322,7 @@
         <jar destfile="build/jbigi.jar"  whenmanifestonly="fail" >
             <fileset dir="installer/lib/jbigi" includes="*freebsd*.so" />
             <manifest>
+                <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.jbigi.tr}" />
@@ -331,6 +336,7 @@
         <jar destfile="build/jbigi.jar"  whenmanifestonly="fail" >
             <fileset dir="installer/lib/jbigi" includes="*linux*.so" />
             <manifest>
+                <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.jbigi.tr}" />
@@ -344,6 +350,7 @@
         <jar destfile="build/jbigi.jar"  whenmanifestonly="fail" >
             <fileset dir="installer/lib/jbigi" includes="*linux-arm*.so,*linux-ppc*.so" />
             <manifest>
+                <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.jbigi.tr}" />
@@ -357,6 +364,7 @@
         <jar destfile="build/jbigi.jar"  whenmanifestonly="fail" >
             <fileset dir="installer/lib/jbigi" includes="*.jnilib" />
             <manifest>
+                <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.jbigi.tr}" />
@@ -370,6 +378,7 @@
         <jar destfile="build/jbigi.jar" whenmanifestonly="fail" >
             <fileset dir="installer/lib/jbigi" includes="*windows*.dll" />
             <manifest>
+                <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.jbigi.tr}" />
@@ -1120,6 +1129,7 @@
         <jar destfile="./pkg-temp/installer/copy.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Copy.class net/i2p/util/FileUtil.class">
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.util.Copy" />
+                <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
@@ -1128,6 +1138,7 @@
         <jar destfile="./pkg-temp/installer/delete.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Delete.class net/i2p/util/FileUtil.class">
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.util.Delete" />
+                <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
@@ -1136,6 +1147,7 @@
         <jar destfile="./pkg-temp/installer/exec.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Exec.class">
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.util.Exec" />
+                <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
@@ -1235,6 +1247,7 @@
         <jar destfile="./pkg-temp/installer/copy.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Copy.class net/i2p/util/FileUtil.class">
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.util.Copy" />
+                <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
@@ -1243,6 +1256,7 @@
         <jar destfile="./pkg-temp/installer/delete.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Delete.class net/i2p/util/FileUtil.class">
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.util.Delete" />
+                <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
@@ -1251,6 +1265,7 @@
         <jar destfile="./pkg-temp/installer/exec.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Exec.class">
             <manifest>
                 <attribute name="Main-Class" value="net.i2p.util.Exec" />
+                <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
                 <attribute name="Base-Revision" value="${workspace.version}" />
                 <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
