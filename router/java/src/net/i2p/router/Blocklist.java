@@ -781,7 +781,7 @@ public class Blocklist {
         Set<Integer> singles = new TreeSet();
         singles.addAll(_singleIPBlocklist);
         if (!singles.isEmpty()) {
-            out.write("<table><tr><th align=center colspan=2><b>");
+            out.write("<table><tr><th align=\"center\" colspan=\"2\"><b>");
             out.write(_("IPs Banned Until Restart"));
             out.write("</b></td></tr>");
             // first 0 - 127
@@ -789,27 +789,27 @@ public class Blocklist {
                  int ip = ii.intValue();
                  if (ip < 0)
                      continue;
-                 out.write("<tr><td align=center width=50%>");
+                 out.write("<tr><td align=\"center\" width=\"50%\">");
                  out.write(toStr(ip));
-                 out.write("</td><td width=50%>&nbsp;</td></tr>\n");
+                 out.write("</td><td width=\"50%\">&nbsp;</td></tr>\n");
             }
             // then 128 - 255
             for (Integer ii : singles) {
                  int ip = ii.intValue();
                  if (ip >= 0)
                      break;
-                 out.write("<tr><td align=center width=50%>");
+                 out.write("<tr><td align=\"center\" width=\"50%\">");
                  out.write(toStr(ip));
-                 out.write("</td><td width=50%>&nbsp;</td></tr>\n");
+                 out.write("</td><td width=\"50%\">&nbsp;</td></tr>\n");
             }
             out.write("</table>");
         }
         if (_blocklistSize > 0) {
-            out.write("<table><tr><th align=center colspan=2><b>");
+            out.write("<table><tr><th align=\"center\" colspan=\"2\"><b>");
             out.write(_("IPs Permanently Banned"));
-            out.write("</b></th></tr><tr><td align=center width=50%><b>");
+            out.write("</b></th></tr><tr><td align=\"center\" width=\"50%\"><b>");
             out.write(_("From"));
-            out.write("</b></td><td align=center width=50%><b>");
+            out.write("</b></td><td align=\"center\" width=\"50%\"><b>");
             out.write(_("To"));
             out.write("</b></td></tr>");
             int max = Math.min(_blocklistSize, MAX_DISPLAY);
@@ -819,7 +819,7 @@ public class Blocklist {
                  int from = getFrom(_blocklist[i]);
                  if (from < 0)
                      continue;
-                 out.write("<tr><td align=center width=50%>"); out.write(toStr(from)); out.write("</td><td align=center width=50%>");
+                 out.write("<tr><td align=\"center\" width=\"50%\">"); out.write(toStr(from)); out.write("</td><td align=\"center\" width=\"50%\">");
                  int to = getTo(_blocklist[i]);
                  if (to != from) {
                      out.write(toStr(to)); out.write("</td></tr>\n");
@@ -832,7 +832,7 @@ public class Blocklist {
                  int from = getFrom(_blocklist[i]);
                  if (from >= 0)
                      break;
-                 out.write("<tr><td align=center width=50%>"); out.write(toStr(from)); out.write("</td><td align=center width=50%>");
+                 out.write("<tr><td align=\"center\" width=\"50%\">"); out.write(toStr(from)); out.write("</td><td align=\"center\" width=\"50%\">");
                  int to = getTo(_blocklist[i]);
                  if (to != from) {
                      out.write(toStr(to)); out.write("</td></tr>\n");

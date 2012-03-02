@@ -1554,7 +1554,7 @@ public class I2PSnarkServlet extends Default {
         }
         out.write("<tr><td>");
         out.write(_("I2CP options"));
-        out.write(": <td><textarea name=\"i2cpOpts\" cols=\"60\" rows=\"1\" style=\"whitespace:nowrap\" spellcheck=\"false\" >"
+        out.write(": <td><textarea name=\"i2cpOpts\" cols=\"60\" rows=\"1\" wrap=\"off\" spellcheck=\"false\" >"
                   + opts.toString() + "</textarea><br>\n" +
 
                   "<tr><td>&nbsp;<td><input type=\"submit\" class=\"accept\" value=\"");

@@ -122,7 +122,7 @@
 <td><%=addr.getNotes()%></td>
 </tr><tr class="list${book.trClass}">
 <td><%=intl._("Destination")%></td>
-<td class="destinations"><textarea rows="1" style="height:3em;whitespace:nowrap" cols="70" readonly="readonly" ><%=addr.getDestination()%></textarea></td>
+<td class="destinations"><textarea rows="1" style="height:3em;" wrap="off" cols="70" readonly="readonly" ><%=addr.getDestination()%></textarea></td>
 </tr></table>
 </div>
 <div id="buttons">
