@@ -1604,7 +1604,7 @@ public class I2PSnarkServlet extends Default {
                    "<td align=\"left\"><input type=\"text\" size=\"16\" name=\"tname\"></td>" +
                    "<td align=\"left\"><input type=\"text\" size=\"40\" name=\"thurl\"></td>" +
                    "<td align=\"left\"><input type=\"text\" size=\"40\" name=\"taurl\"></td></tr>\n" +
-                   "<td colspan=\"2\"></td><td colspan=\"2\" align=\"left\">\n" +
+                   "<tr><td colspan=\"2\"></td><td colspan=\"2\" align=\"left\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"default\" value=\"").append(_("Add tracker")).append("\">\n" +
                    "<input type=\"submit\" name=\"taction\" class=\"delete\" value=\"").append(_("Delete selected")).append("\">\n" +
                    // "<input type=\"reset\" class=\"cancel\" value=\"").append(_("Cancel")).append("\">\n" +

@@ -76,7 +76,7 @@ function toggleAll(category)
  <h3><%=intl._("Configure I2P Stat Collection")%></h3>
  <p><%=intl._("Enable full stats?")%>
  <input type="checkbox" class="optbox" name="isFull" value="true" <%
- if (statshelper.getIsFull()) { %>checked="true" <% } %> >
+ if (statshelper.getIsFull()) { %>checked="checked" <% } %> >
  (<%=intl._("change requires restart to take effect")%>)<br>
 <%
 
@@ -122,7 +122,7 @@ Warning - Log with care, stat file grows without limit.<br>
 %>   <td align="center">
      <a name="<%=statshelper.getCurrentStatName()%>"></a>
      <input type="checkbox" class="optbox <%=statshelper.getCurrentGroupName()%>" name="statList" value="<%=statshelper.getCurrentStatName()%>" <%
-     if (statshelper.getCurrentIsLogged()) { %>checked="true" <% } %> ></td>
+     if (statshelper.getCurrentIsLogged()) { %>checked="checked" <% } %> ></td>
 <%
 
   }  // shouldShowLog
@@ -130,7 +130,7 @@ Warning - Log with care, stat file grows without limit.<br>
 %>   <td align="center">
      <% if (statshelper.getCurrentCanBeGraphed()) { %>
        <input type="checkbox" class="optbox <%=statshelper.getCurrentGroupName()%>" name="graphList" value="<%=statshelper.getCurrentGraphName()%>" <%
-       if (statshelper.getCurrentIsGraphed()) { %>checked="true" <% } %> ><% } %></td>
+       if (statshelper.getCurrentIsGraphed()) { %>checked="checked" <% } %> ><% } %></td>
      <td align="left"><b><%=statshelper.getCurrentStatName()%>:</b><br>
      <%=statshelper.getCurrentStatDescription()%></td></tr><%
     } // end iterating over all stats

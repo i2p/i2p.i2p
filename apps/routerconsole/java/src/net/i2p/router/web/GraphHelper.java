@@ -341,8 +341,8 @@ public class GraphHelper extends FormHandler {
                        "<input type=\"hidden\" name=\"action\" value=\"foo\">\n" +
                        "<input type=\"hidden\" name=\"nonce\" value=\"" + nonce + "\" >\n");
             _out.write(_("Periods") + ": <input size=\"5\" style=\"text-align: right;\" type=\"text\" name=\"periodCount\" value=\"" + _periodCount + "\"><br>\n");
-            _out.write(_("Plot averages") + ": <input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"false\" " + (_showEvents ? "" : "checked=\"true\" ") + "> ");
-            _out.write(_("or")+ " " +_("plot events") + ": <input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"true\" "+ (_showEvents ? "checked=\"true\" " : "") + "><br>\n");
+            _out.write(_("Plot averages") + ": <input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"false\" " + (_showEvents ? "" : "checked=\"checked\" ") + "> ");
+            _out.write(_("or")+ " " +_("plot events") + ": <input type=\"radio\" class=\"optbox\" name=\"showEvents\" value=\"true\" "+ (_showEvents ? "checked=\"checked\" " : "") + "><br>\n");
             _out.write(_("Image sizes") + ": " + _("width") + ": <input size=\"4\" style=\"text-align: right;\" type=\"text\" name=\"width\" value=\"" + _width 
                        + "\"> " + _("pixels") + ", " + _("height") + ": <input size=\"4\" style=\"text-align: right;\" type=\"text\" name=\"height\" value=\"" + _height  
                        + "\"> " + _("pixels") + "<br>\n");
@@ -352,7 +352,7 @@ public class GraphHelper extends FormHandler {
                 _out.write(Integer.toString(times[i]));
                 _out.write("\"");
                 if (times[i] == _refreshDelaySeconds)
-                    _out.write(" selected=\"true\"");
+                    _out.write(" selected=\"selected\"");
                 _out.write(">");
                 if (times[i] > 0)
                     _out.write(DataHelper.formatDuration2(times[i] * 1000));
@@ -365,7 +365,7 @@ public class GraphHelper extends FormHandler {
                        " <input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"persistent\"");
             boolean persistent = _context.getBooleanPropertyDefaultTrue(SummaryListener.PROP_PERSISTENT);
             if (persistent)
-                _out.write(" checked=\"true\"");
+                _out.write(" checked=\"checked\"");
             _out.write(">" +
                        "<hr><div class=\"formaction\"><input type=\"submit\" class=\"acceot\" value=\"" + _("Save settings and redraw graphs") + "\"></div></form>");
         } catch (IOException ioe) {
