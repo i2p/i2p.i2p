@@ -1446,7 +1446,7 @@ public class I2PSnarkServlet extends Default {
             out.write(Integer.toString(times[i]));
             out.write("\"");
             if (times[i] == delay)
-                out.write(" selected=\"true\"");
+                out.write(" selected=\"selected\"");
             out.write(">");
             if (times[i] > 0)
                 out.write(DataHelper.formatDuration2(times[i] * 1000));
@@ -1469,15 +1469,15 @@ public class I2PSnarkServlet extends Default {
 /*
         out.write("Seed percentage: <select name=\"seedPct\" disabled=\"true\" >\n\t");
         if (seedPct <= 0)
-            out.write("<option value=\"0\" selected=\"true\">Unlimited</option>\n\t");
+            out.write("<option value=\"0\" selected=\"selected\">Unlimited</option>\n\t");
         else
             out.write("<option value=\"0\">Unlimited</option>\n\t");
         if (seedPct == 100)
-            out.write("<option value=\"100\" selected=\"true\">100%</option>\n\t");
+            out.write("<option value=\"100\" selected=\"selected\">100%</option>\n\t");
         else
             out.write("<option value=\"100\">100%</option>\n\t");
         if (seedPct == 150)
-            out.write("<option value=\"150\" selected=\"true\">150%</option>\n\t");
+            out.write("<option value=\"150\" selected=\"selected\">150%</option>\n\t");
         else
             out.write("<option value=\"150\">150%</option>\n\t");
         out.write("</select><br>\n");
@@ -1554,7 +1554,7 @@ public class I2PSnarkServlet extends Default {
         }
         out.write("<tr><td>");
         out.write(_("I2CP options"));
-        out.write(": <td><textarea name=\"i2cpOpts\" cols=\"60\" rows=\"1\" wrap=\"off\" spellcheck=\"false\" >"
+        out.write(": <td><textarea name=\"i2cpOpts\" cols=\"60\" rows=\"1\" style=\"whitespace:nowrap\" spellcheck=\"false\" >"
                   + opts.toString() + "</textarea><br>\n" +
 
                   "<tr><td>&nbsp;<td><input type=\"submit\" class=\"accept\" value=\"");
@@ -1715,7 +1715,7 @@ public class I2PSnarkServlet extends Default {
         for (int i = min; i <= max; i++) {
             buf.append("<option value=\"").append(i).append("\" ");
             if (i == now)
-                buf.append("selected=\"true\" ");
+                buf.append("selected=\"selected\" ");
             // constants to prevent tagging
             buf.append(">").append(ngettext(DUMMY1 + name, DUMMY0 + name + 's', i));
             buf.append("</option>\n");
