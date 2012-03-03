@@ -81,4 +81,4 @@ input.default {
   <input type="submit" name="action" class="add" value="<%=intl._("Add item")%>" >
  </div>
 </form>
-</div></div></body></html>
+</div></body></html>

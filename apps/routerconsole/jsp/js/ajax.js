@@ -25,8 +25,7 @@ function ajaxDone(url, target, refresh) {
       document.getElementById(target).innerHTML = results;
       //document.getElementsbyClassName("hideifdown").style.display="block";
     } else {
-      // TODO take from a translated variable
-      document.getElementById(target).innerHTML="<b>Router is down</b>";
+      document.getElementById(target).innerHTML = failMessage;
       //document.getElementByClassName("hideifdown").style.display="none";
     }
     setTimeout(function() {ajax(url, target, refresh);}, refresh);

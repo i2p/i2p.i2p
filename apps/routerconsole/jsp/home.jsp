@@ -6,8 +6,9 @@
 <%=intl.title("home")%>
 <script src="/js/ajax.js" type="text/javascript"></script>
 <script type="text/javascript">
+  var failMessage = "<b><%=intl._("Router is down")%></b>";
   function requestAjax1() { ajax("/xhr1.jsp", "xhr", 15000); }
-  function initAjax() { setInterval(requestAjax1, 15000);  }
+  function initAjax() { setTimeout(requestAjax1, 15000);  }
 </script>
 </head><body onload="initAjax()">
 <%
