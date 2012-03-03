@@ -355,11 +355,11 @@
                 </label>
                 <table border="0"><tr><!-- I give up -->
                 <td><input value="1" type="radio" id="startOnLoad" name="newDest" title="New Destination"
-                     <%=(editBean.getNewDest(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" />                
-                <td><%=intl._("Enable")%>
+                     <%=(editBean.getNewDest(curTunnel) ? " checked=\"checked\"" : "")%> class="tickbox" /></td>
+                <td><%=intl._("Enable")%></td>
                 <td><input value="0" type="radio" id="startOnLoad" name="newDest" title="New Destination"
-                     <%=(editBean.getNewDest(curTunnel) || editBean.getPersistentClientKey(curTunnel) ? "" : " checked=\"checked\"")%> class="tickbox" />                
-                <td><%=intl._("Disable")%>
+                     <%=(editBean.getNewDest(curTunnel) || editBean.getPersistentClientKey(curTunnel) ? "" : " checked=\"checked\"")%> class="tickbox" /></td>
+                <td><%=intl._("Disable")%></td></tr>
                 </table>
             </div>
             <div id="portField" class="rowItem">
