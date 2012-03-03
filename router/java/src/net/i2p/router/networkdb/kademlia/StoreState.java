@@ -14,15 +14,15 @@ import net.i2p.data.Hash;
 import net.i2p.router.RouterContext;
 
 /**
- *
+ *  Tracks the state of a StoreJob
  */
 class StoreState {
-    private RouterContext _context;
-    private Hash _key;
-    private DatabaseEntry _data;
+    private final RouterContext _context;
+    private final Hash _key;
+    private final DatabaseEntry _data;
     private final HashSet<Hash> _pendingPeers;
-    private Map<Hash, Long> _pendingPeerTimes;
-    private Map<Hash, MessageWrapper.WrappedMessage> _pendingMessages;
+    private final Map<Hash, Long> _pendingPeerTimes;
+    private final Map<Hash, MessageWrapper.WrappedMessage> _pendingMessages;
     private final HashSet<Hash> _successfulPeers;
     //private final HashSet<Hash> _successfulExploratoryPeers;
     private final HashSet<Hash> _failedPeers;

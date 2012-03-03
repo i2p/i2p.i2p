@@ -14,6 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import net.i2p.I2PAppContext;
 import net.i2p.crypto.SHA256Generator;
 import net.i2p.util.Log;
 
@@ -23,7 +24,6 @@ import net.i2p.util.Log;
  * @author jrandom
  */
 public abstract class DataStructureImpl implements DataStructure {
-    private final static Log _log = new Log(DataStructureImpl.class);
     
     public String toBase64() {
         byte data[] = toByteArray();
@@ -48,10 +48,12 @@ public abstract class DataStructureImpl implements DataStructure {
             writeBytes(baos);
             return baos.toByteArray();
         } catch (IOException ioe) {
-            _log.error("Error writing out the byte array", ioe);
+            Log log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
+            log.error("Error writing out the byte array", ioe);
             return null;
         } catch (DataFormatException dfe) {
-            _log.error("Error writing out the byte array", dfe);
+            Log log = I2PAppContext.getGlobalContext().logManager().getLog(getClass());
+            log.error("Error writing out the byte array", dfe);
             return null;
         }
     }

@@ -80,7 +80,7 @@ public class ConfigLoggingHelper extends HelperBase {
             String l = levels[i];
             buf.append("<option value=\"").append(l).append('\"');
             if (l.equals(cur))
-                buf.append(" selected=\"true\"");
+                buf.append(" selected=\"selected\"");
             buf.append('>').append(_(l)).append("</option>\n");
         }        
         
@@ -121,7 +121,7 @@ public class ConfigLoggingHelper extends HelperBase {
 
         StringBuilder buf = new StringBuilder(65536);
         buf.append("<select name=\"newlogclass\">\n" +
-                   "<option value=\"\" selected=\"true\">")
+                   "<option value=\"\" selected=\"selected\">")
            .append(_("Select a class to add"))
            .append("</option>\n");
 

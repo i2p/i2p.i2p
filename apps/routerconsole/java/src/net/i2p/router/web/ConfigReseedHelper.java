@@ -56,7 +56,7 @@ public class ConfigReseedHelper extends HelperBase {
         if ((mode == 0 && (!disabled) && (!required)) ||
             (mode == 1 && (!disabled) && required) ||
             (mode == 2 && disabled))
-            return "checked=\"true\"";
+            return "checked=\"checked\"";
         return "";
     }
 
@@ -82,7 +82,7 @@ public class ConfigReseedHelper extends HelperBase {
     private String checked(String prop) {
         boolean enabled =  _context.getBooleanProperty(prop);
         if (enabled)
-            return "checked=\"true\"";
+            return "checked=\"checked\"";
         return "";
     }
 

@@ -52,7 +52,7 @@ public class ConfigClientsHelper extends HelperBase {
         if ((mode == 0 && disabled) ||
             (mode == 1 && (!disabled) && (!ssl)) ||
             (mode == 2 && (!disabled) && ssl))
-            return "checked=\"true\"";
+            return "checked=\"checked\"";
         return "";
     }
 
@@ -60,7 +60,7 @@ public class ConfigClientsHelper extends HelperBase {
     public String getAuth() {
         boolean enabled =  _context.getBooleanProperty(PROP_AUTH);
         if (enabled)
-            return "checked=\"true\"";
+            return "checked=\"checked\"";
         return "";
     }
 
@@ -253,9 +253,9 @@ public class ConfigClientsHelper extends HelperBase {
         }
         buf.append("</td><td align=\"center\" width=\"10%\"><input type=\"checkbox\" class=\"optbox\" name=\"").append(index).append(".enabled\" value=\"true\" ");
         if (enabled) {
-            buf.append("checked=\"true\" ");
+            buf.append("checked=\"checked\" ");
             if (ro)
-                buf.append("disabled=\"true\" ");
+                buf.append("disabled=\"disabled\" ");
         }
         buf.append("></td><td align=\"center\" width=\"15%\">");
         // The icons were way too much, so there's an X in each button class,

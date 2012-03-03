@@ -116,7 +116,7 @@ class DummyNamingService extends NamingService {
         }
     }
 
-    private static class LHM<K, V> extends LinkedHashMap<K, V> {
+    protected static class LHM<K, V> extends LinkedHashMap<K, V> {
         private final int _max;
 
         public LHM(int max) {

@@ -27,7 +27,7 @@ import net.i2p.util.Log;
  */
 class MessageWrapper {
 
-    private static final Log _log = RouterContext.getGlobalContext().logManager().getLog(MessageWrapper.class);
+    //private static final Log _log = RouterContext.getGlobalContext().logManager().getLog(MessageWrapper.class);
 
     private static final int NETDB_TAGS_TO_DELIVER = 6;
     private static final int NETDB_LOW_THRESHOLD = 3;
@@ -71,8 +71,8 @@ class MessageWrapper {
         PublicKey sentTo = to.getIdentity().getPublicKey();
         if (!sentTags.isEmpty())
             tsh = skm.tagsDelivered(sentTo, sentKey, sentTags);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Sent to: " + to.getIdentity().getHash() + " with key: " + sentKey + " and tags: " + sentTags.size());
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Sent to: " + to.getIdentity().getHash() + " with key: " + sentKey + " and tags: " + sentTags.size());
         return new WrappedMessage(msg, skm, sentTo, sentKey, tsh);
     }
 
@@ -103,8 +103,8 @@ class MessageWrapper {
         void acked() {
             if (this.tsh != null) {
                 this.skm.tagsAcked(this.sentTo, this.sessionKey, this.tsh);
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Tags acked for key: " + this.sessionKey);
+                //if (_log.shouldLog(Log.DEBUG))
+                //    _log.debug("Tags acked for key: " + this.sessionKey);
             }
         }
 
@@ -112,8 +112,8 @@ class MessageWrapper {
         void fail() {
             if (this.tsh != null) {
                 this.skm.failTags(this.sentTo, this.sessionKey, this.tsh);
-                if (_log.shouldLog(Log.DEBUG))
-                    _log.debug("Tags NOT acked for key: " + this.sessionKey);
+                //if (_log.shouldLog(Log.DEBUG))
+                //    _log.debug("Tags NOT acked for key: " + this.sessionKey);
             }
         }
     }    

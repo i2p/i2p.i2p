@@ -625,7 +625,7 @@ public class TransientSessionKeyManager extends SessionKeyManager {
             OutboundSession sess = iter.next();
             Set<TagSet> sets = new TreeSet(new TagSetComparator());
             sets.addAll(sess.getTagSets());
-            buf.append("<tr><td><b>Target key:</b> ").append(sess.getTarget().toBase64().substring(0, 64)).append("<br>" +
+            buf.append("<tr><td><b>Target public key:</b> ").append(sess.getTarget().toBase64().substring(0, 20)).append("...<br>" +
                        "<b>Established:</b> ").append(DataHelper.formatDuration(now - sess.getEstablishedDate())).append(" ago<br>" +
                        "<b>Last Used:</b> ").append(DataHelper.formatDuration(now - sess.getLastUsedDate())).append(" ago<br>" +
                        "<b>Session key:</b> ").append(sess.getCurrentKey().toBase64()).append("</td>" +

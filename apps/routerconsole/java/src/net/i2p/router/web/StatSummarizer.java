@@ -172,32 +172,37 @@ public class StatSummarizer implements Runnable {
 
     public boolean renderPng(Rate rate, OutputStream out) throws IOException { 
         return renderPng(rate, out, GraphHelper.DEFAULT_X, GraphHelper.DEFAULT_Y,
-                         false, false, false, false, -1, true); 
+                         false, false, false, false, -1, 0, true); 
     }
 
     /**
      *  This does the single data graphs.
      *  For the two-data bandwidth graph see renderRatePng().
      *  Synchronized to conserve memory.
+     *
+     *  @param end number of periods before now
      *  @return success
      */
     public boolean renderPng(Rate rate, OutputStream out, int width, int height, boolean hideLegend,
                                           boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount,
-                                          boolean showCredit) throws IOException {
+                                          int end, boolean showCredit) throws IOException {
         try {
             try {
                 _sem.acquire();
             } catch (InterruptedException ie) {}
             return locked_renderPng(rate, out, width, height, hideLegend, hideGrid, hideTitle, showEvents,
-                                    periodCount, showCredit);
+                                    periodCount, end, showCredit);
         } finally {
             _sem.release();
         }
     }
 
+    /**
+     *  @param end number of periods before now
+     */
     private boolean locked_renderPng(Rate rate, OutputStream out, int width, int height, boolean hideLegend,
                                           boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount,
-                                          boolean showCredit) throws IOException {
+                                          int end, boolean showCredit) throws IOException {
         if (width > GraphHelper.MAX_X)
             width = GraphHelper.MAX_X;
         else if (width <= 0)
@@ -206,9 +211,11 @@ public class StatSummarizer implements Runnable {
             height = GraphHelper.MAX_Y;
         else if (height <= 0)
             height = GraphHelper.DEFAULT_Y;
+        if (end < 0)
+            end = 0;
         for (SummaryListener lsnr : _listeners) {
             if (lsnr.getRate().equals(rate)) {
-                lsnr.renderPng(out, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount, showCredit);
+                lsnr.renderPng(out, width, height, hideLegend, hideGrid, hideTitle, showEvents, periodCount, end, showCredit);
                 return true;
             }
         }
@@ -368,7 +375,7 @@ public class StatSummarizer implements Runnable {
      * @param specs statName.period,statName.period,statName.period
      * @return list of Rate objects
      */
-    private List<Rate> parseSpecs(String specs) {
+    List<Rate> parseSpecs(String specs) {
         StringTokenizer tok = new StringTokenizer(specs, ",");
         List<Rate> rv = new ArrayList();
         while (tok.hasMoreTokens()) {

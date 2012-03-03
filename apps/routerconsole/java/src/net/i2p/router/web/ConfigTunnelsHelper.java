@@ -172,7 +172,7 @@ public class ConfigTunnelsHelper extends HelperBase {
         if (!props.isEmpty()) {
             buf.append("<tr><td align=\"right\" class=\"mediumtags\">" + _("Inbound options") + ":</td>\n" +
                        "<td colspan=\"2\" align=\"center\"><input name=\"").append(index);
-            buf.append(".inboundOptions\" type=\"text\" size=\"32\" disabled=\"true\" " +
+            buf.append(".inboundOptions\" type=\"text\" size=\"32\" disabled=\"disabled\" " +
                        "value=\"");
             for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
                 String prop = (String)iter.next();
@@ -185,7 +185,7 @@ public class ConfigTunnelsHelper extends HelperBase {
         if (!props.isEmpty()) {
             buf.append("<tr><td align=\"right\" class=\"mediumtags\">" + _("Outbound options") + ":</td>\n" +
                        "<td colspan=\"2\" align=\"center\"><input name=\"").append(index);
-            buf.append(".outboundOptions\" type=\"text\" size=\"32\" disabled=\"true\" " +
+            buf.append(".outboundOptions\" type=\"text\" size=\"32\" disabled=\"disabled\" " +
                        "value=\"");
             for (Iterator iter = props.keySet().iterator(); iter.hasNext(); ) {
                 String prop = (String)iter.next();
@@ -205,7 +205,7 @@ public class ConfigTunnelsHelper extends HelperBase {
         for (int i = min; i <= max; i++) {
             buf.append("<option value=\"").append(i).append("\" ");
             if (i == now)
-                buf.append("selected=\"true\" ");
+                buf.append("selected=\"selected\" ");
             buf.append(">").append(ngettext(DUMMY1 + name, DUMMY2 + name + 's', i));
             buf.append("</option>\n");
         }

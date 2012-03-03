@@ -5,7 +5,7 @@
   <errTitle>I2P Installer</errTitle>
   <chdir>.</chdir>
   <customProcName>false</customProcName>
-  <!--<icon>SimpleApp.ico</icon>-->
+  <icon>resources/console.ico</icon>
   <jre>
     <minVersion>1.5.0</minVersion>
   </jre>

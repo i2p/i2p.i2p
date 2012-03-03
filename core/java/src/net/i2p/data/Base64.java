@@ -41,7 +41,7 @@ import net.i2p.util.Log;
  */
 public class Base64 {
 
-    private final static Log _log = new Log(Base64.class);
+    //private final static Log _log = new Log(Base64.class);
 
     /**
      *  @param source if null will return ""
@@ -750,7 +750,7 @@ public class Base64 {
 
             } // end if: white space, equals sign or better
             else {
-                _log.warn("Bad Base64 input character at " + i + ": " + source[i] + "(decimal)");
+                //_log.warn("Bad Base64 input character at " + i + ": " + source[i] + "(decimal)");
                 return null;
             } // end else: 
         } // each input character

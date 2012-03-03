@@ -20,8 +20,8 @@ public class ConfigNetHelper extends HelperBase {
     public final static String PROP_I2NP_NTCP_PORT = "i2np.ntcp.port";
     public final static String PROP_I2NP_NTCP_AUTO_PORT = "i2np.ntcp.autoport";
     public final static String PROP_I2NP_NTCP_AUTO_IP = "i2np.ntcp.autoip";
-    private final static String CHECKED = " checked=\"true\" ";
-    private final static String DISABLED = " disabled=\"true\" ";
+    private final static String CHECKED = " checked=\"checked\" ";
+    private final static String DISABLED = " disabled=\"disabled\" ";
 
     public String getUdphostname() {
         return _context.getProperty(UDPTransport.PROP_EXTERNAL_HOST, ""); 
@@ -250,7 +250,7 @@ public class ConfigNetHelper extends HelperBase {
             }
             buf.append("<option style=\"text-align: right;\" value=\"").append(val).append("\" ");
             if (pct == val) {
-                buf.append("selected=\"true\" ");
+                buf.append("selected=\"selected\" ");
                 found = true;
             }
             buf.append(">").append(val).append("%</option>\n");

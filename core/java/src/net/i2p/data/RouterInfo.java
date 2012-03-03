@@ -13,6 +13,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -24,6 +25,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.Vector;
 
+import net.i2p.I2PAppContext;
 import net.i2p.crypto.SHA256Generator;
 import net.i2p.util.Clock;
 import net.i2p.util.Log;
@@ -43,10 +45,14 @@ import net.i2p.util.OrderedProperties;
  * @author jrandom
  */
 public class RouterInfo extends DatabaseEntry {
-    private final static Log _log = new Log(RouterInfo.class);
     private RouterIdentity _identity;
     private volatile long _published;
-    private final Set<RouterAddress> _addresses;
+    /**
+     *  Addresses must be sorted by SHA256.
+     *  When an RI is created, they are sorted in setAddresses().
+     *  Save addresses in the order received so we need not resort.
+     */
+    private final List<RouterAddress> _addresses;
     /** may be null to save memory, no longer final */
     private Set<Hash> _peers;
     private final Properties _options;
@@ -71,7 +77,7 @@ public class RouterInfo extends DatabaseEntry {
     public static final String BW_CAPABILITY_CHARS = "KLMNO";
     
     public RouterInfo() {
-        _addresses = new HashSet(2);
+        _addresses = new ArrayList(2);
         _options = new OrderedProperties();
     }
 
@@ -156,21 +162,33 @@ public class RouterInfo extends DatabaseEntry {
      *
      * @return unmodifiable view, non-null
      */
-    public Set<RouterAddress> getAddresses() {
-            return Collections.unmodifiableSet(_addresses);
+    public Collection<RouterAddress> getAddresses() {
+            return Collections.unmodifiableCollection(_addresses);
     }
 
     /**
      * Specify a set of RouterAddress structures at which this router
      * can be contacted.
      *
-     * @throws IllegalStateException if RouterInfo is already signed
+     * Warning - Sorts the addresses here. Do not modify any address
+     *           after calling this, as the sort order is based on the
+     *           hash of the entire address structure.
+     *
+     * @param addresses may be null
+     * @throws IllegalStateException if RouterInfo is already signed or addresses previously set
      */
-    public void setAddresses(Set<RouterAddress> addresses) {
-        if (_signature != null)
+    public void setAddresses(Collection<RouterAddress> addresses) {
+        if (_signature != null || !_addresses.isEmpty())
             throw new IllegalStateException();
-        _addresses.clear();
-        if (addresses != null) _addresses.addAll(addresses);
+        if (addresses != null) {
+            _addresses.addAll(addresses);
+            if (_addresses.size() > 1) {
+                // WARNING this sort algorithm cannot be changed, as it must be consistent
+                // network-wide. The signature is not checked at readin time, but only
+                // later, and the addresses are stored in a Set, not a List.
+                DataHelper.sortStructureList(_addresses);
+            }
+        }
     }
 
     /**
@@ -270,14 +288,7 @@ public class RouterInfo extends DatabaseEntry {
                 DataHelper.writeLong(out, 1, 0);
             } else {
                 DataHelper.writeLong(out, 1, sz);
-                Collection<RouterAddress> addresses = _addresses;
-                if (sz > 1) {
-                    // WARNING this sort algorithm cannot be changed, as it must be consistent
-                    // network-wide. The signature is not checked at readin time, but only
-                    // later, and the addresses are stored in a Set, not a List.
-                    addresses = (Collection<RouterAddress>) DataHelper.sortStructures(addresses);
-                }
-                for (RouterAddress addr : addresses) {
+                for (RouterAddress addr : _addresses) {
                     addr.writeBytes(out);
                 }
             }
@@ -458,16 +469,16 @@ public class RouterInfo extends DatabaseEntry {
         _validated = true;
 
         if (!_isValid) {
+            Log log = I2PAppContext.getGlobalContext().logManager().getLog(RouterInfo.class);
             byte data[] = null;
             try {
                 data = getBytes();
             } catch (DataFormatException dfe) {
-                _log.error("Error validating", dfe);
+                log.error("Error validating", dfe);
                 return;
             }
-            if (_log.shouldLog(Log.ERROR))
-                _log.error("Invalid [" + SHA256Generator.getInstance().calculateHash(data).toBase64()
-                           + (_log.shouldLog(Log.WARN) ? ("]\n" + toString()) : ""),
+            log.error("Invalid [" + SHA256Generator.getInstance().calculateHash(data).toBase64()
+                           + (log.shouldLog(Log.WARN) ? ("]\n" + toString()) : ""),
                            new Exception("Signature failed"));
         }
     }

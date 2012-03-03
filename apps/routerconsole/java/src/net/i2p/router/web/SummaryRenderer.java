@@ -81,13 +81,21 @@ class SummaryRenderer {
     }
 
     public void render(OutputStream out) throws IOException { render(out, GraphHelper.DEFAULT_X, GraphHelper.DEFAULT_Y,
-                                                                     false, false, false, false, -1, false); }
+                                                                     false, false, false, false, -1, 0, false); }
 
-    public void render(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid, boolean hideTitle, boolean showEvents, int periodCount, boolean showCredit) throws IOException {
+    /**
+     *  @param endp number of periods before now
+     */
+    public void render(OutputStream out, int width, int height, boolean hideLegend, boolean hideGrid,
+                       boolean hideTitle, boolean showEvents, int periodCount,
+                       int endp, boolean showCredit) throws IOException {
         long end = _listener.now() - 75*1000;
+        long period = _listener.getRate().getPeriod();
+        if (endp > 0)
+            end -= period * endp;
         if (periodCount <= 0 || periodCount > _listener.getRows())
             periodCount = _listener.getRows();
-        long start = end - _listener.getRate().getPeriod()*periodCount;
+        long start = end - (period * periodCount);
         //long begin = System.currentTimeMillis();
         try {
             RrdGraphDef def = new RrdGraphDef();
@@ -103,9 +111,9 @@ class SummaryRenderer {
                 String p;
                 // we want the formatting and translation of formatDuration2(), except not zh, and not the &nbsp;
                 if (IS_WIN && "zh".equals(Messages.getLanguage(_context)))
-                    p = DataHelper.formatDuration(_listener.getRate().getPeriod());
+                    p = DataHelper.formatDuration(period);
                 else
-                    p = DataHelper.formatDuration2(_listener.getRate().getPeriod()).replace("&nbsp;", " ");
+                    p = DataHelper.formatDuration2(period).replace("&nbsp;", " ");
                 if (showEvents)
                     title = name + ' ' + _("events in {0}", p);
                 else

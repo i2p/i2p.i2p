@@ -56,7 +56,6 @@ import net.i2p.util.RandomSource;
  * @author jrandom
  */
 public class LeaseSet extends DatabaseEntry {
-    private final static Log _log = new Log(LeaseSet.class);
     private Destination _destination;
     private PublicKey _encryptionKey;
     private SigningPublicKey _signingKey;
@@ -71,11 +70,26 @@ public class LeaseSet extends DatabaseEntry {
     private boolean _decrypted;
     private boolean _checked;
 
-    /** This seems like plenty  */
-    public final static int MAX_LEASES = 6;
+    /**
+     *  Unlimited before 0.6.3;
+     *  6 as of 0.6.3;
+     *  Increased in version 0.9.
+     *
+     *  Leasesets larger than 6 should be used with caution,
+     *  as each lease adds 44 bytes, and routers older than version 0.9
+     *  will not be able to connect as they will throw an exception in
+     *  readBytes(). Also, the churn will be quite rapid, leading to
+     *  frequent netdb stores and transmission on existing connections.
+     *
+     *  However we increase it now in case some hugely popular eepsite arrives.
+     *  Strategies elsewhere in the router to efficiently handle
+     *  large leasesets are TBD.
+     */
+    public static final int MAX_LEASES = 16;
+    private static final int OLD_MAX_LEASES = 6;
 
     public LeaseSet() {
-        _leases = new ArrayList(MAX_LEASES);
+        _leases = new ArrayList(OLD_MAX_LEASES);
         _firstExpiration = Long.MAX_VALUE;
     }
 
@@ -354,14 +368,16 @@ public class LeaseSet extends DatabaseEntry {
      *  Must be called after all the leases are in place, but before sign().
      */
     public void encrypt(SessionKey key) {
-        if (_log.shouldLog(Log.WARN))
-            _log.warn("encrypting lease: " + _destination.calculateHash());
+        //if (_log.shouldLog(Log.WARN))
+        //    _log.warn("encrypting lease: " + _destination.calculateHash());
         try {
             encryp(key);
         } catch (DataFormatException dfe) {
-            _log.error("Error encrypting lease: " + _destination.calculateHash());
+            Log log = I2PAppContext.getGlobalContext().logManager().getLog(LeaseSet.class);
+            log.error("Error encrypting lease: " + _destination.calculateHash());
         } catch (IOException ioe) {
-            _log.error("Error encrypting lease: " + _destination.calculateHash());
+            Log log = I2PAppContext.getGlobalContext().logManager().getLog(LeaseSet.class);
+            log.error("Error encrypting lease: " + _destination.calculateHash());
         }
     }
 
@@ -420,8 +436,8 @@ public class LeaseSet extends DatabaseEntry {
      *  encrypted leaseset can be sent on to others (via writeBytes())
      */
     private void decrypt(SessionKey key) throws DataFormatException, IOException {
-        if (_log.shouldLog(Log.WARN))
-            _log.warn("decrypting lease: " + _destination.calculateHash());
+        //if (_log.shouldLog(Log.WARN))
+        //    _log.warn("decrypting lease: " + _destination.calculateHash());
         int size = _leases.size();
         if (size < 2)
             throw new DataFormatException("Bad number of leases for decryption");
@@ -468,9 +484,11 @@ public class LeaseSet extends DatabaseEntry {
                 decrypt(key);
                 _decrypted = true;
             } catch (DataFormatException dfe) {
-                _log.error("Error decrypting lease: " + _destination.calculateHash() + dfe);
+                Log log = I2PAppContext.getGlobalContext().logManager().getLog(LeaseSet.class);
+                log.error("Error decrypting lease: " + _destination.calculateHash() + dfe);
             } catch (IOException ioe) {
-                _log.error("Error decrypting lease: " + _destination.calculateHash() + ioe);
+                Log log = I2PAppContext.getGlobalContext().logManager().getLog(LeaseSet.class);
+                log.error("Error decrypting lease: " + _destination.calculateHash() + ioe);
             }
         }
         _checked = true;

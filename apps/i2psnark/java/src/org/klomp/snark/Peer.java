@@ -268,7 +268,8 @@ public class Peer implements Comparable
             if (_log.shouldLog(Log.DEBUG))
                 _log.debug("Peer supports extensions, sending reply message");
             int metasize = metainfo != null ? metainfo.getInfoBytes().length : -1;
-            out.sendExtension(0, ExtensionHandler.getHandshake(metasize));
+            boolean pexAndMetadata = metainfo == null || !metainfo.isPrivate();
+            out.sendExtension(0, ExtensionHandler.getHandshake(metasize, pexAndMetadata));
         }
 
         if ((options & OPTION_I2P_DHT) != 0 && util.getDHT() != null) {

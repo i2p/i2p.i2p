@@ -75,7 +75,7 @@ public class ConfigUpdateHelper extends HelperBase {
     public String getUpdateThroughProxy() {
         String proxy = _context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY);
         if (Boolean.valueOf(proxy).booleanValue()) 
-            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateThroughProxy\" checked=\"true\" >";
+            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateThroughProxy\" checked=\"checked\" >";
         else
             return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateThroughProxy\" >";
     }
@@ -83,7 +83,7 @@ public class ConfigUpdateHelper extends HelperBase {
     public String getUpdateUnsigned() {
         String foo = _context.getProperty(ConfigUpdateHandler.PROP_UPDATE_UNSIGNED);
         if (Boolean.valueOf(foo).booleanValue()) 
-            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateUnsigned\" checked=\"true\" >";
+            return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateUnsigned\" checked=\"checked\" >";
         else
             return "<input type=\"checkbox\" class=\"optbox\" value=\"true\" name=\"updateUnsigned\" >";
     }
@@ -106,7 +106,7 @@ public class ConfigUpdateHelper extends HelperBase {
         for (int i = 0; i < PERIODS.length; i++) {
             buf.append("<option value=\"").append(PERIODS[i]);
             if (PERIODS[i] == ms)
-                buf.append("\" selected=\"true");
+                buf.append("\" selected=\"selected");
             
             if (PERIODS[i] == -1)
                 buf.append("\">" + _("Never") + "</option>\n");
@@ -128,22 +128,22 @@ public class ConfigUpdateHelper extends HelperBase {
         
         buf.append("<option value=\"notify\"");
         if ("notify".equals(policy) || _dontInstall)
-            buf.append(" selected=\"true\"");
+            buf.append(" selected=\"selected\"");
         buf.append('>').append(_("Notify only")).append("</option>");
 
         buf.append("<option value=\"download\"");
         if (_dontInstall)
-            buf.append(" disabled=\"true\"");
+            buf.append(" disabled=\"disabled\"");
         else if ("download".equals(policy))
-            buf.append(" selected=\"true\"");
+            buf.append(" selected=\"selected\"");
         buf.append('>').append(_("Download and verify only")).append("</option>");
         
         if (_context.hasWrapper()) {
             buf.append("<option value=\"install\"");
             if (_dontInstall)
-                buf.append(" disabled=\"true\"");
+                buf.append(" disabled=\"disabled\"");
             else if ("install".equals(policy))
-                buf.append(" selected=\"true\"");
+                buf.append(" selected=\"selected\"");
             buf.append('>').append(_("Download, verify, and restart")).append("</option>");
         }
         

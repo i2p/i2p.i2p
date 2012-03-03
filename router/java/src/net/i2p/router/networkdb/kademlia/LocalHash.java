@@ -27,7 +27,7 @@ import net.i2p.util.Log;
  * @author moved from Hash.java by zzz
  */
 class LocalHash extends Hash {
-    private final static Log _log = new Log(LocalHash.class);
+    //private final static Log _log = new Log(LocalHash.class);
     private /* FIXME final FIXME */ Map<Hash, byte[]> _xorCache;
 
     private static final int MAX_CACHED_XOR = 1024;
@@ -86,6 +86,7 @@ class LocalHash extends Hash {
                 _xorCache.put(key, distance);
                 cached = _xorCache.size();
             }
+          /****
             if (_log.shouldLog(Log.DEBUG)) {
                 // explicit buffer, since the compiler can't guess how long it'll be
                 StringBuilder buf = new StringBuilder(128);
@@ -94,7 +95,9 @@ class LocalHash extends Hash {
                 buf.append(DataHelper.toHexString(key.getData()));
                 _log.debug(buf.toString(), new Exception());
             }
+          ****/
         } else {
+          /****
             if (_log.shouldLog(Log.DEBUG)) {
                 // explicit buffer, since the compiler can't guess how long it'll be
                 StringBuilder buf = new StringBuilder(128);
@@ -103,6 +106,7 @@ class LocalHash extends Hash {
                 buf.append(DataHelper.toHexString(key.getData()));
                 _log.debug(buf.toString());
             }
+          ****/
         }
         return distance;
     }

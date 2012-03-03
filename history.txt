@@ -1,3 +1,36 @@
+2012-03-02 zzz
+  * BlockfileNamingService: Add negative cache
+  * Build: Add built-by to jars; check for corrupt jars on debug page
+  * configstats.jsp: Hide log settings unless already enabled
+  * DataStructures:
+    - Remove static logs
+    - Sort addresses in RouterInfo at initialization only;
+      change from Set to List to save space
+    - Remove unused counters in Lease to save space
+    - Increase max leases to 16
+  * Graphs:
+    - New single graph page with easy resizing
+    - Support graphing of previous intervals
+  * i2pinstall.exe: Add icon
+  * i2psnark:
+    - Add tracker configuration form
+    - Remove custom tracker option from create form
+    - Add private torrent option
+    - More icons in buttons
+    - Use js for refresh
+  * I2PTunnelHTTPClient:
+    - Refactoring to use Java URI parser to better handle
+      escapes, IPv6 addresses, ports
+    - Rewrite i2paddresshelper scanning/removal
+    - Refactor out local server code
+    - Nicer address helper error page
+  * NetDB:
+    - Reenable verify of RI stores, disabled in 0.7.9,
+      checkin comments claim reenabled in 0.7.10 but didn't happen.
+    - Synchronize StoreJob.sendNext() to avoid dups
+  * netdb.jsp: Fix debug leaseset count again
+  * susidns: Add b64 hash to details page
+
 * 2012-02-27 0.8.13 released
 
 2012-02-22 kytv

@@ -14,7 +14,7 @@ public class ConfigUIHelper extends HelperBase {
         for (String theme : themes) {
             buf.append("<input type=\"radio\" class=\"optbox\" name=\"theme\" ");
             if (theme.equals(current))
-                buf.append("checked=\"true\" ");
+                buf.append("checked=\"checked\" ");
             buf.append("value=\"").append(theme).append("\">").append(_(theme)).append("<br>\n");
         }
         return buf.toString();
@@ -73,7 +73,7 @@ public class ConfigUIHelper extends HelperBase {
             // we use "lang" so it is set automagically in CSSHelper
             buf.append("<input type=\"radio\" class=\"optbox\" name=\"lang\" ");
             if (langs[i].equals(current))
-                buf.append("checked=\"true\" ");
+                buf.append("checked=\"checked\" ");
             buf.append("value=\"").append(langs[i]).append("\">")
                .append("<img height=\"11\" width=\"16\" alt=\"\" src=\"/flags.jsp?c=").append(flags[i]).append("\"> ")
                .append(_(xlangs[i])).append("<br>\n");

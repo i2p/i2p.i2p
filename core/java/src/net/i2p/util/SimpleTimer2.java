@@ -31,7 +31,6 @@ public class SimpleTimer2 {
     private static final int MIN_THREADS = 2;
     private static final int MAX_THREADS = 4;
     private final I2PAppContext _context;
-    private static Log _log; // static so TimedEvent can use it
     private final ScheduledThreadPoolExecutor _executor;
     private final String _name;
     private int _count;
@@ -40,7 +39,6 @@ public class SimpleTimer2 {
     protected SimpleTimer2() { this("SimpleTimer2"); }
     protected SimpleTimer2(String name) {
         _context = I2PAppContext.getGlobalContext();
-        _log = _context.logManager().getLog(SimpleTimer2.class);
         _name = name;
         _count = 0;
         long maxMemory = Runtime.getRuntime().maxMemory();
@@ -79,8 +77,10 @@ public class SimpleTimer2 {
         @Override
         protected void afterExecute(Runnable r, Throwable t) {
             super.afterExecute(r, t);
-            if (t != null) // shoudn't happen, caught in RunnableEvent.run()
-                _log.log(Log.CRIT, "wtf, event borked: " + r, t);
+            if (t != null) { // shoudn't happen, caught in RunnableEvent.run()
+                Log log = I2PAppContext.getGlobalContext().logManager().getLog(SimpleTimer2.class);
+                log.log(Log.CRIT, "wtf, event borked: " + r, t);
+            }
         }
     }
 
@@ -126,6 +126,7 @@ public class SimpleTimer2 {
      *
      */
     public static abstract class TimedEvent implements Runnable {
+        private final Log _log;
         private SimpleTimer2 _pool;
         private int _fuzz;
         protected static final int DEFAULT_FUZZ = 3;
@@ -136,7 +137,9 @@ public class SimpleTimer2 {
         public TimedEvent(SimpleTimer2 pool) {
             _pool = pool;
             _fuzz = DEFAULT_FUZZ;
+            _log = I2PAppContext.getGlobalContext().logManager().getLog(SimpleTimer2.class);
         }
+
         /** automatically schedules, don't use this one if you have other things to do first */
         public TimedEvent(SimpleTimer2 pool, long timeoutMs) {
             this(pool);
