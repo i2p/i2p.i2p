@@ -145,7 +145,7 @@ public class FileDumpHelper extends HelperBase {
         s = getAtt(att, "Workspace-Changes");
         if (s != null)
             buf.append(s.replace(",", "<br>"));
-        buf.append("</font></td>");
+        buf.append("</font></td></tr>\n");
     }
 
     private static byte[] sha256(File f) {
