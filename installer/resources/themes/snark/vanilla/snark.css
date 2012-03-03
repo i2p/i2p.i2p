@@ -493,7 +493,7 @@ input {
      border: 1px inset #000;
      background: #fff /*url('/themes/snark/ubergine/images/graytile.png')*/;	 
      color: #000;
-     margin: 2px 0;
+     margin: 2px 4px;
 }
 
 input.r {
