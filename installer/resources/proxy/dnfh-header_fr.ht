@@ -4,24 +4,31 @@ Cache-control: no-cache
 Connection: close
 Proxy-Connection: close
 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
 <title>Avertissement I2P: site eep inconnu</title>
-<link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico" >
-<link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css" >
+<link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico">
+<link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-<div class=logo>
+<div class="logo">
  <a href="http://127.0.0.1:7657/" title="Console routeur I2P"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="Console routeur I2P" border="0"></a><hr>
  <a href="http://127.0.0.1:7657/config.jsp">Configuration</a> <a href="http://127.0.0.1:7657/help.jsp">Aide</a> <a href="http://127.0.0.1:7657/susidns/index">Carnet d'adresse</a>
 </div>
-<div class=warning id=warning>
+<div class="warning" id="warning">
 <h3>Avertissement I2P: site eep non trouvé dans le carnet d'adresses</h3>
+<p>
 Le site eep n'était pas dans le carnet d'adresses de votre routeur.
 Vérifiez le lien ou trouvez l'adresse BASE64.
-Si vous avez l'adresse BASE64,  reportez-la dans votre fichier userhosts.txt en passant par 
+Si vous avez l'adresse BASE64,  reportez-la dans votre fichier userhosts.txt en passant par
 <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=master">SusiDNS</a>,
-utilisez un lien d'adresse BASE64, ou un service de saut (jump) en  lien ci-dessous.<br><br>
-Si vous voyez cette page souvent: lisez la <a href="http://www.i2p2.i2p/faq_fr.html#subscriptions">faq</a> pour obtenir 
-de l'aide sur <a href="http://127.0.0.1:7657/susidns/config.jsp">l'ajout de quelques souscrptions</a> à votre carnet 
-d'adresses.<hr>
-<b>Destination introuvable:</b><BR><BR>
+utilisez un lien d'adresse BASE64, ou un service de saut (jump) en  lien ci-dessous.
+</p>
+<p>
+Si vous voyez cette page souvent: lisez la <a href="http://www.i2p2.i2p/faq_fr.html#subscriptions">faq</a> pour obtenir
+de l'aide sur <a href="http://127.0.0.1:7657/susidns/config.jsp">l'ajout de quelques souscrptions</a> à votre carnet
+d'adresses.
+</p>
+<hr>
+<p>
+<b>Destination introuvable:</b></p>

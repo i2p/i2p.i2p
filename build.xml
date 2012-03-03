@@ -938,6 +938,7 @@
     </target>
 
     <target name="updater200" depends="prepupdate, preplicenses, pack200, zipit200" />
+    <target name="updater200WithJetty" depends="prepjupdate, preplicenses, pack200, zipit200" />
     <target name="updater200WithJettyFixes" depends="prepjupdatefixes, preplicenses, pack200, zipit200" />
     <target name="updater200WithJettyFixesAndJbigi" depends="prepjupdatefixes, prepjbigiupdate, preplicenses, pack200, zipit200" />
     <target name="updater" depends="prepupdate, preplicenses, zipit" />

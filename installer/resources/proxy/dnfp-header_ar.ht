@@ -4,25 +4,31 @@ Cache-control: no-cache
 Connection: close
 Proxy-Connection: close
 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html lang="ar" dir="rtl"><head>
 <title>تحذير: لابوجد بروكسي خارجي</title>
-<link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico" >
-<link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css" >
+<link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico">
+<link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-<div class=logo>
+<div class="logo">
  <a href="http://127.0.0.1:7657/" title="Router Console"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="I2P Router Console" border="0"></a><hr>
  <a href="http://127.0.0.1:7657/config.jsp">اعدادات</a> <a href="http://127.0.0.1:7657/help.jsp">مساعدة</a> <a href="http://127.0.0.1:7657/susidns/">دفتر العناوين</a>
 </div>
-<div class=warning id=warning>
+<div class="warning" id="warning">
 <h3>تحذير: لابوجد بروكسي خارجي</h3>
+<p>
 لم يتم ايجاد بروكسي خارجي www
 خارج الشبكة أو غير متصل جيدا بباقي المستخدمين.
 يمكنك
-<a href="javascript: parent.window.location.reload()">اعادة المحاولة</a> 
+<a href="javascript: parent.window.location.reload()">اعادة المحاولة</a>
 لإختيار بروكسي خارجي جديد
-<a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">هنا</a> 
-(اذا كان لديك اكثر من واحد). 
+<a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">هنا</a>
+(اذا كان لديك اكثر من واحد).
 اذا استمر المشكل قم بتحرير قائمة البروكسي الخارجية
-<a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=0">هنا</a>. 
-<hr><b>لم يستطع الوصول الى هذا العنوان</b><BR><BR>
+<a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=0">هنا</a>.
+</p>
+<hr>
+<p>
+<b>لم يستطع الوصول الى هذا العنوان</b>
+</p>
