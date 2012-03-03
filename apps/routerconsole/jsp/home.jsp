@@ -1,59 +1,15 @@
 <%@page contentType="text/html"%>
 <%@page pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-
 <html><head>
 <%@include file="css.jsi" %>
 <%=intl.title("home")%>
-
+<script src="/js/ajax.js" type="text/javascript"></script>
 <script type="text/javascript">
-var page = "home";
-function ajax(url,target) {
-  // native XMLHttpRequest object
-  if (window.XMLHttpRequest) {
-    req = new XMLHttpRequest();
-    req.onreadystatechange = function() {ajaxDone(target);};
-    req.open("GET", url, true);
-    req.send(null);
-    // IE/Windows ActiveX version
-  } else if (window.ActiveXObject) {
-    req = new ActiveXObject("Microsoft.XMLDOM");
-    if (req) {
-      req.onreadystatechange = function() {ajaxDone(target);};
-      req.open("GET", url, true);
-      req.send(null);
-    }
-  }
-  //setTimeout("ajax(page,'scriptoutput')", 5000);
-}
-
-function ajaxDone(target) {
-  // only if req is "loaded"
-  if (req.readyState == 4) {
-    // only if "OK"
-    if (req.status == 200) {
-      results = req.responseText;
-      document.getElementById(target).innerHTML = results;
-      document.getElementById("langbox").style.display="block";
-      document.getElementById("home").style.display="block";
-    } else {
-      document.getElementById(target).innerHTML="<b><%=intl._("Router is down")%></b>";
-      document.getElementById("home").style.display="none";
-      document.getElementById("langbox").style.display="none";
-    }
-  }
-}
-
-function requestAjax1() { ajax("/xhr1.jsp", "xhr"); }
-function initAjax() { setInterval(requestAjax1, 15000);  }
-
+  function requestAjax1() { ajax("/xhr1.jsp", "xhr", 15000); }
+  function initAjax() { setInterval(requestAjax1, 15000);  }
 </script>
-
-
-
 </head><body onload="initAjax()">
-
-
 <%
     String consoleNonce = System.getProperty("router.consoleNonce");
     if (consoleNonce == null) {
@@ -61,7 +17,6 @@ function initAjax() { setInterval(requestAjax1, 15000);  }
         System.setProperty("router.consoleNonce", consoleNonce);
     }
 %>
-
 <div class="routersummaryouter" id="appsummary">
  <div class="routersummary">
   <div style="height: 36px;">
@@ -81,12 +36,13 @@ function initAjax() { setInterval(requestAjax1, 15000);  }
     <a href="/home?lang=en&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=us" title="English" alt="English"></a> 
     <a href="/home?lang=ar&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=lang_ar" title="عربية" alt="عربية"></a>
     <a href="/home?lang=zh&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=cn" title="中文" alt="中文"></a> 
+    <a href="/home?lang=cs&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=cz" title="Czech" alt="Czech"></a> 
     <a href="/home?lang=da&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=dk" title="Danish" alt="Danish"></a> 
     <a href="/home?lang=de&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=de" title="Deutsch" alt="Deutsch"></a> 
     <a href="/home?lang=ee&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=ee" title="Eesti" alt="Eesti"></a> 
     <a href="/home?lang=es&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=es" title="Español" alt="Español"></a> 
-    <a href="/home?lang=fi&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=fi" title="Suomi" alt="Suomi"></a> 
-    <a href="/home?lang=fr&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=fr" title="Français" alt="Français"></a><br>
+    <a href="/home?lang=fi&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=fi" title="Suomi" alt="Suomi"></a><br> 
+    <a href="/home?lang=fr&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=fr" title="Français" alt="Français"></a>
     <a href="/home?lang=it&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=it" title="Italiano" alt="Italiano"></a> 
     <a href="/home?lang=nl&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=nl" title="Nederlands" alt="Nederlands"></a> 
     <a href="/home?lang=pl&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=pl" title="Polski" alt="Polski"></a> 
@@ -122,7 +78,7 @@ function initAjax() { setInterval(requestAjax1, 15000);  }
 <div class="home" id="home">
   <div class="search">
     <form action="/search.jsp" method="POST">
-      <table><tr><td align="right">
+      <table class="search"><tr><td align="right">
         <input size="50" type="text" class="search" name="query" />
       </td><td align="left">
         <button type="submit" value="search" class="search"><%=intl._("Search I2P")%></button>

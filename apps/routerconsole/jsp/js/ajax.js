@@ -23,10 +23,11 @@ function ajaxDone(url, target, refresh) {
     if (req.status == 200) {
       results = req.responseText;
       document.getElementById(target).innerHTML = results;
-      document.getElementById("lowersection").style.display="block";
+      //document.getElementsbyClassName("hideifdown").style.display="block";
     } else {
+      // TODO take from a translated variable
       document.getElementById(target).innerHTML="<b>Router is down</b>";
-      document.getElementById("lowersection").style.display="none";
+      //document.getElementByClassName("hideifdown").style.display="none";
     }
     setTimeout(function() {ajax(url, target, refresh);}, refresh);
   }

@@ -630,12 +630,12 @@ div.appgroup {
 }
 
 div.search {
-     margin: 20px;
+     margin: 20px 20px 20px 240px;
      padding: 8px;
      width: auto;
 }
 
-div.search table {
+table.search {
      background: none;
      margin: 20px;
      padding: 8px;
