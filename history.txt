@@ -1,3 +1,13 @@
+2012-03-03 zzz
+  * Console:
+    - New simplified home page, refreshing with AJAX
+    - New home configuration page
+  * i2psnark:
+    - CSS tweaks
+    - Ajax and link fixes
+    - Move js to console in prep for merging w/ homepage
+  * NetDB: Remove bw stats (effective next release)
+
 2012-03-02 zzz
   * BlockfileNamingService: Add negative cache
   * Build: Add built-by to jars; check for corrupt jars on debug page
