@@ -4,24 +4,30 @@ Cache-control: no-cache
 Connection: close
 Proxy-Connection: close
 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
 <title>I2P Warning: Eepsite unknown</title>
-<link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico" >
-<link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css" >
+<link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico">
+<link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-<div class=logo>
+<div class="logo">
  <a href="http://127.0.0.1:7657/index.jsp" title="Router Console"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="I2P Router Console" border="0"></a><hr>
  <a href="http://127.0.0.1:7657/config.jsp">Configuration</a> <a href="http://127.0.0.1:7657/help.jsp">Help</a> <a href="http://127.0.0.1:7657/susidns/index">Addressbook</a>
 </div>
-<div class=warning id=warning>
+<div class="warning" id="warning">
 <h3>Warning: Eepsite Not Found in Addressbook</h3>
+<p>
 The eepsite was not found in your router's addressbook.
 Check the link or find a BASE64 address.
 If you have the BASE64 address,  paste it into your userhosts.txt using
 <a href="http://127.0.0.1:7657/susidns/addressbook.jsp?book=master">SusiDNS</a>,
-use a BASE64 address helper, or use a jump service link below.<br><br>
+use a BASE64 address helper, or use a jump service link below.
+</p>
+<p>
 Seeing this page often? See <a href="http://www.i2p2.i2p/faq.html#subscriptions">the FAQ</a>
 for help in <a href="http://127.0.0.1:7657/susidns/config.jsp">adding some subscriptions</a>
-to your addressbook.<hr>
-<b>Could not find the following destination:</b><BR><BR>
+to your addressbook.</p><hr>
+<p>
+<b>Could not find the following destination:</b>
+</p>

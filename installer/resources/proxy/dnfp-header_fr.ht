@@ -4,26 +4,32 @@ Cache-control: no-cache
 Connection: close
 Proxy-Connection: close
 
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
 <title>Avertissement I2P: Proxy sortant non trouvé</title>
-<link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico" >
-<link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css" >
+<link rel="shortcut icon" href="http://proxy.i2p/themes/console/images/favicon.ico">
+<link href="http://proxy.i2p/themes/console/default/console.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-<div class=logo>
+<div class="logo">
  <a href="http://127.0.0.1:7657/index.jsp" title="Console routeur I2P"><img src="http://proxy.i2p/themes/console/images/i2plogo.png" alt="Console routeur I2P" border="0"></a><hr>
  <a href="http://127.0.0.1:7657/config.jsp">Configuration</a> <a href="http://127.0.0.1:7657/help.jsp">Aide</a> <a href="http://127.0.0.1:7657/susidns/">Carnet d'adresses</a>
 </div>
-<div class=warning id=warning>
+<div class="warning" id="warning">
 <h3>Avertissement I2P: Proxy sortant non trouvé</h3>
-Le serveur mandataire sortant est introuvable. 
+<p>
+Le serveur mandataire sortant est introuvable.
 Il est hors service, le réseau est surchargé,
 ou votre routeur n'est pas encore bien intégré avec des pairs.
-Vous pouvez essayer de 
-<a href="javascript: parent.window.location.reload()">retenter</a> 
-car il se produira une sélection aléatoire de mandataire dans le groupe que vous avez défini 
-<a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">ici</a> 
-(si vous en avez plus d'un de défini). 
-Si vous avez toujours des problèmes vous pouvez modifier votre liste de 
-mandataires <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=0">ici</a>. 
-<hr><b>Destination suivante introuvable:</b><BR><BR>
+Vous pouvez essayer de
+<a href="javascript: parent.window.location.reload()">retenter</a>
+car il se produira une sélection aléatoire de mandataire dans le groupe que vous avez défini
+<a href="http://127.0.0.1:7657/i2ptunnel/index.jsp">ici</a>
+(si vous en avez plus d'un de défini).
+Si vous avez toujours des problèmes vous pouvez modifier votre liste de
+mandataires <a href="http://127.0.0.1:7657/i2ptunnel/edit.jsp?tunnel=0">ici</a>.
+</p>
+<hr>
+<p>
+<b>Destination suivante introuvable:</b>
+</p>
