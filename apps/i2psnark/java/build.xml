@@ -99,14 +99,10 @@
         <copy todir="build/icons/.icons" >
             <fileset dir="../icons/" />
         </copy>
-        <copy todir="build/js/.js" >
-            <fileset dir="../js/" />
-        </copy>
         <war destfile="../i2psnark.war" webxml="../web.xml" >
           <!-- include only the web stuff, as of 0.7.12 the router will add i2psnark.jar to the classpath for the war -->
           <classes dir="./build/obj" includes="**/web/*.class" />
             <fileset dir="build/icons/" />
-            <fileset dir="build/js/" />
             <manifest>
                 <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Built-By" value="${build.built-by}" />
@@ -119,7 +115,7 @@
     
     <target name="warUpToDate">
         <uptodate property="war.uptodate" targetfile="../i2psnark.war" >
-            <srcfiles dir= "." includes="build/obj/org/klomp/snark/web/*.class ../icons/* ../js/* ../web.xml" />
+            <srcfiles dir= "." includes="build/obj/org/klomp/snark/web/*.class ../icons/* ../web.xml" />
         </uptodate>
     </target>
     

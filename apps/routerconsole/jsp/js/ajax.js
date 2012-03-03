@@ -1,9 +1,8 @@
-//var page = "home";
-function ajax(url,target) {
+function ajax(url, target, refresh) {
   // native XMLHttpRequest object
   if (window.XMLHttpRequest) {
     req = new XMLHttpRequest();
-    req.onreadystatechange = function() {ajaxDone(target);};
+    req.onreadystatechange = function() {ajaxDone(url, target, refresh);};
     req.open("GET", url, true);
     req.send(null);
     // IE/Windows ActiveX version
@@ -15,10 +14,9 @@ function ajax(url,target) {
       req.send(null);
     }
   }
-  //setTimeout("ajax(page,'scriptoutput')", 5000);
 }
 
-function ajaxDone(target) {
+function ajaxDone(url, target, refresh) {
   // only if req is "loaded"
   if (req.readyState == 4) {
     // only if "OK"
@@ -30,8 +28,6 @@ function ajaxDone(target) {
       document.getElementById(target).innerHTML="<b>Router is down</b>";
       document.getElementById("lowersection").style.display="none";
     }
+    setTimeout(function() {ajax(url, target, refresh);}, refresh);
   }
 }
-
-function requestAjax1() { ajax("/i2psnark/.ajax/xhr1.html", "mainsection"); }
-function initAjax(delayMs) { setInterval(requestAjax1, delayMs);  }

@@ -158,6 +158,8 @@ public class I2PSnarkServlet extends Default {
             resp.setCharacterEncoding("UTF-8");
             resp.setContentType("text/html; charset=UTF-8");
             PrintWriter out = resp.getWriter();
+            //if (_log.shouldLog(Log.DEBUG))
+            //    _manager.addMessage((_context.clock().now() / 1000) + " xhr1 p=" + req.getParameter("p"));
             writeMessages(out);
             writeTorrents(out, req);
             return;
@@ -204,7 +206,8 @@ public class I2PSnarkServlet extends Default {
         
         String peerParam = req.getParameter("p");
         String peerString;
-        if (peerParam == null || !_manager.util().connected()) {
+        if (peerParam == null || (!_manager.util().connected()) ||
+            peerParam.replaceAll("[a-zA-Z0-9~=-]", "").length() > 0) {  // XSS
             peerString = "";
         } else {
             peerString = "?p=" + peerParam;
@@ -223,15 +226,20 @@ public class I2PSnarkServlet extends Default {
         int delay = 0;
         if (!isConfigure) {
             delay = _manager.getRefreshDelaySeconds();
-            if (delay > 0)
+            if (delay > 0) {
                 //out.write("<meta http-equiv=\"refresh\" content=\"" + delay + ";/i2psnark/" + peerString + "\">\n");
-                out.write("<script src=\"/i2psnark/.js/i2psnark.js\" type=\"text/javascript\"></script>\n");
+                out.write("<script src=\"/js/ajax.js\" type=\"text/javascript\"></script>\n" +
+                          "<script type=\"text/javascript\">\n"  +
+                          "function requestAjax1() { ajax(\"/i2psnark/.ajax/xhr1.html" + peerString + "\", \"mainsection\", " + (delay*1000) + "); }\n" +
+                          "function initAjax(delayMs) { setTimeout(requestAjax1, " + (delay*1000) +");  }\n"  +
+                          "</script>\n");
+            }
         }
         out.write(HEADER_A + _themePath + HEADER_B + "</head>\n");
         if (isConfigure || delay <= 0)
             out.write("<body>");
         else
-            out.write("<body onload=\"initAjax(" + (delay * 1000) + ")\">");
+            out.write("<body onload=\"initAjax()\">");
         out.write("<center>");
         if (isConfigure) {
             out.write("<div class=\"snarknavbar\"><a href=\"/i2psnark/\" title=\"");
@@ -304,7 +312,6 @@ public class I2PSnarkServlet extends Default {
         String peerParam = req.getParameter("p");
 
         List snarks = getSortedSnarks(req);
-        String uri = req.getRequestURI();
         boolean isForm = _manager.util().connected() || !snarks.isEmpty();
         if (isForm) {
             out.write("<form action=\"_post\" method=\"POST\">\n");
@@ -418,6 +425,7 @@ public class I2PSnarkServlet extends Default {
             out.write("&nbsp;");
         }
         out.write("</th></tr></thead>\n");
+        String uri = "/i2psnark/";
         for (int i = 0; i < snarks.size(); i++) {
             Snark snark = (Snark)snarks.get(i);
             boolean showDebug = "2".equals(peerParam);
