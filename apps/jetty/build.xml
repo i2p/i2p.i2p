@@ -179,6 +179,8 @@
     <target name="jar" depends="compile, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
         <!-- set if unset -->
         <property name="workspace.changes.tr" value="" />
+        <!-- old jetty 5 classes blow up the build if you forgot to do distclean -->
+        <delete dir="build/obj/org" />
         <copy todir="build/obj" file="resources/log4j.properties" />
         <jar destfile="./jettylib/jetty-i2p.jar" basedir="./build/obj" includes="**/*.class log4j.properties" >
             <manifest>
