@@ -43,7 +43,7 @@ public class HomeHelper extends HelperBase {
         _x("FAQ") + S + _x("Frequently Asked Questions") + S + "http://www.i2p2.i2p/faq" + S + I + "help.png" + S +
         _x("Forum") + S + _x("Community forum") + S + "http://forum.i2p/" + S + I + "itoopie_sm.png" + S +
         //"ident.i2p" + S + _x("Short message service") + S + "http://ident.i2p/" + S + I + "itoopie_sm.png" + S +
-        _x("Javadocs") + S + _x("Technical documentation") + S + "http://update.killyourtv.i2p/javadoc/" + S + I + "book.png" + S +
+        _x("Javadocs") + S + _x("Technical documentation") + S + "http://i2p-javadocs.i2p/" + S + I + "book.png" + S +
         _x("Key Server") + S + _x("OpenPGP Keyserver") + S + "http://keys.i2p/" + S + I + "book.png" + S +
         _x("Pastebin") + S + _x("I2P Pastebin") + S + "http://pastethis.i2p/" + S + I + "itoopie_sm.png" + S +
         "Planet I2P" + S + _x("I2P News") + S + "http://planet.i2p/" + S + I + "itoopie_sm.png" + S +
