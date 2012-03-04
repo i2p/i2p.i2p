@@ -10,5 +10,5 @@
    }
 %>
 <jsp:useBean class="net.i2p.router.web.CSSHelper" id="intl" scope="request" />
-<jsp:setProperty name="intl" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
+<jsp:setProperty name="intl" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
 <%@include file="xhr1.jsi" %>

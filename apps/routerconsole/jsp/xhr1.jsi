@@ -1,13 +1,13 @@
 <jsp:useBean class="net.i2p.router.web.SummaryHelper" id="helper" scope="request" />
-<jsp:setProperty name="helper" property="contextId" value="<%=(String)session.getAttribute("i2p.contextId")%>" />
-<jsp:setProperty name="helper" property="action" value="<%=request.getParameter("action")%>" />
+<jsp:setProperty name="helper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+<jsp:setProperty name="helper" property="action" value="<%=request.getParameter(\"action\")%>" />
 <table><tr><td align="left"><b><%=intl._("Version")%>:</b></td><td align="right">
 <jsp:getProperty name="helper" property="version" />
 </td></tr><tr><td align="left"><b><%=intl._("Uptime")%>:</b></td><td align="right">
 <jsp:getProperty name="helper" property="uptime" />
 </td></tr></table><hr>
-<jsp:setProperty name="helper" property="updateNonce" value="<%=request.getParameter("updateNonce")%>" />
-<jsp:setProperty name="helper" property="consoleNonce" value="<%=request.getParameter("consoleNonce")%>" />
+<jsp:setProperty name="helper" property="updateNonce" value="<%=request.getParameter(\"updateNonce\")%>" />
+<jsp:setProperty name="helper" property="consoleNonce" value="<%=request.getParameter(\"consoleNonce\")%>" />
 <%
     String reqURI = request.getRequestURI();
     if (reqURI != null)
