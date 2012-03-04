@@ -2,5 +2,4 @@
 0002-jbigi-soname.patch
 0003-renaming-jcpuid.patch
 0004-oom-listener.patch
-#debian-version.patch
-0004-jetty6.patch
+#0004-jetty6.patch

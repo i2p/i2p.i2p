@@ -20,3 +20,6 @@ usr/share/java/jetty-start.jar usr/share/i2p/lib/jetty-start.jar
 usr/share/java/servlet-api-2.5.jar usr/share/i2p/lib/servlet-api.jar
 usr/share/java/jsp-api-2.1.jar usr/share/i2p/lib/jsp-api.jar
 usr/share/java/el-api-2.1.jar usr/share/i2p/lib/el-api.jar
+
+# from glassfish-javaee
+/usr/share/java/glassfish-javaee.jar usr/share/i2p/lib/glassfish-javaee.jar
