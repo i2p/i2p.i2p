@@ -43,17 +43,16 @@ import org.klomp.snark.SnarkManager;
 import org.klomp.snark.Storage;
 import org.klomp.snark.TrackerClient;
 
-import org.mortbay.http.HttpResponse;
-import org.mortbay.jetty.servlet.Default;
-import org.mortbay.util.Resource;
-import org.mortbay.util.URI;
+import org.mortbay.jetty.servlet.DefaultServlet;
+import org.mortbay.resource.Resource;
+import org.mortbay.util.URIUtil;
 
 /**
  *  We extend Default instead of HTTPServlet so we can handle
  *  i2psnark/ file requests with http:// instead of the flaky and
  *  often-blocked-by-the-browser file://
  */
-public class I2PSnarkServlet extends Default {
+public class I2PSnarkServlet extends DefaultServlet {
     private I2PAppContext _context;
     private Log _log;
     private SnarkManager _manager;
@@ -99,14 +98,18 @@ public class I2PSnarkServlet extends Default {
      *  and we can't get any resources (like icons) out of the .war
      */
     @Override
-    protected Resource getResource(String pathInContext) throws IOException
+    public Resource getResource(String pathInContext)
     {
         if (pathInContext == null || pathInContext.equals("/") || pathInContext.equals("/index.jsp") ||
             pathInContext.equals("/index.html") || pathInContext.startsWith("/.icons/") ||
             pathInContext.startsWith("/.js/") || pathInContext.startsWith("/.ajax/"))
             return super.getResource(pathInContext);
         // files in the i2psnark/ directory
-        return _resourceBase.addPath(pathInContext);
+        try {
+            return _resourceBase.addPath(pathInContext);
+        } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
     }
 
     /**
@@ -114,10 +117,11 @@ public class I2PSnarkServlet extends Default {
      *  @since 0.8.3
      */
     @Override
-    public void handleGet(HttpServletRequest request, HttpServletResponse response, String pathInContext, Resource resource, boolean endsWithSlash) throws ServletException, IOException {
-        if (resource.getName().startsWith("jar:file:"))
-            response.setHeader("Cache-Control", "max-age=86400");  // cache for a day
-        super.handleGet(request, response, pathInContext, resource, endsWithSlash);
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+////////////////////////////////////
+        //if (resource.getName().startsWith("jar:file:"))
+        //    response.setHeader("Cache-Control", "max-age=86400");  // cache for a day
+        super.doGet(request, response);
     }
 
     /**
@@ -145,7 +149,7 @@ public class I2PSnarkServlet extends Default {
         // since we are not overriding handle*(), do this here
         String method = req.getMethod();
         if (!(method.equals("GET") || method.equals("HEAD") || method.equals("POST"))) {
-            resp.sendError(HttpResponse.__405_Method_Not_Allowed);
+            resp.sendError(405);
             return;
         }
         _themePath = "/themes/snark/" + _manager.getTheme() + '/';
@@ -171,20 +175,20 @@ public class I2PSnarkServlet extends Default {
             if (path.endsWith("/")) {
                 // bypass the horrid Resource.getListHTML()
                 String pathInfo = req.getPathInfo();
-                String pathInContext = URI.addPaths(path, pathInfo);
+                String pathInContext = URIUtil.addPaths(path, pathInfo);
                 req.setCharacterEncoding("UTF-8");
                 resp.setCharacterEncoding("UTF-8");
                 resp.setContentType("text/html; charset=UTF-8");
                 Resource resource = getResource(pathInContext);
                 if (resource == null || (!resource.exists())) {
-                    resp.sendError(HttpResponse.__404_Not_Found);
+                    resp.sendError(404);
                 } else {
-                    String base = URI.addPaths(req.getRequestURI(), "/");
+                    String base = URIUtil.addPaths(req.getRequestURI(), "/");
                     String listing = getListHTML(resource, base, true, method.equals("POST") ? req.getParameterMap() : null);
                     if (listing != null)
                         resp.getWriter().write(listing);
                     else // shouldn't happen
-                        resp.sendError(HttpResponse.__404_Not_Found);
+                        resp.sendError(404);
                 }
             } else {
                 super.service(req, resp);
@@ -1846,7 +1850,7 @@ public class I2PSnarkServlet extends Default {
         
         StringBuilder buf=new StringBuilder(4096);
         buf.append(DOCTYPE + "<HTML><HEAD><TITLE>");
-        String title = URI.decodePath(base);
+        String title = URIUtil.decodePath(base);
         if (title.startsWith("/i2psnark/"))
             title = title.substring("/i2psnark/".length());
 
@@ -1955,7 +1959,7 @@ public class I2PSnarkServlet extends Default {
             .append(_("Priority")).append("</th>");
         buf.append("</tr></thead>\n");
         buf.append("<tr><td colspan=\"" + (showPriority ? '4' : '3') + "\" class=\"ParentDir\"><A HREF=\"");
-        buf.append(URI.addPaths(base,"../"));
+        buf.append(URIUtil.addPaths(base,"../"));
         buf.append("\"><img alt=\"\" border=\"0\" src=\"" + _imgPath + "up.png\"> ")
             .append(_("Up to higher level directory")).append("</A></td></tr>\n");
 
@@ -1965,7 +1969,7 @@ public class I2PSnarkServlet extends Default {
         boolean showSaveButton = false;
         for (int i=0 ; i< ls.length ; i++)
         {   
-            String encoded=URI.encodePath(ls[i]);
+            String encoded=URIUtil.encodePath(ls[i]);
             // bugfix for I2P - Backport from Jetty 6 (zero file lengths and last-modified times)
             // http://jira.codehaus.org/browse/JETTY-361?page=com.atlassian.jira.plugin.system.issuetabpanels%3Achangehistory-tabpanel#issue-tabs
             // See resource.diff attachment
@@ -2021,9 +2025,9 @@ public class I2PSnarkServlet extends Default {
                 }
             }
 
-            String path=URI.addPaths(base,encoded);
+            String path=URIUtil.addPaths(base,encoded);
             if (item.isDirectory() && !path.endsWith("/"))
-                path=URI.addPaths(path,"/");
+                path=URIUtil.addPaths(path,"/");
             String icon = toIcon(item);
 
             if (complete) {

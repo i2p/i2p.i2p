@@ -77,6 +77,11 @@ public class UrlLauncher {
                 try {
                    test.close();
                 } catch (IOException ioe) {}
+                // Jetty 6 seems to start the Connector before the
+                // webapp is completely ready
+                try {
+                   Thread.sleep(2*1000);
+                } catch (InterruptedException ie) {}
                 return true;
             } catch (Exception e) {}
             if (System.currentTimeMillis() > done)

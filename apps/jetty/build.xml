@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project basedir="." default="all" name="jetty">
 
-    <property name="jetty.base" value="jetty-5.1.15" />
-    <property name="jetty.sha1" value="3a7a3de50f86f0cdb23c33aec632ea7f44132c5e" />
-    <property name="jetty.filename" value="${jetty.base}.tgz" />
-    <property name="jetty.url" value="http://dist.codehaus.org/jetty/jetty-5.1.x/${jetty.filename}" />
+    <property name="jetty.ver" value="6.1.26" />
+    <property name="jetty.base" value="jetty-${jetty.ver}" />
+    <property name="jetty.sha1" value="9485913f1a1945a849a90f1a34853d22350bc524" />
+    <property name="jetty.filename" value="${jetty.base}.zip" />
+    <property name="jetty.url" value="http://dist.codehaus.org/jetty/${jetty.base}/${jetty.filename}" />
     <property name="verified.filename" value="verified.txt" />
     <property name="javac.compilerargs" value="" />
+    <property name="tomcat.lib" value="apache-tomcat-deployer/lib" />
 
     <target name="all" depends="build" />
 
+  <!--
     <target name="ensureJettylib" >
         <available property="jetty.zip.available" file="${jetty.filename}" type="file" />
         <available property="jetty.zip.extracted" file="jettylib" type="dir" />
@@ -17,6 +20,8 @@
         <ant target="verifyJettylib" />
         <ant target="extractJettylib" />
     </target>
+   -->
+    <target name="ensureJettylib" depends="extractJettylib" />
 
     <target name="fetchJettylib" unless="jetty.zip.available" >
         <echo message="It seems that you don't have '${jetty.filename}' deployed." />
@@ -63,27 +68,83 @@
         <touch file="${verified.filename}" />
     </target>
 
+  <!--
     <target name="extractJettylib" unless="jetty.zip.extracted" >
+   -->
+    <target name="extractJettylib" >
+      <!-- for .tgz -->
+      <!--
         <gunzip src="${jetty.filename}" dest="jetty.tar" />
         <untar src="jetty.tar" dest="." />
+      -->
+      <!-- for .zip -->
+      <!--
+        <unzip src="${jetty.filename}" dest="." />
+      -->
         <mkdir dir="jettylib" />
-        <copy todir="jettylib" preservelastmodified="true" >
-            <fileset dir="${jetty.base}/lib">
-                <include name="*.jar" />
-            </fileset>
-            <fileset dir="${jetty.base}/ext">
-                <include name="ant.jar" />
-                <include name="commons-el.jar" />
-                <include name="commons-logging.jar" />
-                <include name="jasper-compiler.jar" />
-                <include name="jasper-runtime.jar" />
-            </fileset>
-        </copy>
+      <!-- We copy everything to names without the version numbers so we
+           can update them later. Where there was something similar in Jetty 5,
+           we use the same names so they will overwrite the Jetty 5 jar on upgrade.
+           Otherwise we use the same name as the symlink in Ubuntu /usr/share/java.
+           Reasons for inclusion:
+              start.jar: Needed for clients.config startup of eepsites
+              jetty-util-xxx.jar: LifeCycle (base class for stuff), URIUtil (used in i2psnark)
+              jetty-sslengine-xxx.jar: SSL NIO Connector for console
+              jetty-java5-threadpool-xxx.jar: Concurrent thread pool for eepsite
+              glassfish 2.1: Not used, too old, see Tomcat below.
+              jetty-rewrite-handler: Not used by I2P, but only 20KB and could be useful for eepsites
+              jetty-management: Not used by I2P, but only 34KB and could be useful for eepsites, and we bundled it with Jetty 5
+              All of these are available in the Ubuntu packages libjetty-java and libjetty-extra-java
+        -->
+        <copy preservelastmodified="true" file="${jetty.base}/start.jar" tofile="jettylib/jetty-start.jar" />
+        <copy file="${jetty.base}/lib/${jetty.base}.jar" tofile="jettylib/org.mortbay.jetty.jar" />
+        <copy preservelastmodified="true" file="${jetty.base}/lib/jetty-util-${jetty.ver}.jar" tofile="jettylib/jetty-util.jar" />
+        <copy preservelastmodified="true" file="${jetty.base}/lib/ext/jetty-java5-threadpool-${jetty.ver}.jar" tofile="jettylib/jetty-java5-threadpool.jar" />
+        <copy preservelastmodified="true" file="${jetty.base}/lib/ext/jetty-rewrite-handler-${jetty.ver}.jar" tofile="jettylib/jetty-rewrite-handler.jar" />
+        <copy preservelastmodified="true" file="${jetty.base}/lib/ext/jetty-sslengine-${jetty.ver}.jar" tofile="jettylib/jetty-sslengine.jar" />
+        <copy preservelastmodified="true" file="${jetty.base}/lib/management/jetty-management-${jetty.ver}.jar" tofile="jettylib/org.mortbay.jmx.jar" />
         <delete file="jetty.tar" />
+      <!--
         <delete dir="${jetty.base}" />
+      -->
+        <!-- commons-logging.jar not in Jetty 6 but we have it in launch4j so copy it over, we need it
+             for org.apache.jasper.JspC compiler
+          -->
+        <copy preservelastmodified="true" file="../../installer/lib/launch4j/lib/commons-logging.jar" todir="jettylib/" />
+        <ant target="copyTomcatLib" />
+    </target>
+
+    <!-- Tomcat.
+         The glassfish jars bundled in Jetty 6 are way too old.
+         For compatibility with very old I2P installations where the classpath
+         was set individually in wrapper.config, we rename and combine the jars as follows:
+         jasper.jar : jasper-runtime.jar
+         jasper-el.jar + el-api.jar : commons-el.jar
+         servlet-api.jar + jsp-api.jar : javax.servlet.jar
+         tomcat-juli.jar : commons-logging.jar
+         empty jar : jasper-compiler.jar
+         Also, take NOTICE and LICENSE out of each one, we bundle those separately.
+     -->
+    <target name="copyTomcatLib" >
+        <jar destfile="jettylib/jasper-runtime.jar" >
+            <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/jasper.jar" />
+        </jar>
+        <jar destfile="jettylib/commons-el.jar" duplicate="preserve" >
+            <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/jasper-el.jar" />
+            <zipfileset excludes="META-INF/**/*" src="${tomcat.lib}/el-api.jar" />
+        </jar>
+        <jar destfile="jettylib/javax.servlet.jar" duplicate="preserve" >
+            <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/servlet-api.jar" />
+            <zipfileset excludes="META-INF/**/*" src="${tomcat.lib}/jsp-api.jar" />
+        </jar>
+        <jar destfile="jettylib/commons-logging.jar" >
+            <zipfileset excludes="META-INF/LICENSE META-INF/NOTICE" src="${tomcat.lib}/tomcat-juli.jar" />
+        </jar>
+        <jar destfile="jettylib/jasper-compiler.jar" />
     </target>
 
     <target name="build" depends="jar" />
+
     <target name="builddep" />
     <target name="compile" depends="builddep, ensureJettylib" >
         <mkdir dir="./build" />
@@ -93,7 +154,7 @@
             debug="true" source="1.5" target="1.5" 
             destdir="./build/obj" 
             includeAntRuntime="false"
-            classpath="./jettylib/commons-logging.jar:./jettylib/javax.servlet.jar:./jettylib/org.mortbay.jetty.jar" >
+            classpath="../../core/java/build/i2p.jar:./jettylib/commons-logging.jar:./jettylib/javax.servlet.jar:./jettylib/org.mortbay.jetty.jar:./jettylib/jetty-util.jar" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
     </target>
@@ -112,10 +173,14 @@
         </exec>
     </target>
 
+    <!-- With Jetty 5 we replaced classes in the jar, but with Jetty 6 we
+         put our stuff in its own jar so we can work with standard Jetty 6 packages
+      -->
     <target name="jar" depends="compile, jarUpToDate, listChangedFiles" unless="jar.uptodate" >
         <!-- set if unset -->
         <property name="workspace.changes.tr" value="" />
-        <jar destfile="./jettylib/org.mortbay.jetty.jar" basedir="./build/obj" includes="**/*.class" update="true" >
+        <copy todir="build/obj" file="resources/log4j.properties" />
+        <jar destfile="./jettylib/jetty-i2p.jar" basedir="./build/obj" includes="**/*.class log4j.properties" >
             <manifest>
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
@@ -126,7 +191,7 @@
     </target>    
 
     <target name="jarUpToDate">
-        <uptodate property="jar.uptodate" targetfile="jettylib/org.mortbay.jetty.jar" >
+        <uptodate property="jar.uptodate" targetfile="jettylib/jetty-i2p.jar" >
             <srcfiles dir= "build/obj" includes="**/*.class" />
         </uptodate>
         <condition property="shouldListChanges" >
@@ -146,7 +211,9 @@
     <target name="cleandep" depends="clean" />
     <target name="distclean" depends="clean">
         <delete dir="./jettylib" />
+      <!--
         <echo message="Not actually deleting the jetty libs (since they're so large)" />
+       -->
     </target>
     <target name="reallyclean" depends="distclean">
     </target>

@@ -84,7 +84,7 @@ public class Servlet extends HttpServlet {
         this.thread.setDaemon(true);
         this.thread.setName("Addressbook");
         this.thread.start();
-        System.out.println("INFO: Starting Addressbook " + Daemon.VERSION);
+        //System.out.println("INFO: Starting Addressbook " + Daemon.VERSION);
         //System.out.println("INFO: config root under " + args[0]);
     }
 

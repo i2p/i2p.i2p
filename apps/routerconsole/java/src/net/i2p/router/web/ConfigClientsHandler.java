@@ -14,7 +14,7 @@ import net.i2p.router.client.ClientManagerFacadeImpl;
 import net.i2p.router.startup.ClientAppConfig;
 import net.i2p.router.startup.LoadClientAppsJob;
 
-import org.mortbay.jetty.Server;
+import org.mortbay.jetty.handler.ContextHandlerCollection;
 
 /**
  *  Saves changes to clients.config or webapps.config
@@ -290,7 +290,7 @@ public class ConfigClientsHandler extends FormHandler {
      * requested and add the .war to that one
      */
     private void startWebApp(String app) {
-        Server s = WebAppStarter.getConsoleServer();
+        ContextHandlerCollection s = WebAppStarter.getConsoleServer();
         if (s != null) {
                     try {
                         File path = new File(_context.getBaseDir(), "webapps");
