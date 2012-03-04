@@ -1,3 +1,43 @@
+2012-03-04 zzz
+  * Jetty: Upgrade to Jetty 6.1.26, Tomcat 6.0.35, and JSTL 1.2.
+    - Supports Servlet 2.5 / JSP 2.1 standards
+    - Jetty and Tomcat jars are checked in, no more need to
+      download Jetty in the build process.
+    - Bundle Jetty 6 rewrite handler and JMX
+    - Bundle sample Jetty config files for rewrite, JMX, and SSL
+    - Use ant's ant.jar instead of the one from Jetty
+    - Port router console, i2psnark, and I2PRequestLog code to Jetty 6
+    - Remove all old Jetty 5 patches and the custom Server() constructor,
+      this will break Seedless use of the custom constructor
+    - Fix up all .jsps to JSP 2.1 standards
+    - Include automatic migration of clients.config,
+      and of jetty.xml files for an eepsite at port 7658.
+      New config includes files in eepsite/contexts and eepsite/etc
+      Any other Jetty-hosted eepsites,
+      or an eepsite not at port 7658 or with custom
+      modifications of the jetty.xml file, will require
+      manual editing of the new Jetty config files.
+      This includes modifications for the seedless server in jetty.xml.
+    - The following plugins are not compatible with Jetty 6
+      and will be disabled until updates are available:
+         i2pcontrol, pebble, and zzzot
+    - Users updating must use the updaterWithJetty build target once,
+      to get the new Jetty and Tomcat.
+    - Put I2PRequestLog in its own jetty-i2p.jar
+    - Jetty logging moved from wrapper to I2P log using the new I2PLogger class,
+      also in jetty-i2p.jar
+  * Console: Start all wars after the main console war,
+    for faster startup and to prevent one failed war from preventing
+    startup of the entire console
+  * i2psnark: Disable i2psnark RunStandalone, unused and instantiated Jetty 5
+  * i2ptunnel: Move i2ptunnel Bean classes from the jar to the war.
+    These were deprecated for external use long ago.
+    This will break very old seedless plugins; updates have
+    been available for months.
+  * susimail: Copy MultiPartRequest and other required classes from Jetty 5.1.15
+    and add it to susimail, as the replacement MultiPartFilter in
+    Jetty 6 is difficult to migrate to, and does not support content-type
+
 2012-03-03 zzz
   * Console:
     - New simplified home page, refreshing with AJAX
