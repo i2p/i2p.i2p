@@ -640,6 +640,8 @@ table.search {
      margin: 20px;
      padding: 8px;
      width: auto;
+     margin-left:auto;
+     margin-right:auto;
 }
 
 img.app {
