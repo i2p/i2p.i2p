@@ -1141,7 +1141,7 @@
              basedir="${basedir}/installer/lib/izpack/patches" />
     </target>
 
-    <target name="installer" depends="preppkg, buildProperties, util-list-changes, izpack-patches" >
+    <target name="utility-jars" depends="buildCore" >
         <mkdir dir="pkg-temp/installer" />
         <!-- set if unset -->
         <property name="workspace.changes.util.tr" value="" />
@@ -1172,6 +1172,9 @@
                 <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
             </manifest>
         </jar>
+    </target>
+
+    <target name="installer" depends="preppkg, buildProperties, util-list-changes, izpack-patches, utility-jars" >
         <!--
           Force 1.5 pack200 output
           Doesnt work!
@@ -1259,37 +1262,7 @@
 	</exec>
     </target>
 
-    <target name="installer-windows" depends="clean, preppkg-windows-only, util-list-changes, izpack-patches" >
-        <mkdir dir="pkg-temp/installer" />
-        <!-- set if unset -->
-        <property name="workspace.changes.util.tr" value="" />
-        <jar destfile="./pkg-temp/installer/copy.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Copy.class net/i2p/util/FileUtil.class">
-            <manifest>
-                <attribute name="Main-Class" value="net.i2p.util.Copy" />
-                <attribute name="Built-By" value="${build.built-by}" />
-                <attribute name="Build-Date" value="${build.timestamp}" />
-                <attribute name="Base-Revision" value="${workspace.version}" />
-                <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
-            </manifest>
-        </jar>
-        <jar destfile="./pkg-temp/installer/delete.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Delete.class net/i2p/util/FileUtil.class">
-            <manifest>
-                <attribute name="Main-Class" value="net.i2p.util.Delete" />
-                <attribute name="Built-By" value="${build.built-by}" />
-                <attribute name="Build-Date" value="${build.timestamp}" />
-                <attribute name="Base-Revision" value="${workspace.version}" />
-                <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
-            </manifest>
-        </jar>
-        <jar destfile="./pkg-temp/installer/exec.jar" basedir="./core/java/build/obj" includes="net/i2p/util/Exec.class">
-            <manifest>
-                <attribute name="Main-Class" value="net.i2p.util.Exec" />
-                <attribute name="Built-By" value="${build.built-by}" />
-                <attribute name="Build-Date" value="${build.timestamp}" />
-                <attribute name="Base-Revision" value="${workspace.version}" />
-                <attribute name="Workspace-Changes" value="${workspace.changes.util.tr}" />
-            </manifest>
-        </jar>
+    <target name="installer-windows" depends="clean, preppkg-windows-only, util-list-changes, izpack-patches, utility-jars" >
 	<izpack input="${basedir}/installer/install.xml" output="${basedir}/install.jar" installerType="standard" basedir="${basedir}" />
         <ant target="installerexe" />
         <delete file="${basedir}/install.jar" />
@@ -1388,7 +1361,7 @@
 <!--
     <target name="release" depends="distclean, updaterWithJettyFixesAndJbigi , updater200WithJettyFixes, preppkg, installer, getReleaseNumber" >
 -->
-    <target name="release" depends="verifyReleaseBuildNumbers, distclean, testscripts, updaterRepack, updater200, preppkgRepack, installer" >
+    <target name="release" depends="verifyReleaseBuildNumbers, distclean, testscripts, updaterWithJettyRepack, updater200WithJetty, preppkgRepack, installer-nowindows, installer-windows" >
         <echo message="================================================================" />
         <echo message="Did you update these files?" />
         <exec executable="ls" failonerror="true">
@@ -1407,7 +1380,8 @@
 
         <echo message="New version number is ${release.number}" />
         <copy file="i2pupdate.zip" tofile="i2pupdate_${release.number}.zip" />
-        <copy file="i2pinstall.exe" tofile="i2pinstall_${release.number}.exe" />
+        <copy file="i2pinstall_${full.version}_windows-only.exe" tofile="i2pinstall_${release.number}.exe" />
+        <copy file="i2pinstall_${full.version}.jar" tofile="i2pinstall_${release.number}.jar" />
         <delete file="i2pupdate.sud" />
         <delete file="i2pupdate.su2" />
         <!-- make this a lot easier by putting release.privkey=/path/to/privkey in override.properties -->
@@ -1506,11 +1480,16 @@
         </exec>
         <echo message="Sign the files:" />
         <delete file="i2pinstall_${release.number}.exe.sig" />
+        <delete file="i2pinstall_${release.number}.jar.sig" />
         <delete file="i2psource_${release.number}.tar.bz2.sig" />
         <delete file="i2pupdate_${release.number}.zip.sig" />
         <exec executable="gpg" failonerror="true">
             <arg value="-b" />
             <arg value="i2pinstall_${release.number}.exe" />
+        </exec>
+        <exec executable="gpg" failonerror="true">
+            <arg value="-b" />
+            <arg value="i2pinstall_${release.number}.jar" />
         </exec>
         <exec executable="gpg" failonerror="true">
             <arg value="-b" />
@@ -1523,11 +1502,13 @@
         <exec executable="chmod" failonerror="true">
             <arg value="444" />
             <arg value="i2pinstall_${release.number}.exe" />
+            <arg value="i2pinstall_${release.number}.jar" />
             <arg value="i2psource_${release.number}.tar.bz2" />
             <arg value="i2pupdate_${release.number}.zip" />
             <arg value="i2pupdate.su2" />
             <arg value="i2pupdate.sud" />
             <arg value="i2pinstall_${release.number}.exe.sig" />
+            <arg value="i2pinstall_${release.number}.jar.sig" />
             <arg value="i2psource_${release.number}.tar.bz2.sig" />
             <arg value="i2pupdate_${release.number}.zip.sig" />
         </exec>
@@ -1535,17 +1516,20 @@
         <exec executable="ls" failonerror="true">
             <arg value="-l" />
             <arg value="i2pinstall_${release.number}.exe" />
+            <arg value="i2pinstall_${release.number}.jar" />
             <arg value="i2psource_${release.number}.tar.bz2" />
             <arg value="i2pupdate_${release.number}.zip" />
             <arg value="i2pupdate.su2" />
             <arg value="i2pupdate.sud" />
             <arg value="i2pinstall_${release.number}.exe.sig" />
+            <arg value="i2pinstall_${release.number}.jar.sig" />
             <arg value="i2psource_${release.number}.tar.bz2.sig" />
             <arg value="i2pupdate_${release.number}.zip.sig" />
         </exec>
         <echo message="SHA256 sums:" />
         <exec executable="sha256sum" failonerror="true">
             <arg value="i2pinstall_${release.number}.exe" />
+            <arg value="i2pinstall_${release.number}.jar" />
             <arg value="i2psource_${release.number}.tar.bz2" />
             <arg value="i2pupdate_${release.number}.zip" />
             <arg value="i2pupdate.su2" />
