@@ -7,6 +7,7 @@ import java.util.StringTokenizer;
 import net.i2p.I2PAppContext;
 
 import org.mortbay.jetty.webapp.Configuration;
+import org.mortbay.jetty.webapp.WebAppClassLoader;
 import org.mortbay.jetty.webapp.WebAppContext;
 
 
@@ -45,7 +46,10 @@ public class WebAppConfiguration implements Configuration {
         return _wac;
     }
 
-    public void configureClassPath() throws Exception {
+    /**
+     *  This was the interface in Jetty 5, now it's configureClassLoader()
+     */
+    private void configureClassPath() throws Exception {
         String ctxPath = _wac.getContextPath();
         //System.err.println("Configure Class Path " + ctxPath);
         if (ctxPath.equals("/"))
@@ -78,7 +82,10 @@ public class WebAppConfiguration implements Configuration {
         if (cp == null)
             return;
         StringTokenizer tok = new StringTokenizer(cp, " ,");
+        StringBuilder buf = new StringBuilder();
         while (tok.hasMoreTokens()) {
+            if (buf.length() > 0)
+                buf.append(',');
             String elem = tok.nextToken().trim();
             String path;
             if (elem.startsWith("$I2P"))
@@ -88,7 +95,17 @@ public class WebAppConfiguration implements Configuration {
             else
                 path = dir.getAbsolutePath() + '/' + elem;
             System.err.println("Adding " + path + " to classpath for " + appName);
-            _wac.setExtraClasspath(path);
+            buf.append(path);
+        }
+        ClassLoader cl = _wac.getClassLoader();
+        if (cl != null && cl instanceof WebAppClassLoader) {
+            WebAppClassLoader wacl = (WebAppClassLoader) cl;
+            wacl.addClassPath(buf.toString());
+        } else {
+            // This was not working because the WebAppClassLoader already exists
+            // and it calls getExtraClasspath in its constructor
+            // Not sure why WACL already exists...
+            _wac.setExtraClasspath(buf.toString());
         }
     }
 
@@ -99,5 +116,7 @@ public class WebAppConfiguration implements Configuration {
     public void deconfigureWebApp() {}
 
     /** @since Jetty 6 */
-    public void configureClassLoader() {}
+    public void configureClassLoader() throws Exception {
+        configureClassPath();
+    }
 }
