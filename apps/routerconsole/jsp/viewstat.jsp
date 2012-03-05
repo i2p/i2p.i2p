@@ -44,6 +44,10 @@ if ( !rendered && ((rs != null) || fakeBw) ) {
         response.setContentType("image/png");
         // very brief 45 sec expire
         response.setDateHeader("Expires", net.i2p.I2PAppContext.getGlobalContext().clock().now() + (45*1000));
+        // http://jira.codehaus.org/browse/JETTY-1346
+        // This doesn't actually appear in the response, but it fixes the problem,
+        // so Jetty must look for this header and close the connection.
+        response.setHeader("Connection", "Close");
         int width = -1;
         int height = -1;
         int periodCount = -1;
