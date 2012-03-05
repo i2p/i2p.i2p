@@ -1,3 +1,13 @@
+2012-03-05 zzz
+  * Build: Make windows and non-windows installers for release
+  * configclients: Tweaks
+  * Graphs: Add time interval to legend
+  * NetDB: Increase min ff to 250
+  * Plugins: Fix setting webapp classpath on Jetty 6
+  * UDP: Log tweaks
+  * viewstat.jsp: Set Connection: Close to work around Jetty bug
+    http://jira.codehaus.org/browse/JETTY-1346
+
 2012-03-04 zzz
   * Jetty: Upgrade to Jetty 6.1.26, Tomcat 6.0.35, and JSTL 1.2.
     - Supports Servlet 2.5 / JSP 2.1 standards

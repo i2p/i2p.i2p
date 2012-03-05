@@ -5,6 +5,8 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
@@ -149,6 +151,9 @@ class SummaryRenderer {
                 def.gprint(plotName, SummaryListener.CF, _("avg") + ": %.2f %s");
                 def.gprint(plotName, "MAX", ' ' + _("max") + ": %.2f %S");
                 def.gprint(plotName, "LAST", ' ' + _("now") + ": %.2f %S\\r");
+                // '07-Jul 21:09 UTC' with month name in the system locale
+                SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM HH:mm");
+                def.comment(sdf.format(new Date(start)) + " -- " + sdf.format(new Date(end)) + " UTC\\r");
             }
             if (!showCredit)
                 def.setShowSignature(false);

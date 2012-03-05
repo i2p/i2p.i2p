@@ -6,7 +6,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -326,6 +328,9 @@ public class StatSummarizer implements Runnable {
                 def.gprint(sendName, "MAX", ' ' + _("max") + ": %.2f %S" + _("Bps") + "\\r");
                 def.gprint(recvName, SummaryListener.CF, _("In average") + ": %.2f %S" + _("Bps"));
                 def.gprint(recvName, "MAX", ' ' + _("max") + ": %.2f %S" + _("Bps") + "\\r");
+                // '07-Jul 21:09 UTC' with month name in the system locale
+                SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM HH:mm");
+                def.comment(sdf.format(new Date(start)) + " -- " + sdf.format(new Date(end)) + " UTC\\r");
             }
             if (!showCredit)
                 def.setShowSignature(false);
