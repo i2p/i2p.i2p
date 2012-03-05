@@ -477,7 +477,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         boolean explicitSpecified = explicitAddressSpecified();
         boolean inboundRecent = _lastInboundReceivedOn + ALLOW_IP_CHANGE_INTERVAL > System.currentTimeMillis();
         if (_log.shouldLog(Log.INFO))
-            _log.info("External address received: " + RemoteHostId.toString(ourIP) + ":" + ourPort + " from " 
+            _log.info("External address received: " + Addresses.toString(ourIP, ourPort) + " from " 
                       + from.toBase64() + ", isValid? " + isValid + ", explicitSpecified? " + explicitSpecified 
                       + ", receivedInboundRecent? " + inboundRecent + " status " + _reachabilityStatus);
         
@@ -491,7 +491,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             // ignore them 
             if (_log.shouldLog(Log.ERROR))
                 _log.error("The router " + from.toBase64() + " told us we have an invalid IP - " 
-                           + RemoteHostId.toString(ourIP) + " port " +  ourPort + ".  Lets throw tomatoes at them");
+                           + Addresses.toString(ourIP, ourPort) + ".  Lets throw tomatoes at them");
             markUnreachable(from);
             //_context.shitlist().shitlistRouter(from, "They said we had an invalid IP", STYLE);
             return;
@@ -506,13 +506,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
             _lastFrom = from;
             _lastOurIP = ourIP;
             _lastOurPort = ourPort;
-            if (_log.shouldLog(Log.WARN))
-                _log.warn("The router " + from.toBase64() + " told us we have a new IP - " 
-                           + RemoteHostId.toString(ourIP) + " port " +  ourPort + ".  Wait until somebody else tells us the same thing.");
+            if (_log.shouldLog(Log.INFO))
+                _log.info("The router " + from.toBase64() + " told us we have a new IP - " 
+                           + Addresses.toString(ourIP, ourPort) + ".  Wait until somebody else tells us the same thing.");
         } else {
-            if (_log.shouldLog(Log.WARN))
-                _log.warn(from.toBase64() + " and " + _lastFrom.toBase64() + " agree we have a new IP - " 
-                           + RemoteHostId.toString(ourIP) + " port " +  ourPort + ".  Changing address.");
+            if (_log.shouldLog(Log.INFO))
+                _log.info(from.toBase64() + " and " + _lastFrom.toBase64() + " agree we have a new IP - " 
+                           + Addresses.toString(ourIP, ourPort) + ".  Changing address.");
             _lastFrom = from;
             _lastOurIP = ourIP;
             _lastOurPort = ourPort;
@@ -530,11 +530,11 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         boolean updated = false;
         boolean fireTest = false;
 
-        if (_log.shouldLog(Log.WARN))
-            _log.warn("Change address? status = " + _reachabilityStatus +
+        if (_log.shouldLog(Log.INFO))
+            _log.info("Change address? status = " + _reachabilityStatus +
                       " diff = " + (_context.clock().now() - _reachabilityStatusLastUpdated) +
                       " old = " + _externalListenHost + ':' + _externalListenPort +
-                      " new = " + RemoteHostId.toString(ourIP) + ':' + ourPort);
+                      " new = " + Addresses.toString(ourIP, ourPort));
 
             synchronized (this) {
                 if ( (_externalListenHost == null) ||
@@ -544,13 +544,14 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                     //     (_externalListenHost == null) || (_externalListenPort <= 0) ||
                     //     (_context.clock().now() - _reachabilityStatusLastUpdated > 2*TEST_FREQUENCY) ) {
                         // they told us something different and our tests are either old or failing
-                        if (_log.shouldLog(Log.WARN))
-                            _log.warn("Trying to change our external address...");
                         try {
                             _externalListenHost = InetAddress.getByAddress(ourIP);
                             // fixed port defaults to true so we never do this
                             if (ourPort >= MIN_EXTERNAL_PORT && !fixedPort)
                                 _externalListenPort = ourPort;
+                            if (_log.shouldLog(Log.WARN))
+                                _log.warn("Trying to change our external address to " +
+                                          Addresses.toString(ourIP, _externalListenPort));
                             if (_externalListenPort > 0)  {
                                 rebuildExternalAddress();
                                 replaceAddress(_externalAddress);
@@ -559,7 +560,8 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
                         } catch (UnknownHostException uhe) {
                             _externalListenHost = null;
                             if (_log.shouldLog(Log.WARN))
-                                _log.warn("Error trying to change our external address", uhe);
+                                _log.warn("Error trying to change our external address to " +
+                                          Addresses.toString(ourIP, ourPort), uhe);
                         }
                     //} else {
                     //    // they told us something different, but our tests are recent and positive,
