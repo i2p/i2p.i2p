@@ -35,6 +35,8 @@
         <echo message="  updater200: Updater compressed with pack200 (creates i2pupdate200.zip, 60% smaller)" />
         <echo message="  updaterWithJavadoc: updater including the javadocs, for display in the console" />
         <echo message="  updater200WithJavadoc: updater including the javadocs, for display in the console (creates i2pupdate200.zip)" />
+        <echo message="  updaterWithJavadocAndJetty: updater including the javadocs, for display in the console, and Jetty " />
+        <echo message="  updater200WithJavadocAndJetty: updater including the javadocs, for display in the console, and Jetty (creates i2pupdate200.zip)" />
         <echo message="  updaterWithJetty: Updater including Jetty" />
         <echo message="  updater200withJetty: Updater including Jetty" />
         <echo message="  updaterWithJettyFixes: updater including local jetty patches" />
@@ -210,16 +212,10 @@
     <!-- this makes an empty build/launchi2p.jar and the build/i2p.exe for the no-wrapper windows startup, if possible -->
     <target name="buildexe">
         <condition property="noExe">
-	    <os arch="x86_64" />
-	</condition>
-        <condition property="noExe">
-	    <os arch="ppc" />
-	</condition>
-	<condition property="noExe">
-	    <os arch="armv5tejl" />
-        </condition>
-        <condition property="noExe">
-	    <os arch="amd64" />
+	    <or>
+	        <os arch="ppc" />
+	        <os arch="armv5tejl" />
+	    </or>
 	</condition>
 	<condition property="noExe">
 	   <not>
@@ -238,6 +234,7 @@
 
     <!-- this makes an empty build/launchi2p.jar and the build/i2p.exe for the no-wrapper windows startup -->
     <target name="doBuildEXE" depends="buildProperties" unless="noExe">
+        <echo message="See the file &quot;build.properties&quot; if this step fails." />
         <jar destfile="./build/launchi2p.jar">
             <manifest>
 	     <attribute name="Main-Class" value="net.i2p.router.RouterLaunch" />
@@ -953,6 +950,8 @@
     <target name="updaterRepack" depends="prepupdate, preplicenses, repack200, zipit" />
     <target name="updaterWithJavadoc" depends="prepupdate, preplicenses, copyJavadoc, zipit" />
     <target name="updater200WithJavadoc" depends="prepupdate, preplicenses, copyJavadoc, pack200, zipit200" />
+    <target name="updaterWithJavadocAndJetty" depends="prepjupdate, preplicenses, copyJavadoc, zipit" />
+    <target name="updater200WithJavadocAndJetty" depends="prepjupdate, preplicenses, copyJavadoc, pack200, zipit200" />
     <target name="updaterWithGeoIP" depends="prepupdate, prepgeoupdate, preplicenses, zipit" />
     <target name="updaterWithJetty" depends="prepjupdate, preplicenses, zipit" />
     <target name="updaterWithJettyRepack" depends="prepjupdate, preplicenses, repack200, zipit" />
@@ -1191,10 +1190,10 @@
 
     <target name="installerexe">
         <condition property="noExe">
-	    <os arch="x86_64" />
-	</condition>
-        <condition property="noExe">
-	    <os arch="amd64" />
+	    <or>
+	        <os arch="ppc" />
+	        <os arch="armv5tejl" />
+	    </or>
 	</condition>
 	<condition property="noExe">
 	   <not>
@@ -1209,6 +1208,7 @@
 
     <!-- this makes i2pinstall.exe from install.jar -->
     <target name="doInstallerEXE" unless="noExe">
+        <echo message="See the file &quot;build.properties&quot; if this step fails." />
 	<!-- now the installer exe -->
         <launch4j configFile="./installer/i2pinstaller.xml" />
 	<!-- thazzit -->
