@@ -101,7 +101,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
  </p><p>
  <%=intl._("A web app may also be disabled by removing the .war file from the webapps directory; however the .war file and web app will reappear when you update your router to a newer version, so disabling the web app here is the preferred method.")%>
  </p><div class="wideload">
-<form action="" method="POST">
+<form action="configclients" method="POST">
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
  <jsp:getProperty name="clientshelper" property="form2" />
  <p><i><%=intl._("All changes require restart to take effect.")%></i>
@@ -125,7 +125,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
 <h3><a name="plugin"></a><%=intl._("Plugin Installation")%></h3><p>
  <%=intl._("To install a plugin, enter the download URL:")%>
  </p><div class="wideload">
-<form action="" method="POST">
+<form action="configclients" method="POST">
 <input type="hidden" name="nonce" value="<%=pageNonce%>" >
 <p>
  <input type="text" size="60" name="pluginURL" >
