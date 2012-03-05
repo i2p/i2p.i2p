@@ -212,16 +212,10 @@
     <!-- this makes an empty build/launchi2p.jar and the build/i2p.exe for the no-wrapper windows startup, if possible -->
     <target name="buildexe">
         <condition property="noExe">
-	    <os arch="x86_64" />
-	</condition>
-        <condition property="noExe">
-	    <os arch="ppc" />
-	</condition>
-	<condition property="noExe">
-	    <os arch="armv5tejl" />
-        </condition>
-        <condition property="noExe">
-	    <os arch="amd64" />
+	    <or>
+	        <os arch="ppc" />
+	        <os arch="armv5tejl" />
+	    </or>
 	</condition>
 	<condition property="noExe">
 	   <not>
@@ -240,6 +234,7 @@
 
     <!-- this makes an empty build/launchi2p.jar and the build/i2p.exe for the no-wrapper windows startup -->
     <target name="doBuildEXE" depends="buildProperties" unless="noExe">
+        <echo message="See the file &quot;build.properties&quot; if this step fails." />
         <jar destfile="./build/launchi2p.jar">
             <manifest>
 	     <attribute name="Main-Class" value="net.i2p.router.RouterLaunch" />
@@ -1192,10 +1187,10 @@
 
     <target name="installerexe">
         <condition property="noExe">
-	    <os arch="x86_64" />
-	</condition>
-        <condition property="noExe">
-	    <os arch="amd64" />
+	    <or>
+	        <os arch="ppc" />
+	        <os arch="armv5tejl" />
+	    </or>
 	</condition>
 	<condition property="noExe">
 	   <not>
@@ -1210,6 +1205,7 @@
 
     <!-- this makes i2pinstall.exe from install.jar -->
     <target name="doInstallerEXE" unless="noExe">
+        <echo message="See the file &quot;build.properties&quot; if this step fails." />
 	<!-- now the installer exe -->
         <launch4j configFile="./installer/i2pinstaller.xml" />
 	<!-- thazzit -->
