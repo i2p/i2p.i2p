@@ -1,3 +1,12 @@
+2012-03-06 zzz
+  * i2psnark: Fix NPE on magnet link addition
+  * Jetty logger: Fix stack trace logging
+  * viewstat.jsp: Properly close the ImageOutputStream to fix
+    NPEs in the finalizer, probably was the root cause of
+    what we blamed on Jetty
+  * Webapp class loader: Fix dup classes in classpath
+    caused by last checkin (symptom: i2psnark in wrong directory)
+
 2012-03-05 zzz
   * Build: Make windows and non-windows installers for release
   * configclients: Tweaks

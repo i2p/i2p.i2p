@@ -1,7 +1,11 @@
 package net.i2p.router.web;
 
 import java.io.File;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import net.i2p.I2PAppContext;
@@ -83,6 +87,7 @@ public class WebAppConfiguration implements Configuration {
             return;
         StringTokenizer tok = new StringTokenizer(cp, " ,");
         StringBuilder buf = new StringBuilder();
+        Set<URL> systemCP = getSystemClassPath();
         while (tok.hasMoreTokens()) {
             if (buf.length() > 0)
                 buf.append(',');
@@ -94,9 +99,20 @@ public class WebAppConfiguration implements Configuration {
                 path = dir.getAbsolutePath() + elem.substring(7);
             else
                 path = dir.getAbsolutePath() + '/' + elem;
+            // As of Jetty 6, we can't add dups to the class path, or
+            // else it screws up statics
+            File jfile = new File(path);
+            File jdir = jfile.getParentFile();
+            if (systemCP.contains(jfile.toURI().toURL()) ||
+                (jdir != null && systemCP.contains(jdir.toURI().toURL()))) {
+                //System.err.println("Not adding " + path + " to classpath for " + appName + ", already in system classpath");
+                continue;
+            }
             System.err.println("Adding " + path + " to classpath for " + appName);
             buf.append(path);
         }
+        if (buf.length() <= 0)
+            return;
         ClassLoader cl = _wac.getClassLoader();
         if (cl != null && cl instanceof WebAppClassLoader) {
             WebAppClassLoader wacl = (WebAppClassLoader) cl;
@@ -107,6 +123,17 @@ public class WebAppConfiguration implements Configuration {
             // Not sure why WACL already exists...
             _wac.setExtraClasspath(buf.toString());
         }
+    }
+
+    /** @since 0.9 */
+    private static Set<URL> getSystemClassPath() {
+        URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+        URL urls[] = urlClassLoader.getURLs();
+        Set<URL> rv = new HashSet(32);
+        for (int i = 0; i < urls.length; i++) {
+            rv.add(urls[i]);
+        }
+        return rv;
     }
 
     public void configureDefaults() {}
