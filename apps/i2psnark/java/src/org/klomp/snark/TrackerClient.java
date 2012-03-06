@@ -156,7 +156,7 @@ public class TrackerClient extends I2PAppThread
         primary = "";
     }
     List tlist = _util.getOpenTrackers();
-    if (tlist != null && !meta.isPrivate()) {
+    if (tlist != null && (meta == null || !meta.isPrivate())) {
         for (int i = 0; i < tlist.size(); i++) {
              String url = (String)tlist.get(i);
              if (!isValidAnnounce(url)) {
