@@ -80,7 +80,7 @@
             <echo message="to patch the source and build the packages." />
     </target>
     <target name="dist" depends="pkg, javadoc" />
-    <target name="dist200" depends="pkg, updater200, javadoc" />
+    <target name="dist200" depends="pkg200, javadoc" />
     <target name="build" depends="build2">
         <!-- so we don't build standalone for the updater -->
         <!-- This builds apps/i2psnark/java/i2psnark-standalone.zip,
@@ -679,6 +679,8 @@
     </target>
 
     <target name="pkg" depends="distclean, updater, preppkg, installer" />
+
+    <target name="pkg200" depends="distclean, updater200, preppkg, installer" />
 
     <target name="pkgclean" depends="deletepkg-temp">
         <delete>
