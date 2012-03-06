@@ -634,6 +634,7 @@ h4.app {
      clear: left;
      margin: 12px 4px;
      padding: 20px 0 8px 0;
+     text-align:center;
 }
 
 div.app {
@@ -641,6 +642,7 @@ div.app {
      padding: 8px;
      height: 100px;
      width: 112px;
+     text-align:center;
 }
 
 div.appgroup {
@@ -658,7 +660,6 @@ div.search {
 
 table.search {
      background: none;
-     margin: 20px;
      padding: 8px;
      width: auto;
      margin-left:auto;
