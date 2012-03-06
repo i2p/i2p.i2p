@@ -63,6 +63,8 @@ public class I2PLogger implements Logger
     {
         if (arg0 == null && arg1 == null) {
             _log.info(msg);
+        } else if (arg0 != null && arg1 == null && arg0 instanceof Throwable) {
+            _log.info(msg, (Throwable) arg0);
         } else if (_log.shouldLog(Log.INFO)) {
             synchronized(_buffer) {
                 format(msg,arg0,arg1);
@@ -80,6 +82,8 @@ public class I2PLogger implements Logger
     {
         if (arg0 == null && arg1 == null) {
             _log.debug(msg);
+        } else if (arg0 != null && arg1 == null && arg0 instanceof Throwable) {
+            _log.debug(msg, (Throwable) arg0);
         } else if (_log.shouldLog(Log.DEBUG)) {
             synchronized(_buffer) {
                 format(msg,arg0,arg1);
@@ -92,6 +96,8 @@ public class I2PLogger implements Logger
     {
         if (arg0 == null && arg1 == null) {
             _log.warn(msg);
+        } else if (arg0 != null && arg1 == null && arg0 instanceof Throwable) {
+            _log.warn(msg, (Throwable) arg0);
         } else if (_log.shouldLog(Log.WARN)) {
             synchronized(_buffer) {
                 format(msg,arg0,arg1);
