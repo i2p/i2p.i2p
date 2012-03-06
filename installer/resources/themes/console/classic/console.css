@@ -620,6 +620,96 @@ th {
      border-bottom: 1px solid #89f;
 }
 
+/***********************************************************************************/
+
+#appsummary {
+     margin-top: 53px;
+}
+
+h2.app {
+     margin: 15px 10px 15px 0 !important;
+}
+
+h4.app {
+     clear: left;
+     margin: 12px 4px;
+     padding: 20px 0 8px 0;
+}
+
+div.app {
+     float: left;
+     padding: 8px;
+     height: 100px;
+     width: 112px;
+}
+
+div.appgroup {
+     clear: left;
+     margin: 4px 20px;
+     padding: 16px 8px;
+     width: auto;
+}
+
+div.search {
+     margin: 20px 20px 20px 240px;
+     padding: 8px;
+     width: auto;
+}
+
+table.search {
+     background: none;
+     margin: 20px;
+     padding: 8px;
+     width: auto;
+     margin-left:auto;
+     margin-right:auto;
+}
+
+img.app {
+     height: 40px;
+     width: 40px;
+     padding: 8px;
+}
+
+img.app2p {
+     height: 48px;
+     padding: 3px 8px;
+}
+
+table.app {
+     background: none;
+     border: 0;
+     margin: auto;
+     width: auto;
+}
+
+tr.app {
+     background: none;
+     border: 0;
+     margin: 0;
+}
+
+td.app {
+     background: none;
+     border: 0;
+     margin: 0;
+}
+
+div.applabel {
+     background: url('images/header.png') center center repeat-x;
+     -moz-border-radius: 4px;
+     -khtml-border-radius: 4px;
+     border: 2px #00f;
+     border-radius: 4px;
+     border-width: 1px;
+     font-size: 9pt;
+     margin: 0;
+     padding: 3px 6px 4px 6px;
+     text-align: center;
+}
+
+/***********************************************************************************/
+
 tt {
      font-size: 8pt;
 }
@@ -909,6 +999,18 @@ div.footnote hr{
      border: 0px solid #99f;
 }
 
+button.search {
+     background: #ffe url('../images/magnifier.png') no-repeat 2px center;
+     padding: 2px 3px 2px 20px;
+     min-height: 22px;
+}
+
+input.search[type="text"] {
+     background: #ffe url('../images/magnifier.png') no-repeat 2px center;
+     padding: 2px 3px 2px 24px;
+     min-height: 22px;
+}
++
 .topness {
      font-size: 7.5pt;
      text-align: right;

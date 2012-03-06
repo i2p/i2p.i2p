@@ -23,13 +23,15 @@
     <target name="help" depends="all" />
     <target name="all" >
         <echo message="Useful targets: " />
-        <echo message="  pkg:       distclean then package everything up (installer, clean tarball, update tarball)" />
+        <echo message="  pkg:       distclean then package everything up (updater, installer)" />
         <echo message="  dist:      pkg and javadoc" />
+        <echo message="  dist200:   pkg, updater200, and javadoc" />
         <echo message="  installer: build the GUI installer" />
         <echo message="  installer-freebsd: build the GUI installer (FreeBSD only)" />
         <echo message="  installer-linux: build the GUI installer (Linux only)" />
         <echo message="  installer-osx: build the GUI installer (OSX only)" />
         <echo message="  installer-windows: build the GUI installer (Windows only)" />
+        <echo message="  installer-nowindows: build the GUI installer (all but Windows)" />
         <echo message="  tarball:   tar the full install into i2p.tar.bz2 (extracts to build a new clean install)" />
         <echo message="  updater:   Package the built files in i2pupdate.zip (extracts safely over existing installs)" />
         <echo message="  updater200: Updater compressed with pack200 (creates i2pupdate200.zip, 60% smaller)" />
@@ -46,11 +48,11 @@
         <echo message="  updaterSmall:   updater with the essentials only - no SAM, i2psnark, SusiMail, SusiDNS, news.xml, or history.txt" />
         <echo message="  updaterRouter:  updater with the i2p.jar and router.jar only" />
         <echo message="  distclean: clean up all derived files" />
-	<!-- <echo message="  syndie:    generate a standalone syndie install" /> -->
+        <!-- <echo message="  syndie:    generate a standalone syndie install" /> -->
         <echo message="  desktopgui: generate a standalone desktopgui install" />
         <echo message="  i2psnark:  generate a standalone i2psnark install" />
         <echo message="  justBOB:  generate a standalone BOB-one.jar" />
-        <echo message="  javadoc:   generate javadoc for the entire project into ./build/javadoc" />
+        <echo message="  javadoc:   generate javadoc for the entire project into ./build/javadoc and ./javadoc.zip" />
         <echo message="  javadoc-test: Javadocs for unit test classes (build/javadoc-test)" />
         <echo message="  slackpkg:  generate Slackware packages in ./Slackware/i2p and ./Slackware/i2p-base" />
         <echo message="  debianhowto: instructions on building Debian packages" />
@@ -77,8 +79,8 @@
             <echo message="Once the dependencies are installed, run &quot;ant debian&quot;"/>
             <echo message="to patch the source and build the packages." />
     </target>
-    <target name="dist" depends="pkg, javadoc">
-    </target>
+    <target name="dist" depends="pkg, javadoc" />
+    <target name="dist200" depends="pkg, updater200, javadoc" />
     <target name="build" depends="build2">
         <!-- so we don't build standalone for the updater -->
         <!-- This builds apps/i2psnark/java/i2psnark-standalone.zip,
@@ -474,6 +476,7 @@
             <link offline="true" href="${wrapperdocs.url}" packagelistLoc="installer/resources/package-lists/wrapper/" />
         </javadoc>
         <echo message="Warning, javadoc embeds timestamps in the output, run with 'TZ=UTC ant javadoc' if you plan to distribute" />
+	<zip destfile="javadoc.zip" basedir="build" level="9" includes="javadoc\**" />
     </target>
 
     <target name="javadoc-test" depends="buildRouter, javadoc" >
@@ -587,16 +590,12 @@
     <target name="clean" depends="pkgclean" >
         <delete dir="./build" />
         <delete file="installer/lib/izpack/patches.jar" failonerror="false" quiet="true" />	
-        <delete file="i2pinstall.exe" failonerror="false" quiet="true" />	
         <delete file="syndie-standalone.zip" failonerror="false" quiet="true" />
-        <delete>
-            <fileset dir="." includes="i2pinstall*jar i2pinstall*bz2" />
+        <delete failonerror="false" quiet="true">
+            <fileset dir="." includes="i2pinstall*jar javadoc.zip i2pinstall*.exe i2pinstall*bz2" />
         </delete>
         <delete file="i2psnark-standalone.zip" failonerror="false" quiet="true" />
         <delete file="BOB-one.jar" failonerror="false" quiet="true" />	
-	<delete dir="core/c/jbigi/bin" />
-	<delete dir="core/c/jbigi/lib" />
-	<delete dir="core/c/jcpuid/lib" />
         <delete dir="debian/tmp" />
         <delete dir="debian/db" />
         <delete file="debian/files" />
@@ -624,6 +623,9 @@
         <ant dir="apps/systray/java/" target="distclean" />
         <ant dir="apps/i2psnark/java/" target="distclean" />
         <ant dir="apps/jetty/" target="distclean" />
+	<delete dir="core/c/jbigi/bin" />
+	<delete dir="core/c/jbigi/lib" />
+	<delete dir="core/c/jcpuid/lib" />
         <ant dir="installer/resources/locale" target="distclean" />
 	<!--
 		NOTE! We need to turn off the default excludes for these
@@ -1269,7 +1271,7 @@
         <move file="${basedir}/i2pinstall.exe" tofile="${basedir}/i2pinstall_${full.version}_windows-only.exe" />
     </target>
 
-    <target name="installer-all" depends="installer-freebsd, installer-linux, installer-osx, installer-windows, installer" >
+    <target name="installer-all" depends="installer-freebsd, installer-linux, installer-osx, installer-windows, installer-nowindows, installer" >
     </target>
     <!-- end custom installers -->
 
