@@ -304,6 +304,7 @@ public class StatSummarizer implements Runnable {
         long period = 60*1000;
         long start = end - period*periodCount;
         //long begin = System.currentTimeMillis();
+        ImageOutputStream ios = null;
         try {
             RrdGraphDef def = new RrdGraphDef();
             def.setTimeSpan(start/1000, end/1000);
@@ -356,7 +357,7 @@ public class StatSummarizer implements Runnable {
             BufferedImage img = new BufferedImage(totalWidth, totalHeight, BufferedImage.TYPE_USHORT_565_RGB);
             Graphics gfx = img.getGraphics();
             graph.render(gfx);
-            ImageOutputStream ios = new MemoryCacheImageOutputStream(out);
+            ios = new MemoryCacheImageOutputStream(out);
             ImageIO.write(img, "png", ios);
 
             //File t = File.createTempFile("jrobinData", ".xml");
@@ -373,6 +374,9 @@ public class StatSummarizer implements Runnable {
         } catch (OutOfMemoryError oom) {
             _log.error("Error rendering", oom);
             throw new IOException("Error plotting: " + oom.getMessage());
+        } finally {
+            // this does not close the underlying stream
+            if (ios != null) try {ios.close();} catch (IOException ioe) {}
         }
     }
     
