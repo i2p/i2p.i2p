@@ -20,11 +20,10 @@
 <!--           war files placed in the webapps/ dir.                           -->
 <!--   * Uncomment the line to allow Jetty to follow symlinks                  -->
 <!--                                                                           -->
-<!-- I2P uses Jetty 5.1.15. We have no plans to upgrade to Jetty 6, due to     -->
-<!-- the significant changes in the API. If you need web server features not   -->
-<!-- found in Jetty 5, you may install and run Jetty 6 in a different JVM,     -->
-<!-- or run any other web server such as Apache. If you do run another         -->
-<!-- web server instead, be sure and disable the Jetty 5 server for your       -->
+<!-- I2P uses Jetty 6.1.26. If you need web server features not found          -->
+<!-- in Jetty 6, you may install and run Jetty 7 or 8 in a different JVM       -->
+<!-- or run any other web server such as Apache. If you do run another web     -->
+<!-- server instead, be sure and disable the Jetty 6 server for your           -->
 <!-- eepsite on http://127.0.0.1:7657/configclients.jsp .                      -->
 <!--                                                                           -->
 <!-- Jetty errors and warnings will appear in wrapper.log, check there         -->
