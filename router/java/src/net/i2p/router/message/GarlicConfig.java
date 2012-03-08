@@ -32,16 +32,17 @@ class GarlicConfig {
     private boolean _requestAck;
     private RouterInfo _replyThroughRouter; // router through which any replies will be sent before delivery to us
     private DeliveryInstructions _replyInstructions; // how the message will be sent from the replyThroughRouter to us
-    private Certificate _replyBlockCertificate;
-    private long _replyBlockMessageId;
-    private long _replyBlockExpiration;
+    // unused and undocumented
+    //private Certificate _replyBlockCertificate;
+    //private long _replyBlockMessageId;
+    //private long _replyBlockExpiration;
     
     public GarlicConfig() {
 	_id = -1;
 	_expiration = -1;
 	_cloveConfigs = new ArrayList(4);
-	_replyBlockMessageId = -1;
-	_replyBlockExpiration = -1;
+	//_replyBlockMessageId = -1;
+	//_replyBlockExpiration = -1;
     }
     
     /**
@@ -121,6 +122,7 @@ class GarlicConfig {
     public void setReplyInstructions(DeliveryInstructions instructions) { _replyInstructions = instructions; }
     public DeliveryInstructions getReplyInstructions() { return _replyInstructions; }
     
+  /****
     public long getReplyBlockMessageId() { return _replyBlockMessageId; }
     public void setReplyBlockMessageId(long id) { _replyBlockMessageId = id; }
     
@@ -129,6 +131,7 @@ class GarlicConfig {
     
     public long getReplyBlockExpiration() { return _replyBlockExpiration; }
     public void setReplyBlockExpiration(long expiration) { _replyBlockExpiration = expiration; }
+   ****/
     
     /**
      * Add a clove to the current message - if any cloves are added, an I2NP message
@@ -158,9 +161,9 @@ class GarlicConfig {
 	buf.append("<garlicId>").append(getId()).append("</garlicId>").append(NL);
 	buf.append("<recipient>").append(getRecipient()).append("</recipient>").append(NL);
 	buf.append("<recipientPublicKey>").append(getRecipientPublicKey()).append("</recipientPublicKey>").append(NL);
-	buf.append("<replyBlockCertificate>").append(getReplyBlockCertificate()).append("</replyBlockCertificate>").append(NL);
-	buf.append("<replyBlockExpiration>").append(new Date(getReplyBlockExpiration())).append("</replyBlockExpiration>").append(NL);
-	buf.append("<replyBlockMessageId>").append(getReplyBlockMessageId()).append("</replyBlockMessageId>").append(NL);
+	//buf.append("<replyBlockCertificate>").append(getReplyBlockCertificate()).append("</replyBlockCertificate>").append(NL);
+	//buf.append("<replyBlockExpiration>").append(new Date(getReplyBlockExpiration())).append("</replyBlockExpiration>").append(NL);
+	//buf.append("<replyBlockMessageId>").append(getReplyBlockMessageId()).append("</replyBlockMessageId>").append(NL);
 	buf.append("<replyInstructions>").append(getReplyInstructions()).append("</replyInstructions>").append(NL);
 	buf.append("<replyThroughRouter>").append(getReplyThroughRouter()).append("</replyThroughRouter>").append(NL);
 	buf.append("<requestAck>").append(getRequestAck()).append("</requestAck>").append(NL);
