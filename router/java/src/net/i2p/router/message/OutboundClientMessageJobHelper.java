@@ -173,7 +173,8 @@ class OutboundClientMessageJobHelper {
         ackClove.setId(ctx.random().nextLong(I2NPMessage.MAX_ID_VALUE));
         ackClove.setPayload(msg);
         ackClove.setRecipient(ctx.router().getRouterInfo());
-        ackClove.setRequestAck(false);
+        // defaults
+        //ackClove.setRequestAck(false);
         
         if (log.shouldLog(Log.DEBUG))
             log.debug("Delivery status message is targetting us [" 
@@ -206,8 +207,9 @@ class OutboundClientMessageJobHelper {
         DataMessage msg = new DataMessage(ctx);
         msg.setData(data.getEncryptedData());
         clove.setPayload(msg);
-        clove.setRecipientPublicKey(null);
-        clove.setRequestAck(false);
+        // defaults
+        //clove.setRecipientPublicKey(null);
+        //clove.setRequestAck(false);
         
         return clove;
     }
@@ -234,8 +236,9 @@ class OutboundClientMessageJobHelper {
         msg.setEntry(replyLeaseSet);
         msg.setMessageExpiration(expiration);
         clove.setPayload(msg);
-        clove.setRecipientPublicKey(null);
-        clove.setRequestAck(false);
+        // defaults
+        //clove.setRecipientPublicKey(null);
+        //clove.setRequestAck(false);
         
         return clove;
     }
