@@ -38,8 +38,20 @@ public class SessionKeyManager {
      * Retrieve the session key currently associated with encryption to the target,
      * or null if a new session key should be generated.
      *
+     * Warning - don't generate a new session if this returns null, it's racy, use getCurrentOrNewKey()
      */
     public SessionKey getCurrentKey(PublicKey target) {
+        return null;
+    }
+
+    /**
+     * Retrieve the session key currently associated with encryption to the target.
+     * Generates a new session and session key if not previously exising.
+     *
+     * @return non-null
+     * @since 0.9
+     */
+    public SessionKey getCurrentOrNewKey(PublicKey target) {
         return null;
     }
 
@@ -47,6 +59,7 @@ public class SessionKeyManager {
      * Associate a new session key with the specified target.  Metrics to determine
      * when to expire that key begin with this call.
      *
+     * @deprecated racy
      */
     public void createSession(PublicKey target, SessionKey key) { // nop
     }
@@ -54,6 +67,7 @@ public class SessionKeyManager {
     /**
      * Generate a new session key and associate it with the specified target.  
      *
+     * @deprecated racy
      */
     public SessionKey createSession(PublicKey target) {
         SessionKey key = KeyGenerator.getInstance().generateSessionKey();

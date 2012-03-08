@@ -1,3 +1,13 @@
+2012-03-09 zzz
+  * GarlicConfig: Remove unused reply block methods
+  * SessionKeyManager:
+    - Don't use unacked tagsets after consecutive ack failures
+      and revert to full ElGamal if necessary (ticket #574)
+    - Synchronize creation of new sessions to prevent dups
+    - Don't remove an unacked session until it's really out of tags
+    - Failsafe removal of old unacked tagsets
+    - Cleanups, final, comments, log tweaks, debug.jsp tweaks, synchronization tweaks
+
 2012-03-06 kytv
  * German and Spanish translation updates from Transifex
 
