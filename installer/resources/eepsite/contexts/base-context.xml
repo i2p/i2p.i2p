@@ -12,13 +12,17 @@ to serve static html files and images.
   <Set name="contextPath">/</Set>
   <Set name="resourceBase">./eepsite/docroot/</Set>
   <Set name="handler">
-    <New class="org.mortbay.jetty.handler.ResourceHandler">
-      <Set name="welcomeFiles">
-        <Array type="String">
-          <Item>index.html</Item>
-        </Array>
-      </Set>
-      <Set name="cacheControl">max-age=3600,public</Set>
+    <New class="org.mortbay.jetty.servlet.ServletHandler" >
+      <Call name="addServletWithMapping">
+        <Arg>
+          <New class="org.mortbay.jetty.servlet.ServletHolder">
+            <Arg>
+              <New class="org.mortbay.jetty.servlet.DefaultServlet" />
+            </Arg>
+          </New>
+        </Arg>
+        <Arg>/</Arg>
+      </Call>
     </New>
   </Set>
 </Configure>

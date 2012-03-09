@@ -1,4 +1,9 @@
 2012-03-09 zzz
+  * Update default eepsite base context to use DefaultServlet
+    instead of ResourceHandler, to provide resume, directory
+    indexes, caching, etc.
+
+2012-03-08 zzz
   * GarlicConfig: Remove unused reply block methods
   * SessionKeyManager:
     - Don't use unacked tagsets after consecutive ack failures
