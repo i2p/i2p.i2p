@@ -2,6 +2,8 @@
   * Update default eepsite base context to use DefaultServlet
     instead of ResourceHandler, to provide resume, directory
     indexes, caching, etc.
+  * Simplify default eepsite base and CGI contexts to use a Context
+    instead of a ContextHolder, ServletHandler, and ServletHolder
 
 2012-03-08 zzz
   * GarlicConfig: Remove unused reply block methods

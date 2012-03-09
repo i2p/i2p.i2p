@@ -22,25 +22,21 @@ Configure a custom context for the eepsite.
  * parameter value.
 -->
 
-<Configure class="org.mortbay.jetty.handler.ContextHandler">
+<Configure class="org.mortbay.jetty.servlet.Context">
   <Set name="contextPath">/cgi-bin</Set>
   <Set name="resourceBase">./eepsite/cgi-bin/</Set>
-  <Set name="handler">
-    <New class="org.mortbay.jetty.servlet.ServletHandler" >
-      <Call name="addServletWithMapping">
-        <Arg>
-          <New class="org.mortbay.jetty.servlet.ServletHolder">
-            <Arg>
-              <New class="org.mortbay.servlet.CGI" />
-            </Arg>
-            <Call name="setInitParameter">
-              <Arg>Path</Arg>
-              <Arg>/usr/local/bin:/bin:/usr/bin</Arg>
-            </Call>
-          </New>
-        </Arg>
-        <Arg>/</Arg>
-      </Call>
-    </New>
-  </Set>
+  <Call name="setInitParams">
+    <Arg>
+      <Map>
+        <Entry>
+          <Item>Path</Item>
+          <Item>/usr/local/bin:/bin:/usr/bin</Item>
+        </Entry>
+      </Map>
+    </Arg>
+  </Call>
+  <Call name="addServlet">
+    <Arg>org.mortbay.servlet.CGI</Arg>
+    <Arg>/</Arg>
+  </Call>
 </Configure>

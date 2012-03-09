@@ -4,26 +4,16 @@
 <!--
 Configure a custom context for the eepsite.
 
-This context contains only a ServletHandler with a default servlet
+This context contains only a Context with a default servlet
 to serve static html files and images.
 -->
 
-<Configure class="org.mortbay.jetty.handler.ContextHandler">
+<Configure class="org.mortbay.jetty.servlet.Context">
   <Set name="contextPath">/</Set>
   <Set name="resourceBase">./eepsite/docroot/</Set>
-  <Set name="handler">
-    <New class="org.mortbay.jetty.servlet.ServletHandler" >
-      <Call name="addServletWithMapping">
-        <Arg>
-          <New class="org.mortbay.jetty.servlet.ServletHolder">
-            <Arg>
-              <New class="org.mortbay.jetty.servlet.DefaultServlet" />
-            </Arg>
-          </New>
-        </Arg>
-        <Arg>/</Arg>
-      </Call>
-    </New>
-  </Set>
+  <Call name="addServlet">
+    <Arg>org.mortbay.jetty.servlet.DefaultServlet</Arg>
+    <Arg>/</Arg>
+  </Call>
 </Configure>
 
