@@ -33,6 +33,11 @@ public class I2PLogger implements Logger
     
     StringBuilder _buffer = new StringBuilder();
     
+    static {
+        // So people don't wonder where the logs went
+        System.out.println("INFO: Jetty " + Server.getVersion() + " logging to I2P logs using class " + Server.class.getName());
+    }
+
     public I2PLogger()
     {
         this(I2PAppContext.getGlobalContext());
