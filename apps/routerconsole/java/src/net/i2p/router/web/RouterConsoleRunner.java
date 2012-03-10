@@ -5,11 +5,14 @@ import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Inet4Address;
 import java.security.KeyStore;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.Executors;
 import java.util.concurrent.SynchronousQueue;
@@ -24,6 +27,7 @@ import net.i2p.data.DataHelper;
 import net.i2p.desktopgui.Main;
 import net.i2p.jetty.I2PLogger;
 import net.i2p.router.RouterContext;
+import net.i2p.util.Addresses;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.PortMapper;
@@ -291,14 +295,27 @@ public class RouterConsoleRunner {
         ServletHandler rootServletHandler = null;
         try {
             int boundAddresses = 0;
+            boolean hasIPV6 = Addresses.getAllAddresses().contains("0:0:0:0:0:0:0:0");
 
             // add standard listeners
+            int lport = 0;
             if (_listenPort != null) {
-                Integer lport = Integer.parseInt(_listenPort);
+                try {
+                    lport = Integer.parseInt(_listenPort);
+                } catch (NumberFormatException nfe) {}
+                if (lport <= 0)
+                    System.err.println("Bad routerconsole port " + _listenPort);
+            }
+            if (lport > 0) {
                 StringTokenizer tok = new StringTokenizer(_listenHost, " ,");
                 while (tok.hasMoreTokens()) {
                     String host = tok.nextToken().trim();
                     try {
+                        // Test before we add the connector, because Jetty 6 won't start if any of the
+                        // connectors are bad
+                        InetAddress test = InetAddress.getByName(host);
+                        if ((!hasIPV6) && (!(test instanceof Inet4Address)))
+                            throw new IOException("IPv6 addresses unsupported, you may ignore this warning if the console is still available at http://127.0.0.1:7657");
                         //if (host.indexOf(":") >= 0) // IPV6 - requires patched Jetty 5
                         //    _server.addListener('[' + host + "]:" + _listenPort);
                         //else
@@ -311,8 +328,6 @@ public class RouterConsoleRunner {
                         lsnr.setName("ConsoleSocket");   // all with same name will use the same thread pool
                         _server.addConnector(lsnr);
                         boundAddresses++;
-                    } catch (NumberFormatException nfe) {
-                        System.err.println("Unable to bind routerconsole to " + host + " port " + _listenPort + ' ' + nfe);
                     } catch (Exception ioe) { // this doesn't seem to work, exceptions don't happen until start() below
                         System.err.println("Unable to bind routerconsole to " + host + " port " + _listenPort + ' ' + ioe);
                     }
@@ -339,6 +354,11 @@ public class RouterConsoleRunner {
                         String host = tok.nextToken().trim();
                         // doing it this way means we don't have to escape an IPv6 host with []
                         try {
+                            // Test before we add the connector, because Jetty 6 won't start if any of the
+                            // connectors are bad
+                            InetAddress test = InetAddress.getByName(host);
+                            if ((!hasIPV6) && (!(test instanceof Inet4Address)))
+                                throw new IOException("IPv6 addresses unsupported, you may ignore this warning if the console is still available at http://127.0.0.1:7657");
                             // TODO if class not found use SslChannelConnector
                             // Sadly there's no common base class with the ssl methods in it
                             SslSelectChannelConnector ssll = new SslSelectChannelConnector();
