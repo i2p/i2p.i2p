@@ -295,7 +295,9 @@ public class RouterConsoleRunner {
         ServletHandler rootServletHandler = null;
         try {
             int boundAddresses = 0;
-            boolean hasIPV6 = Addresses.getAllAddresses().contains("0:0:0:0:0:0:0:0");
+            Set addresses = Addresses.getAllAddresses();
+            boolean hasIPV4 = addresses.contains("0.0.0.0");
+            boolean hasIPV6 = addresses.contains("0:0:0:0:0:0:0:0");
 
             // add standard listeners
             int lport = 0;
@@ -316,6 +318,8 @@ public class RouterConsoleRunner {
                         InetAddress test = InetAddress.getByName(host);
                         if ((!hasIPV6) && (!(test instanceof Inet4Address)))
                             throw new IOException("IPv6 addresses unsupported, you may ignore this warning if the console is still available at http://127.0.0.1:7657");
+                        if ((!hasIPV4) && (test instanceof Inet4Address))
+                            throw new IOException("IPv4 addresses unsupported, you may ignore this warning if the console is still available at http://localhost:7657");
                         //if (host.indexOf(":") >= 0) // IPV6 - requires patched Jetty 5
                         //    _server.addListener('[' + host + "]:" + _listenPort);
                         //else
@@ -359,6 +363,8 @@ public class RouterConsoleRunner {
                             InetAddress test = InetAddress.getByName(host);
                             if ((!hasIPV6) && (!(test instanceof Inet4Address)))
                                 throw new IOException("IPv6 addresses unsupported, you may ignore this warning if the console is still available at http://127.0.0.1:7657");
+                            if ((!hasIPV4) && (test instanceof Inet4Address))
+                                throw new IOException("IPv4 addresses unsupported, you may ignore this warning if the console is still available at http://localhost:7657");
                             // TODO if class not found use SslChannelConnector
                             // Sadly there's no common base class with the ssl methods in it
                             SslSelectChannelConnector ssll = new SslSelectChannelConnector();
