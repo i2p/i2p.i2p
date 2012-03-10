@@ -1142,7 +1142,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
         if (out != null) {
             out.write(errMessage);
             if (targetRequest != null) {
-                String uri = targetRequest;
+                String uri = targetRequest.replace("&", "&amp;");
                 out.write("<a href=\"".getBytes());
                 out.write(uri.getBytes());
                 out.write("\">".getBytes());
@@ -1156,8 +1156,10 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                 if (jumpServers != null && jumpServers.length() > 0) {
                     out.write("<br><br>".getBytes());
                     out.write(_("Click a link below to look for an address helper by using a \"jump\" service:").getBytes("UTF-8"));
-                    out.write("<br>".getBytes());
+                    out.write("<br>\n".getBytes());
 
+                    if (uri.startsWith("http://"))
+                        uri = uri.substring(7);
                     StringTokenizer tok = new StringTokenizer(jumpServers, ", ");
                     while (tok.hasMoreTokens()) {
                         String jurl = tok.nextToken();
@@ -1179,7 +1181,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         out.write("\">".getBytes());
                         out.write(jurl.getBytes());
                         out.write(uri.getBytes());
-                        out.write("</a>".getBytes());
+                        out.write("</a>\n".getBytes());
                     }
                 }
             }
