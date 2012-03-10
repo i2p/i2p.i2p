@@ -133,6 +133,7 @@ input.default { width: 1px; height: 1px; visibility: hidden; }
  <input type="submit" name="action" class="default" value="<%=intl._("Install Plugin")%>" />
  <input type="submit" class="cancel" name="foo" value="<%=intl._("Cancel")%>" />
  <input type="submit" name="action" class="download" value="<%=intl._("Install Plugin")%>" />
+</div><hr><div class="formaction">
  <input type="submit" name="action" class="reload" value="<%=intl._("Update All Installed Plugins")%>" />
  </div></form></div>
 <% } %>
