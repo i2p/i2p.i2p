@@ -72,6 +72,8 @@
         <property name="workspace.changes.tr" value="" />
         <jar destfile="./build/router.jar" basedir="./build/obj" includes="**/*.class" >
             <manifest>
+                <!-- so people with very old wrapper.config files will still work with Jetty 6 -->
+                <attribute name="Class-Path" value="jetty-i2p.jar jetty-java5-threadpool.jar jetty-rewrite-handler.jar jetty-sslengine.jar jetty-start.jar jetty-util.jar" />
                 <attribute name="Implementation-Version" value="${full.version}" />
                 <attribute name="Built-By" value="${build.built-by}" />
                 <attribute name="Build-Date" value="${build.timestamp}" />
