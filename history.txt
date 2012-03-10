@@ -1,3 +1,14 @@
+2012-03-10 zzz
+  * Build: Add new jetty jars to router.jar classpath so it works
+    on very old installs with individual jars specified in the
+    wrapper.config classpath
+  * configloggging: Fix clearing log overrides
+  * Console: Test if IPv6 addresses will work before instantiating
+             connectors, so Jetty will still start without them
+  * HTTP Proxy: Fix generation of jump links (ticket #616),
+                broken by refactoring in -1
+  * Jetty Logger: Put a note in wrapper log saying where the logs went
+
 2012-03-09 zzz
   * Update default eepsite base context to use DefaultServlet
     instead of ResourceHandler, to provide resume, directory
