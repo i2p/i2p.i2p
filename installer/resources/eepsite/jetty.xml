@@ -8,11 +8,9 @@
 <!-- Commonly changed settings:                                                -->
 <!--   * host: Change 127.0.0.1 to 0.0.0.0 in the addListener section          -->
 <!--           to access the server directly (bypassing i2p)                   -->
-<!--           from other computers. The included version of Jetty has         -->
-<!--           been patched to allow IPv6 addresses as well,                   -->
-<!--           enclosed in brackets e.g. [::1]                                 -->
-<!--   * port: Default 7658 in the addListener section                         -->
-<!--   * docroot: Change the ResourceBase in the addContext section            -->
+<!--           from other computers.
+<!--   * port: Default 7658 in the addConnector section                         -->
+<!--   * docroot: Change the ResourceBase in the contexts/base-context.xml file -->
 <!--           to serve files from a different location.                       -->
 <!--   * threads: Raise MinThreads and/or MaxThreads in the addListener section -->
 <!--           if you have a high-traffic site and get a lot of warnings.      -->
@@ -26,8 +24,8 @@
 <!-- server instead, be sure and disable the Jetty 6 server for your           -->
 <!-- eepsite on http://127.0.0.1:7657/configclients.jsp .                      -->
 <!--                                                                           -->
-<!-- Jetty errors and warnings will appear in wrapper.log, check there         -->
-<!-- to diagnose problems.                                                     -->
+<!-- Jetty now uses the I2P logging system rather than wrapper.log.            -->
+<!-- Use the log override org.mortbay.jetty.Server to adjust the log level.    -->
 <!--                                                                           -->
 <!-- Note that the XML encoding for this file is UTF-8.                        -->
 <!--                                                                           -->
