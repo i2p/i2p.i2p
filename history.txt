@@ -1,3 +1,6 @@
+2012-03-11 sponge
+  * fix broken comment in jetty.xml
+
 2012-03-10 zzz
   * Build: Add new jetty jars to router.jar classpath so it works
     on very old installs with individual jars specified in the
