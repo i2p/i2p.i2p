@@ -1,3 +1,9 @@
+2012-03-11 zzz
+  * Build:
+    - Include old commons logging classes in commons-logging.jar
+    - Preserve manifests in Jetty/Tomcat jars
+  * Jetty Logger: Promote warns to erros when a Throwable is the second arg
+
 2012-03-11 sponge
   * fix broken comment in jetty.xml
 

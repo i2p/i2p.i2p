@@ -102,7 +102,7 @@ public class I2PLogger implements Logger
         if (arg0 == null && arg1 == null) {
             _log.warn(msg);
         } else if (arg0 != null && arg1 == null && arg0 instanceof Throwable) {
-            _log.warn(msg, (Throwable) arg0);
+            _log.error(msg, (Throwable) arg0);
         } else if (_log.shouldLog(Log.WARN)) {
             synchronized(_buffer) {
                 format(msg,arg0,arg1);
