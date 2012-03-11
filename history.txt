@@ -1,3 +1,6 @@
+2012-03-11 sponge
+  * Slackware package script updates
+
 2012-03-11 zzz
   * Build:
     - Include old commons logging classes in commons-logging.jar
