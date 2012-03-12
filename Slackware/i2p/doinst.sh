@@ -7,7 +7,7 @@ INST_DIR=directory
 echo
 for i in *.config ; {
 	if [ -f $INST_DIR/$i ] ; then
-		echo "Please check ${INST_DIR}${i}, as there is a new version."
+		echo "Please check ${INST_DIR}${i}, as there is new version."
 		cp $i $INST_DIR/$i.new
 	else
 		cp $i $INST_DIR/$i
@@ -26,9 +26,9 @@ for i in *.config ; {
 
 ( cd $INST_DIR/eepsite
 	if [ -f jetty.xml ] ; then
-		rm jetty.xml.new
+		echo "Please check ${INST_DIR}/eepsite, as there are new files."
 	else
-		mv jetty.xml.new jetty.xml
+		find $PKG/$INSTALL_DIR/i2p -name "*.xml.new" -exec sh -c 'mv "$0" "${0/.new}"' {} \;
 	fi
 )
 

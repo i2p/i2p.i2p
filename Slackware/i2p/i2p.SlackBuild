@@ -18,6 +18,7 @@
 #
 
 BUILD=1sponge
+# INSTALL_DIR is referenced from /, don't prefix it with a '/'
 INSTALL_DIR=opt
 NAME=i2p
 ARCH=noarch
@@ -104,7 +105,10 @@ sed "s|%INSTALL_PATH|/$INSTALL_DIR/i2p|g" runplain.sh > a
 sed "s|%SYSTEM_java_io_tmpdir|/$INSTALL_DIR/i2p|g" a > runplain.sh
 # i2prouter %INSTALL_PATH and %SYSTEM_java_io_tmpdir
 sed "s|%INSTALL_PATH|/$INSTALL_DIR/i2p|g" i2prouter > a
-sed "s|%SYSTEM_java_io_tmpdir|/$INSTALL_DIR/i2p|g" a > i2prouter
+rm i2prouter
+mv a i2prouter
+sed "s|%SYSTEM_java_io_tmpdir|/$INSTALL_DIR/i2p|g" i2prouter > a
+sed "s|#ALLOW_ROOT=true|ALLOW_ROOT=true|g" a > i2prouter
 
 chmod 744 ./i2prouter
 chmod 744 ./osid
@@ -116,7 +120,7 @@ rm -Rf ./lib/*.dll ./*.bat ./*.exe ./installer ./icons ./a postinstall.sh
 
 mv $PKG/$INSTALL_DIR/i2p/*.config $PKG/install
 mv $PKG/$INSTALL_DIR/i2p/blocklist.txt $PKG/$INSTALL_DIR/i2p/blocklist.txt.new
-mv $PKG/$INSTALL_DIR/i2p/eepsite/jetty.xml $PKG/$INSTALL_DIR/i2p/eepsite/jetty.xml.new
+find $PKG/$INSTALL_DIR/i2p -name "*.xml" -exec mv {} {}.new \;
 mv $PKG/$INSTALL_DIR/i2p/eepsite/docroot/index.html $PKG/$INSTALL_DIR/i2p/eepsite/docroot/index.html.new
 mv $PKG/$INSTALL_DIR/i2p/eepsite/docroot/favicon.ico $PKG/$INSTALL_DIR/i2p/eepsite/docroot/favicon.ico.new
 sed "s|directory|/$INSTALL_DIR/i2p/|g" $CWD/doinst.sh > $PKG/install/doinst.sh
