@@ -7,6 +7,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Inet4Address;
+import java.net.ServerSocket;
 import java.security.KeyStore;
 import java.util.HashMap;
 import java.util.List;
@@ -316,10 +317,16 @@ public class RouterConsoleRunner {
                         // Test before we add the connector, because Jetty 6 won't start if any of the
                         // connectors are bad
                         InetAddress test = InetAddress.getByName(host);
+                        ServerSocket testSock = null;
                         if ((!hasIPV6) && (!(test instanceof Inet4Address)))
-                            throw new IOException("IPv6 addresses unsupported, you may ignore this warning if the console is still available at http://127.0.0.1:7657");
+                            throw new IOException("IPv6 addresses unsupported");
                         if ((!hasIPV4) && (test instanceof Inet4Address))
-                            throw new IOException("IPv4 addresses unsupported, you may ignore this warning if the console is still available at http://localhost:7657");
+                            throw new IOException("IPv4 addresses unsupported");
+                        try {
+                            testSock = new ServerSocket(0, 0, test);
+                        } finally {
+                            if (testSock != null) try { testSock.close(); } catch (IOException ioe) {}
+                        }
                         //if (host.indexOf(":") >= 0) // IPV6 - requires patched Jetty 5
                         //    _server.addListener('[' + host + "]:" + _listenPort);
                         //else
@@ -332,8 +339,9 @@ public class RouterConsoleRunner {
                         lsnr.setName("ConsoleSocket");   // all with same name will use the same thread pool
                         _server.addConnector(lsnr);
                         boundAddresses++;
-                    } catch (Exception ioe) { // this doesn't seem to work, exceptions don't happen until start() below
-                        System.err.println("Unable to bind routerconsole to " + host + " port " + _listenPort + ' ' + ioe);
+                    } catch (Exception ioe) {
+                        System.err.println("Unable to bind routerconsole to " + host + " port " + _listenPort + ": " + ioe);
+                        System.err.println("You may ignore this warning if the console is still available at http://localhost:" + _listenPort);
                     }
                 }
                 // XXX: what if listenhosts do not include 127.0.0.1? (Should that ever even happen?)
@@ -362,9 +370,15 @@ public class RouterConsoleRunner {
                             // connectors are bad
                             InetAddress test = InetAddress.getByName(host);
                             if ((!hasIPV6) && (!(test instanceof Inet4Address)))
-                                throw new IOException("IPv6 addresses unsupported, you may ignore this warning if the console is still available at http://127.0.0.1:7657");
+                                throw new IOException("IPv6 addresses unsupported");
                             if ((!hasIPV4) && (test instanceof Inet4Address))
-                                throw new IOException("IPv4 addresses unsupported, you may ignore this warning if the console is still available at http://localhost:7657");
+                                throw new IOException("IPv4 addresses unsupported");
+                            ServerSocket testSock = null;
+                            try {
+                                testSock = new ServerSocket(0, 0, test);
+                            } finally {
+                                if (testSock != null) try { testSock.close(); } catch (IOException ioe) {}
+                            }
                             // TODO if class not found use SslChannelConnector
                             // Sadly there's no common base class with the ssl methods in it
                             SslSelectChannelConnector ssll = new SslSelectChannelConnector();
@@ -379,8 +393,9 @@ public class RouterConsoleRunner {
                             ssll.setName("ConsoleSocket");   // all with same name will use the same thread pool
                             _server.addConnector(ssll);
                             boundAddresses++;
-                        } catch (Exception e) {   // probably no exceptions at this point
+                        } catch (Exception e) {
                             System.err.println("Unable to bind routerconsole to " + host + " port " + sslPort + " for SSL: " + e);
+                            System.err.println("You may ignore this warning if the console is still available at https://localhost:" + sslPort);
                         }
                     }
                     I2PAppContext.getGlobalContext().portMapper().register(PortMapper.SVC_HTTPS_CONSOLE,sslPort);

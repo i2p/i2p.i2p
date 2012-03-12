@@ -72,7 +72,7 @@ public class SearchHelper extends HelperBase {
             }
         }
         StringBuilder buf = new StringBuilder(1024);
-        buf.append("<select name=\"engine\">");
+        buf.append("<select name=\"engine\" title=\"").append(_("Select search engine")).append("\">");
         for (String name : _engines.keySet()) {
             buf.append("<option value=\"").append(name).append('\"');
             if (name.equals(dflt))

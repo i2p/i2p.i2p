@@ -32,7 +32,10 @@
  </div>
 </div>
 
-<div class="welcome">
+<jsp:useBean class="net.i2p.router.web.HomeHelper" id="homehelper" scope="request" />
+<jsp:setProperty name="homehelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
+<% if (homehelper.shouldShowWelcome()) { %>
+<div class="welcome" title="Click a flag to select a language. Click 'configure language' below to change it later.">
   <div class="langbox" id="langbox">
     <a href="/home?lang=en&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=us" title="English" alt="English"></a> 
     <a href="/home?lang=ar&amp;consoleNonce=<%=consoleNonce%>"><img height="11" width="16" style="padding: 0 2px;" src="/flags.jsp?c=lang_ar" title="عربية" alt="عربية"></a>
@@ -55,6 +58,7 @@
   </div>
   <h2 class="app"><%=intl._("Welcome to I2P")%></h2>
 </div>
+<% }  // shouldShowWelcome %>
 
 <div class="news" id="news">
  <jsp:useBean class="net.i2p.router.web.NewsHelper" id="newshelper" scope="request" />
@@ -63,7 +67,6 @@
    if (newshelper.shouldShowNews()) {
        java.io.File fpath = new java.io.File(net.i2p.I2PAppContext.getGlobalContext().getRouterDir(), "docs/news.xml");
 %>
- <h3 class="app"><%=intl._("Latest I2P News")%></h3>
  <jsp:setProperty name="newshelper" property="page" value="<%=fpath.getAbsolutePath()%>" />
  <jsp:setProperty name="newshelper" property="maxLines" value="300" />
  <jsp:getProperty name="newshelper" property="content" />
@@ -80,11 +83,9 @@
   <div class="search">
     <form action="/search.jsp" method="POST">
       <table class="search"><tr><td align="right">
-        <input size="50" type="text" class="search" name="query" />
+        <input size="40" type="text" class="search" name="query" />
       </td><td align="left">
         <button type="submit" value="search" class="search"><%=intl._("Search I2P")%></button>
-      </td></tr><tr><td align="right">
-        <b>Using search engine:</b>
       </td><td align="left">
         <jsp:useBean class="net.i2p.router.web.SearchHelper" id="searchhelper" scope="request" />
         <jsp:setProperty name="searchhelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
@@ -92,8 +93,6 @@
       </td></tr></table>
     </form>
   </div>
-  <jsp:useBean class="net.i2p.router.web.HomeHelper" id="homehelper" scope="request" />
-  <jsp:setProperty name="homehelper" property="contextId" value="<%=(String)session.getAttribute(\"i2p.contextId\")%>" />
   <div class="ag2">
     <h4 class="app"><%=intl._("Eepsites of Interest")%></h4>
     <jsp:getProperty name="homehelper" property="favorites" /><br>
