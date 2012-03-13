@@ -1,4 +1,7 @@
 2012-03-13 sponge
+  * Add sponge.i2p :-D bump version.
+
+2012-03-13 sponge
   * Plugins:
     - Fix a bug in the updater. It was not comparing the correct name.
     - Plugin updates can now be deferred if router-restart-required is set.

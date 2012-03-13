@@ -55,6 +55,7 @@ public class HomeHelper extends HelperBase {
         _x("Technical Docs") + S + _x("Technical documentation") + S + "http://www.i2p2.i2p/how" + S + I + "book.png" + S +
         _x("Trac Wiki") + S + S + "http://trac.i2p2.i2p/" + S + I + "itoopie_sm.png" + S +
         _x("Ugha's Wiki") + S + S + "http://ugha.i2p/" + S + I + "itoopie_sm.png" + S +
+        _x("Sponge's main site") + S + _x("Seedless and the Robert BitTorrent applications") + S + "http://sponge.i2p/" + S + I + "itoopie_sm.png" + S +
         "";
 
 
