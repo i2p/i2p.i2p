@@ -6,15 +6,12 @@ import java.util.Map;
 import java.util.Properties;
 
 import net.i2p.CoreVersion;
-import net.i2p.I2PAppContext;
 import net.i2p.crypto.TrustedUpdate;
 import net.i2p.data.DataHelper;
-import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.util.EepGet;
 import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
-import net.i2p.util.Log;
 import net.i2p.util.OrderedProperties;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.SimpleScheduler;
@@ -49,7 +46,7 @@ public class PluginUpdateHandler extends UpdateHandler {
     public static final String PLUGIN_DIR = "plugins";
 
     private static PluginUpdateHandler _instance;
-    public static final synchronized PluginUpdateHandler getInstance(RouterContext ctx) { 
+    public static final synchronized PluginUpdateHandler getInstance(RouterContext ctx) {
         if (_instance != null)
             return _instance;
         _instance = new PluginUpdateHandler(ctx);
@@ -60,7 +57,7 @@ public class PluginUpdateHandler extends UpdateHandler {
         super(ctx);
         _appStatus = "";
     }
-    
+
     public void update(String xpi2pURL) {
         // don't block waiting for the other one to finish
         if ("true".equals(System.getProperty(PROP_UPDATE_IN_PROGRESS))) {
@@ -79,7 +76,7 @@ public class PluginUpdateHandler extends UpdateHandler {
             update.start();
         }
     }
-    
+
     public String getAppStatus() {
         return _appStatus;
     }
@@ -87,13 +84,13 @@ public class PluginUpdateHandler extends UpdateHandler {
     public boolean isRunning() {
         return _pluginUpdateRunner != null && _pluginUpdateRunner.isRunning();
     }
-    
+
     @Override
     public boolean isDone() {
         // FIXME
         return false;
     }
-    
+
     /** @since 0.8.13 */
     public boolean wasUpdateSuccessful() {
         return _updated;
@@ -116,7 +113,7 @@ public class PluginUpdateHandler extends UpdateHandler {
 
     public class PluginUpdateRunner extends UpdateRunner implements Runnable, EepGet.StatusListener {
 
-        public PluginUpdateRunner(String url) { 
+        public PluginUpdateRunner(String url) {
             super();
         }
 
@@ -124,23 +121,44 @@ public class PluginUpdateHandler extends UpdateHandler {
         protected void update() {
             _updated = false;
             updateStatus("<b>" + _("Downloading plugin from {0}", _xpi2pURL) + "</b>");
-            // use the same settings as for updater
-            boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
-            String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
-            int proxyPort = ConfigUpdateHandler.proxyPort(_context);
-            try {
-                if (shouldProxy)
-                    // 10 retries!!
-                    _get = new EepGet(_context, proxyHost, proxyPort, 10, _updateFile, _xpi2pURL, false);
-                else
-                    _get = new EepGet(_context, 1, _updateFile, _xpi2pURL, false);
-                _get.addStatusListener(PluginUpdateRunner.this);
-                _get.fetch();
-            } catch (Throwable t) {
-                _log.error("Error downloading plugin", t);
+            if(_xpi2pURL.startsWith("file://")) {
+                // strip off "file://"
+                String xpi2pfile = _xpi2pURL.substring(7);
+                if(xpi2pfile.isEmpty()) {
+                        statusDone("<b>" + _("No file specified {0}", _xpi2pURL) + "</b>");
+                } else {
+                    try {
+                        // copy the contents of from to _updateFile
+                        long alreadyTransferred = (new File(xpi2pfile)).getCanonicalFile().length();
+                        if(FileUtil.copy((new File(xpi2pfile)).getCanonicalPath(), _updateFile, true, false)) {
+                            transferComplete(alreadyTransferred, alreadyTransferred, 0L, _xpi2pURL, _updateFile, false);
+                        } else {
+                            statusDone("<b>" + _("File copy failed {0}", _xpi2pURL) + "</b>");
+                        }
+                    } catch (Throwable t) {
+                        _log.error("Error copying plugin {0}", t);
+                    }
+
+                }
+            } else {
+                // use the same settings as for updater
+                boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
+                String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
+                int proxyPort = ConfigUpdateHandler.proxyPort(_context);
+                try {
+                    if (shouldProxy)
+                        // 10 retries!!
+                        _get = new EepGet(_context, proxyHost, proxyPort, 10, _updateFile, _xpi2pURL, false);
+                    else
+                        _get = new EepGet(_context, 1, _updateFile, _xpi2pURL, false);
+                    _get.addStatusListener(PluginUpdateRunner.this);
+                    _get.fetch();
+                } catch (Throwable t) {
+                    _log.error("Error downloading plugin", t);
+                }
             }
         }
-        
+
         @Override
         public void bytesTransferred(long alreadyTransferred, int currentWrite, long bytesTransferred, long bytesRemaining, String url) {
             StringBuilder buf = new StringBuilder(64);
@@ -302,7 +320,6 @@ public class PluginUpdateHandler extends UpdateHandler {
                     statusDone("<b>" + _("Downloaded plugin is for new installs only, but the plugin is already installed", url) + "</b>");
                     return;
                 }
-
                 // compare previous version
                 File oldPropFile = new File(destDir, "plugin.config");
                 Properties oldProps = new OrderedProperties();
@@ -358,7 +375,24 @@ public class PluginUpdateHandler extends UpdateHandler {
                     statusDone("<b>" + _("Plugin requires Jetty version {0} or lower", maxVersion) + "</b>");
                     return;
                 }
-
+                /*
+                // not ready yet...
+                // do we defer extraction and installation?
+                if (Boolean.valueOf(props.getProperty("router-restart-required")).booleanValue() && !Boolean.valueOf(props.getProperty("dont-start-at-install")).booleanValue()) {
+                    // Yup!
+                    if (!destDir.mkdir()) {
+                        to.delete();
+                        statusDone("<b>" + _("Cannot create plugin directory {0}", destDir.getAbsolutePath()) + "</b>");
+                        return;
+                    }
+                    if(!FileUtil.copy(to, destDir, true, true)) {
+                        statusDone("<b>" + _("Cannot copy plugin to directory {0}", destDir.getAbsolutePath()) + "</b>");
+                    }
+                    // we don't need the original file anymore.
+                    to.delete();
+                    statusDone("<b>" + _("Plugin will be installed on next restart.") + "</b>");
+                }
+                */
                 if (PluginStarter.isPluginRunning(appName, _context)) {
                     wasRunning = true;
                     try {
@@ -390,7 +424,6 @@ public class PluginUpdateHandler extends UpdateHandler {
                 statusDone("<b>" + _("Failed to install plugin in {0}", destDir.getAbsolutePath()) + "</b>");
                 return;
             }
-
             _updated = true;
             to.delete();
             if (Boolean.valueOf(props.getProperty("dont-start-at-install")).booleanValue()) {
@@ -441,11 +474,11 @@ public class PluginUpdateHandler extends UpdateHandler {
         }
 
     }
-    
+
     @Override
     protected void updateStatus(String s) {
         super.updateStatus(s);
         _appStatus = s;
     }
 }
-    
+

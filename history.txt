@@ -1,3 +1,11 @@
+2012-03-13 sponge
+  * Plugins:  
+     - Handle 'file://' URLs for installation and updates.
+       You must specify the entire path, e.g.
+       file:///home/someone/magicplugin.xpi2p
+       - This works for updates too!
+       - Only tested on Linux, needs to be tested on Windows.
+
 2012-03-12 zzz
   * Console:
     - Better IPv6 test, hopefully will work on Windows
