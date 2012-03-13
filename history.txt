@@ -1,4 +1,10 @@
 2012-03-13 sponge
+  * Plugins:
+    - Fix a bug in the updater. It was not comparing the correct name.
+    - Plugin updates can now be deferred if router-restart-required is set.
+      The update happens at the next router restart.
+
+2012-03-13 sponge
   * Plugins:  
      - Handle 'file://' URLs for installation and updates.
        You must specify the entire path, e.g.

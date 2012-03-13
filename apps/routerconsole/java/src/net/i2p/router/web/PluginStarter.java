@@ -2,7 +2,6 @@ package net.i2p.router.web;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.ClassLoader;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -198,7 +197,30 @@ public class PluginStarter implements Runnable {
             return false;
         }
 
+        // Do we need to extract an update?
+        File pluginUpdate = new File(ctx.getConfigDir(), PluginUpdateHandler.PLUGIN_DIR + '/' + appName + "/app.xpi2p.zip" );
+        if(pluginUpdate.exists()) {
+            // Compare the start time of the router with the plugin.
+            List<RouterContext> contexts = RouterContext.listContexts();
+            if ( (contexts == null) || (contexts.isEmpty()) )
+                throw new IllegalStateException("No contexts. This is usually because the router is either starting up or shutting down.");
+            if(contexts.get(0).router().getWhenStarted() > pluginUpdate.lastModified()) {
+                if (!FileUtil.extractZip(pluginUpdate, pluginDir)) {
+                    pluginUpdate.delete();
+                    String foo = "Plugin '" + appName + "' failed to update! File '" + pluginUpdate +"' deleted. You may need to remove and install the plugin again.";
+                    log.error(foo);
+                    disablePlugin(appName);
+                    throw new Exception(foo);
+                } else {
+                    pluginUpdate.delete();
+                    // Need to always log this, and  log.logAlways() did not work for me.
+                    System.err.println("INFO: Plugin updated: " + appName);
+                }
+            } // silently fail to update, because we have not restarted.
+        }
+
         Properties props = pluginProperties(ctx, appName);
+
         String minVersion = ConfigClientsHelper.stripHTML(props, "min-i2p-version");
         if (minVersion != null &&
             (new VersionComparator()).compare(CoreVersion.VERSION, minVersion) < 0) {

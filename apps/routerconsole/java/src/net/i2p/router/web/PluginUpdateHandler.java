@@ -14,6 +14,7 @@ import net.i2p.util.FileUtil;
 import net.i2p.util.I2PAppThread;
 import net.i2p.util.OrderedProperties;
 import net.i2p.util.SecureDirectory;
+import net.i2p.util.SecureFile;
 import net.i2p.util.SimpleScheduler;
 import net.i2p.util.SimpleTimer;
 import net.i2p.util.VersionComparator;
@@ -333,7 +334,7 @@ public class PluginUpdateHandler extends UpdateHandler {
                 }
                 String oldPubkey = oldProps.getProperty("key");
                 String oldKeyName = oldProps.getProperty("signer");
-                String oldAppName = props.getProperty("name");
+                String oldAppName = oldProps.getProperty("name");
                 if ((!pubkey.equals(oldPubkey)) || (!signer.equals(oldKeyName)) || (!appName.equals(oldAppName))) {
                     to.delete();
                     statusDone("<b>" + _("Signature of downloaded plugin does not match installed plugin") + "</b>");
@@ -375,24 +376,25 @@ public class PluginUpdateHandler extends UpdateHandler {
                     statusDone("<b>" + _("Plugin requires Jetty version {0} or lower", maxVersion) + "</b>");
                     return;
                 }
-                /*
-                // not ready yet...
                 // do we defer extraction and installation?
-                if (Boolean.valueOf(props.getProperty("router-restart-required")).booleanValue() && !Boolean.valueOf(props.getProperty("dont-start-at-install")).booleanValue()) {
+                if (Boolean.valueOf(props.getProperty("router-restart-required")).booleanValue()) {
                     // Yup!
-                    if (!destDir.mkdir()) {
+                    try {
+                        if(!FileUtil.copy(to, (new SecureFile( new SecureFile(appDir.getCanonicalPath() +"/" + appName +"/"+ ZIP).getCanonicalPath())) , true, true)) {
+                            to.delete();
+                            statusDone("<b>" + _("Cannot copy plugin to directory {0}", destDir.getAbsolutePath()) + "</b>");
+                            return;
+                        }
+                    } catch (Throwable t) {
                         to.delete();
-                        statusDone("<b>" + _("Cannot create plugin directory {0}", destDir.getAbsolutePath()) + "</b>");
+                        _log.error("Error copying plugin {0}", t);
                         return;
-                    }
-                    if(!FileUtil.copy(to, destDir, true, true)) {
-                        statusDone("<b>" + _("Cannot copy plugin to directory {0}", destDir.getAbsolutePath()) + "</b>");
                     }
                     // we don't need the original file anymore.
                     to.delete();
                     statusDone("<b>" + _("Plugin will be installed on next restart.") + "</b>");
+                    return;
                 }
-                */
                 if (PluginStarter.isPluginRunning(appName, _context)) {
                     wasRunning = true;
                     try {
