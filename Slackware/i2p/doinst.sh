@@ -7,7 +7,7 @@ INST_DIR=directory
 echo
 for i in *.config ; {
 	if [ -f $INST_DIR/$i ] ; then
-		echo "Please check ${INST_DIR}${i}, as there is new version."
+		echo "Please check ${INST_DIR}${i}, as there is a new version."
 		cp $i $INST_DIR/$i.new
 	else
 		cp $i $INST_DIR/$i
