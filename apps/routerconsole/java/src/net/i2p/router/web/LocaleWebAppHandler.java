@@ -28,6 +28,7 @@ public class LocaleWebAppHandler extends WebAppContext
     public LocaleWebAppHandler(I2PAppContext ctx, String path, String warPath) {
         super(warPath, path);
         _context = ctx;
+        setInitParams(WebAppStarter.INIT_PARAMS);
     }
     
     /**

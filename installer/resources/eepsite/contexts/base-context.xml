@@ -11,6 +11,16 @@ to serve static html files and images.
 <Configure class="org.mortbay.jetty.servlet.Context">
   <Set name="contextPath">/</Set>
   <Set name="resourceBase">./eepsite/docroot/</Set>
+  <Call name="setInitParams">
+    <Arg>
+      <Map>
+        <Entry>
+          <Item>orb.mortbay.jetty.servlet.Default.cacheControl</Item>
+          <Item>max-age=3600,public</Item>
+        </Entry>
+      </Map>
+    </Arg>
+  </Call>
   <Call name="addServlet">
     <Arg>org.mortbay.jetty.servlet.DefaultServlet</Arg>
     <Arg>/</Arg>

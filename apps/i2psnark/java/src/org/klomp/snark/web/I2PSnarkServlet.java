@@ -101,8 +101,7 @@ public class I2PSnarkServlet extends DefaultServlet {
     public Resource getResource(String pathInContext)
     {
         if (pathInContext == null || pathInContext.equals("/") || pathInContext.equals("/index.jsp") ||
-            pathInContext.equals("/index.html") || pathInContext.startsWith("/.icons/") ||
-            pathInContext.startsWith("/.js/") || pathInContext.startsWith("/.ajax/"))
+            pathInContext.equals("/index.html") || pathInContext.startsWith("/.icons/"))
             return super.getResource(pathInContext);
         // files in the i2psnark/ directory
         try {
@@ -118,9 +117,6 @@ public class I2PSnarkServlet extends DefaultServlet {
      */
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-////////////////////////////////////
-        //if (resource.getName().startsWith("jar:file:"))
-        //    response.setHeader("Cache-Control", "max-age=86400");  // cache for a day
         super.doGet(request, response);
     }
 

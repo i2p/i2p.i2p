@@ -2,15 +2,12 @@ package net.i2p.router.web;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
-import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.I2PAppContext;
 import net.i2p.util.FileUtil;
-import net.i2p.util.Log;
 import net.i2p.util.SecureDirectory;
 import net.i2p.util.PortMapper;
 
@@ -39,11 +36,16 @@ import org.mortbay.jetty.handler.ContextHandlerCollection;
  */
 public class WebAppStarter {
 
-    static final Map<String, Long> warModTimes = new ConcurrentHashMap();
-    static private Log _log;
+    private static final Map<String, Long> warModTimes = new ConcurrentHashMap();
+    static final Map INIT_PARAMS = new HashMap(4);
+    //static private Log _log;
 
     static {
-        _log = ContextHelper.getContext(null).logManager().getLog(WebAppStarter.class); ;
+        //_log = ContextHelper.getContext(null).logManager().getLog(WebAppStarter.class); ;
+        // see DefaultServlet javadocs
+        String pfx = "org.mortbay.jetty.servlet.Default.";
+        INIT_PARAMS.put(pfx + "cacheControl", "max-age=86400");
+        INIT_PARAMS.put(pfx + "dirAllowed", "false");
     }
 
 
@@ -55,7 +57,8 @@ public class WebAppStarter {
                             String appName, String warPath) throws Exception {
          File tmpdir = new SecureDirectory(ctx.getTempDir(), "jetty-work-" + appName + ctx.random().nextInt());
          WebAppContext wac = addWebApp(ctx, server, appName, warPath, tmpdir);      
-		 _log.debug("Loading war from: " + warPath);
+         //_log.debug("Loading war from: " + warPath);
+         wac.setInitParams(INIT_PARAMS);
          wac.start();
     }
 
@@ -101,8 +104,6 @@ public class WebAppStarter {
 
         // this does the passwords...
         RouterConsoleRunner.initialize(wac);
-
-
 
         // see WebAppConfiguration for info
         String[] classNames = wac.getConfigurationClasses();

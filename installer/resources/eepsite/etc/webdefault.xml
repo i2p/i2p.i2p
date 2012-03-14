@@ -153,12 +153,10 @@
       <param-name>useFileMappedBuffer</param-name>
       <param-value>true</param-value>
     </init-param>  
-    <!--
     <init-param>
       <param-name>cacheControl</param-name>
       <param-value>max-age=3600,public</param-value>
     </init-param>
-    -->
     <load-on-startup>0</load-on-startup>
   </servlet> 
 
