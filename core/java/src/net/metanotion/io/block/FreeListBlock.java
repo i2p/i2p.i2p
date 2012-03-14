@@ -30,6 +30,9 @@ package net.metanotion.io.block;
 
 import java.io.IOException;
 
+import net.i2p.I2PAppContext;
+import net.i2p.util.Log;
+
 import net.metanotion.io.RandomAccessInterface;
 
 /**
@@ -80,7 +83,8 @@ class FreeListBlock {
 					branches[good++] = fpg;
 			}
 			if (good != len) {
-				BlockFile.log.error((len - good) + " bad pages in " + this);
+				Log log = I2PAppContext.getGlobalContext().logManager().getLog(BlockFile.class);
+				log.error((len - good) + " bad pages in " + this);
 				len = good;
 				writeBlock();
 			}
@@ -146,7 +150,8 @@ class FreeListBlock {
 		if (len >= MAX_SIZE)
 			throw new IllegalStateException("full");
 		if (getMagic(freePage) == MAGIC_FREE) {
-			BlockFile.log.error("Double free page " + freePage, new Exception());
+			Log log = I2PAppContext.getGlobalContext().logManager().getLog(BlockFile.class);
+			log.error("Double free page " + freePage, new Exception());
 			return;
 		}
 		branches[len++] = freePage;

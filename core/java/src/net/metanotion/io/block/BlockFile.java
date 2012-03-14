@@ -69,7 +69,7 @@ import net.i2p.util.Log;
 public class BlockFile {
 	public static final int PAGESIZE = 1024;
 	public static final long OFFSET_MOUNTED = 20;
-	public static final Log log = I2PAppContext.getGlobalContext().logManager().getLog(BlockFile.class);
+	public final Log log = I2PAppContext.getGlobalContext().logManager().getLog(BlockFile.class);
 
 	public final RandomAccessInterface file;
 

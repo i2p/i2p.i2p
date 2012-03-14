@@ -60,8 +60,8 @@ public class IBSkipSpan extends BSkipSpan {
 
 	@Override
 	public SkipSpan newInstance(SkipList sl) {
-		if (BlockFile.log.shouldLog(Log.DEBUG))
-			BlockFile.log.debug("Splitting page " + this.page + " containing " + this.nKeys + '/' + this.spanSize);
+		if (bf.log.shouldLog(Log.DEBUG))
+			bf.log.debug("Splitting page " + this.page + " containing " + this.nKeys + '/' + this.spanSize);
 		try {
 			int newPage = bf.allocPage();
 			init(bf, newPage, bf.spanSize);
@@ -86,11 +86,11 @@ public class IBSkipSpan extends BSkipSpan {
 				this.firstKey = keys[0];
 			this.keys = null;
 			this.vals = null;
-			if (BlockFile.log.shouldLog(Log.DEBUG))
-				BlockFile.log.debug("Flushed data for page " + this.page + " containing " + this.nKeys + '/' + this.spanSize);
-		} else if (BlockFile.log.shouldLog(Log.DEBUG)) {
+			if (bf.log.shouldLog(Log.DEBUG))
+				bf.log.debug("Flushed data for page " + this.page + " containing " + this.nKeys + '/' + this.spanSize);
+		} else if (bf.log.shouldLog(Log.DEBUG)) {
 			// if keys is null, we are (hopefully) just updating the prev/next pages on an unloaded span
-			BlockFile.log.debug("Flushed pointers for for unloaded page " + this.page + " containing " + this.nKeys + '/' + this.spanSize);
+			bf.log.debug("Flushed pointers for for unloaded page " + this.page + " containing " + this.nKeys + '/' + this.spanSize);
 		}
 	}
 
@@ -103,8 +103,8 @@ public class IBSkipSpan extends BSkipSpan {
 		super.loadData();
 		if (this.nKeys > 0)
 			this.firstKey = this.keys[0];
-		if (BlockFile.log.shouldLog(Log.DEBUG))
-			BlockFile.log.debug("Loaded data for page " + this.page + " containing " + this.nKeys + '/' + this.spanSize + " first key: " + this.firstKey);
+		if (bf.log.shouldLog(Log.DEBUG))
+			bf.log.debug("Loaded data for page " + this.page + " containing " + this.nKeys + '/' + this.spanSize + " first key: " + this.firstKey);
 	}
 
 	/**
@@ -127,11 +127,11 @@ public class IBSkipSpan extends BSkipSpan {
 		curPage = this.bf.readMultiPageData(k, curPage, pageCounter, curNextPage);
 		this.firstKey = (Comparable) this.keySer.construct(k);
 		if (this.firstKey == null) {
-			BlockFile.log.error("Null deserialized first key in page " + curPage);
+			bf.log.error("Null deserialized first key in page " + curPage);
 			repair(1);
 		}
-		if (BlockFile.log.shouldLog(Log.DEBUG))
-			BlockFile.log.debug("Loaded header for page " + this.page + " containing " + this.nKeys + '/' + this.spanSize + " first key: " + this.firstKey);
+		if (bf.log.shouldLog(Log.DEBUG))
+			bf.log.debug("Loaded header for page " + this.page + " containing " + this.nKeys + '/' + this.spanSize + " first key: " + this.firstKey);
 	}
 
 	/**
@@ -174,7 +174,7 @@ public class IBSkipSpan extends BSkipSpan {
 				BlockFile.pageSeek(this.bf.file, curNextPage[0]);
 				int magic = bf.file.readInt();
 				if (magic != BlockFile.MAGIC_CONT) {
-					BlockFile.log.error("Lost " + (this.nKeys - i) + " entries - Bad SkipSpan magic number 0x" + Integer.toHexString(magic) + " on page " + curNextPage[0]);
+					bf.log.error("Lost " + (this.nKeys - i) + " entries - Bad SkipSpan magic number 0x" + Integer.toHexString(magic) + " on page " + curNextPage[0]);
 					lostEntries(i, curPage);
 					break;
 				}
@@ -189,7 +189,7 @@ public class IBSkipSpan extends BSkipSpan {
 			try {
 				curPage = this.bf.readMultiPageData(k, curPage, pageCounter, curNextPage);
 			} catch (IOException ioe) {
-				BlockFile.log.error("Lost " + (this.nKeys - i) + " entries - Error loading " + this + " on page " + curPage, ioe);
+				bf.log.error("Lost " + (this.nKeys - i) + " entries - Error loading " + this + " on page " + curPage, ioe);
 				lostEntries(i, curPage);
 				break;
 			}
@@ -198,7 +198,7 @@ public class IBSkipSpan extends BSkipSpan {
 			if (ckey == null) {
 				// skip the value and keep going
 				curPage = this.bf.skipMultiPageBytes(vsz, curPage, pageCounter, curNextPage);
-				BlockFile.log.error("Null deserialized key in entry " + i + " page " + curPage);
+				bf.log.error("Null deserialized key in entry " + i + " page " + curPage);
 				fail++;
 				continue;
 			}
@@ -209,13 +209,13 @@ public class IBSkipSpan extends BSkipSpan {
 				try {
 					curPage = this.bf.readMultiPageData(v, curPage, pageCounter, curNextPage);
 				} catch (IOException ioe) {
-					BlockFile.log.error("Lost " + (this.nKeys - i) + " entries - Error loading " + this + " on page " + curPage, ioe);
+					bf.log.error("Lost " + (this.nKeys - i) + " entries - Error loading " + this + " on page " + curPage, ioe);
 					lostEntries(i, curPage);
 					break;
 				}
 				Object rv = this.valSer.construct(v);
 				if (rv == null) {
-					BlockFile.log.error("Null deserialized value in entry " + i + " page " + curPage +
+					bf.log.error("Null deserialized value in entry " + i + " page " + curPage +
 					                    " key=" + ckey);
 					fail++;
 				}
@@ -245,9 +245,9 @@ public class IBSkipSpan extends BSkipSpan {
 			if (this.nKeys > 0)
 				this.firstKey = this.keys[0];
 			flush();
-			BlockFile.log.error("Repaired corruption of " + fail + " entries");
+			bf.log.error("Repaired corruption of " + fail + " entries");
 		} catch (IOException ioe) {
-			BlockFile.log.error("Failed to repair corruption of " + fail + " entries", ioe);
+			bf.log.error("Failed to repair corruption of " + fail + " entries", ioe);
 		}
 	*****/
 	}
@@ -258,8 +258,8 @@ public class IBSkipSpan extends BSkipSpan {
 
 	public IBSkipSpan(BlockFile bf, BSkipList bsl, int spanPage, Serializer key, Serializer val) throws IOException {
 		super(bf, bsl);
-		if (BlockFile.log.shouldLog(Log.DEBUG))
-			BlockFile.log.debug("New ibss page " + spanPage);
+		if (bf.log.shouldLog(Log.DEBUG))
+			bf.log.debug("New ibss page " + spanPage);
 		BSkipSpan.loadInit(this, bf, bsl, spanPage, key, val);
 		loadFirstKey();
 		this.next = null;
@@ -287,7 +287,7 @@ public class IBSkipSpan extends BSkipSpan {
 			    previousFirstKey.compareTo(nextFirstKey) >= 0) {
 				// TODO remove, but if we are at the bottom of a level
 				// we have to remove the level too, which is a mess
-				BlockFile.log.error("Corrupt database, span out of order " + ((BSkipSpan)bss.prev).page +
+				bf.log.error("Corrupt database, span out of order " + ((BSkipSpan)bss.prev).page +
 				                    " first key " + previousFirstKey +
 				                    " next page " + bss.page +
 				                    " first key " + nextFirstKey);
@@ -317,7 +317,7 @@ public class IBSkipSpan extends BSkipSpan {
 			    previousFirstKey.compareTo(nextFirstKey) >= 0) {
 				// TODO remove, but if we are at the bottom of a level
 				// we have to remove the level too, which is a mess
-				BlockFile.log.error("Corrupt database, span out of order " + bss.page +
+				bf.log.error("Corrupt database, span out of order " + bss.page +
 				                    " first key " + previousFirstKey +
 				                    " next page " + ((BSkipSpan)bss.next).page +
 				                    " first key " + nextFirstKey);
@@ -386,16 +386,16 @@ public class IBSkipSpan extends BSkipSpan {
 	 */
 	@Override
 	public Object[] remove(Comparable key, SkipList sl) {
-		if (BlockFile.log.shouldLog(Log.DEBUG))
-			BlockFile.log.debug("Remove " + key + " in " + this);
+		if (bf.log.shouldLog(Log.DEBUG))
+			bf.log.debug("Remove " + key + " in " + this);
 		if (nKeys <= 0)
 			return null;
 		try {
 			seekAndLoadData();
 			if (this.nKeys == 1 && this.prev == null && this.next != null && this.next.keys == null) {
 				// fix for NPE in SkipSpan if next is not loaded
-				if (BlockFile.log.shouldLog(Log.INFO))
-					BlockFile.log.info("Loading next data for remove");
+				if (bf.log.shouldLog(Log.INFO))
+					bf.log.info("Loading next data for remove");
 				((IBSkipSpan)this.next).seekAndLoadData();
 			}
 		} catch (IOException ioe) {
