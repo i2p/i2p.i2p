@@ -15,7 +15,7 @@ to serve static html files and images.
     <Arg>
       <Map>
         <Entry>
-          <Item>orb.mortbay.jetty.servlet.Default.cacheControl</Item>
+          <Item>org.mortbay.jetty.servlet.Default.cacheControl</Item>
           <Item>max-age=3600,public</Item>
         </Entry>
       </Map>
