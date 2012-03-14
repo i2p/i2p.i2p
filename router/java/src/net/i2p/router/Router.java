@@ -30,7 +30,6 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.i2p.CoreVersion;
-import net.i2p.crypto.DHSessionKeyBuilder;
 import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
 import net.i2p.data.DataHelper;
@@ -711,10 +710,8 @@ public class Router implements RouterClock.ClockShiftListener {
     
     private void warmupCrypto() {
         _context.random().nextBoolean();
-        // Use restart() to refire the static refiller threads, in case
-        // we are restarting the router in the same JVM (Android)
-        DHSessionKeyBuilder.restart();
-        _context.elGamalEngine().restart();
+        // Instantiate to fire up the YK refiller thread
+        _context.elGamalEngine();
     }
     
     private void startupQueue() {
@@ -1091,15 +1088,12 @@ public class Router implements RouterClock.ClockShiftListener {
 
         // shut down I2PAppContext tasks here
 
-        // If there are multiple routers in the JVM, we don't want to do this
-        // to the DH or YK tasks, as they are singletons.
+        try {
+            _context.elGamalEngine().shutdown();
+        } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting elGamal", t); }
+
         if (contexts.isEmpty()) {
-            try {
-                DHSessionKeyBuilder.shutdown();
-            } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting DH", t); }
-            try {
-                _context.elGamalEngine().shutdown();
-            } catch (Throwable t) { _log.log(Log.CRIT, "Error shutting elGamal", t); }
+            // any thing else to shut down?
         } else {
             _log.logAlways(Log.WARN, "Warning - " + contexts.size() + " routers remaining in this JVM, not releasing all resources");
         }

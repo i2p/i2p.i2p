@@ -1,3 +1,22 @@
+2012-03-14 zzz
+  * Blockfile, i2psnark: Remove static logs
+  * DHSessionKeyBuilder:
+    - Move from core to router/transport
+    - Make non-static, instantiate in TransportManager
+    - Generate keypair in constructor and make final
+      to move more processing to the precalc thread
+      and eliminate races
+    - Synchronize getSessionKey() to eliminate races
+    - Comment out unused methods
+  * Jetty:
+    - Set default cache-control for webapps and eepsite
+    - Disable dir listing for console webapps
+  * UDPTransport:
+    - Make key builder final in InboundEstablishState to
+      eliminate rare NPE (ticket #406)
+    - Remove unused static instance
+  * YKGenerator: Make non-static, instantiate in ElGamalEngine
+
 2012-03-13 sponge
   * Add sponge.i2p :-D bump version.
 
@@ -9,7 +28,7 @@
 
 2012-03-13 sponge
   * Plugins:  
-     - Handle 'file://' URLs for installation and updates.
+     - Handle 'file://' URLs for installation and updates (ticket #429).
        You must specify the entire path, e.g.
        file:///home/someone/magicplugin.xpi2p
        - This works for updates too!

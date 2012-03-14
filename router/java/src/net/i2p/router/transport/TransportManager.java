@@ -30,6 +30,7 @@ import net.i2p.data.i2np.I2NPMessage;
 import net.i2p.router.CommSystemFacade;
 import net.i2p.router.OutNetMessage;
 import net.i2p.router.RouterContext;
+import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import net.i2p.router.transport.ntcp.NTCPTransport;
 import net.i2p.router.transport.udp.UDPTransport;
 import net.i2p.util.Addresses;
@@ -45,6 +46,7 @@ public class TransportManager implements TransportEventListener {
     private final Map<String, Transport> _transports;
     private final RouterContext _context;
     private final UPnPManager _upnpManager;
+    private final DHSessionKeyBuilder.PrecalcRunner _dhThread;
 
     /** default true */
     public final static String PROP_ENABLE_UDP = "i2np.udp.enable";
@@ -67,6 +69,7 @@ public class TransportManager implements TransportEventListener {
             _upnpManager = new UPnPManager(context, this);
         else
             _upnpManager = null;
+        _dhThread = new DHSessionKeyBuilder.PrecalcRunner(context);
     }
     
     public void addTransport(Transport transport) {
@@ -84,12 +87,12 @@ public class TransportManager implements TransportEventListener {
     private void configTransports() {
         boolean enableUDP = _context.getBooleanPropertyDefaultTrue(PROP_ENABLE_UDP);
         if (enableUDP) {
-            UDPTransport udp = new UDPTransport(_context);
+            UDPTransport udp = new UDPTransport(_context, _dhThread);
             addTransport(udp);
             initializeAddress(udp);
         }
         if (isNTCPEnabled(_context))
-            addTransport(new NTCPTransport(_context));
+            addTransport(new NTCPTransport(_context, _dhThread));
         if (_transports.isEmpty())
             _log.log(Log.CRIT, "No transports are enabled");
     }
@@ -135,6 +138,7 @@ public class TransportManager implements TransportEventListener {
     }
 
     public void startListening() {
+        _dhThread.start();
         // For now, only start UPnP if we have no publicly-routable addresses
         // so we don't open the listener ports to the world.
         // Maybe we need a config option to force on? Probably not.
@@ -161,6 +165,9 @@ public class TransportManager implements TransportEventListener {
         startListening();
     }
     
+    /**
+     *  Can be restarted.
+     */
     public void stopListening() {
         if (_upnpManager != null)
             _upnpManager.stop();
@@ -168,6 +175,16 @@ public class TransportManager implements TransportEventListener {
             t.stopListening();
         }
         _transports.clear();
+    }
+    
+    
+    /**
+     *  Cannot be restarted.
+     *  @since 0.9
+     */
+    public void shutdown() {
+        stopListening();
+        _dhThread.shutdown();
     }
     
     public Transport getTransport(String style) {

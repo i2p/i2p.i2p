@@ -34,6 +34,7 @@ import net.i2p.router.RouterContext;
 import net.i2p.router.transport.Transport;
 import net.i2p.router.transport.TransportBid;
 import net.i2p.router.transport.TransportImpl;
+import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import net.i2p.router.util.RandomIterator;
 import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
@@ -43,7 +44,7 @@ import net.i2p.util.SimpleTimer;
 import net.i2p.util.Translate;
 
 /**
- *
+ *  The SSU transport
  */
 public class UDPTransport extends TransportImpl implements TimedWeightedPriorityMessageQueue.FailedListener {
     private final Log _log;
@@ -70,6 +71,7 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     private long _reachabilityStatusLastUpdated;
     private long _introducersSelectedOn;
     private long _lastInboundReceivedOn;
+    private final DHSessionKeyBuilder.Factory _dhFactory;
     
     /** do we need to rebuild our external router address asap? */
     private boolean _needsRebuild;
@@ -178,8 +180,9 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
     //private static final String THINSP = "&thinsp;/&thinsp;";
     private static final String THINSP = " / ";
 
-    public UDPTransport(RouterContext ctx) {
+    public UDPTransport(RouterContext ctx, DHSessionKeyBuilder.Factory dh) {
         super(ctx);
+        _dhFactory = dh;
         _log = ctx.logManager().getLog(UDPTransport.class);
         _peersByIdent = new ConcurrentHashMap(128);
         _peersByRemoteHost = new ConcurrentHashMap(128);
@@ -227,7 +230,6 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         _context.statManager().createRateStat("udp.proactiveReestablish", "How long a session was idle for when we proactively reestablished it", "udp", RATES);
         _context.statManager().createRateStat("udp.dropPeerDroplist", "How many peers currently have their packets dropped outright when a new peer is added to the list?", "udp", RATES);
         _context.statManager().createRateStat("udp.dropPeerConsecutiveFailures", "How many consecutive failed sends to a peer did we attempt before giving up and reestablishing a new session (lifetime is inactivity perood)", "udp", RATES);
-        __instance = this;
 
         SimpleScheduler.getInstance().addPeriodicEvent(new PingIntroducers(), MIN_EXPIRE_TIMEOUT * 3 / 4);
     }
@@ -1623,24 +1625,13 @@ public class UDPTransport extends TransportImpl implements TimedWeightedPriority
         return skews;
     }
     
-    private static UDPTransport __instance;
-    /** **internal, do not use** */
-    public static final UDPTransport _instance() { return __instance; }
-    /** **internal, do not use** return the peers (Hash) of active peers. */
-    public List<Hash> _getActivePeers() {
-        List<Hash> peers = new ArrayList(128);
-        peers.addAll(_peersByIdent.keySet());
-        
-        long now = _context.clock().now();
-        for (Iterator<Hash> iter = peers.iterator(); iter.hasNext(); ) {
-            Hash peer = iter.next();
-            PeerState state = getPeerState(peer);
-            if (now-state.getLastReceiveTime() > 5*60*1000)
-                iter.remove(); // don't include old peers
-        }
-        return peers;
+    /**
+     *  @since 0.9
+     */
+    DHSessionKeyBuilder getDHBuilder() {
+        return _dhFactory.getBuilder();
     }
-    
+
     private static final int FLAG_ALPHA = 0;
     private static final int FLAG_IDLE_IN = 1;
     private static final int FLAG_IDLE_OUT = 2;

@@ -12,7 +12,6 @@ import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 
 import net.i2p.I2PAppContext;
-import net.i2p.crypto.DHSessionKeyBuilder;
 import net.i2p.data.Base64;
 import net.i2p.data.Certificate;
 import net.i2p.data.DataFormatException;
@@ -27,6 +26,7 @@ import net.i2p.data.SigningPrivateKey;
 import net.i2p.data.SigningPublicKey;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
+import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import net.i2p.util.Log;
 
 /**
@@ -70,12 +70,12 @@ import net.i2p.util.Log;
  *
  */
 class EstablishState {
-    private RouterContext _context;
-    private Log _log;
+    private final RouterContext _context;
+    private final Log _log;
 
     // bob receives (and alice sends)
-    private byte _X[];
-    private byte _hX_xor_bobIdentHash[];
+    private final byte _X[];
+    private final byte _hX_xor_bobIdentHash[];
     private int _aliceIdentSize;
     /** contains the decrypted aliceIndexSize + aliceIdent + tsA + padding + aliceSig */
     private ByteArrayOutputStream _sz_aliceIdent_tsA_padding_aliceSig;
@@ -100,7 +100,7 @@ class EstablishState {
      */
     private int _curEncryptedOffset;
     /** decryption buffer */
-    private byte _curDecrypted[];
+    private final byte _curDecrypted[];
 
     /** bytes received so far */
     private int _received;
@@ -109,10 +109,10 @@ class EstablishState {
 
     private byte _extra[];
 
-    private DHSessionKeyBuilder _dh;
+    private final DHSessionKeyBuilder _dh;
 
-    private NTCPTransport _transport;
-    private NTCPConnection _con;
+    private final NTCPTransport _transport;
+    private final NTCPConnection _con;
     private boolean _corrupt;
     /** error causing the corruption */
     private String _err;
@@ -127,15 +127,14 @@ class EstablishState {
         _log = ctx.logManager().getLog(getClass());
         _transport = transport;
         _con = con;
-        _dh = new DHSessionKeyBuilder();
+        _dh = _transport.getDHBuilder();
+        _hX_xor_bobIdentHash = new byte[Hash.HASH_LENGTH];
         if (_con.isInbound()) {
             _X = new byte[256];
-            _hX_xor_bobIdentHash = new byte[Hash.HASH_LENGTH];
             _sz_aliceIdent_tsA_padding_aliceSig = new ByteArrayOutputStream(512);
         } else {
             _X = _dh.getMyPublicValueBytes();
             _Y = new byte[256];
-            _hX_xor_bobIdentHash = new byte[Hash.HASH_LENGTH];
             byte hx[] = ctx.sha().calculateHash(_X).getData();
             DataHelper.xor(hx, 0, con.getRemotePeer().calculateHash().getData(), 0, _hX_xor_bobIdentHash, 0, hx.length);
         }

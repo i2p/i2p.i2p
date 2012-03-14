@@ -31,13 +31,14 @@ import net.i2p.router.transport.CommSystemFacadeImpl;
 import net.i2p.router.transport.Transport;
 import net.i2p.router.transport.TransportBid;
 import net.i2p.router.transport.TransportImpl;
+import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import net.i2p.util.Addresses;
 import net.i2p.util.ConcurrentHashSet;
 import net.i2p.util.Log;
 import net.i2p.util.Translate;
 
 /**
- *
+ *  The NIO TCP transport
  */
 public class NTCPTransport extends TransportImpl {
     private final Log _log;
@@ -64,6 +65,7 @@ public class NTCPTransport extends TransportImpl {
     public static final String PROP_BIND_INTERFACE = "i2np.ntcp.bindInterface";
 
     private final NTCPSendFinisher _finisher;
+    private final DHSessionKeyBuilder.Factory _dhFactory;
     private long _lastBadSkew;
     private static final long[] RATES = { 10*60*1000 };
 
@@ -71,9 +73,9 @@ public class NTCPTransport extends TransportImpl {
     //private static final String THINSP = "&thinsp;/&thinsp;";
     private static final String THINSP = " / ";
 
-    public NTCPTransport(RouterContext ctx) {
+    public NTCPTransport(RouterContext ctx, DHSessionKeyBuilder.Factory dh) {
         super(ctx);
-
+        _dhFactory = dh;
         _log = ctx.logManager().getLog(getClass());
 
         _context.statManager().createRateStat("ntcp.sendTime", "Total message lifetime when sent completely", "ntcp", RATES);
@@ -584,6 +586,13 @@ public class NTCPTransport extends TransportImpl {
     net.i2p.router.transport.ntcp.Writer getWriter() { return _writer; }
     public String getStyle() { return STYLE; }
     EventPumper getPumper() { return _pumper; }
+
+    /**
+     *  @since 0.9
+     */
+    DHSessionKeyBuilder getDHBuilder() {
+        return _dhFactory.getBuilder();
+    }
 
     /**
      * how long from initial connection attempt (accept() or connect()) until

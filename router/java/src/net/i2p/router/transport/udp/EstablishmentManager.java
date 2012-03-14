@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.i2p.crypto.DHSessionKeyBuilder;
 import net.i2p.data.Base64;
 import net.i2p.data.Hash;
 import net.i2p.data.RouterAddress;
@@ -22,6 +21,7 @@ import net.i2p.router.OutNetMessage;
 import net.i2p.router.Router;
 import net.i2p.router.RouterContext;
 import net.i2p.router.networkdb.kademlia.FloodfillNetworkDatabaseFacade;
+import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import net.i2p.util.I2PThread;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleScheduler;
@@ -212,7 +212,7 @@ class EstablishmentManager {
                     }
                     state = new OutboundEstablishState(_context, remAddr, port, 
                                                        msg.getTarget().getIdentity(), 
-                                                       sessionKey, addr);
+                                                       sessionKey, addr, _transport.getDHBuilder());
                     OutboundEstablishState oldState = _outboundStates.putIfAbsent(to, state);
                     boolean isNew = oldState == null;
                     if (!isNew)
@@ -303,7 +303,8 @@ class EstablishmentManager {
                 }
                 if (!_transport.allowConnection())
                     return; // drop the packet
-                state = new InboundEstablishState(_context, from.getIP(), from.getPort(), _transport.getLocalPort());
+                state = new InboundEstablishState(_context, from.getIP(), from.getPort(), _transport.getLocalPort(),
+                                                  _transport.getDHBuilder());
                 state.receiveSessionRequest(reader.getSessionRequestReader());
                 InboundEstablishState oldState = _inboundStates.putIfAbsent(from, state);
                 isNew = oldState == null;

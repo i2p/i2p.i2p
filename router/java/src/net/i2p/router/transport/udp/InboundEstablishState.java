@@ -3,7 +3,6 @@ package net.i2p.router.transport.udp;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import net.i2p.crypto.DHSessionKeyBuilder;
 import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataFormatException;
@@ -12,6 +11,7 @@ import net.i2p.data.RouterIdentity;
 import net.i2p.data.SessionKey;
 import net.i2p.data.Signature;
 import net.i2p.router.RouterContext;
+import net.i2p.router.transport.crypto.DHSessionKeyBuilder;
 import net.i2p.util.Addresses;
 import net.i2p.util.Log;
 
@@ -29,8 +29,7 @@ class InboundEstablishState {
     private byte _receivedX[];
     private byte _bobIP[];
     private final int _bobPort;
-    // try to fix NPE in getSentY() ?????
-    private volatile DHSessionKeyBuilder _keyBuilder;
+    private final DHSessionKeyBuilder _keyBuilder;
     // SessionCreated message
     private byte _sentY[];
     private final byte _aliceIP[];
@@ -68,7 +67,8 @@ class InboundEstablishState {
     /** we are explicitly failing it */
     public static final int STATE_FAILED = 5;
     
-    public InboundEstablishState(RouterContext ctx, byte remoteIP[], int remotePort, int localPort) {
+    public InboundEstablishState(RouterContext ctx, byte remoteIP[], int remotePort, int localPort,
+                                 DHSessionKeyBuilder dh) {
         _context = ctx;
         _log = ctx.logManager().getLog(InboundEstablishState.class);
         _aliceIP = remoteIP;
@@ -77,6 +77,7 @@ class InboundEstablishState {
         _bobPort = localPort;
         _currentState = STATE_UNKNOWN;
         _establishBegin = ctx.clock().now();
+        _keyBuilder = dh;
     }
     
     public synchronized int getState() { return _currentState; }
@@ -106,7 +107,6 @@ class InboundEstablishState {
     
     public synchronized void generateSessionKey() throws DHSessionKeyBuilder.InvalidPublicParameterException {
         if (_sessionKey != null) return;
-        _keyBuilder = new DHSessionKeyBuilder();
         _keyBuilder.setPeerPublicValue(_receivedX);
         _sessionKey = _keyBuilder.getSessionKey();
         ByteArray extra = _keyBuilder.getExtraBytes();
@@ -130,7 +130,6 @@ class InboundEstablishState {
     
     public synchronized byte[] getSentY() {
         if (_sentY == null)
-            // Rare NPE seen here...
             _sentY = _keyBuilder.getMyPublicValueBytes();
         return _sentY;
     }
