@@ -57,6 +57,7 @@ import net.i2p.util.SimpleByteCache;
 public class ElGamalEngine {
     private final Log _log;
     private final I2PAppContext _context;
+    private final YKGenerator _ykgen;
     
     /** 
      * The ElGamal engine should only be constructed and accessed through the 
@@ -73,28 +74,26 @@ public class ElGamalEngine {
                                              new long[] { 60 * 60 * 1000});
         _context = context;
         _log = context.logManager().getLog(ElGamalEngine.class);
+        _ykgen = new YKGenerator(context);
     }
 
     /**
-     *  Note that this stops the singleton precalc thread.
-     *  You don't want to do this if there are multiple routers in the JVM.
-     *  Fix this if you care. See Router.shutdown().
+     *  Note that this stops the precalc thread and it cannot be restarted.
      *  @since 0.8.8
      */
     public void shutdown() {
-        YKGenerator.shutdown();
+        _ykgen.shutdown();
     }
 
     /**
-     *  Only required if shutdown() previously called.
+     *  This is now a noop. Cannot be restarted.
      *  @since 0.8.8
      */
-    public static void restart() {
-        YKGenerator.restart();
+    public void restart() {
     }
 
     private BigInteger[] getNextYK() {
-        return YKGenerator.getNextYK();
+        return _ykgen.getNextYK();
     }
 
     /** encrypt the data to the public key
