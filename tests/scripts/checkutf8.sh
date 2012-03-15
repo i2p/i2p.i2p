@@ -19,7 +19,7 @@ DIRS="\
   apps/susimail/locale \
   apps/desktopgui/locale \
   debian/po \
-  installer/resources/eepsite.help/help \
+  installer/resources/eepsite/docroot/help \
   installer/resources/initialNews \
   installer/resources/proxy \
   installer/resources/readme \
