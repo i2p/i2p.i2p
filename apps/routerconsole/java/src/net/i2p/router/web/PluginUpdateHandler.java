@@ -121,27 +121,23 @@ public class PluginUpdateHandler extends UpdateHandler {
         @Override
         protected void update() {
             _updated = false;
-            updateStatus("<b>" + _("Downloading plugin from {0}", _xpi2pURL) + "</b>");
             if(_xpi2pURL.startsWith("file://")) {
+                updateStatus("<b>" + _("Attempting to copy plugin from {0}", _xpi2pURL) + "</b>");
                 // strip off "file://"
                 String xpi2pfile = _xpi2pURL.substring(7);
-                if(xpi2pfile.isEmpty()) {
+                if(xpi2pfile.length() == 0) { // This is actually what String.isEmpty() does, so it should be safe.
                         statusDone("<b>" + _("No file specified {0}", _xpi2pURL) + "</b>");
                 } else {
-                    try {
-                        // copy the contents of from to _updateFile
-                        long alreadyTransferred = (new File(xpi2pfile)).getCanonicalFile().length();
-                        if(FileUtil.copy((new File(xpi2pfile)).getCanonicalPath(), _updateFile, true, false)) {
-                            transferComplete(alreadyTransferred, alreadyTransferred, 0L, _xpi2pURL, _updateFile, false);
-                        } else {
-                            statusDone("<b>" + _("File copy failed {0}", _xpi2pURL) + "</b>");
-                        }
-                    } catch (Throwable t) {
-                        _log.error("Error copying plugin {0}", t);
+                    // copy the contents of from to _updateFile
+                    long alreadyTransferred = (new File(xpi2pfile)).getAbsoluteFile().length();
+                    if(FileUtil.copy((new File(xpi2pfile)).getAbsolutePath(), _updateFile, true, false)) {
+                        transferComplete(alreadyTransferred, alreadyTransferred, 0L, _xpi2pURL, _updateFile, false);
+                    } else {
+                        statusDone("<b>" + _("Failed to copy file {0}", _xpi2pURL) + "</b>");
                     }
-
                 }
             } else {
+                updateStatus("<b>" + _("Downloading plugin from {0}", _xpi2pURL) + "</b>");
                 // use the same settings as for updater
                 boolean shouldProxy = Boolean.valueOf(_context.getProperty(ConfigUpdateHandler.PROP_SHOULD_PROXY, ConfigUpdateHandler.DEFAULT_SHOULD_PROXY)).booleanValue();
                 String proxyHost = _context.getProperty(ConfigUpdateHandler.PROP_PROXY_HOST, ConfigUpdateHandler.DEFAULT_PROXY_HOST);
@@ -177,6 +173,7 @@ public class PluginUpdateHandler extends UpdateHandler {
 
         @Override
         public void transferComplete(long alreadyTransferred, long bytesTransferred, long bytesRemaining, String url, String outputFile, boolean notModified) {
+            boolean update = false;
             updateStatus("<b>" + _("Plugin downloaded") + "</b>");
             File f = new File(_updateFile);
             File appDir = new SecureDirectory(_context.getConfigDir(), PLUGIN_DIR);
@@ -406,7 +403,7 @@ public class PluginUpdateHandler extends UpdateHandler {
                         _log.error("Error stopping plugin " + appName, e);
                     }
                 }
-
+                update = true;
             } else {
                 if (Boolean.valueOf(props.getProperty("update-only")).booleanValue()) {
                     to.delete();
@@ -428,11 +425,10 @@ public class PluginUpdateHandler extends UpdateHandler {
             }
             _updated = true;
             to.delete();
-            if (Boolean.valueOf(props.getProperty("dont-start-at-install")).booleanValue()) {
-                if (Boolean.valueOf(props.getProperty("router-restart-required")).booleanValue())
-                    statusDone("<b>" + _("Plugin {0} installed, router restart required", appName) + "</b>");
-                else {
-                    statusDone("<b>" + _("Plugin {0} installed", appName) + "</b>");
+            // install != update. Changing the user's settings like this is probabbly a bad idea.
+            if (Boolean.valueOf( props.getProperty("dont-start-at-install")).booleanValue()) {
+                statusDone("<b>" + _("Plugin {0} installed", appName) + "</b>");
+                if(!update) {
                     Properties pluginProps = PluginStarter.pluginProperties();
                     pluginProps.setProperty(PluginStarter.PREFIX + appName + PluginStarter.ENABLED, "false");
                     PluginStarter.storePluginProperties(pluginProps);

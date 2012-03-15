@@ -1,3 +1,15 @@
+2012-03-15 sponge
+  * Plugins:
+    - String.isEmpty() [ java 6 ] -> (String.length() == 0) [ java 5 ]
+    - for a file: URL, use "Attempting to copy plugin from" message
+    - s/{0}// on non-translated string
+    - grammar: "File copy failed {0}" -> "Failed to copy file from {0}"
+    - use the context provided to get startup time
+    - getCanonicalPath() -> getAbsolutePath()
+    - install != update. Don't change the user's settings, and don't restart
+      it on an update if "dont-start-at-install". This gives the same
+      functionality as before.
+
 2012-03-14 zzz
   * Blockfile, i2psnark: Remove static logs
   * DHSessionKeyBuilder:

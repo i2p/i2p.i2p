@@ -201,10 +201,7 @@ public class PluginStarter implements Runnable {
         File pluginUpdate = new File(ctx.getConfigDir(), PluginUpdateHandler.PLUGIN_DIR + '/' + appName + "/app.xpi2p.zip" );
         if(pluginUpdate.exists()) {
             // Compare the start time of the router with the plugin.
-            List<RouterContext> contexts = RouterContext.listContexts();
-            if ( (contexts == null) || (contexts.isEmpty()) )
-                throw new IllegalStateException("No contexts. This is usually because the router is either starting up or shutting down.");
-            if(contexts.get(0).router().getWhenStarted() > pluginUpdate.lastModified()) {
+            if(ctx.router().getWhenStarted() > pluginUpdate.lastModified()) {
                 if (!FileUtil.extractZip(pluginUpdate, pluginDir)) {
                     pluginUpdate.delete();
                     String foo = "Plugin '" + appName + "' failed to update! File '" + pluginUpdate +"' deleted. You may need to remove and install the plugin again.";
