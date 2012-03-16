@@ -32,6 +32,7 @@ import net.i2p.client.naming.NamingService;
 import net.i2p.client.streaming.I2PSocket;
 import net.i2p.client.streaming.I2PSocketManager;
 import net.i2p.client.streaming.I2PSocketOptions;
+import net.i2p.crypto.SHA256Generator;
 import net.i2p.data.Base32;
 import net.i2p.data.Base64;
 import net.i2p.data.DataFormatException;
@@ -981,8 +982,14 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
             return;
         byte[] header = getErrorPage("ahelper-new", ERR_AHELPER_NEW);
         out.write(header);
-        out.write(("<table><tr><td class=\"mediumtags\" align=\"right\">" + _("Host") + "</td><td class=\"mediumtags\">" + destination + "</td></tr>\n" +
-                   "<tr><td class=\"mediumtags\" align=\"right\">" + _("Destination") + "</td><td>" +
+        out.write(("<table><tr><td class=\"mediumtags\" align=\"right\">" + _("Host") +
+                   "</td><td class=\"mediumtags\">" + destination + "</td></tr>\n").getBytes());
+        try {
+            String b32 = Base32.encode(SHA256Generator.getInstance().calculateHash(Base64.decode(ahelperKey)).getData());
+            out.write(("<tr><td class=\"mediumtags\" align=\"right\">" + _("Base 32") + "</td>" +
+                       "<td><a href=\"http://" + b32 + ".b32.i2p/\">" + b32 + ".b32.i2p</a></td></tr>").getBytes());
+        } catch (Exception e) {}
+        out.write(("<tr><td class=\"mediumtags\" align=\"right\">" + _("Destination") + "</td><td>" +
                    "<textarea rows=\"1\" style=\"height: 4em; min-width: 0; min-height: 0;\" cols=\"70\" wrap=\"off\" readonly=\"readonly\" >" +
                    ahelperKey + "</textarea></td></tr></table>\n" +
                    "<hr><div class=\"formaction\">"+
@@ -1179,7 +1186,7 @@ public class I2PTunnelHTTPClient extends I2PTunnelHTTPClientBase implements Runn
                         out.write(jurl.getBytes());
                         out.write(uri.getBytes());
                         out.write("\">".getBytes());
-                        out.write(jurl.getBytes());
+                        out.write(jurl.substring(7).getBytes());
                         out.write(uri.getBytes());
                         out.write("</a>\n".getBytes());
                     }
