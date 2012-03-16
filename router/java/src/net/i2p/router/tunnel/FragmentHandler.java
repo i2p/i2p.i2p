@@ -106,7 +106,7 @@ class FragmentHandler {
     public FragmentHandler(RouterContext context, DefragmentedReceiver receiver) {
         _context = context;
         _log = context.logManager().getLog(FragmentHandler.class);
-        _fragmentedMessages = new HashMap(8);
+        _fragmentedMessages = new HashMap(16);
         _receiver = receiver;
         // all createRateStat in TunnelDispatcher
     }
@@ -351,8 +351,8 @@ class FragmentHandler {
         int size = (int)DataHelper.fromLong(preprocessed, offset, 2);
         offset += 2;
         
-        FragmentedMessage msg = null;
         if (fragmented) {
+            FragmentedMessage msg;
             synchronized (_fragmentedMessages) {
                 msg = _fragmentedMessages.get(Long.valueOf(messageId));
                 if (msg == null) {
@@ -360,11 +360,7 @@ class FragmentHandler {
                     _fragmentedMessages.put(Long.valueOf(messageId), msg);
                 }
             }
-        } else {
-            msg = new FragmentedMessage(_context);
-        }
-        
-        if (fragmented) {
+
             // synchronized is required, fragments may be arriving in different threads
             synchronized(msg) {
                 boolean ok = msg.receive(messageId, preprocessed, offset, size, false, router, tunnelId);
@@ -387,18 +383,17 @@ class FragmentHandler {
                     }
                 }
             }
-        } else {        
-            // synchronized not required if !fragmented
-            boolean ok = msg.receive(messageId, preprocessed, offset, size, true, router, tunnelId);
-            if (!ok) return -1;
+        } else {
+            // Unfragmented
+            // synchronized not required
             // always complete, never an expire event
-            receiveComplete(msg);
+            receiveComplete(preprocessed, offset, size, router, tunnelId);
         }
         
         offset += size;
         
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("Handling finished message " + msg.getMessageId() + " at offset " + offset);
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("Handling finished message " + msg.getMessageId() + " at offset " + offset);
         return offset;
     }
     
@@ -462,6 +457,7 @@ class FragmentHandler {
         return offset;
     }
     
+    
     private void receiveComplete(FragmentedMessage msg) {
         if (msg == null)
             return;
@@ -500,6 +496,37 @@ class FragmentHandler {
         }
     }
 
+    /**
+     *  Zero-copy reception of an unfragmented message
+     *  @since 0.9
+     */
+    private void receiveComplete(byte[] data, int offset, int len, Hash router, TunnelId tunnelId) {
+        _completed++;
+        try {
+            if (_log.shouldLog(Log.DEBUG))
+                _log.debug("RECV unfrag(" + len + ')');
+
+            // TODO read in as unknown message for outbound tunnels,
+            // since this will just be packaged in a TunnelGatewayMessage.
+            // Not a big savings since most everything is a GarlicMessage
+            // and so the readMessage() call is fast.
+            // The unencrypted messages at the OBEP are (V)TBMs
+            // and perhaps an occasional DatabaseLookupMessage
+            I2NPMessageHandler h = new I2NPMessageHandler(_context);
+            h.readMessage(data, offset, len);
+            I2NPMessage m = h.lastRead();
+            noteReception(m.getUniqueId(), 0, "complete: ");// + msg.toString());
+            noteCompletion(m.getUniqueId());
+            _receiver.receiveComplete(m, router, tunnelId);
+        } catch (I2NPMessageException ime) {
+            if (_log.shouldLog(Log.WARN)) {
+                _log.warn("Error receiving unfragmented message (corrupt?)", ime);
+                _log.warn("DUMP:\n" + HexDump.dump(data, offset, len));
+                _log.warn("RAW:\n" + Base64.encode(data, offset, len));
+            }
+        }
+    }
+
     protected void noteReception(long messageId, int fragmentId, Object status) {}
     protected void noteCompletion(long messageId) {}
     protected void noteFailure(long messageId, String status) {}
@@ -523,10 +550,12 @@ class FragmentHandler {
     }
     
     private class RemoveFailed implements SimpleTimer.TimedEvent {
-        private FragmentedMessage _msg;
+        private final FragmentedMessage _msg;
+
         public RemoveFailed(FragmentedMessage msg) {
             _msg = msg;
         }
+
         public void timeReached() {
             boolean removed = false;
             synchronized (_fragmentedMessages) {

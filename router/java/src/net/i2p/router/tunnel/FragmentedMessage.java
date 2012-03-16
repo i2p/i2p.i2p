@@ -1,18 +1,10 @@
 package net.i2p.router.tunnel;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import net.i2p.I2PAppContext;
-import net.i2p.data.Base64;
 import net.i2p.data.ByteArray;
 import net.i2p.data.DataHelper;
 import net.i2p.data.Hash;
 import net.i2p.data.TunnelId;
-import net.i2p.data.i2np.DataMessage;
-import net.i2p.data.i2np.I2NPMessage;
-import net.i2p.data.i2np.I2NPMessageHandler;
 import net.i2p.util.ByteCache;
 import net.i2p.util.Log;
 import net.i2p.util.SimpleTimer;
@@ -30,7 +22,7 @@ class FragmentedMessage {
     private long _messageId;
     private Hash _toRouter;
     private TunnelId _toTunnel;
-    private ByteArray _fragments[];
+    private final ByteArray _fragments[];
     private boolean _lastReceived;
     private int _highFragmentNum;
     private final long _createdOn;
@@ -93,9 +85,9 @@ class FragmentedMessage {
         ba.setValid(length);
         ba.setOffset(0);
         //System.arraycopy(payload, offset, ba.getData(), 0, length);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("fragment[" + fragmentNum + "/" + offset + "/" + length + "]: " 
-                       + Base64.encode(ba.getData(), ba.getOffset(), ba.getValid()));
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("fragment[" + fragmentNum + "/" + offset + "/" + length + "]: " 
+        //               + Base64.encode(ba.getData(), ba.getOffset(), ba.getValid()));
 
         _fragments[fragmentNum] = ba;
         _lastReceived = _lastReceived || isLast;
@@ -145,9 +137,9 @@ class FragmentedMessage {
         ba.setValid(length);
         ba.setOffset(0);
         //System.arraycopy(payload, offset, ba.getData(), 0, length);
-        if (_log.shouldLog(Log.DEBUG))
-            _log.debug("fragment[0/" + offset + "/" + length + "]: " 
-                       + Base64.encode(ba.getData(), ba.getOffset(), ba.getValid()));
+        //if (_log.shouldLog(Log.DEBUG))
+        //    _log.debug("fragment[0/" + offset + "/" + length + "]: " 
+        //               + Base64.encode(ba.getData(), ba.getOffset(), ba.getValid()));
         _fragments[0] = ba;
         _lastReceived = _lastReceived || isLast;
         _toRouter = toRouter;
@@ -160,6 +152,7 @@ class FragmentedMessage {
     public long getMessageId() { return _messageId; }
     public Hash getTargetRouter() { return _toRouter; }
     public TunnelId getTargetTunnel() { return _toTunnel; }
+
     public int getFragmentCount() { 
         int found = 0;
         for (int i = 0; i < _fragments.length; i++)
@@ -204,6 +197,7 @@ class FragmentedMessage {
     public boolean getReleased() { return _completed; }
     
     
+/****
     public void writeComplete(OutputStream out) throws IOException {
         if (_releasedAfter > 0) {
              RuntimeException e = new RuntimeException("use after free in FragmentedMessage");
@@ -216,7 +210,10 @@ class FragmentedMessage {
         }
         _completed = true;
     }
-    public void writeComplete(byte target[], int offset) {
+****/
+
+    /** */
+    private void writeComplete(byte target[], int offset) {
         if (_releasedAfter > 0) {
              RuntimeException e = new RuntimeException("use after free in FragmentedMessage");
              _log.error("FM writeComplete() 2", e);
@@ -229,6 +226,7 @@ class FragmentedMessage {
         }
         _completed = true;
     }
+
     public byte[] toByteArray() {
         synchronized (this) {
             if (_releasedAfter > 0) return null;
