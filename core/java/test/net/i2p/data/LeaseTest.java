@@ -28,7 +28,8 @@ public class LeaseTest extends StructureTest {
         return lease; 
     }
     public DataStructure createStructureToRead() { return new Lease(); }
-    
+
+    /* TODO: Delete this if Lease.getNumSuccess() / getNumFailure() get deleted
     public void testNumSuccessFail() throws Exception{
         Lease lease = new Lease();
         lease.setEndDate(new Date(1000*60*2));
@@ -40,7 +41,8 @@ public class LeaseTest extends StructureTest {
         lease.getNumSuccess();
         lease.getNumFailure();
     }
-    
+    */
+
     public void testExpiration() throws Exception{
         Lease lease = new Lease();
         assertTrue(lease.isExpired());
