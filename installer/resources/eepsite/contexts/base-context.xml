@@ -21,6 +21,24 @@ to serve static html files and images.
       </Map>
     </Arg>
   </Call>
+  <Call name="setMimeTypes">
+    <Arg>
+      <New class="org.mortbay.jetty.MimeTypes">
+        <Call name="addMimeMapping">
+          <Arg>sud</Arg>
+          <Arg>application/zip</Arg>
+        </Call>
+        <Call name="addMimeMapping">
+          <Arg>su2</Arg>
+          <Arg>application/zip</Arg>
+        </Call>
+        <Call name="addMimeMapping">
+          <Arg>xpi2p</Arg>
+          <Arg>application/zip</Arg>
+        </Call>
+      </New>
+    </Arg>
+  </Call>
   <Call name="addServlet">
     <Arg>org.mortbay.jetty.servlet.DefaultServlet</Arg>
     <Arg>/</Arg>
