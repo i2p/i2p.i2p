@@ -139,6 +139,12 @@
             </batchtest>
             <formatter type="xml"/>
         </junit>
+        <!-- fetch the real hostname of this machine -->
+        <exec executable="hostname" outputproperty="host.name"/>
+        <!-- set if unset -->
+        <property name="host.fakename" value="i2ptester" />
+        <!-- replace hostname that junit inserts into reports with fake one -->
+        <replace dir="../../reports/core/junit/" token="${host.name}" value="${host.fakename}"/>
     </target>
     <!-- test reports -->
     <target name="junit.report">
