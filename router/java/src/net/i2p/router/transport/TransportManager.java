@@ -138,7 +138,8 @@ public class TransportManager implements TransportEventListener {
     }
 
     public void startListening() {
-        _dhThread.start();
+        if (_dhThread.getState() == Thread.State.NEW)
+            _dhThread.start();
         // For now, only start UPnP if we have no publicly-routable addresses
         // so we don't open the listener ports to the world.
         // Maybe we need a config option to force on? Probably not.
