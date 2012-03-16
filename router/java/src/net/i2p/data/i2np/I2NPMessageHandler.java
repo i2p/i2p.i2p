@@ -90,6 +90,9 @@ public class I2NPMessageHandler {
         return lastRead();
     }
 
+    /**
+     *  Result is retreived with lastRead()
+     */
     public int readMessage(byte data[], int offset) throws I2NPMessageException {
         return readMessage(data, offset, data.length - offset);
     }
@@ -97,6 +100,8 @@ public class I2NPMessageHandler {
     /**
      *  Set a limit on the max to read from the data buffer, so that
      *  we can use a large buffer but prevent the reader from reading off the end.
+     *
+     *  Result is retreived with lastRead()
      *
      *  @param maxLen read no more than this many bytes from data starting at offset, even if it is longer
      *                must be at least 16
