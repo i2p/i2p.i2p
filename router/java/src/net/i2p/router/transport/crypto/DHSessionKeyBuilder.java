@@ -198,9 +198,14 @@ public class DHSessionKeyBuilder {
 
     /**
      * Specify the value given by the peer for use in the session key negotiation
-     *
+     * @throws IllegalStateException if already set
      */
-    public void setPeerPublicValue(BigInteger peerVal) throws InvalidPublicParameterException {
+    public synchronized void setPeerPublicValue(BigInteger peerVal) throws InvalidPublicParameterException {
+        if (_peerValue != null) {
+            if (!_peerValue.equals(peerVal))
+                throw new IllegalStateException();
+            return;
+        }
         validatePublic(peerVal);
         _peerValue = peerVal;
     }
